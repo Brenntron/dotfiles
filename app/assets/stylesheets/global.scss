@@ -6372,15 +6372,27 @@ h2 {
       label {
         font-size: 20px;
         padding-right: 20px;
+        padding-top: 5px;
+        margin-right: 10px;
         border-right: 1px solid #e0e0e0;
       }
 
-      button {
-        background-color: $content-tab-color;
+      .no-right-border {
+        border-right: none;
+      }
+      input {
+        color: red;
+        width: 0;
+        overflow: hidden;
         border: none;
-        font-size: 12px;
+        background: transparent;
+      }
+
+      button {
+        border-radius: 2px;
+        background-color: #54708c;
         margin-left: 15px;
-        padding: 5px 5px 5px 25px;
+        padding: 8px 20px;
       }
 
       .toolbar-button {
@@ -6389,14 +6401,14 @@ h2 {
     }
 
     .dashboard-time-ticket {
+
       .button-wrapper {
-        width: 382px;
-        text-align: left;
-        float: right;
-        background-color: $content-tab-color;
+        text-align: right;
 
         button {
-          background-color: $content-tab-color;
+          background-color: #54708c;
+          padding: 8px 20px;
+          border-radius: 2px;
           border: none;
         }
 
@@ -6590,6 +6602,11 @@ h2 {
   width: 100%;
   display: inline-flex;
   justify-content: space-between;
+
+  .right-vertical-separator {
+    padding-right: 20px;
+    border-right: 1px solid gray;
+  }
 
   label {
     background-repeat: no-repeat;

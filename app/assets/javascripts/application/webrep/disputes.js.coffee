@@ -1647,78 +1647,24 @@ $ ->
         'maxWidth': 500
       $(this).tooltipster 'show'
     return
+    
 
-#$ ->
-#  $(document).ready ->
-#    data = [
-#      {
-#        case_id: '12345'
-#        dispute: 'paragon.downloads.com'
-#        time_to_close: '2018-08-08 13:59:10'
-#        empty: '',
-#        status: 'E'
-#      }
-#      {
-#        case_id: '12345'
-#        dispute: 'paragon.downloads.com'
-#        time_to_close: '2018-08-08 13:59:10'
-#        empty: '',
-#        status: 'EW'
-#      }
-#      {
-#        case_id: '12345'
-#        dispute: 'paragon.downloads.com'
-#        time_to_close: '2018-08-08 13:59:10'
-#        empty: '',
-#        status: 'W'
-#      }
-#    ]
-#    closeTicketTable = $('#close-ticket-table').DataTable(
-#      order: [ [
-#        0
-#        'desc'
-#      ] ]
-#      dom: '<"datatable-top-tools"lf>t<ip>'
-#      columnDefs: [
-#        {
-#          targets: [
-#            0
-#          ]
-#          orderable: false
-#          searchable: false
-#        }
-#        {
-#          targets: [ 0 ]
-#          className: 'expandable-row-column'
-#        }
-#      ]
-#      columns: [
-#        {
-#          data: null
-#          defaultContent: '<button class="expand-row-button-inline"></button>'
-#        }
-#        { data: 'case_id' }
-#        { data: 'empty' }
-#        {
-#          data: 'status'
-#          render: (data) ->
-#            if data == 'E'
-#              '<label class="status_e">' + data + '</label>'
-#            else if data == 'W'
-#              '<label class="status_w">' + data + '</label>'
-#            else if data == 'EW'
-#              '<label class="status_ew">' + data + '</label>'
-#            else
-#              ''
-#        }
-#        { data: 'dispute' }
-#        { data: 'empty' }
-#        { data: 'time_to_close' }
-#      ]
-#    )
-#    closeTicketTable.clear();
-#    closeTicketTable.rows.add(data);
-#    closeTicketTable.draw();
+$ ->
+  $('#tickets_date_range').daterangepicker()
+  $('button.icon-calendar').click ->
+    console.log ('you clicked me the calendar icon or button')
+    $('#tickets_date_range').trigger 'click'
+  return
+
+
+$ ->
+  $('#tickets_date_range').on 'apply.daterangepicker', (ev, picker) ->
+    start = picker.startDate.format('MMMM/DD/YYYY').split('/')
+    end = picker.endDate.format('MMMM/DD/YYYY').split('/')
+    val = start[0] + ' ' + start[1] + ', ' + start[2] + ' to ' + end[0] + ' ' + end[1] + ', ' + end[2]
+    $('.dashboard-time label')[0].innerHTML = val
+    return
+  return
 
 #    If user changes buttons from initial status, enable the submit button
 #   TODO add this check in later that only allows user to submit if there have been changes made
