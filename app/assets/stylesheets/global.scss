@@ -1751,6 +1751,7 @@ a.static-nav-item {
 .icon-copycat {background-image: url(image_path('icon_copycat.svg'));}
 .icon-paste {background-image: url(image_path('icon_paste.svg'));}
 .icon-clear {background-image: url(image_path('icon_clear.svg'));}
+.icon-submit{background-image: url("icon_submit_arrow.svg")}
 
 .saved-search {
   text-transform: none !important;
@@ -6486,11 +6487,16 @@ h2 {
     width: 100%;
     padding: 5px 20px 20px 20px;
     box-shadow: 0 2px 4px 0 rgba(0, 0, 0, 0.2);
+    -webkit-transition: all 5s ease-in-out;
+    -moz-transition: all 5s ease-in-out;
+    -o-transition: all 5s ease-in-out;
+    -ms-transition: all 5s ease-in-out;
+    transition: all 5s ease-in-out;
 
     .card-body {
       display: inline-flex;
       width: 100%;
-      margin: 5px 0 0 0;
+      margin: 0;
 
       input {
         width: 80%;
@@ -6500,17 +6506,10 @@ h2 {
       button {
         width: 20%;
         background-color: $primary-section-color;
-        font-size: 8px;
-        background-image: url(image_path('icon_submit_arrow.svg'));
-        background-repeat: no-repeat;
-        background-size: 15px;
-        background-position-x: 10px;
-        background-position-y: center;
         margin: 0 0 0 10px;
-        padding: 10px 5px 10px 30px;
+        font-size: 9pt;
+        padding: 10px 10px 10px 25px;
         color: white;
-        border: none;
-        border-radius: 2px;
       }
     }
   }
@@ -6603,9 +6602,6 @@ h2 {
 
       li:last-child {
         border: none;
-        button {
-          //float: right;
-        }
       }
     }
   }
@@ -6674,6 +6670,7 @@ h2 {
 .domain-column {
   min-width: 300px;
 }
+
 #copycat_dialog {
   overflow: visible;
 

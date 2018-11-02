@@ -50,10 +50,10 @@
 
     .col-xs-6.temp-spacer
       .card
-        .label.content-label-sm Comment
+        .content-label-sm Comment
         .card-body
           %input.text_field
-          %button Submit Changes
+          %button.toolbar-button.icon-submit Submit Changes
 
   .row
     .col-xs-12
@@ -70,7 +70,6 @@
             %th WBRS Score
             %th Categories
 
-
 #copycat_dialog{title: 'CopyCat Tool'}
   .dialog-content-wrapper
     %select#copycat-categories.selectize{:multiple=>"multiple", :placeholder=>"Add Categories", :value=>"", :name=>""}
@@ -78,7 +77,5 @@
   .copycat-tool-footer
     %button.toolbar-button.cat-paste-btn.icon-paste{'onclick': 'copycat_paste()'} Paste Categories
     %button.toolbar-button.cat-clear-btn.icon-clear{'onclick': 'copycat_clear()'} Clear Categories
-
-
 
 #whois_dialog{title: 'Domain Lookup Information'}
