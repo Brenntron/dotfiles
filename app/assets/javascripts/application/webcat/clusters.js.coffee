@@ -244,25 +244,56 @@ $ ->
       tr.removeClass 'shown'
     else
 # Open this row
-      row.child(window.format(row.data())).show()
-      tr.addClass 'shown'
-      td = $(tr).next('tr').find('td:first')
-      $(td).addClass 'dispute-entry-table-wrapper'
-      # Check to see which columns should be displayed
-      $('.toggle-vis-nested').each ->
-        checkbox_trigger = $(this).attr('data-column')
-        checkbox = $(this).find('input')
-        if $(checkbox).prop('checked')
-          $('.dispute-entry-table td, .dispute-entry-table th').each ->
-            if $(this).hasClass(checkbox_trigger)
-              $(this).show()
+      cluster = row.data()
+
+      table_head = '<table class="table cluster-path-table">' + '<thead>' + '<tr>' +
+        '<th><input class="cluster_path_select_all" type="checkbox" onclick="select_or_deselect_cluster(' + cluster.cluster_id + ')" id=' + cluster.cluster_id + ' /></th>' +
+        '<th class="clusterpath-col-path">Cluster Paths</th>' +
+        '<th class="clusterpath-col-volume">APAC Region Volume</th>' +
+        '<th class="clusterpath-col-volume">EMRG Region Volume</th>' +
+        '<th class="clusterpath-col-volume">EURP Region Volume</th>' +
+        '<th class="clusterpath-col-volume">GLOB Volume</th>' +
+        '<th class="clusterpath-col-volume">JAPN Volume</th>' +
+        '<th class="clusterpath-col-volume">NA Region Volume</th>' +
+        '<th class="clusterpath-col-wbrs">WBRS Score</th>' +
+        '</tr>' +
+        '</thead>' + '<tbody>'
+      missing_data = '<span class="missing-data">Missing Data</span>'
+      entry_rows = []
+
+
+      std_msg_ajax(
+        method: 'GET'
+        url: "/escalations/api/v1/escalations/webcat/clusters/" + cluster.cluster_id
+        data: {}
+        success: (response) ->
+          json = $.parseJSON(response)
+          entry = json.data
+
+          $(entry).each ->
+            entry_row = '<tr class="index-entry-row">' +
+              '<td class="clusterpath-col-spacer"><input type="checkbox" class="cluster-path-checkbox_' + cluster.cluster_id + '"</td>' + # Spacer for the check box row
+              '<td class="clusterpath-col-path">' + this.url + '</td>' +
+              '<td class="clusterpath-col-volume">' + this.apac_region_volume + '</td>' +
+              '<td class="clusterpath-col-volume">' + this.emrg_region_volume + '</td>' +
+              '<td class="clusterpath-col-volume">' + this.eurp_region_volume + '</td>' +
+              '<td class="clusterpath-col-volume">' + this.glob_volume + '</td>' +
+              '<td class="clusterpath-col-volume">' + this.japn_region_volume + '</td>' +
+              '<td class="clusterpath-col-volume">' + this.na_region_volume + '</td>' +
+              '<td class="clusterpath-col-wbrs">' + this.wbrs_score + '</td>' +
+              '</tr>'
+            entry_rows.push entry_row
             return
-        else if $(checkbox).prop('checked') == false
-          $('.dispute-entry-table td, .dispute-entry-table th').each ->
-            if $(this).hasClass(checkbox_trigger)
-              $(this).hide()
-            return
-        return
+          complete_table = table_head + entry_rows.join('') + '</tbody></table>'
+
+          row.child(complete_table).show()
+          tr.addClass 'shown'
+          td = $(tr).next('tr').find('td:first')
+          $(td).addClass 'dispute-entry-table-wrapper'
+        error: (response) ->
+      )
+
+
     return
 #  Expand cluster rows
 
