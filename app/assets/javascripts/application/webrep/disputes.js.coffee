@@ -1693,10 +1693,26 @@ window.makeBar = (id, data) ->
   return
 
 $ ->
+  window.updateGraph = (label, barName, el) ->
+    originalData = []
+    if barName == 'myBar'
+      originalData = window.barDataSets
+    else if barName == 'barChartGrouped'
+      originalData = window.barChartGroupedData
+
+    if $(el)[0].checked
+      currentData = window[barName].data.datasets
+      window[barName].data.datasets = currentData.concat originalData.filter (x) -> label.indexOf(x.label) >= 0
+      window[barName].update()
+    else
+      currentData = window[barName].data.datasets
+      window[barName].data.datasets = currentData.filter (x) -> label.indexOf(x.label) < 0
+      window[barName].update()
 
   $(document).ready ->
+
     if window.location.pathname.endsWith('dashboard')
-      barDataSets = [
+      window.barDataSets = [
         {
           label: 'Total Ticket Entries'
           backgroundColor: '#6dbcdb'
@@ -1753,26 +1769,6 @@ $ ->
       barDataSet = barDataSets
       makeBar('canvas', barDataSet)
 
-      $('.graph-menu input.all-ticket').click ->
-        if $(this)[0].checked
-          barDataSet = window.myBar.data.datasets
-          window.myBar.data.datasets = barDataSet.concat barDataSets.filter (x) -> x.label == 'Total Ticket Entries'
-          window.myBar.update()
-        else
-          barDataSet = window.myBar.data.datasets
-          window.myBar.data.datasets = barDataSet.filter (x) -> x.label != 'Total Ticket Entries'
-          window.myBar.update()
-
-      $('.graph-menu input.group-ticket').click ->
-        if $(this)[0].checked
-          barDataSet = window.myBar.data.datasets
-          window.myBar.data.datasets = barDataSet.concat barDataSets.filter (x) -> x.label != 'Total Ticket Entries'
-          window.myBar.update()
-        else
-          barDataSet = window.myBar.data.datasets.filter (x) -> x.label != 'E' and x.label != 'W' and x.label != 'EW'
-          window.myBar.data.datasets = barDataSet
-          window.myBar.update()
-
       $('.graph-config select').on 'change', (el) ->
         if el.target.value == 'yearly'
           barDataSet = window.myBar.data.datasets
@@ -1806,9 +1802,9 @@ $ ->
               '#666'
             ]
             data: [
-              3478
-              5267
-              1202
+              5078
+              4367
+              2152
             ]
           } ]
         options:
@@ -1843,9 +1839,9 @@ $ ->
               '#666'
             ]
             data: [
-              3478
-              5267
-              1202
+              2478
+              3267
+              4202
             ]
           } ]
         options:
@@ -2261,8 +2257,49 @@ $ ->
               }
             ]
       )
-
-      new Chart(document.getElementById('bar-chart2-grouped'),
+      window.barChartGroupedData = [
+        {
+          label: 'Total Ticket Entries'
+          backgroundColor: '#6dbcdb'
+          data: [
+            15
+            18
+            22
+            18
+          ]
+        }
+        {
+          label: 'E'
+          backgroundColor: '#8cc63f'
+          data: [
+            0
+            0
+            0
+            0
+          ]
+        }
+        {
+          label: 'W'
+          backgroundColor: '#E47433'
+          data: [
+            0
+            0
+            0
+            0
+          ]
+        }
+        {
+          label: 'EW'
+          backgroundColor: '#BA55D3'
+          data: [
+            0
+            0
+            0
+            0
+          ]
+        }
+      ]
+      window.barChartGrouped = new Chart(document.getElementById('bar-chart2-grouped'),
         type: 'bar'
         data:
           labels: [
@@ -2274,26 +2311,7 @@ $ ->
             'September 7'
             'September 8'
           ]
-          datasets: [
-            {
-              backgroundColor: '#6dbcdb'
-              data: [
-                15
-                18
-                22
-                18
-              ]
-            }
-            {
-              backgroundColor: '#8cc63f'
-              data: [
-                0
-                0
-                0
-                0
-              ]
-            }
-          ]
+          datasets: window.barChartGroupedData
         options:
           legend: display: false
           scales:
@@ -2440,7 +2458,5 @@ $ ->
             showActualPercentages: true
 
       )
-
-
 
 

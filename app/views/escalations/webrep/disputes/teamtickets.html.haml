@@ -1,50 +1,5 @@
 .content-wrapper
-  .dashboard-header-area.my-dashboard-header-area
-    .row
-      .col-xs-6
-        .dashboard-wrapper
-          .dashboard-title
-            %h1 My Dashboard
-            %span.my-dashboard-icon
-
-          .user-info
-            %h5= current_user.display_name
-            %p.dashboard-details
-              = current_user.cvs_username
-
-      .col-xs-6.text-right
-        .dashboard-time-wrapper
-          .dashboard-time
-            %label September 2 - 8, 2018
-            %button.toolbar-button.icon-calendar Change Time Span
-          .dashboard-time-ticket
-            .button-wrapper
-              %button.arrow-left View Last Week's Tickets
-
-  .dashboard-submenu
-    .dashboard-submenu-area
-      .dashboard-menu-list
-        %label.bold View:
-        %ul
-          %li
-            %a.white-user.ticket-owner-button.user-icon-stg-1.bold{:href => "/escalations/webrep/dashboard"} My Tickets
-          %li.active
-            %a.group-user-white.icon-team-grey.user-icon-stg.bold{:href => "/escalations/webrep/teamtickets"} My Team Tickets
-            %span.arrow-down
-          %li
-            %a.all-tickets-white.icon-all-tickets-grey.user-icon-stg.bold{:href => ""} All Tickets
-
-          %li.dropdown
-            %a.custom-user-white.icon-custom-user-grey.user-icon-stg.bold{:href => ""} Select Custom Users
-
-      .dashboard-submission-area
-        %label.right-vertical-separator.bold.font-lg 30
-        %label.font-lg 99
-        %label.uppercase.right-vertical-separator.bold valid total tickets / entries submission
-        %label.uppercase.icon-invalid-grey.user-icon-stg.invalid-stg.bold 12 invalid tickets
-
-      .dashboard-export-report.left-vertical-separator
-        %button.toolbar-button.export-button-white Export Report
+  = render "escalations/webrep/disputes/dashboard_topbar"
 
   .row.top-space
     .col-xs-6
@@ -79,8 +34,7 @@
             %label.left-space.left-vertical-separator 23
 
     .col-xs-6.graph-section
-      -#multi-user graph start here.
-      .col-xs-6.left-graph-frame
+      .col-xs-6
         .graph-top-header.top-space-ex.bottom-space
           %h5.uppercase.header-stg ticket entries closed by ticket owner
         %canvas#bar-chart-horizontal
@@ -91,7 +45,7 @@
 
         .graph-top-header.top-space-ex.bottom-space
           %h5.uppercase.header-stg ticket resolution by ticket owner
-        .graph-bar2-legend
+        .graph-bar-legend
           .custom-legend
             %label Unchanged
             %label.lightgray-legend-color
@@ -105,61 +59,61 @@
             %label Other
             %label.orange-legend-color
         %canvas#bar-chart-grouped.bottom-space
-        .right-graph-table-layout
-          %table.table
-            %thead
-              %tr
-                %th{:scope => "col"} OWNER
-                %th{:scope => "col"} UNCHANGED
-                %th{:scope => "col"} FIXED FN
-                %th{:scope => "col"} FIXED FP
-                %th{:scope => "col"} OTHER
-            %tbody
-              %tr.text-center
-                %td.text-left mtaylor
-                %td 4
-                %td 10
-                %td 8
-                %td 0
-              %tr.text-center
-                %td.text-left chrclair
-                %td 5
-                %td 13
-                %td 7
-                %td 1
-              %tr.text-center
-                %td.text-left nherbert
-                %td 11
-                %td 11
-                %td 6
-                %td 0
 
-              %tr.text-center
-                %td.text-left nverbeck
-                %td 13
-                %td 10
-                %td 7
-                %td 4
+        %table.table.left-space.top-space
+          %thead
+            %tr
+              %th{:scope => "col"} OWNER
+              %th{:scope => "col"} UNCHANGED
+              %th{:scope => "col"} FIXED FN
+              %th{:scope => "col"} FIXED FP
+              %th{:scope => "col"} OTHER
+          %tbody
+            %tr.text-center
+              %td.text-left mtaylor
+              %td 4
+              %td 10
+              %td 8
+              %td 0
+            %tr.text-center
+              %td.text-left chrclair
+              %td 5
+              %td 13
+              %td 7
+              %td 1
+            %tr.text-center
+              %td.text-left nherbert
+              %td 11
+              %td 11
+              %td 6
+              %td 0
 
-              %tr.text-center
-                %td.text-left abreeman
-                %td 9
-                %td 5
-                %td 9
-                %td 1
-            %tfoot
-              %tr
-                %th Total
-                %th.text-center 42
-                %th.text-center 49
-                %th.text-center 37
-                %th.text-center 6
+            %tr.text-center
+              %td.text-left nverbeck
+              %td 13
+              %td 10
+              %td 7
+              %td 4
+
+            %tr.text-center
+              %td.text-left abreeman
+              %td 9
+              %td 5
+              %td 9
+              %td 1
+          %tfoot
+            %tr
+              %th Total
+              %th.text-center 42
+              %th.text-center 49
+              %th.text-center 37
+              %th.text-center 6
 
         .graph-top-header.top-space.bottom-space
           %h5.uppercase.header-stg rule hits for false positive resolutions
         %canvas#bar-chart3-horizontal
 
-      .col-xs-6
+      .col-xs-6.graph-section
         %label.content-label-sm.top-space-ex Time Breakdown
         .graph-config
           %select.form-control
@@ -173,12 +127,12 @@
 
         .graph-menu.float-right
           %label
-            %input.all-ticket{:type => "checkbox", :checked => "checked"}/
+            %input.all-ticket{:type => "checkbox", :checked => "checked", :onclick => 'updateGraph("Total Ticket Entries", "barChartGrouped", this)'}/
             %label.total-legend
             Total Tickets Entries
 
           %label
-            %input.group-ticket{:type => "checkbox"}/
+            %input.group-ticket{:type => "checkbox", :onclick => 'updateGraph(["E", "W", "EW"], "barChartGrouped", this)'}/
             %label.dispute-E.legend-option
             %label.dispute-W.legend-option
             %label.dispute-EW.legend-option
@@ -196,7 +150,7 @@
         .graph-top-header
           %h5.uppercase.header-stg ticket submitted by submitter per day
 
-        .graph-bar2-legend
+        .graph-bar-legend
           .custom-legend
             %label Customer
             %label.skyblue-legend-color
@@ -210,59 +164,57 @@
 
         %canvas#team-pie-chart
 
-        .right-graph-table-layout.left-space
-          %table.table
-            %thead
-              %tr
-                %th{:scope => "col"} RESOLUTION
-                %th{:scope => "col"} %
-                %th{:scope => "col"} COUNT
-            %tbody
-              %tr.text-left
-                %td Unchanged
-                %td 18.75%
-                %td 3
-              %tr.text-left
-                %td Fixed FN
-                %td 37.50%
-                %td 6
-              %tr.text-left
-                %td Fixed FP
-                %td 43.75%
-                %td 7
+        %table.table.left-space.top-space
+          %thead
+            %tr
+              %th{:scope => "col"} RESOLUTION
+              %th{:scope => "col"} %
+              %th{:scope => "col"} COUNT
+          %tbody
+            %tr.text-left
+              %td Unchanged
+              %td 18.75%
+              %td 3
+            %tr.text-left
+              %td Fixed FN
+              %td 37.50%
+              %td 6
+            %tr.text-left
+              %td Fixed FP
+              %td 43.75%
+              %td 7
 
-              %tr.text-left
-                %td Other
-                %td 00.00%
-                %td 0
+            %tr.text-left
+              %td Other
+              %td 00.00%
+              %td 0
 
         .graph-top-header.top-space-ex
           %h5.uppercase.dispute-E-grey.graph-header-icon-stg.header-stg.bottom-space closed web entries by resolution
 
         %canvas#team-pie2-chart
 
-        .right-graph-table-layout.left-space
-          %table.table
-            %thead
-              %tr
-                %th{:scope => "col"} RESOLUTION
-                %th{:scope => "col"} %
-                %th{:scope => "col"} COUNT
-            %tbody
-              %tr.text-left
-                %td Unchanged
-                %td 18.75%
-                %td 3
-              %tr.text-left
-                %td Fixed FN
-                %td 37.50%
-                %td 6
-              %tr.text-left
-                %td Fixed FP
-                %td 43.75%
-                %td 7
+        %table.table.left-space.top-space
+          %thead
+            %tr
+              %th{:scope => "col"} RESOLUTION
+              %th{:scope => "col"} %
+              %th{:scope => "col"} COUNT
+          %tbody
+            %tr.text-left
+              %td Unchanged
+              %td 18.75%
+              %td 3
+            %tr.text-left
+              %td Fixed FN
+              %td 37.50%
+              %td 6
+            %tr.text-left
+              %td Fixed FP
+              %td 43.75%
+              %td 7
 
-              %tr.text-left
-                %td Other
-                %td 00.00%
-                %td 0
+            %tr.text-left
+              %td Other
+              %td 00.00%
+              %td 0
