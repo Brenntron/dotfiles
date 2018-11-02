@@ -93,7 +93,6 @@ $ ->
     headers = {
       'Token': $('input[name="token"]').val(),
       'Xmlrpc-Token': $('input[name="xml_token"]').val(),
-      'X-Bugzilla-Restapi-Token': $('input[name="bugzilla_rest_token"]').val(),
     }
     ips_urls = this.ips_urls.value
     desc = this.description.value

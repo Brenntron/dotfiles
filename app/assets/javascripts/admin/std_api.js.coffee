@@ -55,7 +55,6 @@ window.std_api_ajax =(ajax_data) ->
   ajax_data.headers = {
     'Token': $('input[name="token"]').val(),
     'Xmlrpc-Token': $('input[name="xml_token"]').val(),
-    'X-Bugzilla-Restapi-Token': $('input[name="bugzilla_rest_token"]').val(),
   }
   ajax_data.dataType = 'json'
 

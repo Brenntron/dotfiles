@@ -1,6 +1,6 @@
 module ApplicationHelper
   def bugzilla_rest_token
-    'the_bugzilla_rest_token'
+    session['bugzilla_rest_token']
   end
 
   def bugzilla_api_key

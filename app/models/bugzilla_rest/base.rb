@@ -38,7 +38,7 @@ class BugzillaRest::Base
       #do nothing
     when @api_key.present?
       query_data['Bugzilla_api_key'] = @api_key
-    else
+    when @token.present?
       query_data['Bugzilla_token'] = @token
     end
 
