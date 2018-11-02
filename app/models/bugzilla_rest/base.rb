@@ -24,22 +24,26 @@ class BugzillaRest::Base
     msg = bugzilla_rest_error_msg(response.body)
     case
     when 401 == code
-      raise BugzillaRest::AuthenticationError.new("Bugzilla REST Authentication Error.  #{msg}", code: code)
-    when 300 >= code
-      raise BugzillaRest::BaseError("Error using Bugzilla REST.  #{msg}", code: code)
+      raise AuthenticationError.new("Bugzilla REST Authentication Error.  #{msg}", code: code)
+    when 300 <= code
+      raise BaseError.new("Error using Bugzilla REST.  #{msg}", code: code)
     end
   end
 
-  def post(path, body)
+  def call(method, path, body: '', query: {}, send_auth: true)
+    query_data = query.clone
 
-    # request = HTTPI::Request.new("https://fmd-bugzil-01tst.vrt.sourcefire.com/rest/bug")
-    auth_query =
-        if @api_key.present?
-          "Bugzilla_api_key=#{@api_key}"
-        else
-          "Bugzilla_token=#{@token}"
-        end
-    request = HTTPI::Request.new("https://#{host}#{path}?#{auth_query}")
+    case
+    when !send_auth
+      #do nothing
+    when @api_key.present?
+      query_data['Bugzilla_api_key'] = @api_key
+    else
+      query_data['Bugzilla_token'] = @token
+    end
+
+    query_str = query_data.map { |key, value| "#{CGI.escape(key)}=#{CGI.escape(value)}" }.join('&')
+    request = HTTPI::Request.new("https://#{host}#{path}?#{query_str}")
 
     request.ssl = true
     request.auth.ssl.verify_mode = :peer
@@ -59,7 +63,7 @@ class BugzillaRest::Base
 
     request.body = body
 
-    response = HTTPI.post(request)
+    response = HTTPI.send(method, request)
 
     # raise response.body unless 300 > response.code
     handle_errors(response)

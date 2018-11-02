@@ -56,8 +56,7 @@ module API
           end
 
           def bugzilla_rest_session
-            token = headers['X-Bugzilla-Restapi-Token']
-            token = env['rack.session']['bugzilla_rest_api_token'] unless token.present?
+            token = env['rack.session']['bugzilla_rest_api_token']
             BugzillaRest::Session.new(api_key: current_user.bugzilla_api_key, token: token)
           end
 
