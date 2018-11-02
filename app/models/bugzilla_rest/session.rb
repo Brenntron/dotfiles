@@ -1,7 +1,4 @@
 
-# I don't know why, but rspec breaks unless I have the BugId class referenced below.
-# BugzillaRest::BugId
-
 class BugzillaRest::Session < BugzillaRest::Base
 
   # @return [String] bugzilla token
