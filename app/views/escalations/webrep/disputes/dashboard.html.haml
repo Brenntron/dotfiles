@@ -48,27 +48,129 @@
       .dashboard-export-report.left-vertical-separator
         %button.toolbar-button.export-button-white Export Report
 
-  .toolbar-content-layout
-    -#%button.toolbar-button.icon-queue.btn-pad-left legend
+  .row
+    .col-xs-6
 
-    .content-layout-list
-      %label.icon-custom-star
-        Show Customer Tickets
-        %input{:type => "checkbox", :checked => "checked"}/
+      %h1.dashboard-header My Tickets
+      .content-layout-list
+        %label.content-label-sm.icon-custom-star
+          Show Customer Tickets
+          %input{:type => "checkbox", :checked => "checked"}/
 
-      %label.right-vertical-separator
-        Show Guest Tickets
-        %input{:type => "checkbox", :checked => "checked"}/
+        %label.content-label-sm.no-left-pad.right-vertical-separator
+          Show Guest Tickets
+          %input{:type => "checkbox", :checked => "checked"}/
 
-      %label.dispute-E-grey.btn-margin-left
-        Show Email Tickets
-        %input{:type => "checkbox", :checked => "checked"}/
+        %label.content-label-sm.dispute-E-grey
+          Show Email Tickets
+          %input{:type => "checkbox", :checked => "checked"}/
 
-      %label.dispute-W-grey.btn-margin-left
-        Show Web Tickets
-        %input{:type => "checkbox", :checked => "checked"}/
+        %label.content-label-sm.dispute-W-grey
+          Show Web Tickets
+          %input{:type => "checkbox", :checked => "checked"}/
 
-      %label.dispute-EW-grey.btn-margin-left
-        Show Email/Web Tickets
-        %input{:type => "checkbox", :checked => "checked"}/
+        %label.content-label-sm.dispute-EW-grey.btn-margin-left
+          Show Email/Web Tickets
+          %input{:type => "checkbox", :checked => "checked"}/
 
+      .tickets-section-wrapper.open-tickets-wrapper
+
+        .open-tickets-header
+          %h3.larger-lighter My Open Tickets
+
+          .ticket-count-wrapper
+            %label.total-table-ticket-count 4
+            %label.total-table-entry-count 23
+
+        %table.table.responsive.dashboard-tickets-table#table-user-complaints-open
+          %thead
+            %tr
+              %th
+                -#  priority
+              %th Case ID
+              %th
+                -#  Submitter type
+              %th Status
+              %th
+                -#  Ticket type
+              %th Dispute Preview
+              %th Last Comment Date
+
+        .ticket-entries-totals-wrapper
+          %label.totals-label
+            Total Ticket Entries
+          .ticket-entry-total-block
+            %label.content-label-sm.submitter-customer
+              Customer
+            %span.ticket-entry-total
+              32
+          .ticket-entry-total-block.guest-block-total
+            %label.content-label-sm
+              Guest
+            %span.ticket-entry-total
+              12
+          .ticket-entry-total-block
+            %label.content-label-sm.dispute-E-grey
+              Email Entries
+            %span.ticket-entry-total
+              25
+          .ticket-entry-total-block
+            %label.content-label-sm.dispute-W-grey
+              Web Entries
+            %span.ticket-entry-total
+              22
+          .ticket-entry-total-block
+            %label.content-label-sm.dispute-EW-grey
+              Email/Web Entries
+            %span.ticket-entry-total
+              3
+
+
+      .tickets-section-wrapper.closed-tickets-wrapper
+        .closed-tickets-header
+          %h3.larger-lighter My Closed Tickets
+
+          .ticket-count-wrapper
+            %label.total-table-ticket-count 7
+            %label.total-table-entry-count 46
+
+        %table.table.responsive.dashboard-tickets-table#table-user-complaints-closed
+          %thead
+            %tr
+              %th
+                -#    priority
+              %th Case ID
+              %th
+                -#  Submitter type
+              %th
+                -#  Ticket type
+              %th Dispute Preview
+              %th Time to Close
+        .ticket-entries-totals-wrapper
+          %label.totals-label
+            Total Ticket Entries
+          .ticket-entry-total-block
+            %label.content-label-sm.submitter-customer
+              Customer
+            %span.ticket-entry-total
+              32
+          .ticket-entry-total-block.guest-block-total
+            %label.content-label-sm
+              Guest
+            %span.ticket-entry-total
+              12
+          .ticket-entry-total-block
+            %label.content-label-sm.dispute-E-grey
+              Email Entries
+            %span.ticket-entry-total
+              25
+          .ticket-entry-total-block
+            %label.content-label-sm.dispute-W-grey
+              Web Entries
+            %span.ticket-entry-total
+              22
+          .ticket-entry-total-block
+            %label.content-label-sm.dispute-EW-grey
+              Email/Web Entries
+            %span.ticket-entry-total
+              3
