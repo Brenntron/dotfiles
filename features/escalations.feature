@@ -5,7 +5,7 @@ Feature: Escalations
 
   @javascript
   Scenario: the appropriate canned response is added when manually resolving the bug
-
+    Then pending
     Given a user with commit permission exists and is logged in
     And the following "escalation_bug" bugs with trait "open_bug" exist:
       | id     | bugzilla_id | user_id | summary             | description       | committer_id |
@@ -62,6 +62,7 @@ Feature: Escalations
 
   @javascript
   Scenario: Cannot create a research bug when one bug blocks another
+    Then pending
     Given a user with commit permission exists and is logged in
     And the following "escalation_bug" bugs with trait "open_bug" exist:
       |   id   | bugzilla_id | user_id | summary                 | description       | committer_id |
