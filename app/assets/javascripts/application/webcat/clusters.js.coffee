@@ -249,13 +249,13 @@ $ ->
       table_head = '<table class="table cluster-path-table">' + '<thead>' + '<tr>' +
         '<th><input class="cluster_path_select_all" type="checkbox" onclick="select_or_deselect_cluster(' + cluster.cluster_id + ')" id=' + cluster.cluster_id + ' /></th>' +
         '<th class="clusterpath-col-path">Cluster Paths</th>' +
-        '<th class="clusterpath-col-volume">APAC Region Volume</th>' +
-        '<th class="clusterpath-col-volume">EMRG Region Volume</th>' +
-        '<th class="clusterpath-col-volume">EURP Region Volume</th>' +
-        '<th class="clusterpath-col-volume">GLOB Volume</th>' +
-        '<th class="clusterpath-col-volume">JAPN Volume</th>' +
-        '<th class="clusterpath-col-volume">NA Region Volume</th>' +
-        '<th class="clusterpath-col-wbrs">WBRS Score</th>' +
+        '<th class="clusterpath-col-volume text-center">APAC Region Volume</th>' +
+        '<th class="clusterpath-col-volume text-center">EMRG Region Volume</th>' +
+        '<th class="clusterpath-col-volume text-center">EURP Region Volume</th>' +
+        '<th class="clusterpath-col-volume text-center">GLOB Volume</th>' +
+        '<th class="clusterpath-col-volume text-center">JAPN Volume</th>' +
+        '<th class="clusterpath-col-volum text-centere">NA Region Volume</th>' +
+        '<th class="clusterpath-col-wbrs text-center">WBRS Score</th>' +
         '</tr>' +
         '</thead>' + '<tbody>'
       missing_data = '<span class="missing-data">Missing Data</span>'
@@ -274,13 +274,13 @@ $ ->
             entry_row = '<tr class="index-entry-row">' +
               '<td class="clusterpath-col-spacer"><input type="checkbox" class="cluster-path-checkbox_' + cluster.cluster_id + '"</td>' + # Spacer for the check box row
               '<td class="clusterpath-col-path">' + this.url + '</td>' +
-              '<td class="clusterpath-col-volume">' + this.apac_region_volume + '</td>' +
-              '<td class="clusterpath-col-volume">' + this.emrg_region_volume + '</td>' +
-              '<td class="clusterpath-col-volume">' + this.eurp_region_volume + '</td>' +
-              '<td class="clusterpath-col-volume">' + this.glob_volume + '</td>' +
-              '<td class="clusterpath-col-volume">' + this.japn_region_volume + '</td>' +
-              '<td class="clusterpath-col-volume">' + this.na_region_volume + '</td>' +
-              '<td class="clusterpath-col-wbrs">' + this.wbrs_score + '</td>' +
+              '<td class="clusterpath-col-volume text-center">' + this.apac_region_volume + '</td>' +
+              '<td class="clusterpath-col-volume text-center">' + this.emrg_region_volume + '</td>' +
+              '<td class="clusterpath-col-volume text-center">' + this.eurp_region_volume + '</td>' +
+              '<td class="clusterpath-col-volume text-center">' + this.glob_volume + '</td>' +
+              '<td class="clusterpath-col-volume text-center">' + this.japn_region_volume + '</td>' +
+              '<td class="clusterpath-col-volume text-center">' + this.na_region_volume + '</td>' +
+              '<td class="clusterpath-col-wbrs text-center">' + this.wbrs_score + '</td>' +
               '</tr>'
             entry_rows.push entry_row
             return
@@ -318,7 +318,7 @@ $ ->
       entry_row = '<tr class="index-entry-row">' +
         '<td class="clusterpath-col-spacer"><input type="checkbox" class="cluster-path-checkbox_' + cluster.cluster_id + '"</td>' + # Spacer for the check box row
         '<td class="clusterpath-col-path">' + this.path + '</td>' +
-        '<td class="clusterpath-col-volume">' + this.volume + '</td>' +
+        '<td class="clusterpath-col-volume text-center">' + this.volume + '</td>' +
         '<td class="clusterpath-col-wbrs">' + this.wbrs + '</td>' +
         '<td class="clusterpath-col-rules">' + this.rules + '</td>' +
         '</tr>'
