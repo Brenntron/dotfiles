@@ -41,15 +41,41 @@
       .toolbar
         .div
           %label.toolbar-section-label View
-          %button{class: 'toolbar-button icon-opened-selected'}
+          %button.toolbar-button.icon-opened-selected.esc-tooltipped{onclick: 'open_selected()', type: 'button', title: 'Open Viewable'}
             %span.toolbar-button-text Open Selected
-          %button{class: 'toolbar-button icon-open-all'}
+          %button.toolbar-button.icon-open-all.esc-tooltipped{onclick: 'open_all()', type: 'button', title: 'Open All'}
             %span.toolbar-button-text Open All
-        %button.toolbar-button{class:'cat-btn icon-copycat'} CopyCat Tool
+        %button.toolbar-button.cat-btn.icon-copycat.esc-tooltipped{'onclick': 'copycat_dialog()', title: 'CopyCat Tool'}
+          %span.toolbar-button-text CopyCat Tool
 
     .col-xs-6.temp-spacer
       .card
-        .label.content-label-sm Comment
+        .content-label-sm Comment
         .card-body
           %input.text_field
-          %button Submit Changes
+          %button.toolbar-button.icon-submit Submit Changes
+
+  .row
+    .col-xs-12
+      %table.table.responsive#clusters-index
+        %thead
+          %tr
+            %th
+              -#  Expandable button area
+            %th
+              %input#clusters_check_box{type: 'checkbox'}
+            %th Cluster ID
+            %th Cluster Domain
+            %th Global Volume
+            %th WBRS Score
+            %th Categories
+
+#copycat_dialog{title: 'CopyCat Tool'}
+  .dialog-content-wrapper
+    %select#copycat-categories.selectize{:multiple=>"multiple", :placeholder=>"Add Categories", :value=>"", :name=>""}
+
+  .copycat-tool-footer
+    %button.toolbar-button.cat-paste-btn.icon-paste{'onclick': 'copycat_paste()'} Paste Categories
+    %button.toolbar-button.cat-clear-btn.icon-clear{'onclick': 'copycat_clear()'} Clear Categories
+
+#whois_dialog{title: 'Domain Lookup Information'}

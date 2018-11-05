@@ -1248,6 +1248,11 @@ $ ->
     $('#url_1').focus()
     return
 
+  $('button.cat-btn').on 'click', ->
+    $('button.cat-btn').addClass('active')
+
+  $('#exampleModal').on 'hide.bs.modal', ->
+    $('button.cat-btn').removeClass('active')
   $('#cat-urls-diff').click ->
     if $('#cat-urls-diff').prop('checked')
       $('#categorize-same-form').hide()
