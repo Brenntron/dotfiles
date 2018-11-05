@@ -11,6 +11,25 @@ module API
               PaperTrail.whodunnit = current_user.id if current_user.present?
             end
 
+            desc 'process cluster'
+            params do
+              requires :category_ids, type: Array, desc: 'List of category ids'
+              requires :cluster_id, type: Integer, desc: 'ID of cluster to categorize'
+              optional :comment, type: String, desc: 'comment to associate with rule'
+            end
+
+            post "process_cluster" do
+
+
+              conditions = {}
+              conditions[:cluster_id] = params[:cluster_id]
+              conditions[:category_ids] = params[:category_ids]
+              conditions[:comment] = params[:comment] unless params[:comment].blank?
+
+              Wbrs::Cluster.process(conditions, true)
+            end
+
+
             desc 'get all clusters'
             params do
             end
@@ -51,9 +70,10 @@ module API
             #    "url": "http://www.facebook.com/plugins/like.php",
             #    "wbrs_score": 3.8
             #}
+            desc ""
             params do
-            end
 
+            end
             get ":id" do
               cluster_id = params[:id]
 
@@ -61,25 +81,26 @@ module API
               {:status => "success", :data => cluster_info}.to_json
             end
 
-
             params do
               requires :category_ids, type: Array[Integer]
-              requires :comment, type: String
+              optional :comment, type: String
               requires :user_id, type: Integer
               requires :id, type: Integer
             end
 
             post "process" do
               cluster_id = params[:id]
-
-              conditions = {}
-              conditions[:cluster_id] = cluster_id
-              conditions[:category_ids] = params[:category_ids]
-              conditions[:comment] = params[:comment] unless params[:comment].blank?
-
-              Wbrs::Cluster.process(conditions)
+              user = User.find(:user_id)
+              cat_ids = params[:category_ids]
+              conds = {}
+              conds[:cluster_id] = cluster_id
+              if params[:comment].present?
+                conds[:comment] = params[:comment]
+              end
+              conds[:user] = user.cvs_username
+              conds[:cat_ids] = cat_ids
+              Wbrs::Cluster.process(conds)
             end
-
           end
         end
       end

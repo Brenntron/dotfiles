@@ -153,7 +153,10 @@ class Wbrs::Cluster < Wbrs::Base
   # @param [Array<Integer>] category_ids: List of up to 5 categories to apply to the cluster_id
   # @param [String] comment: comment to add to category rule
   # @param [String] user:  username of user committing categories to clusters
-  def self.process(conditions = {})
+  def self.process(conditions = {}, test =  nil)
+    if test.present?
+      return {}
+    end
     params = stringkey_params(conditions)
 
     response = post_request(path: '/v1/clusters/process', body: params)

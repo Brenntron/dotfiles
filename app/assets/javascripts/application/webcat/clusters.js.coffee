@@ -45,6 +45,27 @@ window.fetch_cluster_data = (id) ->
       #$('.modal-backdrop').remove()
   )
 
+window.categorize_cluster = (cluster_id, comment, category_ids) ->
+  headers = {'Token': $('input[name="token"]').val(), 'Xmlrpc-Token': $('input[name="xml_token"]').val()}
+  $.ajax(
+    url: "/escalations/api/v1/escalations/webcat/clusters/process_cluster"
+    method: 'POST'
+    headers: headers
+    data: {cluster_id: cluster_id, category_ids: category_ids, comment: comment}
+    success: (response) ->
+
+      json = $.parseJSON(response)
+      if json.error
+        #notice_html = "<p>Something went wrong: #{json.error}</p>"
+        #alert(json.error)
+      else
+
+    error: (response) ->
+      notice_html = "<p>Something went wrong: #{response.responseText}</p>"
+      #$("#alert_message").addClass('alert alert-danger alert-dismissable').append(notice_html)
+      #$("#create_research_submit_wait").addClass('hidden').hide()
+      #$("#create_research_submit").show()
+  , this)
 
 $ ->
   $(document).ready ->
