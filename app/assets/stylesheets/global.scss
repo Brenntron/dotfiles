@@ -4546,34 +4546,34 @@ table > tbody > tr > td.dispute_rep_tools {
   margin-right: 8px;
 }
 
-.dispute-entry-table {
-  margin: 0;
+.dispute-entry-table, .cluster-path-table {
+  margin: 0 !important;
 }
 
 .dispute-entry-table .missing-data {
   color: $faint-neutral-color;
 }
 
-.dispute-entry-table tbody{
+.dispute-entry-table tbody, .cluster-path-table tbody {
   background-color: $table-dark-body;
   color: $content-bg-color;
   font-weight: 300;
 }
 
-.dispute-entry-table tbody tr td, .dispute-entry-table thead tr th {
+.dispute-entry-table tbody tr td, .dispute-entry-table thead tr th, .cluster-path-table thead tr th, .cluster-path-table tbody tr td {
   border-color: $table-dark-header;
 }
 
-.dispute-entry-table tr td:first-child, .dispute-entry-table tr th:first-child {
+.dispute-entry-table tr td:first-child, .dispute-entry-table tr th:first-child, .cluster-path-table tr th:first-child, .cluster-path-table tr td:first-child {
   padding-left: 30px;
 }
 
-.dispute-entry-table thead {
+.dispute-entry-table thead, .cluster-path-table thead {
   background-color: $table-dark-header;
   color: $content-bg-color;
 }
 
-.dispute-entry-table th {
+.dispute-entry-table th, .cluster-path-table th {
   font-weight: 600 !important;
 }
 
@@ -4600,14 +4600,6 @@ table > tbody > tr > td.dispute_rep_tools {
 .nested-complaint-data-wrapper table {
   background-color: darken($faint-neutral-color, 5%);
   color: $type-base-color;
-}
-
-.nested-complaint-data-wrapper table td {
-  border-bottom: none;
-  border-bottom: none;
-  padding: 1px 10px !important;
-  font-size: 8pt;
-  color: $type-lighter-color;
 }
 
 .nested-table-input {
@@ -6431,7 +6423,7 @@ h2 {
     padding: 0 0 15px 0;
   }
   .result-label.vertical-separator {
-    border-right: 1px solid #dddddd;
+    border-right: 1px solid $nav-toolbar-color;
   }
   .result-label {
     font-size: .8rem;
@@ -6580,39 +6572,36 @@ h2 {
   float: left;
 }
 
+.data-btn, .help-btn, .google-btn, .category-btn {
+  background-repeat: no-repeat;
+  background-position: center center;
+  width: 20px;
+  height: 20px;
+  border-radius: 2px;
+  border: none;
+  float: right;
+}
+
 .data-btn {
   background-color: $primary-section-color;
   background-image: url(image_path('icon_open_viewable_white.svg'));
-  background-repeat: no-repeat;
   background-size: 75%;
-  background-position-x: center;
-  background-position-y: center;
 }
 
 .help-btn {
   background-image: url(image_path('icon_whois.svg'));
-  background-repeat: no-repeat;
-  background-position-x: center;
-  background-position-y: center;
-  background-color: #dddddd;
-
+  background-color: $nav-toolbar-color;
 }
 
 .google-btn {
   background-image: url(image_path('icon_google_grey.svg'));
-  background-repeat: no-repeat;
-  background-position-x: center;
-  background-position-y: center;
-  background-color: #dddddd;
+  background-color: $nav-toolbar-color;
 }
 
 .category-btn {
   background-color: $primary-section-color;
   background-image: url(image_path('icon_submit_arrow.svg'));
-  background-repeat: no-repeat;
   background-size: 15px;
-  background-position-x: center;
-  background-position-y: center;
 }
 
 .right-margin {

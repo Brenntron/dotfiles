@@ -289,7 +289,7 @@ $ ->
           row.child(complete_table).show()
           tr.addClass 'shown'
           td = $(tr).next('tr').find('td:first')
-          $(td).addClass 'dispute-entry-table-wrapper'
+          $(td).addClass 'nested-complaint-data-wrapper'
         error: (response) ->
       )
 
