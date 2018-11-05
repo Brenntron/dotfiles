@@ -704,6 +704,35 @@ th.alt-col {
   height: 20px;
 }
 
+.expand-row-button:hover {
+  background-color: lighten($nav-toolbar-color, 8%);
+}
+.expand-row-button:focus {
+  background-color: lighten($nav-toolbar-color, 8%);
+  border-style: inset;
+  border-color: $primary-section-color;
+}
+
+.collapse-button:hover {
+  background-color: lighten($nav-toolbar-color, 8%);
+}
+
+.collapse-button:focus {
+  background-color: lighten($nav-toolbar-color, 8%);
+  border-style: inset;
+  border-color: $primary-section-color;
+}
+
+.show-col-button:hover {
+  background-color: lighten($nav-toolbar-color, 8%);
+}
+
+.show-col-button:focus {
+  background-color: lighten($nav-toolbar-color, 8%);
+  border-style: inset;
+  border-color: $primary-section-color;
+}
+
 .shown .expand-row-button-inline, .shown.expand-row-button-inline {
   background-image: url(image_path('icon_collapse_blue.svg'));
 }
