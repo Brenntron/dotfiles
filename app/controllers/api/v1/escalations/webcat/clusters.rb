@@ -85,9 +85,26 @@ module API
               {:status => "success", :data => cluster_info}.to_json
             end
 
+            params do
+              requires :category_ids, type: Array[Integer]
+              optional :comment, type: String
+              requires :user_id, type: Integer
+              requires :id, type: Integer
+            end
 
-
-
+            post "process" do
+              cluster_id = params[:id]
+              user = User.find(:user_id)
+              cat_ids = params[:category_ids]
+              conds = {}
+              conds[:cluster_id] = cluster_id
+              if params[:comment].present?
+                conds[:comment] = params[:comment]
+              end
+              conds[:user] = user.cvs_username
+              conds[:cat_ids] = cat_ids
+              Wbrs::Cluster.process(conds)
+            end
           end
         end
       end
