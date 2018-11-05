@@ -297,7 +297,7 @@ $ ->
     return
 #  Expand cluster rows
 
-  window.format = (cluster) ->
+  window.showClusterPaths = (cluster) ->
     table_head = '<table class="table cluster-path-table">' + '<thead>' + '<tr>' + '<th><input class="cluster_path_select_all" type="checkbox" onclick="select_or_deselect_cluster(' + cluster.cluster_id + ')" id=' + cluster.cluster_id + ' /></th>' + '<th class="clusterpath-col-path">Cluster Paths</th>' + '<th class="clusterpath-col-volume">Volume</th>' + '<th class="clusterpath-col-wbrs">WBRS Score</th>' + '<th class="clusterpath-col-rules">Rules</th>' + '</tr>' + '</thead>' + '<tbody>'
     missing_data = '<span class="missing-data">Missing Data</span>'
     entry_rows = []
