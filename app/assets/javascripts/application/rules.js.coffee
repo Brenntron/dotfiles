@@ -729,7 +729,3 @@ $ ->
 
     }
 
-  $('#exampleModal').on 'shown.bs.modal', ->
-    puts 'Modal active'
-    $('button.toolbar-button.cat-btn').addClass('active')
-
