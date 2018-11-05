@@ -162,6 +162,25 @@ $ ->
 $ ->
   $(document).ready ->
 
+# open selected
+window.open_all = (tableId) ->
+  selectedRows = $('table#' + tableId + ' tr[role="row"]')
+  i = 0
+  while i < selectedRows.length
+    if !$(selectedRows[i]).hasClass('shown')
+      $(selectedRows[i]).find('.expand-row-button-inline').click()
+    i = i + 1
+  selectedRows = $('table#' + tableId + ' .expand-row-button-inline').click()
+
+#  open all selected
+window.open_selected = (tableId) ->
+  selectedRows = $('table#' + tableId + ' tr[role="row"].selected')
+  i = 0
+  while i < selectedRows.length
+    if !$(selectedRows[i]).hasClass('shown')
+      $(selectedRows[i]).find('.expand-row-button-inline').click()
+    i = i + 1
+
 window.copycat_dialog = () ->
   $('#copycat_dialog').dialog({
     dialogClass: "copycat_tool_dialog",
