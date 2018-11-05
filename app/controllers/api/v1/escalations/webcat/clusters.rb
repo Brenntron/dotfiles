@@ -51,11 +51,22 @@ module API
             #    "url": "http://www.facebook.com/plugins/like.php",
             #    "wbrs_score": 3.8
             #}
+            params do
+            end
+
             get ":id" do
               cluster_id = params[:id]
 
               cluster_info = Wbrs::Cluster.retrieve(cluster_id, true)
               {:status => "success", :data => cluster_info}.to_json
+            end
+
+
+            params do
+              requires :category_ids, type: Array[Integer]
+              requires :comment, type: String
+              requires :user_id, type: Integer
+              requires :id, type: Integer
             end
 
             post "process" do

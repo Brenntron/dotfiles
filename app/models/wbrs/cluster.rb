@@ -143,15 +143,16 @@ class Wbrs::Cluster < Wbrs::Base
 
     end
 
-    response = call_json_request(:post, "/v1/clusters/get/#{cluster_id}", body: '')
+    response = call_json_request(:get, "/v1/clusters/get/#{cluster_id}", body: '')
     response_body = JSON.parse(response.body)
-    response_body['data']
+    response_body#['data']
   end
 
   #This is still a work in progress, need to get finalized version from UKR team
   # @param [Integer] cluster_id: The cluster(domain) to be categorized
   # @param [Array<Integer>] category_ids: List of up to 5 categories to apply to the cluster_id
   # @param [String] comment: comment to add to category rule
+  # @param [String] user:  username of user committing categories to clusters
   def self.process(conditions = {})
     params = stringkey_params(conditions)
 
