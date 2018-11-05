@@ -12,8 +12,4 @@ class Escalations::Webcat::ClustersController < Escalations::WebcatController
   def research_params
     params.fetch(:search, {}).permit(:uri, :scope)
   end
-
-  def copycat_tool
-    puts 'Copycat'
-  end
 end

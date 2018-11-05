@@ -6572,89 +6572,49 @@ h2 {
   }
 }
 
-//table layout start here
-.table {
 
-  .right-space {
-    margin-right: 10px;
-  }
 
-  .other-stg {
-    border-bottom: 1px solid $faint-neutral-color;
-
-    ul {
-      float: right;
-      margin: 0;
-      padding: 0;
-
-      li {
-        display: inline-block;
-        margin: 0;
-        height: 22.5px;
-        width: 24px;
-        border-right: 1px solid #dddddd;
-        button {
-          width: 20px;
-          height: 20px;
-          float: left;
-        }
-      }
-
-      li:last-child {
-        border: none;
-      }
-    }
-  }
-
-  .category-search {
-    width: 88%;
-    border: 1px solid #eee;
-    float: left;
-  }
-
-  .data-btn {
-    background-color: $primary-section-color;
-    background-image: url(image_path('icon_open_viewable_white.svg'));
-    background-repeat: no-repeat;
-    background-size: 75%;
-    background-position-x: center;
-    background-position-y: center;
-  }
-
-  .help-btn {
-    background-image: url(image_path('icon_whois.svg'));
-    background-repeat: no-repeat;
-    background-position-x: center;
-    background-position-y: center;
-    background-color: #dddddd;
-
-  }
-
-  .google-btn {
-    background-image: url(image_path('icon_google_grey.svg'));
-    background-repeat: no-repeat;
-    background-position-x: center;
-    background-position-y: center;
-    background-color: #dddddd;
-  }
-
-  button {
-    width: 20px;
-    height: 20px;
-    float: right;
-    border-radius: 2px;
-    border: none;
-  }
-
-  .category-btn {
-    background-color: $primary-section-color;
-    background-image: url(image_path('icon_submit_arrow.svg'));
-    background-repeat: no-repeat;
-    background-size: 15px;
-    background-position-x: center;
-    background-position-y: center;
-  }
+.category-search {
+  width: 88%;
+  border: 1px solid #eee;
+  float: left;
 }
+
+.data-btn {
+  background-color: $primary-section-color;
+  background-image: url(image_path('icon_open_viewable_white.svg'));
+  background-repeat: no-repeat;
+  background-size: 75%;
+  background-position-x: center;
+  background-position-y: center;
+}
+
+.help-btn {
+  background-image: url(image_path('icon_whois.svg'));
+  background-repeat: no-repeat;
+  background-position-x: center;
+  background-position-y: center;
+  background-color: #dddddd;
+
+}
+
+.google-btn {
+  background-image: url(image_path('icon_google_grey.svg'));
+  background-repeat: no-repeat;
+  background-position-x: center;
+  background-position-y: center;
+  background-color: #dddddd;
+}
+
+.category-btn {
+  background-color: $primary-section-color;
+  background-image: url(image_path('icon_submit_arrow.svg'));
+  background-repeat: no-repeat;
+  background-size: 15px;
+  background-position-x: center;
+  background-position-y: center;
+}
+
 .right-margin {
   margin-right: 4px;
 }
