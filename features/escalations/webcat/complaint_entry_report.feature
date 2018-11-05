@@ -11,8 +11,7 @@ Feature: Webcat reporting
       | 100    |
       | 101    |
       | 102    |
-#    TODO: Figure out a way not to hard-code the dates below
-    And I goto "/escalations/webcat/reports/complaint_entry?utf8=1&report%5Bdate_from%5D=2000-01-01&report%5Bdate_to%5D=3999-01-01&report%5Bcustomer_name%5D=&commit=Report"
+    And I goto a "complaint_entry" report surrounding the current year
     Then I should see "CUSTOMER NAME"
     Then I should see "URL"
     Then I should see "ENGINEER"
@@ -20,4 +19,18 @@ Feature: Webcat reporting
     Then I should see "FINAL CATEGORY"
     Then I should see "SUGGESTED CATEGORY"
     Then I should see "CREATED"
-    Then take a photo
+
+
+
+  @javascript
+  Scenario: Exported file should be a csv
+    Given a user with role "webcat user" exists and is logged in
+    And the following complaints exist and have entries resolved today:
+      | id     |
+      | 100    |
+      | 101    |
+      | 102    |
+    And I goto a "complaint_entry" report surrounding the current year
+    When I click "Export"
+    Then response header "Content-Type" should be "text/csv"
+

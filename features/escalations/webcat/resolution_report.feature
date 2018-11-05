@@ -4,15 +4,14 @@ Feature: Webcat reporting
 
 
   @javascript
-  Scenario: Complaints with resolved entries should be displayed
+  Scenario: Engineering reports should be accessible
     Given a user with role "webcat user" exists and is logged in
     And the following complaints exist and have entries resolved today:
       | id     |
       | 100    |
       | 101    |
       | 102    |
-#    TODO: Figure out a way not to hard-code the dates below
-    And I goto "/escalations/webcat/reports/resolution?utf8=1&report%5Bdate_from%5D=2000-01-01&report%5Bdate_to%5D=3999-01-01&commit=Report"
+    And I goto a "resolution" report surrounding the current year
     Then I should see "FIXED COMPLAINTS"
     Then I should see "INVALID COMPLAINTS"
     Then I should see "UNCHANGED COMPLAINTS"
