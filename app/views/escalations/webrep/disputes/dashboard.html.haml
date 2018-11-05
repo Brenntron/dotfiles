@@ -1,30 +1,83 @@
 .content-wrapper
+<<<<<<< HEAD
   = render "escalations/webrep/disputes/dashboard_topbar"
+=======
+  .dashboard-header-area.my-dashboard-header-area
+    .row
+      .col-xs-6
+        .dashboard-wrapper
+          .dashboard-title
+            %h1 My Dashboard
+            %span.my-dashboard-icon
 
-  .row.top-space
+          .user-info
+            %h5= current_user.display_name
+            %p.dashboard-details
+              = current_user.cvs_username
+
+      .col-xs-6.text-right
+        .dashboard-time-wrapper
+          .dashboard-time
+            %label September 08, 2018 - September 15, 2018
+            %button.toolbar-button.icon-calendar Change Time Span
+
+            %input#tickets_date_range{:type => 'text'}
+
+          .dashboard-time-ticket
+            .button-wrapper
+              %button.arrow-left View Last Week's Tickets
+
+  .dashboard-submenu
+    .dashboard-submenu-area
+      .dashboard-menu-list
+        %label.bold View:
+        %ul
+          %li
+            %a.white-user.ticket-owner-button.user-icon-stg-1.bold{:href => ""} My Tickets
+          %li
+            %a.group-user-white.icon-team-grey.user-icon-stg.bold{:href => ""} My Team Tickets
+          %li
+            %a.all-tickets-white.icon-all-tickets-grey.user-icon-stg.bold{:href => ""} All Tickets
+
+          %li.dropdown
+            %a.custom-user-white.icon-custom-user-grey.user-icon-stg.bold{:href => ""} Select Custom Users
+
+      .dashboard-submission-area
+        %label.right-vertical-separator.bold.font-lg 30
+        %label.font-lg 99
+        %label.uppercase.right-vertical-separator.bold valid total tickets / entries submission
+        %label.uppercase.icon-invalid-grey.user-icon-stg.invalid-stg.bold 12 invalid tickets
+
+      .dashboard-export-report.left-vertical-separator
+        %button.toolbar-button.export-button-white Export Report
+>>>>>>> 5_dashboard_reporting_feature
+
+  .row
     .col-xs-6
-      %h1 My Tickets
+
+      %h1.dashboard-header My Tickets
       .content-layout-list
-        %label.icon-custom-star
+        %label.content-label-sm.icon-custom-star
           Show Customer Tickets
           %input{:type => "checkbox", :checked => "checked"}/
 
-        %label.no-left-pad.right-vertical-separator
+        %label.content-label-sm.no-left-pad.right-vertical-separator
           Show Guest Tickets
           %input{:type => "checkbox", :checked => "checked"}/
 
-        %label.dispute-E-grey
+        %label.content-label-sm.dispute-E-grey
           Show Email Tickets
           %input{:type => "checkbox", :checked => "checked"}/
 
-        %label.dispute-W-grey
+        %label.content-label-sm.dispute-W-grey
           Show Web Tickets
           %input{:type => "checkbox", :checked => "checked"}/
 
-        %label.dispute-EW-grey.btn-margin-left
+        %label.content-label-sm.dispute-EW-grey.btn-margin-left
           Show Email/Web Tickets
           %input{:type => "checkbox", :checked => "checked"}/
 
+<<<<<<< HEAD
       .user-tickets-top
         .user-tickets-header
           %h6 My Open Tickets
@@ -151,3 +204,106 @@
               %td Other
               %td 00.00%
               %td 0
+=======
+      .tickets-section-wrapper.open-tickets-wrapper
+
+        .open-tickets-header
+          %h3.larger-lighter My Open Tickets
+
+          .ticket-count-wrapper
+            %label.total-table-ticket-count 4
+            %label.total-table-entry-count 23
+
+        %table.table.responsive.dashboard-tickets-table#table-user-complaints-open
+          %thead
+            %tr
+              %th
+                -#  priority
+              %th Case ID
+              %th
+                -#  Submitter type
+              %th Status
+              %th
+                -#  Ticket type
+              %th Dispute Preview
+              %th Last Comment Date
+
+        .ticket-entries-totals-wrapper
+          %label.totals-label
+            Total Ticket Entries
+          .ticket-entry-total-block
+            %label.content-label-sm.submitter-customer
+              Customer
+            %span.ticket-entry-total
+              32
+          .ticket-entry-total-block.guest-block-total
+            %label.content-label-sm
+              Guest
+            %span.ticket-entry-total
+              12
+          .ticket-entry-total-block
+            %label.content-label-sm.dispute-E-grey
+              Email Entries
+            %span.ticket-entry-total
+              25
+          .ticket-entry-total-block
+            %label.content-label-sm.dispute-W-grey
+              Web Entries
+            %span.ticket-entry-total
+              22
+          .ticket-entry-total-block
+            %label.content-label-sm.dispute-EW-grey
+              Email/Web Entries
+            %span.ticket-entry-total
+              3
+
+
+      .tickets-section-wrapper.closed-tickets-wrapper
+        .closed-tickets-header
+          %h3.larger-lighter My Closed Tickets
+
+          .ticket-count-wrapper
+            %label.total-table-ticket-count 7
+            %label.total-table-entry-count 46
+
+        %table.table.responsive.dashboard-tickets-table#table-user-complaints-closed
+          %thead
+            %tr
+              %th
+                -#    priority
+              %th Case ID
+              %th
+                -#  Submitter type
+              %th
+                -#  Ticket type
+              %th Dispute Preview
+              %th Time to Close
+        .ticket-entries-totals-wrapper
+          %label.totals-label
+            Total Ticket Entries
+          .ticket-entry-total-block
+            %label.content-label-sm.submitter-customer
+              Customer
+            %span.ticket-entry-total
+              32
+          .ticket-entry-total-block.guest-block-total
+            %label.content-label-sm
+              Guest
+            %span.ticket-entry-total
+              12
+          .ticket-entry-total-block
+            %label.content-label-sm.dispute-E-grey
+              Email Entries
+            %span.ticket-entry-total
+              25
+          .ticket-entry-total-block
+            %label.content-label-sm.dispute-W-grey
+              Web Entries
+            %span.ticket-entry-total
+              22
+          .ticket-entry-total-block
+            %label.content-label-sm.dispute-EW-grey
+              Email/Web Entries
+            %span.ticket-entry-total
+              3
+>>>>>>> 5_dashboard_reporting_feature

@@ -1647,6 +1647,7 @@ $ ->
         'maxWidth': 500
       $(this).tooltipster 'show'
     return
+    
 
 window.makeBar = (id, data) ->
   ctx = document.getElementById(id).getContext('2d')
@@ -2459,4 +2460,237 @@ $ ->
 
       )
 
+
+$ ->
+  $('#tickets_date_range').daterangepicker()
+  $('button.icon-calendar').click ->
+    console.log ('you clicked me the calendar icon or button')
+    $('#tickets_date_range').trigger 'click'
+  return
+
+
+$ ->
+  $('#tickets_date_range').on 'apply.daterangepicker', (ev, picker) ->
+    start = picker.startDate.format('MMMM/DD/YYYY').split('/')
+    end = picker.endDate.format('MMMM/DD/YYYY').split('/')
+    val = start[0] + ' ' + start[1] + ', ' + start[2] + ' to ' + end[0] + ' ' + end[1] + ', ' + end[2]
+    $('.dashboard-time label')[0].innerHTML = val
+    return
+  return
+
+#    If user changes buttons from initial status, enable the submit button
+#   TODO add this check in later that only allows user to submit if there have been changes made
+
+
+
+# Create Dashboard Initial Table (My Open Tickets)
+$ ->
+
+  window.open_dashboard_dispute_table = $('#table-user-complaints-open').DataTable(
+    dom: '<t>'
+    data: tempSingleUserOpenTixDataset
+    columnDefs: [
+      {
+        targets: [ 1 ]
+        className: 'id-col'
+      }
+      {
+        targets: [ 3 ]
+        className: 'state-col'
+      }
+      {
+        targets: [
+          0
+          2
+          4
+        ]
+        className: 'text-center'
+      }
+    ]
+    columns: [
+      {
+        data: 'priority'
+        render: (data) ->
+          '<span class="bug-priority p-' + data + '"></span>'
+      }
+      { data: 'case_number' }
+      {
+        data: 'submitter_type'
+        render: (data) ->
+          '<span class="submitter-type-icon submitter-' + data + '"></span>'
+      }
+      { data: 'status' }
+      {
+        data: 'submission_type'
+        render: (data) ->
+          '<span class="dispute-submission-type dispute-' + data  + '"></span>'
+      }
+      { data: 'd_entry_preview' }
+      { data: 'last_comment' }
+    ]
+  )
+
+  window.open_dashboard_dispute_table = $('#table-user-complaints-closed').DataTable(
+    dom: '<t>'
+    data: tempSingleUserClosedTixDataset
+    columnDefs: [
+      {
+        targets: [ 1 ]
+        className: 'id-col'
+      }
+      {
+        targets: [
+          0
+          2
+          3
+        ]
+        className: 'text-center'
+      }
+    ]
+    columns: [
+      {
+        data: 'priority'
+        render: (data) ->
+          '<span class="bug-priority p-' + data + '"></span>'
+      }
+      { data: 'case_number' }
+      {
+        data: 'submitter_type'
+        render: (data) ->
+          '<span class="submitter-type-icon submitter-' + data + '"></span>'
+      }
+      {
+        data: 'submission_type'
+        render: (data) ->
+          '<span class="dispute-submission-type dispute-' + data  + '"></span>'
+      }
+      { data: 'd_entry_preview' }
+      { data: 'time_to_close' }
+    ]
+  )
+
+tempSingleUserOpenTixDataset = [
+  {
+    'priority': ['P1'],
+    'case_number': ['0000375515'],
+    'submitter_type': ['customer'],
+    'status': ['Researching'],
+    'submission_type': ['W'],
+    'd_entry_preview': ['<span class="dispute_entry_content_first">guardiancremation.com</span><span class="dispute-count">4</span>'],
+    'last_comment': ['2018-08-08 13:59:10']
+  },
+  {
+    'priority': ['P3'],
+    'case_number': ['0000375513'],
+    'submitter_type': ['guest'],
+    'status': ['Assigned'],
+    'submission_type': ['E'],
+    'd_entry_preview': ['<span class="dispute_entry_content_first">bvillaseminyak.com</span><span class="dispute-count">7</span>'],
+    'last_comment': ['2018-08-08 13:59:10']
+  },
+  {
+    'priority': ['P4'],
+    'case_number': ['0000375502'],
+    'submitter_type': ['guest'],
+    'status': ['Customer_Pending'],
+    'submission_type': ['W'],
+    'd_entry_preview': ['<span class="dispute_entry_content_first">food-hub.org</span><span class="dispute-count">14</span>'],
+    'last_comment': ['2018-08-08 13:59:10']
+  },
+  {
+    'priority': ['P3'],
+    'case_number': ['000012345'],
+    'submitter_type': ['customer'],
+    'status': ['Researching'],
+    'submission_type': ['W'],
+    'd_entry_preview': ['<span class="dispute_entry_content_first">housingscotlandtoday.com</span><span class="dispute-count">9</span>'],
+    'last_comment': ['2018-08-08 13:59:10']
+  }
+]
+
+
+tempSingleUserClosedTixDataset = [
+  {
+    'priority': ['P1'],
+    'case_number': ['0000375515'],
+    'submitter_type': ['customer'],
+    'submission_type': ['W'],
+    'd_entry_preview': ['<span class="dispute_entry_content_first">guardiancremation.com</span><span class="dispute-count">4</span>'],
+    'time_to_close': ['35m']
+  },
+  {
+    'priority': ['P3'],
+    'case_number': ['0000375513'],
+    'submitter_type': ['guest'],
+    'submission_type': ['E'],
+    'd_entry_preview': ['<span class="dispute_entry_content_first">bvillaseminyak.com</span><span class="dispute-count">7</span>'],
+    'time_to_close': ['1h 25m']
+  },
+  {
+    'priority': ['P4'],
+    'case_number': ['0000375502'],
+    'submitter_type': ['guest'],
+    'submission_type': ['W'],
+    'd_entry_preview': ['<span class="dispute_entry_content_first">food-hub.org</span><span class="dispute-count">14</span>'],
+    'time_to_close': ['<span class="time-over-2-hr">3h 3m</span>']
+  },
+  {
+    'priority': ['P1'],
+    'case_number': ['0000375515'],
+    'submitter_type': ['customer'],
+    'submission_type': ['W'],
+    'd_entry_preview': ['<span class="dispute_entry_content_first">guardiancremation.com</span><span class="dispute-count">4</span>'],
+    'time_to_close': ['35m']
+  },
+  {
+    'priority': ['P3'],
+    'case_number': ['0000375513'],
+    'submitter_type': ['guest'],
+    'submission_type': ['E'],
+    'd_entry_preview': ['<span class="dispute_entry_content_first">bvillaseminyak.com</span><span class="dispute-count">7</span>'],
+    'time_to_close': ['1h 25m']
+  },
+  {
+    'priority': ['P4'],
+    'case_number': ['0000375502'],
+    'submitter_type': ['guest'],
+    'submission_type': ['W'],
+    'd_entry_preview': ['<span class="dispute_entry_content_first">food-hub.org</span><span class="dispute-count">14</span>'],
+    'time_to_close': ['<span class="time-over-2-hr">3h 3m</span>']
+  },
+  {
+    'priority': ['P3'],
+    'case_number': ['000012345'],
+    'submitter_type': ['customer'],
+    'submission_type': ['W'],
+    'd_entry_preview': ['<span class="dispute_entry_content_first">housingscotlandtoday.com</span><span class="dispute-count">9</span>'],
+    'time_to_close': ['42m']
+  }
+]
+
+# This is not actually set up to work yet.
+window.populate_webrep_dashboard_opentix_table = (data = {}) ->
+  headers = {'Token': $('input[name="token"]').val(), 'Xmlrpc-Token': $('input[name="xml_token"]').val()}
+  $.ajax(
+    url: '/escalations/api/v1/escalations/webrep/disputes'
+    method: 'GET'
+    headers: headers
+    data: data
+    data_json: JSON.stringify(data)
+    success: (response) ->
+      console.log(response)
+      console.log(data)
+      json = $.parseJSON(response)
+
+      if json.data.length == 0
+        std_msg_error("No tickets matching filter or search.","")
+
+      else
+        datatable = $('#table-user-complaints-open').DataTable()
+        datatable.clear();
+        datatable.rows.add(json.data);
+        datatable.draw();
+    error: (response) ->
+     console.log(response)
+  , this)
 

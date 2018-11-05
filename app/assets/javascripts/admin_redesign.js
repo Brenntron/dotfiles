@@ -30,7 +30,9 @@
 //= require application/helpers
 //= require clipboard
 //= require moment
+
 //= require application/chart.pieceLabel.min
+//= require application/daterangepicker
 //= require application/webrep_advanced_search
 //= require dataTables/jquery.dataTables
 //= require dataTables/extras/dataTables.responsive
