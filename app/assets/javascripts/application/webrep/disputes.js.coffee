@@ -1170,6 +1170,7 @@ $ ->
       { data: 'submitter_domain' }
       { data: 'submitter_name' }
       { data: 'submitter_email' }
+      { data: 'status_comment' }
 
 
     ])
@@ -1426,6 +1427,7 @@ $ ->
       data['submitter-domain'] = $("#submitter-domain-checkbox").is(':checked')
       data['contact-name'] = $("#contact-name-checkbox").is(':checked')
       data['contact-email'] = $("#contact-email-checkbox").is(':checked')
+      data['status-comment'] = $("#status-comment-checkbox").is(':checked')
 
       std_msg_ajax(
         url: "/escalations/api/v1/escalations/user_preferences/update"
