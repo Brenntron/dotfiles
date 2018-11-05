@@ -32,5 +32,6 @@ Feature: Webcat reporting
       | 102    |
     And I goto a "complaint_entry" report surrounding the current year
     When I click "Export"
-    Then response header "Content-Type" should be "text/csv"
+    # Note the header isn't `text/csv` *specifically because* we generate this on-the-fly
+    Then response header "Content-Type" should be "application/octet-stream"
 
