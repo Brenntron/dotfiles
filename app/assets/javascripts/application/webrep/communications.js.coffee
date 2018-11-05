@@ -139,7 +139,7 @@ $ ->
 
   $('.attachment-reply').on 'click', ->
     $('.file-wrapper-reply').show()
-    $('#file-fields').append("<span class='file-attachment-wrapper'><input class= 'file_attachment' name='attachment' type='file'/></span>")
+    $('#file-fields').append("<span class='file-attachment-wrapper'><input class= 'file_attachment' onchange='check_email_attachment_size(this)' name='attachment' type='file'/></span>")
     $('.file_attachment:last').after("<button class='delete_attachment'>x</button>")
     $('.file_attachment:last').click()
 
@@ -193,7 +193,7 @@ $ ->
     )
 
   $('.new-attachment').on 'click', ->
-    $('#file-fields-new').before("<span class='file-attachment-wrapper'><input class= 'file_attachment_new' name='attachment' type='file'/></span>")
+    $('#file-fields-new').before("<span class='file-attachment-wrapper'><input class= 'file_attachment_new' onchange='check_email_attachment_size(this)' name='attachment' type='file'/></span>")
     $('.file_attachment_new:last').after("<button class='delete_attachment_new'>x</button>")
     $('.file_attachment_new:last').click()
     false
@@ -223,8 +223,7 @@ $ ->
     if $('form')[0].checkValidity() == true
       e.preventDefault()
       if dispute_id
-        $.ajax(
-          headers: headers
+        std_msg_ajax(
           method: 'POST'
           url: '/escalations/api/v1/escalations/webrep/dispute_emails'
           data: form_data
@@ -239,8 +238,7 @@ $ ->
             std_api_error(response, "Email was not sent", response, reload: false)
         )
       else
-        $.ajax(
-          headers: headers
+        std_msg_ajax(
           method: 'POST'
           url: '/escalations/api/v1/escalations/webrep/dispute_emails/ad_hoc'
           data: form_data
@@ -360,6 +358,13 @@ $ ->
     return
   $('.mng-templates-button').on 'click', ->
     $('#manageTemplatesDialog').dialog 'open'
+    return
+
+
+  window.check_email_attachment_size = (e) ->
+    if e.files[0].size > 20971520
+      std_msg_error("Max attachment size is 20MB", "")
+      e.value = ''
     return
 
   ## Manage Email Templates

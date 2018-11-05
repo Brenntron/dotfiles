@@ -107,7 +107,7 @@
                       %label.content-label-sm Comment
                       %textarea.dropdown-comment.adjust-wlbl-input.note-input
                     .button-row-center
-                      %button.primary.dropdown-submit-button{type: 'button', disabled: true, onclick:'toolbar_adust_wlbl_button(this);'}
+                      %button.primary.dropdown-submit-button{type: 'button', disabled: true, onclick:'toolbar_adjust_wlbl_button(this);'}
                         Submit Changes
 
           %span.dropdown
@@ -481,7 +481,7 @@
                                   - entry.referenced_tickets.each do |reference|
                                     %tr
                                       %td
-                                        %a{href: "/escalations/webrep/disputes/#{reference.id}"}
+                                        %a{href: escalations_webrep_disputes_path(reference.id)}
                                           = reference.id
                                       %td
                                         = reference.case_opened_at

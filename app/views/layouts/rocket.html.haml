@@ -58,7 +58,7 @@
                   %a= inline_svg 'icon_amp.svg'
               - if can?(:index, Dispute)
                 %li{class: 'rep-link'}
-                  %a{href: escalations_webrep_tickets_path}
+                  %a{href: escalations_webrep_disputes_path}
                     =inline_svg 'icon_rep.svg'
               - if can?(:index, Complaint)
                 %li{class: 'cat-link'}
@@ -75,10 +75,6 @@
           %a{class: 'static-nav-item', 'data-toggle': 'collapse', href:'.doc-subnav', role:'button', 'aria-expanded':'false', 'aria-controls':'doc-subnav doc-subnav-icons'}
             = image_tag('layout/icon_documentation.svg', class: 'sidenav-icon', alt: 'Docs')
           %ul{class: 'sub-nav collapse doc-subnav', id: 'doc-subnav-icons'}
-            - if can?(:read, RuleDoc)
-              %li{class: 'doc-link'}
-                %a{href: rule_docs_path}
-                  =inline_svg 'icon_snort.svg'
             %li{class: 'wiki-link'}
               %a{href: 'https://confluence.vrt.sourcefire.com/display/OSDWE/Analyst+Console+Documentation', target: '_blank'}
                 =inline_svg 'icon_wiki_grey.svg'
@@ -126,7 +122,7 @@
                     %a AMP
                 - if can?(:index, Dispute)
                   %li{class: 'rep-link'}
-                    %a{href: escalations_webrep_tickets_path} Reputation
+                    %a{href: escalations_webrep_disputes_path} Reputation
                 - if can?(:index, Complaint)
                   %li{class: 'cat-link'}
                     %a{href: escalations_webcat_complaints_path} Categorization
@@ -143,10 +139,6 @@
             %a{class: 'static-nav-item', 'data-toggle': 'collapse', href:'.doc-subnav', role:'button', 'aria-expanded':'false', 'aria-controls':'doc-subnav doc-subnav-icons'}
               Docs
             %ul{class: 'sub-nav collapse doc-subnav', id: 'doc-subnav'}
-              - if can?(:read, RuleDoc)
-                %li{class: 'ruledocs-link'}
-                  %a{href: rule_docs_path}
-                    IPS Rules
               %li{class: 'wiki-link'}
                 %a{href: 'https://confluence.vrt.sourcefire.com/display/OSDWE/Analyst+Console+Documentation', target: '_blank'} Doc
 

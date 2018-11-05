@@ -102,6 +102,8 @@ module API
 
                   complaint_entry_packet[:screen_shot_error] = complaint_entry&.complaint_entry_screenshot&.error_message
 
+                  complaint_entry_packet[:description] = complaint_entry&.complaint&.description
+
                   if complaint_entry.complaint_entry_preload.present?
                     if complaint_entry.complaint_entry_preload.current_category_information.present? &&
                        complaint_entry.complaint_entry_preload.current_category_information != 'DATA ERROR'
