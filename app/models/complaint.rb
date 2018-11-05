@@ -553,11 +553,11 @@ class Complaint < ApplicationRecord
         'classification' => 'unclassified',
     }
 
-    bug_id = bugzilla_rest_session.create_bug(bug_attrs)
+    bug_proxy = bugzilla_rest_session.create_bug(bug_attrs)
 
 
     cust = find_customer(customer) if customer
-    new_complaint = Complaint.create(id: bug_id,
+    new_complaint = Complaint.create(id: bug_proxy.id,
                                      description: description,
                                      customer_id: cust&.id,
                                      status: status,
@@ -570,7 +570,7 @@ class Complaint < ApplicationRecord
       ComplaintEntry.create_complaint_entry(new_complaint, ip_url, User.where(display_name:"Vrt Incoming").first, status, categories)
     end
 
-    bug_id
+    bug_proxy
   end
 
   def self.find_customer(customer)

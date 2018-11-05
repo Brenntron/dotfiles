@@ -8,6 +8,17 @@ class BugzillaRest::Base
     @token = token
   end
 
+  def indifferent(attrs)
+    attrs.inject(ActiveSupport::HashWithIndifferentAccess.new) do |hash, (key, value)|
+      hash[key.to_s] = value
+      hash
+    end
+  end
+
+  def compact(attrs)
+    attrs.reject { |key, value| value.nil? }
+  end
+
   def host
     @host ||= Rails.configuration.bugzilla_host
   end
@@ -42,7 +53,7 @@ class BugzillaRest::Base
       query_data['Bugzilla_token'] = @token
     end
 
-    query_str = query_data.map { |key, value| "#{CGI.escape(key)}=#{CGI.escape(value)}" }.join('&')
+    query_str = query_data.map { |key, value| "#{CGI.escape(key.to_s)}=#{CGI.escape(value)}" }.join('&')
     request = HTTPI::Request.new("https://#{host}#{path}?#{query_str}")
 
     request.ssl = true

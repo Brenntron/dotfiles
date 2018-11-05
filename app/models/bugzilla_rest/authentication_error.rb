@@ -5,7 +5,7 @@ class BugzillaRest::AuthenticationError < BugzillaRest::BaseError
     super
     @url = '/escalations/api/v1/escalations/bugzilla_rest_login'
     @system = 'bugzilla'
-    @prompt = 'Please sign in using your CEC credentials.'
+    @prompt = 'Please sign in using your Cisco CEC credentials.'
     @fields = %w{username *password}
   end
 end
