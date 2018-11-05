@@ -111,8 +111,6 @@ class BugsController < ApplicationController
       flash[:error] = "You do not have access to this bug."
     end
 
-    @bug_references =  Reference.joins(rules: :bugs).where(bugs: {id: @bug.id })
-
     if @bug
       @unique_giblets = @bug.giblets.map {|g| g.name}.uniq
       @show_resolve_button = ['NEW', 'OPEN', 'ASSIGNED', 'DUPLICATE', 'REOPENED'].include?(@bug.state)

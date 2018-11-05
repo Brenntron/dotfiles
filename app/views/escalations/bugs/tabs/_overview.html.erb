@@ -51,43 +51,6 @@
     <% end %>
   </div>
   <div class="col-xs-12 overview-code">
-    <% if (@bug_references | @bug.references).any? %>
-        <% if (@bug_references.cves | @bug.references.cves).any? %>
-            <p>cve:</p>
-            <% (@bug_references.cves.distinct | @bug.references.cves.distinct).each do |ref| %>
-                <div class="col-xs-12">
-                  <code><a href="<%= get_ref_url(ref, "cve") %>" target="_blank"><%= ref.reference_data %></a></code>
-                </div>
-            <% end %>
-        <% end %>
-        <% if (@bug_references.urls | @bug.references.urls).any? %>
-            <p>url:</p>
-            <% (@bug_references.urls.distinct | @bug.references.urls.distinct).each do |ref| %>
-                <div class="col-xs-12">
-                  <code><a href="<%= get_ref_url(ref, "url") %>" target="_blank"><%= ref.reference_data %></a></code>
-                </div>
-            <% end %>
-        <% end %>
-        <% if (@bug_references.bugtraqs | @bug.references.bugtraqs).any? %>
-            <p>bugtraq:</p>
-            <% (@bug_references.bugtraqs.distinct | @bug.references.bugtraqs.distinct).each do |ref| %>
-                <div class="col-xs-12">
-                  <code><a href="<%= get_ref_url(ref, "bugtraq") %>" target="_blank"><%= ref.reference_data %></a></code>
-                </div>
-            <% end %>
-        <% end %>
-        <% if (@bug_references.telus | @bug.references.telus).any? %>
-            <p>telus:</p>
-            <% (@bug_references.telus.distinct | @bug.references.telus.distinct).each do |ref| %>
-                <div class="col-xs-12">
-                  <code><a href="<%= get_ref_url(ref, "telus") %>" target="_blank"><%= ref.reference_data %></a></code>
-                </div>
-            <% end %>
-        <% end %>
-
-    <% else %>
-        <p>< MISSING ></p>
-    <% end %>
   </div>
   <input id="tag_list" class="hidden" value="<%=@tags%>"/>
 </div>

@@ -17,7 +17,6 @@ Rails.application.routes.draw do
         patch :remove_tag
         patch :remove_whiteboard
       end
-      # resources :references
     end
 
     namespace :webcat do
@@ -56,10 +55,10 @@ Rails.application.routes.draw do
       root 'root#index'
       resources :disputes, only: [:index, :show] do
         collection do
-          get :advanced_search
-          get :named_search
-          get :standard_search
-          get :contains_search
+          # get :advanced_search
+          # get :named_search
+          # get :standard_search
+          # get :contains_search
           get :resolution_report
           get :export_per_resolution_report
           get :export_per_engineer_report
@@ -75,7 +74,6 @@ Rails.application.routes.draw do
       resources :dispute_comments       # TODO This route has no controller so determine if it should be removed.
       resources :email_templates        # TODO This route has no controller so determine if it should be removed.
 
-      get 'tickets', to: 'disputes#index'
       get 'dashboard', to: 'disputes#dashboard'
       get 'research', to: 'disputes#research'
     end
@@ -134,30 +132,9 @@ Rails.application.routes.draw do
         get :related
       end
     end
-    resources :reference_types, only: [:index, :edit, :update]
     resources :scheduled_tasks, only: [:index, :show, :create, :destroy] do
       collection do
         post :run_job
-      end
-    end
-
-    namespace :snort_doc do
-      root 'root#index'
-      get 'doc_output', to: 'rule_docs#doc_output'
-      get :rule_docs, to: 'rule_docs#index'
-      get :upload_docs, to: 'rule_docs#upload'
-      post :upload_docs, to: 'rule_docs#send_yaml'
-      namespace :cves do
-        get :nvd
-        post :download
-        get :missing
-        post :update
-      end
-    end
-
-    resources :rules_sync, only: [:index] do
-      collection do
-        get :diagnostics
       end
     end
   end
@@ -207,11 +184,6 @@ Rails.application.routes.draw do
     end
   end
 
-  resources :rule_docs
-  namespace :templates do
-    resources :rules, only: [:show]
-  end
-
   resources :research_bugs, controller: 'bugs'
   resources :bugs, only: [:index, :new, :create, :show, :update] do
     member do
@@ -221,7 +193,6 @@ Rails.application.routes.draw do
       patch :remove_tag
       patch :remove_whiteboard
     end
-    resources :references, only: [:create]
     get :bug_metrics, defaults: { format: :json }
   end
 

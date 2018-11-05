@@ -642,14 +642,6 @@ class Bug < ApplicationRecord
     end
   end
 
-  def exploits_complete?
-    exploits.all? { |expl| expl.attachment.present? }
-  end
-
-  def docs_complete?
-    rules.all? { |rule| rule.doc_complete? }
-  end
-
   def rules_parsed?
     rules.each do |rule|
       next unless 1 == rule.gid
@@ -664,8 +656,6 @@ class Bug < ApplicationRecord
     unless @resolve_errors
       @resolve_errors = []
 
-      @resolve_errors << "Please assign attachments to exploits." unless exploits_complete?
-      @resolve_errors << "Please complete the summary for rule docs." unless docs_complete?
       @resolve_errors << "Rules must be valid." unless rules_parsed?
 
     end
