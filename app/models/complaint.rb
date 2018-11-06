@@ -149,7 +149,7 @@ class Complaint < ApplicationRecord
     new_ips = new_entries_ips.keys.sort
 
     response = {}
-    possibles = Complaint.includes(:complaint_entries).where(:customer_id => complaint.customer_id).select {|complaint| complaint.status != RESOLVED || complaint.status != DUPLICATE}
+    possibles = complaint.customer.complaints.where.not(status: [ RESOLVED, DUPLICATE ])
     candidates = []
 
     possibles.each do |poss|
