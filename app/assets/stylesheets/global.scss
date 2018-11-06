@@ -6448,14 +6448,12 @@ h2 {
     margin-right: 10px;
   }
 
-
-
   ul {
     margin: 0;
     padding: 0;
     height: inherit;
     width: 100%;
-    display: flex;
+    display: block;
     border-right: 2px solid white;
 
     li {
@@ -6463,74 +6461,34 @@ h2 {
       display: inline-block;
       line-height: 50px;
       cursor: pointer;
-      padding: 0 10px;
-      position: relative;
-      border-left: .5px solid $faint-neutral-color;
-      border-right: .5px solid $faint-neutral-color;
-
-      .arrow-down {
-        position: absolute;
-        width: 10px;
-        height: 10px;
-        background: $primary-section-color;
-        transform: rotate(45deg);
-        bottom: -5px;
-        left: calc(50% - 5px);
-      }
+      margin-right: 20px;
 
       a {
         display: block;
         height: 100%;
-        width: 100%;
-        padding-left: 40px;
+        padding: 0 15px 0 40px;
         font-size: 11px;
         text-decoration: none;
         color: $type-lighter-color;
       }
 
-      //a:hover,
-      //a.active {
-      //  color: white;
-      //  background-color: $primary-section-color;
-      //}
-      //.white-user:hover,
-      //.white-user.active{
-      //  background-image: url(image_path('icon_user_white.svg'));;
-      //}
-      //.group-user-white:hover,
-      //.group-user-white.active {
-      //  background-image: url(image_path('icon_team.svg'));
-      //}
-      //.all-tickets-white:hover,
-      //.all-tickets-white.active{
-      //  background-image: url(image_path('icon_ticket.svg'));
-      //}
-      //.custom-user-white:hover,
-      //.custom-user-white.active{
-      //  background-image: url(image_path('icon_custom_user_white.svg'));
-      //}
-
-    }
-
-    li.active,
-    li:hover {
-      background-color: $primary-section-color;
-      a {
+      a:hover {
         color: white;
+        background-color: $primary-section-color;
       }
-
-      .white-user {
+      .white-user:hover {
         background-image: url(image_path('icon_user_white.svg'));;
       }
-      .group-user-white {
+      .group-user-white:hover {
         background-image: url(image_path('icon_team.svg'));
       }
-      .all-tickets-white{
+      .all-tickets-white:hover {
         background-image: url(image_path('icon_ticket.svg'));
       }
-      .custom-user-white{
+      .custom-user-white:hover {
         background-image: url(image_path('icon_custom_user_white.svg'));
       }
+
     }
   }
   .user-icon-stg-1 {
