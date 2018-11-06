@@ -1003,6 +1003,29 @@ $ ->
 
     )
 
+  $('#disputes_check_box').change (el) ->
+    if el.target.checked
+      $('table#disputes-index').DataTable().rows().select()
+      rows = $('table#disputes-index input[type="checkbox"]');
+      i = 1
+      while i < rows.length
+        $(rows[i])[0].checked = true
+        i++
+    else
+      $('table#disputes-index').DataTable().rows().deselect()
+      rows = $('table#disputes-index input[type="checkbox"]');
+      i = 1
+      while i < rows.length
+        $(rows[i])[0].checked = false
+        i++
+
+  $ ->
+    $(document).ready ->
+      $('table#disputes-index .dispute_check_box').on 'click', (el) ->
+        console.log(el)
+  window.toggleRow = (el) ->
+    $(el).closest('tr').toggleClass('selected')
+
   $('#disputes_check_box').change ->
     $('.dispute_check_box').prop 'checked', @checked
     return
@@ -1141,7 +1164,7 @@ $ ->
 
         render: (data) ->
 
-          '<input type="checkbox" name="cbox" class="dispute_check_box" id="cbox' + data + '" value="' + data + '" />'
+          '<input type="checkbox" onclick="toggleRow(this)" name="cbox" class="dispute_check_box" id="cbox' + data + '" value="' + data + '" />'
 
       }
       {
