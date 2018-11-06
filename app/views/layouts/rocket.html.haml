@@ -69,7 +69,7 @@
 
         - if can?(:read, Admin)
           %li{class: 'nav-item nav-admin'}
-            %a{href: admin_root_path}= image_tag('layout/icon_admin.svg', class: 'sidenav-icon', alt: 'Admin')
+            %a{href: '/admin'}= image_tag('layout/icon_admin.svg', class: 'sidenav-icon', alt: 'Admin')
 
         %li{class: 'nav-docs'}
           %a{class: 'static-nav-item', 'data-toggle': 'collapse', href:'.doc-subnav', role:'button', 'aria-expanded':'false', 'aria-controls':'doc-subnav doc-subnav-icons'}
@@ -131,7 +131,7 @@
               Users
           - if can?(:read, Admin)
             %li{class: 'nav-admin static-nav-item'}
-              %a{href: admin_root_path}
+              %a{href: '/admin'}
                 Admin
 
 
