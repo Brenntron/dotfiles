@@ -26,133 +26,6 @@
           Show Email/Web Tickets
           %input{:type => "checkbox", :checked => "checked"}/
 
-      .user-tickets-top
-        .user-tickets-header
-          %h6 My Open Tickets
-
-          .num-frame
-            %label.label-stg 3
-            %label.left-space.left-vertical-separator 23
-
-    .col-xs-6.graph-section
-      .col-xs-6.top-space-ex
-        .graph-top-header
-          %h5.uppercase.header-stg ticket entries closed by day
-
-
-        %label.content-label-sm Time Breakdown
-        .graph-config
-          %select.form-control
-            %option{:selected => "selected", :value => "day"} By Day
-            %option{:value => "weekly"} Weekly
-            %option{:value => "monthly"} Monthly
-            %option{:value => "yearly"} Yearly
-
-          .graph-menu
-            %label
-              %input.all-ticket{:type => "checkbox", :checked => "checked", :onclick => 'updateGraph(["Total Ticket Entries"], "myBar", this)'}/
-              %label.total-legend
-              Total Tickets Entries
-
-            %label
-              %input.group-ticket{:type => "checkbox", :checked => "checked", :onclick => 'updateGraph(["E", "W", "EW"], "myBar", this)'}/
-              %label.dispute-E.legend-option
-              %label.dispute-W.legend-option
-              %label.dispute-EW.legend-option
-              Entries By Ticket Types
-        %canvas#canvas
-
-
-        .graph-top-header.top-space-ex.bottom-space
-          %h5.uppercase.header-stg Times to Close Tickets
-        .average-label
-          %label Average Time To Close
-          %label.label-stg 45m 12s
-        %canvas#line-chart
-
-
-        %label.content-label-sm.top-space-ex Time Breakdown
-        .graph-config
-          %select.form-control
-            %option{:selected => "selected", :value => ""} By Day
-            %option{:value => ""} Weekly
-            %option{:value => ""} Monthly
-            %option{:value => ""} Yearly
-        .graph-top-header
-          %h5.uppercase.header-stg ticket submitted by submitter per day
-        .graph-bar-legend
-          .custom-legend
-            %label Customer
-            %label.skyblue-legend-color
-          .custom-legend
-            %label Guest
-            %label.navyblue-legend-color
-        %canvas#bar-chart
-
-
-      .col-xs-6.top-space-ex.graph-section
-        .graph-top-header
-          %h5.uppercase.dispute-E-grey.graph-header-icon-stg.header-stg.bottom-space closed email entries by resolution
-
-        %canvas#pie-chart
-
-
-        %table.table.left-space.top-space
-          %thead
-            %tr
-              %th{:scope => "col"} RESOLUTION
-              %th{:scope => "col"} %
-              %th{:scope => "col"} COUNT
-          %tbody
-            %tr.text-left
-              %td Unchanged
-              %td 18.75%
-              %td 3
-            %tr.text-left
-              %td Fixed FN
-              %td 37.50%
-              %td 6
-            %tr.text-left
-              %td Fixed FP
-              %td 43.75%
-              %td 7
-
-            %tr.text-left
-              %td Other
-              %td 00.00%
-              %td 0
-
-
-        .graph-top-header.top-space.top-space-ex
-          %h5.uppercase.dispute-W-grey.graph-header-icon-stg.header-stg.bottom-space closed web entries by resolution
-
-        %canvas#pie-chart2
-
-        %table.table.left-space.top-space
-          %thead
-            %tr
-              %th{:scope => "col"} RESOLUTION
-              %th{:scope => "col"} %
-              %th{:scope => "col"} COUNT
-          %tbody
-            %tr.text-left
-              %td Unchanged
-              %td 18.75%
-              %td 3
-            %tr.text-left
-              %td Fixed FN
-              %td 37.50%
-              %td 6
-            %tr.text-left
-              %td Fixed FP
-              %td 43.75%
-              %td 7
-
-            %tr.text-left
-              %td Other
-              %td 00.00%
-              %td 0
-
       .tickets-section-wrapper.open-tickets-wrapper
 
         .open-tickets-header
@@ -166,13 +39,13 @@
           %thead
             %tr
               %th
-                -#  priority
+              -#  priority
               %th Case ID
               %th
-                -#  Submitter type
+              -#  Submitter type
               %th Status
               %th
-                -#  Ticket type
+              -#  Ticket type
               %th Dispute Preview
               %th Last Comment Date
 
@@ -218,12 +91,12 @@
           %thead
             %tr
               %th
-                -#    priority
+              -#    priority
               %th Case ID
               %th
-                -#  Submitter type
+              -#  Submitter type
               %th
-                -#  Ticket type
+              -#  Ticket type
               %th Dispute Preview
               %th Time to Close
         .ticket-entries-totals-wrapper
@@ -254,3 +127,123 @@
               Email/Web Entries
             %span.ticket-entry-total
               3
+
+
+    .col-xs-6.graph-section
+
+      .graph-top-header
+        %h5.uppercase.header-stg ticket entries closed by day
+
+
+      %label.content-label-sm Time Breakdown
+      .graph-config
+        %select.form-control
+          %option{:selected => "selected", :value => "day"} By Day
+          %option{:value => "weekly"} Weekly
+          %option{:value => "monthly"} Monthly
+          %option{:value => "yearly"} Yearly
+
+        .graph-menu
+          %label
+            %input.all-ticket{:type => "checkbox", :checked => "checked", :onclick => 'updateGraph(["Total Ticket Entries"], "myBar", this)'}/
+            %label.total-legend
+            Total Tickets Entries
+
+          %label
+            %input.group-ticket{:type => "checkbox", :checked => "checked", :onclick => 'updateGraph(["E", "W", "EW"], "myBar", this)'}/
+            %label.dispute-E.legend-option
+            %label.dispute-W.legend-option
+            %label.dispute-EW.legend-option
+            Entries By Ticket Types
+      %canvas#canvas
+
+
+      .graph-top-header.top-space-ex.bottom-space
+        %h5.uppercase.header-stg Times to Close Tickets
+      .average-label
+        %label Average Time To Close
+        %label.label-stg 45m 12s
+      %canvas#line-chart
+
+
+      %label.content-label-sm.top-space-ex Time Breakdown
+      .graph-config
+        %select.form-control
+          %option{:selected => "selected", :value => ""} By Day
+          %option{:value => ""} Weekly
+          %option{:value => ""} Monthly
+          %option{:value => ""} Yearly
+      .graph-top-header
+        %h5.uppercase.header-stg ticket submitted by submitter per day
+      .graph-bar-legend
+        .custom-legend
+          %label Customer
+          %label.skyblue-legend-color
+        .custom-legend
+          %label Guest
+          %label.navyblue-legend-color
+      %canvas#bar-chart
+
+
+    .col-xs-6.top-space-ex.graph-section
+      .graph-top-header
+        %h5.uppercase.dispute-E-grey.graph-header-icon-stg.header-stg.bottom-space closed email entries by resolution
+
+      %canvas#pie-chart
+
+
+      %table.table.left-space.top-space
+        %thead
+          %tr
+            %th{:scope => "col"} RESOLUTION
+            %th{:scope => "col"} %
+            %th{:scope => "col"} COUNT
+        %tbody
+          %tr.text-left
+            %td Unchanged
+            %td 18.75%
+            %td 3
+          %tr.text-left
+            %td Fixed FN
+            %td 37.50%
+            %td 6
+          %tr.text-left
+            %td Fixed FP
+            %td 43.75%
+            %td 7
+
+          %tr.text-left
+            %td Other
+            %td 00.00%
+            %td 0
+
+
+      .graph-top-header.top-space.top-space-ex
+        %h5.uppercase.dispute-W-grey.graph-header-icon-stg.header-stg.bottom-space closed web entries by resolution
+
+      %canvas#pie-chart2
+
+      %table.table.left-space.top-space
+        %thead
+          %tr
+            %th{:scope => "col"} RESOLUTION
+            %th{:scope => "col"} %
+            %th{:scope => "col"} COUNT
+        %tbody
+          %tr.text-left
+            %td Unchanged
+            %td 18.75%
+            %td 3
+          %tr.text-left
+            %td Fixed FN
+            %td 37.50%
+            %td 6
+          %tr.text-left
+            %td Fixed FP
+            %td 43.75%
+            %td 7
+
+          %tr.text-left
+            %td Other
+            %td 00.00%
+            %td 0
