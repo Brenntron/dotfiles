@@ -704,30 +704,29 @@ th.alt-col {
   height: 20px;
 }
 
-.expand-row-button:hover {
-  background-color: lighten($nav-toolbar-color, 8%);
-}
-.expand-row-button:focus {
-  background-color: lighten($nav-toolbar-color, 8%);
-  border-style: inset;
-  border-color: $primary-section-color;
-}
-
-.collapse-button:hover {
-  background-color: lighten($nav-toolbar-color, 8%);
-}
-
-.collapse-button:focus {
-  background-color: lighten($nav-toolbar-color, 8%);
-  border-style: inset;
-  border-color: $primary-section-color;
-}
-
-.show-col-button:hover {
+.expand-row-button:hover,
+.collapse-button:hover,
+.show-col-button:hover,
+.mark-related-button:hover,
+.ticket-status-button:hover,
+.ticket-owner-button:hover,
+.adjust-reptool-button:hover,
+.adjust-wlbl-button:hover,
+.export-button:hover,
+.take-ticket-button:hover {
   background-color: lighten($nav-toolbar-color, 8%);
 }
 
-.show-col-button:focus {
+.expand-row-button:focus,
+.collapse-button:focus,
+.show-col-button:focus,
+.mark-related-button:focus,
+.ticket-status-button:focus,
+.ticket-owner-button:focus,
+.adjust-reptool-button:focus,
+.adjust-wlbl-button:focus,
+.export-button:focus,
+.take-ticket-button:focus {
   background-color: lighten($nav-toolbar-color, 8%);
   border-style: inset;
   border-color: $primary-section-color;
@@ -4457,7 +4456,9 @@ table > tbody > tr > td.dispute_rep_tools {
   height: 35px;
   padding: 3px;
 }
-
+.no-margin-datatable-top-tool {
+  margin: 0 !important;
+}
 .dispute-count {
   background-color: darken($nav-toolbar-color, 8%);
   display: inline-block;
