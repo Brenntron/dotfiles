@@ -3,10 +3,8 @@ require "rails_helper"
 RSpec.describe "Peake-Bridge dispute email messages channels", type: :request do
   let(:customer) { FactoryBot.create(:customer) }
   let(:dispute) { FactoryBot.create(:dispute, customer: customer) }
-
-  it 'receives dispute email payload messages' do
-
-    post '/escalations/peake_bridge/channels/ticket-event/messages', as: :json, params: {
+  let(:dispute_email_params) do
+    {
         envelope: {
             channel: "ticket-event",
             addressee: "analyst-console-escalations",
@@ -42,6 +40,13 @@ RSpec.describe "Peake-Bridge dispute email messages channels", type: :request do
             }
         }
     }
+  end
+  let(:bridge_message) { double('Bridge::BaseMessage', post: true) }
+
+  it 'receives dispute email payload messages' do
+    expect(Bridge::EmailCreatedEvent).to receive(:new).and_return(bridge_message)
+
+    post '/escalations/peake_bridge/channels/ticket-event/messages', as: :json, params: dispute_email_params
 
     expect(response).to be_success
     dispute_email = DisputeEmail.where(dispute_id: dispute.id).first
