@@ -5305,6 +5305,10 @@ table.dispute_tool_current tr:last-of-type td {
   padding: 15px;
 }
 
+.dashboard-header-area {
+  padding-bottom: 0 !important;
+}
+
 .dashboard-header-area h1, .complaint-mgt-top-area h1 {
   color: $content-bg-color;
   margin-bottom: 24px;
@@ -6404,6 +6408,7 @@ h2 {
 
       .button-wrapper {
         text-align: right;
+        margin-bottom: 10px;
 
         button {
           background-color: #54708c;
