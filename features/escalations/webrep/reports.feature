@@ -84,7 +84,6 @@ Feature: WebRep Reports
     |status           | resolution | case_resolved_at  |
     |RESOLVED_CLOSED  | FIXED_FP   | 2018-11-06 16:29:5|
     When I goto "/escalations/webrep/disputes/resolution_age_report?customer_id=1&date_from=2018-01-01&date_to=2018-12-30"
-    Then take a screenshot
     Then I should see "Resolution Age Report"
     Then I should see "Number of resolved complaints per resolution"
     Then I trigger-click ".resolution-age-export"
