@@ -25,7 +25,7 @@
         - @report.each_engineer do |counts|
           %tr
             %td= counts.username
-            %td= counts.fixed
+            %td.total-fixed= counts.fixed
             %td= counts.invalid
             %td= counts.unchanged
             %td= counts.duplicate

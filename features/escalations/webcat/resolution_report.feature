@@ -11,6 +11,11 @@ Feature: Webcat reporting
       | 100    |
       | 101    |
       | 102    |
+    And the following complaints exist and have unresolved entries:
+      |id  |
+      |200 |
+      |201 |
+      |202 |
     And I goto a "resolution" report surrounding the current year
     Then I should see "FIXED COMPLAINTS"
     Then I should see "INVALID COMPLAINTS"
@@ -20,6 +25,16 @@ Feature: Webcat reporting
     Then I should see "ENG MAX"
     Then I should see "DEPT AVE"
     Then I should see "DEPT MAX"
+    Then I should see content "3" within "#webcat-resolution-report-table tr:first-child .total-fixed"
+
+  @javascript
+  Scenario: Complaint entries that are not resolved should not be displayed
+    Given a user with role "webcat user" exists and is logged in
+    And the following complaint entries exist:
+      |id|
+      |1 |
+    And I goto a "resolution" report surrounding the current year
+    Then I should see content "" within ".total-fixed"
 
   @javascript
   Scenario: Exported file should be a csv

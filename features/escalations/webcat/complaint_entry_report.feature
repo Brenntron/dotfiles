@@ -20,8 +20,6 @@ Feature: Webcat reporting
     Then I should see "SUGGESTED CATEGORY"
     Then I should see "CREATED"
 
-
-
   @javascript
   Scenario: Exported file should be a csv
     Given a user with role "webcat user" exists and is logged in
