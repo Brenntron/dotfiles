@@ -246,8 +246,8 @@ class Complaint < ApplicationRecord
         summary = "New Web Category Complaint generated at #{DateTime.now.utc.strftime("%Y-%m-%d %H:%M")}"
 
         full_description = <<~HEREDOC
-          IPs: #{new_entries_ips.map {|key, data| key.to_s}.join(', ')}
-          URIs: #{new_entries_urls.map {|key, data| key.to_s}.join(', ')}
+          IPs: #{new_entries_ips.keys.join(', ')}
+          URIs: #{new_entries_urls.keys.join(', ')}
           Problem Summary: #{message_payload["payload"]["problem"]}
         HEREDOC
 
