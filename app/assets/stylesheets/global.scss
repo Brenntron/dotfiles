@@ -5262,8 +5262,8 @@ table.dispute_tool_current tr:last-of-type td {
   /* These below can be deleted after redesign merge, or after the existing style sheet is ported. They exist in the admin redesign stylesheet. */
 .dispute-submission-type {
   background-repeat: no-repeat;
-  width: 20px;
-  height: 20px;
+  width: 16px;
+  height: 16px;
   display: block;
 }
 
@@ -6611,7 +6611,7 @@ h2 {
 }
 
 .top-space-ex {
-  margin-top: 50px;
+  margin-top: 44px;
 }
 
 .bottom-space {
@@ -6705,6 +6705,10 @@ h3.larger-lighter {
   font-weight: 300;
 }
 
+.dashboard-tickets-wrapper {
+  padding-right: 30px;
+}
+
 .open-tickets-header h3, .closed-tickets-header h3 {
   background-repeat: no-repeat;
   background-size: 30px 30px;
@@ -6727,8 +6731,8 @@ h3.larger-lighter {
 
 .submitter-type-icon {
   display: block;
-  width: 20px;
-  height: 20px;
+  width: 16px;
+  height: 16px;
   background-position: center center;
   background-repeat: no-repeat;
 }
@@ -6739,6 +6743,16 @@ h3.larger-lighter {
 
 .dashboard-tickets-table {
   margin-top: 10px !important;
+  font-size: 8pt;
+
+  tbody > tr > td, thead > tr > th {
+    padding: 6px 6px;
+  }
+
+  .bug-priority {
+    width: 18px !important;
+    height: 18px !important;
+  }
 }
 
 td.text-center span {
