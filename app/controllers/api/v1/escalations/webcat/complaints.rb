@@ -143,7 +143,7 @@ module API
                                                        categories_string: prefix["cats"].join(','),
                                                        description: '',
                                                        user: current_user.email,
-                                                       bugzilla_session: bugzilla_session)
+                                                       bugzilla_rest_session: bugzilla_rest_session)
 
                   end
                 end
@@ -162,7 +162,7 @@ module API
                                                      categories_string: permitted_params["cats"].join(','),
                                                      description: '',
                                                      user: current_user.email,
-                                                     bugzilla_session: bugzilla_session)
+                                                     bugzilla_rest_session: bugzilla_rest_session)
                 end
               end
               render json: 'Success'

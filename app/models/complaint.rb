@@ -122,12 +122,12 @@ class Complaint < ApplicationRecord
   end
 
 
-  def self.commit_without_complaint(ip_or_uri:, categories_string:, description:, user:, bugzilla_session:)
+  def self.commit_without_complaint(ip_or_uri:, categories_string:, description:, user:, bugzilla_rest_session:)
     # check to see if URL is in Top URLS
     top_url = Wbrs::TopUrl.check_urls([ip_or_uri]).first.is_important
     if top_url
       #create a complaint/complaint entry and set to pending
-      Complaint.create_action(bugzilla_session, ip_or_uri, description, nil, nil, PENDING, categories_string)
+      Complaint.create_action(bugzilla_rest_session, ip_or_uri, description, nil, nil, PENDING, categories_string)
     else
       # Look for existing prefix
       existing_prefix = Wbrs::Prefix.where({urls: [ip_or_uri]})
