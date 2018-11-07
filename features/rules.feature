@@ -226,3 +226,4 @@ Feature: Rules
       | gid |  sid  | metadata                 | detection         | rule_content             |
       |  1  | 22211 | policy security-ips drop | flowbits:noalert; | # alert (degenerate: yes;) |
     Then a rule gid "1" and sid "22211" is off
+    
