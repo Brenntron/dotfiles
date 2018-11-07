@@ -162,18 +162,18 @@ $ ->
 $ ->
   $(document).ready ->
 
-# open selected
-window.open_all = (tableId) ->
+# expand all functionality
+window.expand_all = (tableId) ->
   selectedRows = $('table#' + tableId + ' tr[role="row"]')
   i = 0
   while i < selectedRows.length
     if !$(selectedRows[i]).hasClass('shown')
       $(selectedRows[i]).find('.expand-row-button-inline').click()
     i = i + 1
-  selectedRows = $('table#' + tableId + ' .expand-row-button-inline').click()
+#  selectedRows = $('table#' + tableId + ' .expand-row-button-inline').click()
 
-#  open all selected
-window.open_selected = (tableId) ->
+#  expand selected funtionality
+window.expand_selected = (tableId) ->
   selectedRows = $('table#' + tableId + ' tr[role="row"].selected')
   i = 0
   while i < selectedRows.length
