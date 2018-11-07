@@ -7,6 +7,8 @@ Feature: Webcat complaints
   @javascript
   Scenario: a user can manually create a new complaint
     Given a user with role "webcat user" exists and is logged in
+    And bugzilla rest api always saves
+    And complaint entry preload is stubbed
     And the following companies exist:
     |id| name  |
     | 1| Cisco |
@@ -22,7 +24,7 @@ Feature: Webcat complaints
     And I fill in "customers" with "Cisco:Talos Person:talos@cisco.com"
     And I fill in selectized with "urgent"
     And I click "Create"
-    And I wait for "30" seconds
+    And I wait for "5" seconds
     And I should see "COMPLAINT CREATED"
 
   @javascript
