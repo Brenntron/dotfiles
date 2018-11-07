@@ -163,7 +163,6 @@ describe Wbrs::ManualWlbl do
 
     let(:dispute_entry) { [DisputeEntry.find(1),DisputeEntry.find(2)]}
 
-
     it 'should add a WL/BL on the backend', :foo => true do
       expect(Wbrs::Base).to receive(:make_post_request).and_return(add_wlbl_response)
 
