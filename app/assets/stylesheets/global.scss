@@ -6435,14 +6435,13 @@ h2 {
     }
   }
 }
-
-.dashboard-submenu {
+#dashboard-tab-list.container {
+  width: 100%;
+  display: inline-flex;
   height: 50px;
   background-color: $faint-neutral-color;
-  margin-right: -15px;
-  margin-left: -15px;
-  color: #fff;
-  padding: 0 10px;
+  margin: 0;
+  padding: 0 15px;
 
   label {
     position: relative;
@@ -6463,6 +6462,7 @@ h2 {
 
     li {
       height: inherit;
+      position: relative;
       display: inline-block;
       line-height: 50px;
       cursor: pointer;
@@ -6493,9 +6493,37 @@ h2 {
       .custom-user-white:hover {
         background-image: url(image_path('icon_custom_user_white.svg'));
       }
+    }
+    li.active {
+      background-color: $primary-section-color;
+      .down-arrow {
+        height: 10px;
+        width: 10px;
+        position: absolute;
+        bottom: -5px;
+        left: 45%;
+        transform: rotate(45deg);
+        background-color: $primary-section-color;
+      }
+      a {
+        color: white;
+      }
 
+      .white-user{
+        background-image: url(image_path('icon_user_white.svg'));;
+      }
+      .group-user-white {
+        background-image: url(image_path('icon_team.svg'));
+      }
+      .all-tickets-white{
+        background-image: url(image_path('icon_ticket.svg'));
+      }
+      .custom-user-white {
+        background-image: url(image_path('icon_custom_user_white.svg'));
+      }
     }
   }
+
   .user-icon-stg-1 {
     background-repeat: no-repeat;
     background-size: 15px;
@@ -6511,70 +6539,67 @@ h2 {
     vertical-align: center;
   }
 
-  .dashboard-submenu-area {
-    width: 100%;
+  .dashboard-submission-area {
     display: flex;
-    position: relative;
+    width: 100%;
+    margin-left: 20px;
 
-    .dashboard-menu-list {
-      display: flex;
-    }
-    .bold {
-      font-weight: bold;
-    }
-    .dashboard-submission-area {
-      display: flex;
-      margin-left: 20px;
-
-      label {
-        height: 30px;
-        top: 10px;
-        margin: 0;
-        line-height: 30px;
-        padding: 0 10px;
-        color: $type-lighter-color;
-        font-size: 12px;
-      }
-
-      .invalid-stg {
-        padding-left: 35px;
-        background-position-y: 5px;
-        background-size: 20px;
-      }
-
-      .right-vertical-separator {
-        border-right: 1px solid $type-lighter-color;
-      }
-
-      .font-lg {
-        font-size: 20px;
-      }
-
-      .uppercase {
-        text-transform: uppercase;
-      }
+    label {
+      height: 30px;
+      top: 10px;
+      margin: 0;
+      line-height: 30px;
+      padding: 0 10px;
+      color: $type-lighter-color;
+      font-size: 12px;
     }
 
-    .dashboard-export-report {
-      position: absolute;
-      right: 0;
-      height: 50px;
-      top: 0;
-      padding: 10px 0 0 10px;
-
-      button {
-        background-color: $type-lighter-color;
-        font-size: 10px;
-        height: 30px;
-        padding: 0 10px 0 30px;
-      }
+    .invalid-stg {
+      padding-left: 35px;
+      background-position-y: 5px;
+      background-size: 20px;
     }
 
-    .left-vertical-separator {
-      border-left: 1px solid white;
+    .right-vertical-separator {
+      border-right: 1px solid $type-lighter-color;
+    }
+
+    .font-lg {
+      font-size: 20px;
+    }
+
+    .uppercase {
+      text-transform: uppercase;
     }
   }
+
+  .dashboard-export-report {
+    height: 100%;
+    padding: 10px 0 0 10px;
+
+    button {
+      background-color: $content-label-color;
+      background-position-x: 10px;
+      color: white;
+      font-size: 10px;
+      height: 30px;
+      width: 100pt;
+      padding: 0 10px 0 20px;
+    }
+  }
+  .left-vertical-separator {
+    border-left: 1px solid white;
+  }
 }
+.tab-content {
+  display: block;
+  width: 100%;
+}
+
+.bold {
+  font-weight: bold;
+}
+
 .vertical-separator {
   padding-right: 20px;
   border-right: 1px solid gray;
@@ -6582,7 +6607,6 @@ h2 {
   top: 50%;
   transform: translateY(50%);
 }
-
 
 .btn-margin-left {
   margin-left: 15px;

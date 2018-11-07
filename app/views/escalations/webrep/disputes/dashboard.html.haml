@@ -1,250 +1,556 @@
 .content-wrapper
-  = render "escalations/webrep/disputes/dashboard_topbar"
+  .dashboard-header-area.my-dashboard-header-area
+    .row
+      .col-xs-6
+        .dashboard-wrapper
+          .dashboard-title
+            %h1 My Dashboard
+            %span.my-dashboard-icon
 
-  .row
-    .col-xs-6
+          .user-info
+            %h5= current_user.display_name
+            %p.dashboard-details
+              = current_user.cvs_username
 
-      %h1.dashboard-header My Tickets
-      .content-layout-list
-        %label.content-label-sm.icon-custom-star
-          Show Customer Tickets
-          %input{:type => "checkbox", :checked => "checked"}/
+      .col-xs-6.text-right
+        .dashboard-time-wrapper
+          .dashboard-time
+            %label September 08, 2018 - September 15, 2018
+            %button.toolbar-button.icon-calendar Change Time Span
 
-        %label.content-label-sm.no-left-pad.right-vertical-separator
-          Show Guest Tickets
-          %input{:type => "checkbox", :checked => "checked"}/
+            %input#tickets_date_range{:type => 'text'}
 
-        %label.content-label-sm.dispute-E-grey
-          Show Email Tickets
-          %input{:type => "checkbox", :checked => "checked"}/
+          .dashboard-time-ticket
+            .button-wrapper
+              %button.arrow-left View Last Week's Tickets
 
-        %label.content-label-sm.dispute-W-grey
-          Show Web Tickets
-          %input{:type => "checkbox", :checked => "checked"}/
+      #dashboard-tab-list.container
+        %label.bold View:
+        %ul
+          %li.active
+            %span.down-arrow
+            %a.white-user.ticket-owner-button.user-icon-stg-1.bold{"data-toggle" => "tab", :href => "#my-ticket"} My Ticket
+          %li
+            %span.down-arrow
+            %a.group-user-white.icon-team-grey.user-icon-stg.bold{"data-toggle" => "tab", :href => "#my-team-tickets"} My Team Tickets
+          %li
+            %span.down-arrow
+            %a.all-tickets-white.icon-all-tickets-grey.user-icon-stg.bold{"data-toggle" => "tab", :href => "#all-tickets"} All tickets
+          %li
+            %span.down-arrow
+            %a.custom-user-white.icon-custom-user-grey.user-icon-stg.bold{"data-toggle" => "tab", :href => "#select-custom-users"} Select Custom Users
 
-        %label.content-label-sm.dispute-EW-grey.btn-margin-left
-          Show Email/Web Tickets
-          %input{:type => "checkbox", :checked => "checked"}/
+        .dashboard-submission-area
+          %label.right-vertical-separator.bold.font-lg 30
+          %label.font-lg 99
+          %label.uppercase.right-vertical-separator.bold valid total tickets / entries submission
+          %label.uppercase.icon-invalid-grey.user-icon-stg.invalid-stg.bold 12 invalid tickets
 
-      .tickets-section-wrapper.open-tickets-wrapper
+        .dashboard-export-report.left-vertical-separator
+          %button.toolbar-button.export-button-white Export Report
 
-        .open-tickets-header
-          %h3.larger-lighter My Open Tickets
-
-          .ticket-count-wrapper
-            %label.total-table-ticket-count 4
-            %label.total-table-entry-count 23
-
-        %table.table.responsive.dashboard-tickets-table#table-user-complaints-open
-          %thead
-            %tr
-              %th
-                -#  priority
-              %th Case ID
-              %th
-                -#  Submitter type
-              %th Status
-              %th
-                -#  Ticket type
-              %th Dispute Preview
-              %th Last Comment Date
-
-        .ticket-entries-totals-wrapper
-          %label.totals-label
-            Total Ticket Entries
-          .ticket-entry-total-block
-            %label.content-label-sm.submitter-customer
-              Customer
-            %span.ticket-entry-total
-              32
-          .ticket-entry-total-block.guest-block-total
-            %label.content-label-sm
-              Guest
-            %span.ticket-entry-total
-              12
-          .ticket-entry-total-block
-            %label.content-label-sm.dispute-E-grey
-              Email Entries
-            %span.ticket-entry-total
-              25
-          .ticket-entry-total-block
-            %label.content-label-sm.dispute-W-grey
-              Web Entries
-            %span.ticket-entry-total
-              22
-          .ticket-entry-total-block
-            %label.content-label-sm.dispute-EW-grey
-              Email/Web Entries
-            %span.ticket-entry-total
-              3
-
-
-      .tickets-section-wrapper.closed-tickets-wrapper
-        .closed-tickets-header
-          %h3.larger-lighter My Closed Tickets
-
-          .ticket-count-wrapper
-            %label.total-table-ticket-count 7
-            %label.total-table-entry-count 46
-
-        %table.table.responsive.dashboard-tickets-table#table-user-complaints-closed
-          %thead
-            %tr
-              %th
-                -#    priority
-              %th Case ID
-              %th
-                -#  Submitter type
-              %th
-                -#  Ticket type
-              %th Dispute Preview
-              %th Time to Close
-        .ticket-entries-totals-wrapper
-          %label.totals-label
-            Total Ticket Entries
-          .ticket-entry-total-block
-            %label.content-label-sm.submitter-customer
-              Customer
-            %span.ticket-entry-total
-              32
-          .ticket-entry-total-block.guest-block-total
-            %label.content-label-sm
-              Guest
-            %span.ticket-entry-total
-              12
-          .ticket-entry-total-block
-            %label.content-label-sm.dispute-E-grey
-              Email Entries
-            %span.ticket-entry-total
-              25
-          .ticket-entry-total-block
-            %label.content-label-sm.dispute-W-grey
-              Web Entries
-            %span.ticket-entry-total
-              22
-          .ticket-entry-total-block
-            %label.content-label-sm.dispute-EW-grey
-              Email/Web Entries
-            %span.ticket-entry-total
-              3
-
-
-    .col-xs-6.graph-section
+  .tab-content
+    #my-ticket.tab-pane.active
       .row
-        .col-xs-6.top-space-ex
-          .graph-top-header
-            %h5.uppercase.header-stg ticket entries closed by day
+        .col-xs-6
+          %h1.dashboard-header My Tickets
+          .content-layout-list
+            %label.content-label-sm.icon-custom-star
+              Show Customer Tickets
+              %input{:type => "checkbox", :checked => "checked"}/
+
+            %label.content-label-sm.no-left-pad.right-vertical-separator
+              Show Guest Tickets
+              %input{:type => "checkbox", :checked => "checked"}/
+
+            %label.content-label-sm.dispute-E-grey
+              Show Email Tickets
+              %input{:type => "checkbox", :checked => "checked"}/
+
+            %label.content-label-sm.dispute-W-grey
+              Show Web Tickets
+              %input{:type => "checkbox", :checked => "checked"}/
+
+            %label.content-label-sm.dispute-EW-grey.btn-margin-left
+              Show Email/Web Tickets
+              %input{:type => "checkbox", :checked => "checked"}/
+
+          .tickets-section-wrapper.open-tickets-wrapper
+
+            .open-tickets-header
+              %h3.larger-lighter My Open Tickets
+
+              .ticket-count-wrapper
+                %label.total-table-ticket-count 4
+                %label.total-table-entry-count 23
+
+            %table.table.responsive.dashboard-tickets-table#table-user-complaints-open
+              %thead
+                %tr
+                  %th
+                    -#  priority
+                  %th Case ID
+                  %th
+                    -#  Submitter type
+                  %th Status
+                  %th
+                    -#  Ticket type
+                  %th Dispute Preview
+                  %th Last Comment Date
+
+            .ticket-entries-totals-wrapper
+              %label.totals-label
+                Total Ticket Entries
+              .ticket-entry-total-block
+                %label.content-label-sm.submitter-customer
+                  Customer
+                %span.ticket-entry-total
+                  32
+              .ticket-entry-total-block.guest-block-total
+                %label.content-label-sm
+                  Guest
+                %span.ticket-entry-total
+                  12
+              .ticket-entry-total-block
+                %label.content-label-sm.dispute-E-grey
+                  Email Entries
+                %span.ticket-entry-total
+                  25
+              .ticket-entry-total-block
+                %label.content-label-sm.dispute-W-grey
+                  Web Entries
+                %span.ticket-entry-total
+                  22
+              .ticket-entry-total-block
+                %label.content-label-sm.dispute-EW-grey
+                  Email/Web Entries
+                %span.ticket-entry-total
+                  3
 
 
-          %label.content-label-sm Time Breakdown
-          .graph-config
-            %select.form-control
-              %option{:selected => "selected", :value => "day"} By Day
-              %option{:value => "weekly"} Weekly
-              %option{:value => "monthly"} Monthly
-              %option{:value => "yearly"} Yearly
+          .tickets-section-wrapper.closed-tickets-wrapper
+            .closed-tickets-header
+              %h3.larger-lighter My Closed Tickets
 
-            .graph-menu
+              .ticket-count-wrapper
+                %label.total-table-ticket-count 7
+                %label.total-table-entry-count 46
+
+            %table.table.responsive.dashboard-tickets-table#table-user-complaints-closed
+              %thead
+                %tr
+                  %th
+                    -#    priority
+                  %th Case ID
+                  %th
+                    -#  Submitter type
+                  %th
+                    -#  Ticket type
+                  %th Dispute Preview
+                  %th Time to Close
+            .ticket-entries-totals-wrapper
+              %label.totals-label
+                Total Ticket Entries
+              .ticket-entry-total-block
+                %label.content-label-sm.submitter-customer
+                  Customer
+                %span.ticket-entry-total
+                  32
+              .ticket-entry-total-block.guest-block-total
+                %label.content-label-sm
+                  Guest
+                %span.ticket-entry-total
+                  12
+              .ticket-entry-total-block
+                %label.content-label-sm.dispute-E-grey
+                  Email Entries
+                %span.ticket-entry-total
+                  25
+              .ticket-entry-total-block
+                %label.content-label-sm.dispute-W-grey
+                  Web Entries
+                %span.ticket-entry-total
+                  22
+              .ticket-entry-total-block
+                %label.content-label-sm.dispute-EW-grey
+                  Email/Web Entries
+                %span.ticket-entry-total
+                  3
+
+        .col-xs-6.graph-section
+          .row
+            .col-xs-6.top-space-ex
+              .graph-top-header
+                %h5.uppercase.header-stg ticket entries closed by day
+
+
+              %label.content-label-sm Time Breakdown
+              .graph-config
+                %select.form-control
+                  %option{:selected => "selected", :value => "day"} By Day
+                  %option{:value => "weekly"} Weekly
+                  %option{:value => "monthly"} Monthly
+                  %option{:value => "yearly"} Yearly
+
+                .graph-menu
+                  %label
+                    %input.all-ticket{:type => "checkbox", :checked => "checked", :onclick => 'updateGraph(["Total Ticket Entries"], "myBar", this)'}/
+                    %label.total-legend
+                    Total Tickets Entries
+
+                  %label
+                    %input.group-ticket{:type => "checkbox", :checked => "checked", :onclick => 'updateGraph(["E", "W", "EW"], "myBar", this)'}/
+                    %label.dispute-E.legend-option
+                    %label.dispute-W.legend-option
+                    %label.dispute-EW.legend-option
+                    Entries By Ticket Types
+              %canvas#canvas
+
+
+              .graph-top-header.top-space-ex.bottom-space
+                %h5.uppercase.header-stg Times to Close Tickets
+              .average-label
+                %label Average Time To Close
+                %label.label-stg 45m 12s
+              %canvas#line-chart
+
+
+              %label.content-label-sm.top-space-ex Time Breakdown
+              .graph-config
+                %select.form-control
+                  %option{:selected => "selected", :value => ""} By Day
+                  %option{:value => ""} Weekly
+                  %option{:value => ""} Monthly
+                  %option{:value => ""} Yearly
+              .graph-top-header
+                %h5.uppercase.header-stg ticket submitted by submitter per day
+              .graph-bar-legend
+                .custom-legend
+                  %label Customer
+                  %label.skyblue-legend-color
+                .custom-legend
+                  %label Guest
+                  %label.navyblue-legend-color
+              %canvas#bar-chart
+
+
+            .col-xs-6.top-space-ex.graph-section
+              .graph-top-header
+                %h5.uppercase.dispute-E-grey.graph-header-icon-stg.header-stg.bottom-space closed email entries by resolution
+
+              %canvas#pie-chart
+
+
+              %table.table.left-space.top-space
+                %thead
+                  %tr
+                    %th{:scope => "col"} RESOLUTION
+                    %th{:scope => "col"} %
+                    %th{:scope => "col"} COUNT
+                %tbody
+                  %tr.text-left
+                    %td Unchanged
+                    %td 18.75%
+                    %td 3
+                  %tr.text-left
+                    %td Fixed FN
+                    %td 37.50%
+                    %td 6
+                  %tr.text-left
+                    %td Fixed FP
+                    %td 43.75%
+                    %td 7
+
+                  %tr.text-left
+                    %td Other
+                    %td 00.00%
+                    %td 0
+
+
+              .graph-top-header.top-space.top-space-ex
+                %h5.uppercase.dispute-W-grey.graph-header-icon-stg.header-stg.bottom-space closed web entries by resolution
+
+              %canvas#pie-chart2
+
+              %table.table.left-space.top-space
+                %thead
+                  %tr
+                    %th{:scope => "col"} RESOLUTION
+                    %th{:scope => "col"} %
+                    %th{:scope => "col"} COUNT
+                %tbody
+                  %tr.text-left
+                    %td Unchanged
+                    %td 18.75%
+                    %td 3
+                  %tr.text-left
+                    %td Fixed FN
+                    %td 37.50%
+                    %td 6
+                  %tr.text-left
+                    %td Fixed FP
+                    %td 43.75%
+                    %td 7
+
+                  %tr.text-left
+                    %td Other
+                    %td 00.00%
+                    %td 0
+
+    #my-team-tickets.tab-pane
+      .row
+        .col-xs-6
+          %h1.dashboard-header My Team Tickets
+          .content-layout-list
+            %label.content-label-sm.icon-custom-star
+              Show Customer Tickets
+              %input{:type => "checkbox", :checked => "checked"}/
+
+            %label.content-label-sm.no-left-pad.right-vertical-separator
+              Show Guest Tickets
+              %input{:type => "checkbox", :checked => "checked"}/
+
+            %label.content-label-sm.dispute-E-grey
+              Show Email Tickets
+              %input{:type => "checkbox", :checked => "checked"}/
+
+            %label.content-label-sm.dispute-W-grey
+              Show Web Tickets
+              %input{:type => "checkbox", :checked => "checked"}/
+
+            %label.content-label-sm.dispute-EW-grey.btn-margin-left
+              Show Email/Web Tickets
+              %input{:type => "checkbox", :checked => "checked"}/
+
+          .tickets-section-wrapper.open-tickets-wrapper
+
+            .open-tickets-header
+              %h3.larger-lighter Open Team Tickets
+
+              .ticket-count-wrapper
+                %label.total-table-ticket-count 4
+                %label.total-table-entry-count 23
+
+        .col-xs-6.graph-section
+          .col-xs-6
+            .graph-top-header.top-space-ex.bottom-space
+              %h5.uppercase.header-stg ticket entries closed by ticket owner
+            %canvas#bar-chart-horizontal
+
+            .graph-top-header.top-space-ex.bottom-space
+              %h5.uppercase.header-stg average time to close tickets by ticket owner
+            %canvas#bar-chart2-horizontal
+
+            .graph-top-header.top-space-ex.bottom-space
+              %h5.uppercase.header-stg ticket resolution by ticket owner
+            .graph-bar-legend
+              .custom-legend
+                %label Unchanged
+                %label.lightgray-legend-color
+              .custom-legend
+                %label Fixed FN
+                %label.navyblue-legend-color
+              .custom-legend
+                %label Fixed FP
+                %label.skyblue-legend-color
+              .custom-legend
+                %label Other
+                %label.orange-legend-color
+            %canvas#bar-chart-grouped.bottom-space
+
+            %table.table.left-space.top-space
+              %thead
+                %tr
+                  %th{:scope => "col"} OWNER
+                  %th{:scope => "col"} UNCHANGED
+                  %th{:scope => "col"} FIXED FN
+                  %th{:scope => "col"} FIXED FP
+                  %th{:scope => "col"} OTHER
+              %tbody
+                %tr.text-center
+                  %td.text-left mtaylor
+                  %td 4
+                  %td 10
+                  %td 8
+                  %td 0
+                %tr.text-center
+                  %td.text-left chrclair
+                  %td 5
+                  %td 13
+                  %td 7
+                  %td 1
+                %tr.text-center
+                  %td.text-left nherbert
+                  %td 11
+                  %td 11
+                  %td 6
+                  %td 0
+
+                %tr.text-center
+                  %td.text-left nverbeck
+                  %td 13
+                  %td 10
+                  %td 7
+                  %td 4
+
+                %tr.text-center
+                  %td.text-left abreeman
+                  %td 9
+                  %td 5
+                  %td 9
+                  %td 1
+              %tfoot
+                %tr
+                  %th Total
+                  %th.text-center 42
+                  %th.text-center 49
+                  %th.text-center 37
+                  %th.text-center 6
+
+            .graph-top-header.top-space.bottom-space
+              %h5.uppercase.header-stg rule hits for false positive resolutions
+            %canvas#bar-chart3-horizontal
+
+          .col-xs-6.graph-section
+            %label.content-label-sm.top-space-ex Time Breakdown
+            .graph-config
+              %select.form-control
+                %option{:selected => "selected", :value => "day"} By Day
+                %option{:value => "weekly"} Weekly
+                %option{:value => "monthly"} Monthly
+                %option{:value => "yearly"} Yearly
+
+            .graph-top-header
+              %h5.uppercase.header-stg ticket entries closed by day
+
+            .graph-menu.float-right
               %label
-                %input.all-ticket{:type => "checkbox", :checked => "checked", :onclick => 'updateGraph(["Total Ticket Entries"], "myBar", this)'}/
+                %input.all-ticket{:type => "checkbox", :checked => "checked", :onclick => 'updateGraph("Total Ticket Entries", "barChartGrouped", this)'}/
                 %label.total-legend
                 Total Tickets Entries
 
               %label
-                %input.group-ticket{:type => "checkbox", :checked => "checked", :onclick => 'updateGraph(["E", "W", "EW"], "myBar", this)'}/
+                %input.group-ticket{:type => "checkbox", :onclick => 'updateGraph(["E", "W", "EW"], "barChartGrouped", this)'}/
                 %label.dispute-E.legend-option
                 %label.dispute-W.legend-option
                 %label.dispute-EW.legend-option
                 Entries By Ticket Types
-          %canvas#canvas
+            %canvas#bar-chart2-grouped
+
+            %label.content-label-sm.top-space Time Breakdown
+            .graph-config
+              %select.form-control
+                %option{:selected => "selected", :value => "day"} By Day
+                %option{:value => "weekly"} Weekly
+                %option{:value => "monthly"} Monthly
+                %option{:value => "yearly"} Yearly
+
+            .graph-top-header
+              %h5.uppercase.header-stg ticket submitted by submitter per day
+
+            .graph-bar-legend
+              .custom-legend
+                %label Customer
+                %label.skyblue-legend-color
+              .custom-legend
+                %label Guest
+                %label.navyblue-legend-color
+            %canvas#bar-chart3-grouped
+
+            .graph-top-header.top-space-ex
+              %h5.uppercase.dispute-E-grey.graph-header-icon-stg.header-stg.bottom-space closed email entries by resolution
+
+            %canvas#team-pie-chart
+
+            %table.table.left-space.top-space
+              %thead
+                %tr
+                  %th{:scope => "col"} RESOLUTION
+                  %th{:scope => "col"} %
+                  %th{:scope => "col"} COUNT
+              %tbody
+                %tr.text-left
+                  %td Unchanged
+                  %td 18.75%
+                  %td 3
+                %tr.text-left
+                  %td Fixed FN
+                  %td 37.50%
+                  %td 6
+                %tr.text-left
+                  %td Fixed FP
+                  %td 43.75%
+                  %td 7
+
+                %tr.text-left
+                  %td Other
+                  %td 00.00%
+                  %td 0
+
+            .graph-top-header.top-space-ex
+              %h5.uppercase.dispute-E-grey.graph-header-icon-stg.header-stg.bottom-space closed web entries by resolution
+
+            %canvas#team-pie2-chart
+
+            %table.table.left-space.top-space
+              %thead
+                %tr
+                  %th{:scope => "col"} RESOLUTION
+                  %th{:scope => "col"} %
+                  %th{:scope => "col"} COUNT
+              %tbody
+                %tr.text-left
+                  %td Unchanged
+                  %td 18.75%
+                  %td 3
+                %tr.text-left
+                  %td Fixed FN
+                  %td 37.50%
+                  %td 6
+                %tr.text-left
+                  %td Fixed FP
+                  %td 43.75%
+                  %td 7
+
+                %tr.text-left
+                  %td Other
+                  %td 00.00%
+                  %td 0
 
 
-          .graph-top-header.top-space-ex.bottom-space
-            %h5.uppercase.header-stg Times to Close Tickets
-          .average-label
-            %label Average Time To Close
-            %label.label-stg 45m 12s
-          %canvas#line-chart
+    #all-tickets.tab-pane
+      .row
+        .col-xs-6
+          %h1.dashboard-header All Tickets
+          .content-layout-list
+            %label.content-label-sm.icon-custom-star
+              Show Customer Tickets
+              %input{:type => "checkbox", :checked => "checked"}/
 
+            %label.content-label-sm.no-left-pad.right-vertical-separator
+              Show Guest Tickets
+              %input{:type => "checkbox", :checked => "checked"}/
 
-          %label.content-label-sm.top-space-ex Time Breakdown
-          .graph-config
-            %select.form-control
-              %option{:selected => "selected", :value => ""} By Day
-              %option{:value => ""} Weekly
-              %option{:value => ""} Monthly
-              %option{:value => ""} Yearly
-          .graph-top-header
-            %h5.uppercase.header-stg ticket submitted by submitter per day
-          .graph-bar-legend
-            .custom-legend
-              %label Customer
-              %label.skyblue-legend-color
-            .custom-legend
-              %label Guest
-              %label.navyblue-legend-color
-          %canvas#bar-chart
+            %label.content-label-sm.dispute-E-grey
+              Show Email Tickets
+              %input{:type => "checkbox", :checked => "checked"}/
 
+            %label.content-label-sm.dispute-W-grey
+              Show Web Tickets
+              %input{:type => "checkbox", :checked => "checked"}/
 
-        .col-xs-6.top-space-ex.graph-section
-          .graph-top-header
-            %h5.uppercase.dispute-E-grey.graph-header-icon-stg.header-stg.bottom-space closed email entries by resolution
+            %label.content-label-sm.dispute-EW-grey.btn-margin-left
+              Show Email/Web Tickets
+              %input{:type => "checkbox", :checked => "checked"}/
 
-          %canvas#pie-chart
+          .tickets-section-wrapper.open-tickets-wrapper
 
+            .open-tickets-header
+              %h3.larger-lighter Open All Tickets
 
-          %table.table.left-space.top-space
-            %thead
-              %tr
-                %th{:scope => "col"} RESOLUTION
-                %th{:scope => "col"} %
-                %th{:scope => "col"} COUNT
-            %tbody
-              %tr.text-left
-                %td Unchanged
-                %td 18.75%
-                %td 3
-              %tr.text-left
-                %td Fixed FN
-                %td 37.50%
-                %td 6
-              %tr.text-left
-                %td Fixed FP
-                %td 43.75%
-                %td 7
+              .ticket-count-wrapper
+                %label.total-table-ticket-count 4
+                %label.total-table-entry-count 23
+    #select-custom-users.tab-pane
+      %p custom selected user
 
-              %tr.text-left
-                %td Other
-                %td 00.00%
-                %td 0
-
-
-          .graph-top-header.top-space.top-space-ex
-            %h5.uppercase.dispute-W-grey.graph-header-icon-stg.header-stg.bottom-space closed web entries by resolution
-
-          %canvas#pie-chart2
-
-          %table.table.left-space.top-space
-            %thead
-              %tr
-                %th{:scope => "col"} RESOLUTION
-                %th{:scope => "col"} %
-                %th{:scope => "col"} COUNT
-            %tbody
-              %tr.text-left
-                %td Unchanged
-                %td 18.75%
-                %td 3
-              %tr.text-left
-                %td Fixed FN
-                %td 37.50%
-                %td 6
-              %tr.text-left
-                %td Fixed FP
-                %td 43.75%
-                %td 7
-
-              %tr.text-left
-                %td Other
-                %td 00.00%
-                %td 0
