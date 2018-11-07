@@ -154,6 +154,7 @@ describe Wbrs::ManualWlbl do
   end
 
   context 'Adding WL/BL' do
+    
     before(:all) do
       FactoryBot.create(:customer)
       FactoryBot.create(:dispute)
