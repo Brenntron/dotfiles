@@ -206,3 +206,30 @@ Feature: Disputes
     Then I wait for "5" seconds
     Then I should see "talosintelligence.com"
     Then I should see "0000000001"
+
+  @javascript
+  Scenario: a user tries to export selected dispute entries
+    Given a user with role "webrep user" exists and is logged in
+    And the following disputes exist and have entries:
+      |id| submission_type|
+      |1 | w              |
+    When I goto "escalations/webrep/disputes?f=all"
+    And I click "#expand-all-index-rows"
+    And I trigger-click ".dispute-entry-checkbox_1"
+    And I click ".export-button"
+    Then I wait for "3" seconds
+    Then I should receive a file of type "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet"
+
+  @javascript
+  Scenario: a user tries to export selected dispute entries on the Research tab
+    Given a user with role "webrep user" exists and is logged in
+    And the following disputes exist and have entries:
+    |id|
+    |1 |
+    When I goto "/escalations/webrep/disputes/1"
+    And I trigger-click "#research-tab-link"
+    And I trigger-click ".dispute_check_box"
+    And I click ".export-button"
+    Then I wait for "3" seconds
+    Then I should receive a file of type "application/octet-stream"
+

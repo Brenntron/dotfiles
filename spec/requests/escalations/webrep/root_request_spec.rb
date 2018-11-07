@@ -7,6 +7,6 @@ RSpec.describe Escalations::Webrep::RootController, type: :request do
 
     get '/escalations/webrep'
 
-    expect(response).to redirect_to('/escalations/webrep/tickets')
+    expect(response).to redirect_to('/escalations/webrep/disputes')
   end
 end

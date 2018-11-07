@@ -57,7 +57,7 @@ window.populate_webrep_index_table = (data = {}) ->
         datatable = $('#disputes-index').DataTable()
         datatable.clear();
         datatable.rows.add(json.data);
-        datatable.draw();
+        datatable.draw(false);
         if array_of_showns.length > 0
           for dispute_id_shown in array_of_showns
             td = $('#disputes-index').find('td.expandable-row-column')

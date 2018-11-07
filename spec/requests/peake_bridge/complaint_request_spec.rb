@@ -61,16 +61,8 @@ RSpec.describe "Peake-Bridge complaint messages channels", type: :request do
         user_company: 'Guest'
     }
   end
-
-  it 'receives complaint payload messages' do
-    vrt_incoming
-    guest_company
-    allow(Escalations::PeakeBridge::MessagesController).to receive(:threaded?).and_return(false)
-    allow(Wbrs::TopUrl).to receive(:check_urls).and_return([ Wbrs::TopUrl.new(is_important: false) ])
-    allow(ComplaintEntryPreload).to receive(:generate_preload_from_complaint_entry)
-    allow(Wbrs::Prefix).to receive(:where).and_return([])
-
-    post '/escalations/peake_bridge/channels/ticket-event/messages', as: :json, params: {
+  let(:complaint_params) do
+    {
         envelope: {
             channel: "ticket-event",
             addressee: "analyst-console-escalations",
@@ -84,6 +76,18 @@ RSpec.describe "Peake-Bridge complaint messages channels", type: :request do
             }
         }
     }
+  end
+  let(:bridge_message) { double('Bridge::BaseMessage', post: true) }
+
+  it 'receives complaint payload messages' do
+    vrt_incoming
+    guest_company
+    expect(Bridge::ComplaintCreatedEvent).to receive(:new).and_return(bridge_message)
+    expect(Bug).to receive(:bugzilla_create).and_return({ 'id' => '10101' })
+    expect(Customer).to receive(:process_and_get_customer).and_return(FactoryBot.create(:customer))
+    allow(ComplaintEntryPreload).to receive(:generate_preload_from_complaint_entry).and_return(true)
+
+    post '/escalations/peake_bridge/channels/ticket-event/messages', as: :json, params: complaint_params
 
     expect(response).to be_success
     complaint = Complaint.where(ticket_source_key: 1001).first

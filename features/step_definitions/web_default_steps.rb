@@ -10,6 +10,12 @@ Given(/^I fill in "(.*?)" with "(.*?)"$/) do |field_label, value|
   fill_in field_label, :with => value
 end
 
+Given(/^I fill in "(.*?)" with today's date"$/) do |field_label|
+  time = Time.now.strftime("%Y-%m-%d")
+  fill_in field_label, :with => time
+
+end
+
 When(/^I click "(.*?)"$/) do |target|
     begin
       click_on(target)
@@ -364,7 +370,7 @@ Then(/^I see "(.*?)" in element "(.*?)"/) do |content, element|
 end
 
 Then /I click "(.*?)" and switch to the new window/ do |target|
-  page.switch_to_window(page.window_opened_by{click_button(target)})
+  page.switch_to_window(page.window_opened_by{find(target).trigger('click')})
 end
 
 Then (/^I should receive a file of type "(.*?)"/) do |type|
