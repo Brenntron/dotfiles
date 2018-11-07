@@ -2484,7 +2484,7 @@ $ ->
 # Create Dashboard Initial Table (My Open Tickets)
 $ ->
 
-  window.open_dashboard_dispute_table = $('#table-user-complaints-open').DataTable(
+  window.open_dashboard_dispute_table = $('#table-user-disputes-open').DataTable(
     dom: '<t>'
     data: tempSingleUserOpenTixDataset
     columnDefs: [
@@ -2528,7 +2528,7 @@ $ ->
     ]
   )
 
-  window.open_dashboard_dispute_table = $('#table-user-complaints-closed').DataTable(
+  window.closed_dashboard_dispute_table = $('#table-user-disputes-closed').DataTable(
     dom: '<t>'
     data: tempSingleUserClosedTixDataset
     columnDefs: [
@@ -2567,11 +2567,99 @@ $ ->
     ]
   )
 
+  window.open_multiuser_dashboard_dispute_table = $('#table-multi-user-disputes-open').DataTable(
+    dom: '<t>'
+    data: tempSingleUserOpenTixDataset
+    columnDefs: [
+      {
+        targets: [ 1 ]
+        className: 'id-col'
+      }
+      {
+        targets: [ 4 ]
+        className: 'state-col'
+      }
+      {
+        targets: [
+          0
+          2
+          5
+        ]
+        className: 'text-center'
+      }
+    ]
+    columns: [
+      {
+        data: 'priority'
+        render: (data) ->
+          '<span class="bug-priority p-' + data + '"></span>'
+      }
+      { data: 'case_number' }
+      {
+        data: 'submitter_type'
+        render: (data) ->
+          '<span class="submitter-type-icon submitter-' + data + '"></span>'
+      }
+      { data: 'owner' }
+      { data: 'status' }
+      {
+        data: 'submission_type'
+        render: (data) ->
+          '<span class="dispute-submission-type dispute-' + data  + '"></span>'
+      }
+      { data: 'd_entry_preview' }
+      { data: 'last_comment' }
+    ]
+  )
+
+  window.closed_dashboard_multiuser_dispute_table = $('#table-multi-user-disputes-closed').DataTable(
+    dom: '<t>'
+    data: tempSingleUserClosedTixDataset
+    columnDefs: [
+      {
+        targets: [ 1 ]
+        className: 'id-col'
+      }
+      {
+        targets: [
+          0
+          2
+          4
+        ]
+        className: 'text-center'
+      }
+    ]
+    columns: [
+      {
+        data: 'priority'
+        render: (data) ->
+          '<span class="bug-priority p-' + data + '"></span>'
+      }
+      { data: 'case_number' }
+      {
+        data: 'submitter_type'
+        render: (data) ->
+          '<span class="submitter-type-icon submitter-' + data + '"></span>'
+      }
+      {
+        data: 'owner'
+      }
+      {
+        data: 'submission_type'
+        render: (data) ->
+          '<span class="dispute-submission-type dispute-' + data  + '"></span>'
+      }
+      { data: 'd_entry_preview' }
+      { data: 'time_to_close' }
+    ]
+  )
+
 tempSingleUserOpenTixDataset = [
   {
     'priority': ['P1'],
     'case_number': ['0000375515'],
     'submitter_type': ['customer'],
+    'owner': ['melitayl'],
     'status': ['Researching'],
     'submission_type': ['W'],
     'd_entry_preview': ['<span class="dispute_entry_content_first">guardiancremation.com</span><span class="dispute-count">4</span>'],
@@ -2581,6 +2669,7 @@ tempSingleUserOpenTixDataset = [
     'priority': ['P3'],
     'case_number': ['0000375513'],
     'submitter_type': ['guest'],
+    'owner': ['nicherbe'],
     'status': ['Assigned'],
     'submission_type': ['E'],
     'd_entry_preview': ['<span class="dispute_entry_content_first">bvillaseminyak.com</span><span class="dispute-count">7</span>'],
@@ -2590,6 +2679,7 @@ tempSingleUserOpenTixDataset = [
     'priority': ['P4'],
     'case_number': ['0000375502'],
     'submitter_type': ['guest'],
+    'owner': ['melitayl'],
     'status': ['Customer_Pending'],
     'submission_type': ['W'],
     'd_entry_preview': ['<span class="dispute_entry_content_first">food-hub.org</span><span class="dispute-count">14</span>'],
@@ -2599,6 +2689,7 @@ tempSingleUserOpenTixDataset = [
     'priority': ['P3'],
     'case_number': ['000012345'],
     'submitter_type': ['customer'],
+    'owner': ['nverbeck'],
     'status': ['Researching'],
     'submission_type': ['W'],
     'd_entry_preview': ['<span class="dispute_entry_content_first">housingscotlandtoday.com</span><span class="dispute-count">9</span>'],
@@ -2612,6 +2703,7 @@ tempSingleUserClosedTixDataset = [
     'priority': ['P1'],
     'case_number': ['0000375515'],
     'submitter_type': ['customer'],
+    'owner' : ['nverbeck'],
     'submission_type': ['W'],
     'd_entry_preview': ['<span class="dispute_entry_content_first">guardiancremation.com</span><span class="dispute-count">4</span>'],
     'time_to_close': ['35m']
@@ -2620,6 +2712,7 @@ tempSingleUserClosedTixDataset = [
     'priority': ['P3'],
     'case_number': ['0000375513'],
     'submitter_type': ['guest'],
+    'owner' : ['nverbeck'],
     'submission_type': ['E'],
     'd_entry_preview': ['<span class="dispute_entry_content_first">bvillaseminyak.com</span><span class="dispute-count">7</span>'],
     'time_to_close': ['1h 25m']
@@ -2628,6 +2721,7 @@ tempSingleUserClosedTixDataset = [
     'priority': ['P4'],
     'case_number': ['0000375502'],
     'submitter_type': ['guest'],
+    'owner' : ['melitayl'],
     'submission_type': ['W'],
     'd_entry_preview': ['<span class="dispute_entry_content_first">food-hub.org</span><span class="dispute-count">14</span>'],
     'time_to_close': ['<span class="time-over-2-hr">3h 3m</span>']
@@ -2636,6 +2730,7 @@ tempSingleUserClosedTixDataset = [
     'priority': ['P1'],
     'case_number': ['0000375515'],
     'submitter_type': ['customer'],
+    'owner' : ['nicherbe'],
     'submission_type': ['W'],
     'd_entry_preview': ['<span class="dispute_entry_content_first">guardiancremation.com</span><span class="dispute-count">4</span>'],
     'time_to_close': ['35m']
@@ -2644,6 +2739,7 @@ tempSingleUserClosedTixDataset = [
     'priority': ['P3'],
     'case_number': ['0000375513'],
     'submitter_type': ['guest'],
+    'owner' : ['nicherbe'],
     'submission_type': ['E'],
     'd_entry_preview': ['<span class="dispute_entry_content_first">bvillaseminyak.com</span><span class="dispute-count">7</span>'],
     'time_to_close': ['1h 25m']
@@ -2652,6 +2748,7 @@ tempSingleUserClosedTixDataset = [
     'priority': ['P4'],
     'case_number': ['0000375502'],
     'submitter_type': ['guest'],
+    'owner' : ['melitayl'],
     'submission_type': ['W'],
     'd_entry_preview': ['<span class="dispute_entry_content_first">food-hub.org</span><span class="dispute-count">14</span>'],
     'time_to_close': ['<span class="time-over-2-hr">3h 3m</span>']
@@ -2660,6 +2757,7 @@ tempSingleUserClosedTixDataset = [
     'priority': ['P3'],
     'case_number': ['000012345'],
     'submitter_type': ['customer'],
+    'owner' : ['nicherbe'],
     'submission_type': ['W'],
     'd_entry_preview': ['<span class="dispute_entry_content_first">housingscotlandtoday.com</span><span class="dispute-count">9</span>'],
     'time_to_close': ['42m']
@@ -2684,11 +2782,10 @@ window.populate_webrep_dashboard_opentix_table = (data = {}) ->
         std_msg_error("No tickets matching filter or search.","")
 
       else
-        datatable = $('#table-user-complaints-open').DataTable()
+        datatable = $('#table-user-disputes-open').DataTable()
         datatable.clear();
         datatable.rows.add(json.data);
         datatable.draw();
     error: (response) ->
      console.log(response)
   , this)
-

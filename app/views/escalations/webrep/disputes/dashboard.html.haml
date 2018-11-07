@@ -76,15 +76,12 @@
               %input{:type => "checkbox", :checked => "checked"}/
 
           .tickets-section-wrapper.open-tickets-wrapper
-
             .open-tickets-header
               %h3.larger-lighter My Open Tickets
-
               .ticket-count-wrapper
                 %label.total-table-ticket-count 4
                 %label.total-table-entry-count 23
-
-            %table.table.responsive.dashboard-tickets-table#table-user-complaints-open
+            %table.table.responsive.dashboard-tickets-table#table-user-disputes-open
               %thead
                 %tr
                   %th
@@ -131,12 +128,10 @@
           .tickets-section-wrapper.closed-tickets-wrapper
             .closed-tickets-header
               %h3.larger-lighter My Closed Tickets
-
               .ticket-count-wrapper
                 %label.total-table-ticket-count 7
                 %label.total-table-entry-count 46
-
-            %table.table.responsive.dashboard-tickets-table#table-user-complaints-closed
+            %table.table.responsive.dashboard-tickets-table#table-user-disputes-closed
               %thead
                 %tr
                   %th
@@ -299,7 +294,7 @@
 
     #my-team-tickets.tab-pane
       .row
-        .col-xs-6
+        .col-xl-6.col-lg-7.col-xs-12.dashboard-tickets-wrapper
           %h1.dashboard-header My Team Tickets
           .content-layout-list
             %label.content-label-sm.icon-custom-star
@@ -323,15 +318,108 @@
               %input{:type => "checkbox", :checked => "checked"}/
 
           .tickets-section-wrapper.open-tickets-wrapper
-
             .open-tickets-header
               %h3.larger-lighter Open Team Tickets
-
               .ticket-count-wrapper
                 %label.total-table-ticket-count 4
                 %label.total-table-entry-count 23
+            %table.table.responsive.dashboard-tickets-table#table-multi-user-disputes-open
+              %thead
+                %tr
+                  %th
+                  -#  priority
+                  %th Case ID
+                  %th
+                  -#  Submitter type
+                  %th Owner
+                  %th Status
+                  %th
+                  -#  Ticket type
+                  %th Dispute Preview
+                  %th Last Comment Date
 
-        .col-xs-6.graph-section
+            .ticket-entries-totals-wrapper
+              %label.totals-label
+                Total Ticket Entries
+              .ticket-entry-total-block
+                %label.content-label-sm.submitter-customer
+                  Customer
+                %span.ticket-entry-total
+                  32
+              .ticket-entry-total-block.guest-block-total
+                %label.content-label-sm
+                  Guest
+                %span.ticket-entry-total
+                  12
+              .ticket-entry-total-block
+                %label.content-label-sm.dispute-E-grey
+                  Email Entries
+                %span.ticket-entry-total
+                  25
+              .ticket-entry-total-block
+                %label.content-label-sm.dispute-W-grey
+                  Web Entries
+                %span.ticket-entry-total
+                  22
+              .ticket-entry-total-block
+                %label.content-label-sm.dispute-EW-grey
+                  Email/Web Entries
+                %span.ticket-entry-total
+                  3
+
+
+          .tickets-section-wrapper.closed-tickets-wrapper
+            .closed-tickets-header
+              %h3.larger-lighter Closed Team Tickets
+              .ticket-count-wrapper
+                %label.total-table-ticket-count 7
+                %label.total-table-entry-count 46
+            %table.table.responsive.dashboard-tickets-table#table-multi-user-disputes-closed
+              %thead
+                %tr
+                  %th
+                  -#    priority
+                  %th Case ID
+                  %th
+                  -#  Submitter type
+                  %th Owner
+                  %th
+                  -#  Ticket type
+                  %th Dispute Preview
+                  %th Time to Close
+            .ticket-entries-totals-wrapper
+              %label.totals-label
+                Total Ticket Entries
+              .ticket-entry-total-block
+                %label.content-label-sm.submitter-customer
+                  Customer
+                %span.ticket-entry-total
+                  32
+              .ticket-entry-total-block.guest-block-total
+                %label.content-label-sm
+                  Guest
+                %span.ticket-entry-total
+                  12
+              .ticket-entry-total-block
+                %label.content-label-sm.dispute-E-grey
+                  Email Entries
+                %span.ticket-entry-total
+                  25
+              .ticket-entry-total-block
+                %label.content-label-sm.dispute-W-grey
+                  Web Entries
+                %span.ticket-entry-total
+                  22
+              .ticket-entry-total-block
+                %label.content-label-sm.dispute-EW-grey
+                  Email/Web Entries
+                %span.ticket-entry-total
+                  3
+
+
+
+
+        .col-xl-6.col-lg-5.col-xs-12.graph-section
           .col-xs-6
             .graph-top-header.top-space-ex.bottom-space
               %h5.uppercase.header-stg ticket entries closed by ticket owner
