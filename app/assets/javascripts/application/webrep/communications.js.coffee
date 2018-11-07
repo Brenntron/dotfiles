@@ -402,20 +402,19 @@ $ ->
     return
 
   window.save_resolution_message_template = () ->
-    template_name = $('#new-resolution-message-template-name')[0].value
+    name = $('#new-resolution-message-template-name')[0].value
     description = $('#new-resolution-message-template-desc')[0].value
     body = $('#new-resolution-message-template-body')[0].value
 
     std_msg_ajax(
       method: 'POST'
-      url: "/escalations/api/v1/escalations/webrep/resolution_message_template"
-      data: {template_name: template_name, description: description, body: body}
-      success_reload: false
+      url: "/escalations/api/v1/escalations/webrep/resolution_message_templates"
+      data: {name: name, description: description, body: body}
       success_reload: false
       success: (response) ->
-        std_msg_success('Email Template Created.', [], reload: true)
+        std_msg_success('Resolution Message template Created.', [], reload: true)
       error: (response) ->
-        std_api_error(response, "There was an error creating the email template.", reload: false)
+        std_api_error(response, "There was an error creating the Resolution Message template.", reload: false)
     )
 
 
@@ -503,7 +502,6 @@ $ ->
       method: 'POST'
       url: "/escalations/api/v1/escalations/webrep/email_templates"
       data: {template_name: template_name, description: description, body: body}
-      success_reload: false
       success_reload: false
       success: (response) ->
         std_msg_success('Email Template Created.', [], reload: true)

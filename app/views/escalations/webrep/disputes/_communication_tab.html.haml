@@ -113,7 +113,7 @@
             %th.min70
           -ResolutionMessageTemplate.all.each do |template|
             %tr
-              %td=template.template_name
+              %td=template.name
               %td=template.description
               %td
                 %button.table-button.edit-button.edit-template{template_id: template.id, name: 'edit-template'}
@@ -131,7 +131,7 @@
             %textarea.template-content#new-resolution-message-template-body
 
       .dialog-section-divider
-        %button.primary#save-resolution-message-template.hidden
+        %button.primary#save-resolution-message-template.hidden{onclick: 'save_resolution_message_template()'}
           Save Template
         %button.secondary#create-resolution-message-template{onclick: 'create_new_resolution_message_template()'}
           Create New Template

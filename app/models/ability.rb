@@ -100,7 +100,7 @@ class Ability
       can [:manage, :acknowledge_bug, :import, :toggle_liberty], ResearchBug do |bug|
         bug.check_permission(current_user)
       end
-      can :manage, [EscalationLink, Attachment, Note, Rule]
+      can :manage, [EscalationLink, Attachment, Note, Rule, ResolutionMessageTemplate]
       can :publish, Rule
       can :publish_to_bugzilla, Note
     end
