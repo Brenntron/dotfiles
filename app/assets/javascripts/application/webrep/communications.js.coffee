@@ -359,6 +359,10 @@ $ ->
   $('.mng-templates-button').on 'click', ->
     $('#manageTemplatesDialog').dialog 'open'
     return
+  $('#manageResolutionMessageTemplatesDialog').dialog
+    autoOpen: false
+    minWidth: 500
+    position: { my: "left center", at: "left center", of: window }
 
 
   window.check_email_attachment_size = (e) ->
@@ -366,6 +370,13 @@ $ ->
       std_msg_error("Max attachment size is 20MB", "")
       e.value = ''
     return
+
+  ## Manage Resolution Message Templates
+
+  window.manage_boilerplates = () ->
+    $('#manageResolutionMessageTemplatesDialog').dialog 'open'
+
+
 
   ## Manage Email Templates
 

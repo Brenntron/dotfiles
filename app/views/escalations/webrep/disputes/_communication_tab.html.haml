@@ -75,6 +75,8 @@
             Compose New Email
           %button.mng-templates-button
             Manage Email Templates
+          %button.mng-boilerplates-button{onclick: 'manage_boilerplates()'}
+            Manage Resolution Message Template
 
 
     .row
@@ -101,6 +103,40 @@
         %pre.email-msg-content
 
     = render 'escalations/webrep/disputes/new_email_dialog'
+
+    #manageResolutionMessageTemplatesDialog{title: 'Manage Resolution Message Templates'}
+      %table.table
+        %thead
+          %tr.table-header-highlight
+            %th Template Name
+            %th Description
+            %th.min70
+          -ResolutionMessageTemplate.all.each do |template|
+            %tr
+              %td=template.template_name
+              %td=template.description
+              %td
+                %button.table-button.edit-button.edit-template{template_id: template.id, name: 'edit-template'}
+                %button.table-button.delete-button.delete-template{template_id: template.id, name: 'delete-template'}
+      #new-resolution-message-template-form-wrapper
+        %h4.dialog-inset-header New Email Template
+        %form
+          .dialog-form-information
+            %span.content-label-sm Name
+            %input#new-resolution-message-template-name{autofocus: true, required: true, type: 'text', name: 'template-name'}
+            %span.content-label-sm Description
+            %input#new-resolution-message-template-desc{required: true, type: 'text', name: 'template-description'}
+          .template-content-wrapper
+            %textarea.template-content#new-resolution-message-template-body
+      .dialog-section-divider
+        %button.primary#save-resolution-message-template.hidden
+          Save Template
+        %button.secondary#create-resolution-message-template
+          Create New Template
+        %button.primary#edit-resolution-message-template.hidden
+          Update Template
+        %button.secondary.hidden#cancel-edit-resolution-message-template
+          Cancel
 
     #manageTemplatesDialog{title: 'Manage Email Templates'}
       %table.table

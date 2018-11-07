@@ -3472,6 +3472,22 @@ input.communication-subject {
   font-size: 9pt;
 }
 
+.mng-boilerplates-button {
+  background-image: url(image_path('icon_template_white.svg'));
+  background-repeat: no-repeat;
+  background-position: 0 2px;
+  background-size: 18px 18px;
+  height: 24px;
+  display: inline-block;
+  background-color: transparent;
+  border: none;
+  padding-left: 22px;
+  padding-right: 0;
+  margin-left: 20px;
+  font-weight: 300;
+  font-size: 9pt;
+}
+
 
 .note-info-item {
   display: inline-block;
@@ -4200,6 +4216,13 @@ input.file_attachment {
 }
 
 #new-template-form-wrapper {
+  display: none;
+  height: 0;
+  margin: 12px;
+  border: 1px solid $faint-neutral-color;
+}
+
+#new-resolution-message-template-form-wrapper {
   display: none;
   height: 0;
   margin: 12px;
