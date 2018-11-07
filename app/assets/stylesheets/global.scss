@@ -5288,19 +5288,12 @@ table.dispute_tool_current tr:last-of-type td {
 .dispute-EW-grey {background-image: url(image_path('icon_type_email_web_grey.svg'));}
 
 
-.my-dashboard-header-area, .complaint-mgt-top-area  {
-  background-color: $bug-section-color;
-  margin-top: -15px;
-  border-radius: 4px 4px 0 0 ;
-}
-
-.team-dashboard-header-area {
+.dashboard-header-area, .complaint-mgt-top-area  {
   background-color: $content-tab-color;
-}
-
-.dashboard-header-area, .complaint-mgt-top-area {
+  margin-top: -15px;
   margin-right: -15px;
   margin-left: -15px;
+  border-radius: 4px 4px 0 0;
   color: $content-bg-color;
   padding: 15px;
 }
@@ -6344,7 +6337,7 @@ h2 {
   color: #333;
 }
 
-.dashboard-header-area.my-dashboard-header-area {
+.dashboard-header-area {
   background-color: $content-tab-color;
 
   .dashboard-wrapper {
@@ -6405,10 +6398,8 @@ h2 {
     }
 
     .dashboard-time-ticket {
-
       .button-wrapper {
         text-align: right;
-        margin-bottom: 10px;
 
         button {
           background-color: #54708c;
@@ -6466,12 +6457,11 @@ h2 {
       display: inline-block;
       line-height: 50px;
       cursor: pointer;
-      margin-right: 20px;
 
       a {
         display: block;
         height: 100%;
-        padding: 0 15px 0 40px;
+        padding: 0 15px 0 30px;
         font-size: 11px;
         text-decoration: none;
         color: $type-lighter-color;
@@ -6527,15 +6517,15 @@ h2 {
   .user-icon-stg-1 {
     background-repeat: no-repeat;
     background-size: 15px;
-    background-position-y: 17px;
+    background-position-y: center;
     background-position-x: 10px;
     vertical-align: center;
   }
   .user-icon-stg {
     background-repeat: no-repeat;
     background-size: 20px;
-    background-position-y: 15px;
-    background-position-x: 10px;
+    background-position-y: center;
+    background-position-x: 6px;
     vertical-align: center;
   }
 
