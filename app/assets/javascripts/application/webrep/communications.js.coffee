@@ -373,9 +373,50 @@ $ ->
 
   ## Manage Resolution Message Templates
 
-  window.manage_boilerplates = () ->
+  window.manage_resolution_message_templates = () ->
     $('#manageResolutionMessageTemplatesDialog').dialog 'open'
 
+  state = true
+
+  window.create_new_resolution_message_template = () ->
+    if state
+      $('#new-resolution-message-template-form-wrapper').show()
+      $('#new-resolution-message-template-form-wrapper').contents().show()
+      $('#create-resolution-message-template').text('Cancel')
+      $('#save-resolution-message-template').removeClass('hidden')
+      $('#new-resolution-message-template-form-wrapper').animate {
+        height: 200
+        borderWidth: '1px'
+      }, 300
+
+    else
+      $('#new-resolution-message-template-form-wrapper').contents().hide()
+      $('#create-resolution-message-template').text('Create New Template')
+      $('#save-resolution-message-template').addClass('hidden')
+      $('#new-resolution-message-template-form-wrapper').animate {
+        height: 0
+        borderWidth: 0
+      }, 300
+
+    state = !state
+    return
+
+  window.save_resolution_message_template = () ->
+    template_name = $('#new-resolution-message-template-name')[0].value
+    description = $('#new-resolution-message-template-desc')[0].value
+    body = $('#new-resolution-message-template-body')[0].value
+
+    std_msg_ajax(
+      method: 'POST'
+      url: "/escalations/api/v1/escalations/webrep/resolution_message_template"
+      data: {template_name: template_name, description: description, body: body}
+      success_reload: false
+      success_reload: false
+      success: (response) ->
+        std_msg_success('Email Template Created.', [], reload: true)
+      error: (response) ->
+        std_api_error(response, "There was an error creating the email template.", reload: false)
+    )
 
 
   ## Manage Email Templates
@@ -407,8 +448,6 @@ $ ->
       height: 200
       borderWidth: '1px'
     }, 300
-
-
 
   $('#cancel-edit-email-template').on 'click', ->
     $('#edit-template-form-wrapper').contents().hide()

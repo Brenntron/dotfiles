@@ -75,7 +75,7 @@
             Compose New Email
           %button.mng-templates-button
             Manage Email Templates
-          %button.mng-boilerplates-button{onclick: 'manage_boilerplates()'}
+          %button.mng-boilerplates-button{onclick: 'manage_resolution_message_templates()'}
             Manage Resolution Message Template
 
 
@@ -118,6 +118,7 @@
               %td
                 %button.table-button.edit-button.edit-template{template_id: template.id, name: 'edit-template'}
                 %button.table-button.delete-button.delete-template{template_id: template.id, name: 'delete-template'}
+
       #new-resolution-message-template-form-wrapper
         %h4.dialog-inset-header New Email Template
         %form
@@ -128,15 +129,14 @@
             %input#new-resolution-message-template-desc{required: true, type: 'text', name: 'template-description'}
           .template-content-wrapper
             %textarea.template-content#new-resolution-message-template-body
+
       .dialog-section-divider
         %button.primary#save-resolution-message-template.hidden
           Save Template
-        %button.secondary#create-resolution-message-template
+        %button.secondary#create-resolution-message-template{onclick: 'create_new_resolution_message_template()'}
           Create New Template
         %button.primary#edit-resolution-message-template.hidden
           Update Template
-        %button.secondary.hidden#cancel-edit-resolution-message-template
-          Cancel
 
     #manageTemplatesDialog{title: 'Manage Email Templates'}
       %table.table
