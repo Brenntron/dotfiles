@@ -82,7 +82,8 @@ class Wbrs::Cluster < Wbrs::Base
       ]
 
     else
-      response = call_json_request(:post, '/v1/clusters/get', body: '')
+      params = stringkey_params({})
+      response = call_json_request(:post, '/v1/clusters/get', body: params)
       response_body = JSON.parse(response.body)
       response_body['data']
     end
