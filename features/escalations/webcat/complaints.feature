@@ -9,6 +9,8 @@ Feature: Webcat complaints
     Given a user with role "webcat user" exists and is logged in
     And bugzilla rest api always saves
     And complaint entry preload is stubbed
+    And WBRS top url is stubbed
+    And WBRS Prefix where is stubbed
     And the following companies exist:
     |id| name  |
     | 1| Cisco |
