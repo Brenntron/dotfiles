@@ -85,16 +85,6 @@ describe Wbrs::ManualWlbl do
     }
   end
 
-  before do
-    FactoryBot.create(:customer)
-    FactoryBot.create(:dispute)
-    FactoryBot.create(:dispute_entry)
-    FactoryBot.create(:dispute_entry)
-
-  end
-
-  let(:dispute_entry) { [DisputeEntry.find(1),DisputeEntry.find(2)]}
-
   let(:find_wlbl_error_json) {'{"Error": "WL/BL entry with ID \'101\' not found."}'}
   let(:where_wlbl_error_json) {'{"Error": "No search criteria provided."}'}
   let(:add_wlbl_error_json) {'{"Error": "Invalid data format."}'}
@@ -163,27 +153,39 @@ describe Wbrs::ManualWlbl do
     }.to raise_error(Wbrs::WbrsError)
   end
 
-  it 'should add a WL/BL on the backend' do
-    expect(Wbrs::Base).to receive(:make_post_request).and_return(add_wlbl_response)
+  context 'Adding WL/BL' do
+    before(:all) do
+      FactoryBot.create(:customer)
+      FactoryBot.create(:dispute)
+      FactoryBot.create(:dispute_entry)
+      FactoryBot.create(:dispute_entry)
+    end
 
-    response = Wbrs::ManualWlbl.add_from_params(dispute_entry, wlbl_params)
+    let(:dispute_entry) { [DisputeEntry.find(1),DisputeEntry.find(2)]}
 
-    warnings = JSON.parse(response)['Warnings']
-    
-    expect(warnings).to be_a_kind_of(Array)
-    expect(warnings.count).to eql(2)
-    expect(warnings[0]).to be_a_kind_of(String)
-    expect(warnings[1]).to be_a_kind_of(String)
-    expect(DisputeEntry.find(1).webrep_wlbl_key).to eq(209053)
-    expect(DisputeEntry.find(2).webrep_wlbl_key).to eq(209054)
+
+    it 'should add a WL/BL on the backend', :foo => true do
+      expect(Wbrs::Base).to receive(:make_post_request).and_return(add_wlbl_response)
+
+      response = Wbrs::ManualWlbl.add_from_params(dispute_entry, wlbl_params)
+
+      warnings = JSON.parse(response)['Warnings']
+
+      expect(warnings).to be_a_kind_of(Array)
+      expect(warnings.count).to eql(2)
+      expect(warnings[0]).to be_a_kind_of(String)
+      expect(warnings[1]).to be_a_kind_of(String)
+      expect(DisputeEntry.find(1).webrep_wlbl_key).to eq(209053)
+      expect(DisputeEntry.find(2).webrep_wlbl_key).to eq(209054)
+    end
+
+    it 'should handle errors adding a WL/BL on the backend', :foo => true do
+      expect(Wbrs::Base).to receive(:make_post_request).and_return(add_wlbl_error)
+
+      expect {
+        Wbrs::ManualWlbl.add_from_params(dispute_entry, error_wlbl_params)
+      }.to raise_error(Wbrs::WbrsError)
+    end
+
   end
-
-  it 'should handle errors adding a WL/BL on the backend' do
-    expect(Wbrs::Base).to receive(:make_post_request).and_return(add_wlbl_error)
-
-    expect {
-      Wbrs::ManualWlbl.add_from_params(dispute_entry, error_wlbl_params)
-    }.to raise_error(Wbrs::WbrsError)
-  end
-
 end
