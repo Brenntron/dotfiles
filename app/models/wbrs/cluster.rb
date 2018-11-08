@@ -146,6 +146,9 @@ class Wbrs::Cluster < Wbrs::Base
 
     response = call_json_request(:get, "/v1/clusters/get/#{cluster_id}", body: '')
     response_body = JSON.parse(response.body)
+    puts "##########################\n"
+    puts response_body.inspect
+
     response_body#['data']
   end
 

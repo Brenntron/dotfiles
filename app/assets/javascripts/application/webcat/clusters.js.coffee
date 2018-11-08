@@ -48,7 +48,17 @@ window.fetch_cluster_data = (id) ->
     error: (response) ->
   )
 
-window.categorize_cluster = (cluster_id, comment, category_ids) ->
+window.categorize_clusters = (cluster_id, comment, category_ids) ->
+
+  clusters_to_categorize = []
+  $('[id*="_categories-selectized"]').filter ->
+    if this.value.length > 0
+      clusters_to_categorize << this
+
+  clusters_to_categorize
+
+
+
   headers = {'Token': $('input[name="token"]').val(), 'Xmlrpc-Token': $('input[name="xml_token"]').val()}
   $.ajax(
     url: "/escalations/api/v1/escalations/webcat/clusters/process_cluster"
@@ -274,12 +284,12 @@ $ ->
             entry_row = '<tr class="index-entry-row">' +
               '<td class="clusterpath-col-spacer"><input type="checkbox" class="cluster-path-checkbox_' + cluster.cluster_id + '"</td>' + # Spacer for the check box row
               '<td class="clusterpath-col-path">' + this.url + '</td>' +
-              '<td class="clusterpath-col-volume text-center">' + this.apac_region_volume + '</td>' +
-              '<td class="clusterpath-col-volume text-center">' + this.emrg_region_volume + '</td>' +
-              '<td class="clusterpath-col-volume text-center">' + this.eurp_region_volume + '</td>' +
+              '<td class="clusterpath-col-volume text-center">' + this.apac_volume + '</td>' +
+              '<td class="clusterpath-col-volume text-center">' + this.emrg_volume + '</td>' +
+              '<td class="clusterpath-col-volume text-center">' + this.eurp_volume + '</td>' +
               '<td class="clusterpath-col-volume text-center">' + this.glob_volume + '</td>' +
-              '<td class="clusterpath-col-volume text-center">' + this.japn_region_volume + '</td>' +
-              '<td class="clusterpath-col-volume text-center">' + this.na_region_volume + '</td>' +
+              '<td class="clusterpath-col-volume text-center">' + this.japn_volume + '</td>' +
+              '<td class="clusterpath-col-volume text-center">' + this.noam_volume + '</td>' +
               '<td class="clusterpath-col-wbrs text-center">' + this.wbrs_score + '</td>' +
               '</tr>'
             entry_rows.push entry_row

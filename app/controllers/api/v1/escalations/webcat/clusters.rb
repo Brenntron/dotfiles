@@ -4,7 +4,7 @@ module API
       module Webcat
         class Clusters < Grape::API
           include API::V1::Defaults
-
+          include ActionView::Helpers::DateHelper
           resource "escalations/webcat/clusters" do
 
             before do
@@ -41,21 +41,18 @@ module API
               if params[:regex].present?
                 clusters = Wbrs::Cluster.where({:regex => params[:regex]})
               else
-                clusters = Wbrs::Cluster.all(true)
+                clusters = Wbrs::Cluster.all()
               end
               if clusters
 
                 clusters.each do |cluster|
                   cluster_packet = {}
-                  cluster_packet[:cluster_id] = cluster[:cluster_id]
-                  cluster_packet[:domain] = cluster[:domain]
-                  cluster_packet[:global_volume] = cluster[:glob_volume]
-                  ctime = Time.gm(cluster[:ctime]).to_i
-                  now = Time.now.utc.to_i
-                  age = (now + ctime)
-                  cluster_packet[:ctime] = Time.gm(cluster[:ctime]).to_i
-                  cluster_packet[:now] = Time.now.utc.to_i
-                  cluster_packet[:age] = distance_of_time_in_words(age)
+                  cluster_packet[:cluster_id] = cluster["cluster_id"]
+                  cluster_packet[:domain] = cluster["domain"]
+                  cluster_packet[:global_volume] = cluster["glob_volume"]
+                  cluster_packet[:ctime] = cluster["ctime"]
+                  #cluster_packet[:now] = Time.now.utc.to_i
+                  cluster_packet[:age] = distance_of_time_in_words(Time.now, Time.parse(cluster["ctime"]))
                   json_packet << cluster_packet
                 end
               end
@@ -81,7 +78,7 @@ module API
             get ":id" do
               cluster_id = params[:id]
 
-              cluster_info = Wbrs::Cluster.retrieve(cluster_id, true)
+              cluster_info = Wbrs::Cluster.retrieve(cluster_id)
               {:status => "success", :data => cluster_info}.to_json
             end
 
@@ -103,7 +100,7 @@ module API
               end
               conds[:user] = user.cvs_username
               conds[:cat_ids] = cat_ids
-              Wbrs::Cluster.process(conds)
+              #Wbrs::Cluster.process(conds)
             end
           end
         end
