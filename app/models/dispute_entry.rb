@@ -244,11 +244,11 @@ class DisputeEntry < ApplicationRecord
     pretty_umbrella_status
   end
 
-  def assign_from_auto_resolve(address:, total_hits:, resolved_at:)
+  def assign_from_auto_resolve(address:, total_hits:, resolved_at:, dispute_entry_id:)
 
     self.status = NEW
 
-    auto_resolve_verdict = AutoResolve.create_from_payload(entry_type, address, total_hits)
+    auto_resolve_verdict = AutoResolve.create_from_payload(entry_type, address, total_hits, dispute_entry_id)
 
     if auto_resolve_verdict.resolved?
       if auto_resolve_verdict.malicious?

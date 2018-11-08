@@ -97,6 +97,30 @@ class AutoResolve
     return nil
   end
 
+  def check_virus_total_from_preload(dispute_entry_id)
+    result = DisputeEntryPreload.where(dispute_entry_id: dispute_entry_id).first.virustotale
+    if result && result['scans']
+      all_scans = result['scans']
+      scan_results = virus_total_scan_names.map do |scan_key|
+        all_scans[scan_key]&.merge('name' => scan_key)
+      end
+      scan_hits = scan_results.select do |scan|
+        scan && scan['detected']
+      end
+      if scan_hits.any?
+        hit_messages = scan_hits.map {|scan| "#{scan['name']}: #{scan['result']}"}
+        append_comment("#{hit_messages.join(', ')}; ")
+        return STATUS_MALICIOUS
+      else
+        append_comment('VT: -; ')
+        return STATUS_NONMALICIOUS
+      end
+    end
+  rescue
+    append_comment('VT: error; ')
+    return nil
+  end
+
   def call_umbrella(address: self.address)
     response = Umbrella::Scan.scan_result(address: address)
     case
@@ -148,7 +172,7 @@ class AutoResolve
 
   # Checks the remote systems.
   # Sets this object state to convention of NEW: human review needed, MALICIOUS: auto resolve, or nil unknown.
-  def check_sources(rule_hits:)
+  def check_sources(rule_hits:, dispute_entry_id:)
     wbrs_hits =
         if Rails.configuration.complaints.check
           check_complaints(rule_hits: rule_hits)
@@ -158,7 +182,7 @@ class AutoResolve
 
     vt_status =
         if Rails.configuration.virus_total.check
-          check_virus_total
+          check_virus_total_from_preload(dispute_entry_id)
         else
           nil
         end
@@ -207,7 +231,7 @@ class AutoResolve
   # @param [String] address_type: 'IP' or 'URI/DOMAIN'
   # @param [String] address: ip address, uri, or domain
   # @param [Array<String>] rule_hits: collection of our rule hits as strings of mnem values
-  def self.create_from_payload(address_type, address, rule_hits = nil)
+  def self.create_from_payload(address_type, address, rule_hits = nil, dispute_entry_id)
     address_type_attr =
         case
           when 'IP' == address_type
@@ -219,7 +243,7 @@ class AutoResolve
         end
 
     auto_resolve = new(address_type: address_type_attr, address: address, rule_hits: rule_hits)
-    auto_resolve.check_sources(rule_hits: rule_hits)
+    auto_resolve.check_sources(rule_hits: rule_hits, dispute_entry_id: dispute_entry_id)
     auto_resolve
   end
 
