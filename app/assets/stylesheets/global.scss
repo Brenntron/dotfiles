@@ -5792,7 +5792,7 @@ table.dataTable tbody tr.selected {
 
 .category-column .form-control.selectize {
   height: 30px !important;
-  margin: -4px 0 !important;
+  margin: -4px 0;
 }
 
 .category-column .form-control.selectize .selectize-input input {
@@ -6637,4 +6637,16 @@ h2 {
   .selectize-dropdown {
     margin: 4px 0 0 -2px;
   }
+}
+
+
+
+
+.category-column .form-control.selectize.selectize-dropdown.cluster_categories {
+  margin-top: 8px;
+  padding: 0 !important;
+}
+
+.selectize-input.has-items + .category-column .form-control.selectize.selectize-dropdown.cluster_categories {
+  margin-top: 4px !important;
 }
