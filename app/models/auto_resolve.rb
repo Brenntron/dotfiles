@@ -152,6 +152,22 @@ class AutoResolve
     return nil
   end
 
+  def check_umbrella_from_preload(dispute_entry_id: dispute_entry_id)
+    result = DisputeEntryPreload.where(dispute_entry_id: dispute_entry_id).first.umbrella
+    if result
+      if result == 'Malicious'
+        append_comment('Umbrella: malicious domain.; ')
+        return STATUS_MALICIOUS
+      else
+        append_comment('Umbrella: -; ')
+        return STATUS_NONMALICIOUS
+      end
+    end
+  rescue
+    append_comment('Umbrella: error; ')
+    return nil
+  end
+
   def mark_malicious
     self.resolved = true
     self.status = STATUS_MALICIOUS
@@ -189,7 +205,7 @@ class AutoResolve
 
     umbrella_status =
         if Rails.configuration.umbrella.check
-          check_umbrella
+          check_umbrella_from_preload
         else
           nil
         end
