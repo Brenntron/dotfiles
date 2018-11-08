@@ -22,16 +22,6 @@ window.populate_clusters_index_table = (filter) ->
         datatable.rows.add(json.data);
         datatable.draw();
 
-        $('.cluster_categories').selectize {
-          persist: false,
-          create: false,
-          maxItems: 5,
-          valueField: 'value',
-          labelField: 'value',
-          searchField: ['text'],
-          options: AC.WebCat.createSelectOptions()
-        }
-
     error: (response) ->
       notice_html = "<p>Something went wrong: #{response.responseText}</p>"
   , this)
@@ -171,6 +161,23 @@ $ ->
 
 $ ->
   $(document).ready ->
+
+    # Moves cluster selectize to table draw so that selectize boxes properly initialize when changing number of items being displayed
+    $("#clusters-index").on 'draw.dt', ->
+      category_inputs = $("select.cluster_categories")
+      $(category_inputs).each ->
+        if $(this).next("div").hasClass("selectize-control")
+#          This is already selectized
+        else
+          $(this).selectize {
+            persist: false,
+            create: false,
+            maxItems: 5,
+            valueField: 'value',
+            labelField: 'value',
+            searchField: ['text'],
+            options: AC.WebCat.createSelectOptions()
+          }
 
 window.copycat_dialog = () ->
   $('#copycat_dialog').dialog({
