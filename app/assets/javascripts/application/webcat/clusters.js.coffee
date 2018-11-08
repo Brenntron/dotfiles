@@ -170,7 +170,15 @@ window.expand_all = (tableId) ->
     if !$(selectedRows[i]).hasClass('shown')
       $(selectedRows[i]).find('.expand-row-button-inline').click()
     i = i + 1
-#  selectedRows = $('table#' + tableId + ' .expand-row-button-inline').click()
+
+# collapse all functionality
+window.collapse_all = (tableId) ->
+  selectedRows = $('table#' + tableId + ' tr[role="row"]')
+  i = 0
+  while i < selectedRows.length
+    if $(selectedRows[i]).hasClass('shown')
+      $(selectedRows[i]).find('.expand-row-button-inline').click()
+    i = i + 1
 
 #  expand selected funtionality
 window.expand_selected = (tableId) ->
@@ -180,6 +188,34 @@ window.expand_selected = (tableId) ->
     if !$(selectedRows[i]).hasClass('shown')
       $(selectedRows[i]).find('.expand-row-button-inline').click()
     i = i + 1
+
+#  collapse selected funtionality
+window.collapse_selected = (tableId) ->
+  selectedRows = $('table#' + tableId + ' tr[role="row"].selected')
+  i = 0
+  while i < selectedRows.length
+    if $(selectedRows[i]).hasClass('shown')
+      $(selectedRows[i]).find('.expand-row-button-inline').click()
+    i = i + 1
+
+# open selected funtionality
+window.open_selected = (tableId) ->
+  table = $('table#' + tableId).DataTable()
+  $.map table.rows('.selected').data(), (row) ->
+    domain = row.domain
+    if !domain.startsWith('http://')
+      domain = 'http://' + domain
+    window.open(domain, '_blank')
+
+# open all functionality
+window.open_all = (tableId) ->
+  table = $('table#' + tableId).DataTable()
+  $.map table.rows().data(), (row) ->
+    domain = row.domain
+    if !domain.startsWith('http://')
+      domain = 'http://' + domain
+    window.open(domain, '_blank')
+
 
 window.copycat_dialog = () ->
   $('#copycat_dialog').dialog({
