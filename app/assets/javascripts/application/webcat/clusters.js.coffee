@@ -69,6 +69,7 @@ window.categorize_clusters = (cluster_id, comment, category_ids) ->
 $ ->
 #  Populate the cluster management table (temp data currently)
   window.clusters_table = $('#clusters-index').DataTable(
+    dom: '<"datatable-top-tools"lf>t<ip>'
     columnDefs: [
       {
         targets: [
@@ -247,6 +248,7 @@ $ ->
 
 
   $('#clusters-index tbody').on 'click', 'td.expandable-row-column', ->
+    $('.cluster-mgt-loader-wrapper').removeClass('hidden')
     tr = $(this).closest('tr')
     row = window.clusters_table.row(tr)
     if row.child.isShown()
@@ -278,6 +280,7 @@ $ ->
         url: "/escalations/api/v1/escalations/webcat/clusters/" + cluster.cluster_id
         data: {}
         success: (response) ->
+          $('.cluster-mgt-loader-wrapper').addClass('hidden')
           json = $.parseJSON(response)
           entry = json.data
 

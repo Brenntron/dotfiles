@@ -6650,3 +6650,34 @@ h2 {
 .selectize-input.has-items + .category-column .form-control.selectize.selectize-dropdown.cluster_categories {
   margin-top: 4px !important;
 }
+
+.cluster-mgt-loader-wrapper {
+  display: block;
+  position: absolute;
+  margin: 175px 38%;
+  width: 170px;
+
+  .gear-loader-wrapper {
+    margin-right: 5px;
+    margin-top: 6px;
+    float: left;
+  }
+
+  .loader-msg {
+    display: inline-block;
+    line-height: 3.5;
+  }
+}
+
+.loader-msg {
+  color: $type-lighter-color;
+}
+
+.cluster-table-toolbar {
+  margin-top: 58px;
+  margin-bottom: 0;
+}
+
+#clusters-index_wrapper .datatable-top-tools {
+  margin-top: -35px;
+}
