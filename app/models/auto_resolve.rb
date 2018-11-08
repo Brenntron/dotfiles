@@ -98,7 +98,7 @@ class AutoResolve
   end
 
   def check_virus_total_from_preload(dispute_entry_id)
-    result = DisputeEntryPreload.where(dispute_entry_id: dispute_entry_id).first.virustotale
+    result = DisputeEntryPreload.where(dispute_entry_id: dispute_entry_id).first.virustotal
     if result && result['scans']
       all_scans = result['scans']
       scan_results = virus_total_scan_names.map do |scan_key|
