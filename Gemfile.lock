@@ -1,6 +1,6 @@
 GIT
   remote: https://git.vrt.sourcefire.com/talosweb/peake-bridge-client.git
-  revision: 2c2dcddf9cfef2be932f735216618a5b85afe435
+  revision: 8c500eeeba990db092b097f9afe6a8019d658f82
   specs:
     peake-bridge-client (0.0.9.0)
       curb (~> 0.9)
@@ -78,13 +78,13 @@ GEM
     awesome_nested_set (3.1.4)
       activerecord (>= 4.0.0, < 5.3)
     awesome_print (1.2.0)
-    aws-sdk (2.11.164)
-      aws-sdk-resources (= 2.11.164)
-    aws-sdk-core (2.11.164)
+    aws-sdk (2.11.166)
+      aws-sdk-resources (= 2.11.166)
+    aws-sdk-core (2.11.166)
       aws-sigv4 (~> 1.0)
       jmespath (~> 1.0)
-    aws-sdk-resources (2.11.164)
-      aws-sdk-core (= 2.11.164)
+    aws-sdk-resources (2.11.166)
+      aws-sdk-core (= 2.11.166)
     aws-sigv4 (1.0.3)
     axiom-types (0.1.1)
       descendants_tracker (~> 0.0.4)
@@ -124,7 +124,7 @@ GEM
       execjs
     coffee-script-source (1.12.2)
     commonjs (0.2.7)
-    concurrent-ruby (1.1.2)
+    concurrent-ruby (1.1.3)
     crass (1.0.4)
     cucumber (2.99.0)
       builder (>= 2.1.2)
@@ -219,10 +219,10 @@ GEM
     grease (0.3.1)
     gruff (0.7.0)
       rmagick (~> 2.13, >= 2.13.4)
-    guard (2.14.0)
+    guard (2.14.2)
       formatador (>= 0.2.4)
       listen (>= 2.7, < 4.0)
-      lumberjack (~> 1.0)
+      lumberjack (>= 1.0.12, < 2.0)
       nenv (~> 0.1)
       notiffany (~> 0.0)
       pry (>= 0.9.12)
@@ -421,7 +421,7 @@ GEM
       rubyzip (>= 1.1.6)
     ruby_dep (1.5.0)
     rubyzip (1.2.2)
-    sass (3.6.0)
+    sass (3.7.1)
       sass-listen (~> 4.0.0)
     sass-listen (4.0.0)
       rb-fsevent (~> 0.9, >= 0.9.4)
@@ -432,7 +432,7 @@ GEM
       sprockets (>= 2.8, < 4.0)
       sprockets-rails (>= 2.0, < 4.0)
       tilt (>= 1.1, < 3)
-    selectize-rails (0.12.5)
+    selectize-rails (0.12.6)
     shellany (0.0.1)
     simple_form (3.5.1)
       actionpack (> 4, < 5.2)
@@ -465,7 +465,7 @@ GEM
     thor (0.19.4)
     thread_safe (0.3.6)
     tilt (2.0.8)
-    tins (1.18.0)
+    tins (1.19.0)
     to_regexp (0.2.1)
     turbolinks (5.0.1)
       turbolinks-source (~> 5)
@@ -539,7 +539,7 @@ DEPENDENCIES
   grape-cancan (~> 0.0.2)
   grape-swagger (~> 0.25.3)
   grape-swagger-rails (~> 0.3.0)
-  guard (= 2.14.0)
+  guard (= 2.14.2)
   guard-cucumber (~> 2.1.2)
   guard-livereload (= 2.5.2)
   gzip (= 1.0)
@@ -593,4 +593,4 @@ DEPENDENCIES
   xmlrpc
 
 BUNDLED WITH
-   1.16.3
+   1.16.6

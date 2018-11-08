@@ -80,7 +80,7 @@ group :development do
   gem 'thin', '~> 1.7.0'
   gem 'puma'
   gem 'awesome_print', '1.2.0'
-  gem 'guard','2.14.0'
+  gem 'guard','2.14.2'
   gem 'guard-livereload', '2.5.2', require: false
   gem 'web-console', '~> 3.4.0'
 end
