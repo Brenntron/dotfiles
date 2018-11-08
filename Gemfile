@@ -15,7 +15,7 @@ gem 'kaminari', '~> 0.16.3'
 
 gem 'cancancan', '~> 1.16.0'
 gem 'grape-cancan', '~> 0.0.2'
-gem 'devise', '~> 4.3.0'
+gem 'devise', '~> 4.5'
 gem 'net-ldap', '~> 0.16.0'
 
 gem 'mysql2', '0.3.21'
