@@ -98,7 +98,7 @@ class AutoResolve
   end
 
   def check_virus_total_from_preload(dispute_entry_id)
-    result = DisputeEntryPreload.where(dispute_entry_id: dispute_entry_id).first.virustotal
+    result = JSON.parse(DisputeEntryPreload.where(dispute_entry_id: dispute_entry_id).first.virustotal)
     if result && result['scans']
       all_scans = result['scans']
       scan_results = virus_total_scan_names.map do |scan_key|
@@ -152,7 +152,7 @@ class AutoResolve
     return nil
   end
 
-  def check_umbrella_from_preload(dispute_entry_id: dispute_entry_id)
+  def check_umbrella_from_preload(dispute_entry_id)
     result = DisputeEntryPreload.where(dispute_entry_id: dispute_entry_id).first.umbrella
     if result
       if result == 'Malicious'
@@ -205,7 +205,7 @@ class AutoResolve
 
     umbrella_status =
         if Rails.configuration.umbrella.check
-          check_umbrella_from_preload
+          check_umbrella_from_preload(dispute_entry_id)
         else
           nil
         end
