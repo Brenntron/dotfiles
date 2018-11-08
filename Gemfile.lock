@@ -1,11 +1,12 @@
 GIT
   remote: https://git.vrt.sourcefire.com/talosweb/peake-bridge-client.git
-  revision: 4c07eec171067039ef8646fb64dbf03316d71df3
+  revision: 2c2dcddf9cfef2be932f735216618a5b85afe435
   specs:
-    peake-bridge-client (0.0.8.0)
+    peake-bridge-client (0.0.9.0)
       curb (~> 0.9)
       httpi (~> 2.4)
       json (>= 1.8.0, < 3.0)
+      openssl (~> 2.1, >= 2.1.2)
 
 PATH
   remote: vendor/gems/activemessaging
@@ -258,7 +259,7 @@ GEM
     http_parser.rb (0.6.0)
     httparty (0.15.7)
       multi_xml (>= 0.5.2)
-    httpi (2.4.3)
+    httpi (2.4.4)
       rack
       socksify
     i18n (0.9.5)
@@ -338,6 +339,7 @@ GEM
     notiffany (0.1.1)
       nenv (~> 0.1)
       shellany (~> 0.0)
+    openssl (2.1.2)
     orm_adapter (0.5.0)
     paper_trail (6.0.2)
       activerecord (>= 4.0, < 5.2)
@@ -566,7 +568,7 @@ DEPENDENCIES
   net-ldap (~> 0.16.0)
   net-ssh (~> 4.1.0)
   paper_trail (~> 6.0.2)
-  peake-bridge-client (>= 0.0.5.0)!
+  peake-bridge-client (>= 0.0.9.0)!
   poltergeist (~> 1.11)
   pry (~> 0.9.12.4)
   pry-remote (~> 0.1.8)
