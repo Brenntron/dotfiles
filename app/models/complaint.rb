@@ -225,7 +225,7 @@ class Complaint < ApplicationRecord
 
 
 
-  def self.process_bridge_payload(message_payload, bugzilla_rest_session: nil)
+  def self.process_bridge_payload(message_payload)
 
     begin
       ActiveRecord::Base.transaction do
@@ -259,7 +259,7 @@ class Complaint < ApplicationRecord
             'classification' => 'unclassified',
         }
 
-        bug_id_object = bugzilla_rest_session.create_bug(bug_attrs, assigned_user: user)
+        bug_id_object = message_payload[:bugzilla_rest_session].create_bug(bug_attrs, assigned_user: user)
 
 
         new_complaint = Complaint.new

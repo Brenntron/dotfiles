@@ -22,7 +22,7 @@ class BugzillaRest::BugProxy < BugzillaRest::Base
     if persisted?
       raise 'update not implemented'
     else
-      response_body = call(:post, '/rest/bug', query: attributes)
+      response_body = call(:post, '/rest/bug', body: attributes.to_json)
       response_hash = JSON.parse(response_body)
 
       attributes[:id] = response_hash['id']

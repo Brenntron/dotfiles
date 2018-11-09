@@ -25,16 +25,15 @@ class Escalations::PeakeBridge::MessagesController < ApplicationController
           message_payload = message_payload.permit!.to_h
         end
         message_payload[:bugzilla_session] = bugzilla_session
+        message_payload[:bugzilla_rest_session] = bugzilla_rest_session
         message_payload[:current_user] = current_user
 
         if self.class.threaded?
           Thread.new do
-            obj_type.constantize.process_bridge_payload(message_payload,
-                                                        bugzilla_rest_session: bugzilla_rest_session)
+            obj_type.constantize.process_bridge_payload(message_payload)
           end
         else
-          obj_type.constantize.process_bridge_payload(message_payload,
-                                                      bugzilla_rest_session: bugzilla_rest_session)
+          obj_type.constantize.process_bridge_payload(message_payload)
         end
 
         #return_message = {
