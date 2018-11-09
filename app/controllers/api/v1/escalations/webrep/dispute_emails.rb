@@ -4,6 +4,7 @@ module API
       module Webrep
         class DisputeEmails < Grape::API
           include API::V1::Defaults
+          include API::BugzillaRestSession
 
           resource "escalations/webrep/dispute_emails" do
 

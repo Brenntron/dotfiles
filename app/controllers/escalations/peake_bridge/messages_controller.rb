@@ -24,7 +24,6 @@ class Escalations::PeakeBridge::MessagesController < ApplicationController
         if message_payload.respond_to?(:permit!)
           message_payload = message_payload.permit!.to_h
         end
-        message_payload[:bugzilla_session] = bugzilla_session
         message_payload[:bugzilla_rest_session] = bugzilla_rest_session
         message_payload[:current_user] = current_user
 
@@ -76,22 +75,6 @@ class Escalations::PeakeBridge::MessagesController < ApplicationController
   # defined so tests can stub to return false.
   def self.threaded?
     true
-  end
-
-  # @return [Bugzilla::XMLRPC] Authenticated bugzilla session
-  def bugzilla_session
-    begin
-      unless @bugzilla_session
-        bugzilla_proxy = Bugzilla::XMLRPC.new(Rails.configuration.bugzilla_host)
-        bugzilla_proxy.bugzilla_login(Bugzilla::User.new(bugzilla_proxy),
-                                      Rails.configuration.bugzilla_username,
-                                      Rails.configuration.bugzilla_password)
-        @bugzilla_session = bugzilla_proxy
-      end
-    rescue => except
-      Rails.logger.error(except.message)
-    end
-    @bugzilla_session
   end
 
   def bugzilla_rest_session

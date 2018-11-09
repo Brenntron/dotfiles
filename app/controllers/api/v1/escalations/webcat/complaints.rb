@@ -4,6 +4,7 @@ module API
       module Webcat
         class Complaints < Grape::API
           include API::V1::Defaults
+          include API::BugzillaRestSession
 
           resource "escalations/webcat/complaints" do
 
