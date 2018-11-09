@@ -32,6 +32,8 @@ window.populate_clusters_index_table = (filter) ->
           options: AC.WebCat.createSelectOptions()
         }
 
+        $("#things").
+
     error: (response) ->
       notice_html = "<p>Something went wrong: #{response.responseText}</p>"
   , this)
@@ -48,16 +50,15 @@ window.fetch_cluster_data = (id) ->
     error: (response) ->
   )
 
-window.categorize_clusters = (cluster_id, comment, category_ids) ->
-
+window.categorize_clusters ->
+  #cluster_id comment category_ids
   clusters_to_categorize = []
   $('[id*="_categories-selectized"]').filter ->
     if this.value.length > 0
       clusters_to_categorize << this
 
-  clusters_to_categorize
-
-
+  clusters_to_categorize.each ->
+    
 
   headers = {'Token': $('input[name="token"]').val(), 'Xmlrpc-Token': $('input[name="xml_token"]').val()}
   $.ajax(

@@ -38,13 +38,19 @@ module API
               authorize!(:index, Complaint)
 
               json_packet = []
-              if params[:regex].present?
-                clusters = Wbrs::Cluster.where({:regex => params[:regex]})
-              else
-                clusters = Wbrs::Cluster.all()
-              end
-              if clusters
 
+
+              if params[:regex].present?
+                cluster_data = Wbrs::Cluster.where({:regex => params[:regex]})
+                clusters = cluster_data["data"]
+                meta = cluster_data["meta"]
+              else
+                cluster_data = Wbrs::Cluster.all()
+                clusters = cluster_data["data"]
+                meta = cluster_data["meta"]
+              end
+
+              if clusters
                 clusters.each do |cluster|
                   cluster_packet = {}
                   cluster_packet[:cluster_id] = cluster["cluster_id"]
@@ -56,7 +62,7 @@ module API
                   json_packet << cluster_packet
                 end
               end
-              {:status => "success", :data => json_packet}.to_json
+              {:status => "success", :data => json_packet, :meta => meta}.to_json
 
             end
 

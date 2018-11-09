@@ -85,7 +85,7 @@ class Wbrs::Cluster < Wbrs::Base
       params = stringkey_params({})
       response = call_json_request(:post, '/v1/clusters/get', body: params)
       response_body = JSON.parse(response.body)
-      response_body['data']
+      response_body
     end
 
   end
@@ -102,7 +102,7 @@ class Wbrs::Cluster < Wbrs::Base
 
     response_body = JSON.parse(response.body)
 
-    response_body['data']
+    response_body
 
   end
 
