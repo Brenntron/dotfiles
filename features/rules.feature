@@ -226,11 +226,4 @@ Feature: Rules
       | gid |  sid  | metadata                 | detection         | rule_content             |
       |  1  | 22211 | policy security-ips drop | flowbits:noalert; | # alert (degenerate: yes;) |
     Then a rule gid "1" and sid "22211" is off
-
-
-
-  @javascript
-  Scenario: I need to ensure the local file grep regex works properly
-    Then pending
-    When code calls grep_line_from_file with sid "1" and gid "139" the response should include "; sid: 1; gid: 139; rev: 1; metadata: rule-type preproc ; classtype:sdf; )"
-    And  code calls grep_line_from_file with sid "98" and gid "116" the response should include "; sid:98; gid:116; rev:1; metadata:rule-type decode; classtype:protocol-command-decode; )"
+    
