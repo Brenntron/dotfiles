@@ -176,7 +176,7 @@
           .row
             .col-xs-6.top-space-ex
               .graph-top-header
-                %h5.uppercase.header-stg ticket entries closed by day
+                %h5.uppercase.header-stg Ticket Entries Closed by Day
 
 
               %label.content-label-sm Time Breakdown
@@ -199,7 +199,7 @@
                     %label.dispute-W.legend-option
                     %label.dispute-EW.legend-option
                     Entries By Ticket Types
-              %canvas#canvas
+              %canvas#graph-ticket-entries-closed
 
 
               .graph-top-header.top-space-ex.bottom-space
@@ -218,7 +218,7 @@
                   %option{:value => ""} Monthly
                   %option{:value => ""} Yearly
               .graph-top-header
-                %h5.uppercase.header-stg ticket submitted by submitter per day
+                %h5.uppercase.header-stg Ticket Submitted by Submitter Type
               .graph-bar-legend
                 .custom-legend
                   %label Customer
@@ -226,7 +226,7 @@
                 .custom-legend
                   %label Guest
                   %label.navyblue-legend-color
-              %canvas#bar-chart
+              %canvas#graph-ticket-entries-submitter
 
 
             .col-xs-6.top-space-ex.graph-section
