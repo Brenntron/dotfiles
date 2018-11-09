@@ -1349,6 +1349,7 @@ $ ->
 
 $ ->
   $(document).ready ->
+
     if window.location.pathname != '/escalations/webrep/tickets'
       $('#filter-cases').hide()
       $('#import-webrep').hide()

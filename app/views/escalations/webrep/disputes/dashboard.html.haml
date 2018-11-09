@@ -11,6 +11,9 @@
             %h5= current_user.display_name
             %p.dashboard-details
               = current_user.cvs_username
+            %input#user_id{type: 'hidden', name: 'user_id', value: "#{current_user.id}"}
+            %input{:name => "token", :type => "hidden", :value => "#{current_user.authentication_token}"}
+            %input{:type => "hidden", :name => "xml_token", :value => "#{xml_token}"}
 
       .col-xs-8.text-right
         .dashboard-time-wrapper
@@ -79,8 +82,8 @@
             .open-tickets-header
               %h3.larger-lighter My Open Tickets
               .ticket-count-wrapper
-                %label.total-table-ticket-count 4
-                %label.total-table-entry-count 23
+                %label#open_single_ticket_count.total-table-ticket-count 4
+                %label#open_single_entry_count.total-table-entry-count 23
             %table.table.responsive.dashboard-tickets-table#table-user-disputes-open
               %thead
                 %tr
@@ -101,27 +104,27 @@
               .ticket-entry-total-block
                 %label.content-label-sm.submitter-customer
                   Customer
-                %span.ticket-entry-total
+                %span#open_single_customer_count.ticket-entry-total
                   32
               .ticket-entry-total-block.guest-block-total
                 %label.content-label-sm
                   Guest
-                %span.ticket-entry-total
+                %span#open_single_guest_count.ticket-entry-total
                   12
               .ticket-entry-total-block
                 %label.content-label-sm.dispute-E-grey
                   Email Entries
-                %span.ticket-entry-total
+                %span#open_single_email_count.ticket-entry-total
                   25
               .ticket-entry-total-block
                 %label.content-label-sm.dispute-W-grey
                   Web Entries
-                %span.ticket-entry-total
+                %span#open_single_web_count.ticket-entry-total
                   22
               .ticket-entry-total-block
                 %label.content-label-sm.dispute-EW-grey
                   Email/Web Entries
-                %span.ticket-entry-total
+                %span#open_single_email_web_count.ticket-entry-total
                   3
 
 

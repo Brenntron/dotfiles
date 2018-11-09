@@ -18,8 +18,8 @@ module API
 
             get "open_tickets_report" do
               authorize!(:index, Dispute)
-
-              report_data = Dispute.open_tickets_report(params[:users], params[:from], params[:to])
+              users = User.where(:id => params[:users])
+              report_data = Dispute.open_tickets_report(users, params[:from], params[:to])
 
               response_data = {:status => "success", :data => report_data}
 

@@ -1246,15 +1246,14 @@ class Dispute < ApplicationRecord
       entry_count = result.dispute_entries.select{ |entry| entry.status != DisputeEntry::STATUS_RESOLVED}.size
       last_comment_time = result.dispute_comments.last.created_at.to_s
       ticket_user = result.user.cvs_username
-      report_data[:table_data] << {:case_id => result.id,
+      report_data[:table_data] << {:case_number => result.id,
                       :status => result.status,
-                      :dispute => result.dispute_entries.first.hostlookup,
+                      :d_entry_preview => "<span class='dispute_entry_content_first'>#{result.dispute_entries.first.hostlookup}</span><span class='dispute-count'>#{entry_count}</span>",
                       :age => distance_of_time_in_words(Time.now, result.created_at),
-                      :is_customer => result.submitter_type == SUBMITTER_TYPE_CUSTOMER,
+                      :submitter_type => result.submitter_type == SUBMITTER_TYPE_CUSTOMER,
                       :submission_type => result.submission_type,
-                      :last_comment_time => last_comment_time,
-                      :entry_count => entry_count,
-                      :user => ticket_user
+                      :last_comment => last_comment_time,
+                      :owner => ticket_user
 
       }
     end
