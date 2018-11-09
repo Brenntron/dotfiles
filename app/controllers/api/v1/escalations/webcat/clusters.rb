@@ -57,7 +57,7 @@ module API
                   cluster_packet[:domain] = cluster["domain"]
                   cluster_packet[:global_volume] = cluster["glob_volume"]
                   cluster_packet[:ctime] = cluster["ctime"]
-                  #cluster_packet[:now] = Time.now.utc.to_i
+                  cluster_packet[:cluster_size] = cluster["cluster_size"] unless cluster["cluster_size"].blank?
                   cluster_packet[:age] = distance_of_time_in_words(Time.now, Time.parse(cluster["ctime"]))
                   json_packet << cluster_packet
                 end

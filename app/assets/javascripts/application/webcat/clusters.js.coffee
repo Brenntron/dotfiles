@@ -32,7 +32,7 @@ window.populate_clusters_index_table = (filter) ->
           options: AC.WebCat.createSelectOptions()
         }
 
-        #$("#things")
+        $("#total_results").html(json.meta.rows_found)
 
     error: (response) ->
       notice_html = "<p>Something went wrong: #{response.responseText}</p>"
@@ -50,7 +50,7 @@ window.fetch_cluster_data = (id) ->
     error: (response) ->
   )
 
-window.categorize_clusters ->
+window.categorize_clusters = () ->
   #cluster_id comment category_ids
   clusters_to_categorize = []
   $('[id*="_categories-selectized"]').filter ->
@@ -316,6 +316,8 @@ $ ->
           td = $(tr).next('tr').find('td:first')
           $(td).addClass 'nested-complaint-data-wrapper'
         error: (response) ->
+          $('.cluster-mgt-loader-wrapper').addClass('hidden')
+          std_api_error(response, "There was an error loading cluster data.", reload: false)
       )
 
 
