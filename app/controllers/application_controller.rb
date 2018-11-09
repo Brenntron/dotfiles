@@ -11,10 +11,11 @@ class ApplicationController < ActionController::Base
 
   def require_login
     session[:previous_url] = request.url
-    redirect_to new_escalations_session_path unless current_user
+    # redirect_to new_escalations_session_path unless current_user
   end
 
   def bugzilla_session()
+    byebug
     xmlrpc = Bugzilla::XMLRPC.new(Rails.configuration.bugzilla_host)
     xmlrpc.token = request.headers['Xmlrpc-Token'] ? request.headers['Xmlrpc-Token'] : xml_token
     xmlrpc
@@ -22,6 +23,10 @@ class ApplicationController < ActionController::Base
 
   def current_user
     user_from_request = User.from_request(params, request)
+    if user_from_request && !session[:email]
+      login_session = LoginSession.new(user_from_request)
+      login_session.set_session(session)
+    end
 
     if LoginSession.yet_active?(session, user_from_request&.email)
       @current_user ||= user_from_request
