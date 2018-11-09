@@ -2,7 +2,7 @@ class CreateAmpFalsePositives < ActiveRecord::Migration[5.1]
   def change
     create_table :amp_false_positives do |t|
       t.string "sha256"
-      t.string "customer_email"
+      t.integer "customer_id"
       t.string "source"
       t.text "description"
       t.string "product"

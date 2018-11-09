@@ -23,7 +23,7 @@ ActiveRecord::Schema.define(version: 20181108181405) do
 
   create_table "amp_false_positives", force: :cascade, options: "ENGINE=InnoDB DEFAULT CHARSET=utf8" do |t|
     t.string "sha256"
-    t.string "customer_email"
+    t.integer "customer_id"
     t.string "source"
     t.text "description"
     t.string "product"
