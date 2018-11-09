@@ -1,7 +1,7 @@
 class AmpFalsePositive < ApplicationRecord
   has_paper_trail on: [:update], ignore: [:updated_at]
   belongs_to :user, :optional => true
-  belongs_to :customer
+  belongs_to :customer, :optional => true
 
   AC_SUCCESS = 'CREATE_ACK'
   AC_FAILED = 'CREATE_FAILED'
@@ -14,7 +14,8 @@ class AmpFalsePositive < ApplicationRecord
   def self.process_bridge_payload(message_payload)
     begin
       ActiveRecord::Base.transaction do
-
+        a = message_payload["payload"]
+        binding.pry
       end
     end
   end

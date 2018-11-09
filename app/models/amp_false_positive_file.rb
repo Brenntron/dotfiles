@@ -1,0 +1,3 @@
+class AmpFalsePositiveFile < ApplicationRecord
+
+end
