@@ -1,11 +1,12 @@
 class BugzillaRest::Base
   include ActiveModel::Model
 
-  attr_reader :api_key, :token
+  attr_reader :api_key, :token, :attributes
 
-  def initialize(api_key: nil, token: nil)
+  def initialize(attrs = {}, api_key: nil, token: nil)
     @api_key = api_key
     @token = token
+    @attributes = attrs
   end
 
   def indifferent(attrs)
@@ -80,5 +81,33 @@ class BugzillaRest::Base
     handle_errors(response)
 
     response.body
+  end
+
+  def respond_to?(method_sym, include_private = false)
+    byebug
+    case
+    when FIELDS.include?(method_sym)
+      true
+    when /\A(?<field_name>.*)=\z/ !~ method_sym.to_s
+      super
+    when FIELDS.include?(field_name)
+      true
+    else
+      super
+    end
+  end
+
+  def method_missing(method_sym, *arguments, &block)
+    byebug
+    case
+    when FIELDS.include?(method_sym)
+      attributes[FIELDS]
+    when /\A(?<field_name>.*)=\z/ !~ method_sym.to_s
+      super
+    when FIELDS.include?(field_name)
+      attributes[field_name] = arguments[0]
+    else
+      super
+    end
   end
 end

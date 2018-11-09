@@ -11,9 +11,11 @@ class BugzillaRest::Session < BugzillaRest::Base
     response_hash['token']
   end
 
-  # @return [Integer] the id of the created bug
-  def create_bug(bug_attrs, assigned_user: User.vrtincoming)
+  def build_bug(bug_attrs)
+    BugzillaRest::BugProxy.new(bug_attrs, api_key: api_key, token: token)
+  end
 
+  def create_bug(bug_attrs, assigned_user: User.vrtincoming)
     BugzillaRest::BugProxy.create!(bug_attrs, assigned_user: assigned_user, api_key: @api_key, token: @token)
   end
 end

@@ -141,10 +141,10 @@ class DisputeEmail < ApplicationRecord
 
   end
 
-  def self.create_email_and_send(params, xmlrpc, user)
+  def self.create_email_and_send(params, bugzilla_rest_session:, current_user:)
     new_email = DisputeEmail.new
     new_email.dispute_id = params[:dispute_id]
-    new_email.from = user.email
+    new_email.from = current_user.email
     if params[:cc].present?
       new_email.to = "#{params[:to]}, #{params[:cc]}"
     else
@@ -159,13 +159,13 @@ class DisputeEmail < ApplicationRecord
     attachments_to_mail = []
 
     if params[:attachments].present?
-      params[:attachments].each do |key, attachment|
+      params[:attachments].values.each do |attachment|
 
         payload = {}
         payload[:file_name] = attachment.filename
         payload[:file_content] = attachment.tempfile
         payload[:content_type] = attachment.type
-        new_local_attachment = DisputeEmailAttachment.build_and_push_to_bugzilla(xmlrpc, payload, user, new_email, false)
+        new_local_attachment = DisputeEmailAttachment.build_and_push_to_bugzilla(bugzilla_rest_session, payload, current_user, new_email, false)
         s3_file_path = new_local_attachment.push_to_aws(attachment)
         new_attachment = {}
         new_attachment[:file_name] = attachment.filename

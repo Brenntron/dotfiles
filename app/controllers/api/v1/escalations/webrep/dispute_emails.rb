@@ -68,7 +68,9 @@ module API
                       params[:to] = current_user.email
                     end
 
-                    DisputeEmail.create_email_and_send(params, bugzilla_session, current_user)
+                    DisputeEmail.create_email_and_send(params,
+                                                       bugzilla_rest_session: bugzilla_rest_session,
+                                                       current_user: current_user)
 
                     # This logic was here to mark an email that had been replied to as "Replied"
                     # Per Melissa's orders, we aren't currently doing a "Replied" icon, and those "Read"
