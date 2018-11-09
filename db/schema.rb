@@ -506,6 +506,23 @@ ActiveRecord::Schema.define(version: 20181108181405) do
     t.index ["reference_id"], name: "index_exploits_references_on_reference_id"
   end
 
+  create_table "false_positives", force: :cascade, options: "ENGINE=InnoDB DEFAULT CHARSET=latin1" do |t|
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.integer "bug_id"
+    t.string "user_email"
+    t.string "sid"
+    t.text "description"
+    t.string "source_authority"
+    t.string "source_key"
+    t.string "os"
+    t.string "version"
+    t.string "built_from"
+    t.string "pcap_lib"
+    t.string "cmd_line_options"
+    t.index ["source_authority", "source_key"], name: "index_false_positives_on_source_authority_and_source_key", unique: true
+  end
+
   create_table "file_references", force: :cascade, options: "ENGINE=InnoDB DEFAULT CHARSET=latin1" do |t|
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
@@ -704,9 +721,7 @@ ActiveRecord::Schema.define(version: 20181108181405) do
     t.index ["user_id", "name"], name: "index_saved_searches_on_user_id_and_name"
   end
 
-  create_table "snort_false_positives", force: :cascade, options: "ENGINE=InnoDB DEFAULT CHARSET=latin1" do |t|
-    t.datetime "created_at", null: false
-    t.datetime "updated_at", null: false
+  create_table "snort_false_positives", force: :cascade, options: "ENGINE=InnoDB DEFAULT CHARSET=utf8" do |t|
     t.integer "bug_id"
     t.string "user_email"
     t.string "sid"
@@ -718,7 +733,9 @@ ActiveRecord::Schema.define(version: 20181108181405) do
     t.string "built_from"
     t.string "pcap_lib"
     t.string "cmd_line_options"
-    t.index ["source_authority", "source_key"], name: "index_snort_false_positives_on_source_authority_and_source_key", unique: true
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.index ["source_authority", "source_key"], name: "index_snort_false_positives_on_source_authority_and_source_key"
   end
 
   create_table "snort_researches", force: :cascade, options: "ENGINE=InnoDB DEFAULT CHARSET=utf8" do |t|
