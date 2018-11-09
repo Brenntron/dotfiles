@@ -345,7 +345,7 @@ table.dataTable.no-footer {
   width: 14px;
   height: 14px;
   right: 0;
-  background-image: url("/assets/layout/icon_sort.svg");
+  background-image: url("assets/layout/icon_sort.svg");
   background-repeat: no-repeat;
   background-position: right center;
   float: right;
@@ -3472,8 +3472,8 @@ input.communication-subject {
   font-size: 9pt;
 }
 
-.mng-boilerplates-button {
-  background-image: url(image_path('icon_template_white.svg'));
+.mng-resolution-message-templates-button {
+  background-image: url(image_path('icon_comment_template.svg'));
   background-repeat: no-repeat;
   background-position: 0 2px;
   background-size: 18px 18px;
@@ -3486,8 +3486,10 @@ input.communication-subject {
   margin-left: 20px;
   font-weight: 300;
   font-size: 9pt;
+  padding-top: 22px;
+  position: absolute;
+  top:21px;
 }
-
 
 .note-info-item {
   display: inline-block;
