@@ -76,8 +76,6 @@ $table-dark-header: #413D3D;
   box-shadow: $shadow;
 }
 
-
-
 /************ Base Styles **************/
 
 body {
@@ -421,6 +419,20 @@ th {
 
 .alert-col {
   padding-left: 30px;
+}
+
+.age-col {
+
+}
+
+.pass-min-hr {
+  color: $warning-accent-color;
+  font-weight: bold;
+}
+
+.overdue {
+  color: $second-section-color;
+  font-weight: bold;
 }
 
 .alt-col {
