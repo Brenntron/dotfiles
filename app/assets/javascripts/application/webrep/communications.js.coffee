@@ -476,6 +476,31 @@ $ ->
           std_api_error(response, "Email Template could not be deleted.", reload: false)
       )
 
+  $('#select-new-resolution-message-template-status').on 'change', ->
+    template_id = this.value
+
+    console.log("Happy")
+    std_msg_ajax(
+      method: 'GET'
+      url: "/escalations/api/v1/escalations/webrep/resolution_message_templates/#{template_id}"
+      success_reload: false
+      success: (response) ->
+        $('.ticket-status-comment').val(response.body)
+      error: (response) ->
+        std_api_error(response, "There was a problem retrieving email template.", reload: false)
+    )
+  $('#select-new-resolution-message-template-resolution').on 'change', ->
+    template_id = this.value
+
+    std_msg_ajax(
+      method: 'GET'
+      url: "/escalations/api/v1/escalations/webrep/resolution_message_templates/#{template_id}"
+      success_reload: false
+      success: (response) ->
+        $('.ticket-resolution-comment').val(response.body)
+      error: (response) ->
+        std_api_error(response, "There was a problem retrieving email template.", reload: false)
+    )
 
   ## Manage Email Templates
 

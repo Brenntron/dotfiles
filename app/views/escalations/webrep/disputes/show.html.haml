@@ -108,9 +108,15 @@
                           %label.ticket-res-radio-label.radio-label{for: "#{Dispute::STATUS_RESOLVED_OTHER}"} Other
                     .col-xs-6.submenu-right-wrapper
                       .resolution-comment-wrapper
+                        %select.dropdown.resolution-message-template-select#select-new-resolution-message-template-resolution
+                          -if ResolutionMessageTemplate.all.empty?
+                            %option.hidden{value:'', disabled: true, selected: true} No Templates Created
+                          -else
+                            %option{value:'', disabled: true, selected: true} No Template Selected
+                            =options_for_select(ResolutionMessageTemplate.all.pluck(:name, :id))
                         %label.content-label-sm
                           Comment
-                        %textarea
+                        %textarea.ticket-resolution-comment
                         %button.primary{onClick: 'show_page_edit_status()'}
                           Submit
 
@@ -118,6 +124,12 @@
                   %input.ticket-status-radio{type: 'radio', name: 'dispute-status', class: "dispute-status-#{@dispute.id}", id: "#{Dispute::STATUS_REOPENED}", value: "#{Dispute::STATUS_REOPENED}"}
                   %label.radio-label.ticket-status-radio-label{for: "#{Dispute::STATUS_REOPENED}"} Re-Opened
                 %li.non-resolution-submit-wrapper#ticket-non-res-submit
+                  %select.dropdown.resolution-message-template-select#select-new-resolution-message-template-status
+                    -if ResolutionMessageTemplate.all.empty?
+                      %option.hidden{value:'', disabled: true, selected: true} No Templates Created
+                    -else
+                      %option{value:'', disabled: true, selected: true} No Template Selected
+                      =options_for_select(ResolutionMessageTemplate.all.pluck(:name, :id))
                   %label.content-label-sm
                     Comment
                   %textarea.ticket-status-comment
