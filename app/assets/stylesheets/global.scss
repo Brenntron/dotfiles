@@ -5549,6 +5549,10 @@ table.dataTable tbody tr.selected {
   background-color: $faint-accent-color;
 }
 
+table.dataTable tbody tr.selected .alt-col{
+  background-color: #dae7ea;
+}
+
 .nested-col-sections {
   display: inline-block;
   float: left;
