@@ -322,7 +322,6 @@ class DisputeEntry < ApplicationRecord
     else
       last_submitted = "N/A"
     end
-
     return last_submitted
   end
 
