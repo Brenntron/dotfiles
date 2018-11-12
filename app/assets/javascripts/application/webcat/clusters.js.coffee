@@ -57,16 +57,23 @@ window.fetch_cluster_data = (id) ->
   )
 
 window.categorize_clusters = () ->
+
+  user_id = $("#user_id").val()
+  comment = ""
   #cluster_id comment category_ids
   clusters_to_categorize = []
   clusters = $ '[id$=\'_categories\']'
 
+  data = {}
+  data["comment"] = comment
+  data["user_id"] = user_id
   $(clusters).each ->
     id =  $(this).attr('id').split('_')[0]
     categories = $(this).next('.selectized').attr('value')
 
     if categories.length > 0
       all_cats = categories.split(',')
+      data["cluster_id_" + id.toString()] = all_cats
       console.log id
       console.log all_cats
 
@@ -86,7 +93,7 @@ window.categorize_clusters = () ->
     url: "/escalations/api/v1/escalations/webcat/clusters/process_cluster"
     method: 'POST'
     headers: headers
-    data: {cluster_id: cluster_id, category_ids: category_ids, comment: comment}
+    data: data
     success: (response) ->
 
       json = $.parseJSON(response)

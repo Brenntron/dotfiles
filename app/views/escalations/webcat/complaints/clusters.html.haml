@@ -8,7 +8,7 @@
     .gear-loader-wrapper
       = inline_svg 'icon_gears_loader.svg', class: 'gears-loader'
     %span.loader-msg Loading data...
-
+    %input#user_id{type: 'hidden', name: 'user_id', value: "#{current_user.id}"}
   .complaint-mgt-top-area.cluster-mgt-top-area
     .row.cluster-title
       .col-xl-3.col-lg-4.col-md-5.col-sm-6.col-xs-12.dashboard-left-data
