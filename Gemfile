@@ -15,7 +15,7 @@ gem 'kaminari', '~> 0.16.3'
 
 gem 'cancancan', '~> 1.16.0'
 gem 'grape-cancan', '~> 0.0.2'
-gem 'devise', '~> 4.3.0'
+gem 'devise', '~> 4.5'
 gem 'net-ldap', '~> 0.16.0'
 
 gem 'mysql2', '0.3.21'
@@ -81,7 +81,7 @@ group :development do
   gem 'thin', '~> 1.7.0'
   gem 'puma'
   gem 'awesome_print', '1.2.0'
-  gem 'guard','2.14.0'
+  gem 'guard','2.14.2'
   gem 'guard-livereload', '2.5.2', require: false
   gem 'web-console', '~> 3.4.0'
 end
@@ -132,5 +132,5 @@ gem 'turbolinks', '~> 5.0.1'
 gem 'paper_trail', '~> 6.0.2'
 gem "sprockets", '~> 3.7.1'
 
-gem "peake-bridge-client", '>= 0.0.5.0', git: "https://git.vrt.sourcefire.com/talosweb/peake-bridge-client.git"
+gem "peake-bridge-client", '>= 0.0.9.0', git: "https://git.vrt.sourcefire.com/talosweb/peake-bridge-client.git"
 

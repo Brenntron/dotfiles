@@ -461,6 +461,20 @@ $ ->
       error: (response) ->
         std_api_error(response, "There was an error updating the email template.", reload: false)
     )
+  window.delete_resolution_message_template = () ->
+    template_id = $(this).attr('resolution-message-template-id')
+    confirmation = confirm('Are you sure you want to delete this template?')
+
+    if confirmation
+      std_msg_ajax(
+        method: 'DELETE'
+        url: "/escalations/api/v1/escalations/webrep/resolution_message_templates/#{template_id}"
+        success_reload: true
+        success: (response) ->
+          std_msg_success('Email Template Deleted.', [], reload: true)
+        error: (response) ->
+          std_api_error(response, "Email Template could not be deleted.", reload: false)
+      )
 
 
   ## Manage Email Templates

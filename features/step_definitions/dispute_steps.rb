@@ -50,4 +50,7 @@ Then(/^the Entry preload with id "(.*?)" should exist$/) do |id|
   expect(DisputeEntryPreload.where(id: id)).to exist
 end
 
+Given(/^a dispute entry with trait "(.*?)" exists$/) do| trait_name|
+  FactoryBot.create(:dispute_entry,trait_name.to_sym)
+end
 

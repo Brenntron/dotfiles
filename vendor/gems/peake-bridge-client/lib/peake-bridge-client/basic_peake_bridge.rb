@@ -4,6 +4,8 @@ require 'net/http'
 
 # gems
 # require 'gssapi'
+require 'httpi'
+require 'curb'
 require 'openssl'
 require 'json'
 
@@ -32,8 +34,7 @@ module PeakeBridge
     # @param [String] ca_file path the PEM file of trusted certs.
     # @param [Boolean] gssapi Set to a truthy value to enable Kerberos authentication
     def initialize(channel:, sender:, addressee: nil, host: nil, port: nil, uri_base: '/channels', extras: nil,
-                   basic_auth: nil, tls_mode: nil, ssl_mode: 'no-ssl', ca_file: nil,
-                   gssapi: nil, gssapi_script: '/usr/local/sbin/krb_auth_token.pl')
+                   basic_auth: nil, tls_mode: nil, ssl_mode: 'no-ssl', ca_file: nil, verbose: false, gssapi: false)
       @channel    = channel
       @sender     = sender
       @addressee  = addressee
@@ -41,7 +42,7 @@ module PeakeBridge
       @host       = host || self.class.default_host
       @port       = port || self.class.default_port
       @uri_base   = uri_base
-
+      @gssapi     = gssapi
       @extras     = extras || {}
 
 
@@ -50,43 +51,42 @@ module PeakeBridge
       raise 'Cannot determine host' unless @host
       raise 'Cannot determine port' unless @port
 
-      @http = Net::HTTP.new(@host, @port)
+      @http = HTTPI::Request.new
       case tls_mode || ssl_mode
         when 'verify-peer'
-          @http.use_ssl = true
-          @http.verify_mode = 1
+          @protocol = "https"
+          @use_ssl = true
+          @http.auth.ssl.verify_mode = :peer
+          @http.auth.ssl.ca_cert_file = ca_file #this will be nil for Heroku apps
         when 'verify-none'
-          @http.use_ssl = true
-          @http.verify_mode = 0
+          @protocol = "https"
+          @use_ssl = true
+          @http.auth.ssl.verify_mode = :none
         else
-          @http.use_ssl = false
+          @protocol = "http"
+          @use_ssl = false
       end
-
-      @http.ca_file = ca_file
-
-      if gssapi
-        # gsscli = GSSAPI::Simple.new(@host, 'HTTP')
-        # token = gsscli.init_context
-        raise 'No gssapi script provided' unless gssapi_script
-        token = `#{gssapi_script}`
-        # @auth_value = "Negotiate #{Base64.strict_encode64(token)}"
-        @auth_value = "Negotiate #{token}"
+      if @gssapi
+        @http.auth.gssnegotiate
       end
+      @http.url = url
     end
 
     def uri
       @uri ||= "#{uri_base}/#{channel}/messages"
     end
 
+    def url
+      @url ||= "#{@protocol}://#{@host}:#{@port}#{uri}"
+    end
+
     def post(message:)
-      request = Net::HTTP::Post.new(uri)
-      request.add_field('Content-Type', 'application/json')
-
-      request.add_field('Authorization', @auth_value)
-
-      request.basic_auth @basic_auth[:user], @basic_auth[:password] if @basic_auth
-      request.body = {envelope: {channel: channel, sender: sender, addressee: addressee}, message: message}.merge(@extras).to_json
-      @http.request(request)
+      if @http.auth.basic?
+        @http.auth.basic(@basic_auth[:user], @basic_auth[:password])
+      end
+      @http.body = {envelope: {channel: channel, sender: sender, addressee: addressee}, message: message}.merge(@extras).to_json
+      @http.headers = {"Content-Type":"application/json" }
+      HTTPI.post(@http, :curb)
     end
   end
 end

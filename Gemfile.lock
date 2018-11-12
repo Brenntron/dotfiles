@@ -1,11 +1,12 @@
 GIT
   remote: https://git.vrt.sourcefire.com/talosweb/peake-bridge-client.git
-  revision: 4c07eec171067039ef8646fb64dbf03316d71df3
+  revision: 2c2dcddf9cfef2be932f735216618a5b85afe435
   specs:
-    peake-bridge-client (0.0.8.0)
+    peake-bridge-client (0.0.9.0)
       curb (~> 0.9)
       httpi (~> 2.4)
       json (>= 1.8.0, < 3.0)
+      openssl (~> 2.1, >= 2.1.2)
 
 PATH
   remote: vendor/gems/rule_test_api
@@ -126,7 +127,7 @@ GEM
       execjs
     coffee-script-source (1.12.2)
     commonjs (0.2.7)
-    concurrent-ruby (1.0.5)
+    concurrent-ruby (1.1.3)
     crass (1.0.4)
     cucumber (2.99.0)
       builder (>= 2.1.2)
@@ -160,10 +161,10 @@ GEM
       delayed_job (>= 3.0, < 5)
     descendants_tracker (0.0.4)
       thread_safe (~> 0.3, >= 0.3.1)
-    devise (4.3.0)
+    devise (4.5.0)
       bcrypt (~> 3.0)
       orm_adapter (~> 0.1)
-      railties (>= 4.1.0, < 5.2)
+      railties (>= 4.1.0, < 6.0)
       responders
       warden (~> 1.2.3)
     diff-lcs (1.3)
@@ -221,10 +222,10 @@ GEM
     grease (0.3.1)
     gruff (0.7.0)
       rmagick (~> 2.13, >= 2.13.4)
-    guard (2.14.0)
+    guard (2.14.2)
       formatador (>= 0.2.4)
       listen (>= 2.7, < 4.0)
-      lumberjack (~> 1.0)
+      lumberjack (>= 1.0.12, < 2.0)
       nenv (~> 0.1)
       notiffany (~> 0.0)
       pry (>= 0.9.12)
@@ -256,7 +257,7 @@ GEM
     http_parser.rb (0.6.0)
     httparty (0.15.7)
       multi_xml (>= 0.5.2)
-    httpi (2.4.3)
+    httpi (2.4.4)
       rack
       socksify
     i18n (0.9.5)
@@ -306,13 +307,13 @@ GEM
       rb-fsevent (~> 0.9, >= 0.9.4)
       rb-inotify (~> 0.9, >= 0.9.7)
       ruby_dep (~> 1.2)
-    loofah (2.2.2)
+    loofah (2.2.3)
       crass (~> 1.0.2)
       nokogiri (>= 1.5.9)
     lumberjack (1.0.13)
     mail (2.7.0)
       mini_mime (>= 0.1.1)
-    method_source (0.9.0)
+    method_source (0.9.1)
     mime-types (3.2.2)
       mime-types-data (~> 3.2015)
     mime-types-data (3.2018.0812)
@@ -331,11 +332,12 @@ GEM
     net-ldap (0.16.1)
     net-ssh (4.1.0)
     nio4r (2.3.1)
-    nokogiri (1.8.4)
+    nokogiri (1.8.5)
       mini_portile2 (~> 2.3.0)
     notiffany (0.1.1)
       nenv (~> 0.1)
       shellany (~> 0.0)
+    openssl (2.1.2)
     orm_adapter (0.5.0)
     paper_trail (6.0.2)
       activerecord (>= 4.0, < 5.2)
@@ -353,7 +355,7 @@ GEM
       slop (~> 3.0)
     public_suffix (3.0.3)
     puma (3.12.0)
-    rack (2.0.5)
+    rack (2.0.6)
     rack-accept (0.4.5)
       rack (>= 0.4)
     rack-cors (0.4.1)
@@ -528,7 +530,7 @@ DEPENDENCIES
   database_cleaner (~> 1.6.1)
   delayed_job (~> 4.1.3)
   delayed_job_active_record (~> 4.1.2)
-  devise (~> 4.3.0)
+  devise (~> 4.5)
   diffy (~> 3.2.0)
   domainatrix
   dotenv-rails (~> 2.2.1)
@@ -541,7 +543,7 @@ DEPENDENCIES
   grape-cancan (~> 0.0.2)
   grape-swagger (~> 0.25.3)
   grape-swagger-rails (~> 0.3.0)
-  guard (= 2.14.0)
+  guard (= 2.14.2)
   guard-cucumber (~> 2.1.2)
   guard-livereload (= 2.5.2)
   gzip (= 1.0)
@@ -564,7 +566,7 @@ DEPENDENCIES
   net-ldap (~> 0.16.0)
   net-ssh (~> 4.1.0)
   paper_trail (~> 6.0.2)
-  peake-bridge-client (>= 0.0.5.0)!
+  peake-bridge-client (>= 0.0.9.0)!
   poltergeist (~> 1.11)
   pry (~> 0.9.12.4)
   pry-remote (~> 0.1.8)
@@ -595,4 +597,4 @@ DEPENDENCIES
   xmlrpc
 
 BUNDLED WITH
-   1.16.3
+   1.16.6
