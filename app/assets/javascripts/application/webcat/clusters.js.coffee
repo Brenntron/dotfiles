@@ -1,3 +1,9 @@
+window.apply_filter_to_table = () ->
+  filter = $("#cluster_filter_field").val()
+
+  populate_clusters_index_table(filter);
+
+
 window.populate_clusters_index_table = (filter) ->
   filter_param = ""
   if filter
