@@ -416,6 +416,51 @@ $ ->
       error: (response) ->
         std_api_error(response, "There was an error creating the Resolution Message template.", reload: false)
     )
+  $('.edit-resolution-message-template').on 'click', ->
+    populate_resolution_message_template_details()
+
+    resolution_message_template_id = $(this).attr('resolution_message_template_id')
+
+    std_msg_ajax(
+      method: 'GET'
+      url: "/escalations/api/v1/escalations/webrep/resolution_message_templates/#{resolution_message_template_id}"
+      success_reload: false
+      success: (response) ->
+        $('#edit-resolution-message-template-name').val(response.name)
+        $('#edit-resolution-message-template-desc').val(response.description)
+        $('#edit-resolution-message-template-body').val(response.body)
+        $('#resolution-message-template-id').val(response.id)
+      error: (response) ->
+        std_api_error(response, "There was a problem retrieving email template.", reload: false)
+    )
+
+  populate_resolution_message_template_details =  ->
+    $('#edit-resolution-message-template-form-wrapper').show()
+    $('#edit-resolution-message-template-form-wrapper').contents().show()
+    $('#create-resolution-message-template').hide()
+    $('#edit-resolution-message-template').removeClass('hidden')
+    $('#cancel-edit-resolution-message-template').removeClass('hidden')
+    $('#edit-resolution-message-template-form-wrapper').animate {
+      height: 200
+      borderWidth: '1px'
+    }, 300
+
+  window.update_resolution_message_template = () ->
+    template_id = $('#resolution-message-template-id').val()
+    name = $('#edit-resolution-message-template-name').val()
+    description = $('#edit-resolution-message-template-desc').val()
+    body = $('#edit-resolution-message-template-body').val()
+
+    std_msg_ajax(
+      method: 'PUT'
+      url: "/escalations/api/v1/escalations/webrep/resolution_message_templates/#{template_id}"
+      data: {name: name, description: description, body: body}
+      success_reload: true
+      success: (response) ->
+        std_msg_success('Email Template Updated.', [], reload: true)
+      error: (response) ->
+        std_api_error(response, "There was an error updating the email template.", reload: false)
+    )
 
 
   ## Manage Email Templates

@@ -19,7 +19,7 @@ module API
             desc "edit an resolution message template"
             params do
               requires :id, type: Integer, desc: "The resolution message template's id in the database."
-              optional :template_name, type: String, desc: "The template name of the template."
+              optional :name, type: String, desc: "The template name of the template."
               optional :description, type: String, desc: "The description of the resolution message template."
               optional :body, type: String, desc: "The body of the template."
             end

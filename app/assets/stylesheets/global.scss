@@ -4238,6 +4238,13 @@ input.file_attachment {
   border: 1px solid $faint-neutral-color;
 }
 
+#edit-resolution-message-template-form-wrapper {
+  display: none;
+  height: 0;
+  margin: 12px;
+  border: 1px solid $faint-neutral-color;
+}
+
 .dialog-inset-header {
   background-color: $bug-section-color;
   padding: 4px 10px;
