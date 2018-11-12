@@ -461,8 +461,9 @@ $ ->
       error: (response) ->
         std_api_error(response, "There was an error updating the resolution message template.", reload: false)
     )
-  window.delete_resolution_message_template = () ->
-    template_id = $(this).attr('resolution-message-template-id')
+
+  $('.delete-resolution-message-template').on 'click', ->
+    template_id = $(this).attr('resolution_message_template_id')
     confirmation = confirm('Are you sure you want to delete this template?')
 
     if confirmation
@@ -479,7 +480,6 @@ $ ->
   $('#select-new-resolution-message-template-status').on 'change', ->
     template_id = this.value
 
-    console.log("Happy")
     std_msg_ajax(
       method: 'GET'
       url: "/escalations/api/v1/escalations/webrep/resolution_message_templates/#{template_id}"
@@ -562,6 +562,7 @@ $ ->
     )
 
   $('.delete-template').on 'click', ->
+    console.log("delete-template")
     template_id = $(this).attr('template_id')
     confirmation = confirm('Are you sure you want to delete this template?')
 
