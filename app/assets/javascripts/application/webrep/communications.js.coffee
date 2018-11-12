@@ -502,6 +502,18 @@ $ ->
         std_api_error(response, "There was a problem retrieving resolution message template.", reload: false)
     )
 
+  window.cancel_edit_resolution_message_template = () ->
+    $('#edit-resolution-message-template-form-wrapper').contents().hide()
+    $('#create-resolution-message-template').hide()
+    $('#save-resolution-message-template').addClass('hidden')
+    $('#create-resolution-message-template').show()
+    $('#cancel-edit-resolution-message-template').addClass('hidden')
+    $('#edit-resolution-message-template').addClass('hidden')
+    $('#edit-resolution-message-template-form-wrapper').animate {
+      height: 0
+      borderWidth: 0
+    }
+
   ## Manage Email Templates
 
   $('.edit-template').on 'click', ->
