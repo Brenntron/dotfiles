@@ -1678,9 +1678,9 @@ $ ->
   ## Data breakdown for 'initial' daily data
   ticketTypeChartLabels = ['September 2', 'September 3', 'September 4', 'September 5', 'September 6', 'September 7', 'September 8']
   ticketTypeTotalData = [20, 24, 30, 28, 0, 0, 0]
-  ticketTypeWData = [15, 20, 18, 20, 0, 0, 0]
-  ticketTypeEData = [8, 7, 15, 12, 0, 0, 0]
-  ticketTypeEWData = [0, 0, 0, 9, 0, 0, 0]
+  ticketTypeWData     = [15, 20, 18, 20, 0, 0, 0]
+  ticketTypeEData     = [8, 7, 15, 12, 0, 0, 0]
+  ticketTypeEWData    = [0, 0, 0, 9, 0, 0, 0]
 
   ## Test data breakdown for a monthly dataset - we'll say 6 months
 #  ticketTypeChartLabels = ['June', 'July', 'August', 'September', 'October', 'November']
@@ -1764,16 +1764,14 @@ $ ->
 #      window.myBar.update()
 
 
+#  Test data for Closed Email Entry Resolutions
+  emailEntryResolutionLabels = ['Fixed', 'Unchanged', 'Fixed FP', 'Other']
+  emailEntryData = [3,6,7,0]
 
-
-  new Chart(document.getElementById('pie-chart'),
+  new Chart($('#closed-email-entries-resolution-piechart'),
     type: 'pie'
     data:
-      labels: [
-        'Fixed'
-        'Unchanged'
-        'Fixed FP'
-      ]
+      labels: emailEntryResolutionLabels
       datasets: [ {
         label: 'close-email-entries'
         backgroundColor: [
@@ -1781,11 +1779,7 @@ $ ->
           '#6dbcdb'
           '#666'
         ]
-        data: [
-          5078
-          4367
-          2152
-        ]
+        data: emailEntryData
       } ]
     options:
       legend: false
