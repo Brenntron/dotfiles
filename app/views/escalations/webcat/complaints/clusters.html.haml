@@ -19,9 +19,9 @@
           .col-xs-10
             .row
               .col-xs-9
-                %input.text_field.search-box{placeholder: 'Regex', autofocus: 'true'}
+                %input#cluster_filter_field.text_field.search-box{placeholder: 'Regex', autofocus: 'true'}
               .col-xs-3.no_pad
-                %button.primary{class:'apply-filter-btn icon-filter-white'}Apply Filter
+                %button.primary{onclick: 'apply_filter_to_table()', class:'apply-filter-btn icon-filter-white'}Apply Filter
 
   .row
     .col-xs-6.temp-spacer
