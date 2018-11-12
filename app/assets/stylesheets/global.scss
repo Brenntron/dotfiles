@@ -5545,6 +5545,15 @@ td.ticket-total::before {
   display: block;
 }
 
+.pass-min-hr {
+  color: $warning-accent-color;
+  font-weight: bold;
+}
+
+.overdue {
+  color: $second-section-color;
+  font-weight: bold;
+}
 
 .loader-gears {
   width: 80px;
