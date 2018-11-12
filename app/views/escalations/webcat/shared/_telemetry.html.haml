@@ -1,11 +1,11 @@
 .row
-  .col-xs-6.dashboard-left-data
+  .col-xs-12.top-area-bar
     %h1= content_for :webcat_page
-    %span.top-info-icon{class: "#{content_for :webcat_icon}"}
-  .col-xs-6
-    %h5= current_user.display_name
-    %p.dashboard-details
-      = link_to "#{@current_user.cvs_username}", escalations_users_path(current_user[:id])
+    %span.top-info-icon.dashboard-left-data{class: "#{content_for :webcat_icon}"}
+    .top-user-info
+      %h5.left-space= current_user.display_name
+      %p.dashboard-details.left-space
+        = link_to "#{@current_user.cvs_username}", escalations_users_path(current_user[:id])
 
 .row#top_bar_extended_info
   .col-xs-2
