@@ -46,7 +46,7 @@ window.refresh_single_open_tickets_table = (user_id)->
         datatable.draw();
 
         #References to other data points used to wrap this table, use as needed
-        
+
         $("#open_single_customer_count").html(json.data.customer_count)
         $("#open_single_guest_count").html(json.data.guest_count)
         $("#open_single_email_count").html(json.data.email_count)
@@ -217,9 +217,13 @@ window.set_initial_date_span = () ->
     firstday = new Date(curr.setDate(first)).toUTCString();
     lastday = new Date(curr.setDate(last)).toUTCString();
 
+
+
     localStorage.setItem 'webrep_report_range_from', firstday
     localStorage.setItem 'webrep_report_range_to', lastday
 
+  alert(localStorage.getItem('webrep_report_range_from'))
+  alert(localStorage.getItem('webrep_report_range_to'))
   user_id = $("#user_id").val()
 
   refresh_single_open_tickets_table(user_id)

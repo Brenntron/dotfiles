@@ -1224,9 +1224,12 @@ class Dispute < ApplicationRecord
 
   def self.open_tickets_report(users, from, to)
 
+    from = "Mon, 4 Jul 2018 17:40:08 GMT"
+
     status_array = [STATUS_ASSIGNED, STATUS_REOPENED, STATUS_CUSTOMER_PENDING, STATUS_CUSTOMER_UPDATE, STATUS_RESEARCHING, STATUS_ESCALATED, STATUS_ON_HOLD]
 
-
+    from = Time.parse(from)
+    to = Time.parse(to)
 
     report_data = {}
     report_data[:table_data] = []
@@ -1244,7 +1247,8 @@ class Dispute < ApplicationRecord
 
     results.each do |result|
       entry_count = result.dispute_entries.select{ |entry| entry.status != DisputeEntry::STATUS_RESOLVED}.size
-      last_comment_time = result.dispute_comments.last.created_at.to_s
+      last_comment_time = nil
+      last_comment_time = result.dispute_comments.last.created_at.to_s unless result.dispute_comments.empty?
       ticket_user = result.user.cvs_username
       report_data[:table_data] << {:case_number => result.id,
                       :status => result.status,
@@ -1264,6 +1268,9 @@ class Dispute < ApplicationRecord
   def self.closed_tickets_report(users, from, to)
 
     status_array = [STATUS_RESOLVED]
+
+    from = Time.parse(from)
+    to = Time.parse(to)
 
     report_data = {}
     report_data[:table_data] = []
@@ -1295,6 +1302,9 @@ class Dispute < ApplicationRecord
   end
 
   def self.ticket_entries_closed_by_day_report(users, from, to)
+
+    from = Time.parse(from)
+    to = Time.parse(to)
 
     swap_day = from
     report_data = {}
@@ -1349,6 +1359,9 @@ class Dispute < ApplicationRecord
 
     status_array = [STATUS_RESOLVED]
 
+    from = Time.parse(from)
+    to = Time.parse(to)
+
     report_data = []
 
     main_results = Dispute.where(:user_id => user.id).where("case_resolved_at between '#{from}' and '#{to}'").where(:status => status_array)
@@ -1362,6 +1375,9 @@ class Dispute < ApplicationRecord
   end
 
   def self.closed_ticket_entries_by_resolution_report(users, from, to, submission_types)
+
+    from = Time.parse(from)
+    to = Time.parse(to)
 
     user_ids = users.pluck(:id)
 
@@ -1419,6 +1435,10 @@ class Dispute < ApplicationRecord
   end
 
   def self.tickets_submitted_by_submitter_per_day(from, to)
+
+    from = Time.parse(from)
+    to = Time.parse(to)
+
     main_results = Dispute.joins(:dispute_entries).where(:user_id => user.id).where("created_at between '#{from}' and '#{to}'")
 
     report_data = {}
@@ -1451,6 +1471,9 @@ class Dispute < ApplicationRecord
 
   def self.ticket_entries_closed_by_ticket_owner(users, from, to)
 
+    from = Time.parse(from)
+    to = Time.parse(to)
+
     user_ids = users.pluck(:id)
 
     main_results = Dispute.joins(:dispute_entries).where("dispute_entries.case_resolved_at between '#{from}' and '#{to}'").where(:user_id => user_ids)
@@ -1473,6 +1496,9 @@ class Dispute < ApplicationRecord
   end
 
   def self.average_time_to_close_tickets_by_ticket_owner(users, from, to)
+
+    from = Time.parse(from)
+    to = Time.parse(to)
 
     raw_data = {}
     report_data = {}
@@ -1503,6 +1529,9 @@ class Dispute < ApplicationRecord
   end
 
   def self.ticket_entry_resolution_by_ticket_owner(users, from, to)
+
+    from = Time.parse(from)
+    to = Time.parse(to)
 
     user_ids = users.pluck(:id)
 
@@ -1566,6 +1595,10 @@ class Dispute < ApplicationRecord
   end
 
   def self.rulehits_for_false_positive_resolutions(users, from , to)
+
+    from = Time.parse(from)
+    to = Time.parse(to)
+
 
     user_ids = users.pluck(:id)
 
