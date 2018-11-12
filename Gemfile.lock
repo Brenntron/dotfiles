@@ -417,9 +417,6 @@ GEM
       rspec-mocks (~> 3.6.0)
       rspec-support (~> 3.6.0)
     rspec-support (3.6.0)
-    ruby-bugzilla (0.6.4)
-      gruff (~> 0)
-      highline
     rubyXL (3.3.29)
       nokogiri (>= 1.4.4)
       rubyzip (>= 1.1.6)
@@ -457,8 +454,6 @@ GEM
       sprockets (>= 3.0.0)
     stomp (1.4.4)
     temple (0.8.0)
-    term-ansicolor (1.6.0)
-      tins (~> 1.0)
     therubyracer (0.12.3)
       libv8 (~> 3.16.14.15)
       ref
@@ -469,7 +464,6 @@ GEM
     thor (0.19.4)
     thread_safe (0.3.6)
     tilt (2.0.8)
-    tins (1.16.3)
     to_regexp (0.2.1)
     turbolinks (5.0.1)
       turbolinks-source (~> 5)
@@ -553,7 +547,6 @@ DEPENDENCIES
   haml (~> 5.0.1)
   hashie-forbidden_attributes (~> 0.1.1)
   her (~> 0.8.6)
-  highline
   httparty (~> 0.15.3)
   httpi (~> 2.4.2)
   inline_svg
@@ -566,7 +559,6 @@ DEPENDENCIES
   launchy (~> 2.4.2)
   less-rails (~> 3.0.0)
   libv8 (= 3.16.14.19)
-  mime-types
   mysql2 (= 0.3.21)
   net-ldap (~> 0.16.0)
   net-ssh (~> 4.1.0)
@@ -581,7 +573,6 @@ DEPENDENCIES
   rb-fsevent (~> 0.9.8)
   rmagick (~> 2.16.0)
   rspec-rails (~> 3.6.0)
-  ruby-bugzilla (~> 0.6.4)
   rubyXL (= 3.3.29)
   rule_test_api!
   selectize-rails (~> 0.12.4)
@@ -589,7 +580,6 @@ DEPENDENCIES
   simplecov
   sprockets (~> 3.7.1)
   stomp (~> 1.4.3)
-  term-ansicolor
   therubyracer (~> 0.12.3)
   thin (~> 1.7.0)
   turbolinks (~> 5.0.1)
