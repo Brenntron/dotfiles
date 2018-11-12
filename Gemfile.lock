@@ -14,15 +14,6 @@ PATH
     rule_test_api (0.1.4)
       her (>= 0.7.2)
 
-PATH
-  remote: vendor/gems/sfbugzilla
-  specs:
-    sfbugzilla (0.1.6)
-      highline
-      mime-types
-      ruby-bugzilla (> 0.6.3)
-      term-ansicolor
-
 GEM
   remote: https://rubygems.org/
   specs:
@@ -105,6 +96,10 @@ GEM
     bootstrap-sass (3.3.7)
       autoprefixer-rails (>= 5.2.1)
       sass (>= 3.3.4)
+    bugzilla (0.10.0)
+      gruff (~> 0)
+      highline
+      xmlrpc (~> 0.3.0)
     builder (3.2.3)
     byebug (10.0.2)
     cancancan (1.16.0)
@@ -522,6 +517,7 @@ DEPENDENCIES
   aws-sdk (~> 2.6)
   bootstrap-multiselect-rails (~> 0.9.9)
   bootstrap-sass (~> 3.3.7)
+  bugzilla
   byebug
   cancancan (~> 1.16.0)
   capybara (~> 2.11.0)
@@ -557,6 +553,7 @@ DEPENDENCIES
   haml (~> 5.0.1)
   hashie-forbidden_attributes (~> 0.1.1)
   her (~> 0.8.6)
+  highline
   httparty (~> 0.15.3)
   httpi (~> 2.4.2)
   inline_svg
@@ -569,6 +566,7 @@ DEPENDENCIES
   launchy (~> 2.4.2)
   less-rails (~> 3.0.0)
   libv8 (= 3.16.14.19)
+  mime-types
   mysql2 (= 0.3.21)
   net-ldap (~> 0.16.0)
   net-ssh (~> 4.1.0)
@@ -587,11 +585,11 @@ DEPENDENCIES
   rubyXL (= 3.3.29)
   rule_test_api!
   selectize-rails (~> 0.12.4)
-  sfbugzilla!
   simple_form (~> 3.5.0)
   simplecov
   sprockets (~> 3.7.1)
   stomp (~> 1.4.3)
+  term-ansicolor
   therubyracer (~> 0.12.3)
   thin (~> 1.7.0)
   turbolinks (~> 5.0.1)
