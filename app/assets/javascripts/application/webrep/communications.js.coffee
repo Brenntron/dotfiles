@@ -414,7 +414,7 @@ $ ->
       success: (response) ->
         std_msg_success('Resolution Message template Created.', [], reload: true)
       error: (response) ->
-        std_api_error(response, "There was an error creating the Resolution Message template.", reload: false)
+        std_api_error(response, "There was an error creating the resolution message template.", reload: false)
     )
   $('.edit-resolution-message-template').on 'click', ->
     populate_resolution_message_template_details()
@@ -431,7 +431,7 @@ $ ->
         $('#edit-resolution-message-template-body').val(response.body)
         $('#resolution-message-template-id').val(response.id)
       error: (response) ->
-        std_api_error(response, "There was a problem retrieving email template.", reload: false)
+        std_api_error(response, "There was a problem retrieving resolution message template.", reload: false)
     )
 
   populate_resolution_message_template_details =  ->
@@ -457,9 +457,9 @@ $ ->
       data: {name: name, description: description, body: body}
       success_reload: true
       success: (response) ->
-        std_msg_success('Email Template Updated.', [], reload: true)
+        std_msg_success('Resolution Message Template Updated.', [], reload: true)
       error: (response) ->
-        std_api_error(response, "There was an error updating the email template.", reload: false)
+        std_api_error(response, "There was an error updating the resolution message template.", reload: false)
     )
   window.delete_resolution_message_template = () ->
     template_id = $(this).attr('resolution-message-template-id')
@@ -471,9 +471,9 @@ $ ->
         url: "/escalations/api/v1/escalations/webrep/resolution_message_templates/#{template_id}"
         success_reload: true
         success: (response) ->
-          std_msg_success('Email Template Deleted.', [], reload: true)
+          std_msg_success('Resolution message template deleted.', [], reload: true)
         error: (response) ->
-          std_api_error(response, "Email Template could not be deleted.", reload: false)
+          std_api_error(response, "Resolution message template could not be deleted.", reload: false)
       )
 
   $('#select-new-resolution-message-template-status').on 'change', ->
@@ -487,7 +487,7 @@ $ ->
       success: (response) ->
         $('.ticket-status-comment').val(response.body)
       error: (response) ->
-        std_api_error(response, "There was a problem retrieving email template.", reload: false)
+        std_api_error(response, "There was a problem retrieving resolution message template.", reload: false)
     )
   $('#select-new-resolution-message-template-resolution').on 'change', ->
     template_id = this.value
@@ -499,7 +499,7 @@ $ ->
       success: (response) ->
         $('.ticket-resolution-comment').val(response.body)
       error: (response) ->
-        std_api_error(response, "There was a problem retrieving email template.", reload: false)
+        std_api_error(response, "There was a problem retrieving resolution message template.", reload: false)
     )
 
   ## Manage Email Templates
