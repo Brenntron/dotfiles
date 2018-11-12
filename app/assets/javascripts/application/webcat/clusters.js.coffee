@@ -53,12 +53,15 @@ window.fetch_cluster_data = (id) ->
 window.categorize_clusters = () ->
   #cluster_id comment category_ids
   clusters_to_categorize = []
-  $('[id*="_categories-selectized"]').filter ->
-    if this.value.length > 0
-      clusters_to_categorize << this
 
-  clusters_to_categorize.each ->
-    
+  $('[id*="_categories"]').filter ->
+
+
+    if this.value.length > 0
+      clusters_to_categorize.push this
+
+  for cluster in clusters_to_categorize
+    alert(cluster.value)
 
   headers = {'Token': $('input[name="token"]').val(), 'Xmlrpc-Token': $('input[name="xml_token"]').val()}
   $.ajax(
@@ -182,7 +185,9 @@ $ ->
             valueField: 'value',
             labelField: 'value',
             searchField: ['text'],
-            options: AC.WebCat.createSelectOptions()
+            options: AC.WebCat.createSelectOptions(),
+            onItemAdd: (item) ->
+              alert(item)
           }
 
 window.copycat_dialog = () ->
