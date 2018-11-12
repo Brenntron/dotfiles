@@ -259,7 +259,8 @@ class Complaint < ApplicationRecord
             'classification' => 'unclassified',
         }
 
-        bug_id_object = message_payload[:bugzilla_rest_session].create_bug(bug_attrs, assigned_user: user)
+        bugzilla_rest_session = message_payload[:bugzilla_rest_session]
+        bug_id_object = bugzilla_rest_session.create_bug(bug_attrs, assigned_user: user)
 
 
         new_complaint = Complaint.new
@@ -449,12 +450,6 @@ class Complaint < ApplicationRecord
   def self.get_latest_wbnp_complaints
     begin
 
-      bugzilla_proxy = Bugzilla::XMLRPC.new(Rails.configuration.bugzilla_host)
-      bugzilla_proxy.bugzilla_login(Bugzilla::User.new(bugzilla_proxy),
-                                    Rails.configuration.bugzilla_username,
-                                    Rails.configuration.bugzilla_password)
-      bugzilla_session = bugzilla_proxy
-
       all_complaints = Wbrs::RuleUiComplaint.where({:add_channels => [WBNP_CHANNEL], :statuses => ['new']})["data"]
 
       new_complaints = []
@@ -466,8 +461,12 @@ class Complaint < ApplicationRecord
         end
       end
 
-      new_complaints.each do |new_ui_complaint|
-        rule_ui_wbnp_create_action(new_ui_complaint, bugzilla_session)
+      if new_complaints.present?
+        bugzilla_rest_session = BugzillaRest::Session.default_session
+        new_complaints.each do |new_ui_complaint|
+          rule_ui_wbnp_create_action(new_ui_complaint, bugzilla_rest_session: bugzilla_rest_session)
+        end
+
       end
 
     rescue
@@ -485,7 +484,7 @@ class Complaint < ApplicationRecord
     uri
   end
 
-  def self.rule_ui_wbnp_create_action(rule_ui_complaint, bugzilla_session)
+  def self.rule_ui_wbnp_create_action(rule_ui_complaint, bugzilla_rest_session:)
     #"#{{"add_channel"=>"wbnp", "comment"=>"", "complaint_id"=>105, "complaint_type"=>"unknown", "customer_name"=>"ORANGE BUSINES SERVICES", "description"=>"",
     # "domain"=>"fmp-usmba.ac.ma", "path"=>"/cdim/mediatheque/e_theses/257-16.pdf", "port"=>0, "protocol"=>"http", "region"=>"", "resolution"=>nil, "state"=>"new",
     # "subdomain"=>"scolarite", "tag"=>nil, "url_query_string"=>"", "when_added"=>"Thu, 30 Aug 2018 15:00:05 GMT", "when_last_updated"=>"Thu, 30 Aug 2018 15:00:05 GMT",
@@ -496,7 +495,6 @@ class Complaint < ApplicationRecord
     description = "WBNP Sourced Complaint"
 
     user = User.where(cvs_username:"vrtincom").first
-    bug_factory = Bugzilla::Bug.new(bugzilla_session)
 
     summary = "New Web Category Complaint generated at #{DateTime.now.utc.strftime("%Y-%m-%d %H:%M")}"
 
@@ -515,10 +513,10 @@ class Complaint < ApplicationRecord
         'classification' => 'unclassified',
     }
 
-    bug_stub_hash = Bug.bugzilla_create(bug_factory, bug_attrs, user, true)
+    bug_proxy = bugzilla_rest_session.create_bug(bug_attrs)
 
     cust = Customer.customer_from_ruleui(rule_ui_complaint)
-    new_complaint = Complaint.create(id: bug_stub_hash["id"],
+    new_complaint = Complaint.create(id: bug_proxy.id,
                                      description: description,
                                      customer_id: cust ? cust.id : nil,
                                      status: NEW,

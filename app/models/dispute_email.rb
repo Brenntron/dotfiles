@@ -15,7 +15,7 @@ class DisputeEmail < ApplicationRecord
   def self.process_bridge_payload(message_payload)
 
     ActiveRecord::Base.transaction do
-      xmlrpc = message_payload[:bugzilla_session]
+      bugzilla_rest_session = message_payload[:bugzilla_rest_session]
       user = message_payload[:current_user]
       envelope = JSON.parse(message_payload["payload"]["envelope"])
       #check envelope for case validity
@@ -90,7 +90,7 @@ class DisputeEmail < ApplicationRecord
 
       if message_payload["attachments"].present?
         message_payload["attachments"].each do |email_attachment|
-          DisputeEmailAttachment.build_and_push_to_bugzilla(xmlrpc, email_attachment, user, new_email)
+          DisputeEmailAttachment.build_and_push_to_bugzilla(bugzilla_rest_session, email_attachment, user, new_email)
         end
       end
 
