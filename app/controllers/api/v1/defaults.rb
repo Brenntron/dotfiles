@@ -47,14 +47,6 @@ module API
             Rails.logger
           end
 
-          def bugzilla_session
-            xmlrpc = Bugzilla::XMLRPC.new(Rails.configuration.bugzilla_host)
-            if current_user
-              xmlrpc.token = request.headers['Xmlrpc-Token']
-            end
-            xmlrpc
-          end
-
           # Standard (our standard) handling of an exception
           # @param [Exception, #read] exception is the exception to report
           # @param [Fixnum] status is the HTTP status code
