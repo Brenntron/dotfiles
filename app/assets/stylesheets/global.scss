@@ -1745,6 +1745,7 @@ a.static-nav-item {
 .icon-all-tickets  {background-image: url(image_path('icon_ticket.svg'));}
 .icon-saved-search {background-image: url(image_path('icon_save_blue.svg'));}
 .icon-recently-viewed {background-image: url(image_path('icon_myrecent.svg'));}
+.icon-custom-star {background-image: url(image_path('icon_customer_star.svg'));}
 
 .saved-search {
   text-transform: none !important;
@@ -2064,7 +2065,14 @@ table .bug-priority {
 }
 
 .submitter-col {
+  text-align: center;
+}
 
+.complaint-submitter-type {
+  background-repeat: no-repeat;
+  width: 20px;
+  height: 20px;
+  border: none;
 }
 
 .bug-state {

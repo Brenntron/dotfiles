@@ -128,7 +128,7 @@ $ ->
           data: 'submitter_type'
           'render': (data, type, full, meta) ->
             if data == 'CUSTOMER'
-              '<button class="ticket-owner-button"></button>'
+              '<button class="complaint-submitter-type icon-custom-star"></button>'
             else
               data
         }
