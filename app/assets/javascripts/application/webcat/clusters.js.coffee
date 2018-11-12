@@ -53,15 +53,27 @@ window.fetch_cluster_data = (id) ->
 window.categorize_clusters = () ->
   #cluster_id comment category_ids
   clusters_to_categorize = []
+  clusters = $ '[id$=\'_categories\']'
 
-  $('[id*="_categories"]').filter ->
+  $(clusters).each ->
+    id =  $(this).attr('id').split('_')[0]
+    categories = $(this).next('.selectized').attr('value')
+
+    if categories.length > 0
+      all_cats = categories.split(',')
+      console.log id
+      console.log all_cats
 
 
-    if this.value.length > 0
-      clusters_to_categorize.push this
 
-  for cluster in clusters_to_categorize
-    alert(cluster.value)
+#  $('[id$="_categories"]').filter ->
+
+#    if this.value.length > 0
+#      console.log(this)
+#      clusters_to_categorize.push this
+#
+#  for cluster in clusters_to_categorize
+#    alert(cluster.value)
 
   headers = {'Token': $('input[name="token"]').val(), 'Xmlrpc-Token': $('input[name="xml_token"]').val()}
   $.ajax(
@@ -118,12 +130,12 @@ $ ->
           return '<button class="expand-row-button-inline expand-row-button-' + data.cluster_id + '"></button>'
       }
       {
-        data: 'cluster_id'
+        data: null
         orderable: false
         searchable: false
         sortable: false
         render: (data, type, full, meta) ->
-          '<input type="checkbox" name="id[]" onclick="toggleRow(this)">'
+          return '<input type="checkbox" name="cluster_id_' + data.cluster_id + '" onclick="toggleRow(this)">'
       }
       {
         data: 'cluster_id'
