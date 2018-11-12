@@ -1130,7 +1130,6 @@ $ ->
         targets: [ 8 ]
         className: 'alt-col'
       }
-
       {
         targets: [ 10 ]
         className: 'age-col'
@@ -1179,7 +1178,7 @@ $ ->
             if hour < 3
               data
             else if hour < 5
-              '<span class="pass-min-hr">' + data + '</span>'
+              '<span class="ticket-age-over3hr">' + data + '</span>'
             else
               '<span class="overdue">' + data + '</span>'
           else

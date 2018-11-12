@@ -421,20 +421,6 @@ th {
   padding-left: 30px;
 }
 
-.age-col {
-
-}
-
-.pass-min-hr {
-  color: $warning-accent-color;
-  font-weight: bold;
-}
-
-.overdue {
-  color: $second-section-color;
-  font-weight: bold;
-}
-
 .alt-col {
   background-color: lighten( $faint-neutral-color, 2% );
 }
@@ -6338,4 +6324,18 @@ h2 {
   margin-top: 24px;
   margin-bottom: 6px;
   color: #333;
+}
+
+.age-col {
+
+}
+
+.ticket-age-over3hr {
+  color: $warning-accent-color;
+  font-weight: bold;
+}
+
+.overdue {
+  color: $second-section-color;
+  font-weight: bold;
 }
