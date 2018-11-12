@@ -1650,24 +1650,74 @@ $ ->
     return
     
 
-window.makeBar = (id, data) ->
-  ctx = document.getElementById(id).getContext('2d')
-  window.myBar = new Chart(ctx,
+$ ->
+
+
+
+  window.updateGraph = (label, barGraphName, e) ->
+    originalData = []
+
+    barGraphName == 'graph-ticket-entries-closed'
+#      originalData = window.barDataSets
+#    else if barName == 'barChartGrouped'
+#      originalData = window.barChartGroupedData
+#
+    if $(e)[0].checked
+      currentData = window[barGraphName].data.datasets
+      window[barGraphName].data.datasets = currentData.concat originalData.filter (x) -> label.indexOf(x.label) >= 0
+      window[barGraphName].update()
+    else
+      currentData = window[barGraphName].data.datasets
+      window[barGraphName].data.datasets = currentData.filter (x) -> label.indexOf(x.label) < 0
+      window[barGraphName].update()
+
+
+
+  ####### Bar chart for Ticket Entries by Ticket Type
+
+  ## Data breakdown for 'initial' daily data
+  ticketTypeChartLabels = ['September 2', 'September 3', 'September 4', 'September 5', 'September 6', 'September 7', 'September 8']
+  ticketTypeTotalData = [20, 24, 30, 28, 0, 0, 0]
+  ticketTypeWData = [15, 20, 18, 20, 0, 0, 0]
+  ticketTypeEData = [8, 7, 15, 12, 0, 0, 0]
+  ticketTypeEWData = [0, 0, 0, 9, 0, 0, 0]
+
+  ## Test data breakdown for a monthly dataset - we'll say 6 months
+#  ticketTypeChartLabels = ['June', 'July', 'August', 'September', 'October', 'November']
+#  ticketTypeTotalData = [120, 124, 130, 128, 110, 142]
+#  ticketTypeWData = [45, 67, 52, 31, 55, 42]
+#  ticketTypeEData = [28, 37, 15, 62, 50, 50]
+#  ticketTypeEWData = [30, 16, 57, 57, 25, 50]
+
+
+  new Chart($('#graph-ticket-entries-closed'),
     type: 'bar'
     data:
-      labels: [
-        'September 2',
-        'September 3',
-        'September 4',
-        'September 5',
-        'September 6',
-        'September 7',
-        'September 8'
-      ]
-      datasets: data
+      labels: ticketTypeChartLabels
+      datasets: [
+        {
+          label: 'Total Ticket Entries'
+          backgroundColor: '#6dbcdb'
+          data: ticketTypeTotalData
+        }
+        {
+          label: 'W'
+          backgroundColor: '#E47433'
+          data: ticketTypeWData
+        }
+        {
+          label: 'E'
+          backgroundColor: '#5FB665'
+          data: ticketTypeEData
+        }
+        {
+          label: 'EW'
+          backgroundColor: '#C14B92'
+          data: ticketTypeEWData
+        }]
     options:
-      responsive: true
-      legend: false
+      legend:
+        display: false
       title:
         display: true
         position: 'bottom'
@@ -1677,6 +1727,246 @@ window.makeBar = (id, data) ->
           {
             gridLines:
               display: false
+            ticks: {
+              min: 0
+            }
+          }
+        ]
+        xAxes: [
+          {
+            gridLines:
+              display: false
+            ticks: {
+              autoSkip: false
+            }
+          }
+        ]
+    )
+
+
+#    makeBar('graph-ticket-entries-closed', barDataSet)
+
+#  $('.graph-config select').on 'change', (el) ->
+#    if el.target.value == 'yearly'
+#      barDataSet = window.myBar.data.datasets
+#      window.myBar.data.datasets = barDataSet.concat barDataSets.filter (x) -> x.label == 'Total Ticket Entries'
+#      window.myBar.update()
+#    else if el.target.value == 'montly'
+#      barDataSet = window.myBar.data.datasets.filter (x) -> x.label != 'E' and x.label != 'W' and x.label != 'EW'
+#      window.myBar.data.datasets = barDataSet
+#      window.myBar.update()
+#    else if el.target.value == 'weekly'
+#      barDataSet = window.myBar.data.datasets.filter (x) -> x.label != 'E' and x.label != 'W' and x.label != 'EW'
+#      window.myBar.data.datasets = barDataSet
+#      window.myBar.update()
+#    else
+#      window.myBar.data.datasets = barDataSets
+#      window.myBar.update()
+
+
+
+
+  new Chart(document.getElementById('pie-chart'),
+    type: 'pie'
+    data:
+      labels: [
+        'Fixed'
+        'Unchanged'
+        'Fixed FP'
+      ]
+      datasets: [ {
+        label: 'close-email-entries'
+        backgroundColor: [
+          '#3e5a72'
+          '#6dbcdb'
+          '#666'
+        ]
+        data: [
+          5078
+          4367
+          2152
+        ]
+      } ]
+    options:
+      legend: false
+      pieceLabel:
+        render: (args) ->
+          return args.percentage + '%'
+        position: 'outside'
+        segment: false
+        precision: 2
+        showZero: true
+        fontStyle: 'bolder'
+        overlap: false
+        showActualPercentages: true
+  )
+
+
+
+  new Chart(document.getElementById('pie-chart2'),
+    type: 'pie'
+    data:
+      labels: [
+        'Fixed'
+        'Unchanged'
+        'Fixed FP'
+      ]
+      datasets: [ {
+        label: 'close-email-entries'
+        backgroundColor: [
+          '#3e5a72'
+          '#6dbcdb'
+          '#666'
+        ]
+        data: [
+          2478
+          3267
+          4202
+        ]
+      } ]
+    options:
+      legend: false
+      pieceLabel:
+        render: (args) ->
+          return args.percentage + '%'
+        position: 'outside'
+        label: 'Unchanched'
+        segment: false
+        precision: 2
+        showZero: true
+        fontStyle: 'bolder'
+        overlap: false
+        showActualPercentages: true
+
+  )
+
+
+
+  new Chart(document.getElementById('line-chart'),
+    type: 'line'
+    data:
+      labels: [
+        0
+        1
+        3
+        4
+        5
+        6
+        7
+        8
+        9
+        10
+        11
+      ]
+      datasets: [
+        {
+          data: [
+            1
+            1.3
+            1.2
+            1.5
+            1.7
+            1.4
+            1.8
+            0.9
+            1
+            1.1
+            1.2
+            1.5
+            1.6
+          ]
+          label: 'close'
+          backgroundColor: '#6dbcdb'
+          fill: true
+          lineTension: 0
+        }
+        {
+          data: [
+            1.4
+            1.4
+            1.4
+            1.4
+            1.4
+            1.4
+            1.4
+            1.4
+            1.4
+            1.4
+            1.4
+          ]
+          label: 'ticket'
+          backgroundColor: 'rgba(135, 206, 250, .1)'
+          fill: true
+          lineTension: 0
+        }
+      ]
+    options:
+      legend: false
+      elements:
+        point:
+          radius: 0
+      scales:
+        yAxes: [
+          {
+            gridLines:
+              display: false
+            ticks: {
+              min: 0
+              stepSize: .5
+              callback: (value, index, values) ->
+                if value > 1
+                  return value + ' hr'
+                else
+                  return value + ' hr'
+            }
+          }
+        ]
+        xAxes: [
+          {
+            gridLines:
+              display: false
+            scaleLabel: {
+              display: true,
+              labelString: 'Tikets'
+            }
+            ticks: {
+              display: false
+            }
+          }
+        ])
+
+
+
+  ###### Bar chart for Ticket Entries by Submitter Type
+
+  # Range of dates displayed, display however, this format is not mandatory.
+  # These three chunks will need to have the json data reformatted and inserted into them as separate arrays
+  submitterChartLabels = ['September 2', 'September 3', 'September 4', 'September 5', 'September 6', 'September 7', 'September 8']
+  submitterCustomerChartData = [20, 24, 30, 28, 10, 5, 13]
+  submitterGuestChartData = [15, 8, 18, 16, 12, 4, 2]
+
+  new Chart($('#graph-ticket-entries-submitter'),
+    type: 'bar'
+    data:
+      labels: submitterChartLabels
+      datasets: [
+        {
+        label: 'Customer'
+        backgroundColor: '#6dbcdb'
+        data: submitterCustomerChartData
+        }
+        {
+          label: 'Guest'
+          backgroundColor: '#3e5a72'
+          data: submitterGuestChartData
+        }]
+    options:
+      legend:
+        display: false
+      scales:
+        yAxes: [
+          {
+            gridLines: display: false
             ticks: {
               min: 0
               stepSize: 10
@@ -1691,765 +1981,454 @@ window.makeBar = (id, data) ->
             }
           }
         ]
-  )
-  return
-
-$ ->
-  window.updateGraph = (label, barName, el) ->
-    originalData = []
-    if barName == 'myBar'
-      originalData = window.barDataSets
-    else if barName == 'barChartGrouped'
-      originalData = window.barChartGroupedData
-
-    if $(el)[0].checked
-      currentData = window[barName].data.datasets
-      window[barName].data.datasets = currentData.concat originalData.filter (x) -> label.indexOf(x.label) >= 0
-      window[barName].update()
-    else
-      currentData = window[barName].data.datasets
-      window[barName].data.datasets = currentData.filter (x) -> label.indexOf(x.label) < 0
-      window[barName].update()
-
-  $(document).ready ->
-
-    window.barDataSets = [
-      {
-        label: 'Total Ticket Entries'
-        backgroundColor: '#6dbcdb'
-        data: [
-          20
-          24
-          30
-          28
-          0
-          0
-          0
-        ]
-      }
-      {
-        label: 'W'
-        backgroundColor: '#E47433'
-        data: [
-          15
-          20
-          18
-          20
-          0
-          0
-          0
-        ]
-      }
-      {
-        label: 'EW'
-        backgroundColor: '#8CC63F'
-        data: [
-          8
-          7
-          15
-          12
-          0
-          0
-          0
-        ]
-      }
-      {
-        label: 'E'
-        backgroundColor: '#BA55D3'
-        data: [
-          0
-          0
-          0
-          9
-          0
-          0
-          0
-        ]
-      }
-    ]
-    barDataSet = barDataSets
-    makeBar('graph-ticket-entries-closed', barDataSet)
-
-    $('.graph-config select').on 'change', (el) ->
-      if el.target.value == 'yearly'
-        barDataSet = window.myBar.data.datasets
-        window.myBar.data.datasets = barDataSet.concat barDataSets.filter (x) -> x.label == 'Total Ticket Entries'
-        window.myBar.update()
-      else if el.target.value == 'montly'
-        barDataSet = window.myBar.data.datasets.filter (x) -> x.label != 'E' and x.label != 'W' and x.label != 'EW'
-        window.myBar.data.datasets = barDataSet
-        window.myBar.update()
-      else if el.target.value == 'weekly'
-        barDataSet = window.myBar.data.datasets.filter (x) -> x.label != 'E' and x.label != 'W' and x.label != 'EW'
-        window.myBar.data.datasets = barDataSet
-        window.myBar.update()
-      else
-        window.myBar.data.datasets = barDataSets
-        window.myBar.update()
-
-    new Chart(document.getElementById('pie-chart'),
-      type: 'pie'
-      data:
-        labels: [
-          'Fixed'
-          'Unchanged'
-          'Fixed FP'
-        ]
-        datasets: [ {
-          label: 'close-email-entries'
-          backgroundColor: [
-            '#3e5a72'
-            '#6dbcdb'
-            '#666'
-          ]
-          data: [
-            5078
-            4367
-            2152
-          ]
-        } ]
-      options:
-        legend: false
-        pieceLabel:
-          render: (args) ->
-            return args.percentage + '%'
-          position: 'outside'
-          segment: false
-          precision: 2
-          showZero: true
-          fontStyle: 'bolder'
-          overlap: false
-          showActualPercentages: true
     )
-
-
-
-    new Chart(document.getElementById('pie-chart2'),
-      type: 'pie'
-      data:
-        labels: [
-          'Fixed'
-          'Unchanged'
-          'Fixed FP'
-        ]
-        datasets: [ {
-          label: 'close-email-entries'
-          backgroundColor: [
-            '#3e5a72'
-            '#6dbcdb'
-            '#666'
-          ]
-          data: [
-            2478
-            3267
-            4202
-          ]
-        } ]
-      options:
-        legend: false
-        pieceLabel:
-          render: (args) ->
-            return args.percentage + '%'
-          position: 'outside'
-          label: 'Unchanched'
-          segment: false
-          precision: 2
-          showZero: true
-          fontStyle: 'bolder'
-          overlap: false
-          showActualPercentages: true
-
-    )
-
-
-
-    new Chart(document.getElementById('line-chart'),
-      type: 'line'
-      data:
-        labels: [
-          0
-          1
-          3
-          4
-          5
-          6
-          7
-          8
-          9
-          10
-          11
-        ]
-        datasets: [
-          {
-            data: [
-              1
-              1.3
-              1.2
-              1.5
-              1.7
-              1.4
-              1.8
-              0.9
-              1
-              1.1
-              1.2
-              1.5
-              1.6
-            ]
-            label: 'close'
-            backgroundColor: '#6dbcdb'
-            fill: true
-            lineTension: 0
-          }
-          {
-            data: [
-              1.4
-              1.4
-              1.4
-              1.4
-              1.4
-              1.4
-              1.4
-              1.4
-              1.4
-              1.4
-              1.4
-            ]
-            label: 'ticket'
-            backgroundColor: 'rgba(135, 206, 250, .1)'
-            fill: true
-            lineTension: 0
-          }
-        ]
-      options:
-        legend: false
-        elements:
-          point:
-            radius: 0
-        scales:
-          yAxes: [
-            {
-              gridLines:
-                display: false
-              ticks: {
-                min: 0
-                stepSize: .5
-                callback: (value, index, values) ->
-                  if value > 1
-                    return value + ' hr'
-                  else
-                    return value + ' hr'
-              }
-            }
-          ]
-          xAxes: [
-            {
-              gridLines:
-                display: false
-              scaleLabel: {
-                display: true,
-                labelString: 'Tikets'
-              }
-              ticks: {
-                display: false
-              }
-            }
-          ])
-
-
-
-    ###### Bar chart for Ticket Entries by Submitter Type
-
-    # Range of dates displayed, display however, this format is not mandatory.
-    # These three chunks will need to have the json data reformatted and inserted into them as separate arrays
-    submitterChartLabels = ['September 2', 'September 3', 'September 4', 'September 5', 'September 6', 'September 7', 'September 8']
-    submitterCustomerChartData = [20, 24, 30, 28, 10, 5, 13]
-    submitterGuestChartData = [15, 8, 18, 16, 12, 4, 2]
-
-    new Chart($('#graph-ticket-entries-submitter'),
-      type: 'bar'
-      data:
-        labels: submitterChartLabels
-        datasets: [
-          {
-          label: 'Customer'
-          backgroundColor: '#6dbcdb'
-          data: submitterCustomerChartData
-          }
-          {
-            label: 'Guest'
-            backgroundColor: '#3e5a72'
-            data: submitterGuestChartData
-          }]
-      options:
-        legend:
-          display: false
-        scales:
-          yAxes: [
-            {
-              gridLines: display: false
-              ticks: {
-                min: 0
-                stepSize: 10
-              }
-            }
-          ]
-          xAxes: [
-            {
-              gridLines: display: false
-              ticks: {
-                autoSkip: false
-              }
-            }
-          ]
-      )
 
 
 
 
 #    graph bottom
-    new Chart(document.getElementById('bar-chart-horizontal'),
-      type: 'horizontalBar'
-      data:
-        labels: [
-          'mtaylor'
-          'chrclair'
-          'nherbert'
-          'nverbeck'
-          'abreeeman'
+  new Chart(document.getElementById('bar-chart-horizontal'),
+    type: 'horizontalBar'
+    data:
+      labels: [
+        'mtaylor'
+        'chrclair'
+        'nherbert'
+        'nverbeck'
+        'abreeeman'
+      ]
+      datasets: [ {
+        backgroundColor: [
+          '#6dbcdb'
+          '#6dbcdb'
+          '#6dbcdb'
+          '#6dbcdb'
+          '#6dbcdb'
         ]
-        datasets: [ {
-          backgroundColor: [
-            '#6dbcdb'
-            '#6dbcdb'
-            '#6dbcdb'
-            '#6dbcdb'
-            '#6dbcdb'
-          ]
-          data: [
-            8
-            15
-            11
-            10
-            13.5
-          ]
-        } ]
-      options:
-        legend: display: false
-        scales:
-          yAxes: [
-            {
-              gridLines: display: false
-              ticks: {
-                min: 0
-                stepSize: 10
-              }
-            }
-          ]
-          xAxes: [
-            {
-              gridLines: display: false
-              ticks: {
-                min: 0
-                stepSize: 5
-                max: 20
-              }
-              scaleLabel: {
-                display: true,
-                labelString: 'Tickets'
-              }
-            }
-          ]
-        )
-
-    new Chart(document.getElementById('bar-chart2-horizontal'),
-      type: 'horizontalBar'
-      data:
-        labels: [
-          'mtaylor'
-          'chrclair'
-          'nherbert'
-          'nverbeck'
-          'abreeeman'
-        ]
-        datasets: [ {
-          backgroundColor: [
-            '#6dbcdb'
-            '#6dbcdb'
-            '#6dbcdb'
-            '#6dbcdb'
-            '#6dbcdb'
-          ]
-          data: [
-            .8
-            .7
-            1.7
-            1.6
-            2
-          ]
-        } ]
-      options:
-        legend: display: false
-        scales:
-          yAxes: [
-            {
-              gridLines: display: false
-              ticks: {
-                min: 0
-                stepSize: 1
-              }
-            }
-          ]
-          xAxes: [
-            {
-              gridLines: display: false
-              ticks: {
-                min: 0
-                stepSize: 1
-                max: 4
-              }
-              scaleLabel: {
-                display: true,
-                labelString: 'hours'
-              }
-            }
-          ]
-    )
-
-    new Chart(document.getElementById('bar-chart-grouped'),
-      type: 'bar'
-      data:
-        labels: [
-          'mtaylor'
-          'chrclair'
-          'nherbert'
-          'nverbeck'
-          'abreeman'
-        ]
-        datasets: [
-          {
-            label: 'Fixed FP'
-            backgroundColor: '#6dbcdb'
-            data: [
-              9.5
-              7.5
-              5
-              6.5
-              9.5
-            ]
-          }
-          {
-            label: 'Fixed FN'
-            backgroundColor: '#2c3e50'
-            data: [
-              10.5
-              14
-              11.5
-              10
-              5
-            ]
-          }
-          {
-            label: 'Unchanged'
-            backgroundColor: '#999'
-            data: [
-              3.5
-              4.8
-              11.5
-              13.5
-              9.5
-            ]
-          }
-          {
-            label: 'Other'
-            backgroundColor: '#E47433'
-            data: [
-              0
-              1.5
-              0
-              3.5
-              1.5
-            ]
-          }
-        ]
-      options:
-        title:
-          display: false
-        legend: display: false
-        scales:
-          yAxes: [
-            {
-              gridLines: display: false
-              ticks: {
-                min: 0
-                stepSize: 5
-                max: 15
-              }
-            }
-          ]
-          xAxes: [
-            {
-              gridLines: display: false
-            }
-          ]
-    )
-
-    new Chart(document.getElementById('bar-chart3-horizontal'),
-      type: 'horizontalBar'
-      data:
-        labels: [
-          'a500'
-          'alx_ cln'
-          'mute_phish'
-          'sbl'
-          'srch'
-          'suwl'
-          'trd_mal'
-        ]
-        datasets: [ {
-          backgroundColor: [
-            '#6dbcdb'
-            '#6dbcdb'
-            '#6dbcdb'
-            '#6dbcdb'
-            '#6dbcdb'
-            '#6dbcdb'
-            '#6dbcdb'
-          ]
-          data: [
-            5
-            18.5
-            9.5
-            14.5
-            4.5
-            7.5
-            3
-          ]
-        } ]
-      options:
-        legend: display: false
-        scales:
-          yAxes: [
-            {
-              gridLines: display: false
-            }
-          ]
-          xAxes: [
-            {
-              gridLines: display: false
-              ticks: {
-                min: 0
-                stepSize: 5
-                max: 20
-              }
-              scaleLabel: {
-                display: true,
-                labelString: 'Total Ticket Entries with FP Resolutions'
-              }
-            }
-          ]
-    )
-    window.barChartGroupedData = [
-      {
-        label: 'Total Ticket Entries'
-        backgroundColor: '#6dbcdb'
         data: [
+          8
           15
-          18
-          22
-          18
+          11
+          10
+          13.5
         ]
-      }
-      {
-        label: 'E'
-        backgroundColor: '#8cc63f'
-        data: [
-          0
-          0
-          0
-          0
-        ]
-      }
-      {
-        label: 'W'
-        backgroundColor: '#E47433'
-        data: [
-          0
-          0
-          0
-          0
-        ]
-      }
-      {
-        label: 'EW'
-        backgroundColor: '#BA55D3'
-        data: [
-          0
-          0
-          0
-          0
-        ]
-      }
-    ]
-    window.barChartGrouped = new Chart(document.getElementById('bar-chart2-grouped'),
-      type: 'bar'
-      data:
-        labels: [
-          'September 2'
-          'September 3'
-          'September 4'
-          'September 5'
-          'September 6'
-          'September 7'
-          'September 8'
-        ]
-        datasets: window.barChartGroupedData
-      options:
-        legend: display: false
-        scales:
-          yAxes: [
-            {
-              gridLines: display: false
+      } ]
+    options:
+      legend: display: false
+      scales:
+        yAxes: [
+          {
+            gridLines: display: false
+            ticks: {
+              min: 0
+              stepSize: 10
             }
-          ]
-          xAxes: [
-            {
-              gridLines: display: false
-              ticks: {
-                autoSkip: false
-              }
+          }
+        ]
+        xAxes: [
+          {
+            gridLines: display: false
+            ticks: {
+              min: 0
+              stepSize: 5
+              max: 20
             }
-          ]
+            scaleLabel: {
+              display: true,
+              labelString: 'Tickets'
+            }
+          }
+        ]
       )
 
-    new Chart(document.getElementById('bar-chart3-grouped'),
-      type: 'bar'
-      data:
-        labels: [
-          'September 2'
-          'September 3'
-          'September 4'
-          'September 5'
-          'September 6'
-          'September 7'
-          'September 8'
+  new Chart(document.getElementById('bar-chart2-horizontal'),
+    type: 'horizontalBar'
+    data:
+      labels: [
+        'mtaylor'
+        'chrclair'
+        'nherbert'
+        'nverbeck'
+        'abreeeman'
+      ]
+      datasets: [ {
+        backgroundColor: [
+          '#6dbcdb'
+          '#6dbcdb'
+          '#6dbcdb'
+          '#6dbcdb'
+          '#6dbcdb'
         ]
-        datasets: [
+        data: [
+          .8
+          .7
+          1.7
+          1.6
+          2
+        ]
+      } ]
+    options:
+      legend: display: false
+      scales:
+        yAxes: [
           {
-            backgroundColor: '#6dbcdb'
-            data: [
-              15
-              18
-              22
-              18
-            ]
+            gridLines: display: false
+            ticks: {
+              min: 0
+              stepSize: 1
+            }
           }
+        ]
+        xAxes: [
           {
-            backgroundColor: '#2c3e50'
-            data: [
-              8.5
-              5.5
-              13.5
-              8.5
-            ]
+            gridLines: display: false
+            ticks: {
+              min: 0
+              stepSize: 1
+              max: 4
+            }
+            scaleLabel: {
+              display: true,
+              labelString: 'hours'
+            }
           }
         ]
-      options:
-        legend: display: false
-        scales:
-          yAxes: [
-            {
-              gridLines: display: false
-              ticks: {
-                min: 0
-                stepSize: 10
-                max: 30
-              }
-            }
-          ]
-          xAxes: [
-            {
-              gridLines: display: false
-              ticks: {
-                autoSkip: false
-              }
-            }
-          ]
-    )
+  )
 
-    new Chart(document.getElementById('team-pie-chart'),
-      type: 'pie'
-      data:
-        labels: [
-          'Fixed'
-          'Unchanged'
-          'Fixed FP'
-        ]
-        datasets: [ {
-          label: 'close-email-entries'
-          backgroundColor: [
-            '#3e5a72'
-            '#6dbcdb'
-            '#666'
-          ]
+  new Chart(document.getElementById('bar-chart-grouped'),
+    type: 'bar'
+    data:
+      labels: [
+        'mtaylor'
+        'chrclair'
+        'nherbert'
+        'nverbeck'
+        'abreeman'
+      ]
+      datasets: [
+        {
+          label: 'Fixed FP'
+          backgroundColor: '#6dbcdb'
           data: [
-            5178
-            4267
-            2202
+            9.5
+            7.5
+            5
+            6.5
+            9.5
           ]
-        } ]
-      options:
-        legend: false
-        pieceLabel:
-          render: (args) ->
-            return args.percentage + '%'
-          position: 'outside'
-          label: 'Unchanched'
-          segment: false
-          precision: 2
-          showZero: true
-          fontStyle: 'bolder'
-          overlap: false
-          showActualPercentages: true
-
-    )
-
-    new Chart(document.getElementById('team-pie2-chart'),
-      type: 'pie'
-      data:
-        labels: [
-          'Fixed'
-          'Unchanged'
-          'Fixed FP'
-        ]
-        datasets: [ {
-          label: 'close-email-entries'
-          backgroundColor: [
-            '#3e5a72'
-            '#6dbcdb'
-            '#666'
-          ]
+        }
+        {
+          label: 'Fixed FN'
+          backgroundColor: '#2c3e50'
           data: [
-            3778
-            4767
-            5900
+            10.5
+            14
+            11.5
+            10
+            5
           ]
-        } ]
-      options:
-        legend: false
-        pieceLabel:
-          render: (args) ->
-            return args.percentage + '%'
-          position: 'outside'
-          label: 'Unchanched'
-          segment: false
-          precision: 2
-          showZero: true
-          fontStyle: 'bolder'
-          overlap: false
-          showActualPercentages: true
+        }
+        {
+          label: 'Unchanged'
+          backgroundColor: '#999'
+          data: [
+            3.5
+            4.8
+            11.5
+            13.5
+            9.5
+          ]
+        }
+        {
+          label: 'Other'
+          backgroundColor: '#E47433'
+          data: [
+            0
+            1.5
+            0
+            3.5
+            1.5
+          ]
+        }
+      ]
+    options:
+      title:
+        display: false
+      legend: display: false
+      scales:
+        yAxes: [
+          {
+            gridLines: display: false
+            ticks: {
+              min: 0
+              stepSize: 5
+              max: 15
+            }
+          }
+        ]
+        xAxes: [
+          {
+            gridLines: display: false
+          }
+        ]
+  )
 
+  new Chart(document.getElementById('bar-chart3-horizontal'),
+    type: 'horizontalBar'
+    data:
+      labels: [
+        'a500'
+        'alx_ cln'
+        'mute_phish'
+        'sbl'
+        'srch'
+        'suwl'
+        'trd_mal'
+      ]
+      datasets: [ {
+        backgroundColor: [
+          '#6dbcdb'
+          '#6dbcdb'
+          '#6dbcdb'
+          '#6dbcdb'
+          '#6dbcdb'
+          '#6dbcdb'
+          '#6dbcdb'
+        ]
+        data: [
+          5
+          18.5
+          9.5
+          14.5
+          4.5
+          7.5
+          3
+        ]
+      } ]
+    options:
+      legend: display: false
+      scales:
+        yAxes: [
+          {
+            gridLines: display: false
+          }
+        ]
+        xAxes: [
+          {
+            gridLines: display: false
+            ticks: {
+              min: 0
+              stepSize: 5
+              max: 20
+            }
+            scaleLabel: {
+              display: true,
+              labelString: 'Total Ticket Entries with FP Resolutions'
+            }
+          }
+        ]
+  )
+  window.barChartGroupedData = [
+    {
+      label: 'Total Ticket Entries'
+      backgroundColor: '#6dbcdb'
+      data: [
+        15
+        18
+        22
+        18
+      ]
+    }
+    {
+      label: 'E'
+      backgroundColor: '#8cc63f'
+      data: [
+        0
+        0
+        0
+        0
+      ]
+    }
+    {
+      label: 'W'
+      backgroundColor: '#E47433'
+      data: [
+        0
+        0
+        0
+        0
+      ]
+    }
+    {
+      label: 'EW'
+      backgroundColor: '#BA55D3'
+      data: [
+        0
+        0
+        0
+        0
+      ]
+    }
+  ]
+  window.barChartGrouped = new Chart(document.getElementById('bar-chart2-grouped'),
+    type: 'bar'
+    data:
+      labels: [
+        'September 2'
+        'September 3'
+        'September 4'
+        'September 5'
+        'September 6'
+        'September 7'
+        'September 8'
+      ]
+      datasets: window.barChartGroupedData
+    options:
+      legend: display: false
+      scales:
+        yAxes: [
+          {
+            gridLines: display: false
+          }
+        ]
+        xAxes: [
+          {
+            gridLines: display: false
+            ticks: {
+              autoSkip: false
+            }
+          }
+        ]
     )
+
+  new Chart(document.getElementById('bar-chart3-grouped'),
+    type: 'bar'
+    data:
+      labels: [
+        'September 2'
+        'September 3'
+        'September 4'
+        'September 5'
+        'September 6'
+        'September 7'
+        'September 8'
+      ]
+      datasets: [
+        {
+          backgroundColor: '#6dbcdb'
+          data: [
+            15
+            18
+            22
+            18
+          ]
+        }
+        {
+          backgroundColor: '#2c3e50'
+          data: [
+            8.5
+            5.5
+            13.5
+            8.5
+          ]
+        }
+      ]
+    options:
+      legend: display: false
+      scales:
+        yAxes: [
+          {
+            gridLines: display: false
+            ticks: {
+              min: 0
+              stepSize: 10
+              max: 30
+            }
+          }
+        ]
+        xAxes: [
+          {
+            gridLines: display: false
+            ticks: {
+              autoSkip: false
+            }
+          }
+        ]
+  )
+
+  new Chart(document.getElementById('team-pie-chart'),
+    type: 'pie'
+    data:
+      labels: [
+        'Fixed'
+        'Unchanged'
+        'Fixed FP'
+      ]
+      datasets: [ {
+        label: 'close-email-entries'
+        backgroundColor: [
+          '#3e5a72'
+          '#6dbcdb'
+          '#666'
+        ]
+        data: [
+          5178
+          4267
+          2202
+        ]
+      } ]
+    options:
+      legend: false
+      pieceLabel:
+        render: (args) ->
+          return args.percentage + '%'
+        position: 'outside'
+        label: 'Unchanched'
+        segment: false
+        precision: 2
+        showZero: true
+        fontStyle: 'bolder'
+        overlap: false
+        showActualPercentages: true
+
+  )
+
+  new Chart(document.getElementById('team-pie2-chart'),
+    type: 'pie'
+    data:
+      labels: [
+        'Fixed'
+        'Unchanged'
+        'Fixed FP'
+      ]
+      datasets: [ {
+        label: 'close-email-entries'
+        backgroundColor: [
+          '#3e5a72'
+          '#6dbcdb'
+          '#666'
+        ]
+        data: [
+          3778
+          4767
+          5900
+        ]
+      } ]
+    options:
+      legend: false
+      pieceLabel:
+        render: (args) ->
+          return args.percentage + '%'
+        position: 'outside'
+        label: 'Unchanched'
+        segment: false
+        precision: 2
+        showZero: true
+        fontStyle: 'bolder'
+        overlap: false
+        showActualPercentages: true
+
+  )
 
 
 $ ->

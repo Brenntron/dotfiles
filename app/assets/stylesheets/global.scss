@@ -6892,8 +6892,10 @@ td.text-center span {
 .graph-config {
   display: inline-flex;
   width: 100%;
-  height: 40px;
+  height: 44px;
   justify-content: space-between;
+  margin-top: 10px;
+  margin-bottom: 10px;
 
   .form-control {
     height: 18px;
@@ -6910,7 +6912,7 @@ td.text-center span {
   height: 100%;
   width: 50%;
   border: 1px solid #dddddd;
-  padding: 0 5px;
+  padding: 3px 5px;
 
   label {
     height: 50%;
@@ -6921,8 +6923,8 @@ td.text-center span {
 
     .total-legend {
       background-color: skyblue;
-      width: 40px;
-      height: 10px;
+      width: 45px;
+      height: 14px;
       position: relative;
       top: 2px;
       border-radius: 2px;
@@ -6930,10 +6932,10 @@ td.text-center span {
 
     .legend-option {
       width: 14px;
-      height: 11px;
+      height: 14px;
       position: relative;
       top: 1.5px;
-      background-position-y: -1px;
+      background-repeat: no-repeat;
     }
 
     .totals-label {
@@ -6979,4 +6981,12 @@ td.text-center span {
       padding-right: 12px;
     }
   }
+}
+
+.graph-select-label {
+  position: absolute;
+}
+
+.graph-config select {
+  margin-top: 22px;
 }

@@ -181,14 +181,13 @@
               .graph-top-header
                 %h5.uppercase.header-stg Ticket Entries Closed by Day
 
-
-              %label.content-label-sm Time Breakdown
               .graph-config
+                %label.content-label-sm.graph-select-label Time Breakdown
                 %select.form-control
                   %option{:selected => "selected", :value => "day"} By Day
-                  %option{:value => "weekly"} Weekly
-                  %option{:value => "monthly"} Monthly
-                  %option{:value => "yearly"} Yearly
+                  %option{:value => "weekly"} By Week
+                  %option{:value => "monthly"} By Month
+                  %option{:value => "yearly"} By Year
 
                 .graph-menu
                   %label
