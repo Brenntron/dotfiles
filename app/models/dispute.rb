@@ -1436,7 +1436,8 @@ class Dispute < ApplicationRecord
 
   def self.tickets_submitted_by_submitter_per_day(from, to)
 
-    #from = "Sun, 06 May 2018 17:40:08 GMT"
+    #from = "Mon, 6 Aug 2018 17:40:08 GMT"
+    #to = "Fri, 10 Aug 2018 17:40:08 GMT"
 
     from = Time.parse(from)
     to = Time.parse(to)
@@ -1459,7 +1460,7 @@ class Dispute < ApplicationRecord
        report_data[swap_day.to_s][:customer_count] = 0
        report_data[swap_day.to_s][:guest_count] = 0
 
-       final_report_data[:chart_labels] << swap_day.to_s
+       final_report_data[:chart_labels] << swap_day.strftime("%a %b %d, %Y")
 
        day_results = main_results.select {|result| Date.parse(result.created_at.to_s) == Date.parse(swap_day.to_s)}
 

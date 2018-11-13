@@ -278,7 +278,6 @@ window.build_graph_ticket_entries_submitter = () ->
                 gridLines: display: false
                 ticks: {
                   min: 0
-                  stepSize: 10
                 }
               }
             ]
