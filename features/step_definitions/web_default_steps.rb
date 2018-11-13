@@ -30,6 +30,10 @@ When(/^I click through "(.*?)" and accept confirmation$/) do |target|
   end
 end
 
+When (/^I click label "(.*?)"$/) do |target|
+  find("label[for=#{target}]").click
+end
+
 Then(/^I cannot click "(.*?)"$/) do |target|
   begin
     raise "Clicked on #{target} when should not have been able to" if click_on(target)

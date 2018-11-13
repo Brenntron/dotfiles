@@ -247,8 +247,8 @@ Feature: Disputes
     Then I wait for "3" seconds
     Then I should see content "This is a test." within "#edit-resolution-message-template-body"
     Given I fill in "edit-resolution-message-template-body" with "ABC"
-    And I click "#edit-resolution-message-template"
-    Then I wait for "3" seconds
+    When I click "#edit-resolution-message-template"
+    And I wait for "3" seconds
     Then I should see "RESOLUTION MESSAGE TEMPLATE UPDATED."
 
   @javascript
@@ -263,8 +263,8 @@ Feature: Disputes
     And I fill in "new-resolution-message-template-name" with "Testimony"
     And I fill in "new-resolution-message-template-desc" with "Apples and Carrots"
     And I fill in "new-resolution-message-template-body" with "Teenage Mutant Ninja Turtles"
-    And I click "#save-resolution-message-template"
-    Then I wait for "3" seconds
+    When I click "#save-resolution-message-template"
+    And I wait for "3" seconds
     Then I should see "RESOLUTION MESSAGE TEMPLATE CREATED."
 
   @javascript
@@ -276,7 +276,21 @@ Feature: Disputes
       |5370|
     And I goto "/escalations/webrep/disputes/5370"
     And I click ".mng-resolution-message-templates-button"
-    Then I click through ".delete-resolution-message-template" and accept confirmation
-    Then I wait for "3" seconds
+    When I click through ".delete-resolution-message-template" and accept confirmation
+    And I wait for "3" seconds
 
     Then I should see "RESOLUTION MESSAGE TEMPLATE DELETED."
+
+  @javascript
+  Scenario: A user selects a resolution message template
+    Given a user with role "webrep user" exists and is logged in
+    And a resolution message template exists
+    And the following disputes exist and have entries:
+      |id  |
+      |5370|
+    And I goto "/escalations/webrep/disputes/5370"
+    And I click "#show-edit-ticket-status-button"
+    And I click "#NEW"
+    When I select "Templar" from "select-new-resolution-message-template-status"
+    And I wait for "3" seconds
+    Then I should see content "This is a test." within ".ticket-status-comment"
