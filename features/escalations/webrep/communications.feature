@@ -306,3 +306,18 @@ Feature: Webrep communications
     Then I click "Send"
     And I wait for "30" seconds
     And I should see "EMAIL SENT"
+
+  @javascript
+  Scenario: a user attaches a file to an email and sends it
+    Given a user with role "webrep user" exists and is logged in
+    And a resolution message template exists
+    And the following disputes exist and have entries:
+    |id  |
+    |5370|
+    And I goto "/escalations/webrep/disputes/5370"
+    And I click ".mng-resolution-message-templates-button"
+    Then take a screenshot
+    Then I should see "Templar"
+    Then I should see "Axe"
+    Then I should see "This is a test."
+
