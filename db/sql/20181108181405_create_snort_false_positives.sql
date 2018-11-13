@@ -1,0 +1,3 @@
+CREATE TABLE `snort_false_positives` (`id` bigint NOT NULL AUTO_INCREMENT PRIMARY KEY, `created_at` datetime NOT NULL, `updated_at` datetime NOT NULL, `bug_id` int, `user_email` varchar(255), `sid` varchar(255), `description` varchar(255), `source_authority` varchar(255), `source_key` varchar(255), `os` varchar(255), `version` varchar(255), `built_from` varchar(255), `pcap_lib` varchar(255), `cmd_line_options` varchar(255)) ENGINE=InnoDB;
+CREATE UNIQUE INDEX `index_snort_false_positives_on_source_authority_and_source_key`  ON `snort_false_positives` (`source_authority`, `source_key`);
+INSERT INTO `schema_migrations` (`version`) VALUES ('20181108181405');
