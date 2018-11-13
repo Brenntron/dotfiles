@@ -1765,7 +1765,7 @@ $ ->
 
 
 #  Test data for Closed Email Entry Resolutions
-  emailEntryResolutionLabels = ['Fixed', 'Unchanged', 'Fixed FP', 'Other']
+  emailEntryResolutionLabels = ['Fixed FN', 'Unchanged', 'Fixed FP', 'Other']
   emailEntryData = [3,6,7,0]
 
   new Chart($('#closed-email-entries-resolution-piechart'),
@@ -1795,16 +1795,14 @@ $ ->
         showActualPercentages: true
   )
 
+  #  Test data for Closed Email Entry Resolutions
+  webEntryResolutionLabels = ['Fixed FN', 'Unchanged', 'Fixed FP', 'Other']
+  webEntryData = [3,6,7,0]
 
-
-  new Chart(document.getElementById('pie-chart2'),
+  new Chart($('#closed-web-entries-resolution-piechart'),
     type: 'pie'
     data:
-      labels: [
-        'Fixed'
-        'Unchanged'
-        'Fixed FP'
-      ]
+      labels: webEntryResolutionLabels
       datasets: [ {
         label: 'close-email-entries'
         backgroundColor: [
@@ -1812,11 +1810,7 @@ $ ->
           '#6dbcdb'
           '#666'
         ]
-        data: [
-          2478
-          3267
-          4202
-        ]
+        data: webEntryData
       } ]
     options:
       legend: false
@@ -1921,7 +1915,7 @@ $ ->
               display: false
             scaleLabel: {
               display: true,
-              labelString: 'Tikets'
+              labelString: 'Tickets'
             }
             ticks: {
               display: false
