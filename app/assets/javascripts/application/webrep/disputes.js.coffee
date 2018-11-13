@@ -1652,12 +1652,16 @@ $ ->
 
 $ ->
 
-
-
   window.updateGraph = (label, barGraphName, e) ->
     originalData = []
 
-    barGraphName == 'graph-ticket-entries-closed'
+    if barGraphName == 'userTicketClosedGraph'
+      originalData = window.userTicketClosedGraphDatasets
+    else
+      alert 'Graph with name ' + barGraphName + ' is not defined'
+      return
+
+#    barGraphName == 'graph-ticket-entries-closed'
 #      originalData = window.barDataSets
 #    else if barName == 'barChartGrouped'
 #      originalData = window.barChartGroupedData
@@ -1682,6 +1686,27 @@ $ ->
   ticketTypeEData     = [8, 7, 15, 12, 0, 0, 0]
   ticketTypeEWData    = [0, 0, 0, 9, 0, 0, 0]
 
+  window.userTicketClosedGraphDatasets = [
+    {
+      label: 'Total Ticket Entries'
+      backgroundColor: '#6dbcdb'
+      data: ticketTypeTotalData
+    }
+    {
+      label: 'W'
+      backgroundColor: '#E47433'
+      data: ticketTypeWData
+    }
+    {
+      label: 'E'
+      backgroundColor: '#5FB665'
+      data: ticketTypeEData
+    }
+    {
+      label: 'EW'
+      backgroundColor: '#C14B92'
+      data: ticketTypeEWData
+    }]
   ## Test data breakdown for a monthly dataset - we'll say 6 months
 #  ticketTypeChartLabels = ['June', 'July', 'August', 'September', 'October', 'November']
 #  ticketTypeTotalData = [120, 124, 130, 128, 110, 142]
@@ -1690,31 +1715,11 @@ $ ->
 #  ticketTypeEWData = [30, 16, 57, 57, 25, 50]
 
 
-  new Chart($('#graph-ticket-entries-closed'),
+  window.userTicketClosedGraph = new Chart($('#graph-ticket-entries-closed'),
     type: 'bar'
     data:
       labels: ticketTypeChartLabels
-      datasets: [
-        {
-          label: 'Total Ticket Entries'
-          backgroundColor: '#6dbcdb'
-          data: ticketTypeTotalData
-        }
-        {
-          label: 'W'
-          backgroundColor: '#E47433'
-          data: ticketTypeWData
-        }
-        {
-          label: 'E'
-          backgroundColor: '#5FB665'
-          data: ticketTypeEData
-        }
-        {
-          label: 'EW'
-          backgroundColor: '#C14B92'
-          data: ticketTypeEWData
-        }]
+      datasets: window.userTicketClosedGraphDatasets,
     options:
       legend:
         display: false
@@ -1929,47 +1934,47 @@ $ ->
 
   # Range of dates displayed, display however, this format is not mandatory.
   # These three chunks will need to have the json data reformatted and inserted into them as separate arrays
-  submitterChartLabels = ['September 2', 'September 3', 'September 4', 'September 5', 'September 6', 'September 7', 'September 8']
-  submitterCustomerChartData = [20, 24, 30, 28, 10, 5, 13]
-  submitterGuestChartData = [15, 8, 18, 16, 12, 4, 2]
+  #submitterChartLabels = ['September 2', 'September 3', 'September 4', 'September 5', 'September 6', 'September 7', 'September 8']
+  #submitterCustomerChartData = [20, 24, 30, 28, 10, 5, 13]
+  #submitterGuestChartData = [15, 8, 18, 16, 12, 4, 2]
 
-  new Chart($('#graph-ticket-entries-submitter'),
-    type: 'bar'
-    data:
-      labels: submitterChartLabels
-      datasets: [
-        {
-        label: 'Customer'
-        backgroundColor: '#6dbcdb'
-        data: submitterCustomerChartData
-        }
-        {
-          label: 'Guest'
-          backgroundColor: '#3e5a72'
-          data: submitterGuestChartData
-        }]
-    options:
-      legend:
-        display: false
-      scales:
-        yAxes: [
-          {
-            gridLines: display: false
-            ticks: {
-              min: 0
-              stepSize: 10
-            }
-          }
-        ]
-        xAxes: [
-          {
-            gridLines: display: false
-            ticks: {
-              autoSkip: false
-            }
-          }
-        ]
-    )
+  #new Chart($('#graph-ticket-entries-submitter'),
+  #  type: 'bar'
+  #  data:
+  #    labels: submitterChartLabels
+  #    datasets: [
+  #      {
+  #      label: 'Customer'
+  #      backgroundColor: '#6dbcdb'
+  #      data: submitterCustomerChartData
+  #      }
+  #      {
+  #        label: 'Guest'
+  #        backgroundColor: '#3e5a72'
+  #        data: submitterGuestChartData
+  #      }]
+  #  options:
+  #    legend:
+  #      display: false
+  #    scales:
+  #      yAxes: [
+  #        {
+  #          gridLines: display: false
+  #          ticks: {
+  #            min: 0
+  #            stepSize: 10
+  #          }
+  #        }
+  #      ]
+  #      xAxes: [
+  #        {
+  #          gridLines: display: false
+  #          ticks: {
+  #            autoSkip: false
+  #          }
+  #        }
+  #      ]
+  #  )
 
 
 

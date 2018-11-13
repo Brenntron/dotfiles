@@ -191,12 +191,12 @@
 
                 .graph-menu
                   %label
-                    %input.all-ticket{:type => "checkbox", :checked => "checked", :onclick => 'updateGraph(["Total Ticket Entries"], "myBar", this)'}/
+                    %input.all-ticket{:type => "checkbox", :checked => "checked", :onclick => 'updateGraph(["Total Ticket Entries"], "userTicketClosedGraph", this)'}/
                     %label.total-legend
                     Total Tickets Entries
 
                   %label
-                    %input.group-ticket{:type => "checkbox", :checked => "checked", :onclick => 'updateGraph(["E", "W", "EW"], "myBar", this)'}/
+                    %input.group-ticket{:type => "checkbox", :checked => "checked", :onclick => 'updateGraph(["E", "W", "EW"], "userTicketClosedGraph", this)'}/
                     %label.dispute-E.legend-option
                     %label.dispute-W.legend-option
                     %label.dispute-EW.legend-option
