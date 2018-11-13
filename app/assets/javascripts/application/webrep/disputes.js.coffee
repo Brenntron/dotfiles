@@ -1130,6 +1130,10 @@ $ ->
         targets: [ 8 ]
         className: 'alt-col'
       }
+      {
+        targets: [ 10 ]
+        className: 'age-col'
+      }
     ]
     columns: [
       {
@@ -1163,7 +1167,23 @@ $ ->
       { data: 'd_entry_preview' }
       { data: 'assigned_to' }
       { data: 'case_opened_at' }
-      { data: 'case_age' }
+      {
+        data: 'case_age'
+        render: (data) ->
+          parts = data.split(' ')
+          days = parseInt(parts[0])
+          hour = parseInt(parts[1])
+
+          if days == 0
+            if hour < 3
+              data
+            else if hour < 5
+              '<span class="ticket-age-over3hr">' + data + '</span>'
+            else
+              '<span class="overdue">' + data + '</span>'
+          else
+            '<span class="overdue">' + data + '</span>'
+      }
       { data: 'source' }
       { data: 'submitter_type'}
       { data: 'submitter_org' }
