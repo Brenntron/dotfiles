@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 20180921200008) do
+ActiveRecord::Schema.define(version: 20181108181405) do
 
   create_table "alerts", force: :cascade, options: "ENGINE=InnoDB DEFAULT CHARSET=utf8" do |t|
     t.datetime "created_at", null: false
@@ -19,6 +19,20 @@ ActiveRecord::Schema.define(version: 20180921200008) do
     t.integer "rule_id", null: false
     t.integer "attachment_id", null: false
     t.index ["test_group", "attachment_id", "rule_id"], name: "index_alerts_on_test_group_and_attachment_id_and_rule_id"
+  end
+
+  create_table "amp_false_positives", force: :cascade, options: "ENGINE=InnoDB DEFAULT CHARSET=utf8" do |t|
+    t.string "sha256"
+    t.integer "customer_id"
+    t.string "source"
+    t.text "description"
+    t.string "product"
+    t.integer "sr_id"
+    t.text "payload"
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.index ["payload"], name: "index_amp_false_positives_on_payload", length: { payload: 15 }
+    t.index ["sha256"], name: "index_amp_false_positives_on_sha256"
   end
 
   create_table "attachments", force: :cascade, options: "ENGINE=InnoDB DEFAULT CHARSET=utf8" do |t|
@@ -42,6 +56,16 @@ ActiveRecord::Schema.define(version: 20180921200008) do
     t.index ["bugzilla_attachment_id"], name: "index_attachments_on_bugzilla_attachment_id"
     t.index ["rule_id"], name: "index_attachments_on_rule_id"
     t.index ["task_id"], name: "index_attachments_on_task_id"
+  end
+
+  create_table "attachments_exploits", id: :integer, force: :cascade, options: "ENGINE=InnoDB DEFAULT CHARSET=utf8" do |t|
+    t.integer "attachment_id"
+    t.integer "exploit_id"
+  end
+
+  create_table "attachments_rules", id: false, force: :cascade, options: "ENGINE=InnoDB DEFAULT CHARSET=utf8" do |t|
+    t.integer "attachment_id"
+    t.integer "rule_id"
   end
 
   create_table "bug_blockers", force: :cascade, options: "ENGINE=InnoDB DEFAULT CHARSET=utf8" do |t|
@@ -262,7 +286,7 @@ ActiveRecord::Schema.define(version: 20180921200008) do
     t.index ["reference_id"], name: "index_cves_on_reference_id", unique: true
   end
 
-  create_table "delayed_jobs", force: :cascade, options: "ENGINE=InnoDB DEFAULT CHARSET=latin1" do |t|
+  create_table "delayed_jobs", force: :cascade, options: "ENGINE=InnoDB DEFAULT CHARSET=utf8" do |t|
     t.integer "priority", default: 0, null: false
     t.integer "attempts", default: 0, null: false
     t.text "handler", null: false
@@ -274,7 +298,6 @@ ActiveRecord::Schema.define(version: 20180921200008) do
     t.string "queue"
     t.datetime "created_at"
     t.datetime "updated_at"
-    t.index ["priority", "run_at"], name: "delayed_jobs_priority"
   end
 
   create_table "dispute_comments", force: :cascade, options: "ENGINE=InnoDB DEFAULT CHARSET=utf8" do |t|
@@ -589,6 +612,13 @@ ActiveRecord::Schema.define(version: 20180921200008) do
     t.index ["reference_type_id"], name: "index_references_on_reference_type_id"
   end
 
+  create_table "references_rules", id: false, force: :cascade, options: "ENGINE=InnoDB DEFAULT CHARSET=utf8" do |t|
+    t.integer "reference_id"
+    t.integer "rule_id"
+    t.index ["reference_id"], name: "index_references_rules_on_reference_id"
+    t.index ["rule_id"], name: "index_references_rules_on_rule_id"
+  end
+
   create_table "roles", force: :cascade, options: "ENGINE=InnoDB DEFAULT CHARSET=utf8" do |t|
     t.string "role"
     t.integer "org_subset_id"
@@ -691,6 +721,23 @@ ActiveRecord::Schema.define(version: 20180921200008) do
     t.index ["user_id", "name"], name: "index_saved_searches_on_user_id_and_name"
   end
 
+  create_table "snort_false_positives", force: :cascade, options: "ENGINE=InnoDB DEFAULT CHARSET=utf8" do |t|
+    t.integer "bug_id"
+    t.string "user_email"
+    t.string "sid"
+    t.text "description"
+    t.string "source_authority"
+    t.string "source_key"
+    t.string "os"
+    t.string "version"
+    t.string "built_from"
+    t.string "pcap_lib"
+    t.string "cmd_line_options"
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.index ["source_authority", "source_key"], name: "index_snort_false_positives_on_source_authority_and_source_key"
+  end
+
   create_table "snort_researches", force: :cascade, options: "ENGINE=InnoDB DEFAULT CHARSET=utf8" do |t|
     t.integer "bug_id"
     t.integer "snort_research_to_research_bug_id"
@@ -758,6 +805,15 @@ ActiveRecord::Schema.define(version: 20180921200008) do
     t.integer "user_id"
     t.string "api_key"
     t.index ["api_key"], name: "index_user_api_keys_on_api_key", unique: true
+  end
+
+  create_table "user_preferences", force: :cascade, options: "ENGINE=InnoDB DEFAULT CHARSET=utf8" do |t|
+    t.integer "user_id"
+    t.string "name"
+    t.text "value"
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.index ["user_id", "name"], name: "index_user_preferences_on_user_id_and_name"
   end
 
   create_table "users", force: :cascade, options: "ENGINE=InnoDB DEFAULT CHARSET=utf8" do |t|
