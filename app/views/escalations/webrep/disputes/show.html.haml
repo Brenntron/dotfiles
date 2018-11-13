@@ -60,10 +60,6 @@
                 NEW
               - else
                 = @dispute.status
-            - if @dispute&.status_comment.present?
-              %button.status-comment-button.esc-tooltipped{title: @dispute&.status_comment}
-            - if @dispute&.resolution_comment.present?
-              %button.status-comment-button.esc-tooltipped{title: @dispute&.resolution_comment}
 
             .dropdown-menu.inline-dropdown-menu#show-edit-ticket-status-dropdown{'aria-labelledby': 'show-edit-ticket-status-button'}
               %ul
@@ -129,6 +125,14 @@
                   .button-row-center
                     %button.primary{onClick: 'show_page_edit_status()'}
                       Submit
+
+          - if @dispute&.status_comment.present?
+            %button.status-comment-button.esc-tooltipped{title: @dispute&.status_comment}
+          - elsif @dispute&.resolution_comment.present?
+            %button.status-comment-button.esc-tooltipped{title: @dispute&.resolution_comment}
+          - else
+            %button.status-comment-button.esc-tooltipped
+
         - else
           .duplicate-status-notice
             =@dispute.resolution

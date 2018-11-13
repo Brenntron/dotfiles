@@ -1016,12 +1016,12 @@ class Dispute < ApplicationRecord
       dispute_packet = dispute.attributes.slice(*%w{id priority status resolution})
       dispute_packet[:case_number] = dispute.case_id_str
       dispute_packet[:status] = "<span class='dispute_status' id='status_#{dispute.id}'> #{dispute.status} </span>"
-      dispute_packet[:status_comment] = nil
       if dispute&.status_comment.present?
         dispute_packet[:status_comment] = dispute&.status_comment
-      end
-      if dispute&.resolution_comment.present?
+      elsif dispute&.resolution_comment.present?
         dispute_packet[:status_comment] = dispute&.resolution_comment
+      else
+        dispute_packet[:status_comment] = nil
       end
       dispute_packet[:case_link] = "<a href='/escalations/webrep/disputes/#{dispute.id}'>" + dispute_packet[:case_number] + "</a>"
       dispute_packet[:submitter_org] = dispute.customer.company.name

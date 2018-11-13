@@ -4473,10 +4473,11 @@ table > tbody > tr > td.dispute_rep_tools {
   width: 20px;
   height: 20px;
   display: inline-block;
-  float: right;
   border: none;
   background-color: transparent;
   margin-left: 15px;
+  position: absolute;
+  margin-top: 3px;
 }
 
 .dropdown-menu-content-block {
