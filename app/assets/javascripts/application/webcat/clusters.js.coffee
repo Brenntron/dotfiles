@@ -59,7 +59,7 @@ window.fetch_cluster_data = (id) ->
 window.categorize_clusters = () ->
 
   user_id = $("#user_id").val()
-  comment = ""
+  comment = $("#cluster_comment_field").val()
   #cluster_id comment category_ids
   clusters_to_categorize = []
   clusters = $ '[id$=\'_categories\']'
@@ -74,19 +74,6 @@ window.categorize_clusters = () ->
     if categories.length > 0
       all_cats = categories.split(',')
       data["cluster_id_" + id.toString()] = all_cats
-      console.log id
-      console.log all_cats
-
-
-
-#  $('[id$="_categories"]').filter ->
-
-#    if this.value.length > 0
-#      console.log(this)
-#      clusters_to_categorize.push this
-#
-#  for cluster in clusters_to_categorize
-#    alert(cluster.value)
 
   headers = {'Token': $('input[name="token"]').val(), 'Xmlrpc-Token': $('input[name="xml_token"]').val()}
   $.ajax(
@@ -100,9 +87,14 @@ window.categorize_clusters = () ->
       if json.error
 
       else
+        filter = $("#cluster_filter_field").val()
+        if filter
+          populate_clusters_index_table(filter)
+        else
+          populate_clusters_index_table()
 
     error: (response) ->
-      notice_html = "<p>Something went wrong: #{response.responseText}</p>"
+      std_api_error(response, "There was an error loading search results.", reload: false)
   , this)
 
 $ ->

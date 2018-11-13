@@ -19,16 +19,35 @@ module API
 
             post "process_cluster" do
 
+              cluster_process_array = []
+
+
               params.keys.each do |key|
                 if key.include?("cluster_id_")
                   conditions = {}
+
+                  total_cats = params[key].to_a.size
+
                   conditions[:comment] = params[:comment] unless params[:comment].blank?
                   conditions[:user] = User.find(params[:user_id]).cvs_username
                   conditions[:cluster_id] = key.gsub("cluster_id_", "").to_i
-                  conditions[:cat_ids] = params[key]
-                  #Wbrs::Cluster.process(conditions, true)
+                  conditions[:cat_ids] = Wbrs::Category.get_category_ids(params[key].to_a)
+
+                  if conditions[:cat_ids].blank? || conditions[:cat_ids].size != total_cats || !conditions[:cat_ids].all? {|i| i.is_a?(Integer)}
+                    raise "could not resolve categories (#{params[key].to_a}) for cluster id #{conditions[:cluster_id]}, stopping process."
+                  end
+                  cluster_process_array << conditions
                 end
               end
+
+              if cluster_process_array.blank?
+                raise "no categories were selected for any cluster, nothing happened."
+              end
+
+              cluster_process_array.each do |conds|
+                Wbrs::Cluster.process(conds)
+              end
+              return {:status => "success"}.to_json
 
             end
 
@@ -90,7 +109,7 @@ module API
               cluster_info = Wbrs::Cluster.retrieve(cluster_id)
               {:status => "success", :data => cluster_info}.to_json
             end
-
+          end
         end
       end
     end
