@@ -1,3 +1,9 @@
+window.apply_filter_to_table = () ->
+  filter = $("#cluster_filter_field").val()
+
+  populate_clusters_index_table(filter);
+
+
 window.populate_clusters_index_table = (filter) ->
   filter_param = ""
   if filter
@@ -32,6 +38,8 @@ window.populate_clusters_index_table = (filter) ->
           options: AC.WebCat.createSelectOptions()
         }
 
+        $("#total_results").html(json.meta.rows_found)
+
     error: (response) ->
       notice_html = "<p>Something went wrong: #{response.responseText}</p>"
   , this)
@@ -48,27 +56,51 @@ window.fetch_cluster_data = (id) ->
     error: (response) ->
   )
 
-window.categorize_cluster = (cluster_id, comment, category_ids) ->
+window.categorize_clusters = () ->
+
+  user_id = $("#user_id").val()
+  comment = $("#cluster_comment_field").val()
+  #cluster_id comment category_ids
+  clusters_to_categorize = []
+  clusters = $ '[id$=\'_categories\']'
+
+  data = {}
+  data["comment"] = comment
+  data["user_id"] = user_id
+  $(clusters).each ->
+    id =  $(this).attr('id').split('_')[0]
+    categories = $(this).next('.selectized').attr('value')
+
+    if categories.length > 0
+      all_cats = categories.split(',')
+      data["cluster_id_" + id.toString()] = all_cats
+
   headers = {'Token': $('input[name="token"]').val(), 'Xmlrpc-Token': $('input[name="xml_token"]').val()}
   $.ajax(
     url: "/escalations/api/v1/escalations/webcat/clusters/process_cluster"
     method: 'POST'
     headers: headers
-    data: {cluster_id: cluster_id, category_ids: category_ids, comment: comment}
+    data: data
     success: (response) ->
 
       json = $.parseJSON(response)
       if json.error
 
       else
+        filter = $("#cluster_filter_field").val()
+        if filter
+          populate_clusters_index_table(filter)
+        else
+          populate_clusters_index_table()
 
     error: (response) ->
-      notice_html = "<p>Something went wrong: #{response.responseText}</p>"
+      std_api_error(response, "There was an error loading search results.", reload: false)
   , this)
 
 $ ->
 #  Populate the cluster management table (temp data currently)
   window.clusters_table = $('#clusters-index').DataTable(
+    dom: '<"datatable-top-tools"lf>t<ip>'
     columnDefs: [
       {
         targets: [
@@ -103,12 +135,12 @@ $ ->
           return '<button class="expand-row-button-inline expand-row-button-' + data.cluster_id + '"></button>'
       }
       {
-        data: 'cluster_id'
+        data: null
         orderable: false
         searchable: false
         sortable: false
         render: (data, type, full, meta) ->
-          '<input type="checkbox" name="id[]" onclick="toggleRow(this)">'
+          return '<input type="checkbox" name="cluster_id_' + data.cluster_id + '" onclick="toggleRow(this)">'
       }
       {
         data: 'cluster_id'
@@ -117,16 +149,10 @@ $ ->
       {
         data: 'domain',
         render: (data) ->
-          regexp = /^(25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)\.(25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)\.(25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)\.(25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)$/i;
-          if (data.match(regexp))
-            data
-          else
-            if (data.startsWith('http') is false)
-              data = 'http://' + data
-              '<button type="button" class="help-btn right-margin esc-tooltipped" title="Whois Domain Lookup Information" onclick="domain_whois(\'' + data + '\')"></button>' +
-              '<button type="button" class="google-btn right-margin esc-tooltipped" title="Google it!" onclick="window.open(\'https://www.google.com/search?q=' + data + '\')"></button>' +
-              data + '<button type="button" onclick="window.open(\'' + data + '\', \'_blank\') " class="data-btn right-margin esc-tooltipped", title="Open ' + data + ' in a new tab"></button>' +
-              ' <span class="label right-margin label-default">3</span>' # TODO: Put real data here
+          '<button type="button" class="help-btn right-margin esc-tooltipped" title="Whois Domain Lookup Information" onclick="domain_whois(\'' + data + '\')"></button>' +
+          '<button type="button" class="google-btn right-margin esc-tooltipped" title="Google it!" onclick="window.open(\'https://www.google.com/search?q=' + data + '\')"></button>' +
+          data + '<button type="button" onclick="window.open(\'https://' + data + '\', \'_blank\') " class="data-btn right-margin esc-tooltipped", title="Open ' + data + ' in a new tab"></button>' +
+          ' <span class="label right-margin label-default">3</span>' # TODO: Put real data here <- Should be cluster entry count
       }
       {
         data: 'global_volume'
@@ -161,6 +187,25 @@ $ ->
 
 $ ->
   $(document).ready ->
+
+    # Moves cluster selectize to table draw so that selectize boxes properly initialize when changing number of items being displayed
+    $("#clusters-index").on 'draw.dt', ->
+      category_inputs = $("select.cluster_categories")
+      $(category_inputs).each ->
+        if $(this).next("div").hasClass("selectize-control")
+#          This is already selectized
+        else
+          $(this).selectize {
+            persist: false,
+            create: false,
+            maxItems: 5,
+            valueField: 'value',
+            labelField: 'value',
+            searchField: ['text'],
+            options: AC.WebCat.createSelectOptions(),
+            onItemAdd: (item) ->
+              alert(item)
+          }
 
 window.copycat_dialog = () ->
   $('#copycat_dialog').dialog({
@@ -236,6 +281,7 @@ $ ->
 
 
   $('#clusters-index tbody').on 'click', 'td.expandable-row-column', ->
+    $('.cluster-mgt-loader-wrapper').removeClass('hidden')
     tr = $(this).closest('tr')
     row = window.clusters_table.row(tr)
     if row.child.isShown()
@@ -267,6 +313,7 @@ $ ->
         url: "/escalations/api/v1/escalations/webcat/clusters/" + cluster.cluster_id
         data: {}
         success: (response) ->
+          $('.cluster-mgt-loader-wrapper').addClass('hidden')
           json = $.parseJSON(response)
           entry = json.data
 
@@ -274,12 +321,12 @@ $ ->
             entry_row = '<tr class="index-entry-row">' +
               '<td class="clusterpath-col-spacer"><input type="checkbox" class="cluster-path-checkbox_' + cluster.cluster_id + '"</td>' + # Spacer for the check box row
               '<td class="clusterpath-col-path">' + this.url + '</td>' +
-              '<td class="clusterpath-col-volume text-center">' + this.apac_region_volume + '</td>' +
-              '<td class="clusterpath-col-volume text-center">' + this.emrg_region_volume + '</td>' +
-              '<td class="clusterpath-col-volume text-center">' + this.eurp_region_volume + '</td>' +
+              '<td class="clusterpath-col-volume text-center">' + this.apac_volume + '</td>' +
+              '<td class="clusterpath-col-volume text-center">' + this.emrg_volume + '</td>' +
+              '<td class="clusterpath-col-volume text-center">' + this.eurp_volume + '</td>' +
               '<td class="clusterpath-col-volume text-center">' + this.glob_volume + '</td>' +
-              '<td class="clusterpath-col-volume text-center">' + this.japn_region_volume + '</td>' +
-              '<td class="clusterpath-col-volume text-center">' + this.na_region_volume + '</td>' +
+              '<td class="clusterpath-col-volume text-center">' + this.japn_volume + '</td>' +
+              '<td class="clusterpath-col-volume text-center">' + this.noam_volume + '</td>' +
               '<td class="clusterpath-col-wbrs text-center">' + this.wbrs_score + '</td>' +
               '</tr>'
             entry_rows.push entry_row
@@ -291,6 +338,8 @@ $ ->
           td = $(tr).next('tr').find('td:first')
           $(td).addClass 'nested-complaint-data-wrapper'
         error: (response) ->
+          $('.cluster-mgt-loader-wrapper').addClass('hidden')
+          std_api_error(response, "There was an error loading cluster data.", reload: false)
       )
 
 

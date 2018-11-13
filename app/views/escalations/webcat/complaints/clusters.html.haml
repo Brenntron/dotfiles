@@ -4,41 +4,37 @@
   - content_for(:webcat_icon) do
     icon-categories
 
+  .cluster-mgt-loader-wrapper.hidden
+    .gear-loader-wrapper
+      = inline_svg 'icon_gears_loader.svg', class: 'gears-loader'
+    %span.loader-msg Loading data...
+    %input#user_id{type: 'hidden', name: 'user_id', value: "#{current_user.id}"}
   .complaint-mgt-top-area.cluster-mgt-top-area
     .row.cluster-title
-      .col-xs-3.dashboard-left-data
+      .col-xl-3.col-lg-4.col-md-5.col-sm-6.col-xs-12.dashboard-left-data
         %h1= content_for :webcat_page
         %span.top-info-icon{class: "#{content_for :webcat_icon}"}
-      .col-xs-9.search-stg
+      .col-xl-9.col-lg-8.col-md-7.col-sm-6.col-xs-12.search-stg
         .row
-          .col-xs-8
+          .col-xs-10
             .row
               .col-xs-9
-                %input.text_field.search-box{placeholder: 'Regex', autofocus: 'true'}
+                %input#cluster_filter_field.text_field.search-box{placeholder: 'Regex', autofocus: 'true'}
               .col-xs-3.no_pad
-                %button.primary{class:'apply-filter-btn icon-filter-white'}Apply Filter
-          .col-xs-4
-            .row.search-options-row.btn-layout
-              .col-xs-6
-                .radio
-                  %label
-                    %input{name: 'choice', type: 'radio', value: 'value'}
-                    Include Pattern
-              .col-xs-6
-                .radio
-                  %label
-                    %input{name: 'choice', type: 'radio', value: 'value'}
-                    Exclude Pattern
+                %button.primary{onclick: 'apply_filter_to_table()', class:'apply-filter-btn icon-filter-white'}Apply Filter
+
   .row
     .col-xs-6.temp-spacer
       .row.default-padding
+
         .result-label.vertical-separator
           Current Cluster Entries:
-          %span 2,354
+          %span#total_results
         .result-label
           Regex:
           %span \d
-      .toolbar
+
+      .toolbar.cluster-table-toolbar
         .div
           %label.toolbar-section-label View
           %button.toolbar-button.icon-opened-selected.esc-tooltipped{onclick: 'open_selected()', type: 'button', title: 'Open Viewable'}
@@ -52,8 +48,8 @@
       .card
         .content-label-sm Comment
         .card-body
-          %input.text_field
-          %button.toolbar-button.icon-submit Submit Changes
+          %input#cluster_comment_field.text_field
+          %button.toolbar-button.icon-submit{'onclick': 'categorize_clusters()'} Submit Changes
 
   .row
     .col-xs-12
