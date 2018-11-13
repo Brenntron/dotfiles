@@ -47,7 +47,7 @@
                           Unassign
 
 
-    .col-xs-2.col-with-divider
+    .col-xs-3.col-with-divider
       .dispute-status-col-wrapper
         %label.content-label-sm
           Status
@@ -60,6 +60,7 @@
                 NEW
               - else
                 = @dispute.status
+
             .dropdown-menu.inline-dropdown-menu#show-edit-ticket-status-dropdown{'aria-labelledby': 'show-edit-ticket-status-button'}
               %ul
                 %li.status-radio-wrapper
@@ -140,6 +141,14 @@
                   .button-row-center
                     %button.primary{onClick: 'show_page_edit_status()'}
                       Submit
+
+          - if @dispute&.status_comment.present?
+            %button.status-comment-button.esc-tooltipped{title: @dispute&.status_comment}
+          - elsif @dispute&.resolution_comment.present?
+            %button.status-comment-button.esc-tooltipped{title: @dispute&.resolution_comment}
+          - else
+            %button.status-comment-button.esc-tooltipped
+
         - else
           .duplicate-status-notice
             =@dispute.resolution
@@ -149,7 +158,7 @@
           Suggested Disposition
         .disposition.disp-negative
           = @dispute.suggested_d
-    .col-xs-3.col-with-divider
+    .col-xs-2.col-with-divider
       %label.content-label-sm
         Dispute Entries
       %div
