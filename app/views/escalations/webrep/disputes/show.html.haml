@@ -60,7 +60,7 @@
                 NEW
               - else
                 = @dispute.status
-            %button.status-comment-button.esc-tooltipped{title: @dispute&.dispute_comments&.last&.comment}
+
 
             .dropdown-menu.inline-dropdown-menu#show-edit-ticket-status-dropdown{'aria-labelledby': 'show-edit-ticket-status-button'}
               %ul
@@ -126,6 +126,10 @@
                   .button-row-center
                     %button.primary{onClick: 'show_page_edit_status()'}
                       Submit
+
+          %button.status-comment-button.esc-tooltipped{title: @dispute&.dispute_comments&.last&.comment}
+
+
         - else
           .duplicate-status-notice
             =@dispute.resolution
