@@ -934,6 +934,9 @@ class Dispute < ApplicationRecord
         dispute.resolution_comment = comment
         dispute.case_closed_at = resolved_at
         dispute.case_resolved_at = resolved_at
+      else
+        dispute.resolution = nil
+        dispute.status_comment = comment
       end
 
       dispute.dispute_entries.each do |entry|

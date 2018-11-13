@@ -203,8 +203,9 @@ window.dispute_status_drop_down = (dispute_id) ->
       status = response.status
       comment = response.comment
 
-      $('.ticket-status-radio' + '#' + status).prop("checked", true);
-      $('.ticket-status-comment').text(comment)
+      $('.ticket-status-radio' + '#' + status).prop("checked", true)
+      if comment?
+        $('.ticket-status-comment').text(comment)
   )
 
 window.dispute_resolution_drop_down = (dispute_id) ->
@@ -218,13 +219,12 @@ window.dispute_resolution_drop_down = (dispute_id) ->
     dataType: 'json'
     success: (response) ->
       response = JSON.parse(response)
-
       resolution = response.resolution
       resolution_comment = response.resolution_comment
 
       # Fill in resolution radio button and comment
       $('.dispute-resolution-' + dispute_id + '#' + resolution).prop("checked", true)
-      $('#dispute-resolution-comment').text(resolution_comment)
+      $('.ticket-resolution-comment').text(resolution_comment)
   )
 
 window.entry_status_drop_down = (dispute_entry_id) ->
@@ -599,7 +599,7 @@ window.show_page_edit_status = () ->
 
   if resolution
     data.resolution = resolution
-    data.comment = $('#dispute-resolution-comment').val()
+    data.comment = $('.ticket-resolution-comment').val()
 
   std_msg_ajax(
     url: '/escalations/api/v1/escalations/webrep/disputes/set_disputes_status'

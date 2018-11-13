@@ -380,6 +380,8 @@ module API
               comment = ""
               if params[:resolution].present?
                 resolution = params[:resolution]
+              else
+                resolution = nil
               end
 
               if params[:comment].present?
@@ -451,7 +453,11 @@ module API
               std_api_v2 do
                 dispute = Dispute.find(permitted_params['dispute_id'])
                 status = dispute.status
-                comment = dispute.resolution_comment
+                if dispute.resolution.present?
+                  comment = dispute.resolution_comment
+                else
+                  comment = dispute.status_comment
+                end
 
                 {:status => status, :comment => comment}.to_json
               end
