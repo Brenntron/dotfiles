@@ -278,7 +278,6 @@ Feature: Disputes
     And I click ".mng-resolution-message-templates-button"
     When I click through ".delete-resolution-message-template" and accept confirmation
     And I wait for "3" seconds
-
     Then I should see "RESOLUTION MESSAGE TEMPLATE DELETED."
 
   @javascript
