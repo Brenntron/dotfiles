@@ -306,22 +306,3 @@ Feature: Webrep communications
     Then I click "Send"
     And I wait for "30" seconds
     And I should see "EMAIL SENT"
-
-  @javascript
-  Scenario: A user selects a template and updates it
-    Given a user with role "webrep user" exists and is logged in
-    And a resolution message template exists
-    And the following disputes exist and have entries:
-      |id  |
-      |5370|
-    And I goto "/escalations/webrep/disputes/5370"
-    And I click ".mng-resolution-message-templates-button"
-    Then I should see "Templar"
-    Then I should see "Axe"
-    Given I click ".edit-resolution-message-template"
-    Then I wait for "3" seconds
-    Then I should see content "This is a test." within "#edit-resolution-message-template-body"
-    Given I fill in "edit-resolution-message-template-body" with "ABC"
-    And I click "#edit-resolution-message-template"
-    Then I wait for "3" seconds
-    Then I should see "RESOLUTION MESSAGE TEMPLATE UPDATED."
