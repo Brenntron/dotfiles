@@ -308,16 +308,20 @@ Feature: Webrep communications
     And I should see "EMAIL SENT"
 
   @javascript
-  Scenario: a user attaches a file to an email and sends it
+  Scenario: A user selects a template and updates it
     Given a user with role "webrep user" exists and is logged in
     And a resolution message template exists
     And the following disputes exist and have entries:
-    |id  |
-    |5370|
+      |id  |
+      |5370|
     And I goto "/escalations/webrep/disputes/5370"
     And I click ".mng-resolution-message-templates-button"
-    Then take a screenshot
     Then I should see "Templar"
     Then I should see "Axe"
-    Then I should see "This is a test."
-
+    Given I click ".edit-resolution-message-template"
+    Then I wait for "3" seconds
+    Then I should see content "This is a test." within "#edit-resolution-message-template-body"
+    Given I fill in "edit-resolution-message-template-body" with "ABC"
+    And I click "#edit-resolution-message-template"
+    Then I wait for "3" seconds
+    Then I should see "RESOLUTION MESSAGE TEMPLATE UPDATED."

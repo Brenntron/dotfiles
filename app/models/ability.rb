@@ -68,7 +68,7 @@ class Ability
 
     if role_names.include?('webrep user')
       can :manage, [Dispute, DisputeComment, DisputeEmail, DisputeEmailAttachment, Attachment, Note,
-                    DisputeEntry, EmailTemplate, Wbrs::ManualWlbl]
+                    DisputeEntry, EmailTemplate, Wbrs::ManualWlbl, ResolutionMessageTemplate]
       can :publish_to_bugzilla, Note
     end
 
@@ -100,7 +100,7 @@ class Ability
       can [:manage, :acknowledge_bug, :import, :toggle_liberty], ResearchBug do |bug|
         bug.check_permission(current_user)
       end
-      can :manage, [EscalationLink, Attachment, Note, Rule, ResolutionMessageTemplate]
+      can :manage, [EscalationLink, Attachment, Note, Rule]
       can :publish, Rule
       can :publish_to_bugzilla, Note
     end
