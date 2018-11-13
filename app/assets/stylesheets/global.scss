@@ -3486,13 +3486,16 @@ input.communication-subject {
    margin-left: 42px;
    font-weight: 300;
    font-size: 9pt;
-   position: relative;
-   top: 9px;
+  top: 22px;
+  position: absolute;
  }
 
 .select-a-template{
-  margin-left: 30px;
+  margin-left: 26px;
   margin-top: 2px;
+  color: $type-base-color;
+  text-transform: uppercase;
+  font-weight: 700;
 }
 
 .select-resolution-message-templates-button {
@@ -5074,6 +5077,17 @@ h5.entry-details-table-header {
   min-height: 40px;
 }
 
+.non-resolution-submit-wrapper .content-label-sm {
+  margin-top: 12px;
+}
+
+.resolution-message-template-select {
+  font-size: 8pt;
+  border-radius: 0;
+  border: 1px solid darken($faint-neutral-color, 5%);
+  width: 100%;
+}
+
 #wlbl_adjust_entries, #wlbl_adjust_entries_index {
   margin-top: 0;
 }
@@ -5513,7 +5527,12 @@ td.ticket-total::before {
 .non-resolution-submit-wrapper {
   padding: 12px !important;
   background-color: $faint-neutral-color;
-  border-radius: 0 0 4px 4px;
+  border-radius: 0 4px 4px 0;
+  position: absolute;
+  width: 200px;
+  top: 0;
+  left: 100%;
+  height: 100%;
 }
 
 .non-resolution-submit-wrapper textarea, .resolution-comment-wrapper textarea {
