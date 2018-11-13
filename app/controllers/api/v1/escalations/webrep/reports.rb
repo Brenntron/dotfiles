@@ -162,6 +162,21 @@ module API
             end
 
 
+            params do
+              requires :from, type: String
+              requires :to, type: String
+            end
+
+            get 'tickets_submitted_by_submitter_per_day' do
+              authorize!(:index, Dispute)
+
+              report_data = Dispute.tickets_submitted_by_submitter_per_day(params[:from], params[:to])
+
+              response_data = {:status => "success", :data => report_data}
+
+              response_data.to_json
+            end
+
           end
         end
       end
