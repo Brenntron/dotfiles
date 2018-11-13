@@ -4473,6 +4473,20 @@ table > tbody > tr > td.dispute_rep_tools {
   background-color: transparent;
 }
 
+
+.status-comment-button {
+  background-image: url(image_path('icon_status_comment.svg'));
+  background-repeat: no-repeat;
+  width: 20px;
+  height: 20px;
+  display: inline-block;
+  border: none;
+  background-color: transparent;
+  margin-left: 15px;
+  position: absolute;
+  margin-top: 3px;
+}
+
 .dropdown-menu-content-block {
   display: inline-block;
   width: 50%;
