@@ -453,10 +453,12 @@ module API
               std_api_v2 do
                 dispute = Dispute.find(permitted_params['dispute_id'])
                 status = dispute.status
-                if dispute.resolution.present?
+                if dispute.status == DisputeEntry::STATUS_RESOLVED
                   comment = dispute.resolution_comment
-                else
+                elsif dispute.status != DisputeEntry::STATUS_RESOLVED
                   comment = dispute.status_comment
+                else
+                  comment = nil
                 end
 
                 {:status => status, :comment => comment}.to_json
