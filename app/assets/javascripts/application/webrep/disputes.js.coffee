@@ -1652,12 +1652,16 @@ $ ->
 
 $ ->
 
-
-
   window.updateGraph = (label, barGraphName, e) ->
     originalData = []
 
-    barGraphName == 'graph-ticket-entries-closed'
+    if barGraphName == 'userTicketClosedGraph'
+      originalData = window.userTicketClosedGraphDatasets
+    else
+      alert 'Graph with name ' + barGraphName + ' is not defined'
+      return
+
+#    barGraphName == 'graph-ticket-entries-closed'
 #      originalData = window.barDataSets
 #    else if barName == 'barChartGrouped'
 #      originalData = window.barChartGroupedData
@@ -1682,6 +1686,27 @@ $ ->
   ticketTypeEData     = [8, 7, 15, 12, 0, 0, 0]
   ticketTypeEWData    = [0, 0, 0, 9, 0, 0, 0]
 
+  window.userTicketClosedGraphDatasets = [
+    {
+      label: 'Total Ticket Entries'
+      backgroundColor: '#6dbcdb'
+      data: ticketTypeTotalData
+    }
+    {
+      label: 'W'
+      backgroundColor: '#E47433'
+      data: ticketTypeWData
+    }
+    {
+      label: 'E'
+      backgroundColor: '#5FB665'
+      data: ticketTypeEData
+    }
+    {
+      label: 'EW'
+      backgroundColor: '#C14B92'
+      data: ticketTypeEWData
+    }]
   ## Test data breakdown for a monthly dataset - we'll say 6 months
 #  ticketTypeChartLabels = ['June', 'July', 'August', 'September', 'October', 'November']
 #  ticketTypeTotalData = [120, 124, 130, 128, 110, 142]
@@ -1690,31 +1715,11 @@ $ ->
 #  ticketTypeEWData = [30, 16, 57, 57, 25, 50]
 
 
-  new Chart($('#graph-ticket-entries-closed'),
+  window.userTicketClosedGraph = new Chart($('#graph-ticket-entries-closed'),
     type: 'bar'
     data:
       labels: ticketTypeChartLabels
-      datasets: [
-        {
-          label: 'Total Ticket Entries'
-          backgroundColor: '#6dbcdb'
-          data: ticketTypeTotalData
-        }
-        {
-          label: 'W'
-          backgroundColor: '#E47433'
-          data: ticketTypeWData
-        }
-        {
-          label: 'E'
-          backgroundColor: '#5FB665'
-          data: ticketTypeEData
-        }
-        {
-          label: 'EW'
-          backgroundColor: '#C14B92'
-          data: ticketTypeEWData
-        }]
+      datasets: window.userTicketClosedGraphDatasets,
     options:
       legend:
         display: false
