@@ -228,7 +228,75 @@ window.set_initial_date_span = () ->
 
   refresh_single_open_tickets_table(user_id)
 
+window.build_graph_ticket_entries_submitter = () ->
+
+  from = localStorage.getItem('webrep_report_range_from')
+  to = localStorage.getItem('webrep_report_range_to')
+
+  data = {
+    from: from,
+    to: to
+  }
+
+  headers = {'Token': $('input[name="token"]').val(), 'Xmlrpc-Token': $('input[name="xml_token"]').val()}
+  $.ajax(
+    url: '/escalations/api/v1/escalations/webrep/reports/tickets_submitted_by_submitter_per_day'
+    method: 'GET'
+    headers: headers
+    data: data
+    dataType: 'json'
+    success: (response) ->
+
+      json = $.parseJSON(response)
+
+      submitterGuestChartData = json["data"]["guest_chart_data"]
+      submitterCustomerChartData = json["data"]["customer_chart_data"]
+      submitterChartLabels = json["data"]["chart_labels"]
+
+
+      new Chart($('#graph-ticket-entries-submitter'),
+        type: 'bar'
+        data:
+          labels: submitterChartLabels
+          datasets: [
+            {
+              label: 'Customer'
+              backgroundColor: '#6dbcdb'
+              data: submitterCustomerChartData
+            }
+            {
+              label: 'Guest'
+              backgroundColor: '#3e5a72'
+              data: submitterGuestChartData
+            }]
+        options:
+          legend:
+            display: false
+          scales:
+            yAxes: [
+              {
+                gridLines: display: false
+                ticks: {
+                  min: 0
+                  stepSize: 10
+                }
+              }
+            ]
+            xAxes: [
+              {
+                gridLines: display: false
+                ticks: {
+                  autoSkip: false
+                }
+              }
+            ]
+      )
+
+    error: (response) ->
+      popup_response_error(response, 'Error building chart')
+  )
 
 $ ->
   $(document).ready ->
     window.set_initial_date_span()
+    window.build_graph_ticket_entries_submitter()

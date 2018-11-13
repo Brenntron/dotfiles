@@ -1935,47 +1935,47 @@ $ ->
 
   # Range of dates displayed, display however, this format is not mandatory.
   # These three chunks will need to have the json data reformatted and inserted into them as separate arrays
-  submitterChartLabels = ['September 2', 'September 3', 'September 4', 'September 5', 'September 6', 'September 7', 'September 8']
-  submitterCustomerChartData = [20, 24, 30, 28, 10, 5, 13]
-  submitterGuestChartData = [15, 8, 18, 16, 12, 4, 2]
+  #submitterChartLabels = ['September 2', 'September 3', 'September 4', 'September 5', 'September 6', 'September 7', 'September 8']
+  #submitterCustomerChartData = [20, 24, 30, 28, 10, 5, 13]
+  #submitterGuestChartData = [15, 8, 18, 16, 12, 4, 2]
 
-  new Chart($('#graph-ticket-entries-submitter'),
-    type: 'bar'
-    data:
-      labels: submitterChartLabels
-      datasets: [
-        {
-        label: 'Customer'
-        backgroundColor: '#6dbcdb'
-        data: submitterCustomerChartData
-        }
-        {
-          label: 'Guest'
-          backgroundColor: '#3e5a72'
-          data: submitterGuestChartData
-        }]
-    options:
-      legend:
-        display: false
-      scales:
-        yAxes: [
-          {
-            gridLines: display: false
-            ticks: {
-              min: 0
-              stepSize: 10
-            }
-          }
-        ]
-        xAxes: [
-          {
-            gridLines: display: false
-            ticks: {
-              autoSkip: false
-            }
-          }
-        ]
-    )
+  #new Chart($('#graph-ticket-entries-submitter'),
+  #  type: 'bar'
+  #  data:
+  #    labels: submitterChartLabels
+  #    datasets: [
+  #      {
+  #      label: 'Customer'
+  #      backgroundColor: '#6dbcdb'
+  #      data: submitterCustomerChartData
+  #      }
+  #      {
+  #        label: 'Guest'
+  #        backgroundColor: '#3e5a72'
+  #        data: submitterGuestChartData
+  #      }]
+  #  options:
+  #    legend:
+  #      display: false
+  #    scales:
+  #      yAxes: [
+  #        {
+  #          gridLines: display: false
+  #          ticks: {
+  #            min: 0
+  #            stepSize: 10
+  #          }
+  #        }
+  #      ]
+  #      xAxes: [
+  #        {
+  #          gridLines: display: false
+  #          ticks: {
+  #            autoSkip: false
+  #          }
+  #        }
+  #      ]
+  #  )
 
 
 

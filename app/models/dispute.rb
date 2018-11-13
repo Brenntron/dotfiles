@@ -1436,12 +1436,20 @@ class Dispute < ApplicationRecord
 
   def self.tickets_submitted_by_submitter_per_day(from, to)
 
+    #from = "Sun, 06 May 2018 17:40:08 GMT"
+
     from = Time.parse(from)
     to = Time.parse(to)
 
-    main_results = Dispute.joins(:dispute_entries).where(:user_id => user.id).where("created_at between '#{from}' and '#{to}'")
+    main_results = Dispute.joins(:dispute_entries).where("disputes.created_at between '#{from}' and '#{to}'")
 
     report_data = {}
+    final_report_data = {}
+
+    final_report_data[:chart_labels] = []
+    final_report_data[:customer_chart_data] = []
+    final_report_data[:guest_chart_data] = []
+
 
     swap_day = from
 
@@ -1450,6 +1458,8 @@ class Dispute < ApplicationRecord
        report_data[swap_day.to_s] = {}
        report_data[swap_day.to_s][:customer_count] = 0
        report_data[swap_day.to_s][:guest_count] = 0
+
+       final_report_data[:chart_labels] << swap_day.to_s
 
        day_results = main_results.select {|result| Date.parse(result.created_at.to_s) == Date.parse(swap_day.to_s)}
 
@@ -1462,10 +1472,13 @@ class Dispute < ApplicationRecord
          end
        end
 
+       final_report_data[:customer_chart_data] << report_data[swap_day.to_s][:customer_count]
+       final_report_data[:guest_chart_data] << report_data[swap_day.to_s][:guest_count]
+
        swap_day = swap_day + 1.day
     end
 
-    report_data
+    final_report_data
 
   end
 
