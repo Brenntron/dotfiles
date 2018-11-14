@@ -1838,39 +1838,33 @@ $ ->
 
   closedTicketNumbers = [375502, 375504, 375513, 375515, 375516, 375517, 375518, 375519, 375520, 375521, 375522]
   timeToCloseTickets = [1, 1.3, 1.2, 1.5, 1.7, 1.4, 1.8, 0.9, 1, 1.1, 1.2, 1.5, 1.6]
+  averageTimeToClose = [1.4, 1.4, 1.4, 1.4, 1.4, 1.4, 1.4, 1.4, 1.4, 1.4, 1.4, 1.4]
+
+
+  window.timeCloseTicketsDataSets = [
+    {
+      data: timeToCloseTickets
+      label: 'Time to close:'
+      backgroundColor: '#6dbcdb'
+      borderWidth: .5
+      fill: true
+      lineTension: 0
+    }
+    {
+      data: averageTimeToClose
+      label: 'ticket'
+      backgroundColor: '#d0ecfd'
+      borderWidth: .5
+      fill: true
+      lineTension: 0
+    }
+  ]
 
   new Chart($('#time-to-close-tickets-linechart'),
     type: 'line'
     data:
       labels: closedTicketNumbers
-      datasets: [
-        {
-          data: timeToCloseTickets
-          label: 'Time to close:'
-          backgroundColor: '#6dbcdb'
-          fill: true
-          lineTension: 0
-        }
-        {
-          data: [
-            1.4
-            1.4
-            1.4
-            1.4
-            1.4
-            1.4
-            1.4
-            1.4
-            1.4
-            1.4
-            1.4
-          ]
-          label: 'ticket'
-          backgroundColor: 'rgba(135, 206, 250, .1)'
-          fill: true
-          lineTension: 0
-        }
-      ]
+      datasets: window.timeCloseTicketsDataSets
     options:
       legend: false
       elements:
@@ -1904,7 +1898,18 @@ $ ->
               display: false
             }
           }
-        ])
+          ]
+#      annotation: {
+#        annotations: [{
+#          type: 'line'
+#          mode: 'horizontal'
+#          scaleID: 'y-axis-0'
+#          value: averageTimeToClose
+#          borderColor: '#d0ecfd'
+#          borderWidth: 1
+#        }]
+#      }
+ )
 
 
 
