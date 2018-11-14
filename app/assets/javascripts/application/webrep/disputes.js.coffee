@@ -1686,6 +1686,14 @@ $ ->
   ticketTypeEData     = [8, 7, 15, 12, 0, 0, 0]
   ticketTypeEWData    = [0, 0, 0, 9, 0, 0, 0]
 
+  ## Test data breakdown for a monthly dataset - we'll say 6 months
+  #  ticketTypeChartLabels = ['June', 'July', 'August', 'September', 'October', 'November']
+  #  ticketTypeTotalData = [120, 124, 130, 128, 110, 142]
+  #  ticketTypeWData = [45, 67, 52, 31, 55, 42]
+  #  ticketTypeEData = [28, 37, 15, 62, 50, 50]
+  #  ticketTypeEWData = [30, 16, 57, 57, 25, 50]
+
+
   window.userTicketClosedGraphDatasets = [
     {
       label: 'Total Ticket Entries'
@@ -1707,12 +1715,6 @@ $ ->
       backgroundColor: '#C14B92'
       data: ticketTypeEWData
     }]
-  ## Test data breakdown for a monthly dataset - we'll say 6 months
-#  ticketTypeChartLabels = ['June', 'July', 'August', 'September', 'October', 'November']
-#  ticketTypeTotalData = [120, 124, 130, 128, 110, 142]
-#  ticketTypeWData = [45, 67, 52, 31, 55, 42]
-#  ticketTypeEData = [28, 37, 15, 62, 50, 50]
-#  ticketTypeEWData = [30, 16, 57, 57, 25, 50]
 
 
   window.userTicketClosedGraph = new Chart($('#graph-ticket-entries-closed'),
@@ -1834,41 +1836,17 @@ $ ->
   )
 
 
+  closedTicketNumbers = [375502, 375504, 375513, 375515, 375516, 375517, 375518, 375519, 375520, 375521, 375522]
+  timeToCloseTickets = [1, 1.3, 1.2, 1.5, 1.7, 1.4, 1.8, 0.9, 1, 1.1, 1.2, 1.5, 1.6]
 
-  new Chart(document.getElementById('line-chart'),
+  new Chart($('#time-to-close-tickets-linechart'),
     type: 'line'
     data:
-      labels: [
-        0
-        1
-        3
-        4
-        5
-        6
-        7
-        8
-        9
-        10
-        11
-      ]
+      labels: closedTicketNumbers
       datasets: [
         {
-          data: [
-            1
-            1.3
-            1.2
-            1.5
-            1.7
-            1.4
-            1.8
-            0.9
-            1
-            1.1
-            1.2
-            1.5
-            1.6
-          ]
-          label: 'close'
+          data: timeToCloseTickets
+          label: 'Time to close:'
           backgroundColor: '#6dbcdb'
           fill: true
           lineTension: 0
