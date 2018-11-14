@@ -231,6 +231,21 @@ Feature: Disputes
     Then I wait for "3" seconds
     Then I should receive a file of type "application/octet-stream"
 
+  @javascript
+  Scenario: A user creates a new resolution message template
+    Given a user with role "webrep user" exists and is logged in
+    And the following disputes exist and have entries:
+      |id  |
+      |5370|
+    And I goto "/escalations/webrep/disputes/5370"
+    And I click ".mng-resolution-message-templates-button"
+    And I click "#create-resolution-message-template"
+    And I fill in "new-resolution-message-template-name" with "Testimony"
+    And I fill in "new-resolution-message-template-desc" with "Apples and Carrots"
+    And I fill in "new-resolution-message-template-body" with "Teenage Mutant Ninja Turtles"
+    When I click "#save-resolution-message-template"
+    And I wait for "3" seconds
+    Then I should see "RESOLUTION MESSAGE TEMPLATE CREATED."
 
   @javascript
   Scenario: A user selects a resolution message template and updates it
@@ -250,22 +265,6 @@ Feature: Disputes
     When I click "#edit-resolution-message-template"
     And I wait for "3" seconds
     Then I should see "RESOLUTION MESSAGE TEMPLATE UPDATED."
-
-  @javascript
-  Scenario: A user creates a new resolution message template
-    Given a user with role "webrep user" exists and is logged in
-    And the following disputes exist and have entries:
-      |id  |
-      |5370|
-    And I goto "/escalations/webrep/disputes/5370"
-    And I click ".mng-resolution-message-templates-button"
-    And I click "#create-resolution-message-template"
-    And I fill in "new-resolution-message-template-name" with "Testimony"
-    And I fill in "new-resolution-message-template-desc" with "Apples and Carrots"
-    And I fill in "new-resolution-message-template-body" with "Teenage Mutant Ninja Turtles"
-    When I click "#save-resolution-message-template"
-    And I wait for "3" seconds
-    Then I should see "RESOLUTION MESSAGE TEMPLATE CREATED."
 
   @javascript
   Scenario: A user deletes a resolution message template
