@@ -1033,7 +1033,6 @@ $ ->
     if ($('.dispute_check_box:checked').length > 0)
 # Select Status
       $('.ticket-status-radio-label').click ->
-        console.log("Wtf")
         radio_button = $(this).prev('.ticket-status-radio')
         $(radio_button[0]).trigger('click')
         if $(radio_button).attr('id') == 'RESOLVED_CLOSED'

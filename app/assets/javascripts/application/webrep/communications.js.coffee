@@ -574,7 +574,6 @@ $ ->
     )
 
   $('.delete-template').on 'click', ->
-    console.log("delete-template")
     template_id = $(this).attr('template_id')
     confirmation = confirm('Are you sure you want to delete this template?')
 
