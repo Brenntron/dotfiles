@@ -931,6 +931,11 @@ class Dispute < ApplicationRecord
         dispute.resolution_comment = comment
         dispute.case_closed_at = resolved_at
         dispute.case_resolved_at = resolved_at
+        dispute.status_comment = nil
+      else
+        dispute.resolution = nil
+        dispute.resolution_comment = nil
+        dispute.status_comment = comment
       end
 
       dispute.dispute_entries.each do |entry|
@@ -1008,6 +1013,13 @@ class Dispute < ApplicationRecord
       dispute_packet = dispute.attributes.slice(*%w{id priority status resolution})
       dispute_packet[:case_number] = dispute.case_id_str
       dispute_packet[:status] = "<span class='dispute_status' id='status_#{dispute.id}'> #{dispute.status} </span>"
+      if dispute&.status_comment.present?
+        dispute_packet[:status_comment] = dispute&.status_comment
+      elsif dispute&.resolution_comment.present?
+        dispute_packet[:status_comment] = dispute&.resolution_comment
+      else
+        dispute_packet[:status_comment] = nil
+      end
       dispute_packet[:case_link] = "<a href='/escalations/webrep/disputes/#{dispute.id}'>" + dispute_packet[:case_number] + "</a>"
       dispute_packet[:submitter_org] = dispute.customer.company.name
       dispute_packet[:submitter_type] = dispute.submitter_type
