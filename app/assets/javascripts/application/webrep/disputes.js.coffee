@@ -1770,74 +1770,74 @@ $ ->
 
 
 #  Test data for Closed Email Entry Resolutions
-  emailEntryResolutionLabels = ['Fixed', 'Unchanged', 'Fixed FP', 'Other']
-  emailEntryData = [3,6,7,0]
+#  emailEntryResolutionLabels = ['Fixed', 'Unchanged', 'Fixed FP', 'Other']
+#  emailEntryData = [3,6,7,0]
 
-  new Chart($('#closed-email-entries-resolution-piechart'),
-    type: 'pie'
-    data:
-      labels: emailEntryResolutionLabels
-      datasets: [ {
-        label: 'close-email-entries'
-        backgroundColor: [
-          '#3e5a72'
-          '#6dbcdb'
-          '#666'
-        ]
-        data: emailEntryData
-      } ]
-    options:
-      legend: false
-      pieceLabel:
-        render: (args) ->
-          return args.percentage + '%'
-        position: 'outside'
-        segment: false
-        precision: 2
-        showZero: true
-        fontStyle: 'bolder'
-        overlap: false
-        showActualPercentages: true
-  )
+#  new Chart($('#closed-email-entries-resolution-piechart'),
+#    type: 'pie'
+#    data:
+#      labels: emailEntryResolutionLabels
+#      datasets: [ {
+#        label: 'close-email-entries'
+#        backgroundColor: [
+#          '#3e5a72'
+#          '#6dbcdb'
+#          '#666'
+#        ]
+#        data: emailEntryData
+#      } ]
+#    options:
+#      legend: false
+#      pieceLabel:
+#        render: (args) ->
+#          return args.percentage + '%'
+#        position: 'outside'
+#        segment: false
+#        precision: 2
+#        showZero: true
+#        fontStyle: 'bolder'
+#        overlap: false
+#        showActualPercentages: true
+#  )
 
 
 
-  new Chart(document.getElementById('pie-chart2'),
-    type: 'pie'
-    data:
-      labels: [
-        'Fixed'
-        'Unchanged'
-        'Fixed FP'
-      ]
-      datasets: [ {
-        label: 'close-email-entries'
-        backgroundColor: [
-          '#3e5a72'
-          '#6dbcdb'
-          '#666'
-        ]
-        data: [
-          2478
-          3267
-          4202
-        ]
-      } ]
-    options:
-      legend: false
-      pieceLabel:
-        render: (args) ->
-          return args.percentage + '%'
-        position: 'outside'
-        label: 'Unchanched'
-        segment: false
-        precision: 2
-        showZero: true
-        fontStyle: 'bolder'
-        overlap: false
-        showActualPercentages: true
+#  new Chart(document.getElementById('closed-web-entries-resolution-piechart'),
+#    type: 'pie'
+#    data:
+#      labels: [
+#        'Fixed'
+#        'Unchanged'
+#        'Fixed FP'
+#      ]
+#      datasets: [ {
+#        label: 'close-email-entries'
+#        backgroundColor: [
+#          '#3e5a72'
+#          '#6dbcdb'
+#          '#666'
+#        ]
+#        data: [
+#          2478
+#          3267
+#          4202
+#        ]
+#      } ]
+#    options:
+#      legend: false
+#      pieceLabel:
+#        render: (args) ->
+#          return args.percentage + '%'
+#        position: 'outside'
+#        label: 'Unchanched'
+#        segment: false
+#        precision: 2
+#        showZero: true
+#        fontStyle: 'bolder'
+#        overlap: false
+#        showActualPercentages: true
 
-  )
+#  )
 
 
 

@@ -295,7 +295,140 @@ window.build_graph_ticket_entries_submitter = () ->
       popup_response_error(response, 'Error building chart')
   )
 
+window.build_single_closed_email_entries_resolution_piechart = () ->
+
+  from = localStorage.getItem('webrep_report_range_from')
+  to = localStorage.getItem('webrep_report_range_to')
+  user_id = $("#user_id").val()
+
+  data = {
+    from: from,
+    to: to,
+    users: [user_id],
+    submission_types: ["e"]
+  }
+
+  headers = {'Token': $('input[name="token"]').val(), 'Xmlrpc-Token': $('input[name="xml_token"]').val()}
+  $.ajax(
+    url: '/escalations/api/v1/escalations/webrep/reports/closed_ticket_entries_by_resolution_report'
+    method: 'GET'
+    headers: headers
+    data: data
+    dataType: 'json'
+    success: (response) ->
+
+      json = $.parseJSON(response)
+
+      emailEntryResolutionLabels = json["data"]["chart_labels"]#['Fixed', 'Unchanged', 'Fixed FP', 'Other']
+      emailEntryData = json["data"]["chart_data"]#[3,6,7,0]
+
+      #table data for Melissa since she refuses to use a DataTable.
+      #json structure is similar to datatable expectation, a hash with keys matching expected column names
+      #{:resolution => 'shiz', :percent => 0.75, :count => 35}
+      tableData = json["data"]["table_data"]
+
+      new Chart($('#closed-email-entries-resolution-piechart'),
+        type: 'pie'
+        data:
+          labels: emailEntryResolutionLabels
+          datasets: [ {
+            label: 'close-email-entries'
+            backgroundColor: [
+              '#3e5a72'
+              '#6dbcdb'
+              '#666'
+            ]
+            data: emailEntryData
+          } ]
+        options:
+          legend: false
+          pieceLabel:
+            render: (args) ->
+              return args.percentage + '%'
+            position: 'outside'
+            segment: false
+            precision: 2
+            showZero: true
+            fontStyle: 'bolder'
+            overlap: false
+            showActualPercentages: true
+      )
+
+    error: (response) ->
+      popup_response_error(response, 'Error building chart')
+  )
+
+
+window.build_single_closed_web_entries_resolution_piechart = () ->
+
+  from = localStorage.getItem('webrep_report_range_from')
+  to = localStorage.getItem('webrep_report_range_to')
+  user_id = $("#user_id").val()
+
+  data = {
+    from: from,
+    to: to,
+    users: [user_id],
+    submission_types: ["w"]
+  }
+
+  headers = {'Token': $('input[name="token"]').val(), 'Xmlrpc-Token': $('input[name="xml_token"]').val()}
+  $.ajax(
+    url: '/escalations/api/v1/escalations/webrep/reports/closed_ticket_entries_by_resolution_report'
+    method: 'GET'
+    headers: headers
+    data: data
+    dataType: 'json'
+    success: (response) ->
+
+      json = $.parseJSON(response)
+
+      emailEntryResolutionLabels = json["data"]["chart_labels"]#['Fixed', 'Unchanged', 'Fixed FP', 'Other']
+      emailEntryData = json["data"]["chart_data"]#[3,6,7,0]
+
+      #table data for Melissa since she refuses to use a DataTable.
+      #json structure is similar to datatable expectation, a hash with keys matching expected column names
+      #{:resolution => 'shiz', :percent => 0.75, :count => 35}
+      tableData = json["data"]["table_data"]
+
+      new Chart($('#closed-web-entries-resolution-piechart'),
+        type: 'pie'
+        data:
+          labels: emailEntryResolutionLabels
+          datasets: [ {
+            label: 'close-email-entries'
+            backgroundColor: [
+              '#3e5a72'
+              '#6dbcdb'
+              '#666'
+            ]
+            data: emailEntryData
+          } ]
+        options:
+          legend: false
+          pieceLabel:
+            render: (args) ->
+              return args.percentage + '%'
+            position: 'outside'
+            segment: false
+            precision: 2
+            showZero: true
+            fontStyle: 'bolder'
+            overlap: false
+            showActualPercentages: true
+      )
+
+    error: (response) ->
+      popup_response_error(response, 'Error building chart')
+  )
+
+
+
+
+
 $ ->
   $(document).ready ->
     window.set_initial_date_span()
     window.build_graph_ticket_entries_submitter()
+    window.build_single_closed_email_entries_resolution_piechart()
+    window.build_single_closed_web_entries_resolution_piechart()

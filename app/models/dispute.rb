@@ -1375,6 +1375,10 @@ class Dispute < ApplicationRecord
   end
 
   def self.closed_ticket_entries_by_resolution_report(users, from, to, submission_types)
+    #users = [User.find(1)]
+    #from = "Wed, 5 Sep 2018 17:40:08 GMT"
+    #to = "Thu, 20 Sep 2018 17:40:08 GMT"
+    #submission_types = ['w']
 
     from = Time.parse(from)
     to = Time.parse(to)
@@ -1385,48 +1389,50 @@ class Dispute < ApplicationRecord
 
     all_entries = main_results.map {|result| result.dispute_entries}.flatten.select {|entry| entry.case_resolved_at.present?}
     total_count = all_entries.size
-
+    #binding.pry
     results = {}
-    results[:chart_data] = {}
+    results[:chart_data] = []
+    results[:chart_labels] = ["Fixed FN", "Unchanged", "Fixed FP", "Other"]
     results[:table_data] = []
-    results[:chart_data][DisputeEntry::STATUS_RESOLVED_FIXED_FP] = all_entries.select {|entry| entry.resolution == DisputeEntry::STATUS_RESOLVED_FIXED_FP}.size.to_f / total_count.to_f
-    results[:chart_data][DisputeEntry::STATUS_RESOLVED_FIXED_FN] = all_entries.select {|entry| entry.resolution == DisputeEntry::STATUS_RESOLVED_FIXED_FN}.size.to_f / total_count.to_f
-    results[:chart_data][DisputeEntry::STATUS_RESOLVED_UNCHANGED] = all_entries.select {|entry| entry.resolution == DisputeEntry::STATUS_RESOLVED_UNCHANGED}.size.to_f / total_count.to_f
-    results[:chart_data][DisputeEntry::STATUS_RESOLVED_OTHER] = all_entries.select {|entry| entry.resolution == DisputeEntry::STATUS_RESOLVED_OTHER}.size.to_f / total_count.to_f
 
-    if results[:chart_data][DisputeEntry::STATUS_RESOLVED_FIXED_FP].nan?
-      results[:chart_data][DisputeEntry::STATUS_RESOLVED_FIXED_FP] = 0
+    results[:chart_data] << all_entries.select {|entry| entry.resolution == DisputeEntry::STATUS_RESOLVED_FIXED_FN}.size.to_f / total_count.to_f
+    results[:chart_data] << all_entries.select {|entry| entry.resolution == DisputeEntry::STATUS_RESOLVED_UNCHANGED}.size.to_f / total_count.to_f
+    results[:chart_data] << all_entries.select {|entry| entry.resolution == DisputeEntry::STATUS_RESOLVED_FIXED_FP}.size.to_f / total_count.to_f
+    results[:chart_data] << all_entries.select {|entry| entry.resolution == DisputeEntry::STATUS_RESOLVED_OTHER}.size.to_f / total_count.to_f
+
+    if results[:chart_data][0].nan?
+      results[:chart_data][0] = 0
     end
 
-    if results[:chart_data][DisputeEntry::STATUS_RESOLVED_FIXED_FN].nan?
-      results[:chart_data][DisputeEntry::STATUS_RESOLVED_FIXED_FN] = 0
+    if results[:chart_data][1].nan?
+      results[:chart_data][1] = 0
     end
 
-    if results[:chart_data][DisputeEntry::STATUS_RESOLVED_UNCHANGED].nan?
-      results[:chart_data][DisputeEntry::STATUS_RESOLVED_UNCHANGED] = 0
+    if results[:chart_data][2].nan?
+      results[:chart_data][2] = 0
     end
 
-    if results[:chart_data][DisputeEntry::STATUS_RESOLVED_OTHER].nan?
-      results[:chart_data][DisputeEntry::STATUS_RESOLVED_OTHER] = 0
+    if results[:chart_data][3].nan?
+      results[:chart_data][3] = 0
     end
 
     results[:table_data] << {:resolution => DisputeEntry::STATUS_RESOLVED_FIXED_FP,
-                             :percent => results[:chart_data][DisputeEntry::STATUS_RESOLVED_FIXED_FP],
+                             :percent => results[:chart_data][2],
                              :count => all_entries.select {|entry| entry.resolution == DisputeEntry::STATUS_RESOLVED_FIXED_FP}.size
                              }
 
     results[:table_data] << {:resolution => DisputeEntry::STATUS_RESOLVED_FIXED_FN,
-                             :percent => results[:chart_data][DisputeEntry::STATUS_RESOLVED_FIXED_FN],
+                             :percent => results[:chart_data][0],
                              :count => all_entries.select {|entry| entry.resolution == DisputeEntry::STATUS_RESOLVED_FIXED_FN}.size
     }
 
     results[:table_data] << {:resolution => DisputeEntry::STATUS_RESOLVED_UNCHANGED,
-                             :percent => results[:chart_data][DisputeEntry::STATUS_RESOLVED_UNCHANGED],
+                             :percent => results[:chart_data][1],
                              :count => all_entries.select {|entry| entry.resolution == DisputeEntry::STATUS_RESOLVED_UNCHANGED}.size
     }
 
     results[:table_data] << {:resolution => DisputeEntry::STATUS_RESOLVED_OTHER,
-                             :percent => results[:chart_data][DisputeEntry::STATUS_RESOLVED_OTHER],
+                             :percent => results[:chart_data][3],
                              :count => all_entries.select {|entry| entry.resolution == DisputeEntry::STATUS_RESOLVED_OTHER}.size
     }
 
