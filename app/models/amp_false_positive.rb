@@ -26,14 +26,14 @@ class AmpFalsePositive < ApplicationRecord
       ActiveRecord::Base.transaction do
         payload = message_payload["payload"]
 
-        self.amp_false_positive_files << AmpFalsePositiveFile.new(payload[file])
-        self.customer = Customer.find_or_create_by_email(payload[user][email]) #also use organization if possible
-        self.sha256 = message_payload['sha256']
-        self.source = message_payload['source']
-        self.description = payload['comment']['text']
-        self.product = payload['source']['name']
-        self.sr_id = message_payload['sr_id']
-        self.status = NEW
+        # self.amp_false_positive_files << AmpFalsePositiveFile.new(payload[file])
+        # self.customer = Customer.find_or_create_by_email(payload[user][email]) #also use organization if possible
+        # self.sha256 = message_payload['sha256']
+        # self.source = message_payload['source']
+        # self.description = payload['comment']['text']
+        # self.product = payload['source']['name']
+        # self.sr_id = message_payload['sr_id']
+        # self.status = NEW
 
 
 
