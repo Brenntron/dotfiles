@@ -1,12 +1,13 @@
 class BugzillaRest::Base
   include ActiveModel::Model
 
-  attr_reader :api_key, :token, :attributes
+  attr_reader :fields, :api_key, :token, :attributes
 
-  def initialize(attrs = {}, api_key: nil, token: nil)
+  def initialize(attrs = {}, fields: [], api_key:, token:)
     @api_key = api_key
     @token = token
-    @attributes = attrs
+    @fields = fields
+    @attributes = compact(indifferent(attrs).slice(*@fields))
   end
 
   def indifferent(attrs)
@@ -80,17 +81,16 @@ class BugzillaRest::Base
     # raise response.body unless 300 > response.code
     handle_errors(response)
 
-    response.body
+    response
   end
 
   def respond_to?(method_sym, include_private = false)
-    byebug
     case
-    when FIELDS.include?(method_sym)
+    when fields.include?(method_sym)
       true
     when /\A(?<field_name>.*)=\z/ !~ method_sym.to_s
       super
-    when FIELDS.include?(field_name)
+    when fields.include?(field_name)
       true
     else
       super
@@ -98,14 +98,13 @@ class BugzillaRest::Base
   end
 
   def method_missing(method_sym, *arguments, &block)
-    byebug
     case
-    when FIELDS.include?(method_sym)
-      attributes[FIELDS]
+    when fields.include?(method_sym)
+      attributes[method_sym]
     when /\A(?<field_name>.*)=\z/ !~ method_sym.to_s
       super
-    when FIELDS.include?(field_name)
-      attributes[field_name] = arguments[0]
+    when fields.include?(field_name)
+      attributes[method_sym] = arguments[0]
     else
       super
     end

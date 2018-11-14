@@ -1,13 +1,13 @@
 class BugzillaRest::BugProxy < BugzillaRest::Base
 
   FIELDS = %i{id product component summary version description opsys platform priority severity
-              state creator classification}
+              creator classification assigned_to groups status
+              resolution whiteboard creation_time last_change_time qa_contact}
 
   def initialize(attrs = {}, assigned_user: User.vrtincoming, api_key:, token:)
     assigned_to_email = assigned_user&.email
-    attributes = compact(indifferent(attrs).slice(*FIELDS).merge('assigned_to' => assigned_to_email))
 
-    super(attributes, api_key: api_key, token: token)
+    super(attrs.reverse_merge('assigned_to' => assigned_to_email), fields: FIELDS, api_key: api_key, token: token)
   end
 
   def id
@@ -22,8 +22,8 @@ class BugzillaRest::BugProxy < BugzillaRest::Base
     if persisted?
       raise 'update not implemented'
     else
-      response_body = call(:post, '/rest/bug', body: attributes.to_json)
-      response_hash = JSON.parse(response_body)
+      response = call(:post, '/rest/bug', body: attributes.to_json)
+      response_hash = JSON.parse(response.body)
 
       attributes[:id] = response_hash['id']
       id.present?
@@ -36,7 +36,42 @@ class BugzillaRest::BugProxy < BugzillaRest::Base
     bug_proxy
   end
 
+  def build_comment(comment_attrs)
+    CommentProxy.new(comment_attrs.merge(bug_id: id), api_key: api_key, token: token)
+  end
+
+  def create_comment!(comment_attrs)
+    CommentProxy.create!(comment_attrs, api_key: api_key, token: token)
+  end
+
+  def comments(reload: false)
+    unless @comments && !reload
+      response = call(:get, "/rest/bug/#{id}/comment")
+      response_hash = JSON.parse(response.body)
+
+      @comments = response_hash['bugs'][id.to_s]['comments'].map do |comment_hash|
+        BugzillaRest::CommentProxy.new(comment_hash, api_key: api_key, token: token)
+      end
+    end
+
+    @comments
+  end
+
   def create_attachment!(attachment_attrs)
     AttachmentProxy.create!(attachment_attrs.merge(bug_id: id), api_key: api_key, token: token)
+  end
+
+  def attachments(reload: false)
+    byebug
+    unless @attachments && !reload
+      response = call(:get, "/rest/bug/#{id}/attachment")
+      response_hash = JSON.parse(response.body)
+
+      @attachments = response_hash['bugs'][id.to_s].map do |attachment_hash|
+        BugzillaRest::AttachmentProxy.new(attachment_hash, api_key: api_key, token: token)
+      end
+    end
+
+    @attachments
   end
 end

@@ -1,10 +1,10 @@
 class BugzillaRest::AttachmentProxy < BugzillaRest::Base
 
-  FIELDS = %i{id data file_name summary content_type comment}
+  FIELDS = %i{id data file_name summary content_type comment is_private is_obsolete attacher}
   attr_accessor :bug_id
 
   def initialize(attrs = {}, api_key:, token:)
-    super(compact(indifferent(attrs).slice(*FIELDS)), api_key: api_key, token: token)
+    super(attrs, fields: FIELDS, api_key: api_key, token: token)
     @bug_id = attrs[:bug_id]
   end
 
@@ -21,8 +21,8 @@ class BugzillaRest::AttachmentProxy < BugzillaRest::Base
       raise 'update not implemented'
     else
       body = attributes.merge('ids' => [ bug_id ]).to_json
-      response_body = call(:post, "/rest/bug/#{bug_id}/attachment", body: body)
-      response_hash = JSON.parse(response_body)
+      response = call(:post, "/rest/bug/#{bug_id}/attachment", body: body)
+      response_hash = JSON.parse(response.body)
 
       attributes[:id] = response_hash['ids'].first
       id.present?
