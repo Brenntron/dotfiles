@@ -92,6 +92,7 @@ window.populate_webrep_index_table = (data = {}) ->
             $('.dispute_check_box').each ->
               if this.value == dispute_click
                 this.checked = true
+                datatable.row(this.closest('tr')).select()
 
         if array_of_dispute_entry_clicks.length > 0
           for dispute_entry_click in array_of_dispute_entry_clicks
@@ -1024,7 +1025,10 @@ $ ->
       $('table#disputes-index .dispute_check_box').on 'click', (el) ->
         console.log(el)
   window.toggleRow = (el) ->
-    $(el).closest('tr').toggleClass('selected')
+    if $(el)[0].checked
+      $(el).closest('tr').addClass('selected')
+    else
+      $(el).closest('tr').removeClass('selected')
 
   $('#disputes_check_box').change ->
     $('.dispute_check_box').prop 'checked', @checked
