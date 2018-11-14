@@ -1772,69 +1772,77 @@ $ ->
 
 
 #  Test data for Closed Email Entry Resolutions
-  emailEntryResolutionLabels = ['Fixed FN', 'Unchanged', 'Fixed FP', 'Other']
-  emailEntryData = [3,6,7,0]
+#  emailEntryResolutionLabels = ['Fixed', 'Unchanged', 'Fixed FP', 'Other']
+#  emailEntryData = [3,6,7,0]
 
-  new Chart($('#closed-email-entries-resolution-piechart'),
-    type: 'pie'
-    data:
-      labels: emailEntryResolutionLabels
-      datasets: [ {
-        label: 'close-email-entries'
-        backgroundColor: [
-          '#3e5a72'
-          '#6dbcdb'
-          '#666'
-        ]
-        data: emailEntryData
-      } ]
-    options:
-      legend: false
-      pieceLabel:
-        render: (args) ->
-          return args.percentage + '%'
-        position: 'outside'
-        segment: false
-        precision: 2
-        showZero: true
-        fontStyle: 'bolder'
-        overlap: false
-        showActualPercentages: true
-  )
+#  new Chart($('#closed-email-entries-resolution-piechart'),
+#    type: 'pie'
+#    data:
+#      labels: emailEntryResolutionLabels
+#      datasets: [ {
+#        label: 'close-email-entries'
+#        backgroundColor: [
+#          '#3e5a72'
+#          '#6dbcdb'
+#          '#666'
+#        ]
+#        data: emailEntryData
+#      } ]
+#    options:
+#      legend: false
+#      pieceLabel:
+#        render: (args) ->
+#          return args.percentage + '%'
+#        position: 'outside'
+#        segment: false
+#        precision: 2
+#        showZero: true
+#        fontStyle: 'bolder'
+#        overlap: false
+#        showActualPercentages: true
+#  )
+
 
   #  Test data for Closed Email Entry Resolutions
-  webEntryResolutionLabels = ['Fixed FN', 'Unchanged', 'Fixed FP', 'Other']
-  webEntryData = [3,6,7,0]
+#  webEntryResolutionLabels = ['Fixed FN', 'Unchanged', 'Fixed FP', 'Other']
+#  webEntryData = [3,6,7,0]
 
-  new Chart($('#closed-web-entries-resolution-piechart'),
-    type: 'pie'
-    data:
-      labels: webEntryResolutionLabels
-      datasets: [ {
-        label: 'close-email-entries'
-        backgroundColor: [
-          '#3e5a72'
-          '#6dbcdb'
-          '#666'
-        ]
-        data: webEntryData
-      } ]
-    options:
-      legend: false
-      pieceLabel:
-        render: (args) ->
-          return args.percentage + '%'
-        position: 'outside'
-        label: 'Unchanched'
-        segment: false
-        precision: 2
-        showZero: true
-        fontStyle: 'bolder'
-        overlap: false
-        showActualPercentages: true
+#  new Chart(document.getElementById('closed-web-entries-resolution-piechart'),
+#    type: 'pie'
+#    data:
+#      labels: [
+#        'Fixed'
+#        'Unchanged'
+#        'Fixed FP'
+#      ]
+#      datasets: [ {
+#        label: 'close-email-entries'
+#        backgroundColor: [
+#          '#3e5a72'
+#          '#6dbcdb'
+#          '#666'
+#        ]
+#        data: [
+#          2478
+#          3267
+#          4202
+#        ]
+#      } ]
+#    options:
+#      legend: false
+#      pieceLabel:
+#        render: (args) ->
+#          return args.percentage + '%'
+#        position: 'outside'
+#        label: 'Unchanched'
+#        segment: false
+#        precision: 2
+#        showZero: true
+#        fontStyle: 'bolder'
+#        overlap: false
+#        showActualPercentages: true
 
-  )
-
+#  )
 
   closedTicketNumbers = [375502, 375504, 375513, 375515, 375516, 375517, 375518, 375519, 375520, 375521, 375522]
   timeToCloseTickets = [1, 1.3, 1.2, 1.5, 1.7, 1.4, 1.8, 0.9, 1, 1.1, 1.2, 1.5, 1.6]
