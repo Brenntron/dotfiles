@@ -36,27 +36,6 @@ class BugzillaRest::BugProxy < BugzillaRest::Base
     bug_proxy
   end
 
-  def build_comment(comment_attrs)
-    CommentProxy.new(comment_attrs.merge(bug_id: id), api_key: api_key, token: token)
-  end
-
-  def create_comment!(comment_attrs)
-    CommentProxy.create!(comment_attrs, api_key: api_key, token: token)
-  end
-
-  def comments(reload: false)
-    unless @comments && !reload
-      response = call(:get, "/rest/bug/#{id}/comment")
-      response_hash = JSON.parse(response.body)
-
-      @comments = response_hash['bugs'][id.to_s]['comments'].map do |comment_hash|
-        BugzillaRest::CommentProxy.new(comment_hash, api_key: api_key, token: token)
-      end
-    end
-
-    @comments
-  end
-
   def create_attachment!(attachment_attrs)
     AttachmentProxy.create!(attachment_attrs.merge(bug_id: id), api_key: api_key, token: token)
   end
