@@ -292,3 +292,17 @@ Feature: Disputes
     When I select "Templar" from "select-new-resolution-message-template-status"
     And I wait for "3" seconds
     Then I should see content "This is a test." within ".ticket-status-comment"
+
+  @javascript
+  Scenario: A user creates a new resolution message template
+    Given a user with role "webrep user" exists and is logged in
+    And the following disputes exist and have entries:
+      |id  |
+      |5370|
+    And I goto "/escalations/webrep/disputes/5370"
+    And I click ".mng-resolution-message-templates-button"
+    And I click "#create-resolution-message-template"
+    When I click "#save-resolution-message-template"
+    And I wait for "3" seconds
+    Then I should see "THERE WAS AN ERROR CREATING THE RESOLUTION MESSAGE TEMPLATE."
+    Then I should see "Name can't be blank and Body can't be blank"
