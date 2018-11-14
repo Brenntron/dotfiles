@@ -1965,32 +1965,20 @@ $ ->
 
 
 
-#    graph bottom
-  new Chart(document.getElementById('bar-chart-horizontal'),
+#### Multi User Graphs #####
+
+#  Ticket entries closed by ticket owner
+
+  ticketOwners = ['mtaylor', 'chrclair', 'nherbert', 'nverbeck', 'abreeeman']
+  ticketEntriesByOwner = [8, 15, 11, 10, 13.5]
+
+  new Chart($('#ticket-entries-closed-by-owner'),
     type: 'horizontalBar'
     data:
-      labels: [
-        'mtaylor'
-        'chrclair'
-        'nherbert'
-        'nverbeck'
-        'abreeeman'
-      ]
+      labels: ticketOwners
       datasets: [ {
-        backgroundColor: [
-          '#6dbcdb'
-          '#6dbcdb'
-          '#6dbcdb'
-          '#6dbcdb'
-          '#6dbcdb'
-        ]
-        data: [
-          8
-          15
-          11
-          10
-          13.5
-        ]
+        backgroundColor: '#6dbcdb'
+        data: ticketEntriesByOwner
       } ]
     options:
       legend: display: false
@@ -2000,7 +1988,6 @@ $ ->
             gridLines: display: false
             ticks: {
               min: 0
-              stepSize: 10
             }
           }
         ]
@@ -2009,42 +1996,26 @@ $ ->
             gridLines: display: false
             ticks: {
               min: 0
-              stepSize: 5
-              max: 20
             }
             scaleLabel: {
               display: true,
-              labelString: 'Tickets'
+              labelString: 'Closed Ticket Entries'
             }
           }
         ]
       )
 
-  new Chart(document.getElementById('bar-chart2-horizontal'),
+
+# Average time to close tickets by ticket owner graph
+  avgTimeToCloseTickets = [.8, .7, 1.7, 1.6, 2]
+
+  new Chart($('#avg-time-to-close-tickets'),
     type: 'horizontalBar'
     data:
-      labels: [
-        'mtaylor'
-        'chrclair'
-        'nherbert'
-        'nverbeck'
-        'abreeeman'
-      ]
+      labels: ticketOwners
       datasets: [ {
-        backgroundColor: [
-          '#6dbcdb'
-          '#6dbcdb'
-          '#6dbcdb'
-          '#6dbcdb'
-          '#6dbcdb'
-        ]
-        data: [
-          .8
-          .7
-          1.7
-          1.6
-          2
-        ]
+        backgroundColor: '#6dbcdb'
+        data: avgTimeToCloseTickets
       } ]
     options:
       legend: display: false
@@ -2054,7 +2025,6 @@ $ ->
             gridLines: display: false
             ticks: {
               min: 0
-              stepSize: 1
             }
           }
         ]
@@ -2063,71 +2033,47 @@ $ ->
             gridLines: display: false
             ticks: {
               min: 0
-              stepSize: 1
-              max: 4
             }
             scaleLabel: {
               display: true,
-              labelString: 'hours'
+              labelString: 'Hours'
             }
           }
         ]
   )
 
-  new Chart(document.getElementById('bar-chart-grouped'),
+
+# Ticket Resolutions by Ticket Owner graph
+
+  fixedFPTickets = [9, 7, 5, 6, 9]
+  fixedFNTickets = [10, 14, 11, 10, 5]
+  unchangedTickets = [3, 4, 11, 13, 9]
+  otherTickets = [0, 1, 0, 3, 5]
+
+  new Chart($('#ticket-resolutions-by-owner'),
     type: 'bar'
     data:
-      labels: [
-        'mtaylor'
-        'chrclair'
-        'nherbert'
-        'nverbeck'
-        'abreeman'
-      ]
+      labels: ticketOwners
       datasets: [
         {
           label: 'Fixed FP'
           backgroundColor: '#6dbcdb'
-          data: [
-            9.5
-            7.5
-            5
-            6.5
-            9.5
-          ]
+          data: fixedFPTickets
         }
         {
           label: 'Fixed FN'
           backgroundColor: '#2c3e50'
-          data: [
-            10.5
-            14
-            11.5
-            10
-            5
-          ]
+          data: fixedFNTickets
         }
         {
           label: 'Unchanged'
           backgroundColor: '#999'
-          data: [
-            3.5
-            4.8
-            11.5
-            13.5
-            9.5
-          ]
+          data: unchangedTickets
         }
         {
           label: 'Other'
           backgroundColor: '#E47433'
-          data: [
-            0
-            1.5
-            0
-            3.5
-            1.5
-          ]
+          data: otherTickets
         }
       ]
     options:
@@ -2140,8 +2086,6 @@ $ ->
             gridLines: display: false
             ticks: {
               min: 0
-              stepSize: 5
-              max: 15
             }
           }
         ]
@@ -2152,37 +2096,19 @@ $ ->
         ]
   )
 
-  new Chart(document.getElementById('bar-chart3-horizontal'),
+
+
+#  Rule Hits for FP Resolutions Graph
+  fpRules = ['a500', 'alx_ cln', 'mute_phish', 'sbl', 'srch', 'suwl', 'trd_mal']
+  totalRuleHits = [ 5, 18, 9, 14, 4, 7, 3]
+
+  new Chart($('#rule-hits-fp-resolutions'),
     type: 'horizontalBar'
     data:
-      labels: [
-        'a500'
-        'alx_ cln'
-        'mute_phish'
-        'sbl'
-        'srch'
-        'suwl'
-        'trd_mal'
-      ]
+      labels: fpRules
       datasets: [ {
-        backgroundColor: [
-          '#6dbcdb'
-          '#6dbcdb'
-          '#6dbcdb'
-          '#6dbcdb'
-          '#6dbcdb'
-          '#6dbcdb'
-          '#6dbcdb'
-        ]
-        data: [
-          5
-          18.5
-          9.5
-          14.5
-          4.5
-          7.5
-          3
-        ]
+        backgroundColor: '#6dbcdb'
+        data: totalRuleHits
       } ]
     options:
       legend: display: false
@@ -2197,8 +2123,6 @@ $ ->
             gridLines: display: false
             ticks: {
               min: 0
-              stepSize: 5
-              max: 20
             }
             scaleLabel: {
               display: true,
@@ -2207,6 +2131,9 @@ $ ->
           }
         ]
   )
+
+
+
   window.barChartGroupedData = [
     {
       label: 'Total Ticket Entries'

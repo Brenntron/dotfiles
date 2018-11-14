@@ -177,7 +177,7 @@
 
         .col-xl-6.col-lg-5.col-xs-12.graph-section
           .row
-            .col-xs-7.top-space-ex
+            .col-lg-12.col-xl-6.top-space-ex
               .graph-top-header
                 %h5.uppercase.header-stg Ticket Entries Closed by Day
 
@@ -231,7 +231,7 @@
               %canvas#graph-ticket-entries-submitter
 
 
-            .col-xs-5.top-space-ex.graph-section
+            .col-lg-12.col-xl-6.top-space-ex.graph-section
               .graph-top-header
                 %h5.uppercase.dispute-E-grey.graph-header-icon-stg.header-stg.bottom-space Closed Email Entries by Resolution
 
@@ -422,17 +422,17 @@
 
 
         .col-xl-6.col-lg-5.col-xs-12.graph-section
-          .col-xs-6
+          .col-lg-12.col-xl-6
             .graph-top-header.top-space-ex.bottom-space
-              %h5.uppercase.header-stg ticket entries closed by ticket owner
-            %canvas#bar-chart-horizontal
+              %h5.uppercase.header-stg Ticket Entries Closed by Ticket Owner
+            %canvas#ticket-entries-closed-by-owner
 
             .graph-top-header.top-space-ex.bottom-space
-              %h5.uppercase.header-stg average time to close tickets by ticket owner
-            %canvas#bar-chart2-horizontal
+              %h5.uppercase.header-stg Average Time to Close Tickets by Ticket Owner
+            %canvas#avg-time-to-close-tickets
 
             .graph-top-header.top-space-ex.bottom-space
-              %h5.uppercase.header-stg ticket resolution by ticket owner
+              %h5.uppercase.header-stg Ticket Resolution by Ticket Owner
             .graph-bar-legend
               .custom-legend
                 %label Unchanged
@@ -446,62 +446,60 @@
               .custom-legend
                 %label Other
                 %label.orange-legend-color
-            %canvas#bar-chart-grouped.bottom-space
+            %canvas#ticket-resolutions-by-owner
 
-            %table.table.left-space.top-space
-              %thead
-                %tr
-                  %th{:scope => "col"} OWNER
-                  %th{:scope => "col"} UNCHANGED
-                  %th{:scope => "col"} FIXED FN
-                  %th{:scope => "col"} FIXED FP
-                  %th{:scope => "col"} OTHER
-              %tbody
-                %tr.text-center
-                  %td.text-left mtaylor
-                  %td 4
-                  %td 10
-                  %td 8
-                  %td 0
-                %tr.text-center
-                  %td.text-left chrclair
-                  %td 5
-                  %td 13
-                  %td 7
-                  %td 1
-                %tr.text-center
-                  %td.text-left nherbert
-                  %td 11
-                  %td 11
-                  %td 6
-                  %td 0
-
-                %tr.text-center
-                  %td.text-left nverbeck
-                  %td 13
-                  %td 10
-                  %td 7
-                  %td 4
-
-                %tr.text-center
-                  %td.text-left abreeman
-                  %td 9
-                  %td 5
-                  %td 9
-                  %td 1
-              %tfoot
-                %tr
-                  %th Total
-                  %th.text-center 42
-                  %th.text-center 49
-                  %th.text-center 37
-                  %th.text-center 6
+            -#%table.table.left-space.top-space
+            -#  %thead
+            -#    %tr
+            -#      %th{:scope => "col"} OWNER
+            -#      %th{:scope => "col"} UNCHANGED
+            -#      %th{:scope => "col"} FIXED FN
+            -#      %th{:scope => "col"} FIXED FP
+            -#      %th{:scope => "col"} OTHER
+            -#  %tbody
+            -#    %tr.text-center
+            -#      %td.text-left mtaylor
+            -#      %td 4
+            -#      %td 10
+            -#      %td 8
+            -#      %td 0
+            -#    %tr.text-center
+            -#      %td.text-left chrclair
+            -#      %td 5
+            -#      %td 13
+            -#      %td 7
+            -#      %td 1
+            -#    %tr.text-center
+            -#      %td.text-left nherbert
+            -#      %td 11
+            -#      %td 11
+            -#      %td 6
+            -#      %td 0
+            -#    %tr.text-center
+            -#      %td.text-left nverbeck
+            -#      %td 13
+            -#      %td 10
+            -#      %td 7
+            -#      %td 4
+            -#    %tr.text-center
+            -#      %td.text-left abreeman
+            -#      %td 9
+            -#      %td 5
+            -#      %td 9
+            -#      %td 1
+            -#  %tfoot
+            -#    %tr
+            -#      %th Total
+            -#      %th.text-center 42
+            -#      %th.text-center 49
+            -#      %th.text-center 37
+            -#      %th.text-center 6
 
             .graph-top-header.top-space.bottom-space
-              %h5.uppercase.header-stg rule hits for false positive resolutions
-            %canvas#bar-chart3-horizontal
+              %h5.uppercase.header-stg Rule Hits for False Positive Resolutions
+            %canvas#rule-hits-fp-resolutions
 
-          .col-xs-6.graph-section
+          .col-lg-12.col-xl-6.graph-section
             %label.content-label-sm.top-space-ex Time Breakdown
             .graph-config
               %select.form-control
