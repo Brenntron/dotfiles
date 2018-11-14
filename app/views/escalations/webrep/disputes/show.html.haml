@@ -47,8 +47,7 @@
                           %button{class: 'secondary', type: 'button', id: 'unassign-dispute-button', onclick: 'toolbar_unassign_dispute();'}
                             Unassign
 
-
-    .col-xs-2.col-with-divider
+    .col-xs-3.col-with-divider
       .dispute-status-col-wrapper
         %label.content-label-sm
           Status
@@ -116,16 +115,24 @@
                           %button.primary{onClick: 'show_page_edit_status()'}
                             Submit
 
-                  %li.status-radio-wrapper
-                    %input.ticket-status-radio{type: 'radio', name: 'dispute-status', class: "dispute-status-#{@dispute.id}", id: "#{Dispute::STATUS_REOPENED}", value: "#{Dispute::STATUS_REOPENED}"}
-                    %label.radio-label.ticket-status-radio-label{for: "#{Dispute::STATUS_REOPENED}"} Re-Opened
-                  %li.non-resolution-submit-wrapper#ticket-non-res-submit
-                    %label.content-label-sm
-                      Comment
-                    %textarea.ticket-status-comment
-                    .button-row-center
-                      %button.primary{onClick: 'show_page_edit_status()'}
-                        Submit
+                %li.status-radio-wrapper
+                  %input.ticket-status-radio{type: 'radio', name: 'dispute-status', class: "dispute-status-#{@dispute.id}", id: "#{Dispute::STATUS_REOPENED}", value: "#{Dispute::STATUS_REOPENED}"}
+                  %label.radio-label.ticket-status-radio-label{for: "#{Dispute::STATUS_REOPENED}"} Re-Opened
+                %li.non-resolution-submit-wrapper#ticket-non-res-submit
+                  %label.content-label-sm
+                    Comment
+                  %textarea.ticket-status-comment
+                  .button-row-center
+                    %button.primary{onClick: 'show_page_edit_status()'}
+                      Submit
+
+          - if @dispute&.status_comment.present?
+            %button.status-comment-button.esc-tooltipped{title: @dispute&.status_comment}
+          - elsif @dispute&.resolution_comment.present?
+            %button.status-comment-button.esc-tooltipped{title: @dispute&.resolution_comment}
+          - else
+            %button.status-comment-button.esc-tooltipped
+
         - else
           .duplicate-status-notice
             =@dispute.resolution
@@ -134,7 +141,7 @@
           Suggested Disposition
         .disposition.disp-negative
           = @dispute.suggested_d
-    .col-xs-3.col-with-divider
+    .col-xs-2.col-with-divider
       %label.content-label-sm
         Dispute Entries
       %div
