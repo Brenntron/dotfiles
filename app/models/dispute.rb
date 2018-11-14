@@ -363,6 +363,7 @@ class Dispute < ApplicationRecord
   #end dispute building instance methods
   #
   def self.process_bridge_payload(message_payload)
+    byebug
     new_dispute = nil
     verdicts_to_blacklist = []
     user = User.where(cvs_username:"vrtincom").first
@@ -470,6 +471,10 @@ class Dispute < ApplicationRecord
           new_dispute_entry.wbrs_score = entry[:wbrs]["WBRS_SCORE"] == "No score" ? nil : entry[:wbrs]["WBRS_SCORE"]
           new_dispute_entry.suggested_disposition = entry[:sbrs]["rep_sugg"]
 
+          new_dispute_entry.save!
+
+          logger.debug "fetching preload"
+          ::Preloader::Base.fetch_all_api_data(key, new_dispute_entry.id)
 
           case
           when !false_negative_claim
@@ -484,7 +489,6 @@ class Dispute < ApplicationRecord
             end
           end
           new_dispute_entry.save!
-
 
           #this is for return back to TI to populate its ticket show pages
           return_payload[key] = new_dispute_entry.new_payload_item
@@ -510,9 +514,6 @@ class Dispute < ApplicationRecord
               new_rule_hit.save!
             end
           end
-
-          logger.debug "fetching preload"
-          ::Preloader::Base.fetch_all_api_data(key, new_dispute_entry.id)
 
         end
         logger.debug "Creating url entries"
