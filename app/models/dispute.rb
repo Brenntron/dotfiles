@@ -363,7 +363,7 @@ class Dispute < ApplicationRecord
   #end dispute building instance methods
   #
   def self.process_bridge_payload(message_payload)
-    byebug
+
     new_dispute = nil
     verdicts_to_blacklist = []
     user = User.where(cvs_username:"vrtincom").first
@@ -453,7 +453,6 @@ class Dispute < ApplicationRecord
 
         logger.debug "Creating ip entries"
         new_entries_ips.each do |key, entry|
-
           false_negative_claim = false
 
           if ["Malicious", "Poor"].include?(entry[:sbrs]["rep_sugg"])
@@ -482,12 +481,14 @@ class Dispute < ApplicationRecord
           else
             auto_resolve_verdict = new_dispute_entry.assign_from_auto_resolve(address: key,
                                                                               total_hits: total_hits,
-                                                                              resolved_at: resolved_at)
+                                                                              resolved_at: resolved_at,
+                                                                              dispute_entry_id: new_dispute_entry.id)
 
             if auto_resolve_verdict.resolved? && auto_resolve_verdict.malicious?
               verdicts_to_blacklist << [auto_resolve_verdict, new_dispute_entry]
             end
           end
+
           new_dispute_entry.save!
 
           #this is for return back to TI to populate its ticket show pages
@@ -561,10 +562,13 @@ class Dispute < ApplicationRecord
                                                                               total_hits: total_hits,
                                                                               resolved_at: resolved_at,
                                                                               dispute_entry_id: new_dispute_entry.id)
+
             if auto_resolve_verdict.resolved? && auto_resolve_verdict.malicious?
               verdicts_to_blacklist << [auto_resolve_verdict, new_dispute_entry]
             end
           end
+
+          new_dispute_entry.save!
 
           return_payload[key] = new_dispute_entry.new_payload_item
 
