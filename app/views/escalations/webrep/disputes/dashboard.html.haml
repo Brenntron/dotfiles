@@ -19,6 +19,7 @@
         .dashboard-time-wrapper
           .dashboard-time
             %label September 08, 2018 - September 15, 2018
+            -# TODO Populate above label with local storage time or current week span
             %button.toolbar-button.icon-calendar Change Time Span
 
             %input#tickets_date_range{:type => 'text'}
@@ -26,6 +27,8 @@
           .dashboard-time-ticket
             .button-wrapper
               %button.arrow-left View Last Week's Tickets
+              -# TODO If local storage time is not current week span, put 'View This Week's Tickets' instead.
+              -# Add function to change time span
 
       #dashboard-tab-list.container
         %label.bold View:
@@ -44,13 +47,15 @@
             %a.custom-user-white.icon-custom-user-grey.user-icon-stg.bold{"data-toggle" => "tab", :href => "#select-custom-users"} Select Custom Users
 
         .dashboard-submission-area
+          -# TODO Hookup counts for Valid Ticket and Entry Counts and Invalid Count (Invalid = Duplicate, Test, Junk, etc.)
           %label.right-vertical-separator.bold.font-lg 30
           %label.font-lg 99
-          %label.uppercase.right-vertical-separator.bold valid total tickets / entries submission
-          %label.uppercase.icon-invalid-grey.user-icon-stg.invalid-stg.bold 12 invalid tickets
+          %label.uppercase.right-vertical-separator.bold Valid Total Tickets / Entries Submission
+          %label.uppercase.icon-invalid-grey.user-icon-stg.invalid-stg.bold 12 Invalid Tickets
 
         .dashboard-export-report.left-vertical-separator
           %button.toolbar-button.export-button-white Export Report
+          -# TODO Hookup exporting. This can be simple for first launch. Later we'll add options to select what gets exported.
 
   .tab-content.dashboard-tab-content
     #my-ticket.tab-pane.active
@@ -59,40 +64,8 @@
     #my-team-tickets.tab-pane
       = render 'escalations/webrep/disputes/multi_user_reports'
 
-
     #all-tickets.tab-pane
-      .row
-        .col-xs-6
-          %h1.dashboard-header All Tickets
-          .content-layout-list
-            %label.content-label-sm.icon-custom-star
-              Show Customer Tickets
-              %input{:type => "checkbox", :checked => "checked"}/
+    -#  Add render to multi user report later
 
-            %label.content-label-sm.no-left-pad.right-vertical-separator
-              Show Guest Tickets
-              %input{:type => "checkbox", :checked => "checked"}/
-
-            %label.content-label-sm.dispute-E-grey
-              Show Email Tickets
-              %input{:type => "checkbox", :checked => "checked"}/
-
-            %label.content-label-sm.dispute-W-grey
-              Show Web Tickets
-              %input{:type => "checkbox", :checked => "checked"}/
-
-            %label.content-label-sm.dispute-EW-grey.btn-margin-left
-              Show Email/Web Tickets
-              %input{:type => "checkbox", :checked => "checked"}/
-
-          .tickets-section-wrapper.open-tickets-wrapper
-
-            .open-tickets-header
-              %h3.larger-lighter Open All Tickets
-
-              .ticket-count-wrapper
-                %label.total-table-ticket-count 4
-                %label.total-table-entry-count 23
     #select-custom-users.tab-pane
-      %p custom selected user
-
+    -#  Add render to single or multi user report depending on how many users are selected
