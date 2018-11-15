@@ -449,6 +449,15 @@ $ ->
     end = picker.endDate.format('MMMM/DD/YYYY').split('/')
     val = start[0] + ' ' + start[1] + ', ' + start[2] + ' to ' + end[0] + ' ' + end[1] + ', ' + end[2]
     $('.dashboard-time label')[0].innerHTML = val
+
+    firstday = new Date(picker.startDate).toUTCString();
+    lastday = new Date(picker.endDate).toUTCString();
+
+    localStorage.setItem 'webrep_report_range_from', picker.startDate
+    localStorage.setItem 'webrep_report_range_to', picker.endDate
+    user_id = $("#user_id").val()
+    refresh_single_open_tickets_table(user_id)
+
     return
   return
 
