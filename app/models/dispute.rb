@@ -1417,22 +1417,22 @@ class Dispute < ApplicationRecord
     end
 
     results[:table_data] << {:resolution => DisputeEntry::STATUS_RESOLVED_FIXED_FP,
-                             :percent => results[:chart_data][2],
+                             :percent => (results[:chart_data][2] * 100),
                              :count => all_entries.select {|entry| entry.resolution == DisputeEntry::STATUS_RESOLVED_FIXED_FP}.size
                              }
 
     results[:table_data] << {:resolution => DisputeEntry::STATUS_RESOLVED_FIXED_FN,
-                             :percent => results[:chart_data][0],
+                             :percent => (results[:chart_data][0] * 100),
                              :count => all_entries.select {|entry| entry.resolution == DisputeEntry::STATUS_RESOLVED_FIXED_FN}.size
     }
 
     results[:table_data] << {:resolution => DisputeEntry::STATUS_RESOLVED_UNCHANGED,
-                             :percent => results[:chart_data][1],
+                             :percent => (results[:chart_data][1] * 100),
                              :count => all_entries.select {|entry| entry.resolution == DisputeEntry::STATUS_RESOLVED_UNCHANGED}.size
     }
 
     results[:table_data] << {:resolution => DisputeEntry::STATUS_RESOLVED_OTHER,
-                             :percent => results[:chart_data][3],
+                             :percent => (results[:chart_data][3] * 100),
                              :count => all_entries.select {|entry| entry.resolution == DisputeEntry::STATUS_RESOLVED_OTHER}.size
     }
 

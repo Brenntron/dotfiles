@@ -326,33 +326,11 @@ window.build_single_closed_email_entries_resolution_piechart = () ->
       #json structure is similar to datatable expectation, a hash with keys matching expected column names
       #{:resolution => 'shiz', :percent => 0.75, :count => 35}
       tableData = json["data"]["table_data"]
-      #      Chris can delete the temp data whenever.
-      temptableData = [
-        {
-          'resolution': 'Unchanged',
-          'percent': '18.75',
-          'count': 12,
-        }
-        {
-          'resolution': 'Fixed FN',
-          'percent': '37.50',
-          'count': 35,
-        }
-        {
-          'resolution': 'Fixed FP',
-          'percent': '43.75',
-          'count': 42,
-        }
-        {
-          'resolution': 'Other',
-          'percent': '0',
-          'count': 0,
-        }
-      ]
 
       email_piechart_table = $('#closed-email-entries-resolution-table tbody')
       $(email_piechart_table).empty()
-      $(temptableData).each ->
+
+      $(tableData).each ->
         $(email_piechart_table).append('<tr><td>' + this.resolution + '</td><td class="text-center">' + this.percent + ' %</td><td class="text-center">' + this.count + '</td></tr>')
 
       new Chart($('#closed-email-entries-resolution-piechart'),
@@ -418,33 +396,11 @@ window.build_single_closed_web_entries_resolution_piechart = () ->
       #json structure is similar to datatable expectation, a hash with keys matching expected column names
       #{:resolution => 'shiz', :percent => 0.75, :count => 35}
       tableData = json["data"]["table_data"]
-      #      Chris can delete the temp data whenever.
-      temptableData = [
-        {
-          'resolution': 'Unchanged',
-          'percent': '18.75',
-          'count': 12,
-        }
-        {
-          'resolution': 'Fixed FN',
-          'percent': '37.50',
-          'count': 35,
-        }
-        {
-          'resolution': 'Fixed FP',
-          'percent': '43.75',
-          'count': 42,
-        }
-        {
-          'resolution': 'Other',
-          'percent': '0',
-          'count': 0,
-        }
-      ]
 
       web_piechart_table = $('#closed-web-entries-resolution-table tbody')
       $(web_piechart_table).empty()
-      $(temptableData).each ->
+      
+      $(tableData).each ->
         $(web_piechart_table).append('<tr><td>' + this.resolution + '</td><td class="text-center">' + this.percent + ' %</td><td class="text-center">' + this.count + '</td></tr>')
 
 
