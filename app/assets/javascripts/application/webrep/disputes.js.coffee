@@ -1838,22 +1838,14 @@ $ ->
 
   closedTicketNumbers = [375502, 375504, 375513, 375515, 375516, 375517, 375518, 375519, 375520, 375521, 375522]
   timeToCloseTickets = [1, 1.3, 1.2, 1.5, 1.7, 1.4, 1.8, 0.9, 1, 1.1, 1.2, 1.5, 1.6]
-  averageTimeToClose = [1.4, 1.4, 1.4, 1.4, 1.4, 1.4, 1.4, 1.4, 1.4, 1.4, 1.4, 1.4]
+  averageTimeToClose = 1.4
 
 
   window.timeCloseTicketsDataSets = [
     {
       data: timeToCloseTickets
       label: 'Time to close:'
-      backgroundColor: '#6dbcdb'
-      borderWidth: .5
-      fill: true
-      lineTension: 0
-    }
-    {
-      data: averageTimeToClose
-      label: 'ticket'
-      backgroundColor: '#d0ecfd'
+      backgroundColor: '#6EBCDB'
       borderWidth: .5
       fill: true
       lineTension: 0
@@ -1899,16 +1891,20 @@ $ ->
             }
           }
           ]
-#      annotation: {
-#        annotations: [{
-#          type: 'line'
-#          mode: 'horizontal'
-#          scaleID: 'y-axis-0'
-#          value: averageTimeToClose
-#          borderColor: '#d0ecfd'
-#          borderWidth: 1
-#        }]
-#      }
+      annotation: {
+        #drawTime: 'beforeDatasetsDraw'
+        annotations: [{
+          type: 'box'
+          yScaleID: 'y-axis-0'
+          xScaleID: 'x-axis-0'
+          xMin: Math.min(closedTicketNumbers)
+          xMax: Math.max(closedTicketNumbers)
+          yMax: averageTimeToClose
+          yMin: 0
+          backgroundColor: 'rgba(196, 234, 248, .35)'
+          borderColor: '#95989A'
+        }]
+      }
  )
 
 
