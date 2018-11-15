@@ -1259,7 +1259,6 @@ class Dispute < ApplicationRecord
                       :last_comment => last_comment_time,
                       :owner => ticket_user,
                       :priority => result.priority
-
       }
     end
 
@@ -1267,6 +1266,8 @@ class Dispute < ApplicationRecord
   end
 
   def self.closed_tickets_report(users, from, to)
+
+    from = "Mon, 4 Jul 2018 17:40:08 GMT"
 
     status_array = [STATUS_RESOLVED]
 
@@ -1279,7 +1280,7 @@ class Dispute < ApplicationRecord
     results = Dispute.includes(:dispute_entries).where("created_at between '#{from}' and '#{to}'").where(:user_id => user_ids).where(:status => status_array)
 
     report_data[:ticket_count] = results.size
-    report_data[:entries_count] = results.map {|result| result.dispute_entries}.flatten.select {|entry| entry.status != DisputeEntry::STATUS_RESOLVED }.size
+    report_data[:entries_count] = results.map {|result| result.dispute_entries}.flatten.select {|entry| entry.status == DisputeEntry::STATUS_RESOLVED }.size
 
     report_data[:customer_count] = results.select {|result| result.submitter_type == SUBMITTER_TYPE_CUSTOMER}.size
     report_data[:guest_count] = results.select {|result| result.submitter_type == SUBMITTER_TYPE_NONCUSTOMER}.size
@@ -1290,12 +1291,14 @@ class Dispute < ApplicationRecord
 
 
     results.each do |result|
-      report_data[:table_data] << {:case_id => result.id,
-                      :resolution => result.resolution,
-                      :dispute => result.dispute_entries.first.hostlookup,
+      entry_count = result.dispute_entries.select{ |entry| entry.status == DisputeEntry::STATUS_RESOLVED}.size
+      report_data[:table_data] << {:case_number => result.id,
+                      # :dispute => result.dispute_entries.first.hostlookup,
+                      :d_entry_preview => "<span class='dispute_entry_content_first'>#{result.dispute_entries.first.hostlookup}</span><span class='dispute-count'>#{entry_count}</span>",
                       :time_to_close => distance_of_time_in_words(result.created_at, result.case_resolved_at),
-                      :is_customer => result.submitter_type == SUBMITTER_TYPE_CUSTOMER,
-                      :submission_type => result.submission_type
+                      :submitter_type => result.submitter_type.downcase,
+                      :submission_type => result.submission_type,
+                      :priority => result.priority
       }
     end
 

@@ -2408,7 +2408,6 @@ $ ->
 
   window.closed_dashboard_dispute_table = $('#table-user-disputes-closed').DataTable(
     dom: '<t>'
-    data: tempSingleUserClosedTixDataset
     columnDefs: [
       {
         targets: [ 1 ]
@@ -2445,50 +2444,50 @@ $ ->
     ]
   )
 
-  window.open_multiuser_dashboard_dispute_table = $('#table-multi-user-disputes-open').DataTable(
-    dom: '<t>'
-    data: tempSingleUserOpenTixDataset
-    columnDefs: [
-      {
-        targets: [ 1 ]
-        className: 'id-col'
-      }
-      {
-        targets: [ 4 ]
-        className: 'state-col'
-      }
-      {
-        targets: [
-          0
-          2
-          5
-        ]
-        className: 'text-center'
-      }
-    ]
-    columns: [
-      {
-        data: 'priority'
-        render: (data) ->
-          '<span class="bug-priority p-' + data + '"></span>'
-      }
-      { data: 'case_number' }
-      {
-        data: 'submitter_type'
-        render: (data) ->
-          '<span class="submitter-type-icon submitter-' + data + '"></span>'
-      }
-      { data: 'owner' }
-      { data: 'status' }
-      {
-        data: 'submission_type'
-        render: (data) ->
-          '<span class="dispute-submission-type dispute-' + data  + '"></span>'
-      }
-      { data: 'd_entry_preview' }
-      { data: 'last_comment' }
-    ]
-  )
+#  window.open_multiuser_dashboard_dispute_table = $('#table-multi-user-disputes-open').DataTable(
+#    dom: '<t>'
+#    data: tempSingleUserClosedTixDataset
+#    columnDefs: [
+#      {
+#        targets: [ 1 ]
+#        className: 'id-col'
+#      }
+#      {
+#        targets: [ 4 ]
+#        className: 'state-col'
+#      }
+#      {
+#        targets: [
+#          0
+#          2
+#          5
+#        ]
+#        className: 'text-center'
+#      }
+#    ]
+#    columns: [
+#      {
+#        data: 'priority'
+#        render: (data) ->
+#          '<span class="bug-priority p-' + data + '"></span>'
+#      }
+#      { data: 'case_number' }
+#      {
+#        data: 'submitter_type'
+#        render: (data) ->
+#          '<span class="submitter-type-icon submitter-' + data + '"></span>'
+#      }
+#      { data: 'owner' }
+#      { data: 'status' }
+#      {
+#        data: 'submission_type'
+#        render: (data) ->
+#          '<span class="dispute-submission-type dispute-' + data  + '"></span>'
+#      }
+#      { data: 'd_entry_preview' }
+#      { data: 'last_comment' }
+#    ]
+#  )
 
   window.closed_dashboard_multiuser_dispute_table = $('#table-multi-user-disputes-closed').DataTable(
     dom: '<t>'
@@ -2544,6 +2543,7 @@ tempSingleUserClosedTixDataset = [
   },
   {
     'priority': ['P3'],
+    'status': ['Researching'],
     'case_number': ['0000375513'],
     'submitter_type': ['guest'],
     'owner' : ['nverbeck'],
@@ -2553,6 +2553,7 @@ tempSingleUserClosedTixDataset = [
   },
   {
     'priority': ['P4'],
+    'status': ['Researching'],
     'case_number': ['0000375502'],
     'submitter_type': ['guest'],
     'owner' : ['melitayl'],
@@ -2562,6 +2563,7 @@ tempSingleUserClosedTixDataset = [
   },
   {
     'priority': ['P1'],
+    'status': ['Researching'],
     'case_number': ['0000375515'],
     'submitter_type': ['customer'],
     'owner' : ['nicherbe'],
@@ -2571,6 +2573,7 @@ tempSingleUserClosedTixDataset = [
   },
   {
     'priority': ['P3'],
+    'status': ['Researching'],
     'case_number': ['0000375513'],
     'submitter_type': ['guest'],
     'owner' : ['nicherbe'],
@@ -2580,6 +2583,7 @@ tempSingleUserClosedTixDataset = [
   },
   {
     'priority': ['P4'],
+    'status': ['Researching'],
     'case_number': ['0000375502'],
     'submitter_type': ['guest'],
     'owner' : ['melitayl'],
@@ -2589,6 +2593,7 @@ tempSingleUserClosedTixDataset = [
   },
   {
     'priority': ['P3'],
+    'status': ['Researching'],
     'case_number': ['000012345'],
     'submitter_type': ['customer'],
     'owner' : ['nicherbe'],
@@ -2597,29 +2602,3 @@ tempSingleUserClosedTixDataset = [
     'time_to_close': ['42m']
   }
 ]
-
-# This is not actually set up to work yet.
-window.populate_webrep_dashboard_opentix_table = (data = {}) ->
-  headers = {'Token': $('input[name="token"]').val(), 'Xmlrpc-Token': $('input[name="xml_token"]').val()}
-  $.ajax(
-    url: '/escalations/api/v1/escalations/webrep/disputes'
-    method: 'GET'
-    headers: headers
-    data: data
-    data_json: JSON.stringify(data)
-    success: (response) ->
-      console.log(response)
-      console.log(data)
-      json = $.parseJSON(response)
-
-      if json.data.length == 0
-        std_msg_error("No tickets matching filter or search.","")
-
-      else
-        datatable = $('#table-user-disputes-open').DataTable()
-        datatable.clear();
-        datatable.rows.add(json.data);
-        datatable.draw();
-    error: (response) ->
-     console.log(response)
-  , this)

@@ -28,8 +28,8 @@
         %h3.larger-lighter
           My Open Tickets
         .ticket-count-wrapper
-          %label#open_single_ticket_count.total-table-ticket-count 4
-          %label#open_single_entry_count.total-table-entry-count 23
+          %label#open_single_ticket_count.total-table-ticket-count
+          %label#open_single_entry_count.total-table-entry-count
       %table.table.responsive.dashboard-tickets-table#table-user-disputes-open
         %thead
           %tr
@@ -51,35 +51,30 @@
           %label.content-label-sm.submitter-customer
             Customer
           %span#open_single_customer_count.ticket-entry-total
-            32
         .ticket-entry-total-block.guest-block-total
           %label.content-label-sm
             Guest
           %span#open_single_guest_count.ticket-entry-total
-            12
         .ticket-entry-total-block
           %label.content-label-sm.dispute-E-grey
             Email Entries
           %span#open_single_email_count.ticket-entry-total
-            25
         .ticket-entry-total-block
           %label.content-label-sm.dispute-W-grey
             Web Entries
           %span#open_single_web_count.ticket-entry-total
-            22
         .ticket-entry-total-block
           %label.content-label-sm.dispute-EW-grey
             Email/Web Entries
           %span#open_single_email_web_count.ticket-entry-total
-            3
 
 
     .tickets-section-wrapper.closed-tickets-wrapper
       .closed-tickets-header
         %h3.larger-lighter My Closed Tickets
         .ticket-count-wrapper
-          %label.total-table-ticket-count 7
-          %label.total-table-entry-count 46
+          %label#closed_single_ticket_count.total-table-ticket-count
+          %label#closed_single_entry_count.total-table-entry-count
       %table.table.responsive.dashboard-tickets-table#table-user-disputes-closed
         %thead
           %tr
@@ -98,28 +93,23 @@
         .ticket-entry-total-block
           %label.content-label-sm.submitter-customer
             Customer
-          %span.ticket-entry-total
-            32
+          %span#closed_single_customer_count.ticket-entry-total
         .ticket-entry-total-block.guest-block-total
           %label.content-label-sm
             Guest
-          %span.ticket-entry-total
-            12
+          %span#closed_single_guest_count.ticket-entry-total
         .ticket-entry-total-block
           %label.content-label-sm.dispute-E-grey
             Email Entries
-          %span.ticket-entry-total
-            25
+          %span#closed_single_email_count.ticket-entry-total
         .ticket-entry-total-block
           %label.content-label-sm.dispute-W-grey
             Web Entries
-          %span.ticket-entry-total
-            22
+          %span#closed_single_web_count.ticket-entry-total
         .ticket-entry-total-block
           %label.content-label-sm.dispute-EW-grey
             Email/Web Entries
-          %span.ticket-entry-total
-            3
+          %span#closed_single_email_web_count.ticket-entry-total
 
   .col-xl-6.col-lg-5.col-xs-12.graph-section
     .row

@@ -80,7 +80,6 @@ window.refresh_multi_open_tickets_table = (user_ids)->
     success: (response) ->
 
       json = $.parseJSON(response)
-
       if json.error
         #$('#refresh-working-msg').hide()
         #$('#refresh-error-msg').show()
@@ -94,6 +93,7 @@ window.refresh_multi_open_tickets_table = (user_ids)->
         datatable.draw();
 
         #References to other data points used to wrap this table, use as needed
+
         # json.data.ticket_count
         # json.data.entries_count
         # json.data.customer_count
@@ -138,19 +138,21 @@ window.refresh_single_closed_tickets_table = (user_id)->
         #$('#refresh-working-msg').show()
         #$('#refresh-working-msg').html('Table data updating correctly')
         #$('#dispute-index-title').text(json['title'])
-        datatable = $('#single_user_closed_tickets').DataTable()
+        datatable = $('#table-user-disputes-closed').DataTable()
         datatable.clear();
         datatable.rows.add(json.data.table_data);
         datatable.draw();
 
         #References to other data points used to wrap this table, use as needed
-        # json.data.ticket_count
-        # json.data.entries_count
-        # json.data.customer_count
-        # json.data.guest_count
-        # json.data.email_count
-        # json.data.web_count
-        # json.data.email_web_count
+
+        $("#closed_single_customer_count").html(json.data.customer_count)
+        $("#closed_single_guest_count").html(json.data.guest_count)
+        $("#closed_single_email_count").html(json.data.email_count)
+        $("#closed_single_web_count").html(json.data.web_count)
+        $("#closed_single_email_web_count").html(json.data.email_web_count)
+
+        $("#closed_single_ticket_count").html(json.data.ticket_count)
+        $("#closed_single_entry_count").html(json.data.entries_count)
 
     error: (response) ->
         #$('#refresh-working-msg').hide()
@@ -227,6 +229,7 @@ window.set_initial_date_span = () ->
   user_id = $("#user_id").val()
 
   refresh_single_open_tickets_table(user_id)
+  refresh_single_closed_tickets_table(user_id)
 
 window.build_graph_ticket_entries_submitter = () ->
 
