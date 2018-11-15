@@ -24,7 +24,9 @@
 
     .tickets-section-wrapper.open-tickets-wrapper
       .open-tickets-header
-        %h3.larger-lighter My Open Tickets
+        -# TODO if selected tab is current user show 'My Open Tickets' in header, otherwise show 'username's Open Tickets'
+        %h3.larger-lighter
+          My Open Tickets
         .ticket-count-wrapper
           %label#open_single_ticket_count.total-table-ticket-count 4
           %label#open_single_entry_count.total-table-entry-count 23

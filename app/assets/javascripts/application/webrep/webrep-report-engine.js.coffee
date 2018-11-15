@@ -222,8 +222,8 @@ window.set_initial_date_span = () ->
     localStorage.setItem 'webrep_report_range_from', firstday
     localStorage.setItem 'webrep_report_range_to', lastday
 
-  alert(localStorage.getItem('webrep_report_range_from'))
-  alert(localStorage.getItem('webrep_report_range_to'))
+#  alert(localStorage.getItem('webrep_report_range_from'))
+#  alert(localStorage.getItem('webrep_report_range_to'))
   user_id = $("#user_id").val()
 
   refresh_single_open_tickets_table(user_id)
@@ -536,7 +536,6 @@ window.build_multi_closed_web_entries_resolution_piechart = () ->
       $(tableData).each ->
         $(web_piechart_table).append('<tr><td>' + this.resolution + '</td><td class="text-center">' + this.percent + ' %</td><td class="text-center">' + this.count + '</td></tr>')
 
-
       new Chart($('#multi-web-entries-by-resolution-piechart'),
         type: 'pie'
         data:
@@ -567,6 +566,30 @@ window.build_multi_closed_web_entries_resolution_piechart = () ->
     error: (response) ->
       popup_response_error(response, 'Error building chart')
   )
+
+$ ->
+  $('#tickets_date_range').daterangepicker()
+  $('button.icon-calendar').click ->
+    $('#tickets_date_range').trigger 'click'
+
+
+$ ->
+  $('#tickets_date_range').on 'apply.daterangepicker', (ev, picker) ->
+    start = picker.startDate.format('MMMM/DD/YYYY').split('/')
+    end = picker.endDate.format('MMMM/DD/YYYY').split('/')
+    val = start[0] + ' ' + start[1] + ', ' + start[2] + ' to ' + end[0] + ' ' + end[1] + ', ' + end[2]
+    $('.dashboard-time label')[0].innerHTML = val
+
+    firstday = new Date(picker.startDate).toUTCString();
+    lastday = new Date(picker.endDate).toUTCString();
+
+    localStorage.setItem 'webrep_report_range_from', picker.startDate
+    localStorage.setItem 'webrep_report_range_to', picker.endDate
+    user_id = $("#user_id").val()
+    refresh_single_open_tickets_table(user_id)
+
+    return
+  return
 
 $ ->
   $(document).ready ->
