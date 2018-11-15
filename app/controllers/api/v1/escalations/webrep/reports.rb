@@ -90,6 +90,11 @@ module API
             get 'closed_ticket_entries_by_resolution_report' do
               authorize!(:index, Dispute)
               users = User.where(:id => params[:users])
+              binding.pry
+              if current_user.team_manager == current_user
+                users = users - [current_user]
+              end
+
               report_data = Dispute.closed_ticket_entries_by_resolution_report(users, params[:from], params[:to], params[:submission_types])
 
               response_data = {:status => "success", :data => report_data}
