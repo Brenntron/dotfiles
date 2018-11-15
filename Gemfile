@@ -120,15 +120,15 @@ group :profile do
 end
 
 gem 'httparty', '~> 0.15.3'
-gem 'uglifier', '~> 3.2.0'
+gem 'uglifier', '4.1.19'
 gem 'jquery-rails', '~> 4.3.1'
 gem 'jquery-ui-rails', '~> 6.0.1'
 gem 'coffee-rails', '~> 4.2.1'
 gem 'less-rails', '~> 3.0.0'
 gem 'bootstrap-sass', '~> 3.3.7'
 gem 'therubyracer', '~> 0.12.3'
-gem 'turbolinks', '~> 5.0.1'
-gem 'paper_trail', '~> 10.0.1'
+gem 'turbolinks', '5.2.0'
+gem 'paper_trail', '10.0.1'
 gem "sprockets", '~> 3.7.1'
 
 gem "peake-bridge-client", '>= 0.0.9.0', git: "https://git.vrt.sourcefire.com/talosweb/peake-bridge-client.git"
