@@ -1839,6 +1839,12 @@ $ ->
   closedTicketNumbers = [375502, 375504, 375513, 375515, 375516, 375517, 375518, 375519, 375520, 375521, 375522]
   timeToCloseTickets = [1, 1.3, 1.2, 1.5, 1.7, 1.4, 1.8, 0.9, 1, 1.1, 1.2, 1.5, 1.6]
   averageTimeToClose = 1.4
+  averageTimeToCloseLabel = {
+    enabled: true
+    content: 'Average Time To Close'
+    backgroundColor: 'none'
+    fontColor: "#000"
+  }
 
 
   window.timeCloseTicketsDataSets = [
@@ -1869,12 +1875,10 @@ $ ->
               display: false
             ticks: {
               min: 0
+              max: 2.5
               stepSize: .5
               callback: (value, index, values) ->
-                if value > 1
-                  return value + ' hr'
-                else
-                  return value + ' hr'
+                return value + ' hr'
             }
           }
         ]
@@ -1892,20 +1896,29 @@ $ ->
           }
           ]
       annotation: {
-        #drawTime: 'beforeDatasetsDraw'
-        annotations: [{
-          type: 'box'
-          yScaleID: 'y-axis-0'
-          xScaleID: 'x-axis-0'
-          xMin: Math.min(closedTicketNumbers)
-          xMax: Math.max(closedTicketNumbers)
-          yMax: averageTimeToClose
-          yMin: 0
-          backgroundColor: 'rgba(196, 234, 248, .35)'
-          borderColor: '#95989A'
-        }]
-      }
- )
+#        drawTime: 'beforeDatasetsDraw'
+#        drawTime: 'afterDatasetsDraw'
+        annotations: [
+          {
+            type: 'box'
+            yScaleID: 'y-axis-0'
+            xScaleID: 'x-axis-0'
+            xMin: Math.min(closedTicketNumbers)
+            xMax: Math.max(closedTicketNumbers)
+            yMax: averageTimeToClose
+            yMin: 0
+            backgroundColor: 'rgba(196, 234, 248, .35)'
+            borderColor: '#95989A'
+          },
+          {
+            type: 'line'
+            mode: 'horizontal'
+            scaleID: 'y-axis-0'
+            value: 2.2
+            label:
+              averageTimeToCloseLabel
+          }]
+      })
 
 
 
