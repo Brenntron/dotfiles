@@ -1254,10 +1254,11 @@ class Dispute < ApplicationRecord
                       :status => result.status,
                       :d_entry_preview => "<span class='dispute_entry_content_first'>#{result.dispute_entries.first.hostlookup}</span><span class='dispute-count'>#{entry_count}</span>",
                       :age => distance_of_time_in_words(Time.now, result.created_at),
-                      :submitter_type => result.submitter_type == SUBMITTER_TYPE_CUSTOMER,
+                      :submitter_type => result.submitter_type.downcase,
                       :submission_type => result.submission_type,
                       :last_comment => last_comment_time,
-                      :owner => ticket_user
+                      :owner => ticket_user,
+                      :priority => result.priority
 
       }
     end
