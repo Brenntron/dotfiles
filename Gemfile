@@ -66,7 +66,7 @@ gem 'jquery-datatables-rails', '~> 3.4.0'
 gem 'ajax-datatables-rails', '~> 0.4.0'
 gem 'clipboard-rails', '1.7.1'
 
-gem 'capybara', '3.11.0'
+gem 'capybara', '2.11.0'
 gem 'poltergeist', '1.18.1'
 
 gem 'inline_svg', '1.3.1'
