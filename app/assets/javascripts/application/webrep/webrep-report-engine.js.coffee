@@ -256,6 +256,8 @@ window.build_graph_ticket_entries_submitter = () ->
       submitterCustomerChartData = json["data"]["customer_chart_data"]
       submitterChartLabels = json["data"]["chart_labels"]
 
+      Chart.defaults.global.defaultFontFamily = "'Open Sans', sans-serif"
+      Chart.defaults.global.defaultFontSize = 10
 
       new Chart($('#graph-ticket-entries-submitter'),
         type: 'bar'
@@ -336,6 +338,9 @@ window.build_single_closed_email_entries_resolution_piechart = () ->
       $(tableData).each ->
         $(email_piechart_table).append('<tr><td>' + this.resolution + '</td><td class="text-center">' + this.percent + ' %</td><td class="text-center">' + this.count + '</td></tr>')
 
+      Chart.defaults.global.defaultFontFamily = "'Open Sans', sans-serif"
+      Chart.defaults.global.defaultFontSize = 10
+
       new Chart($('#closed-email-entries-resolution-piechart'),
         type: 'pie'
         data:
@@ -406,6 +411,8 @@ window.build_single_closed_web_entries_resolution_piechart = () ->
       $(tableData).each ->
         $(web_piechart_table).append('<tr><td>' + this.resolution + '</td><td class="text-center">' + this.percent + ' %</td><td class="text-center">' + this.count + '</td></tr>')
 
+      Chart.defaults.global.defaultFontFamily = "'Open Sans', sans-serif"
+      Chart.defaults.global.defaultFontSize = 10
 
       new Chart($('#closed-web-entries-resolution-piechart'),
         type: 'pie'

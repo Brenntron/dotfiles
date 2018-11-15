@@ -1,26 +1,27 @@
 .row
   .col-xl-6.col-lg-7.col-xs-12.dashboard-tickets-wrapper
     %h1.dashboard-header My Tickets
-    .content-layout-list
-      %label.content-label-sm.icon-custom-star
-        Show Customer Tickets
-        %input{:type => "checkbox", :checked => "checked"}/
-
-      %label.content-label-sm.no-left-pad.right-vertical-separator
-        Show Guest Tickets
-        %input{:type => "checkbox", :checked => "checked"}/
-
-      %label.content-label-sm.dispute-E-grey
-        Show Email Tickets
-        %input{:type => "checkbox", :checked => "checked"}/
-
-      %label.content-label-sm.dispute-W-grey
-        Show Web Tickets
-        %input{:type => "checkbox", :checked => "checked"}/
-
-      %label.content-label-sm.dispute-EW-grey.btn-margin-left
-        Show Email/Web Tickets
-        %input{:type => "checkbox", :checked => "checked"}/
+    -# TODO Hook up the content layout list to the below tables, post launch
+    -#.content-layout-list
+    -#  %label.content-label-sm.icon-custom-star
+    -#    Show Customer Tickets
+    -#    %input{:type => "checkbox", :checked => "checked"}/
+    -#
+    -#  %label.content-label-sm.no-left-pad.right-vertical-separator
+    -#    Show Guest Tickets
+    -#    %input{:type => "checkbox", :checked => "checked"}/
+    -#
+    -#  %label.content-label-sm.dispute-E-grey
+    -#    Show Email Tickets
+    -#    %input{:type => "checkbox", :checked => "checked"}/
+    -#
+    -#  %label.content-label-sm.dispute-W-grey
+    -#    Show Web Tickets
+    -#    %input{:type => "checkbox", :checked => "checked"}/
+    -#
+    -#  %label.content-label-sm.dispute-EW-grey.btn-margin-left
+    -#    Show Email/Web Tickets
+    -#    %input{:type => "checkbox", :checked => "checked"}/
 
     .tickets-section-wrapper.open-tickets-wrapper
       .open-tickets-header
@@ -34,13 +35,13 @@
         %thead
           %tr
             %th
-            -#  priority
+              -#  priority
             %th Case ID
             %th
-            -#  Submitter type
+              -#  Submitter type
             %th Status
             %th
-            -#  Ticket type
+              -#  Ticket type
             %th Dispute Preview
             %th Last Comment Date
 
@@ -79,14 +80,15 @@
         %thead
           %tr
             %th
-            -#    priority
+              -#    priority
             %th Case ID
             %th
-            -#  Submitter type
+              -#  Submitter type
             %th
-            -#  Ticket type
+              -#  Ticket type
             %th Dispute Preview
             %th Time to Close
+
       .ticket-entries-totals-wrapper
         %label.totals-label
           Total Ticket Entries
@@ -111,86 +113,79 @@
             Email/Web Entries
           %span#closed_single_email_web_count.ticket-entry-total
 
+
   .col-xl-6.col-lg-5.col-xs-12.graph-section
     .row
-      .col-lg-12.col-xl-6.top-space-ex
-        .graph-top-header
-          %h5.uppercase.header-stg Ticket Entries Closed by Day
+      .col-md-12.col-lg-7
 
-        .graph-config
-          %label.content-label-sm.graph-select-label Time Breakdown
-          %select.form-control
-            %option{:selected => "selected", :value => "day"} By Day
-            %option{:value => "weekly"} By Week
-            %option{:value => "monthly"} By Month
-            %option{:value => "yearly"} By Year
+        .reports-graph-wrapper
+          %h5 Ticket Entries Closed by Day
+          .graph-config
+            %label.content-label-sm.graph-select-label Time Breakdown
+            %select.form-control
+              %option{:selected => "selected", :value => "day"} By Day
+              %option{:value => "weekly"} By Week
+              %option{:value => "monthly"} By Month
+              %option{:value => "yearly"} By Year
 
-          .graph-menu
-            %label
-              %input.all-ticket{:type => "checkbox", :checked => "checked", :onclick => 'updateGraph(["Total Ticket Entries"], "userTicketClosedGraph", this)'}/
-              %label.total-legend
-              Total Tickets Entries
+            .graph-menu
+              .label-wrapper
+                %input.all-ticket{:type => "checkbox", :checked => "checked", :onclick => 'updateGraph(["Total Ticket Entries"], "userTicketClosedGraph", this)'}/
+                %label.total-legend
+                Total Tickets Entries
 
-            %label
-              %input.group-ticket{:type => "checkbox", :checked => "checked", :onclick => 'updateGraph(["E", "W", "EW"], "userTicketClosedGraph", this)'}/
-              %label.dispute-E.legend-option
-              %label.dispute-W.legend-option
-              %label.dispute-EW.legend-option
-              Entries By Ticket Types
-        %canvas#graph-ticket-entries-closed
+              .label-wrapper
+                %input.group-ticket{:type => "checkbox", :checked => "checked", :onclick => 'updateGraph(["E", "W", "EW"], "userTicketClosedGraph", this)'}/
+                %label.dispute-E.legend-option
+                %label.dispute-W.legend-option
+                %label.dispute-EW.legend-option
+                Entries By Ticket Types
+          %canvas#graph-ticket-entries-closed
 
+        .reports-graph-wrapper
+          %h5 Time to Close Tickets
+          .average-label
+            %label Average Time To Close
+            %label.label-stg 45m 12s
+          %canvas#time-to-close-tickets-linechart
 
-        .graph-top-header.top-space-ex.bottom-space
-          %h5.uppercase.header-stg Time to Close Tickets
-        .average-label
-          %label Average Time To Close
-          %label.label-stg 45m 12s
-        %canvas#time-to-close-tickets-linechart
-
-
-        %label.content-label-sm.top-space-ex Time Breakdown
-        .graph-config
-          %select.form-control
-            %option{:selected => "selected", :value => ""} By Day
-            %option{:value => ""} Weekly
-            %option{:value => ""} Monthly
-            %option{:value => ""} Yearly
-        .graph-top-header
-          %h5.uppercase.header-stg Ticket Submitted by Submitter Type
-        .graph-bar-legend
-          .custom-legend
-            %label Customer
-            %label.skyblue-legend-color
-          .custom-legend
-            %label Guest
-            %label.navyblue-legend-color
-        %canvas#graph-ticket-entries-submitter
+        .reports-graph-wrapper
+          %h5 Ticket Submitted by Submitter Type
+          .graph-config
+            %label.content-label-sm.graph-select-label Time Breakdown
+            %select.form-control
+              %option{:selected => "selected", :value => ""} By Day
+              %option{:value => ""} Weekly
+              %option{:value => ""} Monthly
+              %option{:value => ""} Yearly
+            .graph-bar-legend
+              %label.skyblue-legend-color Customer
+              %label.navyblue-legend-color Guest
+          %canvas#graph-ticket-entries-submitter
 
 
-      .col-lg-12.col-xl-6.top-space-ex.graph-section
-        .graph-top-header
-          %h5.uppercase.dispute-E-grey.graph-header-icon-stg.header-stg.bottom-space Closed Email Entries by Resolution
+      .col-md-12.col-lg-5.graph-section
 
-        %canvas#closed-email-entries-resolution-piechart
+        .reports-graph-wrapper
+          %h5.dispute-E-grey.graph-header-icon-stg Closed Email Entries by Resolution
+          %canvas#closed-email-entries-resolution-piechart
 
-        %table.table#closed-email-entries-resolution-table
-          %thead
-            %tr
-              %th Resolution
-              %th.text-center %
-              %th.text-center Count
-          %tbody
+          %table.table#closed-email-entries-resolution-table
+            %thead
+              %tr
+                %th Resolution
+                %th.text-center %
+                %th.text-center Count
+            %tbody
 
+        .reports-graph-wrapper
+          %h5.dispute-W-grey.graph-header-icon-stg Closed Web Entries by Resolution
+          %canvas#closed-web-entries-resolution-piechart
 
-        .graph-top-header.top-space.top-space-ex
-          %h5.uppercase.dispute-W-grey.graph-header-icon-stg.header-stg.bottom-space Closed Web Entries by Resolution
-
-        %canvas#closed-web-entries-resolution-piechart
-
-        %table.table#closed-web-entries-resolution-table
-          %thead
-            %tr
-              %th Resolution
-              %th.text-center %
-              %th.text-center Count
-          %tbody
+          %table.table#closed-web-entries-resolution-table
+            %thead
+              %tr
+                %th Resolution
+                %th.text-center %
+                %th.text-center Count
+            %tbody
