@@ -222,8 +222,8 @@ window.set_initial_date_span = () ->
     localStorage.setItem 'webrep_report_range_from', firstday
     localStorage.setItem 'webrep_report_range_to', lastday
 
-  alert(localStorage.getItem('webrep_report_range_from'))
-  alert(localStorage.getItem('webrep_report_range_to'))
+#  alert(localStorage.getItem('webrep_report_range_from'))
+#  alert(localStorage.getItem('webrep_report_range_to'))
   user_id = $("#user_id").val()
 
   refresh_single_open_tickets_table(user_id)
@@ -437,6 +437,29 @@ window.build_single_closed_web_entries_resolution_piechart = () ->
 
 
 
+$ ->
+  $('#tickets_date_range').daterangepicker()
+  $('button.icon-calendar').click ->
+    $('#tickets_date_range').trigger 'click'
+
+
+$ ->
+  $('#tickets_date_range').on 'apply.daterangepicker', (ev, picker) ->
+    start = picker.startDate.format('MMMM/DD/YYYY').split('/')
+    end = picker.endDate.format('MMMM/DD/YYYY').split('/')
+    val = start[0] + ' ' + start[1] + ', ' + start[2] + ' to ' + end[0] + ' ' + end[1] + ', ' + end[2]
+    $('.dashboard-time label')[0].innerHTML = val
+
+    firstday = new Date(picker.startDate).toUTCString();
+    lastday = new Date(picker.endDate).toUTCString();
+
+    localStorage.setItem 'webrep_report_range_from', picker.startDate
+    localStorage.setItem 'webrep_report_range_to', picker.endDate
+    user_id = $("#user_id").val()
+    refresh_single_open_tickets_table(user_id)
+
+    return
+  return
 
 
 $ ->

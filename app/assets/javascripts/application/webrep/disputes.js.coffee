@@ -2336,24 +2336,6 @@ $ ->
 
   )
 
-
-$ ->
-  $('#tickets_date_range').daterangepicker()
-  $('button.icon-calendar').click ->
-    console.log ('you clicked me the calendar icon or button')
-    $('#tickets_date_range').trigger 'click'
-  return
-
-
-$ ->
-  $('#tickets_date_range').on 'apply.daterangepicker', (ev, picker) ->
-    start = picker.startDate.format('MMMM/DD/YYYY').split('/')
-    end = picker.endDate.format('MMMM/DD/YYYY').split('/')
-    val = start[0] + ' ' + start[1] + ', ' + start[2] + ' to ' + end[0] + ' ' + end[1] + ', ' + end[2]
-    $('.dashboard-time label')[0].innerHTML = val
-    return
-  return
-
 #    If user changes buttons from initial status, enable the submit button
 #   TODO add this check in later that only allows user to submit if there have been changes made
 
