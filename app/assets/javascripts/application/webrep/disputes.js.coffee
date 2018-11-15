@@ -2362,9 +2362,9 @@ $ ->
 # Create Dashboard Initial Table (My Open Tickets)
 $ ->
 
+#
   window.open_dashboard_dispute_table = $('#table-user-disputes-open').DataTable(
     dom: '<t>'
-    data: tempSingleUserOpenTixDataset
     columnDefs: [
       {
         targets: [ 1 ]
@@ -2531,50 +2531,6 @@ $ ->
       { data: 'time_to_close' }
     ]
   )
-
-tempSingleUserOpenTixDataset = [
-  {
-    'priority': ['P1'],
-    'case_number': ['0000375515'],
-    'submitter_type': ['customer'],
-    'owner': ['melitayl'],
-    'status': ['Researching'],
-    'submission_type': ['W'],
-    'd_entry_preview': ['<span class="dispute_entry_content_first">guardiancremation.com</span><span class="dispute-count">4</span>'],
-    'last_comment': ['2018-08-08 13:59:10']
-  },
-  {
-    'priority': ['P3'],
-    'case_number': ['0000375513'],
-    'submitter_type': ['guest'],
-    'owner': ['nicherbe'],
-    'status': ['Assigned'],
-    'submission_type': ['E'],
-    'd_entry_preview': ['<span class="dispute_entry_content_first">bvillaseminyak.com</span><span class="dispute-count">7</span>'],
-    'last_comment': ['2018-08-08 13:59:10']
-  },
-  {
-    'priority': ['P4'],
-    'case_number': ['0000375502'],
-    'submitter_type': ['guest'],
-    'owner': ['melitayl'],
-    'status': ['Customer_Pending'],
-    'submission_type': ['W'],
-    'd_entry_preview': ['<span class="dispute_entry_content_first">food-hub.org</span><span class="dispute-count">14</span>'],
-    'last_comment': ['2018-08-08 13:59:10']
-  },
-  {
-    'priority': ['P3'],
-    'case_number': ['000012345'],
-    'submitter_type': ['customer'],
-    'owner': ['nverbeck'],
-    'status': ['Researching'],
-    'submission_type': ['W'],
-    'd_entry_preview': ['<span class="dispute_entry_content_first">housingscotlandtoday.com</span><span class="dispute-count">9</span>'],
-    'last_comment': ['2018-08-08 13:59:10']
-  }
-]
-
 
 tempSingleUserClosedTixDataset = [
   {
