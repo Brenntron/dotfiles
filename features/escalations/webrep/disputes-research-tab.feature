@@ -1,5 +1,5 @@
 Feature: Disputes index, Research tab
-  In order to interact with disputes' entries as a user, I will provide ways to interact with entires in the Research tab
+  In order to interact with disputes' entries as a user, I will provide ways to interact with entries in the Research tab
 
   @javascript
   Scenario: Disputes with no entries shouldn't attempt to display any entries in the table
@@ -71,28 +71,3 @@ Feature: Disputes index, Research tab
     Then I should see content "No score." within ".research-table-row-wrapper"
     Then I should see content "Unresolved" within ".research-table-row-wrapper"
     Then I should see content "Unclassified" within ".research-table-row-wrapper"
-
-
-  @javascript
-  Scenario: A user should see links as WBRS/SBRS rule hits which creates an email with a RuleHit Resolution Mailer Template
-    Given a user with role "webrep user" exists and is logged in
-    And the following disputes exist:
-    |id|
-    |1 |
-    And the following dispute_entries exist:
-    |ip_address  | dispute_id|uri|
-    |2.133.94.166| 1         |   |
-    And a Dispute RuleHit exists with name, "sqdk", and RuleType of "WBRS"
-    And a Dispute RuleHit exists with name, "Cbl", and RuleType of "SBRS"
-    And a RuleHit Resolution Mailer template exists with mnemonic, "sqdk", and body of "Temple Gates"
-    And a RuleHit Resolution Mailer template exists with mnemonic, "Cbl", and body of "Wisdom"
-    When I goto "escalations/webrep/disputes/1/"
-    Then I click "#research-tab-link"
-    Then I click "#expand-all-rows"
-    Then I click link "inline-wbrs-hit-1"
-    Then I should see content "Temple Gates" within ".new-body"
-    Then I click ".ui-dialog-titlebar-close"
-    Then I click "#research-tab-link"
-    Then I click "#expand-all-rows"
-    Then I click link "inline-sbrs-hit-2"
-    Then I should see content "Wisdom" within ".new-body"
