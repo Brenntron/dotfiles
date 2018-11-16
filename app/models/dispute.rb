@@ -482,7 +482,7 @@ class Dispute < ApplicationRecord
             auto_resolve_verdict = new_dispute_entry.assign_from_auto_resolve(address: key,
                                                                               total_hits: total_hits,
                                                                               resolved_at: resolved_at,
-                                                                              dispute_entry_id: new_dispute_entry.id)
+                                                                              dispute_entry_id: new_dispute_entry)
 
             if auto_resolve_verdict.resolved? && auto_resolve_verdict.malicious?
               verdicts_to_blacklist << [auto_resolve_verdict, new_dispute_entry]
@@ -561,7 +561,7 @@ class Dispute < ApplicationRecord
             auto_resolve_verdict = new_dispute_entry.assign_from_auto_resolve(address: key,
                                                                               total_hits: total_hits,
                                                                               resolved_at: resolved_at,
-                                                                              dispute_entry_id: new_dispute_entry.id)
+                                                                              dispute_entry_id: new_dispute_entry)
 
             if auto_resolve_verdict.resolved? && auto_resolve_verdict.malicious?
               verdicts_to_blacklist << [auto_resolve_verdict, new_dispute_entry]

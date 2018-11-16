@@ -97,8 +97,10 @@ class AutoResolve
     return nil
   end
 
-  def check_virus_total_from_preload(dispute_entry_id)
-    result = JSON.parse(DisputeEntryPreload.where(dispute_entry_id: dispute_entry_id)&.first&.virustotal)
+  def check_virus_total_from_preload(dispute_entry)
+
+    # dispute_entry.virustotal
+    result = JSON.parse(dispute_entry.dispute_entry_preload&.virustotal)
     if result && result['scans']
       all_scans = result['scans']
       scan_results = virus_total_scan_names.map do |scan_key|
@@ -152,8 +154,8 @@ class AutoResolve
     return nil
   end
 
-  def check_umbrella_from_preload(dispute_entry_id)
-    result = DisputeEntryPreload.where(dispute_entry_id: dispute_entry_id).first.umbrella
+  def check_umbrella_from_preload(dispute_entry)
+    result = DisputeEntryPreload.where(dispute_entry_id: dispute_entry.id).first.umbrella
     if result
       if result == 'Malicious'
         append_comment('Umbrella: malicious domain.; ')
@@ -188,7 +190,7 @@ class AutoResolve
 
   # Checks the remote systems.
   # Sets this object state to convention of NEW: human review needed, MALICIOUS: auto resolve, or nil unknown.
-  def check_sources(rule_hits:, dispute_entry_id:)
+  def check_sources(rule_hits:, dispute_entry:)
     wbrs_hits =
         if Rails.configuration.complaints.check
           check_complaints(rule_hits: rule_hits)
@@ -198,14 +200,14 @@ class AutoResolve
 
     vt_status =
         if Rails.configuration.virus_total.check
-          check_virus_total_from_preload(dispute_entry_id)
+          check_virus_total_from_preload(dispute_entry)
         else
           nil
         end
 
     umbrella_status =
         if Rails.configuration.umbrella.check
-          check_umbrella_from_preload(dispute_entry_id)
+          check_umbrella_from_preload(dispute_entry)
         else
           nil
         end
@@ -247,7 +249,7 @@ class AutoResolve
   # @param [String] address_type: 'IP' or 'URI/DOMAIN'
   # @param [String] address: ip address, uri, or domain
   # @param [Array<String>] rule_hits: collection of our rule hits as strings of mnem values
-  def self.create_from_payload(address_type, address, rule_hits = nil, dispute_entry_id)
+  def self.create_from_payload(address_type, address, rule_hits = nil, dispute_entry:)
     address_type_attr =
         case
           when 'IP' == address_type
@@ -259,7 +261,7 @@ class AutoResolve
         end
 
     auto_resolve = new(address_type: address_type_attr, address: address, rule_hits: rule_hits)
-    auto_resolve.check_sources(rule_hits: rule_hits, dispute_entry_id: dispute_entry_id)
+    auto_resolve.check_sources(rule_hits: rule_hits, dispute_entry: dispute_entry)
     auto_resolve
   end
 
