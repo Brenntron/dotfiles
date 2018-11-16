@@ -445,6 +445,96 @@ window.build_single_closed_web_entries_resolution_piechart = () ->
       popup_response_error(response, 'Error building chart')
   )
 
+window.build_single_entries_closed_by_day_chart = () ->
+  from = localStorage.getItem('webrep_report_range_from')
+  to = localStorage.getItem('webrep_report_range_to')
+  user_id = $("#user_id").val()
+
+  data = {
+    from: from,
+    to: to,
+    users: [user_id]
+  }
+
+  headers = {'Token': $('input[name="token"]').val(), 'Xmlrpc-Token': $('input[name="xml_token"]').val()}
+  $.ajax(
+    url: '/escalations/api/v1/escalations/webrep/reports/ticket_entries_closed_by_day_report'
+    method: 'GET'
+    headers: headers
+    data: data
+    dataType: 'json'
+    success: (response) ->
+
+      json = $.parseJSON(response)
+
+      ticketTypeChartLabels = json['data']['report_labels']
+      ticketTypeTotalData = json['data']['report_total_data']
+      ticketTypeWData = json['data']['report_w_data']
+      ticketTypeEData = json['data']['report_e_data']
+      ticketTypeEWData = json['data']['report_ew_data']
+
+      window.userTicketClosedGraphDatasets = [
+        {
+          label: 'Total Ticket Entries'
+          backgroundColor: '#6dbcdb'
+          data: ticketTypeTotalData
+        }
+        {
+          label: 'W'
+          backgroundColor: '#E47433'
+          data: ticketTypeWData
+        }
+        {
+          label: 'E'
+          backgroundColor: '#5FB665'
+          data: ticketTypeEData
+        }
+        {
+          label: 'EW'
+          backgroundColor: '#C14B92'
+          data: ticketTypeEWData
+        }]
+
+
+      window.userTicketClosedGraph = new Chart($('#graph-ticket-entries-closed'),
+        type: 'bar'
+        data:
+          labels: ticketTypeChartLabels
+          datasets: window.userTicketClosedGraphDatasets,
+        options:
+          legend:
+            display: false
+          title:
+            display: true
+            position: 'bottom'
+            text: 'Dates'
+          scales:
+            yAxes: [
+              {
+                gridLines:
+                  display: false
+                ticks: {
+                  min: 0
+                }
+              }
+            ]
+            xAxes: [
+              {
+                gridLines:
+                  display: false
+                ticks: {
+                  autoSkip: false
+                }
+              }
+            ]
+      )
+
+
+    error: (response) ->
+      popup_response_error(response, 'Error building chart')
+  )
+
+
 
 
 $ ->
@@ -478,3 +568,4 @@ $ ->
     window.build_graph_ticket_entries_submitter()
     window.build_single_closed_email_entries_resolution_piechart()
     window.build_single_closed_web_entries_resolution_piechart()
+    window.build_single_entries_closed_by_day_chart()

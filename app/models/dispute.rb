@@ -1306,6 +1306,9 @@ class Dispute < ApplicationRecord
   end
 
   def self.ticket_entries_closed_by_day_report(users, from, to)
+    #users = [User.find(1)]
+    #from = "Wed, 5 Sep 2018 17:40:08 GMT"
+    #to = "Thu, 20 Sep 2018 17:40:08 GMT"
 
     from = Time.parse(from)
     to = Time.parse(to)
@@ -1318,18 +1321,19 @@ class Dispute < ApplicationRecord
 
     all_entries = main_results.map {|result| result.dispute_entries}.flatten
 
-    report_data[:all_results] = 0
-    report_data[:email_results] = 0
-    report_data[:web_results] = 0
-    report_data[:email_web_results] = 0
+    report_data[:report_labels] = []
+    report_data[:report_total_data] = []
+    report_data[:report_w_data] = []
+    report_data[:report_e_data] = []
+    report_data[:report_ew_data] = []
 
     while Date.parse(swap_day.to_s) != (Date.parse(to.to_s) + 1.day)
 
-      report_data[swap_day.to_s] = {}
-      report_data[swap_day.to_s][:all_results] = 0
-      report_data[swap_day.to_s][:email_results] = 0
-      report_data[swap_day.to_s][:web_results] = 0
-      report_data[swap_day.to_s][:email_web_results] = 0
+      day_all_totals = 0
+      day_e_totals = 0
+      day_w_totals = 0
+      day_ew_totals = 0
+      report_data[:report_labels] << swap_day.strftime("%a %b %d, %Y")
 
       report_day_count = 0
       day_results = all_entries.select {|result| Date.parse(result.case_resolved_at.to_s) == Date.parse(swap_day.to_s)}
@@ -1338,19 +1342,24 @@ class Dispute < ApplicationRecord
 
         day_results.each do |day_result|
           if day_result.status == DisputeEntry::STATUS_RESOLVED
-            report_data[swap_day.to_s][:all_results] += 1
+            day_all_totals += 1
 
             case day_result.dispute.submission_type.downcase
               when 'e'
-                report_data[swap_day.to_s][:email_results] += 1
+                day_e_totals += 1
               when 'w'
-                report_data[swap_day.to_s][:web_results] += 1
+                day_w_totals += 1
               when 'ew'
-                report_data[swap_day.to_s][:email_web_results] += 1
+                day_ew_totals += 1
             end
           end
         end
       end
+
+      report_data[:report_total_data] << day_all_totals
+      report_data[:report_w_data] << day_w_totals
+      report_data[:report_e_data] << day_e_totals
+      report_data[:report_ew_data] << day_ew_totals
 
       swap_day = swap_day + 1.day
     end
