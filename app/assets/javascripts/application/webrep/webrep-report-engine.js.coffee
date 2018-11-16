@@ -689,10 +689,10 @@ $ ->
     localStorage.setItem 'webrep_report_range_from', picker.startDate
     localStorage.setItem 'webrep_report_range_to', picker.endDate
     user_id = $("#user_id").val()
-    refresh_single_open_tickets_table(user_id)
-    refresh_single_closed_tickets_table(user_id)
-    return
-  return
+    #refresh_single_open_tickets_table(user_id)
+    #refresh_single_closed_tickets_table(user_id)
+    #return
+  #return
 
 
 $ ->
