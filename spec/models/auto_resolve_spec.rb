@@ -83,6 +83,11 @@ describe AutoResolve do
     }
     let(:umbrella_conviction_response) { double('HTTPI::Response', code: 200, body: umbrella_conviction_json) }
 
+    let(:dispute_entry) do
+      dispute_entry = DisputeEntry.create(id: 1)
+      dispute_entry.save
+
+    end
 
     it 'skips complaints' do
       allow(Rails.configuration.complaints).to receive(:check).and_return(false)
@@ -92,7 +97,7 @@ describe AutoResolve do
       expect(auto_cisco).to_not receive(:check_virus_total)
       expect(auto_cisco).to_not receive(:check_umbrella)
 
-      auto_cisco.check_sources(rule_hits: [])
+      auto_cisco.check_sources(rule_hits: [], dispute_entry: dispute_entry, address: 'google.com')
 
     end
 
@@ -100,11 +105,10 @@ describe AutoResolve do
     it 'produces new ticket when complaints hits and VT and Umbrella convict' do
       allow(Rails.configuration.complaints).to receive(:check).and_return(true)
       allow(Rails.configuration.virus_total).to receive(:check).and_return(true)
-      allow(Rails.configuration.umbrella).to receive(:check).and_return(true)
       expect(Virustotal::Scan).to receive(:scan_hashes).with(address: target_address).and_return(JSON.parse(virus_total_conviction_json))
       expect(Umbrella::Scan).to receive(:scan_result).with(address: target_address).and_return(umbrella_conviction_response)
 
-      auto_resolve = AutoResolve.create_from_payload('IP', target_address, %w{alx_cln vsvd})
+      auto_resolve = AutoResolve.create_from_payload('IP', target_address, %w{alx_cln vsvd}, dispute_entry)
 
       expect(auto_resolve.resolved?).to be_falsey
       expect(auto_resolve.internal_comment).to include('Kaspersky: kaspermalicious;')
@@ -119,7 +123,7 @@ describe AutoResolve do
       expect(Virustotal::Scan).to receive(:scan_hashes).with(address: target_address).and_return(JSON.parse(virus_total_clear_json))
       expect(Umbrella::Scan).to receive(:scan_result).with(address: target_address).and_return(umbrella_clear_response)
 
-      auto_resolve = AutoResolve.create_from_payload('IP', target_address, %w{alx_cln vsvd})
+      auto_resolve = AutoResolve.create_from_payload('IP', target_address, %w{alx_cln vsvd}, dispute_entry)
 
       expect(auto_resolve.resolved?).to be_falsey
       expect(auto_resolve.internal_comment).to include('VT: -;')
@@ -150,7 +154,7 @@ describe AutoResolve do
       expect(Virustotal::Scan).to receive(:scan_hashes).with(address: target_address).and_return(JSON.parse(virus_total_clear_json))
       expect(Umbrella::Scan).to receive(:scan_result).with(address: target_address).and_return(umbrella_conviction_response)
 
-      auto_resolve = AutoResolve.create_from_payload('IP', target_address, [])
+      auto_resolve = AutoResolve.create_from_payload('IP', target_address, [], dispute_entry)
 
       expect(auto_resolve.resolved?).to be_truthy
       expect(auto_resolve.malicious?).to be_truthy
@@ -166,7 +170,7 @@ describe AutoResolve do
       expect(Virustotal::Scan).to receive(:scan_hashes).with(address: target_address).and_return(JSON.parse(virus_total_clear_json))
       expect(Umbrella::Scan).to receive(:scan_result).with(address: target_address).and_return(umbrella_clear_response)
 
-      auto_resolve = AutoResolve.create_from_payload('IP', target_address, [])
+      auto_resolve = AutoResolve.create_from_payload('IP', target_address, [], dispute_entry)
 
       expect(auto_resolve.resolved?).to be_truthy
       expect(auto_resolve.malicious?).to be_falsey
@@ -182,7 +186,7 @@ describe AutoResolve do
       expect(Virustotal::Scan).to receive(:scan_hashes).with(address: target_address).and_return(JSON.parse(virus_total_clear_json))
       allow(Umbrella::Scan).to receive(:scan_result).with(address: target_address).and_return(umbrella_conviction_response)
 
-      auto_resolve = AutoResolve.create_from_payload('IP', target_address, [])
+      auto_resolve = AutoResolve.create_from_payload('IP', target_address, [], dispute_entry)
 
       expect(auto_resolve.resolved?).to be_falsey
       expect(auto_resolve.internal_comment).to include('VT: -;')
@@ -196,7 +200,7 @@ describe AutoResolve do
       expect(Virustotal::Scan).to receive(:scan_hashes).with(address: target_address).and_return(JSON.parse(virus_total_clear_json))
       allow(Umbrella::Scan).to receive(:scan_result).with(address: target_address).and_return(umbrella_conviction_response)
 
-      auto_resolve = AutoResolve.create_from_payload('IP', target_address, [])
+      auto_resolve = AutoResolve.create_from_payload('IP', target_address, [], dispute_entry)
 
       expect(auto_resolve.resolved?).to be_falsey
       expect(auto_resolve.internal_comment).to include('VT: -;')
@@ -210,7 +214,7 @@ describe AutoResolve do
       allow(Virustotal::Scan).to receive(:scan_hashes).with(address: target_address).and_return(JSON.parse(virus_total_conviction_json))
       expect(Umbrella::Scan).to receive(:scan_result).with(address: target_address).and_return(umbrella_conviction_response)
 
-      auto_resolve = AutoResolve.create_from_payload('IP', target_address, [])
+      auto_resolve = AutoResolve.create_from_payload('IP', target_address, [], dispute_entry)
 
       expect(auto_resolve.resolved?).to be_truthy
       expect(auto_resolve.malicious?).to be_truthy
@@ -225,7 +229,7 @@ describe AutoResolve do
       expect(Virustotal::Scan).to receive(:scan_hashes).with(address: target_address).and_raise(Curl::Err::ConnectionFailedError)
       expect(Umbrella::Scan).to receive(:scan_result).with(address: target_address).and_return(umbrella_conviction_response)
 
-      auto_resolve = AutoResolve.create_from_payload('IP', target_address, [])
+      auto_resolve = AutoResolve.create_from_payload('IP', target_address, [], dispute_entry)
 
       expect(auto_resolve.resolved?).to be_truthy
       expect(auto_resolve.malicious?).to be_truthy
@@ -240,7 +244,7 @@ describe AutoResolve do
       allow(Virustotal::Scan).to receive(:scan_hashes).with(address: target_address).and_return(JSON.parse(virus_total_conviction_json))
       expect(Umbrella::Scan).to receive(:scan_result).with(address: target_address).and_return(umbrella_conviction_response)
 
-      auto_resolve = AutoResolve.create_from_payload('IP', target_address, [])
+      auto_resolve = AutoResolve.create_from_payload('IP', target_address, [], dispute_entry)
 
       expect(auto_resolve.resolved?).to be_truthy
       expect(auto_resolve.malicious?).to be_truthy
@@ -255,7 +259,7 @@ describe AutoResolve do
       allow(Virustotal::Scan).to receive(:scan_hashes).with(address: target_address).and_raise(Curl::Err::ConnectionFailedError)
       expect(Umbrella::Scan).to receive(:scan_result).with(address: target_address).and_return(umbrella_conviction_response)
 
-      auto_resolve = AutoResolve.create_from_payload('IP', target_address, [])
+      auto_resolve = AutoResolve.create_from_payload('IP', target_address, [], dispute_entry)
 
       expect(auto_resolve.resolved?).to be_truthy
       expect(auto_resolve.malicious?).to be_truthy
@@ -269,7 +273,7 @@ describe AutoResolve do
       allow(Virustotal::Scan).to receive(:scan_hashes).with(address: target_address).and_return(JSON.parse(virus_total_conviction_json))
       allow(Umbrella::Scan).to receive(:scan_result).with(address: target_address).and_return(umbrella_conviction_response)
 
-      auto_resolve = AutoResolve.create_from_payload('IP', target_address, [])
+      auto_resolve = AutoResolve.create_from_payload('IP', target_address, [], dispute_entry)
 
       expect(auto_resolve.resolved?).to be_falsey
     end
@@ -282,7 +286,7 @@ describe AutoResolve do
       allow(Virustotal::Scan).to receive(:scan_hashes).with(address: target_address).and_return(JSON.parse(virus_total_conviction_json))
       expect(Umbrella::Scan).to receive(:scan_result).with(address: target_address).and_raise(Curl::Err::ConnectionFailedError)
 
-      auto_resolve = AutoResolve.create_from_payload('IP', target_address, [])
+      auto_resolve = AutoResolve.create_from_payload('IP', target_address, [], dispute_entry)
 
       expect(auto_resolve.resolved?).to be_falsey
     end
@@ -295,7 +299,7 @@ describe AutoResolve do
       expect(Virustotal::Scan).to receive(:scan_hashes).with(address: target_address).and_raise(Curl::Err::ConnectionFailedError)
       allow(Umbrella::Scan).to receive(:scan_result).with(address: target_address).and_return(umbrella_conviction_response)
 
-      auto_resolve = AutoResolve.create_from_payload('IP', target_address, [])
+      auto_resolve = AutoResolve.create_from_payload('IP', target_address, [], dispute_entry)
 
       expect(auto_resolve.resolved?).to be_falsey
     end
@@ -308,7 +312,7 @@ describe AutoResolve do
       expect(Virustotal::Scan).to receive(:scan_hashes).with(address: target_address).and_raise(Curl::Err::ConnectionFailedError)
       allow(Umbrella::Scan).to receive(:scan_result).with(address: target_address).and_raise(Curl::Err::ConnectionFailedError)
 
-      auto_resolve = AutoResolve.create_from_payload('IP', target_address, [])
+      auto_resolve = AutoResolve.create_from_payload('IP', target_address, [], dispute_entry)
 
       expect(auto_resolve.resolved?).to be_falsey
     end

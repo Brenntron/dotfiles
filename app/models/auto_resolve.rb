@@ -97,10 +97,13 @@ class AutoResolve
     return nil
   end
 
-  def check_virus_total_from_preload(dispute_entry)
+  def check_virus_total_from_preload(dispute_entry, address)
+    if dispute_entry.present? && dispute_entry.dispute_entry_preload.present? && dispute_entry.dispute_entry_preload.virustotal.present?
+      result = JSON.parse(dispute_entry.dispute_entry_preload.virustotal)
+    else
+      result = Virustotal::Scan.scan_hashes(address: address)
+    end
 
-    # dispute_entry.virustotal
-    result = JSON.parse(dispute_entry.dispute_entry_preload&.virustotal)
     if result && result['scans']
       all_scans = result['scans']
       scan_results = virus_total_scan_names.map do |scan_key|
@@ -154,17 +157,32 @@ class AutoResolve
     return nil
   end
 
-  def check_umbrella_from_preload(dispute_entry)
-    result = DisputeEntryPreload.where(dispute_entry_id: dispute_entry.id).first.umbrella
-    if result
-      if result == 'Malicious'
-        append_comment('Umbrella: malicious domain.; ')
-        return STATUS_MALICIOUS
-      else
-        append_comment('Umbrella: -; ')
-        return STATUS_NONMALICIOUS
+  def check_umbrella_from_preload(dispute_entry, address)
+    if dispute_entry.present? && DisputeEntryPreload.where(dispute_entry_id: dispute_entry.id).first.umbrella.present?
+      result = DisputeEntryPreload.where(dispute_entry_id: dispute_entry.id).first.umbrella
+      if result
+        if result == 'Malicious'
+          append_comment('Umbrella: malicious domain.; ')
+          return STATUS_MALICIOUS
+        else
+          append_comment('Umbrella: -; ')
+          return STATUS_NONMALICIOUS
+        end
+      end
+    else
+      result = call_umbrella(address: address)
+      if result && result[address]
+        verdict = result[address]
+        if 0 > verdict['status']
+          append_comment('Umbrella: malicious domain.; ')
+          return STATUS_MALICIOUS
+        else
+          append_comment('Umbrella: -; ')
+          return STATUS_NONMALICIOUS
+        end
       end
     end
+
   rescue
     append_comment('Umbrella: error; ')
     return nil
@@ -190,7 +208,7 @@ class AutoResolve
 
   # Checks the remote systems.
   # Sets this object state to convention of NEW: human review needed, MALICIOUS: auto resolve, or nil unknown.
-  def check_sources(rule_hits:, dispute_entry:)
+  def check_sources(rule_hits:, dispute_entry:, address:)
     wbrs_hits =
         if Rails.configuration.complaints.check
           check_complaints(rule_hits: rule_hits)
@@ -200,14 +218,14 @@ class AutoResolve
 
     vt_status =
         if Rails.configuration.virus_total.check
-          check_virus_total_from_preload(dispute_entry)
+          check_virus_total_from_preload(dispute_entry, address)
         else
           nil
         end
 
     umbrella_status =
         if Rails.configuration.umbrella.check
-          check_umbrella_from_preload(dispute_entry)
+          check_umbrella_from_preload(dispute_entry, address)
         else
           nil
         end
@@ -261,7 +279,7 @@ class AutoResolve
         end
 
     auto_resolve = new(address_type: address_type_attr, address: address, rule_hits: rule_hits)
-    auto_resolve.check_sources(rule_hits: rule_hits, dispute_entry: dispute_entry)
+    auto_resolve.check_sources(rule_hits: rule_hits, dispute_entry: dispute_entry, address: address)
     auto_resolve
   end
 
