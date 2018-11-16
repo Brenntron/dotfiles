@@ -199,22 +199,34 @@ window.collapse_selected = (tableId) ->
     i = i + 1
 
 # open selected funtionality
-window.open_selected = (tableId) ->
-  table = $('table#' + tableId).DataTable()
-  $.map table.rows('.selected').data(), (row) ->
-    domain = row.domain
-    if !domain.startsWith('http://')
-      domain = 'http://' + domain
-    window.open(domain, '_blank')
+window.open_selected_clusters = () ->
+  selected_rows = $('#clusters-index').DataTable().rows('.selected')
+  open_selected_tabs(selected_rows, true)
+
 
 # open all functionality
-window.open_all = (tableId) ->
-  table = $('table#' + tableId).DataTable()
-  $.map table.rows().data(), (row) ->
-    domain = row.domain
-    if !domain.startsWith('http://')
-      domain = 'http://' + domain
-    window.open(domain, '_blank')
+window.open_all_clusters = () ->
+  selected_rows = $('#clusters-index').DataTable().rows()
+  open_selected_tabs(selected_rows, true)
+
+# This is here because of weird namespace problems over at `complaints.js.coffee`
+open_selected_tabs = (selected_rows, toggle) ->
+  i = 0
+  while i < selected_rows[0].length
+    subdomain = ""
+    domain = ""
+    path = ""
+    if selected_rows.data()[i].subdomain
+      subdomain = selected_rows.data()[i].subdomain + "."
+    if selected_rows.data()[i].domain
+      domain = selected_rows.data()[i].domain
+    if selected_rows.data()[i].path
+      path = selected_rows.data()[i].path
+    if selected_rows.data()[i].domain
+      window.open("http://"+ subdomain + domain + path)
+    else
+      window.open("http://"+selected_rows.data()[i].ip_address)
+    i++
 
 
 window.copycat_dialog = () ->
