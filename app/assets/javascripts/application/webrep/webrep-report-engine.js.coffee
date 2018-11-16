@@ -61,12 +61,12 @@ window.refresh_single_open_tickets_table = (user_id)->
       #$('#refresh-error-msg').html('An error occured while retrieving data')
   , this)
 
-window.refresh_multi_open_tickets_table = (user_ids)->
+window.refresh_multi_open_tickets_table = ()->
   from = localStorage.getItem('webrep_report_range_from')
   to = localStorage.getItem('webrep_report_range_to')
-
+  team_ids = $.parseJSON("{\"team\":" + $("#team_ids").val() + "}")
   data = {
-    users: user_ids,
+    users: team_ids['team'],
     from: from,
     to: to
   }
@@ -87,20 +87,21 @@ window.refresh_multi_open_tickets_table = (user_ids)->
 
       else
 
-        datatable = $('#multi_user_open_tickets').DataTable()
+        datatable = $('#table-multi-user-disputes-open').DataTable()
         datatable.clear();
         datatable.rows.add(json.data.table_data);
         datatable.draw();
 
         #References to other data points used to wrap this table, use as needed
 
-        # json.data.ticket_count
-        # json.data.entries_count
-        # json.data.customer_count
-        # json.data.guest_count
-        # json.data.email_count
-        # json.data.web_count
-        # json.data.email_web_count
+        $("#open_multi_customer_count").html(json.data.customer_count)
+        $("#open_multi_guest_count").html(json.data.guest_count)
+        $("#open_multi_email_count").html(json.data.email_count)
+        $("#open_multi_web_count").html(json.data.web_count)
+        $("#open_multi_email_web_count").html(json.data.email_web_count)
+
+        $("#open_multi_ticket_count").html(json.data.ticket_count)
+        $("#open_multi_entry_count").html(json.data.entries_count)
 
     error: (response) ->
       #$('#refresh-working-msg').hide()
@@ -160,12 +161,13 @@ window.refresh_single_closed_tickets_table = (user_id)->
         #$('#refresh-error-msg').html('An error occured while retrieving data')
   , this)
 
-window.refresh_multi_closed_tickets_table = (user_ids)->
+window.refresh_multi_closed_tickets_table = ()->
   from = localStorage.getItem('webrep_report_range_from')
   to = localStorage.getItem('webrep_report_range_to')
+  team_ids = $.parseJSON("{\"team\":" + $("#team_ids").val() + "}")
 
   data = {
-    users: user_ids,
+    users: team_ids['team'],
     from: from,
     to: to
   }
@@ -187,19 +189,19 @@ window.refresh_multi_closed_tickets_table = (user_ids)->
 
       else
 
-        datatable = $('#multi_user_closed_tickets').DataTable()
+        datatable = $('#table-multi-user-disputes-closed').DataTable()
         datatable.clear();
         datatable.rows.add(json.data.table_data);
         datatable.draw();
 
-        #References to other data points used to wrap this table, use as needed
-        # json.data.ticket_count
-        # json.data.entries_count
-        # json.data.customer_count
-        # json.data.guest_count
-        # json.data.email_count
-        # json.data.web_count
-        # json.data.email_web_count
+        $("#closed_multi_customer_count").html(json.data.customer_count)
+        $("#closed_multi_guest_count").html(json.data.guest_count)
+        $("#closed_multi_email_count").html(json.data.email_count)
+        $("#closed_multi_web_count").html(json.data.web_count)
+        $("#closed_multi_email_web_count").html(json.data.email_web_count)
+
+        $("#closed_multi_ticket_count").html(json.data.ticket_count)
+        $("#closed_multi_entry_count").html(json.data.entries_count)
 
     error: (response) ->
       #$('#refresh-working-msg').hide()
@@ -688,7 +690,7 @@ $ ->
     localStorage.setItem 'webrep_report_range_to', picker.endDate
     user_id = $("#user_id").val()
     refresh_single_open_tickets_table(user_id)
-
+    refresh_single_closed_tickets_table(user_id)
     return
   return
 
@@ -702,3 +704,6 @@ $ ->
     window.build_multi_closed_email_entries_resolution_piechart()
     window.build_multi_closed_web_entries_resolution_piechart()
     window.build_single_entries_closed_by_day_chart()
+
+    window.refresh_multi_closed_tickets_table()
+    window.refresh_multi_open_tickets_table()
