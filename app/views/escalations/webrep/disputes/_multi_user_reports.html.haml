@@ -51,27 +51,22 @@
           %label.content-label-sm.submitter-customer
             Customer
           %span.ticket-entry-total
-            32
         .ticket-entry-total-block.guest-block-total
           %label.content-label-sm
             Guest
           %span.ticket-entry-total
-            12
         .ticket-entry-total-block
           %label.content-label-sm.dispute-E-grey
             Email Entries
           %span.ticket-entry-total
-            25
         .ticket-entry-total-block
           %label.content-label-sm.dispute-W-grey
             Web Entries
           %span.ticket-entry-total
-            22
         .ticket-entry-total-block
           %label.content-label-sm.dispute-EW-grey
             Email/Web Entries
           %span.ticket-entry-total
-            3
 
 
     .tickets-section-wrapper.closed-tickets-wrapper
@@ -93,6 +88,7 @@
             -#  Ticket type
             %th Dispute Preview
             %th Time to Close
+
       .ticket-entries-totals-wrapper
         %label.totals-label
           Total Ticket Entries
@@ -100,179 +96,169 @@
           %label.content-label-sm.submitter-customer
             Customer
           %span.ticket-entry-total
-            32
         .ticket-entry-total-block.guest-block-total
           %label.content-label-sm
             Guest
           %span.ticket-entry-total
-            12
         .ticket-entry-total-block
           %label.content-label-sm.dispute-E-grey
             Email Entries
           %span.ticket-entry-total
-            25
         .ticket-entry-total-block
           %label.content-label-sm.dispute-W-grey
             Web Entries
           %span.ticket-entry-total
-            22
         .ticket-entry-total-block
           %label.content-label-sm.dispute-EW-grey
             Email/Web Entries
           %span.ticket-entry-total
-            3
-
 
 
 
   .col-xl-6.col-lg-5.col-xs-12.graph-section
-    .col-lg-12.col-xl-6
-      .graph-top-header.top-space-ex.bottom-space
-        %h5.uppercase.header-stg Ticket Entries Closed by Ticket Owner
-      %canvas#ticket-entries-closed-by-owner
+    .row
+      .col-md-12.col-lg-7
 
-      .graph-top-header.top-space-ex.bottom-space
-        %h5.uppercase.header-stg Average Time to Close Tickets by Ticket Owner
-      %canvas#avg-time-to-close-tickets
+        .reports-graph-wrapper
+          %h5 Ticket Entries Closed by Ticket Owner
+          %canvas#ticket-entries-closed-by-owner
 
-      .graph-top-header.top-space-ex.bottom-space
-        %h5.uppercase.header-stg Ticket Resolution by Ticket Owner
-      .graph-bar-legend
-        .custom-legend
-          %label Unchanged
-          %label.lightgray-legend-color
-        .custom-legend
-          %label Fixed FN
-          %label.navyblue-legend-color
-        .custom-legend
-          %label Fixed FP
-          %label.skyblue-legend-color
-        .custom-legend
-          %label Other
-          %label.orange-legend-color
-      %canvas#ticket-resolutions-by-owner
+        .reports-graph-wrapper
+          %h5 Average Time to Close Tickets by Ticket Owner
+          %canvas#avg-time-to-close-tickets
 
-      -#%table.table.left-space.top-space
-      -#  %thead
-      -#    %tr
-      -#      %th{:scope => "col"} OWNER
-      -#      %th{:scope => "col"} UNCHANGED
-      -#      %th{:scope => "col"} FIXED FN
-      -#      %th{:scope => "col"} FIXED FP
-      -#      %th{:scope => "col"} OTHER
-      -#  %tbody
-      -#    %tr.text-center
-      -#      %td.text-left mtaylor
-      -#      %td 4
-      -#      %td 10
-      -#      %td 8
-      -#      %td 0
-      -#    %tr.text-center
-      -#      %td.text-left chrclair
-      -#      %td 5
-      -#      %td 13
-      -#      %td 7
-      -#      %td 1
-      -#    %tr.text-center
-      -#      %td.text-left nherbert
-      -#      %td 11
-      -#      %td 11
-      -#      %td 6
-      -#      %td 0
-      -#    %tr.text-center
-      -#      %td.text-left nverbeck
-      -#      %td 13
-      -#      %td 10
-      -#      %td 7
-      -#      %td 4
-      -#    %tr.text-center
-      -#      %td.text-left abreeman
-      -#      %td 9
-      -#      %td 5
-      -#      %td 9
-      -#      %td 1
-      -#  %tfoot
-      -#    %tr
-      -#      %th Total
-      -#      %th.text-center 42
-      -#      %th.text-center 49
-      -#      %th.text-center 37
-      -#      %th.text-center 6
+        .reports-graph-wrapper
+          %h5 Ticket Resolution by Ticket Owner
+          .graph-bar-legend
+            .custom-legend
+              %label Unchanged
+              %label.lightgray-legend-color
+            .custom-legend
+              %label Fixed FN
+              %label.navyblue-legend-color
+            .custom-legend
+              %label Fixed FP
+              %label.skyblue-legend-color
+            .custom-legend
+              %label Other
+              %label.orange-legend-color
+          %canvas#ticket-resolutions-by-owner
 
-      .graph-top-header.top-space.bottom-space
-        %h5.uppercase.header-stg Rule Hits for False Positive Resolutions
-      %canvas#rule-hits-fp-resolutions
+          %table.table
+            %thead
+              %tr
+                %th{:scope => "col"} OWNER
+                %th{:scope => "col"} UNCHANGED
+                %th{:scope => "col"} FIXED FN
+                %th{:scope => "col"} FIXED FP
+                %th{:scope => "col"} OTHER
+            %tbody
+              %tr.text-center
+                %td.text-left mtaylor
+                %td 4
+                %td 10
+                %td 8
+                %td 0
+              %tr.text-center
+                %td.text-left chrclair
+                %td 5
+                %td 13
+                %td 7
+                %td 1
+              %tr.text-center
+                %td.text-left nherbert
+                %td 11
+                %td 11
+                %td 6
+                %td 0
+              %tr.text-center
+                %td.text-left nverbeck
+                %td 13
+                %td 10
+                %td 7
+                %td 4
+              %tr.text-center
+                %td.text-left abreeman
+                %td 9
+                %td 5
+                %td 9
+                %td 1
+            %tfoot
+              %tr
+                %th Total
+                %th.text-center 42
+                %th.text-center 49
+                %th.text-center 37
+                %th.text-center 6
 
-    .col-lg-12.col-xl-6.graph-section
-      %label.content-label-sm.top-space-ex Time Breakdown
-      .graph-config
-        %select.form-control
-          %option{:selected => "selected", :value => "day"} By Day
-          %option{:value => "weekly"} Weekly
-          %option{:value => "monthly"} Monthly
-          %option{:value => "yearly"} Yearly
-
-      .graph-top-header
-        %h5.uppercase.header-stg ticket entries closed by day
-
-      .graph-menu.float-right
-        %label
-          %input.all-ticket{:type => "checkbox", :checked => "checked", :onclick => 'updateGraph("Total Ticket Entries", "barChartGrouped", this)'}/
-          %label.total-legend
-          Total Tickets Entries
-
-        %label
-          %input.group-ticket{:type => "checkbox", :onclick => 'updateGraph(["E", "W", "EW"], "barChartGrouped", this)'}/
-          %label.dispute-E.legend-option
-          %label.dispute-W.legend-option
-          %label.dispute-EW.legend-option
-          Entries By Ticket Types
-      %canvas#bar-chart2-grouped
-
-      %label.content-label-sm.top-space Time Breakdown
-      .graph-config
-        %select.form-control
-          %option{:selected => "selected", :value => "day"} By Day
-          %option{:value => "weekly"} Weekly
-          %option{:value => "monthly"} Monthly
-          %option{:value => "yearly"} Yearly
-
-      .graph-top-header
-        %h5.uppercase.header-stg ticket submitted by submitter per day
-
-      .graph-bar-legend
-        .custom-legend
-          %label Customer
-          %label.skyblue-legend-color
-        .custom-legend
-          %label Guest
-          %label.navyblue-legend-color
-      %canvas#bar-chart3-grouped
-
-      .graph-top-header.top-space-ex
-        %h5.uppercase.dispute-E-grey.graph-header-icon-stg.header-stg.bottom-space closed email entries by resolution
-
-      %canvas#multi-email-entries-by-resolution-piechart
-
-      %table.table.left-space.top-space#multi-closed-email-entries-resolution-table
-        %thead
-          %tr
-            %th{:scope => "col"} RESOLUTION
-            %th{:scope => "col"} %
-            %th{:scope => "col"} COUNT
-        %tbody
+        .reports-graph-wrapper
+          %h5 Rule Hits for False Positive Resolutions
+          %canvas#rule-hits-fp-resolutions
 
 
-      .graph-top-header.top-space-ex
-        %h5.uppercase.dispute-E-grey.graph-header-icon-stg.header-stg.bottom-space closed web entries by resolution
 
-      %canvas#multi-web-entries-by-resolution-piechart
+      .col-md-12.col-lg-5.graph-section
 
-      %table.table.left-space.top-space#multi-closed-web-entries-resolution-table
-        %thead
-          %tr
-            %th{:scope => "col"} RESOLUTION
-            %th{:scope => "col"} %
-            %th{:scope => "col"} COUNT
-        %tbody
+        .reports-graph-wrapper
+          %h5 Ticket Entries Closed by Day
+          .graph-config
+            %label.content-label-sm.graph-select-label Time Breakdown
+            %select.form-control
+              %option{:selected => "selected", :value => "day"} By Day
+              %option{:value => "weekly"} Weekly
+              %option{:value => "monthly"} Monthly
+              %option{:value => "yearly"} Yearly
 
+          .graph-menu
+            .label-wrapper
+              %input.all-ticket{:type => "checkbox", :checked => "checked", :onclick => 'updateGraph("Total Ticket Entries", "barChartGrouped", this)'}/
+              %label.total-legend
+              Total Tickets Entries
+
+            .label-wrapper
+              %input.group-ticket{:type => "checkbox", :onclick => 'updateGraph(["E", "W", "EW"], "barChartGrouped", this)'}/
+              %label.dispute-E.legend-option
+              %label.dispute-W.legend-option
+              %label.dispute-EW.legend-option
+              Entries By Ticket Types
+          %canvas#bar-chart2-grouped
+
+
+        .reports-graph-wrapper
+          %h5 Tickets Submitted by Submitter Per Day
+          %label.content-label-sm.top-space Time Breakdown
+          .graph-config
+            %select.form-control
+              %option{:selected => "selected", :value => "day"} By Day
+              %option{:value => "weekly"} Weekly
+              %option{:value => "monthly"} Monthly
+              %option{:value => "yearly"} Yearly
+
+          .graph-bar-legend
+            %label.skyblue-legend-color Customer
+            %label.navyblue-legend-color Guest
+          %canvas#bar-chart3-grouped
+
+        .reports-graph-wrapper
+          %h5.dispute-E-grey.graph-header-icon-stg Closed Email Entries by Resolution
+          %canvas#multi-email-entries-by-resolution-piechart
+
+          %table.table#multi-closed-email-entries-resolution-table
+            %thead
+              %tr
+                %th Resolution
+                %th.text-center %
+                %th.text-center Count
+            %tbody
+
+        .reports-graph-wrapper
+          %h5.dispute-E-grey.graph-header-icon-stg Closed Web Entries by Resolution
+          %canvas#multi-web-entries-by-resolution-piechart
+
+          %table.table#multi-closed-web-entries-resolution-table
+            %thead
+              %tr
+                %th Resolution
+                %th.text-center %
+                %th.text-center Count
+            %tbody
