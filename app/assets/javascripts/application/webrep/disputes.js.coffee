@@ -2262,79 +2262,79 @@ $ ->
         ]
   )
 
-  new Chart(document.getElementById('team-pie-chart'),
-    type: 'pie'
-    data:
-      labels: [
-        'Fixed'
-        'Unchanged'
-        'Fixed FP'
-      ]
-      datasets: [ {
-        label: 'close-email-entries'
-        backgroundColor: [
-          '#3e5a72'
-          '#6dbcdb'
-          '#666'
-        ]
-        data: [
-          5178
-          4267
-          2202
-        ]
-      } ]
-    options:
-      legend: false
-      pieceLabel:
-        render: (args) ->
-          return args.percentage + '%'
-        position: 'outside'
-        label: 'Unchanched'
-        segment: false
-        precision: 2
-        showZero: true
-        fontStyle: 'bolder'
-        overlap: false
-        showActualPercentages: true
+  #new Chart(document.getElementById('team-pie-chart'),
+  #  type: 'pie'
+  #  data:
+  #    labels: [
+  #      'Fixed'
+  #      'Unchanged'
+  #      'Fixed FP'
+  #    ]
+  #    datasets: [ {
+  #      label: 'close-email-entries'
+  #      backgroundColor: [
+  #        '#3e5a72'
+  #        '#6dbcdb'
+  #        '#666'
+  #      ]
+  #      data: [
+  #        5178
+  #        4267
+  #        2202
+  #      ]
+  #    } ]
+  #  options:
+  #    legend: false
+  #    pieceLabel:
+  #      render: (args) ->
+  #        return args.percentage + '%'
+  #      position: 'outside'
+  #      label: 'Unchanched'
+  #      segment: false
+  #      precision: 2
+  #      showZero: true
+  #      fontStyle: 'bolder'
+  #      overlap: false
+  #      showActualPercentages: true
 
-  )
+  #)
 
-  new Chart(document.getElementById('team-pie2-chart'),
-    type: 'pie'
-    data:
-      labels: [
-        'Fixed'
-        'Unchanged'
-        'Fixed FP'
-      ]
-      datasets: [ {
-        label: 'close-email-entries'
-        backgroundColor: [
-          '#3e5a72'
-          '#6dbcdb'
-          '#666'
-        ]
-        data: [
-          3778
-          4767
-          5900
-        ]
-      } ]
-    options:
-      legend: false
-      pieceLabel:
-        render: (args) ->
-          return args.percentage + '%'
-        position: 'outside'
-        label: 'Unchanched'
-        segment: false
-        precision: 2
-        showZero: true
-        fontStyle: 'bolder'
-        overlap: false
-        showActualPercentages: true
+  #new Chart(document.getElementById('team-pie2-chart'),
+  #  type: 'pie'
+  #  data:
+  #    labels: [
+  #      'Fixed'
+  #      'Unchanged'
+  #      'Fixed FP'
+  #    ]
+  #    datasets: [ {
+  #      label: 'close-email-entries'
+  #      backgroundColor: [
+  #        '#3e5a72'
+  #        '#6dbcdb'
+  #        '#666'
+  #      ]
+  #      data: [
+  #        3778
+  #        4767
+  #        5900
+  #      ]
+  #    } ]
+  #  options:
+  #    legend: false
+  #    pieceLabel:
+  #      render: (args) ->
+  #        return args.percentage + '%'
+  #      position: 'outside'
+  #      label: 'Unchanched'
+  #      segment: false
+  #      precision: 2
+  #      showZero: true
+  #      fontStyle: 'bolder'
+  #      overlap: false
+  #      showActualPercentages: true
 
-  )
+  #)
 
 #    If user changes buttons from initial status, enable the submit button
 #   TODO add this check in later that only allows user to submit if there have been changes made
