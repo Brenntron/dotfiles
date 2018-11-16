@@ -26,7 +26,7 @@ Feature: Disputes index, Research tab
     When I goto "escalations/webrep/disputes/2"
     And I click "#research-tab-link"
     Then "#disputes-research-table" should be visible
-    
+
   @javascript
   Scenario: Dispute entries with no preloaded data attempt to fire the preloader
     Given a user with role "webrep user" exists with cvs_username, "Cucumber", exists and is logged in
@@ -42,3 +42,32 @@ Feature: Disputes index, Research tab
     Then "#disputes-research-table" should be visible
     And the Entry preload with id "1" should exist
 
+  @javascript
+  Scenario: In the Research Tab, all variables and values should be properly calculated and displayed
+    Given a user with role "webrep user" exists and is logged in
+    And the following disputes exist and have entries:
+      |id|
+      |1 |
+    When I goto "escalations/webrep/disputes/1/"
+    Then I click "#research-tab-link"
+    Then I should see content "talosintelligence.com" within ".research-table-row-wrapper"
+    Then I should see content "WBRS" within ".research-table-row-wrapper"
+    Then I should see content "SBRS" within ".research-table-row-wrapper"
+    Then I should see content "CATEGORY" within ".research-table-row-wrapper"
+    Then I should see content "HOSTNAME" within ".research-table-row-wrapper"
+    Then I should see content "STATUS" within ".research-table-row-wrapper"
+    Then I should see content "RESOLUTION" within ".research-table-row-wrapper"
+    Then I should see content "AS OF" within ".research-table-row-wrapper"
+    Then I should see content "WBRS RULE HITS" within ".research-table-row-wrapper"
+    Then I should see content "WBRS RULES" within ".research-table-row-wrapper"
+    Then I should see content "WL/BL" within ".research-table-row-wrapper"
+    Then I should see content "REFERENCED ON" within ".research-table-row-wrapper"
+    Then I should see content "SBRS RULE HITS" within ".research-table-row-wrapper"
+    Then I should see content "SBRS RULES" within ".research-table-row-wrapper"
+    Then I should see content "CROSSLISTED URLS" within ".research-table-row-wrapper"
+    Then I should see content "REPTOOL CLASS" within ".research-table-row-wrapper"
+    Then I should see content "UMBRELLA" within ".research-table-row-wrapper"
+    Then I should see content "LAST SUBMITTED" within ".research-table-row-wrapper"
+    Then I should see content "No score." within ".research-table-row-wrapper"
+    Then I should see content "Unresolved" within ".research-table-row-wrapper"
+    Then I should see content "Unclassified" within ".research-table-row-wrapper"

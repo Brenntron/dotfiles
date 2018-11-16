@@ -149,7 +149,7 @@ class Complaint < ApplicationRecord
     new_ips = new_entries_ips.keys.sort
 
     response = {}
-    possibles = Complaint.includes(:complaint_entries).where(:customer_id => complaint.customer_id).select {|complaint| complaint.status != RESOLVED || complaint.status != DUPLICATE}
+    possibles = complaint.customer.complaints.where.not(status: [ RESOLVED, DUPLICATE ])
     candidates = []
 
     possibles.each do |poss|
@@ -246,8 +246,8 @@ class Complaint < ApplicationRecord
         summary = "New Web Category Complaint generated at #{DateTime.now.utc.strftime("%Y-%m-%d %H:%M")}"
 
         full_description = <<~HEREDOC
-          IPs: #{new_entries_ips.map {|key, data| key.to_s}.join(', ')}
-          URIs: #{new_entries_urls.map {|key, data| key.to_s}.join(', ')}
+          IPs: #{new_entries_ips.keys.join(', ')}
+          URIs: #{new_entries_urls.keys.join(', ')}
           Problem Summary: #{message_payload["payload"]["problem"]}
         HEREDOC
 

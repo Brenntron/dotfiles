@@ -234,8 +234,8 @@ class DisputeEmail < ApplicationRecord
 
   def self.bad_gateway_body
     <<~BADGATEWAY
-Thank you for emailing the Cisco Talos Intelligence Group dispute system.  Unfortunately, we are not able to accommodate a request sent directly to the system.  In order to file a dispute against a category or reputation score, please submit your request via our dispute page: 
-https://talosintelligence.com/reputation_center/support
+      Thank you for emailing the Cisco Talos Intelligence Group dispute system.  Unfortunately, we are not able to accommodate a request sent directly to the system.  In order to file a dispute against a category or reputation score, please submit your request via our dispute page: 
+      https://talosintelligence.com/reputation_center/support
     BADGATEWAY
   end
 
@@ -245,8 +245,8 @@ https://talosintelligence.com/reputation_center/support
 
   def self.old_case_gateway_body
     <<~BADGATEWAY
-Thank you for emailing the Cisco Talos Intelligence Group dispute system.  Unfortunately, this case has expired and can no longer be reopened.  In order to file a dispute against a category or reputation score, please submit your request via our dispute page: 
-https://talosintelligence.com/reputation_center/support
+      Thank you for emailing the Cisco Talos Intelligence Group dispute system.  Unfortunately, this case has expired and can no longer be reopened.  In order to file a dispute against a category or reputation score, please submit your request via our dispute page: 
+      https://talosintelligence.com/reputation_center/support
     BADGATEWAY
   end
 

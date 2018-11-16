@@ -57,7 +57,7 @@ window.populate_webrep_index_table = (data = {}) ->
         datatable = $('#disputes-index').DataTable()
         datatable.clear();
         datatable.rows.add(json.data);
-        datatable.draw();
+        datatable.draw(false);
         if array_of_showns.length > 0
           for dispute_id_shown in array_of_showns
             td = $('#disputes-index').find('td.expandable-row-column')
@@ -203,8 +203,9 @@ window.dispute_status_drop_down = (dispute_id) ->
       status = response.status
       comment = response.comment
 
-      $('.ticket-status-radio' + '#' + status).prop("checked", true);
-      $('.ticket-status-comment').text(comment)
+      $('.ticket-status-radio' + '#' + status).prop("checked", true)
+      if comment?
+        $('.ticket-status-comment').text(comment)
   )
 
 window.dispute_resolution_drop_down = (dispute_id) ->
@@ -218,13 +219,12 @@ window.dispute_resolution_drop_down = (dispute_id) ->
     dataType: 'json'
     success: (response) ->
       response = JSON.parse(response)
-
       resolution = response.resolution
       resolution_comment = response.resolution_comment
 
       # Fill in resolution radio button and comment
       $('.dispute-resolution-' + dispute_id + '#' + resolution).prop("checked", true)
-      $('#dispute-resolution-comment').text(resolution_comment)
+      $('.ticket-resolution-comment').text(resolution_comment)
   )
 
 window.entry_status_drop_down = (dispute_entry_id) ->
@@ -599,7 +599,7 @@ window.show_page_edit_status = () ->
 
   if resolution
     data.resolution = resolution
-    data.comment = $('#dispute-resolution-comment').val()
+    data.comment = $('.ticket-resolution-comment').val()
 
   std_msg_ajax(
     url: '/escalations/api/v1/escalations/webrep/disputes/set_disputes_status'
@@ -1130,6 +1130,10 @@ $ ->
         targets: [ 8 ]
         className: 'alt-col'
       }
+      {
+        targets: [ 10 ]
+        className: 'age-col'
+      }
     ]
     columns: [
       {
@@ -1163,13 +1167,30 @@ $ ->
       { data: 'd_entry_preview' }
       { data: 'assigned_to' }
       { data: 'case_opened_at' }
-      { data: 'case_age' }
+      {
+        data: 'case_age'
+        render: (data) ->
+          parts = data.split(' ')
+          days = parseInt(parts[0])
+          hour = parseInt(parts[1])
+
+          if days == 0
+            if hour < 3
+              data
+            else if hour < 5
+              '<span class="ticket-age-over3hr">' + data + '</span>'
+            else
+              '<span class="overdue">' + data + '</span>'
+          else
+            '<span class="overdue">' + data + '</span>'
+      }
       { data: 'source' }
       { data: 'submitter_type'}
       { data: 'submitter_org' }
       { data: 'submitter_domain' }
       { data: 'submitter_name' }
       { data: 'submitter_email' }
+      { data: 'status_comment' }
 
 
     ])
@@ -1426,6 +1447,7 @@ $ ->
       data['submitter-domain'] = $("#submitter-domain-checkbox").is(':checked')
       data['contact-name'] = $("#contact-name-checkbox").is(':checked')
       data['contact-email'] = $("#contact-email-checkbox").is(':checked')
+      data['status-comment'] = $("#status-comment-checkbox").is(':checked')
 
       std_msg_ajax(
         url: "/escalations/api/v1/escalations/user_preferences/update"
