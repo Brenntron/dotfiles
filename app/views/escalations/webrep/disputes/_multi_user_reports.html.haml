@@ -27,8 +27,8 @@
       .open-tickets-header
         %h3.larger-lighter Open Team Tickets
         .ticket-count-wrapper
-          %label.total-table-ticket-count 4
-          %label.total-table-entry-count 23
+          %label.total-table-ticket-count
+          %label.total-table-entry-count
       %table.table.responsive.dashboard-tickets-table#table-multi-user-disputes-open
         %thead
           %tr
@@ -73,8 +73,8 @@
       .closed-tickets-header
         %h3.larger-lighter Closed Team Tickets
         .ticket-count-wrapper
-          %label.total-table-ticket-count 7
-          %label.total-table-entry-count 46
+          %label.total-table-ticket-count
+          %label.total-table-entry-count
       %table.table.responsive.dashboard-tickets-table#table-multi-user-disputes-closed
         %thead
           %tr
@@ -130,66 +130,22 @@
         .reports-graph-wrapper
           %h5 Ticket Resolution by Ticket Owner
           .graph-bar-legend
-            .custom-legend
-              %label Unchanged
-              %label.lightgray-legend-color
-            .custom-legend
-              %label Fixed FN
-              %label.navyblue-legend-color
-            .custom-legend
-              %label Fixed FP
-              %label.skyblue-legend-color
-            .custom-legend
-              %label Other
-              %label.orange-legend-color
+            %label.navyblue-legend-color Fixed FN
+            %label.skyblue-legend-color Fixed FP
+            %label.lightgray-legend-color Unchanged
+            %label.orange-legend-color Other
           %canvas#ticket-resolutions-by-owner
 
           %table.table
             %thead
               %tr
-                %th{:scope => "col"} OWNER
-                %th{:scope => "col"} UNCHANGED
-                %th{:scope => "col"} FIXED FN
-                %th{:scope => "col"} FIXED FP
-                %th{:scope => "col"} OTHER
+                %th Owner
+                %th Fixed FN
+                %th Fixed FP
+                %th Unchanged
+                %th Other
             %tbody
-              %tr.text-center
-                %td.text-left mtaylor
-                %td 4
-                %td 10
-                %td 8
-                %td 0
-              %tr.text-center
-                %td.text-left chrclair
-                %td 5
-                %td 13
-                %td 7
-                %td 1
-              %tr.text-center
-                %td.text-left nherbert
-                %td 11
-                %td 11
-                %td 6
-                %td 0
-              %tr.text-center
-                %td.text-left nverbeck
-                %td 13
-                %td 10
-                %td 7
-                %td 4
-              %tr.text-center
-                %td.text-left abreeman
-                %td 9
-                %td 5
-                %td 9
-                %td 1
             %tfoot
-              %tr
-                %th Total
-                %th.text-center 42
-                %th.text-center 49
-                %th.text-center 37
-                %th.text-center 6
 
         .reports-graph-wrapper
           %h5 Rule Hits for False Positive Resolutions
@@ -200,7 +156,7 @@
       .col-md-12.col-lg-5.graph-section
 
         .reports-graph-wrapper
-          %h5 Ticket Entries Closed by Day
+          %h5 Total Ticket Entries Closed
           .graph-config
             %label.content-label-sm.graph-select-label Time Breakdown
             %select.form-control
@@ -209,35 +165,35 @@
               %option{:value => "monthly"} Monthly
               %option{:value => "yearly"} Yearly
 
-          .graph-menu
-            .label-wrapper
-              %input.all-ticket{:type => "checkbox", :checked => "checked", :onclick => 'updateGraph("Total Ticket Entries", "barChartGrouped", this)'}/
-              %label.total-legend
-              Total Tickets Entries
+            .graph-menu
+              .label-wrapper
+                %input.all-ticket{:type => "checkbox", :checked => "checked", :onclick => 'updateGraph("Total Ticket Entries", "multiuser_ticket_type_totals", this)'}/
+                %label.total-legend
+                Total Tickets Entries
 
-            .label-wrapper
-              %input.group-ticket{:type => "checkbox", :onclick => 'updateGraph(["E", "W", "EW"], "barChartGrouped", this)'}/
-              %label.dispute-E.legend-option
-              %label.dispute-W.legend-option
-              %label.dispute-EW.legend-option
-              Entries By Ticket Types
-          %canvas#bar-chart2-grouped
+              .label-wrapper
+                %input.group-ticket{:type => "checkbox",:checked => "checked", :onclick => 'updateGraph(["E", "W", "EW"], "multiuser_ticket_type_totals", this)'}/
+                %label.dispute-E.legend-option
+                %label.dispute-W.legend-option
+                %label.dispute-EW.legend-option
+                Entries By Ticket Types
+          %canvas#graph-multiuser-ticket-entries-closed
 
 
         .reports-graph-wrapper
-          %h5 Tickets Submitted by Submitter Per Day
-          %label.content-label-sm.top-space Time Breakdown
+          %h5 Tickets Submitted by Submitter Type
           .graph-config
+            %label.content-label-sm.graph-select-label Time Breakdown
             %select.form-control
               %option{:selected => "selected", :value => "day"} By Day
               %option{:value => "weekly"} Weekly
               %option{:value => "monthly"} Monthly
               %option{:value => "yearly"} Yearly
 
-          .graph-bar-legend
-            %label.skyblue-legend-color Customer
-            %label.navyblue-legend-color Guest
-          %canvas#bar-chart3-grouped
+            .graph-bar-legend
+              %label.skyblue-legend-color Customer
+              %label.navyblue-legend-color Guest
+          %canvas#graph-multiuser-ticket-entries-submitter
 
         .reports-graph-wrapper
           %h5.dispute-E-grey.graph-header-icon-stg Closed Email Entries by Resolution
