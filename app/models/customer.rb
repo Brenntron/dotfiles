@@ -2,6 +2,7 @@ class Customer < ApplicationRecord
   belongs_to :company
   has_many :complaints
   has_many :disputes
+  has_many :amp_false_positives
 
   validates :email, presence: true, uniqueness: true
 
