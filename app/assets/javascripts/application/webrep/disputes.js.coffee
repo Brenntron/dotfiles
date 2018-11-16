@@ -2390,50 +2390,49 @@ $ ->
     ]
   )
 
-#  window.open_multiuser_dashboard_dispute_table = $('#table-multi-user-disputes-open').DataTable(
-#    dom: '<t>'
-#    data: tempSingleUserClosedTixDataset
-#    columnDefs: [
-#      {
-#        targets: [ 1 ]
-#        className: 'id-col'
-#      }
-#      {
-#        targets: [ 4 ]
-#        className: 'state-col'
-#      }
-#      {
-#        targets: [
-#          0
-#          2
-#          5
-#        ]
-#        className: 'text-center'
-#      }
-#    ]
-#    columns: [
-#      {
-#        data: 'priority'
-#        render: (data) ->
-#          '<span class="bug-priority p-' + data + '"></span>'
-#      }
-#      { data: 'case_number' }
-#      {
-#        data: 'submitter_type'
-#        render: (data) ->
-#          '<span class="submitter-type-icon submitter-' + data + '"></span>'
-#      }
-#      { data: 'owner' }
-#      { data: 'status' }
-#      {
-#        data: 'submission_type'
-#        render: (data) ->
-#          '<span class="dispute-submission-type dispute-' + data  + '"></span>'
-#      }
-#      { data: 'd_entry_preview' }
-#      { data: 'last_comment' }
-#    ]
-#  )
+  window.open_multiuser_dashboard_dispute_table = $('#table-multi-user-disputes-open').DataTable(
+    dom: '<t>'
+    columnDefs: [
+      {
+        targets: [ 1 ]
+        className: 'id-col'
+      }
+      {
+        targets: [ 4 ]
+        className: 'state-col'
+      }
+      {
+        targets: [
+          0
+          2
+          5
+        ]
+        className: 'text-center'
+      }
+    ]
+    columns: [
+      {
+        data: 'priority'
+        render: (data) ->
+          '<span class="bug-priority p-' + data + '"></span>'
+      }
+      { data: 'case_number' }
+      {
+        data: 'submitter_type'
+        render: (data) ->
+          '<span class="submitter-type-icon submitter-' + data + '"></span>'
+      }
+      { data: 'owner' }
+      { data: 'status' }
+      {
+        data: 'submission_type'
+        render: (data) ->
+          '<span class="dispute-submission-type dispute-' + data  + '"></span>'
+      }
+      { data: 'd_entry_preview' }
+      { data: 'last_comment' }
+    ]
+  )
 
   window.closed_dashboard_multiuser_dispute_table = $('#table-multi-user-disputes-closed').DataTable(
     dom: '<t>'
