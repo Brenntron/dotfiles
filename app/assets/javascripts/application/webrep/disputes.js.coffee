@@ -1657,15 +1657,13 @@ $ ->
 
     if barGraphName == 'userTicketClosedGraph'
       originalData = window.userTicketClosedGraphDatasets
+    else if barGraphName == 'multiuser_ticket_type_totals'
+      originalData = totalTicketEntriesbyType
     else
       alert 'Graph with name ' + barGraphName + ' is not defined'
       return
 
-#    barGraphName == 'graph-ticket-entries-closed'
-#      originalData = window.barDataSets
-#    else if barName == 'barChartGrouped'
-#      originalData = window.barChartGroupedData
-#
+
     if $(e)[0].checked
       currentData = window[barGraphName].data.datasets
       window[barGraphName].data.datasets = currentData.concat originalData.filter (x) -> label.indexOf(x.label) >= 0
@@ -2134,61 +2132,42 @@ $ ->
 
 
 
-  window.barChartGroupedData = [
+  totalTicketEnties = [15, 18, 22, 18, 24, 10, 12]
+  emailTicketEntries = [15, 18, 22, 18, 24, 10, 2]
+  webTicketEntries = [15, 18, 22, 18, 24, 10, 5]
+  ewTicketEntries = [15, 18, 22, 18, 24, 10, 7]
+
+  totalTicketEntriesbyType = [
     {
       label: 'Total Ticket Entries'
       backgroundColor: '#6dbcdb'
-      data: [
-        15
-        18
-        22
-        18
-      ]
+      data: totalTicketEnties
     }
     {
       label: 'E'
       backgroundColor: '#8cc63f'
-      data: [
-        0
-        0
-        0
-        0
-      ]
+      data: emailTicketEntries
     }
     {
       label: 'W'
       backgroundColor: '#E47433'
-      data: [
-        0
-        0
-        0
-        0
-      ]
+      data: webTicketEntries
     }
     {
       label: 'EW'
       backgroundColor: '#BA55D3'
-      data: [
-        0
-        0
-        0
-        0
-      ]
+      data: ewTicketEntries
     }
   ]
-  window.barChartGrouped = new Chart(document.getElementById('bar-chart2-grouped'),
+
+  dateRange = ['September 2', 'September 3', 'September 4', 'September 5', 'September 6', 'September 7', 'September 8']
+
+
+  window.multiuser_ticket_type_totals = new Chart($('#graph-multiuser-ticket-entries-closed'),
     type: 'bar'
     data:
-      labels: [
-        'September 2'
-        'September 3'
-        'September 4'
-        'September 5'
-        'September 6'
-        'September 7'
-        'September 8'
-      ]
-      datasets: window.barChartGroupedData
+      labels: dateRange
+      datasets: totalTicketEntriesbyType
     options:
       legend: display: false
       scales:
@@ -2207,36 +2186,23 @@ $ ->
         ]
     )
 
-  new Chart(document.getElementById('bar-chart3-grouped'),
+
+
+  multiuserCustomerSubmissions = [15, 18, 22, 18, 12, 43, 31]
+  multiuserGuestSubmissions = [8, 6, 7, 13, 9, 15, 21]
+
+  new Chart($('#graph-multiuser-ticket-entries-submitter'),
     type: 'bar'
     data:
-      labels: [
-        'September 2'
-        'September 3'
-        'September 4'
-        'September 5'
-        'September 6'
-        'September 7'
-        'September 8'
-      ]
+      labels: dateRange
       datasets: [
         {
           backgroundColor: '#6dbcdb'
-          data: [
-            15
-            18
-            22
-            18
-          ]
+          data: multiuserCustomerSubmissions
         }
         {
           backgroundColor: '#2c3e50'
-          data: [
-            8.5
-            5.5
-            13.5
-            8.5
-          ]
+          data: multiuserGuestSubmissions
         }
       ]
     options:
@@ -2247,8 +2213,6 @@ $ ->
             gridLines: display: false
             ticks: {
               min: 0
-              stepSize: 10
-              max: 30
             }
           }
         ]
