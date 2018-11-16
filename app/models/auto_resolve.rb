@@ -249,7 +249,7 @@ class AutoResolve
   # @param [String] address_type: 'IP' or 'URI/DOMAIN'
   # @param [String] address: ip address, uri, or domain
   # @param [Array<String>] rule_hits: collection of our rule hits as strings of mnem values
-  def self.create_from_payload(address_type, address, rule_hits = nil, dispute_entry:)
+  def self.create_from_payload(address_type, address, rule_hits = nil, dispute_entry)
     address_type_attr =
         case
           when 'IP' == address_type

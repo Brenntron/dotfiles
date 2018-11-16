@@ -453,6 +453,7 @@ class Dispute < ApplicationRecord
 
         logger.debug "Creating ip entries"
         new_entries_ips.each do |key, entry|
+
           false_negative_claim = false
 
           if ["Malicious", "Poor"].include?(entry[:sbrs]["rep_sugg"])
@@ -482,7 +483,7 @@ class Dispute < ApplicationRecord
             auto_resolve_verdict = new_dispute_entry.assign_from_auto_resolve(address: key,
                                                                               total_hits: total_hits,
                                                                               resolved_at: resolved_at,
-                                                                              dispute_entry_id: new_dispute_entry)
+                                                                              dispute_entry: new_dispute_entry)
 
             if auto_resolve_verdict.resolved? && auto_resolve_verdict.malicious?
               verdicts_to_blacklist << [auto_resolve_verdict, new_dispute_entry]
@@ -561,7 +562,7 @@ class Dispute < ApplicationRecord
             auto_resolve_verdict = new_dispute_entry.assign_from_auto_resolve(address: key,
                                                                               total_hits: total_hits,
                                                                               resolved_at: resolved_at,
-                                                                              dispute_entry_id: new_dispute_entry)
+                                                                              dispute_entry: new_dispute_entry)
 
             if auto_resolve_verdict.resolved? && auto_resolve_verdict.malicious?
               verdicts_to_blacklist << [auto_resolve_verdict, new_dispute_entry]

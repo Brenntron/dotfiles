@@ -248,7 +248,7 @@ class DisputeEntry < ApplicationRecord
 
     self.status = NEW
 
-    auto_resolve_verdict = AutoResolve.create_from_payload(entry_type, address, total_hits, dispute_entry: dispute_entry)
+    auto_resolve_verdict = AutoResolve.create_from_payload(entry_type, address, total_hits, dispute_entry)
 
     if auto_resolve_verdict.resolved?
       if auto_resolve_verdict.malicious?
