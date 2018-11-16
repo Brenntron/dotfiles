@@ -1838,14 +1838,36 @@ $ ->
 
   closedTicketNumbers = [375502, 375504, 375513, 375515, 375516, 375517, 375518, 375519, 375520, 375521, 375522]
   timeToCloseTickets = [1, 1.3, 1.2, 1.5, 1.7, 1.4, 1.8, 0.9, 1, 1.1, 1.2, 1.5, 1.6]
-  averageTimeToClose = 1.4
-  averageTimeToCloseLabel = {
-    enabled: true
-    content: 'Average Time To Close'
-    backgroundColor: 'none'
-    fontColor: "#000"
-  }
+  allTimeToClose = undefined
+  averageTimeToClose = 0
+  console.log(timeToCloseTickets.length)
+  if timeToCloseTickets.length
+    console.log(timeToCloseTickets)
+    allTimeToClose = timeToCloseTickets.reduce((a, b) ->
+      a + b
+    )
+    averageTimeToClose = allTimeToClose / timeToCloseTickets.length
+    averageTimeToClose = Math.round(averageTimeToClose * 100)/100
+    console.log(averageTimeToClose)
 
+  window.averageTimeToCloseLabel = (hourAmount) ->
+    totalSecond = hourAmount * 60 * 60
+    seconds = totalSecond % 60
+    totalMinutes = (totalSecond - seconds)/60
+    minutes = totalMinutes % 60
+    totalHours = (totalMinutes - minutes)/60
+    hours = totalHours % 60
+    value = ''
+    if hours > 0
+      value += hours + 'hr ' + minutes + 'm ' + seconds + 's'
+    else if minutes > 0
+      value += minutes + 'm ' + seconds + 's'
+    else
+      value += seconds + 's'
+    $('label#avg-time-to-closed')[0].innerHTML = value
+    return
+
+  averageTimeToCloseLabel(averageTimeToClose)
 
   window.timeCloseTicketsDataSets = [
     {
@@ -1875,7 +1897,7 @@ $ ->
               display: false
             ticks: {
               min: 0
-              max: 2.5
+              max: 2
               stepSize: .5
               callback: (value, index, values) ->
                 return value + ' hr'
@@ -1897,7 +1919,6 @@ $ ->
           ]
       annotation: {
 #        drawTime: 'beforeDatasetsDraw'
-#        drawTime: 'afterDatasetsDraw'
         annotations: [
           {
             type: 'box'
@@ -1909,14 +1930,6 @@ $ ->
             yMin: 0
             backgroundColor: 'rgba(196, 234, 248, .35)'
             borderColor: '#95989A'
-          },
-          {
-            type: 'line'
-            mode: 'horizontal'
-            scaleID: 'y-axis-0'
-            value: 2.2
-            label:
-              averageTimeToCloseLabel
           }]
       })
 
