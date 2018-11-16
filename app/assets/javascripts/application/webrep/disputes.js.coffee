@@ -1680,11 +1680,11 @@ $ ->
   ####### Bar chart for Ticket Entries by Ticket Type
 
   ## Data breakdown for 'initial' daily data
-  ticketTypeChartLabels = ['September 2', 'September 3', 'September 4', 'September 5', 'September 6', 'September 7', 'September 8']
-  ticketTypeTotalData = [20, 24, 30, 28, 0, 0, 0]
-  ticketTypeWData     = [15, 20, 18, 20, 0, 0, 0]
-  ticketTypeEData     = [8, 7, 15, 12, 0, 0, 0]
-  ticketTypeEWData    = [0, 0, 0, 9, 0, 0, 0]
+  #ticketTypeChartLabels = ['September 2', 'September 3', 'September 4', 'September 5', 'September 6', 'September 7', 'September 8']
+  #ticketTypeTotalData = [20, 24, 30, 28, 0, 0, 0]
+  #ticketTypeWData     = [15, 20, 18, 20, 0, 0, 0]
+  #ticketTypeEData     = [8, 7, 15, 12, 0, 0, 0]
+  #ticketTypeEWData    = [0, 0, 0, 9, 0, 0, 0]
 
   ## Test data breakdown for a monthly dataset - we'll say 6 months
   #  ticketTypeChartLabels = ['June', 'July', 'August', 'September', 'October', 'November']
@@ -1694,61 +1694,61 @@ $ ->
   #  ticketTypeEWData = [30, 16, 57, 57, 25, 50]
 
 
-  window.userTicketClosedGraphDatasets = [
-    {
-      label: 'Total Ticket Entries'
-      backgroundColor: '#6dbcdb'
-      data: ticketTypeTotalData
-    }
-    {
-      label: 'W'
-      backgroundColor: '#E47433'
-      data: ticketTypeWData
-    }
-    {
-      label: 'E'
-      backgroundColor: '#5FB665'
-      data: ticketTypeEData
-    }
-    {
-      label: 'EW'
-      backgroundColor: '#C14B92'
-      data: ticketTypeEWData
-    }]
+  #window.userTicketClosedGraphDatasets = [
+  #  {
+  #    label: 'Total Ticket Entries'
+  #    backgroundColor: '#6dbcdb'
+  #    data: ticketTypeTotalData
+  #  }
+  #  {
+  #    label: 'W'
+  #    backgroundColor: '#E47433'
+  #    data: ticketTypeWData
+  #  }
+  #  {
+  #    label: 'E'
+  #    backgroundColor: '#5FB665'
+  #    data: ticketTypeEData
+  #  }
+  #  {
+  #    label: 'EW'
+  #    backgroundColor: '#C14B92'
+  #    data: ticketTypeEWData
+  #  }]
 
 
-  window.userTicketClosedGraph = new Chart($('#graph-ticket-entries-closed'),
-    type: 'bar'
-    data:
-      labels: ticketTypeChartLabels
-      datasets: window.userTicketClosedGraphDatasets,
-    options:
-      legend:
-        display: false
-      title:
-        display: true
-        position: 'bottom'
-        text: 'Dates'
-      scales:
-        yAxes: [
-          {
-            gridLines:
-              display: false
-            ticks: {
-              min: 0
-            }
-          }
-        ]
-        xAxes: [
-          {
-            gridLines:
-              display: false
-            ticks: {
-              autoSkip: false
-            }
-          }
-        ]
-    )
+  #window.userTicketClosedGraph = new Chart($('#graph-ticket-entries-closed'),
+  #  type: 'bar'
+  #  data:
+  #    labels: ticketTypeChartLabels
+  #    datasets: window.userTicketClosedGraphDatasets,
+  #  options:
+  #    legend:
+  #      display: false
+  #    title:
+  #      display: true
+  #      position: 'bottom'
+  #      text: 'Dates'
+  #    scales:
+  #      yAxes: [
+  #        {
+  #          gridLines:
+  #            display: false
+  #          ticks: {
+  #            min: 0
+  #          }
+  #        }
+  #      ]
+  #      xAxes: [
+  #        {
+  #          gridLines:
+  #            display: false
+  #          ticks: {
+  #            autoSkip: false
+  #          }
+  #        }
+  #      ]
+  #  )
 
 
 #    makeBar('graph-ticket-entries-closed', barDataSet)
@@ -1772,69 +1772,77 @@ $ ->
 
 
 #  Test data for Closed Email Entry Resolutions
-  emailEntryResolutionLabels = ['Fixed FN', 'Unchanged', 'Fixed FP', 'Other']
-  emailEntryData = [3,6,7,0]
+#  emailEntryResolutionLabels = ['Fixed', 'Unchanged', 'Fixed FP', 'Other']
+#  emailEntryData = [3,6,7,0]
 
-  new Chart($('#closed-email-entries-resolution-piechart'),
-    type: 'pie'
-    data:
-      labels: emailEntryResolutionLabels
-      datasets: [ {
-        label: 'close-email-entries'
-        backgroundColor: [
-          '#3e5a72'
-          '#6dbcdb'
-          '#666'
-        ]
-        data: emailEntryData
-      } ]
-    options:
-      legend: false
-      pieceLabel:
-        render: (args) ->
-          return args.percentage + '%'
-        position: 'outside'
-        segment: false
-        precision: 2
-        showZero: true
-        fontStyle: 'bolder'
-        overlap: false
-        showActualPercentages: true
-  )
+#  new Chart($('#closed-email-entries-resolution-piechart'),
+#    type: 'pie'
+#    data:
+#      labels: emailEntryResolutionLabels
+#      datasets: [ {
+#        label: 'close-email-entries'
+#        backgroundColor: [
+#          '#3e5a72'
+#          '#6dbcdb'
+#          '#666'
+#        ]
+#        data: emailEntryData
+#      } ]
+#    options:
+#      legend: false
+#      pieceLabel:
+#        render: (args) ->
+#          return args.percentage + '%'
+#        position: 'outside'
+#        segment: false
+#        precision: 2
+#        showZero: true
+#        fontStyle: 'bolder'
+#        overlap: false
+#        showActualPercentages: true
+#  )
+
 
   #  Test data for Closed Email Entry Resolutions
-  webEntryResolutionLabels = ['Fixed FN', 'Unchanged', 'Fixed FP', 'Other']
-  webEntryData = [3,6,7,0]
+#  webEntryResolutionLabels = ['Fixed FN', 'Unchanged', 'Fixed FP', 'Other']
+#  webEntryData = [3,6,7,0]
 
-  new Chart($('#closed-web-entries-resolution-piechart'),
-    type: 'pie'
-    data:
-      labels: webEntryResolutionLabels
-      datasets: [ {
-        label: 'close-email-entries'
-        backgroundColor: [
-          '#3e5a72'
-          '#6dbcdb'
-          '#666'
-        ]
-        data: webEntryData
-      } ]
-    options:
-      legend: false
-      pieceLabel:
-        render: (args) ->
-          return args.percentage + '%'
-        position: 'outside'
-        label: 'Unchanched'
-        segment: false
-        precision: 2
-        showZero: true
-        fontStyle: 'bolder'
-        overlap: false
-        showActualPercentages: true
+#  new Chart(document.getElementById('closed-web-entries-resolution-piechart'),
+#    type: 'pie'
+#    data:
+#      labels: [
+#        'Fixed'
+#        'Unchanged'
+#        'Fixed FP'
+#      ]
+#      datasets: [ {
+#        label: 'close-email-entries'
+#        backgroundColor: [
+#          '#3e5a72'
+#          '#6dbcdb'
+#          '#666'
+#        ]
+#        data: [
+#          2478
+#          3267
+#          4202
+#        ]
+#      } ]
+#    options:
+#      legend: false
+#      pieceLabel:
+#        render: (args) ->
+#          return args.percentage + '%'
+#        position: 'outside'
+#        label: 'Unchanched'
+#        segment: false
+#        precision: 2
+#        showZero: true
+#        fontStyle: 'bolder'
+#        overlap: false
+#        showActualPercentages: true
 
-  )
-
+#  )
 
   closedTicketNumbers = [375502, 375504, 375513, 375515, 375516, 375517, 375518, 375519, 375520, 375521, 375522]
   timeToCloseTickets = [1, 1.3, 1.2, 1.5, 1.7, 1.4, 1.8, 0.9, 1, 1.1, 1.2, 1.5, 1.6]
@@ -1981,32 +1989,20 @@ $ ->
 
 
 
-#    graph bottom
-  new Chart(document.getElementById('bar-chart-horizontal'),
+#### Multi User Graphs #####
+
+#  Ticket entries closed by ticket owner
+
+  ticketOwners = ['mtaylor', 'chrclair', 'nherbert', 'nverbeck', 'abreeeman']
+  ticketEntriesByOwner = [8, 15, 11, 10, 13.5]
+
+  new Chart($('#ticket-entries-closed-by-owner'),
     type: 'horizontalBar'
     data:
-      labels: [
-        'mtaylor'
-        'chrclair'
-        'nherbert'
-        'nverbeck'
-        'abreeeman'
-      ]
+      labels: ticketOwners
       datasets: [ {
-        backgroundColor: [
-          '#6dbcdb'
-          '#6dbcdb'
-          '#6dbcdb'
-          '#6dbcdb'
-          '#6dbcdb'
-        ]
-        data: [
-          8
-          15
-          11
-          10
-          13.5
-        ]
+        backgroundColor: '#6dbcdb'
+        data: ticketEntriesByOwner
       } ]
     options:
       legend: display: false
@@ -2016,7 +2012,6 @@ $ ->
             gridLines: display: false
             ticks: {
               min: 0
-              stepSize: 10
             }
           }
         ]
@@ -2025,42 +2020,26 @@ $ ->
             gridLines: display: false
             ticks: {
               min: 0
-              stepSize: 5
-              max: 20
             }
             scaleLabel: {
               display: true,
-              labelString: 'Tickets'
+              labelString: 'Closed Ticket Entries'
             }
           }
         ]
       )
 
-  new Chart(document.getElementById('bar-chart2-horizontal'),
+
+# Average time to close tickets by ticket owner graph
+  avgTimeToCloseTickets = [.8, .7, 1.7, 1.6, 2]
+
+  new Chart($('#avg-time-to-close-tickets'),
     type: 'horizontalBar'
     data:
-      labels: [
-        'mtaylor'
-        'chrclair'
-        'nherbert'
-        'nverbeck'
-        'abreeeman'
-      ]
+      labels: ticketOwners
       datasets: [ {
-        backgroundColor: [
-          '#6dbcdb'
-          '#6dbcdb'
-          '#6dbcdb'
-          '#6dbcdb'
-          '#6dbcdb'
-        ]
-        data: [
-          .8
-          .7
-          1.7
-          1.6
-          2
-        ]
+        backgroundColor: '#6dbcdb'
+        data: avgTimeToCloseTickets
       } ]
     options:
       legend: display: false
@@ -2070,7 +2049,6 @@ $ ->
             gridLines: display: false
             ticks: {
               min: 0
-              stepSize: 1
             }
           }
         ]
@@ -2079,71 +2057,47 @@ $ ->
             gridLines: display: false
             ticks: {
               min: 0
-              stepSize: 1
-              max: 4
             }
             scaleLabel: {
               display: true,
-              labelString: 'hours'
+              labelString: 'Hours'
             }
           }
         ]
   )
 
-  new Chart(document.getElementById('bar-chart-grouped'),
+
+# Ticket Resolutions by Ticket Owner graph
+
+  fixedFPTickets = [9, 7, 5, 6, 9]
+  fixedFNTickets = [10, 14, 11, 10, 5]
+  unchangedTickets = [3, 4, 11, 13, 9]
+  otherTickets = [0, 1, 0, 3, 5]
+
+  new Chart($('#ticket-resolutions-by-owner'),
     type: 'bar'
     data:
-      labels: [
-        'mtaylor'
-        'chrclair'
-        'nherbert'
-        'nverbeck'
-        'abreeman'
-      ]
+      labels: ticketOwners
       datasets: [
         {
           label: 'Fixed FP'
           backgroundColor: '#6dbcdb'
-          data: [
-            9.5
-            7.5
-            5
-            6.5
-            9.5
-          ]
+          data: fixedFPTickets
         }
         {
           label: 'Fixed FN'
           backgroundColor: '#2c3e50'
-          data: [
-            10.5
-            14
-            11.5
-            10
-            5
-          ]
+          data: fixedFNTickets
         }
         {
           label: 'Unchanged'
           backgroundColor: '#999'
-          data: [
-            3.5
-            4.8
-            11.5
-            13.5
-            9.5
-          ]
+          data: unchangedTickets
         }
         {
           label: 'Other'
           backgroundColor: '#E47433'
-          data: [
-            0
-            1.5
-            0
-            3.5
-            1.5
-          ]
+          data: otherTickets
         }
       ]
     options:
@@ -2156,8 +2110,6 @@ $ ->
             gridLines: display: false
             ticks: {
               min: 0
-              stepSize: 5
-              max: 15
             }
           }
         ]
@@ -2168,37 +2120,19 @@ $ ->
         ]
   )
 
-  new Chart(document.getElementById('bar-chart3-horizontal'),
+
+
+#  Rule Hits for FP Resolutions Graph
+  fpRules = ['a500', 'alx_ cln', 'mute_phish', 'sbl', 'srch', 'suwl', 'trd_mal']
+  totalRuleHits = [ 5, 18, 9, 14, 4, 7, 3]
+
+  new Chart($('#rule-hits-fp-resolutions'),
     type: 'horizontalBar'
     data:
-      labels: [
-        'a500'
-        'alx_ cln'
-        'mute_phish'
-        'sbl'
-        'srch'
-        'suwl'
-        'trd_mal'
-      ]
+      labels: fpRules
       datasets: [ {
-        backgroundColor: [
-          '#6dbcdb'
-          '#6dbcdb'
-          '#6dbcdb'
-          '#6dbcdb'
-          '#6dbcdb'
-          '#6dbcdb'
-          '#6dbcdb'
-        ]
-        data: [
-          5
-          18.5
-          9.5
-          14.5
-          4.5
-          7.5
-          3
-        ]
+        backgroundColor: '#6dbcdb'
+        data: totalRuleHits
       } ]
     options:
       legend: display: false
@@ -2213,8 +2147,6 @@ $ ->
             gridLines: display: false
             ticks: {
               min: 0
-              stepSize: 5
-              max: 20
             }
             scaleLabel: {
               display: true,
@@ -2223,6 +2155,9 @@ $ ->
           }
         ]
   )
+
+
+
   window.barChartGroupedData = [
     {
       label: 'Total Ticket Entries'
@@ -2425,24 +2360,6 @@ $ ->
 
   )
 
-
-$ ->
-  $('#tickets_date_range').daterangepicker()
-  $('button.icon-calendar').click ->
-    console.log ('you clicked me the calendar icon or button')
-    $('#tickets_date_range').trigger 'click'
-  return
-
-
-$ ->
-  $('#tickets_date_range').on 'apply.daterangepicker', (ev, picker) ->
-    start = picker.startDate.format('MMMM/DD/YYYY').split('/')
-    end = picker.endDate.format('MMMM/DD/YYYY').split('/')
-    val = start[0] + ' ' + start[1] + ', ' + start[2] + ' to ' + end[0] + ' ' + end[1] + ', ' + end[2]
-    $('.dashboard-time label')[0].innerHTML = val
-    return
-  return
-
 #    If user changes buttons from initial status, enable the submit button
 #   TODO add this check in later that only allows user to submit if there have been changes made
 
@@ -2451,9 +2368,9 @@ $ ->
 # Create Dashboard Initial Table (My Open Tickets)
 $ ->
 
+#
   window.open_dashboard_dispute_table = $('#table-user-disputes-open').DataTable(
     dom: '<t>'
-    data: tempSingleUserOpenTixDataset
     columnDefs: [
       {
         targets: [ 1 ]
@@ -2497,7 +2414,6 @@ $ ->
 
   window.closed_dashboard_dispute_table = $('#table-user-disputes-closed').DataTable(
     dom: '<t>'
-    data: tempSingleUserClosedTixDataset
     columnDefs: [
       {
         targets: [ 1 ]
@@ -2534,50 +2450,50 @@ $ ->
     ]
   )
 
-  window.open_multiuser_dashboard_dispute_table = $('#table-multi-user-disputes-open').DataTable(
-    dom: '<t>'
-    data: tempSingleUserOpenTixDataset
-    columnDefs: [
-      {
-        targets: [ 1 ]
-        className: 'id-col'
-      }
-      {
-        targets: [ 4 ]
-        className: 'state-col'
-      }
-      {
-        targets: [
-          0
-          2
-          5
-        ]
-        className: 'text-center'
-      }
-    ]
-    columns: [
-      {
-        data: 'priority'
-        render: (data) ->
-          '<span class="bug-priority p-' + data + '"></span>'
-      }
-      { data: 'case_number' }
-      {
-        data: 'submitter_type'
-        render: (data) ->
-          '<span class="submitter-type-icon submitter-' + data + '"></span>'
-      }
-      { data: 'owner' }
-      { data: 'status' }
-      {
-        data: 'submission_type'
-        render: (data) ->
-          '<span class="dispute-submission-type dispute-' + data  + '"></span>'
-      }
-      { data: 'd_entry_preview' }
-      { data: 'last_comment' }
-    ]
-  )
+#  window.open_multiuser_dashboard_dispute_table = $('#table-multi-user-disputes-open').DataTable(
+#    dom: '<t>'
+#    data: tempSingleUserClosedTixDataset
+#    columnDefs: [
+#      {
+#        targets: [ 1 ]
+#        className: 'id-col'
+#      }
+#      {
+#        targets: [ 4 ]
+#        className: 'state-col'
+#      }
+#      {
+#        targets: [
+#          0
+#          2
+#          5
+#        ]
+#        className: 'text-center'
+#      }
+#    ]
+#    columns: [
+#      {
+#        data: 'priority'
+#        render: (data) ->
+#          '<span class="bug-priority p-' + data + '"></span>'
+#      }
+#      { data: 'case_number' }
+#      {
+#        data: 'submitter_type'
+#        render: (data) ->
+#          '<span class="submitter-type-icon submitter-' + data + '"></span>'
+#      }
+#      { data: 'owner' }
+#      { data: 'status' }
+#      {
+#        data: 'submission_type'
+#        render: (data) ->
+#          '<span class="dispute-submission-type dispute-' + data  + '"></span>'
+#      }
+#      { data: 'd_entry_preview' }
+#      { data: 'last_comment' }
+#    ]
+#  )
 
   window.closed_dashboard_multiuser_dispute_table = $('#table-multi-user-disputes-closed').DataTable(
     dom: '<t>'
@@ -2621,50 +2537,6 @@ $ ->
     ]
   )
 
-tempSingleUserOpenTixDataset = [
-  {
-    'priority': ['P1'],
-    'case_number': ['0000375515'],
-    'submitter_type': ['customer'],
-    'owner': ['melitayl'],
-    'status': ['Researching'],
-    'submission_type': ['W'],
-    'd_entry_preview': ['<span class="dispute_entry_content_first">guardiancremation.com</span><span class="dispute-count">4</span>'],
-    'last_comment': ['2018-08-08 13:59:10']
-  },
-  {
-    'priority': ['P3'],
-    'case_number': ['0000375513'],
-    'submitter_type': ['guest'],
-    'owner': ['nicherbe'],
-    'status': ['Assigned'],
-    'submission_type': ['E'],
-    'd_entry_preview': ['<span class="dispute_entry_content_first">bvillaseminyak.com</span><span class="dispute-count">7</span>'],
-    'last_comment': ['2018-08-08 13:59:10']
-  },
-  {
-    'priority': ['P4'],
-    'case_number': ['0000375502'],
-    'submitter_type': ['guest'],
-    'owner': ['melitayl'],
-    'status': ['Customer_Pending'],
-    'submission_type': ['W'],
-    'd_entry_preview': ['<span class="dispute_entry_content_first">food-hub.org</span><span class="dispute-count">14</span>'],
-    'last_comment': ['2018-08-08 13:59:10']
-  },
-  {
-    'priority': ['P3'],
-    'case_number': ['000012345'],
-    'submitter_type': ['customer'],
-    'owner': ['nverbeck'],
-    'status': ['Researching'],
-    'submission_type': ['W'],
-    'd_entry_preview': ['<span class="dispute_entry_content_first">housingscotlandtoday.com</span><span class="dispute-count">9</span>'],
-    'last_comment': ['2018-08-08 13:59:10']
-  }
-]
-
-
 tempSingleUserClosedTixDataset = [
   {
     'priority': ['P1'],
@@ -2677,6 +2549,7 @@ tempSingleUserClosedTixDataset = [
   },
   {
     'priority': ['P3'],
+    'status': ['Researching'],
     'case_number': ['0000375513'],
     'submitter_type': ['guest'],
     'owner' : ['nverbeck'],
@@ -2686,6 +2559,7 @@ tempSingleUserClosedTixDataset = [
   },
   {
     'priority': ['P4'],
+    'status': ['Researching'],
     'case_number': ['0000375502'],
     'submitter_type': ['guest'],
     'owner' : ['melitayl'],
@@ -2695,6 +2569,7 @@ tempSingleUserClosedTixDataset = [
   },
   {
     'priority': ['P1'],
+    'status': ['Researching'],
     'case_number': ['0000375515'],
     'submitter_type': ['customer'],
     'owner' : ['nicherbe'],
@@ -2704,6 +2579,7 @@ tempSingleUserClosedTixDataset = [
   },
   {
     'priority': ['P3'],
+    'status': ['Researching'],
     'case_number': ['0000375513'],
     'submitter_type': ['guest'],
     'owner' : ['nicherbe'],
@@ -2713,6 +2589,7 @@ tempSingleUserClosedTixDataset = [
   },
   {
     'priority': ['P4'],
+    'status': ['Researching'],
     'case_number': ['0000375502'],
     'submitter_type': ['guest'],
     'owner' : ['melitayl'],
@@ -2722,6 +2599,7 @@ tempSingleUserClosedTixDataset = [
   },
   {
     'priority': ['P3'],
+    'status': ['Researching'],
     'case_number': ['000012345'],
     'submitter_type': ['customer'],
     'owner' : ['nicherbe'],
@@ -2730,29 +2608,3 @@ tempSingleUserClosedTixDataset = [
     'time_to_close': ['42m']
   }
 ]
-
-# This is not actually set up to work yet.
-window.populate_webrep_dashboard_opentix_table = (data = {}) ->
-  headers = {'Token': $('input[name="token"]').val(), 'Xmlrpc-Token': $('input[name="xml_token"]').val()}
-  $.ajax(
-    url: '/escalations/api/v1/escalations/webrep/disputes'
-    method: 'GET'
-    headers: headers
-    data: data
-    data_json: JSON.stringify(data)
-    success: (response) ->
-      console.log(response)
-      console.log(data)
-      json = $.parseJSON(response)
-
-      if json.data.length == 0
-        std_msg_error("No tickets matching filter or search.","")
-
-      else
-        datatable = $('#table-user-disputes-open').DataTable()
-        datatable.clear();
-        datatable.rows.add(json.data);
-        datatable.draw();
-    error: (response) ->
-     console.log(response)
-  , this)
