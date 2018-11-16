@@ -1255,7 +1255,7 @@ class Dispute < ApplicationRecord
                       :d_entry_preview => "<span class='dispute_entry_content_first'>#{result.dispute_entries.first.hostlookup}</span><span class='dispute-count'>#{entry_count}</span>",
                       :age => distance_of_time_in_words(Time.now, result.created_at),
                       :submitter_type => result.submitter_type.downcase,
-                      :submission_type => result.submission_type,
+                      :submission_type => result.submission_type.upcase,
                       :last_comment => last_comment_time,
                       :owner => ticket_user,
                       :priority => result.priority
@@ -1298,7 +1298,7 @@ class Dispute < ApplicationRecord
                       :d_entry_preview => "<span class='dispute_entry_content_first'>#{result.dispute_entries.first.hostlookup}</span><span class='dispute-count'>#{entry_count}</span>",
                       :time_to_close => distance_of_time_in_words(result.created_at, result.case_resolved_at),
                       :submitter_type => result.submitter_type.downcase,
-                      :submission_type => result.submission_type,
+                      :submission_type => result.submission_type.upcase,
                       :priority => result.priority,
                       :owner => ticket_user
       }
