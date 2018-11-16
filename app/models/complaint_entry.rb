@@ -551,8 +551,7 @@ class ComplaintEntry < ApplicationRecord
     by_cat = {}
 
     if prefix_id.present?
-      audit_history = Wbrs::HistoryRecord.where({:prefix_id => prefix_id})
-      binding.pry
+      audit_history = Wbrs::HistoryRecord.where(prefix_id: prefix_id)
 
       audit_history.each do |hist|
 
