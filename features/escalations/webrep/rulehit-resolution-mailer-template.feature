@@ -57,6 +57,5 @@ Feature: RuleHit Resolution Mailer Templates
     When I goto "/rulehit_resolution_mailer_templates/"
     And I click through "#delete-1" and accept confirmation
     Then I should see "Rulehit resolution mailer template was successfully destroyed."
-    Then take a screenshot
 
 
