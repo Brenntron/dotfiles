@@ -1680,11 +1680,11 @@ $ ->
   ####### Bar chart for Ticket Entries by Ticket Type
 
   ## Data breakdown for 'initial' daily data
-  ticketTypeChartLabels = ['September 2', 'September 3', 'September 4', 'September 5', 'September 6', 'September 7', 'September 8']
-  ticketTypeTotalData = [20, 24, 30, 28, 0, 0, 0]
-  ticketTypeWData     = [15, 20, 18, 20, 0, 0, 0]
-  ticketTypeEData     = [8, 7, 15, 12, 0, 0, 0]
-  ticketTypeEWData    = [0, 0, 0, 9, 0, 0, 0]
+  #ticketTypeChartLabels = ['September 2', 'September 3', 'September 4', 'September 5', 'September 6', 'September 7', 'September 8']
+  #ticketTypeTotalData = [20, 24, 30, 28, 0, 0, 0]
+  #ticketTypeWData     = [15, 20, 18, 20, 0, 0, 0]
+  #ticketTypeEData     = [8, 7, 15, 12, 0, 0, 0]
+  #ticketTypeEWData    = [0, 0, 0, 9, 0, 0, 0]
 
   ## Test data breakdown for a monthly dataset - we'll say 6 months
   #  ticketTypeChartLabels = ['June', 'July', 'August', 'September', 'October', 'November']
@@ -1694,61 +1694,61 @@ $ ->
   #  ticketTypeEWData = [30, 16, 57, 57, 25, 50]
 
 
-  window.userTicketClosedGraphDatasets = [
-    {
-      label: 'Total Ticket Entries'
-      backgroundColor: '#6dbcdb'
-      data: ticketTypeTotalData
-    }
-    {
-      label: 'W'
-      backgroundColor: '#E47433'
-      data: ticketTypeWData
-    }
-    {
-      label: 'E'
-      backgroundColor: '#5FB665'
-      data: ticketTypeEData
-    }
-    {
-      label: 'EW'
-      backgroundColor: '#C14B92'
-      data: ticketTypeEWData
-    }]
+  #window.userTicketClosedGraphDatasets = [
+  #  {
+  #    label: 'Total Ticket Entries'
+  #    backgroundColor: '#6dbcdb'
+  #    data: ticketTypeTotalData
+  #  }
+  #  {
+  #    label: 'W'
+  #    backgroundColor: '#E47433'
+  #    data: ticketTypeWData
+  #  }
+  #  {
+  #    label: 'E'
+  #    backgroundColor: '#5FB665'
+  #    data: ticketTypeEData
+  #  }
+  #  {
+  #    label: 'EW'
+  #    backgroundColor: '#C14B92'
+  #    data: ticketTypeEWData
+  #  }]
 
 
-  window.userTicketClosedGraph = new Chart($('#graph-ticket-entries-closed'),
-    type: 'bar'
-    data:
-      labels: ticketTypeChartLabels
-      datasets: window.userTicketClosedGraphDatasets,
-    options:
-      legend:
-        display: false
-      title:
-        display: true
-        position: 'bottom'
-        text: 'Dates'
-      scales:
-        yAxes: [
-          {
-            gridLines:
-              display: false
-            ticks: {
-              min: 0
-            }
-          }
-        ]
-        xAxes: [
-          {
-            gridLines:
-              display: false
-            ticks: {
-              autoSkip: false
-            }
-          }
-        ]
-    )
+  #window.userTicketClosedGraph = new Chart($('#graph-ticket-entries-closed'),
+  #  type: 'bar'
+  #  data:
+  #    labels: ticketTypeChartLabels
+  #    datasets: window.userTicketClosedGraphDatasets,
+  #  options:
+  #    legend:
+  #      display: false
+  #    title:
+  #      display: true
+  #      position: 'bottom'
+  #      text: 'Dates'
+  #    scales:
+  #      yAxes: [
+  #        {
+  #          gridLines:
+  #            display: false
+  #          ticks: {
+  #            min: 0
+  #          }
+  #        }
+  #      ]
+  #      xAxes: [
+  #        {
+  #          gridLines:
+  #            display: false
+  #          ticks: {
+  #            autoSkip: false
+  #          }
+  #        }
+  #      ]
+  #  )
 
 
 #    makeBar('graph-ticket-entries-closed', barDataSet)
@@ -2390,7 +2390,6 @@ $ ->
 
   window.closed_dashboard_dispute_table = $('#table-user-disputes-closed').DataTable(
     dom: '<t>'
-    data: tempSingleUserClosedTixDataset
     columnDefs: [
       {
         targets: [ 1 ]
@@ -2427,50 +2426,50 @@ $ ->
     ]
   )
 
-  window.open_multiuser_dashboard_dispute_table = $('#table-multi-user-disputes-open').DataTable(
-    dom: '<t>'
-    data: tempSingleUserOpenTixDataset
-    columnDefs: [
-      {
-        targets: [ 1 ]
-        className: 'id-col'
-      }
-      {
-        targets: [ 4 ]
-        className: 'state-col'
-      }
-      {
-        targets: [
-          0
-          2
-          5
-        ]
-        className: 'text-center'
-      }
-    ]
-    columns: [
-      {
-        data: 'priority'
-        render: (data) ->
-          '<span class="bug-priority p-' + data + '"></span>'
-      }
-      { data: 'case_number' }
-      {
-        data: 'submitter_type'
-        render: (data) ->
-          '<span class="submitter-type-icon submitter-' + data + '"></span>'
-      }
-      { data: 'owner' }
-      { data: 'status' }
-      {
-        data: 'submission_type'
-        render: (data) ->
-          '<span class="dispute-submission-type dispute-' + data  + '"></span>'
-      }
-      { data: 'd_entry_preview' }
-      { data: 'last_comment' }
-    ]
-  )
+#  window.open_multiuser_dashboard_dispute_table = $('#table-multi-user-disputes-open').DataTable(
+#    dom: '<t>'
+#    data: tempSingleUserClosedTixDataset
+#    columnDefs: [
+#      {
+#        targets: [ 1 ]
+#        className: 'id-col'
+#      }
+#      {
+#        targets: [ 4 ]
+#        className: 'state-col'
+#      }
+#      {
+#        targets: [
+#          0
+#          2
+#          5
+#        ]
+#        className: 'text-center'
+#      }
+#    ]
+#    columns: [
+#      {
+#        data: 'priority'
+#        render: (data) ->
+#          '<span class="bug-priority p-' + data + '"></span>'
+#      }
+#      { data: 'case_number' }
+#      {
+#        data: 'submitter_type'
+#        render: (data) ->
+#          '<span class="submitter-type-icon submitter-' + data + '"></span>'
+#      }
+#      { data: 'owner' }
+#      { data: 'status' }
+#      {
+#        data: 'submission_type'
+#        render: (data) ->
+#          '<span class="dispute-submission-type dispute-' + data  + '"></span>'
+#      }
+#      { data: 'd_entry_preview' }
+#      { data: 'last_comment' }
+#    ]
+#  )
 
   window.closed_dashboard_multiuser_dispute_table = $('#table-multi-user-disputes-closed').DataTable(
     dom: '<t>'
@@ -2526,6 +2525,7 @@ tempSingleUserClosedTixDataset = [
   },
   {
     'priority': ['P3'],
+    'status': ['Researching'],
     'case_number': ['0000375513'],
     'submitter_type': ['guest'],
     'owner' : ['nverbeck'],
@@ -2535,6 +2535,7 @@ tempSingleUserClosedTixDataset = [
   },
   {
     'priority': ['P4'],
+    'status': ['Researching'],
     'case_number': ['0000375502'],
     'submitter_type': ['guest'],
     'owner' : ['melitayl'],
@@ -2544,6 +2545,7 @@ tempSingleUserClosedTixDataset = [
   },
   {
     'priority': ['P1'],
+    'status': ['Researching'],
     'case_number': ['0000375515'],
     'submitter_type': ['customer'],
     'owner' : ['nicherbe'],
@@ -2553,6 +2555,7 @@ tempSingleUserClosedTixDataset = [
   },
   {
     'priority': ['P3'],
+    'status': ['Researching'],
     'case_number': ['0000375513'],
     'submitter_type': ['guest'],
     'owner' : ['nicherbe'],
@@ -2562,6 +2565,7 @@ tempSingleUserClosedTixDataset = [
   },
   {
     'priority': ['P4'],
+    'status': ['Researching'],
     'case_number': ['0000375502'],
     'submitter_type': ['guest'],
     'owner' : ['melitayl'],
@@ -2571,6 +2575,7 @@ tempSingleUserClosedTixDataset = [
   },
   {
     'priority': ['P3'],
+    'status': ['Researching'],
     'case_number': ['000012345'],
     'submitter_type': ['customer'],
     'owner' : ['nicherbe'],
@@ -2579,29 +2584,3 @@ tempSingleUserClosedTixDataset = [
     'time_to_close': ['42m']
   }
 ]
-
-# This is not actually set up to work yet.
-window.populate_webrep_dashboard_opentix_table = (data = {}) ->
-  headers = {'Token': $('input[name="token"]').val(), 'Xmlrpc-Token': $('input[name="xml_token"]').val()}
-  $.ajax(
-    url: '/escalations/api/v1/escalations/webrep/disputes'
-    method: 'GET'
-    headers: headers
-    data: data
-    data_json: JSON.stringify(data)
-    success: (response) ->
-      console.log(response)
-      console.log(data)
-      json = $.parseJSON(response)
-
-      if json.data.length == 0
-        std_msg_error("No tickets matching filter or search.","")
-
-      else
-        datatable = $('#table-user-disputes-open').DataTable()
-        datatable.clear();
-        datatable.rows.add(json.data);
-        datatable.draw();
-    error: (response) ->
-     console.log(response)
-  , this)

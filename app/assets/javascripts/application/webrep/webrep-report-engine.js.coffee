@@ -80,7 +80,6 @@ window.refresh_multi_open_tickets_table = (user_ids)->
     success: (response) ->
 
       json = $.parseJSON(response)
-
       if json.error
         #$('#refresh-working-msg').hide()
         #$('#refresh-error-msg').show()
@@ -94,6 +93,7 @@ window.refresh_multi_open_tickets_table = (user_ids)->
         datatable.draw();
 
         #References to other data points used to wrap this table, use as needed
+
         # json.data.ticket_count
         # json.data.entries_count
         # json.data.customer_count
@@ -138,19 +138,21 @@ window.refresh_single_closed_tickets_table = (user_id)->
         #$('#refresh-working-msg').show()
         #$('#refresh-working-msg').html('Table data updating correctly')
         #$('#dispute-index-title').text(json['title'])
-        datatable = $('#single_user_closed_tickets').DataTable()
+        datatable = $('#table-user-disputes-closed').DataTable()
         datatable.clear();
         datatable.rows.add(json.data.table_data);
         datatable.draw();
 
         #References to other data points used to wrap this table, use as needed
-        # json.data.ticket_count
-        # json.data.entries_count
-        # json.data.customer_count
-        # json.data.guest_count
-        # json.data.email_count
-        # json.data.web_count
-        # json.data.email_web_count
+
+        $("#closed_single_customer_count").html(json.data.customer_count)
+        $("#closed_single_guest_count").html(json.data.guest_count)
+        $("#closed_single_email_count").html(json.data.email_count)
+        $("#closed_single_web_count").html(json.data.web_count)
+        $("#closed_single_email_web_count").html(json.data.email_web_count)
+
+        $("#closed_single_ticket_count").html(json.data.ticket_count)
+        $("#closed_single_entry_count").html(json.data.entries_count)
 
     error: (response) ->
         #$('#refresh-working-msg').hide()
@@ -227,6 +229,7 @@ window.set_initial_date_span = () ->
   user_id = $("#user_id").val()
 
   refresh_single_open_tickets_table(user_id)
+  refresh_single_closed_tickets_table(user_id)
 
 window.build_graph_ticket_entries_submitter = () ->
 
@@ -253,6 +256,8 @@ window.build_graph_ticket_entries_submitter = () ->
       submitterCustomerChartData = json["data"]["customer_chart_data"]
       submitterChartLabels = json["data"]["chart_labels"]
 
+      Chart.defaults.global.defaultFontFamily = "'Open Sans', sans-serif"
+      Chart.defaults.global.defaultFontSize = 10
 
       new Chart($('#graph-ticket-entries-submitter'),
         type: 'bar'
@@ -330,6 +335,9 @@ window.build_single_closed_email_entries_resolution_piechart = () ->
       $(tableData).each ->
         $(email_piechart_table).append('<tr><td>' + this.resolution + '</td><td class="text-center">' + this.percent + ' %</td><td class="text-center">' + this.count + '</td></tr>')
 
+      Chart.defaults.global.defaultFontFamily = "'Open Sans', sans-serif"
+      Chart.defaults.global.defaultFontSize = 10
+
       new Chart($('#closed-email-entries-resolution-piechart'),
         type: 'pie'
         data:
@@ -360,6 +368,7 @@ window.build_single_closed_email_entries_resolution_piechart = () ->
     error: (response) ->
       popup_response_error(response, 'Error building chart')
   )
+
 
 
 window.build_single_closed_web_entries_resolution_piechart = () ->
@@ -394,7 +403,7 @@ window.build_single_closed_web_entries_resolution_piechart = () ->
 
       web_piechart_table = $('#closed-web-entries-resolution-table tbody')
       $(web_piechart_table).empty()
-      
+
       $(tableData).each ->
         $(web_piechart_table).append('<tr><td>' + this.resolution + '</td><td class="text-center">' + this.percent + ' %</td><td class="text-center">' + this.count + '</td></tr>')
 
@@ -567,6 +576,98 @@ window.build_multi_closed_web_entries_resolution_piechart = () ->
       popup_response_error(response, 'Error building chart')
   )
 
+
+window.build_single_entries_closed_by_day_chart = () ->
+  from = localStorage.getItem('webrep_report_range_from')
+  to = localStorage.getItem('webrep_report_range_to')
+  user_id = $("#user_id").val()
+
+  data = {
+    from: from,
+    to: to,
+    users: [user_id]
+  }
+
+  headers = {'Token': $('input[name="token"]').val(), 'Xmlrpc-Token': $('input[name="xml_token"]').val()}
+  $.ajax(
+    url: '/escalations/api/v1/escalations/webrep/reports/ticket_entries_closed_by_day_report'
+    method: 'GET'
+    headers: headers
+    data: data
+    dataType: 'json'
+    success: (response) ->
+
+      json = $.parseJSON(response)
+
+      ticketTypeChartLabels = json['data']['report_labels']
+      ticketTypeTotalData = json['data']['report_total_data']
+      ticketTypeWData = json['data']['report_w_data']
+      ticketTypeEData = json['data']['report_e_data']
+      ticketTypeEWData = json['data']['report_ew_data']
+
+      window.userTicketClosedGraphDatasets = [
+        {
+          label: 'Total Ticket Entries'
+          backgroundColor: '#6dbcdb'
+          data: ticketTypeTotalData
+        }
+        {
+          label: 'W'
+          backgroundColor: '#E47433'
+          data: ticketTypeWData
+        }
+        {
+          label: 'E'
+          backgroundColor: '#5FB665'
+          data: ticketTypeEData
+        }
+        {
+          label: 'EW'
+          backgroundColor: '#C14B92'
+          data: ticketTypeEWData
+        }]
+
+
+      window.userTicketClosedGraph = new Chart($('#graph-ticket-entries-closed'),
+        type: 'bar'
+        data:
+          labels: ticketTypeChartLabels
+          datasets: window.userTicketClosedGraphDatasets,
+        options:
+          legend:
+            display: false
+          title:
+            display: true
+            position: 'bottom'
+            text: 'Dates'
+          scales:
+            yAxes: [
+              {
+                gridLines:
+                  display: false
+                ticks: {
+                  min: 0
+                }
+              }
+            ]
+            xAxes: [
+              {
+                gridLines:
+                  display: false
+                ticks: {
+                  autoSkip: false
+                }
+              }
+            ]
+      )
+
+
+    error: (response) ->
+      popup_response_error(response, 'Error building chart')
+  )
+
+
+
 $ ->
   $('#tickets_date_range').daterangepicker()
   $('button.icon-calendar').click ->
@@ -591,6 +692,7 @@ $ ->
     return
   return
 
+
 $ ->
   $(document).ready ->
     window.set_initial_date_span()
@@ -599,3 +701,4 @@ $ ->
     window.build_single_closed_web_entries_resolution_piechart()
     window.build_multi_closed_email_entries_resolution_piechart()
     window.build_multi_closed_web_entries_resolution_piechart()
+    window.build_single_entries_closed_by_day_chart()

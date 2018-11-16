@@ -6806,16 +6806,6 @@ td.text-center span {
   padding-left: 10px;
 }
 
-.graph-top-header {
-  width: 100%;
-  display: flex;
-  justify-content: center;
-
-  .header-stg {
-    color: $type-lighter-color;
-    font-weight: bold;
-  }
-}
 .average-label {
   float: right;
 
@@ -6837,29 +6827,36 @@ td.text-center span {
   }
 
   .graph-bar-legend {
-    height: 100%;
     padding: 0 10px;
     border: 1px solid $faint-neutral-color;
     float: right;
 
     .custom-legend {
-      display: block;
-      padding: 4px 0;
-      text-align: right;
+      padding: 4px 0 20px 4px;
     }
 
-    .skyblue-legend-color {
+    .skyblue-legend-color::before {
+      content: '';
+      float: left;
+      display: block;
       height: 8px;
       width: 8px;
       border-radius: 50%;
       background-color: $primary-section-color;
+      margin-right: 6px;
+      margin-top: 2px;
     }
 
-    .navyblue-legend-color {
+    .navyblue-legend-color::before {
+      float: left;
+      content: '';
+      display: block;
       height: 8px;
       width: 8px;
       border-radius: 50%;
       background-color: $content-tab-color;
+      margin-right: 6px;
+      margin-top: 2px;
     }
 
     .lightgray-legend-color {
@@ -6875,10 +6872,6 @@ td.text-center span {
       border-radius: 50%;
       background-color: $warning-accent-color;
     }
-
-    label {
-      font-size: 11px;
-    }
   }
 
 .graph-header-icon-stg {
@@ -6891,7 +6884,6 @@ td.text-center span {
 .graph-config {
   display: inline-flex;
   width: 100%;
-  height: 44px;
   justify-content: space-between;
   margin-top: 10px;
   margin-bottom: 10px;
@@ -6907,78 +6899,84 @@ td.text-center span {
   }
 }
 
+.graph-bar-legend label {
+  display: block;
+  font-size: 8pt;
+  padding: 4px;
+}
+
+.graph-menu .label-wrapper {
+  display: block;
+  font-size: 8pt;
+  padding: 2px 4px;
+}
+
 .graph-menu {
-  height: 100%;
-  width: 50%;
-  border: 1px solid #dddddd;
+  font-size: 8pt;
+}
+
+.graph-menu, .graph-bar-legend {
+  border: 1px solid $faint-neutral-color;
   padding: 3px 5px;
 
-  label {
-    height: 50%;
-    width: 100%;
-    font-size: 9px;
-    font-weight: bold;
-    color: $content-label-color;
+  .total-legend {
+    background-color: skyblue;
+    width: 45px;
+    height: 14px;
+    position: relative;
+    top: 2px;
+    border-radius: 2px;
+  }
 
-    .total-legend {
-      background-color: skyblue;
-      width: 45px;
-      height: 14px;
-      position: relative;
-      top: 2px;
-      border-radius: 2px;
-    }
+  .legend-option {
+    width: 14px;
+    height: 14px;
+    position: relative;
+    top: 1.5px;
+    background-repeat: no-repeat;
+  }
 
-    .legend-option {
-      width: 14px;
-      height: 14px;
-      position: relative;
-      top: 1.5px;
+  .totals-label {
+    color: $type-lighter-color;
+    text-transform: uppercase;
+    font-size: 8pt;
+    font-weight: 600;
+  }
+
+  .ticket-entries-totals-wrapper {
+    margin-top: 12px;
+  }
+
+  .totals-label, .ticket-entry-total-block {
+    display: inline-block;
+    margin-right: 12px;
+  }
+
+  .ticket-entries-totals-wrapper .content-label-sm {
+    color: $type-lighter-color;
+    font-weight: 500;
+    font-size: 8pt;
+    margin-bottom: 0;
+  }
+
+  .ticket-entry-total {
+    font-weight: 700;
+    font-size: 8.5pt;
+  }
+
+  .ticket-entry-total-block {
+    .submitter-customer, .dispute-E-grey, .dispute-W-grey, .dispute-EW-grey {
+      padding-left: 20px;
+      background-size: 14px 14px;
       background-repeat: no-repeat;
+      background-position: left center;
+      line-height: 1.5em;
     }
+  }
 
-    .totals-label {
-      color: $type-lighter-color;
-      text-transform: uppercase;
-      font-size: 8pt;
-      font-weight: 600;
-    }
-
-    .ticket-entries-totals-wrapper {
-      margin-top: 12px;
-    }
-
-    .totals-label, .ticket-entry-total-block {
-      display: inline-block;
-      margin-right: 12px;
-    }
-
-    .ticket-entries-totals-wrapper .content-label-sm {
-      color: $type-lighter-color;
-      font-weight: 500;
-      font-size: 8pt;
-      margin-bottom: 0;
-    }
-
-    .ticket-entry-total {
-      font-weight: 700;
-      font-size: 8.5pt;
-    }
-
-    .ticket-entry-total-block {
-      .submitter-customer, .dispute-E-grey, .dispute-W-grey, .dispute-EW-grey {
-        padding-left: 20px;
-        background-size: 14px 14px;
-        background-repeat: no-repeat;
-        background-position: left center;
-        line-height: 1.5em;
-      }
-    }
-
-    .guest-block-total {
-      border-right: 1px solid $content-label-color;
-      padding-right: 12px;
-    }
+  .guest-block-total {
+    border-right: 1px solid $content-label-color;
+    padding-right: 12px;
   }
 }
 
@@ -6988,4 +6986,22 @@ td.text-center span {
 
 .graph-config select {
   margin-top: 22px;
+}
+
+.reports-graph-wrapper h5 {
+  text-align: center;
+  color: $type-lighter-color;
+  line-height: 1.25em;
+}
+
+.reports-graph-wrapper {
+  margin: 30px 0;
+}
+
+.reports-graph-wrapper table {
+  font-size: 7.5pt;
+}
+
+.reports-graph-wrapper table > tbody > tr > td, .reports-graph-wrapper table > tbody > tr > td {
+  padding: 4px 8px;
 }
