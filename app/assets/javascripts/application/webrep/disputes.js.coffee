@@ -1840,15 +1840,12 @@ $ ->
   timeToCloseTickets = [1, 1.3, 1.2, 1.5, 1.7, 1.4, 1.8, 0.9, 1, 1.1, 1.2, 1.5, 1.6]
   allTimeToClose = undefined
   averageTimeToClose = 0
-  console.log(timeToCloseTickets.length)
   if timeToCloseTickets.length
-    console.log(timeToCloseTickets)
     allTimeToClose = timeToCloseTickets.reduce((a, b) ->
       a + b
     )
     averageTimeToClose = allTimeToClose / timeToCloseTickets.length
     averageTimeToClose = Math.round(averageTimeToClose * 100)/100
-    console.log(averageTimeToClose)
 
   window.averageTimeToCloseLabel = (hourAmount) ->
     totalSecond = hourAmount * 60 * 60
