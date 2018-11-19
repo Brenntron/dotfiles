@@ -726,7 +726,6 @@ th.alt-col {
 .export-button:focus,
 .take-ticket-button:focus {
   background-color: lighten($bug-section-color, 28%);
-  border: 1px inset $primary-section-color;
 }
 
 .shown .expand-row-button-inline, .shown.expand-row-button-inline {
