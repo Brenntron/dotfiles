@@ -1004,35 +1004,14 @@ $ ->
 
     )
 
-  $('#disputes_check_box').change (el) ->
-    if el.target.checked
-      $('table#disputes-index').DataTable().rows().select()
-      rows = $('table#disputes-index input[type="checkbox"]');
-      i = 1
-      while i < rows.length
-        $(rows[i])[0].checked = true
-        i++
-    else
-      $('table#disputes-index').DataTable().rows().deselect()
-      rows = $('table#disputes-index input[type="checkbox"]');
-      i = 1
-      while i < rows.length
-        $(rows[i])[0].checked = false
-        i++
-
   $ ->
     $(document).ready ->
-      $('table#disputes-index .dispute_check_box').on 'click', (el) ->
-        console.log(el)
-  window.toggleRow = (el) ->
-    if $(el)[0].checked
-      $(el).closest('tr').addClass('selected')
+      $('table#disputes-index .dispute_check_box').on 'click', (box) ->
+  window.toggleRow = (box) ->
+    if $(box)[0].checked
+      $(box).closest('tr').addClass('selected')
     else
-      $(el).closest('tr').removeClass('selected')
-
-  $('#disputes_check_box').change ->
-    $('.dispute_check_box').prop 'checked', @checked
-    return
+      $(box).closest('tr').removeClass('selected')
 
   # Edit Ticket: Edit Ticket Status
   $('#index_ticket_status').click ->
