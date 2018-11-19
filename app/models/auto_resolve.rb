@@ -158,16 +158,14 @@ class AutoResolve
   end
 
   def check_umbrella_from_preload(dispute_entry, address)
-    if dispute_entry.present? && DisputeEntryPreload.where(dispute_entry_id: dispute_entry.id).first.umbrella.present?
-      result = DisputeEntryPreload.where(dispute_entry_id: dispute_entry.id).first.umbrella
-      if result
-        if result == 'Malicious'
-          append_comment('Umbrella: malicious domain.; ')
-          return STATUS_MALICIOUS
-        else
-          append_comment('Umbrella: -; ')
-          return STATUS_NONMALICIOUS
-        end
+    if dispute_entry.present? && dispute_entry.dispute_entry_preload.present? && dispute_entry.dispute_entry_preload.umbrella.present?
+      result = dispute_entry.dispute_entry_preload.umbrella
+      if result == 'Malicious'
+        append_comment('Umbrella: malicious domain.; ')
+        return STATUS_MALICIOUS
+      else
+        append_comment('Umbrella: -; ')
+        return STATUS_NONMALICIOUS
       end
     else
       result = call_umbrella(address: address)

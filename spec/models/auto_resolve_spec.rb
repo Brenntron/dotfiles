@@ -84,9 +84,9 @@ describe AutoResolve do
     let(:umbrella_conviction_response) { double('HTTPI::Response', code: 200, body: umbrella_conviction_json) }
 
     let(:dispute_entry) do
-      dispute_entry = DisputeEntry.create(id: 1)
+      dispute_entry = DisputeEntry.new
+      dispute_entry.id = 1
       dispute_entry.save
-
     end
 
     it 'skips complaints' do
