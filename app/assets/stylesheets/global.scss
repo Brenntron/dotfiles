@@ -4090,9 +4090,12 @@ button.tertiary {
 
 .ui-dialog .ui-dialog-titlebar-close {
   background-color: transparent;
-  background-image: url(image_path('icon_delete_white.svg'));
+  background-image: url(image_path('icon_cancel_white.svg'));
   border: none;
-  margin-right: 3px;
+  margin-top: -15px;
+  background-size: 30px 30px;
+  width: 30px;
+  height: 30px;
 }
 
 #newEmailDialog .sender-receiver-info {
