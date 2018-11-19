@@ -711,7 +711,16 @@ th.alt-col {
 .adjust-reptool-button:hover,
 .adjust-wlbl-button:hover,
 .export-button:hover,
-.take-ticket-button:hover {
+.take-ticket-toolbar-button:hover,
+.open-viewable:hover,
+.open-nonviewable:hover,
+.open-selected:hover,
+.open-all:hover,
+.take-ticket-button:hover,
+.return-ticket-toolbar-button:hover,
+.collapse-all:hover,
+.sync-button:hover,
+.expand-all:hover {
   background-color: lighten($nav-toolbar-color, 8%);
 }
 
@@ -724,7 +733,17 @@ th.alt-col {
 .adjust-reptool-button:focus,
 .adjust-wlbl-button:focus,
 .export-button:focus,
-.take-ticket-button:focus {
+.take-ticket-toolbar-button:focus,
+.take-ticket-button:focus,
+.open-viewable:focus,
+.open-nonviewable:focus,
+.open-selected:focus,
+.open-all:focus,
+.take-ticket-button:focus,
+.return-ticket-toolbar-button:focus,
+.collapse-all:focus,
+.sync-button:focus,
+.expand-all:focus{
   background-color: lighten($bug-section-color, 28%);
 }
 
