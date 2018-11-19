@@ -32,6 +32,7 @@
 //= require moment
 
 //= require application/chart.pieceLabel.min
+//= require application/chartjs-plugin-annotation.min
 //= require application/daterangepicker
 //= require application/webrep_advanced_search
 //= require dataTables/jquery.dataTables

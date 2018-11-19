@@ -1844,39 +1844,50 @@ $ ->
 
   closedTicketNumbers = [375502, 375504, 375513, 375515, 375516, 375517, 375518, 375519, 375520, 375521, 375522]
   timeToCloseTickets = [1, 1.3, 1.2, 1.5, 1.7, 1.4, 1.8, 0.9, 1, 1.1, 1.2, 1.5, 1.6]
+  allTimeToClose = undefined
+  averageTimeToClose = 0
+  if timeToCloseTickets.length
+    allTimeToClose = timeToCloseTickets.reduce((a, b) ->
+      a + b
+    )
+    averageTimeToClose = allTimeToClose / timeToCloseTickets.length
+    averageTimeToClose = Math.round(averageTimeToClose * 100)/100
+
+  window.averageTimeToCloseLabel = (hourAmount) ->
+    totalSecond = hourAmount * 60 * 60
+    seconds = totalSecond % 60
+    totalMinutes = (totalSecond - seconds)/60
+    minutes = totalMinutes % 60
+    totalHours = (totalMinutes - minutes)/60
+    hours = totalHours % 60
+    value = ''
+    if hours > 0
+      value += hours + 'hr ' + minutes + 'm ' + seconds + 's'
+    else if minutes > 0
+      value += minutes + 'm ' + seconds + 's'
+    else
+      value += seconds + 's'
+    return
+
+  averageTimeToCloseLabel(averageTimeToClose)
+
+  window.timeCloseTicketsDataSets = [
+    {
+      data: timeToCloseTickets
+      label: 'Time to Close:'
+      backgroundColor: '#6dbcdb'
+      borderColor: '#55a3c1'
+      borderWidth: 2
+      fill: true
+      lineTension: 0
+    }
+  ]
 
   new Chart($('#time-to-close-tickets-linechart'),
     type: 'line'
     data:
       labels: closedTicketNumbers
-      datasets: [
-        {
-          data: timeToCloseTickets
-          label: 'Time to close:'
-          backgroundColor: '#6dbcdb'
-          fill: true
-          lineTension: 0
-        }
-        {
-          data: [
-            1.4
-            1.4
-            1.4
-            1.4
-            1.4
-            1.4
-            1.4
-            1.4
-            1.4
-            1.4
-            1.4
-          ]
-          label: 'ticket'
-          backgroundColor: 'rgba(135, 206, 250, .1)'
-          fill: true
-          lineTension: 0
-        }
-      ]
+      datasets: window.timeCloseTicketsDataSets
     options:
       legend: false
       elements:
@@ -1891,10 +1902,7 @@ $ ->
               min: 0
               stepSize: .5
               callback: (value, index, values) ->
-                if value > 1
-                  return value + ' hr'
-                else
-                  return value + ' hr'
+                return value + ' hr'
             }
           }
         ]
@@ -1910,7 +1918,29 @@ $ ->
               display: false
             }
           }
-        ])
+          ]
+      annotation: {
+        annotations: [
+          {
+            type: 'line'
+            drawTime: 'afterDatasetsDraw'
+            mode: 'horizontal'
+            scaleID: 'y-axis-0'
+            value: averageTimeToClose
+            borderColor: '#304A60'
+            borderWidth: 1
+            label: {
+              backgroundColor: 'transparent'
+              fontStyle: 'normal'
+              fontColor: '#666'
+              fontSize: 14
+              content: 'Average: ' + averageTimeToClose + ' hr'
+              position: 'right'
+              yAdjust: -10
+              enabled: true
+            }
+          }]
+      })
 
 
 
