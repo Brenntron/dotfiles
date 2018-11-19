@@ -67,6 +67,20 @@ $ ->
         {
           data: 'age'
           width: '40px'
+          'render':(data) ->
+            parts = data.split(' ')
+            days = parseInt(parts[0])
+            hour = parseInt(parts[1])
+
+            if days == 0
+              if hour < 3
+                data
+              else if hour < 5
+                '<span class="ticket-age-over3hr">' + data + '</span>'
+              else
+                '<span class="overdue">' + data + '</span>'
+            else
+              '<span class="overdue">' + data + '</span>'
         }
         {
           data: 'status'

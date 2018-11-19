@@ -5599,6 +5599,15 @@ td.ticket-total::before {
   display: block;
 }
 
+.ticket-age-over3hr {
+  color: $warning-accent-color;
+  font-weight: bold;
+}
+
+.overdue {
+  color: $second-section-color;
+  font-weight: bold;
+}
 
 .loader-gears {
   width: 80px;
