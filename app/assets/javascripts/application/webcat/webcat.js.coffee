@@ -126,7 +126,7 @@ $ ->
         }
         {
           data: 'submitter_type'
-          'render': (data, type, full, meta) ->
+          'render': (data) ->
             if data == 'CUSTOMER'
               '<button class="complaint-submitter-type icon-custom-star esc-tooltipped" title="Customer"></button>'
             else
