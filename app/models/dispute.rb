@@ -1247,7 +1247,7 @@ class Dispute < ApplicationRecord
 
     results.each do |result|
       entry_count = result.dispute_entries.select{ |entry| entry.status != DisputeEntry::STATUS_RESOLVED}.size
-      last_comment_time = nil
+      last_comment_time = "no comments"
       last_comment_time = result.dispute_comments.last.created_at.to_s unless result.dispute_comments.empty?
       ticket_user = result.user.cvs_username
       report_data[:table_data] << {:case_number => result.id,
@@ -1255,7 +1255,7 @@ class Dispute < ApplicationRecord
                       :d_entry_preview => "<span class='dispute_entry_content_first'>#{result.dispute_entries.first.hostlookup}</span><span class='dispute-count'>#{entry_count}</span>",
                       :age => distance_of_time_in_words(Time.now, result.created_at),
                       :submitter_type => result.submitter_type.downcase,
-                      :submission_type => result.submission_type,
+                      :submission_type => result.submission_type.upcase,
                       :last_comment => last_comment_time,
                       :owner => ticket_user,
                       :priority => result.priority
@@ -1292,13 +1292,15 @@ class Dispute < ApplicationRecord
 
     results.each do |result|
       entry_count = result.dispute_entries.select{ |entry| entry.status == DisputeEntry::STATUS_RESOLVED}.size
+      ticket_user = result.user.cvs_username
       report_data[:table_data] << {:case_number => result.id,
                       # :dispute => result.dispute_entries.first.hostlookup,
                       :d_entry_preview => "<span class='dispute_entry_content_first'>#{result.dispute_entries.first.hostlookup}</span><span class='dispute-count'>#{entry_count}</span>",
                       :time_to_close => distance_of_time_in_words(result.created_at, result.case_resolved_at),
                       :submitter_type => result.submitter_type.downcase,
-                      :submission_type => result.submission_type,
-                      :priority => result.priority
+                      :submission_type => result.submission_type.upcase,
+                      :priority => result.priority,
+                      :owner => ticket_user
       }
     end
 
@@ -1388,10 +1390,10 @@ class Dispute < ApplicationRecord
   end
 
   def self.closed_ticket_entries_by_resolution_report(users, from, to, submission_types)
-    #users = [User.find(1)]
-    #from = "Wed, 5 Sep 2018 17:40:08 GMT"
+    #users = [User.find(217), User.find(197)]
+    #from = "Thu, 16 Aug 2018 17:40:08 GMT"
     #to = "Thu, 20 Sep 2018 17:40:08 GMT"
-    #submission_types = ['w']
+    #submission_types = ['e', 'w']
 
     from = Time.parse(from)
     to = Time.parse(to)
@@ -1400,7 +1402,7 @@ class Dispute < ApplicationRecord
 
     main_results = Dispute.joins(:dispute_entries).where(:user_id => user_ids).where("dispute_entries.case_resolved_at between '#{from}' and '#{to}'").where(:submission_type => submission_types)
 
-    all_entries = main_results.map {|result| result.dispute_entries}.flatten.select {|entry| entry.case_resolved_at.present?}
+    all_entries = main_results.map {|result| result.dispute_entries}.flatten.select {|entry| entry.case_resolved_at.present?}.uniq
     total_count = all_entries.size
     #binding.pry
     results = {}
@@ -1430,22 +1432,22 @@ class Dispute < ApplicationRecord
     end
 
     results[:table_data] << {:resolution => DisputeEntry::STATUS_RESOLVED_FIXED_FP,
-                             :percent => (results[:chart_data][2] * 100),
+                             :percent => (results[:chart_data][2] * 100).round(2),
                              :count => all_entries.select {|entry| entry.resolution == DisputeEntry::STATUS_RESOLVED_FIXED_FP}.size
                              }
 
     results[:table_data] << {:resolution => DisputeEntry::STATUS_RESOLVED_FIXED_FN,
-                             :percent => (results[:chart_data][0] * 100),
+                             :percent => (results[:chart_data][0] * 100).round(2),
                              :count => all_entries.select {|entry| entry.resolution == DisputeEntry::STATUS_RESOLVED_FIXED_FN}.size
     }
 
     results[:table_data] << {:resolution => DisputeEntry::STATUS_RESOLVED_UNCHANGED,
-                             :percent => (results[:chart_data][1] * 100),
+                             :percent => (results[:chart_data][1] * 100).round(2),
                              :count => all_entries.select {|entry| entry.resolution == DisputeEntry::STATUS_RESOLVED_UNCHANGED}.size
     }
 
     results[:table_data] << {:resolution => DisputeEntry::STATUS_RESOLVED_OTHER,
-                             :percent => (results[:chart_data][3] * 100),
+                             :percent => (results[:chart_data][3] * 100).round(2),
                              :count => all_entries.select {|entry| entry.resolution == DisputeEntry::STATUS_RESOLVED_OTHER}.size
     }
 
@@ -1510,9 +1512,12 @@ class Dispute < ApplicationRecord
     user_ids = users.pluck(:id)
 
     main_results = Dispute.joins(:dispute_entries).where("dispute_entries.case_resolved_at between '#{from}' and '#{to}'").where(:user_id => user_ids)
-    all_entries = main_results.map {|result| result.dispute_entries}.flatten
+    all_entries = main_results.map {|result| result.dispute_entries}.flatten.uniq
 
     report_data = {}
+    final_data = {}
+    final_data[:report_labels] = []
+    final_data[:report_data] = []
 
     users.each do |user|
       report_data[user.cvs_username] = 0
@@ -1524,7 +1529,12 @@ class Dispute < ApplicationRecord
       end
     end
 
-    report_data
+    report_data.keys.each do |key|
+      final_data[:report_labels] << key
+      final_data[:report_data] << report_data[key]
+    end
+
+    final_data
 
   end
 

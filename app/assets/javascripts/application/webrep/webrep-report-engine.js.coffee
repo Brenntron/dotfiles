@@ -61,12 +61,12 @@ window.refresh_single_open_tickets_table = (user_id)->
       #$('#refresh-error-msg').html('An error occured while retrieving data')
   , this)
 
-window.refresh_multi_open_tickets_table = (user_ids)->
+window.refresh_multi_open_tickets_table = ()->
   from = localStorage.getItem('webrep_report_range_from')
   to = localStorage.getItem('webrep_report_range_to')
-
+  team_ids = $.parseJSON("{\"team\":" + $("#team_ids").val() + "}")
   data = {
-    users: user_ids,
+    users: team_ids['team'],
     from: from,
     to: to
   }
@@ -87,20 +87,21 @@ window.refresh_multi_open_tickets_table = (user_ids)->
 
       else
 
-        datatable = $('#multi_user_open_tickets').DataTable()
+        datatable = $('#table-multi-user-disputes-open').DataTable()
         datatable.clear();
         datatable.rows.add(json.data.table_data);
         datatable.draw();
 
         #References to other data points used to wrap this table, use as needed
 
-        # json.data.ticket_count
-        # json.data.entries_count
-        # json.data.customer_count
-        # json.data.guest_count
-        # json.data.email_count
-        # json.data.web_count
-        # json.data.email_web_count
+        $("#open_multi_customer_count").html(json.data.customer_count)
+        $("#open_multi_guest_count").html(json.data.guest_count)
+        $("#open_multi_email_count").html(json.data.email_count)
+        $("#open_multi_web_count").html(json.data.web_count)
+        $("#open_multi_email_web_count").html(json.data.email_web_count)
+
+        $("#open_multi_ticket_count").html(json.data.ticket_count)
+        $("#open_multi_entry_count").html(json.data.entries_count)
 
     error: (response) ->
       #$('#refresh-working-msg').hide()
@@ -160,12 +161,13 @@ window.refresh_single_closed_tickets_table = (user_id)->
         #$('#refresh-error-msg').html('An error occured while retrieving data')
   , this)
 
-window.refresh_multi_closed_tickets_table = (user_ids)->
+window.refresh_multi_closed_tickets_table = ()->
   from = localStorage.getItem('webrep_report_range_from')
   to = localStorage.getItem('webrep_report_range_to')
+  team_ids = $.parseJSON("{\"team\":" + $("#team_ids").val() + "}")
 
   data = {
-    users: user_ids,
+    users: team_ids['team'],
     from: from,
     to: to
   }
@@ -187,19 +189,19 @@ window.refresh_multi_closed_tickets_table = (user_ids)->
 
       else
 
-        datatable = $('#multi_user_closed_tickets').DataTable()
+        datatable = $('#table-multi-user-disputes-closed').DataTable()
         datatable.clear();
         datatable.rows.add(json.data.table_data);
         datatable.draw();
 
-        #References to other data points used to wrap this table, use as needed
-        # json.data.ticket_count
-        # json.data.entries_count
-        # json.data.customer_count
-        # json.data.guest_count
-        # json.data.email_count
-        # json.data.web_count
-        # json.data.email_web_count
+        $("#closed_multi_customer_count").html(json.data.customer_count)
+        $("#closed_multi_guest_count").html(json.data.guest_count)
+        $("#closed_multi_email_count").html(json.data.email_count)
+        $("#closed_multi_web_count").html(json.data.web_count)
+        $("#closed_multi_email_web_count").html(json.data.email_web_count)
+
+        $("#closed_multi_ticket_count").html(json.data.ticket_count)
+        $("#closed_multi_entry_count").html(json.data.entries_count)
 
     error: (response) ->
       #$('#refresh-working-msg').hide()
@@ -324,12 +326,9 @@ window.build_single_closed_email_entries_resolution_piechart = () ->
 
       json = $.parseJSON(response)
 
-      emailEntryResolutionLabels = json["data"]["chart_labels"]#['Fixed', 'Unchanged', 'Fixed FP', 'Other']
-      emailEntryData = json["data"]["chart_data"]#[3,6,7,0]
+      emailEntryResolutionLabels = json["data"]["chart_labels"]
+      emailEntryData = json["data"]["chart_data"]
 
-      #table data for Melissa since she refuses to use a DataTable.
-      #json structure is similar to datatable expectation, a hash with keys matching expected column names
-      #{:resolution => 'shiz', :percent => 0.75, :count => 35}
       tableData = json["data"]["table_data"]
 
       email_piechart_table = $('#closed-email-entries-resolution-table tbody')
@@ -373,11 +372,13 @@ window.build_single_closed_email_entries_resolution_piechart = () ->
   )
 
 
+
 window.build_single_closed_web_entries_resolution_piechart = () ->
 
   from = localStorage.getItem('webrep_report_range_from')
   to = localStorage.getItem('webrep_report_range_to')
   user_id = $("#user_id").val()
+
 
   data = {
     from: from,
@@ -397,22 +398,17 @@ window.build_single_closed_web_entries_resolution_piechart = () ->
 
       json = $.parseJSON(response)
 
-      emailEntryResolutionLabels = json["data"]["chart_labels"]#['Fixed', 'Unchanged', 'Fixed FP', 'Other']
-      emailEntryData = json["data"]["chart_data"]#[3,6,7,0]
+      emailEntryResolutionLabels = json["data"]["chart_labels"]
+      emailEntryData = json["data"]["chart_data"]
 
-      #table data for Melissa since she refuses to use a DataTable.
-      #json structure is similar to datatable expectation, a hash with keys matching expected column names
-      #{:resolution => 'shiz', :percent => 0.75, :count => 35}
       tableData = json["data"]["table_data"]
 
       web_piechart_table = $('#closed-web-entries-resolution-table tbody')
       $(web_piechart_table).empty()
-      
+
       $(tableData).each ->
         $(web_piechart_table).append('<tr><td>' + this.resolution + '</td><td class="text-center">' + this.percent + ' %</td><td class="text-center">' + this.count + '</td></tr>')
 
-      Chart.defaults.global.defaultFontFamily = "'Open Sans', sans-serif"
-      Chart.defaults.global.defaultFontSize = 10
 
       new Chart($('#closed-web-entries-resolution-piechart'),
         type: 'pie'
@@ -444,6 +440,144 @@ window.build_single_closed_web_entries_resolution_piechart = () ->
     error: (response) ->
       popup_response_error(response, 'Error building chart')
   )
+
+#######
+
+window.build_multi_closed_email_entries_resolution_piechart = () ->
+
+  from = localStorage.getItem('webrep_report_range_from')
+  to = localStorage.getItem('webrep_report_range_to')
+  user_id = $("#user_id").val()
+  team_ids = $.parseJSON("{\"team\":" + $("#team_ids").val() + "}")
+
+  data = {
+    from: from,
+    to: to,
+    users: team_ids['team'],
+    submission_types: ["e"]
+  }
+
+  headers = {'Token': $('input[name="token"]').val(), 'Xmlrpc-Token': $('input[name="xml_token"]').val()}
+  $.ajax(
+    url: '/escalations/api/v1/escalations/webrep/reports/closed_ticket_entries_by_resolution_report'
+    method: 'GET'
+    headers: headers
+    data: data
+    dataType: 'json'
+    success: (response) ->
+
+      json = $.parseJSON(response)
+
+      emailEntryResolutionLabels = json["data"]["chart_labels"]
+      emailEntryData = json["data"]["chart_data"]
+
+      tableData = json["data"]["table_data"]
+
+      email_piechart_table = $('#multi-closed-email-entries-resolution-table tbody')
+      $(email_piechart_table).empty()
+
+      $(tableData).each ->
+        $(email_piechart_table).append('<tr><td>' + this.resolution + '</td><td class="text-center">' + this.percent + ' %</td><td class="text-center">' + this.count + '</td></tr>')
+
+      new Chart($('#multi-email-entries-by-resolution-piechart'),
+        type: 'pie'
+        data:
+          labels: emailEntryResolutionLabels
+          datasets: [ {
+            label: 'close-email-entries'
+            backgroundColor: [
+              '#3e5a72'
+              '#6dbcdb'
+              '#666'
+            ]
+            data: emailEntryData
+          } ]
+        options:
+          legend: false
+          pieceLabel:
+            render: (args) ->
+              return args.percentage + '%'
+            position: 'outside'
+            segment: false
+            precision: 2
+            showZero: true
+            fontStyle: 'bolder'
+            overlap: false
+            showActualPercentages: true
+      )
+
+    error: (response) ->
+      popup_response_error(response, 'Error building chart')
+  )
+
+
+window.build_multi_closed_web_entries_resolution_piechart = () ->
+
+  from = localStorage.getItem('webrep_report_range_from')
+  to = localStorage.getItem('webrep_report_range_to')
+  user_id = $("#user_id").val()
+  team_ids = $.parseJSON("{\"team\":" + $("#team_ids").val() + "}")
+
+  data = {
+    from: from,
+    to: to,
+    users: team_ids['team'],
+    submission_types: ["w"]
+  }
+
+  headers = {'Token': $('input[name="token"]').val(), 'Xmlrpc-Token': $('input[name="xml_token"]').val()}
+  $.ajax(
+    url: '/escalations/api/v1/escalations/webrep/reports/closed_ticket_entries_by_resolution_report'
+    method: 'GET'
+    headers: headers
+    data: data
+    dataType: 'json'
+    success: (response) ->
+
+      json = $.parseJSON(response)
+
+      emailEntryResolutionLabels = json["data"]["chart_labels"]
+      emailEntryData = json["data"]["chart_data"]
+
+      tableData = json["data"]["table_data"]
+
+      web_piechart_table = $('#multi-closed-web-entries-resolution-table tbody')
+      $(web_piechart_table).empty()
+
+      $(tableData).each ->
+        $(web_piechart_table).append('<tr><td>' + this.resolution + '</td><td class="text-center">' + this.percent + ' %</td><td class="text-center">' + this.count + '</td></tr>')
+
+      new Chart($('#multi-web-entries-by-resolution-piechart'),
+        type: 'pie'
+        data:
+          labels: emailEntryResolutionLabels
+          datasets: [ {
+            label: 'close-email-entries'
+            backgroundColor: [
+              '#3e5a72'
+              '#6dbcdb'
+              '#666'
+            ]
+            data: emailEntryData
+          } ]
+        options:
+          legend: false
+          pieceLabel:
+            render: (args) ->
+              return args.percentage + '%'
+            position: 'outside'
+            segment: false
+            precision: 2
+            showZero: true
+            fontStyle: 'bolder'
+            overlap: false
+            showActualPercentages: true
+      )
+
+    error: (response) ->
+      popup_response_error(response, 'Error building chart')
+  )
+
 
 window.build_single_entries_closed_by_day_chart = () ->
   from = localStorage.getItem('webrep_report_range_from')
@@ -535,6 +669,74 @@ window.build_single_entries_closed_by_day_chart = () ->
   )
 
 
+#### Multi User Graphs #####
+
+#  Ticket entries closed by ticket owner
+
+window.build_multi_entries_closed_by_owners_chart = () ->
+  from = localStorage.getItem('webrep_report_range_from')
+  to = localStorage.getItem('webrep_report_range_to')
+  user_id = $("#user_id").val()
+  team_ids = $.parseJSON("{\"team\":" + $("#team_ids").val() + "}")
+  data = {
+    from: from,
+    to: to,
+    users: team_ids['team']
+  }
+
+  headers = {'Token': $('input[name="token"]').val(), 'Xmlrpc-Token': $('input[name="xml_token"]').val()}
+  $.ajax(
+    url: '/escalations/api/v1/escalations/webrep/reports/ticket_entries_closed_by_ticket_owner_report'
+    method: 'GET'
+    headers: headers
+    data: data
+    dataType: 'json'
+    success: (response) ->
+
+      json = $.parseJSON(response)
+
+      ticketOwners = json['data']['report_labels'] #['mtaylor', 'chrclair', 'nherbert', 'nverbeck', 'abreeeman']
+      ticketEntriesByOwner = json['data']['report_data'] #[8, 15, 11, 10, 13.5]
+
+      new Chart($('#ticket-entries-closed-by-owner'),
+        type: 'horizontalBar'
+        data:
+          labels: ticketOwners
+          datasets: [ {
+            backgroundColor: '#6dbcdb'
+            data: ticketEntriesByOwner
+          } ]
+        options:
+          legend: display: false
+          scales:
+            yAxes: [
+              {
+                gridLines: display: false
+                ticks: {
+                  min: 0
+                }
+              }
+            ]
+            xAxes: [
+              {
+                gridLines: display: false
+                ticks: {
+                  min: 0
+                }
+                scaleLabel: {
+                  display: true,
+                  labelString: 'Closed Ticket Entries'
+                }
+              }
+            ]
+      )
+
+
+    error: (response) ->
+      popup_response_error(response, 'Error building chart')
+  )
+
+
 
 
 $ ->
@@ -556,10 +758,10 @@ $ ->
     localStorage.setItem 'webrep_report_range_from', picker.startDate
     localStorage.setItem 'webrep_report_range_to', picker.endDate
     user_id = $("#user_id").val()
-    refresh_single_open_tickets_table(user_id)
-
-    return
-  return
+    #refresh_single_open_tickets_table(user_id)
+    #refresh_single_closed_tickets_table(user_id)
+    #return
+  #return
 
 
 $ ->
@@ -568,4 +770,11 @@ $ ->
     window.build_graph_ticket_entries_submitter()
     window.build_single_closed_email_entries_resolution_piechart()
     window.build_single_closed_web_entries_resolution_piechart()
+    window.build_multi_closed_email_entries_resolution_piechart()
+    window.build_multi_closed_web_entries_resolution_piechart()
     window.build_single_entries_closed_by_day_chart()
+
+    window.refresh_multi_closed_tickets_table()
+    window.refresh_multi_open_tickets_table()
+
+    window.build_multi_entries_closed_by_owners_chart()

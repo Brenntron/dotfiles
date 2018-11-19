@@ -1657,15 +1657,13 @@ $ ->
 
     if barGraphName == 'userTicketClosedGraph'
       originalData = window.userTicketClosedGraphDatasets
+    else if barGraphName == 'multiuser_ticket_type_totals'
+      originalData = totalTicketEntriesbyType
     else
       alert 'Graph with name ' + barGraphName + ' is not defined'
       return
 
-#    barGraphName == 'graph-ticket-entries-closed'
-#      originalData = window.barDataSets
-#    else if barName == 'barChartGrouped'
-#      originalData = window.barChartGroupedData
-#
+
     if $(e)[0].checked
       currentData = window[barGraphName].data.datasets
       window[barGraphName].data.datasets = currentData.concat originalData.filter (x) -> label.indexOf(x.label) >= 0
@@ -2002,38 +2000,38 @@ $ ->
   ticketOwners = ['mtaylor', 'chrclair', 'nherbert', 'nverbeck', 'abreeeman']
   ticketEntriesByOwner = [8, 15, 11, 10, 13.5]
 
-  new Chart($('#ticket-entries-closed-by-owner'),
-    type: 'horizontalBar'
-    data:
-      labels: ticketOwners
-      datasets: [ {
-        backgroundColor: '#6dbcdb'
-        data: ticketEntriesByOwner
-      } ]
-    options:
-      legend: display: false
-      scales:
-        yAxes: [
-          {
-            gridLines: display: false
-            ticks: {
-              min: 0
-            }
-          }
-        ]
-        xAxes: [
-          {
-            gridLines: display: false
-            ticks: {
-              min: 0
-            }
-            scaleLabel: {
-              display: true,
-              labelString: 'Closed Ticket Entries'
-            }
-          }
-        ]
-      )
+#  new Chart($('#ticket-entries-closed-by-owner'),
+#    type: 'horizontalBar'
+#    data:
+#      labels: ticketOwners
+#      datasets: [ {
+#        backgroundColor: '#6dbcdb'
+#        data: ticketEntriesByOwner
+#      } ]
+#    options:
+#      legend: display: false
+#      scales:
+#        yAxes: [
+#          {
+#            gridLines: display: false
+#            ticks: {
+#              min: 0
+#            }
+#          }
+#        ]
+#        xAxes: [
+#          {
+#            gridLines: display: false
+#            ticks: {
+#              min: 0
+#            }
+#            scaleLabel: {
+#              display: true,
+#              labelString: 'Closed Ticket Entries'
+#            }
+#          }
+#        ]
+#      )
 
 
 # Average time to close tickets by ticket owner graph
@@ -2164,61 +2162,42 @@ $ ->
 
 
 
-  window.barChartGroupedData = [
+  totalTicketEnties = [15, 18, 22, 18, 24, 10, 12]
+  emailTicketEntries = [15, 18, 22, 18, 24, 10, 2]
+  webTicketEntries = [15, 18, 22, 18, 24, 10, 5]
+  ewTicketEntries = [15, 18, 22, 18, 24, 10, 7]
+
+  totalTicketEntriesbyType = [
     {
       label: 'Total Ticket Entries'
       backgroundColor: '#6dbcdb'
-      data: [
-        15
-        18
-        22
-        18
-      ]
+      data: totalTicketEnties
     }
     {
       label: 'E'
       backgroundColor: '#8cc63f'
-      data: [
-        0
-        0
-        0
-        0
-      ]
+      data: emailTicketEntries
     }
     {
       label: 'W'
       backgroundColor: '#E47433'
-      data: [
-        0
-        0
-        0
-        0
-      ]
+      data: webTicketEntries
     }
     {
       label: 'EW'
       backgroundColor: '#BA55D3'
-      data: [
-        0
-        0
-        0
-        0
-      ]
+      data: ewTicketEntries
     }
   ]
-  window.barChartGrouped = new Chart(document.getElementById('bar-chart2-grouped'),
+
+  dateRange = ['September 2', 'September 3', 'September 4', 'September 5', 'September 6', 'September 7', 'September 8']
+
+
+  window.multiuser_ticket_type_totals = new Chart($('#graph-multiuser-ticket-entries-closed'),
     type: 'bar'
     data:
-      labels: [
-        'September 2'
-        'September 3'
-        'September 4'
-        'September 5'
-        'September 6'
-        'September 7'
-        'September 8'
-      ]
-      datasets: window.barChartGroupedData
+      labels: dateRange
+      datasets: totalTicketEntriesbyType
     options:
       legend: display: false
       scales:
@@ -2237,36 +2216,23 @@ $ ->
         ]
     )
 
-  new Chart(document.getElementById('bar-chart3-grouped'),
+
+
+  multiuserCustomerSubmissions = [15, 18, 22, 18, 12, 43, 31]
+  multiuserGuestSubmissions = [8, 6, 7, 13, 9, 15, 21]
+
+  new Chart($('#graph-multiuser-ticket-entries-submitter'),
     type: 'bar'
     data:
-      labels: [
-        'September 2'
-        'September 3'
-        'September 4'
-        'September 5'
-        'September 6'
-        'September 7'
-        'September 8'
-      ]
+      labels: dateRange
       datasets: [
         {
           backgroundColor: '#6dbcdb'
-          data: [
-            15
-            18
-            22
-            18
-          ]
+          data: multiuserCustomerSubmissions
         }
         {
           backgroundColor: '#2c3e50'
-          data: [
-            8.5
-            5.5
-            13.5
-            8.5
-          ]
+          data: multiuserGuestSubmissions
         }
       ]
     options:
@@ -2277,8 +2243,6 @@ $ ->
             gridLines: display: false
             ticks: {
               min: 0
-              stepSize: 10
-              max: 30
             }
           }
         ]
@@ -2292,79 +2256,79 @@ $ ->
         ]
   )
 
-  new Chart(document.getElementById('team-pie-chart'),
-    type: 'pie'
-    data:
-      labels: [
-        'Fixed'
-        'Unchanged'
-        'Fixed FP'
-      ]
-      datasets: [ {
-        label: 'close-email-entries'
-        backgroundColor: [
-          '#3e5a72'
-          '#6dbcdb'
-          '#666'
-        ]
-        data: [
-          5178
-          4267
-          2202
-        ]
-      } ]
-    options:
-      legend: false
-      pieceLabel:
-        render: (args) ->
-          return args.percentage + '%'
-        position: 'outside'
-        label: 'Unchanched'
-        segment: false
-        precision: 2
-        showZero: true
-        fontStyle: 'bolder'
-        overlap: false
-        showActualPercentages: true
+  #new Chart(document.getElementById('team-pie-chart'),
+  #  type: 'pie'
+  #  data:
+  #    labels: [
+  #      'Fixed'
+  #      'Unchanged'
+  #      'Fixed FP'
+  #    ]
+  #    datasets: [ {
+  #      label: 'close-email-entries'
+  #      backgroundColor: [
+  #        '#3e5a72'
+  #        '#6dbcdb'
+  #        '#666'
+  #      ]
+  #      data: [
+  #        5178
+  #        4267
+  #        2202
+  #      ]
+  #    } ]
+  #  options:
+  #    legend: false
+  #    pieceLabel:
+  #      render: (args) ->
+  #        return args.percentage + '%'
+  #      position: 'outside'
+  #      label: 'Unchanched'
+  #      segment: false
+  #      precision: 2
+  #      showZero: true
+  #      fontStyle: 'bolder'
+  #      overlap: false
+  #      showActualPercentages: true
 
-  )
+  #)
 
-  new Chart(document.getElementById('team-pie2-chart'),
-    type: 'pie'
-    data:
-      labels: [
-        'Fixed'
-        'Unchanged'
-        'Fixed FP'
-      ]
-      datasets: [ {
-        label: 'close-email-entries'
-        backgroundColor: [
-          '#3e5a72'
-          '#6dbcdb'
-          '#666'
-        ]
-        data: [
-          3778
-          4767
-          5900
-        ]
-      } ]
-    options:
-      legend: false
-      pieceLabel:
-        render: (args) ->
-          return args.percentage + '%'
-        position: 'outside'
-        label: 'Unchanched'
-        segment: false
-        precision: 2
-        showZero: true
-        fontStyle: 'bolder'
-        overlap: false
-        showActualPercentages: true
+  #new Chart(document.getElementById('team-pie2-chart'),
+  #  type: 'pie'
+  #  data:
+  #    labels: [
+  #      'Fixed'
+  #      'Unchanged'
+  #      'Fixed FP'
+  #    ]
+  #    datasets: [ {
+  #      label: 'close-email-entries'
+  #      backgroundColor: [
+  #        '#3e5a72'
+  #        '#6dbcdb'
+  #        '#666'
+  #      ]
+  #      data: [
+  #        3778
+  #        4767
+  #        5900
+  #      ]
+  #    } ]
+  #  options:
+  #    legend: false
+  #    pieceLabel:
+  #      render: (args) ->
+  #        return args.percentage + '%'
+  #      position: 'outside'
+  #      label: 'Unchanched'
+  #      segment: false
+  #      precision: 2
+  #      showZero: true
+  #      fontStyle: 'bolder'
+  #      overlap: false
+  #      showActualPercentages: true
 
-  )
+  #)
 
 #    If user changes buttons from initial status, enable the submit button
 #   TODO add this check in later that only allows user to submit if there have been changes made
@@ -2456,50 +2420,49 @@ $ ->
     ]
   )
 
-#  window.open_multiuser_dashboard_dispute_table = $('#table-multi-user-disputes-open').DataTable(
-#    dom: '<t>'
-#    data: tempSingleUserClosedTixDataset
-#    columnDefs: [
-#      {
-#        targets: [ 1 ]
-#        className: 'id-col'
-#      }
-#      {
-#        targets: [ 4 ]
-#        className: 'state-col'
-#      }
-#      {
-#        targets: [
-#          0
-#          2
-#          5
-#        ]
-#        className: 'text-center'
-#      }
-#    ]
-#    columns: [
-#      {
-#        data: 'priority'
-#        render: (data) ->
-#          '<span class="bug-priority p-' + data + '"></span>'
-#      }
-#      { data: 'case_number' }
-#      {
-#        data: 'submitter_type'
-#        render: (data) ->
-#          '<span class="submitter-type-icon submitter-' + data + '"></span>'
-#      }
-#      { data: 'owner' }
-#      { data: 'status' }
-#      {
-#        data: 'submission_type'
-#        render: (data) ->
-#          '<span class="dispute-submission-type dispute-' + data  + '"></span>'
-#      }
-#      { data: 'd_entry_preview' }
-#      { data: 'last_comment' }
-#    ]
-#  )
+  window.open_multiuser_dashboard_dispute_table = $('#table-multi-user-disputes-open').DataTable(
+    dom: '<t>'
+    columnDefs: [
+      {
+        targets: [ 1 ]
+        className: 'id-col'
+      }
+      {
+        targets: [ 4 ]
+        className: 'state-col'
+      }
+      {
+        targets: [
+          0
+          2
+          5
+        ]
+        className: 'text-center'
+      }
+    ]
+    columns: [
+      {
+        data: 'priority'
+        render: (data) ->
+          '<span class="bug-priority p-' + data + '"></span>'
+      }
+      { data: 'case_number' }
+      {
+        data: 'submitter_type'
+        render: (data) ->
+          '<span class="submitter-type-icon submitter-' + data + '"></span>'
+      }
+      { data: 'owner' }
+      { data: 'status' }
+      {
+        data: 'submission_type'
+        render: (data) ->
+          '<span class="dispute-submission-type dispute-' + data  + '"></span>'
+      }
+      { data: 'd_entry_preview' }
+      { data: 'last_comment' }
+    ]
+  )
 
   window.closed_dashboard_multiuser_dispute_table = $('#table-multi-user-disputes-closed').DataTable(
     dom: '<t>'
