@@ -1970,38 +1970,38 @@ $ ->
   ticketOwners = ['mtaylor', 'chrclair', 'nherbert', 'nverbeck', 'abreeeman']
   ticketEntriesByOwner = [8, 15, 11, 10, 13.5]
 
-  new Chart($('#ticket-entries-closed-by-owner'),
-    type: 'horizontalBar'
-    data:
-      labels: ticketOwners
-      datasets: [ {
-        backgroundColor: '#6dbcdb'
-        data: ticketEntriesByOwner
-      } ]
-    options:
-      legend: display: false
-      scales:
-        yAxes: [
-          {
-            gridLines: display: false
-            ticks: {
-              min: 0
-            }
-          }
-        ]
-        xAxes: [
-          {
-            gridLines: display: false
-            ticks: {
-              min: 0
-            }
-            scaleLabel: {
-              display: true,
-              labelString: 'Closed Ticket Entries'
-            }
-          }
-        ]
-      )
+#  new Chart($('#ticket-entries-closed-by-owner'),
+#    type: 'horizontalBar'
+#    data:
+#      labels: ticketOwners
+#      datasets: [ {
+#        backgroundColor: '#6dbcdb'
+#        data: ticketEntriesByOwner
+#      } ]
+#    options:
+#      legend: display: false
+#      scales:
+#        yAxes: [
+#          {
+#            gridLines: display: false
+#            ticks: {
+#              min: 0
+#            }
+#          }
+#        ]
+#        xAxes: [
+#          {
+#            gridLines: display: false
+#            ticks: {
+#              min: 0
+#            }
+#            scaleLabel: {
+#              display: true,
+#              labelString: 'Closed Ticket Entries'
+#            }
+#          }
+#        ]
+#      )
 
 
 # Average time to close tickets by ticket owner graph

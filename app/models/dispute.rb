@@ -1512,9 +1512,12 @@ class Dispute < ApplicationRecord
     user_ids = users.pluck(:id)
 
     main_results = Dispute.joins(:dispute_entries).where("dispute_entries.case_resolved_at between '#{from}' and '#{to}'").where(:user_id => user_ids)
-    all_entries = main_results.map {|result| result.dispute_entries}.flatten
+    all_entries = main_results.map {|result| result.dispute_entries}.flatten.uniq
 
     report_data = {}
+    final_data = {}
+    final_data[:report_labels] = []
+    final_data[:report_data] = []
 
     users.each do |user|
       report_data[user.cvs_username] = 0
@@ -1526,7 +1529,12 @@ class Dispute < ApplicationRecord
       end
     end
 
-    report_data
+    report_data.keys.each do |key|
+      final_data[:report_labels] << key
+      final_data[:report_data] << report_data[key]
+    end
+
+    final_data
 
   end
 
