@@ -39,6 +39,10 @@ $ ->
           targets: [ 2 ]
           className: 'entry-id-col'
         }
+        {
+          targets: [ 12 ]
+          className: 'submitter-col'
+        }
       ]
       columns: [
         {
@@ -122,6 +126,11 @@ $ ->
         }
         {
           data: 'submitter_type'
+          'render': (data) ->
+            if data == 'CUSTOMER'
+              '<button class="complaint-submitter-type icon-custom-star esc-tooltipped" title="Customer"></button>'
+            else
+              data
         }
         {
           data: 'company_name'
