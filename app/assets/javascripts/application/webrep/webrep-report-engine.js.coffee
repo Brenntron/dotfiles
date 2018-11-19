@@ -669,6 +669,75 @@ window.build_single_entries_closed_by_day_chart = () ->
   )
 
 
+#### Multi User Graphs #####
+
+#  Ticket entries closed by ticket owner
+
+window.build_multi_entries_closed_by_owners_chart = () ->
+  from = localStorage.getItem('webrep_report_range_from')
+  to = localStorage.getItem('webrep_report_range_to')
+  user_id = $("#user_id").val()
+  team_ids = $.parseJSON("{\"team\":" + $("#team_ids").val() + "}")
+  data = {
+    from: from,
+    to: to,
+    users: team_ids['team']
+  }
+
+  headers = {'Token': $('input[name="token"]').val(), 'Xmlrpc-Token': $('input[name="xml_token"]').val()}
+  $.ajax(
+    url: '/escalations/api/v1/escalations/webrep/reports/ticket_entries_closed_by_ticket_owner_report'
+    method: 'GET'
+    headers: headers
+    data: data
+    dataType: 'json'
+    success: (response) ->
+
+      json = $.parseJSON(response)
+
+      ticketOwners = json['data']['report_labels'] #['mtaylor', 'chrclair', 'nherbert', 'nverbeck', 'abreeeman']
+      ticketEntriesByOwner = json['data']['report_data'] #[8, 15, 11, 10, 13.5]
+
+      new Chart($('#ticket-entries-closed-by-owner'),
+        type: 'horizontalBar'
+        data:
+          labels: ticketOwners
+          datasets: [ {
+            backgroundColor: '#6dbcdb'
+            data: ticketEntriesByOwner
+          } ]
+        options:
+          legend: display: false
+          scales:
+            yAxes: [
+              {
+                gridLines: display: false
+                ticks: {
+                  min: 0
+                }
+              }
+            ]
+            xAxes: [
+              {
+                gridLines: display: false
+                ticks: {
+                  min: 0
+                }
+                scaleLabel: {
+                  display: true,
+                  labelString: 'Closed Ticket Entries'
+                }
+              }
+            ]
+      )
+
+
+    error: (response) ->
+      popup_response_error(response, 'Error building chart')
+  )
+
+
+
 
 $ ->
   $('#tickets_date_range').daterangepicker()
@@ -707,3 +776,5 @@ $ ->
 
     window.refresh_multi_closed_tickets_table()
     window.refresh_multi_open_tickets_table()
+
+    window.build_multi_entries_closed_by_owners_chart()
