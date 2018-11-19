@@ -63,7 +63,7 @@ $ ->
         {
           data: 'age'
           width: '40px'
-          'render':(data, type, full, meta) ->
+          'render':(data) ->
             parts = data.split(' ')
             days = parseInt(parts[0])
             hour = parseInt(parts[1])
