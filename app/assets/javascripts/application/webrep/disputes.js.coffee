@@ -1869,7 +1869,6 @@ $ ->
       value += minutes + 'm ' + seconds + 's'
     else
       value += seconds + 's'
-    $('label#avg-time-to-closed')[0].innerHTML = value
     return
 
   averageTimeToCloseLabel(averageTimeToClose)
@@ -1877,9 +1876,10 @@ $ ->
   window.timeCloseTicketsDataSets = [
     {
       data: timeToCloseTickets
-      label: 'Time to close:'
-      backgroundColor: '#6EBCDB'
-      borderWidth: .5
+      label: 'Time to Close:'
+      backgroundColor: '#6dbcdb'
+      borderColor: '#55a3c1'
+      borderWidth: 2
       fill: true
       lineTension: 0
     }
@@ -1902,7 +1902,6 @@ $ ->
               display: false
             ticks: {
               min: 0
-              max: 2
               stepSize: .5
               callback: (value, index, values) ->
                 return value + ' hr'
@@ -1923,18 +1922,25 @@ $ ->
           }
           ]
       annotation: {
-#        drawTime: 'beforeDatasetsDraw'
         annotations: [
           {
-            type: 'box'
-            yScaleID: 'y-axis-0'
-            xScaleID: 'x-axis-0'
-            xMin: Math.min(closedTicketNumbers)
-            xMax: Math.max(closedTicketNumbers)
-            yMax: averageTimeToClose
-            yMin: 0
-            backgroundColor: 'rgba(196, 234, 248, .35)'
-            borderColor: '#95989A'
+            type: 'line'
+            drawTime: 'afterDatasetsDraw'
+            mode: 'horizontal'
+            scaleID: 'y-axis-0'
+            value: averageTimeToClose
+            borderColor: '#304A60'
+            borderWidth: 1
+            label: {
+              backgroundColor: 'transparent'
+              fontStyle: 'normal'
+              fontColor: '#666'
+              fontSize: 14
+              content: 'Average: ' + averageTimeToClose + ' hr'
+              position: 'right'
+              yAdjust: -10
+              enabled: true
+            }
           }]
       })
 
