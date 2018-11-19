@@ -162,6 +162,73 @@ $ ->
 $ ->
   $(document).ready ->
 
+# expand all functionality
+window.expand_all = (tableId) ->
+  selectedRows = $('table#' + tableId + ' tr[role="row"]')
+  i = 0
+  while i < selectedRows.length
+    if !$(selectedRows[i]).hasClass('shown')
+      $(selectedRows[i]).find('.expand-row-button-inline').click()
+    i = i + 1
+
+# collapse all functionality
+window.collapse_all = (tableId) ->
+  selectedRows = $('table#' + tableId + ' tr[role="row"]')
+  i = 0
+  while i < selectedRows.length
+    if $(selectedRows[i]).hasClass('shown')
+      $(selectedRows[i]).find('.expand-row-button-inline').click()
+    i = i + 1
+
+#  expand selected funtionality
+window.expand_selected = (tableId) ->
+  selectedRows = $('table#' + tableId + ' tr[role="row"].selected')
+  i = 0
+  while i < selectedRows.length
+    if !$(selectedRows[i]).hasClass('shown')
+      $(selectedRows[i]).find('.expand-row-button-inline').click()
+    i = i + 1
+
+#  collapse selected funtionality
+window.collapse_selected = (tableId) ->
+  selectedRows = $('table#' + tableId + ' tr[role="row"].selected')
+  i = 0
+  while i < selectedRows.length
+    if $(selectedRows[i]).hasClass('shown')
+      $(selectedRows[i]).find('.expand-row-button-inline').click()
+    i = i + 1
+
+# open selected funtionality
+window.open_selected_clusters = () ->
+  selected_rows = $('#clusters-index').DataTable().rows('.selected')
+  open_selected_tabs(selected_rows, true)
+
+
+# open all functionality
+window.open_all_clusters = () ->
+  selected_rows = $('#clusters-index').DataTable().rows()
+  open_selected_tabs(selected_rows, true)
+
+# This is here because of weird namespace problems over at `complaints.js.coffee`
+open_selected_tabs = (selected_rows, toggle) ->
+  i = 0
+  while i < selected_rows[0].length
+    subdomain = ""
+    domain = ""
+    path = ""
+    if selected_rows.data()[i].subdomain
+      subdomain = selected_rows.data()[i].subdomain + "."
+    if selected_rows.data()[i].domain
+      domain = selected_rows.data()[i].domain
+    if selected_rows.data()[i].path
+      path = selected_rows.data()[i].path
+    if selected_rows.data()[i].domain
+      window.open("http://"+ subdomain + domain + path)
+    else
+      window.open("http://"+selected_rows.data()[i].ip_address)
+    i++
+
+
 window.copycat_dialog = () ->
   $('#copycat_dialog').dialog({
     dialogClass: "copycat_tool_dialog",
