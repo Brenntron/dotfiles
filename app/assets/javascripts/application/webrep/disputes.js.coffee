@@ -1004,9 +1004,6 @@ $ ->
 
     )
 
-  $ ->
-    $(document).ready ->
-      $('table#disputes-index .dispute_check_box').on 'click', (box) ->
   window.toggleRow = (box) ->
     if $(box)[0].checked
       $(box).closest('tr').addClass('selected')
