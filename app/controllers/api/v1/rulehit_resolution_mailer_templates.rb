@@ -5,7 +5,7 @@ module API
 
       resource :rulehit_resolution_mailer_templates do
         # before do
-        #   PaperTrail.whodunnit = current_user.id if current_user.present?
+        #   PaperTrail.request.whodunnit = current_user.id if current_user.present?
         # end
 
         desc "get a mailer template corresponding to a rulehit"

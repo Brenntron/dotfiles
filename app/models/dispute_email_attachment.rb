@@ -57,10 +57,10 @@ class DisputeEmailAttachment < ApplicationRecord
     prefix       = "#{Rails.env}/dispute_email_attachments/#{dispute_email.id}/"
     s3_url       = []
 
-    key    = prefix + "#{file.filename}"
+    key    = prefix + "#{file['filename']}"
     object = bucket.object(key)
-    object.upload_file(File.open(file.tempfile))
-    s3_url = {file.filename => [object.key, file] }
+    object.upload_file(File.open(file['tempfile']))
+    s3_url = {file['filename'] => [object.key, file] }
 
     s3_url.values.flatten[0]
 
