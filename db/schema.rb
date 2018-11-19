@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 20181108181405) do
+ActiveRecord::Schema.define(version: 20181112161433) do
 
   create_table "alerts", force: :cascade, options: "ENGINE=InnoDB DEFAULT CHARSET=utf8" do |t|
     t.datetime "created_at", null: false
@@ -19,6 +19,19 @@ ActiveRecord::Schema.define(version: 20181108181405) do
     t.integer "rule_id", null: false
     t.integer "attachment_id", null: false
     t.index ["test_group", "attachment_id", "rule_id"], name: "index_alerts_on_test_group_and_attachment_id_and_rule_id"
+  end
+
+  create_table "amp_false_positive_files", force: :cascade, options: "ENGINE=InnoDB DEFAULT CHARSET=utf8" do |t|
+    t.string "sha256"
+    t.string "name"
+    t.string "path"
+    t.string "download_url"
+    t.string "detection_name"
+    t.string "detection_count_within_org"
+    t.datetime "first_observed"
+    t.datetime "last_observed"
+    t.string "current_amp_disposition"
+    t.boolean "is_archived", default: false
   end
 
   create_table "amp_false_positives", force: :cascade, options: "ENGINE=InnoDB DEFAULT CHARSET=utf8" do |t|
@@ -31,6 +44,7 @@ ActiveRecord::Schema.define(version: 20181108181405) do
     t.text "payload"
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
+    t.string "status"
     t.index ["payload"], name: "index_amp_false_positives_on_payload", length: { payload: 15 }
     t.index ["sha256"], name: "index_amp_false_positives_on_sha256"
   end
@@ -56,16 +70,6 @@ ActiveRecord::Schema.define(version: 20181108181405) do
     t.index ["bugzilla_attachment_id"], name: "index_attachments_on_bugzilla_attachment_id"
     t.index ["rule_id"], name: "index_attachments_on_rule_id"
     t.index ["task_id"], name: "index_attachments_on_task_id"
-  end
-
-  create_table "attachments_exploits", id: :integer, force: :cascade, options: "ENGINE=InnoDB DEFAULT CHARSET=utf8" do |t|
-    t.integer "attachment_id"
-    t.integer "exploit_id"
-  end
-
-  create_table "attachments_rules", id: false, force: :cascade, options: "ENGINE=InnoDB DEFAULT CHARSET=utf8" do |t|
-    t.integer "attachment_id"
-    t.integer "rule_id"
   end
 
   create_table "bug_blockers", force: :cascade, options: "ENGINE=InnoDB DEFAULT CHARSET=utf8" do |t|
@@ -286,7 +290,7 @@ ActiveRecord::Schema.define(version: 20181108181405) do
     t.index ["reference_id"], name: "index_cves_on_reference_id", unique: true
   end
 
-  create_table "delayed_jobs", force: :cascade, options: "ENGINE=InnoDB DEFAULT CHARSET=utf8" do |t|
+  create_table "delayed_jobs", force: :cascade, options: "ENGINE=InnoDB DEFAULT CHARSET=latin1" do |t|
     t.integer "priority", default: 0, null: false
     t.integer "attempts", default: 0, null: false
     t.text "handler", null: false
@@ -298,6 +302,7 @@ ActiveRecord::Schema.define(version: 20181108181405) do
     t.string "queue"
     t.datetime "created_at"
     t.datetime "updated_at"
+    t.index ["priority", "run_at"], name: "delayed_jobs_priority"
   end
 
   create_table "dispute_comments", force: :cascade, options: "ENGINE=InnoDB DEFAULT CHARSET=utf8" do |t|
@@ -612,12 +617,7 @@ ActiveRecord::Schema.define(version: 20181108181405) do
     t.index ["reference_type_id"], name: "index_references_on_reference_type_id"
   end
 
-  create_table "references_rules", id: false, force: :cascade, options: "ENGINE=InnoDB DEFAULT CHARSET=utf8" do |t|
-    t.integer "reference_id"
-    t.integer "rule_id"
-    t.index ["reference_id"], name: "index_references_rules_on_reference_id"
-    t.index ["rule_id"], name: "index_references_rules_on_rule_id"
-  end
+
 
   create_table "roles", force: :cascade, options: "ENGINE=InnoDB DEFAULT CHARSET=utf8" do |t|
     t.string "role"

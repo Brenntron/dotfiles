@@ -76,8 +76,6 @@ $table-dark-header: #413D3D;
   box-shadow: $shadow;
 }
 
-
-
 /************ Base Styles **************/
 
 body {
@@ -5321,7 +5319,7 @@ table.dispute_tool_current tr:last-of-type td {
 .dispute-EW {background-image: url(image_path('icon_type_email_web.svg'));}
 
 .my-dashboard-header-area, .complaint-mgt-top-area  {
-  background-color: $bug-section-color;
+  background-color: $content-tab-color;
   margin-top: -15px;
   border-radius: 4px 4px 0 0 ;
 }
@@ -5337,9 +5335,18 @@ table.dispute_tool_current tr:last-of-type td {
   padding: 15px;
 }
 
-.dashboard-header-area h1, .complaint-mgt-top-area h1 {
+.top-area-bar {
+  display: inline-flex;
+}
+
+.dashboard-header-area h1 {
   color: $content-bg-color;
   margin-bottom: 24px;
+  display: inline-block;
+}
+
+.complaint-mgt-top-area h1 {
+  color: $content-bg-color;
   display: inline-block;
 }
 
@@ -5360,13 +5367,34 @@ table.dispute_tool_current tr:last-of-type td {
   color: $content-bg-color;
 }
 
-.my-dashboard-icon, .team-icon, .top-info-icon {
+.my-dashboard-icon, .team-icon {
   background-repeat: no-repeat;
   width: 30px;
   height: 30px;
   display: inline-block;
   margin-left: 15px;
   margin-bottom: -6px;
+}
+
+.top-info-icon {
+  background-repeat: no-repeat;
+  width: 30px;
+  height: 30px;
+  display: inline-block;
+  padding-right: 100px;
+  margin: 6px 0 -6px 15px;
+}
+
+.left-space {
+  padding-left: 20px;
+}
+
+.top-margin {
+  margin-top: 8px;
+}
+
+.top-user-info {
+  width: 20%;
 }
 
 .my-dashboard-icon { background-image: url(image_path('icon_dashboard.svg'));}
@@ -6369,4 +6397,18 @@ h2 {
   margin-top: 24px;
   margin-bottom: 6px;
   color: #333;
+}
+
+.age-col {
+
+}
+
+.ticket-age-over3hr {
+  color: $warning-accent-color;
+  font-weight: bold;
+}
+
+.overdue {
+  color: $second-section-color;
+  font-weight: bold;
 }
