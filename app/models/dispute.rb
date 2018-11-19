@@ -1247,7 +1247,7 @@ class Dispute < ApplicationRecord
 
     results.each do |result|
       entry_count = result.dispute_entries.select{ |entry| entry.status != DisputeEntry::STATUS_RESOLVED}.size
-      last_comment_time = nil
+      last_comment_time = "no comments"
       last_comment_time = result.dispute_comments.last.created_at.to_s unless result.dispute_comments.empty?
       ticket_user = result.user.cvs_username
       report_data[:table_data] << {:case_number => result.id,
