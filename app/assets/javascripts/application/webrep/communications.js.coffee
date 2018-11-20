@@ -392,7 +392,7 @@ $ ->
       }, 300
 
     else
-      $('#new-resolution-message-template-form-wrapper').contents().hide()
+      $('#new-resolution-message-template-form-wrapper').css('display', 'none')
       $('#create-resolution-message-template').text('Create New Template')
       $('#save-resolution-message-template').addClass('hidden')
       $('#new-resolution-message-template-form-wrapper').animate {
@@ -420,22 +420,25 @@ $ ->
         std_api_error(response, "There was an error creating the resolution message template.", reload: false)
     )
   $('.edit-resolution-message-template').on 'click', ->
-    populate_resolution_message_template_details()
+    if $('#new-resolution-message-template-form-wrapper').css('display') == "none"
+      populate_resolution_message_template_details()
 
-    resolution_message_template_id = $(this).attr('resolution_message_template_id')
+      resolution_message_template_id = $(this).attr('resolution_message_template_id')
 
-    std_msg_ajax(
-      method: 'GET'
-      url: "/escalations/api/v1/escalations/webrep/resolution_message_templates/#{resolution_message_template_id}"
-      success_reload: false
-      success: (response) ->
-        $('#edit-resolution-message-template-name').val(response.name)
-        $('#edit-resolution-message-template-desc').val(response.description)
-        $('#edit-resolution-message-template-body').val(response.body)
-        $('#resolution-message-template-id').val(response.id)
-      error: (response) ->
-        std_api_error(response, "There was a problem retrieving resolution message template.", reload: false)
-    )
+      std_msg_ajax(
+        method: 'GET'
+        url: "/escalations/api/v1/escalations/webrep/resolution_message_templates/#{resolution_message_template_id}"
+        success_reload: false
+        success: (response) ->
+          $('#edit-resolution-message-template-name').val(response.name)
+          $('#edit-resolution-message-template-desc').val(response.description)
+          $('#edit-resolution-message-template-body').val(response.body)
+          $('#resolution-message-template-id').val(response.id)
+        error: (response) ->
+          std_api_error(response, "There was a problem retrieving resolution message template.", reload: false)
+      )
+    else
+      std_msg_error('Cannot edit a template while in the middle of creating a new one. To discard changes and edit a template, hit Cancel first.', [], reload:false)
 
   populate_resolution_message_template_details =  ->
     $('#edit-resolution-message-template-form-wrapper').show()
