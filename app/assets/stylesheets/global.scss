@@ -4098,6 +4098,10 @@ button.tertiary {
   padding: 10px;
 }
 
+.ui-dialog .ui-dialog-title {
+  overflow: visible !important;
+}
+
 .ui-dialog .ui-dialog-content {
   padding: 0;
 }
