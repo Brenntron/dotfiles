@@ -140,7 +140,7 @@ describe AutoResolve do
       expect(Virustotal::Scan).to receive(:scan_hashes).with(address: target_address).and_return(JSON.parse(virus_total_conviction_json))
       expect(Umbrella::Scan).to receive(:scan_result).with(address: target_address).and_return(umbrella_clear_response)
 
-      auto_resolve = AutoResolve.create_from_payload('IP', target_address, [])
+      auto_resolve = AutoResolve.create_from_payload('IP', target_address, dispute_entry)
 
       expect(auto_resolve.resolved?).to be_truthy
       expect(auto_resolve.malicious?).to be_truthy
