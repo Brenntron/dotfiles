@@ -552,7 +552,7 @@ class Dispute < ApplicationRecord
 
           new_dispute_entry.save!
 
-          logger.debug "fetching preload"
+          logger.info "fetching preload"
           ::Preloader::Base.fetch_all_api_data(key, new_dispute_entry.id)
 
           case
