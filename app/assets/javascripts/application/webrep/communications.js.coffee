@@ -471,18 +471,23 @@ $ ->
 
   $('.delete-resolution-message-template').on 'click', ->
     template_id = $(this).attr('resolution_message_template_id')
-    confirmation = confirm('Are you sure you want to delete this template?')
 
-    if confirmation
-      std_msg_ajax(
-        method: 'DELETE'
-        url: "/escalations/api/v1/escalations/webrep/resolution_message_templates/#{template_id}"
-        success_reload: true
-        success: (response) ->
-          std_msg_success('Resolution message template deleted.', [], reload: true)
-        error: (response) ->
-          std_api_error(response, "Resolution message template could not be deleted.", reload: false)
-      )
+    std_msg_confirm(
+      'Are you sure you want to delete this template? To discard changes, hit Cancel',
+      [],
+      {
+        confirm_dismiss: false,
+        confirm: ->
+          std_msg_ajax(
+            method: 'DELETE'
+            url: "/escalations/api/v1/escalations/webrep/resolution_message_templates/#{template_id}"
+            success_reload: true
+            success: (response) ->
+              std_msg_success('Resolution message template deleted.', [], reload: true)
+            error: (response) ->
+              std_api_error(response, "Resolution message template could not be deleted.", reload: false)
+          )
+      })
 
   $('#select-new-resolution-message-template-status').on 'change', ->
     template_id = this.value
