@@ -87,6 +87,8 @@ describe AutoResolve do
       dispute_entry = DisputeEntry.new
       dispute_entry.id = 1
       dispute_entry.save
+
+      return dispute_entry
     end
 
     it 'skips complaints' do
