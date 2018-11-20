@@ -1455,9 +1455,6 @@ button.secondary:focus, a:focus button.secondary {
   outline: none;
 }
 
-.confirmation-buttons {
-  margin-top: 20px;
-}
 
 a:focus { outline: none;}
 
@@ -1479,6 +1476,20 @@ button.close {
   background-repeat: no-repeat;
   background-size: 30px 30px;
   background-position: -3px -2px;
+}
+
+.confirmation-buttons {
+  margin-top: 20px;
+}
+
+.confirmation-buttons button {
+  display: inline-block;
+  padding-top: 6px !important;
+  background-position: 3px 3px;
+}
+
+.confirmation-buttons button.cancel {
+  background-image: url(image_path('icon_cancel_white.svg'));
 }
 
 /************ Side Nav **************/
