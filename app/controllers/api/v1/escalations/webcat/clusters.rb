@@ -4,7 +4,7 @@ module API
       module Webcat
         class Clusters < Grape::API
           include API::V1::Defaults
-
+          include ActionView::Helpers::DateHelper
           resource "escalations/webcat/clusters" do
 
             before do
@@ -13,20 +13,42 @@ module API
 
             desc 'process cluster'
             params do
-              requires :category_ids, type: Array, desc: 'List of category ids'
-              requires :cluster_id, type: Integer, desc: 'ID of cluster to categorize'
               optional :comment, type: String, desc: 'comment to associate with rule'
+              requires :user_id, type: Integer
             end
 
             post "process_cluster" do
 
+              cluster_process_array = []
 
-              conditions = {}
-              conditions[:cluster_id] = params[:cluster_id]
-              conditions[:category_ids] = params[:category_ids]
-              conditions[:comment] = params[:comment] unless params[:comment].blank?
 
-              Wbrs::Cluster.process(conditions, true)
+              params.keys.each do |key|
+                if key.include?("cluster_id_")
+                  conditions = {}
+
+                  total_cats = params[key].to_a.size
+
+                  conditions[:comment] = params[:comment] unless params[:comment].blank?
+                  conditions[:user] = User.find(params[:user_id]).cvs_username
+                  conditions[:cluster_id] = key.gsub("cluster_id_", "").to_i
+                  conditions[:cat_ids] = Wbrs::Category.get_category_ids(params[key].to_a)
+
+                  if conditions[:cat_ids].blank? || conditions[:cat_ids].size != total_cats || !conditions[:cat_ids].all? {|i| i.is_a?(Integer)}
+                    raise "could not resolve categories (#{params[key].to_a}) for cluster id #{conditions[:cluster_id]}, stopping process."
+                  end
+                  cluster_process_array << conditions
+                end
+              end
+
+              if cluster_process_array.blank?
+                raise "no categories were selected for any cluster, nothing happened."
+              end
+
+              cluster_process_array.each do |conds|
+                Wbrs::Cluster.process(conds)
+              end
+              return {:status => "success"}.to_json
+
             end
 
 
@@ -38,28 +60,31 @@ module API
               authorize!(:index, Complaint)
 
               json_packet = []
-              if params[:regex].present?
-                clusters = Wbrs::Cluster.where({:regex => params[:regex]})
-              else
-                clusters = Wbrs::Cluster.all(true)
-              end
-              if clusters
 
+
+              if params[:regex].present?
+                cluster_data = Wbrs::Cluster.where({:regex => params[:regex]})
+                clusters = cluster_data["data"]
+                meta = cluster_data["meta"]
+              else
+                cluster_data = Wbrs::Cluster.all()
+                clusters = cluster_data["data"]
+                meta = cluster_data["meta"]
+              end
+
+              if clusters
                 clusters.each do |cluster|
                   cluster_packet = {}
-                  cluster_packet[:cluster_id] = cluster[:cluster_id]
-                  cluster_packet[:domain] = cluster[:domain]
-                  cluster_packet[:global_volume] = cluster[:glob_volume]
-                  ctime = Time.gm(cluster[:ctime]).to_i
-                  now = Time.now.utc.to_i
-                  age = (now + ctime)
-                  cluster_packet[:ctime] = Time.gm(cluster[:ctime]).to_i
-                  cluster_packet[:now] = Time.now.utc.to_i
-                  cluster_packet[:age] = distance_of_time_in_words(age)
+                  cluster_packet[:cluster_id] = cluster["cluster_id"]
+                  cluster_packet[:domain] = cluster["domain"]
+                  cluster_packet[:global_volume] = cluster["glob_volume"]
+                  cluster_packet[:ctime] = cluster["ctime"]
+                  cluster_packet[:cluster_size] = cluster["cluster_size"] unless cluster["cluster_size"].blank?
+                  cluster_packet[:age] = distance_of_time_in_words(Time.now, Time.parse(cluster["ctime"]))
                   json_packet << cluster_packet
                 end
               end
-              {:status => "success", :data => json_packet}.to_json
+              {:status => "success", :data => json_packet, :meta => meta}.to_json
 
             end
 
@@ -81,29 +106,8 @@ module API
             get ":id" do
               cluster_id = params[:id]
 
-              cluster_info = Wbrs::Cluster.retrieve(cluster_id, true)
+              cluster_info = Wbrs::Cluster.retrieve(cluster_id)
               {:status => "success", :data => cluster_info}.to_json
-            end
-
-            params do
-              requires :category_ids, type: Array[Integer]
-              optional :comment, type: String
-              requires :user_id, type: Integer
-              requires :id, type: Integer
-            end
-
-            post "process" do
-              cluster_id = params[:id]
-              user = User.find(:user_id)
-              cat_ids = params[:category_ids]
-              conds = {}
-              conds[:cluster_id] = cluster_id
-              if params[:comment].present?
-                conds[:comment] = params[:comment]
-              end
-              conds[:user] = user.cvs_username
-              conds[:cat_ids] = cat_ids
-              Wbrs::Cluster.process(conds)
             end
           end
         end

@@ -5792,7 +5792,7 @@ table.dataTable tbody tr.selected {
 
 .category-column .form-control.selectize {
   height: 30px !important;
-  margin: -4px 0 !important;
+  margin: -4px 0;
 }
 
 .category-column .form-control.selectize .selectize-input input {
@@ -6636,4 +6636,47 @@ h2 {
   .selectize-dropdown {
     margin: 4px 0 0 -2px;
   }
+}
+
+
+
+
+.category-column .form-control.selectize.selectize-dropdown.cluster_categories {
+  margin-top: 8px;
+  padding: 0 !important;
+}
+
+.selectize-input.has-items + .category-column .form-control.selectize.selectize-dropdown.cluster_categories {
+  margin-top: 4px !important;
+}
+
+.cluster-mgt-loader-wrapper {
+  display: block;
+  position: absolute;
+  margin: 175px 38%;
+  width: 170px;
+
+  .gear-loader-wrapper {
+    margin-right: 5px;
+    margin-top: 6px;
+    float: left;
+  }
+
+  .loader-msg {
+    display: inline-block;
+    line-height: 3.5;
+  }
+}
+
+.loader-msg {
+  color: $type-lighter-color;
+}
+
+.cluster-table-toolbar {
+  margin-top: 58px;
+  margin-bottom: 0;
+}
+
+#clusters-index_wrapper .datatable-top-tools {
+  margin-top: -35px;
 }
