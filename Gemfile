@@ -76,7 +76,6 @@ gem 'gzip', '1.0'
 gem 'rubyXL', '3.3.29'
 
 gem 'domainatrix'
-gem 'dotiw'
 
 group :development do
   gem 'thin', '~> 1.7.0'
@@ -133,5 +132,5 @@ gem 'turbolinks', '~> 5.0.1'
 gem 'paper_trail', '~> 6.0.2'
 gem "sprockets", '~> 3.7.1'
 
-#gem "peake-bridge-client", '>= 0.0.5.0', git: "https://git.vrt.sourcefire.com/talosweb/peake-bridge-client.git"
+gem "peake-bridge-client", '>= 0.0.5.0', git: "https://git.vrt.sourcefire.com/talosweb/peake-bridge-client.git"
 
