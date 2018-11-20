@@ -438,7 +438,7 @@ $ ->
           std_api_error(response, "There was a problem retrieving resolution message template.", reload: false)
       )
     else
-      std_msg_error('Cannot edit a template while in the middle of creating a new one. To discard changes and edit a template, hit Cancel first.', [], reload:false)
+      std_msg_error('Error Editing Template', ['Cannot edit a template while in the middle of creating a new one. To discard changes and edit a template, hit Cancel first.'], reload:false)
 
   populate_resolution_message_template_details =  ->
     $('#edit-resolution-message-template-form-wrapper').show()
@@ -473,7 +473,7 @@ $ ->
     template_id = $(this).attr('resolution_message_template_id')
 
     std_msg_confirm(
-      'Are you sure you want to delete this template? To discard changes, hit Cancel',
+      'Are you sure you want to delete this template?',
       [],
       {
         confirm_dismiss: false,
