@@ -98,7 +98,7 @@ class AutoResolve
   end
 
   def check_virus_total_from_preload(dispute_entry, address)
-    if dispute_entry.present? && dispute_entry.dispute_entry_preload.present? && dispute_entry.dispute_entry_preload.virustotal.present?
+    if dispute_entry&.dispute_entry_preload&.virustotal.present?
       result = JSON.parse(dispute_entry.dispute_entry_preload.virustotal)
     else
       result = Virustotal::Scan.scan_hashes(address: address)
@@ -158,7 +158,7 @@ class AutoResolve
   end
 
   def check_umbrella_from_preload(dispute_entry, address)
-    if dispute_entry.present? && dispute_entry.dispute_entry_preload.present? && dispute_entry.dispute_entry_preload.umbrella.present?
+    if dispute_entry&.dispute_entry_preload&.umbrella.present?
       result = dispute_entry.dispute_entry_preload.umbrella
       if result == 'Malicious'
         append_comment('Umbrella: malicious domain.; ')
