@@ -362,6 +362,7 @@ $ ->
   $('#manageResolutionMessageTemplatesDialog').dialog
     autoOpen: false
     minWidth: 500
+    maxWidth: 1000
     position: { my: "left center", at: "left center", of: window }
 
 
@@ -385,8 +386,9 @@ $ ->
       $('#create-resolution-message-template').text('Cancel')
       $('#save-resolution-message-template').removeClass('hidden')
       $('#new-resolution-message-template-form-wrapper').animate {
-        height: 200
+        minHeight: 256
         borderWidth: '1px'
+        marginBottom: 20
       }, 300
 
     else
@@ -394,8 +396,9 @@ $ ->
       $('#create-resolution-message-template').text('Create New Template')
       $('#save-resolution-message-template').addClass('hidden')
       $('#new-resolution-message-template-form-wrapper').animate {
-        height: 0
+        minHeight: 0
         borderWidth: 0
+        marginBottom: 0
       }, 300
 
     state = !state
@@ -441,8 +444,9 @@ $ ->
     $('#edit-resolution-message-template').removeClass('hidden')
     $('#cancel-edit-resolution-message-template').removeClass('hidden')
     $('#edit-resolution-message-template-form-wrapper').animate {
-      height: 200
+      minHeight: 256
       borderWidth: '1px'
+      marginBottom: 20
     }, 300
 
   window.update_resolution_message_template = () ->
@@ -510,9 +514,10 @@ $ ->
     $('#cancel-edit-resolution-message-template').addClass('hidden')
     $('#edit-resolution-message-template').addClass('hidden')
     $('#edit-resolution-message-template-form-wrapper').animate {
-      height: 0
+      minHeight: 0
       borderWidth: 0
-    }
+      marginBottom: 0
+    }, 300
 
   ## Manage Email Templates
 

@@ -147,12 +147,12 @@
           - elsif @dispute&.resolution_comment.present?
             %button.status-comment-button.esc-tooltipped{title: @dispute&.resolution_comment}
           - else
-            %button.status-comment-button.esc-tooltipped
+            %button.status-comment-button
 
         - else
           .duplicate-status-notice
             =@dispute.resolution
-        %button.mng-resolution-message-templates-button{onClick: 'manage_resolution_message_templates()'}
+        %button.mng-resolution-message-templates-button.esc-tooltipped{onClick: 'manage_resolution_message_templates()', title: 'Manage Resolution Message Templates'}
       .disposition-wrapper
         %label.content-label-sm
           Suggested Disposition

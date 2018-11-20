@@ -121,23 +121,23 @@
         %form
           .dialog-form-information
             %span.content-label-sm Name
-            %input#new-resolution-message-template-name{autofocus: true, required: true, type: 'text', name: 'template-name'}
+            %input#new-resolution-message-template-name{autofocus: true, required: true, type: 'text', name: 'template-name', maxlength: 100}
             %span.content-label-sm Description
-            %input#new-resolution-message-template-desc{required: true, type: 'text', name: 'template-description'}
+            %input#new-resolution-message-template-desc{required: true, type: 'text', name: 'template-description', maxlength: 200}
           .template-content-wrapper
-            %textarea.template-content#new-resolution-message-template-body
+            %textarea.template-content#new-resolution-message-template-body{maxlength: 300}
 
       #edit-resolution-message-template-form-wrapper
         %h4.dialog-inset-header Edit Resolution Message Template
         %form
           .dialog-form-information
             %span.content-label-sm Name
-            %input#edit-resolution-message-template-name{autofocus: true, required: true, type: 'text', name: 'template-name'}
+            %input#edit-resolution-message-template-name{autofocus: true, required: true, type: 'text', name: 'template-name', maxlength: 100}
             %span.content-label-sm Description
-            %input#edit-resolution-message-template-desc{required: true, type: 'text', name: 'template-description'}
+            %input#edit-resolution-message-template-desc{required: true, type: 'text', name: 'template-description', maxlength: 200}
             %input.hidden#resolution-message-template-id
           .template-content-wrapper
-            %textarea.template-content#edit-resolution-message-template-body
+            %textarea.template-content#edit-resolution-message-template-body{maxlength: 300}
 
       .dialog-section-divider
         %button.primary#save-resolution-message-template.hidden{onclick: 'save_resolution_message_template()'}
