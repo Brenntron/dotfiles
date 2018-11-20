@@ -209,6 +209,20 @@ window.refresh_multi_closed_tickets_table = ()->
       #$('#refresh-error-msg').html('An error occured while retrieving data')
   , this)
 
+
+window.set_date_label = () ->
+  dateOptions = { year: 'numeric', month: 'long', day: 'numeric' };
+  startdate = new Date(localStorage.getItem('webrep_report_range_from'))
+  enddate = new Date(localStorage.getItem('webrep_report_range_to'))
+  today = new Date()
+  val = startdate.toLocaleDateString("en-US", dateOptions) + ' to ' + enddate.toLocaleDateString("en-US", dateOptions)
+  $('.dashboard-time label')[0].innerHTML = val
+  if today < enddate && today > startdate
+    $('#ticket-view-shortcut').html("View Last Week's Tickets")
+  else
+    $('#ticket-view-shortcut').html("View This Week's Tickets")
+
+
 window.set_initial_date_span = () ->
   from = localStorage.getItem('webrep_report_range_from')
   to = localStorage.getItem('webrep_report_range_to')
@@ -221,8 +235,6 @@ window.set_initial_date_span = () ->
     firstday = new Date(curr.setDate(first)).toUTCString();
     lastday = new Date(curr.setDate(last)).toUTCString();
 
-
-
     localStorage.setItem 'webrep_report_range_from', firstday
     localStorage.setItem 'webrep_report_range_to', lastday
 
@@ -232,6 +244,7 @@ window.set_initial_date_span = () ->
 
   refresh_single_open_tickets_table(user_id)
   refresh_single_closed_tickets_table(user_id)
+  set_date_label()
 
 window.build_graph_ticket_entries_submitter = () ->
 
@@ -744,25 +757,48 @@ $ ->
   $('button.icon-calendar').click ->
     $('#tickets_date_range').trigger 'click'
 
-
-$ ->
   $('#tickets_date_range').on 'apply.daterangepicker', (ev, picker) ->
-    start = picker.startDate.format('MMMM/DD/YYYY').split('/')
-    end = picker.endDate.format('MMMM/DD/YYYY').split('/')
-    val = start[0] + ' ' + start[1] + ', ' + start[2] + ' to ' + end[0] + ' ' + end[1] + ', ' + end[2]
-    $('.dashboard-time label')[0].innerHTML = val
-
     firstday = new Date(picker.startDate).toUTCString();
     lastday = new Date(picker.endDate).toUTCString();
 
     localStorage.setItem 'webrep_report_range_from', picker.startDate
     localStorage.setItem 'webrep_report_range_to', picker.endDate
     user_id = $("#user_id").val()
-    #refresh_single_open_tickets_table(user_id)
+    set_date_label()
+
+  $('#ticket-view-shortcut').click ->
+    if this.innerHTML == "View Last Week's Tickets"
+      curr = new Date;
+      first = curr.getDate() - curr.getDay() - 7;
+      last = first + 6;
+
+      firstday = new Date(curr.setDate(first)).toUTCString();
+      lastday = new Date(curr.setDate(last)).toUTCString();
+
+      localStorage.setItem 'webrep_report_range_from', firstday
+      localStorage.setItem 'webrep_report_range_to', lastday
+    else
+      curr = new Date;
+      first = curr.getDate() - curr.getDay();
+      last = first + 6;
+
+      firstday = new Date(curr.setDate(first)).toUTCString();
+      lastday = new Date(curr.setDate(last)).toUTCString();
+
+      localStorage.setItem 'webrep_report_range_from', firstday
+      localStorage.setItem 'webrep_report_range_to', lastday
+
+    user_id = $("#user_id").val()
+    refresh_single_open_tickets_table(user_id)
+    refresh_single_closed_tickets_table(user_id)
+    set_date_label()
+
+
+
+#refresh_single_open_tickets_table(user_id)
     #refresh_single_closed_tickets_table(user_id)
     #return
   #return
-
 
 $ ->
   $(document).ready ->

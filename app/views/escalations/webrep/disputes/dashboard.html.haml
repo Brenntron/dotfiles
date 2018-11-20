@@ -27,9 +27,7 @@
 
           .dashboard-time-ticket
             .button-wrapper
-              %button.arrow-left View Last Week's Tickets
-              -# TODO If local storage time is not current week span, put 'View This Week's Tickets' instead.
-              -# Add function to change time span
+              %button.arrow-left#ticket-view-shortcut
 
       #dashboard-tab-list.container
         %label.bold View:
