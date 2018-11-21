@@ -363,6 +363,7 @@ $ ->
       table_head = '<table class="table cluster-path-table">' + '<thead>' + '<tr>' +
         '<th><input class="cluster_path_select_all" type="checkbox" onclick="select_or_deselect_cluster(' + cluster.cluster_id + ')" id=' + cluster.cluster_id + ' /></th>' +
         '<th class="clusterpath-col-path">Cluster Paths</th>' +
+        '<th class="clusterpath-col-path">Customer Name</th>' +
         '<th class="clusterpath-col-volume text-center">APAC Region Volume</th>' +
         '<th class="clusterpath-col-volume text-center">EMRG Region Volume</th>' +
         '<th class="clusterpath-col-volume text-center">EURP Region Volume</th>' +
@@ -386,9 +387,12 @@ $ ->
           entry = json.data
 
           $(entry).each ->
+            #until real data comes in
+            this.customer_name = "Sushi and Bluntz, Inc."
             entry_row = '<tr class="index-entry-row">' +
               '<td class="clusterpath-col-spacer"><input type="checkbox" class="cluster-path-checkbox_' + cluster.cluster_id + '"</td>' + # Spacer for the check box row
               '<td class="clusterpath-col-path">' + this.url + '</td>' +
+              '<td class="clusterpath-col-path">' + this.customer_name + '</td>' +
               '<td class="clusterpath-col-volume text-center">' + this.apac_volume + '</td>' +
               '<td class="clusterpath-col-volume text-center">' + this.emrg_volume + '</td>' +
               '<td class="clusterpath-col-volume text-center">' + this.eurp_volume + '</td>' +
