@@ -1100,7 +1100,7 @@ $ ->
       9
       'desc'
     ] ]
-    dom: '<"datatable-top-tools"lf>t<ip>'
+    dom: '<"datatable-top-tools no-margin-datatable-top-tool"lf>t<ip>'
     columnDefs: [
       {
         targets: [
