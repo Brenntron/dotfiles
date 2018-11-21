@@ -275,7 +275,8 @@ Feature: Disputes
       |5370|
     And I goto "/escalations/webrep/disputes/5370"
     And I click ".mng-resolution-message-templates-button"
-    When I click through ".delete-resolution-message-template" and accept confirmation
+    When I click ".delete-resolution-message-template"
+    And I click ".confirm"
     And I wait for "3" seconds
     Then I should see "RESOLUTION MESSAGE TEMPLATE DELETED."
 
