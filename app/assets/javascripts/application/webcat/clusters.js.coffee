@@ -5,6 +5,7 @@ window.apply_filter_to_table = () ->
 
 
 window.populate_clusters_index_table = (filter) ->
+  $('.cluster-mgt-loader-wrapper').removeClass('hidden')
   filter_param = ""
   if filter
     filter_param = "?regex=" + filter
@@ -15,7 +16,7 @@ window.populate_clusters_index_table = (filter) ->
     method: 'GET'
     headers: headers
     success: (response) ->
-
+      $('.cluster-mgt-loader-wrapper').addClass('hidden')
       json = $.parseJSON(response)
       if json.data.length == 0
         std_msg_error("No clusters available.","")
