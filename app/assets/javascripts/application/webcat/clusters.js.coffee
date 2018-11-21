@@ -1,6 +1,6 @@
 window.apply_filter_to_table = () ->
   filter = $("#cluster_filter_field").val()
-
+  $('#regex-filter').html(filter)
   populate_clusters_index_table(filter);
 
 
