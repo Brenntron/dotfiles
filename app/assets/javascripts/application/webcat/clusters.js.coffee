@@ -101,6 +101,7 @@ $ ->
 #  Populate the cluster management table (temp data currently)
   window.clusters_table = $('#clusters-index').DataTable(
     dom: '<"datatable-top-tools"lf>t<ip>'
+    lengthMenu: [50, 100, 500, 1000]
     columnDefs: [
       {
         targets: [
