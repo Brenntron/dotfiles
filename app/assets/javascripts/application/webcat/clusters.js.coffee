@@ -451,4 +451,7 @@ $ ->
   window.select_or_deselect_cluster = (cluster_id)->
     $('.cluster-path-checkbox_' + cluster_id).prop('checked', $('#' + cluster_id).prop('checked'))
 
-
+  $('#cluster_filter_field').keyup (event) ->
+    if event.keyCode == 13
+      apply_filter_to_table()
+    return
