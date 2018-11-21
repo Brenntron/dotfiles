@@ -149,12 +149,12 @@ $ ->
         width: '100px'
       }
       {
-        data: 'domain',
+        data: null,
         render: (data) ->
-          '<button type="button" class="help-btn right-margin esc-tooltipped" title="Whois Domain Lookup Information" onclick="domain_whois(\'' + data + '\')"></button>' +
-          '<button type="button" class="google-btn right-margin esc-tooltipped" title="Google it!" onclick="window.open(\'https://www.google.com/search?q=' + data + '\')"></button>' +
-          data + '<button type="button" onclick="window.open(\'https://' + data + '\', \'_blank\') " class="data-btn right-margin esc-tooltipped", title="Open ' + data + ' in a new tab"></button>' +
-          ' <span class="label right-margin label-default">3</span>' # TODO: Put real data here <- Should be cluster entry count
+          '<button type="button" class="help-btn right-margin esc-tooltipped" title="Whois Domain Lookup Information" onclick="domain_whois(\'' + data.domain + '\')"></button>' +
+          '<button type="button" class="google-btn right-margin esc-tooltipped" title="Google it!" onclick="window.open(\'https://www.google.com/search?q=' + data.domain + '\')"></button>' +
+          data.domain + '<button type="button" onclick="window.open(\'https://' + data.domain + '\', \'_blank\') " class="data-btn right-margin esc-tooltipped", title="Open ' + data.domain + ' in a new tab"></button>' +
+          ' <span class="label right-margin label-default">' + data.cluster_size + '</span>'
       }
       {
         data: 'global_volume'
