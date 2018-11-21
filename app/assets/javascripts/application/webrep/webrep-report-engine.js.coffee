@@ -238,9 +238,12 @@ window.set_initial_date_span = () ->
     localStorage.setItem 'webrep_report_range_from', firstday
     localStorage.setItem 'webrep_report_range_to', lastday
 
-#  alert(localStorage.getItem('webrep_report_range_from'))
-#  alert(localStorage.getItem('webrep_report_range_to'))
   user_id = $("#user_id").val()
+
+  prettyFromDate = new Date(localStorage.getItem('webrep_report_range_from')).toLocaleDateString("en-US")
+  prettyToDate = new Date(localStorage.getItem('webrep_report_range_to')).toLocaleDateString("en-US")
+
+  $('#tickets_date_range').val(prettyFromDate + " - " + prettyToDate)
 
   refresh_single_open_tickets_table(user_id)
   refresh_single_closed_tickets_table(user_id)
@@ -753,6 +756,7 @@ window.build_multi_entries_closed_by_owners_chart = () ->
 
 
 $ ->
+  window.set_initial_date_span()
   $('#tickets_date_range').daterangepicker()
   $('button.icon-calendar').click ->
     $('#tickets_date_range').trigger 'click'
@@ -793,7 +797,6 @@ $ ->
     refresh_single_closed_tickets_table(user_id)
     set_date_label()
 
-  window.set_initial_date_span()
   window.build_graph_ticket_entries_submitter()
   window.build_single_closed_email_entries_resolution_piechart()
   window.build_single_closed_web_entries_resolution_piechart()
