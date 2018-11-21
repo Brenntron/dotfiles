@@ -4448,7 +4448,7 @@ table > tbody > tr > td.dispute_rep_tools {
   padding: 3px;
 }
 
-.dispute-count {
+.dispute-count, .entry-count {
   background-color: darken($nav-toolbar-color, 8%);
   display: inline-block;
   border-radius: 2px;
@@ -4459,8 +4459,22 @@ table > tbody > tr > td.dispute_rep_tools {
   float: right;
 }
 
-.dispute-count, .dispute_entry_content_first {
+.dispute_entry_content_first {
   display: inline-block;
+}
+
+.entry-count {
+  margin-right: 8px;
+  margin-top: 1px;
+}
+
+.domain-column .vertical-separator {
+  border-right: 1px solid $nav-toolbar-color;
+  display: inline-block;
+  height: 16px;
+  margin-top: 3px;
+  margin-right: 8px;
+  float: right;
 }
 
 .take-ticket-button {
