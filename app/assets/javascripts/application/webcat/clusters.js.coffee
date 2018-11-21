@@ -349,7 +349,6 @@ $ ->
 
 
   $('#clusters-index tbody').on 'click', 'td.expandable-row-column', ->
-    $('.cluster-mgt-loader-wrapper').removeClass('hidden')
     tr = $(this).closest('tr')
     row = window.clusters_table.row(tr)
     if row.child.isShown()
@@ -358,6 +357,7 @@ $ ->
       tr.removeClass 'shown'
     else
 # Open this row
+      $('.cluster-mgt-loader-wrapper').removeClass('hidden')
       cluster = row.data()
 
       table_head = '<table class="table cluster-path-table">' + '<thead>' + '<tr>' +
