@@ -793,24 +793,15 @@ $ ->
     refresh_single_closed_tickets_table(user_id)
     set_date_label()
 
+  window.set_initial_date_span()
+  window.build_graph_ticket_entries_submitter()
+  window.build_single_closed_email_entries_resolution_piechart()
+  window.build_single_closed_web_entries_resolution_piechart()
+  window.build_multi_closed_email_entries_resolution_piechart()
+  window.build_multi_closed_web_entries_resolution_piechart()
+  window.build_single_entries_closed_by_day_chart()
 
+  window.refresh_multi_closed_tickets_table()
+  window.refresh_multi_open_tickets_table()
 
-#refresh_single_open_tickets_table(user_id)
-    #refresh_single_closed_tickets_table(user_id)
-    #return
-  #return
-
-$ ->
-  $(document).ready ->
-    window.set_initial_date_span()
-    window.build_graph_ticket_entries_submitter()
-    window.build_single_closed_email_entries_resolution_piechart()
-    window.build_single_closed_web_entries_resolution_piechart()
-    window.build_multi_closed_email_entries_resolution_piechart()
-    window.build_multi_closed_web_entries_resolution_piechart()
-    window.build_single_entries_closed_by_day_chart()
-
-    window.refresh_multi_closed_tickets_table()
-    window.refresh_multi_open_tickets_table()
-
-    window.build_multi_entries_closed_by_owners_chart()
+  window.build_multi_entries_closed_by_owners_chart()
