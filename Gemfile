@@ -120,7 +120,7 @@ group :profile do
 end
 
 gem 'httparty', '~> 0.15.3'
-gem 'uglifier', '4.1.19'
+gem 'uglifier', '4.1.20'
 gem 'jquery-rails', '~> 4.3.1'
 gem 'jquery-ui-rails', '~> 6.0.1'
 gem 'coffee-rails', '~> 4.2.1'
