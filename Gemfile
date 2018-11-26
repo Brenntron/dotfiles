@@ -34,7 +34,6 @@ gem 'curb', '0.9.6' #Libcurl bindings for Ruby
 
 gem 'net-ssh', '5.0.2'
 gem 'daemons', '1.2.6'
-gem 'activemessaging', '0.13.1.2'  # , path: './vendor/gems/activemessaging'
 gem 'stomp', '1.4.6'
 gem 'dalli', '2.7.9'
 gem 'pry', '0.12.2'
