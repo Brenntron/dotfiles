@@ -6,7 +6,7 @@ module API
 
         resource "escalations/bugs" do
           before do
-            PaperTrail.whodunnit = current_user.id if current_user.present?
+            PaperTrail.request.whodunnit = current_user.id if current_user.present?
           end
 
           desc "import one bug from bugzilla"

@@ -54,3 +54,10 @@ Given(/^a dispute entry with trait "(.*?)" exists$/) do| trait_name|
   FactoryBot.create(:dispute_entry,trait_name.to_sym)
 end
 
+Given(/^a Dispute RuleHit exists with name, "(.*?)", and RuleType of "(.*?)"/) do |name, rule_type|
+  FactoryBot.create(:dispute_rule_hit, name: name, rule_type: rule_type)
+end
+
+Given(/^a RuleHit Resolution Mailer template exists with mnemonic, "(.*?)"/) do |mnemonic|
+  FactoryBot.create(:rulehit_resolution_mailer_template, mnemonic: mnemonic)
+end

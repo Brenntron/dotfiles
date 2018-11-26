@@ -155,12 +155,12 @@ Feature: Webcat complaints
     And I goto "/escalations/webcat/reports"
     And I fill in "complaint_entry_report_from" with "2018-08-01"
     And I fill in "complaint_entry_report_to" with "2018-08-02"
-    Then I click "complaint_entry_report" and switch to the new window
+    Then I click "#complaint_entry_report" and switch to the new window
     Then I should see "Webcat Complaint Entry Report"
     Then I goto "/escalations/webcat/reports"
     And I fill in "complaint_entry_report_from" with "2018-08-11"
     And I fill in "complaint_entry_report_to" with "2018-08-12"
-    Then I click "complaint_entry_report" and switch to the new window
+    Then I click "#complaint_entry_report" and switch to the new window
     Then I should see "Webcat Complaint Entry Report"
     
   @javascript

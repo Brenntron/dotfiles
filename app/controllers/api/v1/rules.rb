@@ -5,7 +5,7 @@ module API
 
       resource :rules do
         before do
-          PaperTrail.whodunnit = current_user.id if current_user.present?
+          PaperTrail.request.whodunnit = current_user.id if current_user.present?
         end
         desc "Checks rule to convert to SMTP"
         params do

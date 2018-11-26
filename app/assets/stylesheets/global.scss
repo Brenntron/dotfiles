@@ -76,8 +76,6 @@ $table-dark-header: #413D3D;
   box-shadow: $shadow;
 }
 
-
-
 /************ Base Styles **************/
 
 body {
@@ -702,6 +700,51 @@ th.alt-col {
   display: block;
   width: 20px;
   height: 20px;
+}
+
+.expand-row-button:hover,
+.collapse-button:hover,
+.show-col-button:hover,
+.mark-related-button:hover,
+.ticket-status-button:hover,
+.ticket-owner-button:hover,
+.adjust-reptool-button:hover,
+.adjust-wlbl-button:hover,
+.export-button:hover,
+.take-ticket-toolbar-button:hover,
+.open-viewable:hover,
+.open-nonviewable:hover,
+.open-selected:hover,
+.open-all:hover,
+.take-ticket-button:hover,
+.return-ticket-toolbar-button:hover,
+.collapse-all:hover,
+.sync-button:hover,
+.expand-all:hover {
+  background-color: lighten($nav-toolbar-color, 8%);
+}
+
+.expand-row-button:focus,
+.collapse-button:focus,
+.show-col-button:focus,
+.mark-related-button:focus,
+.ticket-status-button:focus,
+.ticket-owner-button:focus,
+.adjust-reptool-button:focus,
+.adjust-wlbl-button:focus,
+.export-button:focus,
+.take-ticket-toolbar-button:focus,
+.take-ticket-button:focus,
+.open-viewable:focus,
+.open-nonviewable:focus,
+.open-selected:focus,
+.open-all:focus,
+.take-ticket-button:focus,
+.return-ticket-toolbar-button:focus,
+.collapse-all:focus,
+.sync-button:focus,
+.expand-all:focus{
+  background-color: lighten($bug-section-color, 28%);
 }
 
 .shown .expand-row-button-inline, .shown.expand-row-button-inline {
@@ -1756,6 +1799,7 @@ a.static-nav-item {
 .icon-all-tickets  {background-image: url(image_path('icon_ticket.svg'));}
 .icon-saved-search {background-image: url(image_path('icon_save_blue.svg'));}
 .icon-recently-viewed {background-image: url(image_path('icon_myrecent.svg'));}
+.icon-custom-star {background-image: url(image_path('icon_customer_star.svg'));}
 
 .saved-search {
   text-transform: none !important;
@@ -2072,6 +2116,17 @@ table .bug-priority {
 
 .bug-state-col {
   margin-bottom: 5px;
+}
+
+.submitter-col {
+  text-align: center;
+}
+
+.complaint-submitter-type {
+  background-repeat: no-repeat;
+  width: 20px;
+  height: 20px;
+  border: none;
 }
 
 .bug-state {
@@ -4521,7 +4576,9 @@ table > tbody > tr > td.dispute_rep_tools {
   height: 35px;
   padding: 3px;
 }
-
+.no-margin-datatable-top-tool {
+  margin: 0 !important;
+}
 .dispute-count {
   background-color: darken($nav-toolbar-color, 8%);
   display: inline-block;
@@ -5389,7 +5446,7 @@ table.dispute_tool_current tr:last-of-type td {
 .dispute-EW {background-image: url(image_path('icon_type_email_web.svg'));}
 
 .my-dashboard-header-area, .complaint-mgt-top-area  {
-  background-color: $bug-section-color;
+  background-color: $content-tab-color;
   margin-top: -15px;
   border-radius: 4px 4px 0 0 ;
 }
@@ -5405,9 +5462,18 @@ table.dispute_tool_current tr:last-of-type td {
   padding: 15px;
 }
 
-.dashboard-header-area h1, .complaint-mgt-top-area h1 {
+.top-area-bar {
+  display: inline-flex;
+}
+
+.dashboard-header-area h1 {
   color: $content-bg-color;
   margin-bottom: 24px;
+  display: inline-block;
+}
+
+.complaint-mgt-top-area h1 {
+  color: $content-bg-color;
   display: inline-block;
 }
 
@@ -5428,13 +5494,34 @@ table.dispute_tool_current tr:last-of-type td {
   color: $content-bg-color;
 }
 
-.my-dashboard-icon, .team-icon, .top-info-icon {
+.my-dashboard-icon, .team-icon {
   background-repeat: no-repeat;
   width: 30px;
   height: 30px;
   display: inline-block;
   margin-left: 15px;
   margin-bottom: -6px;
+}
+
+.top-info-icon {
+  background-repeat: no-repeat;
+  width: 30px;
+  height: 30px;
+  display: inline-block;
+  padding-right: 100px;
+  margin: 6px 0 -6px 15px;
+}
+
+.left-space {
+  padding-left: 20px;
+}
+
+.top-margin {
+  margin-top: 8px;
+}
+
+.top-user-info {
+  width: 20%;
 }
 
 .my-dashboard-icon { background-image: url(image_path('icon_dashboard.svg'));}
@@ -5661,6 +5748,15 @@ td.ticket-total::before {
   display: block;
 }
 
+.ticket-age-over3hr {
+  color: $warning-accent-color;
+  font-weight: bold;
+}
+
+.overdue {
+  color: $second-section-color;
+  font-weight: bold;
+}
 
 .loader-gears {
   width: 80px;
@@ -5670,6 +5766,10 @@ td.ticket-total::before {
 
 table.dataTable tbody tr.selected {
   background-color: $faint-accent-color;
+}
+
+table.dataTable tbody tr.selected .alt-col{
+  background-color: #dae7ea;
 }
 
 .nested-col-sections {
@@ -6442,4 +6542,18 @@ h2 {
   margin-top: 24px;
   margin-bottom: 6px;
   color: #333;
+}
+
+.age-col {
+
+}
+
+.ticket-age-over3hr {
+  color: $warning-accent-color;
+  font-weight: bold;
+}
+
+.overdue {
+  color: $second-section-color;
+  font-weight: bold;
 }
