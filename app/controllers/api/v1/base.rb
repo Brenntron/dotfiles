@@ -8,12 +8,10 @@ module API
       mount API::V1::Users
       mount API::V1::Notes
       mount API::V1::Events
-      mount API::V1::Tasks
       mount API::V1::SavedSearches
       mount API::V1::Escalations::Base
       mount API::V1::Escalations::Attachments
       mount API::V1::RulehitResolutionMailerTemplates
-
 
     end
   end

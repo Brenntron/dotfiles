@@ -57,9 +57,6 @@ GEM
     activejob (5.2.1)
       activesupport (= 5.2.1)
       globalid (>= 0.3.6)
-    activemessaging (0.13.1.2)
-      activesupport
-      rake
     activemodel (5.2.1)
       activesupport (= 5.2.1)
     activerecord (5.2.1)
@@ -484,8 +481,8 @@ GEM
       coercible (~> 1.0)
       descendants_tracker (~> 0.0, >= 0.0.3)
       equalizer (~> 0.0, >= 0.0.9)
-    warden (1.2.7)
-      rack (>= 1.0)
+    warden (1.2.8)
+      rack (>= 2.0.6)
     web-console (3.7.0)
       actionview (>= 5.0)
       activemodel (>= 5.0)
@@ -510,7 +507,6 @@ PLATFORMS
 
 DEPENDENCIES
   active_model_serializers (= 0.10.8)
-  activemessaging (= 0.13.1.2)
   ajax-datatables-rails (~> 0.4.0)
   awesome_nested_set (= 3.1.4)
   awesome_print (= 1.8.0)
@@ -598,4 +594,4 @@ DEPENDENCIES
   xmlrpc
 
 BUNDLED WITH
-   1.17.0
+   1.17.1
