@@ -68,7 +68,7 @@ class Ability
 
     if role_names.include?('webrep user')
       can :manage, [Dispute, DisputeComment, DisputeEmail, DisputeEmailAttachment, Attachment, Note,
-                    DisputeEntry, EmailTemplate, Wbrs::ManualWlbl]
+                    DisputeEntry, EmailTemplate, Wbrs::ManualWlbl, ResolutionMessageTemplate]
       can :publish_to_bugzilla, Note
     end
 

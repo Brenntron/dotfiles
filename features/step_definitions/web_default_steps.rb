@@ -26,8 +26,12 @@ end
 
 When(/^I click through "(.*?)" and accept confirmation$/) do |target|
   accept_confirm do
-    page.find("#{target}").trigger('click')
+    page.find("#{target}").click
   end
+end
+
+When (/^I click label "(.*?)"$/) do |target|
+  find("label[for=#{target}]").click
 end
 
 Then(/^I cannot click "(.*?)"$/) do |target|
