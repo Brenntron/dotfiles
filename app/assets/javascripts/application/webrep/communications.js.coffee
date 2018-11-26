@@ -235,6 +235,7 @@ $ ->
             std_msg_success('Email Sent.', [], reload: true)
           error: (response) ->
             $('#newEmail').modal('hide');
+            $('.delete_attachment_new').click()
             std_api_error(response, "Email was not sent", response, reload: false)
         )
       else
@@ -250,6 +251,7 @@ $ ->
             std_msg_success('Email Sent.', [], reload: true)
           error: (response) ->
             $('#newEmail').modal('hide');
+            $('.delete_attachment_new').click();
             std_api_error(response, "Email was not sent", response, reload: false)
         )
 
