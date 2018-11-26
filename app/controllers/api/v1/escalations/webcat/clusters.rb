@@ -107,7 +107,10 @@ module API
               cluster_id = params[:id]
 
               cluster_info = Wbrs::Cluster.retrieve(cluster_id)
-              {:status => "success", :data => cluster_info}.to_json
+
+              sorted_limited_cluster_info = cluster_info.sort { |x,y| y["glob_volume"] <=> x["glob_volume"] }.first(300)
+
+              {:status => "success", :data => sorted_limited_cluster_info}.to_json
             end
           end
         end
