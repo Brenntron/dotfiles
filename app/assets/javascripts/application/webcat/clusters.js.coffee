@@ -1,10 +1,11 @@
 window.apply_filter_to_table = () ->
   filter = $("#cluster_filter_field").val()
-
+  $('#regex-filter').html(filter)
   populate_clusters_index_table(filter);
 
 
 window.populate_clusters_index_table = (filter) ->
+  $('.cluster-mgt-loader-wrapper').removeClass('hidden')
   filter_param = ""
   if filter
     filter_param = "?regex=" + filter
@@ -15,7 +16,7 @@ window.populate_clusters_index_table = (filter) ->
     method: 'GET'
     headers: headers
     success: (response) ->
-
+      $('.cluster-mgt-loader-wrapper').addClass('hidden')
       json = $.parseJSON(response)
       if json.data.length == 0
         std_msg_error("No clusters available.","")
@@ -101,6 +102,7 @@ $ ->
 #  Populate the cluster management table (temp data currently)
   window.clusters_table = $('#clusters-index').DataTable(
     dom: '<"datatable-top-tools"lf>t<ip>'
+    lengthMenu: [50, 100, 500, 1000]
     columnDefs: [
       {
         targets: [
@@ -147,12 +149,12 @@ $ ->
         width: '100px'
       }
       {
-        data: 'domain',
+        data: null,
         render: (data) ->
-          '<button type="button" class="help-btn right-margin esc-tooltipped" title="Whois Domain Lookup Information" onclick="domain_whois(\'' + data + '\')"></button>' +
-          '<button type="button" class="google-btn right-margin esc-tooltipped" title="Google it!" onclick="window.open(\'https://www.google.com/search?q=' + data + '\')"></button>' +
-          data + '<button type="button" onclick="window.open(\'https://' + data + '\', \'_blank\') " class="data-btn right-margin esc-tooltipped", title="Open ' + data + ' in a new tab"></button>' +
-          ' <span class="label right-margin label-default">3</span>' # TODO: Put real data here <- Should be cluster entry count
+          '<button type="button" class="help-btn right-margin esc-tooltipped" title="Whois Domain Lookup Information" onclick="domain_whois(\'' + data.domain + '\')"></button>' +
+          '<button type="button" class="google-btn right-margin esc-tooltipped" title="Google it!" onclick="window.open(\'https://www.google.com/search?q=' + data.domain + '\')"></button>' +
+          data.domain + '<button type="button" onclick="window.open(\'https://' + data.domain + '\', \'_blank\') " class="data-btn right-margin esc-tooltipped", title="Open ' + data.domain + ' in a new tab"></button>' +
+          '<span class="vertical-separator"></span><span class="entry-count">' + data.cluster_size + '</span>'
       }
       {
         data: 'global_volume'
@@ -347,7 +349,6 @@ $ ->
 
 
   $('#clusters-index tbody').on 'click', 'td.expandable-row-column', ->
-    $('.cluster-mgt-loader-wrapper').removeClass('hidden')
     tr = $(this).closest('tr')
     row = window.clusters_table.row(tr)
     if row.child.isShown()
@@ -356,11 +357,13 @@ $ ->
       tr.removeClass 'shown'
     else
 # Open this row
+      $('.cluster-mgt-loader-wrapper').removeClass('hidden')
       cluster = row.data()
 
       table_head = '<table class="table cluster-path-table">' + '<thead>' + '<tr>' +
         '<th><input class="cluster_path_select_all" type="checkbox" onclick="select_or_deselect_cluster(' + cluster.cluster_id + ')" id=' + cluster.cluster_id + ' /></th>' +
         '<th class="clusterpath-col-path">Cluster Paths</th>' +
+        '<th class="clusterpath-col-path">Customer Name</th>' +
         '<th class="clusterpath-col-volume text-center">APAC Region Volume</th>' +
         '<th class="clusterpath-col-volume text-center">EMRG Region Volume</th>' +
         '<th class="clusterpath-col-volume text-center">EURP Region Volume</th>' +
@@ -384,9 +387,11 @@ $ ->
           entry = json.data
 
           $(entry).each ->
+
             entry_row = '<tr class="index-entry-row">' +
               '<td class="clusterpath-col-spacer"><input type="checkbox" class="cluster-path-checkbox_' + cluster.cluster_id + '"</td>' + # Spacer for the check box row
               '<td class="clusterpath-col-path">' + this.url + '</td>' +
+              '<td class="clusterpath-col-path">' + this.customer_name + '</td>' +
               '<td class="clusterpath-col-volume text-center">' + this.apac_volume + '</td>' +
               '<td class="clusterpath-col-volume text-center">' + this.emrg_volume + '</td>' +
               '<td class="clusterpath-col-volume text-center">' + this.eurp_volume + '</td>' +
@@ -445,4 +450,7 @@ $ ->
   window.select_or_deselect_cluster = (cluster_id)->
     $('.cluster-path-checkbox_' + cluster_id).prop('checked', $('#' + cluster_id).prop('checked'))
 
-
+  $('#cluster_filter_field').keyup (event) ->
+    if event.keyCode == 13
+      apply_filter_to_table()
+    return
