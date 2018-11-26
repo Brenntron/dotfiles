@@ -387,8 +387,7 @@ $ ->
           entry = json.data
 
           $(entry).each ->
-            #until real data comes in
-            this.customer_name = "Sushi and Bluntz, Inc."
+
             entry_row = '<tr class="index-entry-row">' +
               '<td class="clusterpath-col-spacer"><input type="checkbox" class="cluster-path-checkbox_' + cluster.cluster_id + '"</td>' + # Spacer for the check box row
               '<td class="clusterpath-col-path">' + this.url + '</td>' +
