@@ -8,7 +8,7 @@ module API
           resource "escalations/webrep/dispute_comments" do
 
             before do
-              PaperTrail.whodunnit = current_user.id if current_user.present?
+              PaperTrail.request.whodunnit = current_user.id if current_user.present?
             end
 
             desc "get a dispute comment"
