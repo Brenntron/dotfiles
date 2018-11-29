@@ -236,12 +236,33 @@ Feature: Webcat complaints
     And I should see "Categorization of a Top URL will create a pending complaint entry. All other entries have been submitted directly to WBRS."
 
   @javascript
-  Scenario: a users tries to categorize a URL without picking a category
+  Scenario: a users tries to categorize without selecting a category
     Given a user with role "webcat user" exists and is logged in
     When I goto "/escalations/webcat/complaints?f=ALL"
     And I click ".expand-all"
     And I click "#categorize-urls"
     And I fill in "url_1" with "cisco.com"
+    And I click ".primary"
+    Then I should see "UNABLE TO CATEGORIZE"
+    And I should see "Please confirm that a URL and at least one category for each desired entry exists."
+
+  @javascript
+  Scenario: a users tries to categorize without an URL
+    Given a user with role "webcat user" exists and is logged in
+    When I goto "/escalations/webcat/complaints?f=ALL"
+    And I click ".expand-all"
+    And I click "#categorize-urls"
+    And I fill in selectized with "Adult"
+    And I click ".primary"
+    Then I should see "UNABLE TO CATEGORIZE"
+    And I should see "Please confirm that a URL and at least one category for each desired entry exists."
+
+  @javascript
+  Scenario: a users tries to categorize a URL with an empty form
+    Given a user with role "webcat user" exists and is logged in
+    When I goto "/escalations/webcat/complaints?f=ALL"
+    And I click ".expand-all"
+    And I click "#categorize-urls"
     And I click ".primary"
     Then I should see "UNABLE TO CATEGORIZE"
     And I should see "Please confirm that a URL and at least one category for each desired entry exists."
