@@ -70,7 +70,7 @@ window.cat_new_url = ()->
       success: (response) ->
         $('.modal-backdrop').hide()
         $('#loader-modal').hide()
-        std_msg_success('URLs categorized successfully.',["Categorization of a Top URL will create a pending complaint entry.", "All other entries have been submitted directly to WBRS."], reload: true)
+        std_msg_success('URLs categorized successfully',["Categorization of a Top URL will create a pending complaint entry.", "All other entries have been submitted directly to WBRS."], reload: true)
 
       error: (response) ->
         $('.modal-backdrop').hide()
@@ -78,7 +78,7 @@ window.cat_new_url = ()->
         std_msg_error("Error",["Unable to categorize url."], reload: false)
     )
   else
-    std_msg_error("Unable to categorize.", ["APlease confirm that a URL and at least one category for each desired entry exists"], reload: false)
+    std_msg_error("Unable to categorize", ["Please confirm that a URL and at least one category for each desired entry exists."], reload: false)
 
 
 window.webcat_reset_search = ()->
