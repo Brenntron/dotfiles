@@ -324,6 +324,16 @@ table.dataTable.no-footer {
   border: 1px solid $type-lighter-color !important;
 }
 
+#complaints-index_filter {
+  margin-left: 20px;
+
+  input {
+    width: 300px;
+    border: 1px solid #ccc;
+    border-radius: 2px;
+  }
+}
+
 /***** Pretty Tables *****/
 .pretty th .current {
 }
@@ -508,6 +518,13 @@ th.alt-col {
   display: block;
   padding: 2px 5px;
   border: none;
+}
+
+.dataTables_length{
+  label {
+    background-color: $nav-toolbar-color;
+    font-size: 9pt;
+  }
 }
 
 .toolbar-select-wrapper {
