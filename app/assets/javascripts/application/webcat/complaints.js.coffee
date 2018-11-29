@@ -91,29 +91,32 @@ window.webcat_reset_search = ()->
 
 window.multiple_url_categorization = ()->
   event.preventDefault()
-  $('#loader-modal').modal({
-    backdrop: 'static',
-    keyboard: false
-  })
 
   urls = $("#categorize_urls").val().split(/\n/)
   cats = $("#multi_cat_url_cats").val()
 
-  headers = {'Token': $('input[name="token"]').val(), 'Xmlrpc-Token': $('input[name="xml_token"]').val()}
+  if $("#categorize_urls").val() != "" && cats != null
+    $('#loader-modal').modal({
+      backdrop: 'static',
+      keyboard: false
+    })
 
-  $.ajax(
-    url:'/escalations/api/v1/escalations/webcat/complaints/multi_cat_new_url'
-    method: 'POST'
-    headers: headers
-    data: {urls: urls, cats: cats}
-    success: (response) ->
-      $('#loader-modal').hide()
-      std_msg_success('URLs categorized successfully.',"", reload: true)
-    error: (response) ->
-      $('#loader-modal').hide()
-      $('.modal-backdrop').remove();
-      std_msg_error('Error:' + ' ' + response.responseJSON.message,"", reload: false)
-  )
+    std_msg_ajax(
+      url:'/escalations/api/v1/escalations/webcat/complaints/multi_cat_new_url'
+      method: 'POST'
+      data: {urls: urls, cats: cats}
+      success: (response) ->
+        $('#loader-modal').hide()
+        $('.modal-backdrop').remove()
+        std_msg_success('Success',["URLs/IPs successfully categorized."], reload: true)
+      error: (response) ->
+        $('#loader-modal').hide()
+        $('.modal-backdrop').remove()
+        std_msg_error('Error' + ' ' + response.responseJSON.message,"", reload: false)
+    )
+  else
+    $('#loader-modal').hide()
+    std_msg_error('Error', ['Please check that a URL/IP has been inputted and that at least one category was selected.'], reload: false)
 
 name_servers =(server_list)->
   if undefined == server_list

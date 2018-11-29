@@ -226,7 +226,6 @@ Feature: Webcat complaints
   Scenario: a users tries to categorize a URL
     Given a user with role "webcat user" exists and is logged in
     When I goto "/escalations/webcat/complaints?f=ALL"
-    And I click ".expand-all"
     And I click "#categorize-urls"
     And I fill in "url_1" with "cisco.com"
     And I fill in selectized with "Adult"
@@ -239,7 +238,6 @@ Feature: Webcat complaints
   Scenario: a users tries to categorize without selecting a category
     Given a user with role "webcat user" exists and is logged in
     When I goto "/escalations/webcat/complaints?f=ALL"
-    And I click ".expand-all"
     And I click "#categorize-urls"
     And I fill in "url_1" with "cisco.com"
     And I click ".primary"
@@ -250,7 +248,6 @@ Feature: Webcat complaints
   Scenario: a users tries to categorize without an URL
     Given a user with role "webcat user" exists and is logged in
     When I goto "/escalations/webcat/complaints?f=ALL"
-    And I click ".expand-all"
     And I click "#categorize-urls"
     And I fill in selectized with "Adult"
     And I click ".primary"
@@ -261,8 +258,45 @@ Feature: Webcat complaints
   Scenario: a users tries to categorize a URL with an empty form
     Given a user with role "webcat user" exists and is logged in
     When I goto "/escalations/webcat/complaints?f=ALL"
-    And I click ".expand-all"
     And I click "#categorize-urls"
     And I click ".primary"
     Then I should see "UNABLE TO CATEGORIZE"
     And I should see "Please confirm that a URL and at least one category for each desired entry exists."
+
+  @javascript
+  Scenario: a users tries submits a multiple url categorization
+    Given a user with role "webcat user" exists and is logged in
+    When I goto "/escalations/webcat/complaints?f=ALL"
+    And I click "#categorize-urls"
+    And I click "#cat-urls-same"
+    And I fill in "categorize_urls" with "cisco.com" and "google.com" separated by blank lines
+    And I fill in selectized with "Adult"
+    And I trigger-click ".primary"
+    And I wait for "60" seconds
+    Then I should see "SUCESSS"
+    Then I should see "URLs/IPs successfully categorized."
+
+  @javascript
+  Scenario: a users tries submits a multiple url categorization without a URL
+    Given a user with role "webcat user" exists and is logged in
+    When I goto "/escalations/webcat/complaints?f=ALL"
+    And I click "#categorize-urls"
+    And I click "#cat-urls-same"
+    And I fill in selectized with "Adult"
+    And I trigger-click ".primary"
+    And I wait for "60" seconds
+    Then take a screenshot
+    Then I should see "ERROR"
+    Then I should see "Please check that a URL/IP has been inputted and that at least one category was selected."
+
+  @javascript
+  Scenario: a users tries submits a multiple url categorization without a category
+    Given a user with role "webcat user" exists and is logged in
+    When I goto "/escalations/webcat/complaints?f=ALL"
+    And I click "#categorize-urls"
+    And I click "#cat-urls-same"
+    And I fill in "categorize_urls" with "cisco.com" and "google.com" separated by blank lines
+    And I trigger-click ".primary"
+    Then I should see "ERROR"
+    Then I should see "Please check that a URL/IP has been inputted and that at least one category was selected."
+
