@@ -49,24 +49,43 @@ window.cat_new_url = ()->
     backdrop: 'static',
     keyboard: false
   })
-  data = {}
-  for i in [1...6] by 1
-    data[i] = {url: $("#url_#{i}").val(), cats: $("#cat_new_url_#{i}").val()}
-  headers = {'Token': $('input[name="token"]').val(), 'Xmlrpc-Token': $('input[name="xml_token"]').val()}
 
-  $.ajax(
-    url:'/escalations/api/v1/escalations/webcat/complaints/cat_new_url'
-    method: 'POST'
-    headers: headers
-    data: {data: data}
-    success: (response) ->
-      $('#loader-modal').hide()
-      std_msg_success('URLs categorized successfully.',["Categorization of a Top URL will create a pending complaint entry.", "All other entries have been submitted directly to WBRS."], reload: true)
-    error: (response) ->
-      $('#loader-modal').hide()
-      $('.modal-backdrop').remove()
-      std_msg_error(response,"", reload: false)
-  )
+  data = {}
+  isEmpty = true
+
+  for i in [1...6] by 1
+
+    data[i] = {url: $("#url_#{i}").val(), cats: $("#cat_new_url_#{i}").val()}
+
+    if data[i].url.length > 0 && data[i].cats != null
+      isEmpty = false
+
+  if isEmpty == false
+    $('.modal-backdrop').show()
+    $('#loader-modal').show()
+
+    std_msg_ajax(
+      url:'/escalations/api/v1/escalations/webcat/complaints/cat_new_url'
+      method: 'POST'
+
+      data: {data: data}
+      success: (response) ->
+        $('.modal-backdrop').hide()
+        $('#loader-modal').hide()
+        std_msg_success('URLs categorized successfully.',["Categorization of a Top URL will create a pending complaint entry.", "All other entries have been submitted directly to WBRS."], reload: true)
+
+      error: (response) ->
+        $('.modal-backdrop').hide()
+        $('#loader-modal').hide()
+
+        if response.responseJSON.message == "undefined method `join' for \"\":String"
+          std_msg_error("Unable to categorize url",["Please select at least one category per entry"], reload: false)
+        else
+          std_msg_error("Unable to categorize url",["Please confirm that a URL and category exist for each desired entry exists"], reload: false)
+    )
+  else
+    $('.modal-backdrop').remove()
+    std_msg_error("Unable to categorize.", ["APlease confirm that a URL and at least one category for each desired entry exists"], reload: false)
 
 window.webcat_reset_search = ()->
   inputs = document.getElementsByClassName('form-control')
