@@ -286,7 +286,6 @@ Feature: Webcat complaints
     And I fill in selectized with "Adult"
     And I trigger-click ".primary"
     And I wait for "60" seconds
-    Then take a screenshot
     Then I should see "ERROR"
     Then I should see "Please check that a URL/IP has been inputted and that at least one category was selected."
 
