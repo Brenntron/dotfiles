@@ -73,19 +73,11 @@ window.cat_new_url = ()->
         std_msg_success('URLs categorized successfully.',["Categorization of a Top URL will create a pending complaint entry.", "All other entries have been submitted directly to WBRS."], reload: true)
 
       error: (response) ->
-        $('.modal-backdrop').show()
-        $('#loader-modal').show()
-
-        if response.responseJSON.message == "undefined method `join' for \"\":String"
-          std_msg_error("Unable to categorize url",["Please select at least one category per entry"], reload: false)
-        else
-          std_msg_error("Unable to categorize url",["Please confirm that a URL and category exist for each desired entry exists"], reload: false)
         $('.modal-backdrop').hide()
         $('#loader-modal').hide()
+        std_msg_error("Error",["Unable to categorize url."], reload: false)
     )
   else
-
-
     std_msg_error("Unable to categorize.", ["APlease confirm that a URL and at least one category for each desired entry exists"], reload: false)
 
 
