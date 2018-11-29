@@ -13,7 +13,6 @@ end
 Given(/^I fill in "(.*?)" with today's date"$/) do |field_label|
   time = Time.now.strftime("%Y-%m-%d")
   fill_in field_label, :with => time
-
 end
 
 When(/^I click "(.*?)"$/) do |target|
