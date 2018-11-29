@@ -162,13 +162,13 @@ class DisputeEmail < ApplicationRecord
       params[:attachments].each do |key, attachment|
 
         payload = {}
-        payload[:file_name] = attachment.filename
-        payload[:file_content] = attachment.tempfile
-        payload[:content_type] = attachment.type
+        payload[:file_name] = attachment['filename']
+        payload[:file_content] = attachment['tempfile']
+        payload[:content_type] = attachment['type']
         new_local_attachment = DisputeEmailAttachment.build_and_push_to_bugzilla(xmlrpc, payload, user, new_email, false)
         s3_file_path = new_local_attachment.push_to_aws(attachment)
         new_attachment = {}
-        new_attachment[:file_name] = attachment.filename
+        new_attachment[:file_name] = attachment['filename']
         new_attachment[:file_url] = new_local_attachment.s3_url(s3_file_path)
         attachments_to_mail << new_attachment
       end

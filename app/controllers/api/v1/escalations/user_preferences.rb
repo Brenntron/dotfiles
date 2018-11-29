@@ -26,7 +26,7 @@ module API
           end
           post "update", root: :user_preferences do
             name = params['name']
-            columns = params.data
+            columns = params['data']
 
             user_preference = UserPreference.create_with(value: {}).find_or_create_by(user_id: current_user.id, name: name)
 
