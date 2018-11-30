@@ -460,11 +460,11 @@ window.lookup_prefix = () ->
       for [i .. 5]
         j = 0
         try
-          for [j .. response.json[i].data.length]
+          for [j .. 5]
             selector = '#cat_new_url_' + i.toString()
             $select= $(selector).selectize()
             selectize = $select[0].selectize
-            selectize.addItem(response.json[i].data[j].descr)
+            selectize.addItem(response.json[i][j])
             j++
         catch
           i++

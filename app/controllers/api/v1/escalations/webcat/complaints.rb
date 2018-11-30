@@ -179,7 +179,9 @@ module API
 
             post 'lookup_prefix' do
               prefix_ids = {}
+              categories = {}
 
+              # Grab prefix id for each URL
               permitted_params['urls'].each_with_index do |param, position|
                 prefix_record = Wbrs::Prefix.where(:urls => [param])
                 if !prefix_record.empty? && prefix_record.first.is_active == 1
@@ -190,19 +192,28 @@ module API
               end
 
               responses = {}
-              response_json = {}
 
+              # Make call to API for each prefix id
               prefix_ids.each do |position, prefix_id|
                 if prefix_id != nil
-                  responses[position]= (Wbrs::Prefix.post_request(path: '/v1/cat/rules/get', body: { prefix_ids: [prefix_id] }))
+                  responses[position] = (Wbrs::Prefix.post_request(path: '/v1/cat/rules/get', body: { prefix_ids: [prefix_id] }))
                 end
               end
 
+              # Convert the API response to JSON
               responses.each do |position, response|
-                response_json[position] = JSON.parse(response.body)
+                responses[position] = JSON.parse(response.body)
               end
 
-              render json: response_json
+              # Loop through each individual response's categories and add their name to a hash
+              responses.each do |position, response|
+                categories[position] = {}
+                response['data'].each_with_index do |data, category_position|
+                  categories[position][category_position] = Wbrs::Category.find(data['category_id']).descr
+                end
+              end
+
+              render json: categories
             end
 
             params do
