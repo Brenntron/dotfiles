@@ -92,6 +92,7 @@ window.populate_webrep_index_table = (data = {}) ->
             $('.dispute_check_box').each ->
               if this.value == dispute_click
                 this.checked = true
+                datatable.row(this.closest('tr')).select()
 
         if array_of_dispute_entry_clicks.length > 0
           for dispute_entry_click in array_of_dispute_entry_clicks
@@ -1003,9 +1004,31 @@ $ ->
 
     )
 
-  $('#disputes_check_box').change ->
-    $('.dispute_check_box').prop 'checked', @checked
-    return
+  window.toggleRow = (box) ->
+    if $(box)[0].checked
+      $(box).closest('tr').addClass('selected')
+    else
+      $(box).closest('tr').removeClass('selected')
+
+  $('.ticket-status-radio').click ->
+    all_stat_radios = $('#index-edit-ticket-status-dropdown').find('.status-radio-wrapper')
+    if $(this).is(':checked')
+      wrapper = $(this).parent()
+      $(all_stat_radios).removeClass('selected')
+      $(wrapper).addClass('selected')
+
+    if $(this).attr('id') == 'RESOLVED_CLOSED'
+#      debugger
+      $('#show-ticket-resolution-submenu').show()
+      stat_comment = $('#ticket-non-res-submit').find('.ticket-status-comment')
+      $('#ticket-non-res-submit').hide()
+      $(stat_comment).val('')
+    else
+      $('#ticket-non-res-submit').show()
+      res_comment = $('.resolution-comment-wrapper').find('.ticket-status-comment')
+      $('.ticket-resolution-radio').prop('checked', false)
+      $('#show-ticket-resolution-submenu').hide()
+      $(res_comment[0]).val('')
 
   # Edit Ticket: Edit Ticket Status
   $('#index_ticket_status').click ->
@@ -1097,7 +1120,7 @@ $ ->
       9
       'desc'
     ] ]
-    dom: '<"datatable-top-tools"lf>t<ip>'
+    dom: '<"datatable-top-tools no-margin-datatable-top-tool"lf>t<ip>'
     columnDefs: [
       {
         targets: [
@@ -1145,7 +1168,7 @@ $ ->
 
         render: (data) ->
 
-          '<input type="checkbox" name="cbox" class="dispute_check_box" id="cbox' + data + '" value="' + data + '" />'
+          '<input type="checkbox" onclick="toggleRow(this)" name="cbox" class="dispute_check_box" id="cbox' + data + '" value="' + data + '" />'
 
       }
       {
@@ -1372,41 +1395,41 @@ $ ->
 $ ->
 
   $('#advanced-search-button').click ->
-  std_msg_ajax(
-    method: 'GET'
-    url: '/escalations/api/v1/escalations/webrep/disputes/autopopulate_advanced_search'
-    success: (response) ->
+    std_msg_ajax(
+      method: 'GET'
+      url: '/escalations/api/v1/escalations/webrep/disputes/autopopulate_advanced_search'
+      success: (response) ->
 
-      $('#user-list').empty()
-      $('#status-list').empty()
-      $('#submittertype-list').empty()
-      $('#contactname-list').empty()
-      $('#contactemail-list').empty()
-      $('#company-list').empty()
-      $('#resolution-list').empty()
+        $('#user-list').empty()
+        $('#status-list').empty()
+        $('#submittertype-list').empty()
+        $('#contactname-list').empty()
+        $('#contactemail-list').empty()
+        $('#company-list').empty()
+        $('#resolution-list').empty()
 
 
-      for user in response.json.case_owners
-        $('#user-list').append '<option value=\'' + user.cvs_username + '\'></option>'
+        for user in response.json.case_owners
+          $('#user-list').append '<option value=\'' + user.cvs_username + '\'></option>'
 
-      for status in response.json.statuses
-        $('#status-list').append '<option value=\'' + status + '\'></option>'
+        for status in response.json.statuses
+          $('#status-list').append '<option value=\'' + status + '\'></option>'
 
-      for type in response.json.submitter_types
-        $('#submittertype-list').append '<option value=\'' + type + '\'></option>'
+        for type in response.json.submitter_types
+          $('#submittertype-list').append '<option value=\'' + type + '\'></option>'
 
-      for contact in response.json.contacts
-        $('#contactname-list').append '<option value=\'' + contact.name + '\'></option>'
+        for contact in response.json.contacts
+          $('#contactname-list').append '<option value=\'' + contact.name + '\'></option>'
 
-      for contact in response.json.contacts
-        $('#contactemail-list').append '<option value=\'' + contact.email + '\'></option>'
+        for contact in response.json.contacts
+          $('#contactemail-list').append '<option value=\'' + contact.email + '\'></option>'
 
-      for company in response.json.companies
-        $('#company-list').append '<option value=\'' + company.name + '\'></option>'
+        for company in response.json.companies
+          $('#company-list').append '<option value=\'' + company.name + '\'></option>'
 
-      for resolution in response.json.resolutions
-        $('#resolution-list').append '<option value=\'' + resolution + '\'></option>'
-  )
+        for resolution in response.json.resolutions
+          $('#resolution-list').append '<option value=\'' + resolution + '\'></option>'
+    )
 
 
   $(document).ready ->
