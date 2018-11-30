@@ -314,6 +314,41 @@ window.build_graph_ticket_entries_submitter = () ->
             ]
       )
 
+      new Chart($('#graph-multiuser-ticket-entries-submitter'),
+        type: 'bar'
+        data:
+          labels: submitterChartLabels
+          datasets: [
+            {
+              backgroundColor: '#6dbcdb'
+              data: submitterCustomerChartData
+            }
+            {
+              backgroundColor: '#2c3e50'
+              data: submitterGuestChartData
+            }
+          ]
+        options:
+          legend: display: false
+          scales:
+            yAxes: [
+              {
+                gridLines: display: false
+                ticks: {
+                  min: 0
+                }
+              }
+            ]
+            xAxes: [
+              {
+                gridLines: display: false
+                ticks: {
+                  autoSkip: false
+                }
+              }
+            ]
+      )
+
     error: (response) ->
       popup_response_error(response, 'Error building chart')
   )

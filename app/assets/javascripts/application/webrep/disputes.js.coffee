@@ -2218,43 +2218,43 @@ $ ->
 
 
 
-  multiuserCustomerSubmissions = [15, 18, 22, 18, 12, 43, 31]
-  multiuserGuestSubmissions = [8, 6, 7, 13, 9, 15, 21]
+  #multiuserCustomerSubmissions = [15, 18, 22, 18, 12, 43, 31]
+  #multiuserGuestSubmissions = [8, 6, 7, 13, 9, 15, 21]
 
-  new Chart($('#graph-multiuser-ticket-entries-submitter'),
-    type: 'bar'
-    data:
-      labels: dateRange
-      datasets: [
-        {
-          backgroundColor: '#6dbcdb'
-          data: multiuserCustomerSubmissions
-        }
-        {
-          backgroundColor: '#2c3e50'
-          data: multiuserGuestSubmissions
-        }
-      ]
-    options:
-      legend: display: false
-      scales:
-        yAxes: [
-          {
-            gridLines: display: false
-            ticks: {
-              min: 0
-            }
-          }
-        ]
-        xAxes: [
-          {
-            gridLines: display: false
-            ticks: {
-              autoSkip: false
-            }
-          }
-        ]
-  )
+  #new Chart($('#graph-multiuser-ticket-entries-submitter'),
+  #  type: 'bar'
+  #  data:
+  #    labels: dateRange
+  #    datasets: [
+  #      {
+  #        backgroundColor: '#6dbcdb'
+  #        data: multiuserCustomerSubmissions
+  #      }
+  #      {
+  #        backgroundColor: '#2c3e50'
+  #        data: multiuserGuestSubmissions
+  #      }
+  #    ]
+  #  options:
+  #    legend: display: false
+  #    scales:
+  #      yAxes: [
+  #        {
+  #          gridLines: display: false
+  #          ticks: {
+  #            min: 0
+  #          }
+  #        }
+  #      ]
+  #      xAxes: [
+  #        {
+  #          gridLines: display: false
+  #          ticks: {
+  #            autoSkip: false
+  #          }
+  #        }
+  #      ]
+  #)
 
   #new Chart(document.getElementById('team-pie-chart'),
   #  type: 'pie'
