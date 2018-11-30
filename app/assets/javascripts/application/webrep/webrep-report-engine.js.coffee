@@ -314,6 +314,41 @@ window.build_graph_ticket_entries_submitter = () ->
             ]
       )
 
+      new Chart($('#graph-multiuser-ticket-entries-submitter'),
+        type: 'bar'
+        data:
+          labels: submitterChartLabels
+          datasets: [
+            {
+              backgroundColor: '#6dbcdb'
+              data: submitterCustomerChartData
+            }
+            {
+              backgroundColor: '#2c3e50'
+              data: submitterGuestChartData
+            }
+          ]
+        options:
+          legend: display: false
+          scales:
+            yAxes: [
+              {
+                gridLines: display: false
+                ticks: {
+                  min: 0
+                }
+              }
+            ]
+            xAxes: [
+              {
+                gridLines: display: false
+                ticks: {
+                  autoSkip: false
+                }
+              }
+            ]
+      )
+
     error: (response) ->
       popup_response_error(response, 'Error building chart')
   )
@@ -683,9 +718,171 @@ window.build_single_entries_closed_by_day_chart = () ->
     error: (response) ->
       popup_response_error(response, 'Error building chart')
   )
-
-
 #### Multi User Graphs #####
+
+window.build_multi_entries_closed_by_day_chart = () =>
+  from = localStorage.getItem('webrep_report_range_from')
+  to = localStorage.getItem('webrep_report_range_to')
+  user_id = $("#user_id").val()
+  team_ids = $.parseJSON("{\"team\":" + $("#team_ids").val() + "}")
+  data = {
+    from: from,
+    to: to,
+    users: team_ids['team']
+  }
+
+  headers = {'Token': $('input[name="token"]').val(), 'Xmlrpc-Token': $('input[name="xml_token"]').val()}
+  $.ajax(
+    url: '/escalations/api/v1/escalations/webrep/reports/ticket_entries_closed_by_day_report'
+    method: 'GET'
+    headers: headers
+    data: data
+    dataType: 'json'
+    success: (response) ->
+
+      json = $.parseJSON(response)
+
+      totalTicketEnties = json["data"]["report_total_data"]
+      emailTicketEntries = json["data"]["report_e_data"]
+      webTicketEntries = json["data"]["report_w_data"]
+      ewTicketEntries = json["data"]["report_ew_data"]
+
+      dateRange = json["data"]["report_labels"]
+
+      totalTicketEntriesbyType = [
+        {
+          label: 'Total Ticket Entries'
+          backgroundColor: '#6dbcdb'
+          data: totalTicketEnties
+        }
+        {
+          label: 'E'
+          backgroundColor: '#8cc63f'
+          data: emailTicketEntries
+        }
+        {
+          label: 'W'
+          backgroundColor: '#E47433'
+          data: webTicketEntries
+        }
+        {
+          label: 'EW'
+          backgroundColor: '#BA55D3'
+          data: ewTicketEntries
+        }
+      ]
+
+
+      window.multiuser_ticket_type_totals = new Chart($('#graph-multiuser-ticket-entries-closed'),
+        type: 'bar'
+        data:
+          labels: dateRange
+          datasets: totalTicketEntriesbyType
+        options:
+          legend: display: false
+          scales:
+            yAxes: [
+              {
+                gridLines: display: false
+              }
+            ]
+            xAxes: [
+              {
+                gridLines: display: false
+                ticks: {
+                  autoSkip: false
+                }
+              }
+            ]
+      )
+
+
+    error: (response) ->
+      popup_response_error(response, 'Error building chart')
+  )
+#### Multi User Graphs #####
+
+window.build_multi_ticket_resolution_by_owner_chart = () ->
+  from = localStorage.getItem('webrep_report_range_from')
+  to = localStorage.getItem('webrep_report_range_to')
+  user_id = $("#user_id").val()
+  team_ids = $.parseJSON("{\"team\":" + $("#team_ids").val() + "}")
+  data = {
+    from: from,
+    to: to,
+    users: team_ids['team']
+  }
+
+  headers = {'Token': $('input[name="token"]').val(), 'Xmlrpc-Token': $('input[name="xml_token"]').val()}
+  $.ajax(
+    url: '/escalations/api/v1/escalations/webrep/reports/ticket_entry_resolution_by_ticket_owner'
+    method: 'GET'
+    headers: headers
+    data: data
+    dataType: 'json'
+    success: (response) ->
+
+      json = $.parseJSON(response)
+
+      ticketOwners = json["data"]["ticket_owners"]
+      fixedFPTickets = json["data"]["fixed_fp_tickets"]
+      fixedFNTickets = json["data"]["fixed_fn_tickets"]
+      unchangedTickets = json["data"]["unchanged_tickets"]
+      otherTickets = json["data"]["other_tickets"]
+
+      new Chart($('#ticket-resolutions-by-owner'),
+        type: 'bar'
+        data:
+          labels: ticketOwners
+          datasets: [
+            {
+              label: 'Fixed FP'
+              backgroundColor: '#6dbcdb'
+              data: fixedFPTickets
+            }
+            {
+              label: 'Fixed FN'
+              backgroundColor: '#2c3e50'
+              data: fixedFNTickets
+            }
+            {
+              label: 'Unchanged'
+              backgroundColor: '#999'
+              data: unchangedTickets
+            }
+            {
+              label: 'Other'
+              backgroundColor: '#E47433'
+              data: otherTickets
+            }
+          ]
+        options:
+          title:
+            display: false
+          legend: display: false
+          scales:
+            yAxes: [
+              {
+                gridLines: display: false
+                ticks: {
+                  min: 0
+                }
+              }
+            ]
+            xAxes: [
+              {
+                gridLines: display: false
+              }
+            ]
+      )
+
+
+
+    error: (response) ->
+      popup_response_error(response, 'Error building chart')
+  )
+
+
 
 #  Ticket entries closed by ticket owner
 
@@ -752,7 +949,68 @@ window.build_multi_entries_closed_by_owners_chart = () ->
       popup_response_error(response, 'Error building chart')
   )
 
+window.build_multi_average_time_to_close_tickets = () ->
+  from = localStorage.getItem('webrep_report_range_from')
+  to = localStorage.getItem('webrep_report_range_to')
+  user_id = $("#user_id").val()
+  team_ids = $.parseJSON("{\"team\":" + $("#team_ids").val() + "}")
+  data = {
+    from: from,
+    to: to,
+    users: team_ids['team']
+  }
 
+  headers = {'Token': $('input[name="token"]').val(), 'Xmlrpc-Token': $('input[name="xml_token"]').val()}
+  $.ajax(
+    url: '/escalations/api/v1/escalations/webrep/reports/average_time_to_close_tickets_by_ticket_owner_report'
+    method: 'GET'
+    headers: headers
+    data: data
+    dataType: 'json'
+    success: (response) ->
+
+      json = $.parseJSON(response)
+
+      ticketOwners = json["data"]["report_labels"]
+      avgTimeToCloseTickets = json["data"]["report_data"]
+      
+      new Chart($('#avg-time-to-close-tickets'),
+        type: 'horizontalBar'
+        data:
+          labels: ticketOwners
+          datasets: [ {
+            backgroundColor: '#6dbcdb'
+            data: avgTimeToCloseTickets
+          } ]
+        options:
+          legend: display: false
+          scales:
+            yAxes: [
+              {
+                gridLines: display: false
+                ticks: {
+                  min: 0
+                }
+              }
+            ]
+            xAxes: [
+              {
+                gridLines: display: false
+                ticks: {
+                  min: 0
+                }
+                scaleLabel: {
+                  display: true,
+                  labelString: 'Hours'
+                }
+              }
+            ]
+      )
+
+
+    error: (response) ->
+      popup_response_error(response, 'Error building chart')
+  )
 
 
 
@@ -873,13 +1131,15 @@ $ ->
   window.build_multi_closed_web_entries_resolution_piechart()
   window.build_single_entries_closed_by_day_chart()
 
+  window.build_multi_average_time_to_close_tickets()
+
   window.refresh_multi_closed_tickets_table()
   window.refresh_multi_open_tickets_table()
 
   window.build_multi_entries_closed_by_owners_chart()
 
-
-
-
-
   window.build_multi_rulehits_for_fp_res_chart()
+
+  window.build_multi_entries_closed_by_day_chart()
+
+  window.build_multi_ticket_resolution_by_owner_chart()
