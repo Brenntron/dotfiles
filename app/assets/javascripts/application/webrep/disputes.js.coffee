@@ -2035,40 +2035,40 @@ $ ->
 
 
 # Average time to close tickets by ticket owner graph
-  avgTimeToCloseTickets = [.8, .7, 1.7, 1.6, 2]
+#  avgTimeToCloseTickets = [.8, .7, 1.7, 1.6, 2]
 
-  new Chart($('#avg-time-to-close-tickets'),
-    type: 'horizontalBar'
-    data:
-      labels: ticketOwners
-      datasets: [ {
-        backgroundColor: '#6dbcdb'
-        data: avgTimeToCloseTickets
-      } ]
-    options:
-      legend: display: false
-      scales:
-        yAxes: [
-          {
-            gridLines: display: false
-            ticks: {
-              min: 0
-            }
-          }
-        ]
-        xAxes: [
-          {
-            gridLines: display: false
-            ticks: {
-              min: 0
-            }
-            scaleLabel: {
-              display: true,
-              labelString: 'Hours'
-            }
-          }
-        ]
-  )
+#  new Chart($('#avg-time-to-close-tickets'),
+#    type: 'horizontalBar'
+#    data:
+#      labels: ticketOwners
+#      datasets: [ {
+#        backgroundColor: '#6dbcdb'
+#        data: avgTimeToCloseTickets
+#      } ]
+#    options:
+#      legend: display: false
+#      scales:
+#        yAxes: [
+#          {
+#            gridLines: display: false
+#            ticks: {
+#              min: 0
+#            }
+#          }
+#        ]
+#        xAxes: [
+#          {
+#            gridLines: display: false
+#            ticks: {
+#              min: 0
+#            }
+#            scaleLabel: {
+#              display: true,
+#              labelString: 'Hours'
+#            }
+#          }
+#        ]
+#  )
 
 
 # Ticket Resolutions by Ticket Owner graph
