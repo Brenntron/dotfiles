@@ -2162,59 +2162,59 @@ $ ->
 
 
 
-  totalTicketEnties = [15, 18, 22, 18, 24, 10, 12]
-  emailTicketEntries = [15, 18, 22, 18, 24, 10, 2]
-  webTicketEntries = [15, 18, 22, 18, 24, 10, 5]
-  ewTicketEntries = [15, 18, 22, 18, 24, 10, 7]
+#  totalTicketEnties = [15, 18, 22, 18, 24, 10, 12]
+#  emailTicketEntries = [15, 18, 22, 18, 24, 10, 2]
+#  webTicketEntries = [15, 18, 22, 18, 24, 10, 5]
+#  ewTicketEntries = [15, 18, 22, 18, 24, 10, 7]
 
-  totalTicketEntriesbyType = [
-    {
-      label: 'Total Ticket Entries'
-      backgroundColor: '#6dbcdb'
-      data: totalTicketEnties
-    }
-    {
-      label: 'E'
-      backgroundColor: '#8cc63f'
-      data: emailTicketEntries
-    }
-    {
-      label: 'W'
-      backgroundColor: '#E47433'
-      data: webTicketEntries
-    }
-    {
-      label: 'EW'
-      backgroundColor: '#BA55D3'
-      data: ewTicketEntries
-    }
-  ]
+#  totalTicketEntriesbyType = [
+#    {
+#      label: 'Total Ticket Entries'
+#      backgroundColor: '#6dbcdb'
+#      data: totalTicketEnties
+#    }
+#    {
+#      label: 'E'
+#      backgroundColor: '#8cc63f'
+#      data: emailTicketEntries
+#    }
+#    {
+#      label: 'W'
+#      backgroundColor: '#E47433'
+#      data: webTicketEntries
+#    }
+#    {
+#      label: 'EW'
+#      backgroundColor: '#BA55D3'
+#      data: ewTicketEntries
+#    }
+#  ]
 
   dateRange = ['September 2', 'September 3', 'September 4', 'September 5', 'September 6', 'September 7', 'September 8']
 
 
-  window.multiuser_ticket_type_totals = new Chart($('#graph-multiuser-ticket-entries-closed'),
-    type: 'bar'
-    data:
-      labels: dateRange
-      datasets: totalTicketEntriesbyType
-    options:
-      legend: display: false
-      scales:
-        yAxes: [
-          {
-            gridLines: display: false
-          }
-        ]
-        xAxes: [
-          {
-            gridLines: display: false
-            ticks: {
-              autoSkip: false
-            }
-          }
-        ]
-    )
+#  window.multiuser_ticket_type_totals = new Chart($('#graph-multiuser-ticket-entries-closed'),
+#    type: 'bar'
+#    data:
+#      labels: dateRange
+#      datasets: totalTicketEntriesbyType
+#    options:
+#      legend: display: false
+#      scales:
+#        yAxes: [
+#          {
+#            gridLines: display: false
+#          }
+#        ]
+#        xAxes: [
+#          {
+#            gridLines: display: false
+#            ticks: {
+#              autoSkip: false
+#            }
+#          }
+#        ]
+#    )
 
 
 
