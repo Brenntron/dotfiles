@@ -363,6 +363,7 @@ class Dispute < ApplicationRecord
   #end dispute building instance methods
   #
   def self.process_bridge_payload(message_payload)
+
     new_dispute = nil
     verdicts_to_blacklist = []
     user = User.where(cvs_username:"vrtincom").first
@@ -470,6 +471,10 @@ class Dispute < ApplicationRecord
           new_dispute_entry.wbrs_score = entry[:wbrs]["WBRS_SCORE"] == "No score" ? nil : entry[:wbrs]["WBRS_SCORE"]
           new_dispute_entry.suggested_disposition = entry[:sbrs]["rep_sugg"]
 
+          new_dispute_entry.save!
+
+          logger.info "fetching preload"
+          ::Preloader::Base.fetch_all_api_data(key, new_dispute_entry.id)
 
           case
           when !false_negative_claim
@@ -477,14 +482,15 @@ class Dispute < ApplicationRecord
           else
             auto_resolve_verdict = new_dispute_entry.assign_from_auto_resolve(address: key,
                                                                               total_hits: total_hits,
-                                                                              resolved_at: resolved_at)
+                                                                              resolved_at: resolved_at,
+                                                                              dispute_entry: new_dispute_entry)
 
             if auto_resolve_verdict.resolved? && auto_resolve_verdict.malicious?
               verdicts_to_blacklist << [auto_resolve_verdict, new_dispute_entry]
             end
           end
-          new_dispute_entry.save!
 
+          new_dispute_entry.save!
 
           #this is for return back to TI to populate its ticket show pages
           return_payload[key] = new_dispute_entry.new_payload_item
@@ -510,9 +516,6 @@ class Dispute < ApplicationRecord
               new_rule_hit.save!
             end
           end
-
-          logger.debug "fetching preload"
-          ::Preloader::Base.fetch_all_api_data(key, new_dispute_entry.id)
 
         end
         logger.debug "Creating url entries"
@@ -547,15 +550,19 @@ class Dispute < ApplicationRecord
           new_dispute_entry.path = url_parts[:path]
           new_dispute_entry.hostname = "#{url_parts[:subdomain]}.#{url_parts[:domain]}"
 
+          new_dispute_entry.save!
 
+          logger.info "fetching preload"
+          ::Preloader::Base.fetch_all_api_data(key, new_dispute_entry.id)
 
           case
           when !false_negative_claim
-            new_dispute_entry.status = DisputeEntry::NEW
+            new_dispute_entry.update(status: DisputeEntry::NEW)
           else
             auto_resolve_verdict = new_dispute_entry.assign_from_auto_resolve(address: key,
                                                                               total_hits: total_hits,
-                                                                              resolved_at: resolved_at)
+                                                                              resolved_at: resolved_at,
+                                                                              dispute_entry: new_dispute_entry)
 
             if auto_resolve_verdict.resolved? && auto_resolve_verdict.malicious?
               verdicts_to_blacklist << [auto_resolve_verdict, new_dispute_entry]
@@ -563,7 +570,6 @@ class Dispute < ApplicationRecord
           end
 
           new_dispute_entry.save!
-
 
           return_payload[key] = new_dispute_entry.new_payload_item
 
@@ -577,9 +583,6 @@ class Dispute < ApplicationRecord
               new_rule_hit.save!
             end
           end
-
-          logger.debug "fetching preload"
-          ::Preloader::Base.fetch_all_api_data(key, new_dispute_entry.id)
 
         end
         new_dispute.reload
