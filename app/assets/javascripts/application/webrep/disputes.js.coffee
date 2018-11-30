@@ -1842,16 +1842,16 @@ $ ->
 
 #  )
 
-  closedTicketNumbers = [375502, 375504, 375513, 375515, 375516, 375517, 375518, 375519, 375520, 375521, 375522]
-  timeToCloseTickets = [1, 1.3, 1.2, 1.5, 1.7, 1.4, 1.8, 0.9, 1, 1.1, 1.2, 1.5, 1.6]
-  allTimeToClose = undefined
-  averageTimeToClose = 0
-  if timeToCloseTickets.length
-    allTimeToClose = timeToCloseTickets.reduce((a, b) ->
-      a + b
-    )
-    averageTimeToClose = allTimeToClose / timeToCloseTickets.length
-    averageTimeToClose = Math.round(averageTimeToClose * 100)/100
+  #closedTicketNumbers = [375502, 375504, 375513, 375515, 375516, 375517, 375518, 375519, 375520, 375521, 375522]
+  #timeToCloseTickets = [1, 1.3, 1.2, 1.5, 1.7, 1.4, 1.8, 0.9, 1, 1.1, 1.2, 1.5, 1.6]
+  #allTimeToClose = undefined
+  #averageTimeToClose = 0
+  #if timeToCloseTickets.length
+  #  allTimeToClose = timeToCloseTickets.reduce((a, b) ->
+  #    a + b
+  #  )
+  #  averageTimeToClose = allTimeToClose / timeToCloseTickets.length
+  #  averageTimeToClose = Math.round(averageTimeToClose * 100)/100
 
   window.averageTimeToCloseLabel = (hourAmount) ->
     totalSecond = hourAmount * 60 * 60
@@ -1869,78 +1869,78 @@ $ ->
       value += seconds + 's'
     return
 
-  averageTimeToCloseLabel(averageTimeToClose)
+  #averageTimeToCloseLabel(averageTimeToClose)
 
-  window.timeCloseTicketsDataSets = [
-    {
-      data: timeToCloseTickets
-      label: 'Time to Close:'
-      backgroundColor: '#6dbcdb'
-      borderColor: '#55a3c1'
-      borderWidth: 2
-      fill: true
-      lineTension: 0
-    }
-  ]
+  #window.timeCloseTicketsDataSets = [
+  #  {
+  #    data: timeToCloseTickets
+  #    label: 'Time to Close:'
+  #    backgroundColor: '#6dbcdb'
+  #    borderColor: '#55a3c1'
+  #    borderWidth: 2
+  #    fill: true
+  #    lineTension: 0
+  #  }
+  #]
 
-  new Chart($('#time-to-close-tickets-linechart'),
-    type: 'line'
-    data:
-      labels: closedTicketNumbers
-      datasets: window.timeCloseTicketsDataSets
-    options:
-      legend: false
-      elements:
-        point:
-          radius: 0
-      scales:
-        yAxes: [
-          {
-            gridLines:
-              display: false
-            ticks: {
-              min: 0
-              stepSize: .5
-              callback: (value, index, values) ->
-                return value + ' hr'
-            }
-          }
-        ]
-        xAxes: [
-          {
-            gridLines:
-              display: false
-            scaleLabel: {
-              display: true,
-              labelString: 'Tickets'
-            }
-            ticks: {
-              display: false
-            }
-          }
-          ]
-      annotation: {
-        annotations: [
-          {
-            type: 'line'
-            drawTime: 'afterDatasetsDraw'
-            mode: 'horizontal'
-            scaleID: 'y-axis-0'
-            value: averageTimeToClose
-            borderColor: '#304A60'
-            borderWidth: 1
-            label: {
-              backgroundColor: 'transparent'
-              fontStyle: 'normal'
-              fontColor: '#666'
-              fontSize: 14
-              content: 'Average: ' + averageTimeToClose + ' hr'
-              position: 'right'
-              yAdjust: -10
-              enabled: true
-            }
-          }]
-      })
+  #new Chart($('#time-to-close-tickets-linechart'),
+  #  type: 'line'
+  #  data:
+  #    labels: closedTicketNumbers
+  #    datasets: window.timeCloseTicketsDataSets
+  #  options:
+  #    legend: false
+  #    elements:
+  #      point:
+  #        radius: 0
+  #    scales:
+  #      yAxes: [
+  #        {
+  #          gridLines:
+  #            display: false
+  #          ticks: {
+  #            min: 0
+  #            stepSize: .5
+  #            callback: (value, index, values) ->
+  #              return value + ' hr'
+  #          }
+  #        }
+  #      ]
+  #      xAxes: [
+  #        {
+  #          gridLines:
+  #            display: false
+  #          scaleLabel: {
+  #            display: true,
+  #            labelString: 'Tickets'
+  #          }
+  #          ticks: {
+  #            display: false
+  #          }
+  #        }
+  #        ]
+  #    annotation: {
+  #      annotations: [
+  #        {
+  #          type: 'line'
+  #          drawTime: 'afterDatasetsDraw'
+  #          mode: 'horizontal'
+  #          scaleID: 'y-axis-0'
+  #          value: averageTimeToClose
+  #          borderColor: '#304A60'
+  #          borderWidth: 1
+  #          label: {
+  #            backgroundColor: 'transparent'
+  #            fontStyle: 'normal'
+  #            fontColor: '#666'
+  #            fontSize: 14
+  #            content: 'Average: ' + averageTimeToClose + ' hr'
+  #            position: 'right'
+  #            yAdjust: -10
+  #            enabled: true
+  #          }
+  #        }]
+  #    })
 
 
 
