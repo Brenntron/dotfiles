@@ -6380,6 +6380,23 @@ table#duplicates a {
   height: 26px;
 }
 
+.bug-tabs .nav-tabs li a {
+  background-color: #f2f2f2 !important;
+}
+
+.bug-tabs .nav-tabs li.active a {
+  background-color: #fff !important;
+}
+
+#sidenav-menu-div a {
+  padding-top: 13px;
+}
+
+#sidenav-menu-div .sub-nav a {
+  padding-top: 0;
+}
+
+
 /* These below can be deleted after redesign merge, or after the existing style sheet is ported. They exist in the admin redesign stylesheet. */
 
 h2 {
