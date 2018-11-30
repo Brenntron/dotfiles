@@ -2127,38 +2127,38 @@ $ ->
 
 
 #  Rule Hits for FP Resolutions Graph
-  fpRules = ['a500', 'alx_ cln', 'mute_phish', 'sbl', 'srch', 'suwl', 'trd_mal']
-  totalRuleHits = [ 5, 18, 9, 14, 4, 7, 3]
+#  fpRules = ['a500', 'alx_ cln', 'mute_phish', 'sbl', 'srch', 'suwl', 'trd_mal']
+#  totalRuleHits = [ 5, 18, 9, 14, 4, 7, 3]
 
-  new Chart($('#rule-hits-fp-resolutions'),
-    type: 'horizontalBar'
-    data:
-      labels: fpRules
-      datasets: [ {
-        backgroundColor: '#6dbcdb'
-        data: totalRuleHits
-      } ]
-    options:
-      legend: display: false
-      scales:
-        yAxes: [
-          {
-            gridLines: display: false
-          }
-        ]
-        xAxes: [
-          {
-            gridLines: display: false
-            ticks: {
-              min: 0
-            }
-            scaleLabel: {
-              display: true,
-              labelString: 'Total Ticket Entries with FP Resolutions'
-            }
-          }
-        ]
-  )
+#  new Chart($('#rule-hits-fp-resolutions'),
+#    type: 'horizontalBar'
+#    data:
+#      labels: fpRules
+#      datasets: [ {
+#        backgroundColor: '#6dbcdb'
+#        data: totalRuleHits
+#      } ]
+#    options:
+#      legend: display: false
+#      scales:
+#        yAxes: [
+#          {
+#            gridLines: display: false
+#          }
+#        ]
+#        xAxes: [
+#          {
+#            gridLines: display: false
+#            ticks: {
+#              min: 0
+#            }
+#            scaleLabel: {
+#              display: true,
+#              labelString: 'Total Ticket Entries with FP Resolutions'
+#            }
+#          }
+#        ]
+#  )
 
 
 
