@@ -1544,7 +1544,11 @@ class Dispute < ApplicationRecord
     to = Time.parse(to)
 
     raw_data = {}
-    report_data = {}
+    report = {}
+    report_data = []
+
+    report_labels = []
+
 
     user_ids = users.pluck(:id)
 
@@ -1561,14 +1565,20 @@ class Dispute < ApplicationRecord
     raw_data.each do |k, v|
       avg = v.inject{ |sum, el| sum + el }.to_f / v.size
 
+      report_labels << k
       if !avg.nan?
-        report_data[k] = avg
+        #report_data[k] = avg
+        report_data << avg
       else
-        report_data[k] = 0
+        #report_data[k] = 0
+        report_data << 0
       end
     end
 
-    report_data
+    report[:report_data] = report_data
+    report[:report_labels] = report_labels
+
+    report
   end
 
   def self.ticket_entry_resolution_by_ticket_owner(users, from, to)
