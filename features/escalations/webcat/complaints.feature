@@ -300,3 +300,25 @@ Feature: Webcat complaints
     Then I should see "ERROR"
     Then I should see "Please check that a URL/IP has been inputted and that at least one category was selected."
 
+  @javascript
+  Scenario: a users tries to fetch complaints
+    Given a user with role "webcat user" exists and is logged in
+    When I goto "/escalations/webcat/complaints?f=ALL"
+    And I click "#fetch"
+    And I wait for "90" seconds
+    Then I should see "Complaint updates requested from Talos-Intelligence.  Please refresh your page shortly."
+
+  @javascript
+  Scenario: a users tries to lookup categories for a URL/IP
+    Given a user with role "webcat user" exists and is logged in
+    When I goto "/escalations/webcat/complaints?f=ALL"
+    And I click "#categorize-urls"
+    And I fill in "url_1" with "cisco.com"
+    And I click ".current-categories-button"
+
+
+
+
+
+
+
