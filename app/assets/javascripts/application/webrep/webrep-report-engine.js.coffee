@@ -1013,6 +1013,75 @@ window.build_multi_average_time_to_close_tickets = () ->
   )
 
 
+
+
+
+
+
+window.build_multi_rulehits_for_fp_res_chart = () ->
+  from = localStorage.getItem('webrep_report_range_from')
+  to = localStorage.getItem('webrep_report_range_to')
+  user_id = $("#user_id").val()
+  team_ids = $.parseJSON("{\"team\":" + $("#team_ids").val() + "}")
+  data = {
+    from: from,
+    to: to,
+    users: team_ids['team']
+  }
+
+  headers = {'Token': $('input[name="token"]').val(), 'Xmlrpc-Token': $('input[name="xml_token"]').val()}
+  $.ajax(
+    url: '/escalations/api/v1/escalations/webrep/reports/rulehits_for_false_positive_resolutions'
+    method: 'GET'
+    headers: headers
+    data: data
+    dataType: 'json'
+    success: (response) ->
+
+      json = $.parseJSON(response)
+
+      fpRules = json["data"]["rules"] #['a500', 'alx_ cln', 'mute_phish', 'sbl', 'srch', 'suwl', 'trd_mal']
+      totalRuleHits = json["data"]["rule_hits"] #[ 5, 18, 9, 14, 4, 7, 3]
+
+      new Chart($('#rule-hits-fp-resolutions'),
+        type: 'horizontalBar'
+        data:
+          labels: fpRules
+          datasets: [ {
+            backgroundColor: '#6dbcdb'
+            data: totalRuleHits
+          } ]
+        options:
+          legend: display: false
+          scales:
+            yAxes: [
+              {
+                gridLines: display: false
+              }
+            ]
+            xAxes: [
+              {
+                gridLines: display: false
+                ticks: {
+                  min: 0
+                }
+                scaleLabel: {
+                  display: true,
+                  labelString: 'Total Ticket Entries with FP Resolutions'
+                }
+              }
+            ]
+      )
+
+
+
+
+
+
+    error: (response) ->
+      popup_response_error(response, 'Error building chart')
+  )
+
 $ ->
   window.set_initial_date_span()
   $('#tickets_date_range').daterangepicker()
@@ -1069,7 +1138,8 @@ $ ->
 
   window.build_multi_entries_closed_by_owners_chart()
 
+  window.build_multi_rulehits_for_fp_res_chart()
+
   window.build_multi_entries_closed_by_day_chart()
 
   window.build_multi_ticket_resolution_by_owner_chart()
-

@@ -1652,7 +1652,7 @@ class Dispute < ApplicationRecord
 
     main_results = Dispute.joins(:dispute_entries).where(:user_id => user_ids).where("dispute_entries.case_resolved_at between '#{from}' and '#{to}'")
 
-    all_entries = main_results.map {|result| result.dispute_entries}.flatten.select {|entry| entry.case_resolved_at.present?}
+    all_entries = main_results.map {|result| result.dispute_entries}.flatten.select {|entry| entry.case_resolved_at.present?}.flatten.uniq
 
     fp_entries = all_entries.select {|entry| entry.resolution == DisputeEntry::STATUS_RESOLVED_FIXED_FP}
 
@@ -1670,7 +1670,17 @@ class Dispute < ApplicationRecord
       end
     end
 
-    rulehit_types
+    final_data = {}
+    final_data[:rules] = []
+    final_data[:rule_hits] = []
+
+    rulehit_types.each do |k, v|
+      final_data[:rules] << k
+      final_data[:rule_hits] << v
+    end
+
+
+    final_data
 
   end
 
