@@ -2073,56 +2073,56 @@ $ ->
 
 # Ticket Resolutions by Ticket Owner graph
 
-  fixedFPTickets = [9, 7, 5, 6, 9]
-  fixedFNTickets = [10, 14, 11, 10, 5]
-  unchangedTickets = [3, 4, 11, 13, 9]
-  otherTickets = [0, 1, 0, 3, 5]
+  #fixedFPTickets = [9, 7, 5, 6, 9]
+  #fixedFNTickets = [10, 14, 11, 10, 5]
+  #unchangedTickets = [3, 4, 11, 13, 9]
+  #otherTickets = [0, 1, 0, 3, 5]
 
-  new Chart($('#ticket-resolutions-by-owner'),
-    type: 'bar'
-    data:
-      labels: ticketOwners
-      datasets: [
-        {
-          label: 'Fixed FP'
-          backgroundColor: '#6dbcdb'
-          data: fixedFPTickets
-        }
-        {
-          label: 'Fixed FN'
-          backgroundColor: '#2c3e50'
-          data: fixedFNTickets
-        }
-        {
-          label: 'Unchanged'
-          backgroundColor: '#999'
-          data: unchangedTickets
-        }
-        {
-          label: 'Other'
-          backgroundColor: '#E47433'
-          data: otherTickets
-        }
-      ]
-    options:
-      title:
-        display: false
-      legend: display: false
-      scales:
-        yAxes: [
-          {
-            gridLines: display: false
-            ticks: {
-              min: 0
-            }
-          }
-        ]
-        xAxes: [
-          {
-            gridLines: display: false
-          }
-        ]
-  )
+  #new Chart($('#ticket-resolutions-by-owner'),
+  #  type: 'bar'
+  #  data:
+  #    labels: ticketOwners
+  #    datasets: [
+  #      {
+  #        label: 'Fixed FP'
+  #        backgroundColor: '#6dbcdb'
+  #        data: fixedFPTickets
+  #      }
+  #      {
+  #        label: 'Fixed FN'
+  #        backgroundColor: '#2c3e50'
+  #        data: fixedFNTickets
+  #      }
+  #      {
+  #        label: 'Unchanged'
+  #        backgroundColor: '#999'
+  #        data: unchangedTickets
+  #      }
+  #      {
+  #        label: 'Other'
+  #        backgroundColor: '#E47433'
+  #        data: otherTickets
+  #      }
+  #    ]
+  #  options:
+  #    title:
+  #      display: false
+  #    legend: display: false
+  #    scales:
+  #      yAxes: [
+  #        {
+  #          gridLines: display: false
+  #          ticks: {
+  #            min: 0
+  #          }
+  #        }
+  #      ]
+  #      xAxes: [
+  #        {
+  #          gridLines: display: false
+  #        }
+  #      ]
+  #)
 
 
 
