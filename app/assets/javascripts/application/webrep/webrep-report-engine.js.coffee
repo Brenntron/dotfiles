@@ -683,8 +683,88 @@ window.build_single_entries_closed_by_day_chart = () ->
     error: (response) ->
       popup_response_error(response, 'Error building chart')
   )
+#### Multi User Graphs #####
+
+window.build_multi_entries_closed_by_day_chart = () =>
+  from = localStorage.getItem('webrep_report_range_from')
+  to = localStorage.getItem('webrep_report_range_to')
+  user_id = $("#user_id").val()
+  team_ids = $.parseJSON("{\"team\":" + $("#team_ids").val() + "}")
+  data = {
+    from: from,
+    to: to,
+    users: team_ids['team']
+  }
+
+  headers = {'Token': $('input[name="token"]').val(), 'Xmlrpc-Token': $('input[name="xml_token"]').val()}
+  $.ajax(
+    url: '/escalations/api/v1/escalations/webrep/reports/ticket_entries_closed_by_day_report'
+    method: 'GET'
+    headers: headers
+    data: data
+    dataType: 'json'
+    success: (response) ->
+
+      json = $.parseJSON(response)
+
+      totalTicketEnties = json["data"]["report_total_data"]
+      emailTicketEntries = json["data"]["report_e_data"]
+      webTicketEntries = json["data"]["report_w_data"]
+      ewTicketEntries = json["data"]["report_ew_data"]
+
+      dateRange = json["data"]["report_labels"]
+
+      totalTicketEntriesbyType = [
+        {
+          label: 'Total Ticket Entries'
+          backgroundColor: '#6dbcdb'
+          data: totalTicketEnties
+        }
+        {
+          label: 'E'
+          backgroundColor: '#8cc63f'
+          data: emailTicketEntries
+        }
+        {
+          label: 'W'
+          backgroundColor: '#E47433'
+          data: webTicketEntries
+        }
+        {
+          label: 'EW'
+          backgroundColor: '#BA55D3'
+          data: ewTicketEntries
+        }
+      ]
 
 
+      window.multiuser_ticket_type_totals = new Chart($('#graph-multiuser-ticket-entries-closed'),
+        type: 'bar'
+        data:
+          labels: dateRange
+          datasets: totalTicketEntriesbyType
+        options:
+          legend: display: false
+          scales:
+            yAxes: [
+              {
+                gridLines: display: false
+              }
+            ]
+            xAxes: [
+              {
+                gridLines: display: false
+                ticks: {
+                  autoSkip: false
+                }
+              }
+            ]
+      )
+
+
+    error: (response) ->
+      popup_response_error(response, 'Error building chart')
+  )
 #### Multi User Graphs #####
 
 #  Ticket entries closed by ticket owner
@@ -808,3 +888,6 @@ $ ->
   window.refresh_multi_open_tickets_table()
 
   window.build_multi_entries_closed_by_owners_chart()
+
+
+  window.build_multi_entries_closed_by_day_chart()

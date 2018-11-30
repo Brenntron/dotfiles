@@ -1321,7 +1321,7 @@ class Dispute < ApplicationRecord
     user_ids = users.pluck(:id)
     main_results = Dispute.joins(:dispute_entries).where(:user_id => user_ids).where("dispute_entries.case_resolved_at between '#{from}' and '#{to}'")
 
-    all_entries = main_results.map {|result| result.dispute_entries}.flatten
+    all_entries = main_results.map {|result| result.dispute_entries}.flatten.uniq
 
     report_data[:report_labels] = []
     report_data[:report_total_data] = []
