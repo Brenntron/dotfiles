@@ -315,6 +315,10 @@ Feature: Webcat complaints
     And I click "#categorize-urls"
     And I fill in "url_1" with "cisco.com"
     And I click ".current-categories-button"
+    Then I wait for "10" seconds
+    Then I should see "Computers and Internet"
+
+
 
 
 
