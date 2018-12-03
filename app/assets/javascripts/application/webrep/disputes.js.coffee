@@ -1515,7 +1515,11 @@ $ ->
   $('#edit-dispute-button').click ->
     $('#dispute-priority-icon').hide()
     $('#dispute-priority-select').show()
-    $('.dispute-edit-field').hide()
+
+    $('#dispute-customer-name').hide()
+    $('#dispute-customer-email').hide()
+
+    $('.dispute-edit-input').css('display','block')
 
     $('#save-dispute-button').removeClass('hidden')
     $('#cancel-dispute-button').removeClass('hidden')
@@ -1541,6 +1545,7 @@ $ ->
     $('#cancel-dispute-button').addClass('hidden')
     $('#related-dispute-input').addClass('hidden')
     $('#edit-dispute-button').removeClass('hidden')
+    $('.dispute-edit-input').css('display','none')
 
 
   $('#index-adjust-wlbl').click ->
