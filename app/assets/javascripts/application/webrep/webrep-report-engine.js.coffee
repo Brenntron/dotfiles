@@ -423,6 +423,121 @@ window.build_single_closed_email_entries_resolution_piechart = () ->
   )
 
 
+window.build_single_time_to_close_linechart = () ->
+
+  from = localStorage.getItem('webrep_report_range_from')
+  to = localStorage.getItem('webrep_report_range_to')
+  user_id = $("#user_id").val()
+
+  data = {
+    from: from,
+    to: to,
+    user_id: user_id
+  }
+
+  headers = {'Token': $('input[name="token"]').val(), 'Xmlrpc-Token': $('input[name="xml_token"]').val()}
+  $.ajax(
+    url: '/escalations/api/v1/escalations/webrep/reports/ticket_time_to_close_report'
+    method: 'GET'
+    headers: headers
+    data: data
+    dataType: 'json'
+    success: (response) ->
+
+      json = $.parseJSON(response)
+
+
+      closedTicketNumbers = json["data"]["ticket_numbers"]
+      timeToCloseTickets = json["data"]["close_times"]
+      allTimeToClose = undefined
+      averageTimeToClose = 0
+      if timeToCloseTickets.length
+        allTimeToClose = timeToCloseTickets.reduce((a, b) ->
+          a + b
+        )
+        averageTimeToClose = allTimeToClose / timeToCloseTickets.length
+        averageTimeToClose = Math.round(averageTimeToClose * 100)/100
+
+
+      window.averageTimeToCloseLabel(averageTimeToClose)
+
+
+      timeCloseTicketsDataSets = [
+        {
+          data: timeToCloseTickets
+          label: 'Time to Close:'
+          backgroundColor: '#6dbcdb'
+          borderColor: '#55a3c1'
+          borderWidth: 2
+          fill: true
+          lineTension: 0
+        }
+      ]
+
+      new Chart($('#time-to-close-tickets-linechart'),
+        type: 'line'
+        data:
+          labels: closedTicketNumbers
+          datasets: timeCloseTicketsDataSets
+        options:
+          legend: false
+          elements:
+            point:
+              radius: 0
+          scales:
+            yAxes: [
+              {
+                gridLines:
+                  display: false
+                ticks: {
+                  min: 0
+                  callback: (value, index, values) ->
+                    return value + ' hr'
+                }
+              }
+            ]
+            xAxes: [
+              {
+                gridLines:
+                  display: false
+                scaleLabel: {
+                  display: true,
+                  labelString: 'Tickets'
+                }
+                ticks: {
+                  display: false
+                }
+              }
+            ]
+          annotation: {
+            annotations: [
+              {
+                type: 'line'
+                drawTime: 'afterDatasetsDraw'
+                mode: 'horizontal'
+                scaleID: 'y-axis-0'
+                value: averageTimeToClose
+                borderColor: '#304A60'
+                borderWidth: 1
+                label: {
+                  backgroundColor: 'transparent'
+                  fontStyle: 'normal'
+                  fontColor: '#666'
+                  fontSize: 14
+                  content: 'Average: ' + averageTimeToClose + ' hr'
+                  position: 'right'
+                  yAdjust: -10
+                  enabled: true
+                }
+              }]
+          })
+
+
+    error: (response) ->
+      popup_response_error(response, 'Error building chart')
+  )
+
+
 
 window.build_single_closed_web_entries_resolution_piechart = () ->
 
@@ -1143,3 +1258,4 @@ $ ->
   window.build_multi_entries_closed_by_day_chart()
 
   window.build_multi_ticket_resolution_by_owner_chart()
+  window.build_single_time_to_close_linechart()
