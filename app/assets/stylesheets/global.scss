@@ -289,7 +289,8 @@ table.dataTable thead .sorting_desc {
 }
 
 .dataTables_wrapper .dataTables_length, .dataTables_wrapper .dataTables_filter {
-  float: none;
+  //float: none;
+  height: 100%;
   display: inline-block;
 }
 
@@ -323,18 +324,39 @@ table.dataTable.no-footer {
   border-radius: 2px;
   border: 1px solid $type-lighter-color !important;
 }
+#disputes-index_filter, #complaints-index_filter {
+  label {
+    height: 100%;
+  }
+ }
 
 .table-search-input {
   width: 400px;
-  padding: 3px 3px 3px 26px;
+  height: 100%;
+  padding: 0 3px 0 26px;
+  font-weight: 400;
   border: 1px solid #ccc;
   border-radius: 2px;
   background-image: url(image_path('layout/search_icon_lighter.svg'));
   background-repeat: no-repeat;
+  background-color: $ac-nav-bg-color;
   background-size: 18px;
   background-position: 3px center;
   color: $type-lighter-color;
 }
+.table-search-input::-webkit-input-placeholder {
+  font-size: 7pt;
+  color: $content-tab-color;
+}
+.table-search-input::-moz-placeholder {
+  font-size: 7pt;
+  color: $content-tab-color;
+}
+.table-search-input::-ms-input-placeholder {
+  font-size: 7pt;
+  color: $content-tab-color;
+}
+
 /***** Pretty Tables *****/
 .pretty th .current {
 }
