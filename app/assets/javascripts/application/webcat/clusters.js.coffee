@@ -385,24 +385,45 @@ $ ->
           $('.cluster-mgt-loader-wrapper').addClass('hidden')
           json = $.parseJSON(response)
           entry = json.data
+          entry_count = 0
+          total_shown_entries = 0
+          total_entries = $($(tr[0]).find('.entry-count')[0]).text()
+
+          if total_entries < 300
+            max_viewable_entries = total_entries
+          else
+            max_viewable_entries = 300
+
+          if total_entries > 25
+            link_to_more_results = '<a>Click here to view cluster entry results 1 - ' + max_viewable_entries + '</a>.'
+          else
+            link_to_more_results = ''
 
           $(entry).each ->
+            entry_count++
 
-            entry_row = '<tr class="index-entry-row">' +
-              '<td class="clusterpath-col-spacer"><input type="checkbox" class="cluster-path-checkbox_' + cluster.cluster_id + '"</td>' + # Spacer for the check box row
-              '<td class="clusterpath-col-path">' + this.url + '</td>' +
-              '<td class="clusterpath-col-path">' + this.customer_name + '</td>' +
-              '<td class="clusterpath-col-volume text-center">' + this.apac_volume + '</td>' +
-              '<td class="clusterpath-col-volume text-center">' + this.emrg_volume + '</td>' +
-              '<td class="clusterpath-col-volume text-center">' + this.eurp_volume + '</td>' +
-              '<td class="clusterpath-col-volume text-center">' + this.glob_volume + '</td>' +
-              '<td class="clusterpath-col-volume text-center">' + this.japn_volume + '</td>' +
-              '<td class="clusterpath-col-volume text-center">' + this.noam_volume + '</td>' +
-              '<td class="clusterpath-col-wbrs text-center">' + this.wbrs_score + '</td>' +
-              '</tr>'
-            entry_rows.push entry_row
-            return
-          complete_table = table_head + entry_rows.join('') + '</tbody></table>'
+            if entry_count <= 25
+              entry_row = '<tr class="index-entry-row">' +
+                '<td class="clusterpath-col-spacer"><input type="checkbox" class="cluster-path-checkbox_' + cluster.cluster_id + '"</td>' + # Spacer for the check box row
+                '<td class="clusterpath-col-path">' + this.url + '</td>' +
+                '<td class="clusterpath-col-path">' + this.customer_name + '</td>' +
+                '<td class="clusterpath-col-volume text-center">' + this.apac_volume + '</td>' +
+                '<td class="clusterpath-col-volume text-center">' + this.emrg_volume + '</td>' +
+                '<td class="clusterpath-col-volume text-center">' + this.eurp_volume + '</td>' +
+                '<td class="clusterpath-col-volume text-center">' + this.glob_volume + '</td>' +
+                '<td class="clusterpath-col-volume text-center">' + this.japn_volume + '</td>' +
+                '<td class="clusterpath-col-volume text-center">' + this.noam_volume + '</td>' +
+                '<td class="clusterpath-col-wbrs text-center">' + this.wbrs_score + '</td>' +
+                '</tr>'
+              entry_rows.push entry_row
+              total_shown_entries = entry_count
+              return
+
+          bottom_row = '<tr class="cluster-entry-bottom-row">' +
+          '<td colspan="10">Showing cluster entry results 1 - ' + total_shown_entries + ' of ' + total_entries + '. ' + link_to_more_results + '</td>' +
+          '</tr>'
+
+          complete_table = table_head + entry_rows.join('') + '</tbody><tfoot>' + bottom_row + '</tfoot></table>'
 
           row.child(complete_table).show()
           tr.addClass 'shown'

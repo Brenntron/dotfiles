@@ -66,6 +66,7 @@ $super-faint-neutral: #f9f9f9;
 $faint-accent-color:  #dff1f7;
 $faint-alt-highlight: #fff7cd; /* focus for form inputs */
 $medium-neutral-color: #EAEAEA;
+$dark-neutral-color:  #c2c6c8;
 $table-dark-body: #4E4E4E;
 $table-dark-header: #413D3D;
 
@@ -4582,8 +4583,19 @@ table > tbody > tr > td.dispute_rep_tools {
   padding-left: 30px;
 }
 
-.dispute-entry-table thead, .cluster-path-table thead {
+.dispute-entry-table thead, .cluster-path-table thead, .cluster-path-table tfoot {
   background-color: $table-dark-header;
+  color: $content-bg-color;
+  font-size: 8pt;
+}
+
+.cluster-path-table tfoot td {
+  text-align: center;
+  color: $dark-neutral-color;
+  font-weight: 300;
+}
+
+.cluster-path-table tfoot a {
   color: $content-bg-color;
 }
 
