@@ -4579,6 +4579,11 @@ table > tbody > tr > td.dispute_rep_tools {
   border-color: $table-dark-header;
 }
 
+.cluster-path-table tbody tr td {
+  padding: 4px;
+  font-size: 8.5pt;
+}
+
 .dispute-entry-table tr td:first-child, .dispute-entry-table tr th:first-child, .cluster-path-table tr th:first-child, .cluster-path-table tr td:first-child {
   padding-left: 30px;
 }
