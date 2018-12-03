@@ -309,18 +309,46 @@ Feature: Webcat complaints
     Then I should see "Complaint updates requested from Talos-Intelligence.  Please refresh your page shortly."
 
   @javascript
-  Scenario: a users tries to lookup categories for a URL/IP
+  Scenario: a users tries to lookup categories for a URL
     Given a user with role "webcat user" exists and is logged in
     When I goto "/escalations/webcat/complaints?f=ALL"
     And I click "#categorize-urls"
     And I fill in "url_1" with "cisco.com"
     And I click ".current-categories-button"
-    Then I wait for "10" seconds
+    Then I wait for "15" seconds
     Then I should see "Computers and Internet"
 
+  @javascript
+  Scenario: a users tries to drop current categories on a URL
+    Given a user with role "webcat user" exists and is logged in
+    When I goto "/escalations/webcat/complaints?f=ALL"
+    And I click "#categorize-urls"
+    And I fill in "url_1" with "washingtonpost.com"
+    And I click ".delete-categories-button"
+    And I wait for "10" seconds
+    Then I should see "CATEGORIES HAVE BEEN SUCCESSFULLY DROPPED."
 
+  @javascript
+  Scenario: a users tries to fetch WBNP data
+    Given a user with role "webcat user" exists and is logged in
+    When I goto "/escalations/webcat/complaints?f=ALL"
+    And I click "#fetch_wbnp"
+    And I wait for "10" seconds
+    Then I should see "WBNP COMPLAINTS SUCCESSFULLY RETRIEVED FROM RULEUI."
 
-
+  @javascript
+  Scenario: a users tries to update URI
+    Given a user with role "webcat user" exists and is logged in
+    And a complaint entry with trait "new_entry" exists
+    And a complaint entry preload exists
+    When I goto "/escalations/webcat/complaints?f=ALL"
+    Then I wait for "7" seconds
+    And I click ".expand-all"
+    And I fill in "complaint_prefix_1" with "cisco.com"
+    And I click ".inline-button"
+    And I wait for "10" seconds
+    Then I should see "SUCCESS"
+    Then I should see "URI updated."
 
 
 
