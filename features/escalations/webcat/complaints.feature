@@ -273,7 +273,6 @@ Feature: Webcat complaints
     And I fill in selectized with "Adult"
     And I trigger-click ".primary"
     And I wait for "60" seconds
-    Then take a screenshot
     Then I should see "SUCCESS"
     Then I should see "URLs/IPs successfully categorized."
 
