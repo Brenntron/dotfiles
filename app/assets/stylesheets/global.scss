@@ -324,21 +324,17 @@ table.dataTable.no-footer {
   border: 1px solid $type-lighter-color !important;
 }
 
-#complaints-index_filter, #disputes-index_filter {
-
-  input {
-    width: 400px;
-    padding: 3px 3px 3px 26px;
-    border: 1px solid #ccc;
-    border-radius: 2px;
-    background-image: url(image_path('layout/search_icon_lighter.svg'));
-    background-repeat: no-repeat;
-    background-size: 18px;
-    background-position: 3px center;
-    color: $type-lighter-color;
-  }
+.table-search-input {
+  width: 400px;
+  padding: 3px 3px 3px 26px;
+  border: 1px solid #ccc;
+  border-radius: 2px;
+  background-image: url(image_path('layout/search_icon_lighter.svg'));
+  background-repeat: no-repeat;
+  background-size: 18px;
+  background-position: 3px center;
+  color: $type-lighter-color;
 }
-
 /***** Pretty Tables *****/
 .pretty th .current {
 }

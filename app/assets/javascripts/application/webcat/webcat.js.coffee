@@ -163,6 +163,8 @@ $ ->
       ]
       select: 'style': 'os'
       responsive: true)
+
+    $('#complaints-index_filter input').addClass('table-search-input');
     $('#complaints-index tbody').on 'click', 'td.expandable-row-column', ->
       click_table_buttons complaint_table, this
 
