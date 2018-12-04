@@ -421,7 +421,7 @@ $ ->
               return
 
           bottom_row = '<tr class="cluster-entry-bottom-row">' +
-          '<td colspan="10">Previewing cluster entries 1 - ' + total_shown_entries + '. ' + link_to_more_results + '<span class="total-cluster-entry-count">Total Entries: ' + total_entries + '.</span></td>' +
+          '<td colspan="10">Previewing cluster entries 1 - <span class="total-shown-entries">' + total_shown_entries + '</span>. ' + link_to_more_results + '<span class="total-cluster-entry-count">Total Entries: ' + total_entries + '.</span></td>' +
           '</tr>'
 
           complete_table = table_head + entry_rows.join('') + '</tbody><tfoot>' + bottom_row + '</tfoot></table>'
@@ -434,7 +434,7 @@ $ ->
 #         Expanding to maximum preview rows
           $('.expand-cluster-entries').click ->
             expand_table_row = this
-            expandClusterEntryPreview(cluster, expand_table_row)
+            expandClusterEntryPreview(cluster, expand_table_row, max_viewable_entries)
 
         error: (response) ->
           $('.cluster-mgt-loader-wrapper').addClass('hidden')
@@ -443,84 +443,72 @@ $ ->
     return
 
 
-window.expandClusterEntryPreview = (cluster, expand_table_row) ->
+window.expandClusterEntryPreview = (cluster, expand_table_row, max_viewable_entries) ->
   $('.cluster-mgt-loader-wrapper').removeClass('hidden')
   entry_rows = []
-  table_footer = $($($(expand_table_row).parent()[0]).parent()[0]).parent()[0]
+  table_footer_cell = $(expand_table_row).parent()[0]
+  table_footer = $($(table_footer_cell).parent()[0]).parent()[0]
   table_body = $(table_footer).prev('tbody')[0]
+  footer_link_text = $(expand_table_row).text()
+  total_shown_entries = $(table_footer_cell).children('.total-shown-entries')
+  current_row_count = $(table_body).find('tr').length
 
-  std_msg_ajax(
-    method: 'GET'
-    url: "/escalations/api/v1/escalations/webcat/clusters/" + cluster.cluster_id
-    data: {}
-    success: (response) ->
-      $('.cluster-mgt-loader-wrapper').addClass('hidden')
-      json = $.parseJSON(response)
-      entry = json.data
-      entry_count = 0
+  if current_row_count <= 25
+    std_msg_ajax(
+      method: 'GET'
+      url: "/escalations/api/v1/escalations/webcat/clusters/" + cluster.cluster_id
+      data: {}
+      success: (response) ->
+        $('.cluster-mgt-loader-wrapper').addClass('hidden')
+        json = $.parseJSON(response)
+        entry = json.data
+        entry_count = 0
 
-      $(entry).each ->
-        entry_count++
+        $(entry).each ->
+          entry_count++
 
-        if entry_count > 25
-          entry_row = '<tr class="index-entry-row">' +
-            '<td class="clusterpath-col-spacer"><input type="checkbox" class="cluster-path-checkbox_' + cluster.cluster_id + '"</td>' + # Spacer for the check box row
-            '<td class="clusterpath-col-path">' + this.url + '</td>' +
-            '<td class="clusterpath-col-path">' + this.customer_name + '</td>' +
-            '<td class="clusterpath-col-volume text-center">' + this.apac_volume + '</td>' +
-            '<td class="clusterpath-col-volume text-center">' + this.emrg_volume + '</td>' +
-            '<td class="clusterpath-col-volume text-center">' + this.eurp_volume + '</td>' +
-            '<td class="clusterpath-col-volume text-center">' + this.glob_volume + '</td>' +
-            '<td class="clusterpath-col-volume text-center">' + this.japn_volume + '</td>' +
-            '<td class="clusterpath-col-volume text-center">' + this.noam_volume + '</td>' +
-            '<td class="clusterpath-col-wbrs text-center">' + this.wbrs_score + '</td>' +
-            '</tr>'
-          entry_rows.push entry_row
-          return
+          if entry_count > 25
+            entry_row = '<tr class="index-entry-row">' +
+              '<td class="clusterpath-col-spacer"><input type="checkbox" class="cluster-path-checkbox_' + cluster.cluster_id + '"</td>' + # Spacer for the check box row
+              '<td class="clusterpath-col-path">' + this.url + '</td>' +
+              '<td class="clusterpath-col-path">' + this.customer_name + '</td>' +
+              '<td class="clusterpath-col-volume text-center">' + this.apac_volume + '</td>' +
+              '<td class="clusterpath-col-volume text-center">' + this.emrg_volume + '</td>' +
+              '<td class="clusterpath-col-volume text-center">' + this.eurp_volume + '</td>' +
+              '<td class="clusterpath-col-volume text-center">' + this.glob_volume + '</td>' +
+              '<td class="clusterpath-col-volume text-center">' + this.japn_volume + '</td>' +
+              '<td class="clusterpath-col-volume text-center">' + this.noam_volume + '</td>' +
+              '<td class="clusterpath-col-wbrs text-center">' + this.wbrs_score + '</td>' +
+              '</tr>'
+            entry_rows.push entry_row
+            return
 
-      $(table_body).append(entry_rows)
+        $(table_body).append(entry_rows)
 
-      footer_link_text = $(expand_table_row).text()
-      replacement_text = footer_link_text.replace("preview", "collapse")
-      $(expand_table_row).text(replacement_text)
-      $(expand_table_row).addClass("collapse-cluster-entries")
+        replacement_text = footer_link_text.replace("preview", "collapse")
+        $(expand_table_row).text(replacement_text)
+        $(expand_table_row).addClass("collapse-cluster-entries")
+        $(total_shown_entries[0]).text(max_viewable_entries)
 
-    error: (response) ->
-      $('.cluster-mgt-loader-wrapper').addClass('hidden')
-      std_api_error(response, "There was an error loading cluster data.", reload: false)
-    )
+      error: (response) ->
+        $('.cluster-mgt-loader-wrapper').addClass('hidden')
+        std_api_error(response, "There was an error loading cluster data.", reload: false)
+      )
+  else
+    $('.cluster-mgt-loader-wrapper').addClass('hidden')
+    rows = $(table_body).children('tr')
+    row_count = 0
+    replacement_text = footer_link_text.replace("collapse", "preview")
+    $(expand_table_row).text(replacement_text)
+    $(expand_table_row).removeClass("collapse-cluster-entries")
+    $(total_shown_entries[0]).text('25')
+
+    $(rows).each ->
+      row_count++
+      if row_count > 25
+        $(this).remove()
   return
 
-#  COMMENTING THIS OUT AS I'M PRETTY SURE ITS INITIAL TEST CODE.
-#  window.showClusterPaths = (cluster) ->
-#    table_head = '<table class="table cluster-path-table">' + '<thead>' + '<tr>' + '<th><input class="cluster_path_select_all" type="checkbox" onclick="select_or_deselect_cluster(' + cluster.cluster_id + ')" id=' + cluster.cluster_id + ' /></th>' + '<th class="clusterpath-col-path">Cluster Paths</th>' + '<th class="clusterpath-col-volume">Volume</th>' + '<th class="clusterpath-col-wbrs">WBRS Score</th>' + '<th class="clusterpath-col-rules">Rules</th>' + '</tr>' + '</thead>' + '<tbody>'
-#    missing_data = '<span class="missing-data">Missing Data</span>'
-#    entry_rows = []
-#    entry = [
-#      {
-#        "id": 1,
-#        "path": "255.255.255.0",
-#        "volume": 8.488308,
-#        "rules": "Test"
-#      },
-#      {
-#        "id": 2,
-#        "path": "192.168.0.1",
-#      }
-#    ]
-#    $(entry).each ->
-#
-#      entry_row = '<tr class="index-entry-row">' +
-#        '<td class="clusterpath-col-spacer"><input type="checkbox" class="cluster-path-checkbox_' + cluster.cluster_id + '"</td>' + # Spacer for the check box row
-#        '<td class="clusterpath-col-path">' + this.path + '</td>' +
-#        '<td class="clusterpath-col-volume text-center">' + this.volume + '</td>' +
-#        '<td class="clusterpath-col-wbrs">' + this.wbrs + '</td>' +
-#        '<td class="clusterpath-col-rules">' + this.rules + '</td>' +
-#        '</tr>'
-#      entry_rows.push entry_row
-#      return
-#    # `d` is the original data object for the row
-#    table_head + entry_rows.join('') + '</tbody></table>'
 
   window.select_or_deselect_cluster = (cluster_id)->
     $('.cluster-path-checkbox_' + cluster_id).prop('checked', $('#' + cluster_id).prop('checked'))
