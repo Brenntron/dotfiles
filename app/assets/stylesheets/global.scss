@@ -6717,7 +6717,8 @@ h2 {
   margin: 0 8px;
 }
 
-.table-footer-expand {
+.expand-cluster-entries::after {
+  content: '';
   display: inline-block;
   width: 15px;
   height: 15px;
@@ -6725,4 +6726,8 @@ h2 {
   background-repeat: no-repeat;
   background-position: center center;
   margin-bottom: -4px;
+}
+
+.expand-cluster-entries.collapse-cluster-entries::after {
+  transform: rotate(180deg);
 }

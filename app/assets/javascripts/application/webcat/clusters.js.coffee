@@ -396,7 +396,7 @@ $ ->
             max_viewable_entries = 300
 
           if total_entries > 25
-            link_to_more_results = '<a class="expand-cluster-entries">Click to preview the top  26 - ' + max_viewable_entries + ' cluster entries. <span class="table-footer-expand"></span></a>'
+            link_to_more_results = '<a class="expand-cluster-entries">Click to preview the top  26 - ' + max_viewable_entries + ' cluster entries.</a>'
           else
             link_to_more_results = ''
 
@@ -449,7 +449,6 @@ window.expandClusterEntryPreview = (cluster, expand_table_row) ->
   table_footer = $($($(expand_table_row).parent()[0]).parent()[0]).parent()[0]
   table_body = $(table_footer).prev('tbody')[0]
 
-
   std_msg_ajax(
     method: 'GET'
     url: "/escalations/api/v1/escalations/webcat/clusters/" + cluster.cluster_id
@@ -480,6 +479,11 @@ window.expandClusterEntryPreview = (cluster, expand_table_row) ->
           return
 
       $(table_body).append(entry_rows)
+
+      footer_link_text = $(expand_table_row).text()
+      replacement_text = footer_link_text.replace("preview", "collapse")
+      $(expand_table_row).text(replacement_text)
+      $(expand_table_row).addClass("collapse-cluster-entries")
 
     error: (response) ->
       $('.cluster-mgt-loader-wrapper').addClass('hidden')
