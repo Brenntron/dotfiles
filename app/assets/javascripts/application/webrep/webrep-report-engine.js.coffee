@@ -5,10 +5,20 @@ window.change_reported_week = (new_report_range_from, new_report_range_to)->
   window.refresh_visable_report_tab()
 
 window.refresh_visable_report_tab = ()->
-  alert('refreshing')
-  #most likely called from changing dates, when this is called
-  #grab all visual components and refresh their data
-
+  window.build_graph_ticket_entries_submitter()
+  window.build_single_closed_email_entries_resolution_piechart()
+  window.build_single_closed_web_entries_resolution_piechart()
+  window.build_multi_closed_email_entries_resolution_piechart()
+  window.build_multi_closed_web_entries_resolution_piechart()
+  window.build_single_entries_closed_by_day_chart()
+  window.build_multi_average_time_to_close_tickets()
+  window.refresh_multi_closed_tickets_table()
+  window.refresh_multi_open_tickets_table()
+  window.build_multi_entries_closed_by_owners_chart()
+  window.build_multi_rulehits_for_fp_res_chart()
+  window.build_multi_entries_closed_by_day_chart()
+  window.build_multi_ticket_resolution_by_owner_chart()
+  window.build_single_time_to_close_linechart()
 
 window.refresh_single_open_tickets_table = (user_id)->
   from = localStorage.getItem('webrep_report_range_from')
@@ -1211,6 +1221,7 @@ $ ->
     localStorage.setItem 'webrep_report_range_to', picker.endDate
     user_id = $("#user_id").val()
     set_date_label()
+    window.refresh_visable_report_tab()
 
   $('#ticket-view-shortcut').click ->
     if this.innerHTML == "View Last Week's Tickets"
@@ -1235,27 +1246,7 @@ $ ->
       localStorage.setItem 'webrep_report_range_to', lastday
 
     user_id = $("#user_id").val()
-    refresh_single_open_tickets_table(user_id)
-    refresh_single_closed_tickets_table(user_id)
     set_date_label()
+    window.refresh_visable_report_tab()
 
-  window.build_graph_ticket_entries_submitter()
-  window.build_single_closed_email_entries_resolution_piechart()
-  window.build_single_closed_web_entries_resolution_piechart()
-  window.build_multi_closed_email_entries_resolution_piechart()
-  window.build_multi_closed_web_entries_resolution_piechart()
-  window.build_single_entries_closed_by_day_chart()
-
-  window.build_multi_average_time_to_close_tickets()
-
-  window.refresh_multi_closed_tickets_table()
-  window.refresh_multi_open_tickets_table()
-
-  window.build_multi_entries_closed_by_owners_chart()
-
-  window.build_multi_rulehits_for_fp_res_chart()
-
-  window.build_multi_entries_closed_by_day_chart()
-
-  window.build_multi_ticket_resolution_by_owner_chart()
-  window.build_single_time_to_close_linechart()
+  window.refresh_visable_report_tab()
