@@ -6061,6 +6061,7 @@ table.dataTable tbody tr.selected {
 
 .nested-complaint-data-wrapper a {
   text-decoration: underline;
+  cursor: pointer;
 }
 
 .customer-label {
@@ -6710,4 +6711,18 @@ h2 {
 
 #clusters-index_wrapper .datatable-top-tools {
   margin-top: -35px;
+}
+
+.expand-cluster-entries {
+  margin: 0 8px;
+}
+
+.table-footer-expand {
+  display: inline-block;
+  width: 15px;
+  height: 15px;
+  background-image: url(image_path('icon_expand_table_white.svg'));
+  background-repeat: no-repeat;
+  background-position: center center;
+  margin-bottom: -4px;
 }

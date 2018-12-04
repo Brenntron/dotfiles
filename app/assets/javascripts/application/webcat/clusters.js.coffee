@@ -395,7 +395,7 @@ $ ->
             max_viewable_entries = 300
 
           if total_entries > 25
-            link_to_more_results = '<a>Click here to view cluster entry results 1 - ' + max_viewable_entries + '</a>.'
+            link_to_more_results = '<a class="expand-cluster-entries">Click to preview the top  26 - ' + max_viewable_entries + ' cluster entries. <span class="table-footer-expand"></span></a>'
           else
             link_to_more_results = ''
 
@@ -420,7 +420,7 @@ $ ->
               return
 
           bottom_row = '<tr class="cluster-entry-bottom-row">' +
-          '<td colspan="10">Showing cluster entry results 1 - ' + total_shown_entries + ' of ' + total_entries + '. ' + link_to_more_results + '</td>' +
+          '<td colspan="10">Previewing cluster entries 1 - ' + total_shown_entries + '. ' + link_to_more_results + '<span class="total-cluster-entry-count">Total Entries: ' + total_entries + '.</span></td>' +
           '</tr>'
 
           complete_table = table_head + entry_rows.join('') + '</tbody><tfoot>' + bottom_row + '</tfoot></table>'
