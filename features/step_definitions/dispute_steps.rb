@@ -71,3 +71,8 @@ end
 Given(/^a RuleHit Resolution Mailer template exists with mnemonic, "(.*?)"/) do |mnemonic|
   FactoryBot.create(:rulehit_resolution_mailer_template, mnemonic: mnemonic)
 end
+
+Given(/^I add a test user to current user's team/) do
+  FactoryBot.create(:user, cvs_username: 'teammate', id: 2)
+  User.find(2).move_to_child_of(User.find(1))
+end
