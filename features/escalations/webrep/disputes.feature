@@ -307,3 +307,21 @@ Feature: Disputes
     And I wait for "3" seconds
     Then I should see "THERE WAS AN ERROR CREATING THE RESOLUTION MESSAGE TEMPLATE."
     Then I should see "Name can't be blank and Body can't be blank"
+
+  @javascript
+  Scenario: A user tries to update a dispute
+    Given a user with role "webrep user" exists and is logged in
+    And the following disputes exist and have entries:
+      |id  |
+      |5370|
+    And I goto "/escalations/webrep/disputes/5370"
+    When I click "#edit-dispute-button"
+    And I fill in "dispute-customer-name-input" with "John Smith"
+    And I fill in "dispute-customer-email-input" with "jsmith@cisco.com"
+    And I select "P5" from "dispute-priority-select"
+    And I click "#save-dispute-button"
+    And I wait for "5" seconds
+    And I click "#top_bar_toggle"
+    Then I should see content "John Smith" within "#dispute-customer-name"
+    And I should see content "jsmith@cisco.com" within "#dispute-customer-email"
+    And Dispute entry should have a status of, "P5"
