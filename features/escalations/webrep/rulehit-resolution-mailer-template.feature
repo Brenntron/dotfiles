@@ -58,4 +58,18 @@ Feature: RuleHit Resolution Mailer Templates
     And I click through "#delete-1" and accept confirmation
     Then I should see "Rulehit resolution mailer template was successfully destroyed."
 
+  @javascript
+  Scenario: A user creates an ad hoc email using a RuleHit Resolution Mailer Template
+    Given a user with role "webrep user" exists and is logged in
+    And a RuleHit Resolution Mailer template exists with mnemonic, "blh", and body of "Temple Gates"
+    When I go to "/escalations/webrep/research"
+    And I fill in "search_uri" with "cisco.com"
+    And I click "submit-button"
+    And I wait for "30" seconds
+    And I click first element of class ".adhoc-email-trigger"
+    Then I should see "Compose New Email"
+    Then I should see content "cisco@gmail.com" within ".new-receiver"
+    Then I should see content "cisco@gmail.com" within ".cc-email"
+    Then I should see content "Cucumber" within "#subject"
+    Then I should see content "This is a test body" within ".new-body"
 

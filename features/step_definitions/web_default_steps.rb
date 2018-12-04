@@ -24,6 +24,11 @@ When(/^I click "(.*?)"$/) do |target|
     end
 end
 
+When(/^I click first element of class "(.*?)"$/) do |target|
+  page.find("#{target}", match: :first).click
+end
+
+
 When(/^I click through "(.*?)" and accept confirmation$/) do |target|
   accept_confirm do
     page.find("#{target}").click
