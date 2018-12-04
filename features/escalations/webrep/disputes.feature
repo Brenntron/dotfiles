@@ -337,7 +337,7 @@ Feature: Disputes
     When I click "#add-entries-button"
     And I fill in "add_dispute_entry" with "cisco.com"
     And I click "#button_add_dispute_entry"
-    And I wait for ".*" seconds
+    And I wait for "8" seconds
     Then I should see content "cisco.com" within ".entry-data-content"
     And I should see content "WL-med" within ".entry-data-wlbl"
     And I should see content "BL-heavy" within ".entry-data-wlbl"
