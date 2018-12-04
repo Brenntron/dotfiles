@@ -28,7 +28,7 @@
                 - if (@dispute.resolution != Dispute::DUPLICATE) && (@dispute.status != Dispute::RESOLVED)
                   %button.return-ticket-button.esc-tooltipped{title: 'Return ticket to open queue', onclick: 'toolbar_unassign_dispute();'}
               - else
-                - if (@dispute.resolution != Dispute::DUPLICATE) && (@dispute.status != Dispute::RESOLVED)
+                - if (@dispute.resolution != Dispute::DUPLICATE) && (@dispute.status != Dispute::RESOLVED) && (@dispute.user_id == 1)
                   %button.take-ticket-button#show_ticket_assign.esc-tooltipped{title: 'Assign this ticket to me', onclick: "take_single_dispute(#{@dispute.id});"}
 
                 %span.dropdown
@@ -41,7 +41,7 @@
                         .toolbar
                           %div
                             %label.toolbar-section-label Assignee
-                            =select_tag :index_target_assignee, options_from_collection_for_select(User.joins(roles: :org_subset).where(org_subsets: { name: 'webrep' }).distinct.order(:cvs_username), :id, :cvs_username), prompt: 'Select A User'
+                            =select_tag :index_target_assignee, options_from_collection_for_select(User.joins(roles: :org_subset).where(org_subsets: { name: 'webrep' }).distinct.order(:cvs_username), :id, :cvs_username)
                           %button{class: 'primary', type:'button', id: 'button_reassign', onclick:'toolbar_show_change_assignee();'}
                             Assign
                           - if (@dispute.assignee != 'Unassigned')
