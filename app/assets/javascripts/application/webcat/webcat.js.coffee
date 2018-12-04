@@ -160,7 +160,6 @@ $ ->
           className: 'company-col'
           data: 'company_name'
         }
-
         {
           data: 'assigned_to'
           className: 'alt-col'
@@ -180,7 +179,6 @@ $ ->
       labelField: 'value',
       searchField: ['text'],
       options: AC.WebCat.createSelectOptions()
-
     }
 
     $('.sorting').click (el) ->
@@ -235,5 +233,4 @@ $ ->
       labelField: 'name'
       searchField: 'name'
       options: createSelectOptions()
-
     }
