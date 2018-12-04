@@ -307,3 +307,38 @@ Feature: Disputes
     And I wait for "3" seconds
     Then I should see "THERE WAS AN ERROR CREATING THE RESOLUTION MESSAGE TEMPLATE."
     Then I should see "Name can't be blank and Body can't be blank"
+
+  @javascript
+  Scenario: A user visits the Dashboard page and sees correct ticker counts
+    Given a user with role "webrep user" exists with cvs_username, "Cucumber", exists and is logged in
+    And the following disputes exist and have entries:
+      |id  |status     |user_id|
+      |5370|ASSIGNED   |1      |
+    And the following disputes exist and have entries:
+      |id  |status     |user_id|
+      |5371|ASSIGNED   |1      |
+    And the following disputes exist and have entries:
+      |id  |status     |user_id|
+      |5372|ASSIGNED   |1      |
+    And the following disputes exist and have entries:
+      |id  |status     |user_id|
+      |5373|RESEARCHING|1      |
+    And the following disputes exist and have entries:
+      |id  |status     |user_id|
+      |5374|RESEARCHING|1      |
+    And the following disputes exist and have entries:
+      |id  |status          |user_id|
+      |5375|RESOLVED_CLOSED |1      |
+    And the following disputes exist and have entries:
+      |id  |status          |user_id|
+      |5376|RESOLVED_CLOSED |1      |
+    And the following disputes exist and have entries:
+      |id  |status           |user_id|
+      |5377|RESOLVED_CLOSED  |1      |
+    And the following disputes exist and have entries:
+      |id  |status            |user_id|
+      |5378|RESOLVED_CLOSED   |1      |
+    When I goto "/escalations/webrep/dashboard"
+    Then I should see content "3" within ".open"
+    Then I should see content "2" within ".in_progress"
+    Then I should see content "4" within ".closed"
