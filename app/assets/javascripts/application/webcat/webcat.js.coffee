@@ -65,6 +65,7 @@ $ ->
           width: '50px'
         }
         {
+          className: 'age-col'
           data: 'age'
           width: '40px'
           'render':(data) ->
@@ -87,6 +88,7 @@ $ ->
           className: 'state-col'
         }
         {
+          className: 'tag-col'
           'render':(data,type,full,meta)->
             tags = full.tags
             tag_items = ''
@@ -99,6 +101,7 @@ $ ->
             tag_items
         }
         {
+          className: 'subdomain-col'
           'render':(data,type,full,meta)->
             subdomain = full.subdomain
 
@@ -109,6 +112,7 @@ $ ->
           width: '50px'
         }
         {
+          className: 'domain-col'
           'render':(data,type,full,meta)->
             domain = full.domain
             ip_address = full.ip_address
@@ -118,8 +122,12 @@ $ ->
               '<a href="http://' + ip_address + '" target="blank">' + ip_address + '</a>'
 
         }
-        { data: 'path' }
         {
+          className: 'path-col'
+          data: 'path'
+        }
+        {
+          className: 'category-col'
           'render': (data, type, full, meta) ->
             categories = ''
             category = ''
@@ -132,9 +140,11 @@ $ ->
             category
         }
         {
+          className: 'suggested-col'
           data: 'suggested_category'
         }
         {
+          className: 'wbrs-col'
           data: 'wbrs_score'
           width: '20px'
         }
@@ -147,6 +157,7 @@ $ ->
               data
         }
         {
+          className: 'company-col'
           data: 'company_name'
         }
 
@@ -172,6 +183,12 @@ $ ->
 
     }
 
+    $('.sorting').click (el) ->
+      selected = el.target.className.split(' ')[0]
+      $('.table-column-highlighter').removeClass 'table-column-highlighter'
+      $('.' + selected).addClass 'table-column-highlighter'
+      return
+    return
 
     $('#general_search').on 'keyup', (e) ->
       if event.keyCode == 13
