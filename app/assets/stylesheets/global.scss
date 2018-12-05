@@ -6641,82 +6641,32 @@ h2 {
 }
 
 
-// Cluster top bar header Scss begin here.
-.complaint-mgt-top-area.cluster-mgt-top-area {
+// Cluster top bar header
+.cluster-mgt-top-area {
   background-color: $content-tab-color;
+  padding-bottom: 25px;
 
-  .cluster-title {
-    margin: 0;
-
-    .dashboard-left-data {
-      padding: 0 0;
-      margin-top: 6px;
-
-      h1 {
-        margin: 0;
-      }
-    }
-
-    .search-stg {
-      height: 50px;
-      margin: 0 auto;
-
-      .row {
-        height: 100%;
-
-        .search-box {
-          background-image: none;
-          padding: 0 0 0 10px;
-        }
-
-        input {
-          margin-top: 10px;
-          height: 30px;
-        }
-
-        button {
-          padding-top: 5px;
-          padding-bottom: 5px;
-          margin-top: 10px;
-          height: 30px;
-          vertical-align: center;
-          border-radius: 2px;
-        }
-        .apply-filter-btn {
-          background-repeat: no-repeat;
-          background-size: 26px;
-          padding-left: 40px !important;
-          background-position: 8px center;
-        }
-
-        .search-options-row {
-          max-width: 300px;
-        }
-        .btn-layout {
-          margin: 0;
-
-          .col-xs-6 {
-            .radio {
-              margin: 0;
-              label {
-                line-height: 4.6;
-              }
-            }
-          }
-        }
-      }
-    }
+  .search-box {
+    background-image: none;
+    padding: 0 0 0 10px;
+    margin-top: 10px;
+    height: 30px;
+  }
+  .apply-filter-btn {
+    background-repeat: no-repeat;
+    background-size: 26px;
+    background-position: 8px center;
+    height: 30px;
+    padding-left: 40px !important;
+    padding-top: 5px;
+    padding-bottom: 5px;
+    margin-top: 10px;
   }
 }
 
-//Toolbar Layout UI ticket 194
-.temp-spacer {
+.current-cluster-info-wrapper {
   padding: 20px 15px;
-  min-height: auto;
 
-  .default-padding {
-    padding: 0 0 15px 0;
-  }
   .result-label.vertical-separator {
     border-right: 1px solid $nav-toolbar-color;
   }
@@ -6735,37 +6685,23 @@ h2 {
       float: right;
     }
   }
-  .content-label-sm {
-    width: 100%;
-    display: block;
-    text-align: left;
-  }
-
-  .toolbar {
-    height: 27px;
-
-    .div {
-
-      .toolbar-button {
-        padding-left: 20px;
-      }
-    }
-
-    .cat-btn {
-      margin: 4px 0 0 5px;
-      background-color: $content-tab-color;
-      color: white;
-    }
-
-    .cat-btn.active {
-      background-color: $primary-section-color;
-    }
-    .cat-btn:hover {
-      background-color: $sidebar-nav-base;
-    }
-
-  }
 }
+
+.copycat-btn {
+  margin: 4px 0 0 5px;
+  background-color: $content-tab-color;
+  color: white;
+  display: block;
+  height: 27px;
+}
+
+.copycat-btn.active {
+  background-color: $primary-section-color;
+}
+.copycat-btn:hover {
+  background-color: $sidebar-nav-base;
+}
+
 // Cluster mgmt UI - Comment box / Category Submission
 .card {
   width: 100%;
@@ -6787,7 +6723,7 @@ h2 {
       width: 80%;
     }
 
-    button {
+    button.icon-submit {
       width: 20%;
       background-color: $primary-section-color;
       margin: 0 0 0 10px;
@@ -6829,7 +6765,7 @@ h2 {
   justify-content: space-evenly;
   padding: 0 25px;
 
-  .cat-paste-btn {
+  .copycat-paste-btn {
     background-color: $primary-section-color;
     background-size: 15px;
     background-position: 10px center;
@@ -6839,7 +6775,7 @@ h2 {
 
   }
 
-  .cat-clear-btn {
+  .copycat-clear-btn {
     background-color: $nav-toolbar-color;
     background-size: 22px;
     background-position: 10px center;
@@ -6910,8 +6846,6 @@ h2 {
 }
 
 
-
-
 .category-column .form-control.selectize.selectize-dropdown.cluster_categories {
   margin-top: 8px;
   padding: 0 !important;
@@ -6944,7 +6878,6 @@ h2 {
 }
 
 .cluster-table-toolbar {
-  margin-top: 58px;
   margin-bottom: 0;
 }
 

@@ -10,23 +10,20 @@
     %span.loader-msg Loading data...
     %input#user_id{type: 'hidden', name: 'user_id', value: "#{current_user.id}"}
   .complaint-mgt-top-area.cluster-mgt-top-area
-    .row.cluster-title
-      .col-xl-3.col-lg-4.col-md-5.col-sm-6.col-xs-12.dashboard-left-data
+    .row
+      .col-xl-3.col-lg-4.col-md-5.col-sm-6.col-xs-12
         %h1= content_for :webcat_page
         %span.top-info-icon{class: "#{content_for :webcat_icon}"}
-      .col-xl-9.col-lg-8.col-md-7.col-sm-6.col-xs-12.search-stg
+      .col-xl-9.col-lg-8.col-md-7.col-sm-6.col-xs-12
         .row
-          .col-xs-10
-            .row
-              .col-xs-9
-                %input#cluster_filter_field.text_field.search-box{placeholder: 'Regex', autofocus: 'true'}
-              .col-xs-3.no_pad
-                %button#cluster_filter_button.primary{onclick: 'apply_filter_to_table()', class:'apply-filter-btn icon-filter-white'}Apply Filter
+          .col-xs-9
+            %input#cluster_filter_field.text_field.search-box{placeholder: 'Regex', autofocus: 'true'}
+          .col-xs-3.no_pad
+            %button#cluster_filter_button.primary{onclick: 'apply_filter_to_table()', class:'apply-filter-btn icon-filter-white'}Apply Filter
 
   .row
-    .col-xs-7.temp-spacer
-      .row.default-padding
-
+    .col-xs-7
+      .current-cluster-info-wrapper
         .result-label.vertical-separator
           Current Cluster Entries:
           %span#total_results
@@ -35,14 +32,22 @@
           Regex:
           %span#regex-filter
 
+    .col-xs-5
+      .card
+        .content-label-sm Comment
+        .card-body
+          %input#cluster_comment_field.text_field
+          %button.toolbar-button.icon-submit{'onclick': 'categorize_clusters()'} Submit Changes
+  .row
+    .col-xs-12
       .toolbar.cluster-table-toolbar
-        .div
+        %div
           %label.toolbar-section-label View
           %button.toolbar-button.icon-opened-selected.esc-tooltipped{title: 'Open Viewable', onclick: 'open_selected_clusters()'}
             %span.toolbar-button-text Open Selected
           %button.toolbar-button.icon-open-all.esc-tooltipped{title: 'Open All', onclick: 'open_all_clusters()'}
             %span.toolbar-button-text Open All
-        .div
+        %div
           %label.toolbar-section-label View Nested Data
           %button.toolbar-button.collapse-button.esc-tooltipped{onclick: 'collapse_selected("clusters-index")', type: 'button', title: 'Collapse Selected'}
             %span.toolbar-button-text Collapse Selected
@@ -52,15 +57,8 @@
             %span.toolbar-button-text Expand Selected
           %button.toolbar-button.expand-all.esc-tooltipped{onclick: 'expand_all("clusters-index")', type: 'button', title: 'Expand All'}
             %span.toolbar-button-text Expand All
-        %button.toolbar-button.cat-btn.icon-copycat.esc-tooltipped{'onclick': 'copycat_dialog()', title: 'CopyCat Tool'}
+        %button.toolbar-button.copycat-btn.icon-copycat.esc-tooltipped{'onclick': 'copycat_dialog()', title: 'CopyCat Tool'}
           %span.toolbar-button-text CopyCat Tool
-
-    .col-xs-5
-      .card
-        .content-label-sm Comment
-        .card-body
-          %input#cluster_comment_field.text_field
-          %button.toolbar-button.icon-submit{'onclick': 'categorize_clusters()'} Submit Changes
 
   .row
     .col-xs-12
@@ -82,7 +80,7 @@
     %select#copycat-categories.selectize{:multiple=>"multiple", :placeholder=>"Add Categories", :value=>"", :name=>""}
 
   .copycat-tool-footer
-    %button.toolbar-button.cat-paste-btn.icon-paste{'onclick': 'copycat_paste()'} Paste Categories
-    %button.toolbar-button.cat-clear-btn.icon-clear{'onclick': 'copycat_clear()'} Clear Categories
+    %button.toolbar-button.copycat-paste-btn.icon-paste{'onclick': 'copycat_paste()'} Paste Categories
+    %button.toolbar-button.copycat-clear-btn.icon-clear{'onclick': 'copycat_clear()'} Clear Categories
 
 #whois_dialog{title: 'Domain Lookup Information'}
