@@ -66,6 +66,7 @@ $super-faint-neutral: #f9f9f9;
 $faint-accent-color:  #dff1f7;
 $faint-alt-highlight: #fff7cd; /* focus for form inputs */
 $medium-neutral-color: #EAEAEA;
+$dark-neutral-color:  #c2c6c8;
 $table-dark-body: #4E4E4E;
 $table-dark-header: #413D3D;
 
@@ -4452,7 +4453,7 @@ table > tbody > tr > td.dispute_rep_tools {
   background-color: darken($nav-toolbar-color, 8%);
   display: inline-block;
   border-radius: 2px;
-  font-weight: bold;
+  font-weight: 500;
   padding: 1px 6px;
   color: $content-bg-color;
   margin-top: -1px;
@@ -4578,12 +4579,28 @@ table > tbody > tr > td.dispute_rep_tools {
   border-color: $table-dark-header;
 }
 
+.cluster-path-table tbody tr td {
+  padding: 4px;
+  font-size: 8.5pt;
+}
+
 .dispute-entry-table tr td:first-child, .dispute-entry-table tr th:first-child, .cluster-path-table tr th:first-child, .cluster-path-table tr td:first-child {
   padding-left: 30px;
 }
 
-.dispute-entry-table thead, .cluster-path-table thead {
+.dispute-entry-table thead, .cluster-path-table thead, .cluster-path-table tfoot {
   background-color: $table-dark-header;
+  color: $content-bg-color;
+  font-size: 8pt;
+}
+
+.cluster-path-table tfoot td {
+  text-align: center;
+  color: $dark-neutral-color;
+  font-weight: 300;
+}
+
+.cluster-path-table tfoot a {
   color: $content-bg-color;
 }
 
@@ -6044,6 +6061,7 @@ table.dataTable tbody tr.selected {
 
 .nested-complaint-data-wrapper a {
   text-decoration: underline;
+  cursor: pointer;
 }
 
 .customer-label {
@@ -6693,4 +6711,23 @@ h2 {
 
 #clusters-index_wrapper .datatable-top-tools {
   margin-top: -35px;
+}
+
+.expand-cluster-entries {
+  margin: 0 8px;
+}
+
+.expand-cluster-entries::after {
+  content: '';
+  display: inline-block;
+  width: 15px;
+  height: 15px;
+  background-image: url(image_path('icon_expand_table_white.svg'));
+  background-repeat: no-repeat;
+  background-position: center center;
+  margin-bottom: -4px;
+}
+
+.expand-cluster-entries.collapse-cluster-entries::after {
+  transform: rotate(180deg);
 }
