@@ -155,12 +155,12 @@ Feature: Webcat complaints
     And I goto "/escalations/webcat/reports"
     And I fill in "complaint_entry_report_from" with "2018-08-01"
     And I fill in "complaint_entry_report_to" with "2018-08-02"
-    Then I click "complaint_entry_report" and switch to the new window
+    Then I click "#complaint_entry_report" and switch to the new window
     Then I should see "Webcat Complaint Entry Report"
     Then I goto "/escalations/webcat/reports"
     And I fill in "complaint_entry_report_from" with "2018-08-11"
     And I fill in "complaint_entry_report_to" with "2018-08-12"
-    Then I click "complaint_entry_report" and switch to the new window
+    Then I click "#complaint_entry_report" and switch to the new window
     Then I should see "Webcat Complaint Entry Report"
     
   @javascript
@@ -197,7 +197,7 @@ Feature: Webcat complaints
     And a complaint entry preload exists
     And I goto "/escalations/webcat/complaints/1"
     Then I should see "1.1.1.1"
- @now
+
   @javascript
   Scenario: lookup information is accessable via lookup button
     Given a user with role "webcat user" exists and is logged in

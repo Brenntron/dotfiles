@@ -3,12 +3,8 @@ require "rails_helper"
 RSpec.describe "Peake-Bridge complaint messages channels", type: :request do
   let(:vrt_incoming) { FactoryBot.create(:vrt_incoming_user) }
   let(:guest_company) { FactoryBot.create(:guest_company) }
-
-  it 'receives complaint payload messages' do
-    vrt_incoming
-    guest_company
-
-    post '/escalations/peake_bridge/channels/ticket-event/messages', as: :json, params: {
+  let(:complaint_params) do
+    {
         envelope: {
             channel: "ticket-event",
             addressee: "analyst-console-escalations",
@@ -77,6 +73,18 @@ RSpec.describe "Peake-Bridge complaint messages channels", type: :request do
             }
         }
     }
+  end
+  let(:bridge_message) { double('Bridge::BaseMessage', post: true) }
+
+  it 'receives complaint payload messages' do
+    vrt_incoming
+    guest_company
+    expect(Bridge::ComplaintCreatedEvent).to receive(:new).and_return(bridge_message)
+    expect(Bug).to receive(:bugzilla_create).and_return({ 'id' => '10101' })
+    expect(Customer).to receive(:process_and_get_customer).and_return(FactoryBot.create(:customer))
+    allow(ComplaintEntryPreload).to receive(:generate_preload_from_complaint_entry).and_return(true)
+
+    post '/escalations/peake_bridge/channels/ticket-event/messages', as: :json, params: complaint_params
 
     expect(response).to be_success
     complaint = Complaint.where(ticket_source_key: 1001).first

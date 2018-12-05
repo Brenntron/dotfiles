@@ -8,7 +8,7 @@
       %input{type: 'hidden', name: 'resolution', value: params['resolution']}
       %input{type: 'hidden', name: 'engineer', value: params['engineer']}
       %input{type: 'hidden', name: 'customer_id', value: params['customer_id']}
-      %button Export
+      %button{class: 'resolution-age-export'} Export
 
 
   .report-div
@@ -27,5 +27,5 @@
               %td= entry.case_resolved_at
               %td= entry.resolution
               %td= entry.cvs_username
-              %td= ApplicationRecord.humanize_secs(entry.case_resolved_at - entry.case_opened_at)
-  
+              - if entry.case_resolved_at.present? && entry.case_opened_at.present?
+                %td= ApplicationRecord.humanize_secs(entry.case_resolved_at - entry.case_opened_at)

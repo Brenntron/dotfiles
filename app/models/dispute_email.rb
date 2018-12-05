@@ -162,13 +162,13 @@ class DisputeEmail < ApplicationRecord
       params[:attachments].each do |key, attachment|
 
         payload = {}
-        payload[:file_name] = attachment.filename
-        payload[:file_content] = attachment.tempfile
-        payload[:content_type] = attachment.type
+        payload[:file_name] = attachment['filename']
+        payload[:file_content] = attachment['tempfile']
+        payload[:content_type] = attachment['type']
         new_local_attachment = DisputeEmailAttachment.build_and_push_to_bugzilla(xmlrpc, payload, user, new_email, false)
         s3_file_path = new_local_attachment.push_to_aws(attachment)
         new_attachment = {}
-        new_attachment[:file_name] = attachment.filename
+        new_attachment[:file_name] = attachment['filename']
         new_attachment[:file_url] = new_local_attachment.s3_url(s3_file_path)
         attachments_to_mail << new_attachment
       end
@@ -234,8 +234,8 @@ class DisputeEmail < ApplicationRecord
 
   def self.bad_gateway_body
     <<~BADGATEWAY
-Thank you for emailing the Cisco Talos Intelligence Group dispute system.  Unfortunately, we are not able to accommodate a request sent directly to the system.  In order to file a dispute against a category or reputation score, please submit your request via our dispute page: 
-https://talosintelligence.com/reputation_center/support
+      Thank you for emailing the Cisco Talos Intelligence Group dispute system.  Unfortunately, we are not able to accommodate a request sent directly to the system.  In order to file a dispute against a category or reputation score, please submit your request via our dispute page: 
+      https://talosintelligence.com/reputation_center/support
     BADGATEWAY
   end
 
@@ -245,8 +245,8 @@ https://talosintelligence.com/reputation_center/support
 
   def self.old_case_gateway_body
     <<~BADGATEWAY
-Thank you for emailing the Cisco Talos Intelligence Group dispute system.  Unfortunately, this case has expired and can no longer be reopened.  In order to file a dispute against a category or reputation score, please submit your request via our dispute page: 
-https://talosintelligence.com/reputation_center/support
+      Thank you for emailing the Cisco Talos Intelligence Group dispute system.  Unfortunately, this case has expired and can no longer be reopened.  In order to file a dispute against a category or reputation score, please submit your request via our dispute page: 
+      https://talosintelligence.com/reputation_center/support
     BADGATEWAY
   end
 

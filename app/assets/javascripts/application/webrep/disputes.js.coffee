@@ -57,7 +57,7 @@ window.populate_webrep_index_table = (data = {}) ->
         datatable = $('#disputes-index').DataTable()
         datatable.clear();
         datatable.rows.add(json.data);
-        datatable.draw();
+        datatable.draw(false);
         if array_of_showns.length > 0
           for dispute_id_shown in array_of_showns
             td = $('#disputes-index').find('td.expandable-row-column')
@@ -92,6 +92,7 @@ window.populate_webrep_index_table = (data = {}) ->
             $('.dispute_check_box').each ->
               if this.value == dispute_click
                 this.checked = true
+                datatable.row(this.closest('tr')).select()
 
         if array_of_dispute_entry_clicks.length > 0
           for dispute_entry_click in array_of_dispute_entry_clicks
@@ -203,8 +204,9 @@ window.dispute_status_drop_down = (dispute_id) ->
       status = response.status
       comment = response.comment
 
-      $('.ticket-status-radio' + '#' + status).prop("checked", true);
-      $('.ticket-status-comment').text(comment)
+      $('.ticket-status-radio' + '#' + status).prop("checked", true)
+      if comment?
+        $('.ticket-status-comment').text(comment)
   )
 
 window.dispute_resolution_drop_down = (dispute_id) ->
@@ -218,13 +220,12 @@ window.dispute_resolution_drop_down = (dispute_id) ->
     dataType: 'json'
     success: (response) ->
       response = JSON.parse(response)
-
       resolution = response.resolution
       resolution_comment = response.resolution_comment
 
       # Fill in resolution radio button and comment
       $('.dispute-resolution-' + dispute_id + '#' + resolution).prop("checked", true)
-      $('#dispute-resolution-comment').text(resolution_comment)
+      $('.ticket-resolution-comment').text(resolution_comment)
   )
 
 window.entry_status_drop_down = (dispute_entry_id) ->
@@ -599,7 +600,7 @@ window.show_page_edit_status = () ->
 
   if resolution
     data.resolution = resolution
-    data.comment = $('#dispute-resolution-comment').val()
+    data.comment = $('.ticket-resolution-comment').val()
 
   std_msg_ajax(
     url: '/escalations/api/v1/escalations/webrep/disputes/set_disputes_status'
@@ -1003,9 +1004,31 @@ $ ->
 
     )
 
-  $('#disputes_check_box').change ->
-    $('.dispute_check_box').prop 'checked', @checked
-    return
+  window.toggleRow = (box) ->
+    if $(box)[0].checked
+      $(box).closest('tr').addClass('selected')
+    else
+      $(box).closest('tr').removeClass('selected')
+
+  $('.ticket-status-radio').click ->
+    all_stat_radios = $('#index-edit-ticket-status-dropdown').find('.status-radio-wrapper')
+    if $(this).is(':checked')
+      wrapper = $(this).parent()
+      $(all_stat_radios).removeClass('selected')
+      $(wrapper).addClass('selected')
+
+    if $(this).attr('id') == 'RESOLVED_CLOSED'
+#      debugger
+      $('#show-ticket-resolution-submenu').show()
+      stat_comment = $('#ticket-non-res-submit').find('.ticket-status-comment')
+      $('#ticket-non-res-submit').hide()
+      $(stat_comment).val('')
+    else
+      $('#ticket-non-res-submit').show()
+      res_comment = $('.resolution-comment-wrapper').find('.ticket-status-comment')
+      $('.ticket-resolution-radio').prop('checked', false)
+      $('#show-ticket-resolution-submenu').hide()
+      $(res_comment[0]).val('')
 
   # Edit Ticket: Edit Ticket Status
   $('#index_ticket_status').click ->
@@ -1097,7 +1120,11 @@ $ ->
       9
       'desc'
     ] ]
-    dom: '<"datatable-top-tools"lf>t<ip>'
+    dom: '<"datatable-top-tools no-margin-datatable-top-tool"lf>t<ip>'
+    language: {
+      search: "_INPUT_"
+      searchPlaceholder: "Search within table"
+    }
     columnDefs: [
       {
         targets: [
@@ -1130,6 +1157,10 @@ $ ->
         targets: [ 8 ]
         className: 'alt-col'
       }
+      {
+        targets: [ 10 ]
+        className: 'age-col'
+      }
     ]
     columns: [
       {
@@ -1141,7 +1172,7 @@ $ ->
 
         render: (data) ->
 
-          '<input type="checkbox" name="cbox" class="dispute_check_box" id="cbox' + data + '" value="' + data + '" />'
+          '<input type="checkbox" onclick="toggleRow(this)" name="cbox" class="dispute_check_box" id="cbox' + data + '" value="' + data + '" />'
 
       }
       {
@@ -1163,17 +1194,34 @@ $ ->
       { data: 'd_entry_preview' }
       { data: 'assigned_to' }
       { data: 'case_opened_at' }
-      { data: 'case_age' }
+      {
+        data: 'case_age'
+        render: (data) ->
+          parts = data.split(' ')
+          days = parseInt(parts[0])
+          hour = parseInt(parts[1])
+
+          if days == 0
+            if hour < 3
+              data
+            else if hour < 5
+              '<span class="ticket-age-over3hr">' + data + '</span>'
+            else
+              '<span class="overdue">' + data + '</span>'
+          else
+            '<span class="overdue">' + data + '</span>'
+      }
       { data: 'source' }
       { data: 'submitter_type'}
       { data: 'submitter_org' }
       { data: 'submitter_domain' }
       { data: 'submitter_name' }
       { data: 'submitter_email' }
+      { data: 'status_comment' }
 
 
     ])
-
+  $('#disputes-index_filter input').addClass('table-search-input');
   window.format = (dispute) ->
     table_head = '<table class="table dispute-entry-table">' + '<thead>' + '<tr>' + '<th><input class="dispute_entry_select_all" type="checkbox" onclick="select_or_deselect_all(' + dispute.id + ')" id=' + dispute.id + ' /></th>' + '<th class="entry-col-content">Dispute Entry</th>' + '<th class="entry-col-status">Dispute Entry Status</th>' + '<th class="entry-col-res">Dispute Entry Resolution</th>' + '<th class="entry-col-disp">Suggested Disposition</th>' + '<th class="entry-col-cat">Category</th>' + '<th class="entry-col-wbrs-score">WBRS Score</th>' + '<th class="entry-col-wbrs-hits">WBRS Total Rule Hits</th>' + '<th class="entry-col-wbrs-rules">WBRS Rules</th>' + '<th class="entry-col-sbrs-score">SBRS Score</th>' + '<th class="entry-col-sbrs-hits">SBRS Total Rule Hits</th>' + '<th class="entry-col-sbrs-rules">SBRS Rules</th>' + '</tr>' + '</thead>' + '<tbody>'
     entry = dispute.dispute_entries
@@ -1351,41 +1399,41 @@ $ ->
 $ ->
 
   $('#advanced-search-button').click ->
-  std_msg_ajax(
-    method: 'GET'
-    url: '/escalations/api/v1/escalations/webrep/disputes/autopopulate_advanced_search'
-    success: (response) ->
+    std_msg_ajax(
+      method: 'GET'
+      url: '/escalations/api/v1/escalations/webrep/disputes/autopopulate_advanced_search'
+      success: (response) ->
 
-      $('#user-list').empty()
-      $('#status-list').empty()
-      $('#submittertype-list').empty()
-      $('#contactname-list').empty()
-      $('#contactemail-list').empty()
-      $('#company-list').empty()
-      $('#resolution-list').empty()
+        $('#user-list').empty()
+        $('#status-list').empty()
+        $('#submittertype-list').empty()
+        $('#contactname-list').empty()
+        $('#contactemail-list').empty()
+        $('#company-list').empty()
+        $('#resolution-list').empty()
 
 
-      for user in response.json.case_owners
-        $('#user-list').append '<option value=\'' + user.cvs_username + '\'></option>'
+        for user in response.json.case_owners
+          $('#user-list').append '<option value=\'' + user.cvs_username + '\'></option>'
 
-      for status in response.json.statuses
-        $('#status-list').append '<option value=\'' + status + '\'></option>'
+        for status in response.json.statuses
+          $('#status-list').append '<option value=\'' + status + '\'></option>'
 
-      for type in response.json.submitter_types
-        $('#submittertype-list').append '<option value=\'' + type + '\'></option>'
+        for type in response.json.submitter_types
+          $('#submittertype-list').append '<option value=\'' + type + '\'></option>'
 
-      for contact in response.json.contacts
-        $('#contactname-list').append '<option value=\'' + contact.name + '\'></option>'
+        for contact in response.json.contacts
+          $('#contactname-list').append '<option value=\'' + contact.name + '\'></option>'
 
-      for contact in response.json.contacts
-        $('#contactemail-list').append '<option value=\'' + contact.email + '\'></option>'
+        for contact in response.json.contacts
+          $('#contactemail-list').append '<option value=\'' + contact.email + '\'></option>'
 
-      for company in response.json.companies
-        $('#company-list').append '<option value=\'' + company.name + '\'></option>'
+        for company in response.json.companies
+          $('#company-list').append '<option value=\'' + company.name + '\'></option>'
 
-      for resolution in response.json.resolutions
-        $('#resolution-list').append '<option value=\'' + resolution + '\'></option>'
-  )
+        for resolution in response.json.resolutions
+          $('#resolution-list').append '<option value=\'' + resolution + '\'></option>'
+    )
 
 
   $(document).ready ->
@@ -1426,6 +1474,7 @@ $ ->
       data['submitter-domain'] = $("#submitter-domain-checkbox").is(':checked')
       data['contact-name'] = $("#contact-name-checkbox").is(':checked')
       data['contact-email'] = $("#contact-email-checkbox").is(':checked')
+      data['status-comment'] = $("#status-comment-checkbox").is(':checked')
 
       std_msg_ajax(
         url: "/escalations/api/v1/escalations/user_preferences/update"

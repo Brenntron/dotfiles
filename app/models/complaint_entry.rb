@@ -548,18 +548,21 @@ class ComplaintEntry < ApplicationRecord
     # if Wbrs::Prefix.where(:urls => [self.hostlookup]).present?
     #   prefix_id_lookup = Wbrs::Prefix.where(:urls => [self.hostlookup]).first.prefix_id
     # end
-
-    audit_history = Wbrs::HistoryRecord.where({:prefix_id => prefix_id})
     by_cat = {}
 
-    audit_history.each do |hist|
+    if prefix_id.present?
+      audit_history = Wbrs::HistoryRecord.where(prefix_id: prefix_id)
 
-     if by_cat[hist.category_id].blank?
-       by_cat[hist.category_id] = []
-     end
+      audit_history.each do |hist|
 
-     by_cat[hist.category_id] << hist
+        if by_cat[hist.category_id].blank?
+          by_cat[hist.category_id] = []
+        end
+
+        by_cat[hist.category_id] << hist
+      end
     end
+
 
     if !by_cat.empty?
       data.each do |key, value|
@@ -585,6 +588,37 @@ class ComplaintEntry < ApplicationRecord
       prefix_history = Wbrs::HistoryRecord.where({:prefix_id => prefix_id}).sort_by {|history| history.time}.reverse
     else
       prefix_history = []
+    end
+
+    prefix_history
+  end
+
+  def history_category_data_with_preload_save
+
+    prefix_id = nil
+    prefix_results = Wbrs::Prefix.where({:urls => [self.hostlookup]})
+
+    complaint_entry_preload = ComplaintEntryPreload.where(complaint_entry_id: self.id).first
+
+    if prefix_results.present?
+      prefix_id = prefix_results.first.prefix_id
+    end
+
+    if prefix_id.present?
+      prefix_history = Wbrs::HistoryRecord.where({:prefix_id => prefix_id}).sort_by {|history| history.time}.reverse
+      if complaint_entry_preload.present?
+        complaint_entry_preload.historic_category_information ||= prefix_history.to_json
+        complaint_entry_preload.save
+      else
+        ComplaintEntryPreload.create(complaint_entry_id: self.id, historic_category_information: prefix_history.to_json)
+      end
+    else
+      prefix_history = []
+      if complaint_entry_preload.present?
+        complaint_entry_preload.historic_category_information ||= 'DATA ERROR'
+      else
+        ComplaintEntryPreload.create(complaint_entry_id: self.id, historic_category_information: 'DATA ERROR')
+      end
     end
 
     prefix_history
