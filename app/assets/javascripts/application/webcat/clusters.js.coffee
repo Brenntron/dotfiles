@@ -151,9 +151,9 @@ $ ->
       {
         data: null,
         render: (data) ->
-          '<button type="button" class="help-btn right-margin esc-tooltipped" title="Whois Domain Lookup Information" onclick="domain_whois(\'' + data.domain + '\')"></button>' +
+          '<button type="button" class="whois-btn right-margin esc-tooltipped" title="Whois Domain Lookup Information" onclick="domain_whois(\'' + data.domain + '\')"></button>' +
           '<button type="button" class="google-btn right-margin esc-tooltipped" title="Google it!" onclick="window.open(\'https://www.google.com/search?q=' + data.domain + '\')"></button>' +
-          data.domain + '<button type="button" onclick="window.open(\'https://' + data.domain + '\', \'_blank\') " class="data-btn right-margin esc-tooltipped", title="Open ' + data.domain + ' in a new tab"></button>' +
+          data.domain + '<button type="button" onclick="window.open(\'https://' + data.domain + '\', \'_blank\') " class="open-in-tab-btn right-margin esc-tooltipped", title="Open ' + data.domain + ' in a new tab"></button>' +
           '<span class="vertical-separator"></span><span class="entry-count">' + data.cluster_size + '</span>'
       }
       {
