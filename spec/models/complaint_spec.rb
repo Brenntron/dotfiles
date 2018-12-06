@@ -165,7 +165,9 @@ describe Complaint do
     allow(CapybaraSpider).to receive(:low_capture).and_return('')
     allow(Bridge::ComplaintCreatedEvent).to receive(:new).and_return(double('Bridge::ComplaintCreatedEvent', post: nil))
 
-    Complaint.process_bridge_payload(complaint_message_payload)
+    expect do
+      Complaint.process_bridge_payload(complaint_message_payload)
+    end.to change { Complaint.count }.from(0).to(1)
     expect(ComplaintEntry.first.wbrs_score).to eq(1.58)
   end
 

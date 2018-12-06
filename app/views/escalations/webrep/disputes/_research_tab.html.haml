@@ -107,7 +107,7 @@
                       %label.content-label-sm Comment
                       %textarea.dropdown-comment.adjust-wlbl-input.note-input
                     .button-row-center
-                      %button.primary.dropdown-submit-button{type: 'button', disabled: true, onclick:'toolbar_adust_wlbl_button(this);'}
+                      %button.primary.dropdown-submit-button{type: 'button', disabled: true, onclick:'toolbar_adjust_wlbl_button(this);'}
                         Submit Changes
 
           %span.dropdown
@@ -431,7 +431,7 @@
                         %td.rule-hits-col-list
                           - entry.dispute_rule_hits.select {|rule_hit| rule_hit.rule_type == "WBRS" }.each do |wbrs_hit|
                             - unless RulehitResolutionMailerTemplate.select{|template| template.mnemonic == wbrs_hit.name}.count == 0
-                              %a.wbrs-rule-trigger{href: '#', 'data-id': "#{wbrs_hit.id}"}
+                              %a.wbrs-rule-trigger{href: '#', 'data-id': "#{wbrs_hit.id}", id: "inline-wbrs-hit-#{wbrs_hit.id}"}
                                 = wbrs_hit.name
                                 - unless wbrs_hit.equal? entry.dispute_rule_hits.select {|rule_hit| rule_hit.rule_type == "WBRS" }.last
                                   = ","
@@ -481,7 +481,7 @@
                                   - entry.referenced_tickets.each do |reference|
                                     %tr
                                       %td
-                                        %a{href: "/escalations/webrep/disputes/#{reference.id}"}
+                                        %a{href: escalations_webrep_disputes_path(reference.id)}
                                           = reference.id
                                       %td
                                         = reference.case_opened_at
@@ -506,7 +506,7 @@
                         %td.rule-hits-col-list
                           - entry.dispute_rule_hits.select {|rule_hit| rule_hit.rule_type == "SBRS" }.each do |sbrs_hit|
                             - unless RulehitResolutionMailerTemplate.select{|template| template.mnemonic == sbrs_hit.name}.count == 0
-                              %a.wbrs-rule-trigger{href: '#', 'data-id': "#{sbrs_hit.id}"}
+                              %a.wbrs-rule-trigger{href: '#', 'data-id': "#{sbrs_hit.id}", id: "inline-sbrs-hit-#{sbrs_hit.id}"}
                                 = sbrs_hit.name
                                 - unless sbrs_hit.equal? entry.dispute_rule_hits.select {|rule_hit| rule_hit.rule_type == "SBRS" }.last
                                   = ","

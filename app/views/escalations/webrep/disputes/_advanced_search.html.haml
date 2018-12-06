@@ -11,11 +11,13 @@
     %button.remove-input
   .form-group.search-item
     %label.content-label-sm Case Owner
-    %input.form-control#owner-input{name: 'username'}
+    %input.form-control#owner-input{name: 'username', list: 'user-list'}
+    %datalist#user-list
     %button.remove-input
   .form-group.search-item
     %label.content-label-sm Status
-    %input.form-control#status-input{name: 'status'}
+    %input.form-control#status-input{name: 'status', list: 'status-list'}
+    %datalist#status-list
     %button.remove-input
   .form-group.search-item.hidden
     %label.content-label-sm Priority
@@ -27,7 +29,8 @@
     %button.remove-input
   .form-group.search-item.hidden
     %label.content-label-sm Resolution
-    %input.form-control#resolution-input{name: 'resolution'}
+    %input.form-control#resolution-input{name: 'resolution', list: 'resolution-list'}
+    %datalist#resolution-list
     %button.remove-input
   .form-group.search-item.hidden#submission-type
     %label.content-label-sm Submission Type
@@ -44,19 +47,23 @@
     %button.remove-input.remove-radio-input
   .form-group.search-item.hidden
     %label.content-label-sm Submitter Type
-    %input.form-control#submitter-input{name: 'submitter'}
+    %input.form-control#submitter-input{name: 'submitter', list: 'submittertype-list'}
+    %datalist#submittertype-list
     %button.remove-input
   .form-group.search-item.hidden
     %label.content-label-sm Contact Name
-    %input.form-control#name-input{name: 'contact-name'}
+    %input.form-control#name-input{name: 'contact-name', list: 'contactname-list'}
+    %datalist#contactname-list
     %button.remove-input
   .form-group.search-item.hidden
     %label.content-label-sm Contact Email
-    %input.form-control#email-input{name: 'contact-email'}
+    %input.form-control#email-input{name: 'contact-email', list: 'contactemail-list'}
+    %datalist#contactemail-list
     %button.remove-input
   .form-group.search-item.hidden
     %label.content-label-sm Company
-    %input.form-control#company-input{name: 'company'}
+    %input.form-control#company-input{name: 'company', list: 'company-list'}
+    %datalist#company-list
     %button.remove-input
   .form-group.search-item.hidden
     %label.content-label-sm Submitter Domain
@@ -182,7 +189,7 @@
   .form-group.text-center
     %button.primary#submit-advanced-search{type: 'button', value: 'submit', onclick: 'advanced_webrep_index_table();'}
       Submit Search
-    %button.secondary#reset-advanced-search.reset
+    %button.secondary#reset-advanced-search.reset{type: 'button', onclick: 'webrep_reset_search()'}
       Reset Search
 
 

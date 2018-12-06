@@ -8,7 +8,7 @@ module API
           resource "escalations/webcat/complaint_entries" do
 
             before do
-              PaperTrail.whodunnit = current_user.id if current_user.present?
+              PaperTrail.request.whodunnit = current_user.id if current_user.present?
             end
 
             desc 'get all complaint entries'
@@ -102,6 +102,8 @@ module API
 
                   complaint_entry_packet[:screen_shot_error] = complaint_entry&.complaint_entry_screenshot&.error_message
 
+                  complaint_entry_packet[:description] = complaint_entry&.complaint&.description
+
                   if complaint_entry.complaint_entry_preload.present?
                     if complaint_entry.complaint_entry_preload.current_category_information.present? &&
                        complaint_entry.complaint_entry_preload.current_category_information != 'DATA ERROR'
@@ -149,14 +151,11 @@ module API
                   #which has available to it: mnem, descr, category_id, desc_long
 
                   complaint_entry_packet[:entry_history] = {}
-                  if complaint_entry.complaint_entry_preload.present?
-                    if complaint_entry.complaint_entry_preload.historic_category_information.present?
-                      complaint_entry_packet[:entry_history][:domain_history] = complaint_entry.complaint_entry_preload.historic_category_information
-                    else
-                      complaint_entry_packet[:entry_history][:domain_history] = complaint_entry.historic_category_data
-                    end
+                  if complaint_entry&.complaint_entry_preload&.historic_category_information.present? &&
+                     complaint_entry&.complaint_entry_preload&.historic_category_information != 'DATA ERROR'
+                    complaint_entry_packet[:entry_history][:domain_history] = complaint_entry.complaint_entry_preload.historic_category_information
                   else
-                    complaint_entry_packet[:entry_history][:domain_history] = complaint_entry.historic_category_data
+                    complaint_entry_packet[:entry_history][:domain_history] = complaint_entry.history_category_data_with_preload_save
                   end
 
                   complaint_entry_packet[:entry_history][:complaint_history] = complaint_entry.compose_versions

@@ -16,19 +16,20 @@ class Escalations::PeakeBridge::MessagesController < ApplicationController
   def messages_from_bridge
 
     case envelope_params["sender"]
-      when "snort-org"
-        Rails.logger.info("POST snort-org message, on channel #{envelope_params[:channel].inspect}")
-        fp_create(false_positive_params)
       when "talos-intelligence"
         Rails.logger.info("POST talos-intelligence message, on channel #{envelope_params[:channel].inspect}")
-        obj_type_key = message_params.keys.first
+        obj_type_key, message_payload = message_params.to_h.first
         obj_type = obj_type_key.to_s.camelize
-        message_params[obj_type_key][:bugzilla_session] = bugzilla_session
-        message_params[obj_type_key][:current_user] = current_user
-        #return_message = obj_type.constantize.process_bridge_payload(message_params[obj_type_key])
 
-        Thread.new { obj_type.constantize.process_bridge_payload(message_params[obj_type_key]) }
-        #obj_type.constantize.process_bridge_payload(message_params[obj_type_key])
+        if message_payload.respond_to?(:permit!)
+          message_payload = message_payload.permit!.to_h
+        end
+        message_payload[:bugzilla_session] = bugzilla_session
+        message_payload[:current_user] = current_user
+        #return_message = obj_type.constantize.process_bridge_payload(message_payload)
+
+        Thread.new { obj_type.constantize.process_bridge_payload(message_payload) }
+        #obj_type.constantize.process_bridge_payload(message_payload)
 
         #return_message = {
         #    "envelope":
@@ -37,7 +38,7 @@ class Escalations::PeakeBridge::MessagesController < ApplicationController
         #            "addressee": "talos-intelligence",
         #            "sender": "analyst-console"
         #        },
-        #    "message": {"source_key":message_params[obj_type_key]["source_key"],"ac_status":"CREATE_PENDING", "ticket_entries": "", "case_email": case_email}
+        #    "message": {"source_key":message_payload["source_key"],"ac_status":"CREATE_PENDING", "ticket_entries": "", "case_email": case_email}
         #}
 
         render json: {}, status: :ok
@@ -62,35 +63,9 @@ class Escalations::PeakeBridge::MessagesController < ApplicationController
            status: :bad_request
   end
 
+
+
   private
-
-  def fp_create(params)
-    sender = envelope_params[:sender]
-    Rails.logger.debug("Analyst Console recieved message to create a false positive bug from sender #{sender}")
-    false_positive = FalsePositive.where(source_key:false_positive_params['source_key']).first
-    unless false_positive
-      false_positive = FalsePositive.create_from_params(false_positive_params,
-                                                        attachments_attrs: attachments_params,
-                                                        sender: sender)
-    end
-    Thread.new { false_positive.create_escalation_action(bugzilla_session) }
-    return_message = {
-        "envelope":
-            {
-                "channel": "fp-event",
-                "addressee": "snort-org",
-                "sender": "analyst-console"
-            },
-        "message": {"source_key":message_params["source_key"],"ac_status":"CREATE_ACK"},
-    }
-    render json: return_message, status: :ok
-
-  rescue => except
-    log_exception(except)
-    render plain: except.message, status: :internal_server_error
-  end
-
-
 
 
   # @return [Bugzilla::XMLRPC] Authenticated bugzilla session
@@ -121,10 +96,6 @@ class Escalations::PeakeBridge::MessagesController < ApplicationController
   def message_params
     #TODO: use stronger permitting here eventually
     params.require(:message).permit!
-  end
-
-  def false_positive_params
-    params.require(:message).permit(:user_email, :source_key, fp_attrs: {})
   end
 
   def talos_intelligence_params

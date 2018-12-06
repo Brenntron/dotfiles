@@ -68,6 +68,14 @@ window.cat_new_url = ()->
       std_msg_error(response,"", reload: false)
   )
 
+window.webcat_reset_search = ()->
+  inputs = document.getElementsByClassName('form-control')
+  for i in inputs
+    i.value = ""
+  tags_select = $('#tags-input').selectize()
+  tags_control = tags_select[0].selectize
+  tags_control.clear()
+
 window.multiple_url_categorization = ()->
   event.preventDefault()
   $('#loader-modal').modal({

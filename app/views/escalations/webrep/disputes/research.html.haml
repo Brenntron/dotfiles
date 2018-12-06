@@ -10,7 +10,7 @@
         .col-xs-6
           = search_form.radio_button(:scope, 'broad', id: 'research-search-broad', checked: !params['search'] || params['search']['scope'].eql?("broad"))
           %label{for: 'research-search-broad'} Broad Search
-
+      =search_form.submit :Submit, id: 'submit-button'
   .row
     .col-xs-12
       - if params['search']
@@ -366,7 +366,7 @@
                                     - referenced_entries.each do |reference|
                                       %tr
                                         %td
-                                          %a{href: "/escalations/webrep/disputes/#{reference.id}"}
+                                          %a{href: escalations_webrep_disputes_path(reference.id)}
                                             = reference.id
                                         %td
                                           = reference.case_opened_at
