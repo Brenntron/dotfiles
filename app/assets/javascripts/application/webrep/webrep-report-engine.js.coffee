@@ -20,6 +20,10 @@ window.refresh_visable_report_tab = ()->
   window.build_multi_ticket_resolution_by_owner_chart()
   window.build_single_time_to_close_linechart()
 
+
+#window.initialize_charts = () ->
+
+
 window.refresh_single_open_tickets_table = (user_id)->
   from = localStorage.getItem('webrep_report_range_from')
   to = localStorage.getItem('webrep_report_range_to')
@@ -303,6 +307,7 @@ window.build_graph_ticket_entries_submitter = () ->
               data: submitterGuestChartData
             }]
         options:
+          responsive: false
           legend:
             display: false
           scales:
@@ -339,6 +344,7 @@ window.build_graph_ticket_entries_submitter = () ->
             }
           ]
         options:
+          responsive: false
           legend: display: false
           scales:
             yAxes: [
@@ -415,6 +421,7 @@ window.build_single_closed_email_entries_resolution_piechart = () ->
             data: emailEntryData
           } ]
         options:
+          responsive: false
           legend: false
           pieceLabel:
             render: (args) ->
@@ -490,6 +497,7 @@ window.build_single_time_to_close_linechart = () ->
           labels: closedTicketNumbers
           datasets: timeCloseTicketsDataSets
         options:
+          responsive: false
           legend: false
           elements:
             point:
@@ -600,6 +608,7 @@ window.build_single_closed_web_entries_resolution_piechart = () ->
             data: emailEntryData
           } ]
         options:
+          responsive: false
           legend: false
           pieceLabel:
             render: (args) ->
@@ -669,6 +678,7 @@ window.build_multi_closed_email_entries_resolution_piechart = () ->
             data: emailEntryData
           } ]
         options:
+          responsive: false
           legend: false
           pieceLabel:
             render: (args) ->
@@ -737,6 +747,7 @@ window.build_multi_closed_web_entries_resolution_piechart = () ->
             data: emailEntryData
           } ]
         options:
+          responsive: false
           legend: false
           pieceLabel:
             render: (args) ->
@@ -812,6 +823,7 @@ window.build_single_entries_closed_by_day_chart = () ->
           labels: ticketTypeChartLabels
           datasets: window.userTicketClosedGraphDatasets,
         options:
+          responsive: false
           legend:
             display: false
           title:
@@ -904,6 +916,7 @@ window.build_multi_entries_closed_by_day_chart = () =>
           labels: dateRange
           datasets: totalTicketEntriesbyType
         options:
+          responsive: false
           legend: display: false
           scales:
             yAxes: [
@@ -982,6 +995,7 @@ window.build_multi_ticket_resolution_by_owner_chart = () ->
             }
           ]
         options:
+          responsive: false
           title:
             display: false
           legend: display: false
@@ -1022,6 +1036,9 @@ window.build_multi_entries_closed_by_owners_chart = () ->
     users: team_ids['team']
   }
 
+  $("#ticket-entries-closed-by-owner").empty()
+
+
   headers = {'Token': $('input[name="token"]').val(), 'Xmlrpc-Token': $('input[name="xml_token"]').val()}
   $.ajax(
     url: '/escalations/api/v1/escalations/webrep/reports/ticket_entries_closed_by_ticket_owner_report'
@@ -1038,6 +1055,7 @@ window.build_multi_entries_closed_by_owners_chart = () ->
 
       new Chart($('#ticket-entries-closed-by-owner'),
         type: 'horizontalBar'
+        responsive: false
         data:
           labels: ticketOwners
           datasets: [ {
@@ -1045,6 +1063,7 @@ window.build_multi_entries_closed_by_owners_chart = () ->
             data: ticketEntriesByOwner
           } ]
         options:
+          responsive: false
           legend: display: false
           scales:
             yAxes: [
@@ -1108,6 +1127,7 @@ window.build_multi_average_time_to_close_tickets = () ->
             data: avgTimeToCloseTickets
           } ]
         options:
+          responsive: false
           legend: display: false
           scales:
             yAxes: [
@@ -1177,6 +1197,7 @@ window.build_multi_rulehits_for_fp_res_chart = () ->
             data: totalRuleHits
           } ]
         options:
+          responsive: false
           legend: display: false
           scales:
             yAxes: [
