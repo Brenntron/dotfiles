@@ -7,7 +7,7 @@ module API
 
           resource "escalations/webrep/reports" do
             before do
-              PaperTrail.whodunnit = current_user.id if current_user.present?
+              PaperTrail.request.whodunnit = current_user.id if current_user.present?
             end
             desc 'Open Tickets Report Table'
             params do
