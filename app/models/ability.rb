@@ -25,7 +25,7 @@ class Ability
     if role_names.include?('admin')
       can :read, :all
       can [:acknowledge_bug], Bug
-      can :manage, [Admin, User, Role, Task]
+      can :manage, [Admin, User, Role]
     end
 
 
@@ -68,7 +68,7 @@ class Ability
 
     if role_names.include?('webrep user')
       can :manage, [Dispute, DisputeComment, DisputeEmail, DisputeEmailAttachment, Attachment, Note,
-                    DisputeEntry, EmailTemplate, Wbrs::ManualWlbl]
+                    DisputeEntry, EmailTemplate, Wbrs::ManualWlbl, ResolutionMessageTemplate]
       can :publish_to_bugzilla, Note
     end
 
