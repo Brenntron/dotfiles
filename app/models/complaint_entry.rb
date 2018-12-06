@@ -548,18 +548,21 @@ class ComplaintEntry < ApplicationRecord
     # if Wbrs::Prefix.where(:urls => [self.hostlookup]).present?
     #   prefix_id_lookup = Wbrs::Prefix.where(:urls => [self.hostlookup]).first.prefix_id
     # end
-
-    audit_history = Wbrs::HistoryRecord.where({:prefix_id => prefix_id})
     by_cat = {}
 
-    audit_history.each do |hist|
+    if prefix_id.present?
+      audit_history = Wbrs::HistoryRecord.where(prefix_id: prefix_id)
 
-     if by_cat[hist.category_id].blank?
-       by_cat[hist.category_id] = []
-     end
+      audit_history.each do |hist|
 
-     by_cat[hist.category_id] << hist
+        if by_cat[hist.category_id].blank?
+          by_cat[hist.category_id] = []
+        end
+
+        by_cat[hist.category_id] << hist
+      end
     end
+
 
     if !by_cat.empty?
       data.each do |key, value|
