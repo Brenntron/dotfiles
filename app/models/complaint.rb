@@ -149,7 +149,7 @@ class Complaint < ApplicationRecord
     new_ips = new_entries_ips.keys.sort
 
     response = {}
-    possibles = Complaint.includes(:complaint_entries).where(:customer_id => complaint.customer_id).select {|complaint| complaint.status != RESOLVED || complaint.status != DUPLICATE}
+    possibles = complaint.customer.complaints.where.not(status: [ RESOLVED, DUPLICATE ])
     candidates = []
 
     possibles.each do |poss|
@@ -234,9 +234,8 @@ class Complaint < ApplicationRecord
         user = User.where(cvs_username:"vrtincom").first
         guest = Company.where(:name => "Guest").first
         #TODO: this should be put in a params method
-        message_payload["payload"] = message_payload["payload"].permit!.to_h
-        new_entries_ips = message_payload["payload"]["investigate_ips"].permit!.to_h
-        new_entries_urls = message_payload["payload"]["investigate_urls"].permit!.to_h
+        new_entries_ips = message_payload["payload"]["investigate_ips"]
+        new_entries_urls = message_payload["payload"]["investigate_urls"]
 
         return_payload = {}
 
@@ -246,11 +245,11 @@ class Complaint < ApplicationRecord
 
         summary = "New Web Category Complaint generated at #{DateTime.now.utc.strftime("%Y-%m-%d %H:%M")}"
 
-        full_description = %Q{
-          IPs: #{new_entries_ips.map {|key, data| key.to_s}.join(', ')}
-          URIs: #{new_entries_urls.map {|key, data| key.to_s}.join(', ')}
+        full_description = <<~HEREDOC
+          IPs: #{new_entries_ips.keys.join(', ')}
+          URIs: #{new_entries_urls.keys.join(', ')}
           Problem Summary: #{message_payload["payload"]["problem"]}
-        }
+        HEREDOC
 
         bug_attrs = {
             'product' => 'Escalations Console',
@@ -278,7 +277,7 @@ class Complaint < ApplicationRecord
 
         new_complaint.submitter_type = new_complaint.customer.company_id == guest.id ? SUBMITTER_TYPE_NONCUSTOMER : SUBMITTER_TYPE_CUSTOMER
 
-        new_complaint.save
+        new_complaint.save!
 
         response = is_possible_customer_duplicate?(new_complaint, new_entries_ips, new_entries_urls)
 
@@ -320,7 +319,7 @@ class Complaint < ApplicationRecord
           # but you better believe i dont trust this API so we have some checks to ensure the entry gets created
           importance = Wbrs::TopUrl.check_urls([key]).first.is_important
           new_complaint_entry.is_important = importance if !!importance == importance #making sure importance is a boolean
-          new_complaint_entry.save
+          new_complaint_entry.save!
 
           ComplaintEntryPreload.generate_preload_from_complaint_entry(new_complaint_entry)
 
@@ -383,7 +382,7 @@ class Complaint < ApplicationRecord
           # but you better believe i dont trust this API so we have some checks to ensure the entry gets created
           importance = Wbrs::TopUrl.check_urls([key]).first.is_important
           new_complaint_entry.is_important = !!importance #making sure importance is a boolean
-          new_complaint_entry.save
+          new_complaint_entry.save!
 
           new_payload_item = {}
           new_payload_item[:sugg_type] = entry["cat_sugg"].join(",")
@@ -440,7 +439,6 @@ class Complaint < ApplicationRecord
         #}
       end
     rescue Exception => e
-      logger.debug("Failed.")
       Rails.logger.error "Complaint failed to save, backing out all DB changes."
       Rails.logger.error $!
       Rails.logger.error $!.backtrace.join("\n")

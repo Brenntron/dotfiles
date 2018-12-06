@@ -14,7 +14,7 @@
           .email-reply-buttons
             %button.attachment-button.attachment-label.new-attachment
           %span.content-label-sm.content-label-sm-sub Subject
-          %input.communication-subject.new-subject{type: 'text'}
+          %input.communication-subject.new-subject#subject{type: 'text'}
 
 
       .template-select-wrapper
@@ -32,7 +32,7 @@
       #file-fields-new
 
     .email-reply-body-wrapper
-      %textarea.email-reply-body.new-body
+      %textarea.email-reply-body.new-body{maxlength: 64000}
 
     .email-new-button-wrapper
       %button.primary#send-new-email{value: 'submit'}

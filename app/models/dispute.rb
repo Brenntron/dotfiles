@@ -365,24 +365,25 @@ class Dispute < ApplicationRecord
   #end dispute building instance methods
   #
   def self.process_bridge_payload(message_payload)
+
+    new_dispute = nil
     verdicts_to_blacklist = []
     user = User.where(cvs_username:"vrtincom").first
-    guest = Company.where(:name => "Guest").first
-    opened_at = Time.now
-    resolved_at = Time.now
-    customer = Customer.process_and_get_customer(message_payload)
-
     begin
       ActiveRecord::Base.transaction do
+        guest = Company.where(:name => "Guest").first
+        opened_at = Time.now
+        resolved_at = Time.now
+        customer = Customer.process_and_get_customer(message_payload)
+
 
         logger.debug "Starting ticket create"
 
         #user = User.where(cvs_username:"vrtincom").first
 
         #TODO: this should be put in a params method
-        message_payload["payload"] = message_payload["payload"].permit!.to_h
-        new_entries_ips = message_payload["payload"]["investigate_ips"].permit!.to_h
-        new_entries_urls = message_payload["payload"]["investigate_urls"].permit!.to_h
+        new_entries_ips = message_payload["payload"]["investigate_ips"]
+        new_entries_urls = message_payload["payload"]["investigate_urls"]
 
         return_payload = {}
 
@@ -392,11 +393,11 @@ class Dispute < ApplicationRecord
 
         summary = "New Web Reputation Dispute generated at #{DateTime.now.utc.strftime("%Y-%m-%d %H:%M")}"
 
-        full_description = %Q{
-          IPs: #{new_entries_ips.map {|key, data| key.to_s}.join(', ')}
-          URIs: #{new_entries_urls.map {|key, data| key.to_s}.join(', ')}
+        full_description = <<~HEREDOC
+          IPs: #{new_entries_ips.keys}
+          URIs: #{new_entries_urls.keys}
           Problem Summary: #{message_payload["payload"]["problem"]}
-        }
+        HEREDOC
 
         bug_attrs = {
             'product' => 'Escalations Console',
@@ -440,7 +441,7 @@ class Dispute < ApplicationRecord
         end
         logger.debug "Saving Dispute"
 
-        new_dispute.save
+        new_dispute.save!
 
         response = is_possible_customer_duplicate?(new_dispute, new_entries_ips, new_entries_urls)
 
@@ -466,56 +467,36 @@ class Dispute < ApplicationRecord
 
           total_hits = (wbrs_hits + sbrs_hits).uniq
 
-          auto_resolve_verdict = AutoResolve.create_from_payload("IP", key, total_hits)
-
-          #this is for return back to TI to populate its ticket show pages
-          new_payload_item = {}
-          new_payload_item[:sugg_type] = entry["rep_sugg"]
-
-          if false_negative_claim
-            if auto_resolve_verdict.malicious?
-              new_payload_item[:resolution_message] = "Talos has lowered our reputation score for the URL/Domain/Host to block access."
-              new_payload_item[:resolution] = "FIXED"
-              new_payload_item[:status] = TI_RESOLVED
-            else
-              new_payload_item[:resolution_message] = AUTORESOLVED_UNCHANGED_MESSAGE
-              new_payload_item[:resolution] = "UNCHANGED"
-              new_payload_item[:status] = TI_RESOLVED
-            end
-          else
-            new_payload_item[:status] = TI_NEW
-            new_payload_item[:resolution_message] = ""
-          end
-          new_payload_item[:company_dup] = is_possible_company_duplicate?(new_dispute, key, "IP")
-          return_payload[key] = new_payload_item
-
-          new_dispute_entry = DisputeEntry.new
-          new_dispute_entry.dispute_id = new_dispute.id
-          new_dispute_entry.ip_address = key
-          new_dispute_entry.entry_type = "IP"
+          new_dispute_entry = new_dispute.dispute_entries.build(entry_type: 'IP', ip_address: key)
+          new_dispute_entry.case_opened_at = opened_at
           new_dispute_entry.sbrs_score = entry[:sbrs]["SBRS_SCORE"] == "No score" ? nil : entry[:sbrs]["SBRS_SCORE"]
           new_dispute_entry.wbrs_score = entry[:wbrs]["WBRS_SCORE"] == "No score" ? nil : entry[:wbrs]["WBRS_SCORE"]
           new_dispute_entry.suggested_disposition = entry[:sbrs]["rep_sugg"]
-          new_dispute_entry.case_opened_at = opened_at
 
-          if false_negative_claim
-            if auto_resolve_verdict.malicious?
-              new_dispute_entry.resolution_comment = "Talos has lowered our reputation score for the URL/Domain/Host to block access."
-              new_dispute_entry.resolution = DisputeEntry::STATUS_RESOLVED_FIXED_FN
-              new_dispute_entry.status = DisputeEntry::RESOLVED
-              new_dispute_entry.case_closed_at = resolved_at
-              new_dispute_entry.case_resolved_at = resolved_at
-            else
-              new_dispute_entry.resolution_comment = AUTORESOLVED_UNCHANGED_MESSAGE
-              new_dispute_entry.resolution = DisputeEntry::STATUS_RESOLVED_UNCHANGED
-              new_dispute_entry.status = DisputeEntry::RESOLVED
-              new_dispute_entry.case_closed_at = resolved_at
-              new_dispute_entry.case_resolved_at = resolved_at
-            end
-          else
+          new_dispute_entry.save!
+
+          logger.info "fetching preload"
+          ::Preloader::Base.fetch_all_api_data(key, new_dispute_entry.id)
+
+          case
+          when !false_negative_claim
             new_dispute_entry.status = DisputeEntry::NEW
+          else
+            auto_resolve_verdict = new_dispute_entry.assign_from_auto_resolve(address: key,
+                                                                              total_hits: total_hits,
+                                                                              resolved_at: resolved_at,
+                                                                              dispute_entry: new_dispute_entry)
+
+            if auto_resolve_verdict.resolved? && auto_resolve_verdict.malicious?
+              verdicts_to_blacklist << [auto_resolve_verdict, new_dispute_entry]
+            end
           end
-          new_dispute_entry.save
+
+          new_dispute_entry.save!
+
+          #this is for return back to TI to populate its ticket show pages
+          return_payload[key] = new_dispute_entry.new_payload_item
+
 
           if entry[:sbrs]["SBRS_Rule_Hits"].present?
             all_hits = entry[:sbrs]["SBRS_Rule_Hits"].split(",")
@@ -524,7 +505,7 @@ class Dispute < ApplicationRecord
               new_rule_hit.dispute_entry_id = new_dispute_entry.id
               new_rule_hit.name = rule_hit.strip
               new_rule_hit.rule_type = "SBRS"
-              new_rule_hit.save
+              new_rule_hit.save!
             end
           end
           if entry[:wbrs]["WBRS_Rule_Hits"].present?
@@ -534,13 +515,9 @@ class Dispute < ApplicationRecord
               new_rule_hit.dispute_entry_id = new_dispute_entry.id
               new_rule_hit.name = rule_hit.strip
               new_rule_hit.rule_type = "WBRS"
-              new_rule_hit.save
+              new_rule_hit.save!
             end
           end
-
-          verdicts_to_blacklist << [auto_resolve_verdict, new_dispute_entry]
-          logger.debug "fetching preload"
-          ::Preloader::Base.fetch_all_api_data(key, new_dispute_entry.id)
 
         end
         logger.debug "Creating url entries"
@@ -563,61 +540,40 @@ class Dispute < ApplicationRecord
 
           total_hits = wbrs_hits
 
-          auto_resolve_verdict = AutoResolve.create_from_payload("URI/DOMAIN", key, total_hits)
-
-          url_parts = Dispute.parse_url(key)
-          new_dispute_entry = DisputeEntry.new
-          new_dispute_entry.dispute_id = new_dispute.id
-          new_dispute_entry.uri = key
+          new_dispute_entry = new_dispute.dispute_entries.build(entry_type: 'URI/DOMAIN', uri: key)
+          new_dispute_entry.case_opened_at = opened_at
           new_dispute_entry.wbrs_score = entry["WBRS_SCORE"] == "No score" ? nil : entry["WBRS_SCORE"]
           new_dispute_entry.suggested_disposition = entry["rep_sugg"]
+          new_dispute_entry.is_important = is_important?(key)
+
+          url_parts = Dispute.parse_url(key)
           new_dispute_entry.subdomain = url_parts[:subdomain]
           new_dispute_entry.domain = url_parts[:domain]
           new_dispute_entry.path = url_parts[:path]
           new_dispute_entry.hostname = "#{url_parts[:subdomain]}.#{url_parts[:domain]}"
-          new_dispute_entry.entry_type = "URI/DOMAIN"
-          new_dispute_entry.is_important = is_important?(key)
-          new_dispute_entry.case_opened_at = opened_at
 
-          if false_negative_claim
-            if auto_resolve_verdict.malicious?
-              new_dispute_entry.resolution_comment = "Talos has lowered our reputation score for the URL/Domain/Host to block access."
-              new_dispute_entry.resolution = DisputeEntry::STATUS_RESOLVED_FIXED_FN
-              new_dispute_entry.status = DisputeEntry::RESOLVED
-              new_dispute_entry.case_closed_at = resolved_at
-              new_dispute_entry.case_resolved_at = resolved_at
-            else
-              new_dispute_entry.resolution_comment = AUTORESOLVED_UNCHANGED_MESSAGE
-              new_dispute_entry.resolution = DisputeEntry::STATUS_RESOLVED_UNCHANGED
-              new_dispute_entry.status = DisputeEntry::RESOLVED
-              new_dispute_entry.case_closed_at = resolved_at
-              new_dispute_entry.case_resolved_at = resolved_at
-            end
+          new_dispute_entry.save!
+
+          logger.info "fetching preload"
+          ::Preloader::Base.fetch_all_api_data(key, new_dispute_entry.id)
+
+          case
+          when !false_negative_claim
+            new_dispute_entry.update(status: DisputeEntry::NEW)
           else
-            new_dispute_entry.status = DisputeEntry::NEW
+            auto_resolve_verdict = new_dispute_entry.assign_from_auto_resolve(address: key,
+                                                                              total_hits: total_hits,
+                                                                              resolved_at: resolved_at,
+                                                                              dispute_entry: new_dispute_entry)
+
+            if auto_resolve_verdict.resolved? && auto_resolve_verdict.malicious?
+              verdicts_to_blacklist << [auto_resolve_verdict, new_dispute_entry]
+            end
           end
 
-          new_dispute_entry.save
+          new_dispute_entry.save!
 
-
-          new_payload_item = {}
-          new_payload_item[:sugg_type] = entry["rep_sugg"]
-          if false_negative_claim
-            if auto_resolve_verdict.malicious?
-              new_payload_item[:resolution_message] = "Talos has lowered our reputation score for the URL/Domain/Host to block access."
-              new_payload_item[:resolution] = "FIXED"
-              new_payload_item[:status] = TI_RESOLVED
-            else
-              new_payload_item[:resolution_message] = "The Talos web reputation will remain unchanged, based on available information. If you have further information regarding this URL/Domain/Host that indicates its involvement in malicious activity, please open an escalation with TAC and provide that information."
-              new_payload_item[:resolution] = "UNCHANGED"
-              new_payload_item[:status] = TI_RESOLVED
-            end
-          else
-            new_payload_item[:status] = TI_NEW
-            new_payload_item[:resolution_message] = ""
-          end
-          new_payload_item[:company_dup] = is_possible_company_duplicate?(new_dispute, new_dispute_entry.hostname, "URI/DOMAIN")
-          return_payload[key] = new_payload_item
+          return_payload[key] = new_dispute_entry.new_payload_item
 
           if entry["WBRS_Rule_Hits"].present?
             all_hits = entry["WBRS_Rule_Hits"].split(",")
@@ -626,13 +582,9 @@ class Dispute < ApplicationRecord
               new_rule_hit.dispute_entry_id = new_dispute_entry.id
               new_rule_hit.name = rule_hit.strip
               new_rule_hit.rule_type = "WBRS"
-              new_rule_hit.save
+              new_rule_hit.save!
             end
           end
-
-          verdicts_to_blacklist << [auto_resolve_verdict, new_dispute_entry]
-          logger.debug "fetching preload"
-          ::Preloader::Base.fetch_all_api_data(key, new_dispute_entry.id)
 
         end
         new_dispute.reload
@@ -642,15 +594,18 @@ class Dispute < ApplicationRecord
         logger.debug "Creating email"
         #build first official email of the new case
 
+        email_body = message_payload["payload"]["email_body"].to_s # I don't know how this comes in so we have to make sure it's a string...
+        email_body = email_body[0..64000].gsub(/\s\w+\s*$/, '... ... THIS MESSAGE WAS LONGER THAN 64,000 CHARACTERS AND HAS BEEN TRUNCATED.') # ...Or else this wouldn't work.
+
         first_email = DisputeEmail.new
         first_email.dispute_id = new_dispute.id
         first_email.email_headers = nil
         first_email.from = message_payload["payload"]["email"]
         first_email.to = nil
         first_email.subject = message_payload["payload"]["email_subject"]
-        first_email.body = message_payload["payload"]["email_body"]
+        first_email.body = email_body
         first_email.status = DisputeEmail::UNREAD
-        first_email.save
+        first_email.save!
 
 
         case_email = DisputeEmail.generate_case_email_address(new_dispute.id)
@@ -668,6 +623,7 @@ class Dispute < ApplicationRecord
       conn = ::Bridge::DisputeFailedEvent.new(addressee: "talos-intelligence", source_authority: "talos-intelligence", source_key: message_payload["source_key"])
       conn.post
 
+      nil
     end
 
 
@@ -700,7 +656,7 @@ class Dispute < ApplicationRecord
 
         args = {}
         args[:dispute_id] = dispute_entry.dispute_id
-        args[:user_id] = user.id
+        args[:user_id] = user&.id
         args[:comment] = "Dispute Entry #{dispute_entry.hostlookup} was eligible for auto-resolution, but failed to connect to RepTool. Sending this to the analysts' queue"
 
         DisputeComment.create(args)
@@ -708,8 +664,7 @@ class Dispute < ApplicationRecord
       end
     end
 
-
-
+    new_dispute
   end
 
   def self.age_to_seconds(age_str)
@@ -984,6 +939,11 @@ class Dispute < ApplicationRecord
         dispute.resolution_comment = comment
         dispute.case_closed_at = resolved_at
         dispute.case_resolved_at = resolved_at
+        dispute.status_comment = nil
+      else
+        dispute.resolution = nil
+        dispute.resolution_comment = nil
+        dispute.status_comment = comment
       end
 
       dispute.dispute_entries.each do |entry|
@@ -1061,6 +1021,13 @@ class Dispute < ApplicationRecord
       dispute_packet = dispute.attributes.slice(*%w{id priority status resolution})
       dispute_packet[:case_number] = dispute.case_id_str
       dispute_packet[:status] = "<span class='dispute_status' id='status_#{dispute.id}'> #{dispute.status} </span>"
+      if dispute&.status_comment.present?
+        dispute_packet[:status_comment] = dispute&.status_comment
+      elsif dispute&.resolution_comment.present?
+        dispute_packet[:status_comment] = dispute&.resolution_comment
+      else
+        dispute_packet[:status_comment] = nil
+      end
       dispute_packet[:case_link] = "<a href='/escalations/webrep/disputes/#{dispute.id}'>" + dispute_packet[:case_number] + "</a>"
       dispute_packet[:submitter_org] = dispute.customer.company.name
       dispute_packet[:submitter_type] = dispute.submitter_type

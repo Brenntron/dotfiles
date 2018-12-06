@@ -244,8 +244,61 @@ class DisputeEntry < ApplicationRecord
     pretty_umbrella_status
   end
 
+  def assign_from_auto_resolve(address:, total_hits:, resolved_at:, dispute_entry:)
+
+    self.status = NEW
+
+    auto_resolve_verdict = AutoResolve.create_from_payload(entry_type, address, total_hits, dispute_entry)
+
+    if auto_resolve_verdict.resolved?
+      if auto_resolve_verdict.malicious?
+        self.resolution_comment = "Talos has lowered our reputation score for the URL/Domain/Host to block access."
+        self.resolution = STATUS_RESOLVED_FIXED_FN
+        self.status = RESOLVED
+        self.case_closed_at = resolved_at
+        self.case_resolved_at = resolved_at
+      else
+        self.resolution_comment = Dispute::AUTORESOLVED_UNCHANGED_MESSAGE
+        self.resolution = STATUS_RESOLVED_UNCHANGED
+        self.status = RESOLVED
+        self.case_closed_at = resolved_at
+        self.case_resolved_at = resolved_at
+      end
+    end
+
+    auto_resolve_verdict
+  end
+
+  def new_payload_item
+    case
+    when NEW == status
+      {
+          status: Dispute::TI_NEW,
+          resolution_message: '',
+      }
+    when STATUS_RESOLVED_FIXED_FN == resolution
+      {
+          resolution_message: 'Talos has lowered our reputation score for the URL/Domain/Host to block access.',
+          resolution: 'FIXED',
+          status: Dispute::TI_RESOLVED,
+      }
+    else
+      message =
+          if 'IP' == entry_type
+            Dispute::AUTORESOLVED_UNCHANGED_MESSAGE
+          else
+            'The Talos web reputation will remain unchanged, based on available information. If you have further information regarding this URL/Domain/Host that indicates its involvement in malicious activity, please open an escalation with TAC and provide that information.'
+          end
+      {
+          resolution_message: message,
+          resolution: 'UNCHANGED',
+          status: Dispute::TI_RESOLVED,
+      }
+    end
+  end
+
   def referenced_tickets
-    is_ip_address = !!(hostlookup  =~ Resolv::IPv4::Regex)
+    is_ip_address = !!(hostlookup =~ Resolv::IPv4::Regex)
     if is_ip_address
       references = Dispute.includes(:dispute_entries).where(:dispute_entries => {:ip_address => self.ip_address}).where.not(:dispute_entries => {:dispute_id => self.dispute_id})
     else

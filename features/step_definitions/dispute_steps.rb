@@ -6,6 +6,16 @@ Given(/^the following disputes exist:$/) do |disputes|
   end
 end
 
+Given(/^the following unassigned disputes exist:$/) do |disputes|
+  FactoryBot.create(:customer) unless Customer.all.exists?
+  FactoryBot.create(:user) unless User.all.exists?
+  FactoryBot.create(:user, cvs_username: "vrtincom", cec_username: "vrtincom", email: "vrt-incoming@sourcefire.com")
+  disputes.hashes.each do |dispute_attrs|
+    FactoryBot.create(:dispute, dispute_attrs.reverse_merge(user_id: User.where(cvs_username: "vrtincom").first.id))
+  end
+end
+
+
 
 Given(/^the following dispute_entries exist:$/) do |dispute_entries|
   FactoryBot.create(:customer) unless Customer.all.exists?
@@ -50,4 +60,14 @@ Then(/^the Entry preload with id "(.*?)" should exist$/) do |id|
   expect(DisputeEntryPreload.where(id: id)).to exist
 end
 
+Given(/^a dispute entry with trait "(.*?)" exists$/) do| trait_name|
+  FactoryBot.create(:dispute_entry,trait_name.to_sym)
+end
 
+Given(/^a Dispute RuleHit exists with name, "(.*?)", and RuleType of "(.*?)"/) do |name, rule_type|
+  FactoryBot.create(:dispute_rule_hit, name: name, rule_type: rule_type)
+end
+
+Given(/^a RuleHit Resolution Mailer template exists with mnemonic, "(.*?)"/) do |mnemonic|
+  FactoryBot.create(:rulehit_resolution_mailer_template, mnemonic: mnemonic)
+end

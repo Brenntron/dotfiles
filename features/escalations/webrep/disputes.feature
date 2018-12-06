@@ -115,7 +115,7 @@ Feature: Disputes
     And the following disputes exist and have entries:
     |id|
     |1 |
-    When I goto "escalations/webrep/tickets?f=open"
+    When I goto "escalations/webrep/disputes?f=open"
     And I click "#advanced-search-button"
     And I click "#add-search-items-button"
     And I click "#submitted-older-cb"
@@ -123,4 +123,187 @@ Feature: Disputes
     And I click "#add-search-criteria"
     Then I trigger-click ".export-button"
     Then I wait for "3" seconds
+    Then I should receive a file of type "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet"'
+
+  @javascript
+  Scenario: a user adds and selects columns from the Column drop-down
+    Given a user with role "webrep user" exists and is logged in
+    And the following disputes exist and have entries:
+      |id|
+      |1 |
+    When I goto "escalations/webrep/disputes?f=open"
+    And I trigger-click "#table-show-columns-button"
+    And I trigger-click "#case-id-checkbox"
+    And I trigger-click "#status-checkbox"
+    And I trigger-click "#submitter-type-checkbox"
+    And I trigger-click "#submitter-org-checkbox"
+    And I trigger-click "#submitter-domain-checkbox"
+    And I trigger-click "#contact-name-checkbox"
+    And I trigger-click "#contact-email-checkbox"
+    When I goto "escalations/webrep/disputes?f=open"
+    Then I wait for "5" seconds
+    Then I should not see "CASE ID"
+    Then I should not see "STATUS"
+    Then I should see "SUBMITTER TYPE"
+    Then I should see "SUBMITTER ORG"
+    Then I should see "SUBMITTER DOMAIN"
+    Then I should see "CONTACT NAME"
+    Then I should see "CONTACT EMAIL"
+
+  @javascript
+  Scenario: a users uses advanced search with 'Contact Name' as a search criteria
+    Given a user with role "webrep user" exists and is logged in
+    And the following disputes exist and have entries:
+    |id| submission_type|
+    |1 | w              |
+    When I goto "escalations/webrep/disputes?f=all"
+    And I click "#advanced-search-button"
+    And I click "#add-search-items-button"
+    And I click "#name-cb"
+    And I click "#add-search-criteria"
+    Then I fill in "name-input" with "Bob Jones"
+    Then I click "#submit-advanced-search"
+    And I trigger-click "#advanced-search-button"
+    Then I wait for "5" seconds
+    Then I should see "talosintelligence.com"
+    Then I should see "0000000001"
+
+
+  @javascript
+  Scenario: a users uses advanced search with 'Contact Email' as a search criteria
+    Given a user with role "webrep user" exists and is logged in
+    And the following disputes exist and have entries:
+      |id| submission_type|
+      |1 | w              |
+    When I goto "escalations/webrep/disputes?f=all"
+    And I click "#advanced-search-button"
+    And I click "#add-search-items-button"
+    And I click "#email-cb"
+    And I click "#add-search-criteria"
+    Then I fill in "email-input" with "bob@bob.com"
+    Then I click "#submit-advanced-search"
+    And I trigger-click "#advanced-search-button"
+    Then I wait for "5" seconds
+    Then I should see "talosintelligence.com"
+    Then I should see "0000000001"
+
+  @javascript
+  Scenario: a users uses advanced search with 'Company' as a search criteria
+    Given a user with role "webrep user" exists and is logged in
+    And the following disputes exist and have entries:
+      |id| submission_type|
+      |1 | w              |
+    When I goto "escalations/webrep/disputes?f=all"
+    And I click "#advanced-search-button"
+    And I click "#add-search-items-button"
+    And I click "#company-cb"
+    And I click "#add-search-criteria"
+    Then I fill in "company-input" with "Bobs Burgers"
+    Then I click "#submit-advanced-search"
+    And I trigger-click "#advanced-search-button"
+    Then I wait for "5" seconds
+    Then I should see "talosintelligence.com"
+    Then I should see "0000000001"
+
+  @javascript
+  Scenario: a user tries to export selected dispute entries
+    Given a user with role "webrep user" exists and is logged in
+    And the following disputes exist and have entries:
+      |id| submission_type|
+      |1 | w              |
+    When I goto "escalations/webrep/disputes?f=all"
+    And I click "#expand-all-index-rows"
+    And I trigger-click ".dispute-entry-checkbox_1"
+    And I click ".export-button"
+    Then I wait for "3" seconds
     Then I should receive a file of type "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet"
+
+  @javascript
+  Scenario: a user tries to export selected dispute entries on the Research tab
+    Given a user with role "webrep user" exists and is logged in
+    And the following disputes exist and have entries:
+    |id|
+    |1 |
+    When I goto "/escalations/webrep/disputes/1"
+    And I trigger-click "#research-tab-link"
+    And I trigger-click ".dispute_check_box"
+    And I click ".export-button"
+    Then I wait for "3" seconds
+    Then I should receive a file of type "application/octet-stream"
+
+  @javascript
+  Scenario: A user creates a new resolution message template
+    Given a user with role "webrep user" exists and is logged in
+    And the following disputes exist and have entries:
+      |id  |
+      |5370|
+    And I goto "/escalations/webrep/disputes/5370"
+    And I click ".mng-resolution-message-templates-button"
+    And I click "#create-resolution-message-template"
+    And I fill in "new-resolution-message-template-name" with "Testimony"
+    And I fill in "new-resolution-message-template-desc" with "Apples and Carrots"
+    And I fill in "new-resolution-message-template-body" with "Teenage Mutant Ninja Turtles"
+    When I click "#save-resolution-message-template"
+    And I wait for "3" seconds
+    Then I should see "RESOLUTION MESSAGE TEMPLATE CREATED."
+
+  @javascript
+  Scenario: A user selects a resolution message template and updates it
+    Given a user with role "webrep user" exists and is logged in
+    And a resolution message template exists
+    And the following disputes exist and have entries:
+      |id  |
+      |5370|
+    And I goto "/escalations/webrep/disputes/5370"
+    And I click ".mng-resolution-message-templates-button"
+    Then I should see "Templar"
+    Then I should see "Axe"
+    Given I click ".edit-resolution-message-template"
+    Then I wait for "3" seconds
+    Then I should see content "This is a test." within "#edit-resolution-message-template-body"
+    Given I fill in "edit-resolution-message-template-body" with "ABC"
+    When I click "#edit-resolution-message-template"
+    And I wait for "3" seconds
+    Then I should see "RESOLUTION MESSAGE TEMPLATE UPDATED."
+
+  @javascript
+  Scenario: A user deletes a resolution message template
+    Given a user with role "webrep user" exists and is logged in
+    And a resolution message template exists
+    And the following disputes exist and have entries:
+      |id  |
+      |5370|
+    And I goto "/escalations/webrep/disputes/5370"
+    And I click ".mng-resolution-message-templates-button"
+    When I click ".delete-resolution-message-template"
+    And I click ".confirm"
+    And I wait for "3" seconds
+    Then I should see "RESOLUTION MESSAGE TEMPLATE DELETED."
+
+  @javascript
+  Scenario: A user selects a resolution message template
+    Given a user with role "webrep user" exists and is logged in
+    And a resolution message template exists
+    And the following disputes exist and have entries:
+      |id  |
+      |5370|
+    And I goto "/escalations/webrep/disputes/5370"
+    And I click "#show-edit-ticket-status-button"
+    And I click "#NEW"
+    When I select "Templar" from "select-new-resolution-message-template-status"
+    And I wait for "3" seconds
+    Then I should see content "This is a test." within ".ticket-status-comment"
+
+  @javascript
+  Scenario: A user creates a new resolution message template
+    Given a user with role "webrep user" exists and is logged in
+    And the following disputes exist and have entries:
+      |id  |
+      |5370|
+    And I goto "/escalations/webrep/disputes/5370"
+    And I click ".mng-resolution-message-templates-button"
+    And I click "#create-resolution-message-template"
+    When I click "#save-resolution-message-template"
+    And I wait for "3" seconds
+    Then I should see "THERE WAS AN ERROR CREATING THE RESOLUTION MESSAGE TEMPLATE."
+    Then I should see "Name can't be blank and Body can't be blank"

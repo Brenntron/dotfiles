@@ -23,8 +23,14 @@ window.std_api_ajax =(ajax_data) ->
   ajax_data.headers = {'Token': $('input[name="token"]').val(), 'Xmlrpc-Token': $('input[name="xml_token"]').val()}
   ajax_data.dataType = 'json'
 
-  ajax_data.contentType = 'application/json'
-  ajax_data.data = JSON.stringify(ajax_data.data)
+  if ajax_data.contentType == undefined
+    ajax_data.contentType = 'application/json'
+
+  if ajax_data.processData == undefined
+    ajax_data.processData = true
+
+  if ajax_data.contentType == 'application/json'
+    ajax_data.data = JSON.stringify(ajax_data.data)
 
   if ajax_data.error_prefix == undefined
     ajax_data.error_prefix = ''

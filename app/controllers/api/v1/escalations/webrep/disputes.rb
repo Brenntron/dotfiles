@@ -7,7 +7,7 @@ module API
 
           resource "escalations/webrep/disputes" do
             before do
-              PaperTrail.whodunnit = current_user.id if current_user.present?
+              PaperTrail.request.whodunnit = current_user.id if current_user.present?
             end
             desc 'get all disputes'
             params do
@@ -58,6 +58,7 @@ module API
                   response_data['search_id'] = named_search&.id
                 end
               end
+
               response_data.to_json
 
             end
@@ -379,6 +380,8 @@ module API
               comment = ""
               if params[:resolution].present?
                 resolution = params[:resolution]
+              else
+                resolution = nil
               end
 
               if params[:comment].present?
@@ -450,7 +453,13 @@ module API
               std_api_v2 do
                 dispute = Dispute.find(permitted_params['dispute_id'])
                 status = dispute.status
-                comment = dispute.resolution_comment
+                if dispute.status == DisputeEntry::STATUS_RESOLVED
+                  comment = dispute.resolution_comment
+                elsif dispute.status != DisputeEntry::STATUS_RESOLVED
+                  comment = dispute.status_comment
+                else
+                  comment = nil
+                end
 
                 {:status => status, :comment => comment}.to_json
               end
@@ -572,6 +581,20 @@ module API
 
             end
 
+            desc 'Autopopulate fields on Advanced Search'
+            get 'autopopulate_advanced_search' do
+              case_owners = User.joins(:disputes).where.not(cvs_username: nil).order(cvs_username: :asc).uniq
+              statuses = [Dispute::STATUS_RESEARCHING,Dispute::STATUS_ESCALATED,Dispute::STATUS_CUSTOMER_PENDING,
+                          Dispute::STATUS_ON_HOLD,Dispute::STATUS_RESOLVED,Dispute::STATUS_REOPENED]
+              submitter_types = ['Customer', 'Non-Customer']
+              contacts = Customer.all.order(name: :asc)
+              companies = Company.all.order(name: :asc)
+              resolutions = [Dispute::STATUS_RESOLVED_FIXED_FP, Dispute::STATUS_RESOLVED_FIXED_FN, Dispute::STATUS_RESOLVED_UNCHANGED,
+                             Dispute::STATUS_RESOLVED_INVALID, Dispute::STATUS_RESOLVED_TEST, Dispute::STATUS_RESOLVED_OTHER]
+
+              render json: {case_owners: case_owners, statuses: statuses, submitter_types: submitter_types,
+                            contacts: contacts, companies: companies, resolutions: resolutions }
+            end
 
           end
         end

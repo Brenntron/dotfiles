@@ -76,7 +76,6 @@
           %button.mng-templates-button
             Manage Email Templates
 
-
     .row
       .col-xs-12.email-header-information.hidden
         .email-header-data
@@ -101,6 +100,54 @@
         %pre.email-msg-content
 
     = render 'escalations/webrep/disputes/new_email_dialog'
+
+    #manageResolutionMessageTemplatesDialog{title: 'Manage Resolution Message Templates'}
+      %table.table
+        %thead
+          %tr.table-header-highlight
+            %th Template Name
+            %th Description
+            %th.min70
+          -ResolutionMessageTemplate.all.each do |template|
+            %tr
+              %td=template.name
+              %td=template.description
+              %td
+                %button.table-button.edit-button.edit-resolution-message-template{resolution_message_template_id: template.id, name: 'edit-resolution-message-template'}
+                %button.table-button.delete-button.delete-resolution-message-template{resolution_message_template_id: template.id, name: 'delete-resolution-message-template'}
+
+      #new-resolution-message-template-form-wrapper
+        %h4.dialog-inset-header New Resolution Message Template
+        %form
+          .dialog-form-information
+            %span.content-label-sm Name
+            %input#new-resolution-message-template-name{autofocus: true, required: true, type: 'text', name: 'template-name', maxlength: 100}
+            %span.content-label-sm Description
+            %input#new-resolution-message-template-desc{required: true, type: 'text', name: 'template-description', maxlength: 200}
+          .template-content-wrapper
+            %textarea.template-content#new-resolution-message-template-body{maxlength: 300}
+
+      #edit-resolution-message-template-form-wrapper
+        %h4.dialog-inset-header Edit Resolution Message Template
+        %form
+          .dialog-form-information
+            %span.content-label-sm Name
+            %input#edit-resolution-message-template-name{autofocus: true, required: true, type: 'text', name: 'template-name', maxlength: 100}
+            %span.content-label-sm Description
+            %input#edit-resolution-message-template-desc{required: true, type: 'text', name: 'template-description', maxlength: 200}
+            %input.hidden#resolution-message-template-id
+          .template-content-wrapper
+            %textarea.template-content#edit-resolution-message-template-body{maxlength: 300}
+
+      .dialog-section-divider
+        %button.primary#save-resolution-message-template.hidden{onclick: 'save_resolution_message_template()'}
+          Save Template
+        %button.secondary#create-resolution-message-template{onclick: 'create_new_resolution_message_template()'}
+          Create New Template
+        %button.primary#edit-resolution-message-template.hidden{onclick: 'update_resolution_message_template()'}
+          Update Template
+        %button.secondary.hidden#cancel-edit-resolution-message-template{onclick: 'cancel_edit_resolution_message_template()'}
+          Cancel
 
     #manageTemplatesDialog{title: 'Manage Email Templates'}
       %table.table
@@ -187,7 +234,7 @@
                     #file-fields
             .row
               .col-xs-12.email-reply-body-wrapper
-                %textarea.email-reply-body.reply-body{autofocus: true}
+                %textarea.email-reply-body.reply-body{autofocus: true, maxlength: 64000}
 
         .row
           .col-xs-12.text-center

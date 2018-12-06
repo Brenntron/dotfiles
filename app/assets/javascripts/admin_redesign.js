@@ -18,10 +18,8 @@
 //= require bootstrap-table.min
 //= require admin/bs-dropdown-select
 //= require admin/rules
-//= require rule_docs
 //= require admin/notes
 //= require admin/bs-admin-tabs
-//= require admin/snort-docs
 //= require admin/std_api
 //= require admin/std_msg
 //= require application/webrep/disputes-support

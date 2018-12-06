@@ -24,7 +24,7 @@
         <td><%= rulehit_resolution_mailer_template.body %></td>
         <td><%= link_to 'Show', rulehit_resolution_mailer_template %></td>
         <td><%= link_to 'Edit', edit_rulehit_resolution_mailer_template_path(rulehit_resolution_mailer_template) %></td>
-        <td><%= link_to 'Destroy', rulehit_resolution_mailer_template, method: :delete, data: { confirm: 'Are you sure?' } %></td>
+        <td><%= link_to 'Destroy', rulehit_resolution_mailer_template, method: :delete, data: { confirm: 'Are you sure?' }, id: 'delete-'+rulehit_resolution_mailer_template.id.to_s  %></td>
       </tr>
     <% end %>
   </tbody>

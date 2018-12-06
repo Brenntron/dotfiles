@@ -1,6 +1,8 @@
 describe Dispute do
+  let(:target_url_address) {'www.spanx.com'}
+  let(:target_ip_address) {'184.168.221.74'}
   let(:dispute_email) do
-    <<-HEREDOC
+    <<~HEREDOC
         ____________________________________________________________
         User-entered Information:
         ____________________________________________________________
@@ -31,20 +33,98 @@ describe Dispute do
         Hostname's IPs:
     HEREDOC
   end
-  let(:dispute_message_payload) do
+  let(:fn_ip_dispute_message_payload) do
     ActionController::Parameters.new(
         {
             payload: {
                 'name' => "Marlin Pierce",
                 'email' => "marlpier@cisco.com",
-                'domain' => "cisco.com",
+                'domain' => target_ip_address,
+                'problem' => "New category",
+                'details' => '',
+                'user_ip' => "::1",
+                'ticket_time' => "September 03, 2018 12:04",
+                'investigate_ips' => {
+                    target_ip_address => {
+                        "wbrs" => {
+                            'WBRS_SCORE' => '1.58',
+                            'WBRS_Rule_Hits' => "alx_cln, vsvd",
+                            'Hostname_ips' => '',
+                            'rep_sugg' => "Good",
+                            'category' => "Shopping"
+                        },
+                        "sbrs" => {
+                            "SBRS_SCORE"=>"No score",
+                            "SBRS_Rule_Hits"=>"",
+                            "Hostname"=>"www.pretenders.com",
+                            'rep_sugg' => "Good",
+                            "category"=>"Search Engines and Portals"
+                        },
+                    }
+                },
+                'investigate_urls' => {},
+                'email_subject' => "New category",
+                'email_body' => dispute_email,
+                'user_company' => "Cisco Systems, Inc.",
+                'submission_type' => "w"
+            },
+            source_key: 47,
+            source_type: "Dispute"
+    })
+  end
+  let(:fp_ip_dispute_message_payload) do
+    ActionController::Parameters.new(
+        {
+            payload: {
+                'name' => "Marlin Pierce",
+                'email' => "marlpier@cisco.com",
+                'domain' => target_ip_address,
+                'problem' => "New category",
+                'details' => '',
+                'user_ip' => "::1",
+                'ticket_time' => "September 03, 2018 12:04",
+                'investigate_ips' => {
+                    target_ip_address => {
+                        "wbrs" => {
+                            'WBRS_SCORE' => '1.58',
+                            'WBRS_Rule_Hits' => "alx_cln, vsvd",
+                            'Hostname_ips' => '',
+                            'rep_sugg' => "Malicious",
+                            'category' => "Shopping"
+                        },
+                        "sbrs" => {
+                            "SBRS_SCORE"=>"No score",
+                            "SBRS_Rule_Hits"=>"",
+                            "Hostname"=>"www.pretenders.com",
+                            'rep_sugg' => "Malicious",
+                            "category"=>"Search Engines and Portals"
+                        },
+                    }
+                },
+                'investigate_urls' => {},
+                'email_subject' => "New category",
+                'email_body' => dispute_email,
+                'user_company' => "Cisco Systems, Inc.",
+                'submission_type' => "w"
+            },
+            source_key: 47,
+            source_type: "Dispute"
+    })
+  end
+  let(:fn_url_dispute_message_payload) do
+    ActionController::Parameters.new(
+        {
+            payload: {
+                'name' => "Marlin Pierce",
+                'email' => "marlpier@cisco.com",
+                'domain' => target_url_address,
                 'problem' => "New category",
                 'details' => '',
                 'user_ip' => "::1",
                 'ticket_time' => "September 03, 2018 12:04",
                 'investigate_ips' => {},
                 'investigate_urls' => {
-                    'www.spanx.com' => {
+                    target_url_address => {
                         'WBRS_SCORE' => '1.58',
                         'WBRS_Rule_Hits' => "alx_cln, vsvd",
                         'Hostname_ips' => '',
@@ -62,21 +142,54 @@ describe Dispute do
             source_type: "Dispute"
     })
   end
+  let(:fp_url_dispute_message_payload) do
+    ActionController::Parameters.new(
+        {
+            payload: {
+                'name' => "Marlin Pierce",
+                'email' => "marlpier@cisco.com",
+                'domain' => target_url_address,
+                'problem' => "New category",
+                'details' => '',
+                'user_ip' => "::1",
+                'ticket_time' => "September 03, 2018 12:04",
+                'investigate_ips' => {},
+                'investigate_urls' => {
+                    target_url_address => {
+                        'WBRS_SCORE' => '1.58',
+                        'WBRS_Rule_Hits' => "alx_cln, vsvd",
+                        'Hostname_ips' => '',
+                        'rep_sugg' => "Malicious",
+                        'category' => "Shopping"
+
+                    }
+                },
+                'email_subject' => "New category",
+                'email_body' => dispute_email,
+                'user_company' => "Cisco Systems, Inc.",
+                'submission_type' => "w"
+            },
+            source_key: 47,
+            source_type: "Dispute"
+    })
+  end
   let(:top_url_response_json) do
     {
-        "www.spanx.com": true
+        target_url_address => true,
+        target_ip_address => true,
     }.to_json
   end
   let(:blacklist_json) do
     {
-        'www.spanx.com' => 'NOT_FOUND'
+        target_url_address => 'NOT_FOUND',
+        target_ip_address => 'NOT_FOUND',
     }.to_json
   end
   let(:virustotal_json) do
     {
         "scan_id": "263a0bca315778e09734a8ac9539f557905e909847d901946c5df1a13e631b17-1536170044",
-        "resource": "spanx.com",
-        "url": "http://spanx.com/",
+        "resource": target_url_address,
+        "url": "http://#{target_url_address}/",
         "response_code": 1,
         "scan_date": "2018-09-05 17:54:04",
         "permalink": "https://www.virustotal.com/url/263a0bca315778e09734a8ac9539f557905e909847d901946c5df1a13e631b17/analysis/1536170044/", "verbose_msg": "Scan finished, scan information embedded in this object",
@@ -97,8 +210,8 @@ describe Dispute do
             "Virusdie External Site Scan": {"detected": false, "result": "clean site"},
             "Quttera": {"detected": false, "result": "clean site"},
             "AegisLab WebGuard": {"detected": false, "result": "clean site"},
-            "MalwareDomainList": {"detected": false, "result": "clean site", "detail": "http://www.malwaredomainlist.com/mdl.php?search=spanx.com"},
-            "ZeusTracker": {"detected": false, "result": "clean site", "detail": "https://zeustracker.abuse.ch/monitor.php?host=spanx.com"},
+            "MalwareDomainList": {"detected": false, "result": "clean site", "detail": "http://www.malwaredomainlist.com/mdl.php?search=#{target_url_address}"},
+            "ZeusTracker": {"detected": false, "result": "clean site", "detail": "https://zeustracker.abuse.ch/monitor.php?host=#{target_url_address}"},
             "zvelo": {"detected": false, "result": "clean site"},
             "Google Safebrowsing": {"detected": false, "result": "clean site"},
             "Kaspersky": {"detected": false, "result": "clean site"},
@@ -122,7 +235,7 @@ describe Dispute do
             "AlienVault": {"detected": false, "result": "clean site"},
             "Emsisoft": {"detected": false, "result": "clean site"},
             "Rising": {"detected": false, "result": "clean site"},
-            "Malc0de Database": {"detected": false, "result": "clean site", "detail": "http://malc0de.com/database/index.php?search=spanx.com"},
+            "Malc0de Database": {"detected": false, "result": "clean site", "detail": "http://malc0de.com/database/index.php?search=#{target_url_address}"},
             "malwares.com URL checker": {"detected": false, "result": "clean site"},
             "Phishtank": {"detected": false, "result": "clean site"},
             "Malwared": {"detected": false, "result": "clean site"},
@@ -136,7 +249,7 @@ describe Dispute do
             "Malekal": {"detected": false, "result": "clean site"},
             "ESET": {"detected": false, "result": "clean site"},
             "Sophos": {"detected": false, "result": "unrated site"},
-            "Yandex Safebrowsing": {"detected": false, "result": "clean site", "detail": "http://yandex.com/infected?l10n=en&url=http://spanx.com/"},
+            "Yandex Safebrowsing": {"detected": false, "result": "clean site", "detail": "http://yandex.com/infected?l10n=en&url=http://#{target_url_address}/"},
             "Spam404": {"detected": false, "result": "clean site"},
             "Nucleon": {"detected": false, "result": "clean site"},
             "Sucuri SiteCheck": {"detected": false, "result": "clean site"},
@@ -154,6 +267,15 @@ describe Dispute do
         }
     }.to_json
   end
+  let(:umbrella_clear_json) {
+    {
+        target_url_address => {
+            "status" => 1,
+            "security_categories" => [],
+            "content_categories" => ["25","32"]
+        }
+    }.to_json
+  }
   let(:manual_wlbl_json) do
     {
         "data" => [
@@ -183,7 +305,7 @@ describe Dispute do
             "response_took" => 0.014037847518920898,
             "response_repdb_time" => 1536348248,
             "isolation_level" => "REPEATABLE-READ",
-            "request" => "http://prod-xbrs-writer1.vega.ironport.com:80/v1/domain/www.spanx.com?consumer=TEST",
+            "request" => "http://prod-xbrs-writer1.vega.ironport.com:80/v1/domain/#{target_url_address}?consumer=TEST",
             "product_version" => "1.3.0 2018-05-16 09:38 PDT",
             "response_local_time" => 1536348248,
             "total_data_rows" => 0,
@@ -195,7 +317,7 @@ describe Dispute do
         "resource" => {
             "requested_subdomain" => nil,
             "data_rows" => 0,
-            "requested_domain" => "www.spanx.com"
+            "requested_domain" => target_url_address
         }
     }.to_json +
     "\n---\n" +
@@ -228,7 +350,7 @@ describe Dispute do
   end
   let(:umbrella_data) do
     {
-        "www.spanx.com" => {
+        target_url_address => {
             "status" => 0,
             "security_categories" => [],
             "content_categories" => ["8", "41"]
@@ -238,8 +360,12 @@ describe Dispute do
   let(:top_url_response_response) { double('HTTPI::Response', code: 200, body: top_url_response_json) }
   let(:blacklist_response) { double('HTTPI::Response', code: 200, body: blacklist_json) }
   let(:virustotal_response) { double('HTTPI::Response', code: 200, body: virustotal_json) }
+  let(:umbrella_clear_response) { double('HTTPI::Response', code: 200, body: umbrella_clear_json) }
   let(:manual_wlbl_response) { double('HTTPI::Response', code: 200, body: manual_wlbl_json) }
   let(:xbrs_domain_response) { double('HTTPI::Response', code: 200, body: xbrs_domain_json) }
+  let(:auto_resolve_new) { double('AutoResolve', resolved?: false, malicious?: nil) }
+  let(:auto_convict) { double('AutoResolve', resolved?: true, malicious?: true) }
+  let(:auto_acquit) { double('AutoResolve', resolved?: true, malicious?: false) }
   let(:bug_factory) do
     double('Bugzilla::Bug', create: { "id" => 101 })
   end
@@ -249,7 +375,7 @@ describe Dispute do
     FactoryBot.create(:guest_company)
   end
 
-  it 'processes bridge payload' do
+  it 'processes fn ip bridge payload' do
     allow(Bugzilla::Bug).to receive(:new).and_return(bug_factory)
     allow(Wbrs::Base)
         .to receive(:call_json_request)
@@ -261,8 +387,12 @@ describe Dispute do
                 .and_return(blacklist_response)
     allow(Virustotal::Base)
         .to receive(:call_request)
-                .with(:get, anything) # TODO .with(:get, '/vtapi/v2/url/report?resource=www.spanx.com')
+                .with(:get, anything) # TODO .with(:get, "/vtapi/v2/url/report?resource=#{target_ip_address}")
                 .and_return(virustotal_response)
+    allow(Umbrella::Scan)
+        .to receive(:scan_result)
+                .with(address: target_ip_address)
+                .and_return(umbrella_clear_response)
     allow(Wbrs::Base)
         .to receive(:post_request)
                 .with(path: '/v1/rep/wlbl/get', body: anything)
@@ -271,11 +401,339 @@ describe Dispute do
         .to receive(:call_request)
                 .with(:get, anything)
                 .and_return(xbrs_domain_response)
-    allow(Preloader::Base).to receive(:auto_resolve_new).and_return(double("AutoResolve", call_umbrella: umbrella_data))
     allow(Bridge::DisputeCreatedEvent).to receive(:new).and_return(double('Bridge::DisputeCreatedEvent', post: nil))
 
+    dispute = nil
     expect do
-      Dispute.process_bridge_payload(dispute_message_payload)
+      dispute = Dispute.process_bridge_payload(fn_ip_dispute_message_payload)
     end.to change { Dispute.count }.from(0).to(1)
+
+    expect(dispute).to_not be_nil
+    expect(dispute.dispute_entries.count).to eq(1)
+    dispute_entry = dispute.dispute_entries.first
+    expect(dispute_entry.status).to eql(DisputeEntry::NEW)
+    expect(dispute_entry.resolution).to be_nil
+  end
+
+  it 'processes fp ip auto-resolve as new bridge payload' do
+    allow(Bugzilla::Bug).to receive(:new).and_return(bug_factory)
+    allow(RepApi::Base)
+        .to receive(:call_json_request)
+                .with(:post, '/blacklist/get', body: anything)
+                .and_return(blacklist_response)
+    # TODO remove redundant API call
+    allow(Wbrs::Base)
+        .to receive(:call_json_request)
+                .with(:post, '/v1/cat/urls/top', body: anything)
+                .and_return(top_url_response_response)
+    # TODO remove redundant API call
+    allow(Virustotal::Base)
+        .to receive(:call_request)
+                .with(:get, anything) # TODO .with(:get, "/vtapi/v2/url/report?resource=#{target_ip_address}")
+                .and_return(virustotal_response)
+    # TODO remove redundant API call
+    allow(Umbrella::Scan)
+        .to receive(:scan_result)
+                .with(address: target_ip_address)
+                .and_return(umbrella_clear_response)
+    allow(AutoResolve)
+        .to receive(:create_from_payload)
+                .with('IP', target_ip_address, anything, anything)
+                .and_return(auto_resolve_new)
+    allow(Wbrs::Base)
+        .to receive(:post_request)
+                .with(path: '/v1/rep/wlbl/get', body: anything)
+                .and_return(manual_wlbl_response)
+    allow(Xbrs::Base)
+        .to receive(:call_request)
+                .with(:get, anything)
+                .and_return(xbrs_domain_response)
+    allow(Bridge::DisputeCreatedEvent).to receive(:new).and_return(double('Bridge::DisputeCreatedEvent', post: nil))
+
+    dispute = nil
+    expect do
+      dispute = Dispute.process_bridge_payload(fp_ip_dispute_message_payload)
+    end.to change { Dispute.count }.from(0).to(1)
+
+    expect(dispute).to_not be_nil
+    expect(dispute.dispute_entries.count).to eq(1)
+    dispute_entry = dispute.dispute_entries.first
+    expect(dispute_entry.status).to eql(DisputeEntry::NEW)
+    expect(dispute_entry.resolution).to be_nil
+  end
+
+  it 'processes fp ip auto-convicted bridge payload' do
+    allow(Bugzilla::Bug).to receive(:new).and_return(bug_factory)
+    allow(RepApi::Base)
+        .to receive(:call_json_request)
+                .with(:post, '/blacklist/get', body: anything)
+                .and_return(blacklist_response)
+    # TODO remove redundant API call
+    allow(Wbrs::Base)
+        .to receive(:call_json_request)
+                .with(:post, '/v1/cat/urls/top', body: anything)
+                .and_return(top_url_response_response)
+    # TODO remove redundant API call
+    allow(Virustotal::Base)
+        .to receive(:call_request)
+                .with(:get, anything) # TODO .with(:get, "/vtapi/v2/url/report?resource=#{target_ip_address}")
+                .and_return(virustotal_response)
+    # TODO remove redundant API call
+    allow(Umbrella::Scan)
+        .to receive(:scan_result)
+                .with(address: target_ip_address)
+                .and_return(umbrella_clear_response)
+    allow(AutoResolve)
+        .to receive(:create_from_payload)
+                .with('IP', target_ip_address, anything, anything)
+                .and_return(auto_convict)
+    allow(Wbrs::Base)
+        .to receive(:post_request)
+                .with(path: '/v1/rep/wlbl/get', body: anything)
+                .and_return(manual_wlbl_response)
+    allow(Xbrs::Base)
+        .to receive(:call_request)
+                .with(:get, anything)
+                .and_return(xbrs_domain_response)
+    allow(Bridge::DisputeCreatedEvent).to receive(:new).and_return(double('Bridge::DisputeCreatedEvent', post: nil))
+
+    dispute = nil
+    expect do
+      dispute = Dispute.process_bridge_payload(fp_ip_dispute_message_payload)
+    end.to change { Dispute.count }.from(0).to(1)
+
+    expect(dispute).to_not be_nil
+    expect(dispute.dispute_entries.count).to eq(1)
+    dispute_entry = dispute.dispute_entries.first
+    expect(dispute_entry.status).to eql(DisputeEntry::RESOLVED)
+    expect(dispute_entry.resolution).to eql(DisputeEntry::STATUS_RESOLVED_FIXED_FN)
+  end
+
+  it 'processes fp ip auto-acquit bridge payload' do
+    allow(Bugzilla::Bug).to receive(:new).and_return(bug_factory)
+    allow(RepApi::Base)
+        .to receive(:call_json_request)
+                .with(:post, '/blacklist/get', body: anything)
+                .and_return(blacklist_response)
+    # TODO remove redundant API call
+    allow(Wbrs::Base)
+        .to receive(:call_json_request)
+                .with(:post, '/v1/cat/urls/top', body: anything)
+                .and_return(top_url_response_response)
+    # TODO remove redundant API call
+    allow(Virustotal::Base)
+        .to receive(:call_request)
+                .with(:get, anything) # TODO .with(:get, "/vtapi/v2/url/report?resource=#{target_ip_address}")
+                .and_return(virustotal_response)
+    # TODO remove redundant API call
+    allow(Umbrella::Scan)
+        .to receive(:scan_result)
+                .with(address: target_ip_address)
+                .and_return(umbrella_clear_response)
+    allow(AutoResolve)
+        .to receive(:create_from_payload)
+                .with('IP', target_ip_address, anything, anything)
+                .and_return(auto_acquit)
+    allow(Wbrs::Base)
+        .to receive(:post_request)
+                .with(path: '/v1/rep/wlbl/get', body: anything)
+                .and_return(manual_wlbl_response)
+    allow(Xbrs::Base)
+        .to receive(:call_request)
+                .with(:get, anything)
+                .and_return(xbrs_domain_response)
+    allow(Bridge::DisputeCreatedEvent).to receive(:new).and_return(double('Bridge::DisputeCreatedEvent', post: nil))
+
+    dispute = nil
+    expect do
+      dispute = Dispute.process_bridge_payload(fp_ip_dispute_message_payload)
+    end.to change { Dispute.count }.from(0).to(1)
+
+    expect(dispute).to_not be_nil
+    expect(dispute.dispute_entries.count).to eq(1)
+    dispute_entry = dispute.dispute_entries.first
+    expect(dispute_entry.status).to eql(DisputeEntry::RESOLVED)
+    expect(dispute_entry.resolution).to eql(DisputeEntry::STATUS_RESOLVED_UNCHANGED)
+  end
+
+  it 'processes fn url bridge payload' do
+    allow(Bugzilla::Bug).to receive(:new).and_return(bug_factory)
+    allow(Wbrs::Base)
+        .to receive(:call_json_request)
+                .with(:post, '/v1/cat/urls/top', body: anything)
+                .and_return(top_url_response_response)
+    allow(RepApi::Base)
+        .to receive(:call_json_request)
+                .with(:post, '/blacklist/get', body: anything)
+                .and_return(blacklist_response)
+    allow(Virustotal::Base)
+        .to receive(:call_request)
+                .with(:get, anything) # TODO .with(:get, "/vtapi/v2/url/report?resource=#{target_url_address}")
+                .and_return(virustotal_response)
+    allow(Umbrella::Scan)
+        .to receive(:scan_result)
+                .with(address: target_url_address)
+                .and_return(umbrella_clear_response)
+    allow(Wbrs::Base)
+        .to receive(:post_request)
+                .with(path: '/v1/rep/wlbl/get', body: anything)
+                .and_return(manual_wlbl_response)
+    allow(Xbrs::Base)
+        .to receive(:call_request)
+                .with(:get, anything)
+                .and_return(xbrs_domain_response)
+    allow(Bridge::DisputeCreatedEvent).to receive(:new).and_return(double('Bridge::DisputeCreatedEvent', post: nil))
+
+    dispute = nil
+    expect do
+      dispute = Dispute.process_bridge_payload(fn_url_dispute_message_payload)
+    end.to change { Dispute.count }.from(0).to(1)
+
+    expect(dispute).to_not be_nil
+    expect(dispute.dispute_entries.count).to eq(1)
+    dispute_entry = dispute.dispute_entries.first
+    expect(dispute_entry.status).to eql(DisputeEntry::NEW)
+    expect(dispute_entry.resolution).to be_nil
+  end
+
+  it 'processes fp url auto-resolve as new bridge payload' do
+    allow(Bugzilla::Bug).to receive(:new).and_return(bug_factory)
+    allow(RepApi::Base)
+        .to receive(:call_json_request)
+                .with(:post, '/blacklist/get', body: anything)
+                .and_return(blacklist_response)
+    # TODO remove redundant API call
+    allow(Wbrs::Base)
+        .to receive(:call_json_request)
+                .with(:post, '/v1/cat/urls/top', body: anything)
+                .and_return(top_url_response_response)
+    # TODO remove redundant API call
+    allow(Virustotal::Base)
+        .to receive(:call_request)
+                .with(:get, anything) # TODO .with(:get, "/vtapi/v2/url/report?resource=#{target_url_address}")
+                .and_return(virustotal_response)
+    # TODO remove redundant API call
+    allow(Umbrella::Scan)
+        .to receive(:scan_result)
+                .with(address: target_url_address)
+                .and_return(umbrella_clear_response)
+    allow(AutoResolve)
+        .to receive(:create_from_payload)
+                .with('URI/DOMAIN', target_url_address, anything, anything)
+                .and_return(auto_resolve_new)
+    allow(Wbrs::Base)
+        .to receive(:post_request)
+                .with(path: '/v1/rep/wlbl/get', body: anything)
+                .and_return(manual_wlbl_response)
+    allow(Xbrs::Base)
+        .to receive(:call_request)
+                .with(:get, anything)
+                .and_return(xbrs_domain_response)
+    allow(Bridge::DisputeCreatedEvent).to receive(:new).and_return(double('Bridge::DisputeCreatedEvent', post: nil))
+
+    dispute = nil
+    expect do
+      dispute = Dispute.process_bridge_payload(fp_url_dispute_message_payload)
+    end.to change { Dispute.count }.from(0).to(1)
+
+    expect(dispute).to_not be_nil
+    expect(dispute.dispute_entries.count).to eq(1)
+    dispute_entry = dispute.dispute_entries.first
+    expect(dispute_entry.status).to eql(DisputeEntry::NEW)
+    expect(dispute_entry.resolution).to be_nil
+  end
+
+  it 'processes fp url auto-convicted bridge payload' do
+    allow(Bugzilla::Bug).to receive(:new).and_return(bug_factory)
+    allow(RepApi::Base)
+        .to receive(:call_json_request)
+                .with(:post, '/blacklist/get', body: anything)
+                .and_return(blacklist_response)
+    # TODO remove redundant API call
+    allow(Wbrs::Base)
+        .to receive(:call_json_request)
+                .with(:post, '/v1/cat/urls/top', body: anything)
+                .and_return(top_url_response_response)
+    # TODO remove redundant API call
+    allow(Virustotal::Base)
+        .to receive(:call_request)
+                .with(:get, anything) # TODO .with(:get, "/vtapi/v2/url/report?resource=#{target_url_address}")
+                .and_return(virustotal_response)
+    # TODO remove redundant API call
+    allow(Umbrella::Scan)
+        .to receive(:scan_result)
+                .with(address: target_url_address)
+                .and_return(umbrella_clear_response)
+    allow(AutoResolve)
+        .to receive(:create_from_payload)
+                .with('URI/DOMAIN', target_url_address, anything, anything)
+                .and_return(auto_convict)
+    allow(Wbrs::Base)
+        .to receive(:post_request)
+                .with(path: '/v1/rep/wlbl/get', body: anything)
+                .and_return(manual_wlbl_response)
+    allow(Xbrs::Base)
+        .to receive(:call_request)
+                .with(:get, anything)
+                .and_return(xbrs_domain_response)
+    allow(Bridge::DisputeCreatedEvent).to receive(:new).and_return(double('Bridge::DisputeCreatedEvent', post: nil))
+
+    dispute = nil
+    expect do
+      dispute = Dispute.process_bridge_payload(fp_url_dispute_message_payload)
+    end.to change { Dispute.count }.from(0).to(1)
+
+    expect(dispute).to_not be_nil
+    expect(dispute.dispute_entries.count).to eq(1)
+    dispute_entry = dispute.dispute_entries.first
+    expect(dispute_entry.status).to eql(DisputeEntry::RESOLVED)
+    expect(dispute_entry.resolution).to eql(DisputeEntry::STATUS_RESOLVED_FIXED_FN)
+  end
+
+  it 'processes fp url auto-acquit bridge payload' do
+    allow(Bugzilla::Bug).to receive(:new).and_return(bug_factory)
+    allow(RepApi::Base)
+        .to receive(:call_json_request)
+                .with(:post, '/blacklist/get', body: anything)
+                .and_return(blacklist_response)
+    # TODO remove redundant API call
+    allow(Wbrs::Base)
+        .to receive(:call_json_request)
+                .with(:post, '/v1/cat/urls/top', body: anything)
+                .and_return(top_url_response_response)
+    # TODO remove redundant API call
+    allow(Virustotal::Base)
+        .to receive(:call_request)
+                .with(:get, anything) # TODO .with(:get, "/vtapi/v2/url/report?resource=#{target_url_address}")
+                .and_return(virustotal_response)
+    # TODO remove redundant API call
+    allow(Umbrella::Scan)
+        .to receive(:scan_result)
+                .with(address: target_url_address)
+                .and_return(umbrella_clear_response)
+    allow(AutoResolve)
+        .to receive(:create_from_payload)
+                .with('URI/DOMAIN', target_url_address, anything, anything)
+                .and_return(auto_acquit)
+    allow(Wbrs::Base)
+        .to receive(:post_request)
+                .with(path: '/v1/rep/wlbl/get', body: anything)
+                .and_return(manual_wlbl_response)
+    allow(Xbrs::Base)
+        .to receive(:call_request)
+                .with(:get, anything)
+                .and_return(xbrs_domain_response)
+    allow(Bridge::DisputeCreatedEvent).to receive(:new).and_return(double('Bridge::DisputeCreatedEvent', post: nil))
+
+    dispute = nil
+    expect do
+      dispute = Dispute.process_bridge_payload(fp_url_dispute_message_payload)
+    end.to change { Dispute.count }.from(0).to(1)
+
+    expect(dispute).to_not be_nil
+    expect(dispute.dispute_entries.count).to eq(1)
+    dispute_entry = dispute.dispute_entries.first
+    expect(dispute_entry.status).to eql(DisputeEntry::RESOLVED)
+    expect(dispute_entry.resolution).to eql(DisputeEntry::STATUS_RESOLVED_UNCHANGED)
   end
 end
