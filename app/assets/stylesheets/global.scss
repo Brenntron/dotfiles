@@ -6544,10 +6544,6 @@ h2 {
   color: #333;
 }
 
-.age-col {
-
-}
-
 .ticket-age-over3hr {
   color: $warning-accent-color;
   font-weight: bold;
@@ -6556,4 +6552,9 @@ h2 {
 .overdue {
   color: $second-section-color;
   font-weight: bold;
+}
+
+.sorting_1, .sorting_asc {
+  background-color: $faint-accent-color !important;
+  opacity: 80%;
 }
