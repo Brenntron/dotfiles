@@ -1183,6 +1183,8 @@ thead th.sorting.center {
 
 .message-div li {
   font-weight: 400;
+  font-size: 8.5pt;
+  color: #666;
   text-transform: none;
   padding: 2px 0;
 }
@@ -1191,7 +1193,7 @@ thead th.sorting.center {
   margin-top: 5px;
 }
 
-#message-text li:first-child {
+#message-text li:first-child, li#prompt-text {
   border-top: 1px solid $faint-neutral-color;
   padding-top: 10px;
   margin-top: 10px;
@@ -1206,6 +1208,28 @@ thead th.sorting.center {
   font-size: 8.5pt;
   color: $type-lighter-color;
   text-transform: uppercase;
+}
+
+#modal-login-form {
+  margin-top: 20px;
+}
+
+#modal-login-form .panel-button {
+  padding: 0 !important;
+  text-align: center;
+  line-height: 2em;
+  min-width: 100px;
+  margin-top: 25px;
+}
+
+#modal-login-form input {
+  border: 4px solid $content-bg-color;
+  outline: 1px solid $faint-neutral-color;
+  height: 30px;
+}
+
+#modal-login-form .form-group {
+  margin-bottom: 5px;
 }
 
 .message-instruction {

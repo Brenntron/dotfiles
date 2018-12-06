@@ -1,16 +1,19 @@
 .modal.fade#login-modal
   .modal-dialog{role: 'document'}
     .modal-content
-      #api-msg.message-div
+      #api-msg.message-div.error-msg
         %button.close{'data-dismiss': 'modal', 'aria-label': 'Close'}
         #message-text= 'Unable to authenticate.'
-        #prompt-text= 'Please log in.'
+        %ul
+          %li#prompt-text= 'Please log in.'
         %form#modal-login-form
           %input{type: 'hidden', name: 'url', value: ''}
-          %label Username
-          %input{name: 'username'}
-          %lable Password
-          %input{type: 'password', name: 'password'}
-          .confirmation-buttons
-            %button.panel-button.call-to-action.confirm.wide{'aria-label': 'Login', onclick: 'std_api_login(); return false;'} Login
-            %button.panel-button.secondary.cancel.wide{'data-dismiss': 'modal', 'aria-label': 'Skip'} Skip
+          .form-group.text-left
+            %label.content-label-sm Username
+            %input.form-control{name: 'username', autofocus: 'true'}
+          .form-group.text-left
+            %lable.content-label-sm Password
+            %input.form-control{type: 'password', name: 'password'}
+          .form-group.text-center
+            %button.panel-button.primary{'aria-label': 'Login', onclick: 'std_api_login(); return false;'} Login
+            %button.panel-button.secondary{'data-dismiss': 'modal', 'aria-label': 'Skip'} Skip
