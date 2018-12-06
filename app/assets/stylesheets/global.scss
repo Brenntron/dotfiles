@@ -6647,3 +6647,34 @@ h2 {
   color: $second-section-color;
   font-weight: bold;
 }
+
+#user-settings-dropdown {
+  background-image: url(image_path('icon_gear_settings_grey.svg'));
+  background-repeat: no-repeat;
+  width: 30px;
+  height: 44px;
+  background-size: 22px 22px;
+  background-position: center center;
+  margin-right: 6px;
+  display: inline-block;
+  background-color: transparent;
+  border: none;
+}
+
+#nav-banner a.nav-username {
+  display: inline-block;
+  width: auto;
+  float: right;
+  margin-right: 8px;
+}
+
+#login-div .dropdown.open {
+  background-color: transparent !important;
+}
+
+#login-div .dropdown.open .dropdown-menu {
+  margin-top: -15px;
+  border-radius: 0 0 4px 4px;
+  color: $type-base-color;
+  padding: 10px;
+}
