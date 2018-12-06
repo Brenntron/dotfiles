@@ -235,6 +235,12 @@ Then(/^I should see content "(.*?)" within "(.*?)"$/) do |content, target|
   end
 end
 
+Then(/^I should see content "(.*?)" within first element of class "(.*?)"$/) do |content, target|
+  within(target, match: :first) do
+    page.has_content?(content)
+  end
+end
+
 Then(/^I should not see content "(.*?)" within "(.*?)"$/) do |content, target|
   within(target) do
     !page.has_content?(content)

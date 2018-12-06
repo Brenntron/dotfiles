@@ -329,7 +329,7 @@ Feature: Disputes
   @javascript
   Scenario: A user tries add a new dispute entry (ad hoc)
     Given a user with role "webrep user" exists and is logged in
-    And the following disputes exist and have entries:
+    And the following disputes exist:
       |id  |
       |5370|
     And I goto "/escalations/webrep/disputes/5370"
@@ -337,7 +337,7 @@ Feature: Disputes
     When I click "#add-entries-button"
     And I fill in "add_dispute_entry" with "cisco.com"
     And I click "#button_add_dispute_entry"
-    And I wait for "8" seconds
+    And I wait for "15" seconds
     Then I should see content "cisco.com" within ".entry-data-content"
     And I should see content "WL-med" within ".entry-data-wlbl"
     And I should see content "BL-heavy" within ".entry-data-wlbl"
