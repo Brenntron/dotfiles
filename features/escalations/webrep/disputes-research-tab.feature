@@ -1,5 +1,5 @@
 Feature: Disputes index, Research tab
-  In order to interact with disputes' entries as a user, I will provide ways to interact with entires in the Research tab
+  In order to interact with disputes' entries as a user, I will provide ways to interact with entries in the Research tab
 
   @javascript
   Scenario: Disputes with no entries shouldn't attempt to display any entries in the table

@@ -133,11 +133,6 @@ Rails.application.routes.draw do
         get :related
       end
     end
-    resources :scheduled_tasks, only: [:index, :show, :create, :destroy] do
-      collection do
-        post :run_job
-      end
-    end
   end
 
   resources :events, only: [] do

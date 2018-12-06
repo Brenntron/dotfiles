@@ -24,6 +24,12 @@ $ ->
           $node.addClass 'highlight-plus5Hours'
         else
         return
+
+      dom: '<"datatable-top-tools no-margin-datatable-top-tool"lf>t<ip>'
+      language: {
+        search: "_INPUT_"
+        searchPlaceholder: "Search within table"
+      }
       columnDefs: [
         {
           targets: [ 0 ]
@@ -38,6 +44,10 @@ $ ->
         {
           targets: [ 2 ]
           className: 'entry-id-col'
+        }
+        {
+          targets: [ 12 ]
+          className: 'submitter-col'
         }
       ]
       columns: [
@@ -63,6 +73,20 @@ $ ->
         {
           data: 'age'
           width: '40px'
+          'render':(data) ->
+            parts = data.split(' ')
+            days = parseInt(parts[0])
+            hour = parseInt(parts[1])
+
+            if days == 0
+              if hour < 3
+                data
+              else if hour < 5
+                '<span class="ticket-age-over3hr">' + data + '</span>'
+              else
+                '<span class="overdue">' + data + '</span>'
+            else
+              '<span class="overdue">' + data + '</span>'
         }
         {
           data: 'status'
@@ -122,6 +146,11 @@ $ ->
         }
         {
           data: 'submitter_type'
+          'render': (data) ->
+            if data == 'CUSTOMER'
+              '<button class="complaint-submitter-type icon-custom-star esc-tooltipped" title="Customer"></button>'
+            else
+              data
         }
         {
           data: 'company_name'
@@ -134,6 +163,8 @@ $ ->
       ]
       select: 'style': 'os'
       responsive: true)
+
+    $('#complaints-index_filter input').addClass('table-search-input');
     $('#complaints-index tbody').on 'click', 'td.expandable-row-column', ->
       click_table_buttons complaint_table, this
 

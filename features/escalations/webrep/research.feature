@@ -1,13 +1,38 @@
-Feature: WebRep Reputation Research
+Feature: Webrep, the BFRP
+  In order to research ad-hoc dispute entries,
+  I will provide an interface to search these
+  by domain.
 
-@javascript
-  Scenario: a user goes to the Reputation Research page
-  Given a user with role "webrep user" exists and is logged in
-  And I go to "/escalations/webrep/research"
-  And I fill in "search_uri" with "cisco.com"
-  And I click "#submit-button"
-  Then I wait for "30" seconds
-  Then I should see "cisco.com (8 found)"
-  Then I should see "ammssanfrancisco.com:80/ponyb/gate.php"
-  Then I should see "www.cisco.com/web"
-  Then I should see "callcisco.com"
+  @javascript
+  Scenario: Duplicate entries are consolidated into a single row in this view
+    Given a user with role "webrep user" exists and is logged in
+    And the following disputes exist:
+      |id|
+      |1 |
+      |2 |
+      |3 |
+    And the following dispute_entries exist:
+      |dispute_id           |uri                 |entry_type |
+      |1                    |mytestingdomain.com |URI/DOMAIN |
+      |2                    |mytestingdomain.com |URI/DOMAIN |
+      |3                    |mytestingdomain.com |URI/DOMAIN |
+    When I goto "escalations/webrep/research?utf8=1&search%5Buri%5D=mytestingdomain.com&search%5Bscope%5D=strict&commit=Submit"
+    Then I wait for "30" seconds
+    Then I should see "3 ticket(s)"
+
+  @javascript
+  Scenario: Duplicate resolution also works with IP addresses
+    Given a user with role "webrep user" exists and is logged in
+    And the following disputes exist:
+      |id|
+      |1 |
+      |2 |
+      |3 |
+    And the following dispute_entries exist:
+      |dispute_id           |uri                 |entry_type |
+      |1                    |100.100.200.1       |IP         |
+      |2                    |100.100.200.1       |IP         |
+      |3                    |100.100.200.1       |IP         |
+    When I goto "escalations/webrep/research?utf8=1&search%5Buri%5D=100.100.200.1&search%5Bscope%5D=strict&commit=Submit"
+    Then I wait for "30" seconds
+    Then I should see "3 ticket(s)"
