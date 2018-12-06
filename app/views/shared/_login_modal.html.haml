@@ -1,11 +1,11 @@
 .modal.fade#login-modal
   .modal-dialog{role: 'document'}
     .modal-content
-      #api-msg.message-div#modal-login-div
+      #api-msg.message-div
+        %button.close{'data-dismiss': 'modal', 'aria-label': 'Close'}
+        #message-text= 'Unable to authenticate.'
+        #prompt-text= 'Please log in.'
         %form#modal-login-form
-          %button.close{'data-dismiss': 'modal', 'aria-label': 'Close'}
-          #message-text= 'Unable to authenticate.'
-          #prompt-text= 'Please log in.'
           %input{type: 'hidden', name: 'url', value: ''}
           %label Username
           %input{name: 'username'}
