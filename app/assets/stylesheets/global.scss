@@ -6549,6 +6549,14 @@ table#duplicates a {
   padding-top: 0;
 }
 
+.disabled-link {
+  cursor: not-allowed;
+  opacity: .5 !important;
+}
+
+.disabled-link:hover {
+  text-decoration: none !important;
+}
 
 /* These below can be deleted after redesign merge, or after the existing style sheet is ported. They exist in the admin redesign stylesheet. */
 
