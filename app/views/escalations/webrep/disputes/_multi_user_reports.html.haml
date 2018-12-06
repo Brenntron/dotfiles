@@ -1,0 +1,227 @@
+.row
+  .col-xl-6.col-lg-7.col-xs-12.dashboard-tickets-wrapper
+    %h1.dashboard-header My Team Tickets
+    -# TODO Hook up the content layout list to the below tables, post launch
+    -#.content-layout-list
+    -#  %label.content-label-sm.icon-custom-star
+    -#    Show Customer Tickets
+    -#    %input{:type => "checkbox", :checked => "checked"}/
+    -#
+    -#  %label.content-label-sm.no-left-pad.right-vertical-separator
+    -#    Show Guest Tickets
+    -#    %input{:type => "checkbox", :checked => "checked"}/
+    -#
+    -#  %label.content-label-sm.dispute-E-grey
+    -#    Show Email Tickets
+    -#    %input{:type => "checkbox", :checked => "checked"}/
+    -#
+    -#  %label.content-label-sm.dispute-W-grey
+    -#    Show Web Tickets
+    -#    %input{:type => "checkbox", :checked => "checked"}/
+    -#
+    -#  %label.content-label-sm.dispute-EW-grey.btn-margin-left
+    -#    Show Email/Web Tickets
+    -#    %input{:type => "checkbox", :checked => "checked"}/
+
+    .tickets-section-wrapper.open-tickets-wrapper
+      .open-tickets-header
+        %h3.larger-lighter Open Team Tickets
+        .ticket-count-wrapper
+          %label.total-table-ticket-count#open_multi_ticket_count
+          %label.total-table-entry-count#open_multi_entry_count
+      %table.table.responsive.dashboard-tickets-table#table-multi-user-disputes-open
+        %thead
+          %tr
+            %th
+            -#  priority
+            %th Case ID
+            %th
+            -#  Submitter type
+            %th Owner
+            %th Status
+            %th
+            -#  Ticket type
+            %th Dispute Preview
+            %th Last Comment Date
+
+      .ticket-entries-totals-wrapper
+        %label.totals-label
+          Total Ticket Entries
+        .ticket-entry-total-block
+          %label.content-label-sm.submitter-customer
+            Customer
+
+          %span.ticket-entry-total#open_multi_customer_count
+
+        .ticket-entry-total-block.guest-block-total
+          %label.content-label-sm
+            Guest
+          %span.ticket-entry-total#open_multi_guest_count
+
+        .ticket-entry-total-block
+          %label.content-label-sm.dispute-E-grey
+            Email Entries
+          %span.ticket-entry-total#open_multi_email_count
+
+        .ticket-entry-total-block
+          %label.content-label-sm.dispute-W-grey
+            Web Entries
+          %span.ticket-entry-total#open_multi_web_count
+
+        .ticket-entry-total-block
+          %label.content-label-sm.dispute-EW-grey
+            Email/Web Entries
+          %span.ticket-entry-total#open_multi_email_web_count
+
+    .tickets-section-wrapper.closed-tickets-wrapper
+      .closed-tickets-header
+        %h3.larger-lighter Closed Team Tickets
+        .ticket-count-wrapper
+          %label.total-table-ticket-count#closed_multi_ticket_count
+          %label.total-table-entry-count#closed_multi_entry_count
+      %table.table.responsive.dashboard-tickets-table#table-multi-user-disputes-closed
+        %thead
+          %tr
+            %th
+            -#    priority
+            %th Case ID
+            %th
+            -#  Submitter type
+            %th Owner
+            %th
+            -#  Ticket type
+            %th Dispute Preview
+            %th Time to Close
+
+      .ticket-entries-totals-wrapper
+        %label.totals-label
+          Total Ticket Entries
+        .ticket-entry-total-block
+          %label.content-label-sm.submitter-customer
+            Customer
+          %span.ticket-entry-total#closed_multi_customer_count
+
+        .ticket-entry-total-block.guest-block-total
+          %label.content-label-sm
+            Guest
+          %span.ticket-entry-total#closed_multi_guest_count
+
+        .ticket-entry-total-block
+          %label.content-label-sm.dispute-E-grey
+            Email Entries
+          %span.ticket-entry-total#closed_multi_email_count
+
+        .ticket-entry-total-block
+          %label.content-label-sm.dispute-W-grey
+            Web Entries
+          %span.ticket-entry-total#closed_multi_web_count
+
+        .ticket-entry-total-block
+          %label.content-label-sm.dispute-EW-grey
+            Email/Web Entries
+          %span.ticket-entry-total#closed_multi_email_web_count
+
+
+  .col-xl-6.col-lg-5.col-xs-12.graph-section
+    .row
+      .col-md-12.col-lg-7
+
+        .reports-graph-wrapper
+          %h5 Ticket Entries Closed by Ticket Owner
+          %canvas#ticket-entries-closed-by-owner
+
+        .reports-graph-wrapper
+          %h5 Average Time to Close Tickets by Ticket Owner
+          %canvas#avg-time-to-close-tickets
+
+        .reports-graph-wrapper
+          %h5 Ticket Resolution by Ticket Owner
+          .graph-bar-legend
+            %label.navyblue-legend-color Fixed FN
+            %label.skyblue-legend-color Fixed FP
+            %label.lightgray-legend-color Unchanged
+            %label.orange-legend-color Other
+          %canvas#ticket-resolutions-by-owner
+
+          %table.table
+            %thead
+              %tr
+                %th Owner
+                %th Fixed FN
+                %th Fixed FP
+                %th Unchanged
+                %th Other
+            %tbody
+            %tfoot
+
+        .reports-graph-wrapper
+          %h5 Rule Hits for False Positive Resolutions
+          %canvas#rule-hits-fp-resolutions
+
+
+
+      .col-md-12.col-lg-5.graph-section
+
+        .reports-graph-wrapper
+          %h5 Total Ticket Entries Closed
+          .graph-config
+            %label.content-label-sm.graph-select-label Time Breakdown
+            %select.form-control
+              %option{:selected => "selected", :value => "day"} By Day
+              %option{:value => "weekly"} Weekly
+              %option{:value => "monthly"} Monthly
+              %option{:value => "yearly"} Yearly
+
+            .graph-menu
+              .label-wrapper
+                %input.all-ticket{:type => "checkbox", :checked => "checked", :onclick => 'updateGraph("Total Ticket Entries", "multiuser_ticket_type_totals", this)'}/
+                %label.total-legend
+                Total Tickets Entries
+
+              .label-wrapper
+                %input.group-ticket{:type => "checkbox",:checked => "checked", :onclick => 'updateGraph(["E", "W", "EW"], "multiuser_ticket_type_totals", this)'}/
+                %label.dispute-E.legend-option
+                %label.dispute-W.legend-option
+                %label.dispute-EW.legend-option
+                Entries By Ticket Types
+          %canvas#graph-multiuser-ticket-entries-closed
+
+
+        .reports-graph-wrapper
+          %h5 Tickets Submitted by Submitter Type
+          .graph-config
+            %label.content-label-sm.graph-select-label Time Breakdown
+            %select.form-control
+              %option{:selected => "selected", :value => "day"} By Day
+              %option{:value => "weekly"} Weekly
+              %option{:value => "monthly"} Monthly
+              %option{:value => "yearly"} Yearly
+
+            .graph-bar-legend
+              %label.skyblue-legend-color Customer
+              %label.navyblue-legend-color Guest
+          %canvas#graph-multiuser-ticket-entries-submitter
+
+        .reports-graph-wrapper
+          %h5.dispute-E-grey.graph-header-icon-stg Closed Email Entries by Resolution
+          %canvas#multi-email-entries-by-resolution-piechart
+
+          %table.table#multi-closed-email-entries-resolution-table
+            %thead
+              %tr
+                %th Resolution
+                %th.text-center %
+                %th.text-center Count
+            %tbody
+
+        .reports-graph-wrapper
+          %h5.dispute-E-grey.graph-header-icon-stg Closed Web Entries by Resolution
+          %canvas#multi-web-entries-by-resolution-piechart
+
+          %table.table#multi-closed-web-entries-resolution-table
+            %thead
+              %tr
+                %th Resolution
+                %th.text-center %
+                %th.text-center Count
+            %tbody

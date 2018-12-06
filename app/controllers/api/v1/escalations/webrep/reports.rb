@@ -7,7 +7,7 @@ module API
 
           resource "escalations/webrep/reports" do
             before do
-              PaperTrail.whodunnit = current_user.id if current_user.present?
+              PaperTrail.request.whodunnit = current_user.id if current_user.present?
             end
             desc 'Open Tickets Report Table'
             params do
@@ -18,8 +18,8 @@ module API
 
             get "open_tickets_report" do
               authorize!(:index, Dispute)
-
-              report_data = Dispute.open_tickets_report(params[:users], params[:from], params[:to])
+              users = User.where(:id => params[:users])
+              report_data = Dispute.open_tickets_report(users, params[:from], params[:to])
 
               response_data = {:status => "success", :data => report_data}
 
@@ -90,6 +90,10 @@ module API
             get 'closed_ticket_entries_by_resolution_report' do
               authorize!(:index, Dispute)
               users = User.where(:id => params[:users])
+              if current_user.team_manager == current_user && users.size > 1
+                users = users - [current_user]
+              end
+
               report_data = Dispute.closed_ticket_entries_by_resolution_report(users, params[:from], params[:to], params[:submission_types])
 
               response_data = {:status => "success", :data => report_data}
@@ -161,6 +165,21 @@ module API
               response_data.to_json
             end
 
+
+            params do
+              requires :from, type: String
+              requires :to, type: String
+            end
+
+            get 'tickets_submitted_by_submitter_per_day' do
+              authorize!(:index, Dispute)
+
+              report_data = Dispute.tickets_submitted_by_submitter_per_day(params[:from], params[:to])
+
+              response_data = {:status => "success", :data => report_data}
+
+              response_data.to_json
+            end
 
           end
         end

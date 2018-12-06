@@ -5474,8 +5474,8 @@ table.dispute_tool_current tr:last-of-type td {
   /* These below can be deleted after redesign merge, or after the existing style sheet is ported. They exist in the admin redesign stylesheet. */
 .dispute-submission-type {
   background-repeat: no-repeat;
-  width: 20px;
-  height: 20px;
+  width: 16px;
+  height: 16px;
   display: block;
 }
 
@@ -5500,7 +5500,7 @@ table.dispute_tool_current tr:last-of-type td {
 .dispute-EW-grey {background-image: url(image_path('icon_type_email_web_grey.svg'));}
 
 
-.my-dashboard-header-area, .complaint-mgt-top-area  {
+.dashboard-header-area, .complaint-mgt-top-area  {
   background-color: $content-tab-color;
   margin-top: -15px;
   border-radius: 4px 4px 0 0 ;
@@ -5508,20 +5508,23 @@ table.dispute_tool_current tr:last-of-type td {
 
 .team-dashboard-header-area {
   background-color: $content-tab-color;
-}
-
-.dashboard-header-area, .complaint-mgt-top-area {
+  margin-top: -15px;
   margin-right: -15px;
   margin-left: -15px;
+  border-radius: 4px 4px 0 0;
   color: $content-bg-color;
   padding: 15px;
+}
+
+.dashboard-header-area {
+  padding-bottom: 0 !important;
 }
 
 .top-area-bar {
   display: inline-flex;
 }
 
-.dashboard-header-area h1 {
+.dashboard-header-area h1, .complaint-mgt-top-area h1 {
   color: $content-bg-color;
   margin-bottom: 24px;
   display: inline-block;
@@ -6600,8 +6603,7 @@ h2 {
   color: #333;
 }
 
-
-.dashboard-header-area.my-dashboard-header-area {
+.dashboard-header-area {
   background-color: $content-tab-color;
 
   .dashboard-wrapper {
@@ -6662,7 +6664,6 @@ h2 {
     }
 
     .dashboard-time-ticket {
-
       .button-wrapper {
         text-align: right;
 
@@ -6691,14 +6692,13 @@ h2 {
     }
   }
 }
-
-.dashboard-submenu {
+#dashboard-tab-list.container {
+  width: 100%;
+  display: inline-flex;
   height: 50px;
   background-color: $faint-neutral-color;
-  margin-right: -15px;
-  margin-left: -15px;
-  color: #fff;
-  padding: 0 10px;
+  margin: 0;
+  padding: 0 15px;
 
   label {
     position: relative;
@@ -6708,8 +6708,6 @@ h2 {
     font-size: 10px;
     margin-right: 10px;
   }
-
-
 
   ul {
     margin: 0;
@@ -6721,15 +6719,15 @@ h2 {
 
     li {
       height: inherit;
+      position: relative;
       display: inline-block;
       line-height: 50px;
       cursor: pointer;
-      margin-right: 20px;
 
       a {
         display: block;
         height: 100%;
-        padding: 0 15px 0 40px;
+        padding: 0 15px 0 30px;
         font-size: 11px;
         text-decoration: none;
         color: $type-lighter-color;
@@ -6751,88 +6749,117 @@ h2 {
       .custom-user-white:hover {
         background-image: url(image_path('icon_custom_user_white.svg'));
       }
+    }
+    li.active {
+      background-color: $primary-section-color;
+      .down-arrow {
+        height: 10px;
+        width: 10px;
+        position: absolute;
+        bottom: -5px;
+        left: 45%;
+        transform: rotate(45deg);
+        background-color: $primary-section-color;
+      }
+      a {
+        color: white;
+      }
 
+      .white-user{
+        background-image: url(image_path('icon_user_white.svg'));;
+      }
+      .group-user-white {
+        background-image: url(image_path('icon_team.svg'));
+      }
+      .all-tickets-white{
+        background-image: url(image_path('icon_ticket.svg'));
+      }
+      .custom-user-white {
+        background-image: url(image_path('icon_custom_user_white.svg'));
+      }
     }
   }
+
   .user-icon-stg-1 {
     background-repeat: no-repeat;
     background-size: 15px;
-    background-position-y: 17px;
+    background-position-y: center;
     background-position-x: 10px;
     vertical-align: center;
   }
   .user-icon-stg {
     background-repeat: no-repeat;
     background-size: 20px;
-    background-position-y: 15px;
-    background-position-x: 10px;
+    background-position-y: center;
+    background-position-x: 6px;
     vertical-align: center;
   }
 
-  .dashboard-submenu-area {
-    width: 100%;
+  .dashboard-submission-area {
     display: flex;
-    position: relative;
+    width: 100%;
+    margin-left: 20px;
 
-    .dashboard-menu-list {
-      display: flex;
-    }
-    .bold {
-      font-weight: bold;
-    }
-    .dashboard-submission-area {
-      display: flex;
-      margin-left: 20px;
-
-      label {
-        height: 30px;
-        top: 10px;
-        margin: 0;
-        line-height: 30px;
-        padding: 0 10px;
-        color: $type-lighter-color;
-        font-size: 12px;
-      }
-
-      .invalid-stg {
-        padding-left: 35px;
-        background-position-y: 5px;
-        background-size: 20px;
-      }
-
-      .right-vertical-separator {
-        border-right: 1px solid $type-lighter-color;
-      }
-
-      .font-lg {
-        font-size: 20px;
-      }
-
-      .uppercase {
-        text-transform: uppercase;
-      }
+    label {
+      height: 30px;
+      top: 10px;
+      margin: 0;
+      line-height: 30px;
+      padding: 0 10px;
+      color: $type-lighter-color;
+      font-size: 12px;
     }
 
-    .dashboard-export-report {
-      position: absolute;
-      right: 0;
-      height: 50px;
-      top: 0;
-      padding: 10px 0 0 10px;
-
-      button {
-        background-color: $type-lighter-color;
-        font-size: 10px;
-        height: 30px;
-        padding: 0 10px 0 30px;
-      }
+    .invalid-stg {
+      padding-left: 35px;
+      background-position-y: 5px;
+      background-size: 20px;
     }
 
-    .left-vertical-separator {
-      border-left: 1px solid white;
+    .right-vertical-separator {
+      border-right: 1px solid $type-lighter-color;
+    }
+
+    .font-lg {
+      font-size: 20px;
+    }
+
+    .uppercase {
+      text-transform: uppercase;
     }
   }
+
+  .dashboard-export-report {
+    height: 100%;
+    padding: 10px 0 0 10px;
+
+    button {
+      background-color: $content-label-color;
+      background-position-x: 10px;
+      color: white;
+      font-size: 10px;
+      height: 30px;
+      width: 100pt;
+      padding: 0 10px 0 20px;
+    }
+  }
+  .left-vertical-separator {
+    border-left: 1px solid white;
+  }
 }
+.tab-content {
+  display: block;
+  width: 100%;
+}
+
+.dashboard-tab-content {
+  margin-top: 40px;
+}
+
+.bold {
+  font-weight: bold;
+}
+
 .vertical-separator {
   padding-right: 20px;
   border-right: 1px solid gray;
@@ -6841,13 +6868,20 @@ h2 {
   transform: translateY(50%);
 }
 
-
 .btn-margin-left {
   margin-left: 15px;
 }
 
 .top-space {
   margin-top: 20px;
+}
+
+.top-space-ex {
+  margin-top: 44px;
+}
+
+.bottom-space {
+  margin-bottom: 20px;
 }
 
 .toolbar-content-layout {
@@ -6937,6 +6971,10 @@ h3.larger-lighter {
   font-weight: 300;
 }
 
+.dashboard-tickets-wrapper {
+  padding-right: 30px;
+}
+
 .open-tickets-header h3, .closed-tickets-header h3 {
   background-repeat: no-repeat;
   background-size: 30px 30px;
@@ -6956,14 +6994,11 @@ h3.larger-lighter {
   background-image: url(image_path('icon_fixedbugs_grey.svg'));
 }
 
-.dashboard-header {
-  margin-top: 40px;
-}
 
 .submitter-type-icon {
   display: block;
-  width: 20px;
-  height: 20px;
+  width: 16px;
+  height: 16px;
   background-position: center center;
   background-repeat: no-repeat;
 }
@@ -6974,6 +7009,16 @@ h3.larger-lighter {
 
 .dashboard-tickets-table {
   margin-top: 10px !important;
+  font-size: 8pt;
+
+  tbody > tr > td, thead > tr > th {
+    padding: 6px 6px;
+  }
+
+  .bug-priority {
+    width: 18px !important;
+    height: 18px !important;
+  }
 }
 
 td.text-center span {
@@ -7023,13 +7068,215 @@ td.text-center span {
   padding-right: 12px;
 }
 
+.left-space {
+  padding-left: 10px;
+}
+
+.average-label {
+  float: right;
+
+  label {
+    font-size: 10px;
+    color: $type-lighter-color;
+    font-weight: bold;
+  }
+
+  .label-stg {
+    font-weight: bold;
+    color: $type-base-color;
+    display: block;
+    font-size: 15px;
+  }
+}
+.graph-section {
+  border-left: 1px solid $faint-neutral-color;
+  }
+
+  .graph-bar-legend {
+    padding: 0 10px;
+    border: 1px solid $faint-neutral-color;
+    float: right;
+
+    .custom-legend {
+      padding: 4px 0 20px 4px;
+    }
+
+    .skyblue-legend-color::before {
+      content: '';
+      float: left;
+      display: block;
+      height: 8px;
+      width: 8px;
+      border-radius: 50%;
+      background-color: $primary-section-color;
+      margin-right: 6px;
+      margin-top: 2px;
+    }
+
+    .navyblue-legend-color::before {
+      float: left;
+      content: '';
+      display: block;
+      height: 8px;
+      width: 8px;
+      border-radius: 50%;
+      background-color: $content-tab-color;
+      margin-right: 6px;
+      margin-top: 2px;
+    }
+
+    .lightgray-legend-color {
+      height: 8px;
+      width: 8px;
+      border-radius: 50%;
+      background-color: $content-label-color;
+    }
+
+    .orange-legend-color {
+      height: 8px;
+      width: 8px;
+      border-radius: 50%;
+      background-color: $warning-accent-color;
+    }
+  }
+
+.graph-header-icon-stg {
+  background-repeat: no-repeat;
+  background-size: 14px;
+  padding-left: 20px;
+}
+
+.graph-config {
+  display: inline-flex;
+  width: 100%;
+  justify-content: space-between;
+  margin-top: 10px;
+  margin-bottom: 10px;
+
+  .form-control {
+    height: 18px;
+    width: 25%;
+    padding: 0;
+    outline-offset: 2px;
+    font-size: 10px;
+    font-weight: bold;
+    background-color: lightgray;
+  }
+}
+
+.graph-bar-legend label {
+  display: block;
+  font-size: 8pt;
+  padding: 4px;
+}
+
+.graph-menu .label-wrapper {
+  display: block;
+  font-size: 8pt;
+  padding: 2px 4px;
+}
+
+.graph-menu {
+  font-size: 8pt;
+}
+
+.graph-menu, .graph-bar-legend {
+  border: 1px solid $faint-neutral-color;
+  padding: 3px 5px;
+
+  .total-legend {
+    background-color: skyblue;
+    width: 45px;
+    height: 14px;
+    position: relative;
+    top: 2px;
+    border-radius: 2px;
+  }
+
+  .legend-option {
+    width: 14px;
+    height: 14px;
+    position: relative;
+    top: 1.5px;
+    background-repeat: no-repeat;
+  }
+
+  .totals-label {
+    color: $type-lighter-color;
+    text-transform: uppercase;
+    font-size: 8pt;
+    font-weight: 600;
+  }
+
+  .ticket-entries-totals-wrapper {
+    margin-top: 12px;
+  }
+
+  .totals-label, .ticket-entry-total-block {
+    display: inline-block;
+    margin-right: 12px;
+  }
+
+  .ticket-entries-totals-wrapper .content-label-sm {
+    color: $type-lighter-color;
+    font-weight: 500;
+    font-size: 8pt;
+    margin-bottom: 0;
+  }
+
+  .ticket-entry-total {
+    font-weight: 700;
+    font-size: 8.5pt;
+  }
+
+  .ticket-entry-total-block {
+    .submitter-customer, .dispute-E-grey, .dispute-W-grey, .dispute-EW-grey {
+      padding-left: 20px;
+      background-size: 14px 14px;
+      background-repeat: no-repeat;
+      background-position: left center;
+      line-height: 1.5em;
+    }
+  }
+
+  .guest-block-total {
+    border-right: 1px solid $content-label-color;
+    padding-right: 12px;
+  }
+}
+
+.graph-select-label {
+  position: absolute;
+}
+
+.graph-config select {
+  margin-top: 22px;
+}
+
+.reports-graph-wrapper h5 {
+  text-align: center;
+  color: $type-lighter-color;
+  line-height: 1.25em;
+}
+
+.reports-graph-wrapper {
+  margin: 30px 0;
+}
+
+.reports-graph-wrapper table {
+  font-size: 7.5pt;
+}
+
+.reports-graph-wrapper table > tbody > tr > td, .reports-graph-wrapper table > tbody > tr > td {
+  padding: 4px 8px;
+}
 
 .ticket-age-over3hr {
   color: $warning-accent-color;
-  font-weight: bold;
+  font-weight: 500;
 }
 
 .overdue {
   color: $second-section-color;
-  font-weight: bold;
+  font-weight: 500;
 }

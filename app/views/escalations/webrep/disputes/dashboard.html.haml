@@ -1,7 +1,7 @@
 .content-wrapper
-  .dashboard-header-area.my-dashboard-header-area
+  .dashboard-header-area
     .row
-      .col-xs-6
+      .col-xs-4
         .dashboard-wrapper
           .dashboard-title
             %h1 My Dashboard
@@ -11,166 +11,60 @@
             %h5= current_user.display_name
             %p.dashboard-details
               = current_user.cvs_username
+            %input#user_id{type: 'hidden', name: 'user_id', value: "#{current_user.id}"}
+            %input{:name => "token", :type => "hidden", :value => "#{current_user.authentication_token}"}
+            %input{:type => "hidden", :name => "xml_token", :value => "#{xml_token}"}
+            %input#team_ids{:type => "hidden", :name => "team_ids", :value => "#{current_user.my_team.pluck(:id).to_s}"}
 
-      .col-xs-6.text-right
+      .col-xs-8.text-right
         .dashboard-time-wrapper
           .dashboard-time
             %label September 08, 2018 - September 15, 2018
+            -# TODO Populate above label with local storage time or current week span
             %button.toolbar-button.icon-calendar Change Time Span
 
             %input#tickets_date_range{:type => 'text'}
 
           .dashboard-time-ticket
             .button-wrapper
-              %button.arrow-left View Last Week's Tickets
+              %button.arrow-left#ticket-view-shortcut
 
-  .dashboard-submenu
-    .dashboard-submenu-area
-      .dashboard-menu-list
+      #dashboard-tab-list.container
         %label.bold View:
         %ul
+          %li.active
+            %span.down-arrow
+            %a.white-user.ticket-owner-button.user-icon-stg-1.bold{"data-toggle" => "tab", :href => "#my-ticket"} My Ticket
           %li
-            %a.white-user.ticket-owner-button.user-icon-stg-1.bold{:href => ""} My Tickets
+            %span.down-arrow
+            %a.group-user-white.icon-team-grey.user-icon-stg.bold{"data-toggle" => "tab", :href => "#my-team-tickets"} My Team Tickets
           %li
-            %a.group-user-white.icon-team-grey.user-icon-stg.bold{:href => ""} My Team Tickets
+            %span.down-arrow
+            %a.all-tickets-white.icon-all-tickets-grey.user-icon-stg.bold{"data-toggle" => "tab", :href => "#all-tickets"} All tickets
           %li
-            %a.all-tickets-white.icon-all-tickets-grey.user-icon-stg.bold{:href => ""} All Tickets
+            %span.down-arrow
+            %a.custom-user-white.icon-custom-user-grey.user-icon-stg.bold{"data-toggle" => "tab", :href => "#select-custom-users"} Select Custom Users
 
-          %li.dropdown
-            %a.custom-user-white.icon-custom-user-grey.user-icon-stg.bold{:href => ""} Select Custom Users
+        .dashboard-submission-area
+          -# TODO Hookup counts for Valid Ticket and Entry Counts and Invalid Count (Invalid = Duplicate, Test, Junk, etc.)
+          %label.right-vertical-separator.bold.font-lg 30
+          %label.font-lg 99
+          %label.uppercase.right-vertical-separator.bold Valid Total Tickets / Entries Submission
+          %label.uppercase.icon-invalid-grey.user-icon-stg.invalid-stg.bold 12 Invalid Tickets
 
-      .dashboard-submission-area
-        %label.right-vertical-separator.bold.font-lg 30
-        %label.font-lg 99
-        %label.uppercase.right-vertical-separator.bold valid total tickets / entries submission
-        %label.uppercase.icon-invalid-grey.user-icon-stg.invalid-stg.bold 12 invalid tickets
+        .dashboard-export-report.left-vertical-separator
+          %button.toolbar-button.export-button-white Export Report
+          -# TODO Hookup exporting. This can be simple for first launch. Later we'll add options to select what gets exported.
 
-      .dashboard-export-report.left-vertical-separator
-        %button.toolbar-button.export-button-white Export Report
+  .tab-content.dashboard-tab-content
+    #my-ticket.tab-pane.active
+      = render 'escalations/webrep/disputes/single_user_reports'
 
-  .row
-    .col-xs-6
+    #my-team-tickets.tab-pane
+      = render 'escalations/webrep/disputes/multi_user_reports'
 
-      %h1.dashboard-header My Tickets
-      .content-layout-list
-        %label.content-label-sm.icon-custom-star
-          Show Customer Tickets
-          %input{:type => "checkbox", :checked => "checked"}/
+    #all-tickets.tab-pane
+    -#  Add render to multi user report later
 
-        %label.content-label-sm.no-left-pad.right-vertical-separator
-          Show Guest Tickets
-          %input{:type => "checkbox", :checked => "checked"}/
-
-        %label.content-label-sm.dispute-E-grey
-          Show Email Tickets
-          %input{:type => "checkbox", :checked => "checked"}/
-
-        %label.content-label-sm.dispute-W-grey
-          Show Web Tickets
-          %input{:type => "checkbox", :checked => "checked"}/
-
-        %label.content-label-sm.dispute-EW-grey.btn-margin-left
-          Show Email/Web Tickets
-          %input{:type => "checkbox", :checked => "checked"}/
-
-      .tickets-section-wrapper.open-tickets-wrapper
-
-        .open-tickets-header
-          %h3.larger-lighter My Open Tickets
-
-          .ticket-count-wrapper
-            %label.total-table-ticket-count 4
-            %label.total-table-entry-count 23
-
-        %table.table.responsive.dashboard-tickets-table#table-user-complaints-open
-          %thead
-            %tr
-              %th
-                -#  priority
-              %th Case ID
-              %th
-                -#  Submitter type
-              %th Status
-              %th
-                -#  Ticket type
-              %th Dispute Preview
-              %th Last Comment Date
-
-        .ticket-entries-totals-wrapper
-          %label.totals-label
-            Total Ticket Entries
-          .ticket-entry-total-block
-            %label.content-label-sm.submitter-customer
-              Customer
-            %span.ticket-entry-total
-              32
-          .ticket-entry-total-block.guest-block-total
-            %label.content-label-sm
-              Guest
-            %span.ticket-entry-total
-              12
-          .ticket-entry-total-block
-            %label.content-label-sm.dispute-E-grey
-              Email Entries
-            %span.ticket-entry-total
-              25
-          .ticket-entry-total-block
-            %label.content-label-sm.dispute-W-grey
-              Web Entries
-            %span.ticket-entry-total
-              22
-          .ticket-entry-total-block
-            %label.content-label-sm.dispute-EW-grey
-              Email/Web Entries
-            %span.ticket-entry-total
-              3
-
-
-      .tickets-section-wrapper.closed-tickets-wrapper
-        .closed-tickets-header
-          %h3.larger-lighter My Closed Tickets
-
-          .ticket-count-wrapper
-            %label.total-table-ticket-count 7
-            %label.total-table-entry-count 46
-
-        %table.table.responsive.dashboard-tickets-table#table-user-complaints-closed
-          %thead
-            %tr
-              %th
-                -#    priority
-              %th Case ID
-              %th
-                -#  Submitter type
-              %th
-                -#  Ticket type
-              %th Dispute Preview
-              %th Time to Close
-        .ticket-entries-totals-wrapper
-          %label.totals-label
-            Total Ticket Entries
-          .ticket-entry-total-block
-            %label.content-label-sm.submitter-customer
-              Customer
-            %span.ticket-entry-total
-              32
-          .ticket-entry-total-block.guest-block-total
-            %label.content-label-sm
-              Guest
-            %span.ticket-entry-total
-              12
-          .ticket-entry-total-block
-            %label.content-label-sm.dispute-E-grey
-              Email Entries
-            %span.ticket-entry-total
-              25
-          .ticket-entry-total-block
-            %label.content-label-sm.dispute-W-grey
-              Web Entries
-            %span.ticket-entry-total
-              22
-          .ticket-entry-total-block
-            %label.content-label-sm.dispute-EW-grey
-              Email/Web Entries
-            %span.ticket-entry-total
-              3
+    #select-custom-users.tab-pane
+    -#  Add render to single or multi user report depending on how many users are selected

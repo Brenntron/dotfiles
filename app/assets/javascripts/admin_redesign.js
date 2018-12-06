@@ -28,6 +28,9 @@
 //= require application/helpers
 //= require clipboard
 //= require moment
+
+//= require application/chart.pieceLabel.min
+//= require application/chartjs-plugin-annotation.min
 //= require application/daterangepicker
 //= require application/webrep_advanced_search
 //= require dataTables/jquery.dataTables
@@ -38,4 +41,5 @@
 //= require application/webrep_research_tab
 //= require application/webcat/webcat
 //= require application/webcat/categories
+//= require application/webrep/webrep-report-engine
 

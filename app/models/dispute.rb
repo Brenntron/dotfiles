@@ -1191,9 +1191,12 @@ class Dispute < ApplicationRecord
 
   def self.open_tickets_report(users, from, to)
 
+    from = "Mon, 4 Jul 2018 17:40:08 GMT"
+
     status_array = [STATUS_ASSIGNED, STATUS_REOPENED, STATUS_CUSTOMER_PENDING, STATUS_CUSTOMER_UPDATE, STATUS_RESEARCHING, STATUS_ESCALATED, STATUS_ON_HOLD]
 
-
+    from = Time.parse(from)
+    to = Time.parse(to)
 
     report_data = {}
     report_data[:table_data] = []
@@ -1211,18 +1214,18 @@ class Dispute < ApplicationRecord
 
     results.each do |result|
       entry_count = result.dispute_entries.select{ |entry| entry.status != DisputeEntry::STATUS_RESOLVED}.size
-      last_comment_time = result.dispute_comments.last.created_at.to_s
+      last_comment_time = "no comments"
+      last_comment_time = result.dispute_comments.last.created_at.to_s unless result.dispute_comments.empty?
       ticket_user = result.user.cvs_username
-      report_data[:table_data] << {:case_id => result.id,
+      report_data[:table_data] << {:case_number => result.id,
                       :status => result.status,
-                      :dispute => result.dispute_entries.first.hostlookup,
+                      :d_entry_preview => "<span class='dispute_entry_content_first'>#{result.dispute_entries.first.hostlookup}</span><span class='dispute-count'>#{entry_count}</span>",
                       :age => distance_of_time_in_words(Time.now, result.created_at),
-                      :is_customer => result.submitter_type == SUBMITTER_TYPE_CUSTOMER,
-                      :submission_type => result.submission_type,
-                      :last_comment_time => last_comment_time,
-                      :entry_count => entry_count,
-                      :user => ticket_user
-
+                      :submitter_type => result.submitter_type.downcase,
+                      :submission_type => result.submission_type.upcase,
+                      :last_comment => last_comment_time,
+                      :owner => ticket_user,
+                      :priority => result.priority
       }
     end
 
@@ -1231,7 +1234,12 @@ class Dispute < ApplicationRecord
 
   def self.closed_tickets_report(users, from, to)
 
+    from = "Mon, 4 Jul 2018 17:40:08 GMT"
+
     status_array = [STATUS_RESOLVED]
+
+    from = Time.parse(from)
+    to = Time.parse(to)
 
     report_data = {}
     report_data[:table_data] = []
@@ -1239,7 +1247,7 @@ class Dispute < ApplicationRecord
     results = Dispute.includes(:dispute_entries).where("created_at between '#{from}' and '#{to}'").where(:user_id => user_ids).where(:status => status_array)
 
     report_data[:ticket_count] = results.size
-    report_data[:entries_count] = results.map {|result| result.dispute_entries}.flatten.select {|entry| entry.status != DisputeEntry::STATUS_RESOLVED }.size
+    report_data[:entries_count] = results.map {|result| result.dispute_entries}.flatten.select {|entry| entry.status == DisputeEntry::STATUS_RESOLVED }.size
 
     report_data[:customer_count] = results.select {|result| result.submitter_type == SUBMITTER_TYPE_CUSTOMER}.size
     report_data[:guest_count] = results.select {|result| result.submitter_type == SUBMITTER_TYPE_NONCUSTOMER}.size
@@ -1250,12 +1258,16 @@ class Dispute < ApplicationRecord
 
 
     results.each do |result|
-      report_data[:table_data] << {:case_id => result.id,
-                      :resolution => result.resolution,
-                      :dispute => result.dispute_entries.first.hostlookup,
+      entry_count = result.dispute_entries.select{ |entry| entry.status == DisputeEntry::STATUS_RESOLVED}.size
+      ticket_user = result.user.cvs_username
+      report_data[:table_data] << {:case_number => result.id,
+                      # :dispute => result.dispute_entries.first.hostlookup,
+                      :d_entry_preview => "<span class='dispute_entry_content_first'>#{result.dispute_entries.first.hostlookup}</span><span class='dispute-count'>#{entry_count}</span>",
                       :time_to_close => distance_of_time_in_words(result.created_at, result.case_resolved_at),
-                      :is_customer => result.submitter_type == SUBMITTER_TYPE_CUSTOMER,
-                      :submission_type => result.submission_type
+                      :submitter_type => result.submitter_type.downcase,
+                      :submission_type => result.submission_type.upcase,
+                      :priority => result.priority,
+                      :owner => ticket_user
       }
     end
 
@@ -1263,6 +1275,12 @@ class Dispute < ApplicationRecord
   end
 
   def self.ticket_entries_closed_by_day_report(users, from, to)
+    #users = [User.find(1)]
+    #from = "Wed, 5 Sep 2018 17:40:08 GMT"
+    #to = "Thu, 20 Sep 2018 17:40:08 GMT"
+
+    from = Time.parse(from)
+    to = Time.parse(to)
 
     swap_day = from
     report_data = {}
@@ -1270,20 +1288,21 @@ class Dispute < ApplicationRecord
     user_ids = users.pluck(:id)
     main_results = Dispute.joins(:dispute_entries).where(:user_id => user_ids).where("dispute_entries.case_resolved_at between '#{from}' and '#{to}'")
 
-    all_entries = main_results.map {|result| result.dispute_entries}.flatten
+    all_entries = main_results.map {|result| result.dispute_entries}.flatten.uniq
 
-    report_data[:all_results] = 0
-    report_data[:email_results] = 0
-    report_data[:web_results] = 0
-    report_data[:email_web_results] = 0
+    report_data[:report_labels] = []
+    report_data[:report_total_data] = []
+    report_data[:report_w_data] = []
+    report_data[:report_e_data] = []
+    report_data[:report_ew_data] = []
 
     while Date.parse(swap_day.to_s) != (Date.parse(to.to_s) + 1.day)
 
-      report_data[swap_day.to_s] = {}
-      report_data[swap_day.to_s][:all_results] = 0
-      report_data[swap_day.to_s][:email_results] = 0
-      report_data[swap_day.to_s][:web_results] = 0
-      report_data[swap_day.to_s][:email_web_results] = 0
+      day_all_totals = 0
+      day_e_totals = 0
+      day_w_totals = 0
+      day_ew_totals = 0
+      report_data[:report_labels] << swap_day.strftime("%a %b %d, %Y")
 
       report_day_count = 0
       day_results = all_entries.select {|result| Date.parse(result.case_resolved_at.to_s) == Date.parse(swap_day.to_s)}
@@ -1292,19 +1311,24 @@ class Dispute < ApplicationRecord
 
         day_results.each do |day_result|
           if day_result.status == DisputeEntry::STATUS_RESOLVED
-            report_data[swap_day.to_s][:all_results] += 1
+            day_all_totals += 1
 
             case day_result.dispute.submission_type.downcase
               when 'e'
-                report_data[swap_day.to_s][:email_results] += 1
+                day_e_totals += 1
               when 'w'
-                report_data[swap_day.to_s][:web_results] += 1
+                day_w_totals += 1
               when 'ew'
-                report_data[swap_day.to_s][:email_web_results] += 1
+                day_ew_totals += 1
             end
           end
         end
       end
+
+      report_data[:report_total_data] << day_all_totals
+      report_data[:report_w_data] << day_w_totals
+      report_data[:report_e_data] << day_e_totals
+      report_data[:report_ew_data] << day_ew_totals
 
       swap_day = swap_day + 1.day
     end
@@ -1313,16 +1337,22 @@ class Dispute < ApplicationRecord
 
   end
 
-  def self.ticket_time_to_close_report(user, from, to)
+  def self.ticket_time_to_close_report(user_id, from, to)
 
     status_array = [STATUS_RESOLVED]
 
-    report_data = []
+    from = Time.parse(from)
+    to = Time.parse(to)
 
-    main_results = Dispute.where(:user_id => user.id).where("case_resolved_at between '#{from}' and '#{to}'").where(:status => status_array)
+    report_data = {}
+    report_data[:ticket_numbers] = []
+    report_data[:close_times] = []
+
+    main_results = Dispute.where(:user_id => user_id).where("case_resolved_at between '#{from}' and '#{to}'").where(:status => status_array)
 
     main_results.each do |result|
-      report_data << ((result.case_resolved_at - result.created_at) / 3600 )
+      report_data[:ticket_numbers] << result.id
+      report_data[:close_times] << ((result.case_resolved_at - result.created_at) / 3600 )
     end
 
     report_data
@@ -1330,55 +1360,64 @@ class Dispute < ApplicationRecord
   end
 
   def self.closed_ticket_entries_by_resolution_report(users, from, to, submission_types)
+    #users = [User.find(217), User.find(197)]
+    #from = "Thu, 16 Aug 2018 17:40:08 GMT"
+    #to = "Thu, 20 Sep 2018 17:40:08 GMT"
+    #submission_types = ['e', 'w']
+
+    from = Time.parse(from)
+    to = Time.parse(to)
 
     user_ids = users.pluck(:id)
 
     main_results = Dispute.joins(:dispute_entries).where(:user_id => user_ids).where("dispute_entries.case_resolved_at between '#{from}' and '#{to}'").where(:submission_type => submission_types)
 
-    all_entries = main_results.map {|result| result.dispute_entries}.flatten.select {|entry| entry.case_resolved_at.present?}
+    all_entries = main_results.map {|result| result.dispute_entries}.flatten.select {|entry| entry.case_resolved_at.present?}.uniq
     total_count = all_entries.size
-
+    #binding.pry
     results = {}
-    results[:chart_data] = {}
+    results[:chart_data] = []
+    results[:chart_labels] = ["Fixed FN", "Unchanged", "Fixed FP", "Other"]
     results[:table_data] = []
-    results[:chart_data][DisputeEntry::STATUS_RESOLVED_FIXED_FP] = all_entries.select {|entry| entry.resolution == DisputeEntry::STATUS_RESOLVED_FIXED_FP}.size.to_f / total_count.to_f
-    results[:chart_data][DisputeEntry::STATUS_RESOLVED_FIXED_FN] = all_entries.select {|entry| entry.resolution == DisputeEntry::STATUS_RESOLVED_FIXED_FN}.size.to_f / total_count.to_f
-    results[:chart_data][DisputeEntry::STATUS_RESOLVED_UNCHANGED] = all_entries.select {|entry| entry.resolution == DisputeEntry::STATUS_RESOLVED_UNCHANGED}.size.to_f / total_count.to_f
-    results[:chart_data][DisputeEntry::STATUS_RESOLVED_OTHER] = all_entries.select {|entry| entry.resolution == DisputeEntry::STATUS_RESOLVED_OTHER}.size.to_f / total_count.to_f
 
-    if results[:chart_data][DisputeEntry::STATUS_RESOLVED_FIXED_FP].nan?
-      results[:chart_data][DisputeEntry::STATUS_RESOLVED_FIXED_FP] = 0
+    results[:chart_data] << all_entries.select {|entry| entry.resolution == DisputeEntry::STATUS_RESOLVED_FIXED_FN}.size.to_f / total_count.to_f
+    results[:chart_data] << all_entries.select {|entry| entry.resolution == DisputeEntry::STATUS_RESOLVED_UNCHANGED}.size.to_f / total_count.to_f
+    results[:chart_data] << all_entries.select {|entry| entry.resolution == DisputeEntry::STATUS_RESOLVED_FIXED_FP}.size.to_f / total_count.to_f
+    results[:chart_data] << all_entries.select {|entry| entry.resolution == DisputeEntry::STATUS_RESOLVED_OTHER}.size.to_f / total_count.to_f
+
+    if results[:chart_data][0].nan?
+      results[:chart_data][0] = 0
     end
 
-    if results[:chart_data][DisputeEntry::STATUS_RESOLVED_FIXED_FN].nan?
-      results[:chart_data][DisputeEntry::STATUS_RESOLVED_FIXED_FN] = 0
+    if results[:chart_data][1].nan?
+      results[:chart_data][1] = 0
     end
 
-    if results[:chart_data][DisputeEntry::STATUS_RESOLVED_UNCHANGED].nan?
-      results[:chart_data][DisputeEntry::STATUS_RESOLVED_UNCHANGED] = 0
+    if results[:chart_data][2].nan?
+      results[:chart_data][2] = 0
     end
 
-    if results[:chart_data][DisputeEntry::STATUS_RESOLVED_OTHER].nan?
-      results[:chart_data][DisputeEntry::STATUS_RESOLVED_OTHER] = 0
+    if results[:chart_data][3].nan?
+      results[:chart_data][3] = 0
     end
 
     results[:table_data] << {:resolution => DisputeEntry::STATUS_RESOLVED_FIXED_FP,
-                             :percent => results[:chart_data][DisputeEntry::STATUS_RESOLVED_FIXED_FP],
+                             :percent => (results[:chart_data][2] * 100).round(2),
                              :count => all_entries.select {|entry| entry.resolution == DisputeEntry::STATUS_RESOLVED_FIXED_FP}.size
                              }
 
     results[:table_data] << {:resolution => DisputeEntry::STATUS_RESOLVED_FIXED_FN,
-                             :percent => results[:chart_data][DisputeEntry::STATUS_RESOLVED_FIXED_FN],
+                             :percent => (results[:chart_data][0] * 100).round(2),
                              :count => all_entries.select {|entry| entry.resolution == DisputeEntry::STATUS_RESOLVED_FIXED_FN}.size
     }
 
     results[:table_data] << {:resolution => DisputeEntry::STATUS_RESOLVED_UNCHANGED,
-                             :percent => results[:chart_data][DisputeEntry::STATUS_RESOLVED_UNCHANGED],
+                             :percent => (results[:chart_data][1] * 100).round(2),
                              :count => all_entries.select {|entry| entry.resolution == DisputeEntry::STATUS_RESOLVED_UNCHANGED}.size
     }
 
     results[:table_data] << {:resolution => DisputeEntry::STATUS_RESOLVED_OTHER,
-                             :percent => results[:chart_data][DisputeEntry::STATUS_RESOLVED_OTHER],
+                             :percent => (results[:chart_data][3] * 100).round(2),
                              :count => all_entries.select {|entry| entry.resolution == DisputeEntry::STATUS_RESOLVED_OTHER}.size
     }
 
@@ -1387,9 +1426,22 @@ class Dispute < ApplicationRecord
   end
 
   def self.tickets_submitted_by_submitter_per_day(from, to)
-    main_results = Dispute.joins(:dispute_entries).where(:user_id => user.id).where("created_at between '#{from}' and '#{to}'")
+
+    #from = "Mon, 6 Aug 2018 17:40:08 GMT"
+    #to = "Fri, 10 Aug 2018 17:40:08 GMT"
+
+    from = Time.parse(from)
+    to = Time.parse(to)
+
+    main_results = Dispute.joins(:dispute_entries).where("disputes.created_at between '#{from}' and '#{to}'")
 
     report_data = {}
+    final_report_data = {}
+
+    final_report_data[:chart_labels] = []
+    final_report_data[:customer_chart_data] = []
+    final_report_data[:guest_chart_data] = []
+
 
     swap_day = from
 
@@ -1398,6 +1450,8 @@ class Dispute < ApplicationRecord
        report_data[swap_day.to_s] = {}
        report_data[swap_day.to_s][:customer_count] = 0
        report_data[swap_day.to_s][:guest_count] = 0
+
+       final_report_data[:chart_labels] << swap_day.strftime("%a %b %d, %Y")
 
        day_results = main_results.select {|result| Date.parse(result.created_at.to_s) == Date.parse(swap_day.to_s)}
 
@@ -1410,21 +1464,30 @@ class Dispute < ApplicationRecord
          end
        end
 
+       final_report_data[:customer_chart_data] << report_data[swap_day.to_s][:customer_count]
+       final_report_data[:guest_chart_data] << report_data[swap_day.to_s][:guest_count]
+
        swap_day = swap_day + 1.day
     end
 
-    report_data
+    final_report_data
 
   end
 
   def self.ticket_entries_closed_by_ticket_owner(users, from, to)
 
+    from = Time.parse(from)
+    to = Time.parse(to)
+
     user_ids = users.pluck(:id)
 
     main_results = Dispute.joins(:dispute_entries).where("dispute_entries.case_resolved_at between '#{from}' and '#{to}'").where(:user_id => user_ids)
-    all_entries = main_results.map {|result| result.dispute_entries}.flatten
+    all_entries = main_results.map {|result| result.dispute_entries}.flatten.uniq
 
     report_data = {}
+    final_data = {}
+    final_data[:report_labels] = []
+    final_data[:report_data] = []
 
     users.each do |user|
       report_data[user.cvs_username] = 0
@@ -1436,14 +1499,26 @@ class Dispute < ApplicationRecord
       end
     end
 
-    report_data
+    report_data.keys.each do |key|
+      final_data[:report_labels] << key
+      final_data[:report_data] << report_data[key]
+    end
+
+    final_data
 
   end
 
   def self.average_time_to_close_tickets_by_ticket_owner(users, from, to)
 
+    from = Time.parse(from)
+    to = Time.parse(to)
+
     raw_data = {}
-    report_data = {}
+    report = {}
+    report_data = []
+
+    report_labels = []
+
 
     user_ids = users.pluck(:id)
 
@@ -1460,29 +1535,38 @@ class Dispute < ApplicationRecord
     raw_data.each do |k, v|
       avg = v.inject{ |sum, el| sum + el }.to_f / v.size
 
+      report_labels << k
       if !avg.nan?
-        report_data[k] = avg
+        #report_data[k] = avg
+        report_data << avg
       else
-        report_data[k] = 0
+        #report_data[k] = 0
+        report_data << 0
       end
     end
 
-    report_data
+    report[:report_data] = report_data
+    report[:report_labels] = report_labels
+
+    report
   end
 
   def self.ticket_entry_resolution_by_ticket_owner(users, from, to)
+
+    from = Time.parse(from)
+    to = Time.parse(to)
 
     user_ids = users.pluck(:id)
 
     main_results = Dispute.joins(:dispute_entries).where(:user_id => user_ids).where("dispute_entries.case_resolved_at between '#{from}' and '#{to}'")
 
-    all_entries = main_results.map {|result| result.dispute_entries}.flatten.select {|entry| entry.case_resolved_at.present?}
-    #total_count = all_entries.size
+    all_entries = main_results.map {|result| result.dispute_entries}.flatten.select {|entry| entry.case_resolved_at.present?}.flatten.uniq
+
 
     results = {}
     results[:chart_data] = {}
-    results[:table_data] = []
-
+    #results[:table_data] = []
+    final_data = {}
 
     users.each do |user|
       results[:chart_data][user.cvs_username] = {}
@@ -1492,54 +1576,53 @@ class Dispute < ApplicationRecord
       results[:chart_data][user.cvs_username][DisputeEntry::STATUS_RESOLVED_OTHER] = 0
     end
 
-    results[:chart_data][:total] = {}
-    results[:chart_data][:total][DisputeEntry::STATUS_RESOLVED_FIXED_FP] = 0
-    results[:chart_data][:total][DisputeEntry::STATUS_RESOLVED_FIXED_FN] = 0
-    results[:chart_data][:total][DisputeEntry::STATUS_RESOLVED_UNCHANGED] = 0
-    results[:chart_data][:total][DisputeEntry::STATUS_RESOLVED_OTHER] = 0
-
     all_entries.each do |entry|
       case entry.resolution
         when DisputeEntry::STATUS_RESOLVED_FIXED_FP
           results[:chart_data][entry.dispute.user.cvs_username][DisputeEntry::STATUS_RESOLVED_FIXED_FP] += 1
-          results[:chart_data][:total][DisputeEntry::STATUS_RESOLVED_FIXED_FP] += 1
+          #results[:chart_data][:total][DisputeEntry::STATUS_RESOLVED_FIXED_FP] += 1
         when DisputeEntry::STATUS_RESOLVED_FIXED_FN
           results[:chart_data][entry.dispute.user.cvs_username][DisputeEntry::STATUS_RESOLVED_FIXED_FN] += 1
-          results[:chart_data][:total][DisputeEntry::STATUS_RESOLVED_FIXED_FN] += 1
+          #results[:chart_data][:total][DisputeEntry::STATUS_RESOLVED_FIXED_FN] += 1
         when DisputeEntry::STATUS_RESOLVED_UNCHANGED
           results[:chart_data][entry.dispute.user.cvs_username][DisputeEntry::STATUS_RESOLVED_UNCHANGED] += 1
-          results[:chart_data][:total][DisputeEntry::STATUS_RESOLVED_UNCHANGED] += 1
+          #results[:chart_data][:total][DisputeEntry::STATUS_RESOLVED_UNCHANGED] += 1
         when DisputeEntry::STATUS_RESOLVED_OTHER
           results[:chart_data][entry.dispute.user.cvs_username][DisputeEntry::STATUS_RESOLVED_OTHER] += 1
-          results[:chart_data][:total][DisputeEntry::STATUS_RESOLVED_OTHER] += 1
+          #results[:chart_data][:total][DisputeEntry::STATUS_RESOLVED_OTHER] += 1
       end
     end
 
-    users.each do |user|
-      results[:table_data] << {:owner => user.cvs_username,
-                                DisputeEntry::STATUS_RESOLVED_UNCHANGED => results[:chart_data][user.cvs_username][DisputeEntry::STATUS_RESOLVED_UNCHANGED],
-                                DisputeEntry::STATUS_RESOLVED_FIXED_FN => results[:chart_data][user.cvs_username][DisputeEntry::STATUS_RESOLVED_FIXED_FN],
-                                DisputeEntry::STATUS_RESOLVED_FIXED_FP => results[:chart_data][user.cvs_username][DisputeEntry::STATUS_RESOLVED_FIXED_FP],
-                                DisputeEntry::STATUS_RESOLVED_OTHER => results[:chart_data][user.cvs_username][DisputeEntry::STATUS_RESOLVED_OTHER]}
+    final_data[:ticket_owners] = []
+    final_data[:fixed_fp_tickets] = []
+    final_data[:fixed_fn_tickets] = []
+    final_data[:unchanged_tickets] = []
+    final_data[:other_tickets] = []
+
+
+    results[:chart_data].each do |k, v|
+      final_data[:ticket_owners] << k
+      final_data[:fixed_fp_tickets] << v[DisputeEntry::STATUS_RESOLVED_FIXED_FP]
+      final_data[:fixed_fn_tickets] << v[DisputeEntry::STATUS_RESOLVED_FIXED_FN]
+      final_data[:unchanged_tickets] << v[DisputeEntry::STATUS_RESOLVED_UNCHANGED]
+      final_data[:other_tickets] << v[DisputeEntry::STATUS_RESOLVED_OTHER]
     end
 
-    results[:table_data] << {:owner => "TOTAL",
-                             DisputeEntry::STATUS_RESOLVED_UNCHANGED => results[:chart_data][:total][DisputeEntry::STATUS_RESOLVED_UNCHANGED],
-                             DisputeEntry::STATUS_RESOLVED_FIXED_FN => results[:chart_data][:total][DisputeEntry::STATUS_RESOLVED_FIXED_FN],
-                             DisputeEntry::STATUS_RESOLVED_FIXED_FP => results[:chart_data][:total][DisputeEntry::STATUS_RESOLVED_FIXED_FP],
-                             DisputeEntry::STATUS_RESOLVED_OTHER => results[:chart_data][:total][DisputeEntry::STATUS_RESOLVED_OTHER]}
-
-    results
+    final_data
 
   end
 
   def self.rulehits_for_false_positive_resolutions(users, from , to)
 
+    from = Time.parse(from)
+    to = Time.parse(to)
+
+
     user_ids = users.pluck(:id)
 
     main_results = Dispute.joins(:dispute_entries).where(:user_id => user_ids).where("dispute_entries.case_resolved_at between '#{from}' and '#{to}'")
 
-    all_entries = main_results.map {|result| result.dispute_entries}.flatten.select {|entry| entry.case_resolved_at.present?}
+    all_entries = main_results.map {|result| result.dispute_entries}.flatten.select {|entry| entry.case_resolved_at.present?}.flatten.uniq
 
     fp_entries = all_entries.select {|entry| entry.resolution == DisputeEntry::STATUS_RESOLVED_FIXED_FP}
 
@@ -1557,7 +1640,17 @@ class Dispute < ApplicationRecord
       end
     end
 
-    rulehit_types
+    final_data = {}
+    final_data[:rules] = []
+    final_data[:rule_hits] = []
+
+    rulehit_types.each do |k, v|
+      final_data[:rules] << k
+      final_data[:rule_hits] << v
+    end
+
+
+    final_data
 
   end
 
