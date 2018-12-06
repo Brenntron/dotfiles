@@ -6554,7 +6554,14 @@ h2 {
   font-weight: bold;
 }
 
-.sorting_1, .sorting_asc {
+.sorting_1, .sorting_asc, .sorting_desc {
   background-color: $faint-accent-color !important;
   opacity: 80%;
+  background-position-x: 95% !important;
+}
+.sorting {
+  background-position-x: 95% !important;
+}
+#time-submitted {
+  width: 150px;
 }
