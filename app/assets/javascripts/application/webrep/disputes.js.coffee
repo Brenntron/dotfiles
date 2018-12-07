@@ -97,6 +97,7 @@ window.populate_webrep_index_table = (data = {}) ->
             $('.dispute-entry-checkbox').each ->
               if this.id == dispute_entry_click
                 this.checked = true
+                toggleRow(this)
         if array_of_dispute_entry_selectalls.length > 0
           for dispute_entry_selectall in array_of_dispute_entry_selectalls
             $('.dispute_entry_select_all').each ->
