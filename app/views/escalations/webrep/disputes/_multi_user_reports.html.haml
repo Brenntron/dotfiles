@@ -137,10 +137,10 @@
         .reports-graph-wrapper
           %h5 Ticket Resolution by Ticket Owner
           .graph-bar-legend
-            %label.navyblue-legend-color Fixed FN
-            %label.skyblue-legend-color Fixed FP
-            %label.lightgray-legend-color Unchanged
-            %label.orange-legend-color Other
+            %label.navyblue-legend-color.graph-legend-circle Fixed FN
+            %label.skyblue-legend-color.graph-legend-circle Fixed FP
+            %label.lightgray-legend-color.graph-legend-circle Unchanged
+            %label.orange-legend-color.graph-legend-circle Other
           %canvas#ticket-resolutions-by-owner
 
           %table.table
@@ -198,8 +198,8 @@
               %option{:value => "yearly"} Yearly
 
             .graph-bar-legend
-              %label.skyblue-legend-color Customer
-              %label.navyblue-legend-color Guest
+              %label.skyblue-legend-color.graph-legend-circle Customer
+              %label.navyblue-legend-color.graph-legend-circle Guest
           %canvas#graph-multiuser-ticket-entries-submitter
 
         .reports-graph-wrapper

@@ -6731,6 +6731,9 @@ h2 {
         color: white;
         background-color: $primary-section-color;
       }
+      a:focus {
+        background-color: $primary-section-color;
+      }
       .white-user:hover {
         background-image: url(image_path('icon_user_white.svg'));;
       }
@@ -7095,41 +7098,30 @@ td.text-center span {
       padding: 4px 0 20px 4px;
     }
 
-    .skyblue-legend-color::before {
+    .graph-legend-circle::before {
       content: '';
       float: left;
       display: block;
       height: 8px;
       width: 8px;
       border-radius: 50%;
-      background-color: $primary-section-color;
       margin-right: 6px;
       margin-top: 2px;
+    }
+
+    .skyblue-legend-color::before {
+      background-color: $primary-section-color;
     }
 
     .navyblue-legend-color::before {
-      float: left;
-      content: '';
-      display: block;
-      height: 8px;
-      width: 8px;
-      border-radius: 50%;
       background-color: $content-tab-color;
-      margin-right: 6px;
-      margin-top: 2px;
     }
 
-    .lightgray-legend-color {
-      height: 8px;
-      width: 8px;
-      border-radius: 50%;
+    .lightgray-legend-color::before {
       background-color: $content-label-color;
     }
 
-    .orange-legend-color {
-      height: 8px;
-      width: 8px;
-      border-radius: 50%;
+    .orange-legend-color::before {
       background-color: $warning-accent-color;
     }
   }
