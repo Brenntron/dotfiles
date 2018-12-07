@@ -86,9 +86,26 @@
   - if current_user
     #login-div.nav-tool-block.col-sm-3.col-lg-3
       %span.dropdown
-        %button#user-settings-dropdown.dropdown-toggle{'data-toggle': 'dropdown', 'aria-expanded': 'false', 'aria-haspopup': 'true', type: 'button'}
-        .dropdown-menu{'aria-labelledby': 'user-settings-dropdown'}
-          test
+        %button#user-settings-dropdown-button.dropdown-toggle{'data-toggle': 'dropdown', 'aria-expanded': 'false', 'aria-haspopup': 'true', type: 'button'}
+        #user-settings-dropdown.dropdown-menu{'aria-labelledby': 'user-settings-dropdown-button'}
+          -#    If user is logged into Bugzilla
+          -#.message-text Log out of Bugzilla
+          
+          -#-#    Else
+          .message-text Log into Bugzilla
+          %form
+            .form-group.text-left
+              %label.content-label-sm Username
+              %input.form-control{name: 'username', autofocus: 'true'}
+            .form-group.text-left
+              %lable.content-label-sm Password
+              %input.form-control{type: 'password', name: 'password'}
+            .form-group.text-center
+              %button.panel-button.primary{'aria-label': 'Login', onclick: 'std_api_login(); return false;'} Login
+
+          %a{href: "/users/#{current_user[:id]}"}
+            Login settings
+
       %a.nav-username{href: "/users/#{current_user[:id]}"}
         = current_user[:display_name]
 
