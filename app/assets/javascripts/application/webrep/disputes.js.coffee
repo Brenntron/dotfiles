@@ -1,5 +1,7 @@
 window.select_or_deselect_all = (dispute_id)->
   $('.dispute-entry-checkbox_' + dispute_id).prop('checked', $('#' + dispute_id).prop('checked'))
+  $('.dispute-entry-checkbox_' + dispute_id).each ->
+    toggleRow(this)
 
 window.populate_webrep_index_table = (data = {}) ->
 
