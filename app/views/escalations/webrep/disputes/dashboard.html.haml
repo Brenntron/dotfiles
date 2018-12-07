@@ -34,13 +34,13 @@
         %ul
           %li.active
             %span.down-arrow
-            %a.white-user.ticket-owner-button.user-icon-stg-1.bold{"data-toggle" => "tab", :href => "#my-ticket"} My Ticket
+            %a.white-user.ticket-owner-button.user-icon-stg-1.bold{"data-toggle" => "tab", :href => "#my-tickets"} My Tickets
           %li
             %span.down-arrow
             %a.group-user-white.icon-team-grey.user-icon-stg.bold{"data-toggle" => "tab", :href => "#my-team-tickets"} My Team Tickets
           %li
             %span.down-arrow
-            %a.all-tickets-white.icon-all-tickets-grey.user-icon-stg.bold{"data-toggle" => "tab", :href => "#all-tickets"} All tickets
+            %a.all-tickets-white.icon-all-tickets-grey.user-icon-stg.bold{"data-toggle" => "tab", :href => "#all-tickets"} All Tickets
           %li
             %span.down-arrow
             %a.custom-user-white.icon-custom-user-grey.user-icon-stg.bold{"data-toggle" => "tab", :href => "#select-custom-users"} Select Custom Users
@@ -57,7 +57,7 @@
           -# TODO Hookup exporting. This can be simple for first launch. Later we'll add options to select what gets exported.
 
   .tab-content.dashboard-tab-content
-    #my-ticket.tab-pane.active
+    #my-tickets.tab-pane.active
       = render 'escalations/webrep/disputes/single_user_reports'
 
     #my-team-tickets.tab-pane
