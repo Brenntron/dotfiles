@@ -24,6 +24,12 @@ $ ->
           $node.addClass 'highlight-plus5Hours'
         else
         return
+
+      dom: '<"datatable-top-tools no-margin-datatable-top-tool"lf>t<ip>'
+      language: {
+        search: "_INPUT_"
+        searchPlaceholder: "Search within table"
+      }
       columnDefs: [
         {
           targets: [ 0 ]
@@ -158,6 +164,8 @@ $ ->
       ]
       select: 'style': 'os'
       responsive: true)
+
+    $('#complaints-index_filter input').addClass('table-search-input');
     $('#complaints-index tbody').on 'click', 'td.expandable-row-column', ->
       click_table_buttons complaint_table, this
 
