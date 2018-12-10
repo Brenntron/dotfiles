@@ -367,7 +367,8 @@ $ ->
 
     else
       $(dropdown_wrapper).removeClass('open')
-      alert ('Please select 1 row')
+      $('#wl_bl_errorModal').modal('show')
+#      alert ('Please select 1 row')
 
 
 

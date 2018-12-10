@@ -641,3 +641,14 @@
 = render 'escalations/webrep/disputes/new_email_dialog'
 %input{:name => "token", :type => "hidden", :value => "#{current_user.authentication_token}"}
 %input{:name => "xml_token", :type => "hidden", :value => "#{xml_token}"}
+
+#wl_bl_errorModal.modal.fade{"aria-hidden" => "true", "aria-labelledby" => "exampleModalLabel", :role => "dialog", :tabindex => "-6"}
+  .modal-dialog{:role => "document"}
+    .modal-content
+      .modal-header
+        %h5#exampleModalLabel.modal-title Modal title
+      .modal-body
+        Please select 1 row.
+      .modal-footer
+        %button.btn.btn-primary{:type => "button", "data-dismiss" => "modal"} OK
+
