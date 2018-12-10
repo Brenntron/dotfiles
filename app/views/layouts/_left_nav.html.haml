@@ -1,0 +1,140 @@
+#sidenav-icons-div
+  %input{id: 'nav-trigger', type: 'checkbox', hidden: 'hidden'}
+  %label{for: 'nav-trigger', id: 'nav-trigger-label'}
+    = image_tag('layout/ac_nav_icon.svg', class: 'sidenav-icon', alt: 'Menu')
+  %ul{class: 'sidenav-icons'}
+    %li{class: 'nav-item nav-ac static-nav-item'}
+      = image_tag('layout/analyst_console_icon.svg', class: 'sidenav-icon', alt: 'Analyst Console')
+    %li{class: 'nav-menu-spacer static-nav-item'}
+    - if can?(:read, Admin) || can?(:index, ResearchBug)
+      %li{class: 'nav-bugs'}
+        %a{class: 'static-nav-item', 'data-toggle': 'collapse', href:'.bugs-subnav', role:'button', 'aria-expanded':'false', 'aria-controls':'bugs-subnav bugs-subnav-icons'}
+          = image_tag('layout/bugs_icon.svg', class: 'sidenav-icon', alt: 'Bugs')
+        %ul{class: 'sub-nav collapse bugs-subnav', id: 'bugs-subnav-icons'}
+          - if can?(:index, ResearchBug)
+            %li{class: 'ips-link'}
+              %a{href: bugs_path}= inline_svg 'icon_snort.svg'
+          - if can?(:read, Admin)
+            %li{class: 'clam-link'}
+              %a.disabled-link= inline_svg 'icon_clam.svg'
+          - if can?(:read, Admin)
+            %li{class: 'amp-link'}
+              %a.disabled-link= inline_svg 'icon_amp.svg'
+          - if can?(:read, Admin)
+            %li{class: 'rep-link'}
+              %a.disabled-link= inline_svg 'icon_rep.svg'
+          - if can?(:read, Admin)
+            %li{class: 'cat-link'}
+              %a.disabled-link= inline_svg 'icon_cat.svg'
+    - if can?(:read, Admin) || can?(:index, EscalationBug) || can?(:index, Dispute) || can?(:index, Complaint)
+      %li{class: 'nav-escalations'}
+        %a{class: 'static-nav-item', 'data-toggle': 'collapse', href:'.esc-subnav', role:'button', 'aria-expanded':'false', 'aria-controls':'esc-subnav esc-subnav-icons'}
+          = image_tag('layout/icon_escalations.svg', class: 'sidenav-icon', alt: 'Escalations')
+        %ul{class: 'sub-nav collapse esc-subnav', id: 'esc-subnav-icons'}
+          - if can?(:index, EscalationBug)
+            %li{class: 'ips-link'}
+              %a{href: escalations_bugs_path}
+                =inline_svg 'icon_snort.svg'
+          - if can?(:read, Admin)
+            %li{class: 'clam-link'}
+              %a.disabled-link= inline_svg 'icon_clam.svg'
+          - if can?(:read, Admin)
+            %li{class: 'amp-link'}
+              %a.disabled-link= inline_svg 'icon_amp.svg'
+          - if can?(:index, Dispute)
+            %li{class: 'rep-link'}
+              %a{href: escalations_webrep_disputes_path}
+                =inline_svg 'icon_rep.svg'
+          - if can?(:index, Complaint)
+            %li{class: 'cat-link'}
+              %a{href: escalations_webcat_complaints_path}
+                =inline_svg 'icon_cat.svg'
+    %li{class: 'nav-item nav-users'}
+      %a{href: escalations_users_path}= image_tag('layout/users_icon.svg', class: 'sidenav-icon', alt: 'Users')
+
+    - if can?(:read, Admin)
+      %li{class: 'nav-item nav-admin'}
+        %a{href: '/admin'}= image_tag('layout/icon_admin.svg', class: 'sidenav-icon', alt: 'Admin')
+
+    %li{class: 'nav-docs'}
+      %a{class: 'static-nav-item', 'data-toggle': 'collapse', href:'.doc-subnav', role:'button', 'aria-expanded':'false', 'aria-controls':'doc-subnav doc-subnav-icons'}
+        = image_tag('layout/icon_documentation.svg', class: 'sidenav-icon', alt: 'Docs')
+      %ul{class: 'sub-nav collapse doc-subnav', id: 'doc-subnav-icons'}
+        %li{class: 'wiki-link'}
+          %a{href: 'https://confluence.vrt.sourcefire.com/display/OSDWE/Analyst+Console+Documentation', target: '_blank'}
+            =inline_svg 'icon_wiki_grey.svg'
+        %li{class: 'github-link'}
+          - if !@version.nil?
+            %a{href: "https://git.vrt.sourcefire.com/talosweb/analyst-console/releases/tag/v#{@version}"}
+              = image_tag('icon_github.png', class: 'github-icon', alt: 'GitHub', size: '16x16')
+          - else
+            %a{href: "https://git.vrt.sourcefire.com/talosweb/analyst-console/releases/"}
+              = image_tag('icon_github.png', class: 'github-icon', alt: 'GitHub', size: '16x16')
+
+  #sidenav-menu-div
+    %ul{class: 'nav-container'}
+      %li{class: 'nav-ac static-nav-item'}
+        = image_tag('layout/ac_logo_text.svg', class: 'ac-logo-text', alt: 'Analyst Console')
+      %li{class: 'static-nav-item'}
+      - if can?(:read, Admin) || can?(:index, ResearchBug)
+        %li{class: 'nav-bugs'}
+          %a{class: 'static-nav-item', 'data-toggle': 'collapse', href:'.bugs-subnav', role:'button', 'aria-expanded':'false', 'aria-controls':'bugs-subnav bugs-subnav-icons'}
+            Bugs
+
+          %ul{class: 'sub-nav collapse bugs-subnav', id: 'bugs-subnav'}
+            - if can?(:index, ResearchBug)
+              %li{class: 'ips-link'}
+                %a{href: bugs_path} IPS
+            - if can?(:read, Admin)
+              %li{class: 'clam-link'}
+                %a.disabled-link Clam
+            - if can?(:read, Admin)
+              %li{class: 'amp-link'}
+                %a.disabled-link AMP
+            - if can?(:read, Admin)
+              %li{class: 'rep-link'}
+                %a.disabled-link Reputation
+            - if can?(:read, Admin)
+              %li{class: 'cat-link'}
+                %a.disabled-link Categorization
+
+      - if can?(:read, Admin) || can?(:index, EscalationBug) || can?(:index, Dispute) || can?(:index, Complaint)
+        %li{class: 'nav-escalations'}
+          %a{class: 'static-nav-item', 'data-toggle': 'collapse', href:'.esc-subnav', role:'button', 'aria-expanded':'false', 'aria-controls':'esc-subnav esc-subnav-icons'}
+            Escalations
+          %ul{class: 'sub-nav collapse esc-subnav', id: 'esc-subnav'}
+            - if can?(:index, EscalationBug)
+              %li{class: 'ips-link'}
+                %a{href: escalations_bugs_path} IPS
+            - if can?(:read, Admin)
+              %li{class: 'clam-link'}
+                %a.disabled-link Clam
+            - if can?(:read, Admin)
+              %li{class: 'amp-link'}
+                %a.disabled-link AMP
+            - if can?(:index, Dispute)
+              %li{class: 'rep-link'}
+                %a{href: escalations_webrep_disputes_path} Reputation
+            - if can?(:index, Complaint)
+              %li{class: 'cat-link'}
+                %a{href: escalations_webcat_complaints_path} Categorization
+      %li{class: 'nav-users static-nav-item'}
+        %a{href: escalations_users_path}
+          Users
+      - if can?(:read, Admin)
+        %li{class: 'nav-admin static-nav-item'}
+          %a{href: '/admin'}
+            Admin
+
+
+      %li{class: 'nav-docs'}
+        %a{class: 'static-nav-item', 'data-toggle': 'collapse', href:'.doc-subnav', role:'button', 'aria-expanded':'false', 'aria-controls':'doc-subnav doc-subnav-icons'}
+          Docs
+        %ul{class: 'sub-nav collapse doc-subnav', id: 'doc-subnav'}
+          %li{class: 'wiki-link'}
+            %a{href: 'https://confluence.vrt.sourcefire.com/display/OSDWE/Analyst+Console+Documentation', target: '_blank'} Doc
+          %li{class: 'github-link'}
+            - if !@version.nil?
+              %a{href: "https://git.vrt.sourcefire.com/talosweb/analyst-console/releases/tag/v#{@version}"} V #{@version}
+            - else
+              %a{href: "https://git.vrt.sourcefire.com/talosweb/analyst-console/releases/"} Release Notes
