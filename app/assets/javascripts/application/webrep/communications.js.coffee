@@ -193,10 +193,11 @@ $ ->
     )
 
   $('.new-attachment').on 'click', ->
-    $('#file-fields-new').before("<span class='file-attachment-wrapper'><input class= 'file_attachment_new' onchange='check_email_attachment_size(this)' name='attachment' type='file'/></span>")
-    $('.file_attachment_new:last').after("<button class='delete_attachment_new'>x</button>")
-    $('.file_attachment_new:last').click()
-    false
+    unless ( $(".file-attachment-wrapper > .file_attachment_new").length > 0 && !$(".file-attachment-wrapper > .file_attachment_new").last().val() )
+      $('#file-fields-new').before("<span class='file-attachment-wrapper'><input class= 'file_attachment_new' onchange='check_email_attachment_size(this)' name='attachment' type='file'/></span>")
+      $('.file_attachment_new:last').after("<button class='delete_attachment_new'>x</button>")
+      $('.file_attachment_new:last').click()
+      false
 
   $('body').on 'click', '.delete_attachment_new', ->
     $(this).parent().remove()
