@@ -5,6 +5,8 @@ ZSH_DISABLE_COMPFIX=true
 # Path to your oh-my-zsh installation.
 export ZSH="/Users/Brenntron/.oh-my-zsh"
 
+export TERM=screen-256color-bce tmux
+
 # Set name of the theme to load. Optionally, if you set this to "random"
 # it'll load a random theme each time that oh-my-zsh is loaded.
 # See https://github.com/robbyrussell/oh-my-zsh/wiki/Themes
@@ -113,8 +115,6 @@ for zsh_source in $HOME/.zsh/configs/*.zsh; do
 done
 
 ensure_tmux_is_running
-
-export TERM=xterm-256Color tmux
 
 . $HOME/.asdf/asdf.sh
 
