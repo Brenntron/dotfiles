@@ -4,6 +4,7 @@ class ApplicationController < ActionController::Base
   #protect_from_forgery with: :null_session, :if => Proc.new { |c| c.request.accept == 'application/json' }
   before_action :set_paper_trail_whodunnit
   before_action :require_login
+  before_action :set_version
   helper_method :current_user
   helper_method :xml_token
 
@@ -33,6 +34,16 @@ class ApplicationController < ActionController::Base
 
   def xml_token
     @xml_token ||= session[:token] if session[:token]
+  end
+
+  def set_version
+    begin
+      @version = (File.read './public/version').split('.')
+      @version = @version[0] + '.' + @version[1] + '.' + @version[2]
+    rescue
+      @version = nil
+    end
+    @version
   end
 
   rescue_from ::CanCan::AccessDenied do |exception|
