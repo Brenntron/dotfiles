@@ -304,8 +304,10 @@ Feature: Webcat complaints
     Given a user with role "webcat user" exists and is logged in
     When I goto "/escalations/webcat/complaints?f=ALL"
     And I click "#fetch"
-    And I wait for "90" seconds
-    Then I should see "Complaint updates requested from Talos-Intelligence.  Please refresh your page shortly."
+    Given successful PeakeBridge poll is stubbed
+    Then I wait for "3" seconds
+    Then take a screenshot
+    Then I should see "COMPLAINT UPDATES REQUESTED FROM TALOS-INTELLIGENCE.  PLEASE REFRESH YOUR PAGE SHORTLY."
 
   @javascript
   Scenario: a users tries to lookup categories for a URL
