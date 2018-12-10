@@ -306,7 +306,6 @@ Feature: Webcat complaints
     And I click "#fetch"
     Given successful PeakeBridge poll is stubbed
     Then I wait for "3" seconds
-    Then take a screenshot
     Then I should see "COMPLAINT UPDATES REQUESTED FROM TALOS-INTELLIGENCE.  PLEASE REFRESH YOUR PAGE SHORTLY."
 
   @javascript
