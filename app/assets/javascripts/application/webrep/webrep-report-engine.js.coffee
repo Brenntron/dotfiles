@@ -1,4 +1,12 @@
 window.populate_top_banner = ()->
+  from = localStorage.getItem('webrep_report_range_from')
+  to = localStorage.getItem('webrep_report_range_to')
+
+  data = {
+    from: from,
+    to: to
+  }
+
   headers = {'Token': $('input[name="token"]').val(), 'Xmlrpc-Token': $('input[name="xml_token"]').val()}
   $.ajax(
     url: '/escalations/api/v1/escalations/webrep/reports/populate_top_banner'
@@ -9,9 +17,9 @@ window.populate_top_banner = ()->
 
       json = $.parseJSON(response)
 
-      #json['data']['valid_tickets_total']
-      #json['data']['valid_entries_total']
-      #json['data']['invalid_tickets_total']
+      $('#total-valid-ticket-count').text(json.data.valid_tickets_total)
+      $('#total-valid-entry-count').text(json.data.valid_entries_total)
+      $('#total-invalid-ticket-count').text(json.data.invalid_tickets_total + ' Invalid Tickets')
 
   , this)
 
