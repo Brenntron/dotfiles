@@ -138,10 +138,11 @@ $ ->
     )
 
   $('.attachment-reply').on 'click', ->
-    $('.file-wrapper-reply').show()
-    $('#file-fields').append("<span class='file-attachment-wrapper'><input class= 'file_attachment' onchange='check_email_attachment_size(this)' name='attachment' type='file'/></span>")
-    $('.file_attachment:last').after("<button class='delete_attachment'>x</button>")
-    $('.file_attachment:last').click()
+    unless ( $(".file-attachment-reply > .file_attachment").length > 0 && !$(".file-attachment-wrapper > .file_attachment").last().val() )
+      $('.file-wrapper-reply').show()
+      $('#file-fields').append("<span class='file-attachment-wrapper file-attachment-reply'><input class= 'file_attachment' onchange='check_email_attachment_size(this)' name='attachment' type='file'/></span>")
+      $('.file_attachment:last').after("<button class='delete_attachment'>x</button>")
+      $('.file_attachment:last').click()
 
   $('body').on 'click', '.delete_attachment', ->
     $(this).parent().remove()
