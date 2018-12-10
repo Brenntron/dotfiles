@@ -462,7 +462,7 @@ window.lookup_prefix = () ->
       for [i .. 5]
         j = 0
         try
-          for [j .. 5]
+          for [j .. Object.keys(response.json[i]).length]
             selector = '#cat_new_url_' + i.toString()
             $select= $(selector).selectize()
             selectize = $select[0].selectize
