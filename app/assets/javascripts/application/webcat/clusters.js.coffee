@@ -29,15 +29,7 @@ window.populate_clusters_index_table = (filter) ->
         datatable.rows.add(json.data);
         datatable.draw();
 
-        $('.cluster_categories').selectize {
-          persist: false,
-          create: false,
-          maxItems: 5,
-          valueField: 'value',
-          labelField: 'value',
-          searchField: ['text'],
-          options: AC.WebCat.createSelectOptions()
-        }
+        selectize_category_inputs();
 
         $("#total_results").html(json.meta.rows_found)
 
@@ -153,9 +145,9 @@ $ ->
         data: null,
         render: (data) ->
           '<button type="button" class="whois-btn right-margin esc-tooltipped" title="Whois Domain Lookup Information" onclick="domain_whois(\'' + data.domain + '\')"></button>' +
-          '<button type="button" class="google-btn right-margin esc-tooltipped" title="Google it!" onclick="window.open(\'https://www.google.com/search?q=' + data.domain + '\')"></button>' +
-          data.domain + '<button type="button" onclick="window.open(\'https://' + data.domain + '\', \'_blank\') " class="open-in-tab-btn right-margin esc-tooltipped", title="Open ' + data.domain + ' in a new tab"></button>' +
-          '<span class="vertical-separator"></span><span class="entry-count">' + data.cluster_size + '</span>'
+            '<button type="button" class="google-btn right-margin esc-tooltipped" title="Google it!" onclick="window.open(\'https://www.google.com/search?q=' + data.domain + '\')"></button>' +
+            data.domain + '<button type="button" onclick="window.open(\'https://' + data.domain + '\', \'_blank\') " class="open-in-tab-btn right-margin esc-tooltipped", title="Open ' + data.domain + ' in a new tab"></button>' +
+            '<span class="vertical-separator"></span><span class="entry-count">' + data.cluster_size + '</span>'
       }
       {
         data: 'global_volume'
@@ -182,8 +174,8 @@ $ ->
     cluster_entry_html = ''
     cluster_entry_html =
       '<table><tr><td>' +
-      'Testing setup' +
-      '</td></tr></table>'
+        'Testing setup' +
+        '</td></tr></table>'
 
     cluster_entry_html
 
@@ -257,25 +249,6 @@ open_selected_tabs = (selected_rows, toggle) ->
       window.open("http://"+selected_rows.data()[i].ip_address)
     i++
 
-    # Moves cluster selectize to table draw so that selectize boxes properly initialize when changing number of items being displayed
-    $("#clusters-index").on 'draw.dt', ->
-      category_inputs = $("select.cluster_categories")
-      $(category_inputs).each ->
-        if $(this).next("div").hasClass("selectize-control")
-#          This is already selectized
-        else
-          $(this).selectize {
-            persist: false,
-            create: false,
-            maxItems: 5,
-            valueField: 'value',
-            labelField: 'value',
-            searchField: ['text'],
-            options: AC.WebCat.createSelectOptions(),
-            onItemAdd: (item) ->
-              alert(item)
-          }
-
 window.copycat_dialog = () ->
   $('#copycat_dialog').dialog({
     dialogClass: "copycat_tool_dialog",
@@ -329,6 +302,25 @@ window.copycat_paste = () ->
 window.toggleRow = (el) ->
   $(el).closest('tr').toggleClass('selected')
 
+
+window.selectize_category_inputs = () ->
+  console.log 'into selectizing'
+  category_inputs = $("select.cluster_categories")
+  $(category_inputs).each ->
+    if $(this).next("div").hasClass("selectize-control")
+#          This is already selectized
+    else
+      $(this).selectize {
+        persist: false,
+        create: false,
+        maxItems: 5,
+        valueField: 'value',
+        labelField: 'value',
+        searchField: ['text'],
+        options: AC.WebCat.createSelectOptions(),
+      }
+
+
 # Select rows in Clusters Table
 $ ->
   $('#clusters_check_box').click ->
@@ -348,17 +340,23 @@ $ ->
         $(rows[i])[0].checked = false
         i++
 
+  # Moves cluster selectize to table draw so that selectize boxes properly initialize when changing number of items being displayed
+  $("#clusters-index").on 'draw.dt', ->
+    selectize_category_inputs()
+
+  $("#clusters-index").on 'order.dt', ->
+    selectize_category_inputs()
 
   #  Expand cluster rows
   $('#clusters-index tbody').on 'click', 'td.expandable-row-column', ->
     tr = $(this).closest('tr')
     row = window.clusters_table.row(tr)
     if row.child.isShown()
-    # This row is already open - close it
+# This row is already open - close it
       row.child.hide()
       tr.removeClass 'shown'
     else
-    # Open this row
+# Open this row
       $('.cluster-mgt-loader-wrapper').removeClass('hidden')
       cluster = row.data()
 
@@ -422,8 +420,8 @@ $ ->
               return
 
           bottom_row = '<tr class="cluster-entry-bottom-row">' +
-          '<td colspan="10">Previewing cluster entries 1 - <span class="total-shown-entries">' + total_shown_entries + '</span>. ' + link_to_more_results + '<span class="total-cluster-entry-count">Total Entries: ' + total_entries + '.</span></td>' +
-          '</tr>'
+            '<td colspan="10">Previewing cluster entries 1 - <span class="total-shown-entries">' + total_shown_entries + '</span>. ' + link_to_more_results + '<span class="total-cluster-entry-count">Total Entries: ' + total_entries + '.</span></td>' +
+            '</tr>'
 
           complete_table = table_head + entry_rows.join('') + '</tbody><tfoot>' + bottom_row + '</tfoot></table>'
 
@@ -432,7 +430,7 @@ $ ->
           td = $(tr).next('tr').find('td:first')
           $(td).addClass 'nested-complaint-data-wrapper'
 
-#         Expanding to maximum preview rows
+          #         Expanding to maximum preview rows
           $('.expand-cluster-entries').click ->
             expand_table_row = this
             expandClusterEntryPreview(cluster, expand_table_row, max_viewable_entries)
@@ -494,7 +492,7 @@ window.expandClusterEntryPreview = (cluster, expand_table_row, max_viewable_entr
       error: (response) ->
         $('.cluster-mgt-loader-wrapper').addClass('hidden')
         std_api_error(response, "There was an error loading cluster data.", reload: false)
-      )
+    )
   else
     $('.cluster-mgt-loader-wrapper').addClass('hidden')
     rows = $(table_body).children('tr')
@@ -508,7 +506,6 @@ window.expandClusterEntryPreview = (cluster, expand_table_row, max_viewable_entr
       row_count++
       if row_count > 25
         $(this).remove()
-  return
 
 
   window.select_or_deselect_cluster = (cluster_id)->
