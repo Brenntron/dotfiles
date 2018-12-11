@@ -305,9 +305,11 @@ module API
               begin
                 prefix_id = Wbrs::Prefix.where(:urls => [permitted_params['url']]).first.prefix_id
                 response = Wbrs::HistoryRecord.where({:prefix_id => prefix_id}).sort_by {|history| history.time}.reverse
+              rescue
+                response = {error: 'The URL you provided does not have available data.'}
+              end
 
-                render response.to_json
-                end
+               render response.to_json
             end
 
 

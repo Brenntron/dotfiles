@@ -462,55 +462,57 @@ window.retrieve_history = (position) ->
 
   url = $("#url_" + position).val()
 
-  std_msg_ajax(
-    url: '/escalations/api/v1/escalations/webcat/complaint_entries/categorize_urls_history'
-    method: 'POST'
-    data: {'position': position, url: url}
-    success: (response) ->
-      json = JSON.parse(response)
+  if url.length > 0
+    std_msg_ajax(
+      url: '/escalations/api/v1/escalations/webcat/complaint_entries/categorize_urls_history'
+      method: 'POST'
+      data: {'position': position, url: url}
+      success: (response) ->
+        json = JSON.parse(response)
 
-      if json.error
-        std_msg_error("<p>Something went wrong: #{json.error}","")
-      else
-        #parse this json properly
-        history_dialog_content = '<div class="dialog-content-wrapper">' +
-          '<h5>Domain History</h5>' +
-          '<table class="history-table"><thead><tr><th>Action</th><th>Confidence</th><th>Description</th><th>Time</th><th>User</th><th>Category</th></tr></thead>' +
-          '<tbody>'
-
-        for entry in json
-
-          entry_string = "" +
-            '<tr>' +
-            '<td>' + entry['action'] + '</td>' +
-            '<td>' + entry['confidence'] + '</td>' +
-            '<td>' + entry['description'] + '</td>' +
-            '<td>' + entry['time'] + '</td>' +
-            '<td>' + entry['user'] + '</td>' +
-            '<td>' + entry['category']['descr'] + '</td>' +
-            '</tr>'
-
-          history_dialog_content += entry_string
-        history_dialog_content += '</tbody></table>'
-
-        if $("#history_dialog").length
-          history_dialog = this
-          $("#history_dialog").html(history_dialog_content)
-          $('#history_dialog').dialog('open')
+        if json.error
+          std_msg_error("<p>Something went wrong: #{json.error}","")
         else
-          history_dialog = '<div id="history_dialog" title="History Information"></div>'
-          $('body').append(history_dialog)
-          $("#history_dialog").html(history_dialog_content)
-          #$('#history_dialog').append(history_dialog_content)
-          $('#history_dialog').dialog
-            autoOpen: false
-            minWidth: 600
-            position: { my: "right top", at: "right top", of: window }
-          $('#history_dialog').dialog('open')
+          history_dialog_content = '<div class="dialog-content-wrapper">' +
+            '<h5>Domain History</h5>' +
+            '<table class="history-table"><thead><tr><th>Action</th><th>Confidence</th><th>Description</th><th>Time</th><th>User</th><th>Category</th></tr></thead>' +
+            '<tbody>'
 
-    error: (response) ->
-      std_msg_error("<p>Something went wrong: #{response.responseText}","")
-  , this)
+          for entry in json
+
+            entry_string = "" +
+              '<tr>' +
+              '<td>' + entry['action'] + '</td>' +
+              '<td>' + entry['confidence'] + '</td>' +
+              '<td>' + entry['description'] + '</td>' +
+              '<td>' + entry['time'] + '</td>' +
+              '<td>' + entry['user'] + '</td>' +
+              '<td>' + entry['category']['descr'] + '</td>' +
+              '</tr>'
+
+            history_dialog_content += entry_string
+
+          history_dialog_content += '</tbody></table>'
+
+          if $("#history_dialog").length
+            history_dialog = this
+            $("#history_dialog").html(history_dialog_content)
+            $('#history_dialog').dialog('open')
+          else
+            history_dialog = '<div id="history_dialog" title="History Information"></div>'
+            $('body').append(history_dialog)
+            $("#history_dialog").html(history_dialog_content)
+            $('#history_dialog').dialog
+              autoOpen: false
+              minWidth: 600
+              position: { my: "right top", at: "right top", of: window }
+            $('#history_dialog').dialog('open')
+
+      error: (response) ->
+        std_msg_error("<p>Something went wrong: #{response.responseText}","")
+    , this)
+  else
+    std_msg_error("Error",['No data available for blank URL.'])
 
 window.drop_current_categories = () ->
 
