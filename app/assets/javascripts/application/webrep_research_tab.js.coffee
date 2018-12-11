@@ -192,7 +192,7 @@ $ ->
 #
 
     else
-      alert ('Please select only one row.')
+      errorModal(this)
       $(dropdown).removeClass('open')
       return false
 
@@ -241,7 +241,7 @@ $ ->
 #
 
     else
-      alert ('Please select only one row.')
+      errorModal(this)
       $(dropdown).removeClass('open')
       return false
 
@@ -367,12 +367,7 @@ $ ->
 
     else
       $(dropdown_wrapper).removeClass('open')
-      $('#wl_bl_errorModal').modal('show')
-#      alert ('Please select 1 row')
-
-
-
-
+      errorModal(this)
 
 
   #Inline Adjust WL/BL Button
@@ -614,3 +609,10 @@ $(document).ready ->
       $('.ticket-resolution-radio').prop('checked', false)
       $('#show-ticket-resolution-submenu').hide()
       $(res_comment[0]).val('')
+
+
+window.errorModal = (errorModal) ->
+  title = window.location.host
+  error_message = ' says'
+  $('#wl_bl_errorModal').modal('show')
+  $('#wl_bl_errorModalLabel').html(title + error_message);

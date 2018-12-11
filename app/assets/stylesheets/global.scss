@@ -6621,3 +6621,11 @@ h2 {
   color: $second-section-color;
   font-weight: bold;
 }
+
+#wl_bl_errorModal .modal-header, .modal-footer, button {
+  border: none;
+}
+
+#wl_bl_errorModal button:focus {
+  outline: none;
+}
