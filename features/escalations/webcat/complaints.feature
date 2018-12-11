@@ -302,9 +302,9 @@ Feature: Webcat complaints
   @javascript
   Scenario: a users tries to fetch complaints
     Given a user with role "webcat user" exists and is logged in
+    And PeakeBridge poll is stubbed
     When I goto "/escalations/webcat/complaints?f=ALL"
     And I click "#fetch"
-    Given successful PeakeBridge poll is stubbed
     Then I wait for "3" seconds
     Then I should see "COMPLAINT UPDATES REQUESTED FROM TALOS-INTELLIGENCE.  PLEASE REFRESH YOUR PAGE SHORTLY."
 
