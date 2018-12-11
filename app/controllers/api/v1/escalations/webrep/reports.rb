@@ -181,6 +181,24 @@ module API
               response_data.to_json
             end
 
+            params do
+              requires :from, type: String
+              requires :to, type: String
+            end
+
+            get 'populate_top_banner' do
+              authorize!(:index, Dispute)
+
+              data = Dispute.populate_top_banner()
+
+              response_data = {:status => "success", :data => data}
+
+              response_data.to_json
+
+
+
+            end
+
           end
         end
       end

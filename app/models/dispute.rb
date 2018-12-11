@@ -1654,5 +1654,41 @@ class Dispute < ApplicationRecord
 
   end
 
+  def self.populate_top_banner()
+
+    main_results = Dispute.all
+
+    results = {}
+    results[:valid_tickets_total] = 0
+    results[:valid_entries_total] = 0
+    results[:invalid_tickets_total] = 0
+
+    main_results.each do |result|
+      if ![DUPLICATE].include?(result.status)
+        if result.status == RESOLVED
+          if ![STATUS_RESOLVED_INVALID, STATUS_RESOLVED_TEST, STATUS_RESOLVED_OTHER].include?(result.resolution)
+            results[:valid_tickets_total] += 1
+            results[:valid_entries_total] += result.dispute_entries.size
+          end
+
+          if [STATUS_RESOLVED_INVALID, STATUS_RESOLVED_TEST, STATUS_RESOLVED_OTHER].include?(result.resolution)
+            results[:invalid_tickets_total] += 1
+          end
+        else
+          results[:valid_tickets_total] += 1
+          results[:valid_entries_total] += result.dispute_entries.size
+        end
+
+      end
+
+      if [DUPLICATE].include?(result.status)
+        results[:invalid_tickets_total] += 1
+      end
+    end
+
+    results
+
+  end
+
 end
 

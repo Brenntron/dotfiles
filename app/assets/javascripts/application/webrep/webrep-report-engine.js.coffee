@@ -1,3 +1,29 @@
+window.populate_top_banner = ()->
+  from = localStorage.getItem('webrep_report_range_from')
+  to = localStorage.getItem('webrep_report_range_to')
+
+  data = {
+    from: from,
+    to: to
+  }
+
+  headers = {'Token': $('input[name="token"]').val(), 'Xmlrpc-Token': $('input[name="xml_token"]').val()}
+  $.ajax(
+    url: '/escalations/api/v1/escalations/webrep/reports/populate_top_banner'
+    method: 'GET'
+    headers: headers
+    data: data
+    success: (response) ->
+
+      json = $.parseJSON(response)
+
+      $('#total-valid-ticket-count').text(json.data.valid_tickets_total)
+      $('#total-valid-entry-count').text(json.data.valid_entries_total)
+      $('#total-invalid-ticket-count').text(json.data.invalid_tickets_total + ' Invalid Tickets')
+
+  , this)
+
+
 window.change_reported_week = (new_report_range_from, new_report_range_to)->
   localStorage.setItem 'webrep_report_range_from', new_report_range_from
   localStorage.setItem 'webrep_report_range_to', new_report_range_to
@@ -1271,3 +1297,4 @@ $ ->
     window.refresh_visable_report_tab()
 
   window.refresh_visable_report_tab()
+  window.populate_top_banner()
