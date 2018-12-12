@@ -21,7 +21,6 @@ window.populate_clusters_index_table = (filter) ->
       if json.data.length == 0
         std_msg_error("No clusters available.","")
       if json.error
-        notice_html = "<p>Something went wrong: #{json.error}</p>"
         std_msg_error('Table Error', [json.error])
       else
         datatable = $('#clusters-index').DataTable()
@@ -34,7 +33,7 @@ window.populate_clusters_index_table = (filter) ->
         $("#total_results").html(json.meta.rows_found)
 
     error: (response) ->
-      notice_html = "<p>Something went wrong: #{response.responseText}</p>"
+      std_msg_error('Table Error', [response.responseText])
   , this)
 
 window.categorize_clusters = () ->
