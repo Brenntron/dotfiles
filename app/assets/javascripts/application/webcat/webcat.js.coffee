@@ -229,8 +229,7 @@ $ ->
     }
 
 $('#exampleModal').on 'shown.bs.modal', ->
-  puts 'Modal active'
   $('button.toolbar-button.cat-btn').addClass('active')
 
-$('.toolbar-button').on 'click', ->
-  puts 'You clicked me'
+#$('.toolbar-button').on 'click', ->
+
