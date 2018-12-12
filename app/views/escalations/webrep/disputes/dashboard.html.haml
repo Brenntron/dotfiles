@@ -46,15 +46,30 @@
             %a.custom-user-white.icon-custom-user-grey.user-icon-stg.bold{"data-toggle" => "tab", :href => "#select-custom-users"} Select Custom Users
 
         .dashboard-submission-area
-          -# TODO Hookup counts for Valid Ticket and Entry Counts and Invalid Count (Invalid = Duplicate, Test, Junk, etc.)
           %label#total-valid-ticket-count.right-vertical-separator.bold.font-lg
           %label#total-valid-entry-count.font-lg
           %label.uppercase.right-vertical-separator.bold Valid Total Tickets / Entries Submission
           %label#total-invalid-ticket-count.uppercase.icon-invalid-grey.user-icon-stg.invalid-stg.bold
 
         .dashboard-export-report.left-vertical-separator
-          %button.toolbar-button.export-button-white Export Report
-          -# TODO Hookup exporting. This can be simple for first launch. Later we'll add options to select what gets exported.
+          %span.dropdown
+            %button.toolbar-button.export-button-white.dropdown-toggle#export-reports-dropdown-button{'data-toggle': 'dropdown', 'aria-haspopup': 'true', 'aria-expanded': 'false'}
+              Export Report
+            .dropdown-menu#export-reports-dropdown{'aria-labelledby': 'export-reports-dropdown-button'}
+              %ul
+                %li
+                  %input.report-checkbox#my_tickets_report{type: 'checkbox', checked: 'checked'} My Tickets
+                %li
+                  %input.report-checkbox#my_team_tickets_report{type: 'checkbox', checked: 'checked'} My Team Tickets
+                %li
+                  %input.report-checkbox#all_tickets_report{type: 'checkbox', checked: 'checked'} All Tickets
+                %li
+                  %input.report-checkbox#custom_tickets_report{type: 'checkbox', checked: 'checked'} Custom Users Tickets
+              %hr
+              %button#export-reports-button.primary
+                Export
+
+  -# TODO Hookup exporting. This can be simple for first launch. Later we'll add options to select what gets exported.
 
   .tab-content.dashboard-tab-content
     #my-tickets.tab-pane.active
