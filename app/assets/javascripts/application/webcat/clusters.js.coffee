@@ -296,28 +296,31 @@ window.selectize_category_inputs = () ->
         options: AC.WebCat.createSelectOptions(),
       }
 
+window.toggle_all_checkboxes = () ->
+  if $('#clusters_check_box').prop('checked')
+    $('#clusters-index').DataTable().rows().select()
+    rows = $('table#clusters-index input[type="checkbox"]');
+    i = 1
+    while i < rows.length
+      $(rows[i])[0].checked = true
+      i++
+  else
+    $('#clusters-index').DataTable().rows().deselect()
+    rows = $('table#clusters-index input[type="checkbox"]')
+    i = 1
+    while i < rows.length
+      $(rows[i])[0].checked = false
+      i++
 
 # Select rows in Clusters Table
 $ ->
   $('#clusters_check_box').click ->
-    if $('#clusters_check_box').prop('checked')
-      $('#clusters-index').DataTable().rows().select()
-      rows = $('table#clusters-index input[type="checkbox"]');
-      i = 1
-      while i < rows.length
-        $(rows[i])[0].checked = true
-        i++
-    else
-      $('#clusters-index').DataTable().rows().deselect()
-      rows = $('table#clusters-index input[type="checkbox"]')
-      i = 1
-      while i < rows.length
-        $(rows[i])[0].checked = false
-        i++
+    toggle_all_checkboxes()
 
   # Moves cluster selectize to table draw so that selectize boxes properly initialize when changing number of items being displayed
   $("#clusters-index").on 'draw.dt', ->
     selectize_category_inputs()
+    toggle_all_checkboxes()
 
   $("#clusters-index").on 'order.dt', ->
     selectize_category_inputs()
