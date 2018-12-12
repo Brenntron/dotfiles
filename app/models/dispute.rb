@@ -710,7 +710,7 @@ class Dispute < ApplicationRecord
   def self.advanced_search(params, search_name:, user:)
 
     dispute_fields =
-        params.to_h.slice(*%w{status org_domain priority resolution submission_type submitter_type
+        params.to_h.slice(*%w{status org_domain priority resolution submitter_type
                               case_id case_owner_username})
     dispute_fields['id'] = dispute_fields.delete('case_id')
 
@@ -736,6 +736,13 @@ class Dispute < ApplicationRecord
     if params['submitted_newer'].present?
       relation =
           relation.where('case_opened_at >= :submitted_newer', submitted_newer: params['submitted_newer'])
+    end
+
+    if params['submission_type'].present?
+      submission_types = YAML.load(params['submission_type'])
+
+      relation =
+          relation.where({submission_type: submission_types})
     end
 
     if params['submitted_older'].present?
