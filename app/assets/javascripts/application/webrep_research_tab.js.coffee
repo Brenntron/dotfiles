@@ -1,4 +1,10 @@
 $ ->
+  window.errorModal = (errorModal, errorText) ->
+    title = window.location.host
+    title_message = ' says'
+    $('#wl_bl_errorModal').modal('show')
+    $('.modal-header').html(title + title_message)
+    $('#wl_bl_errorModal .modal-body').html(errorText)
 
   # go back to the last tab after reload
 
@@ -32,8 +38,7 @@ $ ->
           first_item = $(editable_data)[0]
           $(first_item).next('.table-entry-input')[0].focus()
     else
-      alert ('Select at least one entry to edit.')
-
+      errorModal(this, 'Select at least one entry to edit')
 
   $('.dispute_check_box').on 'click', (e) ->
     if $(this).not(":checked") && $('.cancel-changes').is(":visible")
@@ -192,7 +197,7 @@ $ ->
 #
 
     else
-      errorModal(this)
+      errorModal(this, 'Please select only one row')
       $(dropdown).removeClass('open')
       return false
 
@@ -241,7 +246,7 @@ $ ->
 #
 
     else
-      errorModal(this)
+      errorModal(this, 'Please select 1 row')
       $(dropdown).removeClass('open')
       return false
 
@@ -367,7 +372,7 @@ $ ->
 
     else
       $(dropdown_wrapper).removeClass('open')
-      errorModal(this)
+      errorModal(this, 'Please select 1 row')
 
 
   #Inline Adjust WL/BL Button
@@ -609,10 +614,3 @@ $(document).ready ->
       $('.ticket-resolution-radio').prop('checked', false)
       $('#show-ticket-resolution-submenu').hide()
       $(res_comment[0]).val('')
-
-
-window.errorModal = (errorModal) ->
-  title = window.location.host
-  error_message = ' says'
-  $('#wl_bl_errorModal').modal('show')
-  $('#wl_bl_errorModalLabel').html(title + error_message);
