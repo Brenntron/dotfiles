@@ -22,7 +22,7 @@ window.populate_clusters_index_table = (filter) ->
         std_msg_error("No clusters available.","")
       if json.error
         notice_html = "<p>Something went wrong: #{json.error}</p>"
-        alert(json.error)
+        std_msg_error('Table Error', [json.error])
       else
         datatable = $('#clusters-index').DataTable()
         datatable.clear();
@@ -36,18 +36,6 @@ window.populate_clusters_index_table = (filter) ->
     error: (response) ->
       notice_html = "<p>Something went wrong: #{response.responseText}</p>"
   , this)
-
-window.fetch_cluster_data = (id) ->
-  std_msg_ajax(
-    method: 'GET'
-    url: "/escalations/api/v1/escalations/webcat/clusters/" + id
-    data: {}
-    success: (response) ->
-      json = $.parseJSON(response)
-      json.data
-      console.log (json.data)
-    error: (response) ->
-  )
 
 window.categorize_clusters = () ->
 
@@ -82,7 +70,7 @@ window.categorize_clusters = () ->
 
       json = $.parseJSON(response)
       if json.error
-
+        std_msg_error('Process Error', [json.error])
       else
         $("#cluster_comment_field").val('')
         filter = $("#cluster_filter_field").val()
@@ -169,21 +157,6 @@ $ ->
     ]
   )
   window.populate_clusters_index_table()
-
-  #  Nested cluster entries within the parent cluster row
-  #  Format established below
-  format = (cluster_entry_row) ->
-    cluster_entry = cluster_entry_row.data()
-    missing_data = '<span class="missing-data">No Data</span>'
-
-    cluster_entry_html = ''
-    cluster_entry_html =
-      '<table><tr><td>' +
-        'Testing setup' +
-        '</td></tr></table>'
-
-    cluster_entry_html
-
 
 $ ->
   $(document).ready ->
@@ -334,7 +307,6 @@ $ ->
       i = 1
       while i < rows.length
         $(rows[i])[0].checked = true
-        console.log(rows[i].value)
         i++
     else
       $('#clusters-index').DataTable().rows().deselect()
