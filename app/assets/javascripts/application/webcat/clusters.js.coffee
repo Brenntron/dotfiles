@@ -56,17 +56,21 @@ window.categorize_clusters = () ->
   #cluster_id comment category_ids
   clusters_to_categorize = []
   clusters = $ '[id$=\'_categories\']'
+  categories = []
+  category_values = []
 
   data = {}
   data["comment"] = comment
   data["user_id"] = user_id
   $(clusters).each ->
     id =  $(this).attr('id').split('_')[0]
-    categories = $(this).next('.selectized').attr('value')
+    categories = $(this).find('option')
+    $(categories).each ->
+      value = $(this).attr('value')
+      category_values.push value
 
-    if categories.length > 0
-      all_cats = categories.split(',')
-      data["cluster_id_" + id.toString()] = all_cats
+    if categories? and categories.length > 0
+      data["cluster_id_" + id.toString()] = category_values
 
   headers = {'Token': $('input[name="token"]').val(), 'Xmlrpc-Token': $('input[name="xml_token"]').val()}
   $.ajax(
@@ -80,6 +84,7 @@ window.categorize_clusters = () ->
       if json.error
 
       else
+        $("#cluster_comment_field").val('')
         filter = $("#cluster_filter_field").val()
         if filter
           populate_clusters_index_table(filter)
@@ -304,7 +309,6 @@ window.toggleRow = (el) ->
 
 
 window.selectize_category_inputs = () ->
-  console.log 'into selectizing'
   category_inputs = $("select.cluster_categories")
   $(category_inputs).each ->
     if $(this).next("div").hasClass("selectize-control")
