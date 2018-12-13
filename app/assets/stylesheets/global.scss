@@ -621,6 +621,10 @@ th.alt-col {
   height: 20px;
 }
 
+.dashboard-tickets-wrapper .toolbar-button-label {
+  background-size: 16px 16px;
+  background-position: 17px 2px;
+}
 
 
 #edit-button, .edit-button      {background-image: url(image_path('icon_edit.svg'));}
@@ -1847,7 +1851,7 @@ a.static-nav-item {
 .icon-user-white {background-image: url(image_path('icon_user_white.svg'));}
 .icon-custom-user-white {background-image: url(image_path('icon_custom_user_white.svg'));}
 .icon-custom-star {background-image: url(image_path('icon_customer_star.svg'));}
-
+.icon-guest-user {background-image: url(image_path('icon_guest_grey.svg'));}
 
 .saved-search {
   text-transform: none !important;
@@ -7002,6 +7006,10 @@ h3.larger-lighter {
 
 .submitter-customer {
   background-image: url(image_path('icon_customer_star.svg'));
+}
+
+.submitter-guest {
+  background-image: url(image_path('icon_guest_grey.svg'));
 }
 
 .dashboard-tickets-table {
