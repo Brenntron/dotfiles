@@ -710,7 +710,7 @@ class Dispute < ApplicationRecord
   # @param [String] search_name name to save this search as a saved search.
   # @param [ActiveRecord::Relation] base_relation relation to chain this search onto.
   # @return [ActiveRecord::Relation]
-  def self.advanced_search(params, search_name:, user:)
+  def self.advanced_search(params, search_name:, user:, reload:)
 
     dispute_fields =
         params.to_h.slice(*%w{status org_domain priority resolution submitter_type
@@ -828,7 +828,7 @@ class Dispute < ApplicationRecord
     end
 
     # Save this search as a named search
-    if params.present? && search_name.present?
+    if params.present? && search_name.present? && reload == false
       save_named_search(search_name, params, user: user)
     end
 
@@ -839,7 +839,7 @@ class Dispute < ApplicationRecord
   # @param [String] search_name the name of the saved search.
   # @param [ActiveRecord::Relation] base_relation relation to chain this search onto.
   # @return [ActiveRecord::Relation]
-  def self.named_search(search_name, user:)
+  def self.named_search(search_name, user:, reload:)
     named_search = user.named_searches.where(name: search_name).first
     raise "No search named '#{search_name}' found." unless named_search
     search_params = named_search.named_search_criteria.inject({}) do |search_params, criterion|
@@ -851,7 +851,7 @@ class Dispute < ApplicationRecord
       end
       search_params
     end
-    advanced_search(search_params, search_name: nil, user: user)
+    advanced_search(search_params, search_name: nil, user: user, reload: reload)
   end
 
   def self.standard_search_title(search_name)
@@ -997,12 +997,12 @@ class Dispute < ApplicationRecord
   # @param [String] search_name name of saved search.
   # @param [ActiveRecord::Relation] base_relation relation to chain this search onto.
   # @return [ActiveRecord::Relation]
-  def self.robust_search(search_type, search_name: nil, params: nil, user:)
+  def self.robust_search(search_type, search_name: nil, params: nil, user:, reload:)
     case search_type
       when 'advanced'
-        advanced_search(params, search_name: search_name, user: user)
+        advanced_search(params, search_name: search_name, user: user, reload: reload)
       when 'named'
-        named_search(search_name, user: user)
+        named_search(search_name, user: user, reload: reload)
       when 'standard'
         standard_search(search_name, user: user)
       when 'contains'

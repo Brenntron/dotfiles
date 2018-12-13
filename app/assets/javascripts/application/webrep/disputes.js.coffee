@@ -3,7 +3,8 @@ window.select_or_deselect_all = (dispute_id)->
 
   $('.dispute-entry-checkbox_' + dispute_id).prop('checked', $('#' + dispute_id).prop('checked'))
 
-window.populate_webrep_index_table = (data = {}) ->
+window.populate_webrep_index_table = (data = {}, reload = false) ->
+  data['reload'] = reload
 
   array_of_showns = []
   array_of_dispute_clicks = []
@@ -106,8 +107,12 @@ window.populate_webrep_index_table = (data = {}) ->
                 this.checked = true
 
 
-        if undefined != json.search_name && $('#dispute-index-title').val() != json.search_name
+        if undefined != json.search_name
           $('#saved-search-tbody').append(named_search_tag(json.search_name, json.search_id))
+
+          if $(".#{json.search_name}").length > 1
+            $(".#{json.search_name}")[0].remove()
+
 
     error: (response) ->
       $('#refresh-working-msg').hide()
@@ -153,7 +158,10 @@ window.advanced_webrep_index_table = () ->
   }
   window.current_search_data = data
 
-  $(".#{data['search_name']}")[0].remove()
+  prevent_duplicate = data['search_name']
+
+  if $('.' + prevent_duplicate).length > 0
+    $('.' + prevent_duplicate)[0].remove()
 
   window.populate_webrep_index_table(data)
 
@@ -1801,9 +1809,10 @@ $ ->
     $("#advanced-search-dropdown").hide()
 
   $(document).ready ->
+    console.log('Interval')
     setInterval ->
       if window.current_search_data
-        window.populate_webrep_index_table(window.current_search_data)
+        window.populate_webrep_index_table(window.current_search_data, true)
     , 60000
 
     $('body').on 'mouseover mouseenter', '.esc-tooltipped', ->
