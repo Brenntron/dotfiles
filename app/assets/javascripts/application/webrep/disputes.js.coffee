@@ -1456,19 +1456,6 @@ $ ->
 
     )
 
-    $('#export-reports-button').on "click", ->
-      paramObject = {}
-      $('.report-checkbox').each ->
-        if this.checked
-          paramObject[this.name] = true
-        else
-          paramObject[this.name] = false
-
-      paramObject.startdate = localStorage.getItem('webrep_report_range_from')
-      paramObject.enddate = localStorage.getItem('webrep_report_range_to')
-      window.location = "/escalations/webrep/dashboard.xlsx?" + $.param(paramObject);
-
-
     $('.toggle-vis').on "click", ->
       data = {}
       data['priority'] = $("#priority-checkbox").is(':checked')

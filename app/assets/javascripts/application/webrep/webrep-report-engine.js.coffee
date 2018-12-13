@@ -1255,6 +1255,18 @@ window.build_multi_rulehits_for_fp_res_chart = () ->
   )
 
 $ ->
+  $('#export-reports-button').on "click", ->
+    paramObject = {}
+    $('.report-checkbox').each ->
+      if this.checked
+        paramObject[this.name] = true
+      else
+        paramObject[this.name] = false
+
+    paramObject.startdate = localStorage.getItem('webrep_report_range_from')
+    paramObject.enddate = localStorage.getItem('webrep_report_range_to')
+    window.location = "/escalations/webrep/dashboard.xlsx?" + $.param(paramObject);
+
   window.set_initial_date_span()
   $('#tickets_date_range').daterangepicker()
   $('button.icon-calendar').click ->
