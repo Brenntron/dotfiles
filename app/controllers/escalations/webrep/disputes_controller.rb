@@ -80,7 +80,16 @@ class Escalations::Webrep::DisputesController < ApplicationController
     respond_to do |format|
       format.html
       format.xlsx do
-        # render :html => "test"
+        # Expected params:
+        #
+        # mytickets - bool
+        # myteamtickets - bool
+        # alltickets - bool
+        # customtickets - TBD; no spec for this yet
+        # startdate - datetime (get from localstorage object)
+        # enddate - datetime (get from localstorage object)
+        # render status: 200, json: params.to_json
+
         # index_params = JSON.parse(params['data_json'])
         # search_type = index_params['search_type']
         # search_name = 'advanced' == search_type ? nil : index_params['search_name']

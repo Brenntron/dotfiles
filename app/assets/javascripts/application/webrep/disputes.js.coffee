@@ -1456,6 +1456,17 @@ $ ->
 
     )
 
+    $('#export-reports-button').on "click", ->
+      std_api_ajax(
+        type: 'GET'
+        url: "/escalations/webrep/dashboard.xlsx?param=name"
+        error_prefix: "Export could not be completed"
+        failure_reload: false
+        success: (response) ->
+          
+      )
+
+
 
     $('.toggle-vis').on "click", ->
       data = {}
