@@ -1457,15 +1457,16 @@ $ ->
     )
 
     $('#export-reports-button').on "click", ->
-      std_api_ajax(
-        type: 'GET'
-        url: "/escalations/webrep/dashboard.xlsx?param=name"
-        error_prefix: "Export could not be completed"
-        failure_reload: false
-        success: (response) ->
-          
-      )
+      paramObject = {}
+      $('.report-checkbox').each ->
+        if this.checked
+          paramObject[this.name] = true
+        else
+          paramObject[this.name] = false
 
+      paramObject.startdate = localStorage.getItem('webrep_report_range_from')
+      paramObject.enddate = localStorage.getItem('webrep_report_range_to')
+      window.location = "/escalations/webrep/dashboard.xlsx?" + $.param(paramObject);
 
 
     $('.toggle-vis').on "click", ->

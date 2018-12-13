@@ -58,13 +58,13 @@
             .dropdown-menu#export-reports-dropdown{'aria-labelledby': 'export-reports-dropdown-button'}
               %ul
                 %li
-                  %input.report-checkbox#my_tickets_report{type: 'checkbox', checked: 'checked'} My Tickets
+                  %input.report-checkbox#my_tickets_report{type: 'checkbox', checked: 'checked', name: 'mytickets'} My Tickets
                 %li
-                  %input.report-checkbox#my_team_tickets_report{type: 'checkbox', checked: 'checked'} My Team Tickets
+                  %input.report-checkbox#my_team_tickets_report{type: 'checkbox', checked: 'checked', name: 'myteamtickets'} My Team Tickets
                 %li
-                  %input.report-checkbox#all_tickets_report{type: 'checkbox', checked: 'checked'} All Tickets
+                  %input.report-checkbox#all_tickets_report{type: 'checkbox', checked: 'checked', name: 'alltickets'} All Tickets
                 %li
-                  %input.report-checkbox#custom_tickets_report{type: 'checkbox', checked: 'checked'} Custom Users Tickets
+                  %input.report-checkbox#custom_tickets_report{type: 'checkbox', checked: 'checked', name: 'customtickets'} Custom Users Tickets
               %hr
               %button#export-reports-button.primary
                 Export

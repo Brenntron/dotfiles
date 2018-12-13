@@ -88,7 +88,47 @@ class Escalations::Webrep::DisputesController < ApplicationController
         # customtickets - TBD; no spec for this yet
         # startdate - datetime (get from localstorage object)
         # enddate - datetime (get from localstorage object)
-        # render status: 200, json: params.to_json
+
+        @contents = RubyXL::Workbook.new
+        def insert_row_with_data(data, sheetname, format = nil)
+          worksheet = @contents[sheetname]
+          data_insertion_index = worksheet.sheet_data.rows.count
+          data.each_with_index do |new_data, i|
+            worksheet.add_cell(data_insertion_index, i, new_data)
+            case format
+            when "bold"
+              worksheet.sheet_data[data_insertion_index][i].change_font_bold(true)
+            when "h1"
+              worksheet.sheet_data[data_insertion_index][i].change_font_bold(true)
+              worksheet.sheet_data[data_insertion_index][i].change_font_size(14)
+            when "h2"
+              worksheet.sheet_data[data_insertion_index][i].change_font_bold(true)
+              worksheet.sheet_data[data_insertion_index][i].change_font_size(12)
+            end
+          end
+        end
+
+        if params['mytickets'] == "true"
+          @contents.add_worksheet('My Tickets')
+          mytickets_headers = ['Priority', 'Case ID', 'Status', 'Entry Count', 'Owner', 'Customer Name', 'Customer Email', 'Customer Company', 'Company URL', 'Time Submitted', 'Age', 'Dispute Entry', 'Dispute Entry Status', 'Suggested Disposition', 'Category', 'WBRS Score', 'WBRS Total Rule Hits', 'SBRS Score', 'SBRS Total Rule Hits', 'Important?', 'Resolution', 'Resolution Comments']
+          insert_row_with_data(mytickets_headers, "My Tickets", "h1")
+        end
+
+        if params['myteamtickets'] == "true"
+          @contents.add_worksheet('My Team Tickets')
+          myteamtickets_headers = ['Priority', 'Case ID', 'Status', 'Entry Count', 'Owner', 'Customer Name', 'Customer Email', 'Customer Company', 'Company URL', 'Time Submitted', 'Age', 'Dispute Entry', 'Dispute Entry Status', 'Suggested Disposition', 'Category', 'WBRS Score', 'WBRS Total Rule Hits', 'SBRS Score', 'SBRS Total Rule Hits', 'Important?', 'Resolution', 'Resolution Comments']
+          insert_row_with_data(myteamtickets_headers, "My Team Tickets", "h1")
+        end
+
+        if params['alltickets'] == "true"
+          @contents.add_worksheet('All Tickets')
+          alltickets_headers = ['Priority', 'Case ID', 'Status', 'Entry Count', 'Owner', 'Customer Name', 'Customer Email', 'Customer Company', 'Company URL', 'Time Submitted', 'Age', 'Dispute Entry', 'Dispute Entry Status', 'Suggested Disposition', 'Category', 'WBRS Score', 'WBRS Total Rule Hits', 'SBRS Score', 'SBRS Total Rule Hits', 'Important?', 'Resolution', 'Resolution Comments']
+          insert_row_with_data(alltickets_headers, "All Tickets", "h1")
+        end
+
+        if params['customtickets'] == "true"
+          # Not yet implemented
+        end
 
         # index_params = JSON.parse(params['data_json'])
         # search_type = index_params['search_type']
@@ -129,8 +169,12 @@ class Escalations::Webrep::DisputesController < ApplicationController
         #
         # end
         #
-        # send_data contents.stream.string, filename: "disputes_search_#{Time.now}.xlsx",
-        #           disposition: 'attachment'
+        #
+        #
+
+        @contents.worksheets.delete(@contents['Sheet1'])
+        send_data @contents.stream.string, filename: "disputes_search_#{Time.now}.xlsx",
+                  disposition: 'attachment'
       end
     end
   end
