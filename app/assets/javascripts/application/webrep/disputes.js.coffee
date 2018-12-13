@@ -106,12 +106,12 @@ window.populate_webrep_index_table = (data = {}, reload = false) ->
               if this.id == dispute_entry_selectall
                 this.checked = true
 
-
         if undefined != json.search_name
-          $('#saved-search-tbody').append(named_search_tag(json.search_name, json.search_id))
+          search_name = json.search_name.replace(/\W/g, '')
+          $('#saved-search-tbody').append(named_search_tag(search_name, json.search_id))
 
-          if $(".#{json.search_name}").length > 1
-            $(".#{json.search_name}")[0].remove()
+          if $(".#{search_name}").length > 1
+            $(".#{search_name}")[0].remove()
 
 
     error: (response) ->
@@ -131,7 +131,7 @@ window.advanced_webrep_index_table = () ->
     submission_types.push('ew')
   data = {
     search_type: 'advanced'
-    search_name: form.find('input[name="search_name"]').val()
+    search_name: form.find('input[name="search_name"]').val().replace(/\W/g, '')
     customer: {
       name: form.find('input[id="name-input"]').val()
       email: form.find('input[id="email-input"]').val()
@@ -159,9 +159,10 @@ window.advanced_webrep_index_table = () ->
   window.current_search_data = data
 
   prevent_duplicate = data['search_name']
+  prevent_duplicate = prevent_duplicate.replace(/\W/g, '')
 
-  if $('.' + prevent_duplicate).length > 0
-    $('.' + prevent_duplicate)[0].remove()
+  if $('.'+prevent_duplicate).length > 0
+    $('.'+prevent_duplicate)[0].remove()
 
   window.populate_webrep_index_table(data)
 
