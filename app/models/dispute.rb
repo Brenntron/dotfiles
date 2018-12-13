@@ -739,7 +739,7 @@ class Dispute < ApplicationRecord
     end
 
     if params['submission_type'].present?
-      submission_types = YAML.load(params['submission_type'])
+      submission_types = YAML.load(params['submission_type'].to_s)
 
       relation =
           relation.where({submission_type: submission_types})
