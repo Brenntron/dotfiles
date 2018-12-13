@@ -153,7 +153,8 @@ window.advanced_webrep_index_table = () ->
   }
   window.current_search_data = data
 
-#  $(".#{data['search_name']}").remove()
+  $(".#{data['search_name']}")[0].remove()
+
   window.populate_webrep_index_table(data)
 
 window.standard_webrep_index_table = (search_name) ->
