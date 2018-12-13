@@ -682,9 +682,12 @@ class Dispute < ApplicationRecord
   end
 
   def self.save_named_search(search_name, params, user:)
+    NamedSearch.where(name: search_name).delete_all
     named_search =
         user.named_searches.where(name: search_name).first || NamedSearch.create!(user: user, name: search_name)
     NamedSearchCriterion.where(named_search: named_search).delete_all
+
+
     params.each do |field_name, value|
       case
         when value.kind_of?(Hash)

@@ -106,7 +106,7 @@ window.populate_webrep_index_table = (data = {}) ->
                 this.checked = true
 
 
-        if undefined != json.search_name
+        if undefined != json.search_name && $('#dispute-index-title').val() != json.search_name
           $('#saved-search-tbody').append(named_search_tag(json.search_name, json.search_id))
 
     error: (response) ->
@@ -152,6 +152,8 @@ window.advanced_webrep_index_table = () ->
     modified_newer: form.find('input[id="modified-newer-input"]').val()
   }
   window.current_search_data = data
+
+#  $(".#{data['search_name']}").remove()
   window.populate_webrep_index_table(data)
 
 window.standard_webrep_index_table = (search_name) ->
@@ -1791,6 +1793,7 @@ $ ->
     $('#advanced-search-dropdown').show()
 
   $('#submit-advanced-search').click ->
+    $('#search_name').val("")
     $('#advanced-search-dropdown').toggle()
 
   $(document).click ->

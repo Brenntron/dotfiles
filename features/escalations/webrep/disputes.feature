@@ -307,3 +307,13 @@ Feature: Disputes
     And I wait for "3" seconds
     Then I should see "THERE WAS AN ERROR CREATING THE RESOLUTION MESSAGE TEMPLATE."
     Then I should see "Name can't be blank and Body can't be blank"
+
+  @javascript
+  Scenario: A user creates a new named search for disputes
+    Given a user with role "webrep user" exists and is logged in
+    When I goto "/escalations/webrep/disputes"
+    And I trigger-click "#advanced-search-button"
+    And I fill in "search_name" with "Lab Rat"
+    And I trigger-click "#submit-advanced-search"
+    And I trigger-click "#filter-cases"
+    Then I should see content "Lab Rat" within "#saved-searches-wrapper"
