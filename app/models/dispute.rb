@@ -710,7 +710,7 @@ class Dispute < ApplicationRecord
   # @param [String] search_name name to save this search as a saved search.
   # @param [ActiveRecord::Relation] base_relation relation to chain this search onto.
   # @return [ActiveRecord::Relation]
-  def self.advanced_search(params, search_name:, user:, reload:)
+  def self.advanced_search(params, search_name:, user:, reload: false)
 
     dispute_fields =
         params.to_h.slice(*%w{status org_domain priority resolution submitter_type
@@ -839,7 +839,7 @@ class Dispute < ApplicationRecord
   # @param [String] search_name the name of the saved search.
   # @param [ActiveRecord::Relation] base_relation relation to chain this search onto.
   # @return [ActiveRecord::Relation]
-  def self.named_search(search_name, user:, reload:)
+  def self.named_search(search_name, user:, reload: false)
     named_search = user.named_searches.where(name: search_name).first
     raise "No search named '#{search_name}' found." unless named_search
     search_params = named_search.named_search_criteria.inject({}) do |search_params, criterion|
@@ -997,7 +997,7 @@ class Dispute < ApplicationRecord
   # @param [String] search_name name of saved search.
   # @param [ActiveRecord::Relation] base_relation relation to chain this search onto.
   # @return [ActiveRecord::Relation]
-  def self.robust_search(search_type, search_name: nil, params: nil, user:, reload:)
+  def self.robust_search(search_type, search_name: nil, params: nil, user:, reload: false)
     case search_type
       when 'advanced'
         advanced_search(params, search_name: search_name, user: user, reload: reload)
