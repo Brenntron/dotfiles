@@ -38,7 +38,7 @@ $ ->
           first_item = $(editable_data)[0]
           $(first_item).next('.table-entry-input')[0].focus()
     else
-      std_msg_error(window.location.host + ' says', 'Select at least one entry to edit')
+      std_msg_error(window.location.host + ' says', ['Select at least one entry to edit'])
 
   $('.dispute_check_box').on 'click', (e) ->
     if $(this).not(":checked") && $('.cancel-changes').is(":visible")
@@ -197,7 +197,7 @@ $ ->
 #
 
     else
-      std_msg_error(window.location.host + ' says', 'Please select only one row')
+      std_msg_error(window.location.host + ' says', ['Please select only one row'])
       $(dropdown).removeClass('open')
       return false
 
@@ -246,7 +246,7 @@ $ ->
 #
 
     else
-      std_msg_error(window.location.host + ' says', 'Please select 1 row')
+      std_msg_error(window.location.host + ' says', ['Please select 1 row'])
       $(dropdown).removeClass('open')
       return false
 
@@ -372,7 +372,7 @@ $ ->
 
     else
       $(dropdown_wrapper).removeClass('open')
-      std_msg_error(window.location.host + ' says', 'Please select 1 row')
+      std_msg_error(window.location.host + ' says', ['Please select 1 row'])
 
 
   #Inline Adjust WL/BL Button
