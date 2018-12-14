@@ -317,3 +317,25 @@ Feature: Disputes
     And I trigger-click "#submit-advanced-search"
     And I trigger-click "#filter-cases"
     Then I should see content "Lab Rat" within "#saved-searches-wrapper"
+
+  @javascript
+  Scenario: A user creates a new named search for disputes
+    Given a user with role "webrep user" exists and is logged in
+    And the following disputes exist and have entries:
+      |id|status|
+      |1 |NEW   |
+    And the following disputes exist and have entries:
+      |id|status|
+      |2 |NEW   |
+    And a named search with the name, "Cucumber Test" exists
+    And a named search criteria exists with field_name: "status" and value: "NEW"
+    When I goto "/escalations/webrep/disputes?f=closed"
+    Then I should not see "0000000001"
+    Then I should not see "NEW"
+    Then I should not see "0000000002"
+    And I trigger-click "#filter-cases"
+    And I trigger-click ".saved-search"
+    Then I should see "0000000001"
+    Then I should see "NEW"
+    Then I should see "0000000002"
+

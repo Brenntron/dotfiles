@@ -71,3 +71,11 @@ end
 Given(/^a RuleHit Resolution Mailer template exists with mnemonic, "(.*?)"/) do |mnemonic|
   FactoryBot.create(:rulehit_resolution_mailer_template, mnemonic: mnemonic)
 end
+
+Given(/^a named search with the name, "(.*?)" exists/) do |name|
+  FactoryBot.create(:named_search, name: name)
+end
+
+Given(/^a named search criteria exists with field_name: "(.*?)" and value: "(.*?)"/) do |field_name, value|
+  FactoryBot.create(:named_search_criterion, field_name: field_name, value: value)
+end

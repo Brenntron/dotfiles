@@ -1810,7 +1810,6 @@ $ ->
     $("#advanced-search-dropdown").hide()
 
   $(document).ready ->
-    console.log('Interval')
     setInterval ->
       if window.current_search_data
         window.populate_webrep_index_table(window.current_search_data, true)
