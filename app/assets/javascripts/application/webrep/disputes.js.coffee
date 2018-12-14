@@ -2687,74 +2687,208 @@ $ ->
     ]
   )
 
-tempSingleUserClosedTixDataset = [
-  {
-    'priority': ['P1'],
-    'case_number': ['0000375515'],
-    'submitter_type': ['customer'],
-    'owner' : ['nverbeck'],
-    'submission_type': ['W'],
-    'd_entry_preview': ['<span class="dispute_entry_content_first">guardiancremation.com</span><span class="dispute-count">4</span>'],
-    'time_to_close': ['35m']
-  },
-  {
-    'priority': ['P3'],
-    'status': ['Researching'],
-    'case_number': ['0000375513'],
-    'submitter_type': ['guest'],
-    'owner' : ['nverbeck'],
-    'submission_type': ['E'],
-    'd_entry_preview': ['<span class="dispute_entry_content_first">bvillaseminyak.com</span><span class="dispute-count">7</span>'],
-    'time_to_close': ['1h 25m']
-  },
-  {
-    'priority': ['P4'],
-    'status': ['Researching'],
-    'case_number': ['0000375502'],
-    'submitter_type': ['guest'],
-    'owner' : ['melitayl'],
-    'submission_type': ['W'],
-    'd_entry_preview': ['<span class="dispute_entry_content_first">food-hub.org</span><span class="dispute-count">14</span>'],
-    'time_to_close': ['<span class="time-over-2-hr">3h 3m</span>']
-  },
-  {
-    'priority': ['P1'],
-    'status': ['Researching'],
-    'case_number': ['0000375515'],
-    'submitter_type': ['customer'],
-    'owner' : ['nicherbe'],
-    'submission_type': ['W'],
-    'd_entry_preview': ['<span class="dispute_entry_content_first">guardiancremation.com</span><span class="dispute-count">4</span>'],
-    'time_to_close': ['35m']
-  },
-  {
-    'priority': ['P3'],
-    'status': ['Researching'],
-    'case_number': ['0000375513'],
-    'submitter_type': ['guest'],
-    'owner' : ['nicherbe'],
-    'submission_type': ['E'],
-    'd_entry_preview': ['<span class="dispute_entry_content_first">bvillaseminyak.com</span><span class="dispute-count">7</span>'],
-    'time_to_close': ['1h 25m']
-  },
-  {
-    'priority': ['P4'],
-    'status': ['Researching'],
-    'case_number': ['0000375502'],
-    'submitter_type': ['guest'],
-    'owner' : ['melitayl'],
-    'submission_type': ['W'],
-    'd_entry_preview': ['<span class="dispute_entry_content_first">food-hub.org</span><span class="dispute-count">14</span>'],
-    'time_to_close': ['<span class="time-over-2-hr">3h 3m</span>']
-  },
-  {
-    'priority': ['P3'],
-    'status': ['Researching'],
-    'case_number': ['000012345'],
-    'submitter_type': ['customer'],
-    'owner' : ['nicherbe'],
-    'submission_type': ['W'],
-    'd_entry_preview': ['<span class="dispute_entry_content_first">housingscotlandtoday.com</span><span class="dispute-count">9</span>'],
-    'time_to_close': ['42m']
-  }
-]
+
+
+
+tempSingleUserClosedTixDataset = []
+
+$ ->
+# Toggle which rows to show on tables
+  show_ticket_type_cb = $('.show-tickets-cb')
+
+  $(show_ticket_type_cb).click ->
+    open_tickets_rows = $('#table-user-disputes-open').find('tr')
+    closed_tickets_rows = $('#table-user-disputes-closed').find('tr')
+    all_tickets_rows = []
+
+    $(open_tickets_rows).each ->
+      all_tickets_rows.push this
+    $(closed_tickets_rows).each ->
+      all_tickets_rows.push this
+
+    customer_rows = []
+    guest_rows = []
+
+    $(all_tickets_rows).each ->
+      parent_row = this
+      submitter_type = $(this).find('.submitter-type-icon')
+      if $(submitter_type).hasClass('submitter-customer')
+        customer_rows.push parent_row
+      if $(submitter_type).hasClass('submitter-guest')
+        guest_rows.push parent_row
+
+    c_e_rows = []
+    c_w_rows = []
+    c_ew_rows = []
+    g_e_rows = []
+    g_w_rows = []
+    g_ew_rows = []
+
+    $(customer_rows).each ->
+      ticket_type = $(this).find('.dispute-submission-type')
+      if $(ticket_type).hasClass('dispute-E')
+        c_e_rows.push this
+      if $(ticket_type).hasClass('dispute-W')
+        c_w_rows.push this
+      if $(ticket_type).hasClass('dispute-EW')
+        c_ew_rows.push this
+
+    $(guest_rows).each ->
+      ticket_type = $(this).find('.dispute-submission-type')
+      if $(ticket_type).hasClass('dispute-E')
+        g_e_rows.push this
+      if $(ticket_type).hasClass('dispute-W')
+        g_w_rows.push this
+      if $(ticket_type).hasClass('dispute-EW')
+        g_ew_rows.push this
+
+    show_email_cb = $('#tickets-show-email-cb')
+    show_web_cb = $('#tickets-show-web-cb')
+    show_emailweb_cb = $('#tickets-show-email-web-cb')
+    show_customer_cb = $('#tickets-show-customer-cb')
+    show_guests_cb = $('#tickets-show-guest-cb')
+
+
+    if this == show_customer_cb[0]
+      if this.checked
+        if show_email_cb[0].checked
+          console.log 'email checked'
+          $(c_e_rows).each ->
+            if $(this).hasClass('hidden')
+              $(this).removeClass('hidden')
+        else
+          $(c_e_rows).each ->
+            unless $(this).hasClass('hidden')
+              $(this).addClass('hidden')
+        if show_web_cb[0].checked
+          $(c_w_rows).each ->
+            if $(this).hasClass('hidden')
+              $(this).removeClass('hidden')
+        else
+          $(c_w_rows).each ->
+            unless $(this).hasClass('hidden')
+              $(this).addClass('hidden')
+        if show_emailweb_cb[0].checked
+          $(c_ew_rows).each ->
+            if $(this).hasClass('hidden')
+              $(this).removeClass('hidden')
+        else
+          $(c_ew_rows).each ->
+            unless $(this).hasClass('hidden')
+              $(this).addClass('hidden')
+      else
+        $(customer_rows).each ->
+          unless $(this).hasClass('hidden')
+            $(this).addClass('hidden')
+
+    if this == show_guests_cb[0]
+      if this.checked
+        if show_email_cb[0].checked
+          $(g_e_rows).each ->
+            if $(this).hasClass('hidden')
+              $(this).removeClass('hidden')
+        else
+          $(g_e_rows).each ->
+            unless $(this).hasClass('hidden')
+              $(this).addClass('hidden')
+        if show_web_cb[0].checked
+          $(g_w_rows).each ->
+            if $(this).hasClass('hidden')
+              $(this).removeClass('hidden')
+        else
+          $(g_w_rows).each ->
+            unless $(this).hasClass('hidden')
+              $(this).addClass('hidden')
+        if show_emailweb_cb[0].checked
+          $(g_ew_rows).each ->
+            if $(this).hasClass('hidden')
+              $(this).removeClass('hidden')
+        else
+          $(g_ew_rows).each ->
+            unless $(this).hasClass('hidden')
+              $(this).addClass('hidden')
+      else
+        $(guest_rows).each ->
+          unless $(this).hasClass('hidden')
+            $(this).addClass('hidden')
+
+    if this == show_email_cb[0]
+      if this.checked
+        if show_customer_cb[0].checked
+          $(c_e_rows).each ->
+            if $(this).hasClass('hidden')
+              $(this).removeClass('hidden')
+        else
+          $(c_e_rows).each ->
+            unless $(this).hasClass('hidden')
+              $(this).addClass('hidden')
+        if show_guests_cb[0].checked
+          $(g_e_rows).each ->
+            if $(this).hasClass('hidden')
+              $(this).removeClass('hidden')
+        else
+          $(g_e_rows).each ->
+            unless $(this).hasClass('hidden')
+              $(this).addClass('hidden')
+      else
+        $(c_e_rows).each ->
+          unless $(this).hasClass('hidden')
+            $(this).addClass('hidden')
+        $(g_e_rows).each ->
+          unless $(this).hasClass('hidden')
+            $(this).addClass('hidden')
+
+    if this == show_web_cb[0]
+      if this.checked
+        if show_customer_cb[0].checked
+          $(c_w_rows).each ->
+            if $(this).hasClass('hidden')
+              $(this).removeClass('hidden')
+        else
+          $(c_w_rows).each ->
+            unless $(this).hasClass('hidden')
+              $(this).addClass('hidden')
+        if show_guests_cb[0].checked
+          $(g_w_rows).each ->
+            if $(this).hasClass('hidden')
+              $(this).removeClass('hidden')
+        else
+          $(g_w_rows).each ->
+            unless $(this).hasClass('hidden')
+              $(this).addClass('hidden')
+      else
+        $(c_w_rows).each ->
+          unless $(this).hasClass('hidden')
+            $(this).addClass('hidden')
+        $(g_w_rows).each ->
+          unless $(this).hasClass('hidden')
+            $(this).addClass('hidden')
+
+    if this == show_emailweb_cb[0]
+      if this.checked
+        if show_customer_cb[0].checked
+          $(c_ew_rows).each ->
+            if $(this).hasClass('hidden')
+              $(this).removeClass('hidden')
+        else
+          $(c_ew_rows).each ->
+            unless $(this).hasClass('hidden')
+              $(this).addClass('hidden')
+        if show_guests_cb[0].checked
+          $(g_ew_rows).each ->
+            if $(this).hasClass('hidden')
+              $(this).removeClass('hidden')
+        else
+          $(g_ew_rows).each ->
+            unless $(this).hasClass('hidden')
+              $(this).addClass('hidden')
+      else
+        $(c_ew_rows).each ->
+          unless $(this).hasClass('hidden')
+            $(this).addClass('hidden')
+        $(g_ew_rows).each ->
+          unless $(this).hasClass('hidden')
+            $(this).addClass('hidden')
+
+
+
