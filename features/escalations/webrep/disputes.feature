@@ -381,3 +381,37 @@ Feature: Disputes
     Then I should see content "3" within ".open-team"
     Then I should see content "2" within ".in-progress-team"
     Then I should see content "4" within ".closed-team"
+
+  Scenario: A user tries to update a dispute
+    Given a user with role "webrep user" exists and is logged in
+    And the following disputes exist and have entries:
+      |id  |
+      |5370|
+    And I goto "/escalations/webrep/disputes/5370"
+    When I click "#edit-dispute-button"
+    And I fill in "dispute-customer-name-input" with "John Smith"
+    And I fill in "dispute-customer-email-input" with "jsmith@cisco.com"
+    And I select "P5" from "dispute-priority-select"
+    And I click "#save-dispute-button"
+    And I wait for "5" seconds
+    And I click "#top_bar_toggle"
+    Then I should see content "John Smith" within "#dispute-customer-name"
+    And I should see content "jsmith@cisco.com" within "#dispute-customer-email"
+    And Dispute entry should have a status of, "P5"
+
+  @javascript
+  Scenario: A user tries add a new dispute entry (ad hoc)
+    Given a user with role "webrep user" exists and is logged in
+    And the following disputes exist:
+      |id  |
+      |5370|
+    And I goto "/escalations/webrep/disputes/5370"
+    Then I click link "Research"
+    When I click "#add-entries-button"
+    And I fill in "add_dispute_entry" with "cisco.com"
+    And I click "#button_add_dispute_entry"
+    And I wait for "15" seconds
+    Then I should see content "cisco.com" within ".entry-data-content"
+    And I should see content "WL-med" within ".entry-data-wlbl"
+    And I should see content "BL-heavy" within ".entry-data-wlbl"
+

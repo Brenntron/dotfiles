@@ -6,7 +6,7 @@ module API
           include API::V1::Defaults
           resource "escalations/webrep/resolution_message_templates" do
 
-            desc "get an resolution message template"
+            desc "get a resolution message template"
             params do
               requires :id, type: String, desc: "ID of the resolution message template"
             end

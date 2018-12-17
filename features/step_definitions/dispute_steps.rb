@@ -60,7 +60,7 @@ Then(/^the Entry preload with id "(.*?)" should exist$/) do |id|
   expect(DisputeEntryPreload.where(id: id)).to exist
 end
 
-Given(/^a dispute entry with trait "(.*?)" exists$/) do| trait_name|
+Given(/^a dispute entry with trait "(.*?)" exists$/) do |trait_name|
   FactoryBot.create(:dispute_entry,trait_name.to_sym)
 end
 
@@ -75,4 +75,7 @@ end
 Given(/^I add a test user to current user's team/) do
   FactoryBot.create(:user, cvs_username: 'teammate', id: 2)
   User.find(2).move_to_child_of(User.find(1))
+  
+Given (/^Dispute entry should have a status of, "(.*?)"/) do |status|
+  expect(Dispute.first.priority).to eq(status)
 end

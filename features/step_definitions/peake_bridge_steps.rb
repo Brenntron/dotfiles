@@ -20,3 +20,10 @@ Given(/^failing "(.*)" PeakeBridge post message is stubbed$/) do |class_name|
   peake_bridge_klass = class_name.constantize
   peake_bridge_klass.stub(:new).and_return(conn)
 end
+
+Given(/^PeakeBridge poll is stubbed$/) do
+  success = double('Net::HTTPResponse', code: 200, body: '[]')
+
+  ::Bridge::DirectRequest.stub(:poll).and_return(success)
+end
+
