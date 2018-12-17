@@ -85,7 +85,11 @@ window.categorize_clusters = () ->
 $ ->
 #  Populate the cluster management table (temp data currently)
   window.clusters_table = $('#clusters-index').DataTable(
-    dom: '<"datatable-top-tools"lf>t<ip>'
+    dom: '<"datatable-top-tools no-margin-datatable-top-tool"lf>t<ip>'
+    language: {
+      search: "_INPUT_"
+      searchPlaceholder: "Search within table"
+    }
     order: []
     lengthMenu: [50, 100, 500, 1000]
     columnDefs: [
@@ -155,6 +159,7 @@ $ ->
       }
     ]
   )
+  $('#clusters-index_filter input').addClass('table-search-input');
   window.populate_clusters_index_table()
 
 $ ->
