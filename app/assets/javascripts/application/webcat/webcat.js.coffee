@@ -1,6 +1,3 @@
-$('#myModal').on 'shown.bs.modal', ->
-  $('#myInput').trigger 'focus'
-
 window.display_tooltip = (id)->
   $('#cat_tooltip_' + id).tooltip('toggle')
 
@@ -37,10 +34,12 @@ $ ->
           orderable: false
           searchable: false
         }
-          targets: [ 1 ]
+        {
+          targets: [1]
           className: 'important-flag-col'
           orderable: false
           searchable: false
+        }
         {
           targets: [ 2 ]
           className: 'entry-id-col'
@@ -53,7 +52,6 @@ $ ->
       columns: [
         {
           data: null
-
           width: '14px'
           orderable: false
           searchable: false
@@ -155,7 +153,6 @@ $ ->
         {
           data: 'company_name'
         }
-
         {
           data: 'assigned_to'
           className: 'alt-col'
@@ -164,7 +161,9 @@ $ ->
       select: 'style': 'os'
       responsive: true)
 
+
     $('#complaints-index_filter input').addClass('table-search-input');
+
     $('#complaints-index tbody').on 'click', 'td.expandable-row-column', ->
       click_table_buttons complaint_table, this
 
@@ -228,3 +227,9 @@ $ ->
       options: createSelectOptions()
 
     }
+
+$('#exampleModal').on 'shown.bs.modal', ->
+  $('button.toolbar-button.cat-btn').addClass('active')
+
+#$('.toolbar-button').on 'click', ->
+
