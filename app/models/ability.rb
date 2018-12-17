@@ -48,7 +48,7 @@ class Ability
     end
 
     if role_names.include?('webcat user')
-      can :manage, [Complaint, Attachment, Note]
+      can :manage, [Complaint, ComplaintEntry, Attachment, Note]
       can :publish_to_bugzilla, Note
     end
 

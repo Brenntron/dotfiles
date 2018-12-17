@@ -38,7 +38,7 @@ Rails.application.routes.draw do
       resources :customers, only: :index
 
       get 'show_multiple', to: 'complaints#show_multiple'
-      get 'rules', to: 'complaints#rules'
+      get 'clusters', to: 'complaints#clusters'
 
       resources :reports, only: [:index] do
         collection do

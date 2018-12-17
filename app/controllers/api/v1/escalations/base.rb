@@ -17,6 +17,7 @@ module API
         mount API::V1::Escalations::Webcat::Complaints
         mount API::V1::Escalations::Webcat::ComplaintEntries
         mount API::V1::Escalations::Webcat::Customers
+        mount API::V1::Escalations::Webcat::Clusters
       end
     end
   end
