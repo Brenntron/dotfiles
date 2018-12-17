@@ -1184,6 +1184,8 @@ thead th.sorting.center {
 
 .message-div li {
   font-weight: 400;
+  font-size: 8.5pt;
+  color: #666;
   text-transform: none;
   padding: 2px 0;
 }
@@ -1192,7 +1194,7 @@ thead th.sorting.center {
   margin-top: 5px;
 }
 
-#message-text li:first-child {
+#message-text li:first-child, li#prompt-text {
   border-top: 1px solid $faint-neutral-color;
   padding-top: 10px;
   margin-top: 10px;
@@ -1207,6 +1209,28 @@ thead th.sorting.center {
   font-size: 8.5pt;
   color: $type-lighter-color;
   text-transform: uppercase;
+}
+
+#modal-login-form {
+  margin-top: 20px;
+}
+
+#modal-login-form .panel-button {
+  padding: 0 !important;
+  text-align: center;
+  line-height: 2em;
+  min-width: 100px;
+  margin-top: 25px;
+}
+
+#modal-login-form input {
+  border: 4px solid $content-bg-color;
+  outline: 1px solid $faint-neutral-color;
+  height: 30px;
+}
+
+#modal-login-form .form-group {
+  margin-bottom: 5px;
 }
 
 .message-instruction {
@@ -3316,7 +3340,7 @@ fieldset.top-content {
 }
 
 .highlighted-section-header {
-  background-color: #4E4E4E;
+  background-color: $table-dark-body;
   color: $content-bg-color;
   margin-top: -15px;
   padding-top: 12px;
@@ -3337,7 +3361,7 @@ fieldset.top-content {
   display: block;
   height: 10px;
   position: absolute;
-  background-color: #4E4E4E;
+  background-color: $table-dark-body;
   z-index: 60;
   width: 100%;
   margin-top: -12px;
@@ -3942,7 +3966,7 @@ td.wbrs-highlight, td.sbrs-highlight {
 }
 
 .escalations--webrep--disputes-controller #nav-banner, .escalations--webcat--complaints-controller #nav-banner, .escalations--webcat--reports-controller #nav-banner {
-  background-color: #4E4E4E;
+  background-color: $table-dark-body;
   color: $content-bg-color;
 }
 
@@ -3973,7 +3997,7 @@ td.wbrs-highlight, td.sbrs-highlight {
 .escalations--webcat--reports-controller #nav-banner a:hover,
 .escalations--webcat--reports-controller .dropdown.open
 {
-  background-color: lighten(#4E4E4E, 10%);
+  background-color: lighten($table-dark-body, 10%);
 }
 
 .escalations--webrep--disputes-controller #advanced-search-button, .escalations--webcat--complaints-controller #advanced-search-button, .escalations--webcat--reports-controller #advanced-search-button  {
@@ -4194,7 +4218,7 @@ button.tertiary {
 /** Below for the new email dialog box **/
 
 .ui-dialog .ui-dialog-titlebar {
-  background-color: #4E4E4E;
+  background-color: $table-dark-body;
   color: $content-bg-color;
   margin: 0 !important;
   font-weight: 300;
@@ -6956,4 +6980,93 @@ h2 {
 }
 #time-submitted {
   width: 150px;
+}
+
+#user-settings-dropdown-button {
+  background-image: url(image_path('icon_gear_settings_grey.svg'));
+  background-repeat: no-repeat;
+  width: 30px;
+  height: 44px;
+  background-size: 22px 22px;
+  background-position: center center;
+  margin-right: 6px;
+  display: inline-block;
+  background-color: transparent;
+  border: none;
+}
+
+#nav-banner a.nav-username {
+  display: inline-block;
+  width: auto;
+  float: right;
+  margin-right: 8px;
+}
+
+#login-div .dropdown.open {
+  background-color: transparent !important;
+}
+
+#login-div .dropdown.open #user-settings-dropdown-button {
+  background-image: url(image_path('icon_gear_settings_light_grey.svg'));
+}
+
+#login-div .dropdown.open .dropdown-menu {
+  margin-top: -14px;
+  border-radius: 0 0 4px 4px;
+  color: $type-base-color;
+  padding: 10px;
+}
+
+#login-div .dropdown.open .dropdown-menu::before {
+  top: 0;
+  left: 9px;
+  border: solid transparent;
+  content: " ";
+  height: 0;
+  width: 0;
+  position: absolute;
+  border-top-color: $table-dark-body;
+  border-width: 7px;
+  margin-left: 0;
+}
+
+#user-settings-dropdown a {
+  color: $type-lighter-color !important;
+  font-weight: 300;
+  text-transform: none;
+  font-size: 9pt;
+}
+
+#user-settings-dropdown a:hover {
+  text-decoration: underline;
+}
+
+#user-settings-dropdown {
+  border: none !important;
+}
+
+#user-settings-dropdown .message-text {
+  margin: 10px 0 ;
+  padding: 0;
+  line-height: 1em;
+}
+
+#user-settings-dropdown .content-label-sm {
+  padding: 0;
+}
+
+#user-settings-dropdown input {
+  border: 4px solid $content-bg-color;
+  outline: 1px solid $faint-neutral-color;
+  height: 30px;
+}
+
+#user-settings-dropdown .form-group {
+  margin-bottom: 4px;
+}
+
+#user-settings-dropdown button {
+  width: 100%;
+  margin: 12px 0 0 0;
+  padding: 0;
 }
