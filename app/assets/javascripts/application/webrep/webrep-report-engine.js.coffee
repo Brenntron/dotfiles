@@ -259,8 +259,10 @@ window.set_date_label = () ->
   $('.dashboard-time label')[0].innerHTML = val
   if today < enddate && today > startdate
     $('#ticket-view-shortcut').html("View Last Week's Tickets")
+    $('#ticket-view-shortcut').switchClass('arrow-right','arrow-left')
   else
     $('#ticket-view-shortcut').html("View This Week's Tickets")
+    $('#ticket-view-shortcut').switchClass('arrow-left','arrow-right')
 
 
 window.set_initial_date_span = () ->

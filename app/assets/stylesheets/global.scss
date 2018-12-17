@@ -6686,6 +6686,20 @@ h2 {
           margin-right: 10px;
           float: left;
         }
+        .arrow-right::before {
+          content: '';
+          width: 0;
+          height: 0;
+          border-bottom: 5px solid transparent;
+          border-top: 5px solid transparent;
+          border-left: 5px solid white;
+          font-size: 0;
+          line-height: 0;
+          margin-top: 1px;
+          margin-left: 10px;
+          margin-right: -7px;
+          float: right;
+        }
       }
     }
   }
