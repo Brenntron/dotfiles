@@ -10,10 +10,13 @@ Given(/^I fill in "(.*?)" with "(.*?)"$/) do |field_label, value|
   fill_in field_label, :with => value
 end
 
+Given(/^I fill in "(.*?)" with "(.*?)" and "(.*?)" separated by blank lines$/) do |field_label, value, value_2|
+  fill_in field_label, :with => value + "\n" + value_2
+end
+
 Given(/^I fill in "(.*?)" with today's date"$/) do |field_label|
   time = Time.now.strftime("%Y-%m-%d")
   fill_in field_label, :with => time
-
 end
 
 When(/^I click "(.*?)"$/) do |target|
@@ -231,6 +234,12 @@ end
 
 Then(/^I should see content "(.*?)" within "(.*?)"$/) do |content, target|
   within(target) do
+    page.has_content?(content)
+  end
+end
+
+Then(/^I should see content "(.*?)" within first element of class "(.*?)"$/) do |content, target|
+  within(target, match: :first) do
     page.has_content?(content)
   end
 end
