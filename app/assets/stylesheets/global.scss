@@ -66,6 +66,7 @@ $super-faint-neutral: #f9f9f9;
 $faint-accent-color:  #dff1f7;
 $faint-alt-highlight: #fff7cd; /* focus for form inputs */
 $medium-neutral-color: #EAEAEA;
+$dark-neutral-color:  #c2c6c8;
 $table-dark-body: #4E4E4E;
 $table-dark-header: #413D3D;
 
@@ -1402,9 +1403,10 @@ fieldset.tight {
 /*** Overriding selectize plugin styles to work with our forms ***/
 .selectize-input {
   border: none;
-  padding: 2px 0 0 0 !important;
-  margin: -4px 0  !important;
+  padding: 1px 0 0 0 !important;
+  margin: -4px 0 -4px -2px !important;
   min-height: 0 !important;
+  box-shadow: none !important;
 }
 
 .selectize-input.focus {
@@ -1825,7 +1827,6 @@ a.static-nav-item {
 .icon-new    {background-image: url(image_path('icon_create.svg'));}
 .icon-import {background-image: url(image_path('icon_import.svg'));}
 .icon-filter {background-image: url(image_path('icon_filter.svg'));}
-
 .icon-my-bugs      {background-image: url(image_path('icon_mybugs.svg'));}
 .icon-my-open-bugs {background-image: url(image_path('icon_myopenbugs.svg'));}
 .icon-team-bugs    {background-image: url(image_path('icon_teambugs.svg'));}
@@ -1838,6 +1839,12 @@ a.static-nav-item {
 .icon-all-tickets  {background-image: url(image_path('icon_ticket.svg'));}
 .icon-saved-search {background-image: url(image_path('icon_save_blue.svg'));}
 .icon-recently-viewed {background-image: url(image_path('icon_myrecent.svg'));}
+.icon-opened-selected {background-image: url(image_path('icon_open_selected.svg'));}
+.icon-open-all {background-image: url(image_path('icon_open_all.svg'));}
+.icon-copycat {background-image: url(image_path('icon_copycat.svg'));}
+.icon-paste {background-image: url(image_path('icon_paste.svg'));}
+.icon-clear {background-image: url(image_path('icon_clear.svg'));}
+.icon-submit{background-image: url("icon_submit_arrow.svg")}
 .icon-custom-star {background-image: url(image_path('icon_customer_star.svg'));}
 
 .saved-search {
@@ -4220,6 +4227,18 @@ button.tertiary {
   height: 30px;
 }
 
+.ui-dialog .ui-dialog-titlebar-close-simple {
+  background-color: transparent;
+  background-image: url(image_path('icon_delete_simple.svg'));
+  border: none;
+  margin-right: 3px;
+  position: absolute;
+  right: .3em;
+  width: 20px;
+  padding: 1px;
+  height: 20px;
+}
+
 #newEmailDialog .sender-receiver-info {
   margin-top: 0;
 }
@@ -4615,22 +4634,37 @@ table > tbody > tr > td.dispute_rep_tools {
   height: 35px;
   padding: 3px;
 }
+
 .no-margin-datatable-top-tool {
   margin: 0 !important;
 }
-.dispute-count {
+.dispute-count, .entry-count {
   background-color: darken($nav-toolbar-color, 8%);
   display: inline-block;
   border-radius: 2px;
-  font-weight: bold;
+  font-weight: 500;
   padding: 1px 6px;
   color: $content-bg-color;
   margin-top: -1px;
   float: right;
 }
 
-.dispute-count, .dispute_entry_content_first {
+.dispute_entry_content_first {
   display: inline-block;
+}
+
+.entry-count {
+  margin-right: 8px;
+  margin-top: 1px;
+}
+
+.domain-column .vertical-separator {
+  border-right: 1px solid $nav-toolbar-color;
+  display: inline-block;
+  height: 16px;
+  margin-top: 3px;
+  margin-right: 8px;
+  float: right;
 }
 
 .take-ticket-button {
@@ -4730,34 +4764,50 @@ table > tbody > tr > td.dispute_rep_tools {
   margin-right: 8px;
 }
 
-.dispute-entry-table {
-  margin: 0;
+.dispute-entry-table, .cluster-path-table {
+  margin: 0 !important;
 }
 
 .dispute-entry-table .missing-data {
   color: $faint-neutral-color;
 }
 
-.dispute-entry-table tbody{
+.dispute-entry-table tbody, .cluster-path-table tbody {
   background-color: $table-dark-body;
   color: $content-bg-color;
   font-weight: 300;
 }
 
-.dispute-entry-table tbody tr td, .dispute-entry-table thead tr th {
+.dispute-entry-table tbody tr td, .dispute-entry-table thead tr th, .cluster-path-table thead tr th, .cluster-path-table tbody tr td {
   border-color: $table-dark-header;
 }
 
-.dispute-entry-table tr td:first-child, .dispute-entry-table tr th:first-child {
+.cluster-path-table tbody tr td {
+  padding: 4px;
+  font-size: 8.5pt;
+}
+
+.dispute-entry-table tr td:first-child, .dispute-entry-table tr th:first-child, .cluster-path-table tr th:first-child, .cluster-path-table tr td:first-child {
   padding-left: 30px;
 }
 
-.dispute-entry-table thead {
+.dispute-entry-table thead, .cluster-path-table thead, .cluster-path-table tfoot {
   background-color: $table-dark-header;
+  color: $content-bg-color;
+  font-size: 8pt;
+}
+
+.cluster-path-table tfoot td {
+  text-align: center;
+  color: $dark-neutral-color;
+  font-weight: 300;
+}
+
+.cluster-path-table tfoot a {
   color: $content-bg-color;
 }
 
-.dispute-entry-table th {
+.dispute-entry-table th, .cluster-path-table th {
   font-weight: 600 !important;
 }
 
@@ -4784,14 +4834,6 @@ table > tbody > tr > td.dispute_rep_tools {
 .nested-complaint-data-wrapper table {
   background-color: darken($faint-neutral-color, 5%);
   color: $type-base-color;
-}
-
-.nested-complaint-data-wrapper table td {
-  border-bottom: none;
-  border-bottom: none;
-  padding: 1px 10px !important;
-  font-size: 8pt;
-  color: $type-lighter-color;
 }
 
 .nested-table-input {
@@ -6033,12 +6075,21 @@ table.dataTable tbody tr.selected .alt-col{
   margin-bottom: 0;
 }
 
-.nav-tool-content-wrapper .form-control.selectize, #categorize-urls-form-wrapper .form-control.selectize {
+.nav-tool-content-wrapper .form-control.selectize, #categorize-urls-form-wrapper .form-control.selectize, .category-column .form-control.selectize {
   background-color: transparent;
   border: 4px solid $content-bg-color;
   outline: 1px solid darken($faint-neutral-color, 5%);
   padding: 1px;
   height: 32px;
+}
+
+.category-column .form-control.selectize {
+  height: 30px !important;
+  margin: -4px 0;
+}
+
+.category-column .form-control.selectize .selectize-input input {
+  font-size: 8.5pt;
 }
 
 .selectize-dropdown.multi.form-control.selectize {
@@ -6100,6 +6151,7 @@ table.dataTable tbody tr.selected .alt-col{
 
 .selectize-dropdown-content {
   min-height: 28px !important;
+  font-size: 8.5pt;
 }
 
 #advanced-search-wrapper .selectize-input.dropdown-active::before {
@@ -6254,7 +6306,7 @@ table.dataTable tbody tr.selected .alt-col{
   font-size: 8pt;
 }
 
-.nested-complaint-data-wrapper .selectize-control.multi .selectize-input .item {
+.nested-complaint-data-wrapper .selectize-control.multi .selectize-input .item, .category-column .selectize-control.multi .selectize-input .item {
   padding: 2px 6px;
   margin: 2px;
   font-size: 8pt;
@@ -6271,6 +6323,7 @@ table.dataTable tbody tr.selected .alt-col{
 
 .nested-complaint-data-wrapper a {
   text-decoration: underline;
+  cursor: pointer;
 }
 
 .customer-label {
@@ -6340,6 +6393,10 @@ table.dataTable tbody tr.selected .alt-col{
 }
 
 #complaint_button_dialog .dialog-content-wrapper, #history_dialog .dialog-content-wrapper {
+  padding: 15px;
+}
+
+#cluster_button_dialog .dialog-content-wrapper, #copycat_dialog .dialog-content-wrapper {
   padding: 15px;
 }
 
@@ -6572,6 +6629,31 @@ table#duplicates a {
   height: 26px;
 }
 
+.bug-tabs .nav-tabs li a {
+  background-color: #f2f2f2 !important;
+}
+
+.bug-tabs .nav-tabs li.active a {
+  background-color: #fff !important;
+}
+
+.retro-styling #sidenav-menu-div a {
+  padding-top: 13px;
+}
+
+#sidenav-menu-div .sub-nav a {
+  padding-top: 0;
+}
+
+.disabled-link {
+  cursor: not-allowed;
+  opacity: .5 !important;
+}
+
+.disabled-link:hover {
+  text-decoration: none !important;
+}
+
 /* These below can be deleted after redesign merge, or after the existing style sheet is ported. They exist in the admin redesign stylesheet. */
 
 h2 {
@@ -6583,16 +6665,277 @@ h2 {
   color: #333;
 }
 
-.age-col {
 
+// Cluster top bar header
+.cluster-mgt-top-area {
+  background-color: $content-tab-color;
+  padding-bottom: 25px;
+
+  .search-box {
+    background-image: none;
+    padding: 0 0 0 10px;
+    margin-top: 10px;
+    height: 30px;
+  }
+  .apply-filter-btn {
+    background-repeat: no-repeat;
+    background-size: 26px;
+    background-position: 8px center;
+    height: 30px;
+    padding-left: 40px !important;
+    padding-top: 5px;
+    padding-bottom: 5px;
+    margin-top: 10px;
+  }
+}
+
+.current-cluster-info-wrapper {
+  padding: 20px 15px;
+
+  .result-label.vertical-separator {
+    border-right: 1px solid $nav-toolbar-color;
+  }
+  .result-label {
+    font-size: .8rem;
+    text-transform: uppercase;
+    font-weight: bold;
+    margin-top: 0;
+    display: inline-block;
+    padding: 0 15px;
+
+    span {
+      color: $primary-section-color;
+      text-transform: none;
+      padding-left: 10px;
+      float: right;
+    }
+  }
+}
+
+.copycat-btn {
+  margin: 4px 0 0 5px;
+  background-color: $content-tab-color;
+  color: white;
+  display: block;
+  height: 27px;
+}
+
+.copycat-btn.active {
+  background-color: $primary-section-color;
+}
+.copycat-btn:hover {
+  background-color: $sidebar-nav-base;
+}
+
+// Cluster mgmt UI - Comment box / Category Submission
+.card {
+  width: 100%;
+  padding: 10px;
+  margin-top: 20px;
+  box-shadow: 0 2px 4px 0 rgba(0, 0, 0, 0.2);
+  -webkit-transition: all 5s ease-in-out;
+  -moz-transition: all 5s ease-in-out;
+  -o-transition: all 5s ease-in-out;
+  -ms-transition: all 5s ease-in-out;
+  transition: all 5s ease-in-out;
+
+  .card-body {
+    display: inline-flex;
+    width: 100%;
+    margin: 0;
+
+    input {
+      width: 80%;
+    }
+
+    button.icon-submit {
+      width: 20%;
+      background-color: $primary-section-color;
+      margin: 0 0 0 10px;
+      padding: 5px 5px 5px 25px;
+      font-size: 9pt;
+      color: white;
+    }
+  }
+}
+
+// copycat tool dialog
+#copycat_dialog {
+  display: none;
+}
+.copycat_tool_dialog {
+  min-width: 400px;
+  min-height: 135px;
+}
+
+.copycat_tool_dialog .ui-dialog-titlebar {
+  background-color: $content-tab-color;
+  background-image: url(image_path('icon_copycat.svg'));
+  background-repeat: no-repeat;
+  background-position: 8px center;
+  background-size: 24px 24px;
+  padding-left: 40px;
+  border: none;
+  width: 100%;
+}
+
+#copycat-categories-selectized {
+    width: 100%;
+    height: 30px;
+    padding: 0 10px;
+    border: 1px solid #e0e0e0;
+}
+
+.copycat-tool-footer {
+  display: flex;
+  justify-content: space-evenly;
+  padding: 0 25px;
+
+  .copycat-paste-btn {
+    background-color: $primary-section-color;
+    background-size: 15px;
+    background-position: 10px center;
+    color: white;
+    font-size: 12px;
+    padding: 10px 20px 10px 35px;
+
+  }
+
+  .copycat-clear-btn {
+    background-color: $nav-toolbar-color;
+    background-size: 22px;
+    background-position: 10px center;
+    font-size: 12px;
+    padding: 10px 20px 10px 45px;
+  }
+}
+
+.open-in-tab-btn, .whois-btn, .google-btn {
+  background-repeat: no-repeat;
+  background-position: center center;
+  width: 20px;
+  height: 20px;
+  border-radius: 2px;
+  border: none;
+  float: right;
+}
+
+.open-in-tab-btn {
+  background-color: $primary-section-color;
+  background-image: url(image_path('icon_open_viewable_white.svg'));
+  background-size: 75%;
+}
+
+.whois-btn {
+  background-image: url(image_path('icon_whois.svg'));
+  background-color: $nav-toolbar-color;
+}
+
+.google-btn {
+  background-image: url(image_path('icon_google_grey.svg'));
+  background-color: $nav-toolbar-color;
+}
+
+.right-margin {
+  margin-right: 4px;
+}
+
+.category-column {
+  min-width: 250px;
+}
+
+.category-column fieldset {
+  margin: 0;
+}
+
+.domain-column {
+  min-width: 300px;
+}
+
+#copycat_dialog {
+  overflow: visible;
+
+  .selectize-input {
+    border: 1px solid #dddddd !important;
+    padding: 0 5px !important;
+
+    .item {
+      padding: 2px 6px;
+      margin: 2px;
+      font-size: 8pt;
+    }
+  }
+
+  .selectize-dropdown {
+    margin: 4px 0 0 -2px;
+  }
+}
+
+
+.category-column .form-control.selectize.selectize-dropdown.cluster_categories {
+  margin-top: 8px;
+  padding: 0 !important;
+}
+
+.selectize-input.has-items + .category-column .form-control.selectize.selectize-dropdown.cluster_categories {
+  margin-top: 4px !important;
+}
+
+.cluster-mgt-loader-wrapper {
+  display: block;
+  position: absolute;
+  margin: 100px 37%;
+  width: 170px;
+
+  .gear-loader-wrapper {
+    margin-right: 5px;
+    margin-top: 6px;
+    float: left;
+  }
+
+  .loader-msg {
+    display: inline-block;
+    line-height: 3.5;
+  }
+}
+
+.loader-msg {
+  color: $type-lighter-color;
+}
+
+.cluster-table-toolbar {
+  margin-bottom: 0;
+}
+
+#clusters-index_wrapper .datatable-top-tools {
+  margin-top: -35px;
+}
+
+.expand-cluster-entries {
+  margin: 0 8px;
+}
+
+.expand-cluster-entries::after {
+  content: '';
+  display: inline-block;
+  width: 15px;
+  height: 15px;
+  background-image: url(image_path('icon_expand_table_white.svg'));
+  background-repeat: no-repeat;
+  background-position: center center;
+  margin-bottom: -4px;
+}
+
+.expand-cluster-entries.collapse-cluster-entries::after {
+  transform: rotate(180deg);
 }
 
 .ticket-age-over3hr {
   color: $warning-accent-color;
-  font-weight: bold;
+  font-weight: 600;
 }
 
 .overdue {
   color: $second-section-color;
-  font-weight: bold;
+  font-weight: 600;
 }
