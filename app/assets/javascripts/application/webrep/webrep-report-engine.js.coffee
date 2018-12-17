@@ -1260,9 +1260,12 @@ $ ->
     $('.report-checkbox').each ->
       if this.checked
         paramObject[this.name] = true
+        undefined
       else
         paramObject[this.name] = false
+        undefined
 
+    debugger
     paramObject.startdate = localStorage.getItem('webrep_report_range_from')
     paramObject.enddate = localStorage.getItem('webrep_report_range_to')
     window.location = "/escalations/webrep/dashboard.xlsx?" + $.param(paramObject);
