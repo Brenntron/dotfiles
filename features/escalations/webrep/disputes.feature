@@ -319,7 +319,7 @@ Feature: Disputes
     Then I should see content "Lab Rat" within "#saved-searches-wrapper"
 
   @javascript
-  Scenario: A user creates a new named search for disputes
+  Scenario: A user uses a new named search for disputes
     Given a user with role "webrep user" exists and is logged in
     And the following disputes exist and have entries:
       |id|status|
@@ -338,4 +338,14 @@ Feature: Disputes
     Then I should see "0000000001"
     Then I should see "NEW"
     Then I should see "0000000002"
+
+  @javascript
+  Scenario: A user creates a new named search for disputes
+    Given a user with role "webrep user" exists and is logged in
+    When I goto "/escalations/webrep/disputes?f=closed"
+    And I trigger-click "#advanced-search-button"
+    And I fill in "search_name" with "Cucumber Test"
+    And I trigger-click "#submit-advanced-search"
+    And I trigger-click "#filter-cases"
+    Then I should see content "Cucumber Test" within "#saved-searches-wrapper"
 
