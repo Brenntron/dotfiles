@@ -17,7 +17,7 @@ class Escalations::Webrep::DisputesController < ApplicationController
         contents = RubyXL::Workbook.new
         @worksheet = contents[0]
 
-        def insert_row_with_data(data, format = nil)
+        def singlesheet_insert_row_with_data(data, format = nil)
           data_insertion_index = @worksheet.sheet_data.rows.count
           data.each_with_index do |new_data, i|
             @worksheet.add_cell(data_insertion_index, i, new_data)
@@ -35,19 +35,15 @@ class Escalations::Webrep::DisputesController < ApplicationController
         end
 
         dispute_headers = ['Priority', 'Case ID', 'Status', 'Entry Count', 'Owner', 'Customer Name', 'Customer Email', 'Customer Company', 'Company URL', 'Time Submitted', 'Age', 'Dispute Entry', 'Dispute Entry Status', 'Suggested Disposition', 'Category', 'WBRS Score', 'WBRS Total Rule Hits', 'SBRS Score', 'SBRS Total Rule Hits', 'Important?', 'Resolution', 'Resolution Comments']
-        insert_row_with_data(dispute_headers, "h1")
+        singlesheet_insert_row_with_data(dispute_headers, "h1")
 
         @disputes.each do |dispute|
-          # insert_row_with_data([dispute.priority, dispute.case_id_str, dispute.status, dispute.org_domain, dispute.dispute_entries.count, dispute.user.cvs_username, dispute.case_opened_at, ApplicationRecord.humanize_secs(Time.now - dispute.case_opened_at)], "h2")
-          # insert_row_with_data([ 'Dispute Entry', 'Dispute Entry Status', 'Suggested Disposition', 'Category', 'WBRS Score', 'WBRS Total Rule Hits', 'SBRS Score', 'SBRS Total Rule Hits', 'Important?', 'Resolution', 'Resolution Comments' ], "bold")
           dispute.dispute_entries.each do |dispute_entry|
-            insert_row_with_data([ dispute_entry.dispute.priority, dispute_entry.dispute.case_id_str, dispute_entry.dispute.status, dispute_entry.dispute.dispute_entries.count, dispute_entry.dispute.user.cvs_username, dispute_entry.dispute.customer.name, dispute_entry.dispute.customer.email, dispute_entry.dispute.customer.company.name, dispute_entry.dispute.org_domain ,dispute_entry.dispute.case_opened_at.strftime("%FT%T"), ApplicationRecord.humanize_secs(Time.now - dispute_entry.dispute.case_opened_at), dispute_entry.hostlookup, dispute_entry.status, dispute_entry.suggested_disposition, dispute_entry.primary_category, dispute_entry.wbrs_score, dispute_entry.dispute_rule_hits.wbrs_rule_hits.count, dispute_entry.sbrs_score, dispute_entry.dispute_rule_hits.sbrs_rule_hits.count, dispute_entry.is_important, dispute_entry.resolution, dispute_entry.resolution_comment ])
+            singlesheet_insert_row_with_data([ dispute_entry.dispute.priority, dispute_entry.dispute.case_id_str, dispute_entry.dispute.status, dispute_entry.dispute.dispute_entries.count, dispute_entry.dispute.user.cvs_username, dispute_entry.dispute.customer.name, dispute_entry.dispute.customer.email, dispute_entry.dispute.customer.company.name, dispute_entry.dispute.org_domain ,dispute_entry.dispute.case_opened_at.strftime("%FT%T"), ApplicationRecord.humanize_secs(Time.now - dispute_entry.dispute.case_opened_at), dispute_entry.hostlookup, dispute_entry.status, dispute_entry.suggested_disposition, dispute_entry.primary_category, dispute_entry.wbrs_score, dispute_entry.dispute_rule_hits.wbrs_rule_hits.count, dispute_entry.sbrs_score, dispute_entry.dispute_rule_hits.sbrs_rule_hits.count, dispute_entry.is_important, dispute_entry.resolution, dispute_entry.resolution_comment ])
           end
-
         end
 
-        send_data contents.stream.string, filename: "disputes_search_#{Time.now}.xlsx",
-                  disposition: 'attachment'
+        send_data contents.stream.string, filename: "disputes_search_#{Time.now}.xlsx", disposition: 'attachment'
       end
     end
   end
@@ -84,12 +80,11 @@ class Escalations::Webrep::DisputesController < ApplicationController
         #
         # mytickets - bool
         # myteamtickets - bool
-        # alltickets - bool
-        # customtickets - TBD; no spec for this yet
+        # alltickets - Not implemented
+        # customtickets - Not implemented
         # startdate - datetime (get from localstorage object)
         # enddate - datetime (get from localstorage object)
         #
-
 
         def insert_row_with_data(data, filename, sheetname, format = nil)
           worksheet = filename[sheetname]
@@ -132,15 +127,85 @@ class Escalations::Webrep::DisputesController < ApplicationController
           mytickets_xlsx.add_worksheet(mytickets_workbook_names[:closed_web_by_resolution])
 
 
-          my_open_tickets_headers = ['Priority', 'Case ID', 'Status', 'Entry Count', 'Owner', 'Customer Name', 'Customer Email', 'Customer Company', 'Company URL', 'Time Submitted', 'Age', 'Dispute Entry', 'Dispute Entry Status', 'Suggested Disposition', 'Category', 'WBRS Score', 'WBRS Total Rule Hits', 'SBRS Score', 'SBRS Total Rule Hits', 'Important?', 'Resolution', 'Resolution Comments']
+          # Build the headers of each individual worksheet
+          my_open_tickets_headers = ['Case ID', 'Status', 'Dispute Preview', 'Last Comment Date']
+          my_closed_tickets_headers = ['Case ID', 'Submitter Type', 'Submission Type', 'Priority', 'Dispute Prevew', 'Time to Close']
+          total_ticket_entries_closed_headers = ['Date', 'Web', 'Email', 'Web_Email', 'Total']
+          time_to_close_tickets_headers = ['Ticket', 'Time']
+          ticket_submitted_by_submitter_type_headers = ['Date', 'Customer', 'Guest']
+          closed_email_by_resolution_headers = ['Resolution', 'Count']
+          closed_web_by_resolution_headers = ['Resolution', 'Count']
           insert_row_with_data(my_open_tickets_headers, mytickets_xlsx, mytickets_workbook_names[:my_open_tickets], "h1")
-          insert_row_with_data(my_open_tickets_headers, mytickets_xlsx, mytickets_workbook_names[:my_closed_tickets], "h1")
-          insert_row_with_data(my_open_tickets_headers, mytickets_xlsx, mytickets_workbook_names[:total_ticket_entries_closed], "h1")
-          insert_row_with_data(my_open_tickets_headers, mytickets_xlsx, mytickets_workbook_names[:time_to_close_tickets], "h1")
-          insert_row_with_data(my_open_tickets_headers, mytickets_xlsx, mytickets_workbook_names[:ticket_submitted_by_submitter_type], "h1")
-          insert_row_with_data(my_open_tickets_headers, mytickets_xlsx, mytickets_workbook_names[:closed_email_by_resolution], "h1")
-          insert_row_with_data(my_open_tickets_headers, mytickets_xlsx, mytickets_workbook_names[:closed_web_by_resolution], "h1")
-          # Do other data insertion here
+          insert_row_with_data(my_closed_tickets_headers, mytickets_xlsx, mytickets_workbook_names[:my_closed_tickets], "h1")
+          insert_row_with_data(total_ticket_entries_closed_headers, mytickets_xlsx, mytickets_workbook_names[:total_ticket_entries_closed], "h1")
+          insert_row_with_data(time_to_close_tickets_headers, mytickets_xlsx, mytickets_workbook_names[:time_to_close_tickets], "h1")
+          insert_row_with_data(ticket_submitted_by_submitter_type_headers, mytickets_xlsx, mytickets_workbook_names[:ticket_submitted_by_submitter_type], "h1")
+          insert_row_with_data(closed_email_by_resolution_headers, mytickets_xlsx, mytickets_workbook_names[:closed_email_by_resolution], "h1")
+          insert_row_with_data(closed_web_by_resolution_headers, mytickets_xlsx, mytickets_workbook_names[:closed_web_by_resolution], "h1")
+
+          # Insert data in each sheet
+
+          # My Open Tickets
+          my_open_tickets_data = Dispute.open_tickets_report([current_user], params[:startdate], params[:enddate])
+          my_open_tickets_data[:table_data].each do |d|
+            data_values = [d[:case_number], d[:status], ActionController::Base.helpers.strip_tags(d[:d_entry_preview]), d[:last_comment]]
+            # The Rails `strip_tags` method doesn't work directly in this controller and I don't know why.
+
+            insert_row_with_data(data_values, mytickets_xlsx, mytickets_workbook_names[:my_open_tickets])
+          end
+
+          # My Closed Tickets
+          my_closed_tickets_data = Dispute.closed_tickets_report([current_user], params[:startdate], params[:enddate])
+          my_closed_tickets_data[:table_data].each do |d|
+            data_values = [d[:case_number], d[:submitter_type], d[:submission_type], d[:priority], ActionController::Base.helpers.strip_tags(d[:d_entry_preview]), d[:time_to_close]]
+
+            insert_row_with_data(data_values, mytickets_xlsx, mytickets_workbook_names[:my_closed_tickets])
+          end
+
+          # Total ticket entries closed
+          @total_ticket_entries_closed_data = Dispute.ticket_entries_closed_by_day_report([current_user], params[:startdate], params[:enddate])
+          @total_ticket_entries_closed_data[:report_labels].each_with_index do |row, i|
+            final_row = []
+            final_row << row
+            final_row << @total_ticket_entries_closed_data[:report_w_data][i]
+            final_row << @total_ticket_entries_closed_data[:report_e_data][i]
+            final_row << @total_ticket_entries_closed_data[:report_ew_data][i]
+            final_row << @total_ticket_entries_closed_data[:report_total_data][i]
+            insert_row_with_data(final_row, mytickets_xlsx, mytickets_workbook_names[:total_ticket_entries_closed])
+          end
+
+          # Time to close tickets
+          @time_to_close_tickets_data = Dispute.ticket_time_to_close_report(current_user.id, params[:startdate], params[:enddate])
+          @time_to_close_tickets_data[:ticket_numbers].each_with_index do |row, i|
+            final_row = []
+            final_row << row
+            final_row << @time_to_close_tickets_data[:close_times][i]
+            insert_row_with_data(final_row, mytickets_xlsx, mytickets_workbook_names[:time_to_close_tickets])
+          end
+
+          # Ticket Submitted by Submitter Type
+          @ticket_submitted_by_submitter_type_data = Dispute.tickets_submitted_by_submitter_per_day(params[:startdate], params[:enddate])
+          @ticket_submitted_by_submitter_type_data[:chart_labels].each_with_index do |row, i|
+            final_row = []
+            final_row << row
+            final_row << @ticket_submitted_by_submitter_type_data[:customer_chart_data][i]
+            final_row << @ticket_submitted_by_submitter_type_data[:guest_chart_data][i]
+            insert_row_with_data(final_row, mytickets_xlsx, mytickets_workbook_names[:ticket_submitted_by_submitter_type])
+          end
+
+          # Closed Email by Resolution
+          closed_email_by_resolution_data = Dispute.closed_ticket_entries_by_resolution_report([current_user], params[:startdate], params[:enddate], "E")
+          closed_email_by_resolution_data[:table_data].each do |d|
+            data_values = [d[:resolution], d[:count]]
+            insert_row_with_data(data_values, mytickets_xlsx, mytickets_workbook_names[:closed_email_by_resolution])
+          end
+
+          # Closed Web by Resolution
+          closed_web_by_resolution_data = Dispute.closed_ticket_entries_by_resolution_report([current_user], params[:startdate], params[:enddate], "W")
+          closed_web_by_resolution_data[:table_data].each do |d|
+            data_values = [d[:resolution], d[:count]]
+            insert_row_with_data(data_values, mytickets_xlsx, mytickets_workbook_names[:closed_web_by_resolution])
+          end
 
           # NOTE: Use the .delete method here with caution. For some reason,
           # deleting a single sheet, of any name, will also delete all other blank sheets in the file.

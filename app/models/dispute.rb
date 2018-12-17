@@ -1219,7 +1219,7 @@ class Dispute < ApplicationRecord
       ticket_user = result.user.cvs_username
       report_data[:table_data] << {:case_number => result.id,
                       :status => result.status,
-                      :d_entry_preview => "<span class='dispute_entry_content_first'>#{result.dispute_entries.first.hostlookup}</span><span class='dispute-count'>#{entry_count}</span>",
+                      :d_entry_preview => "<span class='dispute_entry_content_first'>#{result.dispute_entries.first&.hostlookup}</span><span class='dispute-count'>#{entry_count}</span>",
                       :age => distance_of_time_in_words(Time.now, result.created_at),
                       :submitter_type => result.submitter_type.downcase,
                       :submission_type => result.submission_type.upcase,
@@ -1262,7 +1262,7 @@ class Dispute < ApplicationRecord
       ticket_user = result.user.cvs_username
       report_data[:table_data] << {:case_number => result.id,
                       # :dispute => result.dispute_entries.first.hostlookup,
-                      :d_entry_preview => "<span class='dispute_entry_content_first'>#{result.dispute_entries.first.hostlookup}</span><span class='dispute-count'>#{entry_count}</span>",
+                      :d_entry_preview => "<span class='dispute_entry_content_first'>#{result.dispute_entries.first&.hostlookup}</span><span class='dispute-count'>#{entry_count}</span>",
                       :time_to_close => distance_of_time_in_words(result.created_at, result.case_resolved_at),
                       :submitter_type => result.submitter_type.downcase,
                       :submission_type => result.submission_type.upcase,
