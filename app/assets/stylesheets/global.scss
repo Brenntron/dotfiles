@@ -6939,3 +6939,15 @@ h2 {
   color: $second-section-color;
   font-weight: 600;
 }
+
+.sorting_1, .sorting_asc, .sorting_desc {
+  background-color: $faint-accent-color !important;
+  opacity: 80%;
+  background-position-x: 95% !important;
+}
+.sorting {
+  background-position-x: 95% !important;
+}
+#time-submitted {
+  width: 150px;
+}

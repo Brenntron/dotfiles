@@ -122,7 +122,9 @@ $ ->
               '<a href="http://' + ip_address + '" target="blank">' + ip_address + '</a>'
 
         }
-        { data: 'path' }
+        {
+          data: 'path'
+        }
         {
           'render': (data, type, full, meta) ->
             categories = ''
@@ -176,9 +178,7 @@ $ ->
       labelField: 'value',
       searchField: ['text'],
       options: AC.WebCat.createSelectOptions()
-
     }
-
 
     $('#general_search').on 'keyup', (e) ->
       if event.keyCode == 13
@@ -225,7 +225,6 @@ $ ->
       labelField: 'name'
       searchField: 'name'
       options: createSelectOptions()
-
     }
 
 $('#exampleModal').on 'shown.bs.modal', ->
