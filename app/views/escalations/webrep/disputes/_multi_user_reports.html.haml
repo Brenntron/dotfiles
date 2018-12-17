@@ -40,14 +40,14 @@
       %table.table.responsive.dashboard-tickets-table#table-multi-user-disputes-open
         %thead
           %tr
-            %th
+            %th.esc-tooltipped{title: 'Priority'}
             -#  priority
             %th Case ID
-            %th
+            %th.esc-tooltipped{title: 'Submitter Type'}
             -#  Submitter type
             %th Owner
             %th Status
-            %th
+            %th.esc-tooltipped{title: 'Ticket Type'}
             -#  Ticket type
             %th Dispute Preview
             %th Last Comment Date
@@ -90,13 +90,13 @@
       %table.table.responsive.dashboard-tickets-table#table-multi-user-disputes-closed
         %thead
           %tr
-            %th
+            %th.esc-tooltipped{title: 'Priority'}
             -#    priority
             %th Case ID
-            %th
+            %th.esc-tooltipped{title: 'Submitter Type'}
             -#  Submitter type
             %th Owner
-            %th
+            %th.esc-tooltipped{title: 'Ticket Type'}
             -#  Ticket type
             %th Dispute Preview
             %th Time to Close

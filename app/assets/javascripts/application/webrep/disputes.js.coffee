@@ -2625,20 +2625,28 @@ $ ->
       {
         data: 'priority'
         render: (data) ->
-          '<span class="bug-priority p-' + data + '"></span>'
+          '<span class="esc-tooltipped bug-priority p-' + data + '" title="Priority ' + data + '"></span>'
       }
       { data: 'case_number' }
       {
         data: 'submitter_type'
         render: (data) ->
-          '<span class="submitter-type-icon submitter-' + data + '"></span>'
+          if (data) == 'customer'
+            return '<span class="esc-tooltipped submitter-type-icon submitter-' + data + '" title="Customer"></span>'
+          else
+            return '<span class="esc-tooltipped submitter-type-icon submitter-' + data + '" title="Guest"></span>'
       }
       { data: 'owner' }
       { data: 'status' }
       {
         data: 'submission_type'
         render: (data) ->
-          '<span class="dispute-submission-type dispute-' + data  + '"></span>'
+          if (data) == 'E'
+            return '<span class="esc-tooltipped dispute-submission-type dispute-' + data  + '" title="Email"></span>'
+          else if (data) == 'W'
+            return '<span class="esc-tooltipped dispute-submission-type dispute-' + data  + '" title="Web"></span>'
+          else if (data) == 'EW'
+            return '<span class="esc-tooltipped dispute-submission-type dispute-' + data  + '" title="Email/Web"></span>'
       }
       { data: 'd_entry_preview' }
       { data: 'last_comment' }
@@ -2666,13 +2674,16 @@ $ ->
       {
         data: 'priority'
         render: (data) ->
-          '<span class="bug-priority p-' + data + '"></span>'
+          '<span class="esc-tooltipped bug-priority p-' + data + '" title="Priority ' + data + '"></span>'
       }
       { data: 'case_number' }
       {
         data: 'submitter_type'
         render: (data) ->
-          '<span class="submitter-type-icon submitter-' + data + '"></span>'
+          if (data) == 'customer'
+            return '<span class="esc-tooltipped submitter-type-icon submitter-' + data + '" title="Customer"></span>'
+          else
+            return '<span class="esc-tooltipped submitter-type-icon submitter-' + data + '" title="Guest"></span>'
       }
       {
         data: 'owner'
@@ -2680,7 +2691,12 @@ $ ->
       {
         data: 'submission_type'
         render: (data) ->
-          '<span class="dispute-submission-type dispute-' + data  + '"></span>'
+          if (data) == 'E'
+            return '<span class="esc-tooltipped dispute-submission-type dispute-' + data  + '" title="Email"></span>'
+          else if (data) == 'W'
+            return '<span class="esc-tooltipped dispute-submission-type dispute-' + data  + '" title="Web"></span>'
+          else if (data) == 'EW'
+            return '<span class="esc-tooltipped dispute-submission-type dispute-' + data  + '" title="Email/Web"></span>'
       }
       { data: 'd_entry_preview' }
       { data: 'time_to_close' }
