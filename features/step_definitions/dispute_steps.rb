@@ -60,7 +60,7 @@ Then(/^the Entry preload with id "(.*?)" should exist$/) do |id|
   expect(DisputeEntryPreload.where(id: id)).to exist
 end
 
-Given(/^a dispute entry with trait "(.*?)" exists$/) do| trait_name|
+Given(/^a dispute entry with trait "(.*?)" exists$/) do |trait_name|
   FactoryBot.create(:dispute_entry,trait_name.to_sym)
 end
 
@@ -70,4 +70,8 @@ end
 
 Given(/^a RuleHit Resolution Mailer template exists with mnemonic, "(.*?)"/) do |mnemonic|
   FactoryBot.create(:rulehit_resolution_mailer_template, mnemonic: mnemonic)
+end
+
+Given (/^Dispute entry should have a status of, "(.*?)"/) do |status|
+  expect(Dispute.first.priority).to eq(status)
 end

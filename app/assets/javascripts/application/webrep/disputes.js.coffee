@@ -1121,6 +1121,10 @@ $ ->
       'desc'
     ] ]
     dom: '<"datatable-top-tools no-margin-datatable-top-tool"lf>t<ip>'
+    language: {
+      search: "_INPUT_"
+      searchPlaceholder: "Search within table"
+    }
     columnDefs: [
       {
         targets: [
@@ -1217,7 +1221,7 @@ $ ->
 
 
     ])
-
+  $('#disputes-index_filter input').addClass('table-search-input');
   window.format = (dispute) ->
     table_head = '<table class="table dispute-entry-table">' + '<thead>' + '<tr>' + '<th><input class="dispute_entry_select_all" type="checkbox" onclick="select_or_deselect_all(' + dispute.id + ')" id=' + dispute.id + ' /></th>' + '<th class="entry-col-content">Dispute Entry</th>' + '<th class="entry-col-status">Dispute Entry Status</th>' + '<th class="entry-col-res">Dispute Entry Resolution</th>' + '<th class="entry-col-disp">Suggested Disposition</th>' + '<th class="entry-col-cat">Category</th>' + '<th class="entry-col-wbrs-score">WBRS Score</th>' + '<th class="entry-col-wbrs-hits">WBRS Total Rule Hits</th>' + '<th class="entry-col-wbrs-rules">WBRS Rules</th>' + '<th class="entry-col-sbrs-score">SBRS Score</th>' + '<th class="entry-col-sbrs-hits">SBRS Total Rule Hits</th>' + '<th class="entry-col-sbrs-rules">SBRS Rules</th>' + '</tr>' + '</thead>' + '<tbody>'
     entry = dispute.dispute_entries
@@ -1515,7 +1519,11 @@ $ ->
   $('#edit-dispute-button').click ->
     $('#dispute-priority-icon').hide()
     $('#dispute-priority-select').show()
-    $('.dispute-edit-field').hide()
+
+    $('#dispute-customer-name').hide()
+    $('#dispute-customer-email').hide()
+
+    $('.dispute-edit-input').css('display','block')
 
     $('#save-dispute-button').removeClass('hidden')
     $('#cancel-dispute-button').removeClass('hidden')
@@ -1541,6 +1549,7 @@ $ ->
     $('#cancel-dispute-button').addClass('hidden')
     $('#related-dispute-input').addClass('hidden')
     $('#edit-dispute-button').removeClass('hidden')
+    $('.dispute-edit-input').css('display','none')
 
 
   $('#index-adjust-wlbl').click ->

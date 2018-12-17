@@ -138,10 +138,11 @@ $ ->
     )
 
   $('.attachment-reply').on 'click', ->
-    $('.file-wrapper-reply').show()
-    $('#file-fields').append("<span class='file-attachment-wrapper'><input class= 'file_attachment' onchange='check_email_attachment_size(this)' name='attachment' type='file'/></span>")
-    $('.file_attachment:last').after("<button class='delete_attachment'>x</button>")
-    $('.file_attachment:last').click()
+    unless ( $(".file-attachment-reply > .file_attachment").length > 0 && !$(".file-attachment-wrapper > .file_attachment").last().val() )
+      $('.file-wrapper-reply').show()
+      $('#file-fields').append("<span class='file-attachment-wrapper file-attachment-reply'><input class= 'file_attachment' onchange='check_email_attachment_size(this)' name='attachment' type='file'/></span>")
+      $('.file_attachment:last').after("<button class='delete_attachment'>x</button>")
+      $('.file_attachment:last').click()
 
   $('body').on 'click', '.delete_attachment', ->
     $(this).parent().remove()
@@ -193,10 +194,11 @@ $ ->
     )
 
   $('.new-attachment').on 'click', ->
-    $('#file-fields-new').before("<span class='file-attachment-wrapper'><input class= 'file_attachment_new' onchange='check_email_attachment_size(this)' name='attachment' type='file'/></span>")
-    $('.file_attachment_new:last').after("<button class='delete_attachment_new'>x</button>")
-    $('.file_attachment_new:last').click()
-    false
+    unless ( $(".file-attachment-wrapper > .file_attachment_new").length > 0 && !$(".file-attachment-wrapper > .file_attachment_new").last().val() )
+      $('#file-fields-new').before("<span class='file-attachment-wrapper'><input class= 'file_attachment_new' onchange='check_email_attachment_size(this)' name='attachment' type='file'/></span>")
+      $('.file_attachment_new:last').after("<button class='delete_attachment_new'>x</button>")
+      $('.file_attachment_new:last').click()
+      false
 
   $('body').on 'click', '.delete_attachment_new', ->
     $(this).parent().remove()
@@ -235,6 +237,7 @@ $ ->
             std_msg_success('Email Sent.', [], reload: true)
           error: (response) ->
             $('#newEmail').modal('hide');
+            $('.delete_attachment_new').click()
             std_api_error(response, "Email was not sent", response, reload: false)
         )
       else
@@ -250,6 +253,7 @@ $ ->
             std_msg_success('Email Sent.', [], reload: true)
           error: (response) ->
             $('#newEmail').modal('hide');
+            $('.delete_attachment_new').click();
             std_api_error(response, "Email was not sent", response, reload: false)
         )
 
