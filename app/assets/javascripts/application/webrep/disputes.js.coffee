@@ -108,7 +108,9 @@ window.populate_webrep_index_table = (data = {}) ->
 
 
         if undefined != json.search_name
-          $('#saved-search-tbody').append(named_search_tag(json.search_name, json.search_id))
+          searchId = 'saved_search_' + json.search_id
+          if $('#saved-search-tbody tr#' + searchId).length == 0
+            $('#saved-search-tbody').append(named_search_tag(json.search_name, json.search_id))
 
     error: (response) ->
       $('#refresh-working-msg').hide()
