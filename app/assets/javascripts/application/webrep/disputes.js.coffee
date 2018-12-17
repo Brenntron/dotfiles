@@ -2697,17 +2697,31 @@ $ ->
   show_ticket_type_cb = $('.show-tickets-cb')
 
   $(show_ticket_type_cb).click ->
-    open_tickets_rows = $('#table-user-disputes-open').find('tr')
-    closed_tickets_rows = $('#table-user-disputes-closed').find('tr')
+#    Need to traverse to toolbar wrapper and get the sibling wrappers for the tables
+    toolbar_wrapper = $(this).parents('.toolbar')
+    table_wrappers = $(toolbar_wrapper[0]).siblings('.tickets-section-wrapper')
+    ticket_tables = $(table_wrappers).find('.dashboard-tickets-table')
+
     all_tickets_rows = []
-
-    $(open_tickets_rows).each ->
-      all_tickets_rows.push this
-    $(closed_tickets_rows).each ->
-      all_tickets_rows.push this
-
     customer_rows = []
     guest_rows = []
+    c_e_rows = []
+    c_w_rows = []
+    c_ew_rows = []
+    g_e_rows = []
+    g_w_rows = []
+    g_ew_rows = []
+
+    show_email_cb = $(toolbar_wrapper).find('.tickets-show-email-cb')
+    show_web_cb = $(toolbar_wrapper).find('.tickets-show-web-cb')
+    show_emailweb_cb = $(toolbar_wrapper).find('.tickets-show-email-web-cb')
+    show_customer_cb = $(toolbar_wrapper).find('.tickets-show-customer-cb')
+    show_guests_cb = $(toolbar_wrapper).find('.tickets-show-guest-cb')
+
+    $(ticket_tables).each ->
+      row = $(this).find('tr')
+      $(row).each ->
+        all_tickets_rows.push this
 
     $(all_tickets_rows).each ->
       parent_row = this
@@ -2716,13 +2730,6 @@ $ ->
         customer_rows.push parent_row
       if $(submitter_type).hasClass('submitter-guest')
         guest_rows.push parent_row
-
-    c_e_rows = []
-    c_w_rows = []
-    c_ew_rows = []
-    g_e_rows = []
-    g_w_rows = []
-    g_ew_rows = []
 
     $(customer_rows).each ->
       ticket_type = $(this).find('.dispute-submission-type')
@@ -2742,17 +2749,10 @@ $ ->
       if $(ticket_type).hasClass('dispute-EW')
         g_ew_rows.push this
 
-    show_email_cb = $('#tickets-show-email-cb')
-    show_web_cb = $('#tickets-show-web-cb')
-    show_emailweb_cb = $('#tickets-show-email-web-cb')
-    show_customer_cb = $('#tickets-show-customer-cb')
-    show_guests_cb = $('#tickets-show-guest-cb')
-
 
     if this == show_customer_cb[0]
       if this.checked
         if show_email_cb[0].checked
-          console.log 'email checked'
           $(c_e_rows).each ->
             if $(this).hasClass('hidden')
               $(this).removeClass('hidden')
@@ -2889,6 +2889,3 @@ $ ->
         $(g_ew_rows).each ->
           unless $(this).hasClass('hidden')
             $(this).addClass('hidden')
-
-
-

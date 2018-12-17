@@ -1,18 +1,17 @@
 .row
   .col-xl-6.col-lg-7.col-xs-12.dashboard-tickets-wrapper
     %h1.dashboard-header My Tickets
-    -# TODO Hook up the content layout list to the below tables, post launch
     .toolbar
       %div
         %label.toolbar-section-label
           Show Tickets by Submitter
         %span.toolbar-select-wrapper
           %label.toolbar-button-label.icon-custom-star.esc-tooltipped{for:'tickets-show-customer-cb', title: 'Customer Tickets'}
-            %input#tickets-show-customer-cb.toolbar-checkbox.show-tickets-cb{type: 'checkbox', checked: 'checked'}
+            %input#tickets-show-customer-cb.tickets-show-customer-cb.toolbar-checkbox.show-tickets-cb{type: 'checkbox', checked: 'checked'}
             %span.toolbar-button-text
               Customer Tickets
           %label.toolbar-button-label.icon-guest-user.esc-tooltipped{for:'tickets-show-guest-cb', title: 'Guest Tickets'}
-            %input#tickets-show-guest-cb.toolbar-checkbox.show-tickets-cb{type: 'checkbox', checked: 'checked'}
+            %input#tickets-show-guest-cb.tickets-show-guest-cb.toolbar-checkbox.show-tickets-cb{type: 'checkbox', checked: 'checked'}
             %span.toolbar-button-text
               Guest Tickets
       %div
@@ -20,18 +19,17 @@
           Show Tickets by Type
         %span.toolbar-select-wrapper
           %label.toolbar-button-label.dispute-E-grey.esc-tooltipped{for:'tickets-show-email-cb', title: 'Email Tickets'}
-            %input#tickets-show-email-cb.toolbar-checkbox.show-tickets-cb{type: 'checkbox', checked: 'checked'}
+            %input#tickets-show-email-cb.tickets-show-email-cb.toolbar-checkbox.show-tickets-cb{type: 'checkbox', checked: 'checked'}
             %span.toolbar-button-text
               Email Tickets
           %label.toolbar-button-label.dispute-W-grey.esc-tooltipped{for:'tickets-show-web-cb', title: 'Web Tickets'}
-            %input#tickets-show-web-cb.toolbar-checkbox.show-tickets-cb{type: 'checkbox', checked: 'checked'}
+            %input#tickets-show-web-cb.tickets-show-web-cb.toolbar-checkbox.show-tickets-cb{type: 'checkbox', checked: 'checked'}
             %span.toolbar-button-text
               Web Tickets
           %label.toolbar-button-label.dispute-EW-grey.esc-tooltipped{for:'tickets-show-email-web-cb', title: 'Email / Web Tickets'}
-            %input#tickets-show-email-web-cb.toolbar-checkbox.show-tickets-cb{type: 'checkbox', checked: 'checked'}
+            %input#tickets-show-email-web-cb.tickets-show-email-web-cb.toolbar-checkbox.show-tickets-cb{type: 'checkbox', checked: 'checked'}
             %span.toolbar-button-text
               Email / Web Tickets
-
 
     .tickets-section-wrapper.open-tickets-wrapper
       .open-tickets-header
