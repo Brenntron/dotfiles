@@ -88,10 +88,11 @@ class Escalations::Webrep::DisputesController < ApplicationController
         # customtickets - TBD; no spec for this yet
         # startdate - datetime (get from localstorage object)
         # enddate - datetime (get from localstorage object)
+        #
 
-        @contents = RubyXL::Workbook.new
-        def insert_row_with_data(data, sheetname, format = nil)
-          worksheet = @contents[sheetname]
+
+        def insert_row_with_data(data, filename, sheetname, format = nil)
+          worksheet = filename[sheetname]
           data_insertion_index = worksheet.sheet_data.rows.count
           data.each_with_index do |new_data, i|
             worksheet.add_cell(data_insertion_index, i, new_data)
@@ -108,22 +109,140 @@ class Escalations::Webrep::DisputesController < ApplicationController
           end
         end
 
+        @spreadsheet_directory = Dir.mktmpdir
+
         if params['mytickets'] == "true"
-          @contents.add_worksheet('My Tickets')
-          mytickets_headers = ['Priority', 'Case ID', 'Status', 'Entry Count', 'Owner', 'Customer Name', 'Customer Email', 'Customer Company', 'Company URL', 'Time Submitted', 'Age', 'Dispute Entry', 'Dispute Entry Status', 'Suggested Disposition', 'Category', 'WBRS Score', 'WBRS Total Rule Hits', 'SBRS Score', 'SBRS Total Rule Hits', 'Important?', 'Resolution', 'Resolution Comments']
-          insert_row_with_data(mytickets_headers, "My Tickets", "h1")
+          mytickets_file = File.new("#{@spreadsheet_directory}/my-tickets_#{Time.now}.xlsx", 'w+')
+          mytickets_xlsx = RubyXL::Workbook.new
+          mytickets_workbook_names = {
+              :my_open_tickets => 'My Open Tickets',
+              :my_closed_tickets => 'My Closed Tickets',
+              :total_ticket_entries_closed => 'Total Ticket Entries Closed',
+              :time_to_close_tickets => 'Time to Close Tickets',
+              :ticket_submitted_by_submitter_type => 'Tickets Submitted by Submitter Type',
+              :closed_email_by_resolution => 'Closed Email Entries by Resolution',
+              :closed_web_by_resolution => 'Closed Web Entries by Resolution'
+          }
+          mytickets_xlsx.add_worksheet(mytickets_workbook_names[:my_open_tickets])
+          mytickets_xlsx.add_worksheet(mytickets_workbook_names[:my_closed_tickets])
+          mytickets_xlsx.add_worksheet(mytickets_workbook_names[:total_ticket_entries_closed])
+          mytickets_xlsx.add_worksheet(mytickets_workbook_names[:time_to_close_tickets])
+          mytickets_xlsx.add_worksheet(mytickets_workbook_names[:ticket_submitted_by_submitter_type])
+          mytickets_xlsx.add_worksheet(mytickets_workbook_names[:closed_email_by_resolution])
+          mytickets_xlsx.add_worksheet(mytickets_workbook_names[:closed_web_by_resolution])
+
+
+          my_open_tickets_headers = ['Priority', 'Case ID', 'Status', 'Entry Count', 'Owner', 'Customer Name', 'Customer Email', 'Customer Company', 'Company URL', 'Time Submitted', 'Age', 'Dispute Entry', 'Dispute Entry Status', 'Suggested Disposition', 'Category', 'WBRS Score', 'WBRS Total Rule Hits', 'SBRS Score', 'SBRS Total Rule Hits', 'Important?', 'Resolution', 'Resolution Comments']
+          insert_row_with_data(my_open_tickets_headers, mytickets_xlsx, mytickets_workbook_names[:my_open_tickets], "h1")
+          insert_row_with_data(my_open_tickets_headers, mytickets_xlsx, mytickets_workbook_names[:my_closed_tickets], "h1")
+          insert_row_with_data(my_open_tickets_headers, mytickets_xlsx, mytickets_workbook_names[:total_ticket_entries_closed], "h1")
+          insert_row_with_data(my_open_tickets_headers, mytickets_xlsx, mytickets_workbook_names[:time_to_close_tickets], "h1")
+          insert_row_with_data(my_open_tickets_headers, mytickets_xlsx, mytickets_workbook_names[:ticket_submitted_by_submitter_type], "h1")
+          insert_row_with_data(my_open_tickets_headers, mytickets_xlsx, mytickets_workbook_names[:closed_email_by_resolution], "h1")
+          insert_row_with_data(my_open_tickets_headers, mytickets_xlsx, mytickets_workbook_names[:closed_web_by_resolution], "h1")
+          # Do other data insertion here
+
+          # NOTE: Use the .delete method here with caution. For some reason,
+          # deleting a single sheet, of any name, will also delete all other blank sheets in the file.
+          # As long as you have your data inserted before you do this, nothing should go wrong.
+          # I think this could be because of .rewinding and .reading the file later on,
+          # but don't have time to look into it at the moment. Could also just be a bug in
+          # RubyXL.
+          mytickets_xlsx.worksheets.delete(mytickets_xlsx['Sheet1'])
+
+          mytickets_xlsx.write(mytickets_file)
+          mytickets_file.rewind
+          @mytickets_output_file = mytickets_file.read
         end
 
+        # send_data @mytickets_output_file, filename: "my_tickets_#{Time.now}.xlsx", disposition: 'attachment'
+
+
         if params['myteamtickets'] == "true"
-          @contents.add_worksheet('My Team Tickets')
-          myteamtickets_headers = ['Priority', 'Case ID', 'Status', 'Entry Count', 'Owner', 'Customer Name', 'Customer Email', 'Customer Company', 'Company URL', 'Time Submitted', 'Age', 'Dispute Entry', 'Dispute Entry Status', 'Suggested Disposition', 'Category', 'WBRS Score', 'WBRS Total Rule Hits', 'SBRS Score', 'SBRS Total Rule Hits', 'Important?', 'Resolution', 'Resolution Comments']
-          insert_row_with_data(myteamtickets_headers, "My Team Tickets", "h1")
+          myteamtickets_file = File.new("#{@spreadsheet_directory}/my-team-tickets_#{Time.now}.xlsx", 'w+')
+          myteamtickets_xlsx = RubyXL::Workbook.new
+          myteamtickets_workbook_names = {
+              :my_open_tickets => 'My Open Tickets',
+              :my_closed_tickets => 'My Closed Tickets',
+              :total_ticket_entries_closed => 'Total Ticket Entries Closed',
+              :time_to_close_tickets => 'Time to Close Tickets',
+              :ticket_submitted_by_submitter_type => 'Tickets Submitted by Submitter Type',
+              :closed_email_by_resolution => 'Closed Email Entries by Resolution',
+              :closed_web_by_resolution => 'Closed Web Entries by Resolution'
+          }
+          myteamtickets_xlsx.add_worksheet(myteamtickets_workbook_names[:my_open_tickets])
+          myteamtickets_xlsx.add_worksheet(myteamtickets_workbook_names[:my_closed_tickets])
+          myteamtickets_xlsx.add_worksheet(myteamtickets_workbook_names[:total_ticket_entries_closed])
+          myteamtickets_xlsx.add_worksheet(myteamtickets_workbook_names[:time_to_close_tickets])
+          myteamtickets_xlsx.add_worksheet(myteamtickets_workbook_names[:ticket_submitted_by_submitter_type])
+          myteamtickets_xlsx.add_worksheet(myteamtickets_workbook_names[:closed_email_by_resolution])
+          myteamtickets_xlsx.add_worksheet(myteamtickets_workbook_names[:closed_web_by_resolution])
+
+
+          my_open_tickets_headers = ['Priority', 'Case ID', 'Status', 'Entry Count', 'Owner', 'Customer Name', 'Customer Email', 'Customer Company', 'Company URL', 'Time Submitted', 'Age', 'Dispute Entry', 'Dispute Entry Status', 'Suggested Disposition', 'Category', 'WBRS Score', 'WBRS Total Rule Hits', 'SBRS Score', 'SBRS Total Rule Hits', 'Important?', 'Resolution', 'Resolution Comments']
+          insert_row_with_data(my_open_tickets_headers, myteamtickets_xlsx, myteamtickets_workbook_names[:my_open_tickets], "h1")
+          insert_row_with_data(my_open_tickets_headers, myteamtickets_xlsx, myteamtickets_workbook_names[:my_closed_tickets], "h1")
+          insert_row_with_data(my_open_tickets_headers, myteamtickets_xlsx, myteamtickets_workbook_names[:total_ticket_entries_closed], "h1")
+          insert_row_with_data(my_open_tickets_headers, myteamtickets_xlsx, myteamtickets_workbook_names[:time_to_close_tickets], "h1")
+          insert_row_with_data(my_open_tickets_headers, myteamtickets_xlsx, myteamtickets_workbook_names[:ticket_submitted_by_submitter_type], "h1")
+          insert_row_with_data(my_open_tickets_headers, myteamtickets_xlsx, myteamtickets_workbook_names[:closed_email_by_resolution], "h1")
+          insert_row_with_data(my_open_tickets_headers, myteamtickets_xlsx, myteamtickets_workbook_names[:closed_web_by_resolution], "h1")
+          # Do other data insertion here
+
+          myteamtickets_xlsx.worksheets.delete(myteamtickets_xlsx['Sheet1'])
+
+          myteamtickets_xlsx.write(myteamtickets_file)
+          myteamtickets_file.rewind
+          @myteamtickets_output_file = myteamtickets_file.read
+        end
+
+        # send_data @myteamtickets_output_file, filename: "my_team_tickets_#{Time.now}.xlsx", disposition: 'attachment'
+
+        input_filenames = Dir.entries(@spreadsheet_directory).select {|f| !File.directory? f}
+        if input_filenames.count > 1
+
+          #Attachment name
+          filename = "webrep_export-#{Time.now}.zip"
+          temp_file = Tempfile.new(filename)
+
+          begin
+            #This is the tricky part
+            #Initialize the temp file as a zip file
+            Zip::OutputStream.open(temp_file) { |zos| }
+
+            #Add files to the zip file as usual
+            Zip::File.open(temp_file.path, Zip::File::CREATE) do |zipfile|
+              #Put files in here
+              input_filenames.each do |filename|
+                  # Two arguments:
+                  # - The name of the file as it will appear in the archive
+                  # - The original file, including the path to find it
+                  zipfile.add(filename, File.join(@spreadsheet_directory, filename))
+                end
+            end
+
+            #Read the binary data from the file
+            zip_data = File.read(temp_file.path)
+
+            #Send the data to the browser as an attachment
+            #We do not send the file directly because it will
+            #get deleted before rails actually starts sending it
+            send_data(zip_data, :type => 'application/zip', :filename => filename)
+          ensure
+            #Close and delete the temp file
+            temp_file.close
+            temp_file.unlink
+          end
+
+        else
+          send_file File.join(@spreadsheet_directory, input_filenames[0]), :disposition => 'attachment'
         end
 
         if params['alltickets'] == "true"
-          @contents.add_worksheet('All Tickets')
-          alltickets_headers = ['Priority', 'Case ID', 'Status', 'Entry Count', 'Owner', 'Customer Name', 'Customer Email', 'Customer Company', 'Company URL', 'Time Submitted', 'Age', 'Dispute Entry', 'Dispute Entry Status', 'Suggested Disposition', 'Category', 'WBRS Score', 'WBRS Total Rule Hits', 'SBRS Score', 'SBRS Total Rule Hits', 'Important?', 'Resolution', 'Resolution Comments']
-          insert_row_with_data(alltickets_headers, "All Tickets", "h1")
+          # Not yet implemented
+          # @contents.add_worksheet('All Tickets')
+          # alltickets_headers = ['Priority', 'Case ID', 'Status', 'Entry Count', 'Owner', 'Customer Name', 'Customer Email', 'Customer Company', 'Company URL', 'Time Submitted', 'Age', 'Dispute Entry', 'Dispute Entry Status', 'Suggested Disposition', 'Category', 'WBRS Score', 'WBRS Total Rule Hits', 'SBRS Score', 'SBRS Total Rule Hits', 'Important?', 'Resolution', 'Resolution Comments']
+          # insert_row_with_data(alltickets_headers, "All Tickets", "h1")
         end
 
         if params['customtickets'] == "true"
@@ -172,9 +291,9 @@ class Escalations::Webrep::DisputesController < ApplicationController
         #
         #
 
-        @contents.worksheets.delete(@contents['Sheet1'])
-        send_data @contents.stream.string, filename: "disputes_search_#{Time.now}.xlsx",
-                  disposition: 'attachment'
+        # @contents.worksheets.delete(@contents['Sheet1'])
+        # send_data @contents.stream.string, filename: "disputes_search_#{Time.now}.xlsx",
+        #           disposition: 'attachment'
       end
     end
   end
