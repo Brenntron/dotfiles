@@ -17,8 +17,6 @@
 //= require bootstrap-sprockets
 //= require bootstrap-table.min
 //= require admin/bs-dropdown-select
-//= require admin/rules
-//= require admin/notes
 //= require admin/bs-admin-tabs
 //= require admin/std_api
 //= require admin/std_msg
