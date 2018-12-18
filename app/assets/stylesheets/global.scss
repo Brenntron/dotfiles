@@ -6721,6 +6721,26 @@ h2 {
     margin-right: 10px;
   }
 
+  .nav-tabs > li > a {
+    display: block;
+    height: 100%;
+    padding: 0 15px 0 30px;
+    font-size: 11px;
+    text-decoration: none;
+    color: $type-lighter-color;
+    background-color: transparent;
+    line-height: 4.5em;
+    box-shadow: none;
+    border: none;
+    border-radius: 0;
+    text-transform: none;
+    margin: 0;
+  }
+
+  .nav-tabs::before {
+    background-color: transparent;
+  }
+
   ul {
     margin: 0;
     padding: 0;
@@ -6735,15 +6755,6 @@ h2 {
       display: inline-block;
       line-height: 50px;
       cursor: pointer;
-
-      a {
-        display: block;
-        height: 100%;
-        padding: 0 15px 0 30px;
-        font-size: 11px;
-        text-decoration: none;
-        color: $type-lighter-color;
-      }
 
       a:hover {
         color: white;
