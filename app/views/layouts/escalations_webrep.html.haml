@@ -63,7 +63,7 @@
           %tbody#saved-search-tbody
             - if current_user.named_searches.any?
               - current_user.named_searches.each do |named_search|
-                %tr{id: "saved_search_#{named_search.id}", class: "#{named_search.name}"}
+                %tr{id: "saved_search_#{named_search.id}", class: "named_search_#{named_search.name}"}
                   %td
                     %a.saved-search{onclick: "named_webrep_index_table('#{named_search.name}');"}
                       = named_search.name
