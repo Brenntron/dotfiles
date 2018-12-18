@@ -60,7 +60,7 @@ Then(/^the Entry preload with id "(.*?)" should exist$/) do |id|
   expect(DisputeEntryPreload.where(id: id)).to exist
 end
 
-Given(/^a dispute entry with trait "(.*?)" exists$/) do| trait_name|
+Given(/^a dispute entry with trait "(.*?)" exists$/) do |trait_name|
   FactoryBot.create(:dispute_entry,trait_name.to_sym)
 end
 
@@ -78,4 +78,7 @@ end
 
 Given(/^a named search criteria exists with field_name: "(.*?)" and value: "(.*?)"/) do |field_name, value|
   FactoryBot.create(:named_search_criterion, field_name: field_name, value: value)
+
+Given (/^Dispute entry should have a status of, "(.*?)"/) do |status|
+  expect(Dispute.first.priority).to eq(status)
 end

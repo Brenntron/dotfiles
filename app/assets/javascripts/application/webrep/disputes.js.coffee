@@ -1,7 +1,8 @@
 window.select_or_deselect_all = (dispute_id)->
 
-
   $('.dispute-entry-checkbox_' + dispute_id).prop('checked', $('#' + dispute_id).prop('checked'))
+  $('.dispute-entry-checkbox_' + dispute_id).each ->
+    toggleRow(this)
 
 window.populate_webrep_index_table = (data = {}, reload = false) ->
   data['reload'] = reload
@@ -100,6 +101,7 @@ window.populate_webrep_index_table = (data = {}, reload = false) ->
             $('.dispute-entry-checkbox').each ->
               if this.id == dispute_entry_click
                 this.checked = true
+                toggleRow(this)
         if array_of_dispute_entry_selectalls.length > 0
           for dispute_entry_selectall in array_of_dispute_entry_selectalls
             $('.dispute_entry_select_all').each ->
@@ -1276,7 +1278,7 @@ $ ->
       if this.entry.sbrs_score != null
         sbrs_score = this.entry.sbrs_score
       else sbrs_score = missing_data
-      entry_row = '<tr class="index-entry-row">' + '<td><input type="checkbox" class="dispute-entry-checkbox dispute-entry-checkbox_' + dispute.id + '" id= ' + dispute_entry_id + ' ></td>' + '<td class="entry-col-content ' + important + '">' + entry_content + '</td>' +
+      entry_row = '<tr class="index-entry-row">' + '<td><input type="checkbox" onclick="toggleRow(this)" class="dispute-entry-checkbox dispute-entry-checkbox_' + dispute.id + '" id= ' + dispute_entry_id + ' ></td>' + '<td class="entry-col-content ' + important + '">' + entry_content + '</td>' +
         '<td class="entry-col-status">' + status + '</td>' +
         '<td class="entry-col-res esc-tooltipped" title="' + resolution_comment + '">' + resolution + '</td>' +
         '<td class="entry-col-disp">' + suggested_disposition + '</td>' +
@@ -1521,7 +1523,11 @@ $ ->
   $('#edit-dispute-button').click ->
     $('#dispute-priority-icon').hide()
     $('#dispute-priority-select').show()
-    $('.dispute-edit-field').hide()
+
+    $('#dispute-customer-name').hide()
+    $('#dispute-customer-email').hide()
+
+    $('.dispute-edit-input').css('display','block')
 
     $('#save-dispute-button').removeClass('hidden')
     $('#cancel-dispute-button').removeClass('hidden')
@@ -1547,6 +1553,7 @@ $ ->
     $('#cancel-dispute-button').addClass('hidden')
     $('#related-dispute-input').addClass('hidden')
     $('#edit-dispute-button').removeClass('hidden')
+    $('.dispute-edit-input').css('display','none')
 
 
   $('#index-adjust-wlbl').click ->
@@ -1786,6 +1793,9 @@ window.populate_resolution_dropdown = (dispute_id) ->
 
       $('.entry-status-radio' + '.' + status + '_' + dispute_id).prop("checked", true)
   )
+
+window.disputes_select_all_check_box = () ->
+  $('.dispute_check_box').prop('checked', $('#disputes_check_box').prop('checked'))
 
 $ ->
 
