@@ -359,7 +359,7 @@ Feature: Disputes
     And I trigger-click "#submit-advanced-search"
     And I trigger-click "#filter-cases"
     Then I should see content "Cucumber" within "#saved-searches-wrapper"
-    And There is only one element of class, "Cucumber"
+    And There is only one element of class, "named_search_Cucumber"
 
   @javascript
   Scenario: A user creates a new named search for disputes and stays on the page (tests to make sure multiple named search criteria are not created)
