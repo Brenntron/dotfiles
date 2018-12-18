@@ -9,9 +9,9 @@ class ApplicationController < ActionController::Base
 
   private
 
+  # TODO Unneeded?
   def require_login
     session[:previous_url] = request.url
-    # redirect_to new_escalations_session_path unless current_user
   end
 
   def bugzilla_session()

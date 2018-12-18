@@ -27,6 +27,7 @@ class Escalations::PeakeBridge::MessagesController < ApplicationController
         message_payload[:bugzilla_rest_session] = bugzilla_rest_session
         message_payload[:current_user] = current_user
 
+        # This is so the tests can stub out the `threaded?` method and test synchronously.
         if self.class.threaded?
           Thread.new do
             obj_type.constantize.process_bridge_payload(message_payload)

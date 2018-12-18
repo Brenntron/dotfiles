@@ -11,7 +11,6 @@ class DisputeEmailAttachment < ApplicationRecord
     bug_proxy = bugzilla_rest_session.build_bug(id: dispute_email.dispute.id)
 
     options = {
-      # ids: dispute_email.dispute.id,
       data: Base64.encode64(file_content),
       file_name: payload[:file_name],
       content_type: payload[:content_type],
