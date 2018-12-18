@@ -38,8 +38,13 @@ class ApplicationController < ActionController::Base
 
   def set_version
     begin
-      @version = (File.read './public/version.html').gsub('analyst-console-','').split('.')
-      @version = @version[0] + '.' + @version[1] + '.' + @version[2]
+      @version = (File.read './public/version.html')
+      if /(?<version>[0-9\.]+)\z/ =~ @version
+        @version = version.split('.')
+        @version = @version[0] + '.' + @version[1] + '.' + @version[2]
+      else
+        @version = nil
+      end
     rescue
       @version = nil
     end
