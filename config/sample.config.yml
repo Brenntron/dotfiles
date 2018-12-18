@@ -200,6 +200,7 @@ staging:
       api_key: "redacted"
   bugzilla:
     host: "bugzilla-staging.vrt.sourcefire.com"
+    api_key: "redacted"
   cert:
     vrt: "/usr/local/etc/trusted-certificates.pem"
   peakebridge:
@@ -231,6 +232,10 @@ staging:
     gssnegotiate: true
   ruletest:
     url: "https://fmd-rultst-01stg.vrt.sourcefire.com"
+  sds:
+    host: "v2.sds.cisco.com"
+    cert_file: "/usr/local/etc/sds-certificate.pem"
+    pkey_file: "/usr/local/etc/sds-pkey.pem"
   snort_doc_max_fails: 3
   snort_org:
     host: "localhost"
@@ -274,6 +279,7 @@ production:
       api_key: "redacted"
   bugzilla:
     host: "bugzilla.vrt.sourcefire.com"
+    api_key: "redacted"
   cert:
     vrt: "/usr/local/etc/trusted-certificates.pem"
   peakebridge:
