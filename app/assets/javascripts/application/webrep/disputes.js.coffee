@@ -153,14 +153,8 @@ window.advanced_webrep_index_table = () ->
     modified_older: form.find('input[id="modified-older-input"]').val()
     modified_newer: form.find('input[id="modified-newer-input"]').val()
   }
+
   window.current_search_data = data
-
-  prevent_duplicate = data['search_name']
-  prevent_duplicate = prevent_duplicate.replace(/\W/g, '')
-
-  if $('.'+prevent_duplicate).length > 0
-    $('.'+prevent_duplicate)[0].remove()
-
   window.populate_webrep_index_table(data)
 
 window.standard_webrep_index_table = (search_name) ->
