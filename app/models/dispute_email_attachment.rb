@@ -8,7 +8,6 @@ class DisputeEmailAttachment < ApplicationRecord
       file_content = payload[:file_content].read
     end
 
-    byebug
     bug_proxy = bugzilla_rest_session.build_bug(id: dispute_email.dispute.id)
 
     options = {
