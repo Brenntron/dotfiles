@@ -311,11 +311,20 @@ Feature: Disputes
     Then I should see "Name can't be blank and Body can't be blank"
 
   @javascript
-  Scenario: A user tries to update a dispute
+  Scenario: A user updates a dispute's status (top navigation bar)
     Given a user with role "webrep user" exists and is logged in
     And the following disputes exist and have entries:
       |id  |
       |5370|
+    When I goto "/escalations/webrep/disputes/5370"
+    And I click "#show-edit-ticket-status-button"
+    And I click "#ESCALATED"
+    And I click ".primary"
+    Then I should see content "Escalated" within "#show-edit-ticket-status-button"
+    And I click "#show-edit-ticket-status-button"
+    And I click "#RESOLVED_CLOSED"
+    And I click ".primary"
+    Then I should see content "RESOLVED_CLOSED" within "#show-edit-ticket-status-button"
     And I goto "/escalations/webrep/disputes/5370"
     When I click "#edit-dispute-button"
     And I fill in "dispute-customer-name-input" with "John Smith"
