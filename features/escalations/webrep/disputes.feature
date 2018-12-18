@@ -313,10 +313,10 @@ Feature: Disputes
     Given a user with role "webrep user" exists and is logged in
     When I goto "/escalations/webrep/disputes"
     And I trigger-click "#advanced-search-button"
-    And I fill in "search_name" with "Lab Rat"
+    And I fill in "search_name" with "Lab"
     And I trigger-click "#submit-advanced-search"
     And I trigger-click "#filter-cases"
-    Then I should see content "Lab Rat" within "#saved-searches-wrapper"
+    Then I should see content "Lab" within "#saved-searches-wrapper"
 
   @javascript
   Scenario: A user uses a new named search for disputes
@@ -327,7 +327,7 @@ Feature: Disputes
     And the following disputes exist and have entries:
       |id|status|
       |2 |NEW   |
-    And a named search with the name, "Cucumber Test" exists
+    And a named search with the name, "Cucumber" exists
     And a named search criteria exists with field_name: "status" and value: "NEW"
     When I goto "/escalations/webrep/disputes?f=closed"
     Then I should not see "0000000001"
@@ -344,10 +344,23 @@ Feature: Disputes
     Given a user with role "webrep user" exists and is logged in
     When I goto "/escalations/webrep/disputes?f=closed"
     And I trigger-click "#advanced-search-button"
-    And I fill in "search_name" with "Cucumber Test"
+    And I fill in "search_name" with "Cucumber"
     And I trigger-click "#submit-advanced-search"
     And I trigger-click "#filter-cases"
-    Then I should see content "Cucumber Test" within "#saved-searches-wrapper"
+    Then I should see content "Cucumber" within "#saved-searches-wrapper"
+
+  @javascript
+  Scenario: A user creates a duplicate named search for disputes
+    Given a user with role "webrep user" exists and is logged in
+    And a named search with the name, "Cucumber" exists
+    And a named search criteria exists with field_name: "status" and value: "NEW"
+    When I goto "/escalations/webrep/disputes?f=closed"
+    And I trigger-click "#advanced-search-button"
+    And I fill in "search_name" with "Cucumber"
+    And I trigger-click "#submit-advanced-search"
+    And I trigger-click "#filter-cases"
+    Then I should see content "Cucumber" within "#saved-searches-wrapper"
+    And There is only one element of class, "Cucumber"
 
   @javascript
   Scenario: A user creates a new named search for disputes and stays on the page (tests to make sure multiple named search criteria are not created)
