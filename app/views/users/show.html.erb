@@ -35,15 +35,15 @@
             <% end %>
           </div>
 
+      <% if can?(:manage_bugzilla_api, @user) %>
+        <div>
+          <%= link_to 'Bugzilla API Key', edit_escalations_user_bugzilla_api_key_path(@user) %>
+        </div>
+      <% end %>
+
       <% if current_user.has_role?('api user') %>
         <div class="col-xs-12">
           <h4>Log In Settings:</h4>
-          <% if can?(:manage_bugzilla_api, @user) %>
-              <div>
-                <%= link_to 'Bugzilla API Key', edit_escalations_user_bugzilla_api_key_path(@user) %>
-              </div>
-          <% end %>
-
           <p>Bugzilla Token: <pre><%= xml_token %></pre></p>
         </div>
       <% end %>
