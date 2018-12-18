@@ -5,36 +5,37 @@ window.apply_filter_to_table = () ->
 
 
 window.populate_clusters_index_table = (filter) ->
-  $('.cluster-mgt-loader-wrapper').removeClass('hidden')
-  filter_param = ""
-  if filter
-    filter_param = "?regex=" + filter
+  if $('#clusters-index_wrapper').length > 0
+    $('.cluster-mgt-loader-wrapper').removeClass('hidden')
+    filter_param = ""
+    if filter
+      filter_param = "?regex=" + filter
 
-  headers = {'Token': $('input[name="token"]').val(), 'Xmlrpc-Token': $('input[name="xml_token"]').val()}
-  $.ajax(
-    url: "/escalations/api/v1/escalations/webcat/clusters" + filter_param
-    method: 'GET'
-    headers: headers
-    success: (response) ->
-      $('.cluster-mgt-loader-wrapper').addClass('hidden')
-      json = $.parseJSON(response)
-      if json.data.length == 0
-        std_msg_error("No clusters available.","")
-      if json.error
-        std_msg_error('Table Error', [json.error])
-      else
-        datatable = $('#clusters-index').DataTable()
-        datatable.clear();
-        datatable.rows.add(json.data);
-        datatable.draw();
+    headers = {'Token': $('input[name="token"]').val(), 'Xmlrpc-Token': $('input[name="xml_token"]').val()}
+    $.ajax(
+      url: "/escalations/api/v1/escalations/webcat/clusters" + filter_param
+      method: 'GET'
+      headers: headers
+      success: (response) ->
+        $('.cluster-mgt-loader-wrapper').addClass('hidden')
+        json = $.parseJSON(response)
+        if json.data.length == 0
+          std_msg_error("No clusters available.","")
+        if json.error
+          std_msg_error('Table Error', [json.error])
+        else
+          datatable = $('#clusters-index').DataTable()
+          datatable.clear();
+          datatable.rows.add(json.data);
+          datatable.draw();
 
-        selectize_category_inputs();
+          selectize_category_inputs();
 
-        $("#total_results").html(json.meta.rows_found)
+          $("#total_results").html(json.meta.rows_found)
 
-    error: (response) ->
-      std_msg_error('Table Error', [response.responseText])
-  , this)
+      error: (response) ->
+        std_msg_error('Table Error', [response.responseText])
+    , this)
 
 window.categorize_clusters = () ->
 
