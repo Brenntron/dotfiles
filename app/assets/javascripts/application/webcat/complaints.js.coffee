@@ -37,6 +37,8 @@ window.updateURI = (complaint_entry_id) ->
         $("#history-#{complaint_entry_id}").replaceWith('<button class="secondary" id="history-' + complaint_entry_id + '" onclick="history_dialog('+complaint_entry_id+')">History</button>')
         $("#domain-#{complaint_entry_id}").replaceWith('<button class="secondary" id="domain-' + complaint_entry_id + '" onclick="domain_whois(\''+response.domain+'\')">Domain</button>')
 
+        std_msg_success("Success",['URI updated.'])
+
 
 
 
@@ -45,28 +47,41 @@ window.updateURI = (complaint_entry_id) ->
 
 window.cat_new_url = ()->
   event.preventDefault()
-  $('#loader-modal').modal({
-    backdrop: 'static',
-    keyboard: false
-  })
-  data = {}
-  for i in [1...6] by 1
-    data[i] = {url: $("#url_#{i}").val(), cats: $("#cat_new_url_#{i}").val()}
-  headers = {'Token': $('input[name="token"]').val(), 'Xmlrpc-Token': $('input[name="xml_token"]').val()}
 
-  $.ajax(
-    url:'/escalations/api/v1/escalations/webcat/complaints/cat_new_url'
-    method: 'POST'
-    headers: headers
-    data: {data: data}
-    success: (response) ->
-      $('#loader-modal').hide()
-      std_msg_success('URLs categorized successfully.',["Categorization of a Top URL will create a pending complaint entry.", "All other entries have been submitted directly to WBRS."], reload: true)
-    error: (response) ->
-      $('#loader-modal').hide()
-      $('.modal-backdrop').remove()
-      std_msg_error(response,"", reload: false)
-  )
+  data = {}
+  isEmpty = true
+
+  for i in [1...6] by 1
+
+    data[i] = {url: $("#url_#{i}").val(), cats: $("#cat_new_url_#{i}").val()}
+
+    if data[i].url.length > 0 && data[i].cats != null
+      isEmpty = false
+
+  if isEmpty == false
+
+    $('#loader-modal').modal({
+      backdrop: 'static',
+      keyboard: false
+    })
+
+    std_msg_ajax(
+      url:'/escalations/api/v1/escalations/webcat/complaints/cat_new_url'
+      method: 'POST'
+      data: {data: data}
+      success: (response) ->
+        $('.modal-backdrop').hide()
+        $('#loader-modal').hide()
+        std_msg_success('URLs categorized successfully',["Categorization of a Top URL will create a pending complaint entry.", "All other entries have been submitted directly to WBRS."], reload: true)
+
+      error: (response) ->
+        $('.modal-backdrop').hide()
+        $('#loader-modal').hide()
+        std_msg_error("Error",["Unable to categorize url."], reload: false)
+    )
+  else
+    std_msg_error("Unable to categorize", ["Please confirm that a URL and at least one category for each desired entry exists."], reload: false)
+
 
 window.webcat_reset_search = ()->
   inputs = document.getElementsByClassName('form-control')
@@ -78,29 +93,32 @@ window.webcat_reset_search = ()->
 
 window.multiple_url_categorization = ()->
   event.preventDefault()
-  $('#loader-modal').modal({
-    backdrop: 'static',
-    keyboard: false
-  })
 
   urls = $("#categorize_urls").val().split(/\n/)
   cats = $("#multi_cat_url_cats").val()
 
-  headers = {'Token': $('input[name="token"]').val(), 'Xmlrpc-Token': $('input[name="xml_token"]').val()}
+  if $("#categorize_urls").val() != "" && cats != null
+    $('#loader-modal').modal({
+      backdrop: 'static',
+      keyboard: false
+    })
 
-  $.ajax(
-    url:'/escalations/api/v1/escalations/webcat/complaints/multi_cat_new_url'
-    method: 'POST'
-    headers: headers
-    data: {urls: urls, cats: cats}
-    success: (response) ->
-      $('#loader-modal').hide()
-      std_msg_success('URLs categorized successfully.',"", reload: true)
-    error: (response) ->
-      $('#loader-modal').hide()
-      $('.modal-backdrop').remove();
-      std_msg_error('Error:' + ' ' + response.responseJSON.message,"", reload: false)
-  )
+    std_msg_ajax(
+      url:'/escalations/api/v1/escalations/webcat/complaints/multi_cat_new_url'
+      method: 'POST'
+      data: {urls: urls, cats: cats}
+      success: (response) ->
+        $('#loader-modal').hide()
+        $('.modal-backdrop').remove()
+        std_msg_success('Success',["URLs/IPs successfully categorized."], reload: true)
+      error: (response) ->
+        $('#loader-modal').hide()
+        $('.modal-backdrop').remove()
+        std_msg_error('Error' + ' ' + response.responseJSON.message,"", reload: false)
+    )
+  else
+    $('#loader-modal').hide()
+    std_msg_error('Error', ['Please check that a URL/IP has been inputted and that at least one category was selected.'], reload: false)
 
 name_servers =(server_list)->
   if undefined == server_list
@@ -444,11 +462,11 @@ window.lookup_prefix = () ->
       for [i .. 5]
         j = 0
         try
-          for [j .. response.json[i].data.length]
+          for [j .. Object.keys(response.json[i]).length]
             selector = '#cat_new_url_' + i.toString()
             $select= $(selector).selectize()
             selectize = $select[0].selectize
-            selectize.addItem(response.json[i].data[j].descr)
+            selectize.addItem(response.json[i][j])
             j++
         catch
           i++
@@ -462,55 +480,57 @@ window.retrieve_history = (position) ->
 
   url = $("#url_" + position).val()
 
-  std_msg_ajax(
-    url: '/escalations/api/v1/escalations/webcat/complaint_entries/categorize_urls_history'
-    method: 'POST'
-    data: {'position': position, url: url}
-    success: (response) ->
-      json = JSON.parse(response)
+  if url.length > 0
+    std_msg_ajax(
+      url: '/escalations/api/v1/escalations/webcat/complaint_entries/categorize_urls_history'
+      method: 'POST'
+      data: {'position': position, url: url}
+      success: (response) ->
+        json = JSON.parse(response)
 
-      if json.error
-        std_msg_error("<p>Something went wrong: #{json.error}","")
-      else
-        #parse this json properly
-        history_dialog_content = '<div class="dialog-content-wrapper">' +
-          '<h5>Domain History</h5>' +
-          '<table class="history-table"><thead><tr><th>Action</th><th>Confidence</th><th>Description</th><th>Time</th><th>User</th><th>Category</th></tr></thead>' +
-          '<tbody>'
-
-        for entry in json
-
-          entry_string = "" +
-            '<tr>' +
-            '<td>' + entry['action'] + '</td>' +
-            '<td>' + entry['confidence'] + '</td>' +
-            '<td>' + entry['description'] + '</td>' +
-            '<td>' + entry['time'] + '</td>' +
-            '<td>' + entry['user'] + '</td>' +
-            '<td>' + entry['category']['descr'] + '</td>' +
-            '</tr>'
-
-          history_dialog_content += entry_string
-        history_dialog_content += '</tbody></table>'
-
-        if $("#history_dialog").length
-          history_dialog = this
-          $("#history_dialog").html(history_dialog_content)
-          $('#history_dialog').dialog('open')
+        if json.error
+          std_msg_error("<p>Something went wrong: #{json.error}","")
         else
-          history_dialog = '<div id="history_dialog" title="History Information"></div>'
-          $('body').append(history_dialog)
-          $("#history_dialog").html(history_dialog_content)
-          #$('#history_dialog').append(history_dialog_content)
-          $('#history_dialog').dialog
-            autoOpen: false
-            minWidth: 600
-            position: { my: "right top", at: "right top", of: window }
-          $('#history_dialog').dialog('open')
+          history_dialog_content = '<div class="dialog-content-wrapper">' +
+            '<h5>Domain History</h5>' +
+            '<table class="history-table"><thead><tr><th>Action</th><th>Confidence</th><th>Description</th><th>Time</th><th>User</th><th>Category</th></tr></thead>' +
+            '<tbody>'
 
-    error: (response) ->
-      std_msg_error("<p>Something went wrong: #{response.responseText}","")
-  , this)
+          for entry in json
+
+            entry_string = "" +
+              '<tr>' +
+              '<td>' + entry['action'] + '</td>' +
+              '<td>' + entry['confidence'] + '</td>' +
+              '<td>' + entry['description'] + '</td>' +
+              '<td>' + entry['time'] + '</td>' +
+              '<td>' + entry['user'] + '</td>' +
+              '<td>' + entry['category']['descr'] + '</td>' +
+              '</tr>'
+
+            history_dialog_content += entry_string
+
+          history_dialog_content += '</tbody></table>'
+
+          if $("#history_dialog").length
+            history_dialog = this
+            $("#history_dialog").html(history_dialog_content)
+            $('#history_dialog').dialog('open')
+          else
+            history_dialog = '<div id="history_dialog" title="History Information"></div>'
+            $('body').append(history_dialog)
+            $("#history_dialog").html(history_dialog_content)
+            $('#history_dialog').dialog
+              autoOpen: false
+              minWidth: 600
+              position: { my: "right top", at: "right top", of: window }
+            $('#history_dialog').dialog('open')
+
+      error: (response) ->
+        std_msg_error("<p>Something went wrong: #{response.responseText}","")
+    , this)
+  else
+    std_msg_error("Error",['No data available for blank URL.'])
 
 window.drop_current_categories = () ->
 

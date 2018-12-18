@@ -114,7 +114,6 @@ module API
                 dispute_comment.save
               end
 
-
               dispute.to_json
             end
 
