@@ -10,7 +10,7 @@ function named_search_tag(search_name, search_id) {
         ' onclick="delete_disputes_named_search(this, \'' + search_name + '\');"' +
         ' title="Delete Saved Search">' +
         delete_image + '</a>'
-    row_tr = '<tr id="saved_search_' + search_id + '" class= \'' + search_name + '\'><td>' + search_link + delete_link + '</td></tr>'
+    row_tr = '<tr id="saved_search_' + search_id + '" class= "named_search_' + search_name + '"><td>' + search_link + delete_link + '</td></tr>'
 
     return row_tr;
 }
