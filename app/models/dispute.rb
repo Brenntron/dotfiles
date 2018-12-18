@@ -682,11 +682,11 @@ class Dispute < ApplicationRecord
   end
 
   def self.save_named_search(search_name, params, user:)
+    NamedSearchCriterion.where(named_search_id: NamedSearch.where(name: search_name).ids).delete_all
     NamedSearch.where(name: search_name).delete_all
+
     named_search =
         user.named_searches.where(name: search_name).first || NamedSearch.create!(user: user, name: search_name)
-    NamedSearchCriterion.where(named_search: named_search).delete_all
-
 
     params.each do |field_name, value|
       case
@@ -694,6 +694,8 @@ class Dispute < ApplicationRecord
           value.each do |sub_field_name, sub_value|
             named_search.named_search_criteria.create(field_name: "#{field_name}~#{sub_field_name}", value: sub_value)
           end
+        when field_name == 'reload'
+          #do nothing
         when 'search_type' == field_name
           #do nothing
         when 'search_name' == field_name
