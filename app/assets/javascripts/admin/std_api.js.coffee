@@ -108,4 +108,3 @@ window.std_api_form =(button_tag, form_selector, url, options = {}) ->
   options.url = url
   options.data = form_tag.serialize()
   std_api_ajax options
-
