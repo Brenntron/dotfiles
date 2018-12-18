@@ -1359,7 +1359,7 @@ class Dispute < ApplicationRecord
 
   end
 
-  def self.closed_ticket_entries_by_resolution_report(users, from, to, submission_types)
+  def self.closed_ticket_entries_by_resolution_report(users, from, to, submission_types = nil)
     #users = [User.find(217), User.find(197)]
     #from = "Thu, 16 Aug 2018 17:40:08 GMT"
     #to = "Thu, 20 Sep 2018 17:40:08 GMT"
@@ -1370,7 +1370,12 @@ class Dispute < ApplicationRecord
 
     user_ids = users.pluck(:id)
 
-    main_results = Dispute.joins(:dispute_entries).where(:user_id => user_ids).where("dispute_entries.case_resolved_at between '#{from}' and '#{to}'").where(:submission_type => submission_types)
+    if submission_types.present?
+      main_results = Dispute.joins(:dispute_entries).where(:user_id => user_ids).where("dispute_entries.case_resolved_at between '#{from}' and '#{to}'").where(:submission_type => submission_types)
+    else
+      main_results = Dispute.joins(:dispute_entries).where(:user_id => user_ids).where("dispute_entries.case_resolved_at between '#{from}' and '#{to}'")
+    end
+
 
     all_entries = main_results.map {|result| result.dispute_entries}.flatten.select {|entry| entry.case_resolved_at.present?}.uniq
     total_count = all_entries.size

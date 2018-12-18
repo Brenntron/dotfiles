@@ -252,10 +252,10 @@ class Escalations::Webrep::DisputesController < ApplicationController
 
           open_team_tickets_headers = ['Case ID', 'Owner', 'Status', 'Dispute Preview', 'Last Comment Date']
           closed_team_tickets_headers = ['Case ID', 'Owner', 'Submitter Type', 'Submission Type', 'Priority', 'Dispute Prevew', 'Time to Close']
-          average_time_to_close_by_owner_headers = ['Owner', 'Time']
-          ticket_resolution_by_owner_headers = ['Owner', 'Resolution']
-          rule_hits_for_false_positive_resolutions_headers = ['Tickets', 'FPs']
-          total_ticket_entries_closed_headers = ['Date', 'Web', 'Email', 'Web_Email', 'Total']
+          average_time_to_close_by_owner_headers = ['Owner', 'Ticket', 'Time']
+          ticket_resolution_by_owner_headers = ['Owner', 'Fixed FP', 'Fixed FN', 'Unchanged', 'Other']
+          rule_hits_for_false_positive_resolutions_headers = ['Rules', 'Rule Hits']
+          total_ticket_entries_closed_headers = ['Resolution', 'Count']
           ticket_submitted_by_submitter_type_headers = ['Date', 'Customer', 'Guest']
           closed_email_by_resolution_headers = ['Resolution', 'Count']
           closed_web_by_resolution_headers = ['Resolution', 'Count']
@@ -274,7 +274,7 @@ class Escalations::Webrep::DisputesController < ApplicationController
           # Begin data insertion
 
           # My Team Tickets
-          open_team_tickets_data = Dispute.open_tickets_report([current_user], params[:startdate], params[:enddate])
+          open_team_tickets_data = Dispute.open_tickets_report(current_user.my_team, params[:startdate], params[:enddate])
           open_team_tickets_data[:table_data].each do |d|
             data_values = [d[:case_number], d[:owner], d[:status], ActionController::Base.helpers.strip_tags(d[:d_entry_preview]), d[:last_comment]]
             # The Rails `strip_tags` method doesn't work directly in this controller and I don't know why.
@@ -284,63 +284,77 @@ class Escalations::Webrep::DisputesController < ApplicationController
 
 
           # Closed Tickets
-          closed_team_tickets_data = Dispute.closed_tickets_report([current_user], params[:startdate], params[:enddate])
-
+          closed_team_tickets_data = Dispute.closed_tickets_report(current_user.my_team, params[:startdate], params[:enddate])
           closed_team_tickets_data[:table_data].each do |d|
             data_values = [d[:case_number], d[:owner], d[:submitter_type], d[:submission_type], d[:priority], ActionController::Base.helpers.strip_tags(d[:d_entry_preview]), d[:time_to_close]]
             insert_row_with_data(data_values, myteamtickets_xlsx, myteamtickets_workbook_names[:closed_team_tickets])
           end
 
-
-
-
-
           # Average time to close by owner
-
-
-
-
+          current_user.my_team.each do |t|
+            @time_to_close_tickets_data = Dispute.ticket_time_to_close_report(t.id, params[:startdate], params[:enddate])
+            @time_to_close_tickets_data[:ticket_numbers].each_with_index do |row, i|
+              final_row = []
+              final_row << t.cvs_username
+              final_row << row
+              final_row << @time_to_close_tickets_data[:close_times][i]
+              insert_row_with_data(final_row, myteamtickets_xlsx, myteamtickets_workbook_names[:average_time_to_close_tickets_by_owner])
+            end
+          end
 
           # Ticket Resolution by owner
+          @ticket_resolution_by_owner_data = Dispute.ticket_entry_resolution_by_ticket_owner(current_user.my_team, params[:startdate], params[:enddate])
+          @ticket_resolution_by_owner_data[:ticket_owners].each_with_index do |row, i|
+            final_row = []
+            final_row << row
+            final_row << @ticket_resolution_by_owner_data[:fixed_fp_tickets][i]
+            final_row << @ticket_resolution_by_owner_data[:fixed_fn_tickets][i]
+            final_row << @ticket_resolution_by_owner_data[:unchanged_tickets][i]
+            final_row << @ticket_resolution_by_owner_data[:other_tickets][i]
+            insert_row_with_data(final_row, myteamtickets_xlsx, myteamtickets_workbook_names[:ticket_resolution_by_owner])
 
-
+          end
 
           # Rule hits for false positive resolutions
-
-
-
+          @rule_hits_for_false_positive_resolutions_data = Dispute.rulehits_for_false_positive_resolutions(current_user.my_team, params[:startdate], params[:enddate])
+          @rule_hits_for_false_positive_resolutions_data[:rules].each_with_index do |row, i|
+            final_row = []
+            final_row << row
+            final_row << @rule_hits_for_false_positive_resolutions_data[:rule_hits][i]
+            insert_row_with_data(final_row, myteamtickets_xlsx, myteamtickets_workbook_names[:rule_hits_for_false_positive_resolutions])
+          end
 
 
           # Total ticket entries closed
-
-
-
+          total_ticket_entries_closed_data = Dispute.closed_ticket_entries_by_resolution_report(current_user.my_team, params[:startdate], params[:enddate])
+          total_ticket_entries_closed_data[:table_data].each do |d|
+            data_values = [d[:resolution], d[:count]]
+            insert_row_with_data(data_values, myteamtickets_xlsx, myteamtickets_workbook_names[:total_ticket_entries_closed])
+          end
 
           # Tickets submitted by submitter type
-
-
+          @ticket_submitted_by_submitter_type_data = Dispute.tickets_submitted_by_submitter_per_day(params[:startdate], params[:enddate])
+          @ticket_submitted_by_submitter_type_data[:chart_labels].each_with_index do |row, i|
+            final_row = []
+            final_row << row
+            final_row << @ticket_submitted_by_submitter_type_data[:customer_chart_data][i]
+            final_row << @ticket_submitted_by_submitter_type_data[:guest_chart_data][i]
+            insert_row_with_data(final_row, myteamtickets_xlsx, myteamtickets_workbook_names[:ticket_submitted_by_submitter_type])
+          end
 
           # Closed email entries by Resolution
-
-
-
+          closed_email_by_resolution_data = Dispute.closed_ticket_entries_by_resolution_report(current_user.my_team, params[:startdate], params[:enddate], "E")
+          closed_email_by_resolution_data[:table_data].each do |d|
+            data_values = [d[:resolution], d[:count]]
+            insert_row_with_data(data_values, myteamtickets_xlsx, myteamtickets_workbook_names[:closed_email_by_resolution])
+          end
 
           # Closed Web entries by Resolution
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
+          closed_web_by_resolution_data = Dispute.closed_ticket_entries_by_resolution_report(current_user.my_team, params[:startdate], params[:enddate], "W")
+          closed_web_by_resolution_data[:table_data].each do |d|
+            data_values = [d[:resolution], d[:count]]
+            insert_row_with_data(data_values, myteamtickets_xlsx, myteamtickets_workbook_names[:closed_web_by_resolution])
+          end
 
 
 
