@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 20181024204839) do
+ActiveRecord::Schema.define(version: 2018_11_13_170614) do
 
   create_table "alerts", force: :cascade, options: "ENGINE=InnoDB DEFAULT CHARSET=utf8" do |t|
     t.datetime "created_at", null: false
@@ -35,12 +35,13 @@ ActiveRecord::Schema.define(version: 20181024204839) do
     t.datetime "created_at"
     t.datetime "updated_at"
     t.integer "bug_id"
-    t.integer "unused_rule_id"
+    t.integer "rule_id"
+    t.integer "unused_reference_id"
     t.integer "task_id"
     t.index ["bug_id"], name: "index_attachments_on_bug_id"
     t.index ["bugzilla_attachment_id"], name: "index_attachments_on_bugzilla_attachment_id"
+    t.index ["rule_id"], name: "index_attachments_on_rule_id"
     t.index ["task_id"], name: "index_attachments_on_task_id"
-    t.index ["unused_rule_id"], name: "index_attachments_on_unused_rule_id"
   end
 
   create_table "bug_blockers", force: :cascade, options: "ENGINE=InnoDB DEFAULT CHARSET=utf8" do |t|
@@ -73,13 +74,16 @@ ActiveRecord::Schema.define(version: 20181024204839) do
     t.string "component"
     t.string "version"
     t.text "description"
-    t.string "unused_opsys"
-    t.string "unused_platform"
+    t.string "opsys"
+    t.string "platform"
     t.string "priority"
-    t.string "unused_severity"
+    t.string "severity"
     t.text "research_notes"
     t.text "committer_notes"
     t.integer "classification", default: 0
+    t.integer "unused_gid", default: 1
+    t.integer "unused_sid"
+    t.integer "unused_rev", default: 1
     t.datetime "assigned_at"
     t.datetime "pending_at"
     t.datetime "resolved_at"
@@ -90,6 +94,9 @@ ActiveRecord::Schema.define(version: 20181024204839) do
     t.datetime "created_at"
     t.datetime "updated_at"
     t.integer "user_id"
+    t.integer "unused_reference_id"
+    t.integer "unused_rule_id"
+    t.integer "unused_attachment_id"
     t.string "liberty", default: "CLEAR"
     t.string "whiteboard"
     t.boolean "acknowledged", default: false
@@ -103,6 +110,8 @@ ActiveRecord::Schema.define(version: 20181024204839) do
   create_table "bugs_rules", force: :cascade, options: "ENGINE=InnoDB DEFAULT CHARSET=utf8" do |t|
     t.integer "bug_id", default: 0, null: false
     t.integer "rule_id", default: 0, null: false
+    t.text "unused_svn_result_output"
+    t.integer "unused_svn_result_code"
     t.boolean "tested"
     t.boolean "in_summary", default: false
     t.index ["bug_id", "rule_id"], name: "index_bugs_rules_on_bug_id_and_rule_id", unique: true
@@ -134,7 +143,7 @@ ActiveRecord::Schema.define(version: 20181024204839) do
     t.string "subdomain"
     t.string "domain"
     t.string "path"
-    t.float "wbrs_score", limit: 24
+    t.float "wbrs_score"
     t.string "url_primary_category"
     t.string "resolution"
     t.text "resolution_comment"
@@ -143,7 +152,7 @@ ActiveRecord::Schema.define(version: 20181024204839) do
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
     t.boolean "viewable", default: true, null: false
-    t.float "sbrs_score", limit: 24
+    t.float "sbrs_score"
     t.text "uri"
     t.string "suggested_disposition"
     t.string "ip_address"
@@ -228,9 +237,9 @@ ActiveRecord::Schema.define(version: 20181024204839) do
     t.string "cve_key", null: false
     t.text "description"
     t.string "severity"
-    t.float "base_score", limit: 24
-    t.float "impact_score", limit: 24
-    t.float "exploit_score", limit: 24
+    t.float "base_score"
+    t.float "impact_score"
+    t.float "exploit_score"
     t.string "confidentiality_impact"
     t.string "integrity_impact"
     t.string "availability_impact"
@@ -298,7 +307,7 @@ ActiveRecord::Schema.define(version: 20181024204839) do
     t.text "uri"
     t.string "hostname"
     t.string "entry_type"
-    t.float "score", limit: 24
+    t.float "score"
     t.string "score_type"
     t.string "suggested_disposition"
     t.string "primary_category"
@@ -313,8 +322,8 @@ ActiveRecord::Schema.define(version: 20181024204839) do
     t.text "resolution_comment"
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
-    t.float "sbrs_score", limit: 24
-    t.float "wbrs_score", limit: 24
+    t.float "sbrs_score"
+    t.float "wbrs_score"
     t.integer "webrep_wlbl_key"
     t.integer "reptool_key"
     t.boolean "is_important"
@@ -434,6 +443,7 @@ ActiveRecord::Schema.define(version: 20181024204839) do
     t.string "name"
     t.string "description"
     t.string "pcap_validation"
+    t.integer "unused_exploit_id"
     t.index ["name"], name: "index_exploit_types_on_name"
   end
 
@@ -443,8 +453,10 @@ ActiveRecord::Schema.define(version: 20181024204839) do
     t.datetime "created_at"
     t.datetime "updated_at"
     t.integer "attachment_id"
+    t.integer "unused_reference_id"
     t.index ["attachment_id"], name: "index_exploits_on_attachment_id"
     t.index ["exploit_type_id"], name: "index_exploits_on_exploit_type_id"
+    t.index ["unused_reference_id"], name: "index_exploits_on_unused_reference_id"
   end
 
   create_table "exploits_references", force: :cascade, options: "ENGINE=InnoDB DEFAULT CHARSET=utf8" do |t|
@@ -635,6 +647,7 @@ create_table "roles", options: "ENGINE=InnoDB DEFAULT CHARSET=utf8", force: :cas
     t.integer "sid"
     t.integer "rev"
     t.string "state"
+    t.boolean "unused_tested", default: false
     t.boolean "committed", default: false
     t.datetime "created_at"
     t.datetime "updated_at"
@@ -692,6 +705,7 @@ create_table "roles", options: "ENGINE=InnoDB DEFAULT CHARSET=utf8", force: :cas
     t.string "cmd_line_options"
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
+    t.index ["source_authority", "source_key"], name: "index_snort_false_positives_on_source_authority_and_source_key"
   end
 
   create_table "snort_researches", force: :cascade, options: "ENGINE=InnoDB DEFAULT CHARSET=utf8" do |t|
@@ -732,9 +746,9 @@ create_table "roles", options: "ENGINE=InnoDB DEFAULT CHARSET=utf8", force: :cas
     t.integer "task_id", null: false
     t.integer "rule_id", null: false
     t.integer "bug_id"
-    t.float "average_check", limit: 24
-    t.float "average_match", limit: 24
-    t.float "average_nonmatch", limit: 24
+    t.float "average_check"
+    t.float "average_match"
+    t.float "average_nonmatch"
     t.index ["rule_id", "task_id"], name: "index_test_reports_on_rule_id_and_task_id", unique: true
   end
 
