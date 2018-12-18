@@ -11,6 +11,19 @@ window.std_api_login =() ->
   )
 
 
+window.top_banner_bugzilla_login =() ->
+  username = $('form#top_banner_bugzilla_login_form').find('input[name=username]').val()
+  password = $('form#top_banner_bugzilla_login_form').find('input[name=password]').val()
+  std_msg_ajax(
+    method: 'POST'
+    url: '/escalations/api/v1/escalations/bugzilla_rest_login'
+    data: { username: username, password: password }
+    error_prefix: 'Error logging in.'
+    success: (response) ->
+      $('form#top_banner_bugzilla_login_form').find('input[name=username]').val('')
+      $('form#top_banner_bugzilla_login_form').find('input[name=password]').val('')
+  )
+
 
 window.check_auth_prompt =(response) ->
   (response.responseJSON != undefined) && (response.responseJSON.prompt != undefined)
