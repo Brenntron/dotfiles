@@ -78,6 +78,7 @@ end
 
 Given(/^a named search criteria exists with field_name: "(.*?)" and value: "(.*?)"/) do |field_name, value|
   FactoryBot.create(:named_search_criterion, field_name: field_name, value: value)
+end
 
 Given (/^Dispute entry should have a status of, "(.*?)"/) do |status|
   expect(Dispute.first.priority).to eq(status)
