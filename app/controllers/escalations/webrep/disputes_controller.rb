@@ -200,6 +200,7 @@ class Escalations::Webrep::DisputesController < ApplicationController
             insert_row_with_data(data_values, mytickets_xlsx, mytickets_workbook_names[:closed_email_by_resolution])
           end
 
+
           # Closed Web by Resolution
           closed_web_by_resolution_data = Dispute.closed_ticket_entries_by_resolution_report([current_user], params[:startdate], params[:enddate], "W")
           closed_web_by_resolution_data[:table_data].each do |d|
@@ -227,32 +228,124 @@ class Escalations::Webrep::DisputesController < ApplicationController
           myteamtickets_file = File.new("#{@spreadsheet_directory}/my-team-tickets_#{Time.now}.xlsx", 'w+')
           myteamtickets_xlsx = RubyXL::Workbook.new
           myteamtickets_workbook_names = {
-              :my_open_tickets => 'My Open Tickets',
-              :my_closed_tickets => 'My Closed Tickets',
+              :open_team_tickets => 'My Team Tickets',
+              :closed_team_tickets => 'Closed Tickets',
+              :average_time_to_close_tickets_by_owner => 'Average Time to Close Tickets by Owner',
+              :ticket_resolution_by_owner => 'Ticket Resolution by Owner',
+              :rule_hits_for_false_positive_resolutions => 'Rule Hits for False Positive Resolutions',
               :total_ticket_entries_closed => 'Total Ticket Entries Closed',
-              :time_to_close_tickets => 'Time to Close Tickets',
               :ticket_submitted_by_submitter_type => 'Tickets Submitted by Submitter Type',
               :closed_email_by_resolution => 'Closed Email Entries by Resolution',
               :closed_web_by_resolution => 'Closed Web Entries by Resolution'
           }
-          myteamtickets_xlsx.add_worksheet(myteamtickets_workbook_names[:my_open_tickets])
-          myteamtickets_xlsx.add_worksheet(myteamtickets_workbook_names[:my_closed_tickets])
+          myteamtickets_xlsx.add_worksheet(myteamtickets_workbook_names[:open_team_tickets])
+          myteamtickets_xlsx.add_worksheet(myteamtickets_workbook_names[:closed_team_tickets])
+          myteamtickets_xlsx.add_worksheet(myteamtickets_workbook_names[:average_time_to_close_tickets_by_owner])
+          myteamtickets_xlsx.add_worksheet(myteamtickets_workbook_names[:ticket_resolution_by_owner])
+          myteamtickets_xlsx.add_worksheet(myteamtickets_workbook_names[:rule_hits_for_false_positive_resolutions])
           myteamtickets_xlsx.add_worksheet(myteamtickets_workbook_names[:total_ticket_entries_closed])
-          myteamtickets_xlsx.add_worksheet(myteamtickets_workbook_names[:time_to_close_tickets])
           myteamtickets_xlsx.add_worksheet(myteamtickets_workbook_names[:ticket_submitted_by_submitter_type])
           myteamtickets_xlsx.add_worksheet(myteamtickets_workbook_names[:closed_email_by_resolution])
           myteamtickets_xlsx.add_worksheet(myteamtickets_workbook_names[:closed_web_by_resolution])
 
+          # Build headers of each individual worksheet
 
-          my_open_tickets_headers = ['Priority', 'Case ID', 'Status', 'Entry Count', 'Owner', 'Customer Name', 'Customer Email', 'Customer Company', 'Company URL', 'Time Submitted', 'Age', 'Dispute Entry', 'Dispute Entry Status', 'Suggested Disposition', 'Category', 'WBRS Score', 'WBRS Total Rule Hits', 'SBRS Score', 'SBRS Total Rule Hits', 'Important?', 'Resolution', 'Resolution Comments']
-          insert_row_with_data(my_open_tickets_headers, myteamtickets_xlsx, myteamtickets_workbook_names[:my_open_tickets], "h1")
-          insert_row_with_data(my_open_tickets_headers, myteamtickets_xlsx, myteamtickets_workbook_names[:my_closed_tickets], "h1")
-          insert_row_with_data(my_open_tickets_headers, myteamtickets_xlsx, myteamtickets_workbook_names[:total_ticket_entries_closed], "h1")
-          insert_row_with_data(my_open_tickets_headers, myteamtickets_xlsx, myteamtickets_workbook_names[:time_to_close_tickets], "h1")
-          insert_row_with_data(my_open_tickets_headers, myteamtickets_xlsx, myteamtickets_workbook_names[:ticket_submitted_by_submitter_type], "h1")
-          insert_row_with_data(my_open_tickets_headers, myteamtickets_xlsx, myteamtickets_workbook_names[:closed_email_by_resolution], "h1")
-          insert_row_with_data(my_open_tickets_headers, myteamtickets_xlsx, myteamtickets_workbook_names[:closed_web_by_resolution], "h1")
-          # Do other data insertion here
+          open_team_tickets_headers = ['Case ID', 'Owner', 'Status', 'Dispute Preview', 'Last Comment Date']
+          closed_team_tickets_headers = ['Case ID', 'Owner', 'Submitter Type', 'Submission Type', 'Priority', 'Dispute Prevew', 'Time to Close']
+          average_time_to_close_by_owner_headers = ['Owner', 'Time']
+          ticket_resolution_by_owner_headers = ['Owner', 'Resolution']
+          rule_hits_for_false_positive_resolutions_headers = ['Tickets', 'FPs']
+          total_ticket_entries_closed_headers = ['Date', 'Web', 'Email', 'Web_Email', 'Total']
+          ticket_submitted_by_submitter_type_headers = ['Date', 'Customer', 'Guest']
+          closed_email_by_resolution_headers = ['Resolution', 'Count']
+          closed_web_by_resolution_headers = ['Resolution', 'Count']
+
+          insert_row_with_data(open_team_tickets_headers, myteamtickets_xlsx, myteamtickets_workbook_names[:open_team_tickets], "h1")
+          insert_row_with_data(closed_team_tickets_headers, myteamtickets_xlsx, myteamtickets_workbook_names[:closed_team_tickets], "h1")
+          insert_row_with_data(average_time_to_close_by_owner_headers, myteamtickets_xlsx, myteamtickets_workbook_names[:average_time_to_close_tickets_by_owner], "h1")
+          insert_row_with_data(ticket_resolution_by_owner_headers, myteamtickets_xlsx, myteamtickets_workbook_names[:ticket_resolution_by_owner], "h1")
+          insert_row_with_data(rule_hits_for_false_positive_resolutions_headers, myteamtickets_xlsx, myteamtickets_workbook_names[:rule_hits_for_false_positive_resolutions], "h1")
+          insert_row_with_data(total_ticket_entries_closed_headers, myteamtickets_xlsx, myteamtickets_workbook_names[:total_ticket_entries_closed], "h1")
+          insert_row_with_data(ticket_submitted_by_submitter_type_headers, myteamtickets_xlsx, myteamtickets_workbook_names[:ticket_submitted_by_submitter_type], "h1")
+          insert_row_with_data(closed_email_by_resolution_headers, myteamtickets_xlsx, myteamtickets_workbook_names[:closed_email_by_resolution], "h1")
+          insert_row_with_data(closed_web_by_resolution_headers, myteamtickets_xlsx, myteamtickets_workbook_names[:closed_web_by_resolution], "h1")
+
+
+          # Begin data insertion
+
+          # My Team Tickets
+          open_team_tickets_data = Dispute.open_tickets_report([current_user], params[:startdate], params[:enddate])
+          open_team_tickets_data[:table_data].each do |d|
+            data_values = [d[:case_number], d[:owner], d[:status], ActionController::Base.helpers.strip_tags(d[:d_entry_preview]), d[:last_comment]]
+            # The Rails `strip_tags` method doesn't work directly in this controller and I don't know why.
+
+            insert_row_with_data(data_values, myteamtickets_xlsx, myteamtickets_workbook_names[:open_team_tickets])
+          end
+
+
+          # Closed Tickets
+          closed_team_tickets_data = Dispute.closed_tickets_report([current_user], params[:startdate], params[:enddate])
+
+          closed_team_tickets_data[:table_data].each do |d|
+            data_values = [d[:case_number], d[:owner], d[:submitter_type], d[:submission_type], d[:priority], ActionController::Base.helpers.strip_tags(d[:d_entry_preview]), d[:time_to_close]]
+            insert_row_with_data(data_values, myteamtickets_xlsx, myteamtickets_workbook_names[:closed_team_tickets])
+          end
+
+
+
+
+
+          # Average time to close by owner
+
+
+
+
+
+          # Ticket Resolution by owner
+
+
+
+          # Rule hits for false positive resolutions
+
+
+
+
+
+          # Total ticket entries closed
+
+
+
+
+          # Tickets submitted by submitter type
+
+
+
+          # Closed email entries by Resolution
+
+
+
+
+          # Closed Web entries by Resolution
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+          # End data insertion
+
 
           myteamtickets_xlsx.worksheets.delete(myteamtickets_xlsx['Sheet1'])
 
