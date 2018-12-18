@@ -349,3 +349,16 @@ Feature: Disputes
     And I trigger-click "#filter-cases"
     Then I should see content "Cucumber Test" within "#saved-searches-wrapper"
 
+  @javascript
+  Scenario: A user creates a new named search for disputes and stays on the page (tests to make sure multiple named search criteria are not created)
+    Given a user with role "webrep user" exists and is logged in
+    When I goto "/escalations/webrep/disputes?f=closed"
+    And I trigger-click "#advanced-search-button"
+    And I fill in "search_name" with "Cucumber"
+    And I trigger-click "#submit-advanced-search"
+    And I trigger-click "#filter-cases"
+    Then I should see content "Cucumber" within "#saved-searches-wrapper"
+    Then I wait for "90" seconds
+    Then There is only one element of class, "Cucumber"
+
+
