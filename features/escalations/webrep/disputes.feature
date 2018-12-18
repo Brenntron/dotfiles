@@ -371,7 +371,7 @@ Feature: Disputes
     And I trigger-click "#filter-cases"
     Then I should see content "Cucumber" within "#saved-searches-wrapper"
     Then I wait for "90" seconds
-    Then There is only one element of class, "Cucumber"
+    Then There is only one element of class, "named_search_Cucumber"
     
   Scenario: A user updates a dispute's status (top navigation bar)
     Given a user with role "webrep user" exists and is logged in
