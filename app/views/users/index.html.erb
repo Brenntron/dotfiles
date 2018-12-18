@@ -1,56 +1,28 @@
 <table class="table index-table">
   <thead>
     <tr>
-      <td><strong>Open</strong></td>
-      <td><strong>Pending</strong></td>
-      <td><strong>Closed</strong></td>
-      <td><strong>All</strong></td>
-      <td><strong>Committer</strong></td>
+      <td><strong>Me</strong></td>
+      <td><strong>Team</strong></td>
+      <td><strong>Co-workers</strong></td>
     </tr>
   </thead>
   <tbody>
     <tr>
-      <td><%= current_user.bugs.open_bugs.count %></td>
-      <td><%= current_user.bugs.pending.count %></td>
-      <td><%= current_user.bugs.closed.count %></td>
-      <td><%= current_user.bugs.count %></td>
+      <td><%= link_to current_user.cvs_username, escalations_user_path(current_user) %></td>
       <td>
-        <% if current_user.has_role?('committer') %>
-            <i class="glyphicon glyphicon-ok"></i>
+        <% if current_user.children.any? %>
+          <% current_user.children.each do |user| %>
+            <li><%= link_to user.cvs_username, escalations_user_path(user) %></li>
+          <% end %>
+        <% end %>
+      </td>
+      <td>
+        <% if current_user.child? %>
+          <% current_user.siblings.each do |user| %>
+            <li><%= link_to user.cvs_username, escalations_user_path(user) %></li>
+          <% end %>
         <% end %>
       </td>
     </tr>
-    <% if current_user.has_role?('manager') %>
-      <tr></tr>
-      <% current_user.children.each do |user| %>
-        <tr>
-          <td><%= user.bugs.open_bugs.count %></td>
-          <td><%= user.bugs.pending.count %></td>
-          <td><%= user.bugs.closed.count %></td>
-          <td><%= user.bugs.count %></td>
-          <td>
-            <% if user.has_role?('committer') %>
-              <i class="glyphicon glyphicon-ok"></i>
-            <% end %>
-          </td>
-        </tr>
-      <% end %>
-    <% end %>
-    <tr></tr>
-    <% if current_user.child? %>
-      <% current_user.siblings.each do |user| %>
-          <tr>
-            <td><%= user.bugs.open_bugs.count %></td>
-            <td><%= user.bugs.pending.count %></td>
-            <td><%= user.bugs.closed.count %></td>
-            <td><%= user.bugs.count %></td>
-            <td>
-              <% if user.has_role?('committer') %>
-                  <i class="glyphicon glyphicon-ok"></i>
-              <% end %>
-            </td>
-          </tr>
-      <% end %>
-    <% end %>
   </tbody>
 </table>

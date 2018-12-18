@@ -1,8 +1,5 @@
 <div class="row item-info">
   <div class="row subheading">
-    <button class="btn back_btn_user pull-right">
-      <i class="glyphicon glyphicon-th-list"></i> <strong class="hidden-xs">user list</strong>
-    </button>
   </div>
   <div class='col-lg-11 col-md-11'>
     <div class="row">
@@ -15,10 +12,6 @@
               </span>
             <% end %>
             <a href="mailto:<%= @user.email %>" data-toggle="tooltip" data-placement="top" title="send mail"><i class="glyphicon glyphicon-envelope"></i></a>
-            <% if @user == current_user %>
-              <a type="button" class="glyphicon glyphicon-cloud-download" id="user-bugs" value="<%=@user.id%>" data-toggle="tooltip" data-placement="top" title="import <%=@user.cvs_username%>'s bugs from bugzilla"></a>
-              <button class="select-sm btn btn-default hidden" id="importing_image"><span class="glyphicon glyphicon-refresh glyphicon-refresh-animate"></span> coffee break</button>
-            <% end %>
           </span>
         </h2>
         <p class="text-muted"><em><strong><%=@user.roles.map(&:role).join(', ')%></strong></em></p>
@@ -80,133 +73,6 @@
         </div>
       </div>
     <div class="row">
-      <div class="col-xs-11"><hr/></div>
-      <div class='col-xs-12'>
-        <div class='col-xs-11'>
-          <h4>Assignments</h4>
-        </div>
-      </div>
-      <div class='col-sm-11'>
-        <ul class="nav nav-tabs users-split-color users-split-color-nav-tweak" role="tablist">
-          <li role="presentation" class="user-tab <%= "active" if (params[:active_tab].blank? || params[:active_tab] == "open") %>" id="open-tab"><a href="#open" aria-controls="open" role="tab" data-toggle="tab">open (<%= @user.bugs.open_bugs.count %>)</a></li>
-          <li role="presentation" class="user-tab <%= "active" if params[:active_tab] == "pending" %>" id="pending-tab"><a href="#pending" aria-controls="pending" role="tab" data-toggle="tab">pending (<%= @user.bugs.pending.count %>)</a></li>
-          <li role="presentation" class="user-tab <%= "active" if params[:active_tab] == "closed" %>" id="closed-tab"><a href="#closed" aria-controls="closed" role="tab" data-toggle="tab">closed (<%= @user.bugs.closed.count %>)</a></li>
-        </ul>
-
-        <div class="tab-content users-split-color-content-tweak">
-          <div role="tabpanel" class="tab-pane <%= "active" if (params[:active_tab].blank? || params[:active_tab] == "open") %>" id="open">
-            <table class="table table-hover table-borderless">
-              <% if @open_bugs.any? %>
-                <% @open_bugs.sort_by{ |b| b.priority_sort }.each do |bug| %>
-                  <tr>
-                    <td>
-                      <p><strong><%=bug.priority%></strong></p>
-                    </td>
-                    <td>
-                      <p><strong><%= link_to bug.bugzilla_id, bug_path(bug) %></strong></p>
-                    </td>
-                    <td>
-                      <p><%= bug.summary %>
-                      <button class="btn btn-default tiny-button text-muted return-bug" data-id="<%=bug.id%>">return</button>
-                      </p>
-                    </td>
-                  </tr>
-
-                <% end %>
-                  <th colspan=3>
-                    <div class="apple_pagination">
-                      <%= will_paginate @open_bugs, :param_name => "open_page", params: {active_tab: "open"} %>
-                    </div>
-                  </th>
-              <% else %>
-                <div class="col-xs-12">
-                  <p class="text-muted"><em>No open bugs at this time.</em></p>
-                </div>
-              <% end %>
-            </table>
-          </div>
-          <div role="tabpanel" class="tab-pane <%= "active" if params[:active_tab] == "pending" %>" id="pending">
-            <table class="table table-hover table-borderless">
-              <% if @pending_bugs.any? %>
-                <% @pending_bugs.each do |bug| %>
-                  <tr>
-                    <td>
-                      <strong><%= link_to bug.bugzilla_id, bug_path(bug) %></strong>
-                    </td>
-                    <td>
-                      <%= bug.summary %>
-                    </td>
-                  </tr>
-                <% end %>
-                <tfoot>
-                  <th colspan=2>
-                    <div class="apple_pagination">
-                    <%= will_paginate @pending_bugs, :param_name => "pending_page", params: {active_tab: "pending"} %>
-                    </div>
-                  </th>
-                </tfoot>
-              <% else %>
-                <div class="col-xs-12">
-                  <p class="text-muted"><em>No pending bugs at this time.</em></p>
-                </div>
-              <% end %>
-            </table>
-          </div>
-          <div role="tabpanel" class="tab-pane <%= "active" if params[:active_tab] == "closed" %>" id="closed">
-            <table class="table table-hover table-borderless">
-              <% if @closed_bugs.any? %>
-                <% @closed_bugs.each do |bug| %>
-                  <tr>
-                    <td>
-                      <strong><%= link_to bug.bugzilla_id, bug_path(bug) %></strong>
-                    </td>
-                    <td>
-                      <%= bug.summary %>
-                    </td>
-                  </tr>
-                <% end %>
-                <tfoot>
-                  <th colspan=2>
-                    <div class="apple_pagination">
-                    <%= will_paginate @closed_bugs, :param_name => "closed_page", params: {active_tab: "closed"} %>
-                    </div>
-                  </th>
-                </tfoot>
-              <% else %>
-                <div class="col-xs-12">
-                  <p class="text-muted"><em>No closed bugs at this time.</em></p>
-                </div>
-              <% end %>
-            </table>
-          </div>
-        </div>
-
-      </div>
-    </div>
-    <div class="row users-split-color-row-tweak">
-      <div class="col-xs-11"><hr/></div>
-      <div class='col-xs-12'>
-        <div class='col-xs-11'>
-          <h4>Metrics</h4>
-          <div id="msg"></div>
-        </div>
-      </div>
-      <div class="col-lg-5 col-md-6">
-        <div class="user-metrics" id='<%=@user.id%>'></div>
-        <p>Bug status changes last <%=current_user.chart_timeframe_preference%> days <a href="#" class="tiny text-muted change_metrics_timeframe"><em>change</em></a></p>
-        <p class="tiny text-muted"><em>click legend items to show/hide data</em></p>
-        <%= render 'shared/change_metrics_timeframe_form' %>
-        <canvas id="statusChart"></canvas>
-      </div>
-      <div class="col-lg-5 col-md-6">
-        <p>Work Time Averages</p>
-        <canvas id="timeChart"></canvas>
-        <br>
-        <div class="col-xs-12">
-          <p class="text-muted small"><em>* Averages rounded to the nearest whole number.</em></p>
-        </div>
-      </div>
-
     </div>
     <!--<div class="footer-spacer"></div>-->
 

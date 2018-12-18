@@ -1,13 +1,7 @@
 class UsersController < ApplicationController
   load_and_authorize_resource
 
-  #per_page for User show page Closed bugs tab 
-  CLOSED_BUGS_PAGINATION_SIZE = 25
-  PENDING_BUGS_PAGINATION_SIZE = 10
-  OPEN_BUGS_PAGINATION_SIZE = 10
-
   before_action :require_login
-  before_action :set_query_session
 
   def index
     @users = current_user.children
@@ -15,11 +9,6 @@ class UsersController < ApplicationController
 
   def show
     @user = User.where(id: params[:id]).first
-    if @user
-      @closed_bugs = @user.bugs.closed.order("created_at DESC").paginate(:page => params[:closed_page], :per_page => CLOSED_BUGS_PAGINATION_SIZE)
-      @pending_bugs = @user.bugs.pending.paginate(:page => params[:pending_page], :per_page => PENDING_BUGS_PAGINATION_SIZE)
-      @open_bugs = @user.bugs.open_bugs.paginate(:page => params[:open_page], :per_page => OPEN_BUGS_PAGINATION_SIZE)
-    end
     case
       when @user.nil?
         flash[:error] = "Could not find user '#{params[:id]}'"
@@ -81,76 +70,7 @@ class UsersController < ApplicationController
     end
   end
 
-  def status_metrics
-    @user = User.find(params[:user_id])
-    pending = {}
-    reopened = {}
-    timeframe = current_user.chart_timeframe_preference
-    (timeframe.days.ago.to_date..Date.today).each do |day|
-      pending[day.strftime("%b %d, %Y")] = @user.bugs.where('DATE(pending_at) = ?', day).count
-      reopened[day.strftime("%b %d, %Y")] = @user.bugs.where('DATE(reopened_at) = ?', day).count
-    end
-    respond_to do |format|
-      format.json {
-        render :json => [pending, reopened]
-      }
-    end
-  end
-
-  def time_metrics
-    @user = User.find(params[:user_id])
-    @work_time_ave = @user.bugs.average(:work_time).try(:round)
-    @rework_time_ave = @user.bugs.average(:rework_time).try(:round)
-    @review_time_ave = @user.bugs.average(:review_time).try(:round)
-
-    respond_to do |format|
-      format.json {
-        render :json => [@work_time_ave,
-                         @rework_time_ave,
-                         @review_time_ave]
-      }
-    end
-  end
-
-  def pending_team_metrics
-    respond_to do |format|
-      format.json {
-        render :json => current_user.team_metrics('pending')
-      }
-    end
-  end
-
-  def resolved_team_metrics
-    respond_to do |format|
-      format.json {
-        render :json => current_user.team_metrics('resolved')
-      }
-    end
-  end
-
-  def time_team_metrics
-    respond_to do |format|
-      format.json {
-        render :json => current_user.team_work_times
-      }
-    end
-  end
-
-  def component_team_metrics
-    respond_to do |format|
-      format.json {
-        render :json => [current_user.team_by_component('Snort Rules'),
-                         current_user.team_by_component('SO Rules'),
-                         current_user.team_by_component('Malware')]
-      }
-    end
-  end
-
   private
-
-  def set_query_session
-    session[:query] = current_user.default_bug_list
-  end
 
   def user_params
     params.require(:user).permit(:parent_id, :display_name,:cvs_username, :cec_username, :kerberos_login, :committer, :confirmed, :email, :class_level, :metrics_timeframe, role_ids: [])
