@@ -683,7 +683,6 @@ class Dispute < ApplicationRecord
 
   def self.save_named_search(search_name, params, user:)
     NamedSearchCriterion.where(named_search_id: NamedSearch.where(name: search_name).ids).delete_all
-    NamedSearch.where(name: search_name).delete_all
 
     named_search =
         user.named_searches.where(name: search_name).first || NamedSearch.create!(user: user, name: search_name)
