@@ -359,7 +359,7 @@ Feature: Disputes
     And I trigger-click "#submit-advanced-search"
     And I trigger-click "#filter-cases"
     Then I should see content "Cucumber" within "#saved-searches-wrapper"
-    And There is only one element of class, "named_search_Cucumber"
+    And There is only one element of class, "saved-search"
 
   @javascript
   Scenario: A user creates a new named search for disputes and stays on the page (tests to make sure multiple named search criteria are not created)
@@ -371,7 +371,7 @@ Feature: Disputes
     And I trigger-click "#filter-cases"
     Then I should see content "Cucumber" within "#saved-searches-wrapper"
     Then I wait for "90" seconds
-    Then There is only one element of class, "named_search_Cucumber"
+    Then There is only one element of class, "saved-search"
     
   Scenario: A user updates a dispute's status (top navigation bar)
     Given a user with role "webrep user" exists and is logged in
