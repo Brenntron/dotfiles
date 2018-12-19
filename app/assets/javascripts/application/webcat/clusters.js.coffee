@@ -45,7 +45,6 @@ window.categorize_clusters = () ->
   clusters_to_categorize = []
   clusters = $ '[id$=\'_categories\']'
   categories = []
-  category_values = []
 
   data = {}
   data["comment"] = comment
@@ -53,11 +52,13 @@ window.categorize_clusters = () ->
   $(clusters).each ->
     id =  $(this).attr('id').split('_')[0]
     categories = $(this).find('option')
-    $(categories).each ->
-      value = $(this).attr('value')
-      category_values.push value
 
     if categories? and categories.length > 0
+      category_values = []
+      $(categories).each ->
+        value = $(this).attr('value')
+        category_values.push value
+
       data["cluster_id_" + id.toString()] = category_values
 
   headers = {'Token': $('input[name="token"]').val(), 'Xmlrpc-Token': $('input[name="xml_token"]').val()}
@@ -167,7 +168,7 @@ $ ->
   $(document).ready ->
 
 # expand all functionality
-window.expand_all = (tableId) ->
+window.expand_all_clusters = (tableId) ->
   selectedRows = $('table#' + tableId + ' tr[role="row"]')
   i = 0
   while i < selectedRows.length
@@ -176,7 +177,7 @@ window.expand_all = (tableId) ->
     i = i + 1
 
 # collapse all functionality
-window.collapse_all = (tableId) ->
+window.collapse_all_clusters = (tableId) ->
   selectedRows = $('table#' + tableId + ' tr[role="row"]')
   i = 0
   while i < selectedRows.length
@@ -185,7 +186,7 @@ window.collapse_all = (tableId) ->
     i = i + 1
 
 #  expand selected funtionality
-window.expand_selected = (tableId) ->
+window.expand_selected_clusters = (tableId) ->
   selectedRows = $('table#' + tableId + ' tr[role="row"].selected')
   i = 0
   while i < selectedRows.length
@@ -194,7 +195,7 @@ window.expand_selected = (tableId) ->
     i = i + 1
 
 #  collapse selected funtionality
-window.collapse_selected = (tableId) ->
+window.collapse_selected_clusters = (tableId) ->
   selectedRows = $('table#' + tableId + ' tr[role="row"].selected')
   i = 0
   while i < selectedRows.length
