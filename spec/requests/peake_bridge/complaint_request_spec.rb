@@ -83,9 +83,10 @@ RSpec.describe "Peake-Bridge complaint messages channels", type: :request do
     vrt_incoming
     guest_company
     expect(Bridge::ComplaintCreatedEvent).to receive(:new).and_return(bridge_message)
-    expect(Bug).to receive(:bugzilla_create).and_return({ 'id' => '10101' })
     expect(Customer).to receive(:process_and_get_customer).and_return(FactoryBot.create(:customer))
     allow(ComplaintEntryPreload).to receive(:generate_preload_from_complaint_entry).and_return(true)
+    bugzilla_rest_session = BugzillaRest::Session.default_session
+    expect(bugzilla_rest_session).to receive(:create_bug).and_return(bugzilla_rest_session.build_bug(id: 1001))
 
     post '/escalations/peake_bridge/channels/ticket-event/messages', as: :json, params: complaint_params
 

@@ -79,7 +79,7 @@ class Escalations::PeakeBridge::MessagesController < ApplicationController
   end
 
   def bugzilla_rest_session
-    BugzillaRest::Session.new(api_key: Rails.configuration.bugzilla_api_key, token: nil)
+    BugzillaRest::Session.default_session
   end
 
   def log_exception(except)
