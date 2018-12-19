@@ -6604,6 +6604,17 @@ h2 {
 .dashboard-header-area {
   background-color: $content-tab-color;
 
+  button, a {
+    background-color: #54708c;
+    padding: 8px 20px;
+    border-radius: 2px;
+    border: none;
+  }
+
+  a {
+    color: $content-bg-color;
+  }
+
   .dashboard-wrapper {
     display: flex;
 
@@ -6650,10 +6661,7 @@ h2 {
       }
 
       button {
-        border-radius: 2px;
-        background-color: #54708c;
         margin-left: 15px;
-        padding: 8px 20px;
       }
 
       .toolbar-button {
@@ -6664,13 +6672,6 @@ h2 {
     .dashboard-time-ticket {
       .button-wrapper {
         text-align: right;
-
-        button {
-          background-color: #54708c;
-          padding: 8px 20px;
-          border-radius: 2px;
-          border: none;
-        }
 
         .arrow-left::before {
           content: '';

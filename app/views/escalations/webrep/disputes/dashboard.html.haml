@@ -16,11 +16,16 @@
             %input{:type => "hidden", :name => "xml_token", :value => "#{xml_token}"}
             %input#team_ids{:type => "hidden", :name => "team_ids", :value => "#{current_user.my_team.pluck(:id).to_s}"}
 
-      .col-xs-8.text-right
+      .col-xs-2
+        .dashboard-wrapper
+          .button-wrapper
+            - if current_user&.has_role?('big_email_honcho')
+              %a.toolbar-button#resolution-email-editor{href: '/rulehit_resolution_mailer_templates'} Edit Rule Hit Email Templates
+
+      .col-xs-6.text-right
         .dashboard-time-wrapper
           .dashboard-time
-            %label September 08, 2018 - September 15, 2018
-            -# TODO Populate above label with local storage time or current week span
+            %label
             %button.toolbar-button.icon-calendar Change Time Span
 
             %input#tickets_date_range{:type => 'text'}
