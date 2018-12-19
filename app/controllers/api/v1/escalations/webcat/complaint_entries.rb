@@ -54,6 +54,12 @@ module API
                                                                user: current_user)
 
               if complaint_entries
+
+                #grab rulelib data for all urls
+                all_urls = complaint_entries.pluck(:uri)
+
+                certainty_on_urls = Wbrs::Prefix.get_certainty_sources_for_urls(all_urls)
+
                 complaint_entries.each do |complaint_entry|
                   complaint_entry_packet = {}
                   complaint_entry_packet[:age] = ComplaintEntry.what_time_is_it((Time.now - complaint_entry.created_at).to_i)
@@ -124,6 +130,7 @@ module API
                                                                               :name => value['name'] || 'N/A',
                                                                               :long_description => value['long_description']}
                         #TODO: replace this with working code when the API is finished and we can actually get certainty.
+
                         complaint_entry_packet[:current_categories][key][:certainty] = [
                             {:source => "Missing Source data", :source_category => "Missing Category", :source_certainty => "N/A", :source_confidence => 'N.A'}
                         ]
