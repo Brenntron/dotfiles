@@ -224,7 +224,7 @@ window.domain_whois = (IP_Domain) ->
             minWidth: 400
             position: { my: "right bottom", at: "right bottom", of: window }
     error: (response) ->
-      notice_html = "<p>Something went wrong: #{response.responseJSON.message}</p>"
+      notice_html = "<p>Something went wrong: #{response.responseText}</p>"
   , this)
 
 window.filterByStatus = (filter) ->
@@ -527,7 +527,7 @@ window.retrieve_history = (position) ->
             $('#history_dialog').dialog('open')
 
       error: (response) ->
-        std_msg_error("<p>Something went wrong: #{response.responseText}","")
+        std_msg_error("<p>Something went wrong: #{response.responseJSON.message}","")
     , this)
   else
     std_msg_error("Error",['No data available for blank URL.'])
