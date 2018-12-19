@@ -109,7 +109,8 @@ window.populate_webrep_index_table = (data = {}, reload = false) ->
                 this.checked = true
 
         if undefined != json.search_name
-          if $(".named_search_#{json.search_name}").length == 0
+          searchId = 'saved_search_' + json.overwrite_search_id
+          if $('#saved-search-tbody tr#' + searchId).length == 0
             $('#saved-search-tbody').append(named_search_tag(json.search_name, json.search_id))
 
     error: (response) ->
@@ -129,7 +130,7 @@ window.advanced_webrep_index_table = () ->
     submission_types.push('ew')
   data = {
     search_type: 'advanced'
-    search_name: form.find('input[name="search_name"]').val().replace(/\W/g, '')
+    search_name: form.find('input[name="search_name"]').val()
     customer: {
       name: form.find('input[id="name-input"]').val()
       email: form.find('input[id="email-input"]').val()

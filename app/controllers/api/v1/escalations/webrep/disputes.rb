@@ -43,6 +43,12 @@ module API
             get "" do
               authorize!(:index, Dispute)
 
+              if 'advanced' == permitted_params['search_type']
+                if permitted_params['search_name'].present?
+                  overwrite_search_id = NamedSearch.where(user:current_user, name: permitted_params['search_name']).first
+                end
+              end
+
               disputes = Dispute.robust_search(permitted_params['search_type'],
                                                search_name: permitted_params['search_name'],
                                                params: permitted_params,
@@ -51,7 +57,7 @@ module API
               title = Dispute.robust_search_title(permitted_params['search_type'], search_name: permitted_params['search_name'])
               json_packet = Dispute.to_data_packet(disputes, user: current_user)
 
-              response_data = {status: "success", title: title, data: json_packet}
+              response_data = {status: "success", title: title, data: json_packet, overwrite_search_id: overwrite_search_id&.id}
               if 'advanced' == permitted_params['search_type']
                 if permitted_params['search_name'].present?
                   search_name = permitted_params['search_name']
