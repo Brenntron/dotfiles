@@ -260,12 +260,12 @@ class Complaint < ApplicationRecord
         }
 
         bugzilla_rest_session = message_payload[:bugzilla_rest_session]
-        bug_id_object = bugzilla_rest_session.create_bug(bug_attrs, assigned_user: user)
+        bug_proxy = bugzilla_rest_session.create_bug(bug_attrs, assigned_user: user)
 
 
         new_complaint = Complaint.new
         new_complaint.submission_type = message_payload["payload"]["submission_type"]
-        new_complaint.id = bug_id_object.id
+        new_complaint.id = bug_proxy.id
         new_complaint.description = message_payload["payload"]["problem"]
         new_complaint.ticket_source_key = message_payload["source_key"]
         new_complaint.ticket_source = "talos-intelligence"

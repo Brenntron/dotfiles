@@ -115,7 +115,6 @@ describe Complaint do
   end
 
   it 'processes bridge payload' do
-    allow(Bugzilla::Bug).to receive(:new).and_return(bug_factory)
     # Note: get rules is called three times.
     # Note: had get rules returned results, another call to get the history would have been made.
     allow(Wbrs::Base)
@@ -136,6 +135,9 @@ describe Complaint do
                 .and_return(top_url_response_response)
     allow(CapybaraSpider).to receive(:low_capture).and_return('')
     allow(Bridge::ComplaintCreatedEvent).to receive(:new).and_return(double('Bridge::ComplaintCreatedEvent', post: nil))
+    bugzilla_rest_session = BugzillaRest::Session.default_session
+    expect(bugzilla_rest_session).to receive(:create_bug).and_return(bugzilla_rest_session.build_bug(id: 1001))
+    complaint_message_payload[:bugzilla_rest_session] = bugzilla_rest_session
 
     expect do
       Complaint.process_bridge_payload(complaint_message_payload)
