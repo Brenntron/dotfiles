@@ -25,8 +25,12 @@ class BugzillaRest::Session < BugzillaRest::Base
   # @return [BugzillaRest::Session] the session for the analyst-console service account.
   def self.default_session
     unless @default_session
-      @default_session = BugzillaRest::Session.new(api_key: nil, token: nil)
-      @default_session.login(Rails.configuration.bugzilla_username, Rails.configuration.bugzilla_password)
+      if Rails.configuration.bugzilla_api_key
+        @default_session = BugzillaRest::Session.new(api_key: Rails.configuration.bugzilla_api_key, token: nil)
+      else
+        @default_session = BugzillaRest::Session.new(api_key: nil, token: nil)
+        @default_session.login(Rails.configuration.bugzilla_username, Rails.configuration.bugzilla_password)
+      end
     end
     return @default_session
   end
