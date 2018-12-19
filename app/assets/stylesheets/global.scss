@@ -5522,9 +5522,9 @@ table.dispute_tool_current tr:last-of-type td {
   margin: auto;
 }
 
-.dispute-W {background-image: url(image_path('icon_type_web.svg'));}
-.dispute-E {background-image: url(image_path('icon_type_email.svg'));}
-.dispute-EW {background-image: url(image_path('icon_type_email_web.svg'));}
+.dispute-W, .dispute-w {background-image: url(image_path('icon_type_web.svg'));}
+.dispute-E, .dispute-e {background-image: url(image_path('icon_type_email.svg'));}
+.dispute-EW, .dispute-ew {background-image: url(image_path('icon_type_email_web.svg'));}
 
 .my-dashboard-header-area, .complaint-mgt-top-area  {
   background-color: $content-tab-color;
