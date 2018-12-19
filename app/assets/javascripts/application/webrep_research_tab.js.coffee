@@ -239,7 +239,7 @@ $ ->
 #
 
     else
-      std_msg_error('No rows selected', ['Please select 1 row'])
+      std_msg_error('No rows selected', ['Please select one row'])
       $(dropdown).removeClass('open')
       return false
 
@@ -365,7 +365,7 @@ $ ->
 
     else
       $(dropdown_wrapper).removeClass('open')
-      std_msg_error('No rows selected', ['Please select 1 row.'])
+      std_msg_error('No rows selected', ['Please select one row.'])
 
 
   #Inline Adjust WL/BL Button

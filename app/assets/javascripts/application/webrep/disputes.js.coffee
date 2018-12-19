@@ -1069,7 +1069,7 @@ $ ->
           $(res_comment[0]).val('')
     else
       $(dropdown).removeClass('open')
-      std_msg_error(window.location.host + ' says', ['No rows selected'])
+      std_msg_error('No rows selected', ['Please select at least one row.'])
 
   # Edit Entry: Edit Entry Status
   $('#index-entry-status-button').click ->
@@ -1109,7 +1109,7 @@ $ ->
           $('#index-entry-resolution-submenu').hide()
           $(res_comment).val('')
     else
-      std_msg_error(window.location.host + ' says', ['No rows selected'])
+      std_msg_error('No rows selected', ['Please select at least one row.'])
       $(dropdown).removeClass('open')
       return false
 
@@ -1646,7 +1646,7 @@ $ ->
 
     else
       $(dropdown_wrapper).removeClass('open')
-      std_msg_error(window.location.host + ' says', ['Please select 1 row'])
+      std_msg_error('No rows selected', ['Please select at least one row.'])
 
   $('#set-related-dispute-submit-button').click ->
     dropdown = $('#set-related-dispute-div').parent()
