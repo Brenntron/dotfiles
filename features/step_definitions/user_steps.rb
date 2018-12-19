@@ -65,15 +65,16 @@ Given(/^current user exists$/) do
 end
 
 def fill_in_login_form
-  fill_in "uname", :with => ENV['Bugzilla_login']
-  fill_in "psw", :with => ENV['Bugzilla_secret']
+  fill_in "username", :with => ENV['Bugzilla_login']
+  fill_in "password", :with => ENV['Bugzilla_secret']
 end
 
 def sign_in_user
-  visit root_path
+  visit escalations_webcat_complaints_path
+  click_on('user-settings-dropdown-button')
   fill_in_login_form
-  click_on("Login")
-  sleep 1
+  click_on('top_banner_bugzilla_login_button')
+  sleep 3
 end
 Given (/^the user signs in$/) do
   sign_in_user
