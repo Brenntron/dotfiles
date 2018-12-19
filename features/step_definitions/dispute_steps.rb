@@ -80,6 +80,11 @@ Given(/^a named search criteria exists with field_name: "(.*?)" and value: "(.*?
   FactoryBot.create(:named_search_criterion, field_name: field_name, value: value)
 end
 
+Given(/^I add a test user to current user's team/) do
+  FactoryBot.create(:user, cvs_username: 'teammate', id: 2)
+  User.find(2).move_to_child_of(User.find(1))
+end
+  
 Given (/^Dispute entry should have a status of, "(.*?)"/) do |status|
   expect(Dispute.first.priority).to eq(status)
 end
