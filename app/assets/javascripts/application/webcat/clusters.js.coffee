@@ -45,7 +45,6 @@ window.categorize_clusters = () ->
   clusters_to_categorize = []
   clusters = $ '[id$=\'_categories\']'
   categories = []
-  category_values = []
 
   data = {}
   data["comment"] = comment
@@ -53,11 +52,13 @@ window.categorize_clusters = () ->
   $(clusters).each ->
     id =  $(this).attr('id').split('_')[0]
     categories = $(this).find('option')
-    $(categories).each ->
-      value = $(this).attr('value')
-      category_values.push value
 
     if categories? and categories.length > 0
+      category_values = []
+      $(categories).each ->
+        value = $(this).attr('value')
+        category_values.push value
+
       data["cluster_id_" + id.toString()] = category_values
 
   headers = {'Token': $('input[name="token"]').val(), 'Xmlrpc-Token': $('input[name="xml_token"]').val()}

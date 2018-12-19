@@ -250,6 +250,7 @@ Feature: Webcat complaints
     And I fill in "url_1" with "fmasoifkis.com"
     And I click "#history-1"
     And I wait for "5" seconds
+    Then take a screenshot
     Then I should see "SOMETHING WENT WRONG: THE URL YOU PROVIDED DOES NOT HAVE AVAILABLE DATA."
 
   Scenario: a users tries to categorize a URL
