@@ -554,7 +554,7 @@ window.toolbar_adjust_reptool_bl_button_research =(button_tag) ->
   )
 
 window.toolbar_index_edit_status = () ->
-  statusName = $('input[name=entry-status]:checked').attr('id')
+  statusName = $('input[name=entry-status]:checked').val()
   
   data = {}
   
@@ -569,7 +569,7 @@ window.toolbar_index_edit_status = () ->
       data[this.id].push({
         id: this.id
         field: "resolution"
-        new: $('input[name=entry-resolution]:checked').attr('id')
+        new: $('input[name=entry-resolution]:checked').val()
       })
 
       data[this.id].push({
@@ -589,12 +589,12 @@ window.toolbar_index_edit_status = () ->
   )
 
 window.show_page_edit_status = () ->
-  statusName = $('input[name=dispute-status]:checked').attr('id')
+  statusName = $('input[name=dispute-status]:checked').val()
   comment = $('.ticket-status-comment').val()
   dispute_id = $('#dispute_id').text()
 
   if statusName == "RESOLVED_CLOSED"
-    resolution = $('input[name=dispute-resolution]:checked').attr('id')
+    resolution = $('input[name=dispute-resolution]:checked').val()
 
   data = {
     dispute_ids: [ dispute_id ]
@@ -1083,7 +1083,7 @@ $ ->
       $('.entry-status-radio-label').click ->
         radio_button = $(this).prev('.entry-status-radio')
         $(radio_button[0]).trigger('click')
-        if $(radio_button).attr('id') == 'RESOLVED_CLOSED'
+        if $(radio_button).val() == 'RESOLVED_CLOSED'
           $('#index-entry-resolution-submenu').show()
           stat_comment = $('#entry-non-res-submit').find('.entry-status-comment')
           $('#entry-non-res-submit').hide()
@@ -1101,7 +1101,7 @@ $ ->
           wrapper = $(this).parent()
           $(all_stat_radios).removeClass('selected')
           $(wrapper).addClass('selected')
-        if $(this).attr('id') == 'RESOLVED_CLOSED'
+        if $(this).val() == 'RESOLVED_CLOSED'
           $('#index-entry-resolution-submenu').show()
           stat_comment = $('#entry-non-res-submit').find('.entry-status-comment')
           $('#entry-non-res-submit').hide()
