@@ -224,7 +224,7 @@ window.domain_whois = (IP_Domain) ->
             minWidth: 400
             position: { my: "right bottom", at: "right bottom", of: window }
     error: (response) ->
-      notice_html = "<p>Something went wrong: #{response.responseText}</p>"
+      notice_html = "<p>Something went wrong: #{response.responseJSON.message}</p>"
   , this)
 
 window.filterByStatus = (filter) ->
