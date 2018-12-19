@@ -45,6 +45,10 @@ $ ->
           className: 'entry-id-col'
         }
         {
+          targets: [3]
+          orderData: 15
+        }
+        {
           targets: [ 12 ]
           className: 'submitter-col'
         }
@@ -158,6 +162,10 @@ $ ->
         {
           data: 'assigned_to'
           className: 'alt-col'
+        }
+        {
+          data: 'age_int'
+          visible: false
         }
       ]
       select: 'style': 'os'

@@ -15,8 +15,10 @@
             %th
             -# Expand / Collapse Button
             %th
-              %input#disputes_check_box{type: 'checkbox'}
+
+              %input#disputes_check_box{type: 'checkbox', onclick: 'disputes_select_all_check_box();'}
             %th.text-center#priority.esc-tooltipped{title: 'Priority'}
+
             -# Priority
             %th#case-id Case ID
             %th#status Status

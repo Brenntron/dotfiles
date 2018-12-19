@@ -1,4 +1,5 @@
 window.select_or_deselect_all = (dispute_id)->
+
   $('.dispute-entry-checkbox_' + dispute_id).prop('checked', $('#' + dispute_id).prop('checked'))
   $('.dispute-entry-checkbox_' + dispute_id).each ->
     toggleRow(this)
@@ -1792,6 +1793,9 @@ window.populate_resolution_dropdown = (dispute_id) ->
 
       $('.entry-status-radio' + '.' + status + '_' + dispute_id).prop("checked", true)
   )
+
+window.disputes_select_all_check_box = () ->
+  $('.dispute_check_box').prop('checked', $('#disputes_check_box').prop('checked'))
 
 $ ->
 
