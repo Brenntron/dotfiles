@@ -72,7 +72,3 @@ Feature: RuleHit Resolution Mailer Templates
     Then I should see content "cisco@gmail.com" within ".cc-email"
     Then I should see content "Cucumber" within "#subject"
     Then I should see content "This is a test body" within ".new-body"
-
-
-
-

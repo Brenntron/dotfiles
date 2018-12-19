@@ -227,6 +227,33 @@ Feature: Webcat complaints
     Then I should see "Description for testing"
 
   @javascript
+  Scenario: a user looks up a complaint's entry history without entering a URL
+    Given a user with role "webcat user" exists and is logged in
+    When I click "#categorize-urls"
+    And I click "#history-1"
+    Then I should see "No data available for blank URL."
+
+  @javascript
+  Scenario: a user looks up a complaint's entry history with a valid URL
+    Given a user with role "webcat user" exists and is logged in
+    When I click "#categorize-urls"
+    And I fill in "url_1" with "cisco.com"
+    And I click "#history-1"
+    And I wait for "5" seconds
+    Then I should see "History Information"
+    And I should see "DOMAIN HISTORY"
+    And I should see "Tue, 12 May 2015 17:39:53 GMT"
+
+  @javascript
+  Scenario: a user looks up a complaint's entry history with an invalid URL
+    Given a user with role "webcat user" exists and is logged in
+    When I click "#categorize-urls"
+    And I fill in "url_1" with "fmasoifkis.com"
+    And I click "#history-1"
+    And I wait for "5" seconds
+    Then take a screenshot
+    Then I should see "SOMETHING WENT WRONG: THE URL YOU PROVIDED DOES NOT HAVE AVAILABLE DATA."
+
   Scenario: a users tries to categorize a URL
     Given a user with role "webcat user" exists and is logged in
     When I goto "/escalations/webcat/complaints?f=ALL"
@@ -353,8 +380,3 @@ Feature: Webcat complaints
     And I wait for "10" seconds
     Then I should see "SUCCESS"
     Then I should see "URI updated."
-
-
-
-
-
