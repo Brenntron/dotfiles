@@ -432,7 +432,7 @@ window.enlarge_image = (id,image)->
     trigger: 'focus'
     content: '<img src="' + image + '">').popover 'show'
 
-window.lookup_prefix = () ->
+window.lookup_prefix = (event) ->
 
   event.preventDefault()
 
