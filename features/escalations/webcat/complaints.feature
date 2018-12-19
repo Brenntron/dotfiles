@@ -225,7 +225,6 @@ Feature: Webcat complaints
   @javascript
   Scenario: a user looks up a complaint's entry history without entering a URL
     Given a user with role "webcat user" exists and is logged in
-    And I goto "/escalations/webcat/complaints?f=ALL"
     When I click "#categorize-urls"
     And I click "#history-1"
     Then I should see "No data available for blank URL."
@@ -233,7 +232,6 @@ Feature: Webcat complaints
   @javascript
   Scenario: a user looks up a complaint's entry history with a valid URL
     Given a user with role "webcat user" exists and is logged in
-    And I goto "/escalations/webcat/complaints?f=ALL"
     When I click "#categorize-urls"
     And I fill in "url_1" with "cisco.com"
     And I click "#history-1"
@@ -245,7 +243,6 @@ Feature: Webcat complaints
   @javascript
   Scenario: a user looks up a complaint's entry history with an invalid URL
     Given a user with role "webcat user" exists and is logged in
-    And I goto "/escalations/webcat/complaints?f=ALL"
     When I click "#categorize-urls"
     And I fill in "url_1" with "fmasoifkis.com"
     And I click "#history-1"
