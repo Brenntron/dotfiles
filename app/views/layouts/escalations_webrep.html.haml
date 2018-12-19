@@ -59,7 +59,7 @@
         %h3.nav-tool-dropdown-header
           %span.nav-dropdown-content-icon.icon-saved-search
           My Saved Searches
-        %table#saved-search.table.table-condensed.small
+        %table#saved-search.table
           %tbody#saved-search-tbody
             - if current_user.named_searches.any?
               - current_user.named_searches.each do |named_search|
