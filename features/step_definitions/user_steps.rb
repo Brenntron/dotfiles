@@ -33,7 +33,8 @@ end
 Given(/^a user with role "(.*?)" exists with cvs_username, "(.*?)", exists and is logged in$/) do |role, username|
   @user = FactoryBot.create(:current_user, confirmed: true, cvs_username: username)
   @user.roles << FactoryBot.create(:role, role: role)
-  sign_in_user
+  # sign_in_user
+  @user.update(bugzilla_api_key: Rails.configuration.bugzilla_api_key)
 end
 
 Given(/^a user with id "(.*?)" has a role "(.*?)" and is logged in$/) do |user_id, role|
@@ -70,11 +71,18 @@ def fill_in_login_form
 end
 
 def sign_in_user
-  visit escalations_webcat_complaints_path
-  click_on('user-settings-dropdown-button')
-  fill_in_login_form
-  click_on('top_banner_bugzilla_login_button')
-  sleep 3
+  current_user = User.where(cvs_username: ENV['authenticate_cvs_username']).first
+  current_user.update(bugzilla_api_key: Rails.configuration.bugzilla_api_key)
+  # case
+  # when current_user.roles.where(role: 'webcat user').exists?
+  #   visit escalations_webcat_complaints_path
+  # when current_user.roles.where(role: 'webrep user').exists?
+  #   visit escalations_webrep_disputes_path
+  # end
+  # click_on('user-settings-dropdown-button')
+  # fill_in_login_form
+  # click_on('top_banner_bugzilla_login_button')
+  # sleep 3
 end
 Given (/^the user signs in$/) do
   sign_in_user
