@@ -527,7 +527,7 @@ window.retrieve_history = (position) ->
             $('#history_dialog').dialog('open')
 
       error: (response) ->
-        std_msg_error("<p>Something went wrong: #{response.responseText}","")
+        std_msg_error("<p>Something went wrong: #{response.responseJSON.message}","")
     , this)
   else
     std_msg_error("Error",['No data available for blank URL.'])
