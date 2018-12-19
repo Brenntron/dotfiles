@@ -76,14 +76,16 @@ class Escalations::Webrep::DisputesController < ApplicationController
     respond_to do |format|
       format.html
       format.xlsx do
+        #
+        # This is a GET request;
         # Expected params:
         #
         # mytickets - bool
         # myteamtickets - bool
         # alltickets - Not implemented
         # customtickets - Not implemented
-        # startdate - datetime (get from localstorage object)
-        # enddate - datetime (get from localstorage object)
+        # startdate - datetime (the JS making the request gets from localstorage object)
+        # enddate - datetime (the JS making the request gets from localstorage object)
         #
 
         def insert_row_with_data(data, filename, sheetname, format = nil)
@@ -221,9 +223,6 @@ class Escalations::Webrep::DisputesController < ApplicationController
           @mytickets_output_file = mytickets_file.read
         end
 
-        # send_data @mytickets_output_file, filename: "my_tickets_#{Time.now}.xlsx", disposition: 'attachment'
-
-
         if params['myteamtickets'] == "true"
           myteamtickets_file = File.new("#{@spreadsheet_directory}/my-team-tickets_#{Time.now}.xlsx", 'w+')
           myteamtickets_xlsx = RubyXL::Workbook.new
@@ -356,10 +355,7 @@ class Escalations::Webrep::DisputesController < ApplicationController
             insert_row_with_data(data_values, myteamtickets_xlsx, myteamtickets_workbook_names[:closed_web_by_resolution])
           end
 
-
-
           # End data insertion
-
 
           myteamtickets_xlsx.worksheets.delete(myteamtickets_xlsx['Sheet1'])
 
@@ -368,27 +364,17 @@ class Escalations::Webrep::DisputesController < ApplicationController
           @myteamtickets_output_file = myteamtickets_file.read
         end
 
-        # send_data @myteamtickets_output_file, filename: "my_team_tickets_#{Time.now}.xlsx", disposition: 'attachment'
-
         input_filenames = Dir.entries(@spreadsheet_directory).select {|f| !File.directory? f}
         if input_filenames.count > 1
-
-          #Attachment name
           filename = "webrep_export-#{Time.now}.zip"
           temp_file = Tempfile.new(filename)
 
           begin
-            #This is the tricky part
-            #Initialize the temp file as a zip file
             Zip::OutputStream.open(temp_file) { |zos| }
 
             #Add files to the zip file as usual
             Zip::File.open(temp_file.path, Zip::File::CREATE) do |zipfile|
-              #Put files in here
               input_filenames.each do |filename|
-                  # Two arguments:
-                  # - The name of the file as it will appear in the archive
-                  # - The original file, including the path to find it
                   zipfile.add(filename, File.join(@spreadsheet_directory, filename))
                 end
             end
@@ -412,60 +398,12 @@ class Escalations::Webrep::DisputesController < ApplicationController
 
         if params['alltickets'] == "true"
           # Not yet implemented
-          # @contents.add_worksheet('All Tickets')
-          # alltickets_headers = ['Priority', 'Case ID', 'Status', 'Entry Count', 'Owner', 'Customer Name', 'Customer Email', 'Customer Company', 'Company URL', 'Time Submitted', 'Age', 'Dispute Entry', 'Dispute Entry Status', 'Suggested Disposition', 'Category', 'WBRS Score', 'WBRS Total Rule Hits', 'SBRS Score', 'SBRS Total Rule Hits', 'Important?', 'Resolution', 'Resolution Comments']
-          # insert_row_with_data(alltickets_headers, "All Tickets", "h1")
         end
 
         if params['customtickets'] == "true"
           # Not yet implemented
         end
-
-        # index_params = JSON.parse(params['data_json'])
-        # search_type = index_params['search_type']
-        # search_name = 'advanced' == search_type ? nil : index_params['search_name']
-        # @disputes = Dispute.robust_search(search_type,
-        #                                   search_name: search_name,
-        #                                   params: index_params,
-        #                                   user: current_user)
-        # contents = RubyXL::Workbook.new
-        # @worksheet = contents[0]
-        #
-        # def insert_row_with_data(data, format = nil)
-        #   data_insertion_index = @worksheet.sheet_data.rows.count
-        #   data.each_with_index do |new_data, i|
-        #     @worksheet.add_cell(data_insertion_index, i, new_data)
-        #     case format
-        #     when "bold"
-        #       @worksheet.sheet_data[data_insertion_index][i].change_font_bold(true)
-        #     when "h1"
-        #       @worksheet.sheet_data[data_insertion_index][i].change_font_bold(true)
-        #       @worksheet.sheet_data[data_insertion_index][i].change_font_size(14)
-        #     when "h2"
-        #       @worksheet.sheet_data[data_insertion_index][i].change_font_bold(true)
-        #       @worksheet.sheet_data[data_insertion_index][i].change_font_size(12)
-        #     end
-        #   end
-        # end
-        #
-        # dispute_headers = ['Priority', 'Case ID', 'Status', 'Entry Count', 'Owner', 'Customer Name', 'Customer Email', 'Customer Company', 'Company URL', 'Time Submitted', 'Age', 'Dispute Entry', 'Dispute Entry Status', 'Suggested Disposition', 'Category', 'WBRS Score', 'WBRS Total Rule Hits', 'SBRS Score', 'SBRS Total Rule Hits', 'Important?', 'Resolution', 'Resolution Comments']
-        # insert_row_with_data(dispute_headers, "h1")
-        #
-        # @disputes.each do |dispute|
-        #   # insert_row_with_data([dispute.priority, dispute.case_id_str, dispute.status, dispute.org_domain, dispute.dispute_entries.count, dispute.user.cvs_username, dispute.case_opened_at, ApplicationRecord.humanize_secs(Time.now - dispute.case_opened_at)], "h2")
-        #   # insert_row_with_data([ 'Dispute Entry', 'Dispute Entry Status', 'Suggested Disposition', 'Category', 'WBRS Score', 'WBRS Total Rule Hits', 'SBRS Score', 'SBRS Total Rule Hits', 'Important?', 'Resolution', 'Resolution Comments' ], "bold")
-        #   dispute.dispute_entries.each do |dispute_entry|
-        #     insert_row_with_data([ dispute_entry.dispute.priority, dispute_entry.dispute.case_id_str, dispute_entry.dispute.status, dispute_entry.dispute.dispute_entries.count, dispute_entry.dispute.user.cvs_username, dispute_entry.dispute.customer.name, dispute_entry.dispute.customer.email, dispute_entry.dispute.customer.company.name, dispute_entry.dispute.org_domain ,dispute_entry.dispute.case_opened_at.strftime("%FT%T"), ApplicationRecord.humanize_secs(Time.now - dispute_entry.dispute.case_opened_at), dispute_entry.hostlookup, dispute_entry.status, dispute_entry.suggested_disposition, dispute_entry.primary_category, dispute_entry.wbrs_score, dispute_entry.dispute_rule_hits.wbrs_rule_hits.count, dispute_entry.sbrs_score, dispute_entry.dispute_rule_hits.sbrs_rule_hits.count, dispute_entry.is_important, dispute_entry.resolution, dispute_entry.resolution_comment ])
-        #   end
-        #
-        # end
-        #
-        #
-        #
-
-        # @contents.worksheets.delete(@contents['Sheet1'])
-        # send_data @contents.stream.string, filename: "disputes_search_#{Time.now}.xlsx",
-        #           disposition: 'attachment'
+        
       end
     end
   end
