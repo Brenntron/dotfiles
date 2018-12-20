@@ -1,27 +1,35 @@
 .row
   .col-xl-6.col-lg-7.col-xs-12.dashboard-tickets-wrapper
     %h1.dashboard-header My Team Tickets
-    -# TODO Hook up the content layout list to the below tables, post launch
-    -#.content-layout-list
-    -#  %label.content-label-sm.icon-custom-star
-    -#    Show Customer Tickets
-    -#    %input{:type => "checkbox", :checked => "checked"}/
-    -#
-    -#  %label.content-label-sm.no-left-pad.right-vertical-separator
-    -#    Show Guest Tickets
-    -#    %input{:type => "checkbox", :checked => "checked"}/
-    -#
-    -#  %label.content-label-sm.dispute-E-grey
-    -#    Show Email Tickets
-    -#    %input{:type => "checkbox", :checked => "checked"}/
-    -#
-    -#  %label.content-label-sm.dispute-W-grey
-    -#    Show Web Tickets
-    -#    %input{:type => "checkbox", :checked => "checked"}/
-    -#
-    -#  %label.content-label-sm.dispute-EW-grey.btn-margin-left
-    -#    Show Email/Web Tickets
-    -#    %input{:type => "checkbox", :checked => "checked"}/
+    .toolbar
+      %div
+        %label.toolbar-section-label
+          Show Tickets by Submitter
+        %span.toolbar-select-wrapper
+          %label.toolbar-button-label.icon-custom-star.esc-tooltipped{for:'tickets-multi-show-customer-cb', title: 'Customer Tickets'}
+            %input#tickets-multi-show-customer-cb.tickets-show-customer-cb.toolbar-checkbox.show-tickets-cb{type: 'checkbox', checked: 'checked'}
+            %span.toolbar-button-text
+              Customer Tickets
+          %label.toolbar-button-label.icon-guest-user.esc-tooltipped{for:'tickets-multi-show-guest-cb', title: 'Guest Tickets'}
+            %input#tickets-multi-show-guest-cb.tickets-show-guest-cb.toolbar-checkbox.show-tickets-cb{type: 'checkbox', checked: 'checked'}
+            %span.toolbar-button-text
+              Guest Tickets
+      %div
+        %label.toolbar-section-label
+          Show Tickets by Type
+        %span.toolbar-select-wrapper
+          %label.toolbar-button-label.dispute-E-grey.esc-tooltipped{for:'tickets-multi-show-email-cb', title: 'Email Tickets'}
+            %input#tickets-multi-show-email-cb.tickets-show-email-cb.toolbar-checkbox.show-tickets-cb{type: 'checkbox', checked: 'checked'}
+            %span.toolbar-button-text
+              Email Tickets
+          %label.toolbar-button-label.dispute-W-grey.esc-tooltipped{for:'tickets-multi-show-web-cb', title: 'Web Tickets'}
+            %input#tickets-multi-show-web-cb.tickets-show-web-cb.toolbar-checkbox.show-tickets-cb{type: 'checkbox', checked: 'checked'}
+            %span.toolbar-button-text
+              Web Tickets
+          %label.toolbar-button-label.dispute-EW-grey.esc-tooltipped{for:'tickets-multi-show-email-web-cb', title: 'Email / Web Tickets'}
+            %input#tickets-multi-show-email-web-cb.tickets-show-email-web-cb.toolbar-checkbox.show-tickets-cb{type: 'checkbox', checked: 'checked'}
+            %span.toolbar-button-text
+              Email / Web Tickets
 
     .tickets-section-wrapper.open-tickets-wrapper
       .open-tickets-header
@@ -32,14 +40,14 @@
       %table.table.responsive.dashboard-tickets-table#table-multi-user-disputes-open
         %thead
           %tr
-            %th
+            %th.esc-tooltipped{title: 'Priority'}
             -#  priority
             %th Case ID
-            %th
+            %th.esc-tooltipped{title: 'Submitter Type'}
             -#  Submitter type
             %th Owner
             %th Status
-            %th
+            %th.esc-tooltipped{title: 'Ticket Type'}
             -#  Ticket type
             %th Dispute Preview
             %th Last Comment Date
@@ -82,13 +90,13 @@
       %table.table.responsive.dashboard-tickets-table#table-multi-user-disputes-closed
         %thead
           %tr
-            %th
+            %th.esc-tooltipped{title: 'Priority'}
             -#    priority
             %th Case ID
-            %th
+            %th.esc-tooltipped{title: 'Submitter Type'}
             -#  Submitter type
             %th Owner
-            %th
+            %th.esc-tooltipped{title: 'Ticket Type'}
             -#  Ticket type
             %th Dispute Preview
             %th Time to Close

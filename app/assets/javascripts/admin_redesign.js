@@ -16,6 +16,7 @@
 //= require bootstrap-multiselect
 //= require bootstrap-sprockets
 //= require bootstrap-table.min
+//= require bootstrap_tabs
 //= require admin/bs-dropdown-select
 //= require admin/rules
 //= require admin/notes
