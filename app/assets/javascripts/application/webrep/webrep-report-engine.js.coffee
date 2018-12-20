@@ -31,20 +31,25 @@ window.change_reported_week = (new_report_range_from, new_report_range_to)->
   window.refresh_visable_report_tab()
 
 window.refresh_visable_report_tab = ()->
-  window.build_graph_ticket_entries_submitter()
-  window.build_single_closed_email_entries_resolution_piechart()
-  window.build_single_closed_web_entries_resolution_piechart()
-  window.build_multi_closed_email_entries_resolution_piechart()
-  window.build_multi_closed_web_entries_resolution_piechart()
-  window.build_single_entries_closed_by_day_chart()
-  window.build_multi_average_time_to_close_tickets()
-  window.refresh_multi_closed_tickets_table()
-  window.refresh_multi_open_tickets_table()
-  window.build_multi_entries_closed_by_owners_chart()
-  window.build_multi_rulehits_for_fp_res_chart()
-  window.build_multi_entries_closed_by_day_chart()
-  window.build_multi_ticket_resolution_by_owner_chart()
-  window.build_single_time_to_close_linechart()
+  if $('#dashboard-tab-list').length > 0
+    user_id = $("#user_id").val()
+
+    window.build_graph_ticket_entries_submitter()
+    window.build_single_closed_email_entries_resolution_piechart()
+    window.build_single_closed_web_entries_resolution_piechart()
+    window.build_multi_closed_email_entries_resolution_piechart()
+    window.build_multi_closed_web_entries_resolution_piechart()
+    window.build_single_entries_closed_by_day_chart()
+    window.build_multi_average_time_to_close_tickets()
+    window.refresh_multi_closed_tickets_table()
+    window.refresh_multi_open_tickets_table()
+    window.refresh_single_open_tickets_table(user_id)
+    window.refresh_single_closed_tickets_table(user_id)
+    window.build_multi_entries_closed_by_owners_chart()
+    window.build_multi_rulehits_for_fp_res_chart()
+    window.build_multi_entries_closed_by_day_chart()
+    window.build_multi_ticket_resolution_by_owner_chart()
+    window.build_single_time_to_close_linechart()
 
 
 #window.initialize_charts = () ->
@@ -287,8 +292,7 @@ window.set_initial_date_span = () ->
 
   $('#tickets_date_range').val(prettyFromDate + " - " + prettyToDate)
 
-  refresh_single_open_tickets_table(user_id)
-  refresh_single_closed_tickets_table(user_id)
+  window.refresh_visable_report_tab()
   set_date_label()
 
 window.build_graph_ticket_entries_submitter = () ->
@@ -1257,46 +1261,49 @@ window.build_multi_rulehits_for_fp_res_chart = () ->
   )
 
 $ ->
-  window.set_initial_date_span()
-  $('#tickets_date_range').daterangepicker()
-  $('button.icon-calendar').click ->
-    $('#tickets_date_range').trigger 'click'
 
-  $('#tickets_date_range').on 'apply.daterangepicker', (ev, picker) ->
-    firstday = new Date(picker.startDate).toUTCString();
-    lastday = new Date(picker.endDate).toUTCString();
+  if $('#dashboard-tab-list').length > 0
 
-    localStorage.setItem 'webrep_report_range_from', picker.startDate
-    localStorage.setItem 'webrep_report_range_to', picker.endDate
-    user_id = $("#user_id").val()
-    set_date_label()
+    window.set_initial_date_span()
+    $('#tickets_date_range').daterangepicker()
+    $('button.icon-calendar').click ->
+      $('#tickets_date_range').trigger 'click'
+
+    $('#tickets_date_range').on 'apply.daterangepicker', (ev, picker) ->
+      firstday = new Date(picker.startDate).toUTCString();
+      lastday = new Date(picker.endDate).toUTCString();
+
+      localStorage.setItem 'webrep_report_range_from', picker.startDate
+      localStorage.setItem 'webrep_report_range_to', picker.endDate
+      user_id = $("#user_id").val()
+      set_date_label()
+      window.refresh_visable_report_tab()
+
+    $('#ticket-view-shortcut').click ->
+      if this.innerHTML == "View Last Week's Tickets"
+        curr = new Date;
+        first = curr.getDate() - curr.getDay() - 7;
+        last = first + 6;
+
+        firstday = new Date(curr.setDate(first)).toUTCString();
+        lastday = new Date(curr.setDate(last)).toUTCString();
+
+        localStorage.setItem 'webrep_report_range_from', firstday
+        localStorage.setItem 'webrep_report_range_to', lastday
+      else
+        curr = new Date;
+        first = curr.getDate() - curr.getDay();
+        last = first + 6;
+
+        firstday = new Date(curr.setDate(first)).toUTCString();
+        lastday = new Date(curr.setDate(last)).toUTCString();
+
+        localStorage.setItem 'webrep_report_range_from', firstday
+        localStorage.setItem 'webrep_report_range_to', lastday
+
+      user_id = $("#user_id").val()
+      set_date_label()
+      window.refresh_visable_report_tab()
+
     window.refresh_visable_report_tab()
-
-  $('#ticket-view-shortcut').click ->
-    if this.innerHTML == "View Last Week's Tickets"
-      curr = new Date;
-      first = curr.getDate() - curr.getDay() - 7;
-      last = first + 6;
-
-      firstday = new Date(curr.setDate(first)).toUTCString();
-      lastday = new Date(curr.setDate(last)).toUTCString();
-
-      localStorage.setItem 'webrep_report_range_from', firstday
-      localStorage.setItem 'webrep_report_range_to', lastday
-    else
-      curr = new Date;
-      first = curr.getDate() - curr.getDay();
-      last = first + 6;
-
-      firstday = new Date(curr.setDate(first)).toUTCString();
-      lastday = new Date(curr.setDate(last)).toUTCString();
-
-      localStorage.setItem 'webrep_report_range_from', firstday
-      localStorage.setItem 'webrep_report_range_to', lastday
-
-    user_id = $("#user_id").val()
-    set_date_label()
-    window.refresh_visable_report_tab()
-
-  window.refresh_visable_report_tab()
-  window.populate_top_banner()
+    window.populate_top_banner()
