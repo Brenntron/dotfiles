@@ -324,7 +324,7 @@ table.dataTable.no-footer {
   border-radius: 2px;
   border: 1px solid $type-lighter-color !important;
 }
-#disputes-index_filter, #complaints-index_filter {
+#disputes-index_filter, #complaints-index_filter, #clusters-index_filter {
   label {
     height: 100%;
   }
@@ -5853,6 +5853,10 @@ table.dataTable tbody tr.selected .alt-col{
   background-color: #dae7ea;
 }
 
+table.dispute-entry-table tbody tr.selected {
+  background-color: $type-lighter-color;
+}
+
 .nested-col-sections {
   display: inline-block;
   float: left;
@@ -6938,4 +6942,16 @@ h2 {
 .overdue {
   color: $second-section-color;
   font-weight: 600;
+}
+
+.sorting_1, .sorting_asc, .sorting_desc {
+  background-color: $faint-accent-color !important;
+  opacity: 80%;
+  background-position-x: 95% !important;
+}
+.sorting {
+  background-position-x: 95% !important;
+}
+#time-submitted {
+  width: 150px;
 }

@@ -5,36 +5,37 @@ window.apply_filter_to_table = () ->
 
 
 window.populate_clusters_index_table = (filter) ->
-  $('.cluster-mgt-loader-wrapper').removeClass('hidden')
-  filter_param = ""
-  if filter
-    filter_param = "?regex=" + filter
+  if $('#clusters-index_wrapper').length > 0
+    $('.cluster-mgt-loader-wrapper').removeClass('hidden')
+    filter_param = ""
+    if filter
+      filter_param = "?regex=" + filter
 
-  headers = {'Token': $('input[name="token"]').val(), 'Xmlrpc-Token': $('input[name="xml_token"]').val()}
-  $.ajax(
-    url: "/escalations/api/v1/escalations/webcat/clusters" + filter_param
-    method: 'GET'
-    headers: headers
-    success: (response) ->
-      $('.cluster-mgt-loader-wrapper').addClass('hidden')
-      json = $.parseJSON(response)
-      if json.data.length == 0
-        std_msg_error("No clusters available.","")
-      if json.error
-        std_msg_error('Table Error', [json.error])
-      else
-        datatable = $('#clusters-index').DataTable()
-        datatable.clear();
-        datatable.rows.add(json.data);
-        datatable.draw();
+    headers = {'Token': $('input[name="token"]').val(), 'Xmlrpc-Token': $('input[name="xml_token"]').val()}
+    $.ajax(
+      url: "/escalations/api/v1/escalations/webcat/clusters" + filter_param
+      method: 'GET'
+      headers: headers
+      success: (response) ->
+        $('.cluster-mgt-loader-wrapper').addClass('hidden')
+        json = $.parseJSON(response)
+        if json.data.length == 0
+          std_msg_error("No clusters available.","")
+        if json.error
+          std_msg_error('Table Error', [json.error])
+        else
+          datatable = $('#clusters-index').DataTable()
+          datatable.clear();
+          datatable.rows.add(json.data);
+          datatable.draw();
 
-        selectize_category_inputs();
+          selectize_category_inputs();
+  
+          $("#total_results").html(json.meta.rows_found)
 
-        $("#total_results").html(json.meta.rows_found)
-
-    error: (response) ->
-      std_msg_error('Table Error', [response.responseText])
-  , this)
+      error: (response) ->
+        std_msg_error('Table Error', [response.responseText])
+    , this)
 
 window.categorize_clusters = () ->
 
@@ -44,7 +45,6 @@ window.categorize_clusters = () ->
   clusters_to_categorize = []
   clusters = $ '[id$=\'_categories\']'
   categories = []
-  category_values = []
 
   data = {}
   data["comment"] = comment
@@ -52,11 +52,13 @@ window.categorize_clusters = () ->
   $(clusters).each ->
     id =  $(this).attr('id').split('_')[0]
     categories = $(this).find('option')
-    $(categories).each ->
-      value = $(this).attr('value')
-      category_values.push value
 
     if categories? and categories.length > 0
+      category_values = []
+      $(categories).each ->
+        value = $(this).attr('value')
+        category_values.push value
+
       data["cluster_id_" + id.toString()] = category_values
 
   headers = {'Token': $('input[name="token"]').val(), 'Xmlrpc-Token': $('input[name="xml_token"]').val()}
@@ -85,7 +87,11 @@ window.categorize_clusters = () ->
 $ ->
 #  Populate the cluster management table (temp data currently)
   window.clusters_table = $('#clusters-index').DataTable(
-    dom: '<"datatable-top-tools"lf>t<ip>'
+    dom: '<"datatable-top-tools no-margin-datatable-top-tool"lf>t<ip>'
+    language: {
+      search: "_INPUT_"
+      searchPlaceholder: "Search within table"
+    }
     order: []
     lengthMenu: [50, 100, 500, 1000]
     columnDefs: [
@@ -155,6 +161,7 @@ $ ->
       }
     ]
   )
+  $('#clusters-index_filter input').addClass('table-search-input');
   window.populate_clusters_index_table()
 
 $ ->
