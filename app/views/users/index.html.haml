@@ -1,0 +1,117 @@
+.content-wrapper
+  %h1.index-table-header Related Users
+
+  %table.table.responsive.index-table
+    %thead
+      %tr
+        %th
+        -# User group
+        %th Name
+        %th Username
+        %th Roles
+        %th.text-center Open Bugs
+        %th.text-center Pending Bugs
+        %th.text-center Closed Bugs
+        %th.text-center All Bugs
+        %th.text-center Committer
+        - if current_user.has_role?('manager')
+          %th
+    -# Edit / Delete Row
+    %tbody
+      - if current_user.has_role?('manager')
+        - team_total = current_user.children.length + 1
+        %tr
+          %td.user-group{rowspan: "#{team_total}"} Team
+          %td.alt-col.user-col-divider= current_user.display_name
+          %td.alt-col.user-name-col.current-user= link_to current_user.cvs_username, user_path(current_user)
+          %td.data_small_emphasis=current_user.roles.map(&:role).join(', ')
+          %td.text-center= current_user.bugs.open_bugs.count
+          %td.text-center= current_user.bugs.pending.count
+          %td.text-center= current_user.bugs.closed.count
+          %td.text-center= current_user.bugs.count
+          %td.text-center
+            - if current_user.has_role?('committer')
+              Yes
+          %td
+        - current_user.children.each do |user|
+          %tr
+            %td.alt-col.user-col-divider= user.display_name
+            %td.alt-col.user-name-col= link_to user.cvs_username, user_path(user)
+            %td.data_small_emphasis=user.roles.map(&:role).join(', ')
+            %td.text-center= user.bugs.open_bugs.count
+            %td.text-center= user.bugs.pending.count
+            %td.text-center= user.bugs.closed.count
+            %td.text-center= user.bugs.count
+            %td.text-center
+              - if user.has_role?('committer')
+                Yes
+            %td.text-right.table-button-row
+              %button.edit-button.table-row-button.tooltipped#edit-user{title: "Edit #{user.cvs_username}'s roles"}
+              = link_to user_remove_from_team_path(user_id: user.id), method: :patch, data: {confirm: "Remove #{user.display_name} from team?"} do
+                %button.remove-button.table-row-button.tooltipped#remove-user{title: "Remove #{user.cvs_username} from this team"}
+
+      - else
+        %tr
+          %td.user-group
+          %td.alt-col.user-col-divider= current_user.display_name
+          %td.alt-col.user-name-col.current-user= link_to current_user.cvs_username, user_path(current_user)
+          %td.data_small_emphasis=current_user.roles.map(&:role).join(', ')
+          %td.text-center= current_user.bugs.open_bugs.count
+          %td.text-center= current_user.bugs.pending.count
+          %td.text-center= current_user.bugs.closed.count
+          %td.text-center= current_user.bugs.count
+          %td.text-center
+            - if current_user.has_role?('committer')
+              Yes
+          %td
+
+      - if current_user.child?
+        - coworkers_total = current_user.siblings.length
+        - current_user.siblings.each_with_index do |user, index|
+          %tr
+            - if index == 0
+              %td.user-group{rowspan: "#{coworkers_total}"}
+                Coworkers
+            %td.alt-col.user-col-divider= user.display_name
+            %td.alt-col.user-name-col= link_to user.cvs_username, user_path(user)
+            %td.data_small_emphasis= user.roles.map(&:role).join(', ')
+            %td.text-center= user.bugs.open_bugs.count
+            %td.text-center= user.bugs.pending.count
+            %td.text-center= user.bugs.closed.count
+            %td.text-center= user.bugs.count
+            %td.text-center
+              - if user.has_role?('committer')
+                Yes
+            %td
+
+
+
+
+-#<table class="table index-table">
+-#  <thead>
+-#    <tr>
+-#      <td><strong>Me</strong></td>
+-#      <td><strong>Team</strong></td>
+-#      <td><strong>Co-workers</strong></td>
+-#    </tr>
+-#  </thead>
+-#  <tbody>
+-#    <tr>
+-#      <td><%= link_to current_user.cvs_username, escalations_user_path(current_user) %></td>
+-#      <td>
+-#        <% if current_user.children.any? %>
+-#          <% current_user.children.each do |user| %>
+-#            <li><%= link_to user.cvs_username, escalations_user_path(user) %></li>
+-#          <% end %>
+-#        <% end %>
+-#      </td>
+-#      <td>
+-#        <% if current_user.child? %>
+-#          <% current_user.siblings.each do |user| %>
+-#            <li><%= link_to user.cvs_username, escalations_user_path(user) %></li>
+-#          <% end %>
+-#        <% end %>
+-#      </td>
+-#    </tr>
+-#  </tbody>
+-#</table>
