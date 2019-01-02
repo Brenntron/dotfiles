@@ -19,11 +19,6 @@
             %button.toolbar-button.email-button.tooltipped{title: "Send Message to #{@user.cvs_username}"}
         - if can?(:manage, @user)
           %button.toolbar-button.edit-button.tooltipped{title: "Edit #{@user.cvs_username}'s roles", 'data-toggle': 'modal', 'data-target': "#roleModal_#{@user.id}"}
-        -# Add in new way to edit user role
-        -#<% if can?(:manage, @user)  %>
-        -#  <span data-toggle="modal" data-target='<%= "#roleModal_#{@user.id}" %>'>
-        -#  </span>
-        -#<% end %>
         - if @user == current_user && @user.has_role?('manager')
           = link_to escalations_users_path do
             %button.toolbar-button.manage-button.tooltipped{title: "Manage Team"}

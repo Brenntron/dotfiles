@@ -46,9 +46,21 @@
               - if user.has_role?('committer')
                 Yes
             %td.text-right.table-button-row
-              %button.edit-button.table-row-button.tooltipped#edit-user{title: "Edit #{user.cvs_username}'s roles"}
+              %button.edit-button.table-row-button.tooltipped#edit-user{title: "Edit #{user.cvs_username}'s roles", 'data-toggle': 'modal', 'data-target': "#roleModal_#{user.id}"}
               = link_to user_remove_from_team_path(user_id: user.id), method: :patch, data: {confirm: "Remove #{user.display_name} from team?"} do
                 %button.remove-button.table-row-button.tooltipped#remove-user{title: "Remove #{user.cvs_username} from this team"}
+
+
+          .modal.fade{id: "roleModal_#{user.id}", tabindex: '-1', role: 'dialog', 'aria-hidden': 'true'}
+            .modal-dialog{role: 'document'}
+              .modal-content
+                .modal-header
+                  %button.close{type: 'button', 'data-dismiss': 'modal', 'aria-hidden': 'true'}
+                  %h4.modal-title
+                    Update Role(s) for
+                    = user.cvs_username
+                .modal-body
+                  =render 'shared/role_form', user: user
 
       - else
         %tr
