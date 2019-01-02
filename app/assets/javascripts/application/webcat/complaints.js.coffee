@@ -477,20 +477,18 @@ window.lookup_prefix = () ->
   )
 
 window.retrieve_history = (position) ->
-
-  $('#loader-modal').show()
-
-
-  $('#loader-modal').modal({
-    backdrop: 'static',
-    keyboard: false
-  })
-
   $(".cat-url-error").hide()
 
   url = $("#url_" + position).val()
 
   if url.length > 0
+    $('#loader-modal').show()
+
+    $('#loader-modal').modal({
+      backdrop: 'static',
+      keyboard: false
+    })
+
     std_msg_ajax(
       url: '/escalations/api/v1/escalations/webcat/complaint_entries/categorize_urls_history'
       method: 'POST'
@@ -545,7 +543,8 @@ window.retrieve_history = (position) ->
         $("#url-#{position}").show()
     , this)
   else
-    std_msg_error("Error",['No data available for blank URL.'])
+    $("#cat-url-message-#{position}").text("No data available for blank URL.")
+    $("#url-#{position}").show()
 
 window.drop_current_categories = () ->
 
