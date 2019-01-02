@@ -540,11 +540,11 @@ window.retrieve_history = (position) ->
       error: (response) ->
         $('.modal-backdrop').hide()
         $('#loader-modal').hide()
-        $("#url-#{position}").show()
+        $("#cat-url-#{position}").show()
     , this)
   else
     $("#cat-url-message-#{position}").text("No data available for blank URL.")
-    $("#url-#{position}").show()
+    $("#cat-url-#{position}").show()
 
 window.drop_current_categories = () ->
 
