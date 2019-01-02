@@ -1279,11 +1279,3 @@ $ ->
     if $('#cat-urls-same').prop('checked')
       $('#categorize-diff-form').hide()
       $('#categorize-same-form').show()
-
-  $('.dropdown').on 'hide.bs.dropdown', ->
-    return false
-
-
-
-
-
