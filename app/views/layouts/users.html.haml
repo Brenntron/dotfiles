@@ -23,11 +23,9 @@
 
 
   - if current_user
-    #login-div.nav-tool-block.col-xs-2.col-lg-2
+    #login-div.nav-tool-block.col-xs-3.col-lg-2
       %a{href: "/users/#{current_user[:id]}"}
         = current_user[:display_name]
-
-    -##username= current_user.cvs_username
 
 = render template: "layouts/rocket"
 

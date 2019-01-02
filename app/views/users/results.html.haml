@@ -1,0 +1,48 @@
+.content-wrapper
+  %h1.index-table-header Users
+  %table.table.responsive.index-table
+    %thead
+      %tr
+        %th Name
+        %th Username
+        %th.text-center Open Bugs
+        %th.text-center Pending Bugs
+        %th.text-center Closed Bugs
+        %th.text-center All Bugs
+        %th.text-center Committer
+    %tbody
+      - @users.each do |user|
+        %tr
+          %td.alt-col.user-col-divider= user.display_name
+          - if current_user.has_role?('admin')
+            %td.alt-col.user-name-col= link_to user.cvs_username, user_path(user)
+          - else
+            %td.alt-col.user-name-col= user.cvs_username
+          %td.text-center= user.bugs.open_bugs.count
+          %td.text-center= user.bugs.pending.count
+          %td.text-center= user.bugs.closed.count
+          %td.text-center= user.bugs.count
+          %td.text-center
+            - if user.has_role?('committer')
+              Yes
+
+-#<table class="table index-table">
+-#  <thead>
+-#  <tr>
+-#    <th>Name</th>
+-#    <th>email</th>
+-#  </tr>
+-#  </thead>
+-#  <tbody>
+-#  <% @users.each do |user| %>
+-#    <tr>
+-#      <% if current_user.has_role?('admin') %>
+-#        <td><%= link_to user.display_name, escalations_user_path(user) %></td>
+-#      <% else %>
+-#        <td><%= user.display_name %></td>
+-#      <% end %>
+-#      <td><%= user.email %></td>
+-#    </tr>
+-#  <% end %>
+-#  </tbody>
+-#</table>
