@@ -478,6 +478,8 @@ window.lookup_prefix = () ->
 
 window.retrieve_history = (position) ->
 
+  $(".cat-url-error").hide()
+
   url = $("#url_" + position).val()
 
   if url.length > 0
@@ -527,7 +529,7 @@ window.retrieve_history = (position) ->
             $('#history_dialog').dialog('open')
 
       error: (response) ->
-        std_msg_error("<p>Something went wrong: #{response.responseJSON.message}","")
+        $(".cat-url-error").show()
     , this)
   else
     std_msg_error("Error",['No data available for blank URL.'])

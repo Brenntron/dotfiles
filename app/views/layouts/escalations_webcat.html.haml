@@ -41,6 +41,9 @@
       .nav-tool-content-wrapper#categorize-urls-form-wrapper
         #categorize-diff-form
           %form{method: 'get', 'accept-charset': 'UTF-8'}
+            %div.cat-url-error
+              %button.categorize-urls-warning-icon
+              %span No history associated with this url.
             %h5 Categorize URLs with Different Categories
             .toolbar
               %div

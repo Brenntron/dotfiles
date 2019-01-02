@@ -6955,3 +6955,17 @@ h2 {
 #time-submitted {
   width: 150px;
 }
+
+.cat-url-error{
+  color: black;
+  display: none;
+}
+
+.categorize-urls-warning-icon{
+  width: 15px;
+  height: 15px;
+  background-image: url(image_path('icon_warning_orange.svg'));
+  background-repeat: no-repeat;
+  background-position: center center;
+  border:0;
+}
