@@ -5520,6 +5520,7 @@ table.dispute_tool_current tr:last-of-type td {
 #disputes-index .dispute-submission-type {
   display: block;
   margin: auto;
+  cursor: default;
 }
 
 .dispute-W, .dispute-w {background-image: url(image_path('icon_type_web.svg'));}
