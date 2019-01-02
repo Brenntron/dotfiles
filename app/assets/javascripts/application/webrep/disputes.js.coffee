@@ -633,7 +633,7 @@ window.toolbar_index_change_assignee = () ->
     success: (response) ->
       window.location.reload()
     error: (response) ->
-      popup_response_error(response, 'Error changing assignee')
+      std_msg_error('Assign Error', ['Error changing assignee', response.responseJSON.error])
   )
 
 window.toolbar_show_change_assignee = () ->
@@ -656,7 +656,7 @@ window.toolbar_show_change_assignee = () ->
     success: (response) ->
       window.location.reload()
     error: (response) ->
-      popup_response_error(response, 'Error changing assignee')
+      std_msg_error('Assign Error', ['Error changing assignee', response.responseJSON.error])
   )
 
 window.related_disputes = () ->
@@ -681,7 +681,7 @@ window.related_disputes = () ->
     success: (response) ->
       window.location.reload()
     error: (response) ->
-      popup_response_error(response, 'Error setting related dispute.')
+      std_msg_error('Setting related error', ['Error setting related dispute', response.responseJSON.error])
   )
 
 window.toolbar_unassign_dispute = () ->
