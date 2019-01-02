@@ -538,6 +538,7 @@ window.retrieve_history = (position) ->
             $('#history_dialog').dialog('open')
 
       error: (response) ->
+        $("#cat-url-message-#{position}").text("No history associated with this url.")
         $('.modal-backdrop').hide()
         $('#loader-modal').hide()
         $("#cat-url-#{position}").show()
