@@ -478,6 +478,14 @@ window.lookup_prefix = () ->
 
 window.retrieve_history = (position) ->
 
+  $('#loader-modal').show()
+
+
+  $('#loader-modal').modal({
+    backdrop: 'static',
+    keyboard: false
+  })
+
   $(".cat-url-error").hide()
 
   url = $("#url_" + position).val()
@@ -488,6 +496,9 @@ window.retrieve_history = (position) ->
       method: 'POST'
       data: {'position': position, url: url}
       success: (response) ->
+        $('.modal-backdrop').hide()
+        $('#loader-modal').hide()
+
         json = JSON.parse(response)
 
         if json.error
@@ -529,7 +540,9 @@ window.retrieve_history = (position) ->
             $('#history_dialog').dialog('open')
 
       error: (response) ->
-        $(".cat-url-error").show()
+        $('.modal-backdrop').hide()
+        $('#loader-modal').hide()
+        $("#url-#{position}").show()
     , this)
   else
     std_msg_error("Error",['No data available for blank URL.'])

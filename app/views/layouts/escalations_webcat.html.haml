@@ -41,9 +41,6 @@
       .nav-tool-content-wrapper#categorize-urls-form-wrapper
         #categorize-diff-form
           %form{method: 'get', 'accept-charset': 'UTF-8'}
-            %div.cat-url-error
-              %button.categorize-urls-warning-icon
-              %span No history associated with this url.
             %h5 Categorize URLs with Different Categories
             .toolbar
               %div
@@ -53,6 +50,9 @@
                   %span Drop All Current Categories
 
             .form-group
+              %div.cat-url-error#url-1
+                %button.categorize-urls-warning-icon
+                %span No history associated with this url.
               %label.content-label-sm URL
               %br
               %input.inline-input.form-control#url_1{:name => "token", :type => "text", :value => "", :placeholder=>"URL", autofocus: 'true', tabindex: '1'}/
@@ -61,6 +61,9 @@
               %select.form-control#cat_new_url_1.cat_new_url.contacts.selectize{:multiple => "multiple", :placeholder => "Enter up to 5 categories", :style => "display: none;", tabindex: '2'}
             %hr.thin.condensed
             .form-group
+              %div.cat-url-error#url-2
+                %button.categorize-urls-warning-icon
+                %span No history associated with this url.
               %label.content-label-sm URL
               %br
               %input.inline-input.form-control#url_2{:name => "token", :type => "text", :value => "", :placeholder=>"URL", tabindex: '3'}/
@@ -69,6 +72,9 @@
               %select.form-control#cat_new_url_2.cat_new_url.contacts.selectize{:multiple => "multiple", :placeholder => "Enter up to 5 categories", :style => "display: none;", :tabindex => "4"}
             %hr.thin.condensed
             .form-group
+              %div.cat-url-error#url-3
+                %button.categorize-urls-warning-icon
+                %span No history associated with this url.
               %label.content-label-sm URL
               %br
               %input.inline-input.form-control#url_3{:name => "token", :type => "text", :value => "", :placeholder=>"URL", tabindex: '5'}/
@@ -77,6 +83,9 @@
               %select.form-control#cat_new_url_3.cat_new_url.contacts.selectize{:multiple => "multiple", :placeholder => "Enter up to 5 categories", :style => "display: none;", :tabindex => "6"}
             %hr.thin.condensed
             .form-group
+              %div.cat-url-error#url-4
+                %button.categorize-urls-warning-icon
+                %span No history associated with this url.
               %label.content-label-sm URL
               %br
               %input.inline-input.form-control#url_4{:name => "token", :type => "text", :value => "", :placeholder=>"URL", tabindex: '7'}/
@@ -85,6 +94,9 @@
               %select.form-control#cat_new_url_4.cat_new_url.contacts.selectize{:multiple => "multiple", :placeholder => "Enter up to 5 categories", :style => "display: none;", :tabindex => "8"}
             %hr.thin.condensed
             .form-group
+              %div.cat-url-error#url-5
+                %button.categorize-urls-warning-icon
+                %span No history associated with this url.
               %label.content-label-sm URL
               %br
               %input.inline-input.form-control#url_5{:name => "token", :type => "text", :value => "", :placeholder=>"URL", tabindex: '9'}/
