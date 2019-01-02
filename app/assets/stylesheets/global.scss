@@ -3939,25 +3939,44 @@ td.wbrs-highlight, td.sbrs-highlight {
   margin: 0;
 }
 
-.escalations--webrep--disputes-controller #nav-banner, .escalations--webcat--complaints-controller #nav-banner, .escalations--webcat--reports-controller #nav-banner {
+// These styles are for the dark top navigation used in escalations section. After the site is updated across the board
+// we can consolidate these to be the master styles for the top nav instead of being controller dependant.
+
+.escalations--webrep--disputes-controller #nav-banner,
+.escalations--webcat--complaints-controller #nav-banner,
+.escalations--webcat--reports-controller #nav-banner,
+.users-controller #nav-banner {
   background-color: #4E4E4E;
   color: $content-bg-color;
 }
 
-.escalations--webrep--disputes-controller #nav-banner a, .escalations--webcat--complaints-controller #nav-banner a, .escalations--webcat--reports-controller #nav-banner a {
+.escalations--webrep--disputes-controller #nav-banner a,
+.escalations--webcat--complaints-controller #nav-banner a,
+.escalations--webcat--reports-controller #nav-banner a,
+.users-controller #nav-banner a {
   color: $content-bg-color;
 }
 
-.escalations--webrep--disputes-controller .nav-tool-blocks, .escalations--webcat--complaints-controller .nav-tool-blocks, .escalations--webcat--reports-controller .nav-tool-blocks {
+.escalations--webrep--disputes-controller .nav-tool-blocks,
+.escalations--webcat--complaints-controller .nav-tool-blocks,
+.escalations--webcat--reports-controller .nav-tool-blocks,
+.users-controller .nav-tool-blocks {
   border: none;
 }
 
-.escalations--webrep--disputes-controller #nav-banner .nav-page-button, .escalations--webcat--complaints-controller #nav-banner .nav-page-button, .escalations--webcat--reports-controller #nav-banner .nav-page-button {
+.escalations--webrep--disputes-controller #nav-banner .nav-page-button,
+.escalations--webcat--complaints-controller #nav-banner .nav-page-button,
+.escalations--webcat--reports-controller #nav-banner .nav-page-button,
+.users-controller #nav-banner .nav-page-button {
   display: inline-block;
   width: 44px;
 }
 
-.escalations--webrep--disputes-controller #nav-banner .nav-page-button.active, .escalations--webcat--complaints-controller #nav-banner .nav-page-button.active, .escalations--webcat--reports-controller #nav-banner .nav-page-button.active {
+.escalations--webrep--disputes-controller #nav-banner .nav-page-button.active,
+.escalations--webcat--complaints-controller #nav-banner .nav-page-button.active,
+.escalations--webcat--reports-controller #nav-banner .nav-page-button.active,
+.users-controller #nav-banner .nav-page-button.active
+{
   background-color: $bug-section-color;
 }
 
@@ -3969,12 +3988,18 @@ td.wbrs-highlight, td.sbrs-highlight {
 .escalations--webcat--complaints-controller .dropdown.open,
 .escalations--webcat--reports-controller #nav-banner .nav-page-button:hover,
 .escalations--webcat--reports-controller #nav-banner a:hover,
-.escalations--webcat--reports-controller .dropdown.open
+.escalations--webcat--reports-controller .dropdown.open,
+.users-controller #nav-banner .nav-page-button:hover,
+.users-controller #nav-banner a:hover
 {
   background-color: lighten(#4E4E4E, 10%);
 }
 
-.escalations--webrep--disputes-controller #advanced-search-button, .escalations--webcat--complaints-controller #advanced-search-button, .escalations--webcat--reports-controller #advanced-search-button  {
+.escalations--webrep--disputes-controller #advanced-search-button,
+.escalations--webcat--complaints-controller #advanced-search-button,
+.escalations--webcat--reports-controller #advanced-search-button,
+.users-controller #advanced-search-button
+{
   background-color: darken($faint-neutral-color, 5%);
   color: $type-lighter-color;
   text-transform: uppercase;
@@ -3987,12 +4012,19 @@ td.wbrs-highlight, td.sbrs-highlight {
   right: 0;
 }
 
-.escalations--webrep--disputes-controller  #advanced-search-button::before, .escalations--webcat--complaints-controller  #advanced-search-button::before, .escalations--webcat--reports-controller  #advanced-search-button::before {
+.escalations--webrep--disputes-controller  #advanced-search-button::before,
+.escalations--webcat--complaints-controller  #advanced-search-button::before,
+.escalations--webcat--reports-controller  #advanced-search-button::before
+{
   display: none;
 }
 
 
-.escalations--webrep--disputes-controller .search-box, .escalations--webcat--complaints-controller .search-box, .escalations--webcat--reports-controller .search-box {
+.escalations--webrep--disputes-controller .search-box,
+.escalations--webcat--complaints-controller .search-box,
+.escalations--webcat--reports-controller .search-box,
+.users-controller .search-box
+{
   background-image: url(image_path('layout/search_icon_lighter.svg'));
 }
 
@@ -4163,6 +4195,8 @@ button.tertiary {
 .icon-reports {background-image: url(image_path('icon_reports.svg'));}
 .icon-new-white {background-image: url(image_path('icon_new_white.svg'));}
 .icon-categorize-white {background-image: url(image_path('icon_categorize_white.svg'));}
+.icon-user-page {background-image: url(image_path('icon_user_white.svg'));}
+.icon-related-users {background-image: url(image_path('icon_team_white.svg'));}
 
 .remove-input {
   background-image: url(image_path('icon_minus_blue.svg'));
