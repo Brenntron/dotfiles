@@ -9,13 +9,7 @@
         %th Name
         %th Username
         %th Roles
-        %th.text-center Open Tickets
-        %th.text-center Pending Tickets
-        %th.text-center Closed Tickets
-        %th.text-center All Tickets
-        %th.text-center Committer
-        - if current_user.has_role?('manager')
-          %th
+        %th
     -# Edit / Delete Row
     %tbody
       - if current_user.has_role?('manager')
@@ -25,26 +19,12 @@
           %td.alt-col.user-col-divider= current_user.display_name
           %td.alt-col.user-name-col.current-user= link_to current_user.cvs_username, user_path(current_user)
           %td.data_small_emphasis=current_user.roles.map(&:role).join(', ')
-          %td.text-center= current_user.bugs.open_bugs.count
-          %td.text-center= current_user.bugs.pending.count
-          %td.text-center= current_user.bugs.closed.count
-          %td.text-center= current_user.bugs.count
-          %td.text-center
-            - if current_user.has_role?('committer')
-              Yes
           %td
         - current_user.children.each do |user|
           %tr
             %td.alt-col.user-col-divider= user.display_name
             %td.alt-col.user-name-col= link_to user.cvs_username, user_path(user)
             %td.data_small_emphasis=user.roles.map(&:role).join(', ')
-            %td.text-center= user.bugs.open_bugs.count
-            %td.text-center= user.bugs.pending.count
-            %td.text-center= user.bugs.closed.count
-            %td.text-center= user.bugs.count
-            %td.text-center
-              - if user.has_role?('committer')
-                Yes
             %td.text-right.table-button-row
               %button.edit-button.table-row-button.tooltipped#edit-user{title: "Edit #{user.cvs_username}'s roles", 'data-toggle': 'modal', 'data-target': "#roleModal_#{user.id}"}
               = link_to user_remove_from_team_path(user_id: user.id), method: :patch, data: {confirm: "Remove #{user.display_name} from team?"} do
@@ -67,13 +47,6 @@
           %td.alt-col.user-col-divider= current_user.display_name
           %td.alt-col.user-name-col.current-user= link_to current_user.cvs_username, user_path(current_user)
           %td.data_small_emphasis=current_user.roles.map(&:role).join(', ')
-          %td.text-center= current_user.bugs.open_bugs.count
-          %td.text-center= current_user.bugs.pending.count
-          %td.text-center= current_user.bugs.closed.count
-          %td.text-center= current_user.bugs.count
-          %td.text-center
-            - if current_user.has_role?('committer')
-              Yes
           %td
 
       - if current_user.child?
@@ -86,11 +59,4 @@
             %td.alt-col.user-col-divider= user.display_name
             %td.alt-col.user-name-col= link_to user.cvs_username, user_path(user)
             %td.data_small_emphasis= user.roles.map(&:role).join(', ')
-            %td.text-center= user.bugs.open_bugs.count
-            %td.text-center= user.bugs.pending.count
-            %td.text-center= user.bugs.closed.count
-            %td.text-center= user.bugs.count
-            %td.text-center
-              - if user.has_role?('committer')
-                Yes
             %td

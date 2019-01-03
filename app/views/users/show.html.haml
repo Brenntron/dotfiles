@@ -31,11 +31,9 @@
       .row
         - if @user.has_role?('manager')
           .col-xs-12.user-col-wrapper
-            - first_child =  @user.children.first
-            - children_col = @user.children.count.to_f / 2
-            %div.user-col-layout{style: "column-count: #{(children_col.to_f).ceil}"}
+            %div.user-col-layout{style: "column-count: #{(@children_col.to_f).ceil}"}
               - @user.children.each do |user|
-                - if user == first_child
+                - if user == @first_child
                   %h5.content-label-sm{style: 'column-span: all'}
                     Reports
                 %div
@@ -53,11 +51,9 @@
                   = link_for_manager(current_user, @user)
 
             - if @user.child?
-              - first_sibling = @user.siblings.first
-              - sibling_col = @user.siblings.count.to_f / 2
-              %div.user-col-layout.last{style: "column-count: #{(sibling_col.to_f).ceil}"}
+              %div.user-col-layout.last{style: "column-count: #{(@sibling_col.to_f).ceil}"}
                 - @user.siblings.each do |user|
-                  - if user == first_sibling
+                  - if user == @first_sibling
                     %h5.content-label-sm{style: 'column-span: all'}
                       Peers
                   %div
@@ -76,11 +72,9 @@
                   %br
                   = link_for_manager(current_user, @user)
             - if @user.child?
-              - first_sibling = @user.siblings.first
-              - sibling_col = @user.siblings.count.to_f / 2
-              %div.user-col-layout.last{style: "column-count: #{(sibling_col.to_f).ceil}", 'data-division': "#{sibling_col}"}
+              %div.user-col-layout.last{style: "column-count: #{(@sibling_col.to_f).ceil}", 'data-division': "#{@sibling_col}"}
                 - @user.siblings.each do |user|
-                  - if user == first_sibling
+                  - if user == @first_sibling
                     %h5.content-label-sm{style: 'column-span: all'}
                       Peers
                   %div
@@ -98,82 +92,3 @@
           Update Role(s) for
           = @user.cvs_username
       =render 'shared/role_form', user: @user
-
-
-
--#            <% if can?(:manage, @user)  %>
--#              <span data-toggle="modal" data-target='<%= "#roleModal_#{@user.id}" %>'>
--#                <a type="button" class="glyphicon glyphicon-pencil" data-toggle="tooltip" data-placement="top" title="edit roles"></a>
--#              </span>
--#            <% end %>
-
-
--#      <% if current_user.has_role?('admin') %>
--#          <div class="col-xs-12 col-sm-8">
--#            <%= render 'form' %>
--#            <hr />
--#          </div>
--#      <% end %>
--#      <% if current_user.has_role?('api user') %>
--#        <div class="col-xs-12 col-sm-8">
--#          <p>Application Token: <pre><%= current_user.authentication_token %></pre></p>
--#          <p>Bugzilla Token: <pre><%= xml_token %></pre></p>
--#        </div>
--#      <% end %>
--#    </div>
--#    <div class='row top-space'>
--#      <div class="col-xs-11">
--#        <% if @user == current_user %>
--#          <div class="col-xs-12">
--#            <h4>Team</h4>
--#          </div>
--#          <div class="col-xs-6 col-sm-4">
--#            <h6 class="text-muted">managers</h6>
--#            <% if @user.parent.present? %>
--#              <ul class="compact-list">
--#                <li><%= link_for_manager(current_user, @user) %></li>
--#              </ul>
--#            <% else %>
--#              <p class="text-muted small"><em><strong><%= @user.cvs_username %></strong> answers to no one!</em></p>
--#            <% end %>
--#          </div>
--#          <div class="col-xs-6 col-sm-4">
--#            <h6 class="text-muted"><%= link_to 'team', escalations_users_path %></h6>
--#            <% if @user.children.any? %>
--#              <ul class="compact-list">
--#                <% @user.children.each do |member| %>
--#                <li><%= link_to member.cvs_username, escalations_user_path(member) %></li>
--#                <% end %>
--#              </ul>
--#            <% else %>
--#              <p class="text-muted small"><em><strong><%= @user.cvs_username %></strong> is a lone wolf!</em></p>
--#            <% end %>
--#          </div>
--#          <div class="col-xs-6 col-sm-4">
--#            <h6 class="text-muted"><%= link_to 'co-workers', escalations_users_path %></h6>
--#            <% if @user.siblings.any?  && @user.child? %>
--#                <ul class="compact-list">
--#                  <% @user.siblings.each do |co| %>
--#                      <li><%= link_to co.cvs_username, escalations_user_path(co) %></li>
--#                  <% end %>
--#                </ul>
--#            <% else %>
--#                <p class="text-muted small"><em><strong><%= @user.cvs_username %></strong> works alone!</em></p>
--#            <% end %>
--#          </div>
--#        <%end%>
--#        </div>
--#      </div>
--#    <div class="row">
--#    </div>
--#    <!--<div class="footer-spacer"></div>-->
--#
--#  </div>
--#</div>
--#<div class="spacer"></div>
--#<input type="hidden" name="token" value="<%= current_user.authentication_token %>">
--#<input type="hidden" name="xml_token" value="<%= xml_token %>">
--#<input type="hidden" name="current_user" value="<%= current_user.id%>">
--#
--#
-

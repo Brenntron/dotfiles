@@ -5,11 +5,7 @@
       %tr
         %th Name
         %th Username
-        %th.text-center Open Tickets
-        %th.text-center Pending Tickets
-        %th.text-center Closed Tickets
-        %th.text-center All Tickets
-        %th.text-center Committer
+        %th Email
     %tbody
       - @users.each do |user|
         %tr
@@ -18,10 +14,4 @@
             %td.alt-col.user-name-col= link_to user.cvs_username, user_path(user)
           - else
             %td.alt-col.user-name-col= user.cvs_username
-          %td.text-center= user.bugs.open_bugs.count
-          %td.text-center= user.bugs.pending.count
-          %td.text-center= user.bugs.closed.count
-          %td.text-center= user.bugs.count
-          %td.text-center
-            - if user.has_role?('committer')
-              Yes
+          %td.alt-col.user-name-col= user.email

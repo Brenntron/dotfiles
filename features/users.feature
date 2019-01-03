@@ -36,7 +36,6 @@ Feature: User Accounts
 
   @javascript
   Scenario: A non-manager user can go to the users index page and see only their co-workers.
-            Assigned bugs should be on users show page.
             A non-manager cannot get to the relationships section.
     Given a user with role "analyst" exists and is logged in
     And the following users exist
@@ -51,9 +50,8 @@ Feature: User Accounts
     And  I goto "/escalations/users"
     And  I should see "h_clinton"
     And  I should not see "d_drumph"
-    And  I should see a user search form
     Then I goto "/escalations/users/3"
-    Then I should see "H_CLINTON"
+    Then I should see "h_clinton"
     Then I goto "/escalations/users/4"
     And  I should see "You are not authorized to view that user."
     Then I goto "/escalations/users/1"
@@ -96,11 +94,11 @@ Feature: User Accounts
     Then I wait for "3" seconds
     And  I goto "/escalations/users"
     Then I click "h_clinton"
-    Then I click the span with data-target "#roleModal_3"
+    Then I click the button with data-target "#roleModal_3"
     And I wait for "1" seconds
     And I should see "Update Role(s) for h_clinton"
     And I check "analyst"
-    Then I click "Save changes"
+    Then I click "Save Roles"
     And I should see "h_clinton updated successfully"
     And I should see "analyst"
 
@@ -182,7 +180,7 @@ Feature: User Accounts
     Then I wait for "1" seconds
     Then I should see "Update Role(s) for h_clinton"
     Then I check "analyst"
-    Then I click "Save changes"
+    Then I click "Save Roles"
     Then I should see "h_clinton updated successfully."
     Then I click ".glyphicon-chevron-right"
     And I should see "analyst"
@@ -192,7 +190,7 @@ Feature: User Accounts
     Then I should see "Update Role(s) for d_drumph"
     Then I check "analyst"
     Then I check "committer"
-    Then I click "Save changes"
+    Then I click "Save Roles"
     Then I should see "d_drumph updated successfully."
     Then I should see "analyst, committer"
 
@@ -236,9 +234,8 @@ Feature: User Accounts
       | porsche@cisco.com  |
       | bentley@cisco.com  |
     When I goto "/escalations/users"
-    Then I should see a user search form
     Given I fill in "user_search_name" with "CAR"
-    When I click button "search"
+    Then I hit enter within "#user_search_name"
     Then I see a user_searches result for name "carlzipp@cisco.com"
     And I see a user_searches result for name "davecarr@cisco.com"
     And I do not see a user_searches result for name "porsche@cisco.com"
@@ -256,7 +253,7 @@ Feature: User Accounts
       | email4@cisco.com | Bentley Ford        |
     Given I goto "/escalations/users"
     Given I fill in "user_search_name" with "CAR"
-    When I click button "search"
+    Then I hit enter within "#user_search_name"
     Then I see a user_searches result for name "Carl Zipp"
     And I see a user_searches result for name "David Carr"
     And I do not see a user_searches result for name "Porsche Bugatti"
@@ -274,7 +271,7 @@ Feature: User Accounts
       | email4@cisco.com | bentley      |
     Given I goto "/escalations/users"
     Given I fill in "user_search_name" with "CAR"
-    When I click button "search"
+    Then I hit enter within "#user_search_name"
     Then I see a user_searches result for name "email1@cisco.com"
     And I see a user_searches result for name "email2@cisco.com"
     And I do not see a user_searches result for name "email3@cisco.com"
@@ -292,7 +289,7 @@ Feature: User Accounts
       | email4@cisco.com | bentley      |
     Given I goto "/escalations/users"
     Given I fill in "user_search_name" with "CAR"
-    When I click button "search"
+    Then I hit enter within "#user_search_name"
     Then I see a user_searches result for name "email1@cisco.com"
     And I see a user_searches result for name "email2@cisco.com"
     And I do not see a user_searches result for name "email3@cisco.com"
@@ -310,7 +307,7 @@ Feature: User Accounts
       | email4@cisco.com | bentley        |
     Given I goto "/escalations/users"
     Given I fill in "user_search_name" with "CAR"
-    When I click button "search"
+    Then I hit enter within "#user_search_name"
     Then I see a user_searches result for name "email1@cisco.com"
     And I see a user_searches result for name "email2@cisco.com"
     And I do not see a user_searches result for name "email3@cisco.com"

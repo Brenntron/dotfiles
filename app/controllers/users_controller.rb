@@ -9,6 +9,11 @@ class UsersController < ApplicationController
 
   def show
     @user = User.where(id: params[:id]).first
+
+    @first_sibling = @user.siblings.first
+    @sibling_col = @user.siblings.count.to_f / 2
+    @first_child = @user.children.first
+    @children_col = @user.children.count.to_f / 2
     case
       when @user.nil?
         flash[:error] = "Could not find user '#{params[:id]}'"

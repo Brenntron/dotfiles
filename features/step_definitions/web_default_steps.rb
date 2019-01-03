@@ -314,8 +314,8 @@ Then(/^I click the link with data-target "(.*?)"$/) do |target|
   find("a[data-target='#{target}']").click
 end
 
-Then(/^I click the span with data-target "(.*?)"$/) do |target|
-  find("span[data-target='#{target}']").click
+Then(/^I click the button with data-target "(.*?)"$/) do |target|
+  find("button[data-target='#{target}']").click
 end
 
 And(/^"(.*?)" should be in the "(.*?)" dropdown list$/) do |value, field|
@@ -394,4 +394,8 @@ end
 
 Then (/^I should receive a file of type "(.*?)"/) do |type|
   result = page.response_headers['Content-Type'].should == type
+end
+
+Then (/^I hit enter within "(.*?)"/) do |element|
+  find(element).native.send_keys(:return)
 end
