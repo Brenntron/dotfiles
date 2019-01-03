@@ -167,7 +167,7 @@
         %h3.nav-tool-dropdown-header
           %span.nav-dropdown-content-icon.icon-saved-search
           My Saved Searches
-        %table{class: 'table table-condensed small', id: 'saved-search'}
+        %table{class: 'table', id: 'saved-search'}
           %tbody
             - if current_user.named_searches.any?
               - current_user.named_searches.each do |named_search|
