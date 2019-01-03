@@ -479,6 +479,10 @@ window.lookup_prefix = () ->
 window.retrieve_history = (position) ->
   $(".cat-url-error").hide()
 
+  for url_position in [1..5]
+    $("#url_#{url_position}").css("border-width", "")
+    $("#url_#{url_position}").css("border-color", "")
+
   url = $("#url_" + position).val()
 
   if url.length > 0
@@ -542,10 +546,15 @@ window.retrieve_history = (position) ->
         $('.modal-backdrop').hide()
         $('#loader-modal').hide()
         $("#cat-url-#{position}").show()
+        $("#url_#{position}").css("border-width", "2px")
+        $("#url_#{position}").css("border-color", "#E47433")
     , this)
   else
     $("#cat-url-message-#{position}").text("No data available for blank URL.")
     $("#cat-url-#{position}").show()
+    $("#url_#{position}").css("border-width", "2px")
+    $("#url_#{position}").css("border-color", "#E47433")
+
 
 window.drop_current_categories = () ->
 
