@@ -484,6 +484,11 @@ th.alt-col {
   }
 }
 
+// Buttons //
+button {
+  background-color: transparent;
+}
+
 /**** Content toolbar  *******/
 /*** Current toolbar is specifically generated on a datatables table         ***/
 /*** We will need to work around this for the other places where toolbars    ***/
@@ -4152,6 +4157,11 @@ button.tertiary {
 
 .search-item {
   padding-right: 20px;
+}
+
+.search-item .form-control {
+  font-size: 8pt;
+  line-height: .75em !important;
 }
 
 .icon-dashboard {background-image: url(image_path('icon_dashboard.svg'));}
