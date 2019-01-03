@@ -63,6 +63,13 @@
         %li{class: 'wiki-link'}
           %a{href: 'https://confluence.vrt.sourcefire.com/display/OSDWE/Analyst+Console+Documentation', target: '_blank'}
             =inline_svg 'icon_wiki_grey.svg'
+        %li{class: 'github-link'}
+          - if !@version.nil?
+            %a{href: "https://git.vrt.sourcefire.com/talosweb/analyst-console/releases/tag/v#{@version}"}
+              = image_tag('icon_github.png', class: 'github-icon', alt: 'GitHub', size: '16x16')
+          - else
+            %a{href: "https://git.vrt.sourcefire.com/talosweb/analyst-console/releases/"}
+              = image_tag('icon_github.png', class: 'github-icon', alt: 'GitHub', size: '16x16')
 
   #sidenav-menu-div
     %ul{class: 'nav-container'}
@@ -126,3 +133,8 @@
         %ul{class: 'sub-nav collapse doc-subnav', id: 'doc-subnav'}
           %li{class: 'wiki-link'}
             %a{href: 'https://confluence.vrt.sourcefire.com/display/OSDWE/Analyst+Console+Documentation', target: '_blank'} Doc
+          %li{class: 'github-link'}
+            - if !@version.nil?
+              %a{href: "https://git.vrt.sourcefire.com/talosweb/analyst-console/releases/tag/v#{@version}"} V #{@version}
+            - else
+              %a{href: "https://git.vrt.sourcefire.com/talosweb/analyst-console/releases/"} Release Notes

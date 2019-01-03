@@ -324,7 +324,7 @@ table.dataTable.no-footer {
   border-radius: 2px;
   border: 1px solid $type-lighter-color !important;
 }
-#disputes-index_filter, #complaints-index_filter {
+#disputes-index_filter, #complaints-index_filter, #clusters-index_filter {
   label {
     height: 100%;
   }
@@ -5559,11 +5559,12 @@ table.dispute_tool_current tr:last-of-type td {
 #disputes-index .dispute-submission-type {
   display: block;
   margin: auto;
+  cursor: default;
 }
 
-.dispute-W {background-image: url(image_path('icon_type_web.svg'));}
-.dispute-E {background-image: url(image_path('icon_type_email.svg'));}
-.dispute-EW {background-image: url(image_path('icon_type_email_web.svg'));}
+.dispute-W, .dispute-w {background-image: url(image_path('icon_type_web.svg'));}
+.dispute-E, .dispute-e {background-image: url(image_path('icon_type_email.svg'));}
+.dispute-EW, .dispute-ew {background-image: url(image_path('icon_type_email_web.svg'));}
 
 .my-dashboard-header-area, .complaint-mgt-top-area  {
   background-color: $content-tab-color;
@@ -5890,6 +5891,10 @@ table.dataTable tbody tr.selected {
 
 table.dataTable tbody tr.selected .alt-col{
   background-color: #dae7ea;
+}
+
+table.dispute-entry-table tbody tr.selected {
+  background-color: $type-lighter-color;
 }
 
 .nested-col-sections {
@@ -6977,4 +6982,21 @@ h2 {
 .overdue {
   color: $second-section-color;
   font-weight: 600;
+}
+
+.sorting_1, .sorting_asc, .sorting_desc {
+  background-color: $faint-accent-color !important;
+  opacity: 80%;
+  background-position-x: 95% !important;
+}
+.sorting {
+  background-position-x: 95% !important;
+}
+#time-submitted {
+  width: 150px;
+}
+
+.github-icon {
+  margin-left: 15px;
+  margin-top: 6px;
 }

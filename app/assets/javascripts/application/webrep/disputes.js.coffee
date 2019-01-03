@@ -1,7 +1,8 @@
 window.select_or_deselect_all = (dispute_id)->
 
-
   $('.dispute-entry-checkbox_' + dispute_id).prop('checked', $('#' + dispute_id).prop('checked'))
+  $('.dispute-entry-checkbox_' + dispute_id).each ->
+    toggleRow(this)
 
 window.populate_webrep_index_table = (data = {}) ->
 
@@ -99,6 +100,7 @@ window.populate_webrep_index_table = (data = {}) ->
             $('.dispute-entry-checkbox').each ->
               if this.id == dispute_entry_click
                 this.checked = true
+                toggleRow(this)
         if array_of_dispute_entry_selectalls.length > 0
           for dispute_entry_selectall in array_of_dispute_entry_selectalls
             $('.dispute_entry_select_all').each ->
@@ -107,7 +109,9 @@ window.populate_webrep_index_table = (data = {}) ->
 
 
         if undefined != json.search_name
-          $('#saved-search-tbody').append(named_search_tag(json.search_name, json.search_id))
+          searchId = 'saved_search_' + json.search_id
+          if $('#saved-search-tbody tr#' + searchId).length == 0
+            $('#saved-search-tbody').append(named_search_tag(json.search_name, json.search_id))
 
     error: (response) ->
       $('#refresh-working-msg').hide()
@@ -1189,7 +1193,14 @@ $ ->
        {
         data: 'submission_type'
         render: (data) ->
-          '<span class="dispute-submission-type dispute-' + data  + '"></span>'
+          title = ''
+          if data == 'w'
+            title = 'Web'
+          else if data == 'e'
+            title = 'Email'
+          else if data == 'ew'
+            title = 'Email Web'
+          '<span class="dispute-submission-type esc-tooltipped dispute-' + data + '" title="' + title + '"></span>'
       }
       { data: 'd_entry_preview' }
       { data: 'assigned_to' }
@@ -1274,7 +1285,7 @@ $ ->
       if this.entry.sbrs_score != null
         sbrs_score = this.entry.sbrs_score
       else sbrs_score = missing_data
-      entry_row = '<tr class="index-entry-row">' + '<td><input type="checkbox" class="dispute-entry-checkbox dispute-entry-checkbox_' + dispute.id + '" id= ' + dispute_entry_id + ' ></td>' + '<td class="entry-col-content ' + important + '">' + entry_content + '</td>' +
+      entry_row = '<tr class="index-entry-row">' + '<td><input type="checkbox" onclick="toggleRow(this)" class="dispute-entry-checkbox dispute-entry-checkbox_' + dispute.id + '" id= ' + dispute_entry_id + ' ></td>' + '<td class="entry-col-content ' + important + '">' + entry_content + '</td>' +
         '<td class="entry-col-status">' + status + '</td>' +
         '<td class="entry-col-res esc-tooltipped" title="' + resolution_comment + '">' + resolution + '</td>' +
         '<td class="entry-col-disp">' + suggested_disposition + '</td>' +
@@ -1789,6 +1800,9 @@ window.populate_resolution_dropdown = (dispute_id) ->
 
       $('.entry-status-radio' + '.' + status + '_' + dispute_id).prop("checked", true)
   )
+
+window.disputes_select_all_check_box = () ->
+  $('.dispute_check_box').prop('checked', $('#disputes_check_box').prop('checked'))
 
 $ ->
 
