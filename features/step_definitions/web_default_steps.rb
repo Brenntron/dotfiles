@@ -399,3 +399,7 @@ end
 Then (/^I should receive a file of type "(.*?)"/) do |type|
   result = page.response_headers['Content-Type'].should == type
 end
+
+Then(/^There is only one element of class, "(.*?)"$/) do |value|
+    expect(page.evaluate_script("$('.#{value}').length")).to eq(1)
+end

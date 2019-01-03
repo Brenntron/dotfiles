@@ -4,7 +4,8 @@ window.select_or_deselect_all = (dispute_id)->
   $('.dispute-entry-checkbox_' + dispute_id).each ->
     toggleRow(this)
 
-window.populate_webrep_index_table = (data = {}) ->
+window.populate_webrep_index_table = (data = {}, reload = false) ->
+  data['reload'] = reload
 
   array_of_showns = []
   array_of_dispute_clicks = []
@@ -107,7 +108,6 @@ window.populate_webrep_index_table = (data = {}) ->
               if this.id == dispute_entry_selectall
                 this.checked = true
 
-
         if undefined != json.search_name
           searchId = 'saved_search_' + json.search_id
           if $('#saved-search-tbody tr#' + searchId).length == 0
@@ -155,6 +155,7 @@ window.advanced_webrep_index_table = () ->
     modified_older: form.find('input[id="modified-older-input"]').val()
     modified_newer: form.find('input[id="modified-newer-input"]').val()
   }
+
   window.current_search_data = data
   window.populate_webrep_index_table(data)
 
@@ -1810,6 +1811,7 @@ $ ->
     $('#advanced-search-dropdown').show()
 
   $('#submit-advanced-search').click ->
+    $('#search_name').val("")
     $('#advanced-search-dropdown').toggle()
 
   $(document).click ->
@@ -1818,7 +1820,7 @@ $ ->
   $(document).ready ->
     setInterval ->
       if window.current_search_data
-        window.populate_webrep_index_table(window.current_search_data)
+        window.populate_webrep_index_table(window.current_search_data, true)
     , 60000
 
     $('body').on 'mouseover mouseenter', '.esc-tooltipped', ->
