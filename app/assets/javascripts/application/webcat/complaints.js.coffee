@@ -643,12 +643,14 @@ format = (complaint_entry_row) ->
     data: {'id': complaint_entry.entry_id}
     success: (response) ->
       current_categories = JSON.parse(response)
+      certainty_row = '<tr><td>' + '1' + '</td><td>' + 'Business' + '</td><td>' + 1000 + '</td></tr>'
+      $('.simple-nested-table').append(certainty_row)
 
     error: (response) ->
       current_categories = ''
   )
 
-  debugger
+
 
   if current_categories?
     categories = current_categories
