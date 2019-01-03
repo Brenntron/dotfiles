@@ -5,10 +5,10 @@
       %tr
         %th Name
         %th Username
-        %th.text-center Open Bugs
-        %th.text-center Pending Bugs
-        %th.text-center Closed Bugs
-        %th.text-center All Bugs
+        %th.text-center Open Tickets
+        %th.text-center Pending Tickets
+        %th.text-center Closed Tickets
+        %th.text-center All Tickets
         %th.text-center Committer
     %tbody
       - @users.each do |user|
@@ -25,24 +25,3 @@
           %td.text-center
             - if user.has_role?('committer')
               Yes
-
--#<table class="table index-table">
--#  <thead>
--#  <tr>
--#    <th>Name</th>
--#    <th>email</th>
--#  </tr>
--#  </thead>
--#  <tbody>
--#  <% @users.each do |user| %>
--#    <tr>
--#      <% if current_user.has_role?('admin') %>
--#        <td><%= link_to user.display_name, escalations_user_path(user) %></td>
--#      <% else %>
--#        <td><%= user.display_name %></td>
--#      <% end %>
--#      <td><%= user.email %></td>
--#    </tr>
--#  <% end %>
--#  </tbody>
--#</table>

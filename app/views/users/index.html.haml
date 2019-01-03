@@ -9,10 +9,10 @@
         %th Name
         %th Username
         %th Roles
-        %th.text-center Open Bugs
-        %th.text-center Pending Bugs
-        %th.text-center Closed Bugs
-        %th.text-center All Bugs
+        %th.text-center Open Tickets
+        %th.text-center Pending Tickets
+        %th.text-center Closed Tickets
+        %th.text-center All Tickets
         %th.text-center Committer
         - if current_user.has_role?('manager')
           %th
@@ -94,36 +94,3 @@
               - if user.has_role?('committer')
                 Yes
             %td
-
-
-
-
-
--#<table class="table index-table">
--#  <thead>
--#    <tr>
--#      <td><strong>Me</strong></td>
--#      <td><strong>Team</strong></td>
--#      <td><strong>Co-workers</strong></td>
--#    </tr>
--#  </thead>
--#  <tbody>
--#    <tr>
--#      <td><%= link_to current_user.cvs_username, escalations_user_path(current_user) %></td>
--#      <td>
--#        <% if current_user.children.any? %>
--#          <% current_user.children.each do |user| %>
--#            <li><%= link_to user.cvs_username, escalations_user_path(user) %></li>
--#          <% end %>
--#        <% end %>
--#      </td>
--#      <td>
--#        <% if current_user.child? %>
--#          <% current_user.siblings.each do |user| %>
--#            <li><%= link_to user.cvs_username, escalations_user_path(user) %></li>
--#          <% end %>
--#        <% end %>
--#      </td>
--#    </tr>
--#  </tbody>
--#</table>
