@@ -27,15 +27,17 @@ class Beaker::Base
     request = HTTPI::Request.new("https://#{host}:#{port}/v1#{path}")
 
     request.ssl = true
-    request.auth.ssl.verify_mode = :peer
-
+    request.auth.ssl.verify_mode = :none
     request
   end
 
   def self.request(path:, body:)
     request = new_request(path)
 
-    request.headers = {"Content-Type" => "application/json" }
+    request.headers = {
+        "Content-Type" => "application/json",
+        "Authorization" => "Bearer test"
+    }
     request.body = body.to_json
 
     request
@@ -43,7 +45,7 @@ class Beaker::Base
 
   def self.call_request(method, request)
     case method
-      when :post
+    when :post
           HTTPI.post(request)
       else #:get
           HTTPI.get(request)
@@ -70,7 +72,9 @@ class Beaker::Base
   def self.call_beaker_request(method, path, body, raw = false, content_type: 'application/json')
     request = new_request(path)
 
-    request.headers = {'Content-Type' => content_type }
+    # TODO: In production, a real Bearer token should go here, but so far, no one has
+    # been able to specify where to find one. On lower environments, any string will work.
+    request.headers = {'Content-Type' => content_type, 'Authorization' => 'Bearer test' }
     request.body = body.to_json
 
     response = request_error_handling(call_request(method, request))
