@@ -532,37 +532,22 @@ class ComplaintEntry < ApplicationRecord
   end
 
   def current_category_data
-
     data = {}
-    prefix_id = nil
-    prefix_results = Wbrs::Prefix.where({:urls => [self.hostlookup]})
 
-    prefix_results.each do |result|
-      data[result.category] = {:is_active => result.is_active, :mnemonic => result.mnem, :category_id => result.category, :prefix_id => result.prefix_id}
-      prefix_id = result.prefix_id
-    end
-
-
-    ##LOOK INTO:  CURRENTLY COMMENTED OUT UNTIL WE MEET UP WITH RULEAPI TEAM TO FIGURE OUT WHY HISTORY DOESN'T MATCH UP WITH CURRENT
-    #
-    # if Wbrs::Prefix.where(:urls => [self.hostlookup]).present?
-    #   prefix_id_lookup = Wbrs::Prefix.where(:urls => [self.hostlookup]).first.prefix_id
-    # end
-    by_cat = {}
+    prefix_id = Wbrs::Prefix.where({:urls => [self.hostlookup]})&.first&.prefix_id
 
     if prefix_id.present?
       audit_history = Wbrs::HistoryRecord.where(prefix_id: prefix_id)
 
       audit_history.each do |hist|
 
-        if by_cat[hist.category_id].blank?
-          by_cat[hist.category_id] = []
+        if hist.category_id.blank?
+          hist.category_id = []
         end
 
-        by_cat[hist.category_id] << hist
+        hist.category_id << hist
       end
     end
-
 
     if !by_cat.empty?
       data.each do |key, value|
@@ -573,6 +558,8 @@ class ComplaintEntry < ApplicationRecord
         data[key][:certainty] = [{:source => 'N/A', :source_category => 'N/A', :source_certainty => '1000'}]
       end
     end
+
+    binding.pry
 
     data
   end

@@ -625,6 +625,7 @@ format = (complaint_entry_row) ->
   unchanged_radio = ""
   fixed_radio = ""
   invalid_radio = ""
+
   if complaint_entry.resolution
     switch (complaint_entry.resolution)
       when "UNCHANGED"
@@ -635,8 +636,19 @@ format = (complaint_entry_row) ->
         invalid_radio = "checked='checked'"
   else
     fixed_radio = "checked='checked'"
-  if complaint_entry.current_categories?
-    categories = complaint_entry.current_categories
+
+  std_msg_ajax(
+    method: 'POST'
+    url: '/escalations/api/v1/escalations/webcat/complaint_entries/retrieve_current_categories'
+    data: {'id': complaint_entry.entry_id}
+    success: (response) ->
+      debugger
+      current_categories = response
+    error: (response) ->
+      current_categories = ''
+  )
+  if current_categories?
+    categories = current_categories
     category_table = ''
     category_row = ''
     tooltip_table = ''
@@ -672,10 +684,6 @@ format = (complaint_entry_row) ->
       return
 
   if complaint_entry.entry_history?
-    if complaint_entry.entry_history.domain_history.length >= 1
-      domain_history = complaint_entry.entry_history.domain_history
-    else
-      domain_history = ''
     if complaint_entry.entry_history.complaint_history.length >= 1
       complaint_history = complaint_entry.entry_history.complaint_history
     else
