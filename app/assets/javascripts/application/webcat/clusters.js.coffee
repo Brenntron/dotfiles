@@ -168,7 +168,7 @@ $ ->
   $(document).ready ->
 
 # expand all functionality
-window.expand_all = (tableId) ->
+window.expand_all_clusters = (tableId) ->
   selectedRows = $('table#' + tableId + ' tr[role="row"]')
   i = 0
   while i < selectedRows.length
@@ -177,7 +177,7 @@ window.expand_all = (tableId) ->
     i = i + 1
 
 # collapse all functionality
-window.collapse_all = (tableId) ->
+window.collapse_all_clusters = (tableId) ->
   selectedRows = $('table#' + tableId + ' tr[role="row"]')
   i = 0
   while i < selectedRows.length
@@ -186,7 +186,7 @@ window.collapse_all = (tableId) ->
     i = i + 1
 
 #  expand selected funtionality
-window.expand_selected = (tableId) ->
+window.expand_selected_clusters = (tableId) ->
   selectedRows = $('table#' + tableId + ' tr[role="row"].selected')
   i = 0
   while i < selectedRows.length
@@ -195,7 +195,7 @@ window.expand_selected = (tableId) ->
     i = i + 1
 
 #  collapse selected funtionality
-window.collapse_selected = (tableId) ->
+window.collapse_selected_clusters = (tableId) ->
   selectedRows = $('table#' + tableId + ' tr[role="row"].selected')
   i = 0
   while i < selectedRows.length

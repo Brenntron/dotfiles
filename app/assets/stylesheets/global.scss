@@ -5520,11 +5520,12 @@ table.dispute_tool_current tr:last-of-type td {
 #disputes-index .dispute-submission-type {
   display: block;
   margin: auto;
+  cursor: default;
 }
 
-.dispute-W {background-image: url(image_path('icon_type_web.svg'));}
-.dispute-E {background-image: url(image_path('icon_type_email.svg'));}
-.dispute-EW {background-image: url(image_path('icon_type_email_web.svg'));}
+.dispute-W, .dispute-w {background-image: url(image_path('icon_type_web.svg'));}
+.dispute-E, .dispute-e {background-image: url(image_path('icon_type_email.svg'));}
+.dispute-EW, .dispute-ew {background-image: url(image_path('icon_type_email_web.svg'));}
 
 .my-dashboard-header-area, .complaint-mgt-top-area  {
   background-color: $content-tab-color;
@@ -6954,4 +6955,25 @@ h2 {
 }
 #time-submitted {
   width: 150px;
+}
+
+.cat-url-error{
+  color: black;
+  font-size: 11px;
+  font-weight: normal;
+  display: none;
+}
+
+.categorize-urls-warning-icon{
+  width: 15px;
+  height: 15px;
+  background-image: url(image_path('icon_warning_orange.svg'));
+  background-repeat: no-repeat;
+  background-position: center center;
+  border:0;
+}
+
+.github-icon {
+  margin-left: 15px;
+  margin-top: 6px;
 }

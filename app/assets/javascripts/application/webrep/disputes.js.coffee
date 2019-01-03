@@ -1194,7 +1194,14 @@ $ ->
        {
         data: 'submission_type'
         render: (data) ->
-          '<span class="dispute-submission-type dispute-' + data  + '"></span>'
+          title = ''
+          if data == 'w'
+            title = 'Web'
+          else if data == 'e'
+            title = 'Email'
+          else if data == 'ew'
+            title = 'Email Web'
+          '<span class="dispute-submission-type esc-tooltipped dispute-' + data + '" title="' + title + '"></span>'
       }
       { data: 'd_entry_preview' }
       { data: 'assigned_to' }

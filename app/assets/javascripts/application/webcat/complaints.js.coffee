@@ -477,15 +477,30 @@ window.lookup_prefix = () ->
   )
 
 window.retrieve_history = (position) ->
+  $(".cat-url-error").hide()
+
+  for url_position in [1..5]
+    $("#url_#{url_position}").css("border-width", "")
+    $("#url_#{url_position}").css("border-color", "")
 
   url = $("#url_" + position).val()
 
   if url.length > 0
+    $('#loader-modal').show()
+
+    $('#loader-modal').modal({
+      backdrop: 'static',
+      keyboard: false
+    })
+
     std_msg_ajax(
       url: '/escalations/api/v1/escalations/webcat/complaint_entries/categorize_urls_history'
       method: 'POST'
       data: {'position': position, url: url}
       success: (response) ->
+        $('.modal-backdrop').hide()
+        $('#loader-modal').hide()
+
         json = JSON.parse(response)
 
         if json.error
@@ -527,10 +542,19 @@ window.retrieve_history = (position) ->
             $('#history_dialog').dialog('open')
 
       error: (response) ->
-        std_msg_error("<p>Something went wrong: #{response.responseText}","")
+        $("#cat-url-message-#{position}").text("No history associated with this url.")
+        $('.modal-backdrop').hide()
+        $('#loader-modal').hide()
+        $("#cat-url-#{position}").show()
+        $("#url_#{position}").css("border-width", "2px")
+        $("#url_#{position}").css("border-color", "#E47433")
     , this)
   else
-    std_msg_error("Error",['No data available for blank URL.'])
+    $("#cat-url-message-#{position}").text("No data available for blank URL.")
+    $("#cat-url-#{position}").show()
+    $("#url_#{position}").css("border-width", "2px")
+    $("#url_#{position}").css("border-color", "#E47433")
+
 
 window.drop_current_categories = () ->
 
@@ -1277,8 +1301,3 @@ $ ->
     if $('#cat-urls-same').prop('checked')
       $('#categorize-diff-form').hide()
       $('#categorize-same-form').show()
-
-
-
-
-
