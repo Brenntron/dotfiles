@@ -382,6 +382,7 @@ Feature: Disputes
     Then I should see content "2" within ".in-progress-team"
     Then I should see content "4" within ".closed-team"
 
+  @javascript
   Scenario: A user tries to update a dispute
     Given a user with role "webrep user" exists and is logged in
     And the following disputes exist and have entries:
@@ -393,11 +394,10 @@ Feature: Disputes
     And I click ".primary"
     Then I should see content "Escalated" within "#show-edit-ticket-status-button"
     And I click "#show-edit-ticket-status-button"
-    And I click "#RESOLVED_CLOSED"
+    And I click "#RESEARCHING"
     And I click ".primary"
-    Then I should see content "RESOLVED_CLOSED" within "#show-edit-ticket-status-button"
-    And I goto "/escalations/webrep/disputes/5370"
-    When I click "#edit-dispute-button"
+    Then I should see content "RESEARCHING" within "#show-edit-ticket-status-button"
+    When I click ".edit-button"
     And I fill in "dispute-customer-name-input" with "John Smith"
     And I fill in "dispute-customer-email-input" with "jsmith@cisco.com"
     And I select "P5" from "dispute-priority-select"
