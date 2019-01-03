@@ -532,34 +532,16 @@ class ComplaintEntry < ApplicationRecord
   end
 
   def current_category_data
-    data = {}
+
+    data = []
 
     prefix_id = Wbrs::Prefix.where({:urls => [self.hostlookup]})&.first&.prefix_id
+    current_categories = Wbrs::Prefix.categories(prefix_id)
 
-    if prefix_id.present?
-      audit_history = Wbrs::HistoryRecord.where(prefix_id: prefix_id)
-
-      audit_history.each do |hist|
-
-        if hist.category_id.blank?
-          hist.category_id = []
-        end
-
-        hist.category_id << hist
-      end
+    current_categories['data'].each do |category|
+      # Returns an array of hashes for each category
+      data << Wbrs::Category.find(category['category_id'])
     end
-
-    if !by_cat.empty?
-      data.each do |key, value|
-        data[key][:confidence] = by_cat[key].last.confidence
-        data[key][:name] = by_cat[key].last.category.descr
-        data[key][:long_description] = by_cat[key].last.category.desc_long
-        # Certainty is dummy data
-        data[key][:certainty] = [{:source => 'N/A', :source_category => 'N/A', :source_certainty => '1000'}]
-      end
-    end
-
-    binding.pry
 
     data
   end

@@ -642,11 +642,14 @@ format = (complaint_entry_row) ->
     url: '/escalations/api/v1/escalations/webcat/complaint_entries/retrieve_current_categories'
     data: {'id': complaint_entry.entry_id}
     success: (response) ->
-      debugger
-      current_categories = response
+      current_categories = JSON.parse(response)
+
     error: (response) ->
       current_categories = ''
   )
+
+  debugger
+
   if current_categories?
     categories = current_categories
     category_table = ''
