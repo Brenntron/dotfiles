@@ -532,7 +532,6 @@ class ComplaintEntry < ApplicationRecord
   end
 
   def current_category_data
-
     data = {}
 
     prefix = Wbrs::Prefix.where({:urls => [self.hostlookup]})&.first
@@ -540,11 +539,9 @@ class ComplaintEntry < ApplicationRecord
 
     current_categories['data'].each do |category|
       category_id = category['category_id']
-      category_data = JSON.parse(Wbrs::Category.find(category_id).to_json)
-      data[category_id] = {}
+      category_data = Wbrs::Category.find(category_id)
 
-      data[category_id] = category_data
-      data[category_id]['confidence'] = category['confidence']
+      data[category_id] = {desc_long: category_data.desc_long, descr: category_data.descr, mnem: category_data.mnem, is_active: category_data.is_active, confidence: category['confidence']}
     end
 
     data
