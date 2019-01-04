@@ -337,7 +337,7 @@ window.take_selected = ()->
         json = $.parseJSON(response)
         if json.error
           notice_html = "<p>Something went wrong: #{json.error}</p>"
-          alert(json.error)
+          std_msg_error('take error', [json.error])
         else
           i = 0
           while i < selected_rows[0].length
@@ -348,6 +348,8 @@ window.take_selected = ()->
       error: (response) ->
         notice_html = "<p>Something went wrong: #{response.responseText}</p>"
     , this)
+  else
+    std_msg_error('Error', ['No row selected.'])
 
 
 
@@ -369,7 +371,7 @@ window.return_selected = ()->
         json = $.parseJSON(response)
         if json.error
           notice_html = "<p>Something went wrong: #{json.error}</p>"
-          alert(json.error)
+          std_msg_error('return error', [json.error])
         else
           i = 0
           while i < selected_rows[0].length
@@ -380,6 +382,8 @@ window.return_selected = ()->
       error: (response) ->
         notice_html = "<p>Something went wrong: #{response.responseText}</p>"
     , this)
+  else
+    std_msg_error('Error', ['No row selected.'])
 
 window.select_cat_text_field = (id) ->
   if (typeof numericalValue)

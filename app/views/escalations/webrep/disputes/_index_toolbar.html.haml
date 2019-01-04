@@ -164,7 +164,7 @@
             %button{class: 'primary', type:'button', id: 'button_reassign', onclick:'toolbar_index_change_assignee();'}
               Assign
 
-    %span.dropdown
+    %span#mark-as-related.dropdown
       %button#index_mark_related.toolbar-button.mark-related-button.dropdown-button-margin-right.esc-tooltipped{title: 'Mark as Related', 'data-toggle': 'dropdown', 'aria-haspopup': 'true', 'aria-expanded': 'false'}
         %span.toolbar-button-text
           Mark as Related
@@ -245,7 +245,7 @@
                 Submit
 
 
-    %span.dropdown
+    %span#adjust-wlbl.dropdown
       %button#index-adjust-wlbl.toolbar-button.adjust-wlbl-button.dropdown-button-margin-right.dropdown-toggle.esc-tooltipped{title: 'Adjust WL/BL', 'data-toggle': 'dropdown', 'aria-haspopup': 'true', 'aria-expanded': 'false'}
         %span.toolbar-button-text Adjust WL/BL
       .dropdown-menu.toolbar-dropdown#wlbl_adjust_entries_index{'aria-labelledby': 'wlbl_entries_button'}
