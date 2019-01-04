@@ -4,7 +4,8 @@ window.select_or_deselect_all = (dispute_id)->
   $('.dispute-entry-checkbox_' + dispute_id).each ->
     toggleRow(this)
 
-window.populate_webrep_index_table = (data = {}) ->
+window.populate_webrep_index_table = (data = {}, reload = false) ->
+  data['reload'] = reload
 
   array_of_showns = []
   array_of_dispute_clicks = []
@@ -107,7 +108,6 @@ window.populate_webrep_index_table = (data = {}) ->
               if this.id == dispute_entry_selectall
                 this.checked = true
 
-
         if undefined != json.search_name
           searchId = 'saved_search_' + json.search_id
           if $('#saved-search-tbody tr#' + searchId).length == 0
@@ -155,6 +155,7 @@ window.advanced_webrep_index_table = () ->
     modified_older: form.find('input[id="modified-older-input"]').val()
     modified_newer: form.find('input[id="modified-newer-input"]').val()
   }
+
   window.current_search_data = data
   window.populate_webrep_index_table(data)
 
@@ -554,7 +555,7 @@ window.toolbar_adjust_reptool_bl_button_research =(button_tag) ->
   )
 
 window.toolbar_index_edit_status = () ->
-  statusName = $('input[name=entry-status]:checked').attr('id')
+  statusName = $('input[name=entry-status]:checked').val()
   
   data = {}
   
@@ -569,7 +570,7 @@ window.toolbar_index_edit_status = () ->
       data[this.id].push({
         id: this.id
         field: "resolution"
-        new: $('input[name=entry-resolution]:checked').attr('id')
+        new: $('input[name=entry-resolution]:checked').val()
       })
 
       data[this.id].push({
@@ -589,12 +590,12 @@ window.toolbar_index_edit_status = () ->
   )
 
 window.show_page_edit_status = () ->
-  statusName = $('input[name=dispute-status]:checked').attr('id')
+  statusName = $('input[name=dispute-status]:checked').val()
   comment = $('.ticket-status-comment').val()
   dispute_id = $('#dispute_id').text()
 
   if statusName == "RESOLVED_CLOSED"
-    resolution = $('input[name=dispute-resolution]:checked').attr('id')
+    resolution = $('input[name=dispute-resolution]:checked').val()
 
   data = {
     dispute_ids: [ dispute_id ]
@@ -1083,7 +1084,7 @@ $ ->
       $('.entry-status-radio-label').click ->
         radio_button = $(this).prev('.entry-status-radio')
         $(radio_button[0]).trigger('click')
-        if $(radio_button).attr('id') == 'RESOLVED_CLOSED'
+        if $(radio_button).val() == 'RESOLVED_CLOSED'
           $('#index-entry-resolution-submenu').show()
           stat_comment = $('#entry-non-res-submit').find('.entry-status-comment')
           $('#entry-non-res-submit').hide()
@@ -1101,7 +1102,7 @@ $ ->
           wrapper = $(this).parent()
           $(all_stat_radios).removeClass('selected')
           $(wrapper).addClass('selected')
-        if $(this).attr('id') == 'RESOLVED_CLOSED'
+        if $(this).val() == 'RESOLVED_CLOSED'
           $('#index-entry-resolution-submenu').show()
           stat_comment = $('#entry-non-res-submit').find('.entry-status-comment')
           $('#entry-non-res-submit').hide()
@@ -1810,6 +1811,7 @@ $ ->
     $('#advanced-search-dropdown').show()
 
   $('#submit-advanced-search').click ->
+    $('#search_name').val("")
     $('#advanced-search-dropdown').toggle()
 
   $(document).click ->
@@ -1818,7 +1820,7 @@ $ ->
   $(document).ready ->
     setInterval ->
       if window.current_search_data
-        window.populate_webrep_index_table(window.current_search_data)
+        window.populate_webrep_index_table(window.current_search_data, true)
     , 60000
 
     $('body').on 'mouseover mouseenter', '.esc-tooltipped', ->

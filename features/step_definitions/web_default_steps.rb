@@ -400,6 +400,8 @@ Then (/^I should receive a file of type "(.*?)"/) do |type|
   result = page.response_headers['Content-Type'].should == type
 end
 
+
 Then (/^I hit enter within "(.*?)"/) do |element|
   find(element).native.send_keys(:return)
+
 end
