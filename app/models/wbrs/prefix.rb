@@ -45,7 +45,7 @@ class Wbrs::Prefix < Wbrs::Base
   end
 
   # @return [Array<Wbrs::Category>] array of categories related to this prefix.
-  def self.categories(id)
+  def categories
     response = Wbrs::Prefix.post_request(path: '/v1/cat/rules/get', body: { prefix_ids: [ id ] })
 
     response_body = JSON.parse(response.body)
@@ -54,6 +54,7 @@ class Wbrs::Prefix < Wbrs::Base
     #   Wbrs::Category.new_from_datum(datum.slice(*Wbrs::Category::FIELD_NAMES))
     # end
     #
+
     response_body
   end
 

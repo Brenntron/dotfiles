@@ -535,8 +535,8 @@ class ComplaintEntry < ApplicationRecord
 
     data = {}
 
-    prefix_id = Wbrs::Prefix.where({:urls => [self.hostlookup]})&.first&.prefix_id
-    current_categories = Wbrs::Prefix.categories(prefix_id)
+    prefix = Wbrs::Prefix.where({:urls => [self.hostlookup]})&.first
+    current_categories = prefix.categories
 
     current_categories['data'].each do |category|
       category_id = category['category_id']
