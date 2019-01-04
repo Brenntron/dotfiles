@@ -533,14 +533,18 @@ class ComplaintEntry < ApplicationRecord
 
   def current_category_data
 
-    data = []
+    data = {}
 
     prefix_id = Wbrs::Prefix.where({:urls => [self.hostlookup]})&.first&.prefix_id
     current_categories = Wbrs::Prefix.categories(prefix_id)
 
     current_categories['data'].each do |category|
-      # Returns an array of hashes for each category
-      data << Wbrs::Category.find(category['category_id'])
+      category_id = category['category_id']
+      category_data = JSON.parse(Wbrs::Category.find(category_id).to_json)
+      data[category_id] = {}
+
+      data[category_id] = category_data
+      data[category_id]['confidence'] = category['confidence']
     end
 
     data

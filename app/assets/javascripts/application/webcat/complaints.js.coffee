@@ -643,14 +643,22 @@ format = (complaint_entry_row) ->
     data: {'id': complaint_entry.entry_id}
     success: (response) ->
       current_categories = JSON.parse(response)
-      certainty_row = '<tr><td>' + '1' + '</td><td>' + 'Business' + '</td><td>' + 1000 + '</td></tr>'
-      $('.simple-nested-table').append(certainty_row)
+
+      $.each current_categories, (key, value) ->
+        category = this
+        active =  $(this).attr("is_active")
+        if active == 1
+          confidence = this.confidence
+          mnemonic = this.mnem
+          name = this.descr
+          cat_id = this.category_id
+          top_certainty = 'N/A'
+          category_row = '<tr><td>' + confidence + '</td><td>' + mnemonic + ' - ' + name + '</td><td><span class="certainty-flag nested-tooltipped" onmouseover="triggerTooltips(this)" data-tooltip-content="#certainty_table' + complaint_entry.entry_id + '_' + cat_id + '">' + top_certainty + '</span>' + '</td></tr>'
+          $('.simple-nested-table').append(category_row)
 
     error: (response) ->
       current_categories = ''
   )
-
-
 
   if current_categories?
     categories = current_categories
@@ -663,30 +671,6 @@ format = (complaint_entry_row) ->
     tooltip_table_end = '</tbody></table>'
     tooltip_table_guts = ''
     tooltip_wrapper_end = '</span></div>'
-    $.each categories, (key, value) ->
-      category = this
-      active =  $(this).attr("is_active")
-      if active == 1
-        confidence = this.confidence
-        mnemonic = this.mnemonic
-        name = this.name
-        cat_id = this.category_id
-        top_certainty = this.certainty[0].source_certainty
-        certainties = this.certainty
-        $(certainties).each ->
-          source_confidence = this.source_confidence
-          source_certainty = this.source_certainty
-          source_category = this.source_category
-          source_name = this.source
-          certainty_row = '<tr><td>' + source_confidence + '</td><td>' + source_name + '</td><td>' + source_certainty + '</td></tr>'
-          tooltip_table_guts = tooltip_table_guts + certainty_row
-
-        tooltip_table = tooltip_table_start + tooltip_table_guts + tooltip_table_end
-        tooltip_all = tooltip_wrapper_start + 'certainty_table' + complaint_entry.entry_id + '_' +cat_id + '">' + tooltip_table + tooltip_wrapper_end
-        category_row = '<tr><td>' + confidence + '</td><td>' + mnemonic + ' - ' + name + '</td><td><span class="certainty-flag nested-tooltipped" onmouseover="triggerTooltips(this)" data-tooltip-content="#certainty_table' + complaint_entry.entry_id + '_' +cat_id + '">' + top_certainty + '</span>' + tooltip_all + '</td></tr>'
-        category_table = category_table + category_row
-
-      return
 
   if complaint_entry.entry_history?
     if complaint_entry.entry_history.complaint_history.length >= 1
@@ -717,8 +701,7 @@ format = (complaint_entry_row) ->
       '</div></div>' +
       '<div class="col-xs-5 col-with-divider">' +
       '<table class="simple-nested-table" id="' + complaint_entry.entry_id + '"><thead><tr><th>Conf</th><th>Current Categories</th><th>Certainty</th></tr></thead>' +
-      '<tbody>' + category_table +
-      '</tbody></table>' +
+      '</table>' +
       '</div>' +
       '<div class="col-xs-2">' +
       '<label class="content-label-sm">Resolution</label><br/>' +
@@ -769,8 +752,7 @@ format = (complaint_entry_row) ->
       '<span class="nested-complaint-data">' + customer_description + '</span>' +
       '</div></div><div class="col-xs-5 col-with-divider">' +
       '<table class="simple-nested-table" id="\' + complaint_entry.entry_id + \'"><thead><tr><th>Conf</th><th>Current Categories</th><th>Certainty</th></tr></thead>' +
-      '<tbody>' + category_table +
-      '</tbody></table>' +
+      '</table>' +
       '</div><div class="col-xs-2">' +
       '<button class="secondary" id="lookup-' + complaint_entry.entry_id + '"onclick="lookup_dialog(' + complaint_entry.entry_id  + ')">Lookup</button><br/>' +
       '<button class="secondary" id="history-' + complaint_entry.entry_id + '" onclick="history_dialog(' + complaint_entry.entry_id  + ')">History</button><br/>' +
