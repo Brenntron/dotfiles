@@ -682,15 +682,19 @@ class Dispute < ApplicationRecord
   end
 
   def self.save_named_search(search_name, params, user:)
+    NamedSearchCriterion.where(named_search_id: NamedSearch.where(name: search_name).ids).delete_all
+
     named_search =
         user.named_searches.where(name: search_name).first || NamedSearch.create!(user: user, name: search_name)
-    NamedSearchCriterion.where(named_search: named_search).delete_all
+
     params.each do |field_name, value|
       case
         when value.kind_of?(Hash)
           value.each do |sub_field_name, sub_value|
             named_search.named_search_criteria.create(field_name: "#{field_name}~#{sub_field_name}", value: sub_value)
           end
+        when field_name == 'reload'
+          #do nothing
         when 'search_type' == field_name
           #do nothing
         when 'search_name' == field_name
@@ -707,10 +711,10 @@ class Dispute < ApplicationRecord
   # @param [String] search_name name to save this search as a saved search.
   # @param [ActiveRecord::Relation] base_relation relation to chain this search onto.
   # @return [ActiveRecord::Relation]
-  def self.advanced_search(params, search_name:, user:)
+  def self.advanced_search(params, search_name:, user:, reload: false)
 
     dispute_fields =
-        params.to_h.slice(*%w{status org_domain priority resolution submission_type submitter_type
+        params.to_h.slice(*%w{status org_domain priority resolution submitter_type
                               case_id case_owner_username})
     dispute_fields['id'] = dispute_fields.delete('case_id')
 
@@ -736,6 +740,13 @@ class Dispute < ApplicationRecord
     if params['submitted_newer'].present?
       relation =
           relation.where('case_opened_at >= :submitted_newer', submitted_newer: params['submitted_newer'])
+    end
+
+    if params['submission_type'].present?
+      submission_types = YAML.load(params['submission_type'].to_s)
+
+      relation =
+          relation.where({submission_type: submission_types})
     end
 
     if params['submitted_older'].present?
@@ -818,7 +829,7 @@ class Dispute < ApplicationRecord
     end
 
     # Save this search as a named search
-    if params.present? && search_name.present?
+    if params.present? && search_name.present? && reload == false
       save_named_search(search_name, params, user: user)
     end
 
@@ -829,7 +840,7 @@ class Dispute < ApplicationRecord
   # @param [String] search_name the name of the saved search.
   # @param [ActiveRecord::Relation] base_relation relation to chain this search onto.
   # @return [ActiveRecord::Relation]
-  def self.named_search(search_name, user:)
+  def self.named_search(search_name, user:, reload: false)
     named_search = user.named_searches.where(name: search_name).first
     raise "No search named '#{search_name}' found." unless named_search
     search_params = named_search.named_search_criteria.inject({}) do |search_params, criterion|
@@ -841,7 +852,7 @@ class Dispute < ApplicationRecord
       end
       search_params
     end
-    advanced_search(search_params, search_name: nil, user: user)
+    advanced_search(search_params, search_name: nil, user: user, reload: reload)
   end
 
   def self.standard_search_title(search_name)
@@ -987,12 +998,12 @@ class Dispute < ApplicationRecord
   # @param [String] search_name name of saved search.
   # @param [ActiveRecord::Relation] base_relation relation to chain this search onto.
   # @return [ActiveRecord::Relation]
-  def self.robust_search(search_type, search_name: nil, params: nil, user:)
+  def self.robust_search(search_type, search_name: nil, params: nil, user:, reload: false)
     case search_type
       when 'advanced'
-        advanced_search(params, search_name: search_name, user: user)
+        advanced_search(params, search_name: search_name, user: user, reload: reload)
       when 'named'
-        named_search(search_name, user: user)
+        named_search(search_name, user: user, reload: reload)
       when 'standard'
         standard_search(search_name, user: user)
       when 'contains'

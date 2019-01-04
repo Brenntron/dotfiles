@@ -11,19 +11,19 @@
       .col-xs-4
         %table.tickets-totals-table
           %tr
-            %td.ticket-total= Dispute.assigned_disputes.where(user: current_user).count
+            %td.ticket-total.open= Dispute.assigned_disputes.where(user: current_user).count
             %td.entries-total= DisputeEntry.joins(:dispute).where(disputes: {user: current_user, status: Dispute::ASSIGNED}).count
             %td
               %span.ticket-type-label Open
               Tickets / Total Entries per Ticket
           %tr
-            %td.ticket-total= Dispute.in_progress_disputes.where(user: current_user).count
+            %td.ticket-total.in-progress= Dispute.in_progress_disputes.where(user: current_user).count
             %td.entries-total= DisputeEntry.joins(:dispute).where(disputes: {user: current_user, status: [ Dispute::STATUS_RESEARCHING, Dispute::STATUS_ESCALATED, Dispute::STATUS_CUSTOMER_PENDING, Dispute::STATUS_ON_HOLD, Dispute::STATUS_REOPENED ]}).count
             %td
               %span.ticket-type-label In Progress
               Tickets / Total Entries per Ticket
           %tr
-            %td.ticket-total= Dispute.closed_disputes.where(user: current_user).count
+            %td.ticket-total.closed= Dispute.closed_disputes.where(user: current_user).count
             %td.entries-total= DisputeEntry.joins(:dispute).where(disputes: {user: current_user, status: Dispute::RESOLVED}).count
             %td
               %span.ticket-type-label Closed
@@ -64,20 +64,20 @@
       .col-xs-4.dashboard-left-data
         %table.tickets-totals-table
           %tr
-            %td.ticket-total= Dispute.assigned_disputes.my_team(current_user).count
+            %td.ticket-total.open-team= Dispute.assigned_disputes.my_team(current_user).count
             -#%td.entries-total= DisputeEntry.open_entries.my_team(current_user).count
             %td.entries-total= DisputeEntry.joins(:dispute).where(disputes: {status: Dispute::ASSIGNED}).my_team(current_user).count
             %td
               %span.ticket-type-label Open
               Tickets / Total Entries per Ticket
           %tr
-            %td.ticket-total= Dispute.in_progress_disputes.my_team(current_user).count
+            %td.ticket-total.in-progress-team= Dispute.in_progress_disputes.my_team(current_user).count
             %td.entries-total= DisputeEntry.joins(:dispute).where(disputes: {status: [ Dispute::STATUS_RESEARCHING, Dispute::STATUS_ESCALATED, Dispute::STATUS_CUSTOMER_PENDING, Dispute::STATUS_ON_HOLD, Dispute::STATUS_REOPENED ]}).my_team(current_user).count
             %td
               %span.ticket-type-label In Progress
               Tickets / Total Entries per Ticket
           %tr
-            %td.ticket-total= Dispute.closed_disputes.my_team(current_user).count
+            %td.ticket-total.closed-team= Dispute.closed_disputes.my_team(current_user).count
             %td.entries-total= DisputeEntry.joins(:dispute).where(disputes: {status: Dispute::RESOLVED}).my_team(current_user).count
             %td
               %span.ticket-type-label Closed

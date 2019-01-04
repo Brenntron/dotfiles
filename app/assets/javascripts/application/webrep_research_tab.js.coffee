@@ -588,7 +588,6 @@ $(document).ready ->
     'tooltipster-borderless'
     'tooltipster-borderless-customized'
   ]
-  return
 
   $('.ticket-status-radio').click ->
     all_stat_radios = $('#show-edit-ticket-status-dropdown').find('.status-radio-wrapper')

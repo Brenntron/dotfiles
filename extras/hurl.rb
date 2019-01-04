@@ -292,8 +292,8 @@ class Hurl
         output_tar_path = args.input_tar_path
       else
         output_tar_path = args.gen_output_tar_path
-        puts "curl -L https://git.vrt.sourcefire.com/talosweb/#{args.project}/tarball/#{args.base_dir} > #{output_tar_path}"
-        system "curl -L https://git.vrt.sourcefire.com/talosweb/#{args.project}/tarball/#{args.base_dir} > #{output_tar_path}"
+        puts "curl -Lk https://git.vrt.sourcefire.com/talosweb/#{args.project}/tarball/#{args.base_dir} > #{output_tar_path}"
+        system "curl -Lk https://git.vrt.sourcefire.com/talosweb/#{args.project}/tarball/#{args.base_dir} > #{output_tar_path}"
       end
     end
 
