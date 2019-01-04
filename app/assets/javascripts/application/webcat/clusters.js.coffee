@@ -346,7 +346,6 @@ $ ->
       cluster = row.data()
 
       table_head = '<table class="table cluster-path-table">' + '<thead>' + '<tr>' +
-        '<th><input class="cluster_path_select_all" type="checkbox" onclick="select_or_deselect_cluster(' + cluster.cluster_id + ')" id=' + cluster.cluster_id + ' /></th>' +
         '<th class="clusterpath-col-path">Cluster Paths</th>' +
         '<th class="clusterpath-col-path">Customer Name</th>' +
         '<th class="clusterpath-col-volume text-center">APAC Region Volume</th>' +
@@ -389,7 +388,6 @@ $ ->
 
             if entry_count <= 25
               entry_row = '<tr class="index-entry-row">' +
-                '<td class="clusterpath-col-spacer"><input type="checkbox" class="cluster-path-checkbox_' + cluster.cluster_id + '"</td>' + # Spacer for the check box row
                 '<td class="clusterpath-col-path">' + this.url + '</td>' +
                 '<td class="clusterpath-col-path">' + this.customer_name + '</td>' +
                 '<td class="clusterpath-col-volume text-center">' + this.apac_volume + '</td>' +
@@ -453,7 +451,6 @@ window.expandClusterEntryPreview = (cluster, expand_table_row, max_viewable_entr
 
           if entry_count > 25
             entry_row = '<tr class="index-entry-row">' +
-              '<td class="clusterpath-col-spacer"><input type="checkbox" class="cluster-path-checkbox_' + cluster.cluster_id + '"</td>' + # Spacer for the check box row
               '<td class="clusterpath-col-path">' + this.url + '</td>' +
               '<td class="clusterpath-col-path">' + this.customer_name + '</td>' +
               '<td class="clusterpath-col-volume text-center">' + this.apac_volume + '</td>' +
@@ -493,10 +490,7 @@ window.expandClusterEntryPreview = (cluster, expand_table_row, max_viewable_entr
         $(this).remove()
 
 
-  window.select_or_deselect_cluster = (cluster_id)->
-    $('.cluster-path-checkbox_' + cluster_id).prop('checked', $('#' + cluster_id).prop('checked'))
-
-  $('#cluster_filter_field').keyup (event) ->
-    if event.keyCode == 13
-      apply_filter_to_table()
-    return
+$('#cluster_filter_field').keyup (event) ->
+  if event.keyCode == 13
+    apply_filter_to_table()
+  return
