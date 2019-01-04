@@ -550,6 +550,11 @@ window.drop_current_categories = () ->
 )
 
 format = (complaint_entry_row) ->
+
+  $('#loader-modal').modal({
+    keyboard: false,
+  })
+
   complaint_entry = complaint_entry_row.data()
   row_id = complaint_entry_row[0][0]
   missing_data = '<span class="missing-data">No Data</span>'
@@ -642,6 +647,9 @@ format = (complaint_entry_row) ->
     url: '/escalations/api/v1/escalations/webcat/complaint_entries/retrieve_current_categories'
     data: {'id': complaint_entry.entry_id}
     success: (response) ->
+      $('#loader-modal').modal('hide');
+      $('.modal-backdrop').remove()
+
       current_categories = JSON.parse(response)
 
       $.each current_categories, (key, value) ->
@@ -657,6 +665,9 @@ format = (complaint_entry_row) ->
           $('.simple-nested-table').append(category_row)
 
     error: (response) ->
+      $('#loader-modal').modal('hide');
+      $('.modal-backdrop').remove()
+
       current_categories = ''
   )
 
