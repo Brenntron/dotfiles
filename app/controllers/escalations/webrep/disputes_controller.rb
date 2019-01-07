@@ -106,6 +106,26 @@ class Escalations::Webrep::DisputesController < ApplicationController
           end
         end
 
+        def insert_adhoc_data(data, xpos, ypos, filename, sheetname, format = nil)
+          # Insert a single data value into an arbitrary cell. `xpos` and `ypos`
+          # are integers specifying what cell to insert into.
+          worksheet = filename[sheetname]
+          worksheet.add_cell(xpos, ypos, data)
+          case format
+          when "bold"
+            worksheet.sheet_data[xpos][ypos].change_font_bold(true)
+          when "h1"
+            worksheet.sheet_data[xpos][ypos].change_font_bold(true)
+            worksheet.sheet_data[xpos][ypos].change_font_size(14)
+
+          when "h2"
+            worksheet.sheet_data[xpos][ypos].change_font_bold(true)
+            worksheet.sheet_data[xpos][ypos].change_font_size(12)
+
+          end
+
+        end
+
         @spreadsheet_directory = Dir.mktmpdir
 
         if params['mytickets'] == "true"
