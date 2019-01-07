@@ -155,8 +155,8 @@ class Escalations::Webrep::DisputesController < ApplicationController
           total_ticket_entries_closed_headers = ['Date', 'Web', 'Email', 'Web_Email', 'Total']
           time_to_close_tickets_headers = ['Ticket', 'Time']
           ticket_submitted_by_submitter_type_headers = ['Date', 'Customer', 'Guest']
-          closed_email_by_resolution_headers = ['Resolution', 'Count']
-          closed_web_by_resolution_headers = ['Resolution', 'Count']
+          closed_email_by_resolution_headers = ['Resolution', 'Count', 'Percent']
+          closed_web_by_resolution_headers = ['Resolution', 'Count', 'Percent']
           insert_row_with_data(my_open_tickets_headers, mytickets_xlsx, mytickets_workbook_names[:my_open_tickets], "h1")
           insert_row_with_data(my_closed_tickets_headers, mytickets_xlsx, mytickets_workbook_names[:my_closed_tickets], "h1")
           insert_row_with_data(total_ticket_entries_closed_headers, mytickets_xlsx, mytickets_workbook_names[:total_ticket_entries_closed], "h1")
@@ -172,17 +172,21 @@ class Escalations::Webrep::DisputesController < ApplicationController
           my_open_tickets_data[:table_data].each do |d|
             data_values = [d[:case_number], d[:submitter_type], d[:submission_type], d[:priority], ActionController::Base.helpers.strip_tags(d[:d_entry_preview]), d[:time_to_close]]
             # The Rails `strip_tags` method doesn't work directly in this controller and I don't know why.
-
             insert_row_with_data(data_values, mytickets_xlsx, mytickets_workbook_names[:my_open_tickets])
           end
+          insert_adhoc_data("Entry Count", 0, 6, mytickets_xlsx, mytickets_workbook_names[:my_open_tickets], "h1")
+          insert_adhoc_data(my_open_tickets_data[:table_data].length, 1, 6, mytickets_xlsx, mytickets_workbook_names[:my_open_tickets])
+
 
           # My Closed Tickets
           my_closed_tickets_data = Dispute.closed_tickets_report([current_user], params[:startdate], params[:enddate])
           my_closed_tickets_data[:table_data].each do |d|
             data_values = [d[:case_number], d[:submitter_type], d[:submission_type], d[:priority], ActionController::Base.helpers.strip_tags(d[:d_entry_preview]), d[:time_to_close]]
-
             insert_row_with_data(data_values, mytickets_xlsx, mytickets_workbook_names[:my_closed_tickets])
           end
+          insert_adhoc_data("Entry Count", 0, 6, mytickets_xlsx, mytickets_workbook_names[:my_closed_tickets], "h1")
+          insert_adhoc_data(my_closed_tickets_data[:table_data].length, 1, 6, mytickets_xlsx, mytickets_workbook_names[:my_closed_tickets])
+
 
           # Total ticket entries closed
           @total_ticket_entries_closed_data = Dispute.ticket_entries_closed_by_day_report([current_user], params[:startdate], params[:enddate])
@@ -222,7 +226,7 @@ class Escalations::Webrep::DisputesController < ApplicationController
           # Closed Email by Resolution
           closed_email_by_resolution_data = Dispute.closed_ticket_entries_by_resolution_report([current_user], params[:startdate], params[:enddate], "E")
           closed_email_by_resolution_data[:table_data].each do |d|
-            data_values = [d[:resolution], d[:count]]
+            data_values = [d[:resolution], d[:count], d[:percent]]
             insert_row_with_data(data_values, mytickets_xlsx, mytickets_workbook_names[:closed_email_by_resolution])
           end
 
@@ -230,7 +234,7 @@ class Escalations::Webrep::DisputesController < ApplicationController
           # Closed Web by Resolution
           closed_web_by_resolution_data = Dispute.closed_ticket_entries_by_resolution_report([current_user], params[:startdate], params[:enddate], "W")
           closed_web_by_resolution_data[:table_data].each do |d|
-            data_values = [d[:resolution], d[:count]]
+            data_values = [d[:resolution], d[:count], d[:percent]]
             insert_row_with_data(data_values, mytickets_xlsx, mytickets_workbook_names[:closed_web_by_resolution])
           end
 
@@ -296,15 +300,15 @@ class Escalations::Webrep::DisputesController < ApplicationController
 
           # Begin data insertion
 
-          # My Team Tickets
+          # My Team [open] Tickets
           open_team_tickets_data = Dispute.open_tickets_report(current_user.my_team, params[:startdate], params[:enddate])
           open_team_tickets_data[:table_data].each do |d|
             data_values = [d[:case_number], d[:owner], d[:submitter_type], d[:submission_type], d[:priority], ActionController::Base.helpers.strip_tags(d[:d_entry_preview]), d[:time_to_close]]
             # The Rails `strip_tags` method doesn't work directly in this controller and I don't know why.
-
             insert_row_with_data(data_values, myteamtickets_xlsx, myteamtickets_workbook_names[:open_team_tickets])
           end
-
+          insert_adhoc_data("Entry Count", 0, 7, myteamtickets_xlsx, myteamtickets_workbook_names[:open_team_tickets], "h1")
+          insert_adhoc_data(open_team_tickets_data[:table_data].length, 1, 7, myteamtickets_xlsx, myteamtickets_workbook_names[:open_team_tickets])
 
           # Closed Tickets
           closed_team_tickets_data = Dispute.closed_tickets_report(current_user.my_team, params[:startdate], params[:enddate])
@@ -312,6 +316,8 @@ class Escalations::Webrep::DisputesController < ApplicationController
             data_values = [d[:case_number], d[:owner], d[:submitter_type], d[:submission_type], d[:priority], ActionController::Base.helpers.strip_tags(d[:d_entry_preview]), d[:time_to_close]]
             insert_row_with_data(data_values, myteamtickets_xlsx, myteamtickets_workbook_names[:closed_team_tickets])
           end
+          insert_adhoc_data("Entry Count", 0, 7, myteamtickets_xlsx, myteamtickets_workbook_names[:closed_team_tickets], "h1")
+          insert_adhoc_data(closed_team_tickets_data[:table_data].length, 1, 7, myteamtickets_xlsx, myteamtickets_workbook_names[:closed_team_tickets])
 
           # Average time to close by owner
           current_user.my_team.each do |t|
@@ -335,7 +341,6 @@ class Escalations::Webrep::DisputesController < ApplicationController
             final_row << @ticket_resolution_by_owner_data[:unchanged_tickets][i]
             final_row << @ticket_resolution_by_owner_data[:other_tickets][i]
             insert_row_with_data(final_row, myteamtickets_xlsx, myteamtickets_workbook_names[:ticket_resolution_by_owner])
-
           end
 
           # Rule hits for false positive resolutions
