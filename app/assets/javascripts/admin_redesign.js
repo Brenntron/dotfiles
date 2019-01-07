@@ -38,5 +38,4 @@
 //= require application/webrep_research_tab
 //= require application/webcat/webcat
 //= require application/webcat/categories
-//= require_directory ./application
 

@@ -3962,10 +3962,9 @@ td.wbrs-highlight, td.sbrs-highlight {
     .nav-page-button {
       display: inline-block;
       width: 44px;
-
-      .active {
-        background-color: $bug-section-color;
-      }
+    }
+    .active {
+      background-color: $bug-section-color;
     }
   }
 
