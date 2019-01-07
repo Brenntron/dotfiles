@@ -526,9 +526,8 @@ window.toolbar_adjust_reptool_bl_button =(button_tag) ->
     entry_ids = $('.dispute-entry-checkbox:checked').map(() ->
       parseInt(this.id)
     ).toArray()
-
   if entry_ids.length == 0
-    std_msg_error('Error', ['No row(s) selected.'])
+    std_msg_error('No rows selected', ['Please select at least one row.'])
     return
 
   reptool_bl_form = button_tag.form
@@ -598,9 +597,9 @@ window.toolbar_adjust_reptool_bl_button_research =(button_tag) ->
 
 window.toolbar_index_edit_status = () ->
   statusName = $('input[name=entry-status]:checked').val()
-  
+
   data = {}
-  
+
   entry_ids = $('.dispute-entry-checkbox:checked').map(() ->
     data[this.id] = [{
       id: this.id
@@ -703,7 +702,7 @@ window.toolbar_show_change_assignee = () ->
     success: (response) ->
       window.location.reload()
     error: (response) ->
-      std_msg_error('Assign Error', ['Error changing assignee', response.responseJSON.error])
+      std_msg_error('No Tickets Selected', ['Select at least one ticket to assign to yourself.'])
   )
 
 window.related_disputes = () ->
@@ -857,7 +856,7 @@ window.take_disputes = () ->
   ).toArray()
 
   if dispute_ids.length == 0
-    std_msg_error('Assign Issue(s)', ['No dispute(s) selected'])
+    std_msg_error('No Tickets Selected', ['Please select at least one ticket to assign.'])
     return
 
   std_msg_ajax(
@@ -869,15 +868,13 @@ window.take_disputes = () ->
       for dispute_id in response.dispute_ids
         $('#owner_' + dispute_id).text(response.username)
         $('#status_' + dispute_id).text("Assigned")
-      std_msg_success('Issues Assigned', [response.dispute_ids.length + ' issue(s) have been assigned to ' + response.username])
+      std_msg_success('Tickets successfully assigned', [response.dispute_ids.length + ' have been assigned to ' + response.username])
     error: (error) ->
       std_msg_error('Assign Issue(s) Error', [
         'Failed to assign ' + dispute_ids.length + ' issue(s).',
         'Due to: ' + error.responseJSON.error
       ])
   )
-
-
 
 window.take_single_dispute = (id) ->
   dispute_ids = [ id ]
@@ -1731,7 +1728,7 @@ $ ->
 
     else
       $(dropdown_wrapper).removeClass('open')
-      std_msg_error('No rows selected', ['Please select at least oneSSS row.'])
+      std_msg_error('No rows selected', ['Please select at least one row.'])
 
   $('#set-related-dispute-submit-button').click ->
     dropdown = $('#set-related-dispute-div').parent()

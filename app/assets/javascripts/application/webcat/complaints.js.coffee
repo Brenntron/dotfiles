@@ -367,7 +367,7 @@ window.take_selected = ()->
         notice_html = "<p>Something went wrong: #{response.responseText}</p>"
     , this)
   else
-    std_msg_error('Error', ['No row selected.'])
+    std_msg_error('No rows selected', ['Please select at least one row.'])
 
 
 

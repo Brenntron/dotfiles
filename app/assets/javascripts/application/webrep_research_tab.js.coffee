@@ -199,7 +199,7 @@ $ ->
     dropdown = $('#reptool_adjust_entries').parent()
 
     # Only allowing a single submission at a time for now.
-    if ($('.dispute_check_box:checked').length > 0)
+    if ($('.dispute_check_box:checked').length == 1)
       show_content = $('#reptool_adjust_entries').find('.entry-dispute-name')
       show_rep_class = $('#reptool_adjust_entries').find('.entry-reptool-class')
       show_rep_exp = $('#reptool_adjust_entries').find('.entry-reptool-expiration')
@@ -238,8 +238,12 @@ $ ->
       )
 #
 
-    else
+    else if $('.dispute_check_box:checked').length == 0
       std_msg_error('No rows selected', ['Please select one row'])
+      $(dropdown).removeClass('open')
+      return false
+    else
+      std_msg_error('Error', ['Please select one row'])
       $(dropdown).removeClass('open')
       return false
 
