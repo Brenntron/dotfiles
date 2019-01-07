@@ -533,6 +533,8 @@ class ComplaintEntry < ApplicationRecord
 
   def current_category_data
     prefix = Wbrs::Prefix.where({:urls => [self.hostlookup]})&.first
+    return {} unless prefix
+
     current_categories = prefix.categories
 
     current_categories.inject({}) do |data, category|
