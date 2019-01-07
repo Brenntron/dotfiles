@@ -532,49 +532,22 @@ class ComplaintEntry < ApplicationRecord
   end
 
   def current_category_data
+    prefix = Wbrs::Prefix.where({:urls => [self.hostlookup]})&.first
+    return {} unless prefix
 
-    data = {}
-    prefix_id = nil
-    prefix_results = Wbrs::Prefix.where({:urls => [self.hostlookup]})
+    current_categories = prefix.categories
 
-    prefix_results.each do |result|
-      data[result.category] = {:is_active => result.is_active, :mnemonic => result.mnem, :category_id => result.category, :prefix_id => result.prefix_id}
-      prefix_id = result.prefix_id
+    current_categories.inject({}) do |data, category|
+      data[category.category_id] = {
+          category_id: category.category_id,
+          desc_long: category.desc_long,
+          descr: category.descr,
+          mnem: category.mnem,
+          is_active: category.is_active,
+          confidence: category.confidence
+      }
+      data
     end
-
-
-    ##LOOK INTO:  CURRENTLY COMMENTED OUT UNTIL WE MEET UP WITH RULEAPI TEAM TO FIGURE OUT WHY HISTORY DOESN'T MATCH UP WITH CURRENT
-    #
-    # if Wbrs::Prefix.where(:urls => [self.hostlookup]).present?
-    #   prefix_id_lookup = Wbrs::Prefix.where(:urls => [self.hostlookup]).first.prefix_id
-    # end
-    by_cat = {}
-
-    if prefix_id.present?
-      audit_history = Wbrs::HistoryRecord.where(prefix_id: prefix_id)
-
-      audit_history.each do |hist|
-
-        if by_cat[hist.category_id].blank?
-          by_cat[hist.category_id] = []
-        end
-
-        by_cat[hist.category_id] << hist
-      end
-    end
-
-
-    if !by_cat.empty?
-      data.each do |key, value|
-        data[key][:confidence] = by_cat[key].last.confidence
-        data[key][:name] = by_cat[key].last.category.descr
-        data[key][:long_description] = by_cat[key].last.category.desc_long
-        # Certainty is dummy data
-        data[key][:certainty] = [{:source => 'N/A', :source_category => 'N/A', :source_certainty => '1000'}]
-      end
-    end
-
-    data
   end
 
   def historic_category_data
