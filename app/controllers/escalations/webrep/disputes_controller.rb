@@ -150,8 +150,8 @@ class Escalations::Webrep::DisputesController < ApplicationController
 
 
           # Build the headers of each individual worksheet
-          my_open_tickets_headers = ['Case ID', 'Submitter Type', 'Ticket Type', 'Priority', 'Dispute Preview', 'Last Comment Date']
-          my_closed_tickets_headers = ['Case ID', 'Submitter Type', 'Ticket Type', 'Priority', 'Dispute Preview', 'Time to Close']
+          my_open_tickets_headers = ['Case ID', 'Submitter Type', 'Ticket Type', 'Priority', 'Dispute Preview', 'Last Comment Date', 'Entry Count']
+          my_closed_tickets_headers = ['Case ID', 'Submitter Type', 'Ticket Type', 'Priority', 'Dispute Preview', 'Time to Close', 'Entry Count']
           total_ticket_entries_closed_headers = ['Date', 'Web', 'Email', 'Web_Email', 'Total']
           time_to_close_tickets_headers = ['Ticket', 'Time (hrs)']
           ticket_submitted_by_submitter_type_headers = ['Date', 'Customer', 'Guest']
@@ -170,22 +170,18 @@ class Escalations::Webrep::DisputesController < ApplicationController
           # My Open Tickets
           my_open_tickets_data = Dispute.open_tickets_report([current_user], params[:startdate], params[:enddate])
           my_open_tickets_data[:table_data].each do |d|
-            data_values = [d[:case_number], d[:submitter_type], d[:submission_type], d[:priority], ActionController::Base.helpers.strip_tags(d[:d_entry_preview]).gsub(/ *\d+$/, ''), d[:last_comment]]
+            data_values = [d[:case_number], d[:submitter_type], d[:submission_type], d[:priority], ActionController::Base.helpers.strip_tags(d[:d_entry_preview]).gsub(/ *\d+$/, ''), d[:last_comment], ActionController::Base.helpers.strip_tags(d[:d_entry_preview]).scan(/\d+/).last]
             # The Rails `strip_tags` method doesn't work directly in this controller and I don't know why.
             insert_row_with_data(data_values, mytickets_xlsx, mytickets_workbook_names[:my_open_tickets])
           end
-          insert_adhoc_data("Entry Count", 0, 6, mytickets_xlsx, mytickets_workbook_names[:my_open_tickets], "h1")
-          insert_adhoc_data(my_open_tickets_data[:table_data].length, 1, 6, mytickets_xlsx, mytickets_workbook_names[:my_open_tickets])
 
 
           # My Closed Tickets
           my_closed_tickets_data = Dispute.closed_tickets_report([current_user], params[:startdate], params[:enddate])
           my_closed_tickets_data[:table_data].each do |d|
-            data_values = [d[:case_number], d[:submitter_type], d[:submission_type], d[:priority], ActionController::Base.helpers.strip_tags(d[:d_entry_preview]).gsub(/ *\d+$/, ''), d[:time_to_close]]
+            data_values = [d[:case_number], d[:submitter_type], d[:submission_type], d[:priority], ActionController::Base.helpers.strip_tags(d[:d_entry_preview]).gsub(/ *\d+$/, ''), d[:time_to_close], ActionController::Base.helpers.strip_tags(d[:d_entry_preview]).scan(/\d+/).last]
             insert_row_with_data(data_values, mytickets_xlsx, mytickets_workbook_names[:my_closed_tickets])
           end
-          insert_adhoc_data("Entry Count", 0, 6, mytickets_xlsx, mytickets_workbook_names[:my_closed_tickets], "h1")
-          insert_adhoc_data(my_closed_tickets_data[:table_data].length, 1, 6, mytickets_xlsx, mytickets_workbook_names[:my_closed_tickets])
 
 
           # Total ticket entries closed
@@ -277,8 +273,8 @@ class Escalations::Webrep::DisputesController < ApplicationController
 
           # Build headers of each individual worksheet
 
-          open_team_tickets_headers = ['Case ID', 'Owner', 'Submitter Type', 'Ticket Type', 'Priority', 'Dispute Preview', 'Last Comment']
-          closed_team_tickets_headers = ['Case ID', 'Owner', 'Submitter Type', 'Ticket Type', 'Priority', 'Dispute Preview', 'Time to Close']
+          open_team_tickets_headers = ['Case ID', 'Owner', 'Submitter Type', 'Ticket Type', 'Priority', 'Dispute Preview', 'Last Comment', 'Entry Count']
+          closed_team_tickets_headers = ['Case ID', 'Owner', 'Submitter Type', 'Ticket Type', 'Priority', 'Dispute Preview', 'Time to Close', 'Entry Count']
           average_time_to_close_by_owner_headers = ['Owner', 'Time (hrs)']
           ticket_resolution_by_owner_headers = ['Owner', 'Fixed FP', 'Fixed FN', 'Unchanged', 'Other']
           rule_hits_for_false_positive_resolutions_headers = ['Rules', 'Rule Hits']
@@ -303,21 +299,17 @@ class Escalations::Webrep::DisputesController < ApplicationController
           # My Team [open] Tickets
           open_team_tickets_data = Dispute.open_tickets_report(current_user.my_team, params[:startdate], params[:enddate])
           open_team_tickets_data[:table_data].each do |d|
-            data_values = [d[:case_number], d[:owner], d[:submitter_type], d[:submission_type], d[:priority], ActionController::Base.helpers.strip_tags(d[:d_entry_preview]).gsub(/ *\d+$/, ''), d[:last_comment]]
+            data_values = [d[:case_number], d[:owner], d[:submitter_type], d[:submission_type], d[:priority], ActionController::Base.helpers.strip_tags(d[:d_entry_preview]).gsub(/ *\d+$/, ''), d[:last_comment], ActionController::Base.helpers.strip_tags(d[:d_entry_preview]).scan(/\d+/).last]
             # The Rails `strip_tags` method doesn't work directly in this controller and I don't know why.
             insert_row_with_data(data_values, myteamtickets_xlsx, myteamtickets_workbook_names[:open_team_tickets])
           end
-          insert_adhoc_data("Entry Count", 0, 7, myteamtickets_xlsx, myteamtickets_workbook_names[:open_team_tickets], "h1")
-          insert_adhoc_data(open_team_tickets_data[:table_data].length, 1, 7, myteamtickets_xlsx, myteamtickets_workbook_names[:open_team_tickets])
 
           # Closed Tickets
           closed_team_tickets_data = Dispute.closed_tickets_report(current_user.my_team, params[:startdate], params[:enddate])
           closed_team_tickets_data[:table_data].each do |d|
-            data_values = [d[:case_number], d[:owner], d[:submitter_type], d[:submission_type], d[:priority], ActionController::Base.helpers.strip_tags(d[:d_entry_preview]).gsub(/ *\d+$/, ''), d[:time_to_close]]
+            data_values = [d[:case_number], d[:owner], d[:submitter_type], d[:submission_type], d[:priority], ActionController::Base.helpers.strip_tags(d[:d_entry_preview]).gsub(/ *\d+$/, ''), d[:time_to_close], ActionController::Base.helpers.strip_tags(d[:d_entry_preview]).scan(/\d+/).last]
             insert_row_with_data(data_values, myteamtickets_xlsx, myteamtickets_workbook_names[:closed_team_tickets])
           end
-          insert_adhoc_data("Entry Count", 0, 7, myteamtickets_xlsx, myteamtickets_workbook_names[:closed_team_tickets], "h1")
-          insert_adhoc_data(closed_team_tickets_data[:table_data].length, 1, 7, myteamtickets_xlsx, myteamtickets_workbook_names[:closed_team_tickets])
 
           # Average time to close by owner
 
