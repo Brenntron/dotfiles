@@ -426,17 +426,6 @@ $ ->
       )
     return
 
-  $('.cat_new_url').selectize {
-    persist: false,
-    create: false,
-    maxItems: 5,
-    valueField: 'value',
-    labelField: 'value',
-    searchField: ['text'],
-    options: AC.WebCat.createSelectOptions()
-  }
-
-
 window.expandClusterEntryPreview = (cluster, expand_table_row, max_viewable_entries) ->
   $('.cluster-mgt-loader-wrapper').removeClass('hidden')
   entry_rows = []
