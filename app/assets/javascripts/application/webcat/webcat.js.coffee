@@ -21,7 +21,10 @@ $ ->
           $node.addClass 'highlight-plus5Hours'
         else
         return
-
+      order: [ [
+        3
+        'desc'
+      ] ]
       dom: '<"datatable-top-tools no-margin-datatable-top-tool"lf>t<ip>'
       language: {
         search: "_INPUT_"
@@ -65,6 +68,9 @@ $ ->
         }
         {
           data: null
+          orderable: false
+          searchable: false
+          sortable: false
           defaultContent: '<span></span>'
           width: '24px'
         }

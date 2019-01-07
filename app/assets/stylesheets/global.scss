@@ -2170,6 +2170,7 @@ table .bug-priority {
 
 .complaint-submitter-type {
   background-repeat: no-repeat;
+  background-color: transparent;
   width: 20px;
   height: 20px;
   border: none;
@@ -5847,11 +5848,11 @@ td.ticket-total::before {
 }
 
 table.dataTable tbody tr.selected {
-  background-color: $faint-accent-color;
+  background-color: #fff7cd63;
 }
 
 table.dataTable tbody tr.selected .alt-col{
-  background-color: #dae7ea;
+  background-color: #f5f2e5;
 }
 
 table.dispute-entry-table tbody tr.selected {
@@ -6945,14 +6946,20 @@ h2 {
   font-weight: 600;
 }
 
-.sorting_1, .sorting_asc, .sorting_desc {
-  background-color: $faint-accent-color !important;
-  opacity: 80%;
-  background-position-x: 95% !important;
-}
 .sorting {
   background-position-x: 95% !important;
 }
+
+.sorting_1, .sorting_asc, .sorting_desc {
+  background-position-x: 95% !important;
+  background-color: #d7dadb2b;
+}
+
+th.sorting_1, th.sorting_asc, th.sorting_desc {
+  color: $bug-section-color;
+  background-color: #d7dadb2b;
+}
+
 #time-submitted {
   width: 150px;
 }
