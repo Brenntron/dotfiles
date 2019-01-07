@@ -204,6 +204,10 @@ class Escalations::Webrep::DisputesController < ApplicationController
             final_row << @time_to_close_tickets_data[:close_times][i]
             insert_row_with_data(final_row, mytickets_xlsx, mytickets_workbook_names[:time_to_close_tickets])
           end
+          time_to_close_tickets_average = @time_to_close_tickets_data[:close_times].inject{ |sum, el| sum + el }.to_f / @time_to_close_tickets_data[:close_times].size
+          insert_adhoc_data("Average Time to Close", 0, 2, mytickets_xlsx, mytickets_workbook_names[:time_to_close_tickets], "h1")
+          insert_adhoc_data(time_to_close_tickets_average, 1, 2, mytickets_xlsx, mytickets_workbook_names[:time_to_close_tickets])
+
 
           # Ticket Submitted by Submitter Type
           @ticket_submitted_by_submitter_type_data = Dispute.tickets_submitted_by_submitter_per_day(params[:startdate], params[:enddate])
