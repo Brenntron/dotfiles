@@ -52,7 +52,7 @@ window.cat_new_url = ()->
 
   for i in [1...6] by 1
 
-    data[i] = {url: $("#url_#{i}").val(), cats: $("#cat_new_url_#{i}")[0].nextSibling.value}
+    data[i] = {url: $("#url_#{i}").val(), cats: $("#cat_new_url_#{i}").val()}
 
     if data[i].url.length > 0 && data[i].cats != null
       isEmpty = false
@@ -431,10 +431,7 @@ window.enlarge_image = (id,image)->
     trigger: 'focus'
     content: '<img src="' + image + '">').popover 'show'
 
-window.lookup_prefix = (event) ->
-
-  event.preventDefault()
-
+window.lookup_prefix = () ->
   $('#loader-modal').show()
   $('.modal-backdrop').show()
 
