@@ -277,8 +277,8 @@ class Escalations::Webrep::DisputesController < ApplicationController
 
           # Build headers of each individual worksheet
 
-          open_team_tickets_headers = ['Case ID', 'Owner', 'Submitter Type', 'Submission Type', 'Priority', 'Dispute Prevew', 'Time to Close']
-          closed_team_tickets_headers = ['Case ID', 'Owner', 'Submitter Type', 'Submission Type', 'Priority', 'Dispute Prevew', 'Time to Close']
+          open_team_tickets_headers = ['Case ID', 'Owner', 'Submitter Type', 'Ticket Type', 'Priority', 'Dispute Prevew', 'Time to Close']
+          closed_team_tickets_headers = ['Case ID', 'Owner', 'Submitter Type', 'Ticket Type', 'Priority', 'Dispute Prevew', 'Time to Close']
           average_time_to_close_by_owner_headers = ['Owner', 'Ticket', 'Time']
           ticket_resolution_by_owner_headers = ['Owner', 'Fixed FP', 'Fixed FN', 'Unchanged', 'Other']
           rule_hits_for_false_positive_resolutions_headers = ['Rules', 'Rule Hits']
