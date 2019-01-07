@@ -493,7 +493,17 @@ window.row_adust_reptool_bl_button =(button_tag) ->
     success: (response) ->
       window.location.reload()
     error: (response) ->
-      popup_response_error(response, 'Error adjusting WL/BL')
+      if response.responseJSON == undefined
+        response_lines = response.responseText.split("\n")
+        if 2 < response_lines.length
+          errormsg = [response_lines[0], response_lines[1]]
+        else
+          errormsg = [response.responseText]
+      else if response.responseJSON.error != undefined
+        errormsg = [response.responseJSON.error]
+      else
+        errormsg = [response.responseText]
+      std_msg_error('reptool wl/bl adjustment error', ['Error adjusting WL/BL'].concat(errormsg) )
   )
 
 window.row_adust_reptool_bl_button_research =(button_tag) ->
@@ -778,16 +788,17 @@ window.toolbar_index_mark_duplicate = (box_names) ->
 
 
 window.add_dispute_entry = () ->
-  if $('#add_dispute_entry').length == 1
-    std_msg_error('Entry content cannot be blank', ['Please provide content for the new entry.'])
-  $('#loader-modal').modal({
-    backdrop: 'static',
-    keyboard: true
-  })
   data = {
     'uri': $('#add_dispute_entry').val(),
     'dispute_id': $('#dispute_id').text(),
   }
+  if $('#add_dispute_entry').val() == ''
+    std_msg_error('Entry content cannot be blank', ['Please provide content for the new entry.'])
+  else
+    $('#loader-modal').modal({
+      backdrop: 'static',
+      keyboard: true
+    })
 
   headers = {'Token': $('input[name="token"]').val(), 'Xmlrpc-Token': $('input[name="xml_token"]').val()}
   $.ajax(
