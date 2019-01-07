@@ -532,19 +532,20 @@ class ComplaintEntry < ApplicationRecord
   end
 
   def current_category_data
-    data = {}
-
     prefix = Wbrs::Prefix.where({:urls => [self.hostlookup]})&.first
     current_categories = prefix.categories
 
-    current_categories['data'].each do |category|
-      category_id = category['category_id']
-      category_data = Wbrs::Category.find(category_id)
-
-      data[category_id] = {desc_long: category_data.desc_long, descr: category_data.descr, mnem: category_data.mnem, is_active: category_data.is_active, confidence: category['confidence']}
+    current_categories.inject({}) do |data, category|
+      data[category.category_id] = {
+          category_id: category.category_id,
+          desc_long: category.desc_long,
+          descr: category.descr,
+          mnem: category.mnem,
+          is_active: category.is_active,
+          confidence: category.confidence
+      }
+      data
     end
-
-    data
   end
 
   def historic_category_data
