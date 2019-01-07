@@ -1159,10 +1159,6 @@ $ ->
         className: 'text-center'
       }
       {
-        targets: [ 8 ]
-        className: 'alt-col'
-      }
-      {
         targets: [ 10 ]
         className: 'age-col'
       }

@@ -167,7 +167,6 @@ $ ->
         }
         {
           data: 'assigned_to'
-          className: 'alt-col'
         }
         {
           data: 'age_int'
