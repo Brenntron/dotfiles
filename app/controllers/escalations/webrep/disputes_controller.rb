@@ -130,8 +130,8 @@ class Escalations::Webrep::DisputesController < ApplicationController
 
 
           # Build the headers of each individual worksheet
-          my_open_tickets_headers = ['Case ID', 'Status', 'Dispute Preview', 'Last Comment Date']
-          my_closed_tickets_headers = ['Case ID', 'Submitter Type', 'Submission Type', 'Priority', 'Dispute Prevew', 'Time to Close']
+          my_open_tickets_headers = ['Case ID', 'Submitter Type', 'Ticket Type', 'Priority', 'Dispute Prevew', 'Time to Close']
+          my_closed_tickets_headers = ['Case ID', 'Submitter Type', 'Ticket Type', 'Priority', 'Dispute Prevew', 'Time to Close']
           total_ticket_entries_closed_headers = ['Date', 'Web', 'Email', 'Web_Email', 'Total']
           time_to_close_tickets_headers = ['Ticket', 'Time']
           ticket_submitted_by_submitter_type_headers = ['Date', 'Customer', 'Guest']
@@ -150,7 +150,7 @@ class Escalations::Webrep::DisputesController < ApplicationController
           # My Open Tickets
           my_open_tickets_data = Dispute.open_tickets_report([current_user], params[:startdate], params[:enddate])
           my_open_tickets_data[:table_data].each do |d|
-            data_values = [d[:case_number], d[:status], ActionController::Base.helpers.strip_tags(d[:d_entry_preview]), d[:last_comment]]
+            data_values = [d[:case_number], d[:submitter_type], d[:submission_type], d[:priority], ActionController::Base.helpers.strip_tags(d[:d_entry_preview]), d[:time_to_close]]
             # The Rails `strip_tags` method doesn't work directly in this controller and I don't know why.
 
             insert_row_with_data(data_values, mytickets_xlsx, mytickets_workbook_names[:my_open_tickets])
@@ -249,7 +249,7 @@ class Escalations::Webrep::DisputesController < ApplicationController
 
           # Build headers of each individual worksheet
 
-          open_team_tickets_headers = ['Case ID', 'Owner', 'Status', 'Dispute Preview', 'Last Comment Date']
+          open_team_tickets_headers = ['Case ID', 'Owner', 'Submitter Type', 'Submission Type', 'Priority', 'Dispute Prevew', 'Time to Close']
           closed_team_tickets_headers = ['Case ID', 'Owner', 'Submitter Type', 'Submission Type', 'Priority', 'Dispute Prevew', 'Time to Close']
           average_time_to_close_by_owner_headers = ['Owner', 'Ticket', 'Time']
           ticket_resolution_by_owner_headers = ['Owner', 'Fixed FP', 'Fixed FN', 'Unchanged', 'Other']
@@ -275,7 +275,7 @@ class Escalations::Webrep::DisputesController < ApplicationController
           # My Team Tickets
           open_team_tickets_data = Dispute.open_tickets_report(current_user.my_team, params[:startdate], params[:enddate])
           open_team_tickets_data[:table_data].each do |d|
-            data_values = [d[:case_number], d[:owner], d[:status], ActionController::Base.helpers.strip_tags(d[:d_entry_preview]), d[:last_comment]]
+            data_values = [d[:case_number], d[:owner], d[:submitter_type], d[:submission_type], d[:priority], ActionController::Base.helpers.strip_tags(d[:d_entry_preview]), d[:time_to_close]]
             # The Rails `strip_tags` method doesn't work directly in this controller and I don't know why.
 
             insert_row_with_data(data_values, myteamtickets_xlsx, myteamtickets_workbook_names[:open_team_tickets])
