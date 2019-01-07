@@ -46,14 +46,13 @@ window.updateURI = (complaint_entry_id) ->
   )
 
 window.cat_new_url = ()->
-  event.preventDefault()
 
   data = {}
   isEmpty = true
 
   for i in [1...6] by 1
 
-    data[i] = {url: $("#url_#{i}").val(), cats: $("#cat_new_url_#{i}").val()}
+    data[i] = {url: $("#url_#{i}").val(), cats: $("#cat_new_url_#{i}")[0].nextSibling.value}
 
     if data[i].url.length > 0 && data[i].cats != null
       isEmpty = false
