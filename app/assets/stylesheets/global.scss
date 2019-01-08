@@ -3979,6 +3979,10 @@ td.wbrs-highlight, td.sbrs-highlight {
   background-color: lighten(#4E4E4E, 10%);
 }
 
+.research-table-details-wrapper .dropdown.open {
+  background-color: transparent;
+}
+
 .escalations--webrep--disputes-controller #advanced-search-button, .escalations--webcat--complaints-controller #advanced-search-button, .escalations--webcat--reports-controller #advanced-search-button  {
   background-color: darken($faint-neutral-color, 5%);
   color: $type-lighter-color;
