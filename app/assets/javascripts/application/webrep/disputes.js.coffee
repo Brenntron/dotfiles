@@ -6,14 +6,14 @@ $(document).ready ->
       dropdownMenu.show()
     else
       $(this).removeClass('open')
-      std_msg_error('Error', ['No row(s) selected'])
+      std_msg_error('No rows selected', ['Please select at least one row.'])
 
   $('span#adjust-wlbl').on 'show.bs.dropdown', ->
     dropdownMenu = $(this).find('.dropdown-menu')
     if $('.dispute_check_box:checked').length == 0
       dropdownMenu.hide()
       $(this).removeClass('open')
-      std_msg_error('Error', ['No row(s) selected'])
+      std_msg_error('No rows selected', ['Please select a row.'])
 
 window.select_or_deselect_all = (dispute_id)->
 
@@ -689,7 +689,7 @@ window.toolbar_index_change_assignee = () ->
     success: (response) ->
       window.location.reload()
     error: (response) ->
-      std_msg_error('No Assignee Selected', ['Please select a username from the dropdown to assign this ticket to.', response.responseJSON.error])
+      std_msg_error('no rows selected', ['Please select at least one row to change assignee.'])
   )
 
 window.toolbar_show_change_assignee = () ->
@@ -800,18 +800,18 @@ window.add_dispute_entry = () ->
       keyboard: true
     })
 
-  headers = {'Token': $('input[name="token"]').val(), 'Xmlrpc-Token': $('input[name="xml_token"]').val()}
-  $.ajax(
-    url: '/escalations/api/v1/escalations/webrep/disputes/new_adhoc_entry'
-    method: 'POST'
-    headers: headers
-    data: data
-    dataType: 'json'
-    success: (response) ->
-      window.location.reload()
-    error: (response) ->
-      popup_response_error(response, 'Error adding entry.')
-  )
+    headers = {'Token': $('input[name="token"]').val(), 'Xmlrpc-Token': $('input[name="xml_token"]').val()}
+    $.ajax(
+      url: '/escalations/api/v1/escalations/webrep/disputes/new_adhoc_entry'
+      method: 'POST'
+      headers: headers
+      data: data
+      dataType: 'json'
+      success: (response) ->
+        window.location.reload()
+      error: (response) ->
+        popup_response_error(response, 'Error adding entry.')
+    )
 
 window.add_related_case_id= ()->
   id = $('#dispute_id').text()
@@ -1638,7 +1638,7 @@ $ ->
 
   $('#index-adjust-wlbl').click ->
     if $('.dispute_check_box:checked').length == 0
-      std_msg_error('No row(s) selected', ['Please select atleast one row.'])
+      std_msg_error('No rows selected', ['Please select at least one row.'])
       return false
 
     tbody = $('#wlbl_adjust_entries_index').find('table.dispute_tool_current').find('tbody')
@@ -1739,7 +1739,7 @@ $ ->
 
     else
       $(dropdown_wrapper).removeClass('open')
-      std_msg_error('No rows selected', ['Please select at least one row.'])
+      std_msg_error('No rows selected', ['Please select one row.'])
 
   $('#set-related-dispute-submit-button').click ->
     dropdown = $('#set-related-dispute-div').parent()

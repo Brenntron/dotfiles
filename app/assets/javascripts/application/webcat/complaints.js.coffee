@@ -401,7 +401,7 @@ window.return_selected = ()->
         notice_html = "<p>Something went wrong: #{response.responseText}</p>"
     , this)
   else
-    std_msg_error('Error', ['No row selected.'])
+    std_msg_error('no rows selected', ['Please select at least one row.'])
 
 window.select_cat_text_field = (id) ->
   if (typeof numericalValue)
@@ -1137,6 +1137,8 @@ window.open_nonviewable = () ->
 window.open_selected = () ->
   selected_rows = $('#complaints-index').DataTable().rows('.selected')
   open_selected(selected_rows, true)
+  if open_selected(selected_rows, false)
+    std_msg_error('No rows selected', ['Please select at least one row.'])
 window.open_all = () ->
   selected_rows = $('#complaints-index').DataTable().rows()
   open_selected(selected_rows, true)

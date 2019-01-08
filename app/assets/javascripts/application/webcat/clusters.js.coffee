@@ -207,6 +207,8 @@ window.collapse_selected_clusters = (tableId) ->
 window.open_selected_clusters = () ->
   selected_rows = $('#clusters-index').DataTable().rows('.selected')
   open_selected_tabs(selected_rows, true)
+  if open_selected_tabs(selected_rows, false)
+    std_msg_error('no rows selected', ['Please select at least one row.'])
 
 
 # open all functionality
