@@ -2,6 +2,17 @@ window.display_tooltip = (id)->
   $('#cat_tooltip_' + id).tooltip('toggle')
 
 $ ->
+
+  $('.cat_new_url').selectize {
+    persist: false,
+    create: false,
+    maxItems: 5,
+    valueField: 'value',
+    labelField: 'value',
+    searchField: ['text'],
+    options: AC.WebCat.createSelectOptions()
+  }
+
   if $('#complaints-index').length
     complaint_table = $('#complaints-index').DataTable(
       'rowCallback': (row, data, index) ->
@@ -176,17 +187,6 @@ $ ->
 
     $('#complaints-index tbody').on 'click', 'td.expandable-row-column', ->
       click_table_buttons complaint_table, this
-
-
-    $('.cat_new_url').selectize {
-      persist: false,
-      create: false,
-      maxItems: 5,
-      valueField: 'value',
-      labelField: 'value',
-      searchField: ['text'],
-      options: AC.WebCat.createSelectOptions()
-    }
 
     $('#general_search').on 'keyup', (e) ->
       if event.keyCode == 13

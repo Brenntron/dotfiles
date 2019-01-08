@@ -310,6 +310,71 @@ Feature: Disputes
     Then I should see "THERE WAS AN ERROR CREATING THE RESOLUTION MESSAGE TEMPLATE."
     Then I should see "Name can't be blank and Body can't be blank"
 
+  Scenario: A user creates a new named search for disputes
+    Given a user with role "webrep user" exists and is logged in
+    When I goto "/escalations/webrep/disputes"
+    And I trigger-click "#advanced-search-button"
+    And I fill in "search_name" with "Lab"
+    And I trigger-click "#submit-advanced-search"
+    And I trigger-click "#filter-cases"
+    Then I should see content "Lab" within "#saved-searches-wrapper"
+
+  @javascript
+  Scenario: A user uses a new named search for disputes
+    Given a user with role "webrep user" exists and is logged in
+    And the following disputes exist and have entries:
+      |id|status|
+      |1 |NEW   |
+    And the following disputes exist and have entries:
+      |id|status|
+      |2 |NEW   |
+    And a named search with the name, "Cucumber" exists
+    And a named search criteria exists with field_name: "status" and value: "NEW"
+    When I goto "/escalations/webrep/disputes?f=closed"
+    Then I should not see "0000000001"
+    Then I should not see "NEW"
+    Then I should not see "0000000002"
+    And I trigger-click "#filter-cases"
+    And I trigger-click ".saved-search"
+    Then I should see "0000000001"
+    Then I should see "NEW"
+    Then I should see "0000000002"
+
+  @javascript
+  Scenario: A user creates a new named search for disputes
+    Given a user with role "webrep user" exists and is logged in
+    When I goto "/escalations/webrep/disputes?f=closed"
+    And I trigger-click "#advanced-search-button"
+    And I fill in "search_name" with "Cucumber"
+    And I trigger-click "#submit-advanced-search"
+    And I trigger-click "#filter-cases"
+    Then I should see content "Cucumber" within "#saved-searches-wrapper"
+
+  @javascript
+  Scenario: A user creates a duplicate named search for disputes
+    Given a user with role "webrep user" exists and is logged in
+    And a named search with the name, "Cucumber" exists
+    And a named search criteria exists with field_name: "status" and value: "NEW"
+    When I goto "/escalations/webrep/disputes?f=closed"
+    And I trigger-click "#advanced-search-button"
+    And I fill in "search_name" with "Cucumber"
+    And I trigger-click "#submit-advanced-search"
+    And I trigger-click "#filter-cases"
+    Then I should see content "Cucumber" within "#saved-searches-wrapper"
+    And There is only one element of class, "saved-search"
+
+  @javascript
+  Scenario: A user creates a new named search for disputes and stays on the page (tests to make sure multiple named search criteria are not created)
+    Given a user with role "webrep user" exists and is logged in
+    When I goto "/escalations/webrep/disputes?f=closed"
+    And I trigger-click "#advanced-search-button"
+    And I fill in "search_name" with "Cucumber"
+    And I trigger-click "#submit-advanced-search"
+    And I trigger-click "#filter-cases"
+    Then I should see content "Cucumber" within "#saved-searches-wrapper"
+    Then I wait for "90" seconds
+    Then There is only one element of class, "saved-search"
+    
   @javascript
   Scenario: A user visits the Dashboard page and sees correct ticket counts
     Given a user with role "webrep user" exists with cvs_username, "Cucumber", exists and is logged in
@@ -384,6 +449,7 @@ Feature: Disputes
     Then I should see content "2" within ".in-progress-team"
     Then I should see content "4" within ".closed-team"
 
+  @javascript
   Scenario: A user tries to update a dispute
     Given a user with role "webrep user" exists and is logged in
     And the following disputes exist and have entries:
@@ -395,11 +461,10 @@ Feature: Disputes
     And I click ".primary"
     Then I should see content "Escalated" within "#show-edit-ticket-status-button"
     And I click "#show-edit-ticket-status-button"
-    And I click "#RESOLVED_CLOSED"
+    And I click "#RESEARCHING"
     And I click ".primary"
-    Then I should see content "RESOLVED_CLOSED" within "#show-edit-ticket-status-button"
-    And I goto "/escalations/webrep/disputes/5370"
-    When I click "#edit-dispute-button"
+    Then I should see content "RESEARCHING" within "#show-edit-ticket-status-button"
+    When I click ".edit-button"
     And I fill in "dispute-customer-name-input" with "John Smith"
     And I fill in "dispute-customer-email-input" with "jsmith@cisco.com"
     And I select "P5" from "dispute-priority-select"
