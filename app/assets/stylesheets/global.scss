@@ -484,6 +484,11 @@ th.alt-col {
   }
 }
 
+// Buttons //
+button {
+  background-color: transparent;
+}
+
 /**** Content toolbar  *******/
 /*** Current toolbar is specifically generated on a datatables table         ***/
 /*** We will need to work around this for the other places where toolbars    ***/
@@ -4154,6 +4159,11 @@ button.tertiary {
   padding-right: 20px;
 }
 
+.search-item .form-control {
+  font-size: 8pt;
+  line-height: .75em !important;
+}
+
 .icon-dashboard {background-image: url(image_path('icon_dashboard.svg'));}
 .icon-queue     {background-image: url(image_path('icon_queue.svg'));}
 .icon-research  {background-image: url(image_path('icon_new_research_white.svg'));}
@@ -6964,10 +6974,26 @@ h2 {
   display: none;
 }
 
+.cat-url-success{
+  color: black;
+  font-size: 11px;
+  font-weight: normal;
+  display: none;
+}
+
 .categorize-urls-warning-icon{
   width: 15px;
   height: 15px;
   background-image: url(image_path('icon_warning_orange.svg'));
+  background-repeat: no-repeat;
+  background-position: center center;
+  border:0;
+}
+
+.categorize-urls-success-icon{
+  width: 15px;
+  height: 15px;
+  background-image: url(image_path('icon_success.svg'));
   background-repeat: no-repeat;
   background-position: center center;
   border:0;

@@ -428,7 +428,6 @@ $ ->
       )
     return
 
-
 window.expandClusterEntryPreview = (cluster, expand_table_row, max_viewable_entries) ->
   $('.cluster-mgt-loader-wrapper').removeClass('hidden')
   entry_rows = []
@@ -502,3 +501,4 @@ window.expandClusterEntryPreview = (cluster, expand_table_row, max_viewable_entr
     if event.keyCode == 13
       apply_filter_to_table()
     return
+

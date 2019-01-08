@@ -217,29 +217,29 @@ module API
             end
 
             params do
-              requires :urls, type: Array[String], desc: "Drops categories on URLS"
+              requires :urls, type: Hash, desc: "Drops categories on URLS"
             end
 
             post 'drop_current_categories' do
-              prefix_ids = []
-              response = []
+              response = {}
+              prefix_ids = {}
 
-              urls = permitted_params['urls'].compact
+              urls = permitted_params['urls']
 
-              urls.each do |url|
-                if url == ''
-                  urls.delete('')
+              urls.each do |key, value|
+                if !Wbrs::Prefix.where(:urls => [value]).empty?
+                  prefix_ids[key] = Wbrs::Prefix.where(:urls => [value]).first.prefix_id
+                else
+                  prefix_ids[key] = nil
                 end
               end
 
-              urls.each do |param|
-                if !Wbrs::Prefix.where(:urls => [param]).empty?
-                  prefix_ids.push(Wbrs::Prefix.where(:urls => [param]).first.prefix_id)
+              prefix_ids.each do |key, value|
+                if prefix_ids[key] != nil
+                  response[key] = Wbrs::Prefix.disable(value, current_user.email)
+                else
+                  response[key] = nil
                 end
-              end
-
-              prefix_ids.each do |prefix_id|
-                response = Wbrs::Prefix.disable(prefix_id, current_user.email)
               end
 
               render json: response
