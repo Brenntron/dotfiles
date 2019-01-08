@@ -46,7 +46,6 @@ window.updateURI = (complaint_entry_id) ->
   )
 
 window.cat_new_url = ()->
-  event.preventDefault()
 
   data = {}
   isEmpty = true
@@ -433,9 +432,6 @@ window.enlarge_image = (id,image)->
     content: '<img src="' + image + '">').popover 'show'
 
 window.lookup_prefix = () ->
-
-  event.preventDefault()
-
   $('#loader-modal').show()
   $('.modal-backdrop').show()
 
@@ -542,7 +538,7 @@ window.retrieve_history = (position) ->
             $('#history_dialog').dialog('open')
 
       error: (response) ->
-        $("#cat-url-message-#{position}").text("No history associated with this url.")
+        $("#cat-url-error-message-#{position}").text("No history associated with this url.")
         $('.modal-backdrop').hide()
         $('#loader-modal').hide()
         $("#cat-url-#{position}").show()
@@ -550,25 +546,50 @@ window.retrieve_history = (position) ->
         $("#url_#{position}").css("border-color", "#E47433")
     , this)
   else
-    $("#cat-url-message-#{position}").text("No data available for blank URL.")
+    $("#cat-url-error-message-#{position}").text("No data available for blank URL.")
     $("#cat-url-#{position}").show()
     $("#url_#{position}").css("border-width", "2px")
     $("#url_#{position}").css("border-color", "#E47433")
 
 
 window.drop_current_categories = () ->
+  $(".cat-url-error").hide()
+  $(".cat-url-success").hide()
 
-  urls = []
+  $('#loader-modal').modal({
+    backdrop: 'static',
+    keyboard: false,
+  })
+
+  $("#url_#{i}").css("border-width", "")
+  $("#url_#{i}").css("border-color", "")
+
+  $('#loader-modal').show()
+
+  urls = {}
 
   for i in [1 .. 5]
-    urls.push($("#url_" + i ).val())
+    if $("#url_" + i ).val() != ""
+      urls[i] = $("#url_" + i ).val()
 
   std_msg_ajax(
     url:'/escalations/api/v1/escalations/webcat/complaints/drop_current_categories'
     method: 'POST'
     data: { 'urls': urls }
     success: (response) ->
-      std_msg_success('Categories have been successfully dropped.', [], reload: false)
+      for key, value of response.json
+        if value && value.code == 200
+          $("#url_#{key}").css("border-width", "2px")
+          $("#url_#{key}").css("border-color", "green")
+          $("#cat-url-success-message-#{key}").text("Categories successfully dropped.")
+          $("#cat-url-success-#{key}").show()
+        else
+          $("#url_#{key}").css("border-width", "2px")
+          $("#url_#{key}").css("border-color", "#E47433")
+          $("#cat-url-error-message-#{key}").text("Unable to drop categories.")
+          $("#cat-url-#{key}").show()
+      $('#loader-modal').hide()
+      $('.modal-backdrop').hide()
     error: (response) ->
       std_msg_error("<p>There has been an error dropping categories: #{json.error}","")
 )
