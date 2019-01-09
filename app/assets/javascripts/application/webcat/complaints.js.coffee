@@ -1157,9 +1157,10 @@ window.open_nonviewable = () ->
   open_selected(selected_rows, false)
 window.open_selected = () ->
   selected_rows = $('#complaints-index').DataTable().rows('.selected')
-  open_selected(selected_rows, true)
-  if open_selected(selected_rows, false)
+  if selected_rows[0].length == 0
     std_msg_error('No rows selected', ['Please select at least one row.'])
+  else
+    open_selected(selected_rows, true)
 window.open_all = () ->
   selected_rows = $('#complaints-index').DataTable().rows()
   open_selected(selected_rows, true)
