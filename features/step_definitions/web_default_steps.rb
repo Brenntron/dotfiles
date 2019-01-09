@@ -10,10 +10,13 @@ Given(/^I fill in "(.*?)" with "(.*?)"$/) do |field_label, value|
   fill_in field_label, :with => value
 end
 
+Given(/^I fill in "(.*?)" with "(.*?)" and "(.*?)" separated by blank lines$/) do |field_label, value, value_2|
+  fill_in field_label, :with => value + "\n" + value_2
+end
+
 Given(/^I fill in "(.*?)" with today's date"$/) do |field_label|
   time = Time.now.strftime("%Y-%m-%d")
   fill_in field_label, :with => time
-
 end
 
 When(/^I click "(.*?)"$/) do |target|
@@ -22,6 +25,10 @@ When(/^I click "(.*?)"$/) do |target|
     rescue Capybara::ElementNotFound => e
       page.find("#{target}").click
     end
+end
+
+When(/^I click first element of class "(.*?)"$/) do |target|
+  page.find("#{target}", match: :first).click
 end
 
 When(/^I click through "(.*?)" and accept confirmation$/) do |target|
@@ -235,6 +242,12 @@ Then(/^I should see content "(.*?)" within "(.*?)"$/) do |content, target|
   end
 end
 
+Then(/^I should see content "(.*?)" within first element of class "(.*?)"$/) do |content, target|
+  within(target, match: :first) do
+    page.has_content?(content)
+  end
+end
+
 Then(/^I should not see content "(.*?)" within "(.*?)"$/) do |content, target|
   within(target) do
     !page.has_content?(content)
@@ -385,4 +398,8 @@ end
 
 Then (/^I should receive a file of type "(.*?)"/) do |type|
   result = page.response_headers['Content-Type'].should == type
+end
+
+Then(/^There is only one element of class, "(.*?)"$/) do |value|
+    expect(page.evaluate_script("$('.#{value}').length")).to eq(1)
 end

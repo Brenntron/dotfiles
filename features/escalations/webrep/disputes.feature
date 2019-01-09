@@ -307,3 +307,185 @@ Feature: Disputes
     And I wait for "3" seconds
     Then I should see "THERE WAS AN ERROR CREATING THE RESOLUTION MESSAGE TEMPLATE."
     Then I should see "Name can't be blank and Body can't be blank"
+
+  Scenario: A user creates a new named search for disputes
+    Given a user with role "webrep user" exists and is logged in
+    When I goto "/escalations/webrep/disputes"
+    And I trigger-click "#advanced-search-button"
+    And I fill in "search_name" with "Lab"
+    And I trigger-click "#submit-advanced-search"
+    And I trigger-click "#filter-cases"
+    Then I should see content "Lab" within "#saved-searches-wrapper"
+
+  @javascript
+  Scenario: A user uses a new named search for disputes
+    Given a user with role "webrep user" exists and is logged in
+    And the following disputes exist and have entries:
+      |id|status|
+      |1 |NEW   |
+    And the following disputes exist and have entries:
+      |id|status|
+      |2 |NEW   |
+    And a named search with the name, "Cucumber" exists
+    And a named search criteria exists with field_name: "status" and value: "NEW"
+    When I goto "/escalations/webrep/disputes?f=closed"
+    Then I should not see "0000000001"
+    Then I should not see "NEW"
+    Then I should not see "0000000002"
+    And I trigger-click "#filter-cases"
+    And I trigger-click ".saved-search"
+    Then I should see "0000000001"
+    Then I should see "NEW"
+    Then I should see "0000000002"
+
+  @javascript
+  Scenario: A user creates a new named search for disputes
+    Given a user with role "webrep user" exists and is logged in
+    When I goto "/escalations/webrep/disputes?f=closed"
+    And I trigger-click "#advanced-search-button"
+    And I fill in "search_name" with "Cucumber"
+    And I trigger-click "#submit-advanced-search"
+    And I trigger-click "#filter-cases"
+    Then I should see content "Cucumber" within "#saved-searches-wrapper"
+
+  @javascript
+  Scenario: A user creates a duplicate named search for disputes
+    Given a user with role "webrep user" exists and is logged in
+    And a named search with the name, "Cucumber" exists
+    And a named search criteria exists with field_name: "status" and value: "NEW"
+    When I goto "/escalations/webrep/disputes?f=closed"
+    And I trigger-click "#advanced-search-button"
+    And I fill in "search_name" with "Cucumber"
+    And I trigger-click "#submit-advanced-search"
+    And I trigger-click "#filter-cases"
+    Then I should see content "Cucumber" within "#saved-searches-wrapper"
+    And There is only one element of class, "saved-search"
+
+  @javascript
+  Scenario: A user creates a new named search for disputes and stays on the page (tests to make sure multiple named search criteria are not created)
+    Given a user with role "webrep user" exists and is logged in
+    When I goto "/escalations/webrep/disputes?f=closed"
+    And I trigger-click "#advanced-search-button"
+    And I fill in "search_name" with "Cucumber"
+    And I trigger-click "#submit-advanced-search"
+    And I trigger-click "#filter-cases"
+    Then I should see content "Cucumber" within "#saved-searches-wrapper"
+    Then I wait for "90" seconds
+    Then There is only one element of class, "saved-search"
+    
+  @javascript
+  Scenario: A user visits the Dashboard page and sees correct ticket counts
+    Given a user with role "webrep user" exists with cvs_username, "Cucumber", exists and is logged in
+    And the following disputes exist and have entries:
+      |id  |status     |user_id|
+      |5370|ASSIGNED   |1      |
+    And the following disputes exist and have entries:
+      |id  |status     |user_id|
+      |5371|ASSIGNED   |1      |
+    And the following disputes exist and have entries:
+      |id  |status     |user_id|
+      |5372|ASSIGNED   |1      |
+    And the following disputes exist and have entries:
+      |id  |status     |user_id|
+      |5373|RESEARCHING|1      |
+    And the following disputes exist and have entries:
+      |id  |status     |user_id|
+      |5374|RESEARCHING|1      |
+    And the following disputes exist and have entries:
+      |id  |status          |user_id|
+      |5375|RESOLVED_CLOSED |1      |
+    And the following disputes exist and have entries:
+      |id  |status          |user_id|
+      |5376|RESOLVED_CLOSED |1      |
+    And the following disputes exist and have entries:
+      |id  |status           |user_id|
+      |5377|RESOLVED_CLOSED  |1      |
+    And the following disputes exist and have entries:
+      |id  |status            |user_id|
+      |5378|RESOLVED_CLOSED   |1      |
+    When I goto "/escalations/webrep/dashboard"
+    Then I should see content "3" within ".open"
+    Then I should see content "2" within ".in-progress"
+    Then I should see content "4" within ".closed"
+
+  @javascript
+  Scenario: A user visits the Dashboard page and sees correct ticket counts for their team
+    Given a user with role "webrep user" exists with cvs_username, "Cucumber", exists and is logged in
+    And I add a test user to current user's team
+    And the following disputes exist and have entries:
+      |id  |status     |user_id|
+      |5370|ASSIGNED   |2      |
+    And the following disputes exist and have entries:
+      |id  |status     |user_id|
+      |5371|ASSIGNED   |1      |
+    And the following disputes exist and have entries:
+      |id  |status     |user_id|
+      |5372|ASSIGNED   |1      |
+    And the following disputes exist and have entries:
+      |id  |status     |user_id|
+      |5373|RESEARCHING|2      |
+    And the following disputes exist and have entries:
+      |id  |status     |user_id|
+      |5374|RESEARCHING|1      |
+    And the following disputes exist and have entries:
+      |id  |status          |user_id|
+      |5375|RESOLVED_CLOSED |1      |
+    And the following disputes exist and have entries:
+      |id  |status          |user_id|
+      |5376|RESOLVED_CLOSED |1      |
+    And the following disputes exist and have entries:
+      |id  |status           |user_id|
+      |5377|RESOLVED_CLOSED  |1      |
+    And the following disputes exist and have entries:
+      |id  |status            |user_id|
+      |5378|RESOLVED_CLOSED   |2     |
+    When I goto "/escalations/webrep/dashboard"
+    Then I should see content "2" within ".open"
+    Then I should see content "1" within ".in-progress"
+    Then I should see content "3" within ".closed"
+    Then I should see content "3" within ".open-team"
+    Then I should see content "2" within ".in-progress-team"
+    Then I should see content "4" within ".closed-team"
+
+  @javascript
+  Scenario: A user tries to update a dispute
+    Given a user with role "webrep user" exists and is logged in
+    And the following disputes exist and have entries:
+      |id  |
+      |5370|
+    When I goto "/escalations/webrep/disputes/5370"
+    And I click "#show-edit-ticket-status-button"
+    And I click "#ESCALATED"
+    And I click ".primary"
+    Then I should see content "Escalated" within "#show-edit-ticket-status-button"
+    And I click "#show-edit-ticket-status-button"
+    And I click "#RESEARCHING"
+    And I click ".primary"
+    Then I should see content "RESEARCHING" within "#show-edit-ticket-status-button"
+    When I click ".edit-button"
+    And I fill in "dispute-customer-name-input" with "John Smith"
+    And I fill in "dispute-customer-email-input" with "jsmith@cisco.com"
+    And I select "P5" from "dispute-priority-select"
+    And I click "#save-dispute-button"
+    And I wait for "5" seconds
+    And I click "#top_bar_toggle"
+    Then I should see content "John Smith" within "#dispute-customer-name"
+    And I should see content "jsmith@cisco.com" within "#dispute-customer-email"
+    And Dispute entry should have a status of, "P5"
+
+  @javascript
+  Scenario: A user tries add a new dispute entry (ad hoc)
+    Given a user with role "webrep user" exists and is logged in
+    And the following disputes exist:
+      |id  |
+      |5370|
+    And I goto "/escalations/webrep/disputes/5370"
+    Then I click link "Research"
+    When I click "#add-entries-button"
+    And I fill in "add_dispute_entry" with "cisco.com"
+    And I click "#button_add_dispute_entry"
+    And I wait for "15" seconds
+    Then I should see content "cisco.com" within ".entry-data-content"
+    And I should see content "WL-med" within ".entry-data-wlbl"
+    And I should see content "BL-heavy" within ".entry-data-wlbl"
+

@@ -1,9 +1,11 @@
 window.select_or_deselect_all = (dispute_id)->
 
-
   $('.dispute-entry-checkbox_' + dispute_id).prop('checked', $('#' + dispute_id).prop('checked'))
+  $('.dispute-entry-checkbox_' + dispute_id).each ->
+    toggleRow(this)
 
-window.populate_webrep_index_table = (data = {}) ->
+window.populate_webrep_index_table = (data = {}, reload = false) ->
+  data['reload'] = reload
 
   array_of_showns = []
   array_of_dispute_clicks = []
@@ -99,15 +101,17 @@ window.populate_webrep_index_table = (data = {}) ->
             $('.dispute-entry-checkbox').each ->
               if this.id == dispute_entry_click
                 this.checked = true
+                toggleRow(this)
         if array_of_dispute_entry_selectalls.length > 0
           for dispute_entry_selectall in array_of_dispute_entry_selectalls
             $('.dispute_entry_select_all').each ->
               if this.id == dispute_entry_selectall
                 this.checked = true
 
-
         if undefined != json.search_name
-          $('#saved-search-tbody').append(named_search_tag(json.search_name, json.search_id))
+          searchId = 'saved_search_' + json.search_id
+          if $('#saved-search-tbody tr#' + searchId).length == 0
+            $('#saved-search-tbody').append(named_search_tag(json.search_name, json.search_id))
 
     error: (response) ->
       $('#refresh-working-msg').hide()
@@ -151,6 +155,7 @@ window.advanced_webrep_index_table = () ->
     modified_older: form.find('input[id="modified-older-input"]').val()
     modified_newer: form.find('input[id="modified-newer-input"]').val()
   }
+
   window.current_search_data = data
   window.populate_webrep_index_table(data)
 
@@ -550,7 +555,7 @@ window.toolbar_adjust_reptool_bl_button_research =(button_tag) ->
   )
 
 window.toolbar_index_edit_status = () ->
-  statusName = $('input[name=entry-status]:checked').attr('id')
+  statusName = $('input[name=entry-status]:checked').val()
   
   data = {}
   
@@ -565,7 +570,7 @@ window.toolbar_index_edit_status = () ->
       data[this.id].push({
         id: this.id
         field: "resolution"
-        new: $('input[name=entry-resolution]:checked').attr('id')
+        new: $('input[name=entry-resolution]:checked').val()
       })
 
       data[this.id].push({
@@ -585,12 +590,12 @@ window.toolbar_index_edit_status = () ->
   )
 
 window.show_page_edit_status = () ->
-  statusName = $('input[name=dispute-status]:checked').attr('id')
+  statusName = $('input[name=dispute-status]:checked').val()
   comment = $('.ticket-status-comment').val()
   dispute_id = $('#dispute_id').text()
 
   if statusName == "RESOLVED_CLOSED"
-    resolution = $('input[name=dispute-resolution]:checked').attr('id')
+    resolution = $('input[name=dispute-resolution]:checked').val()
 
   data = {
     dispute_ids: [ dispute_id ]
@@ -721,27 +726,32 @@ window.toolbar_index_mark_duplicate = (box_names) ->
 
 
 window.add_dispute_entry = () ->
-  $('#loader-modal').modal({
-    backdrop: 'static',
-    keyboard: false
-  })
-  data = {
-    'uri': $('#add_dispute_entry').val(),
-    'dispute_id': $('#dispute_id').text(),
-  }
+  entry_content = $('#add_dispute_entry').val()
+  if $.trim(entry_content) == '' || entry_content == null
+#    Do not allow accidental submission of empty or blank spaced entry
+    return false
+  else
+    $('#loader-modal').modal({
+      backdrop: 'static',
+      keyboard: false
+    })
+    data = {
+      'uri': entry_content,
+      'dispute_id': $('#dispute_id').text(),
+    }
 
-  headers = {'Token': $('input[name="token"]').val(), 'Xmlrpc-Token': $('input[name="xml_token"]').val()}
-  $.ajax(
-    url: '/escalations/api/v1/escalations/webrep/disputes/new_adhoc_entry'
-    method: 'POST'
-    headers: headers
-    data: data
-    dataType: 'json'
-    success: (response) ->
-      window.location.reload()
-    error: (response) ->
-      popup_response_error(response, 'Error adding entry.')
-  )
+    headers = {'Token': $('input[name="token"]').val(), 'Xmlrpc-Token': $('input[name="xml_token"]').val()}
+    $.ajax(
+      url: '/escalations/api/v1/escalations/webrep/disputes/new_adhoc_entry'
+      method: 'POST'
+      headers: headers
+      data: data
+      dataType: 'json'
+      success: (response) ->
+        window.location.reload()
+      error: (response) ->
+        popup_response_error(response, 'Error adding entry.')
+    )
 
 window.add_related_case_id= ()->
   id = $('#dispute_id').text()
@@ -1079,7 +1089,7 @@ $ ->
       $('.entry-status-radio-label').click ->
         radio_button = $(this).prev('.entry-status-radio')
         $(radio_button[0]).trigger('click')
-        if $(radio_button).attr('id') == 'RESOLVED_CLOSED'
+        if $(radio_button).val() == 'RESOLVED_CLOSED'
           $('#index-entry-resolution-submenu').show()
           stat_comment = $('#entry-non-res-submit').find('.entry-status-comment')
           $('#entry-non-res-submit').hide()
@@ -1097,7 +1107,7 @@ $ ->
           wrapper = $(this).parent()
           $(all_stat_radios).removeClass('selected')
           $(wrapper).addClass('selected')
-        if $(this).attr('id') == 'RESOLVED_CLOSED'
+        if $(this).val() == 'RESOLVED_CLOSED'
           $('#index-entry-resolution-submenu').show()
           stat_comment = $('#entry-non-res-submit').find('.entry-status-comment')
           $('#entry-non-res-submit').hide()
@@ -1189,7 +1199,14 @@ $ ->
        {
         data: 'submission_type'
         render: (data) ->
-          '<span class="dispute-submission-type dispute-' + data  + '"></span>'
+          title = ''
+          if data == 'w'
+            title = 'Web'
+          else if data == 'e'
+            title = 'Email'
+          else if data == 'ew'
+            title = 'Email Web'
+          '<span class="dispute-submission-type esc-tooltipped dispute-' + data + '" title="' + title + '"></span>'
       }
       { data: 'd_entry_preview' }
       { data: 'assigned_to' }
@@ -1274,7 +1291,7 @@ $ ->
       if this.entry.sbrs_score != null
         sbrs_score = this.entry.sbrs_score
       else sbrs_score = missing_data
-      entry_row = '<tr class="index-entry-row">' + '<td><input type="checkbox" class="dispute-entry-checkbox dispute-entry-checkbox_' + dispute.id + '" id= ' + dispute_entry_id + ' ></td>' + '<td class="entry-col-content ' + important + '">' + entry_content + '</td>' +
+      entry_row = '<tr class="index-entry-row">' + '<td><input type="checkbox" onclick="toggleRow(this)" class="dispute-entry-checkbox dispute-entry-checkbox_' + dispute.id + '" id= ' + dispute_entry_id + ' ></td>' + '<td class="entry-col-content ' + important + '">' + entry_content + '</td>' +
         '<td class="entry-col-status">' + status + '</td>' +
         '<td class="entry-col-res esc-tooltipped" title="' + resolution_comment + '">' + resolution + '</td>' +
         '<td class="entry-col-disp">' + suggested_disposition + '</td>' +
@@ -1519,7 +1536,11 @@ $ ->
   $('#edit-dispute-button').click ->
     $('#dispute-priority-icon').hide()
     $('#dispute-priority-select').show()
-    $('.dispute-edit-field').hide()
+
+    $('#dispute-customer-name').hide()
+    $('#dispute-customer-email').hide()
+
+    $('.dispute-edit-input').css('display','block')
 
     $('#save-dispute-button').removeClass('hidden')
     $('#cancel-dispute-button').removeClass('hidden')
@@ -1545,6 +1566,7 @@ $ ->
     $('#cancel-dispute-button').addClass('hidden')
     $('#related-dispute-input').addClass('hidden')
     $('#edit-dispute-button').removeClass('hidden')
+    $('.dispute-edit-input').css('display','none')
 
 
   $('#index-adjust-wlbl').click ->
@@ -1785,12 +1807,16 @@ window.populate_resolution_dropdown = (dispute_id) ->
       $('.entry-status-radio' + '.' + status + '_' + dispute_id).prop("checked", true)
   )
 
+window.disputes_select_all_check_box = () ->
+  $('.dispute_check_box').prop('checked', $('#disputes_check_box').prop('checked'))
+
 $ ->
 
   $('#advanced-search-button').click ->
     $('#advanced-search-dropdown').show()
 
   $('#submit-advanced-search').click ->
+    $('#search_name').val("")
     $('#advanced-search-dropdown').toggle()
 
   $(document).click ->
@@ -1799,7 +1825,7 @@ $ ->
   $(document).ready ->
     setInterval ->
       if window.current_search_data
-        window.populate_webrep_index_table(window.current_search_data)
+        window.populate_webrep_index_table(window.current_search_data, true)
     , 60000
 
     $('body').on 'mouseover mouseenter', '.esc-tooltipped', ->

@@ -4,16 +4,15 @@ module API
       include API::V1::Defaults
 
       resource :rulehit_resolution_mailer_templates do
-        # before do
-        #   PaperTrail.request.whodunnit = current_user.id if current_user.present?
-        # end
+        before do
+          PaperTrail.request.whodunnit = current_user.id if current_user.present?
+        end
 
         desc "get a mailer template corresponding to a rulehit"
         params do
           requires :rulehit_id, type: Integer, desc: "Bugzilla id."
         end
         get 'make_rulehit_mail/:rulehit_id' do
-
           Rails.logger.debug("Retrieving rulehit mailer template...")
 
           begin

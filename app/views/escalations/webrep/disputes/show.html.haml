@@ -28,7 +28,7 @@
                 - if (@dispute.resolution != Dispute::DUPLICATE) && (@dispute.status != Dispute::RESOLVED)
                   %button.return-ticket-button.esc-tooltipped{title: 'Return ticket to open queue', onclick: 'toolbar_unassign_dispute();'}
               - else
-                - if (@dispute.resolution != Dispute::DUPLICATE) && (@dispute.status != Dispute::RESOLVED)
+                - if (@dispute.resolution != Dispute::DUPLICATE) && (@dispute.status != Dispute::RESOLVED) && (@dispute.user.cvs_username == 'vrtincom')
                   %button.take-ticket-button#show_ticket_assign.esc-tooltipped{title: 'Assign this ticket to me', onclick: "take_single_dispute(#{@dispute.id});"}
 
                 %span.dropdown
@@ -41,11 +41,12 @@
                         .toolbar
                           %div
                             %label.toolbar-section-label Assignee
-                            =select_tag :index_target_assignee, options_from_collection_for_select(User.joins(roles: :org_subset).where(org_subsets: { name: 'webrep' }).distinct.order(:cvs_username), :id, :cvs_username), prompt: 'Select A User'
+                            =select_tag :index_target_assignee, options_from_collection_for_select(User.joins(roles: :org_subset).where(org_subsets: { name: 'webrep' }).distinct.order(:cvs_username), :id, :cvs_username), class: 'toolbar-select'
                           %button{class: 'primary', type:'button', id: 'button_reassign', onclick:'toolbar_show_change_assignee();'}
                             Assign
-                          %button{class: 'secondary', type: 'button', id: 'unassign-dispute-button', onclick: 'toolbar_unassign_dispute();'}
-                            Unassign
+                          - if (@dispute.assignee != 'Unassigned')
+                            %button{class: 'secondary', type: 'button', id: 'unassign-dispute-button', onclick: 'toolbar_unassign_dispute();'}
+                              Unassign
 
     .col-xs-3.col-with-divider
       .dispute-status-col-wrapper
@@ -115,10 +116,10 @@
                           %textarea
                           %button.primary{onClick: 'show_page_edit_status()'}
                             Submit
-                            
-                %li.status-radio-wrapper
-                  %input.ticket-status-radio{type: 'radio', name: 'dispute-status', class: "dispute-status-#{@dispute.id}", id: "#{Dispute::STATUS_REOPENED}", value: "#{Dispute::STATUS_REOPENED}"}
-                  %label.radio-label.ticket-status-radio-label{for: "#{Dispute::STATUS_REOPENED}"} Re-Opened
+                  %li.status-radio-wrapper
+                    %input.ticket-status-radio{type: 'radio', name: 'dispute-status', class: "dispute-status-#{@dispute.id}", id: "#{Dispute::STATUS_REOPENED}", value: "#{Dispute::STATUS_REOPENED}"}
+                    %label.radio-label.ticket-status-radio-label{for: "#{Dispute::STATUS_REOPENED}"} Re-Opened
+
                 %li.non-resolution-submit-wrapper#ticket-non-res-submit
                   %center{class: 'select-resolution-message-templates-button'}
                     %p{class:'select-a-template'} Select A Template
