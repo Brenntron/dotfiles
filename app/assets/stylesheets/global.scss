@@ -7003,3 +7003,10 @@ h2 {
   margin-left: 15px;
   margin-top: 6px;
 }
+
+.input-truncate {
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  overflow: hidden;
+  width: 160px !important;
+}
