@@ -3385,6 +3385,7 @@ fieldset.top-content {
 .duplicate-status-notice {
   color: $warning-accent-color;
   font-weight: 700;
+  display: inline-block;
 }
 
 .email-header-information {
@@ -3977,6 +3978,10 @@ td.wbrs-highlight, td.sbrs-highlight {
 .escalations--webcat--reports-controller .dropdown.open
 {
   background-color: lighten(#4E4E4E, 10%);
+}
+
+.research-table-details-wrapper .dropdown.open {
+  background-color: transparent;
 }
 
 .escalations--webrep--disputes-controller #advanced-search-button, .escalations--webcat--complaints-controller #advanced-search-button, .escalations--webcat--reports-controller #advanced-search-button  {
@@ -7010,3 +7015,4 @@ h2 {
   overflow: hidden;
   width: 160px !important;
 }
+
