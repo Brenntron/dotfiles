@@ -76,6 +76,9 @@ development:
     # verify_mode { "no-tls" for http, "verify-none" for self signed cert, "verify-peer" for CA }
     verify_mode: "no-tls"
     gssnegotiate: false
+  bls:
+    host: "stage-bls-vip.sv4.ironport.com"
+    port: 443
   xbrs:
     #host: "localhost"
     #port: 1188                          #default xbrs_stub port
@@ -164,6 +167,9 @@ test:
     # verify_mode { "no-tls" for http, "verify-none" for self signed cert, "verify-peer" for CA }
     verify_mode: "no-tls"
     gssnegotiate: false
+  bls:
+    host: "stage-bls-vip.sv4.ironport.com"
+    port: 443
   xbrs:
     #host: "localhost"
     #port: 1188                          #default xbrs_stub port
