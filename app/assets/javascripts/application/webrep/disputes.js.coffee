@@ -161,6 +161,7 @@ window.advanced_webrep_index_table = () ->
   if dispute_save_search_format.test(data.search_name) == true
     std_msg_error('save search name error', ['Please enter a name without any special character', 'Example: !@#$%^&*()'])
   else
+    window.location.reload()
     window.populate_webrep_index_table(data)
 
 window.standard_webrep_index_table = (search_name) ->
