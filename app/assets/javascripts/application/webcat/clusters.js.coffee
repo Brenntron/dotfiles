@@ -151,7 +151,7 @@ $ ->
         data: 'global_volume'
       }
       {
-        data: null
+        data: 'wbrs_score'
         defaultContent: 'N/A'
       }
       {
@@ -386,6 +386,8 @@ $ ->
             link_to_more_results = '<a class="expand-cluster-entries">Click to preview the top  26 - ' + max_viewable_entries + ' cluster entries.</a>'
           else
             link_to_more_results = ''
+
+
 
           $(entry).each ->
             entry_count++

@@ -704,7 +704,7 @@ format = (complaint_entry_row) ->
       $.each current_categories, (key, value) ->
         category = this
         active =  $(this).attr("is_active")
-        if active == 1
+        if active == true
           confidence = this.confidence
           mnemonic = this.mnem
           name = this.descr
