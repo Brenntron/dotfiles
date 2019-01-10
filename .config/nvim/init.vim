@@ -28,6 +28,7 @@ Plug 'chrisbra/Colorizer'
 Plug 'neoclide/coc.nvim', {'do': 'yarn install'}
 Plug 'tpope/vim-dispatch'
 Plug 'w0rp/ale'
+Plug 'dbakker/vim-projectroot'
 
 " Generic Programming Support
 Plug 'ludovicchabant/vim-gutentags'
@@ -65,6 +66,7 @@ Plug 'jadercorrea/elixir_generator.vim'
 
 " Ruby Support
 Plug 'vim-ruby/vim-ruby'
+Plug 'hackhowtofaq/vim-solargraph'
 
 " Freemarker Support
 Plug 'andreshazard/vim-freemarker'
