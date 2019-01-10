@@ -788,18 +788,20 @@ window.toolbar_index_mark_duplicate = (box_names) ->
 
 
 window.add_dispute_entry = () ->
-  data = {
-    'uri': $('#add_dispute_entry').val(),
-    'dispute_id': $('#dispute_id').text(),
-  }
-  if $('#add_dispute_entry').val() == ''
+  entry_content = $('#add_dispute_entry').val()
+  if $.trim(entry_content) == '' || entry_content == null
+#    Do not allow accidental submission of empty or blank spaced entry
     std_msg_error('Entry content cannot be blank', ['Please provide content for the new entry.'])
+    return false
   else
     $('#loader-modal').modal({
       backdrop: 'static',
       keyboard: true
     })
-
+    data = {
+      'uri': $('#add_dispute_entry').val(),
+      'dispute_id': $('#dispute_id').text(),
+    }
     headers = {'Token': $('input[name="token"]').val(), 'Xmlrpc-Token': $('input[name="xml_token"]').val()}
     $.ajax(
       url: '/escalations/api/v1/escalations/webrep/disputes/new_adhoc_entry'
