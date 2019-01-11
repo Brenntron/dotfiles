@@ -128,6 +128,7 @@ window.advanced_webrep_index_table = () ->
     submission_types.push('e')
   if form.find('input[name="advanced_search[submission_type]"][value="ew"]').is(':checked')
     submission_types.push('ew')
+  dispute_save_search_format = /[!@#$%^&*()_+\-=\[\]{};':"\\|,.<>\/?]/
   data = {
     search_type: 'advanced'
     search_name: form.find('input[name="search_name"]').val()
@@ -157,7 +158,11 @@ window.advanced_webrep_index_table = () ->
   }
 
   window.current_search_data = data
-  window.populate_webrep_index_table(data)
+  if dispute_save_search_format.test(data.search_name) == true
+    std_msg_error('save search name error', ['Please enter a name without any special character', 'Example: !@#$%^&*()'])
+  else
+    window.location.reload()
+    window.populate_webrep_index_table(data)
 
 window.standard_webrep_index_table = (search_name) ->
   data = {

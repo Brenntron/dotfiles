@@ -1220,6 +1220,7 @@ window.commit_marked = () ->
 
 
 window.advanced_webcat_index_table = () ->
+  complaint_save_search_format = /[!@#$%^&*()_+\-=\[\]{};':"\\|,.<>\/?]/
   data = {
     customer: {
       name: $('#cat_named_search').find('input[id="name-input"]').val()
@@ -1243,7 +1244,11 @@ window.advanced_webcat_index_table = () ->
     modified_older: $('#cat_named_search').find('input[id="modified-older-input"]').val()
     modified_newer: $('#cat_named_search').find('input[id="modified-newer-input"]').val()
   }
-  window.populate_advanced_webcat_index_table(data)
+  if complaint_save_search_format.test(data.search_name) == true
+    std_msg_error('save search name error', ['Please enter a name without any special character', 'Example: !@#$%^&*()'])
+  else
+    window.location.reload()
+    window.populate_advanced_webcat_index_table(data)
 
 
 window.populate_advanced_webcat_index_table = (data = {}) ->

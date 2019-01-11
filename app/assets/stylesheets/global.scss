@@ -7015,3 +7015,11 @@ th.sorting_1, th.sorting_asc, th.sorting_desc {
   margin-left: 15px;
   margin-top: 6px;
 }
+
+.input-truncate {
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  overflow: hidden;
+  width: 160px !important;
+}
+

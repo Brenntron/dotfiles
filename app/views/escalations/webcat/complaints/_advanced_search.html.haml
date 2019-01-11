@@ -145,7 +145,7 @@
   .form-group
     %label.content-label-sm
       Add Name to save this search criteria to My Saved Searches
-    %input.form-control{name: 'search_name'}
+    %input.form-control{name: 'search_name', :type => 'text', :maxlength => '50'}
   .form-group.text-center
     %button.primary#submit-advanced-search{type: 'button', value: 'submit', onclick: 'advanced_webcat_index_table();'}
       Submit Search
