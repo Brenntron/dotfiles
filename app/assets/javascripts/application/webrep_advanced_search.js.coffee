@@ -33,8 +33,6 @@ $(document).ready ->
     field_name = $(this).parent().find('input').attr('id') || $(this).parent().find('select').attr('id')
     field_wrapper = $(this).parent().attr('id')
     $('.search-checkbox').each ->
-      console.log field_name
-      console.log field_wrapper
       if $(this).attr('for') == field_name
         $($(this).parent()).parent().removeClass('hidden')
       else if $(this).attr('for') == field_wrapper
