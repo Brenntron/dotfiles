@@ -7712,3 +7712,54 @@ td.text-center span {
   margin-left: 15px;
   margin-top: 6px;
 }
+
+#export-reports-dropdown {
+  border: none;
+  color: $type-lighter-color;
+  left: auto;
+  right: 0;
+  margin-top: 0;
+  border-radius: 4px 0 4px 4px;
+  padding: 12px;
+  font-size: 8.5pt;
+}
+
+#export-reports-dropdown li {
+  line-height: 1em !important;
+  padding: 6px 0;
+}
+
+#export-reports-dropdown li input {
+  margin-right: 6px;
+}
+
+#export-reports-dropdown hr {
+  margin-top: 10px;
+  margin-bottom: 4px;
+}
+
+.dropdown.open #export-reports-dropdown-button {
+  background-color: $bug-section-color !important;
+}
+
+#export-reports-button {
+  background-color: $bug-section-color !important;
+  border-radius: 2px;
+  border: none;
+  padding: 0 !important;
+}
+
+.dropdown.open #export-reports-dropdown-button::after {
+  content: '';
+  display: block;
+  top: 100%;
+  left: 50%;
+  border: solid transparent;
+  height: 0;
+  width: 0;
+  position: absolute;
+  border-top-color: $bug-section-color !important;
+  border-width: 9px;
+  margin-left: -9px;
+  z-index: 1010;
+}

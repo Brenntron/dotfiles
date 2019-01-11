@@ -58,8 +58,24 @@
           %label#total-invalid-ticket-count.uppercase.icon-invalid-grey.user-icon-stg.invalid-stg.bold
 
         .dashboard-export-report.left-vertical-separator
-          %button.toolbar-button.export-button-white Export Report
-          -# TODO Hookup exporting. This can be simple for first launch. Later we'll add options to select what gets exported.
+          %span.dropdown
+            %button.toolbar-button.export-button-white.dropdown-toggle#export-reports-dropdown-button{'data-toggle': 'dropdown', 'aria-haspopup': 'true', 'aria-expanded': 'false'}
+              Export Report
+            .dropdown-menu#export-reports-dropdown{'aria-labelledby': 'export-reports-dropdown-button'}
+              %ul
+                %li
+                  %input.report-checkbox#my_tickets_report{type: 'checkbox', checked: 'checked', name: 'mytickets'} My Tickets
+                %li
+                  %input.report-checkbox#my_team_tickets_report{type: 'checkbox', checked: 'checked', name: 'myteamtickets'} My Team Tickets
+                %li
+                  %input.report-checkbox#all_tickets_report{type: 'checkbox', checked: 'checked', name: 'alltickets'} All Tickets
+                %li
+                  %input.report-checkbox#custom_tickets_report{type: 'checkbox', checked: 'checked', name: 'customtickets'} Custom Users Tickets
+              %hr
+              %button#export-reports-button.primary
+                Export
+
+  -# TODO Hookup exporting. This can be simple for first launch. Later we'll add options to select what gets exported.
 
   .tab-content.dashboard-tab-content
     #my-tickets.tab-pane.active{role: 'tabpanel'}

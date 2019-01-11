@@ -1473,7 +1473,6 @@ $ ->
 
     )
 
-
     $('.toggle-vis').on "click", ->
       data = {}
       data['priority'] = $("#priority-checkbox").is(':checked')
