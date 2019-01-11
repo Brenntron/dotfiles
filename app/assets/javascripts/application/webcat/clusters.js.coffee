@@ -92,7 +92,10 @@ $ ->
       search: "_INPUT_"
       searchPlaceholder: "Search within table"
     }
-    order: []
+    order: [ [
+      2
+      'asc'
+    ] ]
     lengthMenu: [50, 100, 500, 1000]
     columnDefs: [
       {
