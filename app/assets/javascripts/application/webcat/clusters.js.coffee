@@ -332,6 +332,101 @@ $ ->
   $("#clusters-index").on 'order.dt', ->
     selectize_category_inputs()
 
+  $('#clusters-index tbody').on 'click', '.entry-count', ->
+    tr = $(this).closest('tr')
+    row = window.clusters_table.row(tr)
+    if row.child.isShown()
+# This row is already open - close it
+      row.child.hide()
+      tr.removeClass 'shown'
+    else
+# Open this row
+      $('.cluster-mgt-loader-wrapper').removeClass('hidden')
+      cluster = row.data()
+
+      table_head = '<table class="table cluster-path-table">' + '<thead>' + '<tr>' +
+        '<th><input class="cluster_path_select_all" type="checkbox" onclick="select_or_deselect_cluster(' + cluster.cluster_id + ')" id=' + cluster.cluster_id + ' /></th>' +
+        '<th class="clusterpath-col-path">Cluster Paths</th>' +
+        '<th class="clusterpath-col-path">Customer Name</th>' +
+        '<th class="clusterpath-col-volume text-center">APAC Region Volume</th>' +
+        '<th class="clusterpath-col-volume text-center">EMRG Region Volume</th>' +
+        '<th class="clusterpath-col-volume text-center">EURP Region Volume</th>' +
+        '<th class="clusterpath-col-volume text-center">GLOB Volume</th>' +
+        '<th class="clusterpath-col-volume text-center">JAPN Volume</th>' +
+        '<th class="clusterpath-col-volum text-centere">NA Region Volume</th>' +
+        '<th class="clusterpath-col-wbrs text-center">WBRS Score</th>' +
+        '</tr>' +
+        '</thead>' + '<tbody>'
+      missing_data = '<span class="missing-data">Missing Data</span>'
+      entry_rows = []
+
+
+      std_msg_ajax(
+        method: 'GET'
+        url: "/escalations/api/v1/escalations/webcat/clusters/" + cluster.cluster_id
+        data: {}
+        success: (response) ->
+          $('.cluster-mgt-loader-wrapper').addClass('hidden')
+          json = $.parseJSON(response)
+          entry = json.data
+          entry_count = 0
+          total_shown_entries = 0
+          total_entries = $($(tr[0]).find('.entry-count')[0]).text()
+
+          if total_entries < 300
+            max_viewable_entries = total_entries
+          else
+            max_viewable_entries = 300
+
+          if total_entries > 25
+            link_to_more_results = '<a class="expand-cluster-entries">Click to preview the top  26 - ' + max_viewable_entries + ' cluster entries.</a>'
+          else
+            link_to_more_results = ''
+
+
+
+          $(entry).each ->
+            entry_count++
+
+            if entry_count <= 25
+              entry_row = '<tr class="index-entry-row">' +
+                '<td class="clusterpath-col-spacer"><input type="checkbox" class="cluster-path-checkbox_' + cluster.cluster_id + '"</td>' + # Spacer for the check box row
+                '<td class="clusterpath-col-path">' + this.url + '</td>' +
+                '<td class="clusterpath-col-path">' + this.customer_name + '</td>' +
+                '<td class="clusterpath-col-volume text-center">' + this.apac_volume + '</td>' +
+                '<td class="clusterpath-col-volume text-center">' + this.emrg_volume + '</td>' +
+                '<td class="clusterpath-col-volume text-center">' + this.eurp_volume + '</td>' +
+                '<td class="clusterpath-col-volume text-center">' + this.glob_volume + '</td>' +
+                '<td class="clusterpath-col-volume text-center">' + this.japn_volume + '</td>' +
+                '<td class="clusterpath-col-volume text-center">' + this.noam_volume + '</td>' +
+                '<td class="clusterpath-col-wbrs text-center">' + this.wbrs_score + '</td>' +
+                '</tr>'
+              entry_rows.push entry_row
+              total_shown_entries = entry_count
+              return
+
+          bottom_row = '<tr class="cluster-entry-bottom-row">' +
+            '<td colspan="10">Previewing cluster entries 1 - <span class="total-shown-entries">' + total_shown_entries + '</span>. ' + link_to_more_results + '<span class="total-cluster-entry-count">Total Entries: ' + total_entries + '.</span></td>' +
+            '</tr>'
+
+          complete_table = table_head + entry_rows.join('') + '</tbody><tfoot>' + bottom_row + '</tfoot></table>'
+
+          row.child(complete_table).show()
+          tr.addClass 'shown'
+          td = $(tr).next('tr').find('td:first')
+          $(td).addClass 'nested-complaint-data-wrapper'
+
+          #         Expanding to maximum preview rows
+          $('.expand-cluster-entries').click ->
+            expand_table_row = this
+            expandClusterEntryPreview(cluster, expand_table_row, max_viewable_entries)
+
+        error: (response) ->
+          $('.cluster-mgt-loader-wrapper').addClass('hidden')
+          std_api_error(response, "There was an error loading cluster data.", reload: false)
+      )
+    return
+
   #  Expand cluster rows
   $('#clusters-index tbody').on 'click', 'td.expandable-row-column', ->
     tr = $(this).closest('tr')
