@@ -428,7 +428,7 @@ class Dispute < ApplicationRecord
         new_dispute.submission_type = message_payload["payload"]["submission_type"]  # email, web, both  [e|w|ew]
         new_dispute.status = NEW
 
-        new_dispute.customer_id = customer.id
+        new_dispute.customer_id = customer&.id
 
         new_dispute.submitter_type = new_dispute.customer.company_id == guest.id ? SUBMITTER_TYPE_NONCUSTOMER : SUBMITTER_TYPE_CUSTOMER
 
