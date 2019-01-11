@@ -134,3 +134,9 @@ Rails.configuration.virustotal.host     = virustotal['host']
 Rails.configuration.virustotal.port     = virustotal['port']
 Rails.configuration.virustotal.api_key  = virustotal['api_key']
 
+bls_config = env_config['bls']
+raise 'config.yml missing bls section' unless bls_config
+Rails.configuration.bls                = OpenStruct.new
+Rails.configuration.bls.host           = bls_config['host']
+Rails.configuration.bls.port           = bls_config['port']
+

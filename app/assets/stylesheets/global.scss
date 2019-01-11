@@ -484,6 +484,11 @@ th.alt-col {
   }
 }
 
+// Buttons //
+button {
+  background-color: transparent;
+}
+
 /**** Content toolbar  *******/
 /*** Current toolbar is specifically generated on a datatables table         ***/
 /*** We will need to work around this for the other places where toolbars    ***/
@@ -3385,6 +3390,7 @@ fieldset.top-content {
 .duplicate-status-notice {
   color: $warning-accent-color;
   font-weight: 700;
+  display: inline-block;
 }
 
 .email-header-information {
@@ -3975,27 +3981,45 @@ td.wbrs-highlight, td.sbrs-highlight {
   #nav-banner .nav-page-button:hover, #nav-banner a:hover, .dropdown.open {
     background-color: lighten(#4E4E4E, 10%);
   }
+}
 
-  #advanced-search-button {
-    background-color: darken($faint-neutral-color, 5%);
-    color: $type-lighter-color;
-    text-transform: uppercase;
-    font-weight: 600;
-    margin: -3px 0 0 0;
-    height: 28px;
-    border-radius: 0 4px 4px 0;
-    padding: 0 16px;
-    position: absolute;
-    right: 0;
-  }
+.research-table-details-wrapper .dropdown.open {
+  background-color: transparent;
+}
 
-  #advanced-search-button::before {
-    display: none;
-  }
+.escalations--webrep--disputes-controller #advanced-search-button, .escalations--webcat--complaints-controller #advanced-search-button, .escalations--webcat--reports-controller #advanced-search-button  {
+  background-color: darken($faint-neutral-color, 5%);
+  color: $type-lighter-color;
+  text-transform: uppercase;
+  font-weight: 600;
+  margin: -3px 0 0 0;
+  height: 28px;
+  border-radius: 0 4px 4px 0;
+  padding: 0 16px;
+  position: absolute;
+  right: 0;
+}
 
-  .search-box {
-    background-image: url(image_path('layout/search_icon_lighter.svg'));
-  }
+
+#advanced-search-button {
+  background-color: darken($faint-neutral-color, 5%);
+  color: $type-lighter-color;
+  text-transform: uppercase;
+  font-weight: 600;
+  margin: -3px 0 0 0;
+  height: 28px;
+  border-radius: 0 4px 4px 0;
+  padding: 0 16px;
+  position: absolute;
+  right: 0;
+}
+
+#advanced-search-button::before {
+  display: none;
+}
+
+.search-box {
+  background-image: url(image_path('layout/search_icon_lighter.svg'));
 }
 
 
@@ -4155,6 +4179,11 @@ button.tertiary {
 
 .search-item {
   padding-right: 20px;
+}
+
+.search-item .form-control {
+  font-size: 8pt;
+  line-height: .75em !important;
 }
 
 .icon-dashboard {background-image: url(image_path('icon_dashboard.svg'));}
@@ -6969,10 +6998,26 @@ h2 {
   display: none;
 }
 
+.cat-url-success{
+  color: black;
+  font-size: 11px;
+  font-weight: normal;
+  display: none;
+}
+
 .categorize-urls-warning-icon{
   width: 15px;
   height: 15px;
   background-image: url(image_path('icon_warning_orange.svg'));
+  background-repeat: no-repeat;
+  background-position: center center;
+  border:0;
+}
+
+.categorize-urls-success-icon{
+  width: 15px;
+  height: 15px;
+  background-image: url(image_path('icon_success.svg'));
   background-repeat: no-repeat;
   background-position: center center;
   border:0;

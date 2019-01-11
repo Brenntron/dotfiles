@@ -73,7 +73,14 @@ module API
               end
 
               if clusters
+                beaker_urls_list = []
                 clusters.each do |cluster|
+                  beaker_urls_list << {"url" => cluster["domain"]}
+                end
+
+                beaker_verdicts = Beaker::Verdicts.verdicts(beaker_urls_list)
+
+                clusters.each_with_index do |cluster, index|
                   cluster_packet = {}
                   cluster_packet[:cluster_id] = cluster["cluster_id"]
                   cluster_packet[:domain] = cluster["domain"]
@@ -81,6 +88,7 @@ module API
                   cluster_packet[:ctime] = cluster["ctime"]
                   cluster_packet[:cluster_size] = cluster["cluster_size"] unless cluster["cluster_size"].blank?
                   cluster_packet[:age] = distance_of_time_in_words(Time.now, Time.parse(cluster["ctime"]))
+                  cluster_packet[:wbrs_score] = beaker_verdicts[index]["response"]["thrt"]["scor"] if beaker_verdicts[index]["response"].present? && beaker_verdicts[index]["response"]["thrt"].present?
                   json_packet << cluster_packet
                 end
               end

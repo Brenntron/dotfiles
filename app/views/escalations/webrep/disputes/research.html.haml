@@ -366,7 +366,7 @@
                                     - referenced_entries.each do |reference|
                                       %tr
                                         %td
-                                          %a{href: escalations_webrep_disputes_path(reference.id)}
+                                          %a{href: escalations_webrep_dispute_path(reference.id)}
                                             = reference.id
                                         %td
                                           = reference.case_opened_at
