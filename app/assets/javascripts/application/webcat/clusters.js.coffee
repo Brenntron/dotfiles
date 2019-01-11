@@ -151,7 +151,7 @@ $ ->
         data: 'global_volume'
       }
       {
-        data: null
+        data: 'wbrs_score'
         defaultContent: 'N/A'
       }
       {
@@ -383,6 +383,8 @@ $ ->
           else
             link_to_more_results = ''
 
+
+
           $(entry).each ->
             entry_count++
 
@@ -423,7 +425,6 @@ $ ->
           std_api_error(response, "There was an error loading cluster data.", reload: false)
       )
     return
-
 
 window.expandClusterEntryPreview = (cluster, expand_table_row, max_viewable_entries) ->
   $('.cluster-mgt-loader-wrapper').removeClass('hidden')
@@ -490,7 +491,11 @@ window.expandClusterEntryPreview = (cluster, expand_table_row, max_viewable_entr
         $(this).remove()
 
 
-$('#cluster_filter_field').keyup (event) ->
-  if event.keyCode == 13
-    apply_filter_to_table()
-  return
+
+  window.select_or_deselect_cluster = (cluster_id)->
+    $('.cluster-path-checkbox_' + cluster_id).prop('checked', $('#' + cluster_id).prop('checked'))
+
+  $('#cluster_filter_field').keyup (event) ->
+    if event.keyCode == 13
+      apply_filter_to_table()
+    return

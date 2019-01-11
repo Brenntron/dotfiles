@@ -49,9 +49,11 @@ class Wbrs::Prefix < Wbrs::Base
     response = Wbrs::Prefix.post_request(path: '/v1/cat/rules/get', body: { prefix_ids: [ id ] })
 
     response_body = JSON.parse(response.body)
+
     response_body['data'].map do |datum|
-      datum['category_id'] = datum.delete('category')
-      Wbrs::Category.new_from_datum(datum.slice(*Wbrs::Category::FIELD_NAMES))
+      Wbrs::AssociatedCategory.new(category_id: datum['category_id'],
+                                   confidence: datum['confidence'],
+                                   is_active: datum['is_active'])
     end
   end
 

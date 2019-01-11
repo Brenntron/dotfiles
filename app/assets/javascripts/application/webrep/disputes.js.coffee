@@ -726,27 +726,32 @@ window.toolbar_index_mark_duplicate = (box_names) ->
 
 
 window.add_dispute_entry = () ->
-  $('#loader-modal').modal({
-    backdrop: 'static',
-    keyboard: false
-  })
-  data = {
-    'uri': $('#add_dispute_entry').val(),
-    'dispute_id': $('#dispute_id').text(),
-  }
+  entry_content = $('#add_dispute_entry').val()
+  if $.trim(entry_content) == '' || entry_content == null
+#    Do not allow accidental submission of empty or blank spaced entry
+    return false
+  else
+    $('#loader-modal').modal({
+      backdrop: 'static',
+      keyboard: false
+    })
+    data = {
+      'uri': entry_content,
+      'dispute_id': $('#dispute_id').text(),
+    }
 
-  headers = {'Token': $('input[name="token"]').val(), 'Xmlrpc-Token': $('input[name="xml_token"]').val()}
-  $.ajax(
-    url: '/escalations/api/v1/escalations/webrep/disputes/new_adhoc_entry'
-    method: 'POST'
-    headers: headers
-    data: data
-    dataType: 'json'
-    success: (response) ->
-      window.location.reload()
-    error: (response) ->
-      popup_response_error(response, 'Error adding entry.')
-  )
+    headers = {'Token': $('input[name="token"]').val(), 'Xmlrpc-Token': $('input[name="xml_token"]').val()}
+    $.ajax(
+      url: '/escalations/api/v1/escalations/webrep/disputes/new_adhoc_entry'
+      method: 'POST'
+      headers: headers
+      data: data
+      dataType: 'json'
+      success: (response) ->
+        window.location.reload()
+      error: (response) ->
+        popup_response_error(response, 'Error adding entry.')
+    )
 
 window.add_related_case_id= ()->
   id = $('#dispute_id').text()

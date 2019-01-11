@@ -46,7 +46,6 @@ window.updateURI = (complaint_entry_id) ->
   )
 
 window.cat_new_url = ()->
-  event.preventDefault()
 
   data = {}
   isEmpty = true
@@ -433,9 +432,6 @@ window.enlarge_image = (id,image)->
     content: '<img src="' + image + '">').popover 'show'
 
 window.lookup_prefix = () ->
-
-  event.preventDefault()
-
   $('#loader-modal').show()
   $('.modal-backdrop').show()
 
@@ -542,7 +538,7 @@ window.retrieve_history = (position) ->
             $('#history_dialog').dialog('open')
 
       error: (response) ->
-        $("#cat-url-message-#{position}").text("No history associated with this url.")
+        $("#cat-url-error-message-#{position}").text("No history associated with this url.")
         $('.modal-backdrop').hide()
         $('#loader-modal').hide()
         $("#cat-url-#{position}").show()
@@ -550,30 +546,60 @@ window.retrieve_history = (position) ->
         $("#url_#{position}").css("border-color", "#E47433")
     , this)
   else
-    $("#cat-url-message-#{position}").text("No data available for blank URL.")
+    $("#cat-url-error-message-#{position}").text("No data available for blank URL.")
     $("#cat-url-#{position}").show()
     $("#url_#{position}").css("border-width", "2px")
     $("#url_#{position}").css("border-color", "#E47433")
 
 
 window.drop_current_categories = () ->
+  $(".cat-url-error").hide()
+  $(".cat-url-success").hide()
 
-  urls = []
+  $('#loader-modal').modal({
+    backdrop: 'static',
+    keyboard: false,
+  })
+
+  $("#url_#{i}").css("border-width", "")
+  $("#url_#{i}").css("border-color", "")
+
+  $('#loader-modal').show()
+
+  urls = {}
 
   for i in [1 .. 5]
-    urls.push($("#url_" + i ).val())
+    if $("#url_" + i ).val() != ""
+      urls[i] = $("#url_" + i ).val()
 
   std_msg_ajax(
     url:'/escalations/api/v1/escalations/webcat/complaints/drop_current_categories'
     method: 'POST'
     data: { 'urls': urls }
     success: (response) ->
-      std_msg_success('Categories have been successfully dropped.', [], reload: false)
+      for key, value of response.json
+        if value && value.code == 200
+          $("#url_#{key}").css("border-width", "2px")
+          $("#url_#{key}").css("border-color", "green")
+          $("#cat-url-success-message-#{key}").text("Categories successfully dropped.")
+          $("#cat-url-success-#{key}").show()
+        else
+          $("#url_#{key}").css("border-width", "2px")
+          $("#url_#{key}").css("border-color", "#E47433")
+          $("#cat-url-error-message-#{key}").text("Unable to drop categories.")
+          $("#cat-url-#{key}").show()
+      $('#loader-modal').hide()
+      $('.modal-backdrop').hide()
     error: (response) ->
       std_msg_error("<p>There has been an error dropping categories: #{json.error}","")
 )
 
 format = (complaint_entry_row) ->
+
+  $('#loader-modal').modal({
+    keyboard: false,
+  })
+
   complaint_entry = complaint_entry_row.data()
   row_id = complaint_entry_row[0][0]
   missing_data = '<span class="missing-data">No Data</span>'
@@ -649,6 +675,7 @@ format = (complaint_entry_row) ->
   unchanged_radio = ""
   fixed_radio = ""
   invalid_radio = ""
+
   if complaint_entry.resolution
     switch (complaint_entry.resolution)
       when "UNCHANGED"
@@ -659,8 +686,38 @@ format = (complaint_entry_row) ->
         invalid_radio = "checked='checked'"
   else
     fixed_radio = "checked='checked'"
-  if complaint_entry.current_categories?
-    categories = complaint_entry.current_categories
+
+  std_msg_ajax(
+    method: 'POST'
+    url: '/escalations/api/v1/escalations/webcat/complaint_entries/retrieve_current_categories'
+    data: {'id': complaint_entry.entry_id}
+    success: (response) ->
+      $('#loader-modal').modal('hide');
+      $('.modal-backdrop').remove()
+
+      current_categories = JSON.parse(response)
+
+      $.each current_categories, (key, value) ->
+        category = this
+        active =  $(this).attr("is_active")
+        if active == true
+          confidence = this.confidence
+          mnemonic = this.mnem
+          name = this.descr
+          cat_id = this.category_id
+          top_certainty = 'N/A'
+          category_row = '<tr><td>' + confidence + '</td><td>' + mnemonic + ' - ' + name + '</td><td><span class="certainty-flag nested-tooltipped" onmouseover="triggerTooltips(this)" data-tooltip-content="#certainty_table' + complaint_entry.entry_id + '_' + cat_id + '">' + top_certainty + '</span>' + '</td></tr>'
+          $(".simple-nested-table" + "#" + complaint_entry.entry_id).append(category_row)
+
+    error: (response) ->
+      $('#loader-modal').modal('hide');
+      $('.modal-backdrop').remove()
+
+      current_categories = ''
+  )
+
+  if current_categories?
+    categories = current_categories
     category_table = ''
     category_row = ''
     tooltip_table = ''
@@ -670,36 +727,8 @@ format = (complaint_entry_row) ->
     tooltip_table_end = '</tbody></table>'
     tooltip_table_guts = ''
     tooltip_wrapper_end = '</span></div>'
-    $.each categories, (key, value) ->
-      category = this
-      active =  $(this).attr("is_active")
-      if active == 1
-        confidence = this.confidence
-        mnemonic = this.mnemonic
-        name = this.name
-        cat_id = this.category_id
-        top_certainty = this.certainty[0].source_certainty
-        certainties = this.certainty
-        $(certainties).each ->
-          source_confidence = this.source_confidence
-          source_certainty = this.source_certainty
-          source_category = this.source_category
-          source_name = this.source
-          certainty_row = '<tr><td>' + source_confidence + '</td><td>' + source_name + '</td><td>' + source_certainty + '</td></tr>'
-          tooltip_table_guts = tooltip_table_guts + certainty_row
-
-        tooltip_table = tooltip_table_start + tooltip_table_guts + tooltip_table_end
-        tooltip_all = tooltip_wrapper_start + 'certainty_table' + complaint_entry.entry_id + '_' +cat_id + '">' + tooltip_table + tooltip_wrapper_end
-        category_row = '<tr><td>' + confidence + '</td><td>' + mnemonic + ' - ' + name + '</td><td><span class="certainty-flag nested-tooltipped" onmouseover="triggerTooltips(this)" data-tooltip-content="#certainty_table' + complaint_entry.entry_id + '_' +cat_id + '">' + top_certainty + '</span>' + tooltip_all + '</td></tr>'
-        category_table = category_table + category_row
-
-      return
 
   if complaint_entry.entry_history?
-    if complaint_entry.entry_history.domain_history.length >= 1
-      domain_history = complaint_entry.entry_history.domain_history
-    else
-      domain_history = ''
     if complaint_entry.entry_history.complaint_history.length >= 1
       complaint_history = complaint_entry.entry_history.complaint_history
     else
@@ -728,8 +757,7 @@ format = (complaint_entry_row) ->
       '</div></div>' +
       '<div class="col-xs-5 col-with-divider">' +
       '<table class="simple-nested-table" id="' + complaint_entry.entry_id + '"><thead><tr><th>Conf</th><th>Current Categories</th><th>Certainty</th></tr></thead>' +
-      '<tbody>' + category_table +
-      '</tbody></table>' +
+      '</table>' +
       '</div>' +
       '<div class="col-xs-2">' +
       '<label class="content-label-sm">Resolution</label><br/>' +
@@ -779,9 +807,8 @@ format = (complaint_entry_row) ->
       '<label class="content-label-sm">Customer Description</label>' +
       '<span class="nested-complaint-data">' + customer_description + '</span>' +
       '</div></div><div class="col-xs-5 col-with-divider">' +
-      '<table class="simple-nested-table" id="\' + complaint_entry.entry_id + \'"><thead><tr><th>Conf</th><th>Current Categories</th><th>Certainty</th></tr></thead>' +
-      '<tbody>' + category_table +
-      '</tbody></table>' +
+      '<table class="simple-nested-table" id="' + complaint_entry.entry_id + '"><thead><tr><th>Conf</th><th>Current Categories</th><th>Certainty</th></tr></thead>' +
+      '</table>' +
       '</div><div class="col-xs-2">' +
       '<button class="secondary" id="lookup-' + complaint_entry.entry_id + '"onclick="lookup_dialog(' + complaint_entry.entry_id  + ')">Lookup</button><br/>' +
       '<button class="secondary" id="history-' + complaint_entry.entry_id + '" onclick="history_dialog(' + complaint_entry.entry_id  + ')">History</button><br/>' +
