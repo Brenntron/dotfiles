@@ -209,7 +209,10 @@ window.collapse_selected_clusters = (tableId) ->
 # open selected funtionality
 window.open_selected_clusters = () ->
   selected_rows = $('#clusters-index').DataTable().rows('.selected')
-  open_selected_tabs(selected_rows, true)
+  if selected_rows[0].length == 0
+    std_msg_error('no rows selected', ['Please select at least one row.'])
+  else
+    open_selected_tabs(selected_rows, true)
 
 
 # open all functionality

@@ -1,5 +1,4 @@
 $ ->
-
   # go back to the last tab after reload
 
   $('a[data-toggle="tab"]').on 'shown.bs.tab', (e) ->
@@ -32,8 +31,7 @@ $ ->
           first_item = $(editable_data)[0]
           $(first_item).next('.table-entry-input')[0].focus()
     else
-      alert ('Select at least one entry to edit.')
-
+      std_msg_error('No rows selected', ['Select at least one entry to edit'])
 
   $('.dispute_check_box').on 'click', (e) ->
     if $(this).not(":checked") && $('.cancel-changes').is(":visible")
@@ -192,7 +190,7 @@ $ ->
 #
 
     else
-      alert ('Please select only one row.')
+      std_msg_error('No rows selected', ['Please select a row'])
       $(dropdown).removeClass('open')
       return false
 
@@ -201,14 +199,14 @@ $ ->
     dropdown = $('#reptool_adjust_entries').parent()
 
     # Only allowing a single submission at a time for now.
-    if ($('.dispute-entry-checkbox:checked').length == 1)
+    if ($('.dispute_check_box:checked').length == 1)
       show_content = $('#reptool_adjust_entries').find('.entry-dispute-name')
       show_rep_class = $('#reptool_adjust_entries').find('.entry-reptool-class')
       show_rep_exp = $('#reptool_adjust_entries').find('.entry-reptool-expiration')
       submit_button = $('#reptool_adjust_entries').find('.dropdown-submit-button')
       comment_input = $('#reptool_adjust_entries').find('.comment-input')
       entry_content = ''
-      $('.dispute-entry-checkbox').each ->
+      $('.dispute_check_box').each ->
         if $(this).prop('checked')
           entry_row = $(this).parents('.index-entry-row')[0]
           entry_content = $(entry_row).find('.entry-col-content').text()
@@ -240,8 +238,12 @@ $ ->
       )
 #
 
+    else if $('.dispute_check_box:checked').length == 0
+      std_msg_error('No rows selected', ['Please select one row'])
+      $(dropdown).removeClass('open')
+      return false
     else
-      alert ('Please select only one row.')
+      std_msg_error('Error', ['Please select one row'])
       $(dropdown).removeClass('open')
       return false
 
@@ -367,11 +369,7 @@ $ ->
 
     else
       $(dropdown_wrapper).removeClass('open')
-      alert ('Please select 1 row')
-
-
-
-
+      std_msg_error('No rows selected', ['Please select one row.'])
 
 
   #Inline Adjust WL/BL Button

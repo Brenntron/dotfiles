@@ -354,7 +354,7 @@ window.take_selected = ()->
         json = $.parseJSON(response)
         if json.error
           notice_html = "<p>Something went wrong: #{json.error}</p>"
-          alert(json.error)
+          std_msg_error('take error', [json.error])
         else
           i = 0
           while i < selected_rows[0].length
@@ -365,6 +365,8 @@ window.take_selected = ()->
       error: (response) ->
         notice_html = "<p>Something went wrong: #{response.responseText}</p>"
     , this)
+  else
+    std_msg_error('No rows selected', ['Please select at least one row.'])
 
 
 
@@ -386,7 +388,7 @@ window.return_selected = ()->
         json = $.parseJSON(response)
         if json.error
           notice_html = "<p>Something went wrong: #{json.error}</p>"
-          alert(json.error)
+          std_msg_error('return error', [json.error])
         else
           i = 0
           while i < selected_rows[0].length
@@ -397,6 +399,8 @@ window.return_selected = ()->
       error: (response) ->
         notice_html = "<p>Something went wrong: #{response.responseText}</p>"
     , this)
+  else
+    std_msg_error('no rows selected', ['Please select at least one row.'])
 
 window.select_cat_text_field = (id) ->
   if (typeof numericalValue)
@@ -1153,7 +1157,10 @@ window.open_nonviewable = () ->
   open_selected(selected_rows, false)
 window.open_selected = () ->
   selected_rows = $('#complaints-index').DataTable().rows('.selected')
-  open_selected(selected_rows, true)
+  if selected_rows[0].length == 0
+    std_msg_error('No rows selected', ['Please select at least one row.'])
+  else
+    open_selected(selected_rows, true)
 window.open_all = () ->
   selected_rows = $('#complaints-index').DataTable().rows()
   open_selected(selected_rows, true)
