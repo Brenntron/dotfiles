@@ -96,7 +96,7 @@ $ ->
 
 # Inline Edit Status
   $('.radio-label').click ->
-    radio_button = $(this).prev('input[type="radio"')
+    radio_button = $(this).prev('input[type="radio"]')
     $(radio_button[0]).trigger('click')
     dropdown_wrapper = $(this).parents('.inline-dropdown-menu')
     active_status = $(dropdown_wrapper[0]).prev('.inline-select-dropdown')
