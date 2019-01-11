@@ -28,6 +28,7 @@ module API
               optional :age_newer, type: String
               optional :modified_older, type: Date
               optional :modified_newer, type: Date
+              optional :reload, type: Boolean
               optional :customer, type: Hash do
                 optional :name, type: String
                 optional :email, type: String
@@ -45,7 +46,8 @@ module API
               disputes = Dispute.robust_search(permitted_params['search_type'],
                                                search_name: permitted_params['search_name'],
                                                params: permitted_params,
-                                               user: current_user).includes(:user, :dispute_entries => [:dispute_rule_hits])  # [but inside]
+                                               user: current_user,
+                                               reload: permitted_params['reload']).includes(:user, :dispute_entries => [:dispute_rule_hits])  # [but inside]
               title = Dispute.robust_search_title(permitted_params['search_type'], search_name: permitted_params['search_name'])
               json_packet = Dispute.to_data_packet(disputes, user: current_user)
 
@@ -111,7 +113,6 @@ module API
                 dispute_comment.comment = permitted_params[:comment]
                 dispute_comment.save
               end
-
 
               dispute.to_json
             end

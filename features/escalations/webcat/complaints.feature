@@ -221,3 +221,169 @@ Feature: Webcat complaints
     And I goto "/escalations/webcat/complaints?f=ALL"
     And I click ".expand-all"
     Then I should see "Description for testing"
+
+  @javascript
+  Scenario: a user looks up a complaint's entry history without entering a URL
+    Given a user with role "webcat user" exists and is logged in
+    And I goto "/escalations/webcat/complaints?f=ALL"
+    When I click "#categorize-urls"
+    And I click "#history-1"
+    Then I should see content "No data available for blank URL." within "#cat-url-1"
+
+  @javascript
+  Scenario: a user looks up a complaint's entry history with a valid URL
+    Given a user with role "webcat user" exists and is logged in
+    And I goto "/escalations/webcat/complaints?f=ALL"
+    When I click "#categorize-urls"
+    And I fill in "url_1" with "cisco.com"
+    And I click "#history-1"
+    And I wait for "5" seconds
+    Then I should see "History Information"
+    And I should see "DOMAIN HISTORY"
+    And I should see "Tue, 12 May 2015 17:39:53 GMT"
+
+  @javascript
+  Scenario: a user looks up a complaint's entry history with an invalid URL
+    Given a user with role "webcat user" exists and is logged in
+    And I goto "/escalations/webcat/complaints?f=ALL"
+    When I click "#categorize-urls"
+    And I fill in "url_1" with "fmasoifkis.com"
+    And I click "#history-1"
+    And I wait for "5" seconds
+    Then I should see content "No history associated with this url." within "#cat-url-1"
+
+  @javascript
+  Scenario: a user looks up a complaint's entry history with an invalid URL in the third position (make sure that the notification appears in the right spot)
+    Given a user with role "webcat user" exists and is logged in
+    When I click "#categorize-urls"
+    And I fill in "url_3" with "fmasoifkis.com"
+    And I click "#history-3"
+    And I wait for "5" seconds
+    Then I should see content "No history associated with this url." within "#cat-url-3"
+
+  Scenario: a users tries to categorize a URL
+    Given a user with role "webcat user" exists and is logged in
+    When I goto "/escalations/webcat/complaints?f=ALL"
+    And I click "#categorize-urls"
+    And I fill in "url_1" with "cisco.com"
+    And I fill in selectized with "Adult"
+    And I click ".primary"
+    And I wait for "45" seconds
+    Then I should see "URLS CATEGORIZED SUCCESSFULLY"
+    And I should see "Categorization of a Top URL will create a pending complaint entry. All other entries have been submitted directly to WBRS."
+
+  @javascript
+  Scenario: a users tries to categorize without selecting a category
+    Given a user with role "webcat user" exists and is logged in
+    When I goto "/escalations/webcat/complaints?f=ALL"
+    And I click "#categorize-urls"
+    And I fill in "url_1" with "cisco.com"
+    And I click ".primary"
+    Then I should see "UNABLE TO CATEGORIZE"
+    And I should see "Please confirm that a URL and at least one category for each desired entry exists."
+
+  @javascript
+  Scenario: a users tries to categorize without an URL
+    Given a user with role "webcat user" exists and is logged in
+    When I goto "/escalations/webcat/complaints?f=ALL"
+    And I click "#categorize-urls"
+    And I fill in selectized with "Adult"
+    And I click ".primary"
+    Then I should see "UNABLE TO CATEGORIZE"
+    And I should see "Please confirm that a URL and at least one category for each desired entry exists."
+
+  @javascript
+  Scenario: a users tries to categorize a URL with an empty form
+    Given a user with role "webcat user" exists and is logged in
+    When I goto "/escalations/webcat/complaints?f=ALL"
+    And I click "#categorize-urls"
+    And I click ".primary"
+    Then I should see "UNABLE TO CATEGORIZE"
+    And I should see "Please confirm that a URL and at least one category for each desired entry exists."
+
+  @javascript
+  Scenario: a users tries submits a multiple url categorization
+    Given a user with role "webcat user" exists and is logged in
+    When I goto "/escalations/webcat/complaints?f=ALL"
+    And I click "#categorize-urls"
+    And I click "#cat-urls-same"
+    And I fill in "categorize_urls" with "cisco.com" and "google.com" separated by blank lines
+    And I fill in selectized with "Adult"
+    And I trigger-click ".primary"
+    And I wait for "60" seconds
+    Then I should see "SUCCESS"
+    Then I should see "URLs/IPs successfully categorized."
+
+  @javascript
+  Scenario: a users tries submits a multiple url categorization without a URL
+    Given a user with role "webcat user" exists and is logged in
+    When I goto "/escalations/webcat/complaints?f=ALL"
+    And I click "#categorize-urls"
+    And I click "#cat-urls-same"
+    And I fill in selectized with "Adult"
+    And I trigger-click ".primary"
+    And I wait for "60" seconds
+    Then I should see "ERROR"
+    Then I should see "Please check that a URL/IP has been inputted and that at least one category was selected."
+
+  @javascript
+  Scenario: a users tries submits a multiple url categorization without a category
+    Given a user with role "webcat user" exists and is logged in
+    When I goto "/escalations/webcat/complaints?f=ALL"
+    And I click "#categorize-urls"
+    And I click "#cat-urls-same"
+    And I fill in "categorize_urls" with "cisco.com" and "google.com" separated by blank lines
+    And I trigger-click ".primary"
+    Then I should see "ERROR"
+    Then I should see "Please check that a URL/IP has been inputted and that at least one category was selected."
+
+  @javascript
+  Scenario: a users tries to fetch complaints
+    Given a user with role "webcat user" exists and is logged in
+    And PeakeBridge poll is stubbed
+    When I goto "/escalations/webcat/complaints?f=ALL"
+    And I click "#fetch"
+    Then I wait for "3" seconds
+    Then I should see "COMPLAINT UPDATES REQUESTED FROM TALOS-INTELLIGENCE.  PLEASE REFRESH YOUR PAGE SHORTLY."
+
+  @javascript
+  Scenario: a users tries to lookup categories for a URL
+    Given a user with role "webcat user" exists and is logged in
+    When I goto "/escalations/webcat/complaints?f=ALL"
+    And I click "#categorize-urls"
+    And I fill in "url_1" with "cisco.com"
+    And I click ".current-categories-button"
+    Then I wait for "15" seconds
+    Then I should see "Computers and Internet"
+
+  @javascript
+  Scenario: a users tries to drop current categories on a URL
+    Given a user with role "webcat user" exists and is logged in
+    When I goto "/escalations/webcat/complaints?f=ALL"
+    And I click "#categorize-urls"
+    And I fill in "url_1" with "washingtonpost.com"
+    And I click ".delete-categories-button"
+    And I wait for "10" seconds
+    Then I should see "CATEGORIES HAVE BEEN SUCCESSFULLY DROPPED."
+
+  @javascript
+  Scenario: a users tries to fetch WBNP data
+    Given a user with role "webcat user" exists and is logged in
+    When I goto "/escalations/webcat/complaints?f=ALL"
+    And I click "#fetch_wbnp"
+    And I wait for "10" seconds
+    Then I should see "WBNP COMPLAINTS SUCCESSFULLY RETRIEVED FROM RULEUI."
+
+  @javascript
+  Scenario: a users tries to update URI
+    Given a user with role "webcat user" exists and is logged in
+    And a complaint entry with trait "new_entry" exists
+    And a complaint entry preload exists
+    When I goto "/escalations/webcat/complaints?f=ALL"
+    Then I wait for "7" seconds
+    And I click ".expand-all"
+    And I fill in "complaint_prefix_1" with "cisco.com"
+    And I click ".inline-button"
+    And I wait for "10" seconds
+    Then I should see "SUCCESS"
+    Then I should see "URI updated."

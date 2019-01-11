@@ -6,7 +6,7 @@
     %a#complaints.nav-page-button{href: '/escalations/webcat/complaints?f=ACTIVE', class: ("active" if current_page?('/escalations/webcat/complaints'))}
       %span.nav-toolbar-icon-large.icon-queue
 
-    %a#rules.nav-page-button{href: '/escalations/webcat/rules', class: ("active" if current_page?('/escalations/webcat/rules'))}
+    %a#rules.nav-page-button{href: '/escalations/webcat/clusters', class: ("active" if current_page?('/escalations/webcat/clusters'))}
       %span.nav-toolbar-icon-large.icon-categories
 
     %a#reports.nav-page-button{href: '/escalations/webcat/reports', class: ("active" if current_page?('/escalations/webcat/reports'))}
@@ -50,42 +50,72 @@
                   %span Drop All Current Categories
 
             .form-group
+              %div.cat-url-error#cat-url-1
+                %button.categorize-urls-warning-icon
+                %span#cat-url-error-message-1 No history associated with this url.
+              %div.cat-url-success#cat-url-success-1
+                %button.categorize-urls-success-icon
+                %span#cat-url-success-message-1 Categories successfully dropped.
               %label.content-label-sm URL
               %br
               %input.inline-input.form-control#url_1{:name => "token", :type => "text", :value => "", :placeholder=>"URL", autofocus: 'true', tabindex: '1'}/
-              %button.inline-button.history-button.esc-tooltipped{type: 'button', onclick: 'retrieve_history(1)', title: 'Entry Category History'}
+              %button.inline-button.history-button.esc-tooltipped#history-1{type: 'button', onclick: 'retrieve_history(1)', title: 'Entry Category History'}
               %label.content-label-sm Categories
-              %select.form-control#cat_new_url_1.cat_new_url.contacts.selectize{:multiple => "multiple", :placeholder => "Enter up to 5 categories", :style => "display: none;", tabindex: '2'}
+              %select.form-control#cat_new_url_1.cat_new_url.contacts.selectize{:multiple => "multiple", :placeholder => "Enter up to 5 categories", :style => "display: none;", tabindex: "2"}
             %hr.thin.condensed
             .form-group
+              %div.cat-url-error#cat-url-2
+                %button.categorize-urls-warning-icon
+                %span#cat-url-error-message-2 No history associated with this url.
+              %div.cat-url-success#cat-url-success-2
+                %button.categorize-urls-success-icon
+                %span#cat-url-success-message-2 Categories successfully dropped.
               %label.content-label-sm URL
               %br
               %input.inline-input.form-control#url_2{:name => "token", :type => "text", :value => "", :placeholder=>"URL", tabindex: '3'}/
-              %button.inline-button.history-button.esc-tooltipped{type: 'button', onclick: 'retrieve_history(2)', title: 'Entry Category History'}
+              %button.inline-button.history-button.esc-tooltipped#history-2{type: 'button', onclick: 'retrieve_history(2)', title: 'Entry Category History'}
               %label.content-label-sm Categories
               %select.form-control#cat_new_url_2.cat_new_url.contacts.selectize{:multiple => "multiple", :placeholder => "Enter up to 5 categories", :style => "display: none;", :tabindex => "4"}
             %hr.thin.condensed
             .form-group
+              %div.cat-url-error#cat-url-3
+                %button.categorize-urls-warning-icon
+                %span#cat-url-error-message-3 No history associated with this url.
+              %div.cat-url-success#cat-url-success-3
+                %button.categorize-urls-success-icon
+                %span#cat-url-success-message-3 Categories successfully dropped.
               %label.content-label-sm URL
               %br
               %input.inline-input.form-control#url_3{:name => "token", :type => "text", :value => "", :placeholder=>"URL", tabindex: '5'}/
-              %button.inline-button.history-button.esc-tooltipped{type: 'button', onclick: 'retrieve_history(3)', title: 'Entry Category History'}
+              %button.inline-button.history-button.esc-tooltipped#history-3{type: 'button', onclick: 'retrieve_history(3)', title: 'Entry Category History'}
               %label.content-label-sm Categories
               %select.form-control#cat_new_url_3.cat_new_url.contacts.selectize{:multiple => "multiple", :placeholder => "Enter up to 5 categories", :style => "display: none;", :tabindex => "6"}
             %hr.thin.condensed
             .form-group
+              %div.cat-url-error#cat-url-4
+                %button.categorize-urls-warning-icon
+                %span#cat-url-error-message-4 No history associated with this url.
+              %div.cat-url-success#cat-url-success-4
+                %button.categorize-urls-success-icon
+                %span#cat-url-success-message-4 Categories successfully dropped.
               %label.content-label-sm URL
               %br
               %input.inline-input.form-control#url_4{:name => "token", :type => "text", :value => "", :placeholder=>"URL", tabindex: '7'}/
-              %button.inline-button.history-button.esc-tooltipped{type: 'button', onclick: 'retrieve_history(4)', title: 'Entry Category History'}
+              %button.inline-button.history-button.esc-tooltipped#history-4{type: 'button', onclick: 'retrieve_history(4)', title: 'Entry Category History'}
               %label.content-label-sm Categories
               %select.form-control#cat_new_url_4.cat_new_url.contacts.selectize{:multiple => "multiple", :placeholder => "Enter up to 5 categories", :style => "display: none;", :tabindex => "8"}
             %hr.thin.condensed
             .form-group
+              %div.cat-url-error#cat-url-5
+                %button.categorize-urls-warning-icon
+                %span#cat-url-error-message-5 No history associated with this url.
+              %div.cat-url-success#cat-url-success-5
+                %button.categorize-urls-success-icon
+                %span#cat-url-success-message-5 Categories successfully dropped.
               %label.content-label-sm URL
               %br
               %input.inline-input.form-control#url_5{:name => "token", :type => "text", :value => "", :placeholder=>"URL", tabindex: '9'}/
-              %button.inline-button.history-button.esc-tooltipped{type: 'button', onclick: 'retrieve_history(5)', title: 'Entry Category History'}
+              %button.inline-button.history-button.esc-tooltipped#history-5{type: 'button', onclick: 'retrieve_history(5)', title: 'Entry Category History'}
               %label.content-label-sm Categories
               %select.form-control#cat_new_url_5.cat_new_url.contacts.selectize{:multiple => "multiple", :placeholder => "Enter up to 5 categories", :style => "display: none;", :tabindex => "10"}
             .form-group.text-center
@@ -152,7 +182,7 @@
         %h3.nav-tool-dropdown-header
           %span.nav-dropdown-content-icon.icon-saved-search
           My Saved Searches
-        %table{class: 'table table-condensed small', id: 'saved-search'}
+        %table{class: 'table', id: 'saved-search'}
           %tbody
             - if current_user.named_searches.any?
               - current_user.named_searches.each do |named_search|

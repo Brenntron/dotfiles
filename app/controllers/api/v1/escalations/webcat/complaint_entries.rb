@@ -104,39 +104,7 @@ module API
 
                   complaint_entry_packet[:description] = complaint_entry&.complaint&.description
 
-                  if complaint_entry.complaint_entry_preload.present?
-                    if complaint_entry.complaint_entry_preload.current_category_information.present? &&
-                       complaint_entry.complaint_entry_preload.current_category_information != 'DATA ERROR'
-                      complaint_entry_packet[:current_categories] = {}
-                      parsed_current_cat_information = JSON.parse(complaint_entry.complaint_entry_preload.current_category_information)
-
-
-                      parsed_current_cat_information.each_pair do |key,value|
-
-                        complaint_entry_packet[:current_categories][key] = {}
-                        complaint_entry_packet[:current_categories][key][:certainty] = {}
-
-                        complaint_entry_packet[:current_categories][key] = {:is_active => value['is_active'],
-                                                                              :mnemonic => value['mnemonic'],
-                                                                              :category_id => value['category_id'],
-                                                                              :prefix_id => value['prefix_id'],
-                                                                              :confidence => value['confidence'] || 'N/A',
-                                                                              :name => value['name'] || 'N/A',
-                                                                              :long_description => value['long_description']}
-                        #TODO: replace this with working code when the API is finished and we can actually get certainty.
-                        complaint_entry_packet[:current_categories][key][:certainty] = [
-                            {:source => "Missing Source data", :source_category => "Missing Category", :source_certainty => "N/A", :source_confidence => 'N.A'}
-                        ]
-                      end
-
-
-                      # complaint_entry_packet[:current_categories] = complaint_entry.complaint_entry_preload.current_category_information
-                    else
-                      complaint_entry_packet[:current_categories] = {}
-                    end
-                  else
-                    complaint_entry_packet[:current_categories] = {}
-                  end
+                  # Need to rip this out, because if current category information changes, preload data will be out of date
 
                   #fake it til they make it
                   # fake_ass_bullshit = {}
@@ -151,13 +119,8 @@ module API
                   #which has available to it: mnem, descr, category_id, desc_long
 
                   complaint_entry_packet[:entry_history] = {}
-                  if complaint_entry&.complaint_entry_preload&.historic_category_information.present? &&
-                     complaint_entry&.complaint_entry_preload&.historic_category_information != 'DATA ERROR'
-                    complaint_entry_packet[:entry_history][:domain_history] = complaint_entry.complaint_entry_preload.historic_category_information
-                  else
-                    complaint_entry_packet[:entry_history][:domain_history] = complaint_entry.history_category_data_with_preload_save
-                  end
 
+                  complaint_entry_packet[:entry_history][:domain_history]
                   complaint_entry_packet[:entry_history][:complaint_history] = complaint_entry.compose_versions
 
                   json_packet << complaint_entry_packet
@@ -302,12 +265,15 @@ module API
               requires :url, type:  String, desc: "Parse URL's and retrieve history"
             end
             post 'categorize_urls_history' do
-              begin
-                prefix_id = Wbrs::Prefix.where(:urls => [permitted_params['url']]).first.prefix_id
-                response = Wbrs::HistoryRecord.where({:prefix_id => prefix_id}).sort_by {|history| history.time}.reverse
-
-                render response.to_json
+              std_api_v2 do
+                begin
+                  prefix_id = Wbrs::Prefix.where(:urls => [permitted_params['url']]).first.prefix_id
+                  response = Wbrs::HistoryRecord.where({:prefix_id => prefix_id}).sort_by {|history| history.time}.reverse
+                  render response.to_json
+                rescue
+                  raise 'The URL you provided does not have available data.'
                 end
+              end
             end
 
 
@@ -409,6 +375,16 @@ module API
               end
             end
 
+            desc 'Retrieve historic_category_information from expanding a complaint entry row'
+            params do
+              requires :id, type: Integer
+            end
+            post 'retrieve_current_categories' do
+              std_api_v2 do
+                complaint_entry = ComplaintEntry.find(params[:id])
+                complaint_entry.current_category_data.to_json
+              end
+            end
           end
         end
       end

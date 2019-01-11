@@ -37,6 +37,8 @@ window.updateURI = (complaint_entry_id) ->
         $("#history-#{complaint_entry_id}").replaceWith('<button class="secondary" id="history-' + complaint_entry_id + '" onclick="history_dialog('+complaint_entry_id+')">History</button>')
         $("#domain-#{complaint_entry_id}").replaceWith('<button class="secondary" id="domain-' + complaint_entry_id + '" onclick="domain_whois(\''+response.domain+'\')">Domain</button>')
 
+        std_msg_success("Success",['URI updated.'])
+
 
 
 
@@ -44,29 +46,41 @@ window.updateURI = (complaint_entry_id) ->
   )
 
 window.cat_new_url = ()->
-  event.preventDefault()
-  $('#loader-modal').modal({
-    backdrop: 'static',
-    keyboard: false
-  })
-  data = {}
-  for i in [1...6] by 1
-    data[i] = {url: $("#url_#{i}").val(), cats: $("#cat_new_url_#{i}").val()}
-  headers = {'Token': $('input[name="token"]').val(), 'Xmlrpc-Token': $('input[name="xml_token"]').val()}
 
-  $.ajax(
-    url:'/escalations/api/v1/escalations/webcat/complaints/cat_new_url'
-    method: 'POST'
-    headers: headers
-    data: {data: data}
-    success: (response) ->
-      $('#loader-modal').hide()
-      std_msg_success('URLs categorized successfully.',["Categorization of a Top URL will create a pending complaint entry.", "All other entries have been submitted directly to WBRS."], reload: true)
-    error: (response) ->
-      $('#loader-modal').hide()
-      $('.modal-backdrop').remove()
-      std_msg_error(response,"", reload: false)
-  )
+  data = {}
+  isEmpty = true
+
+  for i in [1...6] by 1
+
+    data[i] = {url: $("#url_#{i}").val(), cats: $("#cat_new_url_#{i}").val()}
+
+    if data[i].url.length > 0 && data[i].cats != null
+      isEmpty = false
+
+  if isEmpty == false
+
+    $('#loader-modal').modal({
+      backdrop: 'static',
+      keyboard: false
+    })
+
+    std_msg_ajax(
+      url:'/escalations/api/v1/escalations/webcat/complaints/cat_new_url'
+      method: 'POST'
+      data: {data: data}
+      success: (response) ->
+        $('.modal-backdrop').hide()
+        $('#loader-modal').hide()
+        std_msg_success('URLs categorized successfully',["Categorization of a Top URL will create a pending complaint entry.", "All other entries have been submitted directly to WBRS."], reload: true)
+
+      error: (response) ->
+        $('.modal-backdrop').hide()
+        $('#loader-modal').hide()
+        std_msg_error("Error",["Unable to categorize url."], reload: false)
+    )
+  else
+    std_msg_error("Unable to categorize", ["Please confirm that a URL and at least one category for each desired entry exists."], reload: false)
+
 
 window.webcat_reset_search = ()->
   inputs = document.getElementsByClassName('form-control')
@@ -78,29 +92,32 @@ window.webcat_reset_search = ()->
 
 window.multiple_url_categorization = ()->
   event.preventDefault()
-  $('#loader-modal').modal({
-    backdrop: 'static',
-    keyboard: false
-  })
 
   urls = $("#categorize_urls").val().split(/\n/)
   cats = $("#multi_cat_url_cats").val()
 
-  headers = {'Token': $('input[name="token"]').val(), 'Xmlrpc-Token': $('input[name="xml_token"]').val()}
+  if $("#categorize_urls").val() != "" && cats != null
+    $('#loader-modal').modal({
+      backdrop: 'static',
+      keyboard: false
+    })
 
-  $.ajax(
-    url:'/escalations/api/v1/escalations/webcat/complaints/multi_cat_new_url'
-    method: 'POST'
-    headers: headers
-    data: {urls: urls, cats: cats}
-    success: (response) ->
-      $('#loader-modal').hide()
-      std_msg_success('URLs categorized successfully.',"", reload: true)
-    error: (response) ->
-      $('#loader-modal').hide()
-      $('.modal-backdrop').remove();
-      std_msg_error('Error:' + ' ' + response.responseJSON.message,"", reload: false)
-  )
+    std_msg_ajax(
+      url:'/escalations/api/v1/escalations/webcat/complaints/multi_cat_new_url'
+      method: 'POST'
+      data: {urls: urls, cats: cats}
+      success: (response) ->
+        $('#loader-modal').hide()
+        $('.modal-backdrop').remove()
+        std_msg_success('Success',["URLs/IPs successfully categorized."], reload: true)
+      error: (response) ->
+        $('#loader-modal').hide()
+        $('.modal-backdrop').remove()
+        std_msg_error('Error' + ' ' + response.responseJSON.message,"", reload: false)
+    )
+  else
+    $('#loader-modal').hide()
+    std_msg_error('Error', ['Please check that a URL/IP has been inputted and that at least one category was selected.'], reload: false)
 
 name_servers =(server_list)->
   if undefined == server_list
@@ -415,9 +432,6 @@ window.enlarge_image = (id,image)->
     content: '<img src="' + image + '">').popover 'show'
 
 window.lookup_prefix = () ->
-
-  event.preventDefault()
-
   $('#loader-modal').show()
   $('.modal-backdrop').show()
 
@@ -444,11 +458,11 @@ window.lookup_prefix = () ->
       for [i .. 5]
         j = 0
         try
-          for [j .. response.json[i].data.length]
+          for [j .. Object.keys(response.json[i]).length]
             selector = '#cat_new_url_' + i.toString()
             $select= $(selector).selectize()
             selectize = $select[0].selectize
-            selectize.addItem(response.json[i].data[j].descr)
+            selectize.addItem(response.json[i][j])
             j++
         catch
           i++
@@ -459,77 +473,133 @@ window.lookup_prefix = () ->
   )
 
 window.retrieve_history = (position) ->
+  $(".cat-url-error").hide()
+
+  for url_position in [1..5]
+    $("#url_#{url_position}").css("border-width", "")
+    $("#url_#{url_position}").css("border-color", "")
 
   url = $("#url_" + position).val()
 
-  std_msg_ajax(
-    url: '/escalations/api/v1/escalations/webcat/complaint_entries/categorize_urls_history'
-    method: 'POST'
-    data: {'position': position, url: url}
-    success: (response) ->
-      json = JSON.parse(response)
+  if url.length > 0
+    $('#loader-modal').show()
 
-      if json.error
-        std_msg_error("<p>Something went wrong: #{json.error}","")
-      else
-        #parse this json properly
-        history_dialog_content = '<div class="dialog-content-wrapper">' +
-          '<h5>Domain History</h5>' +
-          '<table class="history-table"><thead><tr><th>Action</th><th>Confidence</th><th>Description</th><th>Time</th><th>User</th><th>Category</th></tr></thead>' +
-          '<tbody>'
+    $('#loader-modal').modal({
+      backdrop: 'static',
+      keyboard: false
+    })
 
-        for entry in json
+    std_msg_ajax(
+      url: '/escalations/api/v1/escalations/webcat/complaint_entries/categorize_urls_history'
+      method: 'POST'
+      data: {'position': position, url: url}
+      success: (response) ->
+        $('.modal-backdrop').hide()
+        $('#loader-modal').hide()
 
-          entry_string = "" +
-            '<tr>' +
-            '<td>' + entry['action'] + '</td>' +
-            '<td>' + entry['confidence'] + '</td>' +
-            '<td>' + entry['description'] + '</td>' +
-            '<td>' + entry['time'] + '</td>' +
-            '<td>' + entry['user'] + '</td>' +
-            '<td>' + entry['category']['descr'] + '</td>' +
-            '</tr>'
+        json = JSON.parse(response)
 
-          history_dialog_content += entry_string
-        history_dialog_content += '</tbody></table>'
-
-        if $("#history_dialog").length
-          history_dialog = this
-          $("#history_dialog").html(history_dialog_content)
-          $('#history_dialog').dialog('open')
+        if json.error
+          std_msg_error("<p>Something went wrong: #{json.error}","")
         else
-          history_dialog = '<div id="history_dialog" title="History Information"></div>'
-          $('body').append(history_dialog)
-          $("#history_dialog").html(history_dialog_content)
-          #$('#history_dialog').append(history_dialog_content)
-          $('#history_dialog').dialog
-            autoOpen: false
-            minWidth: 600
-            position: { my: "right top", at: "right top", of: window }
-          $('#history_dialog').dialog('open')
+          history_dialog_content = '<div class="dialog-content-wrapper">' +
+            '<h5>Domain History</h5>' +
+            '<table class="history-table"><thead><tr><th>Action</th><th>Confidence</th><th>Description</th><th>Time</th><th>User</th><th>Category</th></tr></thead>' +
+            '<tbody>'
 
-    error: (response) ->
-      std_msg_error("<p>Something went wrong: #{response.responseText}","")
-  , this)
+          for entry in json
+
+            entry_string = "" +
+              '<tr>' +
+              '<td>' + entry['action'] + '</td>' +
+              '<td>' + entry['confidence'] + '</td>' +
+              '<td>' + entry['description'] + '</td>' +
+              '<td>' + entry['time'] + '</td>' +
+              '<td>' + entry['user'] + '</td>' +
+              '<td>' + entry['category']['descr'] + '</td>' +
+              '</tr>'
+
+            history_dialog_content += entry_string
+
+          history_dialog_content += '</tbody></table>'
+
+          if $("#history_dialog").length
+            history_dialog = this
+            $("#history_dialog").html(history_dialog_content)
+            $('#history_dialog').dialog('open')
+          else
+            history_dialog = '<div id="history_dialog" title="History Information"></div>'
+            $('body').append(history_dialog)
+            $("#history_dialog").html(history_dialog_content)
+            $('#history_dialog').dialog
+              autoOpen: false
+              minWidth: 600
+              position: { my: "right top", at: "right top", of: window }
+            $('#history_dialog').dialog('open')
+
+      error: (response) ->
+        $("#cat-url-error-message-#{position}").text("No history associated with this url.")
+        $('.modal-backdrop').hide()
+        $('#loader-modal').hide()
+        $("#cat-url-#{position}").show()
+        $("#url_#{position}").css("border-width", "2px")
+        $("#url_#{position}").css("border-color", "#E47433")
+    , this)
+  else
+    $("#cat-url-error-message-#{position}").text("No data available for blank URL.")
+    $("#cat-url-#{position}").show()
+    $("#url_#{position}").css("border-width", "2px")
+    $("#url_#{position}").css("border-color", "#E47433")
+
 
 window.drop_current_categories = () ->
+  $(".cat-url-error").hide()
+  $(".cat-url-success").hide()
 
-  urls = []
+  $('#loader-modal').modal({
+    backdrop: 'static',
+    keyboard: false,
+  })
+
+  $("#url_#{i}").css("border-width", "")
+  $("#url_#{i}").css("border-color", "")
+
+  $('#loader-modal').show()
+
+  urls = {}
 
   for i in [1 .. 5]
-    urls.push($("#url_" + i ).val())
+    if $("#url_" + i ).val() != ""
+      urls[i] = $("#url_" + i ).val()
 
   std_msg_ajax(
     url:'/escalations/api/v1/escalations/webcat/complaints/drop_current_categories'
     method: 'POST'
     data: { 'urls': urls }
     success: (response) ->
-      std_msg_success('Categories have been successfully dropped.', [], reload: false)
+      for key, value of response.json
+        if value && value.code == 200
+          $("#url_#{key}").css("border-width", "2px")
+          $("#url_#{key}").css("border-color", "green")
+          $("#cat-url-success-message-#{key}").text("Categories successfully dropped.")
+          $("#cat-url-success-#{key}").show()
+        else
+          $("#url_#{key}").css("border-width", "2px")
+          $("#url_#{key}").css("border-color", "#E47433")
+          $("#cat-url-error-message-#{key}").text("Unable to drop categories.")
+          $("#cat-url-#{key}").show()
+      $('#loader-modal').hide()
+      $('.modal-backdrop').hide()
     error: (response) ->
       std_msg_error("<p>There has been an error dropping categories: #{json.error}","")
 )
 
 format = (complaint_entry_row) ->
+
+  $('#loader-modal').modal({
+    keyboard: false,
+  })
+
   complaint_entry = complaint_entry_row.data()
   row_id = complaint_entry_row[0][0]
   missing_data = '<span class="missing-data">No Data</span>'
@@ -605,6 +675,7 @@ format = (complaint_entry_row) ->
   unchanged_radio = ""
   fixed_radio = ""
   invalid_radio = ""
+
   if complaint_entry.resolution
     switch (complaint_entry.resolution)
       when "UNCHANGED"
@@ -615,8 +686,38 @@ format = (complaint_entry_row) ->
         invalid_radio = "checked='checked'"
   else
     fixed_radio = "checked='checked'"
-  if complaint_entry.current_categories?
-    categories = complaint_entry.current_categories
+
+  std_msg_ajax(
+    method: 'POST'
+    url: '/escalations/api/v1/escalations/webcat/complaint_entries/retrieve_current_categories'
+    data: {'id': complaint_entry.entry_id}
+    success: (response) ->
+      $('#loader-modal').modal('hide');
+      $('.modal-backdrop').remove()
+
+      current_categories = JSON.parse(response)
+
+      $.each current_categories, (key, value) ->
+        category = this
+        active =  $(this).attr("is_active")
+        if active == true
+          confidence = this.confidence
+          mnemonic = this.mnem
+          name = this.descr
+          cat_id = this.category_id
+          top_certainty = 'N/A'
+          category_row = '<tr><td>' + confidence + '</td><td>' + mnemonic + ' - ' + name + '</td><td><span class="certainty-flag nested-tooltipped" onmouseover="triggerTooltips(this)" data-tooltip-content="#certainty_table' + complaint_entry.entry_id + '_' + cat_id + '">' + top_certainty + '</span>' + '</td></tr>'
+          $(".simple-nested-table" + "#" + complaint_entry.entry_id).append(category_row)
+
+    error: (response) ->
+      $('#loader-modal').modal('hide');
+      $('.modal-backdrop').remove()
+
+      current_categories = ''
+  )
+
+  if current_categories?
+    categories = current_categories
     category_table = ''
     category_row = ''
     tooltip_table = ''
@@ -626,36 +727,8 @@ format = (complaint_entry_row) ->
     tooltip_table_end = '</tbody></table>'
     tooltip_table_guts = ''
     tooltip_wrapper_end = '</span></div>'
-    $.each categories, (key, value) ->
-      category = this
-      active =  $(this).attr("is_active")
-      if active == 1
-        confidence = this.confidence
-        mnemonic = this.mnemonic
-        name = this.name
-        cat_id = this.category_id
-        top_certainty = this.certainty[0].source_certainty
-        certainties = this.certainty
-        $(certainties).each ->
-          source_confidence = this.source_confidence
-          source_certainty = this.source_certainty
-          source_category = this.source_category
-          source_name = this.source
-          certainty_row = '<tr><td>' + source_confidence + '</td><td>' + source_name + '</td><td>' + source_certainty + '</td></tr>'
-          tooltip_table_guts = tooltip_table_guts + certainty_row
-
-        tooltip_table = tooltip_table_start + tooltip_table_guts + tooltip_table_end
-        tooltip_all = tooltip_wrapper_start + 'certainty_table' + complaint_entry.entry_id + '_' +cat_id + '">' + tooltip_table + tooltip_wrapper_end
-        category_row = '<tr><td>' + confidence + '</td><td>' + mnemonic + ' - ' + name + '</td><td><span class="certainty-flag nested-tooltipped" onmouseover="triggerTooltips(this)" data-tooltip-content="#certainty_table' + complaint_entry.entry_id + '_' +cat_id + '">' + top_certainty + '</span>' + tooltip_all + '</td></tr>'
-        category_table = category_table + category_row
-
-      return
 
   if complaint_entry.entry_history?
-    if complaint_entry.entry_history.domain_history.length >= 1
-      domain_history = complaint_entry.entry_history.domain_history
-    else
-      domain_history = ''
     if complaint_entry.entry_history.complaint_history.length >= 1
       complaint_history = complaint_entry.entry_history.complaint_history
     else
@@ -684,8 +757,7 @@ format = (complaint_entry_row) ->
       '</div></div>' +
       '<div class="col-xs-5 col-with-divider">' +
       '<table class="simple-nested-table" id="' + complaint_entry.entry_id + '"><thead><tr><th>Conf</th><th>Current Categories</th><th>Certainty</th></tr></thead>' +
-      '<tbody>' + category_table +
-      '</tbody></table>' +
+      '</table>' +
       '</div>' +
       '<div class="col-xs-2">' +
       '<label class="content-label-sm">Resolution</label><br/>' +
@@ -735,9 +807,8 @@ format = (complaint_entry_row) ->
       '<label class="content-label-sm">Customer Description</label>' +
       '<span class="nested-complaint-data">' + customer_description + '</span>' +
       '</div></div><div class="col-xs-5 col-with-divider">' +
-      '<table class="simple-nested-table" id="\' + complaint_entry.entry_id + \'"><thead><tr><th>Conf</th><th>Current Categories</th><th>Certainty</th></tr></thead>' +
-      '<tbody>' + category_table +
-      '</tbody></table>' +
+      '<table class="simple-nested-table" id="' + complaint_entry.entry_id + '"><thead><tr><th>Conf</th><th>Current Categories</th><th>Certainty</th></tr></thead>' +
+      '</table>' +
       '</div><div class="col-xs-2">' +
       '<button class="secondary" id="lookup-' + complaint_entry.entry_id + '"onclick="lookup_dialog(' + complaint_entry.entry_id  + ')">Lookup</button><br/>' +
       '<button class="secondary" id="history-' + complaint_entry.entry_id + '" onclick="history_dialog(' + complaint_entry.entry_id  + ')">History</button><br/>' +
@@ -1257,10 +1328,3 @@ $ ->
     if $('#cat-urls-same').prop('checked')
       $('#categorize-diff-form').hide()
       $('#categorize-same-form').show()
-
-
-
-
-
-
-
