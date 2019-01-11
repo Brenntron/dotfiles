@@ -592,9 +592,8 @@ class Dispute < ApplicationRecord
         logger.debug "Creating email"
         #build first official email of the new case
 
-        email_body = message_payload["payload"]["email_body"].to_s # I don't know how this comes in so we have to make sure it's a string...
-        email_body = email_body[0..64000].gsub(/\s\w+\s*$/, '... ... THIS MESSAGE WAS LONGER THAN 64,000 CHARACTERS AND HAS BEEN TRUNCATED.') # ...Or else this wouldn't work.
-
+        email_body = message_payload["payload"]["email_body"].to_s # Make sure we're working with a string
+        email_body = email_body.truncate(64000, omission: '... THIS MESSAGE WAS LONGER THAN 64,000 CHARACTERS AND HAS BEEN TRUNCATED')
         first_email = DisputeEmail.new
         first_email.dispute_id = new_dispute.id
         first_email.email_headers = nil
