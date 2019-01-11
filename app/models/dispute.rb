@@ -430,7 +430,7 @@ class Dispute < ApplicationRecord
 
         new_dispute.customer_id = customer&.id
 
-        new_dispute.submitter_type = new_dispute.customer.company_id == guest.id ? SUBMITTER_TYPE_NONCUSTOMER : SUBMITTER_TYPE_CUSTOMER
+        new_dispute.submitter_type = new_dispute&.customer&.company_id == guest.id ? SUBMITTER_TYPE_NONCUSTOMER : SUBMITTER_TYPE_CUSTOMER
 
         if new_dispute.submitter_type == SUBMITTER_TYPE_CUSTOMER
           new_dispute.priority = "P3"
