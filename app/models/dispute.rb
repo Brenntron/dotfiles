@@ -460,8 +460,17 @@ class Dispute < ApplicationRecord
             false_negative_claim = true
           end
 
-          wbrs_hits = entry[:wbrs]["WBRS_Rule_Hits"].split(",").map {|hit| hit.strip }
-          sbrs_hits = entry[:sbrs]["SBRS_Rule_Hits"].split(",").map {|hit| hit.strip }
+          if entry && entry[:wbrs] && entry[:wbrs]["WBRS_Rule_Hits"]
+            wbrs_hits = entry[:wbrs]["WBRS_Rule_Hits"].split(",").map {|hit| hit.strip }
+          else
+            wbrs_hits = nil
+          end
+
+          if entry && entry[:sbrs] && entry[:sbrs]["SBRS_Rule_Hits"]
+            sbrs_hits = entry[:sbrs]["SBRS_Rule_Hits"].split(",").map {|hit| hit.strip }
+          else
+            sbrs_hits = nil
+          end
 
           total_hits = (wbrs_hits + sbrs_hits).uniq
 
