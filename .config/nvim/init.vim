@@ -353,6 +353,16 @@ nmap <silent> gr <Plug>(coc-references)
 nmap ; :Buffers<CR>
 nmap <Leader>f :Files<CR>
 nmap <Leader>r :Tags<CR>
+
+" Override Rg commands to search inside git repo
+command! -bang -nargs=* Rg
+  \ call fzf#vim#grep(
+    \ "rg --column --line-number --no-heading --color=always --smart-case ".shellescape(<q-args>),
+    \ 1,
+    \ {'dir': FugitiveWorkTree()},
+    \ <bang>0
+  \ )
+
 let g:fzf_tags_command = 'ctags -R'
 let g:fzf_action = {
   \ 'ctrl-t': 'tab split',
