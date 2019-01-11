@@ -34,17 +34,22 @@ class Customer < ApplicationRecord
   end
 
   def self.process_and_get_customer(payload)
-    customer_email = payload["payload"]["email"]
-    customer_company = payload["payload"]["user_company"]
-    customer_name = payload["payload"]["name"]
+    if payload["payload"] && payload["payload"]["email"] && payload["payload"]["user_company"] && payload["payload"]["name"]
+      customer_email = payload["payload"]["email"]
 
-    customer_exists = Customer.thread_safe_find_or_create_by(email: customer_email)
-    if customer_exists.new_record?
-      company_exists = Company.thread_safe_find_or_create_by(name: customer_company)
+      customer_company = payload["payload"]["user_company"]
+      customer_name = payload["payload"]["name"]
 
-      customer_exists.company_id = company_exists.id
-      customer_exists.name = customer_name
-      customer_exists.save!
+      customer_exists = Customer.thread_safe_find_or_create_by(email: customer_email)
+      if customer_exists.new_record?
+        company_exists = Company.thread_safe_find_or_create_by(name: customer_company)
+
+        customer_exists.company_id = company_exists.id
+        customer_exists.name = customer_name
+        customer_exists.save!
+      end
+    else
+      customer_exists = nil
     end
 
     customer_exists
