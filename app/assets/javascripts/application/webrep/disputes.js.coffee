@@ -1188,7 +1188,7 @@ $ ->
       {
         data: 'priority'
         render: (data) ->
-          '<span class="bug-priority p-' + data + '"></span>'
+          '<span class="bug-priority p-' + data + '">' + data + '</span>'
 
       }
       { data: 'case_link' }
@@ -1206,7 +1206,7 @@ $ ->
             title = 'Email'
           else if data == 'ew'
             title = 'Email Web'
-          '<span class="dispute-submission-type esc-tooltipped dispute-' + data + '" title="' + title + '"></span>'
+          '<span class="dispute-submission-type esc-tooltipped dispute-' + data + '" title="' + title + '">' + data + '</span>'
       }
       { data: 'd_entry_preview' }
       { data: 'assigned_to' }
@@ -1229,7 +1229,11 @@ $ ->
             '<span class="overdue">' + data + '</span>'
       }
       { data: 'source' }
-      { data: 'submitter_type'}
+      {
+        data: 'submitter_type'
+        render: (data) ->
+          return data
+      }
       { data: 'submitter_org' }
       { data: 'submitter_domain' }
       { data: 'submitter_name' }
