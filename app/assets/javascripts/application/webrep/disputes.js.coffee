@@ -1229,11 +1229,7 @@ $ ->
             '<span class="overdue">' + data + '</span>'
       }
       { data: 'source' }
-      {
-        data: 'submitter_type'
-        render: (data) ->
-          return data
-      }
+      { data: 'submitter_type'}
       { data: 'submitter_org' }
       { data: 'submitter_domain' }
       { data: 'submitter_name' }
