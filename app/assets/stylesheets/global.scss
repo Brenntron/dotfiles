@@ -2156,6 +2156,7 @@ table .bug-priority {
   width: 22px;
   height: 22px;
   margin-right: 0;
+  color: transparent;
 }
 
 .bug-priority.p-Unspecified {background-image: url(image_path("icon_p_unknown.svg"));}
@@ -5525,6 +5526,7 @@ table.dispute_tool_current tr:last-of-type td {
   background-repeat: no-repeat;
   width: 20px;
   height: 20px;
+  color: transparent;
 }
 
 .top-case-info .dispute-submission-type {
