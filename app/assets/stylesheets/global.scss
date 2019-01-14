@@ -2766,8 +2766,15 @@ fieldset.top-content {
   column-count: 7;
 }
 
+.user-relationship-wrapper {
+  display: inline-block;
+  float: left;
+}
+
 .user-col-layout div {
   padding-bottom: 6px;
+  white-space: nowrap;
+  page-break-inside: avoid
 }
 
 .user-col-layout {
