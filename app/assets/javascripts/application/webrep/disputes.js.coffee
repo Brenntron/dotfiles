@@ -1550,7 +1550,7 @@ $ ->
       data['case-id'] = $("#case-id-checkbox").is(':checked')
       data['status'] = $("#status-checkbox").is(':checked')
       data['resolution'] = $("#resolution-checkbox").is(':checked')
-      data['ticket-type'] = $("#ticket-type-checkbox").is(':checked')
+      data['submission-type'] = $("#submission-type-checkbox").is(':checked')
       data['dispute'] = $("#dispute-checkbox").is(':checked')
       data['owner'] = $("#owner-checkbox").is(':checked')
       data['time-submitted'] = $("#time-submitted-checkbox").is(':checked')
