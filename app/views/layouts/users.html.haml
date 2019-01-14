@@ -1,0 +1,37 @@
+- content_for(:title) do
+  Users - Analyst Console
+
+- content_for(:nav_banner) do
+  .nav-tool-blocks.nav-page-button-wrapper.col-xs-3.col-sm-3.col-lg-2
+    %a#userpage.nav-page-button{href: "/users/#{current_user[:id]}", class: ("active" if current_page?("/users/#{current_user[:id]}"))}
+      %span.nav-toolbar-icon-large.icon-user-page
+
+    %a#related-users.nav-page-button{href: '/escalations/users', class: ("active" if current_page?('/escalations/users'))}
+      %span.nav-toolbar-icon-large.icon-related-users
+
+  -#- if current_user.has_role?('manager')
+    -#  = link_to user_relationship_path(current_user) do
+    -#    Manage Team
+    -# Add this after relationship piece is completed
+
+  .nav-tool-blocks.search-wrapper.col-xs-6.col-lg-8
+    .input-group.search-group
+      = form_for :user, url: results_users_path, method: :get do |form|
+        = form.fields_for :search do |search_fields|
+          = search_fields.text_field :name, class: 'search-box', placeholder: 'Search for Users'
+  -#= text_field_tag 'bug[id]', "#{@bug_search_id}", class: 'search-box', placeholder: 'Search by bug ID'
+
+
+  - if current_user
+    #login-div.nav-tool-block.col-xs-3.col-lg-2
+      %a{href: "/users/#{current_user[:id]}"}
+        = current_user[:display_name]
+
+= render template: "layouts/rocket"
+
+
+- if params[:f]
+  :javascript
+    $(document).ready(function(){
+      filterByStatus("#{params[:f]}")
+    })

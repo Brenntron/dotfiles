@@ -84,17 +84,9 @@ Rails.application.routes.draw do
         get :results
       end
 
-      # TODO Review metrics for applicability to escalations users
-      get :status_metrics, defaults: {format: :json}
-      get :time_metrics, defaults: {format: :json}
-      get :pending_team_metrics, defaults: {format: :json}
-      get :resolved_team_metrics, defaults: {format: :json}
-      get :time_team_metrics, defaults: {format: :json}
-      get :component_team_metrics, defaults: {format: :json}
-
       patch :add_to_team
       patch :remove_from_team
-      resources :relationships, only: [:index, :show] do
+      resources :relationships, controller: '/relationships', only: [:index, :show] do
         collection do
           get :member_status
         end
@@ -159,7 +151,7 @@ Rails.application.routes.draw do
 
   # resources :tests
 
-  resources :users, only: [:index, :show, :update] do
+  resources :users, only: [:show, :update] do
 
     collection do
       get :results
