@@ -49,7 +49,7 @@
                       = @user.parent.display_name
                     %br
                     = link_for_manager(current_user, @user)
-  
+
             - if @user.child?
               .user-relationship-wrapper
                 %h5.content-label-sm Peers
