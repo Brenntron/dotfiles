@@ -4662,6 +4662,7 @@ table > tbody > tr > td.dispute_rep_tools {
   color: $content-bg-color;
   margin-top: -1px;
   float: right;
+  cursor: pointer;
 }
 
 .dispute_entry_content_first {
@@ -4671,7 +4672,6 @@ table > tbody > tr > td.dispute_rep_tools {
 .entry-count {
   margin-right: 8px;
   margin-top: 1px;
-  cursor: pointer;
 }
 
 .domain-column .vertical-separator {
