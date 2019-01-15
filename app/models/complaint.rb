@@ -271,7 +271,8 @@ class Complaint < ApplicationRecord
         new_complaint.ticket_source_key = message_payload["source_key"]
         new_complaint.ticket_source = "talos-intelligence"
         new_complaint.ticket_source_type = message_payload["source_type"]
-        new_complaint.customer_id = Customer.process_and_get_customer(message_payload).id
+        customer = Customer.process_and_get_customer(message_payload)
+        new_complaint.customer_id = customer&.id
         new_complaint.status = NEW
         new_complaint.channel = TI_CHANNEL
         new_complaint.submitter_type = (new_complaint.customer.nil? || new_complaint.customer&.company_id == guest.id) ? SUBMITTER_TYPE_NONCUSTOMER : SUBMITTER_TYPE_CUSTOMER
