@@ -1240,6 +1240,7 @@ $ ->
       {
         targets: [ 10 ]
         className: 'age-col'
+        orderData: 18
       }
     ]
     columns: [
@@ -1305,6 +1306,10 @@ $ ->
       { data: 'submitter_name' }
       { data: 'submitter_email' }
       { data: 'status_comment' }
+      {
+        data: 'age_int'
+        visible: false
+      }
 
 
     ])
