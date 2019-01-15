@@ -128,8 +128,9 @@ class ComplaintEntry < ApplicationRecord
                    case_resolved_at: Time.now,
                    user:current_user)
             complaint.set_status(current_status)
-            #this is where we should send off the category to the API
-            if entry_status != "INVALID"
+            #this is where we sbinding.pryhould send off the category to the API
+            if entry_status != "INVALID" && categories_string != ''
+              binding.pry
               commit_category(ip_or_uri: self.uri_or_ip,
                               categories_string: categories_string,
                               description: comment,
@@ -173,7 +174,9 @@ class ComplaintEntry < ApplicationRecord
                case_resolved_at: Time.now,user:current_user)
         complaint.set_status(current_status)
         #this is where we should send off the category to the API
-        if entry_status != "INVALID"
+        binding.pry
+        if entry_status != "INVALID" && categories_string != ''
+          binding.pry
           commit_category(ip_or_uri: self.uri_or_ip,
                           categories_string: categories_string,
                           description: comment,

@@ -287,7 +287,9 @@ window.updateEntryColumns = (entry_id,row_id) ->
   resolution_comment = $('#complaint_resolution_comment_'+entry_id)[0].value
   headers = {'Token': $('input[name="token"]').val(), 'Xmlrpc-Token': $('input[name="xml_token"]').val()}
 
-  if categories.length == 0 && status != 'INVALID'
+  unchanged = $("#unchanged#{entry_id}").is(':checked')
+
+  if categories.length == 0 && status != 'INVALID' && unchanged == false
     std_msg_error("Must include at least one category.","", reload: false)
     $("#submit_changes_#{entry_id}").prop("disabled",false)
   else
