@@ -274,8 +274,7 @@ class Complaint < ApplicationRecord
         new_complaint.customer_id = Customer.process_and_get_customer(message_payload).id
         new_complaint.status = NEW
         new_complaint.channel = TI_CHANNEL
-
-        new_complaint.submitter_type = new_complaint.customer.company_id == guest.id ? SUBMITTER_TYPE_NONCUSTOMER : SUBMITTER_TYPE_CUSTOMER
+        new_complaint.submitter_type = (new_complaint.customer.nil? || new_complaint.customer&.company_id == guest.id) ? SUBMITTER_TYPE_NONCUSTOMER : SUBMITTER_TYPE_CUSTOMER
 
         new_complaint.save!
 
