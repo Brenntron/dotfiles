@@ -1093,6 +1093,7 @@ class Dispute < ApplicationRecord
 
       dispute_packet[:case_opened_at] = dispute.case_opened_at&.strftime('%Y-%m-%d %H:%M:%S')
       dispute_packet[:case_age] = dispute.dispute_age
+      dispute_packet[:age_int] = (Time.now - dispute.created_at).to_i
       # dispute_packet[:suggested_disposition] = 'Malicious: Phishing'
       dispute_packet[:suggested_disposition] = dispute.suggested_d
       dispute_packet[:source] = dispute.ticket_source.nil? ? "Bugzilla" : dispute.ticket_source
