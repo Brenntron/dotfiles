@@ -463,13 +463,15 @@ class Dispute < ApplicationRecord
           if entry && entry[:wbrs] && entry[:wbrs]["WBRS_Rule_Hits"]
             wbrs_hits = entry[:wbrs]["WBRS_Rule_Hits"].split(",").map {|hit| hit.strip }
           else
-            wbrs_hits = nil
+            Rails.logger.error('No data for WBRS Rule Hits')
+            wbrs_hits = []
           end
 
           if entry && entry[:sbrs] && entry[:sbrs]["SBRS_Rule_Hits"]
             sbrs_hits = entry[:sbrs]["SBRS_Rule_Hits"].split(",").map {|hit| hit.strip }
           else
-            sbrs_hits = nil
+            Rails.logger.error('No data for SBRS Rule Hits')
+            sbrs_hits = []
           end
 
           total_hits = (wbrs_hits + sbrs_hits).uniq
