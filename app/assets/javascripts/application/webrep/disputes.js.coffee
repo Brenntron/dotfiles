@@ -535,7 +535,7 @@ window.row_adust_reptool_bl_button_research =(button_tag) ->
 
 window.toolbar_adjust_reptool_bl_button =(button_tag) ->
   entry_ids = $('.dispute_check_box:checked').map(() ->
-    parseInt($(this).attr('value'))
+    parseInt($(this).attr('data-entry-id'))
   ).toArray()
   if entry_ids.length == 0
     entry_ids = $('.dispute-entry-checkbox:checked').map(() ->
@@ -552,6 +552,7 @@ window.toolbar_adjust_reptool_bl_button =(button_tag) ->
     'classifications': [ reptool_bl_form.getElementsByClassName('classifications-input')[0].value ]
     'comment': reptool_bl_form.getElementsByClassName('comment-input')[0].value
   }
+
   headers = {'Token': $('input[name="token"]').val(), 'Xmlrpc-Token': $('input[name="xml_token"]').val()}
   $.ajax(
     url: '/escalations/api/v1/escalations/webrep/disputes/reptool_bl'
