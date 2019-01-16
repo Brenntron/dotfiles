@@ -26,7 +26,12 @@
           %td.alt-col.user-col-divider= current_user.display_name
           %td.alt-col.user-name-col.current-user= link_to current_user.cvs_username, user_path(current_user)
           %td.data_small_emphasis=current_user.roles.map(&:role).join(', ')
-          %td
+          - if current_user.has_role?('admin')
+            %td.text-right.table-button-row
+              %button.edit-button.table-row-button.tooltipped{title: "Edit #{current_user.cvs_username}'s roles", 'data-toggle': 'modal', 'data-target': "#roleModal_#{current_user.id}"}
+          - else
+            %td
+
         - current_user.children.each do |user|
           - if user.has_role?('manager') and user.children.length > 0
             %tr
@@ -89,3 +94,14 @@
             %td.alt-col.user-name-col= link_to user.cvs_username, user_path(user)
             %td.data_small_emphasis= user.roles.map(&:role).join(', ')
             %td
+
+  - if current_user.has_role?('admin')
+    .modal.fade{id: "roleModal_#{current_user.id}", tabindex: '-1', role: 'dialog', 'aria-hidden': 'true'}
+      .modal-dialog{role: 'document'}
+        .modal-content
+          .modal-header
+            %button.close{type: 'button', 'data-dismiss': 'modal', 'aria-label': 'Close'}
+            %h4.modal-title
+              Update Role(s) for
+              = current_user.cvs_username
+          =render 'shared/role_form', user: current_user
