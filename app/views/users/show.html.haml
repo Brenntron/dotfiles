@@ -12,6 +12,16 @@
         %br
         %span.data_small_emphasis
           =@user.roles.map(&:role).join(', ')
+        %hr.thin
+        .user-access-wrapper
+          %label.content-label-sm Access
+          - if current_user.has_role?('api user')
+            %label.content-label-md Application Token
+            %pre.code-snippet
+              = current_user.authentication_token
+            %label.content-label-md.extra-space Bugzilla Token
+            %pre.code-snippet
+              = xml_token
 
       .user-buttons
         - if @user != current_user

@@ -9,6 +9,10 @@
     %a#related-users.nav-page-button{href: '/escalations/users', class: ("active" if current_page?('/escalations/users'))}
       %span.nav-toolbar-icon-large.icon-related-users
 
+    %a#all-users.nav-page-button{href: ''}
+      -#Add link to view all users
+      %span.nav-toolbar-icon-large.icon-queue
+
   -#- if current_user.has_role?('manager')
     -#  = link_to user_relationship_path(current_user) do
     -#    Manage Team
