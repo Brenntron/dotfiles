@@ -18,22 +18,46 @@
           %td.alt-col.user-col-divider= current_user.parent.display_name
           %td.alt-col.user-name-col.current-user= link_to current_user.parent.cvs_username, user_path(current_user.parent)
           %td.data_small_emphasis= current_user.parent.roles.map(&:role).join(', ')
+          %td
       - if current_user.has_role?('manager')
-        - team_total = current_user.children.length + 1
+        - team_total = current_user.descendants.length
         %tr
           %td.user-group{rowspan: "#{team_total}"} Team
           %td.alt-col.user-col-divider= current_user.display_name
           %td.alt-col.user-name-col.current-user= link_to current_user.cvs_username, user_path(current_user)
           %td.data_small_emphasis=current_user.roles.map(&:role).join(', ')
+          %td
         - current_user.children.each do |user|
-          %tr
-            %td.alt-col.user-col-divider= user.display_name
-            %td.alt-col.user-name-col= link_to user.cvs_username, user_path(user)
-            %td.data_small_emphasis=user.roles.map(&:role).join(', ')
-            %td.text-right.table-button-row
-              %button.edit-button.table-row-button.tooltipped#edit-user{title: "Edit #{user.cvs_username}'s roles", 'data-toggle': 'modal', 'data-target': "#roleModal_#{user.id}"}
-              = link_to user_remove_from_team_path(user_id: user.id), method: :patch, data: {confirm: "Remove #{user.display_name} from team?"} do
-                %button.remove-button.table-row-button.tooltipped#remove-user{title: "Remove #{user.cvs_username} from this team"}
+          - if user.has_role?('manager') and user.children.length > 0
+            %tr
+              %td.alt-col.user-col-divider.manager-row-indicator
+                %span= user.display_name
+                %button.expand-manager-row-button
+              %td.alt-col.user-name-col= link_to user.cvs_username, user_path(user)
+              %td.data_small_emphasis=user.roles.map(&:role).join(', ')
+              %td.text-right.table-button-row
+                %button.edit-button.table-row-button.tooltipped{title: "Edit #{user.cvs_username}'s roles", 'data-toggle': 'modal', 'data-target': "#roleModal_#{user.id}"}
+                = link_to user_remove_from_team_path(user_id: user.id), method: :patch, data: {confirm: "Remove #{user.display_name} from team?"} do
+                  %button.remove-button.table-row-button.tooltipped{title: "Remove #{user.cvs_username} from this team"}
+
+            - user.children.each do |child|
+              %tr.manage-child-row
+                %td.alt-col.user-col-divider= child.display_name
+                %td.alt-col.user-name-col= link_to child.cvs_username, user_path(child)
+                %td.data_small_emphasis=child.roles.map(&:role).join(', ')
+                %td.text-right.table-button-row
+                  %button.edit-button.table-row-button.tooltipped{title: "Edit #{child.cvs_username}'s roles", 'data-toggle': 'modal', 'data-target': "#roleModal_#{child.id}"}
+                  = link_to user_remove_from_team_path(user_id: child.id), method: :patch, data: {confirm: "Remove #{child.display_name} from team?"} do
+                    %button.remove-button.table-row-button.tooltipped{title: "Remove #{child.cvs_username} from this team"}
+          - else
+            %tr
+              %td.alt-col.user-col-divider= user.display_name
+              %td.alt-col.user-name-col= link_to user.cvs_username, user_path(user)
+              %td.data_small_emphasis=user.roles.map(&:role).join(', ')
+              %td.text-right.table-button-row
+                %button.edit-button.table-row-button.tooltipped{title: "Edit #{user.cvs_username}'s roles", 'data-toggle': 'modal', 'data-target': "#roleModal_#{user.id}"}
+                = link_to user_remove_from_team_path(user_id: user.id), method: :patch, data: {confirm: "Remove #{user.display_name} from team?"} do
+                  %button.remove-button.table-row-button.tooltipped{title: "Remove #{user.cvs_username} from this team"}
 
 
           .modal.fade{id: "roleModal_#{user.id}", tabindex: '-1', role: 'dialog', 'aria-hidden': 'true'}

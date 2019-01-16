@@ -464,6 +464,7 @@ th.alt-col {
 
 .user-col-divider {
   border-right: 2px solid $content-bg-color;
+  min-width: 140px;
 }
 
 /**** Col Width Mins *****/
@@ -725,6 +726,7 @@ button {
 
 .table-button-row {
   padding: 0 !important;
+  min-width: 90px;
 }
 
 .expand-toggle-button {
@@ -7057,3 +7059,31 @@ th.sorting_1, th.sorting_asc, th.sorting_desc {
   margin-top: 12px;
 }
 
+.manager-row-indicator {
+  padding: 0 0 0 8px !important;
+}
+
+.manager-row-indicator span {
+  display: inline-block;
+  padding-top: 8px;
+}
+
+.expand-manager-row-button {
+  background-image: url(image_path('icon_expand_table_grey.svg'));
+  background-repeat: no-repeat;
+  background-position: center center;
+  background-size: 20px 20px;
+  width: 33px;
+  height: 33px;
+  float: right;
+  border: none;
+}
+
+.blank-white-cell {
+  border: none !important;
+  background-color: transparent;
+}
+
+.manage-child-row .user-col-divider {
+  padding-left: 16px;
+}
