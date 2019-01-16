@@ -76,7 +76,7 @@ window.cat_new_url = ()->
       error: (response) ->
         $('.modal-backdrop').hide()
         $('#loader-modal').hide()
-        std_msg_error("Error",["Unable to categorize url."], reload: false)
+        std_api_error(response, "Unable to categorize url.", reload: false)
     )
   else
     std_msg_error("Unable to categorize", ["Please confirm that a URL and at least one category for each desired entry exists."], reload: false)
