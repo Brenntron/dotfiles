@@ -12,6 +12,12 @@
         %th
     -# Edit / Delete Row
     %tbody
+      - if current_user.parent.present?
+        %tr
+          %td.user-group Manager
+          %td.alt-col.user-col-divider= current_user.parent.display_name
+          %td.alt-col.user-name-col.current-user= link_to current_user.parent.cvs_username, user_path(current_user.parent)
+          %td.data_small_emphasis= current_user.parent.roles.map(&:role).join(', ')
       - if current_user.has_role?('manager')
         - team_total = current_user.children.length + 1
         %tr
@@ -19,7 +25,6 @@
           %td.alt-col.user-col-divider= current_user.display_name
           %td.alt-col.user-name-col.current-user= link_to current_user.cvs_username, user_path(current_user)
           %td.data_small_emphasis=current_user.roles.map(&:role).join(', ')
-          %td
         - current_user.children.each do |user|
           %tr
             %td.alt-col.user-col-divider= user.display_name

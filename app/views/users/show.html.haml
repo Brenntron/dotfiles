@@ -12,10 +12,11 @@
         %br
         %span.data_small_emphasis
           =@user.roles.map(&:role).join(', ')
-        %hr.thin
-        .user-access-wrapper
-          %label.content-label-sm Access
-          - if current_user.has_role?('api user')
+
+        - if current_user.has_role?('api user')
+          %hr.thin
+          .user-access-wrapper
+            %label.content-label-sm Access
             %label.content-label-md Application Token
             %pre.code-snippet
               = current_user.authentication_token

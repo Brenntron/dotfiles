@@ -5,6 +5,7 @@ class UsersController < ApplicationController
 
   def index
     @users = current_user.children
+
   end
 
   def show
