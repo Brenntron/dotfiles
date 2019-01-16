@@ -7,9 +7,9 @@ $ ->
     persist: false,
     create: false,
     maxItems: 5,
-    valueField: 'value',
-    labelField: 'value',
-    searchField: ['text'],
+    valueField: 'category_id',
+    labelField: 'category_name',
+    searchField: ['category_name', 'category_code'],
     options: AC.WebCat.createSelectOptions()
   }
 

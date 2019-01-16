@@ -1,6 +1,6 @@
 namespace 'AC.WebCat', (exports) ->
 
-  categories = [
+  categories1 = [
     'adlt - Adult',
     'adv - Advertisements',
     'alc - Alcohol',
@@ -87,7 +87,7 @@ namespace 'AC.WebCat', (exports) ->
     'mail - Web-based Email'
   ]
 
-  categories = {
+  categories2 = {
     'adlt - Adult': 6,
     'adv - Advertisements': 27,
     'alc - Alcohol': 77,
@@ -176,8 +176,17 @@ namespace 'AC.WebCat', (exports) ->
 
 
   exports.createSelectOptions = ->
-    options = []
-    for x in categories
+#    options1 = []
+#
+#    for x in categories1
+#      value_name = x.split(' - ')[1]
+#      code = x.split(' - ')[0]
+#      options1.push {value: value_name, text: code}
+#    return options1
+
+    options2 = []
+    for x, y of categories2
       value_name = x.split(' - ')[1]
-      options.push {value: value_name, text: x}
-    return options
+      code = x.split(' - ')[0]
+      options2.push {category_id: y, category_name: value_name, category_code: code}
+    return options2
