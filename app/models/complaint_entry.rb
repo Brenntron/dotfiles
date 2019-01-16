@@ -187,8 +187,9 @@ class ComplaintEntry < ApplicationRecord
 
   def commit_category(ip_or_uri:, categories_string:, description:, user:)
     # Look for existing prefix
+
     existing_prefix = Wbrs::Prefix.where({urls: [ip_or_uri]})
-    category_ids_array = Wbrs::Category.get_category_ids(categories_string.split(','))
+    category_ids_array = categories_string.split(',').map {|cat| cat.to_i}
 
     if existing_prefix.present?
       prefix_object = Wbrs::Prefix.new
