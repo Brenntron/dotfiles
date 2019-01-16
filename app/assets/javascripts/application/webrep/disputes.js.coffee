@@ -1398,6 +1398,11 @@ $ ->
       tr.addClass 'shown'
       td = $(tr).next('tr').find('td:first')
       $(td).addClass 'dispute-entry-table-wrapper'
+      third_col = $('.dispute-entry-table tbody td.entry-col-res')[3]
+      $(third_col).each ->
+        if $(this).resolution_comment = ''
+          $(this).removeClass('esc-tooltipped')
+          console.log('no tooltip')
       # Check to see which columns should be displayed
       $('.toggle-vis-nested').each ->
         checkbox_trigger = $(this).attr('data-column')
