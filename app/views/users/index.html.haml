@@ -26,11 +26,12 @@
           %td.alt-col.user-col-divider= current_user.display_name
           %td.alt-col.user-name-col.current-user= link_to current_user.cvs_username, user_path(current_user)
           %td.data_small_emphasis=current_user.roles.map(&:role).join(', ')
-          - if current_user.has_role?('admin')
-            %td.text-right.table-button-row
+          %td.text-right.table-button-row
+            - if current_user.has_role?('admin')
               %button.edit-button.table-row-button.tooltipped{title: "Edit #{current_user.cvs_username}'s roles", 'data-toggle': 'modal', 'data-target': "#roleModal_#{current_user.id}"}
-          - else
-            %td
+            -#%span.dropdown
+            %button.add-user-button.table-row-button.tooltipped{title: "Add user"}
+
 
         - current_user.children.each do |user|
           - if user.has_role?('manager') and user.children.length > 0
