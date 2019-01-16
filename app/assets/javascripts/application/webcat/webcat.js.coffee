@@ -1,6 +1,10 @@
 window.display_tooltip = (id)->
   $('#cat_tooltip_' + id).tooltip('toggle')
 
+window.td_truncate = (str, max, long) ->
+  long = long or '...'
+  if typeof str == 'string' and str.length > max then str.substring(0, max) + long else str
+
 $ ->
 
   $('.cat_new_url').selectize {
@@ -145,6 +149,11 @@ $ ->
         }
         {
           data: 'path'
+          'render': (data, type, full, meta) ->
+            full_data = data
+            if type == 'display'
+              full_data = td_truncate(data, 20)
+            return '<span class="esc-tooltipped td-truncate" title="' + data + '">' + full_data + '</span>'
         }
         {
           'render': (data, type, full, meta) ->
