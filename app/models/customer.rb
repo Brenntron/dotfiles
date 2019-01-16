@@ -49,7 +49,7 @@ class Customer < ApplicationRecord
         customer_exists.save!
       end
     else
-      customer_exists = nil
+      customer_exists = Customer.thread_safe_find_or_create_by(email: "guest@cisco.com", name: "Guest", company:Company.find_by_name("Guest"))
     end
 
     customer_exists
