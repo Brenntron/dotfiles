@@ -1385,7 +1385,7 @@ $ ->
 
   if !location.search && $('#disputes-index').length
     standard_webrep_index_table('open')
-  $('#disputes-index tbody').on 'click', 'td.expandable-row-column', ->
+  $('#disputes-index tbody').on 'click', 'td.expandable-row-column, .dispute-count', ->
     tr = $(this).closest('tr')
     row = window.dispute_table.row(tr)
     if row.child.isShown()

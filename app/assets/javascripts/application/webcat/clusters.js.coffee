@@ -339,7 +339,7 @@ $ ->
     selectize_category_inputs()
 
   #  Expand cluster rows
-  $('#clusters-index tbody').on 'click', 'td.expandable-row-column', ->
+  $('#clusters-index tbody').on 'click', 'td.expandable-row-column, .entry-count', ->
     tr = $(this).closest('tr')
     row = window.clusters_table.row(tr)
     if row.child.isShown()
