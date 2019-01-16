@@ -150,9 +150,9 @@ class Dispute < ApplicationRecord
   def each_duplicate(&block)
     if related_dispute && Dispute::DUPLICATE == self.resolution
       #block.call(related_dispute)
-      related_dispute.relating_disputes.where(resolution: Dispute::DUPLICATE).each(&block)
+      related_dispute.relating_disputes.where(resolution: Dispute::DUPLICATE).where.not(id: self.id).each(&block)
     else
-      relating_disputes.where(resolution: Dispute::DUPLICATE).each(&block)
+      relating_disputes.where(resolution: Dispute::DUPLICATE).where.not(id: self.id).each(&block)
     end
   end
 
