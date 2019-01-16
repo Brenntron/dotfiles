@@ -632,6 +632,7 @@ button {
 #edit-button, .edit-button      {background-image: url(image_path('icon_edit.svg'));}
 .related-button   {background-image: url(image_path('icon_related.svg'));}
 .delete-button    {background-image: url(image_path('icon_delete.svg'));}
+.rmt-delete-button    {background-image: url(image_path('icon_delete.svg'));}
 .list-button      {background-image: url(image_path('icon_list.svg'));}
 .view-button      {background-image: url(image_path('icon_view.svg'));}
 .splitview-button {background-image: url(image_path('icon_splitview.svg'));}
@@ -2156,6 +2157,7 @@ table .bug-priority {
   width: 22px;
   height: 22px;
   margin-right: 0;
+  color: transparent;
 }
 
 .bug-priority.p-Unspecified {background-image: url(image_path("icon_p_unknown.svg"));}
@@ -5525,6 +5527,7 @@ table.dispute_tool_current tr:last-of-type td {
   background-repeat: no-repeat;
   width: 20px;
   height: 20px;
+  color: transparent;
 }
 
 .top-case-info .dispute-submission-type {
@@ -7015,3 +7018,11 @@ th.sorting_1, th.sorting_asc, th.sorting_desc {
   margin-left: 15px;
   margin-top: 6px;
 }
+
+.input-truncate {
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  overflow: hidden;
+  width: 160px !important;
+}
+

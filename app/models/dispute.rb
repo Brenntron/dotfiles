@@ -150,9 +150,9 @@ class Dispute < ApplicationRecord
   def each_duplicate(&block)
     if related_dispute && Dispute::DUPLICATE == self.resolution
       #block.call(related_dispute)
-      related_dispute.relating_disputes.where(resolution: Dispute::DUPLICATE).each(&block)
+      related_dispute.relating_disputes.where(resolution: Dispute::DUPLICATE).where.not(id: self.id).each(&block)
     else
-      relating_disputes.where(resolution: Dispute::DUPLICATE).each(&block)
+      relating_disputes.where(resolution: Dispute::DUPLICATE).where.not(id: self.id).each(&block)
     end
   end
 
@@ -459,8 +459,19 @@ class Dispute < ApplicationRecord
             false_negative_claim = true
           end
 
-          wbrs_hits = entry[:wbrs]["WBRS_Rule_Hits"].split(",").map {|hit| hit.strip }
-          sbrs_hits = entry[:sbrs]["SBRS_Rule_Hits"].split(",").map {|hit| hit.strip }
+          if entry && entry[:wbrs] && entry[:wbrs]["WBRS_Rule_Hits"]
+            wbrs_hits = entry[:wbrs]["WBRS_Rule_Hits"].split(",").map {|hit| hit.strip }
+          else
+            Rails.logger.error('No data for WBRS Rule Hits')
+            wbrs_hits = []
+          end
+
+          if entry && entry[:sbrs] && entry[:sbrs]["SBRS_Rule_Hits"]
+            sbrs_hits = entry[:sbrs]["SBRS_Rule_Hits"].split(",").map {|hit| hit.strip }
+          else
+            Rails.logger.error('No data for SBRS Rule Hits')
+            sbrs_hits = []
+          end
 
           total_hits = (wbrs_hits + sbrs_hits).uniq
 
@@ -1092,6 +1103,7 @@ class Dispute < ApplicationRecord
 
       dispute_packet[:case_opened_at] = dispute.case_opened_at&.strftime('%Y-%m-%d %H:%M:%S')
       dispute_packet[:case_age] = dispute.dispute_age
+      dispute_packet[:age_int] = (Time.now - dispute.created_at).to_i
       # dispute_packet[:suggested_disposition] = 'Malicious: Phishing'
       dispute_packet[:suggested_disposition] = dispute.suggested_d
       dispute_packet[:source] = dispute.ticket_source.nil? ? "Bugzilla" : dispute.ticket_source

@@ -456,7 +456,7 @@ class DisputeEntry < ApplicationRecord
   # If the research page is served from the DisputesController, this method is here.
   # If the controller action is moved to another controller, move this method to another class.
   def self.research_results(research_params)
-    if research_params.present?
+    if research_params.present? && research_params['uri'].strip != ''
       url = research_params['uri'].gsub(/\r\n?/, "\n").strip # Remove all white spaces and newlines
       domain_of_url = Dispute.parse_url(url)[:domain]
       entries = entries_of_url(url)
