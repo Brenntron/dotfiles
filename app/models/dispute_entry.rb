@@ -80,30 +80,34 @@ class DisputeEntry < ApplicationRecord
   end
 
   def parse_url(url = self.hostlookup)
-    domainatrix = Domainatrix.parse(url)
+    uri = URI.parse(url)
+    domain = PublicSuffix.parse(uri.host)
+    subdomain = uri.host.gsub(Regexp.new("\\.?#{domain.domain}$"), '')
 
-    uri_parts = {}
-
-    uri_parts[:subdomain] = domainatrix.subdomain
-    uri_parts[:domain] = ([domainatrix.domain] + [domainatrix.public_suffix]).join('.')
-    uri_parts[:path] = domainatrix.path
-
-    uri_parts
+    {
+        subdomain: subdomain,
+        domain: domain.domain,
+        path: uri.path
+    }
   end
 
   def self.domain_of(url)
-    domainatrix = Domainatrix.parse(url)
-    "#{domainatrix.domain}.#{domainatrix.public_suffix}"
+    uri = URI.parse(url)
+    domain = PublicSuffix.parse(uri.host)
+    domain.domain
   end
 
   def assign_url_parts(url = self.hostlookup)
-    domainatrix = Domainatrix.parse(url)
+    uri = URI.parse(url)
+    domain = PublicSuffix.parse(uri.host)
 
-    self.subdomain = domainatrix.subdomain
-    self.domain = domainatrix.domain
-    self.path = domainatrix.path
-    self.hostname = "#{self.subdomain}.#{self.domain}"
-    self.top_level_domain = domainatrix.public_suffix
+    self.subdomain                      = uri.host.gsub(Regexp.new("\\.?#{domain.domain}$"), '')
+    self.domain                         = domain.domain
+    self.path                           = uri.path
+    self.hostname                       = uri.host
+    self.top_level_domain               = domain.tld
+
+    self
   end
 
   def ti_status
