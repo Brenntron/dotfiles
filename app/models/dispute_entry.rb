@@ -79,6 +79,33 @@ class DisputeEntry < ApplicationRecord
     end
   end
 
+  def parse_url(url = self.hostlookup)
+    domainatrix = Domainatrix.parse(url)
+
+    uri_parts = {}
+
+    uri_parts[:subdomain] = domainatrix.subdomain
+    uri_parts[:domain] = ([domainatrix.domain] + [domainatrix.public_suffix]).join('.')
+    uri_parts[:path] = domainatrix.path
+
+    uri_parts
+  end
+
+  def self.domain_of(url)
+    domainatrix = Domainatrix.parse(url)
+    "#{domainatrix.domain}.#{domainatrix.public_suffix}"
+  end
+
+  def assign_url_parts(url = self.hostlookup)
+    domainatrix = Domainatrix.parse(url)
+
+    self.subdomain = domainatrix.subdomain
+    self.domain = domainatrix.domain
+    self.path = domainatrix.path
+    self.hostname = "#{self.subdomain}.#{self.domain}"
+    self.top_level_domain = domainatrix.public_suffix
+  end
+
   def ti_status
     RESOLVED == status ? Dispute::TI_RESOLVED : Dispute::TI_NEW
   end
@@ -458,7 +485,7 @@ class DisputeEntry < ApplicationRecord
   def self.research_results(research_params)
     if research_params.present? && research_params['uri'].strip != ''
       url = research_params['uri'].gsub(/\r\n?/, "\n").strip # Remove all white spaces and newlines
-      domain_of_url = Dispute.parse_url(url)[:domain]
+      domain_of_url = DisputeEntry.domain_of(url)
       entries = entries_of_url(url)
 
       # BEGIN LOGIC TO CONSOLIDATE WLBL INFO TO UNIQUE URIS
@@ -481,7 +508,7 @@ class DisputeEntry < ApplicationRecord
       final_entries = []
       rejected_entries = []
       unique_entries.each do |r_entry|
-        entry_domain = Dispute.parse_url(r_entry.hostlookup)[:domain]
+        entry_domain = DisputeEntry.domain_of(r_entry.hostlookup)
         if entry_domain.include?(domain_of_url)
           final_entries << r_entry
         else
