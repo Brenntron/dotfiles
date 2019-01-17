@@ -268,9 +268,9 @@ window.updatePending = (id,row_id) ->
           persist: false,
           create: false,
           maxItems: 5,
-          valueField: 'value',
-          labelField: 'value',
-          searchField: ['text'],
+          valueField: 'category_id',
+          labelField: 'category_name',
+          searchField: ['category_name', 'category_code'],
           options: AC.WebCat.createSelectOptions(),
           items: selected_options(temp_row.data().category)
         }
@@ -313,9 +313,9 @@ window.updateEntryColumns = (entry_id,row_id) ->
             persist: false,
             create: false,
             maxItems: 5
-            valueField: 'value'
-            labelField: 'value'
-            searchField: 'text'
+            valueField: 'category_id',
+            labelField: 'category_name',
+            searchField: ['category_name', 'category_code'],
             options: AC.WebCat.createSelectOptions()
             items: selected_options(temp_row.data().category)
           }
@@ -323,9 +323,9 @@ window.updateEntryColumns = (entry_id,row_id) ->
             persist: false,
             create: false,
             maxItems: 5
-            valueField: 'value'
-            labelField: 'value'
-            searchField: 'text'
+            valueField: 'category_id',
+            labelField: 'category_name',
+            searchField: ['category_name', 'category_code'],
             options: AC.WebCat.createSelectOptions()
             items: selected_options(temp_row.data().category)
           }
@@ -1005,9 +1005,9 @@ window.click_table_buttons = (complaint_table, button)->
       persist: false,
       create: false,
       maxItems: 5,
-      valueField: 'value',
-      labelField: 'value',
-      searchField: ['text'],
+      valueField: 'category_id',
+      labelField: 'category_name',
+      searchField: ['category_name', 'category_code'],
       options: AC.WebCat.createSelectOptions()
       items: selected_options(row.data().category)
     }
