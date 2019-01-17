@@ -177,6 +177,20 @@ Feature: Webcat complaints
     Then I should see "MUST INCLUDE AT LEAST ONE CATEGORY."
 
   @javascript
+  Scenario: a user attempts to submit changes with resolution set to 'Unchanged'
+    Given a user with role "webcat user" exists and is logged in
+    And a complaint entry with trait "new_entry" exists
+    And a complaint entry preload exists
+    And I goto "/escalations/webcat/complaints?f=ALL"
+    And I wait for "5" seconds
+    And I click ".expand-all"
+    And I wait for "5" seconds
+    And I click "#unchanged1"
+    And I click "#submit_changes_1"
+    And I wait for "5" seconds
+    Then I should see "COMPLETED"
+
+  @javascript
   Scenario: a user clicks the domain button
     Given a user with role "webcat user" exists and is logged in
     And a complaint entry with trait "new_entry" exists
