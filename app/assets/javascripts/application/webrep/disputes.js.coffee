@@ -1398,11 +1398,13 @@ $ ->
       tr.addClass 'shown'
       td = $(tr).next('tr').find('td:first')
       $(td).addClass 'dispute-entry-table-wrapper'
-      third_col = $('.dispute-entry-table tbody td.entry-col-res')[3]
-      $(third_col).each ->
-        if $(this).resolution_comment = ''
-          $(this).removeClass('esc-tooltipped')
-          console.log('no tooltip')
+#      check if nested table has a resolution comment and remove tooltip if there is no comment
+      resolution_column = $('td.entry-col-res')
+      i = 0
+      while i < resolution_column.length
+        if resolution_column[i].title == '' or null
+          resolution_column[i].classList.remove('esc-tooltipped')
+        i++
       # Check to see which columns should be displayed
       $('.toggle-vis-nested').each ->
         checkbox_trigger = $(this).attr('data-column')
