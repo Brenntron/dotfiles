@@ -30,8 +30,8 @@ window.updateURI = (complaint_entry_id) ->
 
         $("#domain_#{complaint_entry_id}").text(response.domain)
         $("#subdomain_#{complaint_entry_id}").text(response.subdomain)
-        $("#entry-uri-#{complaint_entry_id}").html("<a href='http://#{uri}'>#{uri}</a>")
-        $("#site-search-#{complaint_entry_id}").html("<a href='https://www.google.com/search?q=site%3A#{uri}'>#{uri}</a>")
+        $("#entry-uri-#{complaint_entry_id}").html("<a href='http://#{uri}' target='_blank'>#{uri}</a>")
+        $("#site-search-#{complaint_entry_id}").html("<a href='https://www.google.com/search?q=site%3A#{uri}' target='_blank'>#{uri}</a>")
 
 
         $("#history-#{complaint_entry_id}").replaceWith('<button class="secondary" id="history-' + complaint_entry_id + '" onclick="history_dialog('+complaint_entry_id+')">History</button>')
