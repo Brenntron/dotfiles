@@ -19,7 +19,6 @@ gem 'devise', '~> 4.5'
 gem 'net-ldap', '0.16.1'
 
 gem 'mysql2', '0.5.2'
-gem 'with_advisory_lock', '~> 4.0'
 gem 'rmagick', '~> 2.16.0'
 gem 'ruby-bugzilla', '~> 0.6.4'
 
@@ -33,17 +32,24 @@ gem 'httpi', '2.4.4'
 gem 'curb', '0.9.6' #Libcurl bindings for Ruby
 
 gem 'net-ssh', '5.0.2'
-gem 'daemons', '1.2.6'
 gem 'stomp', '1.4.6'
+
+# System Management
+gem 'foreman', '0.85.0'
+gem 'daemons', '1.2.6'
 gem 'dalli', '2.7.9'
+gem 'dotenv-rails', '2.5.0'
+gem 'with_advisory_lock', '~> 4.0'
+gem 'delayed_job', '4.1.5'
+gem 'delayed_job_active_record', '4.1.3'
+
+# Micellaneous
 gem 'pry', '0.12.2'
 gem 'pry-remote', '~> 0.1.8'
 
-gem 'foreman', '0.85.0'
 
 gem 'simple_form', '4.0.1'
 gem 'jbuilder', '2.8.0'
-gem 'dotenv-rails', '2.5.0'
 gem 'diffy', '3.2.1'
 
 gem 'selectize-rails', '~> 0.12.4'
@@ -59,8 +65,6 @@ gem 'whois-parser', '1.1.0'
 
 gem 'will_paginate', '3.1.6'
 
-gem 'delayed_job', '4.1.5'
-gem 'delayed_job_active_record', '4.1.3'
 gem 'jquery-datatables-rails', '~> 3.4.0'
 gem 'ajax-datatables-rails', '~> 0.4.0'
 gem 'clipboard-rails', '1.7.1'
@@ -74,7 +78,7 @@ gem 'inline_svg', '1.3.1'
 gem 'gzip', '1.0'
 gem 'rubyXL', '3.3.30'
 
-gem 'domainatrix', '0.0.11'
+gem 'public_suffix', '~> 3.0'
 
 group :development do
   gem 'thin', '1.7.2'
