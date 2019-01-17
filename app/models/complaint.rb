@@ -78,15 +78,15 @@ class Complaint < ApplicationRecord
   end
 
   def self.parse_url(url)
-    url = Domainatrix.parse(url)
+    uri = URI.parse(URI.parse(url).scheme.nil? ? "http://#{url}" : url)
+    domain = PublicSuffix.parse(uri.host)
+    subdomain = uri.host.gsub(Regexp.new("\\.?#{domain.domain}$"), '')
 
-    uri_parts = {}
-
-    uri_parts[:subdomain] = url.subdomain
-    uri_parts[:domain] = ([url.domain] + [url.public_suffix]).join('.')
-    uri_parts[:path] = url.path
-
-    uri_parts
+    {
+        subdomain: subdomain,
+        domain: domain.domain,
+        path: uri.path
+    }
   end
 
   def self.is_possible_company_duplicate(complaint, entry, entry_type)
