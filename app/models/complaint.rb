@@ -78,7 +78,7 @@ class Complaint < ApplicationRecord
   end
 
   def self.parse_url(url)
-    uri = URI.parse(url)
+    uri = URI.parse(URI.parse(url).scheme.nil? ? "http://#{url}" : url)
     domain = PublicSuffix.parse(uri.host)
     subdomain = uri.host.gsub(Regexp.new("\\.?#{domain.domain}$"), '')
 
