@@ -233,13 +233,14 @@ class DisputeEntry < ApplicationRecord
     # TODO: This is a little ugly, being as the same logic exists inside `base.rb` of the Preload model.
     # If time ever permits, refactor it.
     @umbrella = AutoResolve.new.call_umbrella(address: hostlookup)
+
     pretty_umbrella_status = "Unclassified" # Default or "0"
     if @umbrella.present?
       case
         # Per docs here: https://dashboard.umbrella.com/o/1755319/#overview
-      when @umbrella[:status] == "-1"
+      when @umbrella[hostlookup]["status"] == -1
         pretty_umbrella_status = "Malicious"
-      when @umbrella[:status] == "1"
+      when @umbrella[hostlookup]["status"] == 1
         pretty_umbrella_status = "Benign"
       end
     end
@@ -495,7 +496,7 @@ class DisputeEntry < ApplicationRecord
 
       if research_params['scope'] == "strict"
         unless entries.find{|entry| url == entry.uri}
-          return entries << DisputeEntry.new(uri: url)
+          entries << DisputeEntry.new(uri: url)
         end
       end
 
