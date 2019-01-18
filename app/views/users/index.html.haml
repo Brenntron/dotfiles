@@ -26,7 +26,7 @@
       - if current_user.has_role?('manager')
         - team_total = current_user.descendants.length + 1
         %tr
-          %td.user-group{rowspan: "#{team_total}"} Team
+          %td#team-cell.user-group{rowspan: "#{team_total}", 'data-rowspan': "#{team_total}"} Team
           %td.alt-col.user-col-divider.user-displayname-col= current_user.display_name
           %td.alt-col.user-col-divider.user-name-col.current-user= link_to current_user.cvs_username, user_path(current_user)
           %td.alt-col.user-col-divider=current_user.children.length
