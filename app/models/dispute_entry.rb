@@ -79,6 +79,37 @@ class DisputeEntry < ApplicationRecord
     end
   end
 
+  def parse_url(url = self.hostlookup)
+    uri = URI.parse(URI.parse(url).scheme.nil? ? "http://#{url}" : url)
+    domain = PublicSuffix.parse(uri.host)
+    subdomain = uri.host.gsub(Regexp.new("\\.?#{domain.domain}$"), '')
+
+    {
+        subdomain: subdomain,
+        domain: domain.domain,
+        path: uri.path
+    }
+  end
+
+  def self.domain_of(url)
+    uri = URI.parse(URI.parse(url).scheme.nil? ? "http://#{url}" : url)
+    domain = PublicSuffix.parse(uri.host)
+    domain.domain
+  end
+
+  def assign_url_parts(url = self.hostlookup)
+    uri = URI.parse(URI.parse(url).scheme.nil? ? "http://#{url}" : url)
+    domain = PublicSuffix.parse(uri.host)
+
+    self.subdomain                      = uri.host.gsub(Regexp.new("\\.?#{domain.domain}$"), '')
+    self.domain                         = domain.domain
+    self.path                           = uri.path
+    self.hostname                       = uri.host
+    self.top_level_domain               = domain.tld
+
+    self
+  end
+
   def ti_status
     RESOLVED == status ? Dispute::TI_RESOLVED : Dispute::TI_NEW
   end
@@ -233,14 +264,18 @@ class DisputeEntry < ApplicationRecord
     # TODO: This is a little ugly, being as the same logic exists inside `base.rb` of the Preload model.
     # If time ever permits, refactor it.
     @umbrella = AutoResolve.new.call_umbrella(address: hostlookup)
+
     pretty_umbrella_status = "Unclassified" # Default or "0"
-    case
-      # Per docs here: https://dashboard.umbrella.com/o/1755319/#overview
-    when @umbrella[:status] == "-1"
-      pretty_umbrella_status = "Malicious"
-    when @umbrella[:status] == "1"
-      pretty_umbrella_status = "Benign"
+    if @umbrella.present?
+      case
+        # Per docs here: https://dashboard.umbrella.com/o/1755319/#overview
+      when @umbrella[hostlookup]["status"] == -1
+        pretty_umbrella_status = "Malicious"
+      when @umbrella[hostlookup]["status"] == 1
+        pretty_umbrella_status = "Benign"
+      end
     end
+
     pretty_umbrella_status
   end
 
@@ -453,9 +488,9 @@ class DisputeEntry < ApplicationRecord
   # If the research page is served from the DisputesController, this method is here.
   # If the controller action is moved to another controller, move this method to another class.
   def self.research_results(research_params)
-    if research_params.present?
+    if research_params.present? && research_params['uri'].strip != ''
       url = research_params['uri'].gsub(/\r\n?/, "\n").strip # Remove all white spaces and newlines
-      domain_of_url = Dispute.parse_url(url)[:domain]
+      domain_of_url = DisputeEntry.domain_of(url)
       entries = entries_of_url(url)
 
       # BEGIN LOGIC TO CONSOLIDATE WLBL INFO TO UNIQUE URIS
@@ -478,7 +513,7 @@ class DisputeEntry < ApplicationRecord
       final_entries = []
       rejected_entries = []
       unique_entries.each do |r_entry|
-        entry_domain = Dispute.parse_url(r_entry.hostlookup)[:domain]
+        entry_domain = DisputeEntry.domain_of(r_entry.hostlookup)
         if entry_domain.include?(domain_of_url)
           final_entries << r_entry
         else
@@ -492,7 +527,7 @@ class DisputeEntry < ApplicationRecord
 
       if research_params['scope'] == "strict"
         unless entries.find{|entry| url == entry.uri}
-          return entries << DisputeEntry.new(uri: url)
+          entries << DisputeEntry.new(uri: url)
         end
       end
 

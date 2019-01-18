@@ -1,15 +1,19 @@
 window.display_tooltip = (id)->
   $('#cat_tooltip_' + id).tooltip('toggle')
 
+window.td_truncate = (str, max, long) ->
+  long = long or '...'
+  if typeof str == 'string' and str.length > max then str.substring(0, max) + long else str
+
 $ ->
 
   $('.cat_new_url').selectize {
     persist: false,
     create: false,
     maxItems: 5,
-    valueField: 'value',
-    labelField: 'value',
-    searchField: ['text'],
+    valueField: 'category_id',
+    labelField: 'category_name',
+    searchField: ['category_name', 'category_code'],
     options: AC.WebCat.createSelectOptions()
   }
 
@@ -32,7 +36,10 @@ $ ->
           $node.addClass 'highlight-plus5Hours'
         else
         return
-
+      order: [ [
+        3
+        'desc'
+      ] ]
       dom: '<"datatable-top-tools no-margin-datatable-top-tool"lf>t<ip>'
       language: {
         search: "_INPUT_"
@@ -76,6 +83,9 @@ $ ->
         }
         {
           data: null
+          orderable: false
+          searchable: false
+          sortable: false
           defaultContent: '<span></span>'
           width: '24px'
         }
@@ -139,6 +149,11 @@ $ ->
         }
         {
           data: 'path'
+          'render': (data, type, full, meta) ->
+            full_data = data
+            if type == 'display'
+              full_data = td_truncate(data, 20)
+            return '<span class="esc-tooltipped td-truncate" title="' + data + '">' + full_data + '</span>'
         }
         {
           'render': (data, type, full, meta) ->
@@ -172,7 +187,6 @@ $ ->
         }
         {
           data: 'assigned_to'
-          className: 'alt-col'
         }
         {
           data: 'age_int'

@@ -636,6 +636,7 @@ button {
 #edit-button, .edit-button      {background-image: url(image_path('icon_edit.svg'));}
 .related-button   {background-image: url(image_path('icon_related.svg'));}
 .delete-button    {background-image: url(image_path('icon_delete.svg'));}
+.rmt-delete-button    {background-image: url(image_path('icon_delete.svg'));}
 .list-button      {background-image: url(image_path('icon_list.svg'));}
 .view-button      {background-image: url(image_path('icon_view.svg'));}
 .splitview-button {background-image: url(image_path('icon_splitview.svg'));}
@@ -2169,6 +2170,7 @@ table .bug-priority {
   width: 22px;
   height: 22px;
   margin-right: 0;
+  color: transparent;
 }
 
 .bug-priority.p-Unspecified {background-image: url(image_path("icon_p_unknown.svg"));}
@@ -2188,6 +2190,7 @@ table .bug-priority {
 
 .complaint-submitter-type {
   background-repeat: no-repeat;
+  background-color: transparent;
   width: 20px;
   height: 20px;
   border: none;
@@ -3398,6 +3401,7 @@ fieldset.top-content {
 .duplicate-status-notice {
   color: $warning-accent-color;
   font-weight: 700;
+  display: inline-block;
 }
 
 .email-header-information {
@@ -4674,6 +4678,7 @@ table > tbody > tr > td.dispute_rep_tools {
   color: $content-bg-color;
   margin-top: -1px;
   float: right;
+  cursor: pointer;
 }
 
 .dispute_entry_content_first {
@@ -5534,9 +5539,9 @@ table.dispute_tool_current tr:last-of-type td {
   /* These below can be deleted after redesign merge, or after the existing style sheet is ported. They exist in the admin redesign stylesheet. */
 .dispute-submission-type {
   background-repeat: no-repeat;
-  width: 16px;
-  height: 16px;
-  display: block;
+  width: 20px;
+  height: 20px;
+  color: transparent;
 }
 
 .top-case-info .dispute-submission-type {
@@ -5877,11 +5882,11 @@ td.ticket-total::before {
 }
 
 table.dataTable tbody tr.selected {
-  background-color: $faint-accent-color;
+  background-color: #fff7cd63;
 }
 
 table.dataTable tbody tr.selected .alt-col{
-  background-color: #dae7ea;
+  background-color: #f5f2e5;
 }
 
 table.dispute-entry-table tbody tr.selected {
@@ -7513,7 +7518,7 @@ td.text-center span {
 .copycat-tool-footer {
   display: flex;
   justify-content: space-evenly;
-  padding: 0 25px;
+  padding: 0 25px 15px 25px;
 
   .copycat-paste-btn {
     background-color: $primary-section-color;
@@ -7664,14 +7669,20 @@ td.text-center span {
   font-weight: 500;
 }
 
-.sorting_1, .sorting_asc, .sorting_desc {
-  background-color: $faint-accent-color !important;
-  opacity: 80%;
-  background-position-x: 95% !important;
-}
 .sorting {
   background-position-x: 95% !important;
 }
+
+.sorting_1, .sorting_asc, .sorting_desc {
+  background-position-x: 95% !important;
+  background-color: #d7dadb2b;
+}
+
+th.sorting_1, th.sorting_asc, th.sorting_desc {
+  color: $bug-section-color;
+  background-color: #d7dadb2b;
+}
+
 #time-submitted {
   width: 150px;
 }
@@ -7763,3 +7774,11 @@ td.text-center span {
   margin-left: -9px;
   z-index: 1010;
 }
+
+.input-truncate {
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  overflow: hidden;
+  width: 160px !important;
+}
+
