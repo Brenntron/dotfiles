@@ -68,8 +68,8 @@ class Wbrs::Category < Wbrs::Base
     categories = Wbrs::Category.all
     category_ids = []
     categories.each do |cat|
-      if category_array.include?(cat.descr)
-        category_ids << cat.id
+      if category_array.include?(cat.category_id.to_s)
+        category_ids << cat.category_id
       end
     end
     category_ids
