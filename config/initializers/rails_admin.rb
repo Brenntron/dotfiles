@@ -10,7 +10,11 @@ RailsAdmin.config do |config|
   # config.current_user_method(&:current_user)
 
   ## == Cancan ==
-  # config.authorize_with :cancancan
+  # config.authorize_with :cancan
+
+  config.authorize_with do
+    authorize! :read, Admin
+  end
 
   ## == Pundit ==
   # config.authorize_with :pundit
