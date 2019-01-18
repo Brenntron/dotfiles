@@ -4,7 +4,7 @@ class UsersController < ApplicationController
   before_action :require_login
 
   def index
-    @users = current_user.children
+    @users = current_user.children.order(:display_name)
 
   end
 
@@ -23,7 +23,7 @@ class UsersController < ApplicationController
         flash[:error] = 'You are not authorized to view that user.'
         redirect_to escalations_users_path
       else
-        @users = current_user.children
+        @users = current_user.children.order(:display_name)
     end
   end
 

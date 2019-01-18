@@ -13,11 +13,6 @@
       -#Add link to view all users
       %span.nav-toolbar-icon-large.icon-queue
 
-  -#- if current_user.has_role?('manager')
-    -#  = link_to user_relationship_path(current_user) do
-    -#    Manage Team
-    -# Add this after relationship piece is completed
-
   .nav-tool-blocks.search-wrapper.col-xs-6.col-lg-8
     .input-group.search-group
       = form_for :user, url: results_users_path, method: :get do |form|

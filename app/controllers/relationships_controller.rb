@@ -6,7 +6,7 @@ class RelationshipsController < ApplicationController
 
   def index
     @user = current_user
-    @users = @user.available_users
+    @users = @user.available_users.order(:display_name)
   end
 
   def show
