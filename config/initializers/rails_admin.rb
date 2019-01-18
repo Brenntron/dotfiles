@@ -1,4 +1,16 @@
 RailsAdmin.config do |config|
+  begin
+    build_name = (File.read './public/version.html')
+    if /(?<build_num>[0-9\.]+)/ =~ build_name
+      build_ary = build_num.split('.')
+      version = build_ary[0..2].join('.') #handles 1, 2, 3, and more elements
+    else
+      version = nil
+    end
+  rescue
+    version = nil
+  end
+
   config.parent_controller = 'ApplicationController'
 
   ### Popular gems integration
@@ -27,6 +39,8 @@ RailsAdmin.config do |config|
   ## == Gravatar integration ==
   ## To disable Gravatar integration in Navigation Bar set to false
   config.show_gravatar = false
+
+  config.main_app_name = ["Analyst Console Escalations", "#{version}"]
 
 
   config.included_models = ["Company", "Complaint", "ComplaintEntry", "Customer", "Dispute", "DisputeComment", "DisputeEntry", "EmailTemplate", "DisputeEmailAttachment", "DisputeRule", "DisputeRuleHit", "ResolutionMessageTemplate", "User", "UserApiKey", "UserPreference" ]
