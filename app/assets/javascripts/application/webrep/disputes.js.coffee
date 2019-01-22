@@ -424,6 +424,7 @@ window.save_dispute = () ->
     'customer_name': $('#dispute-customer-name-input').val()
     'customer_email': $('#dispute-customer-email-input').val()
     'status': $('#status').val()
+    'submission_type': $('#dispute-submission-type-select').val().toLowerCase()
   }
 
   std_msg_ajax(
@@ -1610,6 +1611,9 @@ $ ->
       $('#web-rep-search').show()
 
   $('#edit-dispute-button').click ->
+    $('.dispute-submission-type').hide()
+    $('#dispute-submission-type-select').show()
+
     $('#dispute-priority-icon').hide()
     $('#dispute-priority-select').show()
 
@@ -1637,6 +1641,8 @@ $ ->
     $('#dispute-priority-icon').show()
     $('#dispute-priority-select').hide()
     $('.dispute-edit-field').show()
+    $('#dispute-submission-type-select').hide()
+    $('.dispute-submission-type').show()
 
     $('#save-dispute-button').addClass('hidden')
     $('#cancel-dispute-button').addClass('hidden')

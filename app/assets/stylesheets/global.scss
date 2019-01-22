@@ -5999,6 +5999,13 @@ table.dispute-entry-table tbody tr.selected {
   margin-bottom: 4px;
 }
 
+#dispute-submission-type-select {
+  display: none;
+  width: 45px;
+  margin-top: 5px;
+  position: absolute;
+}
+
 .dispute-edit-input {
   display: none;
   color: $type-base-color;
