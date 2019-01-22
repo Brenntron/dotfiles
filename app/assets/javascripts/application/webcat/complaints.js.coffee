@@ -807,9 +807,9 @@ format = (complaint_entry_row) ->
       '<label class="content-label-sm">Case ID</label>' +
       '<span class="nested-complaint-data case-id"><a href="complaints/' + complaint_entry.complaint_id + '">' + complaint_entry.complaint_id + '</a></span>' +
       '<label class="content-label-sm">Entry URI</label>' +
-      '<span class="nested-complaint-data" id="entry-uri-' + complaint_entry.entry_id + '">' + uri + '</span>' +
+      '<span class="nested-complaint-data input-truncate esc-tooltipped" id="entry-uri-' + complaint_entry.entry_id + '" title="' + url + '">' + uri + '</span>' +
       '<label class="content-label-sm" id="site-search">Site Search</label>' +
-      '<span class="nested-complaint-data" id="site-search-' + complaint_entry.entry_id + '">' + search_uri + '</span>' +
+      '<span class="nested-complaint-data input-truncate esc-tooltipped" id="site-search-' + complaint_entry.entry_id + '" title="' + url + '">' + search_uri + '</span>' +
       '<label class="content-label-sm">Customer Description</label>' +
       '<span class="nested-complaint-data">' + customer_description + '</span>' +
       '</div></div><div class="col-xs-5 col-with-divider">' +

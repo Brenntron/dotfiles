@@ -142,7 +142,7 @@ $ ->
             domain = full.domain
             ip_address = full.ip_address
             if domain
-              '<p id="domain_' + full.entry_id + '">' + domain + '</p>'
+              '<p class="input-truncate esc-tooltipped" id="domain_' + full.entry_id + '" title="' + domain + '">' + domain + '</p>'
             else
               '<a href="http://' + ip_address + '" target="blank">' + ip_address + '</a>'
 
