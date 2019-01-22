@@ -299,6 +299,7 @@ window.updateEntryColumns = (entry_id,row_id) ->
       headers: headers
       data: {'id': entry_id,'prefix': prefix,'categories':categories,'status':status,'comment':comment, 'resolution_comment': resolution_comment }
       success: (response) ->
+#        submit then refresh
         window.location.reload()
         json = $.parseJSON(response)
         if !json.error
