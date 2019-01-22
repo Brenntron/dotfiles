@@ -647,6 +647,12 @@ format = (complaint_entry_row) ->
   else
     confidence = missing_data
 
+  customer_name = ''
+  if complaint_entry.customer_name
+    customer_name = complaint_entry.customer_name
+  else
+    customer_name = missing_data
+
   customer_description = ''
   if complaint_entry.description
     customer_description = complaint_entry.description
@@ -810,6 +816,8 @@ format = (complaint_entry_row) ->
       '<span class="nested-complaint-data" id="entry-uri-' + complaint_entry.entry_id + '">' + uri + '</span>' +
       '<label class="content-label-sm" id="site-search">Site Search</label>' +
       '<span class="nested-complaint-data" id="site-search-' + complaint_entry.entry_id + '">' + search_uri + '</span>' +
+      '<label class="content-label-sm">Customer Name</label>' +
+      '<span class="nested-complaint-data">' + customer_name + '</span>' +
       '<label class="content-label-sm">Customer Description</label>' +
       '<span class="nested-complaint-data">' + customer_description + '</span>' +
       '</div></div><div class="col-xs-5 col-with-divider">' +
