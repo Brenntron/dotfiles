@@ -31,6 +31,10 @@ class UsersController < ApplicationController
     @users = User.search(params.require(:user).require(:search).permit(:name)).order(:display_name)
   end
 
+  def all
+    @users = User.all.order(:display_name)
+  end
+
   def update
     @user = User.find(params[:id])
     @user.update(user_params)

@@ -81,6 +81,10 @@ Rails.application.routes.draw do
     resources :users, controller: '/users', only: [:index, :show, :update] do
 
       collection do
+        get :all
+      end
+
+      collection do
         get :results
       end
 
