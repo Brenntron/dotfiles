@@ -183,7 +183,7 @@
           %span.nav-dropdown-content-icon.icon-saved-search
           My Saved Searches
         %table{class: 'table', id: 'saved-search'}
-          %tbody
+          %tbody#saved-search-tbody
             - if current_user.named_searches.any?
               - current_user.named_searches.each do |named_search|
                 %tr{id: "saved_search_#{named_search.id}"}

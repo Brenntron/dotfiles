@@ -14,3 +14,19 @@ function named_search_tag(search_name, search_id) {
 
     return row_tr;
 }
+
+function complaint_named_search_tag(search_name, search_id) {
+    var search_link, delete_image, delete_link, row_tr;
+
+    search_link =
+        '<a class="saved-search"' +
+        ' onclick="named_webcat_index_table(\'' + search_name + '\');">' + search_name + '</a>'
+    delete_image = '<%= image_tag('icon_cancel_grey.svg') %>'
+    delete_link = '<a class="delete-search"' +
+        ' onclick="delete_disputes_named_search(this, \'' + search_name + '\');"' +
+        ' title="Delete Saved Search">' +
+        delete_image + '</a>'
+    row_tr = '<tr id="saved_search_' + search_id + '"><td>' + search_link + delete_link + '</td></tr>'
+
+    return row_tr;
+}
