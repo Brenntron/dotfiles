@@ -1369,18 +1369,15 @@ $ ->
       else sbrs_score = missing_data
       entry_row = '<tr class="index-entry-row">' + '<td><input type="checkbox" onclick="toggleRow(this)" class="dispute-entry-checkbox dispute-entry-checkbox_' + dispute.id + '" id= ' + dispute_entry_id + ' ></td>' + '<td class="entry-col-content ' + important + '">' + entry_content + '</td>' +
         '<td class="entry-col-status">' + status + '</td>' +
-        if resolution_comment != '' or null
-          '<td class="entry-col-res esc-tooltipped" title="' + resolution_comment + '">' + resolution + '</td>'
-        else
-          '<td class="entry-col-res">' + resolution_comment + '</td>' +
-          '<td class="entry-col-disp">' + suggested_disposition + '</td>' +
-          '<td class="entry-col-cat">' + category + '</td>' +
-          '<td class="entry-col-wbrs-score">' + wbrs_score + '</td>' +
-          '<td class="entry-col-wbrs-hits">' +  this.wbrs_rule_hits.length + '</td>' +
-          '<td class="entry-col-wbrs-rules">' + this.wbrs_rule_hits.join(', ') + '</td>' +
-          '<td class="entry-col-sbrs-score">' + sbrs_score + '</td>' +
-          '<td class="entry-col-sbrs-hits">' + this.sbrs_rule_hits.length + '</td>' +
-          '<td class="entry-col-sbrs-rules">' + this.sbrs_rule_hits.join(', ') + '</td>'
+        '<td class="entry-col-res" title="' + resolution_comment + '">' + resolution + '</td>' +
+        '<td class="entry-col-disp">' + suggested_disposition + '</td>' +
+        '<td class="entry-col-cat">' + category + '</td>' +
+        '<td class="entry-col-wbrs-score">' + wbrs_score + '</td>' +
+        '<td class="entry-col-wbrs-hits">' +  this.wbrs_rule_hits.length + '</td>' +
+        '<td class="entry-col-wbrs-rules">' + this.wbrs_rule_hits.join(', ') + '</td>' +
+        '<td class="entry-col-sbrs-score">' + sbrs_score + '</td>' +
+        '<td class="entry-col-sbrs-hits">' + this.sbrs_rule_hits.length + '</td>' +
+        '<td class="entry-col-sbrs-rules">' + this.sbrs_rule_hits.join(', ') + '</td>'
       entry_rows.push entry_row
       return
     # `d` is the original data object for the row
@@ -1401,6 +1398,13 @@ $ ->
       tr.addClass 'shown'
       td = $(tr).next('tr').find('td:first')
       $(td).addClass 'dispute-entry-table-wrapper'
+
+      resolution_column = $('td.entry-col-res')
+      i = 0
+      while i < resolution_column.length
+        if resolution_column[i].title != '' or null
+          resolution_column[i].classList.add('esc-tooltipped')
+        i++
       # Check to see which columns should be displayed
       $('.toggle-vis-nested').each ->
         checkbox_trigger = $(this).attr('data-column')
