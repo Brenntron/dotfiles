@@ -46,9 +46,8 @@ module API
 
               search_type = ComplaintEntry.get_search_type(permitted_params)
               search_name = permitted_params[:search_name] ? permitted_params[:search_name] : nil
-
-
-              complaint_entries = ComplaintEntry.robust_search(search_type,
+              #complaint_entries = ComplaintEntry.first(5)ComplaintEntry.robust_search(search_type,
+              complaint_entries = ComplaintEntry.includes(:complaint_entry_screenshot, :user, {:complaint => [:complaint_tags, {:customer => :company}]}).robust_search(search_type,
                                                                search_name: search_name,
                                                                params: permitted_params,
                                                                user: current_user)
@@ -121,7 +120,7 @@ module API
                   complaint_entry_packet[:entry_history] = {}
 
                   complaint_entry_packet[:entry_history][:domain_history]
-                  complaint_entry_packet[:entry_history][:complaint_history] = complaint_entry.compose_versions
+                  complaint_entry_packet[:entry_history][:complaint_history] = {}#complaint_entry.compose_versions
 
                   json_packet << complaint_entry_packet
                 end

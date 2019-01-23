@@ -91,7 +91,10 @@ $ ->
       search: "_INPUT_"
       searchPlaceholder: "Search within table"
     }
-    order: []
+    order: [ [
+      2
+      'asc'
+    ] ]
     lengthMenu: [50, 100, 500, 1000]
     columnDefs: [
       {
@@ -205,7 +208,10 @@ window.collapse_selected_clusters = (tableId) ->
 # open selected funtionality
 window.open_selected_clusters = () ->
   selected_rows = $('#clusters-index').DataTable().rows('.selected')
-  open_selected_tabs(selected_rows, true)
+  if selected_rows[0].length == 0
+    std_msg_error('no rows selected', ['Please select at least one row.'])
+  else
+    open_selected_tabs(selected_rows, true)
 
 
 # open all functionality
@@ -243,9 +249,9 @@ window.copycat_dialog = () ->
         persist: false,
         create: false,
         maxItems: 5,
-        valueField: 'value',
-        labelField: 'value',
-        searchField: ['text'],
+        valueField: 'category_id',
+        labelField: 'category_name',
+        searchField: ['category_name', 'category_code'],
         options: AC.WebCat.createSelectOptions()
       }
   });
@@ -296,9 +302,9 @@ window.selectize_category_inputs = () ->
         persist: false,
         create: false,
         maxItems: 5,
-        valueField: 'value',
-        labelField: 'value',
-        searchField: ['text'],
+        valueField: 'category_id',
+        labelField: 'category_name',
+        searchField: ['category_name', 'category_code'],
         options: AC.WebCat.createSelectOptions(),
       }
 
@@ -332,7 +338,7 @@ $ ->
     selectize_category_inputs()
 
   #  Expand cluster rows
-  $('#clusters-index tbody').on 'click', 'td.expandable-row-column', ->
+  $('#clusters-index tbody').on 'click', 'td.expandable-row-column, .entry-count', ->
     tr = $(this).closest('tr')
     row = window.clusters_table.row(tr)
     if row.child.isShown()
@@ -345,7 +351,6 @@ $ ->
       cluster = row.data()
 
       table_head = '<table class="table cluster-path-table">' + '<thead>' + '<tr>' +
-        '<th><input class="cluster_path_select_all" type="checkbox" onclick="select_or_deselect_cluster(' + cluster.cluster_id + ')" id=' + cluster.cluster_id + ' /></th>' +
         '<th class="clusterpath-col-path">Cluster Paths</th>' +
         '<th class="clusterpath-col-path">Customer Name</th>' +
         '<th class="clusterpath-col-volume text-center">APAC Region Volume</th>' +
@@ -390,7 +395,6 @@ $ ->
 
             if entry_count <= 25
               entry_row = '<tr class="index-entry-row">' +
-                '<td class="clusterpath-col-spacer"><input type="checkbox" class="cluster-path-checkbox_' + cluster.cluster_id + '"</td>' + # Spacer for the check box row
                 '<td class="clusterpath-col-path">' + this.url + '</td>' +
                 '<td class="clusterpath-col-path">' + this.customer_name + '</td>' +
                 '<td class="clusterpath-col-volume text-center">' + this.apac_volume + '</td>' +
@@ -453,7 +457,6 @@ window.expandClusterEntryPreview = (cluster, expand_table_row, max_viewable_entr
 
           if entry_count > 25
             entry_row = '<tr class="index-entry-row">' +
-              '<td class="clusterpath-col-spacer"><input type="checkbox" class="cluster-path-checkbox_' + cluster.cluster_id + '"</td>' + # Spacer for the check box row
               '<td class="clusterpath-col-path">' + this.url + '</td>' +
               '<td class="clusterpath-col-path">' + this.customer_name + '</td>' +
               '<td class="clusterpath-col-volume text-center">' + this.apac_volume + '</td>' +
@@ -493,6 +496,7 @@ window.expandClusterEntryPreview = (cluster, expand_table_row, max_viewable_entr
         $(this).remove()
 
 
+
   window.select_or_deselect_cluster = (cluster_id)->
     $('.cluster-path-checkbox_' + cluster_id).prop('checked', $('#' + cluster_id).prop('checked'))
 
@@ -500,4 +504,3 @@ window.expandClusterEntryPreview = (cluster, expand_table_row, max_viewable_entr
     if event.keyCode == 13
       apply_filter_to_table()
     return
-

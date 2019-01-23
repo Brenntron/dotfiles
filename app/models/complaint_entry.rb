@@ -129,7 +129,7 @@ class ComplaintEntry < ApplicationRecord
                    user:current_user)
             complaint.set_status(current_status)
             #this is where we should send off the category to the API
-            if entry_status != "INVALID"
+            if entry_status != "INVALID" && categories_string != ''
               commit_category(ip_or_uri: self.uri_or_ip,
                               categories_string: categories_string,
                               description: comment,
@@ -173,7 +173,7 @@ class ComplaintEntry < ApplicationRecord
                case_resolved_at: Time.now,user:current_user)
         complaint.set_status(current_status)
         #this is where we should send off the category to the API
-        if entry_status != "INVALID"
+        if entry_status != "INVALID" && categories_string != ''
           commit_category(ip_or_uri: self.uri_or_ip,
                           categories_string: categories_string,
                           description: comment,
@@ -187,8 +187,9 @@ class ComplaintEntry < ApplicationRecord
 
   def commit_category(ip_or_uri:, categories_string:, description:, user:)
     # Look for existing prefix
+
     existing_prefix = Wbrs::Prefix.where({urls: [ip_or_uri]})
-    category_ids_array = Wbrs::Category.get_category_ids(categories_string.split(','))
+    category_ids_array = categories_string.split(',').map {|cat| cat.to_i}
 
     if existing_prefix.present?
       prefix_object = Wbrs::Prefix.new
