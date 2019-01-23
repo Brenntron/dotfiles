@@ -150,9 +150,9 @@ class Dispute < ApplicationRecord
   def each_duplicate(&block)
     if related_dispute && Dispute::DUPLICATE == self.resolution
       #block.call(related_dispute)
-      related_dispute.relating_disputes.where(resolution: Dispute::DUPLICATE).each(&block)
+      related_dispute.relating_disputes.where(resolution: Dispute::DUPLICATE).where.not(id: self.id).each(&block)
     else
-      relating_disputes.where(resolution: Dispute::DUPLICATE).each(&block)
+      relating_disputes.where(resolution: Dispute::DUPLICATE).where.not(id: self.id).each(&block)
     end
   end
 
@@ -171,29 +171,6 @@ class Dispute < ApplicationRecord
       result << other_dispute
     end
     result
-  end
-
-  def self.parse_url(url)
-    pre_url = url.gsub("http://", "").gsub("https://", "")
-    url = "http://" + pre_url
-
-    uri_parts = {}
-
-    uri_object = URI(url)
-
-    domain_parts = uri_object.host.split(".")
-    if domain_parts.size > 2
-      uri_parts[:subdomain] = domain_parts.first
-      uri_parts[:domain] = (domain_parts - [domain_parts.first]).join('.')
-      uri_parts[:path] = uri_object.path
-    else
-      uri_parts[:subdomain] = ""
-      uri_parts[:domain] = uri_object.host
-      uri_parts[:path] = uri_object.path
-    end
-
-
-    uri_parts
   end
 
   def self.is_possible_company_duplicate?(dispute, entry, entry_type)
@@ -428,9 +405,8 @@ class Dispute < ApplicationRecord
         new_dispute.submission_type = message_payload["payload"]["submission_type"]  # email, web, both  [e|w|ew]
         new_dispute.status = NEW
 
-        new_dispute.customer_id = customer.id
-
-        new_dispute.submitter_type = new_dispute.customer.company_id == guest.id ? SUBMITTER_TYPE_NONCUSTOMER : SUBMITTER_TYPE_CUSTOMER
+        new_dispute.customer_id = customer&.id
+        new_dispute.submitter_type = (new_dispute.customer.nil? || new_dispute.customer&.company_id == guest.id) ? SUBMITTER_TYPE_NONCUSTOMER : SUBMITTER_TYPE_CUSTOMER
 
         if new_dispute.submitter_type == SUBMITTER_TYPE_CUSTOMER
           new_dispute.priority = "P3"
@@ -460,8 +436,19 @@ class Dispute < ApplicationRecord
             false_negative_claim = true
           end
 
-          wbrs_hits = entry[:wbrs]["WBRS_Rule_Hits"].split(",").map {|hit| hit.strip }
-          sbrs_hits = entry[:sbrs]["SBRS_Rule_Hits"].split(",").map {|hit| hit.strip }
+          if entry && entry[:wbrs] && entry[:wbrs]["WBRS_Rule_Hits"]
+            wbrs_hits = entry[:wbrs]["WBRS_Rule_Hits"].split(",").map {|hit| hit.strip }
+          else
+            Rails.logger.error('No data for WBRS Rule Hits')
+            wbrs_hits = []
+          end
+
+          if entry && entry[:sbrs] && entry[:sbrs]["SBRS_Rule_Hits"]
+            sbrs_hits = entry[:sbrs]["SBRS_Rule_Hits"].split(",").map {|hit| hit.strip }
+          else
+            Rails.logger.error('No data for SBRS Rule Hits')
+            sbrs_hits = []
+          end
 
           total_hits = (wbrs_hits + sbrs_hits).uniq
 
@@ -544,11 +531,7 @@ class Dispute < ApplicationRecord
           new_dispute_entry.suggested_disposition = entry["rep_sugg"]
           new_dispute_entry.is_important = is_important?(key)
 
-          url_parts = Dispute.parse_url(key)
-          new_dispute_entry.subdomain = url_parts[:subdomain]
-          new_dispute_entry.domain = url_parts[:domain]
-          new_dispute_entry.path = url_parts[:path]
-          new_dispute_entry.hostname = "#{url_parts[:subdomain]}.#{url_parts[:domain]}"
+          new_dispute_entry.assign_url_parts(key)
 
           new_dispute_entry.save!
 
@@ -1093,6 +1076,7 @@ class Dispute < ApplicationRecord
 
       dispute_packet[:case_opened_at] = dispute.case_opened_at&.strftime('%Y-%m-%d %H:%M:%S')
       dispute_packet[:case_age] = dispute.dispute_age
+      dispute_packet[:age_int] = (Time.now - dispute.created_at).to_i
       # dispute_packet[:suggested_disposition] = 'Malicious: Phishing'
       dispute_packet[:suggested_disposition] = dispute.suggested_d
       dispute_packet[:source] = dispute.ticket_source.nil? ? "Bugzilla" : dispute.ticket_source

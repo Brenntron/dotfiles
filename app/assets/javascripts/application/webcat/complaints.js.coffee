@@ -30,8 +30,8 @@ window.updateURI = (complaint_entry_id) ->
 
         $("#domain_#{complaint_entry_id}").text(response.domain)
         $("#subdomain_#{complaint_entry_id}").text(response.subdomain)
-        $("#entry-uri-#{complaint_entry_id}").html("<a href='http://#{uri}'>#{uri}</a>")
-        $("#site-search-#{complaint_entry_id}").html("<a href='https://www.google.com/search?q=site%3A#{uri}'>#{uri}</a>")
+        $("#entry-uri-#{complaint_entry_id}").html("<a href='http://#{uri}' target='_blank' onclick='select_cat_text_field(#{complaint_entry_id})' >#{uri}</a>")
+        $("#site-search-#{complaint_entry_id}").html("<a href='https://www.google.com/search?q=site%3A#{uri}' target='_blank' onclick='select_cat_text_field(#{complaint_entry_id})'>#{uri}</a>")
 
 
         $("#history-#{complaint_entry_id}").replaceWith('<button class="secondary" id="history-' + complaint_entry_id + '" onclick="history_dialog('+complaint_entry_id+')">History</button>')
@@ -76,7 +76,7 @@ window.cat_new_url = ()->
       error: (response) ->
         $('.modal-backdrop').hide()
         $('#loader-modal').hide()
-        std_msg_error("Error",["Unable to categorize url."], reload: false)
+        std_api_error(response, "Unable to categorize url.", reload: false)
     )
   else
     std_msg_error("Unable to categorize", ["Please confirm that a URL and at least one category for each desired entry exists."], reload: false)
@@ -268,9 +268,9 @@ window.updatePending = (id,row_id) ->
           persist: false,
           create: false,
           maxItems: 5,
-          valueField: 'value',
-          labelField: 'value',
-          searchField: ['text'],
+          valueField: 'category_id',
+          labelField: 'category_name',
+          searchField: ['category_name', 'category_code'],
           options: AC.WebCat.createSelectOptions(),
           items: selected_options(temp_row.data().category)
         }
@@ -287,7 +287,9 @@ window.updateEntryColumns = (entry_id,row_id) ->
   resolution_comment = $('#complaint_resolution_comment_'+entry_id)[0].value
   headers = {'Token': $('input[name="token"]').val(), 'Xmlrpc-Token': $('input[name="xml_token"]').val()}
 
-  if categories.length == 0 && status != 'INVALID'
+  unchanged = $("#unchanged#{entry_id}").is(':checked')
+
+  if categories.length == 0 && status != 'INVALID' && unchanged == false
     std_msg_error("Must include at least one category.","", reload: false)
     $("#submit_changes_#{entry_id}").prop("disabled",false)
   else
@@ -313,9 +315,9 @@ window.updateEntryColumns = (entry_id,row_id) ->
             persist: false,
             create: false,
             maxItems: 5
-            valueField: 'value'
-            labelField: 'value'
-            searchField: 'text'
+            valueField: 'category_id',
+            labelField: 'category_name',
+            searchField: ['category_name', 'category_code'],
             options: AC.WebCat.createSelectOptions()
             items: selected_options(temp_row.data().category)
           }
@@ -323,9 +325,9 @@ window.updateEntryColumns = (entry_id,row_id) ->
             persist: false,
             create: false,
             maxItems: 5
-            valueField: 'value'
-            labelField: 'value'
-            searchField: 'text'
+            valueField: 'category_id',
+            labelField: 'category_name',
+            searchField: ['category_name', 'category_code'],
             options: AC.WebCat.createSelectOptions()
             items: selected_options(temp_row.data().category)
           }
@@ -805,9 +807,9 @@ format = (complaint_entry_row) ->
       '<label class="content-label-sm">Case ID</label>' +
       '<span class="nested-complaint-data case-id"><a href="complaints/' + complaint_entry.complaint_id + '">' + complaint_entry.complaint_id + '</a></span>' +
       '<label class="content-label-sm">Entry URI</label>' +
-      '<span class="nested-complaint-data" id="entry-uri-' + complaint_entry.entry_id + '">' + uri + '</span>' +
+      '<span class="nested-complaint-data input-truncate esc-tooltipped" id="entry-uri-' + complaint_entry.entry_id + '" title="' + url + '">' + uri + '</span>' +
       '<label class="content-label-sm" id="site-search">Site Search</label>' +
-      '<span class="nested-complaint-data" id="site-search-' + complaint_entry.entry_id + '">' + search_uri + '</span>' +
+      '<span class="nested-complaint-data input-truncate esc-tooltipped" id="site-search-' + complaint_entry.entry_id + '" title="' + url + '">' + search_uri + '</span>' +
       '<label class="content-label-sm">Customer Description</label>' +
       '<span class="nested-complaint-data">' + customer_description + '</span>' +
       '</div></div><div class="col-xs-5 col-with-divider">' +
@@ -1005,9 +1007,9 @@ window.click_table_buttons = (complaint_table, button)->
       persist: false,
       create: false,
       maxItems: 5,
-      valueField: 'value',
-      labelField: 'value',
-      searchField: ['text'],
+      valueField: 'category_id',
+      labelField: 'category_name',
+      searchField: ['category_name', 'category_code'],
       options: AC.WebCat.createSelectOptions()
       items: selected_options(row.data().category)
     }

@@ -103,6 +103,7 @@ class Escalations::Webrep::DisputesController < ApplicationController
     @dispute = Dispute.find(params[:id])
     contents = CSV.generate do |csv|
       csv << [
+          'Host',
           'WBRS',
           'WBRS Rule Hits',
           'WBRS Rules',
@@ -123,6 +124,7 @@ class Escalations::Webrep::DisputesController < ApplicationController
       ]
       @dispute.dispute_entries.each do |entry|
         csv << [
+            entry.hostlookup,
             entry.wbrs_score,
             entry.dispute_rule_hits.wbrs_rule_hits.count,
             "\"#{entry.dispute_rule_hits.wbrs_rule_hits.map {|wbrs_hit| wbrs_hit.name}.join(', ')}\"",

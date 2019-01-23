@@ -535,7 +535,7 @@ window.row_adust_reptool_bl_button_research =(button_tag) ->
 
 window.toolbar_adjust_reptool_bl_button =(button_tag) ->
   entry_ids = $('.dispute_check_box:checked').map(() ->
-    parseInt($(this).attr('value'))
+    parseInt($(this).attr('data-entry-id'))
   ).toArray()
   if entry_ids.length == 0
     entry_ids = $('.dispute-entry-checkbox:checked').map(() ->
@@ -552,6 +552,7 @@ window.toolbar_adjust_reptool_bl_button =(button_tag) ->
     'classifications': [ reptool_bl_form.getElementsByClassName('classifications-input')[0].value ]
     'comment': reptool_bl_form.getElementsByClassName('comment-input')[0].value
   }
+
   headers = {'Token': $('input[name="token"]').val(), 'Xmlrpc-Token': $('input[name="xml_token"]').val()}
   $.ajax(
     url: '/escalations/api/v1/escalations/webrep/disputes/reptool_bl'
@@ -1240,6 +1241,7 @@ $ ->
       {
         targets: [ 10 ]
         className: 'age-col'
+        orderData: 18
       }
     ]
     columns: [
@@ -1258,7 +1260,7 @@ $ ->
       {
         data: 'priority'
         render: (data) ->
-          '<span class="bug-priority p-' + data + '"></span>'
+          '<span class="bug-priority p-' + data + '">' + data + '</span>'
 
       }
       { data: 'case_link' }
@@ -1276,7 +1278,7 @@ $ ->
             title = 'Email'
           else if data == 'ew'
             title = 'Email Web'
-          '<span class="dispute-submission-type esc-tooltipped dispute-' + data + '" title="' + title + '"></span>'
+          '<span class="dispute-submission-type esc-tooltipped dispute-' + data + '" title="' + title + '">' + data + '</span>'
       }
       { data: 'd_entry_preview' }
       { data: 'assigned_to' }
@@ -1305,6 +1307,10 @@ $ ->
       { data: 'submitter_name' }
       { data: 'submitter_email' }
       { data: 'status_comment' }
+      {
+        data: 'age_int'
+        visible: false
+      }
 
 
     ])
@@ -1379,7 +1385,7 @@ $ ->
 
   if !location.search && $('#disputes-index').length
     standard_webrep_index_table('open')
-  $('#disputes-index tbody').on 'click', 'td.expandable-row-column', ->
+  $('#disputes-index tbody').on 'click', 'td.expandable-row-column, .dispute-count', ->
     tr = $(this).closest('tr')
     row = window.dispute_table.row(tr)
     if row.child.isShown()
@@ -1550,7 +1556,7 @@ $ ->
       data['case-id'] = $("#case-id-checkbox").is(':checked')
       data['status'] = $("#status-checkbox").is(':checked')
       data['resolution'] = $("#resolution-checkbox").is(':checked')
-      data['ticket-type'] = $("#ticket-type-checkbox").is(':checked')
+      data['submission-type'] = $("#submission-type-checkbox").is(':checked')
       data['dispute'] = $("#dispute-checkbox").is(':checked')
       data['owner'] = $("#owner-checkbox").is(':checked')
       data['time-submitted'] = $("#time-submitted-checkbox").is(':checked')
