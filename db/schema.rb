@@ -134,7 +134,6 @@ ActiveRecord::Schema.define(version: 2019_01_22_220012) do
     t.integer "unused_svn_result_code"
     t.boolean "tested"
     t.boolean "in_summary", default: false
-    t.boolean "edited", default: false
     t.index ["bug_id", "rule_id"], name: "index_bugs_rules_on_bug_id_and_rule_id", unique: true
   end
 
@@ -295,6 +294,7 @@ ActiveRecord::Schema.define(version: 2019_01_22_220012) do
     t.string "queue"
     t.datetime "created_at"
     t.datetime "updated_at"
+    t.index ["priority", "run_at"], name: "delayed_jobs_priority"
   end
 
   create_table "dispute_comments", options: "ENGINE=InnoDB DEFAULT CHARSET=utf8", force: :cascade do |t|
@@ -625,13 +625,6 @@ ActiveRecord::Schema.define(version: 2019_01_22_220012) do
     t.index ["reference_type_id"], name: "index_references_on_reference_type_id"
   end
 
-  create_table "references_rules", id: false, options: "ENGINE=InnoDB DEFAULT CHARSET=utf8", force: :cascade do |t|
-    t.integer "reference_id"
-    t.integer "rule_id"
-    t.index ["reference_id"], name: "index_references_rules_on_reference_id"
-    t.index ["rule_id"], name: "index_references_rules_on_rule_id"
-  end
-
   create_table "reputation_files", options: "ENGINE=InnoDB DEFAULT CHARSET=utf8", force: :cascade do |t|
     t.integer "bugzilla_attachment_id"
     t.string "sha256"
@@ -845,12 +838,12 @@ ActiveRecord::Schema.define(version: 2019_01_22_220012) do
   end
 
   create_table "user_preferences", options: "ENGINE=InnoDB DEFAULT CHARSET=utf8", force: :cascade do |t|
-    t.integer "user_id"
+    t.bigint "user_id"
     t.string "name"
     t.text "value"
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
-    t.index ["user_id", "name"], name: "index_user_preferences_on_user_id_and_name"
+    t.index ["user_id", "name"], name: "index_user_preferences_on_user_id"
   end
 
   create_table "users", options: "ENGINE=InnoDB DEFAULT CHARSET=utf8", force: :cascade do |t|
