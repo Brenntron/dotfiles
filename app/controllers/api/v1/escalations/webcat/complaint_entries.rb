@@ -43,8 +43,6 @@ module API
 
             get "" do
               json_packet = []
-              search_name = nil
-              named_search = nil
 
               search_type = ComplaintEntry.get_search_type(permitted_params)
               search_name = permitted_params[:search_name] ? permitted_params[:search_name] : nil
@@ -53,8 +51,6 @@ module API
                                                                search_name: search_name,
                                                                params: permitted_params,
                                                                user: current_user)
-
-
 
               if complaint_entries
                 complaint_entries.each do |complaint_entry|
@@ -136,7 +132,6 @@ module API
               end
 
                 {:status => "success", :search_name => search_name, :search_id => named_search&.id, :data => json_packet}.to_json
-              # end
             end
 
 
