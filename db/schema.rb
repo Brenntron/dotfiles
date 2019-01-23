@@ -53,16 +53,7 @@ ActiveRecord::Schema.define(version: 2019_01_22_220012) do
     t.index ["rule_id"], name: "index_attachments_on_rule_id"
     t.index ["task_id"], name: "index_attachments_on_task_id"
   end
-
-  create_table "attachments_exploits", id: :integer, options: "ENGINE=InnoDB DEFAULT CHARSET=utf8", force: :cascade do |t|
-    t.integer "attachment_id"
-    t.integer "exploit_id"
-  end
-
-  create_table "attachments_rules", id: false, options: "ENGINE=InnoDB DEFAULT CHARSET=utf8", force: :cascade do |t|
-    t.integer "attachment_id"
-    t.integer "rule_id"
-  end
+  
 
   create_table "bug_blockers", options: "ENGINE=InnoDB DEFAULT CHARSET=utf8", force: :cascade do |t|
     t.integer "snort_blocker_bug_id"
