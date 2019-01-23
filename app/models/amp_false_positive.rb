@@ -1,48 +1,41 @@
 class AmpFalsePositive < ApplicationRecord
-  has_paper_trail on: [:update], ignore: [:updated_at]
-  belongs_to :user, :optional => true
-  belongs_to :customer, :optional => true
-  has_many :amp_false_positive_files
-
-  AC_SUCCESS         = 'CREATE_ACK'
-  AC_FAILED          = 'CREATE_FAILED'
-  AC_PENDING         = 'CREATE_PENDING'
-
-  TI_NEW             = 'PENDING'
-  TI_RESOLVED        = 'RESOLVED'
-  TI_CLOSED          = 'CLOSED'
-
-  NEW                = "NEW"
-  RESOLVED           = "RESOLVED"
-  ASSIGNED           = 'ASSIGNED'
-  ACTIVE             = 'ACTIVE'
-  COMPLETED          = 'COMPLETED'
-  PENDING            = 'PENDING'
-  DUPLICATE          = "DUPLICATE"
-
+  belongs_to :file_reputation_ticket
+  delegate :customer, :customer_id, to: :file_reputation_ticket, allow_nil: true
 
   def self.process_bridge_payload(message_payload)
-    begin
-      ActiveRecord::Base.transaction do
-        payload = message_payload["payload"]
-
-        # self.amp_false_positive_files << AmpFalsePositiveFile.new(payload[file])
-        # self.customer = Customer.find_or_create_by_email(payload[user][email]) #also use organization if possible
-        # self.sha256 = message_payload['sha256']
-        # self.source = message_payload['source']
-        # self.description = payload['comment']['text']
-        # self.product = payload['source']['name']
-        # self.sr_id = message_payload['sr_id']
-        # self.status = NEW
-
-
-
-      end
-    end
+    #what ever is coming in from the bridge should start here and end up eventually in create_file_rep_ticket
+    user = User.where(cvs_username:"vrtincom").first    begin
+                                                          ActiveRecord::Base.transaction do
+                                                            create_file_rep_ticket(message_payload)
+                                                          end
+                                                        rescue Exception = e
+                                                          raise("there was an error: #{e.message}")
+                                                        end
   end
 
-  def ti_status
-    RESOLVED == status ? AmpFalsePositive::TI_RESOLVED : AmpFalsePositive::TI_NEW
+  def self.create_file_rep_ticket(params)
+    #   use this method to create the File reputation ticket for this amp FP when needed
+    #   get Customer
+    # c = Customer.where(email: params[email]).first
+    #   Create ReputationFile
+    # repfile = ReputationFile.create(bugzilla_attachment_id: prams["bugzilla_attachment_id"],
+    #                                 sha256: params["sha256"],
+    #                                 file_path: params["file_path"],
+    #                                 file_name:["file_name"])
+    #   Create FileReputationTicket
+    # file_ticket = FileReputationTicket.create(customer: c,
+    #                                           status: params["status"],
+    #                                           source: params["source"],
+    #                                           description: params["description"],
+    #                                           reputation_file: rep_file )
+    #   Create AmpFalsePositive
+    # ampFP = AmpFalsePositive.create(sr_id: params["parent_ticket_id"],
+    #                                 payload: params["payload"],
+    #                                 file_reputation_ticket: file_ticket)
+    #
   end
+
+
+
 
 end
