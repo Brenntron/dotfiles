@@ -513,16 +513,24 @@ class ComplaintEntry < ApplicationRecord
   #
 
   def set_current_category
+    category_list = []
     prefix_results = Wbrs::Prefix.where({:urls => [self.hostlookup]})
     if prefix_results
       if prefix_results.first&.is_active == 1
-        categories = prefix_results.map{ |result| result.descr}
-        self.url_primary_category = categories.join(',')
-        self.category = categories.join(',')
+
+        categories = prefix_results.find_all {|result| result.path == self.path}
+        categories.each do |cat|
+          category_list << Wbrs::Category.find(cat.category_id)
+        end
+
+        self.url_primary_category = category_list.join(',')
+        self.category = category_list.join(',')
       else
         categories = nil
       end
     end
+
+    category_list.join(',')
   rescue => except
 
     Rails.logger.warn "Populating categories from Wbrs failed."
