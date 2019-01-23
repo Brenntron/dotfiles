@@ -13,6 +13,17 @@
         %span.data_small_emphasis
           =@user.roles.map(&:role).join(', ')
 
+        - if current_user.has_role?('api user')
+          %hr.thin
+          .user-access-wrapper
+            %label.content-label-sm Access
+            %label.content-label-md Application Token
+            %pre.code-snippet
+              = current_user.authentication_token
+            %label.content-label-md.extra-space Bugzilla Token
+            %pre.code-snippet
+              = xml_token
+
       .user-buttons
         - if @user != current_user
           %a{href: "mailto:#{@user.email}"}
@@ -31,56 +42,55 @@
       .row
         - if @user.has_role?('manager')
           .col-xs-12.user-col-wrapper
-            %div.user-col-layout{style: "column-count: #{(@children_col.to_f).ceil}"}
-              - @user.children.each do |user|
-                - if user == @first_child
-                  %h5.content-label-sm{style: 'column-span: all'}
-                    Reports
-                %div
-                  = link_to user.display_name, user_path(user), class: 'related-user'
-                  %br
-                  = link_to user.cvs_username, user_path(user), class: 'related-username'
-
-            - if @user.parent.present?
-              %div.user-col-layout{style: 'column-count: 1'}
-                %h5.content-label-sm Manager
-                %div
-                  %span.related-user
-                    = @user.parent.display_name
-                  %br
-                  = link_for_manager(current_user, @user)
-
-            - if @user.child?
-              %div.user-col-layout.last{style: "column-count: #{(@sibling_col.to_f).ceil}"}
-                - @user.siblings.each do |user|
-                  - if user == @first_sibling
-                    %h5.content-label-sm{style: 'column-span: all'}
-                      Peers
+            .user-relationship-wrapper
+              %h5.content-label-sm Reports
+              %div.user-col-layout{style: "column-count: #{(@children_col.to_f).ceil}"}
+                - @user.children.each do |user|
                   %div
                     = link_to user.display_name, user_path(user), class: 'related-user'
                     %br
                     = link_to user.cvs_username, user_path(user), class: 'related-username'
+
+            - if @user.parent.present?
+              .user-relationship-wrapper
+                %h5.content-label-sm Manager
+                %div.user-col-layout{style: 'column-count: 1'}
+                  %div
+                    %span.related-user
+                      = @user.parent.display_name
+                    %br
+                    = link_for_manager(current_user, @user)
+
+            - if @user.child?
+              .user-relationship-wrapper
+                %h5.content-label-sm Peers
+                %div.user-col-layout.last{style: "column-count: #{(@sibling_col.to_f).ceil}"}
+                  - @user.siblings.each do |user|
+                    %div
+                      = link_to user.display_name, user_path(user), class: 'related-user'
+                      %br
+                      = link_to user.cvs_username, user_path(user), class: 'related-username'
 
         - else
           .col-xs-12.user-col-wrapper
             - if @user.parent.present?
-              %div.user-col-layout{style: 'column-count: 1'}
+              .user-relationship-wrapper
                 %h5.content-label-sm Manager
-                %div
-                  %span.related-user
-                    = @user.parent.display_name
-                  %br
-                  = link_for_manager(current_user, @user)
-            - if @user.child?
-              %div.user-col-layout.last{style: "column-count: #{(@sibling_col.to_f).ceil}", 'data-division': "#{@sibling_col}"}
-                - @user.siblings.each do |user|
-                  - if user == @first_sibling
-                    %h5.content-label-sm{style: 'column-span: all'}
-                      Peers
+                %div.user-col-layout{style: 'column-count: 1'}
                   %div
-                    = link_to user.display_name, user_path(user), class: 'related-user'
+                    %span.related-user
+                      = @user.parent.display_name
                     %br
-                    = link_to user.cvs_username, user_path(user), class: 'related-username'
+                    = link_for_manager(current_user, @user)
+            - if @user.child?
+              .user-relationship-wrapper
+                %h5.content-label-sm Peers
+                %div.user-col-layout.last{style: "column-count: #{(@sibling_col.to_f).ceil}", 'data-division': "#{@sibling_col}"}
+                  - @user.siblings.each do |user|
+                    %div
+                      = link_to user.display_name, user_path(user), class: 'related-user'
+                      %br
+                      = link_to user.cvs_username, user_path(user), class: 'related-username'
 
 
 .modal.fade{id: "roleModal_#{@user.id}", tabindex: '-1', role: 'dialog', 'aria-hidden': 'true'}

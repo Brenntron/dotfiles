@@ -4,7 +4,8 @@ class UsersController < ApplicationController
   before_action :require_login
 
   def index
-    @users = current_user.children
+    @users = current_user.children.order(:display_name)
+
   end
 
   def show
@@ -22,12 +23,16 @@ class UsersController < ApplicationController
         flash[:error] = 'You are not authorized to view that user.'
         redirect_to escalations_users_path
       else
-        @users = current_user.children
+        @users = current_user.children.order(:display_name)
     end
   end
 
   def results
     @users = User.search(params.require(:user).require(:search).permit(:name)).order(:display_name)
+  end
+
+  def all
+    @users = User.all.order(:display_name)
   end
 
   def update

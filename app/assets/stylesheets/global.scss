@@ -458,12 +458,17 @@ th {
   background-color: lighten( $faint-neutral-color, 2% );
 }
 
+.alt-col.lighter-alt-col {
+  background-color: lighten( $faint-neutral-color, 5% );
+}
+
 th.alt-col {
   background-color: transparent;
 }
 
 .user-col-divider {
   border-right: 2px solid $content-bg-color;
+  min-width: 140px;
 }
 
 /**** Col Width Mins *****/
@@ -690,6 +695,7 @@ button {
 .expand-all {background-image: url(image_path('icon_expand_all.svg'));}
 .dropdown.open .mark-related-button {background-image: url(image_path('icon_related_white.svg'));}
 .url-cat-button {background-image: url(image_path('icon_categorize.svg'));}
+.add-user-button {background-image: url(image_path('icon_add_user_grey.svg'));}
 .delete-search {
   display: inline-block;
   float: right;
@@ -726,6 +732,7 @@ button {
 
 .table-button-row {
   padding: 0 !important;
+  min-width: 100px;
 }
 
 .expand-toggle-button {
@@ -2768,8 +2775,15 @@ fieldset.top-content {
   column-count: 7;
 }
 
+.user-relationship-wrapper {
+  display: inline-block;
+  float: left;
+}
+
 .user-col-layout div {
   padding-bottom: 6px;
+  white-space: nowrap;
+  page-break-inside: avoid
 }
 
 .user-col-layout {
@@ -7046,3 +7060,83 @@ th.sorting_1, th.sorting_asc, th.sorting_desc {
   width: 160px !important;
 }
 
+.user-access-wrapper label {
+  width: 100%;
+}
+
+.user-access-wrapper .content-label-md.extra-space {
+  margin-top: 12px;
+}
+
+.manager-row-indicator {
+  padding: 0 0 0 8px !important;
+}
+
+.manager-row-indicator span {
+  display: inline-block;
+  padding-top: 8px;
+}
+
+.expand-manager-row-button {
+  background-image: url(image_path('icon_expand_table_grey.svg'));
+  background-repeat: no-repeat;
+  background-position: center center;
+  background-size: 20px 20px;
+  width: 33px;
+  height: 33px;
+  float: right;
+  border: none;
+}
+
+.expand-manager-row-button.up {
+  transform: rotate(180deg);
+}
+
+.blank-white-cell {
+  border: none !important;
+  background-color: transparent;
+}
+
+.manage-child-row .user-displayname-col {
+  padding-left: 16px !important;
+}
+
+.manage-grandchild-row .user-displayname-col {
+  padding-left: 26px !important
+}
+
+.table-button-row .dropdown-menu {
+  top: 30px;
+  right: 0;
+  left: auto;
+  border-radius: 4px 0 4px 4px;
+  border: none;
+}
+
+.table-button-row .dropdown-menu h3 {
+  color: #fff;
+  padding: 6px 10px;
+  font-weight: 400;
+  font-size: 9pt;
+  background-color: $bug-section-color;
+  min-width: 275px;
+  border-radius: 4px 0 0 0;
+  margin-top: -5px;
+  margin-bottom: 0;
+}
+
+.table-button-row .dropdown-menu .toolbar-select {
+  width: 100%;
+}
+
+.select-wrapper {
+  width: 100%;
+}
+
+.table-button-row .dropdown-menu button {
+  padding: 8px 30px;
+}
+
+.table-button-row .dropdown.open {
+  background-color: $bug-section-color;
+}
