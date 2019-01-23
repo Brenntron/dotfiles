@@ -43,6 +43,8 @@ module API
 
             get "" do
               json_packet = []
+              search_name = nil
+              named_search = nil
 
               search_type = ComplaintEntry.get_search_type(permitted_params)
               search_name = permitted_params[:search_name] ? permitted_params[:search_name] : nil
@@ -51,6 +53,8 @@ module API
                                                                search_name: search_name,
                                                                params: permitted_params,
                                                                user: current_user)
+
+
 
               if complaint_entries
                 complaint_entries.each do |complaint_entry|
@@ -126,16 +130,13 @@ module API
                 end
               end
 
-              if search_type == 'advanced' || search_type == 'named'
-                if permitted_params['search_name'].present?
-                  search_name = permitted_params['search_name']
-                  named_search = NamedSearch.where(user: current_user, name: search_name).first
-
-                  {:status => "success", :search_name => search_name, :search_id => named_search&.id, :data => json_packet}.to_json
-                end
-              else
-                {:status => "success", :data => json_packet}.to_json
+              if permitted_params['search_name'].present?
+                search_name = permitted_params['search_name']
+                named_search = NamedSearch.where(user: current_user, name: search_name).first
               end
+
+                {:status => "success", :search_name => search_name, :search_id => named_search&.id, :data => json_packet}.to_json
+              # end
             end
 
 

@@ -1273,7 +1273,7 @@ window.populate_advanced_webcat_index_table = (data = {}) ->
         notice_html = "<p>Something went wrong: #{json.error}</p>"
         alert(json.error)
       else
-        if undefined != json.search_name
+        if json.search_name.length > 0
           searchId = 'saved_search_' + json.search_id
           if $('#saved-search-tbody tr#' + searchId).length == 0
             $('#saved-search-tbody').append(complaint_named_search_tag(json.search_name, json.search_id))
