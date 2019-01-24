@@ -1344,11 +1344,11 @@ $ ->
         resolution = this.entry.resolution
       else
         resolution = missing_data
-      resolution_comment = ''
       if this.entry.resolution_comment != null
         resolution_comment = this.entry.resolution_comment
+        resolution_col = '<td class="entry-col-res esc-tooltipped" title="' + resolution_comment + '">' + resolution + '</td>'
       else
-        resolution_comment = ''
+        resolution_col = '<td class="entry-col-res">' + resolution + '</td>'
       suggested_disposition = ''
       if this.entry.suggested_disposition != null
         suggested_disposition = this.entry.suggested_disposition
@@ -1369,7 +1369,7 @@ $ ->
       else sbrs_score = missing_data
       entry_row = '<tr class="index-entry-row">' + '<td><input type="checkbox" onclick="toggleRow(this)" class="dispute-entry-checkbox dispute-entry-checkbox_' + dispute.id + '" id= ' + dispute_entry_id + ' ></td>' + '<td class="entry-col-content ' + important + '">' + entry_content + '</td>' +
         '<td class="entry-col-status">' + status + '</td>' +
-        '<td class="entry-col-res" title="' + resolution_comment + '">' + resolution + '</td>' +
+        resolution_col +
         '<td class="entry-col-disp">' + suggested_disposition + '</td>' +
         '<td class="entry-col-cat">' + category + '</td>' +
         '<td class="entry-col-wbrs-score">' + wbrs_score + '</td>' +
@@ -1399,12 +1399,6 @@ $ ->
       td = $(tr).next('tr').find('td:first')
       $(td).addClass 'dispute-entry-table-wrapper'
 
-      resolution_column = $('td.entry-col-res')
-      i = 0
-      while i < resolution_column.length
-        if resolution_column[i].title != '' or null
-          resolution_column[i].classList.add('esc-tooltipped')
-        i++
       # Check to see which columns should be displayed
       $('.toggle-vis-nested').each ->
         checkbox_trigger = $(this).attr('data-column')
