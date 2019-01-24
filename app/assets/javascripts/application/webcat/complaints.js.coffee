@@ -403,7 +403,7 @@ window.return_selected = ()->
         else
           i = 0
           while i < selected_rows[0].length
-            selected_rows.data().cell(selected_rows[0][i],12).data("Vrt Incoming").draw()
+            selected_rows.data().cell(selected_rows[0][i],14).data("Vrt Incoming").draw()
             selected_rows.data().cell(selected_rows[0][i],5).data("NEW").draw()
             i++
 

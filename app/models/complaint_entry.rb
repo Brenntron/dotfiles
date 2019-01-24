@@ -75,8 +75,8 @@ class ComplaintEntry < ApplicationRecord
       raise("Cannot take someone elses complaint.")
     end
   end
-  def return_complaint(current_user)
-    if self.user == current_user
+  def return_complaint
+    if self.user != User.where(display_name: 'Vrt Incoming').first
       if !self.is_important
         if status!="COMPLETED"
           self.update(user: User.vrtincoming, status:"NEW")
@@ -88,11 +88,7 @@ class ComplaintEntry < ApplicationRecord
         raise("Cannot return complaint when status is pending.")
       end
     else
-      if self.user.nil?
-        raise("Cannot return a complaint that is not assigned")
-      else
-        raise("Cannot return someone elses complaint.")
-      end
+      raise("Cannot return a complaint that is not assigned")
     end
   end
 
