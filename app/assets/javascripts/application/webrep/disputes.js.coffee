@@ -1,3 +1,20 @@
+$(document).ready ->
+  $('span#mark-as-related').on 'show.bs.dropdown', ->
+    dropdownMenu = $(this).find('.dropdown-menu')
+    dropdownMenu.hide()
+    if $('.dispute_check_box:checked').length > 0
+      dropdownMenu.show()
+    else
+      $(this).removeClass('open')
+      std_msg_error('No rows selected', ['Please select at least one row.'])
+
+  $('span#adjust-wlbl').on 'show.bs.dropdown', ->
+    dropdownMenu = $(this).find('.dropdown-menu')
+    if $('.dispute_check_box:checked').length == 0
+      dropdownMenu.hide()
+      $(this).removeClass('open')
+      std_msg_error('No rows selected', ['Please select a row.'])
+
 window.select_or_deselect_all = (dispute_id)->
 
   $('.dispute-entry-checkbox_' + dispute_id).prop('checked', $('#' + dispute_id).prop('checked'))
@@ -128,6 +145,7 @@ window.advanced_webrep_index_table = () ->
     submission_types.push('e')
   if form.find('input[name="advanced_search[submission_type]"][value="ew"]').is(':checked')
     submission_types.push('ew')
+  dispute_save_search_format = /[!@#$%^&*()_+\-=\[\]{};':"\\|,.<>\/?]/
   data = {
     search_type: 'advanced'
     search_name: form.find('input[name="search_name"]').val()
@@ -157,7 +175,11 @@ window.advanced_webrep_index_table = () ->
   }
 
   window.current_search_data = data
-  window.populate_webrep_index_table(data)
+  if dispute_save_search_format.test(data.search_name) == true
+    std_msg_error('save search name error', ['Please enter a name without any special character', 'Example: !@#$%^&*()'])
+  else
+    window.location.reload()
+    window.populate_webrep_index_table(data)
 
 window.standard_webrep_index_table = (search_name) ->
   data = {
@@ -476,7 +498,17 @@ window.row_adust_reptool_bl_button =(button_tag) ->
     success: (response) ->
       window.location.reload()
     error: (response) ->
-      popup_response_error(response, 'Error adjusting WL/BL')
+      if response.responseJSON == undefined
+        response_lines = response.responseText.split("\n")
+        if 2 < response_lines.length
+          errormsg = [response_lines[0], response_lines[1]]
+        else
+          errormsg = [response.responseText]
+      else if response.responseJSON.error != undefined
+        errormsg = [response.responseJSON.error]
+      else
+        errormsg = [response.responseText]
+      std_msg_error('reptool wl/bl adjustment error', ['Error adjusting WL/BL'].concat(errormsg) )
   )
 
 window.row_adust_reptool_bl_button_research =(button_tag) ->
@@ -502,13 +534,17 @@ window.row_adust_reptool_bl_button_research =(button_tag) ->
   )
 
 window.toolbar_adjust_reptool_bl_button =(button_tag) ->
-  entry_ids = $('.dispute_check_box:checkbox:checked').map(() ->
-    this.dataset['entryId']
+  entry_ids = $('.dispute_check_box:checked').map(() ->
+    parseInt($(this).attr('data-entry-id'))
   ).toArray()
   if entry_ids.length == 0
-    entry_ids = $('.dispute-entry-checkbox:checkbox:checked').map(() ->
+    entry_ids = $('.dispute-entry-checkbox:checked').map(() ->
       parseInt(this.id)
     ).toArray()
+  if entry_ids.length == 0
+    std_msg_error('No rows selected', ['Please select at least one row.'])
+    return
+
   reptool_bl_form = button_tag.form
   data = {
     'action': reptool_bl_form.getElementsByClassName('action-input')[0].value
@@ -516,6 +552,7 @@ window.toolbar_adjust_reptool_bl_button =(button_tag) ->
     'classifications': [ reptool_bl_form.getElementsByClassName('classifications-input')[0].value ]
     'comment': reptool_bl_form.getElementsByClassName('comment-input')[0].value
   }
+
   headers = {'Token': $('input[name="token"]').val(), 'Xmlrpc-Token': $('input[name="xml_token"]').val()}
   $.ajax(
     url: '/escalations/api/v1/escalations/webrep/disputes/reptool_bl'
@@ -526,7 +563,17 @@ window.toolbar_adjust_reptool_bl_button =(button_tag) ->
     success: (response) ->
       window.location.reload()
     error: (response) ->
-      popup_response_error(response, 'Error adjusting WL/BL')
+      if response.responseJSON == undefined
+        response_lines = response.responseText.split("\n")
+        if 2 < response_lines.length
+          errormsg = [response_lines[0], response_lines[1]]
+        else
+          errormsg = [response.responseText]
+      else if response.responseJSON.error != undefined
+        errormsg = [response.responseJSON.error]
+      else
+        errormsg = [response.responseText]
+      std_msg_error('Error', ['Error adjusting WL/BL'].concat(errormsg) )
   )
 
 window.toolbar_adjust_reptool_bl_button_research =(button_tag) ->
@@ -551,14 +598,24 @@ window.toolbar_adjust_reptool_bl_button_research =(button_tag) ->
     success: (response) ->
       window.location.reload()
     error: (response) ->
-      popup_response_error(response, 'Error adjusting WL/BL')
+      if response.responseJSON == undefined
+        response_lines = response.responseText.split("\n")
+        if 2 < response_lines.length
+          errormsg = [response_lines[0], response_lines[1]]
+        else
+          errormsg = [response.responseText]
+      else if response.responseJSON.error != undefined
+        errormsg = [response.responseJSON.error]
+      else
+        errormsg = [response.responseText]
+      std_msg_error('Error', ['Error adjusting WL/BL'] + errormsg)
   )
 
 window.toolbar_index_edit_status = () ->
   statusName = $('input[name=entry-status]:checked').val()
-  
+
   data = {}
-  
+
   entry_ids = $('.dispute-entry-checkbox:checked').map(() ->
     data[this.id] = [{
       id: this.id
@@ -638,7 +695,7 @@ window.toolbar_index_change_assignee = () ->
     success: (response) ->
       window.location.reload()
     error: (response) ->
-      popup_response_error(response, 'Error changing assignee')
+      std_msg_error('no rows selected', ['Please select at least one row to change assignee.'])
   )
 
 window.toolbar_show_change_assignee = () ->
@@ -661,15 +718,23 @@ window.toolbar_show_change_assignee = () ->
     success: (response) ->
       window.location.reload()
     error: (response) ->
-      popup_response_error(response, 'Error changing assignee')
+      std_msg_error('No Tickets Selected', ['Select at least one ticket to assign to yourself.'])
   )
 
 window.related_disputes = () ->
   entry_ids = $('.dispute_check_box:checkbox:checked').map(() ->
     Number(this.value)
   ).toArray()
-
+#  if entry_ids.length == 0
+#    std_msg_error('Setting related error', ['No issue(s) selected.'])
+#    return
   original_dispute_id = $('.dispute-id').val()
+
+  # Make sure that the original dispute ID is provided by the user.
+  # If it is not then display an error
+  if original_dispute_id.trim() == ''
+    std_msg_error('Ticket not marked as related', ['Please enter the original ticket number to relate ticket to.'])
+    return
 
   data = {
     'original_dispute_id': original_dispute_id
@@ -685,8 +750,11 @@ window.related_disputes = () ->
     dataType: 'json'
     success: (response) ->
       window.location.reload()
-    error: (response) ->
-      popup_response_error(response, 'Error setting related dispute.')
+    error: (error) ->
+      std_msg_error('Ticket not marked as related', ['Error setting related dispute', error.responseJSON.error])
+      $('.dispute-id').val('')
+      $('span#mark-as-related .dropdown-menu').hide()
+
   )
 
 window.toolbar_unassign_dispute = () ->
@@ -729,17 +797,17 @@ window.add_dispute_entry = () ->
   entry_content = $('#add_dispute_entry').val()
   if $.trim(entry_content) == '' || entry_content == null
 #    Do not allow accidental submission of empty or blank spaced entry
+    std_msg_error('Entry content cannot be blank', ['Please provide content for the new entry.'])
     return false
   else
     $('#loader-modal').modal({
       backdrop: 'static',
-      keyboard: false
+      keyboard: true
     })
     data = {
-      'uri': entry_content,
+      'uri': $('#add_dispute_entry').val(),
       'dispute_id': $('#dispute_id').text(),
     }
-
     headers = {'Token': $('input[name="token"]').val(), 'Xmlrpc-Token': $('input[name="xml_token"]').val()}
     $.ajax(
       url: '/escalations/api/v1/escalations/webrep/disputes/new_adhoc_entry'
@@ -806,6 +874,10 @@ window.take_disputes = () ->
     this.value
   ).toArray()
 
+  if dispute_ids.length == 0
+    std_msg_error('No Tickets Selected', ['Please select at least one ticket to assign.'])
+    return
+
   std_msg_ajax(
     method: 'PATCH'
     url: "/escalations/api/v1/escalations/webrep/disputes/take_disputes"
@@ -815,9 +887,13 @@ window.take_disputes = () ->
       for dispute_id in response.dispute_ids
         $('#owner_' + dispute_id).text(response.username)
         $('#status_' + dispute_id).text("Assigned")
+      std_msg_success('Tickets successfully assigned', [response.dispute_ids.length + ' have been assigned to ' + response.username])
+    error: (error) ->
+      std_msg_error('Assign Issue(s) Error', [
+        'Failed to assign ' + dispute_ids.length + ' issue(s).',
+        'Due to: ' + error.responseJSON.error
+      ])
   )
-
-
 
 window.take_single_dispute = (id) ->
   dispute_ids = [ id ]
@@ -1079,12 +1155,12 @@ $ ->
           $(res_comment[0]).val('')
     else
       $(dropdown).removeClass('open')
-      alert ('No rows selected')
+      std_msg_error('No rows selected', ['Please select at least one row.'])
 
   # Edit Entry: Edit Entry Status
   $('#index-entry-status-button').click ->
     dropdown = $('#index-edit-entry-status-dropdown').parent()
-    if ($('.dispute-entry-checkbox:checked').length > 0)
+    if ($('.dispute_check_box:checked').length > 0)
 
       $('.entry-status-radio-label').click ->
         radio_button = $(this).prev('.entry-status-radio')
@@ -1119,8 +1195,7 @@ $ ->
           $('#index-entry-resolution-submenu').hide()
           $(res_comment).val('')
     else
-      alert ('No rows selected')
-      $(dropdown).removeClass('open')
+      std_msg_error('No rows selected', ['Please select at least one row.'])
       return false
 
 
@@ -1164,12 +1239,9 @@ $ ->
         className: 'text-center'
       }
       {
-        targets: [ 8 ]
-        className: 'alt-col'
-      }
-      {
         targets: [ 10 ]
         className: 'age-col'
+        orderData: 18
       }
     ]
     columns: [
@@ -1188,7 +1260,7 @@ $ ->
       {
         data: 'priority'
         render: (data) ->
-          '<span class="bug-priority p-' + data + '"></span>'
+          '<span class="bug-priority p-' + data + '">' + data + '</span>'
 
       }
       { data: 'case_link' }
@@ -1206,7 +1278,7 @@ $ ->
             title = 'Email'
           else if data == 'ew'
             title = 'Email Web'
-          '<span class="dispute-submission-type esc-tooltipped dispute-' + data + '" title="' + title + '"></span>'
+          '<span class="dispute-submission-type esc-tooltipped dispute-' + data + '" title="' + title + '">' + data + '</span>'
       }
       { data: 'd_entry_preview' }
       { data: 'assigned_to' }
@@ -1235,6 +1307,10 @@ $ ->
       { data: 'submitter_name' }
       { data: 'submitter_email' }
       { data: 'status_comment' }
+      {
+        data: 'age_int'
+        visible: false
+      }
 
 
     ])
@@ -1309,7 +1385,7 @@ $ ->
 
   if !location.search && $('#disputes-index').length
     standard_webrep_index_table('open')
-  $('#disputes-index tbody').on 'click', 'td.expandable-row-column', ->
+  $('#disputes-index tbody').on 'click', 'td.expandable-row-column, .dispute-count', ->
     tr = $(this).closest('tr')
     row = window.dispute_table.row(tr)
     if row.child.isShown()
@@ -1480,7 +1556,7 @@ $ ->
       data['case-id'] = $("#case-id-checkbox").is(':checked')
       data['status'] = $("#status-checkbox").is(':checked')
       data['resolution'] = $("#resolution-checkbox").is(':checked')
-      data['ticket-type'] = $("#ticket-type-checkbox").is(':checked')
+      data['submission-type'] = $("#submission-type-checkbox").is(':checked')
       data['dispute'] = $("#dispute-checkbox").is(':checked')
       data['owner'] = $("#owner-checkbox").is(':checked')
       data['time-submitted'] = $("#time-submitted-checkbox").is(':checked')
@@ -1570,6 +1646,10 @@ $ ->
 
 
   $('#index-adjust-wlbl').click ->
+    if $('.dispute_check_box:checked').length == 0
+      std_msg_error('No rows selected', ['Please select at least one row.'])
+      return false
+
     tbody = $('#wlbl_adjust_entries_index').find('table.dispute_tool_current').find('tbody')
     show_content = $('#wlbl_adjust_entries_index').find('.wlbl-entry-content')
     if !show_content[0]
@@ -1603,7 +1683,7 @@ $ ->
 
     #    $(tbody).empty()
     dropdown_wrapper = $(this).parent()
-    if ($('.dispute-entry-checkbox:checked').length == 1)
+    if ($('.dispute_check_box:checked').length > 0)
       submit_button = $('#wlbl_adjust_entries_index').find('.dropdown-submit-button')
       entry_content = ''
 
@@ -1668,7 +1748,7 @@ $ ->
 
     else
       $(dropdown_wrapper).removeClass('open')
-      alert ('Please select 1 row')
+      std_msg_error('No rows selected', ['Please select one row.'])
 
   $('#set-related-dispute-submit-button').click ->
     dropdown = $('#set-related-dispute-div').parent()

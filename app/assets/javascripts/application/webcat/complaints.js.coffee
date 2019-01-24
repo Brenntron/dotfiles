@@ -30,8 +30,8 @@ window.updateURI = (complaint_entry_id) ->
 
         $("#domain_#{complaint_entry_id}").text(response.domain)
         $("#subdomain_#{complaint_entry_id}").text(response.subdomain)
-        $("#entry-uri-#{complaint_entry_id}").html("<a href='http://#{uri}'>#{uri}</a>")
-        $("#site-search-#{complaint_entry_id}").html("<a href='https://www.google.com/search?q=site%3A#{uri}'>#{uri}</a>")
+        $("#entry-uri-#{complaint_entry_id}").html("<a href='http://#{uri}' target='_blank' onclick='select_cat_text_field(#{complaint_entry_id})' >#{uri}</a>")
+        $("#site-search-#{complaint_entry_id}").html("<a href='https://www.google.com/search?q=site%3A#{uri}' target='_blank' onclick='select_cat_text_field(#{complaint_entry_id})'>#{uri}</a>")
 
 
         $("#history-#{complaint_entry_id}").replaceWith('<button class="secondary" id="history-' + complaint_entry_id + '" onclick="history_dialog('+complaint_entry_id+')">History</button>')
@@ -76,7 +76,7 @@ window.cat_new_url = ()->
       error: (response) ->
         $('.modal-backdrop').hide()
         $('#loader-modal').hide()
-        std_msg_error("Error",["Unable to categorize url."], reload: false)
+        std_api_error(response, "Unable to categorize url.", reload: false)
     )
   else
     std_msg_error("Unable to categorize", ["Please confirm that a URL and at least one category for each desired entry exists."], reload: false)
@@ -268,9 +268,9 @@ window.updatePending = (id,row_id) ->
           persist: false,
           create: false,
           maxItems: 5,
-          valueField: 'value',
-          labelField: 'value',
-          searchField: ['text'],
+          valueField: 'category_id',
+          labelField: 'category_name',
+          searchField: ['category_name', 'category_code'],
           options: AC.WebCat.createSelectOptions(),
           items: selected_options(temp_row.data().category)
         }
@@ -287,7 +287,9 @@ window.updateEntryColumns = (entry_id,row_id) ->
   resolution_comment = $('#complaint_resolution_comment_'+entry_id)[0].value
   headers = {'Token': $('input[name="token"]').val(), 'Xmlrpc-Token': $('input[name="xml_token"]').val()}
 
-  if categories.length == 0 && status != 'INVALID'
+  unchanged = $("#unchanged#{entry_id}").is(':checked')
+
+  if categories.length == 0 && status != 'INVALID' && unchanged == false
     std_msg_error("Must include at least one category.","", reload: false)
     $("#submit_changes_#{entry_id}").prop("disabled",false)
   else
@@ -313,9 +315,9 @@ window.updateEntryColumns = (entry_id,row_id) ->
             persist: false,
             create: false,
             maxItems: 5
-            valueField: 'value'
-            labelField: 'value'
-            searchField: 'text'
+            valueField: 'category_id',
+            labelField: 'category_name',
+            searchField: ['category_name', 'category_code'],
             options: AC.WebCat.createSelectOptions()
             items: selected_options(temp_row.data().category)
           }
@@ -323,9 +325,9 @@ window.updateEntryColumns = (entry_id,row_id) ->
             persist: false,
             create: false,
             maxItems: 5
-            valueField: 'value'
-            labelField: 'value'
-            searchField: 'text'
+            valueField: 'category_id',
+            labelField: 'category_name',
+            searchField: ['category_name', 'category_code'],
             options: AC.WebCat.createSelectOptions()
             items: selected_options(temp_row.data().category)
           }
@@ -354,7 +356,7 @@ window.take_selected = ()->
         json = $.parseJSON(response)
         if json.error
           notice_html = "<p>Something went wrong: #{json.error}</p>"
-          alert(json.error)
+          std_msg_error('take error', [json.error])
         else
           i = 0
           while i < selected_rows[0].length
@@ -365,6 +367,8 @@ window.take_selected = ()->
       error: (response) ->
         notice_html = "<p>Something went wrong: #{response.responseText}</p>"
     , this)
+  else
+    std_msg_error('No rows selected', ['Please select at least one row.'])
 
 
 
@@ -386,7 +390,7 @@ window.return_selected = ()->
         json = $.parseJSON(response)
         if json.error
           notice_html = "<p>Something went wrong: #{json.error}</p>"
-          alert(json.error)
+          std_msg_error('return error', [json.error])
         else
           i = 0
           while i < selected_rows[0].length
@@ -397,6 +401,8 @@ window.return_selected = ()->
       error: (response) ->
         notice_html = "<p>Something went wrong: #{response.responseText}</p>"
     , this)
+  else
+    std_msg_error('no rows selected', ['Please select at least one row.'])
 
 window.select_cat_text_field = (id) ->
   if (typeof numericalValue)
@@ -700,7 +706,7 @@ format = (complaint_entry_row) ->
       $.each current_categories, (key, value) ->
         category = this
         active =  $(this).attr("is_active")
-        if active == 1
+        if active == true
           confidence = this.confidence
           mnemonic = this.mnem
           name = this.descr
@@ -801,9 +807,9 @@ format = (complaint_entry_row) ->
       '<label class="content-label-sm">Case ID</label>' +
       '<span class="nested-complaint-data case-id"><a href="complaints/' + complaint_entry.complaint_id + '">' + complaint_entry.complaint_id + '</a></span>' +
       '<label class="content-label-sm">Entry URI</label>' +
-      '<span class="nested-complaint-data" id="entry-uri-' + complaint_entry.entry_id + '">' + uri + '</span>' +
+      '<span class="nested-complaint-data input-truncate esc-tooltipped" id="entry-uri-' + complaint_entry.entry_id + '" title="' + url + '">' + uri + '</span>' +
       '<label class="content-label-sm" id="site-search">Site Search</label>' +
-      '<span class="nested-complaint-data" id="site-search-' + complaint_entry.entry_id + '">' + search_uri + '</span>' +
+      '<span class="nested-complaint-data input-truncate esc-tooltipped" id="site-search-' + complaint_entry.entry_id + '" title="' + url + '">' + search_uri + '</span>' +
       '<label class="content-label-sm">Customer Description</label>' +
       '<span class="nested-complaint-data">' + customer_description + '</span>' +
       '</div></div><div class="col-xs-5 col-with-divider">' +
@@ -1001,9 +1007,9 @@ window.click_table_buttons = (complaint_table, button)->
       persist: false,
       create: false,
       maxItems: 5,
-      valueField: 'value',
-      labelField: 'value',
-      searchField: ['text'],
+      valueField: 'category_id',
+      labelField: 'category_name',
+      searchField: ['category_name', 'category_code'],
       options: AC.WebCat.createSelectOptions()
       items: selected_options(row.data().category)
     }
@@ -1153,7 +1159,10 @@ window.open_nonviewable = () ->
   open_selected(selected_rows, false)
 window.open_selected = () ->
   selected_rows = $('#complaints-index').DataTable().rows('.selected')
-  open_selected(selected_rows, true)
+  if selected_rows[0].length == 0
+    std_msg_error('No rows selected', ['Please select at least one row.'])
+  else
+    open_selected(selected_rows, true)
 window.open_all = () ->
   selected_rows = $('#complaints-index').DataTable().rows()
   open_selected(selected_rows, true)
@@ -1220,6 +1229,7 @@ window.commit_marked = () ->
 
 
 window.advanced_webcat_index_table = () ->
+  complaint_save_search_format = /[!@#$%^&*()_+\-=\[\]{};':"\\|,.<>\/?]/
   data = {
     customer: {
       name: $('#cat_named_search').find('input[id="name-input"]').val()
@@ -1243,7 +1253,10 @@ window.advanced_webcat_index_table = () ->
     modified_older: $('#cat_named_search').find('input[id="modified-older-input"]').val()
     modified_newer: $('#cat_named_search').find('input[id="modified-newer-input"]').val()
   }
-  window.populate_advanced_webcat_index_table(data)
+  if complaint_save_search_format.test(data.search_name) == true
+    std_msg_error('save search name error', ['Please enter a name without any special character', 'Example: !@#$%^&*()'])
+  else
+    window.populate_advanced_webcat_index_table(data)
 
 
 window.populate_advanced_webcat_index_table = (data = {}) ->
