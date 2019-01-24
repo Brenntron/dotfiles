@@ -498,7 +498,7 @@ class ComplaintEntry < ApplicationRecord
 
     # Save this search as a named search
     if params.present? && search_name.present?
-      Dispute.save_named_search(search_name, params, user: user)
+      Dispute.save_named_search(search_name, params, user: user, project_type: 'Complaint')
     end
     relation
   end
