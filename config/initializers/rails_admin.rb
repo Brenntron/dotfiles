@@ -28,7 +28,7 @@ RailsAdmin.config do |config|
     begin
       authorize! :read, Admin
     rescue
-      flash[:error] = 'Im sorry, Im afraid I can let you go there. Admins Only.'
+      flash[:error] = 'Im sorry, Im afraid I cant let you go there. Admins Only.'
       redirect_to '/'
     end
 
