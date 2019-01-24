@@ -53,7 +53,6 @@ ActiveRecord::Schema.define(version: 2019_01_22_220012) do
     t.index ["rule_id"], name: "index_attachments_on_rule_id"
     t.index ["task_id"], name: "index_attachments_on_task_id"
   end
-  
 
   create_table "bug_blockers", options: "ENGINE=InnoDB DEFAULT CHARSET=utf8", force: :cascade do |t|
     t.integer "snort_blocker_bug_id"
@@ -125,6 +124,7 @@ ActiveRecord::Schema.define(version: 2019_01_22_220012) do
     t.integer "unused_svn_result_code"
     t.boolean "tested"
     t.boolean "in_summary", default: false
+    t.boolean "edited", default: false
     t.index ["bug_id", "rule_id"], name: "index_bugs_rules_on_bug_id_and_rule_id", unique: true
   end
 
@@ -834,7 +834,7 @@ ActiveRecord::Schema.define(version: 2019_01_22_220012) do
     t.text "value"
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
-    t.index ["user_id", "name"], name: "index_user_preferences_on_user_id"
+    t.index ["user_id", "name"], name: "index_user_preferences_on_user_id_and_name"
   end
 
   create_table "users", options: "ENGINE=InnoDB DEFAULT CHARSET=utf8", force: :cascade do |t|
