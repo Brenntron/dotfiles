@@ -96,20 +96,14 @@ $ ->
         {
           data: 'age'
           width: '40px'
-          'render':(data) ->
-            parts = data.split(' ')
-            days = parseInt(parts[0])
-            hour = parseInt(parts[1])
+          'render':(data,type,full,meta) ->
+            ticket_latency = data
+            if full.age > 'about 3 hours'
+              ticket_latency = '<span class="ticket-age-over3hr">' + data + '</span>'
+            else if full.age > 'about 12 hours'
+              ticket_latency = '<span class="overdue">' + data + '</span>'
 
-            if days == 0
-              if hour < 3
-                data
-              else if hour < 5
-                '<span class="ticket-age-over3hr">' + data + '</span>'
-              else
-                '<span class="overdue">' + data + '</span>'
-            else
-              '<span class="overdue">' + data + '</span>'
+            ticket_latency
         }
         {
           data: 'status'
