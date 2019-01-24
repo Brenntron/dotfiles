@@ -282,13 +282,18 @@ window.updateEntryColumns = (entry_id,row_id) ->
   $("#submit_changes_#{entry_id}").prop("disabled",true)
   prefix = $('#complaint_prefix_'+entry_id)[0].value
   categories = $('#input_cat_'+entry_id).val().toString()
+  category_name = $('#input_cat_' + entry_id).next('.selectize-control').find('.item')
+  category_names = []
+  category_name.each ->
+    category_names.push($(this).text())
+  category_names = category_names.toString()
+  debugger
   status = $('[name=resolution'+entry_id+']:checked').val()
   comment = $('#complaint_comment_'+entry_id)[0].value
   resolution_comment = $('#complaint_resolution_comment_'+entry_id)[0].value
   headers = {'Token': $('input[name="token"]').val(), 'Xmlrpc-Token': $('input[name="xml_token"]').val()}
 
   unchanged = $("#unchanged#{entry_id}").is(':checked')
-
   if categories.length == 0 && status != 'INVALID' && unchanged == false
     std_msg_error("Must include at least one category.","", reload: false)
     $("#submit_changes_#{entry_id}").prop("disabled",false)
@@ -297,7 +302,7 @@ window.updateEntryColumns = (entry_id,row_id) ->
       url: '/escalations/api/v1/escalations/webcat/complaint_entries/update'
       method: 'POST'
       headers: headers
-      data: {'id': entry_id,'prefix': prefix,'categories':categories,'status':status,'comment':comment, 'resolution_comment': resolution_comment }
+      data: {'id': entry_id,'prefix': prefix,'categories':categories, 'category_names':category_names, 'status':status,'comment':comment, 'resolution_comment': resolution_comment }
       success: (response) ->
         json = $.parseJSON(response)
         if !json.error
@@ -307,7 +312,8 @@ window.updateEntryColumns = (entry_id,row_id) ->
           temp_row.data().resolution = status
           temp_row.data().internal_comment = comment
           temp_row.data().resolution_comment = resolution_comment
-          temp_row.data().category = categories
+          temp_row.data().category = category_names
+          temp_row.data().category_names = category_names
           temp_row.invalidate().draw()
           temp_row.child().remove()
           temp_row.child(format(temp_row)).show()
@@ -319,7 +325,7 @@ window.updateEntryColumns = (entry_id,row_id) ->
             labelField: 'category_name',
             searchField: ['category_name', 'category_code'],
             options: AC.WebCat.createSelectOptions()
-            items: selected_options(temp_row.data().category)
+            items: selected_options(temp_row.data().category_names)
           }
           $('#input_cat_pending'+ temp_row.data().entry_id).selectize {
             persist: false,
@@ -329,7 +335,7 @@ window.updateEntryColumns = (entry_id,row_id) ->
             labelField: 'category_name',
             searchField: ['category_name', 'category_code'],
             options: AC.WebCat.createSelectOptions()
-            items: selected_options(temp_row.data().category)
+            items: selected_options(temp_row.data().category_names)
           }
 
       error: (response) ->
@@ -420,10 +426,10 @@ window.edit_selected_complaints = () ->
   else
     std_msg_error("alert",["There was an error. Please select an entry to edit"])
 
-selected_options = (categories) ->
+selected_options = (category_names) ->
   options = []
-  if categories
-    options = categories.split(',')
+  if category_names
+    options = category_names.split(',')
   return options
 
 $('html').on 'click', (e) ->
