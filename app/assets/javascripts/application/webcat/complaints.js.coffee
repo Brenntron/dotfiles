@@ -274,6 +274,11 @@ window.updatePending = (id,row_id) ->
           options: AC.WebCat.createSelectOptions(),
           items: selected_options(temp_row.data().category)
         }
+      tds = $('#complaints-index tbody').closest('td')
+      for td in tds
+        if td.className == ''
+          td.classList.add('nested-complaint-data-wrapper')
+
     error: (response) ->
       notice_html = "<p>Something went wrong: #{response.responseText}</p>"
   , this)
@@ -331,6 +336,10 @@ window.updateEntryColumns = (entry_id,row_id) ->
             options: AC.WebCat.createSelectOptions()
             items: selected_options(temp_row.data().category)
           }
+        tds = $('#complaints-index tbody').closest('td')
+        for td in tds
+          if td.className == ''
+            td.classList.add('nested-complaint-data-wrapper')
 
       error: (response) ->
         $("#submit_changes_#{entry_id}").prop("disabled",false)
