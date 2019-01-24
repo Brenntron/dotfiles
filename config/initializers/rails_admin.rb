@@ -25,7 +25,12 @@ RailsAdmin.config do |config|
   # config.authorize_with :cancan
 
   config.authorize_with do
-    authorize! :read, Admin
+    begin
+      authorize! :read, Admin
+    rescue
+      redirect_to '/'
+    end
+
   end
 
   ## == Pundit ==
