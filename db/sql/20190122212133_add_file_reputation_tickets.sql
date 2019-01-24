@@ -15,4 +15,4 @@ CREATE INDEX index_file_reputation_tickets_on_customer_id ON file_reputation_tic
 CREATE INDEX index_file_reputation_tickets_on_reputation_file_id ON file_reputation_tickets (reputation_file_id);
 
 
-INSERT INTO `schema_migrations` (`version`) VALUES ('20181219125445');
+INSERT INTO `schema_migrations` (`version`) VALUES ('20190122212133');
