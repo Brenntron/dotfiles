@@ -209,7 +209,7 @@ module API
               responses.each do |position, response|
                 categories[position] = {}
                 response['data'].each_with_index do |data, category_position|
-                  categories[position][category_position] = Wbrs::Category.find(data['category_id']).descr
+                  categories[position][category_position] = data['category_id']
                 end
               end
 
