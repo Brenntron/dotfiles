@@ -278,7 +278,6 @@ window.updatePending = (id,row_id) ->
       for td in tds
         if td.className == ''
           td.classList.add('nested-complaint-data-wrapper')
-          console.log('wrapper on this')
 
     error: (response) ->
       notice_html = "<p>Something went wrong: #{response.responseText}</p>"
@@ -341,7 +340,6 @@ window.updateEntryColumns = (entry_id,row_id) ->
         for td in tds
           if td.className == ''
             td.classList.add('nested-complaint-data-wrapper')
-            console.log('wrapper on this')
 
       error: (response) ->
         $("#submit_changes_#{entry_id}").prop("disabled",false)
