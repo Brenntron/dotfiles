@@ -4,6 +4,7 @@ CREATE TABLE `reputation_file` (`id` bigint NOT NULL AUTO_INCREMENT PRIMARY KEY,
 CREATE TABLE `immunet_false_positives` (`id` bigint NOT NULL AUTO_INCREMENT PRIMARY KEY, `version` varchar(255) ) ENGINE=InnoDB;
 
 DROP TABLE `amp_false_positive_files`;
+DROP TABLE `amp_false_positives`;
 
 CREATE TABLE `amp_false_positives` (`id` bigint NOT NULL AUTO_INCREMENT PRIMARY KEY, `payload` text, `file_reputation_ticket_id` bigint , `sr_id` int) ENGINE=InnoDB;
 
