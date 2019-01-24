@@ -1277,6 +1277,10 @@ window.advanced_webcat_index_table = () ->
 
 
 window.populate_advanced_webcat_index_table = (data = {}) ->
+  $('#loader-modal').modal({
+    backdrop: 'static',
+    keyboard: false
+  })
   headers = {'Token': $('input[name="token"]').val(), 'Xmlrpc-Token': $('input[name="xml_token"]').val()}
   $.ajax(
     url: '/escalations/api/v1/escalations/webcat/complaint_entries'
@@ -1288,6 +1292,8 @@ window.populate_advanced_webcat_index_table = (data = {}) ->
       json = $.parseJSON(response)
       if json.error
         notice_html = "<p>Something went wrong: #{json.error}</p>"
+        $('#loader-modal').hide()
+        $('.modal-backdrop').remove()
         alert(json.error)
       else
         $('.tickets-totals-table').trigger("click") #close open dropdowns
@@ -1295,8 +1301,16 @@ window.populate_advanced_webcat_index_table = (data = {}) ->
         datatable.clear();
         datatable.rows.add(json.data);
         datatable.draw();
+        setTimeout (->
+          $('#loader-modal').hide()
+          $('.modal-backdrop').remove()
+        ), 2000
+#        $('#loader-modal').hide()
+#        $('.modal-backdrop').remove()
 
       error: (response) ->
+        $('#loader-modal').hide()
+        $('.modal-backdrop').remove()
         std_api_error(response, "There was an error loading search results.", reload: false)
   , this)
 

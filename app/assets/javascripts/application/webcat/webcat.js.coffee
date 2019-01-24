@@ -205,6 +205,10 @@ $ ->
     $('#general_search').on 'keyup', (e) ->
       if event.keyCode == 13
         # do the ajax call
+        $('#loader-modal').modal({
+          backdrop: 'static',
+          keyboard: false
+        })
         filter = this.value
         headers = {'Token': $('input[name="token"]').val(), 'Xmlrpc-Token': $('input[name="xml_token"]').val()}
         $.ajax(
@@ -215,6 +219,8 @@ $ ->
 
             json = $.parseJSON(response)
             if json.error
+              $('#loader-modal').hide()
+              $('.modal-backdrop').remove()
               notice_html = "<p>Something went wrong: #{json.error}</p>"
               alert(json.error)
             else
@@ -222,8 +228,12 @@ $ ->
               datatable.clear();
               datatable.rows.add(json.data);
               datatable.draw();
+              $('#loader-modal').hide()
+              $('.modal-backdrop').remove()
 
           error: (response) ->
+            $('#loader-modal').hide()
+            $('.modal-backdrop').remove()
             std_api_error(response, "There was an error loading search results.", reload: false)
         , this)
 

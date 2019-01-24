@@ -49,6 +49,10 @@ window.populate_webrep_index_table = (data = {}, reload = false) ->
       array_of_showns.push row.data().id
 
   headers = {'Token': $('input[name="token"]').val(), 'Xmlrpc-Token': $('input[name="xml_token"]').val()}
+  $('#loader-modal').modal({
+    backdrop: 'static',
+    keyboard: false
+  })
   $.ajax(
     url: '/escalations/api/v1/escalations/webrep/disputes'
     method: 'GET'
@@ -64,6 +68,8 @@ window.populate_webrep_index_table = (data = {}, reload = false) ->
         std_msg_error("No tickets matching filter or search.","")
 
       if json.error
+        $('#loader-modal').hide()
+        $('.modal-backdrop').remove()
         $('#refresh-working-msg').hide()
         $('#refresh-error-msg').show()
         $('#refresh-error-msg').html('An error occured while retrieving data')
@@ -97,13 +103,21 @@ window.populate_webrep_index_table = (data = {}, reload = false) ->
                     $('.dispute-entry-table td, .dispute-entry-table th').each ->
                       if $(this).hasClass(checkbox_trigger)
                         $(this).show()
+                      $('#loader-modal').hide()
+                      $('.modal-backdrop').remove()
                       return
                   else if $(checkbox).prop('checked') == false
                     $('.dispute-entry-table td, .dispute-entry-table th').each ->
                       if $(this).hasClass(checkbox_trigger)
                         $(this).hide()
+                      $('#loader-modal').hide()
+                      $('.modal-backdrop').remove()
                       return
+                  $('#loader-modal').hide()
+                  $('.modal-backdrop').remove()
                   return
+                $('#loader-modal').hide()
+                $('.modal-backdrop').remove()
                 return
 
         if array_of_dispute_clicks.length > 0
@@ -129,8 +143,12 @@ window.populate_webrep_index_table = (data = {}, reload = false) ->
           searchId = 'saved_search_' + json.search_id
           if $('#saved-search-tbody tr#' + searchId).length == 0
             $('#saved-search-tbody').append(named_search_tag(json.search_name, json.search_id))
+        $('#loader-modal').hide()
+        $('.modal-backdrop').remove()
 
     error: (response) ->
+      $('#loader-modal').hide()
+      $('.modal-backdrop').remove()
       $('#refresh-working-msg').hide()
       $('#refresh-error-msg').show()
       $('#refresh-error-msg').html('An error occured while retrieving data')
