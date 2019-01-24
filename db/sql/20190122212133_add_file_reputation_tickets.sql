@@ -14,5 +14,10 @@ CREATE INDEX index_amp_false_positives_on_payload ON amp_false_positives (payloa
 CREATE INDEX index_file_reputation_tickets_on_customer_id ON file_reputation_tickets (customer_id);
 CREATE INDEX index_file_reputation_tickets_on_reputation_file_id ON file_reputation_tickets (reputation_file_id);
 
+INSERT INTO `schema_migrations` (`version`) VALUES ('20190122211756');
+INSERT INTO `schema_migrations` (`version`) VALUES ('20190122211928');
+INSERT INTO `schema_migrations` (`version`) VALUES ('20190122212005');
+INSERT INTO `schema_migrations` (`version`) VALUES ('20190122212049');
+INSERT INTO `schema_migrations` (`version`) VALUES ('20190122215848');
+INSERT INTO `schema_migrations` (`version`) VALUES ('20190122220012');
 
-INSERT INTO `schema_migrations` (`version`) VALUES ('20190122212133');
