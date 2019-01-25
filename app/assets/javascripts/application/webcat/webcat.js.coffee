@@ -96,20 +96,30 @@ $ ->
         {
           data: 'age'
           width: '40px'
-          'render':(data) ->
-            parts = data.split(' ')
-            days = parseInt(parts[0])
-            hour = parseInt(parts[1])
-
-            if days == 0
-              if hour < 3
-                data
-              else if hour < 5
-                '<span class="ticket-age-over3hr">' + data + '</span>'
+          'render':(data,type,full,meta) ->
+            if data.includes('minute')
+              complaint_latency = data
+            if data.includes('hour')
+              hours = parseInt(data.replace(/[^0-9]/g, ''))
+              if hours <= 3
+                complaint_latency = data
               else
-                '<span class="overdue">' + data + '</span>'
+                complaint_latency = '<span class="ticket-age-over3hr">' + data + '</span>'
+              if hours > 12
+                complaint_latency = '<span class="overdue">' + data + '</span>'
             else
-              '<span class="overdue">' + data + '</span>'
+              complaint_latency = data
+            if data.includes('day')
+              day = parseInt(data.replace(/[^0-9]/g, ''))
+              if day >= 1
+                complaint_latency = '<span class="overdue">' + data + '</span>'
+            if data.includes('months')
+              month = parseInt(data.replace(/[^0-9]/g, ''))
+              complaint_latency = '<span class="overdue">' + data + '</span>'
+            if data.includes('year')
+              year = parseInt(data.replace(/[^0-9]/g, ''))
+              complaint_latency = '<span class="overdue">' + data + '</span>'
+            complaint_latency
         }
         {
           data: 'status'
