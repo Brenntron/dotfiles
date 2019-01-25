@@ -339,7 +339,7 @@ class Complaint < ApplicationRecord
             ces = ComplaintEntryScreenshot.new
             ces.error_message = e.message
             ces.complaint_entry_id = new_complaint_entry.id
-            open("app/assets/images/failed_screenshot.jpg") do |f|
+            open("app/assets/images/timeout_screenshot.jpg") do |f|
               ces.screenshot = f.read
             end
             ces.save!
@@ -409,7 +409,7 @@ class Complaint < ApplicationRecord
             ces = ComplaintEntryScreenshot.new
             ces.error_message = e.message
             ces.complaint_entry_id = new_complaint_entry.id
-            open("app/assets/images/failed_screenshot.jpg") do |f|
+            open("app/assets/images/timeout_screenshot.jpg") do |f|
               ces.screenshot = f.read
             end
             ces.save!
