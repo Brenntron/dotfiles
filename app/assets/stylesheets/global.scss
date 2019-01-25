@@ -6811,7 +6811,7 @@ h2 {
   height: 50px;
   background-color: $faint-neutral-color;
   margin: 0;
-  padding: 0 15px;
+  padding: 0 15px 0 0;
 
   label {
     position: relative;
@@ -7072,7 +7072,7 @@ h2 {
 
 .total-table-ticket-count {
   font-weight: 600;
-  margin-right: 8px;
+  margin-right: 2px;
 }
 
 .total-table-entry-count {
