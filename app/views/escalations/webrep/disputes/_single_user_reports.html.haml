@@ -37,8 +37,8 @@
         %h3.larger-lighter
           My Open Tickets
         .ticket-count-wrapper
-          %label#open_single_ticket_count.total-table-ticket-count
-          %label#open_single_entry_count.total-table-entry-count
+          %label#open_single_ticket_count.total-table-ticket-count.esc-tooltipped{title: 'Total Open Tickets'}
+          %label#open_single_entry_count.total-table-entry-count.esc-tooltipped{title: 'Total Open Ticket Entries'}
       %table.table.responsive.dashboard-tickets-table#table-user-disputes-open
         %thead
           %tr
@@ -82,8 +82,8 @@
       .closed-tickets-header
         %h3.larger-lighter My Closed Tickets
         .ticket-count-wrapper
-          %label#closed_single_ticket_count.total-table-ticket-count
-          %label#closed_single_entry_count.total-table-entry-count
+          %label#closed_single_ticket_count.total-table-ticket-count.esc-tooltipped{title: 'Total Closed Tickets'}
+          %label#closed_single_entry_count.total-table-entry-count.esc-tooltipped{title: 'Total Closed Ticket Entries'}
       %table.table.responsive.dashboard-tickets-table#table-user-disputes-closed
         %thead
           %tr

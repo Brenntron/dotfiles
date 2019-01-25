@@ -35,8 +35,8 @@
       .open-tickets-header
         %h3.larger-lighter Open Team Tickets
         .ticket-count-wrapper
-          %label.total-table-ticket-count#open_multi_ticket_count
-          %label.total-table-entry-count#open_multi_entry_count
+          %label.total-table-ticket-count#open_multi_ticket_count.esc-tooltipped{title: 'Total Open Team Tickets'}
+          %label.total-table-entry-count#open_multi_entry_count.esc-tooltipped{title: 'Total Open Team Ticket Entries'}
       %table.table.responsive.dashboard-tickets-table#table-multi-user-disputes-open
         %thead
           %tr
@@ -85,8 +85,8 @@
       .closed-tickets-header
         %h3.larger-lighter Closed Team Tickets
         .ticket-count-wrapper
-          %label.total-table-ticket-count#closed_multi_ticket_count
-          %label.total-table-entry-count#closed_multi_entry_count
+          %label.total-table-ticket-count#closed_multi_ticket_count.esc-tooltipped{title: 'Total Closed Team Tickets'}
+          %label.total-table-entry-count#closed_multi_entry_count.esc-tooltipped{title: 'Total Closed Team Ticket Entries'}
       %table.table.responsive.dashboard-tickets-table#table-multi-user-disputes-closed
         %thead
           %tr

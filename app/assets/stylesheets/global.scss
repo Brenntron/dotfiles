@@ -2890,10 +2890,6 @@ fieldset.top-content {
   margin-bottom: -20px !important;
 }
 
-.esc-tooltipped:hover {
-  cursor: pointer;
-}
-
 .rule-alerts-table .alerted-flag {
   background-image: url(image_path('icon_alert_red.svg'));
   background-repeat: no-repeat;
@@ -7076,8 +7072,6 @@ h2 {
 
 .total-table-ticket-count {
   font-weight: 600;
-  background-color: $faint-accent-color;
-  border-radius: 50%;
   margin-right: 8px;
 }
 
