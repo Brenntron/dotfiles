@@ -547,8 +547,9 @@ window.build_single_time_to_close_linechart = () ->
                   display: false
                 ticks: {
                   min: 0
+                  precision: 1
                   callback: (value, index, values) ->
-                    return value + ' hr'
+                    return Number(value).toFixed(1) + ' hr'
                 }
               }
             ]
