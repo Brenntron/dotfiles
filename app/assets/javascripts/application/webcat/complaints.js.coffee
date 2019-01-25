@@ -91,7 +91,6 @@ window.webcat_reset_search = ()->
   tags_control.clear()
 
 window.multiple_url_categorization = ()->
-  event.preventDefault()
 
   urls = $("#categorize_urls").val().split(/\n/)
   cats = $("#multi_cat_url_cats").val()
