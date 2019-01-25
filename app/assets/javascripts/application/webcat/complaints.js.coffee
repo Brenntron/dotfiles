@@ -1199,22 +1199,31 @@ toggle_selected = (table, selected_rows)->
     i++
 
 window.collapse_selected =()->
-  table = $('#complaints-index').DataTable()
-  selected_rows = table.rows('.shown.selected')
-  toggle_selected(table,selected_rows)
+  selectedRows = $('.selected')
+
+  if $(selectedRows[1]).hasClass('shown')
+    $(selectedRows[1]).find('.expand-row-button-inline').click()
+
 window.collapse_all =()->
-  table = $('#complaints-index').DataTable()
-  selected_rows = table.rows('.shown')
-  toggle_selected(table,selected_rows)
+  selectedRows = $('table#' + 'complaints-index' + ' tr[role="row"]')
+
+  for i in [0..selectedRows.length]
+    if $(selectedRows[i]).hasClass('shown')
+      $(selectedRows[i]).find('.expand-row-button-inline').click()
 
 window.expand_selected =()->
-  table = $('#complaints-index').DataTable()
-  selected_rows = table.rows('.selected.not-shown')
-  toggle_selected(table,selected_rows)
+  selectedRows = $('.selected')
+
+  if !$(selectedRows[1]).hasClass('shown')
+    $(selectedRows[1]).find('.expand-row-button-inline').click()
+
 window.expand_all =()->
-  table = $('#complaints-index').DataTable()
-  selected_rows = table.rows('.not-shown')
-  toggle_selected(table,selected_rows)
+  selectedRows = $('table#' + 'complaints-index' + ' tr[role="row"]')
+
+  for i in [0..selectedRows.length]
+    if !$(selectedRows[i]).hasClass('shown')
+      $(selectedRows[i]).find('.expand-row-button-inline').click()
+
 
 
 window.mark_for_commit = () ->
