@@ -350,7 +350,11 @@ window.build_graph_ticket_entries_submitter = () ->
               {
                 gridLines: display: false
                 ticks: {
-                  min: 0
+                  beginAtZero: true,
+                  callback: (value) ->
+                    if Number.isInteger(value)
+                      return value
+                    return
                 }
               }
             ]
@@ -387,7 +391,11 @@ window.build_graph_ticket_entries_submitter = () ->
               {
                 gridLines: display: false
                 ticks: {
-                  min: 0
+                  beginAtZero: true,
+                  callback: (value) ->
+                    if Number.isInteger(value)
+                      return value
+                    return
                 }
               }
             ]
@@ -879,7 +887,11 @@ window.build_single_entries_closed_by_day_chart = () ->
                 gridLines:
                   display: false
                 ticks: {
-                  min: 0
+                  beginAtZero: true,
+                  callback: (value) ->
+                    if Number.isInteger(value)
+                      return value
+                    return
                 }
               }
             ]
@@ -966,6 +978,13 @@ window.build_multi_entries_closed_by_day_chart = () =>
             yAxes: [
               {
                 gridLines: display: false
+                ticks: {
+                  beginAtZero: true,
+                  callback: (value) ->
+                    if Number.isInteger(value)
+                      return value
+                    return
+                }
               }
             ]
             xAxes: [
@@ -1049,7 +1068,11 @@ window.build_multi_ticket_resolution_by_owner_chart = () ->
               {
                 gridLines: display: false
                 ticks: {
-                  min: 0
+                  beginAtZero: true,
+                  callback: (value) ->
+                    if Number.isInteger(value)
+                      return value
+                    return
                 }
               }
             ]
@@ -1125,7 +1148,11 @@ window.build_multi_entries_closed_by_owners_chart = () ->
               {
                 gridLines: display: false
                 ticks: {
-                  min: 0
+                  beginAtZero: true,
+                  callback: (value) ->
+                    if Number.isInteger(value)
+                      return value
+                    return
                 }
                 scaleLabel: {
                   display: true,
@@ -1258,7 +1285,11 @@ window.build_multi_rulehits_for_fp_res_chart = () ->
               {
                 gridLines: display: false
                 ticks: {
-                  min: 0
+                  beginAtZero: true,
+                  callback: (value) ->
+                    if Number.isInteger(value)
+                      return value
+                    return
                 }
                 scaleLabel: {
                   display: true,
