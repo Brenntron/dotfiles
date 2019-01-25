@@ -125,8 +125,7 @@
   .col-xl-6.col-lg-5.col-xs-12.graph-section
     .row
       .col-md-12.col-lg-7
-
-        .reports-graph-wrapper.ticket-entry-bar-graph-wrapper
+        .reports-graph-info-container
           %h5 Total Ticket Entries Closed
           .graph-config
             -# TODO Hook this up
@@ -149,13 +148,15 @@
                 %label.dispute-W.legend-option
                 %label.dispute-EW.legend-option
                 Entries By Ticket Types
-          %canvas#graph-ticket-entries-closed
+          .reports-graph-wrapper
+            %canvas#graph-ticket-entries-closed
 
-        .reports-graph-wrapper
+        .reports-graph-info-container
           %h5 Time to Close Tickets
-          %canvas#time-to-close-tickets-linechart
+          .reports-graph-wrapper
+            %canvas#time-to-close-tickets-linechart
 
-        .reports-graph-wrapper
+        .reports-graph-info-container
           %h5 Ticket Submitted by Submitter Type
           .graph-config
             -# TODO Hook this up
@@ -168,15 +169,15 @@
             .graph-bar-legend
               %label.skyblue-legend-color.graph-legend-circle Customer
               %label.navyblue-legend-color.graph-legend-circle Guest
-          %canvas#graph-ticket-entries-submitter
+          .reports-graph-wrapper
+            %canvas#graph-ticket-entries-submitter
 
 
       .col-md-12.col-lg-5.graph-section
-
-        .reports-graph-wrapper
+        .reports-graph-info-container
           %h5.dispute-E-grey.graph-header-icon-stg Closed Email Entries by Resolution
-          %canvas#closed-email-entries-resolution-piechart
-
+          .reports-graph-wrapper
+            %canvas#closed-email-entries-resolution-piechart
           %table.table#closed-email-entries-resolution-table
             %thead
               %tr
@@ -185,10 +186,10 @@
                 %th.text-center Count
             %tbody
 
-        .reports-graph-wrapper
+        .reports-graph-info-container
           %h5.dispute-W-grey.graph-header-icon-stg Closed Web Entries by Resolution
-          %canvas#closed-web-entries-resolution-piechart
-
+          .reports-graph-wrapper
+            %canvas#closed-web-entries-resolution-piechart
           %table.table#closed-web-entries-resolution-table
             %thead
               %tr

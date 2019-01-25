@@ -7307,6 +7307,9 @@ td.text-center span {
 .graph-menu, .graph-bar-legend {
   border: 1px solid $faint-neutral-color;
   padding: 3px 5px;
+  position: absolute;
+  top: 26px;
+  right: 20px;
 
   .total-legend {
     background-color: skyblue;
@@ -7377,6 +7380,11 @@ td.text-center span {
   margin-top: 22px;
 }
 
+.reports-graph-info-container {
+  margin: 30px 0;
+  position: relative;
+}
+
 .reports-graph-wrapper h5 {
   text-align: center;
   color: $type-lighter-color;
@@ -7384,14 +7392,18 @@ td.text-center span {
 }
 
 .reports-graph-wrapper {
-  margin: 30px 0;
+  height: 240px;
 }
 
-.reports-graph-wrapper table {
+.reports-graph-wrapper.graph-with-small-menu {
+  margin-top: 50px;
+}
+
+.reports-graph-info-container table {
   font-size: 7.5pt;
 }
 
-.reports-graph-wrapper table > tbody > tr > td, .reports-graph-wrapper table > tbody > tr > td {
+.reports-graph-info-container table > tbody > tr > td, .reports-graph-info-container table > tbody > tr > td {
   padding: 4px 8px;
 }
 

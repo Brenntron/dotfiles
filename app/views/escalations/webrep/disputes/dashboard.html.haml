@@ -45,11 +45,13 @@
             %span.down-arrow
             %a.group-user-white.icon-team-grey.user-icon-stg.bold{'data-toggle': 'tab', role: 'tab', 'aria-controls': 'my-team-tickets', href: '#my-team-tickets'} My Team Tickets
           %li{role: 'presentation'}
-            %span.down-arrow
-            %a.all-tickets-white.icon-all-tickets-grey.user-icon-stg.bold{'data-toggle': 'tab', role: 'tab', 'aria-controls': 'all-tickets', href: '#all-tickets'} All Tickets
+            -# TODO Add 'All Tickets'
+            -#%span.down-arrow
+            -#%a.all-tickets-white.icon-all-tickets-grey.user-icon-stg.bold{'data-toggle': 'tab', role: 'tab', 'aria-controls': 'all-tickets', href: '#all-tickets'} All Tickets
           %li{role: 'presentation'}
-            %span.down-arrow
-            %a.custom-user-white.icon-custom-user-grey.user-icon-stg.bold{'data-toggle': 'tab', role: 'tab', 'aria-controls': 'select-custom-users', href: '#select-custom-users'} Select Custom Users
+            -# TODO Add 'Custom User Tickets'
+            -#%span.down-arrow
+            -#%a.custom-user-white.icon-custom-user-grey.user-icon-stg.bold{'data-toggle': 'tab', role: 'tab', 'aria-controls': 'select-custom-users', href: '#select-custom-users'} Select Custom Users
 
         .dashboard-submission-area
           %label#total-valid-ticket-count.right-vertical-separator.bold.font-lg
@@ -67,10 +69,10 @@
                   %input.report-checkbox#my_tickets_report{type: 'checkbox', checked: 'checked', name: 'mytickets'} My Tickets
                 %li
                   %input.report-checkbox#my_team_tickets_report{type: 'checkbox', checked: 'checked', name: 'myteamtickets'} My Team Tickets
-                %li
-                  %input.report-checkbox#all_tickets_report{type: 'checkbox', checked: 'checked', name: 'alltickets'} All Tickets
-                %li
-                  %input.report-checkbox#custom_tickets_report{type: 'checkbox', checked: 'checked', name: 'customtickets'} Custom Users Tickets
+                -#%li
+                -#  %input.report-checkbox#all_tickets_report{type: 'checkbox', checked: 'checked', name: 'alltickets'} All Tickets
+                -#%li
+                -#  %input.report-checkbox#custom_tickets_report{type: 'checkbox', checked: 'checked', name: 'customtickets'} Custom Users Tickets
               %hr
               %button#export-reports-button.primary
                 Export

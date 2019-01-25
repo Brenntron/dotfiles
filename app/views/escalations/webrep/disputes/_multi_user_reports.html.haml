@@ -134,23 +134,25 @@
     .row
       .col-md-12.col-lg-7
 
-        .reports-graph-wrapper
+        .reports-graph-info-container
           %h5 Ticket Entries Closed by Ticket Owner
-          %canvas#ticket-entries-closed-by-owner
+          .reports-graph-wrapper
+            %canvas#ticket-entries-closed-by-owner
 
-        .reports-graph-wrapper
+        .reports-graph-info-container
           %h5 Average Time to Close Tickets by Ticket Owner
-          %canvas#avg-time-to-close-tickets
+          .reports-graph-wrapper
+            %canvas#avg-time-to-close-tickets
 
-        .reports-graph-wrapper
+        .reports-graph-info-container
           %h5 Ticket Resolution by Ticket Owner
-          .graph-bar-legend
+          .graph-bar-legend.ticket-resolution-legend
             %label.navyblue-legend-color.graph-legend-circle Fixed FN
             %label.skyblue-legend-color.graph-legend-circle Fixed FP
             %label.lightgray-legend-color.graph-legend-circle Unchanged
             %label.orange-legend-color.graph-legend-circle Other
-          %canvas#ticket-resolutions-by-owner
-
+          .reports-graph-wrapper.graph-with-med-menu
+            %canvas#ticket-resolutions-by-owner
           %table.table
             %thead
               %tr
@@ -162,15 +164,16 @@
             %tbody
             %tfoot
 
-        .reports-graph-wrapper
+        .reports-graph-info-container
           %h5 Rule Hits for False Positive Resolutions
-          %canvas#rule-hits-fp-resolutions
+          .reports-graph-wrapper
+            %canvas#rule-hits-fp-resolutions
 
 
 
       .col-md-12.col-lg-5.graph-section
 
-        .reports-graph-wrapper
+        .reports-graph-info-container
           %h5 Total Ticket Entries Closed
           .graph-config
             -# TODO Hook this up
@@ -193,10 +196,10 @@
                 %label.dispute-W.legend-option
                 %label.dispute-EW.legend-option
                 Entries By Ticket Types
-          %canvas#graph-multiuser-ticket-entries-closed
+          .reports-graph-wrapper.graph-with-small-menu
+            %canvas#graph-multiuser-ticket-entries-closed
 
-
-        .reports-graph-wrapper
+        .reports-graph-info-container
           %h5 Tickets Submitted by Submitter Type
           .graph-config
             -# TODO Hook this up
@@ -210,12 +213,13 @@
             .graph-bar-legend
               %label.skyblue-legend-color.graph-legend-circle Customer
               %label.navyblue-legend-color.graph-legend-circle Guest
-          %canvas#graph-multiuser-ticket-entries-submitter
+          .reports-graph-wrapper
+            %canvas#graph-multiuser-ticket-entries-submitter
 
-        .reports-graph-wrapper
+        .reports-graph-info-container
           %h5.dispute-E-grey.graph-header-icon-stg Closed Email Entries by Resolution
-          %canvas#multi-email-entries-by-resolution-piechart
-
+          .reports-graph-wrapper
+            %canvas#multi-email-entries-by-resolution-piechart
           %table.table#multi-closed-email-entries-resolution-table
             %thead
               %tr
@@ -224,10 +228,10 @@
                 %th.text-center Count
             %tbody
 
-        .reports-graph-wrapper
+        .reports-graph-info-container
           %h5.dispute-E-grey.graph-header-icon-stg Closed Web Entries by Resolution
-          %canvas#multi-web-entries-by-resolution-piechart
-
+          .reports-graph-wrapper
+            %canvas#multi-web-entries-by-resolution-piechart
           %table.table#multi-closed-web-entries-resolution-table
             %thead
               %tr

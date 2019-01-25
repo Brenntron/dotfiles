@@ -340,6 +340,7 @@ window.build_graph_ticket_entries_submitter = () ->
             }]
         options:
           responsive: true
+          maintainAspectRatio: false
           legend:
             display: false
           scales:
@@ -377,6 +378,7 @@ window.build_graph_ticket_entries_submitter = () ->
           ]
         options:
           responsive: true
+          maintainAspectRatio: false
           legend: display: false
           scales:
             yAxes: [
@@ -454,6 +456,7 @@ window.build_single_closed_email_entries_resolution_piechart = () ->
           } ]
         options:
           responsive: true
+          maintainAspectRatio: false
           legend: false
           pieceLabel:
             render: (args) ->
@@ -530,6 +533,7 @@ window.build_single_time_to_close_linechart = () ->
           datasets: timeCloseTicketsDataSets
         options:
           responsive: true
+          maintainAspectRatio: false
           legend: false
           elements:
             point:
@@ -641,6 +645,7 @@ window.build_single_closed_web_entries_resolution_piechart = () ->
           } ]
         options:
           responsive: true
+          maintainAspectRatio: false
           legend: false
           pieceLabel:
             render: (args) ->
@@ -711,6 +716,7 @@ window.build_multi_closed_email_entries_resolution_piechart = () ->
           } ]
         options:
           responsive: true
+          maintainAspectRatio: false
           legend: false
           pieceLabel:
             render: (args) ->
@@ -780,6 +786,7 @@ window.build_multi_closed_web_entries_resolution_piechart = () ->
           } ]
         options:
           responsive: true
+          maintainAspectRatio: false
           legend: false
           pieceLabel:
             render: (args) ->
@@ -856,6 +863,7 @@ window.build_single_entries_closed_by_day_chart = () ->
           datasets: window.userTicketClosedGraphDatasets,
         options:
           responsive: true
+          maintainAspectRatio: false
           legend:
             display: false
           title:
@@ -949,6 +957,7 @@ window.build_multi_entries_closed_by_day_chart = () =>
           datasets: totalTicketEntriesbyType
         options:
           responsive: true
+          maintainAspectRatio: false
           legend: display: false
           scales:
             yAxes: [
@@ -1028,6 +1037,7 @@ window.build_multi_ticket_resolution_by_owner_chart = () ->
           ]
         options:
           responsive: true
+          maintainAspectRatio: false
           title:
             display: false
           legend: display: false
@@ -1088,6 +1098,7 @@ window.build_multi_entries_closed_by_owners_chart = () ->
       new Chart($('#ticket-entries-closed-by-owner'),
         type: 'horizontalBar'
         responsive: true
+        maintainAspectRatio: false
         data:
           labels: ticketOwners
           datasets: [ {
@@ -1096,6 +1107,7 @@ window.build_multi_entries_closed_by_owners_chart = () ->
           } ]
         options:
           responsive: true
+          maintainAspectRatio: false
           legend: display: false
           scales:
             yAxes: [
@@ -1160,6 +1172,7 @@ window.build_multi_average_time_to_close_tickets = () ->
           } ]
         options:
           responsive: true
+          maintainAspectRatio: false
           legend: display: false
           scales:
             yAxes: [
@@ -1230,6 +1243,7 @@ window.build_multi_rulehits_for_fp_res_chart = () ->
           } ]
         options:
           responsive: true
+          maintainAspectRatio: false
           legend: display: false
           scales:
             yAxes: [
