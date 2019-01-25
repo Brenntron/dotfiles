@@ -1285,20 +1285,19 @@ $ ->
       { data: 'case_opened_at' }
       {
         data: 'case_age'
-        render: (data) ->
-          parts = data.split(' ')
-          days = parseInt(parts[0])
-          hour = parseInt(parts[1])
-
-          if days == 0
-            if hour < 3
-              data
-            else if hour < 5
-              '<span class="ticket-age-over3hr">' + data + '</span>'
+        'render':(data,type,full,meta) ->
+          dispute_duration = moment(full.case_opened_at).fromNow()
+          if dispute_duration.includes('hour')
+            hours = parseInt(dispute_duration.replace(/[^0-9]/g, ''))
+            if hours <= 3
+              dispute_latency = data
+            else if hours > 12
+              dispute_latency = '<span class="overdue">' + data + '</span>'
             else
-              '<span class="overdue">' + data + '</span>'
+              dispute_latency = '<span class="ticket-age-over3hr">' + data + '</span>'
           else
-            '<span class="overdue">' + data + '</span>'
+            dispute_latency = '<span class="overdue">' + data + '</span>'
+          dispute_latency
       }
       { data: 'source' }
       { data: 'submitter_type'}
