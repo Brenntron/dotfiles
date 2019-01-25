@@ -360,6 +360,10 @@ window.build_graph_ticket_entries_submitter = () ->
             ]
             xAxes: [
               {
+                type: 'time'
+                time:
+                  displayFormats:
+                    day: 'MMM DD, YYYY'
                 gridLines: display: false
                 ticks: {
                   autoSkip: false
@@ -401,6 +405,10 @@ window.build_graph_ticket_entries_submitter = () ->
             ]
             xAxes: [
               {
+                type: 'time'
+                time:
+                  displayFormats:
+                    day: 'MMM DD, YYYY'
                 gridLines: display: false
                 ticks: {
                   autoSkip: false
@@ -897,6 +905,10 @@ window.build_single_entries_closed_by_day_chart = () ->
             ]
             xAxes: [
               {
+                type: 'time'
+                time:
+                  displayFormats:
+                    day: 'MMM DD, YYYY'
                 gridLines:
                   display: false
                 ticks: {
@@ -989,6 +1001,10 @@ window.build_multi_entries_closed_by_day_chart = () =>
             ]
             xAxes: [
               {
+                type: 'time'
+                time:
+                  displayFormats:
+                    day: 'MMM DD, YYYY'
                 gridLines: display: false
                 ticks: {
                   autoSkip: false
