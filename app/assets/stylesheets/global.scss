@@ -1666,6 +1666,10 @@ button.close {
   background-color: lighten($document-section-color, 33%)
 }
 
+#admin-subnav, #admin-subnav-icons {
+  background-color: lighten($admin-section-color, 30%);
+}
+
 .sub-nav svg {
   width: 20px;
   height: auto;
