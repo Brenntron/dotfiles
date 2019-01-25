@@ -2635,7 +2635,7 @@ $ ->
         render: (data) ->
           '<span class="esc-tooltipped bug-priority p-' + data + '" title="Priority ' + data + '"></span>'
       }
-      { data: 'case_number' }
+      { data: 'case_link' }
       {
         data: 'submitter_type'
         render: (data) ->
@@ -2682,7 +2682,7 @@ $ ->
         render: (data) ->
           '<span class="esc-tooltipped bug-priority p-' + data + '" title="Priority ' + data + '"></span>'
       }
-      { data: 'case_number' }
+      { data: 'case_link' }
       {
         data: 'submitter_type'
         render: (data) ->
@@ -2732,7 +2732,7 @@ $ ->
         render: (data) ->
           '<span class="esc-tooltipped bug-priority p-' + data + '" title="Priority ' + data + '"></span>'
       }
-      { data: 'case_number' }
+      { data: 'case_link' }
       {
         data: 'submitter_type'
         render: (data) ->
@@ -2781,7 +2781,9 @@ $ ->
         render: (data) ->
           '<span class="esc-tooltipped bug-priority p-' + data + '" title="Priority ' + data + '"></span>'
       }
-      { data: 'case_number' }
+      {
+        data: 'case_link'
+      }
       {
         data: 'submitter_type'
         render: (data) ->

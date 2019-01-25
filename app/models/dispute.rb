@@ -1212,6 +1212,7 @@ class Dispute < ApplicationRecord
       last_comment_time = result.dispute_comments.last.created_at.to_s unless result.dispute_comments.empty?
       ticket_user = result.user.cvs_username
       report_data[:table_data] << {:case_number => result.id,
+                      :case_link => "<a href='/escalations/webrep/disputes/#{result.id}'>#{result.case_id_str}</a>",
                       :status => result.status,
                       :d_entry_preview => "<span class='dispute_entry_content_first'>#{result.dispute_entries.first&.hostlookup}</span><span class='dispute-count'>#{entry_count}</span>",
                       :age => distance_of_time_in_words(Time.now, result.created_at),
@@ -1255,6 +1256,7 @@ class Dispute < ApplicationRecord
       entry_count = result.dispute_entries.select{ |entry| entry.status == DisputeEntry::STATUS_RESOLVED}.size
       ticket_user = result.user.cvs_username
       report_data[:table_data] << {:case_number => result.id,
+                      :case_link => "<a href='/escalations/webrep/disputes/#{result.id}'>#{result.case_id_str}</a>",
                       # :dispute => result.dispute_entries.first.hostlookup,
                       :d_entry_preview => "<span class='dispute_entry_content_first'>#{result.dispute_entries.first&.hostlookup}</span><span class='dispute-count'>#{entry_count}</span>",
                       :time_to_close => distance_of_time_in_words(result.created_at, result.case_resolved_at),
