@@ -261,14 +261,16 @@ window.set_date_label = () ->
   enddate = new Date(localStorage.getItem('webrep_report_range_to'))
   today = new Date()
   val = startdate.toLocaleDateString("en-US", dateOptions) + ' to ' + enddate.toLocaleDateString("en-US", dateOptions)
-  $('.dashboard-time label')[0].innerHTML = val
-  if today < enddate && today > startdate
-    $('#ticket-view-shortcut').html("View Last Week's Tickets")
-    $('#ticket-view-shortcut').switchClass('arrow-right','arrow-left')
+  if $('.dashboard-time label').length > 0
+    $('.dashboard-time label')[0].innerHTML = val
+    if today < enddate && today > startdate
+      $('#ticket-view-shortcut').html("View Last Week's Tickets")
+      $('#ticket-view-shortcut').switchClass('arrow-right','arrow-left')
+    else
+      $('#ticket-view-shortcut').html("View This Week's Tickets")
+      $('#ticket-view-shortcut').switchClass('arrow-left','arrow-right')
   else
-    $('#ticket-view-shortcut').html("View This Week's Tickets")
-    $('#ticket-view-shortcut').switchClass('arrow-left','arrow-right')
-
+    return
 
 window.set_initial_date_span = () ->
   from = localStorage.getItem('webrep_report_range_from')
