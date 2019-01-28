@@ -74,7 +74,6 @@ window.refresh_single_open_tickets_table = (user_id)->
     success: (response) ->
 
       json = $.parseJSON(response)
-
       if json.error
         #$('#refresh-working-msg').hide()
         #$('#refresh-error-msg').show()
@@ -226,14 +225,12 @@ window.refresh_multi_closed_tickets_table = ()->
     success: (response) ->
 
       json = $.parseJSON(response)
-
       if json.error
         #$('#refresh-working-msg').hide()
         #$('#refresh-error-msg').show()
         #$('#refresh-error-msg').html('An error occured while retrieving data')
 
       else
-
         datatable = $('#table-multi-user-disputes-closed').DataTable()
         datatable.clear();
         datatable.rows.add(json.data.table_data);
@@ -1122,7 +1119,6 @@ window.build_multi_entries_closed_by_owners_chart = () ->
 
   $("#ticket-entries-closed-by-owner").empty()
 
-
   headers = {'Token': $('input[name="token"]').val(), 'Xmlrpc-Token': $('input[name="xml_token"]').val()}
   $.ajax(
     url: '/escalations/api/v1/escalations/webrep/reports/ticket_entries_closed_by_ticket_owner_report'
@@ -1133,50 +1129,63 @@ window.build_multi_entries_closed_by_owners_chart = () ->
     success: (response) ->
 
       json = $.parseJSON(response)
-
       ticketOwners = json['data']['report_labels'] #['mtaylor', 'chrclair', 'nherbert', 'nverbeck', 'abreeeman']
       ticketEntriesByOwner = json['data']['report_data'] #[8, 15, 11, 10, 13.5]
 
-      new Chart($('#ticket-entries-closed-by-owner'),
-        type: 'horizontalBar'
-        responsive: true
-        maintainAspectRatio: false
-        data:
-          labels: ticketOwners
-          datasets: [ {
-            backgroundColor: '#6dbcdb'
-            data: ticketEntriesByOwner
-          } ]
-        options:
+      total_entries = 0
+      i = 0
+      while i < ticketEntriesByOwner.length
+        total_entries += ticketEntriesByOwner[i] << 0
+        i++
+
+      if total_entries == 0
+        graph_wrapper = $('#ticket-entries-closed-by-owner').parent()
+        unless $('#ticket-entries-closed-by-owner-no-data').length
+          $(graph_wrapper).append('<span id="ticket-entries-closed-by-owner-no-data" class="missing-data graph-missing-data-flag">No data for this date range.</span>')
+      else
+        if $('#ticket-entries-closed-by-owner-no-data').length
+          $('#ticket-entries-closed-by-owner-no-data').remove()
+
+        new Chart($('#ticket-entries-closed-by-owner'),
+          type: 'horizontalBar'
           responsive: true
           maintainAspectRatio: false
-          legend: display: false
-          scales:
-            yAxes: [
-              {
-                gridLines: display: false
-                ticks: {
-                  min: 0
+          data:
+            labels: ticketOwners
+            datasets: [ {
+              backgroundColor: '#6dbcdb'
+              data: ticketEntriesByOwner
+            } ]
+          options:
+            responsive: true
+            maintainAspectRatio: false
+            legend: display: false
+            scales:
+              yAxes: [
+                {
+                  gridLines: display: false
+                  ticks: {
+                    min: 0
+                  }
                 }
-              }
-            ]
-            xAxes: [
-              {
-                gridLines: display: false
-                ticks: {
-                  beginAtZero: true,
-                  callback: (value) ->
-                    if Number.isInteger(value)
-                      return value
-                    return
+              ]
+              xAxes: [
+                {
+                  gridLines: display: false
+                  ticks: {
+                    beginAtZero: true,
+                    callback: (value) ->
+                      if Number.isInteger(value)
+                        return value
+                      return
+                  }
+                  scaleLabel: {
+                    display: true,
+                    labelString: 'Closed Ticket Entries'
+                  }
                 }
-                scaleLabel: {
-                  display: true,
-                  labelString: 'Closed Ticket Entries'
-                }
-              }
-            ]
-      )
+              ]
+        )
 
 
     error: (response) ->
@@ -1207,42 +1216,56 @@ window.build_multi_average_time_to_close_tickets = () ->
 
       ticketOwners = json["data"]["report_labels"]
       avgTimeToCloseTickets = json["data"]["report_data"]
-      
-      new Chart($('#avg-time-to-close-tickets'),
-        type: 'horizontalBar'
-        data:
-          labels: ticketOwners
-          datasets: [ {
-            backgroundColor: '#6dbcdb'
-            data: avgTimeToCloseTickets
-          } ]
-        options:
-          responsive: true
-          maintainAspectRatio: false
-          legend: display: false
-          scales:
-            yAxes: [
-              {
-                gridLines: display: false
-                ticks: {
-                  min: 0
-                }
-              }
-            ]
-            xAxes: [
-              {
-                gridLines: display: false
-                ticks: {
-                  min: 0
-                }
-                scaleLabel: {
-                  display: true,
-                  labelString: 'Hours'
-                }
-              }
-            ]
-      )
 
+      total_tickets = 0
+      i = 0
+      while i < avgTimeToCloseTickets.length
+        total_tickets += avgTimeToCloseTickets[i] << 0
+        i++
+
+      if total_tickets == 0
+        graph_wrapper = $('#avg-time-to-close-tickets').parent()
+        unless $('#avg-time-to-close-tickets-no-data').length
+          $(graph_wrapper).append('<span id="avg-time-to-close-tickets-no-data" class="missing-data graph-missing-data-flag">No data for this date range.</span>')
+
+      else
+        if $('#avg-time-to-close-tickets-no-data').length
+          $('#avg-time-to-close-tickets-no-data').remove()
+
+        new Chart($('#avg-time-to-close-tickets'),
+          type: 'horizontalBar'
+          data:
+            labels: ticketOwners
+            datasets: [ {
+              backgroundColor: '#6dbcdb'
+              data: avgTimeToCloseTickets
+            } ]
+          options:
+            responsive: true
+            maintainAspectRatio: false
+            legend: display: false
+            scales:
+              yAxes: [
+                {
+                  gridLines: display: false
+                  ticks: {
+                    min: 0
+                  }
+                }
+              ]
+              xAxes: [
+                {
+                  gridLines: display: false
+                  ticks: {
+                    min: 0
+                  }
+                  scaleLabel: {
+                    display: true,
+                    labelString: 'Hours'
+                  }
+                }
+              ]
+        )
 
     error: (response) ->
       popup_response_error(response, 'Error building chart')
@@ -1279,46 +1302,56 @@ window.build_multi_rulehits_for_fp_res_chart = () ->
       fpRules = json["data"]["rules"] #['a500', 'alx_ cln', 'mute_phish', 'sbl', 'srch', 'suwl', 'trd_mal']
       totalRuleHits = json["data"]["rule_hits"] #[ 5, 18, 9, 14, 4, 7, 3]
 
-      new Chart($('#rule-hits-fp-resolutions'),
-        type: 'horizontalBar'
-        data:
-          labels: fpRules
-          datasets: [ {
-            backgroundColor: '#6dbcdb'
-            data: totalRuleHits
-          } ]
-        options:
-          responsive: true
-          maintainAspectRatio: false
-          legend: display: false
-          scales:
-            yAxes: [
-              {
-                gridLines: display: false
-              }
-            ]
-            xAxes: [
-              {
-                gridLines: display: false
-                ticks: {
-                  beginAtZero: true,
-                  callback: (value) ->
-                    if Number.isInteger(value)
-                      return value
-                    return
+      total_hits = 0
+      i = 0
+      while i < totalRuleHits.length
+        total_hits += totalRuleHits[i] << 0
+        i++
+
+      if total_hits == 0
+        graph_wrapper = $('#rule-hits-fp-resolutions').parent()
+        unless $('#rule-hits-fp-resolutions-no-data').length
+          $(graph_wrapper).append('<span id="rule-hits-fp-resolutions-no-data" class="missing-data graph-missing-data-flag">No data for this date range.</span>')
+
+      else
+        if $('#rule-hits-fp-resolutions-no-data').length
+          $('#rule-hits-fp-resolutions-no-data').remove()
+
+        new Chart($('#rule-hits-fp-resolutions'),
+          type: 'horizontalBar'
+          data:
+            labels: fpRules
+            datasets: [ {
+              backgroundColor: '#6dbcdb'
+              data: totalRuleHits
+            } ]
+          options:
+            responsive: true
+            maintainAspectRatio: false
+            legend: display: false
+            scales:
+              yAxes: [
+                {
+                  gridLines: display: false
                 }
-                scaleLabel: {
-                  display: true,
-                  labelString: 'Total Ticket Entries with FP Resolutions'
+              ]
+              xAxes: [
+                {
+                  gridLines: display: false
+                  ticks: {
+                    beginAtZero: true,
+                    callback: (value) ->
+                      if Number.isInteger(value)
+                        return value
+                      return
+                  }
+                  scaleLabel: {
+                    display: true,
+                    labelString: 'Total Ticket Entries with FP Resolutions'
+                  }
                 }
-              }
-            ]
-      )
-
-
-
-
-
+              ]
+        )
 
     error: (response) ->
       popup_response_error(response, 'Error building chart')

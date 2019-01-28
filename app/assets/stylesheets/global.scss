@@ -7820,3 +7820,11 @@ th.sorting_1, th.sorting_asc, th.sorting_desc {
 .esc-tooltipped {
   cursor: default;
 }
+
+.graph-missing-data-flag {
+  display: block;
+  margin-top: -50px;
+  width: 100%;
+  font-size: 8pt;
+  text-align: center;
+}
