@@ -490,6 +490,7 @@ window.lookup_prefix = () ->
         i++
       $('#loader-modal').hide()
       $('.modal-backdrop').hide()
+      $('body').removeClass('modal-open')
   )
 
 window.retrieve_history = (position) ->
@@ -556,6 +557,7 @@ window.retrieve_history = (position) ->
               minWidth: 600
               position: { my: "right top", at: "right top", of: window }
             $('#history_dialog').dialog('open')
+            $('body').removeClass('modal-open');
 
       error: (response) ->
         $("#cat-url-error-message-#{position}").text("No history associated with this url.")
@@ -564,6 +566,7 @@ window.retrieve_history = (position) ->
         $("#cat-url-#{position}").show()
         $("#url_#{position}").css("border-width", "2px")
         $("#url_#{position}").css("border-color", "#E47433")
+        $('body').removeClass('modal-open');
     , this)
   else
     $("#cat-url-error-message-#{position}").text("No data available for blank URL.")
