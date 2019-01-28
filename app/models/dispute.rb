@@ -1207,7 +1207,7 @@ class Dispute < ApplicationRecord
     report_data[:email_web_count] = results.select {|result| result.submission_type.downcase == 'ew'}.size
 
     results.each do |result|
-      entry_count = result.dispute_entries.select{ |entry| entry.status != DisputeEntry::STATUS_RESOLVED}.size
+      entry_count = result.dispute_entries.size
       entry_preview = []
       result.dispute_entries.each do |entry|
         if entry.ip_address
@@ -1263,7 +1263,7 @@ class Dispute < ApplicationRecord
 
 
     results.each do |result|
-      entry_count = result.dispute_entries.select{ |entry| entry.status == DisputeEntry::STATUS_RESOLVED}.size
+      entry_count = result.dispute_entries.size
       entry_preview = []
       result.dispute_entries.each do |entry|
         if entry.ip_address
