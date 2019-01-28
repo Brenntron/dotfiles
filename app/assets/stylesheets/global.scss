@@ -7068,7 +7068,7 @@ h2 {
 
 .total-table-ticket-count, .total-table-entry-count {
   height: 30px;
-  width: 30px;
+  width: auto;
   font-size: 14pt;
   line-height: 1.5em;
   text-align: center;
@@ -7076,12 +7076,14 @@ h2 {
 
 .total-table-ticket-count {
   font-weight: 600;
-  margin-right: 2px;
+  margin-right: 12px;
+  text-align: right;
 }
 
 .total-table-entry-count {
+  text-align: left;
   font-weight: 300;
-  padding-left: 8px;
+  padding-left: 12px;
   border-left: 1px solid $faint-neutral-color;
 }
 
@@ -7136,7 +7138,7 @@ h3.larger-lighter {
   background-image: url(image_path('icon_customer_star.svg'));
 }
 
-.submitter-guest {
+.submitter-guest, .submitter-non-customer {
   background-image: url(image_path('icon_guest_grey.svg'));
 }
 

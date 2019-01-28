@@ -1208,13 +1208,23 @@ class Dispute < ApplicationRecord
 
     results.each do |result|
       entry_count = result.dispute_entries.select{ |entry| entry.status != DisputeEntry::STATUS_RESOLVED}.size
+      entry_preview = []
+      result.dispute_entries.each do |entry|
+        if entry.ip_address
+          entry_preview.push(entry.ip_address)
+        end
+        if entry.uri
+          entry_preview.push(entry.uri)
+        end
+      end
+      entry_preview.to_s.inspect
       last_comment_time = "no comments"
       last_comment_time = result.dispute_comments.last.created_at.to_s unless result.dispute_comments.empty?
       ticket_user = result.user.cvs_username
       report_data[:table_data] << {:case_number => result.id,
                       :case_link => "<a href='/escalations/webrep/disputes/#{result.id}'>#{result.case_id_str}</a>",
                       :status => result.status,
-                      :d_entry_preview => "<span class='dispute_entry_content_first'>#{result.dispute_entries.first&.hostlookup}</span><span class='dispute-count'>#{entry_count}</span>",
+                      :d_entry_preview => "<span class='dispute_entry_content_first'>#{result.dispute_entries.first&.hostlookup}</span><span class='dispute-count esc-tooltipped' title='#{entry_preview}'>#{entry_count}</span>",
                       :age => distance_of_time_in_words(Time.now, result.created_at),
                       :submitter_type => result.submitter_type.downcase,
                       :submission_type => result.submission_type.upcase,
@@ -1254,11 +1264,21 @@ class Dispute < ApplicationRecord
 
     results.each do |result|
       entry_count = result.dispute_entries.select{ |entry| entry.status == DisputeEntry::STATUS_RESOLVED}.size
+      entry_preview = []
+      result.dispute_entries.each do |entry|
+        if entry.ip_address
+          entry_preview.push(entry.ip_address)
+        end
+        if entry.uri
+          entry_preview.push(entry.uri)
+        end
+      end
+      entry_preview.to_s.inspect
       ticket_user = result.user.cvs_username
       report_data[:table_data] << {:case_number => result.id,
                       :case_link => "<a href='/escalations/webrep/disputes/#{result.id}'>#{result.case_id_str}</a>",
                       # :dispute => result.dispute_entries.first.hostlookup,
-                      :d_entry_preview => "<span class='dispute_entry_content_first'>#{result.dispute_entries.first&.hostlookup}</span><span class='dispute-count'>#{entry_count}</span>",
+                      :d_entry_preview => "<span class='dispute_entry_content_first'>#{result.dispute_entries.first&.hostlookup}</span><span class='dispute-count esc-tooltipped' title='#{entry_preview}'>#{entry_count}</span>",
                       :time_to_close => distance_of_time_in_words(result.created_at, result.case_resolved_at),
                       :submitter_type => result.submitter_type.downcase,
                       :submission_type => result.submission_type.upcase,

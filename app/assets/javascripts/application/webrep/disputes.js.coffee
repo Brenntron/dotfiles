@@ -2611,6 +2611,7 @@ $ ->
 #
   window.open_dashboard_dispute_table = $('#table-user-disputes-open').DataTable(
     dom: '<t>'
+    paging: false
     columnDefs: [
       {
         targets: [ 1 ]
@@ -2662,6 +2663,7 @@ $ ->
 
   window.closed_dashboard_dispute_table = $('#table-user-disputes-closed').DataTable(
     dom: '<t>'
+    paging: false
     columnDefs: [
       {
         targets: [ 1 ]
@@ -2708,6 +2710,7 @@ $ ->
 
   window.open_multiuser_dashboard_dispute_table = $('#table-multi-user-disputes-open').DataTable(
     dom: '<t>'
+    paging: false
     columnDefs: [
       {
         targets: [ 1 ]
@@ -2760,7 +2763,7 @@ $ ->
 
   window.closed_dashboard_multiuser_dispute_table = $('#table-multi-user-disputes-closed').DataTable(
     dom: '<t>'
-    data: tempSingleUserClosedTixDataset
+    paging: false
     columnDefs: [
       {
         targets: [ 1 ]
@@ -2812,8 +2815,6 @@ $ ->
 
 
 
-
-tempSingleUserClosedTixDataset = []
 
 $ ->
 # Toggle which rows to show on tables
