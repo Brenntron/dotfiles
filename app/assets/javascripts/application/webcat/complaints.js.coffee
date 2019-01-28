@@ -516,7 +516,7 @@ window.retrieve_history = (position) ->
       data: {'position': position, url: url}
       success: (response) ->
         $('.modal-backdrop').hide()
-        $('#loader-modal').remove()
+        $('#loader-modal').hide()
         $('body').removeClass('modal-open')
 
         json = JSON.parse(response)
