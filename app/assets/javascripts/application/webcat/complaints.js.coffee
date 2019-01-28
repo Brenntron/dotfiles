@@ -1191,40 +1191,34 @@ window.open_all = () ->
   open_selected(selected_rows, true)
 
 
-toggle_selected = (table, selected_rows)->
-  i = 0
-  while i < selected_rows[0].length
-    button = $( ".expand-row-button-inline" )[selected_rows[0][i]]
-    click_table_buttons(table, button)
-    i++
+toggle_selected = (selectedRows, expand)->
+    for i in [0..selectedRows.length]
+      if expand
+        if !$(selectedRows[i]).hasClass('shown')
+          $(selectedRows[i]).find('.expand-row-button-inline').click()
+      else
+        if $(selectedRows[i]).hasClass('shown')
+          $(selectedRows[i]).find('.expand-row-button-inline').click()
 
 window.collapse_selected =()->
   selectedRows = $('.selected')
-
-  if $(selectedRows[1]).hasClass('shown')
-    $(selectedRows[1]).find('.expand-row-button-inline').click()
+  expand = false;
+  toggle_selected(selectedRows, expand)
 
 window.collapse_all =()->
   selectedRows = $('table#' + 'complaints-index' + ' tr[role="row"]')
-
-  for i in [0..selectedRows.length]
-    if $(selectedRows[i]).hasClass('shown')
-      $(selectedRows[i]).find('.expand-row-button-inline').click()
+  expand = false;
+  toggle_selected(selectedRows, expand)
 
 window.expand_selected =()->
   selectedRows = $('.selected')
-
-  if !$(selectedRows[1]).hasClass('shown')
-    $(selectedRows[1]).find('.expand-row-button-inline').click()
+  expand = true;
+  toggle_selected(selectedRows, expand)
 
 window.expand_all =()->
   selectedRows = $('table#' + 'complaints-index' + ' tr[role="row"]')
-
-  for i in [0..selectedRows.length]
-    if !$(selectedRows[i]).hasClass('shown')
-      $(selectedRows[i]).find('.expand-row-button-inline').click()
-
-
+  expand = true;
+  toggle_selected(selectedRows, expand)
 
 window.mark_for_commit = () ->
   entry_ids = $('#complaint-entries-div .complaint-entry-checkbox:checkbox:checked').map(() ->
