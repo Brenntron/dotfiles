@@ -7389,9 +7389,19 @@ td.text-center span {
   height: 240px;
 }
 
+.reports-graph-wrapper.pie-graph-wrapper {
+  height: 180px;
+  margin: 20px 0;
+}
+
 .reports-graph-wrapper.graph-with-small-menu {
   margin-top: 50px;
 }
+
+.reports-graph-wrapper.graph-with-med-menu {
+  margin-top: 100px;
+}
+
 
 .reports-graph-info-container table {
   font-size: 7.5pt;
