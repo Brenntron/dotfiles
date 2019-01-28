@@ -91,7 +91,6 @@ window.webcat_reset_search = ()->
   tags_control.clear()
 
 window.multiple_url_categorization = ()->
-  event.preventDefault()
 
   urls = $("#categorize_urls").val().split(/\n/)
   cats = $("#multi_cat_url_cats").val()
@@ -274,6 +273,11 @@ window.updatePending = (id,row_id) ->
           options: AC.WebCat.createSelectOptions(),
           items: selected_options(temp_row.data().category)
         }
+      tds = $('#complaints-index tbody').closest('td')
+      for td in tds
+        if td.className == ''
+          td.classList.add('nested-complaint-data-wrapper')
+
     error: (response) ->
       notice_html = "<p>Something went wrong: #{response.responseText}</p>"
   , this)
@@ -282,13 +286,18 @@ window.updateEntryColumns = (entry_id,row_id) ->
   $("#submit_changes_#{entry_id}").prop("disabled",true)
   prefix = $('#complaint_prefix_'+entry_id)[0].value
   categories = $('#input_cat_'+entry_id).val().toString()
+  category_name = $('#input_cat_' + entry_id).next('.selectize-control').find('.item')
+  category_names = []
+  category_name.each ->
+    category_names.push($(this).text())
+  category_names = category_names.toString()
+  debugger
   status = $('[name=resolution'+entry_id+']:checked').val()
   comment = $('#complaint_comment_'+entry_id)[0].value
   resolution_comment = $('#complaint_resolution_comment_'+entry_id)[0].value
   headers = {'Token': $('input[name="token"]').val(), 'Xmlrpc-Token': $('input[name="xml_token"]').val()}
 
   unchanged = $("#unchanged#{entry_id}").is(':checked')
-
   if categories.length == 0 && status != 'INVALID' && unchanged == false
     std_msg_error("Must include at least one category.","", reload: false)
     $("#submit_changes_#{entry_id}").prop("disabled",false)
@@ -297,7 +306,7 @@ window.updateEntryColumns = (entry_id,row_id) ->
       url: '/escalations/api/v1/escalations/webcat/complaint_entries/update'
       method: 'POST'
       headers: headers
-      data: {'id': entry_id,'prefix': prefix,'categories':categories,'status':status,'comment':comment, 'resolution_comment': resolution_comment }
+      data: {'id': entry_id,'prefix': prefix,'categories':categories, 'category_names':category_names, 'status':status,'comment':comment, 'resolution_comment': resolution_comment }
       success: (response) ->
         json = $.parseJSON(response)
         if !json.error
@@ -307,7 +316,8 @@ window.updateEntryColumns = (entry_id,row_id) ->
           temp_row.data().resolution = status
           temp_row.data().internal_comment = comment
           temp_row.data().resolution_comment = resolution_comment
-          temp_row.data().category = categories
+          temp_row.data().category = category_names
+          temp_row.data().category_names = category_names
           temp_row.invalidate().draw()
           temp_row.child().remove()
           temp_row.child(format(temp_row)).show()
@@ -319,7 +329,7 @@ window.updateEntryColumns = (entry_id,row_id) ->
             labelField: 'category_name',
             searchField: ['category_name', 'category_code'],
             options: AC.WebCat.createSelectOptions()
-            items: selected_options(temp_row.data().category)
+            items: selected_options(temp_row.data().category_names)
           }
           $('#input_cat_pending'+ temp_row.data().entry_id).selectize {
             persist: false,
@@ -329,8 +339,12 @@ window.updateEntryColumns = (entry_id,row_id) ->
             labelField: 'category_name',
             searchField: ['category_name', 'category_code'],
             options: AC.WebCat.createSelectOptions()
-            items: selected_options(temp_row.data().category)
+            items: selected_options(temp_row.data().category_names)
           }
+        tds = $('#complaints-index tbody').closest('td')
+        for td in tds
+          if td.className == ''
+            td.classList.add('nested-complaint-data-wrapper')
 
       error: (response) ->
         $("#submit_changes_#{entry_id}").prop("disabled",false)
@@ -394,7 +408,7 @@ window.return_selected = ()->
         else
           i = 0
           while i < selected_rows[0].length
-            selected_rows.data().cell(selected_rows[0][i],12).data("Vrt Incoming").draw()
+            selected_rows.data().cell(selected_rows[0][i],14).data("Vrt Incoming").draw()
             selected_rows.data().cell(selected_rows[0][i],5).data("NEW").draw()
             i++
 
@@ -420,10 +434,10 @@ window.edit_selected_complaints = () ->
   else
     std_msg_error("alert",["There was an error. Please select an entry to edit"])
 
-selected_options = (categories) ->
+selected_options = (category_names) ->
   options = []
-  if categories
-    options = categories.split(',')
+  if category_names
+    options = category_names.split(',')
   return options
 
 $('html').on 'click', (e) ->
@@ -647,6 +661,12 @@ format = (complaint_entry_row) ->
   else
     confidence = missing_data
 
+  customer_name = ''
+  if complaint_entry.customer_name
+    customer_name = complaint_entry.customer_name
+  else
+    customer_name = missing_data
+
   customer_description = ''
   if complaint_entry.description
     customer_description = complaint_entry.description
@@ -807,9 +827,11 @@ format = (complaint_entry_row) ->
       '<label class="content-label-sm">Case ID</label>' +
       '<span class="nested-complaint-data case-id"><a href="complaints/' + complaint_entry.complaint_id + '">' + complaint_entry.complaint_id + '</a></span>' +
       '<label class="content-label-sm">Entry URI</label>' +
-      '<span class="nested-complaint-data" id="entry-uri-' + complaint_entry.entry_id + '">' + uri + '</span>' +
+      '<span class="nested-complaint-data input-truncate esc-tooltipped" id="entry-uri-' + complaint_entry.entry_id + '" title="' + url + '">' + uri + '</span>' +
       '<label class="content-label-sm" id="site-search">Site Search</label>' +
-      '<span class="nested-complaint-data" id="site-search-' + complaint_entry.entry_id + '">' + search_uri + '</span>' +
+      '<span class="nested-complaint-data input-truncate esc-tooltipped" id="site-search-' + complaint_entry.entry_id + '" title="' + url + '">' + search_uri + '</span>' +
+      '<label class="content-label-sm">Customer Name</label>' +
+      '<span class="nested-complaint-data">' + customer_name + '</span>' +
       '<label class="content-label-sm">Customer Description</label>' +
       '<span class="nested-complaint-data">' + customer_description + '</span>' +
       '</div></div><div class="col-xs-5 col-with-divider">' +
@@ -1256,11 +1278,14 @@ window.advanced_webcat_index_table = () ->
   if complaint_save_search_format.test(data.search_name) == true
     std_msg_error('save search name error', ['Please enter a name without any special character', 'Example: !@#$%^&*()'])
   else
-    window.location.reload()
     window.populate_advanced_webcat_index_table(data)
 
 
 window.populate_advanced_webcat_index_table = (data = {}) ->
+  $('#loader-modal').modal({
+    backdrop: 'static',
+    keyboard: false
+  })
   headers = {'Token': $('input[name="token"]').val(), 'Xmlrpc-Token': $('input[name="xml_token"]').val()}
   $.ajax(
     url: '/escalations/api/v1/escalations/webcat/complaint_entries'
@@ -1272,6 +1297,8 @@ window.populate_advanced_webcat_index_table = (data = {}) ->
       json = $.parseJSON(response)
       if json.error
         notice_html = "<p>Something went wrong: #{json.error}</p>"
+        $('#loader-modal').hide()
+        $('.modal-backdrop').remove()
         alert(json.error)
       else
         $('.tickets-totals-table').trigger("click") #close open dropdowns
@@ -1279,8 +1306,16 @@ window.populate_advanced_webcat_index_table = (data = {}) ->
         datatable.clear();
         datatable.rows.add(json.data);
         datatable.draw();
+        setTimeout (->
+          $('#loader-modal').hide()
+          $('.modal-backdrop').remove()
+        ), 2000
+#        $('#loader-modal').hide()
+#        $('.modal-backdrop').remove()
 
       error: (response) ->
+        $('#loader-modal').hide()
+        $('.modal-backdrop').remove()
         std_api_error(response, "There was an error loading search results.", reload: false)
   , this)
 

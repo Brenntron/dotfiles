@@ -6014,6 +6014,13 @@ table.dispute-entry-table tbody tr.selected {
   margin-bottom: 4px;
 }
 
+#dispute-submission-type-select {
+  display: none;
+  width: 45px;
+  margin-top: 5px;
+  position: absolute;
+}
+
 .dispute-edit-input {
   display: none;
   color: $type-base-color;
@@ -6531,7 +6538,7 @@ hr.condensed {
 }
 
 th.text-center.sorting, th.text-center.sorting_asc, th.text-center.sorting_desc {
-  background-position: center !important;
+  background-position-x: center !important;
 }
 
 #disputes-index .bug-priority {

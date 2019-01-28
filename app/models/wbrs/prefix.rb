@@ -1,5 +1,5 @@
 class Wbrs::Prefix < Wbrs::Base
-  FIELD_NAMES = %w{prefix_id domain is_active path path_hashed port protocol subdomain truncated category descr mnem }
+  FIELD_NAMES = %w{prefix_id domain is_active path path_hashed port protocol subdomain truncated category descr mnem category_id}
   FIELD_SYMS = FIELD_NAMES.map{|name| name.to_sym}
 
   attr_accessor *FIELD_SYMS
