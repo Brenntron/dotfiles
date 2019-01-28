@@ -1224,7 +1224,7 @@ class Dispute < ApplicationRecord
       report_data[:table_data] << {:case_number => result.id,
                       :case_link => "<a href='/escalations/webrep/disputes/#{result.id}'>#{result.case_id_str}</a>",
                       :status => result.status,
-                      :d_entry_preview => "<span class='dispute_entry_content_first'>#{result.dispute_entries.first&.hostlookup}</span><span class='dispute-count esc-tooltipped' title='#{entry_preview}'>#{entry_count}</span>",
+                      :d_entry_preview => "<span class='dispute_entry_content_first'>#{result.dispute_entries.first&.hostlookup}</span><span class='dispute-count esc-tooltipped' title='#{entry_preview.join(",")}'>#{entry_count}</span>",
                       :age => distance_of_time_in_words(Time.now, result.created_at),
                       :submitter_type => result.submitter_type.downcase,
                       :submission_type => result.submission_type.upcase,
