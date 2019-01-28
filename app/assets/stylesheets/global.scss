@@ -5538,18 +5538,22 @@ table.dispute_tool_current tr:last-of-type td {
   width: 20px;
   height: 20px;
   color: transparent;
+  display: block;
+  cursor: default;
 }
 
 .top-case-info .dispute-submission-type {
-  display: block;
   margin-top: 2px;
   margin-left: 3px;
 }
 
 #disputes-index .dispute-submission-type {
-  display: block;
   margin: auto;
-  cursor: default;
+}
+
+.dashboard-tickets-table .dispute-submission-type {
+  width: 15px;
+  height: 15px;
 }
 
 .dispute-W-grey {background-image: url(image_path('icon_type_web_grey.svg'));}
@@ -7798,3 +7802,8 @@ th.sorting_1, th.sorting_asc, th.sorting_desc {
   width: 160px !important;
 }
 
+.hidden-sortable-data {
+  opacity: 0;
+  position: absolute;
+  z-index: -1;
+}

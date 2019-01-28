@@ -2633,27 +2633,27 @@ $ ->
       {
         data: 'priority'
         render: (data) ->
-          '<span class="esc-tooltipped bug-priority p-' + data + '" title="Priority ' + data + '"></span>'
+          '<span class="esc-tooltipped bug-priority p-' + data + '" title="Priority ' + data + '"></span><span class="hidden-sortable-data">' + data + '</span>'
       }
       { data: 'case_link' }
       {
         data: 'submitter_type'
         render: (data) ->
           if (data) == 'customer'
-            return '<span class="esc-tooltipped submitter-type-icon submitter-' + data + '" title="Customer"></span>'
+            return '<span class="esc-tooltipped submitter-type-icon submitter-' + data + '" title="Customer"></span><span class="hidden-sortable-data">' + data + '</span>'
           else
-            return '<span class="esc-tooltipped submitter-type-icon submitter-' + data + '" title="Guest"></span>'
+            return '<span class="esc-tooltipped submitter-type-icon submitter-' + data + '" title="Guest"></span><span class="hidden-sortable-data">' + data + '</span>'
       }
       { data: 'status' }
       {
         data: 'submission_type'
         render: (data) ->
           if (data) == 'E'
-            return '<span class="esc-tooltipped dispute-submission-type dispute-' + data  + '" title="Email"></span>'
+            return '<span class="esc-tooltipped dispute-submission-type dispute-' + data  + '" title="Email"></span><span class="hidden-sortable-data">' + data + '</span>'
           else if (data) == 'W'
-            return '<span class="esc-tooltipped dispute-submission-type dispute-' + data  + '" title="Web"></span>'
+            return '<span class="esc-tooltipped dispute-submission-type dispute-' + data  + '" title="Web"></span><span class="hidden-sortable-data">' + data + '</span>'
           else if (data) == 'EW'
-            return '<span class="esc-tooltipped dispute-submission-type dispute-' + data  + '" title="Email/Web"></span>'
+            return '<span class="esc-tooltipped dispute-submission-type dispute-' + data  + '" title="Email/Web"></span><span class="hidden-sortable-data">' + data + '</span>'
       }
       { data: 'd_entry_preview' }
       { data: 'last_comment' }
@@ -2680,26 +2680,26 @@ $ ->
       {
         data: 'priority'
         render: (data) ->
-          '<span class="esc-tooltipped bug-priority p-' + data + '" title="Priority ' + data + '"></span>'
+          '<span class="esc-tooltipped bug-priority p-' + data + '" title="Priority ' + data + '"></span><span class="hidden-sortable-data">' + data + '</span>'
       }
       { data: 'case_link' }
       {
         data: 'submitter_type'
         render: (data) ->
           if (data) == 'customer'
-            return '<span class="esc-tooltipped submitter-type-icon submitter-' + data + '" title="Customer"></span>'
+            return '<span class="esc-tooltipped submitter-type-icon submitter-' + data + '" title="Customer"></span><span class="hidden-sortable-data">' + data + '</span>'
           else
-            return '<span class="esc-tooltipped submitter-type-icon submitter-' + data + '" title="Guest"></span>'
+            return '<span class="esc-tooltipped submitter-type-icon submitter-' + data + '" title="Guest"></span><span class="hidden-sortable-data">' + data + '</span>'
       }
       {
         data: 'submission_type'
         render: (data) ->
           if (data) == 'E'
-            return '<span class="esc-tooltipped dispute-submission-type dispute-' + data  + '" title="Email"></span>'
+            return '<span class="esc-tooltipped dispute-submission-type dispute-' + data  + '" title="Email"></span><span class="hidden-sortable-data">' + data + '</span>'
           else if (data) == 'W'
-            return '<span class="esc-tooltipped dispute-submission-type dispute-' + data  + '" title="Web"></span>'
+            return '<span class="esc-tooltipped dispute-submission-type dispute-' + data  + '" title="Web"></span><span class="hidden-sortable-data">' + data + '</span>'
           else if (data) == 'EW'
-            return '<span class="esc-tooltipped dispute-submission-type dispute-' + data  + '" title="Email/Web"></span>'
+            return '<span class="esc-tooltipped dispute-submission-type dispute-' + data  + '" title="Email/Web"></span><span class="hidden-sortable-data">' + data + '</span>'
       }
       { data: 'd_entry_preview' }
       { data: 'time_to_close' }
@@ -2730,16 +2730,16 @@ $ ->
       {
         data: 'priority'
         render: (data) ->
-          '<span class="esc-tooltipped bug-priority p-' + data + '" title="Priority ' + data + '"></span>'
+          '<span class="esc-tooltipped bug-priority p-' + data + '" title="Priority ' + data + '"></span><span class="hidden-sortable-data">' + data + '</span>'
       }
       { data: 'case_link' }
       {
         data: 'submitter_type'
         render: (data) ->
           if (data) == 'customer'
-            return '<span class="esc-tooltipped submitter-type-icon submitter-' + data + '" title="Customer"></span>'
+            return '<span class="esc-tooltipped submitter-type-icon submitter-' + data + '" title="Customer"></span><span class="hidden-sortable-data">' + data + '</span>'
           else
-            return '<span class="esc-tooltipped submitter-type-icon submitter-' + data + '" title="Guest"></span>'
+            return '<span class="esc-tooltipped submitter-type-icon submitter-' + data + '" title="Guest"></span><span class="hidden-sortable-data">' + data + '</span>'
       }
       { data: 'owner' }
       { data: 'status' }
@@ -2747,11 +2747,11 @@ $ ->
         data: 'submission_type'
         render: (data) ->
           if (data) == 'E'
-            return '<span class="esc-tooltipped dispute-submission-type dispute-' + data  + '" title="Email"></span>'
+            return '<span class="esc-tooltipped dispute-submission-type dispute-' + data  + '" title="Email"></span><span class="hidden-sortable-data">' + data + '</span>'
           else if (data) == 'W'
-            return '<span class="esc-tooltipped dispute-submission-type dispute-' + data  + '" title="Web"></span>'
+            return '<span class="esc-tooltipped dispute-submission-type dispute-' + data  + '" title="Web"></span><span class="hidden-sortable-data">' + data + '</span>'
           else if (data) == 'EW'
-            return '<span class="esc-tooltipped dispute-submission-type dispute-' + data  + '" title="Email/Web"></span>'
+            return '<span class="esc-tooltipped dispute-submission-type dispute-' + data  + '" title="Email/Web"></span><span class="hidden-sortable-data">' + data + '</span>'
       }
       { data: 'd_entry_preview' }
       { data: 'last_comment' }
@@ -2779,7 +2779,7 @@ $ ->
       {
         data: 'priority'
         render: (data) ->
-          '<span class="esc-tooltipped bug-priority p-' + data + '" title="Priority ' + data + '"></span>'
+          '<span class="esc-tooltipped bug-priority p-' + data + '" title="Priority ' + data + '"></span><span class="hidden-sortable-data">' + data + '</span>'
       }
       {
         data: 'case_link'
@@ -2788,9 +2788,9 @@ $ ->
         data: 'submitter_type'
         render: (data) ->
           if (data) == 'customer'
-            return '<span class="esc-tooltipped submitter-type-icon submitter-' + data + '" title="Customer"></span>'
+            return '<span class="esc-tooltipped submitter-type-icon submitter-' + data + '" title="Customer"></span><span class="hidden-sortable-data">' + data + '</span>'
           else
-            return '<span class="esc-tooltipped submitter-type-icon submitter-' + data + '" title="Guest"></span>'
+            return '<span class="esc-tooltipped submitter-type-icon submitter-' + data + '" title="Guest"></span><span class="hidden-sortable-data">' + data + '</span>'
       }
       {
         data: 'owner'
@@ -2799,11 +2799,11 @@ $ ->
         data: 'submission_type'
         render: (data) ->
           if (data) == 'E'
-            return '<span class="esc-tooltipped dispute-submission-type dispute-' + data  + '" title="Email"></span>'
+            return '<span class="esc-tooltipped dispute-submission-type dispute-' + data  + '" title="Email"></span><span class="hidden-sortable-data">' + data + '</span>'
           else if (data) == 'W'
-            return '<span class="esc-tooltipped dispute-submission-type dispute-' + data  + '" title="Web"></span>'
+            return '<span class="esc-tooltipped dispute-submission-type dispute-' + data  + '" title="Web"></span><span class="hidden-sortable-data">' + data + '</span>'
           else if (data) == 'EW'
-            return '<span class="esc-tooltipped dispute-submission-type dispute-' + data  + '" title="Email/Web"></span>'
+            return '<span class="esc-tooltipped dispute-submission-type dispute-' + data  + '" title="Email/Web"></span><span class="hidden-sortable-data">' + data + '</span>'
       }
       { data: 'd_entry_preview' }
       { data: 'time_to_close' }
