@@ -213,7 +213,7 @@ module API
             post 'return_entry' do
               begin
                 permitted_params['complaint_entry_ids'].each do |id|
-                  ComplaintEntry.find(id).return_complaint(current_user)
+                  ComplaintEntry.find(id).return_complaint
                 end
               rescue Exception => e
                 Rails.logger.error "Failed to take entry: error=> #{e.message}"
