@@ -1218,8 +1218,14 @@ class Dispute < ApplicationRecord
         end
       end
       entry_preview.to_s.inspect
-      last_comment_time = "no comments"
-      last_comment_time = result.dispute_comments.last.created_at.to_s unless result.dispute_comments.empty?
+
+      unless result.dispute_comments.empty?
+        last_comment_time = result.dispute_comments.last.created_at.to_s
+        last_comment_preview = "<span class='esc-tooltipped' title='#{result.dispute_comments.last.comment.truncate(140)}'>#{last_comment_time}</span>"
+      else
+        last_comment_preview = "<span class='missing-data'>No comments</span>"
+      end
+
       ticket_user = result.user.cvs_username
       report_data[:table_data] << {:case_number => result.id,
                       :case_link => "<a href='/escalations/webrep/disputes/#{result.id}'>#{result.case_id_str}</a>",
@@ -1228,7 +1234,7 @@ class Dispute < ApplicationRecord
                       :age => distance_of_time_in_words(Time.now, result.created_at),
                       :submitter_type => result.submitter_type.downcase,
                       :submission_type => result.submission_type.upcase,
-                      :last_comment => last_comment_time,
+                      :last_comment => last_comment_preview,
                       :owner => ticket_user,
                       :priority => result.priority
       }
