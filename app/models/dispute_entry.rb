@@ -398,6 +398,7 @@ class DisputeEntry < ApplicationRecord
     if ip_addr
       wbrs_stuff_ip = Sbrs::ManualSbrs.get_wbrs_data(url: ip_addr)
       wbrs_stuff_rulehits = wbrs_stuff_rulehits + Sbrs::ManualSbrs.get_rule_names_from_rulehits(wbrs_stuff_ip)
+      wbrs_stuff_rulehits = wbrs_stuff_rulehits.uniq
     end
 
 
@@ -548,6 +549,7 @@ class DisputeEntry < ApplicationRecord
           if ip_addr
             wbrs_stuff_ip = Sbrs::ManualSbrs.get_wbrs_data(url: ip_addr)
             wbrs_stuff_rulehits = wbrs_stuff_rulehits + Sbrs::ManualSbrs.get_rule_names_from_rulehits(wbrs_stuff_ip)
+            wbrs_stuff_rulehits = wbrs_stuff_rulehits.uniq
           end
 
           entry.wbrs_score = wbrs_stuff["wbrs"]["score"]
