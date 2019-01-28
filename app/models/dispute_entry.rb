@@ -395,8 +395,10 @@ class DisputeEntry < ApplicationRecord
     wbrs_stuff_rulehits = Sbrs::ManualSbrs.get_rule_names_from_rulehits(wbrs_stuff)
 
     ip_addr = IPSocket.getaddress(hostlookup) rescue nil
-    wbrs_stuff_ip = Sbrs::ManualSbrs.get_wbrs_data(url: ip_addr) if ip_addr
-    wbrs_stuff_rulehits = wbrs_stuff_rulehits + Sbrs::ManualSbrs.get_rule_names_from_rulehits(wbrs_stuff_ip)
+    if ip_addr
+      wbrs_stuff_ip = Sbrs::ManualSbrs.get_wbrs_data(url: ip_addr)
+      wbrs_stuff_rulehits = wbrs_stuff_rulehits + Sbrs::ManualSbrs.get_rule_names_from_rulehits(wbrs_stuff_ip)
+    end
 
 
     self.wbrs_score = wbrs_stuff["wbrs"]["score"]
@@ -543,8 +545,10 @@ class DisputeEntry < ApplicationRecord
           wbrs_stuff_rulehits = Sbrs::ManualSbrs.get_rule_names_from_rulehits(wbrs_stuff)
 
           ip_addr = IPSocket.getaddress(entry.uri) rescue nil
-          wbrs_stuff_ip = Sbrs::ManualSbrs.get_wbrs_data(url: ip_addr) if ip_addr
-          wbrs_stuff_rulehits = wbrs_stuff_rulehits + Sbrs::ManualSbrs.get_rule_names_from_rulehits(wbrs_stuff_ip)
+          if ip_addr
+            wbrs_stuff_ip = Sbrs::ManualSbrs.get_wbrs_data(url: ip_addr)
+            wbrs_stuff_rulehits = wbrs_stuff_rulehits + Sbrs::ManualSbrs.get_rule_names_from_rulehits(wbrs_stuff_ip)
+          end
 
           entry.wbrs_score = wbrs_stuff["wbrs"]["score"]
           wbrs_stuff_rulehits.each do |rule_hit|
