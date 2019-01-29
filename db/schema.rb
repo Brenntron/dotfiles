@@ -18,6 +18,7 @@ ActiveRecord::Schema.define(version: 2019_01_22_220012) do
     t.string "test_group", null: false
     t.integer "rule_id", null: false
     t.integer "attachment_id", null: false
+    t.string "policy"
     t.index ["test_group", "attachment_id", "rule_id"], name: "index_alerts_on_test_group_and_attachment_id_and_rule_id"
   end
 
@@ -276,7 +277,7 @@ ActiveRecord::Schema.define(version: 2019_01_22_220012) do
   create_table "delayed_jobs", options: "ENGINE=InnoDB DEFAULT CHARSET=utf8", force: :cascade do |t|
     t.integer "priority", default: 0, null: false
     t.integer "attempts", default: 0, null: false
-    t.text "handler", null: false
+    t.text "handler", limit: 16777215
     t.text "last_error"
     t.datetime "run_at"
     t.datetime "locked_at"
@@ -623,7 +624,7 @@ ActiveRecord::Schema.define(version: 2019_01_22_220012) do
     t.string "file_name"
   end
 
-  create_table "resolution_message_templates", options: "ENGINE=InnoDB DEFAULT CHARSET=utf8", force: :cascade do |t|
+  create_table "resolution_message_templates", options: "ENGINE=InnoDB DEFAULT CHARSET=latin1", force: :cascade do |t|
     t.string "name"
     t.text "description"
     t.text "body"
@@ -717,6 +718,7 @@ ActiveRecord::Schema.define(version: 2019_01_22_220012) do
     t.string "snort_doc_status", default: "NOTYET"
     t.string "snort_on_off", default: "on"
     t.string "fatal_errors"
+    t.boolean "edited", default: false
     t.index ["gid", "sid"], name: "index_rules_gid_and_sid", unique: true
     t.index ["rule_category_id"], name: "index_rules_on_rule_category_id"
     t.index ["task_id"], name: "index_rules_on_task_id"
@@ -787,6 +789,7 @@ ActiveRecord::Schema.define(version: 2019_01_22_220012) do
     t.integer "user_id"
     t.datetime "stats_updated_at"
     t.string "type", default: "Task"
+    t.string "policy"
     t.index ["bug_id"], name: "index_tasks_on_bug_id"
     t.index ["user_id"], name: "index_tasks_on_user_id"
   end
@@ -834,7 +837,7 @@ ActiveRecord::Schema.define(version: 2019_01_22_220012) do
     t.text "value"
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
-    t.index ["user_id", "name"], name: "index_user_preferences_on_user_id_and_name"
+    t.index ["user_id", "name"], name: "index_user_preferences_on_user_id"
   end
 
   create_table "users", options: "ENGINE=InnoDB DEFAULT CHARSET=utf8", force: :cascade do |t|
