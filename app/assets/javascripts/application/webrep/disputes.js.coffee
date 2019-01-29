@@ -49,6 +49,10 @@ window.populate_webrep_index_table = (data = {}, reload = false) ->
       array_of_showns.push row.data().id
 
   headers = {'Token': $('input[name="token"]').val(), 'Xmlrpc-Token': $('input[name="xml_token"]').val()}
+  $('#loader-modal').modal({
+    backdrop: 'static',
+    keyboard: false
+  })
   $.ajax(
     url: '/escalations/api/v1/escalations/webrep/disputes'
     method: 'GET'
@@ -64,6 +68,8 @@ window.populate_webrep_index_table = (data = {}, reload = false) ->
         std_msg_error("No tickets matching filter or search.","")
 
       if json.error
+        $('#loader-modal').hide()
+        $('.modal-backdrop').remove()
         $('#refresh-working-msg').hide()
         $('#refresh-error-msg').show()
         $('#refresh-error-msg').html('An error occured while retrieving data')
@@ -97,13 +103,21 @@ window.populate_webrep_index_table = (data = {}, reload = false) ->
                     $('.dispute-entry-table td, .dispute-entry-table th').each ->
                       if $(this).hasClass(checkbox_trigger)
                         $(this).show()
+                      $('#loader-modal').hide()
+                      $('.modal-backdrop').remove()
                       return
                   else if $(checkbox).prop('checked') == false
                     $('.dispute-entry-table td, .dispute-entry-table th').each ->
                       if $(this).hasClass(checkbox_trigger)
                         $(this).hide()
+                      $('#loader-modal').hide()
+                      $('.modal-backdrop').remove()
                       return
+                  $('#loader-modal').hide()
+                  $('.modal-backdrop').remove()
                   return
+                $('#loader-modal').hide()
+                $('.modal-backdrop').remove()
                 return
 
         if array_of_dispute_clicks.length > 0
@@ -129,8 +143,12 @@ window.populate_webrep_index_table = (data = {}, reload = false) ->
           searchId = 'saved_search_' + json.search_id
           if $('#saved-search-tbody tr#' + searchId).length == 0
             $('#saved-search-tbody').append(named_search_tag(json.search_name, json.search_id))
+        $('#loader-modal').hide()
+        $('.modal-backdrop').remove()
 
     error: (response) ->
+      $('#loader-modal').hide()
+      $('.modal-backdrop').remove()
       $('#refresh-working-msg').hide()
       $('#refresh-error-msg').show()
       $('#refresh-error-msg').html('An error occured while retrieving data')
@@ -178,7 +196,6 @@ window.advanced_webrep_index_table = () ->
   if dispute_save_search_format.test(data.search_name) == true
     std_msg_error('save search name error', ['Please enter a name without any special character', 'Example: !@#$%^&*()'])
   else
-    window.location.reload()
     window.populate_webrep_index_table(data)
 
 window.standard_webrep_index_table = (search_name) ->
@@ -424,6 +441,7 @@ window.save_dispute = () ->
     'customer_name': $('#dispute-customer-name-input').val()
     'customer_email': $('#dispute-customer-email-input').val()
     'status': $('#status').val()
+    'submission_type': $('#dispute-submission-type-select').val().toLowerCase()
   }
 
   std_msg_ajax(
@@ -1285,20 +1303,31 @@ $ ->
       { data: 'case_opened_at' }
       {
         data: 'case_age'
-        render: (data) ->
-          parts = data.split(' ')
-          days = parseInt(parts[0])
-          hour = parseInt(parts[1])
-
-          if days == 0
-            if hour < 3
-              data
-            else if hour < 5
-              '<span class="ticket-age-over3hr">' + data + '</span>'
+        'render':(data,type,full,meta) ->
+          dispute_duration = moment(full.case_opened_at).fromNow()
+          if dispute_duration.includes('minute')
+            dispute_latency = data
+          if dispute_duration.includes('hour')
+            hours = parseInt(dispute_duration.replace(/[^0-9]/g, ''))
+            if hours <= 3
+              dispute_latency = data
             else
-              '<span class="overdue">' + data + '</span>'
+              dispute_latency = '<span class="ticket-age-over3hr">' + data + '</span>'
+            if hours > 12
+              dispute_latency = '<span class="overdue">' + data + '</span>'
           else
-            '<span class="overdue">' + data + '</span>'
+            dispute_latency = '<span class="overdue">' + data + '</span>'
+          if dispute_duration.includes('day')
+            day = parseInt(data.replace(/[^0-9]/g, ''))
+            if day >= 1
+              dispute_latency = '<span class="overdue">' + data + '</span>'
+          if dispute_duration.includes('months')
+            month = parseInt(data.replace(/[^0-9]/g, ''))
+            dispute_latency = '<span class="overdue">' + data + '</span>'
+          if dispute_duration.includes('year')
+            year = parseInt(data.replace(/[^0-9]/g, ''))
+            dispute_latency = '<span class="overdue">' + data + '</span>'
+          dispute_latency
       }
       { data: 'source' }
       { data: 'submitter_type'}
@@ -1344,11 +1373,11 @@ $ ->
         resolution = this.entry.resolution
       else
         resolution = missing_data
-      resolution_comment = ''
       if this.entry.resolution_comment != null
         resolution_comment = this.entry.resolution_comment
+        resolution_col = '<td class="entry-col-res esc-tooltipped" title="' + resolution_comment + '">' + resolution + '</td>'
       else
-        resolution_comment = ''
+        resolution_col = '<td class="entry-col-res">' + resolution + '</td>'
       suggested_disposition = ''
       if this.entry.suggested_disposition != null
         suggested_disposition = this.entry.suggested_disposition
@@ -1369,7 +1398,7 @@ $ ->
       else sbrs_score = missing_data
       entry_row = '<tr class="index-entry-row">' + '<td><input type="checkbox" onclick="toggleRow(this)" class="dispute-entry-checkbox dispute-entry-checkbox_' + dispute.id + '" id= ' + dispute_entry_id + ' ></td>' + '<td class="entry-col-content ' + important + '">' + entry_content + '</td>' +
         '<td class="entry-col-status">' + status + '</td>' +
-        '<td class="entry-col-res esc-tooltipped" title="' + resolution_comment + '">' + resolution + '</td>' +
+        resolution_col +
         '<td class="entry-col-disp">' + suggested_disposition + '</td>' +
         '<td class="entry-col-cat">' + category + '</td>' +
         '<td class="entry-col-wbrs-score">' + wbrs_score + '</td>' +
@@ -1398,6 +1427,7 @@ $ ->
       tr.addClass 'shown'
       td = $(tr).next('tr').find('td:first')
       $(td).addClass 'dispute-entry-table-wrapper'
+
       # Check to see which columns should be displayed
       $('.toggle-vis-nested').each ->
         checkbox_trigger = $(this).attr('data-column')
@@ -1610,6 +1640,9 @@ $ ->
       $('#web-rep-search').show()
 
   $('#edit-dispute-button').click ->
+    $('.dispute-submission-type').hide()
+    $('#dispute-submission-type-select').show()
+
     $('#dispute-priority-icon').hide()
     $('#dispute-priority-select').show()
 
@@ -1637,6 +1670,8 @@ $ ->
     $('#dispute-priority-icon').show()
     $('#dispute-priority-select').hide()
     $('.dispute-edit-field').show()
+    $('#dispute-submission-type-select').hide()
+    $('.dispute-submission-type').show()
 
     $('#save-dispute-button').addClass('hidden')
     $('#cancel-dispute-button').addClass('hidden')

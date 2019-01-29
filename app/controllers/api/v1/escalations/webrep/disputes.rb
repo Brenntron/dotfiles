@@ -74,11 +74,13 @@ module API
               optional :related_id, type: Integer, desc: "ID of a dispute to relate to this one"
               optional :comment, type: String, desc: "Comment, available regardless of whether resolving"
               optional :resolution, type: String, desc: "Resolution; write this if status is Resolved"
+              optional :submission_type, type: String, desc: "Submission type"
             end
             put ":id" do
               resolved_at = Time.now
               dispute = Dispute.find(params[:id])
 
+              dispute.submission_type = permitted_params[:submission_type]
               dispute.priority = permitted_params[:priority]
               dispute.customer.name = permitted_params[:customer_name]
               dispute.customer.email = permitted_params[:customer_email]
