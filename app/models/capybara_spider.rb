@@ -24,7 +24,7 @@ class CapybaraSpider < Capybara::Session
   end
 
   def self.low_capture(url)
-    `phantomjs /extras/capture_site_image.js #{url}`.strip
+    `phantomjs --ssl-protocol=any /extras/capture_site_image.js #{url}`.strip
   end
 
   def self.capture(url)

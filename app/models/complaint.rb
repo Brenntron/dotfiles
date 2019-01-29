@@ -229,7 +229,7 @@ class Complaint < ApplicationRecord
 
     begin
       ActiveRecord::Base.transaction do
-        max_wait_for_job = 15 #seconds
+        max_wait_for_job = 25 #seconds
 
         user = User.where(cvs_username:"vrtincom").first
         guest = Company.where(:name => "Guest").first
@@ -327,7 +327,7 @@ class Complaint < ApplicationRecord
           begin
             screenshot_data =  ""
             Timeout::timeout(max_wait_for_job) do
-              screenshot_data = CapybaraSpider.low_capture("http://#{new_complaint_entry.hostlookup}")
+              screenshot_data = CapybaraSpider.low_capture("#{new_complaint_entry.hostlookup}")
             end
             ces = ComplaintEntryScreenshot.new
             ces.complaint_entry_id = new_complaint_entry.id
@@ -397,7 +397,7 @@ class Complaint < ApplicationRecord
           begin
             screenshot_data = ""
             Timeout::timeout(max_wait_for_job) do
-              screenshot_data = CapybaraSpider.low_capture("http://#{new_complaint_entry.hostlookup}")
+              screenshot_data = CapybaraSpider.low_capture("#{new_complaint_entry.hostlookup}")
             end
             ces = ComplaintEntryScreenshot.new
             ces.complaint_entry_id = new_complaint_entry.id
