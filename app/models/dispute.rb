@@ -481,7 +481,7 @@ class Dispute < ApplicationRecord
 
           #this is for return back to TI to populate its ticket show pages
           return_payload[key] = new_dispute_entry.new_payload_item
-
+          return_payload[key]['sugg_type'] = new_dispute_entry.suggested_disposition
 
           if entry[:sbrs]["SBRS_Rule_Hits"].present?
             all_hits = entry[:sbrs]["SBRS_Rule_Hits"].split(",")
@@ -555,6 +555,7 @@ class Dispute < ApplicationRecord
           new_dispute_entry.save!
 
           return_payload[key] = new_dispute_entry.new_payload_item
+          return_payload[key]['sugg_type'] = new_dispute_entry.suggested_disposition
 
           if entry["WBRS_Rule_Hits"].present?
             all_hits = entry["WBRS_Rule_Hits"].split(",")
