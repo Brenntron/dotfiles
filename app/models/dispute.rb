@@ -1185,7 +1185,7 @@ class Dispute < ApplicationRecord
 
   def self.open_tickets_report(users, from, to)
 
-    from = "Mon, 4 Jul 2018 17:40:08 GMT"
+    #from = "Mon, 4 Jul 2018 17:40:08 GMT"
 
     status_array = [STATUS_ASSIGNED, STATUS_REOPENED, STATUS_CUSTOMER_PENDING, STATUS_CUSTOMER_UPDATE, STATUS_RESEARCHING, STATUS_ESCALATED, STATUS_ON_HOLD]
 
@@ -1245,7 +1245,7 @@ class Dispute < ApplicationRecord
 
   def self.closed_tickets_report(users, from, to)
 
-    from = "Mon, 4 Jul 2018 17:40:08 GMT"
+    #from = "Mon, 4 Jul 2018 17:40:08 GMT"
 
     status_array = [STATUS_RESOLVED]
 
