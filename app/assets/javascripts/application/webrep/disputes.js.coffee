@@ -2887,7 +2887,7 @@ $ ->
       submitter_type = $(this).find('.submitter-type-icon')
       if $(submitter_type).hasClass('submitter-customer')
         customer_rows.push parent_row
-      if $(submitter_type).hasClass('submitter-guest')
+      if $(submitter_type).hasClass('submitter-non-customer')
         guest_rows.push parent_row
 
     $(customer_rows).each ->
