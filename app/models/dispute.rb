@@ -1200,11 +1200,11 @@ class Dispute < ApplicationRecord
     report_data[:ticket_count] = results.size
     report_data[:entries_count] = results.map {|result| result.dispute_entries}.flatten.select {|entry| entry.status != DisputeEntry::STATUS_RESOLVED }.size
 
-    report_data[:customer_count] = results.select {|result| result.submitter_type == SUBMITTER_TYPE_CUSTOMER}.size
-    report_data[:guest_count] = results.select {|result| result.submitter_type == SUBMITTER_TYPE_NONCUSTOMER}.size
-    report_data[:email_count] = results.select {|result| result.submission_type.downcase == 'e'}.size
-    report_data[:web_count] = results.select {|result| result.submission_type.downcase == 'w'}.size
-    report_data[:email_web_count] = results.select {|result| result.submission_type.downcase == 'ew'}.size
+    report_data[:customer_count] = results.map {|result| result.dispute_entries}.flatten.select {|entry| entry.dispute.submitter_type == SUBMITTER_TYPE_CUSTOMER }.size  #results.select {|result| result.submitter_type == SUBMITTER_TYPE_CUSTOMER}.size
+    report_data[:guest_count] = results.map {|result| result.dispute_entries}.flatten.select {|entry| entry.dispute.submitter_type == SUBMITTER_TYPE_NONCUSTOMER }.size #results.select {|result| result.submitter_type == SUBMITTER_TYPE_NONCUSTOMER}.size
+    report_data[:email_count] = results.map {|result| result.dispute_entries}.flatten.select {|entry| entry.dispute.submission_type.downcase == 'e' }.size #results.select {|result| result.submission_type.downcase == 'e'}.size
+    report_data[:web_count] = results.map {|result| result.dispute_entries}.flatten.select {|entry| entry.dispute.submission_type.downcase == 'w' }.size#results.select {|result| result.submission_type.downcase == 'w'}.size
+    report_data[:email_web_count] = results.map {|result| result.dispute_entries}.flatten.select {|entry| entry.dispute.submission_type.downcase == 'ew' }.size#results.select {|result| result.submission_type.downcase == 'ew'}.size
 
     results.each do |result|
       entry_count = result.dispute_entries.size
@@ -1260,11 +1260,11 @@ class Dispute < ApplicationRecord
     report_data[:ticket_count] = results.size
     report_data[:entries_count] = results.map {|result| result.dispute_entries}.flatten.select {|entry| entry.status == DisputeEntry::STATUS_RESOLVED }.size
 
-    report_data[:customer_count] = results.select {|result| result.submitter_type == SUBMITTER_TYPE_CUSTOMER}.size
-    report_data[:guest_count] = results.select {|result| result.submitter_type == SUBMITTER_TYPE_NONCUSTOMER}.size
-    report_data[:email_count] = results.select {|result| result.submission_type.downcase == 'e'}.size
-    report_data[:web_count] = results.select {|result| result.submission_type.downcase == 'w'}.size
-    report_data[:email_web_count] = results.select {|result| result.submission_type.downcase == 'ew'}.size
+    report_data[:customer_count] = results.map {|result| result.dispute_entries}.flatten.select {|entry| entry.dispute.submitter_type == SUBMITTER_TYPE_CUSTOMER }.size  #results.select {|result| result.submitter_type == SUBMITTER_TYPE_CUSTOMER}.size
+    report_data[:guest_count] = results.map {|result| result.dispute_entries}.flatten.select {|entry| entry.dispute.submitter_type == SUBMITTER_TYPE_NONCUSTOMER }.size #results.select {|result| result.submitter_type == SUBMITTER_TYPE_NONCUSTOMER}.size
+    report_data[:email_count] = results.map {|result| result.dispute_entries}.flatten.select {|entry| entry.dispute.submission_type.downcase == 'e' }.size #results.select {|result| result.submission_type.downcase == 'e'}.size
+    report_data[:web_count] = results.map {|result| result.dispute_entries}.flatten.select {|entry| entry.dispute.submission_type.downcase == 'w' }.size#results.select {|result| result.submission_type.downcase == 'w'}.size
+    report_data[:email_web_count] = results.map {|result| result.dispute_entries}.flatten.select {|entry| entry.dispute.submission_type.downcase == 'ew' }.size#results.select {|result| result.submission_type.downcase == 'ew'}.size
 
 
 
@@ -1308,7 +1308,7 @@ class Dispute < ApplicationRecord
     report_data = {}
 
     user_ids = users.pluck(:id)
-    main_results = Dispute.joins(:dispute_entries).where(:user_id => user_ids).where("dispute_entries.case_resolved_at between '#{from}' and '#{to}'")
+    main_results = Dispute.joins(:dispute_entries).where(:user_id => user_ids).where("disputes.created_at between '#{from}' and '#{to}'").where("dispute_entries.status = '#{STATUS_RESOLVED}'")
 
     all_entries = main_results.map {|result| result.dispute_entries}.flatten.uniq
 
@@ -1370,7 +1370,7 @@ class Dispute < ApplicationRecord
     report_data[:ticket_numbers] = []
     report_data[:close_times] = []
 
-    main_results = Dispute.where(:user_id => user_id).where("case_resolved_at between '#{from}' and '#{to}'").where(:status => status_array)
+    main_results = Dispute.where(:user_id => user_id).where("disputes.created_at between '#{from}' and '#{to}'").where(:status => status_array)
 
     main_results.each do |result|
       report_data[:ticket_numbers] << result.id
@@ -1393,15 +1393,15 @@ class Dispute < ApplicationRecord
     user_ids = users.pluck(:id)
 
     if submission_types.present?
-      main_results = Dispute.joins(:dispute_entries).where(:user_id => user_ids).where("dispute_entries.case_resolved_at between '#{from}' and '#{to}'").where(:submission_type => submission_types)
+      main_results = Dispute.joins(:dispute_entries).where(:user_id => user_ids).where("disputes.created_at between '#{from}' and '#{to}'").where(:submission_type => submission_types).where("dispute_entries.status = '#{STATUS_RESOLVED}'")
     else
-      main_results = Dispute.joins(:dispute_entries).where(:user_id => user_ids).where("dispute_entries.case_resolved_at between '#{from}' and '#{to}'")
+      main_results = Dispute.joins(:dispute_entries).where(:user_id => user_ids).where("disputes.created_at between '#{from}' and '#{to}'").where("dispute_entries.status = '#{STATUS_RESOLVED}'")
     end
 
 
     all_entries = main_results.map {|result| result.dispute_entries}.flatten.select {|entry| entry.case_resolved_at.present?}.uniq
     total_count = all_entries.size
-    #binding.pry
+
     results = {}
     results[:chart_data] = []
     results[:chart_labels] = ["Fixed FN", "Unchanged", "Fixed FP", "Other"]
@@ -1460,8 +1460,8 @@ class Dispute < ApplicationRecord
     from = Time.parse(from)
     to = Time.parse(to)
 
-    main_results = Dispute.joins(:dispute_entries).where("disputes.created_at between '#{from}' and '#{to}'")
-
+    #main_results = Dispute.joins(:dispute_entries).where("disputes.created_at between '#{from}' and '#{to}'")
+    main_results = Dispute.where("disputes.created_at between '#{from}' and '#{to}'")
     report_data = {}
     final_report_data = {}
 
@@ -1480,7 +1480,7 @@ class Dispute < ApplicationRecord
 
        final_report_data[:chart_labels] << swap_day.strftime("%a %b %d, %Y")
 
-       day_results = main_results.select {|result| Date.parse(result.created_at.to_s) == Date.parse(swap_day.to_s)}
+       day_results = main_results.select {|result| Date.parse(result.created_at.to_s) == Date.parse(swap_day.to_s)}.uniq
 
        day_results.each do |result|
          if result.submitter_type == SUBMITTER_TYPE_CUSTOMER
@@ -1508,7 +1508,7 @@ class Dispute < ApplicationRecord
 
     user_ids = users.pluck(:id)
 
-    main_results = Dispute.joins(:dispute_entries).where("dispute_entries.case_resolved_at between '#{from}' and '#{to}'").where(:user_id => user_ids)
+    main_results = Dispute.joins(:dispute_entries).where("disputes.created_at between '#{from}' and '#{to}'").where(:user_id => user_ids).where("dispute_entries.status = '#{STATUS_RESOLVED}'")
     all_entries = main_results.map {|result| result.dispute_entries}.flatten.uniq
 
     report_data = {}
@@ -1553,7 +1553,7 @@ class Dispute < ApplicationRecord
       raw_data[user.cvs_username] = []
     end
 
-    main_results = Dispute.where(:user_id => user_ids).where("case_resolved_at between '#{from}' and '#{to}'")
+    main_results = Dispute.where(:user_id => user_ids).where("disputes.created_at between '#{from}' and '#{to}'").where("disputes.status = '#{STATUS_RESOLVED}'")
 
     main_results.each do |result|
       raw_data[result.user.cvs_username] << ((result.case_resolved_at - result.created_at) / 3600 )
@@ -1585,7 +1585,7 @@ class Dispute < ApplicationRecord
 
     user_ids = users.pluck(:id)
 
-    main_results = Dispute.joins(:dispute_entries).where(:user_id => user_ids).where("dispute_entries.case_resolved_at between '#{from}' and '#{to}'")
+    main_results = Dispute.joins(:dispute_entries).where(:user_id => user_ids).where("disputes.created_at between '#{from}' and '#{to}'").where("dispute_entries.status = '#{STATUS_RESOLVED}'")
 
     all_entries = main_results.map {|result| result.dispute_entries}.flatten.select {|entry| entry.case_resolved_at.present?}.flatten.uniq
 
@@ -1647,7 +1647,7 @@ class Dispute < ApplicationRecord
 
     user_ids = users.pluck(:id)
 
-    main_results = Dispute.joins(:dispute_entries).where(:user_id => user_ids).where("dispute_entries.case_resolved_at between '#{from}' and '#{to}'")
+    main_results = Dispute.joins(:dispute_entries).where(:user_id => user_ids).where("disputes.created_at between '#{from}' and '#{to}'")
 
     all_entries = main_results.map {|result| result.dispute_entries}.flatten.select {|entry| entry.case_resolved_at.present?}.flatten.uniq
 
