@@ -4,13 +4,14 @@ class AmpFalsePositive < ApplicationRecord
 
   def self.process_bridge_payload(message_payload)
     #what ever is coming in from the bridge should start here and end up eventually in create_file_rep_ticket
-    user = User.where(cvs_username:"vrtincom").first    begin
-                                                          ActiveRecord::Base.transaction do
-                                                            create_file_rep_ticket(message_payload)
-                                                          end
-                                                        rescue Exception = e
-                                                          raise("there was an error: #{e.message}")
-                                                        end
+    user = User.where(cvs_username: "vrtincom").first
+    begin
+      ActiveRecord::Base.transaction do
+        create_file_rep_ticket(message_payload)
+      end
+    rescue Exception => e
+      raise("there was an error: #{e.message}")
+    end
   end
 
   def self.create_file_rep_ticket(params)
@@ -34,8 +35,6 @@ class AmpFalsePositive < ApplicationRecord
     #                                 file_reputation_ticket: file_ticket)
     #
   end
-
-
 
 
 end
