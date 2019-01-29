@@ -481,7 +481,7 @@ class Dispute < ApplicationRecord
 
           #this is for return back to TI to populate its ticket show pages
           return_payload[key] = new_dispute_entry.new_payload_item
-          return_payload[key]['sugg_type'] = new_dispute_entry.suggested_disposition
+          return_payload[key]['sugg_type'] = entry[:sbrs]["rep_sugg"]
 
           if entry[:sbrs]["SBRS_Rule_Hits"].present?
             all_hits = entry[:sbrs]["SBRS_Rule_Hits"].split(",")
