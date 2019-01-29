@@ -19,8 +19,6 @@ class Ability
       end
     end
 
-
-
     # admin role includes developers who maintain the site
     if role_names.include?('admin')
       can :read, :all
