@@ -1955,28 +1955,6 @@ $ ->
     return
     
 
-$ ->
-
-  window.updateGraph = (label, barGraphName, e) ->
-    originalData = []
-
-    if barGraphName == 'userTicketClosedGraph'
-      originalData = window.userTicketClosedGraphDatasets
-    else if barGraphName == 'multiuser_ticket_type_totals'
-      originalData = totalTicketEntriesbyType
-    else
-      alert 'Graph with name ' + barGraphName + ' is not defined'
-      return
-
-
-    if $(e)[0].checked
-      currentData = window[barGraphName].data.datasets
-      window[barGraphName].data.datasets = currentData.concat originalData.filter (x) -> label.indexOf(x.label) >= 0
-      window[barGraphName].update()
-    else
-      currentData = window[barGraphName].data.datasets
-      window[barGraphName].data.datasets = currentData.filter (x) -> label.indexOf(x.label) < 0
-      window[barGraphName].update()
 
 
 

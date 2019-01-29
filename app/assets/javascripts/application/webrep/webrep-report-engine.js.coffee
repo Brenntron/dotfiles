@@ -402,6 +402,7 @@ window.build_graph_ticket_entries_submitter = () ->
             ]
             xAxes: [
               {
+                offset: true
                 type: 'time'
                 time:
                   displayFormats:
@@ -709,6 +710,8 @@ window.build_multi_closed_email_entries_resolution_piechart = () ->
       emailEntryResolutionLabels = json["data"]["chart_labels"]
       emailEntryData = json["data"]["chart_data"]
 
+      console.log emailEntryResolutionLabels
+      console.log emailEntryData
       tableData = json["data"]["table_data"]
 
       email_piechart_table = $('#multi-closed-email-entries-resolution-table tbody')
@@ -986,7 +989,10 @@ window.build_multi_entries_closed_by_day_chart = () =>
           scales:
             yAxes: [
               {
-                gridLines: display: false
+                gridLines: {
+                  display: true
+                  color: '#f2f2f2'
+                }
                 ticks: {
                   beginAtZero: true,
                   callback: (value) ->
@@ -999,21 +1005,46 @@ window.build_multi_entries_closed_by_day_chart = () =>
             xAxes: [
               {
                 type: 'time'
+                offset: true
                 time:
                   displayFormats:
                     day: 'MMM DD, YYYY'
-                gridLines: display: false
-                ticks: {
-                  autoSkip: false
+                gridLines: {
+                  display: false
                 }
+                ticks: {
+                  autoSkip: true
+                }
+                scale: 'data'
               }
             ]
       )
 
+      window.updateGraph = (label, barGraphName, e) ->
+        originalData = []
+
+        if barGraphName == 'userTicketClosedGraph'
+          originalData = window.userTicketClosedGraphDatasets
+        else if barGraphName == 'multiuser_ticket_type_totals'
+          originalData = totalTicketEntriesbyType
+        else
+          alert 'Graph with name ' + barGraphName + ' is not defined'
+          return
+
+
+        if $(e)[0].checked
+          currentData = window[barGraphName].data.datasets
+          window[barGraphName].data.datasets = currentData.concat originalData.filter (x) -> label.indexOf(x.label) >= 0
+          window[barGraphName].update()
+        else
+          currentData = window[barGraphName].data.datasets
+          window[barGraphName].data.datasets = currentData.filter (x) -> label.indexOf(x.label) < 0
+          window[barGraphName].update()
+
 
     error: (response) ->
-      popup_response_error(response, 'Error building chart')
-  )
+        popup_response_error(response, 'Error building chart')
+    )
 #### Multi User Graphs #####
 
 window.build_multi_ticket_resolution_by_owner_chart = () ->
@@ -1422,3 +1453,4 @@ $ ->
 
     window.refresh_visable_report_tab()
     window.populate_top_banner()
+
