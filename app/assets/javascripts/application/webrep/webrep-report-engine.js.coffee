@@ -358,6 +358,7 @@ window.build_graph_ticket_entries_submitter = () ->
             xAxes: [
               {
                 type: 'time'
+                offset: true
                 time:
                   displayFormats:
                     day: 'MMM DD, YYYY'
@@ -514,94 +515,102 @@ window.build_single_time_to_close_linechart = () ->
 
       json = $.parseJSON(response)
 
-
       closedTicketNumbers = json["data"]["ticket_numbers"]
       timeToCloseTickets = json["data"]["close_times"]
-      allTimeToClose = undefined
-      averageTimeToClose = 0
-      if timeToCloseTickets.length
-        allTimeToClose = timeToCloseTickets.reduce((a, b) ->
-          a + b
-        )
-        averageTimeToClose = allTimeToClose / timeToCloseTickets.length
-        averageTimeToClose = Math.round(averageTimeToClose * 100)/100
+
+      if closedTicketNumbers.length == 0
+        graph_wrapper = $('#time-to-close-tickets-linechart').parent()
+        unless $('#time-to-close-tickets-linechart-no-data').length
+          $(graph_wrapper).append('<span id="time-to-close-tickets-linechart-no-data" class="missing-data graph-missing-data-flag">No data for this date range.</span>')
+      else
+        if $('#time-to-close-tickets-linechart-no-data').length
+          $('#time-to-close-tickets-linechart-no-data').remove()
+
+        allTimeToClose = undefined
+        averageTimeToClose = 0
+        if timeToCloseTickets.length
+          allTimeToClose = timeToCloseTickets.reduce((a, b) ->
+            a + b
+          )
+          averageTimeToClose = allTimeToClose / timeToCloseTickets.length
+          averageTimeToClose = Math.round(averageTimeToClose * 100)/100
 
 
-      window.averageTimeToCloseLabel(averageTimeToClose)
+        window.averageTimeToCloseLabel(averageTimeToClose)
 
 
-      timeCloseTicketsDataSets = [
-        {
-          data: timeToCloseTickets
-          label: 'Time to Close:'
-          backgroundColor: '#6dbcdb'
-          borderColor: '#55a3c1'
-          borderWidth: 2
-          fill: true
-          lineTension: 0
-        }
-      ]
+        timeCloseTicketsDataSets = [
+          {
+            data: timeToCloseTickets
+            label: 'Time to Close:'
+            backgroundColor: '#6dbcdb'
+            borderColor: '#55a3c1'
+            borderWidth: 2
+            fill: true
+            lineTension: 0
+          }
+        ]
 
-      new Chart($('#time-to-close-tickets-linechart'),
-        type: 'line'
-        data:
-          labels: closedTicketNumbers
-          datasets: timeCloseTicketsDataSets
-        options:
-          responsive: true
-          maintainAspectRatio: false
-          legend: false
-          elements:
-            point:
-              radius: 0
-          scales:
-            yAxes: [
-              {
-                gridLines:
-                  display: false
-                ticks: {
-                  min: 0
-                  precision: 1
-                  callback: (value, index, values) ->
-                    return Number(value).toFixed(1) + ' hr'
+        new Chart($('#time-to-close-tickets-linechart'),
+          type: 'line'
+          data:
+            labels: closedTicketNumbers
+            datasets: timeCloseTicketsDataSets
+          options:
+            responsive: true
+            maintainAspectRatio: false
+            legend: false
+            elements:
+              point:
+                radius: 0
+            scales:
+              yAxes: [
+                {
+                  gridLines:
+                    display: false
+                  ticks: {
+                    min: 0
+                    precision: 1
+                    callback: (value, index, values) ->
+                      return Number(value).toFixed(1) + ' hr'
+                  }
                 }
-              }
-            ]
-            xAxes: [
-              {
-                gridLines:
-                  display: false
-                scaleLabel: {
-                  display: true,
-                  labelString: 'Tickets'
+              ]
+              xAxes: [
+                {
+                  gridLines:
+                    display: false
+                  scaleLabel: {
+                    display: true,
+                    labelString: 'Tickets'
+                  }
+                  ticks: {
+                    display: false
+                  }
                 }
-                ticks: {
-                  display: false
-                }
-              }
-            ]
-          annotation: {
-            annotations: [
-              {
-                type: 'line'
-                drawTime: 'afterDatasetsDraw'
-                mode: 'horizontal'
-                scaleID: 'y-axis-0'
-                value: averageTimeToClose
-                borderColor: '#304A60'
-                borderWidth: 1
-                label: {
-                  backgroundColor: 'transparent'
-                  fontStyle: 'normal'
-                  fontColor: '#666'
-                  fontSize: 14
-                  content: 'Average: ' + averageTimeToClose + ' hr'
-                  position: 'right'
-                  yAdjust: -10
-                  enabled: true
-                }
-              }]
-          })
+              ]
+            annotation: {
+              annotations: [
+                {
+                  type: 'line'
+                  drawTime: 'afterDatasetsDraw'
+                  mode: 'horizontal'
+                  scaleID: 'y-axis-0'
+                  value: averageTimeToClose
+                  borderColor: '#304A60'
+                  borderWidth: 1
+                  label: {
+                    backgroundColor: 'transparent'
+                    fontStyle: 'normal'
+                    fontColor: '#666'
+                    fontSize: 14
+                    content: 'Average: ' + averageTimeToClose + ' hr'
+                    position: 'right'
+                    yAdjust: -10
+                    enabled: true
+                  }
+                }]
+            })
 
 
     error: (response) ->
@@ -710,8 +719,6 @@ window.build_multi_closed_email_entries_resolution_piechart = () ->
       emailEntryResolutionLabels = json["data"]["chart_labels"]
       emailEntryData = json["data"]["chart_data"]
 
-      console.log emailEntryResolutionLabels
-      console.log emailEntryData
       tableData = json["data"]["table_data"]
 
       email_piechart_table = $('#multi-closed-email-entries-resolution-table tbody')
@@ -852,71 +859,86 @@ window.build_single_entries_closed_by_day_chart = () ->
       ticketTypeEData = json['data']['report_e_data']
       ticketTypeEWData = json['data']['report_ew_data']
 
-      window.userTicketClosedGraphDatasets = [
-        {
-          label: 'Total Ticket Entries'
-          backgroundColor: '#6dbcdb'
-          data: ticketTypeTotalData
-        }
-        {
-          label: 'W'
-          backgroundColor: '#E47433'
-          data: ticketTypeWData
-        }
-        {
-          label: 'E'
-          backgroundColor: '#5FB665'
-          data: ticketTypeEData
-        }
-        {
-          label: 'EW'
-          backgroundColor: '#C14B92'
-          data: ticketTypeEWData
-        }]
+      total_entries = 0
+      i = 0
+      while i < ticketTypeTotalData.length
+        total_entries += ticketTypeTotalData[i] << 0
+        i++
+
+      if total_entries == 0
+        graph_wrapper = $('#graph-ticket-entries-closed').parent()
+        unless $('#graph-ticket-entries-closed-no-data').length
+          $(graph_wrapper).append('<span id="graph-ticket-entries-closed-no-data" class="missing-data graph-missing-data-flag">No data for this date range.</span>')
+      else
+        if $('#graph-ticket-entries-closed-no-data').length
+          $('#graph-ticket-entries-closed-no-data').remove()
+
+        window.userTicketClosedGraphDatasets = [
+          {
+            label: 'Total Ticket Entries'
+            backgroundColor: '#6dbcdb'
+            data: ticketTypeTotalData
+          }
+          {
+            label: 'W'
+            backgroundColor: '#E47433'
+            data: ticketTypeWData
+          }
+          {
+            label: 'E'
+            backgroundColor: '#5FB665'
+            data: ticketTypeEData
+          }
+          {
+            label: 'EW'
+            backgroundColor: '#C14B92'
+            data: ticketTypeEWData
+          }]
 
 
-      window.userTicketClosedGraph = new Chart($('#graph-ticket-entries-closed'),
-        type: 'bar'
-        data:
-          labels: ticketTypeChartLabels
-          datasets: window.userTicketClosedGraphDatasets,
-        options:
-          responsive: true
-          maintainAspectRatio: false
-          legend:
-            display: false
-          title:
-            display: true
-            position: 'bottom'
-            text: 'Dates'
-          scales:
-            yAxes: [
-              {
-                gridLines:
-                  display: false
-                ticks: {
-                  beginAtZero: true,
-                  callback: (value) ->
-                    if Number.isInteger(value)
-                      return value
-                    return
+        window.userTicketClosedGraph = new Chart($('#graph-ticket-entries-closed'),
+          type: 'bar'
+          data:
+            labels: ticketTypeChartLabels
+            datasets: window.userTicketClosedGraphDatasets,
+          options:
+            responsive: true
+            maintainAspectRatio: false
+            legend:
+              display: false
+            title:
+              display: true
+              position: 'bottom'
+              text: 'Dates'
+            scales:
+              yAxes: [
+                {
+                  gridLines:
+                    display: false
+                  ticks: {
+                    beginAtZero: true,
+                    callback: (value) ->
+                      if Number.isInteger(value)
+                        return value
+                      return
+                  }
                 }
-              }
-            ]
-            xAxes: [
-              {
-                type: 'time'
-                time:
-                  displayFormats:
-                    day: 'MMM DD, YYYY'
-                gridLines:
-                  display: false
-                ticks: {
-                  autoSkip: false
+              ]
+              xAxes: [
+                {
+                  type: 'time'
+                  offset: true
+                  time:
+                    displayFormats:
+                      day: 'MMM DD, YYYY'
+                  gridLines:
+                    display: false
+                  ticks: {
+                    autoSkip: false
+                  }
                 }
-              }
-            ]
-      )
+              ]
+        )
 
 
     error: (response) ->
@@ -950,6 +972,8 @@ window.build_multi_entries_closed_by_day_chart = () =>
       emailTicketEntries = json["data"]["report_e_data"]
       webTicketEntries = json["data"]["report_w_data"]
       ewTicketEntries = json["data"]["report_ew_data"]
+
+
 
       dateRange = json["data"]["report_labels"]
 
