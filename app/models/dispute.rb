@@ -596,6 +596,14 @@ class Dispute < ApplicationRecord
       end
     rescue Exception => e
 
+      if !message_payload["payload"] && !message_payload["payload"]["investigate_ips"]
+        Rails.logger.error "Empty IP payload"
+      end
+
+      if !message_payload["payload"] && !message_payload["payload"]["investigate_urls"]
+        Rails.logger.error "Empty URL payload"
+      end
+
       Rails.logger.error "Dispute failed to save, backing out all DB changes."
       Rails.logger.error $!
       Rails.logger.error $!.backtrace.join("\n")
