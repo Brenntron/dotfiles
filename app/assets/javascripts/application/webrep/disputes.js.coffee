@@ -1447,6 +1447,7 @@ $ ->
 
   # Expand all rows via toolbar button
   $('#expand-all-index-rows').click ->
+    $('body').removeClass('modal-open')
     td = $('#disputes-index').find('td.expandable-row-column')
     $(td).each ->
       tr = $(this).closest('tr')
