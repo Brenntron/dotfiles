@@ -348,7 +348,11 @@
                             - if !entry.respond_to?(:consolidated_wlbl_strings)
                               %span.missing-data Not currently on a list
                             - else
-                              = entry.consolidated_wlbl_strings
+                              %span.wlbl-table-result
+                                = entry.consolidated_wlbl_strings
+                              %button.dispute-inline-buttons.history-button.esc-tooltipped{title: 'WL/BL History', onclick: "wlbl_history_dialog(#{entry.id})"}
+
+
                           %td.left-bordered
                             %label Referenced on
                           %td

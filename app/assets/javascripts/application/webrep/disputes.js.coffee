@@ -1958,3 +1958,47 @@ $ ->
 
 #    If user changes buttons from initial status, enable the submit button
 #   TODO add this check in later that only allows user to submit if there have been changes made
+
+window.wlbl_history_dialog = (id) ->
+#  headers = {'Token': $('input[name="token"]').val(), 'Xmlrpc-Token': $('input[name="xml_token"]').val()}
+#  $.ajax(
+#    url: '/escalations/api/v1/escalations/webrep/dispute_entries/wlbl_history'
+#    method: 'POST'
+#    headers: headers
+#    data: {'id': id}
+#    success: (response) ->
+#      json = $.parseJSON(response)
+#      if json.error
+#        notice_html = "<p>Something went wrong: #{json.error}</p>"
+#        alert(json.error)
+#      else
+#      #parse this json properly
+        history_dialog_content = '<div class="dialog-content-wrapper">' +
+          '<table class="history-table"><thead><tr><th>WL/BL Result</th><th>Comment</th><th>Date</th></tr></thead>' +
+          '<tbody>' +
+#        for entry in json.entry_history.domain_history
+#          entry_string = "" +
+          '<tr>' +
+          '<td>' + 'WLBL List Here' + '</td>' +
+          '<td>' + 'This is a comment' + '</td>' +
+          '<td>' + '01/11/2019' + '</td>' +
+          '</tr>' +
+          '</tbody></table>'
+#
+        if $("#history_dialog").length
+          history_dialog = this
+          $("#history_dialog").html(history_dialog_content)
+          $('#history_dialog').dialog('open')
+        else
+          history_dialog = '<div id="history_dialog" title="WL/BL History"></div>'
+          $('body').append(history_dialog)
+          $("#history_dialog").html(history_dialog_content)
+          #$('#history_dialog').append(history_dialog_content)
+          $('#history_dialog').dialog
+            autoOpen: false
+            minWidth: 600
+            position: { my: "right top", at: "right top", of: window }
+          $('#history_dialog').dialog('open')#
+#    error: (response) ->
+#      notice_html = "<p>Something went wrong: #{response.responseText}</p>"
+#  , this)
