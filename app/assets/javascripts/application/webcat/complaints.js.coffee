@@ -76,7 +76,10 @@ window.cat_new_url = ()->
       error: (response) ->
         $('.modal-backdrop').hide()
         $('#loader-modal').hide()
-        std_api_error(response, "Unable to categorize url.", reload: false)
+        if response.includes('Either no products have been defined to enter bugs against or you have not been given access to any.')
+          std_api_error('Please make sure you have the appropriate permissions in BugZilla.', "Unable to categorize url.", reload: false)
+        else
+          std_api_error(response, "Unable to categorize url.", reload: false)
     )
   else
     std_msg_error("Unable to categorize", ["Please confirm that a URL and at least one category for each desired entry exists."], reload: false)
