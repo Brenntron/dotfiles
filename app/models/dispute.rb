@@ -897,7 +897,7 @@ class Dispute < ApplicationRecord
   # @param [ActiveRecord::Relation] base_relation relation to chain this search onto.
   # @return [ActiveRecord::Relation]
   def self.contains_search(value)
-    dispute_fields = %w{case_number case_guid org_domain subject description
+    dispute_fields = %w{disputes.id case_number case_guid org_domain subject description
                         source_ip_address problem_summary research_notes}
     dispute_where = dispute_fields.map{|field| "#{field} like :pattern"}.join(' or ')
 

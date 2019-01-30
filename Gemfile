@@ -34,6 +34,8 @@ gem 'curb', '0.9.6' #Libcurl bindings for Ruby
 gem 'net-ssh', '5.0.2'
 gem 'stomp', '1.4.6'
 
+gem 'rails_admin', '~> 1.3'
+
 # System Management
 gem 'foreman', '0.85.0'
 gem 'daemons', '1.2.6'

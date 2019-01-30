@@ -184,12 +184,21 @@ class ComplaintEntry < ApplicationRecord
   def commit_category(ip_or_uri:, categories_string:, description:, user:)
     # Look for existing prefix
 
-    existing_prefix = Wbrs::Prefix.where({urls: [ip_or_uri]})
+    existing_prefixes = Wbrs::Prefix.where({urls: [ip_or_uri]})
+    existing_prefix = nil
+    if existing_prefixes.present?
+      existing_prefixes.each do |prefix_found|
+        if prefix_found.subdomain == self.subdomain
+          existing_prefix = prefix_found
+        end
+      end
+    end
+
     category_ids_array = categories_string.split(',').map {|cat| cat.to_i}
 
     if existing_prefix.present?
       prefix_object = Wbrs::Prefix.new
-      prefix_object.set_categories(category_ids_array, prefix_id: existing_prefix[0].prefix_id, user: user, description: description)
+      prefix_object.set_categories(category_ids_array, prefix_id: existing_prefix.prefix_id, user: user, description: description)
     else
       Wbrs::Prefix.create_from_url(url: ip_or_uri, categories: category_ids_array, user: user, description: description)
     end
