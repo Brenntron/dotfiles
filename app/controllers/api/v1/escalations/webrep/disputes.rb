@@ -572,15 +572,23 @@ module API
               end
 
               list_types = []
+              note_entries = []
+              notes = ""
               information.each do |entry|
+                details = Wbrs::ManualWlbl.find(entry.id)
                 if entry.url == params[:entry]
                   if entry.state == "active"
                     list_types << entry.list_type
                   end
+                  details.notes.each do |note|
+                    note_entries << "#{note['user']} - #{note['ctime']}: #{note['note']}"
+                  end
                 end
               end
 
-              return {:status => "success", :data => list_types}.to_json
+              note_entries = note_entries.uniq
+
+              return {:status => "success", :data => list_types, :notes => note_entries.first}.to_json
 
             end
 
