@@ -2001,6 +2001,6 @@ window.wlbl_history_dialog = (id) ->
             minWidth: 600
             position: { my: "right top", at: "right top", of: window }
           $('#history_dialog').dialog('open')#
-#    error: (response) ->
-#      notice_html = "<p>Something went wrong: #{response.responseText}</p>"
-#  , this)
+    error: (response) ->
+      notice_html = "<p>Something went wrong: #{response.responseText}</p>"
+  , this)
