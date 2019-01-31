@@ -596,6 +596,10 @@ class Dispute < ApplicationRecord
       end
     rescue Exception => e
 
+      if !message_payload["payload"]
+        Rails.logger.error "Empty payload"
+      end
+
       if !message_payload["payload"] && !message_payload["payload"]["investigate_ips"]
         Rails.logger.error "Empty IP payload"
       end
