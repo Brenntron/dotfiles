@@ -291,7 +291,6 @@ window.updateEntryColumns = (entry_id,row_id) ->
   category_name.each ->
     category_names.push($(this).text())
   category_names = category_names.toString()
-  debugger
   status = $('[name=resolution'+entry_id+']:checked').val()
   comment = $('#complaint_comment_'+entry_id)[0].value
   resolution_comment = $('#complaint_resolution_comment_'+entry_id)[0].value
@@ -868,7 +867,7 @@ format = (complaint_entry_row) ->
       '<input type="radio" id="fixed' + complaint_entry.entry_id + '" name="resolution' + complaint_entry.entry_id + '" value="FIXED"  ' + fixed_radio + entry_status + '> Fixed  <br/> ' +
       '<input type="radio" id="invalid' + complaint_entry.entry_id + '" name="resolution' + complaint_entry.entry_id + '" value="INVALID" ' + invalid_radio + entry_status + '> Invalid' +
       '<br/>' +
-      '<button class="tertiary" id="submit_changes_' + complaint_entry.entry_id + '" onclick="updateEntryColumns(' + complaint_entry.entry_id + ',' + row_id + ')" ' + entry_status + '>Submit Changes</button>' +
+      '<button class="tertiary submit_changes" id="submit_changes_' + complaint_entry.entry_id + '" onclick="updateEntryColumns(' + complaint_entry.entry_id + ',' + row_id + ')" ' + entry_status + '>Submit Changes</button>' +
       '</div></div></div></div></div></td></tr></table>'
 
   complaint_entry_html
@@ -1362,6 +1361,24 @@ window.triggerTooltips = (item) ->
     ]
     side: 'bottom'
   return
+
+window.master_submit = () ->
+  $('#loader-modal').modal({
+    backdrop: 'static',
+    keyboard: false
+  })
+
+  for i in [0..$('.submit_changes').length-1]
+    if $('.submit_changes')[i].disabled != true
+      $('#loader-modal').show()
+      $('.modal-backdrop').show()
+
+      $('.submit_changes')[i].click()
+
+      $('#loader-modal').hide()
+      $('.modal-backdrop').hide()
+
+
 
 $ ->
   $(document).ready ->
