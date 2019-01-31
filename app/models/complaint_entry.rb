@@ -384,8 +384,13 @@ class ComplaintEntry < ApplicationRecord
     raise "No search named '#{search_name}' found." unless named_search
     search_params = named_search.named_search_criteria.inject({}) do |search_params, criterion|
       if /\A(?<super_name>[^~]*)~(?<sub_name>[^~]*)\z/ =~ criterion.field_name
-        search_params[super_name] ||= {}
-        search_params[super_name][sub_name] = criterion.value
+        if criterion.field_name == 'complaint_entries~complaint_id'
+          search_params[super_name] ||= {}
+          search_params[super_name][sub_name] = YAML::load(criterion.value)
+        else
+          search_params[super_name] ||= {}
+          search_params[super_name][sub_name] = criterion.value
+        end
       else
         search_params[criterion.field_name] = criterion.value
       end
@@ -498,7 +503,7 @@ class ComplaintEntry < ApplicationRecord
 
     # Save this search as a named search
     if params.present? && search_name.present?
-      Dispute.save_named_search(search_name, params, user: user)
+      Dispute.save_named_search(search_name, params, user: user, project_type: 'Complaint')
     end
     relation
   end

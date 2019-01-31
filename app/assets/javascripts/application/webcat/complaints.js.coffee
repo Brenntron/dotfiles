@@ -1308,6 +1308,11 @@ window.populate_advanced_webcat_index_table = (data = {}) ->
         $('.modal-backdrop').remove()
         alert(json.error)
       else
+        if json.search_name.length > 0
+          searchId = 'saved_search_' + json.search_id
+          if $('#saved-search-tbody tr#' + searchId).length == 0
+            $('#saved-search-tbody').append(complaint_named_search_tag(json.search_name, json.search_id))
+
         $('.tickets-totals-table').trigger("click") #close open dropdowns
         datatable = $('#complaints-index').DataTable()
         datatable.clear();
