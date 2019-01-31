@@ -615,7 +615,7 @@ module API
                 end
               end
 
-              
+
               return {:status => "success", :data => note_entries}.to_json
 
             end

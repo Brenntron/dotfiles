@@ -1960,12 +1960,18 @@ $ ->
 #   TODO add this check in later that only allows user to submit if there have been changes made
 
 window.wlbl_history_dialog = (id) ->
+
+  if isFinite(id)
+    data = {'id': id}
+  else
+    data = {'entry': id}
+
   headers = {'Token': $('input[name="token"]').val(), 'Xmlrpc-Token': $('input[name="xml_token"]').val()}
   $.ajax(
     url: '/escalations/api/v1/escalations/webrep/disputes/wlbl_history'
     method: 'GET'
     headers: headers
-    data: {'id': id}
+    data: data
     success: (response) ->
       json = $.parseJSON(response)
       if json.error
