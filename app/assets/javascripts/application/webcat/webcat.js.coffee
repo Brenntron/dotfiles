@@ -209,6 +209,14 @@ $ ->
 
     $('#complaints-index_filter input').addClass('table-search-input');
 
+    $('#complaints-index tbody').on 'click', ' .nested-complaint-data', ->
+      $(this).focus()
+      $(this).toggleClass('highlight-text')
+      innertext = $(this).text()
+      $(innertext).select()
+      document.execCommand 'copy'
+
+
     $('#complaints-index tbody').on 'click', 'td.expandable-row-column', ->
       click_table_buttons complaint_table, this
 

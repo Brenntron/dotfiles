@@ -7038,3 +7038,10 @@ th.sorting_1, th.sorting_asc, th.sorting_desc {
   width: 160px !important;
 }
 
+.highlight-text {
+  background-color: #f7f2aa;
+  -webkit-user-select: all;  /* Chrome 49+ */
+  -moz-user-select: all;     /* Firefox 43+ */
+  -ms-user-select: all;      /* No support yet */
+  user-select: all;
+}

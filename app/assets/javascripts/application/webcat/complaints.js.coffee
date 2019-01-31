@@ -291,7 +291,6 @@ window.updateEntryColumns = (entry_id,row_id) ->
   category_name.each ->
     category_names.push($(this).text())
   category_names = category_names.toString()
-  debugger
   status = $('[name=resolution'+entry_id+']:checked').val()
   comment = $('#complaint_comment_'+entry_id)[0].value
   resolution_comment = $('#complaint_resolution_comment_'+entry_id)[0].value
