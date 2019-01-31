@@ -34,9 +34,12 @@
       %span.toolbar-button-text Fetch Complaints
     %button.toolbar-button.sync-button#fetch_wbnp.esc-tooltipped{ onclick: 'fetch_wbnp_data();', title: 'Fetch WBNP Data'}
       %span.toolbar-button-text Fetch WBNP Data
-    %button.toolbar-button#master-submit{ onclick: 'master_submit();', title: 'Master Submit'}
-      %span.toolbar-button-text Master Submit
-        
+
+  %div
+    %label.toolbar-section-label Bulk
+    %button.toolbar-button.master-submit-button#master-submit.esc-tooltipped{ onclick: 'master_submit();', title: 'Submit Changes'}
+      %span.toolbar-button-text Submit Changes
+
   %div.toolbar-checkbox-wrapper
     %input{type: 'checkbox', checked: true, id:'self_review'}
       Allow Self Review

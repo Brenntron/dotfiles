@@ -1363,20 +1363,29 @@ window.triggerTooltips = (item) ->
   return
 
 window.master_submit = () ->
-  $('#loader-modal').modal({
-    backdrop: 'static',
-    keyboard: false
-  })
+  at_least_one_selected_entry = false
+  at_least_one_populated_selectized = false
 
-  for i in [0..$('.submit_changes').length-1]
-    if $('.submit_changes')[i].disabled != true
-      $('#loader-modal').show()
-      $('.modal-backdrop').show()
+  at_least_one_selected_entry = true unless ('.submit_changes:visible').length = 0
+  at_least_one_populated_selectized = true unless $('.has-items').length == 0
 
-      $('.submit_changes')[i].click()
+  if at_least_one_selected_entry == true && at_least_one_populated_selectized == true
 
-      $('#loader-modal').hide()
-      $('.modal-backdrop').hide()
+    for i in [0..$('.submit_changes').length-1]
+      if $('.submit_changes')[i].disabled != true
+        $('#loader-modal').modal({
+          backdrop: 'static',
+          keyboard: false
+        })
+
+        $('.modal-backdrop').show()
+
+        $('.submit_changes')[i].click()
+
+        $('#loader-modal').hide()
+        $('.modal-backdrop').hide()
+  else
+    std_msg_error('Submit changes functionality enabled only for entries that are expanded and have at least one category. Please expand at least one entry and select at least one category and try again.','')
 
 
 
