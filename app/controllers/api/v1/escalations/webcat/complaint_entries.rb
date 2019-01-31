@@ -161,7 +161,7 @@ module API
               rescue Exception => e
                   return {error:e.message}.to_json
               end
-              {status:entry.status, entry_resolution:permitted_params['status']}.to_json
+              {display_name: current_user.display_name, status:entry.status, entry_resolution:permitted_params['status']}.to_json
             end
 
 

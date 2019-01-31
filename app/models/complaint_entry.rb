@@ -64,8 +64,8 @@ class ComplaintEntry < ApplicationRecord
   end
 
   def take_complaint(current_user)
-    if user.nil? ||user.display_name == "Vrt Incoming"
-      if status!="COMPLETED"
+    if user.nil? || user.display_name == "Vrt Incoming"
+      if status != "COMPLETED"
         self.update(user:current_user, status:"ASSIGNED", case_assigned_at: Time.now)
         complaint.set_status("ASSIGNED")
       else
@@ -84,6 +84,9 @@ class ComplaintEntry < ApplicationRecord
         else
           raise("Cannot return complaint that has been completed.")
         end
+      elsif self.is_important && self.status != "PENDING"
+        self.update(user: User.vrtincoming, status:"NEW")
+        complaint.set_status("NEW")
       else
         raise("Cannot return complaint when status is pending.")
       end
