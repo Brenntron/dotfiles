@@ -1974,12 +1974,13 @@ window.wlbl_history_dialog = (id) ->
       else
 #      #parse this json properly
         history_dialog_content = '<div class="dialog-content-wrapper">' +
-          '<table class="history-table"><thead><tr><th>WL/BL Result</th><th>Comment</th><th>Date</th></tr></thead>' +
+          '<table class="history-table"><thead><tr><th>WL/BL Result</th><th>State</th><th>Comment</th><th>Date</th></tr></thead>' +
           '<tbody>'
         for entry in json.data
           entry_string = "" +
           '<tr>' +
           '<td>' + entry.list_type + '</td>' +
+          '<td>' + entry.state + '</td>' +
           '<td>' + entry.note + '</td>' +
           '<td>' + entry.date + '</td>' +
           '</tr>'
