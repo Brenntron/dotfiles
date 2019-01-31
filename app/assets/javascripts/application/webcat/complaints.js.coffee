@@ -1190,31 +1190,34 @@ window.open_all = () ->
   open_selected(selected_rows, true)
 
 
-toggle_selected = (table, selected_rows)->
-  i = 0
-  while i < selected_rows[0].length
-    button = $( ".expand-row-button-inline" )[selected_rows[0][i]]
-    click_table_buttons(table, button)
-    i++
+toggle_selected = (selectedRows, expand)->
+    for i in [0..selectedRows.length]
+      if expand
+        if !$(selectedRows[i]).hasClass('shown')
+          $(selectedRows[i]).find('.expand-row-button-inline').click()
+      else
+        if $(selectedRows[i]).hasClass('shown')
+          $(selectedRows[i]).find('.expand-row-button-inline').click()
 
 window.collapse_selected =()->
-  table = $('#complaints-index').DataTable()
-  selected_rows = table.rows('.shown.selected')
-  toggle_selected(table,selected_rows)
+  selectedRows = $('.selected')
+  expand = false;
+  toggle_selected(selectedRows, expand)
+
 window.collapse_all =()->
-  table = $('#complaints-index').DataTable()
-  selected_rows = table.rows('.shown')
-  toggle_selected(table,selected_rows)
+  selectedRows = $('table#' + 'complaints-index' + ' tr[role="row"]')
+  expand = false;
+  toggle_selected(selectedRows, expand)
 
 window.expand_selected =()->
-  table = $('#complaints-index').DataTable()
-  selected_rows = table.rows('.selected.not-shown')
-  toggle_selected(table,selected_rows)
-window.expand_all =()->
-  table = $('#complaints-index').DataTable()
-  selected_rows = table.rows('.not-shown')
-  toggle_selected(table,selected_rows)
+  selectedRows = $('.selected')
+  expand = true;
+  toggle_selected(selectedRows, expand)
 
+window.expand_all =()->
+  selectedRows = $('table#' + 'complaints-index' + ' tr[role="row"]')
+  expand = true;
+  toggle_selected(selectedRows, expand)
 
 window.mark_for_commit = () ->
   entry_ids = $('#complaint-entries-div .complaint-entry-checkbox:checkbox:checked').map(() ->
