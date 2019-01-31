@@ -572,6 +572,8 @@ module API
               end
 
               list_types = []
+              note_entries = []
+              notes = ""
               information.each do |entry|
                 if entry.url == params[:entry]
                   if entry.state == "active"
@@ -580,7 +582,41 @@ module API
                 end
               end
 
-              return {:status => "success", :data => list_types}.to_json
+              note_entries = note_entries.uniq
+
+              return {:status => "success", :data => list_types, :notes => note_entries.first}.to_json
+
+            end
+
+            params do
+              optional :id, type: Integer
+              optional :entry, type: String
+            end
+
+            get 'wlbl_history' do
+              note_entries = []
+              entry = ''
+              if params[:id].present?
+                entry = DisputeEntry.find_by_id(params[:id]).hostlookup
+              else
+                entry = params[:entry]
+              end
+
+              information = Wbrs::ManualWlbl.where({:url => entry})
+
+              information.each do |info_entry|
+                if info_entry.url == entry
+                  details = Wbrs::ManualWlbl.find(info_entry.id)
+                  details.notes.each do |note|
+                    date = ''
+                    date = Date.parse(note['ctime']).to_s unless note['ctime'].blank?
+                    note_entries << {:state => info_entry.state, :date => date, :list_type => info_entry.list_type, :note => "#{note['user']} - #{note['ctime']}: #{note['note']}"}
+                  end
+                end
+              end
+
+
+              return {:status => "success", :data => note_entries}.to_json
 
             end
 

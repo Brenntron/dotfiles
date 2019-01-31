@@ -464,7 +464,9 @@
                           - if entry.wbrs_list_type.nil?
                             %span.missing-data Not currently on a list
                           - else
-                            = entry.wbrs_list_type
+                            %span.wlbl-table-result
+                              = entry.wbrs_list_type
+                            %button.dispute-inline-buttons.history-button.esc-tooltipped{title: 'WL/BL History', onclick: "wlbl_history_dialog(#{entry.id})"}
 
                         %td.left-bordered
                           %label Referenced on
