@@ -490,6 +490,7 @@ window.lookup_prefix = () ->
         i++
       $('#loader-modal').hide()
       $('.modal-backdrop').hide()
+      $('body').removeClass('modal-open')
   )
 
 window.retrieve_history = (position) ->
@@ -516,6 +517,7 @@ window.retrieve_history = (position) ->
       success: (response) ->
         $('.modal-backdrop').hide()
         $('#loader-modal').hide()
+        $('body').removeClass('modal-open')
 
         json = JSON.parse(response)
 
@@ -561,9 +563,11 @@ window.retrieve_history = (position) ->
         $("#cat-url-error-message-#{position}").text("No history associated with this url.")
         $('.modal-backdrop').hide()
         $('#loader-modal').hide()
+        $('body').removeClass('modal-open');
         $("#cat-url-#{position}").show()
         $("#url_#{position}").css("border-width", "2px")
         $("#url_#{position}").css("border-color", "#E47433")
+
     , this)
   else
     $("#cat-url-error-message-#{position}").text("No data available for blank URL.")
