@@ -283,6 +283,10 @@ window.updatePending = (id,row_id) ->
   , this)
 
 window.updateEntryColumns = (entry_id,row_id) ->
+  $('#loader-modal').modal({
+    backdrop: 'static',
+    keyboard: false
+  })
   $("#submit_changes_#{entry_id}").prop("disabled",true)
   prefix = $('#complaint_prefix_'+entry_id)[0].value
   categories = $('#input_cat_'+entry_id).val().toString()
@@ -307,6 +311,9 @@ window.updateEntryColumns = (entry_id,row_id) ->
       headers: headers
       data: {'id': entry_id,'prefix': prefix,'categories':categories, 'category_names':category_names, 'status':status,'comment':comment, 'resolution_comment': resolution_comment }
       success: (response) ->
+        $('#loader-modal').hide()
+        $('.modal-backdrop').hide()
+
         json = $.parseJSON(response)
         if !json.error
           table = $('#complaints-index').DataTable()
@@ -346,6 +353,9 @@ window.updateEntryColumns = (entry_id,row_id) ->
             td.classList.add('nested-complaint-data-wrapper')
 
       error: (response) ->
+        $('#loader-modal').hide()
+        $('.modal-backdrop').hide()
+
         $("#submit_changes_#{entry_id}").prop("disabled",false)
         std_msg_error(response,"", reload: false)
     , this)
@@ -1373,17 +1383,13 @@ window.master_submit = () ->
 
     for i in [0..$('.submit_changes').length-1]
       if $('.submit_changes')[i].disabled != true
-        $('#loader-modal').modal({
-          backdrop: 'static',
-          keyboard: false
-        })
 
-        $('.modal-backdrop').show()
+
+
 
         $('.submit_changes')[i].click()
 
-        $('#loader-modal').hide()
-        $('.modal-backdrop').hide()
+
   else
     std_msg_error('Submit changes functionality enabled only for entries that are expanded and have at least one category. Please expand at least one entry and select at least one category and try again.','')
 
