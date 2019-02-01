@@ -835,7 +835,7 @@ format = (complaint_entry_row) ->
   else
     input_cat = 'input_cat_' + complaint_entry.entry_id
 
-    complaint_entry_html = '<table><tr><td class="no_pad"><div class="row"><div class="col-xs-12 col-sm-6 nested-complaint-static-data">' +
+    complaint_entry_html = '<table><tr entry_id="' + complaint_entry.entry_id + '"  row_id = "' + row_id + '"><td class="no_pad"><div class="row"><div class="col-xs-12 col-sm-6 nested-complaint-static-data">' +
       '<div class="row">' +
       '<div class="col-xs-5 col-with-divider">' +
       '<div class="screenshot-thumb-wrapper">' +
@@ -1378,25 +1378,63 @@ window.triggerTooltips = (item) ->
   return
 
 window.master_submit = () ->
-  at_least_one_selected_entry = false
-  at_least_one_populated_selectized = false
 
-  at_least_one_selected_entry = true unless ('.submit_changes:visible').length = 0
-  at_least_one_populated_selectized = true unless $('.has-items').length == 0
+  data = []
 
-  if at_least_one_selected_entry == true && at_least_one_populated_selectized == true
+  # Grab entry_id and row_id of selected rows
+  $('.nested-complaint-data-wrapper:visible').each ->
+    entry_id = $(this).find('tr').attr('entry_id')
+    row_id = $(this).find('tr').attr('row_id')
+    prefix = $(this).find("#complaint_prefix_#{entry_id}")[0].value
 
-    for i in [0..$('.submit_changes').length-1]
-      if $('.submit_changes')[i].disabled != true
+    categories = $(this).find("#input_cat_#{entry_id}").val().toString()
+    category_name = $(this).find("#input_cat_#{entry_id}").next('.selectize-control').find('.item')
+    category_names = []
+    category_name.each ->
+      category_names.push($(this).text())
+    data.push({entry_id: entry_id, row_id: row_id, prefix: prefix, categories: categories, category_names: category_names})
+  debugger
+
+  ###debugger###
+
+#    prefix = $('#complaint_prefix_'+entry_id)[0].value
+#    categories = $('#input_cat_'+entry_id).val().toString()
+#    category_name = $('#input_cat_' + entry_id).next('.selectize-control').find('.item')
+#    category_names = []
+#    category_name.each ->
+#      category_names.push($(this).text())
+#    category_names = category_names.toString()
+#    status = $('[name=resolution'+entry_id+']:checked').val()
+#    comment = $('#complaint_comment_'+entry_id)[0].value
+#    resolution_comment = $('#complaint_resolution_comment_'+entry_id)[0].value
+  # Send data to Grape API
+
+#  std_msg_ajax(
+#    method: 'POST'
+#    url: "/escalations/api/v1/escalations/webcat/complaint_entries/master_submit"
+#    data: data
+#    success: (response) ->
 
 
-
-
-        $('.submit_changes')[i].click()
-
-
-  else
-    std_msg_error('Submit changes functionality enabled only for entries that are expanded and have at least one category. Please expand at least one entry and select at least one category and try again.','')
+#  at_least_one_selected_entry = false
+#  at_least_one_populated_selectized = false
+#
+#  at_least_one_selected_entry = true unless ('.submit_changes:visible').length = 0
+#  at_least_one_populated_selectized = true unless $('.has-items').length == 0
+#
+#  if at_least_one_selected_entry == true && at_least_one_populated_selectized == true
+#
+#    for i in [0..$('.submit_changes').length-1]
+#      if $('.submit_changes')[i].disabled != true
+#
+#
+#
+#
+#        $('.submit_changes')[i].click()
+#
+#
+#  else
+#    std_msg_error('Submit changes functionality enabled only for entries that are expanded and have at least one category. Please expand at least one entry and select at least one category and try again.','')
 
 
 

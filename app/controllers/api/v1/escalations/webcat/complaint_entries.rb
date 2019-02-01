@@ -389,6 +389,38 @@ module API
                 complaint_entry.current_category_data.to_json
               end
             end
+
+            desc 'Update several entries at once'
+            params do
+              requires :data, type: Array
+            end
+
+            post 'master_submit' do
+              std_api_v2 do
+                begin
+
+                  permitted_params['data'].each do |entry|
+                    entry = ComplaintEntry.find(entry['entry_id'])
+                    entry.change_category( permitted_params['prefix'],permitted_params['categories'],
+                                           permitted_params['status'],
+                                           permitted_params['comment'],
+                                           permitted_params['resolution_comment'],
+                                           current_user, "")
+                  end
+
+
+                  ComplaintEntryPreload.generate_preload_from_complaint_entry(entry)
+                  if entry.complaint.ticket_source != Complaint::SOURCE_RULEUI
+                    message = Bridge::ComplaintUpdateStatusEvent.new
+                    message.post_complaint(entry.complaint)
+                  end
+
+                rescue Exception => e
+                  return {error:e.message}.to_json
+                end
+                {status:entry.status, entry_resolution:permitted_params['status']}.to_json
+              end
+            end
           end
         end
       end
