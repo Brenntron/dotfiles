@@ -1399,19 +1399,19 @@ window.master_submit = () ->
       json = $.parseJSON(response)
 
       if !json.error
-        for i in json
+        for entry in json
           table = $('#complaints-index').DataTable()
-          temp_row = table.row(i.row_id)
-          temp_row.data().status = i.status
+          temp_row = table.row(entry.row_id)
+          temp_row.data().status = entry.status
 #          temp_row.data().resolution = status
 #          temp_row.data().internal_comment = comment
 #          temp_row.data().resolution_comment = resolution_comment
 #          temp_row.data().category = category_names
-#          temp_row.data().category_names = category_names
+          temp_row.data().category_names = entry.category_names
           temp_row.invalidate().draw()
           temp_row.child().remove()
           temp_row.child(format(temp_row)).show()
-          $('#input_cat_'+ i.entry_id).selectize {
+          $('#input_cat_'+ entry.entry_id).selectize {
             persist: false,
             create: false,
             maxItems: 5
@@ -1421,7 +1421,7 @@ window.master_submit = () ->
             options: AC.WebCat.createSelectOptions()
             items: selected_options(temp_row.data().category_names)
           }
-          $('#input_cat_pending'+ i.entry_id).selectize {
+          $('#input_cat_pending'+ entry.entry_id).selectize {
             persist: false,
             create: false,
             maxItems: 5

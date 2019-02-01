@@ -414,7 +414,7 @@ module API
                       message.post_complaint(complaint_entry.complaint)
                     end
 
-                    response.push({row_id: entry['row_id'], entry_id: entry['entry_id'], status: complaint_entry.status, entry_resolution: entry['status']})
+                    response.push({row_id: entry['row_id'], entry_id: entry['entry_id'], category_names: entry['category_names'], status: complaint_entry.status, entry_resolution: entry['status']})
                   end
                 rescue Exception => e
                   binding.pry
