@@ -287,6 +287,7 @@ window.updateEntryColumns = (entry_id,row_id) ->
     backdrop: 'static',
     keyboard: false
   })
+
   $("#submit_changes_#{entry_id}").prop("disabled",true)
   prefix = $('#complaint_prefix_'+entry_id)[0].value
   categories = $('#input_cat_'+entry_id).val().toString()
@@ -311,8 +312,7 @@ window.updateEntryColumns = (entry_id,row_id) ->
       headers: headers
       data: {'id': entry_id,'prefix': prefix,'categories':categories, 'category_names':category_names, 'status':status,'comment':comment, 'resolution_comment': resolution_comment }
       success: (response) ->
-        $('#loader-modal').hide()
-        $('.modal-backdrop').hide()
+        hide_modals()
 
         json = $.parseJSON(response)
         if !json.error
@@ -353,8 +353,7 @@ window.updateEntryColumns = (entry_id,row_id) ->
             td.classList.add('nested-complaint-data-wrapper')
 
       error: (response) ->
-        $('#loader-modal').hide()
-        $('.modal-backdrop').hide()
+        hide_modals()
 
         $("#submit_changes_#{entry_id}").prop("disabled",false)
         std_msg_error(response,"", reload: false)
@@ -626,6 +625,12 @@ window.drop_current_categories = () ->
     error: (response) ->
       std_msg_error("<p>There has been an error dropping categories: #{json.error}","")
 )
+
+window.hide_modals = () ->
+  $('#loader-modal').hide()
+  $('.modal-backdrop').hide()
+  $('body').removeClass('modal-open')
+
 
 format = (complaint_entry_row) ->
 
