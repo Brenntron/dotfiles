@@ -397,10 +397,9 @@ module API
 
             post 'master_submit' do
               std_api_v2 do
-                begin
-                  response = []
-
-                  permitted_params['data'].each do |entry|
+                permitted_params['data'].each do |entry|
+                  begin
+                    response = []
                     complaint_entry = ComplaintEntry.find(entry['entry_id'])
                     complaint_entry.change_category( entry['prefix'],entry['categories'],
                                                      entry['status'],
@@ -417,13 +416,14 @@ module API
                     response.push({entry_id: entry['entry_id'], row_id: entry['row_id'], status: complaint_entry.status, resolution: entry['status'],
                                        comment: entry['comment'], resolution_comment: entry['resolution_comment'], categories: entry['categories'],
                                        category_names: entry['category_names']})
+                  rescue Exception => e
+                    next
+                  ensure
+                    response.to_json
                   end
-                rescue Exception => e
-                  row_ids = permitted_params['data'].map { |entry|  entry['row_id']}
-                  return {error: e.message, row_ids: row_ids}.to_json
                 end
 
-                response.to_json
+
               end
             end
 

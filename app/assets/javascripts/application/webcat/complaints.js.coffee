@@ -1401,48 +1401,44 @@ window.master_submit = () ->
     url: "/escalations/api/v1/escalations/webcat/complaint_entries/master_submit"
     data: {data: data}
     success: (response) ->
-      debugger
       hide_modals()
 
       json = JSON.parse(response)
 
-      if !json.error
-        table = $('#complaints-index').DataTable()
+      table = $('#complaints-index').DataTable()
 
-        for entry in json
-          temp_row = table.row(entry.row_id)
-          temp_row.data().status = entry.status
-          temp_row.data().resolution = entry.resolution
-          temp_row.data().internal_comment = entry.comment
-          temp_row.data().resolution_comment = entry.resolution_comment
-          temp_row.data().category = entry.category_names
-          temp_row.data().category_names = entry.category_names
-          temp_row.invalidate().draw()
-          temp_row.child().remove()
-          temp_row.child(format(temp_row)).show()
+      for entry in json
+        temp_row = table.row(entry.row_id)
+        temp_row.data().status = entry.status
+        temp_row.data().resolution = entry.resolution
+        temp_row.data().internal_comment = entry.comment
+        temp_row.data().resolution_comment = entry.resolution_comment
+        temp_row.data().category = entry.category_names
+        temp_row.data().category_names = entry.category_names
+        temp_row.invalidate().draw()
+        temp_row.child().remove()
+        temp_row.child(format(temp_row)).show()
 
-          $('#input_cat_'+ entry.entry_id).selectize {
-            persist: false,
-            create: false,
-            maxItems: 5
-            valueField: 'category_id',
-            labelField: 'category_name',
-            searchField: ['category_name', 'category_code'],
-            options: AC.WebCat.createSelectOptions()
-            items: selected_options(entry.categories)
-          }
-          $('#input_cat_pending'+ entry.entry_id).selectize {
-            persist: false,
-            create: false,
-            maxItems: 5
-            valueField: 'category_id',
-            labelField: 'category_name',
-            searchField: ['category_name', 'category_code'],
-            options: AC.WebCat.createSelectOptions()
-            items: selected_options(entry.categories)
-          }
-      else
-        std_msg_error("One or more entries failed to save. #{json.error}","", reload: false)
+        $('#input_cat_'+ entry.entry_id).selectize {
+          persist: false,
+          create: false,
+          maxItems: 5
+          valueField: 'category_id',
+          labelField: 'category_name',
+          searchField: ['category_name', 'category_code'],
+          options: AC.WebCat.createSelectOptions()
+          items: selected_options(entry.categories)
+        }
+        $('#input_cat_pending'+ entry.entry_id).selectize {
+          persist: false,
+          create: false,
+          maxItems: 5
+          valueField: 'category_id',
+          labelField: 'category_name',
+          searchField: ['category_name', 'category_code'],
+          options: AC.WebCat.createSelectOptions()
+          items: selected_options(entry.categories)
+        }
 
       tds = $('#complaints-index tbody').closest('td')
       for td in tds
@@ -1451,7 +1447,8 @@ window.master_submit = () ->
 
     error: (response) ->
       hide_modals()
-      std_msg_error(response,"", reload: false)
+      # When an error is passed back, entries that were successfully updated should be AJAX updated
+      std_msg_error("One or more entries failed to save.","", reload: false)
   , this)
 
 
