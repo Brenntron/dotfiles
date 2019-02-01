@@ -417,7 +417,7 @@ window.build_graph_ticket_entries_submitter = () ->
       )
 
     error: (response) ->
-      popup_response_error(response, 'Error building chart')
+      console.log(response, 'Error building chart')
   )
 
 window.build_single_closed_email_entries_resolution_piechart = () ->
@@ -488,7 +488,7 @@ window.build_single_closed_email_entries_resolution_piechart = () ->
       )
 
     error: (response) ->
-      popup_response_error(response, 'Error building chart')
+      console.log(response, 'Error building chart')
   )
 
 
@@ -614,7 +614,7 @@ window.build_single_time_to_close_linechart = () ->
 
 
     error: (response) ->
-      popup_response_error(response, 'Error building chart')
+      console.log(response, 'Error building chart')
   )
 
 
@@ -686,7 +686,7 @@ window.build_single_closed_web_entries_resolution_piechart = () ->
       )
 
     error: (response) ->
-      popup_response_error(response, 'Error building chart')
+      console.log(response, 'Error building chart')
   )
 
 #######
@@ -757,7 +757,7 @@ window.build_multi_closed_email_entries_resolution_piechart = () ->
       )
 
     error: (response) ->
-      popup_response_error(response, 'Error building chart')
+      console.log(response, 'Error building chart')
   )
 
 
@@ -827,7 +827,7 @@ window.build_multi_closed_web_entries_resolution_piechart = () ->
       )
 
     error: (response) ->
-      popup_response_error(response, 'Error building chart')
+      console.log(response, 'Error building chart')
   )
 
 
@@ -942,7 +942,7 @@ window.build_single_entries_closed_by_day_chart = () ->
 
 
     error: (response) ->
-      popup_response_error(response, 'Error building chart')
+      console.log(response, 'Error building chart')
   )
 #### Multi User Graphs #####
 
@@ -1067,7 +1067,7 @@ window.build_multi_entries_closed_by_day_chart = () =>
 
 
     error: (response) ->
-        popup_response_error(response, 'Error building chart')
+        console.log(response, 'Error building chart')
     )
 #### Multi User Graphs #####
 
@@ -1154,7 +1154,7 @@ window.build_multi_ticket_resolution_by_owner_chart = () ->
 
 
     error: (response) ->
-      popup_response_error(response, 'Error building chart')
+      console.log(response, 'Error building chart')
   )
 
 
@@ -1244,7 +1244,7 @@ window.build_multi_entries_closed_by_owners_chart = () ->
 
 
     error: (response) ->
-      popup_response_error(response, 'Error building chart')
+      console.log(response, 'Error building chart')
   )
 
 window.build_multi_average_time_to_close_tickets = () ->
@@ -1323,7 +1323,7 @@ window.build_multi_average_time_to_close_tickets = () ->
         )
 
     error: (response) ->
-      popup_response_error(response, 'Error building chart')
+      console.log(response, 'Error building chart')
   )
 
 
@@ -1409,7 +1409,7 @@ window.build_multi_rulehits_for_fp_res_chart = () ->
         )
 
     error: (response) ->
-      popup_response_error(response, 'Error building chart')
+      console.log(response, 'Error building chart')
   )
 
 $ ->
