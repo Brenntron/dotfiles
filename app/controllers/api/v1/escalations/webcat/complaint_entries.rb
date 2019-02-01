@@ -417,6 +417,7 @@ module API
                                        comment: entry['comment'], resolution_comment: entry['resolution_comment'], categories: entry['categories'],
                                        category_names: entry['category_names']})
                   rescue Exception => e
+                    # Need to return some kind of error to process to the end-user if an entry fails
                     next
                   end
                 end
