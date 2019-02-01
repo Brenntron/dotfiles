@@ -303,7 +303,7 @@ window.updateEntryColumns = (entry_id,row_id) ->
 
   unchanged = $("#unchanged#{entry_id}").is(':checked')
   if categories.length == 0 && status != 'INVALID' && unchanged == false
-    std_msg_error("One or more entries did not have a selected category. Please select at least one category for each selected entry and try again.","", reload: false)
+    std_msg_error("Must include at least one category.","", reload: false)
     $("#submit_changes_#{entry_id}").prop("disabled",false)
   else
     std_msg_ajax(
@@ -1392,22 +1392,11 @@ window.master_submit = () ->
     category_names = []
     category_name.each ->
       category_names.push($(this).text())
-    data.push({entry_id: entry_id, row_id: row_id, prefix: prefix, categories: categories, category_names: category_names})
-  debugger
-
-  ###debugger###
-
-#    prefix = $('#complaint_prefix_'+entry_id)[0].value
-#    categories = $('#input_cat_'+entry_id).val().toString()
-#    category_name = $('#input_cat_' + entry_id).next('.selectize-control').find('.item')
-#    category_names = []
-#    category_name.each ->
-#      category_names.push($(this).text())
-#    category_names = category_names.toString()
-#    status = $('[name=resolution'+entry_id+']:checked').val()
-#    comment = $('#complaint_comment_'+entry_id)[0].value
-#    resolution_comment = $('#complaint_resolution_comment_'+entry_id)[0].value
-  # Send data to Grape API
+    category_names = category_names.toString()
+    status = $(this).find("[name=resolution#{entry_id}]:checked").val()
+    comment = $(this).find("#complaint_comment_#{entry_id}")[0].value
+    resolution_comment = $(this).find("#complaint_resolution_comment_#{entry_id}")[0].value
+    data.push({entry_id: entry_id, row_id: row_id, prefix: prefix, categories: categories, category_names: category_names, status: status, comment: comment, resolution_comment: resolution_comment})
 
 #  std_msg_ajax(
 #    method: 'POST'
