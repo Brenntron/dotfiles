@@ -303,7 +303,7 @@ window.updateEntryColumns = (entry_id,row_id) ->
 
   unchanged = $("#unchanged#{entry_id}").is(':checked')
   if categories.length == 0 && status != 'INVALID' && unchanged == false
-    std_msg_error("Must include at least one category.","", reload: false)
+    std_msg_error("One or more entries did not have a selected category.","", reload: false)
     $("#submit_changes_#{entry_id}").prop("disabled",false)
   else
     std_msg_ajax(
