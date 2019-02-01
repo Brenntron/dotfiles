@@ -1327,7 +1327,7 @@ class Dispute < ApplicationRecord
       report_data[:report_labels] << swap_day.strftime("%a %b %d, %Y")
 
       report_day_count = 0
-      day_results = all_entries.select {|result| Date.parse(result.case_resolved_at.to_s) == Date.parse(swap_day.to_s)}
+      day_results = all_entries.select {|result| Date.parse(result.created_at.to_s) == Date.parse(swap_day.to_s)}
 
       if day_results.present?
 
@@ -1397,7 +1397,6 @@ class Dispute < ApplicationRecord
     else
       main_results = Dispute.joins(:dispute_entries).where(:user_id => user_ids).where("disputes.created_at between '#{from}' and '#{to}'").where("dispute_entries.status = '#{STATUS_RESOLVED}'")
     end
-
 
     all_entries = main_results.map {|result| result.dispute_entries}.flatten.select {|entry| entry.case_resolved_at.present?}.uniq
     total_count = all_entries.size
