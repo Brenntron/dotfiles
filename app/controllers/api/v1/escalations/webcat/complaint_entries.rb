@@ -414,11 +414,13 @@ module API
                       message.post_complaint(complaint_entry.complaint)
                     end
 
-                    response.push({row_id: entry['row_id'], entry_id: entry['entry_id'], category_names: entry['category_names'], status: complaint_entry.status, entry_resolution: entry['status']})
+                    response.push({entry_id: entry['entry_id'], row_id: entry['row_id'], status: complaint_entry.status, resolution: entry['status'],
+                                       comment: entry['comment'], resolution_comment: entry['resolution_comment'], categories: entry['categories'],
+                                       category_names: entry['category_names']})
                   end
                 rescue Exception => e
-                  binding.pry
-                  return {error:e.message}.to_json
+                  row_ids = permitted_params['data'].map { |entry|  entry['row_id']}
+                  return {error: e.message, row_ids: row_ids}.to_json
                 end
 
                 response.to_json

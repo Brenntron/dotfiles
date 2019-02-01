@@ -617,6 +617,12 @@ window.drop_current_categories = () ->
       std_msg_error("<p>There has been an error dropping categories: #{json.error}","")
 )
 
+window.show_loading_modal = () ->
+  $('#loader-modal').modal({
+    backdrop: 'static',
+    keyboard: false,
+  })
+
 window.hide_modals = () ->
   $('#loader-modal').hide()
   $('.modal-backdrop').hide()
@@ -1369,6 +1375,7 @@ window.triggerTooltips = (item) ->
   return
 
 window.master_submit = () ->
+  show_loading_modal()
 
   data = []
 
@@ -1394,23 +1401,26 @@ window.master_submit = () ->
     url: "/escalations/api/v1/escalations/webcat/complaint_entries/master_submit"
     data: {data: data}
     success: (response) ->
+      debugger
       hide_modals()
 
-      json = $.parseJSON(response)
+      json = JSON.parse(response)
 
       if !json.error
+        table = $('#complaints-index').DataTable()
+
         for entry in json
-          table = $('#complaints-index').DataTable()
           temp_row = table.row(entry.row_id)
           temp_row.data().status = entry.status
-#          temp_row.data().resolution = status
-#          temp_row.data().internal_comment = comment
-#          temp_row.data().resolution_comment = resolution_comment
-#          temp_row.data().category = category_names
+          temp_row.data().resolution = entry.resolution
+          temp_row.data().internal_comment = entry.comment
+          temp_row.data().resolution_comment = entry.resolution_comment
+          temp_row.data().category = entry.category_names
           temp_row.data().category_names = entry.category_names
           temp_row.invalidate().draw()
           temp_row.child().remove()
           temp_row.child(format(temp_row)).show()
+
           $('#input_cat_'+ entry.entry_id).selectize {
             persist: false,
             create: false,
@@ -1419,7 +1429,7 @@ window.master_submit = () ->
             labelField: 'category_name',
             searchField: ['category_name', 'category_code'],
             options: AC.WebCat.createSelectOptions()
-            items: selected_options(temp_row.data().category_names)
+            items: selected_options(entry.categories)
           }
           $('#input_cat_pending'+ entry.entry_id).selectize {
             persist: false,
@@ -1429,18 +1439,19 @@ window.master_submit = () ->
             labelField: 'category_name',
             searchField: ['category_name', 'category_code'],
             options: AC.WebCat.createSelectOptions()
-            items: selected_options(temp_row.data().category_names)
+            items: selected_options(entry.categories)
           }
-        tds = $('#complaints-index tbody').closest('td')
-        for td in tds
-          if td.className == ''
-            td.classList.add('nested-complaint-data-wrapper')
+      else
+        std_msg_error("One or more entries failed to save. #{json.error}","", reload: false)
+
+      tds = $('#complaints-index tbody').closest('td')
+      for td in tds
+        if td.className == ''
+          td.classList.add('nested-complaint-data-wrapper')
 
     error: (response) ->
       hide_modals()
-
-#      $("#submit_changes_#{entry_id}").prop("disabled",false)
-#      std_msg_error(response,"", reload: false)
+      std_msg_error(response,"", reload: false)
   , this)
 
 
