@@ -1308,7 +1308,7 @@ class Dispute < ApplicationRecord
     report_data = {}
 
     user_ids = users.pluck(:id)
-    main_results = Dispute.joins(:dispute_entries).where(:user_id => user_ids).where("disputes.created_at between '#{from}' and '#{to}'").where("dispute_entries.status = '#{STATUS_RESOLVED}'")
+    main_results = Dispute.joins(:dispute_entries).where(:user_id => user_ids).where("disputes.created_at between '#{from}' and '#{to}'").where("dispute_entries.status in ('#{DisputeEntry::RESOLVED}', '#{DisputeEntry::STATUS_RESOLVED}')")
 
     all_entries = main_results.map {|result| result.dispute_entries}.flatten.uniq
 
