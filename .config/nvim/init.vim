@@ -14,8 +14,9 @@ endif
 call plug#begin('~/.vim/plugged')
 
 " Utility
-Plug 'scrooloose/nerdtree'
+Plug 'tpope/vim-vinegar'
 Plug 'majutsushi/tagbar'
+Plug 'sheerun/vim-polyglot'
 Plug 'schickling/vim-bufonly'
 Plug 'wesQ3/vim-windowswap'
 Plug 'SirVer/ultisnips'
@@ -25,10 +26,11 @@ Plug 'benmills/vimux'
 Plug 'jeetsukumaran/vim-buffergator'
 Plug 'gilsondev/searchtasks.vim'
 Plug 'chrisbra/Colorizer'
-Plug 'neoclide/coc.nvim', {'do': 'yarn install'}
+Plug 'neoclide/coc.nvim', {'tag': '*', 'do': { -> coc#util#install()}}
 Plug 'tpope/vim-dispatch'
 Plug 'w0rp/ale'
 Plug 'dbakker/vim-projectroot'
+Plug 'scrooloose/nerdtree'
 
 " Generic Programming Support
 Plug 'ludovicchabant/vim-gutentags'
@@ -148,22 +150,23 @@ syn region javaScriptStringD	start=+"+ skip=+\\\\\|\\"+ end=+"\|$+	contains=java
 syn region javaScriptStringS	start=+'+ skip=+\\\\\|\\'+ end=+'\|$+	contains=javaScriptSpecial,@htmlPreproc
 syn match javaScriptSpecialCharacter "'\\.'"
 syn match javaScriptNumber	"-\=\<\d\+L\=\>\|0[xX][0-9a-fA-F]\+\>"
-let g:airline#extensions#tabline#enabled = 1
-let g:airline#extensions#tabline#left_sep = ' '
-let g:airline#extensions#tabline#left_alt_sep = '|'
-let g:airline_powerline_fonts = 1
 
 " Ale Configuration
+let g:ale_linter_aliases = {'es6': ['javascript']}
+
 let g:ale_linters = {
 \  'javascript': ['eslint'],
 \  'typescript': ['tslint'],
+\  'es6': ['eslint'],
 \  'scss': ['stylelint'],
 \  'ruby': ['rubocop']
 \}
 
 let g:ale_fixers = {
+\  '*': ['remove_trailing_lines', 'trim_whitespace'],
 \  'javascript': ['eslint'],
 \  'typescript': ['tslint'],
+\  'es6': ['eslint'],
 \  'scss': ['stylelint'],
 \  'ruby': ['rubocop']
 \}
@@ -174,48 +177,32 @@ let g:ale_set_quickfix = 1
 let g:ale_sign_column_always = 1
 let g:ale_open_list = 1
 let g:ale_fix_on_save = 1
+let g:ale_linter_explicit = 1
+
+" Airline
+
 let g:airline#extensions#ale#enabled = 1
+let g:airline#extensions#branch#enabled = 1
+let g:airline#extensions#tabline#enabled = 1
+let g:airline#extensions#coc#enabeld = 1
 
-" CoC Configuration
-let s:error_symbol = get(g:, 'airline#extensions#coc#error_symbol', 'E:')
-let s:warning_symbol = get(g:, 'airline#extensions#coc#warning_symbol', 'W:')
+let g:airline_powerline_fonts = 1
 
-function! airline#extensions#coc#get_warning()
-  return airline#extensions#coc#get('warning')
-endfunction
+let g:airline_section_b = airline#section#create(['branch'])
+let g:airline_section_c = airline#section#create(['%<', 'file', '  ', 'readonly', 'hunks'])
 
-function! airline#extensions#coc#get_error()
-  return airline#extensions#coc#get('error')
-endfunction
+let g:airline#extensions#tabline#left_sep = ' '
+let g:airline#extensions#tabline#left_alt_sep = '|'
 
-function! airline#extensions#coc#get(type)
-  let _backup = get(g:, 'coc_stl_format', '')
-  let is_err = (a:type  is# 'error')
-  if is_err
-    let g:coc_stl_format = get(g:, 'airline#extensions#coc#stl_format_err', '%E{[%e(#%fe)]}')
-  else
-    let g:coc_stl_format = get(g:, 'airline#extensions#coc#stl_format_warn', '%W{[%w(#%fw)]}')
-  endif
-  let info = get(b:, 'coc_diagnostic_info', {})
-  if empty(info) | return '' | endif
+let g:airline_section_error = '%{airline#util#wrap(airline#extensions#coc#get_error(),0)}'
+let g:airline_section_warning = '%{airline#util#wrap(airline#extensions#coc#get_warning(),0)}'
 
+let g:airline#extensions#coc#error_symbol = 'Error:'
+let g:airline#extensions#ale#error_symbol = 'E:'
+let g:airline#extensions#ale#warning_symbol = 'W:'
 
-  let cnt = get(info, a:type, 0)
-  if !empty(_backup)
-    let g:coc_stl_format = _backup
-  endif
-
-  if empty(cnt)
-    return ''
-  else
-    return (is_err ? s:error_symbol : s:warning_symbol).cnt
-  endif
-endfunction
-
-function! airline#extensions#coc#init(ext)
-  call airline#parts#define_function('coc_error_count', 'airline#extensions#coc#get_warning')
-  call airline#parts#define_function('coc_warning_count', 'airline#extensions#coc#get_error')
-endfunction
+" vim-vinegar settings
+let g:netrw_list_hide = '\(^\|\s\s\)\zs\.\S\+'
 
 set eol
 
@@ -342,6 +329,9 @@ let g:tagbar_type_elixir = {
 
 " ctag config
 nmap <Leader>j :tag <C-R><C-W>
+
+" RipGrep config
+nmap <Leader>s :Rg <C-R><C-W>
 
 " Remap keys for coc gotos
 nmap <silent> gd <Plug>(coc-definition)
