@@ -329,7 +329,7 @@ window.updateEntryColumns = (entry_id,row_id) ->
             labelField: 'category_name',
             searchField: ['category_name', 'category_code'],
             options: AC.WebCat.createSelectOptions()
-            items: selected_options(temp_row.data().category_names)
+            items: selected_options(categories)
           }
           $('#input_cat_pending'+ temp_row.data().entry_id).selectize {
             persist: false,
@@ -339,7 +339,7 @@ window.updateEntryColumns = (entry_id,row_id) ->
             labelField: 'category_name',
             searchField: ['category_name', 'category_code'],
             options: AC.WebCat.createSelectOptions()
-            items: selected_options(temp_row.data().category_names)
+            items: selected_options(categories)
           }
         tds = $('#complaints-index tbody').closest('td')
         for td in tds
