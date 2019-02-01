@@ -419,7 +419,7 @@ module API
                   rescue Exception => e
                     next
                   ensure
-                    response.to_json
+                    return response.to_json
                   end
                 end
 
