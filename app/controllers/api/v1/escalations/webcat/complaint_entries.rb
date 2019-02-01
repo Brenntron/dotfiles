@@ -397,9 +397,9 @@ module API
 
             post 'master_submit' do
               std_api_v2 do
+                response = []
                 permitted_params['data'].each do |entry|
                   begin
-                    response = []
                     complaint_entry = ComplaintEntry.find(entry['entry_id'])
                     complaint_entry.change_category( entry['prefix'],entry['categories'],
                                                      entry['status'],
@@ -418,12 +418,9 @@ module API
                                        category_names: entry['category_names']})
                   rescue Exception => e
                     next
-                  ensure
-                    return response.to_json
                   end
                 end
-
-
+                response.to_json
               end
             end
 
