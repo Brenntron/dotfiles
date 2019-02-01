@@ -283,11 +283,6 @@ window.updatePending = (id,row_id) ->
   , this)
 
 window.updateEntryColumns = (entry_id,row_id) ->
-  $('#loader-modal').modal({
-    backdrop: 'static',
-    keyboard: false
-  })
-
   $("#submit_changes_#{entry_id}").prop("disabled",true)
   prefix = $('#complaint_prefix_'+entry_id)[0].value
   categories = $('#input_cat_'+entry_id).val().toString()
@@ -312,8 +307,6 @@ window.updateEntryColumns = (entry_id,row_id) ->
       headers: headers
       data: {'id': entry_id,'prefix': prefix,'categories':categories, 'category_names':category_names, 'status':status,'comment':comment, 'resolution_comment': resolution_comment }
       success: (response) ->
-        hide_modals()
-
         json = $.parseJSON(response)
         if !json.error
           table = $('#complaints-index').DataTable()
@@ -353,8 +346,6 @@ window.updateEntryColumns = (entry_id,row_id) ->
             td.classList.add('nested-complaint-data-wrapper')
 
       error: (response) ->
-        hide_modals()
-
         $("#submit_changes_#{entry_id}").prop("disabled",false)
         std_msg_error(response,"", reload: false)
     , this)
@@ -1398,11 +1389,60 @@ window.master_submit = () ->
     resolution_comment = $(this).find("#complaint_resolution_comment_#{entry_id}")[0].value
     data.push({entry_id: entry_id, row_id: row_id, prefix: prefix, categories: categories, category_names: category_names, status: status, comment: comment, resolution_comment: resolution_comment})
 
-#  std_msg_ajax(
-#    method: 'POST'
-#    url: "/escalations/api/v1/escalations/webcat/complaint_entries/master_submit"
-#    data: data
-#    success: (response) ->
+  std_msg_ajax(
+    method: 'POST'
+    url: "/escalations/api/v1/escalations/webcat/complaint_entries/master_submit"
+    data: {data: data}
+    success: (response) ->
+      hide_modals()
+
+      json = $.parseJSON(response)
+
+      if !json.error
+        for i in json
+          table = $('#complaints-index').DataTable()
+          temp_row = table.row(i.row_id)
+          temp_row.data().status = i.status
+#          temp_row.data().resolution = status
+#          temp_row.data().internal_comment = comment
+#          temp_row.data().resolution_comment = resolution_comment
+#          temp_row.data().category = category_names
+#          temp_row.data().category_names = category_names
+          temp_row.invalidate().draw()
+          temp_row.child().remove()
+          temp_row.child(format(temp_row)).show()
+          $('#input_cat_'+ i.entry_id).selectize {
+            persist: false,
+            create: false,
+            maxItems: 5
+            valueField: 'category_id',
+            labelField: 'category_name',
+            searchField: ['category_name', 'category_code'],
+            options: AC.WebCat.createSelectOptions()
+            items: selected_options(temp_row.data().category_names)
+          }
+          $('#input_cat_pending'+ i.entry_id).selectize {
+            persist: false,
+            create: false,
+            maxItems: 5
+            valueField: 'category_id',
+            labelField: 'category_name',
+            searchField: ['category_name', 'category_code'],
+            options: AC.WebCat.createSelectOptions()
+            items: selected_options(temp_row.data().category_names)
+          }
+        tds = $('#complaints-index tbody').closest('td')
+        for td in tds
+          if td.className == ''
+            td.classList.add('nested-complaint-data-wrapper')
+
+    error: (response) ->
+      hide_modals()
+
+#      $("#submit_changes_#{entry_id}").prop("disabled",false)
+#      std_msg_error(response,"", reload: false)
+  , this)
+
 
 
 #  at_least_one_selected_entry = false

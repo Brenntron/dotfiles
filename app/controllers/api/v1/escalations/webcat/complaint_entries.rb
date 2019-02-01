@@ -398,29 +398,33 @@ module API
             post 'master_submit' do
               std_api_v2 do
                 begin
+                  response = []
 
                   permitted_params['data'].each do |entry|
-                    entry = ComplaintEntry.find(entry['entry_id'])
-                    entry.change_category( permitted_params['prefix'],permitted_params['categories'],
-                                           permitted_params['status'],
-                                           permitted_params['comment'],
-                                           permitted_params['resolution_comment'],
-                                           current_user, "")
+                    complaint_entry = ComplaintEntry.find(entry['entry_id'])
+                    complaint_entry.change_category( entry['prefix'],entry['categories'],
+                                                     entry['status'],
+                                                     entry['comment'],
+                                                     entry['resolution_comment'],
+                                                     current_user, "")
+
+                    ComplaintEntryPreload.generate_preload_from_complaint_entry(complaint_entry)
+                    if complaint_entry.complaint.ticket_source != Complaint::SOURCE_RULEUI
+                      message = Bridge::ComplaintUpdateStatusEvent.new
+                      message.post_complaint(complaint_entry.complaint)
+                    end
+
+                    response.push({row_id: entry['row_id'], entry_id: entry['entry_id'], status: complaint_entry.status, entry_resolution: entry['status']})
                   end
-
-
-                  ComplaintEntryPreload.generate_preload_from_complaint_entry(entry)
-                  if entry.complaint.ticket_source != Complaint::SOURCE_RULEUI
-                    message = Bridge::ComplaintUpdateStatusEvent.new
-                    message.post_complaint(entry.complaint)
-                  end
-
                 rescue Exception => e
+                  binding.pry
                   return {error:e.message}.to_json
                 end
-                {status:entry.status, entry_resolution:permitted_params['status']}.to_json
+
+                response.to_json
               end
             end
+
           end
         end
       end
