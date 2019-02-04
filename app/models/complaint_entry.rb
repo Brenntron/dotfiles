@@ -220,7 +220,7 @@ class ComplaintEntry < ApplicationRecord
       new_complaint_entry.complaint_id = complaint.id
       new_complaint_entry.status = status
 
-      wbrs_stuff = Sbrs::ManualSbrs.get_wbrs_data({:url => ip_url})
+      wbrs_stuff = Sbrs::ManualSbrs.get_wbrs_data({:url => URI.escape(ip_url)})
       wbrs_score = wbrs_stuff["wbrs"]["score"]
       new_complaint_entry.wbrs_score = wbrs_score
 
@@ -524,7 +524,7 @@ class ComplaintEntry < ApplicationRecord
 
   def set_current_category
     category_list = []
-    prefix_results = Wbrs::Prefix.where({:urls => [self.hostlookup]})
+    prefix_results = Wbrs::Prefix.where({:urls => [URI.escape(self.hostlookup)]})
     if prefix_results
       if prefix_results.first&.is_active == 1
 
@@ -551,7 +551,7 @@ class ComplaintEntry < ApplicationRecord
   end
 
   def current_category_data
-    prefix = Wbrs::Prefix.where({:urls => [self.hostlookup]})&.first
+    prefix = Wbrs::Prefix.where({:urls => [URI.escape(self.hostlookup)]})&.first
     return {} unless prefix
 
     current_categories = prefix.categories
@@ -572,7 +572,7 @@ class ComplaintEntry < ApplicationRecord
   def historic_category_data
 
     prefix_id = nil
-    prefix_results = Wbrs::Prefix.where({:urls => [self.hostlookup]})
+    prefix_results = Wbrs::Prefix.where({:urls => [URI.escape(self.hostlookup)]})
     if prefix_results.present?
       prefix_id = prefix_results.first.prefix_id
     end
@@ -588,7 +588,7 @@ class ComplaintEntry < ApplicationRecord
   def history_category_data_with_preload_save
 
     prefix_id = nil
-    prefix_results = Wbrs::Prefix.where({:urls => [self.hostlookup]})
+    prefix_results = Wbrs::Prefix.where({:urls => [URI.escape(self.hostlookup)]})
 
     complaint_entry_preload = ComplaintEntryPreload.where(complaint_entry_id: self.id).first
 
