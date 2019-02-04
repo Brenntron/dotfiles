@@ -16,6 +16,11 @@
     %a{href: '#', class: 'dropdown-toggle', id: 'new-dispute', 'data-toggle': 'dropdown', 'aria-haspopup': 'true', 'aria-expanded': 'false'}
       %span{class: 'nav-toolbar-icon icon-new-white'}
       New
+    .dropdown-menu.nav-tools-dropdown{'aria-labelledby': 'new-dispute'}
+      %h3.nav-tool-dropdown-header.inverse
+        New Dispute
+      .nav-tool-content-wrapper#new-dispute-wrapper
+        = render 'escalations/webrep/disputes/new'
 
   .nav-tool-blocks.col-xs-1.col-sm-1.col-lg-1.dropdown
     %a{href: '#', class: 'dropdown-toggle', id: 'filter-cases', 'data-toggle': 'dropdown', 'aria-haspopup': 'true', 'aria-expanded': 'false'}
