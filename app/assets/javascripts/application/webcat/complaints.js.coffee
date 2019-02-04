@@ -1464,7 +1464,8 @@ window.master_submit = () ->
         std_msg_error("Unable to submit changes for selected entries.","", reload: false)
     , this)
   else
-    std_msg_error("Submit changes functionality is only enabled when at least one entry is selected and at least one category is selected per entry. Please try again.","")
+    std_msg_error("Submit changes functionality is only enabled when at least one Complaint entry and " +
+                  "at least one category for an entry is selected. Please try again.","")
 
 $ ->
   $(document).ready ->
