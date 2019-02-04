@@ -1403,8 +1403,6 @@ window.master_submit = () ->
       if categories.length > 0
         data.push({entry_id: entry_id, row_id: row_id, prefix: prefix, categories: categories, category_names: category_names, status: status, comment: comment, resolution_comment: resolution_comment})
 
-
-
     std_msg_ajax(
       method: 'POST'
       url: "/escalations/api/v1/escalations/webcat/complaint_entries/master_submit"
