@@ -274,12 +274,12 @@ window.set_initial_date_span = () ->
   to = localStorage.getItem('webrep_report_range_to')
 
   if from == null && to == null
-    curr = new Date;
-    first = curr.getDate() - curr.getDay();
-    last = first + 6;
+    first = new Date;
+    first.setDate(first.getDate() - 7)
+    last = new Date;
 
-    firstday = new Date(curr.setDate(first)).toUTCString();
-    lastday = new Date(curr.setDate(last)).toUTCString();
+    firstday = new Date(first).toUTCString();
+    lastday = new Date(last).toUTCString();
 
     localStorage.setItem 'webrep_report_range_from', firstday
     localStorage.setItem 'webrep_report_range_to', lastday
