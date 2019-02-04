@@ -1375,11 +1375,14 @@ window.triggerTooltips = (item) ->
   return
 
 window.master_submit = () ->
-  show_loading_modal()
-
   data = []
 
-  # Grab entry_id and row_id of selected rows
+  at_least_one_selected_entry = false
+  at_least_one_populated_selectized = false
+
+  at_least_one_selected_entry = true unless ('.submit_changes:visible').length = 0
+  at_least_one_populated_selectized = true unless $('.has-items').length == 0
+
   $('.nested-complaint-data-wrapper:visible').each ->
     entry_id = $(this).find('tr').attr('entry_id')
     row_id = $(this).find('tr').attr('row_id')
@@ -1396,91 +1399,72 @@ window.master_submit = () ->
     resolution_comment = $(this).find("#complaint_resolution_comment_#{entry_id}")[0].value
     data.push({entry_id: entry_id, row_id: row_id, prefix: prefix, categories: categories, category_names: category_names, status: status, comment: comment, resolution_comment: resolution_comment})
 
-  std_msg_ajax(
-    method: 'POST'
-    url: "/escalations/api/v1/escalations/webcat/complaint_entries/master_submit"
-    data: {data: data}
-    success: (response) ->
-      hide_modals()
+  if at_least_one_selected_entry == true && at_least_one_populated_selectized == true
+    show_loading_modal()
 
-      errors = []
+    std_msg_ajax(
+      method: 'POST'
+      url: "/escalations/api/v1/escalations/webcat/complaint_entries/master_submit"
+      data: {data: data}
+      success: (response) ->
+        hide_modals()
 
-      json = JSON.parse(response)
+        errors = []
 
-      table = $('#complaints-index').DataTable()
+        json = JSON.parse(response)
 
-      for entry in json
-        if entry.error == true
-          errors.push(entry.entry_id)
-        else
-          temp_row = table.row(entry.row_id)
-          temp_row.data().status = entry.status
-          temp_row.data().resolution = entry.resolution
-          temp_row.data().internal_comment = entry.comment
-          temp_row.data().resolution_comment = entry.resolution_comment
-          temp_row.data().category = entry.category_names
-          temp_row.data().category_names = entry.category_names
-          temp_row.invalidate().draw()
-          temp_row.child().remove()
-          temp_row.child(format(temp_row)).show()
+        table = $('#complaints-index').DataTable()
 
-          $('#input_cat_'+ entry.entry_id).selectize {
-            persist: false,
-            create: false,
-            maxItems: 5
-            valueField: 'category_id',
-            labelField: 'category_name',
-            searchField: ['category_name', 'category_code'],
-            options: AC.WebCat.createSelectOptions()
-            items: selected_options(entry.categories)
-          }
-          $('#input_cat_pending'+ entry.entry_id).selectize {
-            persist: false,
-            create: false,
-            maxItems: 5
-            valueField: 'category_id',
-            labelField: 'category_name',
-            searchField: ['category_name', 'category_code'],
-            options: AC.WebCat.createSelectOptions()
-            items: selected_options(entry.categories)
-          }
+        for entry in json
+          if entry.error == true
+            errors.push(entry.entry_id)
+          else
+            temp_row = table.row(entry.row_id)
+            temp_row.data().status = entry.status
+            temp_row.data().resolution = entry.resolution
+            temp_row.data().internal_comment = entry.comment
+            temp_row.data().resolution_comment = entry.resolution_comment
+            temp_row.data().category = entry.category_names
+            temp_row.data().category_names = entry.category_names
+            temp_row.invalidate().draw()
+            temp_row.child().remove()
+            temp_row.child(format(temp_row)).show()
 
-      if errors.length > 0
-        std_msg_error("The following entries could not be saved: #{errors.toString()}",'')
+            $('#input_cat_'+ entry.entry_id).selectize {
+              persist: false,
+              create: false,
+              maxItems: 5
+              valueField: 'category_id',
+              labelField: 'category_name',
+              searchField: ['category_name', 'category_code'],
+              options: AC.WebCat.createSelectOptions()
+              items: selected_options(entry.categories)
+            }
+            $('#input_cat_pending'+ entry.entry_id).selectize {
+              persist: false,
+              create: false,
+              maxItems: 5
+              valueField: 'category_id',
+              labelField: 'category_name',
+              searchField: ['category_name', 'category_code'],
+              options: AC.WebCat.createSelectOptions()
+              items: selected_options(entry.categories)
+            }
 
-      tds = $('#complaints-index tbody').closest('td')
-      for td in tds
-        if td.className == ''
-          td.classList.add('nested-complaint-data-wrapper')
+        if errors.length > 0
+          std_msg_error("The following entries could not be saved: #{errors.toString()}",'')
 
-    error: (response) ->
-      hide_modals()
-      std_msg_error("Unable to submit changes for selected entries.","", reload: false)
-  , this)
+        tds = $('#complaints-index tbody').closest('td')
+        for td in tds
+          if td.className == ''
+            td.classList.add('nested-complaint-data-wrapper')
 
-
-
-#  at_least_one_selected_entry = false
-#  at_least_one_populated_selectized = false
-#
-#  at_least_one_selected_entry = true unless ('.submit_changes:visible').length = 0
-#  at_least_one_populated_selectized = true unless $('.has-items').length == 0
-#
-#  if at_least_one_selected_entry == true && at_least_one_populated_selectized == true
-#
-#    for i in [0..$('.submit_changes').length-1]
-#      if $('.submit_changes')[i].disabled != true
-#
-#
-#
-#
-#        $('.submit_changes')[i].click()
-#
-#
-#  else
-#    std_msg_error('Submit changes functionality enabled only for entries that are expanded and have at least one category. Please expand at least one entry and select at least one category and try again.','')
-
-
+      error: (response) ->
+        hide_modals()
+        std_msg_error("Unable to submit changes for selected entries.","", reload: false)
+    , this)
+  else
+    std_msg_error("Submit changes functionality is only enabled when at least one entry is selected and at least one category is selected per entry. Please try again.","")
 
 $ ->
   $(document).ready ->
