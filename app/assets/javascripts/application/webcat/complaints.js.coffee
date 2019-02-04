@@ -832,7 +832,7 @@ format = (complaint_entry_row) ->
   else
     input_cat = 'input_cat_' + complaint_entry.entry_id
 
-    complaint_entry_html = '<table><tr entry_id="' + complaint_entry.entry_id + '"  row_id = "' + row_id + '"><td class="no_pad"><div class="row"><div class="col-xs-12 col-sm-6 nested-complaint-static-data">' +
+    complaint_entry_html = '<table><tr type="submit_changes" entry_id="' + complaint_entry.entry_id + '"  row_id = "' + row_id + '"><td class="no_pad"><div class="row"><div class="col-xs-12 col-sm-6 nested-complaint-static-data">' +
       '<div class="row">' +
       '<div class="col-xs-5 col-with-divider">' +
       '<div class="screenshot-thumb-wrapper">' +
@@ -1388,8 +1388,9 @@ window.master_submit = () ->
     $('.nested-complaint-data-wrapper:visible').each ->
       entry_id = $(this).find('tr').attr('entry_id')
       row_id = $(this).find('tr').attr('row_id')
+      type = $(this).find('tr').attr('type')
 
-      if entry_id && row_id
+      if type == 'submit_changes' && entry_id && row_id
         prefix = $(this).find("#complaint_prefix_#{entry_id}")[0].value
 
         categories = $(this).find("#input_cat_#{entry_id}").val().toString()
