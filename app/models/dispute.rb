@@ -483,7 +483,7 @@ class Dispute < ApplicationRecord
 
           #this is for return back to TI to populate its ticket show pages
           return_payload[key] = new_dispute_entry.new_payload_item
-
+          return_payload[key]['sugg_type'] = entry[:sbrs]["rep_sugg"]
 
           if entry[:sbrs]["SBRS_Rule_Hits"].present?
             all_hits = entry[:sbrs]["SBRS_Rule_Hits"].split(",")
@@ -557,6 +557,7 @@ class Dispute < ApplicationRecord
           new_dispute_entry.save!
 
           return_payload[key] = new_dispute_entry.new_payload_item
+          return_payload[key]['sugg_type'] = new_dispute_entry.suggested_disposition
 
           if entry["WBRS_Rule_Hits"].present?
             all_hits = entry["WBRS_Rule_Hits"].split(",")
@@ -597,6 +598,18 @@ class Dispute < ApplicationRecord
 
       end
     rescue Exception => e
+
+      if !message_payload["payload"]
+        Rails.logger.error "Empty payload"
+      end
+
+      if !message_payload["payload"] || !message_payload["payload"]["investigate_ips"]
+        Rails.logger.error "Empty IP payload"
+      end
+
+      if !message_payload["payload"] || !message_payload["payload"]["investigate_urls"]
+        Rails.logger.error "Empty URL payload"
+      end
 
       Rails.logger.error "Dispute failed to save, backing out all DB changes."
       Rails.logger.error $!
@@ -665,11 +678,11 @@ class Dispute < ApplicationRecord
     (days * 24 + hours) * 3600
   end
 
-  def self.save_named_search(search_name, params, user:)
-    NamedSearchCriterion.where(named_search_id: NamedSearch.where(name: search_name).ids).delete_all
+  def self.save_named_search(search_name, params, user:, project_type:)
+    NamedSearchCriterion.where(named_search_id: NamedSearch.where(user_id: user.id, name: search_name).ids).delete_all
 
     named_search =
-        user.named_searches.where(name: search_name).first || NamedSearch.create!(user: user, name: search_name)
+        user.named_searches.where(name: search_name).first || NamedSearch.create!(user: user, name: search_name, project_type: project_type)
 
     params.each do |field_name, value|
       case
@@ -814,7 +827,7 @@ class Dispute < ApplicationRecord
 
     # Save this search as a named search
     if params.present? && search_name.present? && reload == false
-      save_named_search(search_name, params, user: user)
+      save_named_search(search_name, params, user: user, project_type: 'Dispute')
     end
 
     relation

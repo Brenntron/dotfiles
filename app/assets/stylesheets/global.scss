@@ -7832,3 +7832,17 @@ th.sorting_1, th.sorting_asc, th.sorting_desc {
   font-size: 8pt;
   text-align: center;
 }
+
+.dispute-inline-buttons.history-button {
+  float: right;
+  margin-top: -3px;
+  margin-bottom: -6px;
+}
+
+.wlbl-table-result {
+  display: inline-block;
+}
+
+#edit-dispute-button {
+  background-color: $faint-neutral-color;
+}

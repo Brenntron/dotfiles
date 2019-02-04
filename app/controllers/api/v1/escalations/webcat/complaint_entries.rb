@@ -125,8 +125,13 @@ module API
                   json_packet << complaint_entry_packet
                 end
               end
-              {:status => "success", :data => json_packet}.to_json
 
+              if permitted_params['search_name'].present?
+                search_name = permitted_params['search_name']
+                named_search = NamedSearch.where(user: current_user, name: search_name).first
+              end
+
+                {:status => "success", :search_name => search_name, :search_id => named_search&.id, :data => json_packet}.to_json
             end
 
 

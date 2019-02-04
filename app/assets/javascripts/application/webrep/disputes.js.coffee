@@ -1447,6 +1447,7 @@ $ ->
 
   # Expand all rows via toolbar button
   $('#expand-all-index-rows').click ->
+    $('body').removeClass('modal-open')
     td = $('#disputes-index').find('td.expandable-row-column')
     $(td).each ->
       tr = $(this).closest('tr')
@@ -2613,9 +2614,6 @@ $ ->
 
   #)
 
-#    If user changes buttons from initial status, enable the submit button
-#   TODO add this check in later that only allows user to submit if there have been changes made
-
 
 
 # Create Dashboard Initial Table (My Open Tickets)
@@ -3026,3 +3024,62 @@ $ ->
         $(g_ew_rows).each ->
           unless $(this).hasClass('hidden')
             $(this).addClass('hidden')
+
+
+
+#    If user changes buttons from initial status, enable the submit button
+#   TODO add this check in later that only allows user to submit if there have been changes made
+
+window.wlbl_history_dialog = (id) ->
+
+  if isFinite(id)
+    data = {'id': id}
+  else
+    data = {'entry': id}
+
+  headers = {'Token': $('input[name="token"]').val(), 'Xmlrpc-Token': $('input[name="xml_token"]').val()}
+  $.ajax(
+    url: '/escalations/api/v1/escalations/webrep/disputes/wlbl_history'
+    method: 'GET'
+    headers: headers
+    data: data
+    success: (response) ->
+      json = $.parseJSON(response)
+      if json.error
+        notice_html = "<p>Something went wrong: #{json.error}</p>"
+        alert(json.error)
+      else
+#      #parse this json properly
+        history_dialog_content = '<div class="dialog-content-wrapper">' +
+          '<table class="history-table"><thead><tr><th>WL/BL Result</th><th>State</th><th>Comment</th><th>Date</th></tr></thead>' +
+          '<tbody>'
+        for entry in json.data
+          entry_string = "" +
+          '<tr>' +
+          '<td>' + entry.list_type + '</td>' +
+          '<td>' + entry.state + '</td>' +
+          '<td>' + entry.note + '</td>' +
+          '<td>' + entry.date + '</td>' +
+          '</tr>'
+          history_dialog_content += entry_string
+
+        history_dialog_content += '</tbody></table>'
+#
+        if $("#history_dialog").length
+          history_dialog = this
+          $("#history_dialog").html(history_dialog_content)
+          $('#history_dialog').dialog('open')
+        else
+          history_dialog = '<div id="history_dialog" title="WL/BL History"></div>'
+          $('body').append(history_dialog)
+          $("#history_dialog").html(history_dialog_content)
+          #$('#history_dialog').append(history_dialog_content)
+          $('#history_dialog').dialog
+            autoOpen: false
+            minWidth: 600
+            position: { my: "right top", at: "right top", of: window }
+          $('#history_dialog').dialog('open')#
+    error: (response) ->
+      notice_html = "<p>Something went wrong: #{response.responseText}</p>"
+  , this)
+

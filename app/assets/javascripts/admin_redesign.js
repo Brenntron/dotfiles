@@ -23,6 +23,7 @@
 //= require admin/bs-admin-tabs
 //= require admin/std_api
 //= require admin/std_msg
+//= require application/webcat/complaints-support
 //= require application/webrep/disputes-support
 //= require application/webrep/disputes
 //= require application/webrep/communications
