@@ -1380,7 +1380,7 @@ window.master_submit = () ->
   at_least_one_selected_entry = false
   at_least_one_populated_selectized = false
 
-  at_least_one_selected_entry = true unless ('.submit_changes:visible').length = 0
+  at_least_one_selected_entry = true unless $('.submit_changes:visible').length == 0
   at_least_one_populated_selectized = true unless $('.has-items').length == 0
 
   if at_least_one_selected_entry == true && at_least_one_populated_selectized == true
