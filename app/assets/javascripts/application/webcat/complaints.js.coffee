@@ -1452,7 +1452,7 @@ window.master_submit = () ->
             }
 
         if errors.length > 0
-          std_msg_error("The following entries could not be saved: #{errors.toString()}",'')
+          std_msg_error("The following entries could not be saved: #{errors.toString()}. The rest were successful",'')
 
         tds = $('#complaints-index tbody').closest('td')
         for td in tds
