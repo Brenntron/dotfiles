@@ -12,6 +12,11 @@
     %a#research.nav-page-button{href: '/escalations/webrep/research', class: ("active" if current_page?('/escalations/webrep/research'))}
       %span.nav-toolbar-icon-large.icon-research
 
+  .nav-tool-blocks.col-xs-1.col-sm-1.col-lg-1.dropdown
+    %a{href: '#', class: 'dropdown-toggle', id: 'new-dispute', 'data-toggle': 'dropdown', 'aria-haspopup': 'true', 'aria-expanded': 'false'}
+      %span{class: 'nav-toolbar-icon icon-new-white'}
+      New
+
   .nav-tool-blocks.col-xs-2.col-sm-2.col-lg-2.dropdown
     %a{href: '#', class: 'dropdown-toggle', id: 'filter-cases', 'data-toggle': 'dropdown', 'aria-haspopup': 'true', 'aria-expanded': 'false'}
       %span{class: 'nav-toolbar-icon icon-filter-white'}
