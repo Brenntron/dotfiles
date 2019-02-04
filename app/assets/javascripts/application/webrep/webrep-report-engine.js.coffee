@@ -274,12 +274,11 @@ window.set_initial_date_span = () ->
   to = localStorage.getItem('webrep_report_range_to')
 
   if from == null && to == null
-    curr = new Date;
-    first = curr.getDate() - curr.getDay();
-    last = first + 6;
+    first = moment().startOf('isoWeek').toDate();
+    last = moment().endOf('isoWeek').toDate();
 
-    firstday = new Date(curr.setDate(first)).toUTCString();
-    lastday = new Date(curr.setDate(last)).toUTCString();
+    firstday = new Date(first).toUTCString();
+    lastday = new Date(last).toUTCString();
 
     localStorage.setItem 'webrep_report_range_from', firstday
     localStorage.setItem 'webrep_report_range_to', lastday
@@ -1451,22 +1450,23 @@ $ ->
 
     $('#ticket-view-shortcut').click ->
       if this.innerHTML == "View Last Week's Tickets"
-        curr = new Date;
-        first = curr.getDate() - curr.getDay() - 7;
-        last = first + 6;
+        d = new Date;
+        d.setDate(d.getDate() - 7)
 
-        firstday = new Date(curr.setDate(first)).toUTCString();
-        lastday = new Date(curr.setDate(last)).toUTCString();
+        first = moment(d).startOf('isoWeek').toDate();
+        last = moment(d).endOf('isoWeek').toDate();
+
+        firstday = new Date(first).toUTCString();
+        lastday = new Date(last).toUTCString();
 
         localStorage.setItem 'webrep_report_range_from', firstday
         localStorage.setItem 'webrep_report_range_to', lastday
       else
-        curr = new Date;
-        first = curr.getDate() - curr.getDay();
-        last = first + 6;
+        first = moment().startOf('isoWeek').toDate();
+        last = moment().endOf('isoWeek').toDate();
 
-        firstday = new Date(curr.setDate(first)).toUTCString();
-        lastday = new Date(curr.setDate(last)).toUTCString();
+        firstday = new Date(first).toUTCString();
+        lastday = new Date(last).toUTCString();
 
         localStorage.setItem 'webrep_report_range_from', firstday
         localStorage.setItem 'webrep_report_range_to', lastday
