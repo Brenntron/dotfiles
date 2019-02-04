@@ -1389,7 +1389,7 @@ window.master_submit = () ->
       entry_id = $(this).find('tr').attr('entry_id')
       row_id = $(this).find('tr').attr('row_id')
 
-      if entry_id
+      if entry_id && row_id
         prefix = $(this).find("#complaint_prefix_#{entry_id}")[0].value
 
         categories = $(this).find("#input_cat_#{entry_id}").val().toString()
