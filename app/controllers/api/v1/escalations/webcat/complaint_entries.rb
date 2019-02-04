@@ -413,11 +413,11 @@ module API
                       message.post_complaint(complaint_entry.complaint)
                     end
 
-                    response.push({entry_id: entry['entry_id'], row_id: entry['row_id'], status: complaint_entry.status, resolution: entry['status'],
+                    response.push({error: false, entry_id: entry['entry_id'], row_id: entry['row_id'], status: complaint_entry.status, resolution: entry['status'],
                                        comment: entry['comment'], resolution_comment: entry['resolution_comment'], categories: entry['categories'],
                                        category_names: entry['category_names']})
                   rescue Exception => e
-                    # Need to return some kind of error to process to the end-user if an entry fails
+                    response.push({error: true, entry_id: entry['entry_id']})
                     next
                   end
                 end
