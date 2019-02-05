@@ -8,6 +8,8 @@ $ ->
       keyboard: false
     })
 
+    $('#loader-modal').show()
+
     headers = {'Token': $('input[name="token"]').val(), 'Xmlrpc-Token': $('input[name="xml_token"]').val()}
     ips_urls = this.ips_urls.value
     assignee = this.assignee.value
@@ -24,7 +26,7 @@ $ ->
         priority: priority,
         ticket_type: ticket_type
       success: (response) ->
-        $('.dropdown-menu').hide()
+        $('#new-dispute').click()
         $('#loader-modal').hide()
 
         data = {
