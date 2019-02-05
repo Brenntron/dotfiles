@@ -1,4 +1,5 @@
 $ ->
+
   $('#new-dispute-form').submit (e) ->
     e.preventDefault()
 
@@ -39,3 +40,8 @@ $ ->
         $('.modal-backdrop').remove();
         std_api_error(response, "Dispute was not created.", reload: false)
     )
+
+  $('#cancel_dispute').on 'click', ->
+    $('#ips_urls').val('')
+    $('#assignee').val('')
+    $('#new-dispute').dropdown('toggle')
