@@ -1,4 +1,4 @@
-%form#new-complaint-form{method: 'get', 'accept-charset': 'UTF-8'}
+%form#new-dispute-form{method: 'get', 'accept-charset': 'UTF-8'}
 
   .form-group
     %input{type:'hidden', name: 'token', value: "#{current_user.authentication_token}"}
@@ -10,7 +10,7 @@
     %textarea#ips_urls{required: true}
   .form-group
     %label.content-label-sm Assignee
-    %input.form-control#owner-input{name: 'assignee', list: 'assignee-list'}
+    %input.form-control#assignee{name: 'assignee', list: 'assignee-list'}
     %datalist#assignee-list
   .form-group
     %label.content-label-sm Priority

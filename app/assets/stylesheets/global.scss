@@ -4023,6 +4023,14 @@ td.wbrs-highlight, td.sbrs-highlight {
   border: 1px solid darken($faint-neutral-color, 5%);
   border-radius: 1px;
 }
+
+#new-dispute-form input {
+  margin-bottom: 8px;
+  background-color: transparent;
+  border: 1px solid darken($faint-neutral-color, 5%);
+  border-radius: 1px;
+}
+
 #advanced-search-wrapper .content-label-sm {
   margin-bottom: 0;
 }

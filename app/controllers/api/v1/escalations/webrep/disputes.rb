@@ -65,6 +65,23 @@ module API
 
             end
 
+            desc 'create a dispute'
+            params do
+              requires :ips_urls, type: String, desc: 'List of URLs to create entries'
+              requires :assignee, type: String, desc: 'Description of new complaint'
+              requires :priority, type: String, desc: 'Customer related to new complaint'
+              requires :ticket_type, type: String, desc: 'Array of tags to be associated with the new complaint'
+            end
+
+            post "" do
+              Dispute.create_action(bugzilla_session,
+                                      permitted_params[:ips_urls],
+                                      permitted_params[:assignee],
+                                      permitted_params[:priority],
+                                      permitted_params[:ticket_type])
+              {:status => 'success'}.to_json
+            end
+
             desc 'update a dispute'
             params do
               optional :priority, type: String, desc: "Priority of P1 through P5"
