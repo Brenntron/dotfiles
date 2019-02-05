@@ -1523,6 +1523,16 @@ $ ->
 $ ->
 
   $('#new-dispute').click ->
+    $('#priority-list').append '<option value=\'P1\'></option>'
+    $('#priority-list').append '<option value=\'P2\'></option>'
+    $('#priority-list').append '<option value=\'P3\'></option>'
+    $('#priority-list').append '<option value=\'P4\'></option>'
+    $('#priority-list').append '<option value=\'P5\'></option>'
+
+    $('#ticket-type-list').append '<option value=\'Web\'></option>'
+    $('#ticket-type-list').append '<option value=\'Email\'></option>'
+    $('#ticket-type-list').append '<option value=\'Email & Web\'></option>'
+
     std_msg_ajax(
       method: 'GET'
       url: '/escalations/api/v1/escalations/webrep/disputes/populate_new_dispute_fields'

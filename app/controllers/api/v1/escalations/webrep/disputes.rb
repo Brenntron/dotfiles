@@ -635,7 +635,7 @@ module API
                             contacts: contacts, companies: companies, resolutions: resolutions }
             end
 
-            desc 'Autopopulate fields on New Dispute'
+            desc 'Auto-populate fields on New Dispute'
             get 'populate_new_dispute_fields' do
               assignees = User.joins(roles: :org_subset).where(org_subsets: { name: 'webrep' }).distinct.order(:cvs_username)
 
