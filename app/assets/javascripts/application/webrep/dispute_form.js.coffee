@@ -23,8 +23,17 @@ $ ->
         priority: priority,
         ticket_type: ticket_type
       success: (response) ->
+        $('.dropdown-menu').hide()
         $('#loader-modal').hide()
-        std_msg_success('Dispute Created.', [], reload: true)
+
+        data = {
+          search_type: 'advanced'
+          case_id: response.json.case_id
+        }
+
+        window.populate_webrep_index_table(data)
+
+        std_msg_success('Dispute Created.', [])
       error: (response) ->
         $('#loader-modal').hide()
         $('.modal-backdrop').remove();

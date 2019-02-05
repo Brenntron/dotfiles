@@ -82,8 +82,6 @@ class Dispute < ApplicationRecord
       ticket_type = 'ew'
     end
 
-    binding.pry
-
     customer = Customer.where(name: 'Dispute Analyst').first
 
     bug_factory = Bugzilla::Bug.new(bugzilla_session)
@@ -111,6 +109,7 @@ class Dispute < ApplicationRecord
                                      user_id: user.id,
                                      priority: priority,
                                      submission_type: ticket_type,
+                                     submitter_type: 'Internal',
                                      status: status,
                                      customer_id: customer.id,
                                      case_opened_at: Time.now)
@@ -120,6 +119,7 @@ class Dispute < ApplicationRecord
       DisputeEntry.create_dispute_entry(new_dispute, ip_url, status)
     end
 
+    new_dispute
   end
 
   def case_id_str

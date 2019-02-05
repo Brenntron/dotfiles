@@ -74,12 +74,12 @@ module API
             end
 
             post "" do
-              Dispute.create_action(bugzilla_session,
+              dispute = Dispute.create_action(bugzilla_session,
                                       permitted_params[:ips_urls],
                                       permitted_params[:assignee],
                                       permitted_params[:priority],
                                       permitted_params[:ticket_type])
-              {:status => 'success'}.to_json
+              render json: {status: 'Success', case_id: dispute.id}
             end
 
             desc 'update a dispute'
