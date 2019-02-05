@@ -9,11 +9,15 @@
     %label.content-label-sm URLs/IP Addresses
     %textarea#ips_urls{required: true}
   .form-group
-    %label.content-label-sm Description
-    %input.form-control#description
+    %label.content-label-sm Assignee
+    %input.form-control#owner-input{name: 'username', list: 'assignee-list'}
+    %datalist#assignee-list
   .form-group
-    %label.content-label-sm Customer
-    %input.form-control#customers{list: 'customerList'}
+    %label.content-label-sm Priority
+    %input.form-control#priority{name: 'priority'}
+  .form-group
+    %label.content-label-sm Ticket Type
+    %input.form-control#ticket_type{list: 'customerList'}
       %datalist#customerList
 
   %hr.thin

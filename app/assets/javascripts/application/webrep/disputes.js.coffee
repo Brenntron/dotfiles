@@ -1522,6 +1522,15 @@ $ ->
 
 $ ->
 
+  $('#new-dispute').click ->
+    std_msg_ajax(
+      method: 'GET'
+      url: '/escalations/api/v1/escalations/webrep/disputes/populate_new_dispute_fields'
+      success: (response) ->
+        for user in response.json.assignees
+          $('#assignee-list').append '<option value=\'' + user.cvs_username + '\'></option>'
+    )
+
   $('#advanced-search-button').click ->
     std_msg_ajax(
       method: 'GET'
