@@ -280,7 +280,6 @@ window.updatePending = (id,row_id) ->
       for td in tds
         if td.className == ''
           td.classList.add('nested-complaint-data-wrapper')
-
     error: (response) ->
       notice_html = "<p>Something went wrong: #{response.responseText}</p>"
   , this)
@@ -294,7 +293,6 @@ window.updateEntryColumns = (entry_id,row_id) ->
   category_name.each ->
     category_names.push($(this).text())
   category_names = category_names.toString()
-  debugger
   status = $('[name=resolution'+entry_id+']:checked').val()
   comment = $('#complaint_comment_'+entry_id)[0].value
   resolution_comment = $('#complaint_resolution_comment_'+entry_id)[0].value
@@ -314,6 +312,10 @@ window.updateEntryColumns = (entry_id,row_id) ->
         json = $.parseJSON(response)
         if !json.error
           table = $('#complaints-index').DataTable()
+
+          selected_rows = $('#complaints-index').DataTable().rows('.selected')
+          selected_rows.data().cell(selected_rows[0][0],14).data("#{json.display_name}").draw()
+
           temp_row = table.row(row_id)
           temp_row.data().status = json.status
           temp_row.data().resolution = status
@@ -412,7 +414,7 @@ window.return_selected = ()->
           i = 0
           while i < selected_rows[0].length
             selected_rows.data().cell(selected_rows[0][i],14).data("Vrt Incoming").draw()
-            selected_rows.data().cell(selected_rows[0][i],5).data("NEW").draw()
+            selected_rows.data().cell(selected_rows[0][i],4).data("NEW").draw()
             i++
 
       error: (response) ->
