@@ -68,8 +68,7 @@ window.populate_webrep_index_table = (data = {}, reload = false) ->
         std_msg_error("No tickets matching filter or search.","")
 
       if json.error
-        $('#loader-modal').hide()
-        $('.modal-backdrop').remove()
+        $('#loader-modal').modal 'hide'
         $('#refresh-working-msg').hide()
         $('#refresh-error-msg').show()
         $('#refresh-error-msg').html('An error occured while retrieving data')
@@ -103,21 +102,17 @@ window.populate_webrep_index_table = (data = {}, reload = false) ->
                     $('.dispute-entry-table td, .dispute-entry-table th').each ->
                       if $(this).hasClass(checkbox_trigger)
                         $(this).show()
-                      $('#loader-modal').hide()
-                      $('.modal-backdrop').remove()
+                      $('#loader-modal').modal 'hide'
                       return
                   else if $(checkbox).prop('checked') == false
                     $('.dispute-entry-table td, .dispute-entry-table th').each ->
                       if $(this).hasClass(checkbox_trigger)
                         $(this).hide()
-                      $('#loader-modal').hide()
-                      $('.modal-backdrop').remove()
+                      $('#loader-modal').modal 'hide'
                       return
-                  $('#loader-modal').hide()
-                  $('.modal-backdrop').remove()
+                  $('#loader-modal').modal 'hide'
                   return
-                $('#loader-modal').hide()
-                $('.modal-backdrop').remove()
+                $('#loader-modal').modal 'hide'
                 return
 
         if array_of_dispute_clicks.length > 0
@@ -143,12 +138,10 @@ window.populate_webrep_index_table = (data = {}, reload = false) ->
           searchId = 'saved_search_' + json.search_id
           if $('#saved-search-tbody tr#' + searchId).length == 0
             $('#saved-search-tbody').append(named_search_tag(json.search_name, json.search_id))
-        $('#loader-modal').hide()
-        $('.modal-backdrop').remove()
+        $('#loader-modal').modal 'hide'
 
     error: (response) ->
-      $('#loader-modal').hide()
-      $('.modal-backdrop').remove()
+      $('#loader-modal').modal 'hide'
       $('#refresh-working-msg').hide()
       $('#refresh-error-msg').show()
       $('#refresh-error-msg').html('An error occured while retrieving data')
@@ -1447,7 +1440,6 @@ $ ->
 
   # Expand all rows via toolbar button
   $('#expand-all-index-rows').click ->
-    $('body').removeClass('modal-open')
     td = $('#disputes-index').find('td.expandable-row-column')
     $(td).each ->
       tr = $(this).closest('tr')
