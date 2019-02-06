@@ -670,7 +670,11 @@ window.show_page_edit_status = () ->
   dispute_id = $('#dispute_id').text()
 
   if statusName == "RESOLVED_CLOSED"
-    resolution = $('input[name=dispute-resolution]:checked').val()
+    if $('#show-edit-ticket-status-dropdown').find('input[name=dispute-resolution]').is(':checked')
+      resolution = $('input[name=dispute-resolution]:checked').val()
+    else
+      std_msg_error('No resolution selected', ['Please select a ticket resolution.'])
+      return
 
   data = {
     dispute_ids: [ dispute_id ]
@@ -1065,6 +1069,16 @@ window.webrep_reset_search = () ->
 
 $ ->
 
+#  Opens ticket status resolution back up after modal close
+  $('#msg-modal').on 'hide.bs.modal', (e) ->
+    if $('#index-edit-ticket-status-dropdown').parent().hasClass('open')
+      $('#msg-modal').on 'hidden.bs.modal', (b) ->
+        $('#index-edit-ticket-status-dropdown').parent().addClass('open')
+    if $('#show-edit-ticket-status-dropdown').parent().hasClass('open')
+      $('#msg-modal').on 'hidden.bs.modal', (c) ->
+        $('#show-edit-ticket-status-dropdown').parent().addClass('open')
+
+
   $('.change_ticket_status_button').click ->
     status = ""
     resolution = ""
@@ -1078,11 +1092,14 @@ $ ->
 
     status = $('#index-edit-ticket-status-dropdown').find('.ticket-status-radio:checked').val()
     if status == 'RESOLVED_CLOSED'
-      resolution = $('#index-edit-ticket-status-dropdown').find('.ticket-resolution-radio:checked').val()
-      comment = $('.resolution-comment-wrapper').find('.ticket-status-comment').val()
+      if $('#index-edit-ticket-status-dropdown').find('.ticket-resolution-radio').is(':checked')
+        resolution = $('#index-edit-ticket-status-dropdown').find('.ticket-resolution-radio:checked').val()
+        comment = $('.resolution-comment-wrapper').find('.ticket-status-comment').val()
+      else
+        std_msg_error('No resolution selected', ['Please select a ticket resolution.'])
+        return
     else
       comment = $('.non-resolution-submit-wrapper').find('.ticket-status-comment').val()
-
 
     data = {
       status: status,
