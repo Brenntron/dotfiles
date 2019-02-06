@@ -74,12 +74,20 @@ module API
             end
 
             post "" do
-              dispute = Dispute.create_action(bugzilla_session,
-                                      permitted_params[:ips_urls],
-                                      permitted_params[:assignee],
-                                      permitted_params[:priority],
-                                      permitted_params[:ticket_type])
-              render json: {status: 'Success', case_id: dispute.id}
+              std_api_v2 do
+                user_validation = User.where(cvs_username: permitted_params['assignee'])
+
+                if user_validation.present?
+                  dispute = Dispute.create_action(bugzilla_session,
+                                          permitted_params[:ips_urls],
+                                          permitted_params[:assignee],
+                                          permitted_params[:priority],
+                                          permitted_params[:ticket_type])
+                  render json: {status: 'Success', case_id: dispute.id}
+                else
+                  raise ("Invalid assignee or assignee does not exist. Please try again.")
+                end
+              end
             end
 
             desc 'update a dispute'
