@@ -10,15 +10,15 @@
     %textarea#ips_urls{required: true}
   .form-group
     %label.content-label-sm Assignee
-    %input.form-control#assignee{name: 'assignee', list: 'assignee-list'}
+    %input.form-control#assignee{name: 'assignee', list: 'assignee-list', required: true}
     %datalist#assignee-list
   .form-group
     %label.content-label-sm Priority
-    %input.form-control#priority{name: 'priority', list: 'priority-list', value: 'P3'}
+    %input.form-control#priority{name: 'priority', list: 'priority-list', value: 'P3', required: true}
     %datalist#priority-list
   .form-group
     %label.content-label-sm Ticket Type
-    %input.form-control#ticket_type{name: 'ticket-type', list:'ticket-type-list', value: 'Web'}
+    %input.form-control#ticket_type{name: 'ticket-type', list:'ticket-type-list', value: 'Web', required: true}
     %datalist#ticket-type-list
 
   %hr.thin

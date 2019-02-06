@@ -35,8 +35,6 @@ $ ->
         }
 
         window.populate_webrep_index_table(data)
-
-        std_msg_success('Dispute Created.', [])
       error: (response) ->
         $('#loader-modal').hide()
         $('.modal-backdrop').remove();
