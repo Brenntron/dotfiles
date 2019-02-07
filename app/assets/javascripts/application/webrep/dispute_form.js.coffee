@@ -10,7 +10,6 @@ $ ->
 
     $('#loader-modal').show()
 
-    headers = {'Token': $('input[name="token"]').val(), 'Xmlrpc-Token': $('input[name="xml_token"]').val()}
     ips_urls = this.ips_urls.value
     assignee = this.assignee.value
     priority = this.priority.value
@@ -19,14 +18,13 @@ $ ->
     std_msg_ajax(
       url: '/escalations/api/v1/escalations/webrep/disputes'
       method: 'POST'
-      headers: headers
       data:
         ips_urls: ips_urls,
         assignee: assignee,
         priority: priority,
         ticket_type: ticket_type
       success: (response) ->
-        $('#new-dispute').click()
+        $('#new-dispute').dropdown('toggle')
         $('#loader-modal').hide()
 
         data = {

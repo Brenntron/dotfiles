@@ -14,12 +14,20 @@
     %datalist#assignee-list
   .form-group
     %label.content-label-sm Priority
-    %input.form-control#priority{name: 'priority', list: 'priority-list', value: 'P3', required: true}
-    %datalist#priority-list
+  .form-group
+    %select#priority.content-label-md
+      %option P1
+      %option P2
+      %option{:selected => 'selected'} P3
+      %option P4
+      %option P5
   .form-group
     %label.content-label-sm Ticket Type
-    %input.form-control#ticket_type{name: 'ticket-type', list:'ticket-type-list', value: 'Web', required: true}
-    %datalist#ticket-type-list
+  .form-group
+    %select#ticket_type.content-label-md
+      %option{:selected => 'selected'} Web
+      %option Email
+      %option Email & Web
 
   %hr.thin
   .form-group.text-center
