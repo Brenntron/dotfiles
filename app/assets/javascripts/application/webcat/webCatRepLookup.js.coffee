@@ -54,7 +54,7 @@ namespace 'WebCat.RepLookup', (exports) ->
 
     errorFunction = (message) ->
       $('#loader-modal').modal 'hide'
-      console.log message
+      std_msg_error("Error retrieving WHOIS query.","")
 
     $('#loader-modal').modal({
       backdrop: 'static',
