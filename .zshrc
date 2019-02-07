@@ -9,7 +9,48 @@ export ZSH="/Users/Brenntron/.oh-my-zsh"
 # it'll load a random theme each time that oh-my-zsh is loaded.
 # See https://github.com/robbyrussell/oh-my-zsh/wiki/Themes
 ZSH_THEME="powerlevel9k/powerlevel9k"
+
+POWERLEVEL9K_CUSTOM_USER="echo `whoami`"
+POWERLEVEL9K_CUSTOM_USER_BACKGROUND="lightcoral"
+POWERLEVEL9K_CUSTOM_USER_FOREGROUND="grey30"
+
+POWERLEVEL9K_BATTERY_ICON=''
+POWERLEVEL9K_BATTERY_CHARGING="yellow"
+POWERLEVEL9K_BATTERY_CHARGED="green"
+POWERLEVEL9K_BATTERY_DISCONNECTED='$DEFAULT_COLOR'
+POWERLEVEL9K_BATTERY_LOW_THRESHOLD='10'
+POWERLEVEL9K_BATTERY_LOW_COLOR='red'
+
+POWERLEVEL9K_CUSTOM_RUBY_VERSION="echo '\ue23e' `asdf current ruby | sed -ne 's/[^0-9]*\(\([0-9]\.\)\{0,4\}[0-9][^.]\).*/\1/p'`"
+POWERLEVEL9K_CUSTOM_RUBY_VERSION_BACKGROUND="red"
+POWERLEVEL9K_CUSTOM_RUBY_VERSION_FOREGROUND="black"
+
+POWERLEVEL9K_NODE_VERSION_FOREGROUND='grey30'
+
+POWERLEVEL9K_LEFT_PROMPT_ELEMENTS=(
+  battery
+  custom_user
+  dir
+  vcs
+)
+POWERLEVEL9K_RIGHT_PROMPT_ELEMENTS=(
+  status
+  time
+  node_version
+  custom_ruby_version
+  dir_writable
+)
+POWERLEVEL9K_PROMPT_ADD_NEWLINE=true
+
+POWERLEVEL9K_TIME_FORMAT="%D{\uf017 %H:%M \uf073 %d/%m/%y}"
+
+POWERLEVEL9K_STATUS_VERBOSE=false
+POWERLEVEL9K_SHORTEN_STRATEGY="truncate_middle"
+POWERLEVEL9K_SHORTEN_DIR_LENGTH=3
+
 POWERLEVEL9K_MODE='nerdfont-complete'
+
+source ~/.oh-my-zsh/custom/themes/powerlevel9k/powerlevel9k.zsh-theme
 
 # Set list of themes to load
 # Setting this variable when ZSH_THEME=random
