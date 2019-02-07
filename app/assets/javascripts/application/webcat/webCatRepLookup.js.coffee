@@ -1,27 +1,4 @@
 namespace 'WebCat.RepLookup', (exports) ->
-  google_key = undefined
-  ip_limit = 50
-  total_ip = 0
-  ip_offset = 0
-  net_limit = 10
-  net_sort_type = 'asc'
-  net_column_sort = 'domain'
-  search_cdri = ''
-  location_country = ''
-  ip_sort_type = 'asc'
-  ip_column_sort = 'ip'
-  total_net = 0
-  net_limit = 10
-  net_sort_type = 'asc'
-  net_column_sort = 'domain'
-  search_cdri = ''
-  location_country = ''
-  net_offset = 0
-  net_limit = 10
-  net_sort_type = 'asc'
-  net_column_sort = 'domain'
-  search_cdri = ''
-  location_country = ''
 
   exports.getLookup = (query_url, query_entry, offset = 0, sort_column = 'ip', sort_type = 'asc') ->
 
