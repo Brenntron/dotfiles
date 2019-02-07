@@ -642,17 +642,22 @@ window.toolbar_index_edit_status = () ->
     }]
 
     if statusName == "RESOLVED_CLOSED"
-      data[this.id].push({
-        id: this.id
-        field: "resolution"
-        new: $('input[name=entry-resolution]:checked').val()
-      })
+      if $('input[name=entry-resolution]:checked').val()
+        data[this.id].push({
+          id: this.id
+          field: "resolution"
+          new: $('input[name=entry-resolution]:checked').val()
+        })
 
-      data[this.id].push({
-        id: this.id
-        field: "resolution_comment"
-        new: $('#entry-status-comment').val()
-      })
+        data[this.id].push({
+          id: this.id
+          field: "resolution_comment"
+          new: $('#entry-status-comment').val()
+        })
+      else
+        std_msg_error('No resolution selected', ['Please select a ticket resolution.'])
+        return
+
 
   )
 
