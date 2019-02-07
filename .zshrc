@@ -10,7 +10,7 @@ export ZSH="/Users/Brenntron/.oh-my-zsh"
 # See https://github.com/robbyrussell/oh-my-zsh/wiki/Themes
 ZSH_THEME="powerlevel9k/powerlevel9k"
 
-POWERLEVEL9K_CUSTOM_USER="echo `whoami`"
+POWERLEVEL9K_CUSTOM_USER="echo '\uf8e8' `whoami`"
 POWERLEVEL9K_CUSTOM_USER_BACKGROUND="lightcoral"
 POWERLEVEL9K_CUSTOM_USER_FOREGROUND="grey30"
 
