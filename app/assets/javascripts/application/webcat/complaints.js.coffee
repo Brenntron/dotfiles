@@ -74,12 +74,9 @@ window.cat_new_url = ()->
         std_msg_success('URLs categorized successfully',["Categorization of a Top URL will create a pending complaint entry.", "All other entries have been submitted directly to WBRS."], reload: true)
 
       error: (response) ->
+        $('.modal-backdrop').hide()
         $('#loader-modal').hide()
-        $('.modal-backdrop').remove()
-        if response.responseText.includes('Either no products have been defined to enter bugs against or you have not been given access to any.')
-          std_api_error(response, "Please make sure you have the appropriate permissions in Bugzilla. Unable to categorize url.", reload: false)
-        else
-          std_api_error(response, "Unable to categorize url.", reload: false)
+        std_api_error(response, "Unable to categorize url.", reload: false)
     )
   else
     std_msg_error("Unable to categorize", ["Please confirm that a URL and at least one category for each desired entry exists."], reload: false)
@@ -280,6 +277,7 @@ window.updatePending = (id,row_id) ->
       for td in tds
         if td.className == ''
           td.classList.add('nested-complaint-data-wrapper')
+
     error: (response) ->
       notice_html = "<p>Something went wrong: #{response.responseText}</p>"
   , this)
@@ -293,6 +291,7 @@ window.updateEntryColumns = (entry_id,row_id) ->
   category_name.each ->
     category_names.push($(this).text())
   category_names = category_names.toString()
+  debugger
   status = $('[name=resolution'+entry_id+']:checked').val()
   comment = $('#complaint_comment_'+entry_id)[0].value
   resolution_comment = $('#complaint_resolution_comment_'+entry_id)[0].value
@@ -312,10 +311,6 @@ window.updateEntryColumns = (entry_id,row_id) ->
         json = $.parseJSON(response)
         if !json.error
           table = $('#complaints-index').DataTable()
-
-          selected_rows = $('#complaints-index').DataTable().rows('.selected')
-          selected_rows.data().cell(selected_rows[0][0],14).data("#{json.display_name}").draw()
-
           temp_row = table.row(row_id)
           temp_row.data().status = json.status
           temp_row.data().resolution = status
@@ -334,7 +329,7 @@ window.updateEntryColumns = (entry_id,row_id) ->
             labelField: 'category_name',
             searchField: ['category_name', 'category_code'],
             options: AC.WebCat.createSelectOptions()
-            items: selected_options(categories)
+            items: selected_options(temp_row.data().category_names)
           }
           $('#input_cat_pending'+ temp_row.data().entry_id).selectize {
             persist: false,
@@ -344,7 +339,7 @@ window.updateEntryColumns = (entry_id,row_id) ->
             labelField: 'category_name',
             searchField: ['category_name', 'category_code'],
             options: AC.WebCat.createSelectOptions()
-            items: selected_options(categories)
+            items: selected_options(temp_row.data().category_names)
           }
         tds = $('#complaints-index tbody').closest('td')
         for td in tds
@@ -414,7 +409,7 @@ window.return_selected = ()->
           i = 0
           while i < selected_rows[0].length
             selected_rows.data().cell(selected_rows[0][i],14).data("Vrt Incoming").draw()
-            selected_rows.data().cell(selected_rows[0][i],4).data("NEW").draw()
+            selected_rows.data().cell(selected_rows[0][i],5).data("NEW").draw()
             i++
 
       error: (response) ->
@@ -847,7 +842,7 @@ format = (complaint_entry_row) ->
       '<table class="simple-nested-table" id="' + complaint_entry.entry_id + '"><thead><tr><th>Conf</th><th>Current Categories</th><th>Certainty</th></tr></thead>' +
       '</table>' +
       '</div><div class="col-xs-2">' +
-      '<button class="secondary" id="lookup-' + complaint_entry.entry_id + '"onclick="lookup_dialog(' + complaint_entry.entry_id  + ')">Lookup</button><br/>' +
+      '<button class="secondary" id="lookup-' + complaint_entry.entry_id + '" onclick="WebCat.RepLookup.queryWhoIs(\'' + url + '\')">Lookup</button><br/>' +
       '<button class="secondary" id="history-' + complaint_entry.entry_id + '" onclick="history_dialog(' + complaint_entry.entry_id  + ')">History</button><br/>' +
       '<button class="secondary" id="domain-' + complaint_entry.entry_id + '" onclick="domain_whois(\'' + whois_lookup + '\')">Domain</domain>' +
       '</div></div>' +
