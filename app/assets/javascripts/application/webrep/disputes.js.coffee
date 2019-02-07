@@ -1200,7 +1200,7 @@ $ ->
   # Edit Entry: Edit Entry Status
   $('#index-entry-status-button').click ->
     dropdown = $('#index-edit-entry-status-dropdown').parent()
-    if ($('.dispute_check_box:checked').length > 0)
+    if ($('.dispute-entry-checkbox:checked').length > 0)
 
       $('.entry-status-radio-label').click ->
         radio_button = $(this).prev('.entry-status-radio')
@@ -1704,7 +1704,7 @@ $ ->
 
 
   $('#index-adjust-wlbl').click ->
-    if $('.dispute_check_box:checked').length == 0
+    if $('.dispute-entry-checkbox:checked').length == 0
       std_msg_error('No rows selected', ['Please select at least one row.'])
       return false
 
@@ -1741,7 +1741,7 @@ $ ->
 
     #    $(tbody).empty()
     dropdown_wrapper = $(this).parent()
-    if ($('.dispute_check_box:checked').length > 0)
+    if ($('.dispute-entry-checkbox:checked').length > 0)
       submit_button = $('#wlbl_adjust_entries_index').find('.dropdown-submit-button')
       entry_content = ''
 
