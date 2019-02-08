@@ -655,8 +655,9 @@ window.toolbar_index_edit_status = () ->
       })
   )
 
-  if $('input[name=entry-resolution]:checked').val()
-
+  if statusName == "RESOLVED_CLOSED" && !$('input[name=entry-resolution]:checked').val()
+    std_msg_error('No resolution selected', ['Please select a ticket resolution.'])
+  else
     std_msg_ajax(
       method: 'PATCH'
       url: "/escalations/api/v1/escalations/webrep/disputes/entries/field_data"
@@ -664,9 +665,7 @@ window.toolbar_index_edit_status = () ->
       success_reload: true
       error_prefix: 'Error updating data.'
     )
-  else
-    std_msg_error('No resolution selected', ['Please select a ticket resolution.'])
-    return
+
 
 window.show_page_edit_status = () ->
   statusName = $('input[name=dispute-status]:checked').val()
@@ -1003,8 +1002,9 @@ window.save_dispute_entries = () ->
       data[this.dataset.entryId] = fielddata
 
   )
-
-  if $('input[name=entry-resolution]:checked').val()
+  if $('input[name=entry-status]:checked').attr('id') == "RESOLVED_CLOSED" && !$('input[name=entry-resolution]:checked').val()
+    std_msg_error('No resolution selected', ['Please select a ticket resolution.'])
+  else
     std_msg_ajax(
       method: 'PATCH'
       url: "/escalations/api/v1/escalations/webrep/disputes/entries/field_data"
@@ -1012,9 +1012,7 @@ window.save_dispute_entries = () ->
       success_reload: true
       error_prefix: 'Error updating data.'
     )
-  else
-    std_msg_error('No resolution selected', ['Please select a ticket resolution.'])
-    return
+
 
 
 window.show_set_related_dispute = () ->
