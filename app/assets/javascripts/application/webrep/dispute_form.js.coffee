@@ -3,12 +3,12 @@ $ ->
   $('#new-dispute-form').submit (e) ->
     e.preventDefault()
 
-#    $('#loader-modal').modal({
-#      backdrop: 'static'
-#      keyboard: false
-#    })
-#
-#    $('#loader-modal').show()
+    $('#loader-modal').modal({
+      backdrop: 'static'
+      keyboard: false
+    })
+
+    $('#loader-modal').show()
 
     ips_urls = this.ips_urls.value
     assignee = this.assignee.value
@@ -25,8 +25,8 @@ $ ->
         ticket_type: ticket_type
       success: (response) ->
         $('#new-dispute').dropdown('toggle')
-#        $('#loader-modal').hide()
-#        $('.modal-backdrop').hide()
+        $('#loader-modal').hide()
+        $('.modal-backdrop').hide()
 
         data = {
           search_type: 'advanced'
