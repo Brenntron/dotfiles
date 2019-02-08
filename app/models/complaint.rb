@@ -230,7 +230,7 @@ class Complaint < ApplicationRecord
 
     begin
       ActiveRecord::Base.transaction do
-        max_wait_for_job = 25 #seconds
+        max_wait_for_job = 60 #seconds
 
         user = User.where(cvs_username:"vrtincom").first
         guest = Company.where(:name => "Guest").first
@@ -340,7 +340,7 @@ class Complaint < ApplicationRecord
             ces = ComplaintEntryScreenshot.new
             ces.error_message = e.message
             ces.complaint_entry_id = new_complaint_entry.id
-            open("app/assets/images/failed_screenshot.jpg") do |f|
+            open("app/assets/images/timeout_screenshot.jpg") do |f|
               ces.screenshot = f.read
             end
             ces.save!
@@ -410,7 +410,7 @@ class Complaint < ApplicationRecord
             ces = ComplaintEntryScreenshot.new
             ces.error_message = e.message
             ces.complaint_entry_id = new_complaint_entry.id
-            open("app/assets/images/failed_screenshot.jpg") do |f|
+            open("app/assets/images/timeout_screenshot.jpg") do |f|
               ces.screenshot = f.read
             end
             ces.save!
