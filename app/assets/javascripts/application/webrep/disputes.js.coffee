@@ -663,7 +663,7 @@ window.toolbar_index_edit_status = () ->
           error_prefix: 'Error updating data.'
         )
       else
-        std_msg_error('No resolution selected', ['Please select a ticket resolution.'])
+        std_msg_error('No resolution selected', ['Please select an entry resolution.'])
         return
 
 
@@ -1083,6 +1083,9 @@ $ ->
     if $('#show-edit-ticket-status-dropdown').parent().hasClass('open')
       $('#msg-modal').on 'hidden.bs.modal', (c) ->
         $('#show-edit-ticket-status-dropdown').parent().addClass('open')
+    if $('#index-edit-entry-status-dropdown').parent().hasClass('open')
+      $('#msg-modal').on 'hidden.bs.modal', (d) ->
+        $('#index-edit-entry-status-dropdown').parent().addClass('open')
 
 
   $('.change_ticket_status_button').click ->
