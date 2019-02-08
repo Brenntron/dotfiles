@@ -1,4 +1,4 @@
-class RulehitResolutionMailerTemplatesController < ApplicationController
+class Escalations::RulehitResolutionMailerTemplatesController < ApplicationController
   before_action :set_rulehit_resolution_mailer_template, only: [:show, :edit, :update, :destroy]
   layout "escalations/webrep/disputes"
 
@@ -57,7 +57,7 @@ class RulehitResolutionMailerTemplatesController < ApplicationController
   def destroy
     @rulehit_resolution_mailer_template.destroy
     respond_to do |format|
-      format.html { redirect_to rulehit_resolution_mailer_templates_url, notice: 'Rulehit resolution mailer template was successfully destroyed.' }
+      format.html { redirect_to escalations_rulehit_resolution_mailer_templates_url, notice: 'Rulehit resolution mailer template was successfully destroyed.' }
       format.json { head :no_content }
     end
   end
