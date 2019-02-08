@@ -642,33 +642,31 @@ window.toolbar_index_edit_status = () ->
     }]
 
     if statusName == "RESOLVED_CLOSED"
-      if $('input[name=entry-resolution]:checked').val()
-        data[this.id].push({
-          id: this.id
-          field: "resolution"
-          new: $('input[name=entry-resolution]:checked').val()
-        })
+      data[this.id].push({
+        id: this.id
+        field: "resolution"
+        new: $('input[name=entry-resolution]:checked').val()
+      })
 
-        data[this.id].push({
-          id: this.id
-          field: "resolution_comment"
-          new: $('#entry-status-comment').val()
-        })
-
-        std_msg_ajax(
-          method: 'PATCH'
-          url: "/escalations/api/v1/escalations/webrep/disputes/entries/field_data"
-          data: { field_data: data }
-          success_reload: true
-          error_prefix: 'Error updating data.'
-        )
-      else
-        std_msg_error('No resolution selected', ['Please select an entry resolution.'])
-        return
-
-
+      data[this.id].push({
+        id: this.id
+        field: "resolution_comment"
+        new: $('#entry-status-comment').val()
+      })
   )
 
+  if $('input[name=entry-resolution]:checked').val()
+
+    std_msg_ajax(
+      method: 'PATCH'
+      url: "/escalations/api/v1/escalations/webrep/disputes/entries/field_data"
+      data: { field_data: data }
+      success_reload: true
+      error_prefix: 'Error updating data.'
+    )
+  else
+    std_msg_error('No resolution selected', ['Please select a ticket resolution.'])
+    return
 
 window.show_page_edit_status = () ->
   statusName = $('input[name=dispute-status]:checked').val()
@@ -997,7 +995,6 @@ window.save_dispute_entries = () ->
           field: "resolution_comment"
           new: $(this).find("textarea[name='resolution-comment']")[0].value
         })
-
     ).toArray().filter((field_data) ->
       field_data.old != field_data.new
     )
@@ -1007,13 +1004,17 @@ window.save_dispute_entries = () ->
 
   )
 
-  std_msg_ajax(
-    method: 'PATCH'
-    url: "/escalations/api/v1/escalations/webrep/disputes/entries/field_data"
-    data: { field_data: data }
-    success_reload: true
-    error_prefix: 'Error updating data.'
-  )
+  if $('input[name=entry-resolution]:checked').val()
+    std_msg_ajax(
+      method: 'PATCH'
+      url: "/escalations/api/v1/escalations/webrep/disputes/entries/field_data"
+      data: { field_data: data }
+      success_reload: true
+      error_prefix: 'Error updating data.'
+    )
+  else
+    std_msg_error('No resolution selected', ['Please select a ticket resolution.'])
+    return
 
 
 window.show_set_related_dispute = () ->
