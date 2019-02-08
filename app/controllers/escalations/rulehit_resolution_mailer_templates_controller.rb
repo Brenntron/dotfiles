@@ -29,7 +29,7 @@ class Escalations::RulehitResolutionMailerTemplatesController < ApplicationContr
 
     respond_to do |format|
       if @rulehit_resolution_mailer_template.save
-        format.html { redirect_to @rulehit_resolution_mailer_template, notice: 'Rulehit resolution mailer template was successfully created.' }
+        format.html { redirect_to escalations_rulehit_resolution_mailer_template_url(@rulehit_resolution_mailer_template), notice: 'Rulehit resolution mailer template was successfully created.' }
         format.json { render :show, status: :created, location: @rulehit_resolution_mailer_template }
       else
         format.html { render :new }
@@ -43,7 +43,7 @@ class Escalations::RulehitResolutionMailerTemplatesController < ApplicationContr
   def update
     respond_to do |format|
       if @rulehit_resolution_mailer_template.update(rulehit_resolution_mailer_template_params)
-        format.html { redirect_to @rulehit_resolution_mailer_template, notice: 'Rulehit resolution mailer template was successfully updated.' }
+        format.html { redirect_to rulehit_resolution_mailer_template_path(@rulehit_resolution_mailer_template), notice: 'Rulehit resolution mailer template was successfully updated.' }
         format.json { render :show, status: :ok, location: @rulehit_resolution_mailer_template }
       else
         format.html { render :edit }

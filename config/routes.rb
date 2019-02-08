@@ -4,7 +4,7 @@ Rails.application.routes.draw do
   devise_for :users, controllers: {sessions: 'sessions'}
 
   namespace :escalations, except: [:destroy, :edit] do
-    resources :rulehit_resolution_mailer_templates, only: [:new, :index, :show, :update, :destroy, :edit]
+    resources :rulehit_resolution_mailer_templates, only: [:new, :index, :create, :show, :update, :destroy, :edit]
     resources :sessions, controller: '/sessions', only: [:new, :create, :destroy]
 
     # TODO These may be reimplemented in the research passenger instance, and then removed from here
