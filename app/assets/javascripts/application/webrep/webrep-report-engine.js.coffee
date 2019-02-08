@@ -514,8 +514,6 @@ window.build_single_time_to_close_linechart = () ->
 
       json = $.parseJSON(response)
 
-      console.log json
-
       closedTicketNumbers = json["data"]["ticket_numbers"]
       timeToCloseTickets = json["data"]["close_times"]
       if closedTicketNumbers.length == 0
