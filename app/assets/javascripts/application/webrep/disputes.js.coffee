@@ -656,7 +656,7 @@ window.toolbar_index_edit_status = () ->
   )
 
   if statusName == "RESOLVED_CLOSED" && !$('input[name=entry-resolution]:checked').val()
-    std_msg_error('No resolution selected', ['Please select a ticket resolution.'])
+    std_msg_error('No resolution selected', ['Please select an entry resolution.'])
   else
     std_msg_ajax(
       method: 'PATCH'
