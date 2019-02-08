@@ -516,9 +516,12 @@ window.build_single_time_to_close_linechart = () ->
 
       closedTicketNumbers = json["data"]["ticket_numbers"]
       timeToCloseTickets = json["data"]["close_times"]
-
       if closedTicketNumbers.length == 0
+        current_canvas = $('#time-to-close-tickets-linechart')
+        current_graph = $(current_canvas)[0].getContext('2d')
         graph_wrapper = $('#time-to-close-tickets-linechart').parent()
+        current_canvas[0].height = 100
+        $(current_graph)[0].clearRect(0, 0,  current_canvas[0].width, current_canvas[0].height)
         unless $('#time-to-close-tickets-linechart-no-data').length
           $(graph_wrapper).append('<span id="time-to-close-tickets-linechart-no-data" class="missing-data graph-missing-data-flag">No data for this date range.</span>')
       else
@@ -550,7 +553,7 @@ window.build_single_time_to_close_linechart = () ->
           }
         ]
 
-        new Chart($('#time-to-close-tickets-linechart'),
+        closeTicketsChart = new Chart($('#time-to-close-tickets-linechart'),
           type: 'line'
           data:
             labels: closedTicketNumbers
@@ -865,9 +868,14 @@ window.build_single_entries_closed_by_day_chart = () ->
         i++
 
       if total_entries == 0
+        current_canvas = $('#graph-ticket-entries-closed')
+        current_graph = $(current_canvas)[0].getContext('2d')
         graph_wrapper = $('#graph-ticket-entries-closed').parent()
+        current_canvas[0].height = 100
+        $(current_graph)[0].clearRect(0, 0,  current_canvas[0].width, current_canvas[0].height)
         unless $('#graph-ticket-entries-closed-no-data').length
           $(graph_wrapper).append('<span id="graph-ticket-entries-closed-no-data" class="missing-data graph-missing-data-flag">No data for this date range.</span>')
+
       else
         if $('#graph-ticket-entries-closed-no-data').length
           $('#graph-ticket-entries-closed-no-data').remove()
@@ -1193,9 +1201,14 @@ window.build_multi_entries_closed_by_owners_chart = () ->
         i++
 
       if total_entries == 0
+        current_canvas = $('#ticket-entries-closed-by-owner')
+        current_graph =  $(current_canvas)[0].getContext('2d')
         graph_wrapper = $('#ticket-entries-closed-by-owner').parent()
+        current_canvas[0].height = 100
+        $(current_graph)[0].clearRect(0, 0,  current_canvas[0].width, current_canvas[0].height)
         unless $('#ticket-entries-closed-by-owner-no-data').length
           $(graph_wrapper).append('<span id="ticket-entries-closed-by-owner-no-data" class="missing-data graph-missing-data-flag">No data for this date range.</span>')
+
       else
         if $('#ticket-entries-closed-by-owner-no-data').length
           $('#ticket-entries-closed-by-owner-no-data').remove()
@@ -1278,7 +1291,11 @@ window.build_multi_average_time_to_close_tickets = () ->
         i++
 
       if total_tickets == 0
+        current_canvas = $('#avg-time-to-close-tickets')
+        current_graph =  $(current_canvas)[0].getContext('2d')
         graph_wrapper = $('#avg-time-to-close-tickets').parent()
+        current_canvas[0].height = 100
+        $(current_graph)[0].clearRect(0, 0,  current_canvas[0].width, current_canvas[0].height)
         unless $('#avg-time-to-close-tickets-no-data').length
           $(graph_wrapper).append('<span id="avg-time-to-close-tickets-no-data" class="missing-data graph-missing-data-flag">No data for this date range.</span>')
 
@@ -1363,7 +1380,11 @@ window.build_multi_rulehits_for_fp_res_chart = () ->
         i++
 
       if total_hits == 0
+        current_canvas = $('#rule-hits-fp-resolutions')
+        current_graph = $(current_canvas)[0].getContext('2d')
         graph_wrapper = $('#rule-hits-fp-resolutions').parent()
+        current_canvas[0].height = 100
+        $(current_graph)[0].clearRect(0, 0,  current_canvas[0].width, current_canvas[0].height)
         unless $('#rule-hits-fp-resolutions-no-data').length
           $(graph_wrapper).append('<span id="rule-hits-fp-resolutions-no-data" class="missing-data graph-missing-data-flag">No data for this date range.</span>')
 
