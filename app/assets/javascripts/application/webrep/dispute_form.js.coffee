@@ -10,10 +10,12 @@ $ ->
 
     $('#loader-modal').show()
 
+    debugger
+
     ips_urls = this.ips_urls.value
     assignee = this.assignee.value
     priority = this.priority.value
-    ticket_type = this.ticket_type.value
+    ticket_type = $('#ticket-type-dropdown')[0].value
 
     std_msg_ajax(
       url: '/escalations/api/v1/escalations/webrep/disputes'
