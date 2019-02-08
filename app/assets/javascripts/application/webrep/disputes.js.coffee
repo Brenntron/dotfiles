@@ -412,9 +412,11 @@ window.toolbar_research_adjust_wlbl_button =(button_tag) ->
 
 
 window.index_adjust_wlbl_button =(button_tag) ->
+
   checked_url = $('.dispute-entry-checkbox:checked')[0]
   entry_row = $(checked_url).parent().parent()[0]
-  url = $(entry_row).find('.entry-col-content').text()
+  urls = $('.entry-dispute-name:visible').text().split(",")
+
   list_types = $('.wl-bl-list-inline:checkbox:checked').map(() ->
     this.value
   ).toArray()
@@ -422,10 +424,40 @@ window.index_adjust_wlbl_button =(button_tag) ->
   wlbl_form = button_tag.form
 
   data = {
-    'urls': [ url ]
+    'urls': urls
     'trgt_list': list_types
     'note': wlbl_form.getElementsByClassName('adjust-wlbl-input')[0].value
   }
+
+  if urls.length == 1
+    std_msg_ajax(
+      url: '/escalations/api/v1/escalations/webrep/disputes/uri_wlbl'
+      method: 'POST'
+      data: data
+      error_prefix: 'Error adjusting WL/BL.'
+      success_reload: true
+    )
+  else if urls.length > 1
+    bulk_adjust_wlbl_button(button_tag, urls)
+
+
+window.bulk_adjust_wlbl_button = (button_tag, urls) ->
+  checked_url = $('.dispute-entry-checkbox:checked')[0]
+  entry_row = $(checked_url).parent().parent()[0]
+
+  list_types = $('.wl-bl-list-inline:checkbox:checked').map(() ->
+    this.value
+  ).toArray()
+
+  wlbl_form = button_tag.form
+
+  data = {
+    'urls': urls
+    'trgt_list': list_types
+    'note': wlbl_form.getElementsByClassName('adjust-wlbl-input')[0].value
+  }
+
+  debugger
 
   std_msg_ajax(
     url: '/escalations/api/v1/escalations/webrep/disputes/uri_wlbl'
@@ -1728,7 +1760,6 @@ $ ->
 
           entry_row = $(this).parent().parent()[0]
           entry_content = $(entry_row).find('.entry-col-content').text()
-          debugger
           wbrs = $(entry_row).find('.entry-col-wbrs-score').text()
 
           data = {
@@ -1788,7 +1819,7 @@ $ ->
         $(dropdown_wrapper).removeClass('open')
         std_msg_error('No rows selected', ['Please select one row.'])
     else if $('.dispute_check_box:checked').length > 1
-      adjust_multi_wl_bl()
+      get_multi_wl_bl()
 
   $('#set-related-dispute-submit-button').click ->
     dropdown = $('#set-related-dispute-div').parent()
@@ -1930,15 +1961,16 @@ window.populate_resolution_dropdown = (dispute_id) ->
 window.disputes_select_all_check_box = () ->
   $('.dispute_check_box').prop('checked', $('#disputes_check_box').prop('checked'))
 
-window.adjust_multi_wl_bl = () ->
-  console.log("Hope")
-  entry_rows = []
+window.get_multi_wl_bl = () ->
+  urls = []
+  submit_button = $('#wlbl_adjust_entries_index').find('.dropdown-submit-button')
+
   $('.dispute-entry-checkbox:checked').each ->
-#    debugger
     entry_row = $(this).parent().parent()[0]
-    entry_rows.push($(entry_row).find('.entry-col-content').text())
-#  debugger
-  $('.entry-dispute-name').text(entry_rows)
+    urls.push($(entry_row).find('.entry-col-content').text())
+
+  $('.entry-dispute-name').text(urls)
+  $(submit_button).attr('disabled', false)
 
 $ ->
 
