@@ -457,8 +457,6 @@ window.bulk_adjust_wlbl_button = (button_tag, urls) ->
     'note': wlbl_form.getElementsByClassName('adjust-wlbl-input')[0].value
   }
 
-  debugger
-
   std_msg_ajax(
     url: '/escalations/api/v1/escalations/webrep/disputes/uri_wlbl'
     method: 'POST'
