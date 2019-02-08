@@ -33,8 +33,10 @@ $ ->
           case_id: response.json.case_id
         }
 
+        populate_webrep_index_table(data)
+
         if response.json.errors.length > 0
-          std_msg_error("Unable to create duplicate entries: #{response.json.errors.toString()}","")
+          window.setTimeout(std_msg_error("Unable to create duplicate entries: #{response.json.errors.toString()}",""), 5000)
 
       error: (response) ->
         $('#loader-modal').hide()
