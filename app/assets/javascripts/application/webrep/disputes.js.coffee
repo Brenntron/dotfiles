@@ -654,6 +654,14 @@ window.toolbar_index_edit_status = () ->
           field: "resolution_comment"
           new: $('#entry-status-comment').val()
         })
+
+        std_msg_ajax(
+          method: 'PATCH'
+          url: "/escalations/api/v1/escalations/webrep/disputes/entries/field_data"
+          data: { field_data: data }
+          success_reload: true
+          error_prefix: 'Error updating data.'
+        )
       else
         std_msg_error('No resolution selected', ['Please select a ticket resolution.'])
         return
@@ -661,13 +669,6 @@ window.toolbar_index_edit_status = () ->
 
   )
 
-  std_msg_ajax(
-    method: 'PATCH'
-    url: "/escalations/api/v1/escalations/webrep/disputes/entries/field_data"
-    data: { field_data: data }
-    success_reload: true
-    error_prefix: 'Error updating data.'
-  )
 
 window.show_page_edit_status = () ->
   statusName = $('input[name=dispute-status]:checked').val()
