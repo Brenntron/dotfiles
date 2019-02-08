@@ -890,14 +890,14 @@ class Dispute < ApplicationRecord
       when 'team_disputes'
         where(user_id: user.my_team)
       when 'open'
-        where(status: [STATUS_NEW, STATUS_REOPENED])
-    when 'open_email'
-      sbrs_disputes.where(status: [STATUS_NEW, STATUS_REOPENED])
-    when 'open_web'
-      wbrs_disputes.where(status: [STATUS_NEW, STATUS_REOPENED])
+        where(status: [STATUS_NEW, STATUS_REOPENED, STATUS_CUSTOMER_PENDING, STATUS_CUSTOMER_UPDATE, STATUS_ON_HOLD, STATUS_RESEARCHING, STATUS_ESCALATED, STATUS_ASSIGNED])
+      when 'open_email'
+        sbrs_disputes.where(status: [STATUS_NEW, STATUS_REOPENED, STATUS_CUSTOMER_PENDING, STATUS_CUSTOMER_UPDATE, STATUS_ON_HOLD, STATUS_RESEARCHING, STATUS_ESCALATED, STATUS_ASSIGNED])
+      when 'open_web'
+        wbrs_disputes.where(status: [STATUS_NEW, STATUS_REOPENED, STATUS_CUSTOMER_PENDING, STATUS_CUSTOMER_UPDATE, STATUS_ON_HOLD, STATUS_RESEARCHING, STATUS_ESCALATED, STATUS_ASSIGNED])
       when 'closed'
         where(status: [CLOSED, STATUS_RESOLVED])
-    when 'all'
+      when 'all'
         where({})
       else
         raise "No search named '#{search_name}' known."
