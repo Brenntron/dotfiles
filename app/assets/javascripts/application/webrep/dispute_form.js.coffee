@@ -3,12 +3,12 @@ $ ->
   $('#new-dispute-form').submit (e) ->
     e.preventDefault()
 
-    $('#loader-modal').modal({
-      backdrop: 'static',
-      keyboard: false
-    })
-
-    $('#loader-modal').show()
+#    $('#loader-modal').modal({
+#      backdrop: 'static'
+#      keyboard: false
+#    })
+#
+#    $('#loader-modal').show()
 
     ips_urls = this.ips_urls.value
     assignee = this.assignee.value
@@ -25,14 +25,17 @@ $ ->
         ticket_type: ticket_type
       success: (response) ->
         $('#new-dispute').dropdown('toggle')
-        $('#loader-modal').hide()
+#        $('#loader-modal').hide()
+#        $('.modal-backdrop').hide()
 
         data = {
           search_type: 'advanced'
           case_id: response.json.case_id
         }
 
-        window.populate_webrep_index_table(data)
+        if response.json.errors.length > 0
+          std_msg_error("Unable to create duplicate entries: #{response.json.errors.toString()}","")
+
       error: (response) ->
         $('#loader-modal').hide()
         $('.modal-backdrop').remove();
