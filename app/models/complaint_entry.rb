@@ -192,7 +192,9 @@ class ComplaintEntry < ApplicationRecord
     if existing_prefixes.present?
       existing_prefixes.each do |prefix_found|
         if prefix_found.subdomain == self.subdomain
-          existing_prefix = prefix_found
+          if prefix_found.path == self.path
+            existing_prefix = prefix_found
+          end
         end
       end
     end
@@ -533,7 +535,9 @@ class ComplaintEntry < ApplicationRecord
 
         categories = prefix_results.find_all {|result| result.path == self.path}
         categories.each do |cat|
-          category_list << Wbrs::Category.find(cat.category_id).descr
+          if cat.subdomain == self.subdomain
+            category_list << Wbrs::Category.find(cat.category_id).descr
+          end
         end
 
         self.url_primary_category = category_list.uniq.join(',')

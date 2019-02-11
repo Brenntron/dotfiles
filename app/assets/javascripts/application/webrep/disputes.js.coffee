@@ -9,11 +9,9 @@ $(document).ready ->
       std_msg_error('No rows selected', ['Please select at least one row.'])
 
   $('span#adjust-wlbl').on 'show.bs.dropdown', ->
-    dropdownMenu = $(this).find('.dropdown-menu')
     if $('.dispute_check_box:checked').length == 0
-      dropdownMenu.hide()
-      $(this).removeClass('open')
       std_msg_error('No rows selected', ['Please select a row.'])
+      return false
 
 window.select_or_deselect_all = (dispute_id)->
 
@@ -68,8 +66,7 @@ window.populate_webrep_index_table = (data = {}, reload = false) ->
         std_msg_error("No tickets matching filter or search.","")
 
       if json.error
-        $('#loader-modal').hide()
-        $('.modal-backdrop').remove()
+        $('#loader-modal').modal 'hide'
         $('#refresh-working-msg').hide()
         $('#refresh-error-msg').show()
         $('#refresh-error-msg').html('An error occured while retrieving data')
@@ -103,21 +100,17 @@ window.populate_webrep_index_table = (data = {}, reload = false) ->
                     $('.dispute-entry-table td, .dispute-entry-table th').each ->
                       if $(this).hasClass(checkbox_trigger)
                         $(this).show()
-                      $('#loader-modal').hide()
-                      $('.modal-backdrop').remove()
+                      $('#loader-modal').modal 'hide'
                       return
                   else if $(checkbox).prop('checked') == false
                     $('.dispute-entry-table td, .dispute-entry-table th').each ->
                       if $(this).hasClass(checkbox_trigger)
                         $(this).hide()
-                      $('#loader-modal').hide()
-                      $('.modal-backdrop').remove()
+                      $('#loader-modal').modal 'hide'
                       return
-                  $('#loader-modal').hide()
-                  $('.modal-backdrop').remove()
+                  $('#loader-modal').modal 'hide'
                   return
-                $('#loader-modal').hide()
-                $('.modal-backdrop').remove()
+                $('#loader-modal').modal 'hide'
                 return
 
         if array_of_dispute_clicks.length > 0
@@ -143,12 +136,10 @@ window.populate_webrep_index_table = (data = {}, reload = false) ->
           searchId = 'saved_search_' + json.search_id
           if $('#saved-search-tbody tr#' + searchId).length == 0
             $('#saved-search-tbody').append(named_search_tag(json.search_name, json.search_id))
-        $('#loader-modal').hide()
-        $('.modal-backdrop').remove()
+        $('#loader-modal').modal 'hide'
 
     error: (response) ->
-      $('#loader-modal').hide()
-      $('.modal-backdrop').remove()
+      $('#loader-modal').modal 'hide'
       $('#refresh-working-msg').hide()
       $('#refresh-error-msg').show()
       $('#refresh-error-msg').html('An error occured while retrieving data')
@@ -653,16 +644,19 @@ window.toolbar_index_edit_status = () ->
         field: "resolution_comment"
         new: $('#entry-status-comment').val()
       })
-
   )
 
-  std_msg_ajax(
-    method: 'PATCH'
-    url: "/escalations/api/v1/escalations/webrep/disputes/entries/field_data"
-    data: { field_data: data }
-    success_reload: true
-    error_prefix: 'Error updating data.'
-  )
+  if statusName == "RESOLVED_CLOSED" && !$('input[name=entry-resolution]:checked').val()
+    std_msg_error('No resolution selected', ['Please select an entry resolution.'])
+  else
+    std_msg_ajax(
+      method: 'PATCH'
+      url: "/escalations/api/v1/escalations/webrep/disputes/entries/field_data"
+      data: { field_data: data }
+      success_reload: true
+      error_prefix: 'Error updating data.'
+    )
+
 
 window.show_page_edit_status = () ->
   statusName = $('input[name=dispute-status]:checked').val()
@@ -670,7 +664,11 @@ window.show_page_edit_status = () ->
   dispute_id = $('#dispute_id').text()
 
   if statusName == "RESOLVED_CLOSED"
-    resolution = $('input[name=dispute-resolution]:checked').val()
+    if $('#show-edit-ticket-status-dropdown').find('input[name=dispute-resolution]').is(':checked')
+      resolution = $('input[name=dispute-resolution]:checked').val()
+    else
+      std_msg_error('No resolution selected', ['Please select a ticket resolution.'])
+      return
 
   data = {
     dispute_ids: [ dispute_id ]
@@ -987,7 +985,6 @@ window.save_dispute_entries = () ->
           field: "resolution_comment"
           new: $(this).find("textarea[name='resolution-comment']")[0].value
         })
-
     ).toArray().filter((field_data) ->
       field_data.old != field_data.new
     )
@@ -996,14 +993,17 @@ window.save_dispute_entries = () ->
       data[this.dataset.entryId] = fielddata
 
   )
+  if $('input[name=entry-status]:checked').attr('id') == "RESOLVED_CLOSED" && !$('input[name=entry-resolution]:checked').val()
+    std_msg_error('No resolution selected', ['Please select a ticket resolution.'])
+  else
+    std_msg_ajax(
+      method: 'PATCH'
+      url: "/escalations/api/v1/escalations/webrep/disputes/entries/field_data"
+      data: { field_data: data }
+      success_reload: true
+      error_prefix: 'Error updating data.'
+    )
 
-  std_msg_ajax(
-    method: 'PATCH'
-    url: "/escalations/api/v1/escalations/webrep/disputes/entries/field_data"
-    data: { field_data: data }
-    success_reload: true
-    error_prefix: 'Error updating data.'
-  )
 
 
 window.show_set_related_dispute = () ->
@@ -1065,6 +1065,19 @@ window.webrep_reset_search = () ->
 
 $ ->
 
+#  Opens ticket status resolution back up after modal close
+  $('#msg-modal').on 'hide.bs.modal', (e) ->
+    if $('#index-edit-ticket-status-dropdown').parent().hasClass('open')
+      $('#msg-modal').on 'hidden.bs.modal', (b) ->
+        $('#index-edit-ticket-status-dropdown').parent().addClass('open')
+    if $('#show-edit-ticket-status-dropdown').parent().hasClass('open')
+      $('#msg-modal').on 'hidden.bs.modal', (c) ->
+        $('#show-edit-ticket-status-dropdown').parent().addClass('open')
+    if $('#index-edit-entry-status-dropdown').parent().hasClass('open')
+      $('#msg-modal').on 'hidden.bs.modal', (d) ->
+        $('#index-edit-entry-status-dropdown').parent().addClass('open')
+
+
   $('.change_ticket_status_button').click ->
     status = ""
     resolution = ""
@@ -1078,11 +1091,14 @@ $ ->
 
     status = $('#index-edit-ticket-status-dropdown').find('.ticket-status-radio:checked').val()
     if status == 'RESOLVED_CLOSED'
-      resolution = $('#index-edit-ticket-status-dropdown').find('.ticket-resolution-radio:checked').val()
-      comment = $('.resolution-comment-wrapper').find('.ticket-status-comment').val()
+      if $('#index-edit-ticket-status-dropdown').find('.ticket-resolution-radio').is(':checked')
+        resolution = $('#index-edit-ticket-status-dropdown').find('.ticket-resolution-radio:checked').val()
+        comment = $('.resolution-comment-wrapper').find('.ticket-status-comment').val()
+      else
+        std_msg_error('No resolution selected', ['Please select a ticket resolution.'])
+        return
     else
       comment = $('.non-resolution-submit-wrapper').find('.ticket-status-comment').val()
-
 
     data = {
       status: status,
@@ -1178,7 +1194,7 @@ $ ->
   # Edit Entry: Edit Entry Status
   $('#index-entry-status-button').click ->
     dropdown = $('#index-edit-entry-status-dropdown').parent()
-    if ($('.dispute_check_box:checked').length > 0)
+    if ($('.dispute-entry-checkbox:checked').length > 0)
 
       $('.entry-status-radio-label').click ->
         radio_button = $(this).prev('.entry-status-radio')
@@ -1447,7 +1463,6 @@ $ ->
 
   # Expand all rows via toolbar button
   $('#expand-all-index-rows').click ->
-    $('body').removeClass('modal-open')
     td = $('#disputes-index').find('td.expandable-row-column')
     $(td).each ->
       tr = $(this).closest('tr')
@@ -1580,7 +1595,6 @@ $ ->
 
     )
 
-
     $('.toggle-vis').on "click", ->
       data = {}
       data['priority'] = $("#priority-checkbox").is(':checked')
@@ -1682,7 +1696,7 @@ $ ->
 
 
   $('#index-adjust-wlbl').click ->
-    if $('.dispute_check_box:checked').length == 0
+    if $('.dispute-entry-checkbox:checked').length == 0
       std_msg_error('No rows selected', ['Please select at least one row.'])
       return false
 
@@ -1719,7 +1733,7 @@ $ ->
 
     #    $(tbody).empty()
     dropdown_wrapper = $(this).parent()
-    if ($('.dispute_check_box:checked').length > 0)
+    if ($('.dispute-entry-checkbox:checked').length > 0)
       submit_button = $('#wlbl_adjust_entries_index').find('.dropdown-submit-button')
       entry_content = ''
 
@@ -1955,6 +1969,1077 @@ $ ->
         'maxWidth': 500
       $(this).tooltipster 'show'
     return
+    
+
+
+
+
+  ####### Bar chart for Ticket Entries by Ticket Type
+
+  ## Data breakdown for 'initial' daily data
+  #ticketTypeChartLabels = ['September 2', 'September 3', 'September 4', 'September 5', 'September 6', 'September 7', 'September 8']
+  #ticketTypeTotalData = [20, 24, 30, 28, 0, 0, 0]
+  #ticketTypeWData     = [15, 20, 18, 20, 0, 0, 0]
+  #ticketTypeEData     = [8, 7, 15, 12, 0, 0, 0]
+  #ticketTypeEWData    = [0, 0, 0, 9, 0, 0, 0]
+
+  ## Test data breakdown for a monthly dataset - we'll say 6 months
+  #  ticketTypeChartLabels = ['June', 'July', 'August', 'September', 'October', 'November']
+  #  ticketTypeTotalData = [120, 124, 130, 128, 110, 142]
+  #  ticketTypeWData = [45, 67, 52, 31, 55, 42]
+  #  ticketTypeEData = [28, 37, 15, 62, 50, 50]
+  #  ticketTypeEWData = [30, 16, 57, 57, 25, 50]
+
+
+  #window.userTicketClosedGraphDatasets = [
+  #  {
+  #    label: 'Total Ticket Entries'
+  #    backgroundColor: '#6dbcdb'
+  #    data: ticketTypeTotalData
+  #  }
+  #  {
+  #    label: 'W'
+  #    backgroundColor: '#E47433'
+  #    data: ticketTypeWData
+  #  }
+  #  {
+  #    label: 'E'
+  #    backgroundColor: '#5FB665'
+  #    data: ticketTypeEData
+  #  }
+  #  {
+  #    label: 'EW'
+  #    backgroundColor: '#C14B92'
+  #    data: ticketTypeEWData
+  #  }]
+
+
+  #window.userTicketClosedGraph = new Chart($('#graph-ticket-entries-closed'),
+  #  type: 'bar'
+  #  data:
+  #    labels: ticketTypeChartLabels
+  #    datasets: window.userTicketClosedGraphDatasets,
+  #  options:
+  #    legend:
+  #      display: false
+  #    title:
+  #      display: true
+  #      position: 'bottom'
+  #      text: 'Dates'
+  #    scales:
+  #      yAxes: [
+  #        {
+  #          gridLines:
+  #            display: false
+  #          ticks: {
+  #            min: 0
+  #          }
+  #        }
+  #      ]
+  #      xAxes: [
+  #        {
+  #          gridLines:
+  #            display: false
+  #          ticks: {
+  #            autoSkip: false
+  #          }
+  #        }
+  #      ]
+  #  )
+
+
+#    makeBar('graph-ticket-entries-closed', barDataSet)
+
+#  $('.graph-config select').on 'change', (el) ->
+#    if el.target.value == 'yearly'
+#      barDataSet = window.myBar.data.datasets
+#      window.myBar.data.datasets = barDataSet.concat barDataSets.filter (x) -> x.label == 'Total Ticket Entries'
+#      window.myBar.update()
+#    else if el.target.value == 'montly'
+#      barDataSet = window.myBar.data.datasets.filter (x) -> x.label != 'E' and x.label != 'W' and x.label != 'EW'
+#      window.myBar.data.datasets = barDataSet
+#      window.myBar.update()
+#    else if el.target.value == 'weekly'
+#      barDataSet = window.myBar.data.datasets.filter (x) -> x.label != 'E' and x.label != 'W' and x.label != 'EW'
+#      window.myBar.data.datasets = barDataSet
+#      window.myBar.update()
+#    else
+#      window.myBar.data.datasets = barDataSets
+#      window.myBar.update()
+
+
+#  Test data for Closed Email Entry Resolutions
+#  emailEntryResolutionLabels = ['Fixed', 'Unchanged', 'Fixed FP', 'Other']
+#  emailEntryData = [3,6,7,0]
+
+#  new Chart($('#closed-email-entries-resolution-piechart'),
+#    type: 'pie'
+#    data:
+#      labels: emailEntryResolutionLabels
+#      datasets: [ {
+#        label: 'close-email-entries'
+#        backgroundColor: [
+#          '#3e5a72'
+#          '#6dbcdb'
+#          '#666'
+#        ]
+#        data: emailEntryData
+#      } ]
+#    options:
+#      legend: false
+#      pieceLabel:
+#        render: (args) ->
+#          return args.percentage + '%'
+#        position: 'outside'
+#        segment: false
+#        precision: 2
+#        showZero: true
+#        fontStyle: 'bolder'
+#        overlap: false
+#        showActualPercentages: true
+#  )
+
+
+  #  Test data for Closed Email Entry Resolutions
+#  webEntryResolutionLabels = ['Fixed FN', 'Unchanged', 'Fixed FP', 'Other']
+#  webEntryData = [3,6,7,0]
+
+#  new Chart(document.getElementById('closed-web-entries-resolution-piechart'),
+#    type: 'pie'
+#    data:
+#      labels: [
+#        'Fixed'
+#        'Unchanged'
+#        'Fixed FP'
+#      ]
+#      datasets: [ {
+#        label: 'close-email-entries'
+#        backgroundColor: [
+#          '#3e5a72'
+#          '#6dbcdb'
+#          '#666'
+#        ]
+#        data: [
+#          2478
+#          3267
+#          4202
+#        ]
+#      } ]
+#    options:
+#      legend: false
+#      pieceLabel:
+#        render: (args) ->
+#          return args.percentage + '%'
+#        position: 'outside'
+#        label: 'Unchanched'
+#        segment: false
+#        precision: 2
+#        showZero: true
+#        fontStyle: 'bolder'
+#        overlap: false
+#        showActualPercentages: true
+
+#  )
+
+  #closedTicketNumbers = [375502, 375504, 375513, 375515, 375516, 375517, 375518, 375519, 375520, 375521, 375522]
+  #timeToCloseTickets = [1, 1.3, 1.2, 1.5, 1.7, 1.4, 1.8, 0.9, 1, 1.1, 1.2, 1.5, 1.6]
+  #allTimeToClose = undefined
+  #averageTimeToClose = 0
+  #if timeToCloseTickets.length
+  #  allTimeToClose = timeToCloseTickets.reduce((a, b) ->
+  #    a + b
+  #  )
+  #  averageTimeToClose = allTimeToClose / timeToCloseTickets.length
+  #  averageTimeToClose = Math.round(averageTimeToClose * 100)/100
+
+  window.averageTimeToCloseLabel = (hourAmount) ->
+    totalSecond = hourAmount * 60 * 60
+    seconds = totalSecond % 60
+    totalMinutes = (totalSecond - seconds)/60
+    minutes = totalMinutes % 60
+    totalHours = (totalMinutes - minutes)/60
+    hours = totalHours % 60
+    value = ''
+    if hours > 0
+      value += hours + 'hr ' + minutes + 'm ' + seconds + 's'
+    else if minutes > 0
+      value += minutes + 'm ' + seconds + 's'
+    else
+      value += seconds + 's'
+    return
+
+  #averageTimeToCloseLabel(averageTimeToClose)
+
+  #window.timeCloseTicketsDataSets = [
+  #  {
+  #    data: timeToCloseTickets
+  #    label: 'Time to Close:'
+  #    backgroundColor: '#6dbcdb'
+  #    borderColor: '#55a3c1'
+  #    borderWidth: 2
+  #    fill: true
+  #    lineTension: 0
+  #  }
+  #]
+
+  #new Chart($('#time-to-close-tickets-linechart'),
+  #  type: 'line'
+  #  data:
+  #    labels: closedTicketNumbers
+  #    datasets: window.timeCloseTicketsDataSets
+  #  options:
+  #    legend: false
+  #    elements:
+  #      point:
+  #        radius: 0
+  #    scales:
+  #      yAxes: [
+  #        {
+  #          gridLines:
+  #            display: false
+  #          ticks: {
+  #            min: 0
+  #            stepSize: .5
+  #            callback: (value, index, values) ->
+  #              return value + ' hr'
+  #          }
+  #        }
+  #      ]
+  #      xAxes: [
+  #        {
+  #          gridLines:
+  #            display: false
+  #          scaleLabel: {
+  #            display: true,
+  #            labelString: 'Tickets'
+  #          }
+  #          ticks: {
+  #            display: false
+  #          }
+  #        }
+  #        ]
+  #    annotation: {
+  #      annotations: [
+  #        {
+  #          type: 'line'
+  #          drawTime: 'afterDatasetsDraw'
+  #          mode: 'horizontal'
+  #          scaleID: 'y-axis-0'
+  #          value: averageTimeToClose
+  #          borderColor: '#304A60'
+  #          borderWidth: 1
+  #          label: {
+  #            backgroundColor: 'transparent'
+  #            fontStyle: 'normal'
+  #            fontColor: '#666'
+  #            fontSize: 14
+  #            content: 'Average: ' + averageTimeToClose + ' hr'
+  #            position: 'right'
+  #            yAdjust: -10
+  #            enabled: true
+  #          }
+  #        }]
+  #    })
+
+
+
+  ###### Bar chart for Ticket Entries by Submitter Type
+
+  # Range of dates displayed, display however, this format is not mandatory.
+  # These three chunks will need to have the json data reformatted and inserted into them as separate arrays
+  #submitterChartLabels = ['September 2', 'September 3', 'September 4', 'September 5', 'September 6', 'September 7', 'September 8']
+  #submitterCustomerChartData = [20, 24, 30, 28, 10, 5, 13]
+  #submitterGuestChartData = [15, 8, 18, 16, 12, 4, 2]
+
+  #new Chart($('#graph-ticket-entries-submitter'),
+  #  type: 'bar'
+  #  data:
+  #    labels: submitterChartLabels
+  #    datasets: [
+  #      {
+  #      label: 'Customer'
+  #      backgroundColor: '#6dbcdb'
+  #      data: submitterCustomerChartData
+  #      }
+  #      {
+  #        label: 'Guest'
+  #        backgroundColor: '#3e5a72'
+  #        data: submitterGuestChartData
+  #      }]
+  #  options:
+  #    legend:
+  #      display: false
+  #    scales:
+  #      yAxes: [
+  #        {
+  #          gridLines: display: false
+  #          ticks: {
+  #            min: 0
+  #            stepSize: 10
+  #          }
+  #        }
+  #      ]
+  #      xAxes: [
+  #        {
+  #          gridLines: display: false
+  #          ticks: {
+  #            autoSkip: false
+  #          }
+  #        }
+  #      ]
+  #  )
+
+
+
+
+#### Multi User Graphs #####
+
+#  Ticket entries closed by ticket owner
+
+  ticketOwners = ['mtaylor', 'chrclair', 'nherbert', 'nverbeck', 'abreeeman']
+  ticketEntriesByOwner = [8, 15, 11, 10, 13.5]
+
+#  new Chart($('#ticket-entries-closed-by-owner'),
+#    type: 'horizontalBar'
+#    data:
+#      labels: ticketOwners
+#      datasets: [ {
+#        backgroundColor: '#6dbcdb'
+#        data: ticketEntriesByOwner
+#      } ]
+#    options:
+#      legend: display: false
+#      scales:
+#        yAxes: [
+#          {
+#            gridLines: display: false
+#            ticks: {
+#              min: 0
+#            }
+#          }
+#        ]
+#        xAxes: [
+#          {
+#            gridLines: display: false
+#            ticks: {
+#              min: 0
+#            }
+#            scaleLabel: {
+#              display: true,
+#              labelString: 'Closed Ticket Entries'
+#            }
+#          }
+#        ]
+#      )
+
+
+# Average time to close tickets by ticket owner graph
+#  avgTimeToCloseTickets = [.8, .7, 1.7, 1.6, 2]
+
+#  new Chart($('#avg-time-to-close-tickets'),
+#    type: 'horizontalBar'
+#    data:
+#      labels: ticketOwners
+#      datasets: [ {
+#        backgroundColor: '#6dbcdb'
+#        data: avgTimeToCloseTickets
+#      } ]
+#    options:
+#      legend: display: false
+#      scales:
+#        yAxes: [
+#          {
+#            gridLines: display: false
+#            ticks: {
+#              min: 0
+#            }
+#          }
+#        ]
+#        xAxes: [
+#          {
+#            gridLines: display: false
+#            ticks: {
+#              min: 0
+#            }
+#            scaleLabel: {
+#              display: true,
+#              labelString: 'Hours'
+#            }
+#          }
+#        ]
+#  )
+
+
+# Ticket Resolutions by Ticket Owner graph
+
+  #fixedFPTickets = [9, 7, 5, 6, 9]
+  #fixedFNTickets = [10, 14, 11, 10, 5]
+  #unchangedTickets = [3, 4, 11, 13, 9]
+  #otherTickets = [0, 1, 0, 3, 5]
+
+  #new Chart($('#ticket-resolutions-by-owner'),
+  #  type: 'bar'
+  #  data:
+  #    labels: ticketOwners
+  #    datasets: [
+  #      {
+  #        label: 'Fixed FP'
+  #        backgroundColor: '#6dbcdb'
+  #        data: fixedFPTickets
+  #      }
+  #      {
+  #        label: 'Fixed FN'
+  #        backgroundColor: '#2c3e50'
+  #        data: fixedFNTickets
+  #      }
+  #      {
+  #        label: 'Unchanged'
+  #        backgroundColor: '#999'
+  #        data: unchangedTickets
+  #      }
+  #      {
+  #        label: 'Other'
+  #        backgroundColor: '#E47433'
+  #        data: otherTickets
+  #      }
+  #    ]
+  #  options:
+  #    title:
+  #      display: false
+  #    legend: display: false
+  #    scales:
+  #      yAxes: [
+  #        {
+  #          gridLines: display: false
+  #          ticks: {
+  #            min: 0
+  #          }
+  #        }
+  #      ]
+  #      xAxes: [
+  #        {
+  #          gridLines: display: false
+  #        }
+  #      ]
+  #)
+
+
+
+#  Rule Hits for FP Resolutions Graph
+#  fpRules = ['a500', 'alx_ cln', 'mute_phish', 'sbl', 'srch', 'suwl', 'trd_mal']
+#  totalRuleHits = [ 5, 18, 9, 14, 4, 7, 3]
+
+#  new Chart($('#rule-hits-fp-resolutions'),
+#    type: 'horizontalBar'
+#    data:
+#      labels: fpRules
+#      datasets: [ {
+#        backgroundColor: '#6dbcdb'
+#        data: totalRuleHits
+#      } ]
+#    options:
+#      legend: display: false
+#      scales:
+#        yAxes: [
+#          {
+#            gridLines: display: false
+#          }
+#        ]
+#        xAxes: [
+#          {
+#            gridLines: display: false
+#            ticks: {
+#              min: 0
+#            }
+#            scaleLabel: {
+#              display: true,
+#              labelString: 'Total Ticket Entries with FP Resolutions'
+#            }
+#          }
+#        ]
+#  )
+
+
+
+#  totalTicketEnties = [15, 18, 22, 18, 24, 10, 12]
+#  emailTicketEntries = [15, 18, 22, 18, 24, 10, 2]
+#  webTicketEntries = [15, 18, 22, 18, 24, 10, 5]
+#  ewTicketEntries = [15, 18, 22, 18, 24, 10, 7]
+
+#  totalTicketEntriesbyType = [
+#    {
+#      label: 'Total Ticket Entries'
+#      backgroundColor: '#6dbcdb'
+#      data: totalTicketEnties
+#    }
+#    {
+#      label: 'E'
+#      backgroundColor: '#8cc63f'
+#      data: emailTicketEntries
+#    }
+#    {
+#      label: 'W'
+#      backgroundColor: '#E47433'
+#      data: webTicketEntries
+#    }
+#    {
+#      label: 'EW'
+#      backgroundColor: '#BA55D3'
+#      data: ewTicketEntries
+#    }
+#  ]
+
+  dateRange = ['September 2', 'September 3', 'September 4', 'September 5', 'September 6', 'September 7', 'September 8']
+
+
+#  window.multiuser_ticket_type_totals = new Chart($('#graph-multiuser-ticket-entries-closed'),
+#    type: 'bar'
+#    data:
+#      labels: dateRange
+#      datasets: totalTicketEntriesbyType
+#    options:
+#      legend: display: false
+#      scales:
+#        yAxes: [
+#          {
+#            gridLines: display: false
+#          }
+#        ]
+#        xAxes: [
+#          {
+#            gridLines: display: false
+#            ticks: {
+#              autoSkip: false
+#            }
+#          }
+#        ]
+#    )
+
+
+
+  #multiuserCustomerSubmissions = [15, 18, 22, 18, 12, 43, 31]
+  #multiuserGuestSubmissions = [8, 6, 7, 13, 9, 15, 21]
+
+  #new Chart($('#graph-multiuser-ticket-entries-submitter'),
+  #  type: 'bar'
+  #  data:
+  #    labels: dateRange
+  #    datasets: [
+  #      {
+  #        backgroundColor: '#6dbcdb'
+  #        data: multiuserCustomerSubmissions
+  #      }
+  #      {
+  #        backgroundColor: '#2c3e50'
+  #        data: multiuserGuestSubmissions
+  #      }
+  #    ]
+  #  options:
+  #    legend: display: false
+  #    scales:
+  #      yAxes: [
+  #        {
+  #          gridLines: display: false
+  #          ticks: {
+  #            min: 0
+  #          }
+  #        }
+  #      ]
+  #      xAxes: [
+  #        {
+  #          gridLines: display: false
+  #          ticks: {
+  #            autoSkip: false
+  #          }
+  #        }
+  #      ]
+  #)
+
+  #new Chart(document.getElementById('team-pie-chart'),
+  #  type: 'pie'
+  #  data:
+  #    labels: [
+  #      'Fixed'
+  #      'Unchanged'
+  #      'Fixed FP'
+  #    ]
+  #    datasets: [ {
+  #      label: 'close-email-entries'
+  #      backgroundColor: [
+  #        '#3e5a72'
+  #        '#6dbcdb'
+  #        '#666'
+  #      ]
+  #      data: [
+  #        5178
+  #        4267
+  #        2202
+  #      ]
+  #    } ]
+  #  options:
+  #    legend: false
+  #    pieceLabel:
+  #      render: (args) ->
+  #        return args.percentage + '%'
+  #      position: 'outside'
+  #      label: 'Unchanched'
+  #      segment: false
+  #      precision: 2
+  #      showZero: true
+  #      fontStyle: 'bolder'
+  #      overlap: false
+  #      showActualPercentages: true
+
+  #)
+
+  #new Chart(document.getElementById('team-pie2-chart'),
+  #  type: 'pie'
+  #  data:
+  #    labels: [
+  #      'Fixed'
+  #      'Unchanged'
+  #      'Fixed FP'
+  #    ]
+  #    datasets: [ {
+  #      label: 'close-email-entries'
+  #      backgroundColor: [
+  #        '#3e5a72'
+  #        '#6dbcdb'
+  #        '#666'
+  #      ]
+  #      data: [
+  #        3778
+  #        4767
+  #        5900
+  #      ]
+  #    } ]
+  #  options:
+  #    legend: false
+  #    pieceLabel:
+  #      render: (args) ->
+  #        return args.percentage + '%'
+  #      position: 'outside'
+  #      label: 'Unchanched'
+  #      segment: false
+  #      precision: 2
+  #      showZero: true
+  #      fontStyle: 'bolder'
+  #      overlap: false
+  #      showActualPercentages: true
+
+  #)
+
+
+
+# Create Dashboard Initial Table (My Open Tickets)
+$ ->
+
+#
+  window.open_dashboard_dispute_table = $('#table-user-disputes-open').DataTable(
+    dom: '<t>'
+    paging: false
+    columnDefs: [
+      {
+        targets: [ 1 ]
+        className: 'id-col'
+      }
+      {
+        targets: [ 3 ]
+        className: 'state-col'
+      }
+      {
+        targets: [
+          0
+          2
+          4
+        ]
+        className: 'text-center'
+      }
+    ]
+    columns: [
+      {
+        data: 'priority'
+        render: (data) ->
+          '<span class="esc-tooltipped bug-priority p-' + data + '" title="Priority ' + data + '"></span><span class="hidden-sortable-data">' + data + '</span>'
+      }
+      { data: 'case_link' }
+      {
+        data: 'submitter_type'
+        render: (data) ->
+          if (data) == 'customer'
+            return '<span class="esc-tooltipped submitter-type-icon submitter-' + data + '" title="Customer"></span><span class="hidden-sortable-data">' + data + '</span>'
+          else
+            return '<span class="esc-tooltipped submitter-type-icon submitter-' + data + '" title="Guest"></span><span class="hidden-sortable-data">' + data + '</span>'
+      }
+      { data: 'status' }
+      {
+        data: 'submission_type'
+        render: (data) ->
+          if (data) == 'E'
+            return '<span class="esc-tooltipped dispute-submission-type dispute-' + data  + '" title="Email"></span><span class="hidden-sortable-data">' + data + '</span>'
+          else if (data) == 'W'
+            return '<span class="esc-tooltipped dispute-submission-type dispute-' + data  + '" title="Web"></span><span class="hidden-sortable-data">' + data + '</span>'
+          else if (data) == 'EW'
+            return '<span class="esc-tooltipped dispute-submission-type dispute-' + data  + '" title="Email/Web"></span><span class="hidden-sortable-data">' + data + '</span>'
+      }
+      { data: 'd_entry_preview' }
+      { data: 'last_comment' }
+    ]
+  )
+
+  window.closed_dashboard_dispute_table = $('#table-user-disputes-closed').DataTable(
+    dom: '<t>'
+    paging: false
+    columnDefs: [
+      {
+        targets: [ 1 ]
+        className: 'id-col'
+      }
+      {
+        targets: [
+          0
+          2
+          3
+        ]
+        className: 'text-center'
+      }
+    ]
+    columns: [
+      {
+        data: 'priority'
+        render: (data) ->
+          '<span class="esc-tooltipped bug-priority p-' + data + '" title="Priority ' + data + '"></span><span class="hidden-sortable-data">' + data + '</span>'
+      }
+      { data: 'case_link' }
+      {
+        data: 'submitter_type'
+        render: (data) ->
+          if (data) == 'customer'
+            return '<span class="esc-tooltipped submitter-type-icon submitter-' + data + '" title="Customer"></span><span class="hidden-sortable-data">' + data + '</span>'
+          else
+            return '<span class="esc-tooltipped submitter-type-icon submitter-' + data + '" title="Guest"></span><span class="hidden-sortable-data">' + data + '</span>'
+      }
+      {
+        data: 'submission_type'
+        render: (data) ->
+          if (data) == 'E'
+            return '<span class="esc-tooltipped dispute-submission-type dispute-' + data  + '" title="Email"></span><span class="hidden-sortable-data">' + data + '</span>'
+          else if (data) == 'W'
+            return '<span class="esc-tooltipped dispute-submission-type dispute-' + data  + '" title="Web"></span><span class="hidden-sortable-data">' + data + '</span>'
+          else if (data) == 'EW'
+            return '<span class="esc-tooltipped dispute-submission-type dispute-' + data  + '" title="Email/Web"></span><span class="hidden-sortable-data">' + data + '</span>'
+      }
+      { data: 'd_entry_preview' }
+      { data: 'time_to_close' }
+    ]
+  )
+
+  window.open_multiuser_dashboard_dispute_table = $('#table-multi-user-disputes-open').DataTable(
+    dom: '<t>'
+    paging: false
+    columnDefs: [
+      {
+        targets: [ 1 ]
+        className: 'id-col'
+      }
+      {
+        targets: [ 4 ]
+        className: 'state-col'
+      }
+      {
+        targets: [
+          0
+          2
+          5
+        ]
+        className: 'text-center'
+      }
+    ]
+    columns: [
+      {
+        data: 'priority'
+        render: (data) ->
+          '<span class="esc-tooltipped bug-priority p-' + data + '" title="Priority ' + data + '"></span><span class="hidden-sortable-data">' + data + '</span>'
+      }
+      { data: 'case_link' }
+      {
+        data: 'submitter_type'
+        render: (data) ->
+          if (data) == 'customer'
+            return '<span class="esc-tooltipped submitter-type-icon submitter-' + data + '" title="Customer"></span><span class="hidden-sortable-data">' + data + '</span>'
+          else
+            return '<span class="esc-tooltipped submitter-type-icon submitter-' + data + '" title="Guest"></span><span class="hidden-sortable-data">' + data + '</span>'
+      }
+      { data: 'owner' }
+      { data: 'status' }
+      {
+        data: 'submission_type'
+        render: (data) ->
+          if (data) == 'E'
+            return '<span class="esc-tooltipped dispute-submission-type dispute-' + data  + '" title="Email"></span><span class="hidden-sortable-data">' + data + '</span>'
+          else if (data) == 'W'
+            return '<span class="esc-tooltipped dispute-submission-type dispute-' + data  + '" title="Web"></span><span class="hidden-sortable-data">' + data + '</span>'
+          else if (data) == 'EW'
+            return '<span class="esc-tooltipped dispute-submission-type dispute-' + data  + '" title="Email/Web"></span><span class="hidden-sortable-data">' + data + '</span>'
+      }
+      { data: 'd_entry_preview' }
+      { data: 'last_comment' }
+    ]
+  )
+
+  window.closed_dashboard_multiuser_dispute_table = $('#table-multi-user-disputes-closed').DataTable(
+    dom: '<t>'
+    paging: false
+    columnDefs: [
+      {
+        targets: [ 1 ]
+        className: 'id-col'
+      }
+      {
+        targets: [
+          0
+          2
+          4
+        ]
+        className: 'text-center'
+      }
+    ]
+    columns: [
+      {
+        data: 'priority'
+        render: (data) ->
+          '<span class="esc-tooltipped bug-priority p-' + data + '" title="Priority ' + data + '"></span><span class="hidden-sortable-data">' + data + '</span>'
+      }
+      {
+        data: 'case_link'
+      }
+      {
+        data: 'submitter_type'
+        render: (data) ->
+          if (data) == 'customer'
+            return '<span class="esc-tooltipped submitter-type-icon submitter-' + data + '" title="Customer"></span><span class="hidden-sortable-data">' + data + '</span>'
+          else
+            return '<span class="esc-tooltipped submitter-type-icon submitter-' + data + '" title="Guest"></span><span class="hidden-sortable-data">' + data + '</span>'
+      }
+      {
+        data: 'owner'
+      }
+      {
+        data: 'submission_type'
+        render: (data) ->
+          if (data) == 'E'
+            return '<span class="esc-tooltipped dispute-submission-type dispute-' + data  + '" title="Email"></span><span class="hidden-sortable-data">' + data + '</span>'
+          else if (data) == 'W'
+            return '<span class="esc-tooltipped dispute-submission-type dispute-' + data  + '" title="Web"></span><span class="hidden-sortable-data">' + data + '</span>'
+          else if (data) == 'EW'
+            return '<span class="esc-tooltipped dispute-submission-type dispute-' + data  + '" title="Email/Web"></span><span class="hidden-sortable-data">' + data + '</span>'
+      }
+      { data: 'd_entry_preview' }
+      { data: 'time_to_close' }
+    ]
+  )
+
+
+
+
+$ ->
+# Toggle which rows to show on tables
+  show_ticket_type_cb = $('.show-tickets-cb')
+
+  $(show_ticket_type_cb).click ->
+#    Need to traverse to toolbar wrapper and get the sibling wrappers for the tables
+    toolbar_wrapper = $(this).parents('.toolbar')
+    table_wrappers = $(toolbar_wrapper[0]).siblings('.tickets-section-wrapper')
+    ticket_tables = $(table_wrappers).find('.dashboard-tickets-table')
+
+    all_tickets_rows = []
+    customer_rows = []
+    guest_rows = []
+    c_e_rows = []
+    c_w_rows = []
+    c_ew_rows = []
+    g_e_rows = []
+    g_w_rows = []
+    g_ew_rows = []
+
+    show_email_cb = $(toolbar_wrapper).find('.tickets-show-email-cb')
+    show_web_cb = $(toolbar_wrapper).find('.tickets-show-web-cb')
+    show_emailweb_cb = $(toolbar_wrapper).find('.tickets-show-email-web-cb')
+    show_customer_cb = $(toolbar_wrapper).find('.tickets-show-customer-cb')
+    show_guests_cb = $(toolbar_wrapper).find('.tickets-show-guest-cb')
+
+    $(ticket_tables).each ->
+      row = $(this).find('tr')
+      $(row).each ->
+        all_tickets_rows.push this
+
+    $(all_tickets_rows).each ->
+      parent_row = this
+      submitter_type = $(this).find('.submitter-type-icon')
+      if $(submitter_type).hasClass('submitter-customer')
+        customer_rows.push parent_row
+      if $(submitter_type).hasClass('submitter-non-customer')
+        guest_rows.push parent_row
+
+    $(customer_rows).each ->
+      ticket_type = $(this).find('.dispute-submission-type')
+      if $(ticket_type).hasClass('dispute-E')
+        c_e_rows.push this
+      if $(ticket_type).hasClass('dispute-W')
+        c_w_rows.push this
+      if $(ticket_type).hasClass('dispute-EW')
+        c_ew_rows.push this
+
+    $(guest_rows).each ->
+      ticket_type = $(this).find('.dispute-submission-type')
+      if $(ticket_type).hasClass('dispute-E')
+        g_e_rows.push this
+      if $(ticket_type).hasClass('dispute-W')
+        g_w_rows.push this
+      if $(ticket_type).hasClass('dispute-EW')
+        g_ew_rows.push this
+
+
+    if this == show_customer_cb[0]
+      if this.checked
+        if show_email_cb[0].checked
+          $(c_e_rows).each ->
+            if $(this).hasClass('hidden')
+              $(this).removeClass('hidden')
+        else
+          $(c_e_rows).each ->
+            unless $(this).hasClass('hidden')
+              $(this).addClass('hidden')
+        if show_web_cb[0].checked
+          $(c_w_rows).each ->
+            if $(this).hasClass('hidden')
+              $(this).removeClass('hidden')
+        else
+          $(c_w_rows).each ->
+            unless $(this).hasClass('hidden')
+              $(this).addClass('hidden')
+        if show_emailweb_cb[0].checked
+          $(c_ew_rows).each ->
+            if $(this).hasClass('hidden')
+              $(this).removeClass('hidden')
+        else
+          $(c_ew_rows).each ->
+            unless $(this).hasClass('hidden')
+              $(this).addClass('hidden')
+      else
+        $(customer_rows).each ->
+          unless $(this).hasClass('hidden')
+            $(this).addClass('hidden')
+
+    if this == show_guests_cb[0]
+      if this.checked
+        if show_email_cb[0].checked
+          $(g_e_rows).each ->
+            if $(this).hasClass('hidden')
+              $(this).removeClass('hidden')
+        else
+          $(g_e_rows).each ->
+            unless $(this).hasClass('hidden')
+              $(this).addClass('hidden')
+        if show_web_cb[0].checked
+          $(g_w_rows).each ->
+            if $(this).hasClass('hidden')
+              $(this).removeClass('hidden')
+        else
+          $(g_w_rows).each ->
+            unless $(this).hasClass('hidden')
+              $(this).addClass('hidden')
+        if show_emailweb_cb[0].checked
+          $(g_ew_rows).each ->
+            if $(this).hasClass('hidden')
+              $(this).removeClass('hidden')
+        else
+          $(g_ew_rows).each ->
+            unless $(this).hasClass('hidden')
+              $(this).addClass('hidden')
+      else
+        $(guest_rows).each ->
+          unless $(this).hasClass('hidden')
+            $(this).addClass('hidden')
+
+    if this == show_email_cb[0]
+      if this.checked
+        if show_customer_cb[0].checked
+          $(c_e_rows).each ->
+            if $(this).hasClass('hidden')
+              $(this).removeClass('hidden')
+        else
+          $(c_e_rows).each ->
+            unless $(this).hasClass('hidden')
+              $(this).addClass('hidden')
+        if show_guests_cb[0].checked
+          $(g_e_rows).each ->
+            if $(this).hasClass('hidden')
+              $(this).removeClass('hidden')
+        else
+          $(g_e_rows).each ->
+            unless $(this).hasClass('hidden')
+              $(this).addClass('hidden')
+      else
+        $(c_e_rows).each ->
+          unless $(this).hasClass('hidden')
+            $(this).addClass('hidden')
+        $(g_e_rows).each ->
+          unless $(this).hasClass('hidden')
+            $(this).addClass('hidden')
+
+    if this == show_web_cb[0]
+      if this.checked
+        if show_customer_cb[0].checked
+          $(c_w_rows).each ->
+            if $(this).hasClass('hidden')
+              $(this).removeClass('hidden')
+        else
+          $(c_w_rows).each ->
+            unless $(this).hasClass('hidden')
+              $(this).addClass('hidden')
+        if show_guests_cb[0].checked
+          $(g_w_rows).each ->
+            if $(this).hasClass('hidden')
+              $(this).removeClass('hidden')
+        else
+          $(g_w_rows).each ->
+            unless $(this).hasClass('hidden')
+              $(this).addClass('hidden')
+      else
+        $(c_w_rows).each ->
+          unless $(this).hasClass('hidden')
+            $(this).addClass('hidden')
+        $(g_w_rows).each ->
+          unless $(this).hasClass('hidden')
+            $(this).addClass('hidden')
+
+    if this == show_emailweb_cb[0]
+      if this.checked
+        if show_customer_cb[0].checked
+          $(c_ew_rows).each ->
+            if $(this).hasClass('hidden')
+              $(this).removeClass('hidden')
+        else
+          $(c_ew_rows).each ->
+            unless $(this).hasClass('hidden')
+              $(this).addClass('hidden')
+        if show_guests_cb[0].checked
+          $(g_ew_rows).each ->
+            if $(this).hasClass('hidden')
+              $(this).removeClass('hidden')
+        else
+          $(g_ew_rows).each ->
+            unless $(this).hasClass('hidden')
+              $(this).addClass('hidden')
+      else
+        $(c_ew_rows).each ->
+          unless $(this).hasClass('hidden')
+            $(this).addClass('hidden')
+        $(g_ew_rows).each ->
+          unless $(this).hasClass('hidden')
+            $(this).addClass('hidden')
+
 
 
 #    If user changes buttons from initial status, enable the submit button
@@ -2012,3 +3097,4 @@ window.wlbl_history_dialog = (id) ->
     error: (response) ->
       notice_html = "<p>Something went wrong: #{response.responseText}</p>"
   , this)
+

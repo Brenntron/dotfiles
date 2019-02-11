@@ -82,6 +82,8 @@ gem 'rubyXL', '3.3.30'
 
 gem 'public_suffix', '~> 3.0'
 
+gem 'dotiw'
+
 group :development do
   gem 'thin', '1.7.2'
   gem 'puma', '3.12.0'
