@@ -79,7 +79,6 @@ module API
 
                 user_validation = User.where(cvs_username: permitted_params['assignee'])
 
-
                 separated_urls = permitted_params[:ips_urls].split("\n")
 
                 separated_urls.each do |uri|
@@ -101,7 +100,7 @@ module API
                     raise ("Invalid assignee or assignee does not exist. Please try again.")
                   end
                 else
-                  raise ("Unable to create the following duplicate dispute entries: #{errors.to_s}")
+                  raise ("Unable to create the following duplicate dispute entries: #{errors.join("\n")}")
                 end
               end
             end

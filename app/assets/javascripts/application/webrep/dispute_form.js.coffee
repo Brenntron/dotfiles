@@ -28,15 +28,8 @@ $ ->
         $('#loader-modal').hide()
         $('.modal-backdrop').hide()
 
-        data = {
-          search_type: 'advanced'
-          case_id: response.json.case_id
-        }
-
-        populate_webrep_index_table(data)
-
         if response.json.errors.length > 0
-          window.setTimeout(std_msg_error("Unable to create duplicate entries: #{response.json.errors.toString()}",""), 5000)
+          std_msg_error("Unable to create duplicate entries: #{response.json.errors}. The other entries (if any) were successfully created.","", reload: true)
 
       error: (response) ->
         $('#loader-modal').hide()
