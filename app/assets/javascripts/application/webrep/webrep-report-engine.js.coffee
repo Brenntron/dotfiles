@@ -838,6 +838,12 @@ window.build_single_entries_closed_by_day_chart = () ->
   to = localStorage.getItem('webrep_report_range_to')
   user_id = $("#user_id").val()
 
+  cb_all_tix = $('input.all-ticket')[0]
+  cb_types_tix = $('input.group-ticket')[0]
+
+  $(cb_all_tix).checked = true
+  $(cb_types_tix).checked = true
+
   data = {
     from: from,
     to: to,
@@ -963,6 +969,12 @@ window.build_multi_entries_closed_by_day_chart = () =>
     to: to,
     users: team_ids['team']
   }
+
+  cb_all_tix = $('input.all-ticket')[0]
+  cb_types_tix = $('input.group-ticket')[0]
+
+  $(cb_all_tix).checked = true
+  $(cb_types_tix).checked = true
 
   headers = {'Token': $('input[name="token"]').val(), 'Xmlrpc-Token': $('input[name="xml_token"]').val()}
   $.ajax(

@@ -176,12 +176,12 @@
 
             .graph-menu
               .label-wrapper
-                %input.all-ticket{:type => "checkbox", :checked => "checked", :onclick => 'updateGraph("Total Ticket Entries", "multiuser_ticket_type_totals", this)'}/
+                %input.all-ticket{:type => "checkbox", :checked => "checked", :onclick => 'updateGraph("Total Ticket Entries", "multiuser_ticket_type_totals", this)', autocomplete: 'off'}/
                 %label.total-legend
                 Total Tickets Entries
 
               .label-wrapper
-                %input.group-ticket{:type => "checkbox",:checked => "checked", :onclick => 'updateGraph(["E", "W", "EW"], "multiuser_ticket_type_totals", this)'}/
+                %input.group-ticket{:type => "checkbox",:checked => "checked", :onclick => 'updateGraph(["E", "W", "EW"], "multiuser_ticket_type_totals", this)', autocomplete: 'off'}/
                 %label.dispute-E.legend-option
                 %label.dispute-W.legend-option
                 %label.dispute-EW.legend-option
