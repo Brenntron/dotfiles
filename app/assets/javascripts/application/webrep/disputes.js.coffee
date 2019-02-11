@@ -9,7 +9,6 @@ $(document).ready ->
       std_msg_error('No rows selected', ['Please select at least one row.'])
 
   $('span#adjust-wlbl').on 'show.bs.dropdown', ->
-    dropdownMenu = $(this).find('.dropdown-menu')
     if $('.dispute_check_box:checked').length == 0
       std_msg_error('No rows selected', ['Please select a row.'])
       return false
