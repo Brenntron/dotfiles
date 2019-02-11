@@ -69,13 +69,11 @@ window.cat_new_url = ()->
       method: 'POST'
       data: {data: data}
       success: (response) ->
-        $('.modal-backdrop').hide()
-        $('#loader-modal').hide()
+        $('#loader-modal').modal 'hide'
         std_msg_success('URLs categorized successfully',["Categorization of a Top URL will create a pending complaint entry.", "All other entries have been submitted directly to WBRS."], reload: true)
 
       error: (response) ->
-        $('#loader-modal').hide()
-        $('.modal-backdrop').remove()
+        $('#loader-modal').modal 'hide'
         if response.responseText.includes('Either no products have been defined to enter bugs against or you have not been given access to any.')
           std_api_error(response, "Please make sure you have the appropriate permissions in Bugzilla. Unable to categorize url.", reload: false)
         else
