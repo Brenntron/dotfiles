@@ -243,6 +243,8 @@ class Dispute < ApplicationRecord
     dispute.related_id = authority_dispute.id
     dispute.related_at = Time.now
     dispute.resolution = Dispute::DUPLICATE
+    dispute.case_closed_at = Time.now
+    dispute.case_resolved_at = Time.now
     dispute.save
 
     return_payload = {}

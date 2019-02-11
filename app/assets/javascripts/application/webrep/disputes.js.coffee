@@ -653,16 +653,19 @@ window.toolbar_index_edit_status = () ->
         field: "resolution_comment"
         new: $('#entry-status-comment').val()
       })
-
   )
 
-  std_msg_ajax(
-    method: 'PATCH'
-    url: "/escalations/api/v1/escalations/webrep/disputes/entries/field_data"
-    data: { field_data: data }
-    success_reload: true
-    error_prefix: 'Error updating data.'
-  )
+  if statusName == "RESOLVED_CLOSED" && !$('input[name=entry-resolution]:checked').val()
+    std_msg_error('No resolution selected', ['Please select an entry resolution.'])
+  else
+    std_msg_ajax(
+      method: 'PATCH'
+      url: "/escalations/api/v1/escalations/webrep/disputes/entries/field_data"
+      data: { field_data: data }
+      success_reload: true
+      error_prefix: 'Error updating data.'
+    )
+
 
 window.show_page_edit_status = () ->
   statusName = $('input[name=dispute-status]:checked').val()
@@ -670,7 +673,11 @@ window.show_page_edit_status = () ->
   dispute_id = $('#dispute_id').text()
 
   if statusName == "RESOLVED_CLOSED"
-    resolution = $('input[name=dispute-resolution]:checked').val()
+    if $('#show-edit-ticket-status-dropdown').find('input[name=dispute-resolution]').is(':checked')
+      resolution = $('input[name=dispute-resolution]:checked').val()
+    else
+      std_msg_error('No resolution selected', ['Please select a ticket resolution.'])
+      return
 
   data = {
     dispute_ids: [ dispute_id ]
@@ -987,7 +994,6 @@ window.save_dispute_entries = () ->
           field: "resolution_comment"
           new: $(this).find("textarea[name='resolution-comment']")[0].value
         })
-
     ).toArray().filter((field_data) ->
       field_data.old != field_data.new
     )
@@ -996,14 +1002,17 @@ window.save_dispute_entries = () ->
       data[this.dataset.entryId] = fielddata
 
   )
+  if $('input[name=entry-status]:checked').attr('id') == "RESOLVED_CLOSED" && !$('input[name=entry-resolution]:checked').val()
+    std_msg_error('No resolution selected', ['Please select a ticket resolution.'])
+  else
+    std_msg_ajax(
+      method: 'PATCH'
+      url: "/escalations/api/v1/escalations/webrep/disputes/entries/field_data"
+      data: { field_data: data }
+      success_reload: true
+      error_prefix: 'Error updating data.'
+    )
 
-  std_msg_ajax(
-    method: 'PATCH'
-    url: "/escalations/api/v1/escalations/webrep/disputes/entries/field_data"
-    data: { field_data: data }
-    success_reload: true
-    error_prefix: 'Error updating data.'
-  )
 
 
 window.show_set_related_dispute = () ->
@@ -1065,6 +1074,19 @@ window.webrep_reset_search = () ->
 
 $ ->
 
+#  Opens ticket status resolution back up after modal close
+  $('#msg-modal').on 'hide.bs.modal', (e) ->
+    if $('#index-edit-ticket-status-dropdown').parent().hasClass('open')
+      $('#msg-modal').on 'hidden.bs.modal', (b) ->
+        $('#index-edit-ticket-status-dropdown').parent().addClass('open')
+    if $('#show-edit-ticket-status-dropdown').parent().hasClass('open')
+      $('#msg-modal').on 'hidden.bs.modal', (c) ->
+        $('#show-edit-ticket-status-dropdown').parent().addClass('open')
+    if $('#index-edit-entry-status-dropdown').parent().hasClass('open')
+      $('#msg-modal').on 'hidden.bs.modal', (d) ->
+        $('#index-edit-entry-status-dropdown').parent().addClass('open')
+
+
   $('.change_ticket_status_button').click ->
     status = ""
     resolution = ""
@@ -1078,11 +1100,14 @@ $ ->
 
     status = $('#index-edit-ticket-status-dropdown').find('.ticket-status-radio:checked').val()
     if status == 'RESOLVED_CLOSED'
-      resolution = $('#index-edit-ticket-status-dropdown').find('.ticket-resolution-radio:checked').val()
-      comment = $('.resolution-comment-wrapper').find('.ticket-status-comment').val()
+      if $('#index-edit-ticket-status-dropdown').find('.ticket-resolution-radio').is(':checked')
+        resolution = $('#index-edit-ticket-status-dropdown').find('.ticket-resolution-radio:checked').val()
+        comment = $('.resolution-comment-wrapper').find('.ticket-status-comment').val()
+      else
+        std_msg_error('No resolution selected', ['Please select a ticket resolution.'])
+        return
     else
       comment = $('.non-resolution-submit-wrapper').find('.ticket-status-comment').val()
-
 
     data = {
       status: status,
@@ -1178,7 +1203,7 @@ $ ->
   # Edit Entry: Edit Entry Status
   $('#index-entry-status-button').click ->
     dropdown = $('#index-edit-entry-status-dropdown').parent()
-    if ($('.dispute_check_box:checked').length > 0)
+    if ($('.dispute-entry-checkbox:checked').length > 0)
 
       $('.entry-status-radio-label').click ->
         radio_button = $(this).prev('.entry-status-radio')
@@ -1681,7 +1706,7 @@ $ ->
 
 
   $('#index-adjust-wlbl').click ->
-    if $('.dispute_check_box:checked').length == 0
+    if $('.dispute-entry-checkbox:checked').length == 0
       std_msg_error('No rows selected', ['Please select at least one row.'])
       return false
 
@@ -1718,7 +1743,7 @@ $ ->
 
     #    $(tbody).empty()
     dropdown_wrapper = $(this).parent()
-    if ($('.dispute_check_box:checked').length > 0)
+    if ($('.dispute-entry-checkbox:checked').length > 0)
       submit_button = $('#wlbl_adjust_entries_index').find('.dropdown-submit-button')
       entry_content = ''
 
