@@ -78,6 +78,7 @@ class Complaint < ApplicationRecord
   end
 
   def self.parse_url(url)
+    url = URI.escape(url)
     uri = URI.parse(URI.parse(url).scheme.nil? ? "http://#{url}" : url)
     domain = PublicSuffix.parse(uri.host)
     subdomain = uri.host.gsub(Regexp.new("\\.?#{domain.domain}$"), '')
@@ -229,7 +230,7 @@ class Complaint < ApplicationRecord
 
     begin
       ActiveRecord::Base.transaction do
-        max_wait_for_job = 15 #seconds
+        max_wait_for_job = 60 #seconds
 
         user = User.where(cvs_username:"vrtincom").first
         guest = Company.where(:name => "Guest").first
@@ -326,7 +327,7 @@ class Complaint < ApplicationRecord
           begin
             screenshot_data =  ""
             Timeout::timeout(max_wait_for_job) do
-              screenshot_data = CapybaraSpider.low_capture("http://#{new_complaint_entry.hostlookup}")
+              screenshot_data = CapybaraSpider.low_capture("#{new_complaint_entry.hostlookup}")
             end
             ces = ComplaintEntryScreenshot.new
             ces.complaint_entry_id = new_complaint_entry.id
@@ -338,7 +339,7 @@ class Complaint < ApplicationRecord
             ces = ComplaintEntryScreenshot.new
             ces.error_message = e.message
             ces.complaint_entry_id = new_complaint_entry.id
-            open("app/assets/images/failed_screenshot.jpg") do |f|
+            open("app/assets/images/timeout_screenshot.jpg") do |f|
               ces.screenshot = f.read
             end
             ces.save!
@@ -396,7 +397,7 @@ class Complaint < ApplicationRecord
           begin
             screenshot_data = ""
             Timeout::timeout(max_wait_for_job) do
-              screenshot_data = CapybaraSpider.low_capture("http://#{new_complaint_entry.hostlookup}")
+              screenshot_data = CapybaraSpider.low_capture("#{new_complaint_entry.hostlookup}")
             end
             ces = ComplaintEntryScreenshot.new
             ces.complaint_entry_id = new_complaint_entry.id
@@ -408,7 +409,7 @@ class Complaint < ApplicationRecord
             ces = ComplaintEntryScreenshot.new
             ces.error_message = e.message
             ces.complaint_entry_id = new_complaint_entry.id
-            open("app/assets/images/failed_screenshot.jpg") do |f|
+            open("app/assets/images/timeout_screenshot.jpg") do |f|
               ces.screenshot = f.read
             end
             ces.save!

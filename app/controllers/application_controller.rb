@@ -43,7 +43,7 @@ class ApplicationController < ActionController::Base
   def set_version
     begin
       build_name = (File.read './public/version.html')
-      if /(?<build_num>[0-9\.]+)\z/ =~ build_name
+      if /(?<build_num>[0-9\.]+)/ =~ build_name
         build_ary = build_num.split('.')
         @version = build_ary[0..2].join('.') #handles 1, 2, 3, and more elements
       else

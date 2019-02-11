@@ -1,5 +1,6 @@
 Rails.application.routes.draw do
 
+  mount RailsAdmin::Engine => '/escalations/admin', as: 'rails_admin'
   resources :rulehit_resolution_mailer_templates
   devise_for :users, controllers: {sessions: 'sessions'}
 
