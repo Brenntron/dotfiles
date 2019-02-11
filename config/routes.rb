@@ -199,6 +199,7 @@ Rails.application.routes.draw do
     end
   end
 
+  get 'sb_api/query_lookup' => 'sb_api#query_lookup'
 
   mount API::Base => '/escalations/api'
 

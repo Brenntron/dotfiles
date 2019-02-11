@@ -98,7 +98,7 @@ class Sbrs::GetSbrs < Sbrs::Base
     retries ||= 0
 
     begin
-      json_response = self.get_auth_key(ENV['SENDERBASE_USER'],ENV['SENDERBASE_PASS'], params["retried"])
+      json_response = self.get_auth_key(Rails.configuration.sds.user,Rails.configuration.sds.pass, params["retried"])
       lookup_data = self.build_request(params, host, json_response)
       uri = lookup_data[:uri]
       header = lookup_data[:header]

@@ -818,7 +818,7 @@ format = (complaint_entry_row) ->
       '<table class="simple-nested-table" id="' + complaint_entry.entry_id + '"><thead><tr><th>Conf</th><th>Current Categories</th><th>Certainty</th></tr></thead>' +
       '</table>' +
       '</div><div class="col-xs-2">' +
-      '<button class="secondary" id="lookup-' + complaint_entry.entry_id + '"onclick="lookup_dialog(' + complaint_entry.entry_id  + ')">Lookup</button><br/>' +
+      '<button class="secondary" id="lookup-' + complaint_entry.entry_id + '" onclick="WebCat.RepLookup.queryWhoIs(\'' + url + '\')">Lookup</button><br/>' +
       '<button class="secondary" id="history-' + complaint_entry.entry_id + '" onclick="history_dialog(' + complaint_entry.entry_id  + ')">History</button><br/>' +
       '<button class="secondary" id="domain-' + complaint_entry.entry_id + '" onclick="domain_whois(\'' + whois_lookup + '\')">Domain</domain>' +
       '</div></div>' +
