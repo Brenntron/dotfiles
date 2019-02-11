@@ -1062,15 +1062,15 @@ window.build_multi_entries_closed_by_day_chart = () =>
           alert 'Graph with name ' + barGraphName + ' is not defined'
           return
 
-
-        if $(e)[0].checked
-          currentData = window[barGraphName].data.datasets
-          window[barGraphName].data.datasets = currentData.concat originalData.filter (x) -> label.indexOf(x.label) >= 0
-          window[barGraphName].update()
-        else
-          currentData = window[barGraphName].data.datasets
-          window[barGraphName].data.datasets = currentData.filter (x) -> label.indexOf(x.label) < 0
-          window[barGraphName].update()
+        if originalData != undefined
+          if $(e)[0].checked
+            currentData = window[barGraphName].data.datasets
+            window[barGraphName].data.datasets = currentData.concat originalData.filter (x) -> label.indexOf(x.label) >= 0
+            window[barGraphName].update()
+          else
+            currentData = window[barGraphName].data.datasets
+            window[barGraphName].data.datasets = currentData.filter (x) -> label.indexOf(x.label) < 0
+            window[barGraphName].update()
 
 
     error: (response) ->
