@@ -34,6 +34,8 @@ gem 'curb', '0.9.6' #Libcurl bindings for Ruby
 gem 'net-ssh', '5.0.2'
 gem 'stomp', '1.4.6'
 
+gem 'rails_admin', '~> 1.3'
+
 # System Management
 gem 'foreman', '0.85.0'
 gem 'daemons', '1.2.6'
@@ -79,6 +81,8 @@ gem 'gzip', '1.0'
 gem 'rubyXL', '3.3.30'
 
 gem 'public_suffix', '~> 3.0'
+
+gem 'dotiw'
 
 group :development do
   gem 'thin', '1.7.2'
