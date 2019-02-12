@@ -1382,8 +1382,6 @@ window.master_submit = () ->
     keyboard: false
   })
 
-  $('#loader-modal').show()
-
   $('.nested-complaint-data-wrapper:visible').each ->
     entry_id = $(this).find('tr').attr('entry_id')
     row_id = $(this).find('tr').attr('row_id')
