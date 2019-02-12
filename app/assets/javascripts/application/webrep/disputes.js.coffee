@@ -578,7 +578,7 @@ window.toolbar_adjust_reptool_bl_button =(button_tag) ->
       else if response.responseJSON.error != undefined
         errormsg = [response.responseJSON.error]
       else
-        errormsg = [response.responseText]
+        errormsg = response.responseJSON.message
       std_msg_error('Error', ['Error adjusting WL/BL'].concat(errormsg) )
   )
 
