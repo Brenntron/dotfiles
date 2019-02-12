@@ -4,7 +4,6 @@ $ ->
     e.preventDefault()
 
     $('#loader-modal').modal({
-      backdrop: 'static'
       keyboard: false
     })
 
@@ -25,8 +24,7 @@ $ ->
         ticket_type: ticket_type
       success: (response) ->
         $('#new-dispute').dropdown('toggle')
-        $('#loader-modal').hide()
-        $('.modal-backdrop').hide()
+        $('#loader-modal').modal 'hide'
 
         if response.json.errors.length > 0
           std_msg_error("Unable to create duplicate entries: #{response.json.errors}. The other entries (if any) were successfully created.","", reload: true)

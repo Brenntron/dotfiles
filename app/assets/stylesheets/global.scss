@@ -6101,17 +6101,14 @@ table.dispute-entry-table tbody tr.selected {
   min-width: 350px;
 }
 
-
-#new-dispute-wrapper {
-  min-width: 350px;
-}
-
 #new-complaint-wrapper textarea, #new-complaint-wrapper input, #categorize-urls-form-wrapper textarea {
   width: 100%;
 }
 
 #new-dispute-wrapper textarea, #new-dispute-wrapper input {
   width: 100%;
+  min-width: 350px;
+  margin-bottom: 0;
 }
 
 #new-complaint-wrapper textarea, #categorize-urls-form-wrapper textarea {
@@ -6135,10 +6132,6 @@ table.dispute-entry-table tbody tr.selected {
 }
 
 #new-complaint-wrapper .form-group {
-  margin-bottom: 0;
-}
-
-#new-dispute-wrapper .form-group {
   margin-bottom: 0;
 }
 

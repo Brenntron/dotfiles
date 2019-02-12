@@ -10,7 +10,7 @@
     %textarea#ips_urls{required: true}
   .form-group
     %label.content-label-sm Assignee
-    %input.form-control#assignee{name: 'assignee', list: 'assignee-list', required: true}
+    %input.form-control#assignee{name: 'assignee', list: 'assignee-list', required: true, value: "#{current_user.cvs_username}"}
     %datalist#assignee-list
   .form-group
     %label.content-label-sm Priority
@@ -24,7 +24,7 @@
   .form-group
     %label.content-label-sm Ticket Type
   .form-group
-    %select#ticket_type.content-label-md#ticket-type-dropdown
+    %select.content-label-md#ticket-type-dropdown
       %option{:selected => 'selected'} Web
       %option Email
       %option Email & Web
