@@ -617,18 +617,6 @@ window.drop_current_categories = () ->
       std_msg_error("<p>There has been an error dropping categories: #{json.error}","")
 )
 
-window.show_loading_modal = () ->
-  $('#loader-modal').modal({
-    backdrop: 'static',
-    keyboard: false,
-  })
-
-window.hide_modals = () ->
-  $('#loader-modal').hide()
-  $('.modal-backdrop').hide()
-  $('body').removeClass('modal-open')
-
-
 format = (complaint_entry_row) ->
 
   $('#loader-modal').modal({
@@ -1388,7 +1376,10 @@ window.master_submit = () ->
   at_least_one_populated_selectized = true unless $('.has-items').length == 0
 
   if at_least_one_selected_entry == true && at_least_one_populated_selectized == true
-    show_loading_modal()
+    $('#loader-modal').modal({
+      keyboard: false
+    })
+
     $('.nested-complaint-data-wrapper:visible').each ->
       entry_id = $(this).find('tr').attr('entry_id')
       row_id = $(this).find('tr').attr('row_id')
@@ -1415,7 +1406,7 @@ window.master_submit = () ->
       url: "/escalations/api/v1/escalations/webcat/complaint_entries/master_submit"
       data: {data: data}
       success: (response) ->
-        hide_modals()
+        $('#loader-modal').modal 'hide'
 
         errors = []
 
@@ -1470,7 +1461,8 @@ window.master_submit = () ->
             td.classList.add('nested-complaint-data-wrapper')
 
       error: (response) ->
-        hide_modals()
+        console.log('wtf')
+        $('#loader-modal').modal 'hide'
         std_msg_error("Unable to submit changes for selected entries.","", reload: false)
     , this)
   else
