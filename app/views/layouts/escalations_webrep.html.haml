@@ -85,8 +85,31 @@
 
   - if current_user
     #login-div.nav-tool-block.col-sm-3.col-lg-3
-      %a{href: "/users/#{current_user[:id]}"}
+      %span.dropdown
+        %button#user-settings-dropdown-button.dropdown-toggle{'data-toggle': 'dropdown', 'aria-expanded': 'false', 'aria-haspopup': 'true', type: 'button'}
+        #user-settings-dropdown.dropdown-menu{'aria-labelledby': 'user-settings-dropdown-button'}
+          -#    If user is logged into Bugzilla
+          -#.message-text Log out of Bugzilla
+          -# Logout button
+          
+          -#-#    Else
+          .message-text Log into Bugzilla
+          %form#top_banner_bugzilla_login_form
+            .form-group.text-left
+              %label.content-label-sm Username
+              %input.form-control{name: 'username', autofocus: 'true'}
+            .form-group.text-left
+              %lable.content-label-sm Password
+              %input.form-control{type: 'password', name: 'password'}
+            .form-group.text-center
+              %button#top_banner_bugzilla_login_button.panel-button.primary{'aria-label': 'Login', onclick: 'top_banner_bugzilla_login(); return false;'} Login
+
+          %a{href: "/users/#{current_user[:id]}"}
+            Login settings
+
+      %a.nav-username{href: "/users/#{current_user[:id]}"}
         = current_user[:display_name]
+
 
     -##username= current_user.cvs_username
 

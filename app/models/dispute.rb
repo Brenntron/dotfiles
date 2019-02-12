@@ -368,7 +368,7 @@ class Dispute < ApplicationRecord
 
         #create an escalations IP/DOMAIN bugzilla bug here and transfer id to new dispute
 
-        bug_factory = Bugzilla::Bug.new(message_payload[:bugzilla_session])
+        bugzilla_rest_session = message_payload[:bugzilla_rest_session]
 
         summary = "New Web Reputation Dispute generated at #{DateTime.now.utc.strftime("%Y-%m-%d %H:%M")}"
 
@@ -390,12 +390,12 @@ class Dispute < ApplicationRecord
         }
         logger.debug "Creating bugzilla bug"
 
-        bug_stub_hash = Bug.bugzilla_create(bug_factory, bug_attrs, user, true)
+        bug_proxy = bugzilla_rest_session.create_bug(bug_attrs)
 
         logger.debug "Creating dispute"
         new_dispute = Dispute.new
 
-        new_dispute.id = bug_stub_hash["id"]
+        new_dispute.id = bug_proxy.id
         new_dispute.user_id = user.id
         new_dispute.source_ip_address = message_payload["payload"]["user_ip"]
         new_dispute.org_domain = message_payload["payload"]["domain"]

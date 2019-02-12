@@ -13,6 +13,7 @@ development:
   bugzilla:
     #host: "bugzillaTest02.vrt.sourcefire.com"
     host: "bugzilla-staging.vrt.sourcefire.com"
+    api_key: "redacted"
   cert:
     #vrt: "/System/Library/OpenSSL/certs/ca.pem" #Mac OS X standard location for certs
     vrt: "extras/ssh/ca.pem"
@@ -46,10 +47,15 @@ development:
     host: "fmdreputation.vrt.sourcefire.com"
     port: 443
     # verify_mode { "no-tls" for http, "verify-none" for self signed cert, "verify-peer" for CA }
-    verify_mode: "verify-none"
+    verify_mode: "verify-peer"
+    ca_cert_file: "/usr/local/etc/trusted-certificates.pem"
     gssnegotiate: true
   ruletest:
     url: "https://localhost:3000/api_test"
+  sds:
+    host: "v2.sds.cisco.com"
+    cert_file: "/usr/local/etc/sds-certificate.pem"
+    pkey_file: "/usr/local/etc/sds-pkey.pem"
   snort_doc_max_fails: 3
   snort_org:
     host: "localhost"
@@ -105,6 +111,7 @@ test:
   bugzilla:
     #host: "bugzillaTest02.vrt.sourcefire.com"
     host: "bugzilla-staging.vrt.sourcefire.com"
+    api_key: "redacted"
   cert:
     #vrt: "/System/Library/OpenSSL/certs/ca.pem" #Mac OS X standard location for certs
     vrt: "extras/ssh/ca.pem"
@@ -141,6 +148,10 @@ test:
     gssnegotiate: true
   ruletest:
     url: "https://localhost:3000/api_test"
+  sds:
+    host: "v2.sds.cisco.com"
+    cert_file: "/usr/local/etc/sds-certificate.pem"
+    pkey_file: "/usr/local/etc/sds-pkey.pem"
   snort_doc_max_fails: 1
   snort_org:
     host: "localhost"
@@ -195,6 +206,7 @@ staging:
       api_key: "redacted"
   bugzilla:
     host: "bugzilla-staging.vrt.sourcefire.com"
+    api_key: "redacted"
   cert:
     vrt: "/usr/local/etc/trusted-certificates.pem"
   peakebridge:
@@ -275,6 +287,7 @@ production:
       api_key: "redacted"
   bugzilla:
     host: "bugzilla.vrt.sourcefire.com"
+    api_key: "redacted"
   cert:
     vrt: "/usr/local/etc/trusted-certificates.pem"
   peakebridge:
