@@ -802,7 +802,7 @@ format = (complaint_entry_row) ->
       '<button class="secondary inline-button" onclick="updateURI(' + complaint_entry.entry_id + ')">Update URI</button><br/>' +
       '<div class="complaint-selectize-col-wrapper">' +
       '<label class="content-label-sm">Categories to commit</label>' +
-      '<fieldset id="'+input_cat+'" ' + entry_status + '  name="['+input_cat+'][]" class="selectize" placeholder="Enter up to 5 categories" value="">' +
+      '<fieldset id="'+input_cat+'" ' + entry_status + '  name="['+input_cat+'][]" class="selectize pending" placeholder="Enter up to 5 categories" value="">' +
       '</div></div>' +
       '<div class="col-xs-4 col-with-divider">' +
       '<label class="content-label-sm">Internal Comment</label><br/>' +
@@ -1042,7 +1042,8 @@ window.click_table_buttons = (complaint_table, button)->
       options: AC.WebCat.createSelectOptions(),
       items: selected_options(row.data().category),
       onItemAdd: ->
-        $('#master-submit').prop('disabled', false)
+        if !$(this)[0].$input.hasClass('pending')
+          $('#master-submit').prop('disabled', false)
       onItemRemove: ->
         if $(this)[0].items.length == 0
           $('#master-submit').prop('disabled', true)
