@@ -42,5 +42,5 @@
 //= require application/webrep_research_tab
 //= require application/webcat/webcat
 //= require application/webcat/categories
+//= require application/webcat/webCatRepLookup
 //= require application/webrep/webrep-report-engine
-

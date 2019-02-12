@@ -242,6 +242,8 @@ staging:
     host: "v2.sds.cisco.com"
     cert_file: "/usr/local/etc/sds-certificate.pem"
     pkey_file: "/usr/local/etc/sds-pkey.pem"
+    user: 'tidev'
+    pass: "REDACTED"
   snort_doc_max_fails: 3
   snort_org:
     host: "localhost"

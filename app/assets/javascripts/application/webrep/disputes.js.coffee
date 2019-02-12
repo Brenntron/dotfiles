@@ -1,12 +1,9 @@
 $(document).ready ->
+
   $('span#mark-as-related').on 'show.bs.dropdown', ->
-    dropdownMenu = $(this).find('.dropdown-menu')
-    dropdownMenu.hide()
-    if $('.dispute_check_box:checked').length > 0
-      dropdownMenu.show()
-    else
-      $(this).removeClass('open')
+    if $('.dispute_check_box:checked').length == 0
       std_msg_error('No rows selected', ['Please select at least one row.'])
+      return false
 
   $('span#adjust-wlbl').on 'show.bs.dropdown', ->
     if $('.dispute_check_box:checked').length == 0
