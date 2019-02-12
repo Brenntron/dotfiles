@@ -9,8 +9,7 @@ window.std_api_login =() ->
     data: { username: username, password: password }
     error_prefix: 'Error logging in.'
     success: (response) ->
-      debugger
-      $('#api-msg').modal 'hide'
+      $('#login-modal').modal 'hide'
   )
 
 
