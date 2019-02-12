@@ -682,10 +682,10 @@ button {
 .sync-button {background-image: url(image_path('icon_sync.svg'));}
 
 .master-submit-button {
-  color: white;
+  color: $content-bg-color;
   font-weight: 400;
   background-image: url(image_path('icon_submit_arrow.svg'));
-  background-color: #E47433;
+  background-color: $warning-accent-color;
 }
 .open-viewable {background-image: url(image_path('icon_open_viewable.svg'));}
 .open-nonviewable {background-image: url(image_path('icon_open_nonviewable.svg'));}
@@ -854,8 +854,8 @@ thead th.sorting.center {
 }
 
 .toolbar-button:disabled {
-  background-color: $disabled-bg;
-  color: $disabled-txt;
+  background-color: $disabled-bg !important;
+  color: $disabled-txt !important;
 }
 
 .copydoc-button.button-in-use {
