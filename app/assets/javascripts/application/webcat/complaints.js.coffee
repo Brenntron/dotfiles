@@ -1032,6 +1032,8 @@ window.click_table_buttons = (complaint_table, button)->
     row.child.hide()
     tr.removeClass 'shown'
     tr.addClass 'not-shown'
+    if $('.shown').length == 0
+      $('#master-submit').prop('disabled', true)
   else
     # Open this row
     row.child(format(row)).show()
@@ -1062,6 +1064,8 @@ window.click_table_buttons = (complaint_table, button)->
         $('.complaint-entry-table td, .complaint-entry-table th').each ->
           if $(button).hasClass(checkbox_trigger)
             $(button).hide()
+    if $('#master-submit').prop('disabled') == true
+      $('#master-submit').prop('disabled', false)
 
 window.populate_webcat_index_table = (filter) ->
   if !filter
