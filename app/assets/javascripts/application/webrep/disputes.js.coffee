@@ -540,13 +540,10 @@ window.row_adust_reptool_bl_button_research =(button_tag) ->
   )
 
 window.toolbar_adjust_reptool_bl_button =(button_tag) ->
-  entry_ids = $('.dispute_check_box:checked').map(() ->
-    parseInt($(this).attr('data-entry-id'))
+  entry_ids = $('.dispute-entry-checkbox:checked').map(() ->
+    parseInt(this.id)
   ).toArray()
-  if entry_ids.length == 0
-    entry_ids = $('.dispute-entry-checkbox:checked').map(() ->
-      parseInt(this.id)
-    ).toArray()
+
   if entry_ids.length == 0
     std_msg_error('No rows selected', ['Please select at least one row.'])
     return
@@ -559,27 +556,15 @@ window.toolbar_adjust_reptool_bl_button =(button_tag) ->
     'comment': reptool_bl_form.getElementsByClassName('comment-input')[0].value
   }
 
-  headers = {'Token': $('input[name="token"]').val(), 'Xmlrpc-Token': $('input[name="xml_token"]').val()}
-  $.ajax(
+  std_msg_ajax(
     url: '/escalations/api/v1/escalations/webrep/disputes/reptool_bl'
     method: 'POST'
-    headers: headers
     data: data
     dataType: 'json'
     success: (response) ->
       window.location.reload()
     error: (response) ->
-      if response.responseJSON == undefined
-        response_lines = response.responseText.split("\n")
-        if 2 < response_lines.length
-          errormsg = [response_lines[0], response_lines[1]]
-        else
-          errormsg = [response.responseText]
-      else if response.responseJSON.error != undefined
-        errormsg = [response.responseJSON.error]
-      else
-        errormsg = response.responseJSON.message
-      std_msg_error('Error', ['Error adjusting WL/BL'].concat(errormsg) )
+      std_msg_error('Error', ['Error adjusting WL/BL'].concat(response.responseJSON.message) )
   )
 
 window.toolbar_adjust_reptool_bl_button_research =(button_tag) ->
