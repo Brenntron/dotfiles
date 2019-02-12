@@ -8,6 +8,9 @@ window.std_api_login =() ->
     url: url
     data: { username: username, password: password }
     error_prefix: 'Error logging in.'
+    success: (response) ->
+      debugger
+      $('#api-msg').modal 'hide'
   )
 
 
@@ -22,6 +25,7 @@ window.top_banner_bugzilla_login =() ->
     success: (response) ->
       $('form#top_banner_bugzilla_login_form').find('input[name=username]').val('')
       $('form#top_banner_bugzilla_login_form').find('input[name=password]').val('')
+      $('#user-settings-dropdown-button').click()
   )
 
 
