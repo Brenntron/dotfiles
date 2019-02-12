@@ -1,14 +1,8 @@
 require "rails_helper"
 
 RSpec.describe "Peake-Bridge dispute messages channels", type: :request do
-  let(:vrt_incoming) { FactoryBot.create(:vrt_incoming_user) }
-  let(:guest_company) { FactoryBot.create(:guest_company) }
-
-  it 'receives complaint payload messages' do
-    vrt_incoming
-    guest_company
-
-    post '/escalations/peake_bridge/channels/ticket-event/messages', as: :json, params: {
+  let(:dispute_message_json) do
+    {
         envelope: {
             channel: "ticket-event",
             addressee: "analyst-console-escalations",
@@ -72,7 +66,7 @@ RSpec.describe "Peake-Bridge dispute messages channels", type: :request do
                     problem: 'What do I need to do to improve the reputation',
                     submission_type: 'w',
                     name: 'Ricardo Pedraza',
-                    user_company: 'Guest',
+                    user_company: '3-Support Support',
                     email: 'webmaster@cmim.org',
                     email_subject: 'Now AC is ready, 355 Toyota and The Pretenders reputation dispute.',
                     email_body: "____________________________________________________________\nUser-entered Information:\n____________________________________________________________\nTime: October 11, 2018 16:15\nName: Marlin Pierce\nE-mail: marlpier@cisco.com\nDomain: cisco.com\nInquiry Type: web\nKey Rules: \nProblem Summary: Now AC is ready, 355 Toyota and The Pretenders reputation dispute.\nIP(s) to be investigated:\n64.70.56.99\n184.168.47.225\n\nURI(s) to be investigated:\n355toyota.com\nthepretenders.com\n\nDetailed Descriptions:\n\n\n____________________________________________________________\nCisco Confidential Analysis:\n____________________________________________________________\n\nUser's IP:      ::1\n\n64.70.56.99\nSBRS Score:     No score\nSBRS Rule Hits: \nHostname:       www.dealer.com\n\n184.168.47.225\nSBRS Score:     No score\nSBRS Rule Hits: \nHostname:       redirect-v225.secureserver.net\n\n355toyota.com\nWBRS Score:     No score\nWBRS Rule Hits: \nHostname's IPs: \n\nthepretenders.com\nWBRS Score:     No score\nWBRS Rule Hits: \nHostname's IPs: \n",
@@ -82,6 +76,15 @@ RSpec.describe "Peake-Bridge dispute messages channels", type: :request do
             }
         }
     }
+  end
+  let(:vrt_incoming) { FactoryBot.create(:vrt_incoming_user) }
+  let(:guest_company) { FactoryBot.create(:guest_company) }
+
+  it 'receives dispute payload messages' do
+    vrt_incoming
+    guest_company
+
+    post '/escalations/peake_bridge/channels/ticket-event/messages', as: :json, params: dispute_message_json
 
     expect(response).to be_success
     dispute = Dispute.where(ticket_source_key: 1001).first
@@ -93,7 +96,7 @@ RSpec.describe "Peake-Bridge dispute messages channels", type: :request do
     expect(dispute.dispute_entries.where(uri: 'thepretenders.com')).to exist
   end
 
-  it 'handle error receiving complaint payload messages with no payload' do
+  it 'handle error receiving dispute payload messages with no payload' do
     vrt_incoming
     guest_company
 
@@ -104,7 +107,7 @@ RSpec.describe "Peake-Bridge dispute messages channels", type: :request do
             sender: "talos-intelligence"
         },
         message: {
-            complaint: {
+            dispute: {
                 source_type: 'Complaint',
                 source_key: 1001,
             }
@@ -112,8 +115,8 @@ RSpec.describe "Peake-Bridge dispute messages channels", type: :request do
     }
 
     # expect(response).to be_error
-    complaint = Complaint.where(ticket_source_key: 1001).first
-    expect(complaint).to be_nil
+    dispute = Dispute.where(ticket_source_key: 1001).first
+    expect(dispute).to be_nil
   end
 end
 
