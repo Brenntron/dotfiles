@@ -249,7 +249,7 @@ endif
 set background=dark " or light if you prefer the light version
 set t_Co=256
 "let g:two_firewatch_italics=1
-color synthwave
+color hybrid
 
 if (has("termguicolors"))
   set termguicolors " 24-bit terminal

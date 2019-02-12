@@ -1,3 +1,6 @@
+# colors
+export TERM=screen-256color
+
 # If you come from bash you might have to change your $PATH.
 export PATH=$HOME/bin:/usr/local/bin:$PATH
 ZSH_DISABLE_COMPFIX=true
@@ -11,7 +14,7 @@ export ZSH="/Users/Brenntron/.oh-my-zsh"
 ZSH_THEME="powerlevel9k/powerlevel9k"
 
 POWERLEVEL9K_CUSTOM_USER="echo '\uf8e8' `whoami`"
-POWERLEVEL9K_CUSTOM_USER_BACKGROUND="lightcoral"
+POWERLEVEL9K_CUSTOM_USER_BACKGROUND="cyan"
 POWERLEVEL9K_CUSTOM_USER_FOREGROUND="grey30"
 
 POWERLEVEL9K_BATTERY_STAGES=($'\uf579' $'\uf57a' $'\uf57b' $'\uf57c' $'\uf57d' $'\uf57e' $'\uf57f' $'\uf580' $'\uf581' $'\uf578' )
@@ -161,5 +164,9 @@ done
 
 [ -f ~/.fzf.zsh ] && source ~/.fzf.zsh
 alias config='/usr/bin/git --git-dir=/Users/Brenntron/.myconfigs/ --work-tree=/Users/Brenntron'
+alias tmux="tmux -2"
 
 export PATH="$HOME/.yarn/bin:$HOME/.config/yarn/global/node_modules/.bin:$PATH"
+export LDFLAGS="-L/usr/local/opt/zlib/lib"
+export CPPFLAGS="-I/usr/local/opt/zlib/include"
+export PKG_CONFIG_PATH="/usr/local/opt/zlib/lib/pkgconfig"
