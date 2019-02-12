@@ -769,7 +769,7 @@ format = (complaint_entry_row) ->
   complaint_entry_html = ''
   if complaint_entry.status == "PENDING"
     input_cat = 'input_cat_' + complaint_entry.entry_id
-    complaint_entry_html = '<table><tr><td class="no_pad"><div class="row">' +
+    complaint_entry_html = '<table><tr class="pending"><td class="no_pad"><div class="row">' +
       '<div class="col-xs-12 col-sm-6 nested-complaint-static-data">' +
       '<div class="row">' +
       '<div class="col-xs-5 col-with-divider">' +
@@ -1377,109 +1377,105 @@ window.triggerTooltips = (item) ->
 window.master_submit = () ->
   data = []
 
-  at_least_one_selected_entry = false
-  at_least_one_populated_selectized = false
+  $('#loader-modal').modal({
+    keyboard: false
+  })
 
-  at_least_one_selected_entry = true unless $('.submit_changes:visible').length == 0
-  at_least_one_populated_selectized = true unless $('.has-items').length == 0
+  $('#loader-modal').show()
 
-  if at_least_one_selected_entry == true && at_least_one_populated_selectized == true
-    $('#loader-modal').modal({
-      keyboard: false
-    })
+  $('.nested-complaint-data-wrapper:visible').each ->
+    entry_id = $(this).find('tr').attr('entry_id')
+    row_id = $(this).find('tr').attr('row_id')
+    type = $(this).find('tr').attr('type')
 
-    $('.nested-complaint-data-wrapper:visible').each ->
-      entry_id = $(this).find('tr').attr('entry_id')
-      row_id = $(this).find('tr').attr('row_id')
-      type = $(this).find('tr').attr('type')
+    if type == 'submit_changes' && entry_id && row_id
+      prefix = $(this).find("#complaint_prefix_#{entry_id}")[0].value
 
-      if type == 'submit_changes' && entry_id && row_id
-        prefix = $(this).find("#complaint_prefix_#{entry_id}")[0].value
+      categories = $(this).find("#input_cat_#{entry_id}").val().toString()
+      category_name = $(this).find("#input_cat_#{entry_id}").next('.selectize-control').find('.item')
+      category_names = []
+      category_name.each ->
+        category_names.push($(this).text())
+      category_names = category_names.toString()
+      status = $(this).find("[name=resolution#{entry_id}]:checked").val()
+      comment = $(this).find("#complaint_comment_#{entry_id}")[0].value
+      resolution_comment = $(this).find("#complaint_resolution_comment_#{entry_id}")[0].value
 
-        categories = $(this).find("#input_cat_#{entry_id}").val().toString()
-        category_name = $(this).find("#input_cat_#{entry_id}").next('.selectize-control').find('.item')
-        category_names = []
-        category_name.each ->
-          category_names.push($(this).text())
-        category_names = category_names.toString()
-        status = $(this).find("[name=resolution#{entry_id}]:checked").val()
-        comment = $(this).find("#complaint_comment_#{entry_id}")[0].value
-        resolution_comment = $(this).find("#complaint_resolution_comment_#{entry_id}")[0].value
+      if categories.length > 0
+        data.push({entry_id: entry_id, row_id: row_id, prefix: prefix, categories: categories, category_names: category_names, status: status, comment: comment, resolution_comment: resolution_comment})
 
-        if categories.length > 0
-          data.push({entry_id: entry_id, row_id: row_id, prefix: prefix, categories: categories, category_names: category_names, status: status, comment: comment, resolution_comment: resolution_comment})
+  std_msg_ajax(
+    method: 'POST'
+    url: "/escalations/api/v1/escalations/webcat/complaint_entries/master_submit"
+    data: {data: data}
+    success: (response) ->
+      $('#loader-modal').modal 'hide'
 
-    std_msg_ajax(
-      method: 'POST'
-      url: "/escalations/api/v1/escalations/webcat/complaint_entries/master_submit"
-      data: {data: data}
-      success: (response) ->
-        $('#loader-modal').modal 'hide'
+      errors = []
 
-        errors = []
+      json = JSON.parse(response)
 
-        json = JSON.parse(response)
+      table = $('#complaints-index').DataTable()
 
-        table = $('#complaints-index').DataTable()
-
-        for entry in json
-          if entry.error == true
-            errors.push(entry.entry_id)
-          else
-            temp_row = table.row(entry.row_id)
-            temp_row.data().status = entry.status
-            temp_row.data().resolution = entry.resolution
-            temp_row.data().internal_comment = entry.comment
-            temp_row.data().resolution_comment = entry.resolution_comment
-            temp_row.data().category = entry.category_names
-            temp_row.data().category_names = entry.category_names
-            temp_row.invalidate().draw()
-            temp_row.child().remove()
-            temp_row.child(format(temp_row)).show()
-
-            $('#input_cat_'+ entry.entry_id).selectize {
-              persist: false,
-              create: false,
-              maxItems: 5
-              valueField: 'category_id',
-              labelField: 'category_name',
-              searchField: ['category_name', 'category_code'],
-              options: AC.WebCat.createSelectOptions()
-              items: selected_options(entry.categories)
-            }
-            $('#input_cat_pending'+ entry.entry_id).selectize {
-              persist: false,
-              create: false,
-              maxItems: 5
-              valueField: 'category_id',
-              labelField: 'category_name',
-              searchField: ['category_name', 'category_code'],
-              options: AC.WebCat.createSelectOptions()
-              items: selected_options(entry.categories)
-            }
-
-        if errors.length > 0
-          std_msg_error("The following entries could not be saved: #{errors.toString()}. The rest (if any) were successful",'')
+      for entry in json
+        if entry.error == true
+          errors.push(entry.entry_id)
         else
-          std_msg_success("All entries were succesfully submitted and saved.","")
+          temp_row = table.row(entry.row_id)
+          temp_row.data().status = entry.status
+          temp_row.data().resolution = entry.resolution
+          temp_row.data().internal_comment = entry.comment
+          temp_row.data().resolution_comment = entry.resolution_comment
+          temp_row.data().category = entry.category_names
+          temp_row.data().category_names = entry.category_names
+          temp_row.invalidate().draw()
+          temp_row.child().remove()
+          temp_row.child(format(temp_row)).show()
 
-        tds = $('#complaints-index tbody').closest('td')
-        for td in tds
-          if td.className == ''
-            td.classList.add('nested-complaint-data-wrapper')
+          $('#input_cat_'+ entry.entry_id).selectize {
+            persist: false,
+            create: false,
+            maxItems: 5
+            valueField: 'category_id',
+            labelField: 'category_name',
+            searchField: ['category_name', 'category_code'],
+            options: AC.WebCat.createSelectOptions()
+            items: selected_options(entry.categories)
+          }
+          $('#input_cat_pending'+ entry.entry_id).selectize {
+            persist: false,
+            create: false,
+            maxItems: 5
+            valueField: 'category_id',
+            labelField: 'category_name',
+            searchField: ['category_name', 'category_code'],
+            options: AC.WebCat.createSelectOptions()
+            items: selected_options(entry.categories)
+          }
 
-      error: (response) ->
-        $('#loader-modal').modal 'hide'
-        std_msg_error("Unable to submit changes for selected entries.","", reload: false)
-    , this)
-  else
-    std_msg_error("Submit changes functionality is only enabled when at least one Complaint entry and " +
-                  "at least one category for an entry is selected. Please try again.","")
+      if errors.length > 0
+        std_msg_error("The following entries could not be saved: #{errors.toString()}. The rest (if any) were successful.",'')
+      else
+        std_msg_success("All entries were succesfully submitted and saved.","")
+
+      tds = $('#complaints-index tbody').closest('td')
+      for td in tds
+        if td.className == ''
+          td.classList.add('nested-complaint-data-wrapper')
+
+    error: (response) ->
+      $('#loader-modal').modal 'hide'
+      std_msg_error("Unable to submit changes for selected entries.","", reload: false)
+  , this)
+
 
 window.verifyMasterSubmit = () ->
+  boolean = false
   if $('.shown').length > 0 && $('.has-items').length > 0
-    return true
-  return false
+    $('.has-items').each ->
+      if (!$(this).closest('tr').hasClass("pending"))
+        boolean = true
+  return boolean
 $ ->
   $(document).ready ->
     if window.location.pathname != '/escalations/webcat/complaints'
