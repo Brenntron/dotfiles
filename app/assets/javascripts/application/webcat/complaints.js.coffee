@@ -1020,8 +1020,10 @@ window.click_table_buttons = (complaint_table, button)->
     row.child.hide()
     tr.removeClass 'shown'
     tr.addClass 'not-shown'
-    if $('.shown').length == 0
+
+    if verifyMasterSubmit() == false
       $('#master-submit').prop('disabled', true)
+
   else
     # Open this row
     row.child(format(row)).show()
@@ -1037,8 +1039,13 @@ window.click_table_buttons = (complaint_table, button)->
       valueField: 'category_id',
       labelField: 'category_name',
       searchField: ['category_name', 'category_code'],
-      options: AC.WebCat.createSelectOptions()
-      items: selected_options(row.data().category)
+      options: AC.WebCat.createSelectOptions(),
+      items: selected_options(row.data().category),
+      onItemAdd: ->
+        $('#master-submit').prop('disabled', false)
+      onItemRemove: ->
+        if $(this)[0].items.length == 0
+          $('#master-submit').prop('disabled', true)
     }
     # Check to see which columns should be displayed
     $('.toggle-vis-nested').each ->
@@ -1052,7 +1059,8 @@ window.click_table_buttons = (complaint_table, button)->
         $('.complaint-entry-table td, .complaint-entry-table th').each ->
           if $(button).hasClass(checkbox_trigger)
             $(button).hide()
-    if $('#master-submit').prop('disabled') == true
+
+    if verifyMasterSubmit() == true
       $('#master-submit').prop('disabled', false)
 
 window.populate_webcat_index_table = (filter) ->
@@ -1469,6 +1477,10 @@ window.master_submit = () ->
     std_msg_error("Submit changes functionality is only enabled when at least one Complaint entry and " +
                   "at least one category for an entry is selected. Please try again.","")
 
+window.verifyMasterSubmit = () ->
+  if $('.shown').length > 0 && $('.has-items').length > 0
+    return true
+  return false
 $ ->
   $(document).ready ->
     if window.location.pathname != '/escalations/webcat/complaints'
