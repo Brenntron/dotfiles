@@ -1469,7 +1469,6 @@ window.master_submit = () ->
             td.classList.add('nested-complaint-data-wrapper')
 
       error: (response) ->
-        console.log('wtf')
         $('#loader-modal').modal 'hide'
         std_msg_error("Unable to submit changes for selected entries.","", reload: false)
     , this)
