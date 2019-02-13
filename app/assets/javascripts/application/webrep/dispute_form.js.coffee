@@ -30,8 +30,7 @@ $ ->
           std_msg_error("Unable to create duplicate entries: #{response.json.errors}. The other entries (if any) were successfully created.","", reload: true)
 
       error: (response) ->
-        $('#loader-modal').hide()
-        $('.modal-backdrop').remove();
+        $('#loader-modal').modal 'hide'
         std_api_error(response, "Dispute was not created.", reload: false)
     )
 
