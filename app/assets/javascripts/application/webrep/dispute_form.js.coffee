@@ -7,8 +7,6 @@ $ ->
       keyboard: false
     })
 
-    $('#loader-modal').show()
-
     ips_urls = this.ips_urls.value
     assignee = this.assignee.value
     priority = this.priority.value
