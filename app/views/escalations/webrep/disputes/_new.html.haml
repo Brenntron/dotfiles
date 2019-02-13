@@ -14,8 +14,7 @@
     %datalist#assignee-list
   .form-group
     %label.content-label-sm Priority
-  .form-group
-    %select#priority.content-label-md
+    %select.form-control#priority
       %option P1
       %option P2
       %option{:selected => 'selected'} P3
@@ -23,8 +22,7 @@
       %option P5
   .form-group
     %label.content-label-sm Ticket Type
-  .form-group
-    %select.content-label-md#ticket-type-dropdown
+    %select.form-control#ticket-type-dropdown
       %option{:selected => 'selected'} Web
       %option Email
       %option Email & Web
