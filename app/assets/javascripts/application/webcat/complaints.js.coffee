@@ -1142,15 +1142,6 @@ open_selected = (selected_rows, toggle) ->
         window.open("http://"+selected_rows.data()[i].ip_address)
     i++
 
-
-$ ->
-  $('#complaints_check_box').click ->
-    if $('#complaints_check_box').prop('checked')
-      $('#complaints-index').DataTable().rows().select()
-    else
-      $('#complaints-index').DataTable().rows().deselect()
-  return
-
 window.open_viewable = () ->
   selected_rows = $('#complaints-index').DataTable().rows()
   open_selected(selected_rows, true)
@@ -1332,6 +1323,7 @@ window.triggerTooltips = (item) ->
   return
 
 $ ->
+
   $('.expand-all').click ->
     complaint_table = $('#complaints-index').DataTable()
     td = $('#complaints-index').find('td.expandable-row-column')
@@ -1372,6 +1364,14 @@ $ ->
             $('.complaint-entry-table td, .complaint-entry-table th').each ->
               if $(button).hasClass(checkbox_trigger)
                 $(button).hide()
+
+
+  $('#complaints_check_box').click ->
+    if $('#complaints_check_box').prop('checked')
+      $('#complaints-index').DataTable().rows().select()
+    else
+      $('#complaints-index').DataTable().rows().deselect()
+  return
 
   $(document).ready ->
     if window.location.pathname != '/escalations/webcat/complaints'
