@@ -294,12 +294,6 @@ class DisputeEntry < ApplicationRecord
         self.status = RESOLVED
         self.case_closed_at = resolved_at
         self.case_resolved_at = resolved_at
-      else
-        self.resolution_comment = Dispute::AUTORESOLVED_UNCHANGED_MESSAGE
-        self.resolution = STATUS_RESOLVED_UNCHANGED
-        self.status = RESOLVED
-        self.case_closed_at = resolved_at
-        self.case_resolved_at = resolved_at
       end
     end
 
