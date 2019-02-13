@@ -1332,6 +1332,43 @@ window.triggerTooltips = (item) ->
   return
 
 $ ->
+  $('.expand-all').click ->
+    complaint_table = $('#complaints-index').DataTable()
+    td = $('#complaints-index').find('td.expandable-row-column')
+
+    td.each ->
+      tr = $(this).closest('tr')
+      row = complaint_table.row(tr)
+      row.child(format(row)).show()
+
+      td = $(tr).next('tr').find('td:first')
+      $(td).addClass 'nested-complaint-data-wrapper'
+      unless $(td).hasClass 'nested-complaint-data-wrapper'
+        tr.find('td:first').addClass 'nested-complaint-data-wrapper'
+
+      $('#input_cat_'+ row.data().entry_id).selectize {
+        persist: false,
+        create: false,
+        maxItems: 5,
+        valueField: 'category_id',
+        labelField: 'category_name',
+        searchField: ['category_name', 'category_code'],
+        options: AC.WebCat.createSelectOptions()
+        items: selected_options(row.data().category)
+      }
+
+      $('.toggle-vis-nested').each ->
+        checkbox_trigger = $(button).attr('data-column')
+        checkbox = $(this).find('input')
+        if $(checkbox).prop('checked')
+          $('.complaint-entry-table td, .complaint-entry-table th').each ->
+            if $(button).hasClass(checkbox_trigger)
+              $(button).show()
+        else if $(checkbox).prop('checked') == false
+          $('.complaint-entry-table td, .complaint-entry-table th').each ->
+            if $(button).hasClass(checkbox_trigger)
+             $(button).hide()
+
   $(document).ready ->
     if window.location.pathname != '/escalations/webcat/complaints'
       $('#filter-complaints').hide()

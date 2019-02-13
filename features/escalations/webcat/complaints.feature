@@ -35,13 +35,14 @@ Feature: Webcat complaints
     And a complaint entry with trait "high_telemetry" exists
     And a complaint entry preload exists
     And I goto "/escalations/webcat/complaints?f=ALL"
-    Then I wait for "7" seconds
+    Then I wait for "3" seconds
     And I should see "Arts"
     Then I should not see "Update"
     And I click ".expand-all"
+    Then I wait for "3" seconds
+    Then take a screenshot
     Then I should see "Commit"
     Then I should see "Decline"
-    Then I should see "Submit"
 
   @javascript
   Scenario: A user does not need to review a low telemetry site
