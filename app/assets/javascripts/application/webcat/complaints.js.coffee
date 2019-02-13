@@ -4,7 +4,7 @@ window.updateURI = (complaint_entry_id) ->
   $('#loader-modal').modal({
     keyboard: false
   })
-  
+
   uri = $("#complaint_prefix_#{complaint_entry_id}").val()
 
   std_msg_ajax(
@@ -31,12 +31,6 @@ window.updateURI = (complaint_entry_id) ->
 
         $("#history-#{complaint_entry_id}").replaceWith('<button class="secondary" id="history-' + complaint_entry_id + '" onclick="history_dialog('+complaint_entry_id+')">History</button>')
         $("#domain-#{complaint_entry_id}").replaceWith('<button class="secondary" id="domain-' + complaint_entry_id + '" onclick="domain_whois(\''+response.domain+'\')">Domain</button>')
-
-        std_msg_success("Success",['URI updated.'])
-
-
-
-
 
   )
 
