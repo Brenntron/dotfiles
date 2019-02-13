@@ -43,6 +43,7 @@ Feature: Webcat complaints
     Then take a screenshot
     Then I should see "Commit"
     Then I should see "Decline"
+    Then I should see "Submit"
 
   @javascript
   Scenario: A user does not need to review a low telemetry site
