@@ -1,4 +1,12 @@
 module ApplicationHelper
+  def bugzilla_rest_token
+    session['bugzilla_rest_token']
+  end
+
+  def bugzilla_api_key
+    current_user&.bugzilla_api_key
+  end
+
   def bootstrap_class_for(flash_type)
     case flash_type
       when "success"

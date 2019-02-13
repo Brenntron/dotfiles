@@ -14,15 +14,6 @@ PATH
     rule_test_api (0.1.4)
       her (>= 0.7.2)
 
-PATH
-  remote: vendor/gems/sfbugzilla
-  specs:
-    sfbugzilla (0.1.6)
-      highline
-      mime-types
-      ruby-bugzilla (> 0.6.3)
-      term-ansicolor
-
 GEM
   remote: https://rubygems.org/
   specs:
@@ -63,6 +54,12 @@ GEM
       activemodel (= 5.2.1)
       activesupport (= 5.2.1)
       arel (>= 9.0)
+    activerecord-session_store (1.1.1)
+      actionpack (>= 4.0)
+      activerecord (>= 4.0)
+      multi_json (~> 1.11, >= 1.11.2)
+      rack (>= 1.5.2, < 3)
+      railties (>= 4.0)
     activestorage (5.2.1)
       actionpack (= 5.2.1)
       activerecord (= 5.2.1)
@@ -77,7 +74,7 @@ GEM
     ajax-datatables-rails (0.4.3)
       railties (>= 4.0)
     arel (9.0.0)
-    autoprefixer-rails (9.3.1)
+    autoprefixer-rails (9.4.2)
       execjs
     awesome_nested_set (3.1.4)
       activerecord (>= 4.0.0, < 5.3)
@@ -101,6 +98,10 @@ GEM
     bootstrap-sass (3.3.7)
       autoprefixer-rails (>= 5.2.1)
       sass (>= 3.3.4)
+    bugzilla (0.10.0)
+      gruff (~> 0)
+      highline
+      xmlrpc (~> 0.3.0)
     builder (3.2.3)
     byebug (10.0.2)
     cancancan (2.3.0)
@@ -273,7 +274,7 @@ GEM
       multi_json (~> 1.0)
       rspec (>= 2.0, < 4.0)
     jsonapi-renderer (0.2.0)
-    jsonpath (0.9.6)
+    jsonpath (0.9.8)
       multi_json
       to_regexp (~> 0.2.1)
     kaminari (1.1.1)
@@ -433,9 +434,6 @@ GEM
       rspec-mocks (~> 3.8.0)
       rspec-support (~> 3.8.0)
     rspec-support (3.8.0)
-    ruby-bugzilla (0.6.4)
-      gruff (~> 0)
-      highline
     rubyXL (3.3.30)
       nokogiri (>= 1.4.4)
       rubyzip (>= 1.1.6)
@@ -473,8 +471,6 @@ GEM
       sprockets (>= 3.0.0)
     stomp (1.4.6)
     temple (0.8.0)
-    term-ansicolor (1.7.0)
-      tins (~> 1.0)
     therubyracer (0.12.3)
       libv8 (~> 3.16.14.15)
       ref
@@ -485,7 +481,6 @@ GEM
     thor (0.19.4)
     thread_safe (0.3.6)
     tilt (2.0.9)
-    tins (1.20.2)
     to_regexp (0.2.1)
     turbolinks (5.2.0)
       turbolinks-source (~> 5.2)
@@ -525,12 +520,14 @@ PLATFORMS
 
 DEPENDENCIES
   active_model_serializers (= 0.10.8)
+  activerecord-session_store (= 1.1.1)
   ajax-datatables-rails (~> 0.4.0)
   awesome_nested_set (= 3.1.4)
   awesome_print (= 1.8.0)
   aws-sdk (= 2.11.170)
   bootstrap-multiselect-rails (~> 0.9.9)
   bootstrap-sass (~> 3.3.7)
+  bugzilla
   byebug (= 10.0.2)
   cancancan (= 2.3.0)
   capybara (= 2.11.0)
@@ -592,11 +589,9 @@ DEPENDENCIES
   rb-fsevent (= 0.10.3)
   rmagick (~> 2.16.0)
   rspec-rails (= 3.8.1)
-  ruby-bugzilla (~> 0.6.4)
   rubyXL (= 3.3.30)
   rule_test_api!
   selectize-rails (~> 0.12.4)
-  sfbugzilla!
   simple_form (= 4.0.1)
   simplecov (= 0.16.1)
   sprockets (~> 3.7.1)

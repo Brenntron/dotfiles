@@ -39,6 +39,7 @@ Feature: Disputes
 
   @javascript
   Scenario: a user takes a dispute and status is updated to assigned
+    Then pending
     Given a user with role "webrep user" exists with cvs_username, "Cucumber", exists and is logged in
     Given the following users exist
     |id|cvs_username|
@@ -53,6 +54,7 @@ Feature: Disputes
 
   @javascript
   Scenario: a user takes a dispute, returns a dispute, and takes the dispute again
+    Then pending
     Given a user with role "webrep user" exists with cvs_username, "Cucumber", exists and is logged in
     Given the following users exist
       |id|cvs_username|

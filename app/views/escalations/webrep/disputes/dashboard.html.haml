@@ -1,94 +1,92 @@
 .content-wrapper
-  .dashboard-header-area.my-dashboard-header-area
+  .dashboard-header-area
     .row
-      .col-xs-3.dashboard-left-data
-        %h1 My Dashboard
-        %span.my-dashboard-icon
-        %h5= current_user.display_name
-        %p.dashboard-details
-          = current_user.cvs_username
-
       .col-xs-4
-        %table.tickets-totals-table
-          %tr
-            %td.ticket-total.open= Dispute.assigned_disputes.where(user: current_user).count
-            %td.entries-total= DisputeEntry.joins(:dispute).where(disputes: {user: current_user, status: Dispute::ASSIGNED}).count
-            %td
-              %span.ticket-type-label Open
-              Tickets / Total Entries per Ticket
-          %tr
-            %td.ticket-total.in-progress= Dispute.in_progress_disputes.where(user: current_user).count
-            %td.entries-total= DisputeEntry.joins(:dispute).where(disputes: {user: current_user, status: [ Dispute::STATUS_RESEARCHING, Dispute::STATUS_ESCALATED, Dispute::STATUS_CUSTOMER_PENDING, Dispute::STATUS_ON_HOLD, Dispute::STATUS_REOPENED ]}).count
-            %td
-              %span.ticket-type-label In Progress
-              Tickets / Total Entries per Ticket
-          %tr
-            %td.ticket-total.closed= Dispute.closed_disputes.where(user: current_user).count
-            %td.entries-total= DisputeEntry.joins(:dispute).where(disputes: {user: current_user, status: Dispute::RESOLVED}).count
-            %td
-              %span.ticket-type-label Closed
-              Tickets / Total Entries per Ticket
-
-      .col-xs-5
+        .dashboard-wrapper
+          .dashboard-title
+            %h1 My Dashboard
+            %span.my-dashboard-icon
 
 
-  .row
-    .col-xs-3.temp-spacer
-      %h2 Generate Report
-      .report-form-wrapper
-        = simple_form_for :report, url: resolution_report_escalations_webrep_disputes_path, method: :get,
-                            html: { target: :_blank } do |rpt_form|
-          = rpt_form.input :date_from, as: :string, input_html: {type: :date}
-          = rpt_form.input :date_to, as: :string, input_html: {type: :date}
-          = rpt_form.input :period, collection: ['Daily', 'Weekly', 'Monthly'], selected: 'Daily'
-          = rpt_form.submit 'Create Report', class: 'button_primary create-report', data: { disable_with: false }
-      .report-display-wrapper
+          .user-info
+            %h5= current_user.display_name
+            %p.dashboard-details
+              = current_user.cvs_username
+            %input#user_id{type: 'hidden', name: 'user_id', value: "#{current_user.id}"}
+            %input{:name => "token", :type => "hidden", :value => "#{current_user.authentication_token}"}
+            %input{:type => "hidden", :name => "xml_token", :value => "#{xml_token}"}
+            %input#team_ids{:type => "hidden", :name => "team_ids", :value => "#{current_user.my_team.pluck(:id).to_s}"}
 
-    - if current_user&.has_role?('big_email_honcho')
-      .col-xs-9.temp-spacer
-        %h2 Edit Rulehit Resolution Mailer Templates
-        %a#resolution-email-editor.nav-page-button{href: '/rulehit_resolution_mailer_templates'} Edit Email Templates
+      .col-xs-2
+        .dashboard-wrapper
+          .button-wrapper
+            - if current_user&.has_role?('big_email_honcho')
+              %a.toolbar-button#resolution-email-editor{href: '/rulehit_resolution_mailer_templates'} Edit Rule Hit Email Templates
 
+      .col-xs-6.text-right
+        .dashboard-time-wrapper
+          .dashboard-time
+            %label
+            %button.toolbar-button.icon-calendar Change Time Span
 
+            %input#tickets_date_range{:type => 'text'}
 
-  .dashboard-header-area.team-dashboard-header-area
-    .row
-      .col-xs-3.dashboard-left-data
-        %h1 My Team
-        %span.team-icon
-        %h5 Web Reputation Escalations
-        %p.dashboard-details
-          Manager:
-          = current_user.team_manager.display_name
+          .dashboard-time-ticket
+            .button-wrapper
+              %button.arrow-left#ticket-view-shortcut
 
-      .col-xs-4.dashboard-left-data
-        %table.tickets-totals-table
-          %tr
-            %td.ticket-total.open-team= Dispute.assigned_disputes.my_team(current_user).count
-            -#%td.entries-total= DisputeEntry.open_entries.my_team(current_user).count
-            %td.entries-total= DisputeEntry.joins(:dispute).where(disputes: {status: Dispute::ASSIGNED}).my_team(current_user).count
-            %td
-              %span.ticket-type-label Open
-              Tickets / Total Entries per Ticket
-          %tr
-            %td.ticket-total.in-progress-team= Dispute.in_progress_disputes.my_team(current_user).count
-            %td.entries-total= DisputeEntry.joins(:dispute).where(disputes: {status: [ Dispute::STATUS_RESEARCHING, Dispute::STATUS_ESCALATED, Dispute::STATUS_CUSTOMER_PENDING, Dispute::STATUS_ON_HOLD, Dispute::STATUS_REOPENED ]}).my_team(current_user).count
-            %td
-              %span.ticket-type-label In Progress
-              Tickets / Total Entries per Ticket
-          %tr
-            %td.ticket-total.closed-team= Dispute.closed_disputes.my_team(current_user).count
-            %td.entries-total= DisputeEntry.joins(:dispute).where(disputes: {status: Dispute::RESOLVED}).my_team(current_user).count
-            %td
-              %span.ticket-type-label Closed
-              Tickets / Total Entries per Ticket
+      #dashboard-tab-list.container
+        %ul.nav.nav-tabs{role: 'tablist'}
+          %li.active{role: 'presentation'}
+            %span.down-arrow
+            %a.white-user.ticket-owner-button.user-icon-stg-1.bold{'data-toggle': 'tab', role: 'tab', 'aria-controls': 'my-tickets', href: '#my-tickets'} My Tickets
+          %li{role: 'presentation'}
+            %span.down-arrow
+            %a.group-user-white.icon-team-grey.user-icon-stg.bold{'data-toggle': 'tab', role: 'tab', 'aria-controls': 'my-team-tickets', href: '#my-team-tickets'} My Team Tickets
+          %li{role: 'presentation'}
+            -# TODO Add 'All Tickets'
+            -#%span.down-arrow
+            -#%a.all-tickets-white.icon-all-tickets-grey.user-icon-stg.bold{'data-toggle': 'tab', role: 'tab', 'aria-controls': 'all-tickets', href: '#all-tickets'} All Tickets
+          %li{role: 'presentation'}
+            -# TODO Add 'Custom User Tickets'
+            -#%span.down-arrow
+            -#%a.custom-user-white.icon-custom-user-grey.user-icon-stg.bold{'data-toggle': 'tab', role: 'tab', 'aria-controls': 'select-custom-users', href: '#select-custom-users'} Select Custom Users
 
-      .col-xs-5
-        %h5 Team Members
-        %ul.multi-col
-          - current_user.my_team.each do |teammate|
-            - unless teammate.cvs_username == current_user.cvs_username
-              %li.dashboard-details #{teammate.display_name} (#{teammate.cvs_username})
+        .dashboard-submission-area
+          %label#total-valid-ticket-count.right-vertical-separator.bold.font-lg
+          %label#total-valid-entry-count.font-lg
+          %label.uppercase.right-vertical-separator.bold Valid Total Tickets / Entries Submission
+          %label#total-invalid-ticket-count.uppercase.icon-invalid-grey.user-icon-stg.invalid-stg.bold
 
-  .row
-    .col-xs-12.temp-spacer
+        .dashboard-export-report.left-vertical-separator
+          %span.dropdown
+            %button.toolbar-button.export-button-white.dropdown-toggle#export-reports-dropdown-button{'data-toggle': 'dropdown', 'aria-haspopup': 'true', 'aria-expanded': 'false'}
+              Export Report
+            .dropdown-menu#export-reports-dropdown{'aria-labelledby': 'export-reports-dropdown-button'}
+              %ul
+                %li
+                  %input.report-checkbox#my_tickets_report{type: 'checkbox', checked: 'checked', name: 'mytickets'} My Tickets
+                %li
+                  %input.report-checkbox#my_team_tickets_report{type: 'checkbox', checked: 'checked', name: 'myteamtickets'} My Team Tickets
+                -#%li
+                -#  %input.report-checkbox#all_tickets_report{type: 'checkbox', checked: 'checked', name: 'alltickets'} All Tickets
+                -#%li
+                -#  %input.report-checkbox#custom_tickets_report{type: 'checkbox', checked: 'checked', name: 'customtickets'} Custom Users Tickets
+              %hr
+              %button#export-reports-button.primary
+                Export
+
+  -# TODO Hookup exporting. This can be simple for first launch. Later we'll add options to select what gets exported.
+
+  .tab-content.dashboard-tab-content
+    #my-tickets.tab-pane.active{role: 'tabpanel'}
+      = render 'escalations/webrep/disputes/single_user_reports'
+
+    #my-team-tickets.tab-pane{role: 'tabpanel'}
+      = render 'escalations/webrep/disputes/multi_user_reports'
+
+    #all-tickets.tab-pane{role: 'tabpanel'}
+    -#  Add render to multi user report later
+
+    #select-custom-users.tab-pane{role: 'tabpanel'}
+    -#  Add render to single or multi user report depending on how many users are selected
