@@ -5,11 +5,6 @@ $(document).ready ->
       std_msg_error('No rows selected', ['Please select at least one row.'])
       return false
 
-  $('span#adjust-wlbl').on 'show.bs.dropdown', ->
-    if $('.dispute_check_box:checked').length == 0
-      std_msg_error('No rows selected', ['Please select a row.'])
-      return false
-
 window.select_or_deselect_all = (dispute_id)->
 
   $('.dispute-entry-checkbox_' + dispute_id).prop('checked', $('#' + dispute_id).prop('checked'))
@@ -1727,7 +1722,7 @@ $ ->
       std_msg_error('No rows selected', ['Please select at least one row.'])
       return false
 
-    else if $('.dispute_check_box:checked').length == 1
+    else if $('.dispute-entry-checkbox:checked').length == 1
       tbody = $('#wlbl_adjust_entries_index').find('table.dispute_tool_current').find('tbody')
       show_content = $('#wlbl_adjust_entries_index').find('.wlbl-entry-content')
       if !show_content[0]
@@ -1761,73 +1756,71 @@ $ ->
 
       #    $(tbody).empty()
       dropdown_wrapper = $(this).parent()
-      if ($('.dispute_check_box:checked').length > 0)
-        submit_button = $('#wlbl_adjust_entries_index').find('.dropdown-submit-button')
-        entry_content = ''
 
-        $('.dispute-entry-checkbox:checked').each ->
+      submit_button = $('#wlbl_adjust_entries_index').find('.dropdown-submit-button')
+      entry_content = ''
 
-          entry_row = $(this).parent().parent()[0]
-          entry_content = $(entry_row).find('.entry-col-content').text()
-          wbrs = $(entry_row).find('.entry-col-wbrs-score').text()
+      $('.dispute-entry-checkbox:checked').each ->
 
-          data = {
+        entry_row = $(this).parent().parent()[0]
+        entry_content = $(entry_row).find('.entry-col-content').text()
+        wbrs = $(entry_row).find('.entry-col-wbrs-score').text()
+
+        data = {
 # Send entry content to reptool
-            'entry' : entry_content
-          }
+          'entry' : entry_content
+        }
 
-          headers = {'Token': $('input[name="token"]').val(), 'Xmlrpc-Token': $('input[name="xml_token"]').val()}
-          $.ajax(
-            url: '/escalations/api/v1/escalations/webrep/disputes/rule_ui_wlbl_get_info_for_form'
-            method: 'GET'
-            headers: headers
-            data: data
-            dataType: 'json'
-            success: (response) ->
+        headers = {'Token': $('input[name="token"]').val(), 'Xmlrpc-Token': $('input[name="xml_token"]').val()}
+        $.ajax(
+          url: '/escalations/api/v1/escalations/webrep/disputes/rule_ui_wlbl_get_info_for_form'
+          method: 'GET'
+          headers: headers
+          data: data
+          dataType: 'json'
+          success: (response) ->
 #values will be in the format of BL-med, BL-weak, BL-heavy   (same with WL)
 
-              response = JSON.parse(response)
-              if response.data != ""
+            response = JSON.parse(response)
+            if response.data != ""
 
-                $(response.data).each ->
-                  if String(this) == 'WL-weak'
-                    $(wl_weak[0]).prop('checked', true)
-                    wl_weak_status = 'true'
-                  if String(this) == 'WL-med'
-                    $(wl_med[0]).prop('checked', true)
-                    wl_med_status = 'true'
-                  if String(this) == 'WL-heavy'
-                    $(wl_heavy[0]).prop('checked', true)
-                    wl_heavy_status = 'true'
-                  if String(this) == 'BL-weak'
-                    $(bl_weak[0]).prop('checked', true)
-                    bl_weak_status = 'true'
-                  if String(this) == 'BL-med'
-                    $(bl_med[0]).prop('checked', true)
-                    bl_med_status = 'true'
-                  if String(this) == 'BL-heavy'
-                    $(bl_heavy[0]).prop('checked', true)
-                    bl_heavy_status = 'true'
+              $(response.data).each ->
+                if String(this) == 'WL-weak'
+                  $(wl_weak[0]).prop('checked', true)
+                  wl_weak_status = 'true'
+                if String(this) == 'WL-med'
+                  $(wl_med[0]).prop('checked', true)
+                  wl_med_status = 'true'
+                if String(this) == 'WL-heavy'
+                  $(wl_heavy[0]).prop('checked', true)
+                  wl_heavy_status = 'true'
+                if String(this) == 'BL-weak'
+                  $(bl_weak[0]).prop('checked', true)
+                  bl_weak_status = 'true'
+                if String(this) == 'BL-med'
+                  $(bl_med[0]).prop('checked', true)
+                  bl_med_status = 'true'
+                if String(this) == 'BL-heavy'
+                  $(bl_heavy[0]).prop('checked', true)
+                  bl_heavy_status = 'true'
 
-                $(show_content[0]).text(entry_content)
-                $(show_wbrs[0]).text(wbrs)
-                $(show_wlbl[0]).text(response.data)
-                $(submit_button).attr('disabled', false)
-              else
-                $(show_content[0]).text(entry_content)
-                $(show_wbrs[0]).text(wbrs)
-                $(show_wlbl[0]).text('Not on a list')
-                $(submit_button).attr('disabled', false)
+              $(show_content[0]).text(entry_content)
+              $(show_wbrs[0]).text(wbrs)
+              $(show_wlbl[0]).text(response.data)
+              $(submit_button).attr('disabled', false)
+            else
+              $(show_content[0]).text(entry_content)
+              $(show_wbrs[0]).text(wbrs)
+              $(show_wlbl[0]).text('Not on a list')
+              $(submit_button).attr('disabled', false)
 #this should probably call the resync data then reload the page, for an up to date score
 
-            error: (response) ->
-              popup_response_error(response, 'Error retrieving WL/BL Data')
-          )
+          error: (response) ->
+            popup_response_error(response, 'Error retrieving WL/BL Data')
+        )
 
-      else
-        $(dropdown_wrapper).removeClass('open')
-        std_msg_error('No rows selected', ['Please select one row.'])
-    else if $('.dispute_check_box:checked').length > 1
+
+    else if $('.dispute-entry-checkbox:checked').length > 1
       get_multi_wl_bl()
 
   $('#set-related-dispute-submit-button').click ->
