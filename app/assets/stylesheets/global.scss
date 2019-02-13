@@ -4052,14 +4052,7 @@ td.wbrs-highlight, td.sbrs-highlight {
   width: 100%;
 }
 
-#advanced-search-wrapper input, #new-complaint-form input, #categorize-urls-form-wrapper input {
-  margin-bottom: 8px;
-  background-color: transparent;
-  border: 1px solid darken($faint-neutral-color, 5%);
-  border-radius: 1px;
-}
-
-#new-dispute-form input {
+#advanced-search-wrapper input, #new-complaint-form input, #categorize-urls-form-wrapper input, #new-dispute-form input {
   margin-bottom: 8px;
   background-color: transparent;
   border: 1px solid darken($faint-neutral-color, 5%);
