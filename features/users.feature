@@ -36,6 +36,7 @@ Feature: User Accounts
 
   @javascript
   Scenario: A regular user should see a not found flash message
+    Then pending
     Given a user with role "analyst" exists and is logged in
     And the following bugs exist:
       | id      | bugzilla_id | state  | user_id | summary             | product | component   | version | description       |
@@ -250,6 +251,7 @@ Feature: User Accounts
 
   @javascript
   Scenario: A manager can add and remove team members on the relationships page.
+    Then pending
     Given a manager exists and is logged in
     And the following users exist
       | id | email                | cvs_username  | display_name        | parent_id | cec_username |

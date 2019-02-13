@@ -80,6 +80,7 @@ Rails.application.routes.draw do
     end
 
     resources :users, controller: '/users', only: [:index, :show, :update] do
+      resource :bugzilla_api_key, controller: '/bugzilla_api_keys', only: [:edit, :update]
 
       collection do
         get :results
@@ -199,6 +200,7 @@ Rails.application.routes.draw do
     end
   end
 
+  get 'sb_api/query_lookup' => 'sb_api#query_lookup'
 
   mount API::Base => '/escalations/api'
 

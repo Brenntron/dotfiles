@@ -2,6 +2,7 @@ source 'https://rubygems.org'
 
 gem 'rails', '5.2.1'
 gem 'haml', '~> 5.0.4'
+gem 'activerecord-session_store', '1.1.1'
 
 gem 'grape', '1.1.0'
 
@@ -20,12 +21,11 @@ gem 'net-ldap', '0.16.1'
 
 gem 'mysql2', '0.5.2'
 gem 'rmagick', '~> 2.16.0'
-gem 'ruby-bugzilla', '~> 0.6.4'
+gem 'bugzilla', require: 'bugzilla'
 
 gem 'xmlrpc'
 gem 'libv8', '3.16.14.19'
 
-gem 'sfbugzilla', path: './vendor/gems/sfbugzilla'
 gem 'rule_test_api', path: './vendor/gems/rule_test_api'
 gem 'her', '1.0.3'
 gem 'httpi', '2.4.4'
@@ -81,6 +81,8 @@ gem 'gzip', '1.0'
 gem 'rubyXL', '3.3.30'
 
 gem 'public_suffix', '~> 3.0'
+
+gem 'dotiw'
 
 group :development do
   gem 'thin', '1.7.2'
