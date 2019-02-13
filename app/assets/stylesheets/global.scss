@@ -6172,7 +6172,7 @@ table.dispute-entry-table tbody tr.selected {
   margin-bottom: 15px;
 }
 
-#new-complaint-wrapper .form-group {
+#new-complaint-wrapper .form-group, #new-dispute-wrapper .form-group {
   margin-bottom: 0;
 }
 
@@ -6274,6 +6274,7 @@ table.dispute-entry-table tbody tr.selected {
   border-radius: 0;
   height: 26px;
   margin-bottom: 8px;
+  padding: 0;
 }
 
 /**** Nested Complaint Table styles ****/
@@ -7984,10 +7985,6 @@ th.sorting_1, th.sorting_asc, th.sorting_desc {
 
 #edit-dispute-button {
   background-color: $faint-neutral-color;
-}
-
-#ticket-type-dropdown {
-  width: 115px;
 }
 
 #whois_content {
