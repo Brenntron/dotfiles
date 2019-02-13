@@ -248,7 +248,8 @@ ActiveRecord::Schema.define(version: 2019_01_29_160213) do
     t.string "phone"
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
-    t.index ["company_id", "name"], name: "index_customers_on_company_id_and_name", unique: true
+    t.index ["company_id", "name"], name: "index_customers_on_company_id_and_name"
+    t.index ["email"], name: "index_customers_on_email", unique: true
   end
 
   create_table "cves", options: "ENGINE=InnoDB DEFAULT CHARSET=latin1", force: :cascade do |t|
