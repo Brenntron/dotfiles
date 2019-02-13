@@ -103,6 +103,7 @@ Plug 'flazz/vim-colorschemes'
 Plug 'rafi/awesome-vim-colorschemes'
 Plug 'chrisharrisx/laser-theme'
 Plug 'exitface/synthwave.vim'
+Plug 'liuchengxu/space-vim-dark'
 
 call plug#end()
 
@@ -188,9 +189,6 @@ let g:airline#extensions#coc#enabeld = 1
 
 let g:airline_powerline_fonts = 1
 
-let g:airline_section_b = airline#section#create(['branch'])
-let g:airline_section_c = airline#section#create(['%<', 'file', '  ', 'readonly', 'hunks'])
-
 let g:airline#extensions#tabline#left_sep = ' '
 let g:airline#extensions#tabline#left_alt_sep = '|'
 
@@ -246,18 +244,10 @@ endif
 "nmap <silent> t<C-g> :TestVisit<CR>   " t Ctrl+g
 
 " Colorscheme
-set background=dark " or light if you prefer the light version
-set t_Co=256
-"let g:two_firewatch_italics=1
-color hybrid
-
-if (has("termguicolors"))
-  set termguicolors " 24-bit terminal
-else
-  let g:synthwave_termcolors=256 " 256 color mode
-endif
-
-let base16colorspace=256
+color space-vim-dark
+set termguicolors
+hi LineNr ctermbg=NONE guibg=NONE
+hi Comment cterm=italic
 
 " Markdown Syntax Support
 augroup markdown
