@@ -400,9 +400,11 @@ window.toolbar_research_adjust_wlbl_button =(button_tag) ->
 
 
 window.index_adjust_wlbl_button =(button_tag) ->
+
   checked_url = $('.dispute-entry-checkbox:checked')[0]
   entry_row = $(checked_url).parent().parent()[0]
-  url = $(entry_row).find('.entry-col-content').text()
+  urls = $('.entry-dispute-name:visible').text().split(",")
+
   list_types = $('.wl-bl-list-inline:checkbox:checked').map(() ->
     this.value
   ).toArray()
@@ -410,7 +412,35 @@ window.index_adjust_wlbl_button =(button_tag) ->
   wlbl_form = button_tag.form
 
   data = {
-    'urls': [ url ]
+    'urls': urls
+    'trgt_list': list_types
+    'note': wlbl_form.getElementsByClassName('adjust-wlbl-input')[0].value
+  }
+
+  if urls.length == 1
+    std_msg_ajax(
+      url: '/escalations/api/v1/escalations/webrep/disputes/uri_wlbl'
+      method: 'POST'
+      data: data
+      error_prefix: 'Error adjusting WL/BL.'
+      success_reload: true
+    )
+  else if urls.length > 1
+    bulk_adjust_wlbl_button(button_tag, urls)
+
+
+window.bulk_adjust_wlbl_button = (button_tag, urls) ->
+  checked_url = $('.dispute-entry-checkbox:checked')[0]
+  entry_row = $(checked_url).parent().parent()[0]
+
+  list_types = $('.wl-bl-list-inline:checkbox:checked').map(() ->
+    this.value
+  ).toArray()
+
+  wlbl_form = button_tag.form
+
+  data = {
+    'urls': urls
     'trgt_list': list_types
     'note': wlbl_form.getElementsByClassName('adjust-wlbl-input')[0].value
   }
@@ -1697,105 +1727,108 @@ $ ->
       std_msg_error('No rows selected', ['Please select at least one row.'])
       return false
 
-    tbody = $('#wlbl_adjust_entries_index').find('table.dispute_tool_current').find('tbody')
-    show_content = $('#wlbl_adjust_entries_index').find('.wlbl-entry-content')
-    if !show_content[0]
-      show_content = $('#wlbl_adjust_entries_index').find('.entry-dispute-name')
-    show_wlbl = $('#wlbl_adjust_entries_index').find('.wlbl-entry-wlbl')
-    show_wbrs = $('#wlbl_adjust_entries_index').find('.wlbl-current-entry-wbrs')
-    if !show_wbrs[0]
-      show_wbrs = $('#wlbl_adjust_entries_index').find('.current-wbrs-score')
-    wl_weak = $('#wlbl_adjust_entries_index').find('.wl-weak-checkbox')
-    wl_med = $('#wlbl_adjust_entries_index').find('.wl-med-checkbox')
-    wl_heavy = $('#wlbl_adjust_entries_index').find('.wl-heavy-checkbox')
-    bl_weak = $('#wlbl_adjust_entries_index').find('.bl-weak-checkbox')
-    bl_med = $('#wlbl_adjust_entries_index').find('.bl-med-checkbox')
-    bl_heavy = $('#wlbl_adjust_entries_index').find('.bl-heavy-checkbox')
+    else if $('.dispute_check_box:checked').length == 1
+      tbody = $('#wlbl_adjust_entries_index').find('table.dispute_tool_current').find('tbody')
+      show_content = $('#wlbl_adjust_entries_index').find('.wlbl-entry-content')
+      if !show_content[0]
+        show_content = $('#wlbl_adjust_entries_index').find('.entry-dispute-name')
+      show_wlbl = $('#wlbl_adjust_entries_index').find('.wlbl-entry-wlbl')
+      show_wbrs = $('#wlbl_adjust_entries_index').find('.wlbl-current-entry-wbrs')
+      if !show_wbrs[0]
+        show_wbrs = $('#wlbl_adjust_entries_index').find('.current-wbrs-score')
+      wl_weak = $('#wlbl_adjust_entries_index').find('.wl-weak-checkbox')
+      wl_med = $('#wlbl_adjust_entries_index').find('.wl-med-checkbox')
+      wl_heavy = $('#wlbl_adjust_entries_index').find('.wl-heavy-checkbox')
+      bl_weak = $('#wlbl_adjust_entries_index').find('.bl-weak-checkbox')
+      bl_med = $('#wlbl_adjust_entries_index').find('.bl-med-checkbox')
+      bl_heavy = $('#wlbl_adjust_entries_index').find('.bl-heavy-checkbox')
 
-    $(show_content[0]).empty()
-    $(show_wbrs[0]).empty()
-    $(show_wlbl[0]).empty()
-    $(wl_weak[0]).prop('checked', false)
-    $(wl_med[0]).prop('checked', false)
-    $(wl_heavy[0]).prop('checked', false)
-    $(bl_weak[0]).prop('checked', false)
-    $(bl_med[0]).prop('checked', false)
-    $(bl_heavy[0]).prop('checked', false)
-    wl_weak_status = 'false'
-    wl_med_status = 'false'
-    wl_heavy_status = 'false'
-    bl_weak_status = 'false'
-    bl_med_status = 'false'
-    bl_heavy_status = 'false'
+      $(show_content[0]).empty()
+      $(show_wbrs[0]).empty()
+      $(show_wlbl[0]).empty()
+      $(wl_weak[0]).prop('checked', false)
+      $(wl_med[0]).prop('checked', false)
+      $(wl_heavy[0]).prop('checked', false)
+      $(bl_weak[0]).prop('checked', false)
+      $(bl_med[0]).prop('checked', false)
+      $(bl_heavy[0]).prop('checked', false)
+      wl_weak_status = 'false'
+      wl_med_status = 'false'
+      wl_heavy_status = 'false'
+      bl_weak_status = 'false'
+      bl_med_status = 'false'
+      bl_heavy_status = 'false'
 
-    #    $(tbody).empty()
-    dropdown_wrapper = $(this).parent()
-    if ($('.dispute-entry-checkbox:checked').length > 0)
-      submit_button = $('#wlbl_adjust_entries_index').find('.dropdown-submit-button')
-      entry_content = ''
+      #    $(tbody).empty()
+      dropdown_wrapper = $(this).parent()
+      if ($('.dispute_check_box:checked').length > 0)
+        submit_button = $('#wlbl_adjust_entries_index').find('.dropdown-submit-button')
+        entry_content = ''
 
-      $('.dispute-entry-checkbox:checked').each ->
+        $('.dispute-entry-checkbox:checked').each ->
 
-        entry_row = $(this).parent().parent()[0]
-        entry_content = $(entry_row).find('.entry-col-content').text()
-        wbrs = $(entry_row).find('.entry-col-wbrs-score').text()
+          entry_row = $(this).parent().parent()[0]
+          entry_content = $(entry_row).find('.entry-col-content').text()
+          wbrs = $(entry_row).find('.entry-col-wbrs-score').text()
 
-        data = {
+          data = {
 # Send entry content to reptool
-          'entry' : entry_content
-        }
+            'entry' : entry_content
+          }
 
-        headers = {'Token': $('input[name="token"]').val(), 'Xmlrpc-Token': $('input[name="xml_token"]').val()}
-        $.ajax(
-          url: '/escalations/api/v1/escalations/webrep/disputes/rule_ui_wlbl_get_info_for_form'
-          method: 'GET'
-          headers: headers
-          data: data
-          dataType: 'json'
-          success: (response) ->
+          headers = {'Token': $('input[name="token"]').val(), 'Xmlrpc-Token': $('input[name="xml_token"]').val()}
+          $.ajax(
+            url: '/escalations/api/v1/escalations/webrep/disputes/rule_ui_wlbl_get_info_for_form'
+            method: 'GET'
+            headers: headers
+            data: data
+            dataType: 'json'
+            success: (response) ->
 #values will be in the format of BL-med, BL-weak, BL-heavy   (same with WL)
 
-            response = JSON.parse(response)
-            if response.data != ""
+              response = JSON.parse(response)
+              if response.data != ""
 
-              $(response.data).each ->
-                if String(this) == 'WL-weak'
-                  $(wl_weak[0]).prop('checked', true)
-                  wl_weak_status = 'true'
-                if String(this) == 'WL-med'
-                  $(wl_med[0]).prop('checked', true)
-                  wl_med_status = 'true'
-                if String(this) == 'WL-heavy'
-                  $(wl_heavy[0]).prop('checked', true)
-                  wl_heavy_status = 'true'
-                if String(this) == 'BL-weak'
-                  $(bl_weak[0]).prop('checked', true)
-                  bl_weak_status = 'true'
-                if String(this) == 'BL-med'
-                  $(bl_med[0]).prop('checked', true)
-                  bl_med_status = 'true'
-                if String(this) == 'BL-heavy'
-                  $(bl_heavy[0]).prop('checked', true)
-                  bl_heavy_status = 'true'
+                $(response.data).each ->
+                  if String(this) == 'WL-weak'
+                    $(wl_weak[0]).prop('checked', true)
+                    wl_weak_status = 'true'
+                  if String(this) == 'WL-med'
+                    $(wl_med[0]).prop('checked', true)
+                    wl_med_status = 'true'
+                  if String(this) == 'WL-heavy'
+                    $(wl_heavy[0]).prop('checked', true)
+                    wl_heavy_status = 'true'
+                  if String(this) == 'BL-weak'
+                    $(bl_weak[0]).prop('checked', true)
+                    bl_weak_status = 'true'
+                  if String(this) == 'BL-med'
+                    $(bl_med[0]).prop('checked', true)
+                    bl_med_status = 'true'
+                  if String(this) == 'BL-heavy'
+                    $(bl_heavy[0]).prop('checked', true)
+                    bl_heavy_status = 'true'
 
-              $(show_content[0]).text(entry_content)
-              $(show_wbrs[0]).text(wbrs)
-              $(show_wlbl[0]).text(response.data)
-              $(submit_button).attr('disabled', false)
-            else
-              $(show_content[0]).text(entry_content)
-              $(show_wbrs[0]).text(wbrs)
-              $(show_wlbl[0]).text('Not on a list')
-              $(submit_button).attr('disabled', false)
+                $(show_content[0]).text(entry_content)
+                $(show_wbrs[0]).text(wbrs)
+                $(show_wlbl[0]).text(response.data)
+                $(submit_button).attr('disabled', false)
+              else
+                $(show_content[0]).text(entry_content)
+                $(show_wbrs[0]).text(wbrs)
+                $(show_wlbl[0]).text('Not on a list')
+                $(submit_button).attr('disabled', false)
 #this should probably call the resync data then reload the page, for an up to date score
 
-          error: (response) ->
-            popup_response_error(response, 'Error retrieving WL/BL Data')
-        )
+            error: (response) ->
+              popup_response_error(response, 'Error retrieving WL/BL Data')
+          )
 
-    else
-      $(dropdown_wrapper).removeClass('open')
-      std_msg_error('No rows selected', ['Please select one row.'])
+      else
+        $(dropdown_wrapper).removeClass('open')
+        std_msg_error('No rows selected', ['Please select one row.'])
+    else if $('.dispute_check_box:checked').length > 1
+      get_multi_wl_bl()
 
   $('#set-related-dispute-submit-button').click ->
     dropdown = $('#set-related-dispute-div').parent()
@@ -1936,6 +1969,17 @@ window.populate_resolution_dropdown = (dispute_id) ->
 
 window.disputes_select_all_check_box = () ->
   $('.dispute_check_box').prop('checked', $('#disputes_check_box').prop('checked'))
+
+window.get_multi_wl_bl = () ->
+  urls = []
+  submit_button = $('#wlbl_adjust_entries_index').find('.dropdown-submit-button')
+
+  $('.dispute-entry-checkbox:checked').each ->
+    entry_row = $(this).parent().parent()[0]
+    urls.push($(entry_row).find('.entry-col-content').text())
+
+  $('.entry-dispute-name').text(urls)
+  $(submit_button).attr('disabled', false)
 
 $ ->
 
