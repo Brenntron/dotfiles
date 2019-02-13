@@ -34,6 +34,10 @@
           %a{href: '?f=team_disputes'}
             %span.nav-dropdown-icon.icon-team-bugs
             My Team Tickets
+        %li{class: ("selected" if params[:f] == "unassigned")}
+          %a{href: '?f=unassigned'}
+            %span.nav-dropdown-icon.icon-unassigned-bugs
+            Unassigned Tickets
         %li{class: ("selected" if params[:f] == "open")}
           %a{href: '?f=open'}
             %span.nav-dropdown-icon.icon-open-bugs
