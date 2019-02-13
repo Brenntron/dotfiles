@@ -72,7 +72,7 @@ class Dispute < ApplicationRecord
   scope :sbrs_disputes, -> { where(submission_type: ['e', 'ew'])}
   scope :wbrs_disputes, -> { where(submission_type: ['w', 'ew'])}
 
-  def self.create_action(bugzilla_session, ips_urls, assignee, priority, ticket_type, status=NEW, categories = nil)
+  def self.create_action(bugzilla_rest_session, ips_urls, assignee, priority, ticket_type, status=NEW, categories = nil)
     user = User.where(cvs_username: assignee).first
 
     case ticket_type
@@ -85,8 +85,6 @@ class Dispute < ApplicationRecord
     end
 
     customer = Customer.where(name: 'Dispute Analyst').first
-
-    bug_factory = Bugzilla::Bug.new(bugzilla_session)
 
     summary = "New WebRep Dispute generated at #{DateTime.now.utc.strftime("%Y-%m-%d %H:%M")}"
 
@@ -105,9 +103,9 @@ class Dispute < ApplicationRecord
         'classification' => 'unclassified',
     }
 
-    bug_stub_hash = Bug.bugzilla_create(bug_factory, bug_attrs, user, true)
+    bug_proxy = bugzilla_rest_session.create_bug(bug_attrs)
 
-    new_dispute = Dispute.create!(id: bug_stub_hash["id"],
+    new_dispute = Dispute.create!(id: bug_proxy.id,
                                      user_id: user.id,
                                      priority: priority,
                                      submission_type: ticket_type,

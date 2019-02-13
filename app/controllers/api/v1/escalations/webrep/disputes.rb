@@ -4,6 +4,7 @@ module API
       module Webrep
         class Disputes < Grape::API
           include API::V1::Defaults
+          include API::BugzillaRestSession
 
           resource "escalations/webrep/disputes" do
             before do
@@ -90,7 +91,7 @@ module API
 
                 if separated_urls.length > errors.length
                   if user_validation.present?
-                    dispute = Dispute.create_action(bugzilla_session,
+                    dispute = Dispute.create_action(bugzilla_rest_session,
                                             permitted_params[:ips_urls],
                                             permitted_params[:assignee],
                                             permitted_params[:priority],
