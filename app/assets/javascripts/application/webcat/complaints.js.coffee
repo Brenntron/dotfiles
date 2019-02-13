@@ -1173,7 +1173,6 @@ toggle_selected = (selectedRows, expand)->
     if expand
       if !$(selectedRows[i]).hasClass('shown')
         $(selectedRows[i]).find('.expand-row-button-inline').click()
-        debugger
     else
       if $(selectedRows[i]).hasClass('shown')
         $(selectedRows[i]).find('.expand-row-button-inline').click()
