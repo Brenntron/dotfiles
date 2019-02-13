@@ -1,7 +1,7 @@
 require 'digest'
 require 'net/http'
 require 'uri'
-class SbApiController < ApplicationController
+class Escalations::SbApiController < ApplicationController
   before_action :referrer_check
 
   def safe_json(json)
