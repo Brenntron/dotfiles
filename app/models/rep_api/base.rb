@@ -116,7 +116,7 @@ class RepApi::Base
         response
       when 404 == response.code
         response_body = JSON.parse(response.body) rescue nil
-        if response_body && response_body[0] && response_body[1]
+        if response_body && response_body[0]
           raise RepApi::RepApiError, "HTTP response #{response.code}: #{response_body[0]['MSG']}"
         else
           raise RepApi::RepApiNotFoundError, "HTTP response #{response.code}"
