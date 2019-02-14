@@ -401,10 +401,9 @@ Feature: Webcat complaints
     And a complaint entry with trait "new_entry" exists
     And a complaint entry preload exists
     When I goto "/escalations/webcat/complaints?f=ALL"
-    Then I wait for "7" seconds
     And I click ".expand-all"
     And I fill in "complaint_prefix_1" with "cisco.com"
-    And I click ".tertiary"
+    And I click ".inline-button"
     And I wait for "10" seconds
     Then I should see "SUCCESS"
     Then I should see "URI updated."
