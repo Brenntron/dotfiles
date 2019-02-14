@@ -1385,11 +1385,9 @@ $ ->
       $('#complaints-index').DataTable().rows().select()
     else
       $('#complaints-index').DataTable().rows().deselect()
-  return
+    return
 
-$ ->
   $(document).ready ->
-    console.log("happy")
     if window.location.pathname != '/escalations/webcat/complaints'
       $('#filter-complaints').hide()
       $('#fetch').hide()
