@@ -212,10 +212,17 @@ $ ->
     $('#complaints-index tbody').on 'click', ' .nested-complaint-data', ->
       $(this).focus()
       $(this).toggleClass('highlight-text')
+      debugger
       innertext = $(this).text()
-      $(innertext).select()
-      document.execCommand 'copy'
+      copyToClipboard(innertext)
 
+    copyToClipboard = (text) ->
+      dummy = document.createElement('input')
+      document.body.appendChild dummy
+      dummy.setAttribute 'value', text
+      dummy.select()
+      document.execCommand 'copy'
+      document.body.removeChild dummy
 
     $('#complaints-index tbody').on 'click', 'td.expandable-row-column', ->
       click_table_buttons complaint_table, this
