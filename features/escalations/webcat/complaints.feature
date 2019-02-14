@@ -40,7 +40,6 @@ Feature: Webcat complaints
     Then I should not see "Update"
     And I click ".expand-all"
     Then I wait for "3" seconds
-    Then take a screenshot
     Then I should see "Commit"
     Then I should see "Decline"
     Then I should see "Submit"
