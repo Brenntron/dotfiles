@@ -90,16 +90,14 @@ $ ->
       backdrop: 'static',
       keyboard: false
     })
-    headers = {'Token': $('input[name="token"]').val(), 'Xmlrpc-Token': $('input[name="xml_token"]').val()}
     ips_urls = this.ips_urls.value
     desc = this.description.value
     customer = this.customers.value
     tags = $('.selectize').val() || []
 
-    $.ajax(
+    std_msg_ajax(
       url: '/escalations/api/v1/escalations/webcat/complaints'
       method: 'POST'
-      headers: headers
       data:
         ips_urls: ips_urls,
         description: desc,

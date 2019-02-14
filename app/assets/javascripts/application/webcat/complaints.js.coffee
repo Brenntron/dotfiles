@@ -4,7 +4,7 @@ window.updateURI = (complaint_entry_id) ->
   $('#loader-modal').modal({
     keyboard: false
   })
-  
+
   uri = $("#complaint_prefix_#{complaint_entry_id}").val()
 
   std_msg_ajax(
@@ -31,12 +31,6 @@ window.updateURI = (complaint_entry_id) ->
 
         $("#history-#{complaint_entry_id}").replaceWith('<button class="secondary" id="history-' + complaint_entry_id + '" onclick="history_dialog('+complaint_entry_id+')">History</button>')
         $("#domain-#{complaint_entry_id}").replaceWith('<button class="secondary" id="domain-' + complaint_entry_id + '" onclick="domain_whois(\''+response.domain+'\')">Domain</button>')
-
-        std_msg_success("Success",['URI updated.'])
-
-
-
-
 
   )
 
@@ -1167,15 +1161,17 @@ window.open_all = () ->
   selected_rows = $('#complaints-index').DataTable().rows()
   open_selected(selected_rows, true)
 
-
 toggle_selected = (selectedRows, expand)->
-    for i in [0..selectedRows.length]
-      if expand
-        if !$(selectedRows[i]).hasClass('shown')
-          $(selectedRows[i]).find('.expand-row-button-inline').click()
-      else
-        if $(selectedRows[i]).hasClass('shown')
-          $(selectedRows[i]).find('.expand-row-button-inline').click()
+  selectState = $('.selected')
+  for i in [0..selectedRows.length]
+    if expand
+      if !$(selectedRows[i]).hasClass('shown')
+        $(selectedRows[i]).find('.expand-row-button-inline').click()
+    else
+      if $(selectedRows[i]).hasClass('shown')
+        $(selectedRows[i]).find('.expand-row-button-inline').click()
+        $(selectedRows[i]).addClass('selected')
+  $(selectState).addClass('selected')
 
 window.collapse_selected =()->
   selectedRows = $('.selected')

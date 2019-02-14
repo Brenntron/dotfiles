@@ -15,7 +15,7 @@ class DisputeEmail < ApplicationRecord
   def self.process_bridge_payload(message_payload)
 
     ActiveRecord::Base.transaction do
-      xmlrpc = message_payload[:bugzilla_session]
+      bugzilla_rest_session = message_payload[:bugzilla_rest_session]
       user = message_payload[:current_user]
       envelope = JSON.parse(message_payload["payload"]["envelope"])
       #check envelope for case validity
@@ -90,7 +90,7 @@ class DisputeEmail < ApplicationRecord
 
       if message_payload["attachments"].present?
         message_payload["attachments"].each do |email_attachment|
-          DisputeEmailAttachment.build_and_push_to_bugzilla(xmlrpc, email_attachment, user, new_email)
+          DisputeEmailAttachment.build_and_push_to_bugzilla(bugzilla_rest_session, email_attachment, user, new_email)
         end
       end
 
@@ -141,10 +141,10 @@ class DisputeEmail < ApplicationRecord
 
   end
 
-  def self.create_email_and_send(params, xmlrpc, user)
+  def self.create_email_and_send(params, bugzilla_rest_session:, current_user:)
     new_email = DisputeEmail.new
     new_email.dispute_id = params[:dispute_id]
-    new_email.from = user.email
+    new_email.from = current_user.email
     if params[:cc].present?
       new_email.to = "#{params[:to]}, #{params[:cc]}"
     else
@@ -159,16 +159,16 @@ class DisputeEmail < ApplicationRecord
     attachments_to_mail = []
 
     if params[:attachments].present?
-      params[:attachments].each do |key, attachment|
+      params[:attachments].values.each do |attachment|
 
         payload = {}
-        payload[:file_name] = attachment['filename']
-        payload[:file_content] = attachment['tempfile']
-        payload[:content_type] = attachment['type']
-        new_local_attachment = DisputeEmailAttachment.build_and_push_to_bugzilla(xmlrpc, payload, user, new_email, false)
+        payload[:file_name] = attachment.filename
+        payload[:file_content] = attachment.tempfile
+        payload[:content_type] = attachment.type
+        new_local_attachment = DisputeEmailAttachment.build_and_push_to_bugzilla(bugzilla_rest_session, payload, current_user, new_email, false)
         s3_file_path = new_local_attachment.push_to_aws(attachment)
         new_attachment = {}
-        new_attachment[:file_name] = attachment['filename']
+        new_attachment[:file_name] = attachment.filename
         new_attachment[:file_url] = new_local_attachment.s3_url(s3_file_path)
         attachments_to_mail << new_attachment
       end

@@ -288,6 +288,7 @@ Feature: Webrep communications
 
   @javascript
   Scenario: a user attaches a file to an email and sends it
+    Then pending
     Given a user with role "webrep user" exists and is logged in
     And the following bugs exist:
     |id   |bugzilla_id|

@@ -18,8 +18,6 @@
 //= require bootstrap-table.min
 //= require bootstrap_tabs
 //= require admin/bs-dropdown-select
-//= require admin/rules
-//= require admin/notes
 //= require admin/bs-admin-tabs
 //= require admin/std_api
 //= require admin/std_msg

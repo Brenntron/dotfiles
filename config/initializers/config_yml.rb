@@ -34,6 +34,7 @@ Rails.configuration.umbrella            = umbrella
 
 raise "config.yml missing bugzilla section" unless env_config['bugzilla']
 Rails.configuration.bugzilla_host       = ENV['Bugzilla_host']   || env_config['bugzilla']['host']
+Rails.configuration.bugzilla_api_key    = env_config['bugzilla']['api_key']
 Rails.configuration.bugzilla_username   = ENV['Bugzilla_login']  || env_config['bugzilla']['login']
 Rails.configuration.bugzilla_password   = ENV['Bugzilla_secret'] || env_config['bugzilla']['password']
 
