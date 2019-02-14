@@ -16,9 +16,8 @@
 //= require bootstrap-multiselect
 //= require bootstrap-sprockets
 //= require bootstrap-table.min
+//= require bootstrap_tabs
 //= require admin/bs-dropdown-select
-//= require admin/rules
-//= require admin/notes
 //= require admin/bs-admin-tabs
 //= require admin/std_api
 //= require admin/std_msg
@@ -29,6 +28,10 @@
 //= require application/helpers
 //= require clipboard
 //= require moment
+
+//= require application/chart.pieceLabel.min
+//= require application/chartjs-plugin-annotation.min
+//= require application/daterangepicker
 //= require application/webrep_advanced_search
 //= require dataTables/jquery.dataTables
 //= require dataTables/extras/dataTables.responsive
@@ -39,4 +42,5 @@
 //= require application/webrep_research_tab
 //= require application/webcat/webcat
 //= require application/webcat/categories
-
+//= require application/webcat/webCatRepLookup
+//= require application/webrep/webrep-report-engine

@@ -70,7 +70,7 @@ class RepApi::Blacklist < RepApi::Base
     entries = params.delete('entries')
     raise 'Missing required entries condition' unless entries
     return [] unless entries.present?
-    string_array = entries.map {|entry| "entry=#{entry}"}
+    string_array = entries.map {|entry| "entry=#{CGI.escape(entry)}"}
 
     response = call_json_request(:post, '/blacklist/get', body: build_request_body(string_array))
     return response.body if raw == true
@@ -105,7 +105,7 @@ class RepApi::Blacklist < RepApi::Base
     input = input.to_a
     input += self.classifications.map{ |classification| "classification=#{classification}" }
     entries = entry.kind_of?(Array) ? entry : [entry]
-    input += entries.map{ |entry_curr| "entry=#{entry_curr}" }
+    input += entries.map{ |entry_curr| "entry=#{CGI.escape(entry_curr)}" }
 
     response = call_json_request(:post, '/blacklist/add', body: build_request_body(input))
 

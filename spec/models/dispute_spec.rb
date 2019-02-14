@@ -376,7 +376,6 @@ describe Dispute do
   end
 
   it 'processes fn ip bridge payload' do
-    allow(Bugzilla::Bug).to receive(:new).and_return(bug_factory)
     allow(Wbrs::Base)
         .to receive(:call_json_request)
                 .with(:post, '/v1/cat/urls/top', body: anything)
@@ -402,6 +401,9 @@ describe Dispute do
                 .with(:get, anything)
                 .and_return(xbrs_domain_response)
     allow(Bridge::DisputeCreatedEvent).to receive(:new).and_return(double('Bridge::DisputeCreatedEvent', post: nil))
+    bugzilla_rest_session = BugzillaRest::Session.default_session
+    expect(bugzilla_rest_session).to receive(:create_bug).and_return(bugzilla_rest_session.build_bug(id: 1001))
+    fn_ip_dispute_message_payload[:bugzilla_rest_session] = bugzilla_rest_session
 
     dispute = nil
     expect do
@@ -416,7 +418,6 @@ describe Dispute do
   end
 
   it 'processes fp ip auto-resolve as new bridge payload' do
-    allow(Bugzilla::Bug).to receive(:new).and_return(bug_factory)
     allow(RepApi::Base)
         .to receive(:call_json_request)
                 .with(:post, '/blacklist/get', body: anything)
@@ -449,6 +450,9 @@ describe Dispute do
                 .with(:get, anything)
                 .and_return(xbrs_domain_response)
     allow(Bridge::DisputeCreatedEvent).to receive(:new).and_return(double('Bridge::DisputeCreatedEvent', post: nil))
+    bugzilla_rest_session = BugzillaRest::Session.default_session
+    expect(bugzilla_rest_session).to receive(:create_bug).and_return(bugzilla_rest_session.build_bug(id: 1001))
+    fp_ip_dispute_message_payload[:bugzilla_rest_session] = bugzilla_rest_session
 
     dispute = nil
     expect do
@@ -463,7 +467,6 @@ describe Dispute do
   end
 
   it 'processes fp ip auto-convicted bridge payload' do
-    allow(Bugzilla::Bug).to receive(:new).and_return(bug_factory)
     allow(RepApi::Base)
         .to receive(:call_json_request)
                 .with(:post, '/blacklist/get', body: anything)
@@ -496,6 +499,9 @@ describe Dispute do
                 .with(:get, anything)
                 .and_return(xbrs_domain_response)
     allow(Bridge::DisputeCreatedEvent).to receive(:new).and_return(double('Bridge::DisputeCreatedEvent', post: nil))
+    bugzilla_rest_session = BugzillaRest::Session.default_session
+    expect(bugzilla_rest_session).to receive(:create_bug).and_return(bugzilla_rest_session.build_bug(id: 1001))
+    fp_ip_dispute_message_payload[:bugzilla_rest_session] = bugzilla_rest_session
 
     dispute = nil
     expect do
@@ -510,7 +516,6 @@ describe Dispute do
   end
 
   it 'processes fp ip auto-acquit bridge payload' do
-    allow(Bugzilla::Bug).to receive(:new).and_return(bug_factory)
     allow(RepApi::Base)
         .to receive(:call_json_request)
                 .with(:post, '/blacklist/get', body: anything)
@@ -543,6 +548,9 @@ describe Dispute do
                 .with(:get, anything)
                 .and_return(xbrs_domain_response)
     allow(Bridge::DisputeCreatedEvent).to receive(:new).and_return(double('Bridge::DisputeCreatedEvent', post: nil))
+    bugzilla_rest_session = BugzillaRest::Session.default_session
+    expect(bugzilla_rest_session).to receive(:create_bug).and_return(bugzilla_rest_session.build_bug(id: 1001))
+    fp_ip_dispute_message_payload[:bugzilla_rest_session] = bugzilla_rest_session
 
     dispute = nil
     expect do
@@ -557,7 +565,6 @@ describe Dispute do
   end
 
   it 'processes fn url bridge payload' do
-    allow(Bugzilla::Bug).to receive(:new).and_return(bug_factory)
     allow(Wbrs::Base)
         .to receive(:call_json_request)
                 .with(:post, '/v1/cat/urls/top', body: anything)
@@ -583,10 +590,14 @@ describe Dispute do
                 .with(:get, anything)
                 .and_return(xbrs_domain_response)
     allow(Bridge::DisputeCreatedEvent).to receive(:new).and_return(double('Bridge::DisputeCreatedEvent', post: nil))
+    bugzilla_rest_session = BugzillaRest::Session.default_session
+    expect(bugzilla_rest_session).to receive(:create_bug).and_return(bugzilla_rest_session.build_bug(id: 1001))
+    message_payload = fp_url_dispute_message_payload
+    message_payload[:bugzilla_rest_session] = bugzilla_rest_session
 
     dispute = nil
     expect do
-      dispute = Dispute.process_bridge_payload(fn_url_dispute_message_payload)
+      dispute = Dispute.process_bridge_payload(message_payload)
     end.to change { Dispute.count }.from(0).to(1)
 
     expect(dispute).to_not be_nil
@@ -597,7 +608,6 @@ describe Dispute do
   end
 
   it 'processes fp url auto-resolve as new bridge payload' do
-    allow(Bugzilla::Bug).to receive(:new).and_return(bug_factory)
     allow(RepApi::Base)
         .to receive(:call_json_request)
                 .with(:post, '/blacklist/get', body: anything)
@@ -630,6 +640,9 @@ describe Dispute do
                 .with(:get, anything)
                 .and_return(xbrs_domain_response)
     allow(Bridge::DisputeCreatedEvent).to receive(:new).and_return(double('Bridge::DisputeCreatedEvent', post: nil))
+    bugzilla_rest_session = BugzillaRest::Session.default_session
+    expect(bugzilla_rest_session).to receive(:create_bug).and_return(bugzilla_rest_session.build_bug(id: 1001))
+    fp_url_dispute_message_payload[:bugzilla_rest_session] = bugzilla_rest_session
 
     dispute = nil
     expect do
@@ -644,7 +657,6 @@ describe Dispute do
   end
 
   it 'processes fp url auto-convicted bridge payload' do
-    allow(Bugzilla::Bug).to receive(:new).and_return(bug_factory)
     allow(RepApi::Base)
         .to receive(:call_json_request)
                 .with(:post, '/blacklist/get', body: anything)
@@ -677,6 +689,9 @@ describe Dispute do
                 .with(:get, anything)
                 .and_return(xbrs_domain_response)
     allow(Bridge::DisputeCreatedEvent).to receive(:new).and_return(double('Bridge::DisputeCreatedEvent', post: nil))
+    bugzilla_rest_session = BugzillaRest::Session.default_session
+    expect(bugzilla_rest_session).to receive(:create_bug).and_return(bugzilla_rest_session.build_bug(id: 1001))
+    fp_url_dispute_message_payload[:bugzilla_rest_session] = bugzilla_rest_session
 
     dispute = nil
     expect do
@@ -691,7 +706,6 @@ describe Dispute do
   end
 
   it 'processes fp url auto-acquit bridge payload' do
-    allow(Bugzilla::Bug).to receive(:new).and_return(bug_factory)
     allow(RepApi::Base)
         .to receive(:call_json_request)
                 .with(:post, '/blacklist/get', body: anything)
@@ -724,6 +738,9 @@ describe Dispute do
                 .with(:get, anything)
                 .and_return(xbrs_domain_response)
     allow(Bridge::DisputeCreatedEvent).to receive(:new).and_return(double('Bridge::DisputeCreatedEvent', post: nil))
+    bugzilla_rest_session = BugzillaRest::Session.default_session
+    expect(bugzilla_rest_session).to receive(:create_bug).and_return(bugzilla_rest_session.build_bug(id: 1001))
+    fp_url_dispute_message_payload[:bugzilla_rest_session] = bugzilla_rest_session
 
     dispute = nil
     expect do

@@ -47,14 +47,6 @@ module API
             Rails.logger
           end
 
-          def bugzilla_session
-            xmlrpc = Bugzilla::XMLRPC.new(Rails.configuration.bugzilla_host)
-            if current_user
-              xmlrpc.token = request.headers['Xmlrpc-Token']
-            end
-            xmlrpc
-          end
-
           # Standard (our standard) handling of an exception
           # @param [Exception, #read] exception is the exception to report
           # @param [Fixnum] status is the HTTP status code
@@ -63,7 +55,7 @@ module API
             exception.backtrace[0..4].each_with_index do |traceline, index|
               Rails.logger.error("backtrace[#{index}] #{traceline}")
             end
-            error!(message: exception.message, status: status, success: false)
+            error!({message: exception.message, status: status, success: false}, status)
           end
 
           # Transition to implement V2 API handling from the V1 API
@@ -79,6 +71,12 @@ module API
             std_exception(exception, status: 404)
           rescue Grape::Exceptions::ValidationErrors => exception
             std_exception(exception, status: 406)
+          rescue BugzillaRest::AuthenticationError => exception
+            Rails.logger.error("exception: #{exception.message}")
+            error!({message: exception.message, status: 401, success: false,
+                    url: exception.url, system: exception.system, prompt: exception.prompt,
+                    fields: exception.fields},
+                   401)
           rescue => exception
             std_exception(exception)
           end

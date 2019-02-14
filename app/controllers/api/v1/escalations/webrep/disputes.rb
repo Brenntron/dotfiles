@@ -346,7 +346,7 @@ module API
                 DisputeEntry.send_status_updates(permitted_params['field_data'])
 
                 permitted_params['field_data'].each do |index, entry|
-                  if entry.length == 3 && entry.last.field == 'resolution_comment' && !entry.last.new.empty?
+                  if entry.length == 3 && entry.last['field'] == 'resolution_comment' && !entry.last['new'].empty?
                     comment = entry.last.new
                     dispute_entry_id = index
                     Dispute.create_note(current_user, comment, dispute_entry_id)
@@ -544,16 +544,16 @@ module API
               information = RepApi::Blacklist.where({entries: [ params[:entry] ]}, true)
               information = JSON.parse(information)
 
-              if information[params[:entry]] == "NOT_FOUND"
+              if information[params[:entry].gsub('http://', '').gsub('https://', '')] == "NOT_FOUND"
                 return {:classification => "not found", :expiration => "", :status => "", :comment => ""}.to_json
               else
                 expiration = ""
                 begin
-                  expiration = Time.parse(information[params[:entry]]["expiration"]).to_s
+                  expiration = Time.parse(information[params[:entry].gsub('http://', '').gsub('https://', '')]["expiration"]).to_s
                 rescue
-                  expiration = information[params[:entry]]["expiration"]
+                  expiration = information[params[:entry].gsub('http://', '').gsub('https://', '')]["expiration"]
                 end
-                return {:classification => information[params[:entry]]["classifications"].first, :expiration => expiration, :status => information[params[:entry]]["status"], :comment => information[params[:entry]]["metadata"]["VRT"]["comment"]}.to_json
+                return {:classification => information[params[:entry].gsub('http://', '').gsub('https://', '')]["classifications"].first, :expiration => expiration, :status => information[params[:entry].gsub('http://', '').gsub('https://', '')]["status"], :comment => information[params[:entry].gsub('http://', '').gsub('https://', '')]["metadata"]["VRT"]["comment"]}.to_json
               end
 
             end

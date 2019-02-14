@@ -216,7 +216,6 @@ $ ->
       if event.keyCode == 13
         # do the ajax call
         $('#loader-modal').modal({
-          backdrop: 'static',
           keyboard: false
         })
         filter = this.value
@@ -229,8 +228,7 @@ $ ->
 
             json = $.parseJSON(response)
             if json.error
-              $('#loader-modal').hide()
-              $('.modal-backdrop').remove()
+              $('#loader-modal').modal 'hide'
               notice_html = "<p>Something went wrong: #{json.error}</p>"
               alert(json.error)
             else
@@ -238,12 +236,10 @@ $ ->
               datatable.clear();
               datatable.rows.add(json.data);
               datatable.draw();
-              $('#loader-modal').hide()
-              $('.modal-backdrop').remove()
+              $('#loader-modal').modal 'hide'
 
           error: (response) ->
-            $('#loader-modal').hide()
-            $('.modal-backdrop').remove()
+            $('#loader-modal').modal 'hide'
             std_api_error(response, "There was an error loading search results.", reload: false)
         , this)
 

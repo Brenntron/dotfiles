@@ -4,6 +4,7 @@ module API
       module Webcat
         class Complaints < Grape::API
           include API::V1::Defaults
+          include API::BugzillaRestSession
 
           resource "escalations/webcat/complaints" do
 
@@ -68,12 +69,14 @@ module API
             end
 
             post "" do
-              Complaint.create_action(bugzilla_session,
-                                      permitted_params[:ips_urls],
-                                      permitted_params[:description],
-                                      permitted_params[:customer],
-                                      permitted_params[:tags])
-              {:status => 'success'}.to_json
+              std_api_v2 do
+                Complaint.create_action(bugzilla_rest_session,
+                                        permitted_params[:ips_urls],
+                                        permitted_params[:description],
+                                        permitted_params[:customer],
+                                        permitted_params[:tags])
+                {:status => 'success'}.to_json
+              end
             end
 
             desc 'test a url'
@@ -141,7 +144,7 @@ module API
                                                        categories_string: prefix["cats"].join(','),
                                                        description: '',
                                                        user: current_user.email,
-                                                       bugzilla_session: bugzilla_session)
+                                                       bugzilla_rest_session: bugzilla_rest_session)
 
                   end
                 end
@@ -160,7 +163,7 @@ module API
                                                      categories_string: permitted_params["cats"].join(','),
                                                      description: '',
                                                      user: current_user.email,
-                                                     bugzilla_session: bugzilla_session)
+                                                     bugzilla_rest_session: bugzilla_rest_session)
                 end
               end
               render json: 'Success'
