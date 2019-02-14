@@ -221,8 +221,9 @@ class Wbrs::ManualWlbl < Wbrs::Base
       collection_of_target_list_type_to_destroy.each do |list_type|
         list_types.delete(list_type)
       end
-      transformed_list_types[url] = captured_list_types[url]
     end
+
+    transformed_list_types = captured_list_types
 
     # Now add each list_type in transformed_list_types back to the urls via API call
     transformed_list_types.each do |url, list_types|
