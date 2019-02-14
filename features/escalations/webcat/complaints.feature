@@ -269,22 +269,24 @@ Feature: Webcat complaints
     And I fill in "url_1" with "fmasoifkis.com"
     And I click "#history-1"
     And I wait for "5" seconds
-    Then I should see "SOMETHING WENT WRONG: THE URL YOU PROVIDED DOES NOT HAVE AVAILABLE DATA."
+    Then I should see "No history associated with this url."
 
   @javascript
   Scenario: a user looks up a complaint's entry history with an invalid URL in the third position (make sure that the notification appears in the right spot)
     Given a user with role "webcat user" exists and is logged in
+    When I goto "/escalations/webcat/complaints?f=ALL"
     When I click "#categorize-urls"
     And I fill in "url_3" with "fmasoifkis.com"
     And I click "#history-3"
     And I wait for "5" seconds
     Then I should see content "No history associated with this url." within "#cat-url-3"
 
+  @javascript
   Scenario: a users tries to categorize a URL
     Given a user with role "webcat user" exists and is logged in
     When I goto "/escalations/webcat/complaints?f=ALL"
     And I click "#categorize-urls"
-    And I fill in "url_1" with "cisco.com"
+    And I fill in "url_1" with "mary.com"
     And I fill in selectized with "Adult"
     And I click ".primary"
     And I wait for "45" seconds
@@ -326,12 +328,14 @@ Feature: Webcat complaints
     When I goto "/escalations/webcat/complaints?f=ALL"
     And I click "#categorize-urls"
     And I click "#cat-urls-same"
-    And I fill in "categorize_urls" with "cisco.com" and "google.com" separated by blank lines
+    And I fill in "url_1" with "mary.com"
+    And I fill in "url_2" with "joseph.com"
     And I fill in selectized with "Adult"
     And I trigger-click ".primary"
-    And I wait for "60" seconds
-    Then I should see "SUCCESS"
-    Then I should see "URLs/IPs successfully categorized."
+    And I wait for "45" seconds
+    Then take a screenshot
+    Then I should see "URLS CATEGORIZED SUCCESSFULLY"
+    And I should see "Categorization of a Top URL will create a pending complaint entry. All other entries have been submitted directly to WBRS."
 
   @javascript
   Scenario: a users tries submits a multiple url categorization without a URL
@@ -341,9 +345,9 @@ Feature: Webcat complaints
     And I click "#cat-urls-same"
     And I fill in selectized with "Adult"
     And I trigger-click ".primary"
-    And I wait for "60" seconds
-    Then I should see "ERROR"
-    Then I should see "Please check that a URL/IP has been inputted and that at least one category was selected."
+    And I wait for "5" seconds
+    Then I should see "UNABLE TO CATEGORIZE"
+    Then I should see "Please confirm that a URL and at least one category for each desired entry exists."
 
   @javascript
   Scenario: a users tries submits a multiple url categorization without a category
@@ -351,10 +355,10 @@ Feature: Webcat complaints
     When I goto "/escalations/webcat/complaints?f=ALL"
     And I click "#categorize-urls"
     And I click "#cat-urls-same"
-    And I fill in "categorize_urls" with "cisco.com" and "google.com" separated by blank lines
+    And I fill in "url_1" with "cisco.com"
     And I trigger-click ".primary"
-    Then I should see "ERROR"
-    Then I should see "Please check that a URL/IP has been inputted and that at least one category was selected."
+    Then I should see "UNABLE TO CATEGORIZE"
+    Then I should see "Please confirm that a URL and at least one category for each desired entry exists."
 
   @javascript
   Scenario: a users tries to fetch complaints
@@ -383,7 +387,7 @@ Feature: Webcat complaints
     And I fill in "url_1" with "washingtonpost.com"
     And I click ".delete-categories-button"
     And I wait for "10" seconds
-    Then I should see "CATEGORIES HAVE BEEN SUCCESSFULLY DROPPED."
+    Then I should see "Categories successfully dropped."
 
   @javascript
   Scenario: a users tries to fetch WBNP data

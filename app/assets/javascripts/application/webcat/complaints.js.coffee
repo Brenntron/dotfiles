@@ -1323,6 +1323,20 @@ window.triggerTooltips = (item) ->
   return
 
 $ ->
+  $('#cat_new_url_modal').on 'shown.bs.modal', ->
+    $('#url_1').focus()
+    return
+
+  $('#cat-urls-diff').click ->
+    if $('#cat-urls-diff').prop('checked')
+      $('#categorize-same-form').hide()
+      $('#categorize-diff-form').show()
+
+  $('#cat-urls-same').click ->
+    console.log('test')
+    if $('#cat-urls-same').prop('checked')
+      $('#categorize-diff-form').hide()
+      $('#categorize-same-form').show()
 
   $('.expand-all').click ->
     complaint_table = $('#complaints-index').DataTable()
@@ -1373,7 +1387,9 @@ $ ->
       $('#complaints-index').DataTable().rows().deselect()
   return
 
+$ ->
   $(document).ready ->
+    console.log("happy")
     if window.location.pathname != '/escalations/webcat/complaints'
       $('#filter-complaints').hide()
       $('#fetch').hide()
@@ -1385,16 +1401,4 @@ $ ->
       $('#web-cat-search').show()
       $('#new-complaint').show()
 
-  $('#cat_new_url_modal').on 'shown.bs.modal', ->
-    $('#url_1').focus()
-    return
 
-  $('#cat-urls-diff').click ->
-    if $('#cat-urls-diff').prop('checked')
-      $('#categorize-same-form').hide()
-      $('#categorize-diff-form').show()
-
-  $('#cat-urls-same').click ->
-    if $('#cat-urls-same').prop('checked')
-      $('#categorize-diff-form').hide()
-      $('#categorize-same-form').show()
