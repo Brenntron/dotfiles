@@ -1333,7 +1333,6 @@ $ ->
       $('#categorize-diff-form').show()
 
   $('#cat-urls-same').click ->
-    console.log('test')
     if $('#cat-urls-same').prop('checked')
       $('#categorize-diff-form').hide()
       $('#categorize-same-form').show()
