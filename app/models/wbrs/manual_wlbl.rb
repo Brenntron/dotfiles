@@ -203,7 +203,6 @@ class Wbrs::ManualWlbl < Wbrs::Base
     captured_list_types = {}
     transformed_list_types = {}
     wlbl_params = stringkey_params(params)
-    wlbl_params['usr'] = username
     params_urls = params[:urls].map {|url| url.strip}
     collection_of_target_list_type_to_destroy = wlbl_params.delete('trgt_list')
 
@@ -228,7 +227,7 @@ class Wbrs::ManualWlbl < Wbrs::Base
     # Now add each list_type in transformed_list_types back to the urls via API call
     transformed_list_types.each do |url, list_types|
       list_types.each do |list_type|
-        post_request(path: '/v1/rep/wlbl/add', body: {url: url, trget_list: list_type, usr: username, note: wlbl_params[:note]})
+        post_request(path: '/v1/rep/wlbl/add', body: {url: url, trget_list: list_type, usr: username, note: params[:note]})
       end
     end
 
