@@ -1,4 +1,4 @@
-class RulehitResolutionMailerTemplatesController < ApplicationController
+class Escalations::RulehitResolutionMailerTemplatesController < ApplicationController
   before_action :set_rulehit_resolution_mailer_template, only: [:show, :edit, :update, :destroy]
   layout "escalations/webrep/disputes"
 
@@ -29,7 +29,7 @@ class RulehitResolutionMailerTemplatesController < ApplicationController
 
     respond_to do |format|
       if @rulehit_resolution_mailer_template.save
-        format.html { redirect_to @rulehit_resolution_mailer_template, notice: 'Rulehit resolution mailer template was successfully created.' }
+        format.html { redirect_to escalations_rulehit_resolution_mailer_template_url(@rulehit_resolution_mailer_template), notice: 'Rulehit resolution mailer template was successfully created.' }
         format.json { render :show, status: :created, location: @rulehit_resolution_mailer_template }
       else
         format.html { render :new }
@@ -43,7 +43,7 @@ class RulehitResolutionMailerTemplatesController < ApplicationController
   def update
     respond_to do |format|
       if @rulehit_resolution_mailer_template.update(rulehit_resolution_mailer_template_params)
-        format.html { redirect_to @rulehit_resolution_mailer_template, notice: 'Rulehit resolution mailer template was successfully updated.' }
+        format.html { redirect_to escalations_rulehit_resolution_mailer_template_url(@rulehit_resolution_mailer_template), notice: 'Rulehit resolution mailer template was successfully updated.' }
         format.json { render :show, status: :ok, location: @rulehit_resolution_mailer_template }
       else
         format.html { render :edit }
@@ -57,7 +57,7 @@ class RulehitResolutionMailerTemplatesController < ApplicationController
   def destroy
     @rulehit_resolution_mailer_template.destroy
     respond_to do |format|
-      format.html { redirect_to rulehit_resolution_mailer_templates_url, notice: 'Rulehit resolution mailer template was successfully destroyed.' }
+      format.html { redirect_to escalations_rulehit_resolution_mailer_templates_url, notice: 'Rulehit resolution mailer template was successfully destroyed.' }
       format.json { head :no_content }
     end
   end
