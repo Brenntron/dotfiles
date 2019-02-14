@@ -1,14 +1,10 @@
 window.updateURI = (complaint_entry_id) ->
   event.preventDefault()
 
-  $('#loader-modal').show()
-  $('.modal-backdrop').show()
-
   $('#loader-modal').modal({
-    backdrop: 'static',
     keyboard: false
   })
-  
+
   uri = $("#complaint_prefix_#{complaint_entry_id}").val()
 
   std_msg_ajax(
@@ -16,8 +12,7 @@ window.updateURI = (complaint_entry_id) ->
     url: "/escalations/api/v1/escalations/webcat/complaints/update_uri"
     data: {complaint_entry_id: complaint_entry_id, uri: uri }
     success: (response) ->
-      $('#loader-modal').hide()
-      $('.modal-backdrop').remove()
+      $('#loader-modal').modal 'hide'
 
       $(".simple-nested-table##{complaint_entry_id} tbody > tr").remove()
 
@@ -37,12 +32,6 @@ window.updateURI = (complaint_entry_id) ->
         $("#history-#{complaint_entry_id}").replaceWith('<button class="secondary" id="history-' + complaint_entry_id + '" onclick="history_dialog('+complaint_entry_id+')">History</button>')
         $("#domain-#{complaint_entry_id}").replaceWith('<button class="secondary" id="domain-' + complaint_entry_id + '" onclick="domain_whois(\''+response.domain+'\')">Domain</button>')
 
-        std_msg_success("Success",['URI updated.'])
-
-
-
-
-
   )
 
 window.cat_new_url = ()->
@@ -60,7 +49,6 @@ window.cat_new_url = ()->
   if isEmpty == false
 
     $('#loader-modal').modal({
-      backdrop: 'static',
       keyboard: false
     })
 
@@ -69,14 +57,15 @@ window.cat_new_url = ()->
       method: 'POST'
       data: {data: data}
       success: (response) ->
-        $('.modal-backdrop').hide()
-        $('#loader-modal').hide()
+        $('#loader-modal').modal 'hide'
         std_msg_success('URLs categorized successfully',["Categorization of a Top URL will create a pending complaint entry.", "All other entries have been submitted directly to WBRS."], reload: true)
 
       error: (response) ->
-        $('.modal-backdrop').hide()
-        $('#loader-modal').hide()
-        std_api_error(response, "Unable to categorize url.", reload: false)
+        $('#loader-modal').modal 'hide'
+        if response.responseText.includes('Either no products have been defined to enter bugs against or you have not been given access to any.')
+          std_api_error(response, "Please make sure you have the appropriate permissions in Bugzilla. Unable to categorize url.", reload: false)
+        else
+          std_api_error(response, "Unable to categorize url.", reload: false)
     )
   else
     std_msg_error("Unable to categorize", ["Please confirm that a URL and at least one category for each desired entry exists."], reload: false)
@@ -97,7 +86,6 @@ window.multiple_url_categorization = ()->
 
   if $("#categorize_urls").val() != "" && cats != null
     $('#loader-modal').modal({
-      backdrop: 'static',
       keyboard: false
     })
 
@@ -106,16 +94,14 @@ window.multiple_url_categorization = ()->
       method: 'POST'
       data: {urls: urls, cats: cats}
       success: (response) ->
-        $('#loader-modal').hide()
-        $('.modal-backdrop').remove()
+        $('#loader-modal').modal 'hide'
         std_msg_success('Success',["URLs/IPs successfully categorized."], reload: true)
       error: (response) ->
-        $('#loader-modal').hide()
-        $('.modal-backdrop').remove()
+        $('#loader-modal').modal 'hide'
         std_msg_error('Error' + ' ' + response.responseJSON.message,"", reload: false)
     )
   else
-    $('#loader-modal').hide()
+    $('#loader-modal').modal 'hide'
     std_msg_error('Error', ['Please check that a URL/IP has been inputted and that at least one category was selected.'], reload: false)
 
 name_servers =(server_list)->
@@ -277,7 +263,6 @@ window.updatePending = (id,row_id) ->
       for td in tds
         if td.className == ''
           td.classList.add('nested-complaint-data-wrapper')
-
     error: (response) ->
       notice_html = "<p>Something went wrong: #{response.responseText}</p>"
   , this)
@@ -310,6 +295,10 @@ window.updateEntryColumns = (entry_id,row_id) ->
         json = $.parseJSON(response)
         if !json.error
           table = $('#complaints-index').DataTable()
+
+          selected_rows = $('#complaints-index').DataTable().rows('.selected')
+          selected_rows.data().cell(selected_rows[0][0],14).data("#{json.display_name}").draw()
+
           temp_row = table.row(row_id)
           temp_row.data().status = json.status
           temp_row.data().resolution = status
@@ -328,7 +317,7 @@ window.updateEntryColumns = (entry_id,row_id) ->
             labelField: 'category_name',
             searchField: ['category_name', 'category_code'],
             options: AC.WebCat.createSelectOptions()
-            items: selected_options(temp_row.data().category_names)
+            items: selected_options(categories)
           }
           $('#input_cat_pending'+ temp_row.data().entry_id).selectize {
             persist: false,
@@ -338,7 +327,7 @@ window.updateEntryColumns = (entry_id,row_id) ->
             labelField: 'category_name',
             searchField: ['category_name', 'category_code'],
             options: AC.WebCat.createSelectOptions()
-            items: selected_options(temp_row.data().category_names)
+            items: selected_options(categories)
           }
         tds = $('#complaints-index tbody').closest('td')
         for td in tds
@@ -408,7 +397,7 @@ window.return_selected = ()->
           i = 0
           while i < selected_rows[0].length
             selected_rows.data().cell(selected_rows[0][i],14).data("Vrt Incoming").draw()
-            selected_rows.data().cell(selected_rows[0][i],5).data("NEW").draw()
+            selected_rows.data().cell(selected_rows[0][i],4).data("NEW").draw()
             i++
 
       error: (response) ->
@@ -451,11 +440,8 @@ window.enlarge_image = (id,image)->
     content: '<img src="' + image + '">').popover 'show'
 
 window.lookup_prefix = () ->
-  $('#loader-modal').show()
-  $('.modal-backdrop').show()
 
   $('#loader-modal').modal({
-    backdrop: 'static',
     keyboard: false
   })
 
@@ -487,8 +473,7 @@ window.lookup_prefix = () ->
           i++
           continue
         i++
-      $('#loader-modal').hide()
-      $('.modal-backdrop').hide()
+      $('#loader-modal').modal 'hide'
   )
 
 window.retrieve_history = (position) ->
@@ -501,10 +486,8 @@ window.retrieve_history = (position) ->
   url = $("#url_" + position).val()
 
   if url.length > 0
-    $('#loader-modal').show()
 
     $('#loader-modal').modal({
-      backdrop: 'static',
       keyboard: false
     })
 
@@ -513,8 +496,7 @@ window.retrieve_history = (position) ->
       method: 'POST'
       data: {'position': position, url: url}
       success: (response) ->
-        $('.modal-backdrop').hide()
-        $('#loader-modal').hide()
+        $('#loader-modal').modal 'hide'
 
         json = JSON.parse(response)
 
@@ -558,11 +540,11 @@ window.retrieve_history = (position) ->
 
       error: (response) ->
         $("#cat-url-error-message-#{position}").text("No history associated with this url.")
-        $('.modal-backdrop').hide()
-        $('#loader-modal').hide()
+        $('#loader-modal').modal 'hide'
         $("#cat-url-#{position}").show()
         $("#url_#{position}").css("border-width", "2px")
         $("#url_#{position}").css("border-color", "#E47433")
+
     , this)
   else
     $("#cat-url-error-message-#{position}").text("No data available for blank URL.")
@@ -576,14 +558,11 @@ window.drop_current_categories = () ->
   $(".cat-url-success").hide()
 
   $('#loader-modal').modal({
-    backdrop: 'static',
     keyboard: false,
   })
 
   $("#url_#{i}").css("border-width", "")
   $("#url_#{i}").css("border-color", "")
-
-  $('#loader-modal').show()
 
   urls = {}
 
@@ -607,8 +586,7 @@ window.drop_current_categories = () ->
           $("#url_#{key}").css("border-color", "#E47433")
           $("#cat-url-error-message-#{key}").text("Unable to drop categories.")
           $("#cat-url-#{key}").show()
-      $('#loader-modal').hide()
-      $('.modal-backdrop').hide()
+      $('#loader-modal').modal 'hide'
     error: (response) ->
       std_msg_error("<p>There has been an error dropping categories: #{json.error}","")
 )
@@ -717,8 +695,7 @@ format = (complaint_entry_row) ->
     url: '/escalations/api/v1/escalations/webcat/complaint_entries/retrieve_current_categories'
     data: {'id': complaint_entry.entry_id}
     success: (response) ->
-      $('#loader-modal').modal('hide');
-      $('.modal-backdrop').remove()
+      $('#loader-modal').modal 'hide'
 
       current_categories = JSON.parse(response)
 
@@ -735,9 +712,7 @@ format = (complaint_entry_row) ->
           $(".simple-nested-table" + "#" + complaint_entry.entry_id).append(category_row)
 
     error: (response) ->
-      $('#loader-modal').modal('hide');
-      $('.modal-backdrop').remove()
-
+      $('#loader-modal').modal 'hide'
       current_categories = ''
   )
 
@@ -837,7 +812,7 @@ format = (complaint_entry_row) ->
       '<table class="simple-nested-table" id="' + complaint_entry.entry_id + '"><thead><tr><th>Conf</th><th>Current Categories</th><th>Certainty</th></tr></thead>' +
       '</table>' +
       '</div><div class="col-xs-2">' +
-      '<button class="secondary" id="lookup-' + complaint_entry.entry_id + '"onclick="lookup_dialog(' + complaint_entry.entry_id  + ')">Lookup</button><br/>' +
+      '<button class="secondary" id="lookup-' + complaint_entry.entry_id + '" onclick="WebCat.RepLookup.queryWhoIs(\'' + url + '\')">Lookup</button><br/>' +
       '<button class="secondary" id="history-' + complaint_entry.entry_id + '" onclick="history_dialog(' + complaint_entry.entry_id  + ')">History</button><br/>' +
       '<button class="secondary" id="domain-' + complaint_entry.entry_id + '" onclick="domain_whois(\'' + whois_lookup + '\')">Domain</domain>' +
       '</div></div>' +
@@ -1118,7 +1093,6 @@ window.display_preview_window = (entry) ->
 
 window.fetch_wbnp_data = () ->
   $('#loader-modal').modal({
-    backdrop: 'static',
     keyboard: false
   })
   std_msg_ajax(
@@ -1126,11 +1100,10 @@ window.fetch_wbnp_data = () ->
     url: '/escalations/api/v1/escalations/webcat/complaints/fetch_wbnp_data'
     data: {}
     success: (response) ->
-      $('#loader-modal').hide()
+      $('#loader-modal').modal 'hide'
       std_msg_success('WBNP Complaints successfully retrieved from RuleUI.', [], reload: true)
     error: (response) ->
-      $('#loader-modal').hide()
-      $('.modal-backdrop').remove()
+      $('#loader-modal').modal 'hide'
       std_api_error(response, 'Error fetching wbnp data complaints.', reload: false)
   )
 
@@ -1188,32 +1161,37 @@ window.open_all = () ->
   selected_rows = $('#complaints-index').DataTable().rows()
   open_selected(selected_rows, true)
 
-
-toggle_selected = (table, selected_rows)->
-  i = 0
-  while i < selected_rows[0].length
-    button = $( ".expand-row-button-inline" )[selected_rows[0][i]]
-    click_table_buttons(table, button)
-    i++
+toggle_selected = (selectedRows, expand)->
+  selectState = $('.selected')
+  for i in [0..selectedRows.length]
+    if expand
+      if !$(selectedRows[i]).hasClass('shown')
+        $(selectedRows[i]).find('.expand-row-button-inline').click()
+    else
+      if $(selectedRows[i]).hasClass('shown')
+        $(selectedRows[i]).find('.expand-row-button-inline').click()
+        $(selectedRows[i]).addClass('selected')
+  $(selectState).addClass('selected')
 
 window.collapse_selected =()->
-  table = $('#complaints-index').DataTable()
-  selected_rows = table.rows('.shown.selected')
-  toggle_selected(table,selected_rows)
+  selectedRows = $('.selected')
+  expand = false;
+  toggle_selected(selectedRows, expand)
+
 window.collapse_all =()->
-  table = $('#complaints-index').DataTable()
-  selected_rows = table.rows('.shown')
-  toggle_selected(table,selected_rows)
+  selectedRows = $('table#' + 'complaints-index' + ' tr[role="row"]')
+  expand = false;
+  toggle_selected(selectedRows, expand)
 
 window.expand_selected =()->
-  table = $('#complaints-index').DataTable()
-  selected_rows = table.rows('.selected.not-shown')
-  toggle_selected(table,selected_rows)
-window.expand_all =()->
-  table = $('#complaints-index').DataTable()
-  selected_rows = table.rows('.not-shown')
-  toggle_selected(table,selected_rows)
+  selectedRows = $('.selected')
+  expand = true;
+  toggle_selected(selectedRows, expand)
 
+window.expand_all =()->
+  selectedRows = $('table#' + 'complaints-index' + ' tr[role="row"]')
+  expand = true;
+  toggle_selected(selectedRows, expand)
 
 window.mark_for_commit = () ->
   entry_ids = $('#complaint-entries-div .complaint-entry-checkbox:checkbox:checked').map(() ->
@@ -1282,7 +1260,6 @@ window.advanced_webcat_index_table = () ->
 
 window.populate_advanced_webcat_index_table = (data = {}) ->
   $('#loader-modal').modal({
-    backdrop: 'static',
     keyboard: false
   })
   headers = {'Token': $('input[name="token"]').val(), 'Xmlrpc-Token': $('input[name="xml_token"]').val()}
@@ -1296,25 +1273,23 @@ window.populate_advanced_webcat_index_table = (data = {}) ->
       json = $.parseJSON(response)
       if json.error
         notice_html = "<p>Something went wrong: #{json.error}</p>"
-        $('#loader-modal').hide()
-        $('.modal-backdrop').remove()
+        $('#loader-modal').modal 'hide'
         alert(json.error)
       else
+        if json.search_name.length > 0
+          searchId = 'saved_search_' + json.search_id
+          if $('#saved-search-tbody tr#' + searchId).length == 0
+            $('#saved-search-tbody').append(complaint_named_search_tag(json.search_name, json.search_id))
+
         $('.tickets-totals-table').trigger("click") #close open dropdowns
         datatable = $('#complaints-index').DataTable()
         datatable.clear();
         datatable.rows.add(json.data);
         datatable.draw();
-        setTimeout (->
-          $('#loader-modal').hide()
-          $('.modal-backdrop').remove()
-        ), 2000
-#        $('#loader-modal').hide()
-#        $('.modal-backdrop').remove()
+        $('#loader-modal').modal 'hide'
 
       error: (response) ->
-        $('#loader-modal').hide()
-        $('.modal-backdrop').remove()
+        $('#loader-modal').modal 'hide'
         std_api_error(response, "There was an error loading search results.", reload: false)
   , this)
 

@@ -90,27 +90,24 @@ $ ->
       backdrop: 'static',
       keyboard: false
     })
-    headers = {'Token': $('input[name="token"]').val(), 'Xmlrpc-Token': $('input[name="xml_token"]').val()}
     ips_urls = this.ips_urls.value
     desc = this.description.value
     customer = this.customers.value
     tags = $('.selectize').val() || []
 
-    $.ajax(
+    std_msg_ajax(
       url: '/escalations/api/v1/escalations/webcat/complaints'
       method: 'POST'
-      headers: headers
       data:
         ips_urls: ips_urls,
         description: desc,
         customer: customer,
         tags: tags
       success: (response) ->
-        $('#loader-modal').hide()
+        $('#loader-modal').modal 'hide'
         std_msg_success('Complaint Created.', [], reload: true)
       error: (response) ->
-        $('#loader-modal').hide()
-        $('.modal-backdrop').remove();
+        $('#loader-modal').modal 'hide'
         std_api_error(response, "Complaint was not created.", reload: false)
     )
 

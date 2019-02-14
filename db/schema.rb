@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 2019_01_22_220012) do
+ActiveRecord::Schema.define(version: 2019_01_29_160213) do
 
   create_table "alerts", options: "ENGINE=InnoDB DEFAULT CHARSET=utf8", force: :cascade do |t|
     t.datetime "created_at", null: false
@@ -156,7 +156,7 @@ ActiveRecord::Schema.define(version: 2019_01_22_220012) do
     t.string "domain"
     t.string "path"
     t.float "wbrs_score"
-    t.string "url_primary_category"
+    t.string "url_primary_category", limit: 1000
     t.string "resolution"
     t.text "resolution_comment"
     t.datetime "complaint_entry_resolved_at"
@@ -169,7 +169,7 @@ ActiveRecord::Schema.define(version: 2019_01_22_220012) do
     t.string "suggested_disposition"
     t.string "ip_address"
     t.string "entry_type"
-    t.string "category"
+    t.string "category", limit: 1000
     t.integer "user_id"
     t.boolean "is_important"
     t.datetime "case_resolved_at"
@@ -248,7 +248,8 @@ ActiveRecord::Schema.define(version: 2019_01_22_220012) do
     t.string "phone"
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
-    t.index ["company_id", "name"], name: "index_customers_on_company_id_and_name", unique: true
+    t.index ["company_id", "name"], name: "index_customers_on_company_id_and_name"
+    t.index ["email"], name: "index_customers_on_email", unique: true
   end
 
   create_table "cves", options: "ENGINE=InnoDB DEFAULT CHARSET=latin1", force: :cascade do |t|

@@ -10,9 +10,9 @@ class ApplicationController < ActionController::Base
 
   private
 
+  # TODO Unneeded?
   def require_login
     session[:previous_url] = request.url
-    redirect_to new_escalations_session_path unless current_user
   end
 
   def bugzilla_session()
@@ -23,6 +23,10 @@ class ApplicationController < ActionController::Base
 
   def current_user
     user_from_request = User.from_request(params, request)
+    if user_from_request && !session[:email]
+      login_session = LoginSession.new(user_from_request)
+      login_session.set_session(session)
+    end
 
     if LoginSession.yet_active?(session, user_from_request&.email)
       @current_user ||= user_from_request
