@@ -204,7 +204,7 @@ class Wbrs::ManualWlbl < Wbrs::Base
     transformed_list_types = {}
     wlbl_params = stringkey_params(params)
     params_urls = params[:urls].map {|url| url.strip}
-    collection_of_target_list_type_to_destroy = wlbl_params.delete('trgt_list')
+    list_types_to_destroy = wlbl_params.delete('trgt_list')
 
     # Capture each url's list_types from the API
     params_urls.each do |param_url|
@@ -217,8 +217,8 @@ class Wbrs::ManualWlbl < Wbrs::Base
 
     # Loop through each url's current categories
     captured_list_types.each do |url, list_types|
-      # Transform the collection by removing the desired list_types
-      collection_of_target_list_type_to_destroy.each do |list_type|
+      # Transform the collection by removing the undesired list_types
+      list_types_to_destroy.each do |list_type|
         list_types.delete(list_type)
       end
     end
