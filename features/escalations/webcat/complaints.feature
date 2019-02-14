@@ -328,14 +328,12 @@ Feature: Webcat complaints
     When I goto "/escalations/webcat/complaints?f=ALL"
     And I click "#categorize-urls"
     And I click "#cat-urls-same"
-    And I fill in "url_1" with "mary.com"
-    And I fill in "url_2" with "joseph.com"
+    And I fill in "categorize_urls" with "joseph.com" and "mary.com" separated by blank lines
     And I fill in selectized with "Adult"
     And I trigger-click ".primary"
     And I wait for "45" seconds
-    Then take a screenshot
-    Then I should see "URLS CATEGORIZED SUCCESSFULLY"
-    And I should see "Categorization of a Top URL will create a pending complaint entry. All other entries have been submitted directly to WBRS."
+    Then I should see "SUCCESS"
+    And I should see "URLs/IPs successfully categorized."
 
   @javascript
   Scenario: a users tries submits a multiple url categorization without a URL
