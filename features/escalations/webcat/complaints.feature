@@ -344,8 +344,8 @@ Feature: Webcat complaints
     And I fill in selectized with "Adult"
     And I trigger-click ".primary"
     And I wait for "5" seconds
-    Then I should see "UNABLE TO CATEGORIZE"
-    Then I should see "Please confirm that a URL and at least one category for each desired entry exists."
+    Then I should see "ERROR"
+    Then I should see "Please check that a URL/IP has been inputted and that at least one category was selected."
 
   @javascript
   Scenario: a users tries submits a multiple url categorization without a category
@@ -353,10 +353,10 @@ Feature: Webcat complaints
     When I goto "/escalations/webcat/complaints?f=ALL"
     And I click "#categorize-urls"
     And I click "#cat-urls-same"
-    And I fill in "url_1" with "cisco.com"
+    And I fill in "categorize_urls" with "cisco.com"
     And I trigger-click ".primary"
-    Then I should see "UNABLE TO CATEGORIZE"
-    Then I should see "Please confirm that a URL and at least one category for each desired entry exists."
+    Then I should see "ERROR"
+    Then I should see "Please check that a URL/IP has been inputted and that at least one category was selected."
 
   @javascript
   Scenario: a users tries to fetch complaints
@@ -404,7 +404,7 @@ Feature: Webcat complaints
     Then I wait for "7" seconds
     And I click ".expand-all"
     And I fill in "complaint_prefix_1" with "cisco.com"
-    And I click ".inline-button"
+    And I click ".tertiary"
     And I wait for "10" seconds
     Then I should see "SUCCESS"
     Then I should see "URI updated."
