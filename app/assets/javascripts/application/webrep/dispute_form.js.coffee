@@ -24,8 +24,6 @@ $ ->
         $('#new-dispute').dropdown('toggle')
         $('#loader-modal').modal 'hide'
 
-        window.location.reload()
-
         if response.json.errors.length > 0
           std_msg_error("Duplicate",["Unable to create duplicate entries: #{response.json.errors}. The other entries (if any) were successfully created."], reload: true)
 

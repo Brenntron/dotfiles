@@ -80,16 +80,16 @@ module API
 
                 user_validation = User.where(cvs_username: permitted_params['assignee'])
 
-                separated_urls = permitted_params[:ips_urls].split("\n")
+                separated_entries = permitted_params[:ips_urls].split("\n")
 
-                separated_urls.each do |uri|
-                  if DisputeEntry.check_for_duplicates(uri)
-                    permitted_params[:ips_urls] = permitted_params[:ips_urls].gsub(uri+"\n","")
-                    errors << uri
+                separated_entries.each do |entry|
+                  if DisputeEntry.check_for_duplicates(entry)
+                    permitted_params[:ips_urls] = permitted_params[:ips_urls].gsub(entry+"\n","")
+                    errors << entry
                   end
                 end
 
-                if separated_urls.length > errors.length
+                if separated_entries.length > errors.length
                   if user_validation.present?
                     dispute = Dispute.create_action(bugzilla_rest_session,
                                             permitted_params[:ips_urls],
