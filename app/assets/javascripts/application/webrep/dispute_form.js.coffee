@@ -12,7 +12,7 @@ $ ->
     priority = this.priority.value
     ticket_type = $('#ticket-type-dropdown')[0].value
 
-    if ips_urls.trim.length > 0
+    if ips_urls.trim().length > 0
       std_msg_ajax(
         url: '/escalations/api/v1/escalations/webrep/disputes'
         method: 'POST'
