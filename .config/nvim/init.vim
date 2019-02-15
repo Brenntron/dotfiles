@@ -118,7 +118,7 @@ set backspace=indent,eol,start
 ""
 let g:better_whitespace_enabled=1
 set modelines=0
-set rnu
+set nu rnu
 set ruler
 set visualbell
 set wrap
