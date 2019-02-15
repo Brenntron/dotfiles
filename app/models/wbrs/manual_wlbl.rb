@@ -202,6 +202,8 @@ class Wbrs::ManualWlbl < Wbrs::Base
   def self.destroy_from_params(params= {}, username:)
     captured_list_types = {}
     transformed_list_types = {}
+    ids_to_drop = []
+
     wlbl_params = stringkey_params(params)
     params_urls = params[:urls].map {|url| url.strip}
     list_types_to_destroy = wlbl_params.delete('trgt_list')
@@ -210,10 +212,12 @@ class Wbrs::ManualWlbl < Wbrs::Base
     params_urls.each do |param_url|
       api_response = Wbrs::ManualWlbl.where({:url => param_url})
       captured_list_types[param_url] = api_response.select {|info| info.state == 'active' }.map {|info| info.list_type}
+
       # Drop list types from the urls now that we have captured their list types
-      drop_from_ids(api_response.select {|info| info.state == 'active' }.map {|info| info.id}, username)
+      ids_to_drop << api_response.select {|info| info.state == 'active' }.map {|info| info.id}
     end
 
+    drop_from_ids(ids_to_drop, username)
     # Now we have a hash with a URL as a key, and its list types as the value (Array format)
     # Next, we remove each list type in 'target_list_to_destroy' from the hash
 
