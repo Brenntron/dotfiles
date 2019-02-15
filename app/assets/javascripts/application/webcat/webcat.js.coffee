@@ -212,9 +212,13 @@ $ ->
     $('#complaints-index tbody').on 'click', ' .nested-complaint-data', ->
       $(this).focus()
       $(this).toggleClass('highlight-text')
-      debugger
+      element = $(this)
       innertext = $(this).text()
       copyToClipboard(innertext)
+      $(element).after( "<p id='copiedAlert'>Copied to clipboard!</p>" )
+      setTimeout (->
+        $("#copiedAlert").remove()
+      ), 1000
 
     copyToClipboard = (text) ->
       dummy = document.createElement('input')
