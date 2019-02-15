@@ -72,6 +72,56 @@ class Dispute < ApplicationRecord
   scope :sbrs_disputes, -> { where(submission_type: ['e', 'ew'])}
   scope :wbrs_disputes, -> { where(submission_type: ['w', 'ew'])}
 
+  def self.create_action(bugzilla_rest_session, ips_urls, assignee, priority, ticket_type, status=NEW, categories = nil)
+    user = User.where(cvs_username: assignee).first
+
+    case ticket_type
+    when 'Web'
+      ticket_type = 'w'
+    when 'Email'
+      ticket_type = 'e'
+    when 'Email & Web'
+      ticket_type = 'ew'
+    end
+
+    customer = Customer.where(name: 'Dispute Analyst').first
+
+    summary = "New WebRep Dispute generated at #{DateTime.now.utc.strftime("%Y-%m-%d %H:%M")}"
+
+    # Does a description need to go in here and be in the form?
+    full_description = %Q{
+          IPs/URIs: #{ips_urls}
+    }
+
+    bug_attrs = {
+        'product' => 'Escalations Console',
+        'component' => 'IP/Domain',
+        'summary' => summary,
+        'version' => 'unspecified',
+        'description' => full_description,
+        'priority' => priority,
+        'classification' => 'unclassified',
+    }
+
+    bug_proxy = bugzilla_rest_session.create_bug(bug_attrs)
+
+    new_dispute = Dispute.create!(id: bug_proxy.id,
+                                     user_id: user.id,
+                                     priority: priority,
+                                     submission_type: ticket_type,
+                                     submitter_type: 'Internal',
+                                     status: status,
+                                     customer_id: customer.id,
+                                     case_opened_at: Time.now)
+
+
+    ips_urls.split(' ').each do |ip_url|
+      DisputeEntry.create_dispute_entry(new_dispute, ip_url, status)
+    end
+
+    new_dispute
+  end
+
   def case_id_str
     '%010i' % id
   end
