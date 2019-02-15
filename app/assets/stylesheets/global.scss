@@ -4612,11 +4612,11 @@ table > tbody > tr > td.dispute_rep_tools {
 }
 
 .dispute_tool_current td {
-  border-right: 1px solid $content-bg-color;
+  border-bottom: none;
 }
 
-.dispute_tool_current td:last-of-type {
-  border-right: none;
+.dispute_tool_current tbody tr:first-child td {
+  padding-top: 8px;
 }
 
 .dispute_tool_current .content-label-sm {
@@ -5532,7 +5532,7 @@ input:checked + .toggle-slider:after {
   color: $type-lighter-color;
 }
 
-.wlbl-toggle-list li {
+.inline-tool-content-wrapper .wlbl-toggle-list li {
   height: 26px;
   padding-left: 22px;
 }
@@ -5552,11 +5552,7 @@ input:checked + .toggle-slider:after {
 
 table.dispute_tool_current th {
   padding: 10px 10px 4px 10px !important;
-  border-right: 1px solid $content-bg-color;
-}
-
-table.dispute_tool_current th:last-of-type {
-  border-right: none;
+  border-bottom: 1px solid $content-bg-color;
 }
 
 table.dispute_tool_current td {

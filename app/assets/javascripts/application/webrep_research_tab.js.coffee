@@ -249,107 +249,136 @@ $ ->
 
 
 
-
-
-
-  #Populating the toolbar Adjust WL/BL Button
-  $('#wlbl_entries_button').click ->
+  ## Populating the research tab toolbar Adjust WL/BL Button
+  window.bulk_get_current_wlbl = () ->
+    ## Clear out any residual data
+    # Empty table
     tbody = $('#wlbl_adjust_entries').find('table.dispute_tool_current').find('tbody')
-    show_content = $('#wlbl_adjust_entries').find('.wlbl-entry-content')
-    if !show_content[0]
-      show_content = $('#wlbl_adjust_entries').find('.entry-dispute-name')
-    show_wlbl = $('#wlbl_adjust_entries').find('.wlbl-entry-wlbl')
-    show_wbrs = $('#wlbl_adjust_entries').find('.wlbl-current-entry-wbrs')
-    if !show_wbrs[0]
-      show_wbrs = $('#wlbl_adjust_entries').find('.current-wbrs-score')
+    $(tbody).empty()
+
+    # Clear the checkboxes
     wl_weak = $('#wlbl_adjust_entries').find('.wl-weak-checkbox')
     wl_med = $('#wlbl_adjust_entries').find('.wl-med-checkbox')
     wl_heavy = $('#wlbl_adjust_entries').find('.wl-heavy-checkbox')
     bl_weak = $('#wlbl_adjust_entries').find('.bl-weak-checkbox')
     bl_med = $('#wlbl_adjust_entries').find('.bl-med-checkbox')
     bl_heavy = $('#wlbl_adjust_entries').find('.bl-heavy-checkbox')
-
-    $(show_content[0]).empty()
-    $(show_wbrs[0]).empty()
-    $(show_wlbl[0]).empty()
     $(wl_weak[0]).prop('checked', false)
     $(wl_med[0]).prop('checked', false)
     $(wl_heavy[0]).prop('checked', false)
     $(bl_weak[0]).prop('checked', false)
     $(bl_med[0]).prop('checked', false)
     $(bl_heavy[0]).prop('checked', false)
-    wl_weak_status = 'false'
-    wl_med_status = 'false'
-    wl_heavy_status = 'false'
-    bl_weak_status = 'false'
-    bl_med_status = 'false'
-    bl_heavy_status = 'false'
 
-#    $(tbody).empty()
-    dropdown_wrapper = $(this).parent()
-    if ($('.dispute_check_box:checked').length == 1)
-      submit_button = $('#wlbl_adjust_entries').find('.dropdown-submit-button')
-      entry_content = ''
+    # Empty comment box
+    comment_box = $('#wlbl_adjust_entries').find('.adjust-wlbl-input')
+    $(comment_box).val('')
 
+    ## Get data to populate table
+    # Get all the checked entry urls
+    if ($('.dispute_check_box:checked').length > 0)
+      data = []
       $('.dispute_check_box:checked').each ->
         entry_row = $(this).parents('.research-table-row')[0]
         entry_content = $(entry_row).find('.entry-data-content').text()
-        wbrs = $(entry_row).find('.entry-data-wbrs-score').find('.current-wbrs-score').text()
-        if !wbrs
-          wbrs = $(entry_row).find('.entry-data-wbrs-score').text()
+        wbrs = $(entry_row).find('.entry-data-wbrs-score').text()
+        wlbl = ''
+        data.push(['entry' : entry_content])
 
-        data = {
-        # Send entry content to reptool
-          'entry' : entry_content
-        }
 
-        headers = {'Token': $('input[name="token"]').val(), 'Xmlrpc-Token': $('input[name="xml_token"]').val()}
-        $.ajax(
-          url: '/escalations/api/v1/escalations/webrep/disputes/rule_ui_wlbl_get_info_for_form'
-          method: 'GET'
-          headers: headers
-          data: data
-          dataType: 'json'
-          success: (response) ->
-            #values will be in the format of BL-med, BL-weak, BL-heavy   (same with WL)
 
-            response = JSON.parse(response)
-            if response.data != ""
+#        ANDREW - This api piece needs to be hooked up to handle the multiple entry checks, then I'll add
+
+#        headers = {'Token': $('input[name="token"]').val(), 'Xmlrpc-Token': $('input[name="xml_token"]').val()}
+#        $.ajax(
+#          url: '/escalations/api/v1/escalations/webrep/disputes/rule_ui_wlbl_get_info_for_form'
+#          method: 'GET'
+#          headers: headers
+#          data: data
+#          dataType: 'json'
+#          success: (response) ->
+#            response = JSON.parse(response)
+#            if response.data != ""
+#              console.log response
+#
+        $(tbody).append('<tr>' + '<td class="wlbl-entry-contententry_content">' + entry_content + '</td><td class="wlbl-entry-wlbl"></td>' + wlbl + '<td class="wlbl-current-entry-wbrs text-center">' + wbrs + '</td>')
+
+#          error: (response) ->
+#            std_msg_error( 'Error retrieving WL/BL Data', response)
+#        )
+
+#    else
+#      std_msg_error('No rows selected', ['Please select one row.'])
+
+
+
+
+
+
+
+#    dropdown_wrapper = $(this).parent()
+#    if ($('.dispute_check_box:checked').length >= 1)
+#      submit_button = $('#wlbl_adjust_entries').find('.dropdown-submit-button')
+#      entry_content = ''
+#
+#      $('.dispute_check_box:checked').each ->
+#        entry_row = $(this).parents('.research-table-row')[0]
+#        entry_content = $(entry_row).find('.entry-data-content').text()
+#        wbrs = $(entry_row).find('.entry-data-wbrs-score').find('.current-wbrs-score').text()
+#        if !wbrs
+#          wbrs = $(entry_row).find('.entry-data-wbrs-score').text()
+#        # Send entry content to reptool
+#        data = {
+#          'entry' : entry_content
+#        }
+
+#        headers = {'Token': $('input[name="token"]').val(), 'Xmlrpc-Token': $('input[name="xml_token"]').val()}
+#        $.ajax(
+#          url: '/escalations/api/v1/escalations/webrep/disputes/rule_ui_wlbl_get_info_for_form'
+#          method: 'GET'
+#          headers: headers
+#          data: data
+#          dataType: 'json'
+#          success: (response) ->
+#            #values will be in the format of BL-med, BL-weak, BL-heavy   (same with WL)
+#
+#            response = JSON.parse(response)
+#            if response.data != ""
         
-              $(response.data).each ->
-                if String(this) == 'WL-weak'
-                  $(wl_weak[0]).prop('checked', true)
-                  wl_weak_status = 'true'
-                if String(this) == 'WL-med'
-                  $(wl_med[0]).prop('checked', true)
-                  wl_med_status = 'true'
-                if String(this) == 'WL-heavy'
-                  $(wl_heavy[0]).prop('checked', true)
-                  wl_heavy_status = 'true'
-                if String(this) == 'BL-weak'
-                  $(bl_weak[0]).prop('checked', true)
-                  bl_weak_status = 'true'
-                if String(this) == 'BL-med'
-                  $(bl_med[0]).prop('checked', true)
-                  bl_med_status = 'true'
-                if String(this) == 'BL-heavy'
-                  $(bl_heavy[0]).prop('checked', true)
-                  bl_heavy_status = 'true'
+#              $(response.data).each ->
+#                if String(this) == 'WL-weak'
+#                  $(wl_weak[0]).prop('checked', true)
+#                  wl_weak_status = 'true'
+#                if String(this) == 'WL-med'
+#                  $(wl_med[0]).prop('checked', true)
+#                  wl_med_status = 'true'
+#                if String(this) == 'WL-heavy'
+#                  $(wl_heavy[0]).prop('checked', true)
+#                  wl_heavy_status = 'true'
+#                if String(this) == 'BL-weak'
+#                  $(bl_weak[0]).prop('checked', true)
+#                  bl_weak_status = 'true'
+#                if String(this) == 'BL-med'
+#                  $(bl_med[0]).prop('checked', true)
+#                  bl_med_status = 'true'
+#                if String(this) == 'BL-heavy'
+#                  $(bl_heavy[0]).prop('checked', true)
+#                  bl_heavy_status = 'true'
 
-              $(show_content[0]).text(entry_content)
-              $(show_wbrs[0]).text(wbrs)
-              $(show_wlbl[0]).text(response.data)
-              $(submit_button).attr('disabled', false)
-            else
-              $(show_content[0]).text(entry_content)
-              $(show_wbrs[0]).text(wbrs)
-              $(show_wlbl[0]).text('Not on a list')
-              $(submit_button).attr('disabled', false)
-            #this should probably call the resync data then reload the page, for an up to date score
-
-          error: (response) ->
-            popup_response_error(response, 'Error retrieving WL/BL Data')
-        )
+#              $(show_content[0]).text(entry_content)
+#              $(show_wbrs[0]).text(wbrs)
+#              $(show_wlbl[0]).text(response.data)
+#              $(submit_button).attr('disabled', false)
+#            else
+#              $(show_content[0]).text(entry_content)
+#              $(show_wbrs[0]).text(wbrs)
+#              $(show_wlbl[0]).text('Not on a list')
+#              $(submit_button).attr('disabled', false)
+#            #this should probably call the resync data then reload the page, for an up to date score
+#
+#          error: (response) ->
+#            popup_response_error(response, 'Error retrieving WL/BL Data')
+#        )
 
 
 
@@ -366,9 +395,11 @@ $ ->
       #    $(tbody[0]).append('<tr><td>' + entry_content + '</td><td class="no-word-break">' + wlbl + '</td><td class="text-center">' + wbrs + '</td></tr>')
       #$($('#wlbl_adjust_entries').find('.comment-wrapper')).show()
 
-    else
-      $(dropdown_wrapper).removeClass('open')
-      std_msg_error('No rows selected', ['Please select one row.'])
+#    else
+#      $(dropdown_wrapper).removeClass('open')
+#      std_msg_error('No rows selected', ['Please select one row.'])
+
+
 
 
   #Inline Adjust WL/BL Button

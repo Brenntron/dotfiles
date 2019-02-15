@@ -40,7 +40,7 @@
         %div
           %label.toolbar-section-label Reputation
           %span.dropdown
-            %button#wlbl_entries_button.toolbar-button.adjust-wlbl-button.dropdown-toggle.esc-tooltipped.dropdown-button-margin-left{title: 'Adjust WL/BL', 'data-toggle': 'dropdown', 'aria-haspopup': 'true', 'aria-expanded': 'false'}
+            %button#wlbl_entries_button.toolbar-button.adjust-wlbl-button.dropdown-toggle.esc-tooltipped.dropdown-button-margin-left{title: 'Adjust WL/BL', 'data-toggle': 'dropdown', 'aria-haspopup': 'true', 'aria-expanded': 'false', onclick: 'bulk_get_current_wlbl()'}
               %span.toolbar-button-text Adjust WL/BL
             .dropdown-menu.toolbar-dropdown#wlbl_adjust_entries{'aria-labelledby': 'wlbl_entries_button'}
               = form_for :wlbl, html: {class: 'adjust-wlbl-form'} do |wlbl_form|
@@ -55,13 +55,13 @@
                         %th.content-label-sm.no-word-break Current WL/BL List
                         %th.text-center.content-label-sm.no-word-break Current WBRS Score
                     %tbody
-                      -# For each checked checkbox populate this information
-                      %tr
-                        %td.wlbl-entry-content
-                        %td.wlbl-entry-wlbl
-                        %td.wlbl-current-entry-wbrs.text-center
+                      -#%tr
+                      -#  %td.wlbl-entry-content
+                      -#  %td.wlbl-entry-wlbl
+                      -#  %td.wlbl-current-entry-wbrs.text-center
 
-                      -#    Removing for now. We can't do a preview until the api is updated to provide that info
+                      -# TODO Hook up ability to preview scores based on changes in WL/BL
+                      -#    We can't do a preview until the api is updated to provide that info
                       -#%td.text-center
                       -#  %label.content-label-sm New Score
                       -#  %br
@@ -78,7 +78,7 @@
                         %label.radio-label{for: 'wlbl-add'} Add to list
                       .col-xs-5
                         %input{type: 'radio', name: 'wlbl-action-radio', id: 'wlbl-remove', value: 'wlbl-remove'}
-                        %label.radio-label{for: 'wlbl-remove'} Remove to list
+                        %label.radio-label{for: 'wlbl-remove'} Remove from list
 
                     .row
                       .col-xs-12
@@ -87,24 +87,24 @@
                           .col-xs-5.col-xs-offset-2
                             %ul
                               %li
-                                %input{type: 'checkbox', value: "WL-weak"}
+                                %input.wl-weak-checkbox.wl-bl-list-inline{type: 'checkbox', name: 'wl-bl-list-inline', value: "WL-weak"}
                                   WL - Weak
                               %li
-                                %input{type: 'checkbox', value: "WL-med"}
+                                %input.wl-med-checkbox.wl-bl-list-inline{type: 'checkbox', name: 'wl-bl-list-inline', value: "WL-med"}
                                   WL - Medium
                               %li
-                                %input{type: 'checkbox', value: "WL-heavy"}
+                                %input.wl-heavy-checkbox.wl-bl-list-inline{type: 'checkbox', name: 'wl-bl-list-inline', value: "WL-heavy"}
                                   WL - Heavy
                           .col-xs-5
                             %ul
                               %li
-                                %input{type: 'checkbox', value: "BL-weak"}
+                                %input.bl-weak-checkbox.wl-bl-list-inline{type: 'checkbox', name: 'wl-bl-list-inline', value: "BL-weak"}
                                   BL - Weak
                               %li
-                                %input{type: 'checkbox', value: "BL-med"}
+                                %input.bl-med-checkbox.wl-bl-list-inline{type: 'checkbox', name: 'wl-bl-list-inline', value: "BL-med"}
                                   BL - Medium
                               %li
-                                %input{type: 'checkbox', value: "BL-heavy"}
+                                %input.bl-heavy-checkbox.wl-bl-list-inline{type: 'checkbox', name: 'wl-bl-list-inline', value: "BL-heavy"}
                                   BL - Heavy
                     -#.row.toggle-offset
                     -#  .col-xs-6
