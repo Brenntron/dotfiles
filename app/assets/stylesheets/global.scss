@@ -4057,12 +4057,13 @@ td.wbrs-highlight, td.sbrs-highlight {
   width: 100%;
 }
 
-#advanced-search-wrapper input, #new-complaint-form input, #categorize-urls-form-wrapper input {
+#advanced-search-wrapper input, #new-complaint-form input, #categorize-urls-form-wrapper input, #new-dispute-form input {
   margin-bottom: 8px;
   background-color: transparent;
   border: 1px solid darken($faint-neutral-color, 5%);
   border-radius: 1px;
 }
+
 #advanced-search-wrapper .content-label-sm {
   margin-bottom: 0;
 }
@@ -4151,12 +4152,12 @@ button.tertiary {
   left: auto;
 }
 
-#advanced-search-dropdown input, #new-complaint-wrapper input, #new-complaint-wrapper textarea, #categorize-urls-form-wrapper input, #categorize-urls-form-wrapper textarea {
+#advanced-search-dropdown input, #new-complaint-wrapper input, #new-dispute-wrapper textarea, #new-complaint-wrapper textarea, #categorize-urls-form-wrapper input, #categorize-urls-form-wrapper textarea {
   border: 4px solid $content-bg-color;
   outline: 1px solid darken($faint-neutral-color, 5%);
 }
 
-#advanced-search-dropdown input:focus, #new-complaint-wrapper input:focus, #new-complaint-wrapper textarea:focus, #categorize-urls-form-wrapper input:focus, #categorize-urls-form-wrapper textarea:focus {
+#advanced-search-dropdown input:focus, #new-complaint-wrapper input:focus,#new-dispute-wrapper textarea:focus, #new-complaint-wrapper textarea:focus, #categorize-urls-form-wrapper input:focus, #categorize-urls-form-wrapper textarea:focus {
   background-color: $faint-alt-highlight;
   border: 4px solid $content-bg-color;
   outline: 1px solid darken($faint-neutral-color, 5%);
@@ -6143,6 +6144,12 @@ table.dispute-entry-table tbody tr.selected {
   width: 100%;
 }
 
+#new-dispute-wrapper textarea, #new-dispute-wrapper input {
+  width: 100%;
+  min-width: 350px;
+  margin-bottom: 0;
+}
+
 #new-complaint-wrapper textarea, #categorize-urls-form-wrapper textarea {
   padding: 4px;
   color: $type-lighter-color;
@@ -6153,7 +6160,17 @@ table.dispute-entry-table tbody tr.selected {
   margin-bottom: 15px;
 }
 
-#new-complaint-wrapper .form-group {
+#new-dispute-wrapper textarea {
+  padding: 4px;
+  color: $type-lighter-color;
+  font-size: 9.5pt;
+  font-weight: 400;
+  line-height: 1.25em;
+  min-height: 100px;
+  margin-bottom: 15px;
+}
+
+#new-complaint-wrapper .form-group, #new-dispute-wrapper .form-group {
   margin-bottom: 0;
 }
 
@@ -6255,6 +6272,7 @@ table.dispute-entry-table tbody tr.selected {
   border-radius: 0;
   height: 26px;
   margin-bottom: 8px;
+  padding: 0;
 }
 
 /**** Nested Complaint Table styles ****/
