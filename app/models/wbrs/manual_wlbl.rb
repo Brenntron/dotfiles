@@ -210,6 +210,8 @@ class Wbrs::ManualWlbl < Wbrs::Base
     params_urls.each do |param_url|
       api_response = Wbrs::ManualWlbl.where({:url => param_url})
       captured_list_types[param_url] = api_response.select {|info| info.state == 'active' }.map {|info| info.list_type}
+      # Drop list types from the urls now that we have captured their list types
+      drop_from_ids(api_response.select {|info| info.state == 'active' }.map {|info| info.id}, username)
     end
 
     # Now we have a hash with a URL as a key, and its list types as the value (Array format)
