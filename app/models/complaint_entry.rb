@@ -69,11 +69,12 @@ class ComplaintEntry < ApplicationRecord
         self.update(user:current_user, status:"ASSIGNED", case_assigned_at: Time.now)
         complaint.set_status("ASSIGNED")
       else
-        raise("Cannot take a completed complaint. How did this happen.")
+        return("Already completed")
       end
     else
-      raise("Cannot take someone elses complaint.")
+      return("Someone elses complaint")
     end
+    return("Complaint taken")
   end
   def return_complaint
     if self.user != User.where(display_name: 'Vrt Incoming').first
@@ -82,17 +83,18 @@ class ComplaintEntry < ApplicationRecord
           self.update(user: User.vrtincoming, status:"NEW")
           complaint.set_status("NEW")
         else
-          raise("Cannot return complaint that has been completed.")
+          return("Already completed")
         end
       elsif self.is_important && self.status != "PENDING"
         self.update(user: User.vrtincoming, status:"NEW")
         complaint.set_status("NEW")
       else
-        raise("Cannot return complaint when status is pending.")
+        return("Status is pending")
       end
     else
-      raise("Cannot return a complaint that is not assigned")
+      return("Not yet assigned")
     end
+    return("Complaint returned")
   end
 
   def is_pending?
