@@ -586,7 +586,8 @@ module API
               information = JSON.parse(information)
 
               if information[params[:entry].gsub('http://', '').gsub('https://', '')] == "NOT_FOUND"
-                return {:classification => "not found", :expiration => "", :status => "", :comment => ""}.to_json
+                return {:entry => params[:entry], :classification => "not found", :expiration => "", :status => "", :comment => ""}.to_json
+              # TODO Make expiration human readable - Just the date
               else
                 expiration = ""
                 begin
@@ -594,7 +595,7 @@ module API
                 rescue
                   expiration = information[params[:entry].gsub('http://', '').gsub('https://', '')]["expiration"]
                 end
-                return {:classification => information[params[:entry].gsub('http://', '').gsub('https://', '')]["classifications"].first, :expiration => expiration, :status => information[params[:entry].gsub('http://', '').gsub('https://', '')]["status"], :comment => information[params[:entry].gsub('http://', '').gsub('https://', '')]["metadata"]["VRT"]["comment"]}.to_json
+                return {:entry => params[:entry], :classification => information[params[:entry].gsub('http://', '').gsub('https://', '')]["classifications"].first, :expiration => expiration, :status => information[params[:entry].gsub('http://', '').gsub('https://', '')]["status"], :comment => information[params[:entry].gsub('http://', '').gsub('https://', '')]["metadata"]["VRT"]["comment"]}.to_json
               end
 
             end

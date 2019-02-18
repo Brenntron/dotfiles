@@ -4528,12 +4528,16 @@ table > tbody > tr > td.dispute_rep_tools {
   background-color: transparent;
 }
 
-.dispute_rep_tools .dropdown-menu, #wlbl_adjust_entries.dropdown-menu, #wlbl_adjust_entries_index.dropdown-menu {
+.dispute_rep_tools .dropdown-menu, #wlbl_adjust_entries.dropdown-menu, #wlbl_adjust_entries_index.dropdown-menu, #reptool_adjust_entries.dropdown-menu {
   left: auto;
   border-radius: 4px 0 4px 4px;
   border: none;
   background-color: $bug-section-color;
   min-width: 330px;
+}
+
+#reptool_adjust_entries.dropdown-menu {
+  width: 450px;
 }
 
 #wlbl_adjust_entries.dropdown-menu li:hover, #wlbl_adjust_entries_index.dropdown-menu li:hover{
@@ -6687,7 +6691,7 @@ table#duplicates a {
   background-size: 18px 18px;
 }
 
-.entry-dispute-name, .entry-reptool-class, .entry-reptool-expiration, .new_wbrs_score, .current-wbrs-score {
+.entry-reptool-class, .entry-reptool-expiration, .new_wbrs_score, .current-wbrs-score {
   float: none !important;
   font-size: 8pt !important;
   padding-left: 0 !important;
@@ -8044,4 +8048,10 @@ th.sorting_1, th.sorting_asc, th.sorting_desc {
   margin-right: -13px !important;
   padding-bottom: 4px !important;
   margin-top: -3px !important;
+}
+
+.toolbar .dropdown-menu span.missing-data {
+  font-size: 8pt;
+  float: none;
+  padding-left: 0;
 }
