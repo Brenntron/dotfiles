@@ -113,7 +113,7 @@ class ComplaintEntry < ApplicationRecord
     categories = categories_string&.split(',')
     ActiveRecord::Base.transaction do
       # If the prefix is a high telemetry value then the status needs to be set to PENDING
-      if self.is_important
+      if self.is_important && entry_status != Complaint::RESOLUTION_UNCHANGED
         if self.status == "PENDING"
           if commit_pending == "commit"
             # commit from pending of important case
@@ -159,7 +159,7 @@ class ComplaintEntry < ApplicationRecord
                  user:current_user)
         end
       else
-        # not important case
+        # not important case or resolution is "unchanged"
 
         current_status = "COMPLETED"
         self.case_assigned_at ||= Time.now
