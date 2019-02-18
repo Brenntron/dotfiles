@@ -145,8 +145,10 @@ $ ->
     $(expand_button).toggleClass('shown')
 
 
-#  Populating the toolbar Adjust RepTool Button
-  $('#reptool_entries_button').click ->
+##  Populating the toolbar Adjust RepTool BL Button
+  window.bulk_get_current_reptool = () ->
+
+
     dropdown = $('#reptool_adjust_entries').parent()
 
     # Only allowing a single submission at a time for now.
