@@ -1394,6 +1394,9 @@ class Dispute < ApplicationRecord
     main_results = Dispute.where(:user_id => user_id).where("disputes.created_at between '#{from}' and '#{to}'").where(:status => status_array)
 
     main_results.each do |result|
+      if !result.case_resolved_at
+        result.case_resolved_at = Time.now
+      end
       report_data[:ticket_numbers] << result.id
       report_data[:close_times] << ((result.case_resolved_at - result.created_at) / 3600 )
     end
