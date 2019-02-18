@@ -581,6 +581,9 @@ window.drop_current_categories = () ->
           $("#url_#{key}").css("border-color", "green")
           $("#cat-url-success-message-#{key}").text("Categories successfully dropped.")
           $("#cat-url-success-#{key}").show()
+          select= $("#cat_new_url_#{key}").selectize()
+          selectize = select[0].selectize
+          selectize.clear()
         else
           $("#url_#{key}").css("border-width", "2px")
           $("#url_#{key}").css("border-color", "#E47433")
