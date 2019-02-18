@@ -834,9 +834,9 @@ format = (complaint_entry_row) ->
       '<input class="nested-table-input complaint-comment-input" id="complaint_resolution_comment_' + complaint_entry.entry_id + '" type="text" onclick="this.select()" value="' + resolution_comment + '" placeholder="Add a comment for the customer." ' + entry_status + '>' +
       '</div><div class="col-xs-2">' +
       '<label class="content-label-sm">Resolution</label><br/>' +
-      '<input type="radio" id="unchanged' + complaint_entry.entry_id + '" name="resolution' + complaint_entry.entry_id + '" value="UNCHANGED" ' + unchanged_radio + entry_status + '> Unchanged <br/> ' +
-      '<input type="radio" id="fixed' + complaint_entry.entry_id + '" name="resolution' + complaint_entry.entry_id + '" value="FIXED"  ' + fixed_radio + entry_status + '> Fixed  <br/> ' +
-      '<input type="radio" id="invalid' + complaint_entry.entry_id + '" name="resolution' + complaint_entry.entry_id + '" value="INVALID" ' + invalid_radio + entry_status + '> Invalid' +
+      '<input type="radio" class="resolution_radio_button" id="unchanged' + complaint_entry.entry_id + '" name="resolution' + complaint_entry.entry_id + '" value="UNCHANGED" ' + unchanged_radio + entry_status + '> Unchanged <br/> ' +
+      '<input type="radio" class="resolution_radio_button" id="fixed' + complaint_entry.entry_id + '" name="resolution' + complaint_entry.entry_id + '" value="FIXED"  ' + fixed_radio + entry_status + '> Fixed  <br/> ' +
+      '<input type="radio" class="resolution_radio_button" id="invalid' + complaint_entry.entry_id + '" name="resolution' + complaint_entry.entry_id + '" value="INVALID" ' + invalid_radio + entry_status + '> Invalid' +
       '<br/>' +
       '<button class="tertiary submit_changes" id="submit_changes_' + complaint_entry.entry_id + '" onclick="updateEntryColumns(' + complaint_entry.entry_id + ',' + row_id + ')" ' + entry_status + '>Submit Changes</button>' +
       '</div></div></div></div></div></td></tr></table>'
@@ -1363,25 +1363,33 @@ window.master_submit = () ->
       comment = $(this).find("#complaint_comment_#{entry_id}")[0].value
       resolution_comment = $(this).find("#complaint_resolution_comment_#{entry_id}")[0].value
 
-      if categories.length > 0
-        data.push({entry_id: entry_id, row_id: row_id, prefix: prefix, categories: categories, category_names: category_names, status: status, comment: comment, resolution_comment: resolution_comment})
+      if (categories.length > 0 && status == 'FIXED') || ((categories.length == 0) && (status == 'INVALID' || status == 'UNCHANGED'))
+        data.push({entry_id: entry_id, error: false, row_id: row_id, prefix: prefix, categories: categories, category_names: category_names, status: status, comment: comment, resolution_comment: resolution_comment})
+      else if status == 'UNCHANGED' || status == 'INVALID'
+        data.push({entry_id: entry_id, error: false, row_id: row_id, prefix: prefix, categories: categories, category_names: category_names, status: status, comment: comment, resolution_comment: resolution_comment})
+      else if (categories.length == 0) && status == 'FIXED'
+        data.push({entry_id, error: true, reason: 'nil_categories'})
 
   std_msg_ajax(
     method: 'POST'
     url: "/escalations/api/v1/escalations/webcat/complaint_entries/master_submit"
     data: {data: data}
     success: (response) ->
-      $('#loader-modal').modal 'hide'
-
-      errors = []
+      errors = false
+      nil_categories = []
+      other = []
 
       json = JSON.parse(response)
 
       table = $('#complaints-index').DataTable()
 
       for entry in json
-        if entry.error == true
-          errors.push(entry.entry_id)
+        if entry.error == true && entry.reason == 'nil_categories'
+          nil_categories.push(entry.entry_id)
+          errors = true
+        else if entry.error == true && entry.reason == 'other'
+          other.push(entry.entry_id)
+          errors = true
         else
           temp_row = table.row(entry.row_id)
           temp_row.data().status = entry.status
@@ -1415,10 +1423,23 @@ window.master_submit = () ->
             items: selected_options(entry.categories)
           }
 
-      if errors.length > 0
-        std_msg_error("The following entries could not be saved: #{errors.toString()}. The rest (if any) were successful.",'')
+      other_boiler_plate = "The following entries could not be saved due to API errors: " + other.toString() + "<br>"
+      no_cats_boiler_plate = "The following entries could not be saved (no categories): " + nil_categories.toString()
+
+      error = ''
+
+      if other.length > 0
+        error += other_boiler_plate
+
+      if nil_categories.length > 0
+        error += no_cats_boiler_plate
+
+      if errors == true
+        $('#loader-modal').modal 'hide'
+        std_msg_error(error,"")
       else
-        std_msg_success("All entries were succesfully submitted and saved.","")
+        $('#loader-modal').modal 'hide'
+        std_msg_success("All complaints successfully processed.")
 
       tds = $('#complaints-index tbody').closest('td')
       for td in tds
@@ -1428,6 +1449,7 @@ window.master_submit = () ->
     error: (response) ->
       $('#loader-modal').modal 'hide'
       std_msg_error("Unable to submit changes for selected entries.","", reload: false)
+
   , this)
 
 
@@ -1464,3 +1486,6 @@ $ ->
     if $('#cat-urls-same').prop('checked')
       $('#categorize-diff-form').hide()
       $('#categorize-same-form').show()
+
+  $(document).on 'change', '.resolution_radio_button', ->
+    $('#master-submit').prop('disabled', false)
