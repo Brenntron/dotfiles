@@ -130,23 +130,73 @@
                   .dropdown-tool-text-divider.secondary-text-divider
                     Adjust Reptool Classification
 
-                  -#.inline-tool-content-wrapper
-                  -#  .toolbar
-                  -#    %div
-                  -#      %label.toolbar-section-label{for: 'blacklist-action-select'} Status
-                  -#      = rep_form.select(:action, ['ACTIVE', 'EXPIRED'],
-                  -#        {include_blank: true},
-                  -#        class: 'toolbar-select select-status adjust-reptool-bl-input action-input',
-                  -#        title: 'RepTool Rule Status',
-                  -#        id: "blacklist-action-select")
-                  -#
-                  -#    %div
-                  -#      %label.toolbar-section-label{for: 'blacklist-classifications-select'} RepTool WL/BL
-                  -#      = rep_form.select(:classification, RepApi::Blacklist.classifications,
-                  -#        {include_blank: true},
-                  -#        class: 'toolbar-select select-rt-rule adjust-reptool-bl-input classifications-input',
-                  -#        title: "RepTool BL Rules",
-                  -#        id: "blacklist-classifications-select")
+                  .inline-tool-content-wrapper
+                    .row
+                      .col-xs-6
+                        %input{type: 'radio', name: 'reptool-action-radio', id: 'reptool-maintain', value: 'reptool-maintain', checked: true}
+                        %label.radio-label{for: 'reptool-maintain'} Maintain current classifications
+                      .col-xs-6
+                        %input{type: 'radio', name: 'reptool-action-radio', id: 'reptool-override', value: 'reptool-override'}
+                        %label.radio-label{for: 'reptool-override'} Override classifications
+
+                    .row
+                      .col-xs-12
+                        %label.content-label-sm{for: "reptool-class-type-select"} Classifications
+                        .row.dropdown-tool-grey-row
+                          .col-xs-4
+                            %ul
+                              %li
+                                %input{type: 'checkbox', value: 'attackers'}
+                                  attackers
+                              %li
+                                %input{type: 'checkbox', value: 'bogon'}
+                                  bogon
+                              %li
+                                %input{type: 'checkbox', value: 'bots'}
+                                  bots
+                              %li
+                                %input{type: 'checkbox', value: 'cnc'}
+                                  cnc
+                              %li
+                                %input{type: 'checkbox', value: 'cryptomining'}
+                                  cryptomining
+                          .col-xs-4
+                            %ul
+                              %li
+                                %input{type: 'checkbox', value: 'dga'}
+                                  dga
+                              %li
+                                %input{type: 'checkbox', value: 'exploit kit'}
+                                  exploit kit
+                              %li
+                                %input{type: 'checkbox', value: 'malware'}
+                                  malware
+                              %li
+                                %input{type: 'checkbox', value: 'open_proxy'}
+                                  open_proxy
+                              %li
+                                %input{type: 'checkbox', value: 'open_relay'}
+                                  open_relay
+                          .col-xs-4
+                            %ul
+                              %li
+                                %input{type: 'checkbox', value: 'phishing'}
+                                  phishing
+                              %li
+                                %input{type: 'checkbox', value: 'response'}
+                                  response
+                              %li
+                                %input{type: 'checkbox', value: 'spam'}
+                                  spam
+                              %li
+                                %input{type: 'checkbox', value: 'suspicious'}
+                                  suspicious
+                              %li
+                                %input{type: 'checkbox', value: 'tor_exit_node'}
+                                  tor_exit_node
+
+
+
                   -#  .comment-wrapper
                   -#    %label.content-label-sm Comment
                   -#    %textarea.dropdown-comment.adjust-reptool-bl-input.comment-input
