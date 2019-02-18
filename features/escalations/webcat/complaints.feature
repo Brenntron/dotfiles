@@ -26,7 +26,7 @@ Feature: Webcat complaints
     And I fill in "customers" with "Cisco:Talos Person:talos@cisco.com"
     And I fill in selectized with "urgent"
     And I click "Create"
-    And I wait for "5" seconds
+    And I wait for "15" seconds
     And I should see "COMPLAINT CREATED"
 
   @javascript
@@ -52,7 +52,7 @@ Feature: Webcat complaints
     And I goto "/escalations/webcat/complaints?f=ALL"
     Then I should not see "Update"
     And I click ".expand-all"
-    And I choose "fixed1"
+    And I trigger-click "#fixed1"
     And I should see "Update"
     And I should not see "commit"
     When I click "#submit_changes_1"
@@ -403,7 +403,7 @@ Feature: Webcat complaints
     When I goto "/escalations/webcat/complaints?f=ALL"
     And I click ".expand-all"
     And I fill in "complaint_prefix_1" with "cisco.com"
-    And I click ".inline-button"
+    And I trigger-click ".inline-button"
     And I wait for "10" seconds
     Then I should see "SUCCESS"
     Then I should see "URI updated."
