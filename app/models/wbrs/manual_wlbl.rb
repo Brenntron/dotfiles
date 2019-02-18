@@ -1,5 +1,5 @@
 class Wbrs::ManualWlbl < Wbrs::Base
-  FIELD_NAMES = %w{id ctime list_type mtime threat_cats url username state}
+  FIELD_NAMES = %w{id ctime list_type mtime threat_cats url username state notes}
   FIELD_SYMS = FIELD_NAMES.map{|name| name.to_sym}
 
 

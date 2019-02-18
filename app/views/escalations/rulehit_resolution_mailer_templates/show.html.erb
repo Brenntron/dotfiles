@@ -1,0 +1,34 @@
+<p id="notice"><%= notice %></p>
+
+<p>
+  <strong>Mnemonic:</strong>
+  <%= @rulehit_resolution_mailer_template.mnemonic %>
+</p>
+
+<p>
+  <strong>To:</strong>
+  <%= @rulehit_resolution_mailer_template.to %>
+</p>
+
+<p>
+  <strong>Cc:</strong>
+  <%= @rulehit_resolution_mailer_template.cc %>
+</p>
+
+<p>
+  <strong>Subject:</strong>
+  <%= @rulehit_resolution_mailer_template.subject %>
+</p>
+
+<p>
+  <strong>Body:</strong>
+  <%= @rulehit_resolution_mailer_template.body %>
+</p>
+
+<%= link_to 'Edit', edit_escalations_rulehit_resolution_mailer_template_path(@rulehit_resolution_mailer_template) %> |
+<%= link_to 'Back', escalations_rulehit_resolution_mailer_templates_path %>
+<script>
+    $( document ).ready(function() {
+        $('body').addClass('escalations--webrep--disputes-controller')
+    });
+</script>

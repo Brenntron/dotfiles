@@ -64,16 +64,17 @@ class ComplaintEntry < ApplicationRecord
   end
 
   def take_complaint(current_user)
-    if user.nil? ||user.display_name == "Vrt Incoming"
-      if status!="COMPLETED"
+    if user.nil? || user.display_name == "Vrt Incoming"
+      if status != "COMPLETED"
         self.update(user:current_user, status:"ASSIGNED", case_assigned_at: Time.now)
         complaint.set_status("ASSIGNED")
       else
-        raise("Cannot take a completed complaint. How did this happen.")
+        return("Already completed")
       end
     else
-      raise("Cannot take someone elses complaint.")
+      return("Someone elses complaint")
     end
+    return("Complaint taken")
   end
   def return_complaint
     if self.user != User.where(display_name: 'Vrt Incoming').first
@@ -82,14 +83,18 @@ class ComplaintEntry < ApplicationRecord
           self.update(user: User.vrtincoming, status:"NEW")
           complaint.set_status("NEW")
         else
-          raise("Cannot return complaint that has been completed.")
+          return("Already completed")
         end
+      elsif self.is_important && self.status != "PENDING"
+        self.update(user: User.vrtincoming, status:"NEW")
+        complaint.set_status("NEW")
       else
-        raise("Cannot return complaint when status is pending.")
+        return("Status is pending")
       end
     else
-      raise("Cannot return a complaint that is not assigned")
+      return("Not yet assigned")
     end
+    return("Complaint returned")
   end
 
   def is_pending?
@@ -189,7 +194,9 @@ class ComplaintEntry < ApplicationRecord
     if existing_prefixes.present?
       existing_prefixes.each do |prefix_found|
         if prefix_found.subdomain == self.subdomain
-          existing_prefix = prefix_found
+          if prefix_found.path == self.path
+            existing_prefix = prefix_found
+          end
         end
       end
     end
@@ -220,7 +227,7 @@ class ComplaintEntry < ApplicationRecord
       new_complaint_entry.complaint_id = complaint.id
       new_complaint_entry.status = status
 
-      wbrs_stuff = Sbrs::ManualSbrs.get_wbrs_data({:url => ip_url})
+      wbrs_stuff = Sbrs::ManualSbrs.get_wbrs_data({:url => URI.escape(ip_url)})
       wbrs_score = wbrs_stuff["wbrs"]["score"]
       new_complaint_entry.wbrs_score = wbrs_score
 
@@ -264,7 +271,7 @@ class ComplaintEntry < ApplicationRecord
     begin
       screenshot_data =  ""
       Timeout::timeout(max_wait_for_job) do
-        screenshot_data = CapybaraSpider.low_capture("http://#{new_complaint_entry.hostlookup}")
+        screenshot_data = CapybaraSpider.low_capture("#{new_complaint_entry.hostlookup}")
       end
       ces = ComplaintEntryScreenshot.new
       ces.complaint_entry_id = new_complaint_entry.id
@@ -524,13 +531,15 @@ class ComplaintEntry < ApplicationRecord
 
   def set_current_category
     category_list = []
-    prefix_results = Wbrs::Prefix.where({:urls => [self.hostlookup]})
+    prefix_results = Wbrs::Prefix.where({:urls => [URI.escape(self.hostlookup)]})
     if prefix_results
       if prefix_results.first&.is_active == 1
 
         categories = prefix_results.find_all {|result| result.path == self.path}
         categories.each do |cat|
-          category_list << Wbrs::Category.find(cat.category_id).descr
+          if cat.subdomain == self.subdomain
+            category_list << Wbrs::Category.find(cat.category_id).descr
+          end
         end
 
         self.url_primary_category = category_list.uniq.join(',')
@@ -551,7 +560,7 @@ class ComplaintEntry < ApplicationRecord
   end
 
   def current_category_data
-    prefix = Wbrs::Prefix.where({:urls => [self.hostlookup]})&.first
+    prefix = Wbrs::Prefix.where({:urls => [URI.escape(self.hostlookup)]})&.first
     return {} unless prefix
 
     current_categories = prefix.categories
@@ -572,7 +581,7 @@ class ComplaintEntry < ApplicationRecord
   def historic_category_data
 
     prefix_id = nil
-    prefix_results = Wbrs::Prefix.where({:urls => [self.hostlookup]})
+    prefix_results = Wbrs::Prefix.where({:urls => [URI.escape(self.hostlookup)]})
     if prefix_results.present?
       prefix_id = prefix_results.first.prefix_id
     end
@@ -588,7 +597,7 @@ class ComplaintEntry < ApplicationRecord
   def history_category_data_with_preload_save
 
     prefix_id = nil
-    prefix_results = Wbrs::Prefix.where({:urls => [self.hostlookup]})
+    prefix_results = Wbrs::Prefix.where({:urls => [URI.escape(self.hostlookup)]})
 
     complaint_entry_preload = ComplaintEntryPreload.where(complaint_entry_id: self.id).first
 

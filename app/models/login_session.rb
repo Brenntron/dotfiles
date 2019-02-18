@@ -82,10 +82,10 @@ class LoginSession
   end
 
   def set_session(session)
-    if success? && user_id && xmlrpc_token
+    if user_id
       session[:user] = user_id
+      session[:username] = user.cvs_username
       session[:email] = user_email
-      session[:token] = xmlrpc_token
       session[:session_version] = self.class.session_version
       session[:session_timestamp] = timestamp
     end
