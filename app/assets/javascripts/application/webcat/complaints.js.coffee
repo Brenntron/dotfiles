@@ -583,6 +583,8 @@ window.drop_current_categories = () ->
           selectize = select[0].selectize
           selectize.clear()
         else
+          $("#url_#{key}").css("border-width", "2px")
+          $("#url_#{key}").css("border-color", "#E47433")
           $("#cat-url-error-message-#{key}").text("Unable to drop categories.")
           $("#cat-url-#{key}").show()
       $('#loader-modal').modal 'hide'
