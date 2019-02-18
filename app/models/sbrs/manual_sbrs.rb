@@ -40,25 +40,25 @@ class Sbrs::ManualSbrs < Sbrs::Base
   end
 
   def self.parse_sbrs(sbrs_response)
-    JSON.parse(sbrs_response.body)[0]["response"]
+    sbrs_return = JSON.parse(sbrs_response.body)
+    sbrs_return = sbrs_return[0]['response']
+
+    sbrs_return
   end
 
   def self.parse_wbrs(wbrs_response)
-    wbrs_return = {}.merge(JSON.parse(wbrs_response.body)[0]["response"])
-    #wbrs_rules = wbrs_return["wbrs-rulehits"]
-    #wbrs_rules = rules_matchup
-    #binding.pry
-    wbrs_return["wbrs-rulehits"] = ["what","the","hell"]
-    wbrs_return["wbrs-rulehits"] = Sbrs::Base.rules_matchup
+    wbrs_return = JSON.parse(wbrs_response.body)
+    wbrs_return = wbrs_return[0]['response']
+
     wbrs_return
   end
 
-  def self.call_sbrs(params)
-    parse_sbrs(request_sds(path: '/score/sbrs/json?ip=', body: params))
+  def self.call_sbrs(params, type: nil)
+    parse_sbrs(request_sds(path: '/score/sbrs/json?ip=', body: params, type: type))
   end
 
-  def self.call_wbrs(params)
-    parse_wbrs(request_sds(path: '/score/wbrs;wbrs-rulehits/json?url=', body: params))
+  def self.call_wbrs(params, type:nil)
+    parse_wbrs(request_sds(path: '/score/wbrs;wbrs-rulehits/json?url=', body: params, type: type))
   end
 
   def self.where(conditions = {}, raw = false)
