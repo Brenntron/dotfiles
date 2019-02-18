@@ -1351,3 +1351,9 @@ $ ->
     if $('#cat-urls-same').prop('checked')
       $('#categorize-diff-form').hide()
       $('#categorize-same-form').show()
+
+  # If a stupidly long email address is returned it will wrap
+  # rather than pushing the column into the column beside it
+  $('.email-row').find('.case-history-author').each ->
+    if $(this).text().length > 28
+      $(this).addClass('break-word')
