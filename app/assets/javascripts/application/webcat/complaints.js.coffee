@@ -4,7 +4,7 @@ window.updateURI = (complaint_entry_id) ->
   $('#loader-modal').modal({
     keyboard: false
   })
-  
+
   uri = $("#complaint_prefix_#{complaint_entry_id}").val()
 
   std_msg_ajax(
@@ -31,12 +31,6 @@ window.updateURI = (complaint_entry_id) ->
 
         $("#history-#{complaint_entry_id}").replaceWith('<button class="secondary" id="history-' + complaint_entry_id + '" onclick="history_dialog('+complaint_entry_id+')">History</button>')
         $("#domain-#{complaint_entry_id}").replaceWith('<button class="secondary" id="domain-' + complaint_entry_id + '" onclick="domain_whois(\''+response.domain+'\')">Domain</button>')
-
-        std_msg_success("Success",['URI updated.'])
-
-
-
-
 
   )
 
@@ -364,7 +358,7 @@ window.take_selected = ()->
         json = $.parseJSON(response)
         if json.error
           notice_html = "<p>Something went wrong: #{json.error}</p>"
-          std_msg_error('take error', [json.error])
+          std_msg_error('take error', json.error)
         else
           i = 0
           while i < selected_rows[0].length
@@ -398,7 +392,7 @@ window.return_selected = ()->
         json = $.parseJSON(response)
         if json.error
           notice_html = "<p>Something went wrong: #{json.error}</p>"
-          std_msg_error('return error', [json.error])
+          std_msg_error('return error', json.error)
         else
           i = 0
           while i < selected_rows[0].length
@@ -583,10 +577,11 @@ window.drop_current_categories = () ->
     success: (response) ->
       for key, value of response.json
         if value && value.code == 200
-          $("#url_#{key}").css("border-width", "2px")
-          $("#url_#{key}").css("border-color", "green")
           $("#cat-url-success-message-#{key}").text("Categories successfully dropped.")
           $("#cat-url-success-#{key}").show()
+          select= $("#cat_new_url_#{key}").selectize()
+          selectize = select[0].selectize
+          selectize.clear()
         else
           $("#url_#{key}").css("border-width", "2px")
           $("#url_#{key}").css("border-color", "#E47433")
@@ -1398,4 +1393,9 @@ $ ->
       $('#web-cat-search').show()
       $('#new-complaint').show()
 
+  # If a stupidly long email address is returned it will wrap
+  # rather than pushing the column into the column beside it
+  $('.email-row').find('.case-history-author').each ->
+    if $(this).text().length > 28
+      $(this).addClass('break-word')
 

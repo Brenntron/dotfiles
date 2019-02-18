@@ -1873,6 +1873,7 @@ a.static-nav-item {
 .icon-team-bugs    {background-image: url(image_path('icon_teambugs.svg'));}
 .icon-pending-bugs {background-image: url(image_path('icon_pendingbugs.svg'));}
 .icon-open-bugs    {background-image: url(image_path('icon_openbugs.svg'));}
+.icon-unassigned-bugs    {background-image: url(image_path('icon_unassigned.svg'));}
 .icon-email-tix {background-image: url(image_path('icon_open_email_tix.svg'));}
 .icon-web-tix {background-image: url(image_path('icon_open_web_tix.svg'));}
 .icon-fixed-bugs   {background-image: url(image_path('icon_fixedbugs.svg'));}
@@ -1956,6 +1957,10 @@ a.static-nav-item {
   position: absolute;
   top: -8px;
   left: 20px;
+}
+
+#filter-cases-list {
+  line-height: 2.5em;
 }
 
 .nav-tool-dropdown-header {
@@ -2918,6 +2923,10 @@ fieldset.top-content {
 
 .tooltipster-base.tooltipster-top.tooltipster-show {
   margin-bottom: -20px !important;
+}
+
+.esc-tooltipped:hover {
+  cursor: pointer;
 }
 
 .rule-alerts-table .alerted-flag {
@@ -4052,12 +4061,13 @@ td.wbrs-highlight, td.sbrs-highlight {
   width: 100%;
 }
 
-#advanced-search-wrapper input, #new-complaint-form input, #categorize-urls-form-wrapper input {
+#advanced-search-wrapper input, #new-complaint-form input, #categorize-urls-form-wrapper input, #new-dispute-form input {
   margin-bottom: 8px;
   background-color: transparent;
   border: 1px solid darken($faint-neutral-color, 5%);
   border-radius: 1px;
 }
+
 #advanced-search-wrapper .content-label-sm {
   margin-bottom: 0;
 }
@@ -4146,12 +4156,12 @@ button.tertiary {
   left: auto;
 }
 
-#advanced-search-dropdown input, #new-complaint-wrapper input, #new-complaint-wrapper textarea, #categorize-urls-form-wrapper input, #categorize-urls-form-wrapper textarea {
+#advanced-search-dropdown input, #new-complaint-wrapper input, #new-dispute-wrapper textarea, #new-complaint-wrapper textarea, #categorize-urls-form-wrapper input, #categorize-urls-form-wrapper textarea {
   border: 4px solid $content-bg-color;
   outline: 1px solid darken($faint-neutral-color, 5%);
 }
 
-#advanced-search-dropdown input:focus, #new-complaint-wrapper input:focus, #new-complaint-wrapper textarea:focus, #categorize-urls-form-wrapper input:focus, #categorize-urls-form-wrapper textarea:focus {
+#advanced-search-dropdown input:focus, #new-complaint-wrapper input:focus,#new-dispute-wrapper textarea:focus, #new-complaint-wrapper textarea:focus, #categorize-urls-form-wrapper input:focus, #categorize-urls-form-wrapper textarea:focus {
   background-color: $faint-alt-highlight;
   border: 4px solid $content-bg-color;
   outline: 1px solid darken($faint-neutral-color, 5%);
@@ -5573,12 +5583,15 @@ table.dispute_tool_current tr:last-of-type td {
 }
 
 .top-case-info .dispute-submission-type {
+  display: block;
   margin-top: 2px;
   margin-left: 3px;
 }
 
 #disputes-index .dispute-submission-type {
+  display: block;
   margin: auto;
+  cursor: default;
 }
 
 .dashboard-tickets-table .dispute-submission-type {
@@ -6138,6 +6151,12 @@ table.dispute-entry-table tbody tr.selected {
   width: 100%;
 }
 
+#new-dispute-wrapper textarea, #new-dispute-wrapper input {
+  width: 100%;
+  min-width: 350px;
+  margin-bottom: 0;
+}
+
 #new-complaint-wrapper textarea, #categorize-urls-form-wrapper textarea {
   padding: 4px;
   color: $type-lighter-color;
@@ -6148,7 +6167,17 @@ table.dispute-entry-table tbody tr.selected {
   margin-bottom: 15px;
 }
 
-#new-complaint-wrapper .form-group {
+#new-dispute-wrapper textarea {
+  padding: 4px;
+  color: $type-lighter-color;
+  font-size: 9.5pt;
+  font-weight: 400;
+  line-height: 1.25em;
+  min-height: 100px;
+  margin-bottom: 15px;
+}
+
+#new-complaint-wrapper .form-group, #new-dispute-wrapper .form-group {
   margin-bottom: 0;
 }
 
@@ -6250,6 +6279,7 @@ table.dispute-entry-table tbody tr.selected {
   border-radius: 0;
   height: 26px;
   margin-bottom: 8px;
+  padding: 0;
 }
 
 /**** Nested Complaint Table styles ****/
@@ -6381,6 +6411,11 @@ table.dispute-entry-table tbody tr.selected {
   outline: 1px solid #cccccc;
   box-shadow: none;
   font-size: 8pt;
+}
+
+#copiedAlert {
+  color: $communication-accent-color;
+  font-size: 80%;
 }
 
 .nested-complaint-data-wrapper .selectize-control.multi .selectize-input .item, .category-column .selectize-control.multi .selectize-input .item {
