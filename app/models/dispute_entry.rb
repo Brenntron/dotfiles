@@ -48,23 +48,70 @@ class DisputeEntry < ApplicationRecord
 
   def self.create_dispute_entry(dispute, ip_url, status = NEW)
     begin
+      params = {}
       new_dispute_entry = DisputeEntry.new
       new_dispute_entry.dispute_id = dispute.id
       new_dispute_entry.status = status
 
       if is_ip?(ip_url)
+        params['ip'] = ip_url
+
+        wbrs_api_response = Sbrs::ManualSbrs.call_wbrs(params)
+        sbrs_api_response = Sbrs::ManualSbrs.call_sbrs(params)
+
         new_dispute_entry.ip_address = ip_url
         new_dispute_entry.entry_type = "IP"
+
+        # Populate WBRS/SBRS Scores
+
+        if wbrs_api_response != nil && wbrs_api_response['wbrs'].present? && wbrs_api_response['wbrs']['score'] != 'noscore'
+          new_dispute_entry.wbrs_score = wbrs_api_response['wbrs']['score']
+        else
+          new_dispute_entry.wbrs_score = nil
+        end
+
+        if sbrs_api_response != nil && sbrs_api_response['sbrs'].present? && sbrs_api_response['sbrs'].present? && sbrs_api_response['sbrs']['score'] != 'noscore'
+          new_dispute_entry.sbrs_score = sbrs_api_response['sbrs']['score']
+        else
+          new_dispute_entry.sbrs_score = nil
+        end
+
       else
+        params['url'] = ip_url
+
+        wbrs_api_response = Sbrs::ManualSbrs.call_wbrs(params, type: 'wbrs')
+        sbrs_api_response = Sbrs::ManualSbrs.call_sbrs(params, type: 'wbrs')
+
         url_parts = Complaint.parse_url(ip_url)
         new_dispute_entry.uri = ip_url
         new_dispute_entry.entry_type = "URI/DOMAIN"
         new_dispute_entry.subdomain = url_parts[:subdomain]
         new_dispute_entry.domain = url_parts[:domain]
         new_dispute_entry.path = url_parts[:path]
+
+        # Populate WBRS/SBRS Scores
+
+        if wbrs_api_response != nil && wbrs_api_response['wbrs'].present? && wbrs_api_response['wbrs']['score'] != 'noscore'
+          new_dispute_entry.wbrs_score = wbrs_api_response['wbrs']['score']
+        else
+          new_dispute_entry.wbrs_score = nil
+        end
+
+        if sbrs_api_response != nil && sbrs_api_response['sbrs'].present? && sbrs_api_response['sbrs'].present? && sbrs_api_response['sbrs']['score'] != 'noscore'
+          new_dispute_entry.sbrs_score = sbrs_api_response['sbrs']['score']
+        else
+          new_dispute_entry.sbrs_score = nil
+        end
       end
 
       new_dispute_entry.save!
+
+      # Create Dispute Entry RuleHits
+      wbrs_rule_hits = Sbrs::ManualSbrs.get_rule_names_from_rulehits(wbrs_api_response)
+
+      wbrs_rule_hits.each do |rule_hit|
+        DisputeRuleHit.create(rule_type:'WBRS', name: rule_hit, dispute_entry_id: new_dispute_entry.id)
+      end
 
     rescue Exception => e
       raise Exception.new("{DisputeEntry creation error: {content: #{ip_url},error:#{e}}}")
