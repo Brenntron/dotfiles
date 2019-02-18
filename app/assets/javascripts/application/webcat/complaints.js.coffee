@@ -1137,15 +1137,6 @@ open_selected = (selected_rows, toggle) ->
         window.open("http://"+selected_rows.data()[i].ip_address)
     i++
 
-
-$ ->
-  $('#complaints_check_box').click ->
-    if $('#complaints_check_box').prop('checked')
-      $('#complaints-index').DataTable().rows().select()
-    else
-      $('#complaints-index').DataTable().rows().deselect()
-  return
-
 window.open_viewable = () ->
   selected_rows = $('#complaints-index').DataTable().rows()
   open_selected(selected_rows, true)
@@ -1327,18 +1318,6 @@ window.triggerTooltips = (item) ->
   return
 
 $ ->
-  $(document).ready ->
-    if window.location.pathname != '/escalations/webcat/complaints'
-      $('#filter-complaints').hide()
-      $('#fetch').hide()
-      $('#web-cat-search').hide()
-      $('#new-complaint').hide()
-    else
-      $('#filter-complaints').show()
-      $('#fetch').show()
-      $('#web-cat-search').show()
-      $('#new-complaint').show()
-
   $('#cat_new_url_modal').on 'shown.bs.modal', ->
     $('#url_1').focus()
     return
@@ -1353,8 +1332,70 @@ $ ->
       $('#categorize-diff-form').hide()
       $('#categorize-same-form').show()
 
+  $('.expand-all').click ->
+    complaint_table = $('#complaints-index').DataTable()
+    td = $('#complaints-index').find('td.expandable-row-column')
+
+    td.each ->
+      tr = $(this).closest('tr')
+      row = complaint_table.row(tr)
+
+      unless row.child.isShown()
+
+        row.child(format(row)).show()
+        tr.addClass 'shown'
+
+        td = $(tr).next('tr').find('td:first')
+        $(td).addClass 'nested-complaint-data-wrapper'
+        unless $(td).hasClass 'nested-complaint-data-wrapper'
+          tr.find('td:first').addClass 'nested-complaint-data-wrapper'
+
+        $('#input_cat_'+ row.data().entry_id).selectize {
+          persist: false,
+          create: false,
+          maxItems: 5,
+          valueField: 'category_id',
+          labelField: 'category_name',
+          searchField: ['category_name', 'category_code'],
+          options: AC.WebCat.createSelectOptions()
+          items: selected_options(row.data().category)
+        }
+
+        $('.toggle-vis-nested').each ->
+          checkbox_trigger = $(button).attr('data-column')
+          checkbox = $(this).find('input')
+          if $(checkbox).prop('checked')
+            $('.complaint-entry-table td, .complaint-entry-table th').each ->
+              if $(button).hasClass(checkbox_trigger)
+                $(button).show()
+          else if $(checkbox).prop('checked') == false
+            $('.complaint-entry-table td, .complaint-entry-table th').each ->
+              if $(button).hasClass(checkbox_trigger)
+                $(button).hide()
+
+
+  $('#complaints_check_box').click ->
+    if $('#complaints_check_box').prop('checked')
+      $('#complaints-index').DataTable().rows().select()
+    else
+      $('#complaints-index').DataTable().rows().deselect()
+    return
+
+  $(document).ready ->
+    if window.location.pathname != '/escalations/webcat/complaints'
+      $('#filter-complaints').hide()
+      $('#fetch').hide()
+      $('#web-cat-search').hide()
+      $('#new-complaint').hide()
+    else
+      $('#filter-complaints').show()
+      $('#fetch').show()
+      $('#web-cat-search').show()
+      $('#new-complaint').show()
+
   # If a stupidly long email address is returned it will wrap
   # rather than pushing the column into the column beside it
   $('.email-row').find('.case-history-author').each ->
     if $(this).text().length > 28
       $(this).addClass('break-word')
+
