@@ -2925,6 +2925,10 @@ fieldset.top-content {
   margin-bottom: -20px !important;
 }
 
+.esc-tooltipped:hover {
+  cursor: pointer;
+}
+
 .rule-alerts-table .alerted-flag {
   background-image: url(image_path('icon_alert_red.svg'));
   background-repeat: no-repeat;
@@ -5579,12 +5583,15 @@ table.dispute_tool_current tr:last-of-type td {
 }
 
 .top-case-info .dispute-submission-type {
+  display: block;
   margin-top: 2px;
   margin-left: 3px;
 }
 
 #disputes-index .dispute-submission-type {
+  display: block;
   margin: auto;
+  cursor: default;
 }
 
 .dashboard-tickets-table .dispute-submission-type {
@@ -6404,6 +6411,11 @@ table.dispute-entry-table tbody tr.selected {
   outline: 1px solid #cccccc;
   box-shadow: none;
   font-size: 8pt;
+}
+
+#copiedAlert {
+  color: $communication-accent-color;
+  font-size: 80%;
 }
 
 .nested-complaint-data-wrapper .selectize-control.multi .selectize-input .item, .category-column .selectize-control.multi .selectize-input .item {
