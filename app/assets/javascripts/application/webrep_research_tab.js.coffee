@@ -151,12 +151,11 @@ $ ->
     ## Clear out any residual data
     # Empty table
     tbody = $('#reptool_adjust_entries').find('table.dispute_tool_current').find('tbody')
-    $(tbody).empty()
+    tbody.empty()
 
     # Empty the comment box
     comment_box = $('#reptool_adjust_entries').find('.comment-input')
-    $(comment_box).val('')
-
+    comment_box.val('')
 
     ## Get data to populate table
     # Get all the checked entry urls
@@ -175,19 +174,20 @@ $ ->
         method: 'POST'
         data: { ip_uris: ip_uris }
         success: (response) ->
-          table = $('.dispute_tool_current')
           response = JSON.parse(response)
 
           for entry in response
             if entry['status'] == "ACTIVE"
               rep_class = entry['classification'] + ' - ' + entry['expiration']
             else
-              rep_class = entry['classification']
+              rep_class = '<span class="missing-data">' + entry['classification'] + '</span>'
 
-            table.append('<tr><td class="reptool-entry-name">' + entry['entry'] + '</td><td class="reptool-entry-class">' + rep_class + '</td><td class="reptool-entry-comment">' + entry['comment'] + '</td></tr>')
+            tbody.append('<tr><td class="reptool-entry-name">' + entry['entry'] + '</td><td class="reptool-entry-class">' + rep_class + '</td><td class="reptool-entry-comment">' + entry['comment'] + '</td></tr>')
         error: (response) ->
           std_api_error(response, "Error retrieving Reptool Data", reload: false)
       )
+
+
 
   $('#reptool_index_entries_button').click ->
     dropdown = $('#reptool_adjust_entries').parent()
