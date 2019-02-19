@@ -161,53 +161,31 @@ $ ->
     ## Get data to populate table
     # Get all the checked entry urls
     if ($('.dispute_check_box:checked').length > 0)
-      data = []
+      ip_uris = []
 
       $('.dispute_check_box:checked').each ->
         entry_row = $(this).parents('.research-table-row')[0]
-        entry_content = $(entry_row).find('.entry-data-content').text()
+        entry_content = $(entry_row).find('.entry-data-content').text().trim()
 
         # Send entry content to reptool
-        data.push('entry' : entry_content)
+        ip_uris.push(entry_content)
 
-
-
-      headers = {'Token': $('input[name="token"]').val(), 'Xmlrpc-Token': $('input[name="xml_token"]').val()}
-      $.ajax(
-        url: '/escalations/api/v1/escalations/webrep/disputes/reptool_get_info_for_form'
-        method: 'GET'
-        headers: headers
-#       change to just 'data' later, after api push can handle multiple entries
-        data: data[0]
-        dataType: 'json'
+      std_msg_ajax(
+        url: '/escalations/api/v1/escalations/webrep/disputes/bulk_reptool_get_info_for_form'
+        method: 'POST'
+        data: { ip_uris: ip_uris }
         success: (response) ->
+
+          table = $('.dispute_tool_current')
+
           response = JSON.parse(response)
-          console.log response
 
           if response?
-#            Cycle through the array returned, after it's available from the api
-            rep_entry = response.entry
-            rep_status = response.status
-            if rep_status == 'ACTIVE'
-              rep_class = response.classification + ' - ' + response.expiration
-              rep_comment = response.comment
-            else
-              rep_class = '<span class="missing-data">No active classifications</span>'
-              rep_comment = ''
+            for entry in response
+              table.append('<tr><td class="reptool-entry-name">' + entry['entry'] + '</td><td class="reptool-entry-class">' + entry['classification'] + '</td><td class="reptool-entry-comment">' + entry['comment'] + '</td></tr>')
           else
             rep_class = '<span class="missing-data">Not on RepTool</span>'
             rep_comment = ''
-
-          $(tbody).append('<tr><td class="reptool-entry-name">' + rep_entry + '</td><td class="reptool-entry-class">' + rep_class + '</td><td class="reptool-entry-comment">' + rep_comment + '</td></tr>')
-
-#            $(show_content[0]).text(entry_content)
-#            $(show_rep_class[0]).text(response.classification)
-#            $(show_rep_exp[0]).text(response.expiration)
-#            $('#blacklist-action-select').val(response.status)
-#            $('#blacklist-classifications-select').val(response.classification)
-#            $(comment_input[0]).val(response.comment)
-#            $(submit_button).attr('disabled', false)
-#          window.location.reload()
         error: (response) ->
           console.log(response, 'Error retrieving Reptool Data')
       )
@@ -280,10 +258,10 @@ $ ->
       std_msg_error('No rows selected', ['Please select one row'])
       $(dropdown).removeClass('open')
       return false
-    else
-      std_msg_error('Error', ['Please select one row'])
-      $(dropdown).removeClass('open')
-      return false
+#    else
+#      std_msg_error('Error', ['Please select one row'])
+#      $(dropdown).removeClass('open')
+#      return false
 
 
 

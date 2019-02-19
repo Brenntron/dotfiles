@@ -5,10 +5,10 @@ $(document).ready ->
       std_msg_error('No rows selected', ['Please select at least one row.'])
       return false
 
-  $('span#adjust-wlbl').on 'show.bs.dropdown', ->
-    if $('.dispute_check_box:checked').length == 0
-      std_msg_error('No rows selected', ['Please select a row.'])
-      return false
+#  $('span#adjust-wlbl').on 'show.bs.dropdown', ->
+#    if $('.dispute_check_box:checked').length == 0
+#      std_msg_error('No rows selected', ['Please select a row.'])
+#      return false
 
 window.select_or_deselect_all = (dispute_id)->
 
@@ -349,6 +349,28 @@ window.row_research_adjust_wlbl_button =(button_tag) ->
     success_reload: true
   )
 
+window.research_toolbar_adjust_wlbl_button =(button_tag) ->
+  urls = []
+  urls = $('.wlbl-entry-content')
+  list_types = $('.wl-bl-list-inline:checkbox:checked').map(() ->
+    this.value
+  ).toArray()
+
+  wlbl_form = button_tag.form
+
+  data = {
+    'urls': [ url ]
+    'trgt_list': list_types
+    'note': wlbl_form.getElementsByClassName('adjust-wlbl-input')[0].value
+  }
+
+  std_msg_ajax(
+    url: '/escalations/api/v1/escalations/webrep/disputes/uri_wlbl'
+    method: 'POST'
+    data: data
+    error_prefix: 'Error adjusting WL/BL.'
+    success_reload: true
+  )
 
 window.toolbar_adjust_wlbl_button =(button_tag) ->
   checked_url = $('.dispute_check_box:checked')[0]
@@ -570,13 +592,8 @@ window.row_adust_reptool_bl_button_research =(button_tag) ->
   )
 
 window.toolbar_adjust_reptool_bl_button =(button_tag) ->
-  entry_ids = $('.dispute_check_box:checked').map(() ->
-    parseInt($(this).attr('data-entry-id'))
-  ).toArray()
-  if entry_ids.length == 0
-    entry_ids = $('.dispute-entry-checkbox:checked').map(() ->
-      parseInt(this.id)
-    ).toArray()
+  entry_ids = $('.dispute-entry-checkbox:checked').map(() -> parseInt(this.id)).toArray()
+
   if entry_ids.length == 0
     std_msg_error('No rows selected', ['Please select at least one row.'])
     return
