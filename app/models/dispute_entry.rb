@@ -46,6 +46,37 @@ class DisputeEntry < ApplicationRecord
     where(case_resolved_at: (date_from..date_to))
   }
 
+  def self.create_dispute_entry(dispute, ip_url, status = NEW)
+    begin
+      new_dispute_entry = DisputeEntry.new
+      new_dispute_entry.dispute_id = dispute.id
+      new_dispute_entry.status = status
+
+      if is_ip?(ip_url)
+        new_dispute_entry.ip_address = ip_url
+        new_dispute_entry.entry_type = "IP"
+      else
+        url_parts = Complaint.parse_url(ip_url)
+        new_dispute_entry.uri = ip_url
+        new_dispute_entry.entry_type = "URI/DOMAIN"
+        new_dispute_entry.subdomain = url_parts[:subdomain]
+        new_dispute_entry.domain = url_parts[:domain]
+        new_dispute_entry.path = url_parts[:path]
+      end
+
+      new_dispute_entry.save!
+
+    rescue Exception => e
+      raise Exception.new("{DisputeEntry creation error: {content: #{ip_url},error:#{e}}}")
+    end
+
+    # Add preload for Dispute Entry here
+  end
+
+  def self.is_ip?(ip)
+    !!IPAddr.new(ip) rescue false
+  end
+
   def self.new_from_wlbl(wlbl)
     new(uri: wlbl.url).tap do |entry|
       entry.wbrs_xlist = [ wlbl ]
@@ -291,12 +322,6 @@ class DisputeEntry < ApplicationRecord
       if auto_resolve_verdict.malicious?
         self.resolution_comment = "Talos has lowered our reputation score for the URL/Domain/Host to block access."
         self.resolution = STATUS_RESOLVED_FIXED_FN
-        self.status = STATUS_RESOLVED
-        self.case_closed_at = resolved_at
-        self.case_resolved_at = resolved_at
-      else
-        self.resolution_comment = Dispute::AUTORESOLVED_UNCHANGED_MESSAGE
-        self.resolution = STATUS_RESOLVED_UNCHANGED
         self.status = STATUS_RESOLVED
         self.case_closed_at = resolved_at
         self.case_resolved_at = resolved_at
@@ -583,6 +608,14 @@ class DisputeEntry < ApplicationRecord
       entries
     else
       []
+    end
+  end
+
+  def self.check_for_duplicates(entry)
+    if DisputeEntry.where(uri: entry).present? || DisputeEntry.where(ip_address: entry).present?
+      return true
+    else
+      return false
     end
   end
 end

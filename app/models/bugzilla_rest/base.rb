@@ -102,6 +102,7 @@ class BugzillaRest::Base
 
     request.ssl = true
     request.auth.ssl.verify_mode = :peer
+    request.auth.ssl.ca_cert_file = Rails.configuration.cert_file
 
     request.headers =
         {

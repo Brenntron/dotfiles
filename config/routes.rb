@@ -1,10 +1,12 @@
 Rails.application.routes.draw do
 
   mount RailsAdmin::Engine => '/escalations/admin', as: 'rails_admin'
-  resources :rulehit_resolution_mailer_templates
   devise_for :users, controllers: {sessions: 'sessions'}
 
   namespace :escalations, except: [:destroy, :edit] do
+    get 'sb_api/query_lookup' => 'sb_api#query_lookup'
+    
+    resources :rulehit_resolution_mailer_templates, only: [:new, :index, :create, :show, :update, :destroy, :edit]
     resources :sessions, controller: '/sessions', only: [:new, :create, :destroy]
 
     # TODO These may be reimplemented in the research passenger instance, and then removed from here
@@ -200,7 +202,6 @@ Rails.application.routes.draw do
     end
   end
 
-  get 'sb_api/query_lookup' => 'sb_api#query_lookup'
 
   mount API::Base => '/escalations/api'
 

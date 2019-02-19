@@ -145,54 +145,92 @@ $ ->
     $(expand_button).toggleClass('shown')
 
 
-#  Populating the toolbar Adjust RepTool Button
-  $('#reptool_entries_button').click ->
-    dropdown = $('#reptool_adjust_entries').parent()
+  ##  Populating the toolbar Adjust RepTool BL Button
+  window.bulk_get_current_reptool = () ->
 
-    # Only allowing a single submission at a time for now.
-    if ($('.dispute_check_box:checked').length == 1)
-      show_content = $('#reptool_adjust_entries').find('.entry-dispute-name')
-      show_rep_class = $('#reptool_adjust_entries').find('.entry-reptool-class')
-      show_rep_exp = $('#reptool_adjust_entries').find('.entry-reptool-expiration')
-      submit_button = $('#reptool_adjust_entries').find('.dropdown-submit-button')
-      comment_input = $('#reptool_adjust_entries').find('.comment-input')
-      entry_content = ''
-      $('.dispute_check_box').each ->
-        if $(this).prop('checked')
-          entry_row = $(this).parents('.research-table-row')[0]
-          entry_content = $(entry_row).find('.entry-data-content').text()
+    ## Clear out any residual data
+    # Empty table
+    tbody = $('#reptool_adjust_entries').find('table.dispute_tool_current').find('tbody')
+    $(tbody).empty()
 
-      data = {
-      # Send entry content to reptool
-        'entry' : entry_content
-      }
+    # Empty the comment box
+    comment_box = $('#reptool_adjust_entries').find('.comment-input')
+    $(comment_box).val('')
+
+
+    ## Get data to populate table
+    # Get all the checked entry urls
+    if ($('.dispute_check_box:checked').length > 0)
+      data = []
+
+      $('.dispute_check_box:checked').each ->
+        entry_row = $(this).parents('.research-table-row')[0]
+        entry_content = $(entry_row).find('.entry-data-content').text()
+
+        # Send entry content to reptool
+        data.push('entry' : entry_content)
+
+
 
       headers = {'Token': $('input[name="token"]').val(), 'Xmlrpc-Token': $('input[name="xml_token"]').val()}
       $.ajax(
         url: '/escalations/api/v1/escalations/webrep/disputes/reptool_get_info_for_form'
         method: 'GET'
         headers: headers
-        data: data
+#       change to just 'data' later, after api push can handle multiple entries
+        data: data[0]
         dataType: 'json'
         success: (response) ->
           response = JSON.parse(response)
-          $(show_content[0]).text(entry_content)
-          $(show_rep_class[0]).text(response.classification)
-          $(show_rep_exp[0]).text(response.expiration)
-          $('#blacklist-action-select').val(response.status)
-          $('#blacklist-classifications-select').val(response.classification)
-          $(comment_input[0]).val(response.comment)
-          $(submit_button).attr('disabled', false)
+          console.log response
+
+          if response?
+#            Cycle through the array returned, after it's available from the api
+            rep_entry = response.entry
+            rep_status = response.status
+            if rep_status == 'ACTIVE'
+              rep_class = response.classification + ' - ' + response.expiration
+              rep_comment = response.comment
+            else
+              rep_class = '<span class="missing-data">No active classifications</span>'
+              rep_comment = ''
+          else
+            rep_class = '<span class="missing-data">Not on RepTool</span>'
+            rep_comment = ''
+
+          $(tbody).append('<tr><td class="reptool-entry-name">' + rep_entry + '</td><td class="reptool-entry-class">' + rep_class + '</td><td class="reptool-entry-comment">' + rep_comment + '</td></tr>')
+
+#            $(show_content[0]).text(entry_content)
+#            $(show_rep_class[0]).text(response.classification)
+#            $(show_rep_exp[0]).text(response.expiration)
+#            $('#blacklist-action-select').val(response.status)
+#            $('#blacklist-classifications-select').val(response.classification)
+#            $(comment_input[0]).val(response.comment)
+#            $(submit_button).attr('disabled', false)
 #          window.location.reload()
         error: (response) ->
-          popup_response_error(response, 'Error retrieving Reptool Data')
+          console.log(response, 'Error retrieving Reptool Data')
       )
 #
 
-    else
-      std_msg_error('No rows selected', ['Please select a row'])
-      $(dropdown).removeClass('open')
-      return false
+  #    dropdown = $('#reptool_adjust_entries').parent()
+#      show_content = $('#reptool_adjust_entries').find('.entry-dispute-name')
+#      show_rep_class = $('#reptool_adjust_entries').find('.entry-reptool-class')
+#      show_rep_exp = $('#reptool_adjust_entries').find('.entry-reptool-expiration')
+#      submit_button = $('#reptool_adjust_entries').find('.dropdown-submit-button')
+#      comment_input = $('#reptool_adjust_entries').find('.comment-input')
+#      entry_content = ''
+#      $('.dispute_check_box').each ->
+#        if $(this).prop('checked')
+#          entry_row = $(this).parents('.research-table-row')[0]
+#          entry_content = $(entry_row).find('.entry-data-content').text()
+
+
+#
+
+#
+#    else
+#      std_msg_error('No rows selected', ['Please select a row'])
 
 
   $('#reptool_index_entries_button').click ->

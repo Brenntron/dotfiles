@@ -4,7 +4,7 @@ window.updateURI = (complaint_entry_id) ->
   $('#loader-modal').modal({
     keyboard: false
   })
-  
+
   uri = $("#complaint_prefix_#{complaint_entry_id}").val()
 
   std_msg_ajax(
@@ -31,12 +31,6 @@ window.updateURI = (complaint_entry_id) ->
 
         $("#history-#{complaint_entry_id}").replaceWith('<button class="secondary" id="history-' + complaint_entry_id + '" onclick="history_dialog('+complaint_entry_id+')">History</button>')
         $("#domain-#{complaint_entry_id}").replaceWith('<button class="secondary" id="domain-' + complaint_entry_id + '" onclick="domain_whois(\''+response.domain+'\')">Domain</button>')
-
-        std_msg_success("Success",['URI updated.'])
-
-
-
-
 
   )
 
@@ -364,7 +358,7 @@ window.take_selected = ()->
         json = $.parseJSON(response)
         if json.error
           notice_html = "<p>Something went wrong: #{json.error}</p>"
-          std_msg_error('take error', [json.error])
+          std_msg_error('take error', json.error)
         else
           i = 0
           while i < selected_rows[0].length
@@ -398,7 +392,7 @@ window.return_selected = ()->
         json = $.parseJSON(response)
         if json.error
           notice_html = "<p>Something went wrong: #{json.error}</p>"
-          std_msg_error('return error', [json.error])
+          std_msg_error('return error', json.error)
         else
           i = 0
           while i < selected_rows[0].length

@@ -21,7 +21,7 @@
         .dashboard-wrapper
           .button-wrapper
             - if current_user&.has_role?('big_email_honcho')
-              %a.toolbar-button#resolution-email-editor{href: '/rulehit_resolution_mailer_templates'} Edit Rule Hit Email Templates
+              %a.toolbar-button#resolution-email-editor{href: '/escalations/rulehit_resolution_mailer_templates'} Edit Rule Hit Email Templates
 
       .col-xs-6.text-right
         .dashboard-time-wrapper

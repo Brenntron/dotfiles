@@ -13,7 +13,7 @@ namespace 'WebCat.RepLookup', (exports) ->
 
 
     $.ajax {
-      url: '/sb_api/query_lookup'
+      url: '/escalations/sb_api/query_lookup'
       method: 'GET'
       crossDomain: true
       dataType: 'json'
