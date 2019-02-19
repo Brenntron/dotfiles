@@ -1376,8 +1376,10 @@ window.master_submit = () ->
     data: {data: data}
     success: (response) ->
       errors = false
-      nil_categories = []
-      other = []
+
+      nil_categories_errors = []
+      api_errors = []
+      success = []
 
       json = JSON.parse(response)
 
@@ -1385,12 +1387,14 @@ window.master_submit = () ->
 
       for entry in json
         if entry.error == true && entry.reason == 'nil_categories'
-          nil_categories.push(entry.entry_id)
+          nil_categories_errors.push(entry.entry_id)
           errors = true
         else if entry.error == true && entry.reason == 'other'
-          other.push(entry.entry_id)
+          api_errors.push(entry.entry_id)
           errors = true
         else
+          success.push(entry.entry_id)
+
           temp_row = table.row(entry.row_id)
           temp_row.data().status = entry.status
           temp_row.data().resolution = entry.resolution
@@ -1423,15 +1427,19 @@ window.master_submit = () ->
             items: selected_options(entry.categories)
           }
 
-      other_boiler_plate = "The following entries could not be saved due to API errors: " + other.toString() + "<br>"
-      no_cats_boiler_plate = "The following entries could not be saved (no categories): " + nil_categories.toString()
+      success_boiler_plate = "The following entries were successfully saved: " + success.toString() + "<br>"
+      other_boiler_plate =  "The following entries could not be saved due to API errors: " + api_errors.toString() + "<br>"
+      no_cats_boiler_plate = "The following entries could not be saved (no categories): " + nil_categories_errors.toString()
 
       error = ''
 
-      if other.length > 0
+
+      if success.length > 0
+        error += success_boiler_plate
+      if api_errors.length > 0
         error += other_boiler_plate
 
-      if nil_categories.length > 0
+      if nil_categories_errors.length > 0
         error += no_cats_boiler_plate
 
       if errors == true
