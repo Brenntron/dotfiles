@@ -145,14 +145,14 @@ $ ->
     $(expand_button).toggleClass('shown')
 
 
-  ##  Populating the toolbar Adjust RepTool BL Button
+
+  ##  Populating the toolbar Adjust RepTool BL button on research tab
   window.bulk_get_current_reptool = () ->
 
     ## Clear out any residual data
     # Empty table
     tbody = $('#reptool_adjust_entries').find('table.dispute_tool_current').find('tbody')
     tbody.empty()
-
     # Empty the comment box
     comment_box = $('#reptool_adjust_entries').find('.comment-input')
     comment_box.val('')
@@ -165,7 +165,6 @@ $ ->
       $('.dispute_check_box:checked').each ->
         entry_row = $(this).parents('.research-table-row')[0]
         entry_content = $(entry_row).find('.entry-data-content').text().trim()
-
         # Send entry content to reptool
         ip_uris.push(entry_content)
 
@@ -186,62 +185,52 @@ $ ->
         error: (response) ->
           std_api_error(response, "Error retrieving Reptool Data", reload: false)
       )
+    else
+      std_msg_error('No rows selected', ['Please select a row'])
 
 
 
-  $('#reptool_index_entries_button').click ->
-    dropdown = $('#reptool_adjust_entries').parent()
+  ## Populating the toolbar Adjust RepTool BL button on index
+  window.bulk_get_current_reptool_index = () ->
 
-    # Only allowing a single submission at a time for now.
-    if ($('.dispute-entry-checkbox:checked').length == 1)
-      show_content = $('#reptool_adjust_entries').find('.entry-dispute-name')
-      show_rep_class = $('#reptool_adjust_entries').find('.entry-reptool-class')
-      show_rep_exp = $('#reptool_adjust_entries').find('.entry-reptool-expiration')
-      submit_button = $('#reptool_adjust_entries').find('.dropdown-submit-button')
-      comment_input = $('#reptool_adjust_entries').find('.comment-input')
-      entry_content = ''
-      $('.dispute-entry-checkbox').each ->
-        if $(this).prop('checked')
-          entry_row = $(this).parents('.index-entry-row')[0]
-          entry_content = $(entry_row).find('.entry-col-content').text()
+    ## Clear out any residual data
+    # Empty table
+    tbody = $('#reptool_adjust_entries').find('table.dispute_tool_current').find('tbody')
+    tbody.empty()
+    # Empty the comment box
+    comment_box = $('#reptool_adjust_entries').find('.comment-input')
+    comment_box.val('')
 
-      data = {
-# Send entry content to reptool
-        'entry' : entry_content
-      }
+    ## Get data to populate table
+    # Get all the checked entry urls
+    if ($('.dispute-entry-checkbox:checked').length > 0)
+      ip_uris = []
 
-      headers = {'Token': $('input[name="token"]').val(), 'Xmlrpc-Token': $('input[name="xml_token"]').val()}
-      $.ajax(
-        url: '/escalations/api/v1/escalations/webrep/disputes/reptool_get_info_for_form'
-        method: 'GET'
-        headers: headers
-        data: data
-        dataType: 'json'
+      $('.dispute-entry-checkbox:checked').each ->
+        entry_row = $(this).parents('.index-entry-row')[0]
+        entry_content = $(entry_row).find('.entry-col-content').text().trim()
+        # Send entry content to reptool
+        ip_uris.push(entry_content)
+
+      std_msg_ajax(
+        url: '/escalations/api/v1/escalations/webrep/disputes/bulk_reptool_get_info_for_form'
+        method: 'POST'
+        data: { ip_uris: ip_uris }
         success: (response) ->
           response = JSON.parse(response)
-          $(show_content[0]).text(entry_content)
-          $(show_rep_class[0]).text(response.classification)
-          $(show_rep_exp[0]).text(response.expiration)
-          $('#blacklist-action-select').val(response.status)
-          $('#blacklist-classifications-select').val(response.classification)
-          $(comment_input[0]).val(response.comment)
-          $(submit_button).attr('disabled', false)
-#          window.location.reload()
+          console.log response
+          for entry in response
+            if entry['status'] == "ACTIVE"
+              rep_class = entry['classification'] + ' - ' + entry['expiration']
+            else
+              rep_class = '<span class="missing-data">' + entry['classification'] + '</span>'
+
+            tbody.append('<tr><td class="reptool-entry-name">' + entry['entry'] + '</td><td class="reptool-entry-class">' + rep_class + '</td><td class="reptool-entry-comment">' + entry['comment'] + '</td></tr>')
         error: (response) ->
-          popup_response_error(response, 'Error retrieving Reptool Data')
+          std_api_error(response, "Error retrieving Reptool Data", reload: false)
       )
-#
-
-    else if $('.dispute-entry-checkbox:checked').length == 0
-      std_msg_error('No rows selected', ['Please select one row'])
-      $(dropdown).removeClass('open')
-      return false
-#    else
-#      std_msg_error('Error', ['Please select one row'])
-#      $(dropdown).removeClass('open')
-#      return false
-
-
+    else
+      std_msg_error('No entry rows selected', ['Please select a row'])
 
 
 
