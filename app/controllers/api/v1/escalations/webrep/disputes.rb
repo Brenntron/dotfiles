@@ -612,17 +612,17 @@ module API
                 return_data = []
 
                 api_response.each do |key, value|
-                  if value.gsub('http://', '').gsub('https://', '') == "NOT_FOUND"
+                  if value == 'NOT_FOUND'
                     return_data.push(:entry => key, :classification => "not found", :expiration => "", :status => "", :comment => "")
                     # TODO Make expiration human readable - Just the date
-                  # else
-                  #   expiration = ""
-                  #   begin
-                  #     expiration = Time.parse(value.gsub('http://', '').gsub('https://', '')]["expiration"]).to_s
-                  #   rescue
-                  #     expiration = information[params[:entry].gsub('http://', '').gsub('https://', '')]["expiration"]
-                  #   end
-                  #   return {:entry => params[:entry], :classification => information[params[:entry].gsub('http://', '').gsub('https://', '')]["classifications"].first, :expiration => expiration, :status => information[params[:entry].gsub('http://', '').gsub('https://', '')]["status"], :comment => information[params[:entry].gsub('http://', '').gsub('https://', '')]["metadata"]["VRT"]["comment"]}.to_json
+                  else
+                    expiration = ""
+                    begin
+                      expiration = Time.parse(value["expiration"]).to_s
+                    rescue
+                      expiration = value["expiration"]
+                    end
+                    return_data.push(:entry => key, :classification => value["classifications"], :expiration => expiration, :status => value["status"], :comment => value["metadata"]["VRT"]["comment"]).to_json
                   end
                 end
                 return_data.to_json

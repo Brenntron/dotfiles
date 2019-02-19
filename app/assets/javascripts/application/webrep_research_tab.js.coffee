@@ -175,9 +175,7 @@ $ ->
         method: 'POST'
         data: { ip_uris: ip_uris }
         success: (response) ->
-
           table = $('.dispute_tool_current')
-
           response = JSON.parse(response)
 
           if response?
@@ -189,27 +187,6 @@ $ ->
         error: (response) ->
           console.log(response, 'Error retrieving Reptool Data')
       )
-#
-
-  #    dropdown = $('#reptool_adjust_entries').parent()
-#      show_content = $('#reptool_adjust_entries').find('.entry-dispute-name')
-#      show_rep_class = $('#reptool_adjust_entries').find('.entry-reptool-class')
-#      show_rep_exp = $('#reptool_adjust_entries').find('.entry-reptool-expiration')
-#      submit_button = $('#reptool_adjust_entries').find('.dropdown-submit-button')
-#      comment_input = $('#reptool_adjust_entries').find('.comment-input')
-#      entry_content = ''
-#      $('.dispute_check_box').each ->
-#        if $(this).prop('checked')
-#          entry_row = $(this).parents('.research-table-row')[0]
-#          entry_content = $(entry_row).find('.entry-data-content').text()
-
-
-#
-
-#
-#    else
-#      std_msg_error('No rows selected', ['Please select a row'])
-
 
   $('#reptool_index_entries_button').click ->
     dropdown = $('#reptool_adjust_entries').parent()
