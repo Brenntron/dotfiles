@@ -81,6 +81,7 @@ gem 'gzip', '1.0'
 gem 'rubyXL', '3.3.30'
 
 gem 'public_suffix', '~> 3.0'
+gem 'addressable', '~> 2.5.2'
 
 gem 'dotiw'
 
