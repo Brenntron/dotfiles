@@ -613,7 +613,7 @@ module API
 
                 api_response.each do |key, value|
                   if value == 'NOT_FOUND'
-                    return_data.push(:entry => key, :classification => "not found", :expiration => "", :status => "", :comment => "")
+                    return_data.push(:entry => key, :classification => "No active classifications", :expiration => "", :status => "INACTIVE", :comment => "")
                     # TODO Make expiration human readable - Just the date
                   else
                     expiration = ""
