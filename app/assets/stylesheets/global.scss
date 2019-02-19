@@ -4537,7 +4537,7 @@ table > tbody > tr > td.dispute_rep_tools {
 }
 
 #reptool_adjust_entries.dropdown-menu {
-  width: 450px;
+  width: 400px;
 }
 
 #wlbl_adjust_entries.dropdown-menu li:hover, #wlbl_adjust_entries_index.dropdown-menu li:hover{
@@ -8027,6 +8027,8 @@ th.sorting_1, th.sorting_asc, th.sorting_desc {
 
   .comment-wrapper {
     margin-top: 12px;
+    margin-left: 3px;
+    margin-right: 3px !important;
 
     .dropdown-comment {
       min-height: 60px;
@@ -8034,7 +8036,7 @@ th.sorting_1, th.sorting_asc, th.sorting_desc {
   }
 }
 
-.dispute-wlbl-adjust-wrapper .inline-tool-content-wrapper {
+.dispute-wlbl-adjust-wrapper .inline-tool-content-wrapper, .dispute-reptool-adjust-wrapper .inline-tool-content-wrapper {
   padding: 6px 10px !important;
 }
 
@@ -8050,4 +8052,29 @@ th.sorting_1, th.sorting_asc, th.sorting_desc {
   font-size: 8pt;
   float: none;
   padding-left: 0;
+}
+
+.toolbar div.dropdown-tool-grey-row li {
+  padding: 2px 12px;
+}
+
+hr.thin.form-divider {
+  margin: 8px -10px;
+}
+
+.dropdown-tool-grey-row + hr.thin.form-divider {
+  border-color: $content-bg-color;
+  margin: 2px -12px !important;
+}
+
+hr.thin.form-divider + .dropdown-tool-grey-row {
+  padding-top: 4px !important;
+}
+
+.dropdown-tool-grey-row .content-label-sm {
+  margin-left: 12px;
+}
+
+.comment-wrapper + hr.thin {
+  margin: 15px 6px;
 }

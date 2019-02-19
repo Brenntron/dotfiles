@@ -132,13 +132,13 @@
 
                   .inline-tool-content-wrapper
                     .row
-                      .col-xs-6
+                      .col-xs-7
                         %input{type: 'radio', name: 'reptool-action-radio', id: 'reptool-maintain', value: 'reptool-maintain', checked: true}
                         %label.radio-label{for: 'reptool-maintain'} Maintain current classifications
-                      .col-xs-6
+                      .col-xs-5
                         %input{type: 'radio', name: 'reptool-action-radio', id: 'reptool-override', value: 'reptool-override'}
                         %label.radio-label{for: 'reptool-override'} Override classifications
-
+                    %hr.thin.form-divider
                     .row
                       .col-xs-12
                         %label.content-label-sm{for: "reptool-class-type-select"} Classifications
@@ -194,15 +194,24 @@
                               %li
                                 %input{type: 'checkbox', value: 'tor_exit_node'}
                                   tor_exit_node
+                        %hr.thin.form-divider
+                        .row.dropdown-tool-grey-row
+                          .col-xs-2
+                            %label.content-label-sm Status
+                          .col-xs-5
+                            %input{type: 'radio', name: 'reptool-status-radio', id: 'reptool-status-active', value: 'reptool-status-active', checked: true}
+                            %label.radio-label{for: 'reptool-status-active'} Set to ACTIVE
+                          .col-xs-5
+                            %input{type: 'radio', name: 'reptool-status-radio', id: 'reptool-status-expired', value: 'reptool-status-expired'}
+                            %label.radio-label{for: 'reptool-status-expired'} Set to EXPIRED
 
-
-
-                  -#  .comment-wrapper
-                  -#    %label.content-label-sm Comment
-                  -#    %textarea.dropdown-comment.adjust-reptool-bl-input.comment-input
-                  -#  .button-row-center
-                  -#    %button.primary.dropdown-submit-button{type: 'button', onclick: 'toolbar_adjust_reptool_bl_button(this)', disabled: true}
-                  -#      Submit Changes
+                    .comment-wrapper
+                      %label.content-label-sm RepTool Comment
+                      %textarea.dropdown-comment.adjust-reptool-bl-input.comment-input
+                    %hr.thin
+                    .button-row-center
+                      %button.primary.dropdown-submit-button{type: 'button', onclick: 'toolbar_adjust_reptool_bl_button(this)', disabled: true}
+                        Submit Changes
 
       %div
         %label.toolbar-section-label Data
