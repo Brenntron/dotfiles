@@ -659,9 +659,9 @@ class DisputeEntry < ApplicationRecord
   end
 
   def self.check_for_duplicates(entry)
-    if DisputeEntry.where(uri: entry).present? || DisputeEntry.where(ip_address: entry).present?
+    if is_ip?(entry) && DisputeEntry.where(ip_address: entry).present?
       return true
-    else
+    elsif !is_ip?(entry) && DisputeEntry.where(uri: entry).present?
       return false
     end
   end
