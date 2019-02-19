@@ -58,6 +58,8 @@ class DisputeEntry < ApplicationRecord
 
         wbrs_api_response = Sbrs::ManualSbrs.call_wbrs(params)
         sbrs_api_response = Sbrs::ManualSbrs.call_sbrs(params)
+        sbrs_api_rulehit_response =  Sbrs::GetSbrs.get_sbrs_rules_for_ip(ip_url)
+
 
         new_dispute_entry.ip_address = ip_url
         new_dispute_entry.entry_type = "IP"
@@ -80,7 +82,6 @@ class DisputeEntry < ApplicationRecord
         params['url'] = ip_url
 
         wbrs_api_response = Sbrs::ManualSbrs.call_wbrs(params, type: 'wbrs')
-        sbrs_api_response = Sbrs::ManualSbrs.call_sbrs(params, type: 'wbrs')
 
         url_parts = Complaint.parse_url(ip_url)
         new_dispute_entry.uri = ip_url
@@ -111,6 +112,12 @@ class DisputeEntry < ApplicationRecord
 
       wbrs_rule_hits.each do |rule_hit|
         DisputeRuleHit.create(rule_type:'WBRS', name: rule_hit, dispute_entry_id: new_dispute_entry.id)
+      end
+
+      if sbrs_api_rulehit_response.present?
+        sbrs_api_rulehit_response.each do |rule_hit|
+          DisputeRuleHit.create(rule_type:'SBRS', name: rule_hit, dispute_entry_id: new_dispute_entry.id)
+        end
       end
 
     rescue Exception => e
