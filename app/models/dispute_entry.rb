@@ -110,8 +110,10 @@ class DisputeEntry < ApplicationRecord
       # Create Dispute Entry RuleHits
       wbrs_rule_hits = Sbrs::ManualSbrs.get_rule_names_from_rulehits(wbrs_api_response)
 
-      wbrs_rule_hits.each do |rule_hit|
-        DisputeRuleHit.create(rule_type:'WBRS', name: rule_hit, dispute_entry_id: new_dispute_entry.id)
+      if wbrs_rule_hits.present?
+        wbrs_rule_hits.each do |rule_hit|
+          DisputeRuleHit.create(rule_type:'WBRS', name: rule_hit, dispute_entry_id: new_dispute_entry.id)
+        end
       end
 
       if sbrs_api_rulehit_response.present?
