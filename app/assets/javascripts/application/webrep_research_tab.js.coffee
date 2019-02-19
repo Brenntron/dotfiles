@@ -178,19 +178,15 @@ $ ->
           table = $('.dispute_tool_current')
           response = JSON.parse(response)
 
-          if response?
-            for entry in response
-              if entry['status'] == "ACTIVE"
-                rep_class = entry['classification'] + ' - ' + entry['expiration']
-              else
-                rep_class = entry['classification']
+          for entry in response
+            if entry['status'] == "ACTIVE"
+              rep_class = entry['classification'] + ' - ' + entry['expiration']
+            else
+              rep_class = entry['classification']
 
-              table.append('<tr><td class="reptool-entry-name">' + entry['entry'] + '</td><td class="reptool-entry-class">' + rep_class + '</td><td class="reptool-entry-comment">' + entry['comment'] + '</td></tr>')
-          else
-            rep_class = '<span class="missing-data">Not on RepTool</span>'
-            rep_comment = ''
+            table.append('<tr><td class="reptool-entry-name">' + entry['entry'] + '</td><td class="reptool-entry-class">' + rep_class + '</td><td class="reptool-entry-comment">' + entry['comment'] + '</td></tr>')
         error: (response) ->
-          console.log(response, 'Error retrieving Reptool Data')
+          std_api_error(response, "Error retrieving Reptool Data", reload: false)
       )
 
   $('#reptool_index_entries_button').click ->
