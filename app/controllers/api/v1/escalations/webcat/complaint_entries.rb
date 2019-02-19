@@ -469,7 +469,7 @@ module API
                       response.push({error: true, entry_id: entry['entry_id'], reason: 'nil_categories'})
                     end
                   rescue Exception => e
-                    response.push({error: true, entry_id: entry['entry_id'], reason: 'other'})
+                    response.push({error: true, entry_id: entry['entry_id'], reason: 'api'})
                     next
                   end
                 end

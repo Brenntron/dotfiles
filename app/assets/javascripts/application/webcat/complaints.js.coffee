@@ -1389,7 +1389,7 @@ window.master_submit = () ->
         if entry.error == true && entry.reason == 'nil_categories'
           nil_categories_errors.push(entry.entry_id)
           errors = true
-        else if entry.error == true && entry.reason == 'other'
+        else if entry.error == true && entry.reason == 'api'
           api_errors.push(entry.entry_id)
           errors = true
         else
@@ -1428,23 +1428,22 @@ window.master_submit = () ->
           }
 
       success_boiler_plate = "The following entries were successfully saved: " + success.toString() + "<br>"
-      other_boiler_plate =  "The following entries could not be saved due to API errors: " + api_errors.toString() + "<br>"
+      api_boiler_plate =  "The following entries could not be saved due to API errors: " + api_errors.toString() + "<br>"
       no_cats_boiler_plate = "The following entries could not be saved (no categories): " + nil_categories_errors.toString()
 
-      error = ''
-
+      error_msg = ''
 
       if success.length > 0
-        error += success_boiler_plate
+        error_msg += success_boiler_plate
       if api_errors.length > 0
-        error += other_boiler_plate
+        error_msg += api_boiler_plate
 
       if nil_categories_errors.length > 0
-        error += no_cats_boiler_plate
+        error_msg += no_cats_boiler_plate
 
       if errors == true
         $('#loader-modal').modal 'hide'
-        std_msg_error(error,"")
+        std_msg_error(error_msg,"")
       else
         $('#loader-modal').modal 'hide'
         std_msg_success("All complaints successfully processed.")
