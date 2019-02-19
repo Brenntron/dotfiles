@@ -125,9 +125,13 @@ class DisputeEntry < ApplicationRecord
   end
 
   def self.domain_of(url)
-    uri = URI.parse(URI.parse(url).scheme.nil? ? "http://#{url}" : url)
-    domain = PublicSuffix.parse(uri.host)
-    domain.domain
+    if !url.start_with?( 'http', 'https')
+      url = "http://" + url
+    end
+
+    clean_url = Addressable::URI.parse(url)
+    clean_host = clean_url.host
+    clean_host.sub(/^www\./, '')
   end
 
   def assign_url_parts(url = self.hostlookup)
