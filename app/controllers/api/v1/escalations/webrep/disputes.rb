@@ -303,8 +303,10 @@ module API
               requires :comment, type: String, desc: "comment"
             end
             post "reptool_bl" do
-              RepApi::Blacklist.adjust_from_params(permitted_params, username: current_user.cvs_username)
-              true
+              std_api_v2 do
+                RepApi::Blacklist.adjust_from_params(permitted_params, username: current_user.cvs_username)
+                true
+              end
             end
 
             desc "Sync data for all dispute entry children"
