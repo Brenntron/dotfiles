@@ -576,6 +576,17 @@ class ComplaintEntry < ApplicationRecord
     end
   end
 
+  def self.get_category(uri_ip)
+    prefix = Wbrs::Prefix.where({:urls => [uri_ip]})&.first
+    return {} unless prefix
+
+    current_categories = prefix.categories
+
+    name = current_categories[0].descr
+
+    name
+  end
+
   def historic_category_data
 
     prefix_id = nil

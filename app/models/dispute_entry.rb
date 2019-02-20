@@ -58,9 +58,11 @@ class DisputeEntry < ApplicationRecord
 
         wbrs_api_response = Sbrs::ManualSbrs.call_wbrs(params)
         sbrs_api_response = Sbrs::ManualSbrs.call_sbrs(params)
+        wbrs_prefix_response = ComplaintEntry.get_category(params['ip'])
 
         new_dispute_entry.ip_address = ip_url
         new_dispute_entry.entry_type = "IP"
+        new_dispute_entry.primary_category = wbrs_prefix_response
 
         # Populate WBRS/SBRS Scores
 
@@ -81,6 +83,7 @@ class DisputeEntry < ApplicationRecord
 
         wbrs_api_response = Sbrs::ManualSbrs.call_wbrs(params, type: 'wbrs')
         sbrs_api_response = Sbrs::ManualSbrs.call_sbrs(params, type: 'wbrs')
+        wbrs_prefix_response = ComplaintEntry.get_category(params['url'])
 
         url_parts = Complaint.parse_url(ip_url)
         new_dispute_entry.uri = ip_url
@@ -88,6 +91,7 @@ class DisputeEntry < ApplicationRecord
         new_dispute_entry.subdomain = url_parts[:subdomain]
         new_dispute_entry.domain = url_parts[:domain]
         new_dispute_entry.path = url_parts[:path]
+        new_dispute_entry.primary_category = wbrs_prefix_response
 
         # Populate WBRS/SBRS Scores
 
@@ -117,7 +121,7 @@ class DisputeEntry < ApplicationRecord
       raise Exception.new("{DisputeEntry creation error: {content: #{ip_url},error:#{e}}}")
     end
 
-    # Add preload for Dispute Entry here
+
   end
 
   def self.is_ip?(ip)
