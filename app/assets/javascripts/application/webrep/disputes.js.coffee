@@ -578,51 +578,82 @@ window.row_adust_reptool_bl_button_research =(button_tag) ->
     url: '/escalations/api/v1/escalations/webrep/disputes/reptool_bl'
     method: 'POST'
     headers: headers
-    data: data
-    dataType: 'json'
-    success: (response) ->
-      window.location.reload()
-    error: (response) ->
-      popup_response_error(response, 'Error adjusting WL/BL')
+    popup_response_error(response, 'Error adjusting WL/BL')
   )
 
-window.toolbar_adjust_reptool_bl_button =(button_tag) ->
-  entry_ids = $('.dispute-entry-checkbox:checked').map(() -> parseInt(this.id)).toArray()
 
-  if entry_ids.length == 0
-    std_msg_error('No rows selected', ['Please select at least one row.'])
-    return
 
-  reptool_bl_form = button_tag.form
-  data = {
-    'action': reptool_bl_form.getElementsByClassName('action-input')[0].value
-    'dispute_entry_ids': entry_ids
-    'classifications': [ reptool_bl_form.getElementsByClassName('classifications-input')[0].value ]
-    'comment': reptool_bl_form.getElementsByClassName('comment-input')[0].value
-  }
+## Enable / Disable bulk reptool submit button
+$ ->
+  $('.reptool-class-cb').click ->
+    reptool_submit = $('#reptool_adjust_entries').find('.dropdown-submit-button')
+    if $('.reptool-class-cb:checked').length > 0
+      $(reptool_submit[0]).attr('disabled', false)
+    else
+      $(reptool_submit[0]).attr('disabled', true)
 
-  headers = {'Token': $('input[name="token"]').val(), 'Xmlrpc-Token': $('input[name="xml_token"]').val()}
-  $.ajax(
-    url: '/escalations/api/v1/escalations/webrep/disputes/reptool_bl'
-    method: 'POST'
-    headers: headers
-    data: data
-    dataType: 'json'
-    success: (response) ->
-      window.location.reload()
-    error: (response) ->
-      if response.responseJSON == undefined
-        response_lines = response.responseText.split("\n")
-        if 2 < response_lines.length
-          errormsg = [response_lines[0], response_lines[1]]
-        else
-          errormsg = [response.responseText]
-      else if response.responseJSON.error != undefined
-        errormsg = [response.responseJSON.error]
-      else
-        errormsg = [response.responseText]
-      std_msg_error('Error', ['Error adjusting WL/BL'].concat(errormsg) )
-  )
+
+## Submit bulk changes to reptool on research tab
+window.submit_bulk_reptool_research_tab = () ->
+  reptool_classes = []
+  #  Get all checked classification checkboxes
+  if $('.reptool-class-cb:checked').length > 0
+    $('.reptool-class-cb:checked').each ->
+      reptool_classes.push($(this).val())
+
+  class_status = $("input[name='reptool-status-radio']:checked").val()
+  comment = $($('#reptool_adjust_entries').find('.dropdown-comment')).val()
+
+  submission_action = $("input[name='reptool-action-radio']:checked").val()
+
+#  Get the entries
+
+
+#  data: data
+#  dataType: 'json'
+#  success: (response) ->
+#    window.location.reload()
+#  error: (response) ->toolbar_adjust_reptool_bl_button =(button_tag) ->
+#  entry_ids = $('.dispute_check_box:checked').map(() -> parseInt(this.id)).toArray()
+
+#  This piece shouldnt be necessary? We already have a check when the dropdown is clicked
+#  if entry_ids.length == 0
+#    std_msg_error('No rows selected', ['Please select at least one row.'])
+#    return
+
+
+#  reptool_bl_form = button_tag.form
+#  data = {
+#    'action': reptool_bl_form.getElementsByClassName('action-input')[0].value
+#    'dispute_entry_ids': entry_ids
+#    'classifications': [ reptool_bl_form.getElementsByClassName('classifications-input')[0].value ]
+#    'comment': reptool_bl_form.getElementsByClassName('comment-input')[0].value
+#  }
+#
+#  headers = {'Token': $('input[name="token"]').val(), 'Xmlrpc-Token': $('input[name="xml_token"]').val()}
+#  $.ajax(
+#    url: '/escalations/api/v1/escalations/webrep/disputes/reptool_bl'
+#    method: 'POST'
+#    headers: headers
+#    data: data
+#    dataType: 'json'
+#    success: (response) ->
+#      window.location.reload()
+#    error: (response) ->
+#      if response.responseJSON == undefined
+#        response_lines = response.responseText.split("\n")
+#        if 2 < response_lines.length
+#          errormsg = [response_lines[0], response_lines[1]]
+#        else
+#          errormsg = [response.responseText]
+#      else if response.responseJSON.error != undefined
+#        errormsg = [response.responseJSON.error]
+#      else
+#        errormsg = [response.responseText]
+#      std_msg_error('Error', ['Error adjusting WL/BL'].concat(errormsg) )
+#  )
+
+
 
 window.toolbar_adjust_reptool_bl_button_research =(button_tag) ->
   checked_url = $('.dispute_check_box:checked')[0]

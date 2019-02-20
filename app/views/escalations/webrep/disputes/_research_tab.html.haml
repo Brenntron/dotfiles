@@ -146,53 +146,53 @@
                           .col-xs-4
                             %ul
                               %li
-                                %input{type: 'checkbox', value: 'attackers'}
+                                %input.reptool-class-cb{type: 'checkbox', name: 'classification', value: 'attackers'}
                                   attackers
                               %li
-                                %input{type: 'checkbox', value: 'bogon'}
+                                %input.reptool-class-cb{type: 'checkbox', name: 'classification', value: 'bogon'}
                                   bogon
                               %li
-                                %input{type: 'checkbox', value: 'bots'}
+                                %input.reptool-class-cb{type: 'checkbox', name: 'classification', value: 'bots'}
                                   bots
                               %li
-                                %input{type: 'checkbox', value: 'cnc'}
+                                %input.reptool-class-cb{type: 'checkbox', name: 'classification', value: 'cnc'}
                                   cnc
                               %li
-                                %input{type: 'checkbox', value: 'cryptomining'}
+                                %input.reptool-class-cb{type: 'checkbox', name: 'classification', value: 'cryptomining'}
                                   cryptomining
                           .col-xs-4
                             %ul
                               %li
-                                %input{type: 'checkbox', value: 'dga'}
+                                %input.reptool-class-cb{type: 'checkbox', name: 'classification', value: 'dga'}
                                   dga
                               %li
-                                %input{type: 'checkbox', value: 'exploit kit'}
+                                %input.reptool-class-cb{type: 'checkbox', name: 'classification', value: 'exploit kit'}
                                   exploit kit
                               %li
-                                %input{type: 'checkbox', value: 'malware'}
+                                %input.reptool-class-cb{type: 'checkbox', name: 'classification', value: 'malware'}
                                   malware
                               %li
-                                %input{type: 'checkbox', value: 'open_proxy'}
+                                %input.reptool-class-cb{type: 'checkbox', name: 'classification', value: 'open_proxy'}
                                   open_proxy
                               %li
-                                %input{type: 'checkbox', value: 'open_relay'}
+                                %input.reptool-class-cb{type: 'checkbox', name: 'classification', value: 'open_relay'}
                                   open_relay
                           .col-xs-4
                             %ul
                               %li
-                                %input{type: 'checkbox', value: 'phishing'}
+                                %input.reptool-class-cb{type: 'checkbox', name: 'classification', value: 'phishing'}
                                   phishing
                               %li
-                                %input{type: 'checkbox', value: 'response'}
+                                %input.reptool-class-cb{type: 'checkbox', name: 'classification', value: 'response'}
                                   response
                               %li
-                                %input{type: 'checkbox', value: 'spam'}
+                                %input.reptool-class-cb{type: 'checkbox', name: 'classification', value: 'spam'}
                                   spam
                               %li
-                                %input{type: 'checkbox', value: 'suspicious'}
+                                %input.reptool-class-cb{type: 'checkbox', name: 'classification', value: 'suspicious'}
                                   suspicious
                               %li
-                                %input{type: 'checkbox', value: 'tor_exit_node'}
+                                %input.reptool-class-cb{type: 'checkbox', name: 'classification', value: 'tor_exit_node'}
                                   tor_exit_node
                         %hr.thin.form-divider
                         .row.dropdown-tool-grey-row
@@ -210,7 +210,7 @@
                       %textarea.dropdown-comment.adjust-reptool-bl-input.comment-input
                     %hr.thin
                     .button-row-center
-                      %button.primary.dropdown-submit-button{type: 'button', onclick: 'toolbar_adjust_reptool_bl_button(this)', disabled: true}
+                      %button.primary.dropdown-submit-button{type: 'button', onclick: 'submit_bulk_reptool_research_tab();', disabled: true}
                         Submit Changes
 
       %div

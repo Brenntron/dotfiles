@@ -8058,6 +8058,10 @@ th.sorting_1, th.sorting_asc, th.sorting_desc {
   padding: 2px 12px;
 }
 
+.toolbar div.dropdown-tool-grey-row li:hover {
+  background-color: transparent !important;
+}
+
 hr.thin.form-divider {
   margin: 8px -10px;
 }
