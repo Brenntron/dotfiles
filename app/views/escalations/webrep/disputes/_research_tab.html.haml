@@ -133,10 +133,10 @@
                   .inline-tool-content-wrapper
                     .row
                       .col-xs-7
-                        %input{type: 'radio', name: 'reptool-action-radio', id: 'reptool-maintain', value: 'reptool-maintain', checked: true}
+                        %input{type: 'radio', name: 'reptool-action-radio', id: 'reptool-maintain', value: 'reptool-maintain'}
                         %label.radio-label{for: 'reptool-maintain'} Maintain current classifications
                       .col-xs-5
-                        %input{type: 'radio', name: 'reptool-action-radio', id: 'reptool-override', value: 'reptool-override'}
+                        %input{type: 'radio', name: 'reptool-action-radio', id: 'reptool-override', value: 'reptool-override', checked: true}
                         %label.radio-label{for: 'reptool-override'} Override classifications
                     %hr.thin.form-divider
                     .row
@@ -199,10 +199,10 @@
                           .col-xs-2
                             %label.content-label-sm Status
                           .col-xs-5
-                            %input{type: 'radio', name: 'reptool-status-radio', id: 'reptool-status-active', value: 'reptool-status-active', checked: true}
+                            %input{type: 'radio', name: 'reptool-status-radio', id: 'reptool-status-active', value: 'ACTIVE', checked: true}
                             %label.radio-label{for: 'reptool-status-active'} Set to ACTIVE
                           .col-xs-5
-                            %input{type: 'radio', name: 'reptool-status-radio', id: 'reptool-status-expired', value: 'reptool-status-expired'}
+                            %input{type: 'radio', name: 'reptool-status-radio', id: 'reptool-status-expired', value: 'EXPIRED'}
                             %label.radio-label{for: 'reptool-status-expired'} Set to EXPIRED
 
                     .comment-wrapper

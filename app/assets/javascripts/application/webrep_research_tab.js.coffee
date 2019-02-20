@@ -177,11 +177,13 @@ $ ->
 
           for entry in response
             if entry['status'] == "ACTIVE"
-              rep_class = entry['classification'] + ' - ' + entry['expiration']
+              rep_class_full = entry['classification'] + ' - ' + entry['expiration']
+              rep_class = entry['classification']
             else
-              rep_class = '<span class="missing-data">' + entry['classification'] + '</span>'
+              rep_class_full = '<span class="missing-data">No active classifications</span>'
+              rep_class = ''
 
-            tbody.append('<tr><td class="reptool-entry-name">' + entry['entry'] + '</td><td class="reptool-entry-class">' + rep_class + '</td><td class="reptool-entry-comment">' + entry['comment'] + '</td></tr>')
+            tbody.append('<tr class="reptool-entry-row"><td class="reptool-entry-name">' + entry['entry'] + '</td><td class="reptool-entry-class" data-classification="' + rep_class + '">' + rep_class_full + '</td><td class="reptool-entry-comment">' + entry['comment'] + '</td></tr>')
         error: (response) ->
           std_api_error(response, "Error retrieving Reptool Data", reload: false)
       )
@@ -218,14 +220,15 @@ $ ->
         data: { ip_uris: ip_uris }
         success: (response) ->
           response = JSON.parse(response)
-          console.log response
           for entry in response
             if entry['status'] == "ACTIVE"
-              rep_class = entry['classification'] + ' - ' + entry['expiration']
+              rep_class_full = entry['classification'] + ' - ' + entry['expiration']
+              rep_class = entry['classification']
             else
-              rep_class = '<span class="missing-data">' + entry['classification'] + '</span>'
+              rep_class_full = '<span class="missing-data">No active classifications</span>'
+              rep_class = ''
 
-            tbody.append('<tr><td class="reptool-entry-name">' + entry['entry'] + '</td><td class="reptool-entry-class">' + rep_class + '</td><td class="reptool-entry-comment">' + entry['comment'] + '</td></tr>')
+            tbody.append('<tr class="reptool-entry-row"><td class="reptool-entry-name">' + entry['entry'] + '</td><td class="reptool-entry-class" data-classification="' + rep_class + '">' + rep_class_full + '</td><td class="reptool-entry-comment">' + entry['comment'] + '</td></tr>')
         error: (response) ->
           std_api_error(response, "Error retrieving Reptool Data", reload: false)
       )
