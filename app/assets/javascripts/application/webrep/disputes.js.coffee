@@ -619,32 +619,31 @@ window.submit_bulk_reptool_research_tab = () ->
   bulk_reptool_menu = $('#reptool_adjust_entries')
   submission_action = bulk_reptool_menu.find("input[name='reptool-action-radio']:checked").val()
 
-  reptool_classes = []
+  checked_classes = []
   #  Get all checked classifications
   if $(bulk_reptool_menu).find('.reptool-class-cb:checked').length > 0
     $(bulk_reptool_menu).find('.reptool-class-cb:checked').each ->
-      reptool_classes.push($(this).val())
+      checked_classes.push($(this).val())
+  # Convert to string for data submission
+  reptool_classes = checked_classes.join()
 
   classification_action = $("input[name='reptool-classes-radio']:checked").val()
   comment = bulk_reptool_menu.find('.dropdown-comment').val()
-
 
   #  Get the entries
   entry_rows = $(bulk_reptool_menu).find('.reptool-entry-row')
   entries = []
 
-  # variable for adding existing classes for various entries that we wish to maintain
-  current_entry_and_classes = []
-  current_classes = []
+  current_entries_and_classes = []
   $(entry_rows).each ->
     entry = $(this).find('.reptool-entry-name')[0]
-    # don't delete these variables, I have a plan
-    current_classes = $($(this).find('.reptool-entry-class')[0]).attr('data-classification')
     entries.push($(entry).text())
+    current_classes = $($(this).find('.reptool-entry-class')[0]).attr('data-classification')
+    current_entries_and_classes.push {
+      'entry': $(entry).text()
+      'classifications': current_classes
+    }
 
-  console.log current_classes
-  # need to grab all the current classifications in case user wants to maintain them
-  # will do after we have the multisubmission working
 
   # If user wants to override existing classes we only need what they've checked
   if submission_action == "reptool-override"
@@ -661,48 +660,56 @@ window.submit_bulk_reptool_research_tab = () ->
       'comment': comment
     }
   else if submission_action == "reptool-maintain"
-    # if 'Add classifications'
-    # go through all entries
-    # each gets the checked classifications added to their list of current entries
+    # currently set up for 1 entry to work fine, or if all entries have identical current classes
+    new_classifications = ''
+    if classification_action == 'add'
+      $(current_entries_and_classes).each ->
+        new_classifications = this.classifications
+        new_classifications = new_classifications + ',' + reptool_classes
+
     # separate call for each entry - check to see if any of them have the exact
-    # same current categories, might make for less api calls
+    # same current categories, might make for less api calls?
 
-    # if 'Remove classifications'
-    # go through all entries
-    # for each set of current classifications, remove any that are in the checked classifications
-    # check to see if any of the new classifications match
+    else
+      $(current_entries_and_classes).each ->
+        current = this.classifications.split(',')
+        subtracted = current.filter((x) ->
+          checked_classes.indexOf(x) < 0
+        )
+        new_classifications = subtracted.join()
+
+    data = {
+      'action': 'ACTIVE'
+      'entries': entries
+      'classifications': new_classifications
+      'comment': comment
+    }
+
     # send separate api calls for each
+  console.log data
 
-
-
-#  else
-#    current_classes
-#    data {
-###      this is where it gets tricky
-#    }
-
-  headers = {'Token': $('input[name="token"]').val(), 'Xmlrpc-Token': $('input[name="xml_token"]').val()}
-  $.ajax(
-    url: '/escalations/api/v1/escalations/webrep/disputes/reptool_bl'
-    method: 'POST'
-    headers: headers
-    data: data
-    dataType: 'json'
-    success: (response) ->
-      window.location.reload()
-    error: (response) ->
-      if response.responseJSON == undefined
-        response_lines = response.responseText.split("\n")
-        if 2 < response_lines.length
-          errormsg = [response_lines[0], response_lines[1]]
-        else
-          errormsg = [response.responseText]
-      else if response.responseJSON.error != undefined
-        errormsg = [response.responseJSON.error]
-      else
-        errormsg = [response.responseText]
-      std_msg_error('Error', ['Error adjusting WL/BL'].concat(errormsg) )
-  )
+#  headers = {'Token': $('input[name="token"]').val(), 'Xmlrpc-Token': $('input[name="xml_token"]').val()}
+#  $.ajax(
+#    url: '/escalations/api/v1/escalations/webrep/disputes/reptool_bl'
+#    method: 'POST'
+#    headers: headers
+#    data: data
+#    dataType: 'json'
+#    success: (response) ->
+#      window.location.reload()
+#    error: (response) ->
+#      if response.responseJSON == undefined
+#        response_lines = response.responseText.split("\n")
+#        if 2 < response_lines.length
+#          errormsg = [response_lines[0], response_lines[1]]
+#        else
+#          errormsg = [response.responseText]
+#      else if response.responseJSON.error != undefined
+#        errormsg = [response.responseJSON.error]
+#      else
+#        errormsg = [response.responseText]
+#      std_msg_error('Error', ['Error adjusting WL/BL'].concat(errormsg) )
+#  )
 
 
 
