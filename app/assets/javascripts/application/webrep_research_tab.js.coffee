@@ -323,34 +323,33 @@ $ ->
 
     list_types = $('.wl-bl-list-inline:checkbox:checked').map(() -> this.value).toArray()
 
+    if $('.dispute_check_box:checked').length > 0
+      $('.dispute_check_box:checked').each ->
+        entry_row = $(this).parents('.research-table-row')[0]
+        ip_uri = $(entry_row).find('.entry-data-content').text()
+
+        ip_uris.push(ip_uri)
+
+    data = {ip_uris: ip_uris, list_types: list_types}
+
     if $('#wlbl-remove').prop('checked') == true
-      if $('.dispute_check_box:checked').length > 0
-        $('.dispute_check_box:checked').each ->
-          entry_row = $(this).parents('.research-table-row')[0]
-          ip_uri = $(entry_row).find('.entry-data-content').text()
-
-          ip_uris.push(ip_uri)
-
-      data = {ip_uris: ip_uris, list_types: list_types}
-
       std_msg_ajax(
         url: '/escalations/api/v1/escalations/webrep/disputes/bulk_rule_ui_wlbl_remove'
         method: 'POST'
         data: data
         success: (response) ->
-          debugger
           bulk_get_current_wlbl()
 
         error: (response) ->
 
       )
-    else if $('wlbl-add').prop('checked') == true
+    else if $('#wlbl-add').prop('checked') == true
       std_msg_ajax(
         url: '/escalations/api/v1/escalations/webrep/disputes/bulk_rule_ui_wlbl_add'
         method: 'POST'
         data: data
         success: (response) ->
-
+          bulk_get_current_wlbl()
         error: (response) ->
 
       )

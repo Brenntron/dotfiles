@@ -626,15 +626,17 @@ module API
             end
 
             params do
-              requires :data, type: Hash
-
+              requires :ip_uris, type: Array[String]
+              requires :list_types, type: Array[String]
             end
 
             post 'bulk_rule_ui_wlbl_add' do
               std_api_v2 do
+                authorize!(:update, Wbrs::ManualWlbl)
+                wlbl_params = {:urls => permitted_params['ip_uris'].map {|ip_uri| ip_uri.strip}, :trgt_list => permitted_params['list_types'], usr: current_user.cvs_username}
 
+                Wbrs::ManualWlbl.bulk_new_wlbl_from_params(wlbl_params)
               end
-
             end
 
             params do

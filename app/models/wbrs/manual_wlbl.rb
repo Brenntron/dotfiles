@@ -90,6 +90,22 @@ class Wbrs::ManualWlbl < Wbrs::Base
     response
   end
 
+  def self.bulk_new_wlbl_from_params(wlbl_params)
+    boolean = true
+    string_params = stringkey_params(wlbl_params)
+    list_types = string_params['trgt_list']
+
+    list_types.each do |list_type|
+      string_params['trgt_list'] = list_type.to_s
+      response = post_request(path: '/v1/rep/wlbl/add', body: string_params)
+      if response.code != 200
+        boolean = false
+      end
+    end
+
+    return boolean
+  end
+
   # @param [Array<DisputeEntry>] entries the database records for the entries to add the WL/BL to.
   # @param [String] trgt_list: Target manual list type
   # @param [String] usr: User creating the WL/BL entries
@@ -180,7 +196,6 @@ class Wbrs::ManualWlbl < Wbrs::Base
       target_list.each do |wlbl|
         new_wlbl_from_params({'urls' => params_urls, 'usr' => username, 'note' => params[:note], 'trgt_list' => wlbl })
       end
-
     end
 
   end
