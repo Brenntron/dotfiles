@@ -298,7 +298,11 @@ $ ->
 
           for entry in response
             ip_uri = entry['ip_uri']
-            list_types = entry['list_types'].toString()
+            list_types = entry['list_types']
+            if list_types
+              list_types = entry['list_types']
+            else
+              list_types = ''
 
             $(tbody).append('<tr>' + '<td class="wlbl-entry-contententry_content">' + ip_uri + '</td><td class="wlbl-entry-wlbl">' + list_types + '</td>' + '<td class="wlbl-current-entry-wbrs text-center">' + '' + '</td>')
 

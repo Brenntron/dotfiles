@@ -605,9 +605,7 @@ module API
                   list_types[entry] = []
                   api_responses = Wbrs::ManualWlbl.where({:url => entry})
 
-                  if api_responses.blank?
-                    data.push({:status => 'error', :ip_uri => entry, :list_types => nil})
-                  end
+
 
                   api_responses.each do |response|
                     if response.url == entry
@@ -619,7 +617,11 @@ module API
 
                   note_entries = note_entries.uniq
 
-                  data.push({:ip_uri => entry, :status => 'success', :list_types => list_types[entry], :notes => note_entries.first})
+                  if api_responses.blank?
+                    data.push({:status => 'error', :ip_uri => entry, :list_types => nil})
+                  else
+                    data.push({:ip_uri => entry, :status => 'success', :list_types => list_types[entry], :notes => note_entries.first})
+                  end
                 end
 
                 data.to_json
