@@ -589,6 +589,44 @@ module API
             end
 
             params do
+              requires :entries, type: Array[String]
+            end
+
+            post 'bulk_rule_ui_wlbl_get_info_for_form' do
+              std_api_v2 do
+
+                params[:entries] = params[:entries].map {|entry| entry.strip}
+
+                data = []
+                list_types = {}
+                note_entries = []
+
+                params[:entries].each do |entry|
+                  list_types[entry] = []
+                  api_responses = Wbrs::ManualWlbl.where({:url => entry})
+
+                  if api_responses.blank?
+                    data.push({:status => 'error', :ip_uri => entry, :list_types => nil})
+                  end
+
+                  api_responses.each do |response|
+                    if response.url == entry
+                      if response.state == "active"
+                        list_types[entry] << response.list_type
+                      end
+                    end
+                  end
+
+                  note_entries = note_entries.uniq
+
+                  data.push({:ip_uri => entry, :status => 'success', :list_types => list_types[entry], :notes => note_entries.first})
+                end
+
+                data.to_json
+              end
+            end
+
+            params do
               optional :id, type: Integer
               optional :entry, type: String
             end

@@ -277,35 +277,39 @@ $ ->
     ## Get data to populate table
     # Get all the checked entry urls
     if ($('.dispute_check_box:checked').length > 0)
-      data = []
+      data = {'entries': []}
+
       $('.dispute_check_box:checked').each ->
+
         entry_row = $(this).parents('.research-table-row')[0]
         entry_content = $(entry_row).find('.entry-data-content').text()
         wbrs = $(entry_row).find('.entry-data-wbrs-score').text()
         wlbl = ''
-        data.push(['entry' : entry_content])
+
+        data['entries'].push(entry_content)
+
+      std_msg_ajax(
+        url: '/escalations/api/v1/escalations/webrep/disputes/bulk_rule_ui_wlbl_get_info_for_form'
+        method: 'POST'
+        data: data
+        dataType: 'json'
+        success: (response) ->
+          response = JSON.parse(response)
+
+          for entry in response
+            ip_uri = entry['ip_uri']
+            list_types = entry['list_types'].toString()
+
+            $(tbody).append('<tr>' + '<td class="wlbl-entry-contententry_content">' + ip_uri + '</td><td class="wlbl-entry-wlbl">' + list_types + '</td>' + '<td class="wlbl-current-entry-wbrs text-center">' + '' + '</td>')
+
+#          if response.data != ""
+#            console.log response
 
 
 
-#        ANDREW - This api piece needs to be hooked up to handle the multiple entry checks, then I'll add
-
-#        headers = {'Token': $('input[name="token"]').val(), 'Xmlrpc-Token': $('input[name="xml_token"]').val()}
-#        $.ajax(
-#          url: '/escalations/api/v1/escalations/webrep/disputes/rule_ui_wlbl_get_info_for_form'
-#          method: 'GET'
-#          headers: headers
-#          data: data
-#          dataType: 'json'
-#          success: (response) ->
-#            response = JSON.parse(response)
-#            if response.data != ""
-#              console.log response
-#
-        $(tbody).append('<tr>' + '<td class="wlbl-entry-contententry_content">' + entry_content + '</td><td class="wlbl-entry-wlbl"></td>' + wlbl + '<td class="wlbl-current-entry-wbrs text-center">' + wbrs + '</td>')
-
-#          error: (response) ->
-#            std_msg_error( 'Error retrieving WL/BL Data', response)
-#        )
+          error: (response) ->
+            std_msg_error( 'Error retrieving WL/BL Data', response)
+        )
 
 #    else
 #      std_msg_error('No rows selected', ['Please select one row.'])
