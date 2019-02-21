@@ -294,6 +294,7 @@ $ ->
         data: data
         dataType: 'json'
         success: (response) ->
+          $(tbody).empty()
           response = JSON.parse(response)
 
           for entry in response
@@ -315,6 +316,29 @@ $ ->
             std_msg_error( 'Error retrieving WL/BL Data', response)
         )
 
+  window.research_bulk_adjust_wlbl =(button_tag) ->
+    checked_url = $('.dispute_check_box:checked')[0]
+    entry_row = $(checked_url).parents('.research-table-row')[0]
+    url = $(entry_row).find('.entry-data-content').text()
+    list_types = $('.wl-bl-list-inline:checkbox:checked').map(() ->
+      this.value
+    ).toArray()
+
+    wlbl_form = button_tag.form
+
+    data = {
+      'urls': [ url ]
+      'trgt_list': list_types
+      'note': wlbl_form.getElementsByClassName('adjust-wlbl-input')[0].value
+    }
+
+    std_msg_ajax(
+      url: '/escalations/api/v1/escalations/webrep/disputes/uri_wlbl'
+      method: 'POST'
+      data: data
+      error_prefix: 'Error adjusting WL/BL.'
+      success_reload: true
+    )
 #    else
 #      std_msg_error('No rows selected', ['Please select one row.'])
 
