@@ -662,13 +662,19 @@ window.submit_bulk_reptool_research_tab = () ->
   else if submission_action == "reptool-maintain"
     # currently set up for 1 entry to work fine, or if all entries have identical current classes
     new_classifications = ''
+    array_of_datas = []
     if classification_action == 'add'
       $(current_entries_and_classes).each ->
         new_classifications = this.classifications
         new_classifications = new_classifications + ',' + reptool_classes
 
-    # separate call for each entry - check to see if any of them have the exact
-    # same current categories, might make for less api calls?
+        temp_data = {
+          'action': 'ACTIVE'
+          'entries': entries
+          'classifications': new_classifications
+          'comment': comment
+        }
+        array_of_datas.push(temp_data)
 
     else
       $(current_entries_and_classes).each ->
@@ -677,16 +683,34 @@ window.submit_bulk_reptool_research_tab = () ->
           checked_classes.indexOf(x) < 0
         )
         new_classifications = subtracted.join()
+        temp_data = {
+          'action': 'ACTIVE'
+          'entries': entries
+          'classifications': new_classifications
+          'comment': comment
+        }
+        array_of_datas.push(temp_data)
 
-    data = {
-      'action': 'ACTIVE'
-      'entries': entries
-      'classifications': new_classifications
-      'comment': comment
-    }
+
+    # Consolidate data for calls here
+    # cycle through all data arrays in the array
+    # merge any that have matching classifications
+    console.log array_of_datas
+    $(array_of_datas).each ->
+      classes = array_of_datas.classifications
+      console.log classes
+
+
+
+
+#    data = {
+#      'action': 'ACTIVE'
+#      'entries': entries
+#      'classifications': new_classifications
+#      'comment': comment
+#    }
 
     # send separate api calls for each
-  console.log data
 
 #  headers = {'Token': $('input[name="token"]').val(), 'Xmlrpc-Token': $('input[name="xml_token"]').val()}
 #  $.ajax(
