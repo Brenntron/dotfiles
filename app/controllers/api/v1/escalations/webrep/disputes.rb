@@ -222,9 +222,6 @@ module API
               true
             end
 
-
-
-
             desc "Adjust a WL/BL entry"
             params do
               requires :dispute_entry_ids, type: Array[Integer], desc: "analyst-console database id"
@@ -626,6 +623,33 @@ module API
 
                 data.to_json
               end
+            end
+
+            params do
+              requires :data, type: Hash
+
+            end
+
+            post 'bulk_rule_ui_wlbl_add' do
+              std_api_v2 do
+
+              end
+
+            end
+
+            params do
+              requires :ip_uris, type: Array[String]
+              requires :list_types, type: Array[String]
+            end
+
+            post 'bulk_rule_ui_wlbl_remove' do
+              std_api_v2 do
+                ip_uris = permitted_params[:ip_uris].map {|ip_uri| ip_uri.strip}
+                list_types = permitted_params[:list_types]
+
+                Wbrs::ManualWlbl.destroy_from_params(ip_uris, list_types, username: current_user.cvs_username)
+              end
+
             end
 
             params do

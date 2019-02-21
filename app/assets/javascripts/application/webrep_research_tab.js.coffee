@@ -292,7 +292,6 @@ $ ->
         url: '/escalations/api/v1/escalations/webrep/disputes/bulk_rule_ui_wlbl_get_info_for_form'
         method: 'POST'
         data: data
-        dataType: 'json'
         success: (response) ->
           $(tbody).empty()
           response = JSON.parse(response)
@@ -317,30 +316,44 @@ $ ->
         )
 
   window.research_bulk_adjust_wlbl =(button_tag) ->
-    checked_url = $('.dispute_check_box:checked')[0]
-    entry_row = $(checked_url).parents('.research-table-row')[0]
-    url = $(entry_row).find('.entry-data-content').text()
-    list_types = $('.wl-bl-list-inline:checkbox:checked').map(() ->
-      this.value
-    ).toArray()
 
-    wlbl_form = button_tag.form
+    data = {}
+    ip_uris = []
+    list_types = []
 
-    data = {
-      'urls': [ url ]
-      'trgt_list': list_types
-      'note': wlbl_form.getElementsByClassName('adjust-wlbl-input')[0].value
-    }
+    list_types = $('.wl-bl-list-inline:checkbox:checked').map(() -> this.value).toArray()
 
-    std_msg_ajax(
-      url: '/escalations/api/v1/escalations/webrep/disputes/uri_wlbl'
-      method: 'POST'
-      data: data
-      error_prefix: 'Error adjusting WL/BL.'
-      success_reload: true
-    )
-#    else
-#      std_msg_error('No rows selected', ['Please select one row.'])
+    if $('#wlbl-remove').prop('checked') == true
+      if $('.dispute_check_box:checked').length > 0
+        $('.dispute_check_box:checked').each ->
+          entry_row = $(this).parents('.research-table-row')[0]
+          ip_uri = $(entry_row).find('.entry-data-content').text()
+
+          ip_uris.push(ip_uri)
+
+      data = {ip_uris: ip_uris, list_types: list_types}
+
+      std_msg_ajax(
+        url: '/escalations/api/v1/escalations/webrep/disputes/bulk_rule_ui_wlbl_remove'
+        method: 'POST'
+        data: data
+        success: (response) ->
+          debugger
+          bulk_get_current_wlbl()
+
+        error: (response) ->
+
+      )
+    else if $('wlbl-add').prop('checked') == true
+      std_msg_ajax(
+        url: '/escalations/api/v1/escalations/webrep/disputes/bulk_rule_ui_wlbl_add'
+        method: 'POST'
+        data: data
+        success: (response) ->
+
+        error: (response) ->
+
+      )
 
 
 
