@@ -602,8 +602,6 @@ module API
                   list_types[entry] = []
                   api_responses = Wbrs::ManualWlbl.where({:url => entry})
 
-
-
                   api_responses.each do |response|
                     if response.url == entry
                       if response.state == "active"
@@ -612,12 +610,24 @@ module API
                     end
                   end
 
-                  note_entries = note_entries.uniq
+                  if ComplaintEntry.is_ip?(entry)
+                    params['ip'] = entry
+                    wbrs_api_response = Sbrs::ManualSbrs.call_wbrs(params)
+                  else
+                    params['url'] = entry
+                    wbrs_api_response = Sbrs::ManualSbrs.call_wbrs(params, type: 'wbrs')
+                  end
+
+                  if wbrs_api_response != nil && wbrs_api_response['wbrs'].present? && wbrs_api_response['wbrs']['score'] != 'noscore'
+                    wbrs_score = wbrs_api_response['wbrs']['score']
+                  else
+                    wbrs_score = nil
+                  end
 
                   if api_responses.blank?
                     data.push({:status => 'error', :ip_uri => entry, :list_types => nil})
                   else
-                    data.push({:ip_uri => entry, :status => 'success', :list_types => list_types[entry], :notes => note_entries.first})
+                    data.push({:ip_uri => entry, :status => 'success', :list_types => list_types[entry], :wbrs_score => wbrs_score, :notes => note_entries.first})
                   end
                 end
 
