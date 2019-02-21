@@ -132,17 +132,26 @@
 
                   .inline-tool-content-wrapper
                     .row
-                      .col-xs-7
-                        %input{type: 'radio', name: 'reptool-action-radio', id: 'reptool-maintain', value: 'reptool-maintain'}
+                      .col-xs-12
+                        %input{type: 'radio', name: 'reptool-action-radio', id: 'reptool-maintain', value: 'reptool-maintain', checked: true}
                         %label.radio-label{for: 'reptool-maintain'} Maintain current classifications
-                      .col-xs-5
-                        %input{type: 'radio', name: 'reptool-action-radio', id: 'reptool-override', value: 'reptool-override', checked: true}
-                        %label.radio-label{for: 'reptool-override'} Override classifications
+                        %input{type: 'radio', name: 'reptool-action-radio', id: 'reptool-override', value: 'reptool-override'}
+                        %label.radio-label{for: 'reptool-override'} Replace current classifications
+                        %input{type: 'radio', name: 'reptool-action-radio', id: 'reptool-drop', value: 'reptool-drop'}
+                        %label.radio-label{for: 'reptool-drop'} Drop all classifications (set entry to EXPIRED)
                     %hr.thin.form-divider
-                    .row
+                    .row#reptool-classifications-row
                       .col-xs-12
                         %label.content-label-sm{for: "reptool-class-type-select"} Classifications
-                        .row.dropdown-tool-grey-row
+                        .row.dropdown-tool-grey-row.nested-radio-row#reptool-class-radio-row
+                          .col-xs-6
+                            %input{type: 'radio', name: 'reptool-classes-radio', id: 'reptool-classes-add', value: 'add', checked: true}
+                            %label.radio-label{for: 'reptool-status-active'} Add selected classifications
+                          .col-xs-6
+                            %input{type: 'radio', name: 'reptool-classes-radio', id: 'reptool-classes-remove', value: 'remove'}
+                            %label.radio-label{for: 'reptool-status-expired'} Remove selected classifications
+                        %hr.thin.form-divider
+                        .row.dropdown-tool-grey-row.checkbox-wrapper-row
                           .col-xs-4
                             %ul
                               %li
@@ -194,16 +203,6 @@
                               %li
                                 %input.reptool-class-cb{type: 'checkbox', name: 'classification', value: 'tor_exit_node'}
                                   tor_exit_node
-                        %hr.thin.form-divider
-                        .row.dropdown-tool-grey-row
-                          .col-xs-2
-                            %label.content-label-sm Status
-                          .col-xs-5
-                            %input{type: 'radio', name: 'reptool-status-radio', id: 'reptool-status-active', value: 'ACTIVE', checked: true}
-                            %label.radio-label{for: 'reptool-status-active'} Set to ACTIVE
-                          .col-xs-5
-                            %input{type: 'radio', name: 'reptool-status-radio', id: 'reptool-status-expired', value: 'EXPIRED'}
-                            %label.radio-label{for: 'reptool-status-expired'} Set to EXPIRED
 
                     .comment-wrapper
                       %label.content-label-sm RepTool Comment

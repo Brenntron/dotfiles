@@ -583,54 +583,102 @@ window.row_adust_reptool_bl_button_research =(button_tag) ->
 
 
 
-## Enable / Disable bulk reptool submit button (specifically on the toolbar)
 $ ->
-  $('#reptool_adjust_entries').find('.reptool-class-cb').click ->
-    reptool_submit = $('#reptool_adjust_entries').find('.dropdown-submit-button')
-    if $('#reptool_adjust_entries').find('.reptool-class-cb:checked').length > 0
+  ## Bulk Reptool form manipulation based on user's selections
+  bulk_reptool_menu = $('#reptool_adjust_entries')
+  submission_actions = bulk_reptool_menu.find("input[name='reptool-action-radio']")
+  reptool_submit = $('#reptool_adjust_entries').find('.dropdown-submit-button')
+
+  # Get submission action, show relavent pieces of the form
+  submission_actions.click ->
+    action = $(this).val()
+    if action == 'reptool-maintain'
+      $('#reptool-classifications-row').show()
+      $('#reptool-class-radio-row').show()
+    else if action == 'reptool-override'
+      $('#reptool-classifications-row').show()
+      $('#reptool-class-radio-row').hide()
+    else if action == 'reptool-drop'
+      $('#reptool-classifications-row').hide()
+      $('#reptool-class-radio-row').hide()
       $(reptool_submit[0]).attr('disabled', false)
-    else
-      $(reptool_submit[0]).attr('disabled', true)
+
+  # If user is not dropping all categories they need to select new ones to drop or add
+  bulk_reptool_menu.find('.reptool-class-cb').click ->
+    if submission_actions.val() == 'reptool-maintain' || submission_actions.val() == 'reptool-override'
+      if bulk_reptool_menu.find('.reptool-class-cb:checked').length > 0
+        $(reptool_submit[0]).attr('disabled', false)
+      else
+        $(reptool_submit[0]).attr('disabled', true)
+
+
 
 
 ## Submit bulk changes to reptool on research tab (specifically on the toolbar)
 window.submit_bulk_reptool_research_tab = () ->
-  reptool_dropdown = $('#reptool_adjust_entries')
+  bulk_reptool_menu = $('#reptool_adjust_entries')
+  submission_action = bulk_reptool_menu.find("input[name='reptool-action-radio']:checked").val()
+
   reptool_classes = []
   #  Get all checked classifications
-  if $(reptool_dropdown).find('.reptool-class-cb:checked').length > 0
-    $(reptool_dropdown).find('.reptool-class-cb:checked').each ->
+  if $(bulk_reptool_menu).find('.reptool-class-cb:checked').length > 0
+    $(bulk_reptool_menu).find('.reptool-class-cb:checked').each ->
       reptool_classes.push($(this).val())
 
-  # class status = ACTIVE or EXPIRED
-  class_status = $("input[name='reptool-status-radio']:checked").val()
-  comment = $($(reptool_dropdown).find('.dropdown-comment')).val()
-  submission_action = $("input[name='reptool-action-radio']:checked").val()
+  classification_action = $("input[name='reptool-classes-radio']:checked").val()
+  comment = bulk_reptool_menu.find('.dropdown-comment').val()
+
 
   #  Get the entries
-  entry_rows = $(reptool_dropdown).find('.reptool-entry-row')
+  entry_rows = $(bulk_reptool_menu).find('.reptool-entry-row')
   entries = []
 
   # variable for adding existing classes for various entries that we wish to maintain
   current_entry_and_classes = []
+  current_classes = []
   $(entry_rows).each ->
     entry = $(this).find('.reptool-entry-name')[0]
     # don't delete these variables, I have a plan
     current_classes = $($(this).find('.reptool-entry-class')[0]).attr('data-classification')
     entries.push($(entry).text())
-  console.log entries
-# need to grab all the current classifications in case user wants to maintain them
-# will do after we have the multisubmission working
+
+  console.log current_classes
+  # need to grab all the current classifications in case user wants to maintain them
+  # will do after we have the multisubmission working
+
+  # If user wants to override existing classes we only need what they've checked
   if submission_action == "reptool-override"
     data = {
-      'action': class_status
+      'action': 'ACTIVE'
       'entries': entries
       'classifications': reptool_classes
       'comment': comment
     }
+  else if submission_action == "reptool-drop"
+    data = {
+      'action': 'EXPIRED'
+      'entries': entries
+      'comment': comment
+    }
+  else if submission_action == "reptool-maintain"
+    # if 'Add classifications'
+    # go through all entries
+    # each gets the checked classifications added to their list of current entries
+    # separate call for each entry - check to see if any of them have the exact
+    # same current categories, might make for less api calls
+
+    # if 'Remove classifications'
+    # go through all entries
+    # for each set of current classifications, remove any that are in the checked classifications
+    # check to see if any of the new classifications match
+    # send separate api calls for each
+
+
+
 #  else
+#    current_classes
 #    data {
-##      this is where it gets tricky
+###      this is where it gets tricky
 #    }
 
   headers = {'Token': $('input[name="token"]').val(), 'Xmlrpc-Token': $('input[name="xml_token"]').val()}

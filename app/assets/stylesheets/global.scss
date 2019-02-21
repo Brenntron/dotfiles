@@ -8044,7 +8044,7 @@ th.sorting_1, th.sorting_asc, th.sorting_desc {
   background-color: $faint-neutral-color;
   margin-left: -13px !important;
   margin-right: -13px !important;
-  padding-bottom: 4px !important;
+  padding-bottom: 4px;
   margin-top: -3px !important;
 }
 
@@ -8071,14 +8071,24 @@ hr.thin.form-divider {
   margin: 2px -12px !important;
 }
 
-hr.thin.form-divider + .dropdown-tool-grey-row {
-  padding-top: 4px !important;
-}
-
 .dropdown-tool-grey-row .content-label-sm {
   margin-left: 12px;
 }
 
 .comment-wrapper + hr.thin {
   margin: 15px 6px;
+}
+
+.nested-radio-row .col-xs-6:first-of-type {
+  padding-left: 15px;
+}
+
+.nested-radio-row {
+  padding-top: 3px !important;
+  padding-bottom: 3px !important;
+}
+
+.checkbox-wrapper-row {
+  padding-top: 6px !important;
+  padding-bottom: 12px !important;
 }
