@@ -864,6 +864,8 @@ class Dispute < ApplicationRecord
         'My Tickets'
       when 'team_disputes'
         'My Team\'s Tickets'
+      when 'unassigned'
+        'Unassigned Tickets'
       when 'open'
         'Open Tickets'
       when 'open_email'
@@ -893,6 +895,8 @@ class Dispute < ApplicationRecord
         where(user_id: user.id)
       when 'team_disputes'
         where(user_id: user.my_team)
+      when 'unassigned'
+        where(status: [STATUS_NEW, STATUS_REOPENED])
       when 'open'
         where(status: [STATUS_NEW, STATUS_REOPENED, STATUS_CUSTOMER_PENDING, STATUS_CUSTOMER_UPDATE, STATUS_ON_HOLD, STATUS_RESEARCHING, STATUS_ESCALATED, STATUS_ASSIGNED])
       when 'open_email'

@@ -198,4 +198,45 @@ class Wbrs::ManualWlbl < Wbrs::Base
     dispute_entry_ids = DisputeEntry.where(dispute_id: dispute_ids).pluck(:id)
     adjust_entries_from_params(entry_params.merge('dispute_entry_ids' => dispute_entry_ids), username: username)
   end
+
+  def self.destroy_from_params(params= {}, username:)
+    captured_list_types = {}
+    transformed_list_types = {}
+    ids_to_drop = []
+
+    wlbl_params = stringkey_params(params)
+    params_urls = params[:urls].map {|url| url.strip}
+    list_types_to_destroy = wlbl_params.delete('trgt_list')
+
+    # Capture each url's list_types from the API
+    params_urls.each do |param_url|
+      api_response = Wbrs::ManualWlbl.where({:url => param_url})
+      captured_list_types[param_url] = api_response.select {|info| info.state == 'active' }.map {|info| info.list_type}
+
+      # Drop list types from the urls now that we have captured their list types
+      ids_to_drop << api_response.select {|info| info.state == 'active' }.map {|info| info.id}
+    end
+
+    drop_from_ids(ids_to_drop, username)
+    # Now we have a hash with a URL as a key, and its list types as the value (Array format)
+    # Next, we remove each list type in 'target_list_to_destroy' from the hash
+
+    # Loop through each url's current categories
+    captured_list_types.each do |url, list_types|
+      # Transform the collection by removing the undesired list_types
+      list_types_to_destroy.each do |list_type|
+        list_types.delete(list_type)
+      end
+    end
+
+    transformed_list_types = captured_list_types
+
+    # Now add each list_type in transformed_list_types back to the urls via API call
+    transformed_list_types.each do |url, list_types|
+      list_types.each do |list_type|
+        post_request(path: '/v1/rep/wlbl/add', body: {url: url, trget_list: list_type, usr: username, note: params[:note]})
+      end
+    end
+
+  end
 end
