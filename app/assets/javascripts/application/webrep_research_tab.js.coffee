@@ -247,6 +247,14 @@ $ ->
       $(dropdown).removeClass('open')
       return false
 
+  ## WL/BL Form manipulation
+  $('.wl-bl-list-inline').click ->
+    wlbl_entries = $('#wlbl_adjust_entries').find('.wlbl-dropdown-row')
+    wlbl_submit = $('#wlbl_adjust_entries').find('.dropdown-submit-button')
+    if wlbl_entries.length > 0 && $('.wl-bl-list-inline:checked').length > 0
+      wlbl_submit.attr('disabled', false)
+    else
+      wlbl_submit.attr('disabled', true)
 
 
   ## Populating the research tab toolbar Adjust WL/BL Button
@@ -280,12 +288,8 @@ $ ->
       data = {'entries': []}
 
       $('.dispute_check_box:checked').each ->
-
         entry_row = $(this).parents('.research-table-row')[0]
         entry_content = $(entry_row).find('.entry-data-content').text()
-        wbrs = $(entry_row).find('.entry-data-wbrs-score').text()
-        wlbl = ''
-
         data['entries'].push(entry_content)
 
       std_msg_ajax(
@@ -300,36 +304,33 @@ $ ->
             ip_uri = entry['ip_uri']
             list_types = entry['list_types']
             wbrs_score = entry['wbrs_score']
+            comment = entry['notes']
+            if wbrs_score == null
+              wbrs_score = '<span class="missing-data">No score.</span>'
+            if comment == null
+              comment = ''
             if list_types
               list_types = entry['list_types']
             else
               list_types = ''
 
-            $(tbody).append('<tr>' + '<td class="wlbl-entry-contententry_content">' + ip_uri + '</td><td class="wlbl-entry-wlbl">' + list_types + '</td>' + '<td class="wlbl-current-entry-wbrs text-center">' + wbrs_score + '</td>')
+            $(tbody).append('<tr class="wlbl-dropdown-row">' + '<td class="wlbl-entry-content">' + ip_uri + '</td><td class="wlbl-entry-wlbl">' + list_types + '</td>' + '<td class="wlbl-current-entry-wbrs text-center">' + wbrs_score + '</td>')
 
-#          if response.data != ""
-#            console.log response
+        error: (response) ->
+          std_msg_error( 'Error retrieving WL/BL Data', response)
+      )
 
-
-
-          error: (response) ->
-            std_msg_error( 'Error retrieving WL/BL Data', response)
-        )
-
-  window.research_bulk_adjust_wlbl =(button_tag) ->
-    wlbl_form = button_tag.form
-
+  ## Bulk submission of WL/BL changes on research tab
+  window.bulk_adjust_wlbl = () ->
     data = {}
     ip_uris = []
     list_types = []
-
     list_types = $('.wl-bl-list-inline:checkbox:checked').map(() -> this.value).toArray()
 
     if $('.dispute_check_box:checked').length > 0
       $('.dispute_check_box:checked').each ->
         entry_row = $(this).parents('.research-table-row')[0]
         ip_uri = $(entry_row).find('.entry-data-content').text()
-
         ip_uris.push(ip_uri)
 
     data = {ip_uris: ip_uris, list_types: list_types, note: wlbl_form.getElementsByClassName('adjust-wlbl-input')[0].value}
@@ -341,7 +342,6 @@ $ ->
         data: data
         success: (response) ->
           bulk_get_current_wlbl()
-
         error: (response) ->
 
       )
