@@ -322,6 +322,18 @@ module API
               end
             end
 
+            desc "Drop a Reptool Bl entry"
+            params do
+              requires :action, type: String, desc: "activate or expire"
+              requires :entries, type: Array[String], desc: "urls"
+            end
+            post "drop_reptool_bl" do
+              std_api_v2 do
+                RepApi::Blacklist.adjust_from_params(permitted_params, username: current_user.cvs_username)
+                true
+              end
+            end
+
             desc "Sync data for all dispute entry children"
             params do
               requires :dispute_id

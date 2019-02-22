@@ -864,7 +864,16 @@ window.submit_bulk_reptool_index = () ->
           errormsg = [response.responseText]
         std_msg_error('Error', ['Error adjusting WL/BL'].concat(errormsg) )
     )
+  else if submission_action == "reptool-drop"
+    std_msg_ajax(
+      url: '/escalations/api/v1/escalations/webrep/disputes/drop_reptool_bl'
+      method: 'POST'
+      data: data
+      success: (response) ->
+        window.location.reload()
+      error: (response) ->
 
+    )
 
 window.toolbar_adjust_reptool_bl_button_research =(button_tag) ->
   checked_url = $('.dispute_check_box:checked')[0]
