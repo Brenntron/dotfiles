@@ -4,6 +4,7 @@ module API
       module Webrep
         class Disputes < Grape::API
           include API::V1::Defaults
+          include API::BugzillaRestSession
 
           resource "escalations/webrep/disputes" do
             before do
@@ -28,6 +29,7 @@ module API
               optional :age_newer, type: String
               optional :modified_older, type: Date
               optional :modified_newer, type: Date
+              optional :reload, type: Boolean
               optional :customer, type: Hash do
                 optional :name, type: String
                 optional :email, type: String
@@ -45,7 +47,8 @@ module API
               disputes = Dispute.robust_search(permitted_params['search_type'],
                                                search_name: permitted_params['search_name'],
                                                params: permitted_params,
-                                               user: current_user).includes(:user, :dispute_entries => [:dispute_rule_hits])  # [but inside]
+                                               user: current_user,
+                                               reload: permitted_params['reload']).includes(:user, :dispute_entries => [:dispute_rule_hits])  # [but inside]
               title = Dispute.robust_search_title(permitted_params['search_type'], search_name: permitted_params['search_name'])
               json_packet = Dispute.to_data_packet(disputes, user: current_user)
 
@@ -63,6 +66,46 @@ module API
 
             end
 
+            desc 'create a dispute'
+            params do
+              requires :ips_urls, type: String, desc: 'List of URLs to create entries'
+              requires :assignee, type: String, desc: 'Description of new complaint'
+              requires :priority, type: String, desc: 'Customer related to new complaint'
+              requires :ticket_type, type: String, desc: 'Array of tags to be associated with the new complaint'
+            end
+
+            post "" do
+              std_api_v2 do
+                errors = []
+
+                user_validation = User.where(cvs_username: permitted_params['assignee'])
+
+                separated_entries = permitted_params[:ips_urls].split("\n")
+
+                separated_entries.each do |entry|
+                  if DisputeEntry.check_for_duplicates(entry)
+                    permitted_params[:ips_urls] = permitted_params[:ips_urls].gsub(entry+"\n","")
+                    errors << entry
+                  end
+                end
+
+                if separated_entries.length > errors.length
+                  if user_validation.present?
+                    dispute = Dispute.create_action(bugzilla_rest_session,
+                                            permitted_params[:ips_urls],
+                                            permitted_params[:assignee],
+                                            permitted_params[:priority],
+                                            permitted_params[:ticket_type])
+                    render json: {status: 'Success', case_id: dispute.id, errors: errors}
+                  else
+                    raise ("Invalid assignee or assignee does not exist. Please try again.")
+                  end
+                else
+                  raise ("Unable to create the following duplicate dispute entries: #{errors.join("\n")}")
+                end
+              end
+            end
+
             desc 'update a dispute'
             params do
               optional :priority, type: String, desc: "Priority of P1 through P5"
@@ -72,11 +115,13 @@ module API
               optional :related_id, type: Integer, desc: "ID of a dispute to relate to this one"
               optional :comment, type: String, desc: "Comment, available regardless of whether resolving"
               optional :resolution, type: String, desc: "Resolution; write this if status is Resolved"
+              optional :submission_type, type: String, desc: "Submission type"
             end
             put ":id" do
               resolved_at = Time.now
               dispute = Dispute.find(params[:id])
 
+              dispute.submission_type = permitted_params[:submission_type]
               dispute.priority = permitted_params[:priority]
               dispute.customer.name = permitted_params[:customer_name]
               dispute.customer.email = permitted_params[:customer_email]
@@ -342,7 +387,7 @@ module API
                 DisputeEntry.send_status_updates(permitted_params['field_data'])
 
                 permitted_params['field_data'].each do |index, entry|
-                  if entry.length == 3 && entry.last.field == 'resolution_comment' && !entry.last.new.empty?
+                  if entry.length == 3 && entry.last['field'] == 'resolution_comment' && !entry.last['new'].empty?
                     comment = entry.last.new
                     dispute_entry_id = index
                     Dispute.create_note(current_user, comment, dispute_entry_id)
@@ -540,16 +585,16 @@ module API
               information = RepApi::Blacklist.where({entries: [ params[:entry] ]}, true)
               information = JSON.parse(information)
 
-              if information[params[:entry]] == "NOT_FOUND"
+              if information[params[:entry].gsub('http://', '').gsub('https://', '')] == "NOT_FOUND"
                 return {:classification => "not found", :expiration => "", :status => "", :comment => ""}.to_json
               else
                 expiration = ""
                 begin
-                  expiration = Time.parse(information[params[:entry]]["expiration"]).to_s
+                  expiration = Time.parse(information[params[:entry].gsub('http://', '').gsub('https://', '')]["expiration"]).to_s
                 rescue
-                  expiration = information[params[:entry]]["expiration"]
+                  expiration = information[params[:entry].gsub('http://', '').gsub('https://', '')]["expiration"]
                 end
-                return {:classification => information[params[:entry]]["classifications"].first, :expiration => expiration, :status => information[params[:entry]]["status"], :comment => information[params[:entry]]["metadata"]["VRT"]["comment"]}.to_json
+                return {:classification => information[params[:entry].gsub('http://', '').gsub('https://', '')]["classifications"].first, :expiration => expiration, :status => information[params[:entry].gsub('http://', '').gsub('https://', '')]["status"], :comment => information[params[:entry].gsub('http://', '').gsub('https://', '')]["metadata"]["VRT"]["comment"]}.to_json
               end
 
             end
@@ -568,6 +613,8 @@ module API
               end
 
               list_types = []
+              note_entries = []
+              notes = ""
               information.each do |entry|
                 if entry.url == params[:entry]
                   if entry.state == "active"
@@ -576,7 +623,41 @@ module API
                 end
               end
 
-              return {:status => "success", :data => list_types}.to_json
+              note_entries = note_entries.uniq
+
+              return {:status => "success", :data => list_types, :notes => note_entries.first}.to_json
+
+            end
+
+            params do
+              optional :id, type: Integer
+              optional :entry, type: String
+            end
+
+            get 'wlbl_history' do
+              note_entries = []
+              entry = ''
+              if params[:id].present?
+                entry = DisputeEntry.find_by_id(params[:id]).hostlookup
+              else
+                entry = params[:entry]
+              end
+
+              information = Wbrs::ManualWlbl.where({:url => entry})
+
+              information.each do |info_entry|
+                if info_entry.url == entry
+                  details = Wbrs::ManualWlbl.find(info_entry.id)
+                  details.notes.each do |note|
+                    date = ''
+                    date = Date.parse(note['ctime']).to_s unless note['ctime'].blank?
+                    note_entries << {:state => info_entry.state, :date => date, :list_type => info_entry.list_type, :note => "#{note['user']} - #{note['ctime']}: #{note['note']}"}
+                  end
+                end
+              end
+
+
+              return {:status => "success", :data => note_entries}.to_json
 
             end
 
@@ -593,6 +674,13 @@ module API
 
               render json: {case_owners: case_owners, statuses: statuses, submitter_types: submitter_types,
                             contacts: contacts, companies: companies, resolutions: resolutions }
+            end
+
+            desc 'Auto-populate fields on New Dispute'
+            get 'populate_new_dispute_fields' do
+              assignees = User.joins(roles: :org_subset).where(org_subsets: { name: 'webrep' }).distinct.order(:cvs_username)
+
+              render json: {assignees: assignees}
             end
 
           end

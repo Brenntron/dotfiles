@@ -7,6 +7,7 @@
         %span.bug-state-info.bug-priority#dispute-priority-icon{class: "p-#{@dispute.priority}"}
         =select_tag(:'dispute-priority-select', options_for_select([["#{Dispute::PRIORITY_1}"], ["#{Dispute::PRIORITY_2}"], ["#{Dispute::PRIORITY_3}"], ["#{Dispute::PRIORITY_4}"], ["#{Dispute::PRIORITY_5}"]], @dispute.priority))
         %span.dispute-submission-type{class:"dispute-#{@dispute.submission_type}"}
+        =select_tag(:'dispute-submission-type-select', options_for_select([["E"], ["W"], ["EW"]], @dispute.submission_type.upcase))
       .case-id-wrapper
         %label.content-label-sm
           Case ID
@@ -41,7 +42,7 @@
                         .toolbar
                           %div
                             %label.toolbar-section-label Assignee
-                            =select_tag :index_target_assignee, options_from_collection_for_select(User.joins(roles: :org_subset).where(org_subsets: { name: 'webrep' }).distinct.order(:cvs_username), :id, :cvs_username)
+                            =select_tag :index_target_assignee, options_from_collection_for_select(User.joins(roles: :org_subset).where(org_subsets: { name: 'webrep' }).distinct.order(:cvs_username), :id, :cvs_username), class: 'toolbar-select'
                           %button{class: 'primary', type:'button', id: 'button_reassign', onclick:'toolbar_show_change_assignee();'}
                             Assign
                           - if (@dispute.assignee != 'Unassigned')

@@ -64,8 +64,8 @@ class ComplaintEntry < ApplicationRecord
   end
 
   def take_complaint(current_user)
-    if user.nil? ||user.display_name == "Vrt Incoming"
-      if status!="COMPLETED"
+    if user.nil? || user.display_name == "Vrt Incoming"
+      if status != "COMPLETED"
         self.update(user:current_user, status:"ASSIGNED", case_assigned_at: Time.now)
         complaint.set_status("ASSIGNED")
       else
@@ -75,8 +75,8 @@ class ComplaintEntry < ApplicationRecord
       raise("Cannot take someone elses complaint.")
     end
   end
-  def return_complaint(current_user)
-    if self.user == current_user
+  def return_complaint
+    if self.user != User.where(display_name: 'Vrt Incoming').first
       if !self.is_important
         if status!="COMPLETED"
           self.update(user: User.vrtincoming, status:"NEW")
@@ -84,15 +84,14 @@ class ComplaintEntry < ApplicationRecord
         else
           raise("Cannot return complaint that has been completed.")
         end
+      elsif self.is_important && self.status != "PENDING"
+        self.update(user: User.vrtincoming, status:"NEW")
+        complaint.set_status("NEW")
       else
         raise("Cannot return complaint when status is pending.")
       end
     else
-      if self.user.nil?
-        raise("Cannot return a complaint that is not assigned")
-      else
-        raise("Cannot return someone elses complaint.")
-      end
+      raise("Cannot return a complaint that is not assigned")
     end
   end
 
@@ -129,7 +128,7 @@ class ComplaintEntry < ApplicationRecord
                    user:current_user)
             complaint.set_status(current_status)
             #this is where we should send off the category to the API
-            if entry_status != "INVALID"
+            if entry_status != "INVALID" && categories_string != ''
               commit_category(ip_or_uri: self.uri_or_ip,
                               categories_string: categories_string,
                               description: comment,
@@ -173,7 +172,7 @@ class ComplaintEntry < ApplicationRecord
                case_resolved_at: Time.now,user:current_user)
         complaint.set_status(current_status)
         #this is where we should send off the category to the API
-        if entry_status != "INVALID"
+        if entry_status != "INVALID" && categories_string != ''
           commit_category(ip_or_uri: self.uri_or_ip,
                           categories_string: categories_string,
                           description: comment,
@@ -187,12 +186,24 @@ class ComplaintEntry < ApplicationRecord
 
   def commit_category(ip_or_uri:, categories_string:, description:, user:)
     # Look for existing prefix
-    existing_prefix = Wbrs::Prefix.where({urls: [ip_or_uri]})
-    category_ids_array = Wbrs::Category.get_category_ids(categories_string.split(','))
+
+    existing_prefixes = Wbrs::Prefix.where({urls: [ip_or_uri]})
+    existing_prefix = nil
+    if existing_prefixes.present?
+      existing_prefixes.each do |prefix_found|
+        if prefix_found.subdomain == self.subdomain
+          if prefix_found.path == self.path
+            existing_prefix = prefix_found
+          end
+        end
+      end
+    end
+
+    category_ids_array = categories_string.split(',').map {|cat| cat.to_i}
 
     if existing_prefix.present?
       prefix_object = Wbrs::Prefix.new
-      prefix_object.set_categories(category_ids_array, prefix_id: existing_prefix[0].prefix_id, user: user, description: description)
+      prefix_object.set_categories(category_ids_array, prefix_id: existing_prefix.prefix_id, user: user, description: description)
     else
       Wbrs::Prefix.create_from_url(url: ip_or_uri, categories: category_ids_array, user: user, description: description)
     end
@@ -214,7 +225,7 @@ class ComplaintEntry < ApplicationRecord
       new_complaint_entry.complaint_id = complaint.id
       new_complaint_entry.status = status
 
-      wbrs_stuff = Sbrs::ManualSbrs.get_wbrs_data({:url => ip_url})
+      wbrs_stuff = Sbrs::ManualSbrs.get_wbrs_data({:url => URI.escape(ip_url)})
       wbrs_score = wbrs_stuff["wbrs"]["score"]
       new_complaint_entry.wbrs_score = wbrs_score
 
@@ -258,7 +269,7 @@ class ComplaintEntry < ApplicationRecord
     begin
       screenshot_data =  ""
       Timeout::timeout(max_wait_for_job) do
-        screenshot_data = CapybaraSpider.low_capture("http://#{new_complaint_entry.hostlookup}")
+        screenshot_data = CapybaraSpider.low_capture("#{new_complaint_entry.hostlookup}")
       end
       ces = ComplaintEntryScreenshot.new
       ces.complaint_entry_id = new_complaint_entry.id
@@ -378,8 +389,13 @@ class ComplaintEntry < ApplicationRecord
     raise "No search named '#{search_name}' found." unless named_search
     search_params = named_search.named_search_criteria.inject({}) do |search_params, criterion|
       if /\A(?<super_name>[^~]*)~(?<sub_name>[^~]*)\z/ =~ criterion.field_name
-        search_params[super_name] ||= {}
-        search_params[super_name][sub_name] = criterion.value
+        if criterion.field_name == 'complaint_entries~complaint_id'
+          search_params[super_name] ||= {}
+          search_params[super_name][sub_name] = YAML::load(criterion.value)
+        else
+          search_params[super_name] ||= {}
+          search_params[super_name][sub_name] = criterion.value
+        end
       else
         search_params[criterion.field_name] = criterion.value
       end
@@ -492,7 +508,7 @@ class ComplaintEntry < ApplicationRecord
 
     # Save this search as a named search
     if params.present? && search_name.present?
-      Dispute.save_named_search(search_name, params, user: user)
+      Dispute.save_named_search(search_name, params, user: user, project_type: 'Complaint')
     end
     relation
   end
@@ -512,16 +528,26 @@ class ComplaintEntry < ApplicationRecord
   #
 
   def set_current_category
-    prefix_results = Wbrs::Prefix.where({:urls => [self.hostlookup]})
+    category_list = []
+    prefix_results = Wbrs::Prefix.where({:urls => [URI.escape(self.hostlookup)]})
     if prefix_results
       if prefix_results.first&.is_active == 1
-        categories = prefix_results.map{ |result| result.descr}
-        self.url_primary_category = categories.join(',')
-        self.category = categories.join(',')
+
+        categories = prefix_results.find_all {|result| result.path == self.path}
+        categories.each do |cat|
+          if cat.subdomain == self.subdomain
+            category_list << Wbrs::Category.find(cat.category_id).descr
+          end
+        end
+
+        self.url_primary_category = category_list.uniq.join(',')
+        self.category = category_list.uniq.join(',')
       else
         categories = nil
       end
     end
+
+    category_list.uniq.join(',')
   rescue => except
 
     Rails.logger.warn "Populating categories from Wbrs failed."
@@ -532,55 +558,82 @@ class ComplaintEntry < ApplicationRecord
   end
 
   def current_category_data
+    prefix_results = Wbrs::Prefix.where({:urls => [URI.escape(self.hostlookup)]})
+    return {} unless prefix_results
+    certainty_on_urls = Wbrs::Prefix.get_certainty_sources_for_urls([self.hostlookup])
 
-    data = {}
-    prefix_id = nil
-    prefix_results = Wbrs::Prefix.where({:urls => [self.hostlookup]})
-
-    prefix_results.each do |result|
-      data[result.category] = {:is_active => result.is_active, :mnemonic => result.mnem, :category_id => result.category, :prefix_id => result.prefix_id}
-      prefix_id = result.prefix_id
+    final_results = []
+    categories = prefix_results.find_all {|result| result.path == self.path}
+    categories.each do |cat|
+      if cat.subdomain == self.subdomain
+        final_results << cat
+      end
     end
 
+    final_current_categories = {}
 
-    ##LOOK INTO:  CURRENTLY COMMENTED OUT UNTIL WE MEET UP WITH RULEAPI TEAM TO FIGURE OUT WHY HISTORY DOESN'T MATCH UP WITH CURRENT
-    #
-    # if Wbrs::Prefix.where(:urls => [self.hostlookup]).present?
-    #   prefix_id_lookup = Wbrs::Prefix.where(:urls => [self.hostlookup]).first.prefix_id
-    # end
-    by_cat = {}
+    final_results.each do |result|
+      current_categories = result.categories
+      category_certainty = {}
+      certainty_on_urls.each do |cert_url, info|
 
-    if prefix_id.present?
-      audit_history = Wbrs::HistoryRecord.where(prefix_id: prefix_id)
-
-      audit_history.each do |hist|
-
-        if by_cat[hist.category_id].blank?
-          by_cat[hist.category_id] = []
+        info.each do |cert_info|
+          if cert_info['subdomain'] == result.subdomain && cert_info['path'] == result.path
+            if category_certainty[(cert_info['category_id'].to_i - 1000)].blank?
+              category_certainty[(cert_info['category_id'].to_i - 1000)] = []
+            end
+            #category_certainty[(cert_info['category_id'].to_i - 1000)] = {:category_id => cert_info['category_id'], :certainty => cert_info['certainty'], :source_mnemonic => cert_info['source_mnemonic'], :source_description => cert_info['source_description']}
+            category_certainty[(cert_info['category_id'].to_i - 1000)] << {:category_id => (cert_info['category_id'].to_i - 1000), :certainty => cert_info['certainty'], :source_mnemonic => cert_info['source_mnemonic'], :source_description => cert_info['source_description']}
+          end
         end
-
-        by_cat[hist.category_id] << hist
       end
+
+      final_current_categories = current_categories
+      final_current_categories = final_current_categories.inject({}) do |data, category|
+        top_certainty = ""
+        if category_certainty[category.category_id].present?
+          top_certainty = category_certainty[category.category_id].first[:certainty]
+          source = category_certainty[category.category_id].first[:source_description]
+
+        end
+        data[category.category_id] = {
+            category_id: category.category_id,
+            desc_long: category.desc_long,
+            descr: category.descr,
+            mnem: category.mnem,
+            is_active: category.is_active,
+            confidence: category.confidence,
+            top_certainty: top_certainty,
+            certainties: category_certainty[category.category_id]
+        }
+        data
+      end
+
+
+
     end
 
+    final_current_categories
 
-    if !by_cat.empty?
-      data.each do |key, value|
-        data[key][:confidence] = by_cat[key].last.confidence
-        data[key][:name] = by_cat[key].last.category.descr
-        data[key][:long_description] = by_cat[key].last.category.desc_long
-        # Certainty is dummy data
-        data[key][:certainty] = [{:source => 'N/A', :source_category => 'N/A', :source_certainty => '1000'}]
-      end
-    end
+    #current_categories = prefix.categories
 
-    data
+    #current_categories.inject({}) do |data, category|
+    #  data[category.category_id] = {
+    #      category_id: category.category_id,
+    #      desc_long: category.desc_long,
+    #      descr: category.descr,
+    #      mnem: category.mnem,
+    #      is_active: category.is_active,
+    #      confidence: category.confidence
+    #  }
+    #  data
+    #end
   end
 
   def historic_category_data
 
     prefix_id = nil
-    prefix_results = Wbrs::Prefix.where({:urls => [self.hostlookup]})
+    prefix_results = Wbrs::Prefix.where({:urls => [URI.escape(self.hostlookup)]})
     if prefix_results.present?
       prefix_id = prefix_results.first.prefix_id
     end
@@ -596,7 +649,7 @@ class ComplaintEntry < ApplicationRecord
   def history_category_data_with_preload_save
 
     prefix_id = nil
-    prefix_results = Wbrs::Prefix.where({:urls => [self.hostlookup]})
+    prefix_results = Wbrs::Prefix.where({:urls => [URI.escape(self.hostlookup)]})
 
     complaint_entry_preload = ComplaintEntryPreload.where(complaint_entry_id: self.id).first
 

@@ -34,6 +34,7 @@ Rails.configuration.umbrella            = umbrella
 
 raise "config.yml missing bugzilla section" unless env_config['bugzilla']
 Rails.configuration.bugzilla_host       = ENV['Bugzilla_host']   || env_config['bugzilla']['host']
+Rails.configuration.bugzilla_api_key    = env_config['bugzilla']['api_key']
 Rails.configuration.bugzilla_username   = ENV['Bugzilla_login']  || env_config['bugzilla']['login']
 Rails.configuration.bugzilla_password   = ENV['Bugzilla_secret'] || env_config['bugzilla']['password']
 
@@ -82,6 +83,8 @@ if sds_config
   Rails.configuration.sds.host          = sds_config['host']
   Rails.configuration.sds.cert_file     = sds_config['cert_file']
   Rails.configuration.sds.pkey_file     = sds_config['pkey_file']
+  Rails.configuration.sds.user          = sds_config['user']
+  Rails.configuration.sds.pass          = sds_config['pass']
 end
 
 Rails.configuration.snort_doc_max_fails = env_config['snort_doc_max_fails'] || 3
@@ -133,4 +136,10 @@ Rails.configuration.virustotal          = OpenStruct.new
 Rails.configuration.virustotal.host     = virustotal['host']
 Rails.configuration.virustotal.port     = virustotal['port']
 Rails.configuration.virustotal.api_key  = virustotal['api_key']
+
+bls_config = env_config['bls']
+raise 'config.yml missing bls section' unless bls_config
+Rails.configuration.bls                = OpenStruct.new
+Rails.configuration.bls.host           = bls_config['host']
+Rails.configuration.bls.port           = bls_config['port']
 

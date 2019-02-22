@@ -14,7 +14,7 @@
   .form-group.search-item
     %label.content-label-sm Status
     %select.form-control#status-input{name: 'status'}
-      =options_for_select(['', Complaint::NEW, Complaint::RESOLVED, Complaint::ASSIGNED, Complaint::ACTIVE, Complaint::COMPLETED, Complaint::PENDING])
+      =options_for_select([['Any Status', '', { class: 'default-placeholder' }], Complaint::NEW, Complaint::RESOLVED, Complaint::ASSIGNED, Complaint::ACTIVE, Complaint::COMPLETED, Complaint::PENDING])
     %button.remove-input
   .form-group.search-item
     %label.content-label-sm Tags
@@ -30,7 +30,7 @@
   .form-group.search-item.hidden
     %label.content-label-sm Added Through Channel
     %select.form-control#channel-input{name: 'channel'}
-      =options_for_select(['', "Internal", "TalosIntel"])
+      =options_for_select(['', "Internal", "TalosIntel", "WBNP"])
     %button.remove-input
   .form-group.search-item.hidden
     %label.content-label-sm Customer Name
@@ -145,7 +145,7 @@
   .form-group
     %label.content-label-sm
       Add Name to save this search criteria to My Saved Searches
-    %input.form-control{name: 'search_name'}
+    %input.form-control{name: 'search_name', :type => 'text', :maxlength => '50'}
   .form-group.text-center
     %button.primary#submit-advanced-search{type: 'button', value: 'submit', onclick: 'advanced_webcat_index_table();'}
       Submit Search

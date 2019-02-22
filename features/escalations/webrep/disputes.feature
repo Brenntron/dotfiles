@@ -7,8 +7,8 @@ Feature: Disputes
   Scenario: a user visits the duplicate cases tab and sees a table of duplicate cases
     Given a user with role "webrep user" exists and is logged in
     Given the following disputes exist and have entries:
-    |id|
-    |1 |
+      | id |
+      | 1  |
     Given a dispute exists and is related to disputes with ID, "1":
     And I go to "/escalations/webrep/disputes/1"
     Then I click "#related-tab-link"
@@ -18,9 +18,9 @@ Feature: Disputes
   Scenario: the last submitted field returns data
     Given a user with role "admin" exists and is logged in
     And the following disputes exist and have entries:
-      |id|
-      | 1|
-      | 2|
+      | id |
+      | 1  |
+      | 2  |
     Then I go to "/escalations/webrep/disputes/1"
     Then I click link "Research"
     Then Expect date in element "#last-submitted" to equal today's date
@@ -29,8 +29,8 @@ Feature: Disputes
   Scenario: a user can see data in the Submitter Type column
     Given a user with role "webrep user" exists and is logged in
     And the following disputes exist and have entries:
-      |id|submitter_type|
-      |1 |CUSTOMER      |
+      | id | submitter_type |
+      | 1  | CUSTOMER       |
     Then I goto "escalations/webrep/"
     When I trigger-click "#table-show-columns-button"
     And I trigger-click "#submitter-type-checkbox"
@@ -39,13 +39,14 @@ Feature: Disputes
 
   @javascript
   Scenario: a user takes a dispute and status is updated to assigned
+    Then pending
     Given a user with role "webrep user" exists with cvs_username, "Cucumber", exists and is logged in
     Given the following users exist
-    |id|cvs_username|
-    | 3|  vrtincom  |
+      | id | cvs_username |
+      | 3  | vrtincom     |
     And the following disputes exist:
-    |id|user_id|
-    | 2|   3   |
+      | id | user_id |
+      | 2  | 3       |
     When I goto "escalations/webrep/disputes"
     And I click ".take-dispute-2"
     Then I see "ASSIGNED" in element "#status_2"
@@ -53,13 +54,14 @@ Feature: Disputes
 
   @javascript
   Scenario: a user takes a dispute, returns a dispute, and takes the dispute again
+    Then pending
     Given a user with role "webrep user" exists with cvs_username, "Cucumber", exists and is logged in
     Given the following users exist
-      |id|cvs_username|
-      |3 |vrtincom    |
+      | id | cvs_username |
+      | 3  | vrtincom     |
     And the following disputes exist:
-      |id|user_id|
-      |2 |3      |
+      | id | user_id |
+      | 2  | 3       |
     When I goto "escalations/webrep/disputes"
     And I click ".take-dispute-2"
     Then I see "ASSIGNED" in element "#status_2"
@@ -75,8 +77,8 @@ Feature: Disputes
   Scenario: a user edits a dispute entry's status and saves their changes
     Given a user with role "webrep user" exists and is logged in
     And the following disputes exist and have entries:
-    |id|
-    |1 |
+      | id |
+      | 1  |
     When I goto "escalations/webrep/disputes/1/"
     And I click "#research-tab-link"
     And I click ".inline-edit-entry-button"
@@ -88,19 +90,19 @@ Feature: Disputes
 
   @javascript
   Scenario: when the user encounters a situation in which no results exists (therefore none returned), an error modal should display
-  Given a user with role "webrep user" exists and is logged in
-  When I goto "escalations/webrep/disputes"
-  Then I should see "NO TICKETS MATCHING FILTER OR SEARCH."
+    Given a user with role "webrep user" exists and is logged in
+    When I goto "escalations/webrep/disputes"
+    Then I should see "NO TICKETS MATCHING FILTER OR SEARCH."
 
   @javascript
   Scenario: a user adds a dispute as a related case using the tooltip button
     Given a user with role "webrep user" exists and is logged in
     And the following disputes exist:
-    |id|
-    |1 |
+      | id |
+      | 1  |
     And the following disputes exist:
-    |id|
-    |2 |
+      | id |
+      | 2  |
     When I goto "escalations/webrep/disputes"
     Given I check "cbox0000000001"
     And I click ".mark-related-button"
@@ -113,8 +115,8 @@ Feature: Disputes
   Scenario: a user uses advanced search filter (Submitted Older/Modified Older) and exports to csv
     Given a user with role "webrep user" exists and is logged in
     And the following disputes exist and have entries:
-    |id|
-    |1 |
+      | id |
+      | 1  |
     When I goto "escalations/webrep/disputes?f=open"
     And I click "#advanced-search-button"
     And I click "#add-search-items-button"
@@ -129,8 +131,8 @@ Feature: Disputes
   Scenario: a user adds and selects columns from the Column drop-down
     Given a user with role "webrep user" exists and is logged in
     And the following disputes exist and have entries:
-      |id|
-      |1 |
+      | id |
+      | 1  |
     When I goto "escalations/webrep/disputes?f=open"
     And I trigger-click "#table-show-columns-button"
     And I trigger-click "#case-id-checkbox"
@@ -154,8 +156,8 @@ Feature: Disputes
   Scenario: a users uses advanced search with 'Contact Name' as a search criteria
     Given a user with role "webrep user" exists and is logged in
     And the following disputes exist and have entries:
-    |id| submission_type|
-    |1 | w              |
+      | id | submission_type |
+      | 1  | w               |
     When I goto "escalations/webrep/disputes?f=all"
     And I click "#advanced-search-button"
     And I click "#add-search-items-button"
@@ -173,8 +175,8 @@ Feature: Disputes
   Scenario: a users uses advanced search with 'Contact Email' as a search criteria
     Given a user with role "webrep user" exists and is logged in
     And the following disputes exist and have entries:
-      |id| submission_type|
-      |1 | w              |
+      | id | submission_type |
+      | 1  | w               |
     When I goto "escalations/webrep/disputes?f=all"
     And I click "#advanced-search-button"
     And I click "#add-search-items-button"
@@ -191,8 +193,8 @@ Feature: Disputes
   Scenario: a users uses advanced search with 'Company' as a search criteria
     Given a user with role "webrep user" exists and is logged in
     And the following disputes exist and have entries:
-      |id| submission_type|
-      |1 | w              |
+      | id | submission_type |
+      | 1  | w               |
     When I goto "escalations/webrep/disputes?f=all"
     And I click "#advanced-search-button"
     And I click "#add-search-items-button"
@@ -209,8 +211,8 @@ Feature: Disputes
   Scenario: a user tries to export selected dispute entries
     Given a user with role "webrep user" exists and is logged in
     And the following disputes exist and have entries:
-      |id| submission_type|
-      |1 | w              |
+      | id | submission_type |
+      | 1  | w               |
     When I goto "escalations/webrep/disputes?f=all"
     And I click "#expand-all-index-rows"
     And I trigger-click ".dispute-entry-checkbox_1"
@@ -222,8 +224,8 @@ Feature: Disputes
   Scenario: a user tries to export selected dispute entries on the Research tab
     Given a user with role "webrep user" exists and is logged in
     And the following disputes exist and have entries:
-    |id|
-    |1 |
+      | id |
+      | 1  |
     When I goto "/escalations/webrep/disputes/1"
     And I trigger-click "#research-tab-link"
     And I trigger-click ".dispute_check_box"
@@ -235,8 +237,8 @@ Feature: Disputes
   Scenario: A user creates a new resolution message template
     Given a user with role "webrep user" exists and is logged in
     And the following disputes exist and have entries:
-      |id  |
-      |5370|
+      | id   |
+      | 5370 |
     And I goto "/escalations/webrep/disputes/5370"
     And I click ".mng-resolution-message-templates-button"
     And I click "#create-resolution-message-template"
@@ -252,8 +254,8 @@ Feature: Disputes
     Given a user with role "webrep user" exists and is logged in
     And a resolution message template exists
     And the following disputes exist and have entries:
-      |id  |
-      |5370|
+      | id   |
+      | 5370 |
     And I goto "/escalations/webrep/disputes/5370"
     And I click ".mng-resolution-message-templates-button"
     Then I should see "Templar"
@@ -271,8 +273,8 @@ Feature: Disputes
     Given a user with role "webrep user" exists and is logged in
     And a resolution message template exists
     And the following disputes exist and have entries:
-      |id  |
-      |5370|
+      | id   |
+      | 5370 |
     And I goto "/escalations/webrep/disputes/5370"
     And I click ".mng-resolution-message-templates-button"
     When I click ".delete-resolution-message-template"
@@ -285,8 +287,8 @@ Feature: Disputes
     Given a user with role "webrep user" exists and is logged in
     And a resolution message template exists
     And the following disputes exist and have entries:
-      |id  |
-      |5370|
+      | id   |
+      | 5370 |
     And I goto "/escalations/webrep/disputes/5370"
     And I click "#show-edit-ticket-status-button"
     And I click "#NEW"
@@ -298,8 +300,8 @@ Feature: Disputes
   Scenario: A user creates a new resolution message template
     Given a user with role "webrep user" exists and is logged in
     And the following disputes exist and have entries:
-      |id  |
-      |5370|
+      | id   |
+      | 5370 |
     And I goto "/escalations/webrep/disputes/5370"
     And I click ".mng-resolution-message-templates-button"
     And I click "#create-resolution-message-template"
@@ -308,36 +310,101 @@ Feature: Disputes
     Then I should see "THERE WAS AN ERROR CREATING THE RESOLUTION MESSAGE TEMPLATE."
     Then I should see "Name can't be blank and Body can't be blank"
 
+  Scenario: A user creates a new named search for disputes
+    Given a user with role "webrep user" exists and is logged in
+    When I goto "/escalations/webrep/disputes"
+    And I trigger-click "#advanced-search-button"
+    And I fill in "search_name" with "Lab"
+    And I trigger-click "#submit-advanced-search"
+    And I trigger-click "#filter-cases"
+    Then I should see content "Lab" within "#saved-searches-wrapper"
+
+  @javascript
+  Scenario: A user uses a new named search for disputes
+    Given a user with role "webrep user" exists and is logged in
+    And the following disputes exist and have entries:
+      | id | status |
+      | 1  | NEW    |
+    And the following disputes exist and have entries:
+      | id | status |
+      | 2  | NEW    |
+    And a named search with the name, "Cucumber" exists
+    And a named search criteria exists with field_name: "status" and value: "NEW"
+    When I goto "/escalations/webrep/disputes?f=closed"
+    Then I should not see "0000000001"
+    Then I should not see "NEW"
+    Then I should not see "0000000002"
+    And I trigger-click "#filter-cases"
+    And I trigger-click ".saved-search"
+    Then I should see "0000000001"
+    Then I should see "NEW"
+    Then I should see "0000000002"
+
+  @javascript
+  Scenario: A user creates a new named search for disputes
+    Given a user with role "webrep user" exists and is logged in
+    When I goto "/escalations/webrep/disputes?f=closed"
+    And I trigger-click "#advanced-search-button"
+    And I fill in "search_name" with "Cucumber"
+    And I trigger-click "#submit-advanced-search"
+    And I trigger-click "#filter-cases"
+    Then I should see content "Cucumber" within "#saved-searches-wrapper"
+
+  @javascript
+  Scenario: A user creates a duplicate named search for disputes
+    Given a user with role "webrep user" exists and is logged in
+    And a named search with the name, "Cucumber" exists
+    And a named search criteria exists with field_name: "status" and value: "NEW"
+    When I goto "/escalations/webrep/disputes?f=closed"
+    And I trigger-click "#advanced-search-button"
+    And I fill in "search_name" with "Cucumber"
+    And I trigger-click "#submit-advanced-search"
+    And I trigger-click "#filter-cases"
+    Then I should see content "Cucumber" within "#saved-searches-wrapper"
+    And There is only one element of class, "saved-search"
+
+  @javascript
+  Scenario: A user creates a new named search for disputes and stays on the page (tests to make sure multiple named search criteria are not created)
+    Given a user with role "webrep user" exists and is logged in
+    When I goto "/escalations/webrep/disputes?f=closed"
+    And I trigger-click "#advanced-search-button"
+    And I fill in "search_name" with "Cucumber"
+    And I trigger-click "#submit-advanced-search"
+    And I trigger-click "#filter-cases"
+    Then I should see content "Cucumber" within "#saved-searches-wrapper"
+    Then I wait for "90" seconds
+    Then There is only one element of class, "saved-search"
+
   @javascript
   Scenario: A user visits the Dashboard page and sees correct ticket counts
     Given a user with role "webrep user" exists with cvs_username, "Cucumber", exists and is logged in
     And the following disputes exist and have entries:
-      |id  |status     |user_id|
-      |5370|ASSIGNED   |1      |
+      | id   | status   | user_id |
+      | 5370 | ASSIGNED | 1       |
     And the following disputes exist and have entries:
-      |id  |status     |user_id|
-      |5371|ASSIGNED   |1      |
+      | id   | status   | user_id |
+      | 5371 | ASSIGNED | 1       |
     And the following disputes exist and have entries:
-      |id  |status     |user_id|
-      |5372|ASSIGNED   |1      |
+      | id   | status   | user_id |
+      | 5372 | ASSIGNED | 1       |
     And the following disputes exist and have entries:
-      |id  |status     |user_id|
-      |5373|RESEARCHING|1      |
+      | id   | status      | user_id |
+      | 5373 | RESEARCHING | 1       |
     And the following disputes exist and have entries:
-      |id  |status     |user_id|
-      |5374|RESEARCHING|1      |
+      | id   | status      | user_id |
+      | 5374 | RESEARCHING | 1       |
     And the following disputes exist and have entries:
-      |id  |status          |user_id|
-      |5375|RESOLVED_CLOSED |1      |
+      | id   | status          | user_id |
+      | 5375 | RESOLVED_CLOSED | 1       |
     And the following disputes exist and have entries:
-      |id  |status          |user_id|
-      |5376|RESOLVED_CLOSED |1      |
+      | id   | status          | user_id |
+      | 5376 | RESOLVED_CLOSED | 1       |
     And the following disputes exist and have entries:
-      |id  |status           |user_id|
-      |5377|RESOLVED_CLOSED  |1      |
+      | id   | status          | user_id |
+      | 5377 | RESOLVED_CLOSED | 1       |
     And the following disputes exist and have entries:
-      |id  |status            |user_id|
-      |5378|RESOLVED_CLOSED   |1      |
+      | id   | status          | user_id |
+      | 5378 | RESOLVED_CLOSED | 1       |
     When I goto "/escalations/webrep/dashboard"
     Then I should see content "3" within ".open"
     Then I should see content "2" within ".in-progress"
@@ -348,32 +415,32 @@ Feature: Disputes
     Given a user with role "webrep user" exists with cvs_username, "Cucumber", exists and is logged in
     And I add a test user to current user's team
     And the following disputes exist and have entries:
-      |id  |status     |user_id|
-      |5370|ASSIGNED   |2      |
+      | id   | status   | user_id |
+      | 5370 | ASSIGNED | 2       |
     And the following disputes exist and have entries:
-      |id  |status     |user_id|
-      |5371|ASSIGNED   |1      |
+      | id   | status   | user_id |
+      | 5371 | ASSIGNED | 1       |
     And the following disputes exist and have entries:
-      |id  |status     |user_id|
-      |5372|ASSIGNED   |1      |
+      | id   | status   | user_id |
+      | 5372 | ASSIGNED | 1       |
     And the following disputes exist and have entries:
-      |id  |status     |user_id|
-      |5373|RESEARCHING|2      |
+      | id   | status      | user_id |
+      | 5373 | RESEARCHING | 2       |
     And the following disputes exist and have entries:
-      |id  |status     |user_id|
-      |5374|RESEARCHING|1      |
+      | id   | status      | user_id |
+      | 5374 | RESEARCHING | 1       |
     And the following disputes exist and have entries:
-      |id  |status          |user_id|
-      |5375|RESOLVED_CLOSED |1      |
+      | id   | status          | user_id |
+      | 5375 | RESOLVED_CLOSED | 1       |
     And the following disputes exist and have entries:
-      |id  |status          |user_id|
-      |5376|RESOLVED_CLOSED |1      |
+      | id   | status          | user_id |
+      | 5376 | RESOLVED_CLOSED | 1       |
     And the following disputes exist and have entries:
-      |id  |status           |user_id|
-      |5377|RESOLVED_CLOSED  |1      |
+      | id   | status          | user_id |
+      | 5377 | RESOLVED_CLOSED | 1       |
     And the following disputes exist and have entries:
-      |id  |status            |user_id|
-      |5378|RESOLVED_CLOSED   |2     |
+      | id   | status          | user_id |
+      | 5378 | RESOLVED_CLOSED | 2       |
     When I goto "/escalations/webrep/dashboard"
     Then I should see content "2" within ".open"
     Then I should see content "1" within ".in-progress"
@@ -382,22 +449,22 @@ Feature: Disputes
     Then I should see content "2" within ".in-progress-team"
     Then I should see content "4" within ".closed-team"
 
+  @javascript
   Scenario: A user tries to update a dispute
     Given a user with role "webrep user" exists and is logged in
     And the following disputes exist and have entries:
-      |id  |
-      |5370|
+      | id   |
+      | 5370 |
     When I goto "/escalations/webrep/disputes/5370"
     And I click "#show-edit-ticket-status-button"
     And I click "#ESCALATED"
     And I click ".primary"
     Then I should see content "Escalated" within "#show-edit-ticket-status-button"
     And I click "#show-edit-ticket-status-button"
-    And I click "#RESOLVED_CLOSED"
+    And I click "#RESEARCHING"
     And I click ".primary"
-    Then I should see content "RESOLVED_CLOSED" within "#show-edit-ticket-status-button"
-    And I goto "/escalations/webrep/disputes/5370"
-    When I click "#edit-dispute-button"
+    Then I should see content "RESEARCHING" within "#show-edit-ticket-status-button"
+    When I click ".edit-button"
     And I fill in "dispute-customer-name-input" with "John Smith"
     And I fill in "dispute-customer-email-input" with "jsmith@cisco.com"
     And I select "P5" from "dispute-priority-select"
@@ -412,8 +479,8 @@ Feature: Disputes
   Scenario: A user tries add a new dispute entry (ad hoc)
     Given a user with role "webrep user" exists and is logged in
     And the following disputes exist:
-      |id  |
-      |5370|
+      | id   |
+      | 5370 |
     And I goto "/escalations/webrep/disputes/5370"
     Then I click link "Research"
     When I click "#add-entries-button"

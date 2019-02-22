@@ -1,0 +1,10 @@
+Edit Bugzilla API Key
+
+.edit_bz_api_key_div
+  = simple_form_for :bugzilla_api_key,
+                    url: escalations_user_bugzilla_api_key_path(@user),
+                    method: :patch do |bz_api_key_form|
+    = bz_api_key_form.input :bugzilla_api_key, label: 'Bugzilla API Key', required: false,
+                            input_html: {value: @user.bugzilla_api_key, size: 50}
+    = bz_api_key_form.submit 'Save'
+

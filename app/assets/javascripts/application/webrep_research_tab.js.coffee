@@ -1,5 +1,4 @@
 $ ->
-
   # go back to the last tab after reload
 
   $('a[data-toggle="tab"]').on 'shown.bs.tab', (e) ->
@@ -32,8 +31,7 @@ $ ->
           first_item = $(editable_data)[0]
           $(first_item).next('.table-entry-input')[0].focus()
     else
-      alert ('Select at least one entry to edit.')
-
+      std_msg_error('No rows selected', ['Select at least one entry to edit'])
 
   $('.dispute_check_box').on 'click', (e) ->
     if $(this).not(":checked") && $('.cancel-changes').is(":visible")
@@ -96,7 +94,7 @@ $ ->
 
 # Inline Edit Status
   $('.radio-label').click ->
-    radio_button = $(this).prev('input[type="radio"')
+    radio_button = $(this).prev('input[type="radio"]')
     $(radio_button[0]).trigger('click')
     dropdown_wrapper = $(this).parents('.inline-dropdown-menu')
     active_status = $(dropdown_wrapper[0]).prev('.inline-select-dropdown')
@@ -192,7 +190,7 @@ $ ->
 #
 
     else
-      alert ('Please select only one row.')
+      std_msg_error('No rows selected', ['Please select a row'])
       $(dropdown).removeClass('open')
       return false
 
@@ -240,11 +238,14 @@ $ ->
       )
 #
 
-    else
-      alert ('Please select only one row.')
+    else if $('.dispute-entry-checkbox:checked').length == 0
+      std_msg_error('No rows selected', ['Please select one row'])
       $(dropdown).removeClass('open')
       return false
-
+    else
+      std_msg_error('Error', ['Please select one row'])
+      $(dropdown).removeClass('open')
+      return false
 
 
 
@@ -367,11 +368,7 @@ $ ->
 
     else
       $(dropdown_wrapper).removeClass('open')
-      alert ('Please select 1 row')
-
-
-
-
+      std_msg_error('No rows selected', ['Please select one row.'])
 
 
   #Inline Adjust WL/BL Button

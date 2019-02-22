@@ -78,15 +78,16 @@ class Complaint < ApplicationRecord
   end
 
   def self.parse_url(url)
-    url = Domainatrix.parse(url)
+    url = URI.escape(url)
+    uri = URI.parse(URI.parse(url).scheme.nil? ? "http://#{url}" : url)
+    domain = PublicSuffix.parse(uri.host)
+    subdomain = uri.host.gsub(Regexp.new("\\.?#{domain.domain}$"), '')
 
-    uri_parts = {}
-
-    uri_parts[:subdomain] = url.subdomain
-    uri_parts[:domain] = ([url.domain] + [url.public_suffix]).join('.')
-    uri_parts[:path] = url.path
-
-    uri_parts
+    {
+        subdomain: subdomain,
+        domain: domain.domain,
+        path: uri.path
+    }
   end
 
   def self.is_possible_company_duplicate(complaint, entry, entry_type)
@@ -122,12 +123,12 @@ class Complaint < ApplicationRecord
   end
 
 
-  def self.commit_without_complaint(ip_or_uri:, categories_string:, description:, user:, bugzilla_session:)
+  def self.commit_without_complaint(ip_or_uri:, categories_string:, description:, user:, bugzilla_rest_session:)
     # check to see if URL is in Top URLS
     top_url = Wbrs::TopUrl.check_urls([ip_or_uri]).first.is_important
     if top_url
       #create a complaint/complaint entry and set to pending
-      Complaint.create_action(bugzilla_session, ip_or_uri, description, nil, nil, PENDING, categories_string)
+      Complaint.create_action(bugzilla_rest_session, ip_or_uri, description, nil, nil, PENDING, categories_string)
     else
       # Look for existing prefix
       existing_prefix = Wbrs::Prefix.where({urls: [ip_or_uri]})
@@ -229,7 +230,7 @@ class Complaint < ApplicationRecord
 
     begin
       ActiveRecord::Base.transaction do
-        max_wait_for_job = 15 #seconds
+        max_wait_for_job = 60 #seconds
 
         user = User.where(cvs_username:"vrtincom").first
         guest = Company.where(:name => "Guest").first
@@ -240,8 +241,6 @@ class Complaint < ApplicationRecord
         return_payload = {}
 
         #create an escalations IP/DOMAIN bugzilla bug here and transfer id to new dispute
-
-        bug_factory = Bugzilla::Bug.new(message_payload[:bugzilla_session])
 
         summary = "New Web Category Complaint generated at #{DateTime.now.utc.strftime("%Y-%m-%d %H:%M")}"
 
@@ -261,21 +260,22 @@ class Complaint < ApplicationRecord
             'classification' => 'unclassified',
         }
 
-        bug_stub_hash = Bug.bugzilla_create(bug_factory, bug_attrs, user, true)
+        bugzilla_rest_session = message_payload[:bugzilla_rest_session]
+        bug_proxy = bugzilla_rest_session.create_bug(bug_attrs, assigned_user: user)
 
 
         new_complaint = Complaint.new
         new_complaint.submission_type = message_payload["payload"]["submission_type"]
-        new_complaint.id = bug_stub_hash["id"]
+        new_complaint.id = bug_proxy.id
         new_complaint.description = message_payload["payload"]["problem"]
         new_complaint.ticket_source_key = message_payload["source_key"]
         new_complaint.ticket_source = "talos-intelligence"
         new_complaint.ticket_source_type = message_payload["source_type"]
-        new_complaint.customer_id = Customer.process_and_get_customer(message_payload).id
+        customer = Customer.process_and_get_customer(message_payload)
+        new_complaint.customer_id = customer&.id
         new_complaint.status = NEW
         new_complaint.channel = TI_CHANNEL
-
-        new_complaint.submitter_type = new_complaint.customer.company_id == guest.id ? SUBMITTER_TYPE_NONCUSTOMER : SUBMITTER_TYPE_CUSTOMER
+        new_complaint.submitter_type = (new_complaint.customer.nil? || new_complaint.customer&.company_id == guest.id) ? SUBMITTER_TYPE_NONCUSTOMER : SUBMITTER_TYPE_CUSTOMER
 
         new_complaint.save!
 
@@ -327,7 +327,7 @@ class Complaint < ApplicationRecord
           begin
             screenshot_data =  ""
             Timeout::timeout(max_wait_for_job) do
-              screenshot_data = CapybaraSpider.low_capture("http://#{new_complaint_entry.hostlookup}")
+              screenshot_data = CapybaraSpider.low_capture("#{new_complaint_entry.hostlookup}")
             end
             ces = ComplaintEntryScreenshot.new
             ces.complaint_entry_id = new_complaint_entry.id
@@ -339,7 +339,7 @@ class Complaint < ApplicationRecord
             ces = ComplaintEntryScreenshot.new
             ces.error_message = e.message
             ces.complaint_entry_id = new_complaint_entry.id
-            open("app/assets/images/failed_screenshot.jpg") do |f|
+            open("app/assets/images/timeout_screenshot.jpg") do |f|
               ces.screenshot = f.read
             end
             ces.save!
@@ -397,7 +397,7 @@ class Complaint < ApplicationRecord
           begin
             screenshot_data = ""
             Timeout::timeout(max_wait_for_job) do
-              screenshot_data = CapybaraSpider.low_capture("http://#{new_complaint_entry.hostlookup}")
+              screenshot_data = CapybaraSpider.low_capture("#{new_complaint_entry.hostlookup}")
             end
             ces = ComplaintEntryScreenshot.new
             ces.complaint_entry_id = new_complaint_entry.id
@@ -409,7 +409,7 @@ class Complaint < ApplicationRecord
             ces = ComplaintEntryScreenshot.new
             ces.error_message = e.message
             ces.complaint_entry_id = new_complaint_entry.id
-            open("app/assets/images/failed_screenshot.jpg") do |f|
+            open("app/assets/images/timeout_screenshot.jpg") do |f|
               ces.screenshot = f.read
             end
             ces.save!
@@ -451,12 +451,6 @@ class Complaint < ApplicationRecord
   def self.get_latest_wbnp_complaints
     begin
 
-      bugzilla_proxy = Bugzilla::XMLRPC.new(Rails.configuration.bugzilla_host)
-      bugzilla_proxy.bugzilla_login(Bugzilla::User.new(bugzilla_proxy),
-                                    Rails.configuration.bugzilla_username,
-                                    Rails.configuration.bugzilla_password)
-      bugzilla_session = bugzilla_proxy
-
       all_complaints = Wbrs::RuleUiComplaint.where({:add_channels => [WBNP_CHANNEL], :statuses => ['new']})["data"]
 
       new_complaints = []
@@ -468,8 +462,12 @@ class Complaint < ApplicationRecord
         end
       end
 
-      new_complaints.each do |new_ui_complaint|
-        rule_ui_wbnp_create_action(new_ui_complaint, bugzilla_session)
+      if new_complaints.present?
+        bugzilla_rest_session = BugzillaRest::Session.default_session
+        new_complaints.each do |new_ui_complaint|
+          rule_ui_wbnp_create_action(new_ui_complaint, bugzilla_rest_session: bugzilla_rest_session)
+        end
+
       end
 
     rescue
@@ -487,7 +485,7 @@ class Complaint < ApplicationRecord
     uri
   end
 
-  def self.rule_ui_wbnp_create_action(rule_ui_complaint, bugzilla_session)
+  def self.rule_ui_wbnp_create_action(rule_ui_complaint, bugzilla_rest_session:)
     #"#{{"add_channel"=>"wbnp", "comment"=>"", "complaint_id"=>105, "complaint_type"=>"unknown", "customer_name"=>"ORANGE BUSINES SERVICES", "description"=>"",
     # "domain"=>"fmp-usmba.ac.ma", "path"=>"/cdim/mediatheque/e_theses/257-16.pdf", "port"=>0, "protocol"=>"http", "region"=>"", "resolution"=>nil, "state"=>"new",
     # "subdomain"=>"scolarite", "tag"=>nil, "url_query_string"=>"", "when_added"=>"Thu, 30 Aug 2018 15:00:05 GMT", "when_last_updated"=>"Thu, 30 Aug 2018 15:00:05 GMT",
@@ -498,7 +496,6 @@ class Complaint < ApplicationRecord
     description = "WBNP Sourced Complaint"
 
     user = User.where(cvs_username:"vrtincom").first
-    bug_factory = Bugzilla::Bug.new(bugzilla_session)
 
     summary = "New Web Category Complaint generated at #{DateTime.now.utc.strftime("%Y-%m-%d %H:%M")}"
 
@@ -517,10 +514,10 @@ class Complaint < ApplicationRecord
         'classification' => 'unclassified',
     }
 
-    bug_stub_hash = Bug.bugzilla_create(bug_factory, bug_attrs, user, true)
+    bug_proxy = bugzilla_rest_session.create_bug(bug_attrs)
 
     cust = Customer.customer_from_ruleui(rule_ui_complaint)
-    new_complaint = Complaint.create(id: bug_stub_hash["id"],
+    new_complaint = Complaint.create(id: bug_proxy.id,
                                      description: description,
                                      customer_id: cust ? cust.id : nil,
                                      status: NEW,
@@ -536,16 +533,14 @@ class Complaint < ApplicationRecord
 
   end
 
-  def self.create_action(bugzilla_session, ips_urls, description, customer, tags, status=NEW, categories = nil)
-    user = User.where(cvs_username:"vrtincom").first
-    bug_factory = Bugzilla::Bug.new(bugzilla_session)
+  def self.create_action(bugzilla_rest_session, ips_urls, description, customer, tags, status=NEW, categories = nil)
 
     summary = "New Web Category Complaint generated at #{DateTime.now.utc.strftime("%Y-%m-%d %H:%M")}"
 
-    full_description = %Q{
+    full_description = <<~HEREDOC
           IPs/URIs: #{ips_urls}
           Problem Summary: #{description}
-    }
+    HEREDOC
 
     bug_attrs = {
         'product' => 'Escalations Console',
@@ -557,20 +552,24 @@ class Complaint < ApplicationRecord
         'classification' => 'unclassified',
     }
 
-    bug_stub_hash = Bug.bugzilla_create(bug_factory, bug_attrs, user, true)
+    bug_proxy = bugzilla_rest_session.create_bug(bug_attrs)
+
 
     cust = find_customer(customer) if customer
-    new_complaint = Complaint.create(id: bug_stub_hash["id"],
+    new_complaint = Complaint.create(id: bug_proxy.id,
                                      description: description,
-                                     customer_id: cust ? cust.id : nil,
+                                     customer_id: cust&.id,
                                      status: status,
                                      channel: INT_CHANNEL)
+
 
     handle_tags(new_complaint, tags) if tags
 
     ips_urls.split(' ').each do |ip_url|
       ComplaintEntry.create_complaint_entry(new_complaint, ip_url, User.where(display_name:"Vrt Incoming").first, status, categories)
     end
+
+    bug_proxy
   end
 
   def self.find_customer(customer)

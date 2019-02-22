@@ -7,6 +7,10 @@ Feature: Webcat complaints
   @javascript
   Scenario: a user can manually create a new complaint
     Given a user with role "webcat user" exists and is logged in
+    And bugzilla rest api always saves
+    And complaint entry preload is stubbed
+    And WBRS top url is stubbed
+    And WBRS Prefix where is stubbed
     And the following companies exist:
     |id| name  |
     | 1| Cisco |
@@ -22,7 +26,7 @@ Feature: Webcat complaints
     And I fill in "customers" with "Cisco:Talos Person:talos@cisco.com"
     And I fill in selectized with "urgent"
     And I click "Create"
-    And I wait for "30" seconds
+    And I wait for "5" seconds
     And I should see "COMPLAINT CREATED"
 
   @javascript
@@ -177,6 +181,20 @@ Feature: Webcat complaints
     Then I should see "MUST INCLUDE AT LEAST ONE CATEGORY."
 
   @javascript
+  Scenario: a user attempts to submit changes with resolution set to 'Unchanged'
+    Given a user with role "webcat user" exists and is logged in
+    And a complaint entry with trait "new_entry" exists
+    And a complaint entry preload exists
+    And I goto "/escalations/webcat/complaints?f=ALL"
+    And I wait for "5" seconds
+    And I click ".expand-all"
+    And I wait for "5" seconds
+    And I click "#unchanged1"
+    And I click "#submit_changes_1"
+    And I wait for "5" seconds
+    Then I should see "COMPLETED"
+
+  @javascript
   Scenario: a user clicks the domain button
     Given a user with role "webcat user" exists and is logged in
     And a complaint entry with trait "new_entry" exists
@@ -225,14 +243,16 @@ Feature: Webcat complaints
   @javascript
   Scenario: a user looks up a complaint's entry history without entering a URL
     Given a user with role "webcat user" exists and is logged in
-    When I click "#categorize-urls"
+    When I goto "/escalations/webcat/complaints?f=ALL"
+    And I click "#categorize-urls"
     And I click "#history-1"
-    Then I should see "No data available for blank URL."
+    Then I should see content "No data available for blank URL." within "#cat-url-1"
 
   @javascript
   Scenario: a user looks up a complaint's entry history with a valid URL
     Given a user with role "webcat user" exists and is logged in
-    When I click "#categorize-urls"
+    When I goto "/escalations/webcat/complaints?f=ALL"
+    And I click "#categorize-urls"
     And I fill in "url_1" with "cisco.com"
     And I click "#history-1"
     And I wait for "5" seconds
@@ -243,12 +263,21 @@ Feature: Webcat complaints
   @javascript
   Scenario: a user looks up a complaint's entry history with an invalid URL
     Given a user with role "webcat user" exists and is logged in
-    When I click "#categorize-urls"
+    When I goto "/escalations/webcat/complaints?f=ALL"
+    And I click "#categorize-urls"
     And I fill in "url_1" with "fmasoifkis.com"
     And I click "#history-1"
     And I wait for "5" seconds
-    Then take a screenshot
     Then I should see "SOMETHING WENT WRONG: THE URL YOU PROVIDED DOES NOT HAVE AVAILABLE DATA."
+
+  @javascript
+  Scenario: a user looks up a complaint's entry history with an invalid URL in the third position (make sure that the notification appears in the right spot)
+    Given a user with role "webcat user" exists and is logged in
+    When I click "#categorize-urls"
+    And I fill in "url_3" with "fmasoifkis.com"
+    And I click "#history-3"
+    And I wait for "5" seconds
+    Then I should see content "No history associated with this url." within "#cat-url-3"
 
   Scenario: a users tries to categorize a URL
     Given a user with role "webcat user" exists and is logged in

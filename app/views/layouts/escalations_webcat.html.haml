@@ -50,14 +50,26 @@
                   %span Drop All Current Categories
 
             .form-group
+              %div.cat-url-error#cat-url-1
+                %button.categorize-urls-warning-icon
+                %span#cat-url-error-message-1 No history associated with this url.
+              %div.cat-url-success#cat-url-success-1
+                %button.categorize-urls-success-icon
+                %span#cat-url-success-message-1 Categories successfully dropped.
               %label.content-label-sm URL
               %br
               %input.inline-input.form-control#url_1{:name => "token", :type => "text", :value => "", :placeholder=>"URL", autofocus: 'true', tabindex: '1'}/
               %button.inline-button.history-button.esc-tooltipped#history-1{type: 'button', onclick: 'retrieve_history(1)', title: 'Entry Category History'}
               %label.content-label-sm Categories
-              %select.form-control#cat_new_url_1.cat_new_url.contacts.selectize{:multiple => "multiple", :placeholder => "Enter up to 5 categories", :style => "display: none;", tabindex: '2'}
+              %select.form-control#cat_new_url_1.cat_new_url.contacts.selectize{:multiple => "multiple", :placeholder => "Enter up to 5 categories", :style => "display: none;", tabindex: "2"}
             %hr.thin.condensed
             .form-group
+              %div.cat-url-error#cat-url-2
+                %button.categorize-urls-warning-icon
+                %span#cat-url-error-message-2 No history associated with this url.
+              %div.cat-url-success#cat-url-success-2
+                %button.categorize-urls-success-icon
+                %span#cat-url-success-message-2 Categories successfully dropped.
               %label.content-label-sm URL
               %br
               %input.inline-input.form-control#url_2{:name => "token", :type => "text", :value => "", :placeholder=>"URL", tabindex: '3'}/
@@ -66,6 +78,12 @@
               %select.form-control#cat_new_url_2.cat_new_url.contacts.selectize{:multiple => "multiple", :placeholder => "Enter up to 5 categories", :style => "display: none;", :tabindex => "4"}
             %hr.thin.condensed
             .form-group
+              %div.cat-url-error#cat-url-3
+                %button.categorize-urls-warning-icon
+                %span#cat-url-error-message-3 No history associated with this url.
+              %div.cat-url-success#cat-url-success-3
+                %button.categorize-urls-success-icon
+                %span#cat-url-success-message-3 Categories successfully dropped.
               %label.content-label-sm URL
               %br
               %input.inline-input.form-control#url_3{:name => "token", :type => "text", :value => "", :placeholder=>"URL", tabindex: '5'}/
@@ -74,6 +92,12 @@
               %select.form-control#cat_new_url_3.cat_new_url.contacts.selectize{:multiple => "multiple", :placeholder => "Enter up to 5 categories", :style => "display: none;", :tabindex => "6"}
             %hr.thin.condensed
             .form-group
+              %div.cat-url-error#cat-url-4
+                %button.categorize-urls-warning-icon
+                %span#cat-url-error-message-4 No history associated with this url.
+              %div.cat-url-success#cat-url-success-4
+                %button.categorize-urls-success-icon
+                %span#cat-url-success-message-4 Categories successfully dropped.
               %label.content-label-sm URL
               %br
               %input.inline-input.form-control#url_4{:name => "token", :type => "text", :value => "", :placeholder=>"URL", tabindex: '7'}/
@@ -82,6 +106,12 @@
               %select.form-control#cat_new_url_4.cat_new_url.contacts.selectize{:multiple => "multiple", :placeholder => "Enter up to 5 categories", :style => "display: none;", :tabindex => "8"}
             %hr.thin.condensed
             .form-group
+              %div.cat-url-error#cat-url-5
+                %button.categorize-urls-warning-icon
+                %span#cat-url-error-message-5 No history associated with this url.
+              %div.cat-url-success#cat-url-success-5
+                %button.categorize-urls-success-icon
+                %span#cat-url-success-message-5 Categories successfully dropped.
               %label.content-label-sm URL
               %br
               %input.inline-input.form-control#url_5{:name => "token", :type => "text", :value => "", :placeholder=>"URL", tabindex: '9'}/
@@ -153,12 +183,12 @@
           %span.nav-dropdown-content-icon.icon-saved-search
           My Saved Searches
         %table{class: 'table', id: 'saved-search'}
-          %tbody
+          %tbody#saved-search-tbody
             - if current_user.named_searches.any?
-              - current_user.named_searches.each do |named_search|
+              - current_user.named_searches.where('project_type = ? OR project_type IS ?', 'Complaint', nil).order(:id).each do |named_search|
                 %tr{id: "saved_search_#{named_search.id}"}
                   %td
-                    %a.saved-search{onclick: "named_webcat_index_table('#{named_search.name}');"}
+                    %a.input-truncate.saved-search.esc-tooltipped{onclick: "named_webcat_index_table('#{named_search.name}');", title: named_search.name}
                       = named_search.name
                     %a.delete-search{title: 'Delete Saved Search', onclick: "delete_disputes_named_search(this, '#{named_search.name}');"}
                       = image_tag('icon_cancel_grey.svg')
@@ -210,7 +240,29 @@
 
   - if current_user
     #login-div.nav-tool-block.col-sm-2.col-lg-2
-      %a{href: "/users/#{current_user[:id]}"}
+      %span.dropdown
+        %button#user-settings-dropdown-button.dropdown-toggle{'data-toggle': 'dropdown', 'aria-expanded': 'false', 'aria-haspopup': 'true', type: 'button'}
+        #user-settings-dropdown.dropdown-menu{'aria-labelledby': 'user-settings-dropdown-button'}
+          -#    If user is logged into Bugzilla
+          -#.message-text Log out of Bugzilla
+          -# Logout button
+
+          -#-#    Else
+          .message-text Log into Bugzilla
+          %form#top_banner_bugzilla_login_form
+            .form-group.text-left
+              %label.content-label-sm Username
+              %input.form-control{name: 'username', autofocus: 'true'}
+            .form-group.text-left
+              %lable.content-label-sm Password
+              %input.form-control{type: 'password', name: 'password'}
+            .form-group.text-center
+              %button#top_banner_bugzilla_login_button.panel-button.primary{'aria-label': 'Login', onclick: 'top_banner_bugzilla_login(); return false;'} Login
+
+          %a{href: "/users/#{current_user[:id]}"}
+            Login settings
+
+      %a.nav-username{href: "/users/#{current_user[:id]}"}
         = current_user[:display_name]
 
     -##username= current_user.cvs_username

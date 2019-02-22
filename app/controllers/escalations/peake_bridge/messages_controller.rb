@@ -24,12 +24,17 @@ class Escalations::PeakeBridge::MessagesController < ApplicationController
         if message_payload.respond_to?(:permit!)
           message_payload = message_payload.permit!.to_h
         end
-        message_payload[:bugzilla_session] = bugzilla_session
+        message_payload[:bugzilla_rest_session] = bugzilla_rest_session
         message_payload[:current_user] = current_user
-        #return_message = obj_type.constantize.process_bridge_payload(message_payload)
 
-        Thread.new { obj_type.constantize.process_bridge_payload(message_payload) }
-        #obj_type.constantize.process_bridge_payload(message_payload)
+        # This is so the tests can stub out the `threaded?` method and test synchronously.
+        if self.class.threaded?
+          Thread.new do
+            obj_type.constantize.process_bridge_payload(message_payload)
+          end
+        else
+          obj_type.constantize.process_bridge_payload(message_payload)
+        end
 
         #return_message = {
         #    "envelope":
@@ -68,20 +73,13 @@ class Escalations::PeakeBridge::MessagesController < ApplicationController
   private
 
 
-  # @return [Bugzilla::XMLRPC] Authenticated bugzilla session
-  def bugzilla_session
-    begin
-      unless @bugzilla_session
-        bugzilla_proxy = Bugzilla::XMLRPC.new(Rails.configuration.bugzilla_host)
-        bugzilla_proxy.bugzilla_login(Bugzilla::User.new(bugzilla_proxy),
-                                      Rails.configuration.bugzilla_username,
-                                      Rails.configuration.bugzilla_password)
-        @bugzilla_session = bugzilla_proxy
-      end
-    rescue => except
-      Rails.logger.error(except.message)
-    end
-    @bugzilla_session
+  # defined so tests can stub to return false.
+  def self.threaded?
+    true
+  end
+
+  def bugzilla_rest_session
+    BugzillaRest::Session.default_session
   end
 
   def log_exception(except)

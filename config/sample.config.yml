@@ -13,6 +13,7 @@ development:
   bugzilla:
     #host: "bugzillaTest02.vrt.sourcefire.com"
     host: "bugzilla-staging.vrt.sourcefire.com"
+    api_key: "redacted"
   cert:
     #vrt: "/System/Library/OpenSSL/certs/ca.pem" #Mac OS X standard location for certs
     vrt: "extras/ssh/ca.pem"
@@ -46,10 +47,15 @@ development:
     host: "fmdreputation.vrt.sourcefire.com"
     port: 443
     # verify_mode { "no-tls" for http, "verify-none" for self signed cert, "verify-peer" for CA }
-    verify_mode: "verify-none"
+    verify_mode: "verify-peer"
+    ca_cert_file: "/usr/local/etc/trusted-certificates.pem"
     gssnegotiate: true
   ruletest:
     url: "https://localhost:3000/api_test"
+  sds:
+    host: "v2.sds.cisco.com"
+    cert_file: "/usr/local/etc/sds-certificate.pem"
+    pkey_file: "/usr/local/etc/sds-pkey.pem"
   snort_doc_max_fails: 3
   snort_org:
     host: "localhost"
@@ -76,6 +82,9 @@ development:
     # verify_mode { "no-tls" for http, "verify-none" for self signed cert, "verify-peer" for CA }
     verify_mode: "no-tls"
     gssnegotiate: false
+  bls:
+    host: "stage-bls-vip.sv4.ironport.com"
+    port: 443
   xbrs:
     #host: "localhost"
     #port: 1188                          #default xbrs_stub port
@@ -102,6 +111,7 @@ test:
   bugzilla:
     #host: "bugzillaTest02.vrt.sourcefire.com"
     host: "bugzilla-staging.vrt.sourcefire.com"
+    api_key: "redacted"
   cert:
     #vrt: "/System/Library/OpenSSL/certs/ca.pem" #Mac OS X standard location for certs
     vrt: "extras/ssh/ca.pem"
@@ -138,6 +148,10 @@ test:
     gssnegotiate: true
   ruletest:
     url: "https://localhost:3000/api_test"
+  sds:
+    host: "v2.sds.cisco.com"
+    cert_file: "/usr/local/etc/sds-certificate.pem"
+    pkey_file: "/usr/local/etc/sds-pkey.pem"
   snort_doc_max_fails: 1
   snort_org:
     host: "localhost"
@@ -164,6 +178,9 @@ test:
     # verify_mode { "no-tls" for http, "verify-none" for self signed cert, "verify-peer" for CA }
     verify_mode: "no-tls"
     gssnegotiate: false
+  bls:
+    host: "stage-bls-vip.sv4.ironport.com"
+    port: 443
   xbrs:
     #host: "localhost"
     #port: 1188                          #default xbrs_stub port
@@ -189,6 +206,7 @@ staging:
       api_key: "redacted"
   bugzilla:
     host: "bugzilla-staging.vrt.sourcefire.com"
+    api_key: "redacted"
   cert:
     vrt: "/usr/local/etc/trusted-certificates.pem"
   peakebridge:
@@ -220,6 +238,12 @@ staging:
     gssnegotiate: true
   ruletest:
     url: "https://fmd-rultst-01stg.vrt.sourcefire.com"
+  sds:
+    host: "v2.sds.cisco.com"
+    cert_file: "/usr/local/etc/sds-certificate.pem"
+    pkey_file: "/usr/local/etc/sds-pkey.pem"
+    user: 'tidev'
+    pass: "REDACTED"
   snort_doc_max_fails: 3
   snort_org:
     host: "localhost"
@@ -263,6 +287,7 @@ production:
       api_key: "redacted"
   bugzilla:
     host: "bugzilla.vrt.sourcefire.com"
+    api_key: "redacted"
   cert:
     vrt: "/usr/local/etc/trusted-certificates.pem"
   peakebridge:

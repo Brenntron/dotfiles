@@ -1,14 +1,10 @@
 window.updateURI = (complaint_entry_id) ->
   event.preventDefault()
 
-  $('#loader-modal').show()
-  $('.modal-backdrop').show()
-
   $('#loader-modal').modal({
-    backdrop: 'static',
     keyboard: false
   })
-  
+
   uri = $("#complaint_prefix_#{complaint_entry_id}").val()
 
   std_msg_ajax(
@@ -16,8 +12,7 @@ window.updateURI = (complaint_entry_id) ->
     url: "/escalations/api/v1/escalations/webcat/complaints/update_uri"
     data: {complaint_entry_id: complaint_entry_id, uri: uri }
     success: (response) ->
-      $('#loader-modal').hide()
-      $('.modal-backdrop').remove()
+      $('#loader-modal').modal 'hide'
 
       $(".simple-nested-table##{complaint_entry_id} tbody > tr").remove()
 
@@ -30,23 +25,16 @@ window.updateURI = (complaint_entry_id) ->
 
         $("#domain_#{complaint_entry_id}").text(response.domain)
         $("#subdomain_#{complaint_entry_id}").text(response.subdomain)
-        $("#entry-uri-#{complaint_entry_id}").html("<a href='http://#{uri}'>#{uri}</a>")
-        $("#site-search-#{complaint_entry_id}").html("<a href='https://www.google.com/search?q=site%3A#{uri}'>#{uri}</a>")
+        $("#entry-uri-#{complaint_entry_id}").html("<a href='http://#{uri}' target='_blank' onclick='select_cat_text_field(#{complaint_entry_id})' >#{uri}</a>")
+        $("#site-search-#{complaint_entry_id}").html("<a href='https://www.google.com/search?q=site%3A#{uri}' target='_blank' onclick='select_cat_text_field(#{complaint_entry_id})'>#{uri}</a>")
 
 
         $("#history-#{complaint_entry_id}").replaceWith('<button class="secondary" id="history-' + complaint_entry_id + '" onclick="history_dialog('+complaint_entry_id+')">History</button>')
         $("#domain-#{complaint_entry_id}").replaceWith('<button class="secondary" id="domain-' + complaint_entry_id + '" onclick="domain_whois(\''+response.domain+'\')">Domain</button>')
 
-        std_msg_success("Success",['URI updated.'])
-
-
-
-
-
   )
 
 window.cat_new_url = ()->
-  event.preventDefault()
 
   data = {}
   isEmpty = true
@@ -61,7 +49,6 @@ window.cat_new_url = ()->
   if isEmpty == false
 
     $('#loader-modal').modal({
-      backdrop: 'static',
       keyboard: false
     })
 
@@ -70,14 +57,15 @@ window.cat_new_url = ()->
       method: 'POST'
       data: {data: data}
       success: (response) ->
-        $('.modal-backdrop').hide()
-        $('#loader-modal').hide()
+        $('#loader-modal').modal 'hide'
         std_msg_success('URLs categorized successfully',["Categorization of a Top URL will create a pending complaint entry.", "All other entries have been submitted directly to WBRS."], reload: true)
 
       error: (response) ->
-        $('.modal-backdrop').hide()
-        $('#loader-modal').hide()
-        std_msg_error("Error",["Unable to categorize url."], reload: false)
+        $('#loader-modal').modal 'hide'
+        if response.responseText.includes('Either no products have been defined to enter bugs against or you have not been given access to any.')
+          std_api_error(response, "Please make sure you have the appropriate permissions in Bugzilla. Unable to categorize url.", reload: false)
+        else
+          std_api_error(response, "Unable to categorize url.", reload: false)
     )
   else
     std_msg_error("Unable to categorize", ["Please confirm that a URL and at least one category for each desired entry exists."], reload: false)
@@ -92,14 +80,12 @@ window.webcat_reset_search = ()->
   tags_control.clear()
 
 window.multiple_url_categorization = ()->
-  event.preventDefault()
 
   urls = $("#categorize_urls").val().split(/\n/)
   cats = $("#multi_cat_url_cats").val()
 
   if $("#categorize_urls").val() != "" && cats != null
     $('#loader-modal').modal({
-      backdrop: 'static',
       keyboard: false
     })
 
@@ -108,16 +94,14 @@ window.multiple_url_categorization = ()->
       method: 'POST'
       data: {urls: urls, cats: cats}
       success: (response) ->
-        $('#loader-modal').hide()
-        $('.modal-backdrop').remove()
+        $('#loader-modal').modal 'hide'
         std_msg_success('Success',["URLs/IPs successfully categorized."], reload: true)
       error: (response) ->
-        $('#loader-modal').hide()
-        $('.modal-backdrop').remove()
+        $('#loader-modal').modal 'hide'
         std_msg_error('Error' + ' ' + response.responseJSON.message,"", reload: false)
     )
   else
-    $('#loader-modal').hide()
+    $('#loader-modal').modal 'hide'
     std_msg_error('Error', ['Please check that a URL/IP has been inputted and that at least one category was selected.'], reload: false)
 
 name_servers =(server_list)->
@@ -269,12 +253,16 @@ window.updatePending = (id,row_id) ->
           persist: false,
           create: false,
           maxItems: 5,
-          valueField: 'value',
-          labelField: 'value',
-          searchField: ['text'],
+          valueField: 'category_id',
+          labelField: 'category_name',
+          searchField: ['category_name', 'category_code'],
           options: AC.WebCat.createSelectOptions(),
           items: selected_options(temp_row.data().category)
         }
+      tds = $('#complaints-index tbody').closest('td')
+      for td in tds
+        if td.className == ''
+          td.classList.add('nested-complaint-data-wrapper')
     error: (response) ->
       notice_html = "<p>Something went wrong: #{response.responseText}</p>"
   , this)
@@ -283,12 +271,18 @@ window.updateEntryColumns = (entry_id,row_id) ->
   $("#submit_changes_#{entry_id}").prop("disabled",true)
   prefix = $('#complaint_prefix_'+entry_id)[0].value
   categories = $('#input_cat_'+entry_id).val().toString()
+  category_name = $('#input_cat_' + entry_id).next('.selectize-control').find('.item')
+  category_names = []
+  category_name.each ->
+    category_names.push($(this).text())
+  category_names = category_names.toString()
   status = $('[name=resolution'+entry_id+']:checked').val()
   comment = $('#complaint_comment_'+entry_id)[0].value
   resolution_comment = $('#complaint_resolution_comment_'+entry_id)[0].value
   headers = {'Token': $('input[name="token"]').val(), 'Xmlrpc-Token': $('input[name="xml_token"]').val()}
 
-  if categories.length == 0 && status != 'INVALID'
+  unchanged = $("#unchanged#{entry_id}").is(':checked')
+  if categories.length == 0 && status != 'INVALID' && unchanged == false
     std_msg_error("Must include at least one category.","", reload: false)
     $("#submit_changes_#{entry_id}").prop("disabled",false)
   else
@@ -296,17 +290,22 @@ window.updateEntryColumns = (entry_id,row_id) ->
       url: '/escalations/api/v1/escalations/webcat/complaint_entries/update'
       method: 'POST'
       headers: headers
-      data: {'id': entry_id,'prefix': prefix,'categories':categories,'status':status,'comment':comment, 'resolution_comment': resolution_comment }
+      data: {'id': entry_id,'prefix': prefix,'categories':categories, 'category_names':category_names, 'status':status,'comment':comment, 'resolution_comment': resolution_comment }
       success: (response) ->
         json = $.parseJSON(response)
         if !json.error
           table = $('#complaints-index').DataTable()
+
+          selected_rows = $('#complaints-index').DataTable().rows('.selected')
+          selected_rows.data().cell(selected_rows[0][0],14).data("#{json.display_name}").draw()
+
           temp_row = table.row(row_id)
           temp_row.data().status = json.status
           temp_row.data().resolution = status
           temp_row.data().internal_comment = comment
           temp_row.data().resolution_comment = resolution_comment
-          temp_row.data().category = categories
+          temp_row.data().category = category_names
+          temp_row.data().category_names = category_names
           temp_row.invalidate().draw()
           temp_row.child().remove()
           temp_row.child(format(temp_row)).show()
@@ -314,22 +313,26 @@ window.updateEntryColumns = (entry_id,row_id) ->
             persist: false,
             create: false,
             maxItems: 5
-            valueField: 'value'
-            labelField: 'value'
-            searchField: 'text'
+            valueField: 'category_id',
+            labelField: 'category_name',
+            searchField: ['category_name', 'category_code'],
             options: AC.WebCat.createSelectOptions()
-            items: selected_options(temp_row.data().category)
+            items: selected_options(categories)
           }
           $('#input_cat_pending'+ temp_row.data().entry_id).selectize {
             persist: false,
             create: false,
             maxItems: 5
-            valueField: 'value'
-            labelField: 'value'
-            searchField: 'text'
+            valueField: 'category_id',
+            labelField: 'category_name',
+            searchField: ['category_name', 'category_code'],
             options: AC.WebCat.createSelectOptions()
-            items: selected_options(temp_row.data().category)
+            items: selected_options(categories)
           }
+        tds = $('#complaints-index tbody').closest('td')
+        for td in tds
+          if td.className == ''
+            td.classList.add('nested-complaint-data-wrapper')
 
       error: (response) ->
         $("#submit_changes_#{entry_id}").prop("disabled",false)
@@ -355,7 +358,7 @@ window.take_selected = ()->
         json = $.parseJSON(response)
         if json.error
           notice_html = "<p>Something went wrong: #{json.error}</p>"
-          alert(json.error)
+          std_msg_error('take error', [json.error])
         else
           i = 0
           while i < selected_rows[0].length
@@ -366,6 +369,8 @@ window.take_selected = ()->
       error: (response) ->
         notice_html = "<p>Something went wrong: #{response.responseText}</p>"
     , this)
+  else
+    std_msg_error('No rows selected', ['Please select at least one row.'])
 
 
 
@@ -387,17 +392,19 @@ window.return_selected = ()->
         json = $.parseJSON(response)
         if json.error
           notice_html = "<p>Something went wrong: #{json.error}</p>"
-          alert(json.error)
+          std_msg_error('return error', [json.error])
         else
           i = 0
           while i < selected_rows[0].length
-            selected_rows.data().cell(selected_rows[0][i],12).data("Vrt Incoming").draw()
-            selected_rows.data().cell(selected_rows[0][i],5).data("NEW").draw()
+            selected_rows.data().cell(selected_rows[0][i],14).data("Vrt Incoming").draw()
+            selected_rows.data().cell(selected_rows[0][i],4).data("NEW").draw()
             i++
 
       error: (response) ->
         notice_html = "<p>Something went wrong: #{response.responseText}</p>"
     , this)
+  else
+    std_msg_error('no rows selected', ['Please select at least one row.'])
 
 window.select_cat_text_field = (id) ->
   if (typeof numericalValue)
@@ -415,10 +422,10 @@ window.edit_selected_complaints = () ->
   else
     std_msg_error("alert",["There was an error. Please select an entry to edit"])
 
-selected_options = (categories) ->
+selected_options = (category_names) ->
   options = []
-  if categories
-    options = categories.split(',')
+  if category_names
+    options = category_names.split(',')
   return options
 
 $('html').on 'click', (e) ->
@@ -434,13 +441,7 @@ window.enlarge_image = (id,image)->
 
 window.lookup_prefix = () ->
 
-  event.preventDefault()
-
-  $('#loader-modal').show()
-  $('.modal-backdrop').show()
-
   $('#loader-modal').modal({
-    backdrop: 'static',
     keyboard: false
   })
 
@@ -472,20 +473,31 @@ window.lookup_prefix = () ->
           i++
           continue
         i++
-      $('#loader-modal').hide()
-      $('.modal-backdrop').hide()
+      $('#loader-modal').modal 'hide'
   )
 
 window.retrieve_history = (position) ->
+  $(".cat-url-error").hide()
+
+  for url_position in [1..5]
+    $("#url_#{url_position}").css("border-width", "")
+    $("#url_#{url_position}").css("border-color", "")
 
   url = $("#url_" + position).val()
 
   if url.length > 0
+
+    $('#loader-modal').modal({
+      keyboard: false
+    })
+
     std_msg_ajax(
       url: '/escalations/api/v1/escalations/webcat/complaint_entries/categorize_urls_history'
       method: 'POST'
       data: {'position': position, url: url}
       success: (response) ->
+        $('#loader-modal').modal 'hide'
+
         json = JSON.parse(response)
 
         if json.error
@@ -527,29 +539,64 @@ window.retrieve_history = (position) ->
             $('#history_dialog').dialog('open')
 
       error: (response) ->
-        std_msg_error("<p>Something went wrong: #{response.responseText}","")
+        $("#cat-url-error-message-#{position}").text("No history associated with this url.")
+        $('#loader-modal').modal 'hide'
+        $("#cat-url-#{position}").show()
+        $("#url_#{position}").css("border-width", "2px")
+        $("#url_#{position}").css("border-color", "#E47433")
+
     , this)
   else
-    std_msg_error("Error",['No data available for blank URL.'])
+    $("#cat-url-error-message-#{position}").text("No data available for blank URL.")
+    $("#cat-url-#{position}").show()
+    $("#url_#{position}").css("border-width", "2px")
+    $("#url_#{position}").css("border-color", "#E47433")
+
 
 window.drop_current_categories = () ->
+  $(".cat-url-error").hide()
+  $(".cat-url-success").hide()
 
-  urls = []
+  $('#loader-modal').modal({
+    keyboard: false,
+  })
+
+  $("#url_#{i}").css("border-width", "")
+  $("#url_#{i}").css("border-color", "")
+
+  urls = {}
 
   for i in [1 .. 5]
-    urls.push($("#url_" + i ).val())
+    if $("#url_" + i ).val() != ""
+      urls[i] = $("#url_" + i ).val()
 
   std_msg_ajax(
     url:'/escalations/api/v1/escalations/webcat/complaints/drop_current_categories'
     method: 'POST'
     data: { 'urls': urls }
     success: (response) ->
-      std_msg_success('Categories have been successfully dropped.', [], reload: false)
+      for key, value of response.json
+        if value && value.code == 200
+          $("#url_#{key}").css("border-width", "2px")
+          $("#url_#{key}").css("border-color", "green")
+          $("#cat-url-success-message-#{key}").text("Categories successfully dropped.")
+          $("#cat-url-success-#{key}").show()
+        else
+          $("#url_#{key}").css("border-width", "2px")
+          $("#url_#{key}").css("border-color", "#E47433")
+          $("#cat-url-error-message-#{key}").text("Unable to drop categories.")
+          $("#cat-url-#{key}").show()
+      $('#loader-modal').modal 'hide'
     error: (response) ->
       std_msg_error("<p>There has been an error dropping categories: #{json.error}","")
 )
 
 format = (complaint_entry_row) ->
+
+  $('#loader-modal').modal({
+    keyboard: false,
+  })
+
   complaint_entry = complaint_entry_row.data()
   row_id = complaint_entry_row[0][0]
   missing_data = '<span class="missing-data">No Data</span>'
@@ -591,6 +638,12 @@ format = (complaint_entry_row) ->
   else
     confidence = missing_data
 
+  customer_name = ''
+  if complaint_entry.customer_name
+    customer_name = complaint_entry.customer_name
+  else
+    customer_name = missing_data
+
   customer_description = ''
   if complaint_entry.description
     customer_description = complaint_entry.description
@@ -625,6 +678,7 @@ format = (complaint_entry_row) ->
   unchanged_radio = ""
   fixed_radio = ""
   invalid_radio = ""
+
   if complaint_entry.resolution
     switch (complaint_entry.resolution)
       when "UNCHANGED"
@@ -635,47 +689,47 @@ format = (complaint_entry_row) ->
         invalid_radio = "checked='checked'"
   else
     fixed_radio = "checked='checked'"
-  if complaint_entry.current_categories?
-    categories = complaint_entry.current_categories
-    category_table = ''
-    category_row = ''
-    tooltip_table = ''
-    tooltip_all = ''
-    tooltip_wrapper_start = '<div class="tooltip_templates"><span id="'
-    tooltip_table_start = '<table class="category-tooltip-table"><thead><tr><th>Confidence</th><th>Source</th><th>Certainty</th></tr></thead><tbody>'
-    tooltip_table_end = '</tbody></table>'
-    tooltip_table_guts = ''
-    tooltip_wrapper_end = '</span></div>'
-    $.each categories, (key, value) ->
-      category = this
-      active =  $(this).attr("is_active")
-      if active == 1
-        confidence = this.confidence
-        mnemonic = this.mnemonic
-        name = this.name
-        cat_id = this.category_id
-        top_certainty = this.certainty[0].source_certainty
-        certainties = this.certainty
-        $(certainties).each ->
-          source_confidence = this.source_confidence
-          source_certainty = this.source_certainty
-          source_category = this.source_category
-          source_name = this.source
-          certainty_row = '<tr><td>' + source_confidence + '</td><td>' + source_name + '</td><td>' + source_certainty + '</td></tr>'
-          tooltip_table_guts = tooltip_table_guts + certainty_row
 
-        tooltip_table = tooltip_table_start + tooltip_table_guts + tooltip_table_end
-        tooltip_all = tooltip_wrapper_start + 'certainty_table' + complaint_entry.entry_id + '_' +cat_id + '">' + tooltip_table + tooltip_wrapper_end
-        category_row = '<tr><td>' + confidence + '</td><td>' + mnemonic + ' - ' + name + '</td><td><span class="certainty-flag nested-tooltipped" onmouseover="triggerTooltips(this)" data-tooltip-content="#certainty_table' + complaint_entry.entry_id + '_' +cat_id + '">' + top_certainty + '</span>' + tooltip_all + '</td></tr>'
-        category_table = category_table + category_row
+  std_msg_ajax(
+    method: 'POST'
+    url: '/escalations/api/v1/escalations/webcat/complaint_entries/retrieve_current_categories'
+    data: {'id': complaint_entry.entry_id}
+    success: (response) ->
+      $('#loader-modal').modal 'hide'
 
-      return
+      current_categories = JSON.parse(response)
+
+      $.each current_categories, (key, value) ->
+        category = this
+        active =  $(this).attr("is_active")
+        if active == true
+          confidence = this.confidence
+          mnemonic = this.mnem
+          name = this.descr
+          cat_id = this.category_id
+          top_certainty = this.top_certainty
+          category_row = '<tr><td>' + confidence + '</td><td>' + mnemonic + ' - ' + name + '</td><td><span class="certainty-flag nested-tooltipped" onmouseover="triggerTooltips(this)" data-tooltip-content="#certainty_table' + complaint_entry.entry_id + '_' + cat_id + '">' + top_certainty + '</span>' + '</td></tr>'
+          $(".simple-nested-table" + "#" + complaint_entry.entry_id).append(category_row)
+
+
+      categories = current_categories
+      category_table = ''
+      category_row = ''
+      tooltip_table = ''
+      tooltip_all = ''
+      tooltip_wrapper_start = '<div class="tooltip_templates"><span id="'
+      tooltip_table_start = '<table class="category-tooltip-table"><thead><tr><th>Certainty</th><th>Category</th><th>Source</th></tr></thead><tbody>'
+      tooltip_table_end = '</tbody></table>'
+
+      tooltip_wrapper_end = '</span></div>'
+
+
+    error: (response) ->
+      $('#loader-modal').modal 'hide'
+      current_categories = ''
+  )
 
   if complaint_entry.entry_history?
-    if complaint_entry.entry_history.domain_history.length >= 1
-      domain_history = complaint_entry.entry_history.domain_history
-    else
-      domain_history = ''
     if complaint_entry.entry_history.complaint_history.length >= 1
       complaint_history = complaint_entry.entry_history.complaint_history
     else
@@ -704,8 +758,7 @@ format = (complaint_entry_row) ->
       '</div></div>' +
       '<div class="col-xs-5 col-with-divider">' +
       '<table class="simple-nested-table" id="' + complaint_entry.entry_id + '"><thead><tr><th>Conf</th><th>Current Categories</th><th>Certainty</th></tr></thead>' +
-      '<tbody>' + category_table +
-      '</tbody></table>' +
+      '</table>' +
       '</div>' +
       '<div class="col-xs-2">' +
       '<label class="content-label-sm">Resolution</label><br/>' +
@@ -749,17 +802,18 @@ format = (complaint_entry_row) ->
       '<label class="content-label-sm">Case ID</label>' +
       '<span class="nested-complaint-data case-id"><a href="complaints/' + complaint_entry.complaint_id + '">' + complaint_entry.complaint_id + '</a></span>' +
       '<label class="content-label-sm">Entry URI</label>' +
-      '<span class="nested-complaint-data" id="entry-uri-' + complaint_entry.entry_id + '">' + uri + '</span>' +
+      '<span class="nested-complaint-data input-truncate esc-tooltipped" id="entry-uri-' + complaint_entry.entry_id + '" title="' + url + '">' + uri + '</span>' +
       '<label class="content-label-sm" id="site-search">Site Search</label>' +
-      '<span class="nested-complaint-data" id="site-search-' + complaint_entry.entry_id + '">' + search_uri + '</span>' +
+      '<span class="nested-complaint-data input-truncate esc-tooltipped" id="site-search-' + complaint_entry.entry_id + '" title="' + url + '">' + search_uri + '</span>' +
+      '<label class="content-label-sm">Customer Name</label>' +
+      '<span class="nested-complaint-data">' + customer_name + '</span>' +
       '<label class="content-label-sm">Customer Description</label>' +
       '<span class="nested-complaint-data">' + customer_description + '</span>' +
       '</div></div><div class="col-xs-5 col-with-divider">' +
-      '<table class="simple-nested-table" id="\' + complaint_entry.entry_id + \'"><thead><tr><th>Conf</th><th>Current Categories</th><th>Certainty</th></tr></thead>' +
-      '<tbody>' + category_table +
-      '</tbody></table>' +
+      '<table class="simple-nested-table" id="' + complaint_entry.entry_id + '"><thead><tr><th>Conf</th><th>Current Categories</th><th>Certainty</th></tr></thead>' +
+      '</table>' +
       '</div><div class="col-xs-2">' +
-      '<button class="secondary" id="lookup-' + complaint_entry.entry_id + '"onclick="lookup_dialog(' + complaint_entry.entry_id  + ')">Lookup</button><br/>' +
+      '<button class="secondary" id="lookup-' + complaint_entry.entry_id + '" onclick="WebCat.RepLookup.queryWhoIs(\'' + url + '\')">Lookup</button><br/>' +
       '<button class="secondary" id="history-' + complaint_entry.entry_id + '" onclick="history_dialog(' + complaint_entry.entry_id  + ')">History</button><br/>' +
       '<button class="secondary" id="domain-' + complaint_entry.entry_id + '" onclick="domain_whois(\'' + whois_lookup + '\')">Domain</domain>' +
       '</div></div>' +
@@ -950,9 +1004,9 @@ window.click_table_buttons = (complaint_table, button)->
       persist: false,
       create: false,
       maxItems: 5,
-      valueField: 'value',
-      labelField: 'value',
-      searchField: ['text'],
+      valueField: 'category_id',
+      labelField: 'category_name',
+      searchField: ['category_name', 'category_code'],
       options: AC.WebCat.createSelectOptions()
       items: selected_options(row.data().category)
     }
@@ -1040,7 +1094,6 @@ window.display_preview_window = (entry) ->
 
 window.fetch_wbnp_data = () ->
   $('#loader-modal').modal({
-    backdrop: 'static',
     keyboard: false
   })
   std_msg_ajax(
@@ -1048,11 +1101,10 @@ window.fetch_wbnp_data = () ->
     url: '/escalations/api/v1/escalations/webcat/complaints/fetch_wbnp_data'
     data: {}
     success: (response) ->
-      $('#loader-modal').hide()
+      $('#loader-modal').modal 'hide'
       std_msg_success('WBNP Complaints successfully retrieved from RuleUI.', [], reload: true)
     error: (response) ->
-      $('#loader-modal').hide()
-      $('.modal-backdrop').remove()
+      $('#loader-modal').modal 'hide'
       std_api_error(response, 'Error fetching wbnp data complaints.', reload: false)
   )
 
@@ -1102,37 +1154,45 @@ window.open_nonviewable = () ->
   open_selected(selected_rows, false)
 window.open_selected = () ->
   selected_rows = $('#complaints-index').DataTable().rows('.selected')
-  open_selected(selected_rows, true)
+  if selected_rows[0].length == 0
+    std_msg_error('No rows selected', ['Please select at least one row.'])
+  else
+    open_selected(selected_rows, true)
 window.open_all = () ->
   selected_rows = $('#complaints-index').DataTable().rows()
   open_selected(selected_rows, true)
 
-
-toggle_selected = (table, selected_rows)->
-  i = 0
-  while i < selected_rows[0].length
-    button = $( ".expand-row-button-inline" )[selected_rows[0][i]]
-    click_table_buttons(table, button)
-    i++
+toggle_selected = (selectedRows, expand)->
+  selectState = $('.selected')
+  for i in [0..selectedRows.length]
+    if expand
+      if !$(selectedRows[i]).hasClass('shown')
+        $(selectedRows[i]).find('.expand-row-button-inline').click()
+    else
+      if $(selectedRows[i]).hasClass('shown')
+        $(selectedRows[i]).find('.expand-row-button-inline').click()
+        $(selectedRows[i]).addClass('selected')
+  $(selectState).addClass('selected')
 
 window.collapse_selected =()->
-  table = $('#complaints-index').DataTable()
-  selected_rows = table.rows('.shown.selected')
-  toggle_selected(table,selected_rows)
+  selectedRows = $('.selected')
+  expand = false;
+  toggle_selected(selectedRows, expand)
+
 window.collapse_all =()->
-  table = $('#complaints-index').DataTable()
-  selected_rows = table.rows('.shown')
-  toggle_selected(table,selected_rows)
+  selectedRows = $('table#' + 'complaints-index' + ' tr[role="row"]')
+  expand = false;
+  toggle_selected(selectedRows, expand)
 
 window.expand_selected =()->
-  table = $('#complaints-index').DataTable()
-  selected_rows = table.rows('.selected.not-shown')
-  toggle_selected(table,selected_rows)
-window.expand_all =()->
-  table = $('#complaints-index').DataTable()
-  selected_rows = table.rows('.not-shown')
-  toggle_selected(table,selected_rows)
+  selectedRows = $('.selected')
+  expand = true;
+  toggle_selected(selectedRows, expand)
 
+window.expand_all =()->
+  selectedRows = $('table#' + 'complaints-index' + ' tr[role="row"]')
+  expand = true;
+  toggle_selected(selectedRows, expand)
 
 window.mark_for_commit = () ->
   entry_ids = $('#complaint-entries-div .complaint-entry-checkbox:checkbox:checked').map(() ->
@@ -1169,6 +1229,7 @@ window.commit_marked = () ->
 
 
 window.advanced_webcat_index_table = () ->
+  complaint_save_search_format = /[!@#$%^&*()_+\-=\[\]{};':"\\|,.<>\/?]/
   data = {
     customer: {
       name: $('#cat_named_search').find('input[id="name-input"]').val()
@@ -1192,10 +1253,16 @@ window.advanced_webcat_index_table = () ->
     modified_older: $('#cat_named_search').find('input[id="modified-older-input"]').val()
     modified_newer: $('#cat_named_search').find('input[id="modified-newer-input"]').val()
   }
-  window.populate_advanced_webcat_index_table(data)
+  if complaint_save_search_format.test(data.search_name) == true
+    std_msg_error('save search name error', ['Please enter a name without any special character', 'Example: !@#$%^&*()'])
+  else
+    window.populate_advanced_webcat_index_table(data)
 
 
 window.populate_advanced_webcat_index_table = (data = {}) ->
+  $('#loader-modal').modal({
+    keyboard: false
+  })
   headers = {'Token': $('input[name="token"]').val(), 'Xmlrpc-Token': $('input[name="xml_token"]').val()}
   $.ajax(
     url: '/escalations/api/v1/escalations/webcat/complaint_entries'
@@ -1207,15 +1274,23 @@ window.populate_advanced_webcat_index_table = (data = {}) ->
       json = $.parseJSON(response)
       if json.error
         notice_html = "<p>Something went wrong: #{json.error}</p>"
+        $('#loader-modal').modal 'hide'
         alert(json.error)
       else
+        if json.search_name.length > 0
+          searchId = 'saved_search_' + json.search_id
+          if $('#saved-search-tbody tr#' + searchId).length == 0
+            $('#saved-search-tbody').append(complaint_named_search_tag(json.search_name, json.search_id))
+
         $('.tickets-totals-table').trigger("click") #close open dropdowns
         datatable = $('#complaints-index').DataTable()
         datatable.clear();
         datatable.rows.add(json.data);
         datatable.draw();
+        $('#loader-modal').modal 'hide'
 
       error: (response) ->
+        $('#loader-modal').modal 'hide'
         std_api_error(response, "There was an error loading search results.", reload: false)
   , this)
 
@@ -1277,10 +1352,3 @@ $ ->
     if $('#cat-urls-same').prop('checked')
       $('#categorize-diff-form').hide()
       $('#categorize-same-form').show()
-
-
-
-
-
-
-

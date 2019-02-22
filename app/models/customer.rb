@@ -2,7 +2,7 @@ class Customer < ApplicationRecord
   belongs_to :company
   has_many :complaints
   has_many :disputes
-  has_many :amp_false_positives
+  has_many :file_reputation_tickets
 
   validates :email, presence: true, uniqueness: true
 
@@ -34,17 +34,22 @@ class Customer < ApplicationRecord
   end
 
   def self.process_and_get_customer(payload)
-    customer_email = payload["payload"]["email"]
-    customer_company = payload["payload"]["user_company"]
-    customer_name = payload["payload"]["name"]
+    if payload["payload"] && payload["payload"]["email"] && payload["payload"]["user_company"] && payload["payload"]["name"]
+      customer_email = payload["payload"]["email"]
 
-    customer_exists = Customer.thread_safe_find_or_create_by(email: customer_email)
-    if customer_exists.new_record?
-      company_exists = Company.thread_safe_find_or_create_by(name: customer_company)
+      customer_company = payload["payload"]["user_company"]
+      customer_name = payload["payload"]["name"]
 
-      customer_exists.company_id = company_exists.id
-      customer_exists.name = customer_name
-      customer_exists.save!
+      customer_exists = Customer.thread_safe_find_or_create_by(email: customer_email)
+      if customer_exists.new_record?
+        company_exists = Company.thread_safe_find_or_create_by(name: customer_company)
+
+        customer_exists.company_id = company_exists.id
+        customer_exists.name = customer_name
+        customer_exists.save!
+      end
+    else
+      customer_exists = Customer.thread_safe_find_or_create_by(email: "guest@cisco.com", name: "Guest", company:Company.find_by_name("Guest"))
     end
 
     customer_exists

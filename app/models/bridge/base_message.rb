@@ -1,7 +1,7 @@
 class Bridge::BaseMessage < PeakeBridge::BasicPeakeBridge
   def initialize(channel:, addressee:)
     super(channel: channel,
-          sender: 'analyst-console',
+          sender: 'analyst-console-escalations',
           addressee: addressee,
           host: Rails.configuration.peakebridge.host,
           port: Rails.configuration.peakebridge.port,

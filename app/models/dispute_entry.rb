@@ -1,3 +1,5 @@
+require 'socket'
+
 class DisputeEntry < ApplicationRecord
   attr_writer :wbrs_xlist
 
@@ -44,6 +46,37 @@ class DisputeEntry < ApplicationRecord
     where(case_resolved_at: (date_from..date_to))
   }
 
+  def self.create_dispute_entry(dispute, ip_url, status = NEW)
+    begin
+      new_dispute_entry = DisputeEntry.new
+      new_dispute_entry.dispute_id = dispute.id
+      new_dispute_entry.status = status
+
+      if is_ip?(ip_url)
+        new_dispute_entry.ip_address = ip_url
+        new_dispute_entry.entry_type = "IP"
+      else
+        url_parts = Complaint.parse_url(ip_url)
+        new_dispute_entry.uri = ip_url
+        new_dispute_entry.entry_type = "URI/DOMAIN"
+        new_dispute_entry.subdomain = url_parts[:subdomain]
+        new_dispute_entry.domain = url_parts[:domain]
+        new_dispute_entry.path = url_parts[:path]
+      end
+
+      new_dispute_entry.save!
+
+    rescue Exception => e
+      raise Exception.new("{DisputeEntry creation error: {content: #{ip_url},error:#{e}}}")
+    end
+
+    # Add preload for Dispute Entry here
+  end
+
+  def self.is_ip?(ip)
+    !!IPAddr.new(ip) rescue false
+  end
+
   def self.new_from_wlbl(wlbl)
     new(uri: wlbl.url).tap do |entry|
       entry.wbrs_xlist = [ wlbl ]
@@ -77,6 +110,37 @@ class DisputeEntry < ApplicationRecord
     else
       self.uri.blank? ? self.ip_address : self.uri
     end
+  end
+
+  def parse_url(url = self.hostlookup)
+    uri = URI.parse(URI.parse(url).scheme.nil? ? "http://#{url}" : url)
+    domain = PublicSuffix.parse(uri.host)
+    subdomain = uri.host.gsub(Regexp.new("\\.?#{domain.domain}$"), '')
+
+    {
+        subdomain: subdomain,
+        domain: domain.domain,
+        path: uri.path
+    }
+  end
+
+  def self.domain_of(url)
+    uri = URI.parse(URI.parse(url).scheme.nil? ? "http://#{url}" : url)
+    domain = PublicSuffix.parse(uri.host)
+    domain.domain
+  end
+
+  def assign_url_parts(url = self.hostlookup)
+    uri = URI.parse(URI.parse(url).scheme.nil? ? "http://#{url}" : url)
+    domain = PublicSuffix.parse(uri.host)
+
+    self.subdomain                      = uri.host.gsub(Regexp.new("\\.?#{domain.domain}$"), '')
+    self.domain                         = domain.domain
+    self.path                           = uri.path
+    self.hostname                       = uri.host
+    self.top_level_domain               = domain.tld
+
+    self
   end
 
   def ti_status
@@ -233,14 +297,18 @@ class DisputeEntry < ApplicationRecord
     # TODO: This is a little ugly, being as the same logic exists inside `base.rb` of the Preload model.
     # If time ever permits, refactor it.
     @umbrella = AutoResolve.new.call_umbrella(address: hostlookup)
+
     pretty_umbrella_status = "Unclassified" # Default or "0"
-    case
-      # Per docs here: https://dashboard.umbrella.com/o/1755319/#overview
-    when @umbrella[:status] == "-1"
-      pretty_umbrella_status = "Malicious"
-    when @umbrella[:status] == "1"
-      pretty_umbrella_status = "Benign"
+    if @umbrella.present?
+      case
+        # Per docs here: https://dashboard.umbrella.com/o/1755319/#overview
+      when @umbrella[hostlookup]["status"] == -1
+        pretty_umbrella_status = "Malicious"
+      when @umbrella[hostlookup]["status"] == 1
+        pretty_umbrella_status = "Benign"
+      end
     end
+
     pretty_umbrella_status
   end
 
@@ -254,13 +322,7 @@ class DisputeEntry < ApplicationRecord
       if auto_resolve_verdict.malicious?
         self.resolution_comment = "Talos has lowered our reputation score for the URL/Domain/Host to block access."
         self.resolution = STATUS_RESOLVED_FIXED_FN
-        self.status = RESOLVED
-        self.case_closed_at = resolved_at
-        self.case_resolved_at = resolved_at
-      else
-        self.resolution_comment = Dispute::AUTORESOLVED_UNCHANGED_MESSAGE
-        self.resolution = STATUS_RESOLVED_UNCHANGED
-        self.status = RESOLVED
+        self.status = STATUS_RESOLVED
         self.case_closed_at = resolved_at
         self.case_resolved_at = resolved_at
       end
@@ -355,8 +417,14 @@ class DisputeEntry < ApplicationRecord
     ::Preloader::Base.fetch_all_api_data(self.hostlookup, self.id)
 
     wbrs_stuff = Sbrs::ManualSbrs.get_wbrs_data({:url => self.hostlookup})
-
     wbrs_stuff_rulehits = Sbrs::ManualSbrs.get_rule_names_from_rulehits(wbrs_stuff)
+
+    ip_addr = IPSocket.getaddress(hostlookup) rescue nil
+    if ip_addr
+      wbrs_stuff_ip = Sbrs::ManualSbrs.get_wbrs_data(url: ip_addr)
+      wbrs_stuff_rulehits = wbrs_stuff_rulehits + Sbrs::ManualSbrs.get_rule_names_from_rulehits(wbrs_stuff_ip)
+      wbrs_stuff_rulehits = wbrs_stuff_rulehits.uniq
+    end
 
 
     self.wbrs_score = wbrs_stuff["wbrs"]["score"]
@@ -453,9 +521,9 @@ class DisputeEntry < ApplicationRecord
   # If the research page is served from the DisputesController, this method is here.
   # If the controller action is moved to another controller, move this method to another class.
   def self.research_results(research_params)
-    if research_params.present?
+    if research_params.present? && research_params['uri'].strip != ''
       url = research_params['uri'].gsub(/\r\n?/, "\n").strip # Remove all white spaces and newlines
-      domain_of_url = Dispute.parse_url(url)[:domain]
+      domain_of_url = DisputeEntry.domain_of(url)
       entries = entries_of_url(url)
 
       # BEGIN LOGIC TO CONSOLIDATE WLBL INFO TO UNIQUE URIS
@@ -478,7 +546,7 @@ class DisputeEntry < ApplicationRecord
       final_entries = []
       rejected_entries = []
       unique_entries.each do |r_entry|
-        entry_domain = Dispute.parse_url(r_entry.hostlookup)[:domain]
+        entry_domain = DisputeEntry.domain_of(r_entry.hostlookup)
         if entry_domain.include?(domain_of_url)
           final_entries << r_entry
         else
@@ -492,7 +560,7 @@ class DisputeEntry < ApplicationRecord
 
       if research_params['scope'] == "strict"
         unless entries.find{|entry| url == entry.uri}
-          return entries << DisputeEntry.new(uri: url)
+          entries << DisputeEntry.new(uri: url)
         end
       end
 
@@ -501,6 +569,13 @@ class DisputeEntry < ApplicationRecord
           is_ip_address = !!(entry.uri  =~ Resolv::IPv4::Regex)
           wbrs_stuff = Sbrs::ManualSbrs.get_wbrs_data({:url => entry.uri})
           wbrs_stuff_rulehits = Sbrs::ManualSbrs.get_rule_names_from_rulehits(wbrs_stuff)
+
+          ip_addr = IPSocket.getaddress(entry.uri) rescue nil
+          if ip_addr
+            wbrs_stuff_ip = Sbrs::ManualSbrs.get_wbrs_data(url: ip_addr)
+            wbrs_stuff_rulehits = wbrs_stuff_rulehits + Sbrs::ManualSbrs.get_rule_names_from_rulehits(wbrs_stuff_ip)
+            wbrs_stuff_rulehits = wbrs_stuff_rulehits.uniq
+          end
 
           entry.wbrs_score = wbrs_stuff["wbrs"]["score"]
           wbrs_stuff_rulehits.each do |rule_hit|
@@ -533,6 +608,14 @@ class DisputeEntry < ApplicationRecord
       entries
     else
       []
+    end
+  end
+
+  def self.check_for_duplicates(entry)
+    if DisputeEntry.where(uri: entry).present? || DisputeEntry.where(ip_address: entry).present?
+      return true
+    else
+      return false
     end
   end
 end

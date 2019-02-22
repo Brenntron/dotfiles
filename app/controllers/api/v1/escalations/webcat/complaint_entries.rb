@@ -46,19 +46,13 @@ module API
 
               search_type = ComplaintEntry.get_search_type(permitted_params)
               search_name = permitted_params[:search_name] ? permitted_params[:search_name] : nil
-
-
-              complaint_entries = ComplaintEntry.robust_search(search_type,
+              #complaint_entries = ComplaintEntry.first(5)ComplaintEntry.robust_search(search_type,
+              complaint_entries = ComplaintEntry.includes(:complaint_entry_screenshot, :user, {:complaint => [:complaint_tags, {:customer => :company}]}).robust_search(search_type,
                                                                search_name: search_name,
                                                                params: permitted_params,
                                                                user: current_user)
 
               if complaint_entries
-
-                #grab rulelib data for all urls
-                all_urls = complaint_entries.pluck(:uri)
-
-                certainty_on_urls = Wbrs::Prefix.get_certainty_sources_for_urls(all_urls)
 
                 complaint_entries.each do |complaint_entry|
                   complaint_entry_packet = {}
@@ -110,41 +104,6 @@ module API
 
                   complaint_entry_packet[:description] = complaint_entry&.complaint&.description
 
-                  if complaint_entry.complaint_entry_preload.present?
-                    if complaint_entry.complaint_entry_preload.current_category_information.present? &&
-                       complaint_entry.complaint_entry_preload.current_category_information != 'DATA ERROR'
-                      complaint_entry_packet[:current_categories] = {}
-                      parsed_current_cat_information = JSON.parse(complaint_entry.complaint_entry_preload.current_category_information)
-
-
-                      parsed_current_cat_information.each_pair do |key,value|
-
-                        complaint_entry_packet[:current_categories][key] = {}
-                        complaint_entry_packet[:current_categories][key][:certainty] = {}
-
-                        complaint_entry_packet[:current_categories][key] = {:is_active => value['is_active'],
-                                                                              :mnemonic => value['mnemonic'],
-                                                                              :category_id => value['category_id'],
-                                                                              :prefix_id => value['prefix_id'],
-                                                                              :confidence => value['confidence'] || 'N/A',
-                                                                              :name => value['name'] || 'N/A',
-                                                                              :long_description => value['long_description']}
-                        #TODO: replace this with working code when the API is finished and we can actually get certainty.
-
-                        complaint_entry_packet[:current_categories][key][:certainty] = [
-                            {:source => "Missing Source data", :source_category => "Missing Category", :source_certainty => "N/A", :source_confidence => 'N.A'}
-                        ]
-                      end
-
-
-                      # complaint_entry_packet[:current_categories] = complaint_entry.complaint_entry_preload.current_category_information
-                    else
-                      complaint_entry_packet[:current_categories] = {}
-                    end
-                  else
-                    complaint_entry_packet[:current_categories] = {}
-                  end
-
                   #fake it til they make it
                   # fake_ass_bullshit = {}
                   # fake_ass_bullshit[77] = {:is_active => 1, :mnemonic => "alc", :category_id => 77, :prefix_id => 12, :confidence => 1, :name => "Alcohol", :long_description => "Good ole fun juice"}
@@ -158,20 +117,20 @@ module API
                   #which has available to it: mnem, descr, category_id, desc_long
 
                   complaint_entry_packet[:entry_history] = {}
-                  if complaint_entry&.complaint_entry_preload&.historic_category_information.present? &&
-                     complaint_entry&.complaint_entry_preload&.historic_category_information != 'DATA ERROR'
-                    complaint_entry_packet[:entry_history][:domain_history] = complaint_entry.complaint_entry_preload.historic_category_information
-                  else
-                    complaint_entry_packet[:entry_history][:domain_history] = complaint_entry.history_category_data_with_preload_save
-                  end
 
-                  complaint_entry_packet[:entry_history][:complaint_history] = complaint_entry.compose_versions
+                  complaint_entry_packet[:entry_history][:domain_history]
+                  complaint_entry_packet[:entry_history][:complaint_history] = {}#complaint_entry.compose_versions
 
                   json_packet << complaint_entry_packet
                 end
               end
-              {:status => "success", :data => json_packet}.to_json
 
+              if permitted_params['search_name'].present?
+                search_name = permitted_params['search_name']
+                named_search = NamedSearch.where(user: current_user, name: search_name).first
+              end
+
+                {:status => "success", :search_name => search_name, :search_id => named_search&.id, :data => json_packet}.to_json
             end
 
 
@@ -201,7 +160,7 @@ module API
               rescue Exception => e
                   return {error:e.message}.to_json
               end
-              {status:entry.status, entry_resolution:permitted_params['status']}.to_json
+              {display_name: current_user.display_name, status:entry.status, entry_resolution:permitted_params['status']}.to_json
             end
 
 
@@ -258,7 +217,7 @@ module API
             post 'return_entry' do
               begin
                 permitted_params['complaint_entry_ids'].each do |id|
-                  ComplaintEntry.find(id).return_complaint(current_user)
+                  ComplaintEntry.find(id).return_complaint
                 end
               rescue Exception => e
                 Rails.logger.error "Failed to take entry: error=> #{e.message}"
@@ -419,6 +378,16 @@ module API
               end
             end
 
+            desc 'Retrieve historic_category_information from expanding a complaint entry row'
+            params do
+              requires :id, type: Integer
+            end
+            post 'retrieve_current_categories' do
+              std_api_v2 do
+                complaint_entry = ComplaintEntry.find(params[:id])
+                complaint_entry.current_category_data.to_json
+              end
+            end
           end
         end
       end

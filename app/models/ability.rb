@@ -9,7 +9,7 @@ class Ability
     role_names = roles.pluck(:role)
 
 
-    can [:read, :update_preferences], User, id: current_user.id
+    can [:read, :update_preferences, :manage_bugzilla_api], User, id: current_user.id
 
     # roles are partitioned into org subsets (snort rules, snort escalations, web cat, web rep)
     # the current user can read the user records of other users in their subset.
@@ -18,8 +18,6 @@ class Ability
         other_user.roles.where(org_subset_id: current_user_role.org_subset_id).exists?
       end
     end
-
-
 
     # admin role includes developers who maintain the site
     if role_names.include?('admin')
