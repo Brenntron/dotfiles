@@ -248,6 +248,14 @@ $ ->
       return false
 
 
+  ## WL/BL Form manipulation
+  $('.wl-bl-list-inline').click ->
+    wlbl_entries = $('#wlbl_adjust_entries').find('.wlbl-dropdown-row')
+    wlbl_submit = $('#wlbl_adjust_entries').find('.dropdown-submit-button')
+    if wlbl_entries.length > 0 && $('.wl-bl-list-inline:checked').length > 0
+      wlbl_submit.attr('disabled', false)
+    else
+      wlbl_submit.attr('disabled', true)
 
   ## Populating the research tab toolbar Adjust WL/BL Button
   window.bulk_get_current_wlbl = () ->
@@ -305,7 +313,7 @@ $ ->
             else
               list_types = ''
 
-            $(tbody).append('<tr>' + '<td class="wlbl-entry-contententry_content">' + ip_uri + '</td><td class="wlbl-entry-wlbl">' + list_types + '</td>' + '<td class="wlbl-current-entry-wbrs text-center">' + wbrs_score + '</td>')
+            $(tbody).append('<tr class="wlbl-dropdown-row">' + '<td class="wlbl-entry-content">' + ip_uri + '</td><td class="wlbl-entry-wlbl">' + list_types + '</td>' + '<td class="wlbl-current-entry-wbrs text-center">' + wbrs_score + '</td>')
 
 #          if response.data != ""
 #            console.log response
