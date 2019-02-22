@@ -667,12 +667,12 @@ window.submit_bulk_reptool_research_tab = () ->
 
         temp_data = {
           'action': 'ACTIVE'
-          'entries': entries
-          'classifications': new_classifications
+          'entries': [this.entry]
+          'classifications': [new_classifications]
           'comment': comment
         }
         array_of_datas.push(temp_data)
-
+        data = array_of_datas
     else
       $(current_entries_and_classes).each ->
         current = this.classifications.split(',')
@@ -682,49 +682,189 @@ window.submit_bulk_reptool_research_tab = () ->
         new_classifications = subtracted.join()
         temp_data = {
           'action': 'ACTIVE'
-          'entries': entries
-          'classifications': new_classifications
+          'entries': [this.entry]
+          'classifications': [new_classifications]
           'comment': comment
         }
         array_of_datas.push(temp_data)
-
+        data = array_of_datas
 
     # Consolidate data for calls here
     # cycle through all data arrays in the array
     # merge any that have matching classifications
-    console.log array_of_datas
-    $(array_of_datas).each ->
-      classes = array_of_datas.classifications
-      console.log classes
+#    console.log array_of_datas
+#    $(array_of_datas).each ->
+#      classes = array_of_datas.classifications
+#      console.log classes
 
+    # send separate api calls for each
+  if submission_action == "reptool-override"
+    std_msg_ajax(
+      url: '/escalations/api/v1/escalations/webrep/disputes/reptool_bl'
+      method: 'POST'
+      data: data
+      success: (response) ->
+        window.location.reload()
+      error: (response) ->
+        if response.responseJSON == undefined
+          response_lines = response.responseText.split("\n")
+          if 2 < response_lines.length
+            errormsg = [response_lines[0], response_lines[1]]
+          else
+            errormsg = [response.responseText]
+        else if response.responseJSON.error != undefined
+          errormsg = [response.responseJSON.error]
+        else
+          errormsg = [response.responseText]
+        std_msg_error('Error', ['Error adjusting WL/BL'].concat(errormsg) )
+    )
+  else if submission_action == "reptool-maintain"
+    std_msg_ajax(
+      url: '/escalations/api/v1/escalations/webrep/disputes/maintain_reptool_bl'
+      method: 'POST'
+      data: {data: data}
+      success: (response) ->
+        window.location.reload()
+      error: (response) ->
+        if response.responseJSON == undefined
+          response_lines = response.responseText.split("\n")
+          if 2 < response_lines.length
+            errormsg = [response_lines[0], response_lines[1]]
+          else
+            errormsg = [response.responseText]
+        else if response.responseJSON.error != undefined
+          errormsg = [response.responseJSON.error]
+        else
+          errormsg = [response.responseText]
+        std_msg_error('Error', ['Error adjusting WL/BL'].concat(errormsg) )
+    )
+window.submit_bulk_reptool_index = () ->
+  bulk_reptool_menu = $('#reptool_adjust_entries')
+  submission_action = $("input[name='reptool-action-radio']:checked").val()
+
+  checked_classes = []
+  #  Get all checked classifications
+  if $(bulk_reptool_menu).find('.reptool-class-cb:checked').length > 0
+    $(bulk_reptool_menu).find('.reptool-class-cb:checked').each ->
+      checked_classes.push($(this).val())
+  # Convert to string for data submission
+  reptool_classes = checked_classes.join()
+
+  classification_action = $("input[name='reptool-classes-radio']:checked").val()
+  comment = bulk_reptool_menu.find('.dropdown-comment').val()
+
+  #  Get the entries
+  entry_rows = $(bulk_reptool_menu).find('.reptool-entry-row')
+  entries = []
+
+  current_entries_and_classes = []
+  $(entry_rows).each ->
+    entry = $(this).find('.reptool-entry-name')[0]
+    entries.push($(entry).text())
+    current_classes = $($(this).find('.reptool-entry-class')[0]).attr('data-classification')
+    current_entries_and_classes.push {
+      'entry': $(entry).text()
+      'classifications': current_classes
+    }
+
+  # If user wants to override existing classes we only need what they've checked
+  if submission_action == "reptool-override"
     data = {
       'action': 'ACTIVE'
       'entries': entries
-      'classifications': new_classifications
+      'classifications': reptool_classes
       'comment': comment
     }
+  else if submission_action == "reptool-drop"
+    data = {
+      'action': 'EXPIRED'
+      'entries': entries
+      'comment': comment
+    }
+  else if submission_action == "reptool-maintain"
+# currently set up for 1 entry to work fine, or if all entries have identical current classes
+    new_classifications = ''
+    array_of_datas = []
+    if classification_action == 'add'
+      $(current_entries_and_classes).each ->
+        new_classifications = this.classifications
+        new_classifications = new_classifications + ',' + reptool_classes
 
-    # send separate api calls for each
+        temp_data = {
+          'action': 'ACTIVE'
+          'entries': [this.entry]
+          'classifications': [new_classifications]
+          'comment': comment
+        }
+        array_of_datas.push(temp_data)
+        data = array_of_datas
+    else
+      $(current_entries_and_classes).each ->
+        current = this.classifications.split(',')
+        subtracted = current.filter((x) ->
+          checked_classes.indexOf(x) < 0
+        )
+        new_classifications = subtracted.join()
+        temp_data = {
+          'action': 'ACTIVE'
+          'entries': [this.entry]
+          'classifications': [new_classifications]
+          'comment': comment
+        }
+        array_of_datas.push(temp_data)
+        data = array_of_datas
 
-  std_msg_ajax(
-    url: '/escalations/api/v1/escalations/webrep/disputes/reptool_bl'
-    method: 'POST'
-    data: data
-    success: (response) ->
-      bulk_get_current_reptool()
-    error: (response) ->
-      if response.responseJSON == undefined
-        response_lines = response.responseText.split("\n")
-        if 2 < response_lines.length
-          errormsg = [response_lines[0], response_lines[1]]
+  # Consolidate data for calls here
+  # cycle through all data arrays in the array
+  # merge any that have matching classifications
+  #    console.log array_of_datas
+  #    $(array_of_datas).each ->
+  #      classes = array_of_datas.classifications
+  #      console.log classes
+
+  # send separate api calls for each
+
+  if submission_action == "reptool-override"
+    std_msg_ajax(
+      url: '/escalations/api/v1/escalations/webrep/disputes/reptool_bl'
+      method: 'POST'
+      data: data
+      success: (response) ->
+        window.location.reload()
+      error: (response) ->
+        if response.responseJSON == undefined
+          response_lines = response.responseText.split("\n")
+          if 2 < response_lines.length
+            errormsg = [response_lines[0], response_lines[1]]
+          else
+            errormsg = [response.responseText]
+        else if response.responseJSON.error != undefined
+          errormsg = [response.responseJSON.error]
         else
           errormsg = [response.responseText]
-      else if response.responseJSON.error != undefined
-        errormsg = [response.responseJSON.error]
-      else
-        errormsg = [response.responseText]
-      std_msg_error('Error', ['Error adjusting WL/BL'].concat(errormsg) )
-  )
+        std_msg_error('Error', ['Error adjusting WL/BL'].concat(errormsg) )
+    )
+  else if submission_action == "reptool-maintain"
+    std_msg_ajax(
+      url: '/escalations/api/v1/escalations/webrep/disputes/maintain_reptool_bl'
+      method: 'POST'
+      data: {data: data}
+      success: (response) ->
+        window.location.reload()
+      error: (response) ->
+        if response.responseJSON == undefined
+          response_lines = response.responseText.split("\n")
+          if 2 < response_lines.length
+            errormsg = [response_lines[0], response_lines[1]]
+          else
+            errormsg = [response.responseText]
+        else if response.responseJSON.error != undefined
+          errormsg = [response.responseJSON.error]
+        else
+          errormsg = [response.responseText]
+        std_msg_error('Error', ['Error adjusting WL/BL'].concat(errormsg) )
+    )
+
 
 window.toolbar_adjust_reptool_bl_button_research =(button_tag) ->
   checked_url = $('.dispute_check_box:checked')[0]
