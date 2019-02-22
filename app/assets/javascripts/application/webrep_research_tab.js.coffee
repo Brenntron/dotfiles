@@ -258,8 +258,17 @@ $ ->
 
 
   ## Populating the research tab toolbar Adjust WL/BL Button
-  window.bulk_get_current_wlbl = () ->
-    ## Clear out any residual data
+  window.bulk_get_current_wlbl = (checkbox) ->
+    debugger
+
+    entries_checked = []
+    $(checkbox).each ->
+      if this.checked = true
+        entries_checked.push(this)
+
+    console.log entries_checked
+
+## Clear out any residual data
     # Empty table
     tbody = $('#wlbl_adjust_entries').find('table.dispute_tool_current').find('tbody')
     $(tbody).empty()
@@ -284,10 +293,11 @@ $ ->
 
     ## Get data to populate table
     # Get all the checked entry urls
-    if ($('.dispute_check_box:checked').length > 0)
+    if (entries_checked.length > 0)
       data = {'entries': []}
 
-      $('.dispute_check_box:checked').each ->
+      $(entries_checked).each ->
+        #Need to pull out the row structure for this to work with index
         entry_row = $(this).parents('.research-table-row')[0]
         entry_content = $(entry_row).find('.entry-data-content').text()
         data['entries'].push(entry_content)
@@ -326,15 +336,17 @@ $ ->
     ip_uris = []
     list_types = []
     list_types = $('.wl-bl-list-inline:checkbox:checked').map(() -> this.value).toArray()
+    wlbl_comment = ''
 
     if $('.dispute_check_box:checked').length > 0
       $('.dispute_check_box:checked').each ->
         entry_row = $(this).parents('.research-table-row')[0]
         ip_uri = $(entry_row).find('.entry-data-content').text()
         ip_uris.push(ip_uri)
+        wlbl_comment = $('#wlbl_adjust_entries').find('.adjust-wlbl-input').val()
 
-    data = {ip_uris: ip_uris, list_types: list_types, note: wlbl_form.getElementsByClassName('adjust-wlbl-input')[0].value}
-
+    data = {ip_uris: ip_uris, list_types: list_types, note: wlbl_comment}
+    console.log data
     if $('#wlbl-remove').prop('checked') == true
       std_msg_ajax(
         url: '/escalations/api/v1/escalations/webrep/disputes/bulk_rule_ui_wlbl_remove'
