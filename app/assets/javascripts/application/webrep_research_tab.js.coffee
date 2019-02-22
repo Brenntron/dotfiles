@@ -317,6 +317,7 @@ $ ->
         )
 
   window.research_bulk_adjust_wlbl =(button_tag) ->
+    wlbl_form = button_tag.form
 
     data = {}
     ip_uris = []
@@ -331,7 +332,7 @@ $ ->
 
         ip_uris.push(ip_uri)
 
-    data = {ip_uris: ip_uris, list_types: list_types}
+    data = {ip_uris: ip_uris, list_types: list_types, note: wlbl_form.getElementsByClassName('adjust-wlbl-input')[0].value}
 
     if $('#wlbl-remove').prop('checked') == true
       std_msg_ajax(
