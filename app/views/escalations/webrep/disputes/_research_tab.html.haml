@@ -55,17 +55,9 @@
                         %th.content-label-sm.no-word-break Current WL/BL List
                         %th.text-center.content-label-sm.no-word-break Current WBRS Score
                     %tbody
-                      -#%tr
-                      -#  %td.wlbl-entry-content
-                      -#  %td.wlbl-entry-wlbl
-                      -#  %td.wlbl-current-entry-wbrs.text-center
 
                       -# TODO Hook up ability to preview scores based on changes in WL/BL
-                      -#    We can't do a preview until the api is updated to provide that info
-                      -#%td.text-center
-                      -#  %label.content-label-sm New Score
-                      -#  %br
-                      -#  %span.new_wbrs_score
+
                   .dropdown-tool-text-divider.secondary-text-divider
                     Adjust WBRS Reputation
 
@@ -146,7 +138,7 @@
                       %label.content-label-sm WL/BL Comment
                       %textarea.dropdown-comment.adjust-wlbl-input.note-input
                     .button-row-center
-                      %button.primary.dropdown-submit-button{type: 'button', onclick:'research_bulk_adjust_wlbl(this);'}
+                      %button.primary.dropdown-submit-button{type: 'button', onclick:'bulk_adjust_wlbl();', disabled: true}
                         Submit Reputation Changes
 
           %span.dropdown
