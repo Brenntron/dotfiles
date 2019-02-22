@@ -618,7 +618,7 @@ module API
                   else
                     expiration = ""
                     begin
-                      expiration = Time.parse(value["expiration"]).to_s
+                      expiration = Date.parse(value["expiration"]).to_s
                     rescue
                       expiration = value["expiration"]
                     end

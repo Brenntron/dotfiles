@@ -611,9 +611,6 @@ $ ->
       else
         $(reptool_submit[0]).attr('disabled', true)
 
-
-
-
 ## Submit bulk changes to reptool on research tab (specifically on the toolbar)
 window.submit_bulk_reptool_research_tab = () ->
   bulk_reptool_menu = $('#reptool_adjust_entries')
@@ -700,42 +697,34 @@ window.submit_bulk_reptool_research_tab = () ->
       classes = array_of_datas.classifications
       console.log classes
 
-
-
-
-#    data = {
-#      'action': 'ACTIVE'
-#      'entries': entries
-#      'classifications': new_classifications
-#      'comment': comment
-#    }
+    data = {
+      'action': 'ACTIVE'
+      'entries': entries
+      'classifications': new_classifications
+      'comment': comment
+    }
 
     # send separate api calls for each
 
-#  headers = {'Token': $('input[name="token"]').val(), 'Xmlrpc-Token': $('input[name="xml_token"]').val()}
-#  $.ajax(
-#    url: '/escalations/api/v1/escalations/webrep/disputes/reptool_bl'
-#    method: 'POST'
-#    headers: headers
-#    data: data
-#    dataType: 'json'
-#    success: (response) ->
-#      window.location.reload()
-#    error: (response) ->
-#      if response.responseJSON == undefined
-#        response_lines = response.responseText.split("\n")
-#        if 2 < response_lines.length
-#          errormsg = [response_lines[0], response_lines[1]]
-#        else
-#          errormsg = [response.responseText]
-#      else if response.responseJSON.error != undefined
-#        errormsg = [response.responseJSON.error]
-#      else
-#        errormsg = [response.responseText]
-#      std_msg_error('Error', ['Error adjusting WL/BL'].concat(errormsg) )
-#  )
-
-
+  std_msg_ajax(
+    url: '/escalations/api/v1/escalations/webrep/disputes/reptool_bl'
+    method: 'POST'
+    data: data
+    success: (response) ->
+      bulk_get_current_reptool()
+    error: (response) ->
+      if response.responseJSON == undefined
+        response_lines = response.responseText.split("\n")
+        if 2 < response_lines.length
+          errormsg = [response_lines[0], response_lines[1]]
+        else
+          errormsg = [response.responseText]
+      else if response.responseJSON.error != undefined
+        errormsg = [response.responseJSON.error]
+      else
+        errormsg = [response.responseText]
+      std_msg_error('Error', ['Error adjusting WL/BL'].concat(errormsg) )
+  )
 
 window.toolbar_adjust_reptool_bl_button_research =(button_tag) ->
   checked_url = $('.dispute_check_box:checked')[0]
