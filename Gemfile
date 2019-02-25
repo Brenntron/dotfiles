@@ -1,17 +1,21 @@
 source 'https://rubygems.org'
 
+# Web-framework
 gem 'rails', '5.2.1'
+gem 'rack-cors', '0.4.1', require: 'rack/cors'
+gem 'active_model_serializers', '0.10.8'
+gem 'grape', '1.1.0'
+gem 'grape-swagger', '0.31.1'
+gem 'grape-swagger-rails', '0.3.0'
+gem 'grape-active_model_serializers', '1.5.2'
+
 gem 'haml', '~> 5.0.4'
 gem 'activerecord-session_store', '1.1.1'
 
-gem 'grape', '1.1.0'
-
-gem 'grape-swagger', '0.31.1'
 gem 'hashie-forbidden_attributes', '~> 0.1.1'
-gem 'active_model_serializers', '0.10.8'
-gem 'grape-active_model_serializers', '1.5.2'
-gem 'grape-swagger-rails', '0.3.0'
-gem 'rack-cors', '0.4.1', require: 'rack/cors'
+
+
+
 gem 'kaminari', '1.1.1'
 
 gem 'cancancan', '2.3.0'
@@ -133,7 +137,7 @@ gem 'jquery-rails', '~> 4.3.1'
 gem 'jquery-ui-rails', '~> 6.0.1'
 gem 'coffee-rails', '~> 4.2.1'
 gem 'less-rails', '~> 3.0.0'
-gem 'bootstrap-sass', '~> 3.3.7'
+gem 'bootstrap-sass', '~> 3.4.1'
 gem 'therubyracer', '~> 0.12.3'
 gem 'turbolinks', '5.2.0'
 gem 'paper_trail', '10.0.1'
