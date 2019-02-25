@@ -148,7 +148,7 @@ $ ->
 
   ##  Populating the toolbar Adjust RepTool BL dropdown
   window.bulk_get_current_reptool = (page) ->
-    
+
     # Define the variables based on the page
     if page == "show"
       checkbox = $('.dispute_check_box:checked')

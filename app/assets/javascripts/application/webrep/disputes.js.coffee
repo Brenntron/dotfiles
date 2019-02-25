@@ -611,7 +611,9 @@ $ ->
       else
         $(reptool_submit[0]).attr('disabled', true)
 
-window.submit_bulk_reptool_index = () ->
+
+# Submit Bulk changes to Reptool
+window.submit_bulk_reptool = () ->
   bulk_reptool_menu = $('#reptool_adjust_entries')
   submission_action = $("input[name='reptool-action-radio']:checked").val()
 
@@ -699,15 +701,8 @@ window.submit_bulk_reptool_index = () ->
         array_of_datas.push(temp_data)
         data = array_of_datas
 
-  # Consolidate data for calls here
-  # cycle through all data arrays in the array
-  # merge any that have matching classifications
-  #    console.log array_of_datas
-  #    $(array_of_datas).each ->
-  #      classes = array_of_datas.classifications
-  #      console.log classes
 
-  # send separate api calls for each
+  # send separate api calls for each type of submission
 
   if submission_action == "reptool-override"
     std_msg_ajax(
@@ -715,7 +710,7 @@ window.submit_bulk_reptool_index = () ->
       method: 'POST'
       data: data
       success: (response) ->
-        window.location.reload()
+        std_msg_success('These RepTool classes (' + reptool_classes + ') are assigned to the following entries:', [entries])
       error: (response) ->
         if response.responseJSON == undefined
           response_lines = response.responseText.split("\n")
@@ -735,7 +730,7 @@ window.submit_bulk_reptool_index = () ->
       method: 'POST'
       data: {data: data}
       success: (response) ->
-        window.location.reload()
+        std_msg_success('These RepTool classes (' + new_classifications + ' were changed on the following entries:', [entries])
       error: (response) ->
         if response.responseJSON == undefined
           response_lines = response.responseText.split("\n")
@@ -755,10 +750,22 @@ window.submit_bulk_reptool_index = () ->
       method: 'POST'
       data: data
       success: (response) ->
-        window.location.reload()
+        std_msg_success('All RepTool classes have been removed from the following entries:', [entries])
       error: (response) ->
-
+        if response.responseJSON == undefined
+          response_lines = response.responseText.split("\n")
+          if 2 < response_lines.length
+            errormsg = [response_lines[0], response_lines[1]]
+          else
+            errormsg = [response.responseText]
+        else if response.responseJSON.error != undefined
+          errormsg = [response.responseJSON.error]
+        else
+          errormsg = [response.responseText]
+        std_msg_error('Error', ['Error adjusting WL/BL'].concat(errormsg) )
     )
+
+
 
 window.toolbar_adjust_reptool_bl_button_research =(button_tag) ->
   checked_url = $('.dispute_check_box:checked')[0]
