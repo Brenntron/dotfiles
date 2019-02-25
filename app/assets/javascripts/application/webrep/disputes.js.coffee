@@ -1738,17 +1738,6 @@ window.populate_resolution_dropdown = (dispute_id) ->
 window.disputes_select_all_check_box = () ->
   $('.dispute_check_box').prop('checked', $('#disputes_check_box').prop('checked'))
 
-window.get_multi_wl_bl = () ->
-  urls = []
-  submit_button = $('#wlbl_adjust_entries_index').find('.dropdown-submit-button')
-
-  $('.dispute-entry-checkbox:checked').each ->
-    entry_row = $(this).parent().parent()[0]
-    urls.push($(entry_row).find('.entry-col-content').text())
-
-  $('.entry-dispute-name').text(urls)
-  $(submit_button).attr('disabled', false)
-
 $ ->
 
   $('#advanced-search-button').click ->
