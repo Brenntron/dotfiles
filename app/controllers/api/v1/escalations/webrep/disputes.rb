@@ -627,7 +627,11 @@ module API
                   if api_responses.blank?
                     data.push({:status => 'error', :ip_uri => entry, :list_types => nil})
                   else
-                    data.push({:ip_uri => entry, :status => 'success', :list_types => list_types[entry], :wbrs_score => wbrs_score, :notes => note_entries.first})
+                    data.push({ ip_uri: entry,
+                                status: 'success',
+                                list_types: list_types[entry],
+                                wbrs_score: wbrs_score,
+                                notes: note_entries.first })
                   end
                 end
 
@@ -644,7 +648,13 @@ module API
             post 'bulk_rule_ui_wlbl_add' do
               std_api_v2 do
                 authorize!(:update, Wbrs::ManualWlbl)
-                wlbl_params = {:urls => permitted_params['ip_uris'].map {|ip_uri| ip_uri.strip}, :trgt_list => permitted_params['list_types'], :note => permitted_params['note'], :usr => current_user.cvs_username}
+                wlbl_params =
+                    {
+                        urls: permitted_params['ip_uris'].map {|ip_uri| ip_uri.strip},
+                        trgt_list: permitted_params['list_types'],
+                        note: permitted_params['note'],
+                        usr: current_user.cvs_username
+                    }
 
                 Wbrs::ManualWlbl.bulk_new_wlbl_from_params(wlbl_params)
               end
