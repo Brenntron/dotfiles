@@ -692,15 +692,25 @@ window.submit_bulk_reptool = () ->
           checked_classes.indexOf(x) < 0
         )
         new_classifications = subtracted.join()
-        temp_data = {
-          'action': 'ACTIVE'
-          'entries': [this.entry]
-          'classifications': [new_classifications]
-          'comment': comment
-        }
-        array_of_datas.push(temp_data)
-        data = array_of_datas
 
+        if new_classifications.length > 0
+          temp_data = {
+            'action': 'ACTIVE'
+            'entries': [this.entry]
+            'classifications': [new_classifications]
+            'comment': comment
+          }
+          array_of_datas.push(temp_data)
+          data = array_of_datas
+        else
+          submission_action == "reptool-drop"
+
+          temp_data = {
+            'action': 'expired'
+            'entries': [this.entry]
+          }
+          array_of_datas.push(temp_data)
+          data = array_of_datas
 
   # send separate api calls for each type of submission
 
