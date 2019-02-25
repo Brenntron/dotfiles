@@ -339,31 +339,38 @@ $ ->
 
 
   ## Bulk submission of WL/BL changes on research tab
-  window.bulk_adjust_wlbl = () ->
+  window.bulk_adjust_wlbl = (page) ->
     data = {}
     ip_uris = []
     list_types = []
     list_types = $('.wl-bl-list-inline:checkbox:checked').map(() -> this.value).toArray()
     wlbl_comment = ''
+    dropdown = ''
 
-    if $('.dispute_check_box:checked').length > 0
-      $('.dispute_check_box:checked').each ->
-        entry_row = $(this).parents('.research-table-row')[0]
-        ip_uri = $(entry_row).find('.entry-data-content').text()
-        ip_uris.push(ip_uri)
-        wlbl_comment = $('#wlbl_adjust_entries').find('.adjust-wlbl-input').val()
+    if page == 'index'
+      dropdown = $('#wlbl_adjust_entries_index')
+    else if page == 'show'
+      dropdown = $('#wlbl_adjust_entries')
+
+    entries = $(dropdown).find('.wlbl-entry-content')
+    wlbl_comment = $(dropdown).find('.adjust-wlbl-input').val()
+
+    if $(entries).length > 0
+      $(entries).each ->
+        entry = $(this).text()
+        ip_uris.push(entry)
 
     data = {ip_uris: ip_uris, list_types: list_types, note: wlbl_comment}
-    console.log data
+    
     if $('#wlbl-remove').prop('checked') == true
       std_msg_ajax(
         url: '/escalations/api/v1/escalations/webrep/disputes/bulk_rule_ui_wlbl_remove'
         method: 'POST'
         data: data
         success: (response) ->
-          bulk_get_current_wlbl()
+          std_msg_success("The following entries have been removed from " + list_types, ip_uris)
         error: (response) ->
-
+          std_api_error(response, 'Error retrieving WL/BL Data')
       )
     else if $('#wlbl-add').prop('checked') == true
       std_msg_ajax(
@@ -371,9 +378,9 @@ $ ->
         method: 'POST'
         data: data
         success: (response) ->
-          bulk_get_current_wlbl()
+          std_msg_success("The following entries have been added to " + list_types, ip_uris)
         error: (response) ->
-
+          std_api_error(response, 'Error retrieving WL/BL Data')
       )
 
 
