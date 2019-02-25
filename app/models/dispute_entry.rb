@@ -60,7 +60,7 @@ class DisputeEntry < ApplicationRecord
         sbrs_api_response = Sbrs::ManualSbrs.call_sbrs(params)
         sbrs_api_rulehit_response =  Sbrs::GetSbrs.get_sbrs_rules_for_ip(ip_url)
         wbrs_prefix_response = ComplaintEntry.get_category(params['ip'])
-        
+
         new_dispute_entry.ip_address = ip_url
         new_dispute_entry.entry_type = "IP"
         new_dispute_entry.primary_category = wbrs_prefix_response
@@ -676,7 +676,11 @@ class DisputeEntry < ApplicationRecord
   def self.check_for_duplicates(entry)
     if is_ip?(entry) && DisputeEntry.where(ip_address: entry).present?
       return true
+    elsif is_ip?(entry) && !DisputeEntry.where(ip_address: entry).present?
+      return false
     elsif !is_ip?(entry) && DisputeEntry.where(uri: entry).present?
+      return true
+    elsif !is_ip?(entry) && !DisputeEntry.where(uri: entry).present?
       return false
     end
   end

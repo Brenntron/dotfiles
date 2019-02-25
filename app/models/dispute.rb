@@ -114,9 +114,10 @@ class Dispute < ApplicationRecord
                                      customer_id: customer.id,
                                      case_opened_at: Time.now)
 
-
     ips_urls.split(' ').each do |ip_url|
-      DisputeEntry.create_dispute_entry(new_dispute, ip_url, status)
+      if DisputeEntry.check_for_duplicates(ip_url) == false
+        DisputeEntry.create_dispute_entry(new_dispute, ip_url, status)
+      end
     end
 
     new_dispute
