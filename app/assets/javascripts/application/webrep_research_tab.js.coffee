@@ -263,7 +263,7 @@ $ ->
     debugger
     entries_checked = []
     $(checkbox).each ->
-      if this.checked = true
+      if this.checked == true
         entries_checked.push(this)
 
     ## Clear out any residual data
