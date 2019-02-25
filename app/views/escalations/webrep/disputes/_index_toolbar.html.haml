@@ -246,7 +246,7 @@
 
 
     %span#adjust-wlbl.dropdown
-      %button#index-adjust-wlbl.toolbar-button.adjust-wlbl-button.dropdown-button-margin-right.dropdown-toggle.esc-tooltipped{title: 'Adjust WL/BL', 'data-toggle': 'dropdown', 'aria-haspopup': 'true', 'aria-expanded': 'false', onclick: 'bulk_get_current_wlbl(".dispute-entry-checkbox")'}
+      %button#index-adjust-wlbl.toolbar-button.adjust-wlbl-button.dropdown-button-margin-right.dropdown-toggle.esc-tooltipped{title: 'Adjust WL/BL', 'data-toggle': 'dropdown', 'aria-haspopup': 'true', 'aria-expanded': 'false', onclick: 'bulk_get_current_wlbl(".dispute-entry-checkbox", ".index-entry-row")'}
         %span.toolbar-button-text Adjust WL/BL
       .dropdown-menu.toolbar-dropdown#wlbl_adjust_entries_index{'aria-labelledby': 'wlbl_entries_button'}
         = form_for :wlbl, html: {class: 'adjust-wlbl-form'} do |wlbl_form|

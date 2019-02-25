@@ -257,18 +257,16 @@ $ ->
       wlbl_submit.attr('disabled', true)
 
 
-  ## Populating the research tab toolbar Adjust WL/BL Button
-  window.bulk_get_current_wlbl = (checkbox) ->
-    debugger
 
+  ## Populating the research tab toolbar Adjust WL/BL Button
+  window.bulk_get_current_wlbl = (checkbox, row) ->
+    debugger
     entries_checked = []
     $(checkbox).each ->
       if this.checked = true
         entries_checked.push(this)
 
-    console.log entries_checked
-
-## Clear out any residual data
+    ## Clear out any residual data
     # Empty table
     tbody = $('#wlbl_adjust_entries').find('table.dispute_tool_current').find('tbody')
     $(tbody).empty()
@@ -297,10 +295,16 @@ $ ->
       data = {'entries': []}
 
       $(entries_checked).each ->
-        #Need to pull out the row structure for this to work with index
-        entry_row = $(this).parents('.research-table-row')[0]
-        entry_content = $(entry_row).find('.entry-data-content').text()
-        data['entries'].push(entry_content)
+        # Make sure if we are on the research tab or the index
+        if row == '.research-table-row'
+          entry_row = $(this).parents('.research-table-row')[0]
+          entry_content = $(entry_row).find('.entry-data-content').text()
+          data['entries'].push(entry_content)
+
+        else if row == '.index-entry-row'
+          entry_row = $(this).parents('.index-entry-row')[0]
+          entry_content = $(entry_row).find('.entry-col-content').text()
+          data['entries'].push(entry_content)
 
       std_msg_ajax(
         url: '/escalations/api/v1/escalations/webrep/disputes/bulk_rule_ui_wlbl_get_info_for_form'
@@ -309,7 +313,7 @@ $ ->
         success: (response) ->
           $(tbody).empty()
           response = JSON.parse(response)
-
+          console.log response
           for entry in response
             ip_uri = entry['ip_uri']
             list_types = entry['list_types']
@@ -329,6 +333,8 @@ $ ->
         error: (response) ->
           std_msg_error( 'Error retrieving WL/BL Data', response)
       )
+
+
 
   ## Bulk submission of WL/BL changes on research tab
   window.bulk_adjust_wlbl = () ->
