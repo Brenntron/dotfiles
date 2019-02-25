@@ -59,10 +59,12 @@ class DisputeEntry < ApplicationRecord
         wbrs_api_response = Sbrs::ManualSbrs.call_wbrs(params)
         sbrs_api_response = Sbrs::ManualSbrs.call_sbrs(params)
         sbrs_api_rulehit_response =  Sbrs::GetSbrs.get_sbrs_rules_for_ip(ip_url)
-
-
+        wbrs_prefix_response = ComplaintEntry.get_category(params['ip'])
+        
         new_dispute_entry.ip_address = ip_url
         new_dispute_entry.entry_type = "IP"
+        new_dispute_entry.primary_category = wbrs_prefix_response
+
 
         # Populate WBRS/SBRS Scores
 
@@ -82,6 +84,8 @@ class DisputeEntry < ApplicationRecord
         params['url'] = ip_url
 
         wbrs_api_response = Sbrs::ManualSbrs.call_wbrs(params, type: 'wbrs')
+        sbrs_api_response = Sbrs::ManualSbrs.call_sbrs(params, type: 'wbrs')
+        wbrs_prefix_response = ComplaintEntry.get_category(params['url'])
 
         url_parts = Complaint.parse_url(ip_url)
         new_dispute_entry.uri = ip_url
@@ -89,6 +93,8 @@ class DisputeEntry < ApplicationRecord
         new_dispute_entry.subdomain = url_parts[:subdomain]
         new_dispute_entry.domain = url_parts[:domain]
         new_dispute_entry.path = url_parts[:path]
+
+        new_dispute_entry.primary_category = wbrs_prefix_response
 
         # Populate WBRS/SBRS Scores
 
@@ -126,7 +132,7 @@ class DisputeEntry < ApplicationRecord
       raise Exception.new("{DisputeEntry creation error: {content: #{ip_url},error:#{e}}}")
     end
 
-    # Add preload for Dispute Entry here
+
   end
 
   def self.is_ip?(ip)
@@ -668,9 +674,9 @@ class DisputeEntry < ApplicationRecord
   end
 
   def self.check_for_duplicates(entry)
-    if DisputeEntry.where(uri: entry).present? || DisputeEntry.where(ip_address: entry).present?
+    if is_ip?(entry) && DisputeEntry.where(ip_address: entry).present?
       return true
-    else
+    elsif !is_ip?(entry) && DisputeEntry.where(uri: entry).present?
       return false
     end
   end

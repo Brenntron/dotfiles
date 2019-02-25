@@ -57,7 +57,7 @@ class Sbrs::ManualSbrs < Sbrs::Base
     parse_sbrs(request_sds(path: '/score/sbrs/json?ip=', body: params, type: type))
   end
 
-  def self.call_wbrs(params, type:nil)
+  def self.call_wbrs(params, type: nil)
     parse_wbrs(request_sds(path: '/score/wbrs;wbrs-rulehits/json?url=', body: params, type: type))
   end
 
