@@ -258,7 +258,7 @@ $ ->
 
 
 
-  ## Populating the research tab toolbar Adjust WL/BL Button
+  ## Populating the toolbar Adjust WL/BL Button (works for index, research page, and research tab of show page)
   window.bulk_get_current_wlbl = (page) ->
     entries_checked = []
     checkbox = ''
@@ -349,7 +349,7 @@ $ ->
 
 
 
-  ## Bulk submission of WL/BL changes on research tab
+  ## Bulk submission of WL/BL changes (works on index, research page, and research tab of show page)
   window.bulk_adjust_wlbl = (page) ->
     data = {}
     ip_uris = []
