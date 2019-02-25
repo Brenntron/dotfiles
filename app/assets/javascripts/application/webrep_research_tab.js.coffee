@@ -259,18 +259,24 @@ $ ->
 
 
   ## Populating the research tab toolbar Adjust WL/BL Button
-  window.bulk_get_current_wlbl = (checkbox, row) ->
+  window.bulk_get_current_wlbl = (page) ->
     entries_checked = []
-    $(checkbox).each ->
-      if this.checked == true
-        entries_checked.push(this)
+    checkbox = ''
+    row = ''
+    tbody = ''
+
+    # Define variables based on what page we're on
+    if page == 'index'
+      checkbox = '.dispute-entry-checkbox'
+      row = '.index-entry-row'
+      tbody = $('#wlbl_adjust_entries_index').find('table.dispute_tool_current').find('tbody')
+    else if page == 'show' || page == 'research'
+      checkbox = '.dispute_check_box'
+      row = '.research-table-row'
+      tbody = $('#wlbl_adjust_entries').find('table.dispute_tool_current').find('tbody')
 
     ## Clear out any residual data
     # Empty table
-    if row == '.research-table-row'
-      tbody = $('#wlbl_adjust_entries').find('table.dispute_tool_current').find('tbody')
-    else if row == '.index-entry-row'
-      tbody = $('#wlbl_adjust_entries_index').find('table.dispute_tool_current').find('tbody')
     $(tbody).empty()
 
     # Clear the checkboxes
@@ -292,12 +298,17 @@ $ ->
     $(comment_box).val('')
 
     ## Get data to populate table
-    # Get all the checked entry urls
+    # Get all the checked entries
+    $(checkbox).each ->
+      if this.checked == true
+        entries_checked.push(this)
+
+    # Pull the entry content out
     if (entries_checked.length > 0)
       data = {'entries': []}
 
       $(entries_checked).each ->
-        # Make sure if we are on the research tab or the index
+        # Slightly different structure to get the actual entry content
         if row == '.research-table-row'
           entry_row = $(this).parents('.research-table-row')[0]
           entry_content = $(entry_row).find('.entry-data-content').text()
@@ -349,7 +360,7 @@ $ ->
 
     if page == 'index'
       dropdown = $('#wlbl_adjust_entries_index')
-    else if page == 'show'
+    else if page == 'show' || page == 'research'
       dropdown = $('#wlbl_adjust_entries')
 
     entries = $(dropdown).find('.wlbl-entry-content')
@@ -361,7 +372,7 @@ $ ->
         ip_uris.push(entry)
 
     data = {ip_uris: ip_uris, list_types: list_types, note: wlbl_comment}
-    
+
     if $('#wlbl-remove').prop('checked') == true
       std_msg_ajax(
         url: '/escalations/api/v1/escalations/webrep/disputes/bulk_rule_ui_wlbl_remove'
@@ -382,95 +393,6 @@ $ ->
         error: (response) ->
           std_api_error(response, 'Error retrieving WL/BL Data')
       )
-
-
-
-
-
-
-
-#    dropdown_wrapper = $(this).parent()
-#    if ($('.dispute_check_box:checked').length >= 1)
-#      submit_button = $('#wlbl_adjust_entries').find('.dropdown-submit-button')
-#      entry_content = ''
-#
-#      $('.dispute_check_box:checked').each ->
-#        entry_row = $(this).parents('.research-table-row')[0]
-#        entry_content = $(entry_row).find('.entry-data-content').text()
-#        wbrs = $(entry_row).find('.entry-data-wbrs-score').find('.current-wbrs-score').text()
-#        if !wbrs
-#          wbrs = $(entry_row).find('.entry-data-wbrs-score').text()
-#        # Send entry content to reptool
-#        data = {
-#          'entry' : entry_content
-#        }
-
-#        headers = {'Token': $('input[name="token"]').val(), 'Xmlrpc-Token': $('input[name="xml_token"]').val()}
-#        $.ajax(
-#          url: '/escalations/api/v1/escalations/webrep/disputes/rule_ui_wlbl_get_info_for_form'
-#          method: 'GET'
-#          headers: headers
-#          data: data
-#          dataType: 'json'
-#          success: (response) ->
-#            #values will be in the format of BL-med, BL-weak, BL-heavy   (same with WL)
-#
-#            response = JSON.parse(response)
-#            if response.data != ""
-        
-#              $(response.data).each ->
-#                if String(this) == 'WL-weak'
-#                  $(wl_weak[0]).prop('checked', true)
-#                  wl_weak_status = 'true'
-#                if String(this) == 'WL-med'
-#                  $(wl_med[0]).prop('checked', true)
-#                  wl_med_status = 'true'
-#                if String(this) == 'WL-heavy'
-#                  $(wl_heavy[0]).prop('checked', true)
-#                  wl_heavy_status = 'true'
-#                if String(this) == 'BL-weak'
-#                  $(bl_weak[0]).prop('checked', true)
-#                  bl_weak_status = 'true'
-#                if String(this) == 'BL-med'
-#                  $(bl_med[0]).prop('checked', true)
-#                  bl_med_status = 'true'
-#                if String(this) == 'BL-heavy'
-#                  $(bl_heavy[0]).prop('checked', true)
-#                  bl_heavy_status = 'true'
-
-#              $(show_content[0]).text(entry_content)
-#              $(show_wbrs[0]).text(wbrs)
-#              $(show_wlbl[0]).text(response.data)
-#              $(submit_button).attr('disabled', false)
-#            else
-#              $(show_content[0]).text(entry_content)
-#              $(show_wbrs[0]).text(wbrs)
-#              $(show_wlbl[0]).text('Not on a list')
-#              $(submit_button).attr('disabled', false)
-#            #this should probably call the resync data then reload the page, for an up to date score
-#
-#          error: (response) ->
-#            popup_response_error(response, 'Error retrieving WL/BL Data')
-#        )
-
-
-
-
-
-
-      #$('.dispute_check_box').each ->
-      #  if $(this).prop('checked')
-      #    entry_row = $(this).parents('.research-table-row')[0]
-      #    entry_content = $(entry_row).find('.entry-data-content').text()
-      #    wbrs = $(entry_row).find('.entry-data-wbrs-score').text()
-      #    wlbl = $(entry_row).find('.entry-data-wlbl').text()
-
-      #    $(tbody[0]).append('<tr><td>' + entry_content + '</td><td class="no-word-break">' + wlbl + '</td><td class="text-center">' + wbrs + '</td></tr>')
-      #$($('#wlbl_adjust_entries').find('.comment-wrapper')).show()
-
-#    else
-#      $(dropdown_wrapper).removeClass('open')
-#      std_msg_error('No rows selected', ['Please select one row.'])
 
 
 
