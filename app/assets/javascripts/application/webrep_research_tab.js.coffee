@@ -146,8 +146,14 @@ $ ->
 
 
 
-  ##  Populating the toolbar Adjust RepTool BL button on research tab
-  window.bulk_get_current_reptool = () ->
+  ##  Populating the toolbar Adjust RepTool BL dropdown
+  window.bulk_get_current_reptool = (page) ->
+    
+    # Define the variables based on the page
+    if page == "show"
+      checkbox = $('.dispute_check_box:checked')
+    else if page == "index"
+      checkbox = $('.dispute-entry-checkbox:checked')
 
     ## Clear out any residual data
     # Empty table
@@ -159,12 +165,15 @@ $ ->
 
     ## Get data to populate table
     # Get all the checked entry urls
-    if ($('.dispute_check_box:checked').length > 0)
+    if ($(checkbox).length > 0)
       ip_uris = []
-
-      $('.dispute_check_box:checked').each ->
-        entry_row = $(this).parents('.research-table-row')[0]
-        entry_content = $(entry_row).find('.entry-data-content').text().trim()
+      $(checkbox).each ->
+        if page == "show"
+          entry_row = $(this).parents('.research-table-row')[0]
+          entry_content = $(entry_row).find('.entry-data-content').text().trim()
+        else if page == "index"
+          entry_row = $(this).parents('.index-entry-row')[0]
+          entry_content = $(entry_row).find('.entry-col-content').text().trim()
         # Send entry content to reptool
         ip_uris.push(entry_content)
 
@@ -189,52 +198,6 @@ $ ->
       )
     else
       std_msg_error('No rows selected', ['Please select a row'])
-
-
-
-  ## Populating the toolbar Adjust RepTool BL button on index
-  window.bulk_get_current_reptool_index = () ->
-
-    ## Clear out any residual data
-    # Empty table
-    tbody = $('#reptool_adjust_entries').find('table.dispute_tool_current').find('tbody')
-    tbody.empty()
-    # Empty the comment box
-    comment_box = $('#reptool_adjust_entries').find('.comment-input')
-    comment_box.val('')
-
-    ## Get data to populate table
-    # Get all the checked entry urls
-    if ($('.dispute-entry-checkbox:checked').length > 0)
-      ip_uris = []
-
-      $('.dispute-entry-checkbox:checked').each ->
-        entry_row = $(this).parents('.index-entry-row')[0]
-        entry_content = $(entry_row).find('.entry-col-content').text().trim()
-        # Send entry content to reptool
-        ip_uris.push(entry_content)
-
-      std_msg_ajax(
-        url: '/escalations/api/v1/escalations/webrep/disputes/bulk_reptool_get_info_for_form'
-        method: 'POST'
-        data: { ip_uris: ip_uris }
-        success: (response) ->
-          response = JSON.parse(response)
-          for entry in response
-            if entry['status'] == "ACTIVE"
-              rep_class_full = entry['classification'] + ' - ' + entry['expiration']
-              rep_class = entry['classification']
-            else
-              rep_class_full = '<span class="missing-data">No active classifications</span>'
-              rep_class = ''
-
-            tbody.append('<tr class="reptool-entry-row"><td class="reptool-entry-name">' + entry['entry'] + '</td><td class="reptool-entry-class" data-classification="' + rep_class + '">' + rep_class_full + '</td><td class="reptool-entry-comment">' + entry['comment'] + '</td></tr>')
-        error: (response) ->
-          std_api_error(response, "Error retrieving Reptool Data", reload: false)
-      )
-    else
-      std_msg_error('No entry rows selected', ['Please select a row'])
-
 
 
 
