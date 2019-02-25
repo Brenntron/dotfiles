@@ -260,7 +260,6 @@ $ ->
 
   ## Populating the research tab toolbar Adjust WL/BL Button
   window.bulk_get_current_wlbl = (checkbox, row) ->
-    debugger
     entries_checked = []
     $(checkbox).each ->
       if this.checked == true
@@ -268,7 +267,10 @@ $ ->
 
     ## Clear out any residual data
     # Empty table
-    tbody = $('#wlbl_adjust_entries').find('table.dispute_tool_current').find('tbody')
+    if row == '.research-table-row'
+      tbody = $('#wlbl_adjust_entries').find('table.dispute_tool_current').find('tbody')
+    else if row == '.index-entry-row'
+      tbody = $('#wlbl_adjust_entries_index').find('table.dispute_tool_current').find('tbody')
     $(tbody).empty()
 
     # Clear the checkboxes
@@ -304,7 +306,7 @@ $ ->
         else if row == '.index-entry-row'
           entry_row = $(this).parents('.index-entry-row')[0]
           entry_content = $(entry_row).find('.entry-col-content').text()
-          data['entries'].push(entry_content)
+          data['entries'].push("\n" + entry_content + "\n")
 
       std_msg_ajax(
         url: '/escalations/api/v1/escalations/webrep/disputes/bulk_rule_ui_wlbl_get_info_for_form'
