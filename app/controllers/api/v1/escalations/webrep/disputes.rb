@@ -4,6 +4,7 @@ module API
       module Webrep
         class Disputes < Grape::API
           include API::V1::Defaults
+          include API::BugzillaRestSession
 
           resource "escalations/webrep/disputes" do
             before do
@@ -63,6 +64,46 @@ module API
 
               response_data.to_json
 
+            end
+
+            desc 'create a dispute'
+            params do
+              requires :ips_urls, type: String, desc: 'List of URLs to create entries'
+              requires :assignee, type: String, desc: 'Description of new complaint'
+              requires :priority, type: String, desc: 'Customer related to new complaint'
+              requires :ticket_type, type: String, desc: 'Array of tags to be associated with the new complaint'
+            end
+
+            post "" do
+              std_api_v2 do
+                errors = []
+
+                user_validation = User.where(cvs_username: permitted_params['assignee'])
+
+                separated_entries = permitted_params[:ips_urls].split("\n")
+
+                separated_entries.each do |entry|
+                  if DisputeEntry.check_for_duplicates(entry)
+                    permitted_params[:ips_urls] = permitted_params[:ips_urls].gsub(entry+"\n","")
+                    errors << entry
+                  end
+                end
+
+                if separated_entries.length > errors.length
+                  if user_validation.present?
+                    dispute = Dispute.create_action(bugzilla_rest_session,
+                                            permitted_params[:ips_urls],
+                                            permitted_params[:assignee],
+                                            permitted_params[:priority],
+                                            permitted_params[:ticket_type])
+                    render json: {status: 'Success', case_id: dispute.id, errors: errors}
+                  else
+                    raise ("Invalid assignee or assignee does not exist. Please try again.")
+                  end
+                else
+                  raise ("Unable to create the following duplicate dispute entries: #{errors.join("\n")}")
+                end
+              end
             end
 
             desc 'update a dispute'
@@ -259,8 +300,35 @@ module API
               requires :comment, type: String, desc: "comment"
             end
             post "reptool_bl" do
-              RepApi::Blacklist.adjust_from_params(permitted_params, username: current_user.cvs_username)
-              true
+              std_api_v2 do
+                RepApi::Blacklist.adjust_from_params(permitted_params, username: current_user.cvs_username)
+                true
+              end
+            end
+
+            desc "Maintain current classifications for RepTool BL entries"
+            params do
+              requires :data, type: Array
+            end
+            post "maintain_reptool_bl" do
+              std_api_v2 do
+                permitted_params['data'].each do |entry|
+                  RepApi::Blacklist.adjust_from_params(entry, username: current_user.cvs_username)
+                end
+                true
+              end
+            end
+
+            desc "Drop a Reptool Bl entry"
+            params do
+              requires :action, type: String, desc: "activate or expire"
+              requires :entries, type: Array[String], desc: "urls"
+            end
+            post "drop_reptool_bl" do
+              std_api_v2 do
+                RepApi::Blacklist.adjust_from_params(permitted_params, username: current_user.cvs_username)
+                true
+              end
             end
 
             desc "Sync data for all dispute entry children"
@@ -542,7 +610,8 @@ module API
               information = JSON.parse(information)
 
               if information[params[:entry].gsub('http://', '').gsub('https://', '')] == "NOT_FOUND"
-                return {:classification => "not found", :expiration => "", :status => "", :comment => ""}.to_json
+                return {:entry => params[:entry], :classification => "not found", :expiration => "", :status => "", :comment => ""}.to_json
+              # TODO Make expiration human readable - Just the date
               else
                 expiration = ""
                 begin
@@ -550,9 +619,36 @@ module API
                 rescue
                   expiration = information[params[:entry].gsub('http://', '').gsub('https://', '')]["expiration"]
                 end
-                return {:classification => information[params[:entry].gsub('http://', '').gsub('https://', '')]["classifications"].first, :expiration => expiration, :status => information[params[:entry].gsub('http://', '').gsub('https://', '')]["status"], :comment => information[params[:entry].gsub('http://', '').gsub('https://', '')]["metadata"]["VRT"]["comment"]}.to_json
+                return {:entry => params[:entry], :classification => information[params[:entry].gsub('http://', '').gsub('https://', '')]["classifications"].first, :expiration => expiration, :status => information[params[:entry].gsub('http://', '').gsub('https://', '')]["status"], :comment => information[params[:entry].gsub('http://', '').gsub('https://', '')]["metadata"]["VRT"]["comment"]}.to_json
               end
 
+            end
+
+            params do
+              requires :ip_uris, type: Array[String]
+            end
+
+            post 'bulk_reptool_get_info_for_form' do
+              std_api_v2 do
+                api_response = JSON.parse(RepApi::Blacklist.where({entries: permitted_params[:ip_uris] }, true))
+                return_data = []
+
+                api_response.each do |key, value|
+                  if value == 'NOT_FOUND'
+                    return_data.push(:entry => key, :classification => "No active classifications", :expiration => "", :status => "INACTIVE", :comment => "")
+                    # TODO Make expiration human readable - Just the date
+                  else
+                    expiration = ""
+                    begin
+                      expiration = Date.parse(value["expiration"]).to_s
+                    rescue
+                      expiration = value["expiration"]
+                    end
+                    return_data.push(:entry => key, :classification => value["classifications"], :expiration => expiration, :status => value["status"], :comment => value["metadata"]["VRT"]["comment"]).to_json
+                  end
+                end
+                return_data.to_json
+              end
             end
 
             params do
@@ -720,6 +816,13 @@ module API
 
               render json: {case_owners: case_owners, statuses: statuses, submitter_types: submitter_types,
                             contacts: contacts, companies: companies, resolutions: resolutions }
+            end
+
+            desc 'Auto-populate fields on New Dispute'
+            get 'populate_new_dispute_fields' do
+              assignees = User.joins(roles: :org_subset).where(org_subsets: { name: 'webrep' }).distinct.order(:cvs_username)
+
+              render json: {assignees: assignees}
             end
 
           end
