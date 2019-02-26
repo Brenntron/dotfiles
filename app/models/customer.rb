@@ -37,15 +37,11 @@ class Customer < ApplicationRecord
     if payload["payload"] && payload["payload"]["email"] && payload["payload"]["user_company"] && payload["payload"]["name"]
       customer_email = payload["payload"]["email"]
 
-      customer_company = payload["payload"]["user_company"]
-      customer_name = payload["payload"]["name"]
+      company_exists = Company.thread_safe_find_or_create_by(name: payload["payload"]["user_company"])
 
-      customer_exists = Customer.thread_safe_find_or_create_by(email: customer_email)
+      customer_exists = Customer.thread_safe_find_or_create_by(email: customer_email, company: company_exists)
       if customer_exists.new_record?
-        company_exists = Company.thread_safe_find_or_create_by(name: customer_company)
-
-        customer_exists.company_id = company_exists.id
-        customer_exists.name = customer_name
+        customer_exists.name = payload["payload"]["name"]
         customer_exists.save!
       end
     else
