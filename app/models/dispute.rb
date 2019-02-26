@@ -114,9 +114,10 @@ class Dispute < ApplicationRecord
                                      customer_id: customer.id,
                                      case_opened_at: Time.now)
 
-
     ips_urls.split(' ').each do |ip_url|
-      DisputeEntry.create_dispute_entry(new_dispute, ip_url, status)
+      if DisputeEntry.check_for_duplicates(ip_url) == false
+        DisputeEntry.create_dispute_entry(new_dispute, ip_url, status)
+      end
     end
 
     new_dispute
@@ -1338,6 +1339,9 @@ class Dispute < ApplicationRecord
 
 
     results.each do |result|
+      if !result.case_resolved_at
+        result.case_resolved_at = Time.now
+      end
       entry_count = result.dispute_entries.size
       entry_preview = []
       result.dispute_entries.each do |entry|
@@ -1350,11 +1354,14 @@ class Dispute < ApplicationRecord
       end
       entry_preview.to_s.inspect
       ticket_user = result.user.cvs_username
+
       report_data[:table_data] << {:case_number => result.id,
                       :case_link => "<a href='/escalations/webrep/disputes/#{result.id}'>#{result.case_id_str}</a>",
                       # :dispute => result.dispute_entries.first.hostlookup,
                       :d_entry_preview => "<span class='dispute_entry_content_first'>#{result.dispute_entries.first&.hostlookup}</span><span class='dispute-count esc-tooltipped' title='#{entry_preview}'>#{entry_count}</span>",
+
                       :time_to_close => distance_of_time_in_words(result.created_at, result.case_resolved_at),
+
                       :submitter_type => result.submitter_type.downcase,
                       :submission_type => result.submission_type.upcase,
                       :priority => result.priority,
@@ -1442,6 +1449,9 @@ class Dispute < ApplicationRecord
     main_results = Dispute.where(:user_id => user_id).where("disputes.created_at between '#{from}' and '#{to}'").where(:status => status_array)
 
     main_results.each do |result|
+      if !result.case_resolved_at
+        result.case_resolved_at = Time.now
+      end
       report_data[:ticket_numbers] << result.id
       report_data[:close_times] << ((result.case_resolved_at - result.created_at) / 3600 )
     end
@@ -1624,6 +1634,9 @@ class Dispute < ApplicationRecord
     main_results = Dispute.where(:user_id => user_ids).where("disputes.created_at between '#{from}' and '#{to}'").where("disputes.status = '#{STATUS_RESOLVED}'")
 
     main_results.each do |result|
+      if !result.case_resolved_at
+        result.case_resolved_at = Time.now
+      end
       raw_data[result.user.cvs_username] << ((result.case_resolved_at - result.created_at) / 3600 )
     end
 

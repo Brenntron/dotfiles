@@ -30,7 +30,7 @@ $ ->
 
         error: (response) ->
           $('#loader-modal').modal 'hide'
-          std_msg_error("Duplicate",[response.responseJSON.message], reload: false)
+          std_msg_error("Error",[response.responseJSON.message], reload: false)
       )
     else
       $('#loader-modal').modal 'hide'
