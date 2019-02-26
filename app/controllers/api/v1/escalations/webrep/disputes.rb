@@ -654,23 +654,38 @@ module API
 
                     if details.notes.present?
                       details.notes.each do |note|
-                        date = ''
-                        date = Date.parse(info_entry.mtime).to_s unless info_entry.ctime.blank?
+                        m_date = Date.parse(info_entry.mtime).to_s unless info_entry.mtime.blank?
+                        c_date = Date.parse(info_entry.ctime).to_s unless info_entry.ctime.blank?
 
-                        note_entries << {:state => info_entry.state, :date => date, :sort_date => DateTime.parse(info_entry.mtime), :list_type => info_entry.list_type, :note => "#{note['user']} - #{note['ctime']}: #{note['note']}"}
+                        if info_entry.ctime != info_entry.mtime
+                          note_entries << {:state => info_entry.state, :date => m_date, :sort_date => DateTime.parse(info_entry.mtime), :list_type => info_entry.list_type, :note => "#{note['user']} - #{note['ctime']}: #{note['note']}"}
+                          note_entries << {:state => info_entry.state, :date => c_date, :sort_date => DateTime.parse(info_entry.ctime), :list_type => info_entry.list_type, :note => "#{note['user']} - #{note['ctime']}: #{note['note']}"}
+                        else
+                          note_entries << {:state => info_entry.state, :date => c_date, :sort_date => DateTime.parse(info_entry.ctime), :list_type => info_entry.list_type, :note => "#{note['user']} - #{note['ctime']}: #{note['note']}"}
+                        end
                       end
                     else
-                      date = ''
-                      date = Date.parse(info_entry.mtime).to_s unless info_entry.ctime.blank?
+                      m_date = Date.parse(info_entry.mtime).to_s unless info_entry.mtime.blank?
+                      c_date = Date.parse(info_entry.ctime).to_s unless info_entry.ctime.blank?
 
-                      note_entries << {:state => info_entry.state, :date => date, :sort_date => DateTime.parse(info_entry.mtime), :list_type => info_entry.list_type, :note => ''}
+                      if info_entry.ctime != info_entry.mtime
+                        note_entries << {:state => info_entry.state, :date => m_date, :sort_date => DateTime.parse(info_entry.mtime), :list_type => info_entry.list_type, :note =>''}
+                        note_entries << {:state => info_entry.state, :date => c_date, :sort_date => DateTime.parse(info_entry.ctime), :list_type => info_entry.list_type, :note =>''}
+                      else
+                        note_entries << {:state => info_entry.state, :date => c_date, :sort_date => DateTime.parse(info_entry.ctime), :list_type => info_entry.list_type, :note =>''}
+                      end
                     end
                   end
                 rescue
-                  date = ''
-                  date = Date.parse(info_entry.mtime).to_s unless info_entry.ctime.blank?
+                  m_date = Date.parse(info_entry.mtime).to_s unless info_entry.mtime.blank?
+                  c_date = Date.parse(info_entry.ctime).to_s unless info_entry.ctime.blank?
 
-                  note_entries << {:state => info_entry.state, :date => date, :sort_date => DateTime.parse(info_entry.mtime), :list_type => info_entry.list_type, :note => ''}
+                  if info_entry.ctime != info_entry.mtime
+                    note_entries << {:state => info_entry.state, :date => m_date, :sort_date => DateTime.parse(info_entry.mtime), :list_type => info_entry.list_type, :note =>''}
+                    note_entries << {:state => info_entry.state, :date => c_date, :sort_date => DateTime.parse(info_entry.ctime), :list_type => info_entry.list_type, :note =>''}
+                  else
+                    note_entries << {:state => info_entry.state, :date => c_date, :sort_date => DateTime.parse(info_entry.ctime), :list_type => info_entry.list_type, :note =>''}
+                  end
                   next
                 end
               end
