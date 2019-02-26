@@ -684,6 +684,13 @@ button {
 .ticket-owner-button {background-image: url(image_path('icon_user_grey.svg'));}
 .sort-by-button {background-image: url(image_path('icon_sort_by.svg'));}
 .sync-button {background-image: url(image_path('icon_sync.svg'));}
+
+.master-submit-button {
+  color: $content-bg-color;
+  font-weight: 400;
+  background-image: url(image_path('icon_submit_arrow.svg'));
+  background-color: $warning-accent-color;
+}
 .open-viewable {background-image: url(image_path('icon_open_viewable.svg'));}
 .open-nonviewable {background-image: url(image_path('icon_open_nonviewable.svg'));}
 .open-selected {background-image: url(image_path('icon_open_selected.svg'));}
@@ -852,8 +859,8 @@ thead th.sorting.center {
 }
 
 .toolbar-button:disabled {
-  background-color: $disabled-bg;
-  color: $disabled-txt;
+  background-color: $disabled-bg !important;
+  color: $disabled-txt !important;
 }
 
 .copydoc-button.button-in-use {

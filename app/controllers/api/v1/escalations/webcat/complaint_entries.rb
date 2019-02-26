@@ -437,6 +437,46 @@ module API
                 complaint_entry.current_category_data.to_json
               end
             end
+
+            desc 'Update several entries at once'
+            params do
+              requires :data, type: Array
+            end
+
+            post 'master_submit' do
+              std_api_v2 do
+                response = []
+                permitted_params['data'].each do |entry|
+                  begin
+                    if entry['error'] == false
+                      complaint_entry = ComplaintEntry.find(entry['entry_id'])
+                      complaint_entry.change_category( entry['prefix'],entry['categories'],
+                                                       entry['status'],
+                                                       entry['comment'],
+                                                       entry['resolution_comment'],
+                                                       current_user, "")
+
+                      ComplaintEntryPreload.generate_preload_from_complaint_entry(complaint_entry)
+                      if complaint_entry.complaint.ticket_source != Complaint::SOURCE_RULEUI
+                        message = Bridge::ComplaintUpdateStatusEvent.new
+                        message.post_complaint(complaint_entry.complaint)
+                      end
+
+                      response.push({error: false, entry_id: entry['entry_id'], row_id: entry['row_id'], status: complaint_entry.status, resolution: entry['status'],
+                                         comment: entry['comment'], resolution_comment: entry['resolution_comment'], categories: entry['categories'],
+                                         category_names: entry['category_names']})
+                    elsif entry['error'] == true && entry['reason'] == 'nil_categories'
+                      response.push({error: true, entry_id: entry['entry_id'], reason: 'nil_categories'})
+                    end
+                  rescue Exception => e
+                    response.push({error: true, entry_id: entry['entry_id'], reason: 'api'})
+                    next
+                  end
+                end
+                response.to_json
+              end
+            end
+
           end
         end
       end
