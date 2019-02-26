@@ -1880,7 +1880,6 @@ a.static-nav-item {
 .icon-team-bugs    {background-image: url(image_path('icon_teambugs.svg'));}
 .icon-pending-bugs {background-image: url(image_path('icon_pendingbugs.svg'));}
 .icon-open-bugs    {background-image: url(image_path('icon_openbugs.svg'));}
-.icon-unassigned-bugs    {background-image: url(image_path('icon_unassigned.svg'));}
 .icon-email-tix {background-image: url(image_path('icon_open_email_tix.svg'));}
 .icon-web-tix {background-image: url(image_path('icon_open_web_tix.svg'));}
 .icon-fixed-bugs   {background-image: url(image_path('icon_fixedbugs.svg'));}
@@ -1964,10 +1963,6 @@ a.static-nav-item {
   position: absolute;
   top: -8px;
   left: 20px;
-}
-
-#filter-cases-list {
-  line-height: 2.5em;
 }
 
 .nav-tool-dropdown-header {
@@ -4537,7 +4532,7 @@ table > tbody > tr > td.dispute_rep_tools {
 
 .dispute_rep_tools .dropdown-menu, #wlbl_adjust_entries.dropdown-menu, #wlbl_adjust_entries_index.dropdown-menu, #reptool_adjust_entries.dropdown-menu {
   left: auto;
-  border-radius: 4px 0 4px 4px;
+  border-radius: 0 4px 4px 4px;
   border: none;
   background-color: $bug-section-color;
   min-width: 330px;
@@ -4633,11 +4628,16 @@ table > tbody > tr > td.dispute_rep_tools {
 }
 
 .dispute_tool_current td {
-  border-bottom: none
+  border-bottom: none;
 }
 
 .dispute_tool_current tbody tr:first-child td {
   padding-top: 8px;
+}
+
+.secondary-text-divider {
+  background-color: $type-lighter-color;
+  margin-right: 0 !important;
 }
 
 .secondary-text-divider {
@@ -5549,7 +5549,7 @@ input:checked + .toggle-slider:after {
   color: $type-lighter-color;
 }
 
-.wlbl-toggle-list li {
+.inline-tool-content-wrapper .wlbl-toggle-list li {
   height: 26px;
   padding-left: 22px;
 }
@@ -8042,6 +8042,7 @@ th.sorting_1, th.sorting_asc, th.sorting_desc {
     }
   }
 }
+
 
 .dispute-wlbl-adjust-wrapper .inline-tool-content-wrapper, .dispute-reptool-adjust-wrapper .inline-tool-content-wrapper {
   padding: 6px 10px !important;

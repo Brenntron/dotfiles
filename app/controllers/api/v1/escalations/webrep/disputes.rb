@@ -263,9 +263,6 @@ module API
               true
             end
 
-
-
-
             desc "Adjust a WL/BL entry"
             params do
               requires :dispute_entry_ids, type: Array[Integer], desc: "analyst-console database id"
@@ -681,6 +678,96 @@ module API
               note_entries = note_entries.uniq
 
               return {:status => "success", :data => list_types, :notes => note_entries.first}.to_json
+
+            end
+
+            params do
+              requires :entries, type: Array[String]
+            end
+
+            post 'bulk_rule_ui_wlbl_get_info_for_form' do
+              std_api_v2 do
+
+                params[:entries] = params[:entries].map {|entry| entry.strip}
+
+                data = []
+                list_types = {}
+                note_entries = []
+
+                params[:entries].each do |entry|
+                  list_types[entry] = []
+                  api_responses = Wbrs::ManualWlbl.where({:url => entry})
+
+                  api_responses.each do |response|
+                    if response.url == entry
+                      if response.state == "active"
+                        list_types[entry] << response.list_type
+                      end
+                    end
+                  end
+
+                  if ComplaintEntry.is_ip?(entry)
+                    params['ip'] = entry
+                    wbrs_api_response = Sbrs::ManualSbrs.call_wbrs(params)
+                  else
+                    params['url'] = entry
+                    wbrs_api_response = Sbrs::ManualSbrs.call_wbrs(params, type: 'wbrs')
+                  end
+
+                  if wbrs_api_response != nil && wbrs_api_response['wbrs'].present? && wbrs_api_response['wbrs']['score'] != 'noscore'
+                    wbrs_score = wbrs_api_response['wbrs']['score']
+                  else
+                    wbrs_score = nil
+                  end
+
+                  if api_responses.blank?
+                    data.push({:status => 'error', :ip_uri => entry, :list_types => nil})
+                  else
+                    data.push({ ip_uri: entry,
+                                status: 'success',
+                                list_types: list_types[entry],
+                                wbrs_score: wbrs_score,
+                                notes: note_entries.first })
+                  end
+                end
+
+                data.to_json
+              end
+            end
+
+            params do
+              requires :ip_uris, type: Array[String]
+              requires :list_types, type: Array[String]
+              requires :note, type: String
+            end
+
+            post 'bulk_rule_ui_wlbl_add' do
+              std_api_v2 do
+                authorize!(:update, Wbrs::ManualWlbl)
+                wlbl_params =
+                    {
+                        urls: permitted_params['ip_uris'].map {|ip_uri| ip_uri.strip},
+                        trgt_list: permitted_params['list_types'],
+                        note: permitted_params['note'],
+                        usr: current_user.cvs_username
+                    }
+
+                Wbrs::ManualWlbl.bulk_new_wlbl_from_params(wlbl_params)
+              end
+            end
+
+            params do
+              requires :ip_uris, type: Array[String]
+              requires :list_types, type: Array[String]
+            end
+
+            post 'bulk_rule_ui_wlbl_remove' do
+              std_api_v2 do
+                ip_uris = permitted_params[:ip_uris].map {|ip_uri| ip_uri.strip}
+                list_types = permitted_params[:list_types]
+
+                Wbrs::ManualWlbl.destroy_from_params(ip_uris, list_types, username: current_user.cvs_username)
+              end
 
             end
 
