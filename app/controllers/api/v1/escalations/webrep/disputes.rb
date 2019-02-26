@@ -655,22 +655,22 @@ module API
                     if details.notes.present?
                       details.notes.each do |note|
                         date = ''
-                        date = Date.parse(info_entry.ctime).to_s unless info_entry.ctime.blank?
+                        date = Date.parse(info_entry.mtime).to_s unless info_entry.ctime.blank?
 
-                        note_entries << {:state => info_entry.state, :date => date, :sort_date => DateTime.parse(info_entry.ctime), :list_type => info_entry.list_type, :note => "#{note['user']} - #{note['ctime']}: #{note['note']}"}
+                        note_entries << {:state => info_entry.state, :date => date, :sort_date => DateTime.parse(info_entry.mtime), :list_type => info_entry.list_type, :note => "#{note['user']} - #{note['ctime']}: #{note['note']}"}
                       end
                     else
                       date = ''
-                      date = Date.parse(info_entry.ctime).to_s unless info_entry.ctime.blank?
+                      date = Date.parse(info_entry.mtime).to_s unless info_entry.ctime.blank?
 
-                      note_entries << {:state => info_entry.state, :date => date, :sort_date => DateTime.parse(info_entry.ctime), :list_type => info_entry.list_type, :note => ''}
+                      note_entries << {:state => info_entry.state, :date => date, :sort_date => DateTime.parse(info_entry.mtime), :list_type => info_entry.list_type, :note => ''}
                     end
                   end
                 rescue
                   date = ''
-                  date = Date.parse(info_entry.ctime).to_s unless info_entry.ctime.blank?
+                  date = Date.parse(info_entry.mtime).to_s unless info_entry.ctime.blank?
 
-                  note_entries << {:state => info_entry.state, :date => date, :sort_date => DateTime.parse(info_entry.ctime), :list_type => info_entry.list_type, :note => ''}
+                  note_entries << {:state => info_entry.state, :date => date, :sort_date => DateTime.parse(info_entry.mtime), :list_type => info_entry.list_type, :note => ''}
                   next
                 end
               end
