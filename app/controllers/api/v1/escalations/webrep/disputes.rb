@@ -648,16 +648,27 @@ module API
               information = Wbrs::ManualWlbl.where({:url => entry})
 
               information.each do |info_entry|
-                if info_entry.url == entry
-                  details = Wbrs::ManualWlbl.find(info_entry.id)
-                  details.notes.each do |note|
-                    date = ''
-                    date = Date.parse(note['ctime']).to_s unless note['ctime'].blank?
-                    note_entries << {:state => info_entry.state, :date => date, :list_type => info_entry.list_type, :note => "#{note['user']} - #{note['ctime']}: #{note['note']}"}
+                begin
+                  if info_entry.url == entry
+                    details = Wbrs::ManualWlbl.find(info_entry.id)
+
+                    if details.present?
+                      if details.notes.present?
+                        details.notes.each do |note|
+                          date = ''
+                          date = Date.parse(note['ctime']).to_s unless note['ctime'].blank?
+                          note_entries << {:state => info_entry.state, :date => date, :list_type => info_entry.list_type, :note => "#{note['user']} - #{note['ctime']}: #{note['note']}"}
+                        end
+                      else
+                        date = Date.parse(info_entry.ctime).to_s unless info_entry.ctime.blank?
+                        note_entries << {:state => info_entry.state, :date => date, :list_type => info_entry.list_type, :note => ''}
+                      end
+                    end
                   end
+                rescue
+                  next
                 end
               end
-
 
               return {:status => "success", :data => note_entries}.to_json
 
