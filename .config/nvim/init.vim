@@ -22,6 +22,7 @@ Plug 'wesQ3/vim-windowswap'
 Plug 'SirVer/ultisnips'
 Plug 'junegunn/fzf', { 'dir': '~/.fzf', 'do': './install --all' }
 Plug 'junegunn/fzf.vim'
+Plug 'wincent/ferret'
 Plug 'benmills/vimux'
 Plug 'jeetsukumaran/vim-buffergator'
 Plug 'gilsondev/searchtasks.vim'
@@ -54,6 +55,7 @@ Plug 'kablamo/vim-git-log'
 Plug 'gregsexton/gitv'
 Plug 'tpope/vim-fugitive'
 Plug 'jaxbot/github-issues.vim'
+Plug 'airblade/vim-gitgutter'
 
 " Elixir Support
 Plug 'elixir-lang/vim-elixir'

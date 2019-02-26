@@ -21,8 +21,8 @@ POWERLEVEL9K_BATTERY_STAGES=($'\uf579' $'\uf57a' $'\uf57b' $'\uf57c' $'\uf57d' $
 POWERLEVEL9K_BATTERY_LEVEL_BACKGROUND=(red3 darkorange3 darkgoldenrod gold3 yellow3 chartreuse2 mediumspringgreen green3 green3 green4 darkgreen)
 POWERLEVEL9K_BATTERY_VERBOSE=false
 
-POWERLEVEL9K_CUSTOM_RUBY_VERSION="echo '\ue23e' `asdf current ruby | sed -ne \
-  's/[^0-9]*\(\([0-9]\.\)\{0,4\}[0-9][^.]\).*/\1/p'`"
+POWERLEVEL9K_CUSTOM_RUBY_VERSION="echo '\ue23e' `(cd $PWD && asdf current ruby | sed -ne \
+  's/[^0-9]*\(\([0-9]\.\)\{0,4\}[0-9][^.]\).*/\1/p')`"
 POWERLEVEL9K_CUSTOM_RUBY_VERSION_BACKGROUND="red"
 POWERLEVEL9K_CUSTOM_RUBY_VERSION_FOREGROUND="black"
 
