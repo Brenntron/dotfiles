@@ -657,29 +657,27 @@ module API
                         date = ''
                         date = Date.parse(info_entry.ctime).to_s unless info_entry.ctime.blank?
 
-                        note_entries << {:state => info_entry.state, :date => date, :list_type => info_entry.list_type, :note => "#{note['user']} - #{note['ctime']}: #{note['note']}"}
+                        note_entries << {:state => info_entry.state, :date => date, :sort_date => DateTime.parse(info_entry.ctime), :list_type => info_entry.list_type, :note => "#{note['user']} - #{note['ctime']}: #{note['note']}"}
                       end
                     else
                       date = ''
                       date = Date.parse(info_entry.ctime).to_s unless info_entry.ctime.blank?
 
-                      note_entries << {:state => info_entry.state, :date => date, :list_type => info_entry.list_type, :note => ''}
+                      note_entries << {:state => info_entry.state, :date => date, :sort_date => DateTime.parse(info_entry.ctime), :list_type => info_entry.list_type, :note => ''}
                     end
-
                   end
                 rescue
                   date = ''
                   date = Date.parse(info_entry.ctime).to_s unless info_entry.ctime.blank?
 
-                  note_entries << {:state => info_entry.state, :date => date, :list_type => info_entry.list_type, :note => ''}
+                  note_entries << {:state => info_entry.state, :date => date, :sort_date => DateTime.parse(info_entry.ctime), :list_type => info_entry.list_type, :note => ''}
                   next
                 end
               end
 
-              note_entries = note_entries.sort_by{|vn| vn[:date]}.reverse
+              note_entries = note_entries.sort_by{|vn| vn[:sort_date]}.reverse
 
               return {:status => "success", :data => note_entries}.to_json
-
             end
 
             desc 'Autopopulate fields on Advanced Search'
