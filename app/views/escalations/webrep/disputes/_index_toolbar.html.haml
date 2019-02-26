@@ -314,49 +314,106 @@
                   Submit Changes
 
     %span.dropdown
-      %button.toolbar-button.adjust-reptool-button.dropdown-button-margin-right.dropdown-toggle#reptool_index_entries_button.esc-tooltipped{title: 'Adjust RepTool BL', 'data-toggle': 'dropdown', 'aria-haspopup': 'true', 'aria-expanded': 'false'}
+      %button.toolbar-button.adjust-reptool-button.dropdown-button-margin-right.dropdown-toggle#reptool_index_entries_button.esc-tooltipped{title: 'Adjust RepTool BL', 'data-toggle': 'dropdown', 'aria-haspopup': 'true', 'aria-expanded': 'false', onclick: 'bulk_get_current_reptool("index");'}
         %span.toolbar-button-text
           Adjust RepTool BL
       .dropdown-menu.toolbar-dropdown#reptool_adjust_entries{'aria-labelledby': 'reptool_entries_button'}
         =form_for :reptool, html: {class: 'adjust-reptool-form'} do |rep_form|
-
           .dispute-reptool-adjust-wrapper
-            .dispute-name-wrapper
-              %label.content-label-sm Dispute
-              %br
-              %span.entry-dispute-name
+            .dropdown-tool-text-divider.primary-text-divider
+              Current Reptool Classification
             %table.dispute_tool_current
-              %tr
-                %td
-                  %label.content-label-sm Classification
-                  %br
-                  %span.entry-reptool-class
-                %td
-                  %label.content-label-sm Expiration
-                  %br
-                  %span.entry-reptool-expiration
-            .inline-tool-content-wrapper
-              .toolbar
-                %div
-                  %label.toolbar-section-label{for: 'blacklist-action-select'} Status
-                  = rep_form.select(:action, ['ACTIVE', 'EXPIRED'],
-                            {include_blank: true},
-                            class: 'toolbar-select select-status adjust-reptool-bl-input action-input',
-                            title: 'RepTool Rule Status',
-                            id: "blacklist-action-select")
+              %thead
+                %tr
+                  %th.content-label-sm Dispute
+                  %th.content-label-sm Active Classes | Expiration
+                  %th.content-label-sm Comment
+              %tbody
+            -# Each checked entry will populate information here
 
-                %div
-                  %label.toolbar-section-label{for: 'blacklist-classifications-select'} RepTool WL/BL
-                  = rep_form.select(:classification, RepApi::Blacklist.classifications,
-                            {include_blank: true},
-                            class: 'toolbar-select select-rt-rule adjust-reptool-bl-input classifications-input',
-                            title: "RepTool BL Rules",
-                            id: "blacklist-classifications-select")
+            .dropdown-tool-text-divider.secondary-text-divider
+              Adjust Reptool Classification
+
+            .inline-tool-content-wrapper
+              .row
+                .col-xs-12
+                  %input{type: 'radio', name: 'reptool-action-radio', id: 'reptool-maintain', value: 'reptool-maintain', checked: true}
+                  %label.radio-label{for: 'reptool-maintain'} Maintain current classifications
+                  %input{type: 'radio', name: 'reptool-action-radio', id: 'reptool-override', value: 'reptool-override'}
+                  %label.radio-label{for: 'reptool-override'} Replace current classifications
+                  %input{type: 'radio', name: 'reptool-action-radio', id: 'reptool-drop', value: 'reptool-drop'}
+                  %label.radio-label{for: 'reptool-drop'} Drop all classifications (set entry to EXPIRED)
+              %hr.thin.form-divider
+              .row#reptool-classifications-row
+                .col-xs-12
+                  %label.content-label-sm{for: "reptool-class-type-select"} Classifications
+                  .row.dropdown-tool-grey-row.nested-radio-row#reptool-class-radio-row
+                    .col-xs-6
+                      %input{type: 'radio', name: 'reptool-classes-radio', id: 'reptool-classes-add', value: 'add', checked: true}
+                      %label.radio-label{for: 'reptool-classes-add'} Add selected classifications
+                    .col-xs-6
+                      %input{type: 'radio', name: 'reptool-classes-radio', id: 'reptool-classes-remove', value: 'remove'}
+                      %label.radio-label{for: 'reptool-classes-remove'} Remove selected classifications
+                  %hr.thin.form-divider
+                  .row.dropdown-tool-grey-row
+                    .col-xs-4
+                      %ul
+                        %li
+                          %input.reptool-class-cb{type: 'checkbox', name: 'classification', value: 'attackers'}
+                            attackers
+                        %li
+                          %input.reptool-class-cb{type: 'checkbox', name: 'classification', value: 'bogon'}
+                            bogon
+                        %li
+                          %input.reptool-class-cb{type: 'checkbox', name: 'classification', value: 'bots'}
+                            bots
+                        %li
+                          %input.reptool-class-cb{type: 'checkbox', name: 'classification', value: 'cnc'}
+                            cnc
+                        %li
+                          %input.reptool-class-cb{type: 'checkbox', name: 'classification', value: 'cryptomining'}
+                            cryptomining
+                    .col-xs-4
+                      %ul
+                        %li
+                          %input.reptool-class-cb{type: 'checkbox', name: 'classification', value: 'dga'}
+                            dga
+                        %li
+                          %input.reptool-class-cb{type: 'checkbox', name: 'classification', value: 'exploitkit'}
+                            exploitkit
+                        %li
+                          %input.reptool-class-cb{type: 'checkbox', name: 'classification', value: 'malware'}
+                            malware
+                        %li
+                          %input.reptool-class-cb{type: 'checkbox', name: 'classification', value: 'open_proxy'}
+                            open_proxy
+                        %li
+                          %input.reptool-class-cb{type: 'checkbox', name: 'classification', value: 'open_relay'}
+                            open_relay
+                    .col-xs-4
+                      %ul
+                        %li
+                          %input.reptool-class-cb{type: 'checkbox', name: 'classification', value: 'phishing'}
+                            phishing
+                        %li
+                          %input.reptool-class-cb{type: 'checkbox', name: 'classification', value: 'response'}
+                            response
+                        %li
+                          %input.reptool-class-cb{type: 'checkbox', name: 'classification', value: 'spam'}
+                            spam
+                        %li
+                          %input.reptool-class-cb{type: 'checkbox', name: 'classification', value: 'suspicious'}
+                            suspicious
+                        %li
+                          %input.reptool-class-cb{type: 'checkbox', name: 'classification', value: 'tor_exit_node'}
+                            tor_exit_node
+
               .comment-wrapper
-                %label.content-label-sm Comment
+                %label.content-label-sm RepTool Comment
                 %textarea.dropdown-comment.adjust-reptool-bl-input.comment-input
+              %hr.thin
               .button-row-center
-                %button.primary.dropdown-submit-button{type: 'button', onclick: 'toolbar_adjust_reptool_bl_button(this)', disabled: true}
+                %button.primary.dropdown-submit-button{type: 'button', onclick: 'submit_bulk_reptool()', disabled: true}
                   Submit Changes
   %div
     %label.toolbar-section-label

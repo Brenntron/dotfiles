@@ -309,6 +309,31 @@ module API
               end
             end
 
+            desc "Maintain current classifications for RepTool BL entries"
+            params do
+              requires :data, type: Array
+            end
+            post "maintain_reptool_bl" do
+              std_api_v2 do
+                permitted_params['data'].each do |entry|
+                  RepApi::Blacklist.adjust_from_params(entry, username: current_user.cvs_username)
+                end
+                true
+              end
+            end
+
+            desc "Drop a Reptool Bl entry"
+            params do
+              requires :action, type: String, desc: "activate or expire"
+              requires :entries, type: Array[String], desc: "urls"
+            end
+            post "drop_reptool_bl" do
+              std_api_v2 do
+                RepApi::Blacklist.adjust_from_params(permitted_params, username: current_user.cvs_username)
+                true
+              end
+            end
+
             desc "Sync data for all dispute entry children"
             params do
               requires :dispute_id
@@ -588,7 +613,8 @@ module API
               information = JSON.parse(information)
 
               if information[params[:entry].gsub('http://', '').gsub('https://', '')] == "NOT_FOUND"
-                return {:classification => "not found", :expiration => "", :status => "", :comment => ""}.to_json
+                return {:entry => params[:entry], :classification => "not found", :expiration => "", :status => "", :comment => ""}.to_json
+              # TODO Make expiration human readable - Just the date
               else
                 expiration = ""
                 begin
@@ -596,9 +622,36 @@ module API
                 rescue
                   expiration = information[params[:entry].gsub('http://', '').gsub('https://', '')]["expiration"]
                 end
-                return {:classification => information[params[:entry].gsub('http://', '').gsub('https://', '')]["classifications"].first, :expiration => expiration, :status => information[params[:entry].gsub('http://', '').gsub('https://', '')]["status"], :comment => information[params[:entry].gsub('http://', '').gsub('https://', '')]["metadata"]["VRT"]["comment"]}.to_json
+                return {:entry => params[:entry], :classification => information[params[:entry].gsub('http://', '').gsub('https://', '')]["classifications"].first, :expiration => expiration, :status => information[params[:entry].gsub('http://', '').gsub('https://', '')]["status"], :comment => information[params[:entry].gsub('http://', '').gsub('https://', '')]["metadata"]["VRT"]["comment"]}.to_json
               end
 
+            end
+
+            params do
+              requires :ip_uris, type: Array[String]
+            end
+
+            post 'bulk_reptool_get_info_for_form' do
+              std_api_v2 do
+                api_response = JSON.parse(RepApi::Blacklist.where({entries: permitted_params[:ip_uris] }, true))
+                return_data = []
+
+                api_response.each do |key, value|
+                  if value == 'NOT_FOUND'
+                    return_data.push(:entry => key, :classification => "No active classifications", :expiration => "", :status => "INACTIVE", :comment => "")
+                    # TODO Make expiration human readable - Just the date
+                  else
+                    expiration = ""
+                    begin
+                      expiration = Date.parse(value["expiration"]).to_s
+                    rescue
+                      expiration = value["expiration"]
+                    end
+                    return_data.push(:entry => key, :classification => value["classifications"], :expiration => expiration, :status => value["status"], :comment => value["metadata"]["VRT"]["comment"]).to_json
+                  end
+                end
+                return_data.to_json
+              end
             end
 
             params do
