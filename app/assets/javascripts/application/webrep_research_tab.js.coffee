@@ -249,8 +249,14 @@ $ ->
 
   ## WL/BL Form manipulation
   $('.wl-bl-list-inline').click ->
-    wlbl_entries = $('#wlbl_adjust_entries').find('.wlbl-dropdown-row')
-    wlbl_submit = $('#wlbl_adjust_entries').find('.dropdown-submit-button')
+    page = ''
+    if $('#wlbl_adjust_entries_index').length > 0
+      page = $('#wlbl_adjust_entries_index')
+    else if $('#wlbl_adjust_entries').length > 0
+      page = $('#wlbl_adjust_entries')
+
+    wlbl_entries = $(page).find('.wlbl-dropdown-row')
+    wlbl_submit = $(page).find('.dropdown-submit-button')
     if wlbl_entries.length > 0 && $('.wl-bl-list-inline:checked').length > 0
       wlbl_submit.attr('disabled', false)
     else
@@ -316,7 +322,6 @@ $ ->
           entry_row = $(this).parents('.research-table-row')[0]
           entry_content = $(entry_row).find('.entry-data-content').text()
           wbrs = $(entry_row).find(current_wbrs).text()
-          console.log wbrs[0]
           data['entries'].push(entry_content)
 
         else if row == '.index-entry-row'
@@ -324,7 +329,6 @@ $ ->
           entry_content = $(entry_row).find('.entry-col-content').text()
           data['entries'].push("\n" + entry_content + "\n")
           wbrs = $(entry_row).find(current_wbrs).text()
-          console.log wbrs[0]
 
       std_msg_ajax(
         url: '/escalations/api/v1/escalations/webrep/disputes/bulk_rule_ui_wlbl_get_info_for_form'
@@ -333,7 +337,6 @@ $ ->
         success: (response) ->
           $(tbody).empty()
           response = JSON.parse(response)
-          console.log response
           for entry in response
             ip_uri = entry['ip_uri']
             list_types = entry['list_types']
@@ -369,41 +372,43 @@ $ ->
     wlbl_comment = ''
     dropdown = ''
 
-    if page == 'index'
-      dropdown = $('#wlbl_adjust_entries_index')
-    else if page == 'show' || page == 'research'
-      dropdown = $('#wlbl_adjust_entries')
+    if $('.wl-bl-list-inline:checkbox:checked').length > 0
 
-    entries = $(dropdown).find('.wlbl-entry-content')
-    wlbl_comment = $(dropdown).find('.adjust-wlbl-input').val()
+      if page == 'index'
+        dropdown = $('#wlbl_adjust_entries_index')
+      else if page == 'show' || page == 'research'
+        dropdown = $('#wlbl_adjust_entries')
 
-    if $(entries).length > 0
-      $(entries).each ->
-        entry = $(this).text()
-        ip_uris.push(entry)
+      entries = $(dropdown).find('.wlbl-entry-content')
+      wlbl_comment = $(dropdown).find('.adjust-wlbl-input').val()
 
-    data = {ip_uris: ip_uris, list_types: list_types, note: wlbl_comment}
+      if $(entries).length > 0
+        $(entries).each ->
+          entry = $(this).text()
+          ip_uris.push(entry)
 
-    if $('#wlbl-remove').prop('checked') == true
-      std_msg_ajax(
-        url: '/escalations/api/v1/escalations/webrep/disputes/bulk_rule_ui_wlbl_remove'
-        method: 'POST'
-        data: data
-        success: (response) ->
-          std_msg_success("The following entries have been removed from " + list_types, ip_uris)
-        error: (response) ->
-          std_api_error(response, 'Error retrieving WL/BL Data')
-      )
-    else if $('#wlbl-add').prop('checked') == true
-      std_msg_ajax(
-        url: '/escalations/api/v1/escalations/webrep/disputes/bulk_rule_ui_wlbl_add'
-        method: 'POST'
-        data: data
-        success: (response) ->
-          std_msg_success("The following entries have been added to " + list_types, ip_uris)
-        error: (response) ->
-          std_api_error(response, 'Error retrieving WL/BL Data')
-      )
+      data = {ip_uris: ip_uris, list_types: list_types, note: wlbl_comment}
+
+      if $('#wlbl-remove').prop('checked') == true
+        std_msg_ajax(
+          url: '/escalations/api/v1/escalations/webrep/disputes/bulk_rule_ui_wlbl_remove'
+          method: 'POST'
+          data: data
+          success: (response) ->
+            std_msg_success("The following entries have been removed from " + list_types, ip_uris)
+          error: (response) ->
+            std_api_error(response, 'Error retrieving WL/BL Data')
+        )
+      else if $('#wlbl-add').prop('checked') == true
+        std_msg_ajax(
+          url: '/escalations/api/v1/escalations/webrep/disputes/bulk_rule_ui_wlbl_add'
+          method: 'POST'
+          data: data
+          success: (response) ->
+            std_msg_success("The following entries have been added to " + list_types, ip_uris)
+          error: (response) ->
+            std_api_error(response, 'Error retrieving WL/BL Data')
+        )
 
 
 
