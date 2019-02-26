@@ -150,7 +150,7 @@ $ ->
   window.bulk_get_current_reptool = (page) ->
 
     # Define the variables based on the page
-    if page == "show"
+    if page == "show" || page == "research"
       checkbox = $('.dispute_check_box:checked')
     else if page == "index"
       checkbox = $('.dispute-entry-checkbox:checked')
@@ -168,7 +168,7 @@ $ ->
     if ($(checkbox).length > 0)
       ip_uris = []
       $(checkbox).each ->
-        if page == "show"
+        if page == "show" || page == "research"
           entry_row = $(this).parents('.research-table-row')[0]
           entry_content = $(entry_row).find('.entry-data-content').text().trim()
         else if page == "index"
