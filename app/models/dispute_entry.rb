@@ -198,13 +198,15 @@ class DisputeEntry < ApplicationRecord
 
   def self.domain_of_with_path(urls)
     if urls.kind_of?(String)
-      if !url.start_with?( 'http', 'https')
-        url = "http://" + url
+      if !urls.start_with?( 'http', 'https')
+        url = "http://" + urls
       end
 
       clean_url = Addressable::URI.parse(url)
       clean_host = clean_url.host + clean_url.path
-      clean_host.sub(/^www\./, '')
+      clean_host = clean_host.sub(/^www\./, '')
+
+      response = clean_host
     elsif urls.kind_of?(Array)
       response = []
       urls.each do |url|
@@ -220,8 +222,9 @@ class DisputeEntry < ApplicationRecord
           response << clean_host
         end
       end
-      response
     end
+
+    response
   end
 
   def self.domain_of_with_path_from_array(urls)
