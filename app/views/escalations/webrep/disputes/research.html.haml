@@ -1,16 +1,22 @@
 .content-wrapper
   .reputation-research-search-wrapper
-    %h1 Reputation Research
-    = form_for(:search, method: "get") do |search_form|
-      = search_form.text_field(:uri, class: 'search-box', placeholder: 'URI or IP Address', autofocus: 'true')
-      .row.search-options-row
-        .col-xs-6
+    .research-header-wrapper
+      %h1 Reputation Research
+      %span.icon-research.top-info-icon
+    .research-search-form.row
+      = form_for(:search, method: "get") do |search_form|
+        .col-xs-4.col-sm-3.col-md-2.col-lg-2.col-xl-1.search-options-col
           = search_form.radio_button(:scope, 'strict', id: 'research-search-strict', checked: params['search'] && params['search']['scope'].eql?("strict"))
           %label{for: 'research-search-strict'} Strict Search
-        .col-xs-6
+          %br
           = search_form.radio_button(:scope, 'broad', id: 'research-search-broad', checked: !params['search'] || params['search']['scope'].eql?("broad"))
           %label{for: 'research-search-broad'} Broad Search
-      =search_form.submit :Submit, id: 'submit-button'
+          %hr.thin
+          =search_form.submit(:Submit, id: 'submit-button', class: 'button_primary')
+        .col-xs-8.col-sm-9.col-md-10.col-lg-10.col-xl-11.search-box-col
+          = search_form.text_field(:uri, class: 'search-box', placeholder: 'URI or IP Address', autofocus: 'true')
+
+
   .row
     .col-xs-12
       - if params['search']

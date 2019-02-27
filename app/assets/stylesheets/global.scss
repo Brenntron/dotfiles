@@ -5015,8 +5015,7 @@ input.table-entry-input:focus {
 
 .reputation-research-search-wrapper {
   margin: -15px -15px 40px -15px;
-  text-align: center;
-  padding: 40px 20px;
+  //padding: 40px 20px;
   background-color: $content-tab-color;
   border-radius: 4px 4px 0 0 ;
 }
@@ -5026,12 +5025,32 @@ input.table-entry-input:focus {
   margin-bottom: 20px;
 }
 
+.reputation-research-search-wrapper .top-info-icon {
+  width: 27px;
+  height: 27px;
+  margin: 0 0 -3px 15px;
+}
+
 .reputation-research-search-wrapper .search-box {
   background-position: right 6px center;
   padding-left: 10px;
   padding-right: 26px;
-  height: 28px;
-  max-width: 500px;
+  min-height: 174px;
+}
+
+.research-search-form {
+  background-color: lighten($content-tab-color, 6%);
+  margin: 15px -15px -15px -15px;
+  padding: 20px;
+  display: block;
+}
+
+.research-search-form .button_primary {
+  margin: 10px 0;
+}
+
+.research-search-form hr.thin {
+  opacity: 0.3;
 }
 
 #disputes-research-table label, #edit-ticket-status-dropdown label {
@@ -5461,19 +5480,27 @@ button.dropdown-submit-button {
   text-align: center;
 }
 
-.search-options-row {
-  max-width: 250px;
-  margin: 12px auto;
+.search-options-col {
+  //max-width: 250px;
+  //display: block;
+  //float: left;
+  //margin-right: 20px;
 }
-.search-options-row label {
+
+.search-options-col label {
   margin-left: 8px;
   color: $content-bg-color;
   font-size: 8pt;
   font-weight: 400;
+  padding: 8px 0;
 }
 
-.search-options-row input[type="radio"] {
+.search-options-col input[type="radio"] {
   border: none;
+}
+
+.search-box-col {
+  //display: block;
 }
 
 .toggle-switch {
@@ -5615,7 +5642,7 @@ table.dispute_tool_current tr:last-of-type td {
 .dispute-EW, .dispute-ew {background-image: url(image_path('icon_type_email_web.svg'));}
 
 
-.team-dashboard-header-area, .dashboard-header-area, .complaint-mgt-top-area{
+.team-dashboard-header-area, .dashboard-header-area, .complaint-mgt-top-area, .reputation-research-search-wrapper {
   background-color: $content-tab-color;
   margin-top: -15px;
   margin-right: -15px;
@@ -5633,14 +5660,9 @@ table.dispute_tool_current tr:last-of-type td {
   display: inline-flex;
 }
 
-.dashboard-header-area h1, .complaint-mgt-top-area h1 {
+.dashboard-header-area h1, .complaint-mgt-top-area h1, .reputation-research-search-wrapper h1 {
   color: $content-bg-color;
-  margin-bottom: 24px;
-  display: inline-block;
-}
-
-.complaint-mgt-top-area h1 {
-  color: $content-bg-color;
+  margin-bottom: 6px;
   display: inline-block;
 }
 
@@ -7500,7 +7522,7 @@ td.text-center span {
 // Cluster top bar header
 .cluster-mgt-top-area {
   background-color: $content-tab-color;
-  padding-bottom: 25px;
+  padding-bottom: 20px;
 
   .search-box {
     background-image: none;
