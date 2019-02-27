@@ -597,7 +597,7 @@ class ComplaintEntry < ApplicationRecord
       prefix_id = prefix_results.first.prefix_id
     end
     if prefix_id.present?
-      prefix_history = Wbrs::HistoryRecord.where({:prefix_id => prefix_id}).sort_by {|history| history.time}.reverse
+      prefix_history = Wbrs::HistoryRecord.where({:prefix_id => prefix_id}).sort_by {|history| DateTime.parse(history.time)}.reverse
     else
       prefix_history = []
     end
