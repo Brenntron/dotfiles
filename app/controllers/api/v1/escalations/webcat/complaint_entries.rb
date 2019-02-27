@@ -320,7 +320,7 @@ module API
               std_api_v2 do
                 begin
                   prefix_id = Wbrs::Prefix.where(:urls => [permitted_params['url']]).first.prefix_id
-                  response = Wbrs::HistoryRecord.where({:prefix_id => prefix_id}).sort_by {|history| history.time}.reverse
+                  response = Wbrs::HistoryRecord.where({:prefix_id => prefix_id}).sort_by {|history| DateTime.parse(history.time)}.reverse
                   render response.to_json
                 rescue
                   raise 'The URL you provided does not have available data.'
