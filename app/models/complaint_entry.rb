@@ -567,7 +567,7 @@ class ComplaintEntry < ApplicationRecord
     final_results = []
     categories = prefix_results.find_all {|result| result.path == self.path}
     categories.each do |cat|
-      if cat.subdomain == self.subdomain
+      if (cat.subdomain == self.subdomain) || (self.subdomain == 'www')
         final_results << cat
       end
     end
