@@ -649,9 +649,9 @@ module API
 
               api_response.each do |response|
                 begin
-                  note_entries = note_entries + Wbrs::ManualWlbl.add_to_history_modal(response, entry)
+                  note_entries = note_entries + Wbrs::ManualWlbl.gather_history_entries(response, entry)
                 rescue
-                  note_entries = note_entries + Wbrs::ManualWlbl.add_to_history_modal_with_note(response,'')
+                  note_entries = note_entries + Wbrs::ManualWlbl.add_to_history_modal(response,'')
                   next
                 end
               end

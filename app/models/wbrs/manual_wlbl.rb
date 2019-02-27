@@ -199,7 +199,7 @@ class Wbrs::ManualWlbl < Wbrs::Base
     adjust_entries_from_params(entry_params.merge('dispute_entry_ids' => dispute_entry_ids), username: username)
   end
 
-  def self.add_to_history_modal(response, entry)
+  def self.gather_history_entries(response, entry)
     note_entries = []
 
     if response.url == entry
@@ -207,16 +207,16 @@ class Wbrs::ManualWlbl < Wbrs::Base
 
       if details.notes.any?
         details.notes.each do |note|
-          note_entries = note_entries + Wbrs::ManualWlbl.add_to_history_modal_with_note(response, "#{note['user']} - #{note['ctime']}: #{note['note']}")
+          note_entries = note_entries + Wbrs::ManualWlbl.add_to_history_modal(response, "#{note['user']} - #{note['ctime']}: #{note['note']}")
         end
       else
-        note_entries = note_entries + Wbrs::ManualWlbl.add_to_history_modal_with_note(response, "")
+        note_entries = note_entries + Wbrs::ManualWlbl.add_to_history_modal(response, "")
       end
     end
     note_entries
   end
 
-  def self.add_to_history_modal_with_note(response, note)
+  def self.add_to_history_modal(response, note)
     note_entries = []
     m_date = ''
     c_date = ''
