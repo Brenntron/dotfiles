@@ -112,4 +112,21 @@ class Wbrs::Prefix < Wbrs::Base
     options = { 'prefix_ids' => [ prefix_id ], 'user' => user }
     Wbrs::Prefix.post_request(path: '/v1/cat/rules/disable', body: Wbrs::Prefix.stringkey_params(options))
   end
+
+  def self.rulelib_rule_sources
+
+    response = Wbrs::Prefix.call_json_request(:get, "/v1/wbrsrulelib/cat/sources", body: {})
+    response_body = JSON.parse(response.body)
+    response_body
+  end
+
+  def self.get_certainty_sources_for_urls(urls)
+    options = {}
+    options[:urls] = urls
+    options[:strict_matching] = 1
+
+    response = Wbrs::Prefix.post_request(path: '/v1/wbrsrulelib/cat/rules', body: Wbrs::Prefix.stringkey_params(options))
+    response_body = JSON.parse(response.body)
+    response_body
+  end
 end

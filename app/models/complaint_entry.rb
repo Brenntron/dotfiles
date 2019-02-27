@@ -560,22 +560,76 @@ class ComplaintEntry < ApplicationRecord
   end
 
   def current_category_data
-    prefix = Wbrs::Prefix.where({:urls => [URI.escape(self.hostlookup)]})&.first
-    return {} unless prefix
+    prefix_results = Wbrs::Prefix.where({:urls => [URI.escape(self.hostlookup)]})
+    return {} unless prefix_results
+    certainty_on_urls = Wbrs::Prefix.get_certainty_sources_for_urls([self.hostlookup])
 
-    current_categories = prefix.categories
-
-    current_categories.inject({}) do |data, category|
-      data[category.category_id] = {
-          category_id: category.category_id,
-          desc_long: category.desc_long,
-          descr: category.descr,
-          mnem: category.mnem,
-          is_active: category.is_active,
-          confidence: category.confidence
-      }
-      data
+    final_results = []
+    categories = prefix_results.find_all {|result| result.path == self.path}
+    categories.each do |cat|
+      if cat.subdomain == self.subdomain
+        final_results << cat
+      end
     end
+
+    final_current_categories = {}
+
+    final_results.each do |result|
+      current_categories = result.categories
+      category_certainty = {}
+      certainty_on_urls.each do |cert_url, info|
+
+        info.each do |cert_info|
+          if cert_info['subdomain'] == result.subdomain && cert_info['path'] == result.path
+            if category_certainty[(cert_info['category_id'].to_i - 1000)].blank?
+              category_certainty[(cert_info['category_id'].to_i - 1000)] = []
+            end
+            #category_certainty[(cert_info['category_id'].to_i - 1000)] = {:category_id => cert_info['category_id'], :certainty => cert_info['certainty'], :source_mnemonic => cert_info['source_mnemonic'], :source_description => cert_info['source_description']}
+            category_certainty[(cert_info['category_id'].to_i - 1000)] << {:category_id => (cert_info['category_id'].to_i - 1000), :certainty => cert_info['certainty'], :source_mnemonic => cert_info['source_mnemonic'], :source_description => cert_info['source_description']}
+          end
+        end
+      end
+
+      final_current_categories = current_categories
+      final_current_categories = final_current_categories.inject({}) do |data, category|
+        top_certainty = ""
+        if category_certainty[category.category_id].present?
+          top_certainty = category_certainty[category.category_id].first[:certainty]
+          source = category_certainty[category.category_id].first[:source_description]
+
+        end
+        data[category.category_id] = {
+            category_id: category.category_id,
+            desc_long: category.desc_long,
+            descr: category.descr,
+            mnem: category.mnem,
+            is_active: category.is_active,
+            confidence: category.confidence,
+            top_certainty: top_certainty,
+            certainties: category_certainty[category.category_id]
+        }
+        data
+      end
+
+
+
+    end
+
+    final_current_categories
+
+    #current_categories = prefix.categories
+
+    #current_categories.inject({}) do |data, category|
+    #  data[category.category_id] = {
+    #      category_id: category.category_id,
+    #      desc_long: category.desc_long,
+    #      descr: category.descr,
+    #      mnem: category.mnem,
+    #      is_active: category.is_active,
+    #      confidence: category.confidence
+    #  }
+    #  data
+    #end
   end
 
   def self.get_category(uri_ip)

@@ -691,14 +691,24 @@ format = (complaint_entry_row) ->
   else
     fixed_radio = "checked='checked'"
 
+
+  category_row = ''
+  tooltip_table = ''
+  tooltip_all = ''
+  tooltip_wrapper_start = '<div class="tooltip_templates"><span id="'
+  tooltip_table_start = '<table class="category-tooltip-table"><thead><tr><th>Certainty</th><th>Source</th><th>Description</th></tr></thead><tbody>'
+  tooltip_table_guts = ''
+  tooltip_table_end = '</tbody></table>'
+  tooltip_wrapper_end = '</span></div>'
+
   std_msg_ajax(
     method: 'POST'
     url: '/escalations/api/v1/escalations/webcat/complaint_entries/retrieve_current_categories'
     data: {'id': complaint_entry.entry_id}
     success: (response) ->
       $('#loader-modal').modal 'hide'
-
       current_categories = JSON.parse(response)
+      categories = current_categories
 
       $.each current_categories, (key, value) ->
         category = this
@@ -708,26 +718,24 @@ format = (complaint_entry_row) ->
           mnemonic = this.mnem
           name = this.descr
           cat_id = this.category_id
-          top_certainty = 'N/A'
-          category_row = '<tr><td>' + confidence + '</td><td>' + mnemonic + ' - ' + name + '</td><td><span class="certainty-flag nested-tooltipped" onmouseover="triggerTooltips(this)" data-tooltip-content="#certainty_table' + complaint_entry.entry_id + '_' + cat_id + '">' + top_certainty + '</span>' + '</td></tr>'
+          top_certainty = this.top_certainty
+          certainties = this.certainties
+          $(certainties).each ->
+            source_certainty = this.certainty
+            source_description = this.source_description
+            source_name = this.source_mnemonic
+            certainty_row = '<tr><td>' + source_certainty + '</td><td>' + source_name + '</td><td>' + source_description + '</td></tr>'
+            tooltip_table_guts = tooltip_table_guts + certainty_row
+
+          tooltip_table = tooltip_table_start + tooltip_table_guts + tooltip_table_end
+          tooltip_all = tooltip_wrapper_start + 'certainty_table' + complaint_entry.entry_id + '_' + cat_id + '">' + tooltip_table + tooltip_wrapper_end
+          category_row = '<tr><td>' + confidence + '</td><td>' + mnemonic + ' - ' + name + '</td><td><span class="certainty-flag nested-tooltipped" onmouseover="triggerTooltips(this)" data-tooltip-content="#certainty_table' + complaint_entry.entry_id + '_' + cat_id + '">' + top_certainty + '</span>' + tooltip_all + '</td></tr>'
           $(".simple-nested-table" + "#" + complaint_entry.entry_id).append(category_row)
 
     error: (response) ->
       $('#loader-modal').modal 'hide'
       current_categories = ''
   )
-
-  if current_categories?
-    categories = current_categories
-    category_table = ''
-    category_row = ''
-    tooltip_table = ''
-    tooltip_all = ''
-    tooltip_wrapper_start = '<div class="tooltip_templates"><span id="'
-    tooltip_table_start = '<table class="category-tooltip-table"><thead><tr><th>Confidence</th><th>Source</th><th>Certainty</th></tr></thead><tbody>'
-    tooltip_table_end = '</tbody></table>'
-    tooltip_table_guts = ''
-    tooltip_wrapper_end = '</span></div>'
 
   if complaint_entry.entry_history?
     if complaint_entry.entry_history.complaint_history.length >= 1
@@ -741,7 +749,9 @@ format = (complaint_entry_row) ->
   complaint_entry_html = ''
   if complaint_entry.status == "PENDING"
     input_cat = 'input_cat_' + complaint_entry.entry_id
-    complaint_entry_html = '<table><tr class="pending"><td class="no_pad"><div class="row">' +
+
+    complaint_entry_html =
+      '<table><tr><td class="no_pad"><div class="row">' +
       '<div class="col-xs-12 col-sm-6 nested-complaint-static-data">' +
       '<div class="row">' +
       '<div class="col-xs-5 col-with-divider">' +
@@ -792,7 +802,9 @@ format = (complaint_entry_row) ->
   else
     input_cat = 'input_cat_' + complaint_entry.entry_id
 
-    complaint_entry_html = '<table><tr type="submit_changes" entry_id="' + complaint_entry.entry_id + '"  row_id = "' + row_id + '"><td class="no_pad"><div class="row"><div class="col-xs-12 col-sm-6 nested-complaint-static-data">' +
+
+    complaint_entry_html =
+      '<table><tr><td class="no_pad"><div class="row"><div class="col-xs-12 col-sm-6 nested-complaint-static-data">' +
       '<div class="row">' +
       '<div class="col-xs-5 col-with-divider">' +
       '<div class="screenshot-thumb-wrapper">' +
