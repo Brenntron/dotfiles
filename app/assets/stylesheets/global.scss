@@ -5032,9 +5032,10 @@ input.table-entry-input:focus {
 }
 
 .reputation-research-search-wrapper .search-box {
-  background-position: right 6px center;
-  padding-left: 10px;
-  padding-right: 26px;
+  background-image: none;
+  padding: 4px 6px;
+  font-size: 8pt;
+  line-height: 1.25em;
   min-height: 174px;
 }
 
