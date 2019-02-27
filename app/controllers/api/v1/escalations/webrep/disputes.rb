@@ -785,22 +785,20 @@ module API
                 entry = params[:entry]
               end
 
-              information = Wbrs::ManualWlbl.where({:url => entry})
+              api_response = Wbrs::ManualWlbl.where({:url => entry})
 
-              information.each do |info_entry|
-                if info_entry.url == entry
-                  details = Wbrs::ManualWlbl.find(info_entry.id)
-                  details.notes.each do |note|
-                    date = ''
-                    date = Date.parse(note['ctime']).to_s unless note['ctime'].blank?
-                    note_entries << {:state => info_entry.state, :date => date, :list_type => info_entry.list_type, :note => "#{note['user']} - #{note['ctime']}: #{note['note']}"}
-                  end
+              api_response.each do |response|
+                begin
+                  note_entries = note_entries + Wbrs::ManualWlbl.gather_history_entries(response, entry)
+                rescue
+                  note_entries = note_entries + Wbrs::ManualWlbl.add_to_history_modal(response,'')
+                  next
                 end
               end
 
+              note_entries = note_entries.sort_by{|vn| vn[:sort_date]}.reverse
 
               return {:status => "success", :data => note_entries}.to_json
-
             end
 
             desc 'Autopopulate fields on Advanced Search'

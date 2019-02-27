@@ -53,6 +53,7 @@ module API
                                                                user: current_user)
 
               if complaint_entries
+
                 complaint_entries.each do |complaint_entry|
                   complaint_entry_packet = {}
                   complaint_entry_packet[:age] = ComplaintEntry.what_time_is_it((Time.now - complaint_entry.created_at).to_i)
@@ -102,8 +103,6 @@ module API
                   complaint_entry_packet[:screen_shot_error] = complaint_entry&.complaint_entry_screenshot&.error_message
 
                   complaint_entry_packet[:description] = complaint_entry&.complaint&.description
-
-                  # Need to rip this out, because if current category information changes, preload data will be out of date
 
                   #fake it til they make it
                   # fake_ass_bullshit = {}
@@ -320,7 +319,7 @@ module API
               std_api_v2 do
                 begin
                   prefix_id = Wbrs::Prefix.where(:urls => [permitted_params['url']]).first.prefix_id
-                  response = Wbrs::HistoryRecord.where({:prefix_id => prefix_id}).sort_by {|history| history.time}.reverse
+                  response = Wbrs::HistoryRecord.where({:prefix_id => prefix_id}).sort_by {|history| DateTime.parse(history.time)}.reverse
                   render response.to_json
                 rescue
                   raise 'The URL you provided does not have available data.'
