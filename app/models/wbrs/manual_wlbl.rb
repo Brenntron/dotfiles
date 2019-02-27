@@ -198,4 +198,56 @@ class Wbrs::ManualWlbl < Wbrs::Base
     dispute_entry_ids = DisputeEntry.where(dispute_id: dispute_ids).pluck(:id)
     adjust_entries_from_params(entry_params.merge('dispute_entry_ids' => dispute_entry_ids), username: username)
   end
+
+  def self.add_to_history_modal(response, entry)
+    note_entries = []
+
+    if response.url == entry
+      details = Wbrs::ManualWlbl.find(response.id)
+
+      if details.notes.any?
+        details.notes.each do |note|
+          note_entries << Wbrs::ManualWlbl.add_to_history_modal_with_note(response, note)
+        end
+      else
+        note_entries << Wbrs::ManualWlbl.add_to_history_modal_without_note(response, note)
+      end
+    end
+
+    note_entries
+  end
+
+  def self.add_to_history_modal_with_note(response, note)
+    note_entries = []
+    m_date = ''
+    c_date = ''
+    m_date = Date.parse(response.mtime).to_s unless response.mtime.blank?
+    c_date = Date.parse(response.ctime).to_s unless response.ctime.blank?
+
+    if response.ctime != response.mtime
+      note_entries << {:state => response.state, :date => m_date, :sort_date => DateTime.parse(response.mtime), :list_type => response.list_type, :note => "#{note['user']} - #{note['ctime']}: #{note['note']}"}
+      note_entries << {:state => response.state, :date => c_date, :sort_date => DateTime.parse(response.ctime), :list_type => response.list_type, :note => "#{note['user']} - #{note['ctime']}: #{note['note']}"}
+    else
+      note_entries << {:state => response.state, :date => c_date, :sort_date => DateTime.parse(response.ctime), :list_type => response.list_type, :note => "#{note['user']} - #{note['ctime']}: #{note['note']}"}
+    end
+
+    note_entries
+  end
+
+  def self.add_to_history_modal_without_note(response)
+    note_entries = []
+    m_date = ''
+    c_date = ''
+    m_date = Date.parse(response.mtime).to_s unless response.mtime.blank?
+    c_date = Date.parse(response.ctime).to_s unless response.ctime.blank?
+
+    if response.ctime != response.mtime
+      note_entries << {:state => response.state, :date => m_date, :sort_date => DateTime.parse(response.mtime), :list_type => response.list_type, :note =>''}
+      note_entries << {:state => response.state, :date => c_date, :sort_date => DateTime.parse(response.ctime), :list_type => response.list_type, :note =>''}
+    else
+      note_entries << {:state => response.state, :date => c_date, :sort_date => DateTime.parse(response.ctime), :list_type => response.list_type, :note =>''}
+    end
+
+    note_entries
+  end
 end

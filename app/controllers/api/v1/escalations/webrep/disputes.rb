@@ -645,47 +645,13 @@ module API
                 entry = params[:entry]
               end
 
-              information = Wbrs::ManualWlbl.where({:url => entry})
+              api_response = Wbrs::ManualWlbl.where({:url => entry})
 
-              information.each do |info_entry|
+              api_response.each do |response|
                 begin
-                  if info_entry.url == entry
-                    details = Wbrs::ManualWlbl.find(info_entry.id)
-
-                    if details.notes.present?
-                      details.notes.each do |note|
-                        m_date = Date.parse(info_entry.mtime).to_s unless info_entry.mtime.blank?
-                        c_date = Date.parse(info_entry.ctime).to_s unless info_entry.ctime.blank?
-
-                        if info_entry.ctime != info_entry.mtime
-                          note_entries << {:state => info_entry.state, :date => m_date, :sort_date => DateTime.parse(info_entry.mtime), :list_type => info_entry.list_type, :note => "#{note['user']} - #{note['ctime']}: #{note['note']}"}
-                          note_entries << {:state => info_entry.state, :date => c_date, :sort_date => DateTime.parse(info_entry.ctime), :list_type => info_entry.list_type, :note => "#{note['user']} - #{note['ctime']}: #{note['note']}"}
-                        else
-                          note_entries << {:state => info_entry.state, :date => c_date, :sort_date => DateTime.parse(info_entry.ctime), :list_type => info_entry.list_type, :note => "#{note['user']} - #{note['ctime']}: #{note['note']}"}
-                        end
-                      end
-                    else
-                      m_date = Date.parse(info_entry.mtime).to_s unless info_entry.mtime.blank?
-                      c_date = Date.parse(info_entry.ctime).to_s unless info_entry.ctime.blank?
-
-                      if info_entry.ctime != info_entry.mtime
-                        note_entries << {:state => info_entry.state, :date => m_date, :sort_date => DateTime.parse(info_entry.mtime), :list_type => info_entry.list_type, :note =>''}
-                        note_entries << {:state => info_entry.state, :date => c_date, :sort_date => DateTime.parse(info_entry.ctime), :list_type => info_entry.list_type, :note =>''}
-                      else
-                        note_entries << {:state => info_entry.state, :date => c_date, :sort_date => DateTime.parse(info_entry.ctime), :list_type => info_entry.list_type, :note =>''}
-                      end
-                    end
-                  end
+                  note_entries = note_entries + Wbrs::ManualWlbl.add_to_history_modal(response, entry)
                 rescue
-                  m_date = Date.parse(info_entry.mtime).to_s unless info_entry.mtime.blank?
-                  c_date = Date.parse(info_entry.ctime).to_s unless info_entry.ctime.blank?
-
-                  if info_entry.ctime != info_entry.mtime
-                    note_entries << {:state => info_entry.state, :date => m_date, :sort_date => DateTime.parse(info_entry.mtime), :list_type => info_entry.list_type, :note =>''}
-                    note_entries << {:state => info_entry.state, :date => c_date, :sort_date => DateTime.parse(info_entry.ctime), :list_type => info_entry.list_type, :note =>''}
-                  else
-                    note_entries << {:state => info_entry.state, :date => c_date, :sort_date => DateTime.parse(info_entry.ctime), :list_type => info_entry.list_type, :note =>''}
-                  end
+                  note_entries = note_entries + Wbrs::ManualWlbl.add_to_history_modal_without_note(response)
                   next
                 end
               end
