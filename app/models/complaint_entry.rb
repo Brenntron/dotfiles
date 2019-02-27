@@ -69,11 +69,12 @@ class ComplaintEntry < ApplicationRecord
         self.update(user:current_user, status:"ASSIGNED", case_assigned_at: Time.now)
         complaint.set_status("ASSIGNED")
       else
-        raise("Cannot take a completed complaint. How did this happen.")
+        return("Already completed")
       end
     else
-      raise("Cannot take someone elses complaint.")
+      return("Someone elses complaint")
     end
+    return("Complaint taken")
   end
   def return_complaint
     if self.user != User.where(display_name: 'Vrt Incoming').first
@@ -82,17 +83,18 @@ class ComplaintEntry < ApplicationRecord
           self.update(user: User.vrtincoming, status:"NEW")
           complaint.set_status("NEW")
         else
-          raise("Cannot return complaint that has been completed.")
+          return("Already completed")
         end
       elsif self.is_important && self.status != "PENDING"
         self.update(user: User.vrtincoming, status:"NEW")
         complaint.set_status("NEW")
       else
-        raise("Cannot return complaint when status is pending.")
+        return("Status is pending")
       end
     else
-      raise("Cannot return a complaint that is not assigned")
+      return("Not yet assigned")
     end
+    return("Complaint returned")
   end
 
   def is_pending?
@@ -113,7 +115,7 @@ class ComplaintEntry < ApplicationRecord
     categories = categories_string&.split(',')
     ActiveRecord::Base.transaction do
       # If the prefix is a high telemetry value then the status needs to be set to PENDING
-      if self.is_important
+      if self.is_important && entry_status != Complaint::RESOLUTION_UNCHANGED
         if self.status == "PENDING"
           if commit_pending == "commit"
             # commit from pending of important case
@@ -159,7 +161,7 @@ class ComplaintEntry < ApplicationRecord
                  user:current_user)
         end
       else
-        # not important case
+        # not important case or resolution is "unchanged"
 
         current_status = "COMPLETED"
         self.case_assigned_at ||= Time.now
@@ -628,6 +630,17 @@ class ComplaintEntry < ApplicationRecord
     #  }
     #  data
     #end
+  end
+
+  def self.get_category(uri_ip)
+    prefix = Wbrs::Prefix.where({:urls => [uri_ip]})&.first
+    return {} unless prefix
+
+    current_categories = prefix.categories
+
+    name = current_categories[0].descr
+
+    name
   end
 
   def historic_category_data

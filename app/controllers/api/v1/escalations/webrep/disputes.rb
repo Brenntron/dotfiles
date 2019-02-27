@@ -263,9 +263,6 @@ module API
               true
             end
 
-
-
-
             desc "Adjust a WL/BL entry"
             params do
               requires :dispute_entry_ids, type: Array[Integer], desc: "analyst-console database id"
@@ -303,8 +300,35 @@ module API
               requires :comment, type: String, desc: "comment"
             end
             post "reptool_bl" do
-              RepApi::Blacklist.adjust_from_params(permitted_params, username: current_user.cvs_username)
-              true
+              std_api_v2 do
+                RepApi::Blacklist.adjust_from_params(permitted_params, username: current_user.cvs_username)
+                true
+              end
+            end
+
+            desc "Maintain current classifications for RepTool BL entries"
+            params do
+              requires :data, type: Array
+            end
+            post "maintain_reptool_bl" do
+              std_api_v2 do
+                permitted_params['data'].each do |entry|
+                  RepApi::Blacklist.adjust_from_params(entry, username: current_user.cvs_username)
+                end
+                true
+              end
+            end
+
+            desc "Drop a Reptool Bl entry"
+            params do
+              requires :action, type: String, desc: "activate or expire"
+              requires :entries, type: Array[String], desc: "urls"
+            end
+            post "drop_reptool_bl" do
+              std_api_v2 do
+                RepApi::Blacklist.adjust_from_params(permitted_params, username: current_user.cvs_username)
+                true
+              end
             end
 
             desc "Sync data for all dispute entry children"
@@ -586,7 +610,8 @@ module API
               information = JSON.parse(information)
 
               if information[params[:entry].gsub('http://', '').gsub('https://', '')] == "NOT_FOUND"
-                return {:classification => "not found", :expiration => "", :status => "", :comment => ""}.to_json
+                return {:entry => params[:entry], :classification => "not found", :expiration => "", :status => "", :comment => ""}.to_json
+              # TODO Make expiration human readable - Just the date
               else
                 expiration = ""
                 begin
@@ -594,9 +619,36 @@ module API
                 rescue
                   expiration = information[params[:entry].gsub('http://', '').gsub('https://', '')]["expiration"]
                 end
-                return {:classification => information[params[:entry].gsub('http://', '').gsub('https://', '')]["classifications"].first, :expiration => expiration, :status => information[params[:entry].gsub('http://', '').gsub('https://', '')]["status"], :comment => information[params[:entry].gsub('http://', '').gsub('https://', '')]["metadata"]["VRT"]["comment"]}.to_json
+                return {:entry => params[:entry], :classification => information[params[:entry].gsub('http://', '').gsub('https://', '')]["classifications"].first, :expiration => expiration, :status => information[params[:entry].gsub('http://', '').gsub('https://', '')]["status"], :comment => information[params[:entry].gsub('http://', '').gsub('https://', '')]["metadata"]["VRT"]["comment"]}.to_json
               end
 
+            end
+
+            params do
+              requires :ip_uris, type: Array[String]
+            end
+
+            post 'bulk_reptool_get_info_for_form' do
+              std_api_v2 do
+                api_response = JSON.parse(RepApi::Blacklist.where({entries: permitted_params[:ip_uris] }, true))
+                return_data = []
+
+                api_response.each do |key, value|
+                  if value == 'NOT_FOUND'
+                    return_data.push(:entry => key, :classification => "No active classifications", :expiration => "", :status => "INACTIVE", :comment => "")
+                    # TODO Make expiration human readable - Just the date
+                  else
+                    expiration = ""
+                    begin
+                      expiration = Date.parse(value["expiration"]).to_s
+                    rescue
+                      expiration = value["expiration"]
+                    end
+                    return_data.push(:entry => key, :classification => value["classifications"], :expiration => expiration, :status => value["status"], :comment => value["metadata"]["VRT"]["comment"]).to_json
+                  end
+                end
+                return_data.to_json
+              end
             end
 
             params do
@@ -626,6 +678,96 @@ module API
               note_entries = note_entries.uniq
 
               return {:status => "success", :data => list_types, :notes => note_entries.first}.to_json
+
+            end
+
+            params do
+              requires :entries, type: Array[String]
+            end
+
+            post 'bulk_rule_ui_wlbl_get_info_for_form' do
+              std_api_v2 do
+
+                params[:entries] = params[:entries].map {|entry| entry.strip}
+
+                data = []
+                list_types = {}
+                note_entries = []
+
+                params[:entries].each do |entry|
+                  list_types[entry] = []
+                  api_responses = Wbrs::ManualWlbl.where({:url => entry})
+
+                  api_responses.each do |response|
+                    if response.url == entry
+                      if response.state == "active"
+                        list_types[entry] << response.list_type
+                      end
+                    end
+                  end
+
+                  if ComplaintEntry.is_ip?(entry)
+                    params['ip'] = entry
+                    wbrs_api_response = Sbrs::ManualSbrs.call_wbrs(params)
+                  else
+                    params['url'] = entry
+                    wbrs_api_response = Sbrs::ManualSbrs.call_wbrs(params, type: 'wbrs')
+                  end
+
+                  if wbrs_api_response != nil && wbrs_api_response['wbrs'].present? && wbrs_api_response['wbrs']['score'] != 'noscore'
+                    wbrs_score = wbrs_api_response['wbrs']['score']
+                  else
+                    wbrs_score = nil
+                  end
+
+                  if api_responses.blank?
+                    data.push({:status => 'error', :ip_uri => entry, :list_types => nil})
+                  else
+                    data.push({ ip_uri: entry,
+                                status: 'success',
+                                list_types: list_types[entry],
+                                wbrs_score: wbrs_score,
+                                notes: note_entries.first })
+                  end
+                end
+
+                data.to_json
+              end
+            end
+
+            params do
+              requires :ip_uris, type: Array[String]
+              requires :list_types, type: Array[String]
+              requires :note, type: String
+            end
+
+            post 'bulk_rule_ui_wlbl_add' do
+              std_api_v2 do
+                authorize!(:update, Wbrs::ManualWlbl)
+                wlbl_params =
+                    {
+                        urls: permitted_params['ip_uris'].map {|ip_uri| ip_uri.strip},
+                        trgt_list: permitted_params['list_types'],
+                        note: permitted_params['note'],
+                        usr: current_user.cvs_username
+                    }
+
+                Wbrs::ManualWlbl.bulk_new_wlbl_from_params(wlbl_params)
+              end
+            end
+
+            params do
+              requires :ip_uris, type: Array[String]
+              requires :list_types, type: Array[String]
+            end
+
+            post 'bulk_rule_ui_wlbl_remove' do
+              std_api_v2 do
+                ip_uris = permitted_params[:ip_uris].map {|ip_uri| ip_uri.strip}
+                list_types = permitted_params[:list_types]
+
+                Wbrs::ManualWlbl.destroy_from_params(ip_uris, list_types, username: current_user.cvs_username)
+              end
 
             end
 

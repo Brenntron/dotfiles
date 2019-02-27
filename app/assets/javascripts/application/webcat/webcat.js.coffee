@@ -97,9 +97,9 @@ $ ->
           data: 'age'
           width: '40px'
           'render':(data,type,full,meta) ->
-            if data.includes('minute')
+            if (~data.indexOf('minute'))
               complaint_latency = data
-            if data.includes('hour')
+            if (~data.indexOf('hour'))
               hours = parseInt(data.replace(/[^0-9]/g, ''))
               if hours <= 3
                 complaint_latency = data
@@ -109,14 +109,14 @@ $ ->
                 complaint_latency = '<span class="overdue">' + data + '</span>'
             else
               complaint_latency = data
-            if data.includes('day')
+            if (~data.indexOf('day'))
               day = parseInt(data.replace(/[^0-9]/g, ''))
               if day >= 1
                 complaint_latency = '<span class="overdue">' + data + '</span>'
-            if data.includes('months')
+            if (~data.indexOf('months'))
               month = parseInt(data.replace(/[^0-9]/g, ''))
               complaint_latency = '<span class="overdue">' + data + '</span>'
-            if data.includes('year')
+            if (~data.indexOf('year'))
               year = parseInt(data.replace(/[^0-9]/g, ''))
               complaint_latency = '<span class="overdue">' + data + '</span>'
             complaint_latency
@@ -208,6 +208,25 @@ $ ->
 
 
     $('#complaints-index_filter input').addClass('table-search-input');
+
+    $('#complaints-index tbody').on 'click', ' .nested-complaint-data', ->
+      $(this).focus()
+      $(this).toggleClass('highlight-text')
+      element = $(this)
+      innertext = $(this).text()
+      copyToClipboard(innertext)
+      $(element).after( "<p id='copiedAlert'>Copied to clipboard!</p>" )
+      setTimeout (->
+        $("#copiedAlert").remove()
+      ), 1000
+
+    copyToClipboard = (text) ->
+      dummy = document.createElement('input')
+      document.body.appendChild dummy
+      dummy.setAttribute 'value', text
+      dummy.select()
+      document.execCommand 'copy'
+      document.body.removeChild dummy
 
     $('#complaints-index tbody').on 'click', 'td.expandable-row-column', ->
       click_table_buttons complaint_table, this

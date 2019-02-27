@@ -48,29 +48,91 @@ class DisputeEntry < ApplicationRecord
 
   def self.create_dispute_entry(dispute, ip_url, status = NEW)
     begin
+      params = {}
       new_dispute_entry = DisputeEntry.new
       new_dispute_entry.dispute_id = dispute.id
       new_dispute_entry.status = status
 
       if is_ip?(ip_url)
+        params['ip'] = ip_url
+
+        wbrs_api_response = Sbrs::ManualSbrs.call_wbrs(params)
+        sbrs_api_response = Sbrs::ManualSbrs.call_sbrs(params)
+        sbrs_api_rulehit_response =  Sbrs::GetSbrs.get_sbrs_rules_for_ip(ip_url)
+        wbrs_prefix_response = ComplaintEntry.get_category(params['ip'])
+
         new_dispute_entry.ip_address = ip_url
         new_dispute_entry.entry_type = "IP"
+        new_dispute_entry.primary_category = wbrs_prefix_response
+
+
+        # Populate WBRS/SBRS Scores
+
+        if wbrs_api_response != nil && wbrs_api_response['wbrs'].present? && wbrs_api_response['wbrs']['score'] != 'noscore'
+          new_dispute_entry.wbrs_score = wbrs_api_response['wbrs']['score']
+        else
+          new_dispute_entry.wbrs_score = nil
+        end
+
+        if sbrs_api_response != nil && sbrs_api_response['sbrs'].present? && sbrs_api_response['sbrs'].present? && sbrs_api_response['sbrs']['score'] != 'noscore'
+          new_dispute_entry.sbrs_score = sbrs_api_response['sbrs']['score']
+        else
+          new_dispute_entry.sbrs_score = nil
+        end
+
       else
+        params['url'] = ip_url
+
+        wbrs_api_response = Sbrs::ManualSbrs.call_wbrs(params, type: 'wbrs')
+        sbrs_api_response = Sbrs::ManualSbrs.call_sbrs(params, type: 'wbrs')
+        wbrs_prefix_response = ComplaintEntry.get_category(params['url'])
+
         url_parts = Complaint.parse_url(ip_url)
         new_dispute_entry.uri = ip_url
         new_dispute_entry.entry_type = "URI/DOMAIN"
         new_dispute_entry.subdomain = url_parts[:subdomain]
         new_dispute_entry.domain = url_parts[:domain]
         new_dispute_entry.path = url_parts[:path]
+
+        new_dispute_entry.primary_category = wbrs_prefix_response
+
+        # Populate WBRS/SBRS Scores
+
+        if wbrs_api_response != nil && wbrs_api_response['wbrs'].present? && wbrs_api_response['wbrs']['score'] != 'noscore'
+          new_dispute_entry.wbrs_score = wbrs_api_response['wbrs']['score']
+        else
+          new_dispute_entry.wbrs_score = nil
+        end
+
+        if sbrs_api_response != nil && sbrs_api_response['sbrs'].present? && sbrs_api_response['sbrs'].present? && sbrs_api_response['sbrs']['score'] != 'noscore'
+          new_dispute_entry.sbrs_score = sbrs_api_response['sbrs']['score']
+        else
+          new_dispute_entry.sbrs_score = nil
+        end
       end
 
       new_dispute_entry.save!
+
+      # Create Dispute Entry RuleHits
+      wbrs_rule_hits = Sbrs::ManualSbrs.get_rule_names_from_rulehits(wbrs_api_response)
+
+      if wbrs_rule_hits.present?
+        wbrs_rule_hits.each do |rule_hit|
+          DisputeRuleHit.create(rule_type:'WBRS', name: rule_hit, dispute_entry_id: new_dispute_entry.id)
+        end
+      end
+
+      if sbrs_api_rulehit_response.present?
+        sbrs_api_rulehit_response.each do |rule_hit|
+          DisputeRuleHit.create(rule_type:'SBRS', name: rule_hit, dispute_entry_id: new_dispute_entry.id)
+        end
+      end
 
     rescue Exception => e
       raise Exception.new("{DisputeEntry creation error: {content: #{ip_url},error:#{e}}}")
     end
 
-    # Add preload for Dispute Entry here
+
   end
 
   def self.is_ip?(ip)
@@ -125,9 +187,13 @@ class DisputeEntry < ApplicationRecord
   end
 
   def self.domain_of(url)
-    uri = URI.parse(URI.parse(url).scheme.nil? ? "http://#{url}" : url)
-    domain = PublicSuffix.parse(uri.host)
-    domain.domain
+    if !url.start_with?( 'http', 'https')
+      url = "http://" + url
+    end
+
+    clean_url = Addressable::URI.parse(url)
+    clean_host = clean_url.host
+    clean_host.sub(/^www\./, '')
   end
 
   def assign_url_parts(url = self.hostlookup)
@@ -612,9 +678,13 @@ class DisputeEntry < ApplicationRecord
   end
 
   def self.check_for_duplicates(entry)
-    if DisputeEntry.where(uri: entry).present? || DisputeEntry.where(ip_address: entry).present?
+    if is_ip?(entry) && DisputeEntry.where(ip_address: entry).present?
       return true
-    else
+    elsif is_ip?(entry) && !DisputeEntry.where(ip_address: entry).present?
+      return false
+    elsif !is_ip?(entry) && DisputeEntry.where(uri: entry).present?
+      return true
+    elsif !is_ip?(entry) && !DisputeEntry.where(uri: entry).present?
       return false
     end
   end
