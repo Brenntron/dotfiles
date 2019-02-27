@@ -196,6 +196,34 @@ class DisputeEntry < ApplicationRecord
     clean_host.sub(/^www\./, '')
   end
 
+  def self.domain_of_with_path(url)
+    if !url.start_with?( 'http', 'https')
+      url = "http://" + url
+    end
+
+    clean_url = Addressable::URI.parse(url)
+    clean_host = clean_url.host + clean_url.path
+    clean_host.sub(/^www\./, '')
+  end
+
+  def self.domain_of_with_path_from_array(urls)
+    response = []
+    urls.each do |url|
+      if url.strip != ''
+        if !url.start_with?( 'http', 'https')
+          url = "http://" + url
+        end
+
+        clean_url = Addressable::URI.parse(url)
+        clean_host = clean_url.host + clean_url.path
+        clean_host = clean_host.sub(/^www\./, '')
+
+        response = [clean_host]
+      end
+    end
+    response
+  end
+
   def assign_url_parts(url = self.hostlookup)
     uri = URI.parse(URI.parse(url).scheme.nil? ? "http://#{url}" : url)
     domain = PublicSuffix.parse(uri.host)
