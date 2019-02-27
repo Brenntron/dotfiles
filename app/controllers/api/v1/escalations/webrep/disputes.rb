@@ -651,7 +651,7 @@ module API
                 begin
                   note_entries = note_entries + Wbrs::ManualWlbl.add_to_history_modal(response, entry)
                 rescue
-                  note_entries = note_entries + Wbrs::ManualWlbl.add_to_history_modal_without_note(response)
+                  note_entries = note_entries + Wbrs::ManualWlbl.add_to_history_modal_with_note(response,'')
                   next
                 end
               end

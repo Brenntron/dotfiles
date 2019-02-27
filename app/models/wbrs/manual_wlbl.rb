@@ -207,13 +207,12 @@ class Wbrs::ManualWlbl < Wbrs::Base
 
       if details.notes.any?
         details.notes.each do |note|
-          note_entries << Wbrs::ManualWlbl.add_to_history_modal_with_note(response, note)
+          note_entries = note_entries + Wbrs::ManualWlbl.add_to_history_modal_with_note(response, "#{note['user']} - #{note['ctime']}: #{note['note']}")
         end
       else
-        note_entries << Wbrs::ManualWlbl.add_to_history_modal_without_note(response)
+        note_entries = note_entries + Wbrs::ManualWlbl.add_to_history_modal_with_note(response, "")
       end
     end
-
     note_entries
   end
 
@@ -225,27 +224,10 @@ class Wbrs::ManualWlbl < Wbrs::Base
     c_date = Date.parse(response.ctime).to_s unless response.ctime.blank?
 
     if response.ctime != response.mtime
-      note_entries << {:state => response.state, :date => m_date, :sort_date => DateTime.parse(response.mtime), :list_type => response.list_type, :note => "#{note['user']} - #{note['ctime']}: #{note['note']}"}
-      note_entries << {:state => response.state, :date => c_date, :sort_date => DateTime.parse(response.ctime), :list_type => response.list_type, :note => "#{note['user']} - #{note['ctime']}: #{note['note']}"}
+      note_entries.push({:state => response.state, :date => m_date, :sort_date => DateTime.parse(response.mtime), :list_type => response.list_type, :note => note})
+      note_entries.push({:state => response.state, :date => c_date, :sort_date => DateTime.parse(response.ctime), :list_type => response.list_type, :note => note})
     else
-      note_entries << {:state => response.state, :date => c_date, :sort_date => DateTime.parse(response.ctime), :list_type => response.list_type, :note => "#{note['user']} - #{note['ctime']}: #{note['note']}"}
-    end
-
-    note_entries
-  end
-
-  def self.add_to_history_modal_without_note(response)
-    note_entries = []
-    m_date = ''
-    c_date = ''
-    m_date = Date.parse(response.mtime).to_s unless response.mtime.blank?
-    c_date = Date.parse(response.ctime).to_s unless response.ctime.blank?
-
-    if response.ctime != response.mtime
-      note_entries << {:state => response.state, :date => m_date, :sort_date => DateTime.parse(response.mtime), :list_type => response.list_type, :note =>''}
-      note_entries << {:state => response.state, :date => c_date, :sort_date => DateTime.parse(response.ctime), :list_type => response.list_type, :note =>''}
-    else
-      note_entries << {:state => response.state, :date => c_date, :sort_date => DateTime.parse(response.ctime), :list_type => response.list_type, :note =>''}
+      note_entries.push({:state => response.state, :date => c_date, :sort_date => DateTime.parse(response.ctime), :list_type => response.list_type, :note => note})
     end
 
     note_entries
