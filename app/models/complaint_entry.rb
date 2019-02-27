@@ -578,6 +578,17 @@ class ComplaintEntry < ApplicationRecord
     end
   end
 
+  def self.get_category(uri_ip)
+    prefix = Wbrs::Prefix.where({:urls => [uri_ip]})&.first
+    return {} unless prefix
+
+    current_categories = prefix.categories
+
+    name = current_categories[0].descr
+
+    name
+  end
+
   def historic_category_data
 
     prefix_id = nil
@@ -586,7 +597,7 @@ class ComplaintEntry < ApplicationRecord
       prefix_id = prefix_results.first.prefix_id
     end
     if prefix_id.present?
-      prefix_history = Wbrs::HistoryRecord.where({:prefix_id => prefix_id}).sort_by {|history| history.time}.reverse
+      prefix_history = Wbrs::HistoryRecord.where({:prefix_id => prefix_id}).sort_by {|history| DateTime.parse(history.time)}.reverse
     else
       prefix_history = []
     end

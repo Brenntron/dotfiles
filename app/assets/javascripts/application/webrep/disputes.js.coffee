@@ -306,23 +306,6 @@ window.popup_response_error =(response, prefix) ->
 
   alert(prefix + "\n" + errormsg)
 
-window.row_adjust_wlbl_button =(button_tag) ->
-  list_types = $('.wl-bl-list-inline:checkbox:checked').map(() ->
-    this.value
-  ).toArray()
-  wlbl_form = button_tag.form;
-  data = {
-    'dispute_entry_ids': [ wlbl_form.getElementsByClassName('dispute-entry-id')[0].value ]
-    'trgt_list': list_types
-    'note': wlbl_form.getElementsByClassName('note-input')[0].value
-  }
-
-  std_msg_ajax(
-    url: '/escalations/api/v1/escalations/webrep/disputes/entry_wlbl'
-    method: 'POST'
-    data: data
-    error_prefix: 'Error adjusting WL/BL.'
-  )
 
 window.row_research_adjust_wlbl_button =(button_tag) ->
   list_types = $('.wl-bl-list-inline:checkbox:checked').map(() ->
@@ -344,60 +327,9 @@ window.row_research_adjust_wlbl_button =(button_tag) ->
     success_reload: true
   )
 
-
-window.toolbar_adjust_wlbl_button =(button_tag) ->
-  checked_url = $('.dispute_check_box:checked')[0]
-  entry_row = $(checked_url).parents('.research-table-row')[0]
-  url = $(entry_row).find('.entry-data-content').text()
-  list_types = $('.wl-bl-list-inline:checkbox:checked').map(() ->
-    this.value
-  ).toArray()
-
-  wlbl_form = button_tag.form
-
-  data = {
-    'urls': [ url ]
-    'trgt_list': list_types
-    'note': wlbl_form.getElementsByClassName('adjust-wlbl-input')[0].value
-  }
-
-  std_msg_ajax(
-    url: '/escalations/api/v1/escalations/webrep/disputes/uri_wlbl'
-    method: 'POST'
-    data: data
-    error_prefix: 'Error adjusting WL/BL.'
-    success_reload: true
-  )
-
-window.toolbar_research_adjust_wlbl_button =(button_tag) ->
-  checked_url = $('.dispute_check_box:checked')[0]
-  entry_row = $(checked_url).parents('.research-table-row')[0]
-  url = $(entry_row).find('.entry-data-content').text()
-  list_types = $('.wl-bl-list-inline:checkbox:checked').map(() ->
-    this.value
-  ).toArray()
-
-  wlbl_form = button_tag.form
-
-  data = {
-    'urls': [ url ]
-    'trgt_list': list_types
-    'note': wlbl_form.getElementsByClassName('adjust-wlbl-input')[0].value
-  }
-
-  std_msg_ajax(
-    url: '/escalations/api/v1/escalations/webrep/disputes/uri_wlbl'
-    method: 'POST'
-    data: data
-    error_prefix: 'Error adjusting WL/BL.'
-    success_reload: true
-  )
-
-
-window.index_adjust_wlbl_button =(button_tag) ->
-  checked_url = $('.dispute-entry-checkbox:checked')[0]
-  entry_row = $(checked_url).parent().parent()[0]
-  url = $(entry_row).find('.entry-col-content').text()
+window.research_toolbar_adjust_wlbl_button =(button_tag) ->
+  urls = []
+  urls = $('.wlbl-entry-content')
   list_types = $('.wl-bl-list-inline:checkbox:checked').map(() ->
     this.value
   ).toArray()
@@ -526,41 +458,204 @@ window.row_adust_reptool_bl_button_research =(button_tag) ->
     url: '/escalations/api/v1/escalations/webrep/disputes/reptool_bl'
     method: 'POST'
     headers: headers
-    data: data
-    dataType: 'json'
-    success: (response) ->
-      window.location.reload()
-    error: (response) ->
-      popup_response_error(response, 'Error adjusting WL/BL')
+    popup_response_error(response, 'Error adjusting WL/BL')
   )
 
-window.toolbar_adjust_reptool_bl_button =(button_tag) ->
-  entry_ids = $('.dispute-entry-checkbox:checked').map(() ->
-    parseInt(this.id)
-  ).toArray()
 
-  if entry_ids.length == 0
-    std_msg_error('No rows selected', ['Please select at least one row.'])
-    return
 
-  reptool_bl_form = button_tag.form
-  data = {
-    'action': reptool_bl_form.getElementsByClassName('action-input')[0].value
-    'dispute_entry_ids': entry_ids
-    'classifications': [ reptool_bl_form.getElementsByClassName('classifications-input')[0].value ]
-    'comment': reptool_bl_form.getElementsByClassName('comment-input')[0].value
-  }
+$ ->
+  ## Bulk Reptool form manipulation based on user's selections
+  bulk_reptool_menu = $('#reptool_adjust_entries')
+  submission_actions = bulk_reptool_menu.find("input[name='reptool-action-radio']")
+  reptool_submit = $('#reptool_adjust_entries').find('.dropdown-submit-button')
 
-  std_msg_ajax(
-    url: '/escalations/api/v1/escalations/webrep/disputes/reptool_bl'
-    method: 'POST'
-    data: data
-    dataType: 'json'
-    success: (response) ->
-      window.location.reload()
-    error: (response) ->
-      std_msg_error('Error', ['Error adjusting WL/BL'].concat(response.responseJSON.message) )
-  )
+  # Get submission action, show relavent pieces of the form
+  submission_actions.click ->
+    action = $(this).val()
+    if action == 'reptool-maintain'
+      $('#reptool-classifications-row').show()
+      $('#reptool-class-radio-row').show()
+    else if action == 'reptool-override'
+      $('#reptool-classifications-row').show()
+      $('#reptool-class-radio-row').hide()
+    else if action == 'reptool-drop'
+      $('#reptool-classifications-row').hide()
+      $('#reptool-class-radio-row').hide()
+      $(reptool_submit[0]).attr('disabled', false)
+
+  # If user is not dropping all categories they need to select new ones to drop or add
+  bulk_reptool_menu.find('.reptool-class-cb').click ->
+    if submission_actions.val() == 'reptool-maintain' || submission_actions.val() == 'reptool-override'
+      if bulk_reptool_menu.find('.reptool-class-cb:checked').length > 0
+        $(reptool_submit[0]).attr('disabled', false)
+      else
+        $(reptool_submit[0]).attr('disabled', true)
+
+
+# Submit Bulk changes to Reptool
+window.submit_bulk_reptool = () ->
+  bulk_reptool_menu = $('#reptool_adjust_entries')
+  submission_action = $("input[name='reptool-action-radio']:checked").val()
+
+  checked_classes = []
+  #  Get all checked classifications
+  if $(bulk_reptool_menu).find('.reptool-class-cb:checked').length > 0
+    $(bulk_reptool_menu).find('.reptool-class-cb:checked').each ->
+      checked_classes.push($(this).val())
+  # Convert to string for data submission
+  reptool_classes = checked_classes.join()
+
+  classification_action = $("input[name='reptool-classes-radio']:checked").val()
+  comment = bulk_reptool_menu.find('.dropdown-comment').val()
+
+  #  Get the entries
+  entry_rows = $(bulk_reptool_menu).find('.reptool-entry-row')
+  entries = []
+
+  current_entries_and_classes = []
+  $(entry_rows).each ->
+    entry = $(this).find('.reptool-entry-name')[0]
+    entries.push($(entry).text())
+    current_classes = $($(this).find('.reptool-entry-class')[0]).attr('data-classification')
+    current_entries_and_classes.push {
+      'entry': $(entry).text()
+      'classifications': current_classes
+    }
+
+  # If user wants to override existing classes we only need what they've checked
+  if submission_action == "reptool-override"
+    data = {
+      'action': 'ACTIVE'
+      'entries': entries
+      'classifications': reptool_classes
+      'comment': comment
+    }
+  else if submission_action == "reptool-drop"
+    data = {
+      'action': 'EXPIRED'
+      'entries': entries
+      'comment': comment
+    }
+  else if submission_action == "reptool-maintain"
+# currently set up for 1 entry to work fine, or if all entries have identical current classes
+    new_classifications = ''
+    array_of_datas = []
+    if classification_action == 'add'
+      $(current_entries_and_classes).each ->
+        if this.classifications.length > 0
+          new_classifications = this.classifications
+          new_classifications = new_classifications + ',' + reptool_classes
+
+          temp_data = {
+            'action': 'ACTIVE'
+            'entries': [this.entry]
+            'classifications': [new_classifications]
+            'comment': comment
+          }
+          array_of_datas.push(temp_data)
+        else
+          new_classifications = reptool_classes
+
+          temp_data = {
+            'action': 'ACTIVE'
+            'entries': [this.entry]
+            'classifications': [new_classifications]
+            'comment': comment
+          }
+          array_of_datas.push(temp_data)
+
+        data = array_of_datas
+    else
+      $(current_entries_and_classes).each ->
+        current = this.classifications.split(',')
+        subtracted = current.filter((x) ->
+          checked_classes.indexOf(x) < 0
+        )
+        new_classifications = subtracted.join()
+
+        if new_classifications.length > 0
+          temp_data = {
+            'action': 'ACTIVE'
+            'entries': [this.entry]
+            'classifications': [new_classifications]
+            'comment': comment
+          }
+          array_of_datas.push(temp_data)
+          data = array_of_datas
+        else
+          submission_action == "reptool-drop"
+
+          temp_data = {
+            'action': 'expired'
+            'entries': [this.entry]
+          }
+          array_of_datas.push(temp_data)
+          data = array_of_datas
+
+  # send separate api calls for each type of submission
+
+  if submission_action == "reptool-override"
+    std_msg_ajax(
+      url: '/escalations/api/v1/escalations/webrep/disputes/reptool_bl'
+      method: 'POST'
+      data: data
+      success: (response) ->
+        std_msg_success('These RepTool classes (' + reptool_classes + ') are assigned to the following entries:', [entries])
+      error: (response) ->
+        if response.responseJSON == undefined
+          response_lines = response.responseText.split("\n")
+          if 2 < response_lines.length
+            errormsg = [response_lines[0], response_lines[1]]
+          else
+            errormsg = [response.responseText]
+        else if response.responseJSON.error != undefined
+          errormsg = [response.responseJSON.error]
+        else
+          errormsg = [response.responseText]
+        std_msg_error('Error', ['Error adjusting WL/BL'].concat(errormsg) )
+    )
+  else if submission_action == "reptool-maintain"
+    std_msg_ajax(
+      url: '/escalations/api/v1/escalations/webrep/disputes/maintain_reptool_bl'
+      method: 'POST'
+      data: {data: data}
+      success: (response) ->
+        std_msg_success('These RepTool classes (' + reptool_classes + ') were changed on the following entries:', [entries])
+      error: (response) ->
+        if response.responseJSON == undefined
+          response_lines = response.responseText.split("\n")
+          if 2 < response_lines.length
+            errormsg = [response_lines[0], response_lines[1]]
+          else
+            errormsg = [response.responseText]
+        else if response.responseJSON.error != undefined
+          errormsg = [response.responseJSON.error]
+        else
+          errormsg = [response.responseText]
+        std_msg_error('Error', ['Error adjusting WL/BL'].concat(errormsg) )
+    )
+  else if submission_action == "reptool-drop"
+    std_msg_ajax(
+      url: '/escalations/api/v1/escalations/webrep/disputes/drop_reptool_bl'
+      method: 'POST'
+      data: data
+      success: (response) ->
+        std_msg_success('All RepTool classes have been removed from the following entries:', [entries])
+      error: (response) ->
+        if response.responseJSON == undefined
+          response_lines = response.responseText.split("\n")
+          if 2 < response_lines.length
+            errormsg = [response_lines[0], response_lines[1]]
+          else
+            errormsg = [response.responseText]
+        else if response.responseJSON.error != undefined
+          errormsg = [response.responseJSON.error]
+        else
+          errormsg = [response.responseText]
+        std_msg_error('Error', ['Error adjusting WL/BL'].concat(errormsg) )
+    )
+
+
 
 window.toolbar_adjust_reptool_bl_button_research =(button_tag) ->
   checked_url = $('.dispute_check_box:checked')[0]
@@ -1686,110 +1781,6 @@ $ ->
     $('.dispute-edit-input').css('display','none')
 
 
-  $('#index-adjust-wlbl').click ->
-    if $('.dispute-entry-checkbox:checked').length == 0
-      std_msg_error('No rows selected', ['Please select at least one row.'])
-      return false
-
-    tbody = $('#wlbl_adjust_entries_index').find('table.dispute_tool_current').find('tbody')
-    show_content = $('#wlbl_adjust_entries_index').find('.wlbl-entry-content')
-    if !show_content[0]
-      show_content = $('#wlbl_adjust_entries_index').find('.entry-dispute-name')
-    show_wlbl = $('#wlbl_adjust_entries_index').find('.wlbl-entry-wlbl')
-    show_wbrs = $('#wlbl_adjust_entries_index').find('.wlbl-current-entry-wbrs')
-    if !show_wbrs[0]
-      show_wbrs = $('#wlbl_adjust_entries_index').find('.current-wbrs-score')
-    wl_weak = $('#wlbl_adjust_entries_index').find('.wl-weak-checkbox')
-    wl_med = $('#wlbl_adjust_entries_index').find('.wl-med-checkbox')
-    wl_heavy = $('#wlbl_adjust_entries_index').find('.wl-heavy-checkbox')
-    bl_weak = $('#wlbl_adjust_entries_index').find('.bl-weak-checkbox')
-    bl_med = $('#wlbl_adjust_entries_index').find('.bl-med-checkbox')
-    bl_heavy = $('#wlbl_adjust_entries_index').find('.bl-heavy-checkbox')
-
-    $(show_content[0]).empty()
-    $(show_wbrs[0]).empty()
-    $(show_wlbl[0]).empty()
-    $(wl_weak[0]).prop('checked', false)
-    $(wl_med[0]).prop('checked', false)
-    $(wl_heavy[0]).prop('checked', false)
-    $(bl_weak[0]).prop('checked', false)
-    $(bl_med[0]).prop('checked', false)
-    $(bl_heavy[0]).prop('checked', false)
-    wl_weak_status = 'false'
-    wl_med_status = 'false'
-    wl_heavy_status = 'false'
-    bl_weak_status = 'false'
-    bl_med_status = 'false'
-    bl_heavy_status = 'false'
-
-    #    $(tbody).empty()
-    dropdown_wrapper = $(this).parent()
-    if ($('.dispute-entry-checkbox:checked').length > 0)
-      submit_button = $('#wlbl_adjust_entries_index').find('.dropdown-submit-button')
-      entry_content = ''
-
-      $('.dispute-entry-checkbox:checked').each ->
-
-        entry_row = $(this).parent().parent()[0]
-        entry_content = $(entry_row).find('.entry-col-content').text()
-        wbrs = $(entry_row).find('.entry-col-wbrs-score').text()
-
-        data = {
-# Send entry content to reptool
-          'entry' : entry_content
-        }
-
-        headers = {'Token': $('input[name="token"]').val(), 'Xmlrpc-Token': $('input[name="xml_token"]').val()}
-        $.ajax(
-          url: '/escalations/api/v1/escalations/webrep/disputes/rule_ui_wlbl_get_info_for_form'
-          method: 'GET'
-          headers: headers
-          data: data
-          dataType: 'json'
-          success: (response) ->
-#values will be in the format of BL-med, BL-weak, BL-heavy   (same with WL)
-
-            response = JSON.parse(response)
-            if response.data != ""
-
-              $(response.data).each ->
-                if String(this) == 'WL-weak'
-                  $(wl_weak[0]).prop('checked', true)
-                  wl_weak_status = 'true'
-                if String(this) == 'WL-med'
-                  $(wl_med[0]).prop('checked', true)
-                  wl_med_status = 'true'
-                if String(this) == 'WL-heavy'
-                  $(wl_heavy[0]).prop('checked', true)
-                  wl_heavy_status = 'true'
-                if String(this) == 'BL-weak'
-                  $(bl_weak[0]).prop('checked', true)
-                  bl_weak_status = 'true'
-                if String(this) == 'BL-med'
-                  $(bl_med[0]).prop('checked', true)
-                  bl_med_status = 'true'
-                if String(this) == 'BL-heavy'
-                  $(bl_heavy[0]).prop('checked', true)
-                  bl_heavy_status = 'true'
-
-              $(show_content[0]).text(entry_content)
-              $(show_wbrs[0]).text(wbrs)
-              $(show_wlbl[0]).text(response.data)
-              $(submit_button).attr('disabled', false)
-            else
-              $(show_content[0]).text(entry_content)
-              $(show_wbrs[0]).text(wbrs)
-              $(show_wlbl[0]).text('Not on a list')
-              $(submit_button).attr('disabled', false)
-#this should probably call the resync data then reload the page, for an up to date score
-
-          error: (response) ->
-            popup_response_error(response, 'Error retrieving WL/BL Data')
-        )
-
-    else
-      $(dropdown_wrapper).removeClass('open')
-      std_msg_error('No rows selected', ['Please select one row.'])
 
   $('#set-related-dispute-submit-button').click ->
     dropdown = $('#set-related-dispute-div').parent()
