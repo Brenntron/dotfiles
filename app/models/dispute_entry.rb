@@ -227,10 +227,6 @@ class DisputeEntry < ApplicationRecord
     response
   end
 
-  def self.domain_of_with_path_from_array(urls)
-
-  end
-
   def assign_url_parts(url = self.hostlookup)
     uri = URI.parse(URI.parse(url).scheme.nil? ? "http://#{url}" : url)
     domain = PublicSuffix.parse(uri.host)
