@@ -210,7 +210,7 @@ class Wbrs::ManualWlbl < Wbrs::Base
           note_entries << Wbrs::ManualWlbl.add_to_history_modal_with_note(response, note)
         end
       else
-        note_entries << Wbrs::ManualWlbl.add_to_history_modal_without_note(response, note)
+        note_entries << Wbrs::ManualWlbl.add_to_history_modal_without_note(response)
       end
     end
 
