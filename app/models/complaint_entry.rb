@@ -560,8 +560,8 @@ class ComplaintEntry < ApplicationRecord
   end
 
   def current_category_data
-    prefix = Wbrs::Prefix.where({:urls => [URI.escape(DisputeEntry.domain_of_with_path(self.hostlookup))]})&.first
-    return {} unless prefix
+    prefix_results = Wbrs::Prefix.where({:urls => [URI.escape(DisputeEntry.domain_of_with_path(self.hostlookup))]})
+    return {} unless prefix_results
     certainty_on_urls = Wbrs::Prefix.get_certainty_sources_for_urls([self.hostlookup])
 
     final_results = []
