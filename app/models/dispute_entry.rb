@@ -218,7 +218,7 @@ class DisputeEntry < ApplicationRecord
         clean_host = clean_url.host + clean_url.path
         clean_host = clean_host.sub(/^www\./, '')
 
-        response = [clean_host]
+        response << clean_host
       end
     end
     response
