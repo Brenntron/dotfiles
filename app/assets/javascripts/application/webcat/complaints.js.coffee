@@ -770,7 +770,7 @@ format = (complaint_entry_row) ->
       '<table class="simple-nested-table" id="' + complaint_entry.entry_id + '"><thead><tr><th>Conf</th><th>Current Categories</th><th>Certainty</th></tr></thead>' +
       '</table>' +
       '</div>' +
-      '<div class="col-xs-2">' +
+      '<div class="col-xs-2 col-with-divider">' +
       '<label class="content-label-sm">Resolution</label><br/>' +
       '<span class="complaint-resolution' + complaint_entry.entry_id + '">' + complaint_entry.resolution + '</span>' +
         '</div><div class="col-xs-2">' +
