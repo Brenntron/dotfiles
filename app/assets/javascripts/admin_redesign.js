@@ -6,6 +6,7 @@
 //= require jquery
 //= require jquery_ujs
 //= require jquery-ui
+//= require datatables
 //= require util
 //= require tree-table
 //= require selectize
@@ -33,9 +34,6 @@
 //= require application/chartjs-plugin-annotation.min
 //= require application/daterangepicker
 //= require application/webrep_advanced_search
-//= require dataTables/jquery.dataTables
-//= require dataTables/extras/dataTables.responsive
-//= require dataTables/extras/dataTables.select
 //= require application/webcat/complaints
 //= require application/webcat/clusters
 //= require application/webcat/complaint_form

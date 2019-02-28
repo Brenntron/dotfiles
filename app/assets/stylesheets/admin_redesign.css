@@ -6,10 +6,9 @@
  *= require datatables
  *= require custom-bootstrap
  *= require bootstrap-switch
+ *= require datatables
  *= require selectize
  *= require selectize.default
- *= require dataTables/extras/dataTables.responsive
- *= require dataTables/jquery.dataTables
  *= require reset
  *= require font_import_opensans
  *= require font_import_firamono
@@ -19,4 +18,4 @@
  *= require tooltipster.bundle.min
  *= require tooltipster-sideTip-borderless.min
  *= require daterangepicker
-*/
+ */
