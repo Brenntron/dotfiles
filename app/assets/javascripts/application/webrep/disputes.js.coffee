@@ -494,6 +494,7 @@ $ ->
 
 # Submit Bulk changes to Reptool
 window.submit_bulk_reptool = () ->
+
   bulk_reptool_menu = $('#reptool_adjust_entries')
   submission_action = $("input[name='reptool-action-radio']:checked").val()
 
@@ -511,7 +512,7 @@ window.submit_bulk_reptool = () ->
   #  Get the entries
   entry_rows = $(bulk_reptool_menu).find('.reptool-entry-row')
   entries = []
-
+  case_ids = ''
   current_entries_and_classes = []
   $(entry_rows).each ->
     entry = $(this).find('.reptool-entry-name')[0]
@@ -521,6 +522,9 @@ window.submit_bulk_reptool = () ->
       'entry': $(entry).text()
       'classifications': current_classes
     }
+    case_ids = $(this).attr("data-case-id")
+
+  comment = comment + '  :' + case_ids
 
   # If user wants to override existing classes we only need what they've checked
   if submission_action == "reptool-override"
@@ -1484,7 +1488,7 @@ $ ->
       if this.entry.sbrs_score != null
         sbrs_score = this.entry.sbrs_score
       else sbrs_score = missing_data
-      entry_row = '<tr class="index-entry-row">' + '<td><input type="checkbox" onclick="toggleRow(this)" class="dispute-entry-checkbox dispute-entry-checkbox_' + dispute.id + '" id= ' + dispute_entry_id + ' ></td>' + '<td class="entry-col-content ' + important + '">' + entry_content + '</td>' +
+      entry_row = '<tr class="index-entry-row" data-case-id="0000' + dispute.id + '">' + '<td><input type="checkbox" onclick="toggleRow(this)" class="dispute-entry-checkbox dispute-entry-checkbox_' + dispute.id + '" id= ' + dispute_entry_id + ' ></td>' + '<td class="entry-col-content ' + important + '">' + entry_content + '</td>' +
         '<td class="entry-col-status">' + status + '</td>' +
         resolution_col +
         '<td class="entry-col-disp">' + suggested_disposition + '</td>' +

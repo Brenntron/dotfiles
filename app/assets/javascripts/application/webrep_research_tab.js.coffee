@@ -148,12 +148,16 @@ $ ->
 
   ##  Populating the toolbar Adjust RepTool BL dropdown
   window.bulk_get_current_reptool = (page) ->
-
     # Define the variables based on the page
-    if page == "show" || page == "research"
+    if page == "show"
       checkbox = $('.dispute_check_box:checked')
+      case_id = $('#dispute_id').text()
+    else if page == "research"
+      checkbox = $('.dispute_check_box:checked')
+      case_id = ''
     else if page == "index"
       checkbox = $('.dispute-entry-checkbox:checked')
+      case_id = []
 
     ## Clear out any residual data
     # Empty table
@@ -174,6 +178,8 @@ $ ->
         else if page == "index"
           entry_row = $(this).parents('.index-entry-row')[0]
           entry_content = $(entry_row).find('.entry-col-content').text().trim()
+          entry_case_id = $(entry_row).attr('data-case-id')
+          case_id.push(entry_case_id)
         # Send entry content to reptool
         ip_uris.push(entry_content)
 
@@ -192,7 +198,7 @@ $ ->
               rep_class_full = '<span class="missing-data">No active classifications</span>'
               rep_class = ''
 
-            tbody.append('<tr class="reptool-entry-row"><td class="reptool-entry-name">' + entry['entry'] + '</td><td class="reptool-entry-class" data-classification="' + rep_class + '">' + rep_class_full + '</td><td class="reptool-entry-comment">' + entry['comment'] + '</td></tr>')
+            tbody.append('<tr class="reptool-entry-row" data-case-id="' + case_id + '"><td class="reptool-entry-name">' + entry['entry'] + '</td><td class="reptool-entry-class" data-classification="' + rep_class + '">' + rep_class_full + '</td><td class="reptool-entry-comment">' + entry['comment'] + '</td></tr>')
         error: (response) ->
           std_api_error(response, "Error retrieving Reptool Data", reload: false)
       )
