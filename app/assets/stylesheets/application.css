@@ -18,6 +18,7 @@
  *= require bootstrap-multiselect
  *= require bootstrap-table.min
  *= require_tree
+ *= require datatables
  *= require_self
  *= stub dataTables/extras/dataTables.responsive
  *= stub dataTables/jquery.dataTables

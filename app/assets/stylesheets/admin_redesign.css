@@ -3,6 +3,7 @@
  * listed below.
 
  *= require jquery-ui
+ *= require datatables
  *= require custom-bootstrap
  *= require bootstrap-switch
  *= require selectize
