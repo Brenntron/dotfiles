@@ -562,7 +562,7 @@ class ComplaintEntry < ApplicationRecord
   def current_category_data
     prefix_results = Wbrs::Prefix.where({:urls => [URI.escape(DisputeEntry.domain_of_with_path(self.hostlookup))]})
     return {} unless prefix_results
-    certainty_on_urls = Wbrs::Prefix.get_certainty_sources_for_urls([self.hostlookup])
+    certainty_on_urls = Wbrs::Prefix.get_certainty_sources_for_urls([DisputeEntry.domain_of_with_path(self.hostlookup)])
 
     final_results = []
     categories = prefix_results.find_all {|result| result.path == self.path}
