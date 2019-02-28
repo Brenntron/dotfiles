@@ -18,10 +18,21 @@ gem 'hashie-forbidden_attributes', '~> 0.1.1'
 
 gem 'kaminari', '1.1.1'
 
+# Security
 gem 'cancancan', '2.3.0'
 gem 'grape-cancan', '0.0.2'
 gem 'devise', '~> 4.5'
+
+# Networking and Messaging
 gem 'net-ldap', '0.16.1'
+gem 'httpi', '2.4.4'
+gem 'her', '1.0.3'
+gem 'curb', '0.9.6' #Libcurl bindings for Ruby
+gem 'net-ssh', '5.0.2'
+gem 'peake-bridge-client', '>= 0.0.9.0', git: "https://git.vrt.sourcefire.com/talosweb/peake-bridge-client.git"
+gem 'stomp', '1.4.6'
+gem 'rule_test_api', path: './vendor/gems/rule_test_api'
+gem 'aws-sdk', '2.11.170'
 
 gem 'mysql2', '0.5.2'
 gem 'rmagick', '~> 2.16.0'
@@ -30,13 +41,7 @@ gem 'bugzilla', require: 'bugzilla'
 gem 'xmlrpc'
 gem 'libv8', '3.16.14.19'
 
-gem 'rule_test_api', path: './vendor/gems/rule_test_api'
-gem 'her', '1.0.3'
-gem 'httpi', '2.4.4'
-gem 'curb', '0.9.6' #Libcurl bindings for Ruby
 
-gem 'net-ssh', '5.0.2'
-gem 'stomp', '1.4.6'
 
 gem 'rails_admin', '~> 1.3'
 
@@ -64,14 +69,14 @@ gem 'chartkick', '~> 2.2.4'
 gem 'bootstrap-multiselect-rails', '~> 0.9.9'
 gem 'awesome_nested_set', '3.1.4'
 
-gem 'aws-sdk', '2.11.170'
 
 gem 'whois', '4.0.7'
 gem 'whois-parser', '1.1.0'
 
 gem 'will_paginate', '3.1.6'
 
-gem 'jquery-datatables-rails', '~> 3.4.0'
+gem 'jquery-datatables', '~> 1.10.19'
+gem "sassc-rails", '~> 2.0'
 gem 'ajax-datatables-rails', '~> 0.4.0'
 gem 'clipboard-rails', '1.7.1'
 
@@ -133,8 +138,8 @@ end
 
 gem 'httparty', '~> 0.15.3'
 gem 'uglifier', '4.1.20'
-gem 'jquery-rails', '~> 4.3.1'
-gem 'jquery-ui-rails', '~> 6.0.1'
+gem 'jquery-rails', '~> 4.3'
+gem 'jquery-ui-rails', '~> 6.0'
 gem 'coffee-rails', '~> 4.2.1'
 gem 'less-rails', '~> 3.0.0'
 gem 'bootstrap-sass', '~> 3.4.1'
@@ -143,5 +148,4 @@ gem 'turbolinks', '5.2.0'
 gem 'paper_trail', '10.0.1'
 gem "sprockets", '~> 3.7.1'
 
-gem "peake-bridge-client", '>= 0.0.9.0', git: "https://git.vrt.sourcefire.com/talosweb/peake-bridge-client.git"
 
