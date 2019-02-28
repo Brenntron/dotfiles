@@ -186,11 +186,12 @@ module API
 
               # Grab prefix id for each URL
               permitted_params['urls'].each_with_index do |param, position|
-                prefix_record = Wbrs::Prefix.where(:urls => [param])
-                if !prefix_record.empty? && prefix_record.first.is_active == 1
-                  prefix_ids[position + 1] = prefix_record.first.prefix_id
-                else
-                  prefix_ids[position + 1 ] = nil
+                if param.strip != ''
+                  prefix_record = Wbrs::Prefix.where(:urls => DisputeEntry.domain_of_with_path([param]))
+
+                  if !prefix_record.empty? && prefix_record.first.is_active == 1
+                    prefix_ids[position + 1] = prefix_record.first.prefix_id
+                  end
                 end
               end
 
