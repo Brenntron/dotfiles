@@ -191,8 +191,6 @@ module API
 
                   if !prefix_record.empty? && prefix_record.first.is_active == 1
                     prefix_ids[position + 1] = prefix_record.first.prefix_id
-                  else
-                    prefix_ids[position + 1 ] = nil
                   end
                 end
               end

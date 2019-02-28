@@ -203,8 +203,8 @@ class DisputeEntry < ApplicationRecord
       end
 
       clean_url = Addressable::URI.parse(url)
-      clean_host = clean_url.host + clean_url.path
-      clean_host = clean_host.sub(/^www\./, '')
+      clean_host = clean_url.host.sub(/^www\./, '')
+      clean_host = clean_host + clean_url.path
 
       response = clean_host
     elsif urls.kind_of?(Array)
@@ -216,8 +216,8 @@ class DisputeEntry < ApplicationRecord
           end
 
           clean_url = Addressable::URI.parse(url)
-          clean_host = clean_url.host + clean_url.path
-          clean_host = clean_host.sub(/^www\./, '')
+          clean_host = clean_url.host.sub(/^www\./, '')
+          clean_host = clean_host + clean_url.path
 
           response << clean_host
         end
