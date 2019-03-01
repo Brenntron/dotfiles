@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 2019_02_05_164048) do
+ActiveRecord::Schema.define(version: 2019_03_01_174437) do
 
   create_table "alerts", options: "ENGINE=InnoDB DEFAULT CHARSET=utf8", force: :cascade do |t|
     t.datetime "created_at", null: false
@@ -523,6 +523,13 @@ ActiveRecord::Schema.define(version: 2019_02_05_164048) do
     t.text "location"
     t.string "file_type_name"
     t.string "source"
+  end
+
+  create_table "file_reps", options: "ENGINE=InnoDB DEFAULT CHARSET=utf8", force: :cascade do |t|
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.text "sha256"
+    t.string "email"
   end
 
   create_table "file_reputation_tickets", options: "ENGINE=InnoDB DEFAULT CHARSET=utf8", force: :cascade do |t|
