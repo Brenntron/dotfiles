@@ -1,2 +1,11 @@
 %h1 File Reputations
 
+#file-rep-datatable-div
+  %table#file-rep-datatable{'data-source': escalations_file_rep_file_reps_path(format: :json)}
+    %caption File Reputations
+    %thead
+      %tr
+        %th sha256
+        %th email
+    %tbody
+

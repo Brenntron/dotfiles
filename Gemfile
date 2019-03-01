@@ -77,7 +77,7 @@ gem 'will_paginate', '3.1.6'
 
 gem 'jquery-datatables', '~> 1.10.19'
 gem "sassc-rails", '~> 2.0'
-gem 'ajax-datatables-rails', '~> 0.4.0'
+gem 'ajax-datatables-rails', '~> 1.0.0'
 gem 'clipboard-rails', '1.7.1'
 
 gem 'capybara', '2.11.0'
