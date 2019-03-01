@@ -301,7 +301,7 @@ class DisputeEntry < ApplicationRecord
     return @wbrs_xlist
   rescue => except
     Rails.logger.warn "Populating xlist from Wbrs failed."
-    Rails.logger.warn "Hostlookup:" + self.hostlookup
+    Rails.logger.warn "Hostlookup:" + hostlookup
     Rails.logger.warn except
     Rails.logger.warn except.backtrace.join("\n")
 
