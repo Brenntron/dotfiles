@@ -22,6 +22,11 @@ Rails.application.routes.draw do
       end
     end
 
+    namespace :file_rep do
+      root 'file_reps#index'
+      resources :file_reps, only: [:index]
+    end
+
     namespace :webcat do
       root 'root#index'
       resources :complaints, only: [:index, :show, :update] do
