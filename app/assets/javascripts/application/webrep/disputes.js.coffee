@@ -512,7 +512,6 @@ window.submit_bulk_reptool = () ->
   #  Get the entries
   entry_rows = $(bulk_reptool_menu).find('.reptool-entry-row')
   entries = []
-  case_ids = ''
   current_entries_and_classes = []
   $(entry_rows).each ->
     entry = $(this).find('.reptool-entry-name')[0]
@@ -522,9 +521,6 @@ window.submit_bulk_reptool = () ->
       'entry': $(entry).text()
       'classifications': current_classes
     }
-    case_ids = $(this).attr("data-case-id")
-
-  comment = comment + '  :' + case_ids
 
   # If user wants to override existing classes we only need what they've checked
   if submission_action == "reptool-override"

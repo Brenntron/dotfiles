@@ -171,17 +171,30 @@ $ ->
     # Get all the checked entry urls
     if ($(checkbox).length > 0)
       ip_uris = []
+      comment_trail = ''
+      comment_array = []
       $(checkbox).each ->
-        if page == "show" || page == "research"
+        if page == "show"
+          entry_row = $(this).parents('.research-table-row')[0]
+          entry_content = $(entry_row).find('.entry-data-content').text().trim()
+        else if page == "research"
           entry_row = $(this).parents('.research-table-row')[0]
           entry_content = $(entry_row).find('.entry-data-content').text().trim()
         else if page == "index"
           entry_row = $(this).parents('.index-entry-row')[0]
           entry_content = $(entry_row).find('.entry-col-content').text().trim()
           entry_case_id = $(entry_row).attr('data-case-id')
-          case_id.push(entry_case_id)
-        # Send entry content to reptool
+          comment_array.push('#' + entry_case_id + ' - ' + entry_content)
+
+        # Prep entry content to send to reptool
         ip_uris.push(entry_content)
+
+      if page == "show"
+        comment_trail = '\n \n------------------------------- \nBULK SUBMISSION: \n #' + case_id + ' - ' + ip_uris.join(', ')
+      else if page == "research"
+        comment_trail = '\n \n------------------------------- \nRESEARCH BULK SUBMISSION: \n' + ip_uris.join('\n')
+      else if page == "index"
+        comment_trail = '\n \n------------------------------- \nBULK SUBMISSION: \n' + comment_array.join('\n')
 
       std_msg_ajax(
         url: '/escalations/api/v1/escalations/webrep/disputes/bulk_reptool_get_info_for_form'
@@ -199,6 +212,8 @@ $ ->
               rep_class = ''
 
             tbody.append('<tr class="reptool-entry-row" data-case-id="' + case_id + '"><td class="reptool-entry-name">' + entry['entry'] + '</td><td class="reptool-entry-class" data-classification="' + rep_class + '">' + rep_class_full + '</td><td class="reptool-entry-comment">' + entry['comment'] + '</td></tr>')
+          comment_box.val(comment_trail)
+
         error: (response) ->
           std_api_error(response, "Error retrieving Reptool Data", reload: false)
       )
