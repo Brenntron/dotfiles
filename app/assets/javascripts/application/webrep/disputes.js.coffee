@@ -397,6 +397,8 @@ window.inline_load_reptool_button =(button_tag) ->
     dataType: 'json'
     success: (response) ->
       response = JSON.parse(response)
+      console.log response
+
       show_content.text(adjust_form.getElementsByClassName('dispute-entry-content')[0].value)
       show_rep_class.text(response.classification)
       show_rep_exp.text(response.expiration)
