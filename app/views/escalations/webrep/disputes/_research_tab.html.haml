@@ -413,7 +413,7 @@
                               %table.dispute_tool_current
                                 %tr
                                   %td
-                                    %label.content-label-sm Classification
+                                    %label.content-label-sm Classifications
                                     %br
                                     - if entry.classifications.empty?
                                       %span.entry-reptool-class Not on RepTool
@@ -428,6 +428,10 @@
                                     - else
                                       %span.entry-reptool-expiration
                                         = entry.blacklist&.expiration
+                                  %td
+                                    %label.content-label-sm Comment
+                                    %br
+                                    %span.entry-reptool-comment
                               .inline-tool-content-wrapper
                                 .toolbar
                                   %div
@@ -450,6 +454,11 @@
                                 .comment-wrapper
                                   %label.content-label-sm Comment
                                   %textarea.dropdown-comment.adjust-reptool-bl-input.comment-input
+                                    \
+                                    \
+                                    \--------------------------
+                                    INDIVIDUAL SUBMISSION:
+                                    &#x000A; ##{@dispute.id} - #{entry.hostlookup}
                                 .button-row-center
                                   %button.primary.dropdown-submit-button{type: 'button', onclick: 'row_adust_reptool_bl_button(this)', disabled: true} Submit Changes
                 %tr.research-overview-row

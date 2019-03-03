@@ -369,7 +369,6 @@ window.save_dispute = () ->
 
 # Populating the in line Adjust Reptool button for research page and research tab
 window.inline_load_reptool_button =(button_tag) ->
-  #debugger
   adjust_form = button_tag.parentElement.getElementsByClassName('adjust-reptool-form')[0]
   submit_button = adjust_form.getElementsByClassName('dropdown-submit-button')
   #$(submit_button).attr("disabled", false)
@@ -381,9 +380,9 @@ window.inline_load_reptool_button =(button_tag) ->
   show_content = $(adjust_form).find('.entry-dispute-name')
   show_rep_class = $(adjust_form).find('.entry-reptool-class')
   show_rep_exp = $(adjust_form).find('.entry-reptool-expiration')
+  show_rep_comment = $(adjust_form).find('.entry-reptool-comment')
   action_input = $(adjust_form).find('.action-input')
   classifications_input = $(adjust_form).find('.classifications-input')
-  comment_input = $(adjust_form).find('.comment-input')
   data = {
 # Send entry content to reptool
     'entry' : adjust_form.getElementsByClassName('dispute-entry-content')[0].value
@@ -398,13 +397,13 @@ window.inline_load_reptool_button =(button_tag) ->
     dataType: 'json'
     success: (response) ->
       response = JSON.parse(response)
-
       show_content.text(adjust_form.getElementsByClassName('dispute-entry-content')[0].value)
       show_rep_class.text(response.classification)
       show_rep_exp.text(response.expiration)
+      show_rep_comment.text(response.comment)
       action_input.val(response.status)
       classifications_input.val(response.classification)
-      comment_input.val(response.comment)
+
       $(submit_button).attr('disabled', false)
 #          window.location.reload()
     error: (response) ->
