@@ -203,6 +203,7 @@ module API
               requires :new_assignee, type: Integer, desc: "User ID of new assignee"
             end
             post "change_assignee" do
+              authorize!(:update, dispute)
               disputes = Dispute.assign(params[:new_assignee], params[:dispute_ids])
               {:status => "success", :data => disputes}.to_json
             end
@@ -347,7 +348,9 @@ module API
                 dispute = Dispute.find(permitted_params['dispute_id'])
                 authorize!(:update, dispute)
 
-                dispute.take_ticket(user: current_user)
+                raise 'This ticket is already assigned.' unless dispute.user_id.nil? || User.vrtincoming&.id == dispute.user_id
+
+                Dispute.assign(current_user, permitted_params['dispute_id'])
 
                 { username: current_user.cvs_username, dispute_id: dispute.id }
               end
