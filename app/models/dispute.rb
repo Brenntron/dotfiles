@@ -1186,8 +1186,8 @@ class Dispute < ApplicationRecord
     # Atomic update statement to handle possible race condition.
     Dispute.where(id: self.id,
                   user_id: self.user_id).update_all(user_id: user.id)
-
-    dispute = Dispute.find(self.id)
+    dispute = Dispute.find(self.id, user_id: user.id)
+    raise 'This record changed while you were editing.' unless dispute.user_id == user.id
 
     if dispute.status == Dispute::STATUS_NEW || dispute.status == Dispute::STATUS_REOPENED
       accepted_at = Time.now
@@ -1202,7 +1202,6 @@ class Dispute < ApplicationRecord
       message = Bridge::DisputeEntryUpdateStatusEvent.new
       message.post_entries(dispute.dispute_entries)
     end
-    raise 'This record changed while you were editing.' unless dispute.user_id == user.id
   end
 
   def self.take_tickets(dispute_ids, user:)
@@ -1214,18 +1213,18 @@ class Dispute < ApplicationRecord
                     user_id:  User.vrtincoming.id).update_all(user_id: user.id)
 
       queries = Dispute.where(id: dispute_ids, user_id: user.id)
-      queries.each do |query|
-        if query.status == Dispute::STATUS_NEW || query.status == Dispute::STATUS_REOPENED
+      queries.each do |dispute|
+        if dispute.status == Dispute::STATUS_NEW || dispute.status == Dispute::STATUS_REOPENED
           accepted_at = Time.now
-          query.update(status: Dispute::STATUS_ASSIGNED, case_accepted_at: accepted_at)
-          query.dispute_entries.each do |entry|
+          dispute.update(status: Dispute::STATUS_ASSIGNED, case_accepted_at: accepted_at)
+          dispute.dispute_entries.each do |entry|
             if entry.status == DisputeEntry::NEW || entry.status == DisputeEntry::STATUS_REOPENED
               entry.update(status: DisputeEntry::ASSIGNED, case_accepted_at: accepted_at)
             end
           end
 
           message = Bridge::DisputeEntryUpdateStatusEvent.new
-          message.post_entries(query.dispute_entries)
+          message.post_entries(dispute.dispute_entries)
         end
       end
 
@@ -1238,11 +1237,11 @@ class Dispute < ApplicationRecord
   def return_dispute
     update(user_id: User.vrtincoming.id)
 
-    if status == 'ASSIGNED'
+    if status == STATUS_ASSIGNED
       update(status: 'NEW', case_accepted_at: nil)
 
       dispute_entries.each do |dispute_entry|
-        if dispute_entry.status == 'ASSIGNED'
+        if dispute_entry.status == DisputeEntry::ASSIGNED
           dispute_entry.update(status: 'NEW', case_accepted_at: nil)
         end
       end
