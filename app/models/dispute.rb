@@ -1208,31 +1208,10 @@ class Dispute < ApplicationRecord
 
   def self.take_tickets(dispute_ids, user:)
     Dispute.transaction do
-      unless Dispute.where(id: dispute_ids, user_id: User.vrtincoming.id)
+      unless 0 == Dispute.where(id: dispute_ids).where.not(user_id: User.vrtincoming.id).count
         raise 'Some of these ticket are already assigned.'
       end
-      Dispute.where(id: dispute_ids,
-                    user_id:  User.vrtincoming.id).update_all(user_id: user.id)
-
-      queries = Dispute.where(id: dispute_ids, user_id: user.id)
-      queries.each do |dispute|
-        if dispute.status == Dispute::STATUS_NEW || dispute.status == Dispute::STATUS_REOPENED
-          accepted_at = Time.now
-          dispute.update(status: Dispute::STATUS_ASSIGNED, case_accepted_at: accepted_at)
-          dispute.dispute_entries.each do |entry|
-            if entry.status == DisputeEntry::NEW || entry.status == DisputeEntry::STATUS_REOPENED
-              entry.update(status: DisputeEntry::ASSIGNED, case_accepted_at: accepted_at)
-            end
-          end
-
-          message = Bridge::DisputeEntryUpdateStatusEvent.new
-          message.post_entries(dispute.dispute_entries)
-        end
-      end
-
-      unless dispute_ids.count == Dispute.where(id: dispute_ids, user_id: user.id).count
-        raise 'This record changed while you were editing and may be already assigned'
-      end
+      Dispute.assign(user, dispute_ids)
     end
   end
 
