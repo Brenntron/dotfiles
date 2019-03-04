@@ -288,32 +288,6 @@ class Dispute < ApplicationRecord
 
   end
 
-  # Assigns a user to given disputes
-  # @param [User|Integer] user the user to assign this dispute to
-  # @param [Array<Integer>|Integer] dispute_ids the disputes to assign
-  # @return [Array<Dispute>] the disputes updated
-  def self.assign(user, dispute_ids)
-    user_id = user.kind_of?(User) ? user.id : user
-    accepted_at = Time.now
-
-    disputes_ary = []
-    Dispute.transaction do
-      disputes = Dispute.where(id: dispute_ids, status: [Dispute::STATUS_NEW, Dispute::STATUS_REOPENED])
-      disputes_ary = disputes.all.to_a
-      disputes.update_all(user_id: user_id, status: Dispute::STATUS_ASSIGNED, case_accepted_at: accepted_at)
-
-      entries = DisputeEntry.where(dispute: disputes_ary, status: [DisputeEntry::NEW, DisputeEntry::STATUS_REOPENED])
-      entries_ary = entries.all.to_a
-      if entries_ary.any?
-        entries.update_all(status: DisputeEntry::ASSIGNED, case_accepted_at: accepted_at)
-        Bridge::DisputeEntryUpdateStatusEvent.new.post_entries(entries_ary)
-      end
-    end
-    # raise "This record changed while you were editing. To continue this operation anyway, reload the page and make your assignment again." unless d.user_id == params[:new_assignee]
-
-    disputes_ary
-  end
-
   def self.manage_duplicate_dispute(dispute, authority_dispute, new_entries_ips, new_entries_urls, source_key)
     resolved_at = Time.now
     dispute.status = Dispute::RESOLVED
@@ -1204,6 +1178,34 @@ class Dispute < ApplicationRecord
       dispute_peeks.create(user: user)
       DisputePeek.delete_excess(user: user)
     end
+  end
+
+  # Assigns a user to given disputes
+  # @param [User|Integer] user the user to assign this dispute to
+  # @param [Array<Integer>|Integer] dispute_ids the disputes to assign
+  # @return [Array<Dispute>] the disputes updated
+  def self.assign(user, dispute_ids)
+    byebug
+    user_id = user.kind_of?(User) ? user.id : user
+    accepted_at = Time.now
+
+    disputes_ary = []
+    Dispute.transaction do
+      byebug
+      disputes = Dispute.where(id: dispute_ids, status: [Dispute::STATUS_NEW, Dispute::STATUS_REOPENED])
+      disputes_ary = disputes.all.to_a
+      disputes.update_all(user_id: user_id, status: Dispute::STATUS_ASSIGNED, case_accepted_at: accepted_at)
+
+      entries = DisputeEntry.where(dispute: disputes_ary, status: [DisputeEntry::NEW, DisputeEntry::STATUS_REOPENED])
+      entries_ary = entries.all.to_a
+      if entries_ary.any?
+        entries.update_all(status: DisputeEntry::ASSIGNED, case_accepted_at: accepted_at)
+        Bridge::DisputeEntryUpdateStatusEvent.new.post_entries(entries_ary)
+      end
+    end
+    # raise "This record changed while you were editing. To continue this operation anyway, reload the page and make your assignment again." unless d.user_id == params[:new_assignee]
+
+    disputes_ary
   end
 
   def self.take_tickets(dispute_ids, user:)
