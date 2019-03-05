@@ -754,7 +754,7 @@ format = (complaint_entry_row) ->
       '<table><tr><td class="no_pad"><div class="row">' +
       '<div class="col-xs-12 col-sm-6 nested-complaint-static-data">' +
       '<div class="row">' +
-      '<div class="col-xs-5 col-with-divider">' +
+      '<div class="col-xs-4 col-with-divider">' +
       '<div class="screenshot-thumb-wrapper">' +
       '<img id="screenshot_id_' + complaint_entry.entry_id + '" class="screenshot-thumb-img" title="' + screen_shot_error + '" data-toggle="popover" onclick="enlarge_image(' + complaint_entry.entry_id + ',\'complaint_entries/serve_image?complaint_entry_id=' + complaint_entry.entry_id + '\')" src="complaint_entries/serve_image?complaint_entry_id=' + complaint_entry.entry_id + '" />' +
       '</div>' +
@@ -766,13 +766,17 @@ format = (complaint_entry_row) ->
       '<label class="content-label-sm">Site Search</label>' +
       '<span class="nested-complaint-data" id="site-search-' + complaint_entry.entry_id + '">' + search_uri + '</span>' +
       '</div></div>' +
-      '<div class="col-xs-5 col-with-divider">' +
+      '<div class="col-xs-4 col-with-divider">' +
       '<table class="simple-nested-table" id="' + complaint_entry.entry_id + '"><thead><tr><th>Conf</th><th>Current Categories</th><th>Certainty</th></tr></thead>' +
       '</table>' +
       '</div>' +
-      '<div class="col-xs-2">' +
+      '<div class="col-xs-2 col-with-divider">' +
       '<label class="content-label-sm">Resolution</label><br/>' +
       '<span class="complaint-resolution' + complaint_entry.entry_id + '">' + complaint_entry.resolution + '</span>' +
+        '</div><div class="col-xs-2">' +
+        '<button class="secondary" id="lookup-' + complaint_entry.entry_id + '" onclick="WebCat.RepLookup.queryWhoIs(\'' + url + '\')">Lookup</button><br/>' +
+        '<button class="secondary" id="history-' + complaint_entry.entry_id + '" onclick="history_dialog(' + complaint_entry.entry_id  + ')">History</button><br/>' +
+        '<button class="secondary" id="domain-' + complaint_entry.entry_id + '" onclick="domain_whois(\'' + whois_lookup + '\')">Domain</domain>' +
       '</div></div></div>' +
       '<div class="col-xs-12 col-sm-6 nested-complaint-editable-data">' +
       '<div class="row">' +
