@@ -174,10 +174,7 @@ $ ->
       comment_trail = ''
       comment_array = []
       $(checkbox).each ->
-        if page == "show"
-          entry_row = $(this).parents('.research-table-row')[0]
-          entry_content = $(entry_row).find('.entry-data-content').text().trim()
-        else if page == "research"
+        if page == "show" || page == "research"
           entry_row = $(this).parents('.research-table-row')[0]
           entry_content = $(entry_row).find('.entry-data-content').text().trim()
         else if page == "index"
@@ -246,30 +243,46 @@ $ ->
     row = ''
     tbody = ''
     current_wbrs = ''
+    comment_box = ''
+    dropdown_wrapper = ''
 
     # Define variables based on what page we're on
     if page == 'index'
+      dropdown_wrapper = $('#wlbl_adjust_entries_index')
       checkbox = '.dispute-entry-checkbox'
       row = '.index-entry-row'
-      tbody = $('#wlbl_adjust_entries_index').find('table.dispute_tool_current').find('tbody')
       current_wbrs = '.entry-col-wbrs-score'
-    else if page == 'show' || page == 'research'
+      case_id = []
+
+    else if page == 'show'
+      dropdown_wrapper = $('#wlbl_adjust_entries')
       checkbox = '.dispute_check_box'
       row = '.research-table-row'
-      tbody = $('#wlbl_adjust_entries').find('table.dispute_tool_current').find('tbody')
       current_wbrs = '.current-wbrs-score'
+      case_id = $('#dispute_id').text()
+
+    else if page == 'research'
+      checkbox = '.dispute_check_box'
+      row = '.research-table-row'
+      current_wbrs = '.current-wbrs-score'
+      case_id = ''
+
+    tbody = $(dropdown_wrapper).find('table.dispute_tool_current').find('tbody')
+    comment_box = $(dropdown_wrapper).find('.adjust-wlbl-input')
 
     ## Clear out any residual data
     # Empty table
     $(tbody).empty()
+    # Empty comment box
+    $(comment_box).text('')
 
     # Clear the checkboxes
-    wl_weak = $('#wlbl_adjust_entries').find('.wl-weak-checkbox')
-    wl_med = $('#wlbl_adjust_entries').find('.wl-med-checkbox')
-    wl_heavy = $('#wlbl_adjust_entries').find('.wl-heavy-checkbox')
-    bl_weak = $('#wlbl_adjust_entries').find('.bl-weak-checkbox')
-    bl_med = $('#wlbl_adjust_entries').find('.bl-med-checkbox')
-    bl_heavy = $('#wlbl_adjust_entries').find('.bl-heavy-checkbox')
+    wl_weak = $(dropdown_wrapper).find('.wl-weak-checkbox')
+    wl_med = $(dropdown_wrapper).find('.wl-med-checkbox')
+    wl_heavy = $(dropdown_wrapper).find('.wl-heavy-checkbox')
+    bl_weak = $(dropdown_wrapper).find('.bl-weak-checkbox')
+    bl_med = $(dropdown_wrapper).find('.bl-med-checkbox')
+    bl_heavy = $(dropdown_wrapper).find('.bl-heavy-checkbox')
     $(wl_weak[0]).prop('checked', false)
     $(wl_med[0]).prop('checked', false)
     $(wl_heavy[0]).prop('checked', false)
@@ -277,9 +290,6 @@ $ ->
     $(bl_med[0]).prop('checked', false)
     $(bl_heavy[0]).prop('checked', false)
 
-    # Empty comment box
-    comment_box = $('#wlbl_adjust_entries').find('.adjust-wlbl-input')
-    $(comment_box).val('')
 
     ## Get data to populate table
     # Get all the checked entries
@@ -289,21 +299,32 @@ $ ->
 
     # Pull the entry content out
     if (entries_checked.length > 0)
-      data = {'entries': []}
+      entries = []
       wbrs = ''
+      comment_trail = ''
+      comment_array = []
       $(entries_checked).each ->
         # Slightly different structure to get the actual entry content
         if row == '.research-table-row'
-          entry_row = $(this).parents('.research-table-row')[0]
-          entry_content = $(entry_row).find('.entry-data-content').text()
+          entry_row = $(this).parents(row)[0]
+          entry_content = $(entry_row).find('.entry-data-content').text().trim()
           wbrs = $(entry_row).find(current_wbrs).text()
-          data['entries'].push(entry_content)
-
         else if row == '.index-entry-row'
-          entry_row = $(this).parents('.index-entry-row')[0]
-          entry_content = $(entry_row).find('.entry-col-content').text()
-          data['entries'].push("\n" + entry_content + "\n")
+          entry_row = $(this).parents(row)[0]
+          entry_content = $(entry_row).find('.entry-col-content').text().trim()
+          entry_case_id = $(entry_row).attr('data-case-id')
           wbrs = $(entry_row).find(current_wbrs).text()
+          comment_array.push('#' + entry_case_id + ' - ' + entry_content)
+
+        entries.push(entry_content)
+      data = {'entries': entries}
+
+      if page == "show"
+        comment_trail = '\n \n------------------------------- \nBULK SUBMISSION: \n #' + case_id + ' - ' + entries.join(', ')
+      else if page == "research"
+        comment_trail = '\n \n------------------------------- \nRESEARCH BULK SUBMISSION: \n' + entries.join('\n')
+      else if page == "index"
+        comment_trail = '\n \n------------------------------- \nBULK SUBMISSION: \n' + comment_array.join('\n')
 
       std_msg_ajax(
         url: '/escalations/api/v1/escalations/webrep/disputes/bulk_rule_ui_wlbl_get_info_for_form'
@@ -328,7 +349,7 @@ $ ->
               comment = ''
 
             $(tbody).append('<tr class="wlbl-dropdown-row">' + '<td class="wlbl-entry-content">' + ip_uri + '</td><td class="wlbl-entry-wlbl">' + list_types + '</td>' + '<td class="wlbl-current-entry-wbrs text-center">' + wbrs_score + '</td>')
-
+          comment_box.text(comment_trail)
         error: (response) ->
           std_msg_error( 'Error retrieving WL/BL Data', response)
       )

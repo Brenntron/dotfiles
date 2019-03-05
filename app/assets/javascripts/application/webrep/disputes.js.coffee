@@ -415,6 +415,9 @@ window.inline_load_reptool_button =(button_tag) ->
 
 
 window.row_adust_reptool_bl_button =(button_tag) ->
+#  Why are we sending the ids instead of the entry content
+#  We should update this to process the same way that the bulk submission does
+
   reptool_bl_form = button_tag.form
   data = {
     'action': reptool_bl_form.getElementsByClassName('action-input')[0].value
