@@ -95,9 +95,9 @@ GEM
     bindex (0.5.0)
     bootstrap-multiselect-rails (0.9.9)
       rails (>= 4.0.0)
-    bootstrap-sass (3.3.7)
+    bootstrap-sass (3.4.1)
       autoprefixer-rails (>= 5.2.1)
-      sass (>= 3.3.4)
+      sassc (>= 2.0.0)
     bugzilla (0.10.0)
       gruff (~> 0)
       highline
@@ -453,6 +453,9 @@ GEM
       sprockets (>= 2.8, < 4.0)
       sprockets-rails (>= 2.0, < 4.0)
       tilt (>= 1.1, < 3)
+    sassc (2.0.0)
+      ffi (~> 1.9.6)
+      rake
     selectize-rails (0.12.6)
     shellany (0.0.1)
     simple_form (4.0.1)
@@ -530,7 +533,7 @@ DEPENDENCIES
   awesome_print (= 1.8.0)
   aws-sdk (= 2.11.170)
   bootstrap-multiselect-rails (~> 0.9.9)
-  bootstrap-sass (~> 3.3.7)
+  bootstrap-sass (~> 3.4.1)
   bugzilla
   byebug (= 10.0.2)
   cancancan (= 2.3.0)
