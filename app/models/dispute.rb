@@ -1185,13 +1185,11 @@ class Dispute < ApplicationRecord
   # @param [Array<Integer>|Integer] dispute_ids the disputes to assign
   # @return [Array<Dispute>] the disputes updated
   def self.assign(user, dispute_ids)
-    byebug
     user_id = user.kind_of?(User) ? user.id : user
     accepted_at = Time.now
 
     disputes_ary = []
     Dispute.transaction do
-      byebug
       disputes = Dispute.where(id: dispute_ids, status: [Dispute::STATUS_NEW, Dispute::STATUS_REOPENED])
       disputes_ary = disputes.all.to_a
       disputes.update_all(user_id: user_id, status: Dispute::STATUS_ASSIGNED, case_accepted_at: accepted_at)
