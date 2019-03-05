@@ -1800,14 +1800,20 @@ $ ->
 #    Get entry content
     research_row = $(button).parents('.research-table-row')[0]
     entry_wrapper = $(research_row).find('.entry-data-content')[0]
-    entry_content = $(entry_wrapper).text()
-    wbrs = $($(research_row).find('.entry-data-wbrs-score')[0]).text().trim()
+    entry_content = $(entry_wrapper).text().trim()
+    wbrs = $($(research_row).find('.entry-data-wbrs-score')[0]).text()
+    if $('#dispute_id').length > 0
+      case_id = $('#dispute_id').text()
+      comment_text = '\n \n------------------------------- \nINDIVIDUAL SUBMISSION: \n #' + case_id + ' - ' + entry_content
+    else
+      comment_text = '\n \n------------------------------- \nRESEARCH SUBMISSION: \n ' + entry_content
 
 #    Define fields that need to be filled out in the dropdown
     dropdown = $(button).next('.dropdown-menu')[0]
     wlbl_list = $(dropdown).find('.wlbl-entry-wlbl')
     wbrs_score = $(dropdown).find('.wlbl-current-entry-wbrs')
     submit_button = $(dropdown).find('.dropdown-submit-button')
+    comment = $(dropdown).find('.adjust-wlbl-input')
     wl_weak = $(dropdown).find('.wl-weak-checkbox')
     wl_med = $(dropdown).find('.wl-med-checkbox')
     wl_heavy = $(dropdown).find('.wl-heavy-checkbox')
@@ -1889,7 +1895,7 @@ $ ->
           $(wbrs_score).text(wbrs)
           $(wlbl_list[0]).text('Not on a list')
           $(submit_button[0]).attr('disabled', false)
-
+        $(comment).text(comment_text)
       error: (response) ->
         popup_response_error(response, 'Error retrieving WL/BL Data')
     )
