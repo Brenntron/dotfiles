@@ -358,36 +358,34 @@ class DisputeEntry < ApplicationRecord
   end
 
   def umbrellaresult
-    begin
-      if dispute_entry_preload.present? && dispute_entry_preload.umbrella.present?
-        @umbrellaresult = dispute_entry_preload.umbrella
-        return @umbrellaresult
-      end
-
-      # TODO: This is a little ugly, being as the same logic exists inside `base.rb` of the Preload model.
-      # If time ever permits, refactor it.
-      @umbrella = AutoResolve.new.call_umbrella(address: hostlookup)
-
-      pretty_umbrella_status = "Unclassified" # Default or "0"
-      if @umbrella.present?
-        case
-          # Per docs here: https://dashboard.umbrella.com/o/1755319/#overview
-        when @umbrella[hostlookup]["status"] == -1
-          pretty_umbrella_status = "Malicious"
-        when @umbrella[hostlookup]["status"] == 1
-          pretty_umbrella_status = "Benign"
-        end
-      end
-
-      pretty_umbrella_status
-    rescue => except
-      Rails.logger.warn "Populating umbrella failed"
-      Rails.logger.warn "Hostlookup:" + hostlookup
-      Rails.logger.warn except
-      Rails.logger.warn except.backtrace.join("\n")
-
-      return 'Unable to resolve'
+    if dispute_entry_preload.present? && dispute_entry_preload.umbrella.present?
+      @umbrellaresult = dispute_entry_preload.umbrella
+      return @umbrellaresult
     end
+
+    # TODO: This is a little ugly, being as the same logic exists inside `base.rb` of the Preload model.
+    # If time ever permits, refactor it.
+    @umbrella = AutoResolve.new.call_umbrella(address: hostlookup)
+
+    pretty_umbrella_status = "Unclassified" # Default or "0"
+    if @umbrella.present?
+      case
+        # Per docs here: https://dashboard.umbrella.com/o/1755319/#overview
+      when @umbrella[hostlookup]["status"] == -1
+        pretty_umbrella_status = "Malicious"
+      when @umbrella[hostlookup]["status"] == 1
+        pretty_umbrella_status = "Benign"
+      end
+    end
+
+    pretty_umbrella_status
+  rescue => except
+    Rails.logger.warn "Populating umbrella failed"
+    Rails.logger.warn "Hostlookup:" + hostlookup
+    Rails.logger.warn except
+    Rails.logger.warn except.backtrace.join("\n")
+
+    return 'Unable to resolve'
   end
 
   def assign_from_auto_resolve(address:, total_hits:, resolved_at:, dispute_entry:)
