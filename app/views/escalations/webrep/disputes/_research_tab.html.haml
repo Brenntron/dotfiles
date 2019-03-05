@@ -340,7 +340,7 @@
                         %button.dispute-inline-buttons.edit-button.inline-edit-entry-button.esc-tooltipped{'data-entry-id': "#{entry.id}", title: 'Edit this entry'}
                       %span.dropdown
                         - if (@dispute.resolution != Dispute::DUPLICATE) && (@dispute.status != Dispute::RESOLVED)
-                          %button.dispute-inline-buttons.adjust-wlbl-button.bfrp-inline-wlbl-button.dropdown-toggle.esc-tooltipped{id: "wlbl_button_#{entry.id}", title: 'Adjust WL/BL', 'data-toggle': 'dropdown', 'aria-haspopup': 'true', 'aria-expanded': 'false'}
+                          %button.dispute-inline-buttons.adjust-wlbl-button.bfrp-inline-wlbl-button.dropdown-toggle.esc-tooltipped{id: "wlbl_button_#{entry.id}", title: 'Adjust WL/BL', 'data-toggle': 'dropdown', 'aria-haspopup': 'true', 'aria-expanded': 'false', onclick: 'get_inline_row_wlbl(this);'}
                         .dropdown-menu{id: "wlbl_adjust_#{entry.id}", 'aria-labelledby': "wlbl_button_#{entry.id}"}
                           = form_for :wlbl, html: {class: 'adjust-wlbl-form'} do |wlbl_form|
                             .dispute-wlbl-adjust-wrapper

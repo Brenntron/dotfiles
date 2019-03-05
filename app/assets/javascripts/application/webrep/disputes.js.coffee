@@ -397,8 +397,6 @@ window.inline_load_reptool_button =(button_tag) ->
     dataType: 'json'
     success: (response) ->
       response = JSON.parse(response)
-      console.log response
-
       show_content.text(adjust_form.getElementsByClassName('dispute-entry-content')[0].value)
       show_rep_class.text(response.classification)
       show_rep_exp.text(response.expiration)
@@ -1798,15 +1796,15 @@ $ ->
       alert('No disputes selected')
 
 # Inline WLBL Adjust Button
-  $('.bfrp-inline-wlbl-button').click ->
+  window.get_inline_row_wlbl = (button) ->
 #    Get entry content
-    research_row = $(this).parents('.research-table-row')[0]
+    research_row = $(button).parents('.research-table-row')[0]
     entry_wrapper = $(research_row).find('.entry-data-content')[0]
     entry_content = $(entry_wrapper).text()
-    wbrs = $($(research_row).find('.entry-data-wbrs-score')[0]).text()
+    wbrs = $($(research_row).find('.entry-data-wbrs-score')[0]).text().trim()
 
 #    Define fields that need to be filled out in the dropdown
-    dropdown = $(this).next('.dropdown-menu')[0]
+    dropdown = $(button).next('.dropdown-menu')[0]
     wlbl_list = $(dropdown).find('.wlbl-entry-wlbl')
     wbrs_score = $(dropdown).find('.wlbl-current-entry-wbrs')
     submit_button = $(dropdown).find('.dropdown-submit-button')
@@ -1892,10 +1890,11 @@ $ ->
           $(wlbl_list[0]).text('Not on a list')
           $(submit_button[0]).attr('disabled', false)
 
-
       error: (response) ->
         popup_response_error(response, 'Error retrieving WL/BL Data')
     )
+
+
 
 window.populate_entry_status_dropdown = (dispute_id) ->
   std_msg_ajax(

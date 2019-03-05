@@ -409,22 +409,6 @@ $ ->
 
 
 
-  #Inline Adjust WL/BL Button
-  $('.dispute-inline-buttons.adjust-wlbl-button').click ->
-    dropdown = $(this).next('.dropdown-menu')
-    comment_wrapper = $(dropdown).find('.comment-wrapper')
-    submit_button = $(dropdown).find('.dropdown-submit-button')
-    list_toggle = $(dropdown ).find('.wl-bl-list-inline')
-    initial_val = ''
-
-    $(list_toggle).each ->
-      initial_val = $(this).prop("checked")
-
-      $(this).click ->
-        if $(this).prop("checked") != initial_val
-          $(comment_wrapper).show()
-          $(submit_button).attr("disabled", false)
-
 
 # Show / hide the different research tables in the expanded row
   $('.research-row-checkbox').click ->
