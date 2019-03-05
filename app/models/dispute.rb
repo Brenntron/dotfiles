@@ -1201,7 +1201,6 @@ class Dispute < ApplicationRecord
         Bridge::DisputeEntryUpdateStatusEvent.new.post_entries(entries_ary)
       end
     end
-    # raise "This record changed while you were editing. To continue this operation anyway, reload the page and make your assignment again." unless d.user_id == params[:new_assignee]
 
     disputes_ary
   end
