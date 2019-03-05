@@ -291,14 +291,12 @@ class DisputeEntry < ApplicationRecord
   end
 
   def wbrs_xlist
-    if dispute_entry_preload.present? && dispute_entry_preload.crosslisted_urls.present?
-      @wbrs_xlist = Wbrs::ManualWlbl.load_from_prefetch(dispute_entry_preload.crosslisted_urls)
-      return @wbrs_xlist
-    end
-
-    @wbrs_xlist = Wbrs::ManualWlbl.where({:url => DisputeEntry.domain_of(hostlookup)})
-
-    return @wbrs_xlist
+    @wbrs_xlist ||=
+        if dispute_entry_preload.present? && dispute_entry_preload.crosslisted_urls.present?
+          Wbrs::ManualWlbl.load_from_prefetch(dispute_entry_preload.crosslisted_urls)
+        else
+          Wbrs::ManualWlbl.where({:url => DisputeEntry.domain_of(hostlookup)})
+        end
   rescue => except
     Rails.logger.warn "Populating xlist from Wbrs failed."
     Rails.logger.warn "Hostlookup:" + hostlookup
