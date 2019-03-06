@@ -369,7 +369,7 @@ window.save_dispute = () ->
 
 # Populating the in line Adjust Reptool button for research page and research tab
 window.inline_load_reptool_button =(button_tag) ->
-  #debugger
+#debugger
   adjust_form = button_tag.parentElement.getElementsByClassName('adjust-reptool-form')[0]
   submit_button = adjust_form.getElementsByClassName('dropdown-submit-button')
   #$(submit_button).attr("disabled", false)
@@ -464,7 +464,7 @@ window.row_adust_reptool_bl_button_research =(button_tag) ->
 
 
 $ ->
-  ## Bulk Reptool form manipulation based on user's selections
+## Bulk Reptool form manipulation based on user's selections
   bulk_reptool_menu = $('#reptool_adjust_entries')
   submission_actions = bulk_reptool_menu.find("input[name='reptool-action-radio']")
   reptool_submit = $('#reptool_adjust_entries').find('.dropdown-submit-button')
@@ -620,7 +620,7 @@ window.submit_bulk_reptool = () ->
       method: 'POST'
       data: {data: data}
       success: (response) ->
-        std_msg_success('These RepTool classes (' + reptool_classes + ') were changed on the following entries:', [entries])
+        std_msg_success('These RepTool classes (' + reptool_classes.replace(/,/g, ', ') + ') were changed on the following entries:', [entries])
       error: (response) ->
         if response.responseJSON == undefined
           response_lines = response.responseText.split("\n")
@@ -813,9 +813,9 @@ window.related_disputes = () ->
   entry_ids = $('.dispute_check_box:checkbox:checked').map(() ->
     Number(this.value)
   ).toArray()
-#  if entry_ids.length == 0
-#    std_msg_error('Setting related error', ['No issue(s) selected.'])
-#    return
+  #  if entry_ids.length == 0
+  #    std_msg_error('Setting related error', ['No issue(s) selected.'])
+  #    return
   original_dispute_id = $('.dispute-id').val()
 
   # Make sure that the original dispute ID is provided by the user.
@@ -1374,7 +1374,7 @@ $ ->
       {
         data: 'dispute_resolution'
       }
-       {
+      {
         data: 'submission_type'
         render: (data) ->
           title = ''
@@ -1679,7 +1679,7 @@ $ ->
               $("##{column}-checkbox").prop('checked', false)
               window.dispute_table.column("##{column}").visible false
 
-    )
+      )
 
     $('.toggle-vis').on "click", ->
       data = {}
@@ -1793,7 +1793,7 @@ $ ->
     else
       alert('No disputes selected')
 
-# Inline WLBL Adjust Button
+  # Inline WLBL Adjust Button
   $('.bfrp-inline-wlbl-button').click ->
 #    Get entry content
     research_row = $(this).parents('.research-table-row')[0]
@@ -1801,7 +1801,7 @@ $ ->
     entry_content = $(entry_wrapper).text()
     wbrs = $($(research_row).find('.entry-data-wbrs-score')[0]).text()
 
-#    Define fields that need to be filled out in the dropdown
+    #    Define fields that need to be filled out in the dropdown
     dropdown = $(this).next('.dropdown-menu')[0]
     wlbl_list = $(dropdown).find('.wlbl-entry-wlbl')
     wbrs_score = $(dropdown).find('.wlbl-current-entry-wbrs')
@@ -1813,7 +1813,7 @@ $ ->
     bl_med = $(dropdown).find('.bl-med-checkbox')
     bl_heavy = $(dropdown).find('.bl-heavy-checkbox')
 
-#   Clearing data to start in case user has page open for a while and data needs to be regrabbed
+    #   Clearing data to start in case user has page open for a while and data needs to be regrabbed
     $(wlbl_list[0]).empty()
     $(wbrs_score[0]).empty()
     $(wl_weak[0]).prop('checked', false)
@@ -1829,7 +1829,7 @@ $ ->
     bl_med_status = 'false'
     bl_heavy_status = 'false'
 
-#    Initializing 'current' status of lists to be filled in when data is fetched
+    #    Initializing 'current' status of lists to be filled in when data is fetched
     initial_wl_weak_status = ''
     initial_wl_med_status = ''
     initial_wl_heavy_status = ''
@@ -1850,7 +1850,7 @@ $ ->
       data: data
       dataType: 'json'
       success: (response) ->
-      #values will be in the format of BL-med, BL-weak, BL-heavy   (same with WL)
+#values will be in the format of BL-med, BL-weak, BL-heavy   (same with WL)
 
         response = JSON.parse(response)
         if response.data != ""
@@ -1947,11 +1947,11 @@ $ ->
           'tooltipster-borderless'
           'tooltipster-borderless-customized'
           'tooltipster-borderless-comment'
-          ]
+        ]
         'maxWidth': 500
       $(this).tooltipster 'show'
     return
-    
+
 
 
 
@@ -2030,98 +2030,98 @@ $ ->
   #  )
 
 
-#    makeBar('graph-ticket-entries-closed', barDataSet)
+  #    makeBar('graph-ticket-entries-closed', barDataSet)
 
-#  $('.graph-config select').on 'change', (el) ->
-#    if el.target.value == 'yearly'
-#      barDataSet = window.myBar.data.datasets
-#      window.myBar.data.datasets = barDataSet.concat barDataSets.filter (x) -> x.label == 'Total Ticket Entries'
-#      window.myBar.update()
-#    else if el.target.value == 'montly'
-#      barDataSet = window.myBar.data.datasets.filter (x) -> x.label != 'E' and x.label != 'W' and x.label != 'EW'
-#      window.myBar.data.datasets = barDataSet
-#      window.myBar.update()
-#    else if el.target.value == 'weekly'
-#      barDataSet = window.myBar.data.datasets.filter (x) -> x.label != 'E' and x.label != 'W' and x.label != 'EW'
-#      window.myBar.data.datasets = barDataSet
-#      window.myBar.update()
-#    else
-#      window.myBar.data.datasets = barDataSets
-#      window.myBar.update()
-
-
-#  Test data for Closed Email Entry Resolutions
-#  emailEntryResolutionLabels = ['Fixed', 'Unchanged', 'Fixed FP', 'Other']
-#  emailEntryData = [3,6,7,0]
-
-#  new Chart($('#closed-email-entries-resolution-piechart'),
-#    type: 'pie'
-#    data:
-#      labels: emailEntryResolutionLabels
-#      datasets: [ {
-#        label: 'close-email-entries'
-#        backgroundColor: [
-#          '#3e5a72'
-#          '#6dbcdb'
-#          '#666'
-#        ]
-#        data: emailEntryData
-#      } ]
-#    options:
-#      legend: false
-#      pieceLabel:
-#        render: (args) ->
-#          return args.percentage + '%'
-#        position: 'outside'
-#        segment: false
-#        precision: 2
-#        showZero: true
-#        fontStyle: 'bolder'
-#        overlap: false
-#        showActualPercentages: true
-#  )
+  #  $('.graph-config select').on 'change', (el) ->
+  #    if el.target.value == 'yearly'
+  #      barDataSet = window.myBar.data.datasets
+  #      window.myBar.data.datasets = barDataSet.concat barDataSets.filter (x) -> x.label == 'Total Ticket Entries'
+  #      window.myBar.update()
+  #    else if el.target.value == 'montly'
+  #      barDataSet = window.myBar.data.datasets.filter (x) -> x.label != 'E' and x.label != 'W' and x.label != 'EW'
+  #      window.myBar.data.datasets = barDataSet
+  #      window.myBar.update()
+  #    else if el.target.value == 'weekly'
+  #      barDataSet = window.myBar.data.datasets.filter (x) -> x.label != 'E' and x.label != 'W' and x.label != 'EW'
+  #      window.myBar.data.datasets = barDataSet
+  #      window.myBar.update()
+  #    else
+  #      window.myBar.data.datasets = barDataSets
+  #      window.myBar.update()
 
 
   #  Test data for Closed Email Entry Resolutions
-#  webEntryResolutionLabels = ['Fixed FN', 'Unchanged', 'Fixed FP', 'Other']
-#  webEntryData = [3,6,7,0]
+  #  emailEntryResolutionLabels = ['Fixed', 'Unchanged', 'Fixed FP', 'Other']
+  #  emailEntryData = [3,6,7,0]
 
-#  new Chart(document.getElementById('closed-web-entries-resolution-piechart'),
-#    type: 'pie'
-#    data:
-#      labels: [
-#        'Fixed'
-#        'Unchanged'
-#        'Fixed FP'
-#      ]
-#      datasets: [ {
-#        label: 'close-email-entries'
-#        backgroundColor: [
-#          '#3e5a72'
-#          '#6dbcdb'
-#          '#666'
-#        ]
-#        data: [
-#          2478
-#          3267
-#          4202
-#        ]
-#      } ]
-#    options:
-#      legend: false
-#      pieceLabel:
-#        render: (args) ->
-#          return args.percentage + '%'
-#        position: 'outside'
-#        label: 'Unchanched'
-#        segment: false
-#        precision: 2
-#        showZero: true
-#        fontStyle: 'bolder'
-#        overlap: false
-#        showActualPercentages: true
+  #  new Chart($('#closed-email-entries-resolution-piechart'),
+  #    type: 'pie'
+  #    data:
+  #      labels: emailEntryResolutionLabels
+  #      datasets: [ {
+  #        label: 'close-email-entries'
+  #        backgroundColor: [
+  #          '#3e5a72'
+  #          '#6dbcdb'
+  #          '#666'
+  #        ]
+  #        data: emailEntryData
+  #      } ]
+  #    options:
+  #      legend: false
+  #      pieceLabel:
+  #        render: (args) ->
+  #          return args.percentage + '%'
+  #        position: 'outside'
+  #        segment: false
+  #        precision: 2
+  #        showZero: true
+  #        fontStyle: 'bolder'
+  #        overlap: false
+  #        showActualPercentages: true
+  #  )
 
-#  )
+
+  #  Test data for Closed Email Entry Resolutions
+  #  webEntryResolutionLabels = ['Fixed FN', 'Unchanged', 'Fixed FP', 'Other']
+  #  webEntryData = [3,6,7,0]
+
+  #  new Chart(document.getElementById('closed-web-entries-resolution-piechart'),
+  #    type: 'pie'
+  #    data:
+  #      labels: [
+  #        'Fixed'
+  #        'Unchanged'
+  #        'Fixed FP'
+  #      ]
+  #      datasets: [ {
+  #        label: 'close-email-entries'
+  #        backgroundColor: [
+  #          '#3e5a72'
+  #          '#6dbcdb'
+  #          '#666'
+  #        ]
+  #        data: [
+  #          2478
+  #          3267
+  #          4202
+  #        ]
+  #      } ]
+  #    options:
+  #      legend: false
+  #      pieceLabel:
+  #        render: (args) ->
+  #          return args.percentage + '%'
+  #        position: 'outside'
+  #        label: 'Unchanched'
+  #        segment: false
+  #        precision: 2
+  #        showZero: true
+  #        fontStyle: 'bolder'
+  #        overlap: false
+  #        showActualPercentages: true
+
+  #  )
 
   #closedTicketNumbers = [375502, 375504, 375513, 375515, 375516, 375517, 375518, 375519, 375520, 375521, 375522]
   #timeToCloseTickets = [1, 1.3, 1.2, 1.5, 1.7, 1.4, 1.8, 0.9, 1, 1.1, 1.2, 1.5, 1.6]
@@ -2274,85 +2274,85 @@ $ ->
 
 
 
-#### Multi User Graphs #####
+  #### Multi User Graphs #####
 
-#  Ticket entries closed by ticket owner
+  #  Ticket entries closed by ticket owner
 
   ticketOwners = ['mtaylor', 'chrclair', 'nherbert', 'nverbeck', 'abreeeman']
   ticketEntriesByOwner = [8, 15, 11, 10, 13.5]
 
-#  new Chart($('#ticket-entries-closed-by-owner'),
-#    type: 'horizontalBar'
-#    data:
-#      labels: ticketOwners
-#      datasets: [ {
-#        backgroundColor: '#6dbcdb'
-#        data: ticketEntriesByOwner
-#      } ]
-#    options:
-#      legend: display: false
-#      scales:
-#        yAxes: [
-#          {
-#            gridLines: display: false
-#            ticks: {
-#              min: 0
-#            }
-#          }
-#        ]
-#        xAxes: [
-#          {
-#            gridLines: display: false
-#            ticks: {
-#              min: 0
-#            }
-#            scaleLabel: {
-#              display: true,
-#              labelString: 'Closed Ticket Entries'
-#            }
-#          }
-#        ]
-#      )
+  #  new Chart($('#ticket-entries-closed-by-owner'),
+  #    type: 'horizontalBar'
+  #    data:
+  #      labels: ticketOwners
+  #      datasets: [ {
+  #        backgroundColor: '#6dbcdb'
+  #        data: ticketEntriesByOwner
+  #      } ]
+  #    options:
+  #      legend: display: false
+  #      scales:
+  #        yAxes: [
+  #          {
+  #            gridLines: display: false
+  #            ticks: {
+  #              min: 0
+  #            }
+  #          }
+  #        ]
+  #        xAxes: [
+  #          {
+  #            gridLines: display: false
+  #            ticks: {
+  #              min: 0
+  #            }
+  #            scaleLabel: {
+  #              display: true,
+  #              labelString: 'Closed Ticket Entries'
+  #            }
+  #          }
+  #        ]
+  #      )
 
 
-# Average time to close tickets by ticket owner graph
-#  avgTimeToCloseTickets = [.8, .7, 1.7, 1.6, 2]
+  # Average time to close tickets by ticket owner graph
+  #  avgTimeToCloseTickets = [.8, .7, 1.7, 1.6, 2]
 
-#  new Chart($('#avg-time-to-close-tickets'),
-#    type: 'horizontalBar'
-#    data:
-#      labels: ticketOwners
-#      datasets: [ {
-#        backgroundColor: '#6dbcdb'
-#        data: avgTimeToCloseTickets
-#      } ]
-#    options:
-#      legend: display: false
-#      scales:
-#        yAxes: [
-#          {
-#            gridLines: display: false
-#            ticks: {
-#              min: 0
-#            }
-#          }
-#        ]
-#        xAxes: [
-#          {
-#            gridLines: display: false
-#            ticks: {
-#              min: 0
-#            }
-#            scaleLabel: {
-#              display: true,
-#              labelString: 'Hours'
-#            }
-#          }
-#        ]
-#  )
+  #  new Chart($('#avg-time-to-close-tickets'),
+  #    type: 'horizontalBar'
+  #    data:
+  #      labels: ticketOwners
+  #      datasets: [ {
+  #        backgroundColor: '#6dbcdb'
+  #        data: avgTimeToCloseTickets
+  #      } ]
+  #    options:
+  #      legend: display: false
+  #      scales:
+  #        yAxes: [
+  #          {
+  #            gridLines: display: false
+  #            ticks: {
+  #              min: 0
+  #            }
+  #          }
+  #        ]
+  #        xAxes: [
+  #          {
+  #            gridLines: display: false
+  #            ticks: {
+  #              min: 0
+  #            }
+  #            scaleLabel: {
+  #              display: true,
+  #              labelString: 'Hours'
+  #            }
+  #          }
+  #        ]
+  #  )
 
 
-# Ticket Resolutions by Ticket Owner graph
+  # Ticket Resolutions by Ticket Owner graph
 
   #fixedFPTickets = [9, 7, 5, 6, 9]
   #fixedFNTickets = [10, 14, 11, 10, 5]
@@ -2407,69 +2407,69 @@ $ ->
 
 
 
-#  Rule Hits for FP Resolutions Graph
-#  fpRules = ['a500', 'alx_ cln', 'mute_phish', 'sbl', 'srch', 'suwl', 'trd_mal']
-#  totalRuleHits = [ 5, 18, 9, 14, 4, 7, 3]
+  #  Rule Hits for FP Resolutions Graph
+  #  fpRules = ['a500', 'alx_ cln', 'mute_phish', 'sbl', 'srch', 'suwl', 'trd_mal']
+  #  totalRuleHits = [ 5, 18, 9, 14, 4, 7, 3]
 
-#  new Chart($('#rule-hits-fp-resolutions'),
-#    type: 'horizontalBar'
-#    data:
-#      labels: fpRules
-#      datasets: [ {
-#        backgroundColor: '#6dbcdb'
-#        data: totalRuleHits
-#      } ]
-#    options:
-#      legend: display: false
-#      scales:
-#        yAxes: [
-#          {
-#            gridLines: display: false
-#          }
-#        ]
-#        xAxes: [
-#          {
-#            gridLines: display: false
-#            ticks: {
-#              min: 0
-#            }
-#            scaleLabel: {
-#              display: true,
-#              labelString: 'Total Ticket Entries with FP Resolutions'
-#            }
-#          }
-#        ]
-#  )
+  #  new Chart($('#rule-hits-fp-resolutions'),
+  #    type: 'horizontalBar'
+  #    data:
+  #      labels: fpRules
+  #      datasets: [ {
+  #        backgroundColor: '#6dbcdb'
+  #        data: totalRuleHits
+  #      } ]
+  #    options:
+  #      legend: display: false
+  #      scales:
+  #        yAxes: [
+  #          {
+  #            gridLines: display: false
+  #          }
+  #        ]
+  #        xAxes: [
+  #          {
+  #            gridLines: display: false
+  #            ticks: {
+  #              min: 0
+  #            }
+  #            scaleLabel: {
+  #              display: true,
+  #              labelString: 'Total Ticket Entries with FP Resolutions'
+  #            }
+  #          }
+  #        ]
+  #  )
 
 
 
-#  totalTicketEnties = [15, 18, 22, 18, 24, 10, 12]
-#  emailTicketEntries = [15, 18, 22, 18, 24, 10, 2]
-#  webTicketEntries = [15, 18, 22, 18, 24, 10, 5]
-#  ewTicketEntries = [15, 18, 22, 18, 24, 10, 7]
+  #  totalTicketEnties = [15, 18, 22, 18, 24, 10, 12]
+  #  emailTicketEntries = [15, 18, 22, 18, 24, 10, 2]
+  #  webTicketEntries = [15, 18, 22, 18, 24, 10, 5]
+  #  ewTicketEntries = [15, 18, 22, 18, 24, 10, 7]
 
-#  totalTicketEntriesbyType = [
-#    {
-#      label: 'Total Ticket Entries'
-#      backgroundColor: '#6dbcdb'
-#      data: totalTicketEnties
-#    }
-#    {
-#      label: 'E'
-#      backgroundColor: '#8cc63f'
-#      data: emailTicketEntries
-#    }
-#    {
-#      label: 'W'
-#      backgroundColor: '#E47433'
-#      data: webTicketEntries
-#    }
-#    {
-#      label: 'EW'
-#      backgroundColor: '#BA55D3'
-#      data: ewTicketEntries
-#    }
-#  ]
+  #  totalTicketEntriesbyType = [
+  #    {
+  #      label: 'Total Ticket Entries'
+  #      backgroundColor: '#6dbcdb'
+  #      data: totalTicketEnties
+  #    }
+  #    {
+  #      label: 'E'
+  #      backgroundColor: '#8cc63f'
+  #      data: emailTicketEntries
+  #    }
+  #    {
+  #      label: 'W'
+  #      backgroundColor: '#E47433'
+  #      data: webTicketEntries
+  #    }
+  #    {
+  #      label: 'EW'
+  #      backgroundColor: '#BA55D3'
+  #      data: ewTicketEntries
+  #    }
+  #  ]
 
   dateRange = ['September 2', 'September 3', 'September 4', 'September 5', 'September 6', 'September 7', 'September 8']
 
@@ -2499,117 +2499,117 @@ $ ->
 
 
 
-  #multiuserCustomerSubmissions = [15, 18, 22, 18, 12, 43, 31]
-  #multiuserGuestSubmissions = [8, 6, 7, 13, 9, 15, 21]
+#multiuserCustomerSubmissions = [15, 18, 22, 18, 12, 43, 31]
+#multiuserGuestSubmissions = [8, 6, 7, 13, 9, 15, 21]
 
-  #new Chart($('#graph-multiuser-ticket-entries-submitter'),
-  #  type: 'bar'
-  #  data:
-  #    labels: dateRange
-  #    datasets: [
-  #      {
-  #        backgroundColor: '#6dbcdb'
-  #        data: multiuserCustomerSubmissions
-  #      }
-  #      {
-  #        backgroundColor: '#2c3e50'
-  #        data: multiuserGuestSubmissions
-  #      }
-  #    ]
-  #  options:
-  #    legend: display: false
-  #    scales:
-  #      yAxes: [
-  #        {
-  #          gridLines: display: false
-  #          ticks: {
-  #            min: 0
-  #          }
-  #        }
-  #      ]
-  #      xAxes: [
-  #        {
-  #          gridLines: display: false
-  #          ticks: {
-  #            autoSkip: false
-  #          }
-  #        }
-  #      ]
-  #)
+#new Chart($('#graph-multiuser-ticket-entries-submitter'),
+#  type: 'bar'
+#  data:
+#    labels: dateRange
+#    datasets: [
+#      {
+#        backgroundColor: '#6dbcdb'
+#        data: multiuserCustomerSubmissions
+#      }
+#      {
+#        backgroundColor: '#2c3e50'
+#        data: multiuserGuestSubmissions
+#      }
+#    ]
+#  options:
+#    legend: display: false
+#    scales:
+#      yAxes: [
+#        {
+#          gridLines: display: false
+#          ticks: {
+#            min: 0
+#          }
+#        }
+#      ]
+#      xAxes: [
+#        {
+#          gridLines: display: false
+#          ticks: {
+#            autoSkip: false
+#          }
+#        }
+#      ]
+#)
 
-  #new Chart(document.getElementById('team-pie-chart'),
-  #  type: 'pie'
-  #  data:
-  #    labels: [
-  #      'Fixed'
-  #      'Unchanged'
-  #      'Fixed FP'
-  #    ]
-  #    datasets: [ {
-  #      label: 'close-email-entries'
-  #      backgroundColor: [
-  #        '#3e5a72'
-  #        '#6dbcdb'
-  #        '#666'
-  #      ]
-  #      data: [
-  #        5178
-  #        4267
-  #        2202
-  #      ]
-  #    } ]
-  #  options:
-  #    legend: false
-  #    pieceLabel:
-  #      render: (args) ->
-  #        return args.percentage + '%'
-  #      position: 'outside'
-  #      label: 'Unchanched'
-  #      segment: false
-  #      precision: 2
-  #      showZero: true
-  #      fontStyle: 'bolder'
-  #      overlap: false
-  #      showActualPercentages: true
+#new Chart(document.getElementById('team-pie-chart'),
+#  type: 'pie'
+#  data:
+#    labels: [
+#      'Fixed'
+#      'Unchanged'
+#      'Fixed FP'
+#    ]
+#    datasets: [ {
+#      label: 'close-email-entries'
+#      backgroundColor: [
+#        '#3e5a72'
+#        '#6dbcdb'
+#        '#666'
+#      ]
+#      data: [
+#        5178
+#        4267
+#        2202
+#      ]
+#    } ]
+#  options:
+#    legend: false
+#    pieceLabel:
+#      render: (args) ->
+#        return args.percentage + '%'
+#      position: 'outside'
+#      label: 'Unchanched'
+#      segment: false
+#      precision: 2
+#      showZero: true
+#      fontStyle: 'bolder'
+#      overlap: false
+#      showActualPercentages: true
 
-  #)
+#)
 
-  #new Chart(document.getElementById('team-pie2-chart'),
-  #  type: 'pie'
-  #  data:
-  #    labels: [
-  #      'Fixed'
-  #      'Unchanged'
-  #      'Fixed FP'
-  #    ]
-  #    datasets: [ {
-  #      label: 'close-email-entries'
-  #      backgroundColor: [
-  #        '#3e5a72'
-  #        '#6dbcdb'
-  #        '#666'
-  #      ]
-  #      data: [
-  #        3778
-  #        4767
-  #        5900
-  #      ]
-  #    } ]
-  #  options:
-  #    legend: false
-  #    pieceLabel:
-  #      render: (args) ->
-  #        return args.percentage + '%'
-  #      position: 'outside'
-  #      label: 'Unchanched'
-  #      segment: false
-  #      precision: 2
-  #      showZero: true
-  #      fontStyle: 'bolder'
-  #      overlap: false
-  #      showActualPercentages: true
+#new Chart(document.getElementById('team-pie2-chart'),
+#  type: 'pie'
+#  data:
+#    labels: [
+#      'Fixed'
+#      'Unchanged'
+#      'Fixed FP'
+#    ]
+#    datasets: [ {
+#      label: 'close-email-entries'
+#      backgroundColor: [
+#        '#3e5a72'
+#        '#6dbcdb'
+#        '#666'
+#      ]
+#      data: [
+#        3778
+#        4767
+#        5900
+#      ]
+#    } ]
+#  options:
+#    legend: false
+#    pieceLabel:
+#      render: (args) ->
+#        return args.percentage + '%'
+#      position: 'outside'
+#      label: 'Unchanched'
+#      segment: false
+#      precision: 2
+#      showZero: true
+#      fontStyle: 'bolder'
+#      overlap: false
+#      showActualPercentages: true
 
-  #)
+#)
 
 
 
@@ -3052,16 +3052,16 @@ window.wlbl_history_dialog = (id) ->
           '<tbody>'
         for entry in json.data
           entry_string = "" +
-          '<tr>' +
-          '<td>' + entry.list_type + '</td>' +
-          '<td>' + entry.state + '</td>' +
-          '<td>' + entry.note + '</td>' +
-          '<td>' + entry.date + '</td>' +
-          '</tr>'
+            '<tr>' +
+            '<td>' + entry.list_type + '</td>' +
+            '<td>' + entry.state + '</td>' +
+            '<td>' + entry.note + '</td>' +
+            '<td>' + entry.date + '</td>' +
+            '</tr>'
           history_dialog_content += entry_string
 
         history_dialog_content += '</tbody></table>'
-#
+        #
         if $("#history_dialog").length
           history_dialog = this
           $("#history_dialog").html(history_dialog_content)
