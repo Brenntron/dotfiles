@@ -385,7 +385,6 @@ window.save_dispute = () ->
 
 # Populating the in line Adjust Reptool button for research page and research tab
 window.inline_load_reptool_button =(button_tag) ->
-  #debugger
   adjust_form = button_tag.parentElement.getElementsByClassName('adjust-reptool-form')[0]
   submit_button = adjust_form.getElementsByClassName('dropdown-submit-button')
   #$(submit_button).attr("disabled", false)
@@ -397,9 +396,9 @@ window.inline_load_reptool_button =(button_tag) ->
   show_content = $(adjust_form).find('.entry-dispute-name')
   show_rep_class = $(adjust_form).find('.entry-reptool-class')
   show_rep_exp = $(adjust_form).find('.entry-reptool-expiration')
+  show_rep_comment = $(adjust_form).find('.entry-reptool-comment')
   action_input = $(adjust_form).find('.action-input')
   classifications_input = $(adjust_form).find('.classifications-input')
-  comment_input = $(adjust_form).find('.comment-input')
   data = {
 # Send entry content to reptool
     'entry' : adjust_form.getElementsByClassName('dispute-entry-content')[0].value
@@ -414,13 +413,13 @@ window.inline_load_reptool_button =(button_tag) ->
     dataType: 'json'
     success: (response) ->
       response = JSON.parse(response)
-
       show_content.text(adjust_form.getElementsByClassName('dispute-entry-content')[0].value)
       show_rep_class.text(response.classification)
       show_rep_exp.text(response.expiration)
+      show_rep_comment.text(response.comment)
       action_input.val(response.status)
       classifications_input.val(response.classification)
-      comment_input.val(response.comment)
+
       $(submit_button).attr('disabled', false)
 #          window.location.reload()
     error: (response) ->
@@ -430,6 +429,9 @@ window.inline_load_reptool_button =(button_tag) ->
 
 
 window.row_adust_reptool_bl_button =(button_tag) ->
+#  Why are we sending the ids instead of the entry content
+#  We should update this to process the same way that the bulk submission does
+
   reptool_bl_form = button_tag.form
   data = {
     'action': reptool_bl_form.getElementsByClassName('action-input')[0].value
@@ -510,6 +512,7 @@ $ ->
 
 # Submit Bulk changes to Reptool
 window.submit_bulk_reptool = () ->
+
   bulk_reptool_menu = $('#reptool_adjust_entries')
   submission_action = $("input[name='reptool-action-radio']:checked").val()
 
@@ -527,7 +530,6 @@ window.submit_bulk_reptool = () ->
   #  Get the entries
   entry_rows = $(bulk_reptool_menu).find('.reptool-entry-row')
   entries = []
-
   current_entries_and_classes = []
   $(entry_rows).each ->
     entry = $(this).find('.reptool-entry-name')[0]
@@ -1500,7 +1502,7 @@ $ ->
       if this.entry.sbrs_score != null
         sbrs_score = this.entry.sbrs_score
       else sbrs_score = missing_data
-      entry_row = '<tr class="index-entry-row">' + '<td><input type="checkbox" onclick="toggleRow(this)" class="dispute-entry-checkbox dispute-entry-checkbox_' + dispute.id + '" id= ' + dispute_entry_id + ' ></td>' + '<td class="entry-col-content ' + important + '">' + entry_content + '</td>' +
+      entry_row = '<tr class="index-entry-row" data-case-id="0000' + dispute.id + '">' + '<td><input type="checkbox" onclick="toggleRow(this)" class="dispute-entry-checkbox dispute-entry-checkbox_' + dispute.id + '" id= ' + dispute_entry_id + ' ></td>' + '<td class="entry-col-content ' + important + '">' + entry_content + '</td>' +
         '<td class="entry-col-status">' + status + '</td>' +
         resolution_col +
         '<td class="entry-col-disp">' + suggested_disposition + '</td>' +
@@ -1810,18 +1812,24 @@ $ ->
       alert('No disputes selected')
 
 # Inline WLBL Adjust Button
-  $('.bfrp-inline-wlbl-button').click ->
+  window.get_inline_row_wlbl = (button) ->
 #    Get entry content
-    research_row = $(this).parents('.research-table-row')[0]
+    research_row = $(button).parents('.research-table-row')[0]
     entry_wrapper = $(research_row).find('.entry-data-content')[0]
-    entry_content = $(entry_wrapper).text()
+    entry_content = $(entry_wrapper).text().trim()
     wbrs = $($(research_row).find('.entry-data-wbrs-score')[0]).text()
+    if $('#dispute_id').length > 0
+      case_id = $('#dispute_id').text()
+      comment_text = '\n \n------------------------------- \nINDIVIDUAL SUBMISSION: \n #' + case_id + ' - ' + entry_content
+    else
+      comment_text = '\n \n------------------------------- \nRESEARCH SUBMISSION: \n ' + entry_content
 
 #    Define fields that need to be filled out in the dropdown
-    dropdown = $(this).next('.dropdown-menu')[0]
+    dropdown = $(button).next('.dropdown-menu')[0]
     wlbl_list = $(dropdown).find('.wlbl-entry-wlbl')
     wbrs_score = $(dropdown).find('.wlbl-current-entry-wbrs')
     submit_button = $(dropdown).find('.dropdown-submit-button')
+    comment = $(dropdown).find('.adjust-wlbl-input')
     wl_weak = $(dropdown).find('.wl-weak-checkbox')
     wl_med = $(dropdown).find('.wl-med-checkbox')
     wl_heavy = $(dropdown).find('.wl-heavy-checkbox')
@@ -1903,11 +1911,12 @@ $ ->
           $(wbrs_score).text(wbrs)
           $(wlbl_list[0]).text('Not on a list')
           $(submit_button[0]).attr('disabled', false)
-
-
+        $(comment).text(comment_text)
       error: (response) ->
         popup_response_error(response, 'Error retrieving WL/BL Data')
     )
+
+
 
 window.populate_entry_status_dropdown = (dispute_id) ->
   std_msg_ajax(

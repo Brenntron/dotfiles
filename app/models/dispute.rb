@@ -679,7 +679,7 @@ class Dispute < ApplicationRecord
       begin
         auto_resolve_verdict = blacklist.first
         if auto_resolve_verdict.malicious?
-          auto_resolve_verdict.publish_to_rep_api
+          auto_resolve_verdict.publish_to_rep_api(dispute_id: blacklist.last.dispute_id)
 
           dispute_entry = blacklist.last
 
