@@ -351,10 +351,12 @@
                                   %tr
                                     %th.content-label-sm.no-word-break Current WL/BL List
                                     %th.text-center.content-label-sm.no-word-break Current WBRS Score
+                                    %th.text-center.content-label-sm.no-word-break Projected Score
                                 %tbody
                                   %tr
                                     %td.wlbl-entry-wlbl
                                     %td.wlbl-current-entry-wbrs.text-center
+                                    %td.wlbl-projected-entry-wbrs.text-center
                               .inline-tool-content-wrapper
                                 .row
                                   .col-xs-12
@@ -394,7 +396,10 @@
                                           %input.bl-heavy-checkbox{type: 'checkbox', name: 'wl-bl-list-inline', class: 'wl-bl-list-inline', value: "BL-heavy"}
                                           %span.toggle-slider
                                         BL - Heavy
-
+                                .button-row-center
+                                  %button.secondary.preview-wbrs-button{type: 'button', disabled: true, onclick: 'preview_wbrs_score(this);'}
+                                    Preview Projected Score
+                                %hr.thin
                                 .comment-wrapper
                                   %label.content-label-sm Comment
                                   %textarea.dropdown-comment.adjust-wlbl-input.note-input

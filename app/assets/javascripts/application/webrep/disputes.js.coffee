@@ -327,6 +327,22 @@ window.row_research_adjust_wlbl_button =(button_tag) ->
     success_reload: true
   )
 
+
+#  Add preview score here
+window.preview_wbrs_score = (button) ->
+  console.log button
+  debugger
+  data = {'test'}
+
+  std_msg_ajax(
+    url: '/escalations/api/v1/escalations/webrep/disputes/uri_wlbl'
+    method: 'POST'
+    data: data
+    error_prefix: 'Error getting WBRS preview score.'
+    success_reload: true
+  )
+
+
 window.research_toolbar_adjust_wlbl_button =(button_tag) ->
   urls = []
   urls = $('.wlbl-entry-content')
