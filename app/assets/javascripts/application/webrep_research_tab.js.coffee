@@ -186,8 +186,6 @@ $ ->
 
           for entry in response
 
-            entry_string = entry['comment']
-
             if entry['status'] == "ACTIVE"
               rep_class_full = entry['classification'] + ' - ' + entry['expiration']
               rep_class = entry['classification']
@@ -197,12 +195,13 @@ $ ->
 
             tbody.append('<tr class="reptool-entry-row"><td class="reptool-entry-name">' + entry['entry'] + '</td><td class="reptool-entry-class" data-classification="' + rep_class + '">' + rep_class_full + '</td><td class="reptool-entry-comment"></td></tr>')
 
-            if entry_string.length > 50
-              entry_string_trunc = entry_string.substring(0, 50) + '...'
-              $('.reptool-entry-comment').text(entry_string_trunc)
+            if entry['comment'].length > 50
+              entry_comment_trunc = entry['comment'].substring(0, 50) + '...'
+              $('.reptool-entry-comment').text(entry_comment_trunc)
               $('.reptool-entry-comment').addClass('esc-tooltipped')
-              $('.esc-tooltipped').attr('title', entry_string)
-
+              $('.esc-tooltipped').attr('title', entry['comment'])
+            else
+              $('.reptool-entry-comment').text(entry['comment'])
 
         error: (response) ->
           std_api_error(response, "Error retrieving Reptool Data", reload: false)
@@ -594,8 +593,10 @@ $(document).ready ->
       $('#show-ticket-resolution-submenu').hide()
       $(res_comment[0]).val('')
 
-  $('.esc-tooltipped').tooltipster({theme: ['tooltipster-borderless','tooltipster-borderless-customized'], maxWidth: 300})
-
+  $('.esc-tooltipped').tooltipster theme: [
+    'tooltipster-borderless'
+    'tooltipster-borderless-customized'
+    ]
 
   $('.ticket-status-radio').click ->
     all_stat_radios = $('#show-edit-ticket-status-dropdown').find('.status-radio-wrapper')
