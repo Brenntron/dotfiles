@@ -600,7 +600,7 @@ window.submit_bulk_reptool = () ->
       method: 'POST'
       data: data
       success: (response) ->
-        std_msg_success('These RepTool classes (' + reptool_classes + ') are assigned to the following entries:', [entries])
+        std_msg_success('These RepTool classes (' + reptool_classes.replace(/,/g, ', ') + ') are assigned to the following entries:', [entries])
       error: (response) ->
         if response.responseJSON == undefined
           response_lines = response.responseText.split("\n")
