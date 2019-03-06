@@ -197,8 +197,8 @@ $ ->
 
             tbody.append('<tr class="reptool-entry-row"><td class="reptool-entry-name">' + entry['entry'] + '</td><td class="reptool-entry-class" data-classification="' + rep_class + '">' + rep_class_full + '</td><td class="reptool-entry-comment"></td></tr>')
 
-            if entry_string.length > 30
-              entry_string_trunc = entry_string.substring(0, 30) + '...'
+            if entry_string.length > 50
+              entry_string_trunc = entry_string.substring(0, 50) + '...'
               $('.reptool-entry-comment').text(entry_string_trunc)
               $('.reptool-entry-comment').addClass('esc-tooltipped')
               $('.esc-tooltipped').attr('title', entry_string)
