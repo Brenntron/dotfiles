@@ -8119,3 +8119,13 @@ hr.thin.form-divider {
   padding-top: 6px !important;
   padding-bottom: 12px !important;
 }
+
+
+.preview-wbrs-button {
+  background-color: $warning-accent-color;
+  padding: 10px 20px;
+  border: none;
+  border-radius: 2px;
+  color: $content-bg-color;
+  margin-top: 10px;
+}
