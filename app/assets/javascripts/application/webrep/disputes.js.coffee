@@ -527,7 +527,7 @@ window.submit_bulk_reptool = () ->
     data = {
       'action': 'ACTIVE'
       'entries': entries
-      'classifications': reptool_classes
+      'classifications': reptool_classes 
       'comment': comment
     }
   else if submission_action == "reptool-drop"
