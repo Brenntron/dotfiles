@@ -2,7 +2,14 @@ class Wbrs::ManualWlbl < Wbrs::Base
   FIELD_NAMES = %w{id ctime list_type mtime threat_cats url username state notes}
   FIELD_SYMS = FIELD_NAMES.map{|name| name.to_sym}
 
-
+  WLBL_MAP = {
+      "wlw" => 31,
+      "wlm" => 32,
+      "wlh" => 33,
+      "blw" => 36,
+      "blm" => 37,
+      "blh" => 38
+  }
   attr_accessor *FIELD_SYMS
 
   def self.new_from_attributes(attributes)
@@ -265,5 +272,32 @@ class Wbrs::ManualWlbl < Wbrs::Base
     end
 
     drop_from_ids(list_types_to_drop, username)
+  end
+
+  def self.project_new_score(url, add, remove)
+    conditions = {}
+    conditions["urls"] = []
+
+
+    url_conditions = {}
+    url_conditions["url"] = url
+    url_conditions["add"] = []
+    url_conditions["rm"] = []
+
+    add.each do |add_flag|
+      url_conditions["add"] << WLBL_MAP[add_flag]
+    end
+
+    remove.each do |remove_flag|
+      url_conditions["rm"] << WLBL_MAP[remove_flag]
+    end
+
+    conditions["urls"] << url_conditions
+    params = stringkey_params(conditions)
+    response = post_request(path: '/v1/rep/complaints/score', body: params)
+
+    response_body = JSON.parse(response.body)
+    response_body["data"][url].first["top_threat_key"]["score"]
+
   end
 end
