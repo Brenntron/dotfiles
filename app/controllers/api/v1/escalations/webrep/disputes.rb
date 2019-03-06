@@ -203,7 +203,7 @@ module API
               requires :new_assignee, type: Integer, desc: "User ID of new assignee"
             end
             post "change_assignee" do
-              authorize!(:update, dispute)
+              authorize!(:update, Dispute)
               disputes = Dispute.assign(params[:new_assignee], params[:dispute_ids])
               {:status => "success", :data => disputes}.to_json
             end

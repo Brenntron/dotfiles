@@ -72,6 +72,8 @@ class Dispute < ApplicationRecord
   scope :sbrs_disputes, -> { where(submission_type: ['e', 'ew'])}
   scope :wbrs_disputes, -> { where(submission_type: ['w', 'ew'])}
 
+  validates_with DisputeValidator
+
   def self.create_action(bugzilla_rest_session, ips_urls, assignee, priority, ticket_type, status=NEW, categories = nil)
     user = User.where(cvs_username: assignee).first
 
@@ -1009,6 +1011,11 @@ class Dispute < ApplicationRecord
         dispute.status_comment = comment
       end
 
+      unless [STATUS_NEW, STATUS_ASSIGNED].include?(dispute.status)
+        dispute.user_id = current_user.id unless dispute.is_assigned?
+      end
+
+      dispute.save!
       dispute.dispute_entries.each do |entry|
         if resolution.present? && entry.status != Dispute::STATUS_RESOLVED
           entry.resolution = resolution
@@ -1020,7 +1027,6 @@ class Dispute < ApplicationRecord
         entry.save
       end
 
-      dispute.save
       if comment.present?
         DisputeComment.create(:user_id => current_user.id, :comment => comment, :dispute_id => dispute.id)
       end
