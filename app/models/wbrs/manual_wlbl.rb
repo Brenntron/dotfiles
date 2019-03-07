@@ -3,12 +3,12 @@ class Wbrs::ManualWlbl < Wbrs::Base
   FIELD_SYMS = FIELD_NAMES.map{|name| name.to_sym}
 
   WLBL_MAP = {
-      "wlw" => 31,
-      "wlm" => 32,
-      "wlh" => 33,
-      "blw" => 36,
-      "blm" => 37,
-      "blh" => 38
+      "WL-weak" => 31,
+      "WL-med" => 32,
+      "WL-heavy" => 33,
+      "BL-weak" => 36,
+      "BL-med" => 37,
+      "BL-heavy" => 38
   }
   attr_accessor *FIELD_SYMS
 

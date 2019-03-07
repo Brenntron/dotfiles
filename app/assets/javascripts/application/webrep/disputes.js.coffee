@@ -1914,12 +1914,12 @@ window.prepare_for_wbrs_preview = (toggle) ->
   preview_button = $(dropdown).find('.preview-wbrs-button')
 
   changed = []
+  add = []
+  remove = []
 
   if current_lists == "Not on a list"
-    console.log 'anything checked is a change'
     $(checked).each ->
       changed.push('changed')
-
   else
     $(list).each ->
       current = this.toString()
@@ -1929,31 +1929,60 @@ window.prepare_for_wbrs_preview = (toggle) ->
         if current == val
           if $(checkbox).prop('checked') != true
             changed.push('changed')
+            remove.push(val)
         else
           if $(checkbox).prop('checked') == true
-            changed.push('changed') 
+            changed.push('changed')
+            add.push(val)
 
   if changed.length > 0
     $(preview_button[0]).attr('disabled', false)
+    add_lists = add.join(',')
+    $(preview_button[0]).attr('data-add', add_lists)
+    remove_lists = remove.join(',')
+    $(preview_button[0]).attr('data-remove', remove_lists)
   else
     $(preview_button[0]).attr('disabled', true)
-
-
-
+    $(preview_button[0]).attr('data-remove', '')
+    $(preview_button[0]).attr('data-add', '')
 
 
 #  Add preview score here
 window.preview_wbrs_score = (button) ->
-  console.log button
-  debugger
-  data = {'test'}
+  dropdown = $(button).parents('.dispute-wlbl-adjust-wrapper')[0]
+  projected_score = $(dropdown).find('.wlbl-projected-entry-wbrs')
+  entry_row = $(button).parents('.research-table-row-wrapper')
+  entry = $(entry_row[0]).find('.entry-data-content')
+  entry_content = $(entry[0]).text().trim()
+  add_lists = ''
+  remove_lists = ''
+  add = $(button).attr('data-add')
+  remove = $(button).attr('data-remove')
+
+  if add != ''
+    add_lists = add.split(',')
+
+  if remove != ''
+    remove_lists = remove.split(',')
+
+  data = {
+    url: entry_content
+    add: add_lists
+    remove: remove_lists
+  }
 
   std_msg_ajax(
-    url: '/escalations/api/v1/escalations/webrep/disputes/uri_wlbl'
+    url: '/escalations/api/v1/escalations/webrep/disputes/project_new_score'
     method: 'POST'
     data: data
     error_prefix: 'Error getting WBRS preview score.'
-    success_reload: true
+    dataType: 'json'
+    success: (response) ->
+      response = JSON.parse(response)
+      console.log response
+      $(projected_score[0]).text(response.score)
+    error: (response) ->
+      console.log(response)
   )
 
 
