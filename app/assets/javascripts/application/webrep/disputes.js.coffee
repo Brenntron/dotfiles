@@ -544,6 +544,16 @@ window.submit_bulk_reptool = () ->
       $(current_entries_and_classes).each ->
         if this.classifications.length > 0
           new_classifications = this.classifications
+
+          new_classifications_array = new_classifications.split(',')
+          reptool_classes_array = reptool_classes.split(',')
+
+          filtered = reptool_classes_array.filter((x) ->
+            new_classifications_array.indexOf(x) < 0
+          )
+          
+          reptool_classes = filtered.join()
+
           new_classifications = new_classifications + ',' + reptool_classes
 
           temp_data = {
