@@ -527,7 +527,7 @@ window.submit_bulk_reptool = () ->
     data = {
       'action': 'ACTIVE'
       'entries': entries
-      'classifications': reptool_classes
+      'classifications': reptool_classes 
       'comment': comment
     }
   else if submission_action == "reptool-drop"
@@ -600,7 +600,7 @@ window.submit_bulk_reptool = () ->
       method: 'POST'
       data: data
       success: (response) ->
-        std_msg_success('These RepTool classes (' + reptool_classes + ') are assigned to the following entries:', [entries])
+        std_msg_success('These RepTool classes (' + reptool_classes.replace(/,/g, ', ') + ') are assigned to the following entries:', [entries])
       error: (response) ->
         if response.responseJSON == undefined
           response_lines = response.responseText.split("\n")
@@ -620,7 +620,7 @@ window.submit_bulk_reptool = () ->
       method: 'POST'
       data: {data: data}
       success: (response) ->
-        std_msg_success('These RepTool classes (' + reptool_classes + ') were changed on the following entries:', [entries])
+        std_msg_success('These RepTool classes (' + reptool_classes.replace(/,/g, ', ') + ') were changed on the following entries:', [entries])
       error: (response) ->
         if response.responseJSON == undefined
           response_lines = response.responseText.split("\n")
