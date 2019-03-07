@@ -1903,42 +1903,35 @@ $ ->
 
 
 # Prepping for previewing WBRS Score
-window.prepare_for_wbrs_preview = (button) ->
+window.prepare_for_wbrs_preview = (toggle) ->
   # Get the current wl/bl settings
-  dropdown = $(button).parents('.dispute-wlbl-adjust-wrapper')[0]
+  dropdown = $(toggle).parents('.dispute-wlbl-adjust-wrapper')[0]
   current_lists = $($(dropdown).find('.wlbl-entry-wlbl')[0]).text()
   list = current_lists.split(',')
   # Get the settings of all the checkboxes
-  checked_items = $(dropdown).find('.wl-bl-list-inline:checked')
+  checkboxes = $(dropdown).find('.wl-bl-list-inline')
+  checked = $(dropdown).find('.wl-bl-list-inline:checked')
   preview_button = $(dropdown).find('.preview-wbrs-button')
 
   changed = []
 
-  $(list).each ->
-    current = this
-    $(checked_items).each ->
-      checkbox = this
-      val = $(checkbox).val()
-#      checked = $(checkbox).val()
-#      console.log current
-#      console.log checked
+  if current_lists == "Not on a list"
+    console.log 'anything checked is a change'
+    $(checked).each ->
+      changed.push('changed')
 
-      # If the checkbox that matches the current list item isn't checked like it should be
-#      if current == $(checkbox).val() && $(checkbox).prop('checked', false)
-#        changed.push('changed')
-
-      if current == val
-        if $(checkbox).prop('checked', true)
-          console.log 'this matches'
-          console log current + ' = ' + val
-        else if $(checkbox).prop('checked', false)
-          console.log 'this does not match'
-          console log current + ' != ' + val
-          changed.push('changed')
-      else
-        console.log current + ' != ' + val
-
-  console.log changed.length
+  else
+    $(list).each ->
+      current = this.toString()
+      $(checkboxes).each ->
+        checkbox = this
+        val = $(checkbox).val()
+        if current == val
+          if $(checkbox).prop('checked') != true
+            changed.push('changed')
+        else
+          if $(checkbox).prop('checked') == true
+            changed.push('changed') 
 
   if changed.length > 0
     $(preview_button[0]).attr('disabled', false)
