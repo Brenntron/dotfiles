@@ -641,7 +641,7 @@
                                     - entry.wbrs_xlist.each do |cross_listed|
                                       %tr
                                         %td= cross_listed.id
-                                        %td= cross_listed.url
+                                        %td.esc-tooltipped{:title => cross_listed.url}= truncate(cross_listed.url, :length=>20)
                                         %td= cross_listed.list_type
                                         %td -
                                         %td= cross_listed.username
@@ -662,7 +662,7 @@
                                     - entry.wbrs_xlist.each do |cross_listed|
                                       %tr
                                         %td= cross_listed.id
-                                        %td= cross_listed.url
+                                        %td.esc-tooltipped{:title => cross_listed.url}= truncate(cross_listed.url, :length=>20)
                                         %td= cross_listed.list_type
                                         %td -
                                         %td= cross_listed.username

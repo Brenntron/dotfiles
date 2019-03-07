@@ -322,18 +322,19 @@ class DisputeEntry < ApplicationRecord
   end
 
   def wbrs_xlist
-    if dispute_entry_preload.present? && dispute_entry_preload.crosslisted_urls.present?
-      @wbrs_xlist = Wbrs::ManualWlbl.load_from_prefetch(dispute_entry_preload.crosslisted_urls)
-      return @wbrs_xlist
-    end
-    @wbrs_xlist ||= Wbrs::ManualWlbl.where({:url => hostlookup})
+    @wbrs_xlist ||=
+        if dispute_entry_preload.present? && dispute_entry_preload.crosslisted_urls.present?
+          Wbrs::ManualWlbl.load_from_prefetch(dispute_entry_preload.crosslisted_urls)
+        else
+          Wbrs::ManualWlbl.where({:url => DisputeEntry.domain_of(hostlookup)})
+        end
   rescue => except
-
     Rails.logger.warn "Populating xlist from Wbrs failed."
+    Rails.logger.warn "Hostlookup:" + hostlookup
     Rails.logger.warn except
     Rails.logger.warn except.backtrace.join("\n")
 
-    []
+    return []
   end
 
   def virustotals
@@ -407,6 +408,13 @@ class DisputeEntry < ApplicationRecord
     end
 
     pretty_umbrella_status
+  rescue => except
+    Rails.logger.warn "Populating umbrella failed"
+    Rails.logger.warn "Hostlookup:" + hostlookup
+    Rails.logger.warn except
+    Rails.logger.warn except.backtrace.join("\n")
+
+    return 'Unable to resolve'
   end
 
   def assign_from_auto_resolve(address:, total_hits:, resolved_at:, dispute_entry:)
@@ -661,7 +669,7 @@ class DisputeEntry < ApplicationRecord
         end
       end
 
-      if research_params['broad'] || entries.find{|entry| url == entry.uri}
+      if research_params['scope'] == "broad" || entries.find{|entry| url == entry.uri}
         entries.each do |entry|
           is_ip_address = !!(entry.uri  =~ Resolv::IPv4::Regex)
           wbrs_stuff = Sbrs::ManualSbrs.get_wbrs_data({:url => entry.uri})
