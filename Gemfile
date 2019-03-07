@@ -33,7 +33,7 @@ gem 'libv8', '3.16.14.19'
 gem 'rule_test_api', path: './vendor/gems/rule_test_api'
 gem 'her', '1.0.3'
 gem 'httpi', '2.4.4'
-gem 'curb', '0.9.6' #Libcurl bindings for Ruby
+gem 'curb', '0.9.8' #Libcurl bindings for Ruby
 
 gem 'net-ssh', '5.0.2'
 gem 'stomp', '1.4.6'
