@@ -1954,8 +1954,8 @@ window.preview_wbrs_score = (button) ->
   entry_row = $(button).parents('.research-table-row-wrapper')
   entry = $(entry_row[0]).find('.entry-data-content')
   entry_content = $(entry[0]).text().trim()
-  add_lists = ''
-  remove_lists = ''
+  add_lists = []
+  remove_lists = []
   add = $(button).attr('data-add')
   remove = $(button).attr('data-remove')
 
