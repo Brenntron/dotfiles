@@ -515,7 +515,7 @@ button {
 
 .toolbar div:last-child {
   //width: 100%;
-  margin-right: 0 !Important;
+  margin-right: 0 !important;
 }
 
 .toolbar label {
@@ -8143,4 +8143,16 @@ hr.thin.form-divider {
   position: absolute;
   margin-left: 10px;
   margin-top: 10px;
+}
+
+//Tooltipster overwrite
+.tooltipster-default{
+  max-width: 300px!important;
+}
+.tooltipster-content{
+  word-break: break-all;
+}
+.reptool-entry-comment{
+  max-width: 160px;
+  overflow-wrap: break-word;
 }

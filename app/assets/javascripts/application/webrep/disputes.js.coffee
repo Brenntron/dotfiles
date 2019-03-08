@@ -530,7 +530,7 @@ window.submit_bulk_reptool = () ->
     data = {
       'action': 'ACTIVE'
       'entries': entries
-      'classifications': reptool_classes
+      'classifications': reptool_classes 
       'comment': comment
     }
   else if submission_action == "reptool-drop"
@@ -547,6 +547,16 @@ window.submit_bulk_reptool = () ->
       $(current_entries_and_classes).each ->
         if this.classifications.length > 0
           new_classifications = this.classifications
+
+          new_classifications_array = new_classifications.split(',')
+          reptool_classes_array = reptool_classes.split(',')
+
+          filtered = reptool_classes_array.filter((x) ->
+            new_classifications_array.indexOf(x) < 0
+          )
+          
+          reptool_classes = filtered.join()
+
           new_classifications = new_classifications + ',' + reptool_classes
 
           temp_data = {
@@ -603,7 +613,7 @@ window.submit_bulk_reptool = () ->
       method: 'POST'
       data: data
       success: (response) ->
-        std_msg_success('These RepTool classes (' + reptool_classes + ') are assigned to the following entries:', [entries])
+        std_msg_success('These RepTool classes (' + reptool_classes.replace(/,/g, ', ') + ') are assigned to the following entries:', [entries])
       error: (response) ->
         if response.responseJSON == undefined
           response_lines = response.responseText.split("\n")
@@ -623,7 +633,7 @@ window.submit_bulk_reptool = () ->
       method: 'POST'
       data: {data: data}
       success: (response) ->
-        std_msg_success('These RepTool classes (' + reptool_classes + ') were changed on the following entries:', [entries])
+        std_msg_success('These RepTool classes (' + reptool_classes.replace(/,/g, ', ') + ') were changed on the following entries:', [entries])
       error: (response) ->
         if response.responseJSON == undefined
           response_lines = response.responseText.split("\n")
@@ -1804,6 +1814,7 @@ $ ->
     entry_content = $(entry_wrapper).text().trim()
     wbrs = $($(research_row).find('.entry-data-wbrs-score')[0]).text()
 
+
     if $('#dispute_id').length > 0
       case_id = $('#dispute_id').text()
       comment_text = '\n \n------------------------------- \nINDIVIDUAL SUBMISSION: \n #' + case_id + ' - ' + entry_content
@@ -1812,6 +1823,13 @@ $ ->
 
 #    Define fields that need to be filled out in the dropdown
     dropdown = $(button).next('.dropdown-menu')[0]
+    preview_button = $(dropdown).find('.preview-wbrs-button')
+    preview_score = $(dropdown).find('.wlbl-projected-entry-wbrs')
+    # Reset the preview button and any leftover preview score
+    $(preview_button).attr('disabled', true)
+    $(preview_button).attr('data-remove', '')
+    $(preview_button).attr('data-add', '')
+    $(preview_score).text('')
     wlbl_list = $(dropdown).find('.wlbl-entry-wlbl')
     wbrs_score = $(dropdown).find('.wlbl-current-entry-wbrs')
     submit_button = $(dropdown).find('.dropdown-submit-button')

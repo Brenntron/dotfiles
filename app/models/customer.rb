@@ -8,7 +8,7 @@ class Customer < ApplicationRecord
 
   def self.thread_safe_find_or_create_by(attributes)
     with_advisory_lock("customer_create", timeout_seconds: 20) do
-      find_or_create_by(attributes)
+      find_by(email: attributes[:email]) || create(attributes)
     end
   end
 
@@ -33,21 +33,24 @@ class Customer < ApplicationRecord
 
   end
 
+  def self.find_or_create_customer(customer_email:, company_name:, name:)
+    company_exists = Company.thread_safe_find_or_create_by(name: company_name)
+
+    Customer.thread_safe_find_or_create_by(email: customer_email, company: company_exists, name: name)
+
+  rescue
+    sleep(15)
+    company_exists = Company.thread_safe_find_or_create_by(name: company_name)
+
+    Customer.thread_safe_find_or_create_by(email: customer_email, company: company_exists, name: name)
+  end
+
   def self.process_and_get_customer(payload)
     if payload["payload"] && payload["payload"]["email"] && payload["payload"]["user_company"] && payload["payload"]["name"]
-      customer_email = payload["payload"]["email"]
-
-      customer_company = payload["payload"]["user_company"]
-      customer_name = payload["payload"]["name"]
-
-      customer_exists = Customer.thread_safe_find_or_create_by(email: customer_email)
-      if customer_exists.new_record?
-        company_exists = Company.thread_safe_find_or_create_by(name: customer_company)
-
-        customer_exists.company_id = company_exists.id
-        customer_exists.name = customer_name
-        customer_exists.save!
-      end
+      customer_exists =
+          find_or_create_customer(customer_email: payload["payload"]["email"],
+                                  company_name: payload["payload"]["user_company"],
+                                  name: payload["payload"]["name"])
     else
       customer_exists = Customer.thread_safe_find_or_create_by(email: "guest@cisco.com", name: "Guest", company:Company.find_by_name("Guest"))
     end
