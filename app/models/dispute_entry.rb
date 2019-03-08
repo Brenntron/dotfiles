@@ -204,7 +204,7 @@ class DisputeEntry < ApplicationRecord
         url = urls
       end
 
-      clean_url = Addressable::URI.parse(url)
+      clean_url = Addressable::URI.parse(url.strip)
       clean_host = clean_url.host.sub(/^www\./, '')
       clean_host = clean_host + clean_url.path
 
@@ -219,7 +219,7 @@ class DisputeEntry < ApplicationRecord
             url = url
           end
 
-          clean_url = Addressable::URI.parse(url)
+          clean_url = Addressable::URI.parse(url.strip)
           clean_host = clean_url.host.sub(/^www\./, '')
           clean_host = clean_host + clean_url.path
 
