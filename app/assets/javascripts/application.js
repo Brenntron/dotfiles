@@ -7,8 +7,7 @@
 
 //= require jquery
 //= require jquery_ujs
-//= require dataTables/jquery.dataTables
-//= require dataTables/extras/dataTables.select
+//= require datatables
 //= require jquery-ui
 //= require bootstrap-sprockets
 //= require selectize
