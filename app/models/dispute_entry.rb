@@ -200,6 +200,8 @@ class DisputeEntry < ApplicationRecord
     if urls.kind_of?(String)
       if !urls.start_with?( 'http', 'https')
         url = "http://" + urls
+      else
+        url = urls
       end
 
       clean_url = Addressable::URI.parse(url)
@@ -213,6 +215,8 @@ class DisputeEntry < ApplicationRecord
         if url.strip != ''
           if !url.start_with?( 'http', 'https')
             url = "http://" + url
+          else
+            url = url
           end
 
           clean_url = Addressable::URI.parse(url)
