@@ -1932,6 +1932,7 @@ window.prepare_for_wbrs_preview = (toggle) ->
         if current == val
           current_on.push(checkbox)
 
+  # Any checkbox that doesn't match the current lists is 'off'
   i = checkboxes.length - 1
   while i >= 0
     j = 0
@@ -1962,6 +1963,7 @@ window.prepare_for_wbrs_preview = (toggle) ->
     $(preview_button[0]).attr('disabled', true)
     $(preview_button[0]).attr('data-remove', '')
     $(preview_button[0]).attr('data-add', '')
+
 
 
 #  Add preview score here
@@ -2001,6 +2003,28 @@ window.preview_wbrs_score = (button) ->
     error: (response) ->
       console.log(response)
   )
+
+
+
+window.reset_score_preview = (button) ->
+  dropdown = $(button).parents('.dispute-wlbl-adjust-wrapper')[0]
+  projected_score = $(dropdown).find('.wlbl-projected-entry-wbrs')
+  checkboxes = $(dropdown).find('.wl-bl-list-inline')
+
+  # Empty projected score box
+  $(projected_score[0]).text('')
+
+  # Grab original 'current' lists
+  current_lists = $($(dropdown).find('.wlbl-entry-wlbl')[0]).text()
+  list = current_lists.split(',')
+
+  # If current entry isn't on a list, all toggles should be 'off'
+  if current_lists == "Not on a list"
+    $(checkboxes).each ->
+      $(this).prop('checked', false)
+
+  else
+    console.log 'better get the lists'
 
 
 window.populate_entry_status_dropdown = (dispute_id) ->

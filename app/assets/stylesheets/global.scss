@@ -8129,3 +8129,18 @@ hr.thin.form-divider {
   color: $content-bg-color;
   margin-top: 10px;
 }
+
+.reset-form-button {
+  background-color: darken($nav-toolbar-color, 10%);
+  background-size: 24px 24px;
+  background-position: center center;
+  border-radius: 2px;
+  border: none;
+  background-repeat: no-repeat;
+  background-image: url(image_path('icon_reset_white.svg'));
+  width: 36px;
+  height: 36px;
+  position: absolute;
+  margin-left: 10px;
+  margin-top: 10px;
+}
