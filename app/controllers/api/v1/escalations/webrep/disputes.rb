@@ -699,7 +699,7 @@ module API
                   api_responses = Wbrs::ManualWlbl.where({:url => entry})
 
                   api_responses.each do |response|
-                    if DisputeEntry.domain_of_with_path(response.url) == entry
+                    if DisputeEntry.domain_of_with_path(response.url) == DisputeEntry.domain_of_with_path(entry)
                       if response.state == "active"
                         list_types[entry] << response.list_type
                       end
