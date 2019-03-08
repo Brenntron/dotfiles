@@ -8100,3 +8100,15 @@ hr.thin.form-divider {
   padding-top: 6px !important;
   padding-bottom: 12px !important;
 }
+
+//Tooltipster overwrite
+.tooltipster-default{
+  max-width: 300px!important;
+}
+.tooltipster-content{
+  word-break: break-all;
+}
+.reptool-entry-comment{
+  max-width: 160px;
+  overflow-wrap: break-word;
+}
