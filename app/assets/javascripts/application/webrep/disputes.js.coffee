@@ -1980,7 +1980,6 @@ window.preview_wbrs_score = (button) ->
 
   if add != ''
     add_lists = add.split(',')
-
   if remove != ''
     remove_lists = remove.split(',')
 
@@ -1998,7 +1997,6 @@ window.preview_wbrs_score = (button) ->
     dataType: 'json'
     success: (response) ->
       response = JSON.parse(response)
-      console.log response
       $(projected_score[0]).text(response.score)
     error: (response) ->
       console.log(response)
@@ -2010,9 +2008,9 @@ window.reset_score_preview = (button) ->
   dropdown = $(button).parents('.dispute-wlbl-adjust-wrapper')[0]
   projected_score = $(dropdown).find('.wlbl-projected-entry-wbrs')
   checkboxes = $(dropdown).find('.wl-bl-list-inline')
-
-  # Empty projected score box
-  $(projected_score[0]).text('')
+  preview_button = $(dropdown).find('.preview-wbrs-button')
+  current_on = []
+  current_off = []
 
   # Grab original 'current' lists
   current_lists = $($(dropdown).find('.wlbl-entry-wlbl')[0]).text()
@@ -2022,9 +2020,41 @@ window.reset_score_preview = (button) ->
   if current_lists == "Not on a list"
     $(checkboxes).each ->
       $(this).prop('checked', false)
-
   else
-    console.log 'better get the lists'
+    $(checkboxes).each ->
+      checkbox = this
+      val = $(checkbox).val()
+      $(list).each ->
+        current = this.toString()
+        if current == val
+          current_on.push(checkbox)
+
+  # Any checkbox that doesn't match the current lists is 'off'
+  i = checkboxes.length - 1
+  while i >= 0
+    j = 0
+    while j < current_on.length
+      if checkboxes[i] == current_on[j]
+        checkboxes.splice i, 1
+      j++
+    i--
+  current_off = checkboxes
+
+  # Empty projected score box
+  $(projected_score[0]).text('')
+
+  # Make checkboxes be on or off depending on original lists
+  $(current_on).each ->
+    $(this).prop('checked', true)
+  $(current_off).each ->
+    $(this).prop('checked', false)
+
+  # Reset preview button to original state
+  $(preview_button[0]).attr('disabled', true)
+  $(preview_button[0]).attr('data-remove', '')
+  $(preview_button[0]).attr('data-add', '')
+
+
 
 
 window.populate_entry_status_dropdown = (dispute_id) ->
