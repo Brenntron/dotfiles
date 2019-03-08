@@ -1803,6 +1803,7 @@ $ ->
     entry_wrapper = $(research_row).find('.entry-data-content')[0]
     entry_content = $(entry_wrapper).text().trim()
     wbrs = $($(research_row).find('.entry-data-wbrs-score')[0]).text()
+
     if $('#dispute_id').length > 0
       case_id = $('#dispute_id').text()
       comment_text = '\n \n------------------------------- \nINDIVIDUAL SUBMISSION: \n #' + case_id + ' - ' + entry_content
@@ -1914,6 +1915,8 @@ window.prepare_for_wbrs_preview = (toggle) ->
   preview_button = $(dropdown).find('.preview-wbrs-button')
 
   changed = []
+  current_on = []
+  current_off = []
   add = []
   remove = []
 
@@ -1921,19 +1924,33 @@ window.prepare_for_wbrs_preview = (toggle) ->
     $(checked).each ->
       changed.push('changed')
   else
-    $(list).each ->
-      current = this.toString()
-      $(checkboxes).each ->
-        checkbox = this
-        val = $(checkbox).val()
+    $(checkboxes).each ->
+      checkbox = this
+      val = $(checkbox).val()
+      $(list).each ->
+        current = this.toString()
         if current == val
-          if $(checkbox).prop('checked') != true
-            changed.push('changed')
-            remove.push(val)
-        else
-          if $(checkbox).prop('checked') == true
-            changed.push('changed')
-            add.push(val)
+          current_on.push(checkbox)
+
+  i = checkboxes.length - 1
+  while i >= 0
+    j = 0
+    while j < current_on.length
+      if checkboxes[i] == current_on[j]
+        checkboxes.splice i, 1
+      j++
+    i--
+  current_off = checkboxes
+
+  $(current_on).each ->
+    if $(this).prop('checked') != true
+      changed.push('changed')
+      remove.push($(this).val())
+
+  $(current_off).each ->
+    if $(this).prop('checked') == true
+      changed.push('changed')
+      add.push($(this).val())
 
   if changed.length > 0
     $(preview_button[0]).attr('disabled', false)
