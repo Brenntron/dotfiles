@@ -199,12 +199,10 @@ class DisputeEntry < ApplicationRecord
   def self.domain_of_with_path(urls)
     if urls.kind_of?(String)
       if !urls.start_with?( 'http', 'https')
-        url = "http://" + urls
-      else
-        url = urls
+        urls = "http://" + urls
       end
 
-      clean_url = Addressable::URI.parse(url.strip)
+      clean_url = Addressable::URI.parse(urls.strip)
       clean_host = clean_url.host.sub(/^www\./, '')
       clean_host = clean_host + clean_url.path
 
@@ -215,8 +213,6 @@ class DisputeEntry < ApplicationRecord
         if url.strip != ''
           if !url.start_with?( 'http', 'https')
             url = "http://" + url
-          else
-            url = url
           end
 
           clean_url = Addressable::URI.parse(url.strip)
