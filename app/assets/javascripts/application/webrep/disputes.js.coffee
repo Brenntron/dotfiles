@@ -367,6 +367,8 @@ window.save_dispute = () ->
     success_reload: true
   )
 
+
+
 ## Populating the inline Adjust Reptool button for research page and research tab
 window.get_current_reptool =(button_tag, page) ->
   dropdown = $(button_tag).parents('.dropdown')[0]
