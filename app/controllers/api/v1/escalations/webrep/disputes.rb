@@ -203,23 +203,9 @@ module API
               requires :new_assignee, type: Integer, desc: "User ID of new assignee"
             end
             post "change_assignee" do
-              json_packet = []
-              params[:dispute_ids].each do |dispute|
-                Dispute.where(id: dispute).update_all(user_id: params[:new_assignee])
-                d = Dispute.find_by(id: dispute)
-                if d.status == Dispute::STATUS_NEW || d.status == Dispute::STATUS_REOPENED
-                  accepted_at = Time.now
-                  d.update(status: Dispute::STATUS_ASSIGNED, case_accepted_at: accepted_at)
-                  d.dispute_entries.each do |entry|
-                    if entry.status == DisputeEntry::NEW || entry.status == DisputeEntry::STATUS_REOPENED
-                      entry.update(status: DisputeEntry::ASSIGNED, case_accepted_at: accepted_at)
-                    end
-                  end
-                end
-                raise "This record changed while you were editing. To continue this operation anyway, reload the page and make your assignment again." unless d.user_id == params[:new_assignee]
-                json_packet << d
-              end
-              {:status => "success", :data => json_packet}.to_json
+              authorize!(:update, Dispute)
+              disputes = Dispute.assign(params[:new_assignee], params[:dispute_ids])
+              {:status => "success", :data => disputes}.to_json
             end
 
             desc "Remove assignee from a group of dispute IDs (revert to vrtincoming)"
@@ -362,7 +348,9 @@ module API
                 dispute = Dispute.find(permitted_params['dispute_id'])
                 authorize!(:update, dispute)
 
-                dispute.take_ticket(user: current_user)
+                raise 'This ticket is already assigned.' unless dispute.user_id.nil? || User.vrtincoming&.id == dispute.user_id
+
+                Dispute.assign(current_user, permitted_params['dispute_id'])
 
                 { username: current_user.cvs_username, dispute_id: dispute.id }
               end
