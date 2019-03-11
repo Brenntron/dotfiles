@@ -2043,7 +2043,8 @@ a.static-nav-item {
   background-color: $ac-nav-bg-color;
   border-radius: 2px;
   padding: 3px;
-  margin: 9px 10px;;
+  margin: 9px 10px;
+  z-index:2
 }
 
 #import_bug, #import_webrep, #add_dispute_entry {
@@ -2089,6 +2090,16 @@ a.static-nav-item {
 
 #advanced-search-dropdown {
   min-width: 400px;
+}
+#advanced-search-dropdown {
+  .selectize-dropdown.multi.form-control.selectize{
+    position: absolute;
+    transform:translateY(15px);
+  }
+  .nav-tool-content-wrapper .form-control.selectize{
+    min-height: 26px;
+    height: 100%;
+  }
 }
 
 .search-group form {
@@ -6226,7 +6237,12 @@ table.dispute-entry-table tbody tr.selected {
 .nav-tool-content-wrapper .form-control.selectize .selectize-input input, #advanced-search-wrapper .form-control.selectize .selectize-input input, #categorize-urls-form-wrapper .form-control.selectize .selectize-input input {
   outline: none !important;
 }
-
+#advanced-search-wrapper .selectize-control.form-control.selectize.multi{
+  padding-top: 3px !important;
+  padding-left: 6px !important;
+  background: white;
+  z-index: 3;
+}
 .selectize-input.dropdown-active::before {
   display: none;
 }
