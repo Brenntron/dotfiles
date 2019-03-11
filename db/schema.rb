@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 2019_03_01_174437) do
+ActiveRecord::Schema.define(version: 2019_03_01_184911) do
 
   create_table "alerts", options: "ENGINE=InnoDB DEFAULT CHARSET=utf8", force: :cascade do |t|
     t.datetime "created_at", null: false
@@ -528,6 +528,7 @@ ActiveRecord::Schema.define(version: 2019_03_01_174437) do
   create_table "file_reps", options: "ENGINE=InnoDB DEFAULT CHARSET=utf8", force: :cascade do |t|
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
+    t.string "file_rep_name"
     t.text "sha256"
     t.string "email"
   end
