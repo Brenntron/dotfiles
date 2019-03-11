@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 2019_01_29_160213) do
+ActiveRecord::Schema.define(version: 2019_02_05_164048) do
 
   create_table "alerts", options: "ENGINE=InnoDB DEFAULT CHARSET=utf8", force: :cascade do |t|
     t.datetime "created_at", null: false
@@ -71,6 +71,7 @@ ActiveRecord::Schema.define(version: 2019_01_29_160213) do
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
     t.index ["link_type", "link_id"], name: "index_bug_reference_rule_links_on_link_type_and_link_id"
+    t.index ["reference_id", "link_type"], name: "index_reference_links_on_reference_and_link_type"
   end
 
   create_table "bugs", options: "ENGINE=InnoDB DEFAULT CHARSET=utf8", force: :cascade do |t|
@@ -156,7 +157,7 @@ ActiveRecord::Schema.define(version: 2019_01_29_160213) do
     t.string "domain"
     t.string "path"
     t.float "wbrs_score"
-    t.string "url_primary_category", limit: 1000
+    t.string "url_primary_category", limit: 2000
     t.string "resolution"
     t.text "resolution_comment"
     t.datetime "complaint_entry_resolved_at"
@@ -169,7 +170,7 @@ ActiveRecord::Schema.define(version: 2019_01_29_160213) do
     t.string "suggested_disposition"
     t.string "ip_address"
     t.string "entry_type"
-    t.string "category", limit: 1000
+    t.string "category", limit: 2000
     t.integer "user_id"
     t.boolean "is_important"
     t.datetime "case_resolved_at"
@@ -577,6 +578,7 @@ ActiveRecord::Schema.define(version: 2019_01_29_160213) do
     t.datetime "updated_at", null: false
     t.integer "user_id"
     t.string "name"
+    t.string "project_type"
     t.index ["user_id", "name"], name: "index_named_searches_on_user_id_and_name", unique: true
   end
 
