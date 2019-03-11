@@ -415,11 +415,13 @@ window.inline_load_reptool_button =(button_tag) ->
 window.row_adust_reptool_bl_button =(button_tag) ->
 #  Why are we sending the ids instead of the entry content
 #  We should update this to process the same way that the bulk submission does
+#  debugger
 
   reptool_bl_form = button_tag.form
   data = {
     'action': reptool_bl_form.getElementsByClassName('action-input')[0].value
     'dispute_entry_ids': [ reptool_bl_form.getElementsByClassName('dispute-entry-id')[0].value ]
+    'entries': 'this'
     'classifications': [ reptool_bl_form.getElementsByClassName('classifications-input')[0].value ]
     'comment': reptool_bl_form.getElementsByClassName('comment-input')[0].value
   }
@@ -445,6 +447,8 @@ window.row_adust_reptool_bl_button =(button_tag) ->
         errormsg = [response.responseText]
       std_msg_error('reptool wl/bl adjustment error', ['Error adjusting WL/BL'].concat(errormsg) )
   )
+
+
 
 window.row_adust_reptool_bl_button_research =(button_tag) ->
   reptool_bl_form = button_tag.form
