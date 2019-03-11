@@ -4530,7 +4530,7 @@ table > tbody > tr > td.dispute_rep_tools {
   background-color: transparent;
 }
 
-.dispute_rep_tools .dropdown-menu, #wlbl_adjust_entries.dropdown-menu, #wlbl_adjust_entries_index.dropdown-menu, #reptool_adjust_entries.dropdown-menu {
+.dispute_rep_tools .dropdown-menu, #wlbl_adjust_entries.dropdown-menu, #wlbl_adjust_entries_index.dropdown-menu, #reptool_adjust_entries.dropdown-menu, .reptool-inline-dropdown {
   left: auto;
   border-radius: 0 4px 4px 4px;
   border: none;
@@ -4538,7 +4538,7 @@ table > tbody > tr > td.dispute_rep_tools {
   min-width: 330px;
 }
 
-#reptool_adjust_entries.dropdown-menu {
+#reptool_adjust_entries.dropdown-menu, .reptool-inline-dropdown {
   width: 400px;
 }
 
@@ -4547,7 +4547,7 @@ table > tbody > tr > td.dispute_rep_tools {
 }
 
 .dispute_rep_tools .dropdown-menu {
-  top: 16px;
+  top: 20px;
   right: 1px;
 }
 
@@ -8038,20 +8038,33 @@ th.sorting_1, th.sorting_asc, th.sorting_desc {
     margin-right: 3px !important;
 
     .dropdown-comment {
-      min-height: 60px;
+      min-height: 90px;
     }
   }
 }
 
+.reptool-inline-dropdown .inline-tool-content-wrapper .radio-label {
+  margin-top: 1px;
+}
 
 .dispute-wlbl-adjust-wrapper .inline-tool-content-wrapper, .dispute-reptool-adjust-wrapper .inline-tool-content-wrapper {
   padding: 6px 10px !important;
 }
 
-.toolbar div.dropdown-tool-grey-row {
+.dropdown-tool-grey-row {
   background-color: $faint-neutral-color;
+}
+
+.toolbar div.dropdown-tool-grey-row {
   margin-left: -13px !important;
   margin-right: -13px !important;
+  padding-bottom: 4px;
+  margin-top: -3px !important;
+}
+
+.dispute-reptool-adjust-wrapper .dropdown-tool-grey-row {
+  margin-left: -10px !important;
+  margin-right: -10px !important;
   padding-bottom: 4px;
   margin-top: -3px !important;
 }
@@ -8062,14 +8075,20 @@ th.sorting_1, th.sorting_asc, th.sorting_desc {
   padding-left: 0;
 }
 
-.toolbar div.dropdown-tool-grey-row li {
+.toolbar div.dropdown-tool-grey-row li, .dispute-reptool-adjust-wrapper .dropdown-tool-grey-row li {
   padding: 2px 12px;
 }
 
-.toolbar div.dropdown-tool-grey-row li:hover {
+.dropdown-tool-grey-row li:hover {
   background-color: transparent !important;
 }
 
+.dispute-reptool-adjust-wrapper .dropdown-tool-grey-row {
+  .col-xs-6, .col-xs-4 {
+    margin-right: 0;
+    padding: 3px;
+  }
+}
 hr.thin.form-divider {
   margin: 8px -10px;
 }
@@ -8099,6 +8118,31 @@ hr.thin.form-divider {
 .checkbox-wrapper-row {
   padding-top: 6px !important;
   padding-bottom: 12px !important;
+}
+
+
+.preview-wbrs-button {
+  background-color: $warning-accent-color;
+  padding: 10px 20px;
+  border: none;
+  border-radius: 2px;
+  color: $content-bg-color;
+  margin-top: 10px;
+}
+
+.reset-form-button {
+  background-color: darken($nav-toolbar-color, 10%);
+  background-size: 24px 24px;
+  background-position: center center;
+  border-radius: 2px;
+  border: none;
+  background-repeat: no-repeat;
+  background-image: url(image_path('icon_reset_white.svg'));
+  width: 36px;
+  height: 36px;
+  position: absolute;
+  margin-left: 10px;
+  margin-top: 10px;
 }
 
 //Tooltipster overwrite
