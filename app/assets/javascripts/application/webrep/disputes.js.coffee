@@ -367,47 +367,52 @@ window.save_dispute = () ->
     success_reload: true
   )
 
-# Populating the in line Adjust Reptool button for research page and research tab
-window.inline_load_reptool_button =(button_tag) ->
-  adjust_form = button_tag.parentElement.getElementsByClassName('adjust-reptool-form')[0]
-  submit_button = adjust_form.getElementsByClassName('dropdown-submit-button')
-  #$(submit_button).attr("disabled", false)
+## Populating the inline Adjust Reptool button for research page and research tab
+window.get_current_reptool =(button_tag, page) ->
+  dropdown = $(button_tag).parents('.dropdown')[0]
+  submit_button = $(dropdown).find('.dropdown-submit-button')[0]
+  entry_row = $(button_tag).parents('.research-table-row')[0]
+  entry = $(entry_row).find('.entry-data-content')
+  entry_content = $(entry).text().trim()
+  case_id = $('#dispute_id').text().trim()
+  comment_trail = ''
 
-  #button_tag.parentElement.getElementsByClassName('adjust-reptool-form')[0].getElementsByClassName('dropdown-submit-button')
+  ## Clear out any residual data
+  # Empty table
+  tbody = $(dropdown).find('table.dispute_tool_current').find('tbody')
+  $(tbody).empty()
+  # Empty the comment box
+  comment_box = $(dropdown).find('.comment-input')
+  comment_box.val('')
 
-  #dropdown = $('#reptool_adjust_entries').parent()
+  if page == "show"
+    comment_trail = '\n \n------------------------------- \nINDIVIDUAL SUBMISSION: \n #' + case_id + ' - ' + entry_content
+#  else if page == "research"
+#    comment_trail = '\n \n------------------------------- \nRESEARCH BULK SUBMISSION: \n' + ip_uris.join('\n')
+#  else if page == "index"
+#    comment_trail = '\n \n------------------------------- \nINDIVIDUAL SUBMISSION: \n' + comment_array.join('\n')
 
-  show_content = $(adjust_form).find('.entry-dispute-name')
-  show_rep_class = $(adjust_form).find('.entry-reptool-class')
-  show_rep_exp = $(adjust_form).find('.entry-reptool-expiration')
-  show_rep_comment = $(adjust_form).find('.entry-reptool-comment')
-  action_input = $(adjust_form).find('.action-input')
-  classifications_input = $(adjust_form).find('.classifications-input')
+
+  # Send entry content to reptool
   data = {
-# Send entry content to reptool
-    'entry' : adjust_form.getElementsByClassName('dispute-entry-content')[0].value
+    'entry': entry_content
   }
-
-  headers = {'Token': $('input[name="token"]').val(), 'Xmlrpc-Token': $('input[name="xml_token"]').val()}
-  $.ajax(
-    url: '/escalations/api/v1/escalations/webrep/disputes/reptool_get_info_for_form'
-    method: 'GET'
-    headers: headers
-    data: data
-    dataType: 'json'
+  std_msg_ajax(
+    url: '/escalations/api/v1/escalations/webrep/disputes/bulk_reptool_get_info_for_form'
+    method: 'POST'
+    data: { ip_uris: entry_content }
     success: (response) ->
       response = JSON.parse(response)
-      show_content.text(adjust_form.getElementsByClassName('dispute-entry-content')[0].value)
-      show_rep_class.text(response.classification)
-      show_rep_exp.text(response.expiration)
-      show_rep_comment.text(response.comment)
-      action_input.val(response.status)
-      classifications_input.val(response.classification)
+      entry = response[0]
+      if entry.status == "ACTIVE"
+        rep_class = entry.classification.join(', ')
+      else
+        rep_class = '<span class="missing-data">No active classifications</span>'
+      tbody.append('<tr class="reptool-entry-row" data-case-id="' + 'case_id' + '"><td class="reptool-entry-class">' + rep_class + '</td><td class="reptool-entry-expiration">' + entry['expiration'] + '</td><td class="reptool-entry-comment">' + entry['comment'] + '</td></tr>')
+      comment_box.val(comment_trail)
 
-      $(submit_button).attr('disabled', false)
-#          window.location.reload()
     error: (response) ->
-      popup_response_error(response, 'Error retrieving Reptool Data')
+      std_api_error(response, "Error retrieving Reptool Data", reload: false)
   )
 
 

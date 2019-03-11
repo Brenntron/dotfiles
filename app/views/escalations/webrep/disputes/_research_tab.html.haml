@@ -124,7 +124,7 @@
                       -# Each checked entry will populate information here
 
                   .dropdown-tool-text-divider.secondary-text-divider
-                    Adjust Reptool Classification
+                    Adjust RepTool Classification
 
                   .inline-tool-content-wrapper
                     .row
@@ -138,7 +138,7 @@
                     %hr.thin.form-divider
                     .row#reptool-classifications-row
                       .col-xs-12
-                        %label.content-label-sm{for: "reptool-class-type-select"} Classifications
+                        %label.content-label-sm{for: 'reptool-class-type-select'} Classifications
                         .row.dropdown-tool-grey-row.nested-radio-row#reptool-class-radio-row
                           .col-xs-6
                             %input{type: 'radio', name: 'reptool-classes-radio', id: 'reptool-classes-add', value: 'add', checked: true}
@@ -403,35 +403,22 @@
                                     Submit Changes
                       %span.dropdown
                         - if (@dispute.resolution != Dispute::DUPLICATE) && (@dispute.status != Dispute::RESOLVED)
-                          %button.dispute-inline-buttons.adjust-reptool-button.dropdown-toggle.esc-tooltipped{onclick: "inline_load_reptool_button(this)", id: "reptool_button_#{entry.id}", title: 'Adjust RepTool BL', 'data-toggle': 'dropdown', 'aria-haspopup': 'true', 'aria-expanded': 'false'}
+                          %button.dispute-inline-buttons.adjust-reptool-button.dropdown-toggle.esc-tooltipped{onclick: "get_current_reptool(this, 'show')", id: "reptool_button_#{entry.id}", title: 'Adjust RepTool BL', 'data-toggle': 'dropdown', 'aria-haspopup': 'true', 'aria-expanded': 'false'}
                         .dropdown-menu.toolbar-dropdown.reptool-inline-dropdown{id: "reptool_adjust_#{entry.id}", 'aria-labelledby': "reptool_button_#{entry.id}"}
                           = form_for :reptool, html: {class: 'adjust-reptool-form'} do |rep_form|
                             .dispute-reptool-adjust-wrapper
                               %input.adjust-reptool-bl-input.dispute-entry-id{type: 'hidden', value: "#{entry.id}" }
                               %input.adjust-reptool-bl-input.dispute-entry-content{type: 'hidden', value: "#{entry.hostlookup}" }
-                              %h3 Adjust RepTool BL
+                              %h3 Adjust RepTool Classification
                               %table.dispute_tool_current
-                                %tr
-                                  %td
-                                    %label.content-label-sm Classifications
-                                    %br
-                                    - if entry.classifications.empty?
-                                      %span.entry-reptool-class Not on RepTool
-                                    - else
-                                      %span.entry-reptool-class
-                                        = entry.classifications
-                                  %td
-                                    %label.content-label-sm Expiration
-                                    %br
-                                    - if entry.blacklist&.expiration.nil?
-                                      %span.entry-reptool-expiration N/A
-                                    - else
-                                      %span.entry-reptool-expiration
-                                        = entry.blacklist&.expiration
-                                  %td
-                                    %label.content-label-sm Comment
-                                    %br
-                                    %span.entry-reptool-comment
+                                %thead
+                                  %tr
+                                    %th.content-label-sm Active Classes
+                                    %th.content-label-sm Expiration
+                                    %th.content-label-sm Comment
+                                %tbody
+                                -#  Will call up-to-date information from the api
+
                               .inline-tool-content-wrapper
                                 .row
                                   .col-xs-12
@@ -442,10 +429,10 @@
                                     %input{type: 'radio', name: 'reptool-action-radio', id: "reptool-drop-inline-#{entry.id}", value: 'reptool-drop'}
                                     %label.radio-label{for: "reptool-drop-inline-#{entry.id}"} Drop all classifications (set entry to EXPIRED)
                                 %hr.thin.form-divider
-                                .row#reptool-classifications-inline-row
+                                .row
                                   .col-xs-12
-                                    %label.content-label-sm{for: "reptool-class-type-select"} Classifications
-                                    .row.dropdown-tool-grey-row.nested-radio-row#reptool-class-radio-row-inline
+                                    %label.content-label-sm{for: 'reptool-class-type-select'} Classifications
+                                    .row.dropdown-tool-grey-row.nested-radio-row
                                       .col-xs-6
                                         %input{type: 'radio', name: 'reptool-classes-radio', id: "reptool-classes-add-inline-#{entry.id}", value: 'add', checked: true}
                                         %label.radio-label{for: "reptool-classes-add-inline-#{entry.id}"} Add selected classifications
@@ -512,7 +499,7 @@
                                         \
                                         \--------------------------
                                         INDIVIDUAL SUBMISSION:
-                                        &#x000A; ##{@dispute.id} - #{entry.hostlookup}
+                                        &#x000A; #0000#{@dispute.id} - #{entry.hostlookup}
                                       %hr.thin
                                       .button-row-center
                                         %button.primary.dropdown-submit-button{type: 'button', onclick: 'submit_inline_reptool(#{entry.id}, #{entry.hostlookup})', disabled: true}
