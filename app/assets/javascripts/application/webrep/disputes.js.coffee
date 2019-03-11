@@ -389,10 +389,8 @@ window.get_current_reptool =(button_tag, page) ->
 
   if page == "show"
     comment_trail = '\n \n------------------------------- \nINDIVIDUAL SUBMISSION: \n #' + case_id + ' - ' + entry_content
-#  else if page == "research"
-#    comment_trail = '\n \n------------------------------- \nRESEARCH BULK SUBMISSION: \n' + ip_uris.join('\n')
-#  else if page == "index"
-#    comment_trail = '\n \n------------------------------- \nINDIVIDUAL SUBMISSION: \n' + comment_array.join('\n')
+  else if page == "research"
+    comment_trail = '\n \n------------------------------- \nINDIVIDUAL RESEARCH SUBMISSION: \n' + entry_content
 
 
   # Send entry content to reptool
