@@ -515,7 +515,7 @@
                                         &#x000A; ##{@dispute.id} - #{entry.hostlookup}
                                       %hr.thin
                                       .button-row-center
-                                        %button.primary.dropdown-submit-button{type: 'button', onclick: 'row_adust_reptool_bl_button(this)', disabled: true}
+                                        %button.primary.dropdown-submit-button{type: 'button', onclick: 'submit_inline_reptool(#{entry.id}, #{entry.hostlookup})', disabled: true}
                                           Submit Changes
                               -#.toolbar
                                 -#  %div

@@ -492,8 +492,177 @@ $ ->
         $(reptool_submit[0]).attr('disabled', false)
       else
         $(reptool_submit[0]).attr('disabled', true)
+####################################################################################################################
 
 
+window.submit_inline_reptool = (entry_id, url) ->
+  menu_id = "#reptool_adjust_" + entry_id
+  bulk_reptool_menu = $(menu_id)
+  submission_action = $("input[name='reptool-action-radio']:checked").val()
+
+  checked_classes = []
+  #  Get all checked classifications
+  if $(bulk_reptool_menu).find('.reptool-class-cb:checked').length > 0
+    $(bulk_reptool_menu).find('.reptool-class-cb:checked').each ->
+      checked_classes.push($(this).val())
+  # Convert to string for data submission
+  reptool_classes = checked_classes.join()
+
+  classification_action = $("input[name='reptool-classes-radio']:checked").val()
+
+  comment = bulk_reptool_menu.find('.dropdown-comment').val()
+
+  entry_rows = $(bulk_reptool_menu).find('.reptool-entry-row')
+  entries = []
+  current_entries_and_classes = []
+  $(entry_rows).each ->
+    entry = $(this).find('.reptool-entry-name')[0]
+    entries.push($(entry).text())
+    current_classes = $($(this).find('.reptool-entry-class')[0]).attr('data-classification')
+    current_entries_and_classes.push {
+      'entry': $(entry).text()
+      'classifications': current_classes
+    }
+
+  if submission_action == "reptool-override"
+    data = {
+      'action': 'ACTIVE'
+      'entries': entries
+      'classifications': reptool_classes
+      'comment': comment
+    }
+  else if submission_action == "reptool-drop"
+    data = {
+      'action': 'EXPIRED'
+      'entries': entries
+      'comment': comment
+    }
+  else if submission_action == "reptool-maintain"
+# currently set up for 1 entry to work fine, or if all entries have identical current classes
+    new_classifications = ''
+    array_of_datas = []
+    if classification_action == 'add'
+      $(current_entries_and_classes).each ->
+        if this.classifications.length > 0
+          new_classifications = this.classifications
+          new_classifications = new_classifications + ',' + reptool_classes
+
+          temp_data = {
+            'action': 'ACTIVE'
+            'entries': [this.entry]
+            'classifications': [new_classifications]
+            'comment': comment
+          }
+          array_of_datas.push(temp_data)
+        else
+          new_classifications = reptool_classes
+
+          temp_data = {
+            'action': 'ACTIVE'
+            'entries': [this.entry]
+            'classifications': [new_classifications]
+            'comment': comment
+          }
+          array_of_datas.push(temp_data)
+
+        data = array_of_datas
+    else
+      $(current_entries_and_classes).each ->
+        current = this.classifications.split(',')
+        subtracted = current.filter((x) ->
+          checked_classes.indexOf(x) < 0
+        )
+        new_classifications = subtracted.join()
+
+        if new_classifications.length > 0
+          temp_data = {
+            'action': 'ACTIVE'
+            'entries': [this.entry]
+            'classifications': [new_classifications]
+            'comment': comment
+          }
+          array_of_datas.push(temp_data)
+          data = array_of_datas
+        else
+          submission_action == "reptool-drop"
+
+          temp_data = {
+            'action': 'expired'
+            'entries': [this.entry]
+          }
+          array_of_datas.push(temp_data)
+          data = array_of_datas
+
+  # send separate api calls for each type of submission
+
+  if submission_action == "reptool-override"
+    std_msg_ajax(
+      url: '/escalations/api/v1/escalations/webrep/disputes/reptool_bl'
+      method: 'POST'
+      data: data
+      success: (response) ->
+        std_msg_success('These RepTool classes (' + reptool_classes + ') are assigned to the following entries:', [entries])
+      error: (response) ->
+        if response.responseJSON == undefined
+          response_lines = response.responseText.split("\n")
+          if 2 < response_lines.length
+            errormsg = [response_lines[0], response_lines[1]]
+          else
+            errormsg = [response.responseText]
+        else if response.responseJSON.error != undefined
+          errormsg = [response.responseJSON.error]
+        else
+          errormsg = [response.responseText]
+        std_msg_error('Error', ['Error adjusting WL/BL'].concat(errormsg) )
+    )
+  else if submission_action == "reptool-maintain"
+    std_msg_ajax(
+      url: '/escalations/api/v1/escalations/webrep/disputes/maintain_reptool_bl'
+      method: 'POST'
+      data: {data: data}
+      success: (response) ->
+        std_msg_success('These RepTool classes (' + reptool_classes + ') were changed on the following entries:', [entries])
+      error: (response) ->
+        if response.responseJSON == undefined
+          response_lines = response.responseText.split("\n")
+          if 2 < response_lines.length
+            errormsg = [response_lines[0], response_lines[1]]
+          else
+            errormsg = [response.responseText]
+        else if response.responseJSON.error != undefined
+          errormsg = [response.responseJSON.error]
+        else
+          errormsg = [response.responseText]
+        std_msg_error('Error', ['Error adjusting WL/BL'].concat(errormsg) )
+    )
+  else if submission_action == "reptool-drop"
+    std_msg_ajax(
+      url: '/escalations/api/v1/escalations/webrep/disputes/drop_reptool_bl'
+      method: 'POST'
+      data: data
+      success: (response) ->
+        std_msg_success('All RepTool classes have been removed from the following entries:', [entries])
+      error: (response) ->
+        if response.responseJSON == undefined
+          response_lines = response.responseText.split("\n")
+          if 2 < response_lines.length
+            errormsg = [response_lines[0], response_lines[1]]
+          else
+            errormsg = [response.responseText]
+        else if response.responseJSON.error != undefined
+          errormsg = [response.responseJSON.error]
+        else
+          errormsg = [response.responseText]
+        std_msg_error('Error', ['Error adjusting WL/BL'].concat(errormsg) )
+    )
+
+
+
+
+
+
+
+###########################################################################################################
 # Submit Bulk changes to Reptool
 window.submit_bulk_reptool = () ->
 
