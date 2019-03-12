@@ -367,13 +367,13 @@ window.save_dispute = () ->
     success_reload: true
   )
 
-
+#####################################################################################
 
 ## Populating the inline Adjust Reptool button for research page and research tab
-window.get_current_reptool =(button_tag, page) ->
-  dropdown = $(button_tag).parents('.dropdown')[0]
+window.get_current_reptool =(button, page) ->
+  dropdown = $(button).parents('.dropdown')[0]
   submit_button = $(dropdown).find('.dropdown-submit-button')[0]
-  entry_row = $(button_tag).parents('.research-table-row')[0]
+  entry_row = $(button).parents('.research-table-row')[0]
   entry = $(entry_row).find('.entry-data-content')
   entry_content = $(entry).text().trim()
   case_id = $('#dispute_id').text().trim()
@@ -391,7 +391,6 @@ window.get_current_reptool =(button_tag, page) ->
     comment_trail = '\n \n------------------------------- \nINDIVIDUAL SUBMISSION: \n #' + case_id + ' - ' + entry_content
   else if page == "research"
     comment_trail = '\n \n------------------------------- \nINDIVIDUAL RESEARCH SUBMISSION: \n' + entry_content
-
 
   # Send entry content to reptool
   data = {
@@ -417,68 +416,118 @@ window.get_current_reptool =(button_tag, page) ->
 
 
 
-window.row_adust_reptool_bl_button =(button_tag) ->
-#  Why are we sending the ids instead of the entry content
-#  We should update this to process the same way that the bulk submission does
-#  debugger
+# Submit individual changes to Reptool (show and research page)
+window.submit_individual_reptool = (button, page) ->
+  # Get current info: entry content, current classes, and case id if there is one
+  dropdown = $(button).parents('.dropdown')[0]
+  entry_row = $(button).parents('.research-table-row')[0]
+  entry = $(entry_row).find('.entry-data-content')
+  entry_content = $(entry).text().trim()
+  current_classes = $($(dropdown).find('.reptool-entry-class')[0]).text()
+  case_id = $('#dispute_id').text().trim()
 
-  reptool_bl_form = button_tag.form
-  data = {
-    'action': reptool_bl_form.getElementsByClassName('action-input')[0].value
-    'dispute_entry_ids': [ reptool_bl_form.getElementsByClassName('dispute-entry-id')[0].value ]
-    'entries': 'this'
-    'classifications': [ reptool_bl_form.getElementsByClassName('classifications-input')[0].value ]
-    'comment': reptool_bl_form.getElementsByClassName('comment-input')[0].value
-  }
-  headers = {'Token': $('input[name="token"]').val(), 'Xmlrpc-Token': $('input[name="xml_token"]').val()}
-  $.ajax(
-    url: '/escalations/api/v1/escalations/webrep/disputes/reptool_bl'
-    method: 'POST'
-    headers: headers
-    data: data
-    dataType: 'json'
-    success: (response) ->
-      window.location.reload()
-    error: (response) ->
-      if response.responseJSON == undefined
-        response_lines = response.responseText.split("\n")
-        if 2 < response_lines.length
-          errormsg = [response_lines[0], response_lines[1]]
-        else
-          errormsg = [response.responseText]
-      else if response.responseJSON.error != undefined
-        errormsg = [response.responseJSON.error]
+  # Get reptool submission action
+  submission_action = $(dropdown).find("input[name='reptool-action-radio']:checked").val()
+
+  checked_classes = []
+  #  Get all checked classifications
+  if $(dropdown).find('.reptool-class-cb:checked').length > 0
+    $(dropdown).find('.reptool-class-cb:checked').each ->
+      checked_classes.push($(this).val())
+  # Convert to string for data submission
+  reptool_classes = checked_classes.join(', ')
+
+  classification_action = $($(dropdown).find("input[name='reptool-classes-radio']:checked")).val()
+  comment = $($(dropdown).find('.dropdown-comment')).val()
+
+  # If user wants to override existing classes we only need what they've checked
+  if submission_action == "reptool-override"
+    api_url = '/escalations/api/v1/escalations/webrep/disputes/reptool_bl'
+    success = 'These RepTool classes (' + reptool_classes + ') are assigned to the following entry:'
+    data = {
+      'action': 'ACTIVE'
+      'entries': entry_content
+      'classifications': reptool_classes
+      'comment': comment
+    }
+  else if submission_action == "reptool-drop"
+    api_url = '/escalations/api/v1/escalations/webrep/disputes/drop_reptool_bl'
+    success = 'All RepTool classes have been removed from the following entry: '
+    data = {
+      'action': 'EXPIRED'
+      'entries': entry_content
+      'comment': comment
+    }
+  else if submission_action == "reptool-maintain"
+    api_url = '/escalations/api/v1/escalations/webrep/disputes/maintain_reptool_bl'
+    fin_classes = []
+    # Put current classes into an array (if there are any)
+    if current_classes != "No active classifications"
+      current_arry = current_classes.split(', ')
+    else
+      current_arry = []
+
+    if classification_action == "add"
+      # Checked classes plus current classes, make sure there aren't dupes
+      if current_arry.length > 1
+        $(current_arry).each ->
+          checked_classes.push(this)
       else
-        errormsg = [response.responseText]
-      std_msg_error('reptool wl/bl adjustment error', ['Error adjusting WL/BL'].concat(errormsg) )
-  )
-
-
-
-window.row_adust_reptool_bl_button_research =(button_tag) ->
-  reptool_bl_form = button_tag.form
-
-  data = {
-    'action': reptool_bl_form.getElementsByClassName('action-input')[0].value
-    'entries': [ reptool_bl_form.getElementsByClassName('dispute-entry-content')[0].value ]
-    'classifications': [ reptool_bl_form.getElementsByClassName('classifications-input')[0].value ]
-    'comment': reptool_bl_form.getElementsByClassName('comment-input')[0].value
-  }
-  headers = {'Token': $('input[name="token"]').val(), 'Xmlrpc-Token': $('input[name="xml_token"]').val()}
-  $.ajax(
-    url: '/escalations/api/v1/escalations/webrep/disputes/reptool_bl'
+        checked_classes.push(current_arry[0])
+#
+      fin_classes = checked_classes.filter(((a) ->
+        if !@[a]
+          @[a] = 1
+          return a
+        return
+      ), {})
+      success = 'The following RepTool classes (' + reptool_classes + ') were added the following entry:'
+    else # classification action = 'remove'
+      # Subtract checked classes from current classes
+      fin_classes = current_arry.filter((a) ->
+        !checked_classes.includes(a)
+      )
+      success = 'The following RepTool classes (' + reptool_classes + ') were removed from the following entry:'
+    data = [data: {
+      'action': 'ACTIVE'
+      'entries': [entry_content]
+      'classifications': [fin_classes.join(', ')]
+      'comment': comment
+    }]
+  debugger
+  console.log data
+  # Send to RepTool!
+  std_msg_ajax(
+    url: api_url
     method: 'POST'
-    headers: headers
-    popup_response_error(response, 'Error adjusting WL/BL')
+    data: data
+    success: (response) ->
+      debugger
+      std_msg_success(success, [entry_content])
+      debugger
+    error: (response) ->
+      console.log response
+#      if response.responseJSON == undefined
+#        response_lines = response.responseText.split("\n")
+#        if 2 < response_lines.length
+#          errormsg = [response_lines[0], response_lines[1]]
+#        else
+#          errormsg = [response.responseText]
+#      else if response.responseJSON.error != undefined
+#        errormsg = [response.responseJSON.error]
+#      else
+#        errormsg = [response.responseText]
+#      std_msg_error('Error', ['Error adjusting WL/BL'].concat(errormsg) )
   )
 
 
+############################################################################################
 
 $ ->
   ## Bulk Reptool form manipulation based on user's selections
   bulk_reptool_menu = $('#reptool_adjust_entries')
   submission_actions = bulk_reptool_menu.find("input[name='reptool-action-radio']")
-  reptool_submit = $('#reptool_adjust_entries').find('.dropdown-submit-button')
+  reptool_submit = bulk_reptool_menu.find('.dropdown-submit-button')
 
   # Get submission action, show relavent pieces of the form
   submission_actions.click ->
@@ -501,182 +550,12 @@ $ ->
         $(reptool_submit[0]).attr('disabled', false)
       else
         $(reptool_submit[0]).attr('disabled', true)
-####################################################################################################################
 
 
-window.submit_inline_reptool = (entry_id, url) ->
-  menu_id = "#reptool_adjust_" + entry_id
-  bulk_reptool_menu = $(menu_id)
-  submission_action = $("input[name='reptool-action-radio']:checked").val()
-
-  checked_classes = []
-  #  Get all checked classifications
-  if $(bulk_reptool_menu).find('.reptool-class-cb:checked').length > 0
-    $(bulk_reptool_menu).find('.reptool-class-cb:checked').each ->
-      checked_classes.push($(this).val())
-  # Convert to string for data submission
-  reptool_classes = checked_classes.join()
-
-  classification_action = $("input[name='reptool-classes-radio']:checked").val()
-
-  comment = bulk_reptool_menu.find('.dropdown-comment').val()
-
-  entry_rows = $(bulk_reptool_menu).find('.reptool-entry-row')
-  entries = []
-  current_entries_and_classes = []
-  $(entry_rows).each ->
-    entry = $(this).find('.reptool-entry-name')[0]
-    entries.push($(entry).text())
-    current_classes = $($(this).find('.reptool-entry-class')[0]).attr('data-classification')
-    current_entries_and_classes.push {
-      'entry': $(entry).text()
-      'classifications': current_classes
-    }
-
-  if submission_action == "reptool-override"
-    data = {
-      'action': 'ACTIVE'
-      'entries': entries
-      'classifications': reptool_classes
-      'comment': comment
-    }
-  else if submission_action == "reptool-drop"
-    data = {
-      'action': 'EXPIRED'
-      'entries': entries
-      'comment': comment
-    }
-  else if submission_action == "reptool-maintain"
-# currently set up for 1 entry to work fine, or if all entries have identical current classes
-    new_classifications = ''
-    array_of_datas = []
-    if classification_action == 'add'
-      $(current_entries_and_classes).each ->
-        if this.classifications.length > 0
-          new_classifications = this.classifications
-          new_classifications = new_classifications + ',' + reptool_classes
-
-          temp_data = {
-            'action': 'ACTIVE'
-            'entries': [this.entry]
-            'classifications': [new_classifications]
-            'comment': comment
-          }
-          array_of_datas.push(temp_data)
-        else
-          new_classifications = reptool_classes
-
-          temp_data = {
-            'action': 'ACTIVE'
-            'entries': [this.entry]
-            'classifications': [new_classifications]
-            'comment': comment
-          }
-          array_of_datas.push(temp_data)
-
-        data = array_of_datas
-    else
-      $(current_entries_and_classes).each ->
-        current = this.classifications.split(',')
-        subtracted = current.filter((x) ->
-          checked_classes.indexOf(x) < 0
-        )
-        new_classifications = subtracted.join()
-
-        if new_classifications.length > 0
-          temp_data = {
-            'action': 'ACTIVE'
-            'entries': [this.entry]
-            'classifications': [new_classifications]
-            'comment': comment
-          }
-          array_of_datas.push(temp_data)
-          data = array_of_datas
-        else
-          submission_action == "reptool-drop"
-
-          temp_data = {
-            'action': 'expired'
-            'entries': [this.entry]
-          }
-          array_of_datas.push(temp_data)
-          data = array_of_datas
-
-  # send separate api calls for each type of submission
-
-  if submission_action == "reptool-override"
-    std_msg_ajax(
-      url: '/escalations/api/v1/escalations/webrep/disputes/reptool_bl'
-      method: 'POST'
-      data: data
-      success: (response) ->
-        std_msg_success('These RepTool classes (' + reptool_classes + ') are assigned to the following entries:', [entries])
-      error: (response) ->
-        if response.responseJSON == undefined
-          response_lines = response.responseText.split("\n")
-          if 2 < response_lines.length
-            errormsg = [response_lines[0], response_lines[1]]
-          else
-            errormsg = [response.responseText]
-        else if response.responseJSON.error != undefined
-          errormsg = [response.responseJSON.error]
-        else
-          errormsg = [response.responseText]
-        std_msg_error('Error', ['Error adjusting WL/BL'].concat(errormsg) )
-    )
-  else if submission_action == "reptool-maintain"
-    std_msg_ajax(
-      url: '/escalations/api/v1/escalations/webrep/disputes/maintain_reptool_bl'
-      method: 'POST'
-      data: {data: data}
-      success: (response) ->
-        std_msg_success('These RepTool classes (' + reptool_classes + ') were changed on the following entries:', [entries])
-      error: (response) ->
-        if response.responseJSON == undefined
-          response_lines = response.responseText.split("\n")
-          if 2 < response_lines.length
-            errormsg = [response_lines[0], response_lines[1]]
-          else
-            errormsg = [response.responseText]
-        else if response.responseJSON.error != undefined
-          errormsg = [response.responseJSON.error]
-        else
-          errormsg = [response.responseText]
-        std_msg_error('Error', ['Error adjusting WL/BL'].concat(errormsg) )
-    )
-  else if submission_action == "reptool-drop"
-    std_msg_ajax(
-      url: '/escalations/api/v1/escalations/webrep/disputes/drop_reptool_bl'
-      method: 'POST'
-      data: data
-      success: (response) ->
-        std_msg_success('All RepTool classes have been removed from the following entries:', [entries])
-      error: (response) ->
-        if response.responseJSON == undefined
-          response_lines = response.responseText.split("\n")
-          if 2 < response_lines.length
-            errormsg = [response_lines[0], response_lines[1]]
-          else
-            errormsg = [response.responseText]
-        else if response.responseJSON.error != undefined
-          errormsg = [response.responseJSON.error]
-        else
-          errormsg = [response.responseText]
-        std_msg_error('Error', ['Error adjusting WL/BL'].concat(errormsg) )
-    )
-
-
-
-
-
-
-
-###########################################################################################################
 # Submit Bulk changes to Reptool
 window.submit_bulk_reptool = () ->
-
   bulk_reptool_menu = $('#reptool_adjust_entries')
-  submission_action = $("input[name='reptool-action-radio']:checked").val()
+  submission_action = $(bulk_reptool_menu).find("input[name='reptool-action-radio']:checked").val()
 
   checked_classes = []
   #  Get all checked classifications
@@ -686,7 +565,7 @@ window.submit_bulk_reptool = () ->
   # Convert to string for data submission
   reptool_classes = checked_classes.join()
 
-  classification_action = $("input[name='reptool-classes-radio']:checked").val()
+  classification_action = $(bulk_reptool_menu).find("input[name='reptool-classes-radio']:checked").val()
   comment = bulk_reptool_menu.find('.dropdown-comment').val()
 
   #  Get the entries
@@ -717,7 +596,6 @@ window.submit_bulk_reptool = () ->
       'comment': comment
     }
   else if submission_action == "reptool-maintain"
-# currently set up for 1 entry to work fine, or if all entries have identical current classes
     new_classifications = ''
     array_of_datas = []
     if classification_action == 'add'
@@ -726,6 +604,8 @@ window.submit_bulk_reptool = () ->
           new_classifications = this.classifications
           new_classifications = new_classifications + ',' + reptool_classes
 
+#          Not sure this piece is taking into account potential duplicate classes.
+#          need to confirm
           temp_data = {
             'action': 'ACTIVE'
             'entries': [this.entry]
@@ -773,7 +653,6 @@ window.submit_bulk_reptool = () ->
           data = array_of_datas
 
   # send separate api calls for each type of submission
-
   if submission_action == "reptool-override"
     std_msg_ajax(
       url: '/escalations/api/v1/escalations/webrep/disputes/reptool_bl'
@@ -795,6 +674,8 @@ window.submit_bulk_reptool = () ->
         std_msg_error('Error', ['Error adjusting WL/BL'].concat(errormsg) )
     )
   else if submission_action == "reptool-maintain"
+    debugger
+    console.log data
     std_msg_ajax(
       url: '/escalations/api/v1/escalations/webrep/disputes/maintain_reptool_bl'
       method: 'POST'
@@ -837,40 +718,40 @@ window.submit_bulk_reptool = () ->
 
 
 
-window.toolbar_adjust_reptool_bl_button_research =(button_tag) ->
-  checked_url = $('.dispute_check_box:checked')[0]
-  entry_row = $(checked_url).parents('.research-table-row')[0]
-  url = $(entry_row).find('.entry-data-content').text()
-
-  reptool_bl_form = button_tag.form
-  data = {
-    'action': reptool_bl_form.getElementsByClassName('action-input')[0].value
-    'entries': [ url ]
-    'classifications': [ reptool_bl_form.getElementsByClassName('classifications-input')[0].value ]
-    'comment': reptool_bl_form.getElementsByClassName('comment-input')[0].value
-  }
-  headers = {'Token': $('input[name="token"]').val(), 'Xmlrpc-Token': $('input[name="xml_token"]').val()}
-  $.ajax(
-    url: '/escalations/api/v1/escalations/webrep/disputes/reptool_bl'
-    method: 'POST'
-    headers: headers
-    data: data
-    dataType: 'json'
-    success: (response) ->
-      window.location.reload()
-    error: (response) ->
-      if response.responseJSON == undefined
-        response_lines = response.responseText.split("\n")
-        if 2 < response_lines.length
-          errormsg = [response_lines[0], response_lines[1]]
-        else
-          errormsg = [response.responseText]
-      else if response.responseJSON.error != undefined
-        errormsg = [response.responseJSON.error]
-      else
-        errormsg = [response.responseText]
-      std_msg_error('Error', ['Error adjusting WL/BL'] + errormsg)
-  )
+#window.toolbar_adjust_reptool_bl_button_research =(button_tag) ->
+#  checked_url = $('.dispute_check_box:checked')[0]
+#  entry_row = $(checked_url).parents('.research-table-row')[0]
+#  url = $(entry_row).find('.entry-data-content').text()
+#
+#  reptool_bl_form = button_tag.form
+#  data = {
+#    'action': reptool_bl_form.getElementsByClassName('action-input')[0].value
+#    'entries': [ url ]
+#    'classifications': [ reptool_bl_form.getElementsByClassName('classifications-input')[0].value ]
+#    'comment': reptool_bl_form.getElementsByClassName('comment-input')[0].value
+#  }
+#  headers = {'Token': $('input[name="token"]').val(), 'Xmlrpc-Token': $('input[name="xml_token"]').val()}
+#  $.ajax(
+#    url: '/escalations/api/v1/escalations/webrep/disputes/reptool_bl'
+#    method: 'POST'
+#    headers: headers
+#    data: data
+#    dataType: 'json'
+#    success: (response) ->
+#      window.location.reload()
+#    error: (response) ->
+#      if response.responseJSON == undefined
+#        response_lines = response.responseText.split("\n")
+#        if 2 < response_lines.length
+#          errormsg = [response_lines[0], response_lines[1]]
+#        else
+#          errormsg = [response.responseText]
+#      else if response.responseJSON.error != undefined
+#        errormsg = [response.responseJSON.error]
+#      else
+#        errormsg = [response.responseText]
+#      std_msg_error('Error', ['Error adjusting WL/BL'] + errormsg)
+#  )
 
 window.toolbar_index_edit_status = () ->
   statusName = $('input[name=entry-status]:checked').val()

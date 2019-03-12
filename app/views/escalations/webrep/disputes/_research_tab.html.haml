@@ -502,26 +502,9 @@
                                         &#x000A; #0000#{@dispute.id} - #{entry.hostlookup}
                                       %hr.thin
                                       .button-row-center
-                                        %button.primary.dropdown-submit-button{type: 'button', onclick: 'submit_inline_reptool(#{entry.id}, #{entry.hostlookup})'}
+                                        %button.primary.dropdown-submit-button{type: 'button', onclick: "submit_individual_reptool(this, 'show')"}
                                           Submit Changes
-                              -#.toolbar
-                                -#  %div
-                                -#    %label.toolbar-section-label{for:"entry-#{entry.id}-blacklist-action-select"} Status
-                                    -#-# Need to add an 'N/A' option in the dropdown for if an item has no classifications
-                                    -#-# in RepTool
-                                    -#= rep_form.select(:action, ['ACTIVE', 'EXPIRED'],
-                                    -#  {selected: entry.blacklist ? 'Active' : 'Expired'},
-                                    -#  class: 'toolbar-select select-status adjust-reptool-bl-input action-input',
-                                    -#  title: 'RepTool Rule Status',
-                                    -#  id: "entry-#{entry.id}-blacklist-action-select")
-                                  %div
-                                    %label.toolbar-section-label{for: "entry-#{entry.id}-blacklist-classifications-select"} RepTool WL/BL
-                                    = rep_form.select(:classification, RepApi::Blacklist.classifications,
-                                      {selected: entry.classifications&.first,
-                                        include_blank: 'Not on RepTool'},
-                                      class: 'toolbar-select select-rt-rule adjust-reptool-bl-input classifications-input',
-                                      title: "RepTool BL Rules",
-                                      id: "entry-#{entry.id}-blacklist-classifications-select")
+
 
                 %tr.research-overview-row
                   %td
