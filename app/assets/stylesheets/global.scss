@@ -2100,11 +2100,39 @@ a.static-nav-item {
     min-height: 26px;
     height: 100%;
   }
+  .selectize-dropdown{
+    //position: absolute;
+    //top: 100%;
+    //left: 0;
+    //z-index: 1000;
+    //display: none;
+    //float: left;
+    o
+    top:0;
+    left: -5px!important;
+    min-width: 350px!important;
+    padding: 5px 0!important;
+    margin: 2px 0 0!important;
+    font-size: 14px!important;
+    text-align: left!important;
+    list-style: none!important;
+    background-color: #fff!important;
+    background-clip: padding-box!important;
+    border: 1px solid #ccc!important;
+    border: 1px solid rgba(0, 0, 0, 0.15)!important;
+    border-radius: 4px!important;
+    -webkit-box-shadow: 0 6px 12px rgba(0, 0, 0, 0.175)!important;
+    box-shadow: 0 6px 12px rgba(0, 0, 0, 0.175)!important;
+  }
+  .selectize-dropdown-content {
+    //background: red!important
+  }
 }
 
 .search-group form {
   display: inline-block;
 }
+
 
 /****** End Top Tool Bar ******/
 
