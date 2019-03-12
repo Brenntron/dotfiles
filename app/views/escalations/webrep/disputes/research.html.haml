@@ -230,7 +230,7 @@
                     %td.dispute_rep_tools
                       %span.dispute_rep_tools_wrapper
                         %span.dropdown
-                          %button.dispute-inline-buttons.adjust-wlbl-button.bfrp-inline-wlbl-button.dropdown-toggle{title: 'Adjust WL/BL', 'data-toggle': 'dropdown', 'aria-haspopup': 'true', 'aria-expanded': 'false'}
+                          %button.dispute-inline-buttons.adjust-wlbl-button.bfrp-inline-wlbl-button.dropdown-toggle{title: 'Adjust WL/BL', 'data-toggle': 'dropdown', 'aria-haspopup': 'true', 'aria-expanded': 'false', onclick: 'get_inline_row_wlbl(this);'}
                           .dropdown-menu
                             = form_for :wlbl, html: {class: 'adjust-wlbl-form'} do |wlbl_form|
                               .dispute-wlbl-adjust-wrapper

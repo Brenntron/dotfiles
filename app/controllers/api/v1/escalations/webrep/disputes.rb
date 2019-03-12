@@ -66,6 +66,19 @@ module API
 
             end
 
+            desc 'project new score'
+            params do
+              requires :url, type: String
+              requires :add, type: Array(String)
+              requires :remove, type: Array(String)
+            end
+
+            post "project_new_score" do
+              new_score = Wbrs::ManualWlbl.project_new_score(permitted_params[:url], permitted_params[:add], permitted_params[:remove])
+              data = {status: "success", score: new_score}
+              data.to_json
+            end
+
             desc 'create a dispute'
             params do
               requires :ips_urls, type: String, desc: 'List of URLs to create entries'
@@ -607,7 +620,7 @@ module API
                 rescue
                   expiration = information[params[:entry].gsub('http://', '').gsub('https://', '')]["expiration"]
                 end
-                return {:entry => params[:entry], :classification => information[params[:entry].gsub('http://', '').gsub('https://', '')]["classifications"].first, :expiration => expiration, :status => information[params[:entry].gsub('http://', '').gsub('https://', '')]["status"], :comment => information[params[:entry].gsub('http://', '').gsub('https://', '')]["metadata"]["VRT"]["comment"]}.to_json
+                return {:entry => params[:entry], :classification => information[params[:entry].gsub('http://', '').gsub('https://', '')]["classifications"], :expiration => expiration, :status => information[params[:entry].gsub('http://', '').gsub('https://', '')]["status"], :comment => information[params[:entry].gsub('http://', '').gsub('https://', '')]["metadata"]["VRT"]["comment"]}.to_json
               end
 
             end
