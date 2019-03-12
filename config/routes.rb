@@ -110,6 +110,7 @@ Rails.application.routes.draw do
         collection do
           get 'poll-from-bridge/messages', to: 'messages#get_messages'
           post 'ticket-event/messages', to: 'messages#messages_from_bridge'
+          post 'file-rep-create/messages', to: 'file_rep_messages#create'
         end
         resources :messages, only: [:create]
       end
