@@ -358,7 +358,7 @@ class Dispute < ApplicationRecord
     is_resolved = true
 
     self.dispute_entries.each do |entry|
-      if entry.status != DisputeEntry::RESOLVED
+      if entry.status != DisputeEntry::STATUS_RESOLVED
         is_resolved = false
         break
       end
