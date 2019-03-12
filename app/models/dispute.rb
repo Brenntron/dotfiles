@@ -312,7 +312,7 @@ class Dispute < ApplicationRecord
       new_dispute_entry.dispute_id = dispute.id
       new_dispute_entry.ip_address = ip
       new_dispute_entry.entry_type = "IP"
-      new_dispute_entry.status = DisputeEntry::RESOLVED
+      new_dispute_entry.status = DisputeEntry::STATUS_RESOLVED
       new_dispute_entry.resolution = DisputeEntry::STATUS_RESOLVED_DUPLICATE
       new_dispute_entry.case_closed_at = resolved_at
       new_dispute_entry.case_resolved_at = resolved_at
@@ -328,7 +328,7 @@ class Dispute < ApplicationRecord
       new_dispute_entry.dispute_id = dispute.id
       new_dispute_entry.uri = url
       new_dispute_entry.entry_type = "URI/DOMAIN"
-      new_dispute_entry.status = DisputeEntry::RESOLVED
+      new_dispute_entry.status = DisputeEntry::STATUS_RESOLVED
       new_dispute_entry.resolution = DisputeEntry::STATUS_RESOLVED_DUPLICATE
       new_dispute_entry.case_closed_at = resolved_at
       new_dispute_entry.case_resolved_at = resolved_at
@@ -358,7 +358,7 @@ class Dispute < ApplicationRecord
     is_resolved = true
 
     self.dispute_entries.each do |entry|
-      if entry.status != DisputeEntry::RESOLVED
+      if entry.status != DisputeEntry::STATUS_RESOLVED
         is_resolved = false
         break
       end
