@@ -474,7 +474,7 @@ window.submit_individual_reptool = (button, page) ->
           checked_classes.push(this)
       else
         checked_classes.push(current_arry[0])
-#
+
       fin_classes = checked_classes.filter(((a) ->
         if !@[a]
           @[a] = 1
@@ -488,36 +488,34 @@ window.submit_individual_reptool = (button, page) ->
         !checked_classes.includes(a)
       )
       success = 'The following RepTool classes (' + reptool_classes + ') were removed from the following entry:'
-    data = [data: {
-      'action': 'ACTIVE'
-      'entries': [entry_content]
-      'classifications': [fin_classes.join(', ')]
-      'comment': comment
+    data = {
+      'data': [{
+        'action': 'ACTIVE'
+        'entries': [entry_content]
+        'classifications': [fin_classes.join(', ')]
+        'comment': comment
     }]
-  debugger
-  console.log data
+    }
+
   # Send to RepTool!
   std_msg_ajax(
     url: api_url
     method: 'POST'
     data: data
     success: (response) ->
-      debugger
       std_msg_success(success, [entry_content])
-      debugger
     error: (response) ->
-      console.log response
-#      if response.responseJSON == undefined
-#        response_lines = response.responseText.split("\n")
-#        if 2 < response_lines.length
-#          errormsg = [response_lines[0], response_lines[1]]
-#        else
-#          errormsg = [response.responseText]
-#      else if response.responseJSON.error != undefined
-#        errormsg = [response.responseJSON.error]
-#      else
-#        errormsg = [response.responseText]
-#      std_msg_error('Error', ['Error adjusting WL/BL'].concat(errormsg) )
+      if response.responseJSON == undefined
+        response_lines = response.responseText.split("\n")
+        if 2 < response_lines.length
+          errormsg = [response_lines[0], response_lines[1]]
+        else
+          errormsg = [response.responseText]
+      else if response.responseJSON.error != undefined
+        errormsg = [response.responseJSON.error]
+      else
+        errormsg = [response.responseText]
+      std_msg_error('Error', ['Error adjusting WL/BL'].concat(errormsg) )
   )
 
 
