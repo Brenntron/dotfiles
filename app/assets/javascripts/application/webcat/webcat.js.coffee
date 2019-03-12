@@ -98,26 +98,22 @@ $ ->
           width: '40px'
           'render':(data,type,full,meta) ->
 
-            newtime = moment(full.created_at)
-            complaint_age = moment.duration(newtime.diff(moment())).asHours();
+            current_time = moment()
+            created_at = moment(full.created_at)
+            complaint_age = moment.duration(created_at.diff(current_time)).asHours();
             complaint_age = Math.abs(complaint_age)
             complaint_age = Math.floor(complaint_age)
 
             if complaint_age < 1
-
-              complaint_latency = '<1 hour'
-
+              complaint_latency = '<1h'
+            else if complaint_age > 120
+              complaint_latency ='<span class="ticket-age-over3hr">  >120h </span>'
+            else if complaint_age < 2
+              complaint_latency = complaint_age + 'h'
+            else if 3 <= complaint_age
+              complaint_latency ='<span class="ticket-age-over3hr">'+ complaint_age + 'h </span>'
             else
-
-              if complaint_age < 2
-                complaint_latency = complaint_age + ' hour'
-              else if 3 <= complaint_age
-                complaint_latency ='<span class="ticket-age-over3hr">'+ complaint_age + ' hours </span>'
-              else if complaint_age >= 12
-                complaint_latency ='<span class="overdue">'+ complaint_age + ' hours </span>'
-              else
-                complaint_latency = complaint_age + ' hours'
-
+              complaint_latency = complaint_age + 'h'
         }
         {
           data: 'status'
