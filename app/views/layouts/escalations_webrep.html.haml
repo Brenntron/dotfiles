@@ -100,6 +100,8 @@
   - if current_user
     #login-div.nav-tool-block.col-sm-3.col-lg-3
       %span.dropdown
+        Placeholder
+        = bugzilla_rest_logged_in?(@bugzilla_rest_session)
         %button#user-settings-dropdown-button.dropdown-toggle{'data-toggle': 'dropdown', 'aria-expanded': 'false', 'aria-haspopup': 'true', type: 'button'}
         #user-settings-dropdown.dropdown-menu{'aria-labelledby': 'user-settings-dropdown-button'}
           -#    If user is logged into Bugzilla
@@ -108,7 +110,6 @@
           
           -#-#    Else
           .message-text Log into Bugzilla
-          = bugzilla_rest_logged_in?(@bugzilla_rest_session)
           %form#top_banner_bugzilla_login_form
             .form-group.text-left
               %label.content-label-sm Username
