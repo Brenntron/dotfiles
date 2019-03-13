@@ -299,7 +299,7 @@
                                       Submit Changes
 
                         %span.dropdown
-                          %button.dispute-inline-buttons.adjust-reptool-button.dropdown-toggle{onclick: "get_current_reptool(this, 'show')", id: "reptool_button_#{entry.id}", title: 'Adjust RepTool BL', 'data-toggle': 'dropdown', 'aria-haspopup': 'true', 'aria-expanded': 'false'}
+                          %button.dispute-inline-buttons.adjust-reptool-button.dropdown-toggle{onclick: "get_current_reptool(this, 'research')", id: "reptool_button_#{entry.id}", title: 'Adjust RepTool BL', 'data-toggle': 'dropdown', 'aria-haspopup': 'true', 'aria-expanded': 'false'}
                           .dropdown-menu.toolbar-dropdown.reptool-inline-dropdown{id: "reptool_adjust_#{entry.id}", 'aria-labelledby': "reptool_button_#{entry.id}"}
                             = form_for :reptool, html: {class: 'adjust-reptool-form'} do |rep_form|
                               .dispute-reptool-adjust-wrapper
@@ -397,7 +397,7 @@
                                           &#x000A; #{entry.hostlookup}
                                         %hr.thin
                                         .button-row-center
-                                          %button.primary.dropdown-submit-button{type: 'button', onclick: 'submit_inline_reptool(#{entry.id}, #{entry.hostlookup})'}
+                                          %button.primary.dropdown-submit-button{type: 'button', onclick: 'submit_individual_reptool(this)'}
                                             Submit Changes
 
 

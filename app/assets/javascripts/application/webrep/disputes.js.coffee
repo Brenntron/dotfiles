@@ -417,7 +417,7 @@ window.get_current_reptool =(button, page) ->
 
 
 # Submit individual changes to Reptool (show and research page)
-window.submit_individual_reptool = (button, page) ->
+window.submit_individual_reptool = (button) ->
   # Get current info: entry content, current classes, and case id if there is one
   dropdown = $(button).parents('.dropdown')[0]
   entry_row = $(button).parents('.research-table-row')[0]
@@ -492,11 +492,10 @@ window.submit_individual_reptool = (button, page) ->
       'data': [{
         'action': 'ACTIVE'
         'entries': [entry_content]
-        'classifications': [fin_classes.join(', ')]
+        'classifications': [fin_classes.join(',')]
         'comment': comment
     }]
     }
-
   # Send to RepTool!
   std_msg_ajax(
     url: api_url
@@ -515,7 +514,7 @@ window.submit_individual_reptool = (button, page) ->
         errormsg = [response.responseJSON.error]
       else
         errormsg = [response.responseText]
-      std_msg_error('Error', ['Error adjusting WL/BL'].concat(errormsg) )
+      std_msg_error('Error', ['Error adjusting RepTool classes'].concat(errormsg) )
   )
 
 
@@ -672,8 +671,6 @@ window.submit_bulk_reptool = () ->
         std_msg_error('Error', ['Error adjusting WL/BL'].concat(errormsg) )
     )
   else if submission_action == "reptool-maintain"
-    debugger
-    console.log data
     std_msg_ajax(
       url: '/escalations/api/v1/escalations/webrep/disputes/maintain_reptool_bl'
       method: 'POST'
