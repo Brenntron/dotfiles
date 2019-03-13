@@ -101,7 +101,6 @@ $ ->
             current_time = moment()
             created_at = moment(full.created_at)
             complaint_age = moment.duration(created_at.diff(current_time)).asHours();
-            console.log(complaint_age)
             complaint_age = Math.abs(complaint_age)
             complaint_age = Math.floor(complaint_age)
 
