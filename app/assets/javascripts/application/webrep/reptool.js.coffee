@@ -1,12 +1,13 @@
 ################################################################################
-# FUNCTIONS FOR POPULATING / SUBMITTING ETC REPTOOL INFORMATION
+# FUNCTIONS FOR POPULATING, SUBMITTING, ETC. REPTOOL INFORMATION
 ################################################################################
 
 
 
 #### POPULATING CURRENT REPTOOL CLASSIFICATIONS ####
 
-## Populating the inline Adjust Reptool button for research page and research tab (individual submission form)
+## Populating the inline Adjust Reptool dropdown for
+## research page and research tab (individual submission form)
 window.get_current_reptool =(button, page) ->
   dropdown = $(button).parents('.dropdown')[0]
   submit_button = $(dropdown).find('.dropdown-submit-button')[0]
@@ -52,7 +53,8 @@ window.get_current_reptool =(button, page) ->
   )
 
 
-##  Populating the toolbar Adjust RepTool BL dropdown (bulk submission form)
+##  Populating the toolbar Adjust RepTool BL dropdown
+## (bulk submission form) - works on index, research page, and show page
 window.bulk_get_current_reptool = (page) ->
 # Define the variables based on the page
   if page == "show"
@@ -137,7 +139,8 @@ window.bulk_get_current_reptool = (page) ->
 
 #### FORM MANIPULATION ####
 
-# Reptool form manipulation to hide and show needed elements / enable submission
+# Reptool form manipulation to hide and show needed elements /
+# enable form submission
 window.reptool_form_prep = (action, submission_type) ->
   dropdown = $(action).parents('.dropdown')[0]
   reptool_submit = $(dropdown).find('.dropdown-submit-button')[0]
@@ -272,7 +275,8 @@ window.submit_individual_reptool = (button) ->
 
 
 ## TODO - Consolidate this code a bit
-## Submit Bulk changes to Reptool
+## Submit Bulk changes to Reptool - toolbar dropdown form
+## This works on index, research page, and research tab of show page
 window.submit_bulk_reptool = () ->
   bulk_reptool_menu = $('#reptool_adjust_entries')
   submission_action = $(bulk_reptool_menu).find("input[name='reptool-action-radio']:checked").val()

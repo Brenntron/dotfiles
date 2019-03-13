@@ -44,3 +44,4 @@
 //= require application/webcat/webCatRepLookup
 //= require application/webrep/webrep-report-engine
 //= require application/webrep/reptool
+//= require application/webrep/wbrs_wlbl

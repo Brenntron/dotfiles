@@ -89,7 +89,7 @@
                       %label.content-label-sm WL/BL Comment
                       %textarea.dropdown-comment.adjust-wlbl-input.note-input
                     .button-row-center
-                      %button.primary.dropdown-submit-button{type: 'button', onclick:'bulk_adjust_wlbl("research");', disabled: true}
+                      %button.primary.dropdown-submit-button{type: 'button', onclick:'submit_bulk_wlbl("research");', disabled: true}
                         Submit Reputation Changes
 
           %span.dropdown
@@ -230,7 +230,7 @@
                     %td.dispute_rep_tools
                       %span.dispute_rep_tools_wrapper
                         %span.dropdown
-                          %button.dispute-inline-buttons.adjust-wlbl-button.bfrp-inline-wlbl-button.dropdown-toggle{title: 'Adjust WL/BL', 'data-toggle': 'dropdown', 'aria-haspopup': 'true', 'aria-expanded': 'false', onclick: 'get_inline_row_wlbl(this);'}
+                          %button.dispute-inline-buttons.adjust-wlbl-button.bfrp-inline-wlbl-button.dropdown-toggle{title: 'Adjust WL/BL', 'data-toggle': 'dropdown', 'aria-haspopup': 'true', 'aria-expanded': 'false', onclick: 'get_current_wlbl(this);'}
                           .dropdown-menu
                             = form_for :wlbl, html: {class: 'adjust-wlbl-form'} do |wlbl_form|
                               .dispute-wlbl-adjust-wrapper
@@ -295,7 +295,7 @@
                                     %label.content-label-sm Comment
                                     %textarea.dropdown-comment.adjust-wlbl-input.note-input
                                   .button-row-center
-                                    %button.primary.dropdown-submit-button{type: 'button', disabled: true, onclick:'row_research_adjust_wlbl_button(this);'}
+                                    %button.primary.dropdown-submit-button{type: 'button', disabled: true, onclick:'submit_individual_wlbl(this);'}
                                       Submit Changes
 
                         %span.dropdown
