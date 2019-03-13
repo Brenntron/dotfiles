@@ -443,7 +443,7 @@ window.submit_individual_reptool = (button, page) ->
   # If user wants to override existing classes we only need what they've checked
   if submission_action == "reptool-override"
     api_url = '/escalations/api/v1/escalations/webrep/disputes/reptool_bl'
-    success = 'These RepTool classes (' + reptool_classes + ') are assigned to the following entry:'
+    success = 'The following RepTool classes have been are assigned to: ' + entry_content
     data = {
       'action': 'ACTIVE'
       'entries': entry_content
@@ -452,7 +452,7 @@ window.submit_individual_reptool = (button, page) ->
     }
   else if submission_action == "reptool-drop"
     api_url = '/escalations/api/v1/escalations/webrep/disputes/drop_reptool_bl'
-    success = 'All RepTool classes have been removed from the following entry: '
+    success = 'All RepTool classes have been removed from: ' + entry_content
     data = {
       'action': 'EXPIRED'
       'entries': entry_content
@@ -481,13 +481,13 @@ window.submit_individual_reptool = (button, page) ->
           return a
         return
       ), {})
-      success = 'The following RepTool classes (' + reptool_classes + ') were added the following entry:'
-    else # classification action = 'remove'
+      success = 'The following RepTool classifications have been added to: ' + entry_content
+    else # classification action == 'remove'
       # Subtract checked classes from current classes
       fin_classes = current_arry.filter((a) ->
         !checked_classes.includes(a)
       )
-      success = 'The following RepTool classes (' + reptool_classes + ') were removed from the following entry:'
+      success = 'The following RepTool classes have been removed from: ' + entry_content
     data = {
       'data': [{
         'action': 'ACTIVE'
@@ -503,7 +503,7 @@ window.submit_individual_reptool = (button, page) ->
     method: 'POST'
     data: data
     success: (response) ->
-      std_msg_success(success, [entry_content])
+      std_msg_success(success, [reptool_classes])
     error: (response) ->
       if response.responseJSON == undefined
         response_lines = response.responseText.split("\n")
