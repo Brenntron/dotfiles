@@ -447,7 +447,7 @@ window.submit_individual_reptool = (button) ->
     data = {
       'action': 'ACTIVE'
       'entries': entry_content
-      'classifications': reptool_classes
+      'classifications': checked_classes.join(',')
       'comment': comment
     }
   else if submission_action == "reptool-drop"
@@ -520,36 +520,6 @@ window.submit_individual_reptool = (button) ->
 
 ############################################################################################
 
-$ ->
-  ## Bulk Reptool form manipulation based on user's selections
-  bulk_reptool_menu = $('#reptool_adjust_entries')
-  submission_actions = bulk_reptool_menu.find("input[name='reptool-action-radio']")
-  reptool_submit = bulk_reptool_menu.find('.dropdown-submit-button')
-
-  # Get submission action, show relavent pieces of the form
-  submission_actions.click ->
-    action = $(this).val()
-    if action == 'reptool-maintain'
-      $('#reptool-classifications-row').show()
-      $('#reptool-class-radio-row').show()
-    else if action == 'reptool-override'
-      $('#reptool-classifications-row').show()
-      $('#reptool-class-radio-row').hide()
-    else if action == 'reptool-drop'
-      $('#reptool-classifications-row').hide()
-      $('#reptool-class-radio-row').hide()
-      $(reptool_submit[0]).attr('disabled', false)
-
-  # If user is not dropping all categories they need to select new ones to drop or add
-  bulk_reptool_menu.find('.reptool-class-cb').click ->
-    if submission_actions.val() == 'reptool-maintain' || submission_actions.val() == 'reptool-override'
-      if bulk_reptool_menu.find('.reptool-class-cb:checked').length > 0
-        $(reptool_submit[0]).attr('disabled', false)
-      else
-        $(reptool_submit[0]).attr('disabled', true)
-
-
-
 # Reptool form manipulation to hide and show needed elements / enable submission
 window.reptool_form_prep = (action, submission_type) ->
   dropdown = $(action).parents('.dropdown')[0]
@@ -579,8 +549,6 @@ window.reptool_form_prep = (action, submission_type) ->
       $(reptool_submit).attr('disabled', true)
 
 
-
-      
 
 # Submit Bulk changes to Reptool
 window.submit_bulk_reptool = () ->

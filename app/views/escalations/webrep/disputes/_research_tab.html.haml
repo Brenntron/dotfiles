@@ -129,17 +129,17 @@
                   .inline-tool-content-wrapper
                     .row
                       .col-xs-12
-                        %input{type: 'radio', name: 'reptool-action-radio', id: 'reptool-maintain', value: 'reptool-maintain', checked: true}
+                        %input{type: 'radio', name: 'reptool-action-radio', id: 'reptool-maintain', value: 'reptool-maintain', checked: true, onclick: 'reptool_form_prep(this, "bulk")'}
                         %label.radio-label{for: 'reptool-maintain'} Maintain current classifications
-                        %input{type: 'radio', name: 'reptool-action-radio', id: 'reptool-override', value: 'reptool-override'}
+                        %input{type: 'radio', name: 'reptool-action-radio', id: 'reptool-override', value: 'reptool-override', onclick: 'reptool_form_prep(this, "bulk")'}
                         %label.radio-label{for: 'reptool-override'} Replace current classifications
-                        %input{type: 'radio', name: 'reptool-action-radio', id: 'reptool-drop', value: 'reptool-drop'}
+                        %input{type: 'radio', name: 'reptool-action-radio', id: 'reptool-drop', value: 'reptool-drop', onclick: 'reptool_form_prep(this, "bulk")'}
                         %label.radio-label{for: 'reptool-drop'} Drop all classifications (set entry to EXPIRED)
                     %hr.thin.form-divider
-                    .row#reptool-classifications-row
+                    .row.reptool-classifications-row
                       .col-xs-12
                         %label.content-label-sm{for: 'reptool-class-type-select'} Classifications
-                        .row.dropdown-tool-grey-row.nested-radio-row#reptool-class-radio-row
+                        .row.dropdown-tool-grey-row.nested-radio-row.reptool-class-radio-row
                           .col-xs-6
                             %input{type: 'radio', name: 'reptool-classes-radio', id: 'reptool-classes-add', value: 'add', checked: true}
                             %label.radio-label{for: 'reptool-classes-add'} Add selected classifications
@@ -151,53 +151,53 @@
                           .col-xs-4
                             %ul
                               %li
-                                %input.reptool-class-cb{type: 'checkbox', name: 'classification', value: 'attackers'}
+                                %input.reptool-class-cb{type: 'checkbox', name: 'classification', value: 'attackers', onclick: 'reptool_form_prep(this, "bulk")'}
                                   attackers
                               %li
-                                %input.reptool-class-cb{type: 'checkbox', name: 'classification', value: 'bogon'}
+                                %input.reptool-class-cb{type: 'checkbox', name: 'classification', value: 'bogon', onclick: 'reptool_form_prep(this, "bulk")'}
                                   bogon
                               %li
-                                %input.reptool-class-cb{type: 'checkbox', name: 'classification', value: 'bots'}
+                                %input.reptool-class-cb{type: 'checkbox', name: 'classification', value: 'bots', onclick: 'reptool_form_prep(this, "bulk")'}
                                   bots
                               %li
-                                %input.reptool-class-cb{type: 'checkbox', name: 'classification', value: 'cnc'}
+                                %input.reptool-class-cb{type: 'checkbox', name: 'classification', value: 'cnc', onclick: 'reptool_form_prep(this, "bulk")'}
                                   cnc
                               %li
-                                %input.reptool-class-cb{type: 'checkbox', name: 'classification', value: 'cryptomining'}
+                                %input.reptool-class-cb{type: 'checkbox', name: 'classification', value: 'cryptomining', onclick: 'reptool_form_prep(this, "bulk")'}
                                   cryptomining
                           .col-xs-4
                             %ul
                               %li
-                                %input.reptool-class-cb{type: 'checkbox', name: 'classification', value: 'dga'}
+                                %input.reptool-class-cb{type: 'checkbox', name: 'classification', value: 'dga', onclick: 'reptool_form_prep(this, "bulk")'}
                                   dga
                               %li
-                                %input.reptool-class-cb{type: 'checkbox', name: 'classification', value: 'exploitkit'}
+                                %input.reptool-class-cb{type: 'checkbox', name: 'classification', value: 'exploitkit', onclick: 'reptool_form_prep(this, "bulk")'}
                                   exploitkit
                               %li
-                                %input.reptool-class-cb{type: 'checkbox', name: 'classification', value: 'malware'}
+                                %input.reptool-class-cb{type: 'checkbox', name: 'classification', value: 'malware', onclick: 'reptool_form_prep(this, "bulk")'}
                                   malware
                               %li
-                                %input.reptool-class-cb{type: 'checkbox', name: 'classification', value: 'open_proxy'}
+                                %input.reptool-class-cb{type: 'checkbox', name: 'classification', value: 'open_proxy', onclick: 'reptool_form_prep(this, "bulk")'}
                                   open_proxy
                               %li
-                                %input.reptool-class-cb{type: 'checkbox', name: 'classification', value: 'open_relay'}
+                                %input.reptool-class-cb{type: 'checkbox', name: 'classification', value: 'open_relay', onclick: 'reptool_form_prep(this, "bulk")'}
                                   open_relay
                           .col-xs-4
                             %ul
                               %li
-                                %input.reptool-class-cb{type: 'checkbox', name: 'classification', value: 'phishing'}
+                                %input.reptool-class-cb{type: 'checkbox', name: 'classification', value: 'phishing', onclick: 'reptool_form_prep(this, "bulk")'}
                                   phishing
                               %li
-                                %input.reptool-class-cb{type: 'checkbox', name: 'classification', value: 'response'}
+                                %input.reptool-class-cb{type: 'checkbox', name: 'classification', value: 'response', onclick: 'reptool_form_prep(this, "bulk")'}
                                   response
                               %li
-                                %input.reptool-class-cb{type: 'checkbox', name: 'classification', value: 'spam'}
+                                %input.reptool-class-cb{type: 'checkbox', name: 'classification', value: 'spam', onclick: 'reptool_form_prep(this, "bulk")'}
                                   spam
                               %li
-                                %input.reptool-class-cb{type: 'checkbox', name: 'classification', value: 'suspicious'}
+                                %input.reptool-class-cb{type: 'checkbox', name: 'classification', value: 'suspicious', onclick: 'reptool_form_prep(this, "bulk")'}
                                   suspicious
                               %li
-                                %input.reptool-class-cb{type: 'checkbox', name: 'classification', value: 'tor_exit_node'}
+                                %input.reptool-class-cb{type: 'checkbox', name: 'classification', value: 'tor_exit_node', onclick: 'reptool_form_prep(this, "bulk")'}
                                   tor_exit_node
 
                     .comment-wrapper
