@@ -549,6 +549,39 @@ $ ->
         $(reptool_submit[0]).attr('disabled', true)
 
 
+
+# Reptool form manipulation to hide and show needed elements / enable submission
+window.reptool_form_prep = (action, submission_type) ->
+  dropdown = $(action).parents('.dropdown')[0]
+  reptool_submit = $(dropdown).find('.dropdown-submit-button')[0]
+  class_actions_row = $(dropdown).find('.reptool-classifications-row')[0]
+  classes_row = $(dropdown).find('.reptool-class-radio-row')[0]
+  action_type = $(action).attr('name')
+
+  if action_type == 'reptool-action-radio'
+    submission_action = $(action).val()
+    # Show relavent pieces of the form
+    if submission_action == 'reptool-maintain'
+      $(class_actions_row).show()
+      $(classes_row).show()
+    else if submission_action == 'reptool-override'
+      $(class_actions_row).show()
+      $(classes_row).hide()
+    else if submission_action == 'reptool-drop'
+      $(class_actions_row).hide()
+      $(classes_row).hide()
+      $(reptool_submit).attr('disabled', false)
+
+  else if action_type = 'classification'
+    if $(dropdown).find('.reptool-class-cb:checked').length > 0
+      $(reptool_submit).attr('disabled', false)
+    else
+      $(reptool_submit).attr('disabled', true)
+
+
+
+      
+
 # Submit Bulk changes to Reptool
 window.submit_bulk_reptool = () ->
   bulk_reptool_menu = $('#reptool_adjust_entries')
