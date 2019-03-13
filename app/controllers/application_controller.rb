@@ -21,6 +21,11 @@ class ApplicationController < ActionController::Base
     xmlrpc
   end
 
+  def bugzilla_rest_session
+    token = session['bugzilla_rest_api_token']
+    BugzillaRest::Session.new(api_key: current_user.bugzilla_api_key, token: token)
+  end
+
   def current_user
     user_from_request = User.from_request(params, request)
     if user_from_request && !session[:email]
