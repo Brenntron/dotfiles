@@ -63,7 +63,7 @@ module API
 
                   complaint_entry_packet[:assigned_to] = complaint_entry.user&.display_name
                   complaint_entry_packet[:status] = complaint_entry.status
-                  complaint_entry_packet[:created_at] = complaint_entry.created_at.strftime('%Y-%m-%d %H:%M:%S')
+                  complaint_entry_packet[:created_at] = complaint_entry.created_at
                   complaint_entry_packet[:customer_name] = complaint_entry.complaint&.customer&.name # Customer name
 
                   complaint_entry_packet[:category] = complaint_entry.url_primary_category
