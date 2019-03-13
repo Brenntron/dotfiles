@@ -9,12 +9,10 @@ module ApplicationHelper
 
   def bugzilla_rest_logged_in?(session)
     if BugzillaRest::Session.logged_in?(session)
-      html = 'Logged In'
+      true
     else
-      html = 'Not Logged In'
+      false
     end
-
-    html
   end
 
   def bootstrap_class_for(flash_type)
