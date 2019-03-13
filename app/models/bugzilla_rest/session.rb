@@ -87,4 +87,16 @@ class BugzillaRest::Session < BugzillaRest::Base
 
     BugzillaRest::AttachmentProxy.new(attachment_attrs, api_key: api_key, token: token)
   end
+
+  def self.logged_in?(session)
+    api_key = session.api_key
+    token = session.token
+
+    if api_key.present? || token.present?
+      return true
+    else
+      return false
+    end
+  end
+
 end

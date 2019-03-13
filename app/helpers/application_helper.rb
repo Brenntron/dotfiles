@@ -7,6 +7,16 @@ module ApplicationHelper
     current_user&.bugzilla_api_key
   end
 
+  def bugzilla_rest_logged_in?(session)
+    if BugzillaRest::Session.logged_in?(session)
+      html = 'Logged In'
+    else
+      html = 'Not Logged In'
+    end
+
+    html
+  end
+
   def bootstrap_class_for(flash_type)
     case flash_type
       when "success"
