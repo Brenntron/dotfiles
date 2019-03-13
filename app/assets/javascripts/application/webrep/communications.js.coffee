@@ -8,7 +8,7 @@ $(window).load ->
   )
 
   $(".email-row[email_id="+most_recent_email+"]").click()
-  
+
 $ ->
 
   $('#history-sort-dropdown').on 'change', ->
@@ -231,12 +231,11 @@ $ ->
           data: form_data
           contentType: false
           processData: false
-          success_reload: true
           success: (response) ->
-            $('#newEmail').modal('hide');
-            std_msg_success('Email Sent.', [], reload: true)
+            $('#newEmailDialog').dialog 'close'
+            window.location.reload()
           error: (response) ->
-            $('#newEmail').modal('hide');
+            $('#newEmailDialog').dialog 'close'
             $('.delete_attachment_new').click()
             std_api_error(response, "Email was not sent", response, reload: false)
         )
@@ -247,13 +246,12 @@ $ ->
           data: form_data
           contentType: false
           processData: false
-          success_reload: true
           success: (response) ->
-            $('#newEmail').modal('hide');
-            std_msg_success('Email Sent.', [], reload: true)
+            $('#newEmailDialog').dialog 'close'
+            window.location.reload()
           error: (response) ->
-            $('#newEmail').modal('hide');
-            $('.delete_attachment_new').click();
+            $('#newEmailDialog').dialog 'close'
+            $('.delete_attachment_new').click()
             std_api_error(response, "Email was not sent", response, reload: false)
         )
 
@@ -340,7 +338,6 @@ $ ->
         method: 'POST'
         url: "/escalations/api/v1/escalations/webrep/dispute_comments"
         data: {user_id: user_id, comment: comment, dispute_id: dispute_id}
-        success_msg: 'Note Created.'
         success_reload: true
         error_prefix: 'Note could not created.'
         failure_reload: false
