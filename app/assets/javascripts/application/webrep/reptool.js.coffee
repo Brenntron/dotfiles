@@ -117,6 +117,14 @@ window.bulk_get_current_reptool = (page) ->
           tbody.append('<tr class="reptool-entry-row" data-case-id="' + case_id + '"><td class="reptool-entry-name">' + entry['entry'] + '</td><td class="reptool-entry-class" data-classification="' + rep_class + '">' + rep_class_full + '</td><td class="reptool-entry-comment">' + entry['comment'] + '</td></tr>')
         comment_box.val(comment_trail)
 
+        if entry['comment'].length > 50
+          entry_comment_trunc = entry['comment'].substring(0, 50) + '...'
+          $('.reptool-entry-comment').text(entry_comment_trunc)
+          $('.reptool-entry-comment').addClass('esc-tooltipped')
+          $('.esc-tooltipped').attr('title', entry['comment'])
+        else
+          $('.reptool-entry-comment').text(entry['comment'])
+
       error: (response) ->
         std_api_error(response, "Error retrieving Reptool Data", reload: false)
     )
@@ -314,10 +322,17 @@ window.submit_bulk_reptool = () ->
       $(current_entries_and_classes).each ->
         if this.classifications.length > 0
           new_classifications = this.classifications
+          new_classifications_array = new_classifications.split(',')
+          reptool_classes_array = reptool_classes.split(',')
+
+          filtered = reptool_classes_array.filter((x) ->
+            new_classifications_array.indexOf(x) < 0
+          )
+
+          reptool_classes = filtered.join()
+
           new_classifications = new_classifications + ',' + reptool_classes
 
-          #          Not sure this piece is taking into account potential duplicate classes.
-          #          need to confirm
           temp_data = {
             'action': 'ACTIVE'
             'entries': [this.entry]
@@ -371,7 +386,7 @@ window.submit_bulk_reptool = () ->
       method: 'POST'
       data: data
       success: (response) ->
-        std_msg_success('These RepTool classes (' + reptool_classes + ') are assigned to the following entries:', [entries])
+        std_msg_success('These RepTool classes (' + reptool_classes.replace(/,/g, ', ') + ') are assigned to the following entries:', [entries])
       error: (response) ->
         if response.responseJSON == undefined
           response_lines = response.responseText.split("\n")
@@ -391,7 +406,7 @@ window.submit_bulk_reptool = () ->
       method: 'POST'
       data: {data: data}
       success: (response) ->
-        std_msg_success('These RepTool classes (' + reptool_classes + ') were changed on the following entries:', [entries])
+        std_msg_success('These RepTool classes (' + reptool_classes.replace(/,/g, ', ') + ') were changed on the following entries:', [entries])
       error: (response) ->
         if response.responseJSON == undefined
           response_lines = response.responseText.split("\n")

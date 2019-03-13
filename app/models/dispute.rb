@@ -72,6 +72,8 @@ class Dispute < ApplicationRecord
   scope :sbrs_disputes, -> { where(submission_type: ['e', 'ew'])}
   scope :wbrs_disputes, -> { where(submission_type: ['w', 'ew'])}
 
+  validates_with DisputeValidator
+
   def self.create_action(bugzilla_rest_session, ips_urls, assignee, priority, ticket_type, status=NEW, categories = nil)
     user = User.where(cvs_username: assignee).first
 
@@ -1009,6 +1011,11 @@ class Dispute < ApplicationRecord
         dispute.status_comment = comment
       end
 
+      unless [STATUS_NEW, STATUS_ASSIGNED].include?(dispute.status)
+        dispute.user_id = current_user.id unless dispute.is_assigned?
+      end
+
+      dispute.save!
       dispute.dispute_entries.each do |entry|
         if resolution.present? && entry.status != Dispute::STATUS_RESOLVED
           entry.resolution = resolution
@@ -1020,7 +1027,6 @@ class Dispute < ApplicationRecord
         entry.save
       end
 
-      dispute.save
       if comment.present?
         DisputeComment.create(:user_id => current_user.id, :comment => comment, :dispute_id => dispute.id)
       end
@@ -1180,69 +1186,48 @@ class Dispute < ApplicationRecord
     end
   end
 
-  def take_ticket(user:)
-    raise 'This ticket is already assigned.' unless self.user_id.nil? || User.vrtincoming&.id == self.user_id
+  # Assigns a user to given disputes
+  # @param [User|Integer] user the user to assign this dispute to
+  # @param [Array<Integer>|Integer] dispute_ids the disputes to assign
+  # @return [Array<Dispute>] the disputes updated
+  def self.assign(user, dispute_ids)
+    user_id = user.kind_of?(User) ? user.id : user
+    accepted_at = Time.now
 
-    # Atomic update statement to handle possible race condition.
-    Dispute.where(id: self.id,
-                  user_id: self.user_id).update_all(user_id: user.id)
+    disputes_ary = []
+    Dispute.transaction do
+      disputes = Dispute.where(id: dispute_ids, status: [Dispute::STATUS_NEW, Dispute::STATUS_REOPENED])
+      disputes_ary = disputes.all.to_a
+      disputes.update_all(user_id: user_id, status: Dispute::STATUS_ASSIGNED, case_accepted_at: accepted_at)
 
-    dispute = Dispute.find(self.id)
-
-    if dispute.status == Dispute::STATUS_NEW || dispute.status == Dispute::STATUS_REOPENED
-      accepted_at = Time.now
-      dispute.update(status: Dispute::STATUS_ASSIGNED, case_accepted_at: accepted_at)
-
-      dispute.dispute_entries.each do |entry|
-        if entry.status == DisputeEntry::NEW || entry.status == DisputeEntry::STATUS_REOPENED
-          entry.update(status: DisputeEntry::ASSIGNED, case_accepted_at: accepted_at)
-        end
+      entries = DisputeEntry.where(dispute: disputes_ary, status: [DisputeEntry::NEW, DisputeEntry::STATUS_REOPENED])
+      entries_ary = entries.all.to_a
+      if entries_ary.any?
+        entries.update_all(status: DisputeEntry::ASSIGNED, case_accepted_at: accepted_at)
+        Bridge::DisputeEntryUpdateStatusEvent.new.post_entries(entries_ary)
       end
-
-      message = Bridge::DisputeEntryUpdateStatusEvent.new
-      message.post_entries(dispute.dispute_entries)
     end
-    raise 'This record changed while you were editing.' unless dispute.user_id == user.id
+
+    disputes_ary
   end
 
   def self.take_tickets(dispute_ids, user:)
     Dispute.transaction do
-      unless Dispute.where(id: dispute_ids, user_id: User.vrtincoming.id)
+      unless 0 == Dispute.where(id: dispute_ids).where.not(user_id: User.vrtincoming.id).count
         raise 'Some of these ticket are already assigned.'
       end
-      Dispute.where(id: dispute_ids,
-                    user_id:  User.vrtincoming.id).update_all(user_id: user.id)
-
-      queries = Dispute.where(id: dispute_ids, user_id: user.id)
-      queries.each do |query|
-        if query.status == Dispute::STATUS_NEW || query.status == Dispute::STATUS_REOPENED
-          accepted_at = Time.now
-          query.update(status: Dispute::STATUS_ASSIGNED, case_accepted_at: accepted_at)
-          query.dispute_entries.each do |entry|
-            if entry.status == DisputeEntry::NEW || entry.status == DisputeEntry::STATUS_REOPENED
-              entry.update(status: DisputeEntry::ASSIGNED, case_accepted_at: accepted_at)
-            end
-          end
-
-          message = Bridge::DisputeEntryUpdateStatusEvent.new
-          message.post_entries(query.dispute_entries)
-        end
-      end
-
-      unless dispute_ids.count == Dispute.where(id: dispute_ids, user_id: user.id).count
-        raise 'This record changed while you were editing and may be already assigned'
-      end
+      Dispute.assign(user, dispute_ids)
     end
   end
 
   def return_dispute
     update(user_id: User.vrtincoming.id)
 
-    if status == 'ASSIGNED'
+    if status == STATUS_ASSIGNED
       update(status: 'NEW', case_accepted_at: nil)
 
       dispute_entries.each do |dispute_entry|
-        if dispute_entry.status == 'ASSIGNED'
+        if dispute_entry.status == DisputeEntry::ASSIGNED
           dispute_entry.update(status: 'NEW', case_accepted_at: nil)
         end
       end

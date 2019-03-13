@@ -6,10 +6,10 @@
       .row.search-options-row
         .col-xs-6
           = search_form.radio_button(:scope, 'strict', id: 'research-search-strict', checked: params['search'] && params['search']['scope'].eql?("strict"))
-          %label{for: 'research-search-strict'} Strict Search
+          %label.esc-tooltipped{title: 'Strict Search returns the inputted URI/IP as an entry, in addition to all entries that match the URL pattern.', for: 'research-search-strict'} Strict Search
         .col-xs-6
           = search_form.radio_button(:scope, 'broad', id: 'research-search-broad', checked: !params['search'] || params['search']['scope'].eql?("broad"))
-          %label{for: 'research-search-broad'} Broad Search
+          %label.esc-tooltipped{title: 'Broad Search returns all records matching the URL pattern.', for: 'research-search-broad'} Broad Search
       =search_form.submit :Submit, id: 'submit-button'
   .row
     .col-xs-12
@@ -694,7 +694,7 @@
                                     - entry.wbrs_xlist.each do |cross_listed|
                                       %tr
                                         %td= cross_listed.id
-                                        %td= cross_listed.url
+                                        %td.esc-tooltipped{:title => cross_listed.url}= truncate(cross_listed.url, :length=>20)
                                         %td= cross_listed.list_type
                                         %td -
                                         %td= cross_listed.username
@@ -715,7 +715,7 @@
                                     - entry.wbrs_xlist.each do |cross_listed|
                                       %tr
                                         %td= cross_listed.id
-                                        %td= cross_listed.url
+                                        %td.esc-tooltipped{:title => cross_listed.url}= truncate(cross_listed.url, :length=>20)
                                         %td= cross_listed.list_type
                                         %td -
                                         %td= cross_listed.username

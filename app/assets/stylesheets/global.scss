@@ -515,7 +515,7 @@ button {
 
 .toolbar div:last-child {
   //width: 100%;
-  margin-right: 0 !Important;
+  margin-right: 0 !important;
 }
 
 .toolbar label {
@@ -8118,4 +8118,41 @@ hr.thin.form-divider {
 .checkbox-wrapper-row {
   padding-top: 6px !important;
   padding-bottom: 12px !important;
+}
+
+
+.preview-wbrs-button {
+  background-color: $warning-accent-color;
+  padding: 10px 20px;
+  border: none;
+  border-radius: 2px;
+  color: $content-bg-color;
+  margin-top: 10px;
+}
+
+.reset-form-button {
+  background-color: darken($nav-toolbar-color, 10%);
+  background-size: 24px 24px;
+  background-position: center center;
+  border-radius: 2px;
+  border: none;
+  background-repeat: no-repeat;
+  background-image: url(image_path('icon_reset_white.svg'));
+  width: 36px;
+  height: 36px;
+  position: absolute;
+  margin-left: 10px;
+  margin-top: 10px;
+}
+
+//Tooltipster overwrite
+.tooltipster-default{
+  max-width: 300px!important;
+}
+.tooltipster-content{
+  word-break: break-all;
+}
+.reptool-entry-comment{
+  max-width: 160px;
+  overflow-wrap: break-word;
 }

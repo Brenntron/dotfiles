@@ -351,10 +351,12 @@
                                   %tr
                                     %th.content-label-sm.no-word-break Current WL/BL List
                                     %th.text-center.content-label-sm.no-word-break Current WBRS Score
+                                    %th.text-center.content-label-sm.no-word-break Projected Score
                                 %tbody
                                   %tr
                                     %td.wlbl-entry-wlbl
                                     %td.wlbl-current-entry-wbrs.text-center
+                                    %td.wlbl-projected-entry-wbrs.text-center
                               .inline-tool-content-wrapper
                                 .row
                                   .col-xs-12
@@ -364,37 +366,41 @@
                                     %ul.wlbl-toggle-list
                                       %li
                                         %label.toggle-switch
-                                          %input.wl-weak-checkbox{type: 'checkbox', name: 'wl-bl-list-inline', class: 'wl-bl-list-inline', value: "WL-weak"}
+                                          %input.wl-weak-checkbox{type: 'checkbox', name: 'wl-bl-list-inline', class: 'wl-bl-list-inline', value: 'WL-weak', onclick: 'prepare_for_wbrs_preview(this)'}
                                           %span.toggle-slider
                                         WL - Weak
                                       %li
                                         %label.toggle-switch
-                                          %input.wl-med-checkbox{type: 'checkbox', name: 'wl-bl-list-inline', class: 'wl-bl-list-inline', value: "WL-med"}
+                                          %input.wl-med-checkbox{type: 'checkbox', name: 'wl-bl-list-inline', class: 'wl-bl-list-inline', value: 'WL-med', onclick: 'prepare_for_wbrs_preview(this)'}
                                           %span.toggle-slider
                                         WL - Medium
                                       %li
                                         %label.toggle-switch
-                                          %input.wl-heavy-checkbox{type: 'checkbox', name: 'wl-bl-list-inline', class: 'wl-bl-list-inline', value: "WL-heavy"}
+                                          %input.wl-heavy-checkbox{type: 'checkbox', name: 'wl-bl-list-inline', class: 'wl-bl-list-inline', value: 'WL-heavy', onclick: 'prepare_for_wbrs_preview(this)'}
                                           %span.toggle-slider
                                         WL - Heavy
                                   .col-xs-6
                                     %ul.wlbl-toggle-list
                                       %li
                                         %label.toggle-switch
-                                          %input.bl-weak-checkbox{type: 'checkbox', name: 'wl-bl-list-inline', class: 'wl-bl-list-inline', value: "BL-weak"}
+                                          %input.bl-weak-checkbox{type: 'checkbox', name: 'wl-bl-list-inline', class: 'wl-bl-list-inline', value: 'BL-weak', onclick: 'prepare_for_wbrs_preview(this)'}
                                           %span.toggle-slider
                                         BL - Weak
                                       %li
                                         %label.toggle-switch
-                                          %input.bl-med-checkbox{type: 'checkbox', name: 'wl-bl-list-inline', class: 'wl-bl-list-inline', value: "BL-med"}
+                                          %input.bl-med-checkbox{type: 'checkbox', name: 'wl-bl-list-inline', class: 'wl-bl-list-inline', value: 'BL-med', onclick: 'prepare_for_wbrs_preview(this)'}
                                           %span.toggle-slider
                                         BL - Medium
                                       %li
                                         %label.toggle-switch
-                                          %input.bl-heavy-checkbox{type: 'checkbox', name: 'wl-bl-list-inline', class: 'wl-bl-list-inline', value: "BL-heavy"}
+                                          %input.bl-heavy-checkbox{type: 'checkbox', name: 'wl-bl-list-inline', class: 'wl-bl-list-inline', value: 'BL-heavy', onclick: 'prepare_for_wbrs_preview(this)'}
                                           %span.toggle-slider
                                         BL - Heavy
-
+                                .button-row-center
+                                  %button.preview-wbrs-button{type: 'button', disabled: true, onclick: 'preview_wbrs_score(this);', 'data-add': '', 'data-remove': ''}
+                                    Preview Projected Score
+                                  %button.reset-form-button.esc-tooltipped{type: 'button', title: 'Reset list toggles.', onclick: 'reset_score_preview(this)'}
+                                %hr.thin
                                 .comment-wrapper
                                   %label.content-label-sm Comment
                                   %textarea.dropdown-comment.adjust-wlbl-input.note-input
@@ -556,7 +562,7 @@
                             %span.missing-data N/A
                           - else
                             = entry.virustotals_negatives_count
-                            \\
+                            \/
                             = entry.virustotals.count
 
                         %td.left-bordered

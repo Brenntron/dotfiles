@@ -74,7 +74,7 @@ GEM
     ajax-datatables-rails (0.4.3)
       railties (>= 4.0)
     arel (9.0.0)
-    autoprefixer-rails (9.4.9)
+    autoprefixer-rails (9.4.10)
       execjs
     awesome_nested_set (3.1.4)
       activerecord (>= 4.0.0, < 5.3)
@@ -95,9 +95,9 @@ GEM
     bindex (0.5.0)
     bootstrap-multiselect-rails (0.9.9)
       rails (>= 4.0.0)
-    bootstrap-sass (3.3.7)
+    bootstrap-sass (3.4.1)
       autoprefixer-rails (>= 5.2.1)
-      sass (>= 3.3.4)
+      sassc (>= 2.0.0)
     bugzilla (0.10.0)
       gruff (~> 0)
       highline
@@ -251,7 +251,7 @@ GEM
     httpi (2.4.4)
       rack
       socksify
-    i18n (1.5.3)
+    i18n (1.6.0)
       concurrent-ruby (~> 1.0)
     ice_nine (0.11.2)
     inline_svg (1.3.1)
@@ -261,11 +261,7 @@ GEM
       activesupport (>= 4.2.0)
       multi_json (>= 1.2)
     jmespath (1.4.0)
-    jquery-datatables-rails (3.4.0)
-      actionpack (>= 3.1)
-      jquery-rails
-      railties (>= 3.1)
-      sass-rails
+    jquery-datatables (1.10.19.1)
     jquery-rails (4.3.3)
       rails-dom-testing (>= 1, < 3)
       railties (>= 4.2.0)
@@ -453,6 +449,15 @@ GEM
       sprockets (>= 2.8, < 4.0)
       sprockets-rails (>= 2.0, < 4.0)
       tilt (>= 1.1, < 3)
+    sassc (2.0.1)
+      ffi (~> 1.9)
+      rake
+    sassc-rails (2.1.0)
+      railties (>= 4.0.0)
+      sassc (>= 2.0)
+      sprockets (> 3.0)
+      sprockets-rails
+      tilt
     selectize-rails (0.12.6)
     shellany (0.0.1)
     simple_form (4.0.1)
@@ -473,7 +478,7 @@ GEM
       activesupport (>= 4.0)
       sprockets (>= 3.0.0)
     stomp (1.4.6)
-    temple (0.8.0)
+    temple (0.8.1)
     therubyracer (0.12.3)
       libv8 (~> 3.16.14.15)
       ref
@@ -530,7 +535,7 @@ DEPENDENCIES
   awesome_print (= 1.8.0)
   aws-sdk (= 2.11.170)
   bootstrap-multiselect-rails (~> 0.9.9)
-  bootstrap-sass (~> 3.3.7)
+  bootstrap-sass (~> 3.4.1)
   bugzilla
   byebug (= 10.0.2)
   cancancan (= 2.3.0)
@@ -570,9 +575,9 @@ DEPENDENCIES
   httpi (= 2.4.4)
   inline_svg (= 1.3.1)
   jbuilder (= 2.8.0)
-  jquery-datatables-rails (~> 3.4.0)
-  jquery-rails (~> 4.3.1)
-  jquery-ui-rails (~> 6.0.1)
+  jquery-datatables (~> 1.10.19)
+  jquery-rails (~> 4.3)
+  jquery-ui-rails (~> 6.0)
   json_spec (= 1.1.5)
   kaminari (= 1.1.1)
   launchy (~> 2.4.2)
@@ -596,6 +601,7 @@ DEPENDENCIES
   rspec-rails (= 3.8.1)
   rubyXL (= 3.3.30)
   rule_test_api!
+  sassc-rails (~> 2.0)
   selectize-rails (~> 0.12.4)
   simple_form (= 4.0.1)
   simplecov (= 0.16.1)
@@ -613,4 +619,4 @@ DEPENDENCIES
   xmlrpc
 
 BUNDLED WITH
-   2.0.1
+   1.16.1

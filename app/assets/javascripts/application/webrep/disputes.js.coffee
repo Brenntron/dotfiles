@@ -327,6 +327,7 @@ window.row_research_adjust_wlbl_button =(button_tag) ->
     success_reload: true
   )
 
+
 window.research_toolbar_adjust_wlbl_button =(button_tag) ->
   urls = []
   urls = $('.wlbl-entry-content')
@@ -1476,6 +1477,8 @@ $ ->
     entry_wrapper = $(research_row).find('.entry-data-content')[0]
     entry_content = $(entry_wrapper).text().trim()
     wbrs = $($(research_row).find('.entry-data-wbrs-score')[0]).text()
+
+
     if $('#dispute_id').length > 0
       case_id = $('#dispute_id').text()
       comment_text = '\n \n------------------------------- \nINDIVIDUAL SUBMISSION: \n #' + case_id + ' - ' + entry_content
@@ -1484,6 +1487,13 @@ $ ->
 
 #    Define fields that need to be filled out in the dropdown
     dropdown = $(button).next('.dropdown-menu')[0]
+    preview_button = $(dropdown).find('.preview-wbrs-button')
+    preview_score = $(dropdown).find('.wlbl-projected-entry-wbrs')
+    # Reset the preview button and any leftover preview score
+    $(preview_button).attr('disabled', true)
+    $(preview_button).attr('data-remove', '')
+    $(preview_button).attr('data-add', '')
+    $(preview_score).text('')
     wlbl_list = $(dropdown).find('.wlbl-entry-wlbl')
     wbrs_score = $(dropdown).find('.wlbl-current-entry-wbrs')
     submit_button = $(dropdown).find('.dropdown-submit-button')
@@ -1573,6 +1583,159 @@ $ ->
       error: (response) ->
         popup_response_error(response, 'Error retrieving WL/BL Data')
     )
+
+
+# Prepping for previewing WBRS Score
+window.prepare_for_wbrs_preview = (toggle) ->
+  # Get the current wl/bl settings
+  dropdown = $(toggle).parents('.dispute-wlbl-adjust-wrapper')[0]
+  current_lists = $($(dropdown).find('.wlbl-entry-wlbl')[0]).text()
+  list = current_lists.split(',')
+  # Get the settings of all the checkboxes
+  checkboxes = $(dropdown).find('.wl-bl-list-inline')
+  checked = $(dropdown).find('.wl-bl-list-inline:checked')
+  preview_button = $(dropdown).find('.preview-wbrs-button')
+
+  changed = []
+  current_on = []
+  current_off = []
+  add = []
+  remove = []
+
+  if current_lists == "Not on a list"
+    $(checked).each ->
+      changed.push('changed')
+  else
+    $(checkboxes).each ->
+      checkbox = this
+      val = $(checkbox).val()
+      $(list).each ->
+        current = this.toString()
+        if current == val
+          current_on.push(checkbox)
+
+  # Any checkbox that doesn't match the current lists is 'off'
+  i = checkboxes.length - 1
+  while i >= 0
+    j = 0
+    while j < current_on.length
+      if checkboxes[i] == current_on[j]
+        checkboxes.splice i, 1
+      j++
+    i--
+  current_off = checkboxes
+
+  $(current_on).each ->
+    if $(this).prop('checked') != true
+      changed.push('changed')
+      remove.push($(this).val())
+
+  $(current_off).each ->
+    if $(this).prop('checked') == true
+      changed.push('changed')
+      add.push($(this).val())
+
+  if changed.length > 0
+    $(preview_button[0]).attr('disabled', false)
+    add_lists = add.join(',')
+    $(preview_button[0]).attr('data-add', add_lists)
+    remove_lists = remove.join(',')
+    $(preview_button[0]).attr('data-remove', remove_lists)
+  else
+    $(preview_button[0]).attr('disabled', true)
+    $(preview_button[0]).attr('data-remove', '')
+    $(preview_button[0]).attr('data-add', '')
+
+
+
+#  Add preview score here
+window.preview_wbrs_score = (button) ->
+  dropdown = $(button).parents('.dispute-wlbl-adjust-wrapper')[0]
+  projected_score = $(dropdown).find('.wlbl-projected-entry-wbrs')
+  entry_row = $(button).parents('.research-table-row-wrapper')
+  entry = $(entry_row[0]).find('.entry-data-content')
+  entry_content = $(entry[0]).text().trim()
+  add_lists = []
+  remove_lists = []
+  add = $(button).attr('data-add')
+  remove = $(button).attr('data-remove')
+
+  if add != ''
+    add_lists = add.split(',')
+  if remove != ''
+    remove_lists = remove.split(',')
+
+  data = {
+    url: entry_content
+    add: add_lists
+    remove: remove_lists
+  }
+
+  std_msg_ajax(
+    url: '/escalations/api/v1/escalations/webrep/disputes/project_new_score'
+    method: 'POST'
+    data: data
+    error_prefix: 'Error getting WBRS preview score.'
+    dataType: 'json'
+    success: (response) ->
+      response = JSON.parse(response)
+      $(projected_score[0]).text(response.score)
+    error: (response) ->
+      console.log(response)
+  )
+
+
+
+window.reset_score_preview = (button) ->
+  dropdown = $(button).parents('.dispute-wlbl-adjust-wrapper')[0]
+  projected_score = $(dropdown).find('.wlbl-projected-entry-wbrs')
+  checkboxes = $(dropdown).find('.wl-bl-list-inline')
+  preview_button = $(dropdown).find('.preview-wbrs-button')
+  current_on = []
+  current_off = []
+
+  # Grab original 'current' lists
+  current_lists = $($(dropdown).find('.wlbl-entry-wlbl')[0]).text()
+  list = current_lists.split(',')
+
+  # If current entry isn't on a list, all toggles should be 'off'
+  if current_lists == "Not on a list"
+    $(checkboxes).each ->
+      $(this).prop('checked', false)
+  else
+    $(checkboxes).each ->
+      checkbox = this
+      val = $(checkbox).val()
+      $(list).each ->
+        current = this.toString()
+        if current == val
+          current_on.push(checkbox)
+
+  # Any checkbox that doesn't match the current lists is 'off'
+  i = checkboxes.length - 1
+  while i >= 0
+    j = 0
+    while j < current_on.length
+      if checkboxes[i] == current_on[j]
+        checkboxes.splice i, 1
+      j++
+    i--
+  current_off = checkboxes
+
+  # Empty projected score box
+  $(projected_score[0]).text('')
+
+  # Make checkboxes be on or off depending on original lists
+  $(current_on).each ->
+    $(this).prop('checked', true)
+  $(current_off).each ->
+    $(this).prop('checked', false)
+
+  # Reset preview button to original state
+  $(preview_button[0]).attr('disabled', true)
+  $(preview_button[0]).attr('data-remove', '')
+  $(preview_button[0]).attr('data-add', '')
+
 
 
 

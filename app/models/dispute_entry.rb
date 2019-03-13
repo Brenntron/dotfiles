@@ -11,6 +11,8 @@ class DisputeEntry < ApplicationRecord
 
   RESOLVED = "RESOLVED"
   NEW = "NEW"
+  ASSIGNED = "ASSIGNED"
+  CLOSED = "CLOSED"
 
   STATUS_RESEARCHING = "RESEARCHING"
   STATUS_ESCALATED = "ESCALATED"
@@ -31,8 +33,6 @@ class DisputeEntry < ApplicationRecord
 
   delegate :cvs_username, to: :dispute, allow_nil: true
 
-  ASSIGNED = "ASSIGNED"
-  CLOSED = "CLOSED"
 
   scope :open_entries, -> { where(status: NEW) }
   scope :assigned_entries, -> { where(status: ASSIGNED) }
@@ -196,6 +196,37 @@ class DisputeEntry < ApplicationRecord
     clean_host.sub(/^www\./, '')
   end
 
+  def self.domain_of_with_path(urls)
+    if urls.kind_of?(String)
+      if !urls.start_with?( 'http', 'https')
+        urls = "http://" + urls
+      end
+
+      clean_url = Addressable::URI.parse(urls.strip)
+      clean_host = clean_url.host.sub(/^www\./, '')
+      clean_host = clean_host + clean_url.path
+
+      response = clean_host
+    elsif urls.kind_of?(Array)
+      response = []
+      urls.each do |url|
+        if url.strip != ''
+          if !url.start_with?( 'http', 'https')
+            url = "http://" + url
+          end
+
+          clean_url = Addressable::URI.parse(url.strip)
+          clean_host = clean_url.host.sub(/^www\./, '')
+          clean_host = clean_host + clean_url.path
+
+          response << clean_host
+        end
+      end
+    end
+
+    response
+  end
+
   def assign_url_parts(url = self.hostlookup)
     uri = URI.parse(URI.parse(url).scheme.nil? ? "http://#{url}" : url)
     domain = PublicSuffix.parse(uri.host)
@@ -291,18 +322,19 @@ class DisputeEntry < ApplicationRecord
   end
 
   def wbrs_xlist
-    if dispute_entry_preload.present? && dispute_entry_preload.crosslisted_urls.present?
-      @wbrs_xlist = Wbrs::ManualWlbl.load_from_prefetch(dispute_entry_preload.crosslisted_urls)
-      return @wbrs_xlist
-    end
-    @wbrs_xlist ||= Wbrs::ManualWlbl.where({:url => hostlookup})
+    @wbrs_xlist ||=
+        if dispute_entry_preload.present? && dispute_entry_preload.crosslisted_urls.present?
+          Wbrs::ManualWlbl.load_from_prefetch(dispute_entry_preload.crosslisted_urls)
+        else
+          Wbrs::ManualWlbl.where({:url => DisputeEntry.domain_of(hostlookup)})
+        end
   rescue => except
-
     Rails.logger.warn "Populating xlist from Wbrs failed."
+    Rails.logger.warn "Hostlookup:" + hostlookup
     Rails.logger.warn except
     Rails.logger.warn except.backtrace.join("\n")
 
-    []
+    return []
   end
 
   def virustotals
@@ -376,6 +408,13 @@ class DisputeEntry < ApplicationRecord
     end
 
     pretty_umbrella_status
+  rescue => except
+    Rails.logger.warn "Populating umbrella failed"
+    Rails.logger.warn "Hostlookup:" + hostlookup
+    Rails.logger.warn except
+    Rails.logger.warn except.backtrace.join("\n")
+
+    return 'Unable to resolve'
   end
 
   def assign_from_auto_resolve(address:, total_hits:, resolved_at:, dispute_entry:)
@@ -630,7 +669,7 @@ class DisputeEntry < ApplicationRecord
         end
       end
 
-      if research_params['broad'] || entries.find{|entry| url == entry.uri}
+      if research_params['scope'] == "broad" || entries.find{|entry| url == entry.uri}
         entries.each do |entry|
           is_ip_address = !!(entry.uri  =~ Resolv::IPv4::Regex)
           wbrs_stuff = Sbrs::ManualSbrs.get_wbrs_data({:url => entry.uri})
