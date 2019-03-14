@@ -4,8 +4,6 @@ class Escalations::Webrep::DisputesController < ApplicationController
   before_action :require_login
 
   def index
-    @bugzilla_rest_session = bugzilla_rest_session
-
     respond_to do |format|
       format.html
       format.xlsx do

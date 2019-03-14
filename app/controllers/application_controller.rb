@@ -7,6 +7,7 @@ class ApplicationController < ActionController::Base
   before_action :set_version
   helper_method :current_user
   helper_method :xml_token
+  helper_method :bugzilla_rest_session
 
   private
 
