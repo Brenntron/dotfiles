@@ -2,13 +2,18 @@ class Escalations::PeakeBridge::FileRepMessagesController < ApplicationControlle
   # skip_before_action :require_login
 
   def create
-    render plain: 'successfully created file rep', status: :ok
+    file_rep = FileRep.new(file_rep_params)
+    if file_rep.save
+      render plain: 'successfully created file rep', status: :ok
+    else
+      error_messages = file_rep.errors.full_messages.join('; ')
+      render plain: "Error(s) creating file rep -- #{error_messages}", status: :ok
+    end
   end
 
   private
 
-  def envelope_params
-    params.require(:envelope).permit(:channel, :sender, :addressee)
+  def file_rep_params
+    params.require(:message).permit(:file_rep_name, :sha256, :email)
   end
-
 end

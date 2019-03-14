@@ -1,0 +1,2 @@
+class FileRep < ApplicationRecord
+end
