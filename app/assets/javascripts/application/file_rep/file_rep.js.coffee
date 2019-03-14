@@ -6,7 +6,7 @@ $ ->
     pagingType: 'full_numbers'
     columns: [
       {data: 'name'}
-      {data: 'sha256'}
+      {data: 'sha256_checksum'}
       {data: 'email'}
     ]
 
