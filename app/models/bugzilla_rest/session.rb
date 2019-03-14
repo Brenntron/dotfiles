@@ -89,8 +89,13 @@ class BugzillaRest::Session < BugzillaRest::Base
   end
 
   def self.logged_in?(session)
-    api_key = session.api_key
-    token = session.token
+    if session.present?
+      api_key = session.api_key
+      token = session.token
+    else
+      api_key = nil
+      token = nil
+    end
 
     if api_key.present? || token.present?
       return true
