@@ -106,12 +106,14 @@ $ ->
 
             if complaint_age < 1
               complaint_latency = '<1h'
-            else if complaint_age > 120
-              complaint_latency ='<span class="ticket-age-over3hr">  >120h </span>'
-            else if 3 <= complaint_age
-              complaint_latency ='<span class="ticket-age-over3hr">'+ complaint_age + 'h </span>'
-            else
+            else if complaint_age > 1 && complaint_age < 3
               complaint_latency = complaint_age + 'h'
+            else if complaint_age >= 3 && complaint_age < 12
+              complaint_latency ='<span class="ticket-age-over3hr">'+ complaint_age + 'h</span>'
+            else if complaint_age >= 12 && complaint_age < 120
+              complaint_latency ='<span class="ticket-age-over12hr">'+ complaint_age + 'h </span>'
+            else if complaint_age >= 120
+              complaint_latency ='<span class="ticket-age-over12hr"> >120h </span>'
         }
         {
           data: 'status'

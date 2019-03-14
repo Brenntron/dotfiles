@@ -7763,12 +7763,12 @@ td.text-center span {
 
 .ticket-age-over3hr {
   color: $warning-accent-color;
-  font-weight: 500;
+  font-weight: bold;
 }
 
-.overdue {
+.ticket-age-over12hr{
   color: $second-section-color;
-  font-weight: 500;
+  font-weight: bold;
 }
 
 .sorting {

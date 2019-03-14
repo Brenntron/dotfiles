@@ -1415,19 +1415,19 @@ $ ->
             else
               dispute_latency = '<span class="ticket-age-over3hr">' + data + '</span>'
             if hours > 12
-              dispute_latency = '<span class="overdue">' + data + '</span>'
+              dispute_latency = '<span class="ticket-age-over12hr">' + data + '</span>'
           else
-            dispute_latency = '<span class="overdue">' + data + '</span>'
+            dispute_latency = '<span class="ticket-age-over12hr">' + data + '</span>'
           if dispute_duration.includes('day')
             day = parseInt(data.replace(/[^0-9]/g, ''))
             if day >= 1
-              dispute_latency = '<span class="overdue">' + data + '</span>'
+              dispute_latency = '<span class="ticket-age-over12hr">' + data + '</span>'
           if dispute_duration.includes('months')
             month = parseInt(data.replace(/[^0-9]/g, ''))
-            dispute_latency = '<span class="overdue">' + data + '</span>'
+            dispute_latency = '<span class="ticket-age-over12hr">' + data + '</span>'
           if dispute_duration.includes('year')
             year = parseInt(data.replace(/[^0-9]/g, ''))
-            dispute_latency = '<span class="overdue">' + data + '</span>'
+            dispute_latency = '<span class="ticket-age-over12hr">' + data + '</span>'
           dispute_latency
       }
       { data: 'source' }
