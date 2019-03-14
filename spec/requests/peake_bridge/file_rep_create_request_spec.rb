@@ -10,7 +10,7 @@ RSpec.describe "Peake-Bridge file rep create channel", type: :request do
         },
         message: {
             file_rep_name: 'Steve',
-            sha256: 'c01b39c7a35ccc3b081a3e83d2c71fa9a767ebfeb45c69f08e17dfe3ef375a7b',
+            sha256_checksum: 'c01b39c7a35ccc3b081a3e83d2c71fa9a767ebfeb45c69f08e17dfe3ef375a7b',
             email: 'steve@arora.org'
         }
     }

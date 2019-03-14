@@ -14,6 +14,6 @@ class Escalations::PeakeBridge::FileRepMessagesController < ApplicationControlle
   private
 
   def file_rep_params
-    params.require(:message).permit(:file_rep_name, :sha256, :email)
+    params.require(:message).permit(:file_rep_name, :sha256_checksum, :email)
   end
 end
