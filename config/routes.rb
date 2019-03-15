@@ -128,40 +128,17 @@ Rails.application.routes.draw do
         get :related
       end
     end
-    resources :rules, only: [:index, :edit, :update] do
-      collection do
-        get :validations
-      end
-      member do
-        get :related
-      end
-    end
   end
 
   resources :events, only: [] do
     collection { get :send_event }
   end
 
-  namespace :api_test do
-    resources :jobs, only: [:index, :create], :defaults => {:format => 'json'}
-    resources :pcaps, only: [:index, :create], :defaults => {:format => 'json'}
-    resources :engines, only: [:index], :defaults => {:format => 'json'}
-    resources :engine_types, only: [:index], :defaults => {:format => 'json'}
-    resources :snort_configurations, only: [:index], :defaults => {:format => 'json'}
-    resources :rule_configurations, only: [:index], :defaults => {:format => 'json'}
-  end
-
   # TODO some of these named routes need to be rethought to conform to rails conventions
-  get 'rules/get_impact' => 'rules#get_impact', format: 'js'
-  get 'rules/export' => 'rules#export'
   post "sessions/create" => "sessions#create"
   post "/attachments" => "attachments#create"
   root 'pages#index'
 
-
-  # resources :rules, param: :sid
-
-  # resources :tests
 
   resources :users, only: [:index, :show, :update] do
 

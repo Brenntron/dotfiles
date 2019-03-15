@@ -8,12 +8,6 @@ GIT
       json (>= 1.8.0, < 3.0)
       openssl (~> 2.1, >= 2.1.2)
 
-PATH
-  remote: vendor/gems/rule_test_api
-  specs:
-    rule_test_api (0.1.4)
-      her (>= 0.7.2)
-
 GEM
   remote: https://rubygems.org/
   specs:
@@ -74,11 +68,12 @@ GEM
     ajax-datatables-rails (0.4.3)
       railties (>= 4.0)
     arel (9.0.0)
-    autoprefixer-rails (9.4.10)
+    autoprefixer-rails (9.5.0)
       execjs
     awesome_nested_set (3.1.4)
       activerecord (>= 4.0.0, < 5.3)
     awesome_print (1.8.0)
+    aws-eventstream (1.0.2)
     aws-sdk (2.11.170)
       aws-sdk-resources (= 2.11.170)
     aws-sdk-core (2.11.170)
@@ -86,7 +81,8 @@ GEM
       jmespath (~> 1.0)
     aws-sdk-resources (2.11.170)
       aws-sdk-core (= 2.11.170)
-    aws-sigv4 (1.0.3)
+    aws-sigv4 (1.1.0)
+      aws-eventstream (~> 1.0, >= 1.0.2)
     axiom-types (0.1.1)
       descendants_tracker (~> 0.0.4)
       ice_nine (~> 0.11.0)
@@ -130,7 +126,7 @@ GEM
       execjs
     coffee-script-source (1.12.2)
     commonjs (0.2.7)
-    concurrent-ruby (1.1.4)
+    concurrent-ruby (1.1.5)
     crass (1.0.4)
     cucumber (2.99.0)
       builder (>= 2.1.2)
@@ -600,7 +596,6 @@ DEPENDENCIES
   rmagick (~> 2.16.0)
   rspec-rails (= 3.8.1)
   rubyXL (= 3.3.30)
-  rule_test_api!
   sassc-rails (~> 2.0)
   selectize-rails (~> 0.12.4)
   simple_form (= 4.0.1)
