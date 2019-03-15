@@ -230,9 +230,7 @@ $ ->
           data: form_data
           contentType: false
           processData: false
-          success: (response) ->
-            $('#newEmailDialog').dialog 'close'
-            window.location.reload()
+          success_reload: true
           error: (response) ->
             $('#newEmailDialog').dialog 'close'
             $('.delete_attachment_new').click()
@@ -245,9 +243,7 @@ $ ->
           data: form_data
           contentType: false
           processData: false
-          success: (response) ->
-            $('#newEmailDialog').dialog 'close'
-            window.location.reload()
+          success_reload: true
           error: (response) ->
             $('#newEmailDialog').dialog 'close'
             $('.delete_attachment_new').click()
