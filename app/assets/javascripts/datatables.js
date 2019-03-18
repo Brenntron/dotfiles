@@ -16,13 +16,14 @@
 // require datatables/extensions/RowGroup/dataTables.rowGroup
 // require datatables/extensions/RowReorder/dataTables.rowReorder
 // require datatables/extensions/Scroller/dataTables.scroller
-// require datatables/extensions/Select/dataTables.select
+//= require datatables/extensions/Select/dataTables.select
 
 //Global setting and initializer
 
 $.extend( $.fn.dataTable.defaults, {
   responsive: true,
   pagingType: 'full',
+  select: true
   //dom:
   //  "<'row'<'col-sm-4 text-left'f><'right-action col-sm-8 text-right'<'buttons'B> <'select-info'> >>" +
   //  "<'row'<'dttb col-12 px-0'tr>>" +
