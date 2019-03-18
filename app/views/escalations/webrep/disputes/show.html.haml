@@ -32,7 +32,7 @@
                 - if (@dispute.resolution != Dispute::DUPLICATE) && (@dispute.status != Dispute::RESOLVED) && (@dispute.user.cvs_username == 'vrtincom')
                   %button.take-ticket-button#show_ticket_assign.esc-tooltipped{title: 'Assign this ticket to me', onclick: "take_single_dispute(#{@dispute.id});"}
                 - else
-                  %button.dispute-inline-buttons.esc-tooltipped.ticket-owner-unassigned-button{title: 'Unassign', id: 'unassign-dispute-button', onclick: 'toolbar_unassign_dispute();'}
+                  %button.dispute-inline-buttons.esc-tooltipped.ticket-owner-unassigned-button{title: 'Unassign', id: 'unassign-dispute-button', onclick: 'toolbar_unassign_dispute();'} 
 
                 %span.dropdown
                   - if (@dispute.resolution != Dispute::DUPLICATE) && (@dispute.status != Dispute::RESOLVED)
