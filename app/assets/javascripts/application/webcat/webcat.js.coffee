@@ -78,7 +78,7 @@ $ ->
           orderable: false
           searchable: false
           sortable: false
-          'render':(data,type,full,meta)->
+          'render':(data)->
             return '<button class="expand-row-button-inline expand-row-button-' + data.entry_id + '"></button>'
         }
         {
@@ -88,6 +88,16 @@ $ ->
           sortable: false
           defaultContent: '<span></span>'
           width: '24px'
+          'render': (data)->
+            if data.is_important
+
+              if data.was_dismissed
+                return '<div class="container-important-tags">' +
+                  '<div class="esc-tooltipped is-important" tooltip title="Important"></div>' +
+                  '<div class="esc-tooltipped was-reviewed" tooltip title="Reviewed"></div>' +
+                  '</div>'
+              else
+                return '<span class="esc-tooltipped is-important" tooltip title="Important"></span>'
         }
         {
           data: 'entry_id'

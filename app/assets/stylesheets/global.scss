@@ -5903,15 +5903,16 @@ td.ticket-total::before {
   content: '';
 }
 
-.entry-important-flag::before, .highlight-second-review .important-flag-col span {
+.entry-important-flag::before, .highlight-second-review .important-flag-col .is-important {
   background-image: url(image_path('icon_important.svg'));
   background-repeat: no-repeat;
   width: 20px;
   height: 20px;
-  margin-bottom: -6px;
-  margin-right: 4px;
-}
 
+}
+.container-important-tags{
+  display: inline-flex;
+}
 .highlight-second-review .important-flag-col span {
   display: block;
 }
@@ -6633,13 +6634,12 @@ table#duplicates a {
   overflow-y: scroll !important;
 }
 
-.highlight-was-dismissed .important-flag-col span::after {
+.highlight-was-dismissed .important-flag-col .was-reviewed::after {
   display: block;
   background-image: url(image_path('icon_reviewed_check.svg'));
   width: 20px;
   height: 20px;
   background-repeat: no-repeat;
-  margin-left: 24px;
   content: '';
 }
 
