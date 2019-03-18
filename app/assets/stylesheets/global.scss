@@ -682,6 +682,7 @@ button {
 .mark-duplicate-button {background-image: url(image_path('icon_mark_duplicate.svg'));}
 .mark-related-button {background-image: url(image_path('icon_related.svg'));}
 .ticket-owner-button {background-image: url(image_path('icon_user_grey.svg'));}
+.ticket-owner-unassigned-button {background-image: url(image_path('icon_unassigned.svg'));}
 .sort-by-button {background-image: url(image_path('icon_sort_by.svg'));}
 .sync-button {background-image: url(image_path('icon_sync.svg'));}
 
@@ -766,6 +767,7 @@ button {
 .mark-related-button:hover,
 .ticket-status-button:hover,
 .ticket-owner-button:hover,
+.ticket-owner-unassigned-button:hover,
 .adjust-reptool-button:hover,
 .adjust-wlbl-button:hover,
 .export-button:hover,
@@ -4568,7 +4570,7 @@ table > tbody > tr > td.dispute_rep_tools {
   display: inline-block;
 }
 
-.dropdown.open .dispute-inline-buttons {
+.dropdown.open .ticket-owner-button {
   background-color: $bug-section-color;
   border-radius: 2px 2px 0 0 ;
 }
@@ -5974,11 +5976,6 @@ table.dispute-entry-table tbody tr.selected {
   float: right;
 }
 
-.dispute-owner-buttons-wrapper .dropdown {
-  display: inline-block;
-  margin-left: 8px;
-}
-
 .dispute-owner-buttons-wrapper .dropdown.open {
   background-color: transparent !important;
 }
@@ -6000,7 +5997,7 @@ table.dispute-entry-table tbody tr.selected {
   padding: 2px 10px !important;
 }
 
-#button_reassign, #unassign-dispute-button {
+#button_reassign{
   text-transform: none;
   display: inline-block;
   padding: 8px 20px;
