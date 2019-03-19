@@ -107,29 +107,23 @@ $ ->
           data: 'age'
           width: '40px'
           'render':(data,type,full,meta) ->
-            if (~data.indexOf('minute'))
-              complaint_latency = data
-            if (~data.indexOf('hour'))
-              hours = parseInt(data.replace(/[^0-9]/g, ''))
-              if hours <= 3
-                complaint_latency = data
-              else
-                complaint_latency = '<span class="ticket-age-over3hr">' + data + '</span>'
-              if hours > 12
-                complaint_latency = '<span class="overdue">' + data + '</span>'
-            else
-              complaint_latency = data
-            if (~data.indexOf('day'))
-              day = parseInt(data.replace(/[^0-9]/g, ''))
-              if day >= 1
-                complaint_latency = '<span class="overdue">' + data + '</span>'
-            if (~data.indexOf('months'))
-              month = parseInt(data.replace(/[^0-9]/g, ''))
-              complaint_latency = '<span class="overdue">' + data + '</span>'
-            if (~data.indexOf('year'))
-              year = parseInt(data.replace(/[^0-9]/g, ''))
-              complaint_latency = '<span class="overdue">' + data + '</span>'
-            complaint_latency
+
+            current_time = moment()
+            created_at = moment(full.created_at)
+            complaint_age = moment.duration(created_at.diff(current_time)).asHours();
+            complaint_age = Math.abs(complaint_age)
+            complaint_age = Math.floor(complaint_age)
+
+            if complaint_age < 1
+              complaint_latency = '<1h'
+            else if complaint_age > 1 && complaint_age < 3
+              complaint_latency = complaint_age + 'h'
+            else if complaint_age >= 3 && complaint_age < 12
+              complaint_latency ='<span class="ticket-age-over3hr">'+ complaint_age + 'h</span>'
+            else if complaint_age >= 12 && complaint_age < 120
+              complaint_latency ='<span class="ticket-age-over12hr">'+ complaint_age + 'h </span>'
+            else if complaint_age >= 120
+              complaint_latency ='<span class="ticket-age-over12hr"> >120h </span>'
         }
         {
           data: 'status'
