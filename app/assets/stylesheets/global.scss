@@ -682,7 +682,6 @@ button {
 .mark-duplicate-button {background-image: url(image_path('icon_mark_duplicate.svg'));}
 .mark-related-button {background-image: url(image_path('icon_related.svg'));}
 .ticket-owner-button {background-image: url(image_path('icon_user_grey.svg'));}
-.ticket-owner-unassigned-button {background-image: url(image_path('icon_unassigned.svg'));}
 .sort-by-button {background-image: url(image_path('icon_sort_by.svg'));}
 .sync-button {background-image: url(image_path('icon_sync.svg'));}
 
@@ -5808,7 +5807,16 @@ td.ticket-total::before {
 #index-change-assign-dropdown .toolbar {
   margin-bottom: 5px;
 }
-
+.secondary.ticket-owner-unassigned-button{
+  padding:5px;
+  margin: 0;
+  margin-top: 5px;
+}
+.container_unassign{
+  position: absolute;
+  margin-top: 5px;
+  border-top: 1px solid #f2f2f2;
+}
 #index-edit-ticket-status-dropdown .radio-label, #index-edit-entry-status-dropdown .radio-label {
   margin-top: 6px;
   margin-bottom: 0;
