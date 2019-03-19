@@ -21,7 +21,7 @@ $(document).ready ->
         select = $(this).find('select')
         if $(input).attr('id') == cb_for || $(select).attr('id') == cb_for || group_id == cb_for
           $(this).removeClass('hidden')
-
+          $('#add-search-criteria')
       $($(this).parent()).parent().addClass('hidden')
       $(this).prop 'checked', false
       return
@@ -30,23 +30,13 @@ $(document).ready ->
     false
 
   $('.remove-input').click ->
-    field_name = $(this).parent().find('input').attr('id') || $(this).parent().find('select').attr('id')
-    field_wrapper = $(this).parent().attr('id')
+    field = $(this).parent()
+    field_name = field.find('input').attr('id') || field.find('select').attr('id')
+    field_wrapper = field.attr('id')
     $('.search-checkbox').each ->
       if $(this).attr('for') == field_name
-        $($(this).parent()).parent().removeClass('hidden')
+        $(field).parent().removeClass('hidden')
       else if $(this).attr('for') == field_wrapper
-        $($(this).parent()).parent().removeClass('hidden')
-    $($(this).parent()).addClass('hidden')
+        $(field).parent().removeClass('hidden')
+    $(field).addClass('hidden')
     false
-
-  $('#search-webrep-cases-form').on 'click', '.remove-input', ->
-    field_name = $(this).parent().find('input').attr('id') || $(this).parent().find('select').attr('id')
-    field_wrapper = $(this).parent().attr('id')
-    $('.search-checkbox').each ->
-      if $(this).attr('for') == field_name
-        $($(this).parent()).parent().removeClass('hidden')
-      else if $(this).attr('for') == field_wrapper
-        $($(this).parent()).parent().removeClass('hidden')
-    $($(this).parent()).addClass('hidden')
-    return
