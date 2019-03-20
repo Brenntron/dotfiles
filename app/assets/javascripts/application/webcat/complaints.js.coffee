@@ -16,12 +16,11 @@ window.updateURI = (complaint_entry_id) ->
 
       $(".simple-nested-table##{complaint_entry_id} tbody > tr").remove()
 
-      if 'ip' == response.status
+      if 'ip' == response.json.status
         std_msg_error("Cannot edit IP entries.","")
       else
-        if response.preload
-          $.each response.data, (key, entry) ->
-            $(".simple-nested-table##{complaint_entry_id}").append("<tr><td>#{entry.confidence}</td><td>#{entry.mnemonic}</td><td>#{entry.name}</td><td>NA</span></td></tr>")
+        $.each response.json.current_categories, (key, entry) ->
+          $(".simple-nested-table##{complaint_entry_id}").append("<tr><td>#{entry.confidence}</td><td>#{entry.mnem} - #{entry.descr}</td><td>#{entry.top_certainty}</span></td></tr>")
 
         $("#domain_#{complaint_entry_id}").text(response.domain)
         $("#subdomain_#{complaint_entry_id}").text(response.subdomain)
@@ -32,7 +31,7 @@ window.updateURI = (complaint_entry_id) ->
         $("#history-#{complaint_entry_id}").replaceWith('<button class="secondary" id="history-' + complaint_entry_id + '" onclick="history_dialog('+complaint_entry_id+')">History</button>')
         $("#domain-#{complaint_entry_id}").replaceWith('<button class="secondary" id="domain-' + complaint_entry_id + '" onclick="domain_whois(\''+response.domain+'\')">Domain</button>')
 
-  )
+ )
 
 window.cat_new_url = ()->
 

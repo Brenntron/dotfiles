@@ -267,8 +267,11 @@ module API
               std_api_v2 do
                 authorize!(:update, ComplaintEntry)
                 complaint_entry = ComplaintEntry.find(permitted_params[:complaint_entry_id])
+                status = complaint_entry.update_uri(permitted_params[:uri])
 
-                complaint_entry.update_uri(permitted_params[:uri])
+                current_categories = complaint_entry.current_category_data
+
+                render json: {current_categories: current_categories, status: status[:status]}
               end
             end
 
