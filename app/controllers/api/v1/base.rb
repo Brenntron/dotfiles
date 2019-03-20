@@ -3,7 +3,6 @@ module API
     class Base < Grape::API
 
       mount API::V1::Bugs
-      mount API::V1::Rules
       mount API::V1::Attachments
       mount API::V1::Users
       mount API::V1::Notes

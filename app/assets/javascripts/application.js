@@ -18,7 +18,5 @@
 //= require application/util
 //= require legacy/attachments.js.coffee
 //= require legacy/bugs.js.coffee
-//= require legacy/escalations.js.coffee
-//= require legacy/rules.js.coffee
 //= require legacy/notes.js.coffee
 //= require_directory ./application
