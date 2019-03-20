@@ -2102,9 +2102,16 @@ a.static-nav-item {
   }
   .selectize-dropdown{
     border: 1px solid #ccc;
+    border: 1px solid rgba(0, 0, 0, 0.15);
     border-radius: 4px;
     -webkit-box-shadow: 0 6px 12px rgba(0, 0, 0, 0.175);
     box-shadow: 0 6px 12px rgba(0, 0, 0, 0.175);
+  }
+  .selectize-control.form-control.selectize.multi{
+    padding-top: 3px !important;
+    padding-left: 6px !important;
+    background: white;
+    z-index: 3;
   }
 }
 
@@ -6244,12 +6251,7 @@ table.dispute-entry-table tbody tr.selected {
 .nav-tool-content-wrapper .form-control.selectize .selectize-input input, #advanced-search-wrapper .form-control.selectize .selectize-input input, #categorize-urls-form-wrapper .form-control.selectize .selectize-input input {
   outline: none !important;
 }
-#advanced-search-wrapper .selectize-control.form-control.selectize.multi{
-  padding-top: 3px !important;
-  padding-left: 6px !important;
-  background: white;
-  z-index: 3;
-}
+
 .selectize-input.dropdown-active::before {
   display: none;
 }
