@@ -330,8 +330,7 @@ window.updateEntryColumns = (entry_id,row_id) ->
             items: selected_options(temp_row.data().category_names)
           }
 
-          $("#complaint_prefix_#{entry_id}").val(prefix)
-
+          $("#complaint_prefix_#{entry_id}").val(json.uri)
           $("#domain_#{entry_id}").text(json.domain)
           $("#subdomain_#{entry_id}").text(json.subdomain)
           $("#entry-uri-#{entry_id}").html("<a href='http://#{json.uri}' target='_blank' onclick='select_cat_text_field(#{entry_id})' >#{json.uri}</a>")
