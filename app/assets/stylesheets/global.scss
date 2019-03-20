@@ -4573,6 +4573,9 @@ table > tbody > tr > td.dispute_rep_tools {
   background-color: $bug-section-color;
   border-radius: 2px 2px 0 0 ;
 }
+.ticket-owner-button {
+  margin: 0px 4px;
+}
 
 .toolbar-button.adjust-wlbl-button    {
   background-image: url(image_path('icon_wlbl_grey.svg'));
