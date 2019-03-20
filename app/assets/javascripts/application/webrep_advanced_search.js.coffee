@@ -21,7 +21,6 @@ $(document).ready ->
         select = $(this).find('select')
         if $(input).attr('id') == cb_for || $(select).attr('id') == cb_for || group_id == cb_for
           $(this).removeClass('hidden')
-          $('#add-search-criteria')
       $($(this).parent()).parent().addClass('hidden')
       $(this).prop 'checked', false
       return

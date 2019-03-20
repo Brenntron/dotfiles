@@ -274,8 +274,6 @@ $ ->
           options.push {name: x}
         return options
 
-
-
     $('#tags-input').selectize {
       persist: false
       create: false
