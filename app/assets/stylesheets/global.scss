@@ -780,7 +780,7 @@ button {
 .collapse-all:hover,
 .sync-button:hover,
 .expand-all:hover {
-  background-color: lighten($nav-toolbar-color, 8%);
+  background-color: lighten($nav-toolbar-color, 8%)!important;
 }
 
 .expand-row-button:focus,
@@ -5811,10 +5811,15 @@ td.ticket-total::before {
   margin-bottom: 5px;
 }
 .secondary.ticket-owner-unassigned-button{
-  padding:5px;
   margin: 0;
-  margin-top: 5px;
-  font-size: inherit;
+  margin-top: 13px;
+  background-color: darken($nav-toolbar-color, 10%);
+  font-weight: 400;
+  text-transform: inherit;
+  text-transform: none;
+  display: inline-block;
+  padding: 8px 20px;
+  font-weight: 400;
 }
 .container_unassign{
   display: flex;
@@ -6004,7 +6009,7 @@ table.dispute-entry-table tbody tr.selected {
   background-color: #6dbcdb;
   min-width: 200px;
   top: 16px;
-  left: 1px;
+  left: 4px;
 }
 
 .dispute-owner-buttons-wrapper h3 {
