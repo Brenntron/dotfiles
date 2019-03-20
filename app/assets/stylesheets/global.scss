@@ -766,6 +766,7 @@ button {
 .mark-related-button:hover,
 .ticket-status-button:hover,
 .ticket-owner-button:hover,
+.ticket-owner-unassigned-button:hover,
 .adjust-reptool-button:hover,
 .adjust-wlbl-button:hover,
 .export-button:hover,
@@ -779,7 +780,7 @@ button {
 .collapse-all:hover,
 .sync-button:hover,
 .expand-all:hover {
-  background-color: lighten($nav-toolbar-color, 8%);
+  background-color: lighten($nav-toolbar-color, 8%)!important;
 }
 
 .expand-row-button:focus,
@@ -4568,9 +4569,12 @@ table > tbody > tr > td.dispute_rep_tools {
   display: inline-block;
 }
 
-.dropdown.open .dispute-inline-buttons {
+.dropdown.open .ticket-owner-button {
   background-color: $bug-section-color;
   border-radius: 2px 2px 0 0 ;
+}
+.ticket-owner-button {
+  margin: 0px 4px;
 }
 
 .toolbar-button.adjust-wlbl-button    {
@@ -5729,7 +5733,7 @@ td.ticket-total::before {
   left: 19px;
   margin-top: -4px;
 }
-
+ 
 .dashboard-left-data {
   border-right: 1px solid $content-bg-color;
 }
@@ -5806,7 +5810,23 @@ td.ticket-total::before {
 #index-change-assign-dropdown .toolbar {
   margin-bottom: 5px;
 }
-
+.secondary.ticket-owner-unassigned-button{
+  margin: 0;
+  margin-top: 13px;
+  background-color: darken($nav-toolbar-color, 10%);
+  font-weight: 400;
+  text-transform: inherit;
+  text-transform: none;
+  display: inline-block;
+  padding: 8px 20px;
+  font-weight: 400;
+}
+.container_unassign{
+  display: flex;
+  margin: 6% 0;
+  padding-top: 1%;
+  border-top: 1px solid #f2f2f2;
+}
 #index-edit-ticket-status-dropdown .radio-label, #index-edit-entry-status-dropdown .radio-label {
   margin-top: 6px;
   margin-bottom: 0;
@@ -5975,11 +5995,6 @@ table.dispute-entry-table tbody tr.selected {
   float: right;
 }
 
-.dispute-owner-buttons-wrapper .dropdown {
-  display: inline-block;
-  margin-left: 8px;
-}
-
 .dispute-owner-buttons-wrapper .dropdown.open {
   background-color: transparent !important;
 }
@@ -5994,14 +6009,14 @@ table.dispute-entry-table tbody tr.selected {
   background-color: #6dbcdb;
   min-width: 200px;
   top: 16px;
-  left: 1px;
+  left: 4px;
 }
 
 .dispute-owner-buttons-wrapper h3 {
   padding: 2px 10px !important;
 }
 
-#button_reassign, #unassign-dispute-button {
+#button_reassign{
   text-transform: none;
   display: inline-block;
   padding: 8px 20px;
