@@ -241,7 +241,6 @@ window.bulk_get_current_wlbl = (page) ->
     )
   else
     std_msg_error('No rows selected', ['Please select at least one entry row.'])
-    $(dropdown).removeClass('open')
     return false
 
 

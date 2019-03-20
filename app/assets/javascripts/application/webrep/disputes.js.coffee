@@ -893,7 +893,6 @@ $ ->
           $('#index-ticket-resolution-submenu').hide()
           $(res_comment[0]).val('')
     else
-      $(dropdown).removeClass('open')
       std_msg_error('No rows selected', ['Please select at least one row.'])
 
   # Edit Entry: Edit Entry Status

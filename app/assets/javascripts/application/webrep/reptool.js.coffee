@@ -132,7 +132,6 @@ window.bulk_get_current_reptool = (page) ->
     )
   else
     std_msg_error('Error', ['Please select one row'])
-    $(dropdown).removeClass('open')
     return false
 
 
