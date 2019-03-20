@@ -5814,8 +5814,9 @@ td.ticket-total::before {
   font-size: inherit;
 }
 .container_unassign{
-  position: absolute;
-  margin-top: 5px;
+  display: flex;
+  margin: 6% 0;
+  padding-top: 1%;
   border-top: 1px solid #f2f2f2;
 }
 #index-edit-ticket-status-dropdown .radio-label, #index-edit-entry-status-dropdown .radio-label {
