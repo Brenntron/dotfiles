@@ -160,7 +160,8 @@ module API
               rescue Exception => e
                   return {error:e.message}.to_json
               end
-              {display_name: current_user.display_name, status:entry.status, entry_resolution:permitted_params['status']}.to_json
+              {display_name: current_user.display_name, status: entry.status, entry_resolution: permitted_params['status'],
+               uri: entry.uri, subdomain: entry.subdomain, domain: entry.domain}.to_json
             end
 
 
