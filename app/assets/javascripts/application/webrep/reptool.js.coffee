@@ -107,7 +107,6 @@ window.bulk_get_current_reptool = (page) ->
       data: { ip_uris: ip_uris }
       success: (response) ->
         response = JSON.parse(response)
-
         for entry in response
           if entry['status'] == "ACTIVE"
             rep_class_full = entry['classification'] + ' - ' + entry['expiration']
@@ -145,6 +144,7 @@ window.reptool_form_prep = (action, submission_type) ->
   reptool_submit = $(dropdown).find('.dropdown-submit-button')[0]
   class_actions_row = $(dropdown).find('.reptool-classifications-row')[0]
   classes_row = $(dropdown).find('.reptool-class-radio-row')[0]
+  comment_row = $(dropdown).find('.comment-wrapper')[0]
   action_type = $(action).attr('name')
 
   if action_type == 'reptool-action-radio'
@@ -153,12 +153,15 @@ window.reptool_form_prep = (action, submission_type) ->
     if submission_action == 'reptool-maintain'
       $(class_actions_row).show()
       $(classes_row).show()
+      $(comment_row).show()
     else if submission_action == 'reptool-override'
       $(class_actions_row).show()
       $(classes_row).hide()
+      $(comment_row).show()
     else if submission_action == 'reptool-drop'
       $(class_actions_row).hide()
       $(classes_row).hide()
+      $(comment_row).hide()
       $(reptool_submit).attr('disabled', false)
 
   else if action_type = 'classification'
@@ -211,7 +214,6 @@ window.submit_individual_reptool = (button) ->
     data = {
       'action': 'EXPIRED'
       'entries': entry_content
-      'comment': comment
     }
   else if submission_action == "reptool-maintain"
     api_url = '/escalations/api/v1/escalations/webrep/disputes/maintain_reptool_bl'
@@ -316,7 +318,6 @@ window.submit_bulk_reptool = () ->
     data = {
       'action': 'EXPIRED'
       'entries': entries
-      'comment': comment
     }
   else if submission_action == "reptool-maintain"
     new_classifications = ''
