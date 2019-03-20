@@ -265,7 +265,6 @@ $ ->
 
     # advanced search tags
     createSelectOptions = ->
-      console.log('in here')
       tags = $('#search_tag_list')[0]
       if tags
         tag_list = tags.value

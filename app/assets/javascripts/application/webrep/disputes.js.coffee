@@ -150,7 +150,6 @@ window.advanced_webrep_index_table = () ->
   dispute_save_search_format = /[!@#$%^&*()_+\-=\[\]{};':"\\|,.<>\/?]/
 
 
-  console.log('up in here',form.find('input[id="status-input"]').val())
   data = {
     search_type: 'advanced'
     search_name: form.find('input[name="search_name"]').val()

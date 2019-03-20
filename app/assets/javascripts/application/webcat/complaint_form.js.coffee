@@ -1,6 +1,6 @@
 complaint_status_list= ["NEW", "RESOLVED", "ASSIGNED", "ACTIVE","COMPLETED","PENDING"]
 complaint_channel_list=["Internal", "TalosIntel", "WBNP"]
-complaint_resolution_list=["RESOLUTION_FIXED", "RESOLUTION_INVALID", "RESOLUTION_UNCHANGED", "RESOLUTION_DUPLICATE"]
+complaint_resolution_list=["FIXED", "INVALID", "UNCHANGED", "DUPLICATE"]
 $ ->
 
   $('#new-complaint').on 'click', ->
