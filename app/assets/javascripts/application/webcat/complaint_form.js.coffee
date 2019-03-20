@@ -50,11 +50,9 @@ $ ->
           $('#status-input-list').append '<option value=\'' + status + '\'></option>'
 
         for channel in complaint_channel_list
-          console.log(channel)
           $('#channel-input-list').append '<option value=\'' + channel + '\'></option>'
 
         for resolution in complaint_resolution_list
-          console.log(resolution, $('#resolution-input'))
           $('#resolution-input-list').append '<option value=\'' + resolution + '\'></option>'
 
     )
