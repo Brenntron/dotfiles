@@ -148,8 +148,6 @@ window.advanced_webrep_index_table = () ->
   if form.find('input[name="advanced_search[submission_type]"][value="ew"]').is(':checked')
     submission_types.push('ew')
   dispute_save_search_format = /[!@#$%^&*()_+\-=\[\]{};':"\\|,.<>\/?]/
-
-
   data = {
     search_type: 'advanced'
     search_name: form.find('input[name="search_name"]').val()

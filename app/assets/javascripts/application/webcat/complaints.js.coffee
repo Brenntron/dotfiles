@@ -1273,7 +1273,6 @@ window.advanced_webcat_index_table = () ->
     modified_older: $('#cat_named_search').find('input[id="modified-older-input"]').val()
     modified_newer: $('#cat_named_search').find('input[id="modified-newer-input"]').val()
   }
-  console.log("status:", $('#cat_named_search').find('input[id="status-input"]').val(), $('#cat_named_search').find('input[id="channel-input"]').val(), $('#cat_named_search').find('input[id="resolution-input"]').val())
 
   if complaint_save_search_format.test(data.search_name) == true
     std_msg_error('save search name error', ['Please enter a name without any special character', 'Example: !@#$%^&*()'])
