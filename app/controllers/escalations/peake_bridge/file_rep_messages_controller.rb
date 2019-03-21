@@ -10,11 +10,13 @@ class Escalations::PeakeBridge::FileRepMessagesController < ApplicationControlle
           file_rep.create(file_rep_params)
         end
     if success_status
+      sender_params[:addressee_id] = file_rep.id
+      sender_params[:addressee_status] = 'NEW'
       Bridge::GenericAck.new(sender_params, addressee: envelope_params[:sender]).post
-      render plain: 'successfully created file rep', status: :ok
+      render plain: '"successfully created file rep"', status: :ok
     else
       error_messages = file_rep.errors.full_messages.join('; ')
-      render plain: "Error(s) creating file rep -- #{error_messages}", status: :internal_server_error
+      render plain: "\"Error(s) creating file rep -- #{error_messages}\"", status: :internal_server_error
     end
   end
 
