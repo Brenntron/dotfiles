@@ -8,10 +8,14 @@ module ApplicationHelper
   end
 
   def bugzilla_rest_logged_in?(session)
-    if BugzillaRest::Session.logged_in?(session)
-      true
+    session.logged_in?
+  end
+
+  def bugzilla_rest_login_icon(session)
+    if bugzilla_rest_logged_in?(session)
+      content_tag(:span, class: "bugzilla-status bugzilla-logged-in esc-tooltipped", title: 'Logged into Bugzilla')
     else
-      false
+      content_tag(:span, class: "bugzilla-status bugzilla-logged-out esc-tooltipped", title: 'Not logged into Bugzilla')
     end
   end
 

@@ -88,6 +88,10 @@ class BugzillaRest::Session < BugzillaRest::Base
     BugzillaRest::AttachmentProxy.new(attachment_attrs, api_key: api_key, token: token)
   end
 
+  def logged_in?
+    self.api_key.present? || self.token.present?
+  end
+
   def self.logged_in?(session)
     if session.present?
       api_key = session.api_key
@@ -105,3 +109,4 @@ class BugzillaRest::Session < BugzillaRest::Base
   end
 
 end
+

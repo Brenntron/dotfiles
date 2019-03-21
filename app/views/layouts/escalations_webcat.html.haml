@@ -240,10 +240,7 @@
 
   - if current_user
     #login-div.nav-tool-block.col-sm-2.col-lg-2
-      - if bugzilla_rest_logged_in?(bugzilla_rest_session) == true
-        %span.bugzilla-status.bugzilla-logged-in.esc-tooltipped{title: 'Logged into Bugzilla'}
-      - else
-        %span.bugzilla-status.bugzilla-logged-out.esc-tooltipped{title: 'Not logged into Bugzilla'}
+      = bugzilla_rest_login_icon(bugzilla_rest_session)
       %span.dropdown
         %button#user-settings-dropdown-button.dropdown-toggle{'data-toggle': 'dropdown', 'aria-expanded': 'false', 'aria-haspopup': 'true', type: 'button'}
         #user-settings-dropdown.dropdown-menu{'aria-labelledby': 'user-settings-dropdown-button'}
