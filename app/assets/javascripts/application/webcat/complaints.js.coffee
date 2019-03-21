@@ -756,13 +756,11 @@ format = (complaint_entry_row) ->
 
   if complaint_entry.status == "PENDING"
     complaint_submission_html =
-      '<div class="col-xs-2">' +
         '<input type="radio" name="resolution_review_' + complaint_entry.entry_id + '" value="commit" > Commit <br/>' +
         '<input type="radio" name="resolution_review_' + complaint_entry.entry_id + '" value="decline" checked="checked"> Decline' +
         '<br/><button class="tertiary" onclick="updatePending(' + complaint_entry.entry_id + ',' + row_id + ')"> Submit </button></div>'
   else
     complaint_submission_html =
-        '<div class="col-xs-2">' +
         '<input type="radio" class="resolution_radio_button" id="unchanged' + complaint_entry.entry_id + '" name="resolution' + complaint_entry.entry_id + '" value="UNCHANGED" ' + unchanged_radio + entry_status + '> Unchanged <br/> ' +
         '<input type="radio" class="resolution_radio_button" id="fixed' + complaint_entry.entry_id + '" name="resolution' + complaint_entry.entry_id + '" value="FIXED"  ' + fixed_radio + entry_status + '> Fixed  <br/> ' +
         '<input type="radio" class="resolution_radio_button" id="invalid' + complaint_entry.entry_id + '" name="resolution' + complaint_entry.entry_id + '" value="INVALID" ' + invalid_radio + entry_status + '> Invalid' +
@@ -814,6 +812,7 @@ format = (complaint_entry_row) ->
       '<label class="content-label-sm customer-label">Customer Facing Comment</label><br/>' +
       '<input class="nested-table-input complaint-comment-input" id="complaint_resolution_comment_' + complaint_entry.entry_id + '" type="text" onclick="this.select()" value="' + resolution_comment + '" placeholder="Add a comment for the customer." ' + entry_status + '>' +
       '</div>' +
+      '<div class="col-xs-2">' +
       '<label class="content-label-sm">Resolution</label><br/>' +
       complaint_submission_html +
       '</div></div></div></div></td></tr></table>'
