@@ -102,8 +102,6 @@ $ ->
 
     )
 
-    $('')
-
   $('#new-complaint-form').submit (e) ->
     e.preventDefault()
     $('#loader-modal').modal({
