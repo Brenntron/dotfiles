@@ -949,7 +949,7 @@ class Dispute < ApplicationRecord
       when 'team_disputes'
         where(user_id: user.my_team)
       when 'unassigned'
-        where(status: [STATUS_NEW, STATUS_REOPENED])
+        where(status: [STATUS_NEW, STATUS_REOPENED], user_id: User.where(display_name: 'Vrt Incoming').first.id)
       when 'open'
         where(status: [STATUS_NEW, STATUS_REOPENED, STATUS_CUSTOMER_PENDING, STATUS_CUSTOMER_UPDATE, STATUS_ON_HOLD, STATUS_RESEARCHING, STATUS_ESCALATED, STATUS_ASSIGNED])
       when 'open_email'
