@@ -138,6 +138,7 @@ window.populate_webrep_index_table = (data = {}, reload = false) ->
   , this)
 
 window.advanced_webrep_index_table = () ->
+
   form = $('#disputes-advanced-search-form')
   submission_types = []
   if form.find('input[name="advanced_search[submission_type]"][value="w"]').is(':checked')
