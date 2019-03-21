@@ -13,9 +13,9 @@ module ApplicationHelper
 
   def bugzilla_rest_login_icon(session)
     if bugzilla_rest_logged_in?(session)
-      content_tag(:span, class: "bugzilla-status bugzilla-logged-in esc-tooltipped", title: 'Logged into Bugzilla')
+      content_tag(:span, '', class: ['bugzilla-status', 'bugzilla-logged-in', 'esc-tooltipped'], title: 'Logged into Bugzilla')
     else
-      content_tag(:span, class: "bugzilla-status bugzilla-logged-out esc-tooltipped", title: 'Not logged into Bugzilla')
+      content_tag(:span, '', class: ['bugzilla-status', 'bugzilla-logged-out', 'esc-tooltipped'], title: 'Not logged into Bugzilla')
     end
   end
 
