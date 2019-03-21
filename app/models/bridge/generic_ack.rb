@@ -6,7 +6,6 @@ class Bridge::GenericAck < Bridge::BaseMessage
   end
 
   def post
-    byebug
     super(message: {sender_data: @sender_data})
   end
   # handle_asynchronously :post, :queue => "generic_ack"
