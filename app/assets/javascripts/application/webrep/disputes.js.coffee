@@ -447,9 +447,9 @@ window.related_disputes = () ->
   entry_ids = $('.dispute_check_box:checkbox:checked').map(() ->
     Number(this.value)
   ).toArray()
-#  if entry_ids.length == 0
-#    std_msg_error('Setting related error', ['No issue(s) selected.'])
-#    return
+  #  if entry_ids.length == 0
+  #    std_msg_error('Setting related error', ['No issue(s) selected.'])
+  #    return
   original_dispute_id = $('.dispute-id').val()
 
   # Make sure that the original dispute ID is provided by the user.
@@ -806,29 +806,29 @@ $ ->
     else
       comment = $('.non-resolution-submit-wrapper').find('.ticket-status-comment').val()
 
+    headers = {'Token': $('input[name="token"]').val(), 'Xmlrpc-Token': $('input[name="xml_token"]').val()}
+
     data = {
       status: status,
       resolution: resolution,
-      comment: comment,
-      dispute_ids: checked_disputes.toString()
+      comment: comment
     }
 
-    headers = {'Token': $('input[name="token"]').val(), 'Xmlrpc-Token': $('input[name="xml_token"]').val()}
-    $.ajax(
-      url: '/escalations/api/v1/escalations/webrep/disputes/set_disputes_status'
-      method: 'POST'
-      headers: headers
-      data: data
-      dataType: 'json'
-      success: (response) ->
-        response = JSON.parse(response)
-        if response.status == "success"
-          window.location.reload()
-      error: (response) ->
-        popup_response_error(response, 'Error Updating Status')
-        window.location.reload()
+    for dispute in checked_disputes
+      data.dispute_ids = dispute
 
-    )
+      $.ajax(
+        url: '/escalations/api/v1/escalations/webrep/disputes/set_disputes_status'
+        method: 'POST'
+        headers: headers
+        data: data
+        dataType: 'json'
+        success: (response) ->
+          window.location.reload()
+        error: (response) ->
+          popup_response_error(response, 'Error Updating Status')
+          window.location.reload()
+      )
 
   window.toggleRow = (box) ->
     if $(box)[0].checked
@@ -859,7 +859,7 @@ $ ->
   # Edit Ticket: Edit Ticket Status
   $('#index_ticket_status').click ->
     dropdown = $('#index-edit-ticket-status-dropdown').parent()
-    if ($('.dispute_check_box:checked').length > 0)
+    if $('.dispute_check_box:checked').length > 0
 # Select Status
       $('.ticket-status-radio-label').click ->
         radio_button = $(this).prev('.ticket-status-radio')
@@ -1007,7 +1007,7 @@ $ ->
       {
         data: 'dispute_resolution'
       }
-       {
+      {
         data: 'submission_type'
         render: (data) ->
           title = ''
@@ -1312,7 +1312,7 @@ $ ->
               $("##{column}-checkbox").prop('checked', false)
               window.dispute_table.column("##{column}").visible false
 
-    )
+      )
 
     $('.toggle-vis').on "click", ->
       data = {}
@@ -1483,7 +1483,7 @@ $ ->
           'tooltipster-borderless'
           'tooltipster-borderless-customized'
           'tooltipster-borderless-comment'
-          ]
+        ]
         'maxWidth': 500
       $(this).tooltipster 'show'
     return
@@ -1563,98 +1563,98 @@ $ ->
   #  )
 
 
-#    makeBar('graph-ticket-entries-closed', barDataSet)
+  #    makeBar('graph-ticket-entries-closed', barDataSet)
 
-#  $('.graph-config select').on 'change', (el) ->
-#    if el.target.value == 'yearly'
-#      barDataSet = window.myBar.data.datasets
-#      window.myBar.data.datasets = barDataSet.concat barDataSets.filter (x) -> x.label == 'Total Ticket Entries'
-#      window.myBar.update()
-#    else if el.target.value == 'montly'
-#      barDataSet = window.myBar.data.datasets.filter (x) -> x.label != 'E' and x.label != 'W' and x.label != 'EW'
-#      window.myBar.data.datasets = barDataSet
-#      window.myBar.update()
-#    else if el.target.value == 'weekly'
-#      barDataSet = window.myBar.data.datasets.filter (x) -> x.label != 'E' and x.label != 'W' and x.label != 'EW'
-#      window.myBar.data.datasets = barDataSet
-#      window.myBar.update()
-#    else
-#      window.myBar.data.datasets = barDataSets
-#      window.myBar.update()
-
-
-#  Test data for Closed Email Entry Resolutions
-#  emailEntryResolutionLabels = ['Fixed', 'Unchanged', 'Fixed FP', 'Other']
-#  emailEntryData = [3,6,7,0]
-
-#  new Chart($('#closed-email-entries-resolution-piechart'),
-#    type: 'pie'
-#    data:
-#      labels: emailEntryResolutionLabels
-#      datasets: [ {
-#        label: 'close-email-entries'
-#        backgroundColor: [
-#          '#3e5a72'
-#          '#6dbcdb'
-#          '#666'
-#        ]
-#        data: emailEntryData
-#      } ]
-#    options:
-#      legend: false
-#      pieceLabel:
-#        render: (args) ->
-#          return args.percentage + '%'
-#        position: 'outside'
-#        segment: false
-#        precision: 2
-#        showZero: true
-#        fontStyle: 'bolder'
-#        overlap: false
-#        showActualPercentages: true
-#  )
+  #  $('.graph-config select').on 'change', (el) ->
+  #    if el.target.value == 'yearly'
+  #      barDataSet = window.myBar.data.datasets
+  #      window.myBar.data.datasets = barDataSet.concat barDataSets.filter (x) -> x.label == 'Total Ticket Entries'
+  #      window.myBar.update()
+  #    else if el.target.value == 'montly'
+  #      barDataSet = window.myBar.data.datasets.filter (x) -> x.label != 'E' and x.label != 'W' and x.label != 'EW'
+  #      window.myBar.data.datasets = barDataSet
+  #      window.myBar.update()
+  #    else if el.target.value == 'weekly'
+  #      barDataSet = window.myBar.data.datasets.filter (x) -> x.label != 'E' and x.label != 'W' and x.label != 'EW'
+  #      window.myBar.data.datasets = barDataSet
+  #      window.myBar.update()
+  #    else
+  #      window.myBar.data.datasets = barDataSets
+  #      window.myBar.update()
 
 
   #  Test data for Closed Email Entry Resolutions
-#  webEntryResolutionLabels = ['Fixed FN', 'Unchanged', 'Fixed FP', 'Other']
-#  webEntryData = [3,6,7,0]
+  #  emailEntryResolutionLabels = ['Fixed', 'Unchanged', 'Fixed FP', 'Other']
+  #  emailEntryData = [3,6,7,0]
 
-#  new Chart(document.getElementById('closed-web-entries-resolution-piechart'),
-#    type: 'pie'
-#    data:
-#      labels: [
-#        'Fixed'
-#        'Unchanged'
-#        'Fixed FP'
-#      ]
-#      datasets: [ {
-#        label: 'close-email-entries'
-#        backgroundColor: [
-#          '#3e5a72'
-#          '#6dbcdb'
-#          '#666'
-#        ]
-#        data: [
-#          2478
-#          3267
-#          4202
-#        ]
-#      } ]
-#    options:
-#      legend: false
-#      pieceLabel:
-#        render: (args) ->
-#          return args.percentage + '%'
-#        position: 'outside'
-#        label: 'Unchanched'
-#        segment: false
-#        precision: 2
-#        showZero: true
-#        fontStyle: 'bolder'
-#        overlap: false
-#        showActualPercentages: true
+  #  new Chart($('#closed-email-entries-resolution-piechart'),
+  #    type: 'pie'
+  #    data:
+  #      labels: emailEntryResolutionLabels
+  #      datasets: [ {
+  #        label: 'close-email-entries'
+  #        backgroundColor: [
+  #          '#3e5a72'
+  #          '#6dbcdb'
+  #          '#666'
+  #        ]
+  #        data: emailEntryData
+  #      } ]
+  #    options:
+  #      legend: false
+  #      pieceLabel:
+  #        render: (args) ->
+  #          return args.percentage + '%'
+  #        position: 'outside'
+  #        segment: false
+  #        precision: 2
+  #        showZero: true
+  #        fontStyle: 'bolder'
+  #        overlap: false
+  #        showActualPercentages: true
+  #  )
 
-#  )
+
+  #  Test data for Closed Email Entry Resolutions
+  #  webEntryResolutionLabels = ['Fixed FN', 'Unchanged', 'Fixed FP', 'Other']
+  #  webEntryData = [3,6,7,0]
+
+  #  new Chart(document.getElementById('closed-web-entries-resolution-piechart'),
+  #    type: 'pie'
+  #    data:
+  #      labels: [
+  #        'Fixed'
+  #        'Unchanged'
+  #        'Fixed FP'
+  #      ]
+  #      datasets: [ {
+  #        label: 'close-email-entries'
+  #        backgroundColor: [
+  #          '#3e5a72'
+  #          '#6dbcdb'
+  #          '#666'
+  #        ]
+  #        data: [
+  #          2478
+  #          3267
+  #          4202
+  #        ]
+  #      } ]
+  #    options:
+  #      legend: false
+  #      pieceLabel:
+  #        render: (args) ->
+  #          return args.percentage + '%'
+  #        position: 'outside'
+  #        label: 'Unchanched'
+  #        segment: false
+  #        precision: 2
+  #        showZero: true
+  #        fontStyle: 'bolder'
+  #        overlap: false
+  #        showActualPercentages: true
+
+  #  )
 
   #closedTicketNumbers = [375502, 375504, 375513, 375515, 375516, 375517, 375518, 375519, 375520, 375521, 375522]
   #timeToCloseTickets = [1, 1.3, 1.2, 1.5, 1.7, 1.4, 1.8, 0.9, 1, 1.1, 1.2, 1.5, 1.6]
@@ -1807,85 +1807,85 @@ $ ->
 
 
 
-#### Multi User Graphs #####
+  #### Multi User Graphs #####
 
-#  Ticket entries closed by ticket owner
+  #  Ticket entries closed by ticket owner
 
   ticketOwners = ['mtaylor', 'chrclair', 'nherbert', 'nverbeck', 'abreeeman']
   ticketEntriesByOwner = [8, 15, 11, 10, 13.5]
 
-#  new Chart($('#ticket-entries-closed-by-owner'),
-#    type: 'horizontalBar'
-#    data:
-#      labels: ticketOwners
-#      datasets: [ {
-#        backgroundColor: '#6dbcdb'
-#        data: ticketEntriesByOwner
-#      } ]
-#    options:
-#      legend: display: false
-#      scales:
-#        yAxes: [
-#          {
-#            gridLines: display: false
-#            ticks: {
-#              min: 0
-#            }
-#          }
-#        ]
-#        xAxes: [
-#          {
-#            gridLines: display: false
-#            ticks: {
-#              min: 0
-#            }
-#            scaleLabel: {
-#              display: true,
-#              labelString: 'Closed Ticket Entries'
-#            }
-#          }
-#        ]
-#      )
+  #  new Chart($('#ticket-entries-closed-by-owner'),
+  #    type: 'horizontalBar'
+  #    data:
+  #      labels: ticketOwners
+  #      datasets: [ {
+  #        backgroundColor: '#6dbcdb'
+  #        data: ticketEntriesByOwner
+  #      } ]
+  #    options:
+  #      legend: display: false
+  #      scales:
+  #        yAxes: [
+  #          {
+  #            gridLines: display: false
+  #            ticks: {
+  #              min: 0
+  #            }
+  #          }
+  #        ]
+  #        xAxes: [
+  #          {
+  #            gridLines: display: false
+  #            ticks: {
+  #              min: 0
+  #            }
+  #            scaleLabel: {
+  #              display: true,
+  #              labelString: 'Closed Ticket Entries'
+  #            }
+  #          }
+  #        ]
+  #      )
 
 
-# Average time to close tickets by ticket owner graph
-#  avgTimeToCloseTickets = [.8, .7, 1.7, 1.6, 2]
+  # Average time to close tickets by ticket owner graph
+  #  avgTimeToCloseTickets = [.8, .7, 1.7, 1.6, 2]
 
-#  new Chart($('#avg-time-to-close-tickets'),
-#    type: 'horizontalBar'
-#    data:
-#      labels: ticketOwners
-#      datasets: [ {
-#        backgroundColor: '#6dbcdb'
-#        data: avgTimeToCloseTickets
-#      } ]
-#    options:
-#      legend: display: false
-#      scales:
-#        yAxes: [
-#          {
-#            gridLines: display: false
-#            ticks: {
-#              min: 0
-#            }
-#          }
-#        ]
-#        xAxes: [
-#          {
-#            gridLines: display: false
-#            ticks: {
-#              min: 0
-#            }
-#            scaleLabel: {
-#              display: true,
-#              labelString: 'Hours'
-#            }
-#          }
-#        ]
-#  )
+  #  new Chart($('#avg-time-to-close-tickets'),
+  #    type: 'horizontalBar'
+  #    data:
+  #      labels: ticketOwners
+  #      datasets: [ {
+  #        backgroundColor: '#6dbcdb'
+  #        data: avgTimeToCloseTickets
+  #      } ]
+  #    options:
+  #      legend: display: false
+  #      scales:
+  #        yAxes: [
+  #          {
+  #            gridLines: display: false
+  #            ticks: {
+  #              min: 0
+  #            }
+  #          }
+  #        ]
+  #        xAxes: [
+  #          {
+  #            gridLines: display: false
+  #            ticks: {
+  #              min: 0
+  #            }
+  #            scaleLabel: {
+  #              display: true,
+  #              labelString: 'Hours'
+  #            }
+  #          }
+  #        ]
+  #  )
 
 
-# Ticket Resolutions by Ticket Owner graph
+  # Ticket Resolutions by Ticket Owner graph
 
   #fixedFPTickets = [9, 7, 5, 6, 9]
   #fixedFNTickets = [10, 14, 11, 10, 5]
@@ -1940,69 +1940,69 @@ $ ->
 
 
 
-#  Rule Hits for FP Resolutions Graph
-#  fpRules = ['a500', 'alx_ cln', 'mute_phish', 'sbl', 'srch', 'suwl', 'trd_mal']
-#  totalRuleHits = [ 5, 18, 9, 14, 4, 7, 3]
+  #  Rule Hits for FP Resolutions Graph
+  #  fpRules = ['a500', 'alx_ cln', 'mute_phish', 'sbl', 'srch', 'suwl', 'trd_mal']
+  #  totalRuleHits = [ 5, 18, 9, 14, 4, 7, 3]
 
-#  new Chart($('#rule-hits-fp-resolutions'),
-#    type: 'horizontalBar'
-#    data:
-#      labels: fpRules
-#      datasets: [ {
-#        backgroundColor: '#6dbcdb'
-#        data: totalRuleHits
-#      } ]
-#    options:
-#      legend: display: false
-#      scales:
-#        yAxes: [
-#          {
-#            gridLines: display: false
-#          }
-#        ]
-#        xAxes: [
-#          {
-#            gridLines: display: false
-#            ticks: {
-#              min: 0
-#            }
-#            scaleLabel: {
-#              display: true,
-#              labelString: 'Total Ticket Entries with FP Resolutions'
-#            }
-#          }
-#        ]
-#  )
+  #  new Chart($('#rule-hits-fp-resolutions'),
+  #    type: 'horizontalBar'
+  #    data:
+  #      labels: fpRules
+  #      datasets: [ {
+  #        backgroundColor: '#6dbcdb'
+  #        data: totalRuleHits
+  #      } ]
+  #    options:
+  #      legend: display: false
+  #      scales:
+  #        yAxes: [
+  #          {
+  #            gridLines: display: false
+  #          }
+  #        ]
+  #        xAxes: [
+  #          {
+  #            gridLines: display: false
+  #            ticks: {
+  #              min: 0
+  #            }
+  #            scaleLabel: {
+  #              display: true,
+  #              labelString: 'Total Ticket Entries with FP Resolutions'
+  #            }
+  #          }
+  #        ]
+  #  )
 
 
 
-#  totalTicketEnties = [15, 18, 22, 18, 24, 10, 12]
-#  emailTicketEntries = [15, 18, 22, 18, 24, 10, 2]
-#  webTicketEntries = [15, 18, 22, 18, 24, 10, 5]
-#  ewTicketEntries = [15, 18, 22, 18, 24, 10, 7]
+  #  totalTicketEnties = [15, 18, 22, 18, 24, 10, 12]
+  #  emailTicketEntries = [15, 18, 22, 18, 24, 10, 2]
+  #  webTicketEntries = [15, 18, 22, 18, 24, 10, 5]
+  #  ewTicketEntries = [15, 18, 22, 18, 24, 10, 7]
 
-#  totalTicketEntriesbyType = [
-#    {
-#      label: 'Total Ticket Entries'
-#      backgroundColor: '#6dbcdb'
-#      data: totalTicketEnties
-#    }
-#    {
-#      label: 'E'
-#      backgroundColor: '#8cc63f'
-#      data: emailTicketEntries
-#    }
-#    {
-#      label: 'W'
-#      backgroundColor: '#E47433'
-#      data: webTicketEntries
-#    }
-#    {
-#      label: 'EW'
-#      backgroundColor: '#BA55D3'
-#      data: ewTicketEntries
-#    }
-#  ]
+  #  totalTicketEntriesbyType = [
+  #    {
+  #      label: 'Total Ticket Entries'
+  #      backgroundColor: '#6dbcdb'
+  #      data: totalTicketEnties
+  #    }
+  #    {
+  #      label: 'E'
+  #      backgroundColor: '#8cc63f'
+  #      data: emailTicketEntries
+  #    }
+  #    {
+  #      label: 'W'
+  #      backgroundColor: '#E47433'
+  #      data: webTicketEntries
+  #    }
+  #    {
+  #      label: 'EW'
+  #      backgroundColor: '#BA55D3'
+  #      data: ewTicketEntries
+  #    }
+  #  ]
 
   dateRange = ['September 2', 'September 3', 'September 4', 'September 5', 'September 6', 'September 7', 'September 8']
 
@@ -2032,117 +2032,117 @@ $ ->
 
 
 
-  #multiuserCustomerSubmissions = [15, 18, 22, 18, 12, 43, 31]
-  #multiuserGuestSubmissions = [8, 6, 7, 13, 9, 15, 21]
+#multiuserCustomerSubmissions = [15, 18, 22, 18, 12, 43, 31]
+#multiuserGuestSubmissions = [8, 6, 7, 13, 9, 15, 21]
 
-  #new Chart($('#graph-multiuser-ticket-entries-submitter'),
-  #  type: 'bar'
-  #  data:
-  #    labels: dateRange
-  #    datasets: [
-  #      {
-  #        backgroundColor: '#6dbcdb'
-  #        data: multiuserCustomerSubmissions
-  #      }
-  #      {
-  #        backgroundColor: '#2c3e50'
-  #        data: multiuserGuestSubmissions
-  #      }
-  #    ]
-  #  options:
-  #    legend: display: false
-  #    scales:
-  #      yAxes: [
-  #        {
-  #          gridLines: display: false
-  #          ticks: {
-  #            min: 0
-  #          }
-  #        }
-  #      ]
-  #      xAxes: [
-  #        {
-  #          gridLines: display: false
-  #          ticks: {
-  #            autoSkip: false
-  #          }
-  #        }
-  #      ]
-  #)
+#new Chart($('#graph-multiuser-ticket-entries-submitter'),
+#  type: 'bar'
+#  data:
+#    labels: dateRange
+#    datasets: [
+#      {
+#        backgroundColor: '#6dbcdb'
+#        data: multiuserCustomerSubmissions
+#      }
+#      {
+#        backgroundColor: '#2c3e50'
+#        data: multiuserGuestSubmissions
+#      }
+#    ]
+#  options:
+#    legend: display: false
+#    scales:
+#      yAxes: [
+#        {
+#          gridLines: display: false
+#          ticks: {
+#            min: 0
+#          }
+#        }
+#      ]
+#      xAxes: [
+#        {
+#          gridLines: display: false
+#          ticks: {
+#            autoSkip: false
+#          }
+#        }
+#      ]
+#)
 
-  #new Chart(document.getElementById('team-pie-chart'),
-  #  type: 'pie'
-  #  data:
-  #    labels: [
-  #      'Fixed'
-  #      'Unchanged'
-  #      'Fixed FP'
-  #    ]
-  #    datasets: [ {
-  #      label: 'close-email-entries'
-  #      backgroundColor: [
-  #        '#3e5a72'
-  #        '#6dbcdb'
-  #        '#666'
-  #      ]
-  #      data: [
-  #        5178
-  #        4267
-  #        2202
-  #      ]
-  #    } ]
-  #  options:
-  #    legend: false
-  #    pieceLabel:
-  #      render: (args) ->
-  #        return args.percentage + '%'
-  #      position: 'outside'
-  #      label: 'Unchanched'
-  #      segment: false
-  #      precision: 2
-  #      showZero: true
-  #      fontStyle: 'bolder'
-  #      overlap: false
-  #      showActualPercentages: true
+#new Chart(document.getElementById('team-pie-chart'),
+#  type: 'pie'
+#  data:
+#    labels: [
+#      'Fixed'
+#      'Unchanged'
+#      'Fixed FP'
+#    ]
+#    datasets: [ {
+#      label: 'close-email-entries'
+#      backgroundColor: [
+#        '#3e5a72'
+#        '#6dbcdb'
+#        '#666'
+#      ]
+#      data: [
+#        5178
+#        4267
+#        2202
+#      ]
+#    } ]
+#  options:
+#    legend: false
+#    pieceLabel:
+#      render: (args) ->
+#        return args.percentage + '%'
+#      position: 'outside'
+#      label: 'Unchanched'
+#      segment: false
+#      precision: 2
+#      showZero: true
+#      fontStyle: 'bolder'
+#      overlap: false
+#      showActualPercentages: true
 
-  #)
+#)
 
-  #new Chart(document.getElementById('team-pie2-chart'),
-  #  type: 'pie'
-  #  data:
-  #    labels: [
-  #      'Fixed'
-  #      'Unchanged'
-  #      'Fixed FP'
-  #    ]
-  #    datasets: [ {
-  #      label: 'close-email-entries'
-  #      backgroundColor: [
-  #        '#3e5a72'
-  #        '#6dbcdb'
-  #        '#666'
-  #      ]
-  #      data: [
-  #        3778
-  #        4767
-  #        5900
-  #      ]
-  #    } ]
-  #  options:
-  #    legend: false
-  #    pieceLabel:
-  #      render: (args) ->
-  #        return args.percentage + '%'
-  #      position: 'outside'
-  #      label: 'Unchanched'
-  #      segment: false
-  #      precision: 2
-  #      showZero: true
-  #      fontStyle: 'bolder'
-  #      overlap: false
-  #      showActualPercentages: true
+#new Chart(document.getElementById('team-pie2-chart'),
+#  type: 'pie'
+#  data:
+#    labels: [
+#      'Fixed'
+#      'Unchanged'
+#      'Fixed FP'
+#    ]
+#    datasets: [ {
+#      label: 'close-email-entries'
+#      backgroundColor: [
+#        '#3e5a72'
+#        '#6dbcdb'
+#        '#666'
+#      ]
+#      data: [
+#        3778
+#        4767
+#        5900
+#      ]
+#    } ]
+#  options:
+#    legend: false
+#    pieceLabel:
+#      render: (args) ->
+#        return args.percentage + '%'
+#      position: 'outside'
+#      label: 'Unchanched'
+#      segment: false
+#      precision: 2
+#      showZero: true
+#      fontStyle: 'bolder'
+#      overlap: false
+#      showActualPercentages: true
 
-  #)
+#)
 
 
 
