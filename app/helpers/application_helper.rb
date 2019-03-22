@@ -7,6 +7,18 @@ module ApplicationHelper
     current_user&.bugzilla_api_key
   end
 
+  def bugzilla_rest_logged_in?(session)
+    session.logged_in?
+  end
+
+  def bugzilla_rest_login_icon(session)
+    if bugzilla_rest_logged_in?(session)
+      content_tag(:span, '', class: ['bugzilla-status', 'bugzilla-logged-in', 'esc-tooltipped'], title: 'Logged into Bugzilla')
+    else
+      content_tag(:span, '', class: ['bugzilla-status', 'bugzilla-logged-out', 'esc-tooltipped'], title: 'Not logged into Bugzilla')
+    end
+  end
+
   def bootstrap_class_for(flash_type)
     case flash_type
       when "success"

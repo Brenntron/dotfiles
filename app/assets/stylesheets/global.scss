@@ -8195,3 +8195,22 @@ hr.thin.form-divider {
   max-width: 160px;
   overflow-wrap: break-word;
 }
+
+// Bugzilla login icons
+.bugzilla-status {
+  position: relative;
+  display: inline-block;
+  width: 22px;
+  height: 42px;
+  background-repeat: no-repeat;
+  background-position: center center;
+  background-color: transparent;
+}
+
+.bugzilla-logged-in {
+  background-image: url(image_path('icon_bugzilla_loggedin.svg'));
+}
+
+.bugzilla-logged-out {
+  background-image: url(image_path('icon_bugzilla_loggedout.svg'));
+}

@@ -25,6 +25,7 @@ window.top_banner_bugzilla_login =() ->
       $('form#top_banner_bugzilla_login_form').find('input[name=username]').val('')
       $('form#top_banner_bugzilla_login_form').find('input[name=password]').val('')
       $('#user-settings-dropdown-button').click()
+      window.location.reload()
   )
 
 
