@@ -924,7 +924,6 @@ $ ->
       std_msg_error('No rows selected', ['Please select at least one row.'])
       return false
 
-
   # Create index table
   window.dispute_table = $('#disputes-index').DataTable(
     order: [ [
@@ -994,7 +993,7 @@ $ ->
       {
         data: 'dispute_resolution'
       }
-        {
+      {
         data: 'submission_type'
         render: (data) ->
           title = ''
@@ -1378,10 +1377,7 @@ $ ->
     $('#edit-dispute-button').addClass('hidden')
 
 
-    if $('#top_bar_extended_info').css('display', 'block')
-      console.log('open')
-    else if $('#top_bar_extended_info').css('display', 'none')
-      console.log('closed')
+    if $('#top_bar_extended_info').css('display', 'none')
       $('#top-bar-toggle').addClass('top-info-open')
       $("#top_bar_extended_info").slideToggle()
 
