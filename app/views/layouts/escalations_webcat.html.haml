@@ -242,7 +242,7 @@
     #login-div.nav-tool-block.col-sm-2.col-lg-2
       = bugzilla_rest_login_icon(bugzilla_rest_session)
       %span.dropdown
-        %button#user-settings-dropdown-button.dropdown-toggle{'data-toggle': 'dropdown', 'aria-expanded': 'false', 'aria-haspopup': 'true', type: 'button'}
+        %span#user-settings-dropdown-button.dropdown-toggle.esc-tooltipped{'title': 'Login to Bugzilla', 'data-toggle': 'dropdown', 'aria-expanded': 'false', 'aria-haspopup': 'true', type: 'button'}
         #user-settings-dropdown.dropdown-menu{'aria-labelledby': 'user-settings-dropdown-button'}
           -#    If user is logged into Bugzilla
           -#.message-text Log out of Bugzilla
