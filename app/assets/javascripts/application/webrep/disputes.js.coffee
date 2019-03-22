@@ -713,6 +713,50 @@ window.set_related_dispute = (form_tag) ->
     error_prefix: 'Error marking relationship.'
   )
 
+window.change_ticket_status = () ->
+  status = $('#index-edit-ticket-status-dropdown').find('.ticket-status-radio:checked').val()
+  resolution = ""
+  comment = ""
+  checkboxes = $('#disputes-index').find('.dispute_check_box')
+  checked_disputes = []
+  
+  $(checkboxes).each ->
+    if $(this).is(':checked')
+      dispute_id = $(this).val()
+      checked_disputes.push(dispute_id)
+
+  if status == 'RESOLVED_CLOSED'
+    if $('#index-edit-ticket-status-dropdown').find('.ticket-resolution-radio').is(':checked')
+      resolution = $('#index-edit-ticket-status-dropdown').find('.ticket-resolution-radio:checked').val()
+      comment = $('.resolution-comment-wrapper').find('.ticket-status-comment').val()
+    else
+      std_msg_error('No resolution selected', ['Please select a ticket resolution.'])
+      return
+  else
+    comment = $('.non-resolution-submit-wrapper').find('.ticket-status-comment').val()
+
+  headers = {'Token': $('input[name="token"]').val(), 'Xmlrpc-Token': $('input[name="xml_token"]').val()}
+  data = {
+    status: status,
+    resolution: resolution,
+    comment: comment
+  }
+
+  for dispute in checked_disputes
+    data.dispute_ids = dispute
+    $.ajax(
+      url: '/escalations/api/v1/escalations/webrep/disputes/set_disputes_status'
+      method: 'POST'
+      headers: headers
+      data: data
+      dataType: 'json'
+      success: (response) ->
+        window.location.reload()
+      error: (response) ->
+        popup_response_error(response, 'Error Updating Status')
+        window.location.reload()
+    )
+
 window.set_relating_disputes = (form_tag) ->
   related_dispute_id = $(form_tag).find(".dispute-id").val()
   dispute_ids = $('.dispute_check_box:checkbox:checked').map(() ->
@@ -770,52 +814,6 @@ $ ->
     if $('#index-edit-entry-status-dropdown').parent().hasClass('open')
       $('#msg-modal').on 'hidden.bs.modal', (d) ->
         $('#index-edit-entry-status-dropdown').parent().addClass('open')
-
-
-  $('.change_ticket_status_button').click ->
-    status = ""
-    resolution = ""
-    comment = ""
-    checkboxes = $('#disputes-index').find('.dispute_check_box')
-    checked_disputes = []
-    $(checkboxes).each ->
-      if $(this).is(':checked')
-        dispute_id = $(this).val()
-        checked_disputes.push(dispute_id)
-
-    status = $('#index-edit-ticket-status-dropdown').find('.ticket-status-radio:checked').val()
-    if status == 'RESOLVED_CLOSED'
-      if $('#index-edit-ticket-status-dropdown').find('.ticket-resolution-radio').is(':checked')
-        resolution = $('#index-edit-ticket-status-dropdown').find('.ticket-resolution-radio:checked').val()
-        comment = $('.resolution-comment-wrapper').find('.ticket-status-comment').val()
-      else
-        std_msg_error('No resolution selected', ['Please select a ticket resolution.'])
-        return
-    else
-      comment = $('.non-resolution-submit-wrapper').find('.ticket-status-comment').val()
-
-    headers = {'Token': $('input[name="token"]').val(), 'Xmlrpc-Token': $('input[name="xml_token"]').val()}
-    data = {
-      status: status,
-      resolution: resolution,
-      comment: comment
-    }
-
-    for dispute in checked_disputes
-      data.dispute_ids = dispute
-
-      $.ajax(
-        url: '/escalations/api/v1/escalations/webrep/disputes/set_disputes_status'
-        method: 'POST'
-        headers: headers
-        data: data
-        dataType: 'json'
-        success: (response) ->
-          window.location.reload()
-        error: (response) ->
-          popup_response_error(response, 'Error Updating Status')
-          window.location.reload()
-    )
 
   window.toggleRow = (box) ->
     if $(box)[0].checked
