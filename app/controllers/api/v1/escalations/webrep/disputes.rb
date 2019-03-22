@@ -645,7 +645,13 @@ module API
                     rescue
                       expiration = value["expiration"]
                     end
-                    return_data.push(:entry => key, :classification => value["classifications"], :expiration => expiration, :status => value["status"], :comment => value["metadata"]["VRT"]["comment"]).to_json
+
+                    comment = ""
+                    if value["metadata"]["VRT"].present? && value["metadata"]["VRT"]["comment"].present?
+                      comment = value["metadata"]["VRT"]["comment"]
+                    end
+
+                    return_data.push(:entry => key, :classification => value["classifications"], :expiration => expiration, :status => value["status"], :comment => comment).to_json
                   end
                 end
                 return_data.to_json
