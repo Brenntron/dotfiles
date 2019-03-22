@@ -321,7 +321,7 @@
                       %label Resolution
                       %span.missing-data
                         Unresolved
-                    - elsif entry.resolution_comment.nil?
+                    - elsif entry.resolution_comment.nil? || entry.resolution_comment.empty?
                       %label Resolution
                       = entry.resolution
                     - else
