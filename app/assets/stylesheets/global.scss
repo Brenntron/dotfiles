@@ -4582,6 +4582,10 @@ table > tbody > tr > td.dispute_rep_tools {
   background-size: 18px 18px;
 }
 
+.add-to-ticket-button {
+  background-image: url(image_path('icon_add_to_ticket.svg'));
+}
+
 .dropdown button.toolbar-button {
   height: 27px;
 }

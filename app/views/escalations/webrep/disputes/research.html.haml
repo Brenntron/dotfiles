@@ -31,6 +31,12 @@
           %button.toolbar-button.collapse-button#collapse-all-rows.esc-tooltipped{title: 'Collapse All Rows'}
             %span.toolbar-button-text Collapse All Rows
         %div
+          %label.toolbar-section-label Edit
+          %span.dropdown
+            %button.toolbar-button.add-to-ticket-button#add-to-ticket-button.esc-tooltipped{title: 'Add to Ticket', 'data-toggle': 'dropdown', 'aria-haspopup': 'true', 'aria-expanded': 'false'}
+              %span.toolbar-button-text Add to Ticket
+            .dropdown-menu.toolbar-dropdown#add_to_ticket_dropdown{'aria-labelledby': 'add-to-ticket-button'}
+              Dropdown information
           %span.dropdown
             %button#wlbl_entries_button.toolbar-button.adjust-wlbl-button.dropdown-toggle.esc-tooltipped.dropdown-button-margin-left{title: 'Adjust WL/BL', 'data-toggle': 'dropdown', 'aria-haspopup': 'true', 'aria-expanded': 'false', onclick: 'bulk_get_current_wlbl("research")'}
               %span.toolbar-button-text Adjust WBRS WL/BL
