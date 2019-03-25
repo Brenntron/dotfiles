@@ -113,7 +113,7 @@ class ComplaintEntry < ApplicationRecord
                       current_user,
                       commit_pending)
     categories = categories_string&.split(',')
-    ActiveRecord::Base.transaction do
+    #ActiveRecord::Base.transaction do
       # If the prefix is a high telemetry value then the status needs to be set to PENDING
       if self.is_important && entry_status != Complaint::RESOLUTION_UNCHANGED
         if self.status == "PENDING"
@@ -134,7 +134,8 @@ class ComplaintEntry < ApplicationRecord
               commit_category(ip_or_uri: self.uri_or_ip,
                               categories_string: categories_string,
                               description: comment,
-                              user: current_user.email)
+                              user: current_user.email,
+                              casenumber: self.complaint.id)
             end
             cat_from_wbrs = self.set_current_category
             update(url_primary_category: cat_from_wbrs, category: cat_from_wbrs)
@@ -178,15 +179,16 @@ class ComplaintEntry < ApplicationRecord
           commit_category(ip_or_uri: self.uri_or_ip,
                           categories_string: categories_string,
                           description: comment,
-                          user: current_user.email)
+                          user: current_user.email,
+                          casenumber: self.complaint.id )
         end
         cat_from_wbrs = self.set_current_category
         update(url_primary_category: cat_from_wbrs, category: cat_from_wbrs)
       end
-    end
+    #end
   end
 
-  def commit_category(ip_or_uri:, categories_string:, description:, user:)
+  def commit_category(ip_or_uri:, categories_string:, description:, user:, casenumber: nil)
     # Look for existing prefix
 
     existing_prefixes = Wbrs::Prefix.where({urls: [ip_or_uri]})
@@ -202,6 +204,10 @@ class ComplaintEntry < ApplicationRecord
     end
 
     category_ids_array = categories_string.split(',').map {|cat| cat.to_i}
+
+    if description.present? && casenumber.present?
+      description = description + "--Case Number: #{casenumber} User: #{user}"
+    end
 
     if existing_prefix.present?
       prefix_object = Wbrs::Prefix.new
@@ -642,15 +648,16 @@ class ComplaintEntry < ApplicationRecord
 
   def historic_category_data
 
-    prefix_id = nil
-    prefix_results = Wbrs::Prefix.where({:urls => [URI.escape(self.hostlookup)]})
-    if prefix_results.present?
-      prefix_id = prefix_results.first.prefix_id
-    end
-    if prefix_id.present?
-      prefix_history = Wbrs::HistoryRecord.where({:prefix_id => prefix_id}).sort_by {|history| DateTime.parse(history.time)}.reverse
-    else
-      prefix_history = []
+    prefix_history = []
+    prefixes = Wbrs::Prefix.where({:urls => [URI.escape(self.hostlookup)]})
+    prefixes.each do |prefix|
+      if prefix.subdomain == self.subdomain && prefix.path == self.path
+        prefix_id = prefix.prefix_id
+        response = Wbrs::HistoryRecord.where({:prefix_id => prefix_id}).sort_by {|history| DateTime.parse(history.time)}.reverse
+        response.each do |resp|
+          prefix_history << resp
+        end
+      end
     end
 
     prefix_history
