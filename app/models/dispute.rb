@@ -175,8 +175,8 @@ class Dispute < ApplicationRecord
       "%dd %dh" % [dd, hh]
     elsif hh > 0
       "%dh %dm" % [hh, mm]
-    else
-      "%dm %ds" % [mm, ss]
+    elsif hh == 0
+      "<1 hr"
     end
   end
 
