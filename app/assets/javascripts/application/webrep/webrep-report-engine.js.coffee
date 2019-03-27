@@ -8,11 +8,7 @@ getChartMax = (dataSet) =>
   else
     max = dataSet
   maxRounded = Math.ceil((max+1)/10)*10
-  maxRange = maxRounded - 2
-  if max > maxRange
-    return max + 10;
-  else
-    return max + 5
+  return maxRounded
 
 setDataPoint = (chartInstance, type) =>
 
@@ -317,7 +313,8 @@ window.build_graph_ticket_entries_submitter = () ->
               data: submitterGuestChartData
             }]
         options:
-          hover: {mode:null}
+          hover:
+            mode: null
           animation:
             onProgress: () ->
               type = 'vertical'
@@ -371,7 +368,8 @@ window.build_graph_ticket_entries_submitter = () ->
             }
           ]
         options:
-          hover: {mode:null}
+          hover:
+            mode: null
           animation:
             onProgress: () ->
               type = 'vertical'
@@ -464,7 +462,8 @@ window.build_single_closed_email_entries_resolution_piechart = () ->
             data: emailEntryData
           } ]
         options:
-          hover: {mode:null}
+          hover:
+            mode: null
           animation:
             onProgress: () ->
           responsive: true
@@ -555,7 +554,8 @@ window.build_single_time_to_close_linechart = () ->
             labels: closedTicketNumbers
             datasets: timeCloseTicketsDataSets
           options:
-            hover: {mode:null}
+            hover:
+              mode: null
             animation:
               onProgress: () ->
             responsive: true
@@ -671,7 +671,8 @@ window.build_single_closed_web_entries_resolution_piechart = () ->
             data: emailEntryData
           } ]
         options:
-          hover: {mode:null}
+          hover:
+            mode: null
           animation:
             onProgress: () ->
           responsive: true
@@ -745,7 +746,8 @@ window.build_multi_closed_email_entries_resolution_piechart = () ->
             data: emailEntryData
           } ]
         options:
-          hover: {mode:null}
+          hover:
+            mode: null
           animation:
             onProgress: () ->
           responsive: true
@@ -818,7 +820,8 @@ window.build_multi_closed_web_entries_resolution_piechart = () ->
             data: emailEntryData
           } ]
         options:
-          hover: {mode:null}
+          hover:
+            mode: null
           animation:
             onProgress: () ->
 
@@ -924,7 +927,8 @@ window.build_single_entries_closed_by_day_chart = () ->
             labels: ticketTypeChartLabels
             datasets: window.userTicketClosedGraphDatasets,
           options:
-            hover: {mode:null}
+            hover:
+              mode: null
             animation:
               onProgress: () ->
                 type = 'vertical'
@@ -1038,7 +1042,8 @@ window.build_multi_entries_closed_by_day_chart = () =>
           labels: dateRange
           datasets: totalTicketEntriesbyType
         options:
-          hover: {mode:null}
+          hover:
+            mode: null
           animation:
             onProgress: () ->
               type = 'vertical'
@@ -1083,7 +1088,6 @@ window.build_multi_entries_closed_by_day_chart = () =>
 
       window.updateGraph = (label, barGraphName, e) ->
 
-        console.log(barGraphName, this)
         originalData = []
 
         if barGraphName == 'userTicketClosedGraph'
@@ -1168,7 +1172,8 @@ window.build_multi_ticket_resolution_by_owner_chart = () ->
             }
           ]
         options:
-          hover: {mode:null}
+          hover:
+            mode: null
           animation:
             onProgress: () ->
               type = 'vertical'
@@ -1192,7 +1197,7 @@ window.build_multi_ticket_resolution_by_owner_chart = () ->
             ]
             xAxes: [
               {
-                categoryPercentage: 1.0
+#                categoryPercentage: 1.0
                 gridLines: display: false
               }
             ]
@@ -1268,7 +1273,8 @@ window.build_multi_entries_closed_by_owners_chart = () ->
               data: ticketEntriesByOwner
             } ]
           options:
-            hover: {mode:null}
+            hover:
+              mode: null
             animation:
               onProgress: () ->
                 setDataPoint(this)
@@ -1366,7 +1372,8 @@ window.build_multi_average_time_to_close_tickets = () ->
               data: avgTimeToCloseTickets
             } ]
           options:
-            hover: {mode:null}
+            hover:
+              mode: null
             animation:
               onProgress: () ->
                 setDataPoint(this)
@@ -1455,7 +1462,8 @@ window.build_multi_rulehits_for_fp_res_chart = () ->
               data: totalRuleHits
             } ]
           options:
-            hover: {mode:null}
+            hover:
+              mode: null
             animation:
               onProgress: () ->
             responsive: true
