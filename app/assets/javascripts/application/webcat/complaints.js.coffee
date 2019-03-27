@@ -755,7 +755,7 @@ format = (complaint_entry_row) ->
   input_cat = 'input_cat_' + complaint_entry.entry_id
 
   if complaint_entry.status == "PENDING"
-    complaint_table_row_html = '<table class="active_table"><tr><td class="no_pad"><div class="row">'
+    complaint_table_row_html = '<table class="active_table"><tr class="pending"><td class="no_pad"><div class="row">'
     complaint_submission_html =
         '<input type="radio" name="resolution_review_' + complaint_entry.entry_id + '" value="commit" > Commit <br/>' +
         '<input type="radio" name="resolution_review_' + complaint_entry.entry_id + '" value="decline" checked="checked"> Decline' +
@@ -979,10 +979,12 @@ window.click_table_buttons = (complaint_table, button)->
       options: AC.WebCat.createSelectOptions(),
       items: selected_options(row.data().category),
       onItemAdd: ->
-        if !$(this)[0].$input.hasClass('pending')
+        if verifyMasterSubmit() == true
           $('#master-submit').prop('disabled', false)
       onItemRemove: ->
-        if $(this)[0].items.length == 0
+        if verifyMasterSubmit() == true
+          $('#master-submit').prop('disabled', false)
+        else
           $('#master-submit').prop('disabled', true)
     }
     # Check to see which columns should be displayed
@@ -1420,9 +1422,12 @@ window.master_submit = () ->
 
 window.verifyMasterSubmit = () ->
   boolean = false
-  if $('.active_master_submit').length > 0 && $('.has-items').length > 0
-    boolean = true
+  if $('.shown').length > 0 && $('.has-items').length > 0
+    $('.has-items').each ->
+      if (!$(this).closest('tr').hasClass("pending"))
+        boolean = true
   return boolean
+
 $ ->
   $('#cat_new_url_modal').on 'shown.bs.modal', ->
     $('#url_1').focus()
