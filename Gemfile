@@ -27,7 +27,7 @@ gem 'devise', '~> 4.5'
 gem 'net-ldap', '0.16.1'
 gem 'httpi', '2.4.4'
 gem 'her', '1.0.3'
-gem 'curb', '0.9.6' #Libcurl bindings for Ruby
+gem 'curb', '0.9.8' #Libcurl bindings for Ruby
 gem 'net-ssh', '5.0.2'
 gem 'peake-bridge-client', '>= 0.0.9.0', git: "https://git.vrt.sourcefire.com/talosweb/peake-bridge-client.git"
 gem 'stomp', '1.4.6'
@@ -39,7 +39,6 @@ gem 'bugzilla', require: 'bugzilla'
 
 gem 'xmlrpc'
 gem 'libv8', '3.16.14.19'
-
 
 
 gem 'rails_admin', '~> 1.3'
