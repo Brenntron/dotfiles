@@ -489,7 +489,7 @@ class Dispute < ApplicationRecord
 
           false_negative_claim = false
 
-          if ["Suspicious sites", "High risk"].include?(entry[:sbrs]["rep_sugg"])
+          if ["Suspicious sites", "High risk","Poor"].include?(entry[:sbrs]["rep_sugg"])
             false_negative_claim = true
           end
 
@@ -571,7 +571,7 @@ class Dispute < ApplicationRecord
 
           false_negative_claim = false
 
-          if ["Suspicious sites", "High risk"].include?(entry["rep_sugg"])
+          if ["Suspicious sites", "High risk","Poor"].include?(entry["rep_sugg"])
             false_negative_claim = true
           end
 
