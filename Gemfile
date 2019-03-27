@@ -31,7 +31,6 @@ gem 'curb', '0.9.8' #Libcurl bindings for Ruby
 gem 'net-ssh', '5.0.2'
 gem 'peake-bridge-client', '>= 0.0.9.0', git: "https://git.vrt.sourcefire.com/talosweb/peake-bridge-client.git"
 gem 'stomp', '1.4.6'
-gem 'rule_test_api', path: './vendor/gems/rule_test_api'
 gem 'aws-sdk', '2.11.170'
 
 gem 'mysql2', '0.5.2'

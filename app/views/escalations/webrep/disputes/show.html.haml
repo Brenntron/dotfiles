@@ -45,9 +45,11 @@
                             =select_tag :index_target_assignee, options_from_collection_for_select(User.joins(roles: :org_subset).where(org_subsets: { name: 'webrep' }).distinct.order(:cvs_username), :id, :cvs_username), class: 'toolbar-select'
                           %button{class: 'primary', type:'button', id: 'button_reassign', onclick:'toolbar_show_change_assignee();'}
                             Assign
-                          - if (@dispute.assignee != 'Unassigned')
-                            %button{class: 'secondary', type: 'button', id: 'unassign-dispute-button', onclick: 'toolbar_unassign_dispute();'}
-                              Unassign
+
+          - if (@dispute.assignee != 'Unassigned')
+            .container_unassign
+              %button{class: 'secondary ticket-owner-unassigned-button', type: 'button', id: 'unassign-dispute-button', onclick: 'toolbar_unassign_dispute();'}
+                Unassign
 
     .col-xs-3.col-with-divider
       .dispute-status-col-wrapper
@@ -62,7 +64,7 @@
                 NEW
               - else
                 = @dispute.status
-                
+
             - if can? :update, Dispute
               .dropdown-menu.inline-dropdown-menu#show-edit-ticket-status-dropdown{'aria-labelledby': 'show-edit-ticket-status-button'}
                 %ul

@@ -138,6 +138,7 @@ window.populate_webrep_index_table = (data = {}, reload = false) ->
   , this)
 
 window.advanced_webrep_index_table = () ->
+
   form = $('#disputes-advanced-search-form')
   submission_types = []
   if form.find('input[name="advanced_search[submission_type]"][value="w"]').is(':checked')
@@ -307,49 +308,6 @@ window.popup_response_error =(response, prefix) ->
   alert(prefix + "\n" + errormsg)
 
 
-window.row_research_adjust_wlbl_button =(button_tag) ->
-  list_types = $('.wl-bl-list-inline:checkbox:checked').map(() ->
-    this.value
-  ).toArray()
-  wlbl_form = button_tag.form;
-
-  data = {
-    'urls': [ wlbl_form.getElementsByClassName('dispute-entry-content')[0].value ]
-    'trgt_list': list_types
-    'note': wlbl_form.getElementsByClassName('note-input')[0].value
-  }
-
-  std_msg_ajax(
-    url: '/escalations/api/v1/escalations/webrep/disputes/uri_wlbl'
-    method: 'POST'
-    data: data
-    error_prefix: 'Error adjusting WL/BL.'
-    success_reload: true
-  )
-
-window.research_toolbar_adjust_wlbl_button =(button_tag) ->
-  urls = []
-  urls = $('.wlbl-entry-content')
-  list_types = $('.wl-bl-list-inline:checkbox:checked').map(() ->
-    this.value
-  ).toArray()
-
-  wlbl_form = button_tag.form
-
-  data = {
-    'urls': [ url ]
-    'trgt_list': list_types
-    'note': wlbl_form.getElementsByClassName('adjust-wlbl-input')[0].value
-  }
-
-  std_msg_ajax(
-    url: '/escalations/api/v1/escalations/webrep/disputes/uri_wlbl'
-    method: 'POST'
-    data: data
-    error_prefix: 'Error adjusting WL/BL.'
-    success_reload: true
-  )
-
 window.save_dispute = () ->
   data = {
     'priority': $('#dispute-priority-select').val()
@@ -367,340 +325,6 @@ window.save_dispute = () ->
     success_reload: true
   )
 
-# Populating the in line Adjust Reptool button for research page and research tab
-window.inline_load_reptool_button =(button_tag) ->
-  #debugger
-  adjust_form = button_tag.parentElement.getElementsByClassName('adjust-reptool-form')[0]
-  submit_button = adjust_form.getElementsByClassName('dropdown-submit-button')
-  #$(submit_button).attr("disabled", false)
-
-  #button_tag.parentElement.getElementsByClassName('adjust-reptool-form')[0].getElementsByClassName('dropdown-submit-button')
-
-  #dropdown = $('#reptool_adjust_entries').parent()
-
-  show_content = $(adjust_form).find('.entry-dispute-name')
-  show_rep_class = $(adjust_form).find('.entry-reptool-class')
-  show_rep_exp = $(adjust_form).find('.entry-reptool-expiration')
-  action_input = $(adjust_form).find('.action-input')
-  classifications_input = $(adjust_form).find('.classifications-input')
-  comment_input = $(adjust_form).find('.comment-input')
-  data = {
-# Send entry content to reptool
-    'entry' : adjust_form.getElementsByClassName('dispute-entry-content')[0].value
-  }
-
-  headers = {'Token': $('input[name="token"]').val(), 'Xmlrpc-Token': $('input[name="xml_token"]').val()}
-  $.ajax(
-    url: '/escalations/api/v1/escalations/webrep/disputes/reptool_get_info_for_form'
-    method: 'GET'
-    headers: headers
-    data: data
-    dataType: 'json'
-    success: (response) ->
-      response = JSON.parse(response)
-
-      show_content.text(adjust_form.getElementsByClassName('dispute-entry-content')[0].value)
-      show_rep_class.text(response.classification)
-      show_rep_exp.text(response.expiration)
-      action_input.val(response.status)
-      classifications_input.val(response.classification)
-      comment_input.val(response.comment)
-      $(submit_button).attr('disabled', false)
-#          window.location.reload()
-    error: (response) ->
-      popup_response_error(response, 'Error retrieving Reptool Data')
-  )
-
-
-
-window.row_adust_reptool_bl_button =(button_tag) ->
-  reptool_bl_form = button_tag.form
-  data = {
-    'action': reptool_bl_form.getElementsByClassName('action-input')[0].value
-    'dispute_entry_ids': [ reptool_bl_form.getElementsByClassName('dispute-entry-id')[0].value ]
-    'classifications': [ reptool_bl_form.getElementsByClassName('classifications-input')[0].value ]
-    'comment': reptool_bl_form.getElementsByClassName('comment-input')[0].value
-  }
-  headers = {'Token': $('input[name="token"]').val(), 'Xmlrpc-Token': $('input[name="xml_token"]').val()}
-  $.ajax(
-    url: '/escalations/api/v1/escalations/webrep/disputes/reptool_bl'
-    method: 'POST'
-    headers: headers
-    data: data
-    dataType: 'json'
-    success: (response) ->
-      window.location.reload()
-    error: (response) ->
-      if response.responseJSON == undefined
-        response_lines = response.responseText.split("\n")
-        if 2 < response_lines.length
-          errormsg = [response_lines[0], response_lines[1]]
-        else
-          errormsg = [response.responseText]
-      else if response.responseJSON.error != undefined
-        errormsg = [response.responseJSON.error]
-      else
-        errormsg = [response.responseText]
-      std_msg_error('reptool wl/bl adjustment error', ['Error adjusting WL/BL'].concat(errormsg) )
-  )
-
-window.row_adust_reptool_bl_button_research =(button_tag) ->
-  reptool_bl_form = button_tag.form
-
-  data = {
-    'action': reptool_bl_form.getElementsByClassName('action-input')[0].value
-    'entries': [ reptool_bl_form.getElementsByClassName('dispute-entry-content')[0].value ]
-    'classifications': [ reptool_bl_form.getElementsByClassName('classifications-input')[0].value ]
-    'comment': reptool_bl_form.getElementsByClassName('comment-input')[0].value
-  }
-  headers = {'Token': $('input[name="token"]').val(), 'Xmlrpc-Token': $('input[name="xml_token"]').val()}
-  $.ajax(
-    url: '/escalations/api/v1/escalations/webrep/disputes/reptool_bl'
-    method: 'POST'
-    headers: headers
-    popup_response_error(response, 'Error adjusting WL/BL')
-  )
-
-
-
-$ ->
-  ## Bulk Reptool form manipulation based on user's selections
-  bulk_reptool_menu = $('#reptool_adjust_entries')
-  submission_actions = bulk_reptool_menu.find("input[name='reptool-action-radio']")
-  reptool_submit = $('#reptool_adjust_entries').find('.dropdown-submit-button')
-
-  # Get submission action, show relavent pieces of the form
-  submission_actions.click ->
-    action = $(this).val()
-    if action == 'reptool-maintain'
-      $('#reptool-classifications-row').show()
-      $('#reptool-class-radio-row').show()
-    else if action == 'reptool-override'
-      $('#reptool-classifications-row').show()
-      $('#reptool-class-radio-row').hide()
-    else if action == 'reptool-drop'
-      $('#reptool-classifications-row').hide()
-      $('#reptool-class-radio-row').hide()
-      $(reptool_submit[0]).attr('disabled', false)
-
-  # If user is not dropping all categories they need to select new ones to drop or add
-  bulk_reptool_menu.find('.reptool-class-cb').click ->
-    if submission_actions.val() == 'reptool-maintain' || submission_actions.val() == 'reptool-override'
-      if bulk_reptool_menu.find('.reptool-class-cb:checked').length > 0
-        $(reptool_submit[0]).attr('disabled', false)
-      else
-        $(reptool_submit[0]).attr('disabled', true)
-
-
-# Submit Bulk changes to Reptool
-window.submit_bulk_reptool = () ->
-  bulk_reptool_menu = $('#reptool_adjust_entries')
-  submission_action = $("input[name='reptool-action-radio']:checked").val()
-
-  checked_classes = []
-  #  Get all checked classifications
-  if $(bulk_reptool_menu).find('.reptool-class-cb:checked').length > 0
-    $(bulk_reptool_menu).find('.reptool-class-cb:checked').each ->
-      checked_classes.push($(this).val())
-  # Convert to string for data submission
-  reptool_classes = checked_classes.join()
-
-  classification_action = $("input[name='reptool-classes-radio']:checked").val()
-  comment = bulk_reptool_menu.find('.dropdown-comment').val()
-
-  #  Get the entries
-  entry_rows = $(bulk_reptool_menu).find('.reptool-entry-row')
-  entries = []
-
-  current_entries_and_classes = []
-  $(entry_rows).each ->
-    entry = $(this).find('.reptool-entry-name')[0]
-    entries.push($(entry).text())
-    current_classes = $($(this).find('.reptool-entry-class')[0]).attr('data-classification')
-    current_entries_and_classes.push {
-      'entry': $(entry).text()
-      'classifications': current_classes
-    }
-
-  # If user wants to override existing classes we only need what they've checked
-  if submission_action == "reptool-override"
-    data = {
-      'action': 'ACTIVE'
-      'entries': entries
-      'classifications': reptool_classes 
-      'comment': comment
-    }
-  else if submission_action == "reptool-drop"
-    data = {
-      'action': 'EXPIRED'
-      'entries': entries
-      'comment': comment
-    }
-  else if submission_action == "reptool-maintain"
-# currently set up for 1 entry to work fine, or if all entries have identical current classes
-    new_classifications = ''
-    array_of_datas = []
-    if classification_action == 'add'
-      $(current_entries_and_classes).each ->
-        if this.classifications.length > 0
-          new_classifications = this.classifications
-
-          new_classifications_array = new_classifications.split(',')
-          reptool_classes_array = reptool_classes.split(',')
-
-          filtered = reptool_classes_array.filter((x) ->
-            new_classifications_array.indexOf(x) < 0
-          )
-          
-          reptool_classes = filtered.join()
-
-          new_classifications = new_classifications + ',' + reptool_classes
-
-          temp_data = {
-            'action': 'ACTIVE'
-            'entries': [this.entry]
-            'classifications': [new_classifications]
-            'comment': comment
-          }
-          array_of_datas.push(temp_data)
-        else
-          new_classifications = reptool_classes
-
-          temp_data = {
-            'action': 'ACTIVE'
-            'entries': [this.entry]
-            'classifications': [new_classifications]
-            'comment': comment
-          }
-          array_of_datas.push(temp_data)
-
-        data = array_of_datas
-    else
-      $(current_entries_and_classes).each ->
-        current = this.classifications.split(',')
-        subtracted = current.filter((x) ->
-          checked_classes.indexOf(x) < 0
-        )
-        new_classifications = subtracted.join()
-
-        if new_classifications.length > 0
-          temp_data = {
-            'action': 'ACTIVE'
-            'entries': [this.entry]
-            'classifications': [new_classifications]
-            'comment': comment
-          }
-          array_of_datas.push(temp_data)
-          data = array_of_datas
-        else
-          submission_action == "reptool-drop"
-
-          temp_data = {
-            'action': 'expired'
-            'entries': [this.entry]
-          }
-          array_of_datas.push(temp_data)
-          data = array_of_datas
-
-  # send separate api calls for each type of submission
-
-  if submission_action == "reptool-override"
-    std_msg_ajax(
-      url: '/escalations/api/v1/escalations/webrep/disputes/reptool_bl'
-      method: 'POST'
-      data: data
-      success: (response) ->
-        std_msg_success('These RepTool classes (' + reptool_classes.replace(/,/g, ', ') + ') are assigned to the following entries:', [entries])
-      error: (response) ->
-        if response.responseJSON == undefined
-          response_lines = response.responseText.split("\n")
-          if 2 < response_lines.length
-            errormsg = [response_lines[0], response_lines[1]]
-          else
-            errormsg = [response.responseText]
-        else if response.responseJSON.error != undefined
-          errormsg = [response.responseJSON.error]
-        else
-          errormsg = [response.responseText]
-        std_msg_error('Error', ['Error adjusting WL/BL'].concat(errormsg) )
-    )
-  else if submission_action == "reptool-maintain"
-    std_msg_ajax(
-      url: '/escalations/api/v1/escalations/webrep/disputes/maintain_reptool_bl'
-      method: 'POST'
-      data: {data: data}
-      success: (response) ->
-        std_msg_success('These RepTool classes (' + reptool_classes.replace(/,/g, ', ') + ') were changed on the following entries:', [entries])
-      error: (response) ->
-        if response.responseJSON == undefined
-          response_lines = response.responseText.split("\n")
-          if 2 < response_lines.length
-            errormsg = [response_lines[0], response_lines[1]]
-          else
-            errormsg = [response.responseText]
-        else if response.responseJSON.error != undefined
-          errormsg = [response.responseJSON.error]
-        else
-          errormsg = [response.responseText]
-        std_msg_error('Error', ['Error adjusting WL/BL'].concat(errormsg) )
-    )
-  else if submission_action == "reptool-drop"
-    std_msg_ajax(
-      url: '/escalations/api/v1/escalations/webrep/disputes/drop_reptool_bl'
-      method: 'POST'
-      data: data
-      success: (response) ->
-        std_msg_success('All RepTool classes have been removed from the following entries:', [entries])
-      error: (response) ->
-        if response.responseJSON == undefined
-          response_lines = response.responseText.split("\n")
-          if 2 < response_lines.length
-            errormsg = [response_lines[0], response_lines[1]]
-          else
-            errormsg = [response.responseText]
-        else if response.responseJSON.error != undefined
-          errormsg = [response.responseJSON.error]
-        else
-          errormsg = [response.responseText]
-        std_msg_error('Error', ['Error adjusting WL/BL'].concat(errormsg) )
-    )
-
-
-
-window.toolbar_adjust_reptool_bl_button_research =(button_tag) ->
-  checked_url = $('.dispute_check_box:checked')[0]
-  entry_row = $(checked_url).parents('.research-table-row')[0]
-  url = $(entry_row).find('.entry-data-content').text()
-
-  reptool_bl_form = button_tag.form
-  data = {
-    'action': reptool_bl_form.getElementsByClassName('action-input')[0].value
-    'entries': [ url ]
-    'classifications': [ reptool_bl_form.getElementsByClassName('classifications-input')[0].value ]
-    'comment': reptool_bl_form.getElementsByClassName('comment-input')[0].value
-  }
-  headers = {'Token': $('input[name="token"]').val(), 'Xmlrpc-Token': $('input[name="xml_token"]').val()}
-  $.ajax(
-    url: '/escalations/api/v1/escalations/webrep/disputes/reptool_bl'
-    method: 'POST'
-    headers: headers
-    data: data
-    dataType: 'json'
-    success: (response) ->
-      window.location.reload()
-    error: (response) ->
-      if response.responseJSON == undefined
-        response_lines = response.responseText.split("\n")
-        if 2 < response_lines.length
-          errormsg = [response_lines[0], response_lines[1]]
-        else
-          errormsg = [response.responseText]
-      else if response.responseJSON.error != undefined
-        errormsg = [response.responseJSON.error]
-      else
-        errormsg = [response.responseText]
-      std_msg_error('Error', ['Error adjusting WL/BL'] + errormsg)
-  )
 
 window.toolbar_index_edit_status = () ->
   statusName = $('input[name=entry-status]:checked').val()
@@ -1270,7 +894,6 @@ $ ->
           $('#index-ticket-resolution-submenu').hide()
           $(res_comment[0]).val('')
     else
-      $(dropdown).removeClass('open')
       std_msg_error('No rows selected', ['Please select at least one row.'])
 
   # Edit Entry: Edit Entry Status
@@ -1412,19 +1035,19 @@ $ ->
             else
               dispute_latency = '<span class="ticket-age-over3hr">' + data + '</span>'
             if hours > 12
-              dispute_latency = '<span class="overdue">' + data + '</span>'
+              dispute_latency = '<span class="ticket-age-over12hr">' + data + '</span>'
           else
-            dispute_latency = '<span class="overdue">' + data + '</span>'
+            dispute_latency = '<span class="ticket-age-over12hr">' + data + '</span>'
           if dispute_duration.includes('day')
             day = parseInt(data.replace(/[^0-9]/g, ''))
             if day >= 1
-              dispute_latency = '<span class="overdue">' + data + '</span>'
+              dispute_latency = '<span class="ticket-age-over12hr">' + data + '</span>'
           if dispute_duration.includes('months')
             month = parseInt(data.replace(/[^0-9]/g, ''))
-            dispute_latency = '<span class="overdue">' + data + '</span>'
+            dispute_latency = '<span class="ticket-age-over12hr">' + data + '</span>'
           if dispute_duration.includes('year')
             year = parseInt(data.replace(/[^0-9]/g, ''))
-            dispute_latency = '<span class="overdue">' + data + '</span>'
+            dispute_latency = '<span class="ticket-age-over12hr">' + data + '</span>'
           dispute_latency
       }
       { data: 'source' }
@@ -1494,7 +1117,7 @@ $ ->
       if this.entry.sbrs_score != null
         sbrs_score = this.entry.sbrs_score
       else sbrs_score = missing_data
-      entry_row = '<tr class="index-entry-row">' + '<td><input type="checkbox" onclick="toggleRow(this)" class="dispute-entry-checkbox dispute-entry-checkbox_' + dispute.id + '" id= ' + dispute_entry_id + ' ></td>' + '<td class="entry-col-content ' + important + '">' + entry_content + '</td>' +
+      entry_row = '<tr class="index-entry-row" data-case-id="0000' + dispute.id + '">' + '<td><input type="checkbox" onclick="toggleRow(this)" class="dispute-entry-checkbox dispute-entry-checkbox_' + dispute.id + '" id= ' + dispute_entry_id + ' ></td>' + '<td class="entry-col-content ' + important + '">' + entry_content + '</td>' +
         '<td class="entry-col-status">' + status + '</td>' +
         resolution_col +
         '<td class="entry-col-disp">' + suggested_disposition + '</td>' +
@@ -1803,105 +1426,9 @@ $ ->
     else
       alert('No disputes selected')
 
-# Inline WLBL Adjust Button
-  $('.bfrp-inline-wlbl-button').click ->
-#    Get entry content
-    research_row = $(this).parents('.research-table-row')[0]
-    entry_wrapper = $(research_row).find('.entry-data-content')[0]
-    entry_content = $(entry_wrapper).text()
-    wbrs = $($(research_row).find('.entry-data-wbrs-score')[0]).text()
-
-#    Define fields that need to be filled out in the dropdown
-    dropdown = $(this).next('.dropdown-menu')[0]
-    wlbl_list = $(dropdown).find('.wlbl-entry-wlbl')
-    wbrs_score = $(dropdown).find('.wlbl-current-entry-wbrs')
-    submit_button = $(dropdown).find('.dropdown-submit-button')
-    wl_weak = $(dropdown).find('.wl-weak-checkbox')
-    wl_med = $(dropdown).find('.wl-med-checkbox')
-    wl_heavy = $(dropdown).find('.wl-heavy-checkbox')
-    bl_weak = $(dropdown).find('.bl-weak-checkbox')
-    bl_med = $(dropdown).find('.bl-med-checkbox')
-    bl_heavy = $(dropdown).find('.bl-heavy-checkbox')
-
-#   Clearing data to start in case user has page open for a while and data needs to be regrabbed
-    $(wlbl_list[0]).empty()
-    $(wbrs_score[0]).empty()
-    $(wl_weak[0]).prop('checked', false)
-    $(wl_med[0]).prop('checked', false)
-    $(wl_heavy[0]).prop('checked', false)
-    $(bl_weak[0]).prop('checked', false)
-    $(bl_med[0]).prop('checked', false)
-    $(bl_heavy[0]).prop('checked', false)
-    wl_weak_status = 'false'
-    wl_med_status = 'false'
-    wl_heavy_status = 'false'
-    bl_weak_status = 'false'
-    bl_med_status = 'false'
-    bl_heavy_status = 'false'
-
-#    Initializing 'current' status of lists to be filled in when data is fetched
-    initial_wl_weak_status = ''
-    initial_wl_med_status = ''
-    initial_wl_heavy_status = ''
-    initial_bl_weak_status = ''
-    initial_bl_med_status = ''
-    initial_bl_heavy_status = ''
-
-    data = {
-#   Send entry content to wbrs
-      'entry' : entry_content
-    }
-
-    headers = {'Token': $('input[name="token"]').val(), 'Xmlrpc-Token': $('input[name="xml_token"]').val()}
-    $.ajax(
-      url: '/escalations/api/v1/escalations/webrep/disputes/rule_ui_wlbl_get_info_for_form'
-      method: 'GET'
-      headers: headers
-      data: data
-      dataType: 'json'
-      success: (response) ->
-      #values will be in the format of BL-med, BL-weak, BL-heavy   (same with WL)
-
-        response = JSON.parse(response)
-        if response.data != ""
-          $(response.data).each ->
-            if String(this) == 'WL-weak'
-              $(wl_weak[0]).prop('checked', true)
-              wl_weak_status = 'true'
-              initial_wl_weak_status = wl_weak_status
-            if String(this) == 'WL-med'
-              $(wl_med[0]).prop('checked', true)
-              wl_med_status = 'true'
-              initial_wl_med_status = wl_med_status
-            if String(this) == 'WL-heavy'
-              $(wl_heavy[0]).prop('checked', true)
-              wl_heavy_status = 'true'
-              initial_wl_heavy_status = wl_heavy_status
-            if String(this) == 'BL-weak'
-              $(bl_weak[0]).prop('checked', true)
-              bl_weak_status = 'true'
-              initial_bl_weak_stats = bl_weak_status
-            if String(this) == 'BL-med'
-              $(bl_med[0]).prop('checked', true)
-              bl_med_status = 'true'
-              initial_bl_med_status = bl_med_status
-            if String(this) == 'BL-heavy'
-              $(bl_heavy[0]).prop('checked', true)
-              bl_heavy_status = 'true'
-              initial_bl_heavy_status = bl_heavy_status
-
-          $(wbrs_score).text(wbrs)
-          $(wlbl_list[0]).text(response.data)
-          $(submit_button[0]).attr('disabled', false)
-        else
-          $(wbrs_score).text(wbrs)
-          $(wlbl_list[0]).text('Not on a list')
-          $(submit_button[0]).attr('disabled', false)
 
 
-      error: (response) ->
-        popup_response_error(response, 'Error retrieving WL/BL Data')
-    )
+
 
 window.populate_entry_status_dropdown = (dispute_id) ->
   std_msg_ajax(
@@ -1933,7 +1460,6 @@ window.disputes_select_all_check_box = () ->
   $('.dispute_check_box').prop('checked', $('#disputes_check_box').prop('checked'))
 
 $ ->
-
   $('#advanced-search-button').click ->
     $('#advanced-search-dropdown').show()
 
@@ -1961,9 +1487,6 @@ $ ->
         'maxWidth': 500
       $(this).tooltipster 'show'
     return
-    
-
-
 
 
   ####### Bar chart for Ticket Entries by Ticket Type
@@ -3031,62 +2554,3 @@ $ ->
         $(g_ew_rows).each ->
           unless $(this).hasClass('hidden')
             $(this).addClass('hidden')
-
-
-
-#    If user changes buttons from initial status, enable the submit button
-#   TODO add this check in later that only allows user to submit if there have been changes made
-
-window.wlbl_history_dialog = (id) ->
-
-  if isFinite(id)
-    data = {'id': id}
-  else
-    data = {'entry': id}
-
-  headers = {'Token': $('input[name="token"]').val(), 'Xmlrpc-Token': $('input[name="xml_token"]').val()}
-  $.ajax(
-    url: '/escalations/api/v1/escalations/webrep/disputes/wlbl_history'
-    method: 'GET'
-    headers: headers
-    data: data
-    success: (response) ->
-      json = $.parseJSON(response)
-      if json.error
-        notice_html = "<p>Something went wrong: #{json.error}</p>"
-        alert(json.error)
-      else
-#      #parse this json properly
-        history_dialog_content = '<div class="dialog-content-wrapper">' +
-          '<table class="history-table"><thead><tr><th>WL/BL Result</th><th>State</th><th>Comment</th><th>Date</th></tr></thead>' +
-          '<tbody>'
-        for entry in json.data
-          entry_string = "" +
-          '<tr>' +
-          '<td>' + entry.list_type + '</td>' +
-          '<td>' + entry.state + '</td>' +
-          '<td>' + entry.note + '</td>' +
-          '<td>' + entry.date + '</td>' +
-          '</tr>'
-          history_dialog_content += entry_string
-
-        history_dialog_content += '</tbody></table>'
-#
-        if $("#history_dialog").length
-          history_dialog = this
-          $("#history_dialog").html(history_dialog_content)
-          $('#history_dialog').dialog('open')
-        else
-          history_dialog = '<div id="history_dialog" title="WL/BL History"></div>'
-          $('body').append(history_dialog)
-          $("#history_dialog").html(history_dialog_content)
-          #$('#history_dialog').append(history_dialog_content)
-          $('#history_dialog').dialog
-            autoOpen: false
-            minWidth: 600
-            position: { my: "right top", at: "right top", of: window }
-          $('#history_dialog').dialog('open')#
-    error: (response) ->
-      notice_html = "<p>Something went wrong: #{response.responseText}</p>"
-  , this)
-

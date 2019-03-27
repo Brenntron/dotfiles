@@ -66,6 +66,19 @@ module API
 
             end
 
+            desc 'project new score'
+            params do
+              requires :url, type: String
+              requires :add, type: Array(String)
+              requires :remove, type: Array(String)
+            end
+
+            post "project_new_score" do
+              new_score = Wbrs::ManualWlbl.project_new_score(permitted_params[:url], permitted_params[:add], permitted_params[:remove])
+              data = {status: "success", score: new_score}
+              data.to_json
+            end
+
             desc 'create a dispute'
             params do
               requires :ips_urls, type: String, desc: 'List of URLs to create entries'
@@ -607,7 +620,7 @@ module API
                 rescue
                   expiration = information[params[:entry].gsub('http://', '').gsub('https://', '')]["expiration"]
                 end
-                return {:entry => params[:entry], :classification => information[params[:entry].gsub('http://', '').gsub('https://', '')]["classifications"].first, :expiration => expiration, :status => information[params[:entry].gsub('http://', '').gsub('https://', '')]["status"], :comment => information[params[:entry].gsub('http://', '').gsub('https://', '')]["metadata"]["VRT"]["comment"]}.to_json
+                return {:entry => params[:entry], :classification => information[params[:entry].gsub('http://', '').gsub('https://', '')]["classifications"], :expiration => expiration, :status => information[params[:entry].gsub('http://', '').gsub('https://', '')]["status"], :comment => information[params[:entry].gsub('http://', '').gsub('https://', '')]["metadata"]["VRT"]["comment"]}.to_json
               end
 
             end
@@ -676,7 +689,7 @@ module API
             post 'bulk_rule_ui_wlbl_get_info_for_form' do
               std_api_v2 do
 
-                params[:entries] = params[:entries].map {|entry| entry.strip}
+                params[:entries] = params[:entries].map {|entry| DisputeEntry.domain_of_with_path(entry.strip)}
 
                 data = []
                 list_types = {}
@@ -687,7 +700,7 @@ module API
                   api_responses = Wbrs::ManualWlbl.where({:url => entry})
 
                   api_responses.each do |response|
-                    if response.url == entry
+                    if DisputeEntry.domain_of_with_path(response.url) == entry
                       if response.state == "active"
                         list_types[entry] << response.list_type
                       end
@@ -732,9 +745,12 @@ module API
             post 'bulk_rule_ui_wlbl_add' do
               std_api_v2 do
                 authorize!(:update, Wbrs::ManualWlbl)
+                parsed_ip_uris = permitted_params['ip_uris'].map{|ip_uri| DisputeEntry.domain_of_with_path(ip_uri).strip}
+                unique_ip_uris = parsed_ip_uris.uniq
+
                 wlbl_params =
                     {
-                        urls: permitted_params['ip_uris'].map {|ip_uri| ip_uri.strip},
+                        urls: unique_ip_uris,
                         trgt_list: permitted_params['list_types'],
                         note: permitted_params['note'],
                         usr: current_user.cvs_username
