@@ -13,13 +13,13 @@ window.updateURI = (complaint_entry_id) ->
     data: {complaint_entry_id: complaint_entry_id, uri: uri }
     success: (response) ->
       {json} = response
-      {current_categories, domain, subdomain} = json
+      {current_categories, domain, subdomain, status} = json
 
       $('#loader-modal').modal 'hide'
 
       $(".simple-nested-table##{complaint_entry_id} tbody > tr").remove()
 
-      if 'ip' == response.json.status
+      if 'ip' == status
         std_msg_error("Cannot edit IP entries.","")
       else
         $.each current_categories, (key, entry) ->
