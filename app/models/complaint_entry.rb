@@ -113,7 +113,7 @@ class ComplaintEntry < ApplicationRecord
                       current_user,
                       commit_pending)
     categories = categories_string&.split(',')
-    #ActiveRecord::Base.transaction do
+    ActiveRecord::Base.transaction do
       # If the prefix is a high telemetry value then the status needs to be set to PENDING
       if self.is_important && entry_status != Complaint::RESOLUTION_UNCHANGED
         if self.status == "PENDING"
@@ -185,7 +185,7 @@ class ComplaintEntry < ApplicationRecord
         cat_from_wbrs = self.set_current_category
         update(url_primary_category: cat_from_wbrs, category: cat_from_wbrs)
       end
-    #end
+    end
   end
 
   def commit_category(ip_or_uri:, categories_string:, description:, user:, casenumber: nil)
