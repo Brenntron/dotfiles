@@ -293,6 +293,8 @@ window.updateEntryColumns = (entry_id,row_id) ->
       data: {'id': entry_id,'prefix': prefix,'categories':categories, 'category_names':category_names, 'status':status,'comment':comment, 'resolution_comment': resolution_comment }
       success: (response) ->
         json = $.parseJSON(response)
+        {uri, domain, subdomain} = json
+
         if !json.error
           table = $('#complaints-index').DataTable()
 
@@ -330,11 +332,11 @@ window.updateEntryColumns = (entry_id,row_id) ->
             items: selected_options(temp_row.data().category_names)
           }
 
-          $("#complaint_prefix_#{entry_id}").val(json.uri)
-          $("#domain_#{entry_id}").text(json.domain)
-          $("#subdomain_#{entry_id}").text(json.subdomain)
-          $("#entry-uri-#{entry_id}").html("<a href='http://#{json.uri}' target='_blank' onclick='select_cat_text_field(#{entry_id})' >#{json.uri}</a>")
-          $("#site-search-#{entry_id}").html("<a href='https://www.google.com/search?q=site%3A#{json.uri}' target='_blank' onclick='select_cat_text_field(#{entry_id})'>#{json.uri}</a>")
+          $("#complaint_prefix_#{entry_id}").val(uri)
+          $("#domain_#{entry_id}").text(domain)
+          $("#subdomain_#{entry_id}").text(subdomain)
+          $("#entry-uri-#{entry_id}").html("<a href='http://#{uri}' target='_blank' onclick='select_cat_text_field(#{entry_id})' >#{uri}</a>")
+          $("#site-search-#{entry_id}").html("<a href='https://www.google.com/search?q=site%3A#{uri}' target='_blank' onclick='select_cat_text_field(#{entry_id})'>#{uri}</a>")
 
         tds = $('#complaints-index tbody').closest('td')
         for td in tds
