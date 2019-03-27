@@ -190,13 +190,12 @@ class ComplaintEntry < ApplicationRecord
     # Look for existing prefix
 
     existing_prefixes = Wbrs::Prefix.where({urls: [ip_or_uri]})
+
     existing_prefix = nil
     if existing_prefixes.present?
       existing_prefixes.each do |prefix_found|
-        if prefix_found.subdomain == self.subdomain
-          if prefix_found.path == self.path
-            existing_prefix = prefix_found
-          end
+        if (prefix_found.subdomain == self.subdomain && prefix_found.path == self.path) || (prefix_found.path == '' && self.path == nil)
+          existing_prefix = prefix_found
         end
       end
     end
@@ -207,7 +206,11 @@ class ComplaintEntry < ApplicationRecord
       prefix_object = Wbrs::Prefix.new
       prefix_object.set_categories(category_ids_array, prefix_id: existing_prefix.prefix_id, user: user, description: description)
     else
-      Wbrs::Prefix.create_from_url(url: ip_or_uri, categories: category_ids_array, user: user, description: description)
+      if self.path.present?
+        Wbrs::Prefix.create_from_url(url: ip_or_uri + self.path, categories: category_ids_array, user: user, description: description)
+      else
+        Wbrs::Prefix.create_from_url(url: ip_or_uri, categories: category_ids_array, user: user, description: description)
+      end
     end
   end
 

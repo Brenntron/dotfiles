@@ -755,11 +755,13 @@ format = (complaint_entry_row) ->
   input_cat = 'input_cat_' + complaint_entry.entry_id
 
   if complaint_entry.status == "PENDING"
+    complaint_table_row_html = '<table class="active_table"><tr><td class="no_pad"><div class="row">'
     complaint_submission_html =
         '<input type="radio" name="resolution_review_' + complaint_entry.entry_id + '" value="commit" > Commit <br/>' +
         '<input type="radio" name="resolution_review_' + complaint_entry.entry_id + '" value="decline" checked="checked"> Decline' +
         '<br/><button class="tertiary" onclick="updatePending(' + complaint_entry.entry_id + ',' + row_id + ')"> Submit </button></div>'
   else
+    complaint_table_row_html = '<table class="active_table"><tr class="active_master_submit" type="submit_changes" entry_id="' + complaint_entry.entry_id + '"  row_id = "' + row_id + '"><td class="no_pad"><div class="row">'
     complaint_submission_html =
         '<input type="radio" class="resolution_radio_button" id="unchanged' + complaint_entry.entry_id + '" name="resolution' + complaint_entry.entry_id + '" value="UNCHANGED" ' + unchanged_radio + entry_status + '> Unchanged <br/> ' +
         '<input type="radio" class="resolution_radio_button" id="fixed' + complaint_entry.entry_id + '" name="resolution' + complaint_entry.entry_id + '" value="FIXED"  ' + fixed_radio + entry_status + '> Fixed  <br/> ' +
@@ -769,7 +771,7 @@ format = (complaint_entry_row) ->
         '</div>'
 
   complaint_entry_html =
-      '<table class="active_table"><tr type="submit_changes" entry_id="' + complaint_entry.entry_id + '"  row_id = "' + row_id + '"><td class="no_pad"><div class="row">' +
+      complaint_table_row_html +
       '<div class="col-xs-12 col-sm-6 nested-complaint-static-data">' +
       '<div class="row">' +
       '<div class="col-xs-5 col-with-divider">' +
@@ -1418,10 +1420,8 @@ window.master_submit = () ->
 
 window.verifyMasterSubmit = () ->
   boolean = false
-  if $('.shown').length > 0 && $('.has-items').length > 0
-    $('.has-items').each ->
-      if (!$(this).closest('tr').hasClass("pending"))
-        boolean = true
+  if $('.active_master_submit').length > 0 && $('.has-items').length > 0
+    boolean = true
   return boolean
 $ ->
   $('#cat_new_url_modal').on 'shown.bs.modal', ->
