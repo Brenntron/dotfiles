@@ -175,7 +175,7 @@ $ ->
               category = categories[0]
               if category == "Not in our list"
                 category = ""
-            category
+            '<p id="category_' + full.entry_id + '">' + category + '</p>'
         }
         {
           data: 'suggested_category'
@@ -183,6 +183,8 @@ $ ->
         {
           data: 'wbrs_score'
           width: '20px'
+          'render': (data, type, full, meta) ->
+            '<p id="wbrs_score_' + full.entry_id + '">' + data + '</p>'
         }
         {
           data: 'submitter_type'

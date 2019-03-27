@@ -13,7 +13,7 @@ window.updateURI = (complaint_entry_id) ->
     data: {complaint_entry_id: complaint_entry_id, uri: uri }
     success: (response) ->
       {json} = response
-      {current_categories, domain, subdomain, status} = json
+      {current_categories, category, wbrs_score, domain, subdomain, status} = json
 
       $('#loader-modal').modal 'hide'
 
@@ -27,13 +27,18 @@ window.updateURI = (complaint_entry_id) ->
 
         $("#domain_#{complaint_entry_id}").text(domain)
         $("#subdomain_#{complaint_entry_id}").text(subdomain)
+        $("#category_#{complaint_entry_id}").text(category)
+        $("#wbrs_score_#{complaint_entry_id}").text(wbrs_score)
+
         $("#entry-uri-#{complaint_entry_id}").html("<a href='http://#{uri}' target='_blank' onclick='select_cat_text_field(#{complaint_entry_id})' >#{uri}</a>")
         $("#site-search-#{complaint_entry_id}").html("<a href='https://www.google.com/search?q=site%3A#{uri}' target='_blank' onclick='select_cat_text_field(#{complaint_entry_id})'>#{uri}</a>")
 
-
-        $("#lookup-#{complaint_entry_id}").replaceWith('<button class="secondary" id="lookup-' + complaint_entry.entry_id + '" onclick="WebCat.RepLookup.queryWhoIs(\'' + domain + '\')">Lookup</button><br/>')
+        $("#lookup-#{complaint_entry_id}").replaceWith('<button class="secondary" id="lookup-' + complaint_entry_id + '" onclick="WebCat.RepLookup.queryWhoIs(\'' + domain + '\')">Lookup</button>')
         $("#history-#{complaint_entry_id}").replaceWith('<button class="secondary" id="history-' + complaint_entry_id + '" onclick="history_dialog('+complaint_entry_id+')">History</button>')
         $("#domain-#{complaint_entry_id}").replaceWith('<button class="secondary" id="domain-' + complaint_entry_id + '" onclick="domain_whois(\''+domain+'\')">Domain</button>')
+    error: (response) ->
+      $('#loader-modal').modal 'hide'
+      std_msg_error("Unable to update URI", [response.responseJSON.message], reload: false)
 
  )
 
