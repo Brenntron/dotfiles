@@ -769,7 +769,7 @@ format = (complaint_entry_row) ->
         '</div>'
 
   complaint_entry_html =
-      '<table class="active_table"><tr><td class="no_pad"><div class="row">' +
+      '<table class="active_table"><tr type="submit_changes" entry_id="' + complaint_entry.entry_id + '"  row_id = "' + row_id + '"><td class="no_pad"><div class="row">' +
       '<div class="col-xs-12 col-sm-6 nested-complaint-static-data">' +
       '<div class="row">' +
       '<div class="col-xs-5 col-with-divider">' +
@@ -1402,7 +1402,7 @@ window.master_submit = () ->
         std_msg_error(error_msg,"")
       else
         $('#loader-modal').modal 'hide'
-        std_msg_success("All complaints successfully processed.")
+        std_msg_success('Success',["All complaints successfully processed."], reload: true)
 
       tds = $('#complaints-index tbody').closest('td')
       for td in tds
