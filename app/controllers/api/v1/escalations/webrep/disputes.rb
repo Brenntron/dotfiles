@@ -647,9 +647,8 @@ module API
                     end
 
                     comment = ""
-                    if value["metadata"]["VRT"].present? && value["metadata"]["VRT"]["comment"].present?
-                      comment = value["metadata"]["VRT"]["comment"]
-                    end
+
+		    comment = value["metadata"].fetch("VRT", {}).fetch("comment", "")
 
                     return_data.push(:entry => key, :classification => value["classifications"], :expiration => expiration, :status => value["status"], :comment => comment).to_json
                   end
