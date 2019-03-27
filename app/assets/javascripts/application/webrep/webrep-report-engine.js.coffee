@@ -2,33 +2,56 @@ Chart.defaults.global.tooltips = false;
 
 getSum = (total, num) -> return total + num
 
-getChartMax = (dataSet) =>
-  if dataSet.length
-    max = Math.max.apply(null, dataSet)
-  else
-    max = dataSet
-  maxRounded = Math.ceil((max+1)/10)*10
-  return maxRounded
-
 setDataPoint = (chartInstance, type) =>
 
-  {ctx, data} = chartInstance
+  {ctx, data, controller, config, chart} = chartInstance
 
   if ctx != undefined
     ctx.textAlign = 'center';
     ctx.fillStyle = "rgba(0, 0, 0, 1)";
     ctx.textBaseline = 'bottom';
     for dataset, dataIndex in data.datasets
-      meta = chartInstance.controller.getDatasetMeta(dataIndex)
+      meta = controller.getDatasetMeta(dataIndex)
       for bar, barIndex in meta.data
+        {x, y} = bar._model
+
         data = dataset.data[barIndex]
         if data > 0
-          if type == 'vertical'
-            ctx.fillText(data, bar._model.x, bar._model.y - 5);
-          else if chartInstance.chart.canvas.id == 'graph-multiuser-ticket-entries-closed'
-            ctx.fillText(data, bar._model.x, bar._model.y);
+          if config.type == 'bar'
+            ctx.fillText(data, x, y);
           else
-            ctx.fillText(data, bar._model.x + 15, bar._model.y + 5);
+            ctx.fillText(data, x + 15, y + 5);
+
+$(window).resize ->
+  Chart.helpers.each Chart.instances, (instance) ->
+    element = document.getElementById(instance.ctx.canvas.id).parentNode
+    console.log(element)
+    if instance.config.type != 'pie'
+      Chart.helpers.removeEvent(element, 'resize', resize)
+      instance.destroy()
+  buildCharts()
+
+unwatch = (instance) ->
+  console.log(instance)
+buildCharts = ()->
+  user_id = $("#user_id").val()
+
+  window.build_graph_ticket_entries_submitter()
+  window.build_single_closed_email_entries_resolution_piechart()
+  window.build_single_closed_web_entries_resolution_piechart()
+  window.build_multi_closed_email_entries_resolution_piechart()
+  window.build_multi_closed_web_entries_resolution_piechart()
+  window.build_single_entries_closed_by_day_chart()
+  window.build_multi_average_time_to_close_tickets()
+  window.refresh_multi_closed_tickets_table()
+  window.refresh_multi_open_tickets_table()
+  window.refresh_single_open_tickets_table(user_id)
+  window.refresh_single_closed_tickets_table(user_id)
+  window.build_multi_entries_closed_by_owners_chart()
+  window.build_multi_rulehits_for_fp_res_chart()
+  window.build_multi_entries_closed_by_day_chart()
+  window.build_multi_ticket_resolution_by_owner_chart()
+  window.build_single_time_to_close_linechart()
 
 window.populate_top_banner = ()->
   from = localStorage.getItem('webrep_report_range_from')
@@ -64,28 +87,7 @@ window.change_reported_week = (new_report_range_from, new_report_range_to)->
 
 window.refresh_visable_report_tab = ()->
   if $('#dashboard-tab-list').length > 0
-    user_id = $("#user_id").val()
-
-    window.build_graph_ticket_entries_submitter()
-    window.build_single_closed_email_entries_resolution_piechart()
-    window.build_single_closed_web_entries_resolution_piechart()
-    window.build_multi_closed_email_entries_resolution_piechart()
-    window.build_multi_closed_web_entries_resolution_piechart()
-    window.build_single_entries_closed_by_day_chart()
-    window.build_multi_average_time_to_close_tickets()
-    window.refresh_multi_closed_tickets_table()
-    window.refresh_multi_open_tickets_table()
-    window.refresh_single_open_tickets_table(user_id)
-    window.refresh_single_closed_tickets_table(user_id)
-    window.build_multi_entries_closed_by_owners_chart()
-    window.build_multi_rulehits_for_fp_res_chart()
-    window.build_multi_entries_closed_by_day_chart()
-    window.build_multi_ticket_resolution_by_owner_chart()
-    window.build_single_time_to_close_linechart()
-
-
-#window.initialize_charts = () ->
-
+    buildCharts()
 
 window.refresh_single_open_tickets_table = (user_id)->
   from = localStorage.getItem('webrep_report_range_from')
@@ -293,7 +295,6 @@ window.build_graph_ticket_entries_submitter = () ->
       submitterCustomerChartData = json["customer_chart_data"]
       submitterChartLabels = json["chart_labels"]
 
-      submitterMax = Math.max(submitterGuestChartData.reduce(getSum), submitterCustomerChartData.reduce(getSum))
       Chart.defaults.global.defaultFontFamily = "'Open Sans', sans-serif"
       Chart.defaults.global.defaultFontSize = 10
 
@@ -317,8 +318,7 @@ window.build_graph_ticket_entries_submitter = () ->
             mode: null
           animation:
             onProgress: () ->
-              type = 'vertical'
-              setDataPoint(this, type)
+              setDataPoint(this)
           responsive: true
           maintainAspectRatio: false
           legend:
@@ -347,7 +347,6 @@ window.build_graph_ticket_entries_submitter = () ->
                 ticks: {
                   autoSkip: false
                   beginAtZero: true
-                  max: getChartMax(submitterMax)
                 }
               }
             ]
@@ -372,8 +371,7 @@ window.build_graph_ticket_entries_submitter = () ->
             mode: null
           animation:
             onProgress: () ->
-              type = 'vertical'
-              setDataPoint(this, type)
+              setDataPoint(this)
           responsive: true
           maintainAspectRatio: false
           legend: display: false
@@ -556,8 +554,6 @@ window.build_single_time_to_close_linechart = () ->
           options:
             hover:
               mode: null
-            animation:
-              onProgress: () ->
             responsive: true
             maintainAspectRatio: false
             legend: false
@@ -931,8 +927,7 @@ window.build_single_entries_closed_by_day_chart = () ->
               mode: null
             animation:
               onProgress: () ->
-                type = 'vertical'
-                setDataPoint(this, type)
+                setDataPoint(this)
             responsive: true
             maintainAspectRatio: false
             legend:
@@ -1046,7 +1041,6 @@ window.build_multi_entries_closed_by_day_chart = () =>
             mode: null
           animation:
             onProgress: () ->
-              type = 'vertical'
               setDataPoint(this)
           responsive: true
           maintainAspectRatio: false
@@ -1176,8 +1170,7 @@ window.build_multi_ticket_resolution_by_owner_chart = () ->
             mode: null
           animation:
             onProgress: () ->
-              type = 'vertical'
-              setDataPoint(this, type)
+              setDataPoint(this)
           maintainAspectRatio: false
           title:
             display: false
@@ -1287,7 +1280,6 @@ window.build_multi_entries_closed_by_owners_chart = () ->
                   gridLines: display: false
                   ticks: {
                     min: 0
-                    max: getChartMax(ticketEntriesByOwner)
                   }
                 }
               ]
@@ -1296,7 +1288,6 @@ window.build_multi_entries_closed_by_owners_chart = () ->
                   gridLines: display: false
                   ticks: {
                     beginAtZero: true,
-                    max: getChartMax(ticketEntriesByOwner)
                     callback: (value) ->
                       if Number.isInteger(value)
                         return value
@@ -1395,7 +1386,6 @@ window.build_multi_average_time_to_close_tickets = () ->
                   ticks: {
                     min: 0
                     stepValue: 10,
-                    max: getChartMax(avgTimeToCloseTickets)
                   }
                   scaleLabel: {
                     display: true,
@@ -1464,8 +1454,6 @@ window.build_multi_rulehits_for_fp_res_chart = () ->
           options:
             hover:
               mode: null
-            animation:
-              onProgress: () ->
             responsive: true
             maintainAspectRatio: false
             legend: display: false
