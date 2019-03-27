@@ -268,7 +268,10 @@ module API
                 begin
                   authorize!(:update, ComplaintEntry)
                   complaint_entry = ComplaintEntry.find(permitted_params[:complaint_entry_id])
-                  status = complaint_entry.update_uri(permitted_params[:uri])
+
+                  if (permitted_params[:uri] =~ Resolv::IPv4::Regex) == nil
+                    status = complaint_entry.update_uri(permitted_params[:uri])
+                  end
 
                   if status[:status] != 'ip'
                     current_categories = complaint_entry.current_category_data
