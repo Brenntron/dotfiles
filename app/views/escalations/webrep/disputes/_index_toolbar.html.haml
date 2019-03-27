@@ -150,7 +150,7 @@
                     Customer Facing Comment
                   %textarea.ticket-status-comment
                   .button-row-center
-                    %button.primary.change_ticket_status_button
+                    %button.primary.change_ticket_status_button{type:'button', id:'webrep_resolve_ticket', onclick:'change_ticket_status();'}
                       Submit
 
           %li.status-radio-wrapper
@@ -161,7 +161,7 @@
               Comment
             %textarea.ticket-status-comment
             .button-row-center
-              %button.primary.change_ticket_status_button
+              %button.primary.change_ticket_status_button{type:'button', id:'webrep_change_ticket_status', onclick:'change_ticket_status();'}
                 Submit
 
     %span#mark-as-related.dropdown

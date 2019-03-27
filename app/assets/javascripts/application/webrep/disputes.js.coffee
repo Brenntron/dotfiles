@@ -447,9 +447,7 @@ window.related_disputes = () ->
   entry_ids = $('.dispute_check_box:checkbox:checked').map(() ->
     Number(this.value)
   ).toArray()
-#  if entry_ids.length == 0
-#    std_msg_error('Setting related error', ['No issue(s) selected.'])
-#    return
+
   original_dispute_id = $('.dispute-id').val()
 
   # Make sure that the original dispute ID is provided by the user.
@@ -641,16 +639,6 @@ window.return_dispute = (dispute_id) ->
 
   )
 
-
-#window.dispute_entry_status = (id, status) ->
-#  std_msg_ajax(
-#    method: 'PATCH'
-#    url: '/escalations/api/v1/escalations/webrep/disputes/entries/' + id + '/status'
-#    data: { status: status }
-#    error_prefix: 'Error updating status.'
-#  )
-
-
 window.save_dispute_entries = () ->
 
   data = {}
@@ -725,6 +713,52 @@ window.set_related_dispute = (form_tag) ->
     error_prefix: 'Error marking relationship.'
   )
 
+window.change_ticket_status = (event) ->
+#  event.preventDefault()
+  status = $('#index-edit-ticket-status-dropdown').find('.ticket-status-radio:checked').val()
+  resolution = ""
+  comment = ""
+  checkboxes = $('#disputes-index').find('.dispute_check_box')
+  checked_disputes = []
+  
+  $(checkboxes).each ->
+    if $(this).is(':checked')
+      dispute_id = $(this).val()
+      checked_disputes.push(dispute_id)
+
+  if status == 'RESOLVED_CLOSED'
+    if $('#index-edit-ticket-status-dropdown').find('.ticket-resolution-radio').is(':checked')
+      resolution = $('#index-edit-ticket-status-dropdown').find('.ticket-resolution-radio:checked').val()
+      comment = $('.resolution-comment-wrapper').find('.ticket-status-comment').val()
+    else
+      std_msg_error('No resolution selected', ['Please select a ticket resolution.'])
+      return
+  else
+    comment = $('.non-resolution-submit-wrapper').find('.ticket-status-comment').val()
+
+  headers = {'Token': $('input[name="token"]').val(), 'Xmlrpc-Token': $('input[name="xml_token"]').val()}
+  data = {
+    status: status,
+    resolution: resolution,
+    comment: comment
+  }
+
+  for dispute in checked_disputes
+#    event.preventDefault()
+    data.dispute_ids = dispute
+    $.ajax(
+      url: '/escalations/api/v1/escalations/webrep/disputes/set_disputes_status'
+      method: 'POST'
+      headers: headers
+      data: data
+      mimeType: 'application/json'
+      success: (response) ->
+        window.location.reload()
+      error: (response) ->
+        if response.status > 400
+          popup_response_error(response, 'Error Updating Status')
+  )
+
 window.set_relating_disputes = (form_tag) ->
   related_dispute_id = $(form_tag).find(".dispute-id").val()
   dispute_ids = $('.dispute_check_box:checkbox:checked').map(() ->
@@ -782,53 +816,6 @@ $ ->
     if $('#index-edit-entry-status-dropdown').parent().hasClass('open')
       $('#msg-modal').on 'hidden.bs.modal', (d) ->
         $('#index-edit-entry-status-dropdown').parent().addClass('open')
-
-
-  $('.change_ticket_status_button').click ->
-    status = ""
-    resolution = ""
-    comment = ""
-    checkboxes = $('#disputes-index').find('.dispute_check_box')
-    checked_disputes = []
-    $(checkboxes).each ->
-      if $(this).is(':checked')
-        dispute_id = $(this).val()
-        checked_disputes.push(dispute_id)
-
-    status = $('#index-edit-ticket-status-dropdown').find('.ticket-status-radio:checked').val()
-    if status == 'RESOLVED_CLOSED'
-      if $('#index-edit-ticket-status-dropdown').find('.ticket-resolution-radio').is(':checked')
-        resolution = $('#index-edit-ticket-status-dropdown').find('.ticket-resolution-radio:checked').val()
-        comment = $('.resolution-comment-wrapper').find('.ticket-status-comment').val()
-      else
-        std_msg_error('No resolution selected', ['Please select a ticket resolution.'])
-        return
-    else
-      comment = $('.non-resolution-submit-wrapper').find('.ticket-status-comment').val()
-
-    data = {
-      status: status,
-      resolution: resolution,
-      comment: comment,
-      dispute_ids: checked_disputes.toString()
-    }
-
-    headers = {'Token': $('input[name="token"]').val(), 'Xmlrpc-Token': $('input[name="xml_token"]').val()}
-    $.ajax(
-      url: '/escalations/api/v1/escalations/webrep/disputes/set_disputes_status'
-      method: 'POST'
-      headers: headers
-      data: data
-      dataType: 'json'
-      success: (response) ->
-        response = JSON.parse(response)
-        if response.status == "success"
-          window.location.reload()
-      error: (response) ->
-        popup_response_error(response, 'Error Updating Status')
-        window.location.reload()
-
-    )
 
   window.toggleRow = (box) ->
     if $(box)[0].checked
@@ -937,7 +924,6 @@ $ ->
       std_msg_error('No rows selected', ['Please select at least one row.'])
       return false
 
-
   # Create index table
   window.dispute_table = $('#disputes-index').DataTable(
     order: [ [
@@ -1007,7 +993,7 @@ $ ->
       {
         data: 'dispute_resolution'
       }
-       {
+      {
         data: 'submission_type'
         render: (data) ->
           title = ''
@@ -1312,7 +1298,7 @@ $ ->
               $("##{column}-checkbox").prop('checked', false)
               window.dispute_table.column("##{column}").visible false
 
-    )
+      )
 
     $('.toggle-vis').on "click", ->
       data = {}
@@ -1391,10 +1377,7 @@ $ ->
     $('#edit-dispute-button').addClass('hidden')
 
 
-    if $('#top_bar_extended_info').css('display', 'block')
-      console.log('open')
-    else if $('#top_bar_extended_info').css('display', 'none')
-      console.log('closed')
+    if $('#top_bar_extended_info').css('display', 'none')
       $('#top-bar-toggle').addClass('top-info-open')
       $("#top_bar_extended_info").slideToggle()
 
@@ -1483,189 +1466,11 @@ $ ->
           'tooltipster-borderless'
           'tooltipster-borderless-customized'
           'tooltipster-borderless-comment'
-          ]
+        ]
         'maxWidth': 500
       $(this).tooltipster 'show'
     return
 
-
-  ####### Bar chart for Ticket Entries by Ticket Type
-
-  ## Data breakdown for 'initial' daily data
-  #ticketTypeChartLabels = ['September 2', 'September 3', 'September 4', 'September 5', 'September 6', 'September 7', 'September 8']
-  #ticketTypeTotalData = [20, 24, 30, 28, 0, 0, 0]
-  #ticketTypeWData     = [15, 20, 18, 20, 0, 0, 0]
-  #ticketTypeEData     = [8, 7, 15, 12, 0, 0, 0]
-  #ticketTypeEWData    = [0, 0, 0, 9, 0, 0, 0]
-
-  ## Test data breakdown for a monthly dataset - we'll say 6 months
-  #  ticketTypeChartLabels = ['June', 'July', 'August', 'September', 'October', 'November']
-  #  ticketTypeTotalData = [120, 124, 130, 128, 110, 142]
-  #  ticketTypeWData = [45, 67, 52, 31, 55, 42]
-  #  ticketTypeEData = [28, 37, 15, 62, 50, 50]
-  #  ticketTypeEWData = [30, 16, 57, 57, 25, 50]
-
-
-  #window.userTicketClosedGraphDatasets = [
-  #  {
-  #    label: 'Total Ticket Entries'
-  #    backgroundColor: '#6dbcdb'
-  #    data: ticketTypeTotalData
-  #  }
-  #  {
-  #    label: 'W'
-  #    backgroundColor: '#E47433'
-  #    data: ticketTypeWData
-  #  }
-  #  {
-  #    label: 'E'
-  #    backgroundColor: '#5FB665'
-  #    data: ticketTypeEData
-  #  }
-  #  {
-  #    label: 'EW'
-  #    backgroundColor: '#C14B92'
-  #    data: ticketTypeEWData
-  #  }]
-
-
-  #window.userTicketClosedGraph = new Chart($('#graph-ticket-entries-closed'),
-  #  type: 'bar'
-  #  data:
-  #    labels: ticketTypeChartLabels
-  #    datasets: window.userTicketClosedGraphDatasets,
-  #  options:
-  #    legend:
-  #      display: false
-  #    title:
-  #      display: true
-  #      position: 'bottom'
-  #      text: 'Dates'
-  #    scales:
-  #      yAxes: [
-  #        {
-  #          gridLines:
-  #            display: false
-  #          ticks: {
-  #            min: 0
-  #          }
-  #        }
-  #      ]
-  #      xAxes: [
-  #        {
-  #          gridLines:
-  #            display: false
-  #          ticks: {
-  #            autoSkip: false
-  #          }
-  #        }
-  #      ]
-  #  )
-
-
-#    makeBar('graph-ticket-entries-closed', barDataSet)
-
-#  $('.graph-config select').on 'change', (el) ->
-#    if el.target.value == 'yearly'
-#      barDataSet = window.myBar.data.datasets
-#      window.myBar.data.datasets = barDataSet.concat barDataSets.filter (x) -> x.label == 'Total Ticket Entries'
-#      window.myBar.update()
-#    else if el.target.value == 'montly'
-#      barDataSet = window.myBar.data.datasets.filter (x) -> x.label != 'E' and x.label != 'W' and x.label != 'EW'
-#      window.myBar.data.datasets = barDataSet
-#      window.myBar.update()
-#    else if el.target.value == 'weekly'
-#      barDataSet = window.myBar.data.datasets.filter (x) -> x.label != 'E' and x.label != 'W' and x.label != 'EW'
-#      window.myBar.data.datasets = barDataSet
-#      window.myBar.update()
-#    else
-#      window.myBar.data.datasets = barDataSets
-#      window.myBar.update()
-
-
-#  Test data for Closed Email Entry Resolutions
-#  emailEntryResolutionLabels = ['Fixed', 'Unchanged', 'Fixed FP', 'Other']
-#  emailEntryData = [3,6,7,0]
-
-#  new Chart($('#closed-email-entries-resolution-piechart'),
-#    type: 'pie'
-#    data:
-#      labels: emailEntryResolutionLabels
-#      datasets: [ {
-#        label: 'close-email-entries'
-#        backgroundColor: [
-#          '#3e5a72'
-#          '#6dbcdb'
-#          '#666'
-#        ]
-#        data: emailEntryData
-#      } ]
-#    options:
-#      legend: false
-#      pieceLabel:
-#        render: (args) ->
-#          return args.percentage + '%'
-#        position: 'outside'
-#        segment: false
-#        precision: 2
-#        showZero: true
-#        fontStyle: 'bolder'
-#        overlap: false
-#        showActualPercentages: true
-#  )
-
-
-  #  Test data for Closed Email Entry Resolutions
-#  webEntryResolutionLabels = ['Fixed FN', 'Unchanged', 'Fixed FP', 'Other']
-#  webEntryData = [3,6,7,0]
-
-#  new Chart(document.getElementById('closed-web-entries-resolution-piechart'),
-#    type: 'pie'
-#    data:
-#      labels: [
-#        'Fixed'
-#        'Unchanged'
-#        'Fixed FP'
-#      ]
-#      datasets: [ {
-#        label: 'close-email-entries'
-#        backgroundColor: [
-#          '#3e5a72'
-#          '#6dbcdb'
-#          '#666'
-#        ]
-#        data: [
-#          2478
-#          3267
-#          4202
-#        ]
-#      } ]
-#    options:
-#      legend: false
-#      pieceLabel:
-#        render: (args) ->
-#          return args.percentage + '%'
-#        position: 'outside'
-#        label: 'Unchanched'
-#        segment: false
-#        precision: 2
-#        showZero: true
-#        fontStyle: 'bolder'
-#        overlap: false
-#        showActualPercentages: true
-
-#  )
-
-  #closedTicketNumbers = [375502, 375504, 375513, 375515, 375516, 375517, 375518, 375519, 375520, 375521, 375522]
-  #timeToCloseTickets = [1, 1.3, 1.2, 1.5, 1.7, 1.4, 1.8, 0.9, 1, 1.1, 1.2, 1.5, 1.6]
-  #allTimeToClose = undefined
-  #averageTimeToClose = 0
-  #if timeToCloseTickets.length
-  #  allTimeToClose = timeToCloseTickets.reduce((a, b) ->
-  #    a + b
-  #  )
-  #  averageTimeToClose = allTimeToClose / timeToCloseTickets.length
-  #  averageTimeToClose = Math.round(averageTimeToClose * 100)/100
 
   window.averageTimeToCloseLabel = (hourAmount) ->
     totalSecond = hourAmount * 60 * 60
@@ -1682,469 +1487,6 @@ $ ->
     else
       value += seconds + 's'
     return
-
-  #averageTimeToCloseLabel(averageTimeToClose)
-
-  #window.timeCloseTicketsDataSets = [
-  #  {
-  #    data: timeToCloseTickets
-  #    label: 'Time to Close:'
-  #    backgroundColor: '#6dbcdb'
-  #    borderColor: '#55a3c1'
-  #    borderWidth: 2
-  #    fill: true
-  #    lineTension: 0
-  #  }
-  #]
-
-  #new Chart($('#time-to-close-tickets-linechart'),
-  #  type: 'line'
-  #  data:
-  #    labels: closedTicketNumbers
-  #    datasets: window.timeCloseTicketsDataSets
-  #  options:
-  #    legend: false
-  #    elements:
-  #      point:
-  #        radius: 0
-  #    scales:
-  #      yAxes: [
-  #        {
-  #          gridLines:
-  #            display: false
-  #          ticks: {
-  #            min: 0
-  #            stepSize: .5
-  #            callback: (value, index, values) ->
-  #              return value + ' hr'
-  #          }
-  #        }
-  #      ]
-  #      xAxes: [
-  #        {
-  #          gridLines:
-  #            display: false
-  #          scaleLabel: {
-  #            display: true,
-  #            labelString: 'Tickets'
-  #          }
-  #          ticks: {
-  #            display: false
-  #          }
-  #        }
-  #        ]
-  #    annotation: {
-  #      annotations: [
-  #        {
-  #          type: 'line'
-  #          drawTime: 'afterDatasetsDraw'
-  #          mode: 'horizontal'
-  #          scaleID: 'y-axis-0'
-  #          value: averageTimeToClose
-  #          borderColor: '#304A60'
-  #          borderWidth: 1
-  #          label: {
-  #            backgroundColor: 'transparent'
-  #            fontStyle: 'normal'
-  #            fontColor: '#666'
-  #            fontSize: 14
-  #            content: 'Average: ' + averageTimeToClose + ' hr'
-  #            position: 'right'
-  #            yAdjust: -10
-  #            enabled: true
-  #          }
-  #        }]
-  #    })
-
-
-
-  ###### Bar chart for Ticket Entries by Submitter Type
-
-  # Range of dates displayed, display however, this format is not mandatory.
-  # These three chunks will need to have the json data reformatted and inserted into them as separate arrays
-  #submitterChartLabels = ['September 2', 'September 3', 'September 4', 'September 5', 'September 6', 'September 7', 'September 8']
-  #submitterCustomerChartData = [20, 24, 30, 28, 10, 5, 13]
-  #submitterGuestChartData = [15, 8, 18, 16, 12, 4, 2]
-
-  #new Chart($('#graph-ticket-entries-submitter'),
-  #  type: 'bar'
-  #  data:
-  #    labels: submitterChartLabels
-  #    datasets: [
-  #      {
-  #      label: 'Customer'
-  #      backgroundColor: '#6dbcdb'
-  #      data: submitterCustomerChartData
-  #      }
-  #      {
-  #        label: 'Guest'
-  #        backgroundColor: '#3e5a72'
-  #        data: submitterGuestChartData
-  #      }]
-  #  options:
-  #    legend:
-  #      display: false
-  #    scales:
-  #      yAxes: [
-  #        {
-  #          gridLines: display: false
-  #          ticks: {
-  #            min: 0
-  #            stepSize: 10
-  #          }
-  #        }
-  #      ]
-  #      xAxes: [
-  #        {
-  #          gridLines: display: false
-  #          ticks: {
-  #            autoSkip: false
-  #          }
-  #        }
-  #      ]
-  #  )
-
-
-
-
-#### Multi User Graphs #####
-
-#  Ticket entries closed by ticket owner
-
-  ticketOwners = ['mtaylor', 'chrclair', 'nherbert', 'nverbeck', 'abreeeman']
-  ticketEntriesByOwner = [8, 15, 11, 10, 13.5]
-
-#  new Chart($('#ticket-entries-closed-by-owner'),
-#    type: 'horizontalBar'
-#    data:
-#      labels: ticketOwners
-#      datasets: [ {
-#        backgroundColor: '#6dbcdb'
-#        data: ticketEntriesByOwner
-#      } ]
-#    options:
-#      legend: display: false
-#      scales:
-#        yAxes: [
-#          {
-#            gridLines: display: false
-#            ticks: {
-#              min: 0
-#            }
-#          }
-#        ]
-#        xAxes: [
-#          {
-#            gridLines: display: false
-#            ticks: {
-#              min: 0
-#            }
-#            scaleLabel: {
-#              display: true,
-#              labelString: 'Closed Ticket Entries'
-#            }
-#          }
-#        ]
-#      )
-
-
-# Average time to close tickets by ticket owner graph
-#  avgTimeToCloseTickets = [.8, .7, 1.7, 1.6, 2]
-
-#  new Chart($('#avg-time-to-close-tickets'),
-#    type: 'horizontalBar'
-#    data:
-#      labels: ticketOwners
-#      datasets: [ {
-#        backgroundColor: '#6dbcdb'
-#        data: avgTimeToCloseTickets
-#      } ]
-#    options:
-#      legend: display: false
-#      scales:
-#        yAxes: [
-#          {
-#            gridLines: display: false
-#            ticks: {
-#              min: 0
-#            }
-#          }
-#        ]
-#        xAxes: [
-#          {
-#            gridLines: display: false
-#            ticks: {
-#              min: 0
-#            }
-#            scaleLabel: {
-#              display: true,
-#              labelString: 'Hours'
-#            }
-#          }
-#        ]
-#  )
-
-
-# Ticket Resolutions by Ticket Owner graph
-
-  #fixedFPTickets = [9, 7, 5, 6, 9]
-  #fixedFNTickets = [10, 14, 11, 10, 5]
-  #unchangedTickets = [3, 4, 11, 13, 9]
-  #otherTickets = [0, 1, 0, 3, 5]
-
-  #new Chart($('#ticket-resolutions-by-owner'),
-  #  type: 'bar'
-  #  data:
-  #    labels: ticketOwners
-  #    datasets: [
-  #      {
-  #        label: 'Fixed FP'
-  #        backgroundColor: '#6dbcdb'
-  #        data: fixedFPTickets
-  #      }
-  #      {
-  #        label: 'Fixed FN'
-  #        backgroundColor: '#2c3e50'
-  #        data: fixedFNTickets
-  #      }
-  #      {
-  #        label: 'Unchanged'
-  #        backgroundColor: '#999'
-  #        data: unchangedTickets
-  #      }
-  #      {
-  #        label: 'Other'
-  #        backgroundColor: '#E47433'
-  #        data: otherTickets
-  #      }
-  #    ]
-  #  options:
-  #    title:
-  #      display: false
-  #    legend: display: false
-  #    scales:
-  #      yAxes: [
-  #        {
-  #          gridLines: display: false
-  #          ticks: {
-  #            min: 0
-  #          }
-  #        }
-  #      ]
-  #      xAxes: [
-  #        {
-  #          gridLines: display: false
-  #        }
-  #      ]
-  #)
-
-
-
-#  Rule Hits for FP Resolutions Graph
-#  fpRules = ['a500', 'alx_ cln', 'mute_phish', 'sbl', 'srch', 'suwl', 'trd_mal']
-#  totalRuleHits = [ 5, 18, 9, 14, 4, 7, 3]
-
-#  new Chart($('#rule-hits-fp-resolutions'),
-#    type: 'horizontalBar'
-#    data:
-#      labels: fpRules
-#      datasets: [ {
-#        backgroundColor: '#6dbcdb'
-#        data: totalRuleHits
-#      } ]
-#    options:
-#      legend: display: false
-#      scales:
-#        yAxes: [
-#          {
-#            gridLines: display: false
-#          }
-#        ]
-#        xAxes: [
-#          {
-#            gridLines: display: false
-#            ticks: {
-#              min: 0
-#            }
-#            scaleLabel: {
-#              display: true,
-#              labelString: 'Total Ticket Entries with FP Resolutions'
-#            }
-#          }
-#        ]
-#  )
-
-
-
-#  totalTicketEnties = [15, 18, 22, 18, 24, 10, 12]
-#  emailTicketEntries = [15, 18, 22, 18, 24, 10, 2]
-#  webTicketEntries = [15, 18, 22, 18, 24, 10, 5]
-#  ewTicketEntries = [15, 18, 22, 18, 24, 10, 7]
-
-#  totalTicketEntriesbyType = [
-#    {
-#      label: 'Total Ticket Entries'
-#      backgroundColor: '#6dbcdb'
-#      data: totalTicketEnties
-#    }
-#    {
-#      label: 'E'
-#      backgroundColor: '#8cc63f'
-#      data: emailTicketEntries
-#    }
-#    {
-#      label: 'W'
-#      backgroundColor: '#E47433'
-#      data: webTicketEntries
-#    }
-#    {
-#      label: 'EW'
-#      backgroundColor: '#BA55D3'
-#      data: ewTicketEntries
-#    }
-#  ]
-
-  dateRange = ['September 2', 'September 3', 'September 4', 'September 5', 'September 6', 'September 7', 'September 8']
-
-
-#  window.multiuser_ticket_type_totals = new Chart($('#graph-multiuser-ticket-entries-closed'),
-#    type: 'bar'
-#    data:
-#      labels: dateRange
-#      datasets: totalTicketEntriesbyType
-#    options:
-#      legend: display: false
-#      scales:
-#        yAxes: [
-#          {
-#            gridLines: display: false
-#          }
-#        ]
-#        xAxes: [
-#          {
-#            gridLines: display: false
-#            ticks: {
-#              autoSkip: false
-#            }
-#          }
-#        ]
-#    )
-
-
-
-  #multiuserCustomerSubmissions = [15, 18, 22, 18, 12, 43, 31]
-  #multiuserGuestSubmissions = [8, 6, 7, 13, 9, 15, 21]
-
-  #new Chart($('#graph-multiuser-ticket-entries-submitter'),
-  #  type: 'bar'
-  #  data:
-  #    labels: dateRange
-  #    datasets: [
-  #      {
-  #        backgroundColor: '#6dbcdb'
-  #        data: multiuserCustomerSubmissions
-  #      }
-  #      {
-  #        backgroundColor: '#2c3e50'
-  #        data: multiuserGuestSubmissions
-  #      }
-  #    ]
-  #  options:
-  #    legend: display: false
-  #    scales:
-  #      yAxes: [
-  #        {
-  #          gridLines: display: false
-  #          ticks: {
-  #            min: 0
-  #          }
-  #        }
-  #      ]
-  #      xAxes: [
-  #        {
-  #          gridLines: display: false
-  #          ticks: {
-  #            autoSkip: false
-  #          }
-  #        }
-  #      ]
-  #)
-
-  #new Chart(document.getElementById('team-pie-chart'),
-  #  type: 'pie'
-  #  data:
-  #    labels: [
-  #      'Fixed'
-  #      'Unchanged'
-  #      'Fixed FP'
-  #    ]
-  #    datasets: [ {
-  #      label: 'close-email-entries'
-  #      backgroundColor: [
-  #        '#3e5a72'
-  #        '#6dbcdb'
-  #        '#666'
-  #      ]
-  #      data: [
-  #        5178
-  #        4267
-  #        2202
-  #      ]
-  #    } ]
-  #  options:
-  #    legend: false
-  #    pieceLabel:
-  #      render: (args) ->
-  #        return args.percentage + '%'
-  #      position: 'outside'
-  #      label: 'Unchanched'
-  #      segment: false
-  #      precision: 2
-  #      showZero: true
-  #      fontStyle: 'bolder'
-  #      overlap: false
-  #      showActualPercentages: true
-
-  #)
-
-  #new Chart(document.getElementById('team-pie2-chart'),
-  #  type: 'pie'
-  #  data:
-  #    labels: [
-  #      'Fixed'
-  #      'Unchanged'
-  #      'Fixed FP'
-  #    ]
-  #    datasets: [ {
-  #      label: 'close-email-entries'
-  #      backgroundColor: [
-  #        '#3e5a72'
-  #        '#6dbcdb'
-  #        '#666'
-  #      ]
-  #      data: [
-  #        3778
-  #        4767
-  #        5900
-  #      ]
-  #    } ]
-  #  options:
-  #    legend: false
-  #    pieceLabel:
-  #      render: (args) ->
-  #        return args.percentage + '%'
-  #      position: 'outside'
-  #      label: 'Unchanched'
-  #      segment: false
-  #      precision: 2
-  #      showZero: true
-  #      fontStyle: 'bolder'
-  #      overlap: false
-  #      showActualPercentages: true
-
-  #)
-
-
 
 # Create Dashboard Initial Table (My Open Tickets)
 $ ->
