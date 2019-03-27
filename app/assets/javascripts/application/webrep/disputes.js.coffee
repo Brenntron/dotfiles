@@ -713,7 +713,8 @@ window.set_related_dispute = (form_tag) ->
     error_prefix: 'Error marking relationship.'
   )
 
-window.change_ticket_status = () ->
+window.change_ticket_status = (event) ->
+#  event.preventDefault()
   status = $('#index-edit-ticket-status-dropdown').find('.ticket-status-radio:checked').val()
   resolution = ""
   comment = ""
@@ -743,19 +744,20 @@ window.change_ticket_status = () ->
   }
 
   for dispute in checked_disputes
+#    event.preventDefault()
     data.dispute_ids = dispute
     $.ajax(
       url: '/escalations/api/v1/escalations/webrep/disputes/set_disputes_status'
       method: 'POST'
       headers: headers
       data: data
-      dataType: 'json'
+      mimeType: 'application/json'
       success: (response) ->
         window.location.reload()
       error: (response) ->
-        popup_response_error(response, 'Error Updating Status')
-        window.location.reload()
-    )
+        if response.status > 400
+          popup_response_error(response, 'Error Updating Status')
+  )
 
 window.set_relating_disputes = (form_tag) ->
   related_dispute_id = $(form_tag).find(".dispute-id").val()
