@@ -12,6 +12,9 @@ window.updateURI = (complaint_entry_id) ->
     url: "/escalations/api/v1/escalations/webcat/complaints/update_uri"
     data: {complaint_entry_id: complaint_entry_id, uri: uri }
     success: (response) ->
+      {json} = response
+      {current_categories, domain, subdomain} = json
+
       $('#loader-modal').modal 'hide'
 
       $(".simple-nested-table##{complaint_entry_id} tbody > tr").remove()
@@ -19,17 +22,18 @@ window.updateURI = (complaint_entry_id) ->
       if 'ip' == response.json.status
         std_msg_error("Cannot edit IP entries.","")
       else
-        $.each response.json.current_categories, (key, entry) ->
+        $.each current_categories, (key, entry) ->
           $(".simple-nested-table##{complaint_entry_id}").append("<tr><td>#{entry.confidence}</td><td>#{entry.mnem} - #{entry.descr}</td><td>#{entry.top_certainty}</span></td></tr>")
 
-        $("#domain_#{complaint_entry_id}").text(response.domain)
-        $("#subdomain_#{complaint_entry_id}").text(response.subdomain)
+        $("#domain_#{complaint_entry_id}").text(domain)
+        $("#subdomain_#{complaint_entry_id}").text(subdomain)
         $("#entry-uri-#{complaint_entry_id}").html("<a href='http://#{uri}' target='_blank' onclick='select_cat_text_field(#{complaint_entry_id})' >#{uri}</a>")
         $("#site-search-#{complaint_entry_id}").html("<a href='https://www.google.com/search?q=site%3A#{uri}' target='_blank' onclick='select_cat_text_field(#{complaint_entry_id})'>#{uri}</a>")
 
 
+        $("#lookup-#{complaint_entry_id}").replaceWith('<button class="secondary" id="lookup-' + complaint_entry.entry_id + '" onclick="WebCat.RepLookup.queryWhoIs(\'' + domain + '\')">Lookup</button><br/>')
         $("#history-#{complaint_entry_id}").replaceWith('<button class="secondary" id="history-' + complaint_entry_id + '" onclick="history_dialog('+complaint_entry_id+')">History</button>')
-        $("#domain-#{complaint_entry_id}").replaceWith('<button class="secondary" id="domain-' + complaint_entry_id + '" onclick="domain_whois(\''+response.domain+'\')">Domain</button>')
+        $("#domain-#{complaint_entry_id}").replaceWith('<button class="secondary" id="domain-' + complaint_entry_id + '" onclick="domain_whois(\''+domain+'\')">Domain</button>')
 
  )
 

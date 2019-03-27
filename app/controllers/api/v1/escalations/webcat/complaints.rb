@@ -270,8 +270,10 @@ module API
                 status = complaint_entry.update_uri(permitted_params[:uri])
 
                 current_categories = complaint_entry.current_category_data
+                domain = complaint_entry.domain
+                subdomain = complaint_entry.subdomain
 
-                render json: {current_categories: current_categories, status: status[:status]}
+                render json: {current_categories: current_categories, status: status[:status], domain: domain, subdomain: subdomain}
               end
             end
 
