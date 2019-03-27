@@ -1,3 +1,39 @@
+Chart.defaults.global.tooltips = false;
+
+getSum = (total, num) -> return total + num
+
+getChartMax = (dataSet) =>
+  if dataSet.length
+    max = Math.max.apply(null, dataSet)
+  else
+    max = dataSet
+  maxRounded = Math.ceil((max+1)/10)*10
+  maxRange = maxRounded - 2
+  if max > maxRange
+    return max + 10;
+  else
+    return max + 5
+
+setDataPoint = (chartInstance, type) =>
+
+  {ctx, data} = chartInstance
+
+  if ctx != undefined
+    ctx.textAlign = 'center';
+    ctx.fillStyle = "rgba(0, 0, 0, 1)";
+    ctx.textBaseline = 'bottom';
+    for dataset, dataIndex in data.datasets
+      meta = chartInstance.controller.getDatasetMeta(dataIndex)
+      for bar, barIndex in meta.data
+        data = dataset.data[barIndex]
+        if data > 0
+          if type == 'vertical'
+            ctx.fillText(data, bar._model.x, bar._model.y - 5);
+          else if chartInstance.chart.canvas.id == 'graph-multiuser-ticket-entries-closed'
+            ctx.fillText(data, bar._model.x, bar._model.y);
+          else
+            ctx.fillText(data, bar._model.x + 15, bar._model.y + 5);
+
 window.populate_top_banner = ()->
   from = localStorage.getItem('webrep_report_range_from')
   to = localStorage.getItem('webrep_report_range_to')
@@ -74,35 +110,20 @@ window.refresh_single_open_tickets_table = (user_id)->
     success: (response) ->
 
       json = $.parseJSON(response)
-      if json.error
-        #$('#refresh-working-msg').hide()
-        #$('#refresh-error-msg').show()
-        #$('#refresh-error-msg').html('An error occured while retrieving data')
 
-      else
-        #$('#refresh-error-msg').hide()
-        #$('#refresh-working-msg').show()
-        #$('#refresh-working-msg').html('Table data updating correctly')
-        #$('#dispute-index-title').text(json['title'])
-        datatable = $('#table-user-disputes-open').DataTable()
-        datatable.clear();
-        datatable.rows.add(json.data.table_data);
-        datatable.draw();
-
-        #References to other data points used to wrap this table, use as needed
-
-        $("#open_single_customer_count").html(json.data.customer_count)
-        $("#open_single_guest_count").html(json.data.guest_count)
-        $("#open_single_email_count").html(json.data.email_count)
-        $("#open_single_web_count").html(json.data.web_count)
-        $("#open_single_email_web_count").html(json.data.email_web_count)
-
-        $("#open_single_ticket_count").html(json.data.ticket_count)
-        $("#open_single_entry_count").html(json.data.entries_count)
+      datatable = $('#table-user-disputes-open').DataTable()
+      datatable.clear();
+      datatable.rows.add(json.data.table_data);
+      datatable.draw();
+      #References to other data points used to wrap this table, use as needed
+      $("#open_single_customer_count").html(json.data.customer_count)
+      $("#open_single_guest_count").html(json.data.guest_count)
+      $("#open_single_email_count").html(json.data.email_count)
+      $("#open_single_web_count").html(json.data.web_count)
+      $("#open_single_email_web_count").html(json.data.email_web_count)
+      $("#open_single_ticket_count").html(json.data.ticket_count)
+      $("#open_single_entry_count").html(json.data.entries_count)
     error: (response) ->
-      #$('#refresh-working-msg').hide()
-      #$('#refresh-error-msg').show()
-      #$('#refresh-error-msg').html('An error occured while retrieving data')
   , this)
 
 window.refresh_multi_open_tickets_table = ()->
@@ -122,35 +143,21 @@ window.refresh_multi_open_tickets_table = ()->
     headers: headers
     data: data
     success: (response) ->
-
       json = $.parseJSON(response)
-      if json.error
-        #$('#refresh-working-msg').hide()
-        #$('#refresh-error-msg').show()
-        #$('#refresh-error-msg').html('An error occured while retrieving data')
-
-      else
-
-        datatable = $('#table-multi-user-disputes-open').DataTable()
-        datatable.clear();
-        datatable.rows.add(json.data.table_data);
-        datatable.draw();
-
-        #References to other data points used to wrap this table, use as needed
-
-        $("#open_multi_customer_count").html(json.data.customer_count)
-        $("#open_multi_guest_count").html(json.data.guest_count)
-        $("#open_multi_email_count").html(json.data.email_count)
-        $("#open_multi_web_count").html(json.data.web_count)
-        $("#open_multi_email_web_count").html(json.data.email_web_count)
-
-        $("#open_multi_ticket_count").html(json.data.ticket_count)
-        $("#open_multi_entry_count").html(json.data.entries_count)
+      datatable = $('#table-multi-user-disputes-open').DataTable()
+      datatable.clear();
+      datatable.rows.add(json.data.table_data);
+      datatable.draw();
+      $("#open_multi_customer_count").html(json.data.customer_count)
+      $("#open_multi_guest_count").html(json.data.guest_count)
+      $("#open_multi_email_count").html(json.data.email_count)
+      $("#open_multi_web_count").html(json.data.web_count)
+      $("#open_multi_email_web_count").html(json.data.email_web_count)
+      $("#open_multi_ticket_count").html(json.data.ticket_count)
+      $("#open_multi_entry_count").html(json.data.entries_count)
 
     error: (response) ->
-      #$('#refresh-working-msg').hide()
-      #$('#refresh-error-msg').show()
-      #$('#refresh-error-msg').html('An error occured while retrieving data')
+
   , this)
 
 window.refresh_single_closed_tickets_table = (user_id)->
@@ -170,39 +177,23 @@ window.refresh_single_closed_tickets_table = (user_id)->
     headers: headers
     data: data
     success: (response) ->
-
       json = $.parseJSON(response)
+      datatable = $('#table-user-disputes-closed').DataTable()
+      datatable.clear();
+      datatable.rows.add(json.data.table_data);
+      datatable.draw();
 
-      if json.error
-        #$('#refresh-working-msg').hide()
-        #$('#refresh-error-msg').show()
-        #$('#refresh-error-msg').html('An error occured while retrieving data')
-
-      else
-        #$('#refresh-error-msg').hide()
-        #$('#refresh-working-msg').show()
-        #$('#refresh-working-msg').html('Table data updating correctly')
-        #$('#dispute-index-title').text(json['title'])
-        datatable = $('#table-user-disputes-closed').DataTable()
-        datatable.clear();
-        datatable.rows.add(json.data.table_data);
-        datatable.draw();
-
-        #References to other data points used to wrap this table, use as needed
-
-        $("#closed_single_customer_count").html(json.data.customer_count)
-        $("#closed_single_guest_count").html(json.data.guest_count)
-        $("#closed_single_email_count").html(json.data.email_count)
-        $("#closed_single_web_count").html(json.data.web_count)
-        $("#closed_single_email_web_count").html(json.data.email_web_count)
-
-        $("#closed_single_ticket_count").html(json.data.ticket_count)
-        $("#closed_single_entry_count").html(json.data.entries_count)
+      #References to other data points used to wrap this table, use as needed
+      $("#closed_single_customer_count").html(json.data.customer_count)
+      $("#closed_single_guest_count").html(json.data.guest_count)
+      $("#closed_single_email_count").html(json.data.email_count)
+      $("#closed_single_web_count").html(json.data.web_count)
+      $("#closed_single_email_web_count").html(json.data.email_web_count)
+      $("#closed_single_ticket_count").html(json.data.ticket_count)
+      $("#closed_single_entry_count").html(json.data.entries_count)
 
     error: (response) ->
-        #$('#refresh-working-msg').hide()
-        #$('#refresh-error-msg').show()
-        #$('#refresh-error-msg').html('An error occured while retrieving data')
+
   , this)
 
 window.refresh_multi_closed_tickets_table = ()->
@@ -223,32 +214,20 @@ window.refresh_multi_closed_tickets_table = ()->
     headers: headers
     data: data
     success: (response) ->
-
       json = $.parseJSON(response)
-      if json.error
-        #$('#refresh-working-msg').hide()
-        #$('#refresh-error-msg').show()
-        #$('#refresh-error-msg').html('An error occured while retrieving data')
-
-      else
-        datatable = $('#table-multi-user-disputes-closed').DataTable()
-        datatable.clear();
-        datatable.rows.add(json.data.table_data);
-        datatable.draw();
-
-        $("#closed_multi_customer_count").html(json.data.customer_count)
-        $("#closed_multi_guest_count").html(json.data.guest_count)
-        $("#closed_multi_email_count").html(json.data.email_count)
-        $("#closed_multi_web_count").html(json.data.web_count)
-        $("#closed_multi_email_web_count").html(json.data.email_web_count)
-
-        $("#closed_multi_ticket_count").html(json.data.ticket_count)
-        $("#closed_multi_entry_count").html(json.data.entries_count)
+      datatable = $('#table-multi-user-disputes-closed').DataTable()
+      datatable.clear();
+      datatable.rows.add(json.data.table_data);
+      datatable.draw();
+      $("#closed_multi_customer_count").html(json.data.customer_count)
+      $("#closed_multi_guest_count").html(json.data.guest_count)
+      $("#closed_multi_email_count").html(json.data.email_count)
+      $("#closed_multi_web_count").html(json.data.web_count)
+      $("#closed_multi_email_web_count").html(json.data.email_web_count)
+      $("#closed_multi_ticket_count").html(json.data.ticket_count)
+      $("#closed_multi_entry_count").html(json.data.entries_count)
 
     error: (response) ->
-      #$('#refresh-working-msg').hide()
-      #$('#refresh-error-msg').show()
-      #$('#refresh-error-msg').html('An error occured while retrieving data')
   , this)
 
 
@@ -312,12 +291,13 @@ window.build_graph_ticket_entries_submitter = () ->
     dataType: 'json'
     success: (response) ->
 
-      json = $.parseJSON(response)
+      json = $.parseJSON(response)["data"]
 
-      submitterGuestChartData = json["data"]["guest_chart_data"]
-      submitterCustomerChartData = json["data"]["customer_chart_data"]
-      submitterChartLabels = json["data"]["chart_labels"]
+      submitterGuestChartData = json["guest_chart_data"]
+      submitterCustomerChartData = json["customer_chart_data"]
+      submitterChartLabels = json["chart_labels"]
 
+      submitterMax = Math.max(submitterGuestChartData.reduce(getSum), submitterCustomerChartData.reduce(getSum))
       Chart.defaults.global.defaultFontFamily = "'Open Sans', sans-serif"
       Chart.defaults.global.defaultFontSize = 10
 
@@ -337,6 +317,11 @@ window.build_graph_ticket_entries_submitter = () ->
               data: submitterGuestChartData
             }]
         options:
+          hover: {mode:null}
+          animation:
+            onProgress: () ->
+              type = 'vertical'
+              setDataPoint(this, type)
           responsive: true
           maintainAspectRatio: false
           legend:
@@ -346,7 +331,6 @@ window.build_graph_ticket_entries_submitter = () ->
               {
                 gridLines: display: false
                 ticks: {
-                  beginAtZero: true,
                   callback: (value) ->
                     if Number.isInteger(value)
                       return value
@@ -356,14 +340,17 @@ window.build_graph_ticket_entries_submitter = () ->
             ]
             xAxes: [
               {
-                type: 'time'
                 offset: true
+                type: 'time'
                 time:
+                  unit: 'day'
                   displayFormats:
-                    day: 'MMM DD, YYYY'
+                    day: 'MMM DD'
                 gridLines: display: false
                 ticks: {
                   autoSkip: false
+                  beginAtZero: true
+                  max: getChartMax(submitterMax)
                 }
               }
             ]
@@ -384,6 +371,11 @@ window.build_graph_ticket_entries_submitter = () ->
             }
           ]
         options:
+          hover: {mode:null}
+          animation:
+            onProgress: () ->
+              type = 'vertical'
+              setDataPoint(this, type)
           responsive: true
           maintainAspectRatio: false
           legend: display: false
@@ -405,8 +397,9 @@ window.build_graph_ticket_entries_submitter = () ->
                 offset: true
                 type: 'time'
                 time:
+                  unit: 'day'
                   displayFormats:
-                    day: 'MMM DD, YYYY'
+                    day: 'MMM DD'
                 gridLines: display: false
                 ticks: {
                   autoSkip: false
@@ -441,12 +434,12 @@ window.build_single_closed_email_entries_resolution_piechart = () ->
     dataType: 'json'
     success: (response) ->
 
-      json = $.parseJSON(response)
+      json = $.parseJSON(response)["data"]
 
-      emailEntryResolutionLabels = json["data"]["chart_labels"]
-      emailEntryData = json["data"]["chart_data"]
+      emailEntryResolutionLabels = json["chart_labels"]
+      emailEntryData = json["chart_data"]
 
-      tableData = json["data"]["table_data"]
+      tableData = json["table_data"]
 
       email_piechart_table = $('#closed-email-entries-resolution-table tbody')
       $(email_piechart_table).empty()
@@ -471,6 +464,9 @@ window.build_single_closed_email_entries_resolution_piechart = () ->
             data: emailEntryData
           } ]
         options:
+          hover: {mode:null}
+          animation:
+            onProgress: () ->
           responsive: true
           maintainAspectRatio: false
           legend: false
@@ -512,10 +508,10 @@ window.build_single_time_to_close_linechart = () ->
     dataType: 'json'
     success: (response) ->
 
-      json = $.parseJSON(response)
+      json = $.parseJSON(response)["data"]
 
-      closedTicketNumbers = json["data"]["ticket_numbers"]
-      timeToCloseTickets = json["data"]["close_times"]
+      closedTicketNumbers = json["ticket_numbers"]
+      timeToCloseTickets = json["close_times"]
       if closedTicketNumbers.length == 0
         current_canvas = $('#time-to-close-tickets-linechart')
         current_graph = $(current_canvas)[0].getContext('2d')
@@ -559,6 +555,9 @@ window.build_single_time_to_close_linechart = () ->
             labels: closedTicketNumbers
             datasets: timeCloseTicketsDataSets
           options:
+            hover: {mode:null}
+            animation:
+              onProgress: () ->
             responsive: true
             maintainAspectRatio: false
             legend: false
@@ -644,12 +643,12 @@ window.build_single_closed_web_entries_resolution_piechart = () ->
     dataType: 'json'
     success: (response) ->
 
-      json = $.parseJSON(response)
+      json = $.parseJSON(response)["data"]
 
-      emailEntryResolutionLabels = json["data"]["chart_labels"]
-      emailEntryData = json["data"]["chart_data"]
+      emailEntryResolutionLabels = json["chart_labels"]
+      emailEntryData = json["chart_data"]
 
-      tableData = json["data"]["table_data"]
+      tableData = json["table_data"]
 
       web_piechart_table = $('#closed-web-entries-resolution-table tbody')
       $(web_piechart_table).empty()
@@ -672,6 +671,9 @@ window.build_single_closed_web_entries_resolution_piechart = () ->
             data: emailEntryData
           } ]
         options:
+          hover: {mode:null}
+          animation:
+            onProgress: () ->
           responsive: true
           maintainAspectRatio: false
           legend: false
@@ -716,12 +718,12 @@ window.build_multi_closed_email_entries_resolution_piechart = () ->
     dataType: 'json'
     success: (response) ->
 
-      json = $.parseJSON(response)
+      json = $.parseJSON(response)["data"]
 
-      emailEntryResolutionLabels = json["data"]["chart_labels"]
-      emailEntryData = json["data"]["chart_data"]
+      emailEntryResolutionLabels = json["chart_labels"]
+      emailEntryData = json["chart_data"]
 
-      tableData = json["data"]["table_data"]
+      tableData = json["table_data"]
 
       email_piechart_table = $('#multi-closed-email-entries-resolution-table tbody')
       $(email_piechart_table).empty()
@@ -743,6 +745,9 @@ window.build_multi_closed_email_entries_resolution_piechart = () ->
             data: emailEntryData
           } ]
         options:
+          hover: {mode:null}
+          animation:
+            onProgress: () ->
           responsive: true
           maintainAspectRatio: false
           legend: false
@@ -786,12 +791,12 @@ window.build_multi_closed_web_entries_resolution_piechart = () ->
     dataType: 'json'
     success: (response) ->
 
-      json = $.parseJSON(response)
+      json = $.parseJSON(response)["data"]
 
-      emailEntryResolutionLabels = json["data"]["chart_labels"]
-      emailEntryData = json["data"]["chart_data"]
+      emailEntryResolutionLabels = json["chart_labels"]
+      emailEntryData = json["chart_data"]
 
-      tableData = json["data"]["table_data"]
+      tableData = json["table_data"]
 
       web_piechart_table = $('#multi-closed-web-entries-resolution-table tbody')
       $(web_piechart_table).empty()
@@ -813,6 +818,10 @@ window.build_multi_closed_web_entries_resolution_piechart = () ->
             data: emailEntryData
           } ]
         options:
+          hover: {mode:null}
+          animation:
+            onProgress: () ->
+
           responsive: true
           maintainAspectRatio: false
           legend: false
@@ -859,13 +868,13 @@ window.build_single_entries_closed_by_day_chart = () ->
     dataType: 'json'
     success: (response) ->
 
-      json = $.parseJSON(response)
+      json = $.parseJSON(response)['data']
 
-      ticketTypeChartLabels = json['data']['report_labels']
-      ticketTypeTotalData = json['data']['report_total_data']
-      ticketTypeWData = json['data']['report_w_data']
-      ticketTypeEData = json['data']['report_e_data']
-      ticketTypeEWData = json['data']['report_ew_data']
+      ticketTypeChartLabels = json['report_labels']
+      ticketTypeTotalData = json['report_total_data']
+      ticketTypeWData = json['report_w_data']
+      ticketTypeEData = json['report_e_data']
+      ticketTypeEWData = json['report_ew_data']
 
       total_entries = 0
       i = 0
@@ -915,6 +924,11 @@ window.build_single_entries_closed_by_day_chart = () ->
             labels: ticketTypeChartLabels
             datasets: window.userTicketClosedGraphDatasets,
           options:
+            hover: {mode:null}
+            animation:
+              onProgress: () ->
+                type = 'vertical'
+                setDataPoint(this, type)
             responsive: true
             maintainAspectRatio: false
             legend:
@@ -922,14 +936,13 @@ window.build_single_entries_closed_by_day_chart = () ->
             title:
               display: true
               position: 'bottom'
-              text: 'Dates'
             scales:
               yAxes: [
                 {
                   gridLines:
                     display: false
                   ticks: {
-                    beginAtZero: true,
+                    beginAtZero: true
                     callback: (value) ->
                       if Number.isInteger(value)
                         return value
@@ -939,11 +952,12 @@ window.build_single_entries_closed_by_day_chart = () ->
               ]
               xAxes: [
                 {
-                  type: 'time'
                   offset: true
+                  type: 'time'
                   time:
+                    unit: 'day'
                     displayFormats:
-                      day: 'MMM DD, YYYY'
+                      day: 'MMM DD'
                   gridLines:
                     display: false
                   ticks: {
@@ -985,16 +999,14 @@ window.build_multi_entries_closed_by_day_chart = () =>
     dataType: 'json'
     success: (response) ->
 
-      json = $.parseJSON(response)
+      json = $.parseJSON(response)["data"]
 
-      totalTicketEnties = json["data"]["report_total_data"]
-      emailTicketEntries = json["data"]["report_e_data"]
-      webTicketEntries = json["data"]["report_w_data"]
-      ewTicketEntries = json["data"]["report_ew_data"]
+      totalTicketEnties = json["report_total_data"]
+      emailTicketEntries = json["report_e_data"]
+      webTicketEntries = json["report_w_data"]
+      ewTicketEntries = json["report_ew_data"]
 
-
-
-      dateRange = json["data"]["report_labels"]
+      dateRange = json["report_labels"]
 
       totalTicketEntriesbyType = [
         {
@@ -1026,6 +1038,11 @@ window.build_multi_entries_closed_by_day_chart = () =>
           labels: dateRange
           datasets: totalTicketEntriesbyType
         options:
+          hover: {mode:null}
+          animation:
+            onProgress: () ->
+              type = 'vertical'
+              setDataPoint(this)
           responsive: true
           maintainAspectRatio: false
           legend: display: false
@@ -1047,11 +1064,12 @@ window.build_multi_entries_closed_by_day_chart = () =>
             ]
             xAxes: [
               {
-                type: 'time'
                 offset: true
+                type: 'time'
                 time:
+                  unit: 'day'
                   displayFormats:
-                    day: 'MMM DD, YYYY'
+                    day: 'MMM DD'
                 gridLines: {
                   display: false
                 }
@@ -1064,6 +1082,8 @@ window.build_multi_entries_closed_by_day_chart = () =>
       )
 
       window.updateGraph = (label, barGraphName, e) ->
+
+        console.log(barGraphName, this)
         originalData = []
 
         if barGraphName == 'userTicketClosedGraph'
@@ -1083,11 +1103,15 @@ window.build_multi_entries_closed_by_day_chart = () =>
             currentData = window[barGraphName].data.datasets
             window[barGraphName].data.datasets = currentData.filter (x) -> label.indexOf(x.label) < 0
             window[barGraphName].update()
+          Chart.helpers.each Chart.instances, (instance) ->
+            if instance.chart.canvas.id == 'graph-multiuser-ticket-entries-closed'
+              setDataPoint(this)
+
 
 
     error: (response) ->
-        console.log(response, 'Error building chart')
-    )
+      console.log(response, 'Error building chart')
+  )
 #### Multi User Graphs #####
 
 window.build_multi_ticket_resolution_by_owner_chart = () ->
@@ -1110,18 +1134,17 @@ window.build_multi_ticket_resolution_by_owner_chart = () ->
     dataType: 'json'
     success: (response) ->
 
-      json = $.parseJSON(response)
+      json = $.parseJSON(response)["data"]
 
-      ticketOwners = json["data"]["ticket_owners"]
-      fixedFPTickets = json["data"]["fixed_fp_tickets"]
-      fixedFNTickets = json["data"]["fixed_fn_tickets"]
-      unchangedTickets = json["data"]["unchanged_tickets"]
-      otherTickets = json["data"]["other_tickets"]
+      fixedFPTickets = json["fixed_fp_tickets"]
+      fixedFNTickets = json["fixed_fn_tickets"]
+      unchangedTickets = json["unchanged_tickets"]
+      otherTickets = json["other_tickets"]
 
       new Chart($('#ticket-resolutions-by-owner'),
         type: 'bar'
         data:
-          labels: ticketOwners
+          labels: ['Fixed FP','Fixed FN','Unchanged','Other']
           datasets: [
             {
               label: 'Fixed FP'
@@ -1145,7 +1168,11 @@ window.build_multi_ticket_resolution_by_owner_chart = () ->
             }
           ]
         options:
-          responsive: true
+          hover: {mode:null}
+          animation:
+            onProgress: () ->
+              type = 'vertical'
+              setDataPoint(this, type)
           maintainAspectRatio: false
           title:
             display: false
@@ -1165,6 +1192,7 @@ window.build_multi_ticket_resolution_by_owner_chart = () ->
             ]
             xAxes: [
               {
+                categoryPercentage: 1.0
                 gridLines: display: false
               }
             ]
@@ -1202,9 +1230,13 @@ window.build_multi_entries_closed_by_owners_chart = () ->
     dataType: 'json'
     success: (response) ->
 
-      json = $.parseJSON(response)
-      ticketOwners = json['data']['report_labels'] #['mtaylor', 'chrclair', 'nherbert', 'nverbeck', 'abreeeman']
-      ticketEntriesByOwner = json['data']['report_data'] #[8, 15, 11, 10, 13.5]
+      json = $.parseJSON(response)["data"]
+      ticketOwners = json['report_labels']
+      ticketEntriesByOwner = json['report_data']
+
+      totalEntries = ticketEntriesByOwner.reduce(getSum)
+      ticketOwners.push('Total Entries')
+      ticketEntriesByOwner.push(totalEntries)
 
       total_entries = 0
       i = 0
@@ -1236,6 +1268,10 @@ window.build_multi_entries_closed_by_owners_chart = () ->
               data: ticketEntriesByOwner
             } ]
           options:
+            hover: {mode:null}
+            animation:
+              onProgress: () ->
+                setDataPoint(this)
             responsive: true
             maintainAspectRatio: false
             legend: display: false
@@ -1245,6 +1281,7 @@ window.build_multi_entries_closed_by_owners_chart = () ->
                   gridLines: display: false
                   ticks: {
                     min: 0
+                    max: getChartMax(ticketEntriesByOwner)
                   }
                 }
               ]
@@ -1253,6 +1290,7 @@ window.build_multi_entries_closed_by_owners_chart = () ->
                   gridLines: display: false
                   ticks: {
                     beginAtZero: true,
+                    max: getChartMax(ticketEntriesByOwner)
                     callback: (value) ->
                       if Number.isInteger(value)
                         return value
@@ -1291,10 +1329,14 @@ window.build_multi_average_time_to_close_tickets = () ->
     dataType: 'json'
     success: (response) ->
 
-      json = $.parseJSON(response)
+      json = $.parseJSON(response)["data"]
 
-      ticketOwners = json["data"]["report_labels"]
-      avgTimeToCloseTickets = json["data"]["report_data"]
+      ticketOwners = json["report_labels"]
+      avgTimeToCloseTickets = json["report_data"]
+
+      totalTime = avgTimeToCloseTickets.reduce(getSum) / avgTimeToCloseTickets.length
+      ticketOwners.push('Team Average')
+      avgTimeToCloseTickets.push(totalTime)
 
       total_tickets = 0
       i = 0
@@ -1324,6 +1366,10 @@ window.build_multi_average_time_to_close_tickets = () ->
               data: avgTimeToCloseTickets
             } ]
           options:
+            hover: {mode:null}
+            animation:
+              onProgress: () ->
+                setDataPoint(this)
             responsive: true
             maintainAspectRatio: false
             legend: display: false
@@ -1341,6 +1387,8 @@ window.build_multi_average_time_to_close_tickets = () ->
                   gridLines: display: false
                   ticks: {
                     min: 0
+                    stepValue: 10,
+                    max: getChartMax(avgTimeToCloseTickets)
                   }
                   scaleLabel: {
                     display: true,
@@ -1353,12 +1401,6 @@ window.build_multi_average_time_to_close_tickets = () ->
     error: (response) ->
       console.log(response, 'Error building chart')
   )
-
-
-
-
-
-
 
 window.build_multi_rulehits_for_fp_res_chart = () ->
   from = localStorage.getItem('webrep_report_range_from')
@@ -1380,10 +1422,10 @@ window.build_multi_rulehits_for_fp_res_chart = () ->
     dataType: 'json'
     success: (response) ->
 
-      json = $.parseJSON(response)
+      json = $.parseJSON(response)["data"]
 
-      fpRules = json["data"]["rules"] #['a500', 'alx_ cln', 'mute_phish', 'sbl', 'srch', 'suwl', 'trd_mal']
-      totalRuleHits = json["data"]["rule_hits"] #[ 5, 18, 9, 14, 4, 7, 3]
+      fpRules = json["rules"] #['a500', 'alx_ cln', 'mute_phish', 'sbl', 'srch', 'suwl', 'trd_mal']
+      totalRuleHits = json["rule_hits"] #[ 5, 18, 9, 14, 4, 7, 3]
 
       total_hits = 0
       i = 0
@@ -1413,6 +1455,9 @@ window.build_multi_rulehits_for_fp_res_chart = () ->
               data: totalRuleHits
             } ]
           options:
+            hover: {mode:null}
+            animation:
+              onProgress: () ->
             responsive: true
             maintainAspectRatio: false
             legend: display: false
@@ -1510,4 +1555,3 @@ $ ->
 
     window.refresh_visable_report_tab()
     window.populate_top_banner()
-
