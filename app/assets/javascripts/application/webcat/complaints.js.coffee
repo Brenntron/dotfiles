@@ -1,3 +1,9 @@
+table_page=0
+
+$(document).on 'click', '.paginate_button', ->
+  table = $('#complaints-index').DataTable()
+  table_page = table.page.info().page
+
 window.updateURI = (complaint_entry_id) ->
   event.preventDefault()
 
@@ -5,7 +11,6 @@ window.updateURI = (complaint_entry_id) ->
     keyboard: false
   })
 
-  uri = $("#complaint_prefix_#{complaint_entry_id}").val()
 
   std_msg_ajax(
     method: 'POST'
@@ -246,7 +251,7 @@ window.updatePending = (id,row_id) ->
         temp_row.data().resolution = resolution
         temp_row.data().internal_comment = comment
         temp_row.data().resolution_comment = resolution_comment
-        temp_row.invalidate().draw()
+        temp_row.invalidate().page(table_page).draw(false)
         temp_row.child().remove()
         temp_row.child(format(temp_row)).show()
         $('#input_cat_'+ temp_row.data().entry_id).selectize {
@@ -306,7 +311,7 @@ window.updateEntryColumns = (entry_id,row_id) ->
           temp_row.data().resolution_comment = resolution_comment
           temp_row.data().category = category_names
           temp_row.data().category_names = category_names
-          temp_row.invalidate().draw()
+          temp_row.invalidate().page(table_page).draw(false)
           temp_row.child().remove()
           temp_row.child(format(temp_row)).show()
           $('#input_cat_'+ temp_row.data().entry_id).selectize {
@@ -747,68 +752,25 @@ format = (complaint_entry_row) ->
 
 
   complaint_entry_html = ''
+  input_cat = 'input_cat_' + complaint_entry.entry_id
+
   if complaint_entry.status == "PENDING"
-    input_cat = 'input_cat_' + complaint_entry.entry_id
-
-    complaint_entry_html =
-      '<table><tr><td class="no_pad"><div class="row">' +
-      '<div class="col-xs-12 col-sm-6 nested-complaint-static-data">' +
-      '<div class="row">' +
-      '<div class="col-xs-4 col-with-divider">' +
-      '<div class="screenshot-thumb-wrapper">' +
-      '<img id="screenshot_id_' + complaint_entry.entry_id + '" class="screenshot-thumb-img" title="' + screen_shot_error + '" data-toggle="popover" onclick="enlarge_image(' + complaint_entry.entry_id + ',\'complaint_entries/serve_image?complaint_entry_id=' + complaint_entry.entry_id + '\')" src="complaint_entries/serve_image?complaint_entry_id=' + complaint_entry.entry_id + '" />' +
-      '</div>' +
-      '<div class="complaint-entry-info">' +
-      '<label class="content-label-sm">Case ID</label>' +
-      '<span class="nested-complaint-data case-id"><a href="complaints/' + complaint_entry.complaint_id + '">' + complaint_entry.complaint_id + '</a></span>' +
-      '<label class="content-label-sm">Entry URI</label>' +
-      '<span class="nested-complaint-data" id="entry-uri-' + complaint_entry.entry_id + '">' + uri + '</span>' +
-      '<label class="content-label-sm">Site Search</label>' +
-      '<span class="nested-complaint-data" id="site-search-' + complaint_entry.entry_id + '">' + search_uri + '</span>' +
-      '</div></div>' +
-      '<div class="col-xs-4 col-with-divider">' +
-      '<table class="simple-nested-table" id="' + complaint_entry.entry_id + '"><thead><tr><th>Conf</th><th>Current Categories</th><th>Certainty</th></tr></thead>' +
-      '</table>' +
-      '</div>' +
-      '<div class="col-xs-2 col-with-divider">' +
-      '<label class="content-label-sm">Resolution</label><br/>' +
-      '<span class="complaint-resolution' + complaint_entry.entry_id + '">' + complaint_entry.resolution + '</span>' +
-        '</div><div class="col-xs-2">' +
-        '<button class="secondary" id="lookup-' + complaint_entry.entry_id + '" onclick="WebCat.RepLookup.queryWhoIs(\'' + url + '\')">Lookup</button><br/>' +
-        '<button class="secondary" id="history-' + complaint_entry.entry_id + '" onclick="history_dialog(' + complaint_entry.entry_id  + ')">History</button><br/>' +
-        '<button class="secondary" id="domain-' + complaint_entry.entry_id + '" onclick="domain_whois(\'' + whois_lookup + '\')">Domain</domain>' +
-      '</div></div></div>' +
-      '<div class="col-xs-12 col-sm-6 nested-complaint-editable-data">' +
-      '<div class="row">' +
-      '<div class="col-xs-6 col-with-divider">' +
-      '<label class="content-label-sm">Edit URI</label><br/>' +
-      '<input class="nested-table-input" id="complaint_prefix_' + complaint_entry.entry_id +
-      '" type="text" onclick="this.select()" value="' + host +
-      '"' + entry_status + '>' +
-      '<button class="secondary inline-button" onclick="updateURI(' + complaint_entry.entry_id + ')">Update URI</button><br/>' +
-      '<div class="complaint-selectize-col-wrapper">' +
-      '<label class="content-label-sm">Categories to commit</label>' +
-      '<fieldset id="'+input_cat+'" ' + entry_status + '  name="['+input_cat+'][]" class="selectize pending" placeholder="Enter up to 5 categories" value="">' +
-      '</div></div>' +
-      '<div class="col-xs-4 col-with-divider">' +
-      '<label class="content-label-sm">Internal Comment</label><br/>' +
-      '<input class="nested-table-input complaint-comment-input" id="complaint_comment_' + complaint_entry.entry_id + '" type="text" onclick="this.select()" class="nested-table-input" value="' + internal_comment + '" placeholder="Add a comment." ' + entry_status + '><br/>'  +
-      '<label class="content-label-sm customer-label">Customer Facing Comment</label><br/>' +
-      '<input class="nested-table-input complaint-comment-input" id="complaint_resolution_comment_' + complaint_entry.entry_id + '" type="text" onclick="this.select()" value="' + resolution_comment + '" placeholder="Add a comment for the customer." ' + entry_status + '>' +
-      '</div>' +
-      '<div class="col-xs-2">' +
-      '<input type="radio" name="resolution_review_' + complaint_entry.entry_id + '" value="commit" > Commit <br/>' +
-      '<input type="radio" name="resolution_review_' + complaint_entry.entry_id + '" value="decline" checked="checked"> Decline' +
-      '<br/><button class="tertiary" onclick="updatePending(' + complaint_entry.entry_id + ',' + row_id + ')"> Submit </button>' +
-      '</div></div>' +
-      '</div></div></td></tr></table>'
-
+    complaint_submission_html =
+        '<input type="radio" name="resolution_review_' + complaint_entry.entry_id + '" value="commit" > Commit <br/>' +
+        '<input type="radio" name="resolution_review_' + complaint_entry.entry_id + '" value="decline" checked="checked"> Decline' +
+        '<br/><button class="tertiary" onclick="updatePending(' + complaint_entry.entry_id + ',' + row_id + ')"> Submit </button></div>'
   else
-    input_cat = 'input_cat_' + complaint_entry.entry_id
+    complaint_submission_html =
+        '<input type="radio" class="resolution_radio_button" id="unchanged' + complaint_entry.entry_id + '" name="resolution' + complaint_entry.entry_id + '" value="UNCHANGED" ' + unchanged_radio + entry_status + '> Unchanged <br/> ' +
+        '<input type="radio" class="resolution_radio_button" id="fixed' + complaint_entry.entry_id + '" name="resolution' + complaint_entry.entry_id + '" value="FIXED"  ' + fixed_radio + entry_status + '> Fixed  <br/> ' +
+        '<input type="radio" class="resolution_radio_button" id="invalid' + complaint_entry.entry_id + '" name="resolution' + complaint_entry.entry_id + '" value="INVALID" ' + invalid_radio + entry_status + '> Invalid' +
+        '<br/>' +
+        '<button class="tertiary submit_changes" id="submit_changes_' + complaint_entry.entry_id + '" onclick="updateEntryColumns(' + complaint_entry.entry_id + ',' + row_id + ')" ' + entry_status + '>Submit Changes</button>' +
+        '</div>'
 
-
-    complaint_entry_html =
-      '<table><tr><td class="no_pad"><div class="row"><div class="col-xs-12 col-sm-6 nested-complaint-static-data">' +
+  complaint_entry_html =
+      '<table class="active_table"><tr><td class="no_pad"><div class="row">' +
+      '<div class="col-xs-12 col-sm-6 nested-complaint-static-data">' +
       '<div class="row">' +
       '<div class="col-xs-5 col-with-divider">' +
       '<div class="screenshot-thumb-wrapper">' +
@@ -849,14 +811,11 @@ format = (complaint_entry_row) ->
       '<input class="nested-table-input complaint-comment-input" id="complaint_comment_' + complaint_entry.entry_id + '" type="text" onclick="this.select()" class="nested-table-input" value="' + internal_comment + '" placeholder="Add a comment." ' + entry_status + '><br/>'  +
       '<label class="content-label-sm customer-label">Customer Facing Comment</label><br/>' +
       '<input class="nested-table-input complaint-comment-input" id="complaint_resolution_comment_' + complaint_entry.entry_id + '" type="text" onclick="this.select()" value="' + resolution_comment + '" placeholder="Add a comment for the customer." ' + entry_status + '>' +
-      '</div><div class="col-xs-2">' +
+      '</div>' +
+      '<div class="col-xs-2">' +
       '<label class="content-label-sm">Resolution</label><br/>' +
-      '<input type="radio" class="resolution_radio_button" id="unchanged' + complaint_entry.entry_id + '" name="resolution' + complaint_entry.entry_id + '" value="UNCHANGED" ' + unchanged_radio + entry_status + '> Unchanged <br/> ' +
-      '<input type="radio" class="resolution_radio_button" id="fixed' + complaint_entry.entry_id + '" name="resolution' + complaint_entry.entry_id + '" value="FIXED"  ' + fixed_radio + entry_status + '> Fixed  <br/> ' +
-      '<input type="radio" class="resolution_radio_button" id="invalid' + complaint_entry.entry_id + '" name="resolution' + complaint_entry.entry_id + '" value="INVALID" ' + invalid_radio + entry_status + '> Invalid' +
-      '<br/>' +
-      '<button class="tertiary submit_changes" id="submit_changes_' + complaint_entry.entry_id + '" onclick="updateEntryColumns(' + complaint_entry.entry_id + ',' + row_id + ')" ' + entry_status + '>Submit Changes</button>' +
-      '</div></div></div></div></div></td></tr></table>'
+      complaint_submission_html +
+      '</div></div></div></div></td></tr></table>'
 
   complaint_entry_html
 
@@ -923,18 +882,6 @@ window.history_dialog = (id) ->
             minWidth: 600
             position: { my: "right top", at: "right top", of: window }
           $('#history_dialog').dialog('open')
-#        dialog_content = $(format_domain_info(json))
-#        if $("#complaint_button_dialog").length
-#          complaint_dialog = this
-#          $('#complaint_button_dialog').html(dialog_content[0])
-#        else
-#          complaint_dialog = '<div id="complaint_button_dialog" title="Domain Information"></div>'
-#          $('body').append(complaint_dialog)
-#          $('#complaint_button_dialog').append(dialog_content[0])
-#          $('#complaint_button_dialog').dialog
-#            autoOpen: true
-#            minWidth: 400
-#            position: { my: "right bottom", at: "right bottom", of: window }
     error: (response) ->
       notice_html = "<p>Something went wrong: #{response.responseText}</p>"
   , this)
@@ -1411,7 +1358,7 @@ window.master_submit = () ->
           temp_row.data().resolution_comment = entry.resolution_comment
           temp_row.data().category = entry.category_names
           temp_row.data().category_names = entry.category_names
-          temp_row.invalidate().draw()
+          temp_row.invalidate().page(table_page).draw(false)
           temp_row.child().remove()
           temp_row.child(format(temp_row)).show()
 
