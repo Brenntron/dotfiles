@@ -11,6 +11,7 @@ window.updateURI = (complaint_entry_id) ->
     keyboard: false
   })
 
+  uri = $("#complaint_prefix_#{complaint_entry_id}").val()
 
   std_msg_ajax(
     method: 'POST'
