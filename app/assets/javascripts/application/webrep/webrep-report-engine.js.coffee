@@ -15,7 +15,7 @@ setDataPoint = (chartInstance, type) =>
       for bar, barIndex in meta.data
         {x, y} = bar._model
         data = dataset.data[barIndex]
-        
+
         if data > 0
           if config.type == 'bar'
             if data > 5
@@ -1141,7 +1141,7 @@ window.build_multi_ticket_resolution_by_owner_chart = () ->
       new Chart($('#ticket-resolutions-by-owner'),
         type: 'bar'
         data:
-          labels: ['Fixed FP','Fixed FN','Unchanged','Other']
+          labels: ticketOwners
           datasets: [
             {
               label: 'Fixed FP'
@@ -1189,7 +1189,6 @@ window.build_multi_ticket_resolution_by_owner_chart = () ->
             ]
             xAxes: [
               {
-#                categoryPercentage: 1.0
                 gridLines: display: false
               }
             ]
