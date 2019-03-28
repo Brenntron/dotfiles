@@ -12,8 +12,7 @@ window.updateURI = (complaint_entry_id) ->
     url: "/escalations/api/v1/escalations/webcat/complaints/update_uri"
     data: {complaint_entry_id: complaint_entry_id, uri: uri }
     success: (response) ->
-      {json} = response
-      {current_categories, category, wbrs_score, domain, subdomain, status} = json
+      {current_categories, category, wbrs_score, domain, subdomain, status} = response.json
 
       $('#loader-modal').modal 'hide'
 
