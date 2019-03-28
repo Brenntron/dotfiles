@@ -327,6 +327,7 @@ window.build_graph_ticket_entries_submitter = () ->
               {
                 gridLines: display: false
                 ticks: {
+                  beginAtZero: true,
                   callback: (value) ->
                     if Number.isInteger(value)
                       return value
@@ -461,8 +462,6 @@ window.build_single_closed_email_entries_resolution_piechart = () ->
         options:
           hover:
             mode: null
-          animation:
-            onProgress: () ->
           responsive: true
           maintainAspectRatio: false
           legend: false
@@ -668,8 +667,6 @@ window.build_single_closed_web_entries_resolution_piechart = () ->
         options:
           hover:
             mode: null
-          animation:
-            onProgress: () ->
           responsive: true
           maintainAspectRatio: false
           legend: false
@@ -743,8 +740,6 @@ window.build_multi_closed_email_entries_resolution_piechart = () ->
         options:
           hover:
             mode: null
-          animation:
-            onProgress: () ->
           responsive: true
           maintainAspectRatio: false
           legend: false
@@ -817,9 +812,6 @@ window.build_multi_closed_web_entries_resolution_piechart = () ->
         options:
           hover:
             mode: null
-          animation:
-            onProgress: () ->
-
           responsive: true
           maintainAspectRatio: false
           legend: false
