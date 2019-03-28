@@ -106,9 +106,9 @@ $ ->
         {
           data: 'age'
           width: '40px'
-          'render':(data) ->
-            console.log data
-            return data
+#          'render':(data) ->
+#            console.log data
+#            return data
 
 #            current_time = moment()
 #            created_at = moment(full.created_at)
