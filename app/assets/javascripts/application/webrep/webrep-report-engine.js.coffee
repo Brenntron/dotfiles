@@ -14,8 +14,8 @@ setDataPoint = (chartInstance, type) =>
       meta = controller.getDatasetMeta(dataIndex)
       for bar, barIndex in meta.data
         {x, y} = bar._model
-
         data = dataset.data[barIndex]
+        
         if data > 0
           if config.type == 'bar'
             if data > 5
