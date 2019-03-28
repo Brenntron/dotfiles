@@ -64,13 +64,14 @@ module API
                   # complaint is more than an hour, less than 120 hours
                   elsif complaint_age_int > 3600 and complaint_age_int < 432000
                     refined_words_age = ComplaintEntry.what_time_is_it(complaint_age_int)
-
                     # complaint is over 3 hours, less than 12 hours
                     if complaint_age_int >= 10800 and complaint_age_int < 43200
                       complaint_entry_packet[:age] = '<span class="ticket-age-over3hr">' + refined_words_age + '</span>'
                     # complaint is over 12 hours, less than 120 hours
                     elsif complaint_age_int > 43200
                       complaint_entry_packet[:age] = '<span class="ticket-age-over12hr">' + refined_words_age + '</span>'
+                    else
+                      complaint_entry_packet[:age] = refined_words_age
                     end
                   # complaint is more than 120 hours
                   elsif complaint_age_int  > 432000
