@@ -276,7 +276,7 @@ window.updateEntryColumns = (entry_id,row_id) ->
   category_name.each ->
     category_names.push($(this).text())
   category_names = category_names.toString()
-  status = $('[name=resolution'+entry_id+']:checked').val()
+  resolution_status = $('[name=resolution'+entry_id+']:checked').val()
   comment = $('#complaint_comment_'+entry_id)[0].value
   resolution_comment = $('#complaint_resolution_comment_'+entry_id)[0].value
   headers = {'Token': $('input[name="token"]').val(), 'Xmlrpc-Token': $('input[name="xml_token"]').val()}
@@ -290,20 +290,19 @@ window.updateEntryColumns = (entry_id,row_id) ->
       url: '/escalations/api/v1/escalations/webcat/complaint_entries/update'
       method: 'POST'
       headers: headers
-      data: {'id': entry_id,'prefix': prefix,'categories':categories, 'category_names':category_names, 'status':status,'comment':comment, 'resolution_comment': resolution_comment }
+      data: {'id': entry_id, 'prefix': prefix, 'categories':categories, 'category_names':category_names, 'status':resolution_status, 'comment':comment, 'resolution_comment': resolution_comment }
       success: (response) ->
-        json = $.parseJSON(response)
-        {uri, domain, subdomain} = json
+        {error, uri, domain, subdomain, status, display_name} = $.parseJSON(response)
 
-        if !json.error
+        if !error
           table = $('#complaints-index').DataTable()
 
           selected_rows = $('#complaints-index').DataTable().rows('.selected')
-          selected_rows.data().cell(selected_rows[0][0],14).data("#{json.display_name}").draw()
+          selected_rows.data().cell(selected_rows[0][0],14).data("#{display_name}").draw()
 
           temp_row = table.row(row_id)
-          temp_row.data().status = json.status
-          temp_row.data().resolution = status
+          temp_row.data().status = status
+          temp_row.data().resolution = resolution_status
           temp_row.data().internal_comment = comment
           temp_row.data().resolution_comment = resolution_comment
           temp_row.data().category = category_names
