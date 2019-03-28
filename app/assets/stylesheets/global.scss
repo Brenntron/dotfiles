@@ -7370,7 +7370,9 @@ td.text-center span {
     .skyblue-legend-color::before {
       background-color: $primary-section-color;
     }
-
+    .yellow-legend-color::before{
+      background-color: $third-section-color
+    }
     .navyblue-legend-color::before {
       background-color: $content-tab-color;
     }

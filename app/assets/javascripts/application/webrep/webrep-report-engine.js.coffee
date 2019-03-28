@@ -2,10 +2,10 @@ Chart.defaults.global.tooltips = false;
 
 getSum = (total, num) -> return total + num
 
-setDataPoint = (chartInstance, type) =>
+setDataPoint = (chartInstance, type) ->
 
   {ctx, data, controller, config, chart} = chartInstance
-
+  console.log(ctx, chartInstance)
   if ctx != undefined
     ctx.textAlign = 'center';
     ctx.fillStyle = "rgba(0, 0, 0, 1)";
@@ -19,17 +19,13 @@ setDataPoint = (chartInstance, type) =>
         if data > 0
           if config.type == 'bar'
             if data > 5
-              ctx.fillStyle = '#fff'
               ctx.fillText(data, x, y + 15);
             else
-              ctx.fillStyle = '#000'
               ctx.fillText(data, x, y);
           else
             if data > 5
-              ctx.fillStyle = '#fff'
               ctx.fillText(data, x - 15, y + 5);
             else
-              ctx.fillStyle = '#000'
               ctx.fillText(data, x + 15, y + 5);
 
 buildCharts = ()->
@@ -309,7 +305,7 @@ window.build_graph_ticket_entries_submitter = () ->
             }
             {
               label: 'Guest'
-              backgroundColor: '#3e5a72'
+              backgroundColor: '#f8cc11'
               data: submitterGuestChartData
             }]
         options:
@@ -362,7 +358,7 @@ window.build_graph_ticket_entries_submitter = () ->
               data: submitterCustomerChartData
             }
             {
-              backgroundColor: '#2c3e50'
+              backgroundColor: '#f8cc11'
               data: submitterGuestChartData
             }
           ]
@@ -914,6 +910,7 @@ window.build_single_entries_closed_by_day_chart = () ->
             labels: ticketTypeChartLabels
             datasets: window.userTicketClosedGraphDatasets,
           options:
+            barPercentage: 1
             hover:
               mode: null
             animation:
@@ -942,6 +939,8 @@ window.build_single_entries_closed_by_day_chart = () ->
               ]
               xAxes: [
                 {
+                  categoryPercentage: 1,
+                  barPercentage: 1,
                   offset: true
                   type: 'time'
                   time:
@@ -1125,6 +1124,7 @@ window.build_multi_ticket_resolution_by_owner_chart = () ->
 
       json = $.parseJSON(response)["data"]
 
+      ticketOwners = json["ticket_owners"]
       fixedFPTickets = json["fixed_fp_tickets"]
       fixedFNTickets = json["fixed_fn_tickets"]
       unchangedTickets = json["unchanged_tickets"]
@@ -1142,7 +1142,7 @@ window.build_multi_ticket_resolution_by_owner_chart = () ->
             }
             {
               label: 'Fixed FN'
-              backgroundColor: '#2c3e50'
+              backgroundColor: '#f8cc11'
               data: fixedFNTickets
             }
             {
@@ -1162,6 +1162,7 @@ window.build_multi_ticket_resolution_by_owner_chart = () ->
           animation:
             onProgress: () ->
               setDataPoint(this)
+          responsive: true
           maintainAspectRatio: false
           title:
             display: false
@@ -1375,7 +1376,6 @@ window.build_multi_average_time_to_close_tickets = () ->
                   gridLines: display: false
                   ticks: {
                     min: 0
-                    stepValue: 10,
                   }
                   scaleLabel: {
                     display: true,
