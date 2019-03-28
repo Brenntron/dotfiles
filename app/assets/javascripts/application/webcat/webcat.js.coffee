@@ -107,23 +107,27 @@ $ ->
           data: 'age'
           width: '40px'
           'render':(data,type,full,meta) ->
-
             current_time = moment()
             created_at = moment(full.created_at)
-            complaint_age = moment.duration(created_at.diff(current_time)).asHours();
-            complaint_age = Math.abs(complaint_age)
-            complaint_age = Math.floor(complaint_age)
 
-            if complaint_age < 1
-              complaint_latency = '<1h'
-            else if complaint_age > 1 && complaint_age < 3
-              complaint_latency = complaint_age + 'h'
-            else if complaint_age >= 3 && complaint_age < 12
-              complaint_latency ='<span class="ticket-age-over3hr">'+ complaint_age + 'h</span>'
-            else if complaint_age >= 12 && complaint_age < 120
-              complaint_latency ='<span class="ticket-age-over12hr">'+ complaint_age + 'h </span>'
-            else if complaint_age >= 120
-              complaint_latency ='<span class="ticket-age-over12hr"> >120h </span>'
+            if created_at == null || created_at == ''
+              complaint_latency = '-'
+
+            else
+              complaint_age = moment.duration(created_at.diff(current_time)).asHours();
+              complaint_age = Math.abs(complaint_age)
+              complaint_age = Math.floor(complaint_age)
+
+              if complaint_age < 1
+                complaint_latency = '<1h'
+              else if complaint_age > 1 && complaint_age < 3
+                complaint_latency = complaint_age + 'h'
+              else if complaint_age >= 3 && complaint_age < 12
+                complaint_latency ='<span class="ticket-age-over3hr">'+ complaint_age + 'h</span>'
+              else if complaint_age >= 12 && complaint_age < 120
+                complaint_latency ='<span class="ticket-age-over12hr">'+ complaint_age + 'h </span>'
+              else if complaint_age >= 120
+                complaint_latency ='<span class="ticket-age-over12hr"> >120h </span>'
         }
         {
           data: 'status'
