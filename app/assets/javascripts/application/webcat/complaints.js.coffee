@@ -4,13 +4,14 @@ $(document).on 'click', '.paginate_button', ->
   table = $('#complaints-index').DataTable()
   table_page = table.page.info().page
 
-window.updateURI = (complaint_entry_id) ->
+window.updateURI = (event, complaint_entry_id) ->
   event.preventDefault()
 
   $('#loader-modal').modal({
     keyboard: false
   })
 
+  uri = $("#complaint_prefix_#{complaint_entry_id}").val()
 
   std_msg_ajax(
     method: 'POST'
@@ -802,7 +803,7 @@ format = (complaint_entry_row) ->
       '<input class="nested-table-input" id="complaint_prefix_' + complaint_entry.entry_id +
       '" type="text" onclick="this.select()" value="' + host +
       '"' + entry_status + '>' +
-      '<button class="secondary inline-button" onclick="updateURI(' + complaint_entry.entry_id + ')">Update URI</button><br/>' +
+      '<button class="secondary inline-button" onclick="updateURI(event,' + complaint_entry.entry_id + ')">Update URI</button><br/>' +
       '<div class="complaint-selectize-col-wrapper">' +
       '<label class="content-label-sm">Edit Categories / Confidence Order</label>' +
       '<fieldset id="'+input_cat+'" ' + entry_status + '  name="['+input_cat+'][]" class="selectize" placeholder="Enter up to 5 categories" value="">' +
