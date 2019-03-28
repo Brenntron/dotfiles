@@ -18,21 +18,20 @@ setDataPoint = (chartInstance, type) =>
         data = dataset.data[barIndex]
         if data > 0
           if config.type == 'bar'
-            ctx.fillText(data, x, y);
+            if data > 5
+              ctx.fillStyle = '#fff'
+              ctx.fillText(data, x, y + 15);
+            else
+              ctx.fillStyle = '#000'
+              ctx.fillText(data, x, y);
           else
-            ctx.fillText(data, x + 15, y + 5);
+            if data > 5
+              ctx.fillStyle = '#fff'
+              ctx.fillText(data, x - 15, y + 5);
+            else
+              ctx.fillStyle = '#000'
+              ctx.fillText(data, x + 15, y + 5);
 
-$(window).resize ->
-  Chart.helpers.each Chart.instances, (instance) ->
-    element = document.getElementById(instance.ctx.canvas.id).parentNode
-    console.log(element)
-    if instance.config.type != 'pie'
-      Chart.helpers.removeEvent(element, 'resize', resize)
-      instance.destroy()
-  buildCharts()
-
-unwatch = (instance) ->
-  console.log(instance)
 buildCharts = ()->
   user_id = $("#user_id").val()
 
