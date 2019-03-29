@@ -81,6 +81,12 @@ Rails.application.routes.draw do
       get 'research', to: 'disputes#research'
     end
 
+    namespace :filerep do
+      root 'root#index'
+      resources :disputes, only: [:index, :show]
+    end
+
+
     resources :users, controller: '/users', only: [:index, :show, :update] do
       resource :bugzilla_api_key, controller: '/bugzilla_api_keys', only: [:edit, :update]
 
