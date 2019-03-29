@@ -40,7 +40,8 @@
               %a.disabled-link= inline_svg 'icon_clam.svg'
           - if can?(:read, Admin)
             %li{class: 'amp-link'}
-              %a.disabled-link= inline_svg 'icon_amp.svg'
+              %a{href: escalations_filerep_disputes_path}
+                = inline_svg 'icon_amp.svg'
           - if can?(:index, Dispute)
             %li{class: 'rep-link'}
               %a{href: escalations_webrep_disputes_path}
@@ -119,13 +120,13 @@
                 %a.disabled-link Clam
             - if can?(:read, Admin)
               %li{class: 'amp-link'}
-                %a.disabled-link AMP
+                %a{href: escalations_filerep_disputes_path} File Reputation
             - if can?(:index, Dispute)
               %li{class: 'rep-link'}
-                %a{href: escalations_webrep_disputes_path} Reputation
+                %a{href: escalations_webrep_disputes_path} Web Reputation
             - if can?(:index, Complaint)
               %li{class: 'cat-link'}
-                %a{href: escalations_webcat_complaints_path} Categorization
+                %a{href: escalations_webcat_complaints_path} Web Categorization
       %li{class: 'nav-users static-nav-item'}
         %a{href: escalations_users_path}
           Users
