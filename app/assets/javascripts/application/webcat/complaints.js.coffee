@@ -505,7 +505,6 @@ window.retrieve_history = (position) ->
         $('#loader-modal').modal 'hide'
 
         json = JSON.parse(response)
-
         if json.error
           std_msg_error("<p>Something went wrong: #{json.error}","")
         else
@@ -820,6 +819,8 @@ format = (complaint_entry_row) ->
 
   complaint_entry_html
 
+
+
 window.history_dialog = (id) ->
   headers = {'Token': $('input[name="token"]').val(), 'Xmlrpc-Token': $('input[name="xml_token"]').val()}
   $.ajax(
@@ -829,15 +830,34 @@ window.history_dialog = (id) ->
     data: {'id': id}
     success: (response) ->
       json = $.parseJSON(response)
+
       if json.error
         notice_html = "<p>Something went wrong: #{json.error}</p>"
         alert(json.error)
       else
-        #parse this json properly
-        history_dialog_content = '<div class="dialog-content-wrapper">' +
+        ## Build the History Dialog
+        history_dialog_content =
+          '<div class="dialog-content-wrapper">' +
+          # Tab navigation
+          '<ul class="nav nav-tabs dialog-tabs" role="tablist">' +
+          '<li class="nav-item active" role="presentation">' +
+          '<a class="nav-link" role="tab" data-toggle="tab" href="#domain-history-tab" aria-controls="">Domain History</a>' +
+          '</li>' +
+          '<li class="nav-item" role="presentation">' +
+          '<a class="nav-link" role="tab" data-toggle="tab" href="#complaint-history-tab" aria-controls="">Complaint Entry History</a>' +
+          '</li>' +
+          '<li class="nav-item" role="presentation">' +
+          '<a class="nav-link" role="tab" data-toggle="tab" href="#xbrs-history-tab" aria-controls="">XBRS History</a>' +
+          '</li>' +
+          '</ul>' +
+          # Tab content - beginning markup of first tab
+          '<div class="tab-content dialog-tab-content">' +
+          '<div class="tab-pane active" role="tabpanel" id="domain-history-tab">' +
           '<h5>Domain History</h5>' +
           '<table class="history-table"><thead><tr><th>Action</th><th>Confidence</th><th>Description</th><th>Time</th><th>User</th><th>Category</th></tr></thead>' +
           '<tbody>'
+
+        # Build domain history table
         for entry in json.entry_history.domain_history
           entry_string = "" +
           '<tr>' +
@@ -848,27 +868,49 @@ window.history_dialog = (id) ->
           '<td>' + entry['user'] + '</td>' +
           '<td>' + entry['category']['descr'] + '</td>' +
           '</tr>'
-
           history_dialog_content += entry_string
-        history_dialog_content += '</tbody></table>'
-        history_dialog_content += '<h5>Complaint Entry History</h5>'
-        entry_string = ""
 
+        history_dialog_content +=
+          # End domain history table and tab
+          '</tbody></table>' +
+          '</div>' +
+          # Start Complaint Entry Tab
+          '<div class="tab-pane" role="tabpanel" id="complaint-history-tab">' +
+          '<h5>Complaint Entry History</h5>' +
+          '<table class="history-table"><thead><th>Time</th><th>User</th><th>Details</th></thead>' +
+          '<tbody>'
+
+        # Build the complaint history table
+        entry_row = ""
         for entry in json.entry_history.complaint_history
-          entry_string = "" + '<p>Time: ' + entry[0] + '</p>'
-
+          entry_row = "<tr><td>" + entry[0] + '</td>'
+          details_col = ""
           i = 0
           for change_key, change_entry of entry
             i = i + 1
             if i > 1
               for key, value of change_entry
-                if key != "whodunnit"
-                  entry_string += "<p>" + key + ": " + value[0] + " - " + value[1] + "</p>"
+                if key == "whodunnit"
+                  entry_row += "<td>" + value + "</td>"
                 else
-                  entry_string += "<p>User: " + value + "</p>" +"</br>"
+                  details_col += '<span class="bold">' + key + ":</span> " + value[0] + " - " + value[1] + "<br/>"
 
-          history_dialog_content += entry_string
+          entry_row += '<td>' + details_col + '</td></tr>'
 
+          history_dialog_content += entry_row
+
+        history_dialog_content +=
+          # End complaint history table and tab
+          '</tbody></table>' +
+          '</div>' +
+          # Start XBRS Tab
+          '<div class="tab-pane" role="tabpanel" id="xbrs-history-tab">' +
+          '<h5>XBRS History</h5>' +
+          '<table class="history-table" id="webcat-xbrs-history"></table>' +
+          '</div>' +
+          '</div>'
+
+        # Only one history dialog open at a time - content gets swapped out
         if $("#history_dialog").length
           history_dialog = this
           $("#history_dialog").html(history_dialog_content)
@@ -880,12 +922,29 @@ window.history_dialog = (id) ->
           #$('#history_dialog').append(history_dialog_content)
           $('#history_dialog').dialog
             autoOpen: false
-            minWidth: 600
+            minWidth: 800
             position: { my: "right top", at: "right top", of: window }
           $('#history_dialog').dialog('open')
     error: (response) ->
       notice_html = "<p>Something went wrong: #{response.responseText}</p>"
   , this)
+
+
+# Not sure if this will be used or not
+window.get_xbrs_history = (url) ->
+  headers = {'Token': $('input[name="token"]').val(), 'Xmlrpc-Token': $('input[name="xml_token"]').val()}
+  $.ajax(
+    url: '/escalations/api/v1/escalations/webcat/complaint_entries/xbrs'
+    method: 'POST'
+    headers: headers
+    data: {'id': id}
+    success: (response) ->
+      json = $.parseJSON(response)
+      console.log json
+    error: (response) ->
+      notice_html = "<p>Something went wrong: #{response.responseText}</p>"
+  , this)
+
 
 
 parse_lookup_dialog_content = (json) ->

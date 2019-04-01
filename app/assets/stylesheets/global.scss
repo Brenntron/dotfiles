@@ -6567,6 +6567,7 @@ table.dispute-entry-table tbody tr.selected {
 
 .history-table td {
   padding: 4px 8px;
+  line-height: 1.25em;
 }
 
 .searched-for-url {
@@ -8214,4 +8215,30 @@ hr.thin.form-divider {
 
 .bugzilla-logged-out {
   background-image: url(image_path('icon_bugzilla_loggedout.svg'));
+}
+
+
+// Tab styles for tabs on dialog boxes
+.nav-tabs.dialog-tabs {
+  margin-top: 0;
+}
+
+.nav-tabs.dialog-tabs > li > a {
+  padding: 10px 15px;
+  box-shadow: none;
+  background-color: darken($content-label-color, 10%);
+}
+
+.nav-tabs.dialog-tabs > li.active > a {
+  background-color: $content-bg-color;
+  border: 1px solid darken($faint-neutral-color, 10%);
+}
+
+.nav-tabs.dialog-tabs::before {
+  height: 1px;
+}
+
+.dialog-tab-content {
+  border: 1px solid darken($faint-neutral-color, 10%);
+  padding: 15px;
 }
