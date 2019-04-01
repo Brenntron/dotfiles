@@ -30,8 +30,7 @@
 
         .search-options-col.tab-pane#lookup-quick{role:'tabpanel'}
           .col-xs-12.toolbar-quicklookup
-            %div.get-rep-button
-              %button.primary.get-rep-data Get Reputation Data
+            %button.primary.get-rep-data Get Reputation Data
             .toolbar.research-toolbar
               %div
                 %label.toolbar-section-label Adjust Reputation
@@ -43,15 +42,14 @@
                 %label.toolbar-section-label File
                 %button.toolbar-button.export-button.esc-tooltipped{title: 'Export to CSV'}
                   %span.toolbar-button-text Export to CSV
-            %div.submit-rep-button
-              %button.primary.submit-rep-changes Submit Reputation Changes
-              %span.small
-                * NOTE: Submitting reputation changes will automatically create a closed ticket
-          .row
+            %button.primary.submit-rep-changes Submit Reputation Changes
+            %span.small.note-repsubmit
+              * NOTE: Submitting reputation changes will automatically create a closed ticket
 
+          .row
             %table.research-table
               %colgroup
-                %col
+                %col.col-dispute
                 %col.col-grey
                 %col.col-grey
                 %col.col-grey
