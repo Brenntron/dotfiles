@@ -56,14 +56,38 @@ module API
 
                 complaint_entries.each do |complaint_entry|
                   complaint_entry_packet = {}
-                  complaint_entry_packet[:age] = ComplaintEntry.what_time_is_it((Time.now - complaint_entry.created_at).to_i)
+                  complaint_age_int = (Time.now - complaint_entry.created_at).to_i
+
+                  # complaint is less than an hour
+                  if complaint_age_int < 3600
+                    complaint_entry_packet[:age] = '<1h'
+                  # complaint is more than an hour, less than 120 hours
+                  elsif complaint_age_int > 3600 and complaint_age_int < 432000
+                    refined_words_age = ComplaintEntry.what_time_is_it(complaint_age_int)
+                    # complaint is over 3 hours, less than 12 hours
+                    if complaint_age_int >= 10800 and complaint_age_int < 43200
+                      complaint_entry_packet[:age] = '<span class="ticket-age-over3hr">' + refined_words_age + '</span>'
+                    # complaint is over 12 hours, less than 120 hours
+                    elsif complaint_age_int > 43200
+                      complaint_entry_packet[:age] = '<span class="ticket-age-over12hr">' + refined_words_age + '</span>'
+                    else
+                      complaint_entry_packet[:age] = refined_words_age
+                    end
+                  # complaint is more than 120 hours
+                  elsif complaint_age_int  > 432000
+                    complaint_entry_packet[:age] = '<span class="ticket-age-over12hr"> >120h </span>'
+                  else
+                    complaint_entry_packet[:age] = complaint_age_int
+                  end
+
+
                   complaint_entry_packet[:age_int] = (Time.now - complaint_entry.created_at).to_i
                   complaint_entry_packet[:complaint_id] = complaint_entry&.complaint.id
                   complaint_entry_packet[:entry_id] = complaint_entry.id
 
                   complaint_entry_packet[:assigned_to] = complaint_entry.user&.display_name
                   complaint_entry_packet[:status] = complaint_entry.status
-                  complaint_entry_packet[:created_at] = complaint_entry.created_at.strftime('%Y-%m-%d %H:%M:%S')
+                  complaint_entry_packet[:created_at] = complaint_entry.created_at
                   complaint_entry_packet[:customer_name] = complaint_entry.complaint&.customer&.name # Customer name
 
                   complaint_entry_packet[:category] = complaint_entry.url_primary_category
@@ -129,7 +153,6 @@ module API
                 search_name = permitted_params['search_name']
                 named_search = NamedSearch.where(user: current_user, name: search_name).first
               end
-
                 {:status => "success", :search_name => search_name, :search_id => named_search&.id, :data => json_packet}.to_json
             end
 

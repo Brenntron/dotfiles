@@ -30,8 +30,9 @@ $(document).ready ->
     false
 
   $('.remove-input').click ->
-    field_name = $(this).parent().find('input').attr('id') || $(this).parent().find('select').attr('id')
-    field_wrapper = $(this).parent().attr('id')
+    field = $(this).parent()
+    field_name = field.find('input').attr('id') || field.find('select').attr('id')
+    field_wrapper = field.attr('id')
     $('.search-checkbox').each ->
       if $(this).attr('for') == field_name
         $($(this).parent()).parent().removeClass('hidden')

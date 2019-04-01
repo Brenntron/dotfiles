@@ -8,7 +8,7 @@ $(window).load ->
   )
 
   $(".email-row[email_id="+most_recent_email+"]").click()
-  
+
 $ ->
 
   $('#history-sort-dropdown').on 'change', ->
@@ -170,9 +170,8 @@ $ ->
       data: form_data
       contentType: false
       processData: false
-      success_reload: true
       success: (response) ->
-        std_msg_success('Email Sent.', [], reload: true)
+        window.location.reload()
       error: (response) ->
         std_api_error(response, "Email was not sent", reload: false)
     )
@@ -232,11 +231,8 @@ $ ->
           contentType: false
           processData: false
           success_reload: true
-          success: (response) ->
-            $('#newEmail').modal('hide');
-            std_msg_success('Email Sent.', [], reload: true)
           error: (response) ->
-            $('#newEmail').modal('hide');
+            $('#newEmailDialog').dialog 'close'
             $('.delete_attachment_new').click()
             std_api_error(response, "Email was not sent", response, reload: false)
         )
@@ -248,12 +244,9 @@ $ ->
           contentType: false
           processData: false
           success_reload: true
-          success: (response) ->
-            $('#newEmail').modal('hide');
-            std_msg_success('Email Sent.', [], reload: true)
           error: (response) ->
-            $('#newEmail').modal('hide');
-            $('.delete_attachment_new').click();
+            $('#newEmailDialog').dialog 'close'
+            $('.delete_attachment_new').click()
             std_api_error(response, "Email was not sent", response, reload: false)
         )
 
@@ -265,16 +258,15 @@ $ ->
   $('.note-delete-button').on "click", ->
     comment_id = $(this).attr('comment_id')
     current_user_id = $('input[name="current_user_id"]').val()
-    confirmation = confirm('Are you sure you want to delete this note?')
 
-    if confirmation
+    std_msg_confirm('Are you sure you want to delete this note?', [])
+
+    $('.confirm').on 'click', ->
       std_msg_ajax(
         method: 'DELETE'
         url: "/escalations/api/v1/escalations/webrep/dispute_comments/#{comment_id}"
         data: {current_user_id: current_user_id}
-        success_reload: false
-        success: (response) ->
-          std_msg_success('Note Deleted.', [], reload: true)
+        success_reload: true
         error: (response) ->
           std_api_error(response, "Note could not be deleted.", reload: false)
       )
@@ -292,8 +284,6 @@ $ ->
       url: "/escalations/api/v1/escalations/webrep/dispute_comments/#{comment_id}"
       data: {current_user_id: current_user_id, comment: updated_comment}
       success_reload: true
-      success: (response) ->
-        std_msg_success('Note Updated.', [], reload: true)
       error: (response) ->
         std_api_error(response, "Note could not be updated.", reload: false)
     )
@@ -340,7 +330,6 @@ $ ->
         method: 'POST'
         url: "/escalations/api/v1/escalations/webrep/dispute_comments"
         data: {user_id: user_id, comment: comment, dispute_id: dispute_id}
-        success_msg: 'Note Created.'
         success_reload: true
         error_prefix: 'Note could not created.'
         failure_reload: false
