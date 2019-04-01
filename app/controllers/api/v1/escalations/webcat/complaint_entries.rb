@@ -53,16 +53,41 @@ module API
                                                                user: current_user)
 
               if complaint_entries
+
                 complaint_entries.each do |complaint_entry|
                   complaint_entry_packet = {}
-                  complaint_entry_packet[:age] = ComplaintEntry.what_time_is_it((Time.now - complaint_entry.created_at).to_i)
+                  complaint_age_int = (Time.now - complaint_entry.created_at).to_i
+
+                  # complaint is less than an hour
+                  if complaint_age_int < 3600
+                    complaint_entry_packet[:age] = '<1h'
+                  # complaint is more than an hour, less than 120 hours
+                  elsif complaint_age_int > 3600 and complaint_age_int < 432000
+                    refined_words_age = ComplaintEntry.what_time_is_it(complaint_age_int)
+                    # complaint is over 3 hours, less than 12 hours
+                    if complaint_age_int >= 10800 and complaint_age_int < 43200
+                      complaint_entry_packet[:age] = '<span class="ticket-age-over3hr">' + refined_words_age + '</span>'
+                    # complaint is over 12 hours, less than 120 hours
+                    elsif complaint_age_int > 43200
+                      complaint_entry_packet[:age] = '<span class="ticket-age-over12hr">' + refined_words_age + '</span>'
+                    else
+                      complaint_entry_packet[:age] = refined_words_age
+                    end
+                  # complaint is more than 120 hours
+                  elsif complaint_age_int  > 432000
+                    complaint_entry_packet[:age] = '<span class="ticket-age-over12hr"> >120h </span>'
+                  else
+                    complaint_entry_packet[:age] = complaint_age_int
+                  end
+
+
                   complaint_entry_packet[:age_int] = (Time.now - complaint_entry.created_at).to_i
                   complaint_entry_packet[:complaint_id] = complaint_entry&.complaint.id
                   complaint_entry_packet[:entry_id] = complaint_entry.id
 
                   complaint_entry_packet[:assigned_to] = complaint_entry.user&.display_name
                   complaint_entry_packet[:status] = complaint_entry.status
-                  complaint_entry_packet[:created_at] = complaint_entry.created_at.strftime('%Y-%m-%d %H:%M:%S')
+                  complaint_entry_packet[:created_at] = complaint_entry.created_at
                   complaint_entry_packet[:customer_name] = complaint_entry.complaint&.customer&.name # Customer name
 
                   complaint_entry_packet[:category] = complaint_entry.url_primary_category
@@ -103,8 +128,6 @@ module API
 
                   complaint_entry_packet[:description] = complaint_entry&.complaint&.description
 
-                  # Need to rip this out, because if current category information changes, preload data will be out of date
-
                   #fake it til they make it
                   # fake_ass_bullshit = {}
                   # fake_ass_bullshit[77] = {:is_active => 1, :mnemonic => "alc", :category_id => 77, :prefix_id => 12, :confidence => 1, :name => "Alcohol", :long_description => "Good ole fun juice"}
@@ -125,8 +148,12 @@ module API
                   json_packet << complaint_entry_packet
                 end
               end
-              {:status => "success", :data => json_packet}.to_json
 
+              if permitted_params['search_name'].present?
+                search_name = permitted_params['search_name']
+                named_search = NamedSearch.where(user: current_user, name: search_name).first
+              end
+                {:status => "success", :search_name => search_name, :search_id => named_search&.id, :data => json_packet}.to_json
             end
 
 
@@ -156,7 +183,7 @@ module API
               rescue Exception => e
                   return {error:e.message}.to_json
               end
-              {status:entry.status, entry_resolution:permitted_params['status']}.to_json
+              {display_name: current_user.display_name, status:entry.status, entry_resolution:permitted_params['status']}.to_json
             end
 
 
@@ -194,8 +221,32 @@ module API
             end
             post 'take_entry' do
               begin
+                error_entry_ids = {}
+                error_count = 0
                 permitted_params['complaint_entry_ids'].each do |id|
-                  ComplaintEntry.find(id).take_complaint(current_user)
+                  status = ComplaintEntry.find(id).take_complaint(current_user)
+                  if status != "Complaint taken"
+                    error_count += 1
+                    if error_entry_ids[status].nil?
+                      error_entry_ids[status] = [id]
+                    else
+                      error_entry_ids[status] << id
+                    end
+                  end
+                end
+                unless error_entry_ids.keys.empty?
+                  if error_count == permitted_params['complaint_entry_ids'].count
+                    error_message = ["---The following entrys could not be taken because---"]
+                  else
+                    error_message = ["---Some entries were taken however, The following entrys could not be taken because---"]
+                  end
+                  error_entry_ids.keys.each do |key|
+                    error_message << "#{key}: entry IDs -> #{error_entry_ids[key].to_sentence}"
+                  end
+                  unless error_count == permitted_params['complaint_entry_ids'].count
+                    error_message << "Please refresh the page to pickup the latest changes."
+                  end
+                  return {:error => error_message}.to_json
                 end
               rescue Exception => e
                 Rails.logger.error "Failed to take entry: error=> #{e.message}"
@@ -212,8 +263,32 @@ module API
             end
             post 'return_entry' do
               begin
+                error_entry_ids = {}
+                error_count = 0
                 permitted_params['complaint_entry_ids'].each do |id|
-                  ComplaintEntry.find(id).return_complaint(current_user)
+                  status = ComplaintEntry.find(id).return_complaint
+                  if status != "Complaint returned"
+                    error_count += 1
+                    if error_entry_ids[status].nil?
+                      error_entry_ids[status] = [id]
+                    else
+                      error_entry_ids[status] << id
+                    end
+                  end
+                end
+                unless error_entry_ids.keys.empty?
+                  if error_count == permitted_params['complaint_entry_ids'].count
+                    error_message = ["---The following entrys could not be returned because---"]
+                  else
+                    error_message = ["---Some entries were returned however, The following entrys could not be returned because---"]
+                  end
+                  error_entry_ids.keys.each do |key|
+                    error_message << "#{key}: entry IDs -> #{error_entry_ids[key].to_sentence}"
+                  end
+                  unless error_count == permitted_params['complaint_entry_ids'].count
+                    error_message << "Please refresh the page to pickup the latest changes."
+                  end
+                  return {:error => error_message}.to_json
                 end
               rescue Exception => e
                 Rails.logger.error "Failed to take entry: error=> #{e.message}"
@@ -267,7 +342,7 @@ module API
               std_api_v2 do
                 begin
                   prefix_id = Wbrs::Prefix.where(:urls => [permitted_params['url']]).first.prefix_id
-                  response = Wbrs::HistoryRecord.where({:prefix_id => prefix_id}).sort_by {|history| history.time}.reverse
+                  response = Wbrs::HistoryRecord.where({:prefix_id => prefix_id}).sort_by {|history| DateTime.parse(history.time)}.reverse
                   render response.to_json
                 rescue
                   raise 'The URL you provided does not have available data.'
@@ -384,6 +459,46 @@ module API
                 complaint_entry.current_category_data.to_json
               end
             end
+
+            desc 'Update several entries at once'
+            params do
+              requires :data, type: Array
+            end
+
+            post 'master_submit' do
+              std_api_v2 do
+                response = []
+                permitted_params['data'].each do |entry|
+                  begin
+                    if entry['error'] == false
+                      complaint_entry = ComplaintEntry.find(entry['entry_id'])
+                      complaint_entry.change_category( entry['prefix'],entry['categories'],
+                                                       entry['status'],
+                                                       entry['comment'],
+                                                       entry['resolution_comment'],
+                                                       current_user, "")
+
+                      ComplaintEntryPreload.generate_preload_from_complaint_entry(complaint_entry)
+                      if complaint_entry.complaint.ticket_source != Complaint::SOURCE_RULEUI
+                        message = Bridge::ComplaintUpdateStatusEvent.new
+                        message.post_complaint(complaint_entry.complaint)
+                      end
+
+                      response.push({error: false, entry_id: entry['entry_id'], row_id: entry['row_id'], status: complaint_entry.status, resolution: entry['status'],
+                                         comment: entry['comment'], resolution_comment: entry['resolution_comment'], categories: entry['categories'],
+                                         category_names: entry['category_names']})
+                    elsif entry['error'] == true && entry['reason'] == 'nil_categories'
+                      response.push({error: true, entry_id: entry['entry_id'], reason: 'nil_categories'})
+                    end
+                  rescue Exception => e
+                    response.push({error: true, entry_id: entry['entry_id'], reason: 'api'})
+                    next
+                  end
+                end
+                response.to_json
+              end
+            end
+
           end
         end
       end

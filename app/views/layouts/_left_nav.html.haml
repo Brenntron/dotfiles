@@ -53,8 +53,16 @@
       %a{href: escalations_users_path}= image_tag('layout/users_icon.svg', class: 'sidenav-icon', alt: 'Users')
 
     - if can?(:read, Admin)
-      %li{class: 'nav-item nav-admin'}
-        %a{href: '/admin'}= image_tag('layout/icon_admin.svg', class: 'sidenav-icon', alt: 'Admin')
+      %li{class: 'nav-admin'}
+        %a{class: 'static-nav-item', 'data-toggle': 'collapse', href:'.admin-subnav', role:'button', 'aria-expanded':'false', 'aria-controls':'admin-subnav admin-subnav-icons'}
+          = image_tag('layout/icon_admin.svg', class: 'sidenav-icon', alt: 'Admin')
+        %ul#admin-subnav-icons.sub-nav.collapse.admin-subnav
+          %li.acr-admin-link
+            %a{href: '/admin'}
+              =inline_svg 'icon_bug_grey.svg'
+          %li.ace-admin-link
+            %a{href: '/escalations/admin'}
+              =inline_svg 'icon_escalations_grey.svg'
 
     %li{class: 'nav-docs'}
       %a{class: 'static-nav-item', 'data-toggle': 'collapse', href:'.doc-subnav', role:'button', 'aria-expanded':'false', 'aria-controls':'doc-subnav doc-subnav-icons'}
@@ -122,9 +130,16 @@
         %a{href: escalations_users_path}
           Users
       - if can?(:read, Admin)
-        %li{class: 'nav-admin static-nav-item'}
-          %a{href: '/admin'}
+        %li{class: 'nav-admin'}
+          %a{class: 'static-nav-item', 'data-toggle': 'collapse', href:'.admin-subnav', role:'button', 'aria-expanded':'false', 'aria-controls':'admin-subnav admin-subnav-icons'}
             Admin
+          %ul.sub-nav.collapse.admin-subnav#admin-subnav
+            %li.acr-admin-link
+              %a{href: '/admin'}
+                Research Admin
+            %li.ace-admin-link
+              %a{href: 'escalations/admin'}
+                Escalations Admin    
 
 
       %li{class: 'nav-docs'}

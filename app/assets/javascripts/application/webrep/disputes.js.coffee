@@ -1,19 +1,9 @@
 $(document).ready ->
-  $('span#mark-as-related').on 'show.bs.dropdown', ->
-    dropdownMenu = $(this).find('.dropdown-menu')
-    dropdownMenu.hide()
-    if $('.dispute_check_box:checked').length > 0
-      dropdownMenu.show()
-    else
-      $(this).removeClass('open')
-      std_msg_error('No rows selected', ['Please select at least one row.'])
 
-  $('span#adjust-wlbl').on 'show.bs.dropdown', ->
-    dropdownMenu = $(this).find('.dropdown-menu')
+  $('span#mark-as-related').on 'show.bs.dropdown', ->
     if $('.dispute_check_box:checked').length == 0
-      dropdownMenu.hide()
-      $(this).removeClass('open')
-      std_msg_error('No rows selected', ['Please select a row.'])
+      std_msg_error('No rows selected', ['Please select at least one row.'])
+      return false
 
 window.select_or_deselect_all = (dispute_id)->
 
@@ -49,6 +39,10 @@ window.populate_webrep_index_table = (data = {}, reload = false) ->
       array_of_showns.push row.data().id
 
   headers = {'Token': $('input[name="token"]').val(), 'Xmlrpc-Token': $('input[name="xml_token"]').val()}
+  $('#loader-modal').modal({
+    backdrop: 'static',
+    keyboard: false
+  })
   $.ajax(
     url: '/escalations/api/v1/escalations/webrep/disputes'
     method: 'GET'
@@ -64,6 +58,7 @@ window.populate_webrep_index_table = (data = {}, reload = false) ->
         std_msg_error("No tickets matching filter or search.","")
 
       if json.error
+        $('#loader-modal').modal 'hide'
         $('#refresh-working-msg').hide()
         $('#refresh-error-msg').show()
         $('#refresh-error-msg').html('An error occured while retrieving data')
@@ -97,13 +92,17 @@ window.populate_webrep_index_table = (data = {}, reload = false) ->
                     $('.dispute-entry-table td, .dispute-entry-table th').each ->
                       if $(this).hasClass(checkbox_trigger)
                         $(this).show()
+                      $('#loader-modal').modal 'hide'
                       return
                   else if $(checkbox).prop('checked') == false
                     $('.dispute-entry-table td, .dispute-entry-table th').each ->
                       if $(this).hasClass(checkbox_trigger)
                         $(this).hide()
+                      $('#loader-modal').modal 'hide'
                       return
+                  $('#loader-modal').modal 'hide'
                   return
+                $('#loader-modal').modal 'hide'
                 return
 
         if array_of_dispute_clicks.length > 0
@@ -129,14 +128,17 @@ window.populate_webrep_index_table = (data = {}, reload = false) ->
           searchId = 'saved_search_' + json.search_id
           if $('#saved-search-tbody tr#' + searchId).length == 0
             $('#saved-search-tbody').append(named_search_tag(json.search_name, json.search_id))
+        $('#loader-modal').modal 'hide'
 
     error: (response) ->
+      $('#loader-modal').modal 'hide'
       $('#refresh-working-msg').hide()
       $('#refresh-error-msg').show()
       $('#refresh-error-msg').html('An error occured while retrieving data')
   , this)
 
 window.advanced_webrep_index_table = () ->
+
   form = $('#disputes-advanced-search-form')
   submission_types = []
   if form.find('input[name="advanced_search[submission_type]"][value="w"]').is(':checked')
@@ -178,7 +180,6 @@ window.advanced_webrep_index_table = () ->
   if dispute_save_search_format.test(data.search_name) == true
     std_msg_error('save search name error', ['Please enter a name without any special character', 'Example: !@#$%^&*()'])
   else
-    window.location.reload()
     window.populate_webrep_index_table(data)
 
 window.standard_webrep_index_table = (search_name) ->
@@ -306,117 +307,6 @@ window.popup_response_error =(response, prefix) ->
 
   alert(prefix + "\n" + errormsg)
 
-window.row_adjust_wlbl_button =(button_tag) ->
-  list_types = $('.wl-bl-list-inline:checkbox:checked').map(() ->
-    this.value
-  ).toArray()
-  wlbl_form = button_tag.form;
-  data = {
-    'dispute_entry_ids': [ wlbl_form.getElementsByClassName('dispute-entry-id')[0].value ]
-    'trgt_list': list_types
-    'note': wlbl_form.getElementsByClassName('note-input')[0].value
-  }
-
-  std_msg_ajax(
-    url: '/escalations/api/v1/escalations/webrep/disputes/entry_wlbl'
-    method: 'POST'
-    data: data
-    error_prefix: 'Error adjusting WL/BL.'
-  )
-
-window.row_research_adjust_wlbl_button =(button_tag) ->
-  list_types = $('.wl-bl-list-inline:checkbox:checked').map(() ->
-    this.value
-  ).toArray()
-  wlbl_form = button_tag.form;
-
-  data = {
-    'urls': [ wlbl_form.getElementsByClassName('dispute-entry-content')[0].value ]
-    'trgt_list': list_types
-    'note': wlbl_form.getElementsByClassName('note-input')[0].value
-  }
-
-  std_msg_ajax(
-    url: '/escalations/api/v1/escalations/webrep/disputes/uri_wlbl'
-    method: 'POST'
-    data: data
-    error_prefix: 'Error adjusting WL/BL.'
-    success_reload: true
-  )
-
-
-window.toolbar_adjust_wlbl_button =(button_tag) ->
-  checked_url = $('.dispute_check_box:checked')[0]
-  entry_row = $(checked_url).parents('.research-table-row')[0]
-  url = $(entry_row).find('.entry-data-content').text()
-  list_types = $('.wl-bl-list-inline:checkbox:checked').map(() ->
-    this.value
-  ).toArray()
-
-  wlbl_form = button_tag.form
-
-  data = {
-    'urls': [ url ]
-    'trgt_list': list_types
-    'note': wlbl_form.getElementsByClassName('adjust-wlbl-input')[0].value
-  }
-
-  std_msg_ajax(
-    url: '/escalations/api/v1/escalations/webrep/disputes/uri_wlbl'
-    method: 'POST'
-    data: data
-    error_prefix: 'Error adjusting WL/BL.'
-    success_reload: true
-  )
-
-window.toolbar_research_adjust_wlbl_button =(button_tag) ->
-  checked_url = $('.dispute_check_box:checked')[0]
-  entry_row = $(checked_url).parents('.research-table-row')[0]
-  url = $(entry_row).find('.entry-data-content').text()
-  list_types = $('.wl-bl-list-inline:checkbox:checked').map(() ->
-    this.value
-  ).toArray()
-
-  wlbl_form = button_tag.form
-
-  data = {
-    'urls': [ url ]
-    'trgt_list': list_types
-    'note': wlbl_form.getElementsByClassName('adjust-wlbl-input')[0].value
-  }
-
-  std_msg_ajax(
-    url: '/escalations/api/v1/escalations/webrep/disputes/uri_wlbl'
-    method: 'POST'
-    data: data
-    error_prefix: 'Error adjusting WL/BL.'
-    success_reload: true
-  )
-
-
-window.index_adjust_wlbl_button =(button_tag) ->
-  checked_url = $('.dispute-entry-checkbox:checked')[0]
-  entry_row = $(checked_url).parent().parent()[0]
-  url = $(entry_row).find('.entry-col-content').text()
-  list_types = $('.wl-bl-list-inline:checkbox:checked').map(() ->
-    this.value
-  ).toArray()
-
-  wlbl_form = button_tag.form
-
-  data = {
-    'urls': [ url ]
-    'trgt_list': list_types
-    'note': wlbl_form.getElementsByClassName('adjust-wlbl-input')[0].value
-  }
-
-  std_msg_ajax(
-    url: '/escalations/api/v1/escalations/webrep/disputes/uri_wlbl'
-    method: 'POST'
-    data: data
-    error_prefix: 'Error adjusting WL/BL.'
-    success_reload: true
-  )
 
 window.save_dispute = () ->
   data = {
@@ -424,6 +314,7 @@ window.save_dispute = () ->
     'customer_name': $('#dispute-customer-name-input').val()
     'customer_email': $('#dispute-customer-email-input').val()
     'status': $('#status').val()
+    'submission_type': $('#dispute-submission-type-select').val().toLowerCase()
   }
 
   std_msg_ajax(
@@ -434,182 +325,6 @@ window.save_dispute = () ->
     success_reload: true
   )
 
-# Populating the in line Adjust Reptool button for research page and research tab
-window.inline_load_reptool_button =(button_tag) ->
-  #debugger
-  adjust_form = button_tag.parentElement.getElementsByClassName('adjust-reptool-form')[0]
-  submit_button = adjust_form.getElementsByClassName('dropdown-submit-button')
-  #$(submit_button).attr("disabled", false)
-
-  #button_tag.parentElement.getElementsByClassName('adjust-reptool-form')[0].getElementsByClassName('dropdown-submit-button')
-
-  #dropdown = $('#reptool_adjust_entries').parent()
-
-  show_content = $(adjust_form).find('.entry-dispute-name')
-  show_rep_class = $(adjust_form).find('.entry-reptool-class')
-  show_rep_exp = $(adjust_form).find('.entry-reptool-expiration')
-  action_input = $(adjust_form).find('.action-input')
-  classifications_input = $(adjust_form).find('.classifications-input')
-  comment_input = $(adjust_form).find('.comment-input')
-  data = {
-# Send entry content to reptool
-    'entry' : adjust_form.getElementsByClassName('dispute-entry-content')[0].value
-  }
-
-  headers = {'Token': $('input[name="token"]').val(), 'Xmlrpc-Token': $('input[name="xml_token"]').val()}
-  $.ajax(
-    url: '/escalations/api/v1/escalations/webrep/disputes/reptool_get_info_for_form'
-    method: 'GET'
-    headers: headers
-    data: data
-    dataType: 'json'
-    success: (response) ->
-      response = JSON.parse(response)
-
-      show_content.text(adjust_form.getElementsByClassName('dispute-entry-content')[0].value)
-      show_rep_class.text(response.classification)
-      show_rep_exp.text(response.expiration)
-      action_input.val(response.status)
-      classifications_input.val(response.classification)
-      comment_input.val(response.comment)
-      $(submit_button).attr('disabled', false)
-#          window.location.reload()
-    error: (response) ->
-      popup_response_error(response, 'Error retrieving Reptool Data')
-  )
-
-
-
-window.row_adust_reptool_bl_button =(button_tag) ->
-  reptool_bl_form = button_tag.form
-  data = {
-    'action': reptool_bl_form.getElementsByClassName('action-input')[0].value
-    'dispute_entry_ids': [ reptool_bl_form.getElementsByClassName('dispute-entry-id')[0].value ]
-    'classifications': [ reptool_bl_form.getElementsByClassName('classifications-input')[0].value ]
-    'comment': reptool_bl_form.getElementsByClassName('comment-input')[0].value
-  }
-  headers = {'Token': $('input[name="token"]').val(), 'Xmlrpc-Token': $('input[name="xml_token"]').val()}
-  $.ajax(
-    url: '/escalations/api/v1/escalations/webrep/disputes/reptool_bl'
-    method: 'POST'
-    headers: headers
-    data: data
-    dataType: 'json'
-    success: (response) ->
-      window.location.reload()
-    error: (response) ->
-      if response.responseJSON == undefined
-        response_lines = response.responseText.split("\n")
-        if 2 < response_lines.length
-          errormsg = [response_lines[0], response_lines[1]]
-        else
-          errormsg = [response.responseText]
-      else if response.responseJSON.error != undefined
-        errormsg = [response.responseJSON.error]
-      else
-        errormsg = [response.responseText]
-      std_msg_error('reptool wl/bl adjustment error', ['Error adjusting WL/BL'].concat(errormsg) )
-  )
-
-window.row_adust_reptool_bl_button_research =(button_tag) ->
-  reptool_bl_form = button_tag.form
-
-  data = {
-    'action': reptool_bl_form.getElementsByClassName('action-input')[0].value
-    'entries': [ reptool_bl_form.getElementsByClassName('dispute-entry-content')[0].value ]
-    'classifications': [ reptool_bl_form.getElementsByClassName('classifications-input')[0].value ]
-    'comment': reptool_bl_form.getElementsByClassName('comment-input')[0].value
-  }
-  headers = {'Token': $('input[name="token"]').val(), 'Xmlrpc-Token': $('input[name="xml_token"]').val()}
-  $.ajax(
-    url: '/escalations/api/v1/escalations/webrep/disputes/reptool_bl'
-    method: 'POST'
-    headers: headers
-    data: data
-    dataType: 'json'
-    success: (response) ->
-      window.location.reload()
-    error: (response) ->
-      popup_response_error(response, 'Error adjusting WL/BL')
-  )
-
-window.toolbar_adjust_reptool_bl_button =(button_tag) ->
-  entry_ids = $('.dispute_check_box:checked').map(() ->
-    parseInt($(this).attr('data-entry-id'))
-  ).toArray()
-  if entry_ids.length == 0
-    entry_ids = $('.dispute-entry-checkbox:checked').map(() ->
-      parseInt(this.id)
-    ).toArray()
-  if entry_ids.length == 0
-    std_msg_error('No rows selected', ['Please select at least one row.'])
-    return
-
-  reptool_bl_form = button_tag.form
-  data = {
-    'action': reptool_bl_form.getElementsByClassName('action-input')[0].value
-    'dispute_entry_ids': entry_ids
-    'classifications': [ reptool_bl_form.getElementsByClassName('classifications-input')[0].value ]
-    'comment': reptool_bl_form.getElementsByClassName('comment-input')[0].value
-  }
-
-  headers = {'Token': $('input[name="token"]').val(), 'Xmlrpc-Token': $('input[name="xml_token"]').val()}
-  $.ajax(
-    url: '/escalations/api/v1/escalations/webrep/disputes/reptool_bl'
-    method: 'POST'
-    headers: headers
-    data: data
-    dataType: 'json'
-    success: (response) ->
-      window.location.reload()
-    error: (response) ->
-      if response.responseJSON == undefined
-        response_lines = response.responseText.split("\n")
-        if 2 < response_lines.length
-          errormsg = [response_lines[0], response_lines[1]]
-        else
-          errormsg = [response.responseText]
-      else if response.responseJSON.error != undefined
-        errormsg = [response.responseJSON.error]
-      else
-        errormsg = [response.responseText]
-      std_msg_error('Error', ['Error adjusting WL/BL'].concat(errormsg) )
-  )
-
-window.toolbar_adjust_reptool_bl_button_research =(button_tag) ->
-  checked_url = $('.dispute_check_box:checked')[0]
-  entry_row = $(checked_url).parents('.research-table-row')[0]
-  url = $(entry_row).find('.entry-data-content').text()
-
-  reptool_bl_form = button_tag.form
-  data = {
-    'action': reptool_bl_form.getElementsByClassName('action-input')[0].value
-    'entries': [ url ]
-    'classifications': [ reptool_bl_form.getElementsByClassName('classifications-input')[0].value ]
-    'comment': reptool_bl_form.getElementsByClassName('comment-input')[0].value
-  }
-  headers = {'Token': $('input[name="token"]').val(), 'Xmlrpc-Token': $('input[name="xml_token"]').val()}
-  $.ajax(
-    url: '/escalations/api/v1/escalations/webrep/disputes/reptool_bl'
-    method: 'POST'
-    headers: headers
-    data: data
-    dataType: 'json'
-    success: (response) ->
-      window.location.reload()
-    error: (response) ->
-      if response.responseJSON == undefined
-        response_lines = response.responseText.split("\n")
-        if 2 < response_lines.length
-          errormsg = [response_lines[0], response_lines[1]]
-        else
-          errormsg = [response.responseText]
-      else if response.responseJSON.error != undefined
-        errormsg = [response.responseJSON.error]
-      else
-        errormsg = [response.responseText]
-      std_msg_error('Error', ['Error adjusting WL/BL'] + errormsg)
-  )
 
 window.toolbar_index_edit_status = () ->
   statusName = $('input[name=entry-status]:checked').val()
@@ -635,16 +350,19 @@ window.toolbar_index_edit_status = () ->
         field: "resolution_comment"
         new: $('#entry-status-comment').val()
       })
-
   )
 
-  std_msg_ajax(
-    method: 'PATCH'
-    url: "/escalations/api/v1/escalations/webrep/disputes/entries/field_data"
-    data: { field_data: data }
-    success_reload: true
-    error_prefix: 'Error updating data.'
-  )
+  if statusName == "RESOLVED_CLOSED" && !$('input[name=entry-resolution]:checked').val()
+    std_msg_error('No resolution selected', ['Please select an entry resolution.'])
+  else
+    std_msg_ajax(
+      method: 'PATCH'
+      url: "/escalations/api/v1/escalations/webrep/disputes/entries/field_data"
+      data: { field_data: data }
+      success_reload: true
+      error_prefix: 'Error updating data.'
+    )
+
 
 window.show_page_edit_status = () ->
   statusName = $('input[name=dispute-status]:checked').val()
@@ -652,7 +370,11 @@ window.show_page_edit_status = () ->
   dispute_id = $('#dispute_id').text()
 
   if statusName == "RESOLVED_CLOSED"
-    resolution = $('input[name=dispute-resolution]:checked').val()
+    if $('#show-edit-ticket-status-dropdown').find('input[name=dispute-resolution]').is(':checked')
+      resolution = $('input[name=dispute-resolution]:checked').val()
+    else
+      std_msg_error('No resolution selected', ['Please select a ticket resolution.'])
+      return
 
   data = {
     dispute_ids: [ dispute_id ]
@@ -725,9 +447,7 @@ window.related_disputes = () ->
   entry_ids = $('.dispute_check_box:checkbox:checked').map(() ->
     Number(this.value)
   ).toArray()
-#  if entry_ids.length == 0
-#    std_msg_error('Setting related error', ['No issue(s) selected.'])
-#    return
+
   original_dispute_id = $('.dispute-id').val()
 
   # Make sure that the original dispute ID is provided by the user.
@@ -919,16 +639,6 @@ window.return_dispute = (dispute_id) ->
 
   )
 
-
-#window.dispute_entry_status = (id, status) ->
-#  std_msg_ajax(
-#    method: 'PATCH'
-#    url: '/escalations/api/v1/escalations/webrep/disputes/entries/' + id + '/status'
-#    data: { status: status }
-#    error_prefix: 'Error updating status.'
-#  )
-
-
 window.save_dispute_entries = () ->
 
   data = {}
@@ -969,7 +679,6 @@ window.save_dispute_entries = () ->
           field: "resolution_comment"
           new: $(this).find("textarea[name='resolution-comment']")[0].value
         })
-
     ).toArray().filter((field_data) ->
       field_data.old != field_data.new
     )
@@ -978,14 +687,17 @@ window.save_dispute_entries = () ->
       data[this.dataset.entryId] = fielddata
 
   )
+  if $('input[name=entry-status]:checked').attr('id') == "RESOLVED_CLOSED" && !$('input[name=entry-resolution]:checked').val()
+    std_msg_error('No resolution selected', ['Please select a ticket resolution.'])
+  else
+    std_msg_ajax(
+      method: 'PATCH'
+      url: "/escalations/api/v1/escalations/webrep/disputes/entries/field_data"
+      data: { field_data: data }
+      success_reload: true
+      error_prefix: 'Error updating data.'
+    )
 
-  std_msg_ajax(
-    method: 'PATCH'
-    url: "/escalations/api/v1/escalations/webrep/disputes/entries/field_data"
-    data: { field_data: data }
-    success_reload: true
-    error_prefix: 'Error updating data.'
-  )
 
 
 window.show_set_related_dispute = () ->
@@ -999,6 +711,52 @@ window.set_related_dispute = (form_tag) ->
     data: { related_dispute_id: related_dispute_id }
     success_reload: true
     error_prefix: 'Error marking relationship.'
+  )
+
+window.change_ticket_status = (event) ->
+#  event.preventDefault()
+  status = $('#index-edit-ticket-status-dropdown').find('.ticket-status-radio:checked').val()
+  resolution = ""
+  comment = ""
+  checkboxes = $('#disputes-index').find('.dispute_check_box')
+  checked_disputes = []
+  
+  $(checkboxes).each ->
+    if $(this).is(':checked')
+      dispute_id = $(this).val()
+      checked_disputes.push(dispute_id)
+
+  if status == 'RESOLVED_CLOSED'
+    if $('#index-edit-ticket-status-dropdown').find('.ticket-resolution-radio').is(':checked')
+      resolution = $('#index-edit-ticket-status-dropdown').find('.ticket-resolution-radio:checked').val()
+      comment = $('.resolution-comment-wrapper').find('.ticket-status-comment').val()
+    else
+      std_msg_error('No resolution selected', ['Please select a ticket resolution.'])
+      return
+  else
+    comment = $('.non-resolution-submit-wrapper').find('.ticket-status-comment').val()
+
+  headers = {'Token': $('input[name="token"]').val(), 'Xmlrpc-Token': $('input[name="xml_token"]').val()}
+  data = {
+    status: status,
+    resolution: resolution,
+    comment: comment
+  }
+
+  for dispute in checked_disputes
+#    event.preventDefault()
+    data.dispute_ids = dispute
+    $.ajax(
+      url: '/escalations/api/v1/escalations/webrep/disputes/set_disputes_status'
+      method: 'POST'
+      headers: headers
+      data: data
+      mimeType: 'application/json'
+      success: (response) ->
+        window.location.reload()
+      error: (response) ->
+        if response.status > 400
+          popup_response_error(response, 'Error Updating Status')
   )
 
 window.set_relating_disputes = (form_tag) ->
@@ -1047,48 +805,17 @@ window.webrep_reset_search = () ->
 
 $ ->
 
-  $('.change_ticket_status_button').click ->
-    status = ""
-    resolution = ""
-    comment = ""
-    checkboxes = $('#disputes-index').find('.dispute_check_box')
-    checked_disputes = []
-    $(checkboxes).each ->
-      if $(this).is(':checked')
-        dispute_id = $(this).val()
-        checked_disputes.push(dispute_id)
-
-    status = $('#index-edit-ticket-status-dropdown').find('.ticket-status-radio:checked').val()
-    if status == 'RESOLVED_CLOSED'
-      resolution = $('#index-edit-ticket-status-dropdown').find('.ticket-resolution-radio:checked').val()
-      comment = $('.resolution-comment-wrapper').find('.ticket-status-comment').val()
-    else
-      comment = $('.non-resolution-submit-wrapper').find('.ticket-status-comment').val()
-
-
-    data = {
-      status: status,
-      resolution: resolution,
-      comment: comment,
-      dispute_ids: checked_disputes.toString()
-    }
-
-    headers = {'Token': $('input[name="token"]').val(), 'Xmlrpc-Token': $('input[name="xml_token"]').val()}
-    $.ajax(
-      url: '/escalations/api/v1/escalations/webrep/disputes/set_disputes_status'
-      method: 'POST'
-      headers: headers
-      data: data
-      dataType: 'json'
-      success: (response) ->
-        response = JSON.parse(response)
-        if response.status == "success"
-          window.location.reload()
-      error: (response) ->
-        popup_response_error(response, 'Error Updating Status')
-        window.location.reload()
-
-    )
+#  Opens ticket status resolution back up after modal close
+  $('#msg-modal').on 'hide.bs.modal', (e) ->
+    if $('#index-edit-ticket-status-dropdown').parent().hasClass('open')
+      $('#msg-modal').on 'hidden.bs.modal', (b) ->
+        $('#index-edit-ticket-status-dropdown').parent().addClass('open')
+    if $('#show-edit-ticket-status-dropdown').parent().hasClass('open')
+      $('#msg-modal').on 'hidden.bs.modal', (c) ->
+        $('#show-edit-ticket-status-dropdown').parent().addClass('open')
+    if $('#index-edit-entry-status-dropdown').parent().hasClass('open')
+      $('#msg-modal').on 'hidden.bs.modal', (d) ->
+        $('#index-edit-entry-status-dropdown').parent().addClass('open')
 
   window.toggleRow = (box) ->
     if $(box)[0].checked
@@ -1154,13 +881,12 @@ $ ->
           $('#index-ticket-resolution-submenu').hide()
           $(res_comment[0]).val('')
     else
-      $(dropdown).removeClass('open')
       std_msg_error('No rows selected', ['Please select at least one row.'])
 
   # Edit Entry: Edit Entry Status
   $('#index-entry-status-button').click ->
     dropdown = $('#index-edit-entry-status-dropdown').parent()
-    if ($('.dispute_check_box:checked').length > 0)
+    if ($('.dispute-entry-checkbox:checked').length > 0)
 
       $('.entry-status-radio-label').click ->
         radio_button = $(this).prev('.entry-status-radio')
@@ -1197,7 +923,6 @@ $ ->
     else
       std_msg_error('No rows selected', ['Please select at least one row.'])
       return false
-
 
   # Create index table
   window.dispute_table = $('#disputes-index').DataTable(
@@ -1268,7 +993,7 @@ $ ->
       {
         data: 'dispute_resolution'
       }
-       {
+      {
         data: 'submission_type'
         render: (data) ->
           title = ''
@@ -1285,20 +1010,34 @@ $ ->
       { data: 'case_opened_at' }
       {
         data: 'case_age'
-        render: (data) ->
-          parts = data.split(' ')
-          days = parseInt(parts[0])
-          hour = parseInt(parts[1])
-
-          if days == 0
-            if hour < 3
-              data
-            else if hour < 5
-              '<span class="ticket-age-over3hr">' + data + '</span>'
+        'render':(data,type,full,meta) ->
+          if data != "<1 hr"
+            dispute_duration = moment(full.case_opened_at).fromNow()
+            if dispute_duration.includes('minute')
+              dispute_latency = data
+            if dispute_duration.includes('hour')
+              hours = parseInt(dispute_duration.replace(/[^0-9]/g, ''))
+              if hours <= 3
+                dispute_latency = data
+              else
+                dispute_latency = '<span class="ticket-age-over3hr">' + data + '</span>'
+              if hours > 12
+                dispute_latency = '<span class="ticket-age-over12hr">' + data + '</span>'
             else
-              '<span class="overdue">' + data + '</span>'
+              dispute_latency = '<span class="ticket-age-over12hr">' + data + '</span>'
+            if dispute_duration.includes('day')
+              day = parseInt(data.replace(/[^0-9]/g, ''))
+              if day >= 1
+                dispute_latency = '<span class="ticket-age-over12hr">' + data + '</span>'
+            if dispute_duration.includes('months')
+              month = parseInt(data.replace(/[^0-9]/g, ''))
+              dispute_latency = '<span class="ticket-age-over12hr">' + data + '</span>'
+            if dispute_duration.includes('year')
+              year = parseInt(data.replace(/[^0-9]/g, ''))
+              dispute_latency = '<span class="ticket-age-over12hr">' + data + '</span>'
+            dispute_latency
           else
-            '<span class="overdue">' + data + '</span>'
+            data
       }
       { data: 'source' }
       { data: 'submitter_type'}
@@ -1344,11 +1083,11 @@ $ ->
         resolution = this.entry.resolution
       else
         resolution = missing_data
-      resolution_comment = ''
       if this.entry.resolution_comment != null
         resolution_comment = this.entry.resolution_comment
+        resolution_col = '<td class="entry-col-res esc-tooltipped" title="' + resolution_comment + '">' + resolution + '</td>'
       else
-        resolution_comment = ''
+        resolution_col = '<td class="entry-col-res">' + resolution + '</td>'
       suggested_disposition = ''
       if this.entry.suggested_disposition != null
         suggested_disposition = this.entry.suggested_disposition
@@ -1367,9 +1106,9 @@ $ ->
       if this.entry.sbrs_score != null
         sbrs_score = this.entry.sbrs_score
       else sbrs_score = missing_data
-      entry_row = '<tr class="index-entry-row">' + '<td><input type="checkbox" onclick="toggleRow(this)" class="dispute-entry-checkbox dispute-entry-checkbox_' + dispute.id + '" id= ' + dispute_entry_id + ' ></td>' + '<td class="entry-col-content ' + important + '">' + entry_content + '</td>' +
+      entry_row = '<tr class="index-entry-row" data-case-id="0000' + dispute.id + '">' + '<td><input type="checkbox" onclick="toggleRow(this)" class="dispute-entry-checkbox dispute-entry-checkbox_' + dispute.id + '" id= ' + dispute_entry_id + ' ></td>' + '<td class="entry-col-content ' + important + '">' + entry_content + '</td>' +
         '<td class="entry-col-status">' + status + '</td>' +
-        '<td class="entry-col-res esc-tooltipped" title="' + resolution_comment + '">' + resolution + '</td>' +
+        resolution_col +
         '<td class="entry-col-disp">' + suggested_disposition + '</td>' +
         '<td class="entry-col-cat">' + category + '</td>' +
         '<td class="entry-col-wbrs-score">' + wbrs_score + '</td>' +
@@ -1398,6 +1137,7 @@ $ ->
       tr.addClass 'shown'
       td = $(tr).next('tr').find('td:first')
       $(td).addClass 'dispute-entry-table-wrapper'
+
       # Check to see which columns should be displayed
       $('.toggle-vis-nested').each ->
         checkbox_trigger = $(this).attr('data-column')
@@ -1491,6 +1231,15 @@ $ ->
 
 $ ->
 
+  $('#new-dispute').click ->
+    std_msg_ajax(
+      method: 'GET'
+      url: '/escalations/api/v1/escalations/webrep/disputes/populate_new_dispute_fields'
+      success: (response) ->
+        for user in response.json.assignees
+          $('#assignee-list').append '<option value=\'' + user.cvs_username + '\'></option>'
+    )
+
   $('#advanced-search-button').click ->
     std_msg_ajax(
       method: 'GET'
@@ -1532,6 +1281,11 @@ $ ->
   $(document).ready ->
 
     if window.location.pathname == '/escalations/webrep/disputes'
+      $('#new-complaint').show()
+    else
+      $('#new-complaint').hide()
+
+    if window.location.pathname == '/escalations/webrep/disputes'
       std_msg_ajax(
         method: 'POST'
         url: "/escalations/api/v1/escalations/user_preferences/"
@@ -1547,8 +1301,7 @@ $ ->
               $("##{column}-checkbox").prop('checked', false)
               window.dispute_table.column("##{column}").visible false
 
-    )
-
+      )
 
     $('.toggle-vis').on "click", ->
       data = {}
@@ -1610,6 +1363,9 @@ $ ->
       $('#web-rep-search').show()
 
   $('#edit-dispute-button').click ->
+    $('.dispute-submission-type').hide()
+    $('#dispute-submission-type-select').show()
+
     $('#dispute-priority-icon').hide()
     $('#dispute-priority-select').show()
 
@@ -1624,10 +1380,7 @@ $ ->
     $('#edit-dispute-button').addClass('hidden')
 
 
-    if $('#top_bar_extended_info').css('display', 'block')
-      console.log('open')
-    else if $('#top_bar_extended_info').css('display', 'none')
-      console.log('closed')
+    if $('#top_bar_extended_info').css('display', 'none')
       $('#top-bar-toggle').addClass('top-info-open')
       $("#top_bar_extended_info").slideToggle()
 
@@ -1637,6 +1390,8 @@ $ ->
     $('#dispute-priority-icon').show()
     $('#dispute-priority-select').hide()
     $('.dispute-edit-field').show()
+    $('#dispute-submission-type-select').hide()
+    $('.dispute-submission-type').show()
 
     $('#save-dispute-button').addClass('hidden')
     $('#cancel-dispute-button').addClass('hidden')
@@ -1645,110 +1400,6 @@ $ ->
     $('.dispute-edit-input').css('display','none')
 
 
-  $('#index-adjust-wlbl').click ->
-    if $('.dispute_check_box:checked').length == 0
-      std_msg_error('No rows selected', ['Please select at least one row.'])
-      return false
-
-    tbody = $('#wlbl_adjust_entries_index').find('table.dispute_tool_current').find('tbody')
-    show_content = $('#wlbl_adjust_entries_index').find('.wlbl-entry-content')
-    if !show_content[0]
-      show_content = $('#wlbl_adjust_entries_index').find('.entry-dispute-name')
-    show_wlbl = $('#wlbl_adjust_entries_index').find('.wlbl-entry-wlbl')
-    show_wbrs = $('#wlbl_adjust_entries_index').find('.wlbl-current-entry-wbrs')
-    if !show_wbrs[0]
-      show_wbrs = $('#wlbl_adjust_entries_index').find('.current-wbrs-score')
-    wl_weak = $('#wlbl_adjust_entries_index').find('.wl-weak-checkbox')
-    wl_med = $('#wlbl_adjust_entries_index').find('.wl-med-checkbox')
-    wl_heavy = $('#wlbl_adjust_entries_index').find('.wl-heavy-checkbox')
-    bl_weak = $('#wlbl_adjust_entries_index').find('.bl-weak-checkbox')
-    bl_med = $('#wlbl_adjust_entries_index').find('.bl-med-checkbox')
-    bl_heavy = $('#wlbl_adjust_entries_index').find('.bl-heavy-checkbox')
-
-    $(show_content[0]).empty()
-    $(show_wbrs[0]).empty()
-    $(show_wlbl[0]).empty()
-    $(wl_weak[0]).prop('checked', false)
-    $(wl_med[0]).prop('checked', false)
-    $(wl_heavy[0]).prop('checked', false)
-    $(bl_weak[0]).prop('checked', false)
-    $(bl_med[0]).prop('checked', false)
-    $(bl_heavy[0]).prop('checked', false)
-    wl_weak_status = 'false'
-    wl_med_status = 'false'
-    wl_heavy_status = 'false'
-    bl_weak_status = 'false'
-    bl_med_status = 'false'
-    bl_heavy_status = 'false'
-
-    #    $(tbody).empty()
-    dropdown_wrapper = $(this).parent()
-    if ($('.dispute_check_box:checked').length > 0)
-      submit_button = $('#wlbl_adjust_entries_index').find('.dropdown-submit-button')
-      entry_content = ''
-
-      $('.dispute-entry-checkbox:checked').each ->
-
-        entry_row = $(this).parent().parent()[0]
-        entry_content = $(entry_row).find('.entry-col-content').text()
-        wbrs = $(entry_row).find('.entry-col-wbrs-score').text()
-
-        data = {
-# Send entry content to reptool
-          'entry' : entry_content
-        }
-
-        headers = {'Token': $('input[name="token"]').val(), 'Xmlrpc-Token': $('input[name="xml_token"]').val()}
-        $.ajax(
-          url: '/escalations/api/v1/escalations/webrep/disputes/rule_ui_wlbl_get_info_for_form'
-          method: 'GET'
-          headers: headers
-          data: data
-          dataType: 'json'
-          success: (response) ->
-#values will be in the format of BL-med, BL-weak, BL-heavy   (same with WL)
-
-            response = JSON.parse(response)
-            if response.data != ""
-
-              $(response.data).each ->
-                if String(this) == 'WL-weak'
-                  $(wl_weak[0]).prop('checked', true)
-                  wl_weak_status = 'true'
-                if String(this) == 'WL-med'
-                  $(wl_med[0]).prop('checked', true)
-                  wl_med_status = 'true'
-                if String(this) == 'WL-heavy'
-                  $(wl_heavy[0]).prop('checked', true)
-                  wl_heavy_status = 'true'
-                if String(this) == 'BL-weak'
-                  $(bl_weak[0]).prop('checked', true)
-                  bl_weak_status = 'true'
-                if String(this) == 'BL-med'
-                  $(bl_med[0]).prop('checked', true)
-                  bl_med_status = 'true'
-                if String(this) == 'BL-heavy'
-                  $(bl_heavy[0]).prop('checked', true)
-                  bl_heavy_status = 'true'
-
-              $(show_content[0]).text(entry_content)
-              $(show_wbrs[0]).text(wbrs)
-              $(show_wlbl[0]).text(response.data)
-              $(submit_button).attr('disabled', false)
-            else
-              $(show_content[0]).text(entry_content)
-              $(show_wbrs[0]).text(wbrs)
-              $(show_wlbl[0]).text('Not on a list')
-              $(submit_button).attr('disabled', false)
-#this should probably call the resync data then reload the page, for an up to date score
-
-          error: (response) ->
-            popup_response_error(response, 'Error retrieving WL/BL Data')
-        )
-
-    else
-      $(dropdown_wrapper).removeClass('open')
-      std_msg_error('No rows selected', ['Please select one row.'])
 
   $('#set-related-dispute-submit-button').click ->
     dropdown = $('#set-related-dispute-div').parent()
@@ -1761,105 +1412,9 @@ $ ->
     else
       alert('No disputes selected')
 
-# Inline WLBL Adjust Button
-  $('.bfrp-inline-wlbl-button').click ->
-#    Get entry content
-    research_row = $(this).parents('.research-table-row')[0]
-    entry_wrapper = $(research_row).find('.entry-data-content')[0]
-    entry_content = $(entry_wrapper).text()
-    wbrs = $($(research_row).find('.entry-data-wbrs-score')[0]).text()
-
-#    Define fields that need to be filled out in the dropdown
-    dropdown = $(this).next('.dropdown-menu')[0]
-    wlbl_list = $(dropdown).find('.wlbl-entry-wlbl')
-    wbrs_score = $(dropdown).find('.wlbl-current-entry-wbrs')
-    submit_button = $(dropdown).find('.dropdown-submit-button')
-    wl_weak = $(dropdown).find('.wl-weak-checkbox')
-    wl_med = $(dropdown).find('.wl-med-checkbox')
-    wl_heavy = $(dropdown).find('.wl-heavy-checkbox')
-    bl_weak = $(dropdown).find('.bl-weak-checkbox')
-    bl_med = $(dropdown).find('.bl-med-checkbox')
-    bl_heavy = $(dropdown).find('.bl-heavy-checkbox')
-
-#   Clearing data to start in case user has page open for a while and data needs to be regrabbed
-    $(wlbl_list[0]).empty()
-    $(wbrs_score[0]).empty()
-    $(wl_weak[0]).prop('checked', false)
-    $(wl_med[0]).prop('checked', false)
-    $(wl_heavy[0]).prop('checked', false)
-    $(bl_weak[0]).prop('checked', false)
-    $(bl_med[0]).prop('checked', false)
-    $(bl_heavy[0]).prop('checked', false)
-    wl_weak_status = 'false'
-    wl_med_status = 'false'
-    wl_heavy_status = 'false'
-    bl_weak_status = 'false'
-    bl_med_status = 'false'
-    bl_heavy_status = 'false'
-
-#    Initializing 'current' status of lists to be filled in when data is fetched
-    initial_wl_weak_status = ''
-    initial_wl_med_status = ''
-    initial_wl_heavy_status = ''
-    initial_bl_weak_status = ''
-    initial_bl_med_status = ''
-    initial_bl_heavy_status = ''
-
-    data = {
-#   Send entry content to wbrs
-      'entry' : entry_content
-    }
-
-    headers = {'Token': $('input[name="token"]').val(), 'Xmlrpc-Token': $('input[name="xml_token"]').val()}
-    $.ajax(
-      url: '/escalations/api/v1/escalations/webrep/disputes/rule_ui_wlbl_get_info_for_form'
-      method: 'GET'
-      headers: headers
-      data: data
-      dataType: 'json'
-      success: (response) ->
-      #values will be in the format of BL-med, BL-weak, BL-heavy   (same with WL)
-
-        response = JSON.parse(response)
-        if response.data != ""
-          $(response.data).each ->
-            if String(this) == 'WL-weak'
-              $(wl_weak[0]).prop('checked', true)
-              wl_weak_status = 'true'
-              initial_wl_weak_status = wl_weak_status
-            if String(this) == 'WL-med'
-              $(wl_med[0]).prop('checked', true)
-              wl_med_status = 'true'
-              initial_wl_med_status = wl_med_status
-            if String(this) == 'WL-heavy'
-              $(wl_heavy[0]).prop('checked', true)
-              wl_heavy_status = 'true'
-              initial_wl_heavy_status = wl_heavy_status
-            if String(this) == 'BL-weak'
-              $(bl_weak[0]).prop('checked', true)
-              bl_weak_status = 'true'
-              initial_bl_weak_stats = bl_weak_status
-            if String(this) == 'BL-med'
-              $(bl_med[0]).prop('checked', true)
-              bl_med_status = 'true'
-              initial_bl_med_status = bl_med_status
-            if String(this) == 'BL-heavy'
-              $(bl_heavy[0]).prop('checked', true)
-              bl_heavy_status = 'true'
-              initial_bl_heavy_status = bl_heavy_status
-
-          $(wbrs_score).text(wbrs)
-          $(wlbl_list[0]).text(response.data)
-          $(submit_button[0]).attr('disabled', false)
-        else
-          $(wbrs_score).text(wbrs)
-          $(wlbl_list[0]).text('Not on a list')
-          $(submit_button[0]).attr('disabled', false)
 
 
-      error: (response) ->
-        popup_response_error(response, 'Error retrieving WL/BL Data')
-    )
+
 
 window.populate_entry_status_dropdown = (dispute_id) ->
   std_msg_ajax(
@@ -1891,7 +1446,6 @@ window.disputes_select_all_check_box = () ->
   $('.dispute_check_box').prop('checked', $('#disputes_check_box').prop('checked'))
 
 $ ->
-
   $('#advanced-search-button').click ->
     $('#advanced-search-dropdown').show()
 
@@ -1915,11 +1469,433 @@ $ ->
           'tooltipster-borderless'
           'tooltipster-borderless-customized'
           'tooltipster-borderless-comment'
-          ]
+        ]
         'maxWidth': 500
       $(this).tooltipster 'show'
     return
 
 
-#    If user changes buttons from initial status, enable the submit button
-#   TODO add this check in later that only allows user to submit if there have been changes made
+  window.averageTimeToCloseLabel = (hourAmount) ->
+    totalSecond = hourAmount * 60 * 60
+    seconds = totalSecond % 60
+    totalMinutes = (totalSecond - seconds)/60
+    minutes = totalMinutes % 60
+    totalHours = (totalMinutes - minutes)/60
+    hours = totalHours % 60
+    value = ''
+    if hours > 0
+      value += hours + 'hr ' + minutes + 'm ' + seconds + 's'
+    else if minutes > 0
+      value += minutes + 'm ' + seconds + 's'
+    else
+      value += seconds + 's'
+    return
+
+# Create Dashboard Initial Table (My Open Tickets)
+$ ->
+
+#
+  window.open_dashboard_dispute_table = $('#table-user-disputes-open').DataTable(
+    dom: '<t>'
+    paging: false
+    columnDefs: [
+      {
+        targets: [ 1 ]
+        className: 'id-col'
+      }
+      {
+        targets: [ 3 ]
+        className: 'state-col'
+      }
+      {
+        targets: [
+          0
+          2
+          4
+        ]
+        className: 'text-center'
+      }
+    ]
+    columns: [
+      {
+        data: 'priority'
+        render: (data) ->
+          '<span class="esc-tooltipped bug-priority p-' + data + '" title="Priority ' + data + '"></span><span class="hidden-sortable-data">' + data + '</span>'
+      }
+      { data: 'case_link' }
+      {
+        data: 'submitter_type'
+        render: (data) ->
+          if (data) == 'customer'
+            return '<span class="esc-tooltipped submitter-type-icon submitter-' + data + '" title="Customer"></span><span class="hidden-sortable-data">' + data + '</span>'
+          else
+            return '<span class="esc-tooltipped submitter-type-icon submitter-' + data + '" title="Guest"></span><span class="hidden-sortable-data">' + data + '</span>'
+      }
+      { data: 'status' }
+      {
+        data: 'submission_type'
+        render: (data) ->
+          if (data) == 'E'
+            return '<span class="esc-tooltipped dispute-submission-type dispute-' + data  + '" title="Email"></span><span class="hidden-sortable-data">' + data + '</span>'
+          else if (data) == 'W'
+            return '<span class="esc-tooltipped dispute-submission-type dispute-' + data  + '" title="Web"></span><span class="hidden-sortable-data">' + data + '</span>'
+          else if (data) == 'EW'
+            return '<span class="esc-tooltipped dispute-submission-type dispute-' + data  + '" title="Email/Web"></span><span class="hidden-sortable-data">' + data + '</span>'
+      }
+      { data: 'd_entry_preview' }
+      { data: 'last_comment' }
+    ]
+  )
+
+  window.closed_dashboard_dispute_table = $('#table-user-disputes-closed').DataTable(
+    dom: '<t>'
+    paging: false
+    columnDefs: [
+      {
+        targets: [ 1 ]
+        className: 'id-col'
+      }
+      {
+        targets: [
+          0
+          2
+          3
+        ]
+        className: 'text-center'
+      }
+    ]
+    columns: [
+      {
+        data: 'priority'
+        render: (data) ->
+          '<span class="esc-tooltipped bug-priority p-' + data + '" title="Priority ' + data + '"></span><span class="hidden-sortable-data">' + data + '</span>'
+      }
+      { data: 'case_link' }
+      {
+        data: 'submitter_type'
+        render: (data) ->
+          if (data) == 'customer'
+            return '<span class="esc-tooltipped submitter-type-icon submitter-' + data + '" title="Customer"></span><span class="hidden-sortable-data">' + data + '</span>'
+          else
+            return '<span class="esc-tooltipped submitter-type-icon submitter-' + data + '" title="Guest"></span><span class="hidden-sortable-data">' + data + '</span>'
+      }
+      {
+        data: 'submission_type'
+        render: (data) ->
+          if (data) == 'E'
+            return '<span class="esc-tooltipped dispute-submission-type dispute-' + data  + '" title="Email"></span><span class="hidden-sortable-data">' + data + '</span>'
+          else if (data) == 'W'
+            return '<span class="esc-tooltipped dispute-submission-type dispute-' + data  + '" title="Web"></span><span class="hidden-sortable-data">' + data + '</span>'
+          else if (data) == 'EW'
+            return '<span class="esc-tooltipped dispute-submission-type dispute-' + data  + '" title="Email/Web"></span><span class="hidden-sortable-data">' + data + '</span>'
+      }
+      { data: 'd_entry_preview' }
+      { data: 'time_to_close' }
+    ]
+  )
+
+  window.open_multiuser_dashboard_dispute_table = $('#table-multi-user-disputes-open').DataTable(
+    dom: '<t>'
+    paging: false
+    columnDefs: [
+      {
+        targets: [ 1 ]
+        className: 'id-col'
+      }
+      {
+        targets: [ 4 ]
+        className: 'state-col'
+      }
+      {
+        targets: [
+          0
+          2
+          5
+        ]
+        className: 'text-center'
+      }
+    ]
+    columns: [
+      {
+        data: 'priority'
+        render: (data) ->
+          '<span class="esc-tooltipped bug-priority p-' + data + '" title="Priority ' + data + '"></span><span class="hidden-sortable-data">' + data + '</span>'
+      }
+      { data: 'case_link' }
+      {
+        data: 'submitter_type'
+        render: (data) ->
+          if (data) == 'customer'
+            return '<span class="esc-tooltipped submitter-type-icon submitter-' + data + '" title="Customer"></span><span class="hidden-sortable-data">' + data + '</span>'
+          else
+            return '<span class="esc-tooltipped submitter-type-icon submitter-' + data + '" title="Guest"></span><span class="hidden-sortable-data">' + data + '</span>'
+      }
+      { data: 'owner' }
+      { data: 'status' }
+      {
+        data: 'submission_type'
+        render: (data) ->
+          if (data) == 'E'
+            return '<span class="esc-tooltipped dispute-submission-type dispute-' + data  + '" title="Email"></span><span class="hidden-sortable-data">' + data + '</span>'
+          else if (data) == 'W'
+            return '<span class="esc-tooltipped dispute-submission-type dispute-' + data  + '" title="Web"></span><span class="hidden-sortable-data">' + data + '</span>'
+          else if (data) == 'EW'
+            return '<span class="esc-tooltipped dispute-submission-type dispute-' + data  + '" title="Email/Web"></span><span class="hidden-sortable-data">' + data + '</span>'
+      }
+      { data: 'd_entry_preview' }
+      { data: 'last_comment' }
+    ]
+  )
+
+  window.closed_dashboard_multiuser_dispute_table = $('#table-multi-user-disputes-closed').DataTable(
+    dom: '<t>'
+    paging: false
+    columnDefs: [
+      {
+        targets: [ 1 ]
+        className: 'id-col'
+      }
+      {
+        targets: [
+          0
+          2
+          4
+        ]
+        className: 'text-center'
+      }
+    ]
+    columns: [
+      {
+        data: 'priority'
+        render: (data) ->
+          '<span class="esc-tooltipped bug-priority p-' + data + '" title="Priority ' + data + '"></span><span class="hidden-sortable-data">' + data + '</span>'
+      }
+      {
+        data: 'case_link'
+      }
+      {
+        data: 'submitter_type'
+        render: (data) ->
+          if (data) == 'customer'
+            return '<span class="esc-tooltipped submitter-type-icon submitter-' + data + '" title="Customer"></span><span class="hidden-sortable-data">' + data + '</span>'
+          else
+            return '<span class="esc-tooltipped submitter-type-icon submitter-' + data + '" title="Guest"></span><span class="hidden-sortable-data">' + data + '</span>'
+      }
+      {
+        data: 'owner'
+      }
+      {
+        data: 'submission_type'
+        render: (data) ->
+          if (data) == 'E'
+            return '<span class="esc-tooltipped dispute-submission-type dispute-' + data  + '" title="Email"></span><span class="hidden-sortable-data">' + data + '</span>'
+          else if (data) == 'W'
+            return '<span class="esc-tooltipped dispute-submission-type dispute-' + data  + '" title="Web"></span><span class="hidden-sortable-data">' + data + '</span>'
+          else if (data) == 'EW'
+            return '<span class="esc-tooltipped dispute-submission-type dispute-' + data  + '" title="Email/Web"></span><span class="hidden-sortable-data">' + data + '</span>'
+      }
+      { data: 'd_entry_preview' }
+      { data: 'time_to_close' }
+    ]
+  )
+
+
+
+
+$ ->
+# Toggle which rows to show on tables
+  show_ticket_type_cb = $('.show-tickets-cb')
+
+  $(show_ticket_type_cb).click ->
+#    Need to traverse to toolbar wrapper and get the sibling wrappers for the tables
+    toolbar_wrapper = $(this).parents('.toolbar')
+    table_wrappers = $(toolbar_wrapper[0]).siblings('.tickets-section-wrapper')
+    ticket_tables = $(table_wrappers).find('.dashboard-tickets-table')
+
+    all_tickets_rows = []
+    customer_rows = []
+    guest_rows = []
+    c_e_rows = []
+    c_w_rows = []
+    c_ew_rows = []
+    g_e_rows = []
+    g_w_rows = []
+    g_ew_rows = []
+
+    show_email_cb = $(toolbar_wrapper).find('.tickets-show-email-cb')
+    show_web_cb = $(toolbar_wrapper).find('.tickets-show-web-cb')
+    show_emailweb_cb = $(toolbar_wrapper).find('.tickets-show-email-web-cb')
+    show_customer_cb = $(toolbar_wrapper).find('.tickets-show-customer-cb')
+    show_guests_cb = $(toolbar_wrapper).find('.tickets-show-guest-cb')
+
+    $(ticket_tables).each ->
+      row = $(this).find('tr')
+      $(row).each ->
+        all_tickets_rows.push this
+
+    $(all_tickets_rows).each ->
+      parent_row = this
+      submitter_type = $(this).find('.submitter-type-icon')
+      if $(submitter_type).hasClass('submitter-customer')
+        customer_rows.push parent_row
+      if $(submitter_type).hasClass('submitter-non-customer')
+        guest_rows.push parent_row
+
+    $(customer_rows).each ->
+      ticket_type = $(this).find('.dispute-submission-type')
+      if $(ticket_type).hasClass('dispute-E')
+        c_e_rows.push this
+      if $(ticket_type).hasClass('dispute-W')
+        c_w_rows.push this
+      if $(ticket_type).hasClass('dispute-EW')
+        c_ew_rows.push this
+
+    $(guest_rows).each ->
+      ticket_type = $(this).find('.dispute-submission-type')
+      if $(ticket_type).hasClass('dispute-E')
+        g_e_rows.push this
+      if $(ticket_type).hasClass('dispute-W')
+        g_w_rows.push this
+      if $(ticket_type).hasClass('dispute-EW')
+        g_ew_rows.push this
+
+
+    if this == show_customer_cb[0]
+      if this.checked
+        if show_email_cb[0].checked
+          $(c_e_rows).each ->
+            if $(this).hasClass('hidden')
+              $(this).removeClass('hidden')
+        else
+          $(c_e_rows).each ->
+            unless $(this).hasClass('hidden')
+              $(this).addClass('hidden')
+        if show_web_cb[0].checked
+          $(c_w_rows).each ->
+            if $(this).hasClass('hidden')
+              $(this).removeClass('hidden')
+        else
+          $(c_w_rows).each ->
+            unless $(this).hasClass('hidden')
+              $(this).addClass('hidden')
+        if show_emailweb_cb[0].checked
+          $(c_ew_rows).each ->
+            if $(this).hasClass('hidden')
+              $(this).removeClass('hidden')
+        else
+          $(c_ew_rows).each ->
+            unless $(this).hasClass('hidden')
+              $(this).addClass('hidden')
+      else
+        $(customer_rows).each ->
+          unless $(this).hasClass('hidden')
+            $(this).addClass('hidden')
+
+    if this == show_guests_cb[0]
+      if this.checked
+        if show_email_cb[0].checked
+          $(g_e_rows).each ->
+            if $(this).hasClass('hidden')
+              $(this).removeClass('hidden')
+        else
+          $(g_e_rows).each ->
+            unless $(this).hasClass('hidden')
+              $(this).addClass('hidden')
+        if show_web_cb[0].checked
+          $(g_w_rows).each ->
+            if $(this).hasClass('hidden')
+              $(this).removeClass('hidden')
+        else
+          $(g_w_rows).each ->
+            unless $(this).hasClass('hidden')
+              $(this).addClass('hidden')
+        if show_emailweb_cb[0].checked
+          $(g_ew_rows).each ->
+            if $(this).hasClass('hidden')
+              $(this).removeClass('hidden')
+        else
+          $(g_ew_rows).each ->
+            unless $(this).hasClass('hidden')
+              $(this).addClass('hidden')
+      else
+        $(guest_rows).each ->
+          unless $(this).hasClass('hidden')
+            $(this).addClass('hidden')
+
+    if this == show_email_cb[0]
+      if this.checked
+        if show_customer_cb[0].checked
+          $(c_e_rows).each ->
+            if $(this).hasClass('hidden')
+              $(this).removeClass('hidden')
+        else
+          $(c_e_rows).each ->
+            unless $(this).hasClass('hidden')
+              $(this).addClass('hidden')
+        if show_guests_cb[0].checked
+          $(g_e_rows).each ->
+            if $(this).hasClass('hidden')
+              $(this).removeClass('hidden')
+        else
+          $(g_e_rows).each ->
+            unless $(this).hasClass('hidden')
+              $(this).addClass('hidden')
+      else
+        $(c_e_rows).each ->
+          unless $(this).hasClass('hidden')
+            $(this).addClass('hidden')
+        $(g_e_rows).each ->
+          unless $(this).hasClass('hidden')
+            $(this).addClass('hidden')
+
+    if this == show_web_cb[0]
+      if this.checked
+        if show_customer_cb[0].checked
+          $(c_w_rows).each ->
+            if $(this).hasClass('hidden')
+              $(this).removeClass('hidden')
+        else
+          $(c_w_rows).each ->
+            unless $(this).hasClass('hidden')
+              $(this).addClass('hidden')
+        if show_guests_cb[0].checked
+          $(g_w_rows).each ->
+            if $(this).hasClass('hidden')
+              $(this).removeClass('hidden')
+        else
+          $(g_w_rows).each ->
+            unless $(this).hasClass('hidden')
+              $(this).addClass('hidden')
+      else
+        $(c_w_rows).each ->
+          unless $(this).hasClass('hidden')
+            $(this).addClass('hidden')
+        $(g_w_rows).each ->
+          unless $(this).hasClass('hidden')
+            $(this).addClass('hidden')
+
+    if this == show_emailweb_cb[0]
+      if this.checked
+        if show_customer_cb[0].checked
+          $(c_ew_rows).each ->
+            if $(this).hasClass('hidden')
+              $(this).removeClass('hidden')
+        else
+          $(c_ew_rows).each ->
+            unless $(this).hasClass('hidden')
+              $(this).addClass('hidden')
+        if show_guests_cb[0].checked
+          $(g_ew_rows).each ->
+            if $(this).hasClass('hidden')
+              $(this).removeClass('hidden')
+        else
+          $(g_ew_rows).each ->
+            unless $(this).hasClass('hidden')
+              $(this).addClass('hidden')
+      else
+        $(c_ew_rows).each ->
+          unless $(this).hasClass('hidden')
+            $(this).addClass('hidden')
+        $(g_ew_rows).each ->
+          unless $(this).hasClass('hidden')
+            $(this).addClass('hidden')

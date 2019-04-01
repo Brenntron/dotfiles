@@ -103,7 +103,7 @@ class RepApi::Blacklist < RepApi::Base
     raise "Missing parameter: comment" unless input.has_key?('comment')
 
     input = input.to_a
-    input += self.classifications.map{ |classification| "classification=#{classification}" }
+    input += self.classifications.join(",").split(",").map{ |classification| "classification=#{classification}" }
     entries = entry.kind_of?(Array) ? entry : [entry]
     input += entries.map{ |entry_curr| "entry=#{entry_curr}" }
 

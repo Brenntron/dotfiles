@@ -26,7 +26,7 @@
       %span.toolbar-button-text Collapse All
     %button.toolbar-button.expand-row-button.esc-tooltipped{onclick: 'expand_selected()', type: 'button', title: 'Expand Selected'}
       %span.toolbar-button-text Expand Selected
-    %button.toolbar-button.expand-all.esc-tooltipped{onclick: 'expand_all()', type: 'button', title: 'Expand All'}
+    %button.toolbar-button.expand-all.esc-tooltipped{type: 'button', title: 'Expand All'}
       %span.toolbar-button-text Expand All
   %div
     %label.toolbar-section-label Data
@@ -34,7 +34,12 @@
       %span.toolbar-button-text Fetch Complaints
     %button.toolbar-button.sync-button#fetch_wbnp.esc-tooltipped{ onclick: 'fetch_wbnp_data();', title: 'Fetch WBNP Data'}
       %span.toolbar-button-text Fetch WBNP Data
-        
+
+  %div
+    %label.toolbar-section-label Bulk
+    %button.toolbar-button.master-submit-button#master-submit.esc-tooltipped{ onclick: 'master_submit();', title: 'Submit Changes', disabled: true}
+      %span.toolbar-button-text Submit Changes
+
   %div.toolbar-checkbox-wrapper
     %input{type: 'checkbox', checked: true, id:'self_review'}
       Allow Self Review

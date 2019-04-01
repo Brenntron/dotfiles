@@ -1,3 +1,5 @@
+require 'socket'
+
 class DisputeEntry < ApplicationRecord
   attr_writer :wbrs_xlist
 
@@ -9,6 +11,8 @@ class DisputeEntry < ApplicationRecord
 
   RESOLVED = "RESOLVED"
   NEW = "NEW"
+  ASSIGNED = "ASSIGNED"
+  CLOSED = "CLOSED"
 
   STATUS_RESEARCHING = "RESEARCHING"
   STATUS_ESCALATED = "ESCALATED"
@@ -29,8 +33,6 @@ class DisputeEntry < ApplicationRecord
 
   delegate :cvs_username, to: :dispute, allow_nil: true
 
-  ASSIGNED = "ASSIGNED"
-  CLOSED = "CLOSED"
 
   scope :open_entries, -> { where(status: NEW) }
   scope :assigned_entries, -> { where(status: ASSIGNED) }
@@ -43,6 +45,99 @@ class DisputeEntry < ApplicationRecord
     date_to = Date.iso8601(date_to_iso) + 1
     where(case_resolved_at: (date_from..date_to))
   }
+
+  def self.create_dispute_entry(dispute, ip_url, status = NEW)
+    begin
+      params = {}
+      new_dispute_entry = DisputeEntry.new
+      new_dispute_entry.dispute_id = dispute.id
+      new_dispute_entry.status = status
+
+      if is_ip?(ip_url)
+        params['ip'] = ip_url
+
+        wbrs_api_response = Sbrs::ManualSbrs.call_wbrs(params)
+        sbrs_api_response = Sbrs::ManualSbrs.call_sbrs(params)
+        sbrs_api_rulehit_response =  Sbrs::GetSbrs.get_sbrs_rules_for_ip(ip_url)
+        wbrs_prefix_response = ComplaintEntry.get_category(params['ip'])
+
+        new_dispute_entry.ip_address = ip_url
+        new_dispute_entry.entry_type = "IP"
+        new_dispute_entry.primary_category = wbrs_prefix_response
+
+
+        # Populate WBRS/SBRS Scores
+
+        if wbrs_api_response != nil && wbrs_api_response['wbrs'].present? && wbrs_api_response['wbrs']['score'] != 'noscore'
+          new_dispute_entry.wbrs_score = wbrs_api_response['wbrs']['score']
+        else
+          new_dispute_entry.wbrs_score = nil
+        end
+
+        if sbrs_api_response != nil && sbrs_api_response['sbrs'].present? && sbrs_api_response['sbrs'].present? && sbrs_api_response['sbrs']['score'] != 'noscore'
+          new_dispute_entry.sbrs_score = sbrs_api_response['sbrs']['score']
+        else
+          new_dispute_entry.sbrs_score = nil
+        end
+
+      else
+        params['url'] = ip_url
+
+        wbrs_api_response = Sbrs::ManualSbrs.call_wbrs(params, type: 'wbrs')
+        sbrs_api_response = Sbrs::ManualSbrs.call_sbrs(params, type: 'wbrs')
+        wbrs_prefix_response = ComplaintEntry.get_category(params['url'])
+
+        url_parts = Complaint.parse_url(ip_url)
+        new_dispute_entry.uri = ip_url
+        new_dispute_entry.entry_type = "URI/DOMAIN"
+        new_dispute_entry.subdomain = url_parts[:subdomain]
+        new_dispute_entry.domain = url_parts[:domain]
+        new_dispute_entry.path = url_parts[:path]
+
+        new_dispute_entry.primary_category = wbrs_prefix_response
+
+        # Populate WBRS/SBRS Scores
+
+        if wbrs_api_response != nil && wbrs_api_response['wbrs'].present? && wbrs_api_response['wbrs']['score'] != 'noscore'
+          new_dispute_entry.wbrs_score = wbrs_api_response['wbrs']['score']
+        else
+          new_dispute_entry.wbrs_score = nil
+        end
+
+        if sbrs_api_response != nil && sbrs_api_response['sbrs'].present? && sbrs_api_response['sbrs'].present? && sbrs_api_response['sbrs']['score'] != 'noscore'
+          new_dispute_entry.sbrs_score = sbrs_api_response['sbrs']['score']
+        else
+          new_dispute_entry.sbrs_score = nil
+        end
+      end
+
+      new_dispute_entry.save!
+
+      # Create Dispute Entry RuleHits
+      wbrs_rule_hits = Sbrs::ManualSbrs.get_rule_names_from_rulehits(wbrs_api_response)
+
+      if wbrs_rule_hits.present?
+        wbrs_rule_hits.each do |rule_hit|
+          DisputeRuleHit.create(rule_type:'WBRS', name: rule_hit, dispute_entry_id: new_dispute_entry.id)
+        end
+      end
+
+      if sbrs_api_rulehit_response.present?
+        sbrs_api_rulehit_response.each do |rule_hit|
+          DisputeRuleHit.create(rule_type:'SBRS', name: rule_hit, dispute_entry_id: new_dispute_entry.id)
+        end
+      end
+
+    rescue Exception => e
+      raise Exception.new("{DisputeEntry creation error: {content: #{ip_url},error:#{e}}}")
+    end
+
+
+  end
+
+  def self.is_ip?(ip)
+    !!IPAddr.new(ip) rescue false
+  end
 
   def self.new_from_wlbl(wlbl)
     new(uri: wlbl.url).tap do |entry|
@@ -92,9 +187,44 @@ class DisputeEntry < ApplicationRecord
   end
 
   def self.domain_of(url)
-    uri = URI.parse(URI.parse(url).scheme.nil? ? "http://#{url}" : url)
-    domain = PublicSuffix.parse(uri.host)
-    domain.domain
+    if !url.start_with?( 'http', 'https')
+      url = "http://" + url
+    end
+
+    clean_url = Addressable::URI.parse(url)
+    clean_host = clean_url.host
+    clean_host.sub(/^www\./, '')
+  end
+
+  def self.domain_of_with_path(urls)
+    if urls.kind_of?(String)
+      if !urls.start_with?( 'http', 'https')
+        urls = "http://" + urls
+      end
+
+      clean_url = Addressable::URI.parse(urls.strip)
+      clean_host = clean_url.host.sub(/^www\./, '')
+      clean_host = clean_host + clean_url.path
+
+      response = clean_host
+    elsif urls.kind_of?(Array)
+      response = []
+      urls.each do |url|
+        if url.strip != ''
+          if !url.start_with?( 'http', 'https')
+            url = "http://" + url
+          end
+
+          clean_url = Addressable::URI.parse(url.strip)
+          clean_host = clean_url.host.sub(/^www\./, '')
+          clean_host = clean_host + clean_url.path
+
+          response << clean_host
+        end
+      end
+    end
+
+    response
   end
 
   def assign_url_parts(url = self.hostlookup)
@@ -192,18 +322,19 @@ class DisputeEntry < ApplicationRecord
   end
 
   def wbrs_xlist
-    if dispute_entry_preload.present? && dispute_entry_preload.crosslisted_urls.present?
-      @wbrs_xlist = Wbrs::ManualWlbl.load_from_prefetch(dispute_entry_preload.crosslisted_urls)
-      return @wbrs_xlist
-    end
-    @wbrs_xlist ||= Wbrs::ManualWlbl.where({:url => hostlookup})
+    @wbrs_xlist ||=
+        if dispute_entry_preload.present? && dispute_entry_preload.crosslisted_urls.present?
+          Wbrs::ManualWlbl.load_from_prefetch(dispute_entry_preload.crosslisted_urls)
+        else
+          Wbrs::ManualWlbl.where({:url => DisputeEntry.domain_of(hostlookup)})
+        end
   rescue => except
-
     Rails.logger.warn "Populating xlist from Wbrs failed."
+    Rails.logger.warn "Hostlookup:" + hostlookup
     Rails.logger.warn except
     Rails.logger.warn except.backtrace.join("\n")
 
-    []
+    return []
   end
 
   def virustotals
@@ -277,6 +408,13 @@ class DisputeEntry < ApplicationRecord
     end
 
     pretty_umbrella_status
+  rescue => except
+    Rails.logger.warn "Populating umbrella failed"
+    Rails.logger.warn "Hostlookup:" + hostlookup
+    Rails.logger.warn except
+    Rails.logger.warn except.backtrace.join("\n")
+
+    return 'Unable to resolve'
   end
 
   def assign_from_auto_resolve(address:, total_hits:, resolved_at:, dispute_entry:)
@@ -289,13 +427,7 @@ class DisputeEntry < ApplicationRecord
       if auto_resolve_verdict.malicious?
         self.resolution_comment = "Talos has lowered our reputation score for the URL/Domain/Host to block access."
         self.resolution = STATUS_RESOLVED_FIXED_FN
-        self.status = RESOLVED
-        self.case_closed_at = resolved_at
-        self.case_resolved_at = resolved_at
-      else
-        self.resolution_comment = Dispute::AUTORESOLVED_UNCHANGED_MESSAGE
-        self.resolution = STATUS_RESOLVED_UNCHANGED
-        self.status = RESOLVED
+        self.status = STATUS_RESOLVED
         self.case_closed_at = resolved_at
         self.case_resolved_at = resolved_at
       end
@@ -390,8 +522,14 @@ class DisputeEntry < ApplicationRecord
     ::Preloader::Base.fetch_all_api_data(self.hostlookup, self.id)
 
     wbrs_stuff = Sbrs::ManualSbrs.get_wbrs_data({:url => self.hostlookup})
-
     wbrs_stuff_rulehits = Sbrs::ManualSbrs.get_rule_names_from_rulehits(wbrs_stuff)
+
+    ip_addr = IPSocket.getaddress(hostlookup) rescue nil
+    if ip_addr
+      wbrs_stuff_ip = Sbrs::ManualSbrs.get_wbrs_data(url: ip_addr)
+      wbrs_stuff_rulehits = wbrs_stuff_rulehits + Sbrs::ManualSbrs.get_rule_names_from_rulehits(wbrs_stuff_ip)
+      wbrs_stuff_rulehits = wbrs_stuff_rulehits.uniq
+    end
 
 
     self.wbrs_score = wbrs_stuff["wbrs"]["score"]
@@ -531,11 +669,18 @@ class DisputeEntry < ApplicationRecord
         end
       end
 
-      if research_params['broad'] || entries.find{|entry| url == entry.uri}
+      if research_params['scope'] == "broad" || entries.find{|entry| url == entry.uri}
         entries.each do |entry|
           is_ip_address = !!(entry.uri  =~ Resolv::IPv4::Regex)
           wbrs_stuff = Sbrs::ManualSbrs.get_wbrs_data({:url => entry.uri})
           wbrs_stuff_rulehits = Sbrs::ManualSbrs.get_rule_names_from_rulehits(wbrs_stuff)
+
+          ip_addr = IPSocket.getaddress(entry.uri) rescue nil
+          if ip_addr
+            wbrs_stuff_ip = Sbrs::ManualSbrs.get_wbrs_data(url: ip_addr)
+            wbrs_stuff_rulehits = wbrs_stuff_rulehits + Sbrs::ManualSbrs.get_rule_names_from_rulehits(wbrs_stuff_ip)
+            wbrs_stuff_rulehits = wbrs_stuff_rulehits.uniq
+          end
 
           entry.wbrs_score = wbrs_stuff["wbrs"]["score"]
           wbrs_stuff_rulehits.each do |rule_hit|
@@ -568,6 +713,18 @@ class DisputeEntry < ApplicationRecord
       entries
     else
       []
+    end
+  end
+
+  def self.check_for_duplicates(entry)
+    if is_ip?(entry) && DisputeEntry.where(ip_address: entry).present?
+      return true
+    elsif is_ip?(entry) && !DisputeEntry.where(ip_address: entry).present?
+      return false
+    elsif !is_ip?(entry) && DisputeEntry.where(uri: entry).present?
+      return true
+    elsif !is_ip?(entry) && !DisputeEntry.where(uri: entry).present?
+      return false
     end
   end
 end

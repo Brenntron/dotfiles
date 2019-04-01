@@ -7,8 +7,7 @@
 
 //= require jquery
 //= require jquery_ujs
-//= require dataTables/jquery.dataTables
-//= require dataTables/extras/dataTables.select
+//= require datatables
 //= require jquery-ui
 //= require bootstrap-sprockets
 //= require selectize
@@ -17,4 +16,7 @@
 //= require bootstrap-multiselect
 //= require application/tree-table
 //= require application/util
+//= require legacy/attachments.js.coffee
+//= require legacy/bugs.js.coffee
+//= require legacy/notes.js.coffee
 //= require_directory ./application

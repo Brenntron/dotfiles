@@ -78,7 +78,7 @@ $ ->
           orderable: false
           searchable: false
           sortable: false
-          'render':(data,type,full,meta)->
+          'render':(data)->
             return '<button class="expand-row-button-inline expand-row-button-' + data.entry_id + '"></button>'
         }
         {
@@ -88,6 +88,16 @@ $ ->
           sortable: false
           defaultContent: '<span></span>'
           width: '24px'
+          'render': (data)->
+            if data.is_important
+
+              if data.was_dismissed
+                return '<div class="container-important-tags">' +
+                  '<div class="esc-tooltipped is-important" tooltip title="Important"></div>' +
+                  '<div class="esc-tooltipped was-reviewed" tooltip title="Reviewed"></div>' +
+                  '</div>'
+              else
+                return '<span class="esc-tooltipped is-important" tooltip title="Important"></span>'
         }
         {
           data: 'entry_id'
@@ -96,20 +106,31 @@ $ ->
         {
           data: 'age'
           width: '40px'
-          'render':(data) ->
-            parts = data.split(' ')
-            days = parseInt(parts[0])
-            hour = parseInt(parts[1])
+#          'render':(data) ->
+#            console.log data
+#            return data
 
-            if days == 0
-              if hour < 3
-                data
-              else if hour < 5
-                '<span class="ticket-age-over3hr">' + data + '</span>'
-              else
-                '<span class="overdue">' + data + '</span>'
-            else
-              '<span class="overdue">' + data + '</span>'
+#            current_time = moment()
+#            created_at = moment(full.created_at)
+#
+#            if created_at == null || created_at == ''
+#              complaint_latency = '-'
+#
+#            else
+#              complaint_age = moment.duration(created_at.diff(current_time)).asHours();
+#              complaint_age = Math.abs(complaint_age)
+#              complaint_age = Math.floor(complaint_age)
+#
+#              if complaint_age < 1
+#                complaint_latency = '<1h'
+#              else if complaint_age > 1 && complaint_age < 3
+#                complaint_latency = complaint_age + 'h'
+#              else if complaint_age >= 3 && complaint_age < 12
+#                complaint_latency ='<span class="ticket-age-over3hr">'+ complaint_age + 'h</span>'
+#              else if complaint_age >= 12 && complaint_age < 120
+#                complaint_latency ='<span class="ticket-age-over12hr">'+ complaint_age + 'h </span>'
+#              else if complaint_age >= 120
+#                complaint_latency ='<span class="ticket-age-over12hr"> >120h </span>'
         }
         {
           data: 'status'
@@ -199,12 +220,34 @@ $ ->
 
     $('#complaints-index_filter input').addClass('table-search-input');
 
+    $('#complaints-index tbody').on 'click', ' .nested-complaint-data', ->
+      $(this).focus()
+      $(this).toggleClass('highlight-text')
+      element = $(this)
+      innertext = $(this).text()
+      copyToClipboard(innertext)
+      $(element).after( "<p id='copiedAlert'>Copied to clipboard!</p>" )
+      setTimeout (->
+        $("#copiedAlert").remove()
+      ), 1000
+
+    copyToClipboard = (text) ->
+      dummy = document.createElement('input')
+      document.body.appendChild dummy
+      dummy.setAttribute 'value', text
+      dummy.select()
+      document.execCommand 'copy'
+      document.body.removeChild dummy
+
     $('#complaints-index tbody').on 'click', 'td.expandable-row-column', ->
       click_table_buttons complaint_table, this
 
     $('#general_search').on 'keyup', (e) ->
       if event.keyCode == 13
         # do the ajax call
+        $('#loader-modal').modal({
+          keyboard: false
+        })
         filter = this.value
         headers = {'Token': $('input[name="token"]').val(), 'Xmlrpc-Token': $('input[name="xml_token"]').val()}
         $.ajax(
@@ -215,6 +258,7 @@ $ ->
 
             json = $.parseJSON(response)
             if json.error
+              $('#loader-modal').modal 'hide'
               notice_html = "<p>Something went wrong: #{json.error}</p>"
               alert(json.error)
             else
@@ -222,8 +266,10 @@ $ ->
               datatable.clear();
               datatable.rows.add(json.data);
               datatable.draw();
+              $('#loader-modal').modal 'hide'
 
           error: (response) ->
+            $('#loader-modal').modal 'hide'
             std_api_error(response, "There was an error loading search results.", reload: false)
         , this)
 

@@ -1,26 +1,78 @@
 
+window.std_api_login =() ->
+  username = $('form#modal-login-form').find('input[name=username]').val()
+  password = $('form#modal-login-form').find('input[name=password]').val()
+  url = $('form#modal-login-form').find('input[name=url]').val()
+  std_msg_ajax(
+    method: 'POST'
+    url: url
+    data: { username: username, password: password }
+    error_prefix: 'Error logging in.'
+    success: (response) ->
+      $('#login-modal').modal 'hide'
+  )
+
+
+window.top_banner_bugzilla_login =() ->
+  username = $('form#top_banner_bugzilla_login_form').find('input[name=username]').val()
+  password = $('form#top_banner_bugzilla_login_form').find('input[name=password]').val()
+  std_msg_ajax(
+    method: 'POST'
+    url: '/escalations/api/v1/escalations/bugzilla_rest_login'
+    data: { username: username, password: password }
+    error_prefix: 'Error logging in.'
+    success: (response) ->
+      $('form#top_banner_bugzilla_login_form').find('input[name=username]').val('')
+      $('form#top_banner_bugzilla_login_form').find('input[name=password]').val('')
+      $('#user-settings-dropdown-button').click()
+      window.location.reload()
+  )
+
+
+window.check_auth_prompt =(response) ->
+  (response.responseJSON != undefined) && (response.responseJSON.prompt != undefined)
+
+
+window.std_api_unauthenticated =(responseJSON) ->
+  msg_div = $('#login-modal').find('#message-text')[0]
+  $(msg_div).html('Unable to authenticate to ' + responseJSON['system'])
+
+  prompt_div = $('#login-modal').find('#prompt-text')[0]
+  $(prompt_div).html(responseJSON['prompt'])
+
+  $('form#modal-login-form').find('input[name=url]').val(responseJSON['url'])
+
+  $('#login-modal').modal('show')
+
+
 window.std_api_error =(response, prefix = "Error", options = {}) ->
-  if response.responseJSON == undefined
-    response_lines = response.responseText.split("\n")
-    if 10 < response_lines.length
-      messages = [ response_lines[0], response_lines[1] ]
+  if check_auth_prompt(response)
+    std_api_unauthenticated(response.responseJSON)
+  else
+    if response.responseJSON == undefined
+      response_lines = response.responseText.split("\n")
+      if 10 < response_lines.length
+        messages = [ response_lines[0], response_lines[1] ]
+      else
+        messages = response.responseText.split("\n")
+    else if response.responseJSON.messages != undefined
+      messages = response.responseJSON.messages
+    else if response.responseJSON.message != undefined
+      messages = [ response.responseJSON.message ]
     else
       messages = response.responseText.split("\n")
-  else if response.responseJSON.messages != undefined
-    messages = response.responseJSON.messages
-  else if response.responseJSON.message != undefined
-    messages = [ response.responseJSON.message ]
-  else
-    messages = response.responseText.split("\n")
 
-  std_msg_error(prefix, messages, options)
+    std_msg_error(prefix, messages, options)
 
 
 # standard way to call AJAX
 # Use std_msg_ajax confirmation message support
 # @param [Hash] ajax_data data and options for this AJAX call.
 window.std_api_ajax =(ajax_data) ->
-  ajax_data.headers = {'Token': $('input[name="token"]').val(), 'Xmlrpc-Token': $('input[name="xml_token"]').val()}
+  ajax_data.headers = {
+    'Token': $('input[name="token"]').val(),
+    'Xmlrpc-Token': $('input[name="xml_token"]').val(),
+  }
   ajax_data.dataType = 'json'
 
   if ajax_data.contentType == undefined

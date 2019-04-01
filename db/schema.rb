@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 2018_11_13_170614) do
+ActiveRecord::Schema.define(version: 2019_01_29_160213) do
 
   create_table "alerts", options: "ENGINE=InnoDB DEFAULT CHARSET=utf8", force: :cascade do |t|
     t.datetime "created_at", null: false
@@ -18,35 +18,18 @@ ActiveRecord::Schema.define(version: 2018_11_13_170614) do
     t.string "test_group", null: false
     t.integer "rule_id", null: false
     t.integer "attachment_id", null: false
+    t.string "policy"
     t.index ["test_group", "attachment_id", "rule_id"], name: "index_alerts_on_test_group_and_attachment_id_and_rule_id"
   end
 
-  create_table "amp_false_positive_files", options: "ENGINE=InnoDB DEFAULT CHARSET=utf8", force: :cascade do |t|
-    t.string "sha256"
-    t.string "name"
-    t.string "path"
-    t.string "download_url"
-    t.string "detection_name"
-    t.string "detection_count_within_org"
-    t.datetime "first_observed"
-    t.datetime "last_observed"
-    t.string "current_amp_disposition"
-    t.boolean "is_archived", default: false
-  end
-
   create_table "amp_false_positives", options: "ENGINE=InnoDB DEFAULT CHARSET=utf8", force: :cascade do |t|
-    t.string "sha256"
-    t.integer "customer_id"
-    t.string "source"
-    t.text "description"
-    t.string "product"
     t.integer "sr_id"
     t.text "payload"
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
-    t.string "status"
+    t.bigint "file_reputation_ticket_id"
+    t.index ["file_reputation_ticket_id"], name: "index_amp_false_positives_on_file_reputation_ticket_id"
     t.index ["payload"], name: "index_amp_false_positives_on_payload", length: 15
-    t.index ["sha256"], name: "index_amp_false_positives_on_sha256"
   end
 
   create_table "attachments", options: "ENGINE=InnoDB DEFAULT CHARSET=utf8", force: :cascade do |t|
@@ -142,6 +125,7 @@ ActiveRecord::Schema.define(version: 2018_11_13_170614) do
     t.integer "unused_svn_result_code"
     t.boolean "tested"
     t.boolean "in_summary", default: false
+    t.boolean "edited", default: false
     t.index ["bug_id", "rule_id"], name: "index_bugs_rules_on_bug_id_and_rule_id", unique: true
   end
 
@@ -172,7 +156,7 @@ ActiveRecord::Schema.define(version: 2018_11_13_170614) do
     t.string "domain"
     t.string "path"
     t.float "wbrs_score"
-    t.string "url_primary_category"
+    t.string "url_primary_category", limit: 1000
     t.string "resolution"
     t.text "resolution_comment"
     t.datetime "complaint_entry_resolved_at"
@@ -185,7 +169,7 @@ ActiveRecord::Schema.define(version: 2018_11_13_170614) do
     t.string "suggested_disposition"
     t.string "ip_address"
     t.string "entry_type"
-    t.string "category"
+    t.string "category", limit: 1000
     t.integer "user_id"
     t.boolean "is_important"
     t.datetime "case_resolved_at"
@@ -264,7 +248,8 @@ ActiveRecord::Schema.define(version: 2018_11_13_170614) do
     t.string "phone"
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
-    t.index ["company_id", "name"], name: "index_customers_on_company_id_and_name", unique: true
+    t.index ["company_id", "name"], name: "index_customers_on_company_id_and_name"
+    t.index ["email"], name: "index_customers_on_email", unique: true
   end
 
   create_table "cves", options: "ENGINE=InnoDB DEFAULT CHARSET=latin1", force: :cascade do |t|
@@ -293,7 +278,7 @@ ActiveRecord::Schema.define(version: 2018_11_13_170614) do
   create_table "delayed_jobs", options: "ENGINE=InnoDB DEFAULT CHARSET=utf8", force: :cascade do |t|
     t.integer "priority", default: 0, null: false
     t.integer "attempts", default: 0, null: false
-    t.text "handler", null: false
+    t.text "handler", limit: 16777215
     t.text "last_error"
     t.datetime "run_at"
     t.datetime "locked_at"
@@ -539,6 +524,17 @@ ActiveRecord::Schema.define(version: 2018_11_13_170614) do
     t.string "source"
   end
 
+  create_table "file_reputation_tickets", options: "ENGINE=InnoDB DEFAULT CHARSET=utf8", force: :cascade do |t|
+    t.bigint "customer_id"
+    t.string "status"
+    t.string "source"
+    t.string "platform"
+    t.string "description"
+    t.bigint "reputation_file_id"
+    t.index ["customer_id"], name: "index_file_reputation_tickets_on_customer_id"
+    t.index ["reputation_file_id"], name: "index_file_reputation_tickets_on_reputation_file_id"
+  end
+
   create_table "fp_file_refs", options: "ENGINE=InnoDB DEFAULT CHARSET=latin1", force: :cascade do |t|
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
@@ -555,6 +551,10 @@ ActiveRecord::Schema.define(version: 2018_11_13_170614) do
     t.bigint "gib_id"
     t.index ["bug_id", "gib_type", "gib_id"], name: "index_giblets_on_bug_id_and_gib_type_and_gib_id"
     t.index ["gib_type", "gib_id"], name: "index_giblets_on_gib_type_and_gib_id"
+  end
+
+  create_table "immunet_false_positives", options: "ENGINE=InnoDB DEFAULT CHARSET=utf8", force: :cascade do |t|
+    t.string "version"
   end
 
   create_table "morsels", options: "ENGINE=InnoDB DEFAULT CHARSET=latin1", force: :cascade do |t|
@@ -618,7 +618,14 @@ ActiveRecord::Schema.define(version: 2018_11_13_170614) do
     t.index ["reference_type_id"], name: "index_references_on_reference_type_id"
   end
 
-  create_table "resolution_message_templates", options: "ENGINE=InnoDB DEFAULT CHARSET=utf8", force: :cascade do |t|
+  create_table "reputation_files", options: "ENGINE=InnoDB DEFAULT CHARSET=utf8", force: :cascade do |t|
+    t.integer "bugzilla_attachment_id"
+    t.string "sha256"
+    t.string "file_path"
+    t.string "file_name"
+  end
+
+  create_table "resolution_message_templates", options: "ENGINE=InnoDB DEFAULT CHARSET=latin1", force: :cascade do |t|
     t.string "name"
     t.text "description"
     t.text "body"
@@ -712,6 +719,7 @@ ActiveRecord::Schema.define(version: 2018_11_13_170614) do
     t.string "snort_doc_status", default: "NOTYET"
     t.string "snort_on_off", default: "on"
     t.string "fatal_errors"
+    t.boolean "edited", default: false
     t.index ["gid", "sid"], name: "index_rules_gid_and_sid", unique: true
     t.index ["rule_category_id"], name: "index_rules_on_rule_category_id"
     t.index ["task_id"], name: "index_rules_on_task_id"
@@ -782,6 +790,7 @@ ActiveRecord::Schema.define(version: 2018_11_13_170614) do
     t.integer "user_id"
     t.datetime "stats_updated_at"
     t.string "type", default: "Task"
+    t.string "policy"
     t.index ["bug_id"], name: "index_tasks_on_bug_id"
     t.index ["user_id"], name: "index_tasks_on_user_id"
   end

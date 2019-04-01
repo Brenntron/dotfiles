@@ -1,4 +1,8 @@
+complaint_status_list= ["NEW", "RESOLVED", "ASSIGNED", "ACTIVE","COMPLETED","PENDING"]
+complaint_channel_list=["Internal", "TalosIntel", "WBNP"]
+complaint_resolution_list=["FIXED", "INVALID", "UNCHANGED", "DUPLICATE"]
 $ ->
+
   $('#new-complaint').on 'click', ->
     headers = {'Token': $('input[name="token"]').val(), 'Xmlrpc-Token': $('input[name="xml_token"]').val()}
     $.ajax(
@@ -15,6 +19,7 @@ $ ->
     )
 
   $('#advanced-search-button').on 'click', ->
+
     headers = {'Token': $('input[name="token"]').val(), 'Xmlrpc-Token': $('input[name="xml_token"]').val()}
     $.ajax(
       url: '/escalations/api/v1/escalations/webcat/customers_names'
@@ -22,6 +27,10 @@ $ ->
       dataType: 'json'
       headers: headers
       success: (response) ->
+
+        $('#channel-input-list').empty()
+        $('#status-input-list').empty()
+        $('#resolution-input-list').empty()
         $('#customerList').empty()
 
         uniques = []
@@ -36,6 +45,15 @@ $ ->
         while j < uniques.length
           $('#customerList').append '<option value=\'' + uniques[j] + '\'></option>'
           j++
+
+        for status in complaint_status_list
+          $('#status-input-list').append '<option value=\'' + status + '\'></option>'
+
+        for channel in complaint_channel_list
+          $('#channel-input-list').append '<option value=\'' + channel + '\'></option>'
+
+        for resolution in complaint_resolution_list
+          $('#resolution-input-list').append '<option value=\'' + resolution + '\'></option>'
 
     )
 
@@ -90,36 +108,30 @@ $ ->
       backdrop: 'static',
       keyboard: false
     })
-    headers = {'Token': $('input[name="token"]').val(), 'Xmlrpc-Token': $('input[name="xml_token"]').val()}
     ips_urls = this.ips_urls.value
     desc = this.description.value
     customer = this.customers.value
     tags = $('.selectize').val() || []
 
-    $.ajax(
+    std_msg_ajax(
       url: '/escalations/api/v1/escalations/webcat/complaints'
       method: 'POST'
-      headers: headers
       data:
         ips_urls: ips_urls,
         description: desc,
         customer: customer,
         tags: tags
       success: (response) ->
-        $('#loader-modal').hide()
+        $('#loader-modal').modal 'hide'
         std_msg_success('Complaint Created.', [], reload: true)
       error: (response) ->
-        $('#loader-modal').hide()
-        $('.modal-backdrop').remove();
+        $('#loader-modal').modal 'hide'
         std_api_error(response, "Complaint was not created.", reload: false)
     )
 
   $('#cancel_complaint').on 'click', ->
     $(':input','#new-complaint-form').val('')
     $('#new-complaint').dropdown('toggle')
-
-
-
 
 
   createSelectOptions = ->

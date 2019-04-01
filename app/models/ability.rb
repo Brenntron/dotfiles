@@ -9,7 +9,7 @@ class Ability
     role_names = roles.pluck(:role)
 
 
-    can [:read, :update_preferences], User, id: current_user.id
+    can [:read, :update_preferences, :manage_bugzilla_api], User, id: current_user.id
 
     # roles are partitioned into org subsets (snort rules, snort escalations, web cat, web rep)
     # the current user can read the user records of other users in their subset.
@@ -18,8 +18,6 @@ class Ability
         other_user.roles.where(org_subset_id: current_user_role.org_subset_id).exists?
       end
     end
-
-
 
     # admin role includes developers who maintain the site
     if role_names.include?('admin')
@@ -93,15 +91,14 @@ class Ability
       can :manage, User do |user| #no delete UI is implemented
         user.ancestors.include?(current_user)
       end
-      can :read, [ResearchBug, Rule]
+      can :read, [ResearchBug]
     end
 
     if role_names.include?('committer')
       can [:manage, :acknowledge_bug, :import, :toggle_liberty], ResearchBug do |bug|
         bug.check_permission(current_user)
       end
-      can :manage, [EscalationLink, Attachment, Note, Rule]
-      can :publish, Rule
+      can :manage, [EscalationLink, Attachment, Note]
       can :publish_to_bugzilla, Note
     end
 
@@ -110,7 +107,6 @@ class Ability
         bug.check_permission(current_user)
       end
       can :manage, [Attachment, Note]
-      can [:read, :create, :update, :destroy], Rule #CRUD but no publish/commit
       # TODO When implementing escalation bugs re-enable
       # can [:manage, :acknowledge_bug, :import], EscalationBug
       # can :manage, EscalationLink
@@ -121,8 +117,8 @@ class Ability
     end
 
     if role_names.include?('build coordinator')
-      cannot [:update, :destroy, :create], [Bug, Rule, Attachment, Note]
-      can :read, [ResearchBug, Attachment, Note, Rule]
+      cannot [:update, :destroy, :create], [Bug, Attachment, Note]
+      can :read, [ResearchBug, Attachment, Note]
     end
   end
 end

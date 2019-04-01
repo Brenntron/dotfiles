@@ -13,6 +13,8 @@
         %span.data_small_emphasis
           =@user.roles.map(&:role).join(', ')
 
+
+        -# Check Marlin's commit on Dec 18 regarding user role and api key
         - if current_user.has_role?('api user')
           %hr.thin
           .user-access-wrapper

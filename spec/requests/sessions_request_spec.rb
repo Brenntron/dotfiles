@@ -6,6 +6,6 @@ RSpec.describe SessionsController, type: :request do
 
     get escalations_root_path
 
-    expect(response).to redirect_to(new_escalations_session_path)
+    expect(response).to redirect_to(escalations_users_path)
   end
 end

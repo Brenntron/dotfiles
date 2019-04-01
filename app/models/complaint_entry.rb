@@ -64,36 +64,37 @@ class ComplaintEntry < ApplicationRecord
   end
 
   def take_complaint(current_user)
-    if user.nil? ||user.display_name == "Vrt Incoming"
-      if status!="COMPLETED"
+    if user.nil? || user.display_name == "Vrt Incoming"
+      if status != "COMPLETED"
         self.update(user:current_user, status:"ASSIGNED", case_assigned_at: Time.now)
         complaint.set_status("ASSIGNED")
       else
-        raise("Cannot take a completed complaint. How did this happen.")
+        return("Already completed")
       end
     else
-      raise("Cannot take someone elses complaint.")
+      return("Someone elses complaint")
     end
+    return("Complaint taken")
   end
-  def return_complaint(current_user)
-    if self.user == current_user
+  def return_complaint
+    if self.user != User.where(display_name: 'Vrt Incoming').first
       if !self.is_important
         if status!="COMPLETED"
           self.update(user: User.vrtincoming, status:"NEW")
           complaint.set_status("NEW")
         else
-          raise("Cannot return complaint that has been completed.")
+          return("Already completed")
         end
+      elsif self.is_important && self.status != "PENDING"
+        self.update(user: User.vrtincoming, status:"NEW")
+        complaint.set_status("NEW")
       else
-        raise("Cannot return complaint when status is pending.")
+        return("Status is pending")
       end
     else
-      if self.user.nil?
-        raise("Cannot return a complaint that is not assigned")
-      else
-        raise("Cannot return someone elses complaint.")
-      end
+      return("Not yet assigned")
     end
+    return("Complaint returned")
   end
 
   def is_pending?
@@ -114,7 +115,7 @@ class ComplaintEntry < ApplicationRecord
     categories = categories_string&.split(',')
     ActiveRecord::Base.transaction do
       # If the prefix is a high telemetry value then the status needs to be set to PENDING
-      if self.is_important
+      if self.is_important && entry_status != Complaint::RESOLUTION_UNCHANGED
         if self.status == "PENDING"
           if commit_pending == "commit"
             # commit from pending of important case
@@ -160,7 +161,7 @@ class ComplaintEntry < ApplicationRecord
                  user:current_user)
         end
       else
-        # not important case
+        # not important case or resolution is "unchanged"
 
         current_status = "COMPLETED"
         self.case_assigned_at ||= Time.now
@@ -188,12 +189,23 @@ class ComplaintEntry < ApplicationRecord
   def commit_category(ip_or_uri:, categories_string:, description:, user:)
     # Look for existing prefix
 
-    existing_prefix = Wbrs::Prefix.where({urls: [ip_or_uri]})
+    existing_prefixes = Wbrs::Prefix.where({urls: [ip_or_uri]})
+    existing_prefix = nil
+    if existing_prefixes.present?
+      existing_prefixes.each do |prefix_found|
+        if prefix_found.subdomain == self.subdomain
+          if prefix_found.path == self.path
+            existing_prefix = prefix_found
+          end
+        end
+      end
+    end
+
     category_ids_array = categories_string.split(',').map {|cat| cat.to_i}
 
     if existing_prefix.present?
       prefix_object = Wbrs::Prefix.new
-      prefix_object.set_categories(category_ids_array, prefix_id: existing_prefix[0].prefix_id, user: user, description: description)
+      prefix_object.set_categories(category_ids_array, prefix_id: existing_prefix.prefix_id, user: user, description: description)
     else
       Wbrs::Prefix.create_from_url(url: ip_or_uri, categories: category_ids_array, user: user, description: description)
     end
@@ -215,7 +227,7 @@ class ComplaintEntry < ApplicationRecord
       new_complaint_entry.complaint_id = complaint.id
       new_complaint_entry.status = status
 
-      wbrs_stuff = Sbrs::ManualSbrs.get_wbrs_data({:url => ip_url})
+      wbrs_stuff = Sbrs::ManualSbrs.get_wbrs_data({:url => URI.escape(ip_url)})
       wbrs_score = wbrs_stuff["wbrs"]["score"]
       new_complaint_entry.wbrs_score = wbrs_score
 
@@ -259,7 +271,7 @@ class ComplaintEntry < ApplicationRecord
     begin
       screenshot_data =  ""
       Timeout::timeout(max_wait_for_job) do
-        screenshot_data = CapybaraSpider.low_capture("http://#{new_complaint_entry.hostlookup}")
+        screenshot_data = CapybaraSpider.low_capture("#{new_complaint_entry.hostlookup}")
       end
       ces = ComplaintEntryScreenshot.new
       ces.complaint_entry_id = new_complaint_entry.id
@@ -379,8 +391,13 @@ class ComplaintEntry < ApplicationRecord
     raise "No search named '#{search_name}' found." unless named_search
     search_params = named_search.named_search_criteria.inject({}) do |search_params, criterion|
       if /\A(?<super_name>[^~]*)~(?<sub_name>[^~]*)\z/ =~ criterion.field_name
-        search_params[super_name] ||= {}
-        search_params[super_name][sub_name] = criterion.value
+        if criterion.field_name == 'complaint_entries~complaint_id'
+          search_params[super_name] ||= {}
+          search_params[super_name][sub_name] = YAML::load(criterion.value)
+        else
+          search_params[super_name] ||= {}
+          search_params[super_name][sub_name] = criterion.value
+        end
       else
         search_params[criterion.field_name] = criterion.value
       end
@@ -493,7 +510,7 @@ class ComplaintEntry < ApplicationRecord
 
     # Save this search as a named search
     if params.present? && search_name.present?
-      Dispute.save_named_search(search_name, params, user: user)
+      Dispute.save_named_search(search_name, params, user: user, project_type: 'Complaint')
     end
     relation
   end
@@ -513,16 +530,26 @@ class ComplaintEntry < ApplicationRecord
   #
 
   def set_current_category
-    prefix_results = Wbrs::Prefix.where({:urls => [self.hostlookup]})
+    category_list = []
+    prefix_results = Wbrs::Prefix.where({:urls => [URI.escape(self.hostlookup)]})
     if prefix_results
       if prefix_results.first&.is_active == 1
-        categories = prefix_results.map{ |result| result.descr}
-        self.url_primary_category = categories.join(',')
-        self.category = categories.join(',')
+
+        categories = prefix_results.find_all {|result| result.path == self.path}
+        categories.each do |cat|
+          if cat.subdomain == self.subdomain
+            category_list << Wbrs::Category.find(cat.category_id).descr
+          end
+        end
+
+        self.url_primary_category = category_list.uniq.join(',')
+        self.category = category_list.uniq.join(',')
       else
         categories = nil
       end
     end
+
+    category_list.uniq.join(',')
   rescue => except
 
     Rails.logger.warn "Populating categories from Wbrs failed."
@@ -533,33 +560,95 @@ class ComplaintEntry < ApplicationRecord
   end
 
   def current_category_data
-    prefix = Wbrs::Prefix.where({:urls => [self.hostlookup]})&.first
+    prefix_results = Wbrs::Prefix.where({:urls => [URI.escape(DisputeEntry.domain_of_with_path(self.hostlookup))]})
+    return {} unless prefix_results
+    certainty_on_urls = Wbrs::Prefix.get_certainty_sources_for_urls([DisputeEntry.domain_of_with_path(self.hostlookup)])
+
+    final_results = []
+    categories = prefix_results.find_all {|result| result.path == self.path}
+    categories.each do |cat|
+      if (cat.subdomain == self.subdomain) || (self.subdomain == 'www')
+        final_results << cat
+      end
+    end
+
+    final_current_categories = {}
+
+    final_results.each do |result|
+      current_categories = result.categories
+      category_certainty = {}
+      certainty_on_urls.each do |cert_url, info|
+
+        info.each do |cert_info|
+          if cert_info['subdomain'] == result.subdomain && cert_info['path'] == result.path
+            if category_certainty[(cert_info['category_id'].to_i - 1000)].blank?
+              category_certainty[(cert_info['category_id'].to_i - 1000)] = []
+            end
+            #category_certainty[(cert_info['category_id'].to_i - 1000)] = {:category_id => cert_info['category_id'], :certainty => cert_info['certainty'], :source_mnemonic => cert_info['source_mnemonic'], :source_description => cert_info['source_description']}
+            category_certainty[(cert_info['category_id'].to_i - 1000)] << {:category_id => (cert_info['category_id'].to_i - 1000), :certainty => cert_info['certainty'], :source_mnemonic => cert_info['source_mnemonic'], :source_description => cert_info['source_description']}
+          end
+        end
+      end
+
+      final_current_categories = current_categories
+      final_current_categories = final_current_categories.inject({}) do |data, category|
+        top_certainty = ""
+        if category_certainty[category.category_id].present?
+          top_certainty = category_certainty[category.category_id].first[:certainty]
+          source = category_certainty[category.category_id].first[:source_description]
+
+        end
+        data[category.category_id] = {
+            category_id: category.category_id,
+            desc_long: category.desc_long,
+            descr: category.descr,
+            mnem: category.mnem,
+            is_active: category.is_active,
+            confidence: category.confidence,
+            top_certainty: top_certainty,
+            certainties: category_certainty[category.category_id]
+        }
+        data
+      end
+    end
+
+    final_current_categories
+
+    #current_categories = prefix.categories
+
+    #current_categories.inject({}) do |data, category|
+    #  data[category.category_id] = {
+    #      category_id: category.category_id,
+    #      desc_long: category.desc_long,
+    #      descr: category.descr,
+    #      mnem: category.mnem,
+    #      is_active: category.is_active,
+    #      confidence: category.confidence
+    #  }
+    #  data
+    #end
+  end
+
+  def self.get_category(uri_ip)
+    prefix = Wbrs::Prefix.where({:urls => [uri_ip]})&.first
     return {} unless prefix
 
     current_categories = prefix.categories
 
-    current_categories.inject({}) do |data, category|
-      data[category.category_id] = {
-          category_id: category.category_id,
-          desc_long: category.desc_long,
-          descr: category.descr,
-          mnem: category.mnem,
-          is_active: category.is_active,
-          confidence: category.confidence
-      }
-      data
-    end
+    name = current_categories[0].descr
+
+    name
   end
 
   def historic_category_data
 
     prefix_id = nil
-    prefix_results = Wbrs::Prefix.where({:urls => [self.hostlookup]})
+    prefix_results = Wbrs::Prefix.where({:urls => [URI.escape(self.hostlookup)]})
     if prefix_results.present?
       prefix_id = prefix_results.first.prefix_id
     end
     if prefix_id.present?
-      prefix_history = Wbrs::HistoryRecord.where({:prefix_id => prefix_id}).sort_by {|history| history.time}.reverse
+      prefix_history = Wbrs::HistoryRecord.where({:prefix_id => prefix_id}).sort_by {|history| DateTime.parse(history.time)}.reverse
     else
       prefix_history = []
     end
@@ -570,7 +659,7 @@ class ComplaintEntry < ApplicationRecord
   def history_category_data_with_preload_save
 
     prefix_id = nil
-    prefix_results = Wbrs::Prefix.where({:urls => [self.hostlookup]})
+    prefix_results = Wbrs::Prefix.where({:urls => [URI.escape(self.hostlookup)]})
 
     complaint_entry_preload = ComplaintEntryPreload.where(complaint_entry_id: self.id).first
 

@@ -24,7 +24,11 @@ class CapybaraSpider < Capybara::Session
   end
 
   def self.low_capture(url)
-    `phantomjs /extras/capture_site_image.js #{url}`.strip
+    Rails.logger.info("captureing screenshot...")
+    output, errors, status = Open3.capture3("phantomjs --ssl-protocol=any --ignore-ssl-errors=true /extras/capture_site_image.js #{url}")
+    Rails.logger.info("Screenshot capture status:#{status.exitstatus} - [#{status.pid}] #{status} ")
+    Rails.logger.info("Errors were: ->#{errors}<-")
+    output
   end
 
   def self.capture(url)

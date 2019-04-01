@@ -7,6 +7,7 @@
         %span.bug-state-info.bug-priority#dispute-priority-icon{class: "p-#{@dispute.priority}"}
         =select_tag(:'dispute-priority-select', options_for_select([["#{Dispute::PRIORITY_1}"], ["#{Dispute::PRIORITY_2}"], ["#{Dispute::PRIORITY_3}"], ["#{Dispute::PRIORITY_4}"], ["#{Dispute::PRIORITY_5}"]], @dispute.priority))
         %span.dispute-submission-type{class:"dispute-#{@dispute.submission_type}"}
+        =select_tag(:'dispute-submission-type-select', options_for_select([["E"], ["W"], ["EW"]], @dispute.submission_type.upcase))
       .case-id-wrapper
         %label.content-label-sm
           Case ID
@@ -44,9 +45,11 @@
                             =select_tag :index_target_assignee, options_from_collection_for_select(User.joins(roles: :org_subset).where(org_subsets: { name: 'webrep' }).distinct.order(:cvs_username), :id, :cvs_username), class: 'toolbar-select'
                           %button{class: 'primary', type:'button', id: 'button_reassign', onclick:'toolbar_show_change_assignee();'}
                             Assign
-                          - if (@dispute.assignee != 'Unassigned')
-                            %button{class: 'secondary', type: 'button', id: 'unassign-dispute-button', onclick: 'toolbar_unassign_dispute();'}
-                              Unassign
+
+          - if (@dispute.assignee != 'Unassigned')
+            .container_unassign
+              %button{class: 'secondary ticket-owner-unassigned-button', type: 'button', id: 'unassign-dispute-button', onclick: 'toolbar_unassign_dispute();'}
+                Unassign
 
     .col-xs-3.col-with-divider
       .dispute-status-col-wrapper
@@ -61,7 +64,7 @@
                 NEW
               - else
                 = @dispute.status
-                
+
             - if can? :update, Dispute
               .dropdown-menu.inline-dropdown-menu#show-edit-ticket-status-dropdown{'aria-labelledby': 'show-edit-ticket-status-button'}
                 %ul
@@ -170,7 +173,7 @@
         %br
         %label.content-label-sm
           Age
-        %div= @dispute.case_opened_at && distance_of_time_in_words(Time.now, @dispute.case_opened_at)
+        %div=@dispute.dispute_age
       - if (@dispute.resolution != Dispute::DUPLICATE) && (@dispute.status != Dispute::RESOLVED)
         .top-info-buttons-wrapper
           %button.edit-button.dispute-top-buttons#edit-dispute-button.esc-tooltipped{title: 'Edit ticket information'}

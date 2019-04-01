@@ -1,8 +1,15 @@
 class Wbrs::ManualWlbl < Wbrs::Base
-  FIELD_NAMES = %w{id ctime list_type mtime threat_cats url username state}
+  FIELD_NAMES = %w{id ctime list_type mtime threat_cats url username state notes}
   FIELD_SYMS = FIELD_NAMES.map{|name| name.to_sym}
 
-
+  WLBL_MAP = {
+      "WL-weak" => 31,
+      "WL-med" => 32,
+      "WL-heavy" => 33,
+      "BL-weak" => 36,
+      "BL-med" => 37,
+      "BL-heavy" => 38
+  }
   attr_accessor *FIELD_SYMS
 
   def self.new_from_attributes(attributes)
@@ -88,6 +95,22 @@ class Wbrs::ManualWlbl < Wbrs::Base
   def self.new_wlbl_from_params(wlbl_params)
     response = post_request(path: '/v1/rep/wlbl/add', body: wlbl_params)
     response
+  end
+
+  def self.bulk_new_wlbl_from_params(wlbl_params)
+    boolean = true
+    string_params = stringkey_params(wlbl_params)
+    list_types = string_params['trgt_list']
+
+    list_types.each do |list_type|
+      string_params['trgt_list'] = list_type.to_s
+      response = post_request(path: '/v1/rep/wlbl/add', body: string_params)
+      if response.code != 200
+        boolean = false
+      end
+    end
+
+    return boolean
   end
 
   # @param [Array<DisputeEntry>] entries the database records for the entries to add the WL/BL to.
@@ -180,7 +203,6 @@ class Wbrs::ManualWlbl < Wbrs::Base
       target_list.each do |wlbl|
         new_wlbl_from_params({'urls' => params_urls, 'usr' => username, 'note' => params[:note], 'trgt_list' => wlbl })
       end
-
     end
 
   end
@@ -197,5 +219,85 @@ class Wbrs::ManualWlbl < Wbrs::Base
     dispute_ids = entry_params.delete('dispute_ids')
     dispute_entry_ids = DisputeEntry.where(dispute_id: dispute_ids).pluck(:id)
     adjust_entries_from_params(entry_params.merge('dispute_entry_ids' => dispute_entry_ids), username: username)
+  end
+
+  def self.gather_history_entries(response, entry)
+    note_entries = []
+
+    if response.url == entry
+      details = Wbrs::ManualWlbl.find(response.id)
+
+      if details.notes.any?
+        details.notes.each do |note|
+          note_entries = note_entries + Wbrs::ManualWlbl.add_to_history_modal(response, "#{note['user']} - #{note['ctime']}: #{note['note']}")
+        end
+      else
+        note_entries = note_entries + Wbrs::ManualWlbl.add_to_history_modal(response, "")
+      end
+    end
+    note_entries
+  end
+
+  def self.add_to_history_modal(response, note)
+    note_entries = []
+    m_date = ''
+    c_date = ''
+    m_date = Date.parse(response.mtime).to_s unless response.mtime.blank?
+    c_date = Date.parse(response.ctime).to_s unless response.ctime.blank?
+
+    if response.ctime != response.mtime
+      note_entries.push({:state => response.state, :date => m_date, :sort_date => DateTime.parse(response.mtime), :list_type => response.list_type, :note => note})
+      note_entries.push({:state => response.state, :date => c_date, :sort_date => DateTime.parse(response.ctime), :list_type => response.list_type, :note => note})
+    else
+      note_entries.push({:state => response.state, :date => c_date, :sort_date => DateTime.parse(response.ctime), :list_type => response.list_type, :note => note})
+    end
+
+    note_entries
+  end
+  
+  def self.destroy_from_params(ip_uris, list_types, username:)
+    list_types_to_drop = []
+
+    ip_uris.each do |param_url|
+      api_response = Wbrs::ManualWlbl.where({:url => param_url})
+      active_entries = api_response.select {|response| response.state == 'active' }.map {|response| response}
+
+      list_types.each do |list_type|
+        active_entries.each do |active_entry|
+          if active_entry.list_type == list_type
+            list_types_to_drop << active_entry.id
+          end
+        end
+      end
+    end
+
+    drop_from_ids(list_types_to_drop, username)
+  end
+
+  def self.project_new_score(url, add, remove)
+    conditions = {}
+    conditions["urls"] = []
+
+
+    url_conditions = {}
+    url_conditions["url"] = url
+    url_conditions["add"] = []
+    url_conditions["rm"] = []
+
+    add.each do |add_flag|
+      url_conditions["add"] << WLBL_MAP[add_flag]
+    end
+
+    remove.each do |remove_flag|
+      url_conditions["rm"] << WLBL_MAP[remove_flag]
+    end
+
+    conditions["urls"] << url_conditions
+    params = stringkey_params(conditions)
+    response = post_request(path: '/v1/rep/complaints/score', body: params)
+
+    response_body = JSON.parse(response.body)
+    response_body["data"][url].first["top_threat_key"]["score"]
+
   end
 end

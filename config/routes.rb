@@ -1,9 +1,12 @@
 Rails.application.routes.draw do
 
-  resources :rulehit_resolution_mailer_templates
+  mount RailsAdmin::Engine => '/escalations/admin', as: 'rails_admin'
   devise_for :users, controllers: {sessions: 'sessions'}
 
   namespace :escalations, except: [:destroy, :edit] do
+    get 'sb_api/query_lookup' => 'sb_api#query_lookup'
+    
+    resources :rulehit_resolution_mailer_templates, only: [:new, :index, :create, :show, :update, :destroy, :edit]
     resources :sessions, controller: '/sessions', only: [:new, :create, :destroy]
 
     # TODO These may be reimplemented in the research passenger instance, and then removed from here
@@ -79,6 +82,7 @@ Rails.application.routes.draw do
     end
 
     resources :users, controller: '/users', only: [:index, :show, :update] do
+      resource :bugzilla_api_key, controller: '/bugzilla_api_keys', only: [:edit, :update]
 
       collection do
         get :all
@@ -120,42 +124,20 @@ Rails.application.routes.draw do
         get :related
       end
     end
-    resources :rules, only: [:index, :edit, :update] do
-      collection do
-        get :validations
-      end
-      member do
-        get :related
-      end
-    end
   end
 
   resources :events, only: [] do
     collection { get :send_event }
   end
 
-  namespace :api_test do
-    resources :jobs, only: [:index, :create], :defaults => {:format => 'json'}
-    resources :pcaps, only: [:index, :create], :defaults => {:format => 'json'}
-    resources :engines, only: [:index], :defaults => {:format => 'json'}
-    resources :engine_types, only: [:index], :defaults => {:format => 'json'}
-    resources :snort_configurations, only: [:index], :defaults => {:format => 'json'}
-    resources :rule_configurations, only: [:index], :defaults => {:format => 'json'}
-  end
-
   # TODO some of these named routes need to be rethought to conform to rails conventions
-  get 'rules/get_impact' => 'rules#get_impact', format: 'js'
-  get 'rules/export' => 'rules#export'
   post "sessions/create" => "sessions#create"
   post "/attachments" => "attachments#create"
   root 'pages#index'
 
 
-  # resources :rules, param: :sid
 
-  # resources :tests
-
-  resources :users, only: [:show, :update] do
+  resources :users, only: [:index, :show, :update] do
 
     collection do
       get :results
