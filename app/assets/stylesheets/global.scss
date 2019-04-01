@@ -5083,7 +5083,12 @@ input.table-entry-input:focus {
   background-color: $content-tab-color;
   border-radius: 4px 4px 0 0 ;
 }
-
+.reputation-research-search-wrapper .nav-tabs::before{
+  content:unset;
+}
+.reputation-research-search-wrapper .nav-tabs{
+  margin:0
+}
 .reputation-research-search-wrapper h1 {
   color: $content-bg-color;
   margin-bottom: 20px;
@@ -5106,17 +5111,22 @@ input.table-entry-input:focus {
 }
 
 .research-search-form {
-  background-color: white;
+  background-color: lighten($content-tab-color, 6%);
   margin: 15px -15px -15px -15px;
   padding: 20px;
   display: block;
 }
-
+.search-options-col#lookup-quick{
+  background: white;
+  margin: -20px;
+  padding: 20px;
+}
 .research-search-form .button_primary {
   margin: 10px 0;
 }
 
 .research-search-form hr.thin {
+
   opacity: 0.3;
 }
 
@@ -5211,41 +5221,42 @@ td.left-bordered {
   display: flex;
   align-items: center;
 }
-.research-lookup-tab{
-  height: 100%;
+.research-header-wrapper .nav-tabs > li > a{
   display: flex;
   align-items: center;
-  color: white;
-  text-decoration: none;
-  padding: 10px;
-}
-.research-lookup-tab:hover{
-  cursor: pointer;
-  background-color: #44a9d1;
-  text-decoration: none;
+  border: none;
+  background: transparent;
+  padding: 23px;
+  border-radius: 0;
+  margin-top: 12px;
+  box-shadow: none;
   color: white;
 }
-.research-lookup-tab.active{
-  cursor: pointer;
-  background-color: #6ebcdb;
-  text-decoration: none;
-  color: white;
+.research-header-wrapper .nav-tabs > li > a:hover{
+  color: white
 }
-
-.research-lookup-tab.active::after{
+.research-header-wrapper .nav-tabs > li.active > a {
+  border: none;
+  background: #6ebcdb;
+  transition: background-color .25s ease-in;
+}
+.research-header-wrapper li::after{
   content: '';
-  background:#6ebcdb;
+  display: inline-block;
+  background-color:transparent;
   height: 10px;
   width: 10px;
   position: relative;
-  bottom: -70%;
-  right: calc(50% - 5px);
+  top: -6px;
+  right: calc(-50% + 5px);
   transform: rotate(45deg);
-  transition: transform 2s;
+  transition: background-color .5s ease-in;
 }
-.search-options-col.lookup-quick{
-  margin-top: 25px;
+.research-header-wrapper li.active::after{
+  content: '';
+  background-color:#6ebcdb;
 }
+
 .expanded-row {
   background-color: $content-tab-color;
   padding: 0 0 0 20px !important;
@@ -5263,9 +5274,7 @@ td.left-bordered {
 .search-options-col, .search-box-col{
   display: none;
 }
-.lookup-detail.active{
-  margin-right: -10px;
-}
+
 .search-options-col.active, .search-box-col.active{
   display: block;
 }
