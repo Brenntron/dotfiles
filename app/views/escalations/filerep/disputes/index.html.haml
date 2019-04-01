@@ -5,10 +5,10 @@
   Add table below
   .row
     .col-xs-12
-      %table.table.responsive#filerep-index-table
+      %table.table.responsive#file-rep-datatable{'data-source': escalations_file_rep_file_reps_path(format: :json)}
         %thead
           %tr
-            %th Header cell
+            %th name
+            %th sha256
+            %th email
         %tbody
-          %tr
-            %td Cell
