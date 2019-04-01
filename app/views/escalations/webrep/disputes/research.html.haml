@@ -5,17 +5,29 @@
       %h1 Reputation
       %ul{class:"nav nav-tabs", role:'tablist'}
         %li{role:"presentation", class: "active"}
-          %a.research-lookup-tab.lookup-detail{href:'#lookup-detail','aria-controls':'lookup-detail', 'data-toggle':'tab', role:"tab"}
+          %a{href:'#lookup-detail','aria-controls':'lookup-detail', 'data-toggle':'tab', role:"tab"}
             %span.icon-lookup-detail.top-info-icon
             Detailed Lookup
         %li{role:'presentation'}
-          %a.research-lookup-tab.lookup-quick{href:'#lookup-quick', 'aria-controls':'lookup-quick','data-toggle':'tab', role:"tab"}
+          %a{href:'#lookup-quick', 'aria-controls':'lookup-quick','data-toggle':'tab', role:"tab"}
             %span.icon-lookup-quick.top-info-icon
             Quick Lookup
 
 
     .research-search-form.row.tab-content
       = form_for(:search, method: "get") do |search_form|
+        .search-options-col.tab-pane.active#lookup-detail
+          .col-xs-4.col-sm-3.col-md-2.col-lg-2.col-xl-1
+            = search_form.radio_button(:scope, 'strict', id: 'research-search-strict', checked: params['search'] && params['search']['scope'].eql?("strict"))
+            %label{for: 'research-search-strict'} Strict Search
+            %br
+            = search_form.radio_button(:scope, 'broad', id: 'research-search-broad', checked: !params['search'] || params['search']['scope'].eql?("broad"))
+            %label{for: 'research-search-broad'} Broad Search
+            %hr.thin
+            =search_form.submit(:Submit, id: 'submit-button', class: 'button_primary')
+          .col-xs-8.col-sm-9.col-md-10.col-lg-10.col-xl-11
+            = search_form.text_area(:uri, class: 'search-box', placeholder: 'URI or IP Address', autofocus: 'true')
+
         .search-options-col.tab-pane#lookup-quick{role:'tabpanel'}
           .col-xs-12.toolbar-quicklookup
             %div.get-rep-button
@@ -40,12 +52,12 @@
             %table.research-table
               %colgroup
                 %col
-                %col.grey
-                %col.grey
-                %col.grey
-                %col.grey
-                %col.grey
-                %col.grey
+                %col.col-grey
+                %col.col-grey
+                %col.col-grey
+                %col.col-grey
+                %col.col-grey
+                %col.col-grey
                 %col
               %tr
                 %th
@@ -66,17 +78,6 @@
                 %td
                 %td{colspan:'6'}
                 %td
-        .search-options-col.tab-pane.active#lookup-detail
-          .col-xs-4.col-sm-3.col-md-2.col-lg-2.col-xl-1
-            = search_form.radio_button(:scope, 'strict', id: 'research-search-strict', checked: params['search'] && params['search']['scope'].eql?("strict"))
-            %label{for: 'research-search-strict'} Strict Search
-            %br
-            = search_form.radio_button(:scope, 'broad', id: 'research-search-broad', checked: !params['search'] || params['search']['scope'].eql?("broad"))
-            %label{for: 'research-search-broad'} Broad Search
-            %hr.thin
-            =search_form.submit(:Submit, id: 'submit-button', class: 'button_primary')
-          .col-xs-8.col-sm-9.col-md-10.col-lg-10.col-xl-11.search-box-col.lookup-detail
-            = search_form.text_area(:uri, class: 'search-box', placeholder: 'URI or IP Address', autofocus: 'true')
 
 
 

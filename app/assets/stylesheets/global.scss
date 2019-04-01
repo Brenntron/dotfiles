@@ -3921,7 +3921,7 @@ input.communication-subject {
   padding: 3px 0 0 10px;
 }
 
-col.grey{
+.col-grey{
   height: 100%;
   background: #efeff1;
 }
@@ -3938,7 +3938,9 @@ col.grey{
 }
 .submit-rep-button .small{
   vertical-align: bottom;
-  color:grey
+  display: inline-block;
+  padding-left: 5px;
+  color: grey;
 }
 
 .research-table{
@@ -5109,24 +5111,27 @@ input.table-entry-input:focus {
   line-height: 1.25em;
   min-height: 174px;
 }
-
+.reputation-research-search-wrapper{
+  padding: 0 15px;
+}
 .research-search-form {
   background-color: lighten($content-tab-color, 6%);
   margin: 15px -15px -15px -15px;
-  padding: 20px;
-  display: block;
+  padding: 30px;
 }
-.search-options-col#lookup-quick{
+.research-search-form.tab-content{
+  width: unset
+}
+.search-options-col#lookup-quick {
   background: white;
-  margin: -20px;
-  padding: 20px;
+  margin: -30px;
+  padding: 20px 10px;
 }
 .research-search-form .button_primary {
   margin: 10px 0;
 }
 
 .research-search-form hr.thin {
-
   opacity: 0.3;
 }
 
