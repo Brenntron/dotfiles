@@ -5020,11 +5020,14 @@ input.table-entry-input:focus {
   -ms-transform: rotate(180deg);
   transform: rotate(180deg);
 }
-.primary.submit-rep-changes {
+.primary#submit-rep-changes {
   background: $warning-accent-color;
 }
-.submit-rep-changes, .get-rep-data{
+#submit-rep-changes, #get-rep-data{
   margin: 15px 5px 5px 5px!important;
+}
+.primary#submit-rep-changes:hover, .primary#submit-rep-changes:focus {
+  background: $warning-dark-color
 }
 .research-table th{
   color: black;
@@ -5047,12 +5050,7 @@ input.table-entry-input:focus {
   border-left: 1px solid #f2f2f2;
   border-right: 1px solid #f2f2f2;
 }
-.primary.submit-rep-changes::before{
-  content: '';
-  height:100%;
-  width: 2px;
-  color: #f2f2f2;
-}
+
 .note-repsubmit.small{
   display: flex;
   align-items: flex-end;
@@ -5086,9 +5084,6 @@ input.table-entry-input:focus {
   width: 10px;
   display: block;
   background: red;
-}
-.primary.submit-rep-changes:hover, .primary.submit-rep-changes:focus {
-  background: $warning-dark-color
 }
 .reputation-research-search-wrapper {
   margin: -15px -15px 40px -15px;

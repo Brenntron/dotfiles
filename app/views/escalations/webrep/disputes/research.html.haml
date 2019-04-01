@@ -5,11 +5,11 @@
       %h1 Reputation
       %ul{class:"nav nav-tabs", role:'tablist'}
         %li{role:"presentation", class: "active"}
-          %a{href:'#lookup-detail','aria-controls':'lookup-detail', 'data-toggle':'tab', role:"tab"}
+          %a{href:'#lookup-detail','aria-controls':'lookup-detail', 'aria-label': 'Detail lookup tab','data-toggle':'tab', role:"tab"}
             %span.icon-lookup-detail.top-info-icon
             Detailed Lookup
         %li{role:'presentation'}
-          %a{href:'#lookup-quick', 'aria-controls':'lookup-quick','data-toggle':'tab', role:"tab"}
+          %a{href:'#lookup-quick', 'aria-controls':'lookup-quick','aria-label': 'Quick lookup tab','data-toggle':'tab', role:"tab"}
             %span.icon-lookup-quick.top-info-icon
             Quick Lookup
 
@@ -30,7 +30,7 @@
 
         .search-options-col.tab-pane#lookup-quick{role:'tabpanel'}
           .col-xs-12.toolbar-quicklookup
-            %button.primary.get-rep-data Get Reputation Data
+            %button.primary#get-rep-data Get Reputation Data
             .toolbar.research-toolbar
               %div
                 %label.toolbar-section-label Adjust Reputation
@@ -42,7 +42,7 @@
                 %label.toolbar-section-label File
                 %button.toolbar-button.export-button.esc-tooltipped{title: 'Export to CSV'}
                   %span.toolbar-button-text Export to CSV
-            %button.primary.submit-rep-changes Submit Reputation Changes
+            %button.primary#submit-rep-changes Submit Reputation Changes
             %span.small.note-repsubmit
               * NOTE: Submitting reputation changes will automatically create a closed ticket
 
