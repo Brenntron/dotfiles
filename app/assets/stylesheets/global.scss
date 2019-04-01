@@ -33,6 +33,7 @@ $user-highlight-color: #FFC5C2;
 $user-med-color: #FC9292;
 $user-dark-color: #560303;
 $warning-accent-color: #E47433;
+$warning-dark-color: #d66d31;
 
 /* Tab Icon Colors */
 $rule-accent-color: #FDBB2B;
@@ -616,6 +617,7 @@ button {
   margin-top: -18px;
   color: $content-label-color !important;
   font-size: 7pt;
+  background: white;
 }
 
 .toolbar-button-label {
@@ -3909,7 +3911,64 @@ input.communication-subject {
   color: $type-lighter-color;
   padding: 0 10px 0 2px;
 }
+.primary.submit-rep-changes {
+  background: $warning-accent-color;
+}
 
+.research-table th{
+  color: black;
+  border-bottom: 1px solid #d7d9db;
+  padding: 3px 0 0 10px;
+}
+
+col.grey{
+  height: 100%;
+  background: #efeff1;
+}
+.research-toolbar{
+  color: black;
+  width: unset;
+  padding: 0 10px;
+}
+.primary.submit-rep-changes::before{
+  content: '';
+  height:100%;
+  width: 2px;
+  color: #f2f2f2;
+}
+.submit-rep-button .small{
+  vertical-align: bottom;
+  color:grey
+}
+
+.research-table{
+  margin: 100px auto;
+  width: 96%!important
+}
+.search-options-col .research-table label {
+  text-transform: uppercase;
+  font-weight: 700;
+  font-size: 8pt;
+  text-align: left;
+  color:black
+}
+.empty-tr>td{
+  height: 200px;
+  border-bottom: unset;
+}
+.research-toolbar label{
+  padding: 0!important;
+  margin-left: -5px!important;
+}
+.get-rep-button{
+  border-right: 1px solid #f2f2f2
+}
+.submit-rep-button{
+  border-left: 1px solid #f2f2f2
+}
+.primary.submit-rep-changes:hover, .primary.submit-rep-changes:focus {
+  background: $warning-dark-color
+}
 .table-nested-reputation td {
   padding-top: 2px;
   padding-bottom: 2px;
@@ -4226,6 +4285,8 @@ button.tertiary {
 .icon-dashboard {background-image: url(image_path('icon_dashboard.svg'));}
 .icon-queue     {background-image: url(image_path('icon_queue.svg'));}
 .icon-research  {background-image: url(image_path('icon_new_research_white.svg'));}
+.icon-lookup-quick  {background-image: url(image_path('icon_rabbit.svg'));}
+.icon-lookup-detail  {background-image: url(image_path('icon_details.svg'));}
 .icon-filter-white {background-image: url(image_path('icon_filter_white.svg'));}
 .icon-import-white {background-image: url(image_path('icon_import_white.svg'));}
 .icon-categories {background-image: url(image_path('icon_categories.svg'));}
@@ -5019,7 +5080,6 @@ input.table-entry-input:focus {
 
 .reputation-research-search-wrapper {
   margin: -15px -15px 40px -15px;
-  //padding: 40px 20px;
   background-color: $content-tab-color;
   border-radius: 4px 4px 0 0 ;
 }
@@ -5033,6 +5093,8 @@ input.table-entry-input:focus {
   width: 27px;
   height: 27px;
   margin: 0 0 -3px 15px;
+  padding-right: 40px;
+
 }
 
 .reputation-research-search-wrapper .search-box {
@@ -5044,7 +5106,7 @@ input.table-entry-input:focus {
 }
 
 .research-search-form {
-  background-color: lighten($content-tab-color, 6%);
+  background-color: white;
   margin: 15px -15px -15px -15px;
   padding: 20px;
   display: block;
@@ -5137,7 +5199,53 @@ td.left-bordered {
 .research-table-input-wrapper.reptool-input-wrapper {
   background-color: $fifth-section-color;
 }
+.research-lookup-container {
+  margin-left: 20px
+}
+.reputation-research-search-wrapper h1{
+  margin: 0 100px 0 0;
+}
+.research-header-wrapper{
+  margin: -15px;
+  height: 70px;
+  display: flex;
+  align-items: center;
+}
+.research-lookup-tab{
+  height: 100%;
+  display: flex;
+  align-items: center;
+  color: white;
+  text-decoration: none;
+  padding: 10px;
+}
+.research-lookup-tab:hover{
+  cursor: pointer;
+  background-color: #44a9d1;
+  text-decoration: none;
+  color: white;
+}
+.research-lookup-tab.active{
+  cursor: pointer;
+  background-color: #6ebcdb;
+  text-decoration: none;
+  color: white;
+}
 
+.research-lookup-tab.active::after{
+  content: '';
+  background:#6ebcdb;
+  height: 10px;
+  width: 10px;
+  position: relative;
+  bottom: -70%;
+  right: calc(50% - 5px);
+  transform: rotate(45deg);
+  transition: transform 2s;
+}
+.search-options-col.lookup-quick{
+  margin-top: 25px;
+}
 .expanded-row {
   background-color: $content-tab-color;
   padding: 0 0 0 20px !important;
@@ -5152,11 +5260,22 @@ td.left-bordered {
   border-right: 6px solid transparent;
   border-top: 10px solid #fff;
 }
-
+.search-options-col, .search-box-col{
+  display: none;
+}
+.lookup-detail.active{
+  margin-right: -10px;
+}
+.search-options-col.active, .search-box-col.active{
+  display: block;
+}
 .expanded-row-data-wrapper {
   background-color: $type-lighter-color;
 }
-
+.toolbar-quicklookup{
+  display:flex;
+  height: 60px;
+}
 .entry-details-table {
   margin: 20px;
   padding-left: 7px;
@@ -5665,7 +5784,7 @@ table.dispute_tool_current tr:last-of-type td {
   display: inline-flex;
 }
 
-.dashboard-header-area h1, .complaint-mgt-top-area h1, .reputation-research-search-wrapper h1 {
+.dashboard-header-area h1, .complaint-mgt-top-area h1 {
   color: $content-bg-color;
   margin-bottom: 6px;
   display: inline-block;

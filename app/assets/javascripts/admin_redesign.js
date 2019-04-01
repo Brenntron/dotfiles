@@ -38,6 +38,7 @@
 //= require dataTables/extras/dataTables.select
 //= require application/webcat/complaints
 //= require application/webcat/clusters
+//= require application/webcat/research_lookup
 //= require application/webcat/complaint_form
 //= require application/webrep/dispute_form
 //= require application/webrep_research_tab
