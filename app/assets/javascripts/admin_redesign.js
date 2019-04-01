@@ -43,5 +43,7 @@
 //= require application/webcat/categories
 //= require application/webcat/webCatRepLookup
 //= require application/webrep/webrep-report-engine
+//= require application/file_rep/file_rep
+
 //= require application/webrep/reptool
 //= require application/webrep/wbrs_wlbl
