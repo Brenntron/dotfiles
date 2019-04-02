@@ -173,7 +173,7 @@
         %br
         %label.content-label-sm
           Age
-        %div= @dispute.case_opened_at && distance_of_time_in_words(Time.now, @dispute.case_opened_at)
+        %div=@dispute.dispute_age
       - if (@dispute.resolution != Dispute::DUPLICATE) && (@dispute.status != Dispute::RESOLVED)
         .top-info-buttons-wrapper
           %button.edit-button.dispute-top-buttons#edit-dispute-button.esc-tooltipped{title: 'Edit ticket information'}
