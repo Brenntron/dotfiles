@@ -142,9 +142,9 @@ $ ->
             subdomain = full.subdomain
 
             if subdomain
-              '<p id="subdomain_' + full.entry_id + '">' + subdomain + '</p>'
+              '<span id="subdomain_' + full.entry_id + '">' + subdomain + '</span>'
             else
-              '<p id="subdomain_' + full.entry_id + '">' + '</p>'
+              '<span id="subdomain_' + full.entry_id + '">' + '</span>'
           width: '50px'
         }
         {
@@ -175,7 +175,7 @@ $ ->
               category = categories[0]
               if category == "Not in our list"
                 category = ""
-            '<p id="category_' + full.entry_id + '">' + category + '</p>'
+            '<span id="category_' + full.entry_id + '">' + category + '</span>'
         }
         {
           data: 'suggested_category'
