@@ -56,6 +56,7 @@ $sidebar-width: 44px;
 $dropshadow: 2px 0 10px 1px rgba(0,0,0,0.1);
 
 /* Typography Colors */
+$type-darkest: #000; /* Black */
 $type-base-color:    #333;   /* Dark Grey */
 $type-lighter-color: #666;   /* Medium Grey */
 $type-faint-accent: #D7DADB; /* Lighter Grey */
@@ -617,7 +618,7 @@ button {
   margin-top: -18px;
   color: $content-label-color !important;
   font-size: 7pt;
-  background: white;
+  background: $ac-nav-bg-color;
 }
 
 .toolbar-button-label {
@@ -1102,7 +1103,7 @@ thead th.sorting.center {
   width: 90%; /* this is not ideal, may have to come back and test other options, should not poke outside of the content wrapper though. */
   height: 10px;
   position: absolute;
-  background-color: white;
+  background-color: $ac-nav-bg-color;
   z-index: 50;
   margin-top: 43px;
   border-top-right-radius: 2px;
@@ -1197,7 +1198,7 @@ thead th.sorting.center {
   }
 
   .modal-content {
-    border: 2px solid #f2f2f2;
+    border: 2px solid $faint-neutral-color;
     border-radius: 2px;
   }
 }
@@ -2127,8 +2128,8 @@ a.static-nav-item {
 }
 
 .content-row {
-  border-top: 2px solid #f2f2f2;
-  border-bottom: 2px solid #f2f2f2;
+  border-top: 2px solid $faint-neutral-color;
+  border-bottom: 2px solid $faint-neutral-color;
   width: 100%;
   padding: 4px 0;
   min-height: 34px;
@@ -4994,7 +4995,7 @@ input.table-entry-input:focus {
 }
 
 #top_bar_extended_info .col-with-divider {
-  border-right-color: #f2f2f2;
+  border-right-color: $faint-neutral-color;
 }
 
 #top_bar_toggle {
@@ -5030,8 +5031,8 @@ input.table-entry-input:focus {
   background: $warning-dark-color
 }
 .research-table th{
-  color: black;
-  border-bottom: 1px solid #d7d9db;
+  color: $type-darkest;
+  border-bottom: 1px solid $dark-neutral-color;
   padding: 3px 0 0 10px;
 }
 
@@ -5042,13 +5043,13 @@ input.table-entry-input:focus {
   width: 30%
 }
 .research-toolbar{
-  color: black;
+  color: $type-darkest;
   width: unset;
   height: 32px;
   margin: 20px 15px;
   padding: 0px 13px;
-  border-left: 1px solid #f2f2f2;
-  border-right: 1px solid #f2f2f2;
+  border-left: 1px solid $faint-neutral-color;
+  border-right: 1px solid $faint-neutral-color;
 }
 
 .note-repsubmit.small{
@@ -5127,7 +5128,7 @@ input.table-entry-input:focus {
   width: unset
 }
 .search-options-col#lookup-quick {
-  background: white;
+  background: $ac-nav-bg-color;
   margin: -30px;
   padding: 50px 10px 0 10px;
 }
@@ -5666,7 +5667,7 @@ button.dropdown-submit-button {
   width: 12px;
   left: 2px;
   bottom: 2px;
-  background-color: white;
+  background-color: $ac-nav-bg-color;
   background-image: url(image_path('icon_x_grey.svg'));
   background-position: center center;
   background-size: 12px;
@@ -6904,7 +6905,7 @@ table#duplicates a {
 }
 
 .bug-tabs .nav-tabs li a {
-  background-color: #f2f2f2 !important;
+  background-color: $faint-neutral-color !important;
 }
 
 .bug-tabs .nav-tabs li.active a {
@@ -8033,14 +8034,14 @@ th.sorting_1, th.sorting_asc, th.sorting_desc {
 }
 
 .cat-url-error{
-  color: black;
+  color: $type-darkest;
   font-size: 11px;
   font-weight: normal;
   display: none;
 }
 
 .cat-url-success{
-  color: black;
+  color: $type-darkest;
   font-size: 11px;
   font-weight: normal;
   display: none;
