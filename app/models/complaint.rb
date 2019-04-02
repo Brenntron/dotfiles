@@ -81,7 +81,7 @@ class Complaint < ApplicationRecord
     url = URI.escape(url)
     uri = URI.parse(URI.parse(url).scheme.nil? ? "http://#{url}" : url)
     domain = PublicSuffix.parse(uri.host)
-    subdomain = uri.host.gsub(Regexp.new("\\.?#{domain.domain}$"), '')
+    subdomain = uri.host.gsub(/\A[0-9]*www[0-9]*\./, '').gsub(Regexp.new("\\.?#{domain.domain}$"), '')
 
     {
         subdomain: subdomain,
@@ -362,7 +362,7 @@ class Complaint < ApplicationRecord
           new_complaint_entry = ComplaintEntry.new
           new_complaint_entry.complaint_id = new_complaint.id
           new_complaint_entry.user_id = user.id
-          new_complaint_entry.uri = key.gsub(/\Awww\./, '')
+          new_complaint_entry.uri = key.gsub(/http[s]*\:\/\//, '').gsub(/\A[0-9]*www[0-9]*\./, '')
           new_complaint_entry.entry_type = "URI/DOMAIN"
           new_complaint_entry.wbrs_score = entry['WBRS_SCORE']
           new_complaint_entry.suggested_disposition = entry["cat_sugg"].join(",") unless entry['cat_sugg'].blank?
