@@ -3,6 +3,8 @@ class Wbrs::Base
   include ApiRequester::ApiRequester
 
   api_requester_config Rails.configuration.wbrs
+  set_default_request_type :json
+  set_default_header "Authorization" => "Bearer #{Rails.configuration.wbrs.auth_token}"
 
   # TODO replace with new_request
   def self.request(path:, body:)
@@ -21,20 +23,6 @@ class Wbrs::Base
     else
       HTTPI.post(request(path: path, body: body))
     end
-  end
-
-  def self.call_json_request(method, path, body:)
-    request = new_request(path)
-
-    request.headers = {"Content-Type" => "application/json", "Authorization" => "Bearer #{Rails.configuration.wbrs.auth_token}" }
-
-    request.body = body.to_json
-
-    request_error_handling(call_request(method, request))
-  end
-
-  def call_json_request(method, path, body:)
-    Wbrs::Base.call_json_request(method, path, body: body)
   end
 
   # TODO replace with call_json_request

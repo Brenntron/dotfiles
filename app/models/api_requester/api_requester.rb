@@ -34,10 +34,29 @@ module ApiRequester::ApiRequester
   end
 
   module ClassMethods
-    attr_reader :request_config
+    attr_reader :default_headers
+
+    def request_config
+      @request_config
+    end
+
+    def set_default_header(new_header)
+      @default_headers ||= {}
+      new_header.each_pair do |key, value|
+        @default_headers[key] = value
+      end
+    end
+
+    def default_request_type=(default_request_type)
+      @default_request_type = default_request_type
+    end
+
+    def set_default_request_type(default_request_type)
+      @default_request_type = default_request_type
+    end
 
     def default_request_type
-      :json
+      @default_request_type || :json
     end
 
     def tls?
@@ -121,21 +140,21 @@ module ApiRequester::ApiRequester
 
     def new_json_request(path, body:, headers: {})
       request = new_request(path)
-      request.headers = headers.merge("Content-Type" => "application/json")
-      request.body = body.to_json
+      request.headers = default_headers.merge(headers).merge("Content-Type" => "application/json")
+      request.body = body ? body.to_json : ''
       request
     end
 
     def new_query_string_request(path, query:, headers: {})
       request = new_request(path, query)
-      request.headers = headers
+      request.headers = default_headers.merge(headers)
       request.body = ''
       request
     end
 
     def new_query_body_request(path, query:, headers: {})
       request = new_request(path)
-      request.headers = headers.merge("Content-Type" => "application/x-www-form-urlencoded")
+      request.headers = default_headers.merge(headers).merge("Content-Type" => "application/x-www-form-urlencoded")
       request.body = query_string(query)
       request
     end
@@ -180,7 +199,7 @@ module ApiRequester::ApiRequester
       request_error_handling(call_by_method(method, request))
     end
 
-    def call_request_parsed(method = :get, path, request_type: default_request_type, input:, headers: {})
+    def call_request_parsed(method = :get, path, request_type: default_request_type, input: nil, headers: {})
       response = call_request(method, path, request_type: request_type, input: input, headers: headers)
       JSON.parse(response.body)
     end
