@@ -2,10 +2,12 @@ Chart.defaults.global.tooltips = false;
 
 getSum = (total, num) -> return total + num
 
+reduceDecimal = (num) -> return Math.round(num * 100) / 100
+
 setDataPoint = (chartInstance, type) ->
 
   {ctx, data, controller, config, chart} = chartInstance
-  console.log(ctx, chartInstance)
+
   if ctx != undefined
     ctx.textAlign = 'center';
     ctx.fillStyle = "rgba(0, 0, 0, 1)";
@@ -23,10 +25,21 @@ setDataPoint = (chartInstance, type) ->
             else
               ctx.fillText(data, x, y);
           else
-            if data > 5
-              ctx.fillText(data, x - 15, y + 5);
+            if data % 1 != 0
+              data = reduceDecimal(data)
+              console.log(data)
+              if data > 15
+                console.log('ininin',data)
+                ctx.fillText(data, x - 15, y + 5);
+              else
+                console.log(data)
+                ctx.fillText(data, x + 15, y - 5);
             else
-              ctx.fillText(data, x + 15, y + 5);
+              if data > 5
+                ctx.fillText(data, x - 15, y + 5);
+              else
+                ctx.fillText(data, x + 15, y + 5);
+
 
 buildCharts = ()->
   user_id = $("#user_id").val()
@@ -305,7 +318,7 @@ window.build_graph_ticket_entries_submitter = () ->
             }
             {
               label: 'Guest'
-              backgroundColor: '#f8cc11'
+              backgroundColor: '#E47433'
               data: submitterGuestChartData
             }]
         options:
@@ -358,7 +371,7 @@ window.build_graph_ticket_entries_submitter = () ->
               data: submitterCustomerChartData
             }
             {
-              backgroundColor: '#f8cc11'
+              backgroundColor: '#E47433'
               data: submitterGuestChartData
             }
           ]
@@ -1142,7 +1155,7 @@ window.build_multi_ticket_resolution_by_owner_chart = () ->
             }
             {
               label: 'Fixed FN'
-              backgroundColor: '#f8cc11'
+              backgroundColor: '#EFAF34'
               data: fixedFNTickets
             }
             {

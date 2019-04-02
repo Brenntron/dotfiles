@@ -3821,7 +3821,7 @@ input.communication-subject {
 }
 
 .add-case-note-button:hover {
-  background-color: #E47433;
+  background-color: $warning-accent-color;
 }
 
 .new-case-note-row {display: none;}
@@ -7373,6 +7373,7 @@ td.text-center span {
     .yellow-legend-color::before{
       background-color: $third-section-color
     }
+
     .navyblue-legend-color::before {
       background-color: $content-tab-color;
     }
