@@ -4,17 +4,6 @@ class Wbrs::Base
 
   api_requester_config Rails.configuration.wbrs
 
-  def self.stringkey_params(conditions = {})
-    conditions.inject({}) do |params, (key, value)|
-      params[key.to_s] = value if value
-      params
-    end
-  end
-
-  def stringkey_params(conditions = {})
-    Wbrs::Base.stringkey_params(conditions)
-  end
-
   # TODO replace with new_request
   def self.request(path:, body:)
     request = new_request(path)
