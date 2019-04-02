@@ -184,7 +184,7 @@ $ ->
           data: 'wbrs_score'
           width: '20px'
           'render': (data, type, full, meta) ->
-            '<p id="wbrs_score_' + full.entry_id + '">' + data + '</p>'
+            '<span id="wbrs_score_' + full.entry_id + '">' + data + '</span>'
         }
         {
           data: 'submitter_type'
