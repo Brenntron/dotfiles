@@ -937,9 +937,12 @@ window.get_xbrs_history = (url) ->
     url: '/escalations/api/v1/escalations/webcat/complaint_entries/xbrs'
     method: 'POST'
     headers: headers
-    data: {'id': id}
+    data: {'url': url}
     success: (response) ->
       json = $.parseJSON(response)
+      #Melissa:
+      #keys in json should be status, data, columns so json['columns'] and json['data'] should be what you need.
+      #dates will be in the format 2019-04-01 01:40:39 -0400
       console.log json
     error: (response) ->
       notice_html = "<p>Something went wrong: #{response.responseText}</p>"

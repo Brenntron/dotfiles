@@ -499,6 +499,45 @@ module API
               end
             end
 
+            desc 'Get XBRS data on complaint url'
+            params do
+              requires :url, type: String
+            end
+
+            post 'xbrs' do
+              #raise 'simulated breakage'
+              response = Xbrs::GetXbrs.by_domain(permitted_params['url'])
+              data = response.last['data']
+              columns = response.last['legend']
+
+              mtime_column_index = 0
+              ctime_column_index = 0
+
+              columns.each_with_index do |col, index|
+                if col == 'ctime'
+                  ctime_column_index = index
+                end
+                if col == 'mtime'
+                  mtime_column_index = index
+                end
+              end
+
+              formatted_data = []
+
+              data.each do |datum|
+                if ctime_column_index != 0
+                  datum[ctime_column_index] = Time.at(datum[ctime_column_index])
+                end
+                if mtime_column_index != 0
+                  datum[mtime_column_index] = Time.at(datum[mtime_column_index])
+                end
+
+                formatted_data << datum
+              end
+
+              {:status => "success", :data => formatted_data, :columns => columns}
+            end
+
           end
         end
       end
