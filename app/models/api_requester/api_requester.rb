@@ -1,6 +1,15 @@
 # Mixin for generic web service requester for web service APIs that we call.
 module ApiRequester::ApiRequester
 
+  class ApiRequesterError < StandardError
+  end
+
+  class ApiRequesterNotFoundError < ApiRequesterError
+  end
+
+  class ApiRequesterNotAuthorized < ApiRequesterError
+  end
+
   # Convenience method for reading config.
   # Reads standard settings, such as host, verify_mode, and ca_cert_file
   # @param [Hash] hash input from a section of config.yml
@@ -26,6 +35,10 @@ module ApiRequester::ApiRequester
 
   module ClassMethods
     attr_reader :request_config
+
+    def default_request_type
+      :json
+    end
 
     def tls?
       request_config.tls
@@ -67,7 +80,7 @@ module ApiRequester::ApiRequester
       @request_config = struct
     end
 
-    def self.stringkey_params(conditions = {})
+    def stringkey_params(conditions = {})
       conditions.inject({}) do |params, (key, value)|
         params[key.to_s] = value if value
         params
@@ -76,6 +89,14 @@ module ApiRequester::ApiRequester
 
     def query_string(query)
       stringkey_params(query).map {|key, value| "#{key}=#{value}"}.join('&')
+    end
+
+    def uri(path, query = nil)
+      raise 'Path required' unless path.present?
+
+      slash_path = '/' == path[0] ? path : '/' + path
+
+      "#{scheme}://#{host}:#{port}#{slash_path}#{'?' + query_string(query) if query}"
     end
 
     def new_request(path, query = nil)
@@ -98,12 +119,70 @@ module ApiRequester::ApiRequester
       request
     end
 
-    def uri(path, query = nil)
-      raise 'Path required' unless path.present?
+    def new_json_request(path, body:, headers: {})
+      request = new_request(path)
+      request.headers = headers.merge("Content-Type" => "application/json")
+      request.body = body.to_json
+      request
+    end
 
-      slash_path = '/' == path[0] ? path : '/' + path
+    def new_query_string_request(path, query:, headers: {})
+      request = new_request(path, query)
+      request.headers = headers
+      request.body = ''
+      request
+    end
 
-      "#{scheme}://#{host}:#{port}#{slash_path}#{'?' + query_string(query) if query}"
+    def new_query_body_request(path, query:, headers: {})
+      request = new_request(path)
+      request.headers = headers.merge("Content-Type" => "application/x-www-form-urlencoded")
+      request.body = query_string(query)
+      request
+    end
+
+    def call_by_method(method, request)
+      HTTPI.send(method, request, :curb)
+    end
+
+    def error_body(response)
+      body = JSON.parse(response.body)
+      body['Error']
+    rescue
+      nil
+    end
+
+    def request_error_handling(response)
+      case
+      when 300 > response.code
+        response
+      when 401 == response.code
+        raise ApiRequesterNotAuthorized, "HTTP response #{response.code} #{error_body(response)}"
+      when 404 == response.code
+        raise ApiRequesterNotFoundError, "HTTP response #{response.code} #{error_body(response)}"
+      else
+        raise ApiRequesterError, "HTTP response #{response.code} #{error_body(response)}"
+      end
+    end
+
+    def call_request(method = :get, path, request_type: default_request_type, input:, headers: {})
+      request =
+          case request_type
+          when :json
+            new_json_request(path, body: input, headers: headers)
+          when :query_string
+            new_query_string_request(path, query: input, headers: headers)
+          when :query_body
+            new_query_body_request(path, query: input, headers: headers)
+          else
+            raise 'Unknown request type, must be :json, :query_string, or :query_body'
+          end
+
+      request_error_handling(call_by_method(method, request))
+    end
+
+    def call_request_parsed(method = :get, path, request_type: default_request_type, input:, headers: {})
+      response = call_request(method, path, request_type: request_type, input: input, headers: headers)
+      JSON.parse(response.body)
     end
   end
 
