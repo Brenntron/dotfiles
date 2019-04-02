@@ -45,7 +45,7 @@ $success-trans: rgba(95, 183, 102, 0.15);
 $disabled-bg: #E5E5E5;
 $disabled-txt: #A0A0A0;
 $communication-accent-color: #C14B92;
-
+$grey-section-color: #e2e2e2;
 /* Content Label Color */
 $content-label-color: #999;     /* Light Grey     */
 
@@ -5038,7 +5038,7 @@ input.table-entry-input:focus {
 }
 
 .col-grey{
-  background: $dark-neutral-color;
+  background: $grey-section-color;
 }
 .col-dispute{
   width: 30%
