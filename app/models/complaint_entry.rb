@@ -717,6 +717,8 @@ class ComplaintEntry < ApplicationRecord
 
       if self.subdomain.present?
         self.uri = subdomain + '.' + domain
+      else
+        self.uri = domain
       end
 
       ComplaintEntryPreload.generate_preload_from_complaint_entry(self)
