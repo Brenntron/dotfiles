@@ -8234,11 +8234,35 @@ hr.thin.form-divider {
   border: 1px solid darken($faint-neutral-color, 10%);
 }
 
-.nav-tabs.dialog-tabs::before {
+.nav-tabs.dialog-tabs > li.active::before {
+  content: '';
+  border-left: 1px solid darken($faint-neutral-color, 10%);
+  border-right: 1px solid darken($faint-neutral-color, 10%);
+  background-color: $content-bg-color;
+  width: 100%;
   height: 1px;
+  display: block;
+  position: absolute;
+  left: 0;
+  padding: 0;
+  z-index: 55;
+  margin-top: 39px;
+  margin-left: -1px;
+}
+
+.nav-tabs.dialog-tabs::before {
+  display: none;
 }
 
 .dialog-tab-content {
   border: 1px solid darken($faint-neutral-color, 10%);
   padding: 15px;
+}
+
+#xbrs-history-tab {
+  overflow: scroll;
+}
+
+.history-table {
+  background-color: $content-bg-color;
 }

@@ -35,7 +35,7 @@ window.updateURI = (event, complaint_entry_id) ->
         $("#site-search-#{complaint_entry_id}").html("<a href='https://www.google.com/search?q=site%3A#{uri}' target='_blank' onclick='select_cat_text_field(#{complaint_entry_id})'>#{uri}</a>")
 
 
-        $("#history-#{complaint_entry_id}").replaceWith('<button class="secondary" id="history-' + complaint_entry_id + '" onclick="history_dialog('+complaint_entry_id+')">History</button>')
+        $("#history-#{complaint_entry_id}").replaceWith('<button class="secondary" id="history-' + complaint_entry_id + '" onclick="history_dialog(#{complaint_entry_id}, #{uri})">History</button>')
         $("#domain-#{complaint_entry_id}").replaceWith('<button class="secondary" id="domain-' + complaint_entry_id + '" onclick="domain_whois(\''+response.domain+'\')">Domain</button>')
 
   )
@@ -792,7 +792,7 @@ format = (complaint_entry_row) ->
       '</table>' +
       '</div><div class="col-xs-2">' +
       '<button class="secondary" id="lookup-' + complaint_entry.entry_id + '" onclick="WebCat.RepLookup.queryWhoIs(\'' + url + '\')">Lookup</button><br/>' +
-      '<button class="secondary" id="history-' + complaint_entry.entry_id + '" onclick="history_dialog(' + complaint_entry.entry_id  + ')">History</button><br/>' +
+      '<button class="secondary" id="history-' + complaint_entry.entry_id + '" onclick="history_dialog(' + complaint_entry.entry_id  + ',\'' + url + '\')">History</button><br/>' +
       '<button class="secondary" id="domain-' + complaint_entry.entry_id + '" onclick="domain_whois(\'' + whois_lookup + '\')">Domain</domain>' +
       '</div></div>' +
       '</div><div class="col-xs-12 col-sm-6 nested-complaint-editable-data">' +
@@ -820,8 +820,8 @@ format = (complaint_entry_row) ->
   complaint_entry_html
 
 
-
-window.history_dialog = (id) ->
+## Complaint history dialog box. Includes tabs for domain history, complaint entry history, and xbrs history of the url.
+window.history_dialog = (id, url) ->
   headers = {'Token': $('input[name="token"]').val(), 'Xmlrpc-Token': $('input[name="xml_token"]').val()}
   $.ajax(
     url: '/escalations/api/v1/escalations/webcat/complaint_entries/history'
@@ -830,7 +830,6 @@ window.history_dialog = (id) ->
     data: {'id': id}
     success: (response) ->
       json = $.parseJSON(response)
-
       if json.error
         notice_html = "<p>Something went wrong: #{json.error}</p>"
         alert(json.error)
@@ -838,16 +837,17 @@ window.history_dialog = (id) ->
         ## Build the History Dialog
         history_dialog_content =
           '<div class="dialog-content-wrapper">' +
+          '<h4>' + url + '</h4>' +
           # Tab navigation
           '<ul class="nav nav-tabs dialog-tabs" role="tablist">' +
           '<li class="nav-item active" role="presentation">' +
-          '<a class="nav-link" role="tab" data-toggle="tab" href="#domain-history-tab" aria-controls="">Domain History</a>' +
+          '<a class="nav-link" role="tab" data-toggle="tab" href="#domain-history-tab" aria-controls="domain-history-tab">Domain History</a>' +
           '</li>' +
           '<li class="nav-item" role="presentation">' +
-          '<a class="nav-link" role="tab" data-toggle="tab" href="#complaint-history-tab" aria-controls="">Complaint Entry History</a>' +
+          '<a class="nav-link" role="tab" data-toggle="tab" href="#complaint-history-tab" aria-controls="complaint-history-tab">Complaint Entry History</a>' +
           '</li>' +
           '<li class="nav-item" role="presentation">' +
-          '<a class="nav-link" role="tab" data-toggle="tab" href="#xbrs-history-tab" aria-controls="">XBRS History</a>' +
+          '<a class="nav-link" role="tab" data-toggle="tab" href="#xbrs-history-tab" aria-controls="xbrs-history-tab" onclick="get_xbrs_history(\'' + url + '\', this)">XBRS History</a>' +
           '</li>' +
           '</ul>' +
           # Tab content - beginning markup of first tab
@@ -906,7 +906,7 @@ window.history_dialog = (id) ->
           # Start XBRS Tab
           '<div class="tab-pane" role="tabpanel" id="xbrs-history-tab">' +
           '<h5>XBRS History</h5>' +
-          '<table class="history-table" id="webcat-xbrs-history"></table>' +
+          '<table class="history-table xbrs-history-table" id="webcat-xbrs-history"></table>' +
           '</div>' +
           '</div>'
 
@@ -930,8 +930,12 @@ window.history_dialog = (id) ->
   , this)
 
 
-# Not sure if this will be used or not
-window.get_xbrs_history = (url) ->
+## Fetches XBRS history of a url on click of the XBRS tab in history
+window.get_xbrs_history = (url, tab) ->
+  wrapper = $(tab).parents('.dialog-content-wrapper')[0]
+  xbrs_table = $(wrapper).find('.xbrs-history-table')[0]
+  # Clear table of residual data
+  $(xbrs_table).empty()
   headers = {'Token': $('input[name="token"]').val(), 'Xmlrpc-Token': $('input[name="xml_token"]').val()}
   $.ajax(
     url: '/escalations/api/v1/escalations/webcat/complaint_entries/xbrs'
@@ -939,11 +943,26 @@ window.get_xbrs_history = (url) ->
     headers: headers
     data: {'url': url}
     success: (response) ->
-      json = $.parseJSON(response)
-      #Melissa:
-      #keys in json should be status, data, columns so json['columns'] and json['data'] should be what you need.
-      #dates will be in the format 2019-04-01 01:40:39 -0400
-      console.log json
+      console.log response
+      thead = '<thead><tr>'
+      $(response['columns']).each ->
+        thead += '<th>' + this + '</th>'
+      thead += '</tr></thead>'
+
+      tbody = '<tbody>'
+      $(response['data']).each ->
+        tbody += '<tr>'
+        row = this
+        $(row).each ->
+          if jQuery.type(this) == 'string' || jQuery.type(this) == 'number'
+            tbody += '<td>' + this + '</td>'
+          else
+            # is null
+            tbody += '<td> - </td>'
+        tbody += '</tr>'
+
+      $(xbrs_table).append(thead)
+      $(xbrs_table).append(tbody)
     error: (response) ->
       notice_html = "<p>Something went wrong: #{response.responseText}</p>"
   , this)
