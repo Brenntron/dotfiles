@@ -191,7 +191,7 @@ class ComplaintEntry < ApplicationRecord
     url_parts = Complaint.parse_url(ip_or_uri)
     existing_prefixes = Wbrs::Prefix.where({urls: [ip_or_uri]})
     existing_prefix = nil
-    #binding.pry
+    
     if existing_prefixes.present?
       existing_prefixes.each do |prefix_found|
         if prefix_found.subdomain == url_parts[:subdomain]
