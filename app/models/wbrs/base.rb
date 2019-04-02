@@ -1,25 +1,8 @@
 class Wbrs::Base
   include ActiveModel::Model
+  include ApiRequester::ApiRequester
 
-  def self.host
-    @host ||= Rails.configuration.wbrs.host || 'localhost'
-  end
-
-  def self.port
-    @port ||= Rails.configuration.wbrs.port || 80
-  end
-
-  def self.verify_mode
-    @verify_mode ||= Rails.configuration.wbrs.verify_mode
-  end
-
-  def self.gssnegotiate?
-    @gssnegotiate ||= Rails.configuration.wbrs.gssnegotiate
-  end
-
-  def self.ca_cert_file
-    @ca_cert_file ||= Rails.configuration.wbrs.ca_cert_file
-  end
+  api_requester_config Rails.configuration.wbrs
 
   def self.stringkey_params(conditions = {})
     conditions.inject({}) do |params, (key, value)|
