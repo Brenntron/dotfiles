@@ -80,7 +80,7 @@ module API
                     complaint_entry_packet[:age] = complaint_age_int
                   end
 
-
+                  complaint_entry_packet[:uri] = complaint_entry.uri
                   complaint_entry_packet[:age_int] = (Time.now - complaint_entry.created_at).to_i
                   complaint_entry_packet[:complaint_id] = complaint_entry&.complaint.id
                   complaint_entry_packet[:entry_id] = complaint_entry.id
