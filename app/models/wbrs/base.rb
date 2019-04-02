@@ -15,39 +15,6 @@ class Wbrs::Base
     Wbrs::Base.stringkey_params(conditions)
   end
 
-  def self.new_request(path)
-    raise 'Path required' unless path.present?
-    raise 'Path must start with slash (/)' unless '/' == path[0]
-
-    protocol =
-        case verify_mode
-          when 'verify-peer'
-            'https'
-          when 'verify-none'
-            'https'
-          else #no-tls
-            'https'
-        end
-    port = 443
-    request = HTTPI::Request.new("#{protocol}://#{host}:#{port}#{path}")
-
-    case verify_mode
-      when 'verify-peer'
-        request.ssl = true
-        request.auth.ssl.verify_mode = :none
-        #request.auth.ssl.ca_cert_file = ca_cert_file #this will be nil for Heroku apps
-      when 'verify-none'
-        request.ssl = true
-        request.auth.ssl.verify_mode = :none
-      else #no-tls
-        request.ssl = true
-        #added this here for new ruleAPI auth requirements.
-        request.auth.ssl.verify_mode = :none
-    end
-
-    request
-  end
-
   # TODO replace with new_request
   def self.request(path:, body:)
     request = new_request(path)
