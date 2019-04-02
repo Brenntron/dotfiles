@@ -60,6 +60,7 @@ $type-darkest: #000; /* Black */
 $type-base-color:    #333;   /* Dark Grey */
 $type-lighter-color: #666;   /* Medium Grey */
 $type-faint-accent: #D7DADB; /* Lighter Grey */
+$type-lightest: #fff; /* White */
 
 /* Additional Colors */
 /* for use on gridlines, form inputs, and other very subtle elements against the content bg color */
@@ -5037,7 +5038,7 @@ input.table-entry-input:focus {
 }
 
 .col-grey{
-  background: #f6f6f6;
+  background: $dark-neutral-color;
 }
 .col-dispute{
   width: 30%
@@ -5057,7 +5058,7 @@ input.table-entry-input:focus {
   align-items: flex-end;
   padding-left: 5px;
   padding-bottom: 5px;
-  color: grey;
+  color: $type-lighter-color;
 }
 
 .research-table{
@@ -5069,7 +5070,7 @@ input.table-entry-input:focus {
   font-weight: 700;
   font-size: 8pt;
   text-align: left;
-  color:black
+  color:$type-darkest
 }
 .empty-tr>td{
   height: 200px;
@@ -5080,12 +5081,6 @@ input.table-entry-input:focus {
   margin-left: -5px!important;
 }
 
-.primary.submit-rep-button::before{
-  height: 10px;
-  width: 10px;
-  display: block;
-  background: red;
-}
 .reputation-research-search-wrapper {
   margin: -15px -15px 40px -15px;
   background-color: $content-tab-color;
@@ -5242,14 +5237,14 @@ td.left-bordered {
   border-radius: 0;
   margin-top: 12px;
   box-shadow: none;
-  color: white;
+  color: $type-lightest;
 }
 .research-header-wrapper .nav-tabs > li > a:hover{
-  color: white
+  color: $type-lightest
 }
 .research-header-wrapper .nav-tabs > li.active > a {
   border: none;
-  background: #6ebcdb;
+  background: $primary-section-color;
   transition: background-color .1s ease-in;
 }
 //caret for active tab  in reputation toolbar
@@ -5266,7 +5261,7 @@ td.left-bordered {
 }
 .research-header-wrapper li.active::after{
   content: '';
-  background-color:#6ebcdb;
+  background-color: $primary-section-color;
   transition: background-color .25s ease-in;
 }
 .expanded-row {
@@ -7097,7 +7092,7 @@ h2 {
       cursor: pointer;
 
       a:hover {
-        color: white;
+        color: $type-lightest;
         background-color: $primary-section-color;
       }
       a:focus {
@@ -7128,7 +7123,7 @@ h2 {
         background-color: $primary-section-color;
       }
       a {
-        color: white;
+        color: $type-lightest;
       }
 
       .white-user{
@@ -7202,7 +7197,7 @@ h2 {
     button {
       background-color: $content-label-color;
       background-position-x: 10px;
-      color: white;
+      color: $type-lightest;
       font-size: 10px;
       height: 30px;
       width: 100pt;
@@ -7701,7 +7696,7 @@ td.text-center span {
 .copycat-btn {
   margin: 4px 0 0 5px;
   background-color: $content-tab-color;
-  color: white;
+  color: $type-lightest;
   display: block;
   height: 27px;
 }
@@ -7740,7 +7735,7 @@ td.text-center span {
       margin: 0 0 0 10px;
       padding: 5px 5px 5px 25px;
       font-size: 9pt;
-      color: white;
+      color: $type-lightest;
     }
   }
 }
@@ -7781,7 +7776,7 @@ td.text-center span {
     background-color: $primary-section-color;
     background-size: 15px;
     background-position: 10px center;
-    color: white;
+    color: $type-lightest;
     font-size: 12px;
     padding: 10px 20px 10px 35px;
 
