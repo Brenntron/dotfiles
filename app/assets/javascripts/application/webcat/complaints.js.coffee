@@ -943,23 +943,56 @@ window.get_xbrs_history = (url, tab) ->
     headers: headers
     data: {'url': url}
     success: (response) ->
-      console.log response
+      # Cycle through and assign index values to column headers
+      col_headers = []
+      i = 0
+      while i < response['columns'].length
+        $(response['columns']).each ->
+          col_defs = []
+          col_defs["index"] = i
+          col_defs["column"] = this.valueOf()
+          col_headers.push(col_defs)
+          i++
+
+      col_indexes = []
       thead = '<thead><tr>'
-      $(response['columns']).each ->
-        thead += '<th>' + this + '</th>'
+      $(col_headers).each ->
+        # We only want these specific columns
+        if this.column == "domain" || this.column == "subdomain" || this.column == "ctime" || this.column == "mtime" || this.column == "mnemonic" || this.column == "operation" || this.column == "path"
+          thead += '<th>' + this.column + '</th>'
+          col_indexes.push(this.index)
       thead += '</tr></thead>'
 
-      tbody = '<tbody>'
+      row_data = []
+      # For each row of data, cycle through and assign index to each column
       $(response['data']).each ->
+        col_data = []
+        d = 0
+        while d < this.length
+          $(this).each ->
+            data = []
+            data["index"] = d
+            data["data"] = this.valueOf()
+            col_data.push(data)
+            d++
+          row_data.push(col_data)
+
+      tbody = '<tbody>'
+      $(row_data).each ->
         tbody += '<tr>'
         row = this
         $(row).each ->
-          if jQuery.type(this) == 'string' || jQuery.type(this) == 'number'
-            tbody += '<td>' + this + '</td>'
-          else
-            # is null
-            tbody += '<td> - </td>'
+          col = this.index
+          col_content = this.data
+          # If our column header indexes and our column data indexes match we create the column in the table
+          if jQuery.inArray(col, col_indexes) != -1
+            if jQuery.type(col_content) == 'string' || jQuery.type(this) == 'number'
+              tbody += '<td>' + col_content + '</td>'
+            else
+              # is null - prevents weird json objects getting through
+              tbody += '<td> - </td>'
         tbody += '</tr>'
+      tbody += '</tbody>'
 
       $(xbrs_table).append(thead)
       $(xbrs_table).append(tbody)
