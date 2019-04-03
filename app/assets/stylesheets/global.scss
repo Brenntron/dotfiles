@@ -33,6 +33,7 @@ $user-highlight-color: #FFC5C2;
 $user-med-color: #FC9292;
 $user-dark-color: #560303;
 $warning-accent-color: #E47433;
+$warning-dark-color: #d66d31;
 
 /* Tab Icon Colors */
 $rule-accent-color: #FDBB2B;
@@ -44,7 +45,7 @@ $success-trans: rgba(95, 183, 102, 0.15);
 $disabled-bg: #E5E5E5;
 $disabled-txt: #A0A0A0;
 $communication-accent-color: #C14B92;
-
+$grey-section-color: #e2e2e2;
 /* Content Label Color */
 $content-label-color: #999;     /* Light Grey     */
 
@@ -55,9 +56,11 @@ $sidebar-width: 44px;
 $dropshadow: 2px 0 10px 1px rgba(0,0,0,0.1);
 
 /* Typography Colors */
+$type-darkest: #000; /* Black */
 $type-base-color:    #333;   /* Dark Grey */
 $type-lighter-color: #666;   /* Medium Grey */
 $type-faint-accent: #D7DADB; /* Lighter Grey */
+$type-lightest: #fff; /* White */
 
 /* Additional Colors */
 /* for use on gridlines, form inputs, and other very subtle elements against the content bg color */
@@ -616,6 +619,7 @@ button {
   margin-top: -18px;
   color: $content-label-color !important;
   font-size: 7pt;
+  background: $ac-nav-bg-color;
 }
 
 .toolbar-button-label {
@@ -1100,7 +1104,7 @@ thead th.sorting.center {
   width: 90%; /* this is not ideal, may have to come back and test other options, should not poke outside of the content wrapper though. */
   height: 10px;
   position: absolute;
-  background-color: white;
+  background-color: $ac-nav-bg-color;
   z-index: 50;
   margin-top: 43px;
   border-top-right-radius: 2px;
@@ -1195,7 +1199,7 @@ thead th.sorting.center {
   }
 
   .modal-content {
-    border: 2px solid #f2f2f2;
+    border: 2px solid $faint-neutral-color;
     border-radius: 2px;
   }
 }
@@ -2125,8 +2129,8 @@ a.static-nav-item {
 }
 
 .content-row {
-  border-top: 2px solid #f2f2f2;
-  border-bottom: 2px solid #f2f2f2;
+  border-top: 2px solid $faint-neutral-color;
+  border-bottom: 2px solid $faint-neutral-color;
   width: 100%;
   padding: 4px 0;
   min-height: 34px;
@@ -4226,6 +4230,8 @@ button.tertiary {
 .icon-dashboard {background-image: url(image_path('icon_dashboard.svg'));}
 .icon-queue     {background-image: url(image_path('icon_queue.svg'));}
 .icon-research  {background-image: url(image_path('icon_new_research_white.svg'));}
+.icon-lookup-quick  {background-image: url(image_path('icon_rabbit.svg'));}
+.icon-lookup-detail  {background-image: url(image_path('icon_details.svg'));}
 .icon-filter-white {background-image: url(image_path('icon_filter_white.svg'));}
 .icon-import-white {background-image: url(image_path('icon_import_white.svg'));}
 .icon-categories {background-image: url(image_path('icon_categories.svg'));}
@@ -4990,7 +4996,7 @@ input.table-entry-input:focus {
 }
 
 #top_bar_extended_info .col-with-divider {
-  border-right-color: #f2f2f2;
+  border-right-color: $faint-neutral-color;
 }
 
 #top_bar_toggle {
@@ -5016,14 +5022,73 @@ input.table-entry-input:focus {
   -ms-transform: rotate(180deg);
   transform: rotate(180deg);
 }
+.primary#submit-rep-changes {
+  background: $warning-accent-color;
+}
+#submit-rep-changes, #get-rep-data{
+  margin: 15px 5px 5px 5px!important;
+}
+.primary#submit-rep-changes:hover, .primary#submit-rep-changes:focus {
+  background: $warning-dark-color
+}
+.research-table th{
+  color: $type-darkest;
+  border-bottom: 1px solid $dark-neutral-color;
+  padding: 3px 0 0 10px;
+}
+
+.col-dispute{
+  width: 30%
+}
+.research-toolbar{
+  color: $type-darkest;
+  width: unset;
+  height: 32px;
+  margin: 20px 15px;
+  padding: 0px 13px;
+  border-left: 1px solid $faint-neutral-color;
+  border-right: 1px solid $faint-neutral-color;
+}
+
+.note-repsubmit.small{
+  display: flex;
+  align-items: flex-end;
+  padding-left: 5px;
+  padding-bottom: 5px;
+  color: $type-lighter-color;
+}
+
+.research-table{
+  margin: 100px auto;
+  width: 96%!important
+}
+.search-options-col .research-table label {
+  text-transform: uppercase;
+  font-weight: 700;
+  font-size: 8pt;
+  text-align: left;
+  color:$type-darkest
+}
+.empty-tr>td{
+  height: 200px;
+  border-bottom: unset;
+}
+.research-toolbar label{
+  padding: 0!important;
+  margin-left: -5px!important;
+}
 
 .reputation-research-search-wrapper {
   margin: -15px -15px 40px -15px;
-  //padding: 40px 20px;
   background-color: $content-tab-color;
   border-radius: 4px 4px 0 0 ;
 }
-
+.reputation-research-search-wrapper .nav-tabs::before{
+  content:unset;
+}
+.reputation-research-search-wrapper .nav-tabs{
+   margin:0
+ }
 .reputation-research-search-wrapper h1 {
   color: $content-bg-color;
   margin-bottom: 20px;
@@ -5033,6 +5098,7 @@ input.table-entry-input:focus {
   width: 27px;
   height: 27px;
   margin: 0 0 -3px 15px;
+  padding-right: 40px;
 }
 
 .reputation-research-search-wrapper .search-box {
@@ -5042,14 +5108,22 @@ input.table-entry-input:focus {
   line-height: 1.25em;
   min-height: 174px;
 }
-
+.reputation-research-search-wrapper{
+  padding: 0 15px;
+}
 .research-search-form {
   background-color: lighten($content-tab-color, 6%);
   margin: 15px -15px -15px -15px;
-  padding: 20px;
-  display: block;
+  padding: 30px;
 }
-
+.research-search-form.tab-content{
+  width: unset
+}
+.search-options-col#lookup-quick {
+  background: $ac-nav-bg-color;
+  margin: -30px;
+  padding: 50px 10px 0 10px;
+}
 .research-search-form .button_primary {
   margin: 10px 0;
 }
@@ -5137,7 +5211,56 @@ td.left-bordered {
 .research-table-input-wrapper.reptool-input-wrapper {
   background-color: $fifth-section-color;
 }
-
+.research-lookup-container {
+  margin-left: 20px
+}
+.reputation-research-search-wrapper h1{
+  margin: 0 100px 0 0;
+}
+.research-header-wrapper{
+  margin: -15px;
+  height: 70px;
+  display: flex;
+  align-items: center;
+}
+.research-header-wrapper .nav-tabs > li > a{
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border: none;
+  width: 250px;
+  background: transparent;
+  padding: 23px;
+  border-radius: 0;
+  margin-top: 12px;
+  box-shadow: none;
+  color: $type-lightest;
+}
+.research-header-wrapper .nav-tabs > li > a:hover{
+  color: $type-lightest
+}
+.research-header-wrapper .nav-tabs > li.active > a {
+  border: none;
+  background: $primary-section-color;
+  transition: background-color .1s ease-in;
+}
+//caret for active tab  in reputation toolbar
+.research-header-wrapper li::after {
+  content: '';
+  display: inline-block;
+  background-color: transparent;
+  height: 10px;
+  width: 10px;
+  position: relative;
+  top: -6px;
+  right: calc(-50% + 5px);
+  transform: rotate(45deg);
+}
+.research-header-wrapper li.active::after{
+  content: '';
+  background-color: $primary-section-color;
+  transition: background-color .25s ease-in;
+}
 .expanded-row {
   background-color: $content-tab-color;
   padding: 0 0 0 20px !important;
@@ -5152,11 +5275,19 @@ td.left-bordered {
   border-right: 6px solid transparent;
   border-top: 10px solid #fff;
 }
-
+.search-options-col, .search-box-col{
+   display: none;
+ }
+.search-options-col.active, .search-box-col.active{
+  display: block;
+}
 .expanded-row-data-wrapper {
   background-color: $type-lighter-color;
 }
-
+.toolbar-quicklookup{
+  display:flex;
+  height: 60px;
+}
 .entry-details-table {
   margin: 20px;
   padding-left: 7px;
@@ -5485,13 +5616,6 @@ button.dropdown-submit-button {
   text-align: center;
 }
 
-.search-options-col {
-  //max-width: 250px;
-  //display: block;
-  //float: left;
-  //margin-right: 20px;
-}
-
 .search-options-col label {
   margin-left: 8px;
   color: $content-bg-color;
@@ -5502,10 +5626,6 @@ button.dropdown-submit-button {
 
 .search-options-col input[type="radio"] {
   border: none;
-}
-
-.search-box-col {
-  //display: block;
 }
 
 .toggle-switch {
@@ -5539,7 +5659,7 @@ button.dropdown-submit-button {
   width: 12px;
   left: 2px;
   bottom: 2px;
-  background-color: white;
+  background-color: $ac-nav-bg-color;
   background-image: url(image_path('icon_x_grey.svg'));
   background-position: center center;
   background-size: 12px;
@@ -5665,7 +5785,7 @@ table.dispute_tool_current tr:last-of-type td {
   display: inline-flex;
 }
 
-.dashboard-header-area h1, .complaint-mgt-top-area h1, .reputation-research-search-wrapper h1 {
+.dashboard-header-area h1, .complaint-mgt-top-area h1 {
   color: $content-bg-color;
   margin-bottom: 6px;
   display: inline-block;
@@ -6777,7 +6897,7 @@ table#duplicates a {
 }
 
 .bug-tabs .nav-tabs li a {
-  background-color: #f2f2f2 !important;
+  background-color: $faint-neutral-color !important;
 }
 
 .bug-tabs .nav-tabs li.active a {
@@ -6969,7 +7089,7 @@ h2 {
       cursor: pointer;
 
       a:hover {
-        color: white;
+        color: $type-lightest;
         background-color: $primary-section-color;
       }
       a:focus {
@@ -7000,7 +7120,7 @@ h2 {
         background-color: $primary-section-color;
       }
       a {
-        color: white;
+        color: $type-lightest;
       }
 
       .white-user{
@@ -7074,7 +7194,7 @@ h2 {
     button {
       background-color: $content-label-color;
       background-position-x: 10px;
-      color: white;
+      color: $type-lightest;
       font-size: 10px;
       height: 30px;
       width: 100pt;
@@ -7573,7 +7693,7 @@ td.text-center span {
 .copycat-btn {
   margin: 4px 0 0 5px;
   background-color: $content-tab-color;
-  color: white;
+  color: $type-lightest;
   display: block;
   height: 27px;
 }
@@ -7612,7 +7732,7 @@ td.text-center span {
       margin: 0 0 0 10px;
       padding: 5px 5px 5px 25px;
       font-size: 9pt;
-      color: white;
+      color: $type-lightest;
     }
   }
 }
@@ -7653,7 +7773,7 @@ td.text-center span {
     background-color: $primary-section-color;
     background-size: 15px;
     background-position: 10px center;
-    color: white;
+    color: $type-lightest;
     font-size: 12px;
     padding: 10px 20px 10px 35px;
 
@@ -7906,14 +8026,14 @@ th.sorting_1, th.sorting_asc, th.sorting_desc {
 }
 
 .cat-url-error{
-  color: black;
+  color: $type-darkest;
   font-size: 11px;
   font-weight: normal;
   display: none;
 }
 
 .cat-url-success{
-  color: black;
+  color: $type-darkest;
   font-size: 11px;
   font-weight: normal;
   display: none;
