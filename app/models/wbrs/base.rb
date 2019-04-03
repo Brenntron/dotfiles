@@ -2,9 +2,9 @@ class Wbrs::Base
   include ActiveModel::Model
   include ApiRequester::ApiRequester
 
-  api_requester_config Rails.configuration.wbrs
+  set_api_requester_config Rails.configuration.wbrs
   set_default_request_type :json
-  set_default_header "Authorization" => "Bearer #{Rails.configuration.wbrs.auth_token}"
+  set_default_headers "Authorization" => "Bearer #{Rails.configuration.wbrs.auth_token}"
 
   # TODO replace with new_request
   def self.request(path:, body:)

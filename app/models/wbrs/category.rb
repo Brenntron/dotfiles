@@ -15,7 +15,7 @@ class Wbrs::Category < Wbrs::Base
   # @return [Array<Wbrs::Category>] Array of the results.
   def self.all(reload: false)
     unless @all || reload
-      response = call_json_request(:get, '/v1/cat/categories', body: '')
+      response = call_request(:get, '/v1/cat/categories', input: '')
 
       response_body = JSON.parse(response.body)
       @all = response_body['data'].map {|datum| new_from_datum(datum)}

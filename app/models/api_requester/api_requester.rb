@@ -1,4 +1,19 @@
 # Mixin for generic web service requester for web service APIs that we call.
+#
+# NOTICE: DANGEROUS ASSUMPTION WAS USED
+#
+# The intention of this mixin was that it could be added to a base class
+# to make that class and all classes which inherit from it web service enabled.
+# (It could just be mixed into a class, which would work too, but it should also work with inheritance.)
+#
+# In order to get it to work with inheritance, there must be an `inherited` method
+# to extend the class methods in this mixin to the subclass.  (Damn it Matz!)
+#
+# I added such a method in this mixin's class methods.
+# However the gotcha is that if a class using this mixin (including the subclasses)
+# defines its own `inherited` method it will clobber this mixin's `inherited` method.
+# So warning, if defining an `inherited` method, call the pass_on_api_requester method.
+#
 module ApiRequester::ApiRequester
 
   class ApiRequesterError < StandardError
@@ -40,7 +55,7 @@ module ApiRequester::ApiRequester
       @request_config
     end
 
-    def set_default_header(new_header)
+    def set_default_headers(new_header)
       @default_headers ||= {}
       new_header.each_pair do |key, value|
         @default_headers[key] = value
@@ -95,7 +110,7 @@ module ApiRequester::ApiRequester
       request_config.api_key
     end
 
-    def api_requester_config(struct)
+    def set_api_requester_config(struct)
       @request_config = struct
     end
 
@@ -202,6 +217,17 @@ module ApiRequester::ApiRequester
     def call_request_parsed(method = :get, path, request_type: default_request_type, input: nil, headers: {})
       response = call_request(method, path, request_type: request_type, input: input, headers: headers)
       JSON.parse(response.body)
+    end
+
+    def pass_on_api_requester(base)
+      base.extend(ClassMethods)
+      base.set_api_requester_config request_config
+      base.set_default_request_type default_request_type
+      base.set_default_headers default_headers
+    end
+
+    def inherited(subclass)
+      pass_on_api_requester(subclass)
     end
   end
 
