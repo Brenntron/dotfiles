@@ -1,5 +1,20 @@
 # Mixin for generic web service requester for web service APIs that we call.
 #
+# == Usage ==
+#
+# Include this mixin into your class and call any set methods you need.
+# Example:
+#
+#     class Wbrs::Base
+#       include ApiRequester::ApiRequester
+#
+#       set_api_requester_config Rails.configuration.wbrs
+#       set_default_request_type :json
+#       set_default_headers "Authorization" => "Bearer #{Rails.configuration.wbrs.auth_token}"
+#     end
+#
+#
+# == WARNING ==
 # NOTICE: DANGEROUS ASSUMPTION WAS USED
 #
 # The intention of this mixin was that it could be added to a base class
@@ -51,13 +66,25 @@ module ApiRequester::ApiRequester
   module ClassMethods
     attr_reader :default_headers
 
+    # Sets the configuration.
+    #
+    # This can (and should) be a configuration read from config.yml using the provided config_of method.
+    #
+    # @param [OpenStruct] struct The config returned from the config_of method.
+    def set_api_requester_config(struct)
+      @request_config = struct
+    end
+
     def request_config
       @request_config
     end
 
-    def set_default_headers(new_header)
+    # Sets any headers which should be included with every API call.
+    #
+    # @param [Hash] headers HTTP request headers as a hash using string keys and string values
+    def set_default_headers(headers)
       @default_headers ||= {}
-      new_header.each_pair do |key, value|
+      headers.each_pair do |key, value|
         @default_headers[key] = value
       end
     end
@@ -66,6 +93,14 @@ module ApiRequester::ApiRequester
       @default_request_type = default_request_type
     end
 
+    # Sets a default content type.
+    #
+    # This will include the appropriate content type header with every API call.
+    #
+    # @param [Symbol] default_request_type
+    #     :json to use the input to the request as JSON for the body of the request
+    #     :query_string to use the input as a query string in the URL
+    #     :query_body to use the input as a query string in the http request body
     def set_default_request_type(default_request_type)
       @default_request_type = default_request_type
     end
@@ -108,10 +143,6 @@ module ApiRequester::ApiRequester
 
     def api_key
       request_config.api_key
-    end
-
-    def set_api_requester_config(struct)
-      @request_config = struct
     end
 
     def stringkey_params(conditions = {})
