@@ -1,3 +1,5 @@
+Chart.defaults.global.plugins.datalabels.display = false
+
 $(document).ready ->
 
   $('span#mark-as-related').on 'show.bs.dropdown', ->

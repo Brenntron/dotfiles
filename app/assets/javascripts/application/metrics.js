@@ -1,3 +1,5 @@
+Chart.defaults.global.plugins.datalabels.display = false
+
 $(document).ready(function() {
     get_bug_chart_data('bug_metrics');
     get_user_chart_data('status_metrics');

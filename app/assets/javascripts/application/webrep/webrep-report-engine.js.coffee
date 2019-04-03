@@ -1,45 +1,24 @@
+Chart.defaults.global.plugins.datalabels.display = false
 Chart.defaults.global.tooltips = false;
+
+globalDataLabels ={
+  color: '#000'
+  anchor: 'end'
+  clamp: true
+  font:
+    weight: 'bold'
+  display: (ctx) ->
+    if ctx.dataset.data[ctx.dataIndex] >= 1
+      return 'auto'
+    return false
+
+  formatter: (value) ->
+    return reduceDecimal(value)
+}
 
 getSum = (total, num) -> return total + num
 
 reduceDecimal = (num) -> return Math.round(num * 100) / 100
-
-setDataPoint = (chartInstance, type) ->
-
-  {ctx, data, controller, config, chart} = chartInstance
-
-  if ctx != undefined
-    ctx.textAlign = 'center';
-    ctx.fillStyle = "rgba(0, 0, 0, 1)";
-    ctx.textBaseline = 'bottom';
-    for dataset, dataIndex in data.datasets
-      meta = controller.getDatasetMeta(dataIndex)
-      for bar, barIndex in meta.data
-        {x, y} = bar._model
-        data = dataset.data[barIndex]
-
-        if data > 0
-          if config.type == 'bar'
-            if data > 5
-              ctx.fillText(data, x, y + 15);
-            else
-              ctx.fillText(data, x, y);
-          else
-            if data % 1 != 0
-              data = reduceDecimal(data)
-              console.log(data)
-              if data > 15
-                console.log('ininin',data)
-                ctx.fillText(data, x - 15, y + 5);
-              else
-                console.log(data)
-                ctx.fillText(data, x + 15, y - 5);
-            else
-              if data > 5
-                ctx.fillText(data, x - 15, y + 5);
-              else
-                ctx.fillText(data, x + 15, y + 5);
-
 
 buildCharts = ()->
   user_id = $("#user_id").val()
@@ -306,7 +285,7 @@ window.build_graph_ticket_entries_submitter = () ->
       Chart.defaults.global.defaultFontFamily = "'Open Sans', sans-serif"
       Chart.defaults.global.defaultFontSize = 10
 
-      new Chart($('#graph-ticket-entries-submitter'),
+      entriesSubmitter = new Chart($('#graph-ticket-entries-submitter'),
         type: 'bar'
         data:
           labels: submitterChartLabels
@@ -322,11 +301,10 @@ window.build_graph_ticket_entries_submitter = () ->
               data: submitterGuestChartData
             }]
         options:
+          plugins:
+            datalabels: globalDataLabels
           hover:
             mode: null
-          animation:
-            onProgress: () ->
-              setDataPoint(this)
           responsive: true
           maintainAspectRatio: false
           legend:
@@ -361,7 +339,7 @@ window.build_graph_ticket_entries_submitter = () ->
             ]
       )
 
-      new Chart($('#graph-multiuser-ticket-entries-submitter'),
+      multiUserEntries = new Chart($('#graph-multiuser-ticket-entries-submitter'),
         type: 'bar'
         data:
           labels: submitterChartLabels
@@ -376,11 +354,10 @@ window.build_graph_ticket_entries_submitter = () ->
             }
           ]
         options:
+          plugins:
+            datalabels: globalDataLabels
           hover:
             mode: null
-          animation:
-            onProgress: () ->
-              setDataPoint(this)
           responsive: true
           maintainAspectRatio: false
           legend: display: false
@@ -923,12 +900,11 @@ window.build_single_entries_closed_by_day_chart = () ->
             labels: ticketTypeChartLabels
             datasets: window.userTicketClosedGraphDatasets,
           options:
+            plugins:
+              datalabels: globalDataLabels
             barPercentage: 1
             hover:
               mode: null
-            animation:
-              onProgress: () ->
-                setDataPoint(this)
             responsive: true
             maintainAspectRatio: false
             legend:
@@ -1040,11 +1016,10 @@ window.build_multi_entries_closed_by_day_chart = () =>
           labels: dateRange
           datasets: totalTicketEntriesbyType
         options:
+          plugins:
+            datalabels: globalDataLabels
           hover:
             mode: null
-          animation:
-            onProgress: () ->
-              setDataPoint(this)
           responsive: true
           maintainAspectRatio: false
           legend: display: false
@@ -1104,10 +1079,6 @@ window.build_multi_entries_closed_by_day_chart = () =>
             currentData = window[barGraphName].data.datasets
             window[barGraphName].data.datasets = currentData.filter (x) -> label.indexOf(x.label) < 0
             window[barGraphName].update()
-          Chart.helpers.each Chart.instances, (instance) ->
-            if instance.chart.canvas.id == 'graph-multiuser-ticket-entries-closed'
-              setDataPoint(this)
-
 
 
     error: (response) ->
@@ -1143,7 +1114,7 @@ window.build_multi_ticket_resolution_by_owner_chart = () ->
       unchangedTickets = json["unchanged_tickets"]
       otherTickets = json["other_tickets"]
 
-      new Chart($('#ticket-resolutions-by-owner'),
+      resolutionsByOwner = new Chart($('#ticket-resolutions-by-owner'),
         type: 'bar'
         data:
           labels: ticketOwners
@@ -1170,11 +1141,10 @@ window.build_multi_ticket_resolution_by_owner_chart = () ->
             }
           ]
         options:
+          plugins:
+            datalabels: globalDataLabels
           hover:
             mode: null
-          animation:
-            onProgress: () ->
-              setDataPoint(this)
           responsive: true
           maintainAspectRatio: false
           title:
@@ -1199,8 +1169,6 @@ window.build_multi_ticket_resolution_by_owner_chart = () ->
               }
             ]
       )
-
-
 
     error: (response) ->
       console.log(response, 'Error building chart')
@@ -1259,7 +1227,7 @@ window.build_multi_entries_closed_by_owners_chart = () ->
         if $('#ticket-entries-closed-by-owner-no-data').length
           $('#ticket-entries-closed-by-owner-no-data').remove()
 
-        new Chart($('#ticket-entries-closed-by-owner'),
+        entriesClosedByOwner = new Chart($('#ticket-entries-closed-by-owner'),
           type: 'horizontalBar'
           responsive: true
           maintainAspectRatio: false
@@ -1270,11 +1238,10 @@ window.build_multi_entries_closed_by_owners_chart = () ->
               data: ticketEntriesByOwner
             } ]
           options:
+            plugins:
+              datalabels: globalDataLabels
             hover:
               mode: null
-            animation:
-              onProgress: () ->
-                setDataPoint(this)
             responsive: true
             maintainAspectRatio: false
             legend: display: false
@@ -1304,7 +1271,6 @@ window.build_multi_entries_closed_by_owners_chart = () ->
                 }
               ]
         )
-
 
     error: (response) ->
       console.log(response, 'Error building chart')
@@ -1358,7 +1324,7 @@ window.build_multi_average_time_to_close_tickets = () ->
         if $('#avg-time-to-close-tickets-no-data').length
           $('#avg-time-to-close-tickets-no-data').remove()
 
-        new Chart($('#avg-time-to-close-tickets'),
+        avgTimeToCloseNew = new Chart($('#avg-time-to-close-tickets'),
           type: 'horizontalBar'
           data:
             labels: ticketOwners
@@ -1367,11 +1333,10 @@ window.build_multi_average_time_to_close_tickets = () ->
               data: avgTimeToCloseTickets
             } ]
           options:
+            plugins:
+              datalabels: globalDataLabels
             hover:
               mode: null
-            animation:
-              onProgress: () ->
-                setDataPoint(this)
             responsive: true
             maintainAspectRatio: false
             legend: display: false
@@ -1446,7 +1411,7 @@ window.build_multi_rulehits_for_fp_res_chart = () ->
         if $('#rule-hits-fp-resolutions-no-data').length
           $('#rule-hits-fp-resolutions-no-data').remove()
 
-        new Chart($('#rule-hits-fp-resolutions'),
+        ruleHitsFPResolutions = new Chart($('#rule-hits-fp-resolutions'),
           type: 'horizontalBar'
           data:
             labels: fpRules
@@ -1455,6 +1420,8 @@ window.build_multi_rulehits_for_fp_res_chart = () ->
               data: totalRuleHits
             } ]
           options:
+            plugins:
+              datalabels: globalDataLabels
             hover:
               mode: null
             responsive: true
@@ -1489,6 +1456,7 @@ window.build_multi_rulehits_for_fp_res_chart = () ->
   )
 
 $ ->
+
   $('#export-reports-button').on "click", ->
     paramObject = {}
     $('.report-checkbox').each ->
