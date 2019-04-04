@@ -850,58 +850,70 @@ window.history_dialog = (id, url) ->
           '<a class="nav-link" role="tab" data-toggle="tab" href="#xbrs-history-tab" aria-controls="xbrs-history-tab" onclick="get_xbrs_history(\'' + url + '\', this)">XBRS History</a>' +
           '</li>' +
           '</ul>' +
+
           # Tab content - beginning markup of first tab
           '<div class="tab-content dialog-tab-content">' +
           '<div class="tab-pane active" role="tabpanel" id="domain-history-tab">' +
-          '<h5>Domain History</h5>' +
+          '<h5>Domain History</h5>'
+
+        if json.entry_history.domain_history.length < 1
+          history_dialog_content += '<span class="missing-data">No domain history available.</span>'
+        else
+          history_dialog_content +=
           '<table class="history-table"><thead><tr><th>Action</th><th>Confidence</th><th>Description</th><th>Time</th><th>User</th><th>Category</th></tr></thead>' +
           '<tbody>'
-
-        # Build domain history table
-        for entry in json.entry_history.domain_history
-          entry_string = "" +
-          '<tr>' +
-          '<td>' + entry['action'] + '</td>' +
-          '<td>' + entry['confidence'] + '</td>' +
-          '<td>' + entry['description'] + '</td>' +
-          '<td>' + entry['time'] + '</td>' +
-          '<td>' + entry['user'] + '</td>' +
-          '<td>' + entry['category']['descr'] + '</td>' +
-          '</tr>'
-          history_dialog_content += entry_string
+          # Build domain history table
+          for entry in json.entry_history.domain_history
+            entry_string = "" +
+            '<tr>' +
+            '<td>' + entry['action'] + '</td>' +
+            '<td>' + entry['confidence'] + '</td>' +
+            '<td>' + entry['description'] + '</td>' +
+            '<td>' + entry['time'] + '</td>' +
+            '<td>' + entry['user'] + '</td>' +
+            '<td>' + entry['category']['descr'] + '</td>' +
+            '</tr>'
+            history_dialog_content += entry_string
+          history_dialog_content +=
+            # End domain history table
+            '</tbody></table>'
 
         history_dialog_content +=
-          # End domain history table and tab
-          '</tbody></table>' +
+          # End domain history tab
           '</div>' +
           # Start Complaint Entry Tab
           '<div class="tab-pane" role="tabpanel" id="complaint-history-tab">' +
-          '<h5>Complaint Entry History</h5>' +
-          '<table class="history-table"><thead><th>Time</th><th>User</th><th>Details</th></thead>' +
-          '<tbody>'
+          '<h5>Complaint Entry History</h5>'
 
-        # Build the complaint history table
-        entry_row = ""
-        for entry in json.entry_history.complaint_history
-          entry_row = "<tr><td>" + entry[0] + '</td>'
-          details_col = ""
-          i = 0
-          for change_key, change_entry of entry
-            i = i + 1
-            if i > 1
-              for key, value of change_entry
-                if key == "whodunnit"
-                  entry_row += "<td>" + value + "</td>"
-                else
-                  details_col += '<span class="bold">' + key + ":</span> " + value[0] + " - " + value[1] + "<br/>"
+        if json.entry_history.complaint_history.length < 1
+          history_dialog_content += '<span class="missing-data">No complaint entry history available.</span>'
+        else
+          history_dialog_content +=
+            '<table class="history-table"><thead><th>Time</th><th>User</th><th>Details</th></thead>' +
+            '<tbody>'
 
-          entry_row += '<td>' + details_col + '</td></tr>'
-
-          history_dialog_content += entry_row
+          # Build the complaint history table
+          entry_row = ""
+          for entry in json.entry_history.complaint_history
+            entry_row = "<tr><td>" + entry[0] + '</td>'
+            details_col = ""
+            i = 0
+            for change_key, change_entry of entry
+              i = i + 1
+              if i > 1
+                for key, value of change_entry
+                  if key == "whodunnit"
+                    entry_row += "<td>" + value + "</td>"
+                  else
+                    details_col += '<span class="bold">' + key + ":</span> " + value[0] + " - " + value[1] + "<br/>"
+            entry_row += '<td>' + details_col + '</td></tr>'
+            history_dialog_content += entry_row
+          history_dialog_content +=
+            # End complaint history table
+            '</tbody></table>'
 
         history_dialog_content +=
-          # End complaint history table and tab
-          '</tbody></table>' +
+          # End complaint history table tab
           '</div>' +
           # Start XBRS Tab
           '<div class="tab-pane" role="tabpanel" id="xbrs-history-tab">' +
@@ -934,8 +946,11 @@ window.history_dialog = (id, url) ->
 window.get_xbrs_history = (url, tab) ->
   wrapper = $(tab).parents('.dialog-content-wrapper')[0]
   xbrs_table = $(wrapper).find('.xbrs-history-table')[0]
+  xbrs_msg = $(wrapper).find('.xbrs-no-data-msg')[0]
   # Clear table of residual data
   $(xbrs_table).empty()
+  if xbrs_msg?
+    $(xbrs_msg).remove()
   headers = {'Token': $('input[name="token"]').val(), 'Xmlrpc-Token': $('input[name="xml_token"]').val()}
   $.ajax(
     url: '/escalations/api/v1/escalations/webcat/complaint_entries/xbrs'
@@ -943,7 +958,9 @@ window.get_xbrs_history = (url, tab) ->
     headers: headers
     data: {'url': url}
     success: (response) ->
-      if response?
+      if response.data.length < 1
+        $('<span class="missing-data xbrs-no-data-msg">No XBRS history available.</span>').insertBefore(xbrs_table)
+      else
         # Cycle through and assign index values to column headers
         col_headers = []
         i = 0
@@ -1010,13 +1027,8 @@ window.get_xbrs_history = (url, tab) ->
           tbody += '</tr>'
         tbody += '</tbody>'
 
-
-
         $(xbrs_table).append(thead)
         $(xbrs_table).append(tbody)
-      else
-        # Message in case there is no history
-        $(xbrs_table).append('<tr><td class="missing-data">No XBRS History available.</td></tr>')
     error: (response) ->
       notice_html = "<p>Something went wrong: #{response.responseText}</p>"
   , this)
