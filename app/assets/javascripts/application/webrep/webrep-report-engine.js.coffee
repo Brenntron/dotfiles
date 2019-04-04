@@ -11,10 +11,7 @@ globalDataLabels ={
   textStrokeColor:'white'
   textStrokeWidth: 3
   display: (ctx) ->
-    if ctx.dataset.data[ctx.dataIndex] >= 1
-      return 'auto'
-    return false
-
+    return ctx.dataset.data[ctx.dataIndex] >= 1
   formatter: (value) ->
     return reduceDecimal(value)
 }
