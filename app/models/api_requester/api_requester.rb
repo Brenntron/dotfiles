@@ -13,6 +13,8 @@
 #       set_default_headers "Authorization" => "Bearer #{Rails.configuration.wbrs.auth_token}"
 #     end
 #
+# Call call_request_parsed or call_request to make an HTTP request.
+#
 #
 # == WARNING ==
 # NOTICE: DANGEROUS ASSUMPTION WAS USED
@@ -97,10 +99,7 @@ module ApiRequester::ApiRequester
     #
     # This will include the appropriate content type header with every API call.
     #
-    # @param [Symbol] default_request_type
-    #     :json to use the input to the request as JSON for the body of the request
-    #     :query_string to use the input as a query string in the URL
-    #     :query_body to use the input as a query string in the http request body
+    # @param [Symbol] default_request_type see call_request
     def set_default_request_type(default_request_type)
       @default_request_type = default_request_type
     end
@@ -218,7 +217,7 @@ module ApiRequester::ApiRequester
 
     def request_error_handling(response)
       case
-      when 300 > response.code
+      when 400 > response.code
         response
       when 401 == response.code
         raise ApiRequesterNotAuthorized, "HTTP response #{response.code} #{error_body(response)}"
@@ -229,7 +228,27 @@ module ApiRequester::ApiRequester
       end
     end
 
-    def call_request(method = :get, path, request_type: default_request_type, input:, headers: {})
+    # Method to make an HTTP request.
+    #
+    # This or call_request_parsed is the method to use to make an HTTP request.
+    # This method is provided if you need the unparsed response body and/or HTTP status code.
+    #
+    # Makes the HTTP request and returns the response or raises an exception if the response is 400 or above.
+    # The class including this mixin should configure the host and other standard configuration,
+    # so only the path and query input is needed.
+    # The input can be packaged as JSON in the request body
+    # or a hash can be encoded in a query string in either the request body or appended to the URL after a '?'.
+    #
+    # @param [Symbol] method :get or :post
+    # @param [String] path The path part of the URL, no scheme, host, or query string.
+    # @param [Symbol] request_type how to package the input into the request
+    #     :json to use the input to the request as JSON for the body of the request
+    #     :query_string to use the input as a query string in the URL
+    #     :query_body to use the input as a query string in the http request body
+    # @param [Hash] headers additional headers to add to the request in addition to standard headers
+    # @return [Net::HTTPResponse] the response from the request
+    # @raise [ApiRequester::ApiRequester::ApiRequesterError]
+    def call_request(method = :get, path, request_type: default_request_type, input: nil, headers: {})
       request =
           case request_type
           when :json
@@ -245,6 +264,27 @@ module ApiRequester::ApiRequester
       request_error_handling(call_by_method(method, request))
     end
 
+    # Method to make an HTTP request.
+    #
+    # This or call_request is the method to use to make an HTTP request.
+    # This method is provided to parse JSON returned in the response body.
+    #
+    # Makes the HTTP request and returns the response or raises an exception if the response is 400 or above.
+    # The class including this mixin should configure the host and other standard configuration,
+    # so only the path and query input is needed.
+    # The input can be packaged as JSON in the request body
+    # or a hash can be encoded in a query string in either the request body or appended to the URL after a '?'.
+    # Parses the JSON returned in the response body and returns the ruby structure.
+    #
+    # @param [Symbol] method :get or :post
+    # @param [String] path The path part of the URL, no scheme, host, or query string.
+    # @param [Symbol] request_type how to package the input into the request
+    #     :json to use the input to the request as JSON for the body of the request
+    #     :query_string to use the input as a query string in the URL
+    #     :query_body to use the input as a query string in the http request body
+    # @param [Hash] headers additional headers to add to the request in addition to standard headers
+    # @return [*] the ruby structure from parsing the JSON in the response body.
+    # @raise [ApiRequester::ApiRequester::ApiRequesterError]
     def call_request_parsed(method = :get, path, request_type: default_request_type, input: nil, headers: {})
       response = call_request(method, path, request_type: request_type, input: input, headers: headers)
       JSON.parse(response.body)
