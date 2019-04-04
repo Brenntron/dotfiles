@@ -6,7 +6,8 @@ globalDataLabels ={
   anchor: 'end'
   clamp: true
   font:
-    weight: 'bold'
+    weight: 600
+    size: 12
   display: (ctx) ->
     if ctx.dataset.data[ctx.dataIndex] >= 1
       return 'auto'
@@ -292,7 +293,7 @@ window.build_graph_ticket_entries_submitter = () ->
           datasets: [
             {
               label: 'Customer'
-              backgroundColor: '#6dbcdb'
+              backgroundColor: '#b5ebff'
               data: submitterCustomerChartData
             }
             {
@@ -345,7 +346,7 @@ window.build_graph_ticket_entries_submitter = () ->
           labels: submitterChartLabels
           datasets: [
             {
-              backgroundColor: '#6dbcdb'
+              backgroundColor: '#b5ebff'
               data: submitterCustomerChartData
             }
             {
@@ -440,7 +441,7 @@ window.build_single_closed_email_entries_resolution_piechart = () ->
             label: 'close-email-entries'
             backgroundColor: [
               '#3e5a72'
-              '#6dbcdb'
+              '#b5ebff'
               '#666'
             ]
             data: emailEntryData
@@ -522,7 +523,7 @@ window.build_single_time_to_close_linechart = () ->
           {
             data: timeToCloseTickets
             label: 'Time to Close:'
-            backgroundColor: '#6dbcdb'
+            backgroundColor: '#b5ebff'
             borderColor: '#55a3c1'
             borderWidth: 2
             fill: true
@@ -645,7 +646,7 @@ window.build_single_closed_web_entries_resolution_piechart = () ->
             label: 'close-email-entries'
             backgroundColor: [
               '#3e5a72'
-              '#6dbcdb'
+              '#b5ebff'
               '#666'
             ]
             data: emailEntryData
@@ -718,7 +719,7 @@ window.build_multi_closed_email_entries_resolution_piechart = () ->
             label: 'close-email-entries'
             backgroundColor: [
               '#3e5a72'
-              '#6dbcdb'
+              '#b5ebff'
               '#666'
             ]
             data: emailEntryData
@@ -790,7 +791,7 @@ window.build_multi_closed_web_entries_resolution_piechart = () ->
             label: 'close-email-entries'
             backgroundColor: [
               '#3e5a72'
-              '#6dbcdb'
+              '#b5ebff'
               '#666'
             ]
             data: emailEntryData
@@ -874,7 +875,7 @@ window.build_single_entries_closed_by_day_chart = () ->
         window.userTicketClosedGraphDatasets = [
           {
             label: 'Total Ticket Entries'
-            backgroundColor: '#6dbcdb'
+            backgroundColor: '#b5ebff'
             data: ticketTypeTotalData
           }
           {
@@ -989,7 +990,7 @@ window.build_multi_entries_closed_by_day_chart = () =>
       totalTicketEntriesbyType = [
         {
           label: 'Total Ticket Entries'
-          backgroundColor: '#6dbcdb'
+          backgroundColor: '#b5ebff'
           data: totalTicketEnties
         }
         {
@@ -1121,12 +1122,12 @@ window.build_multi_ticket_resolution_by_owner_chart = () ->
           datasets: [
             {
               label: 'Fixed FP'
-              backgroundColor: '#6dbcdb'
+              backgroundColor: '#b5ebff'
               data: fixedFPTickets
             }
             {
               label: 'Fixed FN'
-              backgroundColor: '#EFAF34'
+              backgroundColor: '#f9cf81'
               data: fixedFNTickets
             }
             {
@@ -1234,7 +1235,7 @@ window.build_multi_entries_closed_by_owners_chart = () ->
           data:
             labels: ticketOwners
             datasets: [ {
-              backgroundColor: '#6dbcdb'
+              backgroundColor: '#b5ebff'
               data: ticketEntriesByOwner
             } ]
           options:
@@ -1329,7 +1330,7 @@ window.build_multi_average_time_to_close_tickets = () ->
           data:
             labels: ticketOwners
             datasets: [ {
-              backgroundColor: '#6dbcdb'
+              backgroundColor: '#b5ebff'
               data: avgTimeToCloseTickets
             } ]
           options:
@@ -1416,7 +1417,7 @@ window.build_multi_rulehits_for_fp_res_chart = () ->
           data:
             labels: fpRules
             datasets: [ {
-              backgroundColor: '#6dbcdb'
+              backgroundColor: '#b5ebff'
               data: totalRuleHits
             } ]
           options:
