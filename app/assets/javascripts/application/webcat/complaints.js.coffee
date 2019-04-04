@@ -943,59 +943,80 @@ window.get_xbrs_history = (url, tab) ->
     headers: headers
     data: {'url': url}
     success: (response) ->
-      # Cycle through and assign index values to column headers
-      col_headers = []
-      i = 0
-      while i < response['columns'].length
-        $(response['columns']).each ->
-          col_defs = []
-          col_defs["index"] = i
-          col_defs["column"] = this.valueOf()
-          col_headers.push(col_defs)
-          i++
+      if response?
+        # Cycle through and assign index values to column headers
+        col_headers = []
+        i = 0
+        while i < response['columns'].length
+          $(response['columns']).each ->
+            col_defs = []
+            col_defs["index"] = i
+            col_defs["column"] = this.valueOf()
+            col_headers.push(col_defs)
+            i++
 
-      col_indexes = []
-      thead = '<thead><tr>'
-      $(col_headers).each ->
-        # We only want these specific columns
-        if this.column == "domain" || this.column == "subdomain" || this.column == "ctime" || this.column == "mtime" || this.column == "mnemonic" || this.column == "operation" || this.column == "path"
-          thead += '<th>' + this.column + '</th>'
-          col_indexes.push(this.index)
-      thead += '</tr></thead>'
-
-      row_data = []
-      # For each row of data, cycle through and assign index to each column
-      $(response['data']).each ->
-        col_data = []
-        d = 0
-        while d < this.length
-          $(this).each ->
-            data = []
-            data["index"] = d
-            data["data"] = this.valueOf()
-            col_data.push(data)
-            d++
-          row_data.push(col_data)
-
-      tbody = '<tbody>'
-      $(row_data).each ->
-        tbody += '<tr>'
-        row = this
-        $(row).each ->
-          col = this.index
-          col_content = this.data
-          # If our column header indexes and our column data indexes match we create the column in the table
-          if jQuery.inArray(col, col_indexes) != -1
-            if jQuery.type(col_content) == 'string' || jQuery.type(this) == 'number'
-              tbody += '<td>' + col_content + '</td>'
+        col_indexes = []
+        ctime_index = ''
+        thead = '<thead><tr>'
+        $(col_headers).each ->
+          # We only want these specific columns
+          if this.column == "domain" || this.column == "subdomain" || this.column == "ctime" || this.column == "mtime" || this.column == "mnemonic" || this.column == "operation" || this.column == "path"
+            if this.column == "ctime"
+              thead += '<th>Creation Time</th>'
+              ctime_index = this.index
+            else if this.column == "mtime"
+              thead += '<th>Last Modified</th>'
             else
-              # is null - prevents weird json objects getting through
-              tbody += '<td> - </td>'
-        tbody += '</tr>'
-      tbody += '</tbody>'
+              thead += '<th>' + this.column + '</th>'
+            col_indexes.push(this.index)
+        thead += '</tr></thead>'
 
-      $(xbrs_table).append(thead)
-      $(xbrs_table).append(tbody)
+        row_data = []
+        # For each row of data, cycle through and assign index to each column
+        $(response['data']).each ->
+          col_data = []
+          d = 0
+          while d < this.length
+            $(this).each ->
+              data = []
+              data["index"] = d
+              data["data"] = this.valueOf()
+              col_data.push(data)
+              d++
+            row_data.push(col_data)
+
+        # Sort rows by ctime
+        row_data.sort (a,b) ->
+          a1 = a[ctime_index]
+          b1 = b[ctime_index]
+          if a1.data == b1.data
+            return 0
+          if a1.data > b1.data then 1 else -1
+
+        tbody = '<tbody>'
+        $(row_data).each ->
+          tbody += '<tr>'
+          row = this
+          $(row).each ->
+            col = this.index
+            col_content = this.data
+            # If our column header indexes and our column data indexes match we create the column in the table
+            if jQuery.inArray(col, col_indexes) != -1
+              if jQuery.type(col_content) == 'string' || jQuery.type(this) == 'number'
+                tbody += '<td>' + col_content + '</td>'
+              else
+                # is null - prevents weird json objects getting through
+                tbody += '<td> - </td>'
+          tbody += '</tr>'
+        tbody += '</tbody>'
+
+
+
+        $(xbrs_table).append(thead)
+        $(xbrs_table).append(tbody)
+      else
+        # Message in case there is no history
+        $(xbrs_table).append('<tr><td class="missing-data">No XBRS History available.</td></tr>')
     error: (response) ->
       notice_html = "<p>Something went wrong: #{response.responseText}</p>"
   , this)
