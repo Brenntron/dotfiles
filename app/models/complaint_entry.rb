@@ -209,11 +209,7 @@ class ComplaintEntry < ApplicationRecord
       prefix_object = Wbrs::Prefix.new
       prefix_object.set_categories(category_ids_array, prefix_id: existing_prefix.prefix_id, user: user, description: description)
     else
-      if self.path.present?
-        Wbrs::Prefix.create_from_url(url: ip_or_uri + self.path, categories: category_ids_array, user: user, description: description)
-      else
-        Wbrs::Prefix.create_from_url(url: ip_or_uri, categories: category_ids_array, user: user, description: description)
-      end
+      Wbrs::Prefix.create_from_url(url: ip_or_uri, categories: category_ids_array, user: user, description: description)
     end
   end
 
