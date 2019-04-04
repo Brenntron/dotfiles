@@ -53,6 +53,20 @@ module API
                                                                user: current_user)
 
               if complaint_entries
+                should_reload = false
+                complaint_entries.each do |entry|
+                  if entry.uri.present?
+                    if entry.uri.include?("www") || entry.uri.include?("http")
+                      entry.uri = entry.uri.gsub(/\Ahttp[s]*\:\/\//, '').gsub(/\A[0-9]*www[0-9]*\./, '')
+                      entry.save
+                      should_reload = true
+                    end
+                  end
+                end
+
+                if should_reload
+                 complaint_entries.reload
+                end
 
                 complaint_entries.each do |complaint_entry|
                   complaint_entry_packet = {}
@@ -80,7 +94,7 @@ module API
                     complaint_entry_packet[:age] = complaint_age_int
                   end
 
-
+                  complaint_entry_packet[:uri] = complaint_entry.uri
                   complaint_entry_packet[:age_int] = (Time.now - complaint_entry.created_at).to_i
                   complaint_entry_packet[:complaint_id] = complaint_entry&.complaint.id
                   complaint_entry_packet[:entry_id] = complaint_entry.id

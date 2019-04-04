@@ -15,7 +15,7 @@ $second-section-color  : #fc4349;   /* Red            */
 $third-section-color   : #EFAF34;   /* Yellow Ochre   */
 $fourth-section-color  : #8cc63f;   /* Bright Green   */
 $fifth-section-color   : #65A1A1;   /* Dusty Teal     */
-
+$primary-section-color-light : #b5ebff;   /* Light Blue    */
 
 $bug-section-color         : $primary-section-color;
 $escalations-section-color : $second-section-color;
@@ -44,6 +44,7 @@ $success-trans: rgba(95, 183, 102, 0.15);
 $disabled-bg: #E5E5E5;
 $disabled-txt: #A0A0A0;
 $communication-accent-color: #C14B92;
+$yellow-graph-bar:#f9cf81;
 
 /* Content Label Color */
 $content-label-color: #999;     /* Light Grey     */
@@ -3821,7 +3822,7 @@ input.communication-subject {
 }
 
 .add-case-note-button:hover {
-  background-color: #E47433;
+  background-color: $warning-accent-color;
 }
 
 .new-case-note-row {display: none;}
@@ -7369,7 +7370,10 @@ td.text-center span {
     }
 
     .skyblue-legend-color::before {
-      background-color: $primary-section-color;
+      background-color: $primary-section-color-light;
+    }
+    .yellow-legend-color::before{
+      background-color: $yellow-graph-bar
     }
 
     .navyblue-legend-color::before {
@@ -7433,7 +7437,7 @@ td.text-center span {
   right: 20px;
 
   .total-legend {
-    background-color: skyblue;
+    background-color: $primary-section-color-light;
     width: 45px;
     height: 14px;
     position: relative;

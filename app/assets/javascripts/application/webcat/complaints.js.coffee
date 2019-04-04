@@ -18,27 +18,34 @@ window.updateURI = (event, complaint_entry_id) ->
     url: "/escalations/api/v1/escalations/webcat/complaints/update_uri"
     data: {complaint_entry_id: complaint_entry_id, uri: uri }
     success: (response) ->
+      {current_categories, category, wbrs_score, domain, subdomain, status} = response.json
+
       $('#loader-modal').modal 'hide'
 
       $(".simple-nested-table##{complaint_entry_id} tbody > tr").remove()
 
-      if 'ip' == response.status
+      if 'ip' == status
         std_msg_error("Cannot edit IP entries.","")
       else
-        if response.preload
-          $.each response.data, (key, entry) ->
-            $(".simple-nested-table##{complaint_entry_id}").append("<tr><td>#{entry.confidence}</td><td>#{entry.mnemonic}</td><td>#{entry.name}</td><td>NA</span></td></tr>")
+        $.each current_categories, (key, entry) ->
+          $(".simple-nested-table##{complaint_entry_id}").append("<tr><td>#{entry.confidence}</td><td>#{entry.mnem} - #{entry.descr}</td><td>#{entry.top_certainty}</span></td></tr>")
 
-        $("#domain_#{complaint_entry_id}").text(response.domain)
-        $("#subdomain_#{complaint_entry_id}").text(response.subdomain)
+        $("#domain_#{complaint_entry_id}").text(domain)
+        $("#subdomain_#{complaint_entry_id}").text(subdomain)
+        $("#category_#{complaint_entry_id}").text(category)
+        $("#wbrs_score_#{complaint_entry_id}").text(wbrs_score)
+
         $("#entry-uri-#{complaint_entry_id}").html("<a href='http://#{uri}' target='_blank' onclick='select_cat_text_field(#{complaint_entry_id})' >#{uri}</a>")
         $("#site-search-#{complaint_entry_id}").html("<a href='https://www.google.com/search?q=site%3A#{uri}' target='_blank' onclick='select_cat_text_field(#{complaint_entry_id})'>#{uri}</a>")
 
-
+        $("#lookup-#{complaint_entry_id}").replaceWith('<button class="secondary" id="lookup-' + complaint_entry_id + '" onclick="WebCat.RepLookup.queryWhoIs(\'' + domain + '\')">Lookup</button>')
         $("#history-#{complaint_entry_id}").replaceWith('<button class="secondary" id="history-' + complaint_entry_id + '" onclick="history_dialog(' + complaint_entry_id + ',\'' + uri + '\')">History</button>')
-        $("#domain-#{complaint_entry_id}").replaceWith('<button class="secondary" id="domain-' + complaint_entry_id + '" onclick="domain_whois(\''+response.domain+'\')">Domain</button>')
+        $("#domain-#{complaint_entry_id}").replaceWith('<button class="secondary" id="domain-' + complaint_entry_id + '" onclick="domain_whois(\''+domain+'\')">Domain</button>')
+    error: (response) ->
+      $('#loader-modal').modal 'hide'
+      std_msg_error("Unable to update URI", [response.responseJSON.message], reload: false)
 
-  )
+ )
 
 window.cat_new_url = ()->
 
@@ -611,6 +618,7 @@ format = (complaint_entry_row) ->
   url = ''
   search_uri = ''
   if complaint_entry.uri
+    host = complaint_entry.uri
     uri = '<a href="http://' + complaint_entry.uri + '" onclick="select_cat_text_field(' + complaint_entry.entry_id + ')">' + complaint_entry.uri + '</a>'
     search_uri = '<a href="https://www.google.com/search?q=site%3A' + complaint_entry.uri + '" onclick="select_cat_text_field(' + complaint_entry.entry_id + ')">' + complaint_entry.uri + '</a>'
   else if complaint_entry.domain
@@ -755,11 +763,13 @@ format = (complaint_entry_row) ->
   input_cat = 'input_cat_' + complaint_entry.entry_id
 
   if complaint_entry.status == "PENDING"
+    complaint_table_row_html = '<table class="active_table"><tr class="pending"><td class="no_pad"><div class="row">'
     complaint_submission_html =
         '<input type="radio" name="resolution_review_' + complaint_entry.entry_id + '" value="commit" > Commit <br/>' +
         '<input type="radio" name="resolution_review_' + complaint_entry.entry_id + '" value="decline" checked="checked"> Decline' +
         '<br/><button class="tertiary" onclick="updatePending(' + complaint_entry.entry_id + ',' + row_id + ')"> Submit </button></div>'
   else
+    complaint_table_row_html = '<table class="active_table"><tr class="active_master_submit" type="submit_changes" entry_id="' + complaint_entry.entry_id + '"  row_id = "' + row_id + '"><td class="no_pad"><div class="row">'
     complaint_submission_html =
         '<input type="radio" class="resolution_radio_button" id="unchanged' + complaint_entry.entry_id + '" name="resolution' + complaint_entry.entry_id + '" value="UNCHANGED" ' + unchanged_radio + entry_status + '> Unchanged <br/> ' +
         '<input type="radio" class="resolution_radio_button" id="fixed' + complaint_entry.entry_id + '" name="resolution' + complaint_entry.entry_id + '" value="FIXED"  ' + fixed_radio + entry_status + '> Fixed  <br/> ' +
@@ -769,7 +779,7 @@ format = (complaint_entry_row) ->
         '</div>'
 
   complaint_entry_html =
-      '<table class="active_table"><tr><td class="no_pad"><div class="row">' +
+      complaint_table_row_html +
       '<div class="col-xs-12 col-sm-6 nested-complaint-static-data">' +
       '<div class="row">' +
       '<div class="col-xs-5 col-with-divider">' +
@@ -1125,10 +1135,12 @@ window.click_table_buttons = (complaint_table, button)->
       options: AC.WebCat.createSelectOptions(),
       items: selected_options(row.data().category),
       onItemAdd: ->
-        if !$(this)[0].$input.hasClass('pending')
+        if verifyMasterSubmit() == true
           $('#master-submit').prop('disabled', false)
       onItemRemove: ->
-        if $(this)[0].items.length == 0
+        if verifyMasterSubmit() == true
+          $('#master-submit').prop('disabled', false)
+        else
           $('#master-submit').prop('disabled', true)
     }
     # Check to see which columns should be displayed
@@ -1550,7 +1562,7 @@ window.master_submit = () ->
         std_msg_error(error_msg,"")
       else
         $('#loader-modal').modal 'hide'
-        std_msg_success("All complaints successfully processed.")
+        std_msg_success('Success',["All complaints successfully processed."], reload: true)
 
       tds = $('#complaints-index tbody').closest('td')
       for td in tds
@@ -1571,6 +1583,7 @@ window.verifyMasterSubmit = () ->
       if (!$(this).closest('tr').hasClass("pending"))
         boolean = true
   return boolean
+
 $ ->
   $('#cat_new_url_modal').on 'shown.bs.modal', ->
     $('#url_1').focus()

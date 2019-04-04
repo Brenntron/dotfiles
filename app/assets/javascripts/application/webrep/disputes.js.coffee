@@ -1,5 +1,5 @@
 $(document).ready ->
-
+  Chart.defaults.global.plugins.datalabels.display = false
   $('span#mark-as-related').on 'show.bs.dropdown', ->
     if $('.dispute_check_box:checked').length == 0
       std_msg_error('No rows selected', ['Please select at least one row.'])
