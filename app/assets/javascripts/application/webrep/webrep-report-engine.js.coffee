@@ -21,26 +21,6 @@ getSum = (total, num) -> return total + num
 
 reduceDecimal = (num) -> return Math.round(num * 100) / 100
 
-buildCharts = ()->
-  user_id = $("#user_id").val()
-
-  window.build_graph_ticket_entries_submitter()
-  window.build_single_closed_email_entries_resolution_piechart()
-  window.build_single_closed_web_entries_resolution_piechart()
-  window.build_multi_closed_email_entries_resolution_piechart()
-  window.build_multi_closed_web_entries_resolution_piechart()
-  window.build_single_entries_closed_by_day_chart()
-  window.build_multi_average_time_to_close_tickets()
-  window.refresh_multi_closed_tickets_table()
-  window.refresh_multi_open_tickets_table()
-  window.refresh_single_open_tickets_table(user_id)
-  window.refresh_single_closed_tickets_table(user_id)
-  window.build_multi_entries_closed_by_owners_chart()
-  window.build_multi_rulehits_for_fp_res_chart()
-  window.build_multi_entries_closed_by_day_chart()
-  window.build_multi_ticket_resolution_by_owner_chart()
-  window.build_single_time_to_close_linechart()
-
 window.populate_top_banner = ()->
   from = localStorage.getItem('webrep_report_range_from')
   to = localStorage.getItem('webrep_report_range_to')
@@ -75,7 +55,23 @@ window.change_reported_week = (new_report_range_from, new_report_range_to)->
 
 window.refresh_visable_report_tab = ()->
   if $('#dashboard-tab-list').length > 0
-    buildCharts()
+    user_id = $("#user_id").val()
+    window.build_graph_ticket_entries_submitter()
+    window.build_single_closed_email_entries_resolution_piechart()
+    window.build_single_closed_web_entries_resolution_piechart()
+    window.build_multi_closed_email_entries_resolution_piechart()
+    window.build_multi_closed_web_entries_resolution_piechart()
+    window.build_single_entries_closed_by_day_chart()
+    window.build_multi_average_time_to_close_tickets()
+    window.refresh_multi_closed_tickets_table()
+    window.refresh_multi_open_tickets_table()
+    window.refresh_single_open_tickets_table(user_id)
+    window.refresh_single_closed_tickets_table(user_id)
+    window.build_multi_entries_closed_by_owners_chart()
+    window.build_multi_rulehits_for_fp_res_chart()
+    window.build_multi_entries_closed_by_day_chart()
+    window.build_multi_ticket_resolution_by_owner_chart()
+    window.build_single_time_to_close_linechart()
 
 window.refresh_single_open_tickets_table = (user_id)->
   from = localStorage.getItem('webrep_report_range_from')
