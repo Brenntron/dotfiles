@@ -8,6 +8,8 @@ globalDataLabels ={
   font:
     weight: 600
     size: 12
+  textStrokeColor:'white'
+  textStrokeWidth: 3
   display: (ctx) ->
     if ctx.dataset.data[ctx.dataIndex] >= 1
       return 'auto'
