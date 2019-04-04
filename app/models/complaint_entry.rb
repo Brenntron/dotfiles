@@ -190,7 +190,6 @@ class ComplaintEntry < ApplicationRecord
     # Look for existing prefix
     url_parts = Complaint.parse_url(ip_or_uri)
     existing_prefixes = Wbrs::Prefix.where({urls: [ip_or_uri]})
-
     existing_prefix = nil
     
     if existing_prefixes.present?
