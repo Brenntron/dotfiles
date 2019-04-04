@@ -757,11 +757,13 @@ format = (complaint_entry_row) ->
   input_cat = 'input_cat_' + complaint_entry.entry_id
 
   if complaint_entry.status == "PENDING"
+    complaint_table_row_html = '<table class="active_table"><tr class="pending"><td class="no_pad"><div class="row">'
     complaint_submission_html =
         '<input type="radio" name="resolution_review_' + complaint_entry.entry_id + '" value="commit" > Commit <br/>' +
         '<input type="radio" name="resolution_review_' + complaint_entry.entry_id + '" value="decline" checked="checked"> Decline' +
         '<br/><button class="tertiary" onclick="updatePending(' + complaint_entry.entry_id + ',' + row_id + ')"> Submit </button></div>'
   else
+    complaint_table_row_html = '<table class="active_table"><tr class="active_master_submit" type="submit_changes" entry_id="' + complaint_entry.entry_id + '"  row_id = "' + row_id + '"><td class="no_pad"><div class="row">'
     complaint_submission_html =
         '<input type="radio" class="resolution_radio_button" id="unchanged' + complaint_entry.entry_id + '" name="resolution' + complaint_entry.entry_id + '" value="UNCHANGED" ' + unchanged_radio + entry_status + '> Unchanged <br/> ' +
         '<input type="radio" class="resolution_radio_button" id="fixed' + complaint_entry.entry_id + '" name="resolution' + complaint_entry.entry_id + '" value="FIXED"  ' + fixed_radio + entry_status + '> Fixed  <br/> ' +
@@ -771,7 +773,7 @@ format = (complaint_entry_row) ->
         '</div>'
 
   complaint_entry_html =
-      '<table class="active_table"><tr><td class="no_pad"><div class="row">' +
+      complaint_table_row_html +
       '<div class="col-xs-12 col-sm-6 nested-complaint-static-data">' +
       '<div class="row">' +
       '<div class="col-xs-5 col-with-divider">' +
@@ -979,10 +981,12 @@ window.click_table_buttons = (complaint_table, button)->
       options: AC.WebCat.createSelectOptions(),
       items: selected_options(row.data().category),
       onItemAdd: ->
-        if !$(this)[0].$input.hasClass('pending')
+        if verifyMasterSubmit() == true
           $('#master-submit').prop('disabled', false)
       onItemRemove: ->
-        if $(this)[0].items.length == 0
+        if verifyMasterSubmit() == true
+          $('#master-submit').prop('disabled', false)
+        else
           $('#master-submit').prop('disabled', true)
     }
     # Check to see which columns should be displayed
@@ -1404,7 +1408,7 @@ window.master_submit = () ->
         std_msg_error(error_msg,"")
       else
         $('#loader-modal').modal 'hide'
-        std_msg_success("All complaints successfully processed.")
+        std_msg_success('Success',["All complaints successfully processed."], reload: true)
 
       tds = $('#complaints-index tbody').closest('td')
       for td in tds
@@ -1425,6 +1429,7 @@ window.verifyMasterSubmit = () ->
       if (!$(this).closest('tr').hasClass("pending"))
         boolean = true
   return boolean
+
 $ ->
   $('#cat_new_url_modal').on 'shown.bs.modal', ->
     $('#url_1').focus()
