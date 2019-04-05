@@ -82,7 +82,7 @@ Rails.application.routes.draw do
     end
 
     namespace :file_rep do
-      root 'root#index'
+      root 'disputes#index'
       resources :disputes, only: [:index, :show]
     end
 
