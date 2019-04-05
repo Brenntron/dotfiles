@@ -9,9 +9,15 @@ RSpec.describe "Peake-Bridge file rep create channel", type: :request do
             sender: "talos-intelligence"
         },
         message: {
-            file_rep_name: 'Steve',
-            sha256_checksum: 'c01b39c7a35ccc3b081a3e83d2c71fa9a767ebfeb45c69f08e17dfe3ef375a7b',
-            email: 'steve@arora.org'
+            file_reputation_dispute: {
+                file_rep_name: 'Steve',
+                sha256_checksum: 'c01b39c7a35ccc3b081a3e83d2c71fa9a767ebfeb45c69f08e17dfe3ef375a7b',
+                email: 'steve@arora.org'
+            },
+            sender_data: {
+                ticketable_type: 'FileReputationDispute',
+                ticketable_id: 1001
+            }
         }
     }
   end
@@ -23,7 +29,7 @@ RSpec.describe "Peake-Bridge file rep create channel", type: :request do
            params: file_rep_create_message_json
 
       expect(response.code).to eq('200')
-    end.to change { FileRep.count }
+    end.to change { FileReputationDispute.count }
   end
 end
 

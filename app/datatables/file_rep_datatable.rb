@@ -2,9 +2,9 @@ class FileRepDatatable < AjaxDatatablesRails::ActiveRecord
 
   def view_columns
     @view_columns ||= {
-      name:               { data: :name, source: 'FileRep.file_rep_name', cond: :like },
-      sha256_checksum:    { data: :sha256, source: 'FileRep.sha256_checksum', cond: :like },
-      email:              { data: :email, source: 'FileRep.email', cond: :like },
+      name:               { data: :name, source: 'FileReputationDispute.file_rep_name', cond: :like },
+      sha256_checksum:    { data: :sha256, source: 'FileReputationDispute.sha256_checksum', cond: :like },
+      email:              { data: :email, source: 'FileReputationDispute.email', cond: :like },
     }
   end
 
@@ -20,7 +20,7 @@ class FileRepDatatable < AjaxDatatablesRails::ActiveRecord
   end
 
   def get_raw_records
-    FileRep.all
+    FileReputationDispute.all
   end
 
 end
