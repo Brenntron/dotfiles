@@ -5,9 +5,9 @@ $ ->
     ajax: $('#file-rep-datatable').data('source')
     pagingType: 'full_numbers'
     columns: [
-      {data: 'name'}
-      {data: 'sha256_checksum'}
-      {data: 'email'}
+      {data: 'status'}
+      {data: 'sha256_hash'}
+      {data: 'source'}
     ]
 
 
