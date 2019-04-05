@@ -1,7 +1,7 @@
 Chart.defaults.global.plugins.datalabels.display = false
 Chart.defaults.global.tooltips = false;
 Chart.defaults.global.layout.padding = {top: 10, right: 10}
-console.log(Chart.defaults.global)
+
 globalDataLabels ={
   color: '#000'
   anchor: 'end'
