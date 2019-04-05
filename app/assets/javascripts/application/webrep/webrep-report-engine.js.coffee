@@ -13,12 +13,17 @@ globalDataLabels ={
   display: (ctx) ->
     return ctx.dataset.data[ctx.dataIndex] >= 1
   formatter: (value) ->
-    return reduceDecimal(value)
+    if value % 1 == 0
+      return value
+    else
+      return reduceDecimal(value)
 }
 
 getSum = (total, num) -> return total + num
 
-reduceDecimal = (num) -> return Math.round(num * 100) / 100
+reduceDecimal = (num) ->
+    num = Math.round(num * 100) / 100
+    return Number.parseFloat(num).toFixed(2);
 
 window.populate_top_banner = ()->
   from = localStorage.getItem('webrep_report_range_from')
