@@ -20,6 +20,10 @@ getSum = (total, num) -> return total + num
 
 reduceDecimal = (num) -> return Math.round(num * 100) / 100
 
+pieChartLabelFormat = (num) ->
+  if num > 0
+    return num + '%'
+
 window.populate_top_banner = ()->
   from = localStorage.getItem('webrep_report_range_from')
   to = localStorage.getItem('webrep_report_range_to')
@@ -449,7 +453,7 @@ window.build_single_closed_email_entries_resolution_piechart = () ->
           legend: false
           pieceLabel:
             render: (args) ->
-              return args.percentage + '%'
+              pieChartLabelFormat(args.percentage)
             position: 'outside'
             segment: false
             precision: 2
@@ -654,7 +658,7 @@ window.build_single_closed_web_entries_resolution_piechart = () ->
           legend: false
           pieceLabel:
             render: (args) ->
-              return args.percentage + '%'
+              pieChartLabelFormat(args.percentage)
             position: 'outside'
             segment: false
             precision: 2
@@ -727,7 +731,7 @@ window.build_multi_closed_email_entries_resolution_piechart = () ->
           legend: false
           pieceLabel:
             render: (args) ->
-              return args.percentage + '%'
+              pieChartLabelFormat(args.percentage)
             position: 'outside'
             segment: false
             precision: 2
@@ -799,7 +803,7 @@ window.build_multi_closed_web_entries_resolution_piechart = () ->
           legend: false
           pieceLabel:
             render: (args) ->
-              return args.percentage + '%'
+              pieChartLabelFormat(args.percentage)
             position: 'outside'
             segment: false
             precision: 2
