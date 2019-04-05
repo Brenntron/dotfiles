@@ -16,9 +16,11 @@ $ ->
       {data: 'source'}
       #{data: 'platform'}
       #{data: 'sandbox_score'}
+      #{data: 'sandbox_threshold'}
       #{data: 'sandbox_under'} # true if score is under threshold
       #{data: 'sandbox_signer'}
       #{data: 'threatgrid_score'}
+      #{data: 'threatgrid_threshold'}
       #{data: 'threatgrid_under'} # true if score is under threshold
       #{data: 'threatgrid_signer'}
       #{data: 'reversing_labs_score'}
