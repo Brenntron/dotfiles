@@ -10,5 +10,6 @@ class Escalations::FileRep::DisputesController < ApplicationController
   end
 
   def show
+    @file_rep_dispute = FileReputationDispute.find(params[:id])
   end
 end
