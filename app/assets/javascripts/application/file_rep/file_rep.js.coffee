@@ -6,7 +6,10 @@ $ ->
     ajax:
       url: file_rep_url
       data:
-        search_name: 'OPEN TICKETS!'
+        search_type: 'advanced'
+        search_name: 'shaky'
+        search_conditions:
+          status: 'shaky'
     pagingType: 'full_numbers'
     columns: [
       #{data: 'id'}

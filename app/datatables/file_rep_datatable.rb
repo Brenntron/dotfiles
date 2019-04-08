@@ -1,8 +1,11 @@
 class FileRepDatatable < AjaxDatatablesRails::ActiveRecord
 
-  def initialize(params, options = {}, extra)
-    @search_name = extra[:search_name]
-    super(params, options)
+  def initialize(params, search_params)
+    byebug
+    @search_type = search_params['search_type']
+    @search_name = search_params['search_name']
+    @search_conditions = search_params['search_conditions']&.to_h
+    super(params, {})
   end
 
   def view_columns
@@ -73,11 +76,10 @@ class FileRepDatatable < AjaxDatatablesRails::ActiveRecord
   end
 
   def filter_records(records)
-    if @search_name
-      records.where(status: 'shaky')
+    if @search_type
+      super.robust_search(@search_type, search_name: @search_name, params: @search_conditions)
     else
-      records.where(build_conditions)
+      super
     end
   end
-
 end
