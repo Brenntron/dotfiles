@@ -685,6 +685,8 @@ button {
 .ticket-owner-button {background-image: url(image_path('icon_user_grey.svg'));}
 .sort-by-button {background-image: url(image_path('icon_sort_by.svg'));}
 .sync-button {background-image: url(image_path('icon_sync.svg'));}
+.detection-button {background-image: url(image_path('icon_hazard.svg'));}
+.disposition-button {background-image: url(image_path('icon_target.svg'));}
 
 .master-submit-button {
   color: $content-bg-color;

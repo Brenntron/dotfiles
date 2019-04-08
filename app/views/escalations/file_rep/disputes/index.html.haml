@@ -2,7 +2,152 @@
   %h1#filerep-index-title All File Reputation Tickets
 
   -#Toolbar here
-  Add table below
+  .toolbar
+    %div
+      %label.toolbar-section-label
+        View
+      %span.dropdown
+        %button#table-show-columns-button.toolbar-button.show-col-button.dropdown-toggle.esc-tooltipped{title: 'Show/Hide Columns', 'data-toggle': 'dropdown', 'aria-haspopup': 'true', 'aria-expanded': 'false'}
+          %span.toolbar-button-text
+            Show/Hide Columns
+        .dropdown-menu.toolbar-dropdown#table-show-columns-dropdown{'aria-labelledby': 'table-show-columns-button'}
+          .dropdown-menu-content-block
+            .dropdown-menu-toolbar-header.ticket-showcol-header Ticket Entry Details
+            %ul
+              %li.toggle-vis{'data-column':'2'}
+                %input{type: 'checkbox', checked: true, id: 'priority-checkbox'} Priority
+              %li.toggle-vis{'data-column':'3'}
+                %input{type: 'checkbox', checked: true, id: 'case-id-checkbox'} Case ID
+              %li.toggle-vis{'data-column':'4'}
+                %input{type: 'checkbox', checked: true, id: 'status-checkbox'} Status
+              %li.toggle-vis{'data-column':'5'}
+                %input{type: 'checkbox', id: 'resolution-checkbox'} Resolution
+              %li.toggle-vis{'data-column':'6'}
+                %input{type: 'checkbox', id: 'submission-type-checkbox'} Ticket Type
+              %li.toggle-vis{'data-column':'7'}
+                %input{type: 'checkbox', checked: true, id: 'dispute-checkbox'} Dispute
+              %li.toggle-vis{'data-column':'8'}
+                %input{type: 'checkbox', checked: true, id: 'owner-checkbox'} Owner
+              %li.toggle-vis{'data-column':'9'}
+                %input{type: 'checkbox', checked: true, id: 'time-submitted-checkbox'} Time Submitted
+
+            %ul
+              %li.toggle-vis{'data-column':'10'}
+                %input{type: 'checkbox', checked: true, id: 'age-checkbox' } Age
+              %li.toggle-vis{'data-column':'11'}
+                %input{type: 'checkbox', id: 'case-origin-checkbox'} Case Origin
+              %li.toggle-vis{'data-column':'12'}
+                %input{type: 'checkbox', id: 'submitter-type-checkbox'} Submitter Type
+              %li.toggle-vis{'data-column':'13'}
+                %input{type: 'checkbox', id: 'submitter-org-checkbox'} Submitter Org
+              %li.toggle-vis{'data-column':'14'}
+                %input{type: 'checkbox', id: 'submitter-domain-checkbox'} Submitter Domain
+              %li.toggle-vis{'data-column':'15'}
+                %input{type: 'checkbox', id: 'contact-name-checkbox'} Contact Name
+              %li.toggle-vis{'data-column':'16'}
+                %input{type: 'checkbox', id: 'contact-email-checkbox'} Contact Email
+              %li.toggle-vis{'data-column':'17'}
+                %input{type: 'checkbox', id: 'status-comment-checkbox'} Status Comment
+
+    %div
+      %label.toolbar-section-label
+        Owner
+      %button.take-ticket-button#index_ticket_assign.esc-tooltipped{title: 'Assign to me', onclick: 'take_disputes();'}
+        %span.toolbar-button-text
+
+      %span.dropdown
+        %button#index_change_assign.toolbar-button.ticket-owner-button.show-col-button.dropdown-toggle.esc-tooltipped{title: 'Change Assignee', 'data-toggle': 'dropdown', 'aria-haspopup': 'true', 'aria-expanded': 'false'}
+          %span.toolbar-button-text
+            Change Assignee
+        .dropdown-menu.toolbar-dropdown#index-change-assign-dropdown{'aria-labelledby': 'index_change_assign'}
+          .toolbar
+            %div
+              %label.toolbar-section-label Assignee
+              %select{name: 'index_target_assignee', id: 'index_target_assignee', class:'toolbar-select'}
+                - User.joins(roles: :org_subset).where(org_subsets: { name: 'webrep' }).distinct.order(:cvs_username).each do |u|
+                  %option{id: u.id, value: u.id, label: u.cvs_username}
+            %button{class: 'primary', type:'button', id: 'button_reassign', onclick:'toolbar_index_change_assignee();'}
+              Assign
+
+    %div
+      %label.toolbar-section-label
+        Edit Ticket
+      %span.dropdown
+        %button#index_ticket_status.toolbar-button.ticket-status-button.dropdown-button-margin-right.dropdown-toggle.esc-tooltipped{title: 'Edit Ticket Status', 'data-toggle': 'dropdown', 'aria-haspopup': 'true', 'aria-expanded': 'false'}
+          %span.toolbar-button-text
+            Edit Ticket Status
+        .dropdown-menu.toolbar-dropdown#index-edit-ticket-status-dropdown{'aria-labelledby': 'index_ticket_status'}
+          %ul
+            %li.status-radio-wrapper
+              %input.ticket-status-radio{type: 'radio', name: 'ticket-status', id: 'RESEARCHING', value:'RESEARCHING' }
+              %label.ticket-status-radio-label.radio-label{for: 'RESEARCHING'} Researching
+            %li.status-radio-wrapper
+              %input.ticket-status-radio{type: 'radio', name: 'ticket-status', id: 'ESCALATED', value: 'ESCALATED'}
+              %label.ticket-status-radio-label.radio-label{for: 'ESCALATED'} Escalated
+            %li.status-radio-wrapper
+              %input.ticket-status-radio{type: 'radio', name: 'ticket-status', id: 'CUSTOMER_PENDING', value: 'CUSTOMER_PENDING'}
+              %label.ticket-status-radio-label.radio-label{for: 'CUSTOMER_PENDING'} Customer Pending
+            %li.status-radio-wrapper
+              %input.ticket-status-radio{type: 'radio', name: 'ticket-status', id: 'ON_HOLD', value: 'ON_HOLD'}
+              %label.ticket-status-radio-label.radio-label{for: 'ON_HOLD'} On Hold
+            %li.status-radio-wrapper
+              %input.ticket-status-radio.index-resolution-drodown-menu{type: 'radio', name: 'ticket-status', id: 'RESOLVED_CLOSED', value: 'RESOLVED_CLOSED'}
+              %label.ticket-status-radio-label.radio-label{for: 'RESOLVED_CLOSED'} Resolved / Closed
+              .dropdown-menu#index-ticket-resolution-submenu
+                .col-xs-6.submenu-left-wrapper
+                  .submenu-header
+                    Ticket Resolution
+                  %ul
+                    %li
+                      %input.ticket-resolution-radio{type: 'radio', name: 'ticket-resolution', id: 'FIXED_FP', value: 'FIXED_FP'}
+                      %label.ticket-res-radio-label.radio-label{for: 'FIXED_FP'} Fixed - FP
+                    %li
+                      %input.ticket-resolution-radio{type: 'radio', name: 'ticket-resolution', id: 'FIXED_FN', value: 'FIXED_FN'}
+                      %label.ticket-res-radio-label.radio-label{for: 'FIXED_FN'} Fixed - FN
+                    %li
+                      %input.ticket-resolution-radio{type: 'radio', name: 'ticket-resolution', id: 'UNCHANGED', value: 'UNCHANGED'}
+                      %label.ticket-res-radio-label.radio-label{for: 'UNCHANGED'} Unchanged
+                    %li
+                      %input.ticket-resolution-radio{type: 'radio', name: 'ticket-resolution', id: 'INVALID', value: 'INVALID'}
+                      %label.ticket-res-radio-label.radio-label{for: 'INVALID'} Invalid / Junk Mail
+                    %li
+                      %input.ticket-resolution-radio{type: 'radio', name: 'ticket-resolution', id: 'TEST_TRAINING', value: 'TEST_TRAINING'}
+                      %label.ticket-res-radio-label.radio-label{for: 'TEST_TRAINING'} Test / Training
+                    %li
+                      %input.ticket-resolution-radio{type: 'radio', name: 'ticket-resolution', id: 'OTHER', value: 'OTHER'}
+                      %label.ticket-res-radio-label.radio-label{for: 'OTHER'} Other
+                .col-xs-6.submenu-right-wrapper
+                  .resolution-comment-wrapper
+                    %label.content-label-sm.customer-facing-comment
+                      Customer Facing Comment
+                    %textarea.ticket-status-comment
+                    .button-row-center
+                      %button.primary.change_ticket_status_button{type:'button', id:'webrep_resolve_ticket', onclick:'change_ticket_status();'}
+                        Submit
+
+      %span.dropdown
+        %button#file-disp-button.toolbar-button.disposition-button.dropdown-toggle.esc-tooltipped{title: 'Change Disposition', 'data-toggle': 'dropdown', 'aria-haspopup': 'true', 'aria-expanded': 'false'}
+          %span.toolbar-button-text
+            Change Disposition
+        .dropdown-menu.toolbar-dropdown#file-disp-dropdown{'aria-labelledby': 'file-disp-button'}
+          Disposition dropdown
+
+      %span.dropdown
+        %button#file-det-button.toolbar-button.detection-button.dropdown-toggle.esc-tooltipped{title: 'Create Detection', 'data-toggle': 'dropdown', 'aria-haspopup': 'true', 'aria-expanded': 'false'}
+          %span.toolbar-button-text
+            Create Detection
+        .dropdown-menu.toolbar-dropdown#file-det-dropdown{'aria-labelledby': 'file-disp-button'}
+          Detection dropdown
+
+    %div
+      %label.toolbar-section-label
+        File
+      %form#disputes-index-export-form{action: escalations_webrep_disputes_path(format: :xlsx), method: :get}
+        = hidden_field_tag('data_json', '{}', id: 'disputes-index-export-data-input')
+        %button.toolbar-button.export-button.esc-tooltipped{title: 'Export to CSV'}
+          %span.toolbar-button-text
+            Export to CSV
+
   .row
     .col-xs-12
       %table.table.responsive#file-rep-datatable{'data-source': escalations_file_rep_disputes_path(format: :json)}
