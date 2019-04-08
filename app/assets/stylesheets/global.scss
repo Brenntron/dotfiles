@@ -8275,3 +8275,25 @@ hr.thin.form-divider {
 .history-table {
   background-color: $content-bg-color;
 }
+
+#file-index-table-show-columns-dropdown {
+  min-width: 390px;
+}
+
+#file-index-table-show-columns-dropdown ul {
+  display: block;
+  padding: 10px;
+}
+
+#file-index-table-show-columns-dropdown ul:first-of-type {
+  float: left;
+}
+
+#file-index-table-show-columns-dropdown ul li {
+  padding: 4px 12px;
+  font-size: 9pt;
+}
+
+#file-index-table-show-columns-dropdown ul li input {
+  margin-right: 8px;
+}
