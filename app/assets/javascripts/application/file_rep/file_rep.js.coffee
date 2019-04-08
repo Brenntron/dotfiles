@@ -1,5 +1,18 @@
 $ ->
+
   file_rep_url = $('#file-rep-datatable').data('source')
+
+  window.get_search_name = () ->
+    current_url = window.location.href
+    search_param_regex = /f=(.*)/
+    filter_rep_search_name = 'all'
+
+    if current_url.match('f=')
+      # if the url has string that indicates a search param has been added, return the search param
+      filter_rep_search_name = search_param_regex.exec(current_url)[1]
+
+    return filter_rep_search_name
+
   $('#file-rep-datatable').dataTable
     processing: true
     serverSide: true
@@ -7,7 +20,7 @@ $ ->
       url: file_rep_url
       data:
         search_type: 'advanced'
-        search_name: 'shaky'
+        search_name: get_search_name()
         search_conditions:
           status: 'shaky'
     pagingType: 'full_numbers'
