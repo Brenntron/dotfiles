@@ -502,7 +502,6 @@ ActiveRecord::Schema.define(version: 2019_04_08_203516) do
     t.string "file_rep_name"
     t.text "sha256_checksum"
     t.string "email"
-    t.bigint "user_id"
   end
 
   create_table "file_reputation_disputes", options: "ENGINE=InnoDB DEFAULT CHARSET=utf8", force: :cascade do |t|
@@ -525,6 +524,7 @@ ActiveRecord::Schema.define(version: 2019_04_08_203516) do
     t.string "threatgrid_signer"
     t.float "reversing_labs_score"
     t.string "reversing_labs_signer"
+    t.bigint "user_id"
     t.index ["customer_id"], name: "index_file_reputation_disputes_on_customer_id"
     t.index ["sha256_hash"], name: "index_file_reputation_disputes_on_sha256_hash"
   end
