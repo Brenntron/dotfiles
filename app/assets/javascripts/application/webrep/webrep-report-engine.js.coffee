@@ -1,5 +1,6 @@
 Chart.defaults.global.plugins.datalabels.display = false
 Chart.defaults.global.tooltips = false;
+Chart.defaults.global.layout.padding = {top: 10, right: 10}
 
 globalDataLabels ={
   color: '#000'
