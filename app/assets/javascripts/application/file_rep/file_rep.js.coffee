@@ -1,8 +1,12 @@
 $ ->
+  file_rep_url = $('#file-rep-datatable').data('source')
   $('#file-rep-datatable').dataTable
     processing: true
     serverSide: true
-    ajax: $('#file-rep-datatable').data('source')
+    ajax:
+      url: file_rep_url
+      data:
+        search_name: 'OPEN TICKETS!'
     pagingType: 'full_numbers'
     columns: [
       #{data: 'id'}
