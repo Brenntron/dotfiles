@@ -1,7 +1,6 @@
 class FileRepDatatable < AjaxDatatablesRails::ActiveRecord
 
   def initialize(params, search_params)
-    byebug
     @search_type = search_params['search_type']
     @search_name = search_params['search_name']
     @search_conditions = search_params['search_conditions']&.to_h
