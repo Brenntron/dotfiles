@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 2019_04_05_132032) do
+ActiveRecord::Schema.define(version: 2019_04_08_203516) do
 
   create_table "alerts", options: "ENGINE=InnoDB DEFAULT CHARSET=utf8", force: :cascade do |t|
     t.datetime "created_at", null: false
@@ -502,6 +502,7 @@ ActiveRecord::Schema.define(version: 2019_04_05_132032) do
     t.string "file_rep_name"
     t.text "sha256_checksum"
     t.string "email"
+    t.bigint "user_id"
   end
 
   create_table "file_reputation_disputes", options: "ENGINE=InnoDB DEFAULT CHARSET=utf8", force: :cascade do |t|
