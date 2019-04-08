@@ -645,7 +645,12 @@ module API
                     rescue
                       expiration = value["expiration"]
                     end
-                    return_data.push(:entry => key, :classification => value["classifications"], :expiration => expiration, :status => value["status"], :comment => value["metadata"]["VRT"]["comment"]).to_json
+
+                    comment = ""
+
+		    comment = value["metadata"].fetch("VRT", {}).fetch("comment", "")
+
+                    return_data.push(:entry => key, :classification => value["classifications"], :expiration => expiration, :status => value["status"], :comment => comment).to_json
                   end
                 end
                 return_data.to_json
@@ -689,7 +694,7 @@ module API
             post 'bulk_rule_ui_wlbl_get_info_for_form' do
               std_api_v2 do
 
-                params[:entries] = params[:entries].map {|entry| entry.strip}
+                params[:entries] = params[:entries].map {|entry| DisputeEntry.domain_of_with_path(entry.strip)}
 
                 data = []
                 list_types = {}
@@ -700,7 +705,7 @@ module API
                   api_responses = Wbrs::ManualWlbl.where({:url => entry})
 
                   api_responses.each do |response|
-                    if response.url == entry
+                    if DisputeEntry.domain_of_with_path(response.url) == entry
                       if response.state == "active"
                         list_types[entry] << response.list_type
                       end
@@ -745,9 +750,12 @@ module API
             post 'bulk_rule_ui_wlbl_add' do
               std_api_v2 do
                 authorize!(:update, Wbrs::ManualWlbl)
+                parsed_ip_uris = permitted_params['ip_uris'].map{|ip_uri| DisputeEntry.domain_of_with_path(ip_uri).strip}
+                unique_ip_uris = parsed_ip_uris.uniq
+
                 wlbl_params =
                     {
-                        urls: permitted_params['ip_uris'].map {|ip_uri| ip_uri.strip},
+                        urls: unique_ip_uris,
                         trgt_list: permitted_params['list_types'],
                         note: permitted_params['note'],
                         usr: current_user.cvs_username

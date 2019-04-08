@@ -10,6 +10,7 @@ class Xbrs::GetXbrs < Xbrs::Base
   end
 
   def self.by_domain(name, raw = false)
+    name = CGI.escape(name)
     call_xbrs_request(:get, "/v1/domain/#{name}", {}, raw )
   end
 

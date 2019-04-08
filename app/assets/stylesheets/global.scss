@@ -766,6 +766,7 @@ button {
 .mark-related-button:hover,
 .ticket-status-button:hover,
 .ticket-owner-button:hover,
+.ticket-owner-unassigned-button:hover,
 .adjust-reptool-button:hover,
 .adjust-wlbl-button:hover,
 .export-button:hover,
@@ -779,7 +780,7 @@ button {
 .collapse-all:hover,
 .sync-button:hover,
 .expand-all:hover {
-  background-color: lighten($nav-toolbar-color, 8%);
+  background-color: lighten($nav-toolbar-color, 8%)!important;
 }
 
 .expand-row-button:focus,
@@ -2043,7 +2044,8 @@ a.static-nav-item {
   background-color: $ac-nav-bg-color;
   border-radius: 2px;
   padding: 3px;
-  margin: 9px 10px;;
+  margin: 9px 10px;
+  z-index:2
 }
 
 #import_bug, #import_webrep, #add_dispute_entry {
@@ -2089,6 +2091,29 @@ a.static-nav-item {
 
 #advanced-search-dropdown {
   min-width: 400px;
+}
+#advanced-search-dropdown {
+  .selectize-dropdown.multi.form-control.selectize{
+    position: absolute;
+    transform:translateY(15px);
+  }
+  .nav-tool-content-wrapper .form-control.selectize{
+    min-height: 26px;
+    height: 100%;
+  }
+  .selectize-dropdown{
+    border: 1px solid #ccc;
+    border: 1px solid rgba(0, 0, 0, 0.15);
+    border-radius: 4px;
+    -webkit-box-shadow: 0 6px 12px rgba(0, 0, 0, 0.175);
+    box-shadow: 0 6px 12px rgba(0, 0, 0, 0.175);
+  }
+  .selectize-control.form-control.selectize.multi{
+    padding-top: 3px !important;
+    padding-left: 6px !important;
+    background: white;
+    z-index: 3;
+  }
 }
 
 .search-group form {
@@ -4187,6 +4212,7 @@ button.tertiary {
   margin-top: -23px;
   margin-right: 20px;
   display: none;
+  box-shadow: 0 6px 12px rgba(0, 0, 0, 0.175);
 }
 
 #search-criteria-options li {
@@ -4220,7 +4246,6 @@ button.tertiary {
 
 .search-item .form-control {
   font-size: 8pt;
-  line-height: .75em !important;
 }
 
 .icon-dashboard {background-image: url(image_path('icon_dashboard.svg'));}
@@ -4568,9 +4593,12 @@ table > tbody > tr > td.dispute_rep_tools {
   display: inline-block;
 }
 
-.dropdown.open .dispute-inline-buttons {
+.dropdown.open .ticket-owner-button {
   background-color: $bug-section-color;
   border-radius: 2px 2px 0 0 ;
+}
+.ticket-owner-button {
+  margin: 0px 4px;
 }
 
 .toolbar-button.adjust-wlbl-button    {
@@ -5729,7 +5757,7 @@ td.ticket-total::before {
   left: 19px;
   margin-top: -4px;
 }
-
+ 
 .dashboard-left-data {
   border-right: 1px solid $content-bg-color;
 }
@@ -5806,7 +5834,23 @@ td.ticket-total::before {
 #index-change-assign-dropdown .toolbar {
   margin-bottom: 5px;
 }
-
+.secondary.ticket-owner-unassigned-button{
+  margin: 0;
+  margin-top: 13px;
+  background-color: darken($nav-toolbar-color, 10%);
+  font-weight: 400;
+  text-transform: inherit;
+  text-transform: none;
+  display: inline-block;
+  padding: 8px 20px;
+  font-weight: 400;
+}
+.container_unassign{
+  display: flex;
+  margin: 6% 0;
+  padding-top: 1%;
+  border-top: 1px solid #f2f2f2;
+}
 #index-edit-ticket-status-dropdown .radio-label, #index-edit-entry-status-dropdown .radio-label {
   margin-top: 6px;
   margin-bottom: 0;
@@ -5903,15 +5947,16 @@ td.ticket-total::before {
   content: '';
 }
 
-.entry-important-flag::before, .highlight-second-review .important-flag-col span {
+.entry-important-flag::before, .highlight-second-review .important-flag-col .is-important {
   background-image: url(image_path('icon_important.svg'));
   background-repeat: no-repeat;
   width: 20px;
   height: 20px;
-  margin-bottom: -6px;
-  margin-right: 4px;
-}
 
+}
+.container-important-tags{
+  display: inline-flex;
+}
 .highlight-second-review .important-flag-col span {
   display: block;
 }
@@ -5974,11 +6019,6 @@ table.dispute-entry-table tbody tr.selected {
   float: right;
 }
 
-.dispute-owner-buttons-wrapper .dropdown {
-  display: inline-block;
-  margin-left: 8px;
-}
-
 .dispute-owner-buttons-wrapper .dropdown.open {
   background-color: transparent !important;
 }
@@ -5993,14 +6033,14 @@ table.dispute-entry-table tbody tr.selected {
   background-color: #6dbcdb;
   min-width: 200px;
   top: 16px;
-  left: 1px;
+  left: 4px;
 }
 
 .dispute-owner-buttons-wrapper h3 {
   padding: 2px 10px !important;
 }
 
-#button_reassign, #unassign-dispute-button {
+#button_reassign{
   text-transform: none;
   display: inline-block;
   padding: 8px 20px;
@@ -6302,6 +6342,7 @@ table.dispute-entry-table tbody tr.selected {
 
 .nested-complaint-static-data, .nested-complaint-editable-data {
   padding: 12px 15px;
+  margin-left: -5px;
 }
 
 .nested-complaint-static-data {
@@ -6633,13 +6674,12 @@ table#duplicates a {
   overflow-y: scroll !important;
 }
 
-.highlight-was-dismissed .important-flag-col span::after {
+.highlight-was-dismissed .important-flag-col .was-reviewed::after {
   display: block;
   background-image: url(image_path('icon_reviewed_check.svg'));
   width: 20px;
   height: 20px;
   background-repeat: no-repeat;
-  margin-left: 24px;
   content: '';
 }
 
@@ -7763,12 +7803,12 @@ td.text-center span {
 
 .ticket-age-over3hr {
   color: $warning-accent-color;
-  font-weight: 500;
+  font-weight: bold;
 }
 
-.overdue {
+.ticket-age-over12hr{
   color: $second-section-color;
-  font-weight: 500;
+  font-weight: bold;
 }
 
 .sorting {
@@ -8155,4 +8195,23 @@ hr.thin.form-divider {
 .reptool-entry-comment{
   max-width: 160px;
   overflow-wrap: break-word;
+}
+
+// Bugzilla login icons
+.bugzilla-status {
+  position: relative;
+  display: inline-block;
+  width: 22px;
+  height: 42px;
+  background-repeat: no-repeat;
+  background-position: center center;
+  background-color: transparent;
+}
+
+.bugzilla-logged-in {
+  background-image: url(image_path('icon_bugzilla_loggedin.svg'));
+}
+
+.bugzilla-logged-out {
+  background-image: url(image_path('icon_bugzilla_loggedout.svg'));
 }

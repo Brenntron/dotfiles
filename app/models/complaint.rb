@@ -81,7 +81,7 @@ class Complaint < ApplicationRecord
     url = URI.escape(url)
     uri = URI.parse(URI.parse(url).scheme.nil? ? "http://#{url}" : url)
     domain = PublicSuffix.parse(uri.host)
-    subdomain = uri.host.gsub(Regexp.new("\\.?#{domain.domain}$"), '')
+    subdomain = uri.host.gsub(/\A[0-9]*www[0-9]*\./, '').gsub(Regexp.new("\\.?#{domain.domain}$"), '')
 
     {
         subdomain: subdomain,
@@ -293,7 +293,7 @@ class Complaint < ApplicationRecord
 
           prefix_response = Wbrs::Prefix.where({:urls => [key]})
           new_payload_item = {}
-          new_payload_item[:sugg_type] = entry['wbrs']["cat_sugg"]
+          new_payload_item[:sugg_type] = entry['wbrs']["cat_sugg"] unless entry['wbrs']['cat_sugg'].blank?
           new_payload_item[:status] = TI_NEW
           new_payload_item[:resolution_message] = ""
           new_payload_item[:resolution] = ""
@@ -306,10 +306,10 @@ class Complaint < ApplicationRecord
           new_complaint_entry.ip_address = key
           new_complaint_entry.wbrs_score = entry[:wbrs]["WBRS_SCORE"]
           new_complaint_entry.entry_type = "IP"
-          new_complaint_entry.suggested_disposition = entry['wbrs']["cat_sugg"].join(",")
+          new_complaint_entry.suggested_disposition = entry['wbrs']["cat_sugg"].join(",") unless entry['wbrs']['cat_sugg'].blank?
 
           if prefix_response.first&.is_active == 1
-            new_complaint_entry.url_primary_category = entry['wbrs']["current_cat"]
+            new_complaint_entry.url_primary_category = entry['wbrs']["current_cat"] unless entry['wbrs']['current_cat'].blank?
           else
             new_complaint_entry.url_primary_category = nil
           end
@@ -362,14 +362,14 @@ class Complaint < ApplicationRecord
           new_complaint_entry = ComplaintEntry.new
           new_complaint_entry.complaint_id = new_complaint.id
           new_complaint_entry.user_id = user.id
-          new_complaint_entry.uri = key.gsub(/\Awww\./, '')
+          new_complaint_entry.uri = key.gsub(/http[s]*\:\/\//, '').gsub(/\A[0-9]*www[0-9]*\./, '')
           new_complaint_entry.entry_type = "URI/DOMAIN"
           new_complaint_entry.wbrs_score = entry['WBRS_SCORE']
-          new_complaint_entry.suggested_disposition = entry["cat_sugg"].join(",")
+          new_complaint_entry.suggested_disposition = entry["cat_sugg"].join(",") unless entry['cat_sugg'].blank?
 
 
           if prefix_response.first&.is_active?
-            new_complaint_entry.url_primary_category = entry["current_cat"]
+            new_complaint_entry.url_primary_category = entry["current_cat"] unless entry['current_cat'].blank?
           else
             new_complaint_entry.url_primary_category = nil
           end
@@ -385,7 +385,7 @@ class Complaint < ApplicationRecord
           new_complaint_entry.save!
 
           new_payload_item = {}
-          new_payload_item[:sugg_type] = entry["cat_sugg"].join(",")
+          new_payload_item[:sugg_type] = entry["cat_sugg"].join(",") unless entry['cat_sugg'].blank?
           new_payload_item[:status] = TI_NEW
           new_payload_item[:resolution_message] = ""
           new_payload_item[:resolution] = ""
