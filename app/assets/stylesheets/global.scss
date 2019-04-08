@@ -4033,7 +4033,7 @@ td.wbrs-highlight, td.sbrs-highlight {
 .escalations--webrep--disputes-controller,
 .escalations--webcat--complaints-controller,
 .escalations--webcat--reports-controller,
-.escalations--filerep--disputes-controller {
+.escalations--file_rep--disputes-controller {
   #nav-banner {
     background-color: $table-dark-body;
     color: $content-bg-color;
@@ -4057,6 +4057,25 @@ td.wbrs-highlight, td.sbrs-highlight {
       background-color: lighten($table-dark-body, 10%);
     }
   }
+
+  #advanced-search-button {
+    background-color: darken($faint-neutral-color, 5%);
+    color: $type-lighter-color;
+    text-transform: uppercase;
+    font-weight: 600;
+    margin: -3px 0 0 0;
+    height: 28px;
+    border-radius: 0 4px 4px 0;
+    padding: 0 16px;
+    position: absolute;
+    right: 0;
+  }
+  #advanced-search-button::before {
+    display: none;
+  }
+  .search-box {
+    background-image: url(image_path('layout/search_icon_lighter.svg'));
+  }
 }
 
 
@@ -4064,33 +4083,16 @@ td.wbrs-highlight, td.sbrs-highlight {
   background-color: transparent;
 }
 
-.escalations--webrep--disputes-controller #advanced-search-button, .escalations--webcat--complaints-controller #advanced-search-button, .escalations--webcat--reports-controller #advanced-search-button  {
-  background-color: darken($faint-neutral-color, 5%);
-  color: $type-lighter-color;
-  text-transform: uppercase;
-  font-weight: 600;
-  margin: -3px 0 0 0;
-  height: 28px;
-  border-radius: 0 4px 4px 0;
-  padding: 0 16px;
-  position: absolute;
-  right: 0;
-}
 
-.escalations--webrep--disputes-controller  #advanced-search-button::before, .escalations--webcat--complaints-controller  #advanced-search-button::before, .escalations--webcat--reports-controller  #advanced-search-button::before {
-  display: none;
-}
-
-
-.escalations--webrep--disputes-controller .search-box, .escalations--webcat--complaints-controller .search-box, .escalations--webcat--reports-controller .search-box {
-  background-image: url(image_path('layout/search_icon_lighter.svg'));
-}
 
 .search-group, .search-group form, .search-box {
   width: 100%;
 }
 
-#advanced-search-wrapper input, #new-complaint-form input, #categorize-urls-form-wrapper input, #new-dispute-form input {
+#advanced-search-wrapper input,
+#new-complaint-form input,
+#categorize-urls-form-wrapper input,
+#new-dispute-form input {
   margin-bottom: 8px;
   background-color: transparent;
   border: 1px solid darken($faint-neutral-color, 5%);
