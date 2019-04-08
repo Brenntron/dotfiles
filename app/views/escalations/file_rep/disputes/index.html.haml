@@ -2,7 +2,7 @@
   %h1#filerep-index-title All File Reputation Tickets
 
   -#Toolbar here
-  .toolbar
+  .toolbar.file-rep-index-toolbar
     %div
       %label.toolbar-section-label
         View
@@ -59,14 +59,12 @@
             %li.toggle-vis{'data-column':'22'}
               %input{type: 'checkbox', id: 'last-updated-checkbox'} Last Updated
 
-
-
     %div
       %label.toolbar-section-label
         Owner
-      %button.take-ticket-button#index_ticket_assign.esc-tooltipped{title: 'Assign to me', onclick: 'take_disputes();'}
+      %button.toolbar-button.take-ticket-button-full.esc-tooltipped.toolbar-button-spacer{title: 'Assign to me'}
         %span.toolbar-button-text
-
+          Take Ticket
       %span.dropdown
         %button#index_change_assign.toolbar-button.ticket-owner-button.show-col-button.dropdown-toggle.esc-tooltipped{title: 'Change Assignee', 'data-toggle': 'dropdown', 'aria-haspopup': 'true', 'aria-expanded': 'false'}
           %span.toolbar-button-text
@@ -85,7 +83,7 @@
       %label.toolbar-section-label
         Edit Ticket
       %span.dropdown
-        %button#index_ticket_status.toolbar-button.ticket-status-button.dropdown-button-margin-right.dropdown-toggle.esc-tooltipped{title: 'Edit Ticket Status', 'data-toggle': 'dropdown', 'aria-haspopup': 'true', 'aria-expanded': 'false'}
+        %button#index_ticket_status.toolbar-button.ticket-status-button.dropdown-button-margin-right.dropdown-toggle.esc-tooltipped.toolbar-button-spacer{title: 'Edit Ticket Status', 'data-toggle': 'dropdown', 'aria-haspopup': 'true', 'aria-expanded': 'false'}
           %span.toolbar-button-text
             Edit Ticket Status
         .dropdown-menu.toolbar-dropdown#index-edit-ticket-status-dropdown{'aria-labelledby': 'index_ticket_status'}
@@ -138,7 +136,7 @@
                         Submit
 
       %span.dropdown
-        %button#file-disp-button.toolbar-button.disposition-button.dropdown-toggle.esc-tooltipped{title: 'Change Disposition', 'data-toggle': 'dropdown', 'aria-haspopup': 'true', 'aria-expanded': 'false'}
+        %button#file-disp-button.toolbar-button.disposition-button.dropdown-toggle.esc-tooltipped.toolbar-button-spacer{title: 'Change Disposition', 'data-toggle': 'dropdown', 'aria-haspopup': 'true', 'aria-expanded': 'false'}
           %span.toolbar-button-text
             Change Disposition
         .dropdown-menu.toolbar-dropdown#file-disp-dropdown{'aria-labelledby': 'file-disp-button'}

@@ -590,6 +590,7 @@ button {
   border-radius: 2px;
   height: 100%;
   display: inline-block;
+  float: left;
   padding-right: 10px;
   padding-top: 2px;
   padding-left: 20px;
@@ -626,6 +627,10 @@ button {
   margin-right: 6px;
   min-width: 36px;
   height: 20px;
+}
+
+.toolbar-button-spacer {
+  margin-right: 3px;
 }
 
 .dashboard-tickets-wrapper .toolbar-button-label {
@@ -687,6 +692,7 @@ button {
 .sync-button {background-image: url(image_path('icon_sync.svg'));}
 .detection-button {background-image: url(image_path('icon_hazard.svg'));}
 .disposition-button {background-image: url(image_path('icon_target.svg'));}
+.take-ticket-button-full {background-image: url(image_path('icon_take.svg'));}
 
 .master-submit-button {
   color: $content-bg-color;
@@ -928,6 +934,10 @@ thead th.sorting.center {
   font-weight: 400;
   padding-left: 8px;
   line-height: 1em;
+}
+
+.toolbar span.dropdown {
+  float: left;
 }
 
 .toolbar-button-text {
@@ -8296,4 +8306,10 @@ hr.thin.form-divider {
 
 #file-index-table-show-columns-dropdown ul li input {
   margin-right: 8px;
+}
+
+.file-rep-index-toolbar {
+  .ticket-owner-button {
+    margin: 0;
+  }
 }
