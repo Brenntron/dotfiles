@@ -1,5 +1,10 @@
 class FileRepDatatable < AjaxDatatablesRails::ActiveRecord
 
+  def initialize(params, options = {}, extra)
+    @search_name = extra[:search_name]
+    super(params, options)
+  end
+
   def view_columns
     @view_columns ||= {
       id:                 { data: :id, source: 'FileReputationDispute.id', cond: :like },
@@ -65,6 +70,14 @@ class FileRepDatatable < AjaxDatatablesRails::ActiveRecord
 
   def get_raw_records
     FileReputationDispute.all
+  end
+
+  def filter_records(records)
+    if @search_name
+      records.where(status: 'shaky')
+    else
+      records.where(build_conditions)
+    end
   end
 
 end
