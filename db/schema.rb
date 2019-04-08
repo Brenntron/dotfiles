@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 2019_01_29_160213) do
+ActiveRecord::Schema.define(version: 2019_04_05_132032) do
 
   create_table "alerts", options: "ENGINE=InnoDB DEFAULT CHARSET=utf8", force: :cascade do |t|
     t.datetime "created_at", null: false
@@ -46,13 +46,12 @@ ActiveRecord::Schema.define(version: 2019_01_29_160213) do
     t.datetime "created_at"
     t.datetime "updated_at"
     t.integer "bug_id"
-    t.integer "rule_id"
-    t.integer "unused_reference_id"
+    t.integer "unused_rule_id"
     t.integer "task_id"
     t.index ["bug_id"], name: "index_attachments_on_bug_id"
     t.index ["bugzilla_attachment_id"], name: "index_attachments_on_bugzilla_attachment_id"
-    t.index ["rule_id"], name: "index_attachments_on_rule_id"
     t.index ["task_id"], name: "index_attachments_on_task_id"
+    t.index ["unused_rule_id"], name: "index_attachments_on_unused_rule_id"
   end
 
   create_table "bug_blockers", options: "ENGINE=InnoDB DEFAULT CHARSET=utf8", force: :cascade do |t|
@@ -71,6 +70,7 @@ ActiveRecord::Schema.define(version: 2019_01_29_160213) do
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
     t.index ["link_type", "link_id"], name: "index_bug_reference_rule_links_on_link_type_and_link_id"
+    t.index ["reference_id", "link_type"], name: "index_reference_links_on_reference_and_link_type"
   end
 
   create_table "bugs", options: "ENGINE=InnoDB DEFAULT CHARSET=utf8", force: :cascade do |t|
@@ -85,16 +85,13 @@ ActiveRecord::Schema.define(version: 2019_01_29_160213) do
     t.string "component"
     t.string "version"
     t.text "description"
-    t.string "opsys"
-    t.string "platform"
+    t.string "unused_opsys"
+    t.string "unused_platform"
     t.string "priority"
-    t.string "severity"
+    t.string "unused_severity"
     t.text "research_notes"
     t.text "committer_notes"
     t.integer "classification", default: 0
-    t.integer "unused_gid", default: 1
-    t.integer "unused_sid"
-    t.integer "unused_rev", default: 1
     t.datetime "assigned_at"
     t.datetime "pending_at"
     t.datetime "resolved_at"
@@ -105,9 +102,6 @@ ActiveRecord::Schema.define(version: 2019_01_29_160213) do
     t.datetime "created_at"
     t.datetime "updated_at"
     t.integer "user_id"
-    t.integer "unused_reference_id"
-    t.integer "unused_rule_id"
-    t.integer "unused_attachment_id"
     t.string "liberty", default: "CLEAR"
     t.string "whiteboard"
     t.boolean "acknowledged", default: false
@@ -121,8 +115,6 @@ ActiveRecord::Schema.define(version: 2019_01_29_160213) do
   create_table "bugs_rules", options: "ENGINE=InnoDB DEFAULT CHARSET=utf8", force: :cascade do |t|
     t.integer "bug_id", default: 0, null: false
     t.integer "rule_id", default: 0, null: false
-    t.text "unused_svn_result_output"
-    t.integer "unused_svn_result_code"
     t.boolean "tested"
     t.boolean "in_summary", default: false
     t.boolean "edited", default: false
@@ -156,7 +148,7 @@ ActiveRecord::Schema.define(version: 2019_01_29_160213) do
     t.string "domain"
     t.string "path"
     t.float "wbrs_score"
-    t.string "url_primary_category", limit: 1000
+    t.string "url_primary_category", limit: 2000
     t.string "resolution"
     t.text "resolution_comment"
     t.datetime "complaint_entry_resolved_at"
@@ -169,7 +161,7 @@ ActiveRecord::Schema.define(version: 2019_01_29_160213) do
     t.string "suggested_disposition"
     t.string "ip_address"
     t.string "entry_type"
-    t.string "category", limit: 1000
+    t.string "category", limit: 2000
     t.integer "user_id"
     t.boolean "is_important"
     t.datetime "case_resolved_at"
@@ -194,16 +186,6 @@ ActiveRecord::Schema.define(version: 2019_01_29_160213) do
     t.binary "screenshot", limit: 16777215
     t.string "error_message", default: ""
     t.index ["complaint_entry_id"], name: "index_complaint_entry_screenshots_on_complaint_entry_id"
-  end
-
-  create_table "complaint_marked_commits", options: "ENGINE=InnoDB DEFAULT CHARSET=utf8", force: :cascade do |t|
-    t.datetime "created_at", null: false
-    t.datetime "updated_at", null: false
-    t.integer "user_id"
-    t.integer "complaint_entry_id"
-    t.string "comment"
-    t.string "category_list"
-    t.index ["user_id"], name: "index_complaint_marked_commits_on_user_id"
   end
 
   create_table "complaint_tags", options: "ENGINE=InnoDB DEFAULT CHARSET=utf8", force: :cascade do |t|
@@ -453,13 +435,6 @@ ActiveRecord::Schema.define(version: 2019_01_29_160213) do
     t.index ["snort_research_bug_id", "snort_escalation_bug_id"], name: "index_escalation_links"
   end
 
-  create_table "escalations", options: "ENGINE=InnoDB DEFAULT CHARSET=latin1", force: :cascade do |t|
-    t.integer "snort_research_escalation_bug_id"
-    t.integer "snort_escalation_research_bug_id"
-    t.datetime "created_at", null: false
-    t.datetime "updated_at", null: false
-  end
-
   create_table "events", options: "ENGINE=InnoDB DEFAULT CHARSET=utf8", force: :cascade do |t|
     t.string "user"
     t.string "action"
@@ -474,7 +449,6 @@ ActiveRecord::Schema.define(version: 2019_01_29_160213) do
     t.string "name"
     t.string "description"
     t.string "pcap_validation"
-    t.integer "unused_exploit_id"
     t.index ["name"], name: "index_exploit_types_on_name"
   end
 
@@ -484,10 +458,8 @@ ActiveRecord::Schema.define(version: 2019_01_29_160213) do
     t.datetime "created_at"
     t.datetime "updated_at"
     t.integer "attachment_id"
-    t.integer "unused_reference_id"
     t.index ["attachment_id"], name: "index_exploits_on_attachment_id"
     t.index ["exploit_type_id"], name: "index_exploits_on_exploit_type_id"
-    t.index ["unused_reference_id"], name: "index_exploits_on_unused_reference_id"
   end
 
   create_table "exploits_references", options: "ENGINE=InnoDB DEFAULT CHARSET=utf8", force: :cascade do |t|
@@ -524,15 +496,36 @@ ActiveRecord::Schema.define(version: 2019_01_29_160213) do
     t.string "source"
   end
 
-  create_table "file_reputation_tickets", options: "ENGINE=InnoDB DEFAULT CHARSET=utf8", force: :cascade do |t|
+  create_table "file_reps", options: "ENGINE=InnoDB DEFAULT CHARSET=utf8", force: :cascade do |t|
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.string "file_rep_name"
+    t.text "sha256_checksum"
+    t.string "email"
+  end
+
+  create_table "file_reputation_disputes", options: "ENGINE=InnoDB DEFAULT CHARSET=utf8", force: :cascade do |t|
     t.bigint "customer_id"
     t.string "status"
     t.string "source"
     t.string "platform"
     t.string "description"
-    t.bigint "reputation_file_id"
-    t.index ["customer_id"], name: "index_file_reputation_tickets_on_customer_id"
-    t.index ["reputation_file_id"], name: "index_file_reputation_tickets_on_reputation_file_id"
+    t.string "file_name"
+    t.integer "file_size"
+    t.string "sha256_hash"
+    t.string "sample_type"
+    t.string "disposition"
+    t.string "disposition_suggested"
+    t.float "sandbox_score"
+    t.float "sandbox_threshold"
+    t.string "sandbox_signer"
+    t.float "threatgrid_score"
+    t.float "threatgrid_threshold"
+    t.string "threatgrid_signer"
+    t.float "reversing_labs_score"
+    t.string "reversing_labs_signer"
+    t.index ["customer_id"], name: "index_file_reputation_disputes_on_customer_id"
+    t.index ["sha256_hash"], name: "index_file_reputation_disputes_on_sha256_hash"
   end
 
   create_table "fp_file_refs", options: "ENGINE=InnoDB DEFAULT CHARSET=latin1", force: :cascade do |t|
@@ -577,6 +570,7 @@ ActiveRecord::Schema.define(version: 2019_01_29_160213) do
     t.datetime "updated_at", null: false
     t.integer "user_id"
     t.string "name"
+    t.string "project_type"
     t.index ["user_id", "name"], name: "index_named_searches_on_user_id_and_name", unique: true
   end
 
@@ -700,7 +694,6 @@ ActiveRecord::Schema.define(version: 2019_01_29_160213) do
     t.integer "sid"
     t.integer "rev"
     t.string "state"
-    t.boolean "unused_tested", default: false
     t.boolean "committed", default: false
     t.datetime "created_at"
     t.datetime "updated_at"
@@ -807,21 +800,21 @@ ActiveRecord::Schema.define(version: 2019_01_29_160213) do
     t.index ["rule_id", "task_id"], name: "index_test_reports_on_rule_id_and_task_id", unique: true
   end
 
-  create_table "unused_attachments_exploits", options: "ENGINE=InnoDB DEFAULT CHARSET=utf8", force: :cascade do |t|
-    t.integer "attachment_id"
-    t.integer "exploit_id"
+  create_table "unused_complaint_marked_commits", options: "ENGINE=InnoDB DEFAULT CHARSET=utf8", force: :cascade do |t|
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.integer "user_id"
+    t.integer "complaint_entry_id"
+    t.string "comment"
+    t.string "category_list"
+    t.index ["user_id"], name: "index_unused_complaint_marked_commits_on_user_id"
   end
 
-  create_table "unused_attachments_rules", id: false, options: "ENGINE=InnoDB DEFAULT CHARSET=utf8", force: :cascade do |t|
-    t.integer "attachment_id"
-    t.integer "rule_id"
-  end
-
-  create_table "unused_references_rules", id: false, options: "ENGINE=InnoDB DEFAULT CHARSET=utf8", force: :cascade do |t|
-    t.integer "reference_id"
-    t.integer "rule_id"
-    t.index ["reference_id"], name: "index_unused_references_rules_on_reference_id"
-    t.index ["rule_id"], name: "index_unused_references_rules_on_rule_id"
+  create_table "unused_escalations", options: "ENGINE=InnoDB DEFAULT CHARSET=latin1", force: :cascade do |t|
+    t.integer "snort_research_escalation_bug_id"
+    t.integer "snort_escalation_research_bug_id"
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
   end
 
   create_table "user_api_keys", options: "ENGINE=InnoDB DEFAULT CHARSET=latin1", force: :cascade do |t|

@@ -1,4 +1,5 @@
 class NoteDatatable < AjaxDatatablesRails::Base
+  extend Forwardable
 
   def_delegators :@view, :link_to, :edit_admin_note_path, :admin_note_path, :content_tag, :concat
 

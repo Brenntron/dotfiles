@@ -124,7 +124,7 @@
 
   .col-xl-6.col-lg-5.col-xs-12.graph-section
     .row
-      .col-md-12.col-lg-7
+      .col-md-12
         .reports-graph-info-container
           %h5 Total Ticket Entries Closed
           .graph-config
@@ -168,12 +168,12 @@
             -#  %option{:value => ""} Yearly
             .graph-bar-legend
               %label.skyblue-legend-color.graph-legend-circle Customer
-              %label.navyblue-legend-color.graph-legend-circle Guest
+              %label.orange-legend-color.graph-legend-circle Guest
           .reports-graph-wrapper
             %canvas#graph-ticket-entries-submitter
 
 
-      .col-md-12.col-lg-5.graph-section
+      .col-md-12.graph-section
         .reports-graph-info-container
           %h5.dispute-E-grey.graph-header-icon-stg Closed Email Entries by Resolution
           .reports-graph-wrapper.pie-graph-wrapper

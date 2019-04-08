@@ -15,7 +15,7 @@ $second-section-color  : #fc4349;   /* Red            */
 $third-section-color   : #EFAF34;   /* Yellow Ochre   */
 $fourth-section-color  : #8cc63f;   /* Bright Green   */
 $fifth-section-color   : #65A1A1;   /* Dusty Teal     */
-
+$primary-section-color-light : #b5ebff;   /* Light Blue    */
 
 $bug-section-color         : $primary-section-color;
 $escalations-section-color : $second-section-color;
@@ -44,6 +44,7 @@ $success-trans: rgba(95, 183, 102, 0.15);
 $disabled-bg: #E5E5E5;
 $disabled-txt: #A0A0A0;
 $communication-accent-color: #C14B92;
+$yellow-graph-bar:#f9cf81;
 
 /* Content Label Color */
 $content-label-color: #999;     /* Light Grey     */
@@ -3821,7 +3822,7 @@ input.communication-subject {
 }
 
 .add-case-note-button:hover {
-  background-color: #E47433;
+  background-color: $warning-accent-color;
 }
 
 .new-case-note-row {display: none;}
@@ -6563,6 +6564,7 @@ table.dispute-entry-table tbody tr.selected {
 
 .history-table td {
   padding: 4px 8px;
+  line-height: 1.25em;
 }
 
 .searched-for-url {
@@ -7364,7 +7366,10 @@ td.text-center span {
     }
 
     .skyblue-legend-color::before {
-      background-color: $primary-section-color;
+      background-color: $primary-section-color-light;
+    }
+    .yellow-legend-color::before{
+      background-color: $yellow-graph-bar
     }
 
     .navyblue-legend-color::before {
@@ -7428,7 +7433,7 @@ td.text-center span {
   right: 20px;
 
   .total-legend {
-    background-color: skyblue;
+    background-color: $primary-section-color-light;
     width: 45px;
     height: 14px;
     position: relative;
@@ -8210,4 +8215,54 @@ hr.thin.form-divider {
 
 .bugzilla-logged-out {
   background-image: url(image_path('icon_bugzilla_loggedout.svg'));
+}
+
+
+// Tab styles for tabs on dialog boxes
+.nav-tabs.dialog-tabs {
+  margin-top: 0;
+}
+
+.nav-tabs.dialog-tabs > li > a {
+  padding: 10px 15px;
+  box-shadow: none;
+  background-color: darken($content-label-color, 10%);
+}
+
+.nav-tabs.dialog-tabs > li.active > a {
+  background-color: $content-bg-color;
+  border: 1px solid darken($faint-neutral-color, 10%);
+}
+
+.nav-tabs.dialog-tabs > li.active::before {
+  content: '';
+  border-left: 1px solid darken($faint-neutral-color, 10%);
+  border-right: 1px solid darken($faint-neutral-color, 10%);
+  background-color: $content-bg-color;
+  width: 100%;
+  height: 1px;
+  display: block;
+  position: absolute;
+  left: 0;
+  padding: 0;
+  z-index: 55;
+  margin-top: 39px;
+  margin-left: -1px;
+}
+
+.nav-tabs.dialog-tabs::before {
+  display: none;
+}
+
+.dialog-tab-content {
+  border: 1px solid darken($faint-neutral-color, 10%);
+  padding: 15px;
+}
+
+#xbrs-history-tab {
+  overflow: scroll;
+}
+
+.history-table {
+  background-color: $content-bg-color;
 }

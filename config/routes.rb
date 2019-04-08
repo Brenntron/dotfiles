@@ -5,7 +5,7 @@ Rails.application.routes.draw do
 
   namespace :escalations, except: [:destroy, :edit] do
     get 'sb_api/query_lookup' => 'sb_api#query_lookup'
-    
+
     resources :rulehit_resolution_mailer_templates, only: [:new, :index, :create, :show, :update, :destroy, :edit]
     resources :sessions, controller: '/sessions', only: [:new, :create, :destroy]
 
@@ -81,8 +81,8 @@ Rails.application.routes.draw do
       get 'research', to: 'disputes#research'
     end
 
-    namespace :filerep do
-      root 'root#index'
+    namespace :file_rep do
+      root 'disputes#index'
       resources :disputes, only: [:index, :show]
     end
 
@@ -116,6 +116,7 @@ Rails.application.routes.draw do
         collection do
           get 'poll-from-bridge/messages', to: 'messages#get_messages'
           post 'ticket-event/messages', to: 'messages#messages_from_bridge'
+          post 'file-rep-create/messages', to: 'file_rep_messages#create'
         end
         resources :messages, only: [:create]
       end

@@ -1,0 +1,14 @@
+.content-wrapper
+  %h1#filerep-index-title All File Reputation Tickets
+
+  -#Toolbar here
+  Add table below
+  .row
+    .col-xs-12
+      %table.table.responsive#file-rep-datatable{'data-source': escalations_file_rep_disputes_path(format: :json)}
+        %thead
+          %tr
+            %th name
+            %th sha256
+            %th email
+        %tbody
