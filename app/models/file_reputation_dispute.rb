@@ -15,7 +15,7 @@ class FileReputationDispute < ApplicationRecord
   # @return [ActiveRecord::Relation]
   def self.robust_search(search_type, search_name: nil, params: nil)
     if search_type
-      where(status: search_name)
+      where(params || {status: search_name})
     else
       where({})
     end
