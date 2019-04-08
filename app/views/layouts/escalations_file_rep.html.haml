@@ -2,7 +2,7 @@
   Escalations - File Reputation - Analyst Console
 
 - content_for(:nav_banner) do
-  .nav-tool-blocks.nav-page-button-wrapper.col-xs-3.col-sm-3.col-lg-2
+  .nav-tool-blocks.nav-page-button-wrapper.col-xs-3.col-sm-2.col-lg-2
     %a#queue.nav-page-button{href: '/escalations/filerep/disputes', class: ("active" if current_page?('/escalations/filerep/disputes'))}
       %span.nav-toolbar-icon-large.icon-queue
 
@@ -17,78 +17,75 @@
       %h3.nav-tool-dropdown-header.inverse
         New File Dispute
       .nav-tool-content-wrapper#new-dispute-wrapper
--#        = render 'escalations/webrep/disputes/new'
+        = render 'escalations/webrep/disputes/new'
 
   .nav-tool-blocks.col-xs-1.col-sm-1.col-lg-1.dropdown
     %a{href: '#', class: 'dropdown-toggle', id: 'filter-cases', 'data-toggle': 'dropdown', 'aria-haspopup': 'true', 'aria-expanded': 'false'}
       %span{class: 'nav-toolbar-icon icon-filter-white'}
       Filter
+    .dropdown-menu.nav-tools-dropdown#filter-dropdown{'aria-labelledby': 'filter-cases'}
+      %ul#filter-cases-list
+        %li{class: ("selected" if params[:f] == "recently_viewed")}
+          %a{href: '?f=recently_viewed'}
+            %span.nav-dropdown-icon.icon-recently-viewed
+            Recently Viewed
+        %li{class: ("selected" if params[:f] == "my_disputes")}
+          %a{href: '?f=my_disputes'}
+            %span.nav-dropdown-icon.icon-my-bugs
+            My Tickets
+        %li{class: ("selected" if params[:f] == "my_open")}
+          %a{href: '?f=my_open'}
+            %span.nav-dropdown-icon.icon-my-open-bugs
+            My Open Tickets
+            %li{class: ("selected" if params[:f] == "team_disputes")}
+          %a{href: '?f=team_disputes'}
+            %span.nav-dropdown-icon.icon-team-bugs
+            My Team Tickets
+        %li{class: ("selected" if params[:f] == "unassigned")}
+          %a{href: '?f=unassigned'}
+            %span.nav-dropdown-icon.icon-unassigned-bugs
+            Unassigned Tickets
+        %li{class: ("selected" if params[:f] == "open")}
+          %a{href: '?f=open'}
+            %span.nav-dropdown-icon.icon-open-bugs
+            Open Tickets
+        %li{class: ("selected" if params[:f] == "open_email")}
+          %a{href: '?f=open_email'}
+            %span.nav-dropdown-icon.icon-email-tix
+            Open Email Tickets
+        %li{class: ("selected" if params[:f] == "open_web")}
+          %a{href: '?f=open_web'}
+            %span.nav-dropdown-icon.icon-web-tix
+            Open Web Tickets
+        %li{class: ("selected" if params[:f] == "closed")}
+          %a{href: '?f=closed'}
+            %span.nav-dropdown-icon.icon-fixed-bugs
+            Closed Tickets
+        %li{class: ("selected" if params[:f] == "all")}
+          %a{href: '?f=all'}
+            %span.nav-dropdown-icon.icon-all-tickets
+            All Tickets
 
--#    .dropdown-menu.nav-tools-dropdown#filter-dropdown{'aria-labelledby': 'filter-cases'}
--#      %ul#filter-cases-list
--#        %li{class: ("selected" if params[:f] == "recently_viewed")}
--#          %a{href: '?f=recently_viewed'}
--#            %span.nav-dropdown-icon.icon-recently-viewed
--#            Recently Viewed
--#        %li{class: ("selected" if params[:f] == "my_disputes")}
--#          %a{href: '?f=my_disputes'}
--#            %span.nav-dropdown-icon.icon-my-bugs
--#            My Tickets
--#        %li{class: ("selected" if params[:f] == "my_open")}
--#          %a{href: '?f=my_open'}
--#            %span.nav-dropdown-icon.icon-my-open-bugs
--#            My Open Tickets
--#        %li{class: ("selected" if params[:f] == "team_disputes")}
--#          %a{href: '?f=team_disputes'}
--#            %span.nav-dropdown-icon.icon-team-bugs
--#            My Team Tickets
--#        %li{class: ("selected" if params[:f] == "unassigned")}
--#          %a{href: '?f=unassigned'}
--#            %span.nav-dropdown-icon.icon-unassigned-bugs
--#            Unassigned Tickets
--#        %li{class: ("selected" if params[:f] == "open")}
--#          %a{href: '?f=open'}
--#            %span.nav-dropdown-icon.icon-open-bugs
--#            Open Tickets
--#        %li{class: ("selected" if params[:f] == "open_email")}
--#          %a{href: '?f=open_email'}
--#            %span.nav-dropdown-icon.icon-email-tix
--#            Open Email Tickets
--#        %li{class: ("selected" if params[:f] == "open_web")}
--#          %a{href: '?f=open_web'}
--#            %span.nav-dropdown-icon.icon-web-tix
--#            Open Web Tickets
--#        %li{class: ("selected" if params[:f] == "closed")}
--#          %a{href: '?f=closed'}
--#            %span.nav-dropdown-icon.icon-fixed-bugs
--#            Closed Tickets
--#        %li{class: ("selected" if params[:f] == "all")}
--#          %a{href: '?f=all'}
--#            %span.nav-dropdown-icon.icon-all-tickets
--#            All Tickets
--#
--#      #saved-searches-wrapper.nav-tool-content-wrapper
--#        %h3.nav-tool-dropdown-header
--#          %span.nav-dropdown-content-icon.icon-saved-search
--#          My Saved Searches
--#        %table#saved-search.table
--#          %tbody#saved-search-tbody
--#            - if current_user.named_searches.any?
--#              - current_user.named_searches.where('project_type = ? OR project_type IS ?', 'Dispute', nil).order(:id).each do |named_search|
--#                %tr{id: "saved_search_#{named_search.id}"}
--#                  %td
--#                    %a.input-truncate.saved-search.esc-tooltipped{onclick: "named_webrep_index_table('#{named_search.name}');", title: named_search.name}
--#                      = named_search.name
--#                    %a.delete-search{title: 'Delete Saved Search', onclick: "delete_disputes_named_search(this, '#{named_search.name}');"}
--#                      = image_tag('icon_cancel_grey.svg')
--#
+      #saved-searches-wrapper.nav-tool-content-wrapper
+        %h3.nav-tool-dropdown-header
+          %span.nav-dropdown-content-icon.icon-saved-search
+          My Saved Searches
+        %table#saved-search.table
+          %tbody#saved-search-tbody
+            - if current_user.named_searches.any?
+              - current_user.named_searches.where('project_type = ? OR project_type IS ?', 'Dispute', nil).order(:id).each do |named_search|
+                %tr{id: "saved_search_#{named_search.id}"}
+                  %td
+                    %a.input-truncate.saved-search.esc-tooltipped{onclick: "named_webrep_index_table('#{named_search.name}');", title: named_search.name}
+                      = named_search.name
+                    %a.delete-search{title: 'Delete Saved Search', onclick: "delete_disputes_named_search(this, '#{named_search.name}');"}
+                      = image_tag('icon_cancel_grey.svg')
+
 
 
 
   .nav-tool-blocks.col-xs-4.col-sm-4.col-lg-5.search-wrapper
     .input-group.search-group#web-rep-search
-
-
       = form_tag('/tickets', method: :get, onsubmit: 'call_contains_search(this);return false;') do
         = text_field_tag 'case[id]', "#{}", class: 'search-box', placeholder: 'Search by Substring'
 
