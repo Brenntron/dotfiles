@@ -5060,7 +5060,8 @@ input.table-entry-input:focus {
 
 .research-table{
   margin: 100px auto;
-  width: 96%!important
+  width: 96%!important;
+  color: black
 }
 .search-options-col .research-table label {
   text-transform: uppercase;
@@ -5077,7 +5078,7 @@ input.table-entry-input:focus {
   padding: 0!important;
   margin-left: -5px!important;
 }
-
+.col-dispute{}
 .reputation-research-search-wrapper {
   margin: -15px -15px 40px -15px;
   background-color: $content-tab-color;

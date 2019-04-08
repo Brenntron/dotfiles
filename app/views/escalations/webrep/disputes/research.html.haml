@@ -47,9 +47,9 @@
               * NOTE: Submitting reputation changes will automatically create a closed ticket
 
           .row
-            %table.research-table
+            %table#research-table.research-table
               %colgroup
-                %col.col-dispute
+                %col
                 %col.alt-col
                 %col.alt-col
                 %col.alt-col
@@ -57,28 +57,30 @@
                 %col.alt-col
                 %col.alt-col
                 %col
-              %tr
-                %th
-                  %span.checkbox-wrapper
-                    %input{ :type=>"checkbox" }
-                      %span
-                        %label Dispute
-
-                %th WBRS
-                %th WBRS Rule Hits
-                %th WBRS Rules
-                %th Category
-                %th WLBL
-                %th Reptool Classification
-                %th Actions
-
-              %tr.empty-tr
-                %td
-                %td{colspan:'6'}
-                %td
-
-
-
+              %thead
+                %tr
+                  %th
+                    %span.checkbox-wrapper
+                      %input{ :type=>"checkbox" }
+                        %span
+                          %label Dispute
+                  %th WBRS
+                  %th WBRS Rule Hits
+                  %th WBRS Rules
+                  %th Category
+                  %th WLBL
+                  %th Reptool Classification
+                  %th Actions
+              %tbody
+                %tr
+                  %td.col-dispute{contenteditable:""}
+                  %td.col-wbrs
+                  %td.col-wbrs-rule-hits
+                  %td.col-wbrs-rules
+                  %td.col-category
+                  %td.col-wlbl
+                  %td.col-reptool-class
+                  %td.col-actions
 
   .row
     .col-xs-12
