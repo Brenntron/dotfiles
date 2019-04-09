@@ -71,5 +71,18 @@ describe Dispute do
 
       expect(results.count).to eq(1)
     end
+
+    it 'saves a named search and gets it from a robust_search' do
+      FileReputationDispute.robust_search('advanced',
+                                          search_name: 'bad-mess',
+                                          params: {'description' => @long_desc1},
+                                          user: @current_user)
+
+      results = FileReputationDispute.robust_search('named',
+                                                    search_name: 'bad-mess',
+                                                    user: @current_user)
+
+      expect(results.count).to eq(1)
+    end
   end
 end

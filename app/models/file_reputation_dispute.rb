@@ -14,18 +14,65 @@ class FileReputationDispute < ApplicationRecord
 
   validates :status, :file_name, :sha256_hash, :disposition_suggested, presence: true
 
+  def self.save_named_search(search_name, params, user:, project_type:)
+    NamedSearchCriterion.where(named_search_id: NamedSearch.where(user_id: user.id, name: search_name).ids).delete_all
+
+    found_search = user.named_searches.where(name: search_name).first
+    named_search = found_search || NamedSearch.create!(user: user, name: search_name, project_type: project_type)
+
+    params.each do |field_name, value|
+      case
+      when value.kind_of?(Hash)
+        value.each do |sub_field_name, sub_value|
+          named_search.named_search_criteria.create(field_name: "#{field_name}~#{sub_field_name}", value: sub_value)
+        end
+      when 'search_type' == field_name
+        #do nothing
+      when 'search_name' == field_name
+        #do nothing
+      else
+        named_search.named_search_criteria.create(field_name: field_name, value: value)
+      end
+    end
+  end
+
   # Searches based on supplied fields and values.
   # Optionally takes a name to save this search as a saved search.
   # @param [ActionController::Parameters] params supplied fields and values for search.
   # @param [String] search_name name to save this search as a saved search.
   # @param [ActiveRecord::Relation] base_relation relation to chain this search onto.
   # @return [ActiveRecord::Relation]
-  def self.advanced_search(params, search_name:)
-    byebug
+  def self.advanced_search(params, search_name:, user:)
 
     dispute_fields = params.to_h.slice(*FileReputationDispute.column_names)
 
     relation = where(dispute_fields)
+
+    # Save this search as a named search
+    if params.present? && search_name.present?
+      save_named_search(search_name, params, user: user, project_type: 'FileReputationDispute')
+    end
+
+    relation
+  end
+
+  # Searched based on saved search.
+  # @param [String] search_name the name of the saved search.
+  # @param [ActiveRecord::Relation] base_relation relation to chain this search onto.
+  # @return [ActiveRecord::Relation]
+  def self.named_search(search_name, user:)
+    named_search = user.named_searches.where(name: search_name).first
+    raise "No search named '#{search_name}' found." unless named_search
+    search_params = named_search.named_search_criteria.inject({}) do |search_params, criterion|
+      if /\A(?<super_name>[^~]*)~(?<sub_name>[^~]*)\z/ =~ criterion.field_name
+        search_params[super_name] ||= {}
+        search_params[super_name][sub_name] = criterion.value
+      else
+        search_params[criterion.field_name] = criterion.value
+      end
+      search_params
+    end
+    advanced_search(search_params, search_name: nil, user: user)
   end
 
   # Searches based on standard pre-determined filters.
@@ -87,7 +134,7 @@ class FileReputationDispute < ApplicationRecord
   def self.robust_search(search_type, search_name: nil, params: nil, user:)
     case search_type
     when 'advanced'
-      advanced_search(params, search_name: search_name)
+      advanced_search(params, search_name: search_name, user: user)
     when 'named'
       named_search(search_name, user: user)
     when 'standard'
