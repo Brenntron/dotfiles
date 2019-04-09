@@ -21,23 +21,23 @@ class FileReputationDispute < ApplicationRecord
   def self.standard_search(search_name, user:)
     case search_name
     # when 'recently_viewed'
-    #   joins(:dispute_peeks).where(dispute_peeks: {user_id: user.id})
-    # when 'my_open'
-    #   where.not(status: STATUS_RESOLVED).where(user_id: user.id)
+    #   joins(:dispute_peeks).where(dispute_peeks: {assigned_id: user.id})
+    when 'my_open'
+      where.not(status: STATUS_CLOSED).where(assigned_id: user.id)
     when 'my_disputes'
-      where(user_id: user.id)
+      where(assigned_id: user.id)
     # when 'team_disputes'
-    #   where(user_id: user.my_team)
-    # when 'unassigned'
-    #   where(status: [STATUS_NEW, STATUS_REOPENED], user_id: User.where(display_name: 'Vrt Incoming').first.id)
-    # when 'open'
-    #   where(status: [STATUS_NEW, STATUS_REOPENED, STATUS_CUSTOMER_PENDING, STATUS_CUSTOMER_UPDATE, STATUS_ON_HOLD, STATUS_RESEARCHING, STATUS_ESCALATED, STATUS_ASSIGNED])
+    #   where(assigned_id: user.my_team)
+    when 'unassigned'
+      where(assigned_id: nil).where.not(status: STATUS_CLOSED)
+    when 'open'
+      where.not(status: STATUS_CLOSED)
     # when 'open_email'
     #   sbrs_disputes.where(status: [STATUS_NEW, STATUS_REOPENED, STATUS_CUSTOMER_PENDING, STATUS_CUSTOMER_UPDATE, STATUS_ON_HOLD, STATUS_RESEARCHING, STATUS_ESCALATED, STATUS_ASSIGNED])
     # when 'open_web'
     #   wbrs_disputes.where(status: [STATUS_NEW, STATUS_REOPENED, STATUS_CUSTOMER_PENDING, STATUS_CUSTOMER_UPDATE, STATUS_ON_HOLD, STATUS_RESEARCHING, STATUS_ESCALATED, STATUS_ASSIGNED])
     when 'closed'
-      where(status: [STATUS_CLOSED])
+      where(status: STATUS_CLOSED)
     when 'all'
       where({})
     else
