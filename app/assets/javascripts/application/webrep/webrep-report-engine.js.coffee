@@ -1,5 +1,6 @@
 Chart.defaults.global.plugins.datalabels.display = false
 Chart.defaults.global.tooltips = false;
+Chart.defaults.global.layout.padding = {top: 10, right: 10}
 
 globalDataLabels ={
   color: '#000'
@@ -13,12 +14,21 @@ globalDataLabels ={
   display: (ctx) ->
     return ctx.dataset.data[ctx.dataIndex] >= 1
   formatter: (value) ->
-    return reduceDecimal(value)
+    if value % 1 == 0
+      return value
+    else
+      return reduceDecimal(value)
 }
 
 getSum = (total, num) -> return total + num
 
-reduceDecimal = (num) -> return Math.round(num * 100) / 100
+reduceDecimal = (num) ->
+    num = Math.round(num * 100) / 100
+    return Number.parseFloat(num).toFixed(2);
+
+pieChartLabelFormat = (num) ->
+  if num > 0
+    return num + '%'
 
 window.populate_top_banner = ()->
   from = localStorage.getItem('webrep_report_range_from')
@@ -449,7 +459,7 @@ window.build_single_closed_email_entries_resolution_piechart = () ->
           legend: false
           pieceLabel:
             render: (args) ->
-              return args.percentage + '%'
+              pieChartLabelFormat(args.percentage)
             position: 'outside'
             segment: false
             precision: 2
@@ -654,7 +664,7 @@ window.build_single_closed_web_entries_resolution_piechart = () ->
           legend: false
           pieceLabel:
             render: (args) ->
-              return args.percentage + '%'
+              pieChartLabelFormat(args.percentage)
             position: 'outside'
             segment: false
             precision: 2
@@ -727,7 +737,7 @@ window.build_multi_closed_email_entries_resolution_piechart = () ->
           legend: false
           pieceLabel:
             render: (args) ->
-              return args.percentage + '%'
+              pieChartLabelFormat(args.percentage)
             position: 'outside'
             segment: false
             precision: 2
@@ -799,7 +809,7 @@ window.build_multi_closed_web_entries_resolution_piechart = () ->
           legend: false
           pieceLabel:
             render: (args) ->
-              return args.percentage + '%'
+              pieChartLabelFormat(args.percentage)
             position: 'outside'
             segment: false
             precision: 2
