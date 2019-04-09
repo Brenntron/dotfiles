@@ -85,7 +85,7 @@
 
 
   .nav-tool-blocks.col-xs-4.col-sm-4.col-lg-5.search-wrapper
-    .input-group.search-group#web-rep-search
+    .input-group.search-group#file-rep-search
       = form_tag('/tickets', method: :get, onsubmit: 'call_contains_search(this);return false;') do
         = text_field_tag 'case[id]', "#{}", class: 'search-box', placeholder: 'Search by Substring'
 
