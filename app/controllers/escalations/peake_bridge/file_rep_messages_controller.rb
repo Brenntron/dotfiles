@@ -4,13 +4,23 @@ class Escalations::PeakeBridge::FileRepMessagesController < ApplicationControlle
   def create
     file_rep = FileReputationDispute.where(file_name: file_rep_params[:file_rep_name]).first
     file_rep ||= FileReputationDispute.new
+
+    if file_rep.sha256_hash.present?
+      api_response = Threatgrid::ThreatScore.get_threat_score(file_rep.sha256_hash)
+      threat_score = api_response['threat_score']
+      threat_grid_private = api_response['threat_grid_private']
+    end
+
     attributes = {
         file_name: file_rep_params[:file_rep_name],
         sha256_hash: file_rep_params[:sha256_checksum],
         source: file_rep_params[:email],
-        status: 'NEW'
+        status: 'NEW',
+        threat_score: threat_score,
+        threat_grid_private: threat_grid_private
     }
     file_rep.assign_attributes(attributes)
+
     if file_rep.save
       sender_params[:addressee_id] = file_rep.id
       sender_params[:addressee_status] = file_rep.status
