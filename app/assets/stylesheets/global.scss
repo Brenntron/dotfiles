@@ -8306,8 +8306,60 @@ hr.thin.form-divider {
   .ticket-owner-button {
     margin: 0;
   }
+  .toolbar-dropdown {
+    margin-top: 0;
+    margin-left: 0;
+  }
 }
 
 .plain-inline-dropdown-wrapper {
   padding: 10px !important;
+}
+
+.full-row-label {
+  width: 100%;
+  display: block;
+  margin-bottom: 0;
+  padding-bottom: 0;
+}
+
+.plain-inline-dropdown-wrapper {
+  select {
+    margin: 0;
+    height: 24px;
+    width: 100%;
+    border: none !important;
+    outline: 1px solid darken($faint-neutral-color, 10%);
+  }
+  select:focus {
+    margin: 0;
+    height: 24px;
+    border: none !important;
+    outline: 1px solid $bug-section-color !important;
+    box-shadow: none !important;
+  }
+  .text-input {
+    height: 26px;
+    margin-top: -1px;
+    width: 100%;
+  }
+  hr.thin {
+    margin-right: 2px;
+    margin-left: 2px;
+  }
+}
+
+.toolbar  .inline-tool-content-wrapper.plain-inline-dropdown-wrapper .row {
+  margin-left: 2px;
+  margin-right: 2px;
+}
+.file-name-extension {
+  float: none !important;
+  padding-left: 0 !important;
+  line-height: 2em !important;
+  color: $type-lighter-color;
+}
+
+.toolbar .plain-inline-dropdown-wrapper div {
+  //padding: 0;
 }
