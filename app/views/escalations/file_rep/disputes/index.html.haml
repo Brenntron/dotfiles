@@ -140,7 +140,16 @@
           %span.toolbar-button-text
             Change Disposition
         .dropdown-menu.toolbar-dropdown#file-disp-dropdown{'aria-labelledby': 'file-disp-button'}
-          Disposition dropdown
+          .toolbar
+            %div
+              %label.toolbar-section-label Disposition
+              %select.toolbar-select
+                %option Clean
+                %option Common
+                %option Malicious
+                %option Unknown
+            %button{class: 'primary', type:'button', id: 'button_reassign', onclick:'toolbar_index_change_assignee();'}
+              Submit
 
       %span.dropdown
         %button#file-det-button.toolbar-button.detection-button.dropdown-toggle.esc-tooltipped{title: 'Create Detection', 'data-toggle': 'dropdown', 'aria-haspopup': 'true', 'aria-expanded': 'false'}
@@ -180,6 +189,7 @@
               %label.content-label-sm Comment
               %textarea.dropdown-comment
             .button-row-center
+              -# TODO hookup submission of dropdown
               %button.primary.dropdown-submit-button Submit
 
 
