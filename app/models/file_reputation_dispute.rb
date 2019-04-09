@@ -12,11 +12,13 @@ class FileReputationDispute < ApplicationRecord
   validates :status, :file_name, :sha256_hash, :disposition_suggested, presence: true
 
   def update_status(status)
-    self.update(status: status)
+    self.update!(status: status)
 
-    sender_params[:addressee_id] = self.id
-    sender_params[:addressee_status] = self.status
+    envelope = {}
 
-    Bridge::FileRepUpdateStatusEvent.new(sender_params).post
+    envelope[:addressee_id] = self.id
+    envelope[:addressee_status] = self.status
+
+    Bridge::FilerepUpdateStatusEvent.new(envelope).post
   end
 end

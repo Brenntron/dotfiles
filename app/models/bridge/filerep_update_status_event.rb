@@ -1,4 +1,4 @@
-class Bridge::FileRepUpdateStatusEvent < Bridge::BaseMessage
+class Bridge::FilerepUpdateStatusEvent < Bridge::BaseMessage
   def initialize(sender_data)
     super(channel: 'update-filerep-ticket',
           addressee: 'talos-intelligence')
