@@ -14,6 +14,20 @@ class FileReputationDispute < ApplicationRecord
 
   validates :status, :file_name, :sha256_hash, :disposition_suggested, presence: true
 
+  # Searches based on supplied fields and values.
+  # Optionally takes a name to save this search as a saved search.
+  # @param [ActionController::Parameters] params supplied fields and values for search.
+  # @param [String] search_name name to save this search as a saved search.
+  # @param [ActiveRecord::Relation] base_relation relation to chain this search onto.
+  # @return [ActiveRecord::Relation]
+  def self.advanced_search(params, search_name:)
+    byebug
+
+    dispute_fields = params.to_h.slice(*FileReputationDispute.column_names)
+
+    relation = where(dispute_fields)
+  end
+
   # Searches based on standard pre-determined filters.
   # @param [String] search_name name of the filter.
   # @param [ActiveRecord::Relation] base_relation relation to chain this search onto.
@@ -73,7 +87,7 @@ class FileReputationDispute < ApplicationRecord
   def self.robust_search(search_type, search_name: nil, params: nil, user:)
     case search_type
     when 'advanced'
-      advanced_search(params, search_name: search_name, user: user)
+      advanced_search(params, search_name: search_name)
     when 'named'
       named_search(search_name, user: user)
     when 'standard'

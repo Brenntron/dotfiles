@@ -1,16 +1,16 @@
 describe Dispute do
   describe 'robust_search' do
     before(:all) do
-      long_desc1 = 'Long Cool Woman In A Black Dress'
-      long_desc2 = 'Short Skirt Long Jacket'
+      @long_desc1 = 'Long Cool Woman In A Black Dress'
+      @long_desc2 = 'Short Skirt Long Jacket'
 
       @current_user = FactoryBot.create(:current_user)
       @other_user = FactoryBot.create(:fake_user)
 
       @default = FactoryBot.create(:file_reputation_dispute, assigned: @other_user)
       @assigned = FactoryBot.create(:file_reputation_dispute, status: FileReputationDispute::STATUS_ASSIGNED, assigned: @other_user)
-      @closed = FactoryBot.create(:file_reputation_dispute, status: FileReputationDispute::STATUS_CLOSED, assigned: @other_user, description: long_desc2)
-      @my_default = FactoryBot.create(:file_reputation_dispute, assigned: @current_user, description: long_desc1)
+      @closed = FactoryBot.create(:file_reputation_dispute, status: FileReputationDispute::STATUS_CLOSED, assigned: @other_user, description: @long_desc2)
+      @my_default = FactoryBot.create(:file_reputation_dispute, assigned: @current_user, description: @long_desc1)
       @my_assigned = FactoryBot.create(:file_reputation_dispute, status: FileReputationDispute::STATUS_ASSIGNED, assigned: @current_user)
       @my_closed = FactoryBot.create(:file_reputation_dispute, status: FileReputationDispute::STATUS_CLOSED, assigned: @current_user)
       @unassigned = FactoryBot.create(:file_reputation_dispute, assigned: nil)
@@ -63,6 +63,13 @@ describe Dispute do
       results = FileReputationDispute.robust_search('standard', search_name: 'my_open', user: @current_user)
 
       expect(results.count).to eq(2)
+    end
+
+    it 'gets advanced search from a robust_search' do
+
+      results = FileReputationDispute.robust_search('advanced', params: {'description' => @long_desc2}, user: @current_user)
+
+      expect(results.count).to eq(1)
     end
   end
 end
