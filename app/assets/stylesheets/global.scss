@@ -8271,13 +8271,8 @@ hr.thin.form-divider {
 
 // dbinebri: updates below for file rep nav layout new
 // fix for size of list and research icons on left
-// wrapping all file rep styles here in sass nesting
-body.escalations--file_rep--disputes-controller {
-  @media screen and (min-width: 1600px) {
-    .nav-tool-blocks.nav-page-button-wrapper {
-      min-width: 120px;
-    }
-  }
+// wrapping all file rep styles here in sass nesting for specificity
+.escalations--file_rep--disputes-controller {
 
   .nav-tool-blocks.dropdown {
     background-color: $table-dark-body;
@@ -8288,38 +8283,38 @@ body.escalations--file_rep--disputes-controller {
   }
 
   .nav-tool-blocks.search-wrapper {
-    padding: 6px 5px 5px;
+    padding: 5px;
     padding-left: 40px;
-    line-height: 1em;
     text-align: left;
   }
 
+  // search group wrapper
   .input-group.search-group {
-    min-width: 200px;
-    max-width: 450px;
     background-color: $content-bg-color;
     border-radius: 2px;
     padding: 3px;
-    margin: 9px 10px 9px 30px;
+    margin: 0 0 0 30px;
     width: 100%;
+    min-width: 200px;
+    max-width: 450px;
   }
 
   .input-group.search-group form {
     max-width: 450px;
   }
 
+  // search input
   .input-group.search-group .search-box {
-    height: 28px;
-    margin: 2px -3px;
+    height: 22px;
+    margin: 3px -3px;
     background-size: 20px;
-    background-position: 6px center;
+    background-position: 4px center;
   }
 
   // advanced search button
   .input-group.search-group #advanced-search-button {
     padding: 0 12px 0 18px;
-    height: 28px;
-    margin-top: 2px;
+    height: 34px;
   }
 
   // adding the down caret icon using the sort_by svg for advanced search button
@@ -8341,5 +8336,13 @@ body.escalations--file_rep--disputes-controller {
     width: 100%;
     height: 100%;
   }
+
+  // large size fix for this
+  @media screen and (min-width: 1600px) {
+    .nav-tool-blocks.nav-page-button-wrapper {
+      min-width: 120px;
+    }
+  }
+
 
 }
