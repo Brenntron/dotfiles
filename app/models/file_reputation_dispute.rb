@@ -45,6 +45,20 @@ class FileReputationDispute < ApplicationRecord
     end
   end
 
+  # Searches many fields in the record for values containing a given value.
+  # @param [ActiveRecord::Relation] base_relation relation to chain this search onto.
+  # @return [ActiveRecord::Relation]
+  def self.contains_search(value)
+    contains_fields = %w{file_reputation_disputes.id source platform file_name sha256_hash description}
+    contains_where = contains_fields.map{|field| "#{field} like :pattern"}.join(' or ')
+
+    customer_where = %w{name email}.map{|field| "customers.#{field} like :pattern"}.join(' or ')
+    company_where = 'companies.name like :pattern'
+
+    where_str = "#{contains_where} or #{customer_where} or #{company_where}"
+    left_joins(customer: :company).where(where_str, pattern: "%#{value}%")
+  end
+
   # Searches in a variety of ways.
   # advanced -- search by supplied field.
   # named -- call a saved search.
