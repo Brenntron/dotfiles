@@ -5,7 +5,7 @@ class Threatgrid::ThreatScore
   set_default_headers ({})
 
   def self.get_threat_score(query)
-    api_response = call_request_parsed(:get, '/api/v2/search/submissions', input: {q: query, api_key: "#{Rails.configuration.threatgrid.api_key}"})
+    api_response = call_request_parsed(:get, '/api/v2/search/submissions', input: {q: query, sort_by: 'timestamp', api_key: "#{Rails.configuration.threatgrid.api_key}"})
 
     threat_score = api_response&.dig('data','items')[0]&.dig('item','analysis','threat_score')
     threatgrid_private = api_response&.dig('data','items')[0]&.dig('item','private')
