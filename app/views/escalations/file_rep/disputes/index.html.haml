@@ -147,7 +147,41 @@
           %span.toolbar-button-text
             Create Detection
         .dropdown-menu.toolbar-dropdown#file-det-dropdown{'aria-labelledby': 'file-disp-button'}
-          Detection dropdown
+          .inline-tool-content-wrapper.plain-inline-dropdown-wrapper
+            .row
+              .col-xs-12
+                %label.content-label-sm Detection Name
+            .row
+              .col-xs-4
+                %select
+                  -# TODO Add correct detection options here, these are placeholders
+                  %option Win32
+                  %option Trojan
+                  %option PUA
+                  %option Virus
+                  %option Generic
+              .col-xs-5
+                %input{type: 'text'}
+              .col-xs-3
+                %span .Talos
+            .row
+              .col-xs-12
+                %label.content-label-sm Disposition
+                %select
+                  -# TODO Add actual disposition options here, these are placeholders
+                  %option Clean
+                  %option Common
+                  %option Malicious
+                  %option Unknown
+            %hr.thin
+            .comment-wrapper
+              %label.content-label-sm Comment
+              %textarea.dropdown-comment
+            .button-row-center
+              %button.primary.dropdown-submit-button Submit
+
+
+
 
     %div
       %label.toolbar-section-label

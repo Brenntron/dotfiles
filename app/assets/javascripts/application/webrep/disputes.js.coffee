@@ -1352,15 +1352,14 @@ $ ->
         success: (response) ->
       )
 
-
     if window.location.pathname != '/escalations/webrep/disputes'
       $('#filter-cases').hide()
       $('#import-webrep').hide()
-      $('#web-rep-search').hide()
+#      $('#web-rep-search').hide()
     else
       $('#filter-cases').show()
       $('#import-webrep').show()
-      $('#web-rep-search').show()
+#      $('#web-rep-search').show()
 
   $('#edit-dispute-button').click ->
     $('.dispute-submission-type').hide()
