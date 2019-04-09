@@ -1,6 +1,7 @@
 # class FileReputationTicket < ApplicationRecord
 class FileReputationDispute < ApplicationRecord
   belongs_to :customer, optional:true
+  belongs_to :assigned, class_name: 'User', optional:true
   delegate :name, :company, :company_id, to: :customer, allow_nil: true, prefix: true
 
   STATUS_NEW                = 'NEW'
