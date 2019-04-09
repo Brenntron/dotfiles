@@ -4,11 +4,18 @@ class Escalations::PeakeBridge::FileRepMessagesController < ApplicationControlle
   def create
     file_rep = FileReputationDispute.where(file_name: file_rep_params[:file_rep_name]).first
     file_rep ||= FileReputationDispute.new
+
+    sandbox_score = nil
+    sandbox_score_result = FileReputationApi::Sandbox.amp_lookup(file_rep_params[:sha256_checksum])
+    if sandbox_score_result[:success] && sandbox_score_result[:data]["value"].present?
+      sandbox_score = sandbox_score_result[:data]["value"]
+    end
     attributes = {
         file_name: file_rep_params[:file_rep_name],
         sha256_hash: file_rep_params[:sha256_checksum],
         source: file_rep_params[:email],
-        status: 'NEW'
+        status: 'NEW',
+        sandbox_score: sandbox_score
     }
     file_rep.assign_attributes(attributes)
     if file_rep.save
