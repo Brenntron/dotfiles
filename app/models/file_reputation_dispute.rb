@@ -1,6 +1,7 @@
 # class FileReputationTicket < ApplicationRecord
 class FileReputationDispute < ApplicationRecord
   belongs_to :customer, optional:true
+  belongs_to :assigned, class_name: 'User', optional:true
   delegate :name, :company, :company_id, to: :customer, allow_nil: true, prefix: true
 
   # Searches in a variety of ways.
@@ -20,4 +21,13 @@ class FileReputationDispute < ApplicationRecord
       where({})
     end
   end
+
+  STATUS_NEW                = 'NEW'
+  STATUS_ASSIGNED           = 'ASSIGNED'
+  STATUS_CLOSED             = 'CLOSED'
+
+  DISPOSITION_MALICIOUS     = 'MALICIOUS'
+
+  validates :status, :file_name, :sha256_hash, :disposition_suggested, presence: true
+
 end

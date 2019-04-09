@@ -5,7 +5,7 @@ Rails.application.routes.draw do
 
   namespace :escalations, except: [:destroy, :edit] do
     get 'sb_api/query_lookup' => 'sb_api#query_lookup'
-    
+
     resources :rulehit_resolution_mailer_templates, only: [:new, :index, :create, :show, :update, :destroy, :edit]
     resources :sessions, controller: '/sessions', only: [:new, :create, :destroy]
 
