@@ -108,12 +108,8 @@ Rails.configuration.snort_rule_path     = Rails.root.join(env_config['svn']['sno
 
 wbrs_config = env_config['wbrs']
 raise 'config.yml missing wbrs section' unless wbrs_config
-Rails.configuration.wbrs                = OpenStruct.new
-Rails.configuration.wbrs.host           = wbrs_config['host']
-Rails.configuration.wbrs.port           = wbrs_config['port']
-Rails.configuration.wbrs.verify_mode    = wbrs_config['verify_mode'] || wbrs_config['tls_mode']
-Rails.configuration.wbrs.ca_cert_file   = wbrs_config['ca_cert_file']
-Rails.configuration.wbrs.gssnegotiate   = wbrs_config['gssnegotiate']
+Rails.configuration.wbrs                = ApiRequester::ApiRequester.config_of(wbrs_config)
+# TODO convert auth_token to api_key so it is set by config_of method.
 Rails.configuration.wbrs.auth_token     = wbrs_config['auth_token']
 
 xbrs_config = env_config['xbrs']
