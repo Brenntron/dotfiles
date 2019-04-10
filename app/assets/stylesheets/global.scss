@@ -8415,21 +8415,24 @@ hr.thin.form-divider {
   .input-group.search-group #advanced-search-button::after {
     content: '';
     display: block;
-    width: 14px;
+    width: 16px;
     height: 14px;
     right: 0;
     background-image: url(image_path('icon_sort_by.svg'));
     background-repeat: no-repeat;
     background-position: 30% 92%;
-    background-size: 25px 25px;
+    background-size: 26px 26px;
     float: right;
   }
 
-  #nav-banner .nav-tool-blocks.dropdown a {
+  // for the nav button labels, this is where we ensure labels can break and wrap if squeezed tight enough
+  #nav-banner .nav-tool-blocks.dropdown a, #nav-banner .nav-tool-blocks.dropdown a:hover {
     display: inline-block !important;
     width: 100%;
     height: 100%;
-    line-height: 20px;
+    line-height: 16px;
+    max-height: 30px;
+    padding-top: 6px;
   }
 
   // large size fix for this
