@@ -29,9 +29,9 @@ class FileRepDatatable < AjaxDatatablesRails::ActiveRecord
       threatgrid_signer:  { data: :threatgrid_signer, source: 'FileReputationDispute.threatgrid_signer', cond: :like },
       reversing_labs_score: { data: :reversing_labs_score, source: 'FileReputationDispute.reversing_labs_score', cond: :like },
       reversing_labs_signer: { data: :reversing_labs_signer, source: 'FileReputationDispute.reversing_labs_signer', cond: :like },
-      customer_name:      { data: :customer_name, source: 'FileReputationDispute.customer_name', cond: :like },
-      customer_email:     { data: :customer_email, source: 'FileReputationDispute.customer_email', cond: :like },
-      customer_company_name: { data: :customer_company_name, source: 'FileReputationDispute.customer_company_name', cond: :like },
+      # customer_name:      { data: :customer_name, source: 'FileReputationDispute.customer_name', cond: :like },
+      # customer_email:     { data: :customer_email, source: 'FileReputationDispute.customer_email', cond: :like },
+      # customer_company_name: { data: :customer_company_name, source: 'FileReputationDispute.customer_company_name', cond: :like },
     }
   end
 
@@ -75,9 +75,9 @@ class FileRepDatatable < AjaxDatatablesRails::ActiveRecord
           threatgrid_signer:            file_rep.threatgrid_signer,
           reversing_labs_score:         file_rep.reversing_labs_score,
           reversing_labs_signer:        file_rep.reversing_labs_signer,
-          customer_name:                file_rep.customer.name,
-          customer_email:               file_rep.customer.email,
-          customer_company_name:        file_rep.customer.company.name,
+          # customer_name:                file_rep.customer.name,
+          # customer_email:               file_rep.customer.email,
+          # customer_company_name:        file_rep.customer.company.name,
           DT_RowId:                     file_rep.id,
       }
     end
