@@ -722,7 +722,7 @@ class ComplaintEntry < ApplicationRecord
 
       self.domain = parsed_uri[:domain]
       self.subdomain = parsed_uri[:subdomain]
-      self.uri = subdomain + domain
+      self.uri = uri
       ComplaintEntryPreload.generate_preload_from_complaint_entry(self)
 
       save!
