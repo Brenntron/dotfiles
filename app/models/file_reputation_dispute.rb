@@ -141,8 +141,10 @@ class FileReputationDispute < ApplicationRecord
       standard_search(search_name, user: user)
     when 'contains'
       contains_search(params['value'])
+
     else
       where({})
     end
   end
+
 end
