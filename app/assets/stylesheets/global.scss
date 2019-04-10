@@ -8444,6 +8444,7 @@ hr.thin.form-divider {
 
 }
 
+
 // dbinebri: file rep - naming guide modal specific styles here
 // bootstrap 3 modals have many necessary internal divs
 #modal-naming-guide {
@@ -8503,3 +8504,8 @@ hr.thin.form-divider {
 
 }
 
+
+// dbinebri: the tooltips for file rep get too wide, limit the max-width
+.tooltipster-sidetip .tooltipster-box {
+  max-width: 410px !important;
+}
