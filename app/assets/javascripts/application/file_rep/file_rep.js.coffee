@@ -4,7 +4,7 @@ $ ->
 
   window.get_search_type = () ->
     if !localStorage.search_type
-      localStorage.setItem("search_type", "standard")
+      localStorage.search_type = 'standard'
 
     return localStorage.search_type
 
@@ -34,7 +34,7 @@ $ ->
       url: file_rep_url
       data:
         search_type: window.get_search_type()
-        search_name: 'Katie'
+        search_name: window.get_search_name()
         search_conditions:
           status: window.get_search_status()
     pagingType: 'full_numbers'
