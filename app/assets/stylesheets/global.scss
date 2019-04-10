@@ -8267,3 +8267,76 @@ hr.thin.form-divider {
 .history-table {
   background-color: $content-bg-color;
 }
+
+// dbinebri: the new ticket file rep container needs to be wide to handle huge sha256 strings
+.escalations--file_rep--disputes-controller .nav-tools-dropdown {
+  min-width: 540px;
+  margin-left: 35px;
+}
+
+// dbinebri: file reputation - new ticket specific styles inside the new ticket container
+.escalations--file_rep--disputes-controller .dropdown-menu #new-file-rep-form {
+
+  // radio specific styles
+  .file-rep-radio-wrapper {
+    input[type="radio"] {
+      border: none;
+      outline: none;
+      width: unset;
+    }
+    .radio-label {
+      font-size: 8pt;
+      padding-left: 8px;
+    }
+  }
+
+  // file rep new ticket text input styles
+  input {
+    margin-bottom: 8px;
+    background-color: transparent;
+    border: 1px solid darken($faint-neutral-color, 5%);
+    border-radius: 1px;
+    min-width: unset;
+    padding: 5px;
+
+    &:focus {
+      background-color: $faint-alt-highlight;
+      border: 3px solid $content-bg-color;
+      outline: 1px solid darken($faint-neutral-color, 5%);
+      padding: 3px;
+    }
+  }
+
+  // this attachment button/icon should be hidden on page load and
+  // displayed when radio button clicked, js/jquery handles this display logic
+  .file-rep-attachment button {
+    width: 18px;
+    height: 18px;
+    background-color: transparent;
+    border: none;
+  }
+
+  // minor positioning for the attachment icon
+  .attachment-label {
+    position: relative;
+    top: 3px;
+    left: 4px;
+  }
+  // tiny firefox fix
+  @-moz-document url-prefix() {
+    .attachment-label {
+      top: -3px;
+    }
+  }
+
+  hr.thin {
+    margin-top: 10px;
+    margin-bottom: 10px;
+
+    &:last-of-type {
+      margin-top: 30px;
+      margin-bottom: 20px;
+    }
+  }
+
+}

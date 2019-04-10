@@ -1,0 +1,36 @@
+%form#new-file-rep-form{method: 'get', 'accept-charset': 'UTF-8'}
+
+  .form-group
+    %input{type:'hidden', name: 'token', value: "#{current_user.authentication_token}"}
+    %input{type:'hidden', name: 'xml_token', value: "#{xml_token}"}
+    %input{type:'hidden', name: 'current_user', value: "#{current_user.authentication_token}"}
+
+  .form-group
+    %label.content-label-sm File Submission Type
+    .row.file-rep-radio-wrapper
+      .col-xs-3
+        %input{type: 'radio', name: 'file-rep-type', id: 'file-rep-sha256', value: 'file-rep-sha256', checked: true}
+        %label.radio-label{for: 'file-rep-sha256'} SHA256
+      .col-xs-4
+        %input{type: 'radio', name: 'file-rep-type', id: 'file-rep-attachment', value: 'file-rep-attachment'}
+        %label.radio-label{for: 'file-rep-attachment'} Attachment
+        %span.file-rep-attachment{class: 'hidden'}
+          %button.attachment-button.attachment-label.new-attachment
+
+  %hr.thin
+
+  .form-group
+    %label.content-label-sm SHA256
+    %input.form-control#file-rep-sha256{required: true, type: 'text', name: 'template-name', maxlength: 100}
+  .form-group
+    %label.content-label-sm Suggested Disposition
+    %input.form-control#file-rep-suggested_disposition{required: true, type: 'text', name: 'template-name', maxlength: 100}
+  .form-group
+    %label.content-label-sm Assignee
+    %input.form-control#file-rep-assignee{required: true, type: 'text', name: 'template-name', maxlength: 100}
+
+  %hr.thin
+
+  .form-group.text-center
+    %button.primary{value: 'submit', type: 'submit'}
+      Create Ticket
