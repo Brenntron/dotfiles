@@ -3,7 +3,7 @@
     %label.toolbar-section-label
       Table View
     %span.dropdown
-      %button#table-show-columns-button.toolbar-button.show-col-button.dropdown-toggle.esc-tooltipped{title: 'Show/Hide Columns', 'data-toggle': 'dropdown', 'aria-haspopup': 'true', 'aria-expanded': 'false'}
+      %button#table-show-columns-button.toolbar-button.show-col-button.dropdown-toggle.esc-tooltipped.toolbar-button-spacer{title: 'Show/Hide Columns', 'data-toggle': 'dropdown', 'aria-haspopup': 'true', 'aria-expanded': 'false'}
         %span.toolbar-button-text
           Show/Hide Columns
       .dropdown-menu.toolbar-dropdown#table-show-columns-dropdown{'aria-labelledby': 'table-show-columns-button'}
@@ -73,9 +73,9 @@
             %li.toggle-vis-nested{'data-column': 'entry-col-sbrs-rules'}
               %input{type: 'checkbox', id: 'sbrs-rules-checkbox'} SBRS Rules
 
-    %button.toolbar-button.expand-row-button#expand-all-index-rows.esc-tooltipped{title: 'Expand All Rows'}
+    %button.toolbar-button.expand-row-button#expand-all-index-rows.esc-tooltipped.toolbar-button-spacer{title: 'Expand All Rows'}
       %span.toolbar-button-text Expand All Rows
-    %button.toolbar-button.collapse-button.dropdown-button-margin-right#collapse-all-index-rows.esc-tooltipped{title: 'Collapse All Rows'}
+    %button.toolbar-button.collapse-button#collapse-all-index-rows.esc-tooltipped{title: 'Collapse All Rows'}
       %span.toolbar-button-text Collapse All Rows
 
   %div
@@ -87,7 +87,7 @@
       Edit Ticket
 
     %span.dropdown
-      %button#index_change_assign.toolbar-button.ticket-owner-button.show-col-button.dropdown-toggle.esc-tooltipped{title: 'Change Assignee', 'data-toggle': 'dropdown', 'aria-haspopup': 'true', 'aria-expanded': 'false'}
+      %button#index_change_assign.toolbar-button.ticket-owner-button.show-col-button.dropdown-toggle.esc-tooltipped.toolbar-button-spacer{title: 'Change Assignee', 'data-toggle': 'dropdown', 'aria-haspopup': 'true', 'aria-expanded': 'false'}
         %span.toolbar-button-text
           Change Assignee
       .dropdown-menu.toolbar-dropdown#index-change-assign-dropdown{'aria-labelledby': 'index_change_assign'}
@@ -101,7 +101,7 @@
             Assign
 
     %span.dropdown
-      %button#index_ticket_status.toolbar-button.ticket-status-button.dropdown-button-margin-right.dropdown-toggle.esc-tooltipped{title: 'Edit Ticket Status', 'data-toggle': 'dropdown', 'aria-haspopup': 'true', 'aria-expanded': 'false'}
+      %button#index_ticket_status.toolbar-button.ticket-status-button.dropdown-toggle.esc-tooltipped.toolbar-button-spacer{title: 'Edit Ticket Status', 'data-toggle': 'dropdown', 'aria-haspopup': 'true', 'aria-expanded': 'false'}
         %span.toolbar-button-text
           Edit Ticket Status
       .dropdown-menu.toolbar-dropdown#index-edit-ticket-status-dropdown{'aria-labelledby': 'index_ticket_status'}
@@ -165,7 +165,7 @@
                 Submit
 
     %span#mark-as-related.dropdown
-      %button#index_mark_related.toolbar-button.mark-related-button.dropdown-button-margin-right.esc-tooltipped{title: 'Mark as Related', 'data-toggle': 'dropdown', 'aria-haspopup': 'true', 'aria-expanded': 'false'}
+      %button#index_mark_related.toolbar-button.mark-related-button.esc-tooltipped{title: 'Mark as Related', 'data-toggle': 'dropdown', 'aria-haspopup': 'true', 'aria-expanded': 'false'}
         %span.toolbar-button-text
           Mark as Related
       .dropdown-menu.toolbar-dropdown#set-related-dispute-div{'aria-labelledby': 'index_mark_related'}
@@ -181,7 +181,7 @@
     %label.toolbar-section-label
       Edit Dispute Entry
     %span.dropdown
-      %button#index-entry-status-button.toolbar-button.ticket-status-button.esc-tooltipped{title: 'Edit Entry Status', 'data-toggle': 'dropdown', 'aria-haspopup': 'true', 'aria-expanded': 'false'}
+      %button#index-entry-status-button.toolbar-button.ticket-status-button.esc-tooltipped.toolbar-button-spacer{title: 'Edit Entry Status', 'data-toggle': 'dropdown', 'aria-haspopup': 'true', 'aria-expanded': 'false'}
         %span.toolbar-button-text
           Edit Entry Status
       .dropdown-menu.toolbar-dropdown#index-edit-entry-status-dropdown{'aria-labelledby': 'index_ticket_status'}
@@ -313,7 +313,7 @@
                   Submit Reputation Changes
 
     %span.dropdown
-      %button.toolbar-button.adjust-reptool-button.dropdown-button-margin-right.dropdown-toggle#reptool_index_entries_button.esc-tooltipped{title: 'Adjust RepTool BL', 'data-toggle': 'dropdown', 'aria-haspopup': 'true', 'aria-expanded': 'false', onclick: 'bulk_get_current_reptool("index");'}
+      %button.toolbar-button.adjust-reptool-button.dropdown-toggle#reptool_index_entries_button.esc-tooltipped{title: 'Adjust RepTool BL', 'data-toggle': 'dropdown', 'aria-haspopup': 'true', 'aria-expanded': 'false', onclick: 'bulk_get_current_reptool("index");'}
         %span.toolbar-button-text
           Adjust RepTool BL
       .dropdown-menu.toolbar-dropdown#reptool_adjust_entries{'aria-labelledby': 'reptool_entries_button'}

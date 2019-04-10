@@ -590,6 +590,7 @@ button {
   border-radius: 2px;
   height: 100%;
   display: inline-block;
+  float: left;
   padding-right: 10px;
   padding-top: 2px;
   padding-left: 20px;
@@ -626,6 +627,10 @@ button {
   margin-right: 6px;
   min-width: 36px;
   height: 20px;
+}
+
+.toolbar-button-spacer {
+  margin-right: 3px;
 }
 
 .dashboard-tickets-wrapper .toolbar-button-label {
@@ -685,6 +690,9 @@ button {
 .ticket-owner-button {background-image: url(image_path('icon_user_grey.svg'));}
 .sort-by-button {background-image: url(image_path('icon_sort_by.svg'));}
 .sync-button {background-image: url(image_path('icon_sync.svg'));}
+.detection-button {background-image: url(image_path('icon_target.svg'));}
+.disposition-button {background-image: url(image_path('icon_hazard.svg'));}
+.take-ticket-button-full {background-image: url(image_path('icon_take.svg'));}
 
 .master-submit-button {
   color: $content-bg-color;
@@ -926,6 +934,10 @@ thead th.sorting.center {
   font-weight: 400;
   padding-left: 8px;
   line-height: 1em;
+}
+
+.toolbar span.dropdown {
+  float: left;
 }
 
 .toolbar-button-text {
@@ -4595,9 +4607,6 @@ table > tbody > tr > td.dispute_rep_tools {
   background-color: $bug-section-color;
   border-radius: 2px 2px 0 0 ;
 }
-.ticket-owner-button {
-  margin: 0px 4px;
-}
 
 .toolbar-button.adjust-wlbl-button    {
   background-image: url(image_path('icon_wlbl_grey.svg'));
@@ -5824,12 +5833,12 @@ td.ticket-total::before {
   width: 170px !important;
 }
 
-#index-change-assign-dropdown{
+#index-change-assign-dropdown, #file-disp-dropdown{
   margin-left: 0;
   min-width: 0;
 }
 
-#index-change-assign-dropdown .toolbar {
+#index-change-assign-dropdown .toolbar, #file-disp-dropdown .toolbar {
   margin-bottom: 5px;
 }
 .secondary.ticket-owner-unassigned-button{
@@ -8339,4 +8348,87 @@ hr.thin.form-divider {
     }
   }
 
+}
+#file-index-table-show-columns-dropdown {
+  min-width: 390px;
+}
+
+#file-index-table-show-columns-dropdown ul {
+  display: block;
+  padding: 10px;
+}
+
+#file-index-table-show-columns-dropdown ul:first-of-type {
+  float: left;
+}
+
+#file-index-table-show-columns-dropdown ul li {
+  padding: 4px 12px;
+  font-size: 9pt;
+}
+
+#file-index-table-show-columns-dropdown ul li input {
+  margin-right: 8px;
+}
+
+.file-rep-index-toolbar {
+  .ticket-owner-button {
+    margin: 0;
+  }
+  .toolbar-dropdown {
+    margin-top: 0;
+    margin-left: 0;
+  }
+}
+
+.plain-inline-dropdown-wrapper {
+  padding: 10px !important;
+}
+
+.full-row-label {
+  width: 100%;
+  display: block;
+  margin-bottom: 0;
+  padding-bottom: 0;
+}
+
+.plain-inline-dropdown-wrapper {
+  select {
+    margin: 0;
+    height: 24px;
+    width: 100%;
+    border: none !important;
+    outline: 1px solid darken($faint-neutral-color, 10%);
+  }
+  select:focus {
+    margin: 0;
+    height: 24px;
+    border: none !important;
+    outline: 1px solid $bug-section-color !important;
+    box-shadow: none !important;
+  }
+  .text-input {
+    height: 26px;
+    margin-top: -1px;
+    width: 100%;
+  }
+  hr.thin {
+    margin-right: 2px;
+    margin-left: 2px;
+  }
+}
+
+.toolbar  .inline-tool-content-wrapper.plain-inline-dropdown-wrapper .row {
+  margin-left: 2px;
+  margin-right: 2px;
+}
+.file-name-extension {
+  float: none !important;
+  padding-left: 0 !important;
+  line-height: 2em !important;
+  color: $type-lighter-color;
+}
+
+.toolbar .plain-inline-dropdown-wrapper div {
+  //padding: 0;
 }
