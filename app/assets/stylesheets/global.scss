@@ -8323,9 +8323,30 @@ hr.thin.form-divider {
   position: absolute;
   right: 26px;
   top: 0;
+  margin-top: 0;
   button {
     padding: 10px 14px 10px 30px;
     margin-right: 0;
+    margin-bottom: 0;
+    margin-top: 8px;
+  }
+}
+
+@media (min-width: 768px) {
+  .file-edit-buttons-wrapper {
+    position: relative;
+    margin-top: -20px;
+    margin-left: 20px;
+    margin-bottom: 10px;
+  }
+}
+
+@media (min-width: 992px) {
+  .file-edit-buttons-wrapper {
+    position: absolute;
+    right: 26px;
+    top: 0;
+    margin-top: 0;
   }
 }
 
