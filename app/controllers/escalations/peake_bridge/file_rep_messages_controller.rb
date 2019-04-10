@@ -2,10 +2,9 @@ class Escalations::PeakeBridge::FileRepMessagesController < ApplicationControlle
   # skip_before_action :require_login
 
   def create
-    file_rep = FileReputationDispute.where(file_name: file_rep_params[:file_rep_name]).first
-    file_rep ||= FileReputationDispute.new
+    file_rep = FileReputationDispute.new
 
-    customer = customer_params['email'].present? ? Customer.find_or_create_customer(customer_params) : nil
+    customer = find_or_create_customer
     attributes = {
         sha256_hash: file_rep_params[:sha256_checksum],
         file_name: file_rep_params[:file_name],
@@ -46,5 +45,16 @@ class Escalations::PeakeBridge::FileRepMessagesController < ApplicationControlle
 
   def customer_params
     params.require(:message).require(:file_rep).require(:customer).permit(:email, :name, :company_name)
+  end
+
+  def find_or_create_customer
+    args = customer_params
+    if customer_params['email'].present?
+      Customer.find_or_create_customer(customer_email: args['email'],
+                                       name: args['name'],
+                                       company_name: args['customer_params'])
+    else
+      nil
+    end
   end
 end
