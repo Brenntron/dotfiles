@@ -4,6 +4,8 @@ class Escalations::PeakeBridge::FileRepMessagesController < ApplicationControlle
   def create
     file_rep = FileReputationDispute.where(file_name: file_rep_params[:file_rep_name]).first
     file_rep ||= FileReputationDispute.new
+
+    customer = customer_params['email'].present? ? Customer.find_or_create_customer(customer_params) : nil
     attributes = {
         sha256_hash: file_rep_params[:sha256_checksum],
         file_name: file_rep_params[:file_name],
@@ -12,8 +14,8 @@ class Escalations::PeakeBridge::FileRepMessagesController < ApplicationControlle
         disposition_suggested: file_rep_params[:disposition_suggested],
         source: file_rep_params[:source],
         platform: file_rep_params[:platform],
-        status: 'NEW',
-        customer_id: Customer.where(email: customer_params[:email]).first&.id
+        status: FileReputationDispute::STATUS_NEW,
+        customer: customer
     }
     file_rep.assign_attributes(attributes)
     if file_rep.save
