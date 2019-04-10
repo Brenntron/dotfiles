@@ -5,10 +5,15 @@ class Escalations::PeakeBridge::FileRepMessagesController < ApplicationControlle
     file_rep = FileReputationDispute.where(file_name: file_rep_params[:file_rep_name]).first
     file_rep ||= FileReputationDispute.new
     attributes = {
-        file_name: file_rep_params[:file_rep_name],
         sha256_hash: file_rep_params[:sha256_checksum],
-        source: file_rep_params[:email],
-        status: 'NEW'
+        file_name: file_rep_params[:file_name],
+        file_size: file_rep_params[:file_size],
+        sample_type: file_rep_params[:sample_type],
+        disposition_suggested: file_rep_params[:disposition_suggested],
+        source: file_rep_params[:source],
+        platform: file_rep_params[:platform],
+        status: 'NEW',
+        customer_id: Customer.where(email: customer_params[:email]).first&.id
     }
     file_rep.assign_attributes(attributes)
     if file_rep.save
@@ -33,6 +38,11 @@ class Escalations::PeakeBridge::FileRepMessagesController < ApplicationControlle
   end
 
   def file_rep_params
-    params.require(:message).require(:file_reputation_dispute).permit(:file_rep_name, :sha256_checksum, :email)
+    params.require(:message).require(:file_rep).permit(:sha256_checksum, :file_name, :file_size, :sample_type,
+    :disposition_suggested, :source, :platform)
+  end
+
+  def customer_params
+    params.require(:message).require(:file_rep).require(:customer).permit(:email, :name, :company_name)
   end
 end
