@@ -87,15 +87,152 @@
       %span{class: 'nav-toolbar-icon icon-naming-white'}
       Naming Guide
 
-
-    #modal-naming-guide.modal.fade{:role => "dialog"}
-      .modal-dialog
-        .modal-content
-          .modal-header
-            %button.close{"data-dismiss" => "modal", :type => "button"} ×
-            %h4.modal-title AMP Naming Conventions Guide
-          .modal-body
-            %div Some text in the modal.
+  -# dbinebri: all the data in this table exists only for css testing purposes
+  -# will need to be recoded with an amp/ti ajax api call later on
+  #modal-naming-guide.modal.fade{:role => "dialog"}
+    .modal-dialog
+      .modal-content
+        .modal-header
+          %button.close{"data-dismiss" => "modal", :type => "button"} ×
+          %h4.modal-title
+            %span.nav-toolbar-icon.icon-naming-white
+            AMP Naming Conventions Guide
+        .modal-body
+          .modal-table
+            %table.table
+              %thead
+                %tr
+                  %th Pattern
+                  %th Example
+                  %th Engine Description
+                  %th Notes
+              %tbody
+                %tr
+                  %td
+                    %span /^.*Clam.Heuristics.*/
+                  %td ClamAV.Heuristics.SWF.SuspectImage.E
+                  %td THIS IS ALL TEST DATA IN THIS TABLE, FYI. ClamAV Heuristic Rules, often has file extension in alert name (for example swf = flash file)
+                  %td
+                    %span{class: 'nav-toolbar-icon icon-notes'}
+                %tr
+                  %td
+                    %span /^.*.SPERO.*/
+                  %td W32.SPERO.Sality.02.12
+                  %td W32 Binary Header Features based classification engine
+                  %td
+                    %span{class: 'nav-toolbar-icon icon-notes'}
+                %tr
+                  %td
+                    %span /^.*ETHOS.*/
+                  %td W32.ETHOS.COHORS.MAR.a2b3c4
+                  %td Fuzzy hash based classification of Win32 binary headers
+                  %td
+                    %span{class: 'nav-toolbar-icon icon-notes'}
+                %tr
+                  %td
+                    %span /^.*Clam.Heuristics.*/
+                  %td ClamAV.Heuristics.SWF.SuspectImage.E
+                  %td ClamAV Heuristic Rules, often has file extension in alert name (for example swf = flash file)
+                  %td
+                    %span{class: 'nav-toolbar-icon icon-notes'}
+                %tr
+                  %td
+                    %span /^.*.SPERO.*/
+                  %td W32.SPERO.Sality.02.12
+                  %td W32 Binary Header Features based classification engine
+                  %td
+                    %span{class: 'nav-toolbar-icon icon-notes'}
+                %tr
+                  %td
+                    %span /^.*ETHOS.*/
+                  %td W32.ETHOS.COHORS.MAR.a2b3c4
+                  %td Fuzzy hash based classification of Win32 binary headers
+                  %td
+                    %span{class: 'nav-toolbar-icon icon-notes'}
+                %tr
+                  %td
+                    %span /^.*Clam.Heuristics.*/
+                  %td ClamAV.Heuristics.SWF.SuspectImage.E
+                  %td ClamAV Heuristic Rules, often has file extension in alert name (for example swf = flash file)
+                  %td
+                    %span{class: 'nav-toolbar-icon icon-notes'}
+                %tr
+                  %td
+                    %span /^.*.SPERO.*/
+                  %td W32.SPERO.Sality.02.12
+                  %td W32 Binary Header Features based classification engine
+                  %td
+                    %span{class: 'nav-toolbar-icon icon-notes'}
+                %tr
+                  %td
+                    %span /^.*ETHOS.*/
+                  %td W32.ETHOS.COHORS.MAR.a2b3c4
+                  %td Fuzzy hash based classification of Win32 binary headers
+                  %td
+                    %span{class: 'nav-toolbar-icon icon-notes'}
+                %tr
+                  %td
+                    %span /^.*Clam.Heuristics.*/
+                  %td ClamAV.Heuristics.SWF.SuspectImage.E
+                  %td ClamAV Heuristic Rules, often has file extension in alert name (for example swf = flash file)
+                  %td
+                    %span{class: 'nav-toolbar-icon icon-notes'}
+                %tr
+                  %td
+                    %span /^.*.SPERO.*/
+                  %td W32.SPERO.Sality.02.12
+                  %td W32 Binary Header Features based classification engine
+                  %td
+                    %span{class: 'nav-toolbar-icon icon-notes'}
+                %tr
+                  %td
+                    %span /^.*ETHOS.*/
+                  %td W32.ETHOS.COHORS.MAR.a2b3c4
+                  %td Fuzzy hash based classification of Win32 binary headers
+                  %td
+                    %span{class: 'nav-toolbar-icon icon-notes'}
+                %tr
+                  %td
+                    %span /^.*Clam.Heuristics.*/
+                  %td ClamAV.Heuristics.SWF.SuspectImage.E
+                  %td ClamAV Heuristic Rules, often has file extension in alert name (for example swf = flash file)
+                  %td
+                    %span{class: 'nav-toolbar-icon icon-notes'}
+                %tr
+                  %td
+                    %span /^.*.SPERO.*/
+                  %td W32.SPERO.Sality.02.12
+                  %td W32 Binary Header Features based classification engine
+                  %td
+                    %span{class: 'nav-toolbar-icon icon-notes'}
+                %tr
+                  %td
+                    %span /^.*ETHOS.*/
+                  %td W32.ETHOS.COHORS.MAR.a2b3c4
+                  %td Fuzzy hash based classification of Win32 binary headers
+                  %td
+                    %span{class: 'nav-toolbar-icon icon-notes'}
+                %tr
+                  %td
+                    %span /^.*Clam.Heuristics.*/
+                  %td ClamAV.Heuristics.SWF.SuspectImage.E
+                  %td ClamAV Heuristic Rules, often has file extension in alert name (for example swf = flash file)
+                  %td
+                    %span{class: 'nav-toolbar-icon icon-notes'}
+                %tr
+                  %td
+                    %span /^.*.SPERO.*/
+                  %td W32.SPERO.Sality.02.12
+                  %td W32 Binary Header Features based classification engine
+                  %td
+                    %span{class: 'nav-toolbar-icon icon-notes'}
+                %tr
+                  %td
+                    %span /^.*ETHOS.*/
+                  %td W32.ETHOS.COHORS.MAR.a2b3c4
+                  %td Fuzzy hash based classification of Win32 binary headers
+                  %td
+                    %span{class: 'nav-toolbar-icon icon-notes'}
 
 
 
@@ -107,8 +244,6 @@
 
       %button#advanced-search-button.btn.btn-default.nav-tool-button.dropdown-toggle{'data-toggle': 'dropdown', 'aria-haspopup': 'true', 'aria-expanded': 'false'}
         Advanced
-        -#%span{class: 'down-caret'}
-        -#  &#9660;
       .dropdown-menu.nav-tools-dropdown#advanced-search-dropdown{'aria-labelledby': 'advanced-search-button'}
         %h3.nav-tool-dropdown-header.inverse
           Advanced Search
