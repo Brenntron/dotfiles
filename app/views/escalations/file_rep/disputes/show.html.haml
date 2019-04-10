@@ -7,12 +7,10 @@
         .col-xs-3.col-with-divider
           %label.content-label-sm
             Case ID
-          .case-id-tag
+          .top-info-data.case-id-tag
             = @file_rep_dispute.id.to_s.rjust(10, '0')
-          %br
           %label.content-label-sm
             Status
-          %br
           -#  Add ruby code for status here
           %span.dropdown
             %button#show-edit-ticket-status-button.inline-select-dropdown.ticket-status-button.dropdown-toggle{title:'Edit Ticket Status', 'data-toggle': 'dropdown', 'aria-haspopup': 'true', 'aria-expanded': 'false',  }
@@ -48,8 +46,8 @@
 
         .col-xs-2.col-with-divider
           %label.content-label-sm
-            Owner
-          %div
+            Assignee
+          .top-info-data
             - if @file_rep_dispute.assigned.nil? || @file_rep_dispute.assigned == 'Unassigned'
               %span.missing-data "Unassigned"
             - else
@@ -80,7 +78,6 @@
             -#                  =select_tag :index_target_assignee, options_from_collection_for_select(User.joins(roles: :org_subset).where(org_subsets: { name: 'webrep' }).distinct.order(:cvs_username), :id, :cvs_username), class: 'toolbar-select'
             -#                %button{class: 'primary', type:'button', id: 'button_reassign', onclick:'toolbar_show_change_assignee();'}
             -#                  Assign
-          %br
           %label.content-label-sm
             Suggested Disposition
           - if @file_rep_dispute.disposition_suggested == 'Malicious'
@@ -89,62 +86,56 @@
             .disposition= @file_rep_dispute.disposition_suggested
 
         .col-xs-4.col-with-divider
-          %div
-            %label.content-label-sm Customer Name
-            %div
-              -# Add ruby code here
-              Sam Smith
-            %label.content-label-sm Customer Company
-            %div
-              -# Add ruby code here
-              Sam's Seashells
-          %div
-            %label.content-label-sm Customer Email
-            %div
-              -# Add ruby code here
-              sam@samshells.com
+          %label.content-label-sm Customer Name
+          .top-info-data
+            - unless @file_rep_dispute.customer.nil?
+              = @file_rep_dispute.customer.name
+            - else
+              %span.missing-data No customer record
+
+          %label.content-label-sm Customer Company
+          .top-info-data
+            - unless @file_rep_dispute.customer.nil? || @file_rep_dispute.customer.company.nil?
+              = @file_rep_dispute.customer.company.name
+            - else
+              %span.missing-data No customer record
+
+          %label.content-label-sm Customer Email
+          .top-info-data
+            - unless @file_rep_dispute.customer.nil?
+              = @file_rep_dispute.customer.email
+            - else
+              %span.missing-data No customer record
+
         .col-xs-3
-          %label.content-label-sm
-            Date/Time Submitted
-          %div
-            = @file_rep_dispute.created_at
+          %label.content-label-sm Date/Time Submitted
+          .top-info-data= @file_rep_dispute.created_at
 
   .col-sm-6.col-xs-12
     .content-wrapper.top-case-info
       %h4 File Overview
       .row
-        .col-xs-9.col-with-divider
+        .col-xs-8.col-with-divider
           %label.content-label-sm SHA256
-          %br
-          %div.code-snippet.code-string-break
-            = @file_rep_dispute.sha256_hash
-          %br
+          .top-info-data.code-snippet.code-string-break= @file_rep_dispute.sha256_hash
           %label.content-label-sm File Type
-          %div
-            = @file_rep_dispute.sample_type
-
-            -#.col-xs-2.col-with-divider
-
+          .top-info-data= @file_rep_dispute.sample_type
           %label.content-label-sm File Name
-          %div
-            = @file_rep_dispute.file_name
+          .top-info-data= @file_rep_dispute.file_name
           %label.content-label-sm File Size
-          %div
-            = @file_rep_dispute.file_size
+          .top-info-data= @file_rep_dispute.file_size
 
-
-
-        .col-xs-3
+        .col-xs-4
           %label.content-label-sm AMP Disposition
           - if @file_rep_dispute.disposition == 'Malicious'
-            .disposition.disp-negative= @file_rep_dispute.disposition
+            .top-info-data.disposition.disp-negative= @file_rep_dispute.disposition
           - else
-            .disposition= @file_rep_dispute.disposition
+            .top-info-data.disposition= @file_rep_dispute.disposition
           %label.content-label-sm AMP Detection Name
-          %div
+          .top-info-data
             = @file_rep_dispute.detection_name
           %label.content-label-sm AMP Detection Created
-          %div
+          .top-info-data
             = @file_rep_dispute.detection_created_at
 
 -# End of top overview information
