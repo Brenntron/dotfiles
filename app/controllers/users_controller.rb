@@ -158,7 +158,7 @@ class UsersController < ApplicationController
   end
 
   def user_params
-    params.require(:user).permit(:parent_id, :display_name,:cvs_username, :cec_username, :kerberos_login, :committer, :confirmed, :email, :class_level, :metrics_timeframe, role_ids: [])
+    params.require(:user).permit(:parent_id, :display_name,:cvs_username, :cec_username, :kerberos_login, :committer, :confirmed, :email, :class_level, :metrics_timeframe,  :threatgrid_api_key, :sandbox_api_key, role_ids: [])
   end
 
   def user_api_key_params
