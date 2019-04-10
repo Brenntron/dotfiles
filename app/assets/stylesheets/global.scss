@@ -8439,3 +8439,31 @@ hr.thin.form-divider {
 
 
 }
+
+// dbinebri: file rep - naming guide modal styles here
+#modal-naming-guide {
+  min-width: 800px;
+  position: fixed;
+  top: 100px;
+  right: 50px;
+
+  .modal-dialog {
+    margin: 30px auto;
+  }
+
+  .modal-header {
+    background: lighten($table-dark-body, 10%);
+    color: $content-bg-color;
+  }
+
+  .modal-body {
+    height: 400px;
+    overflow-y: scroll;
+
+    div {
+      color: $table-dark-body;
+    }
+  }
+
+}
+

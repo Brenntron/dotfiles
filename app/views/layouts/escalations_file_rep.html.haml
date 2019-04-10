@@ -83,9 +83,21 @@
 
 
   .nav-tool-blocks.col-xs-1.col-sm-1.col-lg-1.dropdown.nav-naming-guide
-    %a{href: '#', class: 'dropdown-toggle', id: 'new-ticket', 'data-toggle': 'dropdown', 'aria-haspopup': 'true', 'aria-expanded': 'false'}
+    %a{href: '#', class: 'modal-toggle', id: 'naming-guide', 'data-toggle': 'modal', 'data-target': '#modal-naming-guide', 'data-backdrop': 'false', 'aria-haspopup': 'true', 'aria-expanded': 'false'}
       %span{class: 'nav-toolbar-icon icon-naming-white'}
       Naming Guide
+
+
+    #modal-naming-guide.modal.fade{:role => "dialog"}
+      .modal-dialog
+        .modal-content
+          .modal-header
+            %button.close{"data-dismiss" => "modal", :type => "button"} ×
+            %h4.modal-title AMP Naming Conventions Guide
+          .modal-body
+            %div Some text in the modal.
+
+
 
 
   .nav-tool-blocks.col-xs-3.col-sm-3.col-lg-6.search-wrapper
