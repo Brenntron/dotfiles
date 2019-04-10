@@ -8273,7 +8273,8 @@ hr.thin.form-divider {
   text-transform: uppercase;
   font-weight: 700 !important;
   color: $type-lighter-color;
-  font-size: 10pt
+  font-size: 10pt;
+  margin-bottom: 20px;
 }
 
 .case-id-tag {
@@ -8306,4 +8307,21 @@ hr.thin.form-divider {
 
 .top-info-data {
   margin-bottom: 10px;
+}
+
+.file-edit-buttons-wrapper {
+  display: inline-block;
+  position: absolute;
+  right: 26px;
+  top: 0;
+  button {
+    padding: 10px 14px 10px 30px;
+    margin-right: 0;
+  }
+}
+
+.create-det-button, .change-disp-button {
+  background-repeat: no-repeat;
+  background-size: 20px 20px;
+  background-position: 10px center;
 }
