@@ -3526,6 +3526,7 @@ fieldset.top-content {
 .nav-tabs > li > a#communication-tab-link {background-image: url(image_path('icon_communication.svg'));}
 .nav-tabs > li > a#research-tab-link {background-image: url(image_path('icon_research_tab.svg'));}
 .nav-tabs > li > a#related-tab-link {background-image: url(image_path('icon_duplicate_tab.svg'));}
+.nav-tabs > li > a#history-tab-link {background-image: url(image_path('icon_history_tab.svg'));}
 
 .email-msg-body pre {
   background-color: $content-bg-color;
@@ -8266,4 +8267,34 @@ hr.thin.form-divider {
 
 .history-table {
   background-color: $content-bg-color;
+}
+
+.top-case-info h4 {
+  text-transform: uppercase;
+  font-weight: 700 !important;
+  color: $type-lighter-color;
+  font-size: 10pt
+}
+
+.case-id-tag {
+  font-weight: 700;
+  font-size: 12pt;
+}
+
+.ticket-overview-wrapper {
+  margin-bottom: 24px;
+}
+
+.ticket-overview-wrapper .inline-select-dropdown {
+  min-width: 100px !important;
+}
+
+.code-string-break {
+  word-wrap: break-word;
+  display: block !important;
+}
+
+.disp-negative {
+  font-weight: 600;
+  color: $warning-accent-color;
 }

@@ -1,32 +1,59 @@
 -#view single record
 .row
   .col-sm-6.col-xs-12
-    .content-wrapper.top-case-info
+    .content-wrapper.top-case-info.ticket-overview-wrapper
       %h4 Ticket Overview
       .row
-        .col-xs-2.col-with-divider
+        .col-xs-3.col-with-divider
           %label.content-label-sm
             Case ID
-          %br
           .case-id-tag
-            -# Add ruby code for id here
-            000084734
+            = @file_rep_dispute.id.to_s.rjust(10, '0')
           %br
           %label.content-label-sm
             Status
           %br
           -#  Add ruby code for status here
-          %select
-            %option{'selected': true} New
-            %option Assigned
-            %option Researching
-            %option Closed
+          %span.dropdown
+            %button#show-edit-ticket-status-button.inline-select-dropdown.ticket-status-button.dropdown-toggle{title:'Edit Ticket Status', 'data-toggle': 'dropdown', 'aria-haspopup': 'true', 'aria-expanded': 'false',  }
+              - if @file_rep_dispute.status.nil?
+                NEW
+              - else
+                = @file_rep_dispute.status
 
-        .col-xs-3.col-with-divider
+            .dropdown-menu.inline-dropdown-menu#show-edit-ticket-status-dropdown{'aria-labelledby': 'show-edit-ticket-status-button'}
+              %ul
+                %li.status-radio-wrapper
+                  %input.ticket-status-radio{type: 'radio', name: 'file-dispute-status', id: 'file-status-new', value: 'NEW'}
+                  %label.radio-label.ticket-status-radio-label{for:'file-status-new'} New
+                %li.status-radio-wrapper
+                  %input.ticket-status-radio{type: 'radio', name: 'file-dispute-status', id: 'file-status-researching', value: 'RESEARCHING'}
+                  %label.radio-label.ticket-status-radio-label{for:'file-status-researching'} Researching
+                %li.status-radio-wrapper
+                  %input.ticket-status-radio{type: 'radio', name: 'file-dispute-status', id: 'file-status-escalated', value: 'ESCALATED'}
+                  %label.radio-label.ticket-status-radio-label{for:'file-status-escalated'} Escalated
+                %li.status-radio-wrapper
+                  %input.ticket-status-radio{type: 'radio', name: 'file-dispute-status', id: 'file-status-pending', value: 'PENDING'}
+                  %label.radio-label.ticket-status-radio-label{for:'file-status-pending'} Customer Pending
+                %li.status-radio-wrapper
+                  %input.ticket-status-radio{type: 'radio', name: 'file-dispute-status', id: 'file-status-onhold', value: 'ONHOLD'}
+                  %label.radio-label.ticket-status-radio-label{for:'file-status-onhold'} On Hold
+                %li.status-radio-wrapper
+                  %input.ticket-status-radio{type: 'radio', name: 'file-dispute-status', id: 'file-status-assigned', value: 'ASSIGNED'}
+                  %label.radio-label.ticket-status-radio-label{for:'file-status-assigned'} Assigned
+                %li.status-radio-wrapper
+                  %input.ticket-status-radio{type: 'radio', name: 'file-dispute-status', id: 'file-status-closed', value: 'RESOLVED'}
+                  %label.radio-label.ticket-status-radio-label{for:'file-status-closed'} Resolved / Closed
+
+
+        .col-xs-2.col-with-divider
           %label.content-label-sm
             Owner
-          -#  Below taken from current webrep
           %div
+            - if @file_rep_dispute.assigned.nil? || @file_rep_dispute.assigned == 'Unassigned'
+              %span.missing-data "Unassigned"
+            - else
+              %span= @file_rep_dispute.assigned.cvs_username
             -#- if @dispute.assignee == 'Unassigned'
             -#  %span.missing-data#dispute-assignee= @dispute.assignee || "None"
             -#- else
@@ -56,22 +83,23 @@
           %br
           %label.content-label-sm
             Suggested Disposition
-          .disposition
-            -# Add ruby code here
-            Malicious
-        .col-xs-4
+          - if @file_rep_dispute.disposition_suggested == 'Malicious'
+            .disposition.disp-negative= @file_rep_dispute.disposition_suggested
+          - else
+            .disposition= @file_rep_dispute.disposition_suggested
+
+        .col-xs-4.col-with-divider
           %div
-            %label Customer Name
+            %label.content-label-sm Customer Name
             %div
               -# Add ruby code here
               Sam Smith
-            %br
-            %label Customer Company
+            %label.content-label-sm Customer Company
             %div
               -# Add ruby code here
               Sam's Seashells
           %div
-            %label Customer Email
+            %label.content-label-sm Customer Email
             %div
               -# Add ruby code here
               sam@samshells.com
@@ -79,46 +107,45 @@
           %label.content-label-sm
             Date/Time Submitted
           %div
-            -# Add ruby code here
-            2019-03-22 13:50:08 UTC
+            = @file_rep_dispute.created_at
 
   .col-sm-6.col-xs-12
     .content-wrapper.top-case-info
       %h4 File Overview
       .row
-        .col-xs-6.col-with-divider
-          %label SHA256
-          %div.code-snippet
-            -# Add ruby code here
-            0170443c47a5e7eb9d16bced87910e5bc11b3b0e10e9a1efa6b582ac15e92166
+        .col-xs-9.col-with-divider
+          %label.content-label-sm SHA256
           %br
-          %label File Type
+          %div.code-snippet.code-string-break
+            = @file_rep_dispute.sha256_hash
+          %br
+          %label.content-label-sm File Type
           %div
-            -# Add ruby code here
-            PE32 executable (GUI) Intel 80386, for MS Windows, UPX compressed
-        .col-xs-2.col-with-divider
-          %label File Name
+            = @file_rep_dispute.sample_type
+
+            -#.col-xs-2.col-with-divider
+
+          %label.content-label-sm File Name
           %div
-            -# Add ruby code here
-            eproxymmbudget.exe
-          %label File Size
+            = @file_rep_dispute.file_name
+          %label.content-label-sm File Size
           %div
-            -# Add ruby code here
-            1 Mb
-        .col-xs-2.col-with-divider
-          %label AMP Disposition
+            = @file_rep_dispute.file_size
+
+
+
+        .col-xs-3
+          %label.content-label-sm AMP Disposition
+          - if @file_rep_dispute.disposition == 'Malicious'
+            .disposition.disp-negative= @file_rep_dispute.disposition
+          - else
+            .disposition= @file_rep_dispute.disposition
+          %label.content-label-sm AMP Detection Name
           %div
-            -# Add ruby code here
-            Malicious
-          %label AMP Detection Name
+            = @file_rep_dispute.detection_name
+          %label.content-label-sm AMP Detection Created
           %div
-            -# Add ruby code here
-            W32.Trojan.19cp.1201
-        .col-xs-2
-          %label AMP Detection Created
-          %div
-            -# Add ruby code here
-            2016-01-16 15:35:24
+            = @file_rep_dispute.detection_created_at
 
 -# End of top overview information
 
