@@ -27,32 +27,32 @@
             Owner
           -#  Below taken from current webrep
           %div
-            - if @dispute.assignee == 'Unassigned'
-              %span.missing-data#dispute-assignee= @dispute.assignee || "None"
-            - else
-              %span= @dispute.assignee || "None"
-            - if can? :update, Dispute
-              .dispute-owner-buttons-wrapper
-                - if @dispute.assignee == current_user.email
-                  - if (@dispute.resolution != Dispute::DUPLICATE) && (@dispute.status != Dispute::RESOLVED)
-                    %button.return-ticket-button.esc-tooltipped{title: 'Return ticket to open queue', onclick: 'toolbar_unassign_dispute();'}
-                - else
-                  - if (@dispute.resolution != Dispute::DUPLICATE) && (@dispute.status != Dispute::RESOLVED) && (@dispute.user.cvs_username == 'vrtincom')
-                    %button.take-ticket-button#show_ticket_assign.esc-tooltipped{title: 'Assign this ticket to me', onclick: "take_single_dispute(#{@dispute.id});"}
-
-                  %span.dropdown
-                    - if (@dispute.resolution != Dispute::DUPLICATE) && (@dispute.status != Dispute::RESOLVED)
-                      %button#index_change_assign.dispute-inline-buttons.ticket-owner-button.dropdown-toggle.esc-tooltipped{title: 'Change Assignee', 'data-toggle': 'dropdown', 'aria-haspopup': 'true', 'aria-expanded': 'false'}
-                    .dropdown-menu#show-change-assign-dropdown{'aria-labelledby': 'index_change_assign'}
-                      .change-assignee-dropdown-wrapper
-                        %h3 Change Assignee
-                        .inline-tool-content-wrapper
-                          .toolbar
-                            %div
-                              %label.toolbar-section-label Assignee
-                              =select_tag :index_target_assignee, options_from_collection_for_select(User.joins(roles: :org_subset).where(org_subsets: { name: 'webrep' }).distinct.order(:cvs_username), :id, :cvs_username), class: 'toolbar-select'
-                            %button{class: 'primary', type:'button', id: 'button_reassign', onclick:'toolbar_show_change_assignee();'}
-                              Assign
+            -#- if @dispute.assignee == 'Unassigned'
+            -#  %span.missing-data#dispute-assignee= @dispute.assignee || "None"
+            -#- else
+            -#  %span= @dispute.assignee || "None"
+            -#- if can? :update, Dispute
+            -#  .dispute-owner-buttons-wrapper
+            -#    - if @dispute.assignee == current_user.email
+            -#      - if (@dispute.resolution != Dispute::DUPLICATE) && (@dispute.status != Dispute::RESOLVED)
+            -#        %button.return-ticket-button.esc-tooltipped{title: 'Return ticket to open queue', onclick: 'toolbar_unassign_dispute();'}
+            -#    - else
+            -#      - if (@dispute.resolution != Dispute::DUPLICATE) && (@dispute.status != Dispute::RESOLVED) && (@dispute.user.cvs_username == 'vrtincom')
+            -#        %button.take-ticket-button#show_ticket_assign.esc-tooltipped{title: 'Assign this ticket to me', onclick: "take_single_dispute(#{@dispute.id});"}
+            -#
+            -#      %span.dropdown
+            -#        - if (@dispute.resolution != Dispute::DUPLICATE) && (@dispute.status != Dispute::RESOLVED)
+            -#          %button#index_change_assign.dispute-inline-buttons.ticket-owner-button.dropdown-toggle.esc-tooltipped{title: 'Change Assignee', 'data-toggle': 'dropdown', 'aria-haspopup': 'true', 'aria-expanded': 'false'}
+            -#        .dropdown-menu#show-change-assign-dropdown{'aria-labelledby': 'index_change_assign'}
+            -#          .change-assignee-dropdown-wrapper
+            -#            %h3 Change Assignee
+            -#            .inline-tool-content-wrapper
+            -#              .toolbar
+            -#                %div
+            -#                  %label.toolbar-section-label Assignee
+            -#                  =select_tag :index_target_assignee, options_from_collection_for_select(User.joins(roles: :org_subset).where(org_subsets: { name: 'webrep' }).distinct.order(:cvs_username), :id, :cvs_username), class: 'toolbar-select'
+            -#                %button{class: 'primary', type:'button', id: 'button_reassign', onclick:'toolbar_show_change_assignee();'}
+            -#                  Assign
           %br
           %label.content-label-sm
             Suggested Disposition
@@ -81,3 +81,66 @@
           %div
             -# Add ruby code here
             2019-03-22 13:50:08 UTC
+
+  .col-sm-6.col-xs-12
+    .content-wrapper.top-case-info
+      %h4 File Overview
+      .row
+        .col-xs-6.col-with-divider
+          %label SHA256
+          %div.code-snippet
+            -# Add ruby code here
+            0170443c47a5e7eb9d16bced87910e5bc11b3b0e10e9a1efa6b582ac15e92166
+          %br
+          %label File Type
+          %div
+            -# Add ruby code here
+            PE32 executable (GUI) Intel 80386, for MS Windows, UPX compressed
+        .col-xs-2.col-with-divider
+          %label File Name
+          %div
+            -# Add ruby code here
+            eproxymmbudget.exe
+          %label File Size
+          %div
+            -# Add ruby code here
+            1 Mb
+        .col-xs-2.col-with-divider
+          %label AMP Disposition
+          %div
+            -# Add ruby code here
+            Malicious
+          %label AMP Detection Name
+          %div
+            -# Add ruby code here
+            W32.Trojan.19cp.1201
+        .col-xs-2
+          %label AMP Detection Created
+          %div
+            -# Add ruby code here
+            2016-01-16 15:35:24
+
+-# End of top overview information
+
+
+
+%ul.nav.nav-tabs{role: 'tablist'}
+  %li.nav-item{role:'presentation'}
+    %a.nav-link#communication-tab-link{href: '#communication_tab', 'aria-controls': 'communication', role: 'tab', 'data-toggle': 'tab'}
+      Communication
+  %li.nav-item{role:'presentation'}
+    %a.nav-link#research-tab-link{href: '#research_tab', 'aria-controls': 'research', role: 'tab', 'data-toggle': 'tab'}
+      Research
+  %li.nav-item{role:'presentation'}
+    %a.nav-link#history-tab-link{href: '#history_tab', 'aria-controls': 'history', role: 'tab', 'data-toggle': 'tab'}
+      History
+
+.tab-content.content-wrapper#bug-tab-content
+  .tab-pane#communication_tab{role: 'tabpanel'}
+    Communication
+    -#= render 'escalations/webrep/disputes/communication_tab'
+  .tab-pane#research_tab{role: 'tabpanel'}
+    Research
+    -#= render 'escalations/webrep/disputes/research_tab'
+  .tab-pane#history_tab{role: 'tabpanel'}
+    History
