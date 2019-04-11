@@ -1,4 +1,5 @@
 class Escalations::FileRep::DisputesController < ApplicationController
+  load_and_authorize_resource class: 'FileReputationDispute'
 
   def index
     respond_to do |format|

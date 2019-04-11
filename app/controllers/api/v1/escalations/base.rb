@@ -8,6 +8,8 @@ module API
         mount API::V1::Escalations::BugzillaRestLogin
         mount API::V1::Escalations::Attachments
         mount API::V1::Escalations::UserPreferences
+        mount API::V1::Escalations::FileRep::Disputes
+        mount API::V1::Escalations::FileRep::DisputeComments
         mount API::V1::Escalations::Webrep::Disputes
         mount API::V1::Escalations::Webrep::DisputeEmails
         mount API::V1::Escalations::Webrep::DisputeComments
