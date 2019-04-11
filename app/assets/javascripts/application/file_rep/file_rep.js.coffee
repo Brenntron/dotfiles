@@ -9,14 +9,14 @@ $ ->
     return localStorage.search_type
 
   window.get_search_name = () ->
-    localStorage.search_name = 'katie'
+    localStorage.search_name = ''
     return localStorage.search_name
 
   window.get_search_status = () ->
     current_url = window.location.href
     status_param_regex = /f=(.*)/
     current_status = status_param_regex.exec(current_url)[1]
-
+    console.log(localStorage.search_status)
     if current_url.match('f=')
       localStorage.search_status = current_status
         # if the url has string that indicates a search param has been added,
