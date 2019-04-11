@@ -8444,26 +8444,16 @@ hr.thin.form-divider {
   //padding: 0;
 }
 
-// dbinebri: updates below for file rep nav layout new
-// fix for size of list and research icons on left
-// wrapping all file rep styles here in sass nesting for specificity
+// dbinebri: updates below for file rep navbar layout new
+// wrapping all file rep nav styles here in sass nesting for specificity
 .escalations--file_rep--disputes-controller {
 
-  .nav-tool-blocks.dropdown {
-    background-color: $table-dark-body;
-  }
-
-  .nav-tool-blocks.dropdown:hover {
-    background-color: lighten($table-dark-body, 10%);
-  }
-
+  // search input group wrapper
   .nav-tool-blocks.search-wrapper {
-    padding: 7px;
-    padding-left: 40px;
+    padding: 7px 7px 7px 40px;
     text-align: left;
   }
 
-  // search group wrapper
   .input-group.search-group {
     padding: 3px 3px 3px 5px;
     margin: 0 0 0 40px;
@@ -8472,16 +8462,12 @@ hr.thin.form-divider {
     max-width: 450px;
   }
 
-  // best way to ensure the max-height of the search input box is right here
-  .input-group.search-group form {
-    //max-height: 24px;
-  }
-
-  // search input
+  // search input field
   .input-group.search-group .search-box {
     height: 24px;
     margin: 0px -3px;
     padding-left: 30px;
+    padding-top: 0;
     background-size: 20px;
     background-position: 4px center;
   }
@@ -8511,19 +8497,16 @@ hr.thin.form-divider {
     display: inline-block !important;
     width: 100%;
     height: 100%;
-    line-height: 16px;
-    max-height: 30px;
-    padding-top: 6px;
   }
 
-  // file rep nav wide - minor width adjustments, the col-lg-1 too narrow, col-lg-2 too wide
-  @media screen and (min-width: 1201px) {
+  // file rep navbar specific styles - minor width adjustments, col-lg-1 is too tight, col-lg-2 too wide
+  @media screen and (min-width: 1200px) {
     .col-lg-1.nav-naming-guide, .col-lg-1.nav-new-ticket {
-      width: 10.5%;
+      width: 12%;
     }
     // below ensures the navbar widths adds up correctly
     .col-lg-2.nav-username {
-      width: 20%;
+      width: 17%;
     }
   }
 

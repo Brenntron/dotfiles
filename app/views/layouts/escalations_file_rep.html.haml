@@ -56,16 +56,6 @@
             %span.nav-dropdown-icon.icon-all-tickets
             All Tickets
 
-  .nav-tool-blocks.col-xs-2.col-sm-2.col-md-2.col-lg-1.dropdown.nav-new-ticket
-    %a{href: '#', class: 'dropdown-toggle', id: 'new-dispute', 'data-toggle': 'dropdown', 'aria-haspopup': 'true', 'aria-expanded': 'false'}
-      %span{class: 'nav-toolbar-icon icon-new-white'}
-      New Ticket
-    .dropdown-menu.nav-tools-dropdown{'aria-labelledby': 'new-dispute'}
-      %h3.nav-tool-dropdown-header.inverse
-        New Ticket
-      .nav-tool-content-wrapper#new-dispute-wrapper
-        = render 'escalations/webrep/disputes/new'
-
       #saved-searches-wrapper.nav-tool-content-wrapper
         %h3.nav-tool-dropdown-header
           %span.nav-dropdown-content-icon.icon-saved-search
@@ -82,8 +72,19 @@
                       = image_tag('icon_cancel_grey.svg')
 
 
+  .nav-tool-blocks.col-xs-2.col-sm-2.col-md-2.col-lg-1.dropdown.nav-new-ticket
+    %a{href: '#', class: 'dropdown-toggle', id: 'new-dispute', 'data-toggle': 'dropdown', 'aria-haspopup': 'true', 'aria-expanded': 'false'}
+      %span{class: 'nav-toolbar-icon icon-new-white'}
+      New Ticket
+    .dropdown-menu.nav-tools-dropdown{'aria-labelledby': 'new-dispute'}
+      %h3.nav-tool-dropdown-header.inverse
+        New Ticket
+      .nav-tool-content-wrapper#new-dispute-wrapper
+        = render 'escalations/webrep/disputes/new'
+
+
   .nav-tool-blocks.col-xs-2.col-sm-2.col-md-2.col-lg-1.dropdown.nav-naming-guide
-    %a{href: '#', class: 'dropdown-toggle', id: 'new-ticket', 'data-toggle': 'dropdown', 'aria-haspopup': 'true', 'aria-expanded': 'false'}
+    %a{href: '#', class: 'dropdown-toggle', id: 'naming-guide', 'data-toggle': 'dropdown', 'aria-haspopup': 'true', 'aria-expanded': 'false'}
       %span{class: 'nav-toolbar-icon icon-naming-white'}
       Naming Guide
 
