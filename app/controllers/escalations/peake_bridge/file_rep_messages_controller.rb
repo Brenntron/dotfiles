@@ -4,13 +4,28 @@ class Escalations::PeakeBridge::FileRepMessagesController < ApplicationControlle
   def create
     file_rep = FileReputationDispute.where(file_name: file_rep_params[:file_rep_name]).first
     file_rep ||= FileReputationDispute.new
+
+    if file_rep_params[:sha256_checksum].present?
+      threatgrid_response = Threatgrid::Search.query(file_rep_params[:sha256_checksum])
+
+      threat_score = threatgrid_response['threat_score']
+      threatgrid_private = threatgrid_response['threatgrid_private']
+    else
+      threat_score = nil
+      threatgrid_private = nil
+    end
+
     attributes = {
         file_name: file_rep_params[:file_rep_name],
         sha256_hash: file_rep_params[:sha256_checksum],
         source: file_rep_params[:email],
-        status: 'NEW'
+        status: 'NEW',
+        disposition_suggested: file_rep_params[:disposition_suggested],
+        threatgrid_score: threat_score,
+        threatgrid_private: threatgrid_private
     }
     file_rep.assign_attributes(attributes)
+
     if file_rep.save
       sender_params[:addressee_id] = file_rep.id
       sender_params[:addressee_status] = file_rep.status
@@ -33,6 +48,6 @@ class Escalations::PeakeBridge::FileRepMessagesController < ApplicationControlle
   end
 
   def file_rep_params
-    params.require(:message).require(:file_reputation_dispute).permit(:file_rep_name, :sha256_checksum, :email)
+    params.require(:message).require(:file_rep).permit(:file_rep_name, :sha256_checksum, :email, :disposition_suggested)
   end
 end

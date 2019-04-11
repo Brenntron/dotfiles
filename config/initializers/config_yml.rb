@@ -139,3 +139,7 @@ Rails.configuration.bls                = OpenStruct.new
 Rails.configuration.bls.host           = bls_config['host']
 Rails.configuration.bls.port           = bls_config['port']
 
+threatgrid = env_config.fetch('threatgrid', {})
+raise 'config.yml missing sendgrid section' unless threatgrid
+Rails.configuration.threatgrid         = ApiRequester::ApiRequester.config_of(threatgrid)
+
