@@ -2,41 +2,45 @@ $ ->
 
   file_rep_url = $('#file-rep-datatable').data('source')
 
+  window.build_data = () ->
+    search_type = window.get_search_type()
+    search_name = window.get_search_name()
+
+    data =
+      search_type: search_type
+      search_name: search_name
+    return data
+
+
   window.get_search_type = () ->
     if !localStorage.search_type
       localStorage.search_type = 'standard'
 
     return localStorage.search_type
 
-  window.get_search_name = () ->
-    localStorage.search_name = ''
-    return localStorage.search_name
 
-  window.get_search_status = () ->
-    current_url = window.location.href
-    status_param_regex = /f=(.*)/
-    current_status = status_param_regex.exec(current_url)[1]
-    console.log(localStorage.search_status)
-    if current_url.match('f=')
-      localStorage.search_status = current_status
+  window.get_search_name = () ->
+    if localStorage.search_type = 'standard'
+      current_url = window.location.href
+      status_param_regex = /f=(.*)/
+      current_name = status_param_regex.exec(current_url)
+      if current_url.match('f=') && current_name
         # if the url has string that indicates a search param has been added,
         #ensure that localStorage search type matches current status
-    else
-      localStorage.search_status ='all'
-
-    return localStorage.search_status
-
+        localStorage.search_name = current_name[1]
+      else
+        localStorage.search_name = 'all'
+    return localStorage.search_name
 
   $('#file-rep-datatable').dataTable
     processing: true
     serverSide: true
     ajax:
       url: file_rep_url
-      data:
-        search_type: window.get_search_type()
-        search_name: window.get_search_name()
-        search_conditions:
-          status: window.get_search_status()
+      data: build_data()
+#        search_conditions:
+#          search_status: 'search_name'
+#          search_name: 'search_name'
     pagingType: 'full_numbers'
     columns: [
       #{data: 'id'}
