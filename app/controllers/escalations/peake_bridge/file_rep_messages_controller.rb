@@ -20,8 +20,9 @@ class Escalations::PeakeBridge::FileRepMessagesController < ApplicationControlle
         sha256_hash: file_rep_params[:sha256_checksum],
         source: file_rep_params[:email],
         status: 'NEW',
-        threat_score: threat_score,
-        threat_grid_private: threatgrid_private
+        disposition_suggested: file_rep_params[:disposition_suggested],
+        threatgrid_score: threat_score,
+        threatgrid_private: threatgrid_private
     }
     file_rep.assign_attributes(attributes)
 
@@ -47,6 +48,6 @@ class Escalations::PeakeBridge::FileRepMessagesController < ApplicationControlle
   end
 
   def file_rep_params
-    params.require(:message).require(:file_rep).permit(:file_rep_name, :sha256_checksum, :email)
+    params.require(:message).require(:file_rep).permit(:file_rep_name, :sha256_checksum, :email, :disposition_suggested)
   end
 end
