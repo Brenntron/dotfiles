@@ -6,7 +6,7 @@ class Escalations::PeakeBridge::FileRepMessagesController < ApplicationControlle
 
     customer = find_or_create_customer
     attributes = {
-        sha256_hash: file_rep_params[:sha256_checksum],
+        sha256_hash: file_rep_params[:sha256_hash],
         file_name: file_rep_params[:file_name],
         file_size: file_rep_params[:file_size],
         sample_type: file_rep_params[:sample_type],
@@ -39,8 +39,8 @@ class Escalations::PeakeBridge::FileRepMessagesController < ApplicationControlle
   end
 
   def file_rep_params
-    params.require(:message).require(:file_rep).permit(:sha256_checksum, :file_name, :file_size, :sample_type,
-    :disposition_suggested, :source, :platform)
+    params.require(:message).require(:file_rep).permit(:sha256_hash, :file_name, :file_size, :sample_type,
+                                                       :disposition_suggested, :source, :platform)
   end
 
   def customer_params
@@ -52,7 +52,7 @@ class Escalations::PeakeBridge::FileRepMessagesController < ApplicationControlle
     if customer_params['email'].present?
       Customer.find_or_create_customer(customer_email: args['email'],
                                        name: args['name'],
-                                       company_name: args['customer_params'])
+                                       company_name: args['company_name'])
     else
       nil
     end
