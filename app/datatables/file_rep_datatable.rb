@@ -53,7 +53,7 @@ class FileRepDatatable < AjaxDatatablesRails::ActiveRecord
           updated_at:                   file_rep.updated_at,
           status:                       file_rep.status,
           resolution:                   file_rep.resolution,
-          assigned:                     file_rep.assigned.cvs_username,
+          assigned:                     file_rep.assigned&.cvs_username,
           file_name:                    file_rep.file_name,
           file_size:                    file_rep.file_size,
           sha256_hash:                  file_rep.sha256_hash,
@@ -75,9 +75,9 @@ class FileRepDatatable < AjaxDatatablesRails::ActiveRecord
           threatgrid_signer:            file_rep.threatgrid_signer,
           reversing_labs_score:         file_rep.reversing_labs_score,
           reversing_labs_signer:        file_rep.reversing_labs_signer,
-          # customer_name:                file_rep.customer.name,
-          # customer_email:               file_rep.customer.email,
-          # customer_company_name:        file_rep.customer.company.name,
+          customer_name:                file_rep.customer&.name,
+          customer_email:               file_rep.customer&.email,
+          customer_company_name:        file_rep.customer&.company&.name,
           DT_RowId:                     file_rep.id,
       }
     end
