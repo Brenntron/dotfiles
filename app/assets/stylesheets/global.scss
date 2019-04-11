@@ -4268,7 +4268,8 @@ button.tertiary {
 .icon-reports {background-image: url(image_path('icon_reports.svg'));}
 .icon-new-white {background-image: url(image_path('icon_new_white.svg'));}
 .icon-categorize-white {background-image: url(image_path('icon_categorize_white.svg'));}
-.icon-naming-white {background-image: url(image_path('icon_naming_list_white2.svg'));}  // dbinebri: for file rep nav
+.icon-naming-white {background-image: url(image_path('icon_naming_list_white2.svg'));}
+.icon-notes {background-image: url(image_path('icon_status_comment.svg'));}
 
 .remove-input {
   background-image: url(image_path('icon_minus_blue.svg'));
@@ -8510,4 +8511,77 @@ hr.thin.form-divider {
     }
   }
 
+  // large size fix for this
+  @media screen and (min-width: 1600px) {
+    .nav-tool-blocks.nav-page-button-wrapper {
+      min-width: 120px;
+    }
+  }
+
+}
+
+
+// dbinebri: file rep - naming guide modal specific styles here
+// bootstrap 3 modals have many necessary internal divs
+#modal-naming-guide {
+  position: fixed;
+
+  .modal-dialog {
+    margin-top: 60px;
+    margin-right: 30px;
+    min-width: 800px;
+  }
+
+  .modal-content {
+    border: 0;
+    box-shadow: 0 5px 15px rgba(0, 0, 0, 0.2);
+  }
+
+  .modal-header {
+    background: darken($table-dark-body, 5%);
+    color: $content-bg-color;
+    border-radius: 5px 5px 0 0;
+    border: none;
+
+    button.close {
+      background-image: url(image_path('icon_cancel_white.svg'));
+      top: 15px;
+      right: 10px;
+    }
+  }
+
+  .modal-body {
+    padding: 25px 15px;
+
+    .modal-table {
+      height: 400px;
+      color: $table-dark-body;
+      overflow-y: scroll;
+
+      table th {
+        text-transform: uppercase;
+        font-weight: bold;
+        font-size: 13px;
+      }
+      table td {
+        padding-top: 10px;
+        font-weight: normal;
+        font-size: 10px;
+        color: $type-lighter-color;
+
+        // pattern column below needs special formatting
+        &:first-of-type span {
+          font-weight: bold;
+          background: darken($content-bg-color, 5%);
+        }
+      }
+    }
+  }
+
+}
+
+
+// dbinebri: the tooltips for file rep get too wide, limit the max-width
+.tooltipster-sidetip .tooltipster-box {
+  max-width: 410px !important;
 }
