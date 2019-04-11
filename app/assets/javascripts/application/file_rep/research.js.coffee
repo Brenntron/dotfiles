@@ -9,13 +9,8 @@ $ ->
       data: {sha256_hash: sha256_hash}
       success_reload: false
       success: (response) ->
-        $('.email-header-information').removeClass('hidden')
-        populate_communication_details(response.email, response.attachments, response.case_email)
 
-        if response.customer == true
-          $('.customer-facing-notice').show()
-        else
-          $('.customer-facing-notice').hide()
+        $('.full_json').html(JSON.stringify(response.json, null, '\t'))
 
       error: (response) ->
         std_api_error(response, "There was a problem retrieving email.", reload: false)
