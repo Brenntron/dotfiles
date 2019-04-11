@@ -5,11 +5,14 @@ class Escalations::PeakeBridge::FileRepMessagesController < ApplicationControlle
     file_rep = FileReputationDispute.where(file_name: file_rep_params[:file_rep_name]).first
     file_rep ||= FileReputationDispute.new
 
-    if file_rep.sha256_hash.present?
-      threatgrid_response = Threatgrid::Search.query(file_rep.sha256_hash)
+    if file_rep_params[:sha256_checksum].present?
+      threatgrid_response = Threatgrid::Search.query(file_rep_params[:sha256_checksum])
 
       threat_score = threatgrid_response['threat_score']
       threatgrid_private = threatgrid_response['threatgrid_private']
+    else
+      threat_score = nil
+      threatgrid_private = nil
     end
 
     attributes = {
@@ -44,6 +47,6 @@ class Escalations::PeakeBridge::FileRepMessagesController < ApplicationControlle
   end
 
   def file_rep_params
-    params.require(:message).require(:file_reputation_dispute).permit(:file_rep_name, :sha256_checksum, :email)
+    params.require(:message).require(:file_rep).permit(:file_rep_name, :sha256_checksum, :email)
   end
 end
