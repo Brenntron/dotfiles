@@ -2,7 +2,7 @@
   Escalations - File Reputation - Analyst Console
 
 - content_for(:nav_banner) do
-  .nav-tool-blocks.nav-page-button-wrapper.col-xs-3.col-sm-2.col-lg-2
+  .nav-tool-blocks.nav-page-button-wrapper.col-xs-3.col-sm-2.col-lg-1
     %a#queue.nav-page-button{href: '/escalations/file_rep/disputes', class: ("active" if current_page?('/escalations/file_rep/disputes'))}
       %span.nav-toolbar-icon-large.icon-queue
 
@@ -82,12 +82,27 @@
                       = image_tag('icon_cancel_grey.svg')
 
 
+  .nav-tool-blocks.col-xs-2.col-sm-2.col-md-2.col-lg-1.dropdown.nav-new-ticket
+    %a{href: '#', class: 'dropdown-toggle', id: 'new-dispute', 'data-toggle': 'dropdown', 'aria-haspopup': 'true', 'aria-expanded': 'false'}
+      %span{class: 'nav-toolbar-icon icon-new-white'}
+      New Ticket
+    .dropdown-menu.nav-tools-dropdown{'aria-labelledby': 'new-dispute'}
+      %h3.nav-tool-dropdown-header.inverse
+        New Ticket
+      .nav-tool-content-wrapper#new-dispute-wrapper
+        = render 'escalations/webrep/disputes/new'
 
 
-  .nav-tool-blocks.col-xs-4.col-sm-4.col-lg-5.search-wrapper
+  .nav-tool-blocks.col-xs-2.col-sm-2.col-md-2.col-lg-1.dropdown.nav-naming-guide
+    %a{href: '#', class: 'dropdown-toggle', id: 'naming-guide', 'data-toggle': 'dropdown', 'aria-haspopup': 'true', 'aria-expanded': 'false'}
+      %span{class: 'nav-toolbar-icon icon-naming-white'}
+      Naming Guide
+
+
+  .nav-tool-blocks.col-xs-3.col-sm-3.col-md-3.col-lg-5.search-wrapper
     .input-group.search-group#file-rep-search
       = form_tag('/tickets', method: :get, onsubmit: 'call_contains_search(this);return false;') do
-        = text_field_tag 'case[id]', "#{}", class: 'search-box', placeholder: 'Search by Substring'
+        = text_field_tag 'case[id]', "#{}", class: 'search-box'
 
       %button#advanced-search-button.btn.btn-default.nav-tool-button.dropdown-toggle{'data-toggle': 'dropdown', 'aria-haspopup': 'true', 'aria-expanded': 'false'}
         Advanced
@@ -103,7 +118,7 @@
 
 
   - if current_user
-    #login-div.nav-tool-block.col-sm-3.col-lg-3
+    #login-div.nav-tool-block.col-sm-2.col-md-2.col-lg-2.nav-username
       = bugzilla_rest_login_icon(bugzilla_rest_session)
       %span.dropdown
         %span#user-settings-dropdown-button.dropdown-toggle.esc-tooltipped{'title': 'Login to Bugzilla', 'data-toggle': 'dropdown', 'aria-expanded': 'false', 'aria-haspopup': 'true', type: 'button'}
@@ -134,6 +149,12 @@
     -##username= current_user.cvs_username
 
 
+  -# dbinebri: below is the naming guide modal, placed with the other modals
+  = render 'shared/naming_guide_modal'
+
+
+
 
 
 = render template: "layouts/rocket"
+
