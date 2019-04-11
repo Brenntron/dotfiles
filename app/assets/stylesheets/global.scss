@@ -3538,6 +3538,7 @@ fieldset.top-content {
 .nav-tabs > li > a#communication-tab-link {background-image: url(image_path('icon_communication.svg'));}
 .nav-tabs > li > a#research-tab-link {background-image: url(image_path('icon_research_tab.svg'));}
 .nav-tabs > li > a#related-tab-link {background-image: url(image_path('icon_duplicate_tab.svg'));}
+.nav-tabs > li > a#history-tab-link {background-image: url(image_path('icon_history_tab.svg'));}
 
 .email-msg-body pre {
   background-color: $content-bg-color;
@@ -8276,6 +8277,87 @@ hr.thin.form-divider {
 .history-table {
   background-color: $content-bg-color;
 }
+
+.top-case-info h4 {
+  text-transform: uppercase;
+  font-weight: 700 !important;
+  color: $type-lighter-color;
+  font-size: 10pt;
+  margin-bottom: 20px;
+}
+
+.case-id-tag {
+  font-weight: 700;
+  font-size: 12pt;
+}
+
+.ticket-overview-wrapper {
+  margin-bottom: 24px;
+}
+
+.ticket-overview-wrapper .inline-select-dropdown {
+  min-width: 100px !important;
+}
+
+.code-string-break {
+  word-wrap: break-word;
+  display: block !important;
+}
+
+.disp-negative {
+  font-weight: 600;
+  color: $warning-accent-color;
+}
+
+.top-case-info .content-label-sm {
+  width: 100%;
+  padding-bottom: 2px;
+}
+
+.top-info-data {
+  margin-bottom: 10px;
+}
+
+.file-edit-buttons-wrapper {
+  display: inline-block;
+  position: absolute;
+  right: 26px;
+  top: 0;
+  margin-top: 0;
+  button {
+    padding: 10px 14px 10px 30px;
+    margin-right: 0;
+    margin-bottom: 0;
+    margin-top: 8px;
+  }
+}
+
+@media (min-width: 768px) {
+  .file-edit-buttons-wrapper {
+    position: relative;
+    margin-top: -20px;
+    margin-left: 20px;
+    margin-bottom: 10px;
+  }
+}
+
+@media (min-width: 992px) {
+  .file-edit-buttons-wrapper {
+    position: absolute;
+    right: 26px;
+    top: 0;
+    margin-top: 0;
+  }
+}
+
+.create-det-button, .change-disp-button {
+  background-repeat: no-repeat;
+  background-size: 20px 20px;
+  background-position: 6px center;
+}
+
+.create-det-button {background-image: url(image_path('icon_target_white.svg'));}
+.change-disp-button {background-image: url(image_path('icon_hazard_white.svg'));}
 
 #file-index-table-show-columns-dropdown {
   min-width: 390px;
