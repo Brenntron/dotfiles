@@ -8376,30 +8376,30 @@ hr.thin.form-divider {
   }
 
   .nav-tool-blocks.search-wrapper {
-    padding: 5px;
+    padding: 7px;
     padding-left: 40px;
     text-align: left;
   }
 
   // search group wrapper
   .input-group.search-group {
-    background-color: $content-bg-color;
-    border-radius: 2px;
-    padding: 3px;
-    margin: 0 0 0 30px;
+    padding: 3px 3px 3px 5px;
+    margin: 0 0 0 40px;
     width: 100%;
     min-width: 200px;
     max-width: 450px;
   }
 
+  // best way to ensure the max-height of the search input box is right here
   .input-group.search-group form {
-    max-width: 450px;
+    //max-height: 24px;
   }
 
   // search input
   .input-group.search-group .search-box {
-    height: 22px;
-    margin: 3px -3px;
+    height: 24px;
+    margin: 0px -3px;
+    padding-left: 30px;
     background-size: 20px;
     background-position: 4px center;
   }
@@ -8407,7 +8407,7 @@ hr.thin.form-divider {
   // advanced search button
   .input-group.search-group #advanced-search-button {
     padding: 0 12px 0 18px;
-    height: 34px;
+    height: 30px;
   }
 
   // adding the down caret icon using the sort_by svg for advanced search button
@@ -8432,6 +8432,17 @@ hr.thin.form-divider {
     line-height: 16px;
     max-height: 30px;
     padding-top: 6px;
+  }
+
+  // file rep nav wide - minor width adjustments, the col-lg-1 too narrow, col-lg-2 too wide
+  @media screen and (min-width: 1201px) {
+    .col-lg-1.nav-naming-guide, .col-lg-1.nav-new-ticket {
+      width: 10.5%;
+    }
+    // below ensures the navbar widths adds up correctly
+    .col-lg-2.nav-username {
+      width: 20%;
+    }
   }
 
 }
