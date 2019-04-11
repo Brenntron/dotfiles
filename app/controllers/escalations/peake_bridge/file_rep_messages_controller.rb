@@ -44,7 +44,7 @@ class Escalations::PeakeBridge::FileRepMessagesController < ApplicationControlle
   end
 
   def customer_params
-    params.require(:message).require(:file_rep).require(:customer).permit(:email, :name, :company_name)
+    params.require(:message).require(:file_rep).fetch(:customer, {}).permit(:email, :name, :company_name)
   end
 
   def find_or_create_customer
