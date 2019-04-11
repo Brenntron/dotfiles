@@ -3,6 +3,7 @@ module API
     module Escalations
       module FileRep
         class Disputes < Grape::API
+        
           desc 'Edit a FileRep Dispute'
           params do
             requires :id, type: Integer
@@ -36,7 +37,7 @@ module API
 
             filerep_dispute.to_json
           end
-
+          
         end
       end
     end

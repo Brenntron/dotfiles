@@ -50,7 +50,6 @@ class Escalations::PeakeBridge::FileRepMessagesController < ApplicationControlle
   end
 
   def file_rep_params
-<<<<<<< HEAD
     params.require(:message).require(:file_rep).permit(:sha256_hash, :file_name, :file_size, :sample_type,
                                                        :disposition_suggested, :source, :platform)
   end
@@ -68,8 +67,5 @@ class Escalations::PeakeBridge::FileRepMessagesController < ApplicationControlle
     else
       nil
     end
-=======
-    params.require(:message).require(:file_rep).permit(:file_rep_name, :sha256_checksum, :email, :disposition_suggested)
->>>>>>> 0b29510a0a503f15229e6f21cf971eaa730d174a
   end
 end
