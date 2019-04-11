@@ -1,6 +1,7 @@
 class FileRepDatatable < AjaxDatatablesRails::ActiveRecord
 
-  def initialize(params, search_params)
+  def initialize(params, search_params, user:)
+    @user = user
     @search_type = search_params['search_type']
     @search_name = search_params['search_name']
     @search_conditions = search_params['search_conditions']&.to_h
@@ -96,7 +97,7 @@ class FileRepDatatable < AjaxDatatablesRails::ActiveRecord
 
   def filter_records(records)
     if @search_type
-      super.robust_search(@search_type, search_name: @search_name, params: @search_conditions)
+      super.robust_search(@search_type, search_name: @search_name, params: @search_conditions, user: @user)
     else
       super
     end

@@ -1,7 +1,7 @@
 module API
   module V1
     module Escalations
-      module Webrep
+      module FileRep
         class Disputes < Grape::API
 
         end
