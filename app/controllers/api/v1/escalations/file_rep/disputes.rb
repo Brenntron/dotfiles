@@ -3,6 +3,7 @@ module API
     module Escalations
       module FileRep
         class Disputes < Grape::API
+          
         end
       end
     end
