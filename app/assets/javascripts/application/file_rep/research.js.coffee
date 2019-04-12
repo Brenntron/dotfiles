@@ -9,9 +9,6 @@ $ ->
       data: {sha256_hash: sha256_hash}
       success_reload: false
       success: (response) ->
-
-        $('.full_json').html(JSON.stringify(response.json, null, '\t'))
-
       error: (response) ->
-        std_api_error(response, "There was a problem retrieving email.", reload: false)
+        std_api_error(response, "There was a problem retrieving the research data.", reload: false)
     )
