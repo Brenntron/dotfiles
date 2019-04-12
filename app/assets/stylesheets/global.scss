@@ -8445,10 +8445,10 @@ hr.thin.form-divider {
   //padding: 0;
 }
 
-// dbinebri: updates below for file rep navbar layout new
-// wrapping all styles ere in sass nesting for file rep specificity
-.escalations--file_rep--disputes-controller {
 
+// dbinebri: updates below for file rep navbar layout new
+// wrapping all styles here in sass nesting for file rep specificity
+.escalations--file_rep--disputes-controller {
   // search input group wrapper
   .nav-tool-blocks.search-wrapper {
     padding: 7px 7px 7px 40px;
@@ -8511,11 +8511,14 @@ hr.thin.form-divider {
     }
   }
 
+  // dbinebri: the tooltips for file rep get too wide, limit the max-width
+  .tooltipster-sidetip {
+    max-width: 410px !important;
+  }
+
 }
 
-
 // dbinebri: file rep - naming guide modal specific styles here
-// bootstrap 3 modals have many internal divs, need styles for each
 #modal-naming-guide {
   position: fixed;
 
@@ -8577,16 +8580,9 @@ hr.thin.form-divider {
       }
     }
   }
-
 }
 
-
-// dbinebri: the tooltips for file rep get too wide, limit the max-width
-.tooltipster-sidetip .tooltipster-box {
-  max-width: 410px !important;
-}
-
-// special light class for nav naming guide on modal active
+// dbinebri: special light class for nav naming guide on modal active
 #nav-banner .nav-naming-guide a#naming-guide.light {
   background-color: lighten($table-dark-body, 5%);
 }
