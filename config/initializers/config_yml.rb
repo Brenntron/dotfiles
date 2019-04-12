@@ -146,3 +146,7 @@ Rails.configuration.reversing_labs.url            = reversing_labs_config['url']
 Rails.configuration.reversing_labs.username       = reversing_labs_config['username']
 Rails.configuration.reversing_labs.password       = reversing_labs_config['password']
 
+threatgrid = env_config.fetch('threatgrid', {})
+raise 'config.yml missing sendgrid section' unless threatgrid
+Rails.configuration.threatgrid         = ApiRequester::ApiRequester.config_of(threatgrid)
+

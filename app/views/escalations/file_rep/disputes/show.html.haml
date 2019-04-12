@@ -1,0 +1,177 @@
+-#view single record
+.row
+  .col-xs-12.col-sm-6
+    .content-wrapper.top-case-info.ticket-overview-wrapper
+      %h4 Ticket Overview
+      .row
+        .col-xs-12.col-sm-12.col-md-12.col-lg-5
+          .row
+            .col-xs-7.col-sm-7.col-with-divider
+              %label.content-label-sm
+                Case ID
+              .top-info-data.case-id-tag
+                = @file_rep_dispute.id.to_s.rjust(10, '0')
+              %label.content-label-sm
+                Status
+              -#  Add ruby code for status here
+              %span.dropdown.top-info-data
+                %button#show-edit-ticket-status-button.inline-select-dropdown.ticket-status-button.dropdown-toggle{title:'Edit Ticket Status', 'data-toggle': 'dropdown', 'aria-haspopup': 'true', 'aria-expanded': 'false',  }
+                  - if @file_rep_dispute.status.nil?
+                    NEW
+                  - else
+                    = @file_rep_dispute.status
+
+                .dropdown-menu.inline-dropdown-menu#show-edit-ticket-status-dropdown{'aria-labelledby': 'show-edit-ticket-status-button'}
+                  %ul
+                    %li.status-radio-wrapper
+                      %input.ticket-status-radio{type: 'radio', name: 'file-dispute-status', id: 'file-status-new', value: 'NEW'}
+                      %label.radio-label.ticket-status-radio-label{for:'file-status-new'} New
+                    %li.status-radio-wrapper
+                      %input.ticket-status-radio{type: 'radio', name: 'file-dispute-status', id: 'file-status-researching', value: 'RESEARCHING'}
+                      %label.radio-label.ticket-status-radio-label{for:'file-status-researching'} Researching
+                    %li.status-radio-wrapper
+                      %input.ticket-status-radio{type: 'radio', name: 'file-dispute-status', id: 'file-status-escalated', value: 'ESCALATED'}
+                      %label.radio-label.ticket-status-radio-label{for:'file-status-escalated'} Escalated
+                    %li.status-radio-wrapper
+                      %input.ticket-status-radio{type: 'radio', name: 'file-dispute-status', id: 'file-status-pending', value: 'PENDING'}
+                      %label.radio-label.ticket-status-radio-label{for:'file-status-pending'} Customer Pending
+                    %li.status-radio-wrapper
+                      %input.ticket-status-radio{type: 'radio', name: 'file-dispute-status', id: 'file-status-onhold', value: 'ONHOLD'}
+                      %label.radio-label.ticket-status-radio-label{for:'file-status-onhold'} On Hold
+                    %li.status-radio-wrapper
+                      %input.ticket-status-radio{type: 'radio', name: 'file-dispute-status', id: 'file-status-assigned', value: 'ASSIGNED'}
+                      %label.radio-label.ticket-status-radio-label{for:'file-status-assigned'} Assigned
+                    %li.status-radio-wrapper
+                      %input.ticket-status-radio{type: 'radio', name: 'file-dispute-status', id: 'file-status-closed', value: 'RESOLVED'}
+                      %label.radio-label.ticket-status-radio-label{for:'file-status-closed'} Resolved / Closed
+
+
+            .col-xs-5.col-sm-5.col-with-divider
+              %label.content-label-sm
+                Assignee
+              .top-info-data
+                - if @file_rep_dispute.assigned.nil? || @file_rep_dispute.assigned == 'Unassigned'
+                  %span.missing-data "Unassigned"
+                - else
+                  %span= @file_rep_dispute.assigned.cvs_username
+                -#- if @dispute.assignee == 'Unassigned'
+                -#  %span.missing-data#dispute-assignee= @dispute.assignee || "None"
+                -#- else
+                -#  %span= @dispute.assignee || "None"
+                -#- if can? :update, Dispute
+                -#  .dispute-owner-buttons-wrapper
+                -#    - if @dispute.assignee == current_user.email
+                -#      - if (@dispute.resolution != Dispute::DUPLICATE) && (@dispute.status != Dispute::RESOLVED)
+                -#        %button.return-ticket-button.esc-tooltipped{title: 'Return ticket to open queue', onclick: 'toolbar_unassign_dispute();'}
+                -#    - else
+                -#      - if (@dispute.resolution != Dispute::DUPLICATE) && (@dispute.status != Dispute::RESOLVED) && (@dispute.user.cvs_username == 'vrtincom')
+                -#        %button.take-ticket-button#show_ticket_assign.esc-tooltipped{title: 'Assign this ticket to me', onclick: "take_single_dispute(#{@dispute.id});"}
+                -#
+                -#      %span.dropdown
+                -#        - if (@dispute.resolution != Dispute::DUPLICATE) && (@dispute.status != Dispute::RESOLVED)
+                -#          %button#index_change_assign.dispute-inline-buttons.ticket-owner-button.dropdown-toggle.esc-tooltipped{title: 'Change Assignee', 'data-toggle': 'dropdown', 'aria-haspopup': 'true', 'aria-expanded': 'false'}
+                -#        .dropdown-menu#show-change-assign-dropdown{'aria-labelledby': 'index_change_assign'}
+                -#          .change-assignee-dropdown-wrapper
+                -#            %h3 Change Assignee
+                -#            .inline-tool-content-wrapper
+                -#              .toolbar
+                -#                %div
+                -#                  %label.toolbar-section-label Assignee
+                -#                  =select_tag :index_target_assignee, options_from_collection_for_select(User.joins(roles: :org_subset).where(org_subsets: { name: 'webrep' }).distinct.order(:cvs_username), :id, :cvs_username), class: 'toolbar-select'
+                -#                %button{class: 'primary', type:'button', id: 'button_reassign', onclick:'toolbar_show_change_assignee();'}
+                -#                  Assign
+              %label.content-label-sm
+                Suggested Disposition
+              - if @file_rep_dispute.disposition_suggested == 'Malicious'
+                .disposition.disp-negative= @file_rep_dispute.disposition_suggested
+              - else
+                .disposition= @file_rep_dispute.disposition_suggested
+
+        .col-xs-12.col-sm-12.col-md-12.col-lg-7.col-with-divider
+          .row
+            .col-xs-7.col-sm-7.col-with-divider
+              %label.content-label-sm Customer Name
+              .top-info-data
+                - unless @file_rep_dispute.customer.nil?
+                  = @file_rep_dispute.customer.name
+                - else
+                  %span.missing-data No customer record
+
+              %label.content-label-sm Customer Company
+              .top-info-data
+                - unless @file_rep_dispute.customer.nil? || @file_rep_dispute.customer.company.nil?
+                  = @file_rep_dispute.customer.company.name
+                - else
+                  %span.missing-data No customer record
+
+              %label.content-label-sm Customer Email
+              .top-info-data
+                - unless @file_rep_dispute.customer.nil?
+                  = @file_rep_dispute.customer.email
+                - else
+                  %span.missing-data No customer record
+
+            .col-xs-5.col-sm-5
+              %label.content-label-sm Date/Time Submitted
+              .top-info-data= @file_rep_dispute.created_at
+
+  .col-xs-12.col-sm-6
+    .content-wrapper.top-case-info
+      %h4 File Overview
+      .file-edit-buttons-wrapper
+        %button.secondary.change-disp-button
+          Change Disposition
+        %button.secondary.create-det-button
+          Create Detection
+
+      .row
+        .col-xs-8.col-with-divider
+          %label.content-label-sm SHA256
+          .top-info-data.code-snippet.code-string-break#sha256_hash= @file_rep_dispute.sha256_hash
+          %label.content-label-sm File Type
+          .top-info-data= @file_rep_dispute.sample_type
+          %label.content-label-sm File Name
+          .top-info-data= @file_rep_dispute.file_name
+          %label.content-label-sm File Size
+          .top-info-data
+            -# TODO find out what file size we will get & convert to unit the analysts want
+            = @file_rep_dispute.file_size
+            bytes
+
+        .col-xs-4
+          %label.content-label-sm AMP Disposition
+          - unless  @file_rep_dispute.disposition.nil?
+            - if @file_rep_dispute.disposition == 'Malicious'
+              .top-info-data.disposition.disp-negative= @file_rep_dispute.disposition
+            - else
+              .top-info-data.disposition= @file_rep_dispute.disposition
+            %label.content-label-sm AMP Detection Name
+            .top-info-data
+              = @file_rep_dispute.detection_name
+            %label.content-label-sm AMP Detection Created
+            .top-info-data
+              = @file_rep_dispute.detection_created_at
+
+
+-# End of top overview information
+
+
+
+%ul.nav.nav-tabs{role: 'tablist'}
+  %li.nav-item{role:'presentation', tab: 'research'}
+    %a.nav-link#research-tab-link{href: '#research_tab', 'aria-controls': 'research', role: 'tab', 'data-toggle': 'tab'}
+      Research
+  %li.nav-item{role:'presentation'}
+    %a.nav-link#communication-tab-link{href: '#communication_tab', 'aria-controls': 'communication', role: 'tab', 'data-toggle': 'tab'}
+      Communication
+  %li.nav-item{role:'presentation'}
+    %a.nav-link#history-tab-link{href: '#history_tab', 'aria-controls': 'history', role: 'tab', 'data-toggle': 'tab'}
+      History
+
+.tab-content.content-wrapper#bug-tab-content
+  .tab-pane#research_tab{role: 'tabpanel'}
+    = render 'escalations/file_rep/disputes/research_tab'
+  .tab-pane#communication_tab{role: 'tabpanel'}
+    = render 'escalations/file_rep/disputes/communication_tab'
+  .tab-pane#history_tab{role: 'tabpanel'}
+    History

@@ -70,6 +70,17 @@ class Ability
       can :publish_to_bugzilla, Note
     end
 
+    if role_names.include?('filerep manager')
+      can :manage, User do |user| #no delete UI is implemented
+        user.ancestors.include?(current_user)
+      end
+      can :manage, FileReputationDispute
+    end
+
+    if role_names.include?('filerep user')
+      can :manage, FileReputationDispute
+    end
+
     if role_names.include?('ips escalator manager')
       can :manage, User do |user| #no delete UI is implemented
         user.ancestors.include?(current_user)

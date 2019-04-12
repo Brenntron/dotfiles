@@ -590,6 +590,7 @@ button {
   border-radius: 2px;
   height: 100%;
   display: inline-block;
+  float: left;
   padding-right: 10px;
   padding-top: 2px;
   padding-left: 20px;
@@ -626,6 +627,10 @@ button {
   margin-right: 6px;
   min-width: 36px;
   height: 20px;
+}
+
+.toolbar-button-spacer {
+  margin-right: 3px;
 }
 
 .dashboard-tickets-wrapper .toolbar-button-label {
@@ -685,6 +690,9 @@ button {
 .ticket-owner-button {background-image: url(image_path('icon_user_grey.svg'));}
 .sort-by-button {background-image: url(image_path('icon_sort_by.svg'));}
 .sync-button {background-image: url(image_path('icon_sync.svg'));}
+.detection-button {background-image: url(image_path('icon_target.svg'));}
+.disposition-button {background-image: url(image_path('icon_hazard.svg'));}
+.take-ticket-button-full {background-image: url(image_path('icon_take.svg'));}
 
 .master-submit-button {
   color: $content-bg-color;
@@ -926,6 +934,10 @@ thead th.sorting.center {
   font-weight: 400;
   padding-left: 8px;
   line-height: 1em;
+}
+
+.toolbar span.dropdown {
+  float: left;
 }
 
 .toolbar-button-text {
@@ -1903,6 +1915,11 @@ a.static-nav-item {
 .icon-submit{background-image: url("icon_submit_arrow.svg")}
 .icon-custom-star {background-image: url(image_path('icon_customer_star.svg'));}
 .icon-guest-user {background-image: url(image_path('icon_guest_grey.svg'));}
+.icon-talos-sandbox {background-image: url(image_path('icon_sandbox2.svg'));}
+.icon-threat-grid {background-image: url(image_path('icon_grid.svg'));}
+.icon-reversing-labs {background-image: url(image_path('icon_reverse.svg'));}
+.icon-show-as-columns {background-image: url(image_path('icon_vertical.svg'));}
+.icon-show-as-stacked {background-image: url(image_path('icon_horizontal.svg'));}
 
 .saved-search {
   text-transform: none !important;
@@ -3526,6 +3543,7 @@ fieldset.top-content {
 .nav-tabs > li > a#communication-tab-link {background-image: url(image_path('icon_communication.svg'));}
 .nav-tabs > li > a#research-tab-link {background-image: url(image_path('icon_research_tab.svg'));}
 .nav-tabs > li > a#related-tab-link {background-image: url(image_path('icon_duplicate_tab.svg'));}
+.nav-tabs > li > a#history-tab-link {background-image: url(image_path('icon_history_tab.svg'));}
 
 .email-msg-body pre {
   background-color: $content-bg-color;
@@ -4255,6 +4273,8 @@ button.tertiary {
 .icon-reports {background-image: url(image_path('icon_reports.svg'));}
 .icon-new-white {background-image: url(image_path('icon_new_white.svg'));}
 .icon-categorize-white {background-image: url(image_path('icon_categorize_white.svg'));}
+.icon-naming-white {background-image: url(image_path('icon_naming_list_white2.svg'));}
+.icon-notes {background-image: url(image_path('icon_status_comment.svg'));}
 
 .remove-input {
   background-image: url(image_path('icon_minus_blue.svg'));
@@ -4594,9 +4614,6 @@ table > tbody > tr > td.dispute_rep_tools {
 .dropdown.open .ticket-owner-button {
   background-color: $bug-section-color;
   border-radius: 2px 2px 0 0 ;
-}
-.ticket-owner-button {
-  margin: 0px 4px;
 }
 
 .toolbar-button.adjust-wlbl-button    {
@@ -5824,12 +5841,12 @@ td.ticket-total::before {
   width: 170px !important;
 }
 
-#index-change-assign-dropdown{
+#index-change-assign-dropdown, #file-disp-dropdown{
   margin-left: 0;
   min-width: 0;
 }
 
-#index-change-assign-dropdown .toolbar {
+#index-change-assign-dropdown .toolbar, #file-disp-dropdown .toolbar {
   margin-bottom: 5px;
 }
 .secondary.ticket-owner-unassigned-button{
@@ -8266,4 +8283,389 @@ hr.thin.form-divider {
 
 .history-table {
   background-color: $content-bg-color;
+}
+
+.top-case-info h4 {
+  text-transform: uppercase;
+  font-weight: 700 !important;
+  color: $type-lighter-color;
+  font-size: 10pt;
+  margin-bottom: 20px;
+}
+
+.case-id-tag {
+  font-weight: 700;
+  font-size: 12pt;
+}
+
+.ticket-overview-wrapper {
+  margin-bottom: 24px;
+}
+
+.ticket-overview-wrapper .inline-select-dropdown {
+  min-width: 100px !important;
+}
+
+.code-string-break {
+  word-wrap: break-word;
+  display: block !important;
+}
+
+.disp-negative {
+  font-weight: 600;
+  color: $warning-accent-color;
+}
+
+.top-case-info .content-label-sm {
+  width: 100%;
+  padding-bottom: 2px;
+}
+
+.top-info-data {
+  margin-bottom: 10px;
+}
+
+.file-edit-buttons-wrapper {
+  display: inline-block;
+  position: absolute;
+  right: 26px;
+  top: 0;
+  margin-top: 0;
+  button {
+    padding: 10px 14px 10px 30px;
+    margin-right: 0;
+    margin-bottom: 0;
+    margin-top: 8px;
+  }
+}
+
+@media (min-width: 768px) {
+  .file-edit-buttons-wrapper {
+    position: relative;
+    margin-top: -20px;
+    margin-left: 20px;
+    margin-bottom: 10px;
+  }
+}
+
+@media (min-width: 992px) {
+  .file-edit-buttons-wrapper {
+    position: absolute;
+    right: 26px;
+    top: 0;
+    margin-top: 0;
+  }
+}
+
+.create-det-button, .change-disp-button {
+  background-repeat: no-repeat;
+  background-size: 20px 20px;
+  background-position: 6px center;
+}
+
+.create-det-button {background-image: url(image_path('icon_target_white.svg'));}
+.change-disp-button {background-image: url(image_path('icon_hazard_white.svg'));}
+
+#file-index-table-show-columns-dropdown {
+  min-width: 390px;
+}
+
+#file-index-table-show-columns-dropdown ul {
+  display: block;
+  padding: 10px;
+}
+
+#file-index-table-show-columns-dropdown ul:first-of-type {
+  float: left;
+}
+
+#file-index-table-show-columns-dropdown ul li {
+  padding: 4px 12px;
+  font-size: 9pt;
+}
+
+#file-index-table-show-columns-dropdown ul li input {
+  margin-right: 8px;
+}
+
+.file-rep-index-toolbar {
+  .ticket-owner-button {
+    margin: 0;
+  }
+  .toolbar-dropdown {
+    margin-top: 0;
+    margin-left: 0;
+  }
+}
+
+.plain-inline-dropdown-wrapper {
+  padding: 10px !important;
+}
+
+.full-row-label {
+  width: 100%;
+  display: block;
+  margin-bottom: 0;
+  padding-bottom: 0;
+}
+
+.plain-inline-dropdown-wrapper {
+  select {
+    margin: 0;
+    height: 24px;
+    width: 100%;
+    border: none !important;
+    outline: 1px solid darken($faint-neutral-color, 10%);
+  }
+  select:focus {
+    margin: 0;
+    height: 24px;
+    border: none !important;
+    outline: 1px solid $bug-section-color !important;
+    box-shadow: none !important;
+  }
+  .text-input {
+    height: 26px;
+    margin-top: -1px;
+    width: 100%;
+  }
+  hr.thin {
+    margin-right: 2px;
+    margin-left: 2px;
+  }
+}
+
+.toolbar  .inline-tool-content-wrapper.plain-inline-dropdown-wrapper .row {
+  margin-left: 2px;
+  margin-right: 2px;
+}
+.file-name-extension {
+  float: none !important;
+  padding-left: 0 !important;
+  line-height: 2em !important;
+  color: $type-lighter-color;
+}
+
+.toolbar .plain-inline-dropdown-wrapper div {
+  //padding: 0;
+}
+
+
+.research-data-header {
+  font-weight: 700;
+  color: $type-lighter-color;
+  margin-top: 14px;
+  padding-bottom: 4px;
+  border-bottom: 4px solid;
+  background-repeat: no-repeat;
+  padding-left: 32px;
+  background-size: 24px 24px;
+  background-position: left -2px;
+}
+
+.sandbox-header {
+  border-bottom-color: $warning-accent-color;
+  background-image: url(image_path('icon_sandbox2.svg'));
+}
+
+.threatgrid-header {
+  border-bottom-color: $communication-accent-color;
+  background-image: url(image_path('icon_grid.svg'));
+}
+
+.reversing-labs-header {
+  border-bottom-color: $success-color;
+  background-image: url(image_path('icon_reverse.svg'));
+}
+
+.sample-present-true, .sample-present-false {
+  width: 30px;
+  height: 40px;
+  background-repeat: no-repeat;
+  position: absolute;
+  display: block;
+  right: 12px;
+  top: 10px;
+}
+
+.sample-present-true {background-image: url(image_path('icon_check_grey.svg'));}
+.sample-present-false {background-image: url(image_path('icon_cancel_grey.svg'));}
+
+.data-report-wrapper {
+  font-size: 8.5pt;
+  margin-top: 20px;
+}
+
+.data-report-label {
+  width: 100%;
+  text-transform: uppercase;
+  font-weight: 700;
+  color: $type-lighter-color;
+  padding-bottom: 5px;
+}
+
+.data-report-score {
+  font-weight: 700;
+  font-size: 14pt;
+}
+
+button.secondary.view-report-external-button {
+  font-size: 9pt;
+  padding: 10px 12px 10px 28px;
+  margin: 1px 0 0 0;
+  background-size: 18px 18px;
+  background-repeat: no-repeat;
+  background-position: 6px 6px;
+  background-image: url(image_path('icon_export_white.svg'));
+}
+
+.text-right .content-label-sm {
+  margin-right: 0;
+}
+
+.toolbar-select-wrapper .toolbar-button-text {
+  padding-left: 22px;
+  padding-right: 6px;
+  line-height: 1.65em;
+}
+
+// dbinebri: updates below for file rep navbar layout new
+// wrapping all file rep nav styles here in sass nesting for specificity
+.escalations--file_rep--disputes-controller {
+
+  // search input group wrapper
+  .nav-tool-blocks.search-wrapper {
+    padding: 7px 7px 7px 40px;
+    text-align: left;
+  }
+
+  .input-group.search-group {
+    padding: 3px 3px 3px 5px;
+    margin: 0 0 0 40px;
+    width: 100%;
+    min-width: 200px;
+    max-width: 450px;
+  }
+
+  // search input field
+  .input-group.search-group .search-box {
+    height: 24px;
+    margin: 0px -3px;
+    padding-left: 30px;
+    padding-top: 0;
+    background-size: 20px;
+    background-position: 4px center;
+  }
+
+  // advanced search button
+  .input-group.search-group #advanced-search-button {
+    padding: 0 12px 0 18px;
+    height: 30px;
+  }
+
+  // adding the down caret icon using the sort_by svg for advanced search button
+  .input-group.search-group #advanced-search-button::after {
+    content: '';
+    display: block;
+    width: 16px;
+    height: 14px;
+    right: 0;
+    background-image: url(image_path('icon_sort_by.svg'));
+    background-repeat: no-repeat;
+    background-position: 30% 92%;
+    background-size: 26px 26px;
+    float: right;
+  }
+
+  // for the nav button labels, this is where we ensure labels can break and wrap if squeezed tight enough
+  #nav-banner .nav-tool-blocks.dropdown a, #nav-banner .nav-tool-blocks.dropdown a:hover {
+    display: inline-block !important;
+    width: 100%;
+    height: 100%;
+  }
+
+  // file rep navbar specific styles - minor width adjustments, col-lg-1 is too tight, col-lg-2 too wide
+  @media screen and (min-width: 1200px) {
+    .col-lg-1.nav-naming-guide, .col-lg-1.nav-new-ticket {
+      width: 12%;
+    }
+    // below ensures the navbar widths adds up correctly
+    .col-lg-2.nav-username {
+      width: 17%;
+    }
+  }
+
+  // large size fix for this
+  @media screen and (min-width: 1600px) {
+    .nav-tool-blocks.nav-page-button-wrapper {
+      min-width: 120px;
+    }
+  }
+
+}
+
+
+// dbinebri: file rep - naming guide modal specific styles here
+// bootstrap 3 modals have many necessary internal divs
+#modal-naming-guide {
+  position: fixed;
+
+  .modal-dialog {
+    margin-top: 60px;
+    margin-right: 30px;
+    min-width: 800px;
+  }
+
+  .modal-content {
+    border: 0;
+    box-shadow: 0 5px 15px rgba(0, 0, 0, 0.2);
+  }
+
+  .modal-header {
+    background: darken($table-dark-body, 5%);
+    color: $content-bg-color;
+    border-radius: 5px 5px 0 0;
+    border: none;
+
+    button.close {
+      background-image: url(image_path('icon_cancel_white.svg'));
+      top: 15px;
+      right: 10px;
+    }
+  }
+
+  .modal-body {
+    padding: 25px 15px;
+
+    .modal-table {
+      height: 400px;
+      color: $table-dark-body;
+      overflow-y: scroll;
+
+      table th {
+        text-transform: uppercase;
+        font-weight: bold;
+        font-size: 13px;
+      }
+      table td {
+        padding-top: 10px;
+        font-weight: normal;
+        font-size: 10px;
+        color: $type-lighter-color;
+
+        // pattern column below needs special formatting
+        &:first-of-type span {
+          font-weight: bold;
+          background: darken($content-bg-color, 5%);
+        }
+      }
+    }
+  }
+
+}
+
+
+// dbinebri: the tooltips for file rep get too wide, limit the max-width
+.tooltipster-sidetip .tooltipster-box {
+  max-width: 410px !important;
 }
