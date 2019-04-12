@@ -127,7 +127,7 @@
       .row
         .col-xs-8.col-with-divider
           %label.content-label-sm SHA256
-          .top-info-data.code-snippet.code-string-break= @file_rep_dispute.sha256_hash
+          .top-info-data.code-snippet.code-string-break#sha256_hash= @file_rep_dispute.sha256_hash
           %label.content-label-sm File Type
           .top-info-data= @file_rep_dispute.sample_type
           %label.content-label-sm File Name
@@ -158,7 +158,7 @@
 
 
 %ul.nav.nav-tabs{role: 'tablist'}
-  %li.nav-item{role:'presentation'}
+  %li.nav-item{role:'presentation', tab: 'research'}
     %a.nav-link#research-tab-link{href: '#research_tab', 'aria-controls': 'research', role: 'tab', 'data-toggle': 'tab'}
       Research
   %li.nav-item{role:'presentation'}
