@@ -10,11 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-<<<<<<< HEAD
 ActiveRecord::Schema.define(version: 2019_04_09_201329) do
-=======
-ActiveRecord::Schema.define(version: 2019_04_08_203516) do
->>>>>>> a47463d6406e57521f6b510b3a17c85c12293903
 
   create_table "alerts", options: "ENGINE=InnoDB DEFAULT CHARSET=utf8", force: :cascade do |t|
     t.datetime "created_at", null: false
