@@ -5973,6 +5973,7 @@ td.ticket-total::before {
 }
 code {
   color:$type-base-color;
+  font-family: 'Fira Mono', monospace;
   line-height: 1.5em;
   padding: 0 5px;
   font-weight: 400;
@@ -5988,14 +5989,13 @@ code {
   color: $warning-accent-color;
   font-weight: bold;
 }
-
+.malicious {
+  color: $warning-accent-color;
+  font-weight: 600;
+}
 .overdue {
   color: $second-section-color;
   font-weight: bold;
-}
-
-.malicious {
-  color: $warning-accent-color;
 }
 
 .loader-gears {

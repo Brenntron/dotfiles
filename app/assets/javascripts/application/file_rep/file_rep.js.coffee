@@ -71,7 +71,11 @@ $ ->
         render: (data) ->
           return '<code id="' + data + '_sha" title="' + data + '" class="esc-tooltipped tooltipstered file_rep_sha">' + data + '</code>'
       }
-      { data: 'file_size'}
+      {
+        data: 'file_size'
+        render: (data) ->
+          return '<span>' + data + 'bytes </span>'
+      }
       { data: 'sample_type'}
       {
         data: 'disposition'
@@ -101,8 +105,32 @@ $ ->
             data = ''
           return data
       }
-      { data: 'sandbox_score'}
-      { data: 'threatgrid_score'}
+      {
+        data: 'sandbox_under'
+        visible: false
+      }
+      {
+        data: 'sandbox_score'
+        render: (data, type, full, meta) ->
+          if full['sandbox_under'] == "true"
+            data = '<span>' + data + '</span>'
+          else
+            data = '<span class="overdue">' + data + '</span>'
+          return data
+      }
+      {
+        data: 'threatgrid_under'
+        visible: false
+      }
+      {
+        data: 'threatgrid_score'
+        render: (data, type, full, meta) ->
+          if full['threatgrid_under'] == "true"
+            data = '<span>' + data + '</span>'
+          else
+            data = '<span class="overdue">' + data + '</span>'
+          return data
+      }
       { data: 'reversing_labs_score'}
       {
         data: 'disposition_suggested'
@@ -111,7 +139,7 @@ $ ->
           if data == 'malicious'
             return '<span class="malicious">malicious</span>'
           else
-          return '<span>clean</span>'
+            return '<span>clean</span>'
       }
       { data: 'created_at'}
       {
@@ -119,9 +147,10 @@ $ ->
         className: "alt-col"
         render: (data) ->
           if data == undefined
-            return '<span class="missing-data">Unassigned</span> <span title="Assign to me" class="esc-tooltipped tooltipstered"><button id="index_ticket_assign" class="take-ticket-button" onClick="take_disputes()"/></span>'
+             data = '<span class="missing-data">Unassigned</span> <span title="Assign to me" class="esc-tooltipped tooltipstered"><button id="index_ticket_assign" class="take-ticket-button" onClick="take_disputes()"/></span>'
           else
-            return data + '<span title="Assign to me" class="esc-tooltipped tooltipstered"><button id="index_ticket_assign" class="take-ticket-button" onClick="take_disputes()"/></span>'
+            data = data + '<span title="Assign to me" class="esc-tooltipped tooltipstered"><button id="index_ticket_assign" class="take-ticket-button" onClick="take_disputes()"/></span>'
+          return data
       }
     ]
 
