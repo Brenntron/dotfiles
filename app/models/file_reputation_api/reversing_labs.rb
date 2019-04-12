@@ -21,52 +21,34 @@ class FileReputationApi::ReversingLabs
     Rails.configuration.reversing_labs.password
   end
 
-  def self.get_reversing_labs_response(uri)
-    request = Net::HTTP::Post.new(uri)
-    request.basic_auth reversing_labs_username, reversing_labs_password
-    req_options = {
-        use_ssl: uri.scheme == "https",
-        verify_mode: OpenSSL::SSL::VERIFY_NONE
-    }
+  def self.sha256_lookup(sha256)
+    uri = URI(reversing_labs_url + "api/databrowser/rldata/query/sha256/#{sha256}?format=json")
 
-    response = Net::HTTP.start(uri.hostname, 443, req_options) do |http|
-      http.request(request)
-    end
+    if Rails.cache.read(uri).blank?
+      request = Net::HTTP::Get.new(uri)
+      request.basic_auth reversing_labs_username, reversing_labs_password
+      req_options = {
+          use_ssl: uri.scheme == "https",
+          verify_mode: OpenSSL::SSL::VERIFY_NONE
+      }
 
-
-    response
-  end
-
-  def self.handle_reversing_labs_response(response)
-    # binding.pry
-    if response.code != "200" #there was an issue
-      {error: 'Data Currently Unavailable'}
-    else
-      begin
-        response = JSON.parse(response.body)
-      rescue JSON::ParserError
-        {error: 'Invalid Hash'}
+      response = Net::HTTP.start(uri.hostname, uri.port, req_options) do |http|
+        http.request(request)
       end
+
+      if response.code != "200" #there was an issue
+        {error: 'Data Currently Unavailable'}
+      else
+        begin
+          response = JSON.parse(response.body)
+          response
+        rescue JSON::ParserError
+          {error: 'Invalid Hash'}
+        end
+      end
+    else
+      Rails.cache.read(uri)
     end
   end
-
-  def self.sample_upload(sha1_value)
-    uri = URI(reversing_labs_url + "api/spex/upload/#{sha1_value}")
-    response = get_reversing_labs_response(uri)
-    handle_reversing_labs_response(response)
-  end
-
-  def self.sample_upload_status(sha1_value)
-    uri = URI(reversing_labs_url + "api/spex/upload/#{sha1_value}/status")
-    response = get_reversing_labs_response(uri)
-    handle_reversing_labs_response(response)
-  end
-
-  def self.sample_download(sha1_value)
-    uri = URI(reversing_labs_url + "api/spex/download/#{sha1_value}")
-    response = get_reversing_labs_response(uri)
-    handle_reversing_labs_response(response)
-  end
-
 
 end
