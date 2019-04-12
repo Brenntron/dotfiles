@@ -2,58 +2,10 @@ $ ->
 
   file_rep_url = $('#file-rep-datatable').data('source')
 
-  $('.saved-search').on 'click', (e) ->
-    localStorage.search_type = "named"
-    localStorage.search_name = e.target.innerText
-
-  window.build_data = () ->
-    search_type = window.get_search_type()
-    search_name = window.get_search_name()
-
-    data =
-      search_type: search_type
-      search_name: search_name
-    return data
-
-  window.get_search_type = () ->
-    if !localStorage.search_type
-      localStorage.search_type = 'standard'
-
-    return localStorage.search_type
-
-
-  window.get_search_name = () ->
-    if localStorage.search_type = 'standard'
-      current_url = window.location.href
-      status_param_regex = /f=(.*)/
-      current_name = status_param_regex.exec(current_url)
-      if current_url.match('f=') && current_name
-        # if the url has string that indicates a search param has been added,
-        #ensure that localStorage search type matches current status
-        localStorage.search_name = current_name[1]
-      else
-        localStorage.search_name = 'all'
-    return localStorage.search_name
-
-  $(document).on 'click ','.file_rep_sha', (e) ->
-    copy_text_id = e.target.id
-    copy_text = document.getElementById(copy_text_id);
-    selection = window.getSelection();
-    range = document.createRange();
-    range.selectNodeContents(copy_text);
-    selection.removeAllRanges();
-    selection.addRange(range);
-    document.execCommand("Copy");
-
   $('#file-rep-datatable').dataTable
     processing: true
     serverSide: true
-    ajax:
-      url: file_rep_url
-      data: build_data()
-#        search_conditions:
-#          search_status: 'search_name'
-#          search_name: 'search_name'
+    ajax: file_rep_url
     pagingType: 'full_numbers'
     columns: [
       {
@@ -71,7 +23,7 @@ $ ->
       {
         data: 'sha256_hash'
         render: (data) ->
-          return '<code id="' + data + '_sha" title="' + data + '" class="esc-tooltipped tooltipstered"><span class="file_rep_sha">' + data + '<></code>'
+          return '<code id="' + data + '_sha" title="' + data + '" class="esc-tooltipped tooltipstered file_rep_sha">' + data + '</code>'
       }
       {
         data: 'file_size'
@@ -167,7 +119,9 @@ $ ->
           return data
       }
     ]
+
   $('.toggle-vis').each ->
+#    toggle visible columns
       table = $('#file-rep-datatable').DataTable()
       column = table.column($(this).attr('data-column'))
       checkbox = $(this).find('input')
@@ -186,5 +140,16 @@ $ ->
         return
       return
       checkbox = $(this).find('input')
+
+    $(document).on 'click ','.file_rep_sha', (e) ->
+#      copy SHA on click
+      copy_text_id = e.target.id
+      copy_text = document.getElementById(copy_text_id);
+      selection = window.getSelection();
+      range = document.createRange();
+      range.selectNodeContents(copy_text);
+      selection.removeAllRanges();
+      selection.addRange(range);
+      document.execCommand("Copy");
 
 

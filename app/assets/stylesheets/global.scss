@@ -5971,7 +5971,7 @@ td.ticket-total::before {
 .font-weight-bold{
   font-weight: bold;
 }
-.sha256_code {
+code.file_rep_sha{
   color:$type-base-color;
   font-family: 'Fira Mono', monospace;
   line-height: 1.5em;
