@@ -15,7 +15,6 @@ $ ->
       search_name: search_name
     return data
 
-
   window.get_search_type = () ->
     if !localStorage.search_type
       localStorage.search_type = 'standard'
@@ -46,7 +45,7 @@ $ ->
     selection.addRange(range);
     document.execCommand("Copy");
 
-  localStorage.dataTable = $('#file-rep-datatable').dataTable
+  $('#file-rep-datatable').dataTable
     processing: true
     serverSide: true
     ajax:
@@ -65,11 +64,14 @@ $ ->
         data: 'status'
         className: 'font-weight-bold'
       }
+      {
+        data: 'resolution'
+      }
       { data: 'file_name'}
       {
         data: 'sha256_hash'
         render: (data) ->
-          return '<code id="' + data + '_sha" title="' + data + '" class="esc-tooltipped tooltipstered file_rep_sha">' + data + '</code>'
+          return '<code id="' + data + '_sha" title="' + data + '" class="esc-tooltipped tooltipstered"><span class="file_rep_sha">' + data + '<></code>'
       }
       {
         data: 'file_size'
@@ -95,6 +97,11 @@ $ ->
             return data
       }
       {
+        data: null
+        render: () ->
+          return '<span>Detection created</span>'
+      }
+      {
         data: 'in_zoo'
         className: "alt-col"
         render: (data) ->
@@ -106,10 +113,6 @@ $ ->
           return data
       }
       {
-        data: 'sandbox_under'
-        visible: false
-      }
-      {
         data: 'sandbox_score'
         render: (data, type, full, meta) ->
           if full['sandbox_under'] == "true"
@@ -117,10 +120,6 @@ $ ->
           else
             data = '<span class="overdue">' + data + '</span>'
           return data
-      }
-      {
-        data: 'threatgrid_under'
-        visible: false
       }
       {
         data: 'threatgrid_score'
@@ -143,15 +142,49 @@ $ ->
       }
       { data: 'created_at'}
       {
+#        submitter Type
+        data: null
+        render: () ->
+          return "<span>submitter Type</span>"
+      }
+      {
+        data: 'customer_name'
+      }
+      {
+        data: 'customer_company_name'
+      }
+      {
+        data: 'customer_email'
+      }
+      {
         data: 'assignee'
         className: "alt-col"
         render: (data) ->
           if data == undefined
-             data = '<span class="missing-data">Unassigned</span> <span title="Assign to me" class="esc-tooltipped tooltipstered"><button id="index_ticket_assign" class="take-ticket-button" onClick="take_disputes()"/></span>'
+            data = '<span class="missing-data">Unassigned</span> <span title="Assign to me" class="esc-tooltipped tooltipstered"><button id="index_ticket_assign" class="take-ticket-button" onClick="take_disputes()"/></span>'
           else
             data = data + '<span title="Assign to me" class="esc-tooltipped tooltipstered"><button id="index_ticket_assign" class="take-ticket-button" onClick="take_disputes()"/></span>'
           return data
       }
     ]
+  $('.toggle-vis').each ->
+      table = $('#file-rep-datatable').DataTable()
+      column = table.column($(this).attr('data-column'))
+      checkbox = $(this).find('input')
+      console.log(column, checkbox)
+      if $(checkbox).prop('checked')
+        column.visible true
+      else
+        column.visible false
+      $(this).on 'click', ->
+        $(checkbox).prop 'checked', !checkbox.prop('checked')
+        column.visible !column.visible()
+        return
+
+      $(checkbox).on 'click', ->
+        $(checkbox).prop 'checked', !checkbox.prop('checked')
+        return
+      return
+      checkbox = $(this).find('input')
 
 

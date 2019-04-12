@@ -5971,7 +5971,7 @@ td.ticket-total::before {
 .font-weight-bold{
   font-weight: bold;
 }
-code {
+.sha256_code {
   color:$type-base-color;
   font-family: 'Fira Mono', monospace;
   line-height: 1.5em;
@@ -5980,7 +5980,7 @@ code {
   background-color:$faint-neutral-color;
   white-space: normal;
   overflow: hidden;
-  width: 200px;
+  width: 90%;
   text-overflow: ellipsis;
   display: inline-block;
 }
