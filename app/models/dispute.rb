@@ -1056,6 +1056,7 @@ class Dispute < ApplicationRecord
   # @param [String] search_type variety of search
   # @param [ActionController::Parameters] params supplied fields and values for search.
   # @param [String] search_name name of saved search.
+  # @param [ActiveRecord::Relation] base_relation relation to chain this search onto.
   # @return [ActiveRecord::Relation]
   def self.robust_search(search_type, search_name: nil, params: nil, user:, reload: false)
     case search_type
