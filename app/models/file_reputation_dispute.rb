@@ -14,6 +14,62 @@ class FileReputationDispute < ApplicationRecord
 
   validates :status, :file_name, :sha256_hash, :disposition_suggested, presence: true
 
+  def self.create_action(bugzilla_rest_session, sha256_hash, file_name, file_size, sample_type, disposition_suggested, source, platform, sha256_checksum)
+
+    file_rep = FileReputationDispute.new
+
+    threat_score = nil
+    threatgrid_private = nil
+    if sha256_checksum.present?
+      threatgrid_response = Threatgrid::Search.query(sha256_checksum)
+
+      threat_score = threatgrid_response['threat_score']
+      threatgrid_private = threatgrid_response['threatgrid_private']
+    end
+
+    summary = "New File Rep Dispute generated at #{DateTime.now.utc.strftime("%Y-%m-%d %H:%M")}"
+
+    full_description = %Q{
+          File name: #{file_name};
+          SHA256 hash: #{sha256_hash}
+    }
+
+    bug_attrs = {
+        'product' => 'Escalations Console',
+        'component' => 'FileRep',
+        'summary' => summary,
+        'version' => 'unspecified',
+        'description' => full_description,
+        'priority' => "P3",
+        'classification' => 'unclassified',
+    }
+
+    bug_proxy = bugzilla_rest_session.create_bug(bug_attrs)
+
+    customer = Customer.where(name: 'Dispute Analyst').first
+    attributes = {
+        id: bug_proxy.id,
+        sha256_hash: sha256_hash,
+        file_name: file_name,
+        file_size: file_size,
+        sample_type: sample_type,
+        disposition_suggested: disposition_suggested,
+        source: source,
+        platform: platform,
+        threatgrid_score: threat_score,
+        threatgrid_private: threatgrid_private,
+        customer: customer
+    }
+    file_rep.assign_attributes(attributes)
+
+    if file_rep.save
+      file_rep
+    else
+      error_messages = file_rep.errors.full_messages.join('; ')
+      render plain: "\"Error(s) creating file rep -- #{error_messages}\"", status: :internal_server_error
+    end
+  end
+
   def self.save_named_search(search_name, params, user:, project_type:)
     NamedSearchCriterion.where(named_search_id: NamedSearch.where(user_id: user.id, name: search_name).ids).delete_all
 
@@ -81,22 +137,22 @@ class FileReputationDispute < ApplicationRecord
   # @return [ActiveRecord::Relation]
   def self.standard_search(search_name, user:)
     case search_name
-    # when 'recently_viewed'
-    #   joins(:dispute_peeks).where(dispute_peeks: {assigned_id: user.id})
+      # when 'recently_viewed'
+      #   joins(:dispute_peeks).where(dispute_peeks: {assigned_id: user.id})
     when 'my_open'
       where.not(status: STATUS_CLOSED).where(assigned_id: user.id)
     when 'my_disputes'
       where(assigned_id: user.id)
-    # when 'team_disputes'
-    #   where(assigned_id: user.my_team)
+      # when 'team_disputes'
+      #   where(assigned_id: user.my_team)
     when 'unassigned'
       where(assigned_id: nil).where.not(status: STATUS_CLOSED)
     when 'open'
       where.not(status: STATUS_CLOSED)
-    # when 'open_email'
-    #   sbrs_disputes.where(status: [STATUS_NEW, STATUS_REOPENED, STATUS_CUSTOMER_PENDING, STATUS_CUSTOMER_UPDATE, STATUS_ON_HOLD, STATUS_RESEARCHING, STATUS_ESCALATED, STATUS_ASSIGNED])
-    # when 'open_web'
-    #   wbrs_disputes.where(status: [STATUS_NEW, STATUS_REOPENED, STATUS_CUSTOMER_PENDING, STATUS_CUSTOMER_UPDATE, STATUS_ON_HOLD, STATUS_RESEARCHING, STATUS_ESCALATED, STATUS_ASSIGNED])
+      # when 'open_email'
+      #   sbrs_disputes.where(status: [STATUS_NEW, STATUS_REOPENED, STATUS_CUSTOMER_PENDING, STATUS_CUSTOMER_UPDATE, STATUS_ON_HOLD, STATUS_RESEARCHING, STATUS_ESCALATED, STATUS_ASSIGNED])
+      # when 'open_web'
+      #   wbrs_disputes.where(status: [STATUS_NEW, STATUS_REOPENED, STATUS_CUSTOMER_PENDING, STATUS_CUSTOMER_UPDATE, STATUS_ON_HOLD, STATUS_RESEARCHING, STATUS_ESCALATED, STATUS_ASSIGNED])
     when 'closed'
       where(status: STATUS_CLOSED)
     when 'all'
@@ -141,10 +197,8 @@ class FileReputationDispute < ApplicationRecord
       standard_search(search_name, user: user)
     when 'contains'
       contains_search(params['value'])
-
     else
       where({})
     end
   end
-
 end
