@@ -140,6 +140,9 @@ Rails.configuration.bls.host           = bls_config['host']
 Rails.configuration.bls.port           = bls_config['port']
 
 threatgrid = env_config.fetch('threatgrid', {})
-raise 'config.yml missing sendgrid section' unless threatgrid
+raise 'config.yml missing threatgrid section' unless threatgrid
 Rails.configuration.threatgrid         = ApiRequester::ApiRequester.config_of(threatgrid)
 
+ticloud = env_config.fetch('ticloud', {})
+raise 'config.yml missing ticloud section' unless ticloud
+Rails.configuration.ticloud         = ApiRequester::ApiRequester.config_of(ticloud)
