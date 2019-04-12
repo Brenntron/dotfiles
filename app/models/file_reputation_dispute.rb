@@ -145,4 +145,51 @@ class FileReputationDispute < ApplicationRecord
       where({})
     end
   end
+
+  #for support with incoming bridge messages from TI coming into messages_controller
+  def self.process_bridge_payload(message_paylod)
+    user = User.where(cvs_username:"vrtincom").first
+    begin
+      ActiveRecord::Base.transaction do
+        guest = Company.where(:name => "Guest").first
+        opened_at = Time.now
+        customer = Customer.process_and_get_customer(message_payload)
+
+        bugzilla_rest_session = message_payload[:bugzilla_rest_session]
+
+        summary = "New File Reputation Reputation Dispute generated at #{DateTime.now.utc.strftime("%Y-%m-%d %H:%M")}"
+
+        full_description = <<~HEREDOC
+          File Rep Sha: #{message_payload[:file_reputation][:sha256_checksum]}
+          
+
+        HEREDOC
+
+        bug_attrs = {
+            'product' => 'Escalations Console',
+            'component' => 'AMP Disputes',
+            'summary' => summary,
+            'version' => 'unspecified', #self.version,
+            'description' => full_description,
+            # 'opsys' => self.os,
+            'priority' => 'Unspecified',
+            'classification' => 'unclassified',
+        }
+        logger.debug "Creating bugzilla bug"
+
+        bug_proxy = bugzilla_rest_session.create_bug(bug_attrs)
+
+        logger.debug "Creating dispute"
+        new_dispute = FileReputationDispute.new
+
+        new_dispute.id = bug_proxy.id
+        new_dispute.user_id = user.id
+        new_dispute.sha256_hash = message_payload[:file_reputation][:sha256_checksum]
+        new_dispute.status = STATUS_NEW
+        new_dispute.file_name = message_payload[:file_reputation][:file_rep_name]
+        new_dispute.customer_id = customer.id
+
+      end
+    end
+  end
 end

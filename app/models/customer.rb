@@ -46,6 +46,11 @@ class Customer < ApplicationRecord
   end
 
   def self.process_and_get_customer(payload)
+
+    if payload[:file_reputation_dispute].present?
+      customer_exists = Customer.thread_safe_find_or_create_by(email: payload[:file_reputation_dispute][:email], name: "")
+    end
+
     if payload["payload"] && payload["payload"]["email"] && payload["payload"]["user_company"] && payload["payload"]["name"]
       customer_exists =
           find_or_create_customer(customer_email: payload["payload"]["email"],
