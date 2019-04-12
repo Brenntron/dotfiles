@@ -120,7 +120,7 @@ $ ->
       }
     ]
 
-  $('.toggle-vis').each ->
+  $('.toggle-vis-file-rep').each ->
 #    toggle visible columns
       table = $('#file-rep-datatable').DataTable()
       column = table.column($(this).attr('data-column'))
