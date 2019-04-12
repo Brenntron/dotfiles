@@ -201,4 +201,4 @@ class FileReputationDispute < ApplicationRecord
       where({})
     end
   end
-end 
+end
