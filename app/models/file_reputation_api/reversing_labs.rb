@@ -23,7 +23,6 @@ class FileReputationApi::ReversingLabs
 
   def self.get_reversing_labs_response(uri)
     request = Net::HTTP::Post.new(uri)
-    binding.pry
     request.basic_auth reversing_labs_username, reversing_labs_password
     req_options = {
         use_ssl: uri.scheme == "https",
@@ -34,7 +33,6 @@ class FileReputationApi::ReversingLabs
       http.request(request)
     end
 
-    binding.pry
 
     response
   end
