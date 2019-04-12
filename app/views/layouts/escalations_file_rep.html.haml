@@ -83,8 +83,9 @@
         = render 'escalations/webrep/disputes/new'
 
 
+  -# naming guide modal - nav button here
   .nav-tool-blocks.col-xs-2.col-sm-2.col-md-2.col-lg-1.dropdown.nav-naming-guide
-    %a{href: '#', class: 'dropdown-toggle', id: 'naming-guide', 'data-toggle': 'dropdown', 'aria-haspopup': 'true', 'aria-expanded': 'false'}
+    %a{href: '#', 'class': 'modal-toggle', id: 'naming-guide', 'aria-haspopup': 'true', 'aria-expanded': 'false'}
       %span{class: 'nav-toolbar-icon icon-naming-white'}
       Naming Guide
 
@@ -101,8 +102,6 @@
           Advanced Search
         #advanced-search-wrapper.nav-tool-content-wrapper
   -#          = render 'escalations/webrep/disputes/advanced_search'
-
-
 
 
 

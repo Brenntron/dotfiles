@@ -8446,7 +8446,7 @@ hr.thin.form-divider {
 }
 
 // dbinebri: updates below for file rep navbar layout new
-// wrapping all file rep nav styles here in sass nesting for specificity
+// wrapping all styles ere in sass nesting for file rep specificity
 .escalations--file_rep--disputes-controller {
 
   // search input group wrapper
@@ -8511,18 +8511,11 @@ hr.thin.form-divider {
     }
   }
 
-  // large size fix for this
-  @media screen and (min-width: 1600px) {
-    .nav-tool-blocks.nav-page-button-wrapper {
-      min-width: 120px;
-    }
-  }
-
 }
 
 
 // dbinebri: file rep - naming guide modal specific styles here
-// bootstrap 3 modals have many necessary internal divs
+// bootstrap 3 modals have many internal divs, need styles for each
 #modal-naming-guide {
   position: fixed;
 
@@ -8562,17 +8555,24 @@ hr.thin.form-divider {
         text-transform: uppercase;
         font-weight: bold;
         font-size: 13px;
+        &:last-of-type {
+          padding-right: 15px;
+        }
       }
       table td {
         padding-top: 10px;
-        font-weight: normal;
+        font-weight: 500;
         font-size: 10px;
-        color: $type-lighter-color;
+        color: darken($type-lighter-color, 5%);
 
-        // pattern column below needs special formatting
-        &:first-of-type span {
-          font-weight: bold;
-          background: darken($content-bg-color, 5%);
+        // "pattern" column below needs special formatting
+        &:first-of-type {
+          span {
+            font-family: 'Fira Mono', monospace;
+            font-weight: 500;
+            background: darken($content-bg-color, 5%);
+            letter-spacing: 0.1px;
+          }
         }
       }
     }
@@ -8584,4 +8584,9 @@ hr.thin.form-divider {
 // dbinebri: the tooltips for file rep get too wide, limit the max-width
 .tooltipster-sidetip .tooltipster-box {
   max-width: 410px !important;
+}
+
+// special light class for nav naming guide on modal active
+#nav-banner .nav-naming-guide a#naming-guide.light {
+  background-color: lighten($table-dark-body, 5%);
 }
