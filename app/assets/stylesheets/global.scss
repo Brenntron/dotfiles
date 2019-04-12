@@ -1209,7 +1209,7 @@ thead th.sorting.center {
   }
 
   .modal-content {
-    border: 2px solid #f2f2f2;
+    border: 2px solid $faint-neutral-color;
     border-radius: 2px;
   }
 }
@@ -2162,8 +2162,8 @@ a.static-nav-item {
 }
 
 .content-row {
-  border-top: 2px solid #f2f2f2;
-  border-bottom: 2px solid #f2f2f2;
+  border-top: 2px solid $faint-neutral-color;
+  border-bottom: 2px solid $faint-neutral-color;
   width: 100%;
   padding: 4px 0;
   min-height: 34px;
@@ -5022,7 +5022,7 @@ input.table-entry-input:focus {
 }
 
 #top_bar_extended_info .col-with-divider {
-  border-right-color: #f2f2f2;
+  border-right-color: $faint-neutral-color;
 }
 
 #top_bar_toggle {
@@ -5857,7 +5857,7 @@ td.ticket-total::before {
   display: flex;
   margin: 6% 0;
   padding-top: 1%;
-  border-top: 1px solid #f2f2f2;
+  border-top: 1px solid $faint-neutral-color;
 }
 #index-edit-ticket-status-dropdown .radio-label, #index-edit-entry-status-dropdown .radio-label {
   margin-top: 6px;
@@ -5968,6 +5968,21 @@ td.ticket-total::before {
 .highlight-second-review .important-flag-col span {
   display: block;
 }
+.font-weight-bold{
+  font-weight: bold;
+}
+code {
+  color:$type-base-color;
+  line-height: 1.5em;
+  padding: 0 5px;
+  font-weight: 400;
+  background-color:$faint-neutral-color;
+  white-space: normal;
+  overflow: hidden;
+  width: 200px;
+  text-overflow: ellipsis;
+  display: inline-block;
+}
 
 .ticket-age-over3hr {
   color: $warning-accent-color;
@@ -5977,6 +5992,10 @@ td.ticket-total::before {
 .overdue {
   color: $second-section-color;
   font-weight: bold;
+}
+
+.malicious {
+  color: $warning-accent-color;
 }
 
 .loader-gears {
@@ -6799,7 +6818,7 @@ table#duplicates a {
 }
 
 .bug-tabs .nav-tabs li a {
-  background-color: #f2f2f2 !important;
+  background-color: $faint-neutral-color!important;
 }
 
 .bug-tabs .nav-tabs li.active a {

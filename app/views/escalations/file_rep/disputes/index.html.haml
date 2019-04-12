@@ -1,6 +1,6 @@
 .content-wrapper
   %h1#filerep-index-title All File Reputation Tickets
-
+  %a.saved-search nos4a2
   -#Toolbar here
   .toolbar.file-rep-index-toolbar
     %div
@@ -209,7 +209,23 @@
       %table.table.responsive#file-rep-datatable{'data-source': escalations_file_rep_disputes_path(format: :json)}
         %thead
           %tr
-            %th name
+            %th Case Id
+            %th Status
+            %th File Name
             %th sha256
-            %th email
+            %th File Size
+            %th Sample Type
+            %th AMP Disp
+            %th AMP Detection Name
+            %th In zoo
+            %th Sandbox score
+            %th Threat Score
+            %th Reversing Labs
+            %th Suggested Disp
+            %th Time Submitted
+            %th Assignee
         %tbody
+
+-#%th name
+-#  %th sha256
+-#  %th email
