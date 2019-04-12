@@ -125,7 +125,6 @@ $ ->
       table = $('#file-rep-datatable').DataTable()
       column = table.column($(this).attr('data-column'))
       checkbox = $(this).find('input')
-      console.log(column, checkbox)
       if $(checkbox).prop('checked')
         column.visible true
       else
