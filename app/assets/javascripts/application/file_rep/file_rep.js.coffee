@@ -74,7 +74,7 @@ $ ->
       {
         data: 'file_size'
         render: (data) ->
-          return '<span>' + data + 'bytes </span>'
+          return '<span>' + data + ' bytes </span>'
       }
       { data: 'sample_type'}
       {
