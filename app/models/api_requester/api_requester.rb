@@ -115,7 +115,6 @@ module ApiRequester::ApiRequester
     end
 
     def set_basic_auth(username: nil, password: nil)
-      byebug
       @basic_auth_username = username || request_config.username
       @basic_auth_password = password || request_config.password
     end
