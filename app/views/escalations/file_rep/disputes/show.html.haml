@@ -159,20 +159,19 @@
 
 %ul.nav.nav-tabs{role: 'tablist'}
   %li.nav-item{role:'presentation'}
-    %a.nav-link#communication-tab-link{href: '#communication_tab', 'aria-controls': 'communication', role: 'tab', 'data-toggle': 'tab'}
-      Communication
-  %li.nav-item{role:'presentation'}
     %a.nav-link#research-tab-link{href: '#research_tab', 'aria-controls': 'research', role: 'tab', 'data-toggle': 'tab'}
       Research
+  %li.nav-item{role:'presentation'}
+    %a.nav-link#communication-tab-link{href: '#communication_tab', 'aria-controls': 'communication', role: 'tab', 'data-toggle': 'tab'}
+      Communication
   %li.nav-item{role:'presentation'}
     %a.nav-link#history-tab-link{href: '#history_tab', 'aria-controls': 'history', role: 'tab', 'data-toggle': 'tab'}
       History
 
 .tab-content.content-wrapper#bug-tab-content
-  .tab-pane#communication_tab{role: 'tabpanel'}
-    Communication
-    -#= render 'escalations/webrep/disputes/communication_tab'
   .tab-pane#research_tab{role: 'tabpanel'}
     = render 'escalations/file_rep/disputes/research_tab'
+  .tab-pane#communication_tab{role: 'tabpanel'}
+    = render 'escalations/file_rep/disputes/communication_tab'
   .tab-pane#history_tab{role: 'tabpanel'}
     History

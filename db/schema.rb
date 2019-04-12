@@ -10,7 +10,11 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
+<<<<<<< HEAD
+ActiveRecord::Schema.define(version: 2019_04_09_201329) do
+=======
 ActiveRecord::Schema.define(version: 2019_04_08_203516) do
+>>>>>>> a47463d6406e57521f6b510b3a17c85c12293903
 
   create_table "alerts", options: "ENGINE=InnoDB DEFAULT CHARSET=utf8", force: :cascade do |t|
     t.datetime "created_at", null: false
@@ -525,8 +529,20 @@ ActiveRecord::Schema.define(version: 2019_04_08_203516) do
     t.float "reversing_labs_score"
     t.string "reversing_labs_signer"
     t.bigint "user_id"
+    t.string "resolution"
+    t.string "detection_name"
+    t.datetime "detection_created_at"
+    t.boolean "in_zoo"
+    t.bigint "assigned_id"
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.boolean "threatgrid_private"
+    t.boolean "has_sample"
+    t.index ["assigned_id"], name: "index_file_reputation_disputes_on_assigned_id"
+    t.index ["created_at"], name: "index_file_reputation_disputes_on_created_at"
     t.index ["customer_id"], name: "index_file_reputation_disputes_on_customer_id"
     t.index ["sha256_hash"], name: "index_file_reputation_disputes_on_sha256_hash"
+    t.index ["updated_at"], name: "index_file_reputation_disputes_on_updated_at"
     t.index ["user_id"], name: "index_file_reputation_disputes_on_user_id"
   end
 

@@ -1,0 +1,1 @@
+CREATE TABLE `file_rep_comments` (`id` bigint NOT NULL AUTO_INCREMENT PRIMARY KEY, `created_at` datetime NOT NULL, `updated_at` datetime NOT NULL, `file_reputation_dispute_id` int, `comment` text, `user_id` int);
