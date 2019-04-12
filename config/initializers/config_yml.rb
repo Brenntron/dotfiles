@@ -141,10 +141,7 @@ Rails.configuration.bls.port           = bls_config['port']
 
 reversing_labs_config = env_config['reversing_labs']
 raise 'config.yml missing ReversingLabs section' unless reversing_labs_config
-Rails.configuration.reversing_labs                = OpenStruct.new
-Rails.configuration.reversing_labs.url            = reversing_labs_config['url']
-Rails.configuration.reversing_labs.username       = reversing_labs_config['username']
-Rails.configuration.reversing_labs.password       = reversing_labs_config['password']
+Rails.configuration.reversing_labs                = ApiRequester::ApiRequester.config_of(reversing_labs_config)
 
 threatgrid = env_config.fetch('threatgrid', {})
 raise 'config.yml missing sendgrid section' unless threatgrid

@@ -1,4 +1,8 @@
 class FileReputationApi::ReversingLabs
+  include ApiRequester::ApiRequester
+  set_api_requester_config Rails.configuration.reversing_labs
+  set_default_request_type :query_string
+  set_basic_auth
 
   # TODO: Either open a ticket to make ApiRequester support HTTP basic auth OR come back here and
   # set up this stuff when it does.
@@ -22,33 +26,25 @@ class FileReputationApi::ReversingLabs
   end
 
   def self.sha256_lookup(sha256)
-    uri = URI(reversing_labs_url + "api/databrowser/rldata/query/sha256/#{sha256}?format=json")
+    cache_key = "reversing_labs:#{sha256}"
+    if Rails.cache.read(cache_key).blank?
+      response = call_request(:get, "api/databrowser/rldata/query/sha256/#{sha256}", input: {format: 'json'})
 
-    if Rails.cache.read(uri).blank?
-      request = Net::HTTP::Get.new(uri)
-      request.basic_auth reversing_labs_username, reversing_labs_password
-      req_options = {
-          use_ssl: uri.scheme == "https",
-          verify_mode: OpenSSL::SSL::VERIFY_NONE
-      }
-
-      response = Net::HTTP.start(uri.hostname, uri.port, req_options) do |http|
-        http.request(request)
-      end
-
-      if response.code != "200" #there was an issue
-        {error: 'Data Currently Unavailable'}
-      else
         begin
           response = JSON.parse(response.body)
           response
         rescue JSON::ParserError
           {error: 'Invalid Hash'}
         end
-      end
+      # end
     else
-      Rails.cache.read(uri)
+      Rails.cache.read(cache_key)
     end
+
+  rescue JSON::ParserError
+    {error: 'Invalid Hash'}
+  rescue
+    {error: 'Data Currently Unavailable'}
   end
 
 end

@@ -11,9 +11,12 @@
 #       set_api_requester_config Rails.configuration.wbrs
 #       set_default_request_type :json
 #       set_default_headers "Authorization" => "Bearer #{Rails.configuration.wbrs.auth_token}"
+#       set_basic_auth
 #     end
 #
 # Call call_request_parsed or call_request to make an HTTP request.
+#
+# Use ApiRequester::ApiRequester.config_of() in config_yml.rb initializer
 #
 #
 # == WARNING ==
@@ -48,16 +51,16 @@ module ApiRequester::ApiRequester
   # @return [OpenStruct] an open struct with standard values set, which can be added to for custom settings.
   def self.config_of(hash)
     struct = OpenStruct.new
-    %w{host verify_mode port gssnegotiate ca_cert_file api_key}.each do |key|
+    %w{host verify_mode port gssnegotiate ca_cert_file api_key username password}.each do |key|
       struct.send((key + '=').to_sym, hash[key])
     end
 
     struct.tls =
         case struct.verify_mode
-        when 'no-tls', 'no-ssl'
-          false
-        else
+        when 'verify-none', 'verify-peer'
           true
+        else
+          false
         end
 
     struct.port ||= struct.tls ? 443 : 80
@@ -66,7 +69,6 @@ module ApiRequester::ApiRequester
   end
 
   module ClassMethods
-    attr_reader :default_headers
 
     # Sets the configuration.
     #
@@ -91,6 +93,10 @@ module ApiRequester::ApiRequester
       end
     end
 
+    def default_headers
+      @default_headers || {}
+    end
+
     def default_request_type=(default_request_type)
       @default_request_type = default_request_type
     end
@@ -106,6 +112,20 @@ module ApiRequester::ApiRequester
 
     def default_request_type
       @default_request_type || :json
+    end
+
+    def set_basic_auth(username: nil, password: nil)
+      byebug
+      @basic_auth_username = username || request_config.username
+      @basic_auth_password = password || request_config.password
+    end
+
+    def basic_auth_username
+      @basic_auth_username
+    end
+
+    def basic_auth_password
+      @basic_auth_password
     end
 
     def tls?
@@ -179,6 +199,8 @@ module ApiRequester::ApiRequester
         request.ssl = false
         # request.auth.ssl.verify_mode = :none
       end
+
+      request.auth.basic( basic_auth_username, basic_auth_password ) if basic_auth_username
 
       request
     end
