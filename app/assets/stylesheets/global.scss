@@ -8517,6 +8517,8 @@ hr.thin.form-divider {
   //padding: 0;
 }
 
+
+
 // dbinebri: updates below for file rep navbar layout new
 // wrapping all file rep nav styles here in sass nesting for specificity
 .escalations--file_rep--disputes-controller {
@@ -8565,6 +8567,11 @@ hr.thin.form-divider {
     float: right;
   }
 
+  // when naming guide modal is active, let's keep a very light opacity backdrop
+  .modal-backdrop.in {
+    opacity: 0.1;
+  }
+
   // for the nav button labels, this is where we ensure labels can break and wrap if squeezed tight enough
   #nav-banner .nav-tool-blocks.dropdown a, #nav-banner .nav-tool-blocks.dropdown a:hover {
     display: inline-block !important;
@@ -8590,70 +8597,76 @@ hr.thin.form-divider {
     }
   }
 
-}
 
 
-// dbinebri: file rep - naming guide modal specific styles here
-// bootstrap 3 modals have many necessary internal divs
-#modal-naming-guide {
-  position: fixed;
+  // dbinebri: file rep - naming guide modal specific styles here
+  // bootstrap 3 modals have many necessary internal divs
+  #modal-naming-guide {
+    position: fixed;
 
-  .modal-dialog {
-    margin-top: 60px;
-    margin-right: 30px;
-    min-width: 800px;
-  }
-
-  .modal-content {
-    border: 0;
-    box-shadow: 0 5px 15px rgba(0, 0, 0, 0.2);
-  }
-
-  .modal-header {
-    background: darken($table-dark-body, 5%);
-    color: $content-bg-color;
-    border-radius: 5px 5px 0 0;
-    border: none;
-
-    button.close {
-      background-image: url(image_path('icon_cancel_white.svg'));
-      top: 15px;
-      right: 10px;
+    .modal-dialog {
+      margin-top: 60px;
+      margin-right: 30px;
+      min-width: 800px;
     }
-  }
 
-  .modal-body {
-    padding: 25px 15px;
+    .modal-content {
+      border: 0;
+      box-shadow: 0 5px 15px rgba(0, 0, 0, 0.2);
+    }
 
-    .modal-table {
-      height: 400px;
-      color: $table-dark-body;
-      overflow-y: scroll;
+    .modal-header {
+      background: $table-dark-body;
+      color: $content-bg-color;
+      border-radius: 5px 5px 0 0;
+      border: none;
+      padding: 10px;
 
-      table th {
-        text-transform: uppercase;
-        font-weight: bold;
-        font-size: 13px;
-      }
-      table td {
-        padding-top: 10px;
+      button.close {
+        background-image: url(image_path('icon_cancel_white.svg'));
+        background-position: center center;
+        top: 10px;
+        right: 10px;
+        color: #444;
         font-weight: normal;
-        font-size: 10px;
-        color: $type-lighter-color;
+        font-size: 19px;
+      }
+    }
 
-        // pattern column below needs special formatting
-        &:first-of-type span {
+    .modal-body {
+      padding: 25px 15px;
+
+      .modal-table {
+        height: 400px;
+        color: $table-dark-body;
+        overflow-y: scroll;
+
+        table th {
+          text-transform: uppercase;
           font-weight: bold;
-          background: darken($content-bg-color, 5%);
+          font-size: 13px;
+        }
+        table td {
+          padding-top: 10px;
+          font-weight: normal;
+          font-size: 10px;
+          color: $type-lighter-color;
+
+          // pattern column below needs special formatting
+          &:first-of-type span {
+            font-weight: bold;
+            background: darken($content-bg-color, 5%);
+          }
         }
       }
     }
+
   }
 
 }
 
 
-// dbinebri: the tooltips for file rep get too wide, limit the max-width
+// dbinebri: the tooltips for modals on file rep get too wide, limit the max-width a little bit
 .tooltipster-sidetip .tooltipster-box {
   max-width: 410px !important;
 }
