@@ -3,6 +3,32 @@ module API
     module Escalations
       module FileRep
         class Disputes < Grape::API
+
+          desc 'Create a File Rep Dispute'
+          params do
+            requires :sha256_hash, type: String, desc: 'SHA256 hash of the file'
+            requires :file_name, type: String, desc: 'Name of the file'
+            requires :file_size, type: Integer, desc: 'File size'
+            requires :sample_type, type: String, desc: 'Sample type'
+            requires :disposition_suggested, type: String, desc: 'What should the disposiiton be'
+            requires :platform, type: String, desc: 'Platform'
+            requires :sha256_checksum, type: String, desc: 'SHA256 checksum'
+          end
+          post "" do
+            std_api_v2 do
+              dispute = FileReputationDispute.create_action(bugzilla_rest_session,
+                                                            params[:sha256_hash],
+                                                            params[:file_name],
+                                                            params[:file_size],
+                                                            params[:sample_type],
+                                                            params[:disposition_suggested],
+                                                            "ACE",
+                                                            params[:platform],
+                                                            params[:sha256_checksum]
+                                                            )
+              render json: {status: 'Success', case_id: dispute.id}
+            end
+            end
         
           desc 'Edit a FileRep Dispute'
           params do

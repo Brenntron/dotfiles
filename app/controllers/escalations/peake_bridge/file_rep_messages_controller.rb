@@ -13,8 +13,29 @@ class Escalations::PeakeBridge::FileRepMessagesController < ApplicationControlle
       threatgrid_private = threatgrid_response['threatgrid_private']
     end
 
+
+    summary = "New File Rep Dispute generated at #{DateTime.now.utc.strftime("%Y-%m-%d %H:%M")}"
+
+    full_description = %Q{
+          File name: #{file_rep_params[:file_name]};
+          SHA256 hash: #{file_rep_params[:sha256_hash]}
+    }
+
+    bug_attrs = {
+        'product' => 'Escalations Console',
+        'component' => 'FileRep',
+        'summary' => summary,
+        'version' => 'unspecified',
+        'description' => full_description,
+        'priority' => "P3",
+        'classification' => 'unclassified',
+    }
+
+    bug_proxy = bugzilla_rest_session.create_bug(bug_attrs)
+
     customer = find_or_create_customer
     attributes = {
+        id: bug_proxy.id,
         sha256_hash: file_rep_params[:sha256_hash],
         file_name: file_rep_params[:file_name],
         file_size: file_rep_params[:file_size],

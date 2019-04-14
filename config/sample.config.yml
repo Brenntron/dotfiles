@@ -31,6 +31,10 @@ development:
         aws_s3_host_name: "US East (N. Virginia)"
         aws_region: "us-east-1"
         aws_bucket: "snort-org-site"
+  reversing_labs:
+    url: "https://ticloud-cdn-api.reversinglabs.com/"
+    username:
+    password: 
   perl:
     cmd: "/usr/bin/env perl"
     canvas_root: "extras"
