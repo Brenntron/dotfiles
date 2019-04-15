@@ -217,7 +217,7 @@ class FileReputationDispute < ApplicationRecord
   end
 
   #for support with incoming bridge messages from TI coming into messages_controller
-  def self.process_bridge_payload(message_paylod, customer_payload)
+  def self.process_bridge_payload(message_payload, customer_payload)
     user = User.where(cvs_username:"vrtincom").first
     begin
       ActiveRecord::Base.transaction do
@@ -274,8 +274,8 @@ class FileReputationDispute < ApplicationRecord
         new_dispute.disposition_suggested = message_payload[:disposition_suggested]
         new_dispute.source = message_payload[:source]
         new_dispute.platform = message_payload[:platform]
-        new_dispute.threatgrid_score: threat_score
-        new_dispute.threatgrid_priate: threatgrid_private
+        new_dispute.threatgrid_score = threat_score
+        new_dispute.threatgrid_priate = threatgrid_private
 
         return_message = ""
         return_success = false
