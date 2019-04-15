@@ -40,14 +40,6 @@
           %a{href: '?f=open'}
             %span.nav-dropdown-icon.icon-open-bugs
             Open Tickets
-        %li{class: ("selected" if params[:f] == "open_email")}
-          %a{href: '?f=open_email'}
-            %span.nav-dropdown-icon.icon-email-tix
-            Open Email Tickets
-        %li{class: ("selected" if params[:f] == "open_web")}
-          %a{href: '?f=open_web'}
-            %span.nav-dropdown-icon.icon-web-tix
-            Open Web Tickets
         %li{class: ("selected" if params[:f] == "closed")}
           %a{href: '?f=closed'}
             %span.nav-dropdown-icon.icon-fixed-bugs
@@ -102,6 +94,8 @@
           Advanced Search
         #advanced-search-wrapper.nav-tool-content-wrapper
   -#          = render 'escalations/webrep/disputes/advanced_search'
+
+
 
 
 

@@ -1,0 +1,41 @@
+#newEmailDialog{title: 'Compose New Email'}
+  %form
+    .email-reply-header-information
+      .row
+        .col-xs-6
+          %span.content-label-sm.content-label-sm-to To
+          %input.receiver-email.new-receiver{autofocus: true, required: true, type: 'email', name: 'receiver'}
+        .col-xs-6
+          %span.content-label-sm.content-label-sm-cc Cc
+          %input.cc-email{type: 'email', name: 'cc-reciever'}
+
+      .row
+        .col-xs-12
+          .email-reply-buttons
+            %button.attachment-button.attachment-label.new-attachment
+          %span.content-label-sm.content-label-sm-sub Subject
+          %input.communication-subject.new-subject#subject{type: 'text'}
+
+
+      -##### Add in later after templates and template management is created
+
+      -#.template-select-wrapper
+      -#  .template-label
+      -#    Select a Template
+      -#
+      -#  %select.dropdown.email-template-select#select-new-template
+      -#    -if EmailTemplate.all.empty?
+      -#      %option.hidden{value:'', disabled: true, selected: true} No Templates Created
+      -#    -else
+      -#      %option.hidden{value:'', disabled: true, selected: true} No Template Selected
+      -#      =options_for_select(EmailTemplate.all.pluck(:template_name, :id))
+
+
+      #file-fields-new
+
+    .email-reply-body-wrapper
+      %textarea.email-reply-body.new-body{maxlength: 64000}
+
+    .email-new-button-wrapper
+      %button.primary#send-new-email{value: 'submit'}
+        Send
