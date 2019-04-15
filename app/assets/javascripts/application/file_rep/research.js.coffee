@@ -50,8 +50,7 @@ $ ->
 #  Call to reversing labs
   std_msg_ajax(
     method: 'GET'
-    url: "/escalations/api/v1/escalations/filerep/reversing_labs/"
-    data: {sha256_hash: sha256_hash}
+    url: "/escalations/api/v1/escalations/filerep/reversing_labs/" + sha256_hash
     success_reload: false
     success: (response) ->
       console.log response
