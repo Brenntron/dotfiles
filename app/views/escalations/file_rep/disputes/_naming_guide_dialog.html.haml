@@ -1,0 +1,226 @@
+#dialog-naming-guide{title: 'AMP Naming Conventions Guide'}
+  %table.table
+    %thead
+      %tr
+        %th Pattern
+        %th Example
+        %th Engine Description
+        %th Notes
+    %tbody
+      %tr
+        %td
+          %span /^.*Clam.Heuristics.*/
+        %td ClamAV.Heuristics.SWF.SuspectImage.E
+        %td ClamAV Heuristic Rules, often has file extension in alert name (For example SWF = Flash file)
+        %td
+          &nbsp;
+      %tr
+        %td
+          %span /^.*.SPERO.*/
+        %td W32.SPERO.Sality.02.12
+        %td W32 Binary Header Features based classification engine
+        %td
+          &nbsp;
+      %tr
+        %td
+          %span /^.*ETHOS.*/
+        %td W32.ETHOS.COHORS.MAR.a2b3c4
+        %td Fuzzy hash based classification of Win32 binary headers
+        %td
+          %span{class: 'nav-toolbar-icon icon-notes esc-tooltipped tooltipstered', title: 'This example contains a partial hash of the SHA256 that matched. (For example a2b3c4 is the first 6 characters of the SHA)'}
+      %tr
+        %td
+          %span /^.*vv/
+        %td W32.Generic:Enistery.b0a91.vv
+        %td Third Party comparison engine
+        %td
+          %span{class: 'nav-toolbar-icon icon-notes esc-tooltipped tooltipstered', title: 'This example contains a partial hash of the SHA256 that matched. (For example b0a91 is the first 5 characters of the SHA)'}
+      %tr
+        %td
+          %span /^.*1201/
+        %td W32.Generic:Detection.1201
+        %td Third Party comparison engine
+        %td
+          %span{class: 'nav-toolbar-icon icon-notes esc-tooltipped tooltipstered', title: 'This example may contain a partial hash of the SHA256 that matched.'}
+      %tr
+        %td
+          %span /^.*tpd/
+        %td Conficker:ConfiDrv-tpd
+        %td Third Party comparison engine
+        %td
+          &nbsp;
+      %tr
+        %td
+          %span /^.*\.rc/
+        %td W32.agent.rc
+        %td Aggressive machine learning engine performs research on unknown samples and compares their aggression with similar samples for one-to-one conviction.
+        %td
+          &nbsp;
+      %tr
+        %td
+          %span /^.*SHEATH.*/
+        %td W32.SHEATH.COHORS.DEC.a2b3c4
+        %td Aggressive machine learning engine performs research on unknown samples and compares their aggression with similar samples for one-to-one conviction.
+        %td
+          %span{class: 'nav-toolbar-icon icon-notes esc-tooltipped tooltipstered', title: 'This example may contain a partial hash of the SHA256 that matched.'}
+      %tr
+        %td
+          %span /^.*tt/
+        %td W32.Gen:Suspicious_Gen5.15e0.tt
+        %td Identifies files that are queried by other infected files to determine if the queried file can be marked malicious
+        %td
+          %span{class: 'nav-toolbar-icon icon-notes esc-tooltipped tooltipstered', title: 'This example may contain a partial hash of the SHA256 that matched.'}
+      %tr
+        %td
+          %span /^.hw/
+        %td W32.Downloader:Suspicious_Gen2.15fo.hw
+        %td Big Data Analysis Engine for Whitelisting clean files.
+        %td
+          %span{class: 'nav-toolbar-icon icon-notes esc-tooltipped tooltipstered', title: 'This example may contain a partial hash of the SHA256 that matched.'}
+      %tr
+        %td
+          %span /^.dk/
+        %td w32.SirefefA.15gc.dk
+        %td Parent/Child relationship based black and whitelisting engine
+        %td
+          %span{class: 'nav-toolbar-icon icon-notes esc-tooltipped tooltipstered', title: 'This example may contain a partial hash of the SHA256 that matched.'}
+      %tr
+        %td
+          %span /^.*IOC/
+        %td W32.Driveby.08.08.IOC
+        %td Synthetic Event Engine that convicts binaries based upon actions of an Indicator of Compromise
+        %td
+          &nbsp;
+      %tr
+        %td
+          %span /^.MASH.SBX.VIOC/
+        %td W32.Auto.a2b3c4d.MASH.SBX.VIOC
+        %td Synthetic Event Engine that convicts binaries based upon actions of an Indicator of Compromise in a Detonation environment.
+        %td
+          %span{class: 'nav-toolbar-icon icon-notes esc-tooltipped tooltipstered', title: 'This example may contain a partial hash of the SHA256 that matched.'}
+      %tr
+        %td
+          %span /^.*SBX.VIOC/
+        %td W32.a2b3c4d5f6-100.SBX.VIOC
+        %td Conviction from a Detonation Environment based binary, the number preceding “SBX” is the score of the binary when ran.
+        %td
+          %span{class: 'nav-toolbar-icon icon-notes esc-tooltipped tooltipstered', title: 'This example may contain a partial hash of the SHA256 that matched.'}
+      %tr
+        %td
+          %span /^.*VRT/
+        %td W32.BD0A0522.tht.VRT
+        %td Conviction of hash based on analysis engines written by the Talos Team.
+        %td
+          %span{class: 'nav-toolbar-icon icon-notes esc-tooltipped tooltipstered', title: 'This example may contain a partial hash of the SHA256 that matched.'}
+      %tr
+        %td
+          %span /^.Talos/
+        %td W32.a2b3c4d.tht.Talos
+        %td Conviction of hash based on analysis engines written by the Talos Team
+        %td
+          %span{class: 'nav-toolbar-icon icon-notes esc-tooltipped tooltipstered', title: 'This example may contain a partial hash of the SHA256 that matched.'}
+      %tr
+        %td
+          %span /^.RET/
+        %td W32.Downloader:Sisha.RET
+        %td Conviction of hash based on analysis engines written by the Research and Efficacy Team
+        %td
+          &nbsp;
+      %tr
+        %td
+          %span /^.*in01/
+        %td W32.Auto.a2b3c4.18157.in01
+        %td Conviction of a file that takes place directly upon import (without Detonation)
+        %td
+          %span{class: 'nav-toolbar-icon icon-notes esc-tooltipped tooltipstered', title: 'This example may contain a partial hash of the SHA256 that matched.'}
+      %tr
+        %td
+          %span /^.*in02/
+        %td W32.Auto.a2b3c4.18157.in02
+        %td Conviction of a file that takes place directly upon import (without Detonation)
+        %td
+          %span{class: 'nav-toolbar-icon icon-notes esc-tooltipped tooltipstered', title: 'This example may contain a partial hash of the SHA256 that matched.'}
+      %tr
+        %td
+          %span /^.*SBX.TG/
+        %td W32.a2b3c4d5e6f7-95.SBX.TG
+        %td Conviction from the ThreatGrid Detonation Environment. The number preceding the “SBX” is the score of the binary when ran.
+        %td
+          &nbsp;
+      %tr
+        %td
+          %span /^.*in03.Talos/
+        %td W32.Auto:a2b3c4.in03.Talos
+        %td Conviction of a file that was compared against itself to see if a disposition (malicious or clean) has changed in other engines in 24 hours.
+        %td
+          %span{class: 'nav-toolbar-icon icon-notes esc-tooltipped tooltipstered', title: 'This example may contain a partial hash of the SHA256 that matched.'}
+      %tr
+        %td
+          %span /^.*in04.Talos/
+        %td W32.Auto:1a2b3c4d.in04.Talos
+        %td Conviction of a file that was compared against itself to see if a disposition (malicious or clean) has changed in other engines in 7 days
+        %td
+          %span{class: 'nav-toolbar-icon icon-notes esc-tooltipped tooltipstered', title: 'This example may contain a partial hash of the SHA256 that matched.'}
+      %tr
+        %td
+          %span /^.*in05.Talos/
+        %td W32.Auto:1a2b3c4d.in05.Talos
+        %td Conviction of a file that is attached to a known Spam or Phishing Campaign. May not necessarily be malicious.
+        %td
+          %span{class: 'nav-toolbar-icon icon-notes esc-tooltipped tooltipstered', title: 'This example may contain a partial hash of the SHA256 that matched.'}
+      %tr
+        %td
+          %span /^.*in07.Talos/
+        %td Auto.a2b3c4d.211543.in07.Talos
+        %td Conviction of a file that takes place directly upon import (without Detonation)
+        %td
+          %span{class: 'nav-toolbar-icon icon-notes esc-tooltipped tooltipstered', title: 'This example may contain a partial hash of the SHA256 that matched.'}
+      %tr
+        %td
+          %span /^.*in10.tht.Talos/
+        %td Auto.1a2b3c4d.in10.tht.Talos
+        %td Conviction of a file that takes place directly upon file import into Talos's infrastructure.
+        %td
+          %span{class: 'nav-toolbar-icon icon-notes esc-tooltipped tooltipstered', title: 'This example may contain a partial hash of the SHA256 that matched.'}
+      %tr
+        %td
+          %span /W32.Auto..*.EncrOff.MRT.TALOS/
+        %td W32.Auto.a2b3c4d.EncrOff.MRT.TALOS
+        %td Encrypted office documents originating from SPAM
+        %td
+          %span{class: 'nav-toolbar-icon icon-notes esc-tooltipped tooltipstered', title: 'This example contains a partial hash of the SHA256 that matched. (For example a2b3c4d is the first 7 characters of the SHA)'}
+      %tr
+        %td
+          %span /PDF.*.Phishing.EE.e01.Talos/
+        %td PDF.a2b3c4d.Phishing.EE.e01.Talos
+        %td Malicious PDFs with malicious URLs originating from SPAM
+        %td
+          %span{class: 'nav-toolbar-icon icon-notes esc-tooltipped tooltipstered', title: 'This example contains a partial hash of the SHA256 that matched. (For example a2b3c4d is the first 7 characters of the SHA)'}
+      %tr
+        %td
+          %span /.*amphr.hunt.Talos/
+        %td Auto.a2b3c4d.amphr.hunt.Talos
+        %td Detection of a infected file based upon comparison with third party engines.
+        %td
+          %span{class: 'nav-toolbar-icon icon-notes esc-tooltipped tooltipstered', title: 'This example contains a partial hash of the SHA256 that matched. (For example a2b3c4d is the first 6 characters of the SHA)'}
+      %tr
+        %td
+          %span /^.*PTP.CAM/
+        %td W32.2B3A9A4200.PTP.CAM
+        %td Probabilistic Threatscore Propagation
+        %td
+          &nbsp;
+      %tr
+        %td
+          %span /^.*\.TC/
+        %td W32.Generic.Malware.FWdld.9CEF586D.TC
+        %td Tetra third party cloud engine, based on BitDefender
+        %td
+          &nbsp;
+      %tr
+        %td
+          %span Win32\..*\.EP\.RET
+        %td Win32.AABBCCDDEE.EP.RET
+        %td Probabilistic Threatscore Propagation
+        %td
+          &nbsp;
