@@ -3,10 +3,10 @@
 
 - content_for(:nav_banner) do
   .nav-tool-blocks.nav-page-button-wrapper.col-xs-3.col-sm-2.col-lg-2
-    %a#queue.nav-page-button{href: '/escalations/filerep/disputes', class: ("active" if current_page?('/escalations/filerep/disputes'))}
+    %a#queue.nav-page-button{href: '/escalations/file_rep/disputes', class: ("active" if current_page?('/escalations/file_rep/disputes'))}
       %span.nav-toolbar-icon-large.icon-queue
 
-    %a#research.nav-page-button{href: '/escalations/filerep/research', class: ("active" if current_page?('/escalations/filerep/research'))}
+    %a#research.nav-page-button{href: '/escalations/file_rep/research', class: ("active" if current_page?('/escalations/file_rep/research'))}
       %span.nav-toolbar-icon-large.icon-research
 
   .nav-tool-blocks.col-xs-1.col-sm-1.col-lg-1.dropdown
@@ -85,7 +85,7 @@
 
 
   .nav-tool-blocks.col-xs-4.col-sm-4.col-lg-5.search-wrapper
-    .input-group.search-group#web-rep-search
+    .input-group.search-group#file-rep-search
       = form_tag('/tickets', method: :get, onsubmit: 'call_contains_search(this);return false;') do
         = text_field_tag 'case[id]', "#{}", class: 'search-box', placeholder: 'Search by Substring'
 
