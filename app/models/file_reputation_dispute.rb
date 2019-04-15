@@ -9,6 +9,9 @@ class FileReputationDispute < ApplicationRecord
   STATUS_NEW                = 'NEW'
   STATUS_ASSIGNED           = 'ASSIGNED'
   STATUS_CLOSED             = 'CLOSED'
+  STATUS_REOPENED           = 'RE-OPENED'
+  STATUS_CUSTOMER_PENDING   = "CUSTOMER_PENDING"
+  STATUS_CUSTOMER_UPDATE    = "CUSTOMER_UPDATE"
 
   DISPOSITION_MALICIOUS     = 'MALICIOUS'
 
@@ -160,7 +163,7 @@ class FileReputationDispute < ApplicationRecord
         summary = "New File Reputation Reputation Dispute generated at #{DateTime.now.utc.strftime("%Y-%m-%d %H:%M")}"
 
         full_description = <<~HEREDOC
-          File Rep Sha: #{message_payload[:file_reputation][:sha256_checksum]}
+          File Rep Sha: #{message_payload[:sha256_hash]}
           
 
         HEREDOC
@@ -184,11 +187,27 @@ class FileReputationDispute < ApplicationRecord
 
         new_dispute.id = bug_proxy.id
         new_dispute.user_id = user.id
-        new_dispute.sha256_hash = message_payload[:file_reputation][:sha256_checksum]
+        new_dispute.sha256_hash = message_payload[:file_reputation][:sha256_hash]
         new_dispute.status = STATUS_NEW
         new_dispute.file_name = message_payload[:file_reputation][:file_rep_name]
         new_dispute.customer_id = customer.id
 
+        return_message = ""
+        return_success = false
+        if new_dispute.save
+          sender_params[:addressee_id] = file_rep.id
+          sender_params[:addressee_status] = file_rep.status
+          Bridge::GenericAck.new(sender_params, addressee: envelope_params[:sender]).post
+          #render plain: '"successfully created file rep"', status: :ok
+          return_message = "successfully created file rep"
+          return_success = true
+        else
+          error_messages = new_dispute.errors.full_messages.join('; ')
+          #render plain: "\"Error(s) creating file rep -- #{error_messages}\"", status: :internal_server_error
+          return_message = "Error(s) creating file rep -- #{error_messages}"
+        end
+
+        {:success => return_success, :return_message => return_message}
       end
     end
   end
