@@ -44,3 +44,18 @@ $ ->
     error: (response) ->
       std_api_error(response, "There was a problem retrieving the research data.", reload: false)
   )
+
+
+
+#  Call to reversing labs
+  std_msg_ajax(
+    method: 'GET'
+    url: "/escalations/api/v1/escalations/filerep/reversing_labs/"
+    data: {sha256_hash: sha256_hash}
+    success_reload: false
+    success: (response) ->
+      console.log response
+
+    error: (response) ->
+      std_api_error(response, "There was a problem retrieving the research data.", reload: false)
+  )
