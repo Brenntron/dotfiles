@@ -1,5 +1,13 @@
 class FileRepDatatable < AjaxDatatablesRails::ActiveRecord
 
+  def initialize(params, search_params, user:)
+    @user = user
+    @search_type = search_params['search_type']
+    @search_name = search_params['search_name']
+    @search_conditions = search_params['search_conditions']&.to_h
+    super(params, {})
+  end
+
   def view_columns
     @view_columns ||= {
       id:                 { data: :id, source: 'FileReputationDispute.id', cond: :like },
@@ -87,4 +95,11 @@ class FileRepDatatable < AjaxDatatablesRails::ActiveRecord
     FileReputationDispute.all
   end
 
+  def filter_records(records)
+    if @search_type
+      super.robust_search(@search_type, search_name: @search_name, params: @search_conditions, user: @user)
+    else
+      super
+    end
+  end
 end
