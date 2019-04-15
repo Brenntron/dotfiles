@@ -8,15 +8,15 @@
   .form-group
     %label.content-label-sm File Submission Type
     .row.file-rep-radio-wrapper
-      .col-xs-3.pad-horiz-small
+      .col-xs-3
         %input{type: 'radio', name: 'file-rep-type', id: 'file-rep-sha256', value: 'file-rep-sha256', checked: true}
         %label.radio-label{for: 'file-rep-sha256'} SHA256
-      .col-xs-4.pad-horiz-small
-        %input{type: 'radio', name: 'file-rep-type', id: 'file-rep-attachment', value: 'file-rep-attachment'}
-        %label.radio-label{for: 'file-rep-attachment'} Attachment
-        -# below is the icon for attaching a file, hidden by default, here for layout purposes
-        %span.file-rep-attachment{class: 'hidden'}
-          %button.attachment-button.attachment-label.new-attachment
+      -#below is the "attachment" radio button for this one, hidden for now
+      -#.col-xs-4
+      -#  %input{type: 'radio', name: 'file-rep-type', id: 'file-rep-attachment', value: 'file-rep-attachment'}
+      -#  %label.radio-label{for: 'file-rep-attachment'} Attachment
+      -#  %span.file-rep-attachment{class: 'hidden'}
+      -#    %button.attachment-button.attachment-label.new-attachment
 
   %hr.thin
 
@@ -30,7 +30,6 @@
       %option Option 2
       %option Option 3
       %option Option 4
-      %option Option 5
   .form-group
     %label.content-label-sm Assignee
     %input.form-control#file-rep-assignee{name: 'assignee', list: 'assignee-list', required: true, value: "#{current_user.cvs_username}"}
