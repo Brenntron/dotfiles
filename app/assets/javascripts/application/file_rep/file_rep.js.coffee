@@ -2,28 +2,26 @@ $ ->
 
   file_rep_url = $('#file-rep-datatable').data('source')
 
-
-#  search_condition =  get_search_condition()
-
-#  return data =
-#      search_type : search_type
-#      search_name: search_name
-
-#    search_condition: search_condition
-
   window.get_search_type = () ->
     if !localStorage.search_type
       localStorage.search_type = 'standard'
-    
     return localStorage.search_type
 
   window.get_search_name = () ->
+
     if localStorage.search_type = 'standard'
+
       current_url = window.location.href
       status_param_regex = /f=(.*)/
       current_name = status_param_regex.exec(current_url)
+
       if current_url.match('f=') && current_name
-        localStorage.search_name = current_name[1]
+       localStorage.search_name = current_name[1]
+      else
+        localStorage.search_name = 'all'
+
+    else if localStorage.search_type = 'named'
+      localStorage.search_name = $('#saved-search .saved-search').text()
 
     return localStorage.search_name
 
@@ -38,8 +36,8 @@ $ ->
     search_condition = window.get_search_condition()
 
     return data =
-            search_type : search_type
-            search_name : search_name
+            search_type : window.get_search_type()
+            search_name : window.get_search_name()
 
 
   $('#file-rep-datatable').dataTable
@@ -77,6 +75,8 @@ $ ->
         data: 'disposition'
         className: 'text-capitalize'
         render: (data) ->
+#          to lowercase this and all other comparison thangs
+
           if data == 'malicious'
             return '<span class="malicious">malicious</span>'
           else
@@ -193,4 +193,5 @@ $ ->
       selection.addRange(range);
       document.execCommand("Copy");
 
-
+    $(document).on 'click', '.saved-search', () ->
+      localStorage.search_type = 'named'
