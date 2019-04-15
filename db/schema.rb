@@ -10,7 +10,8 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 2019_04_15_151221) do
+
+ActiveRecord::Schema.define(version: 2019_04_11_153233) do
 
   create_table "alerts", options: "ENGINE=InnoDB DEFAULT CHARSET=utf8", force: :cascade do |t|
     t.datetime "created_at", null: false
@@ -201,6 +202,10 @@ ActiveRecord::Schema.define(version: 2019_04_15_151221) do
     t.integer "complaint_entry_id"
     t.string "comment"
     t.string "category_list"
+<<<<<<< HEAD
+=======
+    t.index ["user_id"], name: "index_complaint_marked_commits_on_user_id"
+>>>>>>> WEB-4255-file-reputation-console
   end
 
   create_table "complaint_tags", options: "ENGINE=InnoDB DEFAULT CHARSET=utf8", force: :cascade do |t|
@@ -513,6 +518,14 @@ ActiveRecord::Schema.define(version: 2019_04_15_151221) do
     t.string "source"
   end
 
+  create_table "file_rep_comments", options: "ENGINE=InnoDB DEFAULT CHARSET=utf8", force: :cascade do |t|
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.integer "file_reputation_dispute_id"
+    t.text "comment"
+    t.integer "user_id"
+  end
+
   create_table "file_reps", options: "ENGINE=InnoDB DEFAULT CHARSET=utf8", force: :cascade do |t|
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
@@ -541,7 +554,15 @@ ActiveRecord::Schema.define(version: 2019_04_15_151221) do
     t.string "threatgrid_signer"
     t.float "reversing_labs_score"
     t.string "reversing_labs_signer"
+    t.string "resolution"
+    t.string "detection_name"
+    t.datetime "detection_created_at"
+    t.boolean "in_zoo"
+    t.bigint "assigned_id"
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
     t.bigint "user_id"
+<<<<<<< HEAD
     t.string "resolution"
     t.string "detection_name"
     t.datetime "detection_created_at"
@@ -550,6 +571,10 @@ ActiveRecord::Schema.define(version: 2019_04_15_151221) do
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
     t.datetime "case_closed_at"
+=======
+    t.boolean "threatgrid_private"
+    t.boolean "has_sample"
+>>>>>>> WEB-4255-file-reputation-console
     t.index ["assigned_id"], name: "index_file_reputation_disputes_on_assigned_id"
     t.index ["created_at"], name: "index_file_reputation_disputes_on_created_at"
     t.index ["customer_id"], name: "index_file_reputation_disputes_on_customer_id"
@@ -690,6 +715,8 @@ ActiveRecord::Schema.define(version: 2019_04_15_151221) do
     t.datetime "updated_at"
     t.text "policies"
     t.boolean "is_community"
+    t.string "snort_doc_status", default: "NOTYET"
+    t.string "snort_on_off", default: "on"
     t.index ["rule_id"], name: "index_rule_docs_on_rule_id"
   end
 

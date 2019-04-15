@@ -17,6 +17,73 @@ class FileReputationDispute < ApplicationRecord
 
   validates :status, :file_name, :sha256_hash, :disposition_suggested, presence: true
 
+  def update_status(status)
+    self.update!(status: status)
+
+    envelope = {}
+
+    envelope[:addressee_id] = self.id
+    envelope[:addressee_status] = self.status
+
+    Bridge::FilerepUpdateStatusEvent.new(envelope).post
+  end
+  
+  def self.create_action(bugzilla_rest_session, sha256_hash, file_name, file_size, sample_type, disposition_suggested, source, platform, sha256_checksum)
+
+    file_rep = FileReputationDispute.new
+
+    threat_score = nil
+    threatgrid_private = nil
+    if sha256_checksum.present?
+      threatgrid_response = Threatgrid::Search.query(sha256_checksum)
+
+      threat_score = threatgrid_response['threat_score']
+      threatgrid_private = threatgrid_response['threatgrid_private']
+    end
+
+    summary = "New File Rep Dispute generated at #{DateTime.now.utc.strftime("%Y-%m-%d %H:%M")}"
+
+    full_description = %Q{
+          File name: #{file_name};
+          SHA256 hash: #{sha256_hash}
+    }
+
+    bug_attrs = {
+        'product' => 'Escalations Console',
+        'component' => 'FileRep',
+        'summary' => summary,
+        'version' => 'unspecified',
+        'description' => full_description,
+        'priority' => "P3",
+        'classification' => 'unclassified',
+    }
+
+    bug_proxy = bugzilla_rest_session.create_bug(bug_attrs)
+
+    customer = Customer.where(name: 'Dispute Analyst').first
+    attributes = {
+        id: bug_proxy.id,
+        sha256_hash: sha256_hash,
+        file_name: file_name,
+        file_size: file_size,
+        sample_type: sample_type,
+        disposition_suggested: disposition_suggested,
+        source: source,
+        platform: platform,
+        threatgrid_score: threat_score,
+        threatgrid_private: threatgrid_private,
+        customer: customer
+    }
+    file_rep.assign_attributes(attributes)
+
+    if file_rep.save
+      file_rep
+    else
+      error_messages = file_rep.errors.full_messages.join('; ')
+      render plain: "\"Error(s) creating file rep -- #{error_messages}\"", status: :internal_server_error
+    end
+  end
+
   def self.save_named_search(search_name, params, user:, project_type:)
     NamedSearchCriterion.where(named_search_id: NamedSearch.where(user_id: user.id, name: search_name).ids).delete_all
 
@@ -150,19 +217,31 @@ class FileReputationDispute < ApplicationRecord
   end
 
   #for support with incoming bridge messages from TI coming into messages_controller
-  def self.process_bridge_payload(message_paylod)
+  def self.process_bridge_payload(message_paylod, customer_payload)
     user = User.where(cvs_username:"vrtincom").first
     begin
       ActiveRecord::Base.transaction do
+
+        threat_score = nil
+        threatgrid_private = nil
+        if message_payload[:sha256_hash].present?
+          threatgrid_response = Threatgrid::Search.query(file_rep_params[:sha256_hash])
+
+          threat_score = threatgrid_response['threat_score']
+          threatgrid_private = threatgrid_response['threatgrid_private']
+        end
+
+
         guest = Company.where(:name => "Guest").first
         opened_at = Time.now
-        customer = Customer.process_and_get_customer(message_payload)
+        customer = Customer.process_and_get_customer(customer_payload)
 
         bugzilla_rest_session = message_payload[:bugzilla_rest_session]
 
         summary = "New File Reputation Reputation Dispute generated at #{DateTime.now.utc.strftime("%Y-%m-%d %H:%M")}"
 
         full_description = <<~HEREDOC
+          File name: #{file_rep_params[:file_name]}
           File Rep Sha: #{message_payload[:sha256_hash]}
           
 
@@ -174,7 +253,6 @@ class FileReputationDispute < ApplicationRecord
             'summary' => summary,
             'version' => 'unspecified', #self.version,
             'description' => full_description,
-            # 'opsys' => self.os,
             'priority' => 'Unspecified',
             'classification' => 'unclassified',
         }
@@ -187,10 +265,17 @@ class FileReputationDispute < ApplicationRecord
 
         new_dispute.id = bug_proxy.id
         new_dispute.user_id = user.id
-        new_dispute.sha256_hash = message_payload[:file_reputation][:sha256_hash]
+        new_dispute.sha256_hash = message_payload[:sha256_hash]
         new_dispute.status = STATUS_NEW
-        new_dispute.file_name = message_payload[:file_reputation][:file_rep_name]
+        new_dispute.file_name = message_payload[:file_name]
         new_dispute.customer_id = customer.id
+        new_dispute.file_size = message_payload[:file_size]
+        new_dispute.sample_type = message_payload[:sample_type]
+        new_dispute.disposition_suggested = message_payload[:disposition_suggested]
+        new_dispute.source = message_payload[:source]
+        new_dispute.platform = message_payload[:platform]
+        new_dispute.threatgrid_score: threat_score
+        new_dispute.threatgrid_priate: threatgrid_private
 
         return_message = ""
         return_success = false

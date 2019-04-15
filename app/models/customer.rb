@@ -47,12 +47,12 @@ class Customer < ApplicationRecord
 
   def self.process_and_get_customer(payload)
 
-    if payload[:file_rep].present? && payload[:file_rep][:customer].present?
-      if payload[:file_rep][:customer][:company_name] && payload[:file_rep][:customer][:name]
+    if payload[:customer].present?
+      if payload[:customer][:company_name] && payload[:customer][:name]
         customer_exists =
-            find_or_create_customer(customer_email: payload[:file_rep][:customer][:customer_email],
-                                    company_name: payload[:file_rep][:customer][:company_name],
-                                    name: payload[:file_rep][:customer][:name])
+            find_or_create_customer(customer_email: payload[:customer][:customer_email],
+                                    company_name: payload[:customer][:company_name],
+                                    name: payload[:customer][:name])
       else
         customer_exists = Customer.thread_safe_find_or_create_by(email: "guest@cisco.com", name: "Guest", company:Company.find_by_name("Guest"))
       end
