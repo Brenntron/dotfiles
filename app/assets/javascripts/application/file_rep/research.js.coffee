@@ -9,8 +9,12 @@ $ ->
     data: {sha256_hash: sha256_hash}
     success_reload: false
     success: (response) ->
-#      debugger
+      report_present = $('#threatgrid-data-wrapper').find('.tg-data-present')[0]
+      report_missing = $('#threatgrid-data-wrapper').find('.tg-data-missing')[0]
+
       if response.json.data.current_item_count > 0
+        $(report_present).show()
+        $(report_missing).hide()
         file_data = response.json.data.items[0].item
         console.log file_data
 
@@ -20,7 +24,6 @@ $ ->
         $('#tg-score').text(file_data.analysis.threat_score)
         $('#tg-tags').text(file_data.tags.join(', '))
 
-        console.log file_data.analysis.behaviors
         # Adding behaviors
         behaviors = ""
         $(file_data.analysis.behaviors).each ->
@@ -35,8 +38,9 @@ $ ->
 
 
       else
-#        Show the button to push to threatgrid
-        console.log 'we need to push to threatgrid'
+        $(report_present).hide()
+        $(report_missing).show()
+        console.log 'option to push to threatgrid'
 
     error: (response) ->
       std_api_error(response, "There was a problem retrieving the research data.", reload: false)

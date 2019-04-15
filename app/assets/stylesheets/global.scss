@@ -8711,3 +8711,11 @@ button.secondary.view-report-external-button {
   border-radius: 0;
   line-height: 1.25em;
 }
+
+.tg-data-present, .tg-data-missing {
+  display: none;
+}
+
+.tg-data-missing, .sandbox-data-missing, .rl-data-missing {
+  margin-top: 40px;
+}
