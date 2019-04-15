@@ -21,13 +21,13 @@
 
   .form-group
     %label.content-label-sm SHA256
-    %input.form-control#file-rep-sha256{required: true, type: 'text', name: 'template-name', maxlength: 100}
+    %textarea.form-control#file-rep-sha256{required: true, type: 'text', name: 'template-name', rows: '5'}
   .form-group
     %label.content-label-sm Suggested Disposition
-    %input.form-control#file-rep-suggested_disposition{required: true, type: 'text', name: 'template-name', maxlength: 100}
+    -#%input.form-control#file-rep-suggested_disposition{required: true, type: 'text', name: 'template-name', maxlength: 100}
   .form-group
     %label.content-label-sm Assignee
-    %input.form-control#file-rep-assignee{required: true, type: 'text', name: 'template-name', maxlength: 100}
+    -#%input.form-control#file-rep-assignee{required: true, type: 'text', name: 'template-name', maxlength: 100}
 
   %hr.thin
 
