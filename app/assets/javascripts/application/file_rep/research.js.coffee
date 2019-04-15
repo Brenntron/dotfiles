@@ -1,4 +1,5 @@
 $ ->
+#  Commenting the active tab out, I think we should identify this better
 #  if $('.active').attr('tab') == 'research'
 #  This should be wrapped in a window function and called on page load/page refresh, but it keeps breaking when I try to
 #window.threatgrid_data = () ->
@@ -16,7 +17,6 @@ $ ->
         $(report_present).show()
         $(report_missing).hide()
         file_data = response.json.data.items[0].item
-        console.log file_data
 
         # Load the top data
         $('#tg-submission-date').text(file_data.submitted_at)
@@ -36,7 +36,6 @@ $ ->
         full_report = JSON.stringify(response, null, '\t')
         $('#tg-full').text(full_report)
 
-
       else
         $(report_present).hide()
         $(report_missing).show()
@@ -45,6 +44,3 @@ $ ->
     error: (response) ->
       std_api_error(response, "There was a problem retrieving the research data.", reload: false)
   )
-
-
-
