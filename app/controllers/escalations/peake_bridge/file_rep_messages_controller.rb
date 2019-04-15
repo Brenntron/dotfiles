@@ -3,7 +3,7 @@ class Escalations::PeakeBridge::FileRepMessagesController < ApplicationControlle
 
   def create
 
-
+    file_rep_params[:bugzilla_rest_session] = bugzilla_rest_session
     response = FileReputationDispute.process_bridge_payload(file_rep_params, customer_params)
 
     if response[:success]
@@ -35,4 +35,7 @@ class Escalations::PeakeBridge::FileRepMessagesController < ApplicationControlle
     params.require(:message).require(:file_rep).fetch(:customer, {}).permit(:email, :name, :company_name)
   end
 
+  def bugzilla_rest_session
+    BugzillaRest::Session.default_session
+  end
 end

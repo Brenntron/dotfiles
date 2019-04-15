@@ -43,7 +43,7 @@ class DisputeEmail < ApplicationRecord
       ##########################################
 
       dispute = Dispute.where(:id => case_id).first
-      file_rep_dispute = Dispute.where(:id => case_id).first
+      file_rep_dispute = FileReputationDispute.where(:id => case_id).first
       if dispute.present?
 
         if dispute.status == Dispute::RESOLVED && dispute.case_resolved_at >= 2.weeks.ago
