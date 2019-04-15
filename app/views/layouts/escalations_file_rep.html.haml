@@ -9,7 +9,8 @@
     %a#research.nav-page-button{href: '/escalations/file_rep/research', class: ("active" if current_page?('/escalations/file_rep/research'))}
       %span.nav-toolbar-icon-large.icon-research
 
-  .nav-tool-blocks.col-xs-1.col-sm-1.col-lg-1.dropdown.nav-filter
+
+  .nav-tool-blocks.col-xs-1.col-sm-1.col-lg-1.dropdown
     %a{href: '#', class: 'dropdown-toggle', id: 'filter-cases', 'data-toggle': 'dropdown', 'aria-haspopup': 'true', 'aria-expanded': 'false'}
       %span{class: 'nav-toolbar-icon icon-filter-white'}
       Filter
@@ -70,9 +71,9 @@
       New Ticket
     .dropdown-menu.nav-tools-dropdown{'aria-labelledby': 'new-dispute'}
       %h3.nav-tool-dropdown-header.inverse
-        New Ticket
+        New File Reputation Ticket
       .nav-tool-content-wrapper#new-dispute-wrapper
-        = render 'escalations/webrep/disputes/new'
+        = render 'escalations/file_rep/disputes/new'
 
 
   -# naming guide dialog - nav button here

@@ -8307,6 +8307,104 @@ hr.thin.form-divider {
   background-color: $content-bg-color;
 }
 
+// dbinebri: the new ticket file rep container needs to be wide to handle huge sha256 strings
+.escalations--file_rep--disputes-controller .nav-tools-dropdown {
+  min-width: 540px;
+  margin-left: 35px;
+}
+
+// dbinebri: file reputation - new ticket specific styles inside the new ticket container
+.escalations--file_rep--disputes-controller .dropdown-menu #new-file-rep-form {
+
+  // radio specific styles
+  .file-rep-radio-wrapper {
+    input[type="radio"] {
+      border: none;
+      outline: none;
+      width: unset;
+    }
+
+    .radio-label {
+      font-size: 8pt;
+      padding-left: 8px;
+    }
+  }
+
+  // file rep new ticket text input styles
+  input {
+    margin-bottom: 8px;
+    background-color: transparent;
+    border: 1px solid darken($faint-neutral-color, 5%);
+    border-radius: 1px;
+    min-width: unset;
+    padding: 5px;
+
+    &:focus {
+      background-color: $faint-alt-highlight;
+      border: 3px solid $content-bg-color;
+      outline: 1px solid darken($faint-neutral-color, 5%);
+      padding: 3px;
+    }
+  }
+
+  // sha256 are long strings, using textarea to safely handle char length
+  textarea {
+    min-height: 50px;
+  }
+
+  // radio button padding tweaks
+  .pad-horiz-small {
+    padding-right: 2px;
+
+    &:last-of-type {
+      padding-left: 2px;
+    }
+  }
+
+  #file-rep-assignee {
+    padding-left: 10px;
+
+    &:focus {
+      padding-left: 8px;
+    }
+  }
+
+
+  // this attachment button/icon should be hidden on page load and
+  // displayed when radio button clicked, js/jquery handles this display logic
+  .file-rep-attachment button {
+    width: 18px;
+    height: 18px;
+    background-color: transparent;
+    border: none;
+  }
+
+  // minor positioning for the attachment icon
+  .attachment-label {
+    position: relative;
+    top: 3px;
+    left: 4px;
+  }
+
+  // tiny firefox fix
+  @-moz-document url-prefix() {
+    .attachment-label {
+      top: -3px;
+    }
+  }
+
+  hr.thin {
+    margin-top: 10px;
+    margin-bottom: 10px;
+
+    &:last-of-type {
+      margin-top: 30px;
+      margin-bottom: 20px;
+    }
+  }
+
+}
+
 .top-case-info h4 {
   text-transform: uppercase;
   font-weight: 700 !important;
@@ -8552,9 +8650,8 @@ button.secondary.view-report-external-button {
 }
 
 // dbinebri: updates below for file rep navbar layout new
-// wrapping all styles here in sass nesting for file rep specificity
 .escalations--file_rep--disputes-controller {
-  // search input group wrapper
+
   .nav-tool-blocks.search-wrapper {
     padding: 7px 7px 7px 40px;
     text-align: left;
@@ -8598,6 +8695,7 @@ button.secondary.view-report-external-button {
     float: right;
   }
 
+
   // for the nav button labels, this is where we ensure labels can break and wrap if squeezed tight enough
   #nav-banner .nav-tool-blocks.dropdown a, #nav-banner .nav-tool-blocks.dropdown a:hover {
     display: inline-block !important;
@@ -8620,10 +8718,7 @@ button.secondary.view-report-external-button {
   .tooltipster-sidetip {
     max-width: 410px !important;
   }
-
 }
-
-
 
  //dbinebri: file rep - naming guide dialog specific styles here
 .escalations--file_rep--disputes-controller .ui-dialog[aria-describedby=dialog-naming-guide] {
@@ -8632,6 +8727,7 @@ button.secondary.view-report-external-button {
   border-radius: 5px;
   border: 0;
   box-shadow: 0 5px 15px rgba(0, 0, 0, 0.2);
+
   .ui-dialog-titlebar {
     font-family: 'Open Sans', sans-serif;
     font-weight: 600;
@@ -8643,17 +8739,24 @@ button.secondary.view-report-external-button {
   }
 }
 
-
 #dialog-naming-guide {
   font-family: 'Open Sans', sans-serif;
   padding: 10px;
-
   table th {
     text-transform: uppercase;
     font-weight: bold;
     font-size: 13px;
     &:last-of-type {
       padding-right: 15px;
+      button.close {
+        background-image: url(image_path('icon_cancel_white.svg'));
+        background-position: center center;
+        top: 10px;
+        right: 10px;
+        color: #444;
+        font-weight: normal;
+        font-size: 19px;
+      }
     }
   }
   table td {
@@ -8670,13 +8773,30 @@ button.secondary.view-report-external-button {
         background: darken($content-bg-color, 5%);
         letter-spacing: 0.1px;
       }
+      table th {
+        text-transform: uppercase;
+        font-weight: bold;
+        font-size: 13px;
+      }
+      table td {
+        padding-top: 10px;
+        font-weight: normal;
+        font-size: 10px;
+        color: $type-lighter-color;
+
+        // pattern column below needs special formatting
+        &:first-of-type span {
+          font-weight: bold;
+          background: darken($content-bg-color, 5%);
+        }
+      }
     }
   }
 
 }
 
 
-// dbinebri: the tooltips for file rep get too wide, limit the max-width
+// dbinebri: the tooltips for modals on file rep get too wide, limit the max-width a little bit
 .tooltipster-sidetip .tooltipster-box {
   max-width: 410px !important;
 }
