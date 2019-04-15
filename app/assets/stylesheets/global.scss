@@ -8691,3 +8691,31 @@ button.secondary.view-report-external-button {
 .tooltipster-sidetip .tooltipster-box {
   max-width: 410px !important;
 }
+
+
+.data-report-wrapper hr.thin {
+  margin-top: 10px;
+}
+
+.data-report-table {
+  font-size: 8pt;
+}
+
+.data-report-table > tbody > tr > td, .data-report-table > thead > tr > th  {
+  padding: 4px 4px;
+}
+
+.data-report-code-content {
+  padding: 8px 6px;
+  font-family: "Fira Mono", monospace;
+  border-radius: 0;
+  line-height: 1.25em;
+}
+
+.tg-data-present, .tg-data-missing {
+  display: none;
+}
+
+.tg-data-missing, .sandbox-data-missing, .rl-data-missing {
+  margin-top: 40px;
+}
