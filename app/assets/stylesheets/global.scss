@@ -8836,6 +8836,11 @@ button.secondary.view-report-external-button {
     }
   }
 
+  textarea#file-rep-sha256 {
+    min-width: 500px;
+    min-height: 220px;
+  }
+
   // this attachment button/icon should be hidden on page load and
   // displayed when radio button clicked, js/jquery handles this display logic
   .file-rep-attachment button {
