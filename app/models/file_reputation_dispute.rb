@@ -14,6 +14,17 @@ class FileReputationDispute < ApplicationRecord
 
   validates :status, :file_name, :sha256_hash, :disposition_suggested, presence: true
 
+  def update_status(status)
+    self.update!(status: status)
+
+    envelope = {}
+
+    envelope[:addressee_id] = self.id
+    envelope[:addressee_status] = self.status
+
+    Bridge::FilerepUpdateStatusEvent.new(envelope).post
+  end
+  
   def self.create_action(bugzilla_rest_session, sha256_hash, file_name, file_size, sample_type, disposition_suggested, source, platform, sha256_checksum)
 
     file_rep = FileReputationDispute.new
