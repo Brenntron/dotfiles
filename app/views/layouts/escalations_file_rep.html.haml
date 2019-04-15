@@ -75,11 +75,15 @@
       .nav-tool-content-wrapper#new-dispute-wrapper
         = render 'escalations/file_rep/disputes/new'
 
-  -#  file rep: new naming guide modal here
+
+  -# naming guide dialog - nav button here
   .nav-tool-blocks.col-xs-2.col-sm-2.col-md-2.col-lg-1.dropdown.nav-naming-guide
-    %a{href: '#', class: 'modal-toggle', id: 'naming-guide', 'data-toggle': 'modal', 'data-target': '#modal-naming-guide', 'data-backdrop': 'true', 'aria-haspopup': 'true', 'aria-expanded': 'false'}
+    %a{href: '#', id: 'naming-guide', 'aria-haspopup': 'true', 'aria-expanded': 'false'}
       %span{class: 'nav-toolbar-icon icon-naming-white'}
       Naming Guide
+
+      = render 'escalations/file_rep/disputes/naming_guide_dialog'
+
 
 
   .nav-tool-blocks.col-xs-3.col-sm-3.col-md-3.col-lg-5.search-wrapper
@@ -130,9 +134,6 @@
 
     -##username= current_user.cvs_username
 
-
-  -# dbinebri: below is the File Rep: Naming Guide modal, placed with the other modals
-  = render 'shared/naming_guide_modal'
 
 
 

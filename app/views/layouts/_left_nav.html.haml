@@ -26,7 +26,7 @@
           - if can?(:read, Admin)
             %li{class: 'cat-link'}
               %a.disabled-link= inline_svg 'icon_cat.svg'
-    - if can?(:read, Admin) || can?(:index, EscalationBug) || can?(:index, Dispute) || can?(:index, Complaint)
+    - if can?(:read, Admin) || can?(:index, any: [EscalationBug, FileReputationDispute, Dispute, Complaint])
       %li{class: 'nav-escalations'}
         %a{class: 'static-nav-item', 'data-toggle': 'collapse', href:'.esc-subnav', role:'button', 'aria-expanded':'false', 'aria-controls':'esc-subnav esc-subnav-icons'}
           = image_tag('layout/icon_escalations.svg', class: 'sidenav-icon', alt: 'Escalations')
@@ -38,7 +38,7 @@
           - if can?(:read, Admin)
             %li{class: 'clam-link'}
               %a.disabled-link= inline_svg 'icon_clam.svg'
-          - if can?(:read, Admin)
+          - if can?(:index, FileReputationDispute)
             %li{class: 'amp-link'}
               %a{href: escalations_file_rep_disputes_path}
                 = inline_svg 'icon_amp.svg'
@@ -107,7 +107,7 @@
               %li{class: 'cat-link'}
                 %a.disabled-link Categorization
 
-      - if can?(:read, Admin) || can?(:index, EscalationBug) || can?(:index, Dispute) || can?(:index, Complaint)
+      - if can?(:read, Admin) || can?(:index, any: [EscalationBug, FileReputationDispute, Dispute, Complaint])
         %li{class: 'nav-escalations'}
           %a{class: 'static-nav-item', 'data-toggle': 'collapse', href:'.esc-subnav', role:'button', 'aria-expanded':'false', 'aria-controls':'esc-subnav esc-subnav-icons'}
             Escalations
@@ -118,7 +118,7 @@
             - if can?(:read, Admin)
               %li{class: 'clam-link'}
                 %a.disabled-link Clam
-            - if can?(:read, Admin)
+            - if can?(:index, FileReputationDispute)
               %li{class: 'amp-link'}
                 %a{href: escalations_file_rep_disputes_path} File Reputation
             - if can?(:index, Dispute)

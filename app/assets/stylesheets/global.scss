@@ -8645,9 +8645,8 @@ button.secondary.view-report-external-button {
 }
 
 // dbinebri: updates below for file rep navbar layout new
-// wrapping all file rep nav styles here in sass nesting for specificity
+// wrapping all styles here in sass nesting for file rep specificity
 .escalations--file_rep--disputes-controller {
-
   // search input group wrapper
   .nav-tool-blocks.search-wrapper {
     padding: 7px 7px 7px 40px;
@@ -8715,11 +8714,9 @@ button.secondary.view-report-external-button {
     }
   }
 
-  // large size fix for this
-  @media screen and (min-width: 1600px) {
-    .nav-tool-blocks.nav-page-button-wrapper {
-      min-width: 120px;
-    }
+  // dbinebri: the tooltips for file rep get too wide, limit the max-width
+  .tooltipster-sidetip {
+    max-width: 410px !important;
   }
 
 
@@ -8734,12 +8731,32 @@ button.secondary.view-report-external-button {
       margin-right: 30px;
       min-width: 800px;
     }
+ //dbinebri: file rep - naming guide dialog specific styles here
+.escalations--file_rep--disputes-controller .ui-dialog[aria-describedby=dialog-naming-guide] {
+  margin-top: 60px;
+  margin-right: 20px;
+  border-radius: 5px;
+  border: 0;
+  box-shadow: 0 5px 15px rgba(0, 0, 0, 0.2);
+  .ui-dialog-titlebar {
+    font-family: 'Open Sans', sans-serif;
+    font-weight: 600;
+    padding-left: 40px;
+    background-image: url(image_path('icon_naming_list_white2.svg'));
+    background-size: 20px 20px;
+    background-repeat: no-repeat;
+    background-position: 10px center;
+  }
+}
 
     .modal-content {
       border: 0;
       box-shadow: 0 5px 15px rgba(0, 0, 0, 0.2);
     }
 
+#dialog-naming-guide {
+  font-family: 'Open Sans', sans-serif;
+  padding: 10px;
     .modal-header {
       background: $table-dark-body;
       color: $content-bg-color;
@@ -8747,6 +8764,12 @@ button.secondary.view-report-external-button {
       border: none;
       padding: 10px;
 
+  table th {
+    text-transform: uppercase;
+    font-weight: bold;
+    font-size: 13px;
+    &:last-of-type {
+      padding-right: 15px;
       button.close {
         background-image: url(image_path('icon_cancel_white.svg'));
         background-position: center center;
@@ -8757,7 +8780,21 @@ button.secondary.view-report-external-button {
         font-size: 19px;
       }
     }
+  }
+  table td {
+    padding-top: 10px;
+    font-weight: 500;
+    font-size: 10px;
+    color: darken($type-lighter-color, 5%);
 
+    // "pattern" column below needs special code formatting
+    &:first-of-type {
+      span {
+        font-family: 'Fira Mono', monospace;
+        font-weight: 500;
+        background: darken($content-bg-color, 5%);
+        letter-spacing: 0.1px;
+      }
     .modal-body {
       padding: 25px 15px;
 
@@ -8797,80 +8834,29 @@ button.secondary.view-report-external-button {
 }
 
 
-// dbinebri: the new ticket file rep container needs to be wide to handle huge sha256 strings
-.escalations--file_rep--disputes-controller .nav-tools-dropdown {
-  min-width: 540px;
-  margin-left: 35px;
+.data-report-wrapper hr.thin {
+  margin-top: 10px;
 }
 
-// dbinebri: file reputation - new ticket specific styles inside the new ticket container
-.escalations--file_rep--disputes-controller .dropdown-menu #new-file-rep-form {
+.data-report-table {
+  font-size: 8pt;
+}
 
-  // radio specific styles
-  .file-rep-radio-wrapper {
-    input[type="radio"] {
-      border: none;
-      outline: none;
-      width: unset;
-    }
-    .radio-label {
-      font-size: 8pt;
-      padding-left: 8px;
-    }
-  }
+.data-report-table > tbody > tr > td, .data-report-table > thead > tr > th  {
+  padding: 4px 4px;
+}
 
-  // file rep new ticket text input styles
-  input {
-    margin-bottom: 8px;
-    background-color: transparent;
-    border: 1px solid darken($faint-neutral-color, 5%);
-    border-radius: 1px;
-    min-width: unset;
-    padding: 5px;
+.data-report-code-content {
+  padding: 8px 6px;
+  font-family: "Fira Mono", monospace;
+  border-radius: 0;
+  line-height: 1.25em;
+}
 
-    &:focus {
-      background-color: $faint-alt-highlight;
-      border: 3px solid $content-bg-color;
-      outline: 1px solid darken($faint-neutral-color, 5%);
-      padding: 3px;
-    }
-  }
+.tg-data-present, .tg-data-missing {
+  display: none;
+}
 
-  textarea#file-rep-sha256 {
-    min-width: 500px;
-    min-height: 220px;
-  }
-
-  // this attachment button/icon should be hidden on page load and
-  // displayed when radio button clicked, js/jquery handles this display logic
-  .file-rep-attachment button {
-    width: 18px;
-    height: 18px;
-    background-color: transparent;
-    border: none;
-  }
-
-  // minor positioning for the attachment icon
-  .attachment-label {
-    position: relative;
-    top: 3px;
-    left: 4px;
-  }
-  // tiny firefox fix
-  @-moz-document url-prefix() {
-    .attachment-label {
-      top: -3px;
-    }
-  }
-
-  hr.thin {
-    margin-top: 10px;
-    margin-bottom: 10px;
-
-    &:last-of-type {
-      margin-top: 30px;
-      margin-bottom: 20px;
-    }
-  }
-
+.tg-data-missing, .sandbox-data-missing, .rl-data-missing {
+  margin-top: 40px;
 }
