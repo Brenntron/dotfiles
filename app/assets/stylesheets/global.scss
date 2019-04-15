@@ -8699,6 +8699,7 @@ button.secondary.view-report-external-button {
 
 .data-report-table {
   font-size: 8pt;
+  margin-top: 5px;
 }
 
 .data-report-table > tbody > tr > td, .data-report-table > thead > tr > th  {
@@ -8712,7 +8713,7 @@ button.secondary.view-report-external-button {
   line-height: 1.25em;
 }
 
-.tg-data-present, .tg-data-missing {
+.tg-data-present, .tg-data-missing, .rl-data-present, .rl-data-missing {
   display: none;
 }
 

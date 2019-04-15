@@ -10,8 +10,8 @@ $ ->
     data: {sha256_hash: sha256_hash}
     success_reload: false
     success: (response) ->
-      report_present = $('#threatgrid-data-wrapper').find('.tg-data-present')[0]
-      report_missing = $('#threatgrid-data-wrapper').find('.tg-data-missing')[0]
+      report_present = $('#threatgrid-report-wrapper').find('.tg-data-present')[0]
+      report_missing = $('#threatgrid-report-wrapper').find('.tg-data-missing')[0]
 
       if response.json.data.current_item_count > 0
         $(report_present).show()
@@ -42,7 +42,7 @@ $ ->
         console.log 'option to push to threatgrid'
 
     error: (response) ->
-      std_api_error(response, "There was a problem retrieving the research data.", reload: false)
+      std_api_error(response, "There was a problem retrieving data from ThreatGrid.", reload: false)
   )
 
 
@@ -53,8 +53,13 @@ $ ->
     url: "/escalations/api/v1/escalations/filerep/reversing_labs/" + sha256_hash
     success_reload: false
     success: (response) ->
-      console.log response
+      report_present = $('#threatgrid-report-wrapper').find('.rl-data-present')[0]
+      report_missing = $('#threatgrid-report-wrapper').find('.rl-data-missing')[0]
 
-    error: (response) ->
-      std_api_error(response, "There was a problem retrieving the research data.", reload: false)
+      console.log response
+#      If response has data, show report and structure data
+#      else, show missing data message
+
+       error: (response) ->
+      std_api_error(response, "There was a problem retrieving data from Reversing Labs.", reload: false)
   )
