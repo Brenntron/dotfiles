@@ -151,32 +151,3 @@ $ ->
       selection.addRange(range);
       document.execCommand("Copy");
 
-
-
-
-
-
-window.refresh_visible_research_tab = ()->
-#  window.sandbox_data()
-  window.threatgrid_data()
-#  window.reversing_labs_data()
-
-
-window.threatgrid_data = (sha256) ->
-  debugger
-  data = sha256
-
-  $.ajax(
-    url: "/escalations/api/v1/escalations/file_rep/disputes/threatgrid_data"
-    method: 'GET'
-    headers: headers
-    data: data
-    dataType: 'json'
-    success: (response) ->
-      response = JSON.parse(response)
-      #      status = response.status
-      #      comment = response.comment
-      console.log response
-    error: (response) ->
-      console.log response
-  )
