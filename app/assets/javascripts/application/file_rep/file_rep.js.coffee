@@ -58,7 +58,6 @@ $ ->
         className: "alt-col in_zoo"
         render: (data) ->
 #          in_zoo is a boolean but something in the render function parses this to a string.
-          $('td.in_zoo').addClass('text-center')
           if data == "true"
             data = '<span class="glyphicon glyphicon-ok"></span>'
           else
