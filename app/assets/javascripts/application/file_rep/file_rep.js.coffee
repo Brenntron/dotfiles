@@ -152,3 +152,30 @@ $ ->
       document.execCommand("Copy");
 
 
+
+
+
+
+window.refresh_visible_research_tab = ()->
+#  window.sandbox_data()
+  window.threatgrid_data()
+#  window.reversing_labs_data()
+
+
+window.threatgrid_data = (sha) ->
+  headers = {'Token': $('input[name="token"]').val(), 'Xmlrpc-Token': $('input[name="xml_token"]').val()}
+
+  $.ajax(
+    url: "/escalations/api/v1/escalations/file_rep/disputes/threatgrid_data"
+    method: 'GET'
+    headers: headers
+    data: {sha}
+    dataType: 'json'
+    success: (response) ->
+      response = JSON.parse(response)
+      #      status = response.status
+      #      comment = response.comment
+      console.log response
+    error: (response) ->
+      console.log response
+  )
