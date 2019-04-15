@@ -75,10 +75,14 @@
         = render 'escalations/webrep/disputes/new'
 
 
+  -# naming guide dialog - nav button here
   .nav-tool-blocks.col-xs-2.col-sm-2.col-md-2.col-lg-1.dropdown.nav-naming-guide
-    %a{href: '#', class: 'dropdown-toggle', id: 'naming-guide', 'data-toggle': 'dropdown', 'aria-haspopup': 'true', 'aria-expanded': 'false'}
+    %a{href: '#', id: 'naming-guide', 'aria-haspopup': 'true', 'aria-expanded': 'false'}
       %span{class: 'nav-toolbar-icon icon-naming-white'}
       Naming Guide
+
+      = render 'escalations/file_rep/disputes/naming_guide_dialog'
+
 
 
   .nav-tool-blocks.col-xs-3.col-sm-3.col-md-3.col-lg-5.search-wrapper
@@ -129,9 +133,6 @@
 
     -##username= current_user.cvs_username
 
-
-  -# dbinebri: below is the naming guide modal, placed with the other modals
-  = render 'shared/naming_guide_modal'
 
 
 

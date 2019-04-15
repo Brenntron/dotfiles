@@ -8552,9 +8552,8 @@ button.secondary.view-report-external-button {
 }
 
 // dbinebri: updates below for file rep navbar layout new
-// wrapping all file rep nav styles here in sass nesting for specificity
+// wrapping all styles here in sass nesting for file rep specificity
 .escalations--file_rep--disputes-controller {
-
   // search input group wrapper
   .nav-tool-blocks.search-wrapper {
     padding: 7px 7px 7px 40px;
@@ -8617,69 +8616,59 @@ button.secondary.view-report-external-button {
     }
   }
 
-  // large size fix for this
-  @media screen and (min-width: 1600px) {
-    .nav-tool-blocks.nav-page-button-wrapper {
-      min-width: 120px;
-    }
+  // dbinebri: the tooltips for file rep get too wide, limit the max-width
+  .tooltipster-sidetip {
+    max-width: 410px !important;
   }
 
 }
 
 
-// dbinebri: file rep - naming guide modal specific styles here
-// bootstrap 3 modals have many necessary internal divs
-#modal-naming-guide {
-  position: fixed;
 
-  .modal-dialog {
-    margin-top: 60px;
-    margin-right: 30px;
-    min-width: 800px;
+ //dbinebri: file rep - naming guide dialog specific styles here
+.escalations--file_rep--disputes-controller .ui-dialog[aria-describedby=dialog-naming-guide] {
+  margin-top: 60px;
+  margin-right: 20px;
+  border-radius: 5px;
+  border: 0;
+  box-shadow: 0 5px 15px rgba(0, 0, 0, 0.2);
+  .ui-dialog-titlebar {
+    font-family: 'Open Sans', sans-serif;
+    font-weight: 600;
+    padding-left: 40px;
+    background-image: url(image_path('icon_naming_list_white2.svg'));
+    background-size: 20px 20px;
+    background-repeat: no-repeat;
+    background-position: 10px center;
   }
+}
 
-  .modal-content {
-    border: 0;
-    box-shadow: 0 5px 15px rgba(0, 0, 0, 0.2);
-  }
 
-  .modal-header {
-    background: darken($table-dark-body, 5%);
-    color: $content-bg-color;
-    border-radius: 5px 5px 0 0;
-    border: none;
+#dialog-naming-guide {
+  font-family: 'Open Sans', sans-serif;
+  padding: 10px;
 
-    button.close {
-      background-image: url(image_path('icon_cancel_white.svg'));
-      top: 15px;
-      right: 10px;
+  table th {
+    text-transform: uppercase;
+    font-weight: bold;
+    font-size: 13px;
+    &:last-of-type {
+      padding-right: 15px;
     }
   }
+  table td {
+    padding-top: 10px;
+    font-weight: 500;
+    font-size: 10px;
+    color: darken($type-lighter-color, 5%);
 
-  .modal-body {
-    padding: 25px 15px;
-
-    .modal-table {
-      height: 400px;
-      color: $table-dark-body;
-      overflow-y: scroll;
-
-      table th {
-        text-transform: uppercase;
-        font-weight: bold;
-        font-size: 13px;
-      }
-      table td {
-        padding-top: 10px;
-        font-weight: normal;
-        font-size: 10px;
-        color: $type-lighter-color;
-
-        // pattern column below needs special formatting
-        &:first-of-type span {
-          font-weight: bold;
-          background: darken($content-bg-color, 5%);
-        }
+    // "pattern" column below needs special code formatting
+    &:first-of-type {
+      span {
+        font-family: 'Fira Mono', monospace;
+        font-weight: 500;
+        background: darken($content-bg-color, 5%);
+        letter-spacing: 0.1px;
       }
     }
   }
