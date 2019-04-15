@@ -1,6 +1,7 @@
 %input{type:'hidden', name: 'token', value: "#{current_user.authentication_token}"}
 %input{type:'hidden', name: 'xml_token', value: "#{xml_token}"}
 %input{type:'hidden', name: 'current_user', value: "#{current_user.authentication_token}"}
+%input{type:'hidden', name: 'sha256', value: "#{@file_rep_dispute.sha256_hash}"}
 
 
 %h1 Research Data

@@ -162,14 +162,15 @@ window.refresh_visible_research_tab = ()->
 #  window.reversing_labs_data()
 
 
-window.threatgrid_data = (sha) ->
-  headers = {'Token': $('input[name="token"]').val(), 'Xmlrpc-Token': $('input[name="xml_token"]').val()}
+window.threatgrid_data = (sha256) ->
+  debugger
+  data = sha256
 
   $.ajax(
     url: "/escalations/api/v1/escalations/file_rep/disputes/threatgrid_data"
     method: 'GET'
     headers: headers
-    data: {sha}
+    data: data
     dataType: 'json'
     success: (response) ->
       response = JSON.parse(response)
