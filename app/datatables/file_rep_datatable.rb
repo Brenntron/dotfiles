@@ -96,6 +96,7 @@ class FileRepDatatable < AjaxDatatablesRails::ActiveRecord
   end
 
   def filter_records(records)
+
     if @search_type
       super.robust_search(@search_type, search_name: @search_name, params: @search_conditions, user: @user)
     else

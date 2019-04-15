@@ -2,10 +2,52 @@ $ ->
 
   file_rep_url = $('#file-rep-datatable').data('source')
 
+
+#  search_condition =  get_search_condition()
+
+#  return data =
+#      search_type : search_type
+#      search_name: search_name
+
+#    search_condition: search_condition
+
+  window.get_search_type = () ->
+    if !localStorage.search_type
+      localStorage.search_type = 'standard'
+    
+    return localStorage.search_type
+
+  window.get_search_name = () ->
+    if localStorage.search_type = 'standard'
+      current_url = window.location.href
+      status_param_regex = /f=(.*)/
+      current_name = status_param_regex.exec(current_url)
+      if current_url.match('f=') && current_name
+        localStorage.search_name = current_name[1]
+
+    return localStorage.search_name
+
+  window.get_search_condition = () ->
+      if localStorage.search_type = 'standard'
+        return ''
+
+  window.build_data = () ->
+
+    search_type = window.get_search_type()
+    search_name = window.get_search_name()
+    search_condition = window.get_search_condition()
+
+    return data =
+            search_type : search_type
+            search_name : search_name
+
+
   $('#file-rep-datatable').dataTable
     processing: true
     serverSide: true
-    ajax: file_rep_url
+    ajax:
+      url: file_rep_url
+      data: window.build_data()
     pagingType: 'full_numbers'
     columns: [
       {
@@ -23,7 +65,7 @@ $ ->
       {
         data: 'sha256_hash'
         render: (data) ->
-          return '<code id="' + data + '_sha" title="' + data + '" class="esc-tooltipped tooltipstered file_rep_sha">' + data + '</code>'
+          return '<code id="' + data + '_sha" title="' + data + '" class="esc-tooltipped file_rep_sha">' + data + '</code>'
       }
       {
         data: 'file_size'
