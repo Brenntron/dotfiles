@@ -2,7 +2,6 @@
 %input{type:'hidden', name: 'xml_token', value: "#{xml_token}"}
 %input{type:'hidden', name: 'current_user', value: "#{current_user.authentication_token}"}
 
-
 %h1 Research Data
 .row
   .col-xs-12
@@ -74,24 +73,45 @@
     %span.sample-present-true
     -#  else display this
     -# %span.sample-present-false
-    %div.data-report-wrapper
-      -# The below is placeholder for visual data that will be formatted from the returned api call to threatgrid
-      .row
-        .col-xs-4
-          %label.data-report-label
-            Submitted to TG
-          %span.data-report-content
-            2012-12-12T12:12:12Z
-        .col-xs-4
-          %label.data-report-label
-            Run Status
-          %span.data-report-content
-            Completed
-        .col-xs-4.text-right
-          .data-report-score
-            24
-          %label.content-label-sm
-            TG Score
+    %div.data-report-wrapper#threatgrid-data-wrapper
+      .tg-data-present
+        .row
+          .col-xs-4
+            %label.data-report-label Submitted to TG
+            %span.data-report-content#tg-submission-date
+          .col-xs-4
+            %label.data-report-label Run Status
+            %span.data-report-content#tg-run-status
+          .col-xs-4.text-right
+            .data-report-score#tg-score
+            %label.content-label-sm TG Score
+
+        %hr.thin
+        .row
+          .col-xs-12
+            %label.data-report-label Tags
+            %span.data-report-content#tg-tags
+        %hr.thin
+        .row
+          .col-xs-12
+            %label.data-report-label Behaviors
+            %table.data-report-table#tg-behaviors
+              %thead
+                %tr
+                  %th Name
+                  %th Threat
+                  %th Title
+        %hr.thin
+        .row
+          .col-xs-12
+            %label.data-report-label Full Json
+            %pre.data-report-code-content#tg-full
+      .tg-data-missing.text-center
+        %span.missing-data Not in ThreatGrid
+        %br
+        %button.primary
+          Push Sample to ThreatGrid
+
 
   .col-xs-12.col-sm-4
     %h2.research-data-header.reversing-labs-header Reversing Labs

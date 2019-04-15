@@ -151,4 +151,3 @@ $ ->
       selection.addRange(range);
       document.execCommand("Copy");
 
-
