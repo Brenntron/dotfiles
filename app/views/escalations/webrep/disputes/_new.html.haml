@@ -1,4 +1,4 @@
-%form#new-file-rep-form{method: 'get', 'accept-charset': 'UTF-8'}
+%form#new-dispute-form{method: 'get', 'accept-charset': 'UTF-8'}
 
   .form-group
     %input{type:'hidden', name: 'token', value: "#{current_user.authentication_token}"}
@@ -6,29 +6,30 @@
     %input{type:'hidden', name: 'current_user', value: "#{current_user.authentication_token}"}
 
   .form-group
-    %label.content-label-sm File Submission Type
-    .row.file-rep-radio-wrapper
-      .col-xs-4
-        %input{type: 'radio', name: 'file-rep-type', id: 'file-rep-sha256', value: 'file-rep-sha256', checked: true}
-        %label.radio-label{for: 'file-rep-sha256'} SHA256
-      .col-xs-4
-        %input{type: 'radio', name: 'file-rep-type', id: 'file-rep-attachment', value: 'file-rep-attachment'}
-        %label.radio-label{for: 'file-rep-attachment'} Attachment
-
-  %hr.thin
-
-  .form-group
-    %label.content-label-sm SHA256
-    %input.form-control#file-rep-sha256{required: true, type: 'text', name: 'template-name', maxlength: 100}
-  .form-group
-    %label.content-label-sm Suggested Disposition
-    %input.form-control#file-rep-suggested_disposition{required: true, type: 'text', name: 'template-name', maxlength: 100}
+    %label.content-label-sm URLs/IP Addresses
+    %textarea#ips_urls{required: true}
   .form-group
     %label.content-label-sm Assignee
-    %input.form-control#file-rep-assignee{required: true, type: 'text', name: 'template-name', maxlength: 100}
+    %input.form-control#assignee{name: 'assignee', list: 'assignee-list', required: true, value: "#{current_user.cvs_username}"}
+    %datalist#assignee-list
+  .form-group
+    %label.content-label-sm Priority
+    %select.form-control#priority
+      %option P1
+      %option P2
+      %option{:selected => 'selected'} P3
+      %option P4
+      %option P5
+  .form-group
+    %label.content-label-sm Ticket Type
+    %select.form-control#ticket-type-dropdown
+      %option{:selected => 'selected'} Web
+      %option Email
+      %option Email & Web
 
   %hr.thin
-
   .form-group.text-center
     %button.primary{value: 'submit', type: 'submit'}
-      Create Ticket
+      Create
+    %button.secondary#cancel_dispute{type: 'button'}
+      Cancel
