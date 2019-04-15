@@ -75,8 +75,7 @@ $ ->
         data: 'disposition'
         className: 'text-capitalize'
         render: (data) ->
-#          to lowercase this and all other comparison thangs
-
+          data = data.toLowerCase()
           if data == 'malicious'
             return '<span class="malicious">malicious</span>'
           else
@@ -101,38 +100,39 @@ $ ->
         render: (data) ->
 #          in_zoo is a boolean but something in the render function parses this to a string.
           if data == "true"
-            data = '<span class="glyphicon glyphicon-ok"></span>'
+            return '<span class="glyphicon glyphicon-ok"></span>'
           else
-            data = ''
-          return data
+            return ''
+
       }
       {
         data: 'sandbox_score'
         render: (data, type, full, meta) ->
-          if full['sandbox_under'] == "true"
-            data = '<span>' + data + '</span>'
+
+          if full['sandbox_under'] == "false"
+            return '<span class="overdue">' + data + '</span>'
           else
-            data = '<span class="overdue">' + data + '</span>'
-          return data
+            return data
       }
       {
         data: 'threatgrid_score'
         render: (data, type, full, meta) ->
-          if full['threatgrid_under'] == "true"
-            data = '<span>' + data + '</span>'
+          if full['threatgrid_under'] == "false"
+            return '<span class="overdue">' + data + '</span>'
           else
-            data = '<span class="overdue">' + data + '</span>'
-          return data
+            return data
       }
       { data: 'reversing_labs_score'}
       {
         data: 'disposition_suggested'
         className: 'text-capitalize'
         render: (data) ->
+          data = data.toLowerCase()
           if data == 'malicious'
             return '<span class="malicious">malicious</span>'
           else
-            return '<span>clean</span>'
+            return data
+
       }
       { data: 'created_at'}
       {
@@ -155,10 +155,9 @@ $ ->
         className: "alt-col"
         render: (data) ->
           if data == undefined
-            data = '<span class="missing-data">Unassigned</span> <span title="Assign to me" class="esc-tooltipped tooltipstered"><button id="index_ticket_assign" class="take-ticket-button" onClick="take_disputes()"/></span>'
+            return '<span class="missing-data">Unassigned</span> <span title="Assign to me" class="esc-tooltipped tooltipstered"><button id="index_ticket_assign" class="take-ticket-button" onClick="take_disputes()"/></span>'
           else
-            data = data + '<span title="Assign to me" class="esc-tooltipped tooltipstered"><button id="index_ticket_assign" class="take-ticket-button" onClick="take_disputes()"/></span>'
-          return data
+            return data + '<span title="Assign to me" class="esc-tooltipped tooltipstered"><button id="index_ticket_assign" class="take-ticket-button" onClick="take_disputes()"/></span>'
       }
     ]
 
