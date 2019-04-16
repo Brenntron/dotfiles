@@ -59,13 +59,13 @@ module API
               optional :cc, type: String, desc: "string of emails for CC"
             end
 
-            post "", root: "dispute_email" do
+            post "", root: "dispute_emails" do
               std_api_v2 do
                 authorize!(:create, DisputeEmail)
                 begin
                   ActiveRecord::Base.transaction do
                     #temporary, for development, don't wanna be sending these to actual customers
-                    if Rails.env == "development"
+                    if Rails.env.development? || Rails.env.test?
                       params[:to] = current_user.email
                     end
 
