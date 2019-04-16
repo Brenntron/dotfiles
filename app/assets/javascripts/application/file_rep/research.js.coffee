@@ -39,7 +39,7 @@ $ ->
       else
         $(report_present).hide()
         $(report_missing).show()
-        console.log 'option to push to threatgrid'
+#        TODO Set up ability to push to ThreatGrid if sample does not come back
 
     error: (response) ->
       std_api_error(response, "There was a problem retrieving data from ThreatGrid.", reload: false)
@@ -53,13 +53,25 @@ $ ->
     url: "/escalations/api/v1/escalations/filerep/reversing_labs/" + sha256_hash
     success_reload: false
     success: (response) ->
-      report_present = $('#threatgrid-report-wrapper').find('.rl-data-present')[0]
-      report_missing = $('#threatgrid-report-wrapper').find('.rl-data-missing')[0]
+      report_present = $('#reversing-labs-report-wrapper').find('.rl-data-present')[0]
+      report_missing = $('#reversing-labs-report-wrapper').find('.rl-data-missing')[0]
 
-      console.log response
+      unless response.json.error?
+        rl_data = response.json.rl.sample
+        $(report_present).show()
+        $(report_missing).hide()
+
+        $('#rl-first-seen-date').text(rl_data.xref.first_seen)
+        $('#rl-most-recent-date').text(rl_data.xref.last_seen)
+        console.log rl_data
+
+      else
+        $(report_present).hide()
+        $(report_missing).show()
+
 #      If response has data, show report and structure data
 #      else, show missing data message
 
-       error: (response) ->
+     error: (response) ->
       std_api_error(response, "There was a problem retrieving data from Reversing Labs.", reload: false)
   )
