@@ -1,5 +1,6 @@
 class DisputeEmail < ApplicationRecord
-  belongs_to :dispute
+  belongs_to :dispute, optional: true
+  belongs_to :file_reputation_dispute, optional: true
   has_many :dispute_email_attachments
 
   EMAIL_DOMAIN = "dispute.talosintelligence.com"
@@ -204,12 +205,13 @@ class DisputeEmail < ApplicationRecord
 
   def self.create_email_and_send(params, bugzilla_rest_session:, current_user:)
     new_email = DisputeEmail.new
-    if params[:dispute_id].present?
+    case params[:dispute_type]
+    when 'FileReputationDispute'
+      new_email.file_reputation_dispute_id = params[:dispute_id]
+    else #'Dispute'
       new_email.dispute_id = params[:dispute_id]
     end
-    if params[:file_reputation_dispute_id].present?
-      new_email.file_reputation_dispute_id = params[:file_reputation_dispute_id]
-    end
+
     new_email.from = current_user.email
     if params[:cc].present?
       new_email.to = "#{params[:to]}, #{params[:cc]}"
@@ -253,12 +255,13 @@ class DisputeEmail < ApplicationRecord
     new_email.reload
 
     #update dispute status
-    if params[:dispute_id].present?
-      dispute = Dispute.find(params[:dispute_id])
-    end
-    if params[:file_reputation_dispute_id].present?
-      dispute = FileReputationDispute.find(params[:file_reputation_dispute_id])
-    end
+    dispute =
+        case params[:dispute_type]
+        when 'FileReputationDispute'
+          FileReputationDispute.find(params[:dispute_id])
+        else #'Dispute'
+          Dispute.find(params[:dispute_id])
+        end
     dispute.status = Dispute::STATUS_CUSTOMER_PENDING
     dispute.save
 

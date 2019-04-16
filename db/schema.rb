@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 2019_04_15_151221) do
+ActiveRecord::Schema.define(version: 2019_04_16_144436) do
 
   create_table "alerts", options: "ENGINE=InnoDB DEFAULT CHARSET=utf8", force: :cascade do |t|
     t.datetime "created_at", null: false
@@ -563,6 +563,7 @@ ActiveRecord::Schema.define(version: 2019_04_15_151221) do
     t.boolean "threatgrid_private"
     t.boolean "has_sample"
     t.datetime "case_closed_at"
+    t.datetime "case_responded_at"
     t.index ["assigned_id"], name: "index_file_reputation_disputes_on_assigned_id"
     t.index ["created_at"], name: "index_file_reputation_disputes_on_created_at"
     t.index ["customer_id"], name: "index_file_reputation_disputes_on_customer_id"

@@ -23,7 +23,8 @@ RSpec.describe API::V1::Escalations::Webrep::DisputeEmails, type: :request do
       body = "Are you trolling me?"
 
       post '/escalations/api/v1/escalations/webrep/dispute_emails', as: :json, headers: { 'Token' => @auth_token },
-           params: { dispute_id: @fr_dispute_id, to: to, from: from, subject: subject, body: body }
+           params: { dispute_id: @fr_dispute_id, dispute_type: 'FileReputationDispute',
+                     to: to, from: from, subject: subject, body: body }
 
       puts response.code
       puts response.body
