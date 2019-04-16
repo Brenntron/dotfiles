@@ -30,7 +30,9 @@ module API
           end
 
           def current_user
-            return nil if /_#{Rails.configuration.app_name}_session/ !~ @request.headers['Cookie']
+            unless Rails.env.test?
+              return nil if /_#{Rails.configuration.app_name}_session/ !~ @request.headers['Cookie']
+            end
             warden.user || @user
           end
 
