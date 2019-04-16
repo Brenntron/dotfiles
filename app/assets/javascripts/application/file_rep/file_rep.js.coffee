@@ -36,8 +36,9 @@ $ ->
     search_condition = window.get_search_condition()
 
     return data =
-            search_type : window.get_search_type()
-            search_name : window.get_search_name()
+            search_type :'contains'
+            search_condition : '24bd06e29919ada7bab3f30a8e5048615a6273c0860ed2c3e1113e270720eecc'
+            search_name : 'search'
 
 
   $('#file-rep-datatable').dataTable
@@ -45,7 +46,7 @@ $ ->
     serverSide: true
     ajax:
       url: file_rep_url
-      data: window.build_data()
+#      data: window.build_data()
     pagingType: 'full_numbers'
     columns: [
       {
@@ -155,9 +156,9 @@ $ ->
         className: "alt-col"
         render: (data) ->
           if data == undefined
-            return '<span class="missing-data">Unassigned</span> <span title="Assign to me" class="esc-tooltipped tooltipstered"><button id="index_ticket_assign" class="take-ticket-button" onClick="take_disputes()"/></span>'
+            return '<span class="missing-data">Unassigned</span> <span title="Assign to me" class="esc-tooltipped"><button id="index_ticket_assign" class="take-ticket-button" onClick="take_disputes()"/></span>'
           else
-            return data + '<span title="Assign to me" class="esc-tooltipped tooltipstered"><button id="index_ticket_assign" class="take-ticket-button" onClick="take_disputes()"/></span>'
+            return data + '<span title="Assign to me" class="esc-tooltipped"><button id="index_ticket_assign" class="take-ticket-button" onClick="take_disputes()"/></span>'
       }
     ]
 
