@@ -38,33 +38,26 @@
           %span.toolbar-button-text Refresh Data
 
 .row
-  .col-xs-12.col-sm-4
+  .col-xs-12.col-sm-4#sandbox-report-wrapper
     %h2.research-data-header.sandbox-header Talos Sandbox
-    -# if file sample is in sandbox, display most recent run info here
-    %span.sample-present-true
-    -#  else display this
-    -# %span.sample-present-false
-    %div.data-report-wrapper
-      -# The below is placeholder for visual data that will be formatted from the returned api call to the sandbox
-      .row
-        .col-xs-3
-          %label.data-report-label
-            Latest Run
-          %span.data-report-content
-            2012-12-12T12:12:12Z
-        .col-xs-3
-          %label.data-report-label
-            Run Status
-          %span.data-report-content
-            Completed
-        .col-xs-4
-          %button.secondary.view-report-external-button
-            View HTML Report
-        .col-xs-2.text-right
-          .data-report-score
-            29
-          %label.content-label-sm
-            Sandbox Score
+    #sb-loader
+    .sb-data-present
+      %span.sample-present-true
+      %div.data-report-wrapper
+        .row
+          .col-xs-4
+            %label.data-report-label Latest Run
+            %span.data-report-content#sb-run-date
+          .col-xs-4
+            %label.data-report-label Run Status
+            %span.data-report-content#sb-run-status
+          -#  TODO Add html report call information here
+          -#.col-xs-4
+          -#  %button.secondary.view-report-external-button
+          -#    View HTML Report
+          .col-xs-4.text-right
+            .data-report-score#sb-score
+            %label.content-label-sm Sandbox Score
 
 
   .col-xs-12.col-sm-4
