@@ -195,3 +195,4 @@ $ ->
 
     $(document).on 'click', '.saved-search', () ->
       localStorage.search_type = 'named'
+
