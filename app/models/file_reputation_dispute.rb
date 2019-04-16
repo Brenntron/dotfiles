@@ -9,6 +9,9 @@ class FileReputationDispute < ApplicationRecord
   STATUS_NEW                = 'NEW'
   STATUS_ASSIGNED           = 'ASSIGNED'
   STATUS_CLOSED             = 'CLOSED'
+  STATUS_REOPENED           = 'RE-OPENED'
+  STATUS_CUSTOMER_PENDING   = "CUSTOMER_PENDING"
+  STATUS_CUSTOMER_UPDATE    = "CUSTOMER_UPDATE"
 
   DISPOSITION_MALICIOUS     = 'MALICIOUS'
 
@@ -210,6 +213,87 @@ class FileReputationDispute < ApplicationRecord
       contains_search(params['value'])
     else
       where({})
+    end
+  end
+
+  #for support with incoming bridge messages from TI coming into messages_controller
+  def self.process_bridge_payload(message_payload, customer_payload)
+    user = User.where(cvs_username:"vrtincom").first
+    begin
+      ActiveRecord::Base.transaction do
+
+        threat_score = nil
+        threatgrid_private = nil
+        if message_payload[:sha256_hash].present?
+          threatgrid_response = Threatgrid::Search.query(file_rep_params[:sha256_hash])
+
+          threat_score = threatgrid_response['threat_score']
+          threatgrid_private = threatgrid_response['threatgrid_private']
+        end
+
+
+        guest = Company.where(:name => "Guest").first
+        opened_at = Time.now
+        customer = Customer.process_and_get_customer(customer_payload)
+
+        bugzilla_rest_session = message_payload[:bugzilla_rest_session]
+
+        summary = "New File Reputation Reputation Dispute generated at #{DateTime.now.utc.strftime("%Y-%m-%d %H:%M")}"
+
+        full_description = <<~HEREDOC
+          File name: #{file_rep_params[:file_name]}
+          File Rep Sha: #{message_payload[:sha256_hash]}
+          
+
+        HEREDOC
+
+        bug_attrs = {
+            'product' => 'Escalations Console',
+            'component' => 'AMP Disputes',
+            'summary' => summary,
+            'version' => 'unspecified', #self.version,
+            'description' => full_description,
+            'priority' => 'Unspecified',
+            'classification' => 'unclassified',
+        }
+        logger.debug "Creating bugzilla bug"
+
+        bug_proxy = bugzilla_rest_session.create_bug(bug_attrs)
+
+        logger.debug "Creating dispute"
+        new_dispute = FileReputationDispute.new
+
+        new_dispute.id = bug_proxy.id
+        new_dispute.user_id = user.id
+        new_dispute.sha256_hash = message_payload[:sha256_hash]
+        new_dispute.status = STATUS_NEW
+        new_dispute.file_name = message_payload[:file_name]
+        new_dispute.customer_id = customer.id
+        new_dispute.file_size = message_payload[:file_size]
+        new_dispute.sample_type = message_payload[:sample_type]
+        new_dispute.disposition_suggested = message_payload[:disposition_suggested]
+        new_dispute.source = message_payload[:source]
+        new_dispute.platform = message_payload[:platform]
+        new_dispute.threatgrid_score = threat_score
+        new_dispute.threatgrid_priate = threatgrid_private
+
+        return_message = ""
+        return_success = false
+        if new_dispute.save
+          sender_params[:addressee_id] = file_rep.id
+          sender_params[:addressee_status] = file_rep.status
+          Bridge::GenericAck.new(sender_params, addressee: envelope_params[:sender]).post
+          #render plain: '"successfully created file rep"', status: :ok
+          return_message = "successfully created file rep"
+          return_success = true
+        else
+          error_messages = new_dispute.errors.full_messages.join('; ')
+          #render plain: "\"Error(s) creating file rep -- #{error_messages}\"", status: :internal_server_error
+          return_message = "Error(s) creating file rep -- #{error_messages}"
+        end
+
+        {:success => return_success, :return_message => return_message}
+      end
     end
   end
 end
