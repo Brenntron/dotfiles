@@ -57,14 +57,41 @@ $ ->
       report_missing = $('#reversing-labs-report-wrapper').find('.rl-data-missing')[0]
 
       unless response.json.error?
-        rl_data = response.json.rl.sample
+        rl_data = response.json.rl.sample.xref
+        scanner_count = ""
+        result_count = ""
+
         $(report_present).show()
         $(report_missing).hide()
 
-        $('#rl-first-seen-date').text(rl_data.xref.first_seen)
-        $('#rl-most-recent-date').text(rl_data.xref.last_seen)
-        console.log rl_data
+        all_scanner_results = rl_data.entries[0]
+        scan_time = all_scanner_results.record_time
+        scanner_count = all_scanner_results.scanners.length
 
+        $('#rl-first-seen-date').text(rl_data.first_seen)
+        $('#rl-most-recent-date').text(rl_data.last_seen)
+
+
+        # Cycle through the scanner results
+        mal_results = []
+        unk_results = []
+        $(all_scanner_results.scanners).each ->
+          if this.result == ""
+            unk_results.push(this)
+          else
+            mal_results.push(this)
+
+        result_count = mal_results.length
+        $('#rl-scanner-results').text(result_count + '/' + scanner_count)
+
+        # Add the malicious scans to top of table, create rows from each scanner result
+        tbody = ""
+        $(mal_results).each ->
+          tbody += '<tr><td>' + this.name + '</td><td>' + scan_time + '</td><td class="scanner-mal">' + this.result + '</td></tr>'
+        $(unk_results).each ->
+          tbody += '<tr><td>' + this.name + '</td><td>' + scan_time + '</td><td class="scanner-unk">Not Detected</td></tr>'
+
+        $('#rl-scanner-table').append(tbody)
       else
         $(report_present).hide()
         $(report_missing).show()

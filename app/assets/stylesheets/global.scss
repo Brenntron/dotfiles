@@ -8720,3 +8720,29 @@ button.secondary.view-report-external-button {
 .tg-data-missing, .sandbox-data-missing, .rl-data-missing {
   margin-top: 40px;
 }
+
+
+
+// Reversing labs styles
+.scanner-mal {
+  color: $second-section-color;
+  font-weight: 600;
+}
+
+.scanner-mal::before {
+  content: '';
+  display: block;
+  float: left;
+  background-repeat: no-repeat;
+  background-image: url(image_path('icon_malicious.svg'));
+  width: 18px;
+  height: 18px;
+  margin-top: -4px;
+  margin-bottom: -4px;
+  margin-right: 4px;
+}
+
+.scanner-unk {
+  padding-left: 28px !important;
+  color: $type-lighter-color;
+}
