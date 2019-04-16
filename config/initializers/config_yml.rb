@@ -139,6 +139,11 @@ Rails.configuration.bls                = OpenStruct.new
 Rails.configuration.bls.host           = bls_config['host']
 Rails.configuration.bls.port           = bls_config['port']
 
+
+file_reputation_sandbox = env_config['file_reputation_sandbox']
+raise 'config.yml missing file reputation sandbox section' unless file_reputation_sandbox
+Rails.configuration.file_reputation_sandbox        = ApiRequester::ApiRequester.config_of(file_reputation_sandbox)
+
 reversing_labs_config = env_config['reversing_labs']
 raise 'config.yml missing ReversingLabs section' unless reversing_labs_config
 Rails.configuration.reversing_labs                = ApiRequester::ApiRequester.config_of(reversing_labs_config)
