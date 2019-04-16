@@ -13,6 +13,14 @@ class Escalations::PeakeBridge::FileRepMessagesController < ApplicationControlle
       threatgrid_private = threatgrid_response['threatgrid_private']
     end
 
+    certificates = Ticloud::FileAnalysis.certificates(file_rep_params[:sha256_checksum])
+
+    if certificates.present?
+      certificates.each do |certificate|
+        DigitalSigner.create(issuer: certificate['issuer'], subject: certificate['test'], 'valid-from': certificate['valid_from'], 'valid-to': certificate['valid_to'])
+      end
+    end
+
     customer = find_or_create_customer
     attributes = {
         sha256_hash: file_rep_params[:sha256_hash],

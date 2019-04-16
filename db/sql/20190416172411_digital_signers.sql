@@ -1,0 +1,1 @@
+CREATE TABLE `digital_signers` (`id` bigint NOT NULL AUTO_INCREMENT PRIMARY KEY, `issuer` varchar(255), `subject` varchar(255), `valid_from` datetime, `valid_to` datetime, `created_at` datetime NOT NULL, `updated_at` datetime NOT NULL);
