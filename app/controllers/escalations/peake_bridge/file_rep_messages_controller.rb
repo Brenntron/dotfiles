@@ -3,19 +3,40 @@ class Escalations::PeakeBridge::FileRepMessagesController < ApplicationControlle
 
   def create
 
-    byebug
+    return_message = "Can't even"
+    return_success = false
+
+
     message_payload = file_rep_params
     message_payload[:bugzilla_rest_session] = bugzilla_rest_session
-    response = FileReputationDispute.process_bridge_payload(message_payload, customer_params,
-                                                            sender_params: sender_params)
+    new_dispute = FileReputationDispute.process_bridge_payload(message_payload, customer_params)
 
-    if response[:success]
-      sender_params[:addressee_id] = file_rep.id
-      sender_params[:addressee_status] = file_rep.status
-      Bridge::GenericAck.new(sender_params, addressee: envelope_params[:sender]).post
-      render plain: response[:message], status: :ok
+
+    if new_dispute.new_record?
+      error_messages = new_dispute.errors.full_messages.join('; ')
+      #render plain: "\"Error(s) creating file rep -- #{error_messages}\"", status: :internal_server_error
+      return_message = "Error(s) creating file rep -- #{error_messages}"
+      Rails.logger.error(return_message)
     else
-      render plain: response[:message], status: :internal_server_error
+      return_success = true
+      return_message = "successfully created file rep"
+
+      new_dispute.ack_create(envelope_params, sender_params)
+
+      # This is so the tests can stub out the `threaded?` method and test synchronously.
+      if FileReputationDispute.threaded?
+        Thread.new do
+          new_dispute.update_scores
+        end
+      else
+        new_dispute.update_scores
+      end
+    end
+
+    if return_success
+      render plain: return_message, status: :ok
+    else
+      render plain: return_message, status: :internal_server_error
     end
   end
 

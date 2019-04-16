@@ -222,33 +222,34 @@ class FileReputationDispute < ApplicationRecord
   end
 
   def update_threadgrid_score
-    byebug
-    threat_score = nil
-    threatgrid_private = nil
-    if message_payload[:sha256_hash].present?
-      threatgrid_response = Threatgrid::Search.query(file_rep_params[:sha256_hash])
+    if self.sha256_hash.present?
+      threatgrid_response = Threatgrid::Search.query(self.sha256_hash)
 
-      threat_score = threatgrid_response['threat_score']
-      threatgrid_private = threatgrid_response['threatgrid_private']
+      self.threatgrid_score = threatgrid_response[:threat_score]
+      self.threatgrid_private = threatgrid_response[:threatgrid_private]
+      save!
     end
 
-    self.threatgrid_score = threat_score
-    self.threatgrid_priate = threatgrid_private
-    save!
   rescue => except
     Rails.logger.error("Error updating threatgrid score on id #{self.id} -- #{except.error_message}")
   end
 
   def update_scores
-    byebug
     update_threadgrid_score
   end
 
+  def ack_create(envelope_params, sender_params)
+    sender_params[:addressee_id] = self.id
+    sender_params[:addressee_status] = self.status
+    Bridge::GenericAck.new(sender_params, addressee: envelope_params[:sender]).post
+    true
+  rescue => except
+    Rails.logger.error("Error acknowledging File Reputation Dispute creation -- #{except.class.name} #{except.message}")
+    false
+  end
+
   #for support with incoming bridge messages from TI coming into messages_controller
-  def self.process_bridge_payload(message_payload, customer_payload, sender_params:)
-    byebug
-    return_message = "Can't even"
-    return_success = false
+  def self.process_bridge_payload(message_payload, customer_payload)
     user = User.where(cvs_username:"vrtincom").first
     begin
       ActiveRecord::Base.transaction do
@@ -296,33 +297,9 @@ class FileReputationDispute < ApplicationRecord
         new_dispute.source = message_payload[:source]
         new_dispute.platform = message_payload[:platform]
 
-        if new_dispute.save
-          sender_params[:addressee_id] = new_dispute.id
-          sender_params[:addressee_status] = new_dispute.status
-          Bridge::GenericAck.new(sender_params, addressee: envelope_params[:sender]).post
-          #render plain: '"successfully created file rep"', status: :ok
-          return_message = "successfully created file rep"
-          return_success = true
-        else
-          error_messages = new_dispute.errors.full_messages.join('; ')
-          #render plain: "\"Error(s) creating file rep -- #{error_messages}\"", status: :internal_server_error
-          return_message = "Error(s) creating file rep -- #{error_messages}"
-          Rails.logger.error(return_message)
-        end
+        new_dispute.save
+        new_dispute
       end #transaction
-
-      byebug
-      if return_success
-        # This is so the tests can stub out the `threaded?` method and test synchronously.
-        if self.class.threaded?
-          Thread.new do
-            new_dispute.update_scores
-          end
-        else
-          new_dispute.update_scores
-        end
-      end
     end #begin
-    {:success => return_success, :return_message => return_message}
   end
 end
