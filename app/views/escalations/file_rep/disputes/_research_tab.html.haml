@@ -69,6 +69,11 @@
 
   .col-xs-12.col-sm-4#threatgrid-report-wrapper
     %h2.research-data-header.threatgrid-header Threat Grid
+    #tg-loader
+      .inline-loader-wrapper
+        .gear-loader-wrapper
+          = inline_svg 'icon_gears_loader.svg', class: 'gears-loader'
+        %span.loader-msg Loading data...
     .tg-data-present
       %span.sample-present-true
       %div.data-report-wrapper
@@ -114,6 +119,11 @@
 
   .col-xs-12.col-sm-4#reversing-labs-report-wrapper
     %h2.research-data-header.reversing-labs-header Reversing Labs
+    #rl-loader
+      .inline-loader-wrapper
+        .gear-loader-wrapper
+          = inline_svg 'icon_gears_loader.svg', class: 'gears-loader'
+        %span.loader-msg Loading data...
     .rl-data-present
       %span.sample-present-true
       %div.data-report-wrapper

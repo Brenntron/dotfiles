@@ -4,12 +4,14 @@ $ ->
 #  This should be wrapped in a window function and called on page load/page refresh, but it keeps breaking when I try to
 #window.threatgrid_data = () ->
   sha256_hash = $('#sha256_hash')[0].innerText
+  $('#tg-loader').show()
   std_msg_ajax(
     method: 'POST'
     url: "/escalations/api/v1/escalations/filerep/research/"
     data: {sha256_hash: sha256_hash}
     success_reload: false
     success: (response) ->
+      $('#tg-loader').hide()
       report_present = $('#threatgrid-report-wrapper').find('.tg-data-present')[0]
       report_missing = $('#threatgrid-report-wrapper').find('.tg-data-missing')[0]
 
@@ -42,17 +44,20 @@ $ ->
 #        TODO Set up ability to push to ThreatGrid if sample does not come back
 
     error: (response) ->
+      $('#tg-loader').hide()
       std_api_error(response, "There was a problem retrieving data from ThreatGrid.", reload: false)
   )
 
 
 
 #  Call to reversing labs
+  $('#rl-loader').show()
   std_msg_ajax(
     method: 'GET'
     url: "/escalations/api/v1/escalations/filerep/reversing_labs/" + sha256_hash
     success_reload: false
     success: (response) ->
+      $('#rl-loader').hide()
       report_present = $('#reversing-labs-report-wrapper').find('.rl-data-present')[0]
       report_missing = $('#reversing-labs-report-wrapper').find('.rl-data-missing')[0]
 
@@ -96,9 +101,7 @@ $ ->
         $(report_present).hide()
         $(report_missing).show()
 
-#      If response has data, show report and structure data
-#      else, show missing data message
-
-     error: (response) ->
+    error: (response) ->
+      $('#rl-loader').hide()
       std_api_error(response, "There was a problem retrieving data from Reversing Labs.", reload: false)
   )

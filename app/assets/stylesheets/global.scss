@@ -8746,3 +8746,24 @@ button.secondary.view-report-external-button {
   padding-left: 28px !important;
   color: $type-lighter-color;
 }
+
+.inline-loader-wrapper {
+  display: block;
+  position: relative;
+  width: 170px;
+  margin: auto;
+  .loader-msg {
+    display: inline-block;
+    margin-top: 14px;
+    font-style: italic;
+    float: left;
+  }
+  .gear-loader-wrapper {
+    float: left;
+    margin-right: 5px;
+  }
+}
+
+#rl-loader, #tg-loader, #sb-loader {
+  width: 100%;
+}
