@@ -8828,3 +8828,24 @@ button.secondary.view-report-external-button {
 .tg-data-missing, .sandbox-data-missing, .rl-data-missing {
   margin-top: 40px;
 }
+
+// Creating form dialog for when we want to use a dialog instead of a dropdown
+.form-dialog {
+  font-family: 'Open Sans', sans-serif;
+  border-radius: 4px;
+  border: none !important;
+  .ui-dialog-titlebar {
+    background-color: $bug-section-color;
+    line-height: 2.25em;
+    height: 54px;
+    padding-left: 15px;
+
+    .ui-dialog-title {
+      font-size: 14pt;
+      font-weight: 300;
+    }
+  }
+  .form-wrapper {
+    padding: 20px;
+  }
+}

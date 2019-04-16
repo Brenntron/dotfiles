@@ -1,0 +1,12 @@
+#create-detection-dialog{title: 'Create AMP Detection'}
+  .form-wrapper
+    %form
+      .form-group
+        %label.content-label-sm
+          SHA256
+        .code-snippet.code-string-break
+          = @file_rep_dispute.sha256_hash
+      %hr.thin
+      .form-group
+        %label.content-label-sm
+          Detection Name

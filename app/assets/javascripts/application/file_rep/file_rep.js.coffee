@@ -151,3 +151,14 @@ $ ->
       selection.addRange(range);
       document.execCommand("Copy");
 
+
+  # Trigger Create Detection dialog
+  window.amp_detection_dialog = () ->
+    $('#create-detection-dialog').dialog
+      minWidth: 520,
+      classes: {
+        "ui-dialog": "form-dialog"
+      },
+      position: { my: "right center", at: "right center", of: window }
+
+
