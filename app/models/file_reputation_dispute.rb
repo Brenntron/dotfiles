@@ -17,6 +17,11 @@ class FileReputationDispute < ApplicationRecord
 
   validates :status, :file_name, :sha256_hash, :disposition_suggested, presence: true
 
+  # defined so tests can stub to return false.
+  def self.threaded?
+    true
+  end
+
   def update_status(status)
     self.update!(status: status)
 
@@ -216,20 +221,36 @@ class FileReputationDispute < ApplicationRecord
     end
   end
 
+  def update_threadgrid_score
+    byebug
+    threat_score = nil
+    threatgrid_private = nil
+    if message_payload[:sha256_hash].present?
+      threatgrid_response = Threatgrid::Search.query(file_rep_params[:sha256_hash])
+
+      threat_score = threatgrid_response['threat_score']
+      threatgrid_private = threatgrid_response['threatgrid_private']
+    end
+
+    self.threatgrid_score = threat_score
+    self.threatgrid_priate = threatgrid_private
+    save!
+  rescue => except
+    Rails.logger.error("Error updating threatgrid score on id #{self.id} -- #{except.error_message}")
+  end
+
+  def update_scores
+    byebug
+    update_threadgrid_score
+  end
+
   #for support with incoming bridge messages from TI coming into messages_controller
   def self.process_bridge_payload(message_payload, customer_payload)
+    return_message = "Can't even"
+    return_success = false
     user = User.where(cvs_username:"vrtincom").first
     begin
       ActiveRecord::Base.transaction do
-
-        threat_score = nil
-        threatgrid_private = nil
-        if message_payload[:sha256_hash].present?
-          threatgrid_response = Threatgrid::Search.query(file_rep_params[:sha256_hash])
-
-          threat_score = threatgrid_response['threat_score']
-          threatgrid_private = threatgrid_response['threatgrid_private']
-        end
 
 
         guest = Company.where(:name => "Guest").first
@@ -274,11 +295,7 @@ class FileReputationDispute < ApplicationRecord
         new_dispute.disposition_suggested = message_payload[:disposition_suggested]
         new_dispute.source = message_payload[:source]
         new_dispute.platform = message_payload[:platform]
-        new_dispute.threatgrid_score = threat_score
-        new_dispute.threatgrid_priate = threatgrid_private
 
-        return_message = ""
-        return_success = false
         if new_dispute.save
           sender_params[:addressee_id] = file_rep.id
           sender_params[:addressee_status] = file_rep.status
@@ -290,10 +307,22 @@ class FileReputationDispute < ApplicationRecord
           error_messages = new_dispute.errors.full_messages.join('; ')
           #render plain: "\"Error(s) creating file rep -- #{error_messages}\"", status: :internal_server_error
           return_message = "Error(s) creating file rep -- #{error_messages}"
+          Rails.logger.error(return_message)
         end
+      end #transaction
 
-        {:success => return_success, :return_message => return_message}
+      byebug
+      if return_success
+        # This is so the tests can stub out the `threaded?` method and test synchronously.
+        if self.class.threaded?
+          Thread.new do
+            new_dispute.update_scores
+          end
+        else
+          new_dispute.update_scores
+        end
       end
-    end
+    end #begin
+    {:success => return_success, :return_message => return_message}
   end
 end
