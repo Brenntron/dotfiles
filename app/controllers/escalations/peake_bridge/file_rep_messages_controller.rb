@@ -8,7 +8,7 @@ class Escalations::PeakeBridge::FileRepMessagesController < ApplicationControlle
 
     certificates = Ticloud::FileAnalysis.certificates(file_rep_params[:sha256_checksum])
 
-    if certificates.present?
+    if certificates.any?
       certificates.each do |certificate|
         DigitalSigner.create(issuer: certificate['issuer'], subject: certificate['test'], 'valid-from': certificate['valid_from'], 'valid-to': certificate['valid_to'])
       end
