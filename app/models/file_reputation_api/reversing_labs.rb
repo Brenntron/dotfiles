@@ -1,3 +1,7 @@
+##################################################################
+# example shas
+# 99e432ac19e5a47d0d1ddfad9f326d5e169ab6651d844d4b800a79f4f78d410f
+
 class FileReputationApi::ReversingLabs
   include ApiRequester::ApiRequester
   set_api_requester_config Rails.configuration.reversing_labs
