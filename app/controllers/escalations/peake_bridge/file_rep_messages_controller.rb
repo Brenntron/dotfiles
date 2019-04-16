@@ -3,8 +3,11 @@ class Escalations::PeakeBridge::FileRepMessagesController < ApplicationControlle
 
   def create
 
-    file_rep_params[:bugzilla_rest_session] = bugzilla_rest_session
-    response = FileReputationDispute.process_bridge_payload(file_rep_params, customer_params)
+    byebug
+    message_payload = file_rep_params
+    message_payload[:bugzilla_rest_session] = bugzilla_rest_session
+    response = FileReputationDispute.process_bridge_payload(message_payload, customer_params,
+                                                            sender_params: sender_params)
 
     if response[:success]
       sender_params[:addressee_id] = file_rep.id

@@ -245,13 +245,13 @@ class FileReputationDispute < ApplicationRecord
   end
 
   #for support with incoming bridge messages from TI coming into messages_controller
-  def self.process_bridge_payload(message_payload, customer_payload)
+  def self.process_bridge_payload(message_payload, customer_payload, sender_params:)
+    byebug
     return_message = "Can't even"
     return_success = false
     user = User.where(cvs_username:"vrtincom").first
     begin
       ActiveRecord::Base.transaction do
-
 
         guest = Company.where(:name => "Guest").first
         opened_at = Time.now
@@ -262,7 +262,7 @@ class FileReputationDispute < ApplicationRecord
         summary = "New File Reputation Reputation Dispute generated at #{DateTime.now.utc.strftime("%Y-%m-%d %H:%M")}"
 
         full_description = <<~HEREDOC
-          File name: #{file_rep_params[:file_name]}
+          File name: #{message_payload[:file_name]}
           File Rep Sha: #{message_payload[:sha256_hash]}
           
 
@@ -297,8 +297,8 @@ class FileReputationDispute < ApplicationRecord
         new_dispute.platform = message_payload[:platform]
 
         if new_dispute.save
-          sender_params[:addressee_id] = file_rep.id
-          sender_params[:addressee_status] = file_rep.status
+          sender_params[:addressee_id] = new_dispute.id
+          sender_params[:addressee_status] = new_dispute.status
           Bridge::GenericAck.new(sender_params, addressee: envelope_params[:sender]).post
           #render plain: '"successfully created file rep"', status: :ok
           return_message = "successfully created file rep"

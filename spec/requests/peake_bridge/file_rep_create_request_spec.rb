@@ -30,6 +30,11 @@ RSpec.describe "Peake-Bridge file rep create channel", type: :request do
     }
   end
 
+  before(:all) do
+    FactoryBot.create(:current_user)
+    FactoryBot.create(:vrt_incoming_user)
+  end
+
   it 'receives file rep create messages' do
     allow(FileReputationDispute).to receive(:threaded?).and_return(false)
 

@@ -908,6 +908,8 @@ ActiveRecord::Schema.define(version: 2019_04_16_144436) do
     t.datetime "created_at"
     t.datetime "updated_at"
     t.string "bugzilla_api_key"
+    t.string "threatgrid_api_key"
+    t.string "sandbox_api_key"
     t.index ["cvs_username"], name: "index_users_on_cvs_username", unique: true
     t.index ["email"], name: "index_users_on_email", unique: true
     t.index ["lft"], name: "index_users_on_lft"
