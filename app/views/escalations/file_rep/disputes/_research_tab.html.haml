@@ -60,14 +60,16 @@
             %label.content-label-sm Sandbox Score
 
 
-  .col-xs-12.col-sm-4
+  .col-xs-12.col-sm-4#threatgrid-report-wrapper
     %h2.research-data-header.threatgrid-header Threat Grid
-    -# if file sample is in threatgrid, display most recent run info here
-    %span.sample-present-true
-    -#  else display this
-    -# %span.sample-present-false
-    %div.data-report-wrapper#threatgrid-data-wrapper
-      .tg-data-present
+    #tg-loader
+      .inline-loader-wrapper
+        .gear-loader-wrapper
+          = inline_svg 'icon_gears_loader.svg', class: 'gears-loader'
+        %span.loader-msg Loading data...
+    .tg-data-present
+      %span.sample-present-true
+      %div.data-report-wrapper
         .row
           .col-xs-4
             %label.data-report-label Submitted to TG
@@ -99,37 +101,45 @@
           .col-xs-12
             %label.data-report-label Full Json
             %pre.data-report-code-content#tg-full
-      .tg-data-missing.text-center
+    .tg-data-missing.text-center
+      %span.sample-present-false
+      %div.data-report-wrapper
         %span.missing-data Not in ThreatGrid
         %br
         %button.primary
           Push Sample to ThreatGrid
 
 
-  .col-xs-12.col-sm-4
+  .col-xs-12.col-sm-4#reversing-labs-report-wrapper
     %h2.research-data-header.reversing-labs-header Reversing Labs
-    -# if file sample is in reversing labs, display most recent run info here
-    %span.sample-present-true
-    -#  else display this
-    -# %span.sample-present-false
-    %div.data-report-wrapper
+    #rl-loader
+      .inline-loader-wrapper
+        .gear-loader-wrapper
+          = inline_svg 'icon_gears_loader.svg', class: 'gears-loader'
+        %span.loader-msg Loading data...
+    .rl-data-present
+      %span.sample-present-true
       %div.data-report-wrapper
-      -# The below is placeholder for visual data that will be formatted from the returned api call to threatgrid
-      .row
-        .col-xs-4
-          %label.data-report-label
-            First Seen
-          %span.data-report-content
-            2012-12-12T12:12:12Z
-        .col-xs-4
-          %label.data-report-label
-            Most Recent Scan
-          %span.data-report-content
-            2012-12-12T12:12:12Z
-        .col-xs-4.text-right
-          .data-report-score
-            21/54
-          %label.content-label-sm
-            Scanner Results
-
-
+        .row
+          .col-xs-4
+            %label.data-report-label First Seen
+            %span.data-report-content#rl-first-seen-date
+          .col-xs-4
+            %label.data-report-label Most Recent Scan
+            %span.data-report-content#rl-most-recent-date
+          .col-xs-4.text-right
+            .data-report-score#rl-scanner-results
+            %label.content-label-sm Scanner Results
+        %hr.thin
+        .row
+          .col-xs-12
+            %table.data-report-table#rl-scanner-table
+              %thead
+                %tr
+                  %th AV Vender
+                  %th Time Scanned
+                  %th Results
+    .rl-data-missing.text-center
+      %span.sample-present-false
+      %div.data-report-wrapper
+        %span.missing-data Not in Reversing Labs
