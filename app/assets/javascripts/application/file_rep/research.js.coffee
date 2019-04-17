@@ -35,7 +35,7 @@ $ ->
         $('#tg-behaviors').append('<tbody>' + behaviors + '</tbody>')
 
         # Adding full json report in case it's needed
-        full_report = JSON.stringify(response, null, '\t')
+        full_report = JSON.stringify(response.json, null, '\t')
         $('#tg-full').text(full_report)
 
       else
@@ -155,7 +155,7 @@ window.get_sandbox_report = (runid, sha) ->
       $('#sb-score').text(sb_report.score)
 
 
-      # Contacted information
+      # Contacted ips and domains
       contacted_ips = ""
       contacted_domains = ""
 
@@ -174,8 +174,16 @@ window.get_sandbox_report = (runid, sha) ->
         $('#sb-contacted-domains').html('<span class="missing-data">No domains contacted</span>')
 
 
-
-
+      # Indicators of compromise (IOC's)
+      iocs = sb_report.ioc
+      unless iocs.length > 0
+        $('#sb-ioc-col').append('<span class="missing-data">No IOCs detected</span>')
+      else
+        ioc_table = '<table class="data-report-table"><thead><tr><th>Name</th><th class="text-center">Alerts</th></tr></thead><tbody>'
+        $(iocs).each ->
+          ioc_table += '<tr><td>' + this.name + '</td><td class="text-center overdue">' + this.alerts.length + '</td></tr>'
+        ioc_table += '</tbody></table>'
+        $('#sb-ioc-col').append(ioc_table)
 
 
       # Dropped Files
@@ -221,6 +229,10 @@ window.get_sandbox_report = (runid, sha) ->
           processes_tables += process_table
         $('#sb-processes-col').append(processes_tables)
 
+
+      # Adding full json report in case it's needed
+      full_report = JSON.stringify(response.json, null, '\t')
+      $('#sb-full').text(full_report)
       console.log sb_report
 
     error: (response) ->
