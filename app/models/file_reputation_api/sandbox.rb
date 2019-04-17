@@ -14,7 +14,7 @@ class FileReputationApi::Sandbox
         "apikey" => api_key
     }
     begin
-      response = JSON.parse(call_request(:get, endpoint, :request_type => :query_string, :input => query_string).body)
+      response = call_request_parsed(:get, endpoint, :request_type => :query_string, :input => query_string)
       data = {:success => true, :data => response["value"]}
     rescue
       data = {:success => false, :data => {}}
@@ -32,7 +32,7 @@ class FileReputationApi::Sandbox
         "apikey" => api_key
     }
     begin
-      response = JSON.parse(call_request(:get, endpoint, :request_type => :query_string, :input => query_string).body)
+      response = call_request_parsed(:get, endpoint, :request_type => :query_string, :input => query_string)
       data = {:success => true, :data => response["entry"]["disposition"]}
     rescue
       data = {:success => false, :data => {}}
@@ -41,7 +41,7 @@ class FileReputationApi::Sandbox
     data
   end
 
-  def self.sandbox_report(sha256)
+  def self.sandbox_latest_report(sha256)
     endpoint = "/api/2/report/latest"
 
     query_string = {
@@ -50,7 +50,7 @@ class FileReputationApi::Sandbox
     }
 
     begin
-      response = JSON.parse(call_request(:get, endpoint, :request_type => :query_string, :input => query_string).body)
+      response = call_request_parsed(:get, endpoint, :request_type => :query_string, :input => query_string)
       data = {:success => true, :data => response}
     rescue
       data = {:success => false, :data => {}}
@@ -60,6 +60,43 @@ class FileReputationApi::Sandbox
 
   end
 
+  def self.full_report(sha256, runid)
+    endpoint = "/api/2/report"
+
+    query_string = {
+        "hash" => sha256,
+        "runid" => runid,
+        "apikey" => api_key
+    }
+
+    begin
+      response = call_request_parsed(:get, endpoint, :request_type => :query_string, :input => query_string)
+      data = {:success => true, :data => response}
+    rescue
+      data = {:success => false, :data => {}}
+    end
+
+    data
+  end
+
+  def self.full_report_html(sha256, runid)
+    endpoint = "/api/2/report/html"
+
+    query_string = {
+        "hash" => sha256,
+        "runid" => runid,
+        "apikey" => api_key
+    }
+
+    begin
+      response = call_request(:get, endpoint, :request_type => :query_string, :input => query_string)
+      data = {:success => true, :data => response}
+    rescue
+      data = {:success => false, :data => {}}
+    end
+
+    data
+  end
 
 
   ########################################################
