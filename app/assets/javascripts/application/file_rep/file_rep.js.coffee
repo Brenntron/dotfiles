@@ -6,39 +6,67 @@ $ ->
     processing: true
     serverSide: true
     ajax: file_rep_url
+    order: [ [
+      16
+      'desc'
+    ] ]
     pagingType: 'full_numbers'
+    keys:
+      columns: ':not(:first-child)'
+    columnDefs: [
+      {
+        # Making checkbox row unorderable
+        targets: [ 0 ]
+        orderable: false
+        searchable: false
+      }
+      {
+        targets: [ 1 ]
+        className: 'id-col'
+      }
+      {
+        # Bolds the status
+        targets: [ 2 ]
+        className: 'font-weight-bold'
+      }
+    ]
     columns: [
       {
+        data:'id'
+        render: (data) ->
+          return '<input type="checkbox" onclick="toggleRow(this)" name="cbox" class="dispute_check_box" id="cbox' + data + '" value="' + data + '" />'
+      }
+      {
+#        need to zeropad this thing
         data: 'id'
-        className: 'font-weight-bold'
+        render: (data, type, full, meta) ->
+          return '<a href="/escalations/file_rep/disputes/' + data + '">' + data + '</a>'
       }
+      { data: 'status' }
+      { data: 'resolution' }
       {
-        data: 'status'
-        className: 'font-weight-bold'
+        data: 'file_name'
+        render: (data, type, full, meta) ->
+          return '<a href="/escalations/file_rep/disputes/' + full['id'] + '">' + data + '</a>'
       }
-      {
-        data: 'resolution'
-      }
-      { data: 'file_name'}
       {
         data: 'sha256_hash'
-        render: (data) ->
-          return '<code id="' + data + '_sha" title="' + data + '" class="esc-tooltipped tooltipstered file_rep_sha">' + data + '</code>'
+        render: (data, type, full, meta) ->
+          return '<a href="/escalations/file_rep/disputes/' + full['id'] + '"><span id="' + data + '_sha" title="' + data + '" class="esc-tooltipped file_rep_sha">' + data + '</span></a>'
       }
       {
         data: 'file_size'
         render: (data) ->
-          return '<span>' + data + ' bytes </span>'
+          return data + ' bytes'
       }
       { data: 'sample_type'}
       {
         data: 'disposition'
-        className: 'text-capitalize'
         render: (data) ->
           if data == 'malicious'
-            return '<span class="malicious">malicious</span>'
+            return '<span class="malicious text-capitalize">Malicious</span>'
           else
-          return '<span>clean</span>'
+            return '<span class="text-capitalize">' + data + '</span>'
       }
       {
         data: 'detection_name'
@@ -77,7 +105,7 @@ $ ->
         data: 'threatgrid_score'
         render: (data, type, full, meta) ->
           if full['threatgrid_under'] == "true"
-            data = '<span>' + data + '</span>'
+            data = data
           else
             data = '<span class="overdue">' + data + '</span>'
           return data
@@ -85,29 +113,23 @@ $ ->
       { data: 'reversing_labs_score'}
       {
         data: 'disposition_suggested'
-        className: 'text-capitalize'
         render: (data) ->
           if data == 'malicious'
-            return '<span class="malicious">malicious</span>'
+            data = '<span class="malicious text-capitalize">Malicious</span>'
           else
-            return '<span>clean</span>'
+            data =  '<span class="text-capitalize">' + data + '</span>'
+          return data
       }
       { data: 'created_at'}
       {
-#        submitter Type
+#        Submitter Type
         data: null
         render: () ->
-          return "<span>submitter Type</span>"
+          return "Submitter Type"
       }
-      {
-        data: 'customer_name'
-      }
-      {
-        data: 'customer_company_name'
-      }
-      {
-        data: 'customer_email'
-      }
+      { data: 'customer_name' }
+      { data: 'customer_company_name' }
+      { data: 'customer_email' }
       {
         data: 'assignee'
         className: "alt-col"

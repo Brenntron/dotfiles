@@ -10,49 +10,49 @@
             Show/Hide Columns
         .dropdown-menu.toolbar-dropdown#file-index-table-show-columns-dropdown{'aria-labelledby': 'file-index-table-show-columns-button'}
           %ul
-            %li.toggle-vis-file-rep{'data-column':'0'}
-              %input{type: 'checkbox', checked: true, id: 'id-checkbox'} Case ID
             %li.toggle-vis-file-rep{'data-column':'1'}
-              %input{type: 'checkbox', checked: true, id: 'status-checkbox'} Status
+              %input{type: 'checkbox', checked: true, id: 'id-checkbox'} Case ID
             %li.toggle-vis-file-rep{'data-column':'2'}
-              %input{type: 'checkbox', id: 'resolution-checkbox'} Resolution
+              %input{type: 'checkbox', checked: true, id: 'status-checkbox'} Status
             %li.toggle-vis-file-rep{'data-column':'3'}
-              %input{type: 'checkbox', checked: true, id: 'file-name-checkbox'} File Name
+              %input{type: 'checkbox', id: 'resolution-checkbox'} Resolution
             %li.toggle-vis-file-rep{'data-column':'4'}
-              %input{type: 'checkbox', checked: true, id: 'sha256-checkbox'} SHA256
+              %input{type: 'checkbox', checked: true, id: 'file-name-checkbox'} File Name
             %li.toggle-vis-file-rep{'data-column':'5'}
-              %input{type: 'checkbox', checked: true, id: 'file-size-checkbox'} File Size
+              %input{type: 'checkbox', checked: true, id: 'sha256-checkbox'} SHA256
             %li.toggle-vis-file-rep{'data-column':'6'}
-              %input{type: 'checkbox', checked: true, id: 'sample-type-checkbox'} Sample Type
+              %input{type: 'checkbox', checked: true, id: 'file-size-checkbox'} File Size
             %li.toggle-vis-file-rep{'data-column':'7'}
-              %input{type: 'checkbox', checked: true, id: 'amp-disp-checkbox'} AMP Disposition
+              %input{type: 'checkbox', checked: true, id: 'sample-type-checkbox'} Sample Type
             %li.toggle-vis-file-rep{'data-column':'8'}
-              %input{type: 'checkbox', checked: true, id: 'amp-name-checkbox'} AMP Detection Name
+              %input{type: 'checkbox', checked: true, id: 'amp-disp-checkbox'} AMP Disposition
             %li.toggle-vis-file-rep{'data-column':'9'}
-              %input{type: 'checkbox', id: 'amp-date-checkbox'} AMP Detection Created
+              %input{type: 'checkbox', checked: true, id: 'amp-name-checkbox'} AMP Detection Name
             %li.toggle-vis-file-rep{'data-column':'10'}
+              %input{type: 'checkbox', id: 'amp-date-checkbox'} AMP Detection Created
+            %li.toggle-vis-file-rep{'data-column':'11'}
               %input{type: 'checkbox', id: 'in-zoo-checkbox'} In Zoo
 
           %ul
-            %li.toggle-vis-file-rep{'data-column':'11'}
-              %input{type: 'checkbox', checked: true, id: 'sandbox-score-checkbox' } Sandbox Score
             %li.toggle-vis-file-rep{'data-column':'12'}
-              %input{type: 'checkbox', checked: false, id: 'threatgrid-score-checkbox'} Threat Score
+              %input{type: 'checkbox', checked: true, id: 'sandbox-score-checkbox' } Sandbox Score
             %li.toggle-vis-file-rep{'data-column':'13'}
-              %input{type: 'checkbox', checked: true, id: 'reversing-labs-checkbox'} Reversing Labs
+              %input{type: 'checkbox', checked: false, id: 'threatgrid-score-checkbox'} Threat Score
             %li.toggle-vis-file-rep{'data-column':'14'}
-              %input{type: 'checkbox', checked: true, id: 'suggested-disp-checkbox'} Suggested Disposition
+              %input{type: 'checkbox', checked: true, id: 'reversing-labs-checkbox'} Reversing Labs
             %li.toggle-vis-file-rep{'data-column':'15'}
-              %input{type: 'checkbox', id: 'time-submitted-checkbox'} Time Submitted
+              %input{type: 'checkbox', checked: true, id: 'suggested-disp-checkbox'} Suggested Disposition
             %li.toggle-vis-file-rep{'data-column':'16'}
-              %input{type: 'checkbox', id: 'submitter-type-checkbox'} Submitter Type
+              %input{type: 'checkbox', id: 'time-submitted-checkbox'} Time Submitted
             %li.toggle-vis-file-rep{'data-column':'17'}
-              %input{type: 'checkbox', id: 'customer-name-checkbox'} Customer Name
+              %input{type: 'checkbox', id: 'submitter-type-checkbox'} Submitter Type
             %li.toggle-vis-file-rep{'data-column':'18'}
-              %input{type: 'checkbox', id: 'customer-org-checkbox'} Customer Organization
+              %input{type: 'checkbox', id: 'customer-name-checkbox'} Customer Name
             %li.toggle-vis-file-rep{'data-column':'19'}
-              %input{type: 'checkbox', checked: true, id: 'customer-email-checkbox'} Customer Email
+              %input{type: 'checkbox', id: 'customer-org-checkbox'} Customer Organization
             %li.toggle-vis-file-rep{'data-column':'20'}
+              %input{type: 'checkbox', checked: true, id: 'customer-email-checkbox'} Customer Email
+            %li.toggle-vis-file-rep{'data-column':'21'}
               %input{type: 'checkbox', id: 'assignee-checkbox'} Assignee
 
     %div
@@ -205,18 +205,20 @@
       %table.table.responsive#file-rep-datatable{'data-source': escalations_file_rep_disputes_path(format: :json)}
         %thead
           %tr
-            %th Case Id
+            %th
+            -#  Checkbox column
+            %th Case ID
             %th Status
             %th Resolution
             %th File Name
-            %th sha256
+            %th SHA256
             %th File Size
             %th Sample Type
             %th AMP Disp
             %th AMP Detection Name
             %th AMP Detection Created
-            %th In zoo
-            %th Sandbox score
+            %th In Zoo
+            %th Sandbox Score
             %th Threat Score
             %th Reversing Labs
             %th Suggested Disp
