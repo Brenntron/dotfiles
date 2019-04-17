@@ -249,9 +249,25 @@ class FileReputationDispute < ApplicationRecord
     end
   end
 
+  def update_reversing_labs_score
+    score = 0
+    api_response = FileReputationApi::ReversingLabs.sha256_lookup(self.sha256_hash)
+
+    if api_response&.dig('rl','sample','xref','entries').any?
+      api_response&.dig('rl','sample','xref','entries')[0]&.dig('scanners').each do |scanner|
+        if !scanner['result'].empty?
+          score += 1
+        end
+      end
+    end
+
+    self.update(reversing_labs_score: score)
+  end
+
   def update_scores
     update_threadgrid_score
     update_ticode_certs
+    update_reversing_labs_score
   end
 
   def ack_create(envelope_params, sender_params)
