@@ -2,7 +2,8 @@
 class FileReputationDispute < ApplicationRecord
 
   belongs_to :customer, optional:true
-  belongs_to :assigned, class_name: 'User', optional:true
+  belongs_to :assigned, class_name: 'User', foreign_key: :user_id, optional:true #TODO remove
+  belongs_to :user, optional:true
   has_many :digital_signers
 
   delegate :name, :company, :company_id, to: :customer, allow_nil: true, prefix: true
