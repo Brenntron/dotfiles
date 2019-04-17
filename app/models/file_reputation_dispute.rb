@@ -66,6 +66,7 @@ class FileReputationDispute < ApplicationRecord
 
     bug_proxy = bugzilla_rest_session.create_bug(bug_attrs)
 
+
     customer = Customer.where(name: 'Dispute Analyst').first
     attributes = {
         id: bug_proxy.id,
@@ -235,8 +236,22 @@ class FileReputationDispute < ApplicationRecord
     Rails.logger.error("Error updating threatgrid score on id #{self.id} -- #{except.error_message}")
   end
 
+  def update_ticode_certs
+    certificates = Ticloud::FileAnalysis.certificates(self.sha256_hash)
+
+    if certificates&.any?
+      certificates.each do |certificate|
+        digital_signers.create(issuer: certificate['issuer'],
+                               subject: certificate['test'],
+                               valid_from: certificate['valid_from'],
+                               valid_to: certificate['valid_to'])
+      end
+    end
+  end
+
   def update_scores
     update_threadgrid_score
+    update_ticode_certs
   end
 
   def ack_create(envelope_params, sender_params)
