@@ -8347,9 +8347,11 @@ hr.thin.form-divider {
     }
   }
 
-  // sha256 are long strings, using textarea to safely handle char length
-  textarea {
-    min-height: 50px;
+  // need to allow multiple (up to 100) shas at a time here
+  textarea#shas_list {
+    font-family: 'Fira Mono', monospace;
+    font-size: 11.5px;
+    min-height: 200px;
   }
 
   // radio button padding tweaks
@@ -8695,14 +8697,6 @@ button.secondary.view-report-external-button {
     float: right;
   }
 
-
-  // for the nav button labels, this is where we ensure labels can break and wrap if squeezed tight enough
-  #nav-banner .nav-tool-blocks.dropdown a, #nav-banner .nav-tool-blocks.dropdown a:hover {
-    display: inline-block !important;
-    width: 100%;
-    height: 100%;
-  }
-
   // file rep navbar specific styles - minor width adjustments, col-lg-1 is too tight, col-lg-2 too wide
   @media screen and (min-width: 1200px) {
     .col-lg-1.nav-naming-guide, .col-lg-1.nav-new-ticket {
@@ -8800,7 +8794,6 @@ button.secondary.view-report-external-button {
 .tooltipster-sidetip .tooltipster-box {
   max-width: 410px !important;
 }
-
 
 .data-report-wrapper hr.thin {
   margin-top: 10px;
