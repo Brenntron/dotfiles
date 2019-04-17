@@ -165,11 +165,6 @@ $ ->
 
     shas_array = shas_full_text.split(/[\s,;]+/)
 
-    # below this line is for form validation
-    i = undefined
-    curr_sha_object = {}
-    regexp = /^[0-9A-Fa-f]+$/
-
     if shas_array
       console.log "SHAS LIST HERE: " + shas_array + '\n'
       console.log '# OF SHA(s): \n' + shas_array.length + '\n'
@@ -178,6 +173,10 @@ $ ->
 
 #     # review below, I feel this form validation (empty lines or hex)
 #     # should be in a separate ticket, or its extraneous
+
+#    i = undefined
+#    curr_sha_object = {}
+#    regexp = /^[0-9A-Fa-f]+$/
 
 #      while i < shas_array.length
 #        if shas_array[i] == ''
