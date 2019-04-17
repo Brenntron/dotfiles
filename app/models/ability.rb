@@ -78,7 +78,7 @@ class Ability
     end
 
     if role_names.include?('filerep user')
-      can :manage, FileReputationDispute
+      can :manage, [FileReputationDispute, DisputeEmail]
     end
 
     if role_names.include?('ips escalator manager')

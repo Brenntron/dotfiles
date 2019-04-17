@@ -1209,7 +1209,7 @@ thead th.sorting.center {
   }
 
   .modal-content {
-    border: 2px solid #f2f2f2;
+    border: 2px solid $faint-neutral-color;
     border-radius: 2px;
   }
 }
@@ -1915,6 +1915,11 @@ a.static-nav-item {
 .icon-submit{background-image: url("icon_submit_arrow.svg")}
 .icon-custom-star {background-image: url(image_path('icon_customer_star.svg'));}
 .icon-guest-user {background-image: url(image_path('icon_guest_grey.svg'));}
+.icon-talos-sandbox {background-image: url(image_path('icon_sandbox2.svg'));}
+.icon-threat-grid {background-image: url(image_path('icon_grid.svg'));}
+.icon-reversing-labs {background-image: url(image_path('icon_reverse.svg'));}
+.icon-show-as-columns {background-image: url(image_path('icon_vertical.svg'));}
+.icon-show-as-stacked {background-image: url(image_path('icon_horizontal.svg'));}
 
 .saved-search {
   text-transform: none !important;
@@ -2162,8 +2167,8 @@ a.static-nav-item {
 }
 
 .content-row {
-  border-top: 2px solid #f2f2f2;
-  border-bottom: 2px solid #f2f2f2;
+  border-top: 2px solid $faint-neutral-color;
+  border-bottom: 2px solid $faint-neutral-color;
   width: 100%;
   padding: 4px 0;
   min-height: 34px;
@@ -4268,6 +4273,8 @@ button.tertiary {
 .icon-reports {background-image: url(image_path('icon_reports.svg'));}
 .icon-new-white {background-image: url(image_path('icon_new_white.svg'));}
 .icon-categorize-white {background-image: url(image_path('icon_categorize_white.svg'));}
+.icon-naming-white {background-image: url(image_path('icon_naming_list_white2.svg'));}
+.icon-notes {background-image: url(image_path('icon_status_comment.svg'));}
 
 .remove-input {
   background-image: url(image_path('icon_minus_blue.svg'));
@@ -5022,7 +5029,7 @@ input.table-entry-input:focus {
 }
 
 #top_bar_extended_info .col-with-divider {
-  border-right-color: #f2f2f2;
+  border-right-color: $faint-neutral-color;
 }
 
 #top_bar_toggle {
@@ -5857,7 +5864,7 @@ td.ticket-total::before {
   display: flex;
   margin: 6% 0;
   padding-top: 1%;
-  border-top: 1px solid #f2f2f2;
+  border-top: 1px solid $faint-neutral-color;
 }
 #index-edit-ticket-status-dropdown .radio-label, #index-edit-entry-status-dropdown .radio-label {
   margin-top: 6px;
@@ -5962,18 +5969,40 @@ td.ticket-total::before {
   height: 20px;
 
 }
+td.in_zoo{
+  text-align: center;
+}
 .container-important-tags{
   display: inline-flex;
 }
 .highlight-second-review .important-flag-col span {
   display: block;
 }
+.font-weight-bold{
+  font-weight: bold;
+}
+code.file_rep_sha{
+  color:$type-base-color;
+  font-family: 'Fira Mono', monospace;
+  line-height: 1.5em;
+  padding: 0 5px;
+  font-weight: 400;
+  background-color:$faint-neutral-color;
+  white-space: normal;
+  overflow: hidden;
+  width: 90%;
+  text-overflow: ellipsis;
+  display: inline-block;
+}
 
 .ticket-age-over3hr {
   color: $warning-accent-color;
   font-weight: bold;
 }
-
+.malicious {
+  color: $warning-accent-color;
+  font-weight: 600;
+}
 .overdue {
   color: $second-section-color;
   font-weight: bold;
@@ -6799,7 +6828,7 @@ table#duplicates a {
 }
 
 .bug-tabs .nav-tabs li a {
-  background-color: #f2f2f2 !important;
+  background-color: $faint-neutral-color!important;
 }
 
 .bug-tabs .nav-tabs li.active a {
@@ -8278,6 +8307,104 @@ hr.thin.form-divider {
   background-color: $content-bg-color;
 }
 
+// dbinebri: the new ticket file rep container needs to be wide to handle huge sha256 strings
+.escalations--file_rep--disputes-controller .nav-tools-dropdown {
+  min-width: 540px;
+  margin-left: 35px;
+}
+
+// dbinebri: file reputation - new ticket specific styles inside the new ticket container
+.escalations--file_rep--disputes-controller .dropdown-menu #new-file-rep-form {
+
+  // radio specific styles
+  .file-rep-radio-wrapper {
+    input[type="radio"] {
+      border: none;
+      outline: none;
+      width: unset;
+    }
+
+    .radio-label {
+      font-size: 8pt;
+      padding-left: 8px;
+    }
+  }
+
+  // file rep new ticket text input styles
+  input {
+    margin-bottom: 8px;
+    background-color: transparent;
+    border: 1px solid darken($faint-neutral-color, 5%);
+    border-radius: 1px;
+    min-width: unset;
+    padding: 5px;
+
+    &:focus {
+      background-color: $faint-alt-highlight;
+      border: 3px solid $content-bg-color;
+      outline: 1px solid darken($faint-neutral-color, 5%);
+      padding: 3px;
+    }
+  }
+
+  // sha256 are long strings, using textarea to safely handle char length
+  textarea {
+    min-height: 50px;
+  }
+
+  // radio button padding tweaks
+  .pad-horiz-small {
+    padding-right: 2px;
+
+    &:last-of-type {
+      padding-left: 2px;
+    }
+  }
+
+  #file-rep-assignee {
+    padding-left: 10px;
+
+    &:focus {
+      padding-left: 8px;
+    }
+  }
+
+
+  // this attachment button/icon should be hidden on page load and
+  // displayed when radio button clicked, js/jquery handles this display logic
+  .file-rep-attachment button {
+    width: 18px;
+    height: 18px;
+    background-color: transparent;
+    border: none;
+  }
+
+  // minor positioning for the attachment icon
+  .attachment-label {
+    position: relative;
+    top: 3px;
+    left: 4px;
+  }
+
+  // tiny firefox fix
+  @-moz-document url-prefix() {
+    .attachment-label {
+      top: -3px;
+    }
+  }
+
+  hr.thin {
+    margin-top: 10px;
+    margin-bottom: 10px;
+
+    &:last-of-type {
+      margin-top: 30px;
+      margin-bottom: 20px;
+    }
+  }
+
+}
+
 .top-case-info h4 {
   text-transform: uppercase;
   font-weight: 700 !important;
@@ -8441,4 +8568,263 @@ hr.thin.form-divider {
 
 .toolbar .plain-inline-dropdown-wrapper div {
   //padding: 0;
+}
+
+
+.research-data-header {
+  font-weight: 700;
+  color: $type-lighter-color;
+  margin-top: 14px;
+  padding-bottom: 4px;
+  border-bottom: 4px solid;
+  background-repeat: no-repeat;
+  padding-left: 32px;
+  background-size: 24px 24px;
+  background-position: left -2px;
+}
+
+.sandbox-header {
+  border-bottom-color: $warning-accent-color;
+  background-image: url(image_path('icon_sandbox2.svg'));
+}
+
+.threatgrid-header {
+  border-bottom-color: $communication-accent-color;
+  background-image: url(image_path('icon_grid.svg'));
+}
+
+.reversing-labs-header {
+  border-bottom-color: $success-color;
+  background-image: url(image_path('icon_reverse.svg'));
+}
+
+.sample-present-true, .sample-present-false {
+  width: 30px;
+  height: 40px;
+  background-repeat: no-repeat;
+  position: absolute;
+  display: block;
+  right: 12px;
+  top: 10px;
+}
+
+.sample-present-true {background-image: url(image_path('icon_check_grey.svg'));}
+.sample-present-false {background-image: url(image_path('icon_cancel_grey.svg'));}
+
+.data-report-wrapper {
+  font-size: 8.5pt;
+  margin-top: 20px;
+}
+
+.data-report-label {
+  width: 100%;
+  text-transform: uppercase;
+  font-weight: 700;
+  color: $type-lighter-color;
+  padding-bottom: 5px;
+}
+
+.data-report-score {
+  font-weight: 700;
+  font-size: 14pt;
+}
+
+button.secondary.view-report-external-button {
+  font-size: 9pt;
+  padding: 10px 12px 10px 28px;
+  margin: 1px 0 0 0;
+  background-size: 18px 18px;
+  background-repeat: no-repeat;
+  background-position: 6px 6px;
+  background-image: url(image_path('icon_export_white.svg'));
+}
+
+.text-right .content-label-sm {
+  margin-right: 0;
+}
+
+.toolbar-select-wrapper .toolbar-button-text {
+  padding-left: 22px;
+  padding-right: 6px;
+  line-height: 1.65em;
+}
+
+// dbinebri: updates below for file rep navbar layout new
+.escalations--file_rep--disputes-controller {
+
+  .nav-tool-blocks.search-wrapper {
+    padding: 7px 7px 7px 40px;
+    text-align: left;
+  }
+
+  .input-group.search-group {
+    padding: 3px 3px 3px 5px;
+    margin: 0 0 0 40px;
+    width: 100%;
+    min-width: 200px;
+    max-width: 450px;
+  }
+
+  // search input field
+  .input-group.search-group .search-box {
+    height: 24px;
+    margin: 0px -3px;
+    padding-left: 30px;
+    padding-top: 0;
+    background-size: 20px;
+    background-position: 4px center;
+  }
+
+  // advanced search button
+  .input-group.search-group #advanced-search-button {
+    padding: 0 12px 0 18px;
+    height: 30px;
+  }
+
+  // adding the down caret icon using the sort_by svg for advanced search button
+  .input-group.search-group #advanced-search-button::after {
+    content: '';
+    display: block;
+    width: 16px;
+    height: 14px;
+    right: 0;
+    background-image: url(image_path('icon_sort_by.svg'));
+    background-repeat: no-repeat;
+    background-position: 30% 92%;
+    background-size: 26px 26px;
+    float: right;
+  }
+
+
+  // for the nav button labels, this is where we ensure labels can break and wrap if squeezed tight enough
+  #nav-banner .nav-tool-blocks.dropdown a, #nav-banner .nav-tool-blocks.dropdown a:hover {
+    display: inline-block !important;
+    width: 100%;
+    height: 100%;
+  }
+
+  // file rep navbar specific styles - minor width adjustments, col-lg-1 is too tight, col-lg-2 too wide
+  @media screen and (min-width: 1200px) {
+    .col-lg-1.nav-naming-guide, .col-lg-1.nav-new-ticket {
+      width: 12%;
+    }
+    // below ensures the navbar widths adds up correctly
+    .col-lg-2.nav-username {
+      width: 17%;
+    }
+  }
+
+  // dbinebri: the tooltips for file rep get too wide, limit the max-width
+  .tooltipster-sidetip {
+    max-width: 410px !important;
+  }
+}
+
+ //dbinebri: file rep - naming guide dialog specific styles here
+.escalations--file_rep--disputes-controller .ui-dialog[aria-describedby=dialog-naming-guide] {
+  margin-top: 60px;
+  margin-right: 20px;
+  border-radius: 5px;
+  border: 0;
+  box-shadow: 0 5px 15px rgba(0, 0, 0, 0.2);
+
+  .ui-dialog-titlebar {
+    font-family: 'Open Sans', sans-serif;
+    font-weight: 600;
+    padding-left: 40px;
+    background-image: url(image_path('icon_naming_list_white2.svg'));
+    background-size: 20px 20px;
+    background-repeat: no-repeat;
+    background-position: 10px center;
+  }
+}
+
+#dialog-naming-guide {
+  font-family: 'Open Sans', sans-serif;
+  padding: 10px;
+  table th {
+    text-transform: uppercase;
+    font-weight: bold;
+    font-size: 13px;
+    &:last-of-type {
+      padding-right: 15px;
+      button.close {
+        background-image: url(image_path('icon_cancel_white.svg'));
+        background-position: center center;
+        top: 10px;
+        right: 10px;
+        color: #444;
+        font-weight: normal;
+        font-size: 19px;
+      }
+    }
+  }
+  table td {
+    padding-top: 10px;
+    font-weight: 500;
+    font-size: 10px;
+    color: darken($type-lighter-color, 5%);
+
+    // "pattern" column below needs special code formatting
+    &:first-of-type {
+      span {
+        font-family: 'Fira Mono', monospace;
+        font-weight: 500;
+        background: darken($content-bg-color, 5%);
+        letter-spacing: 0.1px;
+      }
+      table th {
+        text-transform: uppercase;
+        font-weight: bold;
+        font-size: 13px;
+      }
+      table td {
+        padding-top: 10px;
+        font-weight: normal;
+        font-size: 10px;
+        color: $type-lighter-color;
+
+        // pattern column below needs special formatting
+        &:first-of-type span {
+          font-weight: bold;
+          background: darken($content-bg-color, 5%);
+        }
+      }
+    }
+  }
+
+}
+
+
+// dbinebri: the tooltips for modals on file rep get too wide, limit the max-width a little bit
+.tooltipster-sidetip .tooltipster-box {
+  max-width: 410px !important;
+}
+
+
+.data-report-wrapper hr.thin {
+  margin-top: 10px;
+}
+
+.data-report-table {
+  font-size: 8pt;
+}
+
+.data-report-table > tbody > tr > td, .data-report-table > thead > tr > th  {
+  padding: 4px 4px;
+}
+
+.data-report-code-content {
+  padding: 8px 6px;
+  font-family: "Fira Mono", monospace;
+  border-radius: 0;
+  line-height: 1.25em;
+}
+
+.tg-data-present, .tg-data-missing {
+  display: none;
+}
+
+.tg-data-missing, .sandbox-data-missing, .rl-data-missing {
+  margin-top: 40px;
 }
