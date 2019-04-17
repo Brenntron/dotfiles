@@ -106,25 +106,58 @@ $ ->
       std_api_error(response, "There was a problem retrieving data from Reversing Labs", reload: false)
   )
 
+
+
   # Sandbox - get runid from file hash
+  $('#sb-loader').show()
   std_msg_ajax(
     method: 'GET'
-    url: "/escalations/api/v1/escalations/filerep/sandbox_api/sandbox_latest_report/" + sha256_hash
+    url: "/escalations/api/v1/escalations/file_rep/sandbox_api/sandbox_latest_report/" + sha256_hash
     success_reload: false
     success: (response) ->
-      console.log response
+      report_present = $('#sandbox-report-wrapper').find('.sb-data-present')[0]
+      report_missing = $('#sandbox-report-wrapper').find('.sb-data-missing')[0]
+      run_id = response.json.data.runid
+
+      # This sha has not been run in the talos sandbox
+      unless run_id?
+        $('#sb-loader').hide()
+        $(report_present).hide()
+        $(report_missing).show()
+      else
+        # Send runid to sandbox
+        window.get_sandbox_report(run_id, sha256_hash)
+
     error: (response) ->
+      $('#sb-loader').hide()
       std_api_error(response, "There was a problem retrieving data from Talos Sandbox", reload: false)
   )
 
-  # Sandbox report api
-#  std_msg_ajax(
-#    method: 'POST'
-#    url: "/escalations/api/v1/escalations/filerep/sandbox_report/"
-#    data: {sha256_hash: sha256_hash}
-#    success_reload: false
-#    success: (response) ->
-#      console.log response
-#    error: (response) ->
-#      std_api_error(response, "There was a problem retrieving data from Talos Sandbox.", reload: false)
-#  )
+
+# Sandbox report api, get full report (json) from runid returned from the sandbox
+window.get_sandbox_report = (runid, sha) ->
+  report_present = $('#sandbox-report-wrapper').find('.sb-data-present')[0]
+  report_missing = $('#sandbox-report-wrapper').find('.sb-data-missing')[0]
+
+  console.log runid
+  std_msg_ajax(
+    method: 'GET'
+    url: "/escalations/api/v1/escalations/file_rep/sandbox_api/sandbox_report/" + runid + '/' + sha
+    success_reload: false
+    success: (response) ->
+      sb_report = response.json.data
+      $('#sb-loader').hide()
+      $(report_present).show()
+      $(report_missing).hide()
+
+      # Load the top data
+      $('#sb-run-date').text(sb_report.date)
+      $('#sb-run-status').text(sb_report.status)
+      $('#sb-score').text(sb_report.score)
+
+      console.log sb_report
+
+    error: (response) ->
+      $('#sb-loader').hide()
+      std_api_error(response, "There was a problem retrieving data from Talos Sandbox", reload: false)
+  )

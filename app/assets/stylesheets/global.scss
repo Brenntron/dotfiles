@@ -8822,11 +8822,11 @@ button.secondary.view-report-external-button {
   line-height: 1.25em;
 }
 
-.tg-data-present, .tg-data-missing, .rl-data-present, .rl-data-missing {
+.tg-data-present, .tg-data-missing, .rl-data-present, .rl-data-missing, .sb-data-present, .sb-data-missing {
   display: none;
 }
 
-.tg-data-missing, .sandbox-data-missing, .rl-data-missing {
+.tg-data-missing, .sb-data-missing, .rl-data-missing {
   margin-top: 40px;
 }
 
