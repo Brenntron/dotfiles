@@ -8307,7 +8307,7 @@ hr.thin.form-divider {
   background-color: $content-bg-color;
 }
 
-// dbinebri: the new ticket file rep container needs to be wide to handle huge sha256 strings
+// dbinebri: the new ticket file rep container needs to be wide and slightly positioned to the right
 .escalations--file_rep--disputes-controller .nav-tools-dropdown {
   min-width: 540px;
   margin-left: 35px;
@@ -8347,7 +8347,7 @@ hr.thin.form-divider {
     }
   }
 
-  // need to allow multiple (up to 100) shas at a time here
+  // new ticket: need to allow multiple (up to 100) shas at a time here
   textarea#shas_list {
     font-family: 'Fira Mono', monospace;
     font-size: 11.5px;

@@ -1,26 +1,50 @@
 # WIP for this coffee file
-#$ ->
-#  $('#new-file-rep-form').submit (e) ->
-#    e.preventDefault()
-#    $('#loader-modal').modal({
-#      backdrop: 'static',
-#      keyboard: false
-#    })
-#    shas_list = this.shas_list.value
-#    disposition_suggested = this.disposition_suggested.value
-#    assignee = this.assignee.value
-#
-#    std_msg_ajax(
-#      url: '/escalations/api/v1/escalations/file_rep/disputes'
-#      method: 'POST'
-#      data:
-#        shas_list: shas_list,
-#        suggested_disposition: suggested_disposition,
-#        assignee: assignee
-#      success: (response) ->
-#        $('#loader-modal').modal 'hide'
-#        std_msg_success('File Reputation Dispute Created.', [], reload: true)
-#      error: (response) ->
-#        $('#loader-modal').modal 'hide'
-#        std_api_error(response, "File Reputation Dispute was not created.", reload: false)
-#    )
+# this file will pass the SHAs to the back-end
+$ ->
+
+  $('#new-file-rep-form').on 'submit', (e) ->
+    e.preventDefault()
+
+    shas_input_type = $('#shas_input_type').val()
+    shas_full_text = $('#shas_list').val()
+    disposition = $('#disposition_suggested').val()
+    assignee = $('#assignee').val()
+
+    shas_array = shas_full_text.split(/[\s,;]+/)
+
+    i = undefined
+    curr_sha_object = {}
+    regexp = /^[0-9A-Fa-f]+$/
+
+    if shas_array
+      console.log '# OF SHA(s): \n' + shas_array.length + '\n'
+
+      while i < shas_array.length
+        if shas_array[i] == ''
+          continue
+
+        else if regexp.test(shas_array[i])
+
+          # build this in back-end, this block below should probably be deleted
+          curr_sha_object =
+            sha: shas_array[i]
+            disposition_suggested: disposition
+            assignee: assignee
+          regexp.lastIndex = 0
+
+          console.log curr_sha_object
+
+        else if regexp.test(shas_array[i] == false)
+
+          regexp.lastIndex = 0
+          console.log 'this sha is BAD: ' + shas_array[i + '\n']
+
+        else
+          console.log 'Unknown error occured. Please try again.'
+
+    else
+      alert 'Hi there, please enter some SHAs to continue.'
+
+    return
+return
+
