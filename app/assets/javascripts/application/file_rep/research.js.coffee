@@ -45,12 +45,12 @@ $ ->
 
     error: (response) ->
       $('#tg-loader').hide()
-      std_api_error(response, "There was a problem retrieving data from ThreatGrid.", reload: false)
+      std_api_error(response, "There was a problem retrieving data from ThreatGrid", reload: false)
   )
 
 
 
-#  Call to reversing labs
+#  Send sha to reversing labs, get data
   $('#rl-loader').show()
   std_msg_ajax(
     method: 'GET'
@@ -103,19 +103,28 @@ $ ->
 
     error: (response) ->
       $('#rl-loader').hide()
-      std_api_error(response, "There was a problem retrieving data from Reversing Labs.", reload: false)
+      std_api_error(response, "There was a problem retrieving data from Reversing Labs", reload: false)
   )
 
-
-
-  # Sandbox report api
+  # Sandbox - get runid from file hash
   std_msg_ajax(
-    method: 'POST'
-    url: "/escalations/api/v1/escalations/filerep/sandbox_report/"
-    data: {sha256_hash: sha256_hash}
+    method: 'GET'
+    url: "/escalations/api/v1/escalations/filerep/sandbox_api/sandbox_latest_report/" + sha256_hash
     success_reload: false
     success: (response) ->
       console.log response
     error: (response) ->
-      std_api_error(response, "There was a problem retrieving data from Talos Sandbox.", reload: false)
+      std_api_error(response, "There was a problem retrieving data from Talos Sandbox", reload: false)
   )
+
+  # Sandbox report api
+#  std_msg_ajax(
+#    method: 'POST'
+#    url: "/escalations/api/v1/escalations/filerep/sandbox_report/"
+#    data: {sha256_hash: sha256_hash}
+#    success_reload: false
+#    success: (response) ->
+#      console.log response
+#    error: (response) ->
+#      std_api_error(response, "There was a problem retrieving data from Talos Sandbox.", reload: false)
+#  )
