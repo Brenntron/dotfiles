@@ -41,6 +41,10 @@
   .col-xs-12.col-sm-4#sandbox-report-wrapper
     %h2.research-data-header.sandbox-header Talos Sandbox
     #sb-loader
+      .inline-loader-wrapper
+        .gear-loader-wrapper
+          = inline_svg 'icon_gears_loader.svg', class: 'gears-loader'
+        %span.loader-msg Loading data...
     .sb-data-present
       %span.sample-present-true
       %div.data-report-wrapper
@@ -58,6 +62,13 @@
           .col-xs-4.text-right
             .data-report-score#sb-score
             %label.content-label-sm Sandbox Score
+    .sb-data-missing.text-center
+      %span.sample-present-false
+      %div.data-report-wrapper
+        %span.missing-data Not in Talos Sandbox
+        %br
+        %button.primary
+          Push and RunSample in Sandbox
 
 
   .col-xs-12.col-sm-4#threatgrid-report-wrapper

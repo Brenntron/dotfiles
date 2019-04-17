@@ -108,10 +108,6 @@ $ ->
 
 
 
-
-
-
-
   # Sandbox report api
   std_msg_ajax(
     method: 'POST'
