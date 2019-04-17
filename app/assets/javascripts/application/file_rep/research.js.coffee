@@ -139,7 +139,6 @@ window.get_sandbox_report = (runid, sha) ->
   report_present = $('#sandbox-report-wrapper').find('.sb-data-present')[0]
   report_missing = $('#sandbox-report-wrapper').find('.sb-data-missing')[0]
 
-  console.log runid
   std_msg_ajax(
     method: 'GET'
     url: "/escalations/api/v1/escalations/file_rep/sandbox_api/sandbox_report/" + runid + '/' + sha
@@ -155,7 +154,55 @@ window.get_sandbox_report = (runid, sha) ->
       $('#sb-run-status').text(sb_report.status)
       $('#sb-score').text(sb_report.score)
 
-      console.log sb_report
+
+      # Contacted information
+      contacted_ips = ""
+      contacted_domains = ""
+
+      if sb_report.contact.ips.length > 0
+        $(sb_report.contact.ips).each ->
+          contacted_ips += this.ip + '<br/>'
+        $('#sb-contacted-ips').append(contacted_ips)
+      else
+        $('#sb-contacted-ips').html('<span class="missing-data">No IPs contacted</span>')
+
+      if sb_report.contact.domainnames.length > 0
+        $(sb_report.contact.domainnames).each ->
+          contacted_domains += this.domainname + '<br/>'
+        $('#sb-contacted-domains').append(contacted_domains)
+      else
+        $('#sb-contacted-domains').html('<span class="missing-data">No domains contacted</span>')
+
+
+      # Dropped Files
+      dropped_files = sb_report.dropped_files
+      dropped_files_tables = ""
+      file_table = ""
+      unless dropped_files.length > 0
+        debugger
+        $('#sb-dropped-files-col').html('<span class="missing-data">No dropped files</span>')
+      else
+        $(dropped_files).each ->
+          file = this
+          file_table =
+            '<table class="vertical-data-report-table">' +
+            '<tr><th class="text-right">MD5</th><td class="code-wrap-col"><span class="code-snippet code-string-break">' + this.MD5 + '</span></td></tr>' +
+            '<tr><th class="text-right">SHA1</th><td class="code-wrap-col"><span class="code-snippet code-string-break">' + this.SHA1 + '</span></td></tr>' +
+            '<tr><th class="text-right">SHA256</th><td class="code-wrap-col"><span class="code-snippet code-string-break">' + this.SHA256 + '</span></td></tr>' +
+            '<tr><th class="text-right">mime</th><td>' + this.mime + '</td></tr>' +
+            '<tr><th class="text-right">path</th><td>' + this.path + '</td></tr>' +
+            '<tr><th class="text-right">size</th><td>' + this.size + '</td></tr>' +
+            '</table>'
+
+
+          console.log file_table
+          dropped_files_tables += file_table
+        $('#sb-dropped-files-col').append(dropped_files_tables)
+
+      console.log dropped_files
+
+
+#      console.log sb_report
 
     error: (response) ->
       $('#sb-loader').hide()
