@@ -154,7 +154,6 @@ $ ->
       document.execCommand("Copy");
 
 
-
 #  dbinebri: file rep form - new ticket jquery here
   $('#new-file-rep-form').on 'submit', (e) ->
     e.preventDefault()
@@ -166,35 +165,38 @@ $ ->
 
     shas_array = shas_full_text.split(/[\s,;]+/)
 
+    # below this line is for form validation
     i = undefined
     curr_sha_object = {}
     regexp = /^[0-9A-Fa-f]+$/
 
     if shas_array
+      console.log "SHAS LIST HERE: " + shas_array + '\n'
       console.log '# OF SHA(s): \n' + shas_array.length + '\n'
+      console.log "SUGGESTED DISPOSITION: \n" + disposition + "\n"
+      console.log "ASSIGNEE: \n" + assignee + "\n"
 
-      while i < shas_array.length
-        if shas_array[i] == ''
-          continue
+#     # review below, I feel this form validation (empty lines or hex)
+#     # should be in a separate ticket, or its extraneous
 
-        else if regexp.test(shas_array[i])
-
-          curr_sha_object =
-            sha: shas_array[i]
-            disposition_suggested: disposition
-            assignee: assignee
-          regexp.lastIndex = 0
-
-          console.log curr_sha_object
-
-        else if regexp.test(shas_array[i] == false)
-
-          regexp.lastIndex = 0
-          console.log 'this sha is BAD: ' + shas_array[i + '\n']
-
-        else
-          console.log 'Unknown error occured. Please try again.'
-
-    else
-      alert 'Hi there, please enter some SHAs to continue.'
-
+#      while i < shas_array.length
+#        if shas_array[i] == ''
+#          continue
+#
+#        else if regexp.test(shas_array[i])
+#
+#          curr_sha_object =
+#            sha: shas_array[i]
+#            disposition_suggested: disposition
+#            assignee: assignee
+#          regexp.lastIndex = 0
+#
+#          console.log curr_sha_object
+#
+#        else if regexp.test(shas_array[i] == false)
+#
+#          regexp.lastIndex = 0
+#          console.log 'This sha is incorrect: ' + shas_array[i + '\n']
+#
+#        else
+#          console.log 'Unknown error occured. Please try again.'
