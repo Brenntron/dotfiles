@@ -2,40 +2,20 @@ class Escalations::PeakeBridge::FileRepMessagesController < ApplicationControlle
   # skip_before_action :require_login
 
   def create
-    file_rep = FileReputationDispute.new
 
-    threat_score = nil
-    threatgrid_private = nil
-    if file_rep_params[:sha256_checksum].present?
-      threatgrid_response = Threatgrid::Search.query(file_rep_params[:sha256_checksum])
+    return_message = "Can't even"
+    return_success = false
 
-      threat_score = threatgrid_response['threat_score']
-      threatgrid_private = threatgrid_response['threatgrid_private']
+    certificates = Ticloud::FileAnalysis.certificates(file_rep_params[:sha256_checksum])
+
+    if certificates.any?
+      certificates.each do |certificate|
+        DigitalSigner.create(issuer: certificate['issuer'], subject: certificate['test'], 'valid-from': certificate['valid_from'], 'valid-to': certificate['valid_to'])
+      end
     end
-
-
-    summary = "New File Rep Dispute generated at #{DateTime.now.utc.strftime("%Y-%m-%d %H:%M")}"
-
-    full_description = %Q{
-          File name: #{file_rep_params[:file_name]};
-          SHA256 hash: #{file_rep_params[:sha256_hash]}
-    }
-
-    bug_attrs = {
-        'product' => 'Escalations Console',
-        'component' => 'FileRep',
-        'summary' => summary,
-        'version' => 'unspecified',
-        'description' => full_description,
-        'priority' => "P3",
-        'classification' => 'unclassified',
-    }
-
-    bug_proxy = bugzilla_rest_session.create_bug(bug_attrs)
 
     customer = find_or_create_customer
     attributes = {
-        id: bug_proxy.id,
         sha256_hash: file_rep_params[:sha256_hash],
         file_name: file_rep_params[:file_name],
         file_size: file_rep_params[:file_size],
@@ -49,14 +29,35 @@ class Escalations::PeakeBridge::FileRepMessagesController < ApplicationControlle
     }
     file_rep.assign_attributes(attributes)
 
-    if file_rep.save
-      sender_params[:addressee_id] = file_rep.id
-      sender_params[:addressee_status] = file_rep.status
-      Bridge::GenericAck.new(sender_params, addressee: envelope_params[:sender]).post
-      render plain: '"successfully created file rep"', status: :ok
+    message_payload = file_rep_params
+    message_payload[:bugzilla_rest_session] = bugzilla_rest_session
+    new_dispute = FileReputationDispute.process_bridge_payload(message_payload, customer_params)
+
+    if new_dispute.new_record?
+      error_messages = new_dispute.errors.full_messages.join('; ')
+      #render plain: "\"Error(s) creating file rep -- #{error_messages}\"", status: :internal_server_error
+      return_message = "Error(s) creating file rep -- #{error_messages}"
+      Rails.logger.error(return_message)
     else
-      error_messages = file_rep.errors.full_messages.join('; ')
-      render plain: "\"Error(s) creating file rep -- #{error_messages}\"", status: :internal_server_error
+      return_success = true
+      return_message = "successfully created file rep"
+
+      new_dispute.ack_create(envelope_params, sender_params)
+
+      # This is so the tests can stub out the `threaded?` method and test synchronously.
+      if FileReputationDispute.threaded?
+        Thread.new do
+          new_dispute.update_scores
+        end
+      else
+        new_dispute.update_scores
+      end
+    end
+
+    if return_success
+      render plain: return_message, status: :ok
+    else
+      render plain: return_message, status: :internal_server_error
     end
   end
 
@@ -79,14 +80,7 @@ class Escalations::PeakeBridge::FileRepMessagesController < ApplicationControlle
     params.require(:message).require(:file_rep).fetch(:customer, {}).permit(:email, :name, :company_name)
   end
 
-  def find_or_create_customer
-    args = customer_params
-    if customer_params['email'].present?
-      Customer.find_or_create_customer(customer_email: args['email'],
-                                       name: args['name'],
-                                       company_name: args['company_name'])
-    else
-      nil
-    end
+  def bugzilla_rest_session
+    BugzillaRest::Session.default_session
   end
 end

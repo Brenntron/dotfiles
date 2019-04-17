@@ -8801,10 +8801,11 @@ button.secondary.view-report-external-button {
 
 .data-report-table {
   font-size: 8pt;
+  margin-top: 5px;
 }
 
 .data-report-table > tbody > tr > td, .data-report-table > thead > tr > th  {
-  padding: 4px 4px;
+  padding: 6px 6px;
 }
 
 .data-report-code-content {
@@ -8814,10 +8815,57 @@ button.secondary.view-report-external-button {
   line-height: 1.25em;
 }
 
-.tg-data-present, .tg-data-missing {
+.tg-data-present, .tg-data-missing, .rl-data-present, .rl-data-missing {
   display: none;
 }
 
 .tg-data-missing, .sandbox-data-missing, .rl-data-missing {
   margin-top: 40px;
+}
+
+
+
+// Reversing labs styles
+.scanner-mal {
+  color: $second-section-color;
+  font-weight: 600;
+}
+
+.scanner-mal::before {
+  content: '';
+  display: block;
+  float: left;
+  background-repeat: no-repeat;
+  background-image: url(image_path('icon_malicious.svg'));
+  width: 18px;
+  height: 18px;
+  margin-top: -4px;
+  margin-bottom: -4px;
+  margin-right: 4px;
+}
+
+.scanner-unk {
+  padding-left: 28px !important;
+  color: $type-lighter-color;
+}
+
+.inline-loader-wrapper {
+  display: block;
+  position: relative;
+  width: 170px;
+  margin: auto;
+  .loader-msg {
+    display: inline-block;
+    margin-top: 14px;
+    font-style: italic;
+    float: left;
+  }
+  .gear-loader-wrapper {
+    float: left;
+    margin-right: 5px;
+  }
+}
+
+#rl-loader, #tg-loader, #sb-loader {
+  width: 100%;
 }
