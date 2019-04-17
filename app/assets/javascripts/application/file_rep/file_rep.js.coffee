@@ -179,6 +179,3 @@ $ ->
       selection.addRange(range);
       document.execCommand("Copy");
 
-    $(document).on 'click', '.saved-search', () ->
-      localStorage.search_type = 'named'
-
