@@ -6,29 +6,6 @@ class Escalations::PeakeBridge::FileRepMessagesController < ApplicationControlle
     return_message = "Can't even"
     return_success = false
 
-    certificates = Ticloud::FileAnalysis.certificates(file_rep_params[:sha256_checksum])
-
-    if certificates.any?
-      certificates.each do |certificate|
-        DigitalSigner.create(issuer: certificate['issuer'], subject: certificate['test'], 'valid-from': certificate['valid_from'], 'valid-to': certificate['valid_to'])
-      end
-    end
-
-    customer = find_or_create_customer
-    attributes = {
-        sha256_hash: file_rep_params[:sha256_hash],
-        file_name: file_rep_params[:file_name],
-        file_size: file_rep_params[:file_size],
-        sample_type: file_rep_params[:sample_type],
-        disposition_suggested: file_rep_params[:disposition_suggested],
-        source: file_rep_params[:source],
-        platform: file_rep_params[:platform],
-        threatgrid_score: threat_score,
-        threatgrid_private: threatgrid_private,
-        customer: customer
-    }
-    file_rep.assign_attributes(attributes)
-
     message_payload = file_rep_params
     message_payload[:bugzilla_rest_session] = bugzilla_rest_session
     new_dispute = FileReputationDispute.process_bridge_payload(message_payload, customer_params)
