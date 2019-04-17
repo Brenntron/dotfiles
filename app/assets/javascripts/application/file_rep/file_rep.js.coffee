@@ -154,7 +154,7 @@ $ ->
       document.execCommand("Copy");
 
 
-#  dbinebri: file rep form - new ticket jquery here
+  #  dbinebri: getting form inputs for new ticket here, back-end will need to parse through the sha list
   $('#new-file-rep-form').on 'submit', (e) ->
     e.preventDefault()
 
@@ -163,39 +163,5 @@ $ ->
     disposition = $('#disposition_suggested').val()
     assignee = $('#assignee').val()
 
+    # delimiters: split the shas by either newline/comma/tab/semi
     shas_array = shas_full_text.split(/[\s,;]+/)
-
-    if shas_array
-      console.log "SHAS LIST HERE: " + shas_array + '\n'
-      console.log '# OF SHA(s): \n' + shas_array.length + '\n'
-      console.log "SUGGESTED DISPOSITION: \n" + disposition + "\n"
-      console.log "ASSIGNEE: \n" + assignee + "\n"
-
-#     # review below, I feel this form validation (empty lines or hex)
-#     # should be in a separate ticket, or its extraneous
-
-#    i = undefined
-#    curr_sha_object = {}
-#    regexp = /^[0-9A-Fa-f]+$/
-
-#      while i < shas_array.length
-#        if shas_array[i] == ''
-#          continue
-#
-#        else if regexp.test(shas_array[i])
-#
-#          curr_sha_object =
-#            sha: shas_array[i]
-#            disposition_suggested: disposition
-#            assignee: assignee
-#          regexp.lastIndex = 0
-#
-#          console.log curr_sha_object
-#
-#        else if regexp.test(shas_array[i] == false)
-#
-#          regexp.lastIndex = 0
-#          console.log 'This sha is incorrect: ' + shas_array[i + '\n']
-#
-#        else
-#          console.log 'Unknown error occured. Please try again.'
