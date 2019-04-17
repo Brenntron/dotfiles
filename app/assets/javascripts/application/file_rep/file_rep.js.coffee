@@ -5,7 +5,7 @@ $ ->
 
 
   window.build_data = () ->
-    current_url = window.location.href
+    
     if current_url.includes('disputes?f=')
 #      if the current url includes the above, it is a standard search'
       status_param_regex = /f=(.*)/
