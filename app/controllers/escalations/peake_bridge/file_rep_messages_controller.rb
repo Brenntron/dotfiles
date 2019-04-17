@@ -6,11 +6,14 @@ class Escalations::PeakeBridge::FileRepMessagesController < ApplicationControlle
     return_message = "Can't even"
     return_success = false
 
-    certificates = Ticloud::FileAnalysis.certificates(file_rep_params[:sha256_checksum])
+    certificates = Ticloud::FileAnalysis.certificates(file_rep_params[:sha256_hash])
 
-    if certificates.any?
+    if certificates&.any?
       certificates.each do |certificate|
-        DigitalSigner.create(issuer: certificate['issuer'], subject: certificate['test'], 'valid-from': certificate['valid_from'], 'valid-to': certificate['valid_to'])
+        DigitalSigner.create(issuer: certificate['issuer'],
+                             subject: certificate['test'],
+                             'valid_from': certificate['valid_from'],
+                             'valid_to': certificate['valid_to'])
       end
     end
 
