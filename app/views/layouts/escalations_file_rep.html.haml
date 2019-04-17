@@ -15,7 +15,7 @@
       %span{class: 'nav-toolbar-icon icon-filter-white'}
       Filter
     .dropdown-menu.nav-tools-dropdown#filter-dropdown{'aria-labelledby': 'filter-cases'}
-      %ul#filter-cases-list
+      %ul#filter-cases-list.file-rep-cases
         %li{class: ("selected" if params[:f] == "recently_viewed")}
           %a{href: '?f=recently_viewed'}
             %span.nav-dropdown-icon.icon-recently-viewed
@@ -133,10 +133,6 @@
 
 
     -##username= current_user.cvs_username
-
-
-
-
 
 
 = render template: "layouts/rocket"

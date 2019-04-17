@@ -1,52 +1,37 @@
 $ ->
 
   file_rep_url = $('#file-rep-datatable').data('source')
+  current_url = window.location.href
 
-  window.get_search_type = () ->
-    if !localStorage.search_type
-      localStorage.search_type = 'standard'
-    return localStorage.search_type
-
-  window.get_search_name = () ->
-
-    if localStorage.search_type = 'standard'
-
-      current_url = window.location.href
-      status_param_regex = /f=(.*)/
-      current_name = status_param_regex.exec(current_url)
-
-      if current_url.match('f=') && current_name
-       localStorage.search_name = current_name[1]
-      else
-        localStorage.search_name = 'all'
-
-    else if localStorage.search_type = 'named'
-      localStorage.search_name = $('#saved-search .saved-search').text()
-
-    return localStorage.search_name
-
-  window.get_search_condition = () ->
-      if localStorage.search_type = 'standard'
-        return ''
 
   window.build_data = () ->
+    current_url = window.location.href
+    if current_url.includes('disputes?f=')
+#      if the current url includes the above, it is a standard search'
+      status_param_regex = /f=(.*)/
+      search_type = 'standard'
+      search_name = status_param_regex.exec(current_url)[1]
+      console.log(search_type, search_name)
+      format_filerep_header(search_type, search_name)
+      return {
+        search_type: search_type
+        search_name : search_name
+      }
+    else
+      return
 
-    search_type = window.get_search_type()
-    search_name = window.get_search_name()
-    search_condition = window.get_search_condition()
-
-    return data =
-            search_type :'contains'
-            search_condition : '24bd06e29919ada7bab3f30a8e5048615a6273c0860ed2c3e1113e270720eecc'
-            search_name : 'search'
-
+  window.format_filerep_header = (search_type, search_name) ->
+    if search_type = 'standard'
+      search_name = search_name.replace(/_/g, " ")
+      new_header = 'Search Results for "<span class="text-capitalize">' + search_name + '</span>" tickets'
+    $('#filerep-index-title')[0].innerHTML = new_header
 
   $('#file-rep-datatable').dataTable
     processing: true
     serverSide: true
     ajax:
       url: file_rep_url
-#      data: window.build_data()
+      data: build_data()
     pagingType: 'full_numbers'
     columns: [
       {
