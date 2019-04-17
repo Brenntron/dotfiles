@@ -1,5 +1,13 @@
 class FileRepDatatable < AjaxDatatablesRails::ActiveRecord
 
+  def initialize(params, search_params, user:)
+    @user = user
+    @search_type = search_params['search_type']
+    @search_name = search_params['search_name']
+    @search_conditions = search_params['search_conditions']
+    super(params, {})
+  end
+
   def view_columns
     @view_columns ||= {
       id:                 { data: :id, source: 'FileReputationDispute.id', cond: :like },
@@ -29,9 +37,9 @@ class FileRepDatatable < AjaxDatatablesRails::ActiveRecord
       threatgrid_signer:  { data: :threatgrid_signer, source: 'FileReputationDispute.threatgrid_signer', cond: :like },
       reversing_labs_score: { data: :reversing_labs_score, source: 'FileReputationDispute.reversing_labs_score', cond: :like },
       reversing_labs_signer: { data: :reversing_labs_signer, source: 'FileReputationDispute.reversing_labs_signer', cond: :like },
-      # customer_name:      { data: :customer_name, source: 'FileReputationDispute.customer_name', cond: :like },
-      # customer_email:     { data: :customer_email, source: 'FileReputationDispute.customer_email', cond: :like },
-      # customer_company_name: { data: :customer_company_name, source: 'FileReputationDispute.customer_company_name', cond: :like },
+      customer_name:      { data: :customer_name, source: 'FileReputationDispute.customer_name', cond: :like },
+      customer_email:     { data: :customer_email, source: 'FileReputationDispute.customer_email', cond: :like },
+      customer_company_name: { data: :customer_company_name, source: 'FileReputationDispute.customer_company_name', cond: :like },
     }
   end
 
@@ -87,4 +95,12 @@ class FileRepDatatable < AjaxDatatablesRails::ActiveRecord
     FileReputationDispute.all
   end
 
+  def filter_records(records)
+
+    if @search_type
+      super.robust_search(@search_type, search_name: @search_name, params: @search_conditions, user: @user)
+    else
+      super
+    end
+  end
 end
