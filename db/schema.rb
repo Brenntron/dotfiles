@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 2019_04_11_153233) do
+ActiveRecord::Schema.define(version: 2019_04_16_172411) do
 
   create_table "alerts", options: "ENGINE=InnoDB DEFAULT CHARSET=utf8", force: :cascade do |t|
     t.datetime "created_at", null: false
@@ -20,16 +20,6 @@ ActiveRecord::Schema.define(version: 2019_04_11_153233) do
     t.integer "attachment_id", null: false
     t.string "policy"
     t.index ["test_group", "attachment_id", "rule_id"], name: "index_alerts_on_test_group_and_attachment_id_and_rule_id"
-  end
-
-  create_table "amp_false_positives", options: "ENGINE=InnoDB DEFAULT CHARSET=utf8", force: :cascade do |t|
-    t.integer "sr_id"
-    t.text "payload"
-    t.datetime "created_at", null: false
-    t.datetime "updated_at", null: false
-    t.bigint "file_reputation_ticket_id"
-    t.index ["file_reputation_ticket_id"], name: "index_amp_false_positives_on_file_reputation_ticket_id"
-    t.index ["payload"], name: "index_amp_false_positives_on_payload", length: 15
   end
 
   create_table "attachments", options: "ENGINE=InnoDB DEFAULT CHARSET=utf8", force: :cascade do |t|
@@ -291,6 +281,16 @@ ActiveRecord::Schema.define(version: 2019_04_11_153233) do
     t.index ["priority", "run_at"], name: "delayed_jobs_priority"
   end
 
+  create_table "digital_signers", options: "ENGINE=InnoDB DEFAULT CHARSET=utf8", force: :cascade do |t|
+    t.string "issuer"
+    t.string "subject"
+    t.datetime "valid_from"
+    t.datetime "valid_to"
+    t.integer "file_reputation_dispute_id"
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+  end
+
   create_table "dispute_comments", options: "ENGINE=InnoDB DEFAULT CHARSET=utf8", force: :cascade do |t|
     t.integer "dispute_id"
     t.text "comment"
@@ -322,6 +322,7 @@ ActiveRecord::Schema.define(version: 2019_04_11_153233) do
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
     t.datetime "email_sent_at"
+    t.integer "file_reputation_dispute_id"
     t.index ["dispute_id"], name: "index_dispute_emails_on_dispute_id"
   end
 
@@ -561,6 +562,7 @@ ActiveRecord::Schema.define(version: 2019_04_11_153233) do
     t.string "threatgrid_signer"
     t.float "reversing_labs_score"
     t.string "reversing_labs_signer"
+    t.bigint "user_id"
     t.string "resolution"
     t.string "detection_name"
     t.datetime "detection_created_at"
@@ -568,9 +570,10 @@ ActiveRecord::Schema.define(version: 2019_04_11_153233) do
     t.bigint "assigned_id"
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
-    t.bigint "user_id"
     t.boolean "threatgrid_private"
     t.boolean "has_sample"
+    t.datetime "case_closed_at"
+    t.datetime "case_responded_at"
     t.index ["assigned_id"], name: "index_file_reputation_disputes_on_assigned_id"
     t.index ["created_at"], name: "index_file_reputation_disputes_on_created_at"
     t.index ["customer_id"], name: "index_file_reputation_disputes_on_customer_id"
@@ -915,6 +918,8 @@ ActiveRecord::Schema.define(version: 2019_04_11_153233) do
     t.datetime "created_at"
     t.datetime "updated_at"
     t.string "bugzilla_api_key"
+    t.string "threatgrid_api_key"
+    t.string "sandbox_api_key"
     t.index ["cvs_username"], name: "index_users_on_cvs_username", unique: true
     t.index ["email"], name: "index_users_on_email", unique: true
     t.index ["lft"], name: "index_users_on_lft"

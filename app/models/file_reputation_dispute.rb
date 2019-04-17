@@ -3,16 +3,25 @@ class FileReputationDispute < ApplicationRecord
 
   belongs_to :customer, optional:true
   belongs_to :assigned, class_name: 'User', optional:true
+  has_many :digital_signers
 
   delegate :name, :company, :company_id, to: :customer, allow_nil: true, prefix: true
 
   STATUS_NEW                = 'NEW'
   STATUS_ASSIGNED           = 'ASSIGNED'
   STATUS_CLOSED             = 'CLOSED'
+  STATUS_REOPENED           = 'RE-OPENED'
+  STATUS_CUSTOMER_PENDING   = "CUSTOMER_PENDING"
+  STATUS_CUSTOMER_UPDATE    = "CUSTOMER_UPDATE"
 
   DISPOSITION_MALICIOUS     = 'MALICIOUS'
 
   validates :status, :file_name, :sha256_hash, :disposition_suggested, presence: true
+
+  # defined so tests can stub to return false.
+  def self.threaded?
+    true
+  end
 
   def update_status(status)
     self.update!(status: status)
@@ -56,6 +65,7 @@ class FileReputationDispute < ApplicationRecord
     }
 
     bug_proxy = bugzilla_rest_session.create_bug(bug_attrs)
+
 
     customer = Customer.where(name: 'Dispute Analyst').first
     attributes = {
@@ -211,5 +221,117 @@ class FileReputationDispute < ApplicationRecord
     else
       where({})
     end
+  end
+
+  def update_threadgrid_score
+    if self.sha256_hash.present?
+      threatgrid_response = Threatgrid::Search.query(self.sha256_hash)
+
+      self.threatgrid_score = threatgrid_response[:threat_score]
+      self.threatgrid_private = threatgrid_response[:threatgrid_private]
+      save!
+    end
+
+  rescue => except
+    Rails.logger.error("Error updating threatgrid score on id #{self.id} -- #{except.error_message}")
+  end
+
+  def update_ticode_certs
+    certificates = Ticloud::FileAnalysis.certificates(self.sha256_hash)
+
+    if certificates&.any?
+      certificates.each do |certificate|
+        digital_signers.create(issuer: certificate['issuer'],
+                               subject: certificate['test'],
+                               valid_from: certificate['valid_from'],
+                               valid_to: certificate['valid_to'])
+      end
+    end
+  end
+
+  def update_reversing_labs_score
+    score = 0
+    api_response = FileReputationApi::ReversingLabs.sha256_lookup(self.sha256_hash)
+
+    if api_response&.dig('rl','sample','xref','entries')&.any?
+      api_response&.dig('rl','sample','xref','entries')[0]&.dig('scanners').each do |scanner|
+        if !scanner['result'].empty?
+          score += 1
+        end
+      end
+    end
+
+    self.update(reversing_labs_score: score)
+  end
+
+  def update_scores
+    update_threadgrid_score
+    update_ticode_certs
+    update_reversing_labs_score
+  end
+
+  def ack_create(envelope_params, sender_params)
+    sender_params[:addressee_id] = self.id
+    sender_params[:addressee_status] = self.status
+    Bridge::GenericAck.new(sender_params, addressee: envelope_params[:sender]).post
+    true
+  rescue => except
+    Rails.logger.error("Error acknowledging File Reputation Dispute creation -- #{except.class.name} #{except.message}")
+    false
+  end
+
+  #for support with incoming bridge messages from TI coming into messages_controller
+  def self.process_bridge_payload(message_payload, customer_payload)
+    user = User.where(cvs_username:"vrtincom").first
+    begin
+      ActiveRecord::Base.transaction do
+
+        guest = Company.where(:name => "Guest").first
+        opened_at = Time.now
+        customer = Customer.process_and_get_customer(customer_payload)
+
+        bugzilla_rest_session = message_payload[:bugzilla_rest_session]
+
+        summary = "New File Reputation Reputation Dispute generated at #{DateTime.now.utc.strftime("%Y-%m-%d %H:%M")}"
+
+        full_description = <<~HEREDOC
+          File name: #{message_payload[:file_name]}
+          File Rep Sha: #{message_payload[:sha256_hash]}
+          
+
+        HEREDOC
+
+        bug_attrs = {
+            'product' => 'Escalations Console',
+            'component' => 'AMP Disputes',
+            'summary' => summary,
+            'version' => 'unspecified', #self.version,
+            'description' => full_description,
+            'priority' => 'Unspecified',
+            'classification' => 'unclassified',
+        }
+        logger.debug "Creating bugzilla bug"
+
+        bug_proxy = bugzilla_rest_session.create_bug(bug_attrs)
+
+        logger.debug "Creating dispute"
+        new_dispute = FileReputationDispute.new
+
+        new_dispute.id = bug_proxy.id
+        new_dispute.user_id = user.id
+        new_dispute.sha256_hash = message_payload[:sha256_hash]
+        new_dispute.status = STATUS_NEW
+        new_dispute.file_name = message_payload[:file_name]
+        new_dispute.customer_id = customer.id
+        new_dispute.file_size = message_payload[:file_size]
+        new_dispute.sample_type = message_payload[:sample_type]
+        new_dispute.disposition_suggested = message_payload[:disposition_suggested]
+        new_dispute.source = message_payload[:source]
+        new_dispute.platform = message_payload[:platform]
+
+        new_dispute.save
+        new_dispute
+      end #transaction
+    end #begin
   end
 end

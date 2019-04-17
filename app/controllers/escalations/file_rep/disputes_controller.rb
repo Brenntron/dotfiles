@@ -4,7 +4,9 @@ class Escalations::FileRep::DisputesController < ApplicationController
     respond_to do |format|
       format.html {  }
       format.json do
-        render json: FileRepDatatable.new(params, search_params.merge('search_conditions' => search_conditions), user: current_user)
+        render json: FileRepDatatable.new(params,
+                                          search_params.merge('search_conditions' => search_conditions),
+                                          user: current_user)
       end
     end
   end

@@ -11,8 +11,9 @@ $ ->
       status_param_regex = /f=(.*)/
       search_type = 'standard'
       search_name = status_param_regex.exec(current_url)[1]
-      console.log(search_type, search_name)
+
       format_filerep_header(search_type, search_name)
+
       return {
         search_type: search_type
         search_name : search_name
