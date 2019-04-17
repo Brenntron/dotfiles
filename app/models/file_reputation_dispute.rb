@@ -253,7 +253,7 @@ class FileReputationDispute < ApplicationRecord
     score = 0
     api_response = FileReputationApi::ReversingLabs.sha256_lookup(self.sha256_hash)
 
-    if api_response&.dig('rl','sample','xref','entries').any?
+    if api_response&.dig('rl','sample','xref','entries')&.any?
       api_response&.dig('rl','sample','xref','entries')[0]&.dig('scanners').each do |scanner|
         if !scanner['result'].empty?
           score += 1
