@@ -1,26 +1,35 @@
 $ ->
 
+
   file_rep_url = $('#file-rep-datatable').data('source')
   current_url = window.location.href;
 
-  window.refresh_filter = () ->
+  window.refresh_localStorage = () ->
     localStorage.removeItem('search_type')
     localStorage.removeItem('search_name')
     localStorage.removeItem('search_conditions')
 
+  window.refresh_url = () ->
     if current_url.includes('disputes?f=')
       new_url = current_url.split('?f=')[0]
       window.location.replace(new_url)
-    location.reload()
+    else
+      location.reload()
+
+  window.build_named_search = (search_name) ->
+    localStorage.search_type = 'named'
+    localStorage.search_name = search_name
+    localStorage.removeItem('search_conditions')
+
+    refresh_url()
+
+  window.build_contains_filerep = (contains) ->
+      refresh_localStorage()
+      refresh_url()
+
+
 
   window.build_advanced_data = () ->
-    if current_url.includes('disputes?f=')
-      new_url = current_url.split('?f=')[0]
-      console.log(new_url)
-      location.replace(new_url);
-
-    if current_url.search != ''
-      current_url.search = ''
 
     form = $('#filerep_disputes-advanced-search-form')
     localStorage.search_type = 'advanced'
@@ -49,11 +58,7 @@ $ ->
       customer_email: form.find('input[id="customer-email-input"]').val()
       customer_company_name: form.find('input[id="customer-company-input"]').val()
     )
-    if current_url.includes('disputes?f=')
-      new_url = current_url.split('?f=')[0]
-      window.location.replace(new_url)
-    else
-      location.reload()
+    refresh_url()
 
   window.build_data = () ->
     data = {
@@ -63,21 +68,17 @@ $ ->
 
     if current_url.includes('disputes?f=')
 #      if the current url includes the above, it is a standard search'
-      localStorage.removeItem('search_type')
-      localStorage.removeItem('search_name')
-      localStorage.removeItem('search_conditions')
-
       status_param_regex = /f=(.*)/
-
       data ={
         search_type : 'standard'
         search_name : status_param_regex.exec(current_url)[1]
       }
+
     else if localStorage.search_type
 
       {search_type, search_name, search_conditions} = localStorage
 
-      if localStorage.search_type == 'advanced'
+      if search_type == 'advanced'
         search_conditions = JSON.parse(search_conditions)
 
         if search_conditions.in_zoo
@@ -89,19 +90,29 @@ $ ->
             search_name: search_name
             search_conditions: search_conditions
           }
-      console.log(data)
+      else if search_type == 'named'
+        data = {
+          search_type: search_type
+          search_name: search_name
+        }
+
     format_filerep_header(data)
 
     return data
 
   window.format_filerep_header = (data) ->
-    console.log('in ')
+
     if data != undefined
       {search_type, search_name} = data
       if search_type == 'standard'
-        new_header = '<span class="text-capitalize">' + search_name.replace(/_/g, " ") + ' tickets </span>'
+        new_header = '<div><span class="text-capitalize">' + search_name.replace(/_/g, " ") + ' tickets </span><span id="refresh-filter-button" class="sync-button esc-tooltipped" title="Refresh Tickets Filter"></span></div>'
       else if search_type == 'advanced'
-        new_header = '<div>Results for Advanced Search <span id="refresh-filter-button" class="sync-button"></span></div>'
+        new_header = '<div>Results for Advanced Search <span id="refresh-filter-button" class="sync-button esc-tooltipped" title="Refresh Tickets Filter"></span></div>'
+      else if search_type == 'named'
+        new_header = '<div>Results for "' + search_name + '" Saved Search <span id="refresh-filter-button" class="sync-button esc-tooltipped" title="Refresh Tickets Filter"></span></div>'
+      else
+        new_header = 'All File Reputation Tickets'
+
       $('#filerep-index-title')[0].innerHTML = new_header
 
 
@@ -112,40 +123,68 @@ $ ->
     ajax:
       url: file_rep_url
       data: build_data()
+    order: [ [
+      16
+      'desc'
+    ] ]
     pagingType: 'full_numbers'
+    keys:
+      columns: ':not(:first-child)'
+    columnDefs: [
+      {
+        # Making checkbox row unorderable
+        targets: [ 0 ]
+        orderable: false
+        searchable: false
+      }
+      {
+        targets: [ 1 ]
+        className: 'id-col'
+      }
+      {
+        # Bolds the status
+        targets: [ 2 ]
+        className: 'font-weight-bold'
+      }
+    ]
     columns: [
       {
+        data:'id'
+        render: (data) ->
+          return '<input type="checkbox" onclick="toggleRow(this)" name="cbox" class="dispute_check_box" id="cbox' + data + '" value="' + data + '" />'
+      }
+      {
+#        need to zeropad this thing
         data: 'id'
-        className: 'font-weight-bold'
+        render: (data, type, full, meta) ->
+          return '<a href="/escalations/file_rep/disputes/' + data + '">' + parseInt(data).pad(6) + '</a>'
       }
+      { data: 'status' }
+      { data: 'resolution' }
       {
-        data: 'status'
-        className: 'font-weight-bold'
+        data: 'file_name'
+        render: (data, type, full, meta) ->
+          return '<a href="/escalations/file_rep/disputes/' + full['id'] + '">' + data + '</a>'
       }
-      {
-        data: 'resolution'
-      }
-      { data: 'file_name'}
       {
         data: 'sha256_hash'
-        render: (data) ->
-          return '<code id="' + data + '_sha" title="' + data + '" class="esc-tooltipped file_rep_sha">' + data + '</code>'
+        render: (data, type, full, meta) ->
+          return '<a href="/escalations/file_rep/disputes/' + full['id'] + '"><span id="' + data + '_sha" title="' + data + '" class="esc-tooltipped file_rep_sha">' + data + '</span></a>'
       }
       {
         data: 'file_size'
         render: (data) ->
-          return '<span>' + data + ' bytes </span>'
+          return data + ' bytes'
       }
       { data: 'sample_type'}
       {
         data: 'disposition'
-        className: 'text-capitalize'
         render: (data) ->
           data = data.toLowerCase()
           if data == 'malicious'
-            return '<span class="malicious">malicious</span>'
+            return '<span class="malicious text-capitalize">malicious</span>'
           else
-          return '<span>clean</span>'
+            return '<span class="text-capitalize">clean</span>'
       }
       {
         data: 'detection_name'
@@ -174,48 +213,42 @@ $ ->
       {
         data: 'sandbox_score'
         render: (data, type, full, meta) ->
-
           if full['sandbox_under'] == "false"
             return '<span class="overdue">' + data + '</span>'
           else
             return data
+
       }
       {
         data: 'threatgrid_score'
         render: (data, type, full, meta) ->
+
           if full['threatgrid_under'] == "false"
             return '<span class="overdue">' + data + '</span>'
           else
             return data
+
       }
       { data: 'reversing_labs_score'}
       {
         data: 'disposition_suggested'
-        className: 'text-capitalize'
         render: (data) ->
           data = data.toLowerCase()
           if data == 'malicious'
-            return '<span class="malicious">malicious</span>'
+            return '<span class="malicious text-capitalize">malicious</span>'
           else
-            return data
-
+            return '<span class="text-capitalize">clean</span>'
       }
       { data: 'created_at'}
       {
-#        submitter Type
+#        Submitter Type
         data: null
         render: () ->
-          return "<span>submitter Type</span>"
+          return "Submitter Type"
       }
-      {
-        data: 'customer_name'
-      }
-      {
-        data: 'customer_company_name'
-      }
-      {
-        data: 'customer_email'
-      }
+      { data: 'customer_name' }
+      { data: 'customer_company_name' }
+      { data: 'customer_email' }
       {
         data: 'assignee'
         className: "alt-col"
@@ -248,7 +281,8 @@ $ ->
     checkbox = $(this).find('input')
 
   $(document).on 'click', '#refresh-filter-button', (e) ->
-    refresh_filter()
+    refresh_localStorage()
+    refresh_url()
 
   $(document).on 'click ','.file_rep_sha', (e) ->
 #      copy SHA on click
@@ -260,3 +294,9 @@ $ ->
       selection.removeAllRanges();
       selection.addRange(range);
       document.execCommand("Copy");
+
+    Number::pad = (size) ->
+      s = String(this)
+      while s.length < (size or 2)
+        s = '0' + s
+      s

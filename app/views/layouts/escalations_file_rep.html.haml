@@ -59,7 +59,7 @@
               - current_user.named_searches.where('project_type = ? OR project_type IS ?', 'FileReputationDispute', nil).order(:id).each do |named_search|
                 %tr{id: "saved_search_#{named_search.id}"}
                   %td
-                    %a.input-truncate.saved-search.esc-tooltipped{onclick: "named_webrep_index_table('#{named_search.name}');", title: named_search.name}
+                    %a.input-truncate.saved-search.esc-tooltipped{onclick: "build_named_search('#{named_search.name}');", title: named_search.name}
                       = named_search.name
                     %a.delete-search{title: 'Delete Saved Search', onclick: "delete_disputes_named_search(this, '#{named_search.name}');"}
                       = image_tag('icon_cancel_grey.svg')
@@ -88,7 +88,7 @@
 
   .nav-tool-blocks.col-xs-3.col-sm-3.col-md-3.col-lg-5.search-wrapper
     .input-group.search-group#file-rep-search
-      = form_tag('/tickets', method: :get, onsubmit: 'call_contains_search(this);return false;') do
+      = form_tag('/tickets', method: :get, onsubmit: 'build_contains_filerep(this);return false;') do
         = text_field_tag 'case[id]', "#{}", class: 'search-box'
 
       %button#advanced-search-button.btn.btn-default.nav-tool-button.dropdown-toggle{'data-toggle': 'dropdown', 'aria-haspopup': 'true', 'aria-expanded': 'false'}
