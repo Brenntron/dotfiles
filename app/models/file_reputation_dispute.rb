@@ -3,6 +3,7 @@ class FileReputationDispute < ApplicationRecord
 
   belongs_to :customer, optional:true
   belongs_to :assigned, class_name: 'User', optional:true
+  has_many :digital_signers
 
   delegate :name, :company, :company_id, to: :customer, allow_nil: true, prefix: true
 
@@ -64,6 +65,7 @@ class FileReputationDispute < ApplicationRecord
     }
 
     bug_proxy = bugzilla_rest_session.create_bug(bug_attrs)
+
 
     customer = Customer.where(name: 'Dispute Analyst').first
     attributes = {
@@ -234,8 +236,38 @@ class FileReputationDispute < ApplicationRecord
     Rails.logger.error("Error updating threatgrid score on id #{self.id} -- #{except.error_message}")
   end
 
+  def update_ticode_certs
+    certificates = Ticloud::FileAnalysis.certificates(self.sha256_hash)
+
+    if certificates&.any?
+      certificates.each do |certificate|
+        digital_signers.create(issuer: certificate['issuer'],
+                               subject: certificate['test'],
+                               valid_from: certificate['valid_from'],
+                               valid_to: certificate['valid_to'])
+      end
+    end
+  end
+
+  def update_reversing_labs_score
+    score = 0
+    api_response = FileReputationApi::ReversingLabs.sha256_lookup(self.sha256_hash)
+
+    if api_response&.dig('rl','sample','xref','entries')&.any?
+      api_response&.dig('rl','sample','xref','entries')[0]&.dig('scanners').each do |scanner|
+        if !scanner['result'].empty?
+          score += 1
+        end
+      end
+    end
+
+    self.update(reversing_labs_score: score)
+  end
+
   def update_scores
     update_threadgrid_score
+    update_ticode_certs
+    update_reversing_labs_score
   end
 
   def ack_create(envelope_params, sender_params)

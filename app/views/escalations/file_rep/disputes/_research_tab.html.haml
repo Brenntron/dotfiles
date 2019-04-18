@@ -74,20 +74,22 @@
             %div.data-report-content.multi-col#sb-contacted-domains
         %hr.thin
         .row
-          .col-xs-12
+          .col-xs-12#sb-ioc-col
             %label.data-report-label Indicators of Compromise
+
         %hr.thin
         .row
           .col-xs-12#sb-dropped-files-col
             %label.data-report-label Dropped Files
-
+        %hr.thin
+        .row
+          .col-xs-12#sb-processes-col
+            %label.data-report-label Processes
         %hr.thin
         .row
           .col-xs-12
-            %label.data-report-label Processes
-
-
-
+            %label.data-report-label Full Json
+            %pre.data-report-code-content#sb-full
     .sb-data-missing.text-center
       %span.sample-present-false
       %div.data-report-wrapper
@@ -117,7 +119,6 @@
           .col-xs-4.text-right
             .data-report-score#tg-score
             %label.content-label-sm TG Score
-
         %hr.thin
         .row
           .col-xs-12

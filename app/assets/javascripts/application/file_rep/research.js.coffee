@@ -35,7 +35,7 @@ $ ->
         $('#tg-behaviors').append('<tbody>' + behaviors + '</tbody>')
 
         # Adding full json report in case it's needed
-        full_report = JSON.stringify(response, null, '\t')
+        full_report = JSON.stringify(response.json, null, '\t')
         $('#tg-full').text(full_report)
 
       else
@@ -155,7 +155,7 @@ window.get_sandbox_report = (runid, sha) ->
       $('#sb-score').text(sb_report.score)
 
 
-      # Contacted information
+      # Contacted ips and domains
       contacted_ips = ""
       contacted_domains = ""
 
@@ -174,16 +174,26 @@ window.get_sandbox_report = (runid, sha) ->
         $('#sb-contacted-domains').html('<span class="missing-data">No domains contacted</span>')
 
 
+      # Indicators of compromise (IOC's)
+      iocs = sb_report.ioc
+      unless iocs.length > 0
+        $('#sb-ioc-col').append('<span class="missing-data">No IOCs detected</span>')
+      else
+        ioc_table = '<table class="data-report-table"><thead><tr><th>Name</th><th class="text-center">Alerts</th></tr></thead><tbody>'
+        $(iocs).each ->
+          ioc_table += '<tr><td>' + this.name + '</td><td class="text-center overdue">' + this.alerts.length + '</td></tr>'
+        ioc_table += '</tbody></table>'
+        $('#sb-ioc-col').append(ioc_table)
+
+
       # Dropped Files
       dropped_files = sb_report.dropped_files
       dropped_files_tables = ""
       file_table = ""
       unless dropped_files.length > 0
-        debugger
         $('#sb-dropped-files-col').html('<span class="missing-data">No dropped files</span>')
       else
         $(dropped_files).each ->
-          file = this
           file_table =
             '<table class="vertical-data-report-table">' +
             '<tr><th class="text-right">MD5</th><td class="code-wrap-col"><span class="code-snippet code-string-break">' + this.MD5 + '</span></td></tr>' +
@@ -194,15 +204,36 @@ window.get_sandbox_report = (runid, sha) ->
             '<tr><th class="text-right">size</th><td>' + this.size + '</td></tr>' +
             '</table>'
 
-
-          console.log file_table
           dropped_files_tables += file_table
         $('#sb-dropped-files-col').append(dropped_files_tables)
 
-      console.log dropped_files
+
+      # Processes
+      processes = sb_report.processes
+      processes_tables = ""
+      process_table = ""
+      unless processes.length > 0
+        $('#sb-processes-col').html('<span class="missing-data">No processes</span>')
+      else
+        $(processes).each ->
+          process_table =
+            '<table class="vertical-data-report-table">' +
+            '<tr><th class="text-right">MD5</th><td class="code-wrap-col"><span class="code-snippet code-string-break">' + this.md5 + '</span></td></tr>' +
+            '<tr><th class="text-right">Name</th><td>' + this.name + '</td></tr>' +
+            '<tr><th class="text-right">PID</th><td>' + this.pid + '</td></tr>'
+          if this.pname?
+            process_table += '<tr><th class="text-right">pname</th><td>' + this.pname + '</td></tr>'
+          if this.ppid?
+            process_table += '<tr><th class="text-right">PPID</th><td>' + this.ppid + '</td></tr>'
+          process_table += '</table>'
+          processes_tables += process_table
+        $('#sb-processes-col').append(processes_tables)
 
 
-#      console.log sb_report
+      # Adding full json report in case it's needed
+      full_report = JSON.stringify(response.json, null, '\t')
+      $('#sb-full').text(full_report)
+      console.log sb_report
 
     error: (response) ->
       $('#sb-loader').hide()
