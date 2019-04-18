@@ -65,10 +65,11 @@ $ ->
       {
         data: 'disposition'
         render: (data) ->
-          if data == 'malicious'
-            return '<span class="malicious text-capitalize">Malicious</span>'
+          if data == 'Malicious'
+            data = '<span class="malicious text-capitalize">Malicious</span>'
           else
-            return '<span class="text-capitalize">' + data + '</span>'
+            data =  '<span class="text-capitalize">' + data + '</span>'
+          return data
       }
       {
         data: 'detection_name'
@@ -98,25 +99,25 @@ $ ->
         data: 'sandbox_score'
         render: (data, type, full, meta) ->
           if full['sandbox_under'] == "true"
-            data = '<span>' + data + '</span>'
+            data = '<span class="score-col text-center">' + parseInt(data) + '</span>'
           else
-            data = '<span class="overdue">' + data + '</span>'
+            data = '<span class="overdue score-col text-center">' + parseInt(data) + '</span>'
           return data
       }
       {
         data: 'threatgrid_score'
         render: (data, type, full, meta) ->
           if full['threatgrid_under'] == "true"
-            data = data
+            data = '<span class="score-col text-center">' + parseInt(data) + '</span>'
           else
-            data = '<span class="overdue">' + data + '</span>'
+            data = '<span class="overdue score-col text-center">' + parseInt(data) + '</span>'
           return data
       }
       { data: 'reversing_labs_score'}
       {
         data: 'disposition_suggested'
         render: (data) ->
-          if data == 'malicious'
+          if data == 'Malicious'
             data = '<span class="malicious text-capitalize">Malicious</span>'
           else
             data =  '<span class="text-capitalize">' + data + '</span>'
