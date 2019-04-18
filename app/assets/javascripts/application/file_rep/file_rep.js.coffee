@@ -1,11 +1,60 @@
 $ ->
 
   file_rep_url = $('#file-rep-datatable').data('source')
+  current_url = window.location;
 
-  $('#file-rep-datatable').dataTable
+  window.build_advanced_data = () ->
+    if current_url.search != ''
+      current_url.search = ''
+
+    form = $('#filerep_disputes-advanced-search-form')
+    localStorage.search_type = 'advanced'
+    localStorage.search_name = form.find('input[name="search_name"]').val()
+    localStorage.search_conditions = JSON.stringify(
+      id: form.find('input[id="caseid-input"]').val()
+      status: form.find('input[id="status-input"]').val()
+      resolution: form.find('input[id="resolution-input"]').val()
+      file_name: form.find('input[id="file-name-input"]').val()
+      sha256_hash: form.find('input[id="sha256-input"]').val()
+      file_size: form.find('input[id="file-size-input"]').val()
+      sample_type: form.find('input[id="sample-type-input"]').val()
+      disposition: form.find('input[id="amp-disposition-input"]').val()
+      detection_name: form.find('input[id="amp-detection-name-input"]').val()
+      assigned_id: form.find('input[id="assignee-input"]').val()
+      sandbox_score: form.find('input[id="sandbox-score-input"]').val()
+      threatgrid_score: form.find('input[id="tg-score-input"]').val()
+      in_zoo: form.find('input[id="in-sample-zoo-input"]:checked').val()
+      reversing_labs: form.find('input[id="reversing-labs-input"]').val()
+      disposition_suggested: form.find('input[id="suggested-disposition-input"]').val()
+      submitter_type: form.find('input[id="submitter-type-input"]').val()
+      customer_type: form.find('input[id="customer-type-input"]').val()
+      customer_name: form.find('input[id="customer-name-input"]').val()
+      customer_email: form.find('input[id="customer-email-input"]').val()
+      customer_company_name: form.find('input[id="customer-company-input"]').val()
+      created_at: form.find('input[id="time-submitted-input"]').val()
+      updated_at: form.find('input[id="last-updated-input"]').val()
+    )
+
+    $( '#file-rep-datatable' ).DataTable().ajax.reload()
+  window.get_search_name = () ->
+    
+  window.get_search_condition = () ->
+      if localStorage.search_type == 'advanced'
+        return JSON.parse(localStorage.search_conditions)
+      else
+        localStorage.search_conditions = ''
+
+  $('#file-rep-datatable').DataTable
     processing: true
     serverSide: true
-    ajax: file_rep_url
+    ajax:
+      url:file_rep_url
+      data: {
+        search_type: 'advanced'
+        search_name: 'closed'
+        search_condition: get_search_condition()
+      }
+
     pagingType: 'full_numbers'
     columns: [
       {
@@ -35,6 +84,7 @@ $ ->
         data: 'disposition'
         className: 'text-capitalize'
         render: (data) ->
+          data = data.toLowerCase()
           if data == 'malicious'
             return '<span class="malicious">malicious</span>'
           else
@@ -67,19 +117,17 @@ $ ->
       {
         data: 'sandbox_score'
         render: (data, type, full, meta) ->
-          if full['sandbox_under'] == "true"
-            data = '<span>' + data + '</span>'
+          if full['sandbox_under'] != "true"
+            return '<span class="overdue">' + data + '</span>'
           else
-            data = '<span class="overdue">' + data + '</span>'
-          return data
+            return data
       }
       {
         data: 'threatgrid_score'
         render: (data, type, full, meta) ->
-          if full['threatgrid_under'] == "true"
-            data = '<span>' + data + '</span>'
+          if full['threatgrid_under'] != "true"
+            return '<span class="overdue">' + data + '</span>'
           else
-            data = '<span class="overdue">' + data + '</span>'
           return data
       }
       { data: 'reversing_labs_score'}
@@ -87,6 +135,7 @@ $ ->
         data: 'disposition_suggested'
         className: 'text-capitalize'
         render: (data) ->
+          data = data.toLowerCase()
           if data == 'malicious'
             return '<span class="malicious">malicious</span>'
           else

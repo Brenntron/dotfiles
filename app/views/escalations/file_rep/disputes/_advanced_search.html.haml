@@ -1,0 +1,281 @@
+-#%form#search-webrep-cases-form{method: 'get', 'accept-charset': 'UTF-8'}
+-#=simple_form_for Dispute.new, url: escalations_webrep_disputes_path, class: 'escalations-search', method: :get do |dispute_form|
+-#THIS IS BEING POPULATED BY THE WEBREP DISPUTES PATH. Depending on what we're doing in the future, we may need to break this out into it's own endpoint
+= form_for :advanced_search, html: {id: 'filerep_disputes-advanced-search-form'}, url: escalations_file_rep_disputes_path, method: 'get', 'accept-charset': 'UTF-8' do |advanced_search_form|
+  .form-group.search-item
+    %label.content-label-sm Case IDs
+    %input.form-control#caseid-input{name: 'case_id', type:"number", min:"0"}
+    %button.remove-input
+  .form-group.search-item
+    %label.content-label-sm Status
+    %input.form-control#status-input{name: 'status', list: 'status-list'}
+    %datalist#status-list
+    %button.remove-input
+  .form-group.search-item
+    %label.content-label-sm Resolution
+    %input.form-control#resolution-input{name: 'resolution', list: 'resolution-list'}
+    %datalist#resolution-list
+    %button.remove-input
+  .form-group.search-item
+    %label.content-label-sm File Name
+    %input.form-control#file-name-input{name: 'file_name'}
+    %button.remove-input
+  .form-group.search-item.hidden
+    %label.content-label-sm SHA256
+    %input.form-control#sha256-input{name: 'SHA256'}
+    %button.remove-input
+  .form-group.search-item.hidden
+    %label.content-label-sm File Size
+    %input.form-control#file-size-input{name: 'file_size'}
+    %button.remove-input
+  .form-group.search-item.hidden
+    %label.content-label-sm Sample Type
+    %input.form-control#sample-type-input{name: 'sample_type'}
+    %button.remove-input
+  .form-group.search-item.hidden
+    %label.content-label-sm AMP Disposition
+    %input.form-control#amp-disposition-input{name: 'amp_disposition'}
+    %button.remove-input
+  .form-group.search-item.hidden
+    %label.content-label-sm AMP Detection Name
+    %input.form-control#amp-detection-name-input{name: 'amp_detection_name'}
+    %button.remove-input
+  .form-group.search-item.hidden
+    %label.content-label-sm AMP Detection Created
+    %input.form-control#amp-detection-created-input{name: 'amp_detection_created'}
+    %button.remove-input
+  .form-group.search-item.hidden
+    %label.content-label-sm Assignee
+    %input.form-control#assignee-input{name: 'assignee'}
+    %button.remove-input
+  .form-group.search-item.hidden
+    %label.content-label-sm Sandbox Score
+    %input.form-control.require-float#sandbox-score-input{name: 'sandbox_score', type:"number"}
+    %button.remove-input
+  .form-group.search-item.hidden
+    %label.content-label-sm TG Score
+    %input.form-control.require-float#tg-score-input{name: 'tg_score', type:"number"}
+    %button.remove-input
+  .form-group.search-item.hidden.in-sample-zoo_container
+    %label.content-label-sm In Sample Zoo
+    %input.form-control#in-sample-zoo-input{name: 'in_sample_zoo', type: 'checkbox', value: 'checked', for: 'in-sample-zoo'}
+    %button.remove-input
+  .form-group.search-item.hidden
+    %label.content-label-sm Reversing Labs
+    %input.form-control.require-float#reversing-labs-input{name: 'reversing_labs', type:"number"}
+    %button.remove-input
+  .form-group.search-item.hidden
+    %label.content-label-sm Suggested Disposition
+    %input.form-control#suggested-disposition-input{name: 'suggested_disposition'}
+    %button.remove-input
+  .form-group.search-item.hidden
+    %label.content-label-sm Submitter Type
+    %input.form-control#submitter-type-input{name: 'submitter_type'}
+    %button.remove-input
+  .form-group.search-item.hidden
+    %label.content-label-sm Customer Type
+    %input.form-control#customer-type-input{name: 'customer_type'}
+    %button.remove-input
+  .form-group.search-item.hidden
+    %label.content-label-sm Customer Name
+    %input.form-control#customer-name-input{name: 'customer_name'}
+    %button.remove-input
+  .form-group.search-item.hidden
+    %label.content-label-sm Customer Email
+    %input.form-control#customer-email-input{name: 'customer_email'}
+    %button.remove-input
+  .form-group.search-item.hidden
+    %label.content-label-sm Customer Company
+    %input.form-control#customer-company-input{name: 'customer_company'}
+    %button.remove-input
+  .form-group.search-item.hidden
+    %label.content-label-sm Time Submitted
+    %input.form-control#time-submitted-input{type: 'date', name: 'time_submitted'}
+    %button.remove-input
+  .form-group.search-item.hidden
+    %label.content-label-sm Last Updated
+    %input.form-control#last-updated-input{type: 'date',name: 'last_updated'}
+    %button.remove-input
+  .form-group.search-item.hidden#submission-type
+    %label.content-label-sm Submission Type
+    .radio-wrapper
+      .ticket-radio-button-wrapper
+        = advanced_search_form.check_box(:submission_type, {id: 'submission-type-w-cb', class: 'form-control', checked: 'checked'}, 'w')
+        %label.content-label-sm{for: 'submission-type-w-cb'} Web Tickets (W)
+      .ticket-radio-button-wrapper
+        = advanced_search_form.check_box(:submission_type, {id: 'submission-type-e-cb', class: 'form-control', checked: 'checked'}, 'e')
+        %label.content-label-sm{for: 'submission-type-e-cb'} Email Tickets (E)
+      .ticket-radio-button-wrapper
+        = advanced_search_form.check_box(:submission_type, {id: 'submission-type-ew-cb', class: 'form-control', checked: 'checked'}, 'ew')
+        %label.content-label-sm{for: 'submission-type-ew-cb'} Email/Web Tickets (EW)
+    %button.remove-input.remove-radio-input
+  .form-group.search-item.hidden
+    %label.content-label-sm Submitter Type
+    %input.form-control#submitter-input{name: 'submitter', list: 'submittertype-list'}
+    %datalist#submittertype-list
+    %button.remove-input
+  .form-group.search-item.hidden
+    %label.content-label-sm Contact Name
+    %input.form-control#name-input{name: 'contact-name', list: 'contactname-list'}
+    %datalist#contactname-list
+    %button.remove-input
+  .form-group.search-item.hidden
+    %label.content-label-sm Contact Email
+    %input.form-control#email-input{name: 'contact-email', list: 'contactemail-list'}
+    %datalist#contactemail-list
+    %button.remove-input
+  .form-group.search-item.hidden
+    %label.content-label-sm Company
+    %input.form-control#company-input{name: 'company', list: 'company-list'}
+    %datalist#company-list
+    %button.remove-input
+  .form-group.search-item.hidden
+    %label.content-label-sm Submitter Domain
+    %input.form-control#domain-input{name: 'domain'}
+    %button.remove-input
+  .form-group.search-item.hidden
+    %label.content-label-sm Date Submitted (Newer)
+    %input.form-control#submitted-newer-input{type: 'date', name: 'date-submitted-newer'}
+    %button.remove-input
+  .form-group.search-item.hidden
+    %label.content-label-sm Date Submitted (Older)
+    %input.form-control#submitted-older-input{type: 'date', name: 'date-submitted-older'}
+    %button.remove-input
+  .form-group.search-item.hidden
+    %label.content-label-sm Case Age (Newer) ex: 30d 12h
+    %input.form-control#age-newer-input{name: 'age'}
+    %button.remove-input
+  .form-group.search-item.hidden
+    %label.content-label-sm Case Age (Older) ex: 7d 12h
+    %input.form-control#age-older-input{name: 'age'}
+    %button.remove-input
+  .form-group.search-item.hidden
+    %label.content-label-sm Last Modified (Newer)
+    %input.form-control#modified-newer-input{type: 'date', name: 'date-modified-newer'}
+    %button.remove-input
+  .form-group.search-item.hidden
+    %label.content-label-sm Last Modified (Older)
+    %input.form-control#modified-older-input{type: 'date', name: 'date-modified-older'}
+    %button.remove-input
+
+  %button#add-search-items-button
+    Add Search Criteria
+  #search-criteria-options
+    .multicol-2
+      %ul
+        %li.hidden
+          %label.search-criteria-label
+            %input.search-checkbox#caseid-cb{type: 'checkbox', name: 'search-criteria', value: 'Case IDs', for: 'caseid-input'}
+            Case IDs
+        %li.hidden
+          %label.search-criteria-label
+            %input.search-checkbox#status-cb{type: 'checkbox', name: 'search-criteria', value: 'Status', for: 'status-input'}
+            Status
+        %li.hidden
+          %label.search-criteria-label
+            %input.search-checkbox#resolution-cb{type: 'checkbox', name: 'search-criteria', value: 'Resolution', for: 'resolution-input' }
+            Resolution
+        %li.hidden
+          %label.search-criteria-label
+            %input.search-checkbox#file-name-cb{type: 'checkbox', name: 'search-criteria', value: 'File Name', for: 'file-name-input' }
+            File Name
+        %li
+          %label.search-criteria-label
+            %input.search-checkbox#sha-cb{type: 'checkbox', name: 'search-criteria', value: 'SHA256', for: 'sha256-input'}
+            SHA256
+        %li
+          %label.search-criteria-label
+            %input.search-checkbox#disposition-cb{type: 'checkbox', name: 'search-criteria', value: 'File Size', for: 'file-size-input'}
+            File Size
+        %li
+          %label.search-criteria-label
+            %input.search-checkbox#sample-type-cb{type: 'checkbox', name: 'search-criteria', value: 'Sample Type', for: 'sample-type-input'}
+            Sample Type
+        %li
+          %label.search-criteria-label
+            %input.search-checkbox#amp-disposition-cb{type: 'checkbox', name: 'search-criteria', value: 'AMP Disposition', for: 'amp-disposition-input'}
+            AMP Disposition
+        %li
+          %label.search-criteria-label
+            %input.search-checkbox#amp-detection-name-cb{type: 'checkbox', name: 'search-criteria', value: 'AMP Detection Name', for: 'amp-detection-name-input'}
+            AMP Detection Name
+        %li
+          %label.search-criteria-label
+            %input.search-checkbox#amp-detection-created-cb{type: 'checkbox', name: 'search-criteria', value: 'AMP Detection Created', for: 'amp-detection-created-input'}
+            AMP Detection Created
+        %li
+          %label.search-criteria-label
+            %input.search-checkbox#assignee-cb{type: 'checkbox', name: 'search-criteria', value: 'Assignee', for: 'assignee-input'}
+            Assignee
+        %li
+          %label.search-criteria-label
+            %input.search-checkbox#sandbox-score-cb{type: 'checkbox', name: 'search-criteria', value: 'Sandbox Score', for: 'sandbox-score-input'}
+            Sandbox Score
+        %li
+          %label.search-criteria-label
+            %input.search-checkbox#tg-score-cb{type: 'checkbox', name: 'search-criteria', value: 'TG Score', for: 'tg-score-input'}
+            TG Score
+        %li
+          %label.search-criteria-label
+            %input.search-checkbox#in-sample-zoo-cb{type: 'checkbox', name: 'search-criteria', value: 'Date Submitted (Older)', for: 'in-sample-zoo-input'}
+            In Sample Zoo
+        %li
+          %label.search-criteria-label
+            %input.search-checkbox#reversing-labs-cb{type: 'checkbox', name: 'search-criteria', value: 'Reversing Labs', for: 'reversing-labs-input'}
+            Reversing Labs
+        %li
+          %label.search-criteria-label
+            %input.search-checkbox#suggested-disposition-cb{type: 'checkbox', name: 'search-criteria', value: 'Suggested Disposition', for: 'suggested-disposition-input'}
+            Suggested Disposition
+        %li
+          %label.search-criteria-label
+            %input.search-checkbox#submitter-type-cb{type: 'checkbox', name: 'search-criteria', value: 'Submitter Type', for: 'submitter-type-input'}
+            Submitter Type
+        %li
+          %label.search-criteria-label
+            %input.search-checkbox#customer-type-cb{type: 'checkbox', name: 'search-criteria', value: 'Customer Type', for: 'customer-type-input'}
+            Customer Type
+        %li
+          %label.search-criteria-label
+            %input.search-checkbox#customer-name-cb{type: 'checkbox', name: 'search-criteria', value: 'Customer Name', for: 'customer-name-input'}
+            Customer Name
+        %li
+          %label.search-criteria-label
+            %input.search-checkbox#customer-company-cb{type: 'checkbox', name: 'search-criteria', value: 'Customer Company', for: 'customer-company-input'}
+            Customer Company
+        %li
+          %label.search-criteria-label
+            %input.search-checkbox#time-submitted-cb{type: 'checkbox', name: 'search-criteria', value: 'Time Submitted', for: 'time-submitted-input'}
+            Time Submitted
+        %li
+          %label.search-criteria-label
+            %input.search-checkbox#last-updated-cb{type: 'checkbox', name: 'search-criteria', value: 'Last Updated', for: 'last-updated-input'}
+            Last Updated
+    .form-group.text-center
+      %button.primary#add-search-criteria
+        Add Search Criteria
+      %button.tertiary#cancel-add-criteria
+        Cancel
+
+  %hr.thin
+  .form-group
+    %label.content-label-sm
+      Add Name to save this search criteria to My Saved Searches
+    %input.form-control#search_name{name: 'search_name', :type => 'text', :maxlength => '50'}
+  .form-group.text-center
+    %button.primary#submit-advanced-search{type: 'button', value: 'submit', onclick: 'build_advanced_data()'}
+      Submit Search
+    %button.secondary#reset-advanced-search.reset{type: 'button', onclick: 'file_rep_reset_search()'}
+      Reset Search
+
+
+-#= simple_form_for Dispute.new, url: escalations_webrep_disputes_path, class: 'escalations-search', method: :get do |dispute_form|
+-#  = dispute_form.input :search_type, as: :hidden, input_html: {value: 'advanced'}
+-#  = dispute_form.input :customer_name
+-#  = dispute_form.input :customer_email
+-#  = dispute_form.input :customer_company_name
+-#  = dispute_form.input :status
+-#  = dispute_form.input :resolution
+-#  = dispute_form.input :subject
+-#  = dispute_form.input :search_name, input_html: {value: ''}
+-#  = dispute_form.submit 'Search'

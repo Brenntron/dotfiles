@@ -56,7 +56,7 @@
         %table#saved-search.table
           %tbody#saved-search-tbody
             - if current_user.named_searches.any?
-              - current_user.named_searches.where('project_type = ? OR project_type IS ?', 'Dispute', nil).order(:id).each do |named_search|
+              - current_user.named_searches.where('project_type = ? OR project_type IS ?', 'FileReputationDispute', nil).order(:id).each do |named_search|
                 %tr{id: "saved_search_#{named_search.id}"}
                   %td
                     %a.input-truncate.saved-search.esc-tooltipped{onclick: "named_webrep_index_table('#{named_search.name}');", title: named_search.name}
@@ -97,7 +97,7 @@
         %h3.nav-tool-dropdown-header.inverse
           Advanced Search
         #advanced-search-wrapper.nav-tool-content-wrapper
-  -#          = render 'escalations/webrep/disputes/advanced_search'
+          = render 'escalations/file_rep/disputes/advanced_search'
 
 
 
