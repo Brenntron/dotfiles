@@ -63,7 +63,6 @@ Rails.configuration.snort_json_path     = Rails.root.join(env_config['perl']['sn
 Rails.configuration.cve2x_path          = Rails.root.join(env_config['perl']['cve2x_path'])
 Rails.configuration.rule2yaml_path      = Rails.root.join(env_config['perl']['rule2yaml_path'])
 
-# byebug
 rep_api = env_config['rep_api']
 raise 'config.yml missing rep_api section' unless rep_api
 Rails.configuration.rep_api                = OpenStruct.new
