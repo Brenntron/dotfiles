@@ -70,12 +70,12 @@ $ ->
       search_name: ''
     }
 
-    if current_url.includes('disputes?f=')
+    if location.search != ''
 #      if the current url includes the above, it is a standard search'
-      status_param_regex = /f=(.*)/
+
       data ={
         search_type : 'standard'
-        search_name : status_param_regex.exec(current_url)[1]
+        search_name : location.search.replace('?f=', '')
       }
 
     else if localStorage.search_type
