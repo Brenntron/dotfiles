@@ -18,6 +18,35 @@ class FileReputationDispute < ApplicationRecord
 
   validates :status, :file_name, :sha256_hash, :disposition_suggested, presence: true
 
+  scope :by_customer, ->(customer_name: nil, customer_email: nil, company_name: nil) {
+    result =
+        case
+        when company_name.present?
+          joins(customer: :company)
+        when customer_name.present? || customer_email.present?
+          joins(:customer)
+        else
+          where({})
+        end
+
+    if customer_name.present?
+      result = result.where('customers.name like :customer_name',
+                            customer_name: "%#{sanitize_sql_like(customer_name)}%")
+    end
+
+    if customer_email.present?
+      result = result.where('customers.email like :customer_email',
+                            customer_email: "%#{sanitize_sql_like(customer_email)}%")
+    end
+
+    if company_name.present?
+      result = result.where('companies.name like :company_name',
+                            company_name: "%#{sanitize_sql_like(company_name)}%")
+    end
+
+    result
+  }
+
   # defined so tests can stub to return false.
   def self.threaded?
     true
@@ -66,7 +95,6 @@ class FileReputationDispute < ApplicationRecord
 
     bug_proxy = bugzilla_rest_session.create_bug(bug_attrs)
 
-
     customer = Customer.where(name: 'Dispute Analyst').first
     attributes = {
         id: bug_proxy.id,
@@ -113,6 +141,20 @@ class FileReputationDispute < ApplicationRecord
     end
   end
 
+  # omits fields with empty strings and nil as values
+  # @param [Hash|ActionController::Parameters] fields input which may contain blank values
+  # @return [Hash] A hash without blanks
+  def self.non_blank_fields(fields)
+    fields.to_h.reject{ |key, value| value.blank? }
+  end
+
+  # selects fields which match database field names from given parameters
+  # @param [Hash|ActionController::Parameters] fields input which may contain blank values
+  # @return [Hash] A hash with just this model's fields
+  def self.matching_field(fields)
+    fields.slice(*FileReputationDispute.column_names)
+  end
+
   # Searches based on supplied fields and values.
   # Optionally takes a name to save this search as a saved search.
   # @param [ActionController::Parameters] params supplied fields and values for search.
@@ -121,9 +163,16 @@ class FileReputationDispute < ApplicationRecord
   # @return [ActiveRecord::Relation]
   def self.advanced_search(params, search_name:, user:)
 
-    dispute_fields = params.to_h.slice(*FileReputationDispute.column_names)
+    search_hash = non_blank_fields(params)
+    dispute_fields = matching_field(search_hash)
 
     relation = where(dispute_fields)
+
+    if %w{customer_name customer_email company_name}.any? {|key_name| search_hash[key_name].present? }
+      relation = relation.by_customer(customer_name: search_hash['customer_name'],
+                                      customer_email: search_hash['customer_email'],
+                                      company_name: search_hash['customer_company_name'])
+    end
 
     # Save this search as a named search
     if params.present? && search_name.present?
