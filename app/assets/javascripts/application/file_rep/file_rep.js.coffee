@@ -37,7 +37,7 @@ $ ->
 
     $( '#file-rep-datatable' ).DataTable().ajax.reload()
   window.get_search_name = () ->
-    
+
   window.get_search_condition = () ->
       if localStorage.search_type == 'advanced'
         return JSON.parse(localStorage.search_conditions)
