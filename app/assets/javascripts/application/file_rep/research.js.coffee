@@ -124,6 +124,12 @@ $ ->
         $('#sb-loader').hide()
         $(report_present).hide()
         $(report_missing).show()
+        if $('#sample-zoo-status').attr('data-zoo-status') == 'YES'
+          $('#sandbox-status-message').text('Not in Talos Sandbox')
+          $('#sandbox-run-button').show()
+        else
+          $('#sandbox-status-message').text('Not in Talos Sandbox or Sample Zoo')
+          $('#sandbox-run-button').hide()
       else
         # Send runid to sandbox
         window.get_sandbox_report(run_id, sha256_hash)
