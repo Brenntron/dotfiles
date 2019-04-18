@@ -123,10 +123,14 @@
                   .resolution-comment-wrapper
                     %label.content-label-sm.customer-facing-comment
                       Customer Facing Comment
-                    %textarea.ticket-status-comment
+                    %textarea.resolution-status-comment
                     .button-row-center
                       %button.primary.change_ticket_status_button{type:'button', id:'webrep_resolve_ticket', onclick:'update_file_rep_status();'}
                         Submit
+            %li.status-radio-wrapper
+              %input.ticket-status-radio{type: 'radio', name: 'ticket-status', id: 'ON_HOLD', value: 'ON_HOLD'}
+              %label.ticket-status-radio-label.radio-label{for: 'ON_HOLD'} On Hold
+
             %li.non-resolution-submit-wrapper#ticket-non-res-submit
               %label.content-label-sm
                 Comment
@@ -134,9 +138,6 @@
               .button-row-center
                 %button.primary.change_ticket_status_button{type:'button', id:'webrep_change_ticket_status', onclick:'update_file_rep_status();'}
                   Submit
-            %li.status-radio-wrapper
-              %input.ticket-status-radio{type: 'radio', name: 'ticket-status', id: 'ON_HOLD', value: 'ON_HOLD'}
-              %label.ticket-status-radio-label.radio-label{for: 'ON_HOLD'} On Hold
 
       %span.dropdown
         %button#file-disp-button.toolbar-button.disposition-button.dropdown-toggle.esc-tooltipped.toolbar-button-spacer{title: 'Change Disposition', 'data-toggle': 'dropdown', 'aria-haspopup': 'true', 'aria-expanded': 'false'}

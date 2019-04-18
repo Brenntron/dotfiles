@@ -103,6 +103,14 @@ module API
 
                 file_rep_disputes.each do |dispute|
                   dispute.update_status(status)
+
+                  if comment.present?
+                    FileRepComment.create!(comment: comment, file_reputation_dispute_id: dispute.id, user_id: current_user.id)
+                  end
+
+                  if resolution.present?
+                    dispute.update(resolution: resolution)
+                  end
                 end
 
                 render json: {status: 'Success'}

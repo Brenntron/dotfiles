@@ -11,13 +11,26 @@ window.update_file_rep_status = () ->
       checked_disputes.push(dispute_id)
 
   status = $('#index-edit-ticket-status-dropdown').find('.ticket-status-radio:checked').val()
+  comment = $('.ticket-status-comment').val()
+
+  if status == "RESOLVED_CLOSED"
+    if $('#index-edit-ticket-status-dropdown').find('#RESOLVED_CLOSED').is(':checked')
+      resolution = $('input[name=ticket-resolution]:checked').val()
+    else
+      std_msg_error('No resolution selected', ['Please select a ticket resolution.'])
+      return
+
+  if resolution
+    comment = $('.resolution-status-comment').val()
 
   std_msg_ajax(
     method: 'POST'
     url: "/escalations/api/v1/escalations/file_rep/disputes/set_disputes_status"
     data:
       dispute_ids: checked_disputes
-      status : status
+      status: status
+      comment: comment
+      resolution: resolution
     success_reload: false
     success: (response) ->
       std_msg_success('File Reputation Ticket statuses updated.', [], reload: true)
@@ -25,6 +38,38 @@ window.update_file_rep_status = () ->
       std_msg_error('Unable to update File Reputation Ticket status.')
   )
 
+window.update_file_rep_status_on_show = () ->
+  resolution = ""
+  comment = ""
+
+  dispute_id = $('#dispute_id').text().trim()
+  status = $('#show-edit-ticket-status-dropdown').find('.fr-ticket-status-radio:checked').val()
+  comment = $('.ticket-status-comment').val()
+
+  if status == "RESOLVED_CLOSED"
+    if $('#show-edit-ticket-status-dropdown').find('#file-status-closed').is(':checked')
+      resolution = $('input[name=dispute-resolution]:checked').val()
+    else
+      std_msg_error('No resolution selected', ['Please select a ticket resolution.'])
+      return
+
+  if resolution
+    comment = $('.resolution-status-comment').val()
+
+  std_msg_ajax(
+    method: 'POST'
+    url: "/escalations/api/v1/escalations/file_rep/disputes/set_disputes_status"
+    data:
+      dispute_ids: [dispute_id]
+      status : status
+      comment: comment
+      resolution: resolution
+    success_reload: false
+    success: (response) ->
+      std_msg_success('File Reputation Ticket statuses updated.', [], reload: true)
+    error: (response) ->
+      std_msg_error('Unable to update File Reputation Ticket status.', [])
+  )
 $ ->
 
   file_rep_url = $('#file-rep-datatable').data('source')
