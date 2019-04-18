@@ -16,7 +16,7 @@ class FileReputationDispute < ApplicationRecord
 
   DISPOSITION_MALICIOUS     = 'MALICIOUS'
 
-  validates :status, :file_name, :sha256_hash, :disposition_suggested, presence: true
+  validates :status, :sha256_hash, :disposition_suggested, presence: true
 
   # defined so tests can stub to return false.
   def self.threaded?
@@ -56,7 +56,7 @@ class FileReputationDispute < ApplicationRecord
 
     bug_attrs = {
         'product' => 'Escalations Console',
-        'component' => 'FileRep',
+        'component' => 'AMP Disputes',
         'summary' => summary,
         'version' => 'unspecified',
         'description' => full_description,
@@ -89,6 +89,41 @@ class FileReputationDispute < ApplicationRecord
       error_messages = file_rep.errors.full_messages.join('; ')
       render plain: "\"Error(s) creating file rep -- #{error_messages}\"", status: :internal_server_error
     end
+  end
+
+  def self.create_through_form(bugzilla_rest_session, sha256_hash, disposition_suggested, assignee)
+
+    summary = "New File Rep Dispute generated at #{DateTime.now.utc.strftime("%Y-%m-%d %H:%M")}"
+
+    full_description = %Q{
+          File name: N/A
+          SHA256 hash: #{sha256_hash}
+    }
+
+    bug_attrs = {
+        'product' => 'Escalations Console',
+        'component' => 'AMP Disputes',
+        'summary' => summary,
+        'version' => 'unspecified',
+        'description' => full_description,
+        'priority' => "P3",
+        'classification' => 'unclassified',
+    }
+
+    bug_proxy = bugzilla_rest_session.create_bug(bug_attrs)
+
+    file_rep = FileReputationDispute.new
+
+    attributes = {
+        id: bug_proxy.id,
+        file_name: 'N/A',
+        sha256_hash: sha256_hash,
+        disposition_suggested: disposition_suggested,
+        user_id: User.where(cvs_username: assignee).first.id
+    }
+
+    file_rep.assign_attributes(attributes)
+    file_rep.save!
   end
 
   def self.save_named_search(search_name, params, user:, project_type:)

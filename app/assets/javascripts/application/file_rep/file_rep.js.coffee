@@ -181,17 +181,3 @@ $ ->
       while s.length < (size or 2)
         s = '0' + s
       s
-
-  #  dbinebri: getting form inputs for new ticket here, back-end will need to parse through the sha list
-  $('#new-file-rep-form').on 'submit', (e) ->
-    e.preventDefault()
-
-    shas_input_type = $('#shas_input_type').val()
-    shas_full_text = $('#shas_list').val()
-    disposition = $('#disposition_suggested').val()
-    assignee = $('#assignee').val()
-
-    # delimiters: split the shas by either newline/comma/tab/semi
-    shas_array = shas_full_text.split(/[\s,;]+/)
-
-    std_msg_ajax
