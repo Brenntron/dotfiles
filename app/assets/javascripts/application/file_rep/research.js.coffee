@@ -1,8 +1,9 @@
 $ ->
+  $('.ticket-status-radio-label').click ->
 #  Commenting the active tab out, I think we should identify this better
 #  if $('.active').attr('tab') == 'research'
 #  This should be wrapped in a window function and called on page load/page refresh, but it keeps breaking when I try to
-#window.threatgrid_data = () ->
+window.threatgrid_data = () ->
   sha256_hash = $('#sha256_hash')[0].innerText
   $('#tg-loader').show()
   std_msg_ajax(

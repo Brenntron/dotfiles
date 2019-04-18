@@ -1,6 +1,31 @@
+window.update_file_rep_status = () ->
+  checked_disputes = []
+  resolution = ""
+  comment = ""
+
+  checkboxes = $('#file-rep-datatable').find('.dispute_check_box')
+
+  $(checkboxes).each ->
+    if $(this).is(':checked')
+      dispute_id = $(this).val()
+      checked_disputes.push(dispute_id)
+
+  status = $('#index-edit-ticket-status-dropdown').find('.ticket-status-radio:checked').val()
+
+  std_msg_ajax(
+    method: 'POST'
+    url: "/escalations/api/v1/escalations/file_rep/disputes/set_disputes_status"
+    data:
+      dispute_ids: checked_disputes
+      status : status
+    success_reload: false
+    success: (response) ->
+      std_msg_success('File Reputation Ticket statuses updated.', [], reload: true)
+    error: (response) ->
+      std_msg_error('Unable to update File Reputation Ticket status.')
+  )
+
 $ ->
-
-
 
   file_rep_url = $('#file-rep-datatable').data('source')
 

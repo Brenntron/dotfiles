@@ -114,9 +114,6 @@
                       %input.ticket-resolution-radio{type: 'radio', name: 'ticket-resolution', id: 'UNCHANGED', value: 'UNCHANGED'}
                       %label.ticket-res-radio-label.radio-label{for: 'UNCHANGED'} Unchanged
                     %li
-                      %input.ticket-resolution-radio{type: 'radio', name: 'ticket-resolution', id: 'INVALID', value: 'INVALID'}
-                      %label.ticket-res-radio-label.radio-label{for: 'INVALID'} Invalid / Junk Mail
-                    %li
                       %input.ticket-resolution-radio{type: 'radio', name: 'ticket-resolution', id: 'TEST_TRAINING', value: 'TEST_TRAINING'}
                       %label.ticket-res-radio-label.radio-label{for: 'TEST_TRAINING'} Test / Training
                     %li
@@ -128,8 +125,18 @@
                       Customer Facing Comment
                     %textarea.ticket-status-comment
                     .button-row-center
-                      %button.primary.change_ticket_status_button{type:'button', id:'webrep_resolve_ticket', onclick:'change_ticket_status();'}
+                      %button.primary.change_ticket_status_button{type:'button', id:'webrep_resolve_ticket', onclick:'update_file_rep_status();'}
                         Submit
+            %li.non-resolution-submit-wrapper#ticket-non-res-submit
+              %label.content-label-sm
+                Comment
+              %textarea.ticket-status-comment
+              .button-row-center
+                %button.primary.change_ticket_status_button{type:'button', id:'webrep_change_ticket_status', onclick:'update_file_rep_status();'}
+                  Submit
+            %li.status-radio-wrapper
+              %input.ticket-status-radio{type: 'radio', name: 'ticket-status', id: 'ON_HOLD', value: 'ON_HOLD'}
+              %label.ticket-status-radio-label.radio-label{for: 'ON_HOLD'} On Hold
 
       %span.dropdown
         %button#file-disp-button.toolbar-button.disposition-button.dropdown-toggle.esc-tooltipped.toolbar-button-spacer{title: 'Change Disposition', 'data-toggle': 'dropdown', 'aria-haspopup': 'true', 'aria-expanded': 'false'}
