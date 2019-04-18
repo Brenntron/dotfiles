@@ -153,7 +153,13 @@ $ ->
       selection.addRange(range);
       document.execCommand("Copy");
 
+    Number::pad = (size) ->
+      s = String(this)
+      while s.length < (size or 2)
+        s = '0' + s
+      s
 
+      
   #  dbinebri: getting form inputs for new ticket here, back-end will need to parse through the sha list
   $('#new-file-rep-form').on 'submit', (e) ->
     e.preventDefault()
