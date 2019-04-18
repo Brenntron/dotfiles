@@ -16,7 +16,7 @@ $ ->
     else
       location.reload()
 
-  $(window).on 'click', '#refresh-filter-button', (e) ->
+  $(document).on 'click', '#refresh-filter-button', (e) ->
     refresh_localStorage()
     refresh_url()
 
