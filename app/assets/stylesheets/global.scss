@@ -8814,10 +8814,15 @@ button.secondary.view-report-external-button {
 .data-report-table {
   font-size: 8pt;
   margin-top: 5px;
+  margin-bottom: 10px;
 }
 
 .data-report-table > tbody > tr > td, .data-report-table > thead > tr > th  {
   padding: 6px 6px;
+}
+
+.data-report-table tr:last-of-type td {
+  border-bottom: none;
 }
 
 .data-report-content {
