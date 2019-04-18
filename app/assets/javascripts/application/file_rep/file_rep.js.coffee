@@ -5,7 +5,7 @@ $ ->
 
 
   window.build_data = () ->
-    
+
     if current_url.includes('disputes?f=')
 #      if the current url includes the above, it is a standard search'
       status_param_regex = /f=(.*)/
@@ -24,7 +24,7 @@ $ ->
   window.format_filerep_header = (search_type, search_name) ->
     if search_type = 'standard'
       search_name = search_name.replace(/_/g, " ")
-      new_header = 'Search Results for "<span class="text-capitalize">' + search_name + '</span>" tickets'
+      new_header = '<span class="text-capitalize">' + search_name + ' tickets </span>'
     $('#filerep-index-title')[0].innerHTML = new_header
 
   $('#file-rep-datatable').dataTable
