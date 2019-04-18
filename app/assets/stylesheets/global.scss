@@ -8899,3 +8899,11 @@ button.secondary.view-report-external-button {
     font-size: 8pt;
   }
 }
+
+
+// dbinebri: adding a minor tweak for the toolbar labels on show page > research tab
+@media screen and (min-width: 1600px) {
+  #research-tab-toolbar .toolbar-button-label .toolbar-button-text {
+    padding-top: 1px;
+  }
+}
