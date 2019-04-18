@@ -8904,11 +8904,15 @@ button.secondary.view-report-external-button {
   }
 }
 
+
+// dbinebri: adding a minor tweak for the toolbar labels on show page > research tab
+@media screen and (min-width: 1600px) {
+  #research-tab-toolbar .toolbar-button-label .toolbar-button-text {
+    padding-top: 1px;
+  }
+}
+
 .score-col {
   width: 100%;
   display: block;
-}
-
-.toolbar-select-wrapper .toolbar-button-text {
-  line-height: 1em;
 }
