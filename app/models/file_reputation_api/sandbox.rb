@@ -2,7 +2,7 @@ class FileReputationApi::Sandbox
   include ApiRequester::ApiRequester
 
   set_api_requester_config Rails.configuration.file_reputation_sandbox
-  set_default_request_type :json
+  set_default_request_type :query_string
   set_default_headers({})
 
   def self.sandbox_score(sha256)
@@ -14,7 +14,7 @@ class FileReputationApi::Sandbox
         "apikey" => api_key
     }
     begin
-      response = call_request_parsed(:get, endpoint, :request_type => :query_string, :input => query_string)
+      response = call_request_parsed(:get, endpoint, :input => query_string)
       data = {:success => true, :data => response["value"]}
     rescue
       data = {:success => false, :data => {}}
@@ -32,7 +32,7 @@ class FileReputationApi::Sandbox
         "apikey" => api_key
     }
     begin
-      response = call_request_parsed(:get, endpoint, :request_type => :query_string, :input => query_string)
+      response = call_request_parsed(:get, endpoint, :input => query_string)
       data = {:success => true, :data => response["entry"]["disposition"]}
     rescue
       data = {:success => false, :data => {}}
@@ -50,7 +50,7 @@ class FileReputationApi::Sandbox
     }
 
     begin
-      response = call_request_parsed(:get, endpoint, :request_type => :query_string, :input => query_string)
+      response = call_request_parsed(:get, endpoint, :input => query_string)
       data = {:success => true, :data => response}
     rescue
       data = {:success => false, :data => {}}
@@ -70,7 +70,7 @@ class FileReputationApi::Sandbox
     }
 
     begin
-      response = call_request_parsed(:get, endpoint, :request_type => :query_string, :input => query_string)
+      response = call_request_parsed(:get, endpoint, :input => query_string)
       data = {:success => true, :data => response}
     rescue
       data = {:success => false, :data => {}}
@@ -89,7 +89,7 @@ class FileReputationApi::Sandbox
     }
 
     begin
-      response = call_request(:get, endpoint, :request_type => :query_string, :input => query_string)
+      response = call_request(:get, endpoint, :input => query_string)
       data = {:success => true, :data => response}
     rescue
       data = {:success => false, :data => {}}
