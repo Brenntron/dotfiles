@@ -146,12 +146,12 @@ Rails.configuration.file_reputation_sandbox        = ApiRequester::ApiRequester.
 
 reversing_labs_config = env_config['reversing_labs']
 raise 'config.yml missing ReversingLabs section' unless reversing_labs_config
-Rails.configuration.reversing_labs                = ApiRequester::ApiRequester.config_of(reversing_labs_config)
+Rails.configuration.reversing_labs      = ApiRequester::ApiRequester.config_of(reversing_labs_config)
 
 threatgrid = env_config.fetch('threatgrid', {})
 raise 'config.yml missing threatgrid section' unless threatgrid
-Rails.configuration.threatgrid         = ApiRequester::ApiRequester.config_of(threatgrid)
+Rails.configuration.threatgrid          = ApiRequester::ApiRequester.config_of(threatgrid)
 
 ticloud = env_config.fetch('ticloud', {})
 raise 'config.yml missing ticloud section' unless ticloud
-Rails.configuration.ticloud         = ApiRequester::ApiRequester.config_of(ticloud)
+Rails.configuration.ticloud             = ApiRequester::ApiRequester.config_of(ticloud)
