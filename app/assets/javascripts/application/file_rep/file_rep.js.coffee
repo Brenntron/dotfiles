@@ -1,5 +1,7 @@
 $ ->
 
+
+
   file_rep_url = $('#file-rep-datatable').data('source')
 
   $('#file-rep-datatable').dataTable
@@ -40,7 +42,7 @@ $ ->
 #        need to zeropad this thing
         data: 'id'
         render: (data, type, full, meta) ->
-          return '<a href="/escalations/file_rep/disputes/' + data + '">' + data + '</a>'
+          return '<a href="/escalations/file_rep/disputes/' + data + '">' + parseInt(data).pad(6) + '</a>'
       }
       { data: 'status' }
       { data: 'resolution' }
@@ -173,3 +175,9 @@ $ ->
       selection.addRange(range);
       document.execCommand("Copy");
 
+
+    Number::pad = (size) ->
+      s = String(this)
+      while s.length < (size or 2)
+        s = '0' + s
+      s
