@@ -6,11 +6,9 @@ class Escalations::PeakeBridge::FileRepMessagesController < ApplicationControlle
     return_message = "Can't even"
     return_success = false
 
-
     message_payload = file_rep_params
     message_payload[:bugzilla_rest_session] = bugzilla_rest_session
     new_dispute = FileReputationDispute.process_bridge_payload(message_payload, customer_params)
-
 
     if new_dispute.new_record?
       error_messages = new_dispute.errors.full_messages.join('; ')

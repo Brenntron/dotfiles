@@ -308,6 +308,7 @@ module ApiRequester::ApiRequester
     # @raise [ApiRequester::ApiRequester::ApiRequesterError]
     def call_request_parsed(method = :get, path, request_type: default_request_type, input: nil, headers: {})
       response = call_request(method, path, request_type: request_type, input: input, headers: headers)
+      return nil if response.body.blank?
       JSON.parse(response.body)
     end
 
