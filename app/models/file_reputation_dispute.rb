@@ -102,7 +102,7 @@ class FileReputationDispute < ApplicationRecord
     }
     file_rep.assign_attributes(attributes)
 
-    if file_rep.save
+    if file_rep.save!
       file_rep.update_scores
       file_rep
     else
@@ -143,9 +143,10 @@ class FileReputationDispute < ApplicationRecord
     }
 
     file_rep.assign_attributes(attributes)
-    file_rep.save!
 
-    file_rep.update_scores
+    if file_rep.save!
+      file_rep.update_scores
+    end
   end
 
   def self.save_named_search(search_name, params, user:, project_type:)
