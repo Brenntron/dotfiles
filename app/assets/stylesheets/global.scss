@@ -5981,18 +5981,22 @@ td.in_zoo{
 .font-weight-bold{
   font-weight: bold;
 }
-code.file_rep_sha{
+.file_rep_sha{
   color:$type-base-color;
   font-family: 'Fira Mono', monospace;
   line-height: 1.5em;
   padding: 0 5px;
   font-weight: 400;
   background-color:$faint-neutral-color;
-  white-space: normal;
-  overflow: hidden;
-  width: 90%;
+  border-radius: 0;
   text-overflow: ellipsis;
-  display: inline-block;
+  white-space: nowrap;
+  overflow: hidden;
+  word-wrap: break-word;
+  word-break: break-all;
+  display: block !important;
+//  temporarily adding till we figure out a better solution
+  width: 100px;
 }
 
 .ticket-age-over3hr {
@@ -8875,4 +8879,9 @@ button.secondary.view-report-external-button {
 
 #rl-loader, #tg-loader, #sb-loader {
   width: 100%;
+}
+
+.score-col {
+  width: 100%;
+  display: block;
 }
