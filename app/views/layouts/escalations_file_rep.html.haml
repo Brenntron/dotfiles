@@ -10,7 +10,7 @@
       %span.nav-toolbar-icon-large.icon-research
 
 
-  .nav-tool-blocks.col-xs-1.col-sm-1.col-lg-1.dropdown
+  .nav-tool-blocks.col-xs-1.col-sm-1.col-lg-1.dropdown,
     %a{href: '#', class: 'dropdown-toggle', id: 'filter-cases', 'data-toggle': 'dropdown', 'aria-haspopup': 'true', 'aria-expanded': 'false'}
       %span{class: 'nav-toolbar-icon icon-filter-white'}
       Filter
@@ -88,7 +88,7 @@
 
   .nav-tool-blocks.col-xs-3.col-sm-3.col-md-3.col-lg-5.search-wrapper
     .input-group.search-group#file-rep-search
-      = form_tag('/tickets', method: :get, onsubmit: 'build_contains_filerep(this);return false;') do
+      = form_tag('/tickets', method: :get, onsubmit: 'build_contains_search(this);return false;') do
         = text_field_tag 'case[id]', "#{}", class: 'search-box'
 
       %button#advanced-search-button.btn.btn-default.nav-tool-button.dropdown-toggle{'data-toggle': 'dropdown', 'aria-haspopup': 'true', 'aria-expanded': 'false'}

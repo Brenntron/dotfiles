@@ -16,6 +16,10 @@ $ ->
     else
       location.reload()
 
+  $(window).on 'click', '#refresh-filter-button', (e) ->
+    refresh_localStorage()
+    refresh_url()
+
   window.build_named_search = (search_name) ->
     localStorage.search_type = 'named'
     localStorage.search_name = search_name
@@ -23,9 +27,9 @@ $ ->
 
     refresh_url()
 
-  window.build_contains_filerep = (contains) ->
-      refresh_localStorage()
-      refresh_url()
+  window.build_contains_search = (contains) ->
+    refresh_localStorage()
+    refresh_url()
 
 
 
@@ -279,10 +283,6 @@ $ ->
       return
     return
     checkbox = $(this).find('input')
-
-  $(document).on 'click', '#refresh-filter-button', (e) ->
-    refresh_localStorage()
-    refresh_url()
 
   $(document).on 'click ','.file_rep_sha', (e) ->
 #      copy SHA on click
