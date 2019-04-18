@@ -71,7 +71,7 @@ $ ->
     }
 
     if location.search != ''
-#      if the current url includes the above, it is a standard search'
+#      if the location.search has value, it is a standard search
 
       data ={
         search_type : 'standard'
