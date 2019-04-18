@@ -39,8 +39,7 @@ module API
               requires :shas_array, type: Array[String], desc: 'SHA256 hash of the file'
               requires :disposition_suggested, type: String, desc: 'Suggested disposition'
               requires :assignee, type: String, desc: 'Assignee'
-              requires :shas_input_type, type: String, desc: 'Input type'
-
+              # requires :shas_input_type, type: String, desc: 'Input type' This will be implemented later when analysts can upload files
             end
             post "form" do
               std_api_v2 do
