@@ -10,7 +10,7 @@ $ ->
     localStorage.removeItem('search_conditions')
 
   window.refresh_url = () ->
-    if current_url.includes('disputes?f=')
+    if current_url.includes('/file_rep/disputes?f=')
       new_url = current_url.split('?f=')[0]
       window.location.replace(new_url)
     else
