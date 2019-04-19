@@ -219,3 +219,15 @@ $ ->
       else if $('.dataset-cb:checked').length == 3
         $('#sandbox-report-wrapper, #threatgrid-report-wrapper, #reversing-labs-report-wrapper').removeClass('col-sm-6 col-sm-12').addClass('col-sm-4')
       return
+
+
+  # Trigger Create Detection dialog
+  window.amp_detection_dialog = () ->
+    $('#create-detection-dialog').dialog
+      minWidth: 520,
+      classes: {
+        "ui-dialog": "form-dialog"
+      },
+      position: { my: "right center", at: "right center", of: window }
+
+

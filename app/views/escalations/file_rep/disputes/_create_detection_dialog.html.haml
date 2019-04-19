@@ -1,0 +1,47 @@
+#create-detection-dialog{title: 'Create AMP Detection'}
+  .form-wrapper
+    %form
+      .row
+        .col-xs-12
+          .form-group
+            %label.content-label-sm
+              SHA256
+            .code-snippet.code-string-break
+              = @file_rep_dispute.sha256_hash
+      %hr.thin
+      .row
+        .col-xs-12
+          .form-group
+
+            %label.content-label-sm
+              Detection Name
+            .row
+              .col-xs-3
+                %select.form-control
+                  %option{selected: 'selected'} Win32
+                  %option Option 2
+                  %option Option 3
+              .col-xs-5
+                %input{type: 'text'}
+              .col-xs-4
+                %span
+                  '.Talos'
+      .row
+        .col-xs-12
+          .form-group
+            %label.content-label-sm
+              Disposition
+            %select.form-control
+              %option{selected: 'selected'} Clean
+              %option Unknown
+              %option Malicious
+      .row
+        .col-xs-12
+          .form-group
+            %label.content-label-sm
+              Comment
+            %textara
+      %hr.thin
+      .button-row-center
+        %button.primary{type:'submit', value: 'submit'}
+          Create Detection

@@ -121,7 +121,7 @@
       .file-edit-buttons-wrapper
         %button.secondary.change-disp-button
           Change Disposition
-        %button.secondary.create-det-button
+        %button.secondary.create-det-button{onclick: 'amp_detection_dialog();'}
           Create Detection
 
       .row
@@ -182,3 +182,5 @@
     = render 'escalations/file_rep/disputes/communication_tab'
   .tab-pane#history_tab{role: 'tabpanel'}
     History
+
+= render 'escalations/file_rep/disputes/create_detection_dialog'
