@@ -231,7 +231,6 @@ h5 {
   white-space: nowrap;
 }
 
-
 /**** Tables ****/
 
 /* Specifically overrides Bootstraps / Datatables styles for data tables */
@@ -693,6 +692,7 @@ button {
 .detection-button {background-image: url(image_path('icon_target.svg'));}
 .disposition-button {background-image: url(image_path('icon_hazard.svg'));}
 .take-ticket-button-full {background-image: url(image_path('icon_take.svg'));}
+.icon-unassigned-bugs {background-image: url(image_path('icon_unassigned.svg'));}
 
 .master-submit-button {
   color: $content-bg-color;
@@ -5981,6 +5981,7 @@ td.in_zoo{
 .font-weight-bold{
   font-weight: bold;
 }
+
 .file_rep_sha{
   color:$type-base-color;
   font-family: 'Fira Mono', monospace;
@@ -8434,6 +8435,7 @@ hr.thin.form-divider {
 
 .code-string-break {
   word-wrap: break-word;
+  word-break: break-all;
   display: block !important;
 }
 
@@ -8806,10 +8808,20 @@ button.secondary.view-report-external-button {
 .data-report-table {
   font-size: 8pt;
   margin-top: 5px;
+  margin-bottom: 10px;
 }
 
 .data-report-table > tbody > tr > td, .data-report-table > thead > tr > th  {
   padding: 6px 6px;
+}
+
+.data-report-table tr:last-of-type td {
+  border-bottom: none;
+}
+
+.data-report-content {
+  line-height: 1.35;
+  font-size: 8pt;
 }
 
 .data-report-code-content {
@@ -8819,11 +8831,11 @@ button.secondary.view-report-external-button {
   line-height: 1.25em;
 }
 
-.tg-data-present, .tg-data-missing, .rl-data-present, .rl-data-missing {
+.tg-data-present, .tg-data-missing, .rl-data-present, .rl-data-missing, .sb-data-present, .sb-data-missing {
   display: none;
 }
 
-.tg-data-missing, .sandbox-data-missing, .rl-data-missing {
+.tg-data-missing, .sb-data-missing, .rl-data-missing {
   margin-top: 40px;
 }
 
@@ -8833,6 +8845,7 @@ button.secondary.view-report-external-button {
 .scanner-mal {
   color: $second-section-color;
   font-weight: 600;
+  padding-left: 22px !important;
 }
 
 .scanner-mal::before {
@@ -8846,6 +8859,7 @@ button.secondary.view-report-external-button {
   margin-top: -4px;
   margin-bottom: -4px;
   margin-right: 4px;
+  margin-left: -22px;
 }
 
 .scanner-unk {
@@ -8872,6 +8886,31 @@ button.secondary.view-report-external-button {
 
 #rl-loader, #tg-loader, #sb-loader {
   width: 100%;
+}
+
+// Specific styles for sandbox report
+.vertical-data-report-table {
+  margin: 10px 0 15px 0;
+  tr td, tr th {
+    border-bottom: none;
+    padding: 4px;
+    font-size: 8pt;
+  }
+  .code-wrap-col {
+    padding-top: 2px;
+    padding-bottom: 2px;
+  }
+  .code-snippet {
+    font-size: 8pt;
+  }
+}
+
+
+// dbinebri: adding a minor tweak for the toolbar labels on show page > research tab
+@media screen and (min-width: 1600px) {
+  #research-tab-toolbar .toolbar-button-label .toolbar-button-text {
+    padding-top: 1px;
+  }
 }
 
 .score-col {
