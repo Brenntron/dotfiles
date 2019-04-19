@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 2019_04_16_172411) do
+ActiveRecord::Schema.define(version: 2019_04_17_165456) do
 
   create_table "alerts", options: "ENGINE=InnoDB DEFAULT CHARSET=utf8", force: :cascade do |t|
     t.datetime "created_at", null: false
@@ -534,15 +534,9 @@ ActiveRecord::Schema.define(version: 2019_04_16_172411) do
     t.integer "user_id"
   end
 
-  create_table "file_reps", options: "ENGINE=InnoDB DEFAULT CHARSET=utf8", force: :cascade do |t|
+  create_table "file_reputation_disputes", options: "ENGINE=InnoDB DEFAULT CHARSET=utf8", force: :cascade do |t|
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
-    t.string "file_rep_name"
-    t.text "sha256_checksum"
-    t.string "email"
-  end
-
-  create_table "file_reputation_disputes", options: "ENGINE=InnoDB DEFAULT CHARSET=utf8", force: :cascade do |t|
     t.bigint "customer_id"
     t.string "status", default: "NEW", null: false
     t.string "source"
@@ -554,27 +548,23 @@ ActiveRecord::Schema.define(version: 2019_04_16_172411) do
     t.string "sample_type"
     t.string "disposition"
     t.string "disposition_suggested"
+    t.bigint "user_id"
     t.float "sandbox_score"
     t.float "sandbox_threshold"
     t.string "sandbox_signer"
+    t.boolean "has_sample"
+    t.boolean "in_zoo"
     t.float "threatgrid_score"
     t.float "threatgrid_threshold"
     t.string "threatgrid_signer"
-    t.float "reversing_labs_score"
+    t.boolean "threatgrid_private"
+    t.integer "reversing_labs_score"
     t.string "reversing_labs_signer"
-    t.bigint "user_id"
     t.string "resolution"
     t.string "detection_name"
     t.datetime "detection_created_at"
-    t.boolean "in_zoo"
-    t.bigint "assigned_id"
-    t.datetime "created_at", null: false
-    t.datetime "updated_at", null: false
-    t.boolean "threatgrid_private"
-    t.boolean "has_sample"
     t.datetime "case_closed_at"
     t.datetime "case_responded_at"
-    t.index ["assigned_id"], name: "index_file_reputation_disputes_on_assigned_id"
     t.index ["created_at"], name: "index_file_reputation_disputes_on_created_at"
     t.index ["customer_id"], name: "index_file_reputation_disputes_on_customer_id"
     t.index ["sha256_hash"], name: "index_file_reputation_disputes_on_sha256_hash"
