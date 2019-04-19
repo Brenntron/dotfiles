@@ -182,3 +182,17 @@ $ ->
       while s.length < (size or 2)
         s = '0' + s
       s
+
+    # dbinebri: adding in checkbox toggle column visible + widths on Show Page, Research tab
+    $('#data-show-sandbox-cb').click -> $('#sandbox-report-wrapper').toggle()
+    $('#data-show-tg-cb').click -> $('#threatgrid-report-wrapper').toggle()
+    $('#data-show-reversing-cb').click -> $('#reversing-labs-report-wrapper').toggle()
+
+    $('#data-show-sandbox-cb, #data-show-tg-cb, #data-show-reversing-cb').click ->
+      if $('.dataset-cb:checked').length == 1
+        $('#sandbox-report-wrapper, #threatgrid-report-wrapper, #reversing-labs-report-wrapper').removeClass('col-sm-4 col-sm-6').addClass('col-sm-12')
+      else if $('.dataset-cb:checked').length == 2
+        $('#sandbox-report-wrapper, #threatgrid-report-wrapper, #reversing-labs-report-wrapper').removeClass('col-sm-4 col-sm-12').addClass('col-sm-6')
+      else if $('.dataset-cb:checked').length == 3
+        $('#sandbox-report-wrapper, #threatgrid-report-wrapper, #reversing-labs-report-wrapper').removeClass('col-sm-6 col-sm-12').addClass('col-sm-4')
+      return
