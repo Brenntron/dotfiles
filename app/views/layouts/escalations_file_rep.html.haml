@@ -16,10 +16,6 @@
       Filter
     .dropdown-menu.nav-tools-dropdown#filter-dropdown{'aria-labelledby': 'filter-cases'}
       %ul#filter-cases-list
-        %li{class: ("selected" if params[:f] == "recently_viewed")}
-          %a{href: '?f=recently_viewed'}
-            %span.nav-dropdown-icon.icon-recently-viewed
-            Recently Viewed
         %li{class: ("selected" if params[:f] == "my_disputes")}
           %a{href: '?f=my_disputes'}
             %span.nav-dropdown-icon.icon-my-bugs
@@ -28,10 +24,6 @@
           %a{href: '?f=my_open'}
             %span.nav-dropdown-icon.icon-my-open-bugs
             My Open Tickets
-            %li{class: ("selected" if params[:f] == "team_disputes")}
-          %a{href: '?f=team_disputes'}
-            %span.nav-dropdown-icon.icon-team-bugs
-            My Team Tickets
         %li{class: ("selected" if params[:f] == "unassigned")}
           %a{href: '?f=unassigned'}
             %span.nav-dropdown-icon.icon-unassigned-bugs
