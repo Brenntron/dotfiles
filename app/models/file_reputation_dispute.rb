@@ -386,7 +386,7 @@ class FileReputationDispute < ApplicationRecord
 
   def self.take_tickets(dispute_ids, user:)
     FileReputationDispute.transaction do
-      unless 0 == Dispute.where(id: dispute_ids).where.not(user_id: User.vrtincoming.id).count
+      unless 0 == FileReputationDispute.where(id: dispute_ids).where.not(user_id: User.vrtincoming.id).count
         raise 'Some of these ticket are already assigned.'
       end
       FileReputationDispute.assign(dispute_ids, user: user)

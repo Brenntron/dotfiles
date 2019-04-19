@@ -16,12 +16,12 @@ window.filerep_take_disputes = () ->
     success: (response) ->
       for dispute_id in response.dispute_ids
         $('#owner_' + dispute_id).text(response.username)
-        $('#status_' + dispute_id).text("Assigned")
+        $('#status_' + dispute_id).text("ASSIGNED")
       std_msg_success('Tickets successfully assigned', [response.dispute_ids.length + ' have been assigned to ' + response.username])
     error: (error) ->
       std_msg_error('Assign Issue(s) Error', [
         'Failed to assign ' + dispute_ids.length + ' issue(s).',
-        'Due to: ' + error.responseJSON.error
+        'Due to: ' + error.responseJSON.message
       ])
   )
 
