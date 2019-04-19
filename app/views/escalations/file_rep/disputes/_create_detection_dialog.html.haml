@@ -32,7 +32,7 @@
             -#  TODO select option that matches current disposition
             -# We may want to move these values into storage somewhere
             -# Note they need to be lowercase values
-            %select.form-control#new-amp-detection-disp{onchange: 'amp_detection_naming()'}
+            %select.form-control#new-amp-detection-disp{onchange: 'amp_detection_naming();'}
               %option{value: 'clean'} Clean
               %option{value: 'common'} Common
               %option{value: 'unknown'} Unknown
@@ -104,7 +104,7 @@
                   %option{value: 'Xls'} Xls
                   %option{value: 'Xml'} Xml
               .col-xs-4.nested-col
-                %select.form-control#new-amp-detection-name-cat
+                %select.form-control#new-amp-detection-name-cat{onchange: 'amp_category_naming();'}
                   %option{value: 'Adware'} Adware
                   %option{value: 'Coinminer'} Coinminer
                   %option{value: 'Downloader'} Downloader
@@ -130,6 +130,7 @@
                   %option{value: 'Trojan'} Trojan
                   %option{value: 'Virus'} Virus
                   %option{value: 'Worm'} Worm
+                  %option{value: ''} No Category Name
               .col-xs-4.nested-col
                 %input#new-amp-detection-name-middle{type: 'text'}
               .col-xs-2.nested-col
@@ -140,8 +141,9 @@
           .form-group
             %label.content-label-sm.content-label-fullwidth
               Comment
-            %textara.form-comment-box
+            %textarea.form-comment-box#new-amp-detection-comment
       %hr.thin
       .button-row-center
-        %button.primary{type:'submit', value: 'submit'}
+        %button.primary{onclick: 'amp_detection_submission(e);'}
+          -# Add type: 'submit', value: 'submit' - removed here for testing purposes
           Create Detection
