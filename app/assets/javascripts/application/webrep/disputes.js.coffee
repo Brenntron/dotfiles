@@ -1275,6 +1275,8 @@ $ ->
 
         for resolution in response.json.resolutions
           $('#resolution-list').append '<option value=\'' + resolution + '\'></option>'
+
+
     )
 
 

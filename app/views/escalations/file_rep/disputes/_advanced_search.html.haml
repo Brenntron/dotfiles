@@ -25,10 +25,6 @@
     %input.form-control#sha256-input{name: 'SHA256'}
     %button.remove-input
   .form-group.search-item.hidden
-    %label.content-label-sm File Size
-    %input.form-control#file-size-input{name: 'file_size'}
-    %button.remove-input
-  .form-group.search-item.hidden
     %label.content-label-sm Sample Type
     %input.form-control#sample-type-input{name: 'sample_type'}
     %button.remove-input
@@ -61,20 +57,12 @@
     %input.form-control#in-sample-zoo-input{name: 'in_sample_zoo', type: 'checkbox', value: 'checked', for: 'in-sample-zoo'}
     %button.remove-input
   .form-group.search-item.hidden
-    %label.content-label-sm Reversing Labs
-    %input.form-control.require-float#reversing-labs-input{name: 'reversing_labs', type:"number"}
-    %button.remove-input
-  .form-group.search-item.hidden
     %label.content-label-sm Suggested Disposition
     %input.form-control#suggested-disposition-input{name: 'suggested_disposition'}
     %button.remove-input
   .form-group.search-item.hidden
     %label.content-label-sm Submitter Type
     %input.form-control#submitter-type-input{name: 'submitter_type'}
-    %button.remove-input
-  .form-group.search-item.hidden
-    %label.content-label-sm Customer Type
-    %input.form-control#customer-type-input{name: 'customer_type'}
     %button.remove-input
   .form-group.search-item.hidden
     %label.content-label-sm Customer Name
@@ -94,7 +82,7 @@
     %button.remove-input
   .form-group.search-item.hidden
     %label.content-label-sm Last Updated
-    %input.form-control#last-updated-input{type: 'date',name: 'last_updated'}
+    %input.form-control#last-updated-input{type: 'date', name: 'last_updated'}
     %button.remove-input
   .form-group.search-item.hidden#submission-type
     %label.content-label-sm Submission Type
@@ -185,10 +173,6 @@
             SHA256
         %li
           %label.search-criteria-label
-            %input.search-checkbox#disposition-cb{type: 'checkbox', name: 'search-criteria', value: 'File Size', for: 'file-size-input'}
-            File Size
-        %li
-          %label.search-criteria-label
             %input.search-checkbox#sample-type-cb{type: 'checkbox', name: 'search-criteria', value: 'Sample Type', for: 'sample-type-input'}
             Sample Type
         %li
@@ -221,20 +205,12 @@
             In Sample Zoo
         %li
           %label.search-criteria-label
-            %input.search-checkbox#reversing-labs-cb{type: 'checkbox', name: 'search-criteria', value: 'Reversing Labs', for: 'reversing-labs-input'}
-            Reversing Labs
-        %li
-          %label.search-criteria-label
             %input.search-checkbox#suggested-disposition-cb{type: 'checkbox', name: 'search-criteria', value: 'Suggested Disposition', for: 'suggested-disposition-input'}
             Suggested Disposition
         %li
           %label.search-criteria-label
             %input.search-checkbox#submitter-type-cb{type: 'checkbox', name: 'search-criteria', value: 'Submitter Type', for: 'submitter-type-input'}
             Submitter Type
-        %li
-          %label.search-criteria-label
-            %input.search-checkbox#customer-type-cb{type: 'checkbox', name: 'search-criteria', value: 'Customer Type', for: 'customer-type-input'}
-            Customer Type
         %li
           %label.search-criteria-label
             %input.search-checkbox#customer-name-cb{type: 'checkbox', name: 'search-criteria', value: 'Customer Name', for: 'customer-name-input'}
