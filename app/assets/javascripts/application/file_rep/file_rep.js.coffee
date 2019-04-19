@@ -25,6 +25,30 @@ window.filerep_take_disputes = () ->
       ])
   )
 
+window.toolbar_file_rep_index_change_assignee = () ->
+
+  entry_ids = $('.dispute_check_box:checkbox:checked').map(() ->
+    Number(this.value)
+  ).toArray()
+
+  new_assignee = $('#index_target_assignee option:selected').val()
+
+  data = {
+    'dispute_ids': entry_ids,
+    'new_assignee': new_assignee
+  }
+
+  std_msg_ajax(
+    url: '/escalations/api/v1/escalations/file_rep/disputes/change_assignee'
+    method: 'POST'
+    data: data
+    dataType: 'json'
+    success: (response) ->
+      window.location.reload()
+    error: (response) ->
+      std_msg_error('no rows selected', ['Please select at least one row to change assignee.'])
+  )
+
 $ ->
   file_rep_url = $('#file-rep-datatable').data('source')
   current_url = window.location.href
@@ -186,7 +210,7 @@ $ ->
       { data: 'customer_company_name' }
       { data: 'customer_email' }
       {
-        data: 'assignee'
+        data: 'user_id'
         className: "alt-col"
         render: (data) ->
           if data == undefined

@@ -80,6 +80,21 @@ module API
               end
             end
 
+            desc 'Change FileRep Dispute assignee'
+            params do
+              requires :dispute_ids, type: Array[Integer]
+              requires :new_assignee, type: String
+            end
+            post 'change_assignee' do
+              std_api_v2 do
+                authorize!(:update, FileReputationDispute)
+
+                disputes = FileReputationDispute.assign(params[:dispute_ids], user: params[:new_assignee])
+
+                {:status => "success", :data => disputes}.to_json
+              end
+            end
+
           end
         end
       end
