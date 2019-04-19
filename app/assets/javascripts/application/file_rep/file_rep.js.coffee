@@ -228,6 +228,17 @@ $ ->
       classes: {
         "ui-dialog": "form-dialog"
       },
-      position: { my: "right center", at: "right center", of: window }
+      position: { my: "top center", at: "top center", of: window }
+    window.amp_detection_naming()
 
 
+  # Create detection form interaction
+  window.amp_detection_naming = () ->
+    # Detection name can only be changed if user is setting a sample to malicious
+    # or keeping it malicious. Hiding detection name part of form if not needed
+    naming_section = $('#new-amp-detection-name-section')
+
+    if $('#new-amp-detection-disp').val() == 'malicious'
+      $(naming_section).show()
+    else
+      $(naming_section).hide()

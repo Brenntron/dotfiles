@@ -32,14 +32,14 @@
             -#  TODO select option that matches current disposition
             -# We may want to move these values into storage somewhere
             -# Note they need to be lowercase values
-            %select.form-control#new-amp-detection-disp
+            %select.form-control#new-amp-detection-disp{onchange: 'amp_detection_naming()'}
               %option{value: 'clean'} Clean
               %option{value: 'common'} Common
               %option{value: 'unknown'} Unknown
               %option{value: 'unseen'} Unseen
               %option{value: 'malicious'} Malicious
 
-      .row
+      .row#new-amp-detection-name-section
         .col-xs-12
           .form-group
             %label.content-label-sm
