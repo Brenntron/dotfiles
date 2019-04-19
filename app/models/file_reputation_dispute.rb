@@ -395,25 +395,14 @@ class FileReputationDispute < ApplicationRecord
 
 
   def self.assign(dispute_ids, user:)
-    user_id = user.kind_of?(User) ? user.id : user
-    accepted_at = Time.now
-
     disputes_ary = []
+    user_id = user.kind_of?(User) ? user.id : user
 
     FileReputationDispute.transaction do
       disputes = FileReputationDispute.where(id: dispute_ids, status: [FileReputationDispute::STATUS_NEW, FileReputationDispute::STATUS_REOPENED])
       disputes_ary = disputes.all.to_a
 
-      disputes.each do |dispute|
-        envelope = {}
-
-        dispute.update(user_id: user_id, status: FileReputationDispute::STATUS_ASSIGNED)
-
-        envelope[:addressee_id] = dispute.id
-        envelope[:addressee_status] = dispute.status
-
-        Bridge::FilerepUpdateStatusEvent.new(envelope).post
-      end
+      disputes.update_all(user_id: user_id, status: FileReputationDispute::STATUS_ASSIGNED)
     end
 
     disputes_ary
