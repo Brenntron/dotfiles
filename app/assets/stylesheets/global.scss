@@ -8840,6 +8840,7 @@ button.secondary.view-report-external-button {
 .scanner-mal {
   color: $second-section-color;
   font-weight: 600;
+  padding-left: 22px !important;
 }
 
 .scanner-mal::before {
@@ -8853,6 +8854,7 @@ button.secondary.view-report-external-button {
   margin-top: -4px;
   margin-bottom: -4px;
   margin-right: 4px;
+  margin-left: -22px;
 }
 
 .scanner-unk {
