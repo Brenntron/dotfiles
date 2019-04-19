@@ -83,8 +83,8 @@ if sds_config
   Rails.configuration.sds.host          = sds_config['host']
   Rails.configuration.sds.cert_file     = sds_config['cert_file']
   Rails.configuration.sds.pkey_file     = sds_config['pkey_file']
-  Rails.configuration.sds.user          = sds_config['user']
-  Rails.configuration.sds.pass          = sds_config['pass']
+  Rails.configuration.sds.user          = sds_config['user']                    # TODO unused?
+  Rails.configuration.sds.pass          = sds_config['pass']                    # TODO unused?
 end
 
 # TODO Check if unused
