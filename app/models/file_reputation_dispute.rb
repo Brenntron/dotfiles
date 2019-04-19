@@ -68,13 +68,15 @@ class FileReputationDispute < ApplicationRecord
 
     file_rep = FileReputationDispute.new
 
-    threat_score = nil
+    threatgrid_score = nil
     threatgrid_private = nil
+    threatgrid_threshold = nil
     if sha256_checksum.present?
       threatgrid_response = Threatgrid::Search.query(sha256_checksum)
 
-      threat_score = threatgrid_response['threat_score']
+      threatgrid_score = threatgrid_response['threatgrid_score']
       threatgrid_private = threatgrid_response['threatgrid_private']
+      threatgrid_threshold = threatgrid_response['threatgrid_threshold']
     end
 
     summary = "New File Rep Dispute generated at #{DateTime.now.utc.strftime("%Y-%m-%d %H:%M")}"
@@ -106,7 +108,8 @@ class FileReputationDispute < ApplicationRecord
         disposition_suggested: disposition_suggested,
         source: source,
         platform: platform,
-        threatgrid_score: threat_score,
+        threatgrid_score: threatgrid_score,
+        threatgrid_threshold: threatgrid_threshold,
         threatgrid_private: threatgrid_private,
         customer: customer
     }
@@ -277,8 +280,9 @@ class FileReputationDispute < ApplicationRecord
     if self.sha256_hash.present?
       threatgrid_response = Threatgrid::Search.query(self.sha256_hash)
 
-      self.threatgrid_score = threatgrid_response[:threat_score]
+      self.threatgrid_score = threatgrid_response[:threatgrid_score]
       self.threatgrid_private = threatgrid_response[:threatgrid_private]
+      self.threatgrid_threshold = threatgrid_response[:threatgrid_threshold]
       save!
     end
 
