@@ -91,6 +91,9 @@ module API
 
                 disputes = FileReputationDispute.assign(params[:dispute_ids], user: params[:new_assignee])
 
+                if disputes.length == 0
+                  raise ('The selected dispute tickets are already assigned.')
+                end
                 {:status => "success", :data => disputes}.to_json
               end
             end

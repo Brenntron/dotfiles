@@ -46,7 +46,7 @@ window.toolbar_file_rep_index_change_assignee = () ->
     success: (response) ->
       window.location.reload()
     error: (response) ->
-      std_msg_error('no rows selected', ['Please select at least one row to change assignee.'])
+      std_msg_error('Unable to change assignee', [response.responseJSON.message])
   )
 
 $ ->
