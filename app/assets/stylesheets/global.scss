@@ -2153,6 +2153,10 @@ a.static-nav-item {
   text-transform: none;
 }
 
+.content-label-sm.content-label-fullwidth {
+  width: 100%;
+}
+
 .content-label-sm.multi-input-form-row {
   position: absolute;
   margin-top: -26px;
@@ -4743,10 +4747,15 @@ table > tbody > tr > td.dispute_rep_tools {
   border: 1px solid $faint-neutral-color !important;;
 }
 
-.dropdown-comment {
+.dropdown-comment, .form-comment-box {
   width: 100%;
   min-height: 20px;
   border: 1px solid darken($faint-neutral-color, 5%);
+}
+
+.form-comment-box {
+  display: block;
+  min-height: 90px;
 }
 
 .datatable-top-tools {
@@ -8951,4 +8960,29 @@ button.secondary.view-report-external-button {
     height: 24px;
     margin-top: 1px;
   }
+}
+
+div[aria-describedby='create-detection-dialog'] {
+  .ui-dialog-title {
+    padding-left: 36px;
+    background-size: 26px 26px;
+    background-repeat: no-repeat;
+    background-position: left center;
+    background-image: url(image_path('icon_target_white.svg'));
+  }
+}
+
+.form-group {
+  .nested-col-row {
+    margin-right: -4px;
+    margin-left: -4px;
+  }
+  .nested-col {
+    padding: 0 4px;
+  }
+}
+
+.uneditable-formfield {
+  line-height: 2em;
+  color: $type-lighter-color;
 }

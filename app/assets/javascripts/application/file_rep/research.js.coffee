@@ -6,6 +6,8 @@ $ ->
 
 window.research_data = () ->
   sha256_hash = $('#sha256_hash')[0].innerText
+
+  # Send sha to ThreatGrid, get data
   $('#tg-loader').show()
   std_msg_ajax(
     method: 'POST'

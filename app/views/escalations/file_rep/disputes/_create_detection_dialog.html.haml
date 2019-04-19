@@ -3,44 +3,144 @@
     %form
       .row
         .col-xs-12
-          .form-group
-            %label.content-label-sm
-              SHA256
-            .code-snippet.code-string-break
-              = @file_rep_dispute.sha256_hash
+          %label.content-label-sm
+            SHA256
+          .code-snippet.code-string-break.top-info-data
+            = @file_rep_dispute.sha256_hash
+      .row
+        .col-xs-4
+          %label.content-label-sm
+            AMP Current Disposition
+          - if @file_rep_dispute.disposition == 'malicious' || 'Malicious'
+            .top-info-data.disp-negative
+              = @file_rep_dispute.disposition
+          - else
+            .top-info-data
+              = @file_rep_dispute.disposition
+        .col-xs-8
+          %label.content-label-sm
+            AMP Current Detection Name
+          .top-info-data
+            = @file_rep_dispute.detection_name
+
       %hr.thin
       .row
         .col-xs-12
           .form-group
+            %label.content-label-sm
+              New Disposition
+            -#  TODO select option that matches current disposition
+            -# We may want to move these values into storage somewhere
+            -# Note they need to be lowercase values
+            %select.form-control#new-amp-detection-disp
+              %option{value: 'clean'} Clean
+              %option{value: 'common'} Common
+              %option{value: 'unknown'} Unknown
+              %option{value: 'unseen'} Unseen
+              %option{value: 'malicious'} Malicious
 
-            %label.content-label-sm
-              Detection Name
-            .row
-              .col-xs-3
-                %select.form-control
-                  %option{selected: 'selected'} Win32
-                  %option Option 2
-                  %option Option 3
-              .col-xs-5
-                %input{type: 'text'}
-              .col-xs-4
-                %span
-                  '.Talos'
       .row
         .col-xs-12
           .form-group
             %label.content-label-sm
-              Disposition
-            %select.form-control
-              %option{selected: 'selected'} Clean
-              %option Unknown
-              %option Malicious
+              New Detection Name
+            -#  TODO select options below that match current detection name if there is one
+            -# We may want to move these values into storage somewhere
+            .row.nested-col-row
+              .col-xs-2.nested-col
+                %select.form-control#new-amp-detection-name-pre
+                  %option{value: 'Andr'} Andr
+                  %option{value: 'Archive'} Archive
+                  %option{value: 'Asp'} Asp
+                  %option{value: 'Cert'} Cert
+                  %option{value: 'Clamav'} Clamav
+                  %option{value: 'Clean'} Clean
+                  %option{value: 'Css'} Css
+                  %option{value: 'Doc'} Doc
+                  %option{value: 'Dos'} Dos
+                  %option{value: 'Eicar'} Eicar
+                  %option{value: 'Email'} Email
+                  %option{value: 'Embedded'} Embedded
+                  %option{value: 'Emf'} Emf
+                  %option{value: 'Heuristics'} Heuristics
+                  %option{value: 'Html'} Html
+                  %option{value: 'Hunting'} Hunting
+                  %option{value: 'Hwp'} Hwp
+                  %option{value: 'Img'} Img
+                  %option{value: 'Ios'} Ios
+                  %option{value: 'Java'} Java
+                  %option{value: 'Js'} Js
+                  %option{value: 'Legacy'} Legacy
+                  %option{value: 'Lnk'} Lnk
+                  %option{value: 'Midi'} Midi
+                  %option{value: 'Mkv'} Mkv
+                  %option{value: 'Mp4'} Mp4
+                  %option{value: 'Multios'} Multios
+                  %option{value: 'Osx'} Osx
+                  %option{value: 'Packed'} Packed
+                  %option{value: 'Pdf'} Pdf
+                  %option{value: 'Phish'} Phish
+                  %option{value: 'Phishtank'} Phishtank
+                  %option{value: 'Php'} Php
+                  %option{value: 'Ppt'} Ppt
+                  %option{value: 'Py'} Py
+                  %option{value: 'Rat'} Rat
+                  %option{value: 'Rtf'} Rtf
+                  %option{value: 'Spy'} Spy
+                  %option{value: 'Submit'} Submit
+                  %option{value: 'Svg'} Svg
+                  %option{value: 'Swf'} Swf
+                  %option{value: 'Symbos'} Symbos
+                  %option{value: 'Test'} Test
+                  %option{value: 'Tif'} Tif
+                  %option{value: 'Tool'} Tool
+                  %option{value: 'Ttf'} Ttf
+                  %option{value: 'Txt'} Txt
+                  %option{value: 'Unix'} Unix
+                  %option{value: 'Vbs'} Vbs
+                  %option{value: 'W32S'} W32S
+                  %option{value: 'Win'} Win
+                  %option{value: 'Wma'} Wma
+                  %option{value: 'Xls'} Xls
+                  %option{value: 'Xml'} Xml
+              .col-xs-4.nested-col
+                %select.form-control#new-amp-detection-name-cat
+                  %option{value: 'Adware'} Adware
+                  %option{value: 'Coinminer'} Coinminer
+                  %option{value: 'Downloader'} Downloader
+                  %option{value: 'Dropper'} Dropper
+                  %option{value: 'Exploit'} Exploit
+                  %option{value: 'File'} File
+                  %option{value: 'Filetype'} Filetype
+                  %option{value: 'Ircbot'} Ircbot
+                  %option{value: 'Joke'} Joke
+                  %option{value: 'Keylogger'} Keylogger
+                  %option{value: 'Macro'} Macro
+                  %option{value: 'Malware'} Malware
+                  %option{value: 'Packed'} Packed
+                  %option{value: 'Packer'} Packer
+                  %option{value: 'Phishing'} Phishing
+                  %option{value: 'Proxy'} Proxy
+                  %option{value: 'Ransomware'} Ransomware
+                  %option{value: 'Revoked'} Revoked
+                  %option{value: 'Rootkit'} Rootkit
+                  %option{value: 'Spyware'} Spyware
+                  %option{value: 'Test'} Test
+                  %option{value: 'Tool'} Tool
+                  %option{value: 'Trojan'} Trojan
+                  %option{value: 'Virus'} Virus
+                  %option{value: 'Worm'} Worm
+              .col-xs-4.nested-col
+                %input#new-amp-detection-name-middle{type: 'text'}
+              .col-xs-2.nested-col
+                %span#new-amp-detection-name-end.uneditable-formfield{value: 'Talos'} .Talos
+      %hr.thin
       .row
         .col-xs-12
           .form-group
-            %label.content-label-sm
+            %label.content-label-sm.content-label-fullwidth
               Comment
-            %textara
+            %textara.form-comment-box
       %hr.thin
       .button-row-center
         %button.primary{type:'submit', value: 'submit'}
