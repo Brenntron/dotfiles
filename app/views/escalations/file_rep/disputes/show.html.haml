@@ -55,7 +55,8 @@
                 - else
                   %span= @file_rep_dispute.assigned.cvs_username
 
-                -# dbinebri: placing the take/change/return buttons here for now, retaining the commented logic after
+                -# dbinebri: placing take/change/return buttons here for now, the placement/formatting is fine
+                -# dbinebri: looks like using the commented ruby logic below throws errors, requires back-end coding for the model or controller
                 .dispute-owner-buttons-wrapper
                   %button.return-ticket-button.esc-tooltipped{title: 'Return Ticket To Open Queue'}
                   %button.take-ticket-button#show_ticket_assign.esc-tooltipped{title: 'Assign this ticket to me'}
@@ -84,9 +85,11 @@
                 -#              .toolbar
                 -#                %div
                 -#                  %label.toolbar-section-label Assignee
-                -#                  =select_tag :index_target_assignee, options_from_collection_for_select(User.joins(roles: :org_subset).where(org_subsets: { name: 'webrep' }).distinct.order(:cvs_username), :id, :cvs_username), class: 'toolbar-select'
+                -#                  =select_tag :index_target_assignee, options_from_collection_for_select(User.joins(roles: :org_subset).where(org_subsets: { name: 'file_rep' }).distinct.order(:cvs_username), :id, :cvs_username), class: 'toolbar-select'
                 -#                %button{class: 'primary', type:'button', id: 'button_reassign', onclick:'toolbar_show_change_assignee();'}
                 -#                  Assign
+
+
               %label.content-label-sm
                 Suggested Disposition
               - if @file_rep_dispute.disposition_suggested == 'Malicious'
