@@ -231,7 +231,6 @@ h5 {
   white-space: nowrap;
 }
 
-
 /**** Tables ****/
 
 /* Specifically overrides Bootstraps / Datatables styles for data tables */
@@ -693,6 +692,7 @@ button {
 .detection-button {background-image: url(image_path('icon_target.svg'));}
 .disposition-button {background-image: url(image_path('icon_hazard.svg'));}
 .take-ticket-button-full {background-image: url(image_path('icon_take.svg'));}
+.icon-unassigned-bugs {background-image: url(image_path('icon_unassigned.svg'));}
 
 .master-submit-button {
   color: $content-bg-color;
@@ -5981,6 +5981,7 @@ td.in_zoo{
 .font-weight-bold{
   font-weight: bold;
 }
+
 .file_rep_sha{
   color:$type-base-color;
   font-family: 'Fira Mono', monospace;
@@ -8698,14 +8699,6 @@ button.secondary.view-report-external-button {
     background-position: 30% 92%;
     background-size: 26px 26px;
     float: right;
-  }
-
-
-  // for the nav button labels, this is where we ensure labels can break and wrap if squeezed tight enough
-  #nav-banner .nav-tool-blocks.dropdown a, #nav-banner .nav-tool-blocks.dropdown a:hover {
-    display: inline-block !important;
-    width: 100%;
-    height: 100%;
   }
 
   // file rep navbar specific styles - minor width adjustments, col-lg-1 is too tight, col-lg-2 too wide
