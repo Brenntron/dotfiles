@@ -73,11 +73,38 @@ window.update_file_rep_status_on_show = () ->
 $ ->
 
   file_rep_url = $('#file-rep-datatable').data('source')
+  current_url = window.location.href
+
+
+  window.build_data = () ->
+
+    if current_url.includes('/file_rep/disputes?f=')
+#      if the current url includes the above, it is a standard search'
+      status_param_regex = /f=(.*)/
+      search_type = 'standard'
+      search_name = status_param_regex.exec(current_url)[1]
+
+      format_filerep_header(search_type, search_name)
+
+      return {
+        search_type: search_type
+        search_name : search_name
+      }
+    else
+      return
+
+  window.format_filerep_header = (search_type, search_name) ->
+    if search_type = 'standard'
+      search_name = search_name.replace(/_/g, " ")
+      new_header = '<span class="text-capitalize">' + search_name + ' tickets </span>'
+    $('#filerep-index-title')[0].innerHTML = new_header
 
   $('#file-rep-datatable').dataTable
     processing: true
     serverSide: true
-    ajax: file_rep_url
+    ajax:
+      url: file_rep_url
+      data: build_data()
     order: [ [
       16
       'desc'
@@ -136,10 +163,10 @@ $ ->
         data: 'disposition'
         render: (data) ->
           if data == 'Malicious'
-            data = '<span class="malicious text-capitalize">Malicious</span>'
+            return '<span class="malicious text-capitalize">Malicious</span>'
           else
-            data =  '<span class="text-capitalize">' + data + '</span>'
-          return data
+            return '<span class="text-capitalize">' + data + '</span>'
+
       }
       {
         data: 'detection_name'
@@ -160,38 +187,35 @@ $ ->
         render: (data) ->
 #          in_zoo is a boolean but something in the render function parses this to a string.
           if data == "true"
-            data = '<span class="glyphicon glyphicon-ok"></span>'
+            return '<span class="glyphicon glyphicon-ok"></span>'
           else
-            data = ''
-          return data
+            return ''
+
       }
       {
         data: 'sandbox_score'
         render: (data, type, full, meta) ->
           if full['sandbox_under'] == "true"
-            data = '<span class="score-col text-center">' + parseInt(data) + '</span>'
+            return '<span class="score-col text-center">' + parseInt(data) + '</span>'
           else
-            data = '<span class="overdue score-col text-center">' + parseInt(data) + '</span>'
-          return data
+            return '<span class="overdue score-col text-center">' + parseInt(data) + '</span>'
       }
       {
         data: 'threatgrid_score'
         render: (data, type, full, meta) ->
           if full['threatgrid_under'] == "true"
-            data = '<span class="score-col text-center">' + parseInt(data) + '</span>'
+            return '<span class="score-col text-center">' + parseInt(data) + '</span>'
           else
-            data = '<span class="overdue score-col text-center">' + parseInt(data) + '</span>'
-          return data
+            return '<span class="overdue score-col text-center">' + parseInt(data) + '</span>'
       }
       { data: 'reversing_labs_score'}
       {
         data: 'disposition_suggested'
         render: (data) ->
           if data == 'Malicious'
-            data = '<span class="malicious text-capitalize">Malicious</span>'
+            return '<span class="malicious text-capitalize">Malicious</span>'
           else
-            data =  '<span class="text-capitalize">' + data + '</span>'
-          return data
+            return  '<span class="text-capitalize">' + data + '</span>'
       }
       { data: 'created_at'}
       {
@@ -208,10 +232,9 @@ $ ->
         className: "alt-col"
         render: (data) ->
           if data == undefined
-            data = '<span class="missing-data">Unassigned</span> <span title="Assign to me" class="esc-tooltipped tooltipstered"><button id="index_ticket_assign" class="take-ticket-button" onClick="take_disputes()"/></span>'
+            return '<span class="missing-data">Unassigned</span> <span title="Assign to me" class="esc-tooltipped"><button id="index_ticket_assign" class="take-ticket-button" onClick="take_disputes()"/></span>'
           else
-            data = data + '<span title="Assign to me" class="esc-tooltipped tooltipstered"><button id="index_ticket_assign" class="take-ticket-button" onClick="take_disputes()"/></span>'
-          return data
+            return data + '<span title="Assign to me" class="esc-tooltipped"><button id="index_ticket_assign" class="take-ticket-button" onClick="take_disputes()"/></span>'
       }
     ]
 
@@ -246,9 +269,22 @@ $ ->
       selection.addRange(range);
       document.execCommand("Copy");
 
-
     Number::pad = (size) ->
       s = String(this)
       while s.length < (size or 2)
         s = '0' + s
       s
+
+    # dbinebri: adding in checkbox toggle column visible + widths on Show Page, Research tab
+    $('#data-show-sandbox-cb').click -> $('#sandbox-report-wrapper').toggle()
+    $('#data-show-tg-cb').click -> $('#threatgrid-report-wrapper').toggle()
+    $('#data-show-reversing-cb').click -> $('#reversing-labs-report-wrapper').toggle()
+
+    $('#data-show-sandbox-cb, #data-show-tg-cb, #data-show-reversing-cb').click ->
+      if $('.dataset-cb:checked').length == 1
+        $('#sandbox-report-wrapper, #threatgrid-report-wrapper, #reversing-labs-report-wrapper').removeClass('col-sm-4 col-sm-6').addClass('col-sm-12')
+      else if $('.dataset-cb:checked').length == 2
+        $('#sandbox-report-wrapper, #threatgrid-report-wrapper, #reversing-labs-report-wrapper').removeClass('col-sm-4 col-sm-12').addClass('col-sm-6')
+      else if $('.dataset-cb:checked').length == 3
+        $('#sandbox-report-wrapper, #threatgrid-report-wrapper, #reversing-labs-report-wrapper').removeClass('col-sm-6 col-sm-12').addClass('col-sm-4')
+      return

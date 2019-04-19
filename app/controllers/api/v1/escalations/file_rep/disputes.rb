@@ -17,8 +17,6 @@ module API
               requires :platform, type: String, desc: 'Platform'
               requires :sha256_checksum, type: String, desc: 'SHA256 checksum'
             end
-
-
             post "" do
               std_api_v2 do
                 dispute = FileReputationDispute.create_action(bugzilla_rest_session,
@@ -32,6 +30,26 @@ module API
                                                               params[:sha256_checksum]
                                                               )
                 render json: {status: 'Success', case_id: dispute.id}
+              end
+            end
+
+            desc 'Create a File Rep Dispute through the form'
+            params do
+              requires :shas_array, type: Array[String], desc: 'SHA256 hash of the file'
+              requires :disposition_suggested, type: String, desc: 'Suggested disposition'
+              requires :assignee, type: String, desc: 'Assignee'
+              # requires :shas_input_type, type: String, desc: 'Input type' This will be implemented later when analysts can upload files
+            end
+            post "form" do
+              std_api_v2 do
+                permitted_params['shas_array'].each do |sha256|
+                  FileReputationDispute.create_through_form(bugzilla_rest_session,
+                                                            sha256,
+                                                            params[:disposition_suggested],
+                                                            params[:assignee])
+                end
+
+                render json: {status: 'Success'}
               end
             end
 
@@ -68,7 +86,7 @@ module API
 
               filerep_dispute.to_json
             end
-
+            
             desc 'Update File Rep Dispute status'
             params do
               requires :dispute_ids, type: Array[String]
@@ -116,7 +134,6 @@ module API
                 render json: {status: 'Success'}
               end
             end
-
           end
         end
       end
