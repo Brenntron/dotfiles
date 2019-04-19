@@ -109,11 +109,11 @@ $ ->
     if data != undefined
       {search_type, search_name} = data
       if search_type == 'standard'
-        new_header = '<div><span class="text-capitalize">' + search_name.replace(/_/g, " ") + ' tickets </span><span id="refresh-filter-button" class="sync-button esc-tooltipped" title="Refresh Tickets Filter"></span></div>'
+        new_header = '<div><span class="text-capitalize">' + search_name.replace(/_/g, " ") + ' tickets </span><span id="refresh-filter-button" class="reset-filter esc-tooltipped" title="Refresh Tickets Filter"></span></div>'
       else if search_type == 'advanced'
-        new_header = '<div>Results for Advanced Search <span id="refresh-filter-button" class="sync-button esc-tooltipped" title="Refresh Tickets Filter"></span></div>'
+        new_header = '<div>Results for Advanced Search <span id="refresh-filter-button" class="reset-filter esc-tooltipped" title="Refresh Tickets Filter"></span></div>'
       else if search_type == 'named'
-        new_header = '<div>Results for "' + search_name + '" Saved Search <span id="refresh-filter-button" class="sync-button esc-tooltipped" title="Refresh Tickets Filter"></span></div>'
+        new_header = '<div>Results for "' + search_name + '" Saved Search <span id="refresh-filter-button" class="reset-filter esc-tooltipped" title="Refresh Tickets Filter"></span></div>'
       else
         new_header = 'All File Reputation Tickets'
 

@@ -328,7 +328,7 @@ table.dataTable.no-footer {
   label {
     height: 100%;
   }
- }
+}
 
 .table-search-input {
   width: 400px;
@@ -693,6 +693,8 @@ button {
 .disposition-button {background-image: url(image_path('icon_hazard.svg'));}
 .take-ticket-button-full {background-image: url(image_path('icon_take.svg'));}
 .icon-unassigned-bugs {background-image: url(image_path('icon_unassigned.svg'));}
+.reset-filter {background-image: url(image_path('icon_reset_grey.svg'));}
+.reset-filter:hover {background-image: url(image_path('icon_reset_blue.svg'));}
 
 .master-submit-button {
   color: $content-bg-color;
@@ -3504,7 +3506,7 @@ fieldset.top-content {
   font-size: 9pt !important;
   line-height: 1.4;
   color: $type-lighter-color;
-  }
+}
 
 .email-reply-body {
   min-height: 300px;
@@ -3708,7 +3710,7 @@ input.communication-subject {
   font-size: 9pt;
   top: 23px;
   position: absolute;
- }
+}
 
 .select-a-template{
   margin-left: 26px;
@@ -5623,7 +5625,7 @@ table.dispute_tool_current tr:last-of-type td {
   padding-bottom: 10px;
 }
 
-  /* These below can be deleted after redesign merge, or after the existing style sheet is ported. They exist in the admin redesign stylesheet. */
+/* These below can be deleted after redesign merge, or after the existing style sheet is ported. They exist in the admin redesign stylesheet. */
 .dispute-submission-type {
   background-repeat: no-repeat;
   width: 20px;
@@ -5772,7 +5774,7 @@ td.ticket-total::before {
   left: 19px;
   margin-top: -4px;
 }
- 
+
 .dashboard-left-data {
   border-right: 1px solid $content-bg-color;
 }
@@ -5969,9 +5971,6 @@ td.ticket-total::before {
   height: 20px;
 
 }
-.in-sample-zoo_container{
-  padding-top: 30px;
-}
 td.in_zoo{
   text-align: center;
 }
@@ -5999,7 +5998,7 @@ td.in_zoo{
   word-wrap: break-word;
   word-break: break-all;
   display: block !important;
-//  temporarily adding till we figure out a better solution
+  //  temporarily adding till we figure out a better solution
   width: 100px;
 }
 
@@ -6408,7 +6407,7 @@ table.dispute-entry-table tbody tr.selected {
 }
 
 .popover{
-    max-width: 100%; /* Max Width of the popover (depending on the container!) */
+  max-width: 100%; /* Max Width of the popover (depending on the container!) */
 }
 
 .nested-complaint-static-data .col-with-divider {
@@ -7391,47 +7390,47 @@ td.text-center span {
 }
 .graph-section {
   border-left: 1px solid $faint-neutral-color;
+}
+
+.graph-bar-legend {
+  padding: 0 10px;
+  border: 1px solid $faint-neutral-color;
+  float: right;
+
+  .custom-legend {
+    padding: 4px 0 20px 4px;
   }
 
-  .graph-bar-legend {
-    padding: 0 10px;
-    border: 1px solid $faint-neutral-color;
-    float: right;
-
-    .custom-legend {
-      padding: 4px 0 20px 4px;
-    }
-
-    .graph-legend-circle::before {
-      content: '';
-      float: left;
-      display: block;
-      height: 8px;
-      width: 8px;
-      border-radius: 50%;
-      margin-right: 6px;
-      margin-top: 2px;
-    }
-
-    .skyblue-legend-color::before {
-      background-color: $primary-section-color-light;
-    }
-    .yellow-legend-color::before{
-      background-color: $yellow-graph-bar
-    }
-
-    .navyblue-legend-color::before {
-      background-color: $content-tab-color;
-    }
-
-    .lightgray-legend-color::before {
-      background-color: $content-label-color;
-    }
-
-    .orange-legend-color::before {
-      background-color: $warning-accent-color;
-    }
+  .graph-legend-circle::before {
+    content: '';
+    float: left;
+    display: block;
+    height: 8px;
+    width: 8px;
+    border-radius: 50%;
+    margin-right: 6px;
+    margin-top: 2px;
   }
+
+  .skyblue-legend-color::before {
+    background-color: $primary-section-color-light;
+  }
+  .yellow-legend-color::before{
+    background-color: $yellow-graph-bar
+  }
+
+  .navyblue-legend-color::before {
+    background-color: $content-tab-color;
+  }
+
+  .lightgray-legend-color::before {
+    background-color: $content-label-color;
+  }
+
+  .orange-legend-color::before {
+    background-color: $warning-accent-color;
+  }
+}
 
 .graph-header-icon-stg {
   background-repeat: no-repeat;
@@ -7700,10 +7699,10 @@ td.text-center span {
 }
 
 #copycat-categories-selectized {
-    width: 100%;
-    height: 30px;
-    padding: 0 10px;
-    border: 1px solid #e0e0e0;
+  width: 100%;
+  height: 30px;
+  padding: 0 10px;
+  border: 1px solid #e0e0e0;
 }
 
 .copycat-tool-footer {
@@ -8721,7 +8720,7 @@ button.secondary.view-report-external-button {
   }
 }
 
- //dbinebri: file rep - naming guide dialog specific styles here
+//dbinebri: file rep - naming guide dialog specific styles here
 .escalations--file_rep--disputes-controller .ui-dialog[aria-describedby=dialog-naming-guide] {
   margin-top: 60px;
   margin-right: 20px;
@@ -8890,12 +8889,6 @@ button.secondary.view-report-external-button {
   width: 100%;
 }
 
-#refresh-filter-button{
-  height: 25px;
-  width: 25px;
-  display: inline-block;
-}
-
 // Specific styles for sandbox report
 .vertical-data-report-table {
   margin: 10px 0 15px 0;
@@ -8921,9 +8914,7 @@ button.secondary.view-report-external-button {
   }
 }
 
-
 .score-col {
   width: 100%;
   display: block;
-
 }
