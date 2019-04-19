@@ -1,7 +1,31 @@
+window.filerep_take_disputes = () ->
+  dispute_ids = $('.dispute_check_box:checkbox:checked').map(() ->
+    this.dataset['entryId']
+    this.value
+  ).toArray()
+
+  if dispute_ids.length == 0
+    std_msg_error('No Tickets Selected', ['Please select at least one ticket to assign.'])
+    return
+
+  std_msg_ajax(
+    method: 'PATCH'
+    url: "/escalations/api/v1/escalations/file_rep/disputes/take_disputes"
+    data: { dispute_ids: dispute_ids }
+    error_prefix: 'Error updating ticket.'
+    success: (response) ->
+      for dispute_id in response.dispute_ids
+        $('#owner_' + dispute_id).text(response.username)
+        $('#status_' + dispute_id).text("Assigned")
+      std_msg_success('Tickets successfully assigned', [response.dispute_ids.length + ' have been assigned to ' + response.username])
+    error: (error) ->
+      std_msg_error('Assign Issue(s) Error', [
+        'Failed to assign ' + dispute_ids.length + ' issue(s).',
+        'Due to: ' + error.responseJSON.error
+      ])
+  )
+
 $ ->
-
-
-
   file_rep_url = $('#file-rep-datatable').data('source')
   current_url = window.location.href
 
