@@ -73,6 +73,7 @@ Rails.configuration.rep_api.ca_cert_file   = rep_api['ca_cert_file']
 Rails.configuration.rep_api.gssnegotiate   = rep_api['gssnegotiate']
 
 
+# TODO Check if unused
 raise "config.yml missing ruletest section" unless env_config['ruletest']
 Rails.configuration.ruletest_server     = env_config['ruletest']['url']
 
@@ -86,8 +87,10 @@ if sds_config
   Rails.configuration.sds.pass          = sds_config['pass']
 end
 
+# TODO Check if unused
 Rails.configuration.snort_doc_max_fails = env_config['snort_doc_max_fails'] || 3
 
+# TODO Check if unused
 snort_org_config = env_config['snort_org']
 raise 'config.yml missing snort_org section' unless snort_org_config
 Rails.configuration.snort_org           = OpenStruct.new
@@ -97,6 +100,7 @@ if env_config['snort_org']
   Rails.configuration.snort_org.api_key   = snort_org_config['api_key']
 end
 
+# TODO Check if unused
 raise "config.yml missing svn section" unless env_config['svn']
 Rails.configuration.svn_cmd             = env_config['svn']['cmd']
 Rails.configuration.svn_pwd             = env_config['svn']['password']
