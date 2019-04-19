@@ -1,5 +1,7 @@
 $ ->
 
+
+
   file_rep_url = $('#file-rep-datatable').data('source')
   current_url = window.location.href
 
@@ -33,40 +35,68 @@ $ ->
     ajax:
       url: file_rep_url
       data: build_data()
+    order: [ [
+      16
+      'desc'
+    ] ]
     pagingType: 'full_numbers'
+    keys:
+      columns: ':not(:first-child)'
+    columnDefs: [
+      {
+        # Making checkbox row unorderable
+        targets: [ 0 ]
+        orderable: false
+        searchable: false
+      }
+      {
+        targets: [ 1 ]
+        className: 'id-col'
+      }
+      {
+        # Bolds the status
+        targets: [ 2 ]
+        className: 'font-weight-bold'
+      }
+    ]
     columns: [
       {
+        data:'id'
+        render: (data) ->
+          return '<input type="checkbox" onclick="toggleRow(this)" name="cbox" class="dispute_check_box" id="cbox' + data + '" value="' + data + '" />'
+      }
+      {
+#        need to zeropad this thing
         data: 'id'
-        className: 'font-weight-bold'
+        render: (data, type, full, meta) ->
+          return '<a href="/escalations/file_rep/disputes/' + data + '">' + parseInt(data).pad(6) + '</a>'
       }
+      { data: 'status' }
+      { data: 'resolution' }
       {
-        data: 'status'
-        className: 'font-weight-bold'
+        data: 'file_name'
+        render: (data, type, full, meta) ->
+          return '<a href="/escalations/file_rep/disputes/' + full['id'] + '">' + data + '</a>'
       }
-      {
-        data: 'resolution'
-      }
-      { data: 'file_name'}
       {
         data: 'sha256_hash'
-        render: (data) ->
-          return '<code id="' + data + '_sha" title="' + data + '" class="esc-tooltipped file_rep_sha">' + data + '</code>'
+        render: (data, type, full, meta) ->
+          return '<a href="/escalations/file_rep/disputes/' + full['id'] + '"><span id="' + data + '_sha" title="' + data + '" class="esc-tooltipped file_rep_sha">' + data + '</span></a>'
       }
       {
         data: 'file_size'
         render: (data) ->
-          return '<span>' + data + ' bytes </span>'
+          return data + ' bytes'
       }
       { data: 'sample_type'}
       {
         data: 'disposition'
-        className: 'text-capitalize'
         render: (data) ->
-          data = data.toLowerCase()
-          if data == 'malicious'
-            return '<span class="malicious">malicious</span>'
+          if data == 'Malicious'
+            return '<span class="malicious text-capitalize">Malicious</span>'
           else
-          return '<span>clean</span>'
+            return '<span class="text-capitalize">' + data + '</span>'
+
       }
       {
         data: 'detection_name'
@@ -95,48 +125,38 @@ $ ->
       {
         data: 'sandbox_score'
         render: (data, type, full, meta) ->
-
-          if full['sandbox_under'] == "false"
-            return '<span class="overdue">' + data + '</span>'
+          if full['sandbox_under'] == "true"
+            return '<span class="score-col text-center">' + parseInt(data) + '</span>'
           else
-            return data
+            return '<span class="overdue score-col text-center">' + parseInt(data) + '</span>'
       }
       {
         data: 'threatgrid_score'
         render: (data, type, full, meta) ->
-          if full['threatgrid_under'] == "false"
-            return '<span class="overdue">' + data + '</span>'
+          if full['threatgrid_under'] == "true"
+            return '<span class="score-col text-center">' + parseInt(data) + '</span>'
           else
-            return data
+            return '<span class="overdue score-col text-center">' + parseInt(data) + '</span>'
       }
       { data: 'reversing_labs_score'}
       {
         data: 'disposition_suggested'
-        className: 'text-capitalize'
         render: (data) ->
-          data = data.toLowerCase()
-          if data == 'malicious'
-            return '<span class="malicious">malicious</span>'
+          if data == 'Malicious'
+            return '<span class="malicious text-capitalize">Malicious</span>'
           else
-            return data
-
+            return  '<span class="text-capitalize">' + data + '</span>'
       }
       { data: 'created_at'}
       {
-#        submitter Type
+#        Submitter Type
         data: null
         render: () ->
-          return "<span>submitter Type</span>"
+          return "Submitter Type"
       }
-      {
-        data: 'customer_name'
-      }
-      {
-        data: 'customer_company_name'
-      }
-      {
-        data: 'customer_email'
-      }
+      { data: 'customer_name' }
+      { data: 'customer_company_name' }
+      { data: 'customer_email' }
       {
         data: 'assignee'
         className: "alt-col"
@@ -179,3 +199,9 @@ $ ->
       selection.addRange(range);
       document.execCommand("Copy");
 
+
+    Number::pad = (size) ->
+      s = String(this)
+      while s.length < (size or 2)
+        s = '0' + s
+      s
