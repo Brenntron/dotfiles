@@ -47,6 +47,7 @@
 //= require application/file_rep/file_rep
 //= require application/file_rep/naming_guide
 //= require application/file_rep/research
+//= require application/file_rep/dispute_form
 
 //= require application/webrep/reptool
 //= require application/webrep/wbrs_wlbl

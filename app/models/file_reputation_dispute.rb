@@ -16,7 +16,7 @@ class FileReputationDispute < ApplicationRecord
 
   DISPOSITION_MALICIOUS     = 'MALICIOUS'
 
-  validates :status, :file_name, :sha256_hash, :disposition_suggested, presence: true
+  validates :status, :sha256_hash, :disposition_suggested, presence: true
 
   scope :by_customer, ->(customer_name: nil, customer_email: nil, company_name: nil) {
     result =
@@ -67,15 +67,6 @@ class FileReputationDispute < ApplicationRecord
 
     file_rep = FileReputationDispute.new
 
-    threat_score = nil
-    threatgrid_private = nil
-    if sha256_checksum.present?
-      threatgrid_response = Threatgrid::Search.query(sha256_checksum)
-
-      threat_score = threatgrid_response['threat_score']
-      threatgrid_private = threatgrid_response['threatgrid_private']
-    end
-
     summary = "New File Rep Dispute generated at #{DateTime.now.utc.strftime("%Y-%m-%d %H:%M")}"
 
     full_description = %Q{
@@ -85,7 +76,7 @@ class FileReputationDispute < ApplicationRecord
 
     bug_attrs = {
         'product' => 'Escalations Console',
-        'component' => 'FileRep',
+        'component' => 'AMP Disputes',
         'summary' => summary,
         'version' => 'unspecified',
         'description' => full_description,
@@ -111,11 +102,50 @@ class FileReputationDispute < ApplicationRecord
     }
     file_rep.assign_attributes(attributes)
 
-    if file_rep.save
+    if file_rep.save!
+      file_rep.update_scores
       file_rep
     else
       error_messages = file_rep.errors.full_messages.join('; ')
       render plain: "\"Error(s) creating file rep -- #{error_messages}\"", status: :internal_server_error
+    end
+  end
+
+  def self.create_through_form(bugzilla_rest_session, sha256_hash, disposition_suggested, assignee)
+
+    summary = "New File Rep Dispute generated at #{DateTime.now.utc.strftime("%Y-%m-%d %H:%M")}"
+
+    full_description = %Q{
+          File name: N/A
+          SHA256 hash: #{sha256_hash}
+    }
+
+    bug_attrs = {
+        'product' => 'Escalations Console',
+        'component' => 'AMP Disputes',
+        'summary' => summary,
+        'version' => 'unspecified',
+        'description' => full_description,
+        'priority' => "P3",
+        'classification' => 'unclassified',
+    }
+
+    bug_proxy = bugzilla_rest_session.create_bug(bug_attrs)
+
+    file_rep = FileReputationDispute.new
+
+    attributes = {
+        id: bug_proxy.id,
+        file_name: 'N/A',
+        sha256_hash: sha256_hash,
+        disposition_suggested: disposition_suggested,
+        user_id: User.where(cvs_username: assignee).first.id
+    }
+
+    file_rep.assign_attributes(attributes)
+
+    if file_rep.save!
+      file_rep.update_scores
     end
   end
 
@@ -313,10 +343,19 @@ class FileReputationDispute < ApplicationRecord
     self.update(reversing_labs_score: score)
   end
 
+  def update_sandbox_score
+    sandbox_response = FileReputationApi::Sandbox.sandbox_score(self.sha256_hash)
+
+    if sandbox_response.present? && sandbox_response[:success] == true
+      self.update(sandbox_score: sandbox_response[:data])
+    end
+  end
+
   def update_scores
     update_threadgrid_score
     update_ticode_certs
     update_reversing_labs_score
+    update_sandbox_score
   end
 
   def ack_create(envelope_params, sender_params)
