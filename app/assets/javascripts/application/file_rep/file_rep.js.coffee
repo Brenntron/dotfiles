@@ -95,7 +95,11 @@ $ ->
         render: (data, type, full, meta) ->
           return '<a href="/escalations/file_rep/disputes/' + data + '">' + parseInt(data).pad(6) + '</a>'
       }
-      { data: 'status' }
+      {
+        data: 'status'
+        render: (data, type, full, meta) ->
+          return '<span id="status_'+ full['id']+'">' + data + '</span>'
+      }
       { data: 'resolution' }
       {
         data: 'file_name'
