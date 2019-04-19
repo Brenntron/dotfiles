@@ -213,7 +213,7 @@ $ ->
         data: 'assigned'
         className: "alt-col"
         render: (data) ->
-          if data == undefined || data == ""
+          if data == 'vrtincom' || data == ""
             return '<span class="missing-data">Unassigned</span> <span title="Assign to me" class="esc-tooltipped"><button id="index_ticket_assign" class="take-ticket-button" onClick="take_disputes()"/></span>'
           else
             return data + '<span title="Assign to me" class="esc-tooltipped"><button id="index_ticket_assign" class="take-ticket-button" onClick="take_disputes()"/></span>'
