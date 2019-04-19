@@ -39,9 +39,6 @@
                       %input.fr-ticket-status-radio{type: 'radio', name: 'file-dispute-status', id: 'file-status-onhold', value: 'ON_HOLD'}
                       %label.radio-label.fr-ticket-status-radio-label{for:'file-status-onhold'} On Hold
                     %li.status-radio-wrapper
-                      %input.fr-ticket-status-radio{type: 'radio', name: 'file-dispute-status', id: 'file-status-assigned', value: 'ASSIGNED'}
-                      %label.radio-label.fr-ticket-status-radio-label{for:'file-status-assigned'} Assigned
-                    %li.status-radio-wrapper
                       %input.fr-ticket-status-radio{type: 'radio', name: 'file-dispute-status', id: 'file-status-closed', value: 'RESOLVED_CLOSED'}
                       %label.radio-label.fr-ticket-status-radio-label{for:'file-status-closed'} Resolved / Closed
                       .dropdown-menu#show-ticket-resolution-submenu
@@ -74,6 +71,9 @@
                             %textarea.resolution-status-comment
                             %button.primary{onClick: 'update_file_rep_status_on_show()'}
                               Submit
+                    %li.status-radio-wrapper
+                      %input.fr-ticket-status-radio{type: 'radio', name: 'file-dispute-status', id: 'file-status-assigned', value: 'RE-OPENED'}
+                      %label.radio-label.fr-ticket-status-radio-label{for:'RE-OPENED'} Re-Opened
                     %li.non-resolution-submit-wrapper#ticket-non-res-submit
                       %label.content-label-sm
                         Comment
