@@ -54,6 +54,13 @@
                   %span.missing-data "Unassigned"
                 - else
                   %span= @file_rep_dispute.assigned.cvs_username
+
+                -# dbinebri: placing the take/change/return buttons here for now, retaining the commented logic after
+                .dispute-owner-buttons-wrapper
+                  %button.return-ticket-button.esc-tooltipped{title: 'Return Ticket To Open Queue'}
+                  %button.take-ticket-button#show_ticket_assign.esc-tooltipped{title: 'Assign this ticket to me'}
+                  %button#index_change_assign.dispute-inline-buttons.ticket-owner-button.dropdown-toggle.esc-tooltipped{title: 'Change Assignee', 'data-toggle': 'dropdown', 'aria-haspopup': 'true', 'aria-expanded': 'false'}
+
                 -#- if @dispute.assignee == 'Unassigned'
                 -#  %span.missing-data#dispute-assignee= @dispute.assignee || "None"
                 -#- else
