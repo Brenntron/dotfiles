@@ -119,8 +119,6 @@ $ ->
 
       $('#filerep-index-title')[0].innerHTML = new_header
 
-
-
   $('#file-rep-datatable').dataTable
     processing: true
     serverSide: true
@@ -184,11 +182,10 @@ $ ->
       {
         data: 'disposition'
         render: (data) ->
-          data = data.toLowerCase()
-          if data == 'malicious'
-            return '<span class="malicious text-capitalize">malicious</span>'
+          if data == 'Malicious'
+            return '<span class="malicious text-capitalize">Malicious</span>'
           else
-            return '<span class="text-capitalize">clean</span>'
+            return '<span class="text-capitalize">' + data + '</span>'
       }
       {
         data: 'detection_name'
@@ -217,31 +214,27 @@ $ ->
       {
         data: 'sandbox_score'
         render: (data, type, full, meta) ->
-          if full['sandbox_under'] == "false"
-            return '<span class="overdue">' + data + '</span>'
+          if full['sandbox_under'] == "true"
+            return '<span class="score-col text-center">' + parseInt(data) + '</span>'
           else
-            return data
-
+            return '<span class="overdue score-col text-center">' + parseInt(data) + '</span>'
       }
       {
         data: 'threatgrid_score'
         render: (data, type, full, meta) ->
-
-          if full['threatgrid_under'] == "false"
-            return '<span class="overdue">' + data + '</span>'
+          if full['threatgrid_under'] == "true"
+            return '<span class="score-col text-center">' + parseInt(data) + '</span>'
           else
-            return data
-
+            return '<span class="overdue score-col text-center">' + parseInt(data) + '</span>'
       }
       { data: 'reversing_labs_score'}
       {
         data: 'disposition_suggested'
         render: (data) ->
-          data = data.toLowerCase()
-          if data == 'malicious'
-            return '<span class="malicious text-capitalize">malicious</span>'
+          if data == 'Malicious'
+            return '<span class="malicious text-capitalize">Malicious</span>'
           else
-            return '<span class="text-capitalize">clean</span>'
+            return  '<span class="text-capitalize">' + data + '</span>'
       }
       { data: 'created_at'}
       {
@@ -300,3 +293,17 @@ $ ->
       while s.length < (size or 2)
         s = '0' + s
       s
+
+    # dbinebri: adding in checkbox toggle column visible + widths on Show Page, Research tab
+    $('#data-show-sandbox-cb').click -> $('#sandbox-report-wrapper').toggle()
+    $('#data-show-tg-cb').click -> $('#threatgrid-report-wrapper').toggle()
+    $('#data-show-reversing-cb').click -> $('#reversing-labs-report-wrapper').toggle()
+
+    $('#data-show-sandbox-cb, #data-show-tg-cb, #data-show-reversing-cb').click ->
+      if $('.dataset-cb:checked').length == 1
+        $('#sandbox-report-wrapper, #threatgrid-report-wrapper, #reversing-labs-report-wrapper').removeClass('col-sm-4 col-sm-6').addClass('col-sm-12')
+      else if $('.dataset-cb:checked').length == 2
+        $('#sandbox-report-wrapper, #threatgrid-report-wrapper, #reversing-labs-report-wrapper').removeClass('col-sm-4 col-sm-12').addClass('col-sm-6')
+      else if $('.dataset-cb:checked').length == 3
+        $('#sandbox-report-wrapper, #threatgrid-report-wrapper, #reversing-labs-report-wrapper').removeClass('col-sm-6 col-sm-12').addClass('col-sm-4')
+      return

@@ -1352,7 +1352,7 @@ $ ->
         success: (response) ->
       )
 
-    if window.location.pathname != '/escalations/webrep/disputes'
+    if window.location.pathname != ('/escalations/webrep/disputes' || '/escalations/file_rep/disputes')
       $('#filter-cases').hide()
       $('#import-webrep').hide()
 #      $('#web-rep-search').hide()
