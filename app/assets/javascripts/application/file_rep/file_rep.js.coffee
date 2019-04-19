@@ -8,7 +8,7 @@ $ ->
 
   window.build_data = () ->
 
-    if current_url.includes('disputes?f=')
+    if current_url.includes('/file_rep/disputes?f=')
 #      if the current url includes the above, it is a standard search'
       status_param_regex = /f=(.*)/
       search_type = 'standard'
@@ -198,7 +198,6 @@ $ ->
       selection.removeAllRanges();
       selection.addRange(range);
       document.execCommand("Copy");
-
 
     Number::pad = (size) ->
       s = String(this)
