@@ -266,23 +266,22 @@ $ ->
     # Get sha
     sha256_hash = $('#sha256_hash')[0].innerText
     # Get form info
-    new_disp = $('new-amp-detection-disp').val()
+    new_disp = $('#new-amp-detection-disp').val()
+    new_detection_name = ''
     if new_disp == 'malicious'
-      new_detection_name = ''
       new_name_pre = $('#new-amp-detection-name-pre').val()
       new_name_cat = $('#new-amp-detection-name-cat').val()
       new_name_txt = $('#new-amp-detection-name-middle').val()
       # Don't add extra period unless they want to use an actual category
-      if new_name_cat = ''
+      if new_name_cat == ''
         new_detection_name = new_name_pre + '.' + new_name_txt + '.Talos'
       else
-        new_detection_name = new_name_pre + '.' + new_name_cat + new_name_txt + '.Talos'
+        new_detection_name = new_name_pre + '.' + new_name_cat + '.' + new_name_txt + '.Talos'
+      detection_array = {name: new_detection_name, disposition: new_disp}
+    else
+      detection_array = {disposition: new_disp}
 
     comment = $('#new-amp-detection-comment').val()
-
-    detection_array = []
-    $(detection_array).push('name', new_detection_name)
-    $(detection_array).push('disposition', new_disp)
 
     console.log(sha256_hash)
     console.log(detection_array)

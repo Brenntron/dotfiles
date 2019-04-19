@@ -243,7 +243,6 @@ window.get_sandbox_report = (runid, sha) ->
       # Adding full json report in case it's needed
       full_report = JSON.stringify(response.json, null, '\t')
       $('#sb-full').text(full_report)
-      console.log sb_report
 
     error: (response) ->
       $('#sb-loader').hide()
