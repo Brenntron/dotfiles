@@ -13,8 +13,14 @@ module API
               std_api_v2 do
                 if /\A\H*(?<sha256_hash>\h{64})\H*\z/ =~ permitted_params[:sha256_hash]
                   api_response = Threatgrid::Search.data(sha256_hash)
-                  attributes = Threatgrid::Search.query_from_data(api_response)
-                  FileReputationDispute.where(sha256_hash: sha256_hash).update_all(attributes)
+
+                  begin
+                    attributes = Threatgrid::Search.query_from_data(api_response)
+                    FileReputationDispute.where(sha256_hash: sha256_hash).update_all(attributes)
+                  rescue => except
+                    Rails.logger.error("Error updating threatgrid score for sha256 hash #{sha256_hash} -- #{except.error_message}")
+                  end
+
                   render json: api_response
                 else
                   exception = RuntimeError.new('Not a valid SHA256')
