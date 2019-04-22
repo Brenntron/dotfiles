@@ -75,6 +75,44 @@ window.file_rep_return_dispute = (dispute_id) ->
       $('#status_' + dispute_id).text("NEW")
   )
 
+window.file_rep_take_dispute = (dispute_id) ->
+  std_msg_ajax(
+    method: 'PATCH'
+    url: "/escalations/api/v1/escalations/file_rep/disputes/take_dispute/" + dispute_id
+    data: {}
+    dispute_id: dispute_id
+    error_prefix: 'Error updating ticket.'
+    success: (response) ->
+      $('.inline-take-dispute-' + dispute_id).replaceWith("<button class='return-ticket-button inline-return-ticket-#{dispute_id}' title='Return ticket to queue' onclick='file_rep_return_dispute(#{dispute_id});'></button>")
+      $("#owner_#{dispute_id}").text(response.username)
+      $('#status_' + dispute_id).text("ASSIGNED")
+  )
+
+window.file_rep_show_take_dispute = (dispute_id) ->
+  std_msg_ajax(
+    method: 'PATCH'
+    url: "/escalations/api/v1/escalations/file_rep/disputes/take_dispute/" + dispute_id
+    data: {}
+    dispute_id: dispute_id
+    error_prefix: 'Error updating ticket.'
+    success: (response) ->
+      $("#dispute-assignee").text(response.username)
+      $('#show-edit-ticket-status-button').text("ASSIGNED")
+      $('.take-ticket-button').replaceWith("<button class='return-ticket-button' title='Return ticket to open queue' onclick='file_rep_show_return_dispute(#{dispute_id});'></button>")
+  )
+
+window.file_rep_show_return_dispute = (dispute_id) ->
+  std_msg_ajax(
+    method: 'PATCH'
+    url: "/escalations/api/v1/escalations/file_rep/disputes/return_dispute/" + dispute_id
+    data: {}
+    dispute_id: dispute_id
+    error_prefix: 'Error updating ticket.'
+    success: (response) ->
+      $("#dispute-assignee").text("Unassigned")
+      $('#show-edit-ticket-status-button').text("NEW")
+      $('.return-ticket-button').replaceWith("<button class='take-ticket-button' title='Assign this ticket to me' onclick='file_rep_show_take_dispute(#{dispute_id});'></button>")
+  )
 $ ->
   file_rep_url = $('#file-rep-datatable').data('source')
   current_url = window.location.href
