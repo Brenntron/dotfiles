@@ -309,10 +309,27 @@ class FileReputationDispute < ApplicationRecord
     Rails.logger.error("Error updating reversing labs score on id #{self.id} -- #{except.error_message}")
   end
 
+  def pdf?
+    if self.file_name.present?
+      /\.pdf$/i =~ self.file_name
+    end
+  end
+
+  def update_sandbox_score
+    latest_report = FileReputationApi::Sandbox.sandbox_latest_report(self.sha256_hash)
+    run_id = latest_report[:data]['runid']
+    full_report = FileReputationApi::Sandbox.full_report(self.sha256_hash, run_id)
+    sandbox_score = full_report[:data]['score']
+    update!(sandbox_score: sandbox_score, sandbox_threshold: self.pdf? ? 90.0 : 61.0)
+  rescue => except
+    Rails.logger.error("Error updating sandbox score on id #{self.id} -- #{except.error_message}")
+  end
+
   def update_scores
     update_threadgrid_score
     update_ticode_certs
     update_reversing_labs_score
+    update_sandbox_score
   end
 
   def ack_create(envelope_params, sender_params)
@@ -327,6 +344,8 @@ class FileReputationDispute < ApplicationRecord
 
   #for support with incoming bridge messages from TI coming into messages_controller
   def self.process_bridge_payload(message_payload, customer_payload)
+    new_dispute = nil
+
     user = User.where(cvs_username:"vrtincom").first
       ActiveRecord::Base.transaction do
 
@@ -374,16 +393,20 @@ class FileReputationDispute < ApplicationRecord
         new_dispute.platform = message_payload[:platform]
 
         new_dispute.save
-        new_dispute
+
       end #transaction
 
     # This is so the tests can stub out the `threaded?` method and test synchronously.
-    if FileReputationDispute.threaded?
-      Thread.new do
+    if new_dispute
+      if FileReputationDispute.threaded?
+        Thread.new do
+          new_dispute.update_scores
+        end
+      else
         new_dispute.update_scores
       end
-    else
-      new_dispute.update_scores
     end
+
+    new_dispute
   end
 end
