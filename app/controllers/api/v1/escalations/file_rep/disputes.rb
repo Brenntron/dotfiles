@@ -5,7 +5,6 @@ module API
         class Disputes < Grape::API
           include API::V1::Defaults
           include API::BugzillaRestSession
-
           resource "escalations/file_rep/disputes" do
 
             desc 'Create a File Rep Dispute'
@@ -17,6 +16,7 @@ module API
               requires :disposition_suggested, type: String, desc: 'What should the disposiiton be'
               requires :platform, type: String, desc: 'Platform'
               requires :sha256_checksum, type: String, desc: 'SHA256 checksum'
+
             end
             post "" do
               std_api_v2 do
@@ -87,6 +87,71 @@ module API
 
               filerep_dispute.to_json
             end
+
+            desc 'Inline Take FileRep Dispute'
+            params do
+              requires :dispute_id, type: Integer
+            end
+            patch 'take_dispute/:dispute_id' do
+              std_api_v2 do
+                authorize!(:update, FileReputationDispute)
+
+                dispute_id = permitted_params['dispute_id']
+                FileReputationDispute.take_tickets(dispute_id, user: current_user)
+
+                { username: current_user.cvs_username, dispute_ids: dispute_id }
+              end
+            end
+
+            desc 'Inline Return FileRep Dispute'
+            params do
+              requires :dispute_id, type: Integer
+            end
+            patch 'return_dispute/:dispute_id' do
+              std_api_v2 do
+                authorize!(:update, FileReputationDispute)
+
+                dispute_id = permitted_params['dispute_id']
+                FileReputationDispute.find(dispute_id).return_dispute
+
+                { username: current_user.cvs_username, dispute_id: dispute_id }
+              end
+            end
+
+            desc 'Take FileRep Disputes'
+            params do
+              requires :dispute_ids, type: Array[Integer]
+            end
+            patch 'take_disputes' do
+              std_api_v2 do
+                authorize!(:update, FileReputationDispute)
+
+                dispute_ids = permitted_params['dispute_ids']
+                FileReputationDispute.take_tickets(dispute_ids, user: current_user)
+
+                { username: current_user.cvs_username, dispute_ids: dispute_ids }
+              end
+            end
+
+            desc 'Change FileRep Dispute assignee'
+            params do
+              requires :dispute_ids, type: Array[Integer]
+              requires :new_assignee, type: String
+            end
+            post 'change_assignee' do
+              std_api_v2 do
+                authorize!(:update, FileReputationDispute)
+
+                assignee = User.find(params[:new_assignee]).cvs_username
+
+                disputes = FileReputationDispute.assign(params[:dispute_ids], user: params[:new_assignee])
+                if disputes.length == 0
+                  raise ('The selected dispute tickets are already assigned.')
+                end
+                {:status => "success", :data => disputes, :assignee => assignee}.to_json
+              end
+            end
+
           end
         end
       end
