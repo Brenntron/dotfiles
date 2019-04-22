@@ -36,4 +36,9 @@ class FileReputationApi::ReversingLabs
 
     { reversing_labs_score: reversing_labs_score, reversing_labs_count: reversing_labs_count }
   end
+
+  def self.score(sha256_hash)
+    api_response = FileReputationApi::ReversingLabs.sha256_lookup(sha256_hash)
+    FileReputationApi::ReversingLabs.score_of_lookup(api_response)
+  end
 end
