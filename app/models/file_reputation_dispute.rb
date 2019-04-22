@@ -409,6 +409,6 @@ class FileReputationDispute < ApplicationRecord
   end
 
   def return_dispute
-    update!(user_id: User.vrtincoming.id)
+    update!(user_id: User.vrtincoming.id, status: FileReputationDispute::STATUS_NEW)
   end
 end
