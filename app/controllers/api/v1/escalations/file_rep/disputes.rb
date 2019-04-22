@@ -142,12 +142,13 @@ module API
               std_api_v2 do
                 authorize!(:update, FileReputationDispute)
 
-                disputes = FileReputationDispute.assign(params[:dispute_ids], user: params[:new_assignee])
+                assignee = User.find(params[:new_assignee]).cvs_username
 
+                disputes = FileReputationDispute.assign(params[:dispute_ids], user: params[:new_assignee])
                 if disputes.length == 0
                   raise ('The selected dispute tickets are already assigned.')
                 end
-                {:status => "success", :data => disputes}.to_json
+                {:status => "success", :data => disputes, :assignee => assignee}.to_json
               end
             end
 

@@ -110,9 +110,29 @@ window.file_rep_show_return_dispute = (dispute_id) ->
     error_prefix: 'Error updating ticket.'
     success: (response) ->
       $("#dispute-assignee").text("Unassigned")
-      $('#show-edit-ticket-status-button').text("NEW")
-      $('.return-ticket-button').replaceWith("<button class='take-ticket-button' title='Assign this ticket to me' onclick='file_rep_show_take_dispute(#{dispute_id});'></button>")
+      $("#show-edit-ticket-status-button").text("NEW")
+      $(".return-ticket-button").replaceWith("<button class='take-ticket-button' title='Assign this ticket to me' onclick='file_rep_show_take_dispute(#{dispute_id});'></button>")
   )
+
+window.file_rep_show_change_assignee = (dispute_id) ->
+  dispute_id = parseInt($('.case-id-tag')[0].innerHTML)
+  new_assignee = $('#index_target_assignee option:selected').val()
+
+  data = {
+    'dispute_ids': [dispute_id],
+    'new_assignee': new_assignee
+  }
+  std_msg_ajax(
+    method: 'POST'
+    url: "/escalations/api/v1/escalations/file_rep/disputes/change_assignee/"
+    data: data
+    dispute_id: dispute_id
+    error_prefix: 'Error updating ticket.'
+    success: (response) ->
+      window.location.reload()
+
+  )
+
 $ ->
   file_rep_url = $('#file-rep-datatable').data('source')
   current_url = window.location.href

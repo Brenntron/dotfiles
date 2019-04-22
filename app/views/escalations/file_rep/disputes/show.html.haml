@@ -72,7 +72,7 @@
                               %div
                                 %label.toolbar-section-label Assignee
                                 =select_tag :index_target_assignee, options_from_collection_for_select(User.joins(roles: :org_subset).where(org_subsets: { name: 'file rep' }).distinct.order(:cvs_username), :id, :cvs_username), class: 'toolbar-select'
-                              %button{class: 'primary', type:'button', id: 'button_reassign', onclick:'toolbar_show_change_assignee();'}
+                              %button{class: 'primary', type:'button', id: 'button_reassign', onclick:'file_rep_show_change_assignee();'}
                                 Assign
 
 
