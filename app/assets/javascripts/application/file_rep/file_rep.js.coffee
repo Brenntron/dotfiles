@@ -218,3 +218,19 @@ $ ->
       else if $('.dataset-cb:checked').length == 3
         $('#sandbox-report-wrapper, #threatgrid-report-wrapper, #reversing-labs-report-wrapper').removeClass('col-sm-6 col-sm-12').addClass('col-sm-4')
       return
+
+
+
+
+  # dbinebri: adding json button expand/collapse functions
+  $('#btn-sandbox-expand').click -> $('#sb-full').toggleClass('json-height-small')
+  $('#btn-threatgrid-expand').click -> $('#tg-full').toggleClass('json-height-small')
+
+  # dbinebri: adding download json button
+  $('#btn-sandbox-download').click ->
+    alert('initiate download.json')
+
+
+
+  $('#btn-threatgrid-download').click ->
+    alert('initiate download.json')
