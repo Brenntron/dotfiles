@@ -49,6 +49,19 @@ window.toolbar_file_rep_index_change_assignee = () ->
       std_msg_error('Unable to change assignee', [response.responseJSON.message])
   )
 
+window.file_rep_take_dispute = (dispute_id) ->
+  std_msg_ajax(
+    method: 'PATCH'
+    url: "/escalations/api/v1/escalations/file_rep/disputes/take_dispute/" + dispute_id
+    data: {}
+    dispute_id: dispute_id
+    error_prefix: 'Error updating ticket.'
+    success: (response) ->
+#      $('.take-dispute-' + dispute_id).replaceWith("<button class='return-ticket-button return-ticket-#{dispute_id}' title='Assign this ticket to me' onclick='return_dispute(#{dispute_id});'></button>")
+#      $('#owner_' + dispute_id).text(response.username)
+#      $('#status_' + dispute_id).text("Assigned")
+  )
+
 $ ->
   file_rep_url = $('#file-rep-datatable').data('source')
   current_url = window.location.href
@@ -212,11 +225,11 @@ $ ->
       {
         data: 'assigned'
         className: "alt-col"
-        render: (data) ->
+        render: (data, type, full, meta) ->
           if data == 'vrtincom' || data == ""
-            return '<span class="missing-data">Unassigned</span> <span title="Assign to me" class="esc-tooltipped"><button id="index_ticket_assign" class="take-ticket-button" onClick="take_disputes()"/></span>'
+            return '<span class="missing-data">Unassigned</span> <span title="Assign to me" class="esc-tooltipped"><button id="index_ticket_assign" class="take-ticket-button" onClick="file_rep_take_dispute(' + full.id + ')"/></span>'
           else
-            return data + '<span title="Assign to me" class="esc-tooltipped"><button id="index_ticket_assign" class="take-ticket-button" onClick="take_disputes()"/></span>'
+            return data + '<span title="Assign to me" class="esc-tooltipped"><button id="index_ticket_assign" class="take-ticket-button" onClick="file_rep_take_dispute(' + full.id + ')"/></span>'
       }
     ]
 

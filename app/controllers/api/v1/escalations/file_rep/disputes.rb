@@ -65,6 +65,21 @@ module API
               filerep_dispute.to_json
             end
 
+            desc 'Inline Take FileRep Dispute'
+            params do
+              requires :dispute_id, type: Integer
+            end
+            patch 'take_dispute/:dispute_id' do
+              std_api_v2 do
+                authorize!(:update, FileReputationDispute)
+
+                dispute_id = permitted_params['dispute_id']
+                FileReputationDispute.take_tickets(dispute_id, user: current_user)
+
+                { username: current_user.cvs_username, dispute_ids: dispute_id }
+              end
+            end
+
             desc 'Take FileRep Disputes'
             params do
               requires :dispute_ids, type: Array[Integer]
