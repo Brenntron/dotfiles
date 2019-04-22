@@ -3,8 +3,8 @@ $ ->
 
   file_rep_url = $('#file-rep-datatable').data('source')
   current_url = window.location.href;
-  time_submitted = {}
-  last_updated = {}
+  time_submitted = ''
+  last_updated = ''
 
   window.refresh_localStorage = () ->
     localStorage.removeItem('search_type')
@@ -36,10 +36,11 @@ $ ->
 
 
   window.build_advanced_data = () ->
-
+    console.log('fucking hi', time_submitted, last_updated)
     form = $('#filerep_disputes-advanced-search-form')
     localStorage.search_type = 'advanced'
     localStorage.search_name = form.find('input[name="search_name"]').val()
+    console.log(time_submitted, time_submitted)
     localStorage.search_conditions = JSON.stringify(
       id: form.find('input[id="caseid-input"]').val()
       created_at: time_submitted
@@ -51,7 +52,7 @@ $ ->
       file_size: form.find('input[id="file-size-input"]').val()
       sha256_hash: form.find('input[id="sha256-input"]').val()
       sample_type: form.find('input[id="sample-type-input"]').val()
-      disposition: Aass     form.find('input[id="amp-disposition-input"]').val()
+      disposition: form.find('input[id="amp-disposition-input"]').val()
       disposition_suggested: form.find('input[id="suggested-disposition-input"]').val()
       sandbox_score: form.find('input[id="sandbox-score-input"]').val()
       threatgrid_score: form.find('input[id="tg-score-input"]').val()
@@ -312,22 +313,37 @@ $ ->
       s
 
   $(document).on 'focus', '#time-submitted-input', (e) ->
-    $('#time-submitted-input').daterangepicker({},
+    if time_submitted != ''
+      placeholder = time_submitted.to + ' - ' + time_submitted.from
+    else
+      placeholder = 'MM-DD-YYYY'
+    $('#time-submitted-input').attr('placeholder', placeholder)
+
+    $('#time-submitted-input').daterangepicker( {},
       (start, end) ->
         time_submitted = {
           from : start.format('YYYY-MM-DD')
           to : end.format('YYYY-MM-DD')
         }
-    );
+        $('#advanced-search-dropdown').show()
+        $('#advanced-search-dropdown').css('display', 'block')
+    )
 
   $(document).on 'focus', '#last-updated-input', () ->
-    $('#last-updated-input').daterangepicker({},
+    if last_updated != ''
+      placeholder = last_updated.to + ' - ' + last_updated.from
+    else
+      placeholder = 'MM-DD-YYYY'
+    $('#last-updated-input').attr('placeholder', placeholder)
+
+    $('#last-updated-input').daterangepicker( {},
       (start, end) ->
         last_updated = {
           from : start.format('YYYY-MM-DD')
           to : end.format('YYYY-MM-DD')
         }
-        console.log(start.format('YYYY-MM-DD'), end.format('YYYY-MM-DD')))
+    )
+
 
   $('#data-show-sandbox-cb').click -> $('#sandbox-report-wrapper').toggle()
   $('#data-show-tg-cb').click -> $('#threatgrid-report-wrapper').toggle()
