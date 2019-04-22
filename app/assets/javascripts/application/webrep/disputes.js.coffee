@@ -1454,8 +1454,9 @@ $ ->
     $('#search_name').val("")
     $('#advanced-search-dropdown').toggle()
 
-  $(document).click ->
-    $("#advanced-search-dropdown").hide()
+  $(document).click (e)->
+    if !e.target.closest('.daterangepicker')
+      $("#advanced-search-dropdown").hide()
 
   $(document).ready ->
     setInterval ->

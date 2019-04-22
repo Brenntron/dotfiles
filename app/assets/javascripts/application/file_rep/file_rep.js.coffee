@@ -201,7 +201,7 @@ $ ->
         data: 'disposition'
         render: (data) ->
           if data == 'Malicious'
-            return '<span class="malicious text-capitalize">Malicious</span>'
+            return '<span class="overdue text-capitalize">Malicious</span>'
           else
             return '<span class="text-capitalize">' + data + '</span>'
       }
@@ -250,7 +250,7 @@ $ ->
         data: 'disposition_suggested'
         render: (data) ->
           if data == 'Malicious'
-            return '<span class="malicious text-capitalize">Malicious</span>'
+            return '<span class="overdue text-capitalize">Malicious</span>'
           else
             return  '<span class="text-capitalize">' + data + '</span>'
       }
