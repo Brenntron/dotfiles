@@ -3,6 +3,7 @@ class FileReputationDispute < ApplicationRecord
 
   belongs_to :customer, optional:true
   belongs_to :assigned, class_name: 'User', optional:true
+  has_many :file_rep_comments
   has_many :digital_signers
 
   delegate :name, :company, :company_id, to: :customer, allow_nil: true, prefix: true
