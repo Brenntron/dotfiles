@@ -57,9 +57,19 @@ window.file_rep_take_dispute = (dispute_id) ->
     dispute_id: dispute_id
     error_prefix: 'Error updating ticket.'
     success: (response) ->
-#      $('.take-dispute-' + dispute_id).replaceWith("<button class='return-ticket-button return-ticket-#{dispute_id}' title='Assign this ticket to me' onclick='return_dispute(#{dispute_id});'></button>")
-#      $('#owner_' + dispute_id).text(response.username)
-#      $('#status_' + dispute_id).text("Assigned")
+      $('.take-dispute-' + dispute_id).replaceWith("<button class='return-ticket-button return-ticket-#{dispute_id}' title='Assign this ticket to me' onclick='return_dispute(#{dispute_id});'></button>")
+      $('#owner_' + dispute_id).text(response.username)
+      $('#status_' + dispute_id).text("Assigned")
+  )
+
+window.file_rep_return_dispute = (dispute_id) ->
+  std_msg_ajax(
+    method: 'PATCH'
+    url: "/escalations/api/v1/escalations/file_rep/disputes/return_dispute/" + dispute_id
+    data: {}
+    dispute_id: dispute_id
+    error_prefix: 'Error updating ticket.'
+    success: (response) ->
   )
 
 $ ->
@@ -226,10 +236,12 @@ $ ->
         data: 'assigned'
         className: "alt-col"
         render: (data, type, full, meta) ->
-          if data == 'vrtincom' || data == ""
+          if full.current_user == data
+            return "<span class='dispute_username' id='owner_#{full.id}'> #{data} </span><button class='return-ticket-button return-ticket-#{full.id}' title='Return ticket.' onclick='file_rep_return_dispute(#{full.id});'></button>"
+          else if data == 'vrtincom' || data == ""
             return '<span class="missing-data">Unassigned</span> <span title="Assign to me" class="esc-tooltipped"><button id="index_ticket_assign" class="take-ticket-button" onClick="file_rep_take_dispute(' + full.id + ')"/></span>'
           else
-            return data + '<span title="Assign to me" class="esc-tooltipped"><button id="index_ticket_assign" class="take-ticket-button" onClick="file_rep_take_dispute(' + full.id + ')"/></span>'
+            return data
       }
     ]
 

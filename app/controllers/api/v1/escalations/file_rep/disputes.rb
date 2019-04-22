@@ -80,6 +80,21 @@ module API
               end
             end
 
+            desc 'Inline Return FileRep Dispute'
+            params do
+              requires :dispute_id, type: Integer
+            end
+            patch 'return_dispute/:dispute_id' do
+              std_api_v2 do
+                authorize!(:update, FileReputationDispute)
+
+                dispute_id = permitted_params['dispute_id']
+                FileReputationDispute.find(dispute_id).return_dispute
+
+                { username: current_user.cvs_username, dispute_id: dispute_id }
+              end
+            end
+
             desc 'Take FileRep Disputes'
             params do
               requires :dispute_ids, type: Array[Integer]

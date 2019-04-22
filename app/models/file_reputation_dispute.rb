@@ -407,4 +407,8 @@ class FileReputationDispute < ApplicationRecord
 
     disputes_ary
   end
+
+  def return_dispute
+    update!(user_id: User.vrtincoming.id)
+  end
 end
