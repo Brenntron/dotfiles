@@ -76,17 +76,6 @@ class FileReputationDispute < ApplicationRecord
 
     file_rep = FileReputationDispute.new
 
-    threatgrid_score = nil
-    threatgrid_private = nil
-    threatgrid_threshold = nil
-    if sha256_checksum.present?
-      threatgrid_response = Threatgrid::Search.query(sha256_checksum)
-
-      threatgrid_score = threatgrid_response['threatgrid_score']
-      threatgrid_private = threatgrid_response['threatgrid_private']
-      threatgrid_threshold = threatgrid_response['threatgrid_threshold']
-    end
-
     summary = "New File Rep Dispute generated at #{DateTime.now.utc.strftime("%Y-%m-%d %H:%M")}"
 
     full_description = %Q{
@@ -116,9 +105,6 @@ class FileReputationDispute < ApplicationRecord
         disposition_suggested: disposition_suggested,
         source: source,
         platform: platform,
-        threatgrid_score: threatgrid_score,
-        threatgrid_threshold: threatgrid_threshold,
-        threatgrid_private: threatgrid_private,
         customer: customer
     }
     file_rep.assign_attributes(attributes)
@@ -364,14 +350,6 @@ class FileReputationDispute < ApplicationRecord
     update!(sandbox_score: sandbox_score, sandbox_threshold: sandbox_threshold)
   rescue => except
     Rails.logger.error("Error updating sandbox score on id #{self.id} -- #{except.error_message}")
-  end
-
-  def update_sandbox_score
-    sandbox_response = FileReputationApi::Sandbox.sandbox_score(self.sha256_hash)
-
-    if sandbox_response.present? && sandbox_response[:success] == true
-      self.update(sandbox_score: sandbox_response[:data])
-    end
   end
 
   def update_scores
