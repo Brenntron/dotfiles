@@ -328,7 +328,6 @@ class FileReputationDispute < ApplicationRecord
   #for support with incoming bridge messages from TI coming into messages_controller
   def self.process_bridge_payload(message_payload, customer_payload)
     user = User.where(cvs_username:"vrtincom").first
-    begin
       ActiveRecord::Base.transaction do
 
         guest = Company.where(:name => "Guest").first
@@ -377,6 +376,14 @@ class FileReputationDispute < ApplicationRecord
         new_dispute.save
         new_dispute
       end #transaction
-    end #begin
+
+    # This is so the tests can stub out the `threaded?` method and test synchronously.
+    if FileReputationDispute.threaded?
+      Thread.new do
+        new_dispute.update_scores
+      end
+    else
+      new_dispute.update_scores
+    end
   end
 end
