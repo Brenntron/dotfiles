@@ -693,7 +693,11 @@ button {
 .disposition-button {background-image: url(image_path('icon_hazard.svg'));}
 .take-ticket-button-full {background-image: url(image_path('icon_take.svg'));}
 .icon-unassigned-bugs {background-image: url(image_path('icon_unassigned.svg'));}
-.reset-filter {background-image: url(image_path('icon_reset_grey.svg'));}
+.reset-filter {
+  background-image: url(image_path('icon_reset_grey.svg'));
+  display: inline-block;
+  height: 25px;
+  width: 25px;}
 .reset-filter:hover {background-image: url(image_path('icon_reset_blue.svg'));}
 
 .master-submit-button {

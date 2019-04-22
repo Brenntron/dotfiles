@@ -3,6 +3,8 @@ $ ->
 
   file_rep_url = $('#file-rep-datatable').data('source')
   current_url = window.location.href;
+  time_submitted = {}
+  last_updated = {}
 
   window.refresh_localStorage = () ->
     localStorage.removeItem('search_type')
@@ -40,8 +42,8 @@ $ ->
     localStorage.search_name = form.find('input[name="search_name"]').val()
     localStorage.search_conditions = JSON.stringify(
       id: form.find('input[id="caseid-input"]').val()
-      created_at: form.find('input[id="time-submitted-input"]').val()
-      updated_at: form.find('input[id="last-updated-input"]').val()
+      created_at: time_submitted
+      updated_at: last_updated
       status: form.find('input[id="status-input"]').val()
       resolution: form.find('input[id="resolution-input"]').val()
       assigned: form.find('input[id="assignee-input"]').val()
@@ -49,7 +51,7 @@ $ ->
       file_size: form.find('input[id="file-size-input"]').val()
       sha256_hash: form.find('input[id="sha256-input"]').val()
       sample_type: form.find('input[id="sample-type-input"]').val()
-      disposition: form.find('input[id="amp-disposition-input"]').val()
+      disposition: Aass     form.find('input[id="amp-disposition-input"]').val()
       disposition_suggested: form.find('input[id="suggested-disposition-input"]').val()
       sandbox_score: form.find('input[id="sandbox-score-input"]').val()
       threatgrid_score: form.find('input[id="tg-score-input"]').val()
@@ -107,13 +109,28 @@ $ ->
   window.format_filerep_header = (data) ->
 
     if data != undefined
+      reset_icon = '<span id="refresh-filter-button" class="reset-filter esc-tooltipped" title="Clear Search Results"></span>'
       {search_type, search_name} = data
+
       if search_type == 'standard'
-        new_header = '<div><span class="text-capitalize">' + search_name.replace(/_/g, " ") + ' tickets </span><span id="refresh-filter-button" class="reset-filter esc-tooltipped" title="Refresh Tickets Filter"></span></div>'
+        new_header =
+          '<div>' +
+          '<span class="text-capitalize">' + search_name.replace(/_/g, " ") +' tickets </span>' +
+          reset_icon +
+          '</div>'
+
       else if search_type == 'advanced'
-        new_header = '<div>Results for Advanced Search <span id="refresh-filter-button" class="reset-filter esc-tooltipped" title="Refresh Tickets Filter"></span></div>'
+        new_header =
+          '<div>Results for Advanced Search ' +
+          reset_icon +
+          '</div>'
+
       else if search_type == 'named'
-        new_header = '<div>Results for "' + search_name + '" Saved Search <span id="refresh-filter-button" class="reset-filter esc-tooltipped" title="Refresh Tickets Filter"></span></div>'
+        new_header =
+          '<div>Results for "' + search_name + '" Saved Search' +
+          reset_icon +
+          '</div>'
+
       else
         new_header = 'All File Reputation Tickets'
 
@@ -294,16 +311,33 @@ $ ->
         s = '0' + s
       s
 
-    # dbinebri: adding in checkbox toggle column visible + widths on Show Page, Research tab
-    $('#data-show-sandbox-cb').click -> $('#sandbox-report-wrapper').toggle()
-    $('#data-show-tg-cb').click -> $('#threatgrid-report-wrapper').toggle()
-    $('#data-show-reversing-cb').click -> $('#reversing-labs-report-wrapper').toggle()
+  $(document).on 'focus', '#time-submitted-input', (e) ->
+    $('#time-submitted-input').daterangepicker({},
+      (start, end) ->
+        time_submitted = {
+          from : start.format('YYYY-MM-DD')
+          to : end.format('YYYY-MM-DD')
+        }
+    );
 
-    $('#data-show-sandbox-cb, #data-show-tg-cb, #data-show-reversing-cb').click ->
-      if $('.dataset-cb:checked').length == 1
-        $('#sandbox-report-wrapper, #threatgrid-report-wrapper, #reversing-labs-report-wrapper').removeClass('col-sm-4 col-sm-6').addClass('col-sm-12')
-      else if $('.dataset-cb:checked').length == 2
-        $('#sandbox-report-wrapper, #threatgrid-report-wrapper, #reversing-labs-report-wrapper').removeClass('col-sm-4 col-sm-12').addClass('col-sm-6')
-      else if $('.dataset-cb:checked').length == 3
-        $('#sandbox-report-wrapper, #threatgrid-report-wrapper, #reversing-labs-report-wrapper').removeClass('col-sm-6 col-sm-12').addClass('col-sm-4')
-      return
+  $(document).on 'focus', '#last-updated-input', () ->
+    $('#last-updated-input').daterangepicker({},
+      (start, end) ->
+        last_updated = {
+          from : start.format('YYYY-MM-DD')
+          to : end.format('YYYY-MM-DD')
+        }
+        console.log(start.format('YYYY-MM-DD'), end.format('YYYY-MM-DD')))
+
+  $('#data-show-sandbox-cb').click -> $('#sandbox-report-wrapper').toggle()
+  $('#data-show-tg-cb').click -> $('#threatgrid-report-wrapper').toggle()
+  $('#data-show-reversing-cb').click -> $('#reversing-labs-report-wrapper').toggle()
+
+  $('#data-show-sandbox-cb, #data-show-tg-cb, #data-show-reversing-cb').click ->
+    if $('.dataset-cb:checked').length == 1
+      $('#sandbox-report-wrapper, #threatgrid-report-wrapper, #reversing-labs-report-wrapper').removeClass('col-sm-4 col-sm-6').addClass('col-sm-12')
+    else if $('.dataset-cb:checked').length == 2
+      $('#sandbox-report-wrapper, #threatgrid-report-wrapper, #reversing-labs-report-wrapper').removeClass('col-sm-4 col-sm-12').addClass('col-sm-6')
+    else if $('.dataset-cb:checked').length == 3
+      $('#sandbox-report-wrapper, #threatgrid-report-wrapper, #reversing-labs-report-wrapper').removeClass('col-sm-6 col-sm-12').addClass('col-sm-4')
+    return
