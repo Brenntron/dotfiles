@@ -194,9 +194,14 @@ class FileReputationDispute < ApplicationRecord
   def self.advanced_search(params, search_name:, user:)
 
     search_hash = non_blank_fields(params)
+    sha256_hash = search_hash.delete('sha256_hash')
     dispute_fields = matching_field(search_hash)
 
     relation = where(dispute_fields)
+
+    if sha256_hash.present?
+      relation = relation.where('sha256_hash like :sha256_hash', sha256_hash: "%#{sanitize_sql_like(sha256_hash)}%")
+    end
 
     if %w{customer_name customer_email company_name}.any? {|key_name| search_hash[key_name].present? }
       relation = relation.by_customer(customer_name: search_hash['customer_name'],
