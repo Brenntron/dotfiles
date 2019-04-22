@@ -2,7 +2,7 @@
 -#=simple_form_for Dispute.new, url: escalations_webrep_disputes_path, class: 'escalations-search', method: :get do |dispute_form|
 -#THIS IS BEING POPULATED BY THE WEBREP DISPUTES PATH. Depending on what we're doing in the future, we may need to break this out into it's own endpoint
 = form_for :advanced_search, html: {id: 'filerep_disputes-advanced-search-form'}, url: escalations_file_rep_disputes_path, method: 'get', 'accept-charset': 'UTF-8' do |advanced_search_form|
-  .form-group.search-item
+  .form-group.search-item.hidden
     %label.content-label-sm Case IDs
     %input.form-control#caseid-input{name: 'case_id', type:"number", min:"0"}
     %button.remove-input
@@ -11,16 +11,16 @@
     %input.form-control#status-input{name: 'status', list: 'status-list'}
     %datalist#status-list
     %button.remove-input
-  .form-group.search-item
+  .form-group.search-item.hidden
     %label.content-label-sm Resolution
     %input.form-control#resolution-input{name: 'resolution', list: 'resolution-list'}
     %datalist#resolution-list
     %button.remove-input
-  .form-group.search-item
+  .form-group.search-item.hidden
     %label.content-label-sm File Name
     %input.form-control#file-name-input{name: 'file_name'}
     %button.remove-input
-  .form-group.search-item.hidden
+  .form-group.search-item
     %label.content-label-sm SHA256
     %input.form-control#sha256-input{name: 'SHA256'}
     %button.remove-input
@@ -28,7 +28,7 @@
     %label.content-label-sm Sample Type
     %input.form-control#sample-type-input{name: 'sample_type'}
     %button.remove-input
-  .form-group.search-item.hidden
+  .form-group.search-item
     %label.content-label-sm AMP Disposition
     %input.form-control#amp-disposition-input{name: 'amp_disposition'}
     %button.remove-input
@@ -49,7 +49,7 @@
     .form-control.require-float#sandbox-score-input{name: 'sandbox_score'}
       .ui-slider-handle
     %button.remove-input
-  .form-group.search-item.hidden
+  .form-group.search-item
     %label.content-label-sm TG Score
     .form-control.require-float#tg-score-input{name: 'tg_score'}
       .ui-slider-handle
@@ -58,7 +58,7 @@
     %label.content-label-sm In Sample Zoo
     %input.form-control#in-sample-zoo-input{name: 'in_sample_zoo', type: 'checkbox', value: 'checked', for: 'in-sample-zoo'}
     %button.remove-input
-  .form-group.search-item.hidden
+  .form-group.search-item
     %label.content-label-sm Suggested Disposition
     %input.form-control#suggested-disposition-input{name: 'suggested_disposition'}
     %button.remove-input
@@ -153,25 +153,25 @@
   #search-criteria-options
     .multicol-2
       %ul
-        %li.hidden
+        %li
           %label.search-criteria-label
             %input.search-checkbox#caseid-cb{type: 'checkbox', name: 'search-criteria', value: 'Case IDs', for: 'caseid-input'}
             Case IDs
-        %li.hidden
+        %li
           %label.search-criteria-label
-            %input.search-checkbox#status-cb{type: 'checkbox', name: 'search-criteria', value: 'Status', for: 'status-input'}
+            %input.search-checkbox#status-cb{type: 'checkbox', checked: true, name: 'search-criteria', value: 'Status', for: 'status-input'}
             Status
-        %li.hidden
+        %li
           %label.search-criteria-label
             %input.search-checkbox#resolution-cb{type: 'checkbox', name: 'search-criteria', value: 'Resolution', for: 'resolution-input' }
             Resolution
-        %li.hidden
+        %li
           %label.search-criteria-label
             %input.search-checkbox#file-name-cb{type: 'checkbox', name: 'search-criteria', value: 'File Name', for: 'file-name-input' }
             File Name
         %li
           %label.search-criteria-label
-            %input.search-checkbox#sha-cb{type: 'checkbox', name: 'search-criteria', value: 'SHA256', for: 'sha256-input'}
+            %input.search-checkbox#sha-cb{type: 'checkbox', checked: true, name: 'search-criteria', value: 'SHA256', for: 'sha256-input'}
             SHA256
         %li
           %label.search-criteria-label
@@ -179,7 +179,7 @@
             Sample Type
         %li
           %label.search-criteria-label
-            %input.search-checkbox#amp-disposition-cb{type: 'checkbox', name: 'search-criteria', value: 'AMP Disposition', for: 'amp-disposition-input'}
+            %input.search-checkbox#amp-disposition-cb{type: 'checkbox', checked: true, name: 'search-criteria', value: 'AMP Disposition', for: 'amp-disposition-input'}
             AMP Disposition
         %li
           %label.search-criteria-label
@@ -195,11 +195,11 @@
             Assignee
         %li
           %label.search-criteria-label
-            %input.search-checkbox#sandbox-score-cb{type: 'checkbox', name: 'search-criteria', value: 'Sandbox Score', for: 'sandbox-score-input'}
+            %input.search-checkbox#sandbox-score-cb{type: 'checkbox', checked: true, name: 'search-criteria', value: 'Sandbox Score', for: 'sandbox-score-input'}
             Sandbox Score
         %li
           %label.search-criteria-label
-            %input.search-checkbox#tg-score-cb{type: 'checkbox', name: 'search-criteria', value: 'TG Score', for: 'tg-score-input'}
+            %input.search-checkbox#tg-score-cb{type: 'checkbox', checked: true, name: 'search-criteria', value: 'TG Score', for: 'tg-score-input'}
             TG Score
         %li
           %label.search-criteria-label
@@ -207,7 +207,7 @@
             In Sample Zoo
         %li
           %label.search-criteria-label
-            %input.search-checkbox#suggested-disposition-cb{type: 'checkbox', name: 'search-criteria', value: 'Suggested Disposition', for: 'suggested-disposition-input'}
+            %input.search-checkbox#suggested-disposition-cb{type: 'checkbox', checked: true, name: 'search-criteria', value: 'Suggested Disposition', for: 'suggested-disposition-input'}
             Suggested Disposition
         %li
           %label.search-criteria-label
