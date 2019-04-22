@@ -3,9 +3,9 @@ module API
     module Escalations
       module FileRep
         class Disputes < Grape::API
-          resource "escalations/file_rep/disputes" do
           include API::V1::Defaults
           include API::BugzillaRestSession
+          resource "escalations/file_rep/disputes" do
 
             desc 'Create a File Rep Dispute'
             params do
