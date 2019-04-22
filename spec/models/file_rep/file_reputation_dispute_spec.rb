@@ -9,10 +9,10 @@ describe Dispute do
 
       @default = FactoryBot.create(:file_reputation_dispute, assigned: @other_user)
       @assigned = FactoryBot.create(:file_reputation_dispute, status: FileReputationDispute::STATUS_ASSIGNED, assigned: @other_user)
-      @closed = FactoryBot.create(:file_reputation_dispute, status: FileReputationDispute::STATUS_CLOSED, assigned: @other_user, description: @long_desc2)
+      @closed = FactoryBot.create(:file_reputation_dispute, status: FileReputationDispute::STATUS_RESOLVED, assigned: @other_user, description: @long_desc2)
       @my_default = FactoryBot.create(:file_reputation_dispute, assigned: @current_user, description: @long_desc1)
       @my_assigned = FactoryBot.create(:file_reputation_dispute, status: FileReputationDispute::STATUS_ASSIGNED, assigned: @current_user)
-      @my_closed = FactoryBot.create(:file_reputation_dispute, status: FileReputationDispute::STATUS_CLOSED, assigned: @current_user)
+      @my_closed = FactoryBot.create(:file_reputation_dispute, status: FileReputationDispute::STATUS_RESOLVED, assigned: @current_user)
       @unassigned = FactoryBot.create(:file_reputation_dispute, assigned: nil)
     end
 

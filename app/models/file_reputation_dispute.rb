@@ -10,12 +10,20 @@ class FileReputationDispute < ApplicationRecord
 
   STATUS_NEW                = 'NEW'
   STATUS_ASSIGNED           = 'ASSIGNED'
-  STATUS_CLOSED             = 'CLOSED'
+  STATUS_RESEARCHING        = 'RESEARCHING'
+  STATUS_ESCALATED          = 'ESCALATED'
+  STATUS_PENDING            = 'PENDING'
+  STATUS_ONHOLD             = 'ONHOLD'
+  STATUS_RESOLVED           = 'RESOLVED'
   STATUS_REOPENED           = 'RE-OPENED'
   STATUS_CUSTOMER_PENDING   = "CUSTOMER_PENDING"
   STATUS_CUSTOMER_UPDATE    = "CUSTOMER_UPDATE"
 
-  DISPOSITION_MALICIOUS     = 'MALICIOUS'
+  DISPOSITION_UNSEEN        = 'unseen'
+  DISPOSITION_UNKNOWN       = 'unknown'
+  DISPOSITION_MALICIOUS     = 'malicious'
+  DISPOSITION_COMMON        = 'common'
+  DISPOSITION_CLEAN         = 'clean'
 
   validates :status, :file_name, :sha256_hash, :disposition_suggested, presence: true
 
@@ -214,21 +222,17 @@ class FileReputationDispute < ApplicationRecord
     # when 'recently_viewed'
     #   joins(:dispute_peeks).where(dispute_peeks: {assigned_id: user.id})
     when 'my_open'
-      where.not(status: STATUS_CLOSED).where(assigned_id: user.id)
+      where.not(status: STATUS_RESOLVED).where(assigned_id: user.id)
     when 'my_disputes'
       where(assigned_id: user.id)
     # when 'team_disputes'
     #   where(assigned_id: user.my_team)
     when 'unassigned'
-      where(assigned_id: nil).where.not(status: STATUS_CLOSED)
+      where(assigned_id: nil).where.not(status: STATUS_RESOLVED)
     when 'open'
-      where.not(status: STATUS_CLOSED)
-    # when 'open_email'
-    #   sbrs_disputes.where(status: [STATUS_NEW, STATUS_REOPENED, STATUS_CUSTOMER_PENDING, STATUS_CUSTOMER_UPDATE, STATUS_ON_HOLD, STATUS_RESEARCHING, STATUS_ESCALATED, STATUS_ASSIGNED])
-    # when 'open_web'
-    #   wbrs_disputes.where(status: [STATUS_NEW, STATUS_REOPENED, STATUS_CUSTOMER_PENDING, STATUS_CUSTOMER_UPDATE, STATUS_ON_HOLD, STATUS_RESEARCHING, STATUS_ESCALATED, STATUS_ASSIGNED])
+      where.not(status: STATUS_RESOLVED)
     when 'closed'
-      where(status: STATUS_CLOSED)
+      where(status: STATUS_RESOLVED)
     when 'all'
       where({})
     else
