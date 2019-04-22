@@ -223,6 +223,24 @@ class FileReputationDispute < ApplicationRecord
       relation = relation.where('sandbox_score <= :sandbox_to', sandbox_to: sandbox_range['to'].to_f)
     end
 
+    if created_at_range['from']
+      relation = relation.where('created_at >= :created_at_from', created_at_from: created_at_range['from'])
+    end
+
+    if created_at_range['to']
+      created_at_to = created_at_range['to']
+      relation = relation.where('created_at <= ADDDATE(:created_at_to, INTERVAL 1 DAY)', created_at_to: created_at_to)
+    end
+
+    if updated_at_range['from']
+      relation = relation.where('updated_at >= :updated_at_from', updated_at_from: updated_at_range['from'])
+    end
+
+    if updated_at_range['to']
+      updated_at_to = updated_at_range['to']
+      relation = relation.where('updated_at <= ADDDATE(:updated_at_to, INTERVAL 1 DAY)', updated_at_to: updated_at_to)
+    end
+
     if %w{customer_name customer_email company_name}.any? {|key_name| search_hash[key_name].present? }
       relation = relation.by_customer(customer_name: search_hash['customer_name'],
                                       customer_email: search_hash['customer_email'],
