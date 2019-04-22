@@ -68,7 +68,7 @@
           %div
             %label.toolbar-section-label Assignee
             %select{name: 'index_target_assignee', id: 'index_target_assignee', class:'toolbar-select'}
-              - User.joins(roles: :org_subset).where(org_subsets: { name: 'webrep' }).distinct.order(:cvs_username).each do |u|
+              - User.joins(roles: :org_subset).where(org_subsets: { name: 'file rep' }).distinct.order(:cvs_username).each do |u|
                 %option{id: u.id, value: u.id, label: u.cvs_username}
           %button{class: 'primary', type:'button', id: 'button_reassign', onclick:'toolbar_file_rep_index_change_assignee();'}
             Assign
