@@ -130,22 +130,6 @@
                       Submit
 
     %span.dropdown
-      %button#file-disp-button.toolbar-button.disposition-button.dropdown-toggle.esc-tooltipped.toolbar-button-spacer{title: 'Change Disposition', 'data-toggle': 'dropdown', 'aria-haspopup': 'true', 'aria-expanded': 'false'}
-        %span.toolbar-button-text
-          Change Disposition
-      .dropdown-menu.toolbar-dropdown#file-disp-dropdown{'aria-labelledby': 'file-disp-button'}
-        .toolbar
-          %div
-            %label.toolbar-section-label Disposition
-            %select.toolbar-select
-              %option Clean
-              %option Common
-              %option Malicious
-              %option Unknown
-          %button{class: 'primary', type:'button', id: 'button_reassign', onclick:'toolbar_index_change_assignee();'}
-            Submit
-
-    %span.dropdown
       %button#file-det-button.toolbar-button.detection-button.dropdown-toggle.esc-tooltipped{title: 'Create Detection', 'data-toggle': 'dropdown', 'aria-haspopup': 'true', 'aria-expanded': 'false'}
         %span.toolbar-button-text
           Create Detection
