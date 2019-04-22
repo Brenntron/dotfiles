@@ -351,6 +351,12 @@ class FileReputationDispute < ApplicationRecord
     end
   end
 
+  def update_trifecta
+    update_threadgrid_score
+    update_reversing_labs_score
+    update_sandbox_score
+  end
+
   def update_scores
     update_threadgrid_score
     update_ticode_certs

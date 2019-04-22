@@ -1,5 +1,7 @@
 $ ->
-
+  $('#file-rep-sync-button').click ->
+    window.research_data()
+    window.update_file_rep_data()
 
 
   file_rep_url = $('#file-rep-datatable').data('source')

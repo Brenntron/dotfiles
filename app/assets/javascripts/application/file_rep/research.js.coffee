@@ -3,6 +3,17 @@ $ ->
   if $('body').hasClass('show-action')
     window.research_data()
 
+window.update_file_rep_data = () ->
+  file_rep_id = $(".case-id-tag")[0].innerText
+  std_msg_ajax(
+    method: 'POST'
+    url: "/escalations/api/v1/escalations/filerep/research/update_file_rep_data"
+    data: {id: file_rep_id}
+    success_reload: false
+    error: (response) ->
+      $('#tg-loader').hide()
+      std_api_error(response, "There was a problem refreshing some research data", reload: false)
+  )
 
 window.research_data = () ->
   sha256_hash = $('#sha256_hash')[0].innerText
