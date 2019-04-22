@@ -4,6 +4,8 @@ module API
       module FileRep
         class Disputes < Grape::API
           resource "escalations/file_rep/disputes" do
+          include API::V1::Defaults
+          include API::BugzillaRestSession
 
             desc 'Create a File Rep Dispute'
             params do
@@ -14,6 +16,7 @@ module API
               requires :disposition_suggested, type: String, desc: 'What should the disposiiton be'
               requires :platform, type: String, desc: 'Platform'
               requires :sha256_checksum, type: String, desc: 'SHA256 checksum'
+
             end
             post "" do
               std_api_v2 do
@@ -29,7 +32,27 @@ module API
                                                               )
                 render json: {status: 'Success', case_id: dispute.id}
               end
+            end
+
+            desc 'Create a File Rep Dispute through the form'
+            params do
+              requires :shas_array, type: Array[String], desc: 'SHA256 hash of the file'
+              requires :disposition_suggested, type: String, desc: 'Suggested disposition'
+              requires :assignee, type: String, desc: 'Assignee'
+              # requires :shas_input_type, type: String, desc: 'Input type' This will be implemented later when analysts can upload files
+            end
+            post "form" do
+              std_api_v2 do
+                permitted_params['shas_array'].each do |sha256|
+                  FileReputationDispute.create_through_form(bugzilla_rest_session,
+                                                            sha256,
+                                                            params[:disposition_suggested],
+                                                            params[:assignee])
+                end
+
+                render json: {status: 'Success'}
               end
+            end
 
             desc 'Edit a FileRep Dispute'
             params do

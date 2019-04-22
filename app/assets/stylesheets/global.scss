@@ -4607,7 +4607,7 @@ table > tbody > tr > td.dispute_rep_tools {
   border-radius: 2px;
   border: none;
   background-repeat: no-repeat;
-  margin:0 1px;
+  margin:0 3px;
   display: inline-block;
 }
 
@@ -6074,8 +6074,8 @@ table.dispute-entry-table tbody tr.selected {
   border: none;
   background-color: #6dbcdb;
   min-width: 200px;
-  top: 16px;
-  left: 4px;
+  top: 18px;
+  left: 3px;
 }
 
 .dispute-owner-buttons-wrapper h3 {
@@ -8312,7 +8312,7 @@ hr.thin.form-divider {
   background-color: $content-bg-color;
 }
 
-// dbinebri: the new ticket file rep container needs to be wide to handle huge sha256 strings
+// dbinebri: the new ticket file rep container needs to be wide and slightly positioned to the right
 .escalations--file_rep--disputes-controller .nav-tools-dropdown {
   min-width: 540px;
   margin-left: 35px;
@@ -8352,9 +8352,11 @@ hr.thin.form-divider {
     }
   }
 
-  // sha256 are long strings, using textarea to safely handle char length
-  textarea {
-    min-height: 50px;
+  // new ticket: need to allow multiple (up to 100) shas at a time here
+  textarea#shas_list {
+    font-family: 'Fira Mono', monospace;
+    font-size: 11.5px;
+    min-height: 200px;
   }
 
   // radio button padding tweaks
@@ -8798,7 +8800,6 @@ button.secondary.view-report-external-button {
 .tooltipster-sidetip .tooltipster-box {
   max-width: 410px !important;
 }
-
 
 .data-report-wrapper hr.thin {
   margin-top: 10px;

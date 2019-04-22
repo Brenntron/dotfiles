@@ -279,7 +279,6 @@ $ ->
       selection.addRange(range);
       document.execCommand("Copy");
 
-
     Number::pad = (size) ->
       s = String(this)
       while s.length < (size or 2)
