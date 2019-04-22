@@ -217,6 +217,7 @@ $ ->
     form_data.append('to', $('.new-receiver').val())
     form_data.append('subject', $('.new-subject').val())
     form_data.append('cc', $('.cc-email').val())
+    form_data.append('dispute_type', "FileReputationDispute")
 
     dispute_id = $('input[name="dispute_id"]').val()
 
