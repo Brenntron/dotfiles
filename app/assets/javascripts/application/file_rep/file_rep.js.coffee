@@ -221,16 +221,9 @@ $ ->
 
 
 
-
-  # dbinebri: adding json button expand/collapse functions
-  $('#btn-sandbox-expand').click -> $('#sb-full').toggleClass('json-height-small')
-  $('#btn-threatgrid-expand').click -> $('#tg-full').toggleClass('json-height-small')
-
   # dbinebri: adding download json button
-  $('#btn-sandbox-download').click ->
-    alert('initiate download.json')
+  $('#download-tg-json').click ->
 
 
 
-  $('#btn-threatgrid-download').click ->
-    alert('initiate download.json')
+  $('#download-sb-json').click ->

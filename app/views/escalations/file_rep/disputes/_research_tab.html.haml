@@ -76,11 +76,14 @@
             %label.data-report-label Processes
         %hr.thin
         .row
-          .col-xs-12
+        .row
+          .col-xs-6
             %label.data-report-label Full Json
-            %span.json-button-wrapper
-              %button#btn-sandbox-expand Expand/Collapse
-              %button#btn-sandbox-download Download JSON
+          .col-xs-6
+            %button.expand-toggle-button.tooltipped{'data-toggle': 'collapse', 'aria-expanded': true, 'data-target': "#collapse_sb_json", 'aria-controls': "collapse_sb_json", 'title': 'Show / Hide'}
+            %a.download-small-button.tooltipped#download-sb-json{'title': 'Download JSON'}
+        .row.collapse_area.collapse.in#collapse_sb_json
+          .col-xs-12
             %pre.data-report-code-content#sb-full
     .sb-data-missing.text-center
       %span.sample-present-false
@@ -128,11 +131,13 @@
                   %th Title
         %hr.thin
         .row
-          .col-xs-12
+          .col-xs-6
             %label.data-report-label Full Json
-            %span.json-button-wrapper
-              %button#btn-threatgrid-expand Expand/Collapse
-              %button#btn-threatgrid-download Download JSON
+          .col-xs-6#tg-full-json
+            %button.expand-toggle-button.tooltipped{'data-toggle': 'collapse', 'aria-expanded': true, 'data-target': "#collapse_tg_json", 'aria-controls': "collapse_tg_json", 'title': 'Show / Hide'}
+            %button.download-small-button.tooltipped#download-tg-json{'title': 'Download JSON'}
+        .row.collapse_area.collapse.in#collapse_tg_json
+          .col-xs-12
             %pre.data-report-code-content#tg-full
     .tg-data-missing.text-center
       %span.sample-present-false

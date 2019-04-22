@@ -8919,37 +8919,13 @@ button.secondary.view-report-external-button {
 }
 
 
-// dbinebri: adding buttons here for json functions for datasets
-.json-button-wrapper {
-  position: absolute;
-  left: 75px;
-  top: -3px;
-
-  #btn-sandbox-expand, #btn-threatgrid-expand, #btn-sandbox-download, #btn-threatgrid-download {
-    margin-left: 5px;
-    font-size: 10px;
-    font-weight: normal;
-    border-radius: 3px;
-    background-repeat: no-repeat;
-    background-size: 15px 15px;
-    padding: 2px;
-    &:hover, :active {
-      background-color: lighten($dark-neutral-color, 10%);
-    }
-  }
-  #btn-sandbox-expand, #btn-threatgrid-expand {
-    background-image: url(image_path("icon_expand2.svg"));
-    background-position: 0 0;
-    padding-left: 15px;
-  }
-  #btn-sandbox-download, #btn-threatgrid-download {
-    background-image: url(image_path("icon_import.svg"));
-    background-position: 2px 0;
-    padding-left: 20px;
-  }
-}
-
-// dbinebri: adding this for expand/collapse json code areas on datasets
-.json-height-small {
-  height: 300px;
+// dbinebri: adding button here for download json buttons
+.download-small-button {
+  background-image: url(image_path('icon_download.svg'));
+  background-repeat: no-repeat;
+  width: 20px;
+  height: 23px;
+  float: right;
+  display: inline-block;
+  border: none;
 }
