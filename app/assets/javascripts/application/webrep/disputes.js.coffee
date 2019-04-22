@@ -1354,7 +1354,7 @@ $ ->
         success: (response) ->
       )
 
-    if window.location.pathname == '/escalations/file_rep/disputes' || window.location.pathname == '/escalations/webrep/disputes'
+    if window.location.pathname == '/escalations/file_rep/disputes' ||  window.location.pathname == '/escalations/webrep/disputes'
       $('#filter-cases').show()
       $('#import-webrep').show()
     #      $('#web-rep-search').show()
