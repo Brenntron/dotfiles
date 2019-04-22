@@ -116,7 +116,7 @@ $ ->
       if search_type == 'standard'
         new_header =
           '<div>' +
-          '<span class="text-capitalize">' + search_name.replace(/_/g, " ") +' tickets </span>' +
+          '<span class="text-capitalize">' + search_name.replace(/_/g, " ") + ' tickets </span>' +
           reset_icon +
           '</div>'
 
