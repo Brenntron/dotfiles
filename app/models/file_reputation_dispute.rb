@@ -195,12 +195,24 @@ class FileReputationDispute < ApplicationRecord
 
     search_hash = non_blank_fields(params)
     sha256_hash = search_hash.delete('sha256_hash')
+    threatgrid_range = search_hash.delete('threatgrid_score') || {}
+    sandbox_score_range = search_hash.delete('sandbox_score') || {}
+    created_at_range = search_hash.delete('created_at') || {}
+    updated_at_range = search_hash.delete('updated_at') || {}
     dispute_fields = matching_field(search_hash)
 
     relation = where(dispute_fields)
 
     if sha256_hash.present?
       relation = relation.where('sha256_hash like :sha256_hash', sha256_hash: "%#{sanitize_sql_like(sha256_hash)}%")
+    end
+
+    if threatgrid_range['from']
+      relation = relation.where('threatgrid_score >= :threatgrid_from', threatgrid_from: threatgrid_range['from'].to_f)
+    end
+
+    if threatgrid_range['to']
+      relation = relation.where('threatgrid_score <= :threatgrid_to', threatgrid_to: threatgrid_range['to'].to_f)
     end
 
     if %w{customer_name customer_email company_name}.any? {|key_name| search_hash[key_name].present? }
