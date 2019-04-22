@@ -44,13 +44,15 @@
     %label.content-label-sm Assignee
     %input.form-control#assignee-input{name: 'assignee'}
     %button.remove-input
-  .form-group.search-item.hidden
-    %label.content-label-sm Sandbox Score
-    %input.form-control.require-float#sandbox-score-input{name: 'sandbox_score', type:"number"}
+  .form-group.search-item
+    %label.content-label-sm{for:'sandbox_score'} Sandbox Score
+    .form-control.require-float#sandbox-score-input{name: 'sandbox_score'}
+      .ui-slider-handle
     %button.remove-input
   .form-group.search-item.hidden
     %label.content-label-sm TG Score
-    %input.form-control.require-float#tg-score-input{name: 'tg_score', type:"number"}
+    .form-control.require-float#tg-score-input{name: 'tg_score'}
+      .ui-slider-handle
     %button.remove-input
   .form-group.search-item.hidden.in-sample-zoo_container
     %label.content-label-sm In Sample Zoo

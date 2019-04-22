@@ -8923,3 +8923,30 @@ button.secondary.view-report-external-button {
   width: 100%;
   display: block;
 }
+
+// kh: overwriting jquery ui slider styles
+.ui-slider.form-control.nav-tool-content-wrapper{
+  background: white!important;
+  margin-bottom: 10px
+}
+.ui-slider.form-control{
+  background: white!important;
+  margin-bottom: 10px
+}
+.ui-slider .ui-slider-handle {
+  width: 1.75em;
+  height: 2.8em;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.form-control .ui-slider-handle.ui-state-focus{
+  background: #44a9d1;
+  color: white;
+  border: none;
+}
+.form-control .ui-slider-handle.ui-state-active{
+  background: $primary-section-color;
+  border: none;
+}

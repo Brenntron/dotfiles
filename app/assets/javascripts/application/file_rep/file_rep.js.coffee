@@ -8,6 +8,8 @@ $ ->
   current_url = window.location.href;
   time_submitted = ''
   last_updated = ''
+  sandbox_score = ''
+  threatgrid_score = ''
 
   window.refresh_localStorage = () ->
     localStorage.removeItem('search_type')
@@ -39,11 +41,9 @@ $ ->
 
 
   window.build_advanced_data = () ->
-    console.log('fucking hi', time_submitted, last_updated)
     form = $('#filerep_disputes-advanced-search-form')
     localStorage.search_type = 'advanced'
     localStorage.search_name = form.find('input[name="search_name"]').val()
-    console.log(time_submitted, time_submitted)
     localStorage.search_conditions = JSON.stringify(
       id: form.find('input[id="caseid-input"]').val()
       created_at: time_submitted
@@ -57,8 +57,8 @@ $ ->
       sample_type: form.find('input[id="sample-type-input"]').val()
       disposition: form.find('input[id="amp-disposition-input"]').val()
       disposition_suggested: form.find('input[id="suggested-disposition-input"]').val()
-      sandbox_score: form.find('input[id="sandbox-score-input"]').val()
-      threatgrid_score: form.find('input[id="tg-score-input"]').val()
+      sandbox_score: sandbox_score
+      threatgrid_score: threatgrid_score
       detection_name: form.find('input[id="amp-detection-name-input"]').val()
       in_zoo: form.find('input[id="in-sample-zoo-input"]:checked').val()
       reversing_labs: form.find('input[id="reversing-labs-input"]').val()
@@ -83,6 +83,7 @@ $ ->
         search_type : 'standard'
         search_name : location.search.replace('?f=', '')
       }
+      refresh_localStorage()
 
     else if localStorage.search_type
 
@@ -107,7 +108,7 @@ $ ->
         }
 
     format_filerep_header(data)
-
+    console.log(data)
     return data
 
   window.format_filerep_header = (data) ->
@@ -346,7 +347,61 @@ $ ->
           to : end.format('YYYY-MM-DD')
         }
     )
+  $('#sandbox-score-input').slider(
+    {
+      range: true,
+      min: 0,
+      max: 100,
+      values: [ 25, 75 ]
+      create: (ui) ->
+        values = $(this).slider("values")
 
+        slider_1 = $('#sandbox-score-input .ui-slider-handle')[0]
+        slider_2 = $('#sandbox-score-input .ui-slider-handle')[1]
+        $(slider_1).text(values[0])
+        $(slider_2).text(values[1])
+
+      slide: ( event, ui ) ->
+        {values} = ui
+
+        slider_1 = $('#sandbox-score-input .ui-slider-handle')[0]
+        slider_2 = $('#sandbox-score-input .ui-slider-handle')[1]
+        $(slider_1).text(values[0])
+        $(slider_2).text(values[1])
+
+        sandbox_score = {
+          from: values[0]
+          to : values[1]
+        }
+    })
+
+  $('#tg-score-input').slider(
+    {
+      range: true,
+      min: 0,
+      max: 100,
+      values: [ 25, 75 ]
+      create: (ui) ->
+        values = $(this).slider("values")
+
+        slider_1 = $('#tg-score-input .ui-slider-handle')[0]
+        slider_2 = $('#tg-score-input .ui-slider-handle')[1]
+        $(slider_1).text(values[0])
+        $(slider_2).text(values[1])
+
+      slide: ( event, ui ) ->
+        {values} = ui
+
+        slider_1 = $('#tg-score-input .ui-slider-handle')[0]
+        slider_2 = $('#tg-score-input .ui-slider-handle')[1]
+        $(slider_1).text(values[0])
+        $(slider_2).text(values[1])
+
+        threatgrid_score = {
+          from: values[0]
+          to : values[1]
+        }
+    })
 
   $('#data-show-sandbox-cb').click -> $('#sandbox-report-wrapper').toggle()
   $('#data-show-tg-cb').click -> $('#threatgrid-report-wrapper').toggle()
