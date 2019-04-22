@@ -316,11 +316,9 @@ class FileReputationDispute < ApplicationRecord
   end
 
   def update_sandbox_score
-    latest_report = FileReputationApi::Sandbox.sandbox_latest_report(self.sha256_hash)
-    run_id = latest_report[:data]['runid']
-    full_report = FileReputationApi::Sandbox.full_report(self.sha256_hash, run_id)
-    sandbox_score = full_report[:data]['score']
-    update!(sandbox_score: sandbox_score, sandbox_threshold: self.pdf? ? 90.0 : 61.0)
+    sandbox_score = FileReputationApi::Sandbox.score(self.sha256_hash)
+    sandbox_threshold = self.pdf? ? 90.0 : 61.0
+    update!(sandbox_score: sandbox_score, sandbox_threshold: sandbox_threshold)
   rescue => except
     Rails.logger.error("Error updating sandbox score on id #{self.id} -- #{except.error_message}")
   end
