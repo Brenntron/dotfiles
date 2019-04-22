@@ -43,7 +43,12 @@ module API
               requires :run_id, type: Integer, desc: "Run ID for a given sha256"
             end
             get "/sandbox_report/:run_id/:sha256_hash" do
-              api_response = FileReputationApi::Sandbox.full_report(params[:sha256_hash], params[:run_id])
+              sha256_hash = params[:sha256_hash]
+              api_response = FileReputationApi::Sandbox.full_report(sha256_hash, params[:run_id])
+
+              sandbox_score = api_response[:data]['score']
+              FileReputationDispute.where(sha256_hash: sha256_hash).update_all(sandbox_score: sandbox_score)
+
               render json: api_response
             end
 
