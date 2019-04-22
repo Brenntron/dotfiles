@@ -6,7 +6,7 @@
       .row
         .col-xs-12.col-sm-12.col-md-12.col-lg-5
           .row
-            .col-xs-7.col-sm-7.col-with-divider
+            .col-xs-6.col-sm-6.col-md-6.col-lg-6.col-xl-6.col-with-divider
               %label.content-label-sm
                 Case ID
               .top-info-data.case-id-tag
@@ -46,40 +46,36 @@
                       %label.radio-label.ticket-status-radio-label{for:'file-status-closed'} Resolved / Closed
 
 
-            .col-xs-5.col-sm-5.col-with-divider
+            .col-xs-6.col-sm-6.col-md-6.col-lg-6.col-xl-6.col-with-divider
               %label.content-label-sm
                 Assignee
               .top-info-data
                 - if @file_rep_dispute.assigned.nil? || @file_rep_dispute.assigned == 'Unassigned'
-                  %span.missing-data "Unassigned"
+                  %span.missing-data#dispute-assignee "Unassigned"
                 - else
                   %span= @file_rep_dispute.assigned.cvs_username
-                -#- if @dispute.assignee == 'Unassigned'
-                -#  %span.missing-data#dispute-assignee= @dispute.assignee || "None"
-                -#- else
-                -#  %span= @dispute.assignee || "None"
-                -#- if can? :update, Dispute
-                -#  .dispute-owner-buttons-wrapper
-                -#    - if @dispute.assignee == current_user.email
-                -#      - if (@dispute.resolution != Dispute::DUPLICATE) && (@dispute.status != Dispute::RESOLVED)
-                -#        %button.return-ticket-button.esc-tooltipped{title: 'Return ticket to open queue', onclick: 'toolbar_unassign_dispute();'}
-                -#    - else
-                -#      - if (@dispute.resolution != Dispute::DUPLICATE) && (@dispute.status != Dispute::RESOLVED) && (@dispute.user.cvs_username == 'vrtincom')
-                -#        %button.take-ticket-button#show_ticket_assign.esc-tooltipped{title: 'Assign this ticket to me', onclick: "take_single_dispute(#{@dispute.id});"}
-                -#
-                -#      %span.dropdown
-                -#        - if (@dispute.resolution != Dispute::DUPLICATE) && (@dispute.status != Dispute::RESOLVED)
-                -#          %button#index_change_assign.dispute-inline-buttons.ticket-owner-button.dropdown-toggle.esc-tooltipped{title: 'Change Assignee', 'data-toggle': 'dropdown', 'aria-haspopup': 'true', 'aria-expanded': 'false'}
-                -#        .dropdown-menu#show-change-assign-dropdown{'aria-labelledby': 'index_change_assign'}
-                -#          .change-assignee-dropdown-wrapper
-                -#            %h3 Change Assignee
-                -#            .inline-tool-content-wrapper
-                -#              .toolbar
-                -#                %div
-                -#                  %label.toolbar-section-label Assignee
-                -#                  =select_tag :index_target_assignee, options_from_collection_for_select(User.joins(roles: :org_subset).where(org_subsets: { name: 'webrep' }).distinct.order(:cvs_username), :id, :cvs_username), class: 'toolbar-select'
-                -#                %button{class: 'primary', type:'button', id: 'button_reassign', onclick:'toolbar_show_change_assignee();'}
-                -#                  Assign
+
+                - if can? :update, FileReputationDispute
+                  .dispute-owner-buttons-wrapper
+                    - if @file_rep_dispute.assigned.email == current_user.email
+                      %button.return-ticket-button.esc-tooltipped{title: 'Return ticket to open queue', onclick: 'toolbar_unassign_dispute();'}
+                    - else
+                      %button.take-ticket-button#show_ticket_assign.esc-tooltipped{title: 'Assign this ticket to me', onclick: "take_single_dispute(#{@file_rep_dispute.id});"}
+
+                    %span.dropdown
+                      %button#index_change_assign.dispute-inline-buttons.ticket-owner-button.dropdown-toggle.esc-tooltipped{title: 'Change Assignee', 'data-toggle': 'dropdown', 'aria-haspopup': 'true', 'aria-expanded': 'false'}
+                      .dropdown-menu#show-change-assign-dropdown{'aria-labelledby': 'index_change_assign'}
+                        .change-assignee-dropdown-wrapper
+                          %h3 Change Assignee
+                          .inline-tool-content-wrapper
+                            .toolbar
+                              %div
+                                %label.toolbar-section-label Assignee
+                                =select_tag :index_target_assignee, options_from_collection_for_select(User.joins(roles: :org_subset).where(org_subsets: { name: 'file rep' }).distinct.order(:cvs_username), :id, :cvs_username), class: 'toolbar-select'
+                              %button{class: 'primary', type:'button', id: 'button_reassign', onclick:'toolbar_show_change_assignee();'}
+                                Assign
+
+
               %label.content-label-sm
                 Suggested Disposition
               - if @file_rep_dispute.disposition_suggested == 'Malicious'
@@ -89,7 +85,7 @@
 
         .col-xs-12.col-sm-12.col-md-12.col-lg-7.col-with-divider
           .row
-            .col-xs-7.col-sm-7.col-with-divider
+            .col-xs-6.col-sm-6.col-md-6.col-with-divider
               %label.content-label-sm Customer Name
               .top-info-data
                 - unless @file_rep_dispute.customer.nil?
@@ -111,7 +107,7 @@
                 - else
                   %span.missing-data No customer record
 
-            .col-xs-5.col-sm-5
+            .col-xs-6.col-sm-6.col-md-6
               %label.content-label-sm Date/Time Submitted
               .top-info-data= @file_rep_dispute.created_at
 
