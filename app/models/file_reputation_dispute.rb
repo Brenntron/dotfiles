@@ -207,36 +207,36 @@ class FileReputationDispute < ApplicationRecord
       relation = relation.where('sha256_hash like :sha256_hash', sha256_hash: "%#{sanitize_sql_like(sha256_hash)}%")
     end
 
-    if threatgrid_range['from']
+    if threatgrid_range['from'].present?
       relation = relation.where('threatgrid_score >= :threatgrid_from', threatgrid_from: threatgrid_range['from'].to_f)
     end
 
-    if threatgrid_range['to']
+    if threatgrid_range['to'].present?
       relation = relation.where('threatgrid_score <= :threatgrid_to', threatgrid_to: threatgrid_range['to'].to_f)
     end
 
-    if sandbox_range['from']
+    if sandbox_range['from'].present?
       relation = relation.where('sandbox_score >= :sandbox_from', sandbox_from: sandbox_range['from'].to_f)
     end
 
-    if sandbox_range['to']
+    if sandbox_range['to'].present?
       relation = relation.where('sandbox_score <= :sandbox_to', sandbox_to: sandbox_range['to'].to_f)
     end
 
-    if created_at_range['from']
+    if created_at_range['from'].present?
       relation = relation.where('created_at >= :created_at_from', created_at_from: created_at_range['from'])
     end
 
-    if created_at_range['to']
+    if created_at_range['to'].present?
       created_at_to = created_at_range['to']
       relation = relation.where('created_at <= ADDDATE(:created_at_to, INTERVAL 1 DAY)', created_at_to: created_at_to)
     end
 
-    if updated_at_range['from']
+    if updated_at_range['from'].present?
       relation = relation.where('updated_at >= :updated_at_from', updated_at_from: updated_at_range['from'])
     end
 
-    if updated_at_range['to']
+    if updated_at_range['to'].present?
       updated_at_to = updated_at_range['to']
       relation = relation.where('updated_at <= ADDDATE(:updated_at_to, INTERVAL 1 DAY)', updated_at_to: updated_at_to)
     end
