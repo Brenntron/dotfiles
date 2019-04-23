@@ -697,7 +697,10 @@ button {
   background-image: url(image_path('icon_reset_grey.svg'));
   display: inline-block;
   height: 25px;
-  width: 25px;}
+  width: 25px;
+  position: relative;
+  top: 2px;
+  left: 7px;}
 .reset-filter:hover {background-image: url(image_path('icon_reset_blue.svg'));}
 
 .master-submit-button {

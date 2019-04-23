@@ -30,7 +30,13 @@
     %button.remove-input
   .form-group.search-item
     %label.content-label-sm AMP Disposition
-    %input.form-control#amp-disposition-input{name: 'amp_disposition'}
+    %input.form-control#amp-disposition-input{name: 'amp_disposition', list:'amp-disp-list'}
+    %datalist#amp-disp-list
+      %option{value: 'Clean'}
+      %option{value: 'Common'}
+      %option{value: 'Malicious'}
+      %option{value: 'Unknown'}
+      %option{value: 'Unseen'}
     %button.remove-input
   .form-group.search-item.hidden
     %label.content-label-sm AMP Detection Name

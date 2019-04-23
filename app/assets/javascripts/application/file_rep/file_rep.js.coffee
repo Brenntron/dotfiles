@@ -1,15 +1,35 @@
 $ ->
-
-  $(window).click (e) ->
-    if !e.target.closest('.daterangepicker')
-     $("#advanced-search-dropdown").hide()
-
-  file_rep_url = $('#file-rep-datatable').data('source')
   current_url = window.location.href;
   time_submitted = ''
   last_updated = ''
   sandbox_score = ''
   threatgrid_score = ''
+
+  $(window).click (e) ->
+    if !e.target.closest('.daterangepicker')
+     $("#advanced-search-dropdown").hide()
+
+  window.file_rep_reset_search = () ->
+    inputs = document.getElementsByClassName('form-control')
+    time_submitted = ''
+    last_updated = ''
+    sandbox_score = ''
+    threatgrid_score = ''
+
+    for i in inputs
+      i.value = ""
+      if $(i).hasClass('ui-slider')
+        values = [ 25, 75 ]
+        $(i).slider({
+          values: values
+        })
+
+        slider_1 = $(i).find('.ui-slider-handle')[0]
+        slider_2 = $(i).find('.ui-slider-handle')[1]
+        $(slider_1).text(values[0])
+        $(slider_2).text(values[1])
+
+  file_rep_url = $('#file-rep-datatable').data('source')
 
   window.refresh_localStorage = () ->
     localStorage.removeItem('search_type')
