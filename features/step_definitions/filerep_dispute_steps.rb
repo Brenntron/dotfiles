@@ -6,6 +6,14 @@ Then (/^a FileRep Ticket should have a TG score$/) do
   expect(FileReputationDispute.first.threatgrid_score).not_to eq(nil)
 end
 
+Then (/^a FileRep Ticket should have a Sandbox score$/) do
+  expect(FileReputationDispute.first.sandbox_score).not_to eq(nil)
+end
+
+Then (/^a FileRep Ticket should have a RL score$/) do
+  expect(FileReputationDispute.first.reversing_labs_score).not_to eq(nil)
+end
+
 Given(/^the following FileRep disputes exist:$/) do |disputes|
   disputes.hashes.each do |dispute_attrs|
     FactoryBot.create(:file_reputation_dispute, dispute_attrs)

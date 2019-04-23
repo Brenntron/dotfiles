@@ -108,5 +108,20 @@ Feature: Disputes
     And I wait for "25" seconds
     And a FileRep Ticket should have a TG score
 
+  @javascript
+  Scenario: a user visits the FileRep Dispute Show page which launches off API calls that also sets the Sandbox score on the record
+    Given a user with role "filerep user" exists and is logged in
+    And A FileRep Dispute with trait "default" exists
+    Then I go to "/escalations/file_rep/disputes/1"
+    And I wait for "25" seconds
+    And a FileRep Ticket should have a Sandbox score
+
+  @javascript
+  Scenario: a user visits the FileRep Dispute Show page which launches off API calls that also sets the RL score on the record
+    Given a user with role "filerep user" exists and is logged in
+    And A FileRep Dispute with trait "default" exists
+    Then I go to "/escalations/file_rep/disputes/1"
+    And I wait for "25" seconds
+    And a FileRep Ticket should have a RL score
 
 
