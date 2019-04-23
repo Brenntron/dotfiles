@@ -614,6 +614,7 @@ button {
 
 .toolbar-section-label {
   position: absolute;
+  display: block;
   margin-top: -18px;
   color: $content-label-color !important;
   font-size: 7pt;
