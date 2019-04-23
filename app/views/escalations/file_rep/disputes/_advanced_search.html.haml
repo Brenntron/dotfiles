@@ -10,11 +10,14 @@
     %label.content-label-sm Status
     %input.form-control#status-input{name: 'status', list: 'filerep-status-list'}
     %datalist#filerep-status-list
-      %option{value: 'Clean'}
-      %option{value: 'Common'}
-      %option{value: 'Malicious'}
-      %option{value: 'Unknown'}
-      %option{value: 'Unseen'}
+      %option{value: 'RESEARCHING'}
+      %option{value: 'ESCALATED'}
+      %option{value: 'CUSTOMER_PENDING'}
+      %option{value: 'ON_HOLD'}
+      %option{value: 'RESOLVED_CLOSED'}
+      %option{value: 'RE-OPENED'}
+      %option{value: 'NEW'}
+      %option{value: 'ASSIGNED'}
     %button.remove-input
   .form-group.search-item.hidden
     %label.content-label-sm Resolution
