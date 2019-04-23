@@ -137,7 +137,7 @@
         .inline-tool-content-wrapper.plain-inline-dropdown-wrapper
           .row
             .col-xs-12
-              %label.content-label-sm.full-row-label  Disposition
+              %label.content-label-sm.full-row-label  New Disposition
           .row
             .col-xs-12
               %select#new-amp-detection-disp{onchange: 'amp_detection_naming("index");'}
@@ -246,7 +246,8 @@
             %textarea.dropdown-comment
           .button-row-center
             -# TODO hookup submission of dropdown
-            %button.primary.dropdown-submit-button Submit
+            %button.primary.dropdown-submit-button{onclick: 'amp_detection_submission(event, "index");'}
+              Submit
 
 
 

@@ -390,28 +390,37 @@ $ ->
 
 
   # Prepare form info for sending to AMP
-  window.amp_detection_submission = (e) ->
+  window.amp_detection_submission = (e, page) ->
     e.preventDefault()
-    # Get sha
-    sha256_hash = $('#sha256_hash')[0].innerText
-    # Get form info
-    new_disp = $('#new-amp-detection-disp').val()
-    new_detection_name = ''
-    if new_disp == 'malicious'
-      new_name_pre = $('#new-amp-detection-name-pre').val()
-      new_name_cat = $('#new-amp-detection-name-cat').val()
-      new_name_txt = $('#new-amp-detection-name-middle').val()
-      # Don't add extra period unless they want to use an actual category
-      if new_name_cat == ''
-        new_detection_name = new_name_pre + '.' + new_name_txt + '.Talos'
+
+    # From show page only one sha can be submitted
+    if page == 'show'
+      # Get sha
+      sha256_hash = $('#sha256_hash')[0].innerText
+      # Get form info
+      new_disp = $('#new-amp-detection-disp').val()
+      new_detection_name = ''
+      if new_disp == 'malicious'
+        new_name_pre = $('#new-amp-detection-name-pre').val()
+        new_name_cat = $('#new-amp-detection-name-cat').val()
+        new_name_txt = $('#new-amp-detection-name-middle').val()
+        # Don't add extra period unless they want to use an actual category
+        if new_name_cat == ''
+          new_detection_name = new_name_pre + '.' + new_name_txt + '.Talos'
+        else
+          new_detection_name = new_name_pre + '.' + new_name_cat + '.' + new_name_txt + '.Talos'
+        detection_array = {name: new_detection_name, disposition: new_disp}
       else
-        new_detection_name = new_name_pre + '.' + new_name_cat + '.' + new_name_txt + '.Talos'
-      detection_array = {name: new_detection_name, disposition: new_disp}
+        detection_array = {disposition: new_disp}
+
+      comment = $('#new-amp-detection-comment').val()
+
+    # From index several shas could be submitted
+    else if page == 'index'
+      console.log 'index!'
+
     else
-      detection_array = {disposition: new_disp}
-
-    comment = $('#new-amp-detection-comment').val()
-
+      alert('Where are you? How did you trigger this? Stahp it.')
 
     return false
 
