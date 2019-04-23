@@ -250,7 +250,6 @@ $ ->
         }
 
     format_filerep_header(data)
-    console.log(data)
     return data
 
   window.format_filerep_header = (data) ->
@@ -267,10 +266,37 @@ $ ->
           '</div>'
 
       else if search_type == 'advanced'
+        search_conditions = JSON.parse(localStorage.search_conditions)
         new_header =
           '<div>Results for Advanced Search ' +
           reset_icon +
           '</div>'
+
+        append_search_div = false
+        search_condition_div = document.createElement('div')
+        search_condition_div.classList.add('search_condition_div')
+
+        for condition_name, condition of search_conditions
+          append_search_div = true
+          if condition != ''
+
+            condition_name = condition_name.replace(/_/g, " ")
+            if typeof condition == 'object'
+              search_ref =
+                '<span>' + condition_name + ' ' + '</span>' +
+                '<span>: ' + condition.from + ' - ' + condition.to + ' </span>'
+            else
+              search_ref =
+                '<span>' + condition_name + ' </span>' +
+                '<span>: ' + condition.from + ' </span>'
+
+            $(search_condition_div).append('<div>' + search_ref + '</div>')
+
+        if append_search_div
+          console.log('ininin', search_condition_div)
+          $('#filerep-index-title').append(search_condition_div)
+
+
 
       else if search_type == 'named'
         new_header =
@@ -350,10 +376,11 @@ $ ->
       {
         data: 'disposition'
         render: (data) ->
-          if data == 'Malicious'
-            return '<span class="malicious text-capitalize">Malicious</span>'
+          data = data.toLowerCase()
+          if data == 'malicious'
+            return '<span class="malicious text-capitalize"> malicious </span>'
           else
-            return '<span class="text-capitalize">' + data + '</span>'
+            return '<span class="text-capitalize"> clean </span>'
       }
       {
         data: 'detection_name'
@@ -399,10 +426,11 @@ $ ->
       {
         data: 'disposition_suggested'
         render: (data) ->
-          if data == 'Malicious'
-            return '<span class="malicious text-capitalize">Malicious</span>'
+          data = data.toLowerCase()
+          if data == 'malicious'
+            return '<span class="malicious text-capitalize"> malicious</span>'
           else
-            return  '<span class="text-capitalize">' + data + '</span>'
+            return  '<span class="text-capitalize"> clean </span>'
       }
       { data: 'created_at'}
       {
