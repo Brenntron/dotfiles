@@ -301,7 +301,7 @@ $ ->
 
 
         if search_condition_tooltip.length > 0
-          container.show()
+          container.css('display', 'inline-block')
           container.addClass('esc-tooltipped')
 
           list = document.createElement('ul')
