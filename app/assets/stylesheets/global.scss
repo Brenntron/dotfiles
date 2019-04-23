@@ -8991,6 +8991,7 @@ div[aria-describedby='create-detection-dialog'] {
   color: $type-lighter-color;
 }
 
+
 #file-det-dropdown {
   min-width: 420px;
 }
@@ -9021,4 +9022,8 @@ div[aria-describedby='create-detection-dialog'] {
 
 .toolbar .dropdown.open .toolbar-button.detection-button {
   background-image: url(image_path('icon_target_white.svg'));
+}
+
+.tg-data-present, .tg-data-missing, .sb-data-present, .sb-data-missing, .rl-data-present, .rl-data-missing {
+  display: none;
 }
