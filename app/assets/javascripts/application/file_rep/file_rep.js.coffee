@@ -311,7 +311,7 @@ $ ->
 
             list.appendChild(item)
 
-          container.append(list)
+          container.prepend(list)
           $(list).hide()
           container.attr('data-tooltip-content', '.tooltip_content')
 
