@@ -9003,25 +9003,25 @@ div[aria-describedby='create-detection-dialog'] {
   border: none;
 }
 
-// dbinebri: fix to ensure the min-height collapsed json area stays a min-height of 300px
+// dbinebri: make sure the full json areas stay visible in collapsed state
 .data-report-wrapper {
   .collapse {
-    display: block !important;
-    visibility: visible !important;
-    overflow: hidden !important;
-    min-height: 300px !important;
-    &.in {
-      min-height: 300px !important;
+    display: block;
+    visibility: visible;
+    overflow: scroll;
+    &.in {  // .in is expanded state
+      overflow-y: hidden;
     }
   }
 }
 
-// dbinebri: fix to ensure the collapsed json area stays gray on expand/collapse
+// dbinebri: ensure json areas stay at a min-height on collapse, and gray on expand/collapse transition
 #collapse_tg_json, #collapse_sb_json {
-  background: #f6f6f6;  // FIX THIS
   min-height: 300px;
-  .col-xs-12 {
-    padding-left: 5px;
-    padding-right: 5px;
+  margin: 0 2px;
+  background: darken($content-bg-color, 4%);
+  .report-size {
+    padding: 0;
+    width: initial;
   }
 }
