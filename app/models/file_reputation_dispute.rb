@@ -14,7 +14,11 @@ class FileReputationDispute < ApplicationRecord
   STATUS_CUSTOMER_PENDING   = "CUSTOMER_PENDING"
   STATUS_CUSTOMER_UPDATE    = "CUSTOMER_UPDATE"
 
-  DISPOSITION_MALICIOUS     = 'MALICIOUS'
+  DISPOSITION_UNSEEN        = 'unseen'
+  DISPOSITION_UNKNOWN       = 'unknown'
+  DISPOSITION_MALICIOUS     = 'malicious'
+  DISPOSITION_COMMON        = 'common'
+  DISPOSITION_CLEAN         = 'clean'
 
   validates :status, :sha256_hash, :disposition_suggested, presence: true
 

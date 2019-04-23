@@ -365,7 +365,7 @@ $ ->
     # Detection name can only be changed if user is setting a sample to malicious
     # or keeping it malicious. Hiding detection name part of form if not needed
     naming_section = $('#new-amp-detection-name-section')
-    if $('#new-amp-detection-disp').val() == 'malicious'
+    if $('#new-amp-detection-disp').val().toLowerCase() == 'malicious'
       $(naming_section).show()
     else
       $(naming_section).hide()
@@ -392,7 +392,7 @@ $ ->
     # Get form info
     new_disp = $('#new-amp-detection-disp').val()
     new_detection_name = ''
-    if new_disp == 'malicious'
+    if new_disp.toLowerCase() == 'malicious'
       new_name_pre = $('#new-amp-detection-name-pre').val()
       new_name_cat = $('#new-amp-detection-name-cat').val()
       new_name_txt = $('#new-amp-detection-name-middle').val()
