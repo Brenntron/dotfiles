@@ -270,7 +270,14 @@ $ ->
           else
             return  '<span class="text-capitalize">' + data + '</span>'
       }
-      { data: 'created_at'}
+      {
+        data: 'created_at'
+        render: (data) ->
+          if data
+            return moment(data).format('MMM D, YYYY h:mm A')
+          else
+            return ''
+      }
       {
 #        Submitter Type
         data: null
