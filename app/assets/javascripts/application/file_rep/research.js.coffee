@@ -1,49 +1,25 @@
 $ ->
-#  If html body is on the show page
+########### GRAB SHA NEEDED FOR REPORTS ############
+#  If html body is on the show page (do not call on other pages)
   if $('body').hasClass('show-action')
-    window.research_data()
-
-kick_off_object = window.kick_off_sample_run - () ->
-
-  sha256_hash = $('#sha256_hash')[0].innerText
-
-  std_msg_ajax(
-    method: 'GET'
-    url: "/escalations/api/v1/escalations/file_rep/sandbox_api/sandbox_latest_report/" + sha256_hash
-    success_reload: false
-    success: (response) ->
-
-      run_id = response.json.data.runid
-      status = response.json.data.status
-
-      if status == "Complete"
-        #this may need some tweaking since it's kinda pseudo code right now, but basically kick off sample run method
-        #needs to be assigned to a variable so that variable can be fed to clearInterval to stop checking after we recognize
-        #the run has been completed and populated the page.
-        clearInterval(kick_off_object)
-        #Melissa, check to see if this is the right  method to call, maybe research_data is the better one to call?
-        window.get_sandbox_report(run_id, sha256_hash)
-      if status == "Error"
-        alert('need to cover this case')
-      if status == "Unsupported File Type"
-        alert('need to cover this case')
-      if status == "Cancelled"
-        alert('need to cover this case')
-      if status == "Running"
-        #maybe set (or keep setting) a message to the UI somewhere here letting the user know shits still happening?
-
-        #this line will call again so that this repeats as many times a necessary, stopping when status == 'complete'
-        setTimeout(kick_off_sample_run, 600000)
-
-    error: (response) ->
-      $('#sb-loader').hide()
-      std_api_error(response, "There was a problem retrieving data from Talos Sandbox", reload: false)
-  )
+    # On the show page we can pull the sha from the FILE OVERVIEW section
+    # This prepares all the remaining functions for data fetches / updates
+    sha256_hash = $('#sha256_hash')[0].innerText
+    window.research_data(sha256_hash)
 
 
-window.research_data = () ->
-  sha256_hash = $('#sha256_hash')[0].innerText
+########### COMPILE RESEARCH REPORTS ############
+# Grabs the initial data for all three reports / datasets
+# Loads on page load
+# Report functions defined immediately below
+window.research_data = (sha256_hash) ->
+  window.get_threatgrid_data(sha256_hash)
+  window.get_reversinglabs_data(sha256_hash)
+  window.get_sandbox_runid(sha256_hash)
 
+
+########### THREATGRID REPORT ############
+window.get_threatgrid_data = (sha256_hash) ->
   # Send sha to ThreatGrid, get data
   $('#tg-loader').show()
   std_msg_ajax(
@@ -91,6 +67,8 @@ window.research_data = () ->
 
 
 
+########### REVERSING LABS REPORT ############
+window.get_reversinglabs_data = (sha256_hash) ->
 #  Send sha to reversing labs, get data
   $('#rl-loader').show()
   std_msg_ajax(
@@ -149,7 +127,10 @@ window.research_data = () ->
 
 
 
-  # Sandbox - get runid from file hash
+########### GET SANDBOX MOST RECENT RUN ID ############
+#### This is needed prior to getting full report
+window.get_sandbox_runid = (sha256_hash) ->
+# Sandbox - get runid from file hash
   $('#sb-loader').show()
   std_msg_ajax(
     method: 'GET'
@@ -181,14 +162,16 @@ window.research_data = () ->
   )
 
 
-# Sandbox report api, get full report (json) from runid returned from the sandbox
-window.get_sandbox_report = (runid, sha) ->
+
+########### TALOS SANDBOX REPORT ############
+# Sandbox report api, get full report (json) from runid returned from the sandbox call above
+window.get_sandbox_report = (runid, sha256_hash) ->
   report_present = $('#sandbox-report-wrapper').find('.sb-data-present')[0]
   report_missing = $('#sandbox-report-wrapper').find('.sb-data-missing')[0]
 
   std_msg_ajax(
     method: 'GET'
-    url: "/escalations/api/v1/escalations/file_rep/sandbox_api/sandbox_report/" + runid + '/' + sha
+    url: "/escalations/api/v1/escalations/file_rep/sandbox_api/sandbox_report/" + runid + '/' + sha256_hash
     success_reload: false
     success: (response) ->
       sb_report = response.json.data
@@ -243,13 +226,13 @@ window.get_sandbox_report = (runid, sha) ->
         $(dropped_files).each ->
           file_table =
             '<table class="vertical-data-report-table">' +
-            '<tr><th class="text-right">MD5</th><td class="code-wrap-col"><span class="code-snippet code-string-break">' + this.MD5 + '</span></td></tr>' +
-            '<tr><th class="text-right">SHA1</th><td class="code-wrap-col"><span class="code-snippet code-string-break">' + this.SHA1 + '</span></td></tr>' +
-            '<tr><th class="text-right">SHA256</th><td class="code-wrap-col"><span class="code-snippet code-string-break">' + this.SHA256 + '</span></td></tr>' +
-            '<tr><th class="text-right">mime</th><td>' + this.mime + '</td></tr>' +
-            '<tr><th class="text-right">path</th><td>' + this.path + '</td></tr>' +
-            '<tr><th class="text-right">size</th><td>' + this.size + '</td></tr>' +
-            '</table>'
+              '<tr><th class="text-right">MD5</th><td class="code-wrap-col"><span class="code-snippet code-string-break">' + this.MD5 + '</span></td></tr>' +
+              '<tr><th class="text-right">SHA1</th><td class="code-wrap-col"><span class="code-snippet code-string-break">' + this.SHA1 + '</span></td></tr>' +
+              '<tr><th class="text-right">SHA256</th><td class="code-wrap-col"><span class="code-snippet code-string-break">' + this.SHA256 + '</span></td></tr>' +
+              '<tr><th class="text-right">mime</th><td>' + this.mime + '</td></tr>' +
+              '<tr><th class="text-right">path</th><td>' + this.path + '</td></tr>' +
+              '<tr><th class="text-right">size</th><td>' + this.size + '</td></tr>' +
+              '</table>'
 
           dropped_files_tables += file_table
         $('#sb-dropped-files-col').append(dropped_files_tables)
@@ -265,9 +248,9 @@ window.get_sandbox_report = (runid, sha) ->
         $(processes).each ->
           process_table =
             '<table class="vertical-data-report-table">' +
-            '<tr><th class="text-right">MD5</th><td class="code-wrap-col"><span class="code-snippet code-string-break">' + this.md5 + '</span></td></tr>' +
-            '<tr><th class="text-right">Name</th><td>' + this.name + '</td></tr>' +
-            '<tr><th class="text-right">PID</th><td>' + this.pid + '</td></tr>'
+              '<tr><th class="text-right">MD5</th><td class="code-wrap-col"><span class="code-snippet code-string-break">' + this.md5 + '</span></td></tr>' +
+              '<tr><th class="text-right">Name</th><td>' + this.name + '</td></tr>' +
+              '<tr><th class="text-right">PID</th><td>' + this.pid + '</td></tr>'
           if this.pname?
             process_table += '<tr><th class="text-right">pname</th><td>' + this.pname + '</td></tr>'
           if this.ppid?
@@ -285,3 +268,60 @@ window.get_sandbox_report = (runid, sha) ->
       $('#sb-loader').hide()
       std_api_error(response, "There was a problem retrieving data from Talos Sandbox", reload: false)
   )
+
+
+
+  
+
+kick_off_object = window.kick_off_sample_run - () ->
+
+  sha256_hash = $('#sha256_hash')[0].innerText
+
+  std_msg_ajax(
+    method: 'GET'
+    url: "/escalations/api/v1/escalations/file_rep/sandbox_api/sandbox_latest_report/" + sha256_hash
+    success_reload: false
+    success: (response) ->
+
+      run_id = response.json.data.runid
+      status = response.json.data.status
+
+      if status == "Complete"
+        #this may need some tweaking since it's kinda pseudo code right now, but basically kick off sample run method
+        #needs to be assigned to a variable so that variable can be fed to clearInterval to stop checking after we recognize
+        #the run has been completed and populated the page.
+        clearInterval(kick_off_object)
+        #Melissa, check to see if this is the right  method to call, maybe research_data is the better one to call?
+        window.get_sandbox_report(run_id, sha256_hash)
+      if status == "Error"
+        alert('need to cover this case')
+      if status == "Unsupported File Type"
+        alert('need to cover this case')
+      if status == "Cancelled"
+        alert('need to cover this case')
+      if status == "Running"
+        #maybe set (or keep setting) a message to the UI somewhere here letting the user know shits still happening?
+
+        #this line will call again so that this repeats as many times a necessary, stopping when status == 'complete'
+        setTimeout(kick_off_sample_run, 600000)
+
+    error: (response) ->
+      $('#sb-loader').hide()
+      std_api_error(response, "There was a problem retrieving data from Talos Sandbox", reload: false)
+  )
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
