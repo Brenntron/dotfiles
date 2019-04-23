@@ -105,6 +105,25 @@ class FileReputationApi::Sandbox
     full_report[:data]['score']
   end
 
+  def self.run_sample(sha256_hash)
+    endpoint = "/api/2/run/hash"
+
+    query_string = {
+        "hash" => sha256,
+        "apikey" => api_key
+    }
+
+    begin
+      response = call_request(:get, endpoint, :input => query_string)
+      data = {:success => true, :data => response}
+    rescue
+      data = {:success => false, :data => {}}
+    end
+
+    data
+
+
+  end
 
   ########################################################
   # some example shas with possible history in sandbox
