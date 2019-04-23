@@ -1,3 +1,125 @@
+window.filerep_take_disputes = () ->
+  dispute_ids = $('.dispute_check_box:checkbox:checked').map(() ->
+    this.dataset['entryId']
+    this.value
+  ).toArray()
+
+  if dispute_ids.length == 0
+    std_msg_error('No Tickets Selected', ['Please select at least one ticket to assign.'])
+    return
+
+  std_msg_ajax(
+    method: 'PATCH'
+    url: "/escalations/api/v1/escalations/file_rep/disputes/take_disputes"
+    data: { dispute_ids: dispute_ids }
+    error_prefix: 'Error updating ticket.'
+    success: (response) ->
+      for dispute_id in response.dispute_ids
+        $('#owner_' + dispute_id).text(response.username)
+        $('#status_' + dispute_id).text("ASSIGNED")
+      std_msg_success('Tickets successfully assigned', [response.dispute_ids.length + ' have been assigned to ' + response.username])
+    error: (error) ->
+      std_msg_error('Assign Issue(s) Error', [
+        'Failed to assign ' + dispute_ids.length + ' issue(s).',
+        'Due to: ' + error.responseJSON.message
+      ])
+  )
+
+window.toolbar_file_rep_index_change_assignee = () ->
+
+  entry_ids = $('.dispute_check_box:checkbox:checked').map(() ->
+    Number(this.value)
+  ).toArray()
+
+  new_assignee = $('#index_target_assignee option:selected').val()
+
+  data = {
+    'dispute_ids': entry_ids,
+    'new_assignee': new_assignee
+  }
+
+  std_msg_ajax(
+    url: '/escalations/api/v1/escalations/file_rep/disputes/change_assignee'
+    method: 'POST'
+    data: data
+    dataType: 'json'
+    success: (response) ->
+      window.location.reload()
+    error: (response) ->
+      std_msg_error('Unable to change assignee', [response.responseJSON.message])
+  )
+
+window.file_rep_take_dispute = (dispute_id) ->
+  std_msg_ajax(
+    method: 'PATCH'
+    url: "/escalations/api/v1/escalations/file_rep/disputes/take_dispute/" + dispute_id
+    data: {}
+    dispute_id: dispute_id
+    error_prefix: 'Error updating ticket.'
+    success: (response) ->
+      $('.inline-take-dispute-' + dispute_id).replaceWith("<button class='return-ticket-button inline-return-ticket-#{dispute_id}' title='Assign this ticket to me' onclick='file_rep_return_dispute(#{dispute_id});'></button>")
+      $("#owner_#{dispute_id}").text(response.username)
+      $('#status_' + dispute_id).text("ASSIGNED")
+  )
+
+window.file_rep_return_dispute = (dispute_id) ->
+  std_msg_ajax(
+    method: 'PATCH'
+    url: "/escalations/api/v1/escalations/file_rep/disputes/return_dispute/" + dispute_id
+    data: {}
+    dispute_id: dispute_id
+    error_prefix: 'Error updating ticket.'
+    success: (response) ->
+      $('.inline-return-ticket-' + dispute_id).replaceWith("<button class='take-ticket-button inline-take-dispute-#{dispute_id}' title='Assign this ticket to me' onclick='file_rep_take_dispute(#{dispute_id});'></button>")
+      $("#owner_#{dispute_id}").text("Unassigned")
+      $('#status_' + dispute_id).text("NEW")
+  )
+
+window.file_rep_show_take_dispute = (dispute_id) ->
+  std_msg_ajax(
+    method: 'PATCH'
+    url: "/escalations/api/v1/escalations/file_rep/disputes/take_dispute/" + dispute_id
+    data: {}
+    dispute_id: dispute_id
+    error_prefix: 'Error updating ticket.'
+    success: (response) ->
+      $("#dispute-assignee").text(response.username)
+      $('#show-edit-ticket-status-button').text("ASSIGNED")
+      $('.take-ticket-button').replaceWith("<button class='return-ticket-button' title='Return ticket to open queue' onclick='file_rep_show_return_dispute(#{dispute_id});'></button>")
+  )
+
+window.file_rep_show_return_dispute = (dispute_id) ->
+  std_msg_ajax(
+    method: 'PATCH'
+    url: "/escalations/api/v1/escalations/file_rep/disputes/return_dispute/" + dispute_id
+    data: {}
+    dispute_id: dispute_id
+    error_prefix: 'Error updating ticket.'
+    success: (response) ->
+      $("#dispute-assignee").text("Unassigned")
+      $("#show-edit-ticket-status-button").text("NEW")
+      $(".return-ticket-button").replaceWith("<button class='take-ticket-button' title='Assign this ticket to me' onclick='file_rep_show_take_dispute(#{dispute_id});'></button>")
+  )
+
+window.file_rep_show_change_assignee = (dispute_id) ->
+  dispute_id = parseInt($('.case-id-tag')[0].innerHTML)
+  new_assignee = $('#index_target_assignee option:selected').val()
+
+  data = {
+    'dispute_ids': [dispute_id],
+    'new_assignee': new_assignee
+  }
+  std_msg_ajax(
+    method: 'POST'
+    url: "/escalations/api/v1/escalations/file_rep/disputes/change_assignee/"
+    data: data
+    dispute_id: dispute_id
+    error_prefix: 'Error updating ticket.'
+    success: (response) ->
+      window.location.reload()
+
+  )
+
 $ ->
   current_url = window.location.href;
   time_submitted = ''
@@ -7,7 +129,7 @@ $ ->
 
   $(window).click (e) ->
     if !e.target.closest('.daterangepicker')
-     $("#advanced-search-dropdown").hide()
+      $("#advanced-search-dropdown").hide()
 
   window.file_rep_reset_search = () ->
     inputs = document.getElementsByClassName('form-control')
@@ -203,7 +325,11 @@ $ ->
         render: (data, type, full, meta) ->
           return '<a href="/escalations/file_rep/disputes/' + data + '">' + parseInt(data).pad(6) + '</a>'
       }
-      { data: 'status' }
+      {
+        data: 'status'
+        render: (data, type, full, meta) ->
+          return '<span id="status_'+ full['id']+'">' + data + '</span>'
+      }
       { data: 'resolution' }
       {
         data: 'file_name'
@@ -289,13 +415,15 @@ $ ->
       { data: 'customer_company_name' }
       { data: 'customer_email' }
       {
-        data: 'assignee'
+        data: 'assigned'
         className: "alt-col"
-        render: (data) ->
-          if data == undefined
-            return '<span class="missing-data">Unassigned</span> <span title="Assign to me" class="esc-tooltipped"><button id="index_ticket_assign" class="take-ticket-button" onClick="take_disputes()"/></span>'
+        render: (data, type, full, meta) ->
+          if full.current_user == data
+            return "<span id='owner_#{full.id}'> #{data} </span><button class='return-ticket-button inline-return-ticket-#{full.id}' title='Return ticket.' onclick='file_rep_return_dispute(#{full.id});'></button>"
+          else if data == 'vrtincom' || data == ""
+            return "<span id='owner_#{full.id}'>Unassigned</span> <span title='Assign to me' class='esc-tooltipped'><button class='take-ticket-button inline-take-dispute-#{full.id}' onClick='file_rep_take_dispute(#{full.id})'/></button></span>"
           else
-            return data + '<span title="Assign to me" class="esc-tooltipped"><button id="index_ticket_assign" class="take-ticket-button" onClick="take_disputes()"/></span>'
+            return data
       }
     ]
 

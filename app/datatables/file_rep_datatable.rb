@@ -87,6 +87,7 @@ class FileRepDatatable < AjaxDatatablesRails::ActiveRecord
           customer_email:               file_rep.customer&.email,
           customer_company_name:        file_rep.customer&.company&.name,
           DT_RowId:                     file_rep.id,
+          current_user:                 @user.cvs_username
       }
     end
   end

@@ -611,7 +611,7 @@ window.take_disputes = () ->
     error: (error) ->
       std_msg_error('Assign Issue(s) Error', [
         'Failed to assign ' + dispute_ids.length + ' issue(s).',
-        'Due to: ' + error.responseJSON.error
+        'Due to: ' + error.responseJSON.message
       ])
   )
 
