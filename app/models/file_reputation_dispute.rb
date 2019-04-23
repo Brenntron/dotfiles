@@ -65,7 +65,7 @@ class FileReputationDispute < ApplicationRecord
   end
 
   def suggested_malicious?
-    self.disposition_suggested.downcase == DISPOSITION_MALICIOUS.downcase
+    self.disposition_suggested&.downcase == DISPOSITION_MALICIOUS.downcase
   end
 
   def update_status(status)
