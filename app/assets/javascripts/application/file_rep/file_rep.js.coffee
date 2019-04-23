@@ -344,11 +344,3 @@ $ ->
         $('#sandbox-report-wrapper, #threatgrid-report-wrapper, #reversing-labs-report-wrapper').removeClass('col-sm-6 col-sm-12').addClass('col-sm-4')
       return
 
-
-
-  # dbinebri: adding download json button
-  $('#download-tg-json').click ->
-
-
-
-  $('#download-sb-json').click ->

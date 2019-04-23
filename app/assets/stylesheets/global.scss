@@ -8929,3 +8929,29 @@ button.secondary.view-report-external-button {
   display: inline-block;
   border: none;
 }
+
+// dbinebri: fix to ensure the min-height collapsed json area stays a min-height of 300px
+.data-report-wrapper {
+  .data-report-code-content {
+    padding: 10px 0;
+  }
+  .collapse {
+    display: block !important;
+    visibility: visible !important;
+    overflow: hidden !important;
+    min-height: 300px !important;
+    &.in {
+      min-height: 300px !important;
+    }
+  }
+}
+
+// dbinebri: fix to ensure the collapsed json area stays gray on expand/collapse
+#collapse_tg_json, #collapse_sb_json {
+  background: #f6f6f6;  // FIX THIS
+  min-height: 300px;
+  padding-left: 0;
+  padding-right: 0;
+  margin-left: 2px;
+  margin-right:  2px;
+}
