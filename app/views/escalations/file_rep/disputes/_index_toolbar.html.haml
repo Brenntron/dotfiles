@@ -130,7 +130,7 @@
                       Submit
 
     %span.dropdown
-      %button#file-det-button.toolbar-button.detection-button.dropdown-toggle.esc-tooltipped{title: 'Create Detection', 'data-toggle': 'dropdown', 'aria-haspopup': 'true', 'aria-expanded': 'false'}
+      %button#file-det-button.toolbar-button.detection-button.dropdown-toggle.esc-tooltipped{title: 'Create Detection', 'data-toggle': 'dropdown', 'aria-haspopup': 'true', 'aria-expanded': 'false', onclick: 'amp_detection_dialog(event, index);'}
         %span.toolbar-button-text
           Create or Change Detection
       .dropdown-menu.toolbar-dropdown#file-det-dropdown{'aria-labelledby': 'file-disp-button'}

@@ -385,7 +385,7 @@ $ ->
 
 
   # Prepare form info for sending to AMP
-  window.amp_detection_submission = (e) ->
+  window.amp_detection_submission = (e, page) ->
     e.preventDefault()
     # Get sha
     sha256_hash = $('#sha256_hash')[0].innerText
@@ -407,10 +407,7 @@ $ ->
 
     comment = $('#new-amp-detection-comment').val()
 
-    console.log(sha256_hash)
-    console.log(detection_array)
-    console.log(comment)
-    # temp just to keep page from refreshing on click of submit
+
     return false
 
 
