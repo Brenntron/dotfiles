@@ -24,8 +24,11 @@ window.research_data = () ->
         $(report_missing).hide()
         file_data = response.json.data.items[0].item
 
-        # Load the top data
-        $('#tg-submission-date').text(file_data.submitted_at)
+        # dbinebri: use moment.js to make date readable
+        tg_formatted_submitted_date = moment(file_data.submitted_at).format('MMM D, YYYY h:mm A');
+
+      # Load the top data
+        $('#tg-submission-date').text(tg_formatted_submitted_date)
         $('#tg-run-status').text(file_data.state)
         $('#tg-score').text(file_data.analysis.threat_score)
         $('#tg-tags').text(file_data.tags.join(', '))
@@ -77,8 +80,12 @@ window.research_data = () ->
         scan_time = all_scanner_results.record_time
         scanner_count = all_scanner_results.scanners.length
 
-        $('#rl-first-seen-date').text(rl_data.first_seen)
-        $('#rl-most-recent-date').text(rl_data.last_seen)
+        # dbinebri: use moment.js to make date readable
+        rl_first_seen_date = moment(rl_data.first_seen).format('MMM D, YYYY h:mm A');
+        rl_last_seen_date = moment(rl_data.last_seen).format('MMM D, YYYY h:mm A');
+
+        $('#rl-first-seen-date').text(rl_first_seen_date)
+        $('#rl-most-recent-date').text(rl_last_seen_date)
 
 
         # Cycle through the scanner results
@@ -159,8 +166,10 @@ window.get_sandbox_report = (runid, sha) ->
       $(report_present).show()
       $(report_missing).hide()
 
-      # Load the top data
-      $('#sb-run-date').text(sb_report.date)
+      # dbinebri: use moment.js to make date readable
+      sb_formatted_run_date = moment(sb_report.date).format('MMM D, YYYY h:mm A');
+
+      $('#sb-run-date').text(sb_formatted_run_date)
       $('#sb-run-status').text(sb_report.status)
       $('#sb-score').text(sb_report.score)
 
