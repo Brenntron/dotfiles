@@ -22,4 +22,23 @@ class FileReputationApi::ReversingLabs
     {error: 'Data Currently Unavailable'}
   end
 
+  def self.score_of_lookup(api_response)
+    reversing_labs_score = 0
+    reversing_labs_count = 0
+    if api_response&.dig('rl','sample','xref','entries')&.any?
+      api_response&.dig('rl','sample','xref','entries')[0]&.dig('scanners').each do |scanner|
+        reversing_labs_count += 1
+        if !scanner['result'].empty?
+          reversing_labs_score += 1
+        end
+      end
+    end
+
+    { reversing_labs_score: reversing_labs_score, reversing_labs_count: reversing_labs_count }
+  end
+
+  def self.score(sha256_hash)
+    api_response = FileReputationApi::ReversingLabs.sha256_lookup(sha256_hash)
+    FileReputationApi::ReversingLabs.score_of_lookup(api_response)
+  end
 end

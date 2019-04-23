@@ -2,19 +2,27 @@
 class FileReputationDispute < ApplicationRecord
 
   belongs_to :customer, optional:true
-  belongs_to :assigned, class_name: 'User', foreign_key: 'user_id', optional: true
+  belongs_to :assigned, class_name: 'User', foreign_key: :user_id, optional:true #TODO remove
   has_many :digital_signers
 
   delegate :name, :company, :company_id, to: :customer, allow_nil: true, prefix: true
 
   STATUS_NEW                = 'NEW'
   STATUS_ASSIGNED           = 'ASSIGNED'
-  STATUS_CLOSED             = 'CLOSED'
+  STATUS_RESEARCHING        = 'RESEARCHING'
+  STATUS_ESCALATED          = 'ESCALATED'
+  STATUS_PENDING            = 'PENDING'
+  STATUS_ONHOLD             = 'ONHOLD'
+  STATUS_RESOLVED           = 'RESOLVED'
   STATUS_REOPENED           = 'RE-OPENED'
   STATUS_CUSTOMER_PENDING   = "CUSTOMER_PENDING"
   STATUS_CUSTOMER_UPDATE    = "CUSTOMER_UPDATE"
 
-  DISPOSITION_MALICIOUS     = 'MALICIOUS'
+  DISPOSITION_UNSEEN        = 'unseen'
+  DISPOSITION_UNKNOWN       = 'unknown'
+  DISPOSITION_MALICIOUS     = 'malicious'
+  DISPOSITION_COMMON        = 'common'
+  DISPOSITION_CLEAN         = 'clean'
 
   validates :status, :sha256_hash, :disposition_suggested, presence: true
 
@@ -50,6 +58,14 @@ class FileReputationDispute < ApplicationRecord
   # defined so tests can stub to return false.
   def self.threaded?
     true
+  end
+
+  def malicious?
+    self.disposition&.downcase == DISPOSITION_MALICIOUS.downcase
+  end
+
+  def suggested_malicious?
+    self.disposition_suggested&.downcase == DISPOSITION_MALICIOUS.downcase
   end
 
   def update_status(status)
@@ -96,8 +112,6 @@ class FileReputationDispute < ApplicationRecord
         disposition_suggested: disposition_suggested,
         source: source,
         platform: platform,
-        threatgrid_score: threat_score,
-        threatgrid_private: threatgrid_private,
         customer: customer
     }
     file_rep.assign_attributes(attributes)
@@ -283,21 +297,17 @@ class FileReputationDispute < ApplicationRecord
     # when 'recently_viewed'
     #   joins(:dispute_peeks).where(dispute_peeks: {assigned_id: user.id})
     when 'my_open'
-      where.not(status: STATUS_CLOSED).where(assigned_id: user.id)
+      where.not(status: STATUS_RESOLVED).where(assigned_id: user.id)
     when 'my_disputes'
       where(assigned_id: user.id)
     # when 'team_disputes'
     #   where(assigned_id: user.my_team)
     when 'unassigned'
-      where(assigned_id: nil).where.not(status: STATUS_CLOSED)
+      where(assigned_id: nil).where.not(status: STATUS_RESOLVED)
     when 'open'
-      where.not(status: STATUS_CLOSED)
-    # when 'open_email'
-    #   sbrs_disputes.where(status: [STATUS_NEW, STATUS_REOPENED, STATUS_CUSTOMER_PENDING, STATUS_CUSTOMER_UPDATE, STATUS_ON_HOLD, STATUS_RESEARCHING, STATUS_ESCALATED, STATUS_ASSIGNED])
-    # when 'open_web'
-    #   wbrs_disputes.where(status: [STATUS_NEW, STATUS_REOPENED, STATUS_CUSTOMER_PENDING, STATUS_CUSTOMER_UPDATE, STATUS_ON_HOLD, STATUS_RESEARCHING, STATUS_ESCALATED, STATUS_ASSIGNED])
+      where.not(status: STATUS_RESOLVED)
     when 'closed'
-      where(status: STATUS_CLOSED)
+      where(status: STATUS_RESOLVED)
     when 'all'
       where({})
     else
@@ -349,8 +359,9 @@ class FileReputationDispute < ApplicationRecord
     if self.sha256_hash.present?
       threatgrid_response = Threatgrid::Search.query(self.sha256_hash)
 
-      self.threatgrid_score = threatgrid_response[:threat_score]
+      self.threatgrid_score = threatgrid_response[:threatgrid_score]
       self.threatgrid_private = threatgrid_response[:threatgrid_private]
+      self.threatgrid_threshold = threatgrid_response[:threatgrid_threshold]
       save!
     end
 
@@ -372,26 +383,23 @@ class FileReputationDispute < ApplicationRecord
   end
 
   def update_reversing_labs_score
-    score = 0
-    api_response = FileReputationApi::ReversingLabs.sha256_lookup(self.sha256_hash)
+    update!(FileReputationApi::ReversingLabs.score(self.sha256_hash))
+  rescue => except
+    Rails.logger.error("Error updating reversing labs score on id #{self.id} -- #{except.error_message}")
+  end
 
-    if api_response&.dig('rl','sample','xref','entries')&.any?
-      api_response&.dig('rl','sample','xref','entries')[0]&.dig('scanners').each do |scanner|
-        if !scanner['result'].empty?
-          score += 1
-        end
-      end
+  def pdf?
+    if self.file_name.present?
+      /\.pdf$/i =~ self.file_name
     end
-
-    self.update(reversing_labs_score: score)
   end
 
   def update_sandbox_score
-    sandbox_response = FileReputationApi::Sandbox.sandbox_score(self.sha256_hash)
-
-    if sandbox_response.present? && sandbox_response[:success] == true
-      self.update(sandbox_score: sandbox_response[:data])
-    end
+    sandbox_score = FileReputationApi::Sandbox.score(self.sha256_hash)
+    sandbox_threshold = self.pdf? ? 90.0 : 61.0
+    update!(sandbox_score: sandbox_score, sandbox_threshold: sandbox_threshold)
+  rescue => except
+    Rails.logger.error("Error updating sandbox score on id #{self.id} -- #{except.error_message}")
   end
 
   def update_scores
@@ -413,8 +421,9 @@ class FileReputationDispute < ApplicationRecord
 
   #for support with incoming bridge messages from TI coming into messages_controller
   def self.process_bridge_payload(message_payload, customer_payload)
+    new_dispute = nil
+
     user = User.where(cvs_username:"vrtincom").first
-    begin
       ActiveRecord::Base.transaction do
 
         guest = Company.where(:name => "Guest").first
@@ -461,9 +470,21 @@ class FileReputationDispute < ApplicationRecord
         new_dispute.platform = message_payload[:platform]
 
         new_dispute.save
-        new_dispute
+
       end #transaction
-    end #begin
+
+    # This is so the tests can stub out the `threaded?` method and test synchronously.
+    if new_dispute
+      if FileReputationDispute.threaded?
+        Thread.new do
+          new_dispute.update_scores
+        end
+      else
+        new_dispute.update_scores
+      end
+    end
+
+    new_dispute
   end
 
   def self.take_tickets(dispute_ids, user:)

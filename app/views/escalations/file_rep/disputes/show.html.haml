@@ -57,7 +57,7 @@
 
                 - if can? :update, FileReputationDispute
                   .dispute-owner-buttons-wrapper
-                    - if @file_rep_dispute.assigned.email == current_user.email
+                    - if @file_rep_dispute.assigned == current_user
                       %button.return-ticket-button.esc-tooltipped{title: 'Return ticket to open queue', onclick: "file_rep_show_return_dispute(#{@file_rep_dispute.id});"}
                     - else
                       %button.take-ticket-button#show_ticket_assign.esc-tooltipped{title: 'Assign this ticket to me', onclick: "file_rep_show_take_dispute(#{@file_rep_dispute.id});"}
@@ -78,7 +78,7 @@
 
               %label.content-label-sm
                 Suggested Disposition
-              - if @file_rep_dispute.disposition_suggested == 'Malicious'
+              - if @file_rep_dispute.suggested_malicious?
                 .disposition.disp-negative= @file_rep_dispute.disposition_suggested
               - else
                 .disposition= @file_rep_dispute.disposition_suggested
@@ -115,9 +115,7 @@
     .content-wrapper.top-case-info
       %h4 File Overview
       .file-edit-buttons-wrapper
-        %button.secondary.change-disp-button
-          Change Disposition
-        %button.secondary.create-det-button
+        %button.secondary.create-det-button{onclick: 'amp_detection_dialog();'}
           Create Detection
 
       .row
@@ -137,7 +135,7 @@
         .col-xs-4
           %label.content-label-sm AMP Disposition
           - unless  @file_rep_dispute.disposition.nil?
-            - if @file_rep_dispute.disposition == 'Malicious'
+            - if @file_rep_dispute.malicious?
               .top-info-data.disposition.disp-negative= @file_rep_dispute.disposition
             - else
               .top-info-data.disposition= @file_rep_dispute.disposition
@@ -178,3 +176,5 @@
     = render 'escalations/file_rep/disputes/communication_tab'
   .tab-pane#history_tab{role: 'tabpanel'}
     History
+
+= render 'escalations/file_rep/disputes/create_detection_dialog'
