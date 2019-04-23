@@ -3,7 +3,6 @@ class FileReputationDispute < ApplicationRecord
 
   belongs_to :customer, optional:true
   belongs_to :assigned, class_name: 'User', foreign_key: :user_id, optional:true #TODO remove
-  belongs_to :user, optional:true
   has_many :digital_signers
 
   delegate :name, :company, :company_id, to: :customer, allow_nil: true, prefix: true
@@ -59,6 +58,14 @@ class FileReputationDispute < ApplicationRecord
   # defined so tests can stub to return false.
   def self.threaded?
     true
+  end
+
+  def malicious?
+    self.disposition.downcase == DISPOSITION_MALICIOUS.downcase
+  end
+
+  def suggested_malicious?
+    self.disposition_suggested.downcase == DISPOSITION_MALICIOUS.downcase
   end
 
   def update_status(status)
@@ -435,5 +442,33 @@ class FileReputationDispute < ApplicationRecord
     end
 
     new_dispute
+  end
+
+  def self.take_tickets(dispute_ids, user:)
+    FileReputationDispute.transaction do
+      unless 0 == FileReputationDispute.where(id: dispute_ids).where.not(user_id: User.vrtincoming.id).count
+        raise 'Some of these ticket are already assigned.'
+      end
+      FileReputationDispute.assign(dispute_ids, user: user)
+    end
+  end
+
+
+  def self.assign(dispute_ids, user:)
+    disputes_ary = []
+    user_id = user.kind_of?(User) ? user.id : user
+
+    FileReputationDispute.transaction do
+      disputes = FileReputationDispute.where(id: dispute_ids, status: [FileReputationDispute::STATUS_NEW, FileReputationDispute::STATUS_REOPENED])
+      disputes_ary = disputes.all.to_a
+
+      disputes.update_all(user_id: user_id, status: FileReputationDispute::STATUS_ASSIGNED)
+    end
+
+    disputes_ary
+  end
+
+  def return_dispute
+    update!(user_id: User.vrtincoming.id, status: FileReputationDispute::STATUS_NEW)
   end
 end
