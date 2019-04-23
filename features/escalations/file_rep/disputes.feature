@@ -60,7 +60,7 @@ Feature: Disputes
     Then I should see "ASSIGNEE"
 
   @javascript
-  Scenario: a disables the File Name column from the FileRep disputes index page
+  Scenario: a user disables the File Name column from the FileRep disputes index page
     Given a user with role "filerep user" exists and is logged in
     And I go to "/escalations/file_rep/disputes"
     When I click "#file-index-table-show-columns-button"
@@ -68,9 +68,32 @@ Feature: Disputes
     Then I should not see "FILE NAME"
 
   @javascript
-  Scenario: a enables the Resolution column from the FileRep disputes index page
+  Scenario: a user enables the Resolution column from the FileRep disputes index page
     Given a user with role "filerep user" exists and is logged in
     And I go to "/escalations/file_rep/disputes"
     When I click "#file-index-table-show-columns-button"
     And I click "#resolution-checkbox"
     Then I should see "RESOLUTION"
+
+  @javascript
+  Scenario: a user visits a FileRep Dispute Show Page and confirms that the layout is properly rendered
+    Given a user with role "filerep user" exists and is logged in
+    And A FileRep Dispute with trait "default" exists
+    When I go to "/escalations/file_rep/disputes/1"
+    Then I should see "TICKET OVERVIEW"
+    And I should see "Case ID"
+    And I should see "0000000001"
+    And I should see "FILE OVERVIEW"
+    And I should see "efb947a43bfe6d0812d105f6afdeb9774f4d79254dd48f89f1e95ffdf8732928"
+    And I should see "CREATE DETECTION"
+    And I should see "COMMUNICATION"
+    And I should see "Case History"
+    And I should see "Compose New Email"
+    And I should see "Notes"
+    When I click "#research-tab-link"
+    Then I should see "Research Data"
+    And I should see "TALOS SANDBOX"
+    And I should see "THREAT GRID"
+    And I should see "REVERSING LABS"
+
+

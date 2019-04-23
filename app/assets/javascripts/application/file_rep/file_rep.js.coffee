@@ -127,7 +127,7 @@ $ ->
 
   window.build_data = () ->
 
-    if current_url.includes('/file_rep/disputes?f=')
+    if current_url.indexOf('/file_rep/disputes?f=') >= 0 # replaced includes with indexOf due to incompatibility with Cucumber's Javascript
 #      if the current url includes the above, it is a standard search'
       status_param_regex = /f=(.*)/
       search_type = 'standard'
