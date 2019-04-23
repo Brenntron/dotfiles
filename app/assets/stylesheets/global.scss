@@ -4224,7 +4224,7 @@ button.tertiary {
   outline: 1px solid darken($faint-neutral-color, 5%);
 }
 
-#advanced-search-dropdown .form-group input[type='checkbox'] {
+#advanced-search-dropdown .form-group input[type='checkbox']:not(#in-sample-zoo-input) {
   border: none;
   outline: none;
   width: auto;
@@ -8361,14 +8361,9 @@ hr.thin.form-divider {
   }
 }
 .in-sample-zoo_container{
-  & {
-    padding-top: 35px;
-  }
-  label{
-    position: relative;
-    top: -10px;
-    left: -10px;
-
+  #in-sample-zoo-input{
+    border: none;
+    outline: none;
   }
 }
 
