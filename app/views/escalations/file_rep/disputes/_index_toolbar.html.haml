@@ -138,10 +138,10 @@
           %div
             %label.toolbar-section-label Disposition
             %select.toolbar-select
-              %option Clean
-              %option Common
-              %option Malicious
-              %option Unknown
+              %option{value: FileReputationDispute::DISPOSITION_CLEAN} Clean
+              %option{value: FileReputationDispute::DISPOSITION_COMMON} Common
+              %option{value: FileReputationDispute::DISPOSITION_MALICIOUS} Malicious
+              %option{value: FileReputationDispute::DISPOSITION_UNKNOWN} Unknown
           %button{class: 'primary', type:'button', id: 'button_reassign', onclick:'toolbar_index_change_assignee();'}
             Submit
 
@@ -174,10 +174,10 @@
             .col-xs-12
               %select
                 -# TODO Add actual disposition options here, these are placeholders
-                %option Clean
-                %option Common
-                %option Malicious
-                %option Unknown
+                %option{value: FileReputationDispute::DISPOSITION_CLEAN} Clean
+                %option{value: FileReputationDispute::DISPOSITION_COMMON} Common
+                %option{value: FileReputationDispute::DISPOSITION_MALICIOUS} Malicious
+                %option{value: FileReputationDispute::DISPOSITION_UNKNOWN} Unknown
           %hr.thin
           .comment-wrapper
             %label.content-label-sm Comment
