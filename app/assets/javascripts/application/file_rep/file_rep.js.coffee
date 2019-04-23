@@ -301,6 +301,7 @@ $ ->
 
 
         if search_condition_tooltip.length > 0
+          container.show()
           container.addClass('esc-tooltipped')
 
           list = document.createElement('ul')
@@ -313,6 +314,7 @@ $ ->
 
           container.prepend(list)
           $(list).hide()
+
           container.attr('data-tooltip-content', '.tooltip_content')
 
 
