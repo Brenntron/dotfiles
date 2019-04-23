@@ -204,7 +204,7 @@ $ ->
       {
         data: 'sha256_hash'
         render: (data, type, full, meta) ->
-          return '<a href="/escalations/file_rep/disputes/' + full['id'] + '"><span id="' + data + '_sha" title="' + data + '" class="esc-tooltipped file_rep_sha">' + data + '</span></a>'
+          return '<span id="' + data + '_sha" title="' + data + '" class="esc-tooltipped file_rep_sha">' + data + '</span>'
       }
       {
         data: 'file_size'
