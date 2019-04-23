@@ -3,6 +3,43 @@ $ ->
   if $('body').hasClass('show-action')
     window.research_data()
 
+kick_off_object = window.kick_off_sample_run - () ->
+
+  sha256_hash = $('#sha256_hash')[0].innerText
+
+  std_msg_ajax(
+    method: 'GET'
+    url: "/escalations/api/v1/escalations/file_rep/sandbox_api/sandbox_latest_report/" + sha256_hash
+    success_reload: false
+    success: (response) ->
+
+      run_id = response.json.data.runid
+      status = response.json.data.status
+
+      if status == "Complete"
+        #this may need some tweaking since it's kinda pseudo code right now, but basically kick off sample run method
+        #needs to be assigned to a variable so that variable can be fed to clearInterval to stop checking after we recognize
+        #the run has been completed and populated the page.
+        clearInterval(kick_off_object)
+        #Melissa, check to see if this is the right  method to call, maybe research_data is the better one to call?
+        window.get_sandbox_report(run_id, sha256_hash)
+      if status == "Error"
+        alert('need to cover this case')
+      if status == "Unsupported File Type"
+        alert('need to cover this case')
+      if status == "Cancelled"
+        alert('need to cover this case')
+      if status == "Running"
+        #maybe set (or keep setting) a message to the UI somewhere here letting the user know shits still happening?
+
+        #this line will call again so that this repeats as many times a necessary, stopping when status == 'complete'
+        setTimeout(kick_off_sample_run, 600000)
+
+    error: (response) ->
+      $('#sb-loader').hide()
+      std_api_error(response, "There was a problem retrieving data from Talos Sandbox", reload: false)
+  )
+
 
 window.research_data = () ->
   sha256_hash = $('#sha256_hash')[0].innerText
