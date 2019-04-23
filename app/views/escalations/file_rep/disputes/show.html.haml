@@ -129,8 +129,8 @@
           %label.content-label-sm File Size
           .top-info-data
             -# TODO find out what file size we will get & convert to unit the analysts want
-            = @file_rep_dispute.file_size
-            bytes
+            = @file_rep_dispute.bytes_to_kb
+            KB
 
         .col-xs-4
           %label.content-label-sm AMP Disposition

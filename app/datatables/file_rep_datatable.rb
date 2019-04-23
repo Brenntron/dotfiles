@@ -64,7 +64,7 @@ class FileRepDatatable < AjaxDatatablesRails::ActiveRecord
           resolution:                   file_rep.resolution,
           assigned:                     file_rep.assigned&.cvs_username,
           file_name:                    file_rep.file_name,
-          file_size:                    file_rep.file_size,
+          file_size:                    file_rep.bytes_to_kb,
           sha256_hash:                  file_rep.sha256_hash,
           sample_type:                  file_rep.sample_type,
           disposition:                  file_rep.disposition,
