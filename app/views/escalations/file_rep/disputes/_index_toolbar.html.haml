@@ -137,16 +137,19 @@
         .inline-tool-content-wrapper.plain-inline-dropdown-wrapper
           .row
             .col-xs-12
-              %label.content-label-sm.full-row-label  Detection Name
+              %label.content-label-sm.full-row-label  Disposition
           .row
             .col-xs-12
               %select
                 -# TODO Add actual disposition options here, these are placeholders
-                %option Clean
-                %option Common
-                %option Malicious
-                %option Unknown
+                %option{value: FileReputationDispute::DISPOSITION_CLEAN} Clean
+                %option{value: FileReputationDispute::DISPOSITION_COMMON} Common
+                %option{value: FileReputationDispute::DISPOSITION_MALICIOUS} Malicious
+                %option{value: FileReputationDispute::DISPOSITION_UNKNOWN} Unknown
 
+          .row
+            .col-xs-12
+              %label.content-label-sm.full-row-label  Detection Name
           .row
             .col-xs-4
               %select
@@ -160,9 +163,6 @@
               %input.text-input{type: 'text'}
             .col-xs-2
               %span.file-name-extension .Talos
-          .row
-            .col-xs-12
-              %label.content-label-sm.full-row-label  Disposition
 
           %hr.thin
           .comment-wrapper

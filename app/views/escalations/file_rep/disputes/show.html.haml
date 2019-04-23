@@ -57,7 +57,7 @@
 
                 - if can? :update, FileReputationDispute
                   .dispute-owner-buttons-wrapper
-                    - if @file_rep_dispute.assigned.email == current_user.email
+                    - if @file_rep_dispute.assigned == current_user
                       %button.return-ticket-button.esc-tooltipped{title: 'Return ticket to open queue', onclick: "file_rep_show_return_dispute(#{@file_rep_dispute.id});"}
                     - else
                       %button.take-ticket-button#show_ticket_assign.esc-tooltipped{title: 'Assign this ticket to me', onclick: "file_rep_show_take_dispute(#{@file_rep_dispute.id});"}
