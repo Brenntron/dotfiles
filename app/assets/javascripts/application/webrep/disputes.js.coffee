@@ -611,7 +611,7 @@ window.take_disputes = () ->
     error: (error) ->
       std_msg_error('Assign Issue(s) Error', [
         'Failed to assign ' + dispute_ids.length + ' issue(s).',
-        'Due to: ' + error.responseJSON.error
+        'Due to: ' + error.responseJSON.message
       ])
   )
 
@@ -1352,14 +1352,14 @@ $ ->
         success: (response) ->
       )
 
-    if window.location.pathname != '/escalations/webrep/disputes'
-      $('#filter-cases').hide()
-      $('#import-webrep').hide()
-#      $('#web-rep-search').hide()
-    else
+    if window.location.pathname == '/escalations/file_rep/disputes' ||  window.location.pathname == '/escalations/webrep/disputes'
       $('#filter-cases').show()
       $('#import-webrep').show()
-#      $('#web-rep-search').show()
+    #      $('#web-rep-search').show()
+    else
+      $('#filter-cases').hide()
+      $('#import-webrep').hide()
+  #      $('#web-rep-search').hide()
 
   $('#edit-dispute-button').click ->
     $('.dispute-submission-type').hide()
