@@ -1453,7 +1453,8 @@ $ ->
     $('#advanced-search-dropdown').toggle()
 
   $(document).click ->
-    $("#advanced-search-dropdown").hide()
+    if !e.target.closest('.daterangepicker')
+      $("#advanced-search-dropdown").hide()
 
   $(document).ready ->
     setInterval ->
