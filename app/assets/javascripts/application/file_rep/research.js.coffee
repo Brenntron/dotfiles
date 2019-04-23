@@ -43,7 +43,7 @@ window.research_data = () ->
         $('#tg-full').text(full_report)
 
 
-        # dbinebri: Convert the threatgrid full_report to a downloadable file, add the Download button hyperlink
+        # dbinebri: Convert the Threatgrid full_report to a downloadable file, add the Download button hyperlink
         # build a formatted date string to add into the filename for download
         tg_today = new Date()
         tg_formatted_day =
@@ -260,7 +260,7 @@ window.get_sandbox_report = (runid, sha) ->
       $('#sb-full').text(full_report)
 
 
-      # dbinebri: Convert the threatgrid full_report to a downloadable file, add the Download button hyperlink
+      # dbinebri: Convert the Talos Sandbox full_report to a downloadable file, add the Download button hyperlink
       # build a formatted date string to add into the filename for download
       sb_today = new Date()
       sb_formatted_day =
