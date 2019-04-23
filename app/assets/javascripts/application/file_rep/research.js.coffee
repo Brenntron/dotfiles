@@ -6,6 +6,8 @@ $ ->
 
 window.research_data = () ->
   sha256_hash = $('#sha256_hash')[0].innerText
+
+  # Send sha to ThreatGrid, get data
   $('#tg-loader').show()
   std_msg_ajax(
     method: 'POST'
@@ -256,7 +258,6 @@ window.get_sandbox_report = (runid, sha) ->
       # Adding full json report in case it's needed
       full_report = JSON.stringify(response.json, null, 2)
       $('#sb-full').text(full_report)
-      console.log sb_report
 
 
       # dbinebri: Convert the threatgrid full_report to a downloadable file, add the Download button hyperlink
