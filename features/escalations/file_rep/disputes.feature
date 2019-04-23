@@ -3,13 +3,16 @@ Feature: Disputes
   as a user
   I will provide ways to interact with disputes
 
+  # Need to stub the API call
   @javascript
   Scenario: an analyst tries to create a FileRep ticket
     Given a user with role "filerep user" exists and is logged in
     And I go to "/escalations/file_rep/disputes"
     Then I click "#new-dispute"
-    Then I fill in "file-rep-shas" with "343518b26e0a872772808605f9f28aa75f64d86a6608e1347c979d033a72cb54"
+    Then I fill in "shas_list" with "343518b26e0a872772808605f9f28aa75f64d86a6608e1347c979d033a72cb54"
     Then I click ".primary"
+    Then I wait for "30" seconds
+    Then take a screenshot
     Then a FileRep Ticket should have been created
 
   @javascript
@@ -95,5 +98,15 @@ Feature: Disputes
     And I should see "TALOS SANDBOX"
     And I should see "THREAT GRID"
     And I should see "REVERSING LABS"
+
+  # Cucumber can't seem to load the DataTable, compromising by checking the ActiveRecord for a TG score
+  @javascript
+  Scenario: a user visits the FileRep Dispute Show page which launches off API calls that also sets the TG score on the record
+    Given a user with role "filerep user" exists and is logged in
+    And A FileRep Dispute with trait "default" exists
+    Then I go to "/escalations/file_rep/disputes/1"
+    And I wait for "25" seconds
+    And a FileRep Ticket should have a TG score
+
 
 

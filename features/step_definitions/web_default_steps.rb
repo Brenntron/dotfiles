@@ -403,3 +403,7 @@ end
 Then(/^There is only one element of class, "(.*?)"$/) do |value|
     expect(page.evaluate_script("$('.#{value}').length")).to eq(1)
 end
+
+Given(/^I click on element "(.*?)" with alt "(.*?)"$/) do |element, alt|
+  find("#{element}[alt='#{alt}']").click
+end

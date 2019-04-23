@@ -2,6 +2,10 @@ Then (/^a FileRep Ticket should have been created$/) do
   expect(FileReputationDispute.count).to eq(1)
 end
 
+Then (/^a FileRep Ticket should have a TG score$/) do
+  expect(FileReputationDispute.first.threatgrid_score).not_to eq(nil)
+end
+
 Given(/^the following FileRep disputes exist:$/) do |disputes|
   disputes.hashes.each do |dispute_attrs|
     FactoryBot.create(:file_reputation_dispute, dispute_attrs)
