@@ -8361,6 +8361,10 @@ hr.thin.form-divider {
   }
 }
 .in-sample-zoo_container{
+  label{
+    position: relative;
+    top: 10px;
+  } 
   #in-sample-zoo-input{
     border: none;
     outline: none;
