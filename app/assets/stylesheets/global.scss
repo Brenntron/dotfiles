@@ -8991,6 +8991,10 @@ div[aria-describedby='create-detection-dialog'] {
   color: $type-lighter-color;
 }
 
+.tg-data-present, .tg-data-missing, .sb-data-present, .sb-data-missing, .rl-data-present, .rl-data-missing {
+  display: none;
+}
+
 
 // dbinebri: adding button here for download json buttons
 .download-small-button {

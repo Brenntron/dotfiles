@@ -345,20 +345,22 @@ $ ->
       return
 
 
+$ ->
+  ## Create detection form interaction
+  $('#create-detection-dialog').dialog
+    autoOpen: false,
+    minWidth: 520,
+    classes: {
+      "ui-dialog": "form-dialog"
+    },
+    position: { my: "top center", at: "top center", of: window }
 
 
   # Trigger Create Detection dialog
   window.amp_detection_dialog = () ->
-    $('#create-detection-dialog').dialog
-      minWidth: 520,
-      classes: {
-        "ui-dialog": "form-dialog"
-      },
-      position: { my: "top center", at: "top center", of: window }
+    $('#create-detection-dialog').dialog('open')
     window.amp_detection_naming()
 
-
-  ## Create detection form interaction
 
   # Hide / Show of Detection Name inputs
   window.amp_detection_naming = () ->
