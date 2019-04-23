@@ -12,7 +12,6 @@ class Escalations::PeakeBridge::FileRepMessagesController < ApplicationControlle
 
     if new_dispute.new_record?
       error_messages = new_dispute.errors.full_messages.join('; ')
-      #render plain: "\"Error(s) creating file rep -- #{error_messages}\"", status: :internal_server_error
       return_message = "Error(s) creating file rep -- #{error_messages}"
       Rails.logger.error(return_message)
     else
@@ -20,15 +19,6 @@ class Escalations::PeakeBridge::FileRepMessagesController < ApplicationControlle
       return_message = "successfully created file rep"
 
       new_dispute.ack_create(envelope_params, sender_params)
-
-      # This is so the tests can stub out the `threaded?` method and test synchronously.
-      if FileReputationDispute.threaded?
-        Thread.new do
-          new_dispute.update_scores
-        end
-      else
-        new_dispute.update_scores
-      end
     end
 
     if return_success

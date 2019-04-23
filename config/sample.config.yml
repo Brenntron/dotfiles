@@ -10,19 +10,25 @@ development:
       check: true
       url: "https://investigate.api.umbrella.com/domains/categorization/"
       api_key: "redacted"
+  bls:
+    host: "stage-bls-vip.sv4.ironport.com"
+    port: 443
   bugzilla:
-    #host: "bugzillaTest02.vrt.sourcefire.com"
-    host: "bugzilla-staging.vrt.sourcefire.com"
+    host: "fmd-bugzil-01tst.vrt.sourcefire.com"
     api_key: "redacted"
   cert:
-    #vrt: "/System/Library/OpenSSL/certs/ca.pem" #Mac OS X standard location for certs
-    vrt: "extras/ssh/ca.pem"
+    vrt: "/usr/local/etc/trusted-certificates.pem"
+  file_reputation_sandbox:
+    host: "intel.api.sourcefire.com"
+    # verify_mode { "no-tls" for http, "verify-none" for self signed cert, "verify-peer" for CA }
+    verify_mode: "verify-none"
+    api_key: "redacted"
   peakebridge:
     host: "localhost"
     port: 2966
-    # ssl_mod { "no-tls" for http, "verify-none" for self signed cert, "verify-peer" for CA }
-    ssl_mode: "verify-peer"
-    ca_file: "/usr/local/etc/trusted-certificates.pem"
+    # verify_mode { "no-tls" for http, "verify-none" for self signed cert, "verify-peer" for CA }
+    verify_mode: "no-tls"
+    #ca_cert_file: "/usr/local/etc/trusted-certificates.pem"
     uri_base: "/peakebridge/channels"
     sources:
       "snort-org":
@@ -30,30 +36,28 @@ development:
         aws_secret_access_key: "redacted"
         aws_s3_host_name: "US East (N. Virginia)"
         aws_region: "us-east-1"
-        aws_bucket: "snort-org-site"
-  reversing_labs:
-    url: "https://ticloud-cdn-api.reversinglabs.com/"
-    username:
-    password: 
+        aws_bucket: "redacted"
   perl:
     cmd: "/usr/bin/env perl"
     canvas_root: "extras"
     extras_dir: 'extras'
-    visruleparser_path: "extras/visruleparser_dev.pl"
+    visruleparser_path: "extras/visruleparser.pl"
     snort_json_path: 'extras/snort_json_parser.pl'
-    cve2x_path: "extras/cve2x_dev.pl"
-    rule2yaml_path: "extras/rule2yaml_dev.pl"
+    cve2x_path: "extras/cve2x.pl"
+    rule2yaml_path: "extras/rule2yaml.pl"
   rep_api:
-    #host: "localhost"
-    #port: 2944                          #default port for wbrs_stub
-    #verify_mode: "no-tls"
-    #gssnegotiate: true
     host: "fmdreputation.vrt.sourcefire.com"
     port: 443
     # verify_mode { "no-tls" for http, "verify-none" for self signed cert, "verify-peer" for CA }
     verify_mode: "verify-peer"
     ca_cert_file: "/usr/local/etc/trusted-certificates.pem"
     gssnegotiate: true
+  reversing_labs:
+    host: 'ticloud-cdn-api.reversinglabs.com'
+    # verify_mode { "no-tls" for http, "verify-none" for self signed cert, "verify-peer" for CA }
+    verify_mode: "verify-none"
+    username: "u/sourcefire"
+    password: "redacted"
   ruletest:
     url: "https://localhost:3000/api_test"
   sds:
@@ -71,29 +75,27 @@ development:
     rules_repo_url: "https://repo-test.vrt.sourcefire.com/svn/rules/trunk"
     ruledocs_repo_url: "https://repo-test.vrt.sourcefire.com/svn/rules/trunk/docs/rulesdocs/"
     snort_rule_path: "extras/snort/snort-rules"
+  threatgrid:
+    host: "panacea.threatgrid.com"
+    port: 443
+    verify_mode: "verify-none"
+    api_key: "redacted"
+  ticloud:
+    host: "ticloud-cdn-api.reversinglabs.com"
+    port: 443
+    verify_mode: "verify-none"
   virustotal:
     url: "https://www.virustotal.com/vtapi/v2/url/report"
     host: "www.virustotal.com"
     port: 443
     api_key: "redacted"
   wbrs:
-    #host: "localhost"
-    #port: 2944                          #default wbrs_stub port
-    #verify_mode: "no-tls"
-    #gssnegotiate: false
-    host: "stage-wbrsruleapi-vip.vega.ironport.com"
-    port: 80
+    host: "test-wbrsruleapi-app1.vega.ironport.com"
     # verify_mode { "no-tls" for http, "verify-none" for self signed cert, "verify-peer" for CA }
-    verify_mode: "no-tls"
+    verify_mode: "verify-none"
     gssnegotiate: false
-  bls:
-    host: "stage-bls-vip.sv4.ironport.com"
-    port: 443
+    auth_token: "redacted"
   xbrs:
-    #host: "localhost"
-    #port: 1188                          #default xbrs_stub port
-    #verify_mode: "no-tls"
-    #gssnegotiate: false
     host: "prod-xbrs.vega.ironport.com"
     port: 80
     # verify_mode { "no-tls" for http, "verify-none" for self signed cert, "verify-peer" for CA }
@@ -112,26 +114,31 @@ test:
       check: true
       url: "https://investigate.api.umbrella.com/domains/categorization/"
       api_key: "redacted"
+  bls:
+    host: "stage-bls-vip.sv4.ironport.com"
+    port: 443
   bugzilla:
-    #host: "bugzillaTest02.vrt.sourcefire.com"
-    host: "bugzilla-staging.vrt.sourcefire.com"
+    host: "fmd-bugzil-01tst.vrt.sourcefire.com"
     api_key: "redacted"
   cert:
-    #vrt: "/System/Library/OpenSSL/certs/ca.pem" #Mac OS X standard location for certs
-    vrt: "extras/ssh/ca.pem"
+    vrt: "/usr/local/etc/trusted-certificates.pem"
+  file_reputation_sandbox:
+    host: "intel.api.sourcefire.com"
+    verify_mode: "verify-none"
+    api_key: "redacted"
   peakebridge:
     host: "localhost"
     port: 2966
-    # ssl_mod { "no-tls" for http, "verify-none" for self signed cert, "verify-peer" for CA }
-    ssl_mode: "no-tls"
-    ca_file: "/usr/local/etc/trusted-certificates.pem"
+    # verify_mode { "no-tls" for http, "verify-none" for self signed cert, "verify-peer" for CA }
+    verify_mode: "no-tls"
     uri_base: "/peakebridge/channels"
     sources:
       "snort-org":
         aws_access_key_id: "redacted"
         aws_secret_access_key: "redacted"
+        aws_s3_host_name: "US East (N. Virginia)"
         aws_region: "us-east-1"
-        aws_bucket: "snort-org-site"
+        aws_bucket: "redacted"
   perl:
     cmd: "/usr/bin/env perl"
     canvas_root: "extras"
@@ -152,6 +159,10 @@ test:
     gssnegotiate: true
   ruletest:
     url: "https://localhost:3000/api_test"
+  reversing_labs:
+    url: "https://ticloud-cdn-api.reversinglabs.com/"
+    username: "u/sourcefire"
+    password: "redacted"
   sds:
     host: "v2.sds.cisco.com"
     cert_file: "/usr/local/etc/sds-certificate.pem"
@@ -163,33 +174,28 @@ test:
     api_key: "redacted"
   svn:
     cmd: "/usr/bin/env svn"
-    password: ""
+    password: "redacted"
     rules_repo_url: "https://repo-test.vrt.sourcefire.com/svn/rules/trunk"
     ruledocs_repo_url: "https://repo-test.vrt.sourcefire.com/svn/rules/trunk/docs/rulesdocs/"
     snort_rule_path: "extras/snort/snort-rules"
+  threatgrid:
+    host: "panacea.threatgrid.com"
+    port: 443
+    verify_mode: "verify-none"
+    api_key: "redacted"
   virustotal:
     url: "https://www.virustotal.com/vtapi/v2/url/report"
     host: "www.virustotal.com"
     port: 443
     api_key: "redacted"
   wbrs:
-    #host: "localhost"
-    #port: 2944                          #default wbrs_stub port
-    #verify_mode: "no-tls"
-    #gssnegotiate: false
-    host: "stage-wbrsruleapi-vip.vega.ironport.com"
+    host: "test-wbrsruleapi-app1.vega.ironport.com"
     port: 80
     # verify_mode { "no-tls" for http, "verify-none" for self signed cert, "verify-peer" for CA }
     verify_mode: "no-tls"
     gssnegotiate: false
-  bls:
-    host: "stage-bls-vip.sv4.ironport.com"
-    port: 443
+    auth_token: "redacted"
   xbrs:
-    #host: "localhost"
-    #port: 1188                          #default xbrs_stub port
-    #verify_mode: "no-tls"
-    #gssnegotiate: false
     host: "prod-xbrs.vega.ironport.com"
     port: 80
     # verify_mode { "no-tls" for http, "verify-none" for self signed cert, "verify-peer" for CA }
@@ -197,7 +203,7 @@ test:
     gssnegotiate: false
 
 staging:
-  amq: #active message queue
+  amq:
     host: "fmd-actmq-01stg.vrt.sourcefire.com"
   auto_resolve:
     complaints:
@@ -208,21 +214,29 @@ staging:
       check: true
       url: "https://investigate.api.umbrella.com/domains/categorization/"
       api_key: "redacted"
+  bls:
+    host: "stage-bls-vip.sv4.ironport.com"
+    port: 443
   bugzilla:
-    host: "bugzilla-staging.vrt.sourcefire.com"
-    api_key: "redacted"
+    host: "fmd-bugzil-01stg.vrt.sourcefire.com"
   cert:
     vrt: "/usr/local/etc/trusted-certificates.pem"
+  file_reputation_sandbox:
+    host: "intel.api.sourcefire.com"
+    # verify_mode { "no-tls" for http, "verify-none" for self signed cert, "verify-peer" for CA }
+    verify_mode: "verify-none"
+    api_key: "redacted"
   peakebridge:
-    host: "stevensville-test.vrt.sourcefire.com"
+    host: "stevensville-stage.vrt.sourcefire.com"
     port: 443
     ssl_mode: "verify-peer"
-    ca_file: "/usr/local/etc/trusted-certificates.pem"
+    ca_cert_file: "/usr/local/etc/trusted-certificates.pem"
     uri_base: "/peakebridge/channels"
     sources:
       "snort-org":
         aws_access_key_id: "redacted"
         aws_secret_access_key: "redacted"
+        aws_s3_host_name: "US East (N. Virginia)"
         aws_region: "us-east-1"
         aws_bucket: "redacted"
   perl:
@@ -240,14 +254,20 @@ staging:
     verify_mode: "verify-peer"
     ca_cert_file: "/usr/local/etc/trusted-certificates.pem"
     gssnegotiate: true
+  reversing_labs:
+    host: 'ticloud-cdn-api.reversinglabs.com'
+    # verify_mode { "no-tls" for http, "verify-none" for self signed cert, "verify-peer" for CA }
+    verify_mode: "verify-peer"
+    username: "u/sourcefire"
+    password: "redacted"
   ruletest:
-    url: "https://fmd-rultst-01stg.vrt.sourcefire.com"
+    url: "https://ruletest-staging.vrt.sourcefire.com"
   sds:
     host: "v2.sds.cisco.com"
     cert_file: "/usr/local/etc/sds-certificate.pem"
     pkey_file: "/usr/local/etc/sds-pkey.pem"
     user: 'tidev'
-    pass: "REDACTED"
+    pass: "redacted"
   snort_doc_max_fails: 3
   snort_org:
     host: "localhost"
@@ -259,6 +279,17 @@ staging:
     rules_repo_url: "https://repo-staging.vrt.sourcefire.com/svn/rules/trunk"
     ruledocs_repo_url: "https://repo-staging.vrt.sourcefire.com/svn/rules/trunk/docs/ruledocs/"
     snort_rule_path: "extras/snort/snort-rules"
+  threatgrid:
+    host: "panacea.threatgrid.com"
+    port: 443
+    # verify_mode { "no-tls" for http, "verify-none" for self signed cert, "verify-peer" for CA }
+    verify_mode: "verify-peer"
+    api_key: "redacted"
+  ticloud:
+    host: "ticloud-cdn-api.reversinglabs.com"
+    port: 443
+    # verify_mode { "no-tls" for http, "verify-none" for self signed cert, "verify-peer" for CA }
+    verify_mode: "verify-peer"
   virustotal:
     url: "https://www.virustotal.com/vtapi/v2/url/report"
     host: "www.virustotal.com"
@@ -270,6 +301,7 @@ staging:
     # verify_mode { "no-tls" for http, "verify-none" for self signed cert, "verify-peer" for CA }
     verify_mode: "no-tls"
     gssnegotiate: false
+    auth_token: "redacted"
   xbrs:
     host: "prod-xbrs.vega.ironport.com"
     port: 80

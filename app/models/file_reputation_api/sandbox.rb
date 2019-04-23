@@ -98,6 +98,13 @@ class FileReputationApi::Sandbox
     data
   end
 
+  def self.score(sha256_hash)
+    latest_report = FileReputationApi::Sandbox.sandbox_latest_report(sha256_hash)
+    run_id = latest_report[:data]['runid']
+    full_report = FileReputationApi::Sandbox.full_report(sha256_hash, run_id)
+    full_report[:data]['score']
+  end
+
 
   ########################################################
   # some example shas with possible history in sandbox

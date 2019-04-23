@@ -9,7 +9,7 @@ if [[ $# -lt 1 ]]; then
     echo 'RAILS_ENV                             Cannot be test or development from bundle install --without'
     echo 'TARFILE                               First ARG -- path to tar file'
     echo 'RELDIR=<timestamp>                    Second ARG -- subdir for this build'
-    echo 'RELBASE=~/disgorge                    Base dir with releases, shared, and current subdirs'
+    echo 'RELBASE=AC-TESTING/$USER/disgorge     Base dir with releases, shared, and current subdirs'
     echo 'RELPATH=$RELBASE/releases/$RELDIR     Dir for source files'
     echo 'SHARED=SHARED                         SHARED to use shared dir, SKIP to omit'
     echo 'SHAREDDIR=$RELBASE/shared             Location of Shared files and dirs'
@@ -32,7 +32,7 @@ else
 fi
 
 if [ "" == "$RELBASE" ]; then
-    RELBASE=~/disgorge
+    RELBASE=/usr/local/AC-TESTING/$USER/disgorge
 fi
 
 if [ "" == "$RELPATH" ]; then
@@ -118,15 +118,15 @@ if [ "SKIP" != "$BUNDLE_PACKAGE" ]; then
     if [ -d vendor/gems ]; then
         cp `find vendor/gems -name '*.gem'` vendor/cache
     fi
-    bundle _1.16.1_ package --path vendor/bundle
+    bundle _1.17.1_ package --path vendor/bundle
 fi
 
 if [ "SKIP" != "$BUNDLE_INSTALL" ]; then
     echo '* bundle install'
     if [ "DEPLOYMENT" == "$DEPLOYMENT" ]; then
-        bundle _1.16.1_ install --deployment --clean --local --path vendor/bundle --without development test profile
+        bundle _1.17.1_ install --deployment --clean --local --path vendor/bundle --without development test profile
     else
-        bundle _1.16.1_ install --local --path vendor/bundle
+        bundle _1.17.1_ install --local --path vendor/bundle
     fi
 fi
 
@@ -276,7 +276,7 @@ fi
 
 echo *Linking new build to local server location
 
-cd /usr/local/AC-TESTING/$USERFOLDER/
+cd /usr/local/AC-TESTING/$USER/
 rm public_html
 ln -s $RAILS_ROOT public_html
 cd public_html
