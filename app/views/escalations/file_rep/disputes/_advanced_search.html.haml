@@ -8,8 +8,13 @@
     %button.remove-input
   .form-group.search-item
     %label.content-label-sm Status
-    %input.form-control#status-input{name: 'status', list: 'status-list'}
-    %datalist#status-list
+    %input.form-control#status-input{name: 'status', list: 'filerep-status-list'}
+    %datalist#filerep-status-list
+      %option{value: 'Clean'}
+      %option{value: 'Common'}
+      %option{value: 'Malicious'}
+      %option{value: 'Unknown'}
+      %option{value: 'Unseen'}
     %button.remove-input
   .form-group.search-item.hidden
     %label.content-label-sm Resolution
@@ -66,7 +71,13 @@
     %button.remove-input
   .form-group.search-item
     %label.content-label-sm Suggested Disposition
-    %input.form-control#suggested-disposition-input{name: 'suggested_disposition'}
+    %input.form-control#suggested-disposition-input{name: 'suggested_disposition', list:'suggested-disposition-list'}
+    %datalist#suggested-disposition-list
+      %option{value: 'Clean'}
+      %option{value: 'Common'}
+      %option{value: 'Malicious'}
+      %option{value: 'Unknown'}
+      %option{value: 'Unseen'}
     %button.remove-input
   .form-group.search-item.hidden
     %label.content-label-sm Submitter Type
