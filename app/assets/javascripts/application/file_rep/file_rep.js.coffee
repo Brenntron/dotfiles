@@ -181,8 +181,8 @@ $ ->
     columns: [
       {
         data:'id'
-        render: (data) ->
-          return '<input type="checkbox" onclick="toggleRow(this)" name="cbox" class="dispute_check_box" id="cbox' + data + '" value="' + data + '" />'
+        render: (data, type, full, meta) ->
+          return '<input type="checkbox" onclick="toggleRow(this)" name="cbox" class="dispute_check_box" id="cbox' + data + '" value="' + data + '" data-sha="' + full['sha256_hash'] + '"/>'
       }
       {
 #        need to zeropad this thing
@@ -345,16 +345,20 @@ $ ->
       return
 
 
+$ ->
+  ## Create detection form dialog
+  $('#create-detection-dialog').dialog
+    autoOpen: false,
+    minWidth: 520,
+    classes: {
+      "ui-dialog": "form-dialog"
+    },
+    position: { my: "top center", at: "top center", of: window }
 
 
   # Trigger Create Detection dialog
   window.amp_detection_dialog = () ->
-    $('#create-detection-dialog').dialog
-      minWidth: 520,
-      classes: {
-        "ui-dialog": "form-dialog"
-      },
-      position: { my: "top center", at: "top center", of: window }
+    $('#create-detection-dialog').dialog('open')
     window.amp_detection_naming()
 
 
@@ -393,32 +397,49 @@ $ ->
   window.amp_detection_submission = (e, page) ->
     e.preventDefault()
 
+    # Get form info
+    new_disp = $('#new-amp-detection-disp').val()
+    new_detection_name = ''
+    if new_disp == 'malicious'
+      new_name_pre = $('#new-amp-detection-name-pre').val()
+      new_name_cat = $('#new-amp-detection-name-cat').val()
+      new_name_txt = $('#new-amp-detection-name-middle').val()
+      # Don't add extra period unless they want to use an actual category
+      if new_name_cat == ''
+        new_detection_name = new_name_pre + '.' + new_name_txt + '.Talos'
+      else
+        new_detection_name = new_name_pre + '.' + new_name_cat + '.' + new_name_txt + '.Talos'
+      detection_array = {name: new_detection_name, disposition: new_disp}
+    else
+      detection_array = {disposition: new_disp}
+
+    comment = $('#new-amp-detection-comment').val()
+
+    # Grab sha data
     # From show page only one sha can be submitted
     if page == 'show'
       # Get sha
-      sha256_hash = $('#sha256_hash')[0].innerText
-      # Get form info
-      new_disp = $('#new-amp-detection-disp').val()
-      new_detection_name = ''
-      if new_disp == 'malicious'
-        new_name_pre = $('#new-amp-detection-name-pre').val()
-        new_name_cat = $('#new-amp-detection-name-cat').val()
-        new_name_txt = $('#new-amp-detection-name-middle').val()
-        # Don't add extra period unless they want to use an actual category
-        if new_name_cat == ''
-          new_detection_name = new_name_pre + '.' + new_name_txt + '.Talos'
-        else
-          new_detection_name = new_name_pre + '.' + new_name_cat + '.' + new_name_txt + '.Talos'
-        detection_array = {name: new_detection_name, disposition: new_disp}
-      else
-        detection_array = {disposition: new_disp}
+      sha = $('#sha256_hash')[0].innerText
 
-      comment = $('#new-amp-detection-comment').val()
-
-    # From index several shas could be submitted
+    # From index several shas could be submitted (from the users perspective)
     else if page == 'index'
-      console.log 'index!'
+      if $('.dispute_check_box:checked').length < 1
+        std_msg_error('No Tickets Selected', ['Please select at least one ticket to submit detection for.'])
+      else
 
+      sha = []
+      # Get all checked checkboxes
+      $('.dispute_check_box:checked').each ->
+        sha_val =  $(this).attr('data-sha')
+        sha.push(sha_val)
+
+
+      # Marlin - I don't know how you want to handl this. We can only send one sha at a time,
+      # but we can set up the back end to send one after another with the same detection setting.
+      # This preps for either case, and provides the sha(s) and the detection info separately.
+
+      console.log sha
+      console.log detection_array
     else
       alert('Where are you? How did you trigger this? Stahp it.')
 
