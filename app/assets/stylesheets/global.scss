@@ -8340,7 +8340,9 @@ hr.thin.form-divider {
 #filerep_searchref_container{
   & {
     color: $primary-section-color;
+    max-width: 100%;
     font-size: .75em ;
+    display: inline-block;
     white-space: nowrap;
     overflow: hidden;
     text-overflow: ellipsis;
