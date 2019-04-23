@@ -78,7 +78,7 @@
 
               %label.content-label-sm
                 Suggested Disposition
-              - if @file_rep_dispute.disposition_suggested == 'malicious' || 'Malicious'
+              - if @file_rep_dispute.suggested_malicious?
                 .disposition.disp-negative= @file_rep_dispute.disposition_suggested
               - else
                 .disposition= @file_rep_dispute.disposition_suggested
@@ -135,7 +135,7 @@
         .col-xs-4
           %label.content-label-sm AMP Disposition
           - unless  @file_rep_dispute.disposition.nil?
-            - if @file_rep_dispute.disposition == 'malicious' || 'Malicious'
+            - if @file_rep_dispute.malicious?
               .top-info-data.disposition.disp-negative= @file_rep_dispute.disposition
             - else
               .top-info-data.disposition= @file_rep_dispute.disposition
