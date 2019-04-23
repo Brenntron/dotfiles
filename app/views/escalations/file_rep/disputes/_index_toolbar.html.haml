@@ -132,12 +132,21 @@
     %span.dropdown
       %button#file-det-button.toolbar-button.detection-button.dropdown-toggle.esc-tooltipped{title: 'Create Detection', 'data-toggle': 'dropdown', 'aria-haspopup': 'true', 'aria-expanded': 'false'}
         %span.toolbar-button-text
-          Create Detection
+          Create or Change Detection
       .dropdown-menu.toolbar-dropdown#file-det-dropdown{'aria-labelledby': 'file-disp-button'}
         .inline-tool-content-wrapper.plain-inline-dropdown-wrapper
           .row
             .col-xs-12
               %label.content-label-sm.full-row-label  Detection Name
+          .row
+            .col-xs-12
+              %select
+                -# TODO Add actual disposition options here, these are placeholders
+                %option Clean
+                %option Common
+                %option Malicious
+                %option Unknown
+
           .row
             .col-xs-4
               %select
@@ -154,14 +163,7 @@
           .row
             .col-xs-12
               %label.content-label-sm.full-row-label  Disposition
-          .row
-            .col-xs-12
-              %select
-                -# TODO Add actual disposition options here, these are placeholders
-                %option Clean
-                %option Common
-                %option Malicious
-                %option Unknown
+
           %hr.thin
           .comment-wrapper
             %label.content-label-sm Comment
