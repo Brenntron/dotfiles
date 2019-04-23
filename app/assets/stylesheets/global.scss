@@ -8327,6 +8327,39 @@ hr.thin.form-divider {
   margin-left: 35px;
 }
 
+#filerep_searchref_container{
+  & {
+    color: $primary-section-color;
+    font-size: .75em ;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    margin-bottom: 30px;
+  }
+  .search-condition{
+    padding: 1px
+  }
+
+  .search-condition:not(:last-child):after {
+    content: ", ";
+  }
+  .search-condition-name{
+    text-transform: uppercase;
+    font-weight: bold;
+  }
+}
+.in-sample-zoo_container{
+  & {
+    padding-top: 35px;
+  }
+  label{
+    position: relative;
+    top: -10px;
+    left: -10px;
+
+  }
+}
+
 // dbinebri: file reputation - new ticket specific styles inside the new ticket container
 .escalations--file_rep--disputes-controller .dropdown-menu #new-file-rep-form {
 
@@ -8384,7 +8417,13 @@ hr.thin.form-divider {
       padding-left: 8px;
     }
   }
+  .in-sample-zoo_container{
 
+  }
+
+  .tooltipster-base{
+    white-space: nowrap;
+  }
 
   // this attachment button/icon should be hidden on page load and
   // displayed when radio button clicked, js/jquery handles this display logic

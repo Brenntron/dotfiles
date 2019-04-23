@@ -121,11 +121,22 @@ window.file_rep_show_change_assignee = (dispute_id) ->
   )
 
 $ ->
-  current_url = window.location.href;
+
+  current_url = window.location.href
   time_submitted = ''
   last_updated = ''
   sandbox_score = ''
   threatgrid_score = ''
+
+  window.triggerTooltips = (item) ->
+    $('.tooltip_content').show()
+    $('.nested-tooltipped').tooltipster
+      theme: [
+        'tooltipster-borderless'
+        'tooltipster-borderless-customized'
+      ]
+      side: 'bottom'
+    return
 
   $(window).click (e) ->
     if !e.target.closest('.daterangepicker')
@@ -266,36 +277,43 @@ $ ->
           '</div>'
 
       else if search_type == 'advanced'
+        search_condition_tooltip = []
         search_conditions = JSON.parse(localStorage.search_conditions)
         new_header =
           '<div>Results for Advanced Search ' +
-          reset_icon +
-          '</div>'
+            reset_icon +
+            '</div>'
 
-        append_search_div = false
-        search_condition_div = document.createElement('div')
-        search_condition_div.classList.add('search_condition_div')
-
+        container = $('#filerep_searchref_container')
         for condition_name, condition of search_conditions
-          append_search_div = true
           if condition != ''
+            condition_name = condition_name.replace(/_/g, " ").toUpperCase()
+            condition_name_HTML = '<span class="search-condition-name text-uppercase">' + condition_name + ': </span>'
 
-            condition_name = condition_name.replace(/_/g, " ")
             if typeof condition == 'object'
-              search_ref =
-                '<span>' + condition_name + ' ' + '</span>' +
-                '<span>: ' + condition.from + ' - ' + condition.to + ' </span>'
+              condition_HTML = '<span>' + condition.to + ' - ' + condition.from + '</span>'
             else
-              search_ref =
-                '<span>' + condition_name + ' </span>' +
-                '<span>: ' + condition.from + ' </span>'
+              condition_HTML = '<span>' + condition + '</span>'
 
-            $(search_condition_div).append('<div>' + search_ref + '</div>')
+            search_condition_tooltip.push(condition_name + ': ' + $(condition_HTML).text())
 
-        if append_search_div
-          console.log('ininin', search_condition_div)
-          $('#filerep-index-title').append(search_condition_div)
+            container.append('<span class="search-condition">' + condition_name_HTML + condition_HTML + '</span>')
 
+
+        if search_condition_tooltip.length > 0
+          container.addClass('esc-tooltipped')
+
+          list = document.createElement('ul')
+          $(list).addClass('tooltip_content')
+          for  li in search_condition_tooltip
+            item = document.createElement('li')
+            item.appendChild(document.createTextNode(li))
+
+            list.appendChild(item)
+
+          container.append(list)
+          $(list).hide()
+          container.attr('data-tooltip-content', '.tooltip_content')
 
 
       else if search_type == 'named'

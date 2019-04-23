@@ -1,5 +1,40 @@
 .content-wrapper
+
   %h1#filerep-index-title All File Reputation Tickets
+  #filerep_searchref_container{onmouseover: "triggerTooltips(this)"}
+  .toolbar.file-rep-index-toolbar
+
+    %div
+      %label.toolbar-section-label
+        View
+      %span.dropdown
+        %button#file-index-table-show-columns-button.toolbar-button.show-col-button.dropdown-toggle.esc-tooltipped{title: 'Show/Hide Columns', 'data-toggle': 'dropdown', 'aria-haspopup': 'true', 'aria-expanded': 'false'}
+          %span.toolbar-button-text
+            Show/Hide Columns
+        .dropdown-menu.toolbar-dropdown#file-index-table-show-columns-dropdown{'aria-labelledby': 'file-index-table-show-columns-button'}
+          %ul
+            %li.toggle-vis-file-rep{'data-column':'1'}
+              %input{type: 'checkbox', checked: true, id: 'id-checkbox'} Case ID
+            %li.toggle-vis-file-rep{'data-column':'2'}
+              %input{type: 'checkbox', checked: true, id: 'status-checkbox'} Status
+            %li.toggle-vis-file-rep{'data-column':'3'}
+              %input{type: 'checkbox', id: 'resolution-checkbox'} Resolution
+            %li.toggle-vis-file-rep{'data-column':'4'}
+              %input{type: 'checkbox', checked: true, id: 'file-name-checkbox'} File Name
+            %li.toggle-vis-file-rep{'data-column':'5'}
+              %input{type: 'checkbox', checked: true, id: 'sha256-checkbox'} SHA256
+            %li.toggle-vis-file-rep{'data-column':'6'}
+              %input{type: 'checkbox', checked: true, id: 'file-size-checkbox'} File Size
+            %li.toggle-vis-file-rep{'data-column':'7'}
+              %input{type: 'checkbox', checked: true, id: 'sample-type-checkbox'} Sample Type
+            %li.toggle-vis-file-rep{'data-column':'8'}
+              %input{type: 'checkbox', checked: true, id: 'amp-disp-checkbox'} AMP Disposition
+            %li.toggle-vis-file-rep{'data-column':'9'}
+              %input{type: 'checkbox', checked: true, id: 'amp-name-checkbox'} AMP Detection Name
+            %li.toggle-vis-file-rep{'data-column':'10'}
+              %input{type: 'checkbox', id: 'amp-date-checkbox'} AMP Detection Created
+            %li.toggle-vis-file-rep{'data-column':'11'}
+              %input{type: 'checkbox', id: 'in-zoo-checkbox'} In Zoo
 
   = render('index_toolbar')
 

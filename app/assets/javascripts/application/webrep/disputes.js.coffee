@@ -1275,8 +1275,6 @@ $ ->
 
         for resolution in response.json.resolutions
           $('#resolution-list').append '<option value=\'' + resolution + '\'></option>'
-
-
     )
 
 
@@ -1354,7 +1352,7 @@ $ ->
         success: (response) ->
       )
 
-    if window.location.pathname == '/escalations/file_rep/disputes' ||  window.location.pathname == '/escalations/webrep/disputes'
+    if window.location.pathname.includes('/escalations/file_rep/disputes') ||  window.location.pathname.includes('/escalations/webrep/disputes')
       $('#filter-cases').show()
       $('#import-webrep').show()
     #      $('#web-rep-search').show()
@@ -1454,10 +1452,8 @@ $ ->
     $('#search_name').val("")
     $('#advanced-search-dropdown').toggle()
 
-  $(document).click (e)->
-    if !e.target.closest('.daterangepicker')
-      $("#advanced-search-dropdown").hide()
-
+  $(document).click ->
+    $("#advanced-search-dropdown").hide()
 
   $(document).ready ->
     setInterval ->
