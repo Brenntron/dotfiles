@@ -130,7 +130,7 @@
                       Submit
 
     %span.dropdown
-      %button#file-det-button.toolbar-button.detection-button.dropdown-toggle.esc-tooltipped{title: 'Create Detection', 'data-toggle': 'dropdown', 'aria-haspopup': 'true', 'aria-expanded': 'false', onclick: 'amp_detection_dialog(event, index);'}
+      %button#file-det-button.toolbar-button.detection-button.dropdown-toggle.esc-tooltipped{title: 'Create Detection', 'data-toggle': 'dropdown', 'aria-haspopup': 'true', 'aria-expanded': 'false'}
         %span.toolbar-button-text
           Create or Change Detection
       .dropdown-menu.toolbar-dropdown#file-det-dropdown{'aria-labelledby': 'file-disp-button'}
@@ -140,7 +140,7 @@
               %label.content-label-sm.full-row-label  Disposition
           .row
             .col-xs-12
-              %select
+              %select#new-amp-detection-disp{onchange: 'amp_detection_naming("index");'}
                 %option{value: FileReputationDispute::DISPOSITION_CLEAN} Clean
                 %option{value: FileReputationDispute::DISPOSITION_COMMON} Common
                 %option{value: FileReputationDispute::DISPOSITION_MALICIOUS} Malicious

@@ -8997,6 +8997,7 @@ div[aria-describedby='create-detection-dialog'] {
 }
 
 #new-amp-detection-name-dd-section {
+  display: none;
   select.form-control {
     font-size: 8pt;
     height: 25px;

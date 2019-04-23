@@ -345,29 +345,32 @@ $ ->
       return
 
 
-$ ->
-  ## Create detection form interaction
-  $('#create-detection-dialog').dialog
-    autoOpen: false,
-    minWidth: 520,
-    classes: {
-      "ui-dialog": "form-dialog"
-    },
-    position: { my: "top center", at: "top center", of: window }
 
 
   # Trigger Create Detection dialog
   window.amp_detection_dialog = () ->
-    $('#create-detection-dialog').dialog('open')
+    $('#create-detection-dialog').dialog
+      minWidth: 520,
+      classes: {
+        "ui-dialog": "form-dialog"
+      },
+      position: { my: "top center", at: "top center", of: window }
     window.amp_detection_naming()
 
 
+  ## Create detection form interaction
+
   # Hide / Show of Detection Name inputs
-  window.amp_detection_naming = () ->
+  window.amp_detection_naming = (page) ->
     # Detection name can only be changed if user is setting a sample to malicious
     # or keeping it malicious. Hiding detection name part of form if not needed
-    naming_section = $('#new-amp-detection-name-section')
-    if $('#new-amp-detection-disp').val().toLowerCase() == 'malicious'
+    naming_section = ''
+    if page == 'show'
+      naming_section = $('#new-amp-detection-name-section')
+    else if page == 'index'
+      naming_section = $('#new-amp-detection-name-dd-section')
+
+    if $('#new-amp-detection-disp').val() == 'malicious'
       $(naming_section).show()
     else
       $(naming_section).hide()
@@ -387,14 +390,14 @@ $ ->
 
 
   # Prepare form info for sending to AMP
-  window.amp_detection_submission = (e, page) ->
+  window.amp_detection_submission = (e) ->
     e.preventDefault()
     # Get sha
     sha256_hash = $('#sha256_hash')[0].innerText
     # Get form info
     new_disp = $('#new-amp-detection-disp').val()
     new_detection_name = ''
-    if new_disp.toLowerCase() == 'malicious'
+    if new_disp == 'malicious'
       new_name_pre = $('#new-amp-detection-name-pre').val()
       new_name_cat = $('#new-amp-detection-name-cat').val()
       new_name_txt = $('#new-amp-detection-name-middle').val()
