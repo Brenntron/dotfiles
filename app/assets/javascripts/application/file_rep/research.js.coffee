@@ -271,28 +271,46 @@ window.get_sandbox_report = (runid, sha256_hash) ->
 
 
 
-  
 
-kick_off_object = window.kick_off_sample_run - () ->
+########### TALOS SANDBOX:: RUN SAMPLE & GET REPORT ############
+# This function can be called if there is no report present
+# (so the sample has not been run in the sandbox) but the sample
+# does exist in the zoo and therefore CAN be run in the sandbox.
 
-  sha256_hash = $('#sha256_hash')[0].innerText
+window.run_sample_in_sandbox = (sha256_hash) ->
+  # Create a new run in the sandbox (assuming sample CAN be run in sandbox)
+  std_msg_ajax(
+    method: 'GET'
+    url: "/escalations/api/v1/escalations/file_rep/sandbox_api/sandbox_run_sample/" + sha256_hash
+    success_reload: false
+    success: (response) ->
+      console.log response
+      # Then we can call to check on the report status
+    error: (response) ->
+      std_api_error(response, "There was a problem retrieving data from Talos Sandbox", reload: false)
+)
 
+
+kick_off_object = window.kick_off_sample_run = (sha256_hash) ->
+  # Make call to check report status
   std_msg_ajax(
     method: 'GET'
     url: "/escalations/api/v1/escalations/file_rep/sandbox_api/sandbox_latest_report/" + sha256_hash
     success_reload: false
     success: (response) ->
-
+      console.log response
       run_id = response.json.data.runid
       status = response.json.data.status
 
       if status == "Complete"
+        window.get_sandbox_report(run_id, sha256_hash)
         #this may need some tweaking since it's kinda pseudo code right now, but basically kick off sample run method
         #needs to be assigned to a variable so that variable can be fed to clearInterval to stop checking after we recognize
         #the run has been completed and populated the page.
+
         clearInterval(kick_off_object)
         #Melissa, check to see if this is the right  method to call, maybe research_data is the better one to call?
-        window.get_sandbox_report(run_id, sha256_hash)
+
       if status == "Error"
         alert('need to cover this case')
       if status == "Unsupported File Type"
@@ -306,22 +324,5 @@ kick_off_object = window.kick_off_sample_run - () ->
         setTimeout(kick_off_sample_run, 600000)
 
     error: (response) ->
-      $('#sb-loader').hide()
       std_api_error(response, "There was a problem retrieving data from Talos Sandbox", reload: false)
   )
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
