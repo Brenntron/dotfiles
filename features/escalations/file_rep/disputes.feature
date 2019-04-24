@@ -168,4 +168,9 @@ Feature: Disputes
     And I should see "TIME SCANNED"
     And I should see "RESULTS"
 
-
+  @javascript
+  Scenario: a user visits the FileRep Dispute Show page and confirms that ReversingLabs data was populated
+    Given a user with role "filerep user" exists and is logged in
+    When I go to "/escalations/file_rep/disputes/"
+    And I click "#naming-guide"
+    Then I should see "AMP Naming Conventions Guide"
