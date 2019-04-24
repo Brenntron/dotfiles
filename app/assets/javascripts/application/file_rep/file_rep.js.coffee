@@ -438,6 +438,16 @@ $ ->
       # but we can set up the back end to send one after another with the same detection setting.
       # This preps for either case, and provides the sha(s) and the detection info separately.
 
+      std_msg_ajax(
+        #url: '/escalations/api/v1/escalations/file_rep/disputes/detections'
+        url: '/escalations/api/v1/escalations/file_rep/detections'
+        method: 'POST'
+        data: {
+          'detection': detection_array
+          'sha256_hashes': sha
+        }
+      )
+
       console.log sha
       console.log detection_array
     else
