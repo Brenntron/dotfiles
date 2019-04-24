@@ -63,7 +63,6 @@ Rails.configuration.snort_json_path     = Rails.root.join(env_config['perl']['sn
 Rails.configuration.cve2x_path          = Rails.root.join(env_config['perl']['cve2x_path'])
 Rails.configuration.rule2yaml_path      = Rails.root.join(env_config['perl']['rule2yaml_path'])
 
-# byebug
 rep_api = env_config['rep_api']
 raise 'config.yml missing rep_api section' unless rep_api
 Rails.configuration.rep_api                = OpenStruct.new
@@ -74,6 +73,7 @@ Rails.configuration.rep_api.ca_cert_file   = rep_api['ca_cert_file']
 Rails.configuration.rep_api.gssnegotiate   = rep_api['gssnegotiate']
 
 
+# TODO Check if unused
 raise "config.yml missing ruletest section" unless env_config['ruletest']
 Rails.configuration.ruletest_server     = env_config['ruletest']['url']
 
@@ -83,12 +83,14 @@ if sds_config
   Rails.configuration.sds.host          = sds_config['host']
   Rails.configuration.sds.cert_file     = sds_config['cert_file']
   Rails.configuration.sds.pkey_file     = sds_config['pkey_file']
-  Rails.configuration.sds.user          = sds_config['user']
-  Rails.configuration.sds.pass          = sds_config['pass']
+  Rails.configuration.sds.user          = sds_config['user']                    # TODO unused?
+  Rails.configuration.sds.pass          = sds_config['pass']                    # TODO unused?
 end
 
+# TODO Check if unused
 Rails.configuration.snort_doc_max_fails = env_config['snort_doc_max_fails'] || 3
 
+# TODO Check if unused
 snort_org_config = env_config['snort_org']
 raise 'config.yml missing snort_org section' unless snort_org_config
 Rails.configuration.snort_org           = OpenStruct.new
@@ -98,6 +100,7 @@ if env_config['snort_org']
   Rails.configuration.snort_org.api_key   = snort_org_config['api_key']
 end
 
+# TODO Check if unused
 raise "config.yml missing svn section" unless env_config['svn']
 Rails.configuration.svn_cmd             = env_config['svn']['cmd']
 Rails.configuration.svn_pwd             = env_config['svn']['password']
@@ -146,12 +149,12 @@ Rails.configuration.file_reputation_sandbox        = ApiRequester::ApiRequester.
 
 reversing_labs_config = env_config['reversing_labs']
 raise 'config.yml missing ReversingLabs section' unless reversing_labs_config
-Rails.configuration.reversing_labs                = ApiRequester::ApiRequester.config_of(reversing_labs_config)
+Rails.configuration.reversing_labs      = ApiRequester::ApiRequester.config_of(reversing_labs_config)
 
 threatgrid = env_config.fetch('threatgrid', {})
 raise 'config.yml missing threatgrid section' unless threatgrid
-Rails.configuration.threatgrid         = ApiRequester::ApiRequester.config_of(threatgrid)
+Rails.configuration.threatgrid          = ApiRequester::ApiRequester.config_of(threatgrid)
 
 ticloud = env_config.fetch('ticloud', {})
 raise 'config.yml missing ticloud section' unless ticloud
-Rails.configuration.ticloud         = ApiRequester::ApiRequester.config_of(ticloud)
+Rails.configuration.ticloud             = ApiRequester::ApiRequester.config_of(ticloud)

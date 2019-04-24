@@ -39,6 +39,8 @@ window.update_file_rep_data = () ->
 
 window.research_data = () ->
   sha256_hash = $('#sha256_hash')[0].innerText
+
+  # Send sha to ThreatGrid, get data
   $('#tg-loader').show()
   std_msg_ajax(
     method: 'POST'
@@ -70,8 +72,23 @@ window.research_data = () ->
         $('#tg-behaviors').append('<tbody>' + behaviors + '</tbody>')
 
         # Adding full json report in case it's needed
-        full_report = JSON.stringify(response.json, null, '\t')
+        full_report = JSON.stringify(response.json, null, 2)
         $('#tg-full').text(full_report)
+
+
+        # dbinebri: Convert the Threatgrid full_report to a downloadable file, add the Download button hyperlink
+        # build a formatted date string to add into the filename for download
+        tg_today = new Date()
+        tg_formatted_day =
+          String(tg_today.getMonth() + 1).padStart(2, '0') + '_' +
+          String(tg_today.getDate()).padStart(2, '0') + '_' + tg_today.getFullYear()
+
+        # create a downloadable file out of the json with the filename preset
+        tg_json_file = 'text/json; charset=utf-8,' + encodeURIComponent(full_report)
+        tg_filename = 'threatgrid_' + tg_formatted_day + '.json'
+        tg_json_link = '<a href="data:' + tg_json_file + '" download="' + tg_filename + '"></a>'
+        $('#download-tg-json').wrap tg_json_link
+
 
       else
         $(report_present).hide()
@@ -272,9 +289,25 @@ window.get_sandbox_report = (runid, sha) ->
 
 
       # Adding full json report in case it's needed
-      full_report = JSON.stringify(response.json, null, '\t')
+      full_report = JSON.stringify(response.json, null, 2)
       $('#sb-full').text(full_report)
-      console.log sb_report
+
+
+      # dbinebri: Convert the Talos Sandbox full_report to a downloadable file, add the Download button hyperlink
+      # build a formatted date string to add into the filename for download
+      sb_today = new Date()
+      sb_formatted_day =
+        String(sb_today.getMonth() + 1).padStart(2, '0') + '_' +
+        String(sb_today.getDate()).padStart(2, '0') + '_' + sb_today.getFullYear()
+
+      # create a downloadable file out of the json with the filename preset + date
+      sb_json_file = 'text/json; charset=utf-8,' + encodeURIComponent(full_report)
+      sb_filename = 'sandbox_' + sb_formatted_day + '.json'
+      sb_json_link = '<a href="data:' + sb_json_file + '" download="' + sb_filename + '"></a>'
+      $('#download-sb-json').wrap sb_json_link
+
+
+
 
     error: (response) ->
       $('#sb-loader').hide()

@@ -6,10 +6,31 @@
     %a#queue.nav-page-button{href: '/escalations/file_rep/disputes', class: ("active" if current_page?('/escalations/file_rep/disputes'))}
       %span.nav-toolbar-icon-large.icon-queue
 
-    %a#research.nav-page-button{href: '/escalations/file_rep/research', class: ("active" if current_page?('/escalations/file_rep/research'))}
+    -# dbinebri: leave this commented out until research feature is ready
+    -#%a#research.nav-page-button{href: '/escalations/file_rep/research', class: ("active" if current_page?('/escalations/file_rep/research'))}
       %span.nav-toolbar-icon-large.icon-research
 
 
+  .nav-tool-blocks.col-xs-2.col-sm-2.col-md-2.col-lg-1.dropdown.nav-new-ticket
+    %a{href: '#', class: 'dropdown-toggle', id: 'new-dispute', 'data-toggle': 'dropdown', 'aria-haspopup': 'true', 'aria-expanded': 'false'}
+      %span{class: 'nav-toolbar-icon icon-new-white'}
+      New Ticket
+    .dropdown-menu.nav-tools-dropdown{'aria-labelledby': 'new-dispute'}
+      %h3.nav-tool-dropdown-header.inverse
+        New File Reputation Ticket
+      .nav-tool-content-wrapper#new-dispute-wrapper
+        = render 'escalations/file_rep/disputes/new'
+
+
+  .nav-tool-blocks.col-xs-2.col-sm-2.col-md-2.col-lg-1.dropdown.nav-naming-guide
+    %a{href: '#', id: 'naming-guide', 'aria-haspopup': 'true', 'aria-expanded': 'false'}
+      %span{class: 'nav-toolbar-icon icon-naming-white'}
+      Naming Guide
+
+      = render 'escalations/file_rep/disputes/naming_guide_dialog'
+
+
+  -# dbinebri: moving Filter closer to search field
   .nav-tool-blocks.col-xs-1.col-sm-1.col-lg-1.dropdown
     %a{href: '#', class: 'dropdown-toggle', id: 'filter-cases', 'data-toggle': 'dropdown', 'aria-haspopup': 'true', 'aria-expanded': 'false'}
       %span{class: 'nav-toolbar-icon icon-filter-white'}
@@ -55,26 +76,6 @@
                       = named_search.name
                     %a.delete-search{title: 'Delete Saved Search', onclick: "delete_disputes_named_search(this, '#{named_search.name}');"}
                       = image_tag('icon_cancel_grey.svg')
-
-
-  .nav-tool-blocks.col-xs-2.col-sm-2.col-md-2.col-lg-1.dropdown.nav-new-ticket
-    %a{href: '#', class: 'dropdown-toggle', id: 'new-dispute', 'data-toggle': 'dropdown', 'aria-haspopup': 'true', 'aria-expanded': 'false'}
-      %span{class: 'nav-toolbar-icon icon-new-white'}
-      New Ticket
-    .dropdown-menu.nav-tools-dropdown{'aria-labelledby': 'new-dispute'}
-      %h3.nav-tool-dropdown-header.inverse
-        New File Reputation Ticket
-      .nav-tool-content-wrapper#new-dispute-wrapper
-        = render 'escalations/file_rep/disputes/new'
-
-
-  -# naming guide dialog - nav button here
-  .nav-tool-blocks.col-xs-2.col-sm-2.col-md-2.col-lg-1.dropdown.nav-naming-guide
-    %a{href: '#', id: 'naming-guide', 'aria-haspopup': 'true', 'aria-expanded': 'false'}
-      %span{class: 'nav-toolbar-icon icon-naming-white'}
-      Naming Guide
-
-      = render 'escalations/file_rep/disputes/naming_guide_dialog'
 
 
 

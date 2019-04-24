@@ -614,6 +614,7 @@ button {
 
 .toolbar-section-label {
   position: absolute;
+  display: block;
   margin-top: -18px;
   color: $content-label-color !important;
   font-size: 7pt;
@@ -2151,6 +2152,10 @@ a.static-nav-item {
   margin-bottom: 3px;
   font-weight: 400;
   text-transform: none;
+}
+
+.content-label-sm.content-label-fullwidth {
+  width: 100%;
 }
 
 .content-label-sm.multi-input-form-row {
@@ -4607,7 +4612,7 @@ table > tbody > tr > td.dispute_rep_tools {
   border-radius: 2px;
   border: none;
   background-repeat: no-repeat;
-  margin:0 1px;
+  margin:0 3px;
   display: inline-block;
 }
 
@@ -4743,10 +4748,15 @@ table > tbody > tr > td.dispute_rep_tools {
   border: 1px solid $faint-neutral-color !important;;
 }
 
-.dropdown-comment {
+.dropdown-comment, .form-comment-box {
   width: 100%;
   min-height: 20px;
   border: 1px solid darken($faint-neutral-color, 5%);
+}
+
+.form-comment-box {
+  display: block;
+  min-height: 90px;
 }
 
 .datatable-top-tools {
@@ -6074,8 +6084,8 @@ table.dispute-entry-table tbody tr.selected {
   border: none;
   background-color: #6dbcdb;
   min-width: 200px;
-  top: 16px;
-  left: 4px;
+  top: 18px;
+  left: 3px;
 }
 
 .dispute-owner-buttons-wrapper h3 {
@@ -8667,7 +8677,7 @@ button.secondary.view-report-external-button {
 
   .input-group.search-group {
     padding: 3px 3px 3px 5px;
-    margin: 0 0 0 40px;
+    margin: 0 0 0 20px;
     width: 100%;
     min-width: 200px;
     max-width: 450px;
@@ -8732,10 +8742,11 @@ button.secondary.view-report-external-button {
     font-family: 'Open Sans', sans-serif;
     font-weight: 600;
     padding-left: 40px;
+    padding-top: 11px;
     background-image: url(image_path('icon_naming_list_white2.svg'));
     background-size: 20px 20px;
     background-repeat: no-repeat;
-    background-position: 10px center;
+    background-position: 11px 9px;
   }
 }
 
@@ -8952,4 +8963,141 @@ button.secondary.view-report-external-button {
   -ms-animation: rotate_clockwise 1.5s linear infinite;
   -o-animation: rotate_clockwise 1.5s linear infinite;
   animation: rotate_clockwise 1.5s linear infinite;
+}
+
+// Creating form dialog for when we want to use a dialog instead of a dropdown
+.form-dialog {
+  font-family: 'Open Sans', sans-serif !important;
+  border-radius: 4px;
+  border: none !important;
+  .ui-dialog-titlebar {
+    background-color: $bug-section-color;
+    line-height: 2.25em;
+    height: 54px;
+    padding-left: 15px;
+
+    .ui-dialog-title {
+      font-size: 14pt;
+      font-weight: 300;
+    }
+  }
+  .form-wrapper {
+    padding: 20px;
+  }
+  .form-control, input, textarea {
+    background-color: transparent;
+    border: 4px solid $content-bg-color;
+    outline: 1px solid darken($faint-neutral-color, 12%);
+  }
+  input {
+    height: 24px;
+    margin-top: 1px;
+  }
+  input:focus, textarea:focus {
+    outline: 1px solid darken($faint-neutral-color, 12%);
+    border: 4px solid $content-bg-color;
+  }
+  input:focus {
+    height: 28px;
+    margin-top: -1px;
+  }
+}
+
+div[aria-describedby='create-detection-dialog'] {
+  .ui-dialog-title {
+    padding-left: 36px;
+    background-size: 26px 26px;
+    background-repeat: no-repeat;
+    background-position: left center;
+    background-image: url(image_path('icon_target_white.svg'));
+  }
+}
+
+.form-group {
+  .nested-col-row {
+    margin-right: -4px;
+    margin-left: -4px;
+  }
+  .nested-col {
+    padding: 0 4px;
+  }
+}
+
+.uneditable-formfield {
+  line-height: 2em;
+  color: $type-lighter-color;
+}
+
+
+#file-det-dropdown {
+  min-width: 420px;
+}
+
+#new-amp-detection-name-section{ display: none;}
+#new-amp-detection-name-dd-section {
+  display: none;
+  select.form-control {
+    font-size: 8pt;
+    height: 25px;
+  }
+  select.form-control:focus {
+    margin-top: -6px;
+    height: 25px;
+  }
+  input {
+    height: 25px;
+    margin-top: -6px;
+    width: 100%;
+  }
+  .nested-col-row {
+    margin-top: 4px;
+    margin-right: -2px !important;
+    margin-left: -2px;
+  }
+  .uneditable-formfield {
+    font-size: 8pt;
+  }
+}
+
+.toolbar .dropdown.open .toolbar-button.detection-button {
+  background-image: url(image_path('icon_target_white.svg'));
+}
+
+.tg-data-present, .tg-data-missing, .sb-data-present, .sb-data-missing, .rl-data-present, .rl-data-missing {
+  display: none;
+}
+
+
+// dbinebri: adding button here for download json buttons
+.download-small-button {
+  background-image: url(image_path('icon_download.svg'));
+  background-repeat: no-repeat;
+  width: 20px;
+  height: 23px;
+  float: right;
+  display: inline-block;
+  border: none;
+}
+
+// dbinebri: make sure the full json areas stay visible in collapsed state
+.data-report-wrapper {
+  .collapse {
+    display: block;
+    visibility: visible;
+    overflow: scroll;
+    &.in {  // .in is expanded state
+      overflow-y: hidden;
+    }
+  }
+}
+
+// dbinebri: ensure json areas stay at a min-height on collapse, and gray on expand/collapse transition
+#collapse_tg_json, #collapse_sb_json {
+  min-height: 300px;
+  margin: 0 2px;
+  background: darken($content-bg-color, 4%);
+  .report-size {
+    padding: 0;
+    width: initial;
+  }
 }

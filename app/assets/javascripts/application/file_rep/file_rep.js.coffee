@@ -4,6 +4,128 @@ $ ->
     window.update_file_rep_data()
 
 
+window.filerep_take_disputes = () ->
+  dispute_ids = $('.dispute_check_box:checkbox:checked').map(() ->
+    this.dataset['entryId']
+    this.value
+  ).toArray()
+
+  if dispute_ids.length == 0
+    std_msg_error('No Tickets Selected', ['Please select at least one ticket to assign.'])
+    return
+
+  std_msg_ajax(
+    method: 'PATCH'
+    url: "/escalations/api/v1/escalations/file_rep/disputes/take_disputes"
+    data: { dispute_ids: dispute_ids }
+    error_prefix: 'Error updating ticket.'
+    success: (response) ->
+      for dispute_id in response.dispute_ids
+        $('#owner_' + dispute_id).text(response.username)
+        $('#status_' + dispute_id).text("ASSIGNED")
+      std_msg_success('Tickets successfully assigned', [response.dispute_ids.length + ' have been assigned to ' + response.username])
+    error: (error) ->
+      std_msg_error('Assign Issue(s) Error', [
+        'Failed to assign ' + dispute_ids.length + ' issue(s).',
+        'Due to: ' + error.responseJSON.message
+      ])
+  )
+
+window.toolbar_file_rep_index_change_assignee = () ->
+
+  entry_ids = $('.dispute_check_box:checkbox:checked').map(() ->
+    Number(this.value)
+  ).toArray()
+
+  new_assignee = $('#index_target_assignee option:selected').val()
+
+  data = {
+    'dispute_ids': entry_ids,
+    'new_assignee': new_assignee
+  }
+
+  std_msg_ajax(
+    url: '/escalations/api/v1/escalations/file_rep/disputes/change_assignee'
+    method: 'POST'
+    data: data
+    dataType: 'json'
+    success: (response) ->
+      window.location.reload()
+    error: (response) ->
+      std_msg_error('Unable to change assignee', [response.responseJSON.message])
+  )
+
+window.file_rep_take_dispute = (dispute_id) ->
+  std_msg_ajax(
+    method: 'PATCH'
+    url: "/escalations/api/v1/escalations/file_rep/disputes/take_dispute/" + dispute_id
+    data: {}
+    dispute_id: dispute_id
+    error_prefix: 'Error updating ticket.'
+    success: (response) ->
+      $('.inline-take-dispute-' + dispute_id).replaceWith("<button class='return-ticket-button inline-return-ticket-#{dispute_id}' title='Assign this ticket to me' onclick='file_rep_return_dispute(#{dispute_id});'></button>")
+      $("#owner_#{dispute_id}").text(response.username)
+      $('#status_' + dispute_id).text("ASSIGNED")
+  )
+
+window.file_rep_return_dispute = (dispute_id) ->
+  std_msg_ajax(
+    method: 'PATCH'
+    url: "/escalations/api/v1/escalations/file_rep/disputes/return_dispute/" + dispute_id
+    data: {}
+    dispute_id: dispute_id
+    error_prefix: 'Error updating ticket.'
+    success: (response) ->
+      $('.inline-return-ticket-' + dispute_id).replaceWith("<button class='take-ticket-button inline-take-dispute-#{dispute_id}' title='Assign this ticket to me' onclick='file_rep_take_dispute(#{dispute_id});'></button>")
+      $("#owner_#{dispute_id}").text("Unassigned")
+      $('#status_' + dispute_id).text("NEW")
+  )
+
+window.file_rep_show_take_dispute = (dispute_id) ->
+  std_msg_ajax(
+    method: 'PATCH'
+    url: "/escalations/api/v1/escalations/file_rep/disputes/take_dispute/" + dispute_id
+    data: {}
+    dispute_id: dispute_id
+    error_prefix: 'Error updating ticket.'
+    success: (response) ->
+      $("#dispute-assignee").text(response.username)
+      $('#show-edit-ticket-status-button').text("ASSIGNED")
+      $('.take-ticket-button').replaceWith("<button class='return-ticket-button' title='Return ticket to open queue' onclick='file_rep_show_return_dispute(#{dispute_id});'></button>")
+  )
+
+window.file_rep_show_return_dispute = (dispute_id) ->
+  std_msg_ajax(
+    method: 'PATCH'
+    url: "/escalations/api/v1/escalations/file_rep/disputes/return_dispute/" + dispute_id
+    data: {}
+    dispute_id: dispute_id
+    error_prefix: 'Error updating ticket.'
+    success: (response) ->
+      $("#dispute-assignee").text("Unassigned")
+      $("#show-edit-ticket-status-button").text("NEW")
+      $(".return-ticket-button").replaceWith("<button class='take-ticket-button' title='Assign this ticket to me' onclick='file_rep_show_take_dispute(#{dispute_id});'></button>")
+  )
+
+window.file_rep_show_change_assignee = (dispute_id) ->
+  dispute_id = parseInt($('.case-id-tag')[0].innerHTML)
+  new_assignee = $('#index_target_assignee option:selected').val()
+
+  data = {
+    'dispute_ids': [dispute_id],
+    'new_assignee': new_assignee
+  }
+  std_msg_ajax(
+    method: 'POST'
+    url: "/escalations/api/v1/escalations/file_rep/disputes/change_assignee/"
+    data: data
+    dispute_id: dispute_id
+    error_prefix: 'Error updating ticket.'
+    success: (response) ->
+      window.location.reload()
+  )
+
+$ ->
   file_rep_url = $('#file-rep-datatable').data('source')
   current_url = window.location.href
 
@@ -64,8 +186,8 @@ $ ->
     columns: [
       {
         data:'id'
-        render: (data) ->
-          return '<input type="checkbox" onclick="toggleRow(this)" name="cbox" class="dispute_check_box" id="cbox' + data + '" value="' + data + '" />'
+        render: (data, type, full, meta) ->
+          return '<input type="checkbox" onclick="toggleRow(this)" name="cbox" class="dispute_check_box" id="cbox' + data + '" value="' + data + '" data-sha="' + full['sha256_hash'] + '"/>'
       }
       {
 #        need to zeropad this thing
@@ -73,7 +195,11 @@ $ ->
         render: (data, type, full, meta) ->
           return '<a href="/escalations/file_rep/disputes/' + data + '">' + parseInt(data).pad(6) + '</a>'
       }
-      { data: 'status' }
+      {
+        data: 'status'
+        render: (data, type, full, meta) ->
+          return '<span id="status_'+ full['id']+'">' + data + '</span>'
+      }
       { data: 'resolution' }
       {
         data: 'file_name'
@@ -83,7 +209,7 @@ $ ->
       {
         data: 'sha256_hash'
         render: (data, type, full, meta) ->
-          return '<a href="/escalations/file_rep/disputes/' + full['id'] + '"><span id="' + data + '_sha" title="' + data + '" class="esc-tooltipped file_rep_sha">' + data + '</span></a>'
+          return '<span id="' + data + '_sha" title="' + data + '" class="esc-tooltipped file_rep_sha">' + data + '</span>'
       }
       {
         data: 'file_size'
@@ -127,18 +253,26 @@ $ ->
       {
         data: 'sandbox_score'
         render: (data, type, full, meta) ->
-          if full['sandbox_under'] == "true"
-            return '<span class="score-col text-center">' + parseInt(data) + '</span>'
+          data = parseInt(data)
+          if isNaN(data)
+            return '<span class="score-col missing-data text-center"> No Score</span>'
           else
-            return '<span class="overdue score-col text-center">' + parseInt(data) + '</span>'
+            if full['sandbox_under'] == "true"
+              return '<span class="score-col text-center">' + parseInt(data) + '</span>'
+            else
+              return '<span class="overdue score-col text-center">' + parseInt(data) + '</span>'
       }
       {
         data: 'threatgrid_score'
         render: (data, type, full, meta) ->
-          if full['threatgrid_under'] == "true"
-            return '<span class="score-col text-center">' + parseInt(data) + '</span>'
+          data = parseInt(data)
+          if isNaN(data)
+            return '<span class="score-col missing-data text-center"> No Score</span>'
           else
-            return '<span class="overdue score-col text-center">' + parseInt(data) + '</span>'
+            if full['threatgrid_under'] == "true"
+              return '<span class="score-col text-center">' + data + '</span>'
+            else
+              return '<span class="overdue score-col text-center">' + data + '</span>'
       }
       { data: 'reversing_labs_score'}
       {
@@ -160,13 +294,15 @@ $ ->
       { data: 'customer_company_name' }
       { data: 'customer_email' }
       {
-        data: 'assignee'
+        data: 'assigned'
         className: "alt-col"
-        render: (data) ->
-          if data == undefined
-            return '<span class="missing-data">Unassigned</span> <span title="Assign to me" class="esc-tooltipped"><button id="index_ticket_assign" class="take-ticket-button" onClick="take_disputes()"/></span>'
+        render: (data, type, full, meta) ->
+          if full.current_user == data
+            return "<span id='owner_#{full.id}'> #{data} </span><button class='return-ticket-button inline-return-ticket-#{full.id}' title='Return ticket.' onclick='file_rep_return_dispute(#{full.id});'></button>"
+          else if data == 'vrtincom' || data == ""
+            return "<span id='owner_#{full.id}'>Unassigned</span> <span title='Assign to me' class='esc-tooltipped'><button class='take-ticket-button inline-take-dispute-#{full.id}' onClick='file_rep_take_dispute(#{full.id})'/></button></span>"
           else
-            return data + '<span title="Assign to me" class="esc-tooltipped"><button id="index_ticket_assign" class="take-ticket-button" onClick="take_disputes()"/></span>'
+            return data
       }
     ]
 
@@ -220,3 +356,106 @@ $ ->
       else if $('.dataset-cb:checked').length == 3
         $('#sandbox-report-wrapper, #threatgrid-report-wrapper, #reversing-labs-report-wrapper').removeClass('col-sm-6 col-sm-12').addClass('col-sm-4')
       return
+
+
+$ ->
+  ## Create detection form dialog
+  $('#create-detection-dialog').dialog
+    autoOpen: false,
+    minWidth: 520,
+    classes: {
+      "ui-dialog": "form-dialog"
+    },
+    position: { my: "top center", at: "top center", of: window }
+
+
+  # Trigger Create Detection dialog
+  window.amp_detection_dialog = () ->
+    $('#create-detection-dialog').dialog('open')
+    window.amp_detection_naming()
+
+
+  ## Create detection form interaction
+
+  # Hide / Show of Detection Name inputs
+  window.amp_detection_naming = (page) ->
+    # Detection name can only be changed if user is setting a sample to malicious
+    # or keeping it malicious. Hiding detection name part of form if not needed
+    naming_section = ''
+    if page == 'show'
+      naming_section = $('#new-amp-detection-name-section')
+    else if page == 'index'
+      naming_section = $('#new-amp-detection-name-dd-section')
+
+    if $('#new-amp-detection-disp').val() == 'malicious'
+      $(naming_section).show()
+    else
+      $(naming_section).hide()
+
+  # Class toggle for if user choses to not use category dropdown
+  window.amp_category_naming = () =>
+    # There is a category dropdown in the naming form to follow the conventions
+    # of ClamAV. But a user can opt not to use this.
+    # This makes it clearer that the dropdown will not add anything to this section of the name
+    cat_selection = $('#new-amp-detection-name-cat')
+    if $(cat_selection).val() == ''
+      $(cat_selection).addClass('missing-data')
+    else
+      if $(cat_selection).hasClass('missing-data')
+        $(cat_selection).removeClass('missing-data')
+
+
+
+  # Prepare form info for sending to AMP
+  window.amp_detection_submission = (e, page) ->
+    e.preventDefault()
+
+    # Get form info
+    new_disp = $('#new-amp-detection-disp').val()
+    new_detection_name = ''
+    if new_disp == 'malicious'
+      new_name_pre = $('#new-amp-detection-name-pre').val()
+      new_name_cat = $('#new-amp-detection-name-cat').val()
+      new_name_txt = $('#new-amp-detection-name-middle').val()
+      # Don't add extra period unless they want to use an actual category
+      if new_name_cat == ''
+        new_detection_name = new_name_pre + '.' + new_name_txt + '.Talos'
+      else
+        new_detection_name = new_name_pre + '.' + new_name_cat + '.' + new_name_txt + '.Talos'
+      detection_array = {name: new_detection_name, disposition: new_disp}
+    else
+      detection_array = {disposition: new_disp}
+
+    comment = $('#new-amp-detection-comment').val()
+
+    # Grab sha data
+    # From show page only one sha can be submitted
+    if page == 'show'
+      # Get sha
+      sha = $('#sha256_hash')[0].innerText
+
+    # From index several shas could be submitted (from the users perspective)
+    else if page == 'index'
+      if $('.dispute_check_box:checked').length < 1
+        std_msg_error('No Tickets Selected', ['Please select at least one ticket to submit detection for.'])
+      else
+
+      sha = []
+      # Get all checked checkboxes
+      $('.dispute_check_box:checked').each ->
+        sha_val =  $(this).attr('data-sha')
+        sha.push(sha_val)
+
+
+      # Marlin - I don't know how you want to handl this. We can only send one sha at a time,
+      # but we can set up the back end to send one after another with the same detection setting.
+      # This preps for either case, and provides the sha(s) and the detection info separately.
+
+      console.log sha
+      console.log detection_array
+    else
+      alert('Where are you? How did you trigger this? Stahp it.')
+
+    return false
+
+
