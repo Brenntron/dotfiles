@@ -248,18 +248,26 @@ $ ->
       {
         data: 'sandbox_score'
         render: (data, type, full, meta) ->
-          if full['sandbox_under'] == "true"
-            return '<span class="score-col text-center">' + parseInt(data) + '</span>'
+          data = parseInt(data)
+          if isNaN(data)
+            return '<span class="score-col missing-data text-center"> No Score</span>'
           else
-            return '<span class="overdue score-col text-center">' + parseInt(data) + '</span>'
+            if full['sandbox_under'] == "true"
+              return '<span class="score-col text-center">' + parseInt(data) + '</span>'
+            else
+              return '<span class="overdue score-col text-center">' + parseInt(data) + '</span>'
       }
       {
         data: 'threatgrid_score'
         render: (data, type, full, meta) ->
-          if full['threatgrid_under'] == "true"
-            return '<span class="score-col text-center">' + parseInt(data) + '</span>'
+          data = parseInt(data)
+          if isNaN(data)
+            return '<span class="score-col missing-data text-center"> No Score</span>'
           else
-            return '<span class="overdue score-col text-center">' + parseInt(data) + '</span>'
+            if full['threatgrid_under'] == "true"
+              return '<span class="score-col text-center">' + data + '</span>'
+            else
+              return '<span class="overdue score-col text-center">' + data + '</span>'
       }
       { data: 'reversing_labs_score'}
       {
