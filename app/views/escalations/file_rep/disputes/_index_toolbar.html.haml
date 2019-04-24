@@ -130,61 +130,124 @@
                       Submit
 
     %span.dropdown
-      %button#file-disp-button.toolbar-button.disposition-button.dropdown-toggle.esc-tooltipped.toolbar-button-spacer{title: 'Change Disposition', 'data-toggle': 'dropdown', 'aria-haspopup': 'true', 'aria-expanded': 'false'}
-        %span.toolbar-button-text
-          Change Disposition
-      .dropdown-menu.toolbar-dropdown#file-disp-dropdown{'aria-labelledby': 'file-disp-button'}
-        .toolbar
-          %div
-            %label.toolbar-section-label Disposition
-            %select.toolbar-select
-              %option{value: FileReputationDispute::DISPOSITION_CLEAN} Clean
-              %option{value: FileReputationDispute::DISPOSITION_COMMON} Common
-              %option{value: FileReputationDispute::DISPOSITION_MALICIOUS} Malicious
-              %option{value: FileReputationDispute::DISPOSITION_UNKNOWN} Unknown
-          %button{class: 'primary', type:'button', id: 'button_reassign', onclick:'toolbar_index_change_assignee();'}
-            Submit
-
-    %span.dropdown
       %button#file-det-button.toolbar-button.detection-button.dropdown-toggle.esc-tooltipped{title: 'Create Detection', 'data-toggle': 'dropdown', 'aria-haspopup': 'true', 'aria-expanded': 'false'}
         %span.toolbar-button-text
-          Create Detection
+          Create or Change Detection
       .dropdown-menu.toolbar-dropdown#file-det-dropdown{'aria-labelledby': 'file-disp-button'}
         .inline-tool-content-wrapper.plain-inline-dropdown-wrapper
           .row
             .col-xs-12
-              %label.content-label-sm.full-row-label  Detection Name
-          .row
-            .col-xs-4
-              %select
-                -# TODO Add correct detection options here, these are placeholders
-                %option Win32
-                %option Trojan
-                %option PUA
-                %option Virus
-                %option Generic
-            .col-xs-6
-              %input.text-input{type: 'text'}
-            .col-xs-2
-              %span.file-name-extension .Talos
+              %label.content-label-sm.full-row-label  New Disposition
           .row
             .col-xs-12
-              %label.content-label-sm.full-row-label  Disposition
-          .row
-            .col-xs-12
-              %select
-                -# TODO Add actual disposition options here, these are placeholders
+              %select#new-amp-detection-disp{onchange: 'amp_detection_naming("index");'}
                 %option{value: FileReputationDispute::DISPOSITION_CLEAN} Clean
                 %option{value: FileReputationDispute::DISPOSITION_COMMON} Common
                 %option{value: FileReputationDispute::DISPOSITION_MALICIOUS} Malicious
                 %option{value: FileReputationDispute::DISPOSITION_UNKNOWN} Unknown
+
+          #new-amp-detection-name-dd-section
+            .row.nested-col-row
+              .col-xs-12
+                %label.content-label-sm.full-row-label  New Detection Name
+            .row.nested-col-row
+              .col-xs-3.nested-col
+                %select.form-control#new-amp-detection-name-pre
+                  %option{value: 'Andr'} Andr
+                  %option{value: 'Archive'} Archive
+                  %option{value: 'Asp'} Asp
+                  %option{value: 'Cert'} Cert
+                  %option{value: 'Clamav'} Clamav
+                  %option{value: 'Clean'} Clean
+                  %option{value: 'Css'} Css
+                  %option{value: 'Doc'} Doc
+                  %option{value: 'Dos'} Dos
+                  %option{value: 'Eicar'} Eicar
+                  %option{value: 'Email'} Email
+                  %option{value: 'Embedded'} Embedded
+                  %option{value: 'Emf'} Emf
+                  %option{value: 'Heuristics'} Heuristics
+                  %option{value: 'Html'} Html
+                  %option{value: 'Hunting'} Hunting
+                  %option{value: 'Hwp'} Hwp
+                  %option{value: 'Img'} Img
+                  %option{value: 'Ios'} Ios
+                  %option{value: 'Java'} Java
+                  %option{value: 'Js'} Js
+                  %option{value: 'Legacy'} Legacy
+                  %option{value: 'Lnk'} Lnk
+                  %option{value: 'Midi'} Midi
+                  %option{value: 'Mkv'} Mkv
+                  %option{value: 'Mp4'} Mp4
+                  %option{value: 'Multios'} Multios
+                  %option{value: 'Osx'} Osx
+                  %option{value: 'Packed'} Packed
+                  %option{value: 'Pdf'} Pdf
+                  %option{value: 'Phish'} Phish
+                  %option{value: 'Phishtank'} Phishtank
+                  %option{value: 'Php'} Php
+                  %option{value: 'Ppt'} Ppt
+                  %option{value: 'Py'} Py
+                  %option{value: 'Rat'} Rat
+                  %option{value: 'Rtf'} Rtf
+                  %option{value: 'Spy'} Spy
+                  %option{value: 'Submit'} Submit
+                  %option{value: 'Svg'} Svg
+                  %option{value: 'Swf'} Swf
+                  %option{value: 'Symbos'} Symbos
+                  %option{value: 'Test'} Test
+                  %option{value: 'Tif'} Tif
+                  %option{value: 'Tool'} Tool
+                  %option{value: 'Ttf'} Ttf
+                  %option{value: 'Txt'} Txt
+                  %option{value: 'Unix'} Unix
+                  %option{value: 'Vbs'} Vbs
+                  %option{value: 'W32S'} W32S
+                  %option{value: 'Win'} Win
+                  %option{value: 'Wma'} Wma
+                  %option{value: 'Xls'} Xls
+                  %option{value: 'Xml'} Xml
+              .col-xs-4.nested-col
+                %select.form-control#new-amp-detection-name-cat{onchange: 'amp_category_naming();'}
+                  %option{value: 'Adware'} Adware
+                  %option{value: 'Coinminer'} Coinminer
+                  %option{value: 'Downloader'} Downloader
+                  %option{value: 'Dropper'} Dropper
+                  %option{value: 'Exploit'} Exploit
+                  %option{value: 'File'} File
+                  %option{value: 'Filetype'} Filetype
+                  %option{value: 'Ircbot'} Ircbot
+                  %option{value: 'Joke'} Joke
+                  %option{value: 'Keylogger'} Keylogger
+                  %option{value: 'Macro'} Macro
+                  %option{value: 'Malware'} Malware
+                  %option{value: 'Packed'} Packed
+                  %option{value: 'Packer'} Packer
+                  %option{value: 'Phishing'} Phishing
+                  %option{value: 'Proxy'} Proxy
+                  %option{value: 'Ransomware'} Ransomware
+                  %option{value: 'Revoked'} Revoked
+                  %option{value: 'Rootkit'} Rootkit
+                  %option{value: 'Spyware'} Spyware
+                  %option{value: 'Test'} Test
+                  %option{value: 'Tool'} Tool
+                  %option{value: 'Trojan'} Trojan
+                  %option{value: 'Virus'} Virus
+                  %option{value: 'Worm'} Worm
+                  %option{value: ''} No Category Name
+              .col-xs-4.nested-col
+                %input#new-amp-detection-name-middle{type: 'text'}
+              .col-xs-1.nested-col
+                %span#new-amp-detection-name-end.uneditable-formfield{value: 'Talos'} .Talos
+
           %hr.thin
           .comment-wrapper
             %label.content-label-sm Comment
             %textarea.dropdown-comment
           .button-row-center
             -# TODO hookup submission of dropdown
-            %button.primary.dropdown-submit-button Submit
+            %button.primary.dropdown-submit-button{onclick: 'amp_detection_submission(event, "index");'}
+              Submit
 
 
 
