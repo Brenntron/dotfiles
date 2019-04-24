@@ -443,8 +443,9 @@ $ ->
         url: '/escalations/api/v1/escalations/file_rep/detections'
         method: 'POST'
         data: {
-          'detection': detection_array
           'sha256_hashes': sha
+          'disposition': new_disp
+          'detection_name': new_detection_name
         }
       )
 

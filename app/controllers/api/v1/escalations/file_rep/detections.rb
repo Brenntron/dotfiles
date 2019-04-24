@@ -9,10 +9,10 @@ module API
 
             desc 'Create detection'
             params do
-              optional :ids, type: Array[Integer]
-              optional :sha256_hashes, type: Array[String], desc: "SHA256 hashes"
-              optional :disposition, type: String
-              optional :detection, type: Hash
+              optional :file_reputation_dispute_ids, type: Array[Integer]
+              requires :sha256_hashes, type: Array[String], desc: "SHA256 hashes"
+              requires :disposition, type: String
+              optional :detection_name, type: String
             end
             post "" do
               std_api_v2 do
