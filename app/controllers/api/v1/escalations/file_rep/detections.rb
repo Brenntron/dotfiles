@@ -18,8 +18,7 @@ module API
               std_api_v2 do
                 FileReputationApi::Detection.create_action(sha256_hashes: params['sha256_hashes'],
                                                            disposition: params['disposition'],
-                                                           detection_name: params['detection_name'],
-                                                           ids: params['file_reputation_dispute_ids'])
+                                                           detection_name: params['detection_name'])
               end
             end
           end
