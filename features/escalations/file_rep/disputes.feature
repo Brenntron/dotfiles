@@ -7,8 +7,8 @@ Feature: Disputes
   Scenario: a user visits their profile page and edits their ThreatGrid and Sandbox API Keys
     Given a user with role "admin" exists and is logged in
     And I go to "/users/1"
-    When I fill in "user_threatgrid_api_key" with "A"
-    And I fill in "user_sandbox_api_key" with "A"
+    When I fill in "user_threatgrid_api_key" with "Let's go."
+    And I fill in "user_sandbox_api_key" with "One more time."
     And I click ".btn-success"
     And I wait for "3" seconds
     Then take a screenshot
@@ -187,12 +187,22 @@ Feature: Disputes
     Then I should see "AMP Naming Conventions Guide"
 
   # Unable to reach Communications tab due to JavaScript errors caused by Poltergeist 2.1.1's incompatibility with JavaScript ES6
+  # Resolved by switching to Selenium
   @javascript
-  Scenario: a user visits the FileRep Dispute Show page and confirms that ReversingLabs data was populated
+  Scenario: a user visits the FileRep Dispute Communications tab and tries to adds a note
     Given a user with role "filerep user" exists and is logged in
     And A FileRep Dispute with trait "default" exists
     When I go to "/escalations/file_rep/disputes/1"
     And I click "#communication-tab-link"
     And I click "#new-case-note-button"
-    And I fill in "new-case-note-textarea" with "Here we go, again."
-    Then I should see "Hero we go, again"
+    And I fill a content-editable field ".new-case-note-textarea" with "Here we go, again."
+    And I click ".new-case-note-save-button"
+    And I go to "/escalations/file_rep/disputes/1"
+    Then I should see "Here we go, again."
+
+  @javascript
+  Scenario: a user visits the FileRep Dispute index page and uses the all filter
+    Given a user with role "filerep user" exists and is logged in
+    And A FileRep Dispute with trait "default" exists
+    When I go to "/escalations/file_rep/disputes?f=all"
+    Then I should see "000001"

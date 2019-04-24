@@ -80,7 +80,7 @@ gem 'clipboard-rails', '1.7.1'
 
 gem 'capybara', '2.11.0'
 gem 'poltergeist', '1.18.1'
-
+gem 'selenium-webdriver'
 gem 'inline_svg', '1.3.1'
 
 
@@ -117,6 +117,7 @@ group :test do
   gem 'json_spec', '1.1.5'
   gem 'simplecov', '0.16.1', :require => false
   gem 'cucumber-api-steps', '~>0.14', require: false
+  gem 'chromedriver-helper'
 end
 
 group :development, :profile do
