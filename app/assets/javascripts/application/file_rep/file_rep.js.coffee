@@ -181,8 +181,8 @@ $ ->
     columns: [
       {
         data:'id'
-        render: (data) ->
-          return '<input type="checkbox" onclick="toggleRow(this)" name="cbox" class="dispute_check_box" id="cbox' + data + '" value="' + data + '" />'
+        render: (data, type, full, meta) ->
+          return '<input type="checkbox" onclick="toggleRow(this)" name="cbox" class="dispute_check_box" id="cbox' + data + '" value="' + data + '" data-sha="' + full['sha256_hash'] + '"/>'
       }
       {
 #        need to zeropad this thing
@@ -346,7 +346,7 @@ $ ->
 
 
 $ ->
-  ## Create detection form interaction
+  ## Create detection form dialog
   $('#create-detection-dialog').dialog
     autoOpen: false,
     minWidth: 520,
@@ -362,12 +362,19 @@ $ ->
     window.amp_detection_naming()
 
 
+  ## Create detection form interaction
+
   # Hide / Show of Detection Name inputs
-  window.amp_detection_naming = () ->
+  window.amp_detection_naming = (page) ->
     # Detection name can only be changed if user is setting a sample to malicious
     # or keeping it malicious. Hiding detection name part of form if not needed
-    naming_section = $('#new-amp-detection-name-section')
-    if $('#new-amp-detection-disp').val().toLowerCase() == 'malicious'
+    naming_section = ''
+    if page == 'show'
+      naming_section = $('#new-amp-detection-name-section')
+    else if page == 'index'
+      naming_section = $('#new-amp-detection-name-dd-section')
+
+    if $('#new-amp-detection-disp').val() == 'malicious'
       $(naming_section).show()
     else
       $(naming_section).hide()
@@ -387,14 +394,13 @@ $ ->
 
 
   # Prepare form info for sending to AMP
-  window.amp_detection_submission = (e) ->
+  window.amp_detection_submission = (e, page) ->
     e.preventDefault()
-    # Get sha
-    sha256_hash = $('#sha256_hash')[0].innerText
+
     # Get form info
     new_disp = $('#new-amp-detection-disp').val()
     new_detection_name = ''
-    if new_disp.toLowerCase() == 'malicious'
+    if new_disp == 'malicious'
       new_name_pre = $('#new-amp-detection-name-pre').val()
       new_name_cat = $('#new-amp-detection-name-cat').val()
       new_name_txt = $('#new-amp-detection-name-middle').val()
@@ -409,10 +415,34 @@ $ ->
 
     comment = $('#new-amp-detection-comment').val()
 
-    console.log(sha256_hash)
-    console.log(detection_array)
-    console.log(comment)
-    # temp just to keep page from refreshing on click of submit
+    # Grab sha data
+    # From show page only one sha can be submitted
+    if page == 'show'
+      # Get sha
+      sha = $('#sha256_hash')[0].innerText
+
+    # From index several shas could be submitted (from the users perspective)
+    else if page == 'index'
+      if $('.dispute_check_box:checked').length < 1
+        std_msg_error('No Tickets Selected', ['Please select at least one ticket to submit detection for.'])
+      else
+
+      sha = []
+      # Get all checked checkboxes
+      $('.dispute_check_box:checked').each ->
+        sha_val =  $(this).attr('data-sha')
+        sha.push(sha_val)
+
+
+      # Marlin - I don't know how you want to handl this. We can only send one sha at a time,
+      # but we can set up the back end to send one after another with the same detection setting.
+      # This preps for either case, and provides the sha(s) and the detection info separately.
+
+      console.log sha
+      console.log detection_array
+    else
+      alert('Where are you? How did you trigger this? Stahp it.')
+
     return false
 
 
