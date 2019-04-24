@@ -8,8 +8,17 @@ class FileReputationApi::Detection
   #set_default_headers({})
 
   attr_accessor :score, :disposition, :got, :score_tg, :samples_disp, :state, :name, :samples_name
+  # {"score"=>4,
+  # "disposition"=>"unknown",
+  # "got"=>"69f3e339c070720906cf40499be79247dbb02758fbf08c72407f81645695c69e",
+  # "score_tg"=>nil,
+  # "samples_disp"=>"unknown",
+  # "state"=>"local",
+  # "name"=>"Test.69F3E339C0.rgh.tht.Talos",
+  # "samples_name"=>"Test.69F3E339C0.rgh.tht.Talos"}
 
   DISPOSITION_MALICIOUS     = 'malicious'
+  DISPOSITION_COMMON        = 'common'
   DISPOSITION_CLEAN         = 'clean'
 
   def sha256_hash
@@ -21,7 +30,7 @@ class FileReputationApi::Detection
   end
 
   def clean?
-    self.disposition.casecmp?(DISPOSITION_CLEAN)
+    self.disposition.casecmp?(DISPOSITION_CLEAN) || self.disposition.casecmp?(DISPOSITION_COMMON)
   end
 
   def clean_to_malicious?(disposition)
@@ -88,26 +97,21 @@ class FileReputationApi::Detection
   def update(disposition:, detection_name: nil)
     byebug
 
-    if same_disposition?(disposition)
+    if same_disposition?(disposition) && same_name?(detection_name)
+      return { success: true, message: 'No change.' }
+    end
+
+    if same_disposition?(disposition) && !malicious?
       byebug
-      if same_name?(detection_name)
-        byebug
-        return { success: true, message: 'No change.' }
-      end
-      unless malicious?
-        byebug
-        return { success: false, error: 'Detection name cannot be changed unless sample is malicious.' }
-      end
-      byebug
+      return { success: false, error: 'Detection name cannot be changed unless sample is malicious.' }
     end
 
     if clean_to_malicious?(disposition)
-      byebug
       return { success: false,
                error: 'Changing a sample from clean to malicious is prohibited.  You may change it to unknown first.' }
     end
 
-    if malicious? && !same_name?(detection_name)
+    if malicious? && detection_name.present? && !same_name?(detection_name)
       self.name = detection_name
       put_bulk
     end
@@ -117,6 +121,7 @@ class FileReputationApi::Detection
     end
 
     self.disposition = disposition
+    self.name = detection_name if detection_name.present?
     put_bulk
 
     if self.score.present?
