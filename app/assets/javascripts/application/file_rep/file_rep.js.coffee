@@ -223,6 +223,7 @@ $ ->
     )
     refresh_url()
 
+
   window.build_data = () ->
     data = {
       search_type: ''
@@ -254,6 +255,7 @@ $ ->
             search_name: search_name
             search_conditions: search_conditions
           }
+        window.location.reload()
       else if search_type == 'named'
         data = {
           search_type: search_type
