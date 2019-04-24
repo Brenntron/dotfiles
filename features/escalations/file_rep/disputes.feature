@@ -217,6 +217,15 @@ Feature: Disputes
     Then I should not see "000001"
 
   @javascript
+  Scenario: a user visits the FileRep Dispute index page and uses the 'Open' filter
+    Given a user with role "filerep user" exists and is logged in
+    And A FileRep Dispute with trait "default" exists
+    And A FileRep Dispute with trait "closed" exists
+    When I go to "/escalations/file_rep/disputes?f=open"
+    Then I should see "000001"
+    Then I should not see "000002"
+
+  @javascript
   Scenario: a user visits the FileRep Dispute index page and uses the 'My Open' filter
     Given a user with role "filerep user" exists and is logged in
     And A FileRep Dispute with trait "assigned" exists
