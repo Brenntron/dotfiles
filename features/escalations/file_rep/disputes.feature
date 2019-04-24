@@ -124,4 +124,48 @@ Feature: Disputes
     And I wait for "25" seconds
     And a FileRep Ticket should have a RL score
 
+  @javascript
+  Scenario: a user visits the FileRep Dispute Show page and confirms that ThreatGrid data was populated
+    Given a user with role "filerep user" exists and is logged in
+    And A FileRep Dispute with trait "default" exists
+    When I go to "/escalations/file_rep/disputes/1"
+    And I click "#research-tab-link"
+    And I wait for "25" seconds
+    Then I should see "THREAT GRID"
+    And I should see "TG Score"
+    And I should see "TAGS"
+    And I should see "BEHAVIORS"
+
+  @javascript
+  Scenario: a user visits the FileRep Dispute Show page and confirms that Sandbox data was populated
+    Given a user with role "filerep user" exists and is logged in
+    And A FileRep Dispute with trait "default" exists
+    When I go to "/escalations/file_rep/disputes/1"
+    And I click "#research-tab-link"
+    And I wait for "25" seconds
+    Then I should see "TALOS SANDBOX"
+    And I should see "LATEST RUN"
+    And I should see "Sandbox Score"
+    And I should see "CONTACTED IPS"
+    And I should see "CONTACTED DOMAIN NAMES"
+    And I should see "INDICATORS OF COMPROMISE"
+    And I should see "DROPPED FILES"
+    And I should see "PROCESSES"
+
+
+  @javascript
+  Scenario: a user visits the FileRep Dispute Show page and confirms that ReversingLabs data was populated
+    Given a user with role "filerep user" exists and is logged in
+    And A FileRep Dispute with trait "default" exists
+    When I go to "/escalations/file_rep/disputes/1"
+    And I click "#research-tab-link"
+    And I wait for "25" seconds
+    Then I should see "REVERSING LABS"
+    And I should see "FIRST SEEN"
+    And I should see "MOST RECENT SCAN"
+    And I should see "Scanner Results"
+    And I should see "AV VENDOR"
+    And I should see "TIME SCANNED"
+    And I should see "RESULTS"
+
 
