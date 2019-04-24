@@ -28,8 +28,16 @@ class FileReputationApi::Detection
     clean? && disposition.casecmp?(DISPOSITION_MALICIOUS)
   end
 
-  def change_detection_name?(detection_name)
-    malicious? && self.detection_name.casecmp?(detection_name)
+  def same_name?(detection_name)
+    if self.name.present?
+      self.name.casecmp?(detection_name)
+    else
+      detection_name.blank?
+    end
+  end
+
+  def same_disposition?(disposition)
+    self.disposition.casecmp?(disposition)
   end
 
   def self.get_bulk(sha256_hash)
@@ -37,22 +45,16 @@ class FileReputationApi::Detection
     new(response_struct)
   end
 
-  def self.put_bulk
-    byebug
+  def put_bulk
     data = {
         "name" => self.name,
         "disposition" => self.disposition,
         "force" => 0
     }
-    call_request_parsed(:put, "/v0/bulk/sha256/#{self.sha256_hash}", input: data)
-    byebug
+    self.class.call_request_parsed(:put, "/v0/bulk/sha256/#{self.sha256_hash}", input: data)
   end
 
-  def put_bulk
-    self.class.put_bulk
-  end
-
-  def self.put_vrt
+  def put_vrt
     byebug
     data = {
         "score" => self.score,
@@ -60,11 +62,12 @@ class FileReputationApi::Detection
         "disposition" => self.disposition,
         "force" => 0
     }
-    call_request_parsed(:put, "/v0/vrt/sha256/#{self.sha256_hash}", input: data)
+    result = self.class.call_request_parsed(:put, "/v0/vrt/sha256/#{self.sha256_hash}", input: data)
     byebug
+    result
   end
 
-  def self.put_tg
+  def put_tg
     byebug
     data = {
         "score" => self.score_tg,
@@ -72,20 +75,30 @@ class FileReputationApi::Detection
         "disposition" => self.disposition,
         "force" => 0
     }
-    call_request_parsed(:put, "/v0/tg/sha256/#{self.sha256_hash}", input: data)
+    result = self.class.call_request_parsed(:put, "/v0/tg/sha256/#{self.sha256_hash}", input: data)
     byebug
+    result
   end
 
   def change_detection_name(detection_name)
-    self.detection_name = detection_name
+    self.name = detection_name
     put_bulk
   end
 
   def update(disposition:, detection_name: nil)
     byebug
 
-    if self.disposition == disposition && self.detection_name == detection_name
-      return { success: true, message: 'No change.' }
+    if same_disposition?(disposition)
+      byebug
+      if same_name?(detection_name)
+        byebug
+        return { success: true, message: 'No change.' }
+      end
+      unless malicious?
+        byebug
+        return { success: false, error: 'Detection name cannot be changed unless sample is malicious.' }
+      end
+      byebug
     end
 
     if clean_to_malicious?(disposition)
@@ -94,12 +107,12 @@ class FileReputationApi::Detection
                error: 'Changing a sample from clean to malicious is prohibited.  You may change it to unknown first.' }
     end
 
-    if malicious? && change_detection_name?(detection_name)
-      self.detection_name = detection_name
+    if malicious? && !same_name?(detection_name)
+      self.name = detection_name
       put_bulk
     end
 
-    if self.disposition == disposition
+    if same_disposition?(disposition)
       return { success: true }
     end
 
@@ -117,6 +130,7 @@ class FileReputationApi::Detection
   end
 
   def self.update_detection(sha256_hash:, disposition:, detection_name: nil)
+    # detection = get_bulk(sha256_hash)
     detection = get_bulk('0cc0e246c03b99572573e07982b6533cd87590cddaddc6732ad0feb34fd66e04')
     # detection = get_bulk('69f3e339c070720906cf40499be79247dbb02758fbf08c72407f81645695c69e')
     detection.update(disposition: disposition, detection_name: detection_name)
