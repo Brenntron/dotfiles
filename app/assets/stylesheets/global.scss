@@ -8994,3 +8994,38 @@ div[aria-describedby='create-detection-dialog'] {
 .tg-data-present, .tg-data-missing, .sb-data-present, .sb-data-missing, .rl-data-present, .rl-data-missing {
   display: none;
 }
+
+
+// dbinebri: adding button here for download json buttons
+.download-small-button {
+  background-image: url(image_path('icon_download.svg'));
+  background-repeat: no-repeat;
+  width: 20px;
+  height: 23px;
+  float: right;
+  display: inline-block;
+  border: none;
+}
+
+// dbinebri: make sure the full json areas stay visible in collapsed state
+.data-report-wrapper {
+  .collapse {
+    display: block;
+    visibility: visible;
+    overflow: scroll;
+    &.in {  // .in is expanded state
+      overflow-y: hidden;
+    }
+  }
+}
+
+// dbinebri: ensure json areas stay at a min-height on collapse, and gray on expand/collapse transition
+#collapse_tg_json, #collapse_sb_json {
+  min-height: 300px;
+  margin: 0 2px;
+  background: darken($content-bg-color, 4%);
+  .report-size {
+    padding: 0;
+    width: initial;
+  }
+}
