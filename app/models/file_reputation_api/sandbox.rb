@@ -109,7 +109,7 @@ class FileReputationApi::Sandbox
     endpoint = "/api/2/run/hash"
 
     query_string = {
-        "hash" => sha256,
+        "hash" => sha256_hash,
         "apikey" => api_key
     }
 

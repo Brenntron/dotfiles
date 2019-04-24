@@ -52,7 +52,7 @@ window.get_threatgrid_data = (sha256_hash) ->
         $('#tg-behaviors').append('<tbody>' + behaviors + '</tbody>')
 
         # Adding full json report in case it's needed
-        full_report = JSON.stringify(response.json, null, '\t')
+        full_report = JSON.stringify(response.json, null, 2)
         $('#tg-full').text(full_report)
 
       else
@@ -151,7 +151,9 @@ window.get_sandbox_runid = (sha256_hash) ->
           $('#sandbox-run-button').show()
         else
           $('#sandbox-status-message').text('Not in Talos Sandbox or Sample Zoo')
-          $('#sandbox-run-button').hide()
+#          $('#sandbox-run-button').hide()
+          # Changing this for testing the 'run sample' function. Revert when finished
+          $('#sandbox-run-button').show()
       else
         # Send runid to sandbox
         window.get_sandbox_report(run_id, sha256_hash)
@@ -177,7 +179,9 @@ window.get_sandbox_report = (runid, sha256_hash) ->
       sb_report = response.json.data
       $('#sb-loader').hide()
       $(report_present).show()
-      $(report_missing).hide()
+#      $(report_missing).hide()
+      #temporary viewable for testing the run sample function, revert when finished
+      $(report_missing).show()
 
       # Load the top data
       $('#sb-run-date').text(sb_report.date)
@@ -261,7 +265,7 @@ window.get_sandbox_report = (runid, sha256_hash) ->
 
 
       # Adding full json report in case it's needed
-      full_report = JSON.stringify(response.json, null, '\t')
+      full_report = JSON.stringify(response.json, null, 2)
       $('#sb-full').text(full_report)
 
     error: (response) ->
@@ -285,10 +289,48 @@ window.run_sample_in_sandbox = (sha256_hash) ->
     success_reload: false
     success: (response) ->
       console.log response
+      window.get_run_status(sha256_hash)
       # Then we can call to check on the report status
     error: (response) ->
       std_api_error(response, "There was a problem retrieving data from Talos Sandbox", reload: false)
 )
+
+
+window.get_run_status = (sha256_hash) ->
+  std_msg_ajax(
+    method: 'GET'
+    url: "/escalations/api/v1/escalations/file_rep/sandbox_api/sandbox_latest_report/" + sha256_hash
+    success_reload: false
+    success: (response) ->
+      console.log response
+      run_id = response.json.data.runid
+      status = response.json.data.status
+
+#      if status == "Complete"
+#        window.get_sandbox_report(run_id, sha256_hash)
+#        #this may need some tweaking since it's kinda pseudo code right now, but basically kick off sample run method
+#        #needs to be assigned to a variable so that variable can be fed to clearInterval to stop checking after we recognize
+#        #the run has been completed and populated the page.
+#
+#        clearInterval(kick_off_object)
+#      #Melissa, check to see if this is the right  method to call, maybe research_data is the better one to call?
+#
+#      if status == "Error"
+#        alert('need to cover this case')
+#      if status == "Unsupported File Type"
+#        alert('need to cover this case')
+#      if status == "Cancelled"
+#        alert('need to cover this case')
+#      if status == "Running"
+#  #maybe set (or keep setting) a message to the UI somewhere here letting the user know shits still happening?
+#
+#  #this line will call again so that this repeats as many times a necessary, stopping when status == 'complete'
+#        setTimeout(kick_off_sample_run, 600000)
+
+    error: (response) ->
+      std_api_error(response, "There was a problem retrieving data from Talos Sandbox", reload: false)
+  )
+
 
 
 kick_off_object = window.kick_off_sample_run = (sha256_hash) ->
