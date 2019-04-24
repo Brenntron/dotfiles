@@ -67,7 +67,7 @@ class FileReputationApi::Detection
     byebug
     data = {
         "score" => self.score,
-        "state" => "local",
+        "state" => self.state,
         "disposition" => self.disposition,
         "force" => 0
     }
@@ -97,13 +97,18 @@ class FileReputationApi::Detection
   def update(disposition:, detection_name: nil)
     byebug
 
-    if same_disposition?(disposition) && same_name?(detection_name)
-      return { success: true, message: 'No change.' }
-    end
+    if same_disposition?(disposition)
+      unless detection_name.present?
+        return { success: true, message: 'No change.' }
+      end
 
-    if same_disposition?(disposition) && !malicious?
-      byebug
-      return { success: false, error: 'Detection name cannot be changed unless sample is malicious.' }
+      if same_name?(detection_name)
+        return { success: true, message: 'No change.' }
+      end
+
+      unless malicious?
+        return { success: false, error: 'Detection name cannot be changed unless sample is malicious.' }
+      end
     end
 
     if clean_to_malicious?(disposition)
