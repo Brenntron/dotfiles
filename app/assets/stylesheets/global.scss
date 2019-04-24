@@ -8991,6 +8991,76 @@ div[aria-describedby='create-detection-dialog'] {
   color: $type-lighter-color;
 }
 
+
+#file-det-dropdown {
+  min-width: 420px;
+}
+
+#new-amp-detection-name-section{ display: none;}
+#new-amp-detection-name-dd-section {
+  display: none;
+  select.form-control {
+    font-size: 8pt;
+    height: 25px;
+  }
+  select.form-control:focus {
+    margin-top: -6px;
+    height: 25px;
+  }
+  input {
+    height: 25px;
+    margin-top: -6px;
+    width: 100%;
+  }
+  .nested-col-row {
+    margin-top: 4px;
+    margin-right: -2px !important;
+    margin-left: -2px;
+  }
+  .uneditable-formfield {
+    font-size: 8pt;
+  }
+}
+
+.toolbar .dropdown.open .toolbar-button.detection-button {
+  background-image: url(image_path('icon_target_white.svg'));
+}
+
 .tg-data-present, .tg-data-missing, .sb-data-present, .sb-data-missing, .rl-data-present, .rl-data-missing {
   display: none;
+}
+
+
+// dbinebri: adding button here for download json buttons
+.download-small-button {
+  background-image: url(image_path('icon_download.svg'));
+  background-repeat: no-repeat;
+  width: 20px;
+  height: 23px;
+  float: right;
+  display: inline-block;
+  border: none;
+}
+
+// dbinebri: make sure the full json areas stay visible in collapsed state
+.data-report-wrapper {
+  .collapse {
+    display: block;
+    visibility: visible;
+    overflow: scroll;
+    &.in {  // .in is expanded state
+      overflow-y: hidden;
+    }
+  }
+}
+
+// dbinebri: ensure json areas stay at a min-height on collapse, and gray on expand/collapse transition
+#collapse_tg_json, #collapse_sb_json {
+  min-height: 300px;
+  margin: 0 2px;
+  background: darken($content-bg-color, 4%);
+  .report-size {
+    padding: 0;
+    width: initial;
+  }
 }
