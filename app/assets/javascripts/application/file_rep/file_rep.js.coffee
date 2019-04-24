@@ -265,7 +265,7 @@ $ ->
         data: 'reversing_labs_score'
         render: (data, type, full, meta) ->
           if data
-            return data + ' / ' + full['reversing_labs_count']
+            return '<span class="score-col text-center">' + data + ' / ' + full['reversing_labs_count'] + '</span>'
           else
             return ''
       }
