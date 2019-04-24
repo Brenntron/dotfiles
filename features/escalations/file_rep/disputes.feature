@@ -3,6 +3,16 @@ Feature: Disputes
   as a user
   I will provide ways to interact with disputes
 
+  @javascript
+  Scenario: a user visits their profile page and edits their ThreatGrid and Sandbox API Keys
+    Given a user with role "admin" exists and is logged in
+    And I go to "/users/1"
+    When I fill in "user_threatgrid_api_key" with "A"
+    And I fill in "user_sandbox_api_key" with "A"
+    And I click ".btn-success"
+    And I wait for "3" seconds
+    Then take a screenshot
+    Then I should see "updated successfully."
   # Need to stub the API call
   @javascript
   Scenario: an analyst tries to create a FileRep ticket
