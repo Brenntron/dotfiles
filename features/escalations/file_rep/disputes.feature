@@ -206,7 +206,7 @@ Feature: Disputes
     And A FileRep Dispute with trait "default" exists
     When I go to "/escalations/file_rep/disputes?f=all"
     Then I should see "000001"
-    
+
   @javascript
   Scenario: a user visits the FileRep Dispute index page and uses the closed filter
     Given a user with role "filerep user" exists and is logged in
