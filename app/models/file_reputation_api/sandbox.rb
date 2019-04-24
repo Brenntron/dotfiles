@@ -114,7 +114,7 @@ class FileReputationApi::Sandbox
     }
 
     begin
-      response = call_request(:get, endpoint, :input => query_string)
+      response = call_request(:post, endpoint, :input => query_string)
       data = {:success => true, :data => response}
     rescue
       data = {:success => false, :data => {}}
