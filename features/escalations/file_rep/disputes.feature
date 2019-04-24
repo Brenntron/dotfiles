@@ -3,6 +3,17 @@ Feature: Disputes
   as a user
   I will provide ways to interact with disputes
 
+  @javascript
+  Scenario: a user visits their profile page and edits their ThreatGrid and Sandbox API Keys
+    Given a user with role "admin" exists and is logged in
+    And I go to "/users/1"
+    When I fill in "user_threatgrid_api_key" with "A"
+    And I fill in "user_sandbox_api_key" with "A"
+    And I click ".btn-success"
+    And I wait for "3" seconds
+    Then take a screenshot
+    Then I should see "updated successfully."
+
   # Need to stub the API call
   @javascript
   Scenario: an analyst tries to create a FileRep ticket
@@ -174,3 +185,14 @@ Feature: Disputes
     When I go to "/escalations/file_rep/disputes/"
     And I click "#naming-guide"
     Then I should see "AMP Naming Conventions Guide"
+
+  # Unable to reach Communications tab due to JavaScript errors caused by Poltergeist 2.1.1's incompatibility with JavaScript ES6
+  @javascript
+  Scenario: a user visits the FileRep Dispute Show page and confirms that ReversingLabs data was populated
+    Given a user with role "filerep user" exists and is logged in
+    And A FileRep Dispute with trait "default" exists
+    When I go to "/escalations/file_rep/disputes/1"
+    And I click "#communication-tab-link"
+    And I click "#new-case-note-button"
+    And I fill in "new-case-note-textarea" with "Here we go, again."
+    Then I should see "Hero we go, again"
