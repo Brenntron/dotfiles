@@ -16,7 +16,10 @@ module API
             end
             post "" do
               std_api_v2 do
-                byebug
+                FileReputationApi::Detection.create_action(sha256_hashes: params['sha256_hashes'],
+                                                           disposition: params['disposition'],
+                                                           detection_name: params['detection_name'],
+                                                           ids: params['file_reputation_dispute_ids'])
               end
             end
           end

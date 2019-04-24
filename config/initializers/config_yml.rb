@@ -5,6 +5,9 @@ raise "config.yml missing #{Rails.env} section" unless env_config
 
 Rails.configuration.app_name = Rails.application.engine_name.gsub(/_application/,'')
 
+amp_poke = env_config.fetch('amp_poke', {})
+Rails.configuration.amp_poke            = ApiRequester::ApiRequester.config_of(amp_poke)
+
 raise "config.yml missing amq section" unless env_config['amq']
 Rails.configuration.amq_host            = env_config['amq']['host']
 
