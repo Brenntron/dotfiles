@@ -64,29 +64,23 @@ class FileReputationApi::Detection
   end
 
   def put_vrt
-    #byebug
     data = {
         "score" => self.score,
         "state" => self.state,
         "disposition" => self.disposition,
         "force" => 0
     }
-    result = self.class.call_request_parsed(:put, "/v0/vrt/sha256/#{self.sha256_hash}", input: data)
-    #byebug
-    result
+    self.class.call_request_parsed(:put, "/v0/vrt/sha256/#{self.sha256_hash}", input: data)
   end
 
   def put_tg
-    #byebug
     data = {
         "score" => self.score_tg,
-        "state" => "local",
+        "state" => self.state,
         "disposition" => self.disposition,
         "force" => 0
     }
-    result = self.class.call_request_parsed(:put, "/v0/tg/sha256/#{self.sha256_hash}", input: data)
-    #byebug
-    result
+    self.class.call_request_parsed(:put, "/v0/tg/sha256/#{self.sha256_hash}", input: data)
   end
 
   def change_detection_name(detection_name)
@@ -95,7 +89,6 @@ class FileReputationApi::Detection
   end
 
   def update(disposition:, detection_name: nil)
-    #byebug
 
     if same_disposition?(disposition)
       unless detection_name.present?
@@ -135,14 +128,11 @@ class FileReputationApi::Detection
       put_tg
     end
 
-    #byebug
     { success: true, message: 'Change completed.' }
   end
 
   def self.update_detection(sha256_hash:, disposition:, detection_name: nil)
     detection = get_bulk(sha256_hash)
-    # detection = get_bulk('0cc0e246c03b99572573e07982b6533cd87590cddaddc6732ad0feb34fd66e04')
-    # detection = get_bulk('69f3e339c070720906cf40499be79247dbb02758fbf08c72407f81645695c69e')
     detection.update(disposition: disposition, detection_name: detection_name)
   end
 
