@@ -332,6 +332,8 @@ $ ->
       $('#filerep-index-title')[0].innerHTML = new_header
 
   $('#file-rep-datatable').dataTable
+    drawCallback: ( settings ) ->
+      
     processing: true
     serverSide: true
     ajax:
