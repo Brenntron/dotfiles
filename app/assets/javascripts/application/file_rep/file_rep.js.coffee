@@ -177,6 +177,12 @@ $ ->
         targets: [ 2 ]
         className: 'font-weight-bold'
       }
+      {
+# Bolds the status
+        targets: [ 12, 13 ]
+        className: 'text-center'
+      }
+
     ]
     columns: [
       {
