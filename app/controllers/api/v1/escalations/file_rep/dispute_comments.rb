@@ -7,6 +7,10 @@ module API
 
           resource "escalations/file_rep/dispute_comments" do
 
+            before do
+              PaperTrail.request.whodunnit = current_user.id if current_user.present?
+            end
+
 
             desc "get a dispute comment"
             params do
