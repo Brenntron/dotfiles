@@ -1352,7 +1352,7 @@ $ ->
         success: (response) ->
       )
 
-    if window.location.pathname.includes('/escalations/file_rep/disputes') ||  window.location.pathname.includes('/escalations/webrep/disputes')
+    if window.location.pathname.includes('/escalations/file_rep') ||  window.location.pathname.includes('/escalations/webrep')
       $('#filter-cases').show()
       $('#import-webrep').show()
     #      $('#web-rep-search').show()
