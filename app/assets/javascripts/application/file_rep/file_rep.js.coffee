@@ -140,7 +140,7 @@ $ ->
 
   $(window).on 'click', (e) ->
     if e.target.closest('.daterangepicker') == null
-      $("#advanced-search-dropdown").hide()
+
     else
       $("#advanced-search-dropdown").show()
 
@@ -223,6 +223,29 @@ $ ->
       customer_email: form.find('input[id="customer-email-input"]').val()
       customer_company_name: form.find('input[id="customer-company-input"]').val()
     )
+      id: form.find('input[id="caseid-input"]').val()
+        created_at: time_submitted
+        updated_at: last_updated
+        status: form.find('input[id="status-input"]').val()
+        resolution: form.find('input[id="resolution-input"]').val()
+        assigned: form.find('input[id="assignee-input"]').val()
+        file_name: form.find('input[id="file-name-input"]').val()
+        file_size: form.find('input[id="file-size-input"]').val()
+        sha256_hash: form.find('input[id="sha256-input"]').val()
+        sample_type: form.find('input[id="sample-type-input"]').val()
+        disposition: form.find('input[id="amp-disposition-input"]').val()
+        disposition_suggested: form.find('input[id="suggested-disposition-input"]').val()
+        sandbox_score: sandbox_score
+        threatgrid_score: threatgrid_score
+        detection_name: form.find('input[id="amp-detection-name-input"]').val()
+        in_zoo: form.find('input[id="in-sample-zoo-input"]:checked').val()
+        reversing_labs: form.find('input[id="reversing-labs-input"]').val()
+        submitter_type: form.find('input[id="submitter-type-input"]').val()
+        customer_type: form.find('input[id="customer-type-input"]').val()
+        customer_name: form.find('input[id="customer-name-input"]').val()
+        form.find('input[id="customer-email-input"]').val()
+        form.find('input[id="customer-company-input"]').val()
+    file_rep_reset_search()
     refresh_url()
 
 
