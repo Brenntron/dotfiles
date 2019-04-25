@@ -8973,12 +8973,12 @@ button.secondary.view-report-external-button {
   }
 }
 #temp_row .delete-search-image{
-  &{
-    background-image: url(image_path('icon_cancel_grey.svg'));
-    border: none!important;
-  }
-
+  background-image: url(image_path('icon_cancel_grey.svg'));
+  display: block;
+  padding: 7px;
+  margin-right: 15px;
 }
+
 .score-col {
   width: 100%;
   display: block;

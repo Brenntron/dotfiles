@@ -1452,7 +1452,7 @@ $ ->
     $('#search_name').val("")
     $('#advanced-search-dropdown').toggle()
 
-  $(document).click ->
+  $(document).on 'click', (e)->
     if !e.target.closest('.daterangepicker')
       $("#advanced-search-dropdown").hide()
 
