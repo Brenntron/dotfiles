@@ -11,20 +11,18 @@ Feature: Disputes
     And I fill in "user_sandbox_api_key" with "One more time."
     And I click ".btn-success"
     And I wait for "3" seconds
-    Then take a screenshot
     Then I should see "updated successfully."
 
   # Need to stub the API call
-  @javascript
-  Scenario: an analyst tries to create a FileRep ticket
-    Given a user with role "filerep user" exists and is logged in
-    And I go to "/escalations/file_rep/disputes"
-    Then I click "#new-dispute"
-    Then I fill in "shas_list" with "343518b26e0a872772808605f9f28aa75f64d86a6608e1347c979d033a72cb54"
-    Then I click ".primary"
-    Then I wait for "30" seconds
-    Then take a screenshot
-    Then a FileRep Ticket should have been created
+#  @javascript
+#  Scenario: an analyst tries to create a FileRep ticket
+#    Given a user with role "filerep user" exists and is logged in
+#    And I go to "/escalations/file_rep/disputes"
+#    Then I click "#new-dispute"
+#    Then I fill in "shas_list" with "343518b26e0a872772808605f9f28aa75f64d86a6608e1347c979d033a72cb54"
+#    Then I click ".primary"
+#    Then I wait for "30" seconds
+#    Then a FileRep Ticket should have been created
 
   @javascript
   Scenario: a user tries to visit the FileRep disputes page without a FileRep role
@@ -67,11 +65,12 @@ Feature: Disputes
     Then I should see "SHA256"
     Then I should see "FILE SIZE"
     Then I should see "SAMPLE TYPE"
-    Then I should see "AMP Disp"
-    Then I should see "IN ZOO"
+    Then I should see "AMP DISP"
+    Then I should see "AMP DETECTION NAME"
+    Then I should see "SANDBOX SCORE"
+    Then I should see "TG SCORE"
     Then I should see "REVERSING LABS"
-    Then I should see "CUSTOMER ORGANIZATION"
-    Then I should see "ASSIGNEE"
+    Then I should see "SUGGESTED DISP"
 
   @javascript
   Scenario: a user disables the File Name column from the FileRep disputes index page
@@ -99,7 +98,7 @@ Feature: Disputes
     And I should see "0000000001"
     And I should see "FILE OVERVIEW"
     And I should see "efb947a43bfe6d0812d105f6afdeb9774f4d79254dd48f89f1e95ffdf8732928"
-    And I should see "CREATE DETECTION"
+    And I should see "CREATE OR CHANGE DETECTION"
     And I should see "COMMUNICATION"
     And I should see "Case History"
     And I should see "Compose New Email"
@@ -201,6 +200,51 @@ Feature: Disputes
     Then I should see "Here we go, again."
 
   @javascript
+  Scenario: a user visits the FileRep Dispute index page and uses the 'My Tickets' filter
+    Given a user with role "filerep user" exists and is logged in
+    And A FileRep Dispute with trait "assigned" exists
+    And A FileRep Dispute with trait "assigned_resolved" exists
+    When I go to "/escalations/file_rep/disputes?f=my_disputes"
+    Then I should see "000001"
+    Then I should see "000002"
+
+  @javascript
+  Scenario: a user visits the FileRep Dispute index page and uses the 'My Open' filter
+    Given a user with role "filerep user" exists and is logged in
+    And A FileRep Dispute with trait "assigned" exists
+    And A FileRep Dispute with trait "assigned_resolved" exists
+    When I go to "/escalations/file_rep/disputes?f=my_open"
+    Then I should see "000001"
+    Then I should not see "000002"
+
+  @javascript
+  Scenario: a user visits the FileRep Dispute index page and uses the 'Unassigned' filter
+    Given a user with role "filerep user" exists and is logged in
+    And A FileRep Dispute with trait "default" exists
+    And A FileRep Dispute with trait "assigned" exists
+    When I go to "/escalations/file_rep/disputes?f=unassigned"
+    Then I should see "000001"
+    Then I should not see "000002"
+
+  @javascript
+  Scenario: a user visits the FileRep Dispute index page and uses the 'Open' filter
+    Given a user with role "filerep user" exists and is logged in
+    And A FileRep Dispute with trait "default" exists
+    And A FileRep Dispute with trait "resolved" exists
+    When I go to "/escalations/file_rep/disputes?f=open"
+    Then I should see "000001"
+    Then I should not see "000002"
+
+  @javascript
+  Scenario: a user visits the FileRep Dispute index page and uses the 'Closed' filter
+    Given a user with role "filerep user" exists and is logged in
+    And A FileRep Dispute with trait "default" exists
+    And A FileRep Dispute with trait "resolved" exists
+    When I go to "/escalations/file_rep/disputes?f=closed"
+    Then I should see "000002"
+    Then I should not see "000001"
+
+  @javascript
   Scenario: a user visits the FileRep Dispute index page and uses the 'All' filter
     Given a user with role "filerep user" exists and is logged in
     And A FileRep Dispute with trait "default" exists
@@ -208,28 +252,12 @@ Feature: Disputes
     Then I should see "000001"
 
   @javascript
-  Scenario: a user visits the FileRep Dispute index page and uses the 'Closed' filter
+  Scenario: a user visits the FileRep Dispute show page and edits its status
     Given a user with role "filerep user" exists and is logged in
     And A FileRep Dispute with trait "default" exists
-    And A FileRep Dispute with trait "closed" exists
-    When I go to "/escalations/file_rep/disputes?f=closed"
-    Then I should see "000002"
-    Then I should not see "000001"
+    When I go to "/escalations/file_rep/disputes/1"
+    And I click "#show-edit-ticket-status-button"
+    And I click on element "input" with accessor "value" of "RESEARCHING"
+    And I click ".primary"
+    Then I should see "RESEARCHING"
 
-  @javascript
-  Scenario: a user visits the FileRep Dispute index page and uses the 'Open' filter
-    Given a user with role "filerep user" exists and is logged in
-    And A FileRep Dispute with trait "default" exists
-    And A FileRep Dispute with trait "closed" exists
-    When I go to "/escalations/file_rep/disputes?f=open"
-    Then I should see "000001"
-    Then I should not see "000002"
-
-  @javascript
-  Scenario: a user visits the FileRep Dispute index page and uses the 'My Open' filter
-    Given a user with role "filerep user" exists and is logged in
-    And A FileRep Dispute with trait "assigned" exists
-    And A FileRep Dispute with trait "default" exists
-    When I go to "/escalations/file_rep/disputes?f=my_disputes"
-    Then I should see "000001"
-    Then I should not see "000002"
