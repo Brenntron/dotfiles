@@ -612,7 +612,7 @@ $ ->
     else if $('.dataset-cb:checked').length == 3
       $('#sandbox-report-wrapper, #threatgrid-report-wrapper, #reversing-labs-report-wrapper').removeClass('col-sm-6 col-sm-12').addClass('col-sm-4')
     return
-\    # dbinebri: adding in checkbox toggle column visible + widths on Show Page, Research tab
+    # dbinebri: adding in checkbox toggle column visible + widths on Show Page, Research tab
     $('#data-show-sandbox-cb').click -> $('#sandbox-report-wrapper').toggle()
     $('#data-show-tg-cb').click -> $('#threatgrid-report-wrapper').toggle()
     $('#data-show-reversing-cb').click -> $('#reversing-labs-report-wrapper').toggle()
