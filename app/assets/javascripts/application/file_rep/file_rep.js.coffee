@@ -138,9 +138,12 @@ $ ->
       side: 'bottom'
     return
 
-  $(window).click (e) ->
-    if !e.target.closest('.daterangepicker')
+  $(window).on 'click', (e) ->
+    if e.target.closest('.daterangepicker') == null
       $("#advanced-search-dropdown").hide()
+    else
+      $("#advanced-search-dropdown").show()
+
 
   window.file_rep_reset_search = () ->
     inputs = document.getElementsByClassName('form-control')
@@ -554,7 +557,6 @@ $ ->
       $(checkbox).prop 'checked', !checkbox.prop('checked')
       return
     return
-    checkbox = $(this).find('input')
 
   $(document).on 'click ','.file_rep_sha', (e) ->
 #      copy SHA on click
@@ -673,19 +675,6 @@ $ ->
     else if $('.dataset-cb:checked').length == 3
       $('#sandbox-report-wrapper, #threatgrid-report-wrapper, #reversing-labs-report-wrapper').removeClass('col-sm-6 col-sm-12').addClass('col-sm-4')
     return
-    # dbinebri: adding in checkbox toggle column visible + widths on Show Page, Research tab
-    $('#data-show-sandbox-cb').click -> $('#sandbox-report-wrapper').toggle()
-    $('#data-show-tg-cb').click -> $('#threatgrid-report-wrapper').toggle()
-    $('#data-show-reversing-cb').click -> $('#reversing-labs-report-wrapper').toggle()
-
-    $('#data-show-sandbox-cb, #data-show-tg-cb, #data-show-reversing-cb').click ->
-      if $('.dataset-cb:checked').length == 1
-        $('#sandbox-report-wrapper, #threatgrid-report-wrapper, #reversing-labs-report-wrapper').removeClass('col-sm-4 col-sm-6').addClass('col-sm-12')
-      else if $('.dataset-cb:checked').length == 2
-        $('#sandbox-report-wrapper, #threatgrid-report-wrapper, #reversing-labs-report-wrapper').removeClass('col-sm-4 col-sm-12').addClass('col-sm-6')
-      else if $('.dataset-cb:checked').length == 3
-        $('#sandbox-report-wrapper, #threatgrid-report-wrapper, #reversing-labs-report-wrapper').removeClass('col-sm-6 col-sm-12').addClass('col-sm-4')
-      return
 
 
 $ ->
