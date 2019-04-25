@@ -348,7 +348,7 @@ $ ->
         if search_type == 'advanced' && search_name_check && text_check
           ###
             creating temporary tr for the filter dropdown
-            attributes added then onclick events
+            attributes added then onclick events 
           ###
           new_tr = document.createElement('tr')
           new_td = document.createElement('td')
