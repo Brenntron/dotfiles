@@ -166,3 +166,10 @@ Then(/^I should see user, "(.*?)", in element "(.*?)"$/) do |username, element|
     expect(page).to have_content(username)
   end
 end
+
+Given(/^a user with role "(.*?)" exists within org subset "(.*?)" and is logged in$/) do |role, org_subset|
+  @user = FactoryBot.create(:current_user, confirmed: true)
+  FactoryBot.create(:org_subset, name: org_subset)
+  @user.roles << FactoryBot.create(:role, role: role, org_subset_id: 1)
+  sign_in_user
+end

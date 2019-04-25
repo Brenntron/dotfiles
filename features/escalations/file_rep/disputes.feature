@@ -261,3 +261,12 @@ Feature: Disputes
     And I click ".primary"
     Then I should see "RESEARCHING"
 
+  @javascript
+  Scenario: a user visits the FileRep Dispute show page and edits its status
+    Given a user with role "filerep user" exists within org subset "file rep" and is logged in
+    And A FileRep Dispute with trait "default" exists
+    When I go to "/escalations/file_rep/disputes/1"
+    And I click "#index_change_assign"
+    And I click "#button_reassign"
+    Then I should not see "ERROR UPDATING TICKET."
+
