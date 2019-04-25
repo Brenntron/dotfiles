@@ -143,8 +143,18 @@ end
 
 Given(/^I should see my username$/) do
   user_attrs = FactoryBot.attributes_for(:current_user)
-  username  = User.where(cvs_username: user_attrs[:cvs_username]).first
-  raise "content found when it should not have been found" if page.has_content?(username)
+  username  = User.where(cvs_username: user_attrs[:cvs_username]).first.cvs_username
+  if !page.has_content?(username)
+    raise "content not found when it should have been found"
+  end
+end
+
+Given(/^I should not see my username$/) do
+  user_attrs = FactoryBot.attributes_for(:current_user)
+  username  = User.where(cvs_username: user_attrs[:cvs_username]).first.cvs_username
+  if page.has_content?(username)
+    raise "content found when it should not have been found"
+  end
 end
 
 Then (/^current user should not have kerberos login$/) do
