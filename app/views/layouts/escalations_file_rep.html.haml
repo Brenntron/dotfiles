@@ -46,7 +46,7 @@
           %span.nav-dropdown-content-icon.icon-saved-search
           My Saved Searches
         %table#saved-search.table
-          %tbody#saved-search-tbody
+          %tbody#saved-search-tbody.filerep-named-search-list
             - if current_user.named_searches.any?
               - current_user.named_searches.where('project_type = ? OR project_type IS ?', 'FileReputationDispute', nil).order(:id).each do |named_search|
                 %tr{id: "saved_search_#{named_search.id}"}

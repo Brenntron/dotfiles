@@ -255,7 +255,6 @@ $ ->
             search_name: search_name
             search_conditions: search_conditions
           }
-        window.location.reload()
       else if search_type == 'named'
         data = {
           search_type: search_type
@@ -333,7 +332,32 @@ $ ->
 
   $('#file-rep-datatable').dataTable
     drawCallback: ( settings ) ->
-      
+      if localStorage.search_name
+        {search_type, search_name, search_conditions } = localStorage
+        if search_type == 'advanced' && search_name != ''
+          search_name = search_name.trim()
+          last_tr = $('.filerep-named-search-list .saved-search').last().text()
+          console.log(last_tr, search_name)
+
+
+
+          new_tr =
+            '<tr id="temp_row">' +
+              '<td> ' +
+                '<a class="input-truncate saved-search esc-tooltipped" title:"' + search_name + '"onclick:"build_named_search(' + search_name + ')"> ' + search_name + '</a> ' +
+                '<a class="delete-search" onclick="delete_disputes_named_search(this, ' + search_name + ' )"><img src="icon_cancel_grey.svg"></img></a>' +
+              '</td>' +
+            '</tr>'
+
+
+          $('.filerep-named-search-list').append(new_tr)
+
+#            %tr{id: "saved_search_#{named_search.id}"}
+#            %td
+#            %a.input-truncate.saved-search.esc-tooltipped{onclick: "build_named_search('#{named_search.name}');", title: named_search.name}
+#            = named_search.name
+#            %a.delete-search{title: 'Delete Saved Search', onclick: "delete_disputes_named_search(this, '#{named_search.name}');"}
+#            = image_tag('icon_cancel_grey.svg')
     processing: true
     serverSide: true
     ajax:
