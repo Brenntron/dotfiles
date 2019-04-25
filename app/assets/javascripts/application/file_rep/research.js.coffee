@@ -15,7 +15,8 @@ $ ->
 window.research_data = (sha256_hash) ->
   window.get_threatgrid_data(sha256_hash)
   window.get_reversinglabs_data(sha256_hash)
-  window.get_sandbox_runid(sha256_hash)
+  window.get_run_status()
+#  window.get_sandbox_runid(sha256_hash)
 
 
 ########### THREATGRID REPORT ############
@@ -69,7 +70,7 @@ window.get_threatgrid_data = (sha256_hash) ->
 
 ########### REVERSING LABS REPORT ############
 window.get_reversinglabs_data = (sha256_hash) ->
-#  Send sha to reversing labs, get data
+  #  Send sha to reversing labs, get data
   $('#rl-loader').show()
   std_msg_ajax(
     method: 'GET'
@@ -130,7 +131,7 @@ window.get_reversinglabs_data = (sha256_hash) ->
 ########### GET SANDBOX MOST RECENT RUN ID ############
 #### This is needed prior to getting full report
 window.get_sandbox_runid = (sha256_hash) ->
-# Sandbox - get runid from file hash
+  # Sandbox - get runid from file hash
   $('#sb-loader').show()
   std_msg_ajax(
     method: 'GET'
@@ -170,6 +171,7 @@ window.get_sandbox_runid = (sha256_hash) ->
 window.get_sandbox_report = (runid, sha256_hash) ->
   report_present = $('#sandbox-report-wrapper').find('.sb-data-present')[0]
   report_missing = $('#sandbox-report-wrapper').find('.sb-data-missing')[0]
+  report_running = $('#sandbox-report-wrapper').find('.sb-report-run')[0]
 
   std_msg_ajax(
     method: 'GET'
@@ -182,6 +184,8 @@ window.get_sandbox_report = (runid, sha256_hash) ->
 #      $(report_missing).hide()
       #temporary viewable for testing the run sample function, revert when finished
       $(report_missing).show()
+      $(report_running).hide()
+
 
       # Load the top data
       $('#sb-run-date').text(sb_report.date)
@@ -281,60 +285,35 @@ window.get_sandbox_report = (runid, sha256_hash) ->
 # (so the sample has not been run in the sandbox) but the sample
 # does exist in the zoo and therefore CAN be run in the sandbox.
 
-window.run_sample_in_sandbox = (sha256_hash) ->
+window.run_sample_in_sandbox = () ->
+  sha256_hash = $('#sha256_hash')[0].innerText
+  report_present = $('#sandbox-report-wrapper').find('.sb-data-present')[0]
+  report_missing = $('#sandbox-report-wrapper').find('.sb-data-missing')[0]
+  report_running = $('#sandbox-report-wrapper').find('.sb-report-run')[0]
+  $(report_present).hide()
+  $(report_missing).hide()
+  # Clear residual data
+  $(report_present).find('.data-report-content').each ->
+    $(this).empty()
+  $(report_running).show()
+  $('#sb-loader').show()
+
   # Create a new run in the sandbox (assuming sample CAN be run in sandbox)
   std_msg_ajax(
     method: 'GET'
     url: "/escalations/api/v1/escalations/file_rep/sandbox_api/sandbox_run_sample/" + sha256_hash
     success_reload: false
     success: (response) ->
-      console.log response
       window.get_run_status(sha256_hash)
-      # Then we can call to check on the report status
     error: (response) ->
       std_api_error(response, "There was a problem retrieving data from Talos Sandbox", reload: false)
 )
 
 
-window.get_run_status = (sha256_hash) ->
-  std_msg_ajax(
-    method: 'GET'
-    url: "/escalations/api/v1/escalations/file_rep/sandbox_api/sandbox_latest_report/" + sha256_hash
-    success_reload: false
-    success: (response) ->
-      console.log response
-      run_id = response.json.data.runid
-      status = response.json.data.status
-
-#      if status == "Complete"
-#        window.get_sandbox_report(run_id, sha256_hash)
-#        #this may need some tweaking since it's kinda pseudo code right now, but basically kick off sample run method
-#        #needs to be assigned to a variable so that variable can be fed to clearInterval to stop checking after we recognize
-#        #the run has been completed and populated the page.
-#
-#        clearInterval(kick_off_object)
-#      #Melissa, check to see if this is the right  method to call, maybe research_data is the better one to call?
-#
-#      if status == "Error"
-#        alert('need to cover this case')
-#      if status == "Unsupported File Type"
-#        alert('need to cover this case')
-#      if status == "Cancelled"
-#        alert('need to cover this case')
-#      if status == "Running"
-#  #maybe set (or keep setting) a message to the UI somewhere here letting the user know shits still happening?
-#
-#  #this line will call again so that this repeats as many times a necessary, stopping when status == 'complete'
-#        setTimeout(kick_off_sample_run, 600000)
-
-    error: (response) ->
-      std_api_error(response, "There was a problem retrieving data from Talos Sandbox", reload: false)
-  )
-
-
-
-kick_off_object = window.kick_off_sample_run = (sha256_hash) ->
-  # Make call to check report status
+get_run_status = window.get_run_status = () ->
+  sha256_hash = $('#sha256_hash')[0].innerText
+  report_running = $('#sandbox-report-wrapper').find('.sb-report-run')[0]
+  report_missing = $('#sandbox-report-wrapper').find('.sb-data-missing')[0]
   std_msg_ajax(
     method: 'GET'
     url: "/escalations/api/v1/escalations/file_rep/sandbox_api/sandbox_latest_report/" + sha256_hash
@@ -345,26 +324,29 @@ kick_off_object = window.kick_off_sample_run = (sha256_hash) ->
       status = response.json.data.status
 
       if status == "Complete"
-        window.get_sandbox_report(run_id, sha256_hash)
-        #this may need some tweaking since it's kinda pseudo code right now, but basically kick off sample run method
-        #needs to be assigned to a variable so that variable can be fed to clearInterval to stop checking after we recognize
-        #the run has been completed and populated the page.
-
-        clearInterval(kick_off_object)
-        #Melissa, check to see if this is the right  method to call, maybe research_data is the better one to call?
-
+        clearInterval(get_run_status)
+        window.get_sandbox_runid(sha256_hash)
       if status == "Error"
-        alert('need to cover this case')
+        clearInterval(get_run_status)
+        $(report_missing).show()
+        $('#sandbox-status-message').text('Error running sample. Report not generated.')
       if status == "Unsupported File Type"
-        alert('need to cover this case')
+        clearInterval(get_run_status)
+        $(report_missing).show()
+        $('#sandbox-status-message').text('Unsupported file type. Report not generated.')
       if status == "Cancelled"
-        alert('need to cover this case')
-      if status == "Running"
-        #maybe set (or keep setting) a message to the UI somewhere here letting the user know shits still happening?
+        clearInterval(get_run_status)
+        $(report_missing).show()
+        $('#sandbox-status-message').text('Report was cancelled.')
+      if status == "Running" || "JoeBox Analysis Running" || "Reports Generating"
+        $(report_running).show()
+        console.log status
+#
+#      setTimeout(get_run_status, 600000)
+      setTimeout(get_run_status, 30000)
 
-        #this line will call again so that this repeats as many times a necessary, stopping when status == 'complete'
-        setTimeout(kick_off_sample_run, 600000)
 
     error: (response) ->
       std_api_error(response, "There was a problem retrieving data from Talos Sandbox", reload: false)
   )
+
