@@ -117,7 +117,6 @@ group :test do
   gem 'json_spec', '1.1.5'
   gem 'simplecov', '0.16.1', :require => false
   gem 'cucumber-api-steps', '~>0.14', require: false
-  gem 'chromedriver-helper'
 end
 
 group :development, :profile do
