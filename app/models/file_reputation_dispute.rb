@@ -209,6 +209,7 @@ class FileReputationDispute < ApplicationRecord
 
     search_hash = non_blank_fields(params)
     sha256_hash = search_hash.delete('sha256_hash')
+    file_name = search_hash.delete('file_name')
     threatgrid_range = search_hash.delete('threatgrid_score') || {}
     sandbox_range = search_hash.delete('sandbox_score') || {}
     created_at_range = search_hash.delete('created_at') || {}
@@ -219,6 +220,10 @@ class FileReputationDispute < ApplicationRecord
 
     if sha256_hash.present?
       relation = relation.where('sha256_hash like :sha256_hash', sha256_hash: "%#{sanitize_sql_like(sha256_hash)}%")
+    end
+
+    if file_name.present?
+      relation = relation.where('file_name like :file_name', file_name: "%#{sanitize_sql_like(file_name)}%")
     end
 
     if threatgrid_range['from'].present?
