@@ -16,7 +16,6 @@ window.research_data = (sha256_hash) ->
   window.get_threatgrid_data(sha256_hash)
   window.get_reversinglabs_data(sha256_hash)
   window.get_run_status()
-#  window.get_sandbox_runid(sha256_hash)
 
 
 ########### THREATGRID REPORT ############
@@ -175,9 +174,7 @@ window.get_sandbox_runid = (sha256_hash) ->
           $('#sandbox-run-button').show()
         else
           $('#sandbox-status-message').text('Not in Talos Sandbox or Sample Zoo')
-#          $('#sandbox-run-button').hide()
-          # Changing this for testing the 'run sample' function. Revert when finished
-          $('#sandbox-run-button').show()
+          $('#sandbox-run-button').hide()
       else
         # Send runid to sandbox
         window.get_sandbox_report(run_id, sha256_hash)
@@ -195,6 +192,7 @@ window.get_sandbox_report = (runid, sha256_hash) ->
   report_present = $('#sandbox-report-wrapper').find('.sb-data-present')[0]
   report_missing = $('#sandbox-report-wrapper').find('.sb-data-missing')[0]
   report_running = $('#sandbox-report-wrapper').find('.sb-report-run')[0]
+  $(report_running).hide()
 
   std_msg_ajax(
     method: 'GET'
@@ -204,11 +202,7 @@ window.get_sandbox_report = (runid, sha256_hash) ->
       sb_report = response.json.data
       $('#sb-loader').hide()
       $(report_present).show()
-#      $(report_missing).hide()
-      #temporary viewable for testing the run sample function, revert when finished
-      $(report_missing).show()
-      $(report_running).hide()
-
+      $(report_missing).hide()
 
       # dbinebri: use moment.js to make date readable
       sb_formatted_run_date = moment(sb_report.date).format('MMM D, YYYY h:mm A')
@@ -312,8 +306,6 @@ window.get_sandbox_report = (runid, sha256_hash) ->
       $('#download-sb-json').wrap sb_json_link
 
 
-
-
     error: (response) ->
       $('#sb-loader').hide()
       std_api_error(response, "There was a problem retrieving data from Talos Sandbox", reload: false)
@@ -346,7 +338,9 @@ window.run_sample_in_sandbox = () ->
     url: "/escalations/api/v1/escalations/file_rep/sandbox_api/sandbox_run_sample/" + sha256_hash
     success_reload: false
     success: (response) ->
-      window.get_run_status(sha256_hash)
+      # Wait 1 minute so the run status is getting a new status
+      # and not the complete status of the last report
+      setTimeout(get_run_status, 60000)
     error: (response) ->
       std_api_error(response, "There was a problem retrieving data from Talos Sandbox", reload: false)
 )
@@ -361,7 +355,6 @@ get_run_status = window.get_run_status = () ->
     url: "/escalations/api/v1/escalations/file_rep/sandbox_api/sandbox_latest_report/" + sha256_hash
     success_reload: false
     success: (response) ->
-      console.log response
       run_id = response.json.data.runid
       status = response.json.data.status
 
@@ -380,12 +373,11 @@ get_run_status = window.get_run_status = () ->
         clearInterval(get_run_status)
         $(report_missing).show()
         $('#sandbox-status-message').text('Report was cancelled.')
-      if status == "Running" || "JoeBox Analysis Running" || "Reports Generating"
+      if status == "Running" || "JoeBox Analysis Running" || "Reports Generating" || "Enqueued to Report Generation"
         $(report_running).show()
         console.log status
-#
-#      setTimeout(get_run_status, 600000)
-      setTimeout(get_run_status, 30000)
+
+      setTimeout(get_run_status, 600000)
 
 
     error: (response) ->
