@@ -339,6 +339,9 @@ $ ->
       std_msg_error("Note is blank. Delete note?",'')
 
 
+
+
+
   $('#newEmailDialog').dialog
     autoOpen: false
     minWidth: 400

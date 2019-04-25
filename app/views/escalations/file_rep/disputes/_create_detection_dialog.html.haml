@@ -32,7 +32,7 @@
             -#  TODO select option that matches current disposition
             -# We may want to move these values into storage somewhere
             -# Note they need to be lowercase values
-            %select.form-control#new-amp-detection-disp{onchange: 'amp_detection_naming();'}
+            %select.form-control#new-amp-detection-disp{onchange: 'amp_detection_naming("show");'}
               %option{value: FileReputationDispute::DISPOSITION_CLEAN} Clean
               %option{value: FileReputationDispute::DISPOSITION_COMMON} Common
               %option{value: FileReputationDispute::DISPOSITION_UNKNOWN} Unknown
@@ -144,6 +144,6 @@
             %textarea.form-comment-box#new-amp-detection-comment
       %hr.thin
       .button-row-center
-        %button.primary{onclick: 'amp_detection_submission(event);'}
+        %button.primary{onclick: 'amp_detection_submission(event, "show");'}
           -# Add type: 'submit', value: 'submit' - removed here for testing purposes
           Create Detection

@@ -181,8 +181,8 @@ $ ->
     columns: [
       {
         data:'id'
-        render: (data) ->
-          return '<input type="checkbox" onclick="toggleRow(this)" name="cbox" class="dispute_check_box" id="cbox' + data + '" value="' + data + '" />'
+        render: (data, type, full, meta) ->
+          return '<input type="checkbox" onclick="toggleRow(this)" name="cbox" class="dispute_check_box" id="cbox' + data + '" value="' + data + '" data-sha="' + full['sha256_hash'] + '"/>'
       }
       {
 #        need to zeropad this thing
@@ -248,18 +248,26 @@ $ ->
       {
         data: 'sandbox_score'
         render: (data, type, full, meta) ->
-          if full['sandbox_under'] == "true"
-            return '<span class="score-col text-center">' + parseInt(data) + '</span>'
+          data = parseInt(data)
+          if isNaN(data)
+            return '<span class="score-col missing-data text-center"> No Score</span>'
           else
-            return '<span class="overdue score-col text-center">' + parseInt(data) + '</span>'
+            if full['sandbox_under'] == "true"
+              return '<span class="score-col text-center">' + parseInt(data) + '</span>'
+            else
+              return '<span class="overdue score-col text-center">' + parseInt(data) + '</span>'
       }
       {
         data: 'threatgrid_score'
         render: (data, type, full, meta) ->
-          if full['threatgrid_under'] == "true"
-            return '<span class="score-col text-center">' + parseInt(data) + '</span>'
+          data = parseInt(data)
+          if isNaN(data)
+            return '<span class="score-col missing-data text-center"> No Score</span>'
           else
-            return '<span class="overdue score-col text-center">' + parseInt(data) + '</span>'
+            if full['threatgrid_under'] == "true"
+              return '<span class="score-col text-center">' + data + '</span>'
+            else
+              return '<span class="overdue score-col text-center">' + data + '</span>'
       }
       { data: 'reversing_labs_score'}
       {
@@ -270,7 +278,14 @@ $ ->
           else
             return  '<span class="text-capitalize">' + data + '</span>'
       }
-      { data: 'created_at'}
+      {
+        data: 'created_at'
+        render: (data) ->
+          if data
+            return moment(data).format('MMM D, YYYY h:mm A')
+          else
+            return ''
+      }
       {
 #        Submitter Type
         data: null
@@ -345,27 +360,36 @@ $ ->
       return
 
 
+$ ->
+  ## Create detection form dialog
+  $('#create-detection-dialog').dialog
+    autoOpen: false,
+    minWidth: 520,
+    classes: {
+      "ui-dialog": "form-dialog"
+    },
+    position: { my: "top center", at: "top center", of: window }
 
 
   # Trigger Create Detection dialog
   window.amp_detection_dialog = () ->
-    $('#create-detection-dialog').dialog
-      minWidth: 520,
-      classes: {
-        "ui-dialog": "form-dialog"
-      },
-      position: { my: "top center", at: "top center", of: window }
+    $('#create-detection-dialog').dialog('open')
     window.amp_detection_naming()
 
 
   ## Create detection form interaction
 
   # Hide / Show of Detection Name inputs
-  window.amp_detection_naming = () ->
+  window.amp_detection_naming = (page) ->
     # Detection name can only be changed if user is setting a sample to malicious
     # or keeping it malicious. Hiding detection name part of form if not needed
-    naming_section = $('#new-amp-detection-name-section')
-    if $('#new-amp-detection-disp').val().toLowerCase() == 'malicious'
+    naming_section = ''
+    if page == 'show'
+      naming_section = $('#new-amp-detection-name-section')
+    else if page == 'index'
+      naming_section = $('#new-amp-detection-name-dd-section')
+
+    if $('#new-amp-detection-disp').val() == 'malicious'
       $(naming_section).show()
     else
       $(naming_section).hide()
@@ -385,14 +409,13 @@ $ ->
 
 
   # Prepare form info for sending to AMP
-  window.amp_detection_submission = (e) ->
+  window.amp_detection_submission = (e, page) ->
     e.preventDefault()
-    # Get sha
-    sha256_hash = $('#sha256_hash')[0].innerText
+
     # Get form info
     new_disp = $('#new-amp-detection-disp').val()
     new_detection_name = ''
-    if new_disp.toLowerCase() == 'malicious'
+    if new_disp == 'malicious'
       new_name_pre = $('#new-amp-detection-name-pre').val()
       new_name_cat = $('#new-amp-detection-name-cat').val()
       new_name_txt = $('#new-amp-detection-name-middle').val()
@@ -407,10 +430,99 @@ $ ->
 
     comment = $('#new-amp-detection-comment').val()
 
-    console.log(sha256_hash)
-    console.log(detection_array)
-    console.log(comment)
-    # temp just to keep page from refreshing on click of submit
+    # Grab sha data
+    # From show page only one sha can be submitted
+    if page == 'show'
+      # Get sha
+      sha = $('#sha256_hash')[0].innerText
+
+    # From index several shas could be submitted (from the users perspective)
+    else if page == 'index'
+      if $('.dispute_check_box:checked').length < 1
+        std_msg_error('No Tickets Selected', ['Please select at least one ticket to submit detection for.'])
+      else
+
+      sha = []
+      # Get all checked checkboxes
+      $('.dispute_check_box:checked').each ->
+        sha_val =  $(this).attr('data-sha')
+        sha.push(sha_val)
+
+
+      # Marlin - I don't know how you want to handl this. We can only send one sha at a time,
+      # but we can set up the back end to send one after another with the same detection setting.
+      # This preps for either case, and provides the sha(s) and the detection info separately.
+
+      console.log sha
+      console.log detection_array
+    else
+      alert('Where are you? How did you trigger this? Stahp it.')
+
     return false
 
 
+
+# TODO: This stuff maybe should be moved into its own file later, but dropping here because convenient
+# (it's all for the comms tab of the show page)
+
+# New Note
+
+  $('#new-filerep-case-note-button').on "click", ->
+    $('.new-case-note-row').show()
+    $(this).hide()
+
+  $('.new-filerep-case-note-cancel-button').on "click", ->
+    $('.new-case-note-row').hide()
+    $('#new-case-note-button').show()
+    $('.new-case-note-textarea').empty()
+
+  $('.new-filerep-case-note-save-button').on "click", ->
+    comment = $('.new-case-note-textarea')[0].innerText
+    dispute_id = $('input[name="dispute_id"]').val()
+    user_id = $('input[name="current_user_id"]').val()
+
+    if comment.trim().length > 0
+      std_msg_ajax(
+        method: 'POST'
+        url: "/escalations/api/v1/escalations/file_rep/dispute_comments"
+        data: {user_id: user_id, comment: comment, file_reputation_dispute_id: dispute_id}
+        success_reload: true
+        error_prefix: 'Note could not created.'
+        failure_reload: false
+      )
+    else
+      std_msg_error("Note is blank. Delete note?",'')
+
+
+  $('.filerep-note-delete-button').on "click", ->
+    comment_id = $(this).attr('comment_id')
+    current_user_id = $('input[name="current_user_id"]').val()
+
+    std_msg_confirm('Are you sure you want to delete this note?', [])
+
+    $('.confirm').on 'click', ->
+      std_msg_ajax(
+        method: 'DELETE'
+        url: "/escalations/api/v1/escalations/file_rep/dispute_comments/#{comment_id}"
+        data: {current_user_id: current_user_id}
+        success_reload: true
+        error: (response) ->
+          std_api_error(response, "Note could not be deleted.", reload: false)
+      )
+
+  # Editing a Note
+
+  $('.filerep-update-note').on "click", ->
+    comment_id = $(this).attr('comment_id')
+    current_user_id = $('input[name="current_user_id"]').val()
+    editable_note_block = $(".note-block" + comment_id)
+    updated_comment = editable_note_block[0].innerText
+
+    std_msg_ajax(
+      method: 'PUT'
+      url: "/escalations/api/v1/escalations/file_rep/dispute_comments/#{comment_id}"
+      data: {current_user_id: current_user_id, comment: updated_comment}
+      success_reload: true
+      error: (response) ->
+        std_api_error(response, "Note could not be updated.", reload: false)
+    )
