@@ -506,7 +506,14 @@ $ ->
           else
             return  '<span class="text-capitalize"> clean </span>'
       }
-      { data: 'created_at'}
+      {
+        data: 'created_at'
+        render: (data) ->
+          if data
+            return moment(data).format('MMM D, YYYY h:mm A')
+          else
+            return ''
+      }
       {
 #        Submitter Type
         data: null
@@ -782,3 +789,68 @@ $ ->
     return false
 
 
+
+# TODO: This stuff maybe should be moved into its own file later, but dropping here because convenient
+# (it's all for the comms tab of the show page)
+
+# New Note
+
+  $('#new-filerep-case-note-button').on "click", ->
+    $('.new-case-note-row').show()
+    $(this).hide()
+
+  $('.new-filerep-case-note-cancel-button').on "click", ->
+    $('.new-case-note-row').hide()
+    $('#new-case-note-button').show()
+    $('.new-case-note-textarea').empty()
+
+  $('.new-filerep-case-note-save-button').on "click", ->
+    comment = $('.new-case-note-textarea')[0].innerText
+    dispute_id = $('input[name="dispute_id"]').val()
+    user_id = $('input[name="current_user_id"]').val()
+
+    if comment.trim().length > 0
+      std_msg_ajax(
+        method: 'POST'
+        url: "/escalations/api/v1/escalations/file_rep/dispute_comments"
+        data: {user_id: user_id, comment: comment, file_reputation_dispute_id: dispute_id}
+        success_reload: true
+        error_prefix: 'Note could not created.'
+        failure_reload: false
+      )
+    else
+      std_msg_error("Note is blank. Delete note?",'')
+
+
+  $('.filerep-note-delete-button').on "click", ->
+    comment_id = $(this).attr('comment_id')
+    current_user_id = $('input[name="current_user_id"]').val()
+
+    std_msg_confirm('Are you sure you want to delete this note?', [])
+
+    $('.confirm').on 'click', ->
+      std_msg_ajax(
+        method: 'DELETE'
+        url: "/escalations/api/v1/escalations/file_rep/dispute_comments/#{comment_id}"
+        data: {current_user_id: current_user_id}
+        success_reload: true
+        error: (response) ->
+          std_api_error(response, "Note could not be deleted.", reload: false)
+      )
+
+  # Editing a Note
+
+  $('.filerep-update-note').on "click", ->
+    comment_id = $(this).attr('comment_id')
+    current_user_id = $('input[name="current_user_id"]').val()
+    editable_note_block = $(".note-block" + comment_id)
+    updated_comment = editable_note_block[0].innerText
+
+    std_msg_ajax(
+      method: 'PUT'
+      url: "/escalations/api/v1/escalations/file_rep/dispute_comments/#{comment_id}"
+      data: {current_user_id: current_user_id, comment: updated_comment}
+      success_reload: true
+      error: (response) ->
+        std_api_error(response, "Note could not be updated.", reload: false)
+    )
