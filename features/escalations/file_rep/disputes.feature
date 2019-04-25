@@ -288,7 +288,7 @@ Feature: Disputes
     Given the following users exist
     |id| cvs_username |
     |1 | vrtincom     |
-    And a user with role "filerep user" exists within org subset "file rep" and is logged in
+    And a user with role "filerep user" exists and is logged in
     And A FileRep Dispute with trait "default" exists
     When I go to "/escalations/file_rep/disputes/1"
     And I click ".take-ticket-button"
@@ -298,4 +298,20 @@ Feature: Disputes
     Then I should not see "ERROR UPDATING TICKET."
     And I should not see my username
     And I should see "Unassigned"
+
+  @javascript
+  Scenario: a user visits the FileRep Dispute Communication tab and sends an email
+    Given a user with role "filerep user" exists and is logged in
+    And A FileRep Dispute with trait "default" exists
+    When I go to "/escalations/file_rep/disputes/1"
+    And I click "#communication-tab-link"
+    And I click ".new-email-button"
+    And I fill in "receiver" with "ancheng3@cisco.com"
+    And I fill in "subject" with "Cucumber Testing"
+    And I fill in the reply textarea with "We can only hope our tests pass."
+    And I click "#send-new-email"
+    Then I should not see "EMAIL WAS NOT SENT"
+    And I should see "ancheng3@cisco.com"
+    And I should see "Cucumber Testing"
+
 
