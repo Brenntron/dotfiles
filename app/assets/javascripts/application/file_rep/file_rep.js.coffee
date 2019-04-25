@@ -192,7 +192,6 @@ $ ->
     refresh_url()
 
 
-
   window.build_advanced_data = () ->
     form = $('#filerep_disputes-advanced-search-form')
     localStorage.search_type = 'advanced'
@@ -333,31 +332,50 @@ $ ->
   $('#file-rep-datatable').dataTable
     drawCallback: ( settings ) ->
       if localStorage.search_name
+
         {search_type, search_name, search_conditions } = localStorage
-        if search_type == 'advanced' && search_name != ''
-          search_name = search_name.trim()
-          last_tr = $('.filerep-named-search-list .saved-search').last().text()
-          console.log(last_tr, search_name)
+        last_tr = $('.filerep-named-search-list .saved-search').last().text()
+
+        ### check variables below
+            text_check makes sure that the last table row doesn't match the named search being saved now
+            search_name_check makes sure that the search is being saved as a named search
+            Not super complicated, but that if statement was looking gross and confusing
+        ###
+
+        text_check = last_tr.trim() != search_name.trim()
+        search_name_check = search_name != ''
+
+        if search_type == 'advanced' && search_name_check && text_check
+          ###
+            creating temporary tr for the filter dropdown
+            attributes added then onclick events
+          ###
+          new_tr = document.createElement('tr')
+          new_td = document.createElement('td')
+          new_link =  document.createElement('a')
+          new_delete_image = document.createElement('img')
+          new_delete = document.createElement('a')
+
+          $(new_tr).attr('id','temp_row')
+          $(new_link).addClass('input-truncate saved-search esc-tooltipped')
+            .attr('title', search_name)
+            .text(search_name)
+          $(new_delete).addClass("delete-search")
+          $(new_delete_image).addClass('delete-search-image')
 
 
+          $(new_link).on 'click', () ->
+            window.build_named_search(search_name)
+          $(new_delete).on 'click', () ->
+            window.delete_disputes_named_search(this,  search_name)
+            refresh_localStorage()
 
-          new_tr =
-            '<tr id="temp_row">' +
-              '<td> ' +
-                '<a class="input-truncate saved-search esc-tooltipped" title:"' + search_name + '"onclick:"build_named_search(' + search_name + ')"> ' + search_name + '</a> ' +
-                '<a class="delete-search" onclick="delete_disputes_named_search(this, ' + search_name + ' )"><img src="icon_cancel_grey.svg"></img></a>' +
-              '</td>' +
-            '</tr>'
-
-
+          $(new_tr).append(new_td)
+          $(new_td).append(new_link)
+          $(new_td).append(new_delete)
+          $(new_delete).append(new_delete_image)
           $('.filerep-named-search-list').append(new_tr)
 
-#            %tr{id: "saved_search_#{named_search.id}"}
-#            %td
-#            %a.input-truncate.saved-search.esc-tooltipped{onclick: "build_named_search('#{named_search.name}');", title: named_search.name}
-#            = named_search.name
-#            %a.delete-search{title: 'Delete Saved Search', onclick: "delete_disputes_named_search(this, '#{named_search.name}');"}
-#            = image_tag('icon_cancel_grey.svg')
     processing: true
     serverSide: true
     ajax:
@@ -390,8 +408,8 @@ $ ->
     columns: [
       {
         data:'id'
-        render: (data) ->
-          return '<input type="checkbox" onclick="toggleRow(this)" name="cbox" class="dispute_check_box" id="cbox' + data + '" value="' + data + '" />'
+        render: (data, type, full, meta) ->
+          return '<input type="checkbox" onclick="toggleRow(this)" name="cbox" class="dispute_check_box" id="cbox' + data + '" value="' + data + '" data-sha="' + full['sha256_hash'] + '"/>'
       }
       {
 #        need to zeropad this thing
@@ -457,18 +475,26 @@ $ ->
       {
         data: 'sandbox_score'
         render: (data, type, full, meta) ->
-          if full['sandbox_under'] == "true"
-            return '<span class="score-col text-center">' + parseInt(data) + '</span>'
+          data = parseInt(data)
+          if isNaN(data)
+            return '<span class="score-col missing-data text-center"> No Score</span>'
           else
-            return '<span class="overdue score-col text-center">' + parseInt(data) + '</span>'
+            if full['sandbox_under'] == "true"
+              return '<span class="score-col text-center">' + parseInt(data) + '</span>'
+            else
+              return '<span class="overdue score-col text-center">' + parseInt(data) + '</span>'
       }
       {
         data: 'threatgrid_score'
         render: (data, type, full, meta) ->
-          if full['threatgrid_under'] == "true"
-            return '<span class="score-col text-center">' + parseInt(data) + '</span>'
+          data = parseInt(data)
+          if isNaN(data)
+            return '<span class="score-col missing-data text-center"> No Score</span>'
           else
-            return '<span class="overdue score-col text-center">' + parseInt(data) + '</span>'
+            if full['threatgrid_under'] == "true"
+              return '<span class="score-col text-center">' + data + '</span>'
+            else
+              return '<span class="overdue score-col text-center">' + data + '</span>'
       }
       { data: 'reversing_labs_score'}
       {
@@ -656,7 +682,7 @@ $ ->
 
 
 $ ->
-  ## Create detection form interaction
+  ## Create detection form dialog
   $('#create-detection-dialog').dialog
     autoOpen: false,
     minWidth: 520,
@@ -672,12 +698,19 @@ $ ->
     window.amp_detection_naming()
 
 
+  ## Create detection form interaction
+
   # Hide / Show of Detection Name inputs
-  window.amp_detection_naming = () ->
+  window.amp_detection_naming = (page) ->
     # Detection name can only be changed if user is setting a sample to malicious
     # or keeping it malicious. Hiding detection name part of form if not needed
-    naming_section = $('#new-amp-detection-name-section')
-    if $('#new-amp-detection-disp').val().toLowerCase() == 'malicious'
+    naming_section = ''
+    if page == 'show'
+      naming_section = $('#new-amp-detection-name-section')
+    else if page == 'index'
+      naming_section = $('#new-amp-detection-name-dd-section')
+
+    if $('#new-amp-detection-disp').val() == 'malicious'
       $(naming_section).show()
     else
       $(naming_section).hide()
@@ -697,14 +730,13 @@ $ ->
 
 
   # Prepare form info for sending to AMP
-  window.amp_detection_submission = (e) ->
+  window.amp_detection_submission = (e, page) ->
     e.preventDefault()
-    # Get sha
-    sha256_hash = $('#sha256_hash')[0].innerText
+
     # Get form info
     new_disp = $('#new-amp-detection-disp').val()
     new_detection_name = ''
-    if new_disp.toLowerCase() == 'malicious'
+    if new_disp == 'malicious'
       new_name_pre = $('#new-amp-detection-name-pre').val()
       new_name_cat = $('#new-amp-detection-name-cat').val()
       new_name_txt = $('#new-amp-detection-name-middle').val()
@@ -718,7 +750,35 @@ $ ->
       detection_array = {disposition: new_disp}
 
     comment = $('#new-amp-detection-comment').val()
-    # temp just to keep page from refreshing on click of submit
+
+    # Grab sha data
+    # From show page only one sha can be submitted
+    if page == 'show'
+      # Get sha
+      sha = $('#sha256_hash')[0].innerText
+
+    # From index several shas could be submitted (from the users perspective)
+    else if page == 'index'
+      if $('.dispute_check_box:checked').length < 1
+        std_msg_error('No Tickets Selected', ['Please select at least one ticket to submit detection for.'])
+      else
+
+      sha = []
+      # Get all checked checkboxes
+      $('.dispute_check_box:checked').each ->
+        sha_val =  $(this).attr('data-sha')
+        sha.push(sha_val)
+
+
+      # Marlin - I don't know how you want to handl this. We can only send one sha at a time,
+      # but we can set up the back end to send one after another with the same detection setting.
+      # This preps for either case, and provides the sha(s) and the detection info separately.
+
+      console.log sha
+      console.log detection_array
+    else
+      alert('Where are you? How did you trigger this? Stahp it.')
+
     return false
 
 

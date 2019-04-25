@@ -371,7 +371,7 @@ class FileReputationDispute < ApplicationRecord
     end
 
   rescue => except
-    Rails.logger.error("Error updating threatgrid score on id #{self.id} -- #{except.error_message}")
+    Rails.logger.error("Error updating threatgrid score on id #{self.id} -- #{except.message}")
   end
 
   def update_ticode_certs
@@ -390,7 +390,7 @@ class FileReputationDispute < ApplicationRecord
   def update_reversing_labs_score
     update!(FileReputationApi::ReversingLabs.score(self.sha256_hash))
   rescue => except
-    Rails.logger.error("Error updating reversing labs score on id #{self.id} -- #{except.error_message}")
+    Rails.logger.error("Error updating reversing labs score on id #{self.id} -- #{except.message}")
   end
 
   def pdf?
@@ -404,7 +404,7 @@ class FileReputationDispute < ApplicationRecord
     sandbox_threshold = self.pdf? ? 90.0 : 61.0
     update!(sandbox_score: sandbox_score, sandbox_threshold: sandbox_threshold)
   rescue => except
-    Rails.logger.error("Error updating sandbox score on id #{self.id} -- #{except.error_message}")
+    Rails.logger.error("Error updating sandbox score on id #{self.id} -- #{except.message}")
   end
 
   def update_scores
