@@ -152,6 +152,12 @@ $ ->
 
     for i in inputs
       i.value = ""
+
+      if $(i).is('#status-input, #sha256-input, #amp-disposition-input, #sandbox-score-input, #tg-score-input, #suggested-disposition-input')
+        $(i).closest('.form-group').removeClass('hidden')
+      else
+        $(i).closest('.form-group').addClass('hidden')
+
       if $(i).hasClass('ui-slider')
         values = [ 25, 75 ]
         $(i).slider({
