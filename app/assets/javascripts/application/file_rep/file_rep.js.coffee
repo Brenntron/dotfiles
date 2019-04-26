@@ -845,4 +845,3 @@ $ ->
       error: (response) ->
         std_api_error(response, "Note could not be updated.", reload: false)
     )
-    
