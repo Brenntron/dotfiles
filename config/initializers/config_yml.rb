@@ -158,3 +158,8 @@ Rails.configuration.threatgrid          = ApiRequester::ApiRequester.config_of(t
 ticloud = env_config.fetch('ticloud', {})
 raise 'config.yml missing ticloud section' unless ticloud
 Rails.configuration.ticloud             = ApiRequester::ApiRequester.config_of(ticloud)
+
+elastic_config = env_config['elastic']
+raise 'config.yml missing elastic section' unless elastic_config
+Rails.configuration.elastic             = OpenStruct.new
+Rails.configuration.elastic.host        = elastic_config['host']

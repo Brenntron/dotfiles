@@ -14,7 +14,7 @@ gem 'activerecord-session_store', '1.1.1'
 
 gem 'hashie-forbidden_attributes', '~> 0.1.1'
 
-
+gem 'elasticsearch-model'
 
 gem 'kaminari', '1.1.1'
 
