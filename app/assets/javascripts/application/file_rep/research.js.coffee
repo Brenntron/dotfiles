@@ -269,6 +269,9 @@ window.get_sandbox_report = (runid, sha) ->
       full_report = JSON.stringify(response.json, null, 2)
       $('#sb-full').text(full_report)
 
+      # Adding link to see sandbox html report
+      $('#sb-report-html').attr('data-sha', sha)
+      $('#sb-report-html').attr('data-runid', runid)
 
       # dbinebri: Convert the Talos Sandbox full_report to a downloadable file, add the Download button hyperlink
       # build a formatted date string to add into the filename for download
@@ -288,5 +291,24 @@ window.get_sandbox_report = (runid, sha) ->
 
     error: (response) ->
       $('#sb-loader').hide()
+      std_api_error(response, "There was a problem retrieving data from Talos Sandbox", reload: false)
+  )
+
+
+
+
+
+
+window.sandbox_html_report = () ->
+  runid = $('#sb-report-html').attr('data-runid')
+  sha = $('#sb-report-html').attr('data-sha')
+
+  std_msg_ajax(
+    method: 'GET'
+    url: "/escalations/api/v1/escalations/file_rep/sandbox_api/sandbox_report_html/" + runid + '/' + sha
+    success_reload: false
+    success: (response) ->
+      console.log response
+    error: (response) ->
       std_api_error(response, "There was a problem retrieving data from Talos Sandbox", reload: false)
   )
