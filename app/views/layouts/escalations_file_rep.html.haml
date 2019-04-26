@@ -38,27 +38,27 @@
     .dropdown-menu.nav-tools-dropdown#filter-dropdown{'aria-labelledby': 'filter-cases'}
       %ul#filter-cases-list
         %li{class: ("selected" if params[:f] == "my_disputes")}
-          %a{href: '?f=my_disputes'}
+          %a{class:"filter-cases", onclick: 'refresh_url("?f=my_disputes")'}
             %span.nav-dropdown-icon.icon-my-bugs
             My Tickets
         %li{class: ("selected" if params[:f] == "my_open")}
-          %a{href: '?f=my_open'}
+          %a{class:"filter-cases", onclick: 'refresh_url("?f=my_open")'}
             %span.nav-dropdown-icon.icon-my-open-bugs
             My Open Tickets
         %li{class: ("selected" if params[:f] == "unassigned")}
-          %a{href: '?f=unassigned'}
+          %a{class:"filter-cases", onclick: 'refresh_url("?f=unassigned")'}
             %span.nav-dropdown-icon.icon-unassigned-bugs
             Unassigned Tickets
         %li{class: ("selected" if params[:f] == "open")}
-          %a{href: '?f=open'}
+          %a{class:"filter-cases", onclick: 'refresh_url("?f=open")'}
             %span.nav-dropdown-icon.icon-open-bugs
             Open Tickets
         %li{class: ("selected" if params[:f] == "closed")}
-          %a{href: '?f=closed'}
+          %a{class:"filter-cases", onclick: 'refresh_url("?f=closed")'}
             %span.nav-dropdown-icon.icon-fixed-bugs
             Closed Tickets
         %li{class: ("selected" if params[:f] == "all")}
-          %a{href: '?f=all'}
+          %a{class:"filter-cases", onclick: 'refresh_url("?f=all")'}
             %span.nav-dropdown-icon.icon-all-tickets
             All Tickets
 

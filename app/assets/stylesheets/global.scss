@@ -6020,6 +6020,9 @@ td.in_zoo{
   width: 100px;
 }
 
+.filter-cases{
+  cursor: pointer;
+}
 .ticket-age-over3hr {
   color: $warning-accent-color;
   font-weight: bold;

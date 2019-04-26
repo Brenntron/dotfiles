@@ -144,7 +144,6 @@ $ ->
     else
       $("#advanced-search-dropdown").show()
 
-
   window.file_rep_reset_search = () ->
     inputs = document.getElementsByClassName('form-control')
     time_submitted = ''
@@ -172,12 +171,16 @@ $ ->
     localStorage.removeItem('search_name')
     localStorage.removeItem('search_conditions')
 
-  window.refresh_url = () ->
-    if current_url.includes('/file_rep/disputes?f=')
-      new_url = current_url.split('?f=')[0]
-      window.location.replace(new_url)
-    else
-      location.reload()
+  window.refresh_url = (href) ->
+    {search_type, search_name} = localStorage
+    url_check = current_url.split('/escalations/file_rep/disputes/')[0]
+    new_url = '/escalations/file_rep/disputes'
+
+    if href != undefined
+      window.location.replace(new_url + href)
+
+    if !href && typeof parseInt(url_check) == 'number'
+      window.location.replace('/escalations/file_rep/disputes')
 
   $(document).on 'click', '#refresh-filter-button', (e) ->
     refresh_localStorage()
@@ -224,8 +227,8 @@ $ ->
       customer_company_name: form.find('input[id="customer-company-input"]').val()
     )
 
-    file_rep_reset_search()
     refresh_url()
+    file_rep_reset_search()
 
 
   window.build_data = () ->
@@ -265,7 +268,6 @@ $ ->
           search_name: search_name
         }
 
-      console.log($('#filerep_searchref_container').length)
       format_filerep_header(data)
       return data
 
@@ -772,8 +774,7 @@ $ ->
       # but we can set up the back end to send one after another with the same detection setting.
       # This preps for either case, and provides the sha(s) and the detection info separately.
 
-      console.log sha
-      console.log detection_array
+
     else
       alert('Where are you? How did you trigger this? Stahp it.')
 
