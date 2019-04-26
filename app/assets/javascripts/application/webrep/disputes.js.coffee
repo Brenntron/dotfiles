@@ -1453,7 +1453,7 @@ $ ->
     $('#advanced-search-dropdown').toggle()
 
   $(document).on 'click', (e)->
-    if e.target.closest('.daterangepicker') == null
+    if e.target.closest('.daterangepicker') == null && e.target.closest('.available') == null
       $("#advanced-search-dropdown").hide()
     else
       $("#advanced-search-dropdown").show()

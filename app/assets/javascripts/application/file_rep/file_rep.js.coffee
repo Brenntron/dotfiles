@@ -121,7 +121,7 @@ window.file_rep_show_change_assignee = (dispute_id) ->
   )
 
 $ ->
-
+  file_rep_url = $('#file-rep-datatable').data('source')
   current_url = window.location.href
   time_submitted = ''
   last_updated = ''
@@ -137,12 +137,6 @@ $ ->
       ]
       side: 'bottom'
     return
-
-  $(window).on 'click', (e) ->
-    if e.target.closest('.daterangepicker') == null
-      $("#advanced-search-dropdown").hide()
-    else
-      $("#advanced-search-dropdown").show()
 
   window.file_rep_reset_search = () ->
     inputs = document.getElementsByClassName('form-control')
@@ -164,7 +158,6 @@ $ ->
         $(slider_1).text(values[0])
         $(slider_2).text(values[1])
 
-  file_rep_url = $('#file-rep-datatable').data('source')
 
   window.refresh_localStorage = () ->
     localStorage.removeItem('search_type')
@@ -298,7 +291,7 @@ $ ->
             condition_name_HTML = '<span class="search-condition-name text-uppercase">' + condition_name + ': </span>'
 
             if typeof condition == 'object'
-              condition_HTML = '<span>' + condition.to + ' - ' + condition.from + '</span>'
+              condition_HTML = '<span>' + condition.from  + ' - ' + condition.to+ '</span>'
             else
               condition_HTML = '<span>' + condition + '</span>'
 
