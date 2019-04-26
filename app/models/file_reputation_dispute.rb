@@ -4,6 +4,7 @@ class FileReputationDispute < ApplicationRecord
   belongs_to :customer, optional:true
   belongs_to :assigned, class_name: 'User', foreign_key: :user_id, optional:true #TODO remove
   has_many :digital_signers
+  has_many :file_rep_comments
 
   delegate :name, :company, :company_id, to: :customer, allow_nil: true, prefix: true
 
@@ -323,7 +324,7 @@ class FileReputationDispute < ApplicationRecord
     end
 
   rescue => except
-    Rails.logger.error("Error updating threatgrid score on id #{self.id} -- #{except.error_message}")
+    Rails.logger.error("Error updating threatgrid score on id #{self.id} -- #{except.message}")
   end
 
   def update_ticode_certs
@@ -342,7 +343,7 @@ class FileReputationDispute < ApplicationRecord
   def update_reversing_labs_score
     update!(FileReputationApi::ReversingLabs.score(self.sha256_hash))
   rescue => except
-    Rails.logger.error("Error updating reversing labs score on id #{self.id} -- #{except.error_message}")
+    Rails.logger.error("Error updating reversing labs score on id #{self.id} -- #{except.message}")
   end
 
   def pdf?
@@ -356,7 +357,7 @@ class FileReputationDispute < ApplicationRecord
     sandbox_threshold = self.pdf? ? 90.0 : 61.0
     update!(sandbox_score: sandbox_score, sandbox_threshold: sandbox_threshold)
   rescue => except
-    Rails.logger.error("Error updating sandbox score on id #{self.id} -- #{except.error_message}")
+    Rails.logger.error("Error updating sandbox score on id #{self.id} -- #{except.message}")
   end
 
   def update_scores
@@ -470,5 +471,11 @@ class FileReputationDispute < ApplicationRecord
 
   def return_dispute
     update!(user_id: User.vrtincoming.id, status: FileReputationDispute::STATUS_NEW)
+  end
+
+  def bytes_to_kb
+    if file_size.present?
+      self.file_size/1024
+    end
   end
 end

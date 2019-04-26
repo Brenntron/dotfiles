@@ -74,11 +74,11 @@ class Ability
       can :manage, User do |user| #no delete UI is implemented
         user.ancestors.include?(current_user)
       end
-      can :manage, FileReputationDispute
+      can :manage, [FileReputationDispute, FileRepComment]
     end
 
     if role_names.include?('filerep user')
-      can :manage, [FileReputationDispute, DisputeEmail]
+      can :manage, [FileReputationDispute, DisputeEmail, FileRepComment]
     end
 
     if role_names.include?('ips escalator manager')
