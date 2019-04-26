@@ -472,4 +472,10 @@ class FileReputationDispute < ApplicationRecord
   def return_dispute
     update!(user_id: User.vrtincoming.id, status: FileReputationDispute::STATUS_NEW)
   end
+
+  def bytes_to_kb
+    if file_size.present?
+      self.file_size/1024
+    end
+  end
 end

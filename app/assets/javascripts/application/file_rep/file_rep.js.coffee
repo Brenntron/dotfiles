@@ -209,7 +209,7 @@ $ ->
       {
         data: 'file_size'
         render: (data) ->
-          return data + ' bytes'
+          return data + ' KB'
       }
       { data: 'sample_type'}
       {
