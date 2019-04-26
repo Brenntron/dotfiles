@@ -62,12 +62,12 @@
     %label.content-label-sm{for:'sandbox_score'} Sandbox Score
     .form-control.require-float#sandbox-score-input{name: 'sandbox_score'}
       .ui-slider-handle
-    %button.remove-input
+    %button.remove-input{onclick: 'reset_slider("sandbox")'}
   .form-group.search-item
     %label.content-label-sm TG Score
     .form-control.require-float#tg-score-input{name: 'tg_score'}
       .ui-slider-handle
-    %button.remove-input
+    %button.remove-input{onclick: 'reset_slider("threatgrid")'}
   .form-group.search-item.hidden.in-sample-zoo_container
     %label.content-label-sm In Sample Zoo
     %input.form-control#in-sample-zoo-input{name: 'in_sample_zoo', type: 'checkbox', value: 'checked', for: 'in-sample-zoo'}

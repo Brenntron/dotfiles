@@ -137,6 +137,11 @@ $ ->
       ]
       side: 'bottom'
     return
+  window.reset_slider = (slider) ->
+    if slider == "sandbox"
+      sandbox_score = ''
+    else
+      threatgrid_score = ''
 
   window.file_rep_reset_search = () ->
     inputs = document.getElementsByClassName('form-control')
