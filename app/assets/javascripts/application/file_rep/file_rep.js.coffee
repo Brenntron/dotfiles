@@ -265,12 +265,13 @@ $ ->
           search_name: search_name
         }
 
-    format_filerep_header(data)
-    return data
+      console.log($('#filerep_searchref_container').length)
+      format_filerep_header(data)
+      return data
 
   window.format_filerep_header = (data) ->
-
-    if data != undefined
+    container = $('#filerep_searchref_container')
+    if data != undefined && container.length > 0
       reset_icon = '<span id="refresh-filter-button" class="reset-filter esc-tooltipped" title="Clear Search Results"></span>'
       {search_type, search_name} = data
 
@@ -289,7 +290,6 @@ $ ->
             reset_icon +
             '</div>'
 
-        container = $('#filerep_searchref_container')
         for condition_name, condition of search_conditions
           if condition != ''
             condition_name = condition_name.replace(/_/g, " ").toUpperCase()

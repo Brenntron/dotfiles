@@ -1125,7 +1125,7 @@ thead th.sorting.center {
   height: 10px;
   position: absolute;
   background-color: white;
-  z-index: 50;
+  z-index: 1;
   margin-top: 43px;
   border-top-right-radius: 2px;
   margin-left: -1px;
@@ -2118,6 +2118,7 @@ a.static-nav-item {
 
 #advanced-search-dropdown {
   min-width: 400px;
+  z-index: 51;
 }
 #advanced-search-dropdown {
   .selectize-dropdown.multi.form-control.selectize{
@@ -3450,7 +3451,7 @@ fieldset.top-content {
   height: 10px;
   position: absolute;
   background-color: $table-dark-body;
-  z-index: 60;
+  z-index: 1;
   width: 100%;
   margin-top: -12px;
 }
