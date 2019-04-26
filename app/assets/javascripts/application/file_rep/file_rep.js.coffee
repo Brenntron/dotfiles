@@ -163,8 +163,8 @@ $ ->
       columns: ':not(:first-child)'
     columnDefs: [
       {
-        # Making checkbox row unorderable
-        targets: [ 0 ]
+        # Making checkbox and RL score rows unorderable
+        targets: [ 0, 14 ]
         orderable: false
         searchable: false
       }
@@ -269,7 +269,14 @@ $ ->
             else
               return '<span class="overdue score-col text-center">' + data + '</span>'
       }
-      { data: 'reversing_labs_score'}
+      {
+        data: 'reversing_labs_score'
+        render: (data, type, full, meta) ->
+          if data
+            return '<span class="score-col text-center">' + data + ' / ' + full['reversing_labs_count'] + '</span>'
+          else
+            return ''
+      }
       {
         data: 'disposition_suggested'
         render: (data) ->
