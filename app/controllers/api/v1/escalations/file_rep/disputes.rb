@@ -6,7 +6,6 @@ module API
           include API::V1::Defaults
           include API::BugzillaRestSession
           resource "escalations/file_rep/disputes" do
-
             desc 'Create a File Rep Dispute'
             params do
               requires :sha256_hash, type: String, desc: 'SHA256 hash of the file'
@@ -88,6 +87,54 @@ module API
               filerep_dispute.to_json
             end
 
+            desc 'Update File Rep Dispute status'
+            params do
+              requires :dispute_ids, type: Array[String]
+              requires :status, type: String
+              optional :resolution, type: String
+              optional :comment, type: String
+            end
+
+            post "set_disputes_status" do
+              std_api_v2 do
+                authorize!(:update, FileReputationDispute)
+                dispute_ids = params[:dispute_ids].map{|id| id.to_i}
+                status = params[:status]
+                resolution = ""
+                comment = ""
+
+                if params[:resolution].present?
+                  resolution = params[:resolution]
+                else
+                  resolution = nil
+                end
+
+                if params[:comment].present?
+                  if status == 'RESOLVED_CLOSED'
+                    comment = status + ' : ' + resolution + ' - ' + params[:comment]
+                  else
+                    comment = status + ' - ' + params[:comment]
+                  end
+                end
+
+                file_rep_disputes = FileReputationDispute.where(id: dispute_ids)
+
+                file_rep_disputes.each do |dispute|
+                  dispute.update_status(status)
+
+                  if comment.present?
+                    FileRepComment.create!(comment: comment, file_reputation_dispute_id: dispute.id, user_id: current_user.id)
+                  end
+
+                  if resolution.present?
+                    dispute.update(resolution: resolution)
+                  end
+                end
+
+                render json: {status: 'Success'}
+              end
+            end
+
             desc 'Inline Take FileRep Dispute'
             params do
               requires :dispute_id, type: Integer
@@ -151,7 +198,6 @@ module API
                 {:status => "success", :data => disputes, :assignee => assignee}.to_json
               end
             end
-
           end
         end
       end

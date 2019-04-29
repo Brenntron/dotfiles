@@ -1,3 +1,83 @@
+$ ->
+  $('#file-rep-sync-button').click ->
+    window.research_data()
+    window.update_file_rep_data()
+
+
+window.update_file_rep_status = () ->
+  checked_disputes = []
+  resolution = ""
+  comment = ""
+
+  checkboxes = $('#file-rep-datatable').find('.dispute_check_box')
+
+  $(checkboxes).each ->
+    if $(this).is(':checked')
+      dispute_id = $(this).val()
+      checked_disputes.push(dispute_id)
+
+  status = $('#index-edit-ticket-status-dropdown').find('.ticket-status-radio:checked').val()
+  comment = $('.ticket-status-comment').val()
+
+  if status == "RESOLVED_CLOSED"
+    if $('#index-edit-ticket-status-dropdown').find('#RESOLVED_CLOSED').is(':checked')
+      resolution = $('input[name=ticket-resolution]:checked').val()
+    else
+      std_msg_error('No resolution selected', ['Please select a ticket resolution.'])
+      return
+
+  if resolution
+    comment = $('.resolution-status-comment').val()
+
+  std_msg_ajax(
+    method: 'POST'
+    url: "/escalations/api/v1/escalations/file_rep/disputes/set_disputes_status"
+    data:
+      dispute_ids: checked_disputes
+      status: status
+      comment: comment
+      resolution: resolution
+    success_reload: false
+    success: (response) ->
+      std_msg_success('File Reputation Ticket statuses updated.', [], reload: true)
+    error: (response) ->
+      std_msg_error('Unable to update File Reputation Ticket status.')
+  )
+
+window.update_file_rep_status_on_show = () ->
+  resolution = ""
+  comment = ""
+
+  dispute_id = $('#dispute_id').text().trim()
+  status = $('#show-edit-ticket-status-dropdown').find('.fr-ticket-status-radio:checked').val()
+  comment = $('.ticket-status-comment').val()
+
+  if status == "RESOLVED_CLOSED"
+    if $('#show-edit-ticket-status-dropdown').find('#file-status-closed').is(':checked')
+      resolution = $('input[name=dispute-resolution]:checked').val()
+    else
+      std_msg_error('No resolution selected', ['Please select a ticket resolution.'])
+      return
+
+  if resolution
+    comment = $('.resolution-status-comment').val()
+
+  std_msg_ajax(
+    method: 'POST'
+    url: "/escalations/api/v1/escalations/file_rep/disputes/set_disputes_status"
+    data:
+      dispute_ids: [dispute_id]
+      status : status
+      comment: comment
+      resolution: resolution
+    success_reload: false
+    success: (response) ->
+      std_msg_success('File Reputation Ticket statuses updated.', [], reload: true)
+    error: (response) ->
+      std_msg_error('Unable to update File Reputation Ticket status.', [])
+  )
+
+
 window.filerep_take_disputes = () ->
   dispute_ids = $('.dispute_check_box:checkbox:checked').map(() ->
     this.dataset['entryId']
@@ -117,7 +197,6 @@ window.file_rep_show_change_assignee = (dispute_id) ->
     error_prefix: 'Error updating ticket.'
     success: (response) ->
       window.location.reload()
-
   )
 
 $ ->

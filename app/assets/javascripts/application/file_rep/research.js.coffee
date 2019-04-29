@@ -4,6 +4,41 @@ $ ->
     window.research_data()
 
 
+window.update_file_rep_data = () ->
+  file_rep_id = $(".case-id-tag")[0].innerText
+  # Hide current data
+  sb_data_true = $($('.sb-data-present')[0]).hide()
+  sb_data_false = $($('.sb-data-missing')[0]).hide()
+  tg_data_true = $($('.tg-data-present')[0]).hide()
+  tg_data_false = $($('.tg-data-missing')[0]).hide()
+  rl_data_true = $($('.rl-data-present')[0]).hide()
+  rl_data_false = $($('.rl-data-missing')[0]).hide()
+
+  # Round and round it goes
+  sync_button = $('#file-rep-sync-button')
+  $(sync_button).addClass('syncing')
+
+  std_msg_ajax(
+    method: 'POST'
+    url: "/escalations/api/v1/escalations/filerep/research/update_file_rep_data"
+    data: {id: file_rep_id}
+    success_reload: false
+    success: (response) ->
+      $('#tg-loader').hide()
+      $('#sb-loader').hide()
+      $('#rl-loader').hide()
+      $(sync_button).removeClass('syncing')
+    error: (response) ->
+      $('#tg-loader').hide()
+      $('#sb-loader').hide()
+      $('#rl-loader').hide()
+      $(sync_button).removeClass('syncing')
+      std_api_error(response, "There was a problem refreshing some research data", reload: false)
+  )
+
+
+
+
 window.research_data = () ->
   sha256_hash = $('#sha256_hash')[0].innerText
 

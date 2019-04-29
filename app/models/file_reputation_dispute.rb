@@ -2,7 +2,9 @@
 class FileReputationDispute < ApplicationRecord
 
   belongs_to :customer, optional:true
-  belongs_to :assigned, class_name: 'User', foreign_key: :user_id, optional:true #TODO remove
+  has_many :file_rep_comments
+  belongs_to :assigned, class_name: 'User', foreign_key: :user_id, optional:true #TODO remove to use :user
+  belongs_to :user, optional:true
   has_many :digital_signers
   has_many :file_rep_comments
 
@@ -406,6 +408,12 @@ class FileReputationDispute < ApplicationRecord
     update!(sandbox_score: sandbox_score, sandbox_threshold: sandbox_threshold)
   rescue => except
     Rails.logger.error("Error updating sandbox score on id #{self.id} -- #{except.message}")
+  end
+
+  def update_trifecta
+    update_threadgrid_score
+    update_reversing_labs_score
+    update_sandbox_score
   end
 
   def update_scores

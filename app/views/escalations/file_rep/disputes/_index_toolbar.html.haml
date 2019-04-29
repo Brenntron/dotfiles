@@ -70,7 +70,7 @@
             %select{name: 'index_target_assignee', id: 'index_target_assignee', class:'toolbar-select'}
               - User.joins(roles: :org_subset).where(org_subsets: { name: 'file rep' }).distinct.order(:cvs_username).each do |u|
                 %option{id: u.id, value: u.id, label: u.cvs_username}
-          %button{class: 'primary', type:'button', id: 'button_reassign', onclick:'toolbar_file_rep_index_change_assignee();'}
+          %button{class: 'primary', type:'button', id: 'button_reassign', onclick:'toolbar_index_change_assignee();'}
             Assign
 
   %div
@@ -112,9 +112,6 @@
                     %input.ticket-resolution-radio{type: 'radio', name: 'ticket-resolution', id: 'UNCHANGED', value: 'UNCHANGED'}
                     %label.ticket-res-radio-label.radio-label{for: 'UNCHANGED'} Unchanged
                   %li
-                    %input.ticket-resolution-radio{type: 'radio', name: 'ticket-resolution', id: 'INVALID', value: 'INVALID'}
-                    %label.ticket-res-radio-label.radio-label{for: 'INVALID'} Invalid / Junk Mail
-                  %li
                     %input.ticket-resolution-radio{type: 'radio', name: 'ticket-resolution', id: 'TEST_TRAINING', value: 'TEST_TRAINING'}
                     %label.ticket-res-radio-label.radio-label{for: 'TEST_TRAINING'} Test / Training
                   %li
@@ -124,10 +121,21 @@
                 .resolution-comment-wrapper
                   %label.content-label-sm.customer-facing-comment
                     Customer Facing Comment
-                  %textarea.ticket-status-comment
+                  %textarea.resolution-status-comment
                   .button-row-center
-                    %button.primary.change_ticket_status_button{type:'button', id:'webrep_resolve_ticket', onclick:'change_ticket_status();'}
+                    %button.primary.change_ticket_status_button{type:'button', id:'webrep_resolve_ticket', onclick:'update_file_rep_status();'}
                       Submit
+          %li.status-radio-wrapper
+            %input.ticket-status-radio{type: 'radio', name: 'ticket-status', id: 'ON_HOLD', value: 'RE-OPENED'}
+            %label.ticket-status-radio-label.radio-label{for: 'RE-OPENED'} Re-Opened
+
+          %li.non-resolution-submit-wrapper#ticket-non-res-submit
+            %label.content-label-sm
+              Comment
+            %textarea.ticket-status-comment
+            .button-row-center
+              %button.primary.change_ticket_status_button{type:'button', id:'webrep_change_ticket_status', onclick:'update_file_rep_status();'}
+                Submit
 
     %span.dropdown
       %button#file-det-button.toolbar-button.detection-button.dropdown-toggle.esc-tooltipped{title: 'Create Detection', 'data-toggle': 'dropdown', 'aria-haspopup': 'true', 'aria-expanded': 'false'}
@@ -248,10 +256,6 @@
             -# TODO hookup submission of dropdown
             %button.primary.dropdown-submit-button{onclick: 'amp_detection_submission(event, "index");'}
               Submit
-
-
-
-
   %div
     %label.toolbar-section-label
       File
@@ -260,3 +264,4 @@
       %button.toolbar-button.export-button.esc-tooltipped{title: 'Export to CSV'}
         %span.toolbar-button-text
           Export to CSV
+
