@@ -36,6 +36,8 @@
 #
 module ApiRequester::ApiRequester
 
+  # Curl::Err::HostResolutionError
+
   class ApiRequesterError < StandardError
   end
 
@@ -185,14 +187,17 @@ module ApiRequester::ApiRequester
     def new_request(path, query = nil)
 
       request = HTTPI::Request.new(uri(path, query))
+      request.auth.gssnegotiate
 
       case verify_mode
       when 'verify-peer'
         request.ssl = true
+        request.auth.ssl.ssl_version = :TLSv1
         request.auth.ssl.verify_mode = :peer
         request.auth.ssl.ca_cert_file = ca_cert_file if ca_cert_file
       when 'verify-none'
         request.ssl = true
+        request.auth.ssl.ssl_version = :TLSv1
         request.auth.ssl.verify_mode = :none
       else #no-tls, no-ssl
         request.ssl = false

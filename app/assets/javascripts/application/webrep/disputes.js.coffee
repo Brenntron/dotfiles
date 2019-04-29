@@ -1352,7 +1352,7 @@ $ ->
         success: (response) ->
       )
 
-    if window.location.pathname == '/escalations/file_rep/disputes' ||  window.location.pathname == '/escalations/webrep/disputes'
+    if window.location.pathname.includes('/escalations/file_rep') ||  window.location.pathname.includes('/escalations/webrep')
       $('#filter-cases').show()
       $('#import-webrep').show()
     #      $('#web-rep-search').show()
@@ -1452,8 +1452,11 @@ $ ->
     $('#search_name').val("")
     $('#advanced-search-dropdown').toggle()
 
-  $(document).click ->
-    $("#advanced-search-dropdown").hide()
+  $(document).on 'click', (e)->
+    if e.target.closest('.daterangepicker') == null && e.target.closest('.available') == null
+      $("#advanced-search-dropdown").hide()
+    else
+      $("#advanced-search-dropdown").show()
 
   $(document).ready ->
     setInterval ->

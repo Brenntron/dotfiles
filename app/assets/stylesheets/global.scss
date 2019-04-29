@@ -328,7 +328,7 @@ table.dataTable.no-footer {
   label {
     height: 100%;
   }
- }
+}
 
 .table-search-input {
   width: 400px;
@@ -694,6 +694,15 @@ button {
 .disposition-button {background-image: url(image_path('icon_hazard.svg'));}
 .take-ticket-button-full {background-image: url(image_path('icon_take.svg'));}
 .icon-unassigned-bugs {background-image: url(image_path('icon_unassigned.svg'));}
+.reset-filter {
+  background-image: url(image_path('icon_reset_grey.svg'));
+  display: inline-block;
+  height: 25px;
+  width: 25px;
+  position: relative;
+  top: 2px;
+  left: 7px;}
+.reset-filter:hover {background-image: url(image_path('icon_reset_blue.svg'));}
 
 .master-submit-button {
   color: $content-bg-color;
@@ -1116,7 +1125,7 @@ thead th.sorting.center {
   height: 10px;
   position: absolute;
   background-color: white;
-  z-index: 50;
+  z-index: 1;
   margin-top: 43px;
   border-top-right-radius: 2px;
   margin-left: -1px;
@@ -1969,7 +1978,7 @@ a.static-nav-item {
   background-color: $bug-section-color;
   border: none;
   border-radius: 4px;
-  padding: 10px;
+  padding: 15px;
   margin-left: 25%;
   padding-bottom: 0
 }
@@ -1997,8 +2006,8 @@ a.static-nav-item {
 }
 
 .nav-tool-content-wrapper {
-  margin-left: -10px;
-  margin-right: -10px;
+  margin-left: -15px;
+  margin-right: -15px;
   background-color: $ac-nav-bg-color;
   padding: 20px;
   border-bottom-left-radius: 4px;
@@ -2007,7 +2016,7 @@ a.static-nav-item {
 
 #saved-searches-wrapper {
   float: right;
-  margin-top: -10px;
+  margin-top: -15px;
   border-top-right-radius: 4px;
   border-bottom-left-radius: 0;
   min-height: 388px;
@@ -2109,6 +2118,7 @@ a.static-nav-item {
 
 #advanced-search-dropdown {
   min-width: 400px;
+  z-index: 51;
 }
 #advanced-search-dropdown {
   .selectize-dropdown.multi.form-control.selectize{
@@ -3441,7 +3451,7 @@ fieldset.top-content {
   height: 10px;
   position: absolute;
   background-color: $table-dark-body;
-  z-index: 60;
+  z-index: 1;
   width: 100%;
   margin-top: -12px;
 }
@@ -3509,7 +3519,7 @@ fieldset.top-content {
   font-size: 9pt !important;
   line-height: 1.4;
   color: $type-lighter-color;
-  }
+}
 
 .email-reply-body {
   min-height: 300px;
@@ -3713,7 +3723,7 @@ input.communication-subject {
   font-size: 9pt;
   top: 23px;
   position: absolute;
- }
+}
 
 .select-a-template{
   margin-left: 26px;
@@ -3759,7 +3769,7 @@ input.communication-subject {
 
 .note-edit-button {background-image: url(image_path('icon_edit.svg'));}
 .note-copy-button {background-image: url(image_path('icon_copy.svg'));}
-.note-delete-button {background-image: url(image_path('icon_delete.svg'));}
+.note-delete-button, .filerep-note-delete-button {background-image: url(image_path('icon_delete.svg'));}
 .note-save-button {background-image: url(image_path('icon_save_grey.svg'));}
 .note-cancel-button {background-image: url(image_path('icon_cancel.svg'));}
 
@@ -4215,7 +4225,7 @@ button.tertiary {
   outline: 1px solid darken($faint-neutral-color, 5%);
 }
 
-#advanced-search-dropdown .form-group input[type='checkbox'] {
+#advanced-search-dropdown .form-group input[type='checkbox']:not(#in-sample-zoo-input) {
   border: none;
   outline: none;
   width: auto;
@@ -4290,7 +4300,7 @@ button.tertiary {
   border: none;
   float: right;
   margin-top: 3px;
-  margin-right: -26px;
+  margin-right: -33px;
 }
 
 .remove-input.remove-radio-input {
@@ -5633,7 +5643,7 @@ table.dispute_tool_current tr:last-of-type td {
   padding-bottom: 10px;
 }
 
-  /* These below can be deleted after redesign merge, or after the existing style sheet is ported. They exist in the admin redesign stylesheet. */
+/* These below can be deleted after redesign merge, or after the existing style sheet is ported. They exist in the admin redesign stylesheet. */
 .dispute-submission-type {
   background-repeat: no-repeat;
   width: 20px;
@@ -5782,7 +5792,7 @@ td.ticket-total::before {
   left: 19px;
   margin-top: -4px;
 }
- 
+
 .dashboard-left-data {
   border-right: 1px solid $content-bg-color;
 }
@@ -6006,10 +6016,13 @@ td.in_zoo{
   word-wrap: break-word;
   word-break: break-all;
   display: block !important;
-//  temporarily adding till we figure out a better solution
+  //  temporarily adding till we figure out a better solution
   width: 100px;
 }
 
+.filter-cases{
+  cursor: pointer;
+}
 .ticket-age-over3hr {
   color: $warning-accent-color;
   font-weight: bold;
@@ -6415,7 +6428,7 @@ table.dispute-entry-table tbody tr.selected {
 }
 
 .popover{
-    max-width: 100%; /* Max Width of the popover (depending on the container!) */
+  max-width: 100%; /* Max Width of the popover (depending on the container!) */
 }
 
 .nested-complaint-static-data .col-with-divider {
@@ -7398,47 +7411,47 @@ td.text-center span {
 }
 .graph-section {
   border-left: 1px solid $faint-neutral-color;
+}
+
+.graph-bar-legend {
+  padding: 0 10px;
+  border: 1px solid $faint-neutral-color;
+  float: right;
+
+  .custom-legend {
+    padding: 4px 0 20px 4px;
   }
 
-  .graph-bar-legend {
-    padding: 0 10px;
-    border: 1px solid $faint-neutral-color;
-    float: right;
-
-    .custom-legend {
-      padding: 4px 0 20px 4px;
-    }
-
-    .graph-legend-circle::before {
-      content: '';
-      float: left;
-      display: block;
-      height: 8px;
-      width: 8px;
-      border-radius: 50%;
-      margin-right: 6px;
-      margin-top: 2px;
-    }
-
-    .skyblue-legend-color::before {
-      background-color: $primary-section-color-light;
-    }
-    .yellow-legend-color::before{
-      background-color: $yellow-graph-bar
-    }
-
-    .navyblue-legend-color::before {
-      background-color: $content-tab-color;
-    }
-
-    .lightgray-legend-color::before {
-      background-color: $content-label-color;
-    }
-
-    .orange-legend-color::before {
-      background-color: $warning-accent-color;
-    }
+  .graph-legend-circle::before {
+    content: '';
+    float: left;
+    display: block;
+    height: 8px;
+    width: 8px;
+    border-radius: 50%;
+    margin-right: 6px;
+    margin-top: 2px;
   }
+
+  .skyblue-legend-color::before {
+    background-color: $primary-section-color-light;
+  }
+  .yellow-legend-color::before{
+    background-color: $yellow-graph-bar
+  }
+
+  .navyblue-legend-color::before {
+    background-color: $content-tab-color;
+  }
+
+  .lightgray-legend-color::before {
+    background-color: $content-label-color;
+  }
+
+  .orange-legend-color::before {
+    background-color: $warning-accent-color;
+  }
+}
 
 .graph-header-icon-stg {
   background-repeat: no-repeat;
@@ -7707,10 +7720,10 @@ td.text-center span {
 }
 
 #copycat-categories-selectized {
-    width: 100%;
-    height: 30px;
-    padding: 0 10px;
-    border: 1px solid #e0e0e0;
+  width: 100%;
+  height: 30px;
+  padding: 0 10px;
+  border: 1px solid #e0e0e0;
 }
 
 .copycat-tool-footer {
@@ -8328,6 +8341,40 @@ hr.thin.form-divider {
   margin-left: 35px;
 }
 
+#filerep_searchref_container{
+  & {
+    color: $primary-section-color;
+    max-width: 100%;
+    font-size: 8pt ;
+    display: none;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    margin-bottom: 30px;
+  }
+  .search-condition{
+    padding: 1px
+  }
+
+  .search-condition:not(:last-child):after {
+    content: ", ";
+  }
+  .search-condition-name{
+    text-transform: uppercase;
+    font-weight: bold;
+  }
+}
+.in-sample-zoo_container{
+  label{
+    position: relative;
+    top: 10px;
+  }
+  #in-sample-zoo-input{
+    border: none;
+    outline: none;
+  }
+}
+
 // dbinebri: file reputation - new ticket specific styles inside the new ticket container
 .escalations--file_rep--disputes-controller .dropdown-menu #new-file-rep-form {
 
@@ -8385,7 +8432,13 @@ hr.thin.form-divider {
       padding-left: 8px;
     }
   }
+  .in-sample-zoo_container{
 
+  }
+
+  .tooltipster-base{
+    white-space: nowrap;
+  }
 
   // this attachment button/icon should be hidden on page load and
   // displayed when radio button clicked, js/jquery handles this display logic
@@ -8677,7 +8730,7 @@ button.secondary.view-report-external-button {
 
   .input-group.search-group {
     padding: 3px 3px 3px 5px;
-    margin: 0 0 0 40px;
+    margin: 0 0 0 20px;
     width: 100%;
     min-width: 200px;
     max-width: 450px;
@@ -8730,7 +8783,7 @@ button.secondary.view-report-external-button {
   }
 }
 
- //dbinebri: file rep - naming guide dialog specific styles here
+//dbinebri: file rep - naming guide dialog specific styles here
 .escalations--file_rep--disputes-controller .ui-dialog[aria-describedby=dialog-naming-guide] {
   margin-top: 60px;
   margin-right: 20px;
@@ -8742,10 +8795,11 @@ button.secondary.view-report-external-button {
     font-family: 'Open Sans', sans-serif;
     font-weight: 600;
     padding-left: 40px;
+    padding-top: 11px;
     background-image: url(image_path('icon_naming_list_white2.svg'));
     background-size: 20px 20px;
     background-repeat: no-repeat;
-    background-position: 10px center;
+    background-position: 11px 9px;
   }
 }
 
@@ -8922,10 +8976,79 @@ button.secondary.view-report-external-button {
     padding-top: 1px;
   }
 }
+#temp_row .delete-search-image{
+  background-image: url(image_path('icon_cancel_grey.svg'));
+  display: block;
+  padding: 7px;
+  margin-right: 15px;
+}
 
 .score-col {
   width: 100%;
   display: block;
+}
+
+
+// Overriding standard button styles in order to animate the syncer
+#file-rep-sync-button {
+  background-image: none;
+  padding-left: 4px;
+  .toolbar-button-text {
+    line-height: 2em;
+    margin-left: 0;
+  }
+}
+
+#file-rep-sync-button::before {
+  content: '';
+  display: block;
+  width: 21px;
+  height: 21px;
+  background-image: url(image_path('icon_sync.svg'));
+  background-repeat: no-repeat;
+  float: left;
+  margin-top: 1px;
+}
+
+#file-rep-sync-button.syncing, #file-rep-sync-button.syncing:hover {
+  background-color: $bug-section-color !important;
+  color: $content-bg-color;
+}
+
+#file-rep-sync-button.syncing::before {
+  background-image: url(image_path('icon_sync_white.svg'));
+  -webkit-animation: rotate_clockwise 1.5s linear infinite;
+  -moz-animation: rotate_clockwise 1.5s linear infinite;
+  -ms-animation: rotate_clockwise 1.5s linear infinite;
+  -o-animation: rotate_clockwise 1.5s linear infinite;
+  animation: rotate_clockwise 1.5s linear infinite;
+}
+
+// kh: overwriting jquery ui slider styles
+.ui-slider.form-control.nav-tool-content-wrapper{
+  background: white!important;
+  margin-bottom: 10px
+}
+.ui-slider.form-control{
+  background: white!important;
+  margin-bottom: 10px
+}
+.ui-slider .ui-slider-handle {
+  width: 1.75em;
+  height: 2.8em;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.form-control .ui-slider-handle.ui-state-focus{
+  background: #44a9d1;
+  color: white;
+  border: none;
+}
+.form-control .ui-slider-handle.ui-state-active{
+  background: $primary-section-color;
+  border: none;
 }
 
 // Creating form dialog for when we want to use a dialog instead of a dropdown
