@@ -3,7 +3,7 @@
   .row
     .col-xs-12
       -# If user has role to edit AMP Naming Conventions, show this button
-      %button.primary.edit-button#amp-edit-button Edit AMP Naming Conventions
+      %button.primary.edit-button#amp-edit-button{onclick: 'edit_amp_naming_conventions();'} Edit AMP Naming Conventions
   .row
     .col-xs-12
       %table.table.responsive#amp-naming-details-table
@@ -19,8 +19,9 @@
         %tbody
           - @conventions.each do |convention|
             -# Hard coding this temporarily. Need to convert to database and actual data
-            %tr
-              %td= convention.pattern
+            %tr{'data-sort-sequence': "#{convention.table_sequence}"}
+              %td
+                %span= convention.pattern
               %td= convention.example
               %td= convention.engine
               %td= convention.engine_description

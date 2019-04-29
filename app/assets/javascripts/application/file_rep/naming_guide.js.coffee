@@ -10,3 +10,10 @@ $ ->
   $('#nav-banner a#naming-guide').click ->
     $('#dialog-naming-guide').dialog('open')
 
+
+#### FUNCTIONS FOR THE NAMING GUIDE PAGE ####
+
+window.edit_amp_naming_conventions = () ->
+  $('#amp-naming-details-table').sortable
+    items: '> tr'
+  $('#amp-naming-details-table').disableSelection()

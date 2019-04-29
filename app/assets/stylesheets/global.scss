@@ -9075,3 +9075,14 @@ div[aria-describedby='create-detection-dialog'] {
   padding: 10px 15px 10px 40px;
   margin: 20px 0;
 }
+
+
+#amp-naming-details-table {
+  span {
+    font-family: 'Fira Mono', monospace;
+    font-weight: 500;
+    background: darken($content-bg-color, 5%);
+    letter-spacing: 0.1px;
+    padding: 2px 4px;
+  }
+}

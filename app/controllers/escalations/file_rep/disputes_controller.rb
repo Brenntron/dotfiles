@@ -16,6 +16,7 @@ class Escalations::FileRep::DisputesController < ApplicationController
   end
 
   def naming_guide
+    # Sort records by table sequence
     @conventions = AmpNamingConvention.all
   end
 
