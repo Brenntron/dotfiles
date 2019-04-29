@@ -286,8 +286,8 @@ $ ->
           search_conditions: search_conditions
         }
 
-      format_filerep_header(data)
-      return data
+    format_filerep_header(data)
+    return data
 
   window.format_filerep_header = (data) ->
     container = $('#filerep_searchref_container')
