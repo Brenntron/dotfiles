@@ -308,7 +308,7 @@ $ ->
         new_header =
           '<div>Results for Advanced Search ' +
             reset_icon +
-            '</div>' 
+            '</div>'
 
         for condition_name, condition of search_conditions
           if condition != ''
