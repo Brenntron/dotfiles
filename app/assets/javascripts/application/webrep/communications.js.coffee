@@ -222,11 +222,6 @@ $ ->
     else if  window.location.href.includes('/webrep/disputes')
       form_data.append('dispute_type', "WebReputationDispute")
 
-    if window.location.href.includes('/file_rep/disputes')
-      form_data.append('dispute_type', "FileReputationDispute")
-    else if  window.location.href.includes('/webrep/disputes')
-      form_data.append('dispute_type', "WebReputationDispute")
-
     dispute_id = $('input[name="dispute_id"]').val()
     
     if $('form')[0].checkValidity() == true
