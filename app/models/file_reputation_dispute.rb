@@ -2,7 +2,9 @@
 class FileReputationDispute < ApplicationRecord
 
   belongs_to :customer, optional:true
-  belongs_to :assigned, class_name: 'User', foreign_key: :user_id, optional:true #TODO remove
+  has_many :file_rep_comments
+  belongs_to :assigned, class_name: 'User', foreign_key: :user_id, optional:true #TODO remove to use :user
+  belongs_to :user, optional:true
   has_many :digital_signers
   has_many :file_rep_comments
 

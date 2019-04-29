@@ -2,8 +2,7 @@ $ ->
 #  If html body is on the show page
   if $('body').hasClass('show-action')
     window.research_data()
-
-
+    
 window.research_data = () ->
   sha256_hash = $('#sha256_hash')[0].innerText
 
