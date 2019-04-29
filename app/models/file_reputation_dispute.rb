@@ -2,20 +2,30 @@
 class FileReputationDispute < ApplicationRecord
 
   belongs_to :customer, optional:true
-  belongs_to :assigned, class_name: 'User', optional:true
   has_many :file_rep_comments
+  belongs_to :assigned, class_name: 'User', foreign_key: :user_id, optional:true #TODO remove to use :user
+  belongs_to :user, optional:true
   has_many :digital_signers
+  has_many :file_rep_comments
 
   delegate :name, :company, :company_id, to: :customer, allow_nil: true, prefix: true
 
   STATUS_NEW                = 'NEW'
   STATUS_ASSIGNED           = 'ASSIGNED'
-  STATUS_CLOSED             = 'CLOSED'
+  STATUS_RESEARCHING        = 'RESEARCHING'
+  STATUS_ESCALATED          = 'ESCALATED'
+  STATUS_PENDING            = 'PENDING'
+  STATUS_ONHOLD             = 'ONHOLD'
+  STATUS_RESOLVED           = 'RESOLVED'
   STATUS_REOPENED           = 'RE-OPENED'
   STATUS_CUSTOMER_PENDING   = "CUSTOMER_PENDING"
   STATUS_CUSTOMER_UPDATE    = "CUSTOMER_UPDATE"
 
-  DISPOSITION_MALICIOUS     = 'MALICIOUS'
+  DISPOSITION_UNSEEN        = 'unseen'
+  DISPOSITION_UNKNOWN       = 'unknown'
+  DISPOSITION_MALICIOUS     = 'malicious'
+  DISPOSITION_COMMON        = 'common'
+  DISPOSITION_CLEAN         = 'clean'
 
   validates :status, :sha256_hash, :disposition_suggested, presence: true
 
@@ -51,6 +61,14 @@ class FileReputationDispute < ApplicationRecord
   # defined so tests can stub to return false.
   def self.threaded?
     true
+  end
+
+  def malicious?
+    self.disposition&.downcase == DISPOSITION_MALICIOUS.downcase
+  end
+
+  def suggested_malicious?
+    self.disposition_suggested&.downcase == DISPOSITION_MALICIOUS.downcase
   end
 
   def update_status(status)
@@ -97,8 +115,6 @@ class FileReputationDispute < ApplicationRecord
         disposition_suggested: disposition_suggested,
         source: source,
         platform: platform,
-        threatgrid_score: threat_score,
-        threatgrid_private: threatgrid_private,
         customer: customer
     }
     file_rep.assign_attributes(attributes)
@@ -195,9 +211,57 @@ class FileReputationDispute < ApplicationRecord
   def self.advanced_search(params, search_name:, user:)
 
     search_hash = non_blank_fields(params)
+    sha256_hash = search_hash.delete('sha256_hash')
+    file_name = search_hash.delete('file_name')
+    threatgrid_range = search_hash.delete('threatgrid_score') || {}
+    sandbox_range = search_hash.delete('sandbox_score') || {}
+    created_at_range = search_hash.delete('created_at') || {}
+    updated_at_range = search_hash.delete('updated_at') || {}
     dispute_fields = matching_field(search_hash)
 
     relation = where(dispute_fields)
+
+    if sha256_hash.present?
+      relation = relation.where('sha256_hash like :sha256_hash', sha256_hash: "%#{sanitize_sql_like(sha256_hash)}%")
+    end
+
+    if file_name.present?
+      relation = relation.where('file_name like :file_name', file_name: "%#{sanitize_sql_like(file_name)}%")
+    end
+
+    if threatgrid_range['from'].present?
+      relation = relation.where('threatgrid_score >= :threatgrid_from', threatgrid_from: threatgrid_range['from'].to_f)
+    end
+
+    if threatgrid_range['to'].present?
+      relation = relation.where('threatgrid_score <= :threatgrid_to', threatgrid_to: threatgrid_range['to'].to_f)
+    end
+
+    if sandbox_range['from'].present?
+      relation = relation.where('sandbox_score >= :sandbox_from', sandbox_from: sandbox_range['from'].to_f)
+    end
+
+    if sandbox_range['to'].present?
+      relation = relation.where('sandbox_score <= :sandbox_to', sandbox_to: sandbox_range['to'].to_f)
+    end
+
+    if created_at_range['from'].present?
+      relation = relation.where('created_at >= :created_at_from', created_at_from: created_at_range['from'])
+    end
+
+    if created_at_range['to'].present?
+      created_at_to = created_at_range['to']
+      relation = relation.where('created_at <= ADDDATE(:created_at_to, INTERVAL 1 DAY)', created_at_to: created_at_to)
+    end
+
+    if updated_at_range['from'].present?
+      relation = relation.where('updated_at >= :updated_at_from', updated_at_from: updated_at_range['from'])
+    end
+
+    if updated_at_range['to'].present?
+      updated_at_to = updated_at_range['to']
+      relation = relation.where('updated_at <= ADDDATE(:updated_at_to, INTERVAL 1 DAY)', updated_at_to: updated_at_to)
+    end
 
     if %w{customer_name customer_email company_name}.any? {|key_name| search_hash[key_name].present? }
       relation = relation.by_customer(customer_name: search_hash['customer_name'],
@@ -241,21 +305,17 @@ class FileReputationDispute < ApplicationRecord
     # when 'recently_viewed'
     #   joins(:dispute_peeks).where(dispute_peeks: {assigned_id: user.id})
     when 'my_open'
-      where.not(status: STATUS_CLOSED).where(assigned_id: user.id)
+      where.not(status: STATUS_RESOLVED).where(assigned_id: user.id)
     when 'my_disputes'
       where(assigned_id: user.id)
     # when 'team_disputes'
     #   where(assigned_id: user.my_team)
     when 'unassigned'
-      where(assigned_id: nil).where.not(status: STATUS_CLOSED)
+      where(assigned_id: nil).where.not(status: STATUS_RESOLVED)
     when 'open'
-      where.not(status: STATUS_CLOSED)
-    # when 'open_email'
-    #   sbrs_disputes.where(status: [STATUS_NEW, STATUS_REOPENED, STATUS_CUSTOMER_PENDING, STATUS_CUSTOMER_UPDATE, STATUS_ON_HOLD, STATUS_RESEARCHING, STATUS_ESCALATED, STATUS_ASSIGNED])
-    # when 'open_web'
-    #   wbrs_disputes.where(status: [STATUS_NEW, STATUS_REOPENED, STATUS_CUSTOMER_PENDING, STATUS_CUSTOMER_UPDATE, STATUS_ON_HOLD, STATUS_RESEARCHING, STATUS_ESCALATED, STATUS_ASSIGNED])
+      where.not(status: STATUS_RESOLVED)
     when 'closed'
-      where(status: STATUS_CLOSED)
+      where(status: STATUS_RESOLVED)
     when 'all'
       where({})
     else
@@ -307,13 +367,14 @@ class FileReputationDispute < ApplicationRecord
     if self.sha256_hash.present?
       threatgrid_response = Threatgrid::Search.query(self.sha256_hash)
 
-      self.threatgrid_score = threatgrid_response[:threat_score]
+      self.threatgrid_score = threatgrid_response[:threatgrid_score]
       self.threatgrid_private = threatgrid_response[:threatgrid_private]
+      self.threatgrid_threshold = threatgrid_response[:threatgrid_threshold]
       save!
     end
 
   rescue => except
-    Rails.logger.error("Error updating threatgrid score on id #{self.id} -- #{except.error_message}")
+    Rails.logger.error("Error updating threatgrid score on id #{self.id} -- #{except.message}")
   end
 
   def update_ticode_certs
@@ -330,26 +391,23 @@ class FileReputationDispute < ApplicationRecord
   end
 
   def update_reversing_labs_score
-    score = 0
-    api_response = FileReputationApi::ReversingLabs.sha256_lookup(self.sha256_hash)
+    update!(FileReputationApi::ReversingLabs.score(self.sha256_hash))
+  rescue => except
+    Rails.logger.error("Error updating reversing labs score on id #{self.id} -- #{except.message}")
+  end
 
-    if api_response&.dig('rl','sample','xref','entries')&.any?
-      api_response&.dig('rl','sample','xref','entries')[0]&.dig('scanners').each do |scanner|
-        if !scanner['result'].empty?
-          score += 1
-        end
-      end
+  def pdf?
+    if self.file_name.present?
+      /\.pdf$/i =~ self.file_name
     end
-
-    self.update(reversing_labs_score: score)
   end
 
   def update_sandbox_score
-    sandbox_response = FileReputationApi::Sandbox.sandbox_score(self.sha256_hash)
-
-    if sandbox_response.present? && sandbox_response[:success] == true
-      self.update(sandbox_score: sandbox_response[:data])
-    end
+    sandbox_score = FileReputationApi::Sandbox.score(self.sha256_hash)
+    sandbox_threshold = self.pdf? ? 90.0 : 61.0
+    update!(sandbox_score: sandbox_score, sandbox_threshold: sandbox_threshold)
+  rescue => except
+    Rails.logger.error("Error updating sandbox score on id #{self.id} -- #{except.message}")
   end
 
   def update_scores
@@ -371,8 +429,9 @@ class FileReputationDispute < ApplicationRecord
 
   #for support with incoming bridge messages from TI coming into messages_controller
   def self.process_bridge_payload(message_payload, customer_payload)
+    new_dispute = nil
+
     user = User.where(cvs_username:"vrtincom").first
-    begin
       ActiveRecord::Base.transaction do
 
         guest = Company.where(:name => "Guest").first
@@ -419,8 +478,54 @@ class FileReputationDispute < ApplicationRecord
         new_dispute.platform = message_payload[:platform]
 
         new_dispute.save
-        new_dispute
+
       end #transaction
-    end #begin
+
+    # This is so the tests can stub out the `threaded?` method and test synchronously.
+    if new_dispute
+      if FileReputationDispute.threaded?
+        Thread.new do
+          new_dispute.update_scores
+        end
+      else
+        new_dispute.update_scores
+      end
+    end
+
+    new_dispute
+  end
+
+  def self.take_tickets(dispute_ids, user:)
+    FileReputationDispute.transaction do
+      unless 0 == FileReputationDispute.where(id: dispute_ids).where.not(user_id: User.vrtincoming.id).count
+        raise 'Some of these ticket are already assigned.'
+      end
+      FileReputationDispute.assign(dispute_ids, user: user)
+    end
+  end
+
+
+  def self.assign(dispute_ids, user:)
+    disputes_ary = []
+    user_id = user.kind_of?(User) ? user.id : user
+
+    FileReputationDispute.transaction do
+      disputes = FileReputationDispute.where(id: dispute_ids, status: [FileReputationDispute::STATUS_NEW, FileReputationDispute::STATUS_REOPENED])
+      disputes_ary = disputes.all.to_a
+
+      disputes.update_all(user_id: user_id, status: FileReputationDispute::STATUS_ASSIGNED)
+    end
+
+    disputes_ary
+  end
+
+  def return_dispute
+    update!(user_id: User.vrtincoming.id, status: FileReputationDispute::STATUS_NEW)
+  end
+
+  def bytes_to_kb
+    if file_size.present?
+      self.file_size/1024
+    end
   end
 end

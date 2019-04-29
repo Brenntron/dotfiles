@@ -328,7 +328,7 @@ table.dataTable.no-footer {
   label {
     height: 100%;
   }
- }
+}
 
 .table-search-input {
   width: 400px;
@@ -614,6 +614,7 @@ button {
 
 .toolbar-section-label {
   position: absolute;
+  display: block;
   margin-top: -18px;
   color: $content-label-color !important;
   font-size: 7pt;
@@ -693,6 +694,15 @@ button {
 .disposition-button {background-image: url(image_path('icon_hazard.svg'));}
 .take-ticket-button-full {background-image: url(image_path('icon_take.svg'));}
 .icon-unassigned-bugs {background-image: url(image_path('icon_unassigned.svg'));}
+.reset-filter {
+  background-image: url(image_path('icon_reset_grey.svg'));
+  display: inline-block;
+  height: 25px;
+  width: 25px;
+  position: relative;
+  top: 2px;
+  left: 7px;}
+.reset-filter:hover {background-image: url(image_path('icon_reset_blue.svg'));}
 
 .master-submit-button {
   color: $content-bg-color;
@@ -1115,7 +1125,7 @@ thead th.sorting.center {
   height: 10px;
   position: absolute;
   background-color: white;
-  z-index: 50;
+  z-index: 1;
   margin-top: 43px;
   border-top-right-radius: 2px;
   margin-left: -1px;
@@ -1968,7 +1978,7 @@ a.static-nav-item {
   background-color: $bug-section-color;
   border: none;
   border-radius: 4px;
-  padding: 10px;
+  padding: 15px;
   margin-left: 25%;
   padding-bottom: 0
 }
@@ -1996,8 +2006,8 @@ a.static-nav-item {
 }
 
 .nav-tool-content-wrapper {
-  margin-left: -10px;
-  margin-right: -10px;
+  margin-left: -15px;
+  margin-right: -15px;
   background-color: $ac-nav-bg-color;
   padding: 20px;
   border-bottom-left-radius: 4px;
@@ -2006,7 +2016,7 @@ a.static-nav-item {
 
 #saved-searches-wrapper {
   float: right;
-  margin-top: -10px;
+  margin-top: -15px;
   border-top-right-radius: 4px;
   border-bottom-left-radius: 0;
   min-height: 388px;
@@ -2108,6 +2118,7 @@ a.static-nav-item {
 
 #advanced-search-dropdown {
   min-width: 400px;
+  z-index: 51;
 }
 #advanced-search-dropdown {
   .selectize-dropdown.multi.form-control.selectize{
@@ -2151,6 +2162,10 @@ a.static-nav-item {
   margin-bottom: 3px;
   font-weight: 400;
   text-transform: none;
+}
+
+.content-label-sm.content-label-fullwidth {
+  width: 100%;
 }
 
 .content-label-sm.multi-input-form-row {
@@ -3436,7 +3451,7 @@ fieldset.top-content {
   height: 10px;
   position: absolute;
   background-color: $table-dark-body;
-  z-index: 60;
+  z-index: 1;
   width: 100%;
   margin-top: -12px;
 }
@@ -3504,7 +3519,7 @@ fieldset.top-content {
   font-size: 9pt !important;
   line-height: 1.4;
   color: $type-lighter-color;
-  }
+}
 
 .email-reply-body {
   min-height: 300px;
@@ -3708,7 +3723,7 @@ input.communication-subject {
   font-size: 9pt;
   top: 23px;
   position: absolute;
- }
+}
 
 .select-a-template{
   margin-left: 26px;
@@ -3754,7 +3769,7 @@ input.communication-subject {
 
 .note-edit-button {background-image: url(image_path('icon_edit.svg'));}
 .note-copy-button {background-image: url(image_path('icon_copy.svg'));}
-.note-delete-button {background-image: url(image_path('icon_delete.svg'));}
+.note-delete-button, .filerep-note-delete-button {background-image: url(image_path('icon_delete.svg'));}
 .note-save-button {background-image: url(image_path('icon_save_grey.svg'));}
 .note-cancel-button {background-image: url(image_path('icon_cancel.svg'));}
 
@@ -4210,7 +4225,7 @@ button.tertiary {
   outline: 1px solid darken($faint-neutral-color, 5%);
 }
 
-#advanced-search-dropdown .form-group input[type='checkbox'] {
+#advanced-search-dropdown .form-group input[type='checkbox']:not(#in-sample-zoo-input) {
   border: none;
   outline: none;
   width: auto;
@@ -4285,7 +4300,7 @@ button.tertiary {
   border: none;
   float: right;
   margin-top: 3px;
-  margin-right: -26px;
+  margin-right: -33px;
 }
 
 .remove-input.remove-radio-input {
@@ -4607,7 +4622,7 @@ table > tbody > tr > td.dispute_rep_tools {
   border-radius: 2px;
   border: none;
   background-repeat: no-repeat;
-  margin:0 1px;
+  margin:0 3px;
   display: inline-block;
 }
 
@@ -4743,10 +4758,15 @@ table > tbody > tr > td.dispute_rep_tools {
   border: 1px solid $faint-neutral-color !important;;
 }
 
-.dropdown-comment {
+.dropdown-comment, .form-comment-box {
   width: 100%;
   min-height: 20px;
   border: 1px solid darken($faint-neutral-color, 5%);
+}
+
+.form-comment-box {
+  display: block;
+  min-height: 90px;
 }
 
 .datatable-top-tools {
@@ -5623,7 +5643,7 @@ table.dispute_tool_current tr:last-of-type td {
   padding-bottom: 10px;
 }
 
-  /* These below can be deleted after redesign merge, or after the existing style sheet is ported. They exist in the admin redesign stylesheet. */
+/* These below can be deleted after redesign merge, or after the existing style sheet is ported. They exist in the admin redesign stylesheet. */
 .dispute-submission-type {
   background-repeat: no-repeat;
   width: 20px;
@@ -5772,7 +5792,7 @@ td.ticket-total::before {
   left: 19px;
   margin-top: -4px;
 }
- 
+
 .dashboard-left-data {
   border-right: 1px solid $content-bg-color;
 }
@@ -5996,10 +6016,13 @@ td.in_zoo{
   word-wrap: break-word;
   word-break: break-all;
   display: block !important;
-//  temporarily adding till we figure out a better solution
+  //  temporarily adding till we figure out a better solution
   width: 100px;
 }
 
+.filter-cases{
+  cursor: pointer;
+}
 .ticket-age-over3hr {
   color: $warning-accent-color;
   font-weight: bold;
@@ -6074,8 +6097,8 @@ table.dispute-entry-table tbody tr.selected {
   border: none;
   background-color: #6dbcdb;
   min-width: 200px;
-  top: 16px;
-  left: 4px;
+  top: 18px;
+  left: 3px;
 }
 
 .dispute-owner-buttons-wrapper h3 {
@@ -6405,7 +6428,7 @@ table.dispute-entry-table tbody tr.selected {
 }
 
 .popover{
-    max-width: 100%; /* Max Width of the popover (depending on the container!) */
+  max-width: 100%; /* Max Width of the popover (depending on the container!) */
 }
 
 .nested-complaint-static-data .col-with-divider {
@@ -7388,47 +7411,47 @@ td.text-center span {
 }
 .graph-section {
   border-left: 1px solid $faint-neutral-color;
+}
+
+.graph-bar-legend {
+  padding: 0 10px;
+  border: 1px solid $faint-neutral-color;
+  float: right;
+
+  .custom-legend {
+    padding: 4px 0 20px 4px;
   }
 
-  .graph-bar-legend {
-    padding: 0 10px;
-    border: 1px solid $faint-neutral-color;
-    float: right;
-
-    .custom-legend {
-      padding: 4px 0 20px 4px;
-    }
-
-    .graph-legend-circle::before {
-      content: '';
-      float: left;
-      display: block;
-      height: 8px;
-      width: 8px;
-      border-radius: 50%;
-      margin-right: 6px;
-      margin-top: 2px;
-    }
-
-    .skyblue-legend-color::before {
-      background-color: $primary-section-color-light;
-    }
-    .yellow-legend-color::before{
-      background-color: $yellow-graph-bar
-    }
-
-    .navyblue-legend-color::before {
-      background-color: $content-tab-color;
-    }
-
-    .lightgray-legend-color::before {
-      background-color: $content-label-color;
-    }
-
-    .orange-legend-color::before {
-      background-color: $warning-accent-color;
-    }
+  .graph-legend-circle::before {
+    content: '';
+    float: left;
+    display: block;
+    height: 8px;
+    width: 8px;
+    border-radius: 50%;
+    margin-right: 6px;
+    margin-top: 2px;
   }
+
+  .skyblue-legend-color::before {
+    background-color: $primary-section-color-light;
+  }
+  .yellow-legend-color::before{
+    background-color: $yellow-graph-bar
+  }
+
+  .navyblue-legend-color::before {
+    background-color: $content-tab-color;
+  }
+
+  .lightgray-legend-color::before {
+    background-color: $content-label-color;
+  }
+
+  .orange-legend-color::before {
+    background-color: $warning-accent-color;
+  }
+}
 
 .graph-header-icon-stg {
   background-repeat: no-repeat;
@@ -7697,10 +7720,10 @@ td.text-center span {
 }
 
 #copycat-categories-selectized {
-    width: 100%;
-    height: 30px;
-    padding: 0 10px;
-    border: 1px solid #e0e0e0;
+  width: 100%;
+  height: 30px;
+  padding: 0 10px;
+  border: 1px solid #e0e0e0;
 }
 
 .copycat-tool-footer {
@@ -8318,6 +8341,40 @@ hr.thin.form-divider {
   margin-left: 35px;
 }
 
+#filerep_searchref_container{
+  & {
+    color: $primary-section-color;
+    max-width: 100%;
+    font-size: 8pt ;
+    display: none;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    margin-bottom: 30px;
+  }
+  .search-condition{
+    padding: 1px
+  }
+
+  .search-condition:not(:last-child):after {
+    content: ", ";
+  }
+  .search-condition-name{
+    text-transform: uppercase;
+    font-weight: bold;
+  }
+}
+.in-sample-zoo_container{
+  label{
+    position: relative;
+    top: 10px;
+  }
+  #in-sample-zoo-input{
+    border: none;
+    outline: none;
+  }
+}
+
 // dbinebri: file reputation - new ticket specific styles inside the new ticket container
 .escalations--file_rep--disputes-controller .dropdown-menu #new-file-rep-form {
 
@@ -8375,7 +8432,13 @@ hr.thin.form-divider {
       padding-left: 8px;
     }
   }
+  .in-sample-zoo_container{
 
+  }
+
+  .tooltipster-base{
+    white-space: nowrap;
+  }
 
   // this attachment button/icon should be hidden on page load and
   // displayed when radio button clicked, js/jquery handles this display logic
@@ -8667,7 +8730,7 @@ button.secondary.view-report-external-button {
 
   .input-group.search-group {
     padding: 3px 3px 3px 5px;
-    margin: 0 0 0 40px;
+    margin: 0 0 0 20px;
     width: 100%;
     min-width: 200px;
     max-width: 450px;
@@ -8720,7 +8783,7 @@ button.secondary.view-report-external-button {
   }
 }
 
- //dbinebri: file rep - naming guide dialog specific styles here
+//dbinebri: file rep - naming guide dialog specific styles here
 .escalations--file_rep--disputes-controller .ui-dialog[aria-describedby=dialog-naming-guide] {
   margin-top: 60px;
   margin-right: 20px;
@@ -8732,10 +8795,11 @@ button.secondary.view-report-external-button {
     font-family: 'Open Sans', sans-serif;
     font-weight: 600;
     padding-left: 40px;
+    padding-top: 11px;
     background-image: url(image_path('icon_naming_list_white2.svg'));
     background-size: 20px 20px;
     background-repeat: no-repeat;
-    background-position: 10px center;
+    background-position: 11px 9px;
   }
 }
 
@@ -8912,8 +8976,178 @@ button.secondary.view-report-external-button {
     padding-top: 1px;
   }
 }
+#temp_row .delete-search-image{
+  background-image: url(image_path('icon_cancel_grey.svg'));
+  display: block;
+  padding: 7px;
+  margin-right: 15px;
+}
 
 .score-col {
   width: 100%;
   display: block;
+}
+
+// kh: overwriting jquery ui slider styles
+.ui-slider.form-control.nav-tool-content-wrapper{
+  background: white!important;
+  margin-bottom: 10px
+}
+.ui-slider.form-control{
+  background: white!important;
+  margin-bottom: 10px
+}
+.ui-slider .ui-slider-handle {
+  width: 1.75em;
+  height: 2.8em;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.form-control .ui-slider-handle.ui-state-focus{
+  background: #44a9d1;
+  color: white;
+  border: none;
+}
+.form-control .ui-slider-handle.ui-state-active{
+  background: $primary-section-color;
+  border: none;
+}
+
+// Creating form dialog for when we want to use a dialog instead of a dropdown
+.form-dialog {
+  font-family: 'Open Sans', sans-serif !important;
+  border-radius: 4px;
+  border: none !important;
+  .ui-dialog-titlebar {
+    background-color: $bug-section-color;
+    line-height: 2.25em;
+    height: 54px;
+    padding-left: 15px;
+
+    .ui-dialog-title {
+      font-size: 14pt;
+      font-weight: 300;
+    }
+  }
+  .form-wrapper {
+    padding: 20px;
+  }
+  .form-control, input, textarea {
+    background-color: transparent;
+    border: 4px solid $content-bg-color;
+    outline: 1px solid darken($faint-neutral-color, 12%);
+  }
+  input {
+    height: 24px;
+    margin-top: 1px;
+  }
+  input:focus, textarea:focus {
+    outline: 1px solid darken($faint-neutral-color, 12%);
+    border: 4px solid $content-bg-color;
+  }
+  input:focus {
+    height: 28px;
+    margin-top: -1px;
+  }
+}
+
+div[aria-describedby='create-detection-dialog'] {
+  .ui-dialog-title {
+    padding-left: 36px;
+    background-size: 26px 26px;
+    background-repeat: no-repeat;
+    background-position: left center;
+    background-image: url(image_path('icon_target_white.svg'));
+  }
+}
+
+.form-group {
+  .nested-col-row {
+    margin-right: -4px;
+    margin-left: -4px;
+  }
+  .nested-col {
+    padding: 0 4px;
+  }
+}
+
+.uneditable-formfield {
+  line-height: 2em;
+  color: $type-lighter-color;
+}
+
+
+#file-det-dropdown {
+  min-width: 420px;
+}
+
+#new-amp-detection-name-section{ display: none;}
+#new-amp-detection-name-dd-section {
+  display: none;
+  select.form-control {
+    font-size: 8pt;
+    height: 25px;
+  }
+  select.form-control:focus {
+    margin-top: -6px;
+    height: 25px;
+  }
+  input {
+    height: 25px;
+    margin-top: -6px;
+    width: 100%;
+  }
+  .nested-col-row {
+    margin-top: 4px;
+    margin-right: -2px !important;
+    margin-left: -2px;
+  }
+  .uneditable-formfield {
+    font-size: 8pt;
+  }
+}
+
+.toolbar .dropdown.open .toolbar-button.detection-button {
+  background-image: url(image_path('icon_target_white.svg'));
+}
+
+.tg-data-present, .tg-data-missing, .sb-data-present, .sb-data-missing, .rl-data-present, .rl-data-missing {
+  display: none;
+}
+
+
+// dbinebri: adding button here for download json buttons
+.download-small-button {
+  background-image: url(image_path('icon_download.svg'));
+  background-repeat: no-repeat;
+  width: 20px;
+  height: 23px;
+  float: right;
+  display: inline-block;
+  border: none;
+}
+
+// dbinebri: make sure the full json areas stay visible in collapsed state
+.data-report-wrapper {
+  .collapse {
+    display: block;
+    visibility: visible;
+    overflow: scroll;
+    &.in {  // .in is expanded state
+      overflow-y: hidden;
+    }
+  }
+}
+
+// dbinebri: ensure json areas stay at a min-height on collapse, and gray on expand/collapse transition
+#collapse_tg_json, #collapse_sb_json {
+  min-height: 300px;
+  margin: 0 2px;
+  background: darken($content-bg-color, 4%);
+  .report-size {
+    padding: 0;
+    width: initial;
+  }
 }

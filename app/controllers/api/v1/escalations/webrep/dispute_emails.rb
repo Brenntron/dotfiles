@@ -84,7 +84,6 @@ module API
                     # end
 
                     if params[:dispute_id].present?
-                      dispute =
                           case params[:dispute_type]
                           when 'FileReputationDispute'
                             dispute = FileReputationDispute.find(params[:dispute_id])

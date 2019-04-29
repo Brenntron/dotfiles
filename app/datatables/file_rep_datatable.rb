@@ -24,7 +24,8 @@ class FileRepDatatable < AjaxDatatablesRails::ActiveRecord
       disposition_suggested: { data: :disposition_suggested, source: 'FileReputationDispute.disposition_suggested', cond: :string_eq },
       source:             { data: :source, source: 'FileReputationDispute.source', cond: :like },
       platform:           { data: :platform, source: 'FileReputationDispute.platform', cond: :like },
-      sandbox_score:      { data: :sandbox_score, source: 'FileReputationDispute.sandbox_score', cond: :like },
+      sandbox_score:      { data: :sandbox_score, source: 'FileReputationDispute.sandbox_score', cond: :eq },
+      sandbox_count:      { data: :sandbox_count, source: 'FileReputationDispute.sandbox_count', cond: :eq },
       sandbox_threshold:  { data: :sandbox_threshold, source: 'FileReputationDispute.sandbox_threshold', cond: :like },
       sandbox_under:      { data: :sandbox_under, source: 'FileReputationDispute.sandbox_under', cond: :like },
       sandbox_signer:     { data: :sandbox_signer, source: 'FileReputationDispute.sandbox_signer', cond: :like },
@@ -63,7 +64,7 @@ class FileRepDatatable < AjaxDatatablesRails::ActiveRecord
           resolution:                   file_rep.resolution,
           assigned:                     file_rep.assigned&.cvs_username,
           file_name:                    file_rep.file_name,
-          file_size:                    file_rep.file_size,
+          file_size:                    file_rep.bytes_to_kb,
           sha256_hash:                  file_rep.sha256_hash,
           sample_type:                  file_rep.sample_type,
           disposition:                  file_rep.disposition,
@@ -82,11 +83,13 @@ class FileRepDatatable < AjaxDatatablesRails::ActiveRecord
           threatgrid_under:             threatgrid_under,
           threatgrid_signer:            file_rep.threatgrid_signer,
           reversing_labs_score:         file_rep.reversing_labs_score,
+          reversing_labs_count:         file_rep.reversing_labs_count,
           reversing_labs_signer:        file_rep.reversing_labs_signer,
           customer_name:                file_rep.customer&.name,
           customer_email:               file_rep.customer&.email,
           customer_company_name:        file_rep.customer&.company&.name,
           DT_RowId:                     file_rep.id,
+          current_user:                 @user.cvs_username
       }
     end
   end

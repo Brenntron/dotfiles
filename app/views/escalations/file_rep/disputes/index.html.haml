@@ -155,58 +155,9 @@
             %button{class: 'primary', type:'button', id: 'button_reassign', onclick:'toolbar_index_change_assignee();'}
               Submit
 
-      %span.dropdown
-        %button#file-det-button.toolbar-button.detection-button.dropdown-toggle.esc-tooltipped{title: 'Create Detection', 'data-toggle': 'dropdown', 'aria-haspopup': 'true', 'aria-expanded': 'false'}
-          %span.toolbar-button-text
-            Create Detection
-        .dropdown-menu.toolbar-dropdown#file-det-dropdown{'aria-labelledby': 'file-disp-button'}
-          .inline-tool-content-wrapper.plain-inline-dropdown-wrapper
-            .row
-              .col-xs-12
-                %label.content-label-sm.full-row-label  Detection Name
-            .row
-              .col-xs-4
-                %select
-                  -# TODO Add correct detection options here, these are placeholders
-                  %option Win32
-                  %option Trojan
-                  %option PUA
-                  %option Virus
-                  %option Generic
-              .col-xs-6
-                %input.text-input{type: 'text'}
-              .col-xs-2
-                %span.file-name-extension .Talos
-            .row
-              .col-xs-12
-                %label.content-label-sm.full-row-label  Disposition
-            .row
-              .col-xs-12
-                %select
-                  -# TODO Add actual disposition options here, these are placeholders
-                  %option Clean
-                  %option Common
-                  %option Malicious
-                  %option Unknown
-            %hr.thin
-            .comment-wrapper
-              %label.content-label-sm Comment
-              %textarea.dropdown-comment
-            .button-row-center
-              -# TODO hookup submission of dropdown
-              %button.primary.dropdown-submit-button Submit
-
-
-
-
-    %div
-      %label.toolbar-section-label
-        File
-      %form#disputes-index-export-form{action: escalations_webrep_disputes_path(format: :xlsx), method: :get}
-        = hidden_field_tag('data_json', '{}', id: 'disputes-index-export-data-input')
-        %button.toolbar-button.export-button.esc-tooltipped{title: 'Export to CSV'}
-          %span.toolbar-button-text
-            Export to CSV
+  %h1#filerep-index-title All File Reputation Tickets
+  #filerep_searchref_container{onmouseover: "triggerTooltips(this)"}
+  = render('index_toolbar')
 
   .row
     .col-xs-12
