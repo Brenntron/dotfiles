@@ -13,16 +13,15 @@ Feature: Disputes
     And I wait for "3" seconds
     Then I should see "updated successfully."
 
-  # Need to stub the API call
-#  @javascript
-#  Scenario: an analyst tries to create a FileRep ticket
-#    Given a user with role "filerep user" exists and is logged in
-#    And I go to "/escalations/file_rep/disputes"
-#    Then I click "#new-dispute"
-#    Then I fill in "shas_list" with "343518b26e0a872772808605f9f28aa75f64d86a6608e1347c979d033a72cb54"
-#    Then I click ".primary"
-#    Then I wait for "30" seconds
-#    Then a FileRep Ticket should have been created
+  @javascript
+  Scenario: an analyst tries to create a FileRep ticket
+    Given a user with role "filerep user" exists and is logged in
+    And I go to "/escalations/file_rep/disputes"
+    Then I click "#new-dispute"
+    Then I fill in "shas_list" with "343518b26e0a872772808605f9f28aa75f64d86a6608e1347c979d033a72cb54"
+    Then I click ".primary"
+    Then I wait for "30" seconds
+    Then a FileRep Ticket should have been created
 
   @javascript
   Scenario: a user tries to visit the FileRep disputes page without a FileRep role
@@ -272,7 +271,7 @@ Feature: Disputes
     And I should see my username
 
   @javascript
-  Scenario: a user visits the FileRep Dispute show page and takes ticket
+  Scenario: a user visits the FileRep Dispute show page and takes a ticket
     Given the following users exist
     |id| cvs_username |
     |1 | vrtincom     |
@@ -284,7 +283,7 @@ Feature: Disputes
     And I should see my username
 
   @javascript
-  Scenario: a user visits the FileRep Dispute show page and returns ticket
+  Scenario: a user visits the FileRep Dispute show page and returns a ticket
     Given the following users exist
     |id| cvs_username |
     |1 | vrtincom     |
@@ -314,4 +313,27 @@ Feature: Disputes
     And I should see "ancheng3@cisco.com"
     And I should see "Cucumber Testing"
 
+  @javascript
+  Scenario: a user visits the FileRep Dispute index page and takes a ticket
+    And a user with role "filerep user" exists and is logged in
+    And A FileRep Dispute with trait "default" exists
+    When I go to "/escalations/file_rep/disputes/"
+    And I click "#file-index-table-show-columns-button"
+    And I click "#assignee-checkbox"
+    And I click ".inline-take-dispute-1"
+    Then I should not see "ERROR UPDATING TICKET."
+    And I should see my username
 
+  @javascript
+  Scenario: a user visits the FileRep Dispute index page and takes a ticket
+    Given the following users exist
+    |id| cvs_username |
+    |1 | vrtincom     |
+    And a user with role "filerep user" exists and is logged in
+    And A FileRep Dispute with trait "assigned" exists
+    When I go to "/escalations/file_rep/disputes/"
+    And I click "#file-index-table-show-columns-button"
+    And I click "#assignee-checkbox"
+    And I click ".inline-return-ticket-1"
+    Then I should not see "ERROR UPDATING TICKET."
+    Then I should see "Unassigned"
