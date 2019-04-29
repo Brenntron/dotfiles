@@ -123,32 +123,270 @@ window.file_rep_show_change_assignee = (dispute_id) ->
 $ ->
   file_rep_url = $('#file-rep-datatable').data('source')
   current_url = window.location.href
+  time_submitted = ''
+  last_updated = ''
+  sandbox_score = ''
+  threatgrid_score = ''
+
+  window.triggerTooltips = (item) ->
+    $('.tooltip_content').show()
+    $('.nested-tooltipped').tooltipster
+      theme: [
+        'tooltipster-borderless'
+        'tooltipster-borderless-customized'
+      ]
+      side: 'bottom'
+    return
+  window.reset_slider = (slider) ->
+    if slider == "sandbox"
+      sandbox_score = ''
+    else
+      threatgrid_score = ''
+
+  window.file_rep_reset_search = () ->
+    inputs = document.getElementsByClassName('form-control')
+    time_submitted = ''
+    last_updated = ''
+    sandbox_score = ''
+    threatgrid_score = ''
+
+    for i in inputs
+      i.value = ""
+
+      if $(i).is('#status-input, #sha256-input, #amp-disposition-input, #sandbox-score-input, #tg-score-input, #suggested-disposition-input')
+        $(i).closest('.form-group').removeClass('hidden')
+      else
+        $(i).closest('.form-group').addClass('hidden')
+
+      if $(i).hasClass('ui-slider')
+        values = [ 25, 75 ]
+        $(i).slider({
+          values: values
+        })
+
+        slider_1 = $(i).find('.ui-slider-handle')[0]
+        slider_2 = $(i).find('.ui-slider-handle')[1]
+        $(slider_1).text(values[0])
+        $(slider_2).text(values[1])
+
+
+  window.refresh_localStorage = () ->
+    localStorage.removeItem('search_type')
+    localStorage.removeItem('search_name')
+    localStorage.removeItem('search_conditions')
+
+  window.refresh_url = (href) ->
+    {search_type, search_name} = localStorage
+    url_check = current_url.split('/escalations/file_rep/disputes/')[0]
+    new_url = '/escalations/file_rep/disputes'
+
+    if href != undefined
+      window.location.replace(new_url + href)
+
+    if !href && typeof parseInt(url_check) == 'number'
+      window.location.replace('/escalations/file_rep/disputes')
+
+  $(document).on 'click', '#refresh-filter-button', (e) ->
+    refresh_localStorage()
+    refresh_url()
+
+  window.build_named_search = (search_name) ->
+    localStorage.search_type = 'named'
+    localStorage.search_name = search_name
+    localStorage.removeItem('search_conditions')
+
+    refresh_url()
+
+  window.build_contains_search = (contains) ->
+    refresh_localStorage()
+    refresh_url()
+
+
+  window.build_advanced_data = () ->
+    form = $('#filerep_disputes-advanced-search-form')
+    localStorage.search_type = 'advanced'
+    localStorage.search_name = form.find('input[name="search_name"]').val()
+    localStorage.search_conditions = JSON.stringify(
+      id: form.find('input[id="caseid-input"]').val()
+      created_at: time_submitted
+      updated_at: last_updated
+      status: form.find('input[id="status-input"]').val()
+      resolution: form.find('input[id="resolution-input"]').val()
+      assigned: form.find('input[id="assignee-input"]').val()
+      file_name: form.find('input[id="file-name-input"]').val()
+      file_size: form.find('input[id="file-size-input"]').val()
+      sha256_hash: form.find('input[id="sha256-input"]').val()
+      sample_type: form.find('input[id="sample-type-input"]').val()
+      disposition: form.find('input[id="amp-disposition-input"]').val()
+      disposition_suggested: form.find('input[id="suggested-disposition-input"]').val()
+      sandbox_score: sandbox_score
+      threatgrid_score: threatgrid_score
+      detection_name: form.find('input[id="amp-detection-name-input"]').val()
+      in_zoo: form.find('input[id="in-sample-zoo-input"]:checked').val()
+      reversing_labs: form.find('input[id="reversing-labs-input"]').val()
+      submitter_type: form.find('input[id="submitter-type-input"]').val()
+      customer_type: form.find('input[id="customer-type-input"]').val()
+      customer_name: form.find('input[id="customer-name-input"]').val()
+      customer_email: form.find('input[id="customer-email-input"]').val()
+      customer_company_name: form.find('input[id="customer-company-input"]').val()
+    )
+
+    refresh_url()
+    file_rep_reset_search()
 
 
   window.build_data = () ->
+    data = {
+      search_type: ''
+      search_name: ''
+    }
 
-    if current_url.includes('/file_rep/disputes?f=')
-#      if the current url includes the above, it is a standard search'
-      status_param_regex = /f=(.*)/
-      search_type = 'standard'
-      search_name = status_param_regex.exec(current_url)[1]
+    if location.search != ''
+#      if the location.search has value, it is a standard search
 
-      format_filerep_header(search_type, search_name)
-
-      return {
-        search_type: search_type
-        search_name : search_name
+      data ={
+        search_type : 'standard'
+        search_name : location.search.replace('?f=', '')
       }
-    else
-      return
+      refresh_localStorage()
 
-  window.format_filerep_header = (search_type, search_name) ->
-    if search_type = 'standard'
-      search_name = search_name.replace(/_/g, " ")
-      new_header = '<span class="text-capitalize">' + search_name + ' tickets </span>'
-    $('#filerep-index-title')[0].innerHTML = new_header
+    else if localStorage.search_type
+
+      {search_type, search_name, search_conditions} = localStorage
+
+      if search_type == 'advanced'
+        search_conditions = JSON.parse(search_conditions)
+
+        if search_conditions.in_zoo
+          {in_zoo} = search_conditions.in_zoo
+          search_conditions.in_zoo = in_zoo == 'checked' ? true : false
+
+        data ={
+            search_type: search_type
+            search_name: search_name
+            search_conditions: search_conditions
+          }
+      else if search_type == 'named'
+        data = {
+          search_type: search_type
+          search_name: search_name
+        }
+
+      format_filerep_header(data)
+      return data
+
+  window.format_filerep_header = (data) ->
+    container = $('#filerep_searchref_container')
+    if data != undefined && container.length > 0
+      reset_icon = '<span id="refresh-filter-button" class="reset-filter esc-tooltipped" title="Clear Search Results"></span>'
+      {search_type, search_name} = data
+
+      if search_type == 'standard'
+        new_header =
+          '<div>' +
+          '<span class="text-capitalize">' + search_name.replace(/_/g, " ") + ' tickets </span>' +
+          reset_icon +
+          '</div>'
+
+      else if search_type == 'advanced'
+        search_condition_tooltip = []
+        search_conditions = JSON.parse(localStorage.search_conditions)
+        new_header =
+          '<div>Results for Advanced Search ' +
+            reset_icon +
+            '</div>'
+
+        for condition_name, condition of search_conditions
+          if condition != ''
+            condition_name = condition_name.replace(/_/g, " ").toUpperCase()
+            condition_name_HTML = '<span class="search-condition-name text-uppercase">' + condition_name + ': </span>'
+
+            if typeof condition == 'object'
+              condition_HTML = '<span>' + condition.from  + ' - ' + condition.to+ '</span>'
+            else
+              condition_HTML = '<span>' + condition + '</span>'
+
+            search_condition_tooltip.push(condition_name + ': ' + $(condition_HTML).text())
+
+            container.append('<span class="search-condition">' + condition_name_HTML + condition_HTML + '</span>')
+
+
+        if search_condition_tooltip.length > 0
+          container.css('display', 'inline-block')
+          container.addClass('esc-tooltipped')
+
+          list = document.createElement('ul')
+          $(list).addClass('tooltip_content')
+          for  li in search_condition_tooltip
+            item = document.createElement('li')
+            item.appendChild(document.createTextNode(li))
+
+            list.appendChild(item)
+
+          container.prepend(list)
+          $(list).hide()
+
+          container.attr('data-tooltip-content', '.tooltip_content')
+
+
+      else if search_type == 'named'
+        new_header =
+          '<div>Results for "' + search_name + '" Saved Search' +
+          reset_icon +
+          '</div>'
+
+      else
+        new_header = 'All File Reputation Tickets'
+
+      $('#filerep-index-title')[0].innerHTML = new_header
 
   $('#file-rep-datatable').dataTable
+    drawCallback: ( settings ) ->
+      if localStorage.search_name
+
+        {search_type, search_name, search_conditions } = localStorage
+        last_tr = $('.filerep-named-search-list .saved-search').last().text()
+
+        ### check variables below
+            text_check makes sure that the last table row doesn't match the named search being saved now
+            search_name_check makes sure that the search is being saved as a named search
+            Not super complicated, but that if statement was looking gross and confusing
+        ###
+
+        text_check = last_tr.trim() != search_name.trim()
+        search_name_check = search_name != ''
+
+        if search_type == 'advanced' && search_name_check && text_check
+          ###
+            creating temporary tr for the filter dropdown
+            attributes added then onclick events 
+          ###
+          new_tr = document.createElement('tr')
+          new_td = document.createElement('td')
+          new_link =  document.createElement('a')
+          new_delete_image = document.createElement('img')
+          new_delete = document.createElement('a')
+
+          $(new_tr).attr('id','temp_row')
+          $(new_link).addClass('input-truncate saved-search esc-tooltipped')
+            .attr('title', search_name)
+            .text(search_name)
+          $(new_delete).addClass("delete-search")
+          $(new_delete_image).addClass('delete-search-image')
+
+
+          $(new_link).on 'click', () ->
+            window.build_named_search(search_name)
+          $(new_delete).on 'click', () ->
+            window.delete_disputes_named_search(this,  search_name)
+            refresh_localStorage()
+
+          $(new_tr).append(new_td)
+          $(new_td).append(new_link)
+          $(new_td).append(new_delete)
+          $(new_delete).append(new_delete_image)
+          $('.filerep-named-search-list').append(new_tr)
+
     processing: true
     serverSide: true
     ajax:
@@ -215,11 +453,11 @@ $ ->
       {
         data: 'disposition'
         render: (data) ->
-          if data == 'Malicious'
-            return '<span class="malicious text-capitalize">Malicious</span>'
+          data = data.toLowerCase()
+          if data == 'malicious'
+            return '<span class="malicious text-capitalize"> malicious </span>'
           else
-            return '<span class="text-capitalize">' + data + '</span>'
-
+            return '<span class="text-capitalize"> clean </span>'
       }
       {
         data: 'detection_name'
@@ -280,10 +518,11 @@ $ ->
       {
         data: 'disposition_suggested'
         render: (data) ->
-          if data == 'Malicious'
-            return '<span class="malicious text-capitalize">Malicious</span>'
+          data = data.toLowerCase()
+          if data == 'malicious'
+            return '<span class="malicious text-capitalize"> malicious</span>'
           else
-            return  '<span class="text-capitalize">' + data + '</span>'
+            return  '<span class="text-capitalize"> clean </span>'
       }
       {
         data: 'created_at'
@@ -317,25 +556,24 @@ $ ->
 
   $('.toggle-vis-file-rep').each ->
 #    toggle visible columns
-      table = $('#file-rep-datatable').DataTable()
-      column = table.column($(this).attr('data-column'))
-      checkbox = $(this).find('input')
-      if $(checkbox).prop('checked')
-        column.visible true
-      else
-        column.visible false
-      $(this).on 'click', ->
-        $(checkbox).prop 'checked', !checkbox.prop('checked')
-        column.visible !column.visible()
-        return
-
-      $(checkbox).on 'click', ->
-        $(checkbox).prop 'checked', !checkbox.prop('checked')
-        return
+    table = $('#file-rep-datatable').DataTable()
+    column = table.column($(this).attr('data-column'))
+    checkbox = $(this).find('input')
+    if $(checkbox).prop('checked')
+      column.visible true
+    else
+      column.visible false
+    $(this).on 'click', ->
+      $(checkbox).prop 'checked', !checkbox.prop('checked')
+      column.visible !column.visible()
       return
-      checkbox = $(this).find('input')
 
-    $(document).on 'click ','.file_rep_sha', (e) ->
+    $(checkbox).on 'click', ->
+      $(checkbox).prop 'checked', !checkbox.prop('checked')
+      return
+    return
+
+  $(document).on 'click ','.file_rep_sha', (e) ->
 #      copy SHA on click
       copy_text_id = e.target.id
       copy_text = document.getElementById(copy_text_id);
@@ -352,19 +590,106 @@ $ ->
         s = '0' + s
       s
 
-    # dbinebri: adding in checkbox toggle column visible + widths on Show Page, Research tab
-    $('#data-show-sandbox-cb').click -> $('#sandbox-report-wrapper').toggle()
-    $('#data-show-tg-cb').click -> $('#threatgrid-report-wrapper').toggle()
-    $('#data-show-reversing-cb').click -> $('#reversing-labs-report-wrapper').toggle()
+  $(document).on 'focus', '#time-submitted-input', (e) ->
+    if time_submitted != ''
+      placeholder = time_submitted.to + ' - ' + time_submitted.from
+    else
+      placeholder = 'MM-DD-YYYY'
+    $('#time-submitted-input').attr('placeholder', placeholder)
 
-    $('#data-show-sandbox-cb, #data-show-tg-cb, #data-show-reversing-cb').click ->
-      if $('.dataset-cb:checked').length == 1
-        $('#sandbox-report-wrapper, #threatgrid-report-wrapper, #reversing-labs-report-wrapper').removeClass('col-sm-4 col-sm-6').addClass('col-sm-12')
-      else if $('.dataset-cb:checked').length == 2
-        $('#sandbox-report-wrapper, #threatgrid-report-wrapper, #reversing-labs-report-wrapper').removeClass('col-sm-4 col-sm-12').addClass('col-sm-6')
-      else if $('.dataset-cb:checked').length == 3
-        $('#sandbox-report-wrapper, #threatgrid-report-wrapper, #reversing-labs-report-wrapper').removeClass('col-sm-6 col-sm-12').addClass('col-sm-4')
-      return
+    $('#time-submitted-input').daterangepicker( {},
+      (start, end) ->
+        time_submitted = {
+          from : start.format('YYYY-MM-DD')
+          to : end.format('YYYY-MM-DD')
+        }
+        $('#advanced-search-dropdown').show()
+        $('#advanced-search-dropdown').css('display', 'block')
+    )
+
+  $(document).on 'focus', '#last-updated-input', () ->
+    if last_updated != ''
+      placeholder = last_updated.to + ' - ' + last_updated.from
+    else
+      placeholder = 'MM-DD-YYYY'
+    $('#last-updated-input').attr('placeholder', placeholder)
+
+    $('#last-updated-input').daterangepicker( {},
+      (start, end) ->
+        last_updated = {
+          from : start.format('YYYY-MM-DD')
+          to : end.format('YYYY-MM-DD')
+        }
+    )
+  $('#sandbox-score-input').slider(
+    {
+      range: true,
+      min: 0,
+      max: 100,
+      values: [ 25, 75 ]
+      create: (ui) ->
+        values = $(this).slider("values")
+
+        slider_1 = $('#sandbox-score-input .ui-slider-handle')[0]
+        slider_2 = $('#sandbox-score-input .ui-slider-handle')[1]
+        $(slider_1).text(values[0])
+        $(slider_2).text(values[1])
+
+      slide: ( event, ui ) ->
+        {values} = ui
+
+        slider_1 = $('#sandbox-score-input .ui-slider-handle')[0]
+        slider_2 = $('#sandbox-score-input .ui-slider-handle')[1]
+        $(slider_1).text(values[0])
+        $(slider_2).text(values[1])
+
+        sandbox_score = {
+          from: values[0]
+          to : values[1]
+        }
+    })
+
+  $('#tg-score-input').slider(
+    {
+      range: true,
+      min: 0,
+      max: 100,
+      values: [ 25, 75 ]
+      create: (ui) ->
+        values = $(this).slider("values")
+
+        slider_1 = $('#tg-score-input .ui-slider-handle')[0]
+        slider_2 = $('#tg-score-input .ui-slider-handle')[1]
+        $(slider_1).text(values[0])
+        $(slider_2).text(values[1])
+
+      slide: ( event, ui ) ->
+        {values} = ui
+
+        slider_1 = $('#tg-score-input .ui-slider-handle')[0]
+        slider_2 = $('#tg-score-input .ui-slider-handle')[1]
+        $(slider_1).text(values[0])
+        $(slider_2).text(values[1])
+
+        threatgrid_score = {
+          from: values[0]
+          to : values[1]
+        }
+    })
+
+# dbinebri: adding in checkbox toggle column visible + widths on Show Page, Research tab
+  $('#data-show-sandbox-cb').click -> $('#sandbox-report-wrapper').toggle()
+  $('#data-show-tg-cb').click -> $('#threatgrid-report-wrapper').toggle()
+  $('#data-show-reversing-cb').click -> $('#reversing-labs-report-wrapper').toggle()
+
+  $('#data-show-sandbox-cb, #data-show-tg-cb, #data-show-reversing-cb').click ->
+    if $('.dataset-cb:checked').length == 1
+      $('#sandbox-report-wrapper, #threatgrid-report-wrapper, #reversing-labs-report-wrapper').removeClass('col-sm-4 col-sm-6').addClass('col-sm-12')
+    else if $('.dataset-cb:checked').length == 2
+      $('#sandbox-report-wrapper, #threatgrid-report-wrapper, #reversing-labs-report-wrapper').removeClass('col-sm-4 col-sm-12').addClass('col-sm-6')
+    else if $('.dataset-cb:checked').length == 3
+      $('#sandbox-report-wrapper, #threatgrid-report-wrapper, #reversing-labs-report-wrapper').removeClass('col-sm-6 col-sm-12').addClass('col-sm-4')
+    return
 
 
 $ ->
