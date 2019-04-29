@@ -40,7 +40,7 @@ window.get_threatgrid_data = (sha256_hash) ->
         # dbinebri: use moment.js to make date readable
         tg_formatted_submitted_date = moment(file_data.submitted_at).format('MMM D, YYYY h:mm A')
 
-      # Load the top data
+        # Load the top data
         $('#tg-submission-date').text(tg_formatted_submitted_date)
         $('#tg-run-status').text(file_data.state)
         $('#tg-score').text(file_data.analysis.threat_score)

@@ -457,7 +457,8 @@ class Complaint < ApplicationRecord
 
       all_complaints.each do |rule_ui_complaint|
         uri_to_test = compile_parts_to_uri(rule_ui_complaint)
-        rule_ui_complaint_exists = ComplaintEntry.where("uri like '%#{uri_to_test}%'")
+        rule_ui_complaint_exists = ComplaintEntry.where("uri like ?", "%" + uri_to_test + "%")
+
         if rule_ui_complaint_exists.blank? && rule_ui_complaint['add_channel'] == WBNP_CHANNEL
           new_complaints << rule_ui_complaint
         end

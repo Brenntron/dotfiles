@@ -9,7 +9,7 @@
             .col-xs-6.col-sm-6.col-md-6.col-lg-6.col-xl-6.col-with-divider
               %label.content-label-sm
                 Case ID
-              .top-info-data.case-id-tag
+              .top-info-data.case-id-tag#dispute_id
                 = @file_rep_dispute.id.to_s.rjust(10, '0')
               %label.content-label-sm
                 Status
@@ -24,27 +24,63 @@
                 .dropdown-menu.inline-dropdown-menu#show-edit-ticket-status-dropdown{'aria-labelledby': 'show-edit-ticket-status-button'}
                   %ul
                     %li.status-radio-wrapper
-                      %input.ticket-status-radio{type: 'radio', name: 'file-dispute-status', id: 'file-status-new', value: 'NEW'}
-                      %label.radio-label.ticket-status-radio-label{for:'file-status-new'} New
+                      %input.fr-ticket-status-radio{type: 'radio', name: 'file-dispute-status', id: 'file-status-new', value: 'NEW'}
+                      %label.radio-label.fr-ticket-status-radio-label{for:'file-status-new'} New
                     %li.status-radio-wrapper
-                      %input.ticket-status-radio{type: 'radio', name: 'file-dispute-status', id: 'file-status-researching', value: 'RESEARCHING'}
-                      %label.radio-label.ticket-status-radio-label{for:'file-status-researching'} Researching
+                      %input.fr-ticket-status-radio{type: 'radio', name: 'file-dispute-status', id: 'file-status-researching', value: 'RESEARCHING'}
+                      %label.radio-label.fr-ticket-status-radio-label{for:'file-status-researching'} Researching
                     %li.status-radio-wrapper
-                      %input.ticket-status-radio{type: 'radio', name: 'file-dispute-status', id: 'file-status-escalated', value: 'ESCALATED'}
-                      %label.radio-label.ticket-status-radio-label{for:'file-status-escalated'} Escalated
+                      %input.fr-ticket-status-radio{type: 'radio', name: 'file-dispute-status', id: 'file-status-escalated', value: 'ESCALATED'}
+                      %label.radio-label.fr-ticket-status-radio-label{for:'file-status-escalated'} Escalated
                     %li.status-radio-wrapper
-                      %input.ticket-status-radio{type: 'radio', name: 'file-dispute-status', id: 'file-status-pending', value: 'PENDING'}
-                      %label.radio-label.ticket-status-radio-label{for:'file-status-pending'} Customer Pending
+                      %input.fr-ticket-status-radio{type: 'radio', name: 'file-dispute-status', id: 'file-status-pending', value: 'PENDING'}
+                      %label.radio-label.fr-ticket-status-radio-label{for:'file-status-pending'} Customer Pending
                     %li.status-radio-wrapper
-                      %input.ticket-status-radio{type: 'radio', name: 'file-dispute-status', id: 'file-status-onhold', value: 'ONHOLD'}
-                      %label.radio-label.ticket-status-radio-label{for:'file-status-onhold'} On Hold
+                      %input.fr-ticket-status-radio{type: 'radio', name: 'file-dispute-status', id: 'file-status-onhold', value: 'ON_HOLD'}
+                      %label.radio-label.fr-ticket-status-radio-label{for:'file-status-onhold'} On Hold
                     %li.status-radio-wrapper
-                      %input.ticket-status-radio{type: 'radio', name: 'file-dispute-status', id: 'file-status-assigned', value: 'ASSIGNED'}
-                      %label.radio-label.ticket-status-radio-label{for:'file-status-assigned'} Assigned
+                      %input.fr-ticket-status-radio{type: 'radio', name: 'file-dispute-status', id: 'file-status-closed', value: 'RESOLVED_CLOSED'}
+                      %label.radio-label.fr-ticket-status-radio-label{for:'file-status-closed'} Resolved / Closed
+                      .dropdown-menu#show-ticket-resolution-submenu
+                        .col-xs-6.submenu-left-wrapper
+                          .submenu-header
+                            Ticket Resolution
+                          %ul
+                            %li
+                              %input.ticket-resolution-radio{type: 'radio', name: 'dispute-resolution', id: "#{Dispute::STATUS_RESOLVED_FIXED_FP}", value: "#{Dispute::STATUS_RESOLVED_FIXED_FP}"}
+                              %label.ticket-res-radio-label.radio-label{for: "#{Dispute::STATUS_RESOLVED_FIXED_FP}"} Fixed - FP
+                            %li
+                              %input.ticket-resolution-radio{type: 'radio', name: 'dispute-resolution', id: "#{Dispute::STATUS_RESOLVED_FIXED_FN}", value: "#{Dispute::STATUS_RESOLVED_FIXED_FN}"}
+                              %label.ticket-res-radio-label.radio-label{for: "#{Dispute::STATUS_RESOLVED_FIXED_FN}"} Fixed - FN
+                            %li
+                              %input.ticket-resolution-radio{type: 'radio', name: 'dispute-resolution', id: "#{Dispute::STATUS_RESOLVED_UNCHANGED}", value: "#{Dispute::STATUS_RESOLVED_UNCHANGED}"}
+                              %label.ticket-res-radio-label.radio-label{for: "#{Dispute::STATUS_RESOLVED_UNCHANGED}"} Unchanged
+                            %li
+                              %input.ticket-resolution-radio{type: 'radio', name: 'dispute-resolution', id: "#{Dispute::STATUS_RESOLVED_INVALID}", value: "#{Dispute::STATUS_RESOLVED_INVALID}"}
+                              %label.ticket-res-radio-label.radio-label{for: "#{Dispute::STATUS_RESOLVED_INVALID}"} Invalid / Junk Mail
+                            %li
+                              %input.ticket-resolution-radio{type: 'radio', name: 'dispute-resolution', id: "#{Dispute::STATUS_RESOLVED_TEST}", value: "#{Dispute::STATUS_RESOLVED_TEST}"}
+                              %label.ticket-res-radio-label.radio-label{for: "#{Dispute::STATUS_RESOLVED_TEST}"} Test / Training
+                            %li
+                              %input.ticket-resolution-radio{type: 'radio', name: 'dispute-resolution', id: "#{Dispute::STATUS_RESOLVED_OTHER}", value: "#{Dispute::STATUS_RESOLVED_OTHER}"}
+                              %label.ticket-res-radio-label.radio-label{for: "#{Dispute::STATUS_RESOLVED_OTHER}"} Other
+                        .col-xs-6.submenu-right-wrapper
+                          .resolution-comment-wrapper
+                            %label.content-label-sm
+                              Comment
+                            %textarea.resolution-status-comment
+                            %button.primary{onClick: 'update_file_rep_status_on_show()'}
+                              Submit
                     %li.status-radio-wrapper
-                      %input.ticket-status-radio{type: 'radio', name: 'file-dispute-status', id: 'file-status-closed', value: 'RESOLVED'}
-                      %label.radio-label.ticket-status-radio-label{for:'file-status-closed'} Resolved / Closed
-
+                      %input.fr-ticket-status-radio{type: 'radio', name: 'file-dispute-status', id: 'file-status-assigned', value: 'RE-OPENED'}
+                      %label.radio-label.fr-ticket-status-radio-label{for:'RE-OPENED'} Re-Opened
+                    %li.non-resolution-submit-wrapper#ticket-non-res-submit
+                      %label.content-label-sm
+                        Comment
+                      %textarea.ticket-status-comment
+                      .button-row-center
+                        %button.primary.change_ticket_status_button{type:'button', id:'webrep_change_ticket_status', onclick:'update_file_rep_status_on_show();'}
+                          Submit
 
             .col-xs-6.col-sm-6.col-md-6.col-lg-6.col-xl-6.col-with-divider
               %label.content-label-sm
@@ -129,8 +165,8 @@
           %label.content-label-sm File Size
           .top-info-data
             -# TODO find out what file size we will get & convert to unit the analysts want
-            = @file_rep_dispute.file_size
-            bytes
+            = @file_rep_dispute.bytes_to_kb
+            KB
 
         .col-xs-4
           %label.content-label-sm AMP Disposition
