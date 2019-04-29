@@ -8990,6 +8990,42 @@ button.secondary.view-report-external-button {
   display: block;
 }
 
+
+// Overriding standard button styles in order to animate the syncer
+#file-rep-sync-button {
+  background-image: none;
+  padding-left: 4px;
+  .toolbar-button-text {
+    line-height: 2em;
+    margin-left: 0;
+  }
+}
+
+#file-rep-sync-button::before {
+  content: '';
+  display: block;
+  width: 21px;
+  height: 21px;
+  background-image: url(image_path('icon_sync.svg'));
+  background-repeat: no-repeat;
+  float: left;
+  margin-top: 1px;
+}
+
+#file-rep-sync-button.syncing, #file-rep-sync-button.syncing:hover {
+  background-color: $bug-section-color !important;
+  color: $content-bg-color;
+}
+
+#file-rep-sync-button.syncing::before {
+  background-image: url(image_path('icon_sync_white.svg'));
+  -webkit-animation: rotate_clockwise 1.5s linear infinite;
+  -moz-animation: rotate_clockwise 1.5s linear infinite;
+  -ms-animation: rotate_clockwise 1.5s linear infinite;
+  -o-animation: rotate_clockwise 1.5s linear infinite;
+  animation: rotate_clockwise 1.5s linear infinite;
+}
+
 // kh: overwriting jquery ui slider styles
 .ui-slider.form-control.nav-tool-content-wrapper{
   background: white!important;
