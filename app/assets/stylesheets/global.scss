@@ -8475,11 +8475,6 @@ hr.thin.form-divider {
 
 }
 
-// dbinebri: ensure the button here has the right font
-#create-detection-dialog button.primary {
-  font-family: "Open Sans", sans-serif;
-}
-
 .top-case-info h4 {
   text-transform: uppercase;
   font-weight: 700 !important;
@@ -9158,6 +9153,11 @@ div[aria-describedby='create-detection-dialog'] {
 }
 
 // dbinebri: minor file rep ui fixes
+
+// dbinebri: ensure the button here has the right font
+#create-detection-dialog button.primary {
+  font-family: "Open Sans", sans-serif;
+}
 
 // add a few tweaks for this dropdown so no overlap with last character and down caret at breakpoints
 // super wide width
