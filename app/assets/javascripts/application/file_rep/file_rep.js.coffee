@@ -197,9 +197,17 @@ $ ->
 
     refresh_url()
 
-  window.build_contains_search = (contains) ->
-    refresh_localStorage()
+  window.build_contains_search = () ->
+    search_string = $('#file-rep-search .search-box').val()
+    if search_string == ''
+      refresh_localStorage()
+      refresh_url()
+    else
+      localStorage.search_type = 'contains'
+      localStorage.search_name = ''
+      localStorage.search_conditions = JSON.stringify({value:search_string})
     refresh_url()
+
 
 
   window.build_advanced_data = () ->
@@ -271,6 +279,13 @@ $ ->
           search_type: search_type
           search_name: search_name
         }
+      else if search_type == 'contains'
+        search_conditions = JSON.parse(search_conditions)
+        console.log
+        data = {
+          search_type: search_type
+          search_conditions: search_conditions
+        }
 
       format_filerep_header(data)
       return data
@@ -330,14 +345,21 @@ $ ->
 
 
       else if search_type == 'named'
+
         new_header =
           '<div>Results for "' + search_name + '" Saved Search' +
           reset_icon +
           '</div>'
 
+      else if search_type == 'contains'
+        search_conditions = JSON.parse(localStorage.search_conditions)
+        new_header =
+          '<div>Results for "' + search_conditions.value + '" '+
+            reset_icon +
+            '</div>'
+
       else
         new_header = 'All File Reputation Tickets'
-
       $('#filerep-index-title')[0].innerHTML = new_header
 
   $('#file-rep-datatable').dataTable
