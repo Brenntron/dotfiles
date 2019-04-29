@@ -255,7 +255,6 @@ $ ->
         search_type : 'standard'
         search_name : location.search.replace('?f=', '')
       }
-      format_filerep_header(data)
       refresh_localStorage()
 
     else if localStorage.search_type
