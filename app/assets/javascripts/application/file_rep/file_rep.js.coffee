@@ -1,3 +1,9 @@
+$ ->
+  $('#file-rep-sync-button').click ->
+    window.research_data()
+    window.update_file_rep_data()
+
+
 window.update_file_rep_status = () ->
   checked_disputes = []
   resolution = ""
@@ -70,6 +76,7 @@ window.update_file_rep_status_on_show = () ->
     error: (response) ->
       std_msg_error('Unable to update File Reputation Ticket status.', [])
   )
+
 
 window.filerep_take_disputes = () ->
   dispute_ids = $('.dispute_check_box:checkbox:checked').map(() ->
@@ -190,7 +197,6 @@ window.file_rep_show_change_assignee = (dispute_id) ->
     error_prefix: 'Error updating ticket.'
     success: (response) ->
       window.location.reload()
-
   )
 
 $ ->
