@@ -1,0 +1,29 @@
+.content-wrapper
+  %h1 AMP Naming Conventions Details
+  .row
+    .col-xs-12
+      -# If user has role to edit AMP Naming Conventions, show this button
+      %button.primary.edit-button#amp-edit-button Edit AMP Naming Conventions
+  .row
+    .col-xs-12
+      %table.table.responsive#amp-naming-details-table
+        %thead
+          %tr
+            %th Pattern
+            %th Example
+            %th Engine
+            %th Engine Description
+            %th Notes
+            %th Public Facing Notes
+            %th Point of Contact
+        %tbody
+          - @conventions.each do |convention|
+            -# Hard coding this temporarily. Need to convert to database and actual data
+            %tr
+              %td= convention.pattern
+              %td= convention.example
+              %td= convention.engine
+              %td= convention.engine_description
+              %td= convention.notes
+              %td= convention.public_notes
+              %td= convention.contact

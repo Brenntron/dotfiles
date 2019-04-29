@@ -15,6 +15,10 @@ class Escalations::FileRep::DisputesController < ApplicationController
     @file_rep_dispute = FileReputationDispute.find(params[:id])
   end
 
+  def naming_guide
+    @conventions = AmpNamingConvention.all
+  end
+
 
   private
 
