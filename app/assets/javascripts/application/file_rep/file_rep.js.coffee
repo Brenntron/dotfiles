@@ -281,7 +281,6 @@ $ ->
         }
       else if search_type == 'contains'
         search_conditions = JSON.parse(search_conditions)
-        console.log
         data = {
           search_type: search_type
           search_conditions: search_conditions
