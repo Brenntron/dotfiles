@@ -308,7 +308,7 @@ $ ->
         new_header =
           '<div>Results for Advanced Search ' +
             reset_icon +
-            '</div>'
+            '</div>' 
 
         for condition_name, condition of search_conditions
           if condition != ''
@@ -576,7 +576,7 @@ $ ->
     ]
 
   $('.toggle-vis-file-rep').each ->
-#    toggle visible columns
+#       toggle visible columns
     table = $('#file-rep-datatable').DataTable()
     column = table.column($(this).attr('data-column'))
     checkbox = $(this).find('input')
