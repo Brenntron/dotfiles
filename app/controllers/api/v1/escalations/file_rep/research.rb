@@ -18,7 +18,7 @@ module API
                     attributes = Threatgrid::Search.query_from_data(api_response)
                     FileReputationDispute.where(sha256_hash: sha256_hash).update_all(attributes)
                   rescue => except
-                    Rails.logger.error("Error updating threatgrid score for sha256 hash #{sha256_hash} -- #{except.error_message}")
+                    Rails.logger.error("Error updating threatgrid score for sha256 hash #{sha256_hash} -- #{except.message}")
                   end
 
                   render json: api_response

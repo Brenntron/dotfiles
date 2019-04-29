@@ -3,6 +3,7 @@ $ ->
   if $('body').hasClass('show-action')
     window.research_data()
 
+
 window.update_file_rep_data = () ->
   file_rep_id = $(".case-id-tag")[0].innerText
   # Hide current data
@@ -37,6 +38,7 @@ window.update_file_rep_data = () ->
 
 
 
+
 window.research_data = () ->
   sha256_hash = $('#sha256_hash')[0].innerText
 
@@ -57,8 +59,11 @@ window.research_data = () ->
         $(report_missing).hide()
         file_data = response.json.data.items[0].item
 
-        # Load the top data
-        $('#tg-submission-date').text(file_data.submitted_at)
+        # dbinebri: use moment.js to make date readable
+        tg_formatted_submitted_date = moment(file_data.submitted_at).format('MMM D, YYYY h:mm A')
+
+      # Load the top data
+        $('#tg-submission-date').text(tg_formatted_submitted_date)
         $('#tg-run-status').text(file_data.state)
         $('#tg-score').text(file_data.analysis.threat_score)
         $('#tg-tags').text(file_data.tags.join(', '))
@@ -125,8 +130,13 @@ window.research_data = () ->
         scan_time = all_scanner_results.record_time
         scanner_count = all_scanner_results.scanners.length
 
-        $('#rl-first-seen-date').text(rl_data.first_seen)
-        $('#rl-most-recent-date').text(rl_data.last_seen)
+        # dbinebri: use moment.js to make dates readable
+        first_seen_date = moment(rl_data.first_seen).format('MMM D, YYYY h:mm A')
+        last_seen_date = moment(rl_data.last_seen).format('MMM D, YYYY h:mm A')
+        formatted_scan_time = moment(scan_time).format('MMM D, YYYY h:mm A')
+
+        $('#rl-first-seen-date').text(first_seen_date)
+        $('#rl-most-recent-date').text(last_seen_date)
 
 
         # Cycle through the scanner results
@@ -144,9 +154,9 @@ window.research_data = () ->
         # Add the malicious scans to top of table, create rows from each scanner result
         tbody = ""
         $(mal_results).each ->
-          tbody += '<tr><td>' + this.name + '</td><td>' + scan_time + '</td><td class="scanner-mal">' + this.result + '</td></tr>'
+          tbody += '<tr><td>' + this.name + '</td><td>' + formatted_scan_time + '</td><td class="scanner-mal">' + this.result + '</td></tr>'
         $(unk_results).each ->
-          tbody += '<tr><td>' + this.name + '</td><td>' + scan_time + '</td><td class="scanner-unk">Not Detected</td></tr>'
+          tbody += '<tr><td>' + this.name + '</td><td>' + formatted_scan_time + '</td><td class="scanner-unk">Not Detected</td></tr>'
 
         $('#rl-scanner-table').append(tbody)
       else
@@ -207,8 +217,10 @@ window.get_sandbox_report = (runid, sha) ->
       $(report_present).show()
       $(report_missing).hide()
 
-      # Load the top data
-      $('#sb-run-date').text(sb_report.date)
+      # dbinebri: use moment.js to make date readable
+      sb_formatted_run_date = moment(sb_report.date).format('MMM D, YYYY h:mm A')
+
+      $('#sb-run-date').text(sb_formatted_run_date)
       $('#sb-run-status').text(sb_report.status)
       $('#sb-score').text(sb_report.score)
 
