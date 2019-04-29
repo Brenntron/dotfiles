@@ -401,8 +401,8 @@ $ ->
       columns: ':not(:first-child)'
     columnDefs: [
       {
-        # Making checkbox row unorderable
-        targets: [ 0 ]
+        # Making checkbox and RL score rows unorderable
+        targets: [ 0, 14 ]
         orderable: false
         searchable: false
       }
@@ -447,7 +447,7 @@ $ ->
       {
         data: 'file_size'
         render: (data) ->
-          return data + ' bytes'
+          return data + ' KB'
       }
       { data: 'sample_type'}
       {
@@ -507,7 +507,14 @@ $ ->
             else
               return '<span class="overdue score-col text-center">' + data + '</span>'
       }
-      { data: 'reversing_labs_score'}
+      {
+        data: 'reversing_labs_score'
+        render: (data, type, full, meta) ->
+          if data
+            return '<span class="score-col text-center">' + data + ' / ' + full['reversing_labs_count'] + '</span>'
+          else
+            return ''
+      }
       {
         data: 'disposition_suggested'
         render: (data) ->
@@ -757,9 +764,11 @@ $ ->
 
     # Grab sha data
     # From show page only one sha can be submitted
+    sha256_hashes = []
     if page == 'show'
       # Get sha
       sha = $('#sha256_hash')[0].innerText
+      sha256_hashes = [sha]
 
     # From index several shas could be submitted (from the users perspective)
     else if page == 'index'
@@ -767,23 +776,28 @@ $ ->
         std_msg_error('No Tickets Selected', ['Please select at least one ticket to submit detection for.'])
       else
 
-      sha = []
       # Get all checked checkboxes
       $('.dispute_check_box:checked').each ->
         sha_val =  $(this).attr('data-sha')
-        sha.push(sha_val)
+        sha256_hashes.push(sha_val)
 
-
-      # Marlin - I don't know how you want to handl this. We can only send one sha at a time,
-      # but we can set up the back end to send one after another with the same detection setting.
-      # This preps for either case, and provides the sha(s) and the detection info separately.
-
-
+      console.log sha256_hashes
+      console.log detection_array
     else
       alert('Where are you? How did you trigger this? Stahp it.')
+      return false
+
+    std_msg_ajax(
+      url: '/escalations/api/v1/escalations/file_rep/detections'
+      method: 'POST'
+      data: {
+        'sha256_hashes': sha256_hashes
+        'disposition': new_disp
+        'detection_name': new_detection_name
+      }
+    )
 
     return false
-
 
 
 # TODO: This stuff maybe should be moved into its own file later, but dropping here because convenient
