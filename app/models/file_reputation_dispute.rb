@@ -360,11 +360,22 @@ class FileReputationDispute < ApplicationRecord
     Rails.logger.error("Error updating sandbox score on id #{self.id} -- #{except.message}")
   end
 
+  def update_sample_zoo
+    zoo_response = FileReputationApi::SampleZoo.data(self.sha256_hash)
+    begin
+      attributes = FileReputationApi::SampleZoo.query_from_data(zoo_response)
+      update!(attributes)
+    end
+  rescue => except
+    Rails.logger.error("Error updating sample zoo flag for id #{self.id} -- #{except.message}")
+  end
+
   def update_scores
     update_threadgrid_score
     update_ticode_certs
     update_reversing_labs_score
     update_sandbox_score
+    update_sample_zoo
   end
 
   def ack_create(envelope_params, sender_params)

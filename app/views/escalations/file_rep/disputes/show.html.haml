@@ -145,13 +145,13 @@
             %label.content-label-sm AMP Detection Created
             .top-info-data
               = @file_rep_dispute.detection_created_at
-            %label.content-label-sm In Sample Zoo
-            - if @file_rep_dispute.in_zoo == 1
-              .top-info-data#sample-zoo-status{'data-zoo-status': 'YES'}
-                %span.glyphicon.glyphicon-ok
-            - else
-              .top-info-data#sample-zoo-status{'data-zoo-status': 'NO'}
-                %span.glyphicon.glyphicon-remove
+          %label.content-label-sm In Sample Zoo
+          - if @file_rep_dispute.in_zoo?
+            .top-info-data#sample-zoo-status{'data-zoo-status': 'YES'}
+              %span.glyphicon.glyphicon-ok
+          - else
+            .top-info-data#sample-zoo-status{'data-zoo-status': 'NO'}
+              %span.glyphicon.glyphicon-remove
 
 
 -# End of top overview information
