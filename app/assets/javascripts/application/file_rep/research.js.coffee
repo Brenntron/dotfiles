@@ -332,7 +332,6 @@ get_run_status = window.get_run_status = (sha256_hash) ->
     url: "/escalations/api/v1/escalations/file_rep/sandbox_api/sandbox_latest_report/" + sha256_hash
     success_reload: false
     success: (response) ->
-      debugger
       console.log response
       unless response.json.success == false
         run_id = response.json.data.runid
