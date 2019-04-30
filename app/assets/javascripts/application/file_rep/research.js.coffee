@@ -368,21 +368,20 @@ get_run_status = window.get_run_status = () ->
       if status == "Complete"
         clearInterval(get_run_status)
         window.get_sandbox_runid(sha256_hash)
-      if status == "Error"
+      else if status == "Error"
         clearInterval(get_run_status)
         $(report_missing).show()
         $('#sandbox-status-message').text('Error running sample. Report not generated.')
-      if status == "Unsupported File Type"
+      else if status == "Unsupported File Type"
         clearInterval(get_run_status)
         $(report_missing).show()
         $('#sandbox-status-message').text('Unsupported file type. Report not generated.')
-      if status == "Cancelled"
+      else if status == "Cancelled"
         clearInterval(get_run_status)
         $(report_missing).show()
         $('#sandbox-status-message').text('Report was cancelled.')
-      if status == "Running" || "JoeBox Analysis Running" || "Reports Generating" || "Enqueued to Report Generation"
+      else if status == "Running" || "JoeBox Analysis Running" || "Reports Generating" || "Enqueued to Report Generation"
         $(report_running).show()
-        console.log status
 
       setTimeout(get_run_status, 600000)
 
