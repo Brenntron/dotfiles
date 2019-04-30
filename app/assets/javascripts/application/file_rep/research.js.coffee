@@ -7,11 +7,11 @@ $ ->
     sha256_hash = $('#sha256_hash')[0].innerText
     window.research_data(sha256_hash)
 
-  # Update the research reports and the items in the db
-  $('#file-rep-sync-button').click ->
-    sha256_hash = $('#sha256_hash')[0].innerText
-    window.research_data(sha256_hash)
-    window.update_file_rep_data()
+# Update the research reports and the items in the db
+$('#file-rep-sync-button').click ->
+  sha256_hash = $('#sha256_hash')[0].innerText
+  window.research_data(sha256_hash)
+  window.update_file_rep_data()
 
     
 
@@ -22,7 +22,7 @@ $ ->
 window.research_data = (sha256_hash) ->
   window.get_threatgrid_data(sha256_hash)
   window.get_reversinglabs_data(sha256_hash)
-  window.get_run_status()
+  window.get_run_status(sha256_hash)
 
 
 ########### THREATGRID REPORT ############
@@ -153,42 +153,6 @@ window.get_reversinglabs_data = (sha256_hash) ->
     error: (response) ->
       $('#rl-loader').hide()
       std_api_error(response, "There was a problem retrieving data from Reversing Labs", reload: false)
-  )
-
-
-
-########### GET SANDBOX MOST RECENT RUN ID ############
-#### This is needed prior to getting full report
-window.get_sandbox_runid = (sha256_hash) ->
-  # Sandbox - get runid from file hash
-  $('#sb-loader').show()
-  std_msg_ajax(
-    method: 'GET'
-    url: "/escalations/api/v1/escalations/file_rep/sandbox_api/sandbox_latest_report/" + sha256_hash
-    success_reload: false
-    success: (response) ->
-      report_present = $('#sandbox-report-wrapper').find('.sb-data-present')[0]
-      report_missing = $('#sandbox-report-wrapper').find('.sb-data-missing')[0]
-      run_id = response.json.data.runid
-
-      # This sha has not been run in the talos sandbox
-      unless run_id?
-        $('#sb-loader').hide()
-        $(report_present).hide()
-        $(report_missing).show()
-        if $('#sample-zoo-status').attr('data-zoo-status') == 'YES'
-          $('#sandbox-status-message').text('Not in Talos Sandbox')
-          $('#sandbox-run-button').show()
-        else
-          $('#sandbox-status-message').text('Not in Talos Sandbox or Sample Zoo')
-          $('#sandbox-run-button').hide()
-      else
-        # Send runid to sandbox
-        window.get_sandbox_report(run_id, sha256_hash)
-
-    error: (response) ->
-      $('#sb-loader').hide()
-      std_api_error(response, "There was a problem retrieving data from Talos Sandbox", reload: false)
   )
 
 
@@ -353,37 +317,62 @@ window.run_sample_in_sandbox = () ->
 )
 
 
-get_run_status = window.get_run_status = () ->
+########### GET SANDBOX CURRENT RUN STATUS & MOST RECENT RUN ID ############
+#### This is needed prior to getting full report & needed for checking a report status
+get_run_status = window.get_run_status = (sha256_hash) ->
+  # Sandbox - send file hash, show loader while fetching data
+  $('#sb-loader').show()
   sha256_hash = $('#sha256_hash')[0].innerText
   report_running = $('#sandbox-report-wrapper').find('.sb-report-run')[0]
+  report_present = $('#sandbox-report-wrapper').find('.sb-data-present')[0]
   report_missing = $('#sandbox-report-wrapper').find('.sb-data-missing')[0]
+
   std_msg_ajax(
     method: 'GET'
     url: "/escalations/api/v1/escalations/file_rep/sandbox_api/sandbox_latest_report/" + sha256_hash
     success_reload: false
     success: (response) ->
-      run_id = response.json.data.runid
-      status = response.json.data.status
+      debugger
+      console.log response
+      unless response.json.success == false
+        run_id = response.json.data.runid
+        status = response.json.data.status
+        console.log status
 
-      if status == "Complete"
-        clearInterval(get_run_status)
-        window.get_sandbox_runid(sha256_hash)
-      else if status == "Error"
-        clearInterval(get_run_status)
-        $(report_missing).show()
-        $('#sandbox-status-message').text('Error running sample. Report not generated.')
-      else if status == "Unsupported File Type"
-        clearInterval(get_run_status)
-        $(report_missing).show()
-        $('#sandbox-status-message').text('Unsupported file type. Report not generated.')
-      else if status == "Cancelled"
-        clearInterval(get_run_status)
-        $(report_missing).show()
-        $('#sandbox-status-message').text('Report was cancelled.')
-      else if status == "Running" || "JoeBox Analysis Running" || "Reports Generating" || "Enqueued to Report Generation"
-        $(report_running).show()
+        # If report status is complete, send runid to get report
+        if status == "Complete"
+          clearInterval(get_run_status)
+          window.get_sandbox_report(run_id, sha256_hash)
+        else if status == "Error"
+          clearInterval(get_run_status)
+          $('#sb-loader').hide()
+          $(report_missing).show()
+          $('#sandbox-status-message').text('Error running sample. Report not generated.')
+        else if status == "Unsupported File Type"
+          clearInterval(get_run_status)
+          $('#sb-loader').hide()
+          $(report_missing).show()
+          $('#sandbox-status-message').text('Unsupported file type. Report not generated.')
+        else if status == "Cancelled"
+          clearInterval(get_run_status)
+          $('#sb-loader').hide()
+          $(report_missing).show()
+          $('#sandbox-status-message').text('Report was cancelled.')
+        else if status == "Running" || "JoeBox Analysis Running" || "Reports Generating" || "Enqueued to Report Generation"
+          $(report_running).show()
 
-      setTimeout(get_run_status, 600000)
+        setTimeout(get_run_status, 600000)
+
+      else
+        $('#sb-loader').hide()
+        $(report_present).hide()
+        $(report_missing).show()
+        if $('#sample-zoo-status').attr('data-zoo-status') == 'YES'
+          $('#sandbox-status-message').text('No report available')
+          $('#sandbox-run-button').show()
+        else
+          $('#sandbox-status-message').text('Not in Talos Sample Zoo')
+          $('#sandbox-run-button').hide()
 
 
     error: (response) ->
