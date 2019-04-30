@@ -2,7 +2,9 @@
 class FileReputationDispute < ApplicationRecord
 
   belongs_to :customer, optional:true
-  belongs_to :assigned, class_name: 'User', foreign_key: :user_id, optional:true #TODO remove
+  has_many :file_rep_comments
+  belongs_to :assigned, class_name: 'User', foreign_key: :user_id, optional:true #TODO remove to use :user
+  belongs_to :user, optional:true
   has_many :digital_signers
   has_many :file_rep_comments
 
@@ -209,9 +211,57 @@ class FileReputationDispute < ApplicationRecord
   def self.advanced_search(params, search_name:, user:)
 
     search_hash = non_blank_fields(params)
+    sha256_hash = search_hash.delete('sha256_hash')
+    file_name = search_hash.delete('file_name')
+    threatgrid_range = search_hash.delete('threatgrid_score') || {}
+    sandbox_range = search_hash.delete('sandbox_score') || {}
+    created_at_range = search_hash.delete('created_at') || {}
+    updated_at_range = search_hash.delete('updated_at') || {}
     dispute_fields = matching_field(search_hash)
 
     relation = where(dispute_fields)
+
+    if sha256_hash.present?
+      relation = relation.where('sha256_hash like :sha256_hash', sha256_hash: "%#{sanitize_sql_like(sha256_hash)}%")
+    end
+
+    if file_name.present?
+      relation = relation.where('file_name like :file_name', file_name: "%#{sanitize_sql_like(file_name)}%")
+    end
+
+    if threatgrid_range['from'].present?
+      relation = relation.where('threatgrid_score >= :threatgrid_from', threatgrid_from: threatgrid_range['from'].to_f)
+    end
+
+    if threatgrid_range['to'].present?
+      relation = relation.where('threatgrid_score <= :threatgrid_to', threatgrid_to: threatgrid_range['to'].to_f)
+    end
+
+    if sandbox_range['from'].present?
+      relation = relation.where('sandbox_score >= :sandbox_from', sandbox_from: sandbox_range['from'].to_f)
+    end
+
+    if sandbox_range['to'].present?
+      relation = relation.where('sandbox_score <= :sandbox_to', sandbox_to: sandbox_range['to'].to_f)
+    end
+
+    if created_at_range['from'].present?
+      relation = relation.where('created_at >= :created_at_from', created_at_from: created_at_range['from'])
+    end
+
+    if created_at_range['to'].present?
+      created_at_to = created_at_range['to']
+      relation = relation.where('created_at <= ADDDATE(:created_at_to, INTERVAL 1 DAY)', created_at_to: created_at_to)
+    end
+
+    if updated_at_range['from'].present?
+      relation = relation.where('updated_at >= :updated_at_from', updated_at_from: updated_at_range['from'])
+    end
+
+    if updated_at_range['to'].present?
+      updated_at_to = updated_at_range['to']
+      relation = relation.where('updated_at <= ADDDATE(:updated_at_to, INTERVAL 1 DAY)', updated_at_to: updated_at_to)
+    end
 
     if %w{customer_name customer_email company_name}.any? {|key_name| search_hash[key_name].present? }
       relation = relation.by_customer(customer_name: search_hash['customer_name'],
@@ -368,6 +418,12 @@ class FileReputationDispute < ApplicationRecord
     end
   rescue => except
     Rails.logger.error("Error updating sample zoo flag for id #{self.id} -- #{except.message}")
+  end
+
+  def update_trifecta
+    update_threadgrid_score
+    update_reversing_labs_score
+    update_sandbox_score
   end
 
   def update_scores
