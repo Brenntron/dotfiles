@@ -182,7 +182,7 @@
             .top-info-data
               = @file_rep_dispute.detection_created_at
             %label.content-label-sm In Sample Zoo
-            - if @file_rep_dispute.in_zoo == 1
+            - if @file_rep_dispute.in_zoo == true
               .top-info-data#sample-zoo-status{'data-zoo-status': 'YES'}
                 %span.glyphicon.glyphicon-ok
             - else
