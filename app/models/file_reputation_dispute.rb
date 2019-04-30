@@ -327,7 +327,8 @@ class FileReputationDispute < ApplicationRecord
   # @param [ActiveRecord::Relation] base_relation relation to chain this search onto.
   # @return [ActiveRecord::Relation]
   def self.contains_search(value)
-    contains_fields = %w{file_reputation_disputes.id source platform file_name sha256_hash description}
+    contains_fields =
+        %w{file_reputation_disputes.id source platform file_name sha256_hash description detection_name sample_type}
     contains_where = contains_fields.map{|field| "#{field} like :pattern"}.join(' or ')
 
     customer_where = %w{name email}.map{|field| "customers.#{field} like :pattern"}.join(' or ')
