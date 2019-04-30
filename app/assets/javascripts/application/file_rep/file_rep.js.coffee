@@ -607,7 +607,7 @@ $ ->
         data: 'created_at'
         render: (data) ->
           if data
-            return moment(data).format('MMM D, YYYY h:mm A')
+            return moment(new Date(data)).format('MMM D, YYYY h:mm A')
           else
             return ''
       }
