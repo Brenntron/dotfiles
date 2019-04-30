@@ -264,10 +264,8 @@ staging:
     url: "https://ruletest-staging.vrt.sourcefire.com"
   sds:
     host: "v2.sds.cisco.com"
-    cert_file: "/usr/local/etc/sds-certificate.pem"
-    pkey_file: "/usr/local/etc/sds-pkey.pem"
-    user: 'tidev'
-    pass: "redacted"
+    cert_file: "/usr/local/etc/analyst-console-escalations/sds-certificate.pem"
+    pkey_file: "/usr/local/etc/analyst-console-escalations/sds-pkey.pem"
   snort_doc_max_fails: 3
   snort_org:
     host: "localhost"
@@ -310,7 +308,11 @@ staging:
     gssnegotiate: false
 
 production:
-  amq: #active message queue
+  amp_poke:
+    host: "poke.vrt.sourcefire.com"
+    # verify_mode { "no-tls" for http, "verify-none" for self signed cert, "verify-peer" for CA }
+    verify_mode: "verify-peer"
+  amq:
     host: "mq.vrt.sourcefire.com"
   auto_resolve:
     complaints:
@@ -321,16 +323,23 @@ production:
       check: true
       url: "https://investigate.api.umbrella.com/domains/categorization/"
       api_key: "redacted"
+  bls:
+    host: "prod-bls-vip.sv4.ironport.com"
+    port: 443
   bugzilla:
     host: "bugzilla.vrt.sourcefire.com"
-    api_key: "redacted"
   cert:
     vrt: "/usr/local/etc/trusted-certificates.pem"
+  file_reputation_sandbox:
+    host: "intel.api.sourcefire.com"
+    # verify_mode { "no-tls" for http, "verify-none" for self signed cert, "verify-peer" for CA }
+    verify_mode: "verify-none"
+    api_key: "redacted"
   peakebridge:
     host: "stevensville.vrt.sourcefire.com"
     port: 443
     ssl_mode: "verify-peer"
-    ca_file: "/usr/local/etc/trusted-certificates.pem"
+    ca_cert_file: "/usr/local/etc/trusted-certificates.pem"
     uri_base: "/peakebridge/channels"
     sources:
       "snort-org":
@@ -353,12 +362,20 @@ production:
     verify_mode: "verify-peer"
     ca_cert_file: "/usr/local/etc/trusted-certificates.pem"
     gssnegotiate: true
+  reversing_labs:
+    host: 'ticloud-cdn-api.reversinglabs.com'
+    # verify_mode { "no-tls" for http, "verify-none" for self signed cert, "verify-peer" for CA }
+    verify_mode: "verify-peer"
+    username: "u/sourcefire"
+    password: "redacted"
   ruletest:
     url: "https://ruletest.vrt.sourcefire.com"
   sds:
     host: "v2.sds.cisco.com"
-    cert_file: "/usr/local/etc/sds-certificate.pem"
-    pkey_file: "/usr/local/etc/sds-pkey.pem"
+    cert_file: "/usr/local/etc/analyst-console-escalations/sds-certificate.pem"
+    pkey_file: "/usr/local/etc/analyst-console-escalations/sds-pkey.pem"
+    user: "talosintel"
+    pass: "redacted"
   snort_doc_max_fails: 10
   snort_org:
     host: "snort.org"
@@ -370,6 +387,17 @@ production:
     rules_repo_url: "https://repo.vrt.sourcefire.com/svn/rules/trunk"
     ruledocs_repo_url: "https://repo.vrt.sourcefire.com/svn/rules/trunk/docs/ruledocs/"
     snort_rule_path: "extras/snort/snort-rules"
+  threatgrid:
+    host: "panacea.threatgrid.com"
+    port: 443
+    # verify_mode { "no-tls" for http, "verify-none" for self signed cert, "verify-peer" for CA }
+    verify_mode: "verify-peer"
+    api_key: "redacted"
+  ticloud:
+    host: "ticloud-cdn-api.reversinglabs.com"
+    port: 443
+    # verify_mode { "no-tls" for http, "verify-none" for self signed cert, "verify-peer" for CA }
+    verify_mode: "verify-peer"
   virustotal:
     url: "https://www.virustotal.com/vtapi/v2/url/report"
     host: "www.virustotal.com"
@@ -380,8 +408,8 @@ production:
     port: 80
     # verify_mode { "no-tls" for http, "verify-none" for self signed cert, "verify-peer" for CA }
     verify_mode: "no-tls"
-    ca_cert_file: "/usr/local/etc/trusted-certificates.pem"
     gssnegotiate: false
+    auth_token: "redacted"
   xbrs:
     host: "prod-xbrs.vega.ironport.com"
     port: 80
