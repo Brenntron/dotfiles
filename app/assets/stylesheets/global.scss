@@ -9241,3 +9241,13 @@ div[aria-describedby='create-detection-dialog'] {
   text-align: center;
 }
 
+// dbinebri: when assignee is 'Unassigned', tweaks to ensure alignment, this word is a bit wider than 8 chars
+.ticket-overview-wrapper {
+  #dispute-assignee.missing-data {
+    font-size: 12px;
+  }
+  .dispute-owner-buttons-wrapper {
+    margin-left: 1px;
+  }
+}
+
