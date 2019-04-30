@@ -13,7 +13,15 @@ $ ->
 
 #### FUNCTIONS FOR THE NAMING GUIDE PAGE ####
 
-window.edit_amp_naming_conventions = () ->
-  $('#amp-naming-details-table').sortable
-    items: '> tr'
-  $('#amp-naming-details-table').disableSelection()
+  dragSortHelper = (e, ui) ->
+    ui.children().each ->
+      $(this).width $(this).width()
+      return
+    ui
+
+  window.edit_amp_naming_conventions = () ->
+    $('#amp-naming-details-table tbody').sortable(
+      helper: dragSortHelper
+      classes: 'ui-sortable-helper': 'selected'
+      placeholder: 'sortable-placeholder'
+    ).disableSelection()

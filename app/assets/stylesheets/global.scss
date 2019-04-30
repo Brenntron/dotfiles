@@ -9078,11 +9078,41 @@ div[aria-describedby='create-detection-dialog'] {
 
 
 #amp-naming-details-table {
+  thead > tr > th {
+    border-bottom: none;
+  }
+  tr:first-of-type td {
+    border-top: 1px solid $faint-neutral-color;
+  }
+  tr {
+    background-color: $content-bg-color;
+  }
   span {
     font-family: 'Fira Mono', monospace;
     font-weight: 500;
     background: darken($content-bg-color, 5%);
     letter-spacing: 0.1px;
     padding: 2px 4px;
+  }
+}
+
+#amp-naming-details-table .ui-sortable {
+  .ui-sortable-handle {
+    cursor: grab;
+  }
+  .ui-sortable-handle:active {
+    cursor: grabbing;
+  }
+  .ui-sortable-helper.selected td {
+    background-color: #fff7cd63 !important;
+  }
+  .sortable-placeholder {
+    background-color: #f5f2e5;
+  }
+  tr:first-of-type td {
+    border-top: 1px solid #bcdce8;
+  }
+  tr:last-of-type td {
+    border-bottom: 1px solid #bcdce8;
   }
 }
