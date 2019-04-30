@@ -9129,7 +9129,7 @@ div[aria-describedby='create-detection-dialog'] {
   border: none;
 }
 
-// dbinebri: make sure the full json areas stay visible in collapsed state
+// make sure the full json areas stay visible in collapsed state
 .data-report-wrapper {
   .collapse {
     display: block;
@@ -9141,7 +9141,7 @@ div[aria-describedby='create-detection-dialog'] {
   }
 }
 
-// dbinebri: ensure json areas stay at a min-height on collapse, and gray on expand/collapse transition
+// ensure json areas stay at a min-height on collapse, and gray on expand/collapse transition
 #collapse_tg_json, #collapse_sb_json {
   min-height: 300px;
   margin: 0 2px;
@@ -9152,12 +9152,12 @@ div[aria-describedby='create-detection-dialog'] {
   }
 }
 
-// dbinebri: minor file rep ui fixes
 
-// dbinebri: ensure the button here has the right font
+// ensure the button here has the right font
 #create-detection-dialog button.primary {
   font-family: "Open Sans", sans-serif;
 }
+
 
 // add a few tweaks for this dropdown so no overlap with last character and down caret at breakpoints
 // super wide width
@@ -9165,7 +9165,7 @@ div[aria-describedby='create-detection-dialog'] {
   #show-edit-ticket-status-button {
     padding-right: 16px;
     &.inline-select-dropdown {
-      background-position: right 0px center;
+      background-position: right 0 center;
     }
   }
 }
@@ -9183,8 +9183,14 @@ div[aria-describedby='create-detection-dialog'] {
   }
 }
 
+// remove right border on smaller widths so dropdown doesn't overlap on right edge
+@media screen and (max-width: 1600px) {
+  .ticket-overview-wrapper .col-with-divider:first-of-type {
+    border-right: 0;
+  }
+}
 
-// dbinebri: FF - tiny vertical alignment fix for 2nd button in this panel
+// FF - tiny vertical alignment fix for 2nd button in this panel
 @-moz-document url-prefix() {
   .dispute-owner-buttons-wrapper button#index_change_assign {
     position: relative;
@@ -9192,9 +9198,8 @@ div[aria-describedby='create-detection-dialog'] {
   }
 }
 
-// dbinebri: need a separate th class so the bg sort icon isn't affected by generic .text-center
+// need a separate th class so the bg sort icon isn't affected by generic .text-center
 #file-rep-datatable_wrapper .th-center {
   text-align: center;
 }
-
 
