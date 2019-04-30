@@ -16,12 +16,17 @@ Feature: Disputes
   @javascript
   Scenario: an analyst tries to create a FileRep ticket
     Given a user with role "filerep user" exists and is logged in
-    And I go to "/escalations/file_rep/disputes"
-    Then I click "#new-dispute"
-    Then I fill in "shas_list" with "343518b26e0a872772808605f9f28aa75f64d86a6608e1347c979d033a72cb54"
-    Then I click ".primary"
-    Then I wait for "30" seconds
-    Then a FileRep Ticket should have been created
+    And bugzilla rest api always saves
+    And ThreatGrid API call is stubbed
+    And TiCloud API call is stubbed
+    And Sandbox API call is stubbed
+    And ReversingLabs API call is stubbed
+    When I go to "/escalations/file_rep/disputes"
+    And I click "#new-dispute"
+    And I fill in "shas_list" with "343518b26e0a872772808605f9f28aa75f64d86a6608e1347c979d033a72cb54"
+    And I click ".primary"
+    And a FileRep Ticket should have been created
+    Then I should see "FILE REPUTATION TICKET CREATED."
 
   @javascript
   Scenario: a user tries to visit the FileRep disputes page without a FileRep role
