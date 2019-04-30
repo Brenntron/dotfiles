@@ -12,11 +12,12 @@ class Escalations::PeakeBridge::FileRepMessagesController < ApplicationControlle
 
     if new_dispute.new_record?
       error_messages = new_dispute.errors.full_messages.join('; ')
-      return_message = "Error(s) creating file rep -- #{error_messages}"
+      expanded_message = "Error(s) creating file rep -- #{error_messages}"
+      return_message = '{ "success": true, "message": "' + expanded_message +'" }'
       Rails.logger.error(return_message)
     else
       return_success = true
-      return_message = "successfully created file rep"
+      return_message = '{ "success": true, "message": "successfully created file rep" }'
 
       new_dispute.ack_create(envelope_params, sender_params)
     end
