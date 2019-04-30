@@ -9096,23 +9096,32 @@ div[aria-describedby='create-detection-dialog'] {
   }
 }
 
-#amp-naming-details-table .ui-sortable {
-  .ui-sortable-handle {
-    cursor: grab;
-  }
-  .ui-sortable-handle:active {
-    cursor: grabbing;
-  }
-  .ui-sortable-helper.selected td {
-    background-color: #fff7cd63 !important;
-  }
-  .sortable-placeholder {
-    background-color: #f5f2e5;
-  }
-  tr:first-of-type td {
-    border-top: 1px solid #bcdce8;
-  }
-  tr:last-of-type td {
-    border-bottom: 1px solid #bcdce8;
+#amp-naming-details-table {
+  .ui-sortable {
+    .ui-sortable-handle {
+      cursor: grab;
+    }
+    .ui-sortable-handle:active {
+      cursor: grabbing;
+      background-color: #fff7cd63 !important;
+    }
+    .ui-sortable-helper.selected td {
+      background-color: #fff7cd63 !important;
+      border-top: 1px solid $faint-neutral-color;
+      border-bottom: 1px solid $faint-neutral-color;
+    }
+    .sortable-placeholder {
+      background-color: #f5f2e5;
+    }
+    tr td {
+      border-top: 1px solid $faint-neutral-color;
+      border-bottom: 1px solid $faint-neutral-color;
+    }
+    tr:first-of-type td {
+      border-top: 1px solid #bcdce8;
+    }
+    tr:last-of-type td {
+      border-bottom: 1px solid #bcdce8;
+    }
   }
 }

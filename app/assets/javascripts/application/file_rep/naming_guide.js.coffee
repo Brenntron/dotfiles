@@ -13,15 +13,29 @@ $ ->
 
 #### FUNCTIONS FOR THE NAMING GUIDE PAGE ####
 
-  dragSortHelper = (e, ui) ->
+  maintain_col_width = (e, ui) ->
     ui.children().each ->
       $(this).width $(this).width()
       return
     ui
 
+  window.update_sequence_numbers = () ->
+    rows = $('#amp-naming-details-table').find('.ui-sortable-handle')
+    r = 0
+    $(rows).each ->
+      new_sort = r + 1
+      $(this).attr('data-sort-sequence', new_sort)
+      r++
+
   window.edit_amp_naming_conventions = () ->
     $('#amp-naming-details-table tbody').sortable(
-      helper: dragSortHelper
+      helper: maintain_col_width
       classes: 'ui-sortable-helper': 'selected'
       placeholder: 'sortable-placeholder'
+      stop: (event, ui) ->
+        window.update_sequence_numbers()
+        return
+
     ).disableSelection()
+
+
