@@ -442,7 +442,8 @@ class FileReputationDispute < ApplicationRecord
 
         guest = Company.where(:name => "Guest").first
         opened_at = Time.now
-        customer = Customer.process_and_get_customer(customer_payload)
+
+        customer = Customer.file_rep_process_and_get_customer(customer_payload)
 
         bugzilla_rest_session = message_payload[:bugzilla_rest_session]
 
