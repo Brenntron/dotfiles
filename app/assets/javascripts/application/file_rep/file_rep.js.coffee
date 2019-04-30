@@ -1,9 +1,3 @@
-$ ->
-  $('#file-rep-sync-button').click ->
-    window.research_data()
-    window.update_file_rep_data()
-
-
 window.update_file_rep_status = () ->
   checked_disputes = []
   resolution = ""
@@ -276,9 +270,17 @@ $ ->
 
     refresh_url()
 
-  window.build_contains_search = (contains) ->
-    refresh_localStorage()
+  window.build_contains_search = () ->
+    search_string = $('#file-rep-search .search-box').val()
+    if search_string == ''
+      refresh_localStorage()
+      refresh_url()
+    else
+      localStorage.search_type = 'contains'
+      localStorage.search_name = ''
+      localStorage.search_conditions = JSON.stringify({value:search_string})
     refresh_url()
+
 
 
   window.build_advanced_data = () ->
@@ -322,7 +324,6 @@ $ ->
 
     if location.search != ''
 #      if the location.search has value, it is a standard search
-
       data ={
         search_type : 'standard'
         search_name : location.search.replace('?f=', '')
@@ -350,9 +351,15 @@ $ ->
           search_type: search_type
           search_name: search_name
         }
+      else if search_type == 'contains'
+        search_conditions = JSON.parse(search_conditions)
+        data = {
+          search_type: search_type
+          search_conditions: search_conditions
+        }
 
-      format_filerep_header(data)
-      return data
+    format_filerep_header(data)
+    return data
 
   window.format_filerep_header = (data) ->
     container = $('#filerep_searchref_container')
@@ -409,14 +416,21 @@ $ ->
 
 
       else if search_type == 'named'
+
         new_header =
           '<div>Results for "' + search_name + '" Saved Search' +
           reset_icon +
           '</div>'
 
+      else if search_type == 'contains'
+        search_conditions = JSON.parse(localStorage.search_conditions)
+        new_header =
+          '<div>Results for "' + search_conditions.value + '" '+
+            reset_icon +
+            '</div>'
+
       else
         new_header = 'All File Reputation Tickets'
-
       $('#filerep-index-title')[0].innerHTML = new_header
 
   $('#file-rep-datatable').dataTable
@@ -634,7 +648,7 @@ $ ->
     ]
 
   $('.toggle-vis-file-rep').each ->
-#    toggle visible columns
+#       toggle visible columns
     table = $('#file-rep-datatable').DataTable()
     column = table.column($(this).attr('data-column'))
     checkbox = $(this).find('input')
