@@ -1,47 +1,32 @@
 $ ->
-#  If html body is on the show page
+########### GRAB SHA NEEDED FOR REPORTS ############
+#  If html body is on the show page (do not call on other pages)
   if $('body').hasClass('show-action')
-    window.research_data()
+    # On the show page we can pull the sha from the FILE OVERVIEW section
+    # This prepares all the remaining functions for data fetches / updates
+    sha256_hash = $('#sha256_hash')[0].innerText
+    window.research_data(sha256_hash)
 
-
-window.update_file_rep_data = () ->
-  file_rep_id = $(".case-id-tag")[0].innerText
-  # Hide current data
-  sb_data_true = $($('.sb-data-present')[0]).hide()
-  sb_data_false = $($('.sb-data-missing')[0]).hide()
-  tg_data_true = $($('.tg-data-present')[0]).hide()
-  tg_data_false = $($('.tg-data-missing')[0]).hide()
-  rl_data_true = $($('.rl-data-present')[0]).hide()
-  rl_data_false = $($('.rl-data-missing')[0]).hide()
-
-  # Round and round it goes
-  sync_button = $('#file-rep-sync-button')
-  $(sync_button).addClass('syncing')
-
-  std_msg_ajax(
-    method: 'POST'
-    url: "/escalations/api/v1/escalations/filerep/research/update_file_rep_data"
-    data: {id: file_rep_id}
-    success_reload: false
-    success: (response) ->
-      $('#tg-loader').hide()
-      $('#sb-loader').hide()
-      $('#rl-loader').hide()
-      $(sync_button).removeClass('syncing')
-    error: (response) ->
-      $('#tg-loader').hide()
-      $('#sb-loader').hide()
-      $('#rl-loader').hide()
-      $(sync_button).removeClass('syncing')
-      std_api_error(response, "There was a problem refreshing some research data", reload: false)
-  )
-
-
-
-
-window.research_data = () ->
+# Update the research reports and the items in the db
+$('#file-rep-sync-button').click ->
   sha256_hash = $('#sha256_hash')[0].innerText
+  window.research_data(sha256_hash)
+  window.update_file_rep_data()
 
+    
+
+########### COMPILE RESEARCH REPORTS ############
+# Grabs the initial data for all three reports / datasets
+# Loads on page load
+# Report functions defined immediately below
+window.research_data = (sha256_hash) ->
+  window.get_threatgrid_data(sha256_hash)
+  window.get_reversinglabs_data(sha256_hash)
+  window.get_run_status(sha256_hash)
+
+
+########### THREATGRID REPORT ############
+window.get_threatgrid_data = (sha256_hash) ->
   # Send sha to ThreatGrid, get data
   $('#tg-loader').show()
   std_msg_ajax(
@@ -62,7 +47,7 @@ window.research_data = () ->
         # dbinebri: use moment.js to make date readable
         tg_formatted_submitted_date = moment(file_data.submitted_at).format('MMM D, YYYY h:mm A')
 
-      # Load the top data
+        # Load the top data
         $('#tg-submission-date').text(tg_formatted_submitted_date)
         $('#tg-run-status').text(file_data.state)
         $('#tg-score').text(file_data.analysis.threat_score)
@@ -107,7 +92,9 @@ window.research_data = () ->
 
 
 
-#  Send sha to reversing labs, get data
+########### REVERSING LABS REPORT ############
+window.get_reversinglabs_data = (sha256_hash) ->
+  #  Send sha to reversing labs, get data
   $('#rl-loader').show()
   std_msg_ajax(
     method: 'GET'
@@ -170,46 +157,17 @@ window.research_data = () ->
 
 
 
-  # Sandbox - get runid from file hash
-  $('#sb-loader').show()
-  std_msg_ajax(
-    method: 'GET'
-    url: "/escalations/api/v1/escalations/file_rep/sandbox_api/sandbox_latest_report/" + sha256_hash
-    success_reload: false
-    success: (response) ->
-      report_present = $('#sandbox-report-wrapper').find('.sb-data-present')[0]
-      report_missing = $('#sandbox-report-wrapper').find('.sb-data-missing')[0]
-      run_id = response.json.data.runid
-
-      # This sha has not been run in the talos sandbox
-      unless run_id?
-        $('#sb-loader').hide()
-        $(report_present).hide()
-        $(report_missing).show()
-        if $('#sample-zoo-status').attr('data-zoo-status') == 'YES'
-          $('#sandbox-status-message').text('Not in Talos Sandbox')
-          $('#sandbox-run-button').show()
-        else
-          $('#sandbox-status-message').text('Not in Talos Sandbox or Sample Zoo')
-          $('#sandbox-run-button').hide()
-      else
-        # Send runid to sandbox
-        window.get_sandbox_report(run_id, sha256_hash)
-
-    error: (response) ->
-      $('#sb-loader').hide()
-      std_api_error(response, "There was a problem retrieving data from Talos Sandbox", reload: false)
-  )
-
-
-# Sandbox report api, get full report (json) from runid returned from the sandbox
-window.get_sandbox_report = (runid, sha) ->
+########### TALOS SANDBOX REPORT ############
+# Sandbox report api, get full report (json) from runid returned from the sandbox call above
+window.get_sandbox_report = (runid, sha256_hash) ->
   report_present = $('#sandbox-report-wrapper').find('.sb-data-present')[0]
   report_missing = $('#sandbox-report-wrapper').find('.sb-data-missing')[0]
+  report_running = $('#sandbox-report-wrapper').find('.sb-report-run')[0]
+  $(report_running).hide()
 
   std_msg_ajax(
     method: 'GET'
-    url: "/escalations/api/v1/escalations/file_rep/sandbox_api/sandbox_report/" + runid + '/' + sha
+    url: "/escalations/api/v1/escalations/file_rep/sandbox_api/sandbox_report/" + runid + '/' + sha256_hash
     success_reload: false
     success: (response) ->
       sb_report = response.json.data
@@ -266,13 +224,13 @@ window.get_sandbox_report = (runid, sha) ->
         $(dropped_files).each ->
           file_table =
             '<table class="vertical-data-report-table">' +
-            '<tr><th class="text-right">MD5</th><td class="code-wrap-col"><span class="code-snippet code-string-break">' + this.MD5 + '</span></td></tr>' +
-            '<tr><th class="text-right">SHA1</th><td class="code-wrap-col"><span class="code-snippet code-string-break">' + this.SHA1 + '</span></td></tr>' +
-            '<tr><th class="text-right">SHA256</th><td class="code-wrap-col"><span class="code-snippet code-string-break">' + this.SHA256 + '</span></td></tr>' +
-            '<tr><th class="text-right">mime</th><td>' + this.mime + '</td></tr>' +
-            '<tr><th class="text-right">path</th><td>' + this.path + '</td></tr>' +
-            '<tr><th class="text-right">size</th><td>' + this.size + '</td></tr>' +
-            '</table>'
+              '<tr><th class="text-right">MD5</th><td class="code-wrap-col"><span class="code-snippet code-string-break">' + this.MD5 + '</span></td></tr>' +
+              '<tr><th class="text-right">SHA1</th><td class="code-wrap-col"><span class="code-snippet code-string-break">' + this.SHA1 + '</span></td></tr>' +
+              '<tr><th class="text-right">SHA256</th><td class="code-wrap-col"><span class="code-snippet code-string-break">' + this.SHA256 + '</span></td></tr>' +
+              '<tr><th class="text-right">mime</th><td>' + this.mime + '</td></tr>' +
+              '<tr><th class="text-right">path</th><td>' + this.path + '</td></tr>' +
+              '<tr><th class="text-right">size</th><td>' + this.size + '</td></tr>' +
+              '</table>'
 
           dropped_files_tables += file_table
         $('#sb-dropped-files-col').append(dropped_files_tables)
@@ -288,9 +246,9 @@ window.get_sandbox_report = (runid, sha) ->
         $(processes).each ->
           process_table =
             '<table class="vertical-data-report-table">' +
-            '<tr><th class="text-right">MD5</th><td class="code-wrap-col"><span class="code-snippet code-string-break">' + this.md5 + '</span></td></tr>' +
-            '<tr><th class="text-right">Name</th><td>' + this.name + '</td></tr>' +
-            '<tr><th class="text-right">PID</th><td>' + this.pid + '</td></tr>'
+              '<tr><th class="text-right">MD5</th><td class="code-wrap-col"><span class="code-snippet code-string-break">' + this.md5 + '</span></td></tr>' +
+              '<tr><th class="text-right">Name</th><td>' + this.name + '</td></tr>' +
+              '<tr><th class="text-right">PID</th><td>' + this.pid + '</td></tr>'
           if this.pname?
             process_table += '<tr><th class="text-right">pname</th><td>' + this.pname + '</td></tr>'
           if this.ppid?
@@ -319,9 +277,139 @@ window.get_sandbox_report = (runid, sha) ->
       $('#download-sb-json').wrap sb_json_link
 
 
-
-
     error: (response) ->
       $('#sb-loader').hide()
       std_api_error(response, "There was a problem retrieving data from Talos Sandbox", reload: false)
+  )
+
+
+
+
+########### TALOS SANDBOX:: RUN SAMPLE & GET REPORT ############
+# This function can be called if there is no report present
+# (so the sample has not been run in the sandbox) but the sample
+# does exist in the zoo and therefore CAN be run in the sandbox.
+
+window.run_sample_in_sandbox = () ->
+  sha256_hash = $('#sha256_hash')[0].innerText
+  report_present = $('#sandbox-report-wrapper').find('.sb-data-present')[0]
+  report_missing = $('#sandbox-report-wrapper').find('.sb-data-missing')[0]
+  report_running = $('#sandbox-report-wrapper').find('.sb-report-run')[0]
+  $(report_present).hide()
+  $(report_missing).hide()
+  # Clear residual data
+  $(report_present).find('.data-report-content').each ->
+    $(this).empty()
+  $(report_running).show()
+  $('#sb-loader').show()
+
+  # Create a new run in the sandbox (assuming sample CAN be run in sandbox)
+  std_msg_ajax(
+    method: 'GET'
+    url: "/escalations/api/v1/escalations/file_rep/sandbox_api/sandbox_run_sample/" + sha256_hash
+    success_reload: false
+    success: (response) ->
+      # Wait 1 minute so the run status is getting a new status
+      # and not the complete status of the last report
+      setTimeout(get_run_status, 60000)
+    error: (response) ->
+      std_api_error(response, "There was a problem retrieving data from Talos Sandbox", reload: false)
+)
+
+
+########### GET SANDBOX CURRENT RUN STATUS & MOST RECENT RUN ID ############
+#### This is needed prior to getting full report & needed for checking a report status
+get_run_status = window.get_run_status = (sha256_hash) ->
+  # Sandbox - send file hash, show loader while fetching data
+  $('#sb-loader').show()
+  sha256_hash = $('#sha256_hash')[0].innerText
+  report_running = $('#sandbox-report-wrapper').find('.sb-report-run')[0]
+  report_present = $('#sandbox-report-wrapper').find('.sb-data-present')[0]
+  report_missing = $('#sandbox-report-wrapper').find('.sb-data-missing')[0]
+
+  std_msg_ajax(
+    method: 'GET'
+    url: "/escalations/api/v1/escalations/file_rep/sandbox_api/sandbox_latest_report/" + sha256_hash
+    success_reload: false
+    success: (response) ->
+      unless response.json.success == false
+        run_id = response.json.data.runid
+        status = response.json.data.status
+        console.log status
+
+        # If report status is complete, send runid to get report
+        if status == "Complete"
+          clearInterval(get_run_status)
+          window.get_sandbox_report(run_id, sha256_hash)
+        else if status == "Error"
+          clearInterval(get_run_status)
+          $('#sb-loader').hide()
+          $(report_missing).show()
+          $('#sandbox-status-message').text('Error running sample. Report not generated.')
+        else if status == "Unsupported File Type"
+          clearInterval(get_run_status)
+          $('#sb-loader').hide()
+          $(report_missing).show()
+          $('#sandbox-status-message').text('Unsupported file type. Report not generated.')
+        else if status == "Cancelled"
+          clearInterval(get_run_status)
+          $('#sb-loader').hide()
+          $(report_missing).show()
+          $('#sandbox-status-message').text('Report was cancelled.')
+        else if status == "Running" || "JoeBox Analysis Running" || "Reports Generating" || "Enqueued to Report Generation"
+          $(report_running).show()
+
+        setTimeout(get_run_status, 600000)
+
+      else
+        $('#sb-loader').hide()
+        $(report_present).hide()
+        $(report_missing).show()
+        if $('#sample-zoo-status').attr('data-zoo-status') == 'YES'
+          $('#sandbox-status-message').text('No report available')
+          $('#sandbox-run-button').show()
+        else
+          $('#sandbox-status-message').text('Not in Talos Sample Zoo')
+          $('#sandbox-run-button').hide()
+
+
+    error: (response) ->
+      std_api_error(response, "There was a problem retrieving data from Talos Sandbox", reload: false)
+  )
+
+
+
+##### UPDATE FILE REP DATA #####
+# Refresh items from the reports that we store in the db & save them
+window.update_file_rep_data = () ->
+  file_rep_id = $(".case-id-tag")[0].innerText
+  # Hide current data
+  sb_data_true = $($('.sb-data-present')[0]).hide()
+  sb_data_false = $($('.sb-data-missing')[0]).hide()
+  tg_data_true = $($('.tg-data-present')[0]).hide()
+  tg_data_false = $($('.tg-data-missing')[0]).hide()
+  rl_data_true = $($('.rl-data-present')[0]).hide()
+  rl_data_false = $($('.rl-data-missing')[0]).hide()
+
+  # Round and round it goes
+  sync_button = $('#file-rep-sync-button')
+  $(sync_button).addClass('syncing')
+
+  # Updating the info for the db
+  std_msg_ajax(
+    method: 'POST'
+    url: "/escalations/api/v1/escalations/filerep/research/update_file_rep_data"
+    data: {id: file_rep_id}
+    success_reload: false
+    success: (response) ->
+      $('#tg-loader').hide()
+      $('#sb-loader').hide()
+      $('#rl-loader').hide()
+      $(sync_button).removeClass('syncing')
+    error: (response) ->
+      $('#tg-loader').hide()
+      $('#sb-loader').hide()
+      $('#rl-loader').hide()
+      $(sync_button).removeClass('syncing')
+      std_api_error(response, "There was a problem refreshing some research data", reload: false)
   )

@@ -90,9 +90,12 @@
       %div.data-report-wrapper
         %span.missing-data#sandbox-status-message
         %br
-        %button.primary#sandbox-run-button
-          Push and Run Sample in Sandbox
-
+        %button.primary#sandbox-run-button{onclick: 'run_sample_in_sandbox()'}
+          Push Sample to Sandbox and Run
+    .sb-report-run.text-center
+      %div.data-report-wrapper.missing-data
+        Sample is running.
+        %br Running a sample can take 10 minutes or longer.
 
   .col-xs-12.col-sm-4#threatgrid-report-wrapper
     %h2.research-data-header.threatgrid-header Threat Grid

@@ -1,9 +1,3 @@
-$ ->
-  $('#file-rep-sync-button').click ->
-    window.research_data()
-    window.update_file_rep_data()
-
-
 window.update_file_rep_status = () ->
   checked_disputes = []
   resolution = ""

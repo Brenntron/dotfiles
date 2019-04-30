@@ -8895,15 +8895,17 @@ button.secondary.view-report-external-button {
   line-height: 1.25em;
 }
 
-.tg-data-present, .tg-data-missing, .rl-data-present, .rl-data-missing, .sb-data-present, .sb-data-missing {
+.tg-data-present, .tg-data-missing, .rl-data-present, .rl-data-missing, .sb-data-present, .sb-data-missing, .sb-report-run {
   display: none;
 }
 
-.tg-data-missing, .sb-data-missing, .rl-data-missing {
+.tg-data-missing, .sb-data-missing, .rl-data-missing, .sb-report-run {
   margin-top: 40px;
 }
 
-
+.sb-report-run .data-report-wrapper {
+  margin-top: 60px;
+}
 
 // Reversing labs styles
 .scanner-mal {
