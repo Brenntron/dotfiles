@@ -2,7 +2,7 @@ class RepApi::Blacklist < RepApi::Base
   FIELD_NAMES = %w{entry disposition public excluded classifications manual_classifications class_id
                    expiration hostname author primary_source metadata seen_by
                    _id _rev first_seen last_seen stale status ip ipi
-                   message}
+                   message seen_since_exclude}
   FIELD_SYMS = FIELD_NAMES.map{|name| name.to_sym}
 
   attr_accessor *FIELD_SYMS
