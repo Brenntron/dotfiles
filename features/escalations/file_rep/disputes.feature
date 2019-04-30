@@ -25,8 +25,12 @@ Feature: Disputes
     And I click "#new-dispute"
     And I fill in "shas_list" with "343518b26e0a872772808605f9f28aa75f64d86a6608e1347c979d033a72cb54"
     And I click ".primary"
-    And a FileRep Ticket should have been created
-    Then I should see "FILE REPUTATION TICKET CREATED."
+    Then a FileRep Ticket should have been created
+    And that FileRep Ticket should have a SHA256 of "343518b26e0a872772808605f9f28aa75f64d86a6608e1347c979d033a72cb54"
+    And that FileRep Ticket should have an assignee of current user
+    # Change this step when we settle on a list of suggested dispositions
+    And that FileRep Ticket should have a suggested disposition of "Option 1"
+    And I should see "FILE REPUTATION TICKET CREATED."
 
   @javascript
   Scenario: a user tries to visit the FileRep disputes page without a FileRep role
