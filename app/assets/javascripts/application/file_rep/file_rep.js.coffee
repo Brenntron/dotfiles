@@ -31,12 +31,12 @@ window.update_file_rep_status = () ->
       status: status
       comment: comment
       resolution: resolution
-    success_reload: false
     success: (response) ->
       if checked_disputes.length == 1
-        std_msg_success('File Reputation Ticket status updated', [], reload: true)
-      else if checked_disputes.length >1
-        std_msg_success('File Reputation Ticket statuses updated', [], reload: true)
+        std_msg_success('File Reputation Ticket status updated', [])
+      else if checked_disputes.length > 1
+        std_msg_success('File Reputation Ticket statuses updated', [])
+      window.location.reload()
     error: (response) ->
       std_msg_error('Unable to update File Reputation Ticket status.')
   )
@@ -69,7 +69,8 @@ window.update_file_rep_status_on_show = () ->
       resolution: resolution
     success_reload: false
     success: (response) ->
-      std_msg_success('File Reputation Ticket status updated', [], reload: true)
+      std_msg_success('File Reputation Ticket status updated', [])
+      window.location.reload()
     error: (response) ->
       std_msg_error('Unable to update File Reputation Ticket status.', [])
   )
