@@ -9113,6 +9113,8 @@ div[aria-describedby='create-detection-dialog'] {
 
 #amp-naming-details-table {
   .ui-sortable {
+    font-size: 8.75pt;
+
     .table-form-content {
       display: block;
     }
@@ -9138,7 +9140,7 @@ div[aria-describedby='create-detection-dialog'] {
       background-repeat: no-repeat;
       background-size: 20px 20px;
       background-image: url(image_path('icon_sortable.svg'));
-      background-position: -4px center;
+      background-position: -4px 10px;
     }
     tr td {
       border-top: 1px solid $faint-neutral-color;
@@ -9150,5 +9152,18 @@ div[aria-describedby='create-detection-dialog'] {
     tr:last-of-type td {
       border-bottom: 1px solid #bcdce8;
     }
+    input, textarea {
+      width: 100%;
+      padding: 2px 4px;
+    }
+    textarea {
+      border: 1px solid darken($faint-neutral-color, 10%);
+    }
   }
+}
+
+.code-input {
+  font-family: 'Fira Mono', monospace;
+  font-weight: 500;
+  letter-spacing: 0.1px;
 }
