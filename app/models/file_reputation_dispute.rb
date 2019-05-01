@@ -303,15 +303,15 @@ class FileReputationDispute < ApplicationRecord
   def self.standard_search(search_name, user:)
     case search_name
     # when 'recently_viewed'
-    #   joins(:dispute_peeks).where(dispute_peeks: {assigned_id: user.id})
+    #   joins(:dispute_peeks).where(dispute_peeks: {user_id: user.id})
     when 'my_open'
-      where.not(status: STATUS_RESOLVED).where(assigned_id: user.id)
+      where.not(status: STATUS_RESOLVED).where(user_id: user.id)
     when 'my_disputes'
-      where(assigned_id: user.id)
+      where(user_id: user.id)
     # when 'team_disputes'
-    #   where(assigned_id: user.my_team)
+    #   where(user_id: user.my_team)
     when 'unassigned'
-      where(assigned_id: nil).where.not(status: STATUS_RESOLVED)
+      where(user_id: nil).where.not(status: STATUS_RESOLVED)
     when 'open'
       where.not(status: STATUS_RESOLVED)
     when 'closed'
