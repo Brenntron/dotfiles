@@ -164,6 +164,7 @@ window.file_rep_show_take_dispute = (dispute_id) ->
       $("#dispute-assignee").text(response.username)
       $('#show-edit-ticket-status-button').text("ASSIGNED")
       $('.take-ticket-button').replaceWith("<button class='return-ticket-button' title='Return ticket to open queue' onclick='file_rep_show_return_dispute(#{dispute_id});'></button>")
+      $('#index_change_assign').replaceWith("<span id='replace_me'>")
   )
 
 window.file_rep_show_return_dispute = (dispute_id) ->
@@ -177,6 +178,7 @@ window.file_rep_show_return_dispute = (dispute_id) ->
       $("#dispute-assignee").text("Unassigned")
       $("#show-edit-ticket-status-button").text("NEW")
       $(".return-ticket-button").replaceWith("<button class='take-ticket-button' title='Assign this ticket to me' onclick='file_rep_show_take_dispute(#{dispute_id});'></button>")
+      $('#replace_me').replaceWith('<button aria-expanded="false" aria-haspopup="true" class="dispute-inline-buttons ticket-owner-button dropdown-toggle esc-tooltipped tooltipstered" data-toggle="dropdown" id="index_change_assign"></button>')
   )
 
 window.file_rep_show_change_assignee = (dispute_id) ->

@@ -101,6 +101,8 @@
                     %span.dropdown
                       - if [FileReputationDispute::STATUS_NEW, FileReputationDispute::STATUS_REOPENED].include? @file_rep_dispute.status
                         %button#index_change_assign.dispute-inline-buttons.ticket-owner-button.dropdown-toggle.esc-tooltipped{title: 'Change Assignee', 'data-toggle': 'dropdown', 'aria-haspopup': 'true', 'aria-expanded': 'false'}
+                      - else
+                        %span#replace_me{display: 'none'}
                       .dropdown-menu#show-change-assign-dropdown{'aria-labelledby': 'index_change_assign'}
                         .change-assignee-dropdown-wrapper
                           %h3 Change Assignee
