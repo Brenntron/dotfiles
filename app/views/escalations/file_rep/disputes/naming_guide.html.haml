@@ -1,9 +1,11 @@
 .content-wrapper
   %h1 AMP Naming Conventions Details
   .row
-    .col-xs-12
+    .col-xs-12.button-row-left.amp-edit-buttons
       -# If user has role to edit AMP Naming Conventions, show this button
       %button.primary.edit-button#amp-edit-button{onclick: 'edit_amp_naming_conventions();'} Edit AMP Naming Conventions
+      %button.primary.save-button#amp-save-button{onclick: 'save_amp_naming_conventions();'} Save Changes
+      %button.secondary.cancel-button#amp-cancel-button{onclick: 'cancel_amp_naming_conventions();'} Cancel
   .row
     .col-xs-12
       %table.table.responsive#amp-naming-details-table
@@ -24,34 +26,38 @@
                 %span.table-content
                   %span.table-code= convention.pattern
                 %span.table-form-content
-                  %input{type: 'text'}
+                  %input{type: 'text', value: "#{convention.pattern}"}
               %td
                 %span.table-content
                   = convention.example
                 %span.table-form-content
-                  %input{type: 'text'}
+                  %input{type: 'text', value: "#{convention.example}"}
               %td
                 %span.table-content
                   = convention.engine
                 %span.table-form-content
-                  %input{type: 'text'}
+                  %input{type: 'text', value: "#{convention.engine}"}
               %td
                 %span.table-content
                   = convention.engine_description
                 %span.table-form-content
                   %textarea
+                    = convention.engine_description
               %td
                 %span.table-content
                   = convention.notes
                 %span.table-form-content
                   %textarea
+                    = convention.notes
               %td
                 %span.table-content
                   = convention.public_notes
                 %span.table-form-content
                   %textarea
+                    = convention.public_notes
               %td
                 %span.table-content
                   = convention.contact
                 %span.table-form-content
                   %textarea
+                    = convention.contact

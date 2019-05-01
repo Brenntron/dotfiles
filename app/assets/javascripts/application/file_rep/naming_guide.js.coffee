@@ -28,6 +28,10 @@ $ ->
       r++
 
   window.edit_amp_naming_conventions = () ->
+    $('#amp-edit-button').hide()
+    $('#amp-save-button').show()
+    $('#amp-cancel-button').show()
+
     $('#amp-naming-details-table tbody').sortable(
       helper: maintain_col_width
       classes: 'ui-sortable-helper': 'selected'
@@ -39,3 +43,8 @@ $ ->
     ).disableSelection()
 
 
+  window.cancel_amp_naming_conventions = () ->
+    $('#amp-edit-button').show()
+    $('#amp-save-button').hide()
+    $('#amp-cancel-button').hide()
+    $('#amp-naming-details-table tbody').sortable 'destroy'
