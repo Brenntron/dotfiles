@@ -19,18 +19,39 @@
         %tbody
           - @conventions.each do |convention|
             -# Hard coding this temporarily. Need to convert to database and actual data
-            %tr{'data-sort-sequence': "#{convention.table_sequence}"}
+            %tr{'data-sort-sequence': "#{convention.table_sequence}", 'data-id': "#{convention.id}"}
               %td
-                %span= convention.pattern
+                %span.table-content
+                  %span.table-code= convention.pattern
+                %span.table-form-content
+                  %input{type: 'text'}
               %td
-                = convention.example
+                %span.table-content
+                  = convention.example
+                %span.table-form-content
+                  %input{type: 'text'}
               %td
-                = convention.engine
+                %span.table-content
+                  = convention.engine
+                %span.table-form-content
+                  %input{type: 'text'}
               %td
-                = convention.engine_description
+                %span.table-content
+                  = convention.engine_description
+                %span.table-form-content
+                  %textarea
               %td
-                = convention.notes
+                %span.table-content
+                  = convention.notes
+                %span.table-form-content
+                  %textarea
               %td
-                = convention.public_notes
+                %span.table-content
+                  = convention.public_notes
+                %span.table-form-content
+                  %textarea
               %td
-                = convention.contact
+                %span.table-content
+                  = convention.contact
+                %span.table-form-content
+                  %textarea

@@ -9087,17 +9087,32 @@ div[aria-describedby='create-detection-dialog'] {
   tr {
     background-color: $content-bg-color;
   }
-  span {
+  tr td:first-of-type, tr th:first-of-type {
+    padding-left: 20px;
+  }
+  .table-code {
     font-family: 'Fira Mono', monospace;
     font-weight: 500;
     background: darken($content-bg-color, 5%);
     letter-spacing: 0.1px;
     padding: 2px 4px;
   }
+  .table-content {
+    display: block;
+  }
+  .table-form-content {
+    display: none;
+  }
 }
 
 #amp-naming-details-table {
   .ui-sortable {
+    .table-form-content {
+      display: block;
+    }
+    .table-content {
+      display: none;
+    }
     .ui-sortable-handle {
       cursor: grab;
     }
@@ -9112,6 +9127,12 @@ div[aria-describedby='create-detection-dialog'] {
     }
     .sortable-placeholder {
       background-color: #f5f2e5;
+    }
+    tr td:first-of-type {
+      background-repeat: no-repeat;
+      background-size: 20px 20px;
+      background-image: url(image_path('icon_sortable.svg'));
+      background-position: -4px center;
     }
     tr td {
       border-top: 1px solid $faint-neutral-color;
