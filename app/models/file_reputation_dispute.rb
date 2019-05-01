@@ -379,7 +379,7 @@ class FileReputationDispute < ApplicationRecord
   end
 
   def update_ticode_certs
-    certificates = Ticloud::FileAnalysis.certificates(self.sha256_hash)
+    certificates = FileReputationApi::ReversingLabs.certificates(self.sha256_hash)
 
     if certificates&.any?
       certificates.each do |certificate|
