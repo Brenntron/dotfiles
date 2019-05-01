@@ -680,10 +680,11 @@ $ ->
       selection.addRange(range);
       document.execCommand("Copy");
 
-      # dbinebri: add a click tooltip for "copied!" that co-exists with the hover tooltip
-      $(this).siblings('.copied-sha-tooltip').removeClass 'hidden'
-      setTimeout($('.copied-sha-tooltip').addClass 'hidden', 1000)
-
+      # dbinebri: add a click tooltip that co-exists with the hover tooltip, hides after 1 sec
+      $(this).siblings('.copied-sha-tooltip').removeClass('hidden')
+      setTimeout ->
+        $('.copied-sha-tooltip').addClass('hidden')
+      , 1000
 
     Number::pad = (size) ->
       s = String(this)
