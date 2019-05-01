@@ -192,8 +192,10 @@ module API
                 assignee = User.find(params[:new_assignee]).cvs_username
 
                 disputes = FileReputationDispute.assign(params[:dispute_ids], user: params[:new_assignee])
-                if disputes.length == 0
-                  raise ('The selected dispute tickets are already assigned.')
+                if params[:dispute_ids].length == 1 && disputes.length == 0
+                  raise ('The selected dispute ticket is already assigned')
+                elsif params[:dispute_ids].length > 1 && disputes.length == 0
+                  raise ('The select dispute tickets are already assigned')
                 end
                 {:status => "success", :data => disputes, :assignee => assignee}.to_json
               end
