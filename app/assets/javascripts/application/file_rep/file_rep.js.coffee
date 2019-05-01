@@ -547,10 +547,12 @@ $ ->
         data: 'disposition'
         render: (data) ->
           data = data.toLowerCase()
+          if data == null || data == 'nil'
+            return
           if data == 'malicious'
             return '<span class="malicious text-capitalize"> malicious </span>'
           else
-            return '<span class="text-capitalize"> clean </span>'
+            return  '<span class="text-capitalize"> ' + data + ' </span>'
       }
       {
         data: 'detection_name'
@@ -611,11 +613,13 @@ $ ->
       {
         data: 'disposition_suggested'
         render: (data) ->
-          data = data.toLowerCase()
+          if data == null || data == 'nil'
+            return
           if data == 'malicious'
             return '<span class="malicious text-capitalize"> malicious</span>'
           else
-            return  '<span class="text-capitalize"> clean </span>'
+            return  '<span class="text-capitalize"> ' + data + ' </span>'
+
       }
       {
         data: 'created_at'
