@@ -44,8 +44,8 @@ window.get_threatgrid_data = (sha256_hash) ->
         $(report_missing).hide()
         file_data = response.json.data.items[0].item
 
-        # dbinebri: use moment.js to make date readable
-        tg_formatted_submitted_date = moment(file_data.submitted_at).format('MMM D, YYYY h:mm A')
+        # dbinebri: use moment.js to make date readable, convert string to Date object first for best practice
+        tg_formatted_submitted_date = moment(new Date(file_data.submitted_at)).format('MMM D, YYYY h:mm A')
 
         # Load the top data
         $('#tg-submission-date').text(tg_formatted_submitted_date)
@@ -118,9 +118,9 @@ window.get_reversinglabs_data = (sha256_hash) ->
         scanner_count = all_scanner_results.scanners.length
 
         # dbinebri: use moment.js to make dates readable
-        first_seen_date = moment(rl_data.first_seen).format('MMM D, YYYY h:mm A')
-        last_seen_date = moment(rl_data.last_seen).format('MMM D, YYYY h:mm A')
-        formatted_scan_time = moment(scan_time).format('MMM D, YYYY h:mm A')
+        first_seen_date = moment(new Date(rl_data.first_seen)).format('MMM D, YYYY h:mm A')
+        last_seen_date = moment(new Date(rl_data.last_seen)).format('MMM D, YYYY h:mm A')
+        formatted_scan_time = moment(new Date(scan_time)).format('MMM D, YYYY h:mm A')
 
         $('#rl-first-seen-date').text(first_seen_date)
         $('#rl-most-recent-date').text(last_seen_date)
@@ -176,7 +176,7 @@ window.get_sandbox_report = (runid, sha256_hash) ->
       $(report_missing).hide()
 
       # dbinebri: use moment.js to make date readable
-      sb_formatted_run_date = moment(sb_report.date).format('MMM D, YYYY h:mm A')
+      sb_formatted_run_date = moment(new Date(sb_report.date)).format('MMM D, YYYY h:mm A')
 
       $('#sb-run-date').text(sb_formatted_run_date)
       $('#sb-run-status').text(sb_report.status)
