@@ -9234,7 +9234,7 @@ div[aria-describedby='create-detection-dialog'] {
   text-align: center;
 }
 
-// dbinebri: assignee column width fix on laptop screens
+// dbinebri: on Show, assignee column width fix on laptop screens
 @media screen and (max-width: 1700px) and (min-width: 1201px){
   .ticket-overview-wrapper {
     .col-ticket-left {
@@ -9253,4 +9253,9 @@ div[aria-describedby='create-detection-dialog'] {
       margin-left: 1px;
     }
   }
+}
+
+// dbinebri: on Index, ensure "Unassigned" and buttons can exist w/o breaking in the Assignee col
+.table > tbody > tr > td.assignee-col, table > tbody > tr > td.assignee-col {
+  min-width: 90px !important;
 }

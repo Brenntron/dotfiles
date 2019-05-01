@@ -89,8 +89,11 @@ window.filerep_take_disputes = () ->
     error_prefix: 'Error updating ticket.'
     success: (response) ->
       for dispute_id in response.dispute_ids
-        $('#owner_' + dispute_id).text(response.username)
+        # dbinebri: adding the take/return button swap logic here
+        $('.take-ticket-button').replaceWith("<button class='return-ticket-button' title='Return ticket to open queue' onclick='file_rep_return_dispute(#{dispute_id});'></button>")
+        $('#owner_' + dispute_id).text(response.username).removeClass('missing-data')
         $('#status_' + dispute_id).text("ASSIGNED")
+
       std_msg_success('Tickets successfully assigned', [response.dispute_ids.length + ' have been assigned to ' + response.username])
     error: (error) ->
       std_msg_error('Assign Issue(s) Error', [
@@ -132,7 +135,7 @@ window.file_rep_take_dispute = (dispute_id) ->
     error_prefix: 'Error updating ticket.'
     success: (response) ->
       $('.inline-take-dispute-' + dispute_id).replaceWith("<button class='return-ticket-button inline-return-ticket-#{dispute_id}' title='Assign this ticket to me' onclick='file_rep_return_dispute(#{dispute_id});'></button>")
-      $("#owner_#{dispute_id}").text(response.username)
+      $("#owner_#{dispute_id}").text(response.username).removeClass('missing-data')
       $('#status_' + dispute_id).text("ASSIGNED")
   )
 
@@ -145,7 +148,7 @@ window.file_rep_return_dispute = (dispute_id) ->
     error_prefix: 'Error updating ticket.'
     success: (response) ->
       $('.inline-return-ticket-' + dispute_id).replaceWith("<button class='take-ticket-button inline-take-dispute-#{dispute_id}' title='Assign this ticket to me' onclick='file_rep_take_dispute(#{dispute_id});'></button>")
-      $("#owner_#{dispute_id}").text("Unassigned")
+      $("#owner_#{dispute_id}").text("Unassigned").addClass('missing-data')
       $('#status_' + dispute_id).text("NEW")
   )
 
@@ -636,12 +639,12 @@ $ ->
       { data: 'customer_email' }
       {
         data: 'assigned'
-        className: "alt-col"
+        className: "alt-col assignee-col"
         render: (data, type, full, meta) ->
           if full.current_user == data
             return "<span id='owner_#{full.id}'> #{data} </span><button class='return-ticket-button inline-return-ticket-#{full.id}' title='Return ticket.' onclick='file_rep_return_dispute(#{full.id});'></button>"
           else if data == 'vrtincom' || data == ""
-            return "<span id='owner_#{full.id}'>Unassigned</span> <span title='Assign to me' class='esc-tooltipped'><button class='take-ticket-button inline-take-dispute-#{full.id}' onClick='file_rep_take_dispute(#{full.id})'/></button></span>"
+            return "<span class='missing-data missing-data-index' id='owner_#{full.id}'>Unassigned</span> <span title='Assign to me' class='esc-tooltipped'><button class='take-ticket-button inline-take-dispute-#{full.id}' onClick='file_rep_take_dispute(#{full.id})'/></button></span>"
           else
             return data
       }
