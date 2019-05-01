@@ -9221,13 +9221,6 @@ div[aria-describedby='create-detection-dialog'] {
   }
 }
 
-// remove right border on smaller widths so dropdown doesn't overlap on right edge
-@media screen and (max-width: 1600px) {
-  .ticket-overview-wrapper .col-with-divider:first-of-type {
-    border-right: 0;
-  }
-}
-
 // FF - tiny vertical alignment fix for 2nd button in this panel
 @-moz-document url-prefix() {
   .dispute-owner-buttons-wrapper button#index_change_assign {
@@ -9241,13 +9234,23 @@ div[aria-describedby='create-detection-dialog'] {
   text-align: center;
 }
 
-// dbinebri: when assignee is 'Unassigned', tweaks to ensure alignment, this word is a bit wider than 8 chars
-.ticket-overview-wrapper {
-  #dispute-assignee.missing-data {
-    font-size: 12px;
-  }
-  .dispute-owner-buttons-wrapper {
-    margin-left: 1px;
+// dbinebri: assignee column width fix on laptop screens
+@media screen and (max-width: 1700px) and (min-width: 1201px){
+  .ticket-overview-wrapper {
+    .col-ticket-left {
+      width: 50%;
+    }
+    .col-ticket-right {
+      width: 50%
+    }
+    .col-assignee {
+      padding-right: 2%;
+    }
+    .missing-data {
+      font-size: 12px;
+    }
+    .dispute-owner-buttons-wrapper {
+      margin-left: 1px;
+    }
   }
 }
-
