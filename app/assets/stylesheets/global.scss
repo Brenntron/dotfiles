@@ -9189,3 +9189,17 @@ div[aria-describedby='create-detection-dialog'] {
     width: initial;
   }
 }
+
+// dbinebri: adding an additional on-click tooltip below the hovered tooltip for sha
+.copied-sha-tooltip {
+  width: 90px;
+  background: rgba(0,0,0,0.7);
+  text-align: center;
+  font-family: 'Open Sans', sans-serif;
+  font-size: 12px;
+  color: #fff;
+  padding: 4px 8px;
+  border-radius: 3px;
+  border: none;
+  position: absolute;
+}

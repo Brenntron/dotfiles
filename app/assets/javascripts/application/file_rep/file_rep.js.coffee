@@ -535,7 +535,7 @@ $ ->
       {
         data: 'sha256_hash'
         render: (data, type, full, meta) ->
-          return '<span id="' + data + '_sha" title="' + data + '" class="esc-tooltipped file_rep_sha">' + data + '</span>'
+          return '<span id="' + data + '_sha" title="' + data + '" class="esc-tooltipped file_rep_sha">' + data + '</span><p class="copied-sha-tooltip hidden">Copied!</p>'
       }
       {
         data: 'file_size'
@@ -676,6 +676,11 @@ $ ->
       selection.removeAllRanges();
       selection.addRange(range);
       document.execCommand("Copy");
+
+      # dbinebri: add a click tooltip for "copied!" that co-exists with the hover tooltip
+      $(this).siblings('.copied-sha-tooltip').removeClass 'hidden'
+      setTimeout($('.copied-sha-tooltip').addClass 'hidden', 1000)
+
 
     Number::pad = (size) ->
       s = String(this)
