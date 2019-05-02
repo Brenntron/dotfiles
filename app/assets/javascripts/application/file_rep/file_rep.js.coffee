@@ -683,6 +683,11 @@ $ ->
       selection.addRange(range);
       document.execCommand("Copy");
 
+      # dbinebri: add a click tooltip that co-exists with the hover tooltip
+      $(this).after('<div class="copied-sha-tooltip">Copied!</div>')
+      $('.copied-sha-tooltip').animate({opacity: '1'}, 200).delay(500).fadeOut()
+
+
     Number::pad = (size) ->
       s = String(this)
       while s.length < (size or 2)
