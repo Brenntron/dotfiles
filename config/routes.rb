@@ -79,6 +79,7 @@ Rails.application.routes.draw do
 
       get 'dashboard', to: 'disputes#dashboard'
       get 'research', to: 'disputes#research'
+      get :export_selected_rows, to: 'disputes#export_selected_rows'
     end
 
     resources :users, controller: '/users', only: [:index, :show, :update] do

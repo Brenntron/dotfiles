@@ -1445,6 +1445,16 @@ window.populate_resolution_dropdown = (dispute_id) ->
 window.disputes_select_all_check_box = () ->
   $('.dispute_check_box').prop('checked', $('#disputes_check_box').prop('checked'))
 
+window.webrep_export_selected_rows = () ->
+  checked_boxes = $('.dispute_check_box:checked').get()
+  ids = checked_boxes.map (checkbox) -> parseInt(checkbox.value)
+
+  query_string = '?'
+  for id in ids
+    query_string += "ids[]=#{id}&"
+
+  window.open("/escalations/webrep/export_selected_rows#{query_string}", "_blank")
+
 $ ->
   $('#advanced-search-button').click ->
     $('#advanced-search-dropdown').show()

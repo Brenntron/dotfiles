@@ -8270,3 +8270,8 @@ hr.thin.form-divider {
 .history-table {
   background-color: $content-bg-color;
 }
+
+.line-up{
+  display: flex;
+  flex-direction: row; /* this is actually the default, but I put it here for clarity reasons */
+}
