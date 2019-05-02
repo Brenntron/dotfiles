@@ -226,7 +226,7 @@ module API
               rescue Exception => e
                 return e.message
               end
-              {status:entry.status, entry_resolution:permitted_params['commit'], was_dismissed: entry.was_dismissed?}.to_json
+              {entry_id: entry.id, uri: entry.uri, status:entry.status, entry_resolution:permitted_params['commit'], was_dismissed: entry.was_dismissed?}.to_json
             end
 
 

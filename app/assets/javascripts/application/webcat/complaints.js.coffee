@@ -243,26 +243,28 @@ window.updatePending = (id,row_id) ->
     headers: headers
     data: {'id': id,'prefix': prefix,'commit':status,'status':resolution,'comment':comment, 'resolution_comment': resolution_comment, 'categories': categories }
     success: (response) ->
-      json = $.parseJSON(response)
-      if json.error
-        notice_html = "<p>Something went wrong: #{json.error}</p>"
-        alert(json.error)
+      {uri, error, entry_id, was_dismissed, status} = $.parseJSON(response)
+      if error
+        notice_html = "<p>Something went wrong: #{error}</p>"
+        alert(error)
       else
         table = $('#complaints-index').DataTable()
         temp_row = table.row(row_id)
         td = $(temp_row).next('tr').find('td:first')
         unless $(td).hasClass 'nested-complaint-data-wrapper'
           $(td).addClass 'nested-complaint-data-wrapper'
-        if json.was_dismissed
+        if was_dismissed
           temp_row.node().className += ' highlight-was-dismissed'
 
-        temp_row.data().status = json.status
+        temp_row.data().uri = uri
+        temp_row.data().status = status
         temp_row.data().resolution = resolution
         temp_row.data().internal_comment = comment
         temp_row.data().resolution_comment = resolution_comment
         temp_row.invalidate().page(table_page).draw(false)
         temp_row.child().remove()
         temp_row.child(format(temp_row)).show()
+
         $('#input_cat_'+ temp_row.data().entry_id).selectize {
           persist: false,
           create: false,
