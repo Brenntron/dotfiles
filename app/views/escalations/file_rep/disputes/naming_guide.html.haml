@@ -4,8 +4,10 @@
     .col-xs-12.button-row-left.amp-edit-buttons
       -# If user has role to edit AMP Naming Conventions, show this button
       %button.primary.edit-button#amp-edit-button{onclick: 'edit_amp_naming_conventions();'} Edit AMP Naming Conventions
-      %button.primary.save-button#amp-save-button{onclick: 'save_amp_naming_conventions();'} Save Changes
-      %button.secondary.cancel-button#amp-cancel-button{onclick: 'cancel_amp_naming_conventions();'} Cancel
+      .active-editing-buttons
+        %button.primary.save-button#amp-save-button{onclick: 'save_amp_naming_conventions();'} Save Changes
+        %button.secondary.cancel-button#amp-cancel-button{onclick: 'cancel_amp_naming_conventions();'} Cancel
+        %button.secondary.add-file-button#amp-new-button{onclick:'add_amp_naming_conventions();'} Add New Naming Convention
   .row
     .col-xs-12
       %table.table.responsive#amp-naming-details-table

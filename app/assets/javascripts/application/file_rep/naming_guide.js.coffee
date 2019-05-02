@@ -29,8 +29,7 @@ $ ->
 
   window.edit_amp_naming_conventions = () ->
     $('#amp-edit-button').hide()
-    $('#amp-save-button').show()
-    $('#amp-cancel-button').show()
+    $('.active-editing-buttons').show()
 
     $('#amp-naming-details-table tbody').sortable(
       helper: maintain_col_width
@@ -45,6 +44,53 @@ $ ->
 
   window.cancel_amp_naming_conventions = () ->
     $('#amp-edit-button').show()
-    $('#amp-save-button').hide()
-    $('#amp-cancel-button').hide()
+    $('.active-editing-buttons').hide()
     $('#amp-naming-details-table tbody').sortable 'destroy'
+    # TODO Figure out how to revert to original sort
+
+
+
+  window.add_amp_naming_conventions = () ->
+    number_of_rows = $('#amp-naming-details-table tbody').find('tr').length
+    new_sequence_number = number_of_rows + 1
+    new_row =
+      '<tr data-sort-sequence="' + new_sequence_number + '" data-id="">' +
+      '<td>' +
+      '<span class="table-content"><span class="table-code"></span></span>' +
+      '<span class="table-form-content"><input type="text"></input></span>' +
+      '</td>' +
+      '<td>' +
+      '<span class="table-content"></span>' +
+      '<span class="table-form-content"><input type="text"></input></span>' +
+      '</td>' +
+      '<td>' +
+      '<span class="table-content"></span>' +
+      '<span class="table-form-content"><input type="text"></input></span>' +
+      '</td>' +
+      '<td>' +
+      '<span class="table-content"></span>' +
+      '<span class="table-form-content"><textarea></textarea></span>' +
+      '</td>' +
+      '<td>' +
+      '<span class="table-content"></span>' +
+      '<span class="table-form-content"><textarea></textarea></span>' +
+      '</td>' +
+      '<td>' +
+      '<span class="table-content"></span>' +
+      '<span class="table-form-content"><textarea></textarea></span>' +
+      '</td>' +
+      '<td>' +
+      '<span class="table-content"></span>' +
+      '<span class="table-form-content"><textarea></textarea></span>' +
+      '</td>' +
+      '</tr>'
+
+    $('#amp-naming-details-table').append(new_row)
+
+
+  window.save_amp_naming_conventions = () ->
+    # compare changes
+    # check for new rows
+    # save to db
+
+

@@ -9079,7 +9079,10 @@ div[aria-describedby='create-detection-dialog'] {
 #amp-edit-button {
   background-image: url(image_path('icon_edit_white.svg'));
 }
-#amp-save-button, #amp-cancel-button {
+#amp-new-button {
+  background-image: url(image_path('icon_add_white.svg'));
+}
+.active-editing-buttons {
   display: none;
 }
 
