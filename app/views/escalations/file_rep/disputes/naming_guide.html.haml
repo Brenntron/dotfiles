@@ -23,41 +23,41 @@
         %tbody
           - @conventions.each do |convention|
             -# Hard coding this temporarily. Need to convert to database and actual data
-            %tr{'data-sort-sequence': "#{convention.table_sequence}", 'data-id': "#{convention.id}"}
-              %td
+            %tr.amp-naming-row{'data-sort-sequence': "#{convention.table_sequence}", 'data-id': "#{convention.id}"}
+              %td.amp-pattern
                 %span.table-content
                   %span.table-code= convention.pattern
                 %span.table-form-content
                   %input.code-input{type: 'text', value: "#{convention.pattern}"}
-              %td
+              %td.amp-example
                 %span.table-content
                   = convention.example
                 %span.table-form-content
                   %input{type: 'text', value: "#{convention.example}"}
-              %td
+              %td.amp-engine
                 %span.table-content
                   = convention.engine
                 %span.table-form-content
                   %input{type: 'text', value: "#{convention.engine}"}
-              %td
+              %td.amp-example-description
                 %span.table-content
                   = convention.engine_description
                 %span.table-form-content
                   %textarea
                     = convention.engine_description
-              %td
+              %td.amp-notes
                 %span.table-content
                   = convention.notes
                 %span.table-form-content
                   %textarea
                     = convention.notes
-              %td
+              %td.amp-public-notes
                 %span.table-content
                   = convention.public_notes
                 %span.table-form-content
                   %textarea
                     = convention.public_notes
-              %td
+              %td.amp-contact
                 %span.table-content
                   = convention.contact
                 %span.table-form-content
