@@ -230,8 +230,23 @@ module ApiRequester::ApiRequester
       request
     end
 
+    def exception_message_of(exception)
+      case
+      when exception.message.present?
+        exception.message
+      when exception.kind_of?(HTTPI::SSLError) && exception.original
+        exception_message_of(exception.original)
+      when exception.cause
+        exception_message_of(exception.cause)
+      else
+        exception.class.name
+      end
+    end
+
     def call_by_method(method, request)
       HTTPI.send(method, request, :curb)
+    rescue => exception
+      raise ApiRequesterError, exception_message_of(exception)
     end
 
     def error_body(response)
