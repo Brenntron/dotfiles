@@ -538,7 +538,7 @@ $ ->
       {
         data: 'sha256_hash'
         render: (data, type, full, meta) ->
-          return '<span id="' + data + '_sha" title="' + data + '" class="esc-tooltipped file_rep_sha">' + data + '</span><div class="copied-sha-tooltip hidden">Copied!</div>'
+          return '<span id="' + data + '_sha" title="' + data + '" class="esc-tooltipped file_rep_sha">' + data + '</span>'
       }
       {
         data: 'file_size'
@@ -683,11 +683,10 @@ $ ->
       selection.addRange(range);
       document.execCommand("Copy");
 
-      # dbinebri: add a click tooltip that co-exists with the hover tooltip, hides after 1 sec
-      $(this).siblings('.copied-sha-tooltip').removeClass('hidden')
-      setTimeout ->
-        $('.copied-sha-tooltip').addClass('hidden')
-      , 1000
+      # dbinebri: add a click tooltip that co-exists with the hover tooltip
+      $(this).after('<div class="copied-sha-tooltip">Copied!</div>')
+      $('.copied-sha-tooltip').animate({opacity: '1'}, 200).delay(500).fadeOut()
+
 
     Number::pad = (size) ->
       s = String(this)

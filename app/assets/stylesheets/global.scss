@@ -9262,6 +9262,7 @@ div[aria-describedby='create-detection-dialog'] {
 
  // dbinebri: adding a specific on-click sha tooltip
 .copied-sha-tooltip {
+  opacity: 0;
   width: 100px;
   background-color: $table-dark-body;
   font-family: 'Open Sans', sans-serif;
