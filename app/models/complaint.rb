@@ -362,7 +362,7 @@ class Complaint < ApplicationRecord
           new_complaint_entry = ComplaintEntry.new
           new_complaint_entry.complaint_id = new_complaint.id
           new_complaint_entry.user_id = user.id
-          new_complaint_entry.uri = key.gsub(/http[s]*\:\/\//, '').gsub(/\A[0-9]*www[0-9]*\./, '')
+          new_complaint_entry.uri = key.gsub(/\Ahttp[s]*\:\/\//, '').gsub(/\A[0-9]*www[0-9]*\./, '')
           new_complaint_entry.entry_type = "URI/DOMAIN"
           new_complaint_entry.wbrs_score = entry['WBRS_SCORE']
           new_complaint_entry.suggested_disposition = entry["cat_sugg"].join(",") unless entry['cat_sugg'].blank?
@@ -456,7 +456,9 @@ class Complaint < ApplicationRecord
       new_complaints = []
 
       all_complaints.each do |rule_ui_complaint|
-        rule_ui_complaint_exists = ComplaintEntry.where(:uri => compile_parts_to_uri(rule_ui_complaint))
+        uri_to_test = compile_parts_to_uri(rule_ui_complaint)
+        rule_ui_complaint_exists = ComplaintEntry.where("uri like ?", "%" + uri_to_test + "%")
+
         if rule_ui_complaint_exists.blank? && rule_ui_complaint['add_channel'] == WBNP_CHANNEL
           new_complaints << rule_ui_complaint
         end
@@ -479,8 +481,9 @@ class Complaint < ApplicationRecord
     subdomain = ""
     if parts["subdomain"].present?
       subdomain = "#{parts["subdomain"]}."
+      subdomain = subdomain.gsub(/\A[0-9]*www[0-9]*\./, '')
     end
-    uri = "#{parts["protocol"]}://#{subdomain}#{parts["domain"]}#{parts["path"]}"
+    uri = "#{subdomain}#{parts["domain"]}#{parts["path"]}"
 
     uri
   end

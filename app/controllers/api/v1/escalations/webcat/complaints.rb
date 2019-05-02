@@ -265,10 +265,37 @@ module API
 
             post 'update_uri' do
               std_api_v2 do
-                authorize!(:update, ComplaintEntry)
-                complaint_entry = ComplaintEntry.find(permitted_params[:complaint_entry_id])
+                begin
+                  authorize!(:update, ComplaintEntry)
+                  complaint_entry = ComplaintEntry.find(permitted_params[:complaint_entry_id])
 
-                complaint_entry.update_uri(permitted_params[:uri])
+                  if (permitted_params[:uri] =~ Resolv::IPv4::Regex) == nil
+                    status = complaint_entry.update_uri(permitted_params[:uri])
+                  end
+
+                  if status[:status] != 'ip'
+                    current_categories = complaint_entry.current_category_data
+                    wbrs_response = Sbrs::ManualSbrs.get_wbrs_data({:url => URI.escape(complaint_entry.domain)})
+                    wbrs_score = wbrs_response["wbrs"]["score"]
+
+                    complaint_entry.wbrs_score = wbrs_score
+                    complaint_entry.category = complaint_entry.set_current_category
+
+                    complaint_entry.save
+
+                    domain = complaint_entry.domain
+                    subdomain = complaint_entry.subdomain
+                    category = complaint_entry.category
+                    path = complaint_entry.path
+                  end
+
+                  render json: {current_categories: current_categories, status: status[:status],
+                                domain: domain, subdomain: subdomain, path: path,
+                                category: category, wbrs_score: wbrs_score}
+                rescue
+                  raise ("Please confirm that a valid URI was given.")
+                end
+
               end
             end
 
