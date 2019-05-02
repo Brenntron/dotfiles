@@ -898,7 +898,7 @@ $ ->
         std_msg_success("Detection successfully created", ['<span class="code-snippet">' + sha256_hashes + '</span>', 'set to <span class="text-capitalize">' + new_disp + '</span> ' + detection_name_msg ], reload: true)
       error: (response) ->
         $('#create-detection-dialog').dialog('close')
-        std_api_error(response, ["Detection not created"], reload: false)
+        std_api_error(response, "Detection not created", reload: false)
     )
 
     return false
