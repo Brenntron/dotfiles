@@ -9259,3 +9259,35 @@ div[aria-describedby='create-detection-dialog'] {
 .table > tbody > tr > td.assignee-col, table > tbody > tr > td.assignee-col {
   min-width: 90px !important;
 }
+
+ // dbinebri: adding a specific on-click sha tooltip
+.copied-sha-tooltip {
+  opacity: 0;
+  width: 100px;
+  background-color: $table-dark-body;
+  font-family: 'Open Sans', sans-serif;
+  font-size: 12px;
+  color: $content-bg-color;
+  padding: 4px 8px;
+  border-radius: 5px;
+  border: none;
+  position: absolute;
+  cursor: default;
+  margin-top: 10px;
+  box-shadow: 5px 5px 8px rgba(0, 0, 0, 0.1);
+  text-align: center;
+  &:after {
+    // little triangle
+    bottom: 100%;
+    left: 50%;
+    content: " ";
+    height: 0;
+    width: 0;
+    position: absolute;
+    pointer-events: none;
+    border-style: solid;
+    border-color: transparent transparent $table-dark-body transparent;
+    border-width: 5px;
+    margin-left: -5px;
+  }
+}
