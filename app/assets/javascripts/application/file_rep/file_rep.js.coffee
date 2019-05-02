@@ -538,7 +538,7 @@ $ ->
       {
         data: 'sha256_hash'
         render: (data, type, full, meta) ->
-          return '<span id="' + data + '_sha" title="' + data + '" class="esc-tooltipped file_rep_sha">' + data + '</span><p class="copied-sha-tooltip hidden">Copied!</p>'
+          return '<span id="' + data + '_sha" title="' + data + '" class="esc-tooltipped file_rep_sha">' + data + '</span><div class="copied-sha-tooltip hidden">Copied!</div>'
       }
       {
         data: 'file_size'

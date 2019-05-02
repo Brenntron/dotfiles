@@ -9260,22 +9260,23 @@ div[aria-describedby='create-detection-dialog'] {
   min-width: 90px !important;
 }
 
-// dbinebri: adding a specific on-click sha tooltip, these are one-off styles
+ // dbinebri: adding a specific on-click sha tooltip
 .copied-sha-tooltip {
   width: 100px;
-  background: rgba(50,50,50,0.9);
-  text-align: center;
+  background-color: $table-dark-body;
   font-family: 'Open Sans', sans-serif;
   font-size: 12px;
-  color: #fff;
+  color: $content-bg-color;
   padding: 4px 8px;
   border-radius: 5px;
   border: none;
   position: absolute;
   cursor: default;
   margin-top: 10px;
-  // the little triangle
+  box-shadow: 5px 5px 8px rgba(0, 0, 0, 0.1);
+  text-align: center;
   &:after {
+    // little triangle
     bottom: 100%;
     left: 50%;
     content: " ";
@@ -9284,7 +9285,7 @@ div[aria-describedby='create-detection-dialog'] {
     position: absolute;
     pointer-events: none;
     border-style: solid;
-    border-color: rgba(50,50,50,0) rgba(50,50,50,0) rgba(50,50,50,0.9) rgba(50,50,50,0);
+    border-color: transparent transparent $table-dark-body transparent;
     border-width: 5px;
     margin-left: -5px;
   }
