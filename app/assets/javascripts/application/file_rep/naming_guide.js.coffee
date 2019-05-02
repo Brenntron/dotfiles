@@ -54,14 +54,6 @@ $ ->
       r++
 
 
-  # Sorting elements function
-  window.getSorted = (selector, attrName) ->
-    $ $(selector).toArray().sort((a, b) ->
-      aVal = parseInt(a.getAttribute(attrName))
-      bVal = parseInt(b.getAttribute(attrName))
-      aVal - bVal
-    )
-
   window.cancel_amp_naming_conventions = () ->
     # Delete any new rows that were not saved
     rows = $('#amp-naming-details-table tbody').find('tr')
@@ -81,8 +73,16 @@ $ ->
       org_seq = $(this).attr('data-org-seq')
       $(this).attr('data-sort-sequence', org_seq)
       $(this).removeAttr('data-org-seq')
-    # Revert to original sort ORDER
-    window.getSorted('.amp-naming-row', 'data-sort-sequence')
+    # Revert original sort ORDER
+    rows =
+      $ rows.sort((a, b) ->
+        aVal = parseInt(a.getAttribute('data-sort-sequence'))
+        bVal = parseInt(b.getAttribute('data-sort-sequence'))
+        aVal - bVal
+      )
+
+    $('#amp-naming-details-table tbody').empty()
+    $(rows).appendTo('#amp-naming-details-table tbody')
 
 
 
