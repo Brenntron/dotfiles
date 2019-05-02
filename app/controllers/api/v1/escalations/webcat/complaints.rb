@@ -207,12 +207,13 @@ module API
               # Convert the API response to JSON
               responses.each do |position, response|
                 responses[position] = JSON.parse(response.body)
+                responses[position] = responses[position]['data'].sort_by! { |key| key['confidence'] }
               end
 
               # Loop through each individual response's categories and add their name to a hash
               responses.each do |position, response|
                 categories[position] = {}
-                response['data'].each_with_index do |data, category_position|
+                response.each_with_index do |data, category_position|
                   categories[position][category_position] = data['category_id']
                 end
               end
