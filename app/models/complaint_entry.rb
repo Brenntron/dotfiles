@@ -107,6 +107,7 @@ class ComplaintEntry < ApplicationRecord
 
   def change_category(prefix,
                       categories_string,
+                      category_names_string,
                       entry_status,
                       comment,
                       resolution_comment,
@@ -154,7 +155,7 @@ class ComplaintEntry < ApplicationRecord
 
           current_status = "PENDING"
           update(resolution: entry_status,
-                 url_primary_category: categories_string,
+                 url_primary_category: category_names_string,
                  category: categories_string,
                  status:current_status,
                  internal_comment: comment,
