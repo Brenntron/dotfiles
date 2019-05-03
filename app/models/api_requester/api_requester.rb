@@ -38,12 +38,19 @@ module ApiRequester::ApiRequester
 
   # Curl::Err::HostResolutionError
 
+  # base class of exceptions for this mixin
   class ApiRequesterError < StandardError
   end
 
+  # exception class for other exceptions re-wrapped as ApiRequesterError.  See `cause` method for original exception.
+  class ApiRequesterExternalError < ApiRequesterError
+  end
+
+  # 404
   class ApiRequesterNotFoundError < ApiRequesterError
   end
 
+  # 401
   class ApiRequesterNotAuthorized < ApiRequesterError
   end
 
@@ -246,7 +253,7 @@ module ApiRequester::ApiRequester
     def call_by_method(method, request)
       HTTPI.send(method, request, :curb)
     rescue => exception
-      raise ApiRequesterError, exception_message_of(exception)
+      raise ApiRequesterExternalError, exception_message_of(exception)
     end
 
     def error_body(response)
