@@ -235,9 +235,9 @@ module ApiRequester::ApiRequester
       when exception.message.present?
         exception.message
       when exception.kind_of?(HTTPI::SSLError) && exception.original
-        exception_message_of(exception.original)
+        "#{exception.class.name} -> " + exception_message_of(exception.original)
       when exception.cause
-        exception_message_of(exception.cause)
+        "#{exception.class.name} -> " + exception_message_of(exception.cause)
       else
         exception.class.name
       end
