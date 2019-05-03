@@ -43,7 +43,7 @@ class Escalations::Webrep::DisputesController < ApplicationController
           end
         end
 
-        send_data contents.stream.string, filename: "disputes_search_#{Time.now}.xlsx", disposition: 'attachment'
+        send_data contents.stream.string, filename: "disputes_search_#{Time.now.utc.iso8601}.xlsx", disposition: 'attachment'
       end
     end
   end
@@ -624,7 +624,7 @@ class Escalations::Webrep::DisputesController < ApplicationController
       end
     end
 
-    send_data contents.stream.string, filename: "disputes_search_#{Time.now}.xlsx", disposition: 'attachment'
+    send_data contents.stream.string, filename: "disputes_search_#{Time.now.utc.iso8601}.xlsx", disposition: 'attachment'
 
   end
 
