@@ -8928,8 +8928,9 @@ button.secondary.view-report-external-button {
   margin-left: -22px;
 }
 
+// dbinebri: fix for "not detected" left padding in RL table on Show
 .scanner-unk {
-  padding-left: 2px !important;
+  padding-left: 22px !important;
   color: $type-lighter-color;
   font-style: italic;
 }
