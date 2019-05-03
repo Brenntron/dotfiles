@@ -429,6 +429,13 @@ class FileReputationDispute < ApplicationRecord
     Rails.logger.error("Error updating sandbox score on id #{self.id} -- #{except.message}")
   end
 
+  def update_amp_disposition
+    detection = FileReputationApi::Detection.get_bulk(self.sha256_hash)
+    update!(disposition: detection.disposition)
+  rescue => except
+    Rails.logger.error("Error updating amp disposition on #{self.id} -- #{except.message}")
+  end
+
   def update_trifecta
     update_threadgrid_score
     update_reversing_labs_score
@@ -511,9 +518,11 @@ class FileReputationDispute < ApplicationRecord
     if new_dispute
       if FileReputationDispute.threaded?
         Thread.new do
+          new_dispute.update_amp_disposition
           new_dispute.update_scores
         end
       else
+        new_dispute.update_amp_disposition
         new_dispute.update_scores
       end
     end
