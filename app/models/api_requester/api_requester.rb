@@ -273,7 +273,6 @@ module ApiRequester::ApiRequester
     end
 
     def specific_error_class(code)
-      byebug
       case code
       when 401
         ApiRequesterNotAuthorized
@@ -291,7 +290,6 @@ module ApiRequester::ApiRequester
     end
 
     def request_error_handling(response)
-      byebug
       error_class = specific_error_class(response.code)
       case
       when 400 > response.code
