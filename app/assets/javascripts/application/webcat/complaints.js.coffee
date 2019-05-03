@@ -243,7 +243,7 @@ window.updatePending = (id,row_id) ->
     headers: headers
     data: {'id': id,'prefix': prefix,'commit':status,'status':resolution,'comment':comment, 'resolution_comment': resolution_comment, 'categories': categories }
     success: (response) ->
-      {uri, error, entry_id, was_dismissed, status} = $.parseJSON(response)
+      {uri, domain, subdomain, path, categories, error, entry_id, was_dismissed, status} = $.parseJSON(response)
       if error
         notice_html = "<p>Something went wrong: #{error}</p>"
         alert(error)
@@ -257,6 +257,7 @@ window.updatePending = (id,row_id) ->
           temp_row.node().className += ' highlight-was-dismissed'
 
         temp_row.data().uri = uri
+        temp_row.data().category = categories
         temp_row.data().status = status
         temp_row.data().resolution = resolution
         temp_row.data().internal_comment = comment
@@ -275,6 +276,11 @@ window.updatePending = (id,row_id) ->
           options: AC.WebCat.createSelectOptions(),
           items: selected_options(temp_row.data().category)
         }
+
+        $("#domain_#{entry_id}").text(domain)
+        $("#subdomain_#{entry_id}").text(subdomain)
+        $("#path_#{entry_id}").text(path)
+
       tds = $('#complaints-index tbody').closest('td')
       for td in tds
         if td.className == ''

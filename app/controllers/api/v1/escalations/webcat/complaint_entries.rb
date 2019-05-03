@@ -215,7 +215,7 @@ module API
             post 'update_pending' do
               begin
                 entry = ComplaintEntry.find(permitted_params['id'])
-                entry.change_category( permitted_params['prefix'], permitted_params['categories'],
+                entry.change_category(permitted_params['prefix'], permitted_params['categories'],
                                     permitted_params['status'],
                                     permitted_params['comment'],permitted_params['resolution_comment'],
                                     current_user, permitted_params['commit'])
@@ -226,7 +226,9 @@ module API
               rescue Exception => e
                 return e.message
               end
-              {entry_id: entry.id, uri: entry.uri, status:entry.status, entry_resolution:permitted_params['commit'], was_dismissed: entry.was_dismissed?}.to_json
+              {entry_id: entry.id, domain: entry.domain, subdomain: entry.subdomain, path: entry.path,
+               categories: permitted_params['categories'], uri: entry.uri, status:entry.status,
+               entry_resolution:permitted_params['commit'], was_dismissed: entry.was_dismissed?}.to_json
             end
 
 
