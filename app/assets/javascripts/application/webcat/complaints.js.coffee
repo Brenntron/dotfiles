@@ -314,7 +314,7 @@ window.updateEntryColumns = (entry_id,row_id) ->
       headers: headers
       data: {'id': entry_id, 'prefix': prefix, 'categories':categories, 'category_names':category_names, 'status':resolution_status, 'comment':comment, 'resolution_comment': resolution_comment }
       success: (response) ->
-        {error, uri, domain, subdomain, status, display_name} = $.parseJSON(response)
+        {error, uri, domain, subdomain, path, status, display_name} = $.parseJSON(response)
 
         if !error
           table = $('#complaints-index').DataTable()
@@ -356,6 +356,7 @@ window.updateEntryColumns = (entry_id,row_id) ->
           $("#complaint_prefix_#{entry_id}").val(uri)
           $("#domain_#{entry_id}").text(domain)
           $("#subdomain_#{entry_id}").text(subdomain)
+          $("#path_#{entry_id}").text(path)
           $("#entry-uri-#{entry_id}").html("<a href='http://#{uri}' target='_blank' onclick='select_cat_text_field(#{entry_id})' >#{uri}</a>")
           $("#site-search-#{entry_id}").html("<a href='https://www.google.com/search?q=site%3A#{uri}' target='_blank' onclick='select_cat_text_field(#{entry_id})'>#{uri}</a>")
 
