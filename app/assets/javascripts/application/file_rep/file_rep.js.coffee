@@ -199,10 +199,14 @@ window.file_rep_show_change_assignee = (dispute_id) ->
 $ ->
   file_rep_url = $('#file-rep-datatable').data('source')
   current_url = window.location.href
+  sorting_request = false
   time_submitted = ''
   last_updated = ''
   sandbox_score = ''
   threatgrid_score = ''
+
+  $(document).on 'click', '.sorting[aria-controls="file-rep-datatable"]', () ->
+    sorting_request = true
 
   window.triggerTooltips = (item) ->
     $('.tooltip_content').show()
@@ -213,6 +217,7 @@ $ ->
       ]
       side: 'bottom'
     return
+
   window.reset_slider = (slider) ->
     if slider == "sandbox"
       sandbox_score = ''
@@ -488,6 +493,22 @@ $ ->
     ajax:
       url: file_rep_url
       data: build_data()
+      error: (error) ->
+
+        if sorting_request
+          error_msg = 'Unable to process sorting request.'
+        else
+          if localStorage.search_type || location.search != ''
+            error_msg = 'Unable to process search request.'
+          else
+            error_msg = 'Unable to process request.'
+
+        error_msg = error.statusText + ': ' + error_msg
+
+        std_msg_error('Error Occurred', [error_msg])
+
+        sorting_request = false
+
     order: [ [
       16
       'desc'
