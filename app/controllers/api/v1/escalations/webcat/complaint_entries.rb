@@ -183,11 +183,13 @@ module API
             post 'update'do
               begin
                 entry = ComplaintEntry.find(permitted_params['id'])
-                entry.change_category( permitted_params['prefix'],permitted_params['categories'],
-                                         permitted_params['status'],
-                                         permitted_params['comment'],
-                                         permitted_params['resolution_comment'],
-                                         current_user, "")
+                entry.change_category( permitted_params['prefix'],
+                                       permitted_params['categories'],
+                                       permitted_params['category_names'],
+                                       permitted_params['status'],
+                                       permitted_params['comment'],
+                                       permitted_params['resolution_comment'],
+                                       current_user, "")
                 ComplaintEntryPreload.generate_preload_from_complaint_entry(entry)
                 if entry.complaint.ticket_source != Complaint::SOURCE_RULEUI
                   message = Bridge::ComplaintUpdateStatusEvent.new
@@ -214,7 +216,7 @@ module API
             post 'update_pending' do
               begin
                 entry = ComplaintEntry.find(permitted_params['id'])
-                entry.change_category( permitted_params['prefix'], permitted_params['categories'],
+                entry.change_category(permitted_params['prefix'], permitted_params['categories'], nil,
                                     permitted_params['status'],
                                     permitted_params['comment'],permitted_params['resolution_comment'],
                                     current_user, permitted_params['commit'])
@@ -486,7 +488,9 @@ module API
                   begin
                     if entry['error'] == false
                       complaint_entry = ComplaintEntry.find(entry['entry_id'])
-                      complaint_entry.change_category( entry['prefix'],entry['categories'],
+                      complaint_entry.change_category( entry['prefix'],
+                                                       entry['categories'],
+                                                       nil,
                                                        entry['status'],
                                                        entry['comment'],
                                                        entry['resolution_comment'],
