@@ -19,8 +19,6 @@
     .row
       .col-xs-12
         %table#case-history
-          -##### Uncomment this section after email backend is ready
-
           -@file_rep_dispute.dispute_emails.each do |email|
             %tr.email-row{class: "email-#{email.status}", email_id: "#{email.id}"}
               %td.alt-col.icon-col
@@ -278,7 +276,7 @@
             %pre
 
 
-    -####### To be uncommented after comments are enabled
+
     -@file_rep_dispute.file_rep_comments.recent_first.each do |comment|
       .note-wrapper
         .row
