@@ -18,15 +18,20 @@ namespace :complaints do
             begin
               complaint = Complaint.find(id)
               complaint.complaint_entries.each do |complaint_entry|
+                next if complaint_entry.status == "COMPLETED"
                 begin
-                  puts "deleting screenshot id: #{complaint_entry.complaint_entry_screenshot.id}"
-                  complaint_entry.complaint_entry_screenshot.delete
+                  if complaint_entry.complaint_entry_screenshot
+                    puts "deleting screenshot id: #{complaint_entry.complaint_entry_screenshot.id}"
+                    complaint_entry.complaint_entry_screenshot.delete
+                  end
                 rescue
                   complaint_screenshot_errors << complaint_entry.complaint_entry_screenshot.id
                 end
                 begin
-                  puts "deleting entry preload id: #{complaint_entry.complaint_entry_preload.id}"
-                  complaint_entry.complaint_entry_preload.delete
+                  if complaint_entry.complaint_entry_preload
+                    puts "deleting entry preload id: #{complaint_entry.complaint_entry_preload.id}"
+                    complaint_entry.complaint_entry_preload.delete
+                  end
                 rescue
                   complaint_entry_preload_errors << complaint_entry.complaint_entry_preload.id
                 end
@@ -38,13 +43,19 @@ namespace :complaints do
                 end
               end
               begin
-                puts "deleting Complaint id: #{complaint.id}"
-                complaint.delete
+                if complaint.complaint_entries.empty?
+                  puts "deleting Complaint id: #{complaint.id}"
+                  complaint.delete
+                else
+                  complaint.set_status(COMPLETED)
+                end
               rescue
                 complaint_errors << complaint.id
               end
             rescue
+              puts "Trouble with this complaint id : #{id}"
               complaint_errors << id
+              next
             end
           end
           if complaint_errors.any?
