@@ -46,13 +46,22 @@ module ApiRequester::ApiRequester
   class ApiRequesterExternalError < ApiRequesterError
   end
 
-  # 404
+  # 401 Unauthenticated
+  class ApiRequesterNotAuthorized < ApiRequesterError
+  end
+
+  # 403 Forbidden or Unauthorized
+  class ApiRequesterForbidden < ApiRequesterError
+  end
+
+  # 404 Not found
   class ApiRequesterNotFoundError < ApiRequesterError
   end
 
-  # 401
-  class ApiRequesterNotAuthorized < ApiRequesterError
+  # 429/420 Exceeded Rate Limit
+  class ApiRequesterExceededRate < ApiRequesterError
   end
+
 
   # Convenience method for reading config.
   # Reads standard settings, such as host, verify_mode, and ca_cert_file
@@ -263,16 +272,32 @@ module ApiRequester::ApiRequester
       nil
     end
 
+    def specific_error_class(code)
+      byebug
+      case code
+      when 401
+        ApiRequesterNotAuthorized
+      when 403
+        ApiRequesterForbidden
+      when 404
+        ApiRequesterNotFoundError
+      when 420
+        ApiRequesterExceededRate
+      when 429
+        ApiRequesterExceededRate
+      else
+        ApiRequesterError
+      end
+    end
+
     def request_error_handling(response)
+      byebug
+      error_class = specific_error_class(response.code)
       case
       when 400 > response.code
         response
-      when 401 == response.code
-        raise ApiRequesterNotAuthorized, "HTTP response #{response.code} #{error_body(response)}"
-      when 404 == response.code
-        raise ApiRequesterNotFoundError, "HTTP response #{response.code} #{error_body(response)}"
       else
-        raise ApiRequesterError, "HTTP response #{response.code} #{error_body(response)}"
+        raise error_class, "HTTP response #{response.code} #{error_body(response)}"
       end
     end
 
