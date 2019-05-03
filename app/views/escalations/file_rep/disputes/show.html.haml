@@ -91,7 +91,7 @@
                 - else
                   %span#dispute-assignee= @file_rep_dispute.assigned.cvs_username
 
-                - if can? :update, FileReputationDispute
+                - if can? :update, @file_rep_dispute
                   .dispute-owner-buttons-wrapper
                     - if @file_rep_dispute.assigned == current_user
                       %button.return-ticket-button.esc-tooltipped{title: 'Return ticket to open queue', onclick: "file_rep_show_return_dispute(#{@file_rep_dispute.id});"}
