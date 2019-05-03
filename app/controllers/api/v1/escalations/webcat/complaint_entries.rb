@@ -176,6 +176,7 @@ module API
               requires :id, type: Integer, desc:'complaint entry id'
               requires :prefix, type: String, desc: 'the url to categorize'
               requires :categories, type: String, desc: 'a list of categories to assign to this prefix'
+              requires :category_names, type: String, desc: 'a list of category names to assign to Complaint Entry record'
               requires :status, type: String, desc: 'setting the status of the entry'
               optional :comment, type: String, desc: 'internal comment'
               optional :resolution_comment, type: String, desc: 'resolution comment for the customer'
