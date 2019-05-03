@@ -113,6 +113,8 @@ GEM
     chart-js-rails (0.1.6)
       railties (> 3.1)
     chartkick (2.2.5)
+    childprocess (1.0.1)
+      rake (< 13.0)
     clipboard-rails (1.7.1)
     cliver (0.3.2)
     coderay (1.1.2)
@@ -455,6 +457,9 @@ GEM
       sprockets-rails
       tilt
     selectize-rails (0.12.6)
+    selenium-webdriver (3.142.0)
+      childprocess (>= 0.5, < 2.0)
+      rubyzip (~> 1.2, >= 1.2.2)
     shellany (0.0.1)
     simple_form (4.0.1)
       actionpack (>= 5.0)
@@ -598,6 +603,7 @@ DEPENDENCIES
   rubyXL (= 3.3.30)
   sassc-rails (~> 2.0)
   selectize-rails (~> 0.12.4)
+  selenium-webdriver
   simple_form (= 4.0.1)
   simplecov (= 0.16.1)
   sprockets (~> 3.7.1)
