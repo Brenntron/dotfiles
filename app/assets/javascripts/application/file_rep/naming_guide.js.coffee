@@ -68,11 +68,29 @@ $ ->
     $('#amp-edit-button').show()
     $('.active-editing-buttons').hide()
 
-    # Revert original sort NUMBERS, remove temp data attribute
+    # Revert any changes
     $(rows).each ->
+      # Revert any changed content back to original state
+      cells = $(this).find('td')
+      $(cells).each ->
+        if $($(this).find('input')).length > 0
+          input = $($(this).find('input')).val()
+          if $(this).hasClass('amp-pattern')
+            content = $($(this).find('.table-code')).text()
+          else
+            content = $($(this).find('.table-content')).text()
+          input == content
+        else
+          textarea = $($(this).find('textarea')).val()
+          content = $($(this).find('.table-content')).text()
+          textarea == content
+
+      # Revert original sort NUMBERS, remove temp data attribute
       org_seq = $(this).attr('data-org-seq')
       $(this).attr('data-sort-sequence', org_seq)
       $(this).removeAttr('data-org-seq')
+
+
     # Revert original sort ORDER
     rows =
       $ rows.sort((a, b) ->
@@ -83,12 +101,6 @@ $ ->
 
     $('#amp-naming-details-table tbody').empty()
     $(rows).appendTo('#amp-naming-details-table tbody')
-
-
-
-
-
-  # TODO Figure out how to revert to original sort
 
 
 
