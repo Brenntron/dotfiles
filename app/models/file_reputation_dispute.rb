@@ -1,5 +1,6 @@
 # class FileReputationTicket < ApplicationRecord
 class FileReputationDispute < ApplicationRecord
+  has_paper_trail on: [:update], ignore: [:updated_at]
 
   belongs_to :customer, optional:true
   has_many :file_rep_comments
@@ -80,6 +81,20 @@ class FileReputationDispute < ApplicationRecord
     envelope[:addressee_status] = self.status
 
     Bridge::FilerepUpdateStatusEvent.new(envelope).post
+  end
+
+  def compose_versioned_items
+
+    versioned_items = [self]
+
+    file_rep_comments.includes(:versions).map{ |dc| versioned_items << dc}
+
+    versioned_items
+
+  end
+
+  def dispute_emails
+    DisputeEmail.where(file_reputation_dispute_id: self.id)
   end
   
   def self.create_action(bugzilla_rest_session, sha256_hash, file_name, file_size, sample_type, disposition_suggested, source, platform, sha256_checksum)
@@ -187,6 +202,9 @@ class FileReputationDispute < ApplicationRecord
       end
     end
   end
+
+
+
 
   # omits fields with empty strings and nil as values
   # @param [Hash|ActionController::Parameters] fields input which may contain blank values

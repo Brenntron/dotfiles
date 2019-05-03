@@ -21,50 +21,50 @@
         %table#case-history
           -##### Uncomment this section after email backend is ready
 
-          -#-@file_rep_dispute.dispute_emails.each do |email|
-          -#  %tr.email-row{class: "email-#{email.status}", email_id: "#{email.id}"}
-          -#    %td.alt-col.icon-col
-          -#      %span.case-history-icon.email-icon{:data => {:history_kind => "email"}}
-          -#    %td
-          -#      %span.case-history-author
-          -#        =email.from
-          -#      %span.case-history-preview
-          -#        =email.subject
-          -#    %td.alt-col.case-history-datetime{:data => {:db_date => email.created_at}}
-          -#      = format_date(email.created_at)
-          -#      %br
-          -#      =email.created_at.strftime("%H:%M:%S")
-          -#-@file_rep_dispute.dispute_comments.recent_first.each do |comment|
-          -#  %tr.note-history-row
-          -#    %td.alt-col.icon-col
-          -#      %span.case-history-icon.note-icon{:data => {:history_kind => "note"}}
-          -#    %td
-          -#      %span.case-history-author
-          -#        =comment.user.cec_username
-          -#      %span.case-history-preview
-          -#        =comment.comment.truncate(75, omission: '...')
-          -#    %td.alt-col.case-history-datetime{:data => {:db_date => comment.created_at}}
-          -#      = format_date(comment.created_at)
-          -#      %br
-          -#      =comment.created_at.strftime("%H:%M:%S")
-          -#-@versioned_items.each do |item|
-          -#  -item.versions.each do |version|
-          -#    %tr.version-row
-          -#      %td.alt-col.icon-col
-          -#        %span.case-history-icon.disp-status-icon{:data => {:history_kind => "version"}}
-          -#      %td
-          -#        %span.case-history-author
-          -#          =whodunnit_helper(version)
-          -#        -version.changeset.each do |field, (changed_from, changed_to) |
-          -#          %span.case-history-preview
-          -#            =field_changeset_handler(field, changed_from)
-          -#            %span.emphasize #{changed_from}
-          -#            to
-          -#            %span.emphasize #{changed_to}.
-          -#      %td.alt-col.case-history-datetime{:data => {:db_date => version.created_at}}
-          -#        = format_date(version.created_at)
-          -#        %br
-          -#        =version.created_at.strftime("%H:%M:%S")
+          -@file_rep_dispute.dispute_emails.each do |email|
+            %tr.email-row{class: "email-#{email.status}", email_id: "#{email.id}"}
+              %td.alt-col.icon-col
+                %span.case-history-icon.email-icon{:data => {:history_kind => "email"}}
+              %td
+                %span.case-history-author
+                  =email.from
+                %span.case-history-preview
+                  =email.subject
+              %td.alt-col.case-history-datetime{:data => {:db_date => email.created_at}}
+                = format_date(email.created_at)
+                %br
+                =email.created_at.strftime("%H:%M:%S")
+          -@file_rep_dispute.file_rep_comments.recent_first.each do |comment|
+            %tr.note-history-row
+              %td.alt-col.icon-col
+                %span.case-history-icon.note-icon{:data => {:history_kind => "note"}}
+              %td
+                %span.case-history-author
+                  =comment.user.cec_username
+                %span.case-history-preview
+                  =comment.comment.truncate(75, omission: '...')
+              %td.alt-col.case-history-datetime{:data => {:db_date => comment.created_at}}
+                = format_date(comment.created_at)
+                %br
+                =comment.created_at.strftime("%H:%M:%S")
+          -@versioned_items.each do |item|
+            -item.versions.each do |version|
+              %tr.version-row
+                %td.alt-col.icon-col
+                  %span.case-history-icon.disp-status-icon{:data => {:history_kind => "version"}}
+                %td
+                  %span.case-history-author
+                    =whodunnit_helper(version)
+                  -version.changeset.each do |field, (changed_from, changed_to) |
+                    %span.case-history-preview
+                      =field_changeset_handler(field, changed_from)
+                      %span.emphasize #{changed_from}
+                      to
+                      %span.emphasize #{changed_to}.
+                %td.alt-col.case-history-datetime{:data => {:db_date => version.created_at}}
+                  = format_date(version.created_at)
+                  %br
+                  =version.created_at.strftime("%H:%M:%S")
 
   .col-sm-6.border-section
     .row
