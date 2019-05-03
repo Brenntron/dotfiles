@@ -11,7 +11,9 @@ $ ->
     $('#dialog-naming-guide').dialog('open')
 
 
-#### FUNCTIONS FOR THE NAMING GUIDE PAGE ####
+
+
+####### FUNCTIONS FOR THE NAMING GUIDE PAGE #######
   # Keep columns of rows consistent while they are moved
   maintain_col_width = (e, ui) ->
     ui.children().each ->
@@ -84,14 +86,12 @@ $ ->
           textarea = $($(this).find('textarea')).val()
           content = $($(this).find('.table-content')).text()
           textarea == content
-
       # Revert original sort NUMBERS, remove temp data attribute
       org_seq = $(this).attr('data-org-seq')
       $(this).attr('data-sort-sequence', org_seq)
       $(this).removeAttr('data-org-seq')
 
-
-    # Revert original sort ORDER
+    # Revert to original sort ORDER
     rows =
       $ rows.sort((a, b) ->
         aVal = parseInt(a.getAttribute('data-sort-sequence'))
@@ -103,7 +103,7 @@ $ ->
     $(rows).appendTo('#amp-naming-details-table tbody')
 
 
-
+  # Create new row in table
   window.add_amp_naming_conventions = () ->
     number_of_rows = $('#amp-naming-details-table tbody').find('tr').length
     new_sequence_number = number_of_rows + 1
@@ -143,8 +143,59 @@ $ ->
 
 
   window.save_amp_naming_conventions = () ->
-    # compare changes
-    # check for new rows
-    # save to db
+    # Update static content to match updated content
+    # and prep for saving
+    rows = $('#amp-naming-details-table tbody').find('tr')
+    rows_to_update = []
+    rows_to_add = []
+
+    $(rows).each ->
+      row = this
+      nochange = true
+      # Copy any new or changed content to the static rows
+      cells = $(row).find('td')
+      $(cells).each ->
+        if $($(this).find('input')).length > 0
+          input = $($(this).find('input')).val()
+          input = $.trim(input)
+          if $(this).hasClass('amp-pattern')
+            content = $($(this).find('.table-code')).text()
+            content = $.trim(content)
+          else
+            content = $($(this).find('.table-content')).text()
+            content = $.trim(content)
+          if content != input
+            nochange = false
+          content == input
+        else
+          textarea = $($(this).find('textarea')).val()
+          textarea = $.trim(textarea)
+          content = $($(this).find('.table-content')).text()
+          content = $.trim(content)
+          if content != textarea
+            nochange = false
+          content == textarea
+
+      # Check to see if sequence order has been changed
+      org_seq = $(row).attr('data-org-seq')
+      if $(this).attr('data-sort-sequence') != org_seq
+        nochange = false
+
+      # Remove temp attribute
+      $(row).removeAttr('data-org-seq')
+
+      # Put changed rows in one array and new ones in a separate array
+      if nochange == false
+        row_id = $(row).attr('data-id')
+        unless row_id == ''
+          rows_to_update.push(this)
+        else
+          rows_to_add.push(this)
+
+          
+
+
+
+
 
 
