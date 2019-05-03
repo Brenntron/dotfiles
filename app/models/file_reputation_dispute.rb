@@ -412,7 +412,7 @@ class FileReputationDispute < ApplicationRecord
   end
 
   def update_sample_zoo
-    zoo_response = FileReputationApi::SampleZoo.data(self.sha256_hash)
+    zoo_response = FileReputationApi::SampleZoo.sha256_lookup(self.sha256_hash)
     begin
       attributes = FileReputationApi::SampleZoo.query_from_data(zoo_response)
       update!(attributes)
