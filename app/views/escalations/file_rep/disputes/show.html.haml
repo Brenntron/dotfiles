@@ -97,7 +97,7 @@
                       %button.take-ticket-button#show_ticket_assign.esc-tooltipped{title: 'Assign this ticket to me', onclick: "file_rep_show_take_dispute(#{@file_rep_dispute.id});"}
 
                     %span.dropdown
-                      - if [FileReputationDispute::STATUS_NEW, FileReputationDispute::STATUS_REOPENED].include? @file_rep_dispute.status
+                      - if can? :change_assignee, @file_rep_dispute
                         %button#index_change_assign.dispute-inline-buttons.ticket-owner-button.dropdown-toggle.esc-tooltipped{title: 'Change Assignee', 'data-toggle': 'dropdown', 'aria-haspopup': 'true', 'aria-expanded': 'false'}
                       - else
                         %span#replace-button
