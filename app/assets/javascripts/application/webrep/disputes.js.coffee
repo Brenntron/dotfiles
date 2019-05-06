@@ -1453,7 +1453,17 @@ window.webrep_export_selected_rows = () ->
   for id in ids
     query_string += "ids[]=#{id}&"
 
-  window.open("/escalations/webrep/export_selected_rows#{query_string}", "_blank")
+  window.open("/escalations/webrep/export_selected_dispute_rows#{query_string}", "_blank")
+
+window.webrep_research_export_selected_rows = () ->
+  checked_boxes = $('.dispute_check_box:checked').get()
+  ids = checked_boxes.map (checkbox) -> parseInt(checkbox.getAttribute('data-entry-id'))
+
+  query_string = '?'
+  for id in ids
+    query_string += "ids[]=#{id}&"
+
+  window.open("/escalations/webrep/export_selected_dispute_entry_rows#{query_string}", "_blank")
 
 $ ->
   $('#advanced-search-button').click ->
