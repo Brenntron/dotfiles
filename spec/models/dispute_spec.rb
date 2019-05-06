@@ -511,7 +511,7 @@ describe Dispute do
     expect(dispute).to_not be_nil
     expect(dispute.dispute_entries.count).to eq(1)
     dispute_entry = dispute.dispute_entries.first
-    expect(dispute_entry.status).to eql(DisputeEntry::RESOLVED)
+    expect(dispute_entry.status).to eql(DisputeEntry::STATUS_RESOLVED)
     expect(dispute_entry.resolution).to eql(DisputeEntry::STATUS_RESOLVED_FIXED_FN)
   end
 
