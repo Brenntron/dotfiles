@@ -413,3 +413,8 @@ window.update_file_rep_data = () ->
       $(sync_button).removeClass('syncing')
       std_api_error(response, "There was a problem refreshing some research data", reload: false)
   )
+
+
+$ ->
+  # dbinebri: on page load - setting the collapsed + height state for both json reports
+  $('#collapse_sb_json, #collapse_tg_json').toggleClass("in").css("height", "300px").attr("aria-expanded", "false")

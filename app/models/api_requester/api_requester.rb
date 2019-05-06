@@ -38,14 +38,30 @@ module ApiRequester::ApiRequester
 
   # Curl::Err::HostResolutionError
 
+  # base class of exceptions for this mixin
   class ApiRequesterError < StandardError
   end
 
+  # exception class for other exceptions re-wrapped as ApiRequesterError.  See `cause` method for original exception.
+  class ApiRequesterExternalError < ApiRequesterError
+  end
+
+  # 401 Unauthenticated
+  class ApiRequesterNotAuthorized < ApiRequesterError
+  end
+
+  # 403 Forbidden or Unauthorized
+  class ApiRequesterForbidden < ApiRequesterError
+  end
+
+  # 404 Not found
   class ApiRequesterNotFoundError < ApiRequesterError
   end
 
-  class ApiRequesterNotAuthorized < ApiRequesterError
+  # 429/420 Exceeded Rate Limit
+  class ApiRequesterExceededRate < ApiRequesterError
   end
+
 
   # Convenience method for reading config.
   # Reads standard settings, such as host, verify_mode, and ca_cert_file
@@ -235,9 +251,9 @@ module ApiRequester::ApiRequester
       when exception.message.present?
         exception.message
       when exception.kind_of?(HTTPI::SSLError) && exception.original
-        exception_message_of(exception.original)
+        "#{exception.class.name} -> " + exception_message_of(exception.original)
       when exception.cause
-        exception_message_of(exception.cause)
+        "#{exception.class.name} -> " + exception_message_of(exception.cause)
       else
         exception.class.name
       end
@@ -246,7 +262,7 @@ module ApiRequester::ApiRequester
     def call_by_method(method, request)
       HTTPI.send(method, request, :curb)
     rescue => exception
-      raise ApiRequesterError, exception_message_of(exception)
+      raise ApiRequesterExternalError, exception_message_of(exception)
     end
 
     def error_body(response)
@@ -256,16 +272,30 @@ module ApiRequester::ApiRequester
       nil
     end
 
+    def specific_error_class(code)
+      case code
+      when 401
+        ApiRequesterNotAuthorized
+      when 403
+        ApiRequesterForbidden
+      when 404
+        ApiRequesterNotFoundError
+      when 420
+        ApiRequesterExceededRate
+      when 429
+        ApiRequesterExceededRate
+      else
+        ApiRequesterError
+      end
+    end
+
     def request_error_handling(response)
+      error_class = specific_error_class(response.code)
       case
       when 400 > response.code
         response
-      when 401 == response.code
-        raise ApiRequesterNotAuthorized, "HTTP response #{response.code} #{error_body(response)}"
-      when 404 == response.code
-        raise ApiRequesterNotFoundError, "HTTP response #{response.code} #{error_body(response)}"
       else
-        raise ApiRequesterError, "HTTP response #{response.code} #{error_body(response)}"
+        raise error_class, "HTTP response #{response.code} #{error_body(response)}"
       end
     end
 

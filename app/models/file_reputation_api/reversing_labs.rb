@@ -41,4 +41,17 @@ class FileReputationApi::ReversingLabs
     api_response = FileReputationApi::ReversingLabs.sha256_lookup(sha256_hash)
     FileReputationApi::ReversingLabs.score_of_lookup(api_response)
   end
+
+  # Returns an array of certificates
+  def self.certificates(sha256)
+    api_response = call_request_parsed(:post, '/api/databrowser/rldata/bulk_query/json', request_type: :json, input: {rl: {query: {hash_type: 'sha256', hashes: [sha256] }}}, headers: {'Authorization': 'Basic dS9zb3VyY2VmaXJlOlV1djRsYWl0'})
+
+    if api_response&.dig('rl','entries')&.any?
+      certificates = api_response&.dig('rl','entries')[0]&.dig('analysis','entries')[0]&.dig('tc_report','metadata','certificate','certificates')
+    else
+      certificates = nil
+    end
+
+    certificates
+  end
 end

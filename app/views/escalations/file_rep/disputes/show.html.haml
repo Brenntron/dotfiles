@@ -4,7 +4,7 @@
     .content-wrapper.top-case-info.ticket-overview-wrapper
       %h4 Ticket Overview
       .row
-        .col-xs-12.col-sm-12.col-md-12.col-lg-5
+        .col-xs-12.col-sm-12.col-md-12.col-lg-5.col-ticket-left
           .row
             .col-xs-6.col-sm-6.col-md-6.col-lg-6.col-xl-6.col-with-divider
               %label.content-label-sm
@@ -82,7 +82,7 @@
                         %button.primary.change_ticket_status_button{type:'button', id:'webrep_change_ticket_status', onclick:'update_file_rep_status_on_show();'}
                           Submit
 
-            .col-xs-6.col-sm-6.col-md-6.col-lg-6.col-xl-6.col-with-divider
+            .col-xs-6.col-sm-6.col-md-6.col-lg-6.col-xl-6.col-with-divider.col-assignee
               %label.content-label-sm
                 Assignee
               .top-info-data
@@ -119,7 +119,7 @@
               - else
                 .disposition= @file_rep_dispute.disposition_suggested
 
-        .col-xs-12.col-sm-12.col-md-12.col-lg-7.col-with-divider
+        .col-xs-12.col-sm-12.col-md-12.col-lg-7.col-with-divider.col-ticket-right
           .row
             .col-xs-6.col-sm-6.col-md-6.col-with-divider
               %label.content-label-sm Customer Name
