@@ -204,6 +204,24 @@ module API
                uri: entry.uri, domain: entry.domain, subdomain: entry.subdomain, path: entry.path}.to_json
             end
 
+            desc 'Bulk update entry resolutions'
+            params do
+              requires :complaint_entry_ids, type: Array[Integer], desc: 'ComplaintEntry ids'
+              requires :resolution_name, type: String
+            end
+            post 'bulk_update_entry_resolution' do
+              begin
+                permitted_params['complaint_entry_ids'].each do |id|
+                  ComplaintEntry.update(id, :resolution => params[:resolution_name], :status => ComplaintEntry::STATUS_COMPLETED)
+                end
+              rescue Exception => e
+                Rails.logger.error "Failed to take entry: error=> #{e.message}"
+                error = "#{e.message}"
+                return {:error => error}.to_json
+              end
+              params[:complaint_entry_ids].to_json
+            end
+
 
             desc 'update a high telemetry entry'
             params do
