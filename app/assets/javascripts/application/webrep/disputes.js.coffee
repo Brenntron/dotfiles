@@ -1046,10 +1046,12 @@ $ ->
       { data: 'submitter_name' }
       { data: 'submitter_email' }
       { data: 'status_comment' }
+      { data: 'updated_at' }
       {
         data: 'age_int'
         visible: false
       }
+
 
 
     ])
