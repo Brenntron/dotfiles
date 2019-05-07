@@ -18,7 +18,7 @@ window.updateURI = (event, complaint_entry_id) ->
     url: "/escalations/api/v1/escalations/webcat/complaints/update_uri"
     data: {complaint_entry_id: complaint_entry_id, uri: uri }
     success: (response) ->
-      {current_categories, category, wbrs_score, domain, subdomain, status} = response.json
+      {current_categories, category, wbrs_score, domain, subdomain, path, status} = response.json
 
       $('#loader-modal').modal 'hide'
 
@@ -32,6 +32,7 @@ window.updateURI = (event, complaint_entry_id) ->
 
         $("#domain_#{complaint_entry_id}").text(domain)
         $("#subdomain_#{complaint_entry_id}").text(subdomain)
+        $("#path_#{complaint_entry_id}").text(path)
         $("#category_#{complaint_entry_id}").text(category)
         $("#wbrs_score_#{complaint_entry_id}").text(wbrs_score)
 
@@ -242,26 +243,29 @@ window.updatePending = (id,row_id) ->
     headers: headers
     data: {'id': id,'prefix': prefix,'commit':status,'status':resolution,'comment':comment, 'resolution_comment': resolution_comment, 'categories': categories }
     success: (response) ->
-      json = $.parseJSON(response)
-      if json.error
-        notice_html = "<p>Something went wrong: #{json.error}</p>"
-        alert(json.error)
+      {uri, domain, subdomain, path, categories, error, entry_id, was_dismissed, status} = $.parseJSON(response)
+      if error
+        notice_html = "<p>Something went wrong: #{error}</p>"
+        alert(error)
       else
         table = $('#complaints-index').DataTable()
         temp_row = table.row(row_id)
         td = $(temp_row).next('tr').find('td:first')
         unless $(td).hasClass 'nested-complaint-data-wrapper'
           $(td).addClass 'nested-complaint-data-wrapper'
-        if json.was_dismissed
+        if was_dismissed
           temp_row.node().className += ' highlight-was-dismissed'
 
-        temp_row.data().status = json.status
+        temp_row.data().uri = uri
+        temp_row.data().category = categories
+        temp_row.data().status = status
         temp_row.data().resolution = resolution
         temp_row.data().internal_comment = comment
         temp_row.data().resolution_comment = resolution_comment
         temp_row.invalidate().page(table_page).draw(false)
         temp_row.child().remove()
         temp_row.child(format(temp_row)).show()
+
         $('#input_cat_'+ temp_row.data().entry_id).selectize {
           persist: false,
           create: false,
@@ -272,6 +276,11 @@ window.updatePending = (id,row_id) ->
           options: AC.WebCat.createSelectOptions(),
           items: selected_options(temp_row.data().category)
         }
+
+        $("#domain_#{entry_id}").text(domain)
+        $("#subdomain_#{entry_id}").text(subdomain)
+        $("#path_#{entry_id}").text(path)
+
       tds = $('#complaints-index tbody').closest('td')
       for td in tds
         if td.className == ''
@@ -289,7 +298,7 @@ window.updateEntryColumns = (entry_id,row_id) ->
   category_name.each ->
     category_names.push($(this).text())
   category_names = category_names.toString()
-  status = $('[name=resolution'+entry_id+']:checked').val()
+  resolution_status = $('[name=resolution'+entry_id+']:checked').val()
   comment = $('#complaint_comment_'+entry_id)[0].value
   resolution_comment = $('#complaint_resolution_comment_'+entry_id)[0].value
   headers = {'Token': $('input[name="token"]').val(), 'Xmlrpc-Token': $('input[name="xml_token"]').val()}
@@ -303,18 +312,19 @@ window.updateEntryColumns = (entry_id,row_id) ->
       url: '/escalations/api/v1/escalations/webcat/complaint_entries/update'
       method: 'POST'
       headers: headers
-      data: {'id': entry_id,'prefix': prefix,'categories':categories, 'category_names':category_names, 'status':status,'comment':comment, 'resolution_comment': resolution_comment }
+      data: {'id': entry_id, 'prefix': prefix, 'categories':categories, 'category_names':category_names, 'status':resolution_status, 'comment':comment, 'resolution_comment': resolution_comment }
       success: (response) ->
-        json = $.parseJSON(response)
-        if !json.error
+        {error, uri, domain, subdomain, path, status, display_name} = $.parseJSON(response)
+
+        if !error
           table = $('#complaints-index').DataTable()
 
           selected_rows = $('#complaints-index').DataTable().rows('.selected')
-          selected_rows.data().cell(selected_rows[0][0],14).data("#{json.display_name}").draw()
+          selected_rows.data().cell(selected_rows[0][0],14).data("#{display_name}").draw()
 
           temp_row = table.row(row_id)
-          temp_row.data().status = json.status
-          temp_row.data().resolution = status
+          temp_row.data().status = status
+          temp_row.data().resolution = resolution_status
           temp_row.data().internal_comment = comment
           temp_row.data().resolution_comment = resolution_comment
           temp_row.data().category = category_names
@@ -342,6 +352,14 @@ window.updateEntryColumns = (entry_id,row_id) ->
             options: AC.WebCat.createSelectOptions()
             items: selected_options(temp_row.data().category_names)
           }
+
+          $("#complaint_prefix_#{entry_id}").val(uri)
+          $("#domain_#{entry_id}").text(domain)
+          $("#subdomain_#{entry_id}").text(subdomain)
+          $("#path_#{entry_id}").text(path)
+          $("#entry-uri-#{entry_id}").html("<a href='http://#{uri}' target='_blank' onclick='select_cat_text_field(#{entry_id})' >#{uri}</a>")
+          $("#site-search-#{entry_id}").html("<a href='https://www.google.com/search?q=site%3A#{uri}' target='_blank' onclick='select_cat_text_field(#{entry_id})'>#{uri}</a>")
+
         tds = $('#complaints-index tbody').closest('td')
         for td in tds
           if td.className == ''

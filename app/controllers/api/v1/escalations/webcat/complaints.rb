@@ -287,10 +287,11 @@ module API
                     domain = complaint_entry.domain
                     subdomain = complaint_entry.subdomain
                     category = complaint_entry.category
+                    path = complaint_entry.path
                   end
 
                   render json: {current_categories: current_categories, status: status[:status],
-                                domain: domain, subdomain: subdomain,
+                                domain: domain, subdomain: subdomain, path: path,
                                 category: category, wbrs_score: wbrs_score}
                 rescue
                   raise ("Please confirm that a valid URI was given.")
