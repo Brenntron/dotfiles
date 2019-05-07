@@ -18,7 +18,7 @@ Feature: Disputes
     Given a user with role "filerep user" exists and is logged in
     And bugzilla rest api always saves
     And ThreatGrid API call is stubbed
-    And TiCloud API call is stubbed
+    And Reversing Labs certificates API call is stubbed
     And Sandbox API call is stubbed
     And ReversingLabs API call is stubbed
     When I go to "/escalations/file_rep/disputes"
@@ -31,12 +31,6 @@ Feature: Disputes
     # Change this step when we settle on a list of suggested dispositions
     And that FileRep Ticket should have a suggested disposition of "Option 1"
     And I should see "FILE REPUTATION TICKET CREATED."
-
-  @javascript
-  Scenario: a user tries to visit the FileRep disputes page without a FileRep role
-    Given a user with role "other user" exists and is logged in
-    And I go to "/escalations/file_rep/disputes"
-    Then I should see "You are not authorized"
 
   @javascript
   Scenario: a user tries to visit the FileRep disputes page with a FileRep role
@@ -187,25 +181,23 @@ Feature: Disputes
     And I should see "RESULTS"
 
   @javascript
-  Scenario: a user visits the FileRep Dispute Show page and confirms that ReversingLabs data was populated
+  Scenario: a user visits the FileRep Dispute index page and clicks the Naming Guide
     Given a user with role "filerep user" exists and is logged in
     When I go to "/escalations/file_rep/disputes/"
     And I click "#naming-guide"
     Then I should see "AMP Naming Conventions Guide"
 
-  # Unable to reach Communications tab due to JavaScript errors caused by Poltergeist 2.1.1's incompatibility with JavaScript ES6
-  # Resolved by switching to Selenium
   @javascript
   Scenario: a user visits the FileRep Dispute Communications tab and tries to adds a note
     Given a user with role "filerep user" exists and is logged in
     And A FileRep Dispute with trait "default" exists
     When I go to "/escalations/file_rep/disputes/1"
     And I click "#communication-tab-link"
-    And I click "#new-case-note-button"
+    And I click "#new-filerep-case-note-button"
     And I fill a content-editable field ".new-case-note-textarea" with "Here we go, again."
-    And I click ".new-case-note-save-button"
-    And I go to "/escalations/file_rep/disputes/1"
-    Then I should see "Here we go, again."
+    And I click ".new-filerep-case-note-save-button"
+    Then I should see content "Here we go, again." within ".note-block1"
+    Then I should not see "Note could not created."
 
   @javascript
   Scenario: a user visits the FileRep Dispute index page and uses the 'My Tickets' filter
@@ -265,9 +257,9 @@ Feature: Disputes
     And A FileRep Dispute with trait "default" exists
     When I go to "/escalations/file_rep/disputes/1"
     And I click "#show-edit-ticket-status-button"
-    And I click on element "input" with accessor "value" of "RESEARCHING"
+    And I click on element "label" with accessor "for" of "file-status-escalated"
     And I click ".primary"
-    Then I should see "RESEARCHING"
+    Then I should see "FILE REPUTATION TICKET STATUSES UPDATED."
 
   @javascript
   Scenario: a user visits the FileRep Dispute show page and changes assignee
