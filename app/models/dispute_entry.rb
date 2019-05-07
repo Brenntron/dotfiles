@@ -4,7 +4,7 @@ class DisputeEntry < ApplicationRecord
   attr_writer :wbrs_xlist
 
   has_paper_trail on: [:update], ignore: [:updated_at, :entry_type]
-  belongs_to :dispute
+  belongs_to :dispute, touch: true
   belongs_to :user, optional: true
   has_many :dispute_rule_hits
   has_one  :dispute_entry_preload
