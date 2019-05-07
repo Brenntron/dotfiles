@@ -4,7 +4,7 @@
     .content-wrapper.top-case-info.ticket-overview-wrapper
       %h4 Ticket Overview
       .row
-        .col-xs-12.col-sm-12.col-md-12.col-lg-5
+        .col-xs-12.col-sm-12.col-md-12.col-lg-5.col-ticket-left
           .row
             .col-xs-6.col-sm-6.col-md-6.col-lg-6.col-xl-6.col-with-divider
               %label.content-label-sm
@@ -82,7 +82,7 @@
                         %button.primary.change_ticket_status_button{type:'button', id:'webrep_change_ticket_status', onclick:'update_file_rep_status_on_show();'}
                           Submit
 
-            .col-xs-6.col-sm-6.col-md-6.col-lg-6.col-xl-6.col-with-divider
+            .col-xs-6.col-sm-6.col-md-6.col-lg-6.col-xl-6.col-with-divider.col-assignee
               %label.content-label-sm
                 Assignee
               .top-info-data
@@ -119,7 +119,7 @@
               - else
                 .disposition= @file_rep_dispute.disposition_suggested
 
-        .col-xs-12.col-sm-12.col-md-12.col-lg-7.col-with-divider
+        .col-xs-12.col-sm-12.col-md-12.col-lg-7.col-with-divider.col-ticket-right
           .row
             .col-xs-6.col-sm-6.col-md-6.col-with-divider
               %label.content-label-sm Customer Name
@@ -182,7 +182,7 @@
             .top-info-data
               = @file_rep_dispute.detection_created_at
             %label.content-label-sm In Sample Zoo
-            - if @file_rep_dispute.in_zoo == 1
+            - if @file_rep_dispute.in_zoo == true
               .top-info-data#sample-zoo-status{'data-zoo-status': 'YES'}
                 %span.glyphicon.glyphicon-ok
             - else
@@ -201,16 +201,13 @@
   %li.nav-item{role:'presentation'}
     %a.nav-link#communication-tab-link{href: '#communication_tab', 'aria-controls': 'communication', role: 'tab', 'data-toggle': 'tab'}
       Communication
-  %li.nav-item{role:'presentation'}
-    %a.nav-link#history-tab-link{href: '#history_tab', 'aria-controls': 'history', role: 'tab', 'data-toggle': 'tab'}
-      History
+
 
 .tab-content.content-wrapper#bug-tab-content
   .tab-pane#research_tab{role: 'tabpanel'}
     = render 'escalations/file_rep/disputes/research_tab'
   .tab-pane#communication_tab{role: 'tabpanel'}
     = render 'escalations/file_rep/disputes/communication_tab'
-  .tab-pane#history_tab{role: 'tabpanel'}
-    History
+
 
 = render 'escalations/file_rep/disputes/create_detection_dialog'

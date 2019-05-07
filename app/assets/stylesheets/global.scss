@@ -8895,15 +8895,17 @@ button.secondary.view-report-external-button {
   line-height: 1.25em;
 }
 
-.tg-data-present, .tg-data-missing, .rl-data-present, .rl-data-missing, .sb-data-present, .sb-data-missing {
+.tg-data-present, .tg-data-missing, .rl-data-present, .rl-data-missing, .sb-data-present, .sb-data-missing, .sb-report-run {
   display: none;
 }
 
-.tg-data-missing, .sb-data-missing, .rl-data-missing {
+.tg-data-missing, .sb-data-missing, .rl-data-missing, .sb-report-run {
   margin-top: 40px;
 }
 
-
+.sb-report-run .data-report-wrapper {
+  margin-top: 60px;
+}
 
 // Reversing labs styles
 .scanner-mal {
@@ -8926,9 +8928,11 @@ button.secondary.view-report-external-button {
   margin-left: -22px;
 }
 
+// dbinebri: fix for "not detected" left padding in RL table on Show
 .scanner-unk {
-  padding-left: 28px !important;
+  padding-left: 22px !important;
   color: $type-lighter-color;
+  font-style: italic;
 }
 
 .inline-loader-wrapper {
@@ -9165,7 +9169,7 @@ div[aria-describedby='create-detection-dialog'] {
   border: none;
 }
 
-// dbinebri: make sure the full json areas stay visible in collapsed state
+// make sure the full json areas stay visible in collapsed state
 .data-report-wrapper {
   .collapse {
     display: block;
@@ -9177,7 +9181,7 @@ div[aria-describedby='create-detection-dialog'] {
   }
 }
 
-// dbinebri: ensure json areas stay at a min-height on collapse, and gray on expand/collapse transition
+// ensure json areas stay at a min-height on collapse, and gray on expand/collapse transition
 #collapse_tg_json, #collapse_sb_json {
   min-height: 300px;
   margin: 0 2px;
@@ -9185,5 +9189,107 @@ div[aria-describedby='create-detection-dialog'] {
   .report-size {
     padding: 0;
     width: initial;
+  }
+}
+
+
+// ensure the button here has the right font
+#create-detection-dialog button.primary {
+  font-family: "Open Sans", sans-serif;
+}
+
+
+// add a few tweaks for this dropdown so no overlap with last character and down caret at breakpoints
+// super wide width
+@media screen and (min-width: 1801px) {
+  #show-edit-ticket-status-button {
+    padding-right: 16px;
+    &.inline-select-dropdown {
+      background-position: right 0 center;
+    }
+  }
+}
+
+// medium wide width
+@media screen and (max-width: 1800px) {
+  #show-edit-ticket-status-button {
+    padding-left: 4px;
+    padding-right: 12px;
+    font-size: 11px;
+    &.inline-select-dropdown {
+      background-size: 14px;
+      background-position: right -1px center;
+    }
+  }
+}
+
+// FF - tiny vertical alignment fix for 2nd button in this panel
+@-moz-document url-prefix() {
+  .dispute-owner-buttons-wrapper button#index_change_assign {
+    position: relative;
+    top: -2px;
+  }
+}
+
+// need a separate th class so the bg sort icon isn't affected by generic .text-center
+#file-rep-datatable_wrapper .th-center {
+  text-align: center;
+}
+
+// dbinebri: on Show, assignee column width fix on laptop screens
+@media screen and (max-width: 1700px) and (min-width: 1201px){
+  .ticket-overview-wrapper {
+    .col-ticket-left {
+      width: 50%;
+    }
+    .col-ticket-right {
+      width: 50%
+    }
+    .col-assignee {
+      padding-right: 2%;
+    }
+    .missing-data {
+      font-size: 12px;
+    }
+    .dispute-owner-buttons-wrapper {
+      margin-left: 1px;
+    }
+  }
+}
+
+// dbinebri: on Index, ensure "Unassigned" and buttons can exist w/o breaking in the Assignee col
+.table > tbody > tr > td.assignee-col, table > tbody > tr > td.assignee-col {
+  min-width: 90px !important;
+}
+
+ // dbinebri: adding a specific on-click sha tooltip
+.copied-sha-tooltip {
+  opacity: 0;
+  width: 100px;
+  background-color: $table-dark-body;
+  font-family: 'Open Sans', sans-serif;
+  font-size: 12px;
+  color: $content-bg-color;
+  padding: 4px 8px;
+  border-radius: 5px;
+  border: none;
+  position: absolute;
+  cursor: default;
+  margin-top: 10px;
+  box-shadow: 5px 5px 8px rgba(0, 0, 0, 0.1);
+  text-align: center;
+  &:after {
+    // little triangle
+    bottom: 100%;
+    left: 50%;
+    content: " ";
+    height: 0;
+    width: 0;
+    position: absolute;
+    pointer-events: none;
+    border-style: solid;
+    border-color: transparent transparent $table-dark-body transparent;
+    border-width: 5px;
+    margin-left: -5px;
   }
 }

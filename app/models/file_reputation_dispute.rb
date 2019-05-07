@@ -1,5 +1,6 @@
 # class FileReputationTicket < ApplicationRecord
 class FileReputationDispute < ApplicationRecord
+  has_paper_trail on: [:update], ignore: [:updated_at]
 
   belongs_to :customer, optional:true
   has_many :file_rep_comments
@@ -80,6 +81,20 @@ class FileReputationDispute < ApplicationRecord
     envelope[:addressee_status] = self.status
 
     Bridge::FilerepUpdateStatusEvent.new(envelope).post
+  end
+
+  def compose_versioned_items
+
+    versioned_items = [self]
+
+    file_rep_comments.includes(:versions).map{ |dc| versioned_items << dc}
+
+    versioned_items
+
+  end
+
+  def dispute_emails
+    DisputeEmail.where(file_reputation_dispute_id: self.id)
   end
   
   def self.create_action(bugzilla_rest_session, sha256_hash, file_name, file_size, sample_type, disposition_suggested, source, platform, sha256_checksum)
@@ -187,6 +202,9 @@ class FileReputationDispute < ApplicationRecord
       end
     end
   end
+
+
+
 
   # omits fields with empty strings and nil as values
   # @param [Hash|ActionController::Parameters] fields input which may contain blank values
@@ -303,15 +321,15 @@ class FileReputationDispute < ApplicationRecord
   def self.standard_search(search_name, user:)
     case search_name
     # when 'recently_viewed'
-    #   joins(:dispute_peeks).where(dispute_peeks: {assigned_id: user.id})
+    #   joins(:dispute_peeks).where(dispute_peeks: {user_id: user.id})
     when 'my_open'
-      where.not(status: STATUS_RESOLVED).where(assigned_id: user.id)
+      where.not(status: STATUS_RESOLVED).where(user_id: user.id)
     when 'my_disputes'
-      where(assigned_id: user.id)
+      where(user_id: user.id)
     # when 'team_disputes'
-    #   where(assigned_id: user.my_team)
+    #   where(user_id: user.my_team)
     when 'unassigned'
-      where(assigned_id: nil).where.not(status: STATUS_RESOLVED)
+      where(user_id: nil).where.not(status: STATUS_RESOLVED)
     when 'open'
       where.not(status: STATUS_RESOLVED)
     when 'closed'
@@ -327,7 +345,8 @@ class FileReputationDispute < ApplicationRecord
   # @param [ActiveRecord::Relation] base_relation relation to chain this search onto.
   # @return [ActiveRecord::Relation]
   def self.contains_search(value)
-    contains_fields = %w{file_reputation_disputes.id source platform file_name sha256_hash description}
+    contains_fields =
+        %w{file_reputation_disputes.id source platform file_name sha256_hash description detection_name sample_type}
     contains_where = contains_fields.map{|field| "#{field} like :pattern"}.join(' or ')
 
     customer_where = %w{name email}.map{|field| "customers.#{field} like :pattern"}.join(' or ')
@@ -378,7 +397,7 @@ class FileReputationDispute < ApplicationRecord
   end
 
   def update_ticode_certs
-    certificates = Ticloud::FileAnalysis.certificates(self.sha256_hash)
+    certificates = FileReputationApi::ReversingLabs.certificates(self.sha256_hash)
 
     if certificates&.any?
       certificates.each do |certificate|
@@ -408,6 +427,13 @@ class FileReputationDispute < ApplicationRecord
     update!(sandbox_score: sandbox_score, sandbox_threshold: sandbox_threshold)
   rescue => except
     Rails.logger.error("Error updating sandbox score on id #{self.id} -- #{except.message}")
+  end
+
+  def update_amp_disposition
+    detection = FileReputationApi::Detection.get_bulk(self.sha256_hash)
+    update!(disposition: detection.disposition)
+  rescue => except
+    Rails.logger.error("Error updating amp disposition on #{self.id} -- #{except.message}")
   end
 
   def update_trifecta
@@ -442,7 +468,8 @@ class FileReputationDispute < ApplicationRecord
 
         guest = Company.where(:name => "Guest").first
         opened_at = Time.now
-        customer = Customer.process_and_get_customer(customer_payload)
+
+        customer = Customer.file_rep_process_and_get_customer(customer_payload)
 
         bugzilla_rest_session = message_payload[:bugzilla_rest_session]
 
@@ -491,9 +518,11 @@ class FileReputationDispute < ApplicationRecord
     if new_dispute
       if FileReputationDispute.threaded?
         Thread.new do
+          new_dispute.update_amp_disposition
           new_dispute.update_scores
         end
       else
+        new_dispute.update_amp_disposition
         new_dispute.update_scores
       end
     end
