@@ -1,5 +1,6 @@
 # class FileReputationTicket < ApplicationRecord
 class FileReputationDispute < ApplicationRecord
+  has_paper_trail on: [:update], ignore: [:updated_at]
 
   belongs_to :customer, optional:true
   has_many :file_rep_comments
@@ -81,7 +82,21 @@ class FileReputationDispute < ApplicationRecord
 
     Bridge::FilerepUpdateStatusEvent.new(envelope).post
   end
-  
+
+  def compose_versioned_items
+
+    versioned_items = [self]
+
+    file_rep_comments.includes(:versions).map{ |dc| versioned_items << dc}
+
+    versioned_items
+
+  end
+
+  def dispute_emails
+    DisputeEmail.where(file_reputation_dispute_id: self.id)
+  end
+
   def self.create_action(bugzilla_rest_session, sha256_hash, file_name, file_size, sample_type, disposition_suggested, source, platform, sha256_checksum)
 
     file_rep = FileReputationDispute.new
@@ -187,6 +202,9 @@ class FileReputationDispute < ApplicationRecord
       end
     end
   end
+
+
+
 
   # omits fields with empty strings and nil as values
   # @param [Hash|ActionController::Parameters] fields input which may contain blank values
@@ -303,15 +321,15 @@ class FileReputationDispute < ApplicationRecord
   def self.standard_search(search_name, user:)
     case search_name
     # when 'recently_viewed'
-    #   joins(:dispute_peeks).where(dispute_peeks: {assigned_id: user.id})
+    #   joins(:dispute_peeks).where(dispute_peeks: {user_id: user.id})
     when 'my_open'
-      where.not(status: STATUS_RESOLVED).where(assigned_id: user.id)
+      where.not(status: STATUS_RESOLVED).where(user_id: user.id)
     when 'my_disputes'
-      where(assigned_id: user.id)
+      where(user_id: user.id)
     # when 'team_disputes'
-    #   where(assigned_id: user.my_team)
+    #   where(user_id: user.my_team)
     when 'unassigned'
-      where(assigned_id: nil).where.not(status: STATUS_RESOLVED)
+      where(user_id: nil).where.not(status: STATUS_RESOLVED)
     when 'open'
       where.not(status: STATUS_RESOLVED)
     when 'closed'
@@ -379,7 +397,7 @@ class FileReputationDispute < ApplicationRecord
   end
 
   def update_ticode_certs
-    certificates = Ticloud::FileAnalysis.certificates(self.sha256_hash)
+    certificates = FileReputationApi::ReversingLabs.certificates(self.sha256_hash)
 
     if certificates&.any?
       certificates.each do |certificate|
@@ -411,6 +429,13 @@ class FileReputationDispute < ApplicationRecord
     Rails.logger.error("Error updating sandbox score on id #{self.id} -- #{except.message}")
   end
 
+  def update_amp_disposition
+    detection = FileReputationApi::Detection.get_bulk(self.sha256_hash)
+    update!(disposition: detection.disposition)
+  rescue => except
+    Rails.logger.error("Error updating amp disposition on #{self.id} -- #{except.message}")
+  end
+
   def update_sample_zoo
     zoo_response = FileReputationApi::SampleZoo.sha256_lookup(self.sha256_hash)
     begin
@@ -439,7 +464,7 @@ class FileReputationDispute < ApplicationRecord
     update_ticode_certs
     update_reversing_labs_score
     update_sandbox_score
-    update_sample_zoo
+    # update_sample_zoo
   end
 
   def ack_create(envelope_params, sender_params)
@@ -511,9 +536,11 @@ class FileReputationDispute < ApplicationRecord
     if new_dispute
       if FileReputationDispute.threaded?
         Thread.new do
+          new_dispute.update_amp_disposition
           new_dispute.update_scores
         end
       else
+        new_dispute.update_amp_disposition
         new_dispute.update_scores
       end
     end
