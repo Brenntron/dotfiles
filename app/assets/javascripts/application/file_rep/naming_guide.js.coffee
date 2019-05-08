@@ -142,12 +142,12 @@ $ ->
     $('#amp-naming-details-table').append(new_row)
 
 
+  # Save all changes and additions
   window.save_amp_naming_conventions = () ->
     # Update static content to match updated content
     # and prep for saving
     rows = $('#amp-naming-details-table tbody').find('tr')
-    rows_to_update = []
-    rows_to_add = []
+    rows_changed = []
 
     $(rows).each ->
       row = this
@@ -156,25 +156,31 @@ $ ->
       cells = $(row).find('td')
       $(cells).each ->
         if $($(this).find('input')).length > 0
-          input = $($(this).find('input')).val()
+          input = $($(this).find('input')).prop('value')
           input = $.trim(input)
+          $(this).attr('defaultValue', input)
           if $(this).hasClass('amp-pattern')
-            content = $($(this).find('.table-code')).text()
+            text = $(this).find('.table-code')
+            content = $(text).text()
             content = $.trim(content)
           else
-            content = $($(this).find('.table-content')).text()
+            text = $(this).find('.table-content')
+            content = $(text).text()
             content = $.trim(content)
           if content != input
             nochange = false
-          content == input
+          content = input
+          $(text).text(content)
         else
-          textarea = $($(this).find('textarea')).val()
+          textarea = $($(this).find('textarea')).prop('value')
           textarea = $.trim(textarea)
-          content = $($(this).find('.table-content')).text()
+          text = $(this).find('.table-content')
+          content = $(text).text()
           content = $.trim(content)
           if content != textarea
             nochange = false
-          content == textarea
+          content = textarea
+          $(text).text(content)
 
       # Check to see if sequence order has been changed
       org_seq = $(row).attr('data-org-seq')
@@ -184,15 +190,60 @@ $ ->
       # Remove temp attribute
       $(row).removeAttr('data-org-seq')
 
-      # Put changed rows in one array and new ones in a separate array
+      # Put changed and new rows in an array
       if nochange == false
-        row_id = $(row).attr('data-id')
-        unless row_id == ''
-          rows_to_update.push(this)
-        else
-          rows_to_add.push(this)
+        rows_changed.push(this)
 
-          
+    # Turn off sortability
+    $('#amp-naming-details-table tbody').sortable('destroy')
+
+    # Hide active editing buttons
+    $('#amp-edit-button').show()
+    $('.active-editing-buttons').hide()
+
+    # Prep new arrays for sending to db
+    # This may need to change, not sure how we'll want this formatted
+    rows_to_update = []
+    rows_to_add = []
+    $(rows_changed).each ->
+      id = $(this).attr('data-id')
+      sequence = $(this).attr('data-sort-sequence')
+      pattern = $($(this).find('.amp-pattern')[0]).find('.table-code').text()
+      example = $($(this).find('.amp-example')[0]).find('.table-content').text()
+      engine = $($(this).find('.amp-engine')[0]).find('.table-content').text()
+      engine_desc = $($(this).find('.amp-engine-description')[0]).find('.table-content').text()
+      notes = $($(this).find('.amp-notes')[0]).find('.table-content').text()
+      public_notes = $($(this).find('.amp-public-notes')[0]).find('.table-content').text()
+      contact = $($(this).find('.amp-contact')[0]).find('.table-content').text()
+
+      unless id == ''
+        rows_to_update.push(
+          'id': id,
+          'pattern': pattern,
+          'example': example,
+          'engine': engine,
+          'engine_description': engine_desc,
+          'notes': notes,
+          'public_notes': public_notes,
+          'contact': contact,
+          'table_sequence': sequence
+        )
+      # New rows won't have an id yet
+      else
+        rows_to_add.push(
+          'pattern': pattern,
+          'example': example,
+          'engine': engine,
+          'engine_description': engine_desc,
+          'notes': notes,
+          'public_notes': public_notes,
+          'contact': contact,
+          'table_sequence': sequence
+        )
+
+      # For reference, remove when hooked up to backend
+      console.log rows_to_add
+      console.log rows_to_update
 
 
 
