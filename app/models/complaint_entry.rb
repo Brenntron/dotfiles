@@ -218,6 +218,41 @@ class ComplaintEntry < ApplicationRecord
     end
   end
 
+  def self.inherit_categories(ip_or_uri:, description:, user:, casenumber: nil)
+    url_parts = Complaint.parse_url(ip_or_uri)
+    master_domain = urls_parts['domain']
+
+    existing_prefixes = Wbrs::Prefix.where({urls: [ip_or_uri]})
+
+    existing_prefix = nil
+
+    # Check if a prefix record exists for the full URI
+    if existing_prefixes.present?
+      existing_prefixes.each do |prefix_found|
+        if prefix_found.subdomain == url_parts[:subdomain]
+          if prefix_found.path == url_parts[:path]
+            existing_prefix = prefix_found
+          end
+        end
+      end
+    end
+
+    if description.present? && casenumber.present?
+      description = description + "--Case Number: #{casenumber} User: #{user}"
+    end
+
+    # Get the categories from the master domain
+    categories_to_set = ComplaintEntry.get_category_ids(master_domain)
+
+    # Inherit categories from the master domain
+    if existing_prefix.present?
+      prefix_object = Wbrs::Prefix.new
+      prefix_object.set_categories(categories_to_set, prefix_id: existing_prefix.prefix_id, user: user, description: description)
+    else
+      Wbrs::Prefix.create_from_url(url: ip_or_uri, categories: categories_to_set, user: user, description: description)
+    end
+  end
+
   def self.self_importance(ip_url)
     begin
       Wbrs::TopUrl.check_urls([ip_url]).first&.is_important
@@ -564,6 +599,34 @@ class ComplaintEntry < ApplicationRecord
     Rails.logger.warn except.backtrace.join("\n")
 
     ''
+  end
+
+  def self.get_category_ids(uri)
+    prefix_results = Wbrs::Prefix.where({:urls => [uri]})
+
+    parsed_uri = Complaint.parse_url(uri)
+
+    return [] unless prefix_results
+
+    if parsed_uri['path'].nil?
+      parsed_uri['path'] = ''
+    end
+
+    if parsed_uri['subdomain'].nil?
+      parsed_uri['subdomain'] = ''
+    end
+
+    final_results = []
+
+    prefix_results.each do |prefix_result|
+      if ((prefix_result.subdomain == parsed_uri['subdomain']) || (parsed_uri['subdomain'] == 'www')) && prefix_result.path == parsed_uri['path']
+        final_results << prefix_result
+      end
+    end
+
+    final_current_categories = final_results.map {|category| category.category_id}
+
+    final_current_categories
   end
 
   def current_category_data
