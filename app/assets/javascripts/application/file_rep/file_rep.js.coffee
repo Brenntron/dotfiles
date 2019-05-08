@@ -469,16 +469,12 @@ $ ->
         curr_sha = $(this).parent().siblings().find('.file_rep_sha').text()  # should be 'e78972341asfdadsf9238'
         curr_score_id = $(this).parent().parent().attr('id')   # should be like '#rl-score-id-5', attach tooltip to this id
 
-        # $(my_row_id).parentsUntil('div').hide(500)
-        console.log "current sha is now: " + curr_sha
-        console.log "current score_id is #rl-score-id-" + curr_score_id
-
         rl_build_table(curr_sha, curr_score_id)  # this func is below
 
 
       window.rl_build_table = (sha256_hash, score_id) ->
 #        $('#rl-loader').show()
-        console.log 'getting the json, show a lower tooltip below score with "loading..."'
+        console.log 'Loading JSON... please wait...'
 
         std_msg_ajax(
           method: 'GET'
@@ -486,9 +482,11 @@ $ ->
           success_reload: false
           success: (response) ->
 #            $('#rl-loader').hide()
-            console.log 'SUCCESS json reported, try again'
-
+            if response.json.error
+              console.log 'ERROR... try another record.'
             unless response.json.error?
+              console.log 'SUCCESS... showing tooltip.'
+
               rl_data = response.json.rl.sample.xref
 
               scanner_count = ""
@@ -521,13 +519,10 @@ $ ->
                 rl_hover_table += '<tr><td class="left">' + this.name + '</td><td class="right scanner-unk">Not Detected</td></tr>'
               rl_hover_table += "</table>"
 
-    #         $(score_id).tooltipster('destroy')
+              # build the selector to attach to
+              score_id_selector = '#rl-score-id-' + score_id
 
-              # 2) build the selector to attach to
-              my_selector = '#rl-score-id-' + score_id
-              console.log my_selector
-
-              $(my_selector).tooltipster
+              $(score_id_selector).tooltipster
                 theme: [
                   'tooltipster-borderless'
                   'tooltipster-borderless-customized'
@@ -536,28 +531,29 @@ $ ->
                 side: 'bottom'
                 content: rl_hover_table
                 contentAsHTML: true
-                trigger: 'hover'
-                autoOpen: 'true'
+                trigger: 'custom'
+                triggerOpen: {
+                  mouseenter: true
+                }
+                triggerClose: {
+                  mouseleave: true
+                  click: true
+                  scroll: true
+                }
+                autoOpen: true
                 autoClose: 'false'
                 interactive: true
+
+              # make sure it opens
+              $(score_id_selector).tooltipster('open')
 
 
           error: (response) ->
             # change this to an error inside the tooltip itself
             std_api_error(response, "There was a problem retrieving data from Reversing Labs", reload: false)
+            console.log 'There was a problem retrieving data from Reversing Labs using this SHA.'
 
         )
-
-
-#      LEAVE THESE LINES HERE FOR TESTING
-#      $('.rl-hover').on 'click', ->
-#        my_current_sha = $(this).parent().siblings().find('.file_rep_sha').text()
-#
-#        # console.log my_current_sha
-#        # rl_build_table('343518b26e0a872772808605f9f28aa75f64d86a6608e1347c979d033a72cb54')
-#
-#        rl_build_table(my_current_sha)
-
 
 
 
