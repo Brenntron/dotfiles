@@ -220,7 +220,7 @@ class ComplaintEntry < ApplicationRecord
 
   def self.inherit_categories(ip_or_uri:, description:, user:, casenumber: nil)
     url_parts = Complaint.parse_url(ip_or_uri)
-    master_domain = urls_parts['domain']
+    master_domain = url_parts[:domain]
 
     existing_prefixes = Wbrs::Prefix.where({urls: [ip_or_uri]})
 
@@ -603,7 +603,7 @@ class ComplaintEntry < ApplicationRecord
 
   def self.get_category_ids(uri)
     prefix_results = Wbrs::Prefix.where({:urls => [uri]})
-
+    
     parsed_uri = Complaint.parse_url(uri)
 
     return [] unless prefix_results
