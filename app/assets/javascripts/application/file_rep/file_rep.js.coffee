@@ -444,7 +444,7 @@ $ ->
   $('#file-rep-datatable').dataTable
     drawCallback: ( settings ) ->
 
-      # dbinebri: we need a "loading" tooltip on hover, move this whole function elsewhere
+      # dbinebri: we need a temporary "loading" tooltip on hover, move this whole function elsewhere
       $('.rl-hover').tooltipster
         theme: [
           'tooltipster-borderless'
@@ -454,6 +454,7 @@ $ ->
         side: 'bottom'
         content: '<div style="padding: 10px;">Loading, please wait...</div>'
         contentAsHTML: true
+        contentCloning: true
         trigger: 'hover'
 
       # dbinebri: define the RL report hover function
@@ -470,7 +471,6 @@ $ ->
             $('#rl-loader').hide()
             console.log 'okay try now it should be working'
 
-            # go ahead and do stuff with the successful json response from RL
             unless response.json.error?
               rl_data = response.json.rl.sample.xref
 
@@ -504,12 +504,8 @@ $ ->
                 rl_hover_table += '<tr><td class="left">' + this.name + '</td><td class="right scanner-mal">' + this.result + '</td></tr>'
               $(unk_results).each ->
                 rl_hover_table += '<tr><td class="left">' + this.name + '</td><td class="right scanner-unk">Not Detected</td></tr>'
-
               rl_hover_table += "</table>"
 
-              # NEW TOOLTIPSTER W/ RL TABLE NOW THAT WE HAVE SUCCESSFUL JSON
-
-#              $('body').hide()
 
               $('.rl-hover').tooltipster('destroy')
               $('.rl-hover').tooltipster
@@ -519,30 +515,28 @@ $ ->
                   'tooltipster-rl-hover'
                 ]
                 side: 'bottom'
-                content: rl_hover_table
+                content: rl_hover_table  # this is where the tooltip gets filled with rl report
                 contentAsHTML: true
                 trigger: 'hover'
-                autoClose: "false"
+                autoOpen: true
+                autoClose: false
                 interactive: true
+                contentCloning: true
 
           error: (response) ->
             std_api_error(response, "There was a problem retrieving data from Reversing Labs", reload: false)
         )
 
+#       dbinebri: we have built the function, now let's get the hover report and pop that table in there
+      $('.rl-hover').on 'mouseover', ->
+        my_current_sha = $(this).parent().siblings().find('.file_rep_sha').text()
+        console.log my_current_sha
 
-      # dbinebri: we have built the function, now let's go the hover report and make it happen
-#      $('.rl-hover').on 'hover', ->
-#        alert 'hi there'
-#        # on hover, grab the current sha for this row they just hovered on
-#        my_current_sha = $(this).parent().find('td span.file_rep_sha').text()
-#        console.log 'you just hovered over the row with sha: '
-#        console.log my_current_sha
+        get_rl_report_hover(my_current_sha)
 
-#        get_rl_report_hover(my_current_sha)
 
-      # FIX THIS ONE
-      get_rl_report_hover('343518b26e0a872772808605f9f28aa75f64d86a6608e1347c979d033a72cb54')
-
+      # LEAVE THIS LINE HERE FOR TESTING
+#      get_rl_report_hover('343518b26e0a872772808605f9f28aa75f64d86a6608e1347c979d033a72cb54')
 
 
       # AJAX ENDS
@@ -737,7 +731,7 @@ $ ->
         data: 'reversing_labs_score'
         render: (data, type, full, meta) ->
           if data
-            return '<span class="score-col text-center rl-hover">' + data + ' / ' + full['reversing_labs_count'] + '</span>'
+            return '<span class="score-col text-center rl-hover" title="Loading...">' + data + ' / ' + full['reversing_labs_count'] + '</span>'
           else
             return ''
       }
