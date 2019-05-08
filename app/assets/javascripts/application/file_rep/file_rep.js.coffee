@@ -441,35 +441,52 @@ $ ->
         new_header = 'All File Reputation Tickets'
       $('#filerep-index-title')[0].innerHTML = new_header
 
+
+
+
   $('#file-rep-datatable').dataTable
     drawCallback: ( settings ) ->
+      # the datatable has been drawn, now we can do stuff inside of it
 
-      # dbinebri: we need a temporary "loading" tooltip on hover, move this whole function elsewhere
-      $('.rl-hover').tooltipster
-        theme: [
-          'tooltipster-borderless'
-          'tooltipster-borderless-customized'
-          'tooltipster-rl-hover'
-        ]
-        side: 'bottom'
-        content: '<div style="padding: 10px;">Loading, please wait...</div>'
-        contentAsHTML: true
-        contentCloning: true
-        trigger: 'hover'
+#       dbinebri: we need a temporary "loading" tooltip on hover, move this whole function elsewhere
+#      $('.rl-hover').tooltipster
+#        theme: [
+#          'tooltipster-borderless'
+#          'tooltipster-borderless-customized'
+#          'tooltipster-rl-hover'
+#        ]
+#        side: 'bottom'
+#        content: '<div style="padding: 10px;">Loading, please wait...</div>'
+#        contentAsHTML: true
+#        contentCloning: true
+#        trigger: 'hover'
+#
+      # 1) detecting the row clicked is the most important, you need the sha from that row first and the score_id
+      # pass that sha and score_id to the ajax call to build the content
+      # build the report, and attach the tooltip to the score_id with the content of rl_hover_table
 
-      # dbinebri: define the RL report hover function
-      window.get_rl_report_hover = (sha256_hash) ->
+      $('.rl-hover').on 'mouseover', ->
+        curr_sha = $(this).parent().siblings().find('.file_rep_sha').text()  # should be 'e78972341asfdadsf9238'
+        curr_score_id = $(this).parent().parent().attr('id')   # should be like '#rl-score-id-5', attach tooltip to this id
 
-        $('#rl-loader').show()
-        console.log 'getting the json from rl api...'
+        # $(my_row_id).parentsUntil('div').hide(500)
+        console.log "current sha is now: " + curr_sha
+        console.log "current score_id is #rl-score-id-" + curr_score_id
+
+        rl_build_table(curr_sha, curr_score_id)  # this func is below
+
+
+      window.rl_build_table = (sha256_hash, score_id) ->
+#        $('#rl-loader').show()
+        console.log 'getting the json, show a lower tooltip below score with "loading..."'
 
         std_msg_ajax(
           method: 'GET'
           url: "/escalations/api/v1/escalations/filerep/reversing_labs/" + sha256_hash
           success_reload: false
           success: (response) ->
-            $('#rl-loader').hide()
-            console.log 'okay try now it should be working'
+#            $('#rl-loader').hide()
+            console.log 'SUCCESS json reported, try again'
 
             unless response.json.error?
               rl_data = response.json.rl.sample.xref
@@ -479,7 +496,6 @@ $ ->
               all_scanner_results = rl_data.entries[0]
               scanner_count = all_scanner_results.scanners.length
 
-              # Cycle through the scanner results
               mal_results = []
               unk_results = []
 
@@ -492,7 +508,6 @@ $ ->
               result_count = mal_results.length
               $('#rl-scanner-results, #rl-score-hover').text(result_count + '/' + scanner_count)
 
-              # BUILD THE RL HOVER TABLE
               rl_hover_table =
                 '<table class="rl-report-top">' +
                 '<tr class="top-row"><td colspan="2">Reversing Labs Details <span class="rl-score-hover"></span></td></tr>' +
@@ -506,42 +521,44 @@ $ ->
                 rl_hover_table += '<tr><td class="left">' + this.name + '</td><td class="right scanner-unk">Not Detected</td></tr>'
               rl_hover_table += "</table>"
 
+    #         $(score_id).tooltipster('destroy')
 
-              $('.rl-hover').tooltipster('destroy')
-              $('.rl-hover').tooltipster
+              # 2) build the selector to attach to
+              my_selector = '#rl-score-id-' + score_id
+              console.log my_selector
+
+              $(my_selector).tooltipster
                 theme: [
                   'tooltipster-borderless'
                   'tooltipster-borderless-customized'
                   'tooltipster-rl-hover'
                 ]
                 side: 'bottom'
-                content: rl_hover_table  # this is where the tooltip gets filled with rl report
+                content: rl_hover_table
                 contentAsHTML: true
                 trigger: 'hover'
-                autoOpen: true
-                autoClose: false
+                autoOpen: 'true'
+                autoClose: 'false'
                 interactive: true
-                contentCloning: true
+
 
           error: (response) ->
+            # change this to an error inside the tooltip itself
             std_api_error(response, "There was a problem retrieving data from Reversing Labs", reload: false)
+
         )
 
-#       dbinebri: we have built the function, now let's get the hover report and pop that table in there
-      $('.rl-hover').on 'mouseover', ->
-        my_current_sha = $(this).parent().siblings().find('.file_rep_sha').text()
-        console.log my_current_sha
 
-        get_rl_report_hover(my_current_sha)
+#      LEAVE THESE LINES HERE FOR TESTING
+#      $('.rl-hover').on 'click', ->
+#        my_current_sha = $(this).parent().siblings().find('.file_rep_sha').text()
+#
+#        # console.log my_current_sha
+#        # rl_build_table('343518b26e0a872772808605f9f28aa75f64d86a6608e1347c979d033a72cb54')
+#
+#        rl_build_table(my_current_sha)
 
 
-      # LEAVE THIS LINE HERE FOR TESTING
-#      get_rl_report_hover('343518b26e0a872772808605f9f28aa75f64d86a6608e1347c979d033a72cb54')
-
-
-      # AJAX ENDS
-      # AJAX ENDS
-      # AJAX ENDS
 
 
 
@@ -731,7 +748,7 @@ $ ->
         data: 'reversing_labs_score'
         render: (data, type, full, meta) ->
           if data
-            return '<span class="score-col text-center rl-hover" title="Loading...">' + data + ' / ' + full['reversing_labs_count'] + '</span>'
+            return '<span class="score-col text-center rl-hover" ' + 'id="rl-score-id-' + full['id'] + '" data-tooltip-content="Loading...">' + data + ' / ' + full['reversing_labs_count'] + '</span>'
           else
             return ''
       }
