@@ -603,7 +603,7 @@ class ComplaintEntry < ApplicationRecord
 
   def self.get_category_ids(uri)
     prefix_results = Wbrs::Prefix.where({:urls => [uri]})
-    
+
     parsed_uri = Complaint.parse_url(uri)
 
     return [] unless prefix_results
