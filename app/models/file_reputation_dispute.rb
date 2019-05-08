@@ -96,7 +96,11 @@ class FileReputationDispute < ApplicationRecord
   def dispute_emails
     DisputeEmail.where(file_reputation_dispute_id: self.id)
   end
+<<<<<<< HEAD
 
+=======
+  
+>>>>>>> WEB-4255-file-reputation-console
   def self.create_action(bugzilla_rest_session, sha256_hash, file_name, file_size, sample_type, disposition_suggested, source, platform, sha256_checksum)
 
     file_rep = FileReputationDispute.new

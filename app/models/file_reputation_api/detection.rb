@@ -138,9 +138,13 @@ class FileReputationApi::Detection
 
   def self.create_action(sha256_hashes:, disposition:, detection_name: nil)
     sha256_hashes.map do |sha256_hash|
-      update_detection(sha256_hash: sha256_hash,
-                       disposition: disposition,
-                       detection_name: detection_name)
+      result = update_detection(sha256_hash: sha256_hash,
+                                disposition: disposition,
+                                detection_name: detection_name)
+      if result[:success]
+        FileReputationDispute.where(sha256_hash: sha256_hash).update_all(disposition: disposition)
+      end
+      result
     end
   end
 end
