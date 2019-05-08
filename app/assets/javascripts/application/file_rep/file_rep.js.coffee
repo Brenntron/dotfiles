@@ -443,6 +443,114 @@ $ ->
 
   $('#file-rep-datatable').dataTable
     drawCallback: ( settings ) ->
+
+      # dbinebri: we need a "loading" tooltip on hover, move this whole function elsewhere
+      $('.rl-hover').tooltipster
+        theme: [
+          'tooltipster-borderless'
+          'tooltipster-borderless-customized'
+          'tooltipster-rl-hover'
+        ]
+        side: 'bottom'
+        content: '<div style="padding: 10px;">Loading, please wait...</div>'
+        contentAsHTML: true
+        trigger: 'hover'
+
+      # dbinebri: define the RL report hover function
+      window.get_rl_report_hover = (sha256_hash) ->
+
+        $('#rl-loader').show()
+        console.log 'getting the json from rl api...'
+
+        std_msg_ajax(
+          method: 'GET'
+          url: "/escalations/api/v1/escalations/filerep/reversing_labs/" + sha256_hash
+          success_reload: false
+          success: (response) ->
+            $('#rl-loader').hide()
+            console.log 'okay try now it should be working'
+
+            # go ahead and do stuff with the successful json response from RL
+            unless response.json.error?
+              rl_data = response.json.rl.sample.xref
+
+              scanner_count = ""
+              result_count = ""
+              all_scanner_results = rl_data.entries[0]
+              scanner_count = all_scanner_results.scanners.length
+
+              # Cycle through the scanner results
+              mal_results = []
+              unk_results = []
+
+              $(all_scanner_results.scanners).each ->
+                if this.result == ""
+                  unk_results.push(this)
+                else
+                  mal_results.push(this)
+
+              result_count = mal_results.length
+              $('#rl-scanner-results, #rl-score-hover').text(result_count + '/' + scanner_count)
+
+              # BUILD THE RL HOVER TABLE
+              rl_hover_table =
+                '<table class="rl-report-top">' +
+                '<tr class="top-row"><td colspan="2">Reversing Labs Details <span class="rl-score-hover"></span></td></tr>' +
+                '<tr class="second-row"><td class="left">AV Vendor</td><td class="right">Results</td></tr>' +
+                '</table>' +
+                '<table class="rl-report-content">'
+
+              $(mal_results).each ->
+                rl_hover_table += '<tr><td class="left">' + this.name + '</td><td class="right scanner-mal">' + this.result + '</td></tr>'
+              $(unk_results).each ->
+                rl_hover_table += '<tr><td class="left">' + this.name + '</td><td class="right scanner-unk">Not Detected</td></tr>'
+
+              rl_hover_table += "</table>"
+
+              # NEW TOOLTIPSTER W/ RL TABLE NOW THAT WE HAVE SUCCESSFUL JSON
+
+#              $('body').hide()
+
+              $('.rl-hover').tooltipster('destroy')
+              $('.rl-hover').tooltipster
+                theme: [
+                  'tooltipster-borderless'
+                  'tooltipster-borderless-customized'
+                  'tooltipster-rl-hover'
+                ]
+                side: 'bottom'
+                content: rl_hover_table
+                contentAsHTML: true
+                trigger: 'hover'
+                autoClose: "false"
+                interactive: true
+
+          error: (response) ->
+            std_api_error(response, "There was a problem retrieving data from Reversing Labs", reload: false)
+        )
+
+
+      # dbinebri: we have built the function, now let's go the hover report and make it happen
+#      $('.rl-hover').on 'hover', ->
+#        alert 'hi there'
+#        # on hover, grab the current sha for this row they just hovered on
+#        my_current_sha = $(this).parent().find('td span.file_rep_sha').text()
+#        console.log 'you just hovered over the row with sha: '
+#        console.log my_current_sha
+
+#        get_rl_report_hover(my_current_sha)
+
+      # FIX THIS ONE
+      get_rl_report_hover('343518b26e0a872772808605f9f28aa75f64d86a6608e1347c979d033a72cb54')
+
+
+
+      # AJAX ENDS
+      # AJAX ENDS
+      # AJAX ENDS
+
+
+
       if localStorage.search_name
 
         {search_type, search_name, search_conditions } = localStorage
@@ -629,7 +737,7 @@ $ ->
         data: 'reversing_labs_score'
         render: (data, type, full, meta) ->
           if data
-            return '<span class="score-col text-center">' + data + ' / ' + full['reversing_labs_count'] + '</span>'
+            return '<span class="score-col text-center rl-hover">' + data + ' / ' + full['reversing_labs_count'] + '</span>'
           else
             return ''
       }

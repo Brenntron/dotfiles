@@ -9293,3 +9293,117 @@ div[aria-describedby='create-detection-dialog'] {
     margin-left: -5px;
   }
 }
+
+
+// dbinebri: adding the RL hover tooltip for index
+.rl-report-hover {
+
+}
+
+// dbinebri: need a special tooltipster here for rl hover table
+.tooltipster-sidetip.tooltipster-borderless.tooltipster-borderless-customized.tooltipster-rl-hover .tooltipster-content {
+  padding: 0;
+  border-radius: 5px;
+  background: transparent
+}
+
+.tooltipster-content {
+  margin-bottom: 0;
+}
+
+// this is the triangle
+.tooltipster-sidetip.tooltipster-borderless.tooltipster-borderless-customized.tooltipster-rl-hover.tooltipster-bottom .tooltipster-arrow-border {
+  border-bottom-color: #333;  // chg to hex
+}
+
+// top row table
+table.rl-report-top {
+  padding: 0;
+  width: 400px;
+  border: none;
+  tr.top-row {
+    span {
+      float: right;
+    }
+    td {
+      border: none;
+      padding: 4px 8px;
+      font-size: 12px;
+      font-weight: bold;
+      text-transform: uppercase;
+      background: #333; // chg to hex
+      text-align: left;
+    }
+  }
+  tr.second-row {
+    border-bottom: solid 1px #333;  // chg to hex
+    padding: 0;
+    td {
+      font-size: 12px;
+      font-weight: bold;
+      padding: 2px 8px;
+      text-transform: uppercase;
+      &.left {
+        text-align: left;
+        width: 173px;
+        border: none;
+      }
+      &.right {
+        text-align: left;
+        width: 227px;
+        border: none;
+      }
+    }
+  }
+}
+
+
+// bottom area table
+table.rl-report-content {
+  display: block;
+  padding: 0;
+  width: 400px;
+  height: 260px;
+  max-height: 260px;
+  overflow-x: hidden;
+  overflow-y: scroll;
+  border: none;
+  tr {
+    td {
+      border: none;
+      padding: 2px 8px;
+      text-align: center;
+      font-size: 10px;
+      &:first-of-type {
+        text-align: left;
+        width: 180px;
+      }
+      &:last-of-type {
+        text-align: left;
+        width: 220px;
+      }
+    }
+    td.scanner-mal {
+      color: #fff;  // chg to hex
+      &::before {
+        content: '';
+        display: block;
+        float: left;
+        background-repeat: no-repeat;
+        background-image: url(/assets/icon_malicious_dark.svg);
+        width: 14px;
+        height: 14px;
+        margin-top: 2px;
+        margin-bottom: 0px;
+        margin-right: 4px;
+        margin-left: -16px;
+      }
+    }
+    td.scanner-unk {
+      color: #fff;  // chg to hex
+      padding-left: 25px;
+      font-style: italic;
+    }
+  }
+}
+
