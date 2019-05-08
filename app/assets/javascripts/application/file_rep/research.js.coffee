@@ -23,6 +23,43 @@ window.research_data = (sha256_hash) ->
   window.get_threatgrid_data(sha256_hash)
   window.get_reversinglabs_data(sha256_hash)
   window.get_run_status(sha256_hash)
+  window.get_zoo_status(sha256_hash)
+
+
+########### SAMPLE ZOO STATUS ############
+window.get_zoo_status = (sha256_hash) ->
+  # check SHA256 agaainst Sample Zoo
+  $('#zoo-loader').show()
+  std_msg_ajax(
+    method: 'GET'
+    url: "/escalations/api/v1/escalations/file_rep/sample_zoo/" + sha256_hash
+    success_reload: false
+    success: (response) ->
+
+      $('#zoo-loader').hide()
+      #  %span.loader-msg Loading data...
+      #.zoo-data-present{'data-zoo-status': 'YES'}
+      zoo_present = $('.zoo-data-present').find('span')
+      zoo_missing = $('.zoo-data-notfound').find('span')
+
+      unless response.json.error?
+        if response.json.in_zoo == true
+          zoo_present.addClass('glyphicon')
+          zoo_present.addClass('glyphicon-remove')
+        else
+          zoo_missing.addClass('glyphicon')
+          zoo_missing.addClass('glyphicon-remove')
+      else
+        $(zoo_present).show()
+        $(zoo_missing).hide()
+
+    error: (response) ->
+      # $('#rl-loader').hide()
+      std_api_error(response, "There was a problem retrieving data from the Sample Zoo", reload: false)
+  )
+
+
+
 
 
 ########### THREATGRID REPORT ############
@@ -281,8 +318,6 @@ window.get_sandbox_report = (runid, sha256_hash) ->
       $('#sb-loader').hide()
       std_api_error(response, "There was a problem retrieving data from Talos Sandbox", reload: false)
   )
-
-
 
 
 ########### TALOS SANDBOX:: RUN SAMPLE & GET REPORT ############

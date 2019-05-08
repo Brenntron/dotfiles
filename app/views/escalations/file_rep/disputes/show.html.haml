@@ -170,7 +170,7 @@
 
         .col-xs-4
           %label.content-label-sm AMP Disposition
-          - unless  @file_rep_dispute.disposition.nil?
+          - unless @file_rep_dispute.disposition.nil?
             - if @file_rep_dispute.malicious?
               .top-info-data.disposition.disp-negative= @file_rep_dispute.disposition
             - else
@@ -181,14 +181,17 @@
             %label.content-label-sm AMP Detection Created
             .top-info-data
               = @file_rep_dispute.detection_created_at
-            %label.content-label-sm In Sample Zoo
-            - if @file_rep_dispute.in_zoo == true
-              .top-info-data#sample-zoo-status{'data-zoo-status': 'YES'}
-                %span.glyphicon.glyphicon-ok
-            - else
-              .top-info-data#sample-zoo-status{'data-zoo-status': 'NO'}
-                %span.glyphicon.glyphicon-remove
-
+          %hr
+          %label.content-label-sm In Sample Zoo
+          #zoo-loader
+            .inline-loader-wrapper
+              .gear-loader-wrapper
+                = inline_svg 'icon_gears_loader.svg', class: 'gears-loader'
+              %span.loader-msg Loading data...
+          .zoo-data-present{'data-zoo-status': 'YES'}
+            %span
+          .zoo-data-notfound{'data-zoo-status': 'NO'}
+            %span
 
 -# End of top overview information
 
