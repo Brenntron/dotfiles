@@ -912,6 +912,11 @@ $ ->
       alert('Where are you? How did you trigger this? Stahp it.')
       return false
 
+    # Small format prep for success message:
+    detection_name_msg = ''
+    unless new_detection_name == ''
+      detection_name_msg = ': ' + new_detection_name
+
     std_msg_ajax(
       url: '/escalations/api/v1/escalations/file_rep/detections'
       method: 'POST'
@@ -920,6 +925,12 @@ $ ->
         'disposition': new_disp
         'detection_name': new_detection_name
       }
+      success: (response) ->
+        $('#create-detection-dialog').dialog('close')
+        std_msg_success("Detection successfully created", ['<span class="code-snippet">' + sha256_hashes + '</span>', 'set to <span class="text-capitalize">' + new_disp + '</span> ' + detection_name_msg ], reload: true)
+      error: (response) ->
+        $('#create-detection-dialog').dialog('close')
+        std_api_error(response, "Detection not created", reload: false)
     )
 
     return false
