@@ -176,7 +176,7 @@ class DisputeEntry < ApplicationRecord
 
   def parse_url(url = self.hostlookup)
     uri = URI.parse(URI.parse(url).scheme.nil? ? "http://#{url}" : url)
-    domain = PublicSuffix.parse(uri.host)
+    domain = PublicSuffix.parse(uri.host, :ignore_private => true)
     subdomain = uri.host.gsub(Regexp.new("\\.?#{domain.domain}$"), '')
 
     {
@@ -229,7 +229,7 @@ class DisputeEntry < ApplicationRecord
 
   def assign_url_parts(url = self.hostlookup)
     uri = URI.parse(URI.parse(url).scheme.nil? ? "http://#{url}" : url)
-    domain = PublicSuffix.parse(uri.host)
+    domain = PublicSuffix.parse(uri.host, :ignore_private => true)
 
     self.subdomain                      = uri.host.gsub(Regexp.new("\\.?#{domain.domain}$"), '')
     self.domain                         = domain.domain
