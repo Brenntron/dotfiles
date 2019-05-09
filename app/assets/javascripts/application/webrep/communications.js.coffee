@@ -205,7 +205,6 @@ $ ->
 
 
   $('#send-new-email').on 'click', (e) ->
-
     headers = {'Token': $('input[name="token"]').val(), 'Xmlrpc-Token': $('input[name="xml_token"]').val()}
 
     form_data = new FormData()
@@ -217,13 +216,14 @@ $ ->
     form_data.append('to', $('.new-receiver').val())
     form_data.append('subject', $('.new-subject').val())
     form_data.append('cc', $('.cc-email').val())
+    
     if window.location.href.includes('/file_rep/disputes')
       form_data.append('dispute_type', "FileReputationDispute")
     else if  window.location.href.includes('/webrep/disputes')
       form_data.append('dispute_type', "WebReputationDispute")
 
     dispute_id = $('input[name="dispute_id"]').val()
-
+    
     if $('form')[0].checkValidity() == true
       e.preventDefault()
       if dispute_id
