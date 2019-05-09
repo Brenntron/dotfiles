@@ -629,6 +629,34 @@ class ComplaintEntry < ApplicationRecord
     final_current_categories
   end
 
+  def self.get_category_names(uri)
+    prefix_results = Wbrs::Prefix.where({:urls => [uri]})
+
+    parsed_uri = Complaint.parse_url(uri)
+
+    return [] unless prefix_results
+
+    if parsed_uri['path'].nil?
+      parsed_uri['path'] = ''
+    end
+
+    if parsed_uri['subdomain'].nil?
+      parsed_uri['subdomain'] = ''
+    end
+
+    final_results = []
+
+    prefix_results.each do |prefix_result|
+      if ((prefix_result.subdomain == parsed_uri['subdomain']) || (parsed_uri['subdomain'] == 'www')) && prefix_result.path == parsed_uri['path']
+        final_results << prefix_result
+      end
+    end
+
+    final_current_categories = final_results.first.categories.map {|category| category.descr}
+
+    final_current_categories
+  end
+
   def current_category_data
     prefix_results = Wbrs::Prefix.where({:urls => [URI.escape(DisputeEntry.domain_of_with_path(self.hostlookup))]})
     return {} unless prefix_results
@@ -682,6 +710,7 @@ class ComplaintEntry < ApplicationRecord
       end
     end
 
+    binding.pry
     final_current_categories
 
     #current_categories = prefix.categories
