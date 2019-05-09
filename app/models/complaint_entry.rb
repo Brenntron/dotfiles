@@ -252,7 +252,7 @@ class ComplaintEntry < ApplicationRecord
       else
         Wbrs::Prefix.create_from_url(url: ip_or_uri, categories: categories_to_set, user: user, description: description)
       end
-    elsif ip_or_uri == self.uri
+    elsif ip_or_uri == self.domain
       raise ('Cannot inherit categories on master domain')
     end
   end
