@@ -710,7 +710,6 @@ class ComplaintEntry < ApplicationRecord
       end
     end
 
-    binding.pry
     final_current_categories
 
     #current_categories = prefix.categories
