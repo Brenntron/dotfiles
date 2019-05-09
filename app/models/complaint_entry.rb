@@ -629,8 +629,8 @@ class ComplaintEntry < ApplicationRecord
     final_current_categories
   end
 
-  def self.get_category_names(uri)
-    prefix_results = Wbrs::Prefix.where({:urls => [uri]})
+  def get_category_names
+    prefix_results = Wbrs::Prefix.where({:urls => [self.domain]})
 
     parsed_uri = Complaint.parse_url(uri)
 
@@ -710,7 +710,6 @@ class ComplaintEntry < ApplicationRecord
       end
     end
 
-    binding.pry
     final_current_categories
 
     #current_categories = prefix.categories

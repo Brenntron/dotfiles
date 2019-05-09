@@ -463,7 +463,7 @@ module API
               end
             end
 
-            desc 'Retrieve historic_category_information from expanding a complaint entry row'
+            desc 'Retrieve current categories from expanding a complaint entry row'
             params do
               requires :id, type: Integer
             end
@@ -481,7 +481,7 @@ module API
             post 'retrieve_category_names_from_master' do
               std_api_v2 do
                 complaint_entry = ComplaintEntry.find(params[:id])
-                ComplaintEntry.get_category_names(complaint_entry.domain).to_json
+                complaint_entry.get_category_names.to_json
               end
             end
 
