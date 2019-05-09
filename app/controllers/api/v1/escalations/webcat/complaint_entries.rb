@@ -463,7 +463,7 @@ module API
               end
             end
 
-            desc 'Retrieve historic_category_information from expanding a complaint entry row'
+            desc 'Retrieve current categories from expanding a complaint entry row'
             params do
               requires :id, type: Integer
             end
