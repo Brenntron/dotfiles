@@ -233,7 +233,7 @@ module API
                 return e.message
               end
               {entry_id: entry.id, domain: entry.domain, subdomain: entry.subdomain, path: entry.path,
-               categories: permitted_params['categories'], uri: entry.uri, status:entry.status,
+               categories: entry.url_primary_category, uri: entry.uri, status:entry.status,
                entry_resolution:permitted_params['commit'], was_dismissed: entry.was_dismissed?}.to_json
             end
 
