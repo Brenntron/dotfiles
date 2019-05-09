@@ -496,7 +496,7 @@ $ ->
       ####### REVERSING LABS INDEX HOVER TOOLTIP BEGINS ###########
       ####### REVERSING LABS INDEX HOVER TOOLTIP BEGINS ###########
 
-      # dbinebri: LOADER TOOLTIP BELOW
+      # dbinebri: LOADER TOOLTIP BELOW, THIS UPDATES WITH CONTENT OR ERROR MESSAGE AFTER LOAD
       $('.rl-hover').on 'mouseover', ->
         curr_sha = $(this).parent().siblings().find('.file_rep_sha').text()
         row_id = $(this).parent().parent().attr('id')
@@ -561,9 +561,9 @@ $ ->
                   '<table class="rl-content">'
 
               $(mal_results).each ->
-                rl_hover_table += '<tr><td class="left">' + this.name + '</td><td class="right scanner-mal">' + this.result + '</td></tr>'
+                rl_hover_table += '<tr><td class="left">' + this.name + '</td><td class="right rl-scanner-mal">' + this.result + '</td></tr>'
               $(unk_results).each ->
-                rl_hover_table += '<tr><td class="left">' + this.name + '</td><td class="right scanner-unk">Not Detected</td></tr>'
+                rl_hover_table += '<tr><td class="left">' + this.name + '</td><td class="right rl-scanner-unk">Not Detected</td></tr>'
               rl_hover_table += "</table>"
 
               $(score_id_selector).tooltipster('content', rl_hover_table)
