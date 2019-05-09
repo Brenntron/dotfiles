@@ -474,7 +474,7 @@ module API
                 if complaint_entry.subdomain.present? || complaint_entry.path.present?
                   master_categories = complaint_entry.get_category_names_from_master
                 else
-                  master_categories = nil
+                  master_categories = []
                 end
 
                 {master_categories: master_categories, current_category_data: complaint_entry.current_category_data }.to_json
@@ -499,7 +499,7 @@ module API
             post 'inherit_categories_from_master_domain' do
               std_api_v2 do
                 complaint_entry = ComplaintEntry.find(params[:id])
-                complaint_entry.inherit_categories(ip_or_uri: self.uri, description:'Inherited from master domain', user: current_user.email)
+                complaint_entry.inherit_categories(ip_or_uri: complaint_entry.uri, description:'Inherited from master domain', user: current_user.email)
               end
             end
 

@@ -119,13 +119,10 @@ window.multiple_url_categorization = ()->
 
 
 window.inheritCategories = (complaint_entry_id) ->
-  headers = {'Token': $('input[name="token"]').val(), 'Xmlrpc-Token': $('input[name="xml_token"]').val()}
   std_msg_ajax(
     url:'/escalations/api/v1/escalations/webcat/complaint_entries/inherit_categories_from_master_domain'
-    headers: headers
     method: 'POST'
-    data:
-      id: complaint_entry_id
+    data: {'id': complaint_entry_id}
     success: (response) ->
       $('#loader-modal').modal 'hide'
       std_msg_success('Success',["Successfully inherited categories from main domain."], reload: true)
@@ -851,7 +848,7 @@ format = (complaint_entry_row) ->
       '<div class="domain-categories" >' +
       '<label class="content-label-sm">Inherit Categories From Main Domain</label><br/>' +
       '<ul id="main-domain-categories_' + complaint_entry.entry_id + '"></ul>'+
-      '<button class="secondary inline-button" onclick="inheritCategories(event,' + complaint_entry.entry_id + ')">Inherit</button><br/>' +
+      '<button class="secondary inline-button" onclick="inheritCategories(' + complaint_entry.entry_id + ')">Inherit</button><br/>' +
       '</div>' +'</div><div class="col-xs-4 col-with-divider">' +
       '<label class="content-label-sm">Internal Comment</label><br/>' +
       '<input class="nested-table-input complaint-comment-input" id="complaint_comment_' + complaint_entry.entry_id + '" type="text" onclick="this.select()" class="nested-table-input" value="' + internal_comment + '" placeholder="Add a comment." ' + entry_status + '><br/>'  +
