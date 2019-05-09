@@ -107,6 +107,7 @@ class ComplaintEntry < ApplicationRecord
 
   def change_category(prefix,
                       categories_string,
+                      category_names_string,
                       entry_status,
                       comment,
                       resolution_comment,
@@ -154,7 +155,7 @@ class ComplaintEntry < ApplicationRecord
 
           current_status = "PENDING"
           update(resolution: entry_status,
-                 url_primary_category: categories_string,
+                 url_primary_category: category_names_string,
                  category: categories_string,
                  status:current_status,
                  internal_comment: comment,
@@ -663,7 +664,8 @@ class ComplaintEntry < ApplicationRecord
   end
 
   def current_category_data
-    prefix_results = Wbrs::Prefix.where({:urls => [URI.escape(DisputeEntry.domain_of_with_path(self.hostlookup))]})
+
+    prefix_results = Wbrs::Prefix.where({:urls => [DisputeEntry.domain_of_with_path(self.hostlookup)]})
     return {} unless prefix_results
     certainty_on_urls = Wbrs::Prefix.get_certainty_sources_for_urls([DisputeEntry.domain_of_with_path(self.hostlookup)])
 
@@ -818,15 +820,19 @@ class ComplaintEntry < ApplicationRecord
 
       self.domain = parsed_uri[:domain]
       self.subdomain = parsed_uri[:subdomain]
-      self.uri = uri
+      self.path = parsed_uri[:path]
+
+      if self.subdomain.present?
+        self.uri = subdomain + '.' + domain
+      else
+        self.uri = uri
+      end
+
       ComplaintEntryPreload.generate_preload_from_complaint_entry(self)
 
-      save!
-
-      return {status: 'success', preload: false, domain: domain, subdomain: subdomain} if complaint_entry_preload&.current_category_information == 'DATA ERROR'
-
-      response = (complaint_entry_preload&.current_category_information)
-      return {status: 'success', preload: true, data: JSON.parse(response), domain: domain, subdomain: subdomain}
+      if save!
+        {status: 'success'}
+      end
     end
   end
 end
