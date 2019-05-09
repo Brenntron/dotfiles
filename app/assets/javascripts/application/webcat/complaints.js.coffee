@@ -119,7 +119,20 @@ window.multiple_url_categorization = ()->
 
 
 window.inheritCategories = (complaint_entry_id) ->
-  console.log('actual inheritance here')
+  headers = {'Token': $('input[name="token"]').val(), 'Xmlrpc-Token': $('input[name="xml_token"]').val()}
+  std_msg_ajax(
+    url:'/escalations/api/v1/escalations/webcat/complaint_entries/inherit_categories_from_master_domain'
+    headers: headers
+    method: 'POST'
+    data:
+      id: complaint_entry_id
+    success: (response) ->
+      $('#loader-modal').modal 'hide'
+      std_msg_success('Success',["Successfully inherited categories from main domain."], reload: true)
+    error: (response) ->
+      $('#loader-modal').modal 'hide'
+      std_msg_error('Error' + ' ' + response.responseJSON.message,"", reload: false)
+    )
 
 name_servers =(server_list)->
   if undefined == server_list
@@ -731,13 +744,13 @@ format = (complaint_entry_row) ->
       { current_category_data : current_categories, master_categories} = JSON.parse(response)
 
       master_categories_list = '#main-domain-categories_' + complaint_entry.entry_id
-      
+
       if master_categories.length > 0
         $(master_categories_list).closest('.domain-categories').show()
 
         for cat in master_categories
           new_cat = '<li>' + cat + '</li>'
-          $(master_categories_list).append(newCat)
+          $(master_categories_list).append(new_cat)
 
       $.each current_categories, (key, value) ->
         category = this
