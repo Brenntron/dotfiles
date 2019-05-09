@@ -447,131 +447,6 @@ $ ->
   $('#file-rep-datatable').dataTable
     drawCallback: ( settings ) ->
 
-      ####### REVERSING LABS INDEX HOVER TOOLTIP BEGINS ###########
-      ####### REVERSING LABS INDEX HOVER TOOLTIP BEGINS ###########
-      ####### REVERSING LABS INDEX HOVER TOOLTIP BEGINS ###########
-
-      # LOADER TOOLTIP BELOW
-      $('.rl-hover').on 'mouseover', ->
-        curr_sha = $(this).parent().siblings().find('.file_rep_sha').text()  # should be 'e78972341asfdadsf9238'
-        curr_score_id = $(this).parent().parent().attr('id')   # get the row id, build selector '#rl-score-id-5' to attach tip
-
-        # build the selector to attach to
-        score_id_selector = '#rl-score-id-' + curr_score_id
-
-#       dbinebri: attach and init the tooltip with "loading", this will open on hover during RL JSON wait period
-        $(score_id_selector).tooltipster
-          theme: [
-            'tooltipster-borderless'
-            'tooltipster-borderless-customized'
-            'tooltipster-rl-hover'
-          ]
-          side: 'bottom'
-          content: '<div style="padding: 0px 10px 12px;">Loading report... <span class="loader-gears" style="width: 25px; height: 25px; display: inline-block; position: relative; top: 6px;"><svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" version="1.1" id="Layer_1" x="0px" y="0px" viewBox="0 0 20 20" style="enable-background:new 0 0 20 20;" xml:space="preserve"><style type="text/css">\t.gear_two{fill:#fff;}\t.gear_one{fill:#fff;}\t.bounding_box{fill:none;}\t.gear_two:#fff;</style><g id="gear_larger" class="rotating">\t<path class="gear_one" d="M7.9,11.5c0,0.7-0.5,1.1-1.1,1.1s-1.1-0.5-1.1-1.1c0-0.7,0.5-1.1,1.1-1.1S7.9,10.8,7.9,11.5z M12.3,11l-0.2-1   l-1.5-0.3L10.1,9l0.6-1.4L10,6.9L8.6,7.8L7.8,7.4L7.3,5.9h-1L5.7,7.4L4.9,7.8L3.6,6.9L2.9,7.6L3.5,9L3,9.8l-1.5,0.3l-0.2,1l1.3,0.8   l0.2,0.9l-1,1.1l0.4,1l1.5-0.3L4.4,15v1.5l1,0.4l1-1.1h0.9l1,1.1l1-0.4V15l0.7-0.6l1.5,0.3l0.5-0.9l-1-1.1l0.2-0.9L12.3,11z"></path>\t<rect x="1.3" y="5.9" class="bounding_box" width="11" height="11"></rect></g><g id="gear_smaller" class="rotating">\t<path class="gear_two" d="M13.8,7c0-0.5,0.4-0.9,0.9-0.9s0.9,0.4,0.9,0.9s-0.4,0.9-0.9,0.9C14.2,7.8,13.8,7.4,13.8,7z M17.3,6.6l1-1.1   l-0.5-0.9l-1.4,0.3l-0.6-0.4l-0.5-1.4h-1.1l-0.5,1.4L13,4.9l-1.4-0.3l-0.5,0.9l1,1.1v0.7l-1,1.1l0.5,0.9L13,9l0.6,0.4l0.5,1.4h1.1   l0.5-1.4L16.3,9l1.4,0.3l0.5-0.9l-1-1.1V6.6H17.3z"></path>\t<rect x="10.7" y="2.9" class="bounding_box" width="8" height="8"></rect></g></svg></span></div>'
-          contentAsHTML: true
-          trigger: 'hover'
-
-        # TOOLTIP OPEN, NOT LOADER
-        $(score_id_selector).tooltipster('open')
-
-        # BUILD THE RL HOVER TOOLTIP
-        rl_build_table(curr_sha, score_id_selector)  # this func is below
-
-
-      window.rl_build_table = (sha256_hash, score_id_selector) ->
-        # AJAX CALL TO GET THE HOVER RL REPORT AND BUILD THE HTML
-        std_msg_ajax(
-          method: 'GET'
-          url: "/escalations/api/v1/escalations/filerep/reversing_labs/" + sha256_hash
-          success_reload: false
-          success: (response) ->
-            if response.json.error
-              # ERROR WITH TOOLTIP? SHOW THIS TOOLTIP
-              $(score_id_selector).tooltipster('destroy')  # redo this in another way?
-              $(score_id_selector).tooltipster
-                theme: [
-                  'tooltipster-borderless'
-                  'tooltipster-borderless-customized'
-                ]
-                side: 'bottom'
-                content: 'There was an error retrieving the info for this SHA.'
-                autoClose: false
-                trigger: 'custom'
-                triggerOpen:
-                  mouseenter: true
-                triggerClose:
-                  mouseleave: true
-                  click: true
-              # OPEN JSON ERROR TOOLTIP
-              $(score_id_selector).tooltipster('open')
-
-            unless response.json.error?
-              # SUCCESS WITH JSON? SHOW THIS TOOLTIP
-              console.log 'SUCCESS... showing tooltip.'
-              rl_data = response.json.rl.sample.xref
-
-              scanner_count = ""
-              result_count = ""
-              all_scanner_results = rl_data.entries[0]
-              scanner_count = all_scanner_results.scanners.length
-
-              mal_results = []
-              unk_results = []
-
-              $(all_scanner_results.scanners).each ->
-                if this.result == ""
-                  unk_results.push(this)
-                else
-                  mal_results.push(this)
-
-              result_count = mal_results.length
-
-              rl_hover_table =
-                '<table class="rl-report-top"><tr class="top-row"><td colspan="2">Reversing Labs Details ' +
-                '<span id="rl-score-hover">' + result_count + '/' + scanner_count + '</span></td></tr>' +
-                '<tr class="second-row"><td class="left">AV Vendor</td><td class="right">Results</td></tr></table>' +
-                '<table class="rl-report-content">'
-
-              $(mal_results).each ->
-                rl_hover_table += '<tr><td class="left">' + this.name + '</td><td class="right scanner-mal">' + this.result + '</td></tr>'
-              $(unk_results).each ->
-                rl_hover_table += '<tr><td class="left">' + this.name + '</td><td class="right scanner-unk">Not Detected</td></tr>'
-              rl_hover_table += "</table>"
-
-              $(score_id_selector).tooltipster('destroy')  # redo this in another way?
-              $(score_id_selector).tooltipster
-                theme: [
-                  'tooltipster-borderless'
-                  'tooltipster-borderless-customized'
-                  'tooltipster-rl-hover'
-                ]
-                side: 'bottom'
-                content: rl_hover_table
-                contentAsHTML: true
-                trigger: 'custom'
-                triggerOpen:
-                  mouseenter: true
-                triggerClose:
-                  mouseleave: true
-                  click: true
-                autoClose: false
-                interactive: true
-
-              # WHEN IT IS ALL DONE AND READY, OPEN THIS TOOLTIP AND OVERWRITE THE LOADER CONTENT
-              $(score_id_selector).tooltipster('open')
-
-
-          error: (response) ->
-            # for this type of error, just show it inside the tooltip
-            console.log 'There was a problem retrieving data for this record.'
-
-        )
-      ####### REVERSING LABS INDEX HOVER TOOLTIP ENDS ###########
-      ####### REVERSING LABS INDEX HOVER TOOLTIP ENDS ###########
-      ####### REVERSING LABS INDEX HOVER TOOLTIP ENDS ###########
-
-
-
       if localStorage.search_name
 
         {search_type, search_name, search_conditions } = localStorage
@@ -616,6 +491,95 @@ $ ->
           $(new_td).append(new_delete)
           $(new_delete).append(new_delete_image)
           $('.filerep-named-search-list').append(new_tr)
+
+
+      ####### REVERSING LABS INDEX HOVER TOOLTIP BEGINS ###########
+      ####### REVERSING LABS INDEX HOVER TOOLTIP BEGINS ###########
+
+      # dbinebri: LOADER TOOLTIP BELOW
+      $('.rl-hover').on 'mouseover', ->
+        curr_sha = $(this).parent().siblings().find('.file_rep_sha').text()
+        row_id = $(this).parent().parent().attr('id')
+        score_id_selector = '#rl-score-id-' + row_id
+
+        $(score_id_selector).tooltipster
+          theme: [
+            'tooltipster-borderless'
+            'tooltipster-borderless-customized'
+            'tooltipster-rl-hover'
+          ]
+          side: 'bottom'
+          content: '<div class="rl-hover-loader">Loading report... <img src="/assets/icon_gear_white.svg" class="rl-cog"></div>'
+          contentAsHTML: true
+          autoClose: false
+          trigger: 'custom'
+          triggerOpen:
+            mouseenter: true
+            click: true
+          triggerClose:
+            mouseleave: true
+            click: true
+            scroll: true
+          interactive: true
+          updateAnimation: false
+
+        # score_id_selector will look like '#rl-score-id-2', attach tooltip to this
+        $(score_id_selector).tooltipster('open')
+
+        rl_build_table(curr_sha, score_id_selector)
+
+      # build the entire rl html table to load into the tooltip above
+      window.rl_build_table = (sha256_hash, score_id_selector) ->
+        std_msg_ajax(
+          method: 'GET'
+          url: "/escalations/api/v1/escalations/filerep/reversing_labs/" + sha256_hash
+          success_reload: false
+          success: (response) ->
+            unless response.json.error?
+              rl_data = response.json.rl.sample.xref
+
+              scanner_count = ""
+              result_count = ""
+              all_scanner_results = rl_data.entries[0]
+              scanner_count = all_scanner_results.scanners.length
+
+              mal_results = []
+              unk_results = []
+
+              $(all_scanner_results.scanners).each ->
+                if this.result == ""
+                  unk_results.push(this)
+                else
+                  mal_results.push(this)
+
+              result_count = mal_results.length
+
+              rl_hover_table =
+                '<table class="rl-header"><tr class="top"><td colspan="2">Reversing Labs Details ' +
+                  '<span id="rl-score-hover">' + result_count + '/' + scanner_count + '</span></td></tr>' +
+                  '<tr class="second"><td class="left">AV Vendor</td><td class="right">Results</td></tr></table>' +
+                  '<table class="rl-content">'
+
+              $(mal_results).each ->
+                rl_hover_table += '<tr><td class="left">' + this.name + '</td><td class="right scanner-mal">' + this.result + '</td></tr>'
+              $(unk_results).each ->
+                rl_hover_table += '<tr><td class="left">' + this.name + '</td><td class="right scanner-unk">Not Detected</td></tr>'
+              rl_hover_table += "</table>"
+
+              $(score_id_selector).tooltipster('content', rl_hover_table)
+
+            # GOT A JSON RESPONSE, BUT AN ERROR WITH SHA? DO THIS TOOLTIP
+            if response.json.error
+              $(score_id_selector).tooltipster('content', '<div class="rl-hover-error">Error loading this SHA.</div>')
+
+          # IF ERROR ON AJAX CALL
+          error: (response) ->
+            $(score_id_selector).tooltipster('content', '<div class="rl-hover-error">There was an error with this SHA.</div>')
+
+        )
+        ####### REVERSING LABS INDEX HOVER TOOLTIP ENDS ###########
+        ####### REVERSING LABS INDEX HOVER TOOLTIP ENDS ###########
+
 
     processing: true
     serverSide: true
@@ -758,7 +722,7 @@ $ ->
         data: 'reversing_labs_score'
         render: (data, type, full, meta) ->
           if data
-            return '<span class="score-col text-center rl-hover" ' + 'id="rl-score-id-' + full['id'] + '" data-tooltip-content="Loading...">' + data + ' / ' + full['reversing_labs_count'] + '</span>'
+            return '<span class="score-col text-center rl-hover" ' + 'id="rl-score-id-' + full['id'] + '" data-tooltip-content="Loading...">' + data + ' / ' + full['reversing_labs_count'] + ' <img src="../../assets/icon_down_arrow_grey.svg" class="rl-more">' + '</span>'
           else
             return ''
       }
@@ -930,20 +894,6 @@ $ ->
           to : values[1]
         }
     })
-
-# dbinebri: adding in checkbox toggle column visible + widths on Show Page, Research tab
-  $('#data-show-sandbox-cb').click -> $('#sandbox-report-wrapper').toggle()
-  $('#data-show-tg-cb').click -> $('#threatgrid-report-wrapper').toggle()
-  $('#data-show-reversing-cb').click -> $('#reversing-labs-report-wrapper').toggle()
-
-  $('#data-show-sandbox-cb, #data-show-tg-cb, #data-show-reversing-cb').click ->
-    if $('.dataset-cb:checked').length == 1
-      $('#sandbox-report-wrapper, #threatgrid-report-wrapper, #reversing-labs-report-wrapper').removeClass('col-sm-4 col-sm-6').addClass('col-sm-12')
-    else if $('.dataset-cb:checked').length == 2
-      $('#sandbox-report-wrapper, #threatgrid-report-wrapper, #reversing-labs-report-wrapper').removeClass('col-sm-4 col-sm-12').addClass('col-sm-6')
-    else if $('.dataset-cb:checked').length == 3
-      $('#sandbox-report-wrapper, #threatgrid-report-wrapper, #reversing-labs-report-wrapper').removeClass('col-sm-6 col-sm-12').addClass('col-sm-4')
-    return
 
 
 $ ->

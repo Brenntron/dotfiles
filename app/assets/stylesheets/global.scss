@@ -9295,88 +9295,64 @@ div[aria-describedby='create-detection-dialog'] {
 }
 
 
-// dbinebri: this is the RL report hover tooltip on index, need some special styles
-.tooltipster-sidetip.tooltipster-borderless.tooltipster-borderless-customized.tooltipster-rl-hover .tooltipster-content {
-  padding: 0;
-  border-radius: 5px;
-  background: transparent;
-  margin-bottom: 0;
-}
-
-// this is the triangle
-.tooltipster-sidetip.tooltipster-borderless.tooltipster-borderless-customized.tooltipster-rl-hover.tooltipster-bottom .tooltipster-arrow-border {
-  border-bottom-color: #333;  // chg to hex
-}
-
-// top row table
-table.rl-report-top {
+// dbinebri: INDEX, RL HOVER TABLE STYLES HERE, this is a one-off tooltip as of now
+// top row for rl hover table
+table.rl-header {
   padding: 0;
   width: 460px;
-  border: none;
-  tr.top-row {
+  text-transform: uppercase;
+  text-align: left;
+  font-size: 12px;
+  font-weight: bold;
+  .top {
     span {
       float: right;
     }
     td {
       border: none;
       padding: 4px 8px;
-      font-size: 12px;
-      font-weight: bold;
-      text-transform: uppercase;
-      background: #333; // chg to hex
-      text-align: left;
+      background: darken($table-dark-body, 10%);
     }
   }
-  tr.second-row {
-    border-bottom: solid 1px #333;  // chg to hex
-    padding: 0;
+  .second {
+    border-bottom: solid 1px darken($table-dark-body, 5%);
     td {
-      font-size: 12px;
-      font-weight: bold;
       padding: 2px 8px;
-      text-transform: uppercase;
+      border: none;
       &.left {
-        text-align: left;
-        width: 200px;
-        border: none;
+        width: 190px;
       }
       &.right {
-        text-align: left;
-        width: 260px;
-        border: none;
+        width: 270px;
       }
     }
   }
 }
 
-
-// bottom area table
-table.rl-report-content {
+// this is the actual rl hover table contents
+table.rl-content {
   display: block;
   padding: 0;
   width: 460px;
   height: 260px;
-  max-height: 260px;
   overflow-x: hidden;
   overflow-y: scroll;
-  border: none;
   tr {
     td {
       border: none;
       padding: 2px 8px;
-      text-align: center;
+      text-align: left;
       font-size: 10px;
       &:first-of-type {
-        text-align: left;
         width: 200px;
       }
       &:last-of-type {
-        text-align: left;
         width: 260px;
       }
     }
-    td.scanner-mal {
-      color: #fff;  // chg to hex
+    // need special scanner-mal and scanner-unk styles here, can't reuse from show page
+    .scanner-mal {
+      color: $content-bg-color;
       &::before {
         content: '';
         display: block;
@@ -9391,11 +9367,63 @@ table.rl-report-content {
         margin-left: -16px;
       }
     }
-    td.scanner-unk {
-      color: #fff;  // chg to hex
+    .scanner-unk {
+      color: $content-bg-color;
       padding-left: 25px;
       font-style: italic;
     }
   }
 }
 
+// index, this is the rl score in the datatable on index, pad-left to account for the down caret
+.rl-hover {
+  padding-left: 12px;
+}
+
+.rl-hover-error {
+  padding: 10px;
+}
+
+// this is a wrapper for loading and error messages in the rl hover tooltip
+.rl-hover-loader {
+  padding: 0 10px 10px;
+
+  .rl-cog {
+    position: relative;
+    top: 7px;
+    width: 22px;
+    height: 22px;
+    transform-origin: 50% 50%;
+    animation: rotate_rl_cog 2s linear infinite;
+  }
+
+  @-webkit-keyframes rotate_rl_cog {
+    from {
+      transform: rotate(0deg);
+    }
+    to {
+      transform: rotate(360deg);
+    }
+  }
+}
+
+// this is the down caret on index page in the datatable
+.rl-more {
+  position: relative;
+  top: 2px;
+  right: 2px;
+  width: 15px;
+  height: 15px;
+}
+
+
+// dbinebri: this is the WRAPPER for the RENDERED full rl table hover, remove padding and add border radius
+.tooltipster-sidetip.tooltipster-borderless.tooltipster-borderless-customized.tooltipster-rl-hover .tooltipster-content {
+  padding: 0;
+  border-radius: 5px;
+}
+
+// this is the triangle, make color match the top row of rl hover table
+.tooltipster-sidetip.tooltipster-borderless.tooltipster-borderless-customized.tooltipster-rl-hover.tooltipster-bottom .tooltipster-arrow-border {
+  border-bottom-color: darken($table-dark-body, 5%);
+}
