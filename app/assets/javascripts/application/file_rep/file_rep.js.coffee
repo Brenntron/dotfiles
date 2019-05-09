@@ -446,47 +446,68 @@ $ ->
 
   $('#file-rep-datatable').dataTable
     drawCallback: ( settings ) ->
-      # the datatable has been drawn, now we can do stuff inside of it
 
-#       dbinebri: we need a temporary "loading" tooltip on hover, move this whole function elsewhere
-#      $('.rl-hover').tooltipster
-#        theme: [
-#          'tooltipster-borderless'
-#          'tooltipster-borderless-customized'
-#          'tooltipster-rl-hover'
-#        ]
-#        side: 'bottom'
-#        content: '<div style="padding: 10px;">Loading, please wait...</div>'
-#        contentAsHTML: true
-#        contentCloning: true
-#        trigger: 'hover'
-#
-      # 1) detecting the row clicked is the most important, you need the sha from that row first and the score_id
-      # pass that sha and score_id to the ajax call to build the content
-      # build the report, and attach the tooltip to the score_id with the content of rl_hover_table
+      ####### REVERSING LABS INDEX HOVER TOOLTIP BEGINS ###########
+      ####### REVERSING LABS INDEX HOVER TOOLTIP BEGINS ###########
+      ####### REVERSING LABS INDEX HOVER TOOLTIP BEGINS ###########
 
+      # LOADER TOOLTIP BELOW
       $('.rl-hover').on 'mouseover', ->
         curr_sha = $(this).parent().siblings().find('.file_rep_sha').text()  # should be 'e78972341asfdadsf9238'
-        curr_score_id = $(this).parent().parent().attr('id')   # should be like '#rl-score-id-5', attach tooltip to this id
+        curr_score_id = $(this).parent().parent().attr('id')   # get the row id, build selector '#rl-score-id-5' to attach tip
 
-        rl_build_table(curr_sha, curr_score_id)  # this func is below
+        # build the selector to attach to
+        score_id_selector = '#rl-score-id-' + curr_score_id
+
+#       dbinebri: attach and init the tooltip with "loading", this will open on hover during RL JSON wait period
+        $(score_id_selector).tooltipster
+          theme: [
+            'tooltipster-borderless'
+            'tooltipster-borderless-customized'
+            'tooltipster-rl-hover'
+          ]
+          side: 'bottom'
+          content: '<div style="padding: 0px 10px 12px;">Loading report... <span class="loader-gears" style="width: 25px; height: 25px; display: inline-block; position: relative; top: 6px;"><svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" version="1.1" id="Layer_1" x="0px" y="0px" viewBox="0 0 20 20" style="enable-background:new 0 0 20 20;" xml:space="preserve"><style type="text/css">\t.gear_two{fill:#fff;}\t.gear_one{fill:#fff;}\t.bounding_box{fill:none;}\t.gear_two:#fff;</style><g id="gear_larger" class="rotating">\t<path class="gear_one" d="M7.9,11.5c0,0.7-0.5,1.1-1.1,1.1s-1.1-0.5-1.1-1.1c0-0.7,0.5-1.1,1.1-1.1S7.9,10.8,7.9,11.5z M12.3,11l-0.2-1   l-1.5-0.3L10.1,9l0.6-1.4L10,6.9L8.6,7.8L7.8,7.4L7.3,5.9h-1L5.7,7.4L4.9,7.8L3.6,6.9L2.9,7.6L3.5,9L3,9.8l-1.5,0.3l-0.2,1l1.3,0.8   l0.2,0.9l-1,1.1l0.4,1l1.5-0.3L4.4,15v1.5l1,0.4l1-1.1h0.9l1,1.1l1-0.4V15l0.7-0.6l1.5,0.3l0.5-0.9l-1-1.1l0.2-0.9L12.3,11z"></path>\t<rect x="1.3" y="5.9" class="bounding_box" width="11" height="11"></rect></g><g id="gear_smaller" class="rotating">\t<path class="gear_two" d="M13.8,7c0-0.5,0.4-0.9,0.9-0.9s0.9,0.4,0.9,0.9s-0.4,0.9-0.9,0.9C14.2,7.8,13.8,7.4,13.8,7z M17.3,6.6l1-1.1   l-0.5-0.9l-1.4,0.3l-0.6-0.4l-0.5-1.4h-1.1l-0.5,1.4L13,4.9l-1.4-0.3l-0.5,0.9l1,1.1v0.7l-1,1.1l0.5,0.9L13,9l0.6,0.4l0.5,1.4h1.1   l0.5-1.4L16.3,9l1.4,0.3l0.5-0.9l-1-1.1V6.6H17.3z"></path>\t<rect x="10.7" y="2.9" class="bounding_box" width="8" height="8"></rect></g></svg></span></div>'
+          contentAsHTML: true
+          trigger: 'hover'
+
+        # TOOLTIP OPEN, NOT LOADER
+        $(score_id_selector).tooltipster('open')
+
+        # BUILD THE RL HOVER TOOLTIP
+        rl_build_table(curr_sha, score_id_selector)  # this func is below
 
 
-      window.rl_build_table = (sha256_hash, score_id) ->
-#        $('#rl-loader').show()
-        console.log 'Loading JSON... please wait...'
-
+      window.rl_build_table = (sha256_hash, score_id_selector) ->
+        # AJAX CALL TO GET THE HOVER RL REPORT AND BUILD THE HTML
         std_msg_ajax(
           method: 'GET'
           url: "/escalations/api/v1/escalations/filerep/reversing_labs/" + sha256_hash
           success_reload: false
           success: (response) ->
-#            $('#rl-loader').hide()
             if response.json.error
-              console.log 'ERROR... try another record.'
-            unless response.json.error?
-              console.log 'SUCCESS... showing tooltip.'
+              # ERROR WITH TOOLTIP? SHOW THIS TOOLTIP
+              $(score_id_selector).tooltipster('destroy')  # redo this in another way?
+              $(score_id_selector).tooltipster
+                theme: [
+                  'tooltipster-borderless'
+                  'tooltipster-borderless-customized'
+                ]
+                side: 'bottom'
+                content: 'There was an error retrieving the info for this SHA.'
+                autoClose: false
+                trigger: 'custom'
+                triggerOpen:
+                  mouseenter: true
+                triggerClose:
+                  mouseleave: true
+                  click: true
+              # OPEN JSON ERROR TOOLTIP
+              $(score_id_selector).tooltipster('open')
 
+            unless response.json.error?
+              # SUCCESS WITH JSON? SHOW THIS TOOLTIP
+              console.log 'SUCCESS... showing tooltip.'
               rl_data = response.json.rl.sample.xref
 
               scanner_count = ""
@@ -504,13 +525,11 @@ $ ->
                   mal_results.push(this)
 
               result_count = mal_results.length
-              $('#rl-scanner-results, #rl-score-hover').text(result_count + '/' + scanner_count)
 
               rl_hover_table =
-                '<table class="rl-report-top">' +
-                '<tr class="top-row"><td colspan="2">Reversing Labs Details <span class="rl-score-hover"></span></td></tr>' +
-                '<tr class="second-row"><td class="left">AV Vendor</td><td class="right">Results</td></tr>' +
-                '</table>' +
+                '<table class="rl-report-top"><tr class="top-row"><td colspan="2">Reversing Labs Details ' +
+                '<span id="rl-score-hover">' + result_count + '/' + scanner_count + '</span></td></tr>' +
+                '<tr class="second-row"><td class="left">AV Vendor</td><td class="right">Results</td></tr></table>' +
                 '<table class="rl-report-content">'
 
               $(mal_results).each ->
@@ -519,9 +538,7 @@ $ ->
                 rl_hover_table += '<tr><td class="left">' + this.name + '</td><td class="right scanner-unk">Not Detected</td></tr>'
               rl_hover_table += "</table>"
 
-              # build the selector to attach to
-              score_id_selector = '#rl-score-id-' + score_id
-
+              $(score_id_selector).tooltipster('destroy')  # redo this in another way?
               $(score_id_selector).tooltipster
                 theme: [
                   'tooltipster-borderless'
@@ -532,29 +549,26 @@ $ ->
                 content: rl_hover_table
                 contentAsHTML: true
                 trigger: 'custom'
-                triggerOpen: {
+                triggerOpen:
                   mouseenter: true
-                }
-                triggerClose: {
+                triggerClose:
                   mouseleave: true
                   click: true
-                  scroll: true
-                }
-                autoOpen: true
-                autoClose: 'false'
+                autoClose: false
                 interactive: true
 
-              # make sure it opens
+              # WHEN IT IS ALL DONE AND READY, OPEN THIS TOOLTIP AND OVERWRITE THE LOADER CONTENT
               $(score_id_selector).tooltipster('open')
 
 
           error: (response) ->
-            # change this to an error inside the tooltip itself
-            std_api_error(response, "There was a problem retrieving data from Reversing Labs", reload: false)
-            console.log 'There was a problem retrieving data from Reversing Labs using this SHA.'
+            # for this type of error, just show it inside the tooltip
+            console.log 'There was a problem retrieving data for this record.'
 
         )
-
+      ####### REVERSING LABS INDEX HOVER TOOLTIP ENDS ###########
+      ####### REVERSING LABS INDEX HOVER TOOLTIP ENDS ###########
+      ####### REVERSING LABS INDEX HOVER TOOLTIP ENDS ###########
 
 
 
