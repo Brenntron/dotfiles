@@ -742,7 +742,7 @@ format = (complaint_entry_row) ->
 
       master_categories_list = '#main-domain-categories_' + complaint_entry.entry_id
 
-      if master_categories != null
+      if master_categories.length > 0
         $(master_categories_list).closest('.domain-categories').show()
 
         for cat in master_categories
