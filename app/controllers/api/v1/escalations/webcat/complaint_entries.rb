@@ -471,7 +471,13 @@ module API
               std_api_v2 do
                 complaint_entry = ComplaintEntry.find(params[:id])
 
-                {master_categories: complaint_entry.get_category_names, current_category_data: complaint_entry.current_category_data }.to_json
+                if complaint_entry.subdomain.present? || complaint_entry.path.present?
+                  master_categories = complaint_entry.get_category_names_from_master
+                else
+                  master_categories = nil
+                end
+
+                {master_categories: master_categories, current_category_data: complaint_entry.current_category_data }.to_json
               end
             end
 

@@ -633,7 +633,7 @@ class ComplaintEntry < ApplicationRecord
     final_current_categories
   end
 
-  def get_category_names
+  def get_category_names_from_master
     prefix_results = Wbrs::Prefix.where({:urls => [self.domain]})
 
     if self.entry_type == 'URI/DOMAIN'
