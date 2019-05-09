@@ -1,22 +1,50 @@
-table_page=0
+table_page = 0
 
 $(document).on 'click', '.paginate_button', ->
   table = $('#complaints-index').DataTable()
   table_page = table.page.info().page
 
-window.inheritCategories = () ->
+window.getCategories = (complaint_entry_id) ->
+  main_domain_categories = ''
   headers = {'Token': $('input[name="token"]').val(), 'Xmlrpc-Token': $('input[name="xml_token"]').val()}
-#  $.ajax(
-#    url: ''
-#    method: 'POST'
-#    headers: headers
-#    data: ''
-#    success: (response) ->
-#      console.log response
-#    error: (response)
-#      console.log response
-#  )
+  $.ajax(
+    url: '/escalations/api/v1/escalations/webcat/complaint_entries/retrieve_category_names_from_master'
+    method: 'POST'
+    headers:headers
+    data:
+      id: complaint_entry_id
+    success: (response) ->
+      response = JSON.parse(response)
+      domain_cats = '#main-domain-categories_' + complaint_entry_id
+      if response
+        $(domain_cats).closest('.domain-categories').show()
+        for cat in response
+          newCat = '<li>' + cat + '</li>'
+          $(domain_cats).append(newCat)
+    error: (response) ->
+      console.log response
+  )
 
+window.inheritCategories = (complaint_entry_id) ->
+  main_domain_categories = ''
+  headers = {'Token': $('input[name="token"]').val(), 'Xmlrpc-Token': $('input[name="xml_token"]').val()}
+  $.ajax(
+    url: '/escalations/api/v1/escalations/webcat/complaint_entries/retrieve_category_names_from_master'
+    method: 'POST'
+    headers:headers
+    data:
+      id: complaint_entry_id
+    success: (response) ->
+      response = JSON.parse(response)
+      domain_cats = '#main-domain-categories_' + complaint_entry_id
+      if response
+        $(domain_cats).closest('.domain-categories').show()
+        for cat in response
+          newCat = '<li>' + cat + '</li>'
+          $(domain_cats).append(newCat)
+    error: (response) ->
+      console.log response
+  )
 
 window.updateURI = (event, complaint_entry_id) ->
   event.preventDefault()
@@ -624,7 +652,9 @@ format = (complaint_entry_row) ->
     keyboard: false,
   })
 
+
   complaint_entry = complaint_entry_row.data()
+  getCategories(complaint_entry.entry_id)
   row_id = complaint_entry_row[0][0]
   missing_data = '<span class="missing-data">No Data</span>'
   uri = ''
@@ -793,6 +823,7 @@ format = (complaint_entry_row) ->
         '<button class="tertiary submit_changes" id="submit_changes_' + complaint_entry.entry_id + '" onclick="updateEntryColumns(' + complaint_entry.entry_id + ',' + row_id + ')" ' + entry_status + '>Submit Changes</button>' +
         '</div>'
 
+
   complaint_entry_html =
       complaint_table_row_html +
       '<div class="col-xs-12 col-sm-6 nested-complaint-static-data">' +
@@ -824,8 +855,11 @@ format = (complaint_entry_row) ->
       '<div class="row">' +
       '<div class="col-xs-6 col-with-divider">' +
 #      TODO TODO TODO
-      '<label class="content-label-sm">Inherit Categories</label><br/>' +
-      '<button class="secondary inline-button" onclick="inheritCategories()">Inherit</button><br/>' +
+      '<div class="domain-categories" >' +
+      '<label class="content-label-sm">Inherit Categories From Main Domain</label><br/>' +
+      '<ul id="main-domain-categories_' + complaint_entry.entry_id + '"></ul>'+
+      '<button class="secondary inline-button" onclick="inheritCategories(event,' + complaint_entry.entry_id + ')">Inherit</button><br/>' +
+      '</div>' +
       '<label class="content-label-sm">Edit URI</label><br/>' +
       '<input class="nested-table-input" id="complaint_prefix_' + complaint_entry.entry_id +
       '" type="text" onclick="this.select()" value="' + host +
