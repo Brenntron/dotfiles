@@ -4,48 +4,6 @@ $(document).on 'click', '.paginate_button', ->
   table = $('#complaints-index').DataTable()
   table_page = table.page.info().page
 
-window.getCategories = (complaint_entry_id) ->
-  main_domain_categories = ''
-  headers = {'Token': $('input[name="token"]').val(), 'Xmlrpc-Token': $('input[name="xml_token"]').val()}
-  $.ajax(
-    url: '/escalations/api/v1/escalations/webcat/complaint_entries/retrieve_category_names_from_master'
-    method: 'POST'
-    headers:headers
-    data:
-      id: complaint_entry_id
-    success: (response) ->
-      response = JSON.parse(response)
-      domain_cats = '#main-domain-categories_' + complaint_entry_id
-      if response
-        $(domain_cats).closest('.domain-categories').show()
-        for cat in response
-          newCat = '<li>' + cat + '</li>'
-          $(domain_cats).append(newCat)
-    error: (response) ->
-      console.log response
-  )
-
-window.inheritCategories = (complaint_entry_id) ->
-  main_domain_categories = ''
-  headers = {'Token': $('input[name="token"]').val(), 'Xmlrpc-Token': $('input[name="xml_token"]').val()}
-  $.ajax(
-    url: '/escalations/api/v1/escalations/webcat/complaint_entries/retrieve_category_names_from_master'
-    method: 'POST'
-    headers:headers
-    data:
-      id: complaint_entry_id
-    success: (response) ->
-      response = JSON.parse(response)
-      domain_cats = '#main-domain-categories_' + complaint_entry_id
-      if response
-        $(domain_cats).closest('.domain-categories').show()
-        for cat in response
-          newCat = '<li>' + cat + '</li>'
-          $(domain_cats).append(newCat)
-    error: (response) ->
-      console.log response
-  )
-
 window.updateURI = (event, complaint_entry_id) ->
   event.preventDefault()
 
@@ -158,6 +116,30 @@ window.multiple_url_categorization = ()->
   else
     $('#loader-modal').modal 'hide'
     std_msg_error('Error', ['Please check that a URL/IP has been inputted and that at least one category was selected.'], reload: false)
+
+window.getCategories = (complaint_entry_id) ->
+  main_domain_categories = ''
+  headers = {'Token': $('input[name="token"]').val(), 'Xmlrpc-Token': $('input[name="xml_token"]').val()}
+  $.ajax(
+    url: '/escalations/api/v1/escalations/webcat/complaint_entries/retrieve_category_names_from_master'
+    method: 'POST'
+    headers:headers
+    data:
+      id: complaint_entry_id
+    success: (response) ->
+      response = JSON.parse(response)
+      domain_cats = '#main-domain-categories_' + complaint_entry_id
+      if response
+        $(domain_cats).closest('.domain-categories').show()
+        for cat in response
+          newCat = '<li>' + cat + '</li>'
+          $(domain_cats).append(newCat)
+    error: (response) ->
+      console.log response
+  )
+
+window.inheritCategories = (complaint_entry_id) ->
+  console.log('actual inheritance here')
 
 name_servers =(server_list)->
   if undefined == server_list
@@ -863,7 +845,6 @@ format = (complaint_entry_row) ->
       '<label class="content-label-sm">Edit Categories / Confidence Order</label>' +
       '<fieldset id="'+input_cat+'" ' + entry_status + '  name="['+input_cat+'][]" class="selectize" placeholder="Enter up to 5 categories" value="">' +
       '</div>' +
-      #      TODO TODO TODO
       '<div class="domain-categories" >' +
       '<label class="content-label-sm">Inherit Categories From Main Domain</label><br/>' +
       '<ul id="main-domain-categories_' + complaint_entry.entry_id + '"></ul>'+
