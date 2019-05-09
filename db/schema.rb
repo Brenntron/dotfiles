@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 2019_04_22_145106) do
+ActiveRecord::Schema.define(version: 2019_04_29_210708) do
 
   create_table "alerts", options: "ENGINE=InnoDB DEFAULT CHARSET=utf8", force: :cascade do |t|
     t.datetime "created_at", null: false
@@ -20,6 +20,17 @@ ActiveRecord::Schema.define(version: 2019_04_22_145106) do
     t.integer "attachment_id", null: false
     t.string "policy"
     t.index ["test_group", "attachment_id", "rule_id"], name: "index_alerts_on_test_group_and_attachment_id_and_rule_id"
+  end
+
+  create_table "amp_naming_conventions", options: "ENGINE=InnoDB DEFAULT CHARSET=utf8", force: :cascade do |t|
+    t.string "pattern"
+    t.string "example"
+    t.string "engine"
+    t.text "engine_description"
+    t.text "notes"
+    t.text "public_notes"
+    t.string "contact"
+    t.integer "table_sequence"
   end
 
   create_table "attachments", options: "ENGINE=InnoDB DEFAULT CHARSET=utf8", force: :cascade do |t|

@@ -247,6 +247,42 @@ $ ->
 
 
 
+  window.create_convention = () ->
+    std_msg_ajax(
+      method: 'POST'
+      url: "/escalations/api/v1/escalations/file_rep/amp_naming_convention"
+      data:
+        pattern: 'malforge'
+        example: 'jennifer.malforge'
+        engine: 'malforge'
+        engine_description: 'Those malforge guys'
+        notes: 'I hate those malforge guys'
+        public_notes: 'Do not trust those malforge guys'
+        contact: 'gee@cisco.com'
+        table_sequence: 10
+      success_reload: false
+      success_msg: 'Naming Convention Created'
+      failure_reload: false
+      error_prefix: 'Error Creating Naming Convention'
+    )
 
 
+  window.update_convention = () ->
+    std_msg_ajax(
+      method: 'PUT'
+      url: "/escalations/api/v1/escalations/file_rep/amp_naming_convention/1"
+      data:
+        pattern: 'malforge'
+        example: 'jennifer.malforge'
+        engine: 'malforge'
+        engine_description: 'Those malforge guys'
+        notes: 'I hate those malforge guys'
+        public_notes: 'Do not trust those malforge guys'
+        contact: 'gee@cisco.com'
+        table_sequence: 10
+      success_reload: false
+      success_msg: 'Naming Convention Updated'
+      failure_reload: false
+      error_prefix: 'Error Updating Naming Convention'
+    )
 
