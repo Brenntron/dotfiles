@@ -306,13 +306,14 @@ Feature: Disputes
     When I go to "/escalations/file_rep/disputes/1"
     And I click "#communication-tab-link"
     And I click ".new-email-button"
-    And I fill in "receiver" with "ancheng3@cisco.com"
+    And I fill in "receiver" with "generic@cisco.com"
     And I fill in "subject" with "Cucumber Testing"
     And I fill in the reply textarea with "We can only hope our tests pass."
     And I click "#send-new-email"
     Then I should not see "EMAIL WAS NOT SENT"
-    And I should see "ancheng3@cisco.com"
-    And I should see "Cucumber Testing"
+    And I should see content "generic@cisco.com" within ".receiver-email"
+    And I should see content "Cucumber Testing" within ".communication-subject"
+    And I should see content "We can only hope our tests pass." within ".email-msg-content"
 
   @javascript
   Scenario: a user visits the FileRep Dispute index page and takes a ticket
