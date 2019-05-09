@@ -117,25 +117,6 @@ window.multiple_url_categorization = ()->
     $('#loader-modal').modal 'hide'
     std_msg_error('Error', ['Please check that a URL/IP has been inputted and that at least one category was selected.'], reload: false)
 
-window.getCategories = (complaint_entry_id) ->
-  headers = {'Token': $('input[name="token"]').val(), 'Xmlrpc-Token': $('input[name="xml_token"]').val()}
-  $.ajax(
-    url: '/escalations/api/v1/escalations/webcat/complaint_entries/retrieve_category_names_from_master'
-    method: 'POST'
-    headers:headers
-    data:
-      id: complaint_entry_id
-    success: (response) ->
-      response = JSON.parse(response)
-      domain_cats = '#main-domain-categories_' + complaint_entry_id
-      if response
-        $(domain_cats).closest('.domain-categories').show()
-        for cat in response
-          newCat = '<li>' + cat + '</li>'
-          $(domain_cats).append(newCat)
-    error: (response) ->
-      console.log response
-  )
 
 window.inheritCategories = (complaint_entry_id) ->
   console.log('actual inheritance here')
@@ -745,15 +726,24 @@ format = (complaint_entry_row) ->
     url: '/escalations/api/v1/escalations/webcat/complaint_entries/retrieve_current_categories'
     data: {'id': complaint_entry.entry_id}
     success: (response) ->
+
       $('#loader-modal').modal 'hide'
-      current_categories = JSON.parse(response)
-      console.log current_categories
-      categories = current_categories
+      { current_category_data : current_categories, master_categories} = JSON.parse(response)
+
+      master_categories_list = '#main-domain-categories_' + complaint_entry.entry_id
+      
+      if master_categories.length > 0
+        $(master_categories_list).closest('.domain-categories').show()
+
+        for cat in master_categories
+          new_cat = '<li>' + cat + '</li>'
+          $(master_categories_list).append(newCat)
 
       $.each current_categories, (key, value) ->
         category = this
         active =  $(this).attr("is_active")
         if active == true
+
           confidence = this.confidence
           mnemonic = this.mnem
           name = this.descr
