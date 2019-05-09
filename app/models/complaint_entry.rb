@@ -244,15 +244,19 @@ class ComplaintEntry < ApplicationRecord
       end
 
       # Get the categories from the master domain
-      categories_to_set = ComplaintEntry.get_category_ids(master_domain)
+      category_data = ComplaintEntry.get_category_data(master_domain)
+      category_ids = category_data[:category_ids]
+      category_names = category_data[:category_names]
 
       # Inherit categories from the master domain
       if existing_prefix.present?
         prefix_object = Wbrs::Prefix.new
-        prefix_object.set_categories(categories_to_set, prefix_id: existing_prefix.prefix_id, user: user, description: description)
+        prefix_object.set_categories(category_ids, user: user, description: description, prefix_id: existing_prefix.prefix_id)
       else
-        Wbrs::Prefix.create_from_url(url: ip_or_uri, categories: categories_to_set, user: user, description: description)
+        Wbrs::Prefix.create_from_url(url: ip_or_uri, categories: category_ids, user: user, description: description)
       end
+
+      self.update(url_primary_category: category_names[0])
     elsif ip_or_uri == self.domain
       raise ('Cannot inherit categories on master domain')
     end
@@ -606,7 +610,7 @@ class ComplaintEntry < ApplicationRecord
     ''
   end
 
-  def self.get_category_ids(uri)
+  def self.get_category_data(uri)
     prefix_results = Wbrs::Prefix.where({:urls => [uri]})
 
     parsed_uri = Complaint.parse_url(uri)
@@ -629,9 +633,10 @@ class ComplaintEntry < ApplicationRecord
       end
     end
 
-    final_current_categories = final_results.map {|category| category.category_id}
+    category_ids = final_results.map {|category| category.category_id}
+    category_names = final_results.first.categories.map {|category| category.descr}
 
-    final_current_categories
+    {category_ids: category_ids, category_names: category_names}
   end
 
   def get_category_names_from_master
