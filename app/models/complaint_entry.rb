@@ -218,7 +218,7 @@ class ComplaintEntry < ApplicationRecord
     end
   end
 
-  def self.inherit_categories(ip_or_uri:, description:, user:, casenumber: nil)
+  def inherit_categories(ip_or_uri:, description:, user:, casenumber: nil)
     url_parts = Complaint.parse_url(ip_or_uri)
     master_domain = url_parts[:domain]
 
@@ -632,29 +632,35 @@ class ComplaintEntry < ApplicationRecord
   def get_category_names
     prefix_results = Wbrs::Prefix.where({:urls => [self.domain]})
 
-    parsed_uri = Complaint.parse_url(uri)
+    if self.entry_type == 'URI/DOMAIN'
+      parsed_uri = Complaint.parse_url(uri)
 
-    return [] unless prefix_results
+      return [] unless prefix_results
 
-    if parsed_uri['path'].nil?
-      parsed_uri['path'] = ''
-    end
-
-    if parsed_uri['subdomain'].nil?
-      parsed_uri['subdomain'] = ''
-    end
-
-    final_results = []
-
-    prefix_results.each do |prefix_result|
-      if ((prefix_result.subdomain == parsed_uri['subdomain']) || (parsed_uri['subdomain'] == 'www')) && prefix_result.path == parsed_uri['path']
-        final_results << prefix_result
+      if parsed_uri['path'].nil?
+        parsed_uri['path'] = ''
       end
+
+      if parsed_uri['subdomain'].nil?
+        parsed_uri['subdomain'] = ''
+      end
+
+      categories = []
+
+      prefix_results.each do |prefix_result|
+        if ((prefix_result.subdomain == parsed_uri['subdomain']) || (parsed_uri['subdomain'] == 'www')) && prefix_result.path == parsed_uri['path']
+          categories << prefix_result
+        end
+      end
+
+      if categories.any?
+        categories = categories.first.categories.map {|category| category.descr}
+      end
+
+      categories
+    elsif self.entry_type == 'IP'
+      raise ("Cannot inherit categories for IP entries.")
     end
-
-    final_current_categories = final_results.first.categories.map {|category| category.descr}
-
-    final_current_categories
   end
 
   def current_category_data
