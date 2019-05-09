@@ -4,6 +4,20 @@ $(document).on 'click', '.paginate_button', ->
   table = $('#complaints-index').DataTable()
   table_page = table.page.info().page
 
+window.inheritCategories = () ->
+  headers = {'Token': $('input[name="token"]').val(), 'Xmlrpc-Token': $('input[name="xml_token"]').val()}
+#  $.ajax(
+#    url: ''
+#    method: 'POST'
+#    headers: headers
+#    data: ''
+#    success: (response) ->
+#      console.log response
+#    error: (response)
+#      console.log response
+#  )
+
+
 window.updateURI = (event, complaint_entry_id) ->
   event.preventDefault()
 
@@ -809,6 +823,9 @@ format = (complaint_entry_row) ->
       '</div><div class="col-xs-12 col-sm-6 nested-complaint-editable-data">' +
       '<div class="row">' +
       '<div class="col-xs-6 col-with-divider">' +
+#      TODO TODO TODO
+      '<label class="content-label-sm">Inherit Categories</label><br/>' +
+      '<button class="secondary inline-button" onclick="inheritCategories()">Inherit</button><br/>' +
       '<label class="content-label-sm">Edit URI</label><br/>' +
       '<input class="nested-table-input" id="complaint_prefix_' + complaint_entry.entry_id +
       '" type="text" onclick="this.select()" value="' + host +
