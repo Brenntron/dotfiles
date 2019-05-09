@@ -613,10 +613,9 @@ class ComplaintEntry < ApplicationRecord
   def self.get_category_data(uri)
     prefix_results = Wbrs::Prefix.where({:urls => [uri]})
 
-    parsed_uri = Complaint.parse_url(uri)
-
     return [] unless prefix_results
 
+    parsed_uri = Complaint.parse_url(uri)
     parsed_uri['path'] = '' unless parsed_uri['path'].present?
     parsed_uri['subdomain'] = '' unless parsed_uri['subdomain'].present?
 
