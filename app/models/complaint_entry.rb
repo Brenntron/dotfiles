@@ -617,13 +617,8 @@ class ComplaintEntry < ApplicationRecord
 
     return [] unless prefix_results
 
-    if parsed_uri['path'].nil?
-      parsed_uri['path'] = ''
-    end
-
-    if parsed_uri['subdomain'].nil?
-      parsed_uri['subdomain'] = ''
-    end
+    parsed_uri['path'] = '' unless parsed_uri['path'].present?
+    parsed_uri['subdomain'] = '' unless parsed_uri['subdomain'].present?
 
     final_results = []
 
@@ -634,7 +629,7 @@ class ComplaintEntry < ApplicationRecord
     end
 
     category_ids = final_results.map {|category| category.category_id}
-    category_names = final_results.first.categories.map {|category| category.descr}
+    category_names = final_results.first.categories.sort_by(&:confidence).map {|category| category.descr}
 
     {category_ids: category_ids, category_names: category_names}
   end
