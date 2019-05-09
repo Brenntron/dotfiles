@@ -219,37 +219,41 @@ class ComplaintEntry < ApplicationRecord
   end
 
   def inherit_categories(ip_or_uri:, description:, user:, casenumber: nil)
-    url_parts = Complaint.parse_url(ip_or_uri)
-    master_domain = url_parts[:domain]
+    if ip_or_uri != self.domain
+      parsed_uri = Complaint.parse_url(ip_or_uri)
+      master_domain = parsed_uri[:domain]
 
-    existing_prefixes = Wbrs::Prefix.where({urls: [ip_or_uri]})
+      existing_prefixes = Wbrs::Prefix.where({urls: [ip_or_uri]})
 
-    existing_prefix = nil
+      existing_prefix = nil
 
-    # Check if a prefix record exists for the full URI
-    if existing_prefixes.present?
-      existing_prefixes.each do |prefix_found|
-        if prefix_found.subdomain == url_parts[:subdomain]
-          if prefix_found.path == url_parts[:path]
-            existing_prefix = prefix_found
+      # Check if a prefix record exists for the full URI
+      if existing_prefixes.present?
+        existing_prefixes.each do |prefix_found|
+          if prefix_found.subdomain == parsed_uri[:subdomain]
+            if prefix_found.path == parsed_uri[:path]
+              existing_prefix = prefix_found
+            end
           end
         end
       end
-    end
 
-    if description.present? && casenumber.present?
-      description = description + "--Case Number: #{casenumber} User: #{user}"
-    end
+      if description.present? && casenumber.present?
+        description = description + "--Case Number: #{casenumber} User: #{user}"
+      end
 
-    # Get the categories from the master domain
-    categories_to_set = ComplaintEntry.get_category_ids(master_domain)
+      # Get the categories from the master domain
+      categories_to_set = ComplaintEntry.get_category_ids(master_domain)
 
-    # Inherit categories from the master domain
-    if existing_prefix.present?
-      prefix_object = Wbrs::Prefix.new
-      prefix_object.set_categories(categories_to_set, prefix_id: existing_prefix.prefix_id, user: user, description: description)
-    else
-      Wbrs::Prefix.create_from_url(url: ip_or_uri, categories: categories_to_set, user: user, description: description)
+      # Inherit categories from the master domain
+      if existing_prefix.present?
+        prefix_object = Wbrs::Prefix.new
+        prefix_object.set_categories(categories_to_set, prefix_id: existing_prefix.prefix_id, user: user, description: description)
+      else
+        Wbrs::Prefix.create_from_url(url: ip_or_uri, categories: categories_to_set, user: user, description: description)
+      end
+    elsif ip_or_uri == self.uri
+      raise ('Cannot inherit categories on master domain')
     end
   end
 
