@@ -118,7 +118,6 @@ window.multiple_url_categorization = ()->
     std_msg_error('Error', ['Please check that a URL/IP has been inputted and that at least one category was selected.'], reload: false)
 
 window.getCategories = (complaint_entry_id) ->
-  main_domain_categories = ''
   headers = {'Token': $('input[name="token"]').val(), 'Xmlrpc-Token': $('input[name="xml_token"]').val()}
   $.ajax(
     url: '/escalations/api/v1/escalations/webcat/complaint_entries/retrieve_category_names_from_master'
@@ -636,7 +635,7 @@ format = (complaint_entry_row) ->
 
 
   complaint_entry = complaint_entry_row.data()
-  getCategories(complaint_entry.entry_id)
+#  getCategories(complaint_entry.entry_id)
   row_id = complaint_entry_row[0][0]
   missing_data = '<span class="missing-data">No Data</span>'
   uri = ''
@@ -748,6 +747,7 @@ format = (complaint_entry_row) ->
     success: (response) ->
       $('#loader-modal').modal 'hide'
       current_categories = JSON.parse(response)
+      console.log current_categories
       categories = current_categories
 
       $.each current_categories, (key, value) ->
