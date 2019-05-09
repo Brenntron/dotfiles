@@ -474,6 +474,17 @@ module API
               end
             end
 
+            desc 'Retrieve category names from master domain'
+            params do
+              requires :id, type: Integer
+            end
+            post 'retrieve_category_names_from_master' do
+              std_api_v2 do
+                complaint_entry = ComplaintEntry.find(params[:id])
+                ComplaintEntry.get_category_names(complaint_entry.domain).to_json
+              end
+            end
+
             desc 'Update several entries at once'
             params do
               requires :data, type: Array
