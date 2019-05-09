@@ -1,4 +1,4 @@
-table_page=0
+table_page = 0
 
 $(document).on 'click', '.paginate_button', ->
   table = $('#complaints-index').DataTable()
@@ -116,6 +116,23 @@ window.multiple_url_categorization = ()->
   else
     $('#loader-modal').modal 'hide'
     std_msg_error('Error', ['Please check that a URL/IP has been inputted and that at least one category was selected.'], reload: false)
+
+
+window.inheritCategories = (complaint_entry_id) ->
+  headers = {'Token': $('input[name="token"]').val(), 'Xmlrpc-Token': $('input[name="xml_token"]').val()}
+  std_msg_ajax(
+    url:'/escalations/api/v1/escalations/webcat/complaint_entries/inherit_categories_from_master_domain'
+    headers: headers
+    method: 'POST'
+    data:
+      id: complaint_entry_id
+    success: (response) ->
+      $('#loader-modal').modal 'hide'
+      std_msg_success('Success',["Successfully inherited categories from main domain."], reload: true)
+    error: (response) ->
+      $('#loader-modal').modal 'hide'
+      std_msg_error('Error' + ' ' + response.responseJSON.message,"", reload: false)
+    )
 
 name_servers =(server_list)->
   if undefined == server_list
@@ -610,7 +627,9 @@ format = (complaint_entry_row) ->
     keyboard: false,
   })
 
+
   complaint_entry = complaint_entry_row.data()
+#  getCategories(complaint_entry.entry_id)
   row_id = complaint_entry_row[0][0]
   missing_data = '<span class="missing-data">No Data</span>'
   uri = ''
@@ -720,14 +739,24 @@ format = (complaint_entry_row) ->
     url: '/escalations/api/v1/escalations/webcat/complaint_entries/retrieve_current_categories'
     data: {'id': complaint_entry.entry_id}
     success: (response) ->
+
       $('#loader-modal').modal 'hide'
-      current_categories = JSON.parse(response).current_category_data
-      categories = current_categories
+      { current_category_data : current_categories, master_categories} = JSON.parse(response)
+
+      master_categories_list = '#main-domain-categories_' + complaint_entry.entry_id
+
+      if master_categories.length > 0
+        $(master_categories_list).closest('.domain-categories').show()
+
+        for cat in master_categories
+          new_cat = '<li>' + cat + '</li>'
+          $(master_categories_list).append(new_cat)
 
       $.each current_categories, (key, value) ->
         category = this
         active =  $(this).attr("is_active")
         if active == true
+
           confidence = this.confidence
           mnemonic = this.mnem
           name = this.descr
@@ -779,6 +808,7 @@ format = (complaint_entry_row) ->
         '<button class="tertiary submit_changes" id="submit_changes_' + complaint_entry.entry_id + '" onclick="updateEntryColumns(' + complaint_entry.entry_id + ',' + row_id + ')" ' + entry_status + '>Submit Changes</button>' +
         '</div>'
 
+
   complaint_entry_html =
       complaint_table_row_html +
       '<div class="col-xs-12 col-sm-6 nested-complaint-static-data">' +
@@ -817,7 +847,12 @@ format = (complaint_entry_row) ->
       '<div class="complaint-selectize-col-wrapper">' +
       '<label class="content-label-sm">Edit Categories / Confidence Order</label>' +
       '<fieldset id="'+input_cat+'" ' + entry_status + '  name="['+input_cat+'][]" class="selectize" placeholder="Enter up to 5 categories" value="">' +
-      '</div></div><div class="col-xs-4 col-with-divider">' +
+      '</div>' +
+      '<div class="domain-categories" >' +
+      '<label class="content-label-sm">Inherit Categories From Main Domain</label><br/>' +
+      '<ul id="main-domain-categories_' + complaint_entry.entry_id + '"></ul>'+
+      '<button class="secondary inline-button" onclick="inheritCategories(event,' + complaint_entry.entry_id + ')">Inherit</button><br/>' +
+      '</div>' +'</div><div class="col-xs-4 col-with-divider">' +
       '<label class="content-label-sm">Internal Comment</label><br/>' +
       '<input class="nested-table-input complaint-comment-input" id="complaint_comment_' + complaint_entry.entry_id + '" type="text" onclick="this.select()" class="nested-table-input" value="' + internal_comment + '" placeholder="Add a comment." ' + entry_status + '><br/>'  +
       '<label class="content-label-sm customer-label">Customer Facing Comment</label><br/>' +

@@ -5013,6 +5013,22 @@ input.table-entry-input:focus {
 #top_bar_extended_info p {
   font-weight: 300;
 }
+.domain-categories{
+  &{
+    display: none;
+    margin-top: 10px;
+  }
+  ul{
+    display: inline-block;
+    min-width: 140px;
+  }
+  li {
+    border-bottom: 1px solid #f2f2f2;
+    border-top: none;
+    padding: 5px;
+    margin-right: 5px
+  }
+}
 
 #top_bar_extended_info .col-with-divider {
   border-right-color: #f2f2f2;
