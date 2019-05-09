@@ -489,7 +489,7 @@ module API
             params do
               requires :id, type: Integer
             end
-            post 'inherit_categories_from_mater_domain' do
+            post 'inherit_categories_from_master_domain' do
               std_api_v2 do
                 complaint_entry = ComplaintEntry.find(params[:id])
                 complaint_entry.inherit_categories(ip_or_uri: self.uri, description:'Inherited from master domain', user: current_user.email)
