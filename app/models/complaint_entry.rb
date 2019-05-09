@@ -637,13 +637,8 @@ class ComplaintEntry < ApplicationRecord
 
       return [] unless prefix_results
 
-      if parsed_uri['path'].nil?
-        parsed_uri['path'] = ''
-      end
-
-      if parsed_uri['subdomain'].nil?
-        parsed_uri['subdomain'] = ''
-      end
+      parsed_uri['path'] = '' unless parsed_uri['path'].present?
+      parsed_uri['subdomain'] = '' unless parsed_uri['subdomain'].present?
 
       categories = []
 
