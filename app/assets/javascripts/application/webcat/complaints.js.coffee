@@ -721,7 +721,7 @@ format = (complaint_entry_row) ->
     data: {'id': complaint_entry.entry_id}
     success: (response) ->
       $('#loader-modal').modal 'hide'
-      current_categories = JSON.parse(response)
+      current_categories = JSON.parse(response).current_category_data
       categories = current_categories
 
       $.each current_categories, (key, value) ->

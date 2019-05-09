@@ -470,7 +470,8 @@ module API
             post 'retrieve_current_categories' do
               std_api_v2 do
                 complaint_entry = ComplaintEntry.find(params[:id])
-                complaint_entry.current_category_data.to_json
+
+                {master_categories: complaint_entry.get_category_names, current_category_data: complaint_entry.current_category_data }.to_json
               end
             end
 
