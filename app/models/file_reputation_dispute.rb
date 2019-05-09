@@ -464,7 +464,7 @@ class FileReputationDispute < ApplicationRecord
     update_ticode_certs
     update_reversing_labs_score
     update_sandbox_score
-    # update_sample_zoo
+    update_sample_zoo
   end
 
   def ack_create(envelope_params, sender_params)
