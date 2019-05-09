@@ -485,6 +485,17 @@ module API
               end
             end
 
+            desc 'Inherit categories from master domain'
+            params do
+              requires :id, type: Integer
+            end
+            post 'inherit_categories_from_master_domain' do
+              std_api_v2 do
+                complaint_entry = ComplaintEntry.find(params[:id])
+                complaint_entry.inherit_categories(ip_or_uri: self.uri, description:'Inherited from master domain', user: current_user.email)
+              end
+            end
+
             desc 'Update several entries at once'
             params do
               requires :data, type: Array
