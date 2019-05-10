@@ -85,6 +85,13 @@ class FileReputationApi::ReversingLabs
     certificates
   end
 
+  def update_database
+    byebug
+    score_attributes = self.score
+    attributes = score_attributes.merge(reversing_labs_raw: self.raw_json)
+    FileReputationDispute.where(sha256_hash: self.sha256_hash).update_all(attributes)
+  end
+
   # Makes an immediate direct call to reversing labs and creates an object.
   # Does not read or write cache or database.
   # @param [String] sah256_hash the SHA256 hash checksum.
@@ -102,15 +109,13 @@ class FileReputationApi::ReversingLabs
   # @param [String] sah256_hash the SHA256 hash checksum.
   # @return [FileReputationApi::ReversingLabs] object for the result.
   def self.lookup_immediate(sha256_hash)
-    rev_labs = lookup_raw(sha256_hash)
+    rev_lab = lookup_raw(sha256_hash)
 
-    Rails.cache.write(rev_labs.cache_key, rev_labs.raw_json)
+    Rails.cache.write(rev_lab.cache_key, rev_lab.raw_json)
 
-    score_attributes = rev_labs.score
-    attributes = score_attributes.merge(reversing_labs_raw: rev_labs.raw_json)
-    FileReputationDispute.where(sha256_hash: sha256_hash).update_all(attributes)
+    # rev_lab.update_database
 
-    rev_labs
+    rev_lab
   end
 
   # Gets the reversing labs data.  May read cached data, so might not be immediate.
