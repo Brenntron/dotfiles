@@ -228,15 +228,8 @@ class ComplaintEntry < ApplicationRecord
 
       existing_prefix = nil
 
-      # Check if a prefix record exists for the full URI
       if existing_prefixes.present?
-        existing_prefixes.each do |prefix_found|
-          if prefix_found.subdomain == parsed_uri[:subdomain]
-            if prefix_found.path == parsed_uri[:path]
-              existing_prefix = prefix_found
-            end
-          end
-        end
+        existing_prefix = existing_prefixes.find { |existing_prefix| existing_prefix.subdomain == parsed_uri[:subdomain] && existing_prefix.path == parsed_uri[:path] }
       end
 
       if description.present? && casenumber.present?
@@ -626,6 +619,8 @@ class ComplaintEntry < ApplicationRecord
         final_results << prefix_result
       end
     end
+
+    return [] unless final_results
 
     category_ids = final_results.map {|category| category.category_id}
     category_names = final_results.first.categories.sort_by(&:confidence).map {|category| category.descr}
