@@ -1,15 +1,7 @@
-
-
-
+require 'rubygems'
 require 'httpi'
-require 'curl'
-require 'open3'
 require 'stomp'
 require 'json'
-require 'tmpdir'
-require 'tempfile'
-require 'base64'
-require 'pry'
 require 'selenium-webdriver'
 
 
@@ -24,44 +16,40 @@ req.auth.gssnegotiate
 
 req.auth.ssl.ca_cert_file = Rails.configuration.cert_file
 
-
-# General options
-local_cache_path = File.expand_path("#{Rails.root}/tmp/pcaps")
-
 if Rails.env =="development"
   OpenSSL::SSL::VERIFY_PEER = OpenSSL::SSL::VERIFY_NONE
 end
 
-# Make sure our pcaps cache exists
-unless File.exists?(local_cache_path)
-  Dir.mkdir(local_cache_path)
-end
-
 max_wait_for_job = 120 #seconds
-
+puts "init stomp"
 stomp_options = {}
 stomp_options = {
     :hosts => [{:login => "guest", :passcode => "guest", :host => Rails.configuration.amq_host, :port => 61613, :ssl => false}],
     :reliable => true, :closed_check => false
 }
+Capybara.register_driver :selenium do |app|
+  Capybara::Selenium::Driver.new( app, :browser => :chrome )
+end
 
 Rails.logger.info("#{Time.now} -> create stomp client and subscribe to amq")
 # Create our stomp client
+puts "create stomp connection"
 client = Stomp::Connection.new(stomp_options)
 # This queue should only have work jobs for All rule runs
 client.subscribe Rails.configuration.subscribe_all_work, {:ack => :client}
+puts "init selenium connection"
 
-driver_firefox = Selenium::WebDriver.for :firefox
-driver_chrome =  Selenium::WebDriver.for :chrome
+options = Selenium::WebDriver::Firefox::Options.new(args: ['-headless'])
+driver = Selenium::WebDriver.for(:firefox, options: options)
 
-def self.low_capture(url)
-  Rails.logger.info("captureing screenshot...")
-  output, errors, status = Open3.capture3("phantomjs --ssl-protocol=any --ignore-ssl-errors=true /extras/capture_site_image.js #{url}")
-  Rails.logger.info("Screenshot capture status:#{status.exitstatus} - [#{status.pid}] #{status} ")
-  Rails.logger.info("Errors were: ->#{errors}<-")
-  output
-end
+# navigate to a really super awesome site
+driver.navigate.to "https://talosintelligence.com"
 
+# resize the window and take a screenshot
+driver.manage.window.resize_to(800, 800)
+driver.save_screenshot "talosintelligence-screenshot.png"
+
+puts "Page title is #{driver.title}"
 
 
 while message = client.receive
@@ -84,17 +72,21 @@ while message = client.receive
     screenshot_entry = ComplaintEntryScreenshot.find(ces_id)
     #take the screenshot using the URL provided
 
-    driver.get host_lookup
+    driver.navigate.to host_lookup
 
     #save the screenshot hopefully in the database so we dont have to worry about disk usage
+    driver.manage.window.resize_to(800, 800)
 
-    data = driver.save_screenshot("./screen.png")
+    data = driver.save_screenshot
 
     screenshot_entry.screenshot = Base64.decode64(data)
 
 
 
-  rescue
+  rescue Exception => ex
+    puts ("#{ex.class}: #{ex.message}")
+  ensure # this is a good practice to get into so that the driver will always exit, even if there is an error
+    driver.quit
   end
 
 
@@ -102,5 +94,4 @@ while message = client.receive
 
 end
 
-driver_firefox.quit
-driver_chrome.quit
+driver.quit
