@@ -3,13 +3,13 @@
 # 99e432ac19e5a47d0d1ddfad9f326d5e169ab6651d844d4b800a79f4f78d410f
 
 class FileReputationApi::ReversingLabs
-  include ActiveModel::Model
-  attr_accessor :sha256_hash, :raw_json
-
   include ApiRequester::ApiRequester
   set_api_requester_config Rails.configuration.reversing_labs
   set_default_request_type :query_string
   set_basic_auth
+
+  include ActiveModel::Model
+  attr_accessor :sha256_hash, :raw_json
 
   def api_response
     @api_response ||= JSON.parse!(self.raw_json)
@@ -77,8 +77,6 @@ class FileReputationApi::ReversingLabs
     rev_lab = lookup_raw(sha256_hash)
 
     Rails.cache.write(rev_lab.cache_key, rev_lab.raw_json)
-
-    # rev_lab.update_database
 
     rev_lab
   end
