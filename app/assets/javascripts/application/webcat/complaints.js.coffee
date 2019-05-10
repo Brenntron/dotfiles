@@ -126,7 +126,9 @@ window.inheritCategories = (complaint_entry_id) ->
     data: {'id': complaint_entry_id}
     success: (response) ->
       $('#loader-modal').modal 'hide'
-      std_msg_success('Success',["Successfully inherited categories from main domain."], reload: true)
+      $('.domain-categories').hide()
+      std_msg_success('Success',["Successfully inherited categories from main domain."], reload: false)
+
     error: (response) ->
       $('#loader-modal').modal 'hide'
       std_msg_error('Error' + ' ' + response.responseJSON.message,"", reload: false)
@@ -762,7 +764,6 @@ format = (complaint_entry_row) ->
 
       if master_categories.length > 0
         $(master_categories_list).closest('.domain-categories').show()
-
         for cat in master_categories
           new_cat = '<li>' + cat + '</li>'
           $(master_categories_list).append(new_cat)
