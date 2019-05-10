@@ -31,9 +31,12 @@ window.update_file_rep_status = () ->
       status: status
       comment: comment
       resolution: resolution
-    success_reload: false
     success: (response) ->
-      std_msg_success('File Reputation Ticket statuses updated.', [], reload: true)
+      if checked_disputes.length == 1
+        std_msg_success('File Reputation Ticket status updated', [])
+      else if checked_disputes.length > 1
+        std_msg_success('File Reputation Ticket statuses updated', [])
+      window.location.reload()
     error: (response) ->
       std_msg_error('Unable to update File Reputation Ticket status.')
   )
@@ -66,7 +69,8 @@ window.update_file_rep_status_on_show = () ->
       resolution: resolution
     success_reload: false
     success: (response) ->
-      std_msg_success('File Reputation Ticket statuses updated.', [], reload: true)
+      std_msg_success('File Reputation Ticket status updated', [])
+      window.location.reload()
     error: (response) ->
       std_msg_error('Unable to update File Reputation Ticket status.', [])
   )
@@ -86,7 +90,7 @@ window.filerep_take_disputes = () ->
     method: 'PATCH'
     url: "/escalations/api/v1/escalations/file_rep/disputes/take_disputes"
     data: { dispute_ids: dispute_ids }
-    error_prefix: 'Error updating ticket.'
+    error_prefix: 'Error updating ticket'
     success: (response) ->
       for dispute_id in response.dispute_ids
         # dbinebri: adding the take/return button swap logic here
@@ -132,7 +136,7 @@ window.file_rep_take_dispute = (dispute_id) ->
     url: "/escalations/api/v1/escalations/file_rep/disputes/take_dispute/" + dispute_id
     data: {}
     dispute_id: dispute_id
-    error_prefix: 'Error updating ticket.'
+    error_prefix: 'Error updating ticket'
     success: (response) ->
       $('.inline-take-dispute-' + dispute_id).replaceWith("<button class='return-ticket-button inline-return-ticket-#{dispute_id}' title='Assign this ticket to me' onclick='file_rep_return_dispute(#{dispute_id});'></button>")
       $("#owner_#{dispute_id}").text(response.username).removeClass('missing-data')
@@ -145,7 +149,7 @@ window.file_rep_return_dispute = (dispute_id) ->
     url: "/escalations/api/v1/escalations/file_rep/disputes/return_dispute/" + dispute_id
     data: {}
     dispute_id: dispute_id
-    error_prefix: 'Error updating ticket.'
+    error_prefix: 'Error updating ticket'
     success: (response) ->
       $('.inline-return-ticket-' + dispute_id).replaceWith("<button class='take-ticket-button inline-take-dispute-#{dispute_id}' title='Assign this ticket to me' onclick='file_rep_take_dispute(#{dispute_id});'></button>")
       $("#owner_#{dispute_id}").text("Unassigned").addClass('missing-data')
@@ -158,11 +162,12 @@ window.file_rep_show_take_dispute = (dispute_id) ->
     url: "/escalations/api/v1/escalations/file_rep/disputes/take_dispute/" + dispute_id
     data: {}
     dispute_id: dispute_id
-    error_prefix: 'Error updating ticket.'
+    error_prefix: 'Error updating ticket'
     success: (response) ->
       $("#dispute-assignee").text(response.username).removeClass('missing-data')
       $('#show-edit-ticket-status-button').text("ASSIGNED")
       $('.take-ticket-button').replaceWith("<button class='return-ticket-button' title='Return ticket to open queue' onclick='file_rep_show_return_dispute(#{dispute_id});'></button>")
+      $('#index_change_assign').replaceWith("<span id='replace-button'>")
   )
 
 window.file_rep_show_return_dispute = (dispute_id) ->
@@ -171,11 +176,12 @@ window.file_rep_show_return_dispute = (dispute_id) ->
     url: "/escalations/api/v1/escalations/file_rep/disputes/return_dispute/" + dispute_id
     data: {}
     dispute_id: dispute_id
-    error_prefix: 'Error updating ticket.'
+    error_prefix: 'Error updating ticket'
     success: (response) ->
       $("#dispute-assignee").text("Unassigned").addClass('missing-data')
       $("#show-edit-ticket-status-button").text("NEW")
       $(".return-ticket-button").replaceWith("<button class='take-ticket-button' title='Assign this ticket to me' onclick='file_rep_show_take_dispute(#{dispute_id});'></button>")
+      $('#replace-button').replaceWith('<button aria-expanded="false" aria-haspopup="true" class="dispute-inline-buttons ticket-owner-button dropdown-toggle esc-tooltipped tooltipstered" data-toggle="dropdown" id="index_change_assign"></button>')
   )
 
 window.file_rep_show_change_assignee = (dispute_id) ->
@@ -191,7 +197,7 @@ window.file_rep_show_change_assignee = (dispute_id) ->
     url: "/escalations/api/v1/escalations/file_rep/disputes/change_assignee/"
     data: data
     dispute_id: dispute_id
-    error_prefix: 'Error updating ticket.'
+    error_prefix: 'Error updating ticket'
     success: (response) ->
       window.location.reload()
   )
