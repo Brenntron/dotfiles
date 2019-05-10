@@ -229,7 +229,7 @@ class ComplaintEntry < ApplicationRecord
       existing_prefix = nil
 
       # Check if a prefix record exists for the full URI
-      if existing_prefixes.present?
+      if existing_prefixes.any?
         existing_prefixes.each do |prefix_found|
           if prefix_found.subdomain == parsed_uri[:subdomain]
             if prefix_found.path == parsed_uri[:path]
