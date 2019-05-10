@@ -502,26 +502,27 @@ $ ->
         row_id = $(this).parent().parent().attr('id')
         score_id_selector = '#rl-score-id-' + row_id
 
-        $(score_id_selector).tooltipster
-          theme: [
-            'tooltipster-borderless'
-            'tooltipster-borderless-customized'
-            'tooltipster-rl-hover'
-          ]
-          side: 'bottom'
-          content: '<div class="rl-hover-loader">Loading report... <img src="/assets/icon_gear_white.svg" class="rl-cog"></div>'
-          contentAsHTML: true
-          autoClose: false
-          trigger: 'custom'
-          triggerOpen:
-            mouseenter: true
-            click: true
-          triggerClose:
-            mouseleave: true
-            click: true
-            scroll: true
-          interactive: true
-          updateAnimation: false
+        unless $(score_id_selector).hasClass("tooltipstered")
+          $(score_id_selector).tooltipster
+            theme: [
+              'tooltipster-borderless'
+              'tooltipster-borderless-customized'
+              'tooltipster-rl-hover'
+            ]
+            side: 'bottom'
+            content: '<div class="rl-hover-loader">Loading report... <img src="/assets/icon_gear_white.svg" class="rl-cog"></div>'
+            contentAsHTML: true
+            autoClose: false
+            trigger: 'custom'
+            triggerOpen:
+              mouseenter: true
+              click: true
+            triggerClose:
+              mouseleave: true
+              click: true
+              scroll: true
+            interactive: true
+            updateAnimation: false
 
         # score_id_selector will look like '#rl-score-id-2', attach tooltip to this
         $(score_id_selector).tooltipster('open')
