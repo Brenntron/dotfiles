@@ -410,7 +410,8 @@ class FileReputationDispute < ApplicationRecord
   end
 
   def update_reversing_labs_score
-    update!(FileReputationApi::ReversingLabs.score(self.sha256_hash))
+    rev_lab = FileReputationApi::ReversingLabs.lookup(self.sha256_hash)
+    rev_lab.update_database
   rescue => except
     Rails.logger.error("Error updating reversing labs score on id #{self.id} -- #{except.message}")
   end

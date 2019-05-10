@@ -52,11 +52,6 @@ class FileReputationApi::ReversingLabs
     { reversing_labs_score: reversing_labs_score, reversing_labs_count: reversing_labs_count }
   end
 
-  def self.score(sha256_hash)
-    api_response = FileReputationApi::ReversingLabs.sha256_lookup(sha256_hash)
-    FileReputationApi::ReversingLabs.score_of_lookup(api_response)
-  end
-
   def score
     reversing_labs_score = 0
     reversing_labs_count = 0
@@ -86,7 +81,6 @@ class FileReputationApi::ReversingLabs
   end
 
   def update_database
-    byebug
     score_attributes = self.score
     attributes = score_attributes.merge(reversing_labs_raw: self.raw_json)
     FileReputationDispute.where(sha256_hash: self.sha256_hash).update_all(attributes)
