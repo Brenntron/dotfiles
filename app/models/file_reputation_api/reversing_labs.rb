@@ -23,35 +23,6 @@ class FileReputationApi::ReversingLabs
     @cache_key ||= self.class.cache_key(self.sha256_hash)
   end
 
-  def self.sha256_lookup(sha256)
-    cache_key = "reversing_labs:#{sha256}"
-    if Rails.cache.read(cache_key).blank?
-      call_request_parsed(:get, "api/databrowser/rldata/query/sha256/#{sha256}", input: {format: 'json'})
-    else
-      Rails.cache.read(cache_key)
-    end
-
-  rescue JSON::ParserError
-    {error: 'Invalid Hash'}
-  rescue
-    {error: 'Data Currently Unavailable'}
-  end
-
-  def self.score_of_lookup(api_response)
-    reversing_labs_score = 0
-    reversing_labs_count = 0
-    if api_response&.dig('rl','sample','xref','entries')&.any?
-      api_response&.dig('rl','sample','xref','entries')[0]&.dig('scanners').each do |scanner|
-        reversing_labs_count += 1
-        if !scanner['result'].empty?
-          reversing_labs_score += 1
-        end
-      end
-    end
-
-    { reversing_labs_score: reversing_labs_score, reversing_labs_count: reversing_labs_count }
-  end
-
   def score
     reversing_labs_score = 0
     reversing_labs_count = 0

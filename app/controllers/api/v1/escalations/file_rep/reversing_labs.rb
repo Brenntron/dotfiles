@@ -11,12 +11,10 @@ module API
             end
             get "/:sha256_hash" do
               sha256_hash = params[:sha256_hash]
-              api_response = FileReputationApi::ReversingLabs.sha256_lookup(sha256_hash)
-              rev_lab = FileReputationApi::ReversingLabs.lookup_immediate(params[:sha256_hash])
+              rev_lab = FileReputationApi::ReversingLabs.lookup_immediate(sha256_hash)
 
               begin
-                score_attributes = FileReputationApi::ReversingLabs.score_of_lookup(api_response)
-                FileReputationDispute.where(sha256_hash: sha256_hash).update_all(score_attributes)
+                rev_lab.update_database
               rescue => except
                 Rails.logger.error("Error updating reversing labs score for sha256 hash #{sha256_hash} -- #{except.error_message}")
               end
