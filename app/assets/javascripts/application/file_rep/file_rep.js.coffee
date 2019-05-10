@@ -721,9 +721,10 @@ $ ->
       }
       {
         data: 'reversing_labs_score'
+        className: 'rl-col'
         render: (data, type, full, meta) ->
           if data
-            return '<span class="score-col text-center rl-hover" ' + 'id="rl-score-id-' + full['id'] + '" data-tooltip-content="Loading...">' + data + ' / ' + full['reversing_labs_count'] + ' <img src="../../assets/icon_down_arrow_grey.svg" class="rl-more">' + '</span>'
+            return '<span class="score-col text-center rl-hover" ' + 'id="rl-score-id-' + full['id'] + '" data-tooltip-content="Loading...">' + data + ' / ' + full['reversing_labs_count'] + '&nbsp;<img src="../../assets/icon_down_arrow_grey.svg" class="rl-more">' + '</span>'
           else
             return ''
       }

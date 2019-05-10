@@ -9377,7 +9377,7 @@ table.rl-content {
 
 // index, this is the rl score in the datatable on index, pad-left to account for the down caret
 .rl-hover {
-  padding-left: 12px;
+  padding-left: 8px;
 }
 
 .rl-hover-error {
@@ -9426,4 +9426,9 @@ table.rl-content {
 // this is the triangle, make color match the top row of rl hover table
 .tooltipster-sidetip.tooltipster-borderless.tooltipster-borderless-customized.tooltipster-rl-hover.tooltipster-bottom .tooltipster-arrow-border {
   border-bottom-color: darken($table-dark-body, 5%);
+}
+
+// make sure down caret on index RL column doesn't break / wrap
+.rl-col {
+  min-width: 70px !important;
 }
