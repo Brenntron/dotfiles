@@ -1693,6 +1693,7 @@ $ ->
     selected_rows = $('#complaints-index').DataTable().rows('.selected')
     if (selected_rows[0].length > 0)
       $('.ticket-status-radio-label').click ->
+        $('#loader-modal').modal()
         radio_button = $(this).prev('.ticket-status-radio')
         $(radio_button[0]).trigger('click')
         entry_ids = []
