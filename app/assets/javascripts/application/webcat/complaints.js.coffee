@@ -646,7 +646,6 @@ format = (complaint_entry_row) ->
 
 
   complaint_entry = complaint_entry_row.data()
-#  getCategories(complaint_entry.entry_id)
   row_id = complaint_entry_row[0][0]
   missing_data = '<span class="missing-data">No Data</span>'
   uri = ''
