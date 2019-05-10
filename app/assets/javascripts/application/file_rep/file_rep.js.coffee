@@ -93,8 +93,11 @@ window.filerep_take_disputes = () ->
     error_prefix: 'Error updating ticket'
     success: (response) ->
       for dispute_id in response.dispute_ids
-        $('#owner_' + dispute_id).text(response.username)
+        # dbinebri: adding the take/return button swap logic here
+        $('.take-ticket-button').replaceWith("<button class='return-ticket-button' title='Return ticket to open queue' onclick='file_rep_return_dispute(#{dispute_id});'></button>")
+        $('#owner_' + dispute_id).text(response.username).removeClass('missing-data')
         $('#status_' + dispute_id).text("ASSIGNED")
+
       std_msg_success('Tickets successfully assigned', [response.dispute_ids.length + ' have been assigned to ' + response.username])
     error: (error) ->
       std_msg_error('Assign Issue(s) Error', [
@@ -136,7 +139,7 @@ window.file_rep_take_dispute = (dispute_id) ->
     error_prefix: 'Error updating ticket'
     success: (response) ->
       $('.inline-take-dispute-' + dispute_id).replaceWith("<button class='return-ticket-button inline-return-ticket-#{dispute_id}' title='Assign this ticket to me' onclick='file_rep_return_dispute(#{dispute_id});'></button>")
-      $("#owner_#{dispute_id}").text(response.username)
+      $("#owner_#{dispute_id}").text(response.username).removeClass('missing-data')
       $('#status_' + dispute_id).text("ASSIGNED")
   )
 
@@ -149,7 +152,7 @@ window.file_rep_return_dispute = (dispute_id) ->
     error_prefix: 'Error updating ticket'
     success: (response) ->
       $('.inline-return-ticket-' + dispute_id).replaceWith("<button class='take-ticket-button inline-take-dispute-#{dispute_id}' title='Assign this ticket to me' onclick='file_rep_take_dispute(#{dispute_id});'></button>")
-      $("#owner_#{dispute_id}").text("Unassigned")
+      $("#owner_#{dispute_id}").text("Unassigned").addClass('missing-data')
       $('#status_' + dispute_id).text("NEW")
   )
 
@@ -161,7 +164,7 @@ window.file_rep_show_take_dispute = (dispute_id) ->
     dispute_id: dispute_id
     error_prefix: 'Error updating ticket'
     success: (response) ->
-      $("#dispute-assignee").text(response.username)
+      $("#dispute-assignee").text(response.username).removeClass('missing-data')
       $('#show-edit-ticket-status-button').text("ASSIGNED")
       $('.take-ticket-button').replaceWith("<button class='return-ticket-button' title='Return ticket to open queue' onclick='file_rep_show_return_dispute(#{dispute_id});'></button>")
       $('#index_change_assign').replaceWith("<span id='replace-button'>")
@@ -175,7 +178,7 @@ window.file_rep_show_return_dispute = (dispute_id) ->
     dispute_id: dispute_id
     error_prefix: 'Error updating ticket'
     success: (response) ->
-      $("#dispute-assignee").text("Unassigned")
+      $("#dispute-assignee").text("Unassigned").addClass('missing-data')
       $("#show-edit-ticket-status-button").text("NEW")
       $(".return-ticket-button").replaceWith("<button class='take-ticket-button' title='Assign this ticket to me' onclick='file_rep_show_take_dispute(#{dispute_id});'></button>")
       $('#replace-button').replaceWith('<button aria-expanded="false" aria-haspopup="true" class="dispute-inline-buttons ticket-owner-button dropdown-toggle esc-tooltipped tooltipstered" data-toggle="dropdown" id="index_change_assign"></button>')
@@ -202,10 +205,14 @@ window.file_rep_show_change_assignee = (dispute_id) ->
 $ ->
   file_rep_url = $('#file-rep-datatable').data('source')
   current_url = window.location.href
+  sorting_request = false
   time_submitted = ''
   last_updated = ''
   sandbox_score = ''
   threatgrid_score = ''
+
+  $(document).on 'click', '.sorting[aria-controls="file-rep-datatable"]', () ->
+    sorting_request = true
 
   window.triggerTooltips = (item) ->
     $('.tooltip_content').show()
@@ -216,6 +223,7 @@ $ ->
       ]
       side: 'bottom'
     return
+
   window.reset_slider = (slider) ->
     if slider == "sandbox"
       sandbox_score = ''
@@ -491,6 +499,22 @@ $ ->
     ajax:
       url: file_rep_url
       data: build_data()
+      error: (error) ->
+
+        if sorting_request
+          error_msg = 'Unable to process sorting request.'
+        else
+          if localStorage.search_type || location.search != ''
+            error_msg = 'Unable to process search request.'
+          else
+            error_msg = 'Unable to process request.'
+
+        error_msg = error.statusText + ': ' + error_msg
+
+        std_msg_error('Error Occurred', [error_msg])
+
+        sorting_request = false
+
     order: [ [
       16
       'desc'
@@ -552,11 +576,12 @@ $ ->
       {
         data: 'disposition'
         render: (data) ->
-          data = data.toLowerCase()
+          if data == null
+            return
           if data == 'malicious'
             return '<span class="malicious text-capitalize"> malicious </span>'
           else
-            return '<span class="text-capitalize"> clean </span>'
+            return  '<span class="text-capitalize"> ' + data + ' </span>'
       }
       {
         data: 'detection_name'
@@ -617,11 +642,13 @@ $ ->
       {
         data: 'disposition_suggested'
         render: (data) ->
-          data = data.toLowerCase()
+          if data == null
+            return
           if data == 'malicious'
             return '<span class="malicious text-capitalize"> malicious</span>'
           else
-            return  '<span class="text-capitalize"> clean </span>'
+            return  '<span class="text-capitalize"> ' + data + ' </span>'
+
       }
       {
         data: 'created_at'
@@ -642,12 +669,12 @@ $ ->
       { data: 'customer_email' }
       {
         data: 'assigned'
-        className: "alt-col"
+        className: "alt-col assignee-col"
         render: (data, type, full, meta) ->
           if full.current_user == data
             return "<span id='owner_#{full.id}'> #{data} </span><button class='return-ticket-button inline-return-ticket-#{full.id}' title='Return ticket.' onclick='file_rep_return_dispute(#{full.id});'></button>"
           else if data == 'vrtincom' || data == ""
-            return "<span id='owner_#{full.id}'>Unassigned</span> <span title='Assign to me' class='esc-tooltipped'><button class='take-ticket-button inline-take-dispute-#{full.id}' onClick='file_rep_take_dispute(#{full.id})'/></button></span>"
+            return "<span class='missing-data missing-data-index' id='owner_#{full.id}'>Unassigned</span> <span title='Assign to me' class='esc-tooltipped'><button class='take-ticket-button inline-take-dispute-#{full.id}' onClick='file_rep_take_dispute(#{full.id})'/></button></span>"
           else
             return data
       }
@@ -682,6 +709,11 @@ $ ->
       selection.removeAllRanges();
       selection.addRange(range);
       document.execCommand("Copy");
+
+      # dbinebri: add a click tooltip that co-exists with the hover tooltip
+      $(this).after('<div class="copied-sha-tooltip">Copied!</div>')
+      $('.copied-sha-tooltip').animate({opacity: '1'}, 200).delay(500).fadeOut()
+
 
     Number::pad = (size) ->
       s = String(this)
@@ -886,6 +918,11 @@ $ ->
       alert('Where are you? How did you trigger this? Stahp it.')
       return false
 
+    # Small format prep for success message:
+    detection_name_msg = ''
+    unless new_detection_name == ''
+      detection_name_msg = ': ' + new_detection_name
+
     std_msg_ajax(
       url: '/escalations/api/v1/escalations/file_rep/detections'
       method: 'POST'
@@ -894,6 +931,12 @@ $ ->
         'disposition': new_disp
         'detection_name': new_detection_name
       }
+      success: (response) ->
+        $('#create-detection-dialog').dialog('close')
+        std_msg_success("Detection successfully created", ['<span class="code-snippet">' + sha256_hashes + '</span>', 'set to <span class="text-capitalize">' + new_disp + '</span> ' + detection_name_msg ], reload: true)
+      error: (response) ->
+        $('#create-detection-dialog').dialog('close')
+        std_api_error(response, "Detection not created", reload: false)
     )
 
     return false
