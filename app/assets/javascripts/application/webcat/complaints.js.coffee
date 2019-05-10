@@ -769,20 +769,12 @@ format = (complaint_entry_row) ->
           $(master_categories_list).append(new_cat)
 
       $.each current_categories, (key, value) ->
-        category = this
         active =  $(this).attr("is_active")
         if active == true
+          { confidence, mnem: mnemonic, descr: name, category_id: cat_id, top_certainty, certainties } = this
 
-          confidence = this.confidence
-          mnemonic = this.mnem
-          name = this.descr
-          cat_id = this.category_id
-          top_certainty = this.top_certainty
-          certainties = this.certainties
           $(certainties).each ->
-            source_certainty = this.certainty
-            source_description = this.source_description
-            source_name = this.source_mnemonic
+            { certainty:source_certainty, source_description, source_mnemonic: source_name } = this
             certainty_row = '<tr><td>' + source_certainty + '</td><td>' + source_name + '</td><td>' + source_description + '</td></tr>'
             tooltip_table_guts = tooltip_table_guts + certainty_row
 
@@ -926,7 +918,7 @@ window.history_dialog = (id, url) ->
           '<tbody>'
           # Build domain history table
           for entry in json.entry_history.domain_history
-            entry_string = "" +
+            entry_string =
             '<tr>' +
             '<td>' + entry['action'] + '</td>' +
             '<td>' + entry['confidence'] + '</td>' +
@@ -936,14 +928,12 @@ window.history_dialog = (id, url) ->
             '<td>' + entry['category']['descr'] + '</td>' +
             '</tr>'
             history_dialog_content += entry_string
-          history_dialog_content +=
-            # End domain history table
-            '</tbody></table>'
+          # End domain history table
+          history_dialog_content += '</tbody></table>'
 
+        # End domain history tab start Complaint Entry Tab
         history_dialog_content +=
-          # End domain history tab
           '</div>' +
-          # Start Complaint Entry Tab
           '<div class="tab-pane" role="tabpanel" id="complaint-history-tab">' +
           '<h5>Complaint Entry History</h5>'
 
@@ -1107,22 +1097,17 @@ parse_lookup_dialog_content = (json) ->
     category = this
     active =  $(this).attr("is_active")
     if active == 1
-      confidence = this.confidence
-      mnemonic = this.mnemonic
-      name = this.name
-      cat_id = this.category_id
+      { confidence, mnemonic, name, category_id: cat_id, certainty: certainties } = this
       top_certainty = this.certainty[0].source_certainty
-      certainties = this.certainty
+
       category_row = '<tr><td>' + mnemonic + ' - ' + name + '</td></tr>'
       lookup_dialog_content = lookup_dialog_content + category_row
       lookup_dialog_content = lookup_dialog_content + '<tr> <table class="lookup-certanty-table">' +
         '<thead><tr><th></th><th>Confidence</th><th>Source</th><th>Certainty</th></tr></thead>' +
         '<tbody>'
       $(certainties).each ->
-        source_confidence = this.source_confidence
-        source_certainty = this.source_certainty
-        source_category = this.source_category
-        source_name = this.source
+        {source_confidence, source_certainty, source_category, source: source_name } = this
+
         lookup_dialog_content = lookup_dialog_content + '<tr><td></td><td>' + source_confidence + '</td><td>' + source_name + '</td><td>' + source_certainty + '</td></tr>'
       lookup_dialog_content += '</tbody></table></tr>'
   lookup_dialog_content += '</tbody></table>'
