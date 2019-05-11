@@ -293,6 +293,41 @@ class DisputeEntry < ApplicationRecord
   def find_xbrs(reload: false)
     @xbrs = nil if reload
     @xbrs ||= get_xbrs_value
+
+    formatted_data = []
+    formatted_data << {}
+    formatted_data << {}
+    formatted_data.last['data'] = []
+    formatted_data.last['legend'] = @xbrs.last['legend']
+    data = @xbrs.last['data']
+    columns = @xbrs.last['legend']
+
+    mtime_column_index = 0
+    ctime_column_index = 0
+
+    columns.each_with_index do |col, index|
+      if col == 'ctime'
+        ctime_column_index = index
+      end
+      if col == 'mtime'
+        mtime_column_index = index
+      end  
+    end 
+
+
+    data.each do |datum|
+      if ctime_column_index != 0
+        datum[ctime_column_index] = Time.at(datum[ctime_column_index])
+      end
+      if
+        datum[mtime_column_index] = Time.at(datum[mtime_column_index])
+      end 
+
+      formatted_data.last['data'] << datum 
+    end  
+
+    formatted_data 
+
   end
 
   def blacklist(reload: false)
