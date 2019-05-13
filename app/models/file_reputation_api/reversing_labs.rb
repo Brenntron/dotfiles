@@ -23,6 +23,25 @@ class FileReputationApi::ReversingLabs
     @cache_key ||= self.class.cache_key(self.sha256_hash)
   end
 
+  def entries
+    @entries ||= api_response&.dig('rl','sample','xref','entries')
+  end
+
+  def scanners
+    unless @scanners
+      @scanners =
+          if entries.any?
+            record_time = entries.map{|entry| entry['record_time']}.sort.last
+            entry = entries.find{|entry| record_time == entry['record_time']}
+            entry.dig('scanners')
+          else
+            []
+          end
+    end
+
+    @scanners
+  end
+
   def score
     reversing_labs_score = 0
     reversing_labs_count = 0
