@@ -448,7 +448,6 @@ $ ->
       $('#filerep-index-title')[0].innerHTML = new_header
 
   window.export_file_rep = () ->
-    debugger
     data = build_data()
     if 'advanced' == data.search_type
       data.search_name = null

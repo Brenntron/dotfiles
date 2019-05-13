@@ -106,4 +106,12 @@ class FileRepDatatable < AjaxDatatablesRails::ActiveRecord
       super
     end
   end
+
+  def self.export_xlsx(search_params_json)
+    search_params = JSON.parse(search_params_json)
+
+    workbook = RubyXL::Workbook.new
+
+    workbook
+  end
 end
