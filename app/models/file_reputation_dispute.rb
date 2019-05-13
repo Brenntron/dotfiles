@@ -565,7 +565,10 @@ class FileReputationDispute < ApplicationRecord
   end
 
   def self.export_xlsx(search_params_json, current_user:)
-    fields = %w{id sha256_hash file_name disposition_suggested}
+    fields = %w{id sha256_hash file_name file_size disposition_suggested source platform
+                status resolution disposition sample_type detection_name detection_created_at in_zoo
+                sandbox_score threatgrid_score reversing_labs_score reversing_labs_count
+                customer_name company_name}
     search_params = JSON.parse(search_params_json)
 
     file_rep_disputes = robust_search(search_params['search_type'],
@@ -588,7 +591,17 @@ class FileReputationDispute < ApplicationRecord
 
     file_rep_disputes.each_with_index do |fr_dispute, row_index|
       fields.each_with_index do |field_name, col_index|
-        cell_data = fr_dispute.attributes[field_name]
+
+        cell_data =
+            case field_name
+            when 'customer_name'
+              fr_dispute.customer_name
+            when 'company_name'
+              fr_dispute.customer_company
+            else
+              fr_dispute.attributes[field_name]
+            end
+
         worksheet.add_cell(row_index + 1, col_index, cell_data)
       end
     end
