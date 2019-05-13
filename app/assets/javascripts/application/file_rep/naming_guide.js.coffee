@@ -121,15 +121,15 @@ $ ->
       '<span class="table-content"></span>' +
       '<span class="table-form-content"><input type="text"></input></span>' +
       '</td>' +
-      '<td class="amp-engine>' +
+      '<td class="amp-engine">' +
       '<span class="table-content"></span>' +
       '<span class="table-form-content"><input type="text"></input></span>' +
       '</td>' +
-      '<td class="amp-engine-description>' +
+      '<td class="amp-engine-description">' +
       '<span class="table-content"></span>' +
       '<span class="table-form-content"><textarea></textarea></span>' +
       '</td>' +
-      '<td class="amp-notes>' +
+      '<td class="amp-notes">' +
       '<span class="table-content"></span>' +
       '<span class="table-form-content"><textarea></textarea></span>' +
       '</td>' +
