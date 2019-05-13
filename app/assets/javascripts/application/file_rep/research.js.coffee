@@ -378,6 +378,20 @@ get_run_status = window.get_run_status = (sha256_hash) ->
   )
 
 
+########### RERUN SANDBOX SAMPLE AND GO TO TOP OF TAB ############
+rerun_status = window.rerun_status = (sha256_hash) ->
+  # make it clear the sample is re-running
+  $('#sb-loader').css
+    'padding':'20px'
+    'display':'inline-block'
+    'border-bottom':'solid 1px #eee'
+    'font-weight': 'bold'
+  $('#sandbox-rerun-button').blur()
+
+  window.get_run_status(sha256_hash)
+  window.scrollTo(0,320)
+
+
 
 ##### UPDATE FILE REP DATA #####
 # Refresh items from the reports that we store in the db & save them

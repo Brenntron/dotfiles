@@ -85,6 +85,11 @@
         .row.collapse_area.collapse.in#collapse_sb_json
           .col-xs-12.report-size
             %pre.data-report-code-content#sb-full
+        %hr.thin
+        .row
+          .col-xs-12
+            %button.primary#sandbox-rerun-button{onclick: 'rerun_status()'}
+              Rerun Sample in Sandbox
     .sb-data-missing.text-center
       %span.sample-present-false
       %div.data-report-wrapper
