@@ -233,7 +233,7 @@ module API
                 return e.message
               end
               {entry_id: entry.id, domain: entry.domain, subdomain: entry.subdomain, path: entry.path,
-               categories: permitted_params['categories'], uri: entry.uri, status:entry.status,
+               categories: entry.url_primary_category, uri: entry.uri, status:entry.status,
                entry_resolution:permitted_params['commit'], was_dismissed: entry.was_dismissed?}.to_json
             end
 
@@ -472,14 +472,43 @@ module API
               end
             end
 
-            desc 'Retrieve historic_category_information from expanding a complaint entry row'
+            desc 'Retrieve current categories from expanding a complaint entry row'
             params do
               requires :id, type: Integer
             end
             post 'retrieve_current_categories' do
               std_api_v2 do
                 complaint_entry = ComplaintEntry.find(params[:id])
-                complaint_entry.current_category_data.to_json
+
+                if complaint_entry.subdomain.present? || complaint_entry.path.present?
+                  master_categories = complaint_entry.get_category_names_from_master
+                else
+                  master_categories = []
+                end
+
+                {master_categories: master_categories, current_category_data: complaint_entry.current_category_data }.to_json
+              end
+            end
+
+            desc 'Retrieve category names from master domain'
+            params do
+              requires :id, type: Integer
+            end
+            post 'retrieve_category_names_from_master' do
+              std_api_v2 do
+                complaint_entry = ComplaintEntry.find(params[:id])
+                complaint_entry.get_category_names.to_json
+              end
+            end
+
+            desc 'Inherit categories from master domain'
+            params do
+              requires :id, type: Integer
+            end
+            post 'inherit_categories_from_master_domain' do
+              std_api_v2 do
+                complaint_entry = ComplaintEntry.find(params[:id])
+                complaint_entry.inherit_categories(ip_or_uri: complaint_entry.uri, description:'Inherited from master domain', user: current_user.email)
               end
             end
 

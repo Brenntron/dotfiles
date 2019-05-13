@@ -1,4 +1,4 @@
-table_page=0
+table_page = 0
 
 $(document).on 'click', '.paginate_button', ->
   table = $('#complaints-index').DataTable()
@@ -117,6 +117,22 @@ window.multiple_url_categorization = ()->
   else
     $('#loader-modal').modal 'hide'
     std_msg_error('Error', ['Please check that a URL/IP has been inputted and that at least one category was selected.'], reload: false)
+
+
+window.inheritCategories = (complaint_entry_id) ->
+  std_msg_ajax(
+    url:'/escalations/api/v1/escalations/webcat/complaint_entries/inherit_categories_from_master_domain'
+    method: 'POST'
+    data: {'id': complaint_entry_id}
+    success: (response) ->
+      $('#loader-modal').modal 'hide'
+      $('.domain-categories').hide()
+      std_msg_success('Success',["Successfully inherited categories from main domain."], reload: false)
+
+    error: (response) ->
+      $('#loader-modal').modal 'hide'
+      std_msg_error('Error' + ' ' + response.responseJSON.message,"", reload: false)
+    )
 
 name_servers =(server_list)->
   if undefined == server_list
@@ -628,6 +644,7 @@ format = (complaint_entry_row) ->
     keyboard: false,
   })
 
+
   complaint_entry = complaint_entry_row.data()
   row_id = complaint_entry_row[0][0]
   missing_data = '<span class="missing-data">No Data</span>'
@@ -738,24 +755,25 @@ format = (complaint_entry_row) ->
     url: '/escalations/api/v1/escalations/webcat/complaint_entries/retrieve_current_categories'
     data: {'id': complaint_entry.entry_id}
     success: (response) ->
+
       $('#loader-modal').modal 'hide'
-      current_categories = JSON.parse(response)
-      categories = current_categories
+      { current_category_data : current_categories, master_categories} = JSON.parse(response)
+
+      master_categories_list = '#main-domain-categories_' + complaint_entry.entry_id
+
+      if master_categories.length > 0
+        $(master_categories_list).closest('.domain-categories').show()
+        for cat in master_categories
+          new_cat = '<li>' + cat + '</li>'
+          $(master_categories_list).append(new_cat)
 
       $.each current_categories, (key, value) ->
-        category = this
         active =  $(this).attr("is_active")
         if active == true
-          confidence = this.confidence
-          mnemonic = this.mnem
-          name = this.descr
-          cat_id = this.category_id
-          top_certainty = this.top_certainty
-          certainties = this.certainties
+          { confidence, mnem: mnemonic, descr: name, category_id: cat_id, top_certainty, certainties } = this
+
           $(certainties).each ->
-            source_certainty = this.certainty
-            source_description = this.source_description
-            source_name = this.source_mnemonic
+            { certainty:source_certainty, source_description, source_mnemonic: source_name } = this
             certainty_row = '<tr><td>' + source_certainty + '</td><td>' + source_name + '</td><td>' + source_description + '</td></tr>'
             tooltip_table_guts = tooltip_table_guts + certainty_row
 
@@ -797,6 +815,7 @@ format = (complaint_entry_row) ->
         '<button class="tertiary submit_changes" id="submit_changes_' + complaint_entry.entry_id + '" onclick="updateEntryColumns(' + complaint_entry.entry_id + ',' + row_id + ')" ' + entry_status + '>Submit Changes</button>' +
         '</div>'
 
+
   complaint_entry_html =
       complaint_table_row_html +
       '<div class="col-xs-12 col-sm-6 nested-complaint-static-data">' +
@@ -835,7 +854,12 @@ format = (complaint_entry_row) ->
       '<div class="complaint-selectize-col-wrapper">' +
       '<label class="content-label-sm">Edit Categories / Confidence Order</label>' +
       '<fieldset id="'+input_cat+'" ' + entry_status + '  name="['+input_cat+'][]" class="selectize" placeholder="Enter up to 5 categories" value="">' +
-      '</div></div><div class="col-xs-4 col-with-divider">' +
+      '</div>' +
+      '<div class="domain-categories" >' +
+      '<label class="content-label-sm">Inherit Categories From Main Domain</label><br/>' +
+      '<ul id="main-domain-categories_' + complaint_entry.entry_id + '"></ul>'+
+      '<button class="secondary inline-button" onclick="inheritCategories(' + complaint_entry.entry_id + ')">Inherit</button><br/>' +
+      '</div>' +'</div><div class="col-xs-4 col-with-divider">' +
       '<label class="content-label-sm">Internal Comment</label><br/>' +
       '<input class="nested-table-input complaint-comment-input" id="complaint_comment_' + complaint_entry.entry_id + '" type="text" onclick="this.select()" class="nested-table-input" value="' + internal_comment + '" placeholder="Add a comment." ' + entry_status + '><br/>'  +
       '<label class="content-label-sm customer-label">Customer Facing Comment</label><br/>' +
@@ -893,7 +917,7 @@ window.history_dialog = (id, url) ->
           '<tbody>'
           # Build domain history table
           for entry in json.entry_history.domain_history
-            entry_string = "" +
+            entry_string =
             '<tr>' +
             '<td>' + entry['action'] + '</td>' +
             '<td>' + entry['confidence'] + '</td>' +
@@ -903,14 +927,12 @@ window.history_dialog = (id, url) ->
             '<td>' + entry['category']['descr'] + '</td>' +
             '</tr>'
             history_dialog_content += entry_string
-          history_dialog_content +=
-            # End domain history table
-            '</tbody></table>'
+          # End domain history table
+          history_dialog_content += '</tbody></table>'
 
+        # End domain history tab start Complaint Entry Tab
         history_dialog_content +=
-          # End domain history tab
           '</div>' +
-          # Start Complaint Entry Tab
           '<div class="tab-pane" role="tabpanel" id="complaint-history-tab">' +
           '<h5>Complaint Entry History</h5>'
 
@@ -1074,22 +1096,17 @@ parse_lookup_dialog_content = (json) ->
     category = this
     active =  $(this).attr("is_active")
     if active == 1
-      confidence = this.confidence
-      mnemonic = this.mnemonic
-      name = this.name
-      cat_id = this.category_id
+      { confidence, mnemonic, name, category_id: cat_id, certainty: certainties } = this
       top_certainty = this.certainty[0].source_certainty
-      certainties = this.certainty
+
       category_row = '<tr><td>' + mnemonic + ' - ' + name + '</td></tr>'
       lookup_dialog_content = lookup_dialog_content + category_row
       lookup_dialog_content = lookup_dialog_content + '<tr> <table class="lookup-certanty-table">' +
         '<thead><tr><th></th><th>Confidence</th><th>Source</th><th>Certainty</th></tr></thead>' +
         '<tbody>'
       $(certainties).each ->
-        source_confidence = this.source_confidence
-        source_certainty = this.source_certainty
-        source_category = this.source_category
-        source_name = this.source
+        {source_confidence, source_certainty, source_category, source: source_name } = this
+
         lookup_dialog_content = lookup_dialog_content + '<tr><td></td><td>' + source_confidence + '</td><td>' + source_name + '</td><td>' + source_certainty + '</td></tr>'
       lookup_dialog_content += '</tbody></table></tr>'
   lookup_dialog_content += '</tbody></table>'
