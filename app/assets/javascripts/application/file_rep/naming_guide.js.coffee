@@ -60,8 +60,12 @@ $ ->
     # Delete any new rows that were not saved
     rows = $('#amp-naming-details-table tbody').find('tr')
     $(rows).each ->
-      if $(this).attr('data-id') == ''
+      id = $(this).attr('data-id')
+      if id == ''
         $(this).remove()
+
+    # Redefining after the dead rows are gone
+    rows = $('#amp-naming-details-table tbody').find('tr')
 
     # Turn off sortability
     $('#amp-naming-details-table tbody').sortable('destroy')
@@ -216,30 +220,35 @@ $ ->
       public_notes = $($(this).find('.amp-public-notes')[0]).find('.table-content').text()
       contact = $($(this).find('.amp-contact')[0]).find('.table-content').text()
 
-      unless id == ''
-        rows_to_update.push(
-          'id': id,
-          'pattern': pattern,
-          'example': example,
-          'engine': engine,
-          'engine_description': engine_desc,
-          'notes': notes,
-          'public_notes': public_notes,
-          'contact': contact,
-          'table_sequence': sequence
-        )
-      # New rows won't have an id yet
+      # Check to make sure no new rows are fully blank
+      if pattern == '' && example == '' && engine == '' && engine_desc == '' && notes == '' && public_notes == '' && contact == ''
+        $(this).remove()
+
       else
-        rows_to_add.push(
-          'pattern': pattern,
-          'example': example,
-          'engine': engine,
-          'engine_description': engine_desc,
-          'notes': notes,
-          'public_notes': public_notes,
-          'contact': contact,
-          'table_sequence': sequence
-        )
+        unless id == ''
+          rows_to_update.push(
+            'id': id,
+            'pattern': pattern,
+            'example': example,
+            'engine': engine,
+            'engine_description': engine_desc,
+            'notes': notes,
+            'public_notes': public_notes,
+            'contact': contact,
+            'table_sequence': sequence
+          )
+        # New rows won't have an id yet
+        else
+          rows_to_add.push(
+            'pattern': pattern,
+            'example': example,
+            'engine': engine,
+            'engine_description': engine_desc,
+            'notes': notes,
+            'public_notes': public_notes,
+            'contact': contact,
+            'table_sequence': sequence
+          )
 
       # For reference, remove when hooked up to backend
       console.log rows_to_add
