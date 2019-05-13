@@ -1,0 +1,66 @@
+.content-wrapper
+  %h1 AMP Naming Conventions Details
+  .row
+    .col-xs-12.button-row-left.amp-edit-buttons
+      -# If user has role to edit AMP Naming Conventions, show this button
+      %button.primary.edit-button#amp-edit-button{onclick: 'edit_amp_naming_conventions();'} Edit AMP Naming Conventions
+      .active-editing-buttons
+        %button.primary.save-button#amp-save-button{onclick: 'save_amp_naming_conventions();'} Save Changes
+        %button.secondary.cancel-button#amp-cancel-button{onclick: 'cancel_amp_naming_conventions();'} Cancel
+        %button.secondary.add-file-button#amp-new-button{onclick:'add_amp_naming_conventions();'} Add New Naming Convention
+  .row
+    .col-xs-12
+      %table.table.responsive#amp-naming-details-table
+        %thead
+          %tr
+            %th Pattern
+            %th Example
+            %th Engine
+            %th Engine Description
+            %th Notes
+            %th Public Facing Notes
+            %th Point of Contact
+        %tbody
+          - @conventions.each do |convention|
+            -# Hard coding this temporarily. Need to convert to database and actual data
+            %tr.amp-naming-row{'data-sort-sequence': "#{convention.table_sequence}", 'data-id': "#{convention.id}"}
+              %td.amp-pattern
+                %span.table-content
+                  %span.table-code= convention.pattern
+                %span.table-form-content
+                  %input.code-input{type: 'text', value: "#{convention.pattern}"}
+              %td.amp-example
+                %span.table-content
+                  = convention.example
+                %span.table-form-content
+                  %input{type: 'text', value: "#{convention.example}"}
+              %td.amp-engine
+                %span.table-content
+                  = convention.engine
+                %span.table-form-content
+                  %input{type: 'text', value: "#{convention.engine}"}
+              %td.amp-example-description
+                %span.table-content
+                  = convention.engine_description
+                %span.table-form-content
+                  %textarea
+                    = convention.engine_description
+              %td.amp-notes
+                %span.table-content
+                  = convention.notes
+                %span.table-form-content
+                  %textarea
+                    = convention.notes
+              %td.amp-public-notes
+                %span.table-content
+                  = convention.public_notes
+                %span.table-form-content
+                  %textarea
+                    = convention.public_notes
+              %td.amp-contact
+                %span.table-content
+                  = convention.contact
+                %span.table-form-content
+                  %textarea
+                    = convention.contact
+                  %span.delete-button{onclick: "delete_amp_naming_convention(#{convention.id}, '#{convention.pattern}');"}

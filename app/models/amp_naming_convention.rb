@@ -1,0 +1,3 @@
+class AmpNamingConvention < ApplicationRecord
+
+end

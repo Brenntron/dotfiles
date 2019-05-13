@@ -84,6 +84,8 @@ Rails.application.routes.draw do
     namespace :file_rep do
       root 'disputes#index'
       resources :disputes, only: [:index, :show]
+
+      get 'naming_guide', to: 'disputes#naming_guide'
     end
 
 
