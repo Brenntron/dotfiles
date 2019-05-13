@@ -378,18 +378,19 @@ get_run_status = window.get_run_status = (sha256_hash) ->
   )
 
 
-########### RERUN SANDBOX SAMPLE AND GO TO TOP OF TAB ############
+########### RERUN SANDBOX SAMPLE ############
 rerun_status = window.rerun_status = (sha256_hash) ->
-  # make it clear the sample is re-running
-  $('#sb-loader').css
-    'padding':'20px'
-    'display':'inline-block'
-    'border-bottom':'solid 1px #eee'
-    'font-weight': 'bold'
-  $('#sandbox-rerun-button').blur()
-
+  # rerun the sample and scroll to top of research tab
   window.get_run_status(sha256_hash)
   window.scrollTo(0,320)
+
+  # make it clear the sample is re-running, show the Loading message above the existing sample
+  $('#sb-loader').css
+    'padding': '20px'
+    'display': 'inline-block'
+    'border-bottom': 'solid 1px #eee'
+    'font-weight': 'bold'
+  $('#sandbox-rerun-button').blur()
 
 
 
