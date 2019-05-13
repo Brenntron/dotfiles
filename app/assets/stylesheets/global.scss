@@ -9236,9 +9236,7 @@ div[aria-describedby='create-detection-dialog'] {
   .table-form-content {
     display: none;
   }
-}
-
-#amp-naming-details-table {
+  // Below styles displayed when 'edit' is clicked
   .ui-sortable {
     font-size: 8.75pt;
 
@@ -9278,6 +9276,21 @@ div[aria-describedby='create-detection-dialog'] {
     }
     tr:last-of-type td {
       border-bottom: 1px solid #bcdce8;
+    }
+    tr td:last-of-type {
+      .table-form-content {
+        margin-right: 20px;
+      }
+    }
+    .delete-button {
+      width: 22px;
+      height: 22px;
+      display: block;
+      float: right;
+      position: absolute;
+      right: 14px;
+      margin-top: -36px;
+      cursor: pointer;
     }
     input, textarea {
       width: 100%;

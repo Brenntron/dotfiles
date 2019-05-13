@@ -250,48 +250,78 @@ $ ->
             'table_sequence': sequence
           )
 
-      # For reference, remove when hooked up to backend
-      console.log rows_to_add
-      console.log rows_to_update
+    if rows_to_add.length > 0
+      window.create_amp_naming_conventions([rows_to_add])
+    if rows_to_update.length > 0
+      window.update_amp_naming_conventions([rows_to_update])
 
 
 
-  window.create_convention = () ->
-    std_msg_ajax(
-      method: 'POST'
-      url: "/escalations/api/v1/escalations/file_rep/amp_naming_convention"
-      data:
-        pattern: 'malforge'
-        example: 'jennifer.malforge'
-        engine: 'malforge'
-        engine_description: 'Those malforge guys'
-        notes: 'I hate those malforge guys'
-        public_notes: 'Do not trust those malforge guys'
-        contact: 'gee@cisco.com'
-        table_sequence: 10
-      success_reload: false
-      success_msg: 'Naming Convention Created'
-      failure_reload: false
-      error_prefix: 'Error Creating Naming Convention'
-    )
+  window.delete_amp_naming_convention = (id, pattern) ->
+    # DELETE WHEN BACKEND IS READY
+    console.log ('Delete this ' + pattern)
+    console.log ('id: ' + id)
+
+#    UNCOMMENT OUT WHEN BACKEND IS READY
+#    std_msg_ajax(
+#      method: 'POST'
+#      url: "/escalations/api/v1/escalations/file_rep/amp_naming_convention/delete"
+#      data:
+#        id: id
+#      success: (response) ->
+#        std_msg_success('AMP Naming Convention Below Has Been Deleted.', [pattern], reload: false)
+#      error: (response) ->
+#        std_msg_error('Error Deleting ' + pattern, [response.responseText], reload: false)
+#    )
 
 
-  window.update_convention = () ->
-    std_msg_ajax(
-      method: 'PUT'
-      url: "/escalations/api/v1/escalations/file_rep/amp_naming_convention/1"
-      data:
-        pattern: 'malforge'
-        example: 'jennifer.malforge'
-        engine: 'malforge'
-        engine_description: 'Those malforge guys'
-        notes: 'I hate those malforge guys'
-        public_notes: 'Do not trust those malforge guys'
-        contact: 'gee@cisco.com'
-        table_sequence: 10
-      success_reload: false
-      success_msg: 'Naming Convention Updated'
-      failure_reload: false
-      error_prefix: 'Error Updating Naming Convention'
-    )
+
+  window.create_amp_naming_conventions = ([data]) ->
+    # Pulling out just patterns for response message
+    response_data = ""
+    if data.length > 1
+      data.each ->
+        response_data += "'" + this.pattern + "', "
+    else
+      response_data = data[0].pattern
+
+    # DELETE WHEN BACKEND IS READY
+    console.log data
+    console.log response_data
+
+    #    UNCOMMENT OUT WHEN BACKEND IS READY
+#    std_msg_ajax(
+#      method: 'POST'
+#      url: "/escalations/api/v1/escalations/file_rep/amp_naming_convention/create"
+#      data: data
+#      success: (response) ->
+#        std_msg_success('The Following AMP Naming Conventions Have Been Created:', [response_data], reload: false)
+#      error: (response) ->
+#        std_msg_error('Error Creating AMP Naming Conventions', [response.responseText], reload: false)
+#    )
+
+
+  window.update_amp_naming_conventions = ([data]) ->
+  # Pulling out just patterns for response message
+    response_data = ""
+    if data.length > 1
+      data.each ->
+        response_data += "'" + this.pattern + "', "
+    else
+      response_data = data[0].pattern
+
+    # DELETE WHEN BACKEND IS READY
+    console.log data
+    console.log response_data
+
+    #    UNCOMMENT OUT WHEN BACKEND IS READY
+#    std_msg_ajax(
+#      method: 'PUT'
+#      url: "/escalations/api/v1/escalations/file_rep/amp_naming_convention/update"
+#      data: data
+#      success: (response) ->
+#        std_msg_success('The Following AMP Naming Conventions Have Been Updated:', [response_data], reload: false)
+#      error: (response) ->
+#        std_msg_error('Error Updating AMP Naming Conventions', [response.responseText], reload: false)
+#    )
 
