@@ -91,15 +91,16 @@
                 - else
                   %span#dispute-assignee= @file_rep_dispute.assigned.cvs_username
 
-                - if can? :update, FileReputationDispute
+                - if can? :update, @file_rep_dispute
                   .dispute-owner-buttons-wrapper
-                    - if @file_rep_dispute.assigned == current_user
-                      %button.return-ticket-button.esc-tooltipped{title: 'Return ticket to open queue', onclick: "file_rep_show_return_dispute(#{@file_rep_dispute.id});"}
-                    - else
+                    - if can? :take, @file_rep_dispute
                       %button.take-ticket-button#show_ticket_assign.esc-tooltipped{title: 'Assign this ticket to me', onclick: "file_rep_show_take_dispute(#{@file_rep_dispute.id});"}
 
                     %span.dropdown
-                      %button#index_change_assign.dispute-inline-buttons.ticket-owner-button.dropdown-toggle.esc-tooltipped{title: 'Change Assignee', 'data-toggle': 'dropdown', 'aria-haspopup': 'true', 'aria-expanded': 'false'}
+                      - if can? :change_assignee, @file_rep_dispute
+                        %button#index_change_assign.dispute-inline-buttons.ticket-owner-button.dropdown-toggle.esc-tooltipped{title: 'Change Assignee', 'data-toggle': 'dropdown', 'aria-haspopup': 'true', 'aria-expanded': 'false'}
+                      - else
+                        %span#replace-button
                       .dropdown-menu#show-change-assign-dropdown{'aria-labelledby': 'index_change_assign'}
                         .change-assignee-dropdown-wrapper
                           %h3 Change Assignee

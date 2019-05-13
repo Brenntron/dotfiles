@@ -143,8 +143,18 @@ end
 
 Given(/^I should see my username$/) do
   user_attrs = FactoryBot.attributes_for(:current_user)
-  username  = User.where(cvs_username: user_attrs[:cvs_username]).first
-  raise "content found when it should not have been found" if page.has_content?(username)
+  username  = User.where(cvs_username: user_attrs[:cvs_username]).first.cvs_username
+  if !page.has_content?(username)
+    raise "content not found when it should have been found"
+  end
+end
+
+Given(/^I should not see my username$/) do
+  user_attrs = FactoryBot.attributes_for(:current_user)
+  username  = User.where(cvs_username: user_attrs[:cvs_username]).first.cvs_username
+  if page.has_content?(username)
+    raise "content found when it should not have been found"
+  end
 end
 
 Then (/^current user should not have kerberos login$/) do
@@ -165,4 +175,11 @@ Then(/^I should see user, "(.*?)", in element "(.*?)"$/) do |username, element|
   within element do
     expect(page).to have_content(username)
   end
+end
+
+Given(/^a user with role "(.*?)" exists within org subset "(.*?)" and is logged in$/) do |role, org_subset|
+  @user = FactoryBot.create(:current_user, confirmed: true)
+  FactoryBot.create(:org_subset, name: org_subset)
+  @user.roles << FactoryBot.create(:role, role: role, org_subset_id: 1)
+  sign_in_user
 end
