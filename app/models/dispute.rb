@@ -268,6 +268,9 @@ class Dispute < ApplicationRecord
     possibles = Dispute.includes(:dispute_entries).where(:customer_id => dispute.customer_id).select {|dispute| dispute.status != RESOLVED || dispute.status != DUPLICATE}
     candidates = []
 
+    all_resolved = true
+
+    # If all possible Disputes are Resolved or Duplicate, do not register as a duplicate
     possibles.each do |poss|
 
       ips = poss.dispute_entries.select{ |entry| entry.entry_type == "IP"}.pluck(:ip_address).sort
@@ -278,10 +281,22 @@ class Dispute < ApplicationRecord
       end
     end
 
-    if candidates.present?
+    candidates.each do |candidate|
+      if candidate.status != RESOLVED
+        all_resolved = false
+      end
+    end
+
+    if candidates.present? && all_resolved == false
       best_candidate = candidates.sort_by {|candidate| candidate.id}.first
       response[:authority] = best_candidate
       response[:is_dupe] = true
+      response[:all_resolved] = false
+    elsif candidates.present? && all_resolved == true
+      best_candidate = candidates.sort_by {|candidate| candidate.id}.last
+      response[:authority] = best_candidate
+      response[:is_dupe] = true
+      response[:all_resolved] = true
     else
       response[:is_dupe] = false
     end
@@ -476,9 +491,13 @@ class Dispute < ApplicationRecord
 
         response = is_possible_customer_duplicate?(new_dispute, new_entries_ips, new_entries_urls)
 
-        if response[:is_dupe] == true
+        if response[:is_dupe] == true && response[:all_resolved] == false
           manage_duplicate_dispute(new_dispute, response[:authority], new_entries_ips, new_entries_urls, message_payload["source_key"] )
           return
+        elsif response[:is_dupe] == true && response[:all_resolved] == true
+          new_dispute.related_id = response[:authority].id
+          new_dispute.related_at = Time.now
+          new_dispute.save!
         end
 
         #IPS and URL/DOMAIN entries are almost virtually the same, maybe this is worthy of refactoring into it's own method.
