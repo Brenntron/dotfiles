@@ -1,7 +1,4 @@
 $ ->
-  # go back to the last tab after reload
-  researchTable = $('research-table').DataTable()
-
   $('a[data-toggle="tab"]').on 'shown.bs.tab', (e) ->
     localStorage.setItem 'lastTab', $(this).attr('id')
     return
@@ -15,29 +12,67 @@ $ ->
     return
 
   # Add Rows to Quick lookup research table
-  researchTable = $('.research-table').DataTable();
+  researchTable = $('.research-table').DataTable({
+    ordering: false
+    rowReorder: true
+  });
 
-  $('.col-dispute').on 'keydown', (e) ->
-#    need to be able to create multiple disputes on paste, autofocus on last row
+  researchTable.on 'row-reorder', (e, diff, edit) ->
+    for i in [0...diff.length]
+      rowData = researchTable.row( diff[i].node ).data();
+      console.log rowData[1], diff[i].oldData
+
+
+  window.buildRow = (parentRow, text) ->
+    if !text
+      text = ''
+    researchTable.row.add(['<div class="col-dispute" contenteditable>' + text + '</div>','','','','','','','']).draw()
+    newRow = parentRow.parentNode.nextElementSibling
+
+    newRowCells = $(newRow).children()
+    newRowCells[1].classList.add('col-wbrs')
+    newRowCells[2].classList.add('col-wbrs-rule-hits')
+    newRowCells[3].classList.add('col-wbrs-rules')
+    newRowCells[4].classList.add('col-category')
+    newRowCells[5].classList.add('col-wlbl')
+    newRowCells[6].classList.add('col-reptool-class')
+    newRowCells[7].classList.add('col-actions')
+
+    newRow = $(newRow).closest('tr')
+    index = newRow.index();
+
+    if index == 1
+      return
+
+    rowToMoveUp = researchTable.row(index).data();
+
+    i = index
+    while i == index
+      --i
+      rowData = researchTable.row(i - 1).data();
+      rowData[0]++;
+
+      researchTable.row(i).data(rowData)
+
+    researchTable.row(0).data(rowToMoveUp);
+
+    researchTable.draw(true);
+
+
+  $( document ).on 'paste', '.col-dispute', (e) ->
+    pasted_text = e.originalEvent.clipboardData.getData('text');
+    pasted_list = pasted_text.replace(/\n/g, ",").split(",")
+    if pasted_list.length > 1
+      for text in pasted_list
+        buildRow(this, text)
+
+  $( document ).on 'keydown', '.col-dispute', (e) ->
+    currentPage = researchTable.page();
+
     if e.which == 13 && e.shiftKey == false
-#    KATIE NOTE, so this is having issues with binding the event on dynamic elements, maybe something to do with
-#     coffeescript, the 'on' isn't really working for that here
-      researchTable.row.add(['Hey','Hey ','Hey ',' Hey',' Hey','Hey ','Hey ',' Hey']).draw()
-#     need to add something for each cell added ^ see if that only needs to be empty string
-#      auto focus on row once it' s created
-      newRow = this.parentNode.nextElementSibling
-      newRowCells = $(newRow).children()
+      buildRow(this)
 
-      newRowCells[0].classList.add('col-dispute')
-      newRowCells[0].setAttribute('contenteditable', '')
-      newRowCells[1].classList.add('col-wbrs')
-      newRowCells[2].classList.add('col-wbrs-rule-hits')
-      newRowCells[3].classList.add('col-wbrs-rules')
-      newRowCells[4].classList.add('col-category')
-      newRowCells[5].classList.add('col-wlbl')
-      newRowCells[6].classList.add('col-reptool-class')
-      newRowCells[7].classList.add('col-actions')
-
+->
 
   $('#edit-dispute-entry-button').click ->
 
