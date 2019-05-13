@@ -563,4 +563,36 @@ class FileReputationDispute < ApplicationRecord
       self.file_size/1024
     end
   end
+
+  def self.export_xlsx(search_params_json, current_user:)
+    fields = %w{id sha256_hash file_name disposition_suggested}
+    search_params = JSON.parse(search_params_json)
+
+    file_rep_disputes = robust_search(search_params['search_type'],
+                                      search_name: search_params['search_name'],
+                                      params: search_params['search_conditions'],
+                                      user: current_user)
+
+    workbook = RubyXL::Workbook.new
+    worksheet = workbook[0]
+
+    fields.each_with_index do |field_name, col_index|
+      case field_name
+      when 'id'
+        worksheet.add_cell(0, col_index, 'Case ID')
+      else
+        worksheet.add_cell(0, col_index, field_name)
+      end
+      worksheet.sheet_data[0][col_index].change_font_bold(true)
+    end
+
+    file_rep_disputes.each_with_index do |fr_dispute, row_index|
+      fields.each_with_index do |field_name, col_index|
+        cell_data = fr_dispute.attributes[field_name]
+        worksheet.add_cell(row_index + 1, col_index, cell_data)
+      end
+    end
+
+    workbook
+  end
 end

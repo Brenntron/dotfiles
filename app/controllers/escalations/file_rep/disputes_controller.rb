@@ -9,7 +9,7 @@ class Escalations::FileRep::DisputesController < ApplicationController
                                           user: current_user)
       end
       format.xlsx do
-        workbook = FileRepDatatable.export_xlsx(params['data_json'])
+        workbook = FileReputationDispute.export_xlsx(params['data_json'], current_user: current_user)
         send_data workbook.stream.string, filename: "filerep_search_#{Time.now}.xlsx", disposition: 'attachment'
       end
     end
