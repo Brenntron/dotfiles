@@ -34,11 +34,11 @@ $(document).ready ->
     field_name = field.find('input').attr('id') || field.find('select').attr('id')
     field_wrapper = field.attr('id')
     $('.search-checkbox').each ->
-      if $(this).attr('for') == field_name
-        $(field).parent().removeClass('hidden')
+      if $(this).attr('for') == field_name 
+        $($(this).parent()).parent().removeClass('hidden')
       else if $(this).attr('for') == field_wrapper
-        $(field).parent().removeClass('hidden')
-    $(field).addClass('hidden')
+        $($(this).parent()).parent().removeClass('hidden')
+    $($(this).parent()).addClass('hidden')
     false
 
   $('#search-webrep-cases-form').on 'click', '.remove-input', ->
