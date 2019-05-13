@@ -5344,6 +5344,10 @@ h5.entry-details-table-header {
   background-color: #90d8f594;
 }
 
+input[type="radio"].ticket-status-radio {
+  margin-top: 0;
+}
+
 .radio-label {
   text-transform: none !important;
   font-weight: 400 !important;

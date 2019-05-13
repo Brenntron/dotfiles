@@ -1704,3 +1704,33 @@ $ ->
   $('.email-row').find('.case-history-author').each ->
     if $(this).text().length > 28
       $(this).addClass('break-word')
+
+
+  $('#complaint_ticket_status').click ->
+    selected_rows = $('#complaints-index').DataTable().rows('.selected')
+    if (selected_rows[0].length > 0)
+      $('.ticket-status-radio-label').click ->
+        $('#loader-modal').modal()
+        radio_button = $(this).prev('.ticket-status-radio')
+        $(radio_button[0]).trigger('click')
+        entry_ids = []
+        i = 0
+        while i < selected_rows[0].length
+          entry_ids.push(selected_rows.data()[i].entry_id)
+          i++
+        data = {
+          complaint_entry_ids: entry_ids,
+          resolution_name: $(radio_button).attr('id')
+        }
+
+        std_msg_ajax(
+          method: 'POST'
+          url: '/escalations/api/v1/escalations/webcat/complaint_entries/bulk_update_entry_resolution'
+          data: data
+          success_reload: true
+          error: (response) ->
+            std_api_error(response, "Some categories could not be set.", reload: true)
+        )
+    else
+      std_msg_error('No rows selected', ['Please select at least one row.'])
+
