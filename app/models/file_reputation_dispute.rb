@@ -329,7 +329,8 @@ class FileReputationDispute < ApplicationRecord
     # when 'team_disputes'
     #   where(user_id: user.my_team)
     when 'unassigned'
-      where(user_id: nil).where.not(status: STATUS_RESOLVED)
+      vrtincoming = User.vrtincoming
+      where(user_id: [nil, vrtincoming]).where.not(status: STATUS_RESOLVED)
     when 'open'
       where.not(status: STATUS_RESOLVED)
     when 'closed'
