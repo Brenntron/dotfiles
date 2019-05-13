@@ -59,9 +59,9 @@
                 %div.user-col-layout{style: 'column-count: 1'}
                   %div
                     %span.related-user
-                      = @user.parent.display_name
+                      = link_for_manager(current_user, @user, display_name: current_user.parent.display_name)
                     %br
-                    = link_for_manager(current_user, @user)
+                    = link_for_manager(current_user, @user, display_name: current_user.parent.cvs_username)
 
             - if @user.child?
               .user-relationship-wrapper
@@ -81,9 +81,9 @@
                 %div.user-col-layout{style: 'column-count: 1'}
                   %div
                     %span.related-user
-                      = @user.parent.display_name
+                      = link_for_manager(current_user, @user, display_name: current_user.parent.display_name)
                     %br
-                    = link_for_manager(current_user, @user)
+                    = link_for_manager(current_user, @user, display_name: current_user.parent.cvs_username)
             - if @user.child?
               .user-relationship-wrapper
                 %h5.content-label-sm Peers
