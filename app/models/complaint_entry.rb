@@ -227,7 +227,7 @@ class ComplaintEntry < ApplicationRecord
       existing_prefixes = Wbrs::Prefix.where({urls: [ip_or_uri]})
 
       existing_prefix = nil
-      
+
       if existing_prefixes.present?
         existing_prefix = existing_prefixes.find { |existing_prefix| existing_prefix.subdomain == parsed_uri[:subdomain] && existing_prefix.path == parsed_uri[:path] }
       end
@@ -622,7 +622,7 @@ class ComplaintEntry < ApplicationRecord
 
     return [] unless final_results
 
-    category_ids = final_results.map {|category| category.category_id}
+    category_ids = final_results.first.categories.sort_by(&:confidence).map {|category| category.category_id}
     category_names = final_results.first.categories.sort_by(&:confidence).map {|category| category.descr}
 
     {category_ids: category_ids, category_names: category_names}
