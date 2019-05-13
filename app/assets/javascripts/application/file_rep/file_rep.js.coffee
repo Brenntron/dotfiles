@@ -493,94 +493,6 @@ $ ->
           $('.filerep-named-search-list').append(new_tr)
 
 
-      ####### REVERSING LABS INDEX HOVER TOOLTIP BEGINS ###########
-      ####### REVERSING LABS INDEX HOVER TOOLTIP BEGINS ###########
-
-      # dbinebri: LOADER TOOLTIP BELOW, THIS UPDATES WITH CONTENT OR ERROR MESSAGE AFTER LOAD
-      $('.rl-hover').on 'mouseover', ->
-        curr_sha = $(this).parent().siblings().find('.file_rep_sha').text()
-        row_id = $(this).parent().parent().attr('id')
-        score_id_selector = '#rl-score-id-' + row_id
-
-        unless $(score_id_selector).hasClass("tooltipstered")
-          $(score_id_selector).tooltipster
-            theme: [
-              'tooltipster-borderless'
-              'tooltipster-borderless-customized'
-              'tooltipster-rl-hover'
-            ]
-            side: 'bottom'
-            content: '<div class="rl-hover-loader">Loading report... <img src="/assets/icon_gear_white.svg" class="rl-cog"></div>'
-            contentAsHTML: true
-            autoClose: false
-            trigger: 'custom'
-            triggerOpen:
-              mouseenter: true
-              click: true
-            triggerClose:
-              mouseleave: true
-              click: true
-              scroll: true
-            interactive: true
-            updateAnimation: false
-
-        # score_id_selector will look like '#rl-score-id-2', attach tooltip to this
-        $(score_id_selector).tooltipster('open')
-
-        rl_build_table(curr_sha, score_id_selector)
-
-      # build the entire rl html table to load into the tooltip above
-      window.rl_build_table = (sha256_hash, score_id_selector) ->
-        std_msg_ajax(
-          method: 'GET'
-          url: "/escalations/api/v1/escalations/filerep/reversing_labs/" + sha256_hash
-          success_reload: false
-          success: (response) ->
-            unless response.json.error?
-              rl_data = response.json.rl.sample.xref
-
-              scanner_count = ""
-              result_count = ""
-              all_scanner_results = rl_data.entries[0]
-              scanner_count = all_scanner_results.scanners.length
-
-              mal_results = []
-              unk_results = []
-
-              $(all_scanner_results.scanners).each ->
-                if this.result == ""
-                  unk_results.push(this)
-                else
-                  mal_results.push(this)
-
-              result_count = mal_results.length
-
-              rl_hover_table =
-                '<table class="rl-header"><tr class="top"><td colspan="2">Reversing Labs Details ' +
-                  '<span id="rl-score-hover">' + result_count + '/' + scanner_count + '</span></td></tr>' +
-                  '<tr class="second"><td class="left">AV Vendor</td><td class="right">Results</td></tr></table>' +
-                  '<table class="rl-content">'
-
-              $(mal_results).each ->
-                rl_hover_table += '<tr><td class="left">' + this.name + '</td><td class="right rl-scanner-mal">' + this.result + '</td></tr>'
-              $(unk_results).each ->
-                rl_hover_table += '<tr><td class="left">' + this.name + '</td><td class="right rl-scanner-unk">Not Detected</td></tr>'
-              rl_hover_table += "</table>"
-
-              $(score_id_selector).tooltipster('content', rl_hover_table)
-
-            # GOT A JSON RESPONSE, BUT AN ERROR WITH SHA? DO THIS TOOLTIP
-            if response.json.error
-              $(score_id_selector).tooltipster('content', '<div class="rl-hover-error">Error loading this SHA.</div>')
-
-          # IF ERROR ON AJAX CALL
-          error: (response) ->
-            $(score_id_selector).tooltipster('content', '<div class="rl-hover-error">There was an error with this SHA.</div>')
-
-        )
-        ####### REVERSING LABS INDEX HOVER TOOLTIP ENDS ###########
-        ####### REVERSING LABS INDEX HOVER TOOLTIP ENDS ###########
-
 
     processing: true
     serverSide: true
@@ -724,6 +636,9 @@ $ ->
         className: 'rl-col'
         render: (data, type, full, meta) ->
           if data
+            # dbinebri: build the RL hover tooltip for each row on page load, hidden until hover
+            rl_build_tooltip(full['id'], full['reversing_labs_scanners'], data, full['reversing_labs_count'])
+
             return '<span class="score-col text-center rl-hover" ' + 'id="rl-score-id-' + full['id'] + '" data-tooltip-content="Loading...">' + data + ' / ' + full['reversing_labs_count'] + '&nbsp;<img src="../../assets/icon_down_arrow_grey.svg" class="rl-more">' + '</span>'
           else
             return ''
@@ -1070,3 +985,89 @@ $ ->
       error: (response) ->
         std_api_error(response, "Note could not be updated.", reload: false)
     )
+
+
+
+$ ->
+
+  # build the entire rl html table to load into the tooltip above
+  window.rl_build_tooltip = (score_id_selector, scanner_list, rl_score, rl_count) ->
+
+    # first, get the parameters passed in here and clean up the scanners list
+    score_id_selector = '#rl-score-id-' + score_id_selector
+
+    #  scanner_list IS A STRING HERE, convert to an object to build ROWS out of each object
+    str_scanners = scanner_list
+    str_scanners = str_scanners.substring(1, str_scanners.length-1)
+    str_scanners = str_scanners.replace(/&quot;/g,'"')
+    str_scanners = str_scanners.replace(/=&gt;/g,':')
+
+    $(score_id_selector).tooltipster
+      theme: [
+        'tooltipster-borderless'
+        'tooltipster-borderless-customized'
+        'tooltipster-rl-hover'
+      ]
+      side: 'bottom'
+      content: '<p>Loading...</p>'
+      contentAsHTML: true
+      autoClose: false
+      trigger: 'custom'
+      triggerOpen:
+        mouseenter: true
+        click: true
+      triggerClose:
+        mouseleave: true
+        click: true
+        scroll: true
+      interactive: true
+      updateAnimation: false
+
+    rl_hover_table =
+      '<table class="rl-header"><tr class="top"><td colspan="2">Reversing Labs Details ' +
+        '<span id="rl-score-hover">' + rl_score + '/' + rl_count + '</span></td></tr>' +
+        '<tr class="second"><td class="left">AV Vendor</td><td class="right">Results</td></tr></table>' +
+        '<table class="rl-content">' +
+        '<tr><td>' + str_scanners + '</td></tr>' +
+        '</table>'
+
+    $(score_id_selector).tooltipster('content', rl_hover_table)
+
+    ##### SAVE BELOW FOR REFERENCE ######
+    #    mal_results = []
+    #    unk_results = []
+
+    #    $(mal_results).each ->
+    #      rl_hover_table += '<tr><td class="left">' + this.name + '</td><td class="right rl-scanner-mal">' + this.result + '</td></tr>'
+    #    $(unk_results).each ->
+    #      rl_hover_table += '<tr><td class="left">' + this.name + '</td><td class="right rl-scanner-unk">Not Detected</td></tr>'
+
+  #        scanner_count = ""
+  #        result_count = ""
+  #        all_scanner_results = rl_data.entries[0]
+  #        scanner_count = all_scanner_results.scanners.length
+  #
+  #        mal_results = []
+  #        unk_results = []
+  #
+  #        $(all_scanner_results.scanners).each ->
+  #          if this.result == ""
+  #            unk_results.push(this)
+  #          else
+  #            mal_results.push(this)
+  #
+  #        result_count = mal_results.length
+  #
+  #        rl_hover_table =
+  #          '<table class="rl-header"><tr class="top"><td colspan="2">Reversing Labs Details ' +
+  #            '<span id="rl-score-hover">' + result_count + '/' + scanner_count + '</span></td></tr>' +
+  #            '<tr class="second"><td class="left">AV Vendor</td><td class="right">Results</td></tr></table>' +
+  #            '<table class="rl-content">'
+  #
+  #        $(mal_results).each ->
+  #          rl_hover_table += '<tr><td class="left">' + this.name + '</td><td class="right rl-scanner-mal">' + this.result + '</td></tr>'
+  #        $(unk_results).each ->
+  #          rl_hover_table += '<tr><td class="left">' + this.name + '</td><td class="right rl-scanner-unk">Not Detected</td></tr>'
+  #        rl_hover_table += "</table>"
+
+  #        $(score_id_selector).tooltipster('content', rl_hover_table)

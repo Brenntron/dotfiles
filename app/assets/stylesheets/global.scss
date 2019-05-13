@@ -9299,7 +9299,7 @@ div[aria-describedby='create-detection-dialog'] {
 // top row for rl hover table
 table.rl-header {
   padding: 0;
-  width: 460px;
+  width: 500px;
   text-transform: uppercase;
   text-align: left;
   font-size: 12px;
@@ -9320,10 +9320,10 @@ table.rl-header {
       padding: 2px 8px;
       border: none;
       &.left {
-        width: 135px;
+        width: 170px;
       }
       &.right {
-        width: 325px;
+        width: 330px;
       }
     }
   }
@@ -9333,7 +9333,7 @@ table.rl-header {
 table.rl-content {
   display: block;
   padding: 0;
-  width: 460px;
+  width: 500px;
   height: 260px;
   overflow-x: hidden;
   overflow-y: scroll;
@@ -9344,10 +9344,11 @@ table.rl-content {
       text-align: left;
       font-size: 10px;
       &.left {
-        width: 160px;
+        width: 190px;
+        text-transform: uppercase;
       }
       &.right {
-        width: 300px;
+        width: 310px;
       }
     }
     // need special scanner-mal and scanner-unk styles here, can't reuse from show page
