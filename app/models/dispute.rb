@@ -203,7 +203,7 @@ class Dispute < ApplicationRecord
   end
 
   def each_duplicate(&block)
-    if related_dispute && Dispute::DUPLICATE == self.resolution
+    if related_dispute
       #block.call(related_dispute)
       related_dispute.relating_disputes.where(resolution: Dispute::DUPLICATE).where.not(id: self.id).each(&block)
     else
