@@ -8,6 +8,9 @@ class Escalations::FileRep::DisputesController < ApplicationController
                                           search_params.merge('search_conditions' => search_conditions),
                                           user: current_user)
       end
+      format.xlsx do
+        byebug
+      end
     end
   end
 
