@@ -9308,3 +9308,10 @@ div[aria-describedby='create-detection-dialog'] {
   margin-bottom: 20px;
 }
 
+#sb-loader .create-new-run {
+  display: inline-block;
+  padding: 20px;
+  font-weight: bold;
+  border-bottom: solid 1px darken($content-bg-color, 10%);
+}
+
