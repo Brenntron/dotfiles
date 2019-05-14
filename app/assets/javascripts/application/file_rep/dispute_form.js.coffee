@@ -22,5 +22,6 @@ $ ->
       success: (response) ->
         std_msg_success('File Reputation Ticket created.', [], reload: true)
       error: (response) ->
-        std_msg_error('Unable to create File Reputation Ticket.', [], reload: false)
+        debugger
+        std_msg_error('Unable to create File Reputation Ticket', [response.responseJSON.message], reload: false)
     )
