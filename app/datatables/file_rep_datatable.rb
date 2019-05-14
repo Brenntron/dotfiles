@@ -93,7 +93,7 @@ class FileRepDatatable < AjaxDatatablesRails::ActiveRecord
           threatgrid_signer:            file_rep.threatgrid_signer,
           reversing_labs_score:         file_rep.reversing_labs_score,
           reversing_labs_count:         file_rep.reversing_labs_count,
-          reversing_labs_scanners:      rl_scanners,
+          reversing_labs_scanners:      rl_scanners.to_json,
           reversing_labs_signer:        file_rep.reversing_labs_signer,
           customer_name:                file_rep.customer&.name,
           customer_email:               file_rep.customer&.email,

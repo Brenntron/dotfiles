@@ -1022,101 +1022,73 @@ $ ->
 $ ->
 
   window.rl_build_tooltip = (score_id_selector, scanner_list, rl_score, rl_count) ->
-
-    i = 0
-    html_list = ""
-    arr_scanners = []
-
     score_id_selector = '#rl-score-id-' + score_id_selector
 
-    #  scanner_list IS A STRING HERE
-    scanners_list = scanner_list  # scanners_list is a string at this point
-#    console.log scanners_list
+    # if there is no scanner data
+    if rl_count == "0"
+      $(score_id_selector).tooltipster
+        theme: [
+          'tooltipster-borderless'
+          'tooltipster-borderless-customized'
+        ]
+        side: 'bottom'
+        content: 'An error has occurred with this SHA.'
+        trigger: 'hover'
 
-    scanners_list = scanners_list.substring(1, scanners_list.length - 1)  # remove the open close brackets
-    scanners_list = scanners_list.replace(/&quot;/g,'"')
-    scanners_list = scanners_list.replace(/=&gt;/g,':')
-    scanners_list = scanners_list.replace(/"/g,'')  # remove the extraneous quotation marks
-    scanners_list = scanners_list.replace(/{/g,'')  # remove the extraneous quotation marks
-    scanners_list = scanners_list.replace(/name:/g,'')  # remove the extraneous quotation marks
-    scanners_list = scanners_list.replace(/result:/g,'')  # remove the extraneous quotation marks
+    else
+      # else build a normal tooltip for each sha on page load
+      scanners_list = scanner_list  # scanners_list is a string at this point
+      scanners_list = scanners_list.replace(/&quot;/g,'"')  # file_rep_datatable.rb is doing a .to_json but it needs a fix
 
-    arr_scanners = scanners_list.split("}, ")
+      obj_scanners = JSON.parse(scanners_list)
+  #    console.log obj_scanners
 
-    $(arr_scanners).each ->
-      curr_array = []
-      curr_array = this.split(', ')
+      # init the mal and unknown arrays
+      mal_results = []
+      unk_results = []
 
-      html_list += '<tr><td class="left">' + curr_array[0] + '</td><td class="right rl-scanner-mal">' + curr_array[1] + '</td></tr>'
+      # each scanner entry, this is where to handle the logic for each scanner
+      $(obj_scanners).each ->
 
+        if this.result == ""
+          unk_results.push(this)
+        else
+          mal_results.push(this)
 
-    $(score_id_selector).tooltipster
-      theme: [
-        'tooltipster-borderless'
-        'tooltipster-borderless-customized'
-        'tooltipster-rl-hover'
-      ]
-      side: 'bottom'
-      content: '<p>Loading...</p>'
-      contentAsHTML: true
-      autoClose: false
-      trigger: 'custom'
-      triggerOpen:
-        mouseenter: true
-        click: true
-      triggerClose:
-        mouseleave: true
-        click: true
-        scroll: true
-      interactive: true
-      updateAnimation: false
+      # init the hover table for rl
+      rl_hover_table =
+        '<table class="rl-header"><tr class="top"><td colspan="2">Reversing Labs Details ' +
+          '<span id="rl-score-hover">' + rl_score + '/' + rl_count + '</span></td></tr>' +
+          '<tr class="second"><td class="left">AV Vendor</td><td class="right">Results</td></tr></table>' +
+          '<table class="rl-content">'
 
-    rl_hover_table =
-      '<table class="rl-header"><tr class="top"><td colspan="2">Reversing Labs Details ' +
-        '<span id="rl-score-hover">' + rl_score + '/' + rl_count + '</span></td></tr>' +
-        '<tr class="second"><td class="left">AV Vendor</td><td class="right">Results</td></tr></table>' +
-        '<table class="rl-content">' +
-#        '<tr><td>' + obj_scanners[0] + '</td></tr>' +
-        '<tr><td>' + html_list + '</td></tr>' +
-        '</table>'
+      $(mal_results).each ->
+        rl_hover_table += '<tr><td class="left">' + this.name + '</td><td class="right rl-scanner-mal">' + this.result + '</td></tr>'
+      $(unk_results).each ->
+        rl_hover_table += '<tr><td class="left">' + this.name + '</td><td class="right rl-scanner-unk">Not Detected</td></tr>'
 
-    $(score_id_selector).tooltipster('content', rl_hover_table)
+      # init the tooltip first
+      $(score_id_selector).tooltipster
+        theme: [
+          'tooltipster-borderless'
+          'tooltipster-borderless-customized'
+          'tooltipster-rl-hover'
+        ]
+        side: 'bottom'
+        content: 'Nothing here'
+        contentAsHTML: true
+        autoClose: false
+        trigger: 'custom'
+        triggerOpen:
+          mouseenter: true
+          click: true
+        triggerClose:
+          mouseleave: true
+          click: true
+          scroll: true
+        interactive: true
+        updateAnimation: false
 
-    ##### SAVE BELOW FOR REFERENCE ######
-    #    mal_results = []
-    #    unk_results = []
+      # add the content into the tooltip
+      $(score_id_selector).tooltipster('content', rl_hover_table)
 
-    #    $(mal_results).each ->
-    #      rl_hover_table += '<tr><td class="left">' + this.name + '</td><td class="right rl-scanner-mal">' + this.result + '</td></tr>'
-    #    $(unk_results).each ->
-    #      rl_hover_table += '<tr><td class="left">' + this.name + '</td><td class="right rl-scanner-unk">Not Detected</td></tr>'
-
-  #        scanner_count = ""
-  #        result_count = ""
-  #        all_scanner_results = rl_data.entries[0]
-  #        scanner_count = all_scanner_results.scanners.length
-  #
-  #        mal_results = []
-  #        unk_results = []
-  #
-  #        $(all_scanner_results.scanners).each ->
-  #          if this.result == ""
-  #            unk_results.push(this)
-  #          else
-  #            mal_results.push(this)
-  #
-  #        result_count = mal_results.length
-  #
-  #        rl_hover_table =
-  #          '<table class="rl-header"><tr class="top"><td colspan="2">Reversing Labs Details ' +
-  #            '<span id="rl-score-hover">' + result_count + '/' + scanner_count + '</span></td></tr>' +
-  #            '<tr class="second"><td class="left">AV Vendor</td><td class="right">Results</td></tr></table>' +
-  #            '<table class="rl-content">'
-  #
-  #        $(mal_results).each ->
-  #          rl_hover_table += '<tr><td class="left">' + this.name + '</td><td class="right rl-scanner-mal">' + this.result + '</td></tr>'
-  #        $(unk_results).each ->
-  #          rl_hover_table += '<tr><td class="left">' + this.name + '</td><td class="right rl-scanner-unk">Not Detected</td></tr>'
-  #        rl_hover_table += "</table>"
-
-  #        $(score_id_selector).tooltipster('content', rl_hover_table)
