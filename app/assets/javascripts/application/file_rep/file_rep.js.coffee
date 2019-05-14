@@ -1018,6 +1018,13 @@ $ ->
     str_scanners = str_scanners.substring(1, str_scanners.length-1)
     str_scanners = str_scanners.replace(/&quot;/g,'"')
     str_scanners = str_scanners.replace(/=&gt;/g,':')
+#    str_scanners = str_scanners.push('}')
+#    str_scanners = str_scanners.unshift('{')
+
+    console.log str_scanners
+#    obj_scanners = JSON.parse(str_scanners)
+
+    # convert str_scanners to json.parse object to do a for each loop through it
 
     $(score_id_selector).tooltipster
       theme: [
@@ -1045,6 +1052,7 @@ $ ->
         '<span id="rl-score-hover">' + rl_score + '/' + rl_count + '</span></td></tr>' +
         '<tr class="second"><td class="left">AV Vendor</td><td class="right">Results</td></tr></table>' +
         '<table class="rl-content">' +
+#        '<tr><td>' + obj_scanners[0] + '</td></tr>' +
         '<tr><td>' + str_scanners + '</td></tr>' +
         '</table>'
 
