@@ -28,7 +28,7 @@ window.research_data = (sha256_hash) ->
 
 ########### SAMPLE ZOO STATUS ############
 window.get_zoo_status = (sha256_hash) ->
-  # check SHA256 agaainst Sample Zoo
+  # check SHA256 against Sample Zoo
   $('#zoo-loader').show()
   std_msg_ajax(
     method: 'GET'
