@@ -1018,26 +1018,37 @@ $ ->
 
 
 
+# dbinebri: build the entire rl html table to load into the tooltip above
 $ ->
 
-  # build the entire rl html table to load into the tooltip above
   window.rl_build_tooltip = (score_id_selector, scanner_list, rl_score, rl_count) ->
 
-    # first, get the parameters passed in here and clean up the scanners list
+    i = 0
+    html_list = ""
+    arr_scanners = []
+
     score_id_selector = '#rl-score-id-' + score_id_selector
 
-    #  scanner_list IS A STRING HERE, convert to an object to build ROWS out of each object
-    str_scanners = scanner_list
-    str_scanners = str_scanners.substring(1, str_scanners.length-1)
-    str_scanners = str_scanners.replace(/&quot;/g,'"')
-    str_scanners = str_scanners.replace(/=&gt;/g,':')
-#    str_scanners = str_scanners.push('}')
-#    str_scanners = str_scanners.unshift('{')
+    #  scanner_list IS A STRING HERE
+    scanners_list = scanner_list  # scanners_list is a string at this point
+#    console.log scanners_list
 
-    console.log str_scanners
-#    obj_scanners = JSON.parse(str_scanners)
+    scanners_list = scanners_list.substring(1, scanners_list.length - 1)  # remove the open close brackets
+    scanners_list = scanners_list.replace(/&quot;/g,'"')
+    scanners_list = scanners_list.replace(/=&gt;/g,':')
+    scanners_list = scanners_list.replace(/"/g,'')  # remove the extraneous quotation marks
+    scanners_list = scanners_list.replace(/{/g,'')  # remove the extraneous quotation marks
+    scanners_list = scanners_list.replace(/name:/g,'')  # remove the extraneous quotation marks
+    scanners_list = scanners_list.replace(/result:/g,'')  # remove the extraneous quotation marks
 
-    # convert str_scanners to json.parse object to do a for each loop through it
+    arr_scanners = scanners_list.split("}, ")
+
+    $(arr_scanners).each ->
+      curr_array = []
+      curr_array = this.split(', ')
+
+      html_list += '<tr><td class="left">' + curr_array[0] + '</td><td class="right rl-scanner-mal">' + curr_array[1] + '</td></tr>'
+
 
     $(score_id_selector).tooltipster
       theme: [
@@ -1066,7 +1077,7 @@ $ ->
         '<tr class="second"><td class="left">AV Vendor</td><td class="right">Results</td></tr></table>' +
         '<table class="rl-content">' +
 #        '<tr><td>' + obj_scanners[0] + '</td></tr>' +
-        '<tr><td>' + str_scanners + '</td></tr>' +
+        '<tr><td>' + html_list + '</td></tr>' +
         '</table>'
 
     $(score_id_selector).tooltipster('content', rl_hover_table)
