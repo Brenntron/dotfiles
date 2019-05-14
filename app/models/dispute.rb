@@ -293,7 +293,7 @@ class Dispute < ApplicationRecord
       response[:is_dupe] = true
       response[:all_resolved] = false
     elsif candidates.present? && all_resolved == true
-      best_candidate = candidates.sort_by {|candidate| candidate.id}.last
+      best_candidate = candidates.sort_by {|candidate| candidate.id}.first
       response[:authority] = best_candidate
       response[:is_dupe] = true
       response[:all_resolved] = true
@@ -303,6 +303,12 @@ class Dispute < ApplicationRecord
 
     response
 
+  end
+
+  def self.manage_all_resolved_duplicate_dispute(dispute, authority_dispute)
+    dispute.related_id = authority_dispute.id
+    dispute.related_at = Time.now
+    dispute.save!
   end
 
   def self.manage_duplicate_dispute(dispute, authority_dispute, new_entries_ips, new_entries_urls, source_key)
@@ -495,9 +501,7 @@ class Dispute < ApplicationRecord
           manage_duplicate_dispute(new_dispute, response[:authority], new_entries_ips, new_entries_urls, message_payload["source_key"] )
           return
         elsif response[:is_dupe] == true && response[:all_resolved] == true
-          new_dispute.related_id = response[:authority].id
-          new_dispute.related_at = Time.now
-          new_dispute.save!
+          manage_all_resolved_duplicate_dispute(new_dispute, response[:authority])
         end
 
         #IPS and URL/DOMAIN entries are almost virtually the same, maybe this is worthy of refactoring into it's own method.
