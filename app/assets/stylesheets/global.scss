@@ -9315,3 +9315,8 @@ div[aria-describedby='create-detection-dialog'] {
   border-bottom: solid 1px darken($content-bg-color, 10%);
 }
 
+.create-new-run-button {
+  background-image: url(/assets/icon_sandbox2.svg);
+  background-position: 6px center;
+  padding-left: 15px;
+}

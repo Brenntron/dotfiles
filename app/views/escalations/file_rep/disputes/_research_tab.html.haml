@@ -25,6 +25,10 @@
         %label.toolbar-section-label Data
         %button.toolbar-button.sync-button#file-rep-sync-button.esc-tooltipped{title: 'Refresh Data'}
           %span.toolbar-button-text Refresh Data
+      %div
+        %label.toolbar-section-label Reports
+        %button.toolbar-button.esc-tooltipped.create-new-run-button{title: 'Create New Sandbox Run', onclick: 'run_sample_in_sandbox()'}
+          %span.toolbar-button-text Create New Sandbox Run
 
 .row
   .col-xs-12.col-sm-4#sandbox-report-wrapper
@@ -85,11 +89,6 @@
         .row.collapse_area.collapse.in#collapse_sb_json
           .col-xs-12.report-size
             %pre.data-report-code-content#sb-full
-        %hr.thin
-        .row
-          .col-xs-12
-            %button.primary#sandbox-rerun-button{onclick: 'rerun_status()'}
-              Rerun Sample in Sandbox
     .sb-data-missing.text-center
       %span.sample-present-false
       %div.data-report-wrapper
