@@ -7,6 +7,9 @@ $ ->
       keyboard: false,
     })
 
+    $('#loader-modal').show()
+    $('.modal-backdrop').show()
+
     shas_input_type = $('#shas_type_text').attr('name')
     shas_full_text = $('#shas_list').val()
     disposition_suggested = $('#disposition_suggested').val()
@@ -25,8 +28,10 @@ $ ->
         shas_input_type: shas_input_type
       success: (response) ->
         $('#loader-modal').hide()
+        $('.modal-backdrop').hide()
         std_msg_success('File Reputation Ticket created.', [], reload: true)
       error: (response) ->
         $('#loader-modal').hide()
+        $('.modal-backdrop').hide()
         std_msg_error('Unable to create File Reputation Ticket', [response.responseJSON.message], reload: false)
     )

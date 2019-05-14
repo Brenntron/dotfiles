@@ -143,7 +143,7 @@ class FileReputationDispute < ApplicationRecord
     end
   end
 
-  def self.create_through_form(bugzilla_rest_session, sha256_hash, disposition_suggested, assignee)
+  def self.create_through_form(bugzilla_rest_session, sha256_hash, disposition_suggested, assignee, current_user)
 
     summary = "New File Rep Dispute generated at #{DateTime.now.utc.strftime("%Y-%m-%d %H:%M")}"
 
@@ -166,12 +166,17 @@ class FileReputationDispute < ApplicationRecord
 
     file_rep = FileReputationDispute.new
 
+    customer = Customer.where(name: 'Dispute Analyst').first
+    file_size =
+
     attributes = {
         id: bug_proxy.id,
         file_name: 'N/A',
         sha256_hash: sha256_hash,
         disposition_suggested: disposition_suggested,
-        user_id: User.where(cvs_username: assignee).first.id
+        user_id: User.where(cvs_username: assignee).first.id,
+        submitter_type: 'Internal',
+        customer_id: customer
     }
 
     file_rep.assign_attributes(attributes)
@@ -447,6 +452,10 @@ class FileReputationDispute < ApplicationRecord
     update_ticode_certs
     update_reversing_labs_score
     update_sandbox_score
+  end
+
+  def sandbox_data
+    file_size = FileReputationDispute.sandbox_disposition(self.sha256_hash)
   end
 
   def ack_create(envelope_params, sender_params)

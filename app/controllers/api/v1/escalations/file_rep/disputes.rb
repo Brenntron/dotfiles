@@ -46,7 +46,8 @@ module API
                   FileReputationDispute.create_through_form(bugzilla_rest_session,
                                                             sha256,
                                                             params[:disposition_suggested],
-                                                            params[:assignee])
+                                                            params[:assignee],
+                                                            current_user)
                 end
 
                 render json: {status: 'Success'}
