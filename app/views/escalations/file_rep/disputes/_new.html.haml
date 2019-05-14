@@ -39,15 +39,12 @@
     %input.form-control#assignee{name: 'assignee', list: 'assignee-list', required: true, value: "#{current_user.cvs_username}"}
     %datalist#assignee-list
 
-  %hr.thin
-
   .form-group.text-center
     -if bugzilla_rest_logged_in?(bugzilla_rest_session)
       %button.primary#file_rep_submit{value: 'submit', type: 'submit'}
         Create Ticket
     -else
-
       %button.primary#file_rep_submit{value: 'submit', type: 'submit', disabled: true}
         Create Ticket
-  .form-group.text-center
-    %label.content-label-sm You must be logged into Bugzilla to create a new ticket
+      .form-group.text-center
+        %label.content-label-sm You must be logged into Bugzilla to create a new ticket
