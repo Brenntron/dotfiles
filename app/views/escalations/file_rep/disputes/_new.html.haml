@@ -42,5 +42,12 @@
   %hr.thin
 
   .form-group.text-center
-    %button.primary#file_rep_submit{value: 'submit', type: 'submit'}
-      Create Ticket
+    -if bugzilla_rest_logged_in?(bugzilla_rest_session)
+      %button.primary#file_rep_submit{value: 'submit', type: 'submit'}
+        Create Ticket
+    -else
+
+      %button.primary#file_rep_submit{value: 'submit', type: 'submit', disabled: true}
+        Create Ticket
+  .form-group.text-center
+    %label.content-label-sm You must be logged into Bugzilla to create a new ticket
