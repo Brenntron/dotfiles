@@ -29,10 +29,9 @@
   .form-group
     %label.content-label-sm Suggested Disposition
     %select.form-control#disposition_suggested
-      %option{:selected => 'selected'} Option 1
-      %option Option 2
-      %option Option 3
-      %option Option 4
+      %option{:selected => 'selected'} Clean
+      %option Common
+      %option Malicious
   .form-group
     %label.content-label-sm Assignee
     %input.form-control#assignee{name: 'assignee', list: 'assignee-list', required: true, value: "#{current_user.cvs_username}"}
