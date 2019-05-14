@@ -9,7 +9,7 @@ class FileReputationApi::SampleZoo
 
   def self.sha256_lookup(sha256)
     cache_key = "sample_zoo:#{sha256}"
-    if Rails.cache.read(cache_key).blank?
+    if Rails.env.development? or Rails.cache.read(cache_key).blank?
       call_request_parsed(:get, "/samples/_search?q=SHA256:#{sha256}")
     else
       Rails.cache.read(cache_key)
@@ -32,9 +32,4 @@ class FileReputationApi::SampleZoo
 
     {in_zoo: in_zoo}
   end
-
-  #def self.flag(sha256_hash)
-  #  api_response = FileReputationApi::SampleZoo.sha256_lookup(sha256_hash)
-  #  FileReputationApi::SampleZoo.query_from_data(api_response)
-  #end
 end

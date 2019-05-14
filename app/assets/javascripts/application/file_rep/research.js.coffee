@@ -37,15 +37,13 @@ window.get_zoo_status = (sha256_hash) ->
     success: (response) ->
 
       $('#zoo-loader').hide()
-      #  %span.loader-msg Loading data...
-      #.zoo-data-present{'data-zoo-status': 'YES'}
       zoo_present = $('.zoo-data-present').find('span')
       zoo_missing = $('.zoo-data-notfound').find('span')
 
       unless response.json.error?
         if response.json.in_zoo == true
           zoo_present.addClass('glyphicon')
-          zoo_present.addClass('glyphicon-remove')
+          zoo_present.addClass('glyphicon-ok')
         else
           zoo_missing.addClass('glyphicon')
           zoo_missing.addClass('glyphicon-remove')
