@@ -285,16 +285,11 @@ class Dispute < ApplicationRecord
       all_resolved = false
     end
 
-    if candidates.present? && all_resolved == false
+    if candidates.present?
       best_candidate = candidates.sort_by {|candidate| candidate.id}.first
       response[:authority] = best_candidate
       response[:is_dupe] = true
-      response[:all_resolved] = false
-    elsif candidates.present? && all_resolved == true
-      best_candidate = candidates.sort_by {|candidate| candidate.id}.first
-      response[:authority] = best_candidate
-      response[:is_dupe] = true
-      response[:all_resolved] = true
+      response[:all_resolved] = all_resolved
     else
       response[:is_dupe] = false
     end
