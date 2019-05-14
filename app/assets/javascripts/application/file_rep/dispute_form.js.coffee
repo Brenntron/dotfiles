@@ -3,6 +3,10 @@ $ ->
   $('#new-file-rep-form').on 'submit', (e) ->
     e.preventDefault()
 
+    $('#loader-modal').modal({
+      keyboard: false,
+    })
+
     shas_input_type = $('#shas_type_text').attr('name')
     shas_full_text = $('#shas_list').val()
     disposition_suggested = $('#disposition_suggested').val()
@@ -20,8 +24,9 @@ $ ->
         assignee: assignee,
         shas_input_type: shas_input_type
       success: (response) ->
+        $('#loader-modal').hide()
         std_msg_success('File Reputation Ticket created.', [], reload: true)
       error: (response) ->
-        debugger
+        $('#loader-modal').hide()
         std_msg_error('Unable to create File Reputation Ticket', [response.responseJSON.message], reload: false)
     )
