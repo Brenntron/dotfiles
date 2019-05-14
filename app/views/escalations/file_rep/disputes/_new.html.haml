@@ -32,6 +32,8 @@
       %option{:selected => 'selected'} Clean
       %option Common
       %option Malicious
+      %option Unknown
+      %option Unseen
   .form-group
     %label.content-label-sm Assignee
     %input.form-control#assignee{name: 'assignee', list: 'assignee-list', required: true, value: "#{current_user.cvs_username}"}
