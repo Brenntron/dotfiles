@@ -298,7 +298,20 @@ $ ->
 
 
   window.build_advanced_data = () ->
-    form = $('#filerep_disputes-advanced-search-form')
+    form = $('#filerep_disputes-advanced-search-form .form-group')
+
+    #  if form groups are hidden, wipe their values
+    $('#filerep_disputes-advanced-search-form .form-group.hidden').find('input').val('')
+
+    if $('#tg-score-input').closest('.form-group').hasClass('.hidden')
+      threatgrid_score = {}
+    if $('#sandbox_score-input').closest('.form-group').hasClass('.hidden')
+      sandbox_score = {}
+    if $('time_submitted-input').closest('.form-group').hasClass('.hidden')
+      last_updated = {}
+    if $('last-updated-input').closest('.form-group').hasClass('.hidden')
+      time_submitted = {}
+
     localStorage.search_type = 'advanced'
     localStorage.search_name = form.find('input[name="search_name"]').val()
     localStorage.search_conditions = JSON.stringify(
