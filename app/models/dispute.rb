@@ -281,10 +281,8 @@ class Dispute < ApplicationRecord
       end
     end
 
-    candidates.each do |candidate|
-      if candidate.status != RESOLVED
-        all_resolved = false
-      end
+    if candidates.find{ |candidate| candidate.status != RESOLVED }
+      all_resolved = false
     end
 
     if candidates.present? && all_resolved == false
