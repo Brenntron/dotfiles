@@ -167,7 +167,6 @@ class FileReputationDispute < ApplicationRecord
     file_rep = FileReputationDispute.new
 
     customer = Customer.where(name: 'Dispute Analyst').first
-    file_size =
 
     attributes = {
         id: bug_proxy.id,
@@ -183,7 +182,14 @@ class FileReputationDispute < ApplicationRecord
 
     if file_rep.save!
       file_rep.update_scores
+      file_rep.populate_fields_from_rl
     end
+  end
+
+  def populate_fields_from_rl
+    api_response = FileReputationApi::ReversingLabs.get_creation_data(self.sha256_hash)
+
+    self.update(file_size: api_response[:file_size], sample_type: api_response[:sample_type])
   end
 
   def self.save_named_search(search_name, params, user:, project_type:)
