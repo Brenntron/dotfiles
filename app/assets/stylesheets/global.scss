@@ -9376,45 +9376,13 @@ table.rl-content {
   }
 }
 
-// index, this is the rl score in the datatable on index, pad-left to account for the down caret
-.rl-hover {
-  padding-left: 8px;
-}
-
-.rl-hover-error {
-  padding: 10px;
-}
-
-// this is a wrapper for loading and error messages in the rl hover tooltip
-.rl-hover-loader {
-  padding: 0 10px 10px;
-
-  .rl-cog {
-    position: relative;
-    top: 7px;
-    width: 22px;
-    height: 22px;
-    transform-origin: 50% 50%;
-    animation: rotate_rl_cog 2s linear infinite;
+// index, special underline fix for rl hover, normal underline is too tight
+.rl-hover a {
+  border-bottom: dotted 1px lighten($table-dark-body, 40%);
+  &:hover {
+    text-decoration: none;
+    color: $table-dark-body;
   }
-
-  @-webkit-keyframes rotate_rl_cog {
-    from {
-      transform: rotate(0deg);
-    }
-    to {
-      transform: rotate(360deg);
-    }
-  }
-}
-
-// this is the down caret on index page in the datatable
-.rl-more {
-  position: relative;
-  top: 2px;
-  right: 2px;
-  width: 15px;
-  height: 15px;
 }
 
 
@@ -9432,4 +9400,5 @@ table.rl-content {
 // make sure down caret on index RL column doesn't break / wrap
 .rl-col {
   min-width: 70px !important;
+  text-align: center;
 }

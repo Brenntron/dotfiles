@@ -654,11 +654,11 @@ $ ->
         data: 'reversing_labs_score'
         className: 'rl-col'
         render: (data, type, full, meta) ->
-          if data
-            # dbinebri: build the RL hover tooltip for each row on page load, hidden until hover
+          if full['reversing_labs_count'] == '0'
+            return '<span class="missing-data">Not in RL</span>'
+          else if data
             rl_build_tooltip(full['id'], full['reversing_labs_scanners'], data, full['reversing_labs_count'])
-
-            return '<span class="score-col text-center rl-hover" ' + 'id="rl-score-id-' + full['id'] + '" data-tooltip-content="Loading...">' + data + ' / ' + full['reversing_labs_count'] + '&nbsp;<img src="../../assets/icon_down_arrow_grey.svg" class="rl-more">' + '</span>'
+            return '<span class="score-col text-center rl-hover" ' + 'id="rl-score-id-' + full['id'] + '"><a>' + data + ' / ' + full['reversing_labs_count'] + '</a></span>'
           else
             return ''
       }
@@ -682,7 +682,6 @@ $ ->
             return ''
       }
       {
-#        Submitter Type
         data: null
         render: () ->
           return "Submitter Type"
@@ -1018,13 +1017,11 @@ $ ->
 
 
 
-# dbinebri: build the entire rl html table to load into the tooltip above
 $ ->
-
+  # dbinebri: build the entire rl html table to load into the tooltip on index
   window.rl_build_tooltip = (score_id_selector, scanner_list, rl_score, rl_count) ->
     score_id_selector = '#rl-score-id-' + score_id_selector
 
-    # if there is no scanner data
     if rl_count == "0"
       $(score_id_selector).tooltipster
         theme: [
@@ -1032,30 +1029,26 @@ $ ->
           'tooltipster-borderless-customized'
         ]
         side: 'bottom'
-        content: 'An error has occurred with this SHA.'
+        content: 'Not in Reversing Labs.'
         trigger: 'hover'
 
     else
-      # else build a normal tooltip for each sha on page load
-      scanners_list = scanner_list  # scanners_list is a string at this point
-      scanners_list = scanners_list.replace(/&quot;/g,'"')  # file_rep_datatable.rb is doing a .to_json but it needs a fix
+      scanners_list = scanner_list
+      # file_rep_datatable.rb is doing a .to_json but it needs a fix
+      scanners_list = scanners_list.replace(/&quot;/g,'"')
 
       obj_scanners = JSON.parse(scanners_list)
-  #    console.log obj_scanners
 
-      # init the mal and unknown arrays
       mal_results = []
       unk_results = []
 
       # each scanner entry, this is where to handle the logic for each scanner
       $(obj_scanners).each ->
-
         if this.result == ""
           unk_results.push(this)
         else
           mal_results.push(this)
 
-      # init the hover table for rl
       rl_hover_table =
         '<table class="rl-header"><tr class="top"><td colspan="2">Reversing Labs Details ' +
           '<span id="rl-score-hover">' + rl_score + '/' + rl_count + '</span></td></tr>' +
@@ -1075,7 +1068,7 @@ $ ->
           'tooltipster-rl-hover'
         ]
         side: 'bottom'
-        content: 'Nothing here'
+        content: ''
         contentAsHTML: true
         autoClose: false
         trigger: 'custom'
