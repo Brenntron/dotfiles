@@ -26,6 +26,8 @@
               %input{type: 'checkbox', checked: true, id: 'owner-checkbox'} Owner
             %li.toggle-vis{'data-column':'9'}
               %input{type: 'checkbox', checked: true, id: 'time-submitted-checkbox'} Time Submitted
+            %li.toggle-vis{'data-column':'18'}
+              %input{type: 'checkbox', checked: true, id: 'last-updated-checkbox'} Last Updated
 
           %ul
             %li.toggle-vis{'data-column':'10'}
@@ -414,7 +416,7 @@
               .button-row-center
                 %button.primary.dropdown-submit-button{type: 'button', onclick: 'submit_bulk_reptool()', disabled: true}
                   Submit Changes
-  %div
+  %div.line-up
     %label.toolbar-section-label
       File
     %form#disputes-index-export-form{action: escalations_webrep_disputes_path(format: :xlsx), method: :get}
@@ -422,4 +424,7 @@
       %button.toolbar-button.export-button.esc-tooltipped{title: 'Export to CSV'}
         %span.toolbar-button-text
           Export to CSV
+    %button.toolbar-button.export-button.esc-tooltipped{title: 'Export Selected to CSV', onclick: 'webrep_export_selected_rows();'}
+      %span.toolbar-button-text
+        Export Selected to CSV
 

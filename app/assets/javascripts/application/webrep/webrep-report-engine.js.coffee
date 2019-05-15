@@ -60,9 +60,9 @@ window.change_reported_week = (new_report_range_from, new_report_range_to)->
   localStorage.setItem 'webrep_report_range_from', new_report_range_from
   localStorage.setItem 'webrep_report_range_to', new_report_range_to
 
-  window.refresh_visable_report_tab()
+  window.refresh_visible_report_tab()
 
-window.refresh_visable_report_tab = ()->
+window.refresh_visible_report_tab = ()->
   if $('#dashboard-tab-list').length > 0
     user_id = $("#user_id").val()
     window.build_graph_ticket_entries_submitter()
@@ -260,7 +260,8 @@ window.set_initial_date_span = () ->
 
   $('#tickets_date_range').val(prettyFromDate + " - " + prettyToDate)
 
-  window.refresh_visable_report_tab()
+  # dbinebri: the line below re-renders the charts 3X on page load, leave commented out
+  # window.refresh_visible_report_tab()
   set_date_label()
 
 window.build_graph_ticket_entries_submitter = () ->
@@ -1497,7 +1498,7 @@ $ ->
       localStorage.setItem 'webrep_report_range_to', picker.endDate
       user_id = $("#user_id").val()
       set_date_label()
-      window.refresh_visable_report_tab()
+      window.refresh_visible_report_tab()
 
     $('#ticket-view-shortcut').click ->
       if this.innerHTML == "View Last Week's Tickets"
@@ -1524,7 +1525,7 @@ $ ->
 
       user_id = $("#user_id").val()
       set_date_label()
-      window.refresh_visable_report_tab()
+      window.refresh_visible_report_tab()
 
-    window.refresh_visable_report_tab()
+    window.refresh_visible_report_tab()
     window.populate_top_banner()

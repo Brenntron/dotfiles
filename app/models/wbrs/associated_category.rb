@@ -1,7 +1,7 @@
 # A category as associated with a prefix.
 #
-# I am trying very hard not to perpetuate the term rule.
-# Our essential concern is which categories are assocated with which prefixes.
+# I am trying very hard not to perpetuate the term "rule" for prefix-category link.
+# Our essential concern is which categories are associated with which prefixes.
 #
 # A Prefix object can return its categories, however, in order to get the confidence value of the association,
 # we cannot represent this simply with a Category class.
