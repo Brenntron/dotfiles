@@ -9,7 +9,7 @@ class FileReputationDispute < ApplicationRecord
   has_many :digital_signers
   has_many :file_rep_comments
 
-  delegate :name, :company, :company_id, to: :customer, allow_nil: true, prefix: true
+  delegate :name, :email, :company, :company_name, :company_id, to: :customer, allow_nil: true, prefix: true
 
   STATUS_NEW                = 'NEW'
   STATUS_ASSIGNED           = 'ASSIGNED'
@@ -566,10 +566,11 @@ class FileReputationDispute < ApplicationRecord
   end
 
   def self.export_xlsx(search_params_json, current_user:)
-    fields = %w{id sha256_hash file_name file_size disposition_suggested source platform
-                status resolution disposition sample_type detection_name detection_created_at in_zoo
-                sandbox_score threatgrid_score reversing_labs_score reversing_labs_count
-                customer_name company_name}
+    fields = %w{id status resolution file_name sha256_hash file_size sample_type
+                disposition detection_name detection_created_at
+                in_zoo sandbox_score threatgrid_score reversing_labs_score reversing_labs_count
+                disposition_suggested created_at sample_type
+                customer_name company_name customer_email user_id}
     search_params = JSON.parse(search_params_json)
 
     file_rep_disputes = robust_search(search_params['search_type'],
@@ -580,13 +581,12 @@ class FileReputationDispute < ApplicationRecord
     workbook = RubyXL::Workbook.new
     worksheet = workbook[0]
 
-    fields.each_with_index do |field_name, col_index|
-      case field_name
-      when 'id'
-        worksheet.add_cell(0, col_index, 'Case ID')
-      else
-        worksheet.add_cell(0, col_index, field_name)
-      end
+    %w{Case\ ID Status Resolution File\ Name SHA256 File\ Size Sample\ Type
+       AMP\ Disposition AMP\ Detection\ Name AMP\ Detection\ Created
+       In\ Zoo Sandbox\ Score TG\ Score Reversing\ Labs\ Hits RL\ Scanners\ Total
+       Suggested\ Disposition Time\ Submitted Submitter\ Type
+       Customer\ Name Customer\ Organization Customer\ email Assignee}.each_with_index do |field_name, col_index|
+      worksheet.add_cell(0, col_index, field_name)
       worksheet.sheet_data[0][col_index].change_font_bold(true)
     end
 
@@ -595,10 +595,20 @@ class FileReputationDispute < ApplicationRecord
 
         cell_data =
             case field_name
+            when 'detection_created_at'
+              fr_dispute.detection_created_at&.utc&.iso8601
+            when 'in_zoo'
+              fr_dispute.in_zoo? ? 'True' : 'False'
+            when 'created_at'
+              fr_dispute.created_at.utc.iso8601
             when 'customer_name'
               fr_dispute.customer_name
+            when 'customer_email'
+              fr_dispute.customer_email
             when 'company_name'
-              fr_dispute.customer_company
+              fr_dispute.customer_company_name
+            when 'user_id'
+              fr_dispute.user.cvs_username
             else
               fr_dispute.attributes[field_name]
             end
