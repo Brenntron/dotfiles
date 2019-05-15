@@ -569,7 +569,7 @@ class FileReputationDispute < ApplicationRecord
     fields = %w{id status resolution file_name sha256_hash file_size sample_type
                 disposition detection_name detection_created_at
                 in_zoo sandbox_score threatgrid_score reversing_labs_score reversing_labs_count
-                disposition_suggested created_at sample_type
+                disposition_suggested created_at submitter_type
                 customer_name company_name customer_email user_id}
     search_params = JSON.parse(search_params_json)
 
