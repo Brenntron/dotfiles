@@ -7693,8 +7693,11 @@ td.text-center span {
     background-position: 10px center;
     color: white;
     font-size: 12px;
-    padding: 10px 20px 10px 35px;
-
+    padding: 12px 20px 12px 35px;
+    transition: background-color 0.2s;
+    &:hover {
+      background-color: darken($primary-section-color, 10%)
+    }
   }
 
   .copycat-clear-btn {
@@ -7702,7 +7705,11 @@ td.text-center span {
     background-size: 22px;
     background-position: 10px center;
     font-size: 12px;
-    padding: 10px 20px 10px 45px;
+    padding: 12px 20px 12px 45px;
+    transition: background-color 0.2s;
+    &:hover {
+      background-color: darken($nav-toolbar-color, 10%)
+    }
   }
 }
 
