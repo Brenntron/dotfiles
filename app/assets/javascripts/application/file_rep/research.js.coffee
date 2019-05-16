@@ -378,17 +378,6 @@ get_run_status = window.get_run_status = (sha256_hash) ->
   )
 
 
-########### RERUN SANDBOX SAMPLE ############
-window.rerun_status = (sha256_hash) ->
-  # rerun the sample and scroll to top of research tab
-  window.get_run_status(sha256_hash)
-  window.scrollTo(0,320)
-
-  # make it clear the sample is re-running
-  $('#sb-loader').addClass('create-new-run')
-  $('#sandbox-rerun-button').blur()
-
-
 
 ##### UPDATE FILE REP DATA #####
 # Refresh items from the reports that we store in the db & save them
