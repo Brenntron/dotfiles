@@ -605,9 +605,12 @@ $ ->
             return data
       }
       {
-        data: null
-        render: () ->
-          return '<span>Detection created</span>'
+        data: 'detection_created_at'
+        render: (data) ->
+          if data
+            return moment(new Date(data)).format('MMM D, YYYY h:mm A')
+          else
+            return ''
       }
       {
         data: 'in_zoo'
@@ -672,10 +675,8 @@ $ ->
             return ''
       }
       {
-#        Submitter Type
-        data: null
-        render: () ->
-          return "Submitter Type"
+        data: 'submitter_type'
+
       }
       { data: 'customer_name' }
       { data: 'customer_company_name' }
