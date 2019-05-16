@@ -63,7 +63,8 @@ module API
             end
             get "/sandbox_report_html/:run_id/:sha256_hash" do
               api_response = FileReputationApi::Sandbox.full_report_html(params[:sha256_hash], params[:run_id])
-              render json: api_response
+              # render json: api_response
+              render api_response[:data].body.force_encoding("ISO-8859-1").encode("UTF-8")
             end
           end
         end
