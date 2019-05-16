@@ -298,7 +298,20 @@ $ ->
 
 
   window.build_advanced_data = () ->
-    form = $('#filerep_disputes-advanced-search-form')
+    form = $('#filerep_disputes-advanced-search-form .form-group')
+
+    #  if form groups are hidden, wipe their values
+    $('#filerep_disputes-advanced-search-form .form-group.hidden').find('input').val('')
+
+    if $('#tg-score-input').closest('.form-group').hasClass('.hidden')
+      threatgrid_score = {}
+    if $('#sandbox_score-input').closest('.form-group').hasClass('.hidden')
+      sandbox_score = {}
+    if $('time_submitted-input').closest('.form-group').hasClass('.hidden')
+      last_updated = {}
+    if $('last-updated-input').closest('.form-group').hasClass('.hidden')
+      time_submitted = {}
+
     localStorage.search_type = 'advanced'
     localStorage.search_name = form.find('input[name="search_name"]').val()
     localStorage.search_conditions = JSON.stringify(
@@ -592,9 +605,12 @@ $ ->
             return data
       }
       {
-        data: null
-        render: () ->
-          return '<span>Detection created</span>'
+        data: 'detection_created_at'
+        render: (data) ->
+          if data
+            return moment(new Date(data)).format('MMM D, YYYY h:mm A')
+          else
+            return ''
       }
       {
         data: 'in_zoo'
@@ -659,10 +675,8 @@ $ ->
             return ''
       }
       {
-#        Submitter Type
-        data: null
-        render: () ->
-          return "Submitter Type"
+        data: 'submitter_type'
+
       }
       { data: 'customer_name' }
       { data: 'customer_company_name' }
@@ -698,6 +712,8 @@ $ ->
       $(checkbox).prop 'checked', !checkbox.prop('checked')
       return
     return
+
+
 
   $(document).on 'click ','.file_rep_sha', (e) ->
 #      copy SHA on click
@@ -1006,3 +1022,57 @@ $ ->
       error: (response) ->
         std_api_error(response, "Note could not be updated.", reload: false)
     )
+
+
+  $(document).ready ->
+
+    $('.toggle-vis-file-rep').on "click", ->
+      data = {}
+      data['id'] = $("#id-checkbox").is(':checked')
+      data['status'] = $("#status-checkbox").is(':checked')
+      data['resolution'] = $("#resolution-checkbox").is(':checked')
+      data['file-name'] = $("#file-name-checkbox").is(':checked')
+      data['sha256'] = $("#sha256-checkbox").is(':checked')
+      data['file-size'] = $("#file-size-checkbox").is(':checked')
+      data['sample-type'] = $("#sample-type-checkbox").is(':checked')
+      data['amp-disp'] = $("#amp-disp-checkbox").is(':checked')
+      data['amp-name'] = $("#amp-name-checkbox").is(':checked')
+      data['amp-date'] = $("#amp-date-checkbox").is(':checked')
+      data['in-zoo'] = $("#in-zoo-checkbox").is(':checked')
+      data['sandbox-score'] = $("#sandbox-score-checkbox").is(':checked')
+      data['threatgrid-score'] = $("#threatgrid-score-checkbox").is(':checked')
+      data['reversing-labs'] = $("#reversing-labs-checkbox").is(':checked')
+      data['suggested-disp'] = $("#suggested-disp-checkbox").is(':checked')
+      data['time-submitted'] = $("#time-submitted-checkbox").is(':checked')
+      data['submitter-type'] = $("#submitter-type-checkbox").is(':checked')
+      data['customer-name'] = $("#customer-name-checkbox").is(':checked')
+      data['customer-org'] = $("#customer-org-checkbox").is(':checked')
+      data['customer-email'] = $("#customer-email-checkbox").is(':checked')
+      data['assignee'] = $("#assignee-checkbox").is(':checked')
+
+
+      std_msg_ajax(
+        url: "/escalations/api/v1/escalations/user_preferences/update"
+        method: 'POST'
+        data: {data, name: 'FileRepColumns'}
+        dataType: 'json'
+        success: (response) ->
+      )
+
+    if window.location.pathname == '/escalations/file_rep/disputes'
+      std_msg_ajax(
+        method: 'POST'
+        url: "/escalations/api/v1/escalations/user_preferences/"
+        data: {name: 'FileRepColumns'}
+        success: (response) ->
+          response = JSON.parse(response)
+
+          $.each response, (column, state) ->
+            if state == true
+              $("##{column}-checkbox").prop('checked', true)
+              $('#file-rep-datatable').DataTable().column("##{column}").visible true
+            else
+              $("##{column}-checkbox").prop('checked', false)
+              $('#file-rep-datatable').DataTable().column("##{column}").visible false
+
+      )
