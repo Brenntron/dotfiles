@@ -1468,12 +1468,18 @@ fieldset.tight {
   background-color: $faint-alt-highlight !important;
 }
 
-.selectize-control.multi .selectize-input {
-
-}
-
 .selectize-control.multi .selectize-input > div {
   margin-top: 2px ;
+}
+
+// small override tweaks below for consistent AC selectize branding, need !important flags
+.selectize-control.multi .selectize-input .item {
+  margin: 5px 2px !important;
+}
+
+.selectize-control.multi .selectize-input [data-value].active {
+  background: darken($primary-section-color, 25%) !important;
+  border: none;
 }
 
 .form-col-list {
@@ -7662,6 +7668,7 @@ td.text-center span {
 .copycat_tool_dialog {
   min-width: 400px;
   min-height: 135px;
+  font-family: 'Open Sans', sans-serif !important;
 }
 
 .copycat_tool_dialog .ui-dialog-titlebar {
@@ -7673,6 +7680,7 @@ td.text-center span {
   padding-left: 40px;
   border: none;
   width: 100%;
+  font-weight: bold;
 }
 
 #copycat-categories-selectized {
@@ -7686,15 +7694,20 @@ td.text-center span {
   display: flex;
   justify-content: space-evenly;
   padding: 0 25px 15px 25px;
+  font-size: 12px;
+
+  .copycat-paste-btn, .copycat-clear-btn {
+    font-family: 'Open Sans', sans-serif;
+    font-size: 12px;
+    transition: background-color 0.2s;
+  }
 
   .copycat-paste-btn {
     background-color: $primary-section-color;
     background-size: 15px;
     background-position: 10px center;
     color: white;
-    font-size: 12px;
     padding: 12px 20px 12px 35px;
-    transition: background-color 0.2s;
     &:hover {
       background-color: darken($primary-section-color, 10%)
     }
@@ -7704,9 +7717,7 @@ td.text-center span {
     background-color: $nav-toolbar-color;
     background-size: 22px;
     background-position: 10px center;
-    font-size: 12px;
     padding: 12px 20px 12px 45px;
-    transition: background-color 0.2s;
     &:hover {
       background-color: darken($nav-toolbar-color, 10%)
     }
@@ -8301,4 +8312,9 @@ hr.thin.form-divider {
 .line-up{
   display: flex;
   flex-direction: row;
+}
+
+// dbinebri: small tweak for copycat placeholder text
+.selectize-input #copycat-categories-selectized {
+  font-size: 12px;
 }
