@@ -175,7 +175,7 @@ class FileReputationDispute < ApplicationRecord
         disposition_suggested: disposition_suggested,
         user_id: User.where(cvs_username: assignee).first.id,
         submitter_type: 'Internal',
-        customer_id: customer
+        customer_id: customer.id
     }
 
     file_rep.assign_attributes(attributes)
