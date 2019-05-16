@@ -25,6 +25,10 @@
         %label.toolbar-section-label Data
         %button.toolbar-button.sync-button#file-rep-sync-button.esc-tooltipped{title: 'Refresh Data'}
           %span.toolbar-button-text Refresh Data
+      %div
+        %label.toolbar-section-label Reports
+        %button.toolbar-button.esc-tooltipped.create-new-run-button{title: 'Create New Sandbox Run', onclick: 'run_sample_in_sandbox()'}
+          %span.toolbar-button-text Create New Sandbox Run
 
 .row
   .col-xs-12.col-sm-4#sandbox-report-wrapper

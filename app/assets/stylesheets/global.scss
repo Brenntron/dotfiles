@@ -9293,3 +9293,19 @@ div[aria-describedby='create-detection-dialog'] {
     margin-left: -5px;
   }
 }
+
+
+// dbinebri: adding a little margin for the rerun sandbox button area
+#sandbox-rerun-button {
+  margin: 5px 0;
+}
+
+#collapse_sb_json {
+  margin-bottom: 25px;
+}
+
+.create-new-run-button {
+  background-image: url(/assets/icon_sandbox_report.svg);
+  background-position: 6px center;
+  padding-left: 15px;
+}
