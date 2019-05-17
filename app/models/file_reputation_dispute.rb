@@ -432,7 +432,7 @@ class FileReputationDispute < ApplicationRecord
 
   def update_amp_disposition
     detection = FileReputationApi::Detection.get_bulk(self.sha256_hash)
-    update!(disposition: detection.disposition)
+    update!(disposition: detection.disposition, detection_name: detection.name)
   rescue => except
     Rails.logger.error("Error updating amp disposition on #{self.id} -- #{except.message}")
   end
