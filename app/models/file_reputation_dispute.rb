@@ -447,12 +447,6 @@ class FileReputationDispute < ApplicationRecord
     Rails.logger.error("Error updating sample zoo flag for id #{self.id} -- #{except.message}")
   end
 
-  def update_trifecta
-    update_threadgrid_score
-    update_reversing_labs_score
-    update_sandbox_score
-  end
-
   def update_superfecta
     update_threadgrid_score
     update_reversing_labs_score
