@@ -450,6 +450,8 @@ class Complaint < ApplicationRecord
   def self.get_latest_wbnp_complaints
     begin
 
+      bad_uris = []
+
       all_complaints = Wbrs::RuleUiComplaint.where({:add_channels => [WBNP_CHANNEL], :statuses => ['new']})["data"]
 
       new_complaints = []
@@ -470,6 +472,8 @@ class Complaint < ApplicationRecord
         end
 
       end
+
+      return bad_uris
 
     rescue
       #no wbnp response
@@ -528,7 +532,8 @@ class Complaint < ApplicationRecord
                                      ticket_source: Complaint::SOURCE_RULEUI,
                                      ticket_source_key: rule_ui_complaint["complaint_id"])
 
-    ComplaintEntry.create_complaint_entry(new_complaint, uri, User.where(display_name:"Vrt Incoming").first)
+    #ComplaintEntry.create_complaint_entry(new_complaint, uri, User.where(display_name:"Vrt Incoming").first)
+    ComplaintEntry.create_wbnp_complaint_entry(new_complaint, uri, rule_ui_complaint, User.where(display_name:"Vrt Incoming").first)
 
 
     Wbrs::RuleUiComplaint.assign_tickets({:complaint_ids => [rule_ui_complaint["complaint_id"]], :user => "admatter"})
