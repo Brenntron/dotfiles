@@ -451,6 +451,10 @@ class FileReputationDispute < ApplicationRecord
     Rails.logger.error("Error updating amp disposition on #{self.id} -- #{except.message}")
   end
 
+  def update_in_zoo
+
+  end
+
   # Update scores when refreshing data on show page
   def update_trifecta
     update_threadgrid_score
@@ -465,6 +469,7 @@ class FileReputationDispute < ApplicationRecord
     update_ticode_certs
     update_reversing_labs_score
     update_sandbox_score
+    update_in_zoo
   end
 
   def sandbox_data
