@@ -8,16 +8,16 @@
           Show/Hide Columns
       .dropdown-menu.toolbar-dropdown#file-index-table-show-columns-dropdown{'aria-labelledby': 'file-index-table-show-columns-button'}
         %ul
-          %li.toggle-vis-file-rep{'data-column':'1'}
-            %input{type: 'checkbox', checked: true, id: 'id-checkbox'} Case ID
+          -#%li.toggle-vis-file-rep{'data-column':'1'}
+          -#  %input{type: 'checkbox', checked: true, id: 'id-checkbox'} Case ID
           %li.toggle-vis-file-rep{'data-column':'2'}
             %input{type: 'checkbox', checked: true, id: 'status-checkbox'} Status
           %li.toggle-vis-file-rep{'data-column':'3'}
             %input{type: 'checkbox', id: 'resolution-checkbox'} Resolution
           %li.toggle-vis-file-rep{'data-column':'4'}
             %input{type: 'checkbox', checked: true, id: 'file-name-checkbox'} File Name
-          %li.toggle-vis-file-rep{'data-column':'5'}
-            %input{type: 'checkbox', checked: true, id: 'sha256-checkbox'} SHA256
+          -#%li.toggle-vis-file-rep{'data-column':'5'}
+          -#  %input{type: 'checkbox', checked: true, id: 'sha256-checkbox'} SHA256
           %li.toggle-vis-file-rep{'data-column':'6'}
             %input{type: 'checkbox', checked: true, id: 'file-size-checkbox'} File Size
           %li.toggle-vis-file-rep{'data-column':'7'}
@@ -261,9 +261,9 @@
   %div
     %label.toolbar-section-label
       File
-    %form#disputes-index-export-form{action: escalations_webrep_disputes_path(format: :xlsx), method: :get}
-      = hidden_field_tag('data_json', '{}', id: 'disputes-index-export-data-input')
-      %button.toolbar-button.export-button.esc-tooltipped{title: 'Export to CSV'}
+    %form#disputes-index-export-form{action: escalations_file_rep_disputes_path(format: :xlsx), method: :get}
+      = hidden_field_tag('data_json', '{}', id: 'index-export-data-input')
+      %button.toolbar-button.export-button.esc-tooltipped{onclick: 'export_file_rep();', title: 'Export to CSV'}
         %span.toolbar-button-text
           Export to CSV
 
