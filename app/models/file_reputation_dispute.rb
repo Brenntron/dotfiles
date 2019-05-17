@@ -28,6 +28,10 @@ class FileReputationDispute < ApplicationRecord
   DISPOSITION_COMMON        = 'common'
   DISPOSITION_CLEAN         = 'clean'
 
+  SUBMITTER_TYPE_AC_FORM    = 'AC-Form'
+  SUBMITTER_TYPE_TI_FORM    = 'TI-Form'
+  SUBMITTER_TYPE_TI_API     = 'TI-API'
+
   validates :status, :sha256_hash, :disposition_suggested, presence: true
 
   scope :by_customer, ->(customer_name: nil, customer_email: nil, company_name: nil) {
@@ -174,7 +178,7 @@ class FileReputationDispute < ApplicationRecord
         sha256_hash: sha256_hash,
         disposition_suggested: disposition_suggested,
         user_id: User.where(cvs_username: assignee).first.id,
-        submitter_type: 'Internal',
+        submitter_type: SUBMITTER_TYPE_AC_FORM,
         customer_id: customer.id
     }
 
@@ -447,13 +451,16 @@ class FileReputationDispute < ApplicationRecord
     Rails.logger.error("Error updating amp disposition on #{self.id} -- #{except.message}")
   end
 
+  # Update scores when refreshing data on show page
   def update_trifecta
     update_threadgrid_score
     update_reversing_labs_score
     update_sandbox_score
   end
 
+  # Initialize all data as when creating a dispute record
   def update_scores
+    update_amp_disposition
     update_threadgrid_score
     update_ticode_certs
     update_reversing_labs_score
@@ -533,11 +540,9 @@ class FileReputationDispute < ApplicationRecord
     if new_dispute
       if FileReputationDispute.threaded?
         Thread.new do
-          new_dispute.update_amp_disposition
           new_dispute.update_scores
         end
       else
-        new_dispute.update_amp_disposition
         new_dispute.update_scores
       end
     end
