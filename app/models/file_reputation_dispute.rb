@@ -96,7 +96,7 @@ class FileReputationDispute < ApplicationRecord
   def dispute_emails
     DisputeEmail.where(file_reputation_dispute_id: self.id)
   end
-  
+
   def self.create_action(bugzilla_rest_session, sha256_hash, file_name, file_size, sample_type, disposition_suggested, source, platform, sha256_checksum)
 
     file_rep = FileReputationDispute.new
@@ -437,10 +437,27 @@ class FileReputationDispute < ApplicationRecord
     Rails.logger.error("Error updating amp disposition on #{self.id} -- #{except.message}")
   end
 
+  def update_sample_zoo
+    zoo_response = FileReputationApi::SampleZoo.sha256_lookup(self.sha256_hash)
+    begin
+      attributes = FileReputationApi::SampleZoo.query_from_data(zoo_response)
+      update!(attributes)
+    end
+  rescue => except
+    Rails.logger.error("Error updating sample zoo flag for id #{self.id} -- #{except.message}")
+  end
+
   def update_trifecta
     update_threadgrid_score
     update_reversing_labs_score
     update_sandbox_score
+  end
+
+  def update_superfecta
+    update_threadgrid_score
+    update_reversing_labs_score
+    update_sandbox_score
+    update_sample_zoo
   end
 
   def update_scores
@@ -448,6 +465,7 @@ class FileReputationDispute < ApplicationRecord
     update_ticode_certs
     update_reversing_labs_score
     update_sandbox_score
+    update_sample_zoo
   end
 
   def ack_create(envelope_params, sender_params)
