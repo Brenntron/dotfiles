@@ -1084,3 +1084,13 @@ $ ->
               $('#file-rep-datatable').DataTable().column("##{column}").visible false
 
       )
+
+  window.detection_now = (sha256_hash) ->
+    std_msg_ajax(
+      method: 'GET'
+      url: '/escalations/api/v1/escalations/file_rep/detections/' + sha256_hash + '/now'
+      success: (detection_data) ->
+        debugger
+        alert(detection_data.disposition)
+        alert(detection_data.detection_name)
+    )
