@@ -529,11 +529,17 @@ class Complaint < ApplicationRecord
                                      ticket_source_key: rule_ui_complaint["complaint_id"])
 
     #ComplaintEntry.create_complaint_entry(new_complaint, uri, User.where(display_name:"Vrt Incoming").first)
-    ComplaintEntry.create_wbnp_complaint_entry(new_complaint, uri, rule_ui_complaint, User.where(display_name:"Vrt Incoming").first)
+    category_data = ComplaintEntry.get_category_data(uri)
 
+    if category_data.empty?
+      primary_category = nil
+    else
+      primary_category = category_data[:category_names][0]
+    end
+
+    ComplaintEntry.create_wbnp_complaint_entry(new_complaint, uri, rule_ui_complaint, User.where(display_name:"Vrt Incoming").first, ComplaintEntry::NEW, categories: primary_category)
 
     Wbrs::RuleUiComplaint.assign_tickets({:complaint_ids => [rule_ui_complaint["complaint_id"]], :user => "admatter"})
-
   end
 
   def self.create_action(bugzilla_rest_session, ips_urls, description, customer, tags, status=NEW, categories = nil)

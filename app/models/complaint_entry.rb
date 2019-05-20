@@ -694,7 +694,7 @@ class ComplaintEntry < ApplicationRecord
   def self.get_category_data(uri)
     prefix_results = Wbrs::Prefix.where({:urls => [uri]})
 
-    return [] unless prefix_results
+    return {} unless prefix_results
 
     parsed_uri = Complaint.parse_url(uri)
     parsed_uri['path'] = '' unless parsed_uri['path'].present?
@@ -708,7 +708,7 @@ class ComplaintEntry < ApplicationRecord
       end
     end
 
-    return [] unless final_results
+    return {} unless final_results
 
     category_ids = final_results.first.categories.sort_by(&:confidence).map {|category| category.category_id}
     category_names = final_results.first.categories.sort_by(&:confidence).map {|category| category.descr}
