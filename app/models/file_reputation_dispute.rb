@@ -179,7 +179,8 @@ class FileReputationDispute < ApplicationRecord
         disposition_suggested: disposition_suggested,
         user_id: User.where(cvs_username: assignee).first.id,
         submitter_type: SUBMITTER_TYPE_AC_FORM,
-        customer_id: customer.id
+        customer_id: customer.id,
+        status: STATUS_ASSIGNED
     }
 
     file_rep.assign_attributes(attributes)
