@@ -29,13 +29,32 @@ class FileReputationApi::Sandbox
     endpoint = "/ntu/1/disposition"
     query_string = {
         "hash" => sha256,
-        "apikey" => api_key
+        "apikey" => api_key,
     }
     begin
       response = call_request_parsed(:get, endpoint, :input => query_string)
       data = {:success => true, :data => response["entry"]["disposition"]}
     rescue
       data = {:success => false, :data => {}}
+    end
+
+    data
+  end
+
+  def self.report_data(sha256)
+
+    endpoint = "/api/2/report"
+    query_string = {
+        "hash" => sha256,
+        "apikey" => api_key,
+        "runid" => '1'
+    }
+    begin
+      response = call_request_parsed(:get, endpoint, :input => query_string)
+
+      data = {:success => true, :file_size => response['dropped_files']['size'], :type => response['dropped_files']['type']}
+    rescue
+      data = {:success => false}
     end
 
     data

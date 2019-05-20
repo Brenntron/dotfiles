@@ -585,7 +585,7 @@ $ ->
       }
       {
         data: 'sha256_hash'
-        render: (data, type, full, meta) ->
+        render: (data) ->
           return '<span id="' + data + '_sha" title="' + data + '" class="esc-tooltipped file_rep_sha">' + data + '</span>'
       }
       {
@@ -678,7 +678,7 @@ $ ->
         data: 'created_at'
         render: (data) ->
           if data
-            return moment(new Date(data)).format('MMM D, YYYY h:mm A')
+            return moment(data, "YYYY-MM-DD HH:mm").format("YYYY-MM-DD HH:mm")
           else
             return ''
       }
@@ -1036,11 +1036,10 @@ $ ->
 
     $('.toggle-vis-file-rep').on "click", ->
       data = {}
-      data['id'] = $("#id-checkbox").is(':checked')
       data['status'] = $("#status-checkbox").is(':checked')
       data['resolution'] = $("#resolution-checkbox").is(':checked')
       data['file-name'] = $("#file-name-checkbox").is(':checked')
-      data['sha256'] = $("#sha256-checkbox").is(':checked')
+#      data['sha256'] = $("#sha256-checkbox").is(':checked')
       data['file-size'] = $("#file-size-checkbox").is(':checked')
       data['sample-type'] = $("#sample-type-checkbox").is(':checked')
       data['amp-disp'] = $("#amp-disp-checkbox").is(':checked')
