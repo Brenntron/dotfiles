@@ -9309,3 +9309,10 @@ div[aria-describedby='create-detection-dialog'] {
   background-position: 6px center;
   padding-left: 15px;
 }
+
+// Datatables special display to get rid of sorting by placeholder 'Na' or 'Missing' etc. values
+
+.no-score::before {
+  content:'No Score';
+  display: block;
+}

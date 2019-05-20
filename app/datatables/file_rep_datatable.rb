@@ -16,7 +16,7 @@ class FileRepDatatable < AjaxDatatablesRails::ActiveRecord
       status:             { data: :status, source: 'FileReputationDispute.status', cond: :string_eq },
       resolution:         { data: :resolution, source: 'FileReputationDispute.resolution', cond: :string_eq },
       assigned:           { data: :assigned, source: 'FileReputationDispute.assigned', cond: :string_eq },
-      file_name:          { data: :file_name, source: 'FileReputationDispute.file_name', cond: :like },
+      file_name:          { data: :file_name, source: 'FileReputationDispute.file_name', cond: :like, type: 'html' },
       file_size:          { data: :file_size, source: 'FileReputationDispute.file_size', searchable: false },
       sha256_hash:        { data: :sha256_hash, source: 'FileReputationDispute.sha256_hash', cond: :like },
       sample_type:        { data: :sample_type, source: 'FileReputationDispute.sample_type', cond: :string_eq },
