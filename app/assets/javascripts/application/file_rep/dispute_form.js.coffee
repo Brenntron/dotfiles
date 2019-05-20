@@ -27,11 +27,11 @@ $ ->
         assignee: assignee,
         shas_input_type: shas_input_type
       success: (response) ->
-        $('#loader-modal').hide()
+        $('#loader-modal').modal 'hide'
         $('.modal-backdrop').hide()
         std_msg_success('File Reputation Ticket created.', [], reload: true)
       error: (response) ->
-        $('#loader-modal').hide()
+        $('#loader-modal').modal 'hide'
         $('.modal-backdrop').hide()
         std_msg_error('Unable to create File Reputation Ticket', [response.responseJSON.message], reload: false)
     )
