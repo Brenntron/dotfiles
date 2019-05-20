@@ -32,6 +32,7 @@
 
 //= require application/chart.pieceLabel.min
 //= require application/chartjs-plugin-annotation.min
+//= require application/chartjs-plugin-datalabels.min
 //= require application/daterangepicker
 //= require application/webrep_advanced_search
 //= require application/webcat/complaints

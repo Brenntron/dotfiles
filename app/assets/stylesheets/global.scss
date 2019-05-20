@@ -15,7 +15,7 @@ $second-section-color  : #fc4349;   /* Red            */
 $third-section-color   : #EFAF34;   /* Yellow Ochre   */
 $fourth-section-color  : #8cc63f;   /* Bright Green   */
 $fifth-section-color   : #65A1A1;   /* Dusty Teal     */
-
+$primary-section-color-light : #b5ebff;   /* Light Blue    */
 
 $bug-section-color         : $primary-section-color;
 $escalations-section-color : $second-section-color;
@@ -44,6 +44,7 @@ $success-trans: rgba(95, 183, 102, 0.15);
 $disabled-bg: #E5E5E5;
 $disabled-txt: #A0A0A0;
 $communication-accent-color: #C14B92;
+$yellow-graph-bar:#f9cf81;
 
 /* Content Label Color */
 $content-label-color: #999;     /* Light Grey     */
@@ -1474,12 +1475,18 @@ fieldset.tight {
   background-color: $faint-alt-highlight !important;
 }
 
-.selectize-control.multi .selectize-input {
-
+.selectize-control.multi .selectize-input > div {
+  margin-top: 2px;
 }
 
-.selectize-control.multi .selectize-input > div {
-  margin-top: 2px ;
+// small override tweaks below for consistent AC selectize branding, need !important flags
+.selectize-control.multi .selectize-input .item {
+  margin: 5px 2px !important;
+}
+
+.selectize-control.multi .selectize-input [data-value].active {
+  background: darken($primary-section-color, 25%) !important;
+  border: none;
 }
 
 .form-col-list {
@@ -3840,7 +3847,7 @@ input.communication-subject {
 }
 
 .add-case-note-button:hover {
-  background-color: #E47433;
+  background-color: $warning-accent-color;
 }
 
 .new-case-note-row {display: none;}
@@ -5044,6 +5051,22 @@ input.table-entry-input:focus {
 #top_bar_extended_info p {
   font-weight: 300;
 }
+.domain-categories{
+  &{
+    display: none;
+    margin-top: 10px;
+  }
+  ul{
+    display: inline-block;
+    min-width: 140px;
+  }
+  li {
+    border-bottom: 1px solid #f2f2f2;
+    border-top: none;
+    padding: 5px;
+    margin-right: 5px
+  }
+}
 
 #top_bar_extended_info .col-with-divider {
   border-right-color: #f2f2f2;
@@ -5357,6 +5380,10 @@ h5.entry-details-table-header {
 
 .inline-dropdown-menu ul li.selected, .toolbar-dropdown ul li.selected {
   background-color: #90d8f594;
+}
+
+input[type="radio"].ticket-status-radio {
+  margin-top: 0;
 }
 
 .radio-label {
@@ -6599,6 +6626,7 @@ table.dispute-entry-table tbody tr.selected {
 
 .history-table td {
   padding: 4px 8px;
+  line-height: 1.25em;
 }
 
 .searched-for-url {
@@ -7400,7 +7428,10 @@ td.text-center span {
     }
 
     .skyblue-legend-color::before {
-      background-color: $primary-section-color;
+      background-color: $primary-section-color-light;
+    }
+    .yellow-legend-color::before{
+      background-color: $yellow-graph-bar
     }
 
     .navyblue-legend-color::before {
@@ -7464,7 +7495,7 @@ td.text-center span {
   right: 20px;
 
   .total-legend {
-    background-color: skyblue;
+    background-color: $primary-section-color-light;
     width: 45px;
     height: 14px;
     position: relative;
@@ -7605,6 +7636,10 @@ td.text-center span {
     margin-top: 0;
     display: inline-block;
     padding: 0 15px;
+    &:last-of-type {
+      position: relative;
+      top: 5px;
+    }
 
     span {
       color: $primary-section-color;
@@ -7669,6 +7704,7 @@ td.text-center span {
 .copycat_tool_dialog {
   min-width: 400px;
   min-height: 135px;
+  font-family: 'Open Sans', sans-serif !important;
 }
 
 .copycat_tool_dialog .ui-dialog-titlebar {
@@ -7680,6 +7716,7 @@ td.text-center span {
   padding-left: 40px;
   border: none;
   width: 100%;
+  font-weight: bold;
 }
 
 #copycat-categories-selectized {
@@ -7693,23 +7730,33 @@ td.text-center span {
   display: flex;
   justify-content: space-evenly;
   padding: 0 25px 15px 25px;
+  font-size: 12px;
+
+  .copycat-paste-btn, .copycat-clear-btn {
+    font-family: 'Open Sans', sans-serif;
+    font-size: 12px;
+    transition: background-color 0.2s;
+  }
 
   .copycat-paste-btn {
     background-color: $primary-section-color;
     background-size: 15px;
     background-position: 10px center;
     color: white;
-    font-size: 12px;
-    padding: 10px 20px 10px 35px;
-
+    padding: 12px 20px 12px 35px;
+    &:hover {
+      background-color: darken($primary-section-color, 10%)
+    }
   }
 
   .copycat-clear-btn {
     background-color: $nav-toolbar-color;
     background-size: 22px;
     background-position: 10px center;
-    font-size: 12px;
-    padding: 10px 20px 10px 45px;
+    padding: 12px 20px 12px 45px;
+    &:hover {
+      background-color: darken($nav-toolbar-color, 10%)
+    }
   }
 }
 
@@ -8327,4 +8374,64 @@ hr.thin.form-divider {
 
 .bugzilla-logged-out {
   background-image: url(image_path('icon_bugzilla_loggedout.svg'));
+}
+
+
+// Tab styles for tabs on dialog boxes
+.nav-tabs.dialog-tabs {
+  margin-top: 0;
+}
+
+.nav-tabs.dialog-tabs > li > a {
+  padding: 10px 15px;
+  box-shadow: none;
+  background-color: darken($content-label-color, 10%);
+}
+
+.nav-tabs.dialog-tabs > li.active > a {
+  background-color: $content-bg-color;
+  border: 1px solid darken($faint-neutral-color, 10%);
+}
+
+.nav-tabs.dialog-tabs > li.active::before {
+  content: '';
+  border-left: 1px solid darken($faint-neutral-color, 10%);
+  border-right: 1px solid darken($faint-neutral-color, 10%);
+  background-color: $content-bg-color;
+  width: 100%;
+  height: 1px;
+  display: block;
+  position: absolute;
+  left: 0;
+  padding: 0;
+  z-index: 55;
+  margin-top: 39px;
+  margin-left: -1px;
+}
+
+.nav-tabs.dialog-tabs::before {
+  display: none;
+}
+
+.dialog-tab-content {
+  border: 1px solid darken($faint-neutral-color, 10%);
+  padding: 15px;
+}
+
+#xbrs-history-tab {
+  overflow: scroll;
+}
+
+.history-table {
+  background-color: $content-bg-color;
+}
+
+.line-up{
+  display: flex;
+  flex-direction: row;
+}
+
+// dbinebri: small tweak for copycat placeholder text
+.selectize-input #copycat-categories-selectized {
+  font-size: 12px;
 }

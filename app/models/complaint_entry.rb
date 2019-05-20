@@ -107,6 +107,7 @@ class ComplaintEntry < ApplicationRecord
 
   def change_category(prefix,
                       categories_string,
+                      category_names_string,
                       entry_status,
                       comment,
                       resolution_comment,
@@ -131,10 +132,11 @@ class ComplaintEntry < ApplicationRecord
             complaint.set_status(current_status)
             #this is where we should send off the category to the API
             if entry_status != "INVALID" && categories_string != ''
-              commit_category(ip_or_uri: self.uri_or_ip,
+              commit_category(ip_or_uri: prefix,
                               categories_string: categories_string,
                               description: comment,
-                              user: current_user.email)
+                              user: current_user.email,
+                              casenumber: self.complaint.id)
             end
             cat_from_wbrs = self.set_current_category
             update(url_primary_category: cat_from_wbrs, category: cat_from_wbrs)
@@ -153,7 +155,7 @@ class ComplaintEntry < ApplicationRecord
 
           current_status = "PENDING"
           update(resolution: entry_status,
-                 url_primary_category: categories_string,
+                 url_primary_category: category_names_string,
                  category: categories_string,
                  status:current_status,
                  internal_comment: comment,
@@ -175,10 +177,11 @@ class ComplaintEntry < ApplicationRecord
         complaint.set_status(current_status)
         #this is where we should send off the category to the API
         if entry_status != "INVALID" && categories_string != ''
-          commit_category(ip_or_uri: self.uri_or_ip,
+          commit_category(ip_or_uri: prefix,
                           categories_string: categories_string,
                           description: comment,
-                          user: current_user.email)
+                          user: current_user.email,
+                          casenumber: self.complaint.id )
         end
         cat_from_wbrs = self.set_current_category
         update(url_primary_category: cat_from_wbrs, category: cat_from_wbrs)
@@ -186,15 +189,16 @@ class ComplaintEntry < ApplicationRecord
     end
   end
 
-  def commit_category(ip_or_uri:, categories_string:, description:, user:)
+  def commit_category(ip_or_uri:, categories_string:, description:, user:, casenumber: nil)
     # Look for existing prefix
-
+    url_parts = Complaint.parse_url(ip_or_uri)
     existing_prefixes = Wbrs::Prefix.where({urls: [ip_or_uri]})
     existing_prefix = nil
+    
     if existing_prefixes.present?
       existing_prefixes.each do |prefix_found|
-        if prefix_found.subdomain == self.subdomain
-          if prefix_found.path == self.path
+        if prefix_found.subdomain == url_parts[:subdomain]
+          if prefix_found.path == url_parts[:path]
             existing_prefix = prefix_found
           end
         end
@@ -203,11 +207,51 @@ class ComplaintEntry < ApplicationRecord
 
     category_ids_array = categories_string.split(',').map {|cat| cat.to_i}
 
+    if description.present? && casenumber.present?
+      description = description + "--Case Number: #{casenumber} User: #{user}"
+    end
+
     if existing_prefix.present?
       prefix_object = Wbrs::Prefix.new
       prefix_object.set_categories(category_ids_array, prefix_id: existing_prefix.prefix_id, user: user, description: description)
     else
       Wbrs::Prefix.create_from_url(url: ip_or_uri, categories: category_ids_array, user: user, description: description)
+    end
+  end
+
+  def inherit_categories(ip_or_uri:, description:, user:, casenumber: nil)
+    if ip_or_uri != self.domain
+      parsed_uri = Complaint.parse_url(ip_or_uri)
+      master_domain = parsed_uri[:domain]
+
+      existing_prefixes = Wbrs::Prefix.where({urls: [ip_or_uri]})
+
+      existing_prefix = nil
+
+      if existing_prefixes.present?
+        existing_prefix = existing_prefixes.find { |existing_prefix| existing_prefix.subdomain == parsed_uri[:subdomain] && existing_prefix.path == parsed_uri[:path] }
+      end
+
+      if description.present? && casenumber.present?
+        description = description + "--Case Number: #{casenumber} User: #{user}"
+      end
+
+      # Get the categories from the master domain
+      category_data = ComplaintEntry.get_category_data(master_domain)
+      category_ids = category_data[:category_ids]
+      category_names = category_data[:category_names]
+
+      # Inherit categories from the master domain
+      if existing_prefix.present?
+        prefix_object = Wbrs::Prefix.new
+        prefix_object.set_categories(category_ids, user: user, description: description, prefix_id: existing_prefix.prefix_id)
+      else
+        Wbrs::Prefix.create_from_url(url: ip_or_uri, categories: category_ids, user: user, description: description)
+      end
+
+      self.update(url_primary_category: category_names[0])
+    elsif ip_or_uri == self.domain
+      raise ('Cannot inherit categories on master domain')
     end
   end
 
@@ -559,8 +603,63 @@ class ComplaintEntry < ApplicationRecord
     ''
   end
 
+  def self.get_category_data(uri)
+    prefix_results = Wbrs::Prefix.where({:urls => [uri]})
+
+    return [] unless prefix_results
+
+    parsed_uri = Complaint.parse_url(uri)
+    parsed_uri['path'] = '' unless parsed_uri['path'].present?
+    parsed_uri['subdomain'] = '' unless parsed_uri['subdomain'].present?
+
+    final_results = []
+
+    prefix_results.each do |prefix_result|
+      if ((prefix_result.subdomain == parsed_uri['subdomain']) || (parsed_uri['subdomain'] == 'www')) && prefix_result.path == parsed_uri['path']
+        final_results << prefix_result
+      end
+    end
+
+    return [] unless final_results
+
+    category_ids = final_results.first.categories.sort_by(&:confidence).map {|category| category.category_id}
+    category_names = final_results.first.categories.sort_by(&:confidence).map {|category| category.descr}
+
+    {category_ids: category_ids, category_names: category_names}
+  end
+
+  def get_category_names_from_master
+    prefix_results = Wbrs::Prefix.where({:urls => [self.domain]})
+
+    if self.entry_type == 'URI/DOMAIN'
+      parsed_uri = Complaint.parse_url(uri)
+
+      return [] unless prefix_results
+
+      parsed_uri['path'] = '' unless parsed_uri['path'].present?
+      parsed_uri['subdomain'] = '' unless parsed_uri['subdomain'].present?
+
+      categories = []
+
+      prefix_results.each do |prefix_result|
+        if ((prefix_result.subdomain == parsed_uri['subdomain']) || (parsed_uri['subdomain'] == 'www')) && prefix_result.path == parsed_uri['path']
+          categories << prefix_result
+        end
+      end
+
+      if categories.any?
+        categories = categories.first.categories.map {|category| category.descr}
+      end
+
+      categories
+    elsif self.entry_type == 'IP'
+      raise ("Cannot inherit categories for IP entries.")
+    end
+  end
+
   def current_category_data
-    prefix_results = Wbrs::Prefix.where({:urls => [URI.escape(DisputeEntry.domain_of_with_path(self.hostlookup))]})
+
+    prefix_results = Wbrs::Prefix.where({:urls => [DisputeEntry.domain_of_with_path(self.hostlookup)]})
     return {} unless prefix_results
     certainty_on_urls = Wbrs::Prefix.get_certainty_sources_for_urls([DisputeEntry.domain_of_with_path(self.hostlookup)])
 
@@ -642,15 +741,16 @@ class ComplaintEntry < ApplicationRecord
 
   def historic_category_data
 
-    prefix_id = nil
-    prefix_results = Wbrs::Prefix.where({:urls => [URI.escape(self.hostlookup)]})
-    if prefix_results.present?
-      prefix_id = prefix_results.first.prefix_id
-    end
-    if prefix_id.present?
-      prefix_history = Wbrs::HistoryRecord.where({:prefix_id => prefix_id}).sort_by {|history| DateTime.parse(history.time)}.reverse
-    else
-      prefix_history = []
+    prefix_history = []
+    prefixes = Wbrs::Prefix.where({:urls => [URI.escape(self.hostlookup)]})
+    prefixes.each do |prefix|
+      if prefix.subdomain == self.subdomain && prefix.path == self.path
+        prefix_id = prefix.prefix_id
+        response = Wbrs::HistoryRecord.where({:prefix_id => prefix_id}).sort_by {|history| DateTime.parse(history.time)}.reverse
+        response.each do |resp|
+          prefix_history << resp
+        end
+      end
     end
 
     prefix_history
@@ -714,15 +814,19 @@ class ComplaintEntry < ApplicationRecord
 
       self.domain = parsed_uri[:domain]
       self.subdomain = parsed_uri[:subdomain]
-      self.uri = subdomain + domain
+      self.path = parsed_uri[:path]
+
+      if self.subdomain.present?
+        self.uri = subdomain + '.' + domain
+      else
+        self.uri = uri
+      end
+
       ComplaintEntryPreload.generate_preload_from_complaint_entry(self)
 
-      save!
-
-      return {status: 'success', preload: false, domain: domain, subdomain: subdomain} if complaint_entry_preload&.current_category_information == 'DATA ERROR'
-
-      response = (complaint_entry_preload&.current_category_information)
-      return {status: 'success', preload: true, data: JSON.parse(response), domain: domain, subdomain: subdomain}
+      if save!
+        {status: 'success'}
+      end
     end
   end
 end

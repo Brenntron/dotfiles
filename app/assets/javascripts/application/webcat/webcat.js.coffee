@@ -153,9 +153,9 @@ $ ->
             subdomain = full.subdomain
 
             if subdomain
-              '<p id="subdomain_' + full.entry_id + '">' + subdomain + '</p>'
+              '<span id="subdomain_' + full.entry_id + '">' + subdomain + '</span>'
             else
-              '<p id="subdomain_' + full.entry_id + '">' + '</p>'
+              '<span id="subdomain_' + full.entry_id + '">' + '</span>'
           width: '50px'
         }
         {
@@ -174,7 +174,7 @@ $ ->
             full_data = data
             if type == 'display'
               full_data = td_truncate(data, 20)
-            return '<span class="esc-tooltipped td-truncate" title="' + data + '">' + full_data + '</span>'
+            return '<span class="esc-tooltipped td-truncate" id="path_' + full.entry_id + '" title="' + data + '">' + full_data + '</span>'
         }
         {
           'render': (data, type, full, meta) ->
@@ -186,7 +186,7 @@ $ ->
               category = categories[0]
               if category == "Not in our list"
                 category = ""
-            category
+            '<span id="category_' + full.entry_id + '">' + category + '</span>'
         }
         {
           data: 'suggested_category'
@@ -194,6 +194,8 @@ $ ->
         {
           data: 'wbrs_score'
           width: '20px'
+          'render': (data, type, full, meta) ->
+            '<span id="wbrs_score_' + full.entry_id + '">' + data + '</span>'
         }
         {
           data: 'submitter_type'
