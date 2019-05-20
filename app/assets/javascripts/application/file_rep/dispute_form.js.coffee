@@ -17,6 +17,9 @@ $ ->
 
     # delimiters: split the shas by either newline/comma/tab/semi
     shas_array = shas_full_text.split(/[\s,;]+/)
+    shas_array = shas_array.filter((sha) ->
+      sha != ""
+    )
 
     std_msg_ajax(
       url: '/escalations/api/v1/escalations/file_rep/disputes/form'
