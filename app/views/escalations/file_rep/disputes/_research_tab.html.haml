@@ -78,7 +78,8 @@
         .row
           .col-xs-12.text-center
             -#%a{href: '#', target: '_blank'}
-            %button.secondary.view-report-external-button.data-report-button#sb-report-html{onclick: 'sandbox_html_report();'}
+            -#%button.secondary.view-report-external-button.data-report-button#sb-report-html{onclick: 'sandbox_html_report();'}
+            %a.secondary.view-report-external-button.data-report-button#sb-report-html{download: "sandbox-report.html"}
               View HTML Report
         %hr.thin
         .row
