@@ -450,8 +450,6 @@ class Complaint < ApplicationRecord
   def self.get_latest_wbnp_complaints
     begin
 
-      bad_uris = []
-
       all_complaints = Wbrs::RuleUiComplaint.where({:add_channels => [WBNP_CHANNEL], :statuses => ['new']})["data"]
 
       new_complaints = []
@@ -472,8 +470,6 @@ class Complaint < ApplicationRecord
         end
 
       end
-
-      return bad_uris
 
     rescue
       #no wbnp response
