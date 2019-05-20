@@ -109,13 +109,19 @@ window.bulk_get_current_reptool = (page) ->
         response = JSON.parse(response)
         for entry in response
           if entry['status'] == "ACTIVE"
-            rep_class_full = entry['classification'] + ' - ' + entry['expiration']
-            rep_class = entry['classification']
-          else
-            rep_class_full = '<span class="missing-data">No active classifications</span>'
-            rep_class = ''
+            rep_class_exp = entry['expiration']
+            rep_class_list = entry['classification']
+            rep_class_attr = ''
+            # remove dupes from array then add space after each entry
+            rep_class_list = rep_class_list.filter((elem, index, self) -> index == self.indexOf(elem))
+            rep_class_list = rep_class_list.join(', ')
 
-          tbody.append('<tr class="reptool-entry-row" data-case-id="' + case_id + '"><td class="reptool-entry-name">' + entry['entry'] + '</td><td class="reptool-entry-class" data-classification="' + rep_class + '">' + rep_class_full + '</td><td class="reptool-entry-comment">' + entry['comment'] + '</td></tr>')
+          else
+            rep_class_attr = 'No active classifications'
+            rep_class_exp = ''
+            rep_class_list = '<span class="missing-data">No active classifications</span>'
+
+          tbody.append('<tr class="reptool-entry-row" data-case-id="' + case_id + '"><td class="reptool-entry-name">' + entry['entry'] + '</td><td class="reptool-entry-class" data-classification="' + rep_class_attr + '">' + rep_class_list + '</td><td>' + rep_class_exp + '</td><td class="reptool-entry-comment">' + entry['comment'] + '</td></tr>')
         comment_box.val(comment_trail)
 
         if entry['comment'].length > 50
