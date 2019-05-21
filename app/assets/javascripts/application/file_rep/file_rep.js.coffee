@@ -465,7 +465,7 @@ $ ->
 
   $('#file-rep-datatable').dataTable
     drawCallback: ( settings ) ->
-
+      console.log 'draw'
       if localStorage.search_name
 
         {search_type, search_name, search_conditions } = localStorage
@@ -660,8 +660,52 @@ $ ->
           if full['reversing_labs_count'] == '0'
             return '<span class="missing-data">Not in RL</span>'
           else if data
-            rl_build_tooltip(full['id'], full['reversing_labs_scanners'], data, full['reversing_labs_count'])
-            return '<span class="score-col text-center rl-hover" ' + 'id="rl-score-id-' + full['id'] + '"><a>' + data + ' / ' + full['reversing_labs_count'] + '</a></span>'
+            score_id_selector = full['id']
+            scanner_list = full['reversing_labs_scanners']
+            rl_score = data
+            rl_count = full['reversing_labs_count']
+            score_id_selector = '#rl-score-id-' + score_id_selector
+            rl_hover_table = ''
+
+            if rl_count == "0"
+              $(score_id_selector).tooltipster
+                theme: [
+                  'tooltipster-borderless'
+                  'tooltipster-borderless-customized'
+                ]
+                side: 'bottom'
+                content: 'Not in Reversing Labs.'
+                trigger: 'hover'
+
+            else
+              scanners_list = scanner_list
+              # file_rep_datatable.rb is doing a .to_json but it needs a fix
+              scanners_list = scanners_list.replace(/&quot;/g,'"')
+
+              obj_scanners = JSON.parse(scanners_list)
+
+              mal_results = []
+              unk_results = []
+
+              # each scanner entry, this is where to handle the logic for each scanner
+              $(obj_scanners).each ->
+                if this.result == ""
+                  unk_results.push(this)
+                else
+                  mal_results.push(this)
+
+              rl_hover_table +=
+                '<table class=\'rl-header\'><tr class=\'top\'><td colspan=\'2\'>Reversing Labs Details ' +
+                  '<span id=\'rl-score-hover\'>' + rl_score + '/' + rl_count + '</span></td></tr>' +
+                  '<tr class=\'second\'><td class=\'left\'>AV Vendor</td><td class=\'right\'>Results</td></tr></table>' +
+                  '<table class=\'rl-content\'>'
+
+              $(mal_results).each ->
+                rl_hover_table += '<tr><td class=\'left\'>' + this.name + '</td><td class=\'right rl-scanner-mal\'>' + this.result + '</td></tr>'
+              $(unk_results).each ->
+                rl_hover_table += '<tr><td class=\'left\'>' + this.name + '</td><td class=\'right rl-scanner-unk\'>Not Detected</td></tr>'
+
+            return '<span title="' + rl_hover_table + '" class="score-col text-center rl-hover" ' + 'id="rl-score-id-' + full['id'] + '" ><a>' + data + ' / ' + full['reversing_labs_count'] + '</a></span>'
           else
             return ''
       }
@@ -703,6 +747,32 @@ $ ->
             return data
       }
     ]
+
+#
+  $('#file-rep-datatable').on 'draw.dt', ->
+    $('.rl-hover').tooltipster
+      theme: [
+        'tooltipster-borderless'
+        'tooltipster-borderless-customized'
+        'tooltipster-rl-hover'
+      ]
+      side: 'bottom'
+      contentAsHTML: true
+      autoClose: false
+      trigger: 'custom'
+      triggerOpen:
+        mouseenter: true
+        click: true
+      triggerClose:
+        mouseleave: true
+        click: true
+        scroll: true
+      interactive: true
+      updateAnimation: false
+
+    return
+
+
 
   $('.toggle-vis-file-rep').each ->
 #       toggle visible columns
@@ -836,6 +906,7 @@ $ ->
 
 
 $ ->
+
   ## Create detection form dialog
   $('#create-detection-dialog').dialog
     autoOpen: false,
@@ -1072,73 +1143,4 @@ $ ->
               $('#file-rep-datatable').DataTable().column("##{column}").visible false
 
       )
-
-
-$ ->
-  # dbinebri: build the entire rl html table to load into the tooltip on index
-  window.rl_build_tooltip = (score_id_selector, scanner_list, rl_score, rl_count) ->
-    score_id_selector = '#rl-score-id-' + score_id_selector
-
-    if rl_count == "0"
-      $(score_id_selector).tooltipster
-        theme: [
-          'tooltipster-borderless'
-          'tooltipster-borderless-customized'
-        ]
-        side: 'bottom'
-        content: 'Not in Reversing Labs.'
-        trigger: 'hover'
-
-    else
-      scanners_list = scanner_list
-      # file_rep_datatable.rb is doing a .to_json but it needs a fix
-      scanners_list = scanners_list.replace(/&quot;/g,'"')
-
-      obj_scanners = JSON.parse(scanners_list)
-
-      mal_results = []
-      unk_results = []
-
-      # each scanner entry, this is where to handle the logic for each scanner
-      $(obj_scanners).each ->
-        if this.result == ""
-          unk_results.push(this)
-        else
-          mal_results.push(this)
-
-      rl_hover_table =
-        '<table class="rl-header"><tr class="top"><td colspan="2">Reversing Labs Details ' +
-          '<span id="rl-score-hover">' + rl_score + '/' + rl_count + '</span></td></tr>' +
-          '<tr class="second"><td class="left">AV Vendor</td><td class="right">Results</td></tr></table>' +
-          '<table class="rl-content">'
-
-      $(mal_results).each ->
-        rl_hover_table += '<tr><td class="left">' + this.name + '</td><td class="right rl-scanner-mal">' + this.result + '</td></tr>'
-      $(unk_results).each ->
-        rl_hover_table += '<tr><td class="left">' + this.name + '</td><td class="right rl-scanner-unk">Not Detected</td></tr>'
-
-      # init the tooltip first
-      $(score_id_selector).tooltipster
-        theme: [
-          'tooltipster-borderless'
-          'tooltipster-borderless-customized'
-          'tooltipster-rl-hover'
-        ]
-        side: 'bottom'
-        content: ''
-        contentAsHTML: true
-        autoClose: false
-        trigger: 'custom'
-        triggerOpen:
-          mouseenter: true
-          click: true
-        triggerClose:
-          mouseleave: true
-          click: true
-          scroll: true
-        interactive: true
-        updateAnimation: false
-
-      # add the content into the tooltip
-      $(score_id_selector).tooltipster('content', rl_hover_table)
 
