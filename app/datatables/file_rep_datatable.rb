@@ -36,7 +36,9 @@ class FileRepDatatable < AjaxDatatablesRails::ActiveRecord
       threatgrid_threshold: { data: :threatgrid_threshold, source: 'FileReputationDispute.threatgrid_threshold', cond: :like },
       threatgrid_under:   { data: :threatgrid_under, source: 'FileReputationDispute.threatgrid_under', cond: :like },
       threatgrid_signer:  { data: :threatgrid_signer, source: 'FileReputationDispute.threatgrid_signer', cond: :like },
-      reversing_labs_score: { data: :reversing_labs_score, source: 'FileReputationDispute.reversing_labs_score', cond: :like },
+      reversing_labs_score: { data: :reversing_labs_score, source: 'FileReputationDispute.reversing_labs_score', searchable: false },
+      reversing_labs_count: { data: :reversing_labs_count, source: 'FileReputationDispute.reversing_labs_count', searchable: false },
+      reversing_labs_scanners: { data: :reversing_labs_scanners, source: 'FileReputationDispute.reversing_labs_scanners', searchable: false },
       reversing_labs_signer: { data: :reversing_labs_signer, source: 'FileReputationDispute.reversing_labs_signer', cond: :like },
       submitter_type: { data: :submitter_type, source: 'FileReputationDispute.submitter_type', cond: :like},
       customer_name:      { data: :customer_name, source: 'FileReputationDispute.customer_name', cond: :like },
@@ -55,6 +57,13 @@ class FileRepDatatable < AjaxDatatablesRails::ActiveRecord
       threatgrid_under =
           if file_rep.threatgrid_score && file_rep.threatgrid_threshold
             file_rep.threatgrid_score < file_rep.threatgrid_threshold
+          end
+
+      rl_scanners =
+          if file_rep.reversing_labs_raw
+            rev_lab = FileReputationApi::ReversingLabs.new(sha256_hash: file_rep.sha256_hash,
+                                                           raw_json: file_rep.reversing_labs_raw)
+            rev_lab.scanners
           end
 
       {
@@ -85,6 +94,7 @@ class FileRepDatatable < AjaxDatatablesRails::ActiveRecord
           threatgrid_signer:            file_rep.threatgrid_signer,
           reversing_labs_score:         file_rep.reversing_labs_score,
           reversing_labs_count:         file_rep.reversing_labs_count,
+          reversing_labs_scanners:      rl_scanners.to_json,
           reversing_labs_signer:        file_rep.reversing_labs_signer,
           submitter_type:               file_rep.submitter_type,
           customer_name:                file_rep.customer&.name,
