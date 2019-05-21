@@ -267,7 +267,7 @@ module ApiRequester::ApiRequester
 
     def error_body(response)
       body = JSON.parse(response.body)
-      body['Error']
+      body['message']
     rescue
       nil
     end
