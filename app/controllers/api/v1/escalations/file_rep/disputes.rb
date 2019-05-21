@@ -42,11 +42,18 @@ module API
             end
             post "form" do
               std_api_v2 do
-                permitted_params['shas_array'].each do |sha256|
-                  FileReputationDispute.create_through_form(bugzilla_rest_session,
-                                                            sha256,
-                                                            params[:disposition_suggested],
-                                                            params[:assignee])
+                user_validation = User.where(cvs_username: params[:assignee])
+
+                if user_validation.present?
+                  permitted_params['shas_array'].each do |sha256|
+                    FileReputationDispute.create_through_form(bugzilla_rest_session,
+                                                              sha256,
+                                                              params[:disposition_suggested],
+                                                              params[:assignee],
+                                                              current_user)
+                  end
+                else
+                  raise "Invalid assignee or assignee does not exist. Please try again."
                 end
 
                 render json: {status: 'Success'}

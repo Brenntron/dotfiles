@@ -42,7 +42,18 @@ class FileReputationApi::ReversingLabs
     @scanners
   end
 
-  def score
+  def self.get_creation_data(sha256)
+    api_response = call_request_parsed(:get, "api/databrowser/rldata/query/sha256/#{sha256}", input: {format: 'json'})
+
+    {file_size: api_response['rl']['sample']['sample_size'], sample_type: api_response['rl']['sample']['xref']['sample_type']}
+
+  rescue JSON::ParserError
+    {error: 'Invalid Hash'}
+  rescue
+    {error: 'Data Currently Unavailable'}
+  end
+
+  def self.score_of_lookup(api_response)
     reversing_labs_score = 0
     reversing_labs_count = 0
     if api_response&.dig('rl','sample','xref','entries')&.any?
@@ -61,7 +72,7 @@ class FileReputationApi::ReversingLabs
   def self.certificates(sha256)
     api_response = call_request_parsed(:post, '/api/databrowser/rldata/bulk_query/json', request_type: :json, input: {rl: {query: {hash_type: 'sha256', hashes: [sha256] }}}, headers: {'Authorization': 'Basic dS9zb3VyY2VmaXJlOlV1djRsYWl0'})
 
-    if api_response&.dig('rl','entries')&.any?
+    if api_response&.dig('rl','entries')&.any? && api_response&.dig('rl','entries')[0]&.dig('analysis','entries').present?
       certificates = api_response&.dig('rl','entries')[0]&.dig('analysis','entries')[0]&.dig('tc_report','metadata','certificate','certificates')
     else
       certificates = nil

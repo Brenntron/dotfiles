@@ -9396,9 +9396,3 @@ table.rl-content {
 .tooltipster-sidetip.tooltipster-borderless.tooltipster-borderless-customized.tooltipster-rl-hover.tooltipster-bottom .tooltipster-arrow-border {
   border-bottom-color: darken($table-dark-body, 5%);
 }
-
-// make sure down caret on index RL column doesn't break / wrap
-.rl-col {
-  min-width: 70px !important;
-  text-align: center;
-}
