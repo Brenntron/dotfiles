@@ -5,4 +5,8 @@ class FileRepComment < ApplicationRecord
   validates :comment, presence: true
 
   scope :recent_first, -> {order('created_at DESC')}
+
+  def self.create_action(comment, dispute_id, current_user)
+    FileRepComment.create!(comment: comment, file_reputation_dispute_id: dispute_id, user_id: current_user.id)
+  end
 end

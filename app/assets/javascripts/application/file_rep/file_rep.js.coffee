@@ -915,6 +915,7 @@ $ ->
     else
       detection_array = {disposition: new_disp}
 
+    dispute_id = parseInt($('#dispute_id').text())
     comment = $('#new-amp-detection-comment').val()
 
     # Grab sha data
@@ -954,6 +955,9 @@ $ ->
         'sha256_hashes': sha256_hashes
         'disposition': new_disp
         'detection_name': new_detection_name
+        'comment': comment
+        'dispute_id': dispute_id
+
       }
       success: (response) ->
         $('#create-detection-dialog').dialog('close')
