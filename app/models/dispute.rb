@@ -203,7 +203,7 @@ class Dispute < ApplicationRecord
   end
 
   def each_duplicate(&block)
-    if related_dispute && Dispute::DUPLICATE == self.resolution
+    if related_dispute
       #block.call(related_dispute)
       related_dispute.relating_disputes.where(resolution: Dispute::DUPLICATE).where.not(id: self.id).each(&block)
     else
@@ -268,6 +268,9 @@ class Dispute < ApplicationRecord
     possibles = Dispute.includes(:dispute_entries).where(:customer_id => dispute.customer_id).select {|dispute| dispute.status != RESOLVED || dispute.status != DUPLICATE}
     candidates = []
 
+    all_resolved = true
+
+    # If all possible Disputes are Resolved or Duplicate, do not register as a duplicate
     possibles.each do |poss|
 
       ips = poss.dispute_entries.select{ |entry| entry.entry_type == "IP"}.pluck(:ip_address).sort
@@ -278,16 +281,27 @@ class Dispute < ApplicationRecord
       end
     end
 
-    if candidates.present?
+    if candidates.find{ |candidate| candidate.status != RESOLVED }
+      all_resolved = false
+    end
+
+    if candidates.any?
       best_candidate = candidates.sort_by {|candidate| candidate.id}.first
       response[:authority] = best_candidate
       response[:is_dupe] = true
+      response[:all_resolved] = all_resolved
     else
       response[:is_dupe] = false
     end
 
     response
 
+  end
+
+  def self.manage_all_resolved_duplicate_dispute(dispute, authority_dispute)
+    dispute.related_id = authority_dispute.id
+    dispute.related_at = Time.now
+    dispute.save!
   end
 
   def self.manage_duplicate_dispute(dispute, authority_dispute, new_entries_ips, new_entries_urls, source_key)
@@ -476,9 +490,11 @@ class Dispute < ApplicationRecord
 
         response = is_possible_customer_duplicate?(new_dispute, new_entries_ips, new_entries_urls)
 
-        if response[:is_dupe] == true
+        if response[:is_dupe] == true && response[:all_resolved] == false
           manage_duplicate_dispute(new_dispute, response[:authority], new_entries_ips, new_entries_urls, message_payload["source_key"] )
           return
+        elsif response[:is_dupe] == true && response[:all_resolved] == true
+          manage_all_resolved_duplicate_dispute(new_dispute, response[:authority])
         end
 
         #IPS and URL/DOMAIN entries are almost virtually the same, maybe this is worthy of refactoring into it's own method.
