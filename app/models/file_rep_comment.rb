@@ -6,7 +6,8 @@ class FileRepComment < ApplicationRecord
 
   scope :recent_first, -> {order('created_at DESC')}
 
-  def self.create_action(comment, dispute_id, current_user)
+  def self.create_action(comment, old_disposition, new_disposition, dispute_id, current_user)
+    comment = "Dispositon changed from #{old_disposition} to #{new_disposition.capitalize} - #{comment}"
     FileRepComment.create!(comment: comment, file_reputation_dispute_id: dispute_id, user_id: current_user.id)
   end
 end

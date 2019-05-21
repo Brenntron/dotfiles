@@ -14,6 +14,7 @@ module API
               requires :disposition, type: String
               optional :detection_name, type: String
               optional :comment, type: String
+              optional :old_disposition, type: String
             end
             post "" do
               std_api_v2 do
@@ -21,7 +22,7 @@ module API
                                                                     disposition: params['disposition'],
                                                                     detection_name: params['detection_name'])
 
-                FileRepComment.create_action(params[:comment], params[:dispute_id], current_user)
+                FileRepComment.create_action(params[:comment], params[:old_disposition], params[:disposition], params[:dispute_id], current_user)
 
                 result.to_json
               end
