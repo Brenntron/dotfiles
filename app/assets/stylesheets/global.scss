@@ -9295,17 +9295,104 @@ div[aria-describedby='create-detection-dialog'] {
 }
 
 
-// dbinebri: adding a little margin for the rerun sandbox button area
-#sandbox-rerun-button {
-  margin: 5px 0;
+// dbinebri: INDEX, RL HOVER TABLE STYLES HERE, this is a one-off tooltip as of now
+// top row for rl hover table
+table.rl-header {
+  padding: 0;
+  width: 500px;
+  text-transform: uppercase;
+  text-align: left;
+  font-size: 12px;
+  font-weight: bold;
+  .top {
+    span {
+      float: right;
+    }
+    td {
+      border: none;
+      padding: 4px 8px;
+      background: darken($table-dark-body, 10%);
+    }
+  }
+  .second {
+    border-bottom: solid 1px darken($table-dark-body, 5%);
+    td {
+      padding: 2px 8px;
+      border: none;
+      &.left {
+        width: 165px;
+      }
+      &.right {
+        width: 335px;
+      }
+    }
+  }
 }
 
-#collapse_sb_json {
-  margin-bottom: 25px;
+// this is the actual rl hover table contents
+table.rl-content {
+  display: block;
+  padding: 0;
+  width: 500px;
+  height: 260px;
+  overflow-x: hidden;
+  overflow-y: scroll;
+  tr {
+    td {
+      border: none;
+      padding: 2px 8px;
+      text-align: left;
+      font-size: 10px;
+      &.left {
+        width: 190px;
+        text-transform: uppercase;
+      }
+      &.right {
+        width: 310px;
+      }
+    }
+    // need special scanner-mal and scanner-unk styles here, can't reuse from show page
+    .rl-scanner-mal {
+      color: $content-bg-color;
+      &::before {
+        content: '';
+        display: block;
+        float: left;
+        background-repeat: no-repeat;
+        background-image: url(/assets/icon_malicious_dark.svg);
+        width: 14px;
+        height: 14px;
+        margin-top: 2px;
+        margin-bottom: 0;
+        margin-right: 4px;
+        margin-left: -16px;
+      }
+    }
+    .rl-scanner-unk {
+      color: $content-bg-color;
+      padding-left: 10px;
+      font-style: italic;
+    }
+  }
 }
 
-.create-new-run-button {
-  background-image: url(/assets/icon_sandbox_report.svg);
-  background-position: 6px center;
-  padding-left: 15px;
+// index, special underline fix for rl hover, normal underline is too tight
+.rl-hover a {
+  border-bottom: dotted 1px lighten($table-dark-body, 40%);
+  &:hover {
+    text-decoration: none;
+    color: $table-dark-body;
+  }
+}
+
+
+// dbinebri: this is the WRAPPER for the RENDERED full rl table hover, remove padding and add border radius
+.tooltipster-sidetip.tooltipster-borderless.tooltipster-borderless-customized.tooltipster-rl-hover .tooltipster-content {
+  padding: 0;
+  border-radius: 5px;
+}
+
+// this is the triangle, make color match the top row of rl hover table
+.tooltipster-sidetip.tooltipster-borderless.tooltipster-borderless-customized.tooltipster-rl-hover.tooltipster-bottom .tooltipster-arrow-border {
+  border-bottom-color: darken($table-dark-body, 5%);
 }
