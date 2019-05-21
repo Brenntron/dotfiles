@@ -9396,3 +9396,10 @@ table.rl-content {
 .tooltipster-sidetip.tooltipster-borderless.tooltipster-borderless-customized.tooltipster-rl-hover.tooltipster-bottom .tooltipster-arrow-border {
   border-bottom-color: darken($table-dark-body, 5%);
 }
+
+// dbinebri: ensuring create new report button gets icon
+.create-new-run-button {
+  background-image: url(/assets/icon_sandbox_report.svg);
+  background-position: 6px center;
+  padding-left: 15px;
+}
