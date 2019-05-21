@@ -53,7 +53,7 @@ class FileReputationApi::ReversingLabs
     {error: 'Data Currently Unavailable'}
   end
 
-  def self.score_of_lookup(api_response)
+  def score
     reversing_labs_score = 0
     reversing_labs_count = 0
     if api_response&.dig('rl','sample','xref','entries')&.any?
