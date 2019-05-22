@@ -174,7 +174,7 @@ $ ->
             full_data = data
             if type == 'display'
               full_data = td_truncate(data, 20)
-            return '<span class="esc-tooltipped td-truncate" title="' + data + '">' + full_data + '</span>'
+            return '<span class="esc-tooltipped td-truncate" id="path_' + full.entry_id + '" title="' + data + '">' + full_data + '</span>'
         }
         {
           'render': (data, type, full, meta) ->

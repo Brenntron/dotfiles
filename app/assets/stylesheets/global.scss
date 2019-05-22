@@ -1490,12 +1490,18 @@ fieldset.tight {
   background-color: $faint-alt-highlight !important;
 }
 
-.selectize-control.multi .selectize-input {
-
+.selectize-control.multi .selectize-input > div {
+  margin-top: 2px;
 }
 
-.selectize-control.multi .selectize-input > div {
-  margin-top: 2px ;
+// small override tweaks below for consistent AC selectize branding, need !important flags
+.selectize-control.multi .selectize-input .item {
+  margin: 5px 2px !important;
+}
+
+.selectize-control.multi .selectize-input [data-value].active {
+  background: darken($primary-section-color, 25%) !important;
+  border: none;
 }
 
 .form-col-list {
@@ -5047,6 +5053,22 @@ input.table-entry-input:focus {
 #top_bar_extended_info p {
   font-weight: 300;
 }
+.domain-categories{
+  &{
+    display: none;
+    margin-top: 10px;
+  }
+  ul{
+    display: inline-block;
+    min-width: 140px;
+  }
+  li {
+    border-bottom: 1px solid #f2f2f2;
+    border-top: none;
+    padding: 5px;
+    margin-right: 5px
+  }
+}
 
 #top_bar_extended_info .col-with-divider {
   border-right-color: $faint-neutral-color;
@@ -5360,6 +5382,10 @@ h5.entry-details-table-header {
 
 .inline-dropdown-menu ul li.selected, .toolbar-dropdown ul li.selected {
   background-color: #90d8f594;
+}
+
+input[type="radio"].ticket-status-radio {
+  margin-top: 0;
 }
 
 .radio-label {
@@ -7642,6 +7668,10 @@ td.text-center span {
     margin-top: 0;
     display: inline-block;
     padding: 0 15px;
+    &:last-of-type {
+      position: relative;
+      top: 5px;
+    }
 
     span {
       color: $primary-section-color;
@@ -7706,6 +7736,7 @@ td.text-center span {
 .copycat_tool_dialog {
   min-width: 400px;
   min-height: 135px;
+  font-family: 'Open Sans', sans-serif !important;
 }
 
 .copycat_tool_dialog .ui-dialog-titlebar {
@@ -7717,6 +7748,7 @@ td.text-center span {
   padding-left: 40px;
   border: none;
   width: 100%;
+  font-weight: bold;
 }
 
 #copycat-categories-selectized {
@@ -7730,23 +7762,33 @@ td.text-center span {
   display: flex;
   justify-content: space-evenly;
   padding: 0 25px 15px 25px;
+  font-size: 12px;
+
+  .copycat-paste-btn, .copycat-clear-btn {
+    font-family: 'Open Sans', sans-serif;
+    font-size: 12px;
+    transition: background-color 0.2s;
+  }
 
   .copycat-paste-btn {
     background-color: $primary-section-color;
     background-size: 15px;
     background-position: 10px center;
     color: white;
-    font-size: 12px;
-    padding: 10px 20px 10px 35px;
-
+    padding: 12px 20px 12px 35px;
+    &:hover {
+      background-color: darken($primary-section-color, 10%)
+    }
   }
 
   .copycat-clear-btn {
     background-color: $nav-toolbar-color;
     background-size: 22px;
     background-position: 10px center;
-    font-size: 12px;
-    padding: 10px 20px 10px 45px;
+    padding: 12px 20px 12px 45px;
+    &:hover {
+      background-color: darken($nav-toolbar-color, 10%)
+    }
   }
 }
 
@@ -8335,6 +8377,7 @@ hr.thin.form-divider {
   background-color: $content-bg-color;
 }
 
+
 // dbinebri: the new ticket file rep container needs to be wide and slightly positioned to the right
 .escalations--file_rep--disputes-controller .nav-tools-dropdown {
   min-width: 540px;
@@ -8472,7 +8515,6 @@ hr.thin.form-divider {
       margin-bottom: 20px;
     }
   }
-
 }
 
 .top-case-info h4 {
@@ -9402,4 +9444,14 @@ table.rl-content {
   background-image: url(/assets/icon_sandbox_report.svg);
   background-position: 6px center;
   padding-left: 15px;
+}
+
+.line-up{
+  display: flex;
+  flex-direction: row;
+}
+
+// dbinebri: small tweak for copycat placeholder text
+.selectize-input #copycat-categories-selectized {
+  font-size: 12px;
 }
