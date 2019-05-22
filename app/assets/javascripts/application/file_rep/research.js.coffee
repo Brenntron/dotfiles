@@ -451,3 +451,19 @@ window.update_file_rep_data = () ->
 $ ->
   # dbinebri: on page load - setting the collapsed + height state for both json reports
   $('#collapse_sb_json, #collapse_tg_json').toggleClass("in").css("height", "300px").attr("aria-expanded", "false")
+
+
+  # dbinebri: refactoring this. this is checkbox toggle column visible + widths on Show Page, Research tab
+  $('#data-show-sandbox-cb').click -> $('#sandbox-report-wrapper').toggle()
+  $('#data-show-tg-cb').click -> $('#threatgrid-report-wrapper').toggle()
+  $('#data-show-reversing-cb').click -> $('#reversing-labs-report-wrapper').toggle()
+
+  wrapper_list = $('#sandbox-report-wrapper, #threatgrid-report-wrapper, #reversing-labs-report-wrapper')
+
+  $('#data-show-sandbox-cb, #data-show-tg-cb, #data-show-reversing-cb').click ->
+    if $('.dataset-cb:checked').length == 1
+      $(wrapper_list).removeClass('col-sm-4 col-sm-6').addClass('col-sm-12')
+    else if $('.dataset-cb:checked').length == 2
+      $(wrapper_list).removeClass('col-sm-4 col-sm-12').addClass('col-sm-6')
+    else if $('.dataset-cb:checked').length == 3
+      $(wrapper_list).removeClass('col-sm-6 col-sm-12').addClass('col-sm-4')

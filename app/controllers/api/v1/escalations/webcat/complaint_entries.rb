@@ -176,6 +176,7 @@ module API
               requires :id, type: Integer, desc:'complaint entry id'
               requires :prefix, type: String, desc: 'the url to categorize'
               requires :categories, type: String, desc: 'a list of categories to assign to this prefix'
+              requires :category_names, type: String, desc: 'a list of category names to assign to Complaint Entry record'
               requires :status, type: String, desc: 'setting the status of the entry'
               optional :comment, type: String, desc: 'internal comment'
               optional :resolution_comment, type: String, desc: 'resolution comment for the customer'
@@ -183,11 +184,13 @@ module API
             post 'update'do
               begin
                 entry = ComplaintEntry.find(permitted_params['id'])
-                entry.change_category( permitted_params['prefix'],permitted_params['categories'],
-                                         permitted_params['status'],
-                                         permitted_params['comment'],
-                                         permitted_params['resolution_comment'],
-                                         current_user, "")
+                entry.change_category( permitted_params['prefix'],
+                                       permitted_params['categories'],
+                                       permitted_params['category_names'],
+                                       permitted_params['status'],
+                                       permitted_params['comment'],
+                                       permitted_params['resolution_comment'],
+                                       current_user, "")
                 ComplaintEntryPreload.generate_preload_from_complaint_entry(entry)
                 if entry.complaint.ticket_source != Complaint::SOURCE_RULEUI
                   message = Bridge::ComplaintUpdateStatusEvent.new
@@ -197,7 +200,26 @@ module API
               rescue Exception => e
                   return {error:e.message}.to_json
               end
-              {display_name: current_user.display_name, status:entry.status, entry_resolution:permitted_params['status']}.to_json
+              {display_name: current_user.display_name, status: entry.status, entry_resolution: permitted_params['status'],
+               uri: entry.uri, domain: entry.domain, subdomain: entry.subdomain, path: entry.path}.to_json
+            end
+
+            desc 'Bulk update entry resolutions'
+            params do
+              requires :complaint_entry_ids, type: Array[Integer], desc: 'ComplaintEntry ids'
+              requires :resolution_name, type: String
+            end
+            post 'bulk_update_entry_resolution' do
+              begin
+                permitted_params['complaint_entry_ids'].each do |id|
+                  ComplaintEntry.update(id, :resolution => params[:resolution_name], :status => ComplaintEntry::STATUS_COMPLETED)
+                end
+              rescue Exception => e
+                Rails.logger.error "Failed to take entry: error=> #{e.message}"
+                error = "#{e.message}"
+                return {:error => error}.to_json
+              end
+              params[:complaint_entry_ids].to_json
             end
 
 
@@ -214,9 +236,12 @@ module API
             post 'update_pending' do
               begin
                 entry = ComplaintEntry.find(permitted_params['id'])
-                entry.change_category( permitted_params['prefix'], permitted_params['categories'],
-                                    permitted_params['status'],
-                                    permitted_params['comment'],permitted_params['resolution_comment'],
+
+                entry.change_category(permitted_params['prefix'],
+                                      permitted_params['categories'],
+                                      nil,
+                                      permitted_params['status'],
+                                      permitted_params['comment'],permitted_params['resolution_comment'],
                                     current_user, permitted_params['commit'])
 
                 message = Bridge::ComplaintUpdateStatusEvent.new
@@ -225,7 +250,9 @@ module API
               rescue Exception => e
                 return e.message
               end
-              {status:entry.status, entry_resolution:permitted_params['commit'], was_dismissed: entry.was_dismissed?}.to_json
+              {entry_id: entry.id, domain: entry.domain, subdomain: entry.subdomain, path: entry.path,
+               categories: entry.url_primary_category, uri: entry.uri, status:entry.status,
+               entry_resolution:permitted_params['commit'], was_dismissed: entry.was_dismissed?}.to_json
             end
 
 
@@ -463,14 +490,43 @@ module API
               end
             end
 
-            desc 'Retrieve historic_category_information from expanding a complaint entry row'
+            desc 'Retrieve current categories from expanding a complaint entry row'
             params do
               requires :id, type: Integer
             end
             post 'retrieve_current_categories' do
               std_api_v2 do
                 complaint_entry = ComplaintEntry.find(params[:id])
-                complaint_entry.current_category_data.to_json
+
+                if complaint_entry.subdomain.present? || complaint_entry.path.present?
+                  master_categories = complaint_entry.get_category_names_from_master
+                else
+                  master_categories = []
+                end
+
+                {master_categories: master_categories, current_category_data: complaint_entry.current_category_data }.to_json
+              end
+            end
+
+            desc 'Retrieve category names from master domain'
+            params do
+              requires :id, type: Integer
+            end
+            post 'retrieve_category_names_from_master' do
+              std_api_v2 do
+                complaint_entry = ComplaintEntry.find(params[:id])
+                complaint_entry.get_category_names.to_json
+              end
+            end
+
+            desc 'Inherit categories from master domain'
+            params do
+              requires :id, type: Integer
+            end
+            post 'inherit_categories_from_master_domain' do
+              std_api_v2 do
+                complaint_entry = ComplaintEntry.find(params[:id])
+                complaint_entry.inherit_categories(ip_or_uri: complaint_entry.uri, description:'Inherited from master domain', user: current_user.email)
               end
             end
 
@@ -486,7 +542,9 @@ module API
                   begin
                     if entry['error'] == false
                       complaint_entry = ComplaintEntry.find(entry['entry_id'])
-                      complaint_entry.change_category( entry['prefix'],entry['categories'],
+                      complaint_entry.change_category( entry['prefix'],
+                                                       entry['categories'],
+                                                       nil,
                                                        entry['status'],
                                                        entry['comment'],
                                                        entry['resolution_comment'],

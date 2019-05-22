@@ -1,5 +1,5 @@
 class DisputeEmail < ApplicationRecord
-  belongs_to :dispute, optional: true
+  belongs_to :dispute, optional: true, touch: true
   belongs_to :file_reputation_dispute, optional: true
   has_many :dispute_email_attachments
 
