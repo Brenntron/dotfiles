@@ -2206,7 +2206,7 @@ a.static-nav-item {
 }
 
 .missing-info, .missing-data {
-  color: $type-lighter-color;
+  color: lighten($type-lighter-color, 20%);
   font-style: italic;
 }
 
@@ -9314,5 +9314,10 @@ div[aria-describedby='create-detection-dialog'] {
 
 .no-score::before {
   content:'No Score';
+  display: block;
+}
+
+.unknown-file::before {
+  content:'Unknown';
   display: block;
 }

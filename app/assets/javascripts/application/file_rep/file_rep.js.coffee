@@ -582,8 +582,7 @@ $ ->
         data: 'file_name'
         render: (data, type, full, meta) ->
           if data == "N/A" || data == "Unknown" || data == "Missing" || data == ""
-            data = ""
-          else
+            data = '<span class="missing-data unknown-file"></span>'
           return data
       }
       {
