@@ -168,7 +168,7 @@ class FileReputationDispute < ApplicationRecord
 
     attributes = {
         id: bug_proxy.id,
-        file_name: 'N/A',
+        file_name: nil,
         sha256_hash: sha256_hash,
         disposition_suggested: disposition_suggested,
         user_id: User.where(cvs_username: assignee).first.id
