@@ -1,7 +1,7 @@
 $ ->
 ########### GRAB SHA NEEDED FOR REPORTS ############
 #  If html body is on the show page (do not call on other pages)
-  if $('body').hasClass('show-action')
+  if $('body').hasClass('escalations--file_rep--disputes-controller') && $('body').hasClass('show-action')
     # On the show page we can pull the sha from the FILE OVERVIEW section
     # This prepares all the remaining functions for data fetches / updates
     sha256_hash = $('#sha256_hash')[0].innerText
