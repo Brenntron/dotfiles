@@ -485,7 +485,7 @@ class DisputeEntry < ApplicationRecord
   def last_submitted
     if self.referenced_tickets.count > 0
 
-      last_submitted = referenced_tickets.last.created_at
+      last_submitted = referenced_tickets.order(:created_at).last.created_at
     else
       last_submitted = "N/A"
     end
