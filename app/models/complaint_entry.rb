@@ -785,7 +785,7 @@ class ComplaintEntry < ApplicationRecord
           source = category_certainty[category.category_id].first[:source_description]
 
         end
-        data[category.category_id] = {
+        data[category.confidence] = {
             category_id: category.category_id,
             desc_long: category.desc_long,
             descr: category.descr,
