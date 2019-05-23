@@ -579,6 +579,7 @@ module API
             post 'xbrs' do
               #raise 'simulated breakage'
               response = Xbrs::GetXbrs.by_domain(permitted_params['url'])
+              return [] if response.is_a?(Hash) && response[:error].present?
               data = response.last['data']
               columns = response.last['legend']
 
