@@ -290,15 +290,15 @@ $ ->
     console.log response_data
 
     #    UNCOMMENT OUT WHEN BACKEND IS READY
-#    std_msg_ajax(
-#      method: 'POST'
-#      url: "/escalations/api/v1/escalations/file_rep/amp_naming_convention/create"
-#      data: data
-#      success: (response) ->
-#        std_msg_success('The Following AMP Naming Conventions Have Been Created:', [response_data], reload: false)
-#      error: (response) ->
-#        std_msg_error('Error Creating AMP Naming Conventions', [response.responseText], reload: false)
-#    )
+    std_msg_ajax(
+      method: 'POST'
+      url: "/escalations/api/v1/escalations/file_rep/amp_naming_convention"
+      data: { patterns: data }
+      success: (response) ->
+        std_msg_success('The Following AMP Naming Conventions Have Been Created:', [response_data], reload: false)
+      error: (response) ->
+        std_msg_error('Error Creating AMP Naming Conventions', [response.responseText], reload: false)
+    )
 
 
   window.update_amp_naming_conventions = ([data]) ->

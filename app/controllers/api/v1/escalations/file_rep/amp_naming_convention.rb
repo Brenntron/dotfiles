@@ -4,24 +4,26 @@ module API
       module FileRep
         class AmpNamingConvention < Grape::API
           include API::V1::Defaults
-          # include API::BugzillaRestSession
 
           resource "escalations/file_rep/amp_naming_convention" do
 
             desc 'Create an AMP Naming Convention record through the form'
             params do
-              requires :pattern, type: String
-              requires :example, type: String
-              requires :engine, type: String
-              requires :engine_description, type: String
-              requires :notes, type: String
-              requires :public_notes, type: String
-              requires :contact, type: String
-              optional :table_sequence, type: Integer
+              requires :patterns, type: Array do
+                requires :pattern, type: String
+                requires :example, type: String
+                requires :engine, type: String
+                requires :engine_description, type: String
+                requires :notes, type: String
+                requires :public_notes, type: String
+                requires :contact, type: String
+                optional :table_sequence, type: Integer
+              end
             end
             post "" do
               std_api_v2 do
-                conv = ::AmpNamingConvention.create!(params)
+                conv = ::AmpNamingConvention.new
+                conv.update_from_params(params['patterns'])
 
                 render json: {status: 'Success', id: conv.id}
               end
