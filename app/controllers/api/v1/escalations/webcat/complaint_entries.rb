@@ -504,7 +504,40 @@ module API
                   master_categories = []
                 end
 
-                {master_categories: master_categories, current_category_data: complaint_entry.current_category_data }.to_json
+                wbrs_categories = complaint_entry.current_category_data
+
+                # Pull data from SDS if WBRS does not return a valid response
+                if wbrs_categories.empty?
+                  sds_params = {}
+                  sds_params["query_string"] = "/score/wbrs;webcat/json?url=#{complaint_entry.uri}"
+                  sds_response = JSON.parse(SbApi.remote_lookup_sds(sds_params))
+                  sds_category = sds_response['short_description']
+
+                  wbrs_response = Wbrs::Prefix.get_certainty_sources_for_urls([complaint_entry.uri])
+
+                  if !wbrs_response.empty? && wbrs_response[complaint_entry.uri].present?
+                    certainty_data_for_sds = []
+                    sds_category_match = wbrs_response[complaint_entry.uri].select {|entry| entry['description'] == sds_category}
+
+                    if sds_category_match.any?
+                      sds_category_match.each do |match|
+                        certainty = match['certainty']
+                        confidence = match['confidence']
+                        source_mnemonic = match['source_mnemonic']
+                        source_description = match['source_description']
+
+                        certainty_data_for_sds << {certainty: certainty, confidence: confidence, source_mnemonic: source_mnemonic,
+                                                  source_description: source_description}
+                      end
+
+                      # Sort certainty data by descending order
+                      certainty_data_for_sds.sort_by! {|data| data['certainty']}.reverse
+                    end
+                  end
+                end
+
+                {master_categories: master_categories, current_category_data: wbrs_categories,
+                 sds_category: sds_category, certainty_data_for_sds: certainty_data_for_sds }.to_json
               end
             end
 

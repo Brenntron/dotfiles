@@ -740,7 +740,6 @@ format = (complaint_entry_row) ->
   else
     fixed_radio = "checked='checked'"
 
-
   category_row = ''
   tooltip_table = ''
   tooltip_all = ''
@@ -750,14 +749,23 @@ format = (complaint_entry_row) ->
   tooltip_table_end = '</tbody></table>'
   tooltip_wrapper_end = '</span></div>'
 
+  # SDS Tooltip Table
+
+  sds_tooltip_table = ''
+  sds_tooltip_all = ''
+  sds_tooltip_wrapper_start = '<div class="tooltip_templates"><span id="sds_'
+  sds_tooltip_table_start = '<table class="category-tooltip-table"><thead><tr><th>Certainty</th><th>Source</th><th>Description</th></tr></thead><tbody>'
+  sds_tooltip_table_guts = ''
+  sds_tooltip_table_end = '</tbody></table>'
+  sds_tooltip_wrapper_end = '</span></div>'
+
   std_msg_ajax(
     method: 'POST'
     url: '/escalations/api/v1/escalations/webcat/complaint_entries/retrieve_current_categories'
     data: {'id': complaint_entry.entry_id}
     success: (response) ->
-
       $('#loader-modal').modal 'hide'
-      { current_category_data : current_categories, master_categories} = JSON.parse(response)
+      { current_category_data : current_categories, master_categories, sds_category, certainty_data_for_sds} = JSON.parse(response)
 
       master_categories_list = '#main-domain-categories_' + complaint_entry.entry_id
 
@@ -781,6 +789,16 @@ format = (complaint_entry_row) ->
           tooltip_all = tooltip_wrapper_start + 'certainty_table' + complaint_entry.entry_id + '_' + cat_id + '">' + tooltip_table + tooltip_wrapper_end
           category_row = '<tr><td>' + confidence + '</td><td>' + mnemonic + ' - ' + name + '</td><td><span class="certainty-flag nested-tooltipped" onmouseover="triggerTooltips(this)" data-tooltip-content="#certainty_table' + complaint_entry.entry_id + '_' + cat_id + '">' + top_certainty + '</span>' + tooltip_all + '</td></tr>'
           $(".simple-nested-table" + "#" + complaint_entry.entry_id).append(category_row)
+
+      # Populate SDS table
+      if sds_category
+        sds_tooltip_table_guts = sds_tooltip_table_guts
+        sds_tooltip_table = sds_tooltip_table_start
+        sds_tooltip_all = sds_tooltip_wrapper_start + 'certainty_table' + complaint_entry.entry_id + '">' + sds_tooltip_table + sds_tooltip_wrapper_end
+
+        category_row = '<td>1</td>' + '<td>' + sds_category + '</td><td><span class="certainty-flag nested-tooltipped" onmouseover="triggerTooltips(this)" data-tooltip-content="#sds_certainty_table' + complaint_entry.entry_id + '">' + certainty_data_for_sds[0]['certainty'] + '</span>' + sds_tooltip_all + '</td>'
+
+        $(".simple-nested-table" + "#sds_" + complaint_entry.entry_id).append(category_row)
 
     error: (response) ->
       $('#loader-modal').modal 'hide'
@@ -836,7 +854,12 @@ format = (complaint_entry_row) ->
       '<label class="content-label-sm">Customer Description</label>' +
       '<span class="nested-complaint-data">' + customer_description + '</span>' +
       '</div></div><div class="col-xs-5 col-with-divider">' +
+      '<label class="content-label-sm">WBRS</label>' +
       '<table class="simple-nested-table" id="' + complaint_entry.entry_id + '"><thead><tr><th>Conf</th><th>Current Categories</th><th>Certainty</th></tr></thead>' +
+      '</table>' +
+      '</br>' +
+      '<label class="content-label-sm">SDS</label>' +
+      '<table class="simple-nested-table" id="sds_' + complaint_entry.entry_id + '"><thead><tr><th>Conf</th><th>Current Categories</th><th>Certainty</th></tr></thead>' +
       '</table>' +
       '</div><div class="col-xs-2">' +
       '<button class="secondary" id="lookup-' + complaint_entry.entry_id + '" onclick="WebCat.RepLookup.queryWhoIs(\'' + url + '\')">Lookup</button><br/>' +
