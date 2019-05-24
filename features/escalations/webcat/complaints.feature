@@ -425,10 +425,10 @@ Feature: Webcat complaints
   Scenario: a user expands a Complaint Entry and sees SDS data
     Given a user with role "webcat user" exists and is logged in
     And the following complaint entries exist:
-    | uri         | domain     | path |
-    | 1000rr.com  | 1000rr.com |      |
+    | uri             | domain        | path |
+    | baumpflege.ac   | baumpflege.ac |      |
     When I goto "/escalations/webcat/complaints?f=ALL"
     And I click ".expand-row-button-1"
     And I wait for "5" seconds
     Then take a screenshot
-    Then I should see content "Transportation" within ".sds_category"
+    Then I should see content "Games" within ".sds_category"
