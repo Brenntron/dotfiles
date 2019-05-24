@@ -42,15 +42,15 @@ puts "init selenium connection"
 options = Selenium::WebDriver::Firefox::Options.new(args: ['-headless'])
 driver = Selenium::WebDriver.for(:firefox, options: options)
 
-# navigate to a really super awesome site
-driver.navigate.to "https://talosintelligence.com"
-
-# resize the window and take a screenshot
-driver.manage.window.resize_to(800, 800)
-driver.save_screenshot "talosintelligence-screenshot.png"
-
-puts "Page title is #{driver.title}"
-
+# # navigate to a really super awesome site
+# driver.navigate.to "https://talosintelligence.com"
+#
+# # resize the window and take a screenshot
+# driver.manage.window.resize_to(800, 800)
+# driver.save_screenshot "talosintelligence-screenshot.png"
+#
+# puts "Page title is #{driver.title}"
+#
 
 while message = client.receive
   begin
@@ -81,17 +81,11 @@ while message = client.receive
 
     screenshot_entry.screenshot = Base64.decode64(data)
 
-
-
   rescue Exception => ex
     puts ("#{ex.class}: #{ex.message}")
   ensure # this is a good practice to get into so that the driver will always exit, even if there is an error
     driver.quit
   end
-
-
-
-
 end
 
 driver.quit

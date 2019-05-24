@@ -1,0 +1,26 @@
+#!/usr/bin/env ruby
+
+require 'rubygems'
+require 'daemons'
+
+ENV['RAILS_ENV'] ||= 'production'
+ENV['APP_ROOT'] ||= File.expand_path(File.join(File.dirname(__FILE__), '..'))
+APP_ROOT = ENV['APP_ROOT']
+require File.join(APP_ROOT, "config", "environment")
+
+script_file = File.join(APP_ROOT, 'lib', 'screengrab.rb')
+tmp_dir = File.join(APP_ROOT, 'tmp')
+
+options = {
+  :app_name   => "screenshot",
+  :dir_mode   => :normal,
+  :dir        => tmp_dir,
+  :multiple   => true,
+  :ontop      => false,
+  :mode       => :load,
+  :backtrace  => true,
+  :monitor    => true,    
+  :log_output => true,
+}
+
+Daemons.run(script_file,options)
