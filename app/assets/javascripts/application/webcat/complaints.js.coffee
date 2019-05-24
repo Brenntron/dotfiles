@@ -862,7 +862,7 @@ format = (complaint_entry_row) ->
       '</table>' +
       '</br>' +
       '<label class="content-label-sm">SDS</label>' +
-      '<table class="simple-nested-table" id="sds_' + complaint_entry.entry_id + '"><thead><tr><th>Conf</th><th>Current Categories</th><th>Certainty</th></tr></thead>' +
+      '<table class="simple-nested-table" id="sds_' + complaint_entry.entry_id + '"><thead><tr><th class="col-sm-1">Conf</th><th class="col-sm-4">Current Categories</th><th class="col-sm-2">Certainty</th></tr></thead>' +
       '</table>' +
       '</div><div class="col-xs-2">' +
       '<button class="secondary" id="lookup-' + complaint_entry.entry_id + '" onclick="WebCat.RepLookup.queryWhoIs(\'' + url + '\')">Lookup</button><br/>' +
