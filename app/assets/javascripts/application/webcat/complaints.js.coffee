@@ -792,6 +792,10 @@ format = (complaint_entry_row) ->
           category_row = '<tr><td>' + confidence + '</td><td>' + mnemonic + ' - ' + name + '</td><td><span class="certainty-flag nested-tooltipped" onmouseover="triggerTooltips(this)" data-tooltip-content="#certainty_table' + complaint_entry.entry_id + '_' + cat_id + '">' + top_certainty + '</span>' + tooltip_all + '</td><td class=sds_category>' + sds_category + '</td></tr>'
           $(".simple-nested-table" + "#" + complaint_entry.entry_id).append(category_row)
 
+      if jQuery.isEmptyObject(current_categories) == true && sds_category
+        category_row = '<tr><td><td></td><td></td><td class=sds_category>' + sds_category + '</td></tr>'
+        $(".simple-nested-table" + "#" + complaint_entry.entry_id).append(category_row)
+
     error: (response) ->
       $('#loader-modal').modal 'hide'
       current_categories = ''
@@ -846,7 +850,6 @@ format = (complaint_entry_row) ->
       '<label class="content-label-sm">Customer Description</label>' +
       '<span class="nested-complaint-data">' + customer_description + '</span>' +
       '</div></div><div class="col-xs-7 col-with-divider">' +
-      '<label class="content-label-sm">WBRS</label>' +
       '<table class="simple-nested-table" id="' + complaint_entry.entry_id + '"><thead><tr><th class="col-sm-1">Conf</th><th class="col-sm-4">WBRS Categories</th><th class="col-sm-2">WBRS Certainty</th><th>SDS Category</tr></thead>' +
       '</table>' +
       '</br>' +
