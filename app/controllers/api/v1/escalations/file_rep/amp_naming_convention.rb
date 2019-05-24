@@ -22,30 +22,34 @@ module API
             end
             post "" do
               std_api_v2 do
-                conv = ::AmpNamingConvention.new
-                conv.update_from_params(params['patterns'])
+                ti_pattern = TiApi::AmpNamingPattern.new(params['patterns'])
+                ti_pattern.update_ti!
+                ::AmpNamingConvention.save_batch(ti_pattern.records)
 
-                render json: {status: 'Success', id: conv.id}
+                render json: {status: 'Success'}
               end
             end
 
             desc 'Edit an AMP Naming Convention record through the form'
             params do
-              requires :pattern, type: String
-              requires :example, type: String
-              requires :engine, type: String
-              requires :engine_description, type: String
-              requires :notes, type: String
-              requires :public_notes, type: String
-              requires :contact, type: String
-              optional :table_sequence, type: Integer
+              requires :patterns, type: Array do
+                requires :pattern, type: String
+                requires :example, type: String
+                requires :engine, type: String
+                requires :engine_description, type: String
+                requires :notes, type: String
+                requires :public_notes, type: String
+                requires :contact, type: String
+                optional :table_sequence, type: Integer
+              end
             end
-            put ":id" do
+            patch "" do
               std_api_v2 do
-                conv = ::AmpNamingConvention.find(params['id'])
-                conv.update!(params.reject {|key, value| 'id' == key.to_s })
+                ti_pattern = TiApi::AmpNamingPattern.new(params['patterns'])
+                ti_pattern.update_ti!
+                ::AmpNamingConvention.save_batch(ti_pattern.records)
 
-                render json: {status: 'Success', id: conv.id}
+                render json: {status: 'Success'}
               end
             end
           end

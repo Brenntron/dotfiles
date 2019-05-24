@@ -289,7 +289,6 @@ $ ->
     console.log data
     console.log response_data
 
-    #    UNCOMMENT OUT WHEN BACKEND IS READY
     std_msg_ajax(
       method: 'POST'
       url: "/escalations/api/v1/escalations/file_rep/amp_naming_convention"
@@ -302,7 +301,7 @@ $ ->
 
 
   window.update_amp_naming_conventions = ([data]) ->
-  # Pulling out just patterns for response message
+    # Pulling out just patterns for response message
     response_data = ""
     if data.length > 1
       $(data).each ->
@@ -314,14 +313,13 @@ $ ->
     console.log data
     console.log response_data
 
-    #    UNCOMMENT OUT WHEN BACKEND IS READY
-#    std_msg_ajax(
-#      method: 'PUT'
-#      url: "/escalations/api/v1/escalations/file_rep/amp_naming_convention/update"
-#      data: data
-#      success: (response) ->
-#        std_msg_success('The Following AMP Naming Conventions Have Been Updated:', [response_data], reload: false)
-#      error: (response) ->
-#        std_msg_error('Error Updating AMP Naming Conventions', [response.responseText], reload: false)
-#    )
+    std_msg_ajax(
+      method: 'PATCH'
+      url: "/escalations/api/v1/escalations/file_rep/amp_naming_convention"
+      data: { patterns: data }
+      success: (response) ->
+        std_msg_success('The Following AMP Naming Conventions Have Been Updated:', [response_data], reload: false)
+      error: (response) ->
+        std_msg_error('Error Updating AMP Naming Conventions', [response.responseText], reload: false)
+    )
 

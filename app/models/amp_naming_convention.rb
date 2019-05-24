@@ -12,6 +12,16 @@ class AmpNamingConvention < ApplicationRecord
       raise errors.full_messages.to_sentence unless valid?
       ti_pattern.update!(self)
       save!
+  def self.save_batch(records)
+    # Since table_sequence might be reordered, but must be unique at all times,
+    # move to negative of its intended position, then negate it again.
+    records.each do |record|
+      record.table_sequence = -record.table_sequence
+      record.save!
+    end
+    records.each do |record|
+      record.table_sequence = -record.table_sequence
+      record.save!
     end
 
     return true
