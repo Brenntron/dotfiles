@@ -792,8 +792,11 @@ format = (complaint_entry_row) ->
 
       # Populate SDS table
       if sds_category
-        sds_tooltip_table_guts = sds_tooltip_table_guts
-        sds_tooltip_table = sds_tooltip_table_start
+        $(certainty_data_for_sds).each ->
+          sds_certainty_row = '<tr><td>' + this.certainty + '</td><td>' + this.source_mnemonic + '</td><td>' + this.source_description + '</td></tr>'
+          sds_tooltip_table_guts = sds_tooltip_table_guts + sds_certainty_row
+
+        sds_tooltip_table = sds_tooltip_table_start + sds_tooltip_table_guts + sds_tooltip_table_end
         sds_tooltip_all = sds_tooltip_wrapper_start + 'certainty_table' + complaint_entry.entry_id + '">' + sds_tooltip_table + sds_tooltip_wrapper_end
 
         category_row = '<td>1</td>' + '<td>' + sds_category + '</td><td><span class="certainty-flag nested-tooltipped" onmouseover="triggerTooltips(this)" data-tooltip-content="#sds_certainty_table' + complaint_entry.entry_id + '">' + certainty_data_for_sds[0]['certainty'] + '</span>' + sds_tooltip_all + '</td>'
