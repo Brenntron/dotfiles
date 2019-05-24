@@ -272,7 +272,8 @@ window.get_sandbox_report = (runid, sha) ->
       # Adding link to see sandbox html report
       $('#sb-report-html').attr('data-sha', sha)
       $('#sb-report-html').attr('data-runid', runid)
-      $('#sb-report-html').attr('href', "/escalations/api/v1/escalations/file_rep/sandbox_api/sandbox_report_html/" + runid + "/" + sha)
+      $('#sb-report-html').attr('href', "/escalations/file_rep/sandbox-html-report?run_id=" + runid + "&sha256_hash=" + sha)
+      $('#sb-report-html-download').attr('href', "/escalations/file_rep/sandbox-html-report.gzip?run_id=" + runid + "&sha256_hash=" + sha)
 
 
       # dbinebri: Convert the Talos Sandbox full_report to a downloadable file, add the Download button hyperlink

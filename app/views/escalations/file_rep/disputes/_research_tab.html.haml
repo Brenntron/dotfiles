@@ -79,8 +79,10 @@
           .col-xs-12.text-center
             -#%a{href: '#', target: '_blank'}
             -#%button.secondary.view-report-external-button.data-report-button#sb-report-html{onclick: 'sandbox_html_report();'}
-            %a.secondary.view-report-external-button.data-report-button#sb-report-html{download: "sandbox-report.html"}
+            %a.btn.btn-primary.view-report-external-button.data-report-button#sb-report-html{href: "/escalations/file_rep/sandbox-html-report", target: "_blank"}
               View HTML Report
+            %a.btn.btn-primary.view-report-external-button.data-report-button#sb-report-html-download{href: ""}
+              Download HTML Report
         %hr.thin
         .row
           .col-xs-6
