@@ -26,13 +26,6 @@ class SbApi < ApplicationRecord
     eb["short_description"] = "-"
     eb["long_description"] = "-"
     begin
-      score_plucked = pluck_score(response)
-      eb["response"] = score_to_text(score_plucked, request_type)
-      if score_plucked == "noscore"
-        # "noscore" eventually becomes "Neutral", but later we want to
-        # know cases which "Neutral" cases were because of "noscore"
-        eb["show"] = "0"
-      end
       cat_match = webcat_list[pluck_webcat_code(response)]
       eb["short_description"] = cat_match["name"]
       eb["long_description"] = cat_match["description"]
@@ -41,64 +34,8 @@ class SbApi < ApplicationRecord
     eb.to_json
   end
 
-  def self.sbrs_to_text(original_score)
-    # Poor is -10 to -2.0
-    # Neutral is -1.9 to 0.9
-    # Neutral (score none)
-    # Good is +1.0 to +10
-    t = 'Neutral'
-    begin
-      score = original_score.to_f
-      case
-      when score >= 1         # Good is +1.0 to +10
-        t = 'Good'
-      when score > -2         # Neutral is -1.9 to 0.9
-        t = 'Neutral'
-      when score <= -2        # Poor is -10 to -2.0
-        t = 'Poor'
-      when score == 'noscore' # Neutral (score none)
-        t = 'Neutral'
-      else
-        t = 'Neutral'
-      end
-    rescue
-      t = 'Neutral'
-    end
-  end
-
-  def self.score_to_text(original_score, score_type = "wbrs")
-    txt = 'Unavailable'
-    begin
-      if score_type == "sbrs" or score_type == "ip"
-        txt = sbrs_to_text(original_score)
-      elsif score_type == "wbrs" or score_type == "url"
-        txt = wbrs_to_text(original_score)
-      end
-    rescue
-      txt = 'Unavailable'
-    end
-    txt
-  end
-
   def self.pluck_webcat_code(response)
     JSON.parse(response.body)[0]["response"]["webcat"]["cat"].to_s
-  end
-
-  def self.pluck_score(response)
-    begin
-      result = JSON.parse(response.body)
-      if result[0]["response"]["wbrs"]
-        result[0]["response"]["wbrs"]["score"].to_s
-      else
-        if result[0]["response"]["sbrs"]
-          result[0]["response"]["sbrs"]["score"].to_s
-        else
-          "noscore_"
-        end
-      end
-    rescue
-      "noscore-"
-    end
   end
 
   def self.determine_sds_uri(sds_type)
