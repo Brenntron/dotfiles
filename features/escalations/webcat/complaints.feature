@@ -422,7 +422,7 @@ Feature: Webcat complaints
 
   # This will eventually need to be stubbed, because the response from SDS might update
   @javascript
-  Scenario: a user expands a Complaint Entry and sees SDS data
+  Scenario: a user expands a Complaint Entry and sees SDS data when WBRS data is not present
     Given a user with role "webcat user" exists and is logged in
     And the following complaint entries exist:
     | uri             | domain        | path |
@@ -430,5 +430,4 @@ Feature: Webcat complaints
     When I goto "/escalations/webcat/complaints?f=ALL"
     And I click ".expand-row-button-1"
     And I wait for "5" seconds
-    Then take a screenshot
     Then I should see content "Games" within ".sds_category"
