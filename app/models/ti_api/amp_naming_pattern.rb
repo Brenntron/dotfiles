@@ -35,6 +35,7 @@ class TiApi::AmpNamingPattern < TiApi::Base
       attribute_values = pattern_params.slice(*AmpNamingConvention.column_names)
       attribute_values.delete('id')
       record.assign_attributes(attribute_values)
+      raise "Invalid record for #{record.pattern} -- #{record.errors.full_messages.to_sentence}" unless record.valid?
 
       DataElement.new( pattern_params: attribute_values,
                        prev_position: prev_position,
