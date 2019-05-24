@@ -280,7 +280,7 @@ $ ->
     # Pulling out just patterns for response message
     response_data = ""
     if data.length > 1
-      data.each ->
+      $(data).each ->
         response_data += "'" + this.pattern + "', "
     else
       response_data = data[0].pattern
@@ -305,7 +305,7 @@ $ ->
   # Pulling out just patterns for response message
     response_data = ""
     if data.length > 1
-      data.each ->
+      $(data).each ->
         response_data += "'" + this.pattern + "', "
     else
       response_data = data[0].pattern
