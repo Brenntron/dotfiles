@@ -256,24 +256,20 @@ $ ->
       window.update_amp_naming_conventions([rows_to_update])
 
 
-
   window.delete_amp_naming_convention = (id, pattern) ->
     # DELETE WHEN BACKEND IS READY
     console.log ('Delete this ' + pattern)
     console.log ('id: ' + id)
 
-#    UNCOMMENT OUT WHEN BACKEND IS READY
-#    std_msg_ajax(
-#      method: 'POST'
-#      url: "/escalations/api/v1/escalations/file_rep/amp_naming_convention/delete"
-#      data:
-#        id: id
-#      success: (response) ->
-#        std_msg_success('AMP Naming Convention Below Has Been Deleted.', [pattern], reload: false)
-#      error: (response) ->
-#        std_msg_error('Error Deleting ' + pattern, [response.responseText], reload: false)
-#    )
-
+    std_msg_ajax(
+      method: 'DELETE'
+      url: "/escalations/api/v1/escalations/file_rep/amp_naming_convention/" + id
+      data: {}
+      success: (response) ->
+        std_msg_success('AMP Naming Convention Below Has Been Deleted.', [pattern], reload: false)
+      error: (response) ->
+        std_msg_error('Error Deleting ' + pattern, [response.responseText], reload: false)
+    )
 
 
   window.create_amp_naming_conventions = ([data]) ->
@@ -284,10 +280,6 @@ $ ->
         response_data += "'" + this.pattern + "', "
     else
       response_data = data[0].pattern
-
-    # DELETE WHEN BACKEND IS READY
-    console.log data
-    console.log response_data
 
     std_msg_ajax(
       method: 'POST'
@@ -308,10 +300,6 @@ $ ->
         response_data += "'" + this.pattern + "', "
     else
       response_data = data[0].pattern
-
-    # DELETE WHEN BACKEND IS READY
-    console.log data
-    console.log response_data
 
     std_msg_ajax(
       method: 'PATCH'

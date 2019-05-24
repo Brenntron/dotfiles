@@ -52,6 +52,21 @@ module API
                 render json: {status: 'Success'}
               end
             end
+
+            desc 'Delete an AMP Naming Convention record through the form'
+            params do
+              requires :id, type: Integer
+            end
+            delete ":id" do
+              std_api_v2 do
+                byebug
+                record = ::AmpNamingConvention.find(params['id'])
+                TiApi::AmpNamingPattern.delete_on_ti!(record.table_sequence)
+                record.destroy!
+
+                render json: {status: 'Success'}
+              end
+            end
           end
         end
       end
