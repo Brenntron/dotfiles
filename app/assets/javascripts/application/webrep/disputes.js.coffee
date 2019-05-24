@@ -1046,10 +1046,12 @@ $ ->
       { data: 'submitter_name' }
       { data: 'submitter_email' }
       { data: 'status_comment' }
+      { data: 'updated_at' }
       {
         data: 'age_int'
         visible: false
       }
+
 
 
     ])
@@ -1352,7 +1354,7 @@ $ ->
         success: (response) ->
       )
 
-    if window.location.pathname == '/escalations/file_rep/disputes' ||  window.location.pathname == '/escalations/webrep/disputes'
+    if window.location.pathname.includes('/escalations/file_rep') ||  window.location.pathname.includes('/escalations/webrep')
       $('#filter-cases').show()
       $('#import-webrep').show()
     #      $('#web-rep-search').show()
@@ -1444,6 +1446,34 @@ window.populate_resolution_dropdown = (dispute_id) ->
 window.disputes_select_all_check_box = () ->
   $('.dispute_check_box').prop('checked', $('#disputes_check_box').prop('checked'))
 
+window.webrep_export_selected_rows = () ->
+  checked_boxes = $('.dispute_check_box:checked').get()
+
+  if checked_boxes.length > 0
+    ids = checked_boxes.map (checkbox) -> parseInt(checkbox.value)
+
+    query_string = '?'
+    for id in ids
+      query_string += "ids[]=#{id}&"
+
+    window.open("/escalations/webrep/export_selected_dispute_rows#{query_string}", "_blank")
+  else
+    std_msg_error('Error',['Please select at least one row before exporting'])
+
+window.webrep_research_export_selected_rows = () ->
+  checked_boxes = $('.dispute_check_box:checked').get()
+
+  if checked_boxes.length > 0
+    ids = checked_boxes.map (checkbox) -> parseInt(checkbox.getAttribute('data-entry-id'))
+
+    query_string = '?'
+    for id in ids
+      query_string += "ids[]=#{id}&"
+
+    window.open("/escalations/webrep/export_selected_dispute_entry_rows#{query_string}", "_blank")
+  else
+    std_msg_error('Error',['Please select at least one row before exporting'])
+
 $ ->
   $('#advanced-search-button').click ->
     $('#advanced-search-dropdown').show()
@@ -1452,8 +1482,11 @@ $ ->
     $('#search_name').val("")
     $('#advanced-search-dropdown').toggle()
 
-  $(document).click ->
-    $("#advanced-search-dropdown").hide()
+  $(document).on 'click', (e)->
+    if e.target.closest('.daterangepicker') == null && e.target.closest('.available') == null
+      $("#advanced-search-dropdown").hide()
+    else
+      $("#advanced-search-dropdown").show()
 
   $(document).ready ->
     setInterval ->

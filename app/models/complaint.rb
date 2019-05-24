@@ -78,9 +78,8 @@ class Complaint < ApplicationRecord
   end
 
   def self.parse_url(url)
-    url = URI.escape(url)
     uri = URI.parse(URI.parse(url).scheme.nil? ? "http://#{url}" : url)
-    domain = PublicSuffix.parse(uri.host)
+    domain = PublicSuffix.parse(uri.host, :ignore_private => true)
     subdomain = uri.host.gsub(/\A[0-9]*www[0-9]*\./, '').gsub(Regexp.new("\\.?#{domain.domain}$"), '')
 
     {
@@ -457,7 +456,8 @@ class Complaint < ApplicationRecord
 
       all_complaints.each do |rule_ui_complaint|
         uri_to_test = compile_parts_to_uri(rule_ui_complaint)
-        rule_ui_complaint_exists = ComplaintEntry.where("uri like '%#{uri_to_test}%'")
+        rule_ui_complaint_exists = ComplaintEntry.where("uri like ?", "%" + uri_to_test + "%")
+
         if rule_ui_complaint_exists.blank? && rule_ui_complaint['add_channel'] == WBNP_CHANNEL
           new_complaints << rule_ui_complaint
         end
@@ -528,7 +528,8 @@ class Complaint < ApplicationRecord
                                      ticket_source: Complaint::SOURCE_RULEUI,
                                      ticket_source_key: rule_ui_complaint["complaint_id"])
 
-    ComplaintEntry.create_complaint_entry(new_complaint, uri, User.where(display_name:"Vrt Incoming").first)
+    #ComplaintEntry.create_complaint_entry(new_complaint, uri, User.where(display_name:"Vrt Incoming").first)
+    ComplaintEntry.create_wbnp_complaint_entry(new_complaint, uri, rule_ui_complaint, User.where(display_name:"Vrt Incoming").first)
 
 
     Wbrs::RuleUiComplaint.assign_tickets({:complaint_ids => [rule_ui_complaint["complaint_id"]], :user => "admatter"})

@@ -17,7 +17,7 @@ $(document).ready ->
 
       $(search_criteria_group).each ->
         group_id = $(this).attr('id')
-        input = $(this).find('input')
+        input = $(this).find('.form-control')
         select = $(this).find('select')
         if $(input).attr('id') == cb_for || $(select).attr('id') == cb_for || group_id == cb_for
           $(this).removeClass('hidden')

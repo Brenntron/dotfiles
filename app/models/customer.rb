@@ -6,6 +6,8 @@ class Customer < ApplicationRecord
 
   validates :email, presence: true, uniqueness: true
 
+  delegate :name, to: :company, allow_nil: true, prefix: true
+
   def self.thread_safe_find_or_create_by(attributes)
     with_advisory_lock("customer_create", timeout_seconds: 20) do
       find_by(email: attributes[:email]) || create(attributes)
@@ -65,6 +67,19 @@ class Customer < ApplicationRecord
           find_or_create_customer(customer_email: payload["payload"]["email"],
                                   company_name: payload["payload"]["user_company"],
                                   name: payload["payload"]["name"])
+    else
+      customer_exists = Customer.thread_safe_find_or_create_by(email: "guest@cisco.com", name: "Guest", company:Company.find_by_name("Guest"))
+    end
+
+    customer_exists
+  end
+
+  def self.file_rep_process_and_get_customer(payload)
+    if payload[:name].present? && payload[:company_name].present? && payload[:email]
+      customer_exists =
+          find_or_create_customer(customer_email: payload[:email],
+                                  company_name: payload[:company_name],
+                                  name: payload[:name])
     else
       customer_exists = Customer.thread_safe_find_or_create_by(email: "guest@cisco.com", name: "Guest", company:Company.find_by_name("Guest"))
     end

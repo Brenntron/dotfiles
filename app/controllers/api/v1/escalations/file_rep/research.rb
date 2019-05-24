@@ -29,6 +29,21 @@ module API
                 end
               end
             end
+
+            desc "update file rep columns"
+            params do
+              requires :id, type: Integer, desc: "file rep id"
+            end
+            post "update_file_rep_data" do
+
+              filerep = FileReputationDispute.where(:id => permitted_params[:id]).first
+              if filerep.present?
+                filerep.update_superfecta
+              end
+
+              render json: {}
+
+            end
           end
         end
       end

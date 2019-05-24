@@ -38,27 +38,27 @@
     .dropdown-menu.nav-tools-dropdown#filter-dropdown{'aria-labelledby': 'filter-cases'}
       %ul#filter-cases-list
         %li{class: ("selected" if params[:f] == "my_disputes")}
-          %a{href: '?f=my_disputes'}
+          %a{class:"filter-cases", onclick: 'refresh_url("?f=my_disputes")'}
             %span.nav-dropdown-icon.icon-my-bugs
             My Tickets
         %li{class: ("selected" if params[:f] == "my_open")}
-          %a{href: '?f=my_open'}
+          %a{class:"filter-cases", onclick: 'refresh_url("?f=my_open")'}
             %span.nav-dropdown-icon.icon-my-open-bugs
             My Open Tickets
         %li{class: ("selected" if params[:f] == "unassigned")}
-          %a{href: '?f=unassigned'}
+          %a{class:"filter-cases", onclick: 'refresh_url("?f=unassigned")'}
             %span.nav-dropdown-icon.icon-unassigned-bugs
             Unassigned Tickets
         %li{class: ("selected" if params[:f] == "open")}
-          %a{href: '?f=open'}
+          %a{class:"filter-cases", onclick: 'refresh_url("?f=open")'}
             %span.nav-dropdown-icon.icon-open-bugs
             Open Tickets
         %li{class: ("selected" if params[:f] == "closed")}
-          %a{href: '?f=closed'}
+          %a{class:"filter-cases", onclick: 'refresh_url("?f=closed")'}
             %span.nav-dropdown-icon.icon-fixed-bugs
             Closed Tickets
         %li{class: ("selected" if params[:f] == "all")}
-          %a{href: '?f=all'}
+          %a{class:"filter-cases", onclick: 'refresh_url("?f=all")'}
             %span.nav-dropdown-icon.icon-all-tickets
             All Tickets
 
@@ -67,12 +67,12 @@
           %span.nav-dropdown-content-icon.icon-saved-search
           My Saved Searches
         %table#saved-search.table
-          %tbody#saved-search-tbody
+          %tbody#saved-search-tbody.filerep-named-search-list
             - if current_user.named_searches.any?
-              - current_user.named_searches.where('project_type = ? OR project_type IS ?', 'Dispute', nil).order(:id).each do |named_search|
+              - current_user.named_searches.where('project_type = ? OR project_type IS ?', 'FileReputationDispute', nil).order(:id).each do |named_search|
                 %tr{id: "saved_search_#{named_search.id}"}
                   %td
-                    %a.input-truncate.saved-search.esc-tooltipped{onclick: "named_webrep_index_table('#{named_search.name}');", title: named_search.name}
+                    %a.input-truncate.saved-search.esc-tooltipped{onclick: "build_named_search('#{named_search.name}');", title: named_search.name}
                       = named_search.name
                     %a.delete-search{title: 'Delete Saved Search', onclick: "delete_disputes_named_search(this, '#{named_search.name}');"}
                       = image_tag('icon_cancel_grey.svg')
@@ -81,7 +81,7 @@
 
   .nav-tool-blocks.col-xs-3.col-sm-3.col-md-3.col-lg-5.search-wrapper
     .input-group.search-group#file-rep-search
-      = form_tag('/tickets', method: :get, onsubmit: 'call_contains_search(this);return false;') do
+      = form_tag('/tickets', method: :get, onsubmit: 'build_contains_search();return false;') do
         = text_field_tag 'case[id]', "#{}", class: 'search-box'
 
       %button#advanced-search-button.btn.btn-default.nav-tool-button.dropdown-toggle{'data-toggle': 'dropdown', 'aria-haspopup': 'true', 'aria-expanded': 'false'}
@@ -90,7 +90,7 @@
         %h3.nav-tool-dropdown-header.inverse
           Advanced Search
         #advanced-search-wrapper.nav-tool-content-wrapper
-  -#          = render 'escalations/webrep/disputes/advanced_search'
+          = render 'escalations/file_rep/disputes/advanced_search'
 
 
 

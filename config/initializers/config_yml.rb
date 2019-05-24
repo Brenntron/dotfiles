@@ -5,6 +5,9 @@ raise "config.yml missing #{Rails.env} section" unless env_config
 
 Rails.configuration.app_name = Rails.application.engine_name.gsub(/_application/,'')
 
+amp_poke = env_config.fetch('amp_poke', {})
+Rails.configuration.amp_poke            = ApiRequester::ApiRequester.config_of(amp_poke)
+
 raise "config.yml missing amq section" unless env_config['amq']
 Rails.configuration.amq_host            = env_config['amq']['host']
 
@@ -158,3 +161,14 @@ Rails.configuration.threatgrid          = ApiRequester::ApiRequester.config_of(t
 ticloud = env_config.fetch('ticloud', {})
 raise 'config.yml missing ticloud section' unless ticloud
 Rails.configuration.ticloud             = ApiRequester::ApiRequester.config_of(ticloud)
+
+elastic_config = env_config['elastic']
+raise 'config.yml missing elastic section' unless elastic_config
+Rails.configuration.elastic              = OpenStruct.new
+Rails.configuration.elastic.host         = elastic_config['host']
+Rails.configuration.elastic.port         = elastic_config['port']
+Rails.configuration.elastic.verify_mode  = elastic_config['verify_mode']
+Rails.configuration.elastic.ca_cert_file = elastic_config['ca_cert_file']
+Rails.configuration.elastic.username     = elastic_config['username']
+Rails.configuration.elastic.password     = elastic_config['password']
+Rails.configuration.elastic.tls          = true

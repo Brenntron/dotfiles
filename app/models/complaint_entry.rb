@@ -107,6 +107,7 @@ class ComplaintEntry < ApplicationRecord
 
   def change_category(prefix,
                       categories_string,
+                      category_names_string,
                       entry_status,
                       comment,
                       resolution_comment,
@@ -154,7 +155,7 @@ class ComplaintEntry < ApplicationRecord
 
           current_status = "PENDING"
           update(resolution: entry_status,
-                 url_primary_category: categories_string,
+                 url_primary_category: category_names_string,
                  category: categories_string,
                  status:current_status,
                  internal_comment: comment,
@@ -218,6 +219,42 @@ class ComplaintEntry < ApplicationRecord
     end
   end
 
+  def inherit_categories(ip_or_uri:, description:, user:, casenumber: nil)
+    if ip_or_uri != self.domain
+      parsed_uri = Complaint.parse_url(ip_or_uri)
+      master_domain = parsed_uri[:domain]
+
+      existing_prefixes = Wbrs::Prefix.where({urls: [ip_or_uri]})
+
+      existing_prefix = nil
+
+      if existing_prefixes.present?
+        existing_prefix = existing_prefixes.find { |existing_prefix| existing_prefix.subdomain == parsed_uri[:subdomain] && existing_prefix.path == parsed_uri[:path] }
+      end
+
+      if description.present? && casenumber.present?
+        description = description + "--Case Number: #{casenumber} User: #{user}"
+      end
+
+      # Get the categories from the master domain
+      category_data = ComplaintEntry.get_category_data(master_domain)
+      category_ids = category_data[:category_ids]
+      category_names = category_data[:category_names]
+
+      # Inherit categories from the master domain
+      if existing_prefix.present?
+        prefix_object = Wbrs::Prefix.new
+        prefix_object.set_categories(category_ids, user: user, description: description, prefix_id: existing_prefix.prefix_id)
+      else
+        Wbrs::Prefix.create_from_url(url: ip_or_uri, categories: category_ids, user: user, description: description)
+      end
+
+      self.update(url_primary_category: category_names[0])
+    elsif ip_or_uri == self.domain
+      raise ('Cannot inherit categories on master domain')
+    end
+  end
+
   def self.self_importance(ip_url)
     begin
       Wbrs::TopUrl.check_urls([ip_url]).first&.is_important
@@ -227,6 +264,94 @@ class ComplaintEntry < ApplicationRecord
       Rails.logger.warn e&.backtrace&.join("\n")
     end
   end
+
+  def self.create_wbnp_complaint_entry(complaint, ip_url, url_parts, user = nil, status = NEW, categories = nil)
+
+    begin
+      new_complaint_entry = ComplaintEntry.new
+      new_complaint_entry.complaint_id = complaint.id
+      new_complaint_entry.status = status
+
+      begin
+        wbrs_stuff = Sbrs::ManualSbrs.get_wbrs_data({:url => URI.escape(ip_url)})
+        wbrs_score = wbrs_stuff["wbrs"]["score"]
+        new_complaint_entry.wbrs_score = wbrs_score
+      rescue
+        #do nothing continue with saving the entry
+      end
+
+      if is_ip?(ip_url)
+        new_complaint_entry.ip_address = ip_url
+        new_complaint_entry.entry_type = "IP"
+
+      else
+        new_complaint_entry.uri = ip_url
+        new_complaint_entry.entry_type = "URI/DOMAIN"
+        new_complaint_entry.subdomain = url_parts["subdomain"]
+        new_complaint_entry.domain = url_parts["domain"]
+        new_complaint_entry.path = url_parts["path"]
+      end
+      #lets query the top url API endpoint to determine if this is an important site or not
+      # but you better believe i dont trust this API so we have some checks to ensure the entry gets created
+      begin
+        importance = self_importance(ip_url)
+        new_complaint_entry.is_important = importance if importance
+      rescue
+        #do nothing keep building entry
+      end
+      new_complaint_entry.user = user
+      new_complaint_entry.case_assigned_at ||= Time.now if user && user.display_name != "Vrt Incoming"
+
+      if status == PENDING # occurs when attempt to categorized a Top URl without a complaint
+        new_complaint_entry.url_primary_category = categories
+        new_complaint_entry.category = categories
+      else
+        current_category = new_complaint_entry.set_current_category
+        new_complaint_entry.url_primary_category = current_category
+        new_complaint_entry.category = current_category
+      end
+
+      new_complaint_entry.save
+
+    rescue Exception => e
+      raise Exception.new("{ComplaintEntry creation error: {content: #{ip_url},error:#{e}}}")
+    end
+
+    ComplaintEntryPreload.generate_preload_from_complaint_entry(new_complaint_entry)
+    max_wait_for_job = 15 #seconds
+    begin
+      screenshot_data =  ""
+      Timeout::timeout(max_wait_for_job) do
+        screenshot_data = CapybaraSpider.low_capture("#{new_complaint_entry.hostlookup}")
+      end
+      ces = ComplaintEntryScreenshot.new
+      ces.complaint_entry_id = new_complaint_entry.id
+      ces.screenshot = Base64.decode64(screenshot_data)
+      ces.save!
+    rescue Timeout::Error => e
+      #couldnt complete in time
+      Rails.logger.error( "#{e} --- Timed out waiting for screenshot for #{new_complaint_entry.hostlookup} to finish")
+      ces = ComplaintEntryScreenshot.new
+      ces.error_message = e.message
+      ces.complaint_entry_id = new_complaint_entry.id
+      open("app/assets/images/failed_screenshot.jpg") do |f|
+        ces.screenshot = f.read
+      end
+      ces.save!
+    rescue Exception => e
+      Rails.logger.error("#{e.message}")
+      #do nothing, it was worth a try. kittens are sad now
+      ces = ComplaintEntryScreenshot.new
+      ces.error_message = e.message
+      ces.complaint_entry_id = new_complaint_entry.id
+      open("app/assets/images/failed_screenshot.jpg") do |f|
+        ces.screenshot = f.read
+      end
+      ces.save!
+    end
+
+  end
+
 
   def self.create_complaint_entry(complaint, ip_url, user = nil, status = NEW, categories = nil)
     begin
@@ -566,8 +691,63 @@ class ComplaintEntry < ApplicationRecord
     ''
   end
 
+  def self.get_category_data(uri)
+    prefix_results = Wbrs::Prefix.where({:urls => [uri]})
+
+    return [] unless prefix_results
+
+    parsed_uri = Complaint.parse_url(uri)
+    parsed_uri['path'] = '' unless parsed_uri['path'].present?
+    parsed_uri['subdomain'] = '' unless parsed_uri['subdomain'].present?
+
+    final_results = []
+
+    prefix_results.each do |prefix_result|
+      if ((prefix_result.subdomain == parsed_uri['subdomain']) || (parsed_uri['subdomain'] == 'www')) && prefix_result.path == parsed_uri['path']
+        final_results << prefix_result
+      end
+    end
+
+    return [] unless final_results
+
+    category_ids = final_results.first.categories.sort_by(&:confidence).map {|category| category.category_id}
+    category_names = final_results.first.categories.sort_by(&:confidence).map {|category| category.descr}
+
+    {category_ids: category_ids, category_names: category_names}
+  end
+
+  def get_category_names_from_master
+    prefix_results = Wbrs::Prefix.where({:urls => [self.domain]})
+
+    if self.entry_type == 'URI/DOMAIN'
+      parsed_uri = Complaint.parse_url(uri)
+
+      return [] unless prefix_results
+
+      parsed_uri['path'] = '' unless parsed_uri['path'].present?
+      parsed_uri['subdomain'] = '' unless parsed_uri['subdomain'].present?
+
+      categories = []
+
+      prefix_results.each do |prefix_result|
+        if ((prefix_result.subdomain == parsed_uri['subdomain']) || (parsed_uri['subdomain'] == 'www')) && prefix_result.path == parsed_uri['path']
+          categories << prefix_result
+        end
+      end
+
+      if categories.any?
+        categories = categories.first.categories.map {|category| category.descr}
+      end
+
+      categories
+    elsif self.entry_type == 'IP'
+      raise ("Cannot inherit categories for IP entries.")
+    end
+  end
+
   def current_category_data
-    prefix_results = Wbrs::Prefix.where({:urls => [URI.escape(DisputeEntry.domain_of_with_path(self.hostlookup))]})
+
+    prefix_results = Wbrs::Prefix.where({:urls => [DisputeEntry.domain_of_with_path(self.hostlookup)]})
     return {} unless prefix_results
     certainty_on_urls = Wbrs::Prefix.get_certainty_sources_for_urls([DisputeEntry.domain_of_with_path(self.hostlookup)])
 
@@ -722,15 +902,19 @@ class ComplaintEntry < ApplicationRecord
 
       self.domain = parsed_uri[:domain]
       self.subdomain = parsed_uri[:subdomain]
-      self.uri = uri
+      self.path = parsed_uri[:path]
+
+      if self.subdomain.present?
+        self.uri = subdomain + '.' + domain
+      else
+        self.uri = uri
+      end
+
       ComplaintEntryPreload.generate_preload_from_complaint_entry(self)
 
-      save!
-
-      return {status: 'success', preload: false, domain: domain, subdomain: subdomain} if complaint_entry_preload&.current_category_information == 'DATA ERROR'
-
-      response = (complaint_entry_preload&.current_category_information)
-      return {status: 'success', preload: true, data: JSON.parse(response), domain: domain, subdomain: subdomain}
+      if save!
+        {status: 'success'}
+      end
     end
   end
 end

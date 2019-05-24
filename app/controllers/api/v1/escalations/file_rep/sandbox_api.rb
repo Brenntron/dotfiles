@@ -56,6 +56,14 @@ module API
               render json: api_response
             end
 
+            desc ''
+            params do
+              requires :sha256_hash, type: String, desc: "SHA256 hash"
+            end
+            get "/sandbox_run_sample/:sha256_hash" do
+              api_response = FileReputationApi::Sandbox.run_sample(params[:sha256_hash])
+              render json: api_response
+            end
           end
         end
       end

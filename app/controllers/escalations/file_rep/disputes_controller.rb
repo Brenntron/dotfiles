@@ -8,11 +8,17 @@ class Escalations::FileRep::DisputesController < ApplicationController
                                           search_params.merge('search_conditions' => search_conditions),
                                           user: current_user)
       end
+      format.xlsx do
+        workbook = FileReputationDispute.export_xlsx(params['data_json'], current_user: current_user)
+        send_data workbook.stream.string, filename: "filerep_search_#{Time.now}.xlsx", disposition: 'attachment'
+      end
     end
   end
 
   def show
     @file_rep_dispute = FileReputationDispute.find(params[:id])
+    @versioned_items = @file_rep_dispute.compose_versioned_items
+
   end
 
   def sandbox_html_report

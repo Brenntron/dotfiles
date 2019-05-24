@@ -23,8 +23,12 @@
               Reversing Labs
       %div
         %label.toolbar-section-label Data
-        %button.toolbar-button.sync-button.esc-tooltipped{title: 'Refresh Data'}
+        %button.toolbar-button.sync-button#file-rep-sync-button.esc-tooltipped{title: 'Refresh Data'}
           %span.toolbar-button-text Refresh Data
+      %div
+        %label.toolbar-section-label Reports
+        %button.toolbar-button.esc-tooltipped.create-new-run-button{title: 'Create New Sandbox Run', onclick: 'run_sample_in_sandbox()'}
+          %span.toolbar-button-text Create New Sandbox Run
 
 .row
   .col-xs-12.col-sm-4#sandbox-report-wrapper
@@ -98,9 +102,12 @@
       %div.data-report-wrapper
         %span.missing-data#sandbox-status-message
         %br
-        %button.primary#sandbox-run-button
-          Push and Run Sample in Sandbox
-
+        %button.primary#sandbox-run-button{onclick: 'run_sample_in_sandbox()'}
+          Push Sample to Sandbox and Run
+    .sb-report-run.text-center
+      %div.data-report-wrapper.missing-data
+        Sample is running.
+        %br Running a sample can take 10 minutes or longer.
 
   .col-xs-12.col-sm-4#threatgrid-report-wrapper
     %h2.research-data-header.threatgrid-header Threat Grid
@@ -152,8 +159,8 @@
       %div.data-report-wrapper
         %span.missing-data Not in ThreatGrid
         %br
-        %button.primary
-          Push Sample to ThreatGrid
+        -#%button.primary
+        -#  Push Sample to ThreatGrid
 
 
   .col-xs-12.col-sm-4#reversing-labs-report-wrapper

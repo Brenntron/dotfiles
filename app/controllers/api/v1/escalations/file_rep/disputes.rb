@@ -6,7 +6,6 @@ module API
           include API::V1::Defaults
           include API::BugzillaRestSession
           resource "escalations/file_rep/disputes" do
-
             desc 'Create a File Rep Dispute'
             params do
               requires :sha256_hash, type: String, desc: 'SHA256 hash of the file'
@@ -43,11 +42,18 @@ module API
             end
             post "form" do
               std_api_v2 do
-                permitted_params['shas_array'].each do |sha256|
-                  FileReputationDispute.create_through_form(bugzilla_rest_session,
-                                                            sha256,
-                                                            params[:disposition_suggested],
-                                                            params[:assignee])
+                user_validation = User.where(cvs_username: params[:assignee])
+
+                if user_validation.present?
+                  permitted_params['shas_array'].each do |sha256|
+                    FileReputationDispute.create_through_form(bugzilla_rest_session,
+                                                              sha256,
+                                                              params[:disposition_suggested],
+                                                              params[:assignee],
+                                                              current_user)
+                  end
+                else
+                  raise "Invalid assignee or assignee does not exist. Please try again."
                 end
 
                 render json: {status: 'Success'}
@@ -86,6 +92,54 @@ module API
               filerep_dispute.save!
 
               filerep_dispute.to_json
+            end
+
+            desc 'Update File Rep Dispute status'
+            params do
+              requires :dispute_ids, type: Array[String]
+              requires :status, type: String
+              optional :resolution, type: String
+              optional :comment, type: String
+            end
+
+            post "set_disputes_status" do
+              std_api_v2 do
+                authorize!(:update, FileReputationDispute)
+                dispute_ids = params[:dispute_ids].map{|id| id.to_i}
+                status = params[:status]
+                resolution = ""
+                comment = ""
+
+                if params[:resolution].present?
+                  resolution = params[:resolution]
+                else
+                  resolution = nil
+                end
+
+                if params[:comment].present?
+                  if status == 'RESOLVED_CLOSED'
+                    comment = status + ' : ' + resolution + ' - ' + params[:comment]
+                  else
+                    comment = status + ' - ' + params[:comment]
+                  end
+                end
+
+                file_rep_disputes = FileReputationDispute.where(id: dispute_ids)
+
+                file_rep_disputes.each do |dispute|
+                  dispute.update_status(status)
+
+                  if comment.present?
+                    FileRepComment.create!(comment: comment, file_reputation_dispute_id: dispute.id, user_id: current_user.id)
+                  end
+
+                  if resolution.present?
+                    dispute.update(resolution: resolution)
+                  end
+                end
+
+                render json: {status: 'Success'}
+              end
             end
 
             desc 'Inline Take FileRep Dispute'
@@ -145,13 +199,14 @@ module API
                 assignee = User.find(params[:new_assignee]).cvs_username
 
                 disputes = FileReputationDispute.assign(params[:dispute_ids], user: params[:new_assignee])
-                if disputes.length == 0
-                  raise ('The selected dispute tickets are already assigned.')
+                if params[:dispute_ids].length == 1 && disputes.length == 0
+                  raise ('The selected dispute ticket is already assigned')
+                elsif params[:dispute_ids].length > 1 && disputes.length == 0
+                  raise ('The selected dispute tickets are already assigned')
                 end
                 {:status => "success", :data => disputes, :assignee => assignee}.to_json
               end
             end
-
           end
         end
       end
