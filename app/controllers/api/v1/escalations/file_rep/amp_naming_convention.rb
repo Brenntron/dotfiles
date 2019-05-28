@@ -59,7 +59,6 @@ module API
             end
             delete ":id" do
               std_api_v2 do
-                byebug
                 record = ::AmpNamingConvention.find(params['id'])
                 TiApi::AmpNamingPattern.delete_on_ti!(record.table_sequence)
                 record.destroy!
