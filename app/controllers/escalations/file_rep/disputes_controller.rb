@@ -23,9 +23,16 @@ class Escalations::FileRep::DisputesController < ApplicationController
 
   def sandbox_html_report
     api_response = FileReputationApi::Sandbox.full_report_html(params['sha256_hash'], params['run_id'])
-    file_contents = api_response[:data].body.force_encoding("ISO-8859-1").encode("UTF-8")
+
+    if api_response[:data].present?
+      file_contents = api_response[:data].body.force_encoding("ISO-8859-1").encode("UTF-8")
+    else
+      file_contents = "No Sandbox report found."
+    end
+
 
     respond_to do |format|
+
       format.html { render body: file_contents }
       format.gzip do
         # Note: When I started this, I thought I would have to gzip this in order
