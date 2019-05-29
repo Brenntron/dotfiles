@@ -85,7 +85,7 @@ $ ->
       ]
 
       # insert new data in array at index it will be displayed in
-      row_data.splice index, 0, new_data
+      row_data.splice new_index, 0, new_data
       # set index row to match new placement in datatable
       for i in [0...row_data.length]
         row_data[i][0] = i
