@@ -40,36 +40,35 @@ $ ->
     text_list = text.filter( (string) -> return string != '')
     parent_index = parseInt(parent_index)
 
-    index = 0
+    i = 0
     researchTable.rows().every () ->
 
       data = researchTable.data(this)[0]
-      every_row = researchTable.data(this)[index][2]
+      every_row = researchTable.data(this)[i][2]
       text_list = text_list.filter (text) ->
         return text != $(every_row).attr('data')
 
       if typeof data[0] == 'string'
         researchTable.row().remove(this)
-      index++
+      i++
 
     if text_list.length == 0
       text_list = ['']
     else
       text_list.push('')
 
-    text_list = text_list.filter (item, i) ->  return text_list.indexOf item == i
+    text_list = text_list.filter (item, index) ->  return text_list.indexOf item == index
 
     parent_row = $( row_data[0][2] ).attr('data')
-    for i in [0...text_list.length]
 
-      first_row = $( row_data[0][2] ).attr('data')
+    for i in [0...text_list.length]
       if parent_index == 0 && parent_row == undefined
-        index = parent_index + i
+        new_index = parent_index + i
       else
-        index = parent_index + 1 + i
+        new_index = parent_index + 1 + i
 
       new_data = [
-        index,
+        new_index,
         '<div class="col-select-all">' +
           '<span class="checkbox-wrapper">' +
             '<input type="checkbox" checked>' +
@@ -100,10 +99,10 @@ $ ->
       this.invalidate()
       this.data( row_data[i] )
       i++
+
     researchTable.draw()
-    focus_row = $('.col-bulk-dispute')[index]
+    focus_row = $('.col-bulk-dispute')[new_index]
     focus_row.focus()
-    console.log $(focus_row).innerHTML = ''
 
 
   $( document ).on 'keydown', '.col-bulk-dispute', (e) ->
