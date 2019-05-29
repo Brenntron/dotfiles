@@ -21,7 +21,7 @@ class ComplaintEntry < ApplicationRecord
   NEW = "NEW"
   PENDING = "PENDING"
   STATUS_COMPLETED = "COMPLETED"
-
+  STATUS_REOPENED = "REOPENED"
   STATUS_RESOLVED_FIXED_FN = "FIXED FN"
   STATUS_RESOLVED_FIXED_FP = "FIXED FP"
   STATUS_RESOLVED_FIXED_UNCHANGED = "UNCHANGED"
@@ -924,7 +924,8 @@ class ComplaintEntry < ApplicationRecord
     end
 
     self.status = STATUS_REOPENED
-    self.resolution_message = resolution_message + "\n\n" + " This dispute has been re-opened."
+    self.resolution = nil
+    self.resolution_comment = self.resolution_comment + "<br />" + " --This dispute has been re-opened."
     if save
       if self.complaint.status == Complaint::COMPLETED
         self.complaint.status = Complaint::REOPENED
