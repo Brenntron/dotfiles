@@ -1105,7 +1105,7 @@ $ ->
 
     $('select[name="file-rep-datatable_length"]').on "change", ->
       data = {}
-      data['length'] = $('select[name="file-rep-datatable_length"]').val()
+      data['entriesperpage'] = $('select[name="file-rep-datatable_length"]').val()
       std_msg_ajax(
         url: "/escalations/api/v1/escalations/user_preferences/update"
         method: 'POST'
@@ -1178,17 +1178,20 @@ $ ->
       std_msg_ajax(
         method: 'POST'
         url: "/escalations/api/v1/escalations/user_preferences/"
-        data: {name: 'FileRepEntriesPerPage'}
-        success: (response) ->
-          response = JSON.parse(response)
-          $('select[name="file-rep-datatable_length"]').val(response.length)
-      )
-
-      std_msg_ajax(
-        method: 'POST'
-        url: "/escalations/api/v1/escalations/user_preferences/"
         data: {name: 'FileRepCurrentPage'}
         success: (response) ->
           response = JSON.parse(response)
           $('#file-rep-datatable').DataTable().page(response.currentpage).draw('page')
       )
+
+      std_msg_ajax(
+        method: 'POST'
+        url: "/escalations/api/v1/escalations/user_preferences/"
+        data: {name: 'FileRepEntriesPerPage'}
+        success: (response) ->
+          response = JSON.parse(response)
+          $('#file-rep-datatable').DataTable().page.len(response.entriesperpage).draw('page')
+
+      )
+
+
