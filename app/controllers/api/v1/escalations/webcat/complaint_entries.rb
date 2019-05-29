@@ -70,29 +70,18 @@ module API
 
                 complaint_entries.each do |complaint_entry|
                   complaint_entry_packet = {}
-                  # complaint_age_int = ComplaintEntry.humanize_secs(Time.now - complaint_entry.created_at)
-                  #
-                  # # complaint is less than an hour
-                  # if complaint_age_int < 3600
-                  #   complaint_entry_packet[:age] = '<1h'
-                  # # complaint is more than an hour, less than 120 hours
-                  # elsif complaint_age_int > 3600 and complaint_age_int < 432000
-                  #   refined_words_age = ComplaintEntry.what_time_is_it(complaint_age_int)
-                  #   # complaint is over 3 hours, less than 12 hours
-                  #   if complaint_age_int >= 10800 and complaint_age_int < 43200
-                  #     complaint_entry_packet[:age] = '<span class="ticket-age-over3hr">' + refined_words_age + '</span>'
-                  #   # complaint is over 12 hours, less than 120 hours
-                  #   elsif complaint_age_int > 43200
-                  #     complaint_entry_packet[:age] = '<span class="ticket-age-over12hr">' + refined_words_age + '</span>'
-                  #   else
-                  #     complaint_entry_packet[:age] = refined_words_age
-                  #   end
-                  # # complaint is more than 120 hours
-                  # elsif complaint_age_int  > 432000
-                  #   complaint_entry_packet[:age] = '<span class="ticket-age-over12hr"> >120h </span>'
-                  # else
-                  # end
-                  complaint_entry_packet[:age] = ComplaintEntry.humanize_secs(Time.now - complaint_entry.created_at)
+                  complaint_age = Time.now - complaint_entry.created_at
+                  humanized_age = ComplaintEntry.humanize_secs(complaint_age)
+
+                  complaint_entry_packet[:age] =
+                      case
+                      when complaint_age  > 43200
+                        "<span class=\"ticket-age-over12hr\">#{humanized_age}</span>"
+                      when complaint_age > 10800
+                        "<span class=\"ticket-age-over3hr\">#{humanized_age}</span>"
+                      else
+                        "<span class=\"ticket-age-under3hr\">#{humanized_age}</span>"
+                      end
 
                   complaint_entry_packet[:uri] = complaint_entry.uri
                   complaint_entry_packet[:age_int] = (Time.now - complaint_entry.created_at).to_i
