@@ -917,4 +917,26 @@ class ComplaintEntry < ApplicationRecord
       end
     end
   end
+
+  def reopen
+    if self&.status != STATUS_COMPLETED
+      return false
+    end
+
+    self.status = STATUS_REOPENED
+    self.resolution_message = resolution_message + "\n\n" + " This dispute has been re-opened."
+    if save
+      if self.complaint.status == Complaint::COMPLETED
+        self.complaint.status = Complaint::REOPENED
+        self.complaint.save
+      end
+
+      message = Bridge::ComplaintUpdateStatusEvent.new
+      message.post_complaint(self.complaint)
+
+      return true
+    else
+      return false
+    end
+  end
 end
