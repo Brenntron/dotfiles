@@ -9273,6 +9273,11 @@ div[aria-describedby='create-detection-dialog'] {
   }
 }
 
+// dbinebri: add file rep datatable bg color white in case all cols are showing
+#file-rep-datatable {
+  background-color: $content-bg-color;
+}
+
 // need a separate th class so the bg sort icon isn't affected by generic .text-center
 #file-rep-datatable_wrapper .th-center {
   text-align: center;
