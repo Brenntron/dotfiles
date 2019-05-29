@@ -8827,13 +8827,12 @@ button.secondary.view-report-external-button {
 
 // dbinebri: wrapper for naming-guide-dialog, jquery generates this, leave this here
 .ui-dialog[aria-describedby=naming-guide-dialog] {
-  margin-top: 50px;
+  margin-top: 55px;
   margin-right: 20px;
   border-radius: 5px;
   border: 0;
   box-shadow: 0 5px 15px rgba(0, 0, 0, 0.2);
 
-  // specific formatting for this dialog titlebar
   .ui-dialog-titlebar {
     font-family: 'Open Sans', sans-serif;
     font-weight: 600;
@@ -8850,9 +8849,6 @@ button.secondary.view-report-external-button {
 #naming-guide-dialog {
   font-family: 'Open Sans', sans-serif;
   padding: 10px;
-  //max-height: 700px !important;
-  //height: calc(100% - 37px) !important;
-  height: 50vh !important;
 
   table th {
     text-transform: uppercase;

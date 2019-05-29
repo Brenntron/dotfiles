@@ -2,19 +2,16 @@ $ ->
   # dbinebri: for file rep - naming guide dialog
   $('#naming-guide-dialog').dialog
     autoOpen: false
-    resizable: false
+    resizable: true
+    width: 700
     minWidth: 700
-#    maxWidth: 1200
-
-    height: "auto"
-#    minHeight: 300
-#    maxHeight: 700
-#    resize: "auto"
+    height: 500
+    minHeight: 500
+    maxHeight: 800
     position:
-      my: "left bottom"
-#      at: "right top"
-#      of: window
+      at: "right top"
+    resize: (event, ui) ->
+      $('#naming-guide-dialog').css('height', 'calc(100% - 40px)')
 
-  $('#nav-banner a#naming-guide').click ->
+  $('#nav-banner #naming-guide').click ->
     $('#naming-guide-dialog').dialog('open')
-
