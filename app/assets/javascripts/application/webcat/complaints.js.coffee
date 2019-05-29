@@ -463,13 +463,16 @@ $('html').on 'click', (e) ->
   if typeof $(e.target).data('original-title') == 'undefined' and !$(e.target).parents().is('.popover.in')
     $('[data-original-title]').popover 'hide'
 
+window.retakeScreenshot = (id)->
+  debugger
+
 window.enlarge_image = (id,image)->
   $('#screenshot_id_'+ id).popover(
     html: true
     container: 'body'
     trigger: 'focus'
-    content: '<img src="' + image + '">').popover 'show'
-
+    content: '<img src="' + image + '"><p><a class="btn-sm retake-screenshot" onclick="retakeScreenshot(' + id + ')">Retake Screenshot </a></p>').popover 'show'
+#    uri = '<a href="http://' + complaint_entry.uri + '" onclick="select_cat_text_field(' + complaint_entry.entry_id + ')">' + complaint_entry.uri + '</a>'
 window.lookup_prefix = () ->
 
   $('#loader-modal').modal({

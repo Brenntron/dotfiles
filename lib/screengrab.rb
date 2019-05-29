@@ -36,7 +36,7 @@ Rails.logger.info("#{Time.now} -> create stomp client and subscribe to amq")
 puts "create stomp connection"
 client = Stomp::Connection.new(stomp_options)
 # This queue should only have work jobs for All rule runs
-client.subscribe Rails.configuration.subscribe_all_work, {:ack => :client}
+client.subscribe Rails.configuration.subscribe_screenshot, {:ack => :client}
 puts "init selenium connection"
 
 options = Selenium::WebDriver::Firefox::Options.new(args: ['-headless'])
@@ -51,7 +51,7 @@ driver = Selenium::WebDriver.for(:firefox, options: options)
 #
 # puts "Page title is #{driver.title}"
 #
-
+puts "Waiting for messages"
 while message = client.receive
   begin
     # Start by parsing the request
@@ -65,7 +65,7 @@ while message = client.receive
     # Save the task_id
     ces_id = request['ces_id']
     host_lookup = request['host_lookup']
-
+binding.pry
     #get object that contains info about where we are taking the screenshot
     # and where to put the data once the shot is taken
 
