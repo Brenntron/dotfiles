@@ -127,7 +127,7 @@ $ ->
 
   $('#edit-dispute-entry-button').click ->
 
-    if $('.dispute_check_box:checked').length > 0
+    if ($('.dispute_check_box:checked').length > 0)
       $('.edit-entries-buttons').removeClass('hidden')
       $('.dispute_check_box').each ->
 
@@ -144,7 +144,7 @@ $ ->
           $(first_item).next('.table-entry-input')[0].focus()
 
     else
-      std_msg_error 'No rows selected', ['Select at least one entry to edit']
+      std_msg_error('No rows selected', ['Select at least one entry to edit'])
 
   $('.dispute_check_box').on 'click', (e) ->
     if $(this).not(":checked") && $('.cancel-changes').is(":visible")
