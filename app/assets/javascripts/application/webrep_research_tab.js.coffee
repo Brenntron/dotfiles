@@ -27,11 +27,12 @@ $ ->
       $(col).prop('checked', e_val)
 
   $(document).on 'change', '.col-select-all input', (e) ->
-    e_val = e.currentTarget.checked
     select_cols = $('.col-select-all input')
-    select_cols.every((col)-> return col)
-    if !e_val
-      $('#select-all-bulk').prop('checked', e_val)
+    select_vals = []
+    for col in select_cols
+      select_vals.push( $(col).prop('checked') )
+    bulk_value = select_vals.every( (col) -> return col)
+    $('#select-all-bulk').prop('checked', bulk_value)
 
 
   window.buildRow = ( text, parent_index ) ->
