@@ -8954,6 +8954,8 @@ button.secondary.view-report-external-button {
   color: $second-section-color;
   font-weight: 600;
   padding-left: 22px !important;
+  // dbinebri: ensure RL result data strings wrap correctly
+  word-break: break-all;
 }
 
 .scanner-mal::before {
