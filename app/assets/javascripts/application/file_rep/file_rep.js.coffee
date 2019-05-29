@@ -1103,6 +1103,17 @@ $ ->
 
   $(document).ready ->
 
+    $('select[name="file-rep-datatable_length"]').on "change", ->
+      data = {}
+      data['length'] = $('select[name="file-rep-datatable_length"]').val()
+      std_msg_ajax(
+        url: "/escalations/api/v1/escalations/user_preferences/update"
+        method: 'POST'
+        data: {data, name: 'FileRepEntriesPerPage'}
+        dataType: 'json'
+        success: (response) ->
+      )
+
     $('.toggle-vis-file-rep').on "click", ->
       data = {}
       data['status'] = $("#status-checkbox").is(':checked')
@@ -1151,4 +1162,14 @@ $ ->
               $("##{column}-checkbox").prop('checked', false)
               $('#file-rep-datatable').DataTable().column("##{column}").visible false
 
+      )
+
+      std_msg_ajax(
+        method: 'POST'
+        url: "/escalations/api/v1/escalations/user_preferences/"
+        data: {name: 'FileRepEntriesPerPage'}
+        success: (response) ->
+          response = JSON.parse(response)
+          console.log(response)
+          $('select[name="file-rep-datatable_length"]').val(response.length)
       )
