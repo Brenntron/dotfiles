@@ -1114,6 +1114,17 @@ $ ->
         success: (response) ->
       )
 
+    $('#file-rep-datatable_paginate').on "click", ->
+      data = {}
+      data['currentpage'] = $('#file-rep-datatable').DataTable().page()
+      std_msg_ajax(
+        url: "/escalations/api/v1/escalations/user_preferences/update"
+        method: 'POST'
+        data: {data, name: 'FileRepCurrentPage'}
+        dataType: 'json'
+        success: (response) ->
+      )
+
     $('.toggle-vis-file-rep').on "click", ->
       data = {}
       data['status'] = $("#status-checkbox").is(':checked')
@@ -1170,6 +1181,14 @@ $ ->
         data: {name: 'FileRepEntriesPerPage'}
         success: (response) ->
           response = JSON.parse(response)
-          console.log(response)
           $('select[name="file-rep-datatable_length"]').val(response.length)
+      )
+
+      std_msg_ajax(
+        method: 'POST'
+        url: "/escalations/api/v1/escalations/user_preferences/"
+        data: {name: 'FileRepCurrentPage'}
+        success: (response) ->
+          response = JSON.parse(response)
+          $('#file-rep-datatable').DataTable().page(response.currentpage).draw('page')
       )
