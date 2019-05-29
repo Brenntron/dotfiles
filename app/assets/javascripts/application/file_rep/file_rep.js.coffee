@@ -1125,6 +1125,20 @@ $ ->
         success: (response) ->
       )
 
+    $('#file-rep-datatable th').on "click", ->
+      setTimeout (-> # Wait until after the sorting event is finished before saving the result
+        data = {}
+        data['sortorder'] = $('#file-rep-datatable').DataTable().order()
+        std_msg_ajax(
+          url: "/escalations/api/v1/escalations/user_preferences/update"
+          method: 'POST'
+          data: {data, name: 'FileRepSortOrder'}
+          dataType: 'json'
+          success: (response) ->
+        )
+      ), 100
+
+
     $('.toggle-vis-file-rep').on "click", ->
       data = {}
       data['status'] = $("#status-checkbox").is(':checked')
@@ -1178,6 +1192,15 @@ $ ->
       std_msg_ajax(
         method: 'POST'
         url: "/escalations/api/v1/escalations/user_preferences/"
+        data: {name: 'FileRepSortOrder'}
+        success: (response) ->
+          response = JSON.parse(response)
+          $('#file-rep-datatable').DataTable().order(response.sortorder).draw()
+      )
+
+      std_msg_ajax(
+        method: 'POST'
+        url: "/escalations/api/v1/escalations/user_preferences/"
         data: {name: 'FileRepCurrentPage'}
         success: (response) ->
           response = JSON.parse(response)
@@ -1191,7 +1214,8 @@ $ ->
         success: (response) ->
           response = JSON.parse(response)
           $('#file-rep-datatable').DataTable().page.len(response.entriesperpage).draw('page')
-
       )
+
+
 
 
