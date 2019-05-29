@@ -14,71 +14,123 @@ $ ->
   # Add Rows to Quick lookup research table
   researchTable = $('.research-table').DataTable({
     ordering: false
-    rowReorder: true
+    columnDefs: [
+      "targets": [ 0 ],
+      "visible": false
+    ]
   });
 
-  researchTable.on 'row-reorder', (e, diff, edit) ->
-    for i in [0...diff.length]
-      rowData = researchTable.row( diff[i].node ).data();
-      console.log rowData[1], diff[i].oldData
+  $(document).on 'change', '#select-all-bulk', (e) ->
+    e_val = e.currentTarget.checked
+    select_cols = $('.col-select-all input')
+    for col in select_cols
+      $(col).prop('checked', e_val)
+
+  $(document).on 'change', '.col-select-all input', (e) ->
+    e_val = e.currentTarget.checked
+    select_cols = $('.col-select-all input')
+    select_cols.every((col)-> return col)
+    if !e_val
+      $('#select-all-bulk').prop('checked', e_val)
 
 
-  window.buildRow = (parentRow, text) ->
-    if !text
-      text = ''
-    researchTable.row.add(['<div class="col-dispute" contenteditable>' + text + '</div>','','','','','','','']).draw()
-    newRow = parentRow.parentNode.nextElementSibling
+  window.buildRow = ( text, parent_index ) ->
 
-    newRowCells = $(newRow).children()
-    newRowCells[1].classList.add('col-wbrs')
-    newRowCells[2].classList.add('col-wbrs-rule-hits')
-    newRowCells[3].classList.add('col-wbrs-rules')
-    newRowCells[4].classList.add('col-category')
-    newRowCells[5].classList.add('col-wlbl')
-    newRowCells[6].classList.add('col-reptool-class')
-    newRowCells[7].classList.add('col-actions')
+    row_data = researchTable.rows().data()
+    text_list = text.filter( (string) -> return string != '')
+    parent_index = parseInt(parent_index)
 
-    newRow = $(newRow).closest('tr')
-    index = newRow.index();
+    index = 0
+    researchTable.rows().every () ->
 
-    if index == 1
-      return
+      data = researchTable.data(this)[0]
+      every_row = researchTable.data(this)[index][2]
+      text_list = text_list.filter (text) ->
+        return text != $(every_row).attr('data')
 
-    rowToMoveUp = researchTable.row(index).data();
+      if typeof data[0] == 'string'
+        researchTable.row().remove(this)
+      index++
 
-    i = index
-    while i == index
-      --i
-      rowData = researchTable.row(i - 1).data();
-      rowData[0]++;
+    if text_list.length == 0
+      text_list = ['']
+    else
+      text_list.push('')
 
-      researchTable.row(i).data(rowData)
+    text_list = text_list.filter (item, i) ->  return text_list.indexOf item == i
 
-    researchTable.row(0).data(rowToMoveUp);
+    parent_row = $( row_data[0][2] ).attr('data')
+    for i in [0...text_list.length]
 
-    researchTable.draw(true);
+      first_row = $( row_data[0][2] ).attr('data')
+      if parent_index == 0 && parent_row == undefined
+        index = parent_index + i
+      else
+        index = parent_index + 1 + i
+
+      new_data = [
+        index,
+        '<div class="col-select-all">' +
+          '<span class="checkbox-wrapper">' +
+            '<input type="checkbox" checked>' +
+          '</span>' +
+        '</div>',
+        '<p class="col-bulk-dispute" contenteditable="true" data=' + text_list[i] + '>' + text_list[i] + '</p>',
+        '<div class="col-wbrs"></div>',
+        '<div class="col-wbrs-rule-hits"></div>',
+        '<div class="col-wbrs-rules"></div>',
+        '<div class="col-category"></div>',
+        '<div class="col-wlbl"></div>',
+        '<div class="col-reptool-class"></div>',
+        '<div class="col-actions"></div>'
+      ]
+
+      # insert new data in array at index it will be displayed in
+      row_data.splice index, 0, new_data
+      # set index row to match new placement in datatable
+      for i in [0...row_data.length]
+        row_data[i][0] = i
+
+      #  add new row(s) to datatable, delay redraw of table til row data is updated
+      researchTable.row.add(new_data).draw('false')
+
+    #  replace all rows with updated data and redraw
+    i = 0
+    researchTable.rows().every () ->
+      this.invalidate()
+      this.data( row_data[i] )
+      i++
+    researchTable.draw()
+    focus_row = $('.col-bulk-dispute')[index]
+    focus_row.focus()
+    console.log $(focus_row).innerHTML = ''
 
 
-  $( document ).on 'paste', '.col-dispute', (e) ->
-    pasted_text = e.originalEvent.clipboardData.getData('text');
-    pasted_list = pasted_text.replace(/\n/g, ",").split(",")
-    if pasted_list.length > 1
-      for text in pasted_list
-        buildRow(this, text)
+  $( document ).on 'keydown', '.col-bulk-dispute', (e) ->
 
-  $( document ).on 'keydown', '.col-dispute', (e) ->
-    currentPage = researchTable.page();
+    key = e.which
+    text = this.innerText.trim()
+    row = this.closest('tr')
 
-    if e.which == 13 && e.shiftKey == false
-      buildRow(this)
+    if key == 13 && e.shiftKey == false
+      $( this ).blur()
+      text = text.replace( /\n/g, " " ).split( " " )
+      parent_index = researchTable.row( row ).data()[0]
+
+      buildRow(text, parent_index)
+
+    if key == 8 && text == ''
+      researchTable.rows( row ).remove()
+      researchTable.draw()
 
 ->
 
   $('#edit-dispute-entry-button').click ->
 
-    if ($('.dispute_check_box:checked').length > 0)
+    if $('.dispute_check_box:checked').length > 0
       $('.edit-entries-buttons').removeClass('hidden')
       $('.dispute_check_box').each ->
+
         if $(this).prop('checked')
           entry_row = $(this).parents('.research-table-row')[0]
           $(entry_row).addClass('editing-row')
@@ -90,8 +142,9 @@ $ ->
             $(this).show()
           first_item = $(editable_data)[0]
           $(first_item).next('.table-entry-input')[0].focus()
+
     else
-      std_msg_error('No rows selected', ['Select at least one entry to edit'])
+      std_msg_error 'No rows selected', ['Select at least one entry to edit']
 
   $('.dispute_check_box').on 'click', (e) ->
     if $(this).not(":checked") && $('.cancel-changes').is(":visible")
@@ -99,7 +152,6 @@ $ ->
         $('.cancel-changes').click()
       else
         e.preventDefault()
-
 
 
   $('.cancel-changes').click ->

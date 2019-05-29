@@ -5037,8 +5037,11 @@ input.table-entry-input:focus {
   padding: 3px 0 0 10px;
 }
 
-.col-dispute{
-  width: 30%
+.col-bulk-dispute{
+  min-width: 150px;
+}
+.col-bulk-dispute div {
+  display: none;
 }
 .research-toolbar{
   color: $type-darkest;

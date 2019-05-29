@@ -49,6 +49,7 @@
           %table#research-table.research-table
             %colgroup
               %col
+              %col
               %col.alt-col
               %col.alt-col
               %col.alt-col
@@ -59,10 +60,10 @@
             %thead
               %tr
                 %th
+                %th
                   %span.checkbox-wrapper
-                    %input{ :type=>"checkbox" }
-                      %span
-                        %label Dispute
+                    %input#select-all-bulk{ :type=>"checkbox", checked: "true" }
+                %th Dispute
                 %th WBRS
                 %th WBRS Rule Hits
                 %th WBRS Rules
@@ -72,7 +73,9 @@
                 %th Actions
             %tbody
               %tr
-                %td.col-dispute{contenteditable:""}
+                %td 0
+                %td.col-select-all
+                %td.col-bulk-dispute{ contenteditable:"" }
                 %td.col-wbrs
                 %td.col-wbrs-rule-hits
                 %td.col-wbrs-rules
