@@ -504,7 +504,14 @@ module API
                   master_categories = []
                 end
 
-                {master_categories: master_categories, current_category_data: complaint_entry.current_category_data }.to_json
+                wbrs_categories = complaint_entry.current_category_data
+
+                # Pull category from SDS
+                sds_params = {}
+                sds_params['url'] = complaint_entry.uri
+                sds_category = Sbrs::ManualSbrs.call_wbrs_webcat(sds_params, type: 'wbrs')
+                {master_categories: master_categories, current_category_data: wbrs_categories,
+                 sds_category: sds_category }.to_json
               end
             end
 
