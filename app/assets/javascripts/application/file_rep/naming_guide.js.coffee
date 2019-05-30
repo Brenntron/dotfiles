@@ -5,7 +5,7 @@ $ ->
     width: 800
     minWidth: 700
     height: 500
-    minHeight: 500
+    minHeight: 300
     position:
       at: "right top"
     resize: () ->
