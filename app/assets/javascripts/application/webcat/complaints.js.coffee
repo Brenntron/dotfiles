@@ -740,7 +740,6 @@ format = (complaint_entry_row) ->
   else
     fixed_radio = "checked='checked'"
 
-
   category_row = ''
   tooltip_table = ''
   tooltip_all = ''
@@ -755,13 +754,14 @@ format = (complaint_entry_row) ->
     url: '/escalations/api/v1/escalations/webcat/complaint_entries/retrieve_current_categories'
     data: {'id': complaint_entry.entry_id}
     success: (response) ->
-
       $('#loader-modal').modal 'hide'
-      { current_category_data : current_categories, master_categories} = JSON.parse(response)
+      { current_category_data : current_categories, master_categories, sds_category} = JSON.parse(response)
+
+      sds_category == '' unless sds_category != null
 
       master_categories_list = '#main-domain-categories_' + complaint_entry.entry_id
 
-      if master_categories.length > 0
+      if master_categories && master_categories.length > 0
         $(master_categories_list).closest('.domain-categories').show()
         for cat in master_categories
           new_cat = '<li>' + cat + '</li>'
@@ -779,8 +779,12 @@ format = (complaint_entry_row) ->
 
           tooltip_table = tooltip_table_start + tooltip_table_guts + tooltip_table_end
           tooltip_all = tooltip_wrapper_start + 'certainty_table' + complaint_entry.entry_id + '_' + cat_id + '">' + tooltip_table + tooltip_wrapper_end
-          category_row = '<tr><td>' + confidence + '</td><td>' + mnemonic + ' - ' + name + '</td><td><span class="certainty-flag nested-tooltipped" onmouseover="triggerTooltips(this)" data-tooltip-content="#certainty_table' + complaint_entry.entry_id + '_' + cat_id + '">' + top_certainty + '</span>' + tooltip_all + '</td></tr>'
+          category_row = '<tr><td>' + confidence + '</td><td>' + mnemonic + ' - ' + name + '</td><td><span class="certainty-flag nested-tooltipped" onmouseover="triggerTooltips(this)" data-tooltip-content="#certainty_table' + complaint_entry.entry_id + '_' + cat_id + '">' + top_certainty + '</span>' + tooltip_all + '</td><td class=sds_category>' + sds_category + '</td></tr>'
           $(".simple-nested-table" + "#" + complaint_entry.entry_id).append(category_row)
+
+      if jQuery.isEmptyObject(current_categories) == true && sds_category
+        category_row = '<tr><td><td></td><td></td><td class=sds_category>' + sds_category + '</td></tr>'
+        $(".simple-nested-table" + "#" + complaint_entry.entry_id).append(category_row)
 
     error: (response) ->
       $('#loader-modal').modal 'hide'
@@ -835,9 +839,10 @@ format = (complaint_entry_row) ->
       '<span class="nested-complaint-data">' + customer_name + '</span>' +
       '<label class="content-label-sm">Customer Description</label>' +
       '<span class="nested-complaint-data">' + customer_description + '</span>' +
-      '</div></div><div class="col-xs-5 col-with-divider">' +
-      '<table class="simple-nested-table" id="' + complaint_entry.entry_id + '"><thead><tr><th>Conf</th><th>Current Categories</th><th>Certainty</th></tr></thead>' +
+      '</div></div><div class="col-xs-7 col-with-divider">' +
+      '<table class="simple-nested-table" id="' + complaint_entry.entry_id + '"><thead><tr><th class="col-sm-1">Conf</th><th class="col-sm-4">WBRS Categories</th><th class="col-sm-2">WBRS Certainty</th><th>SDS Category</tr></thead>' +
       '</table>' +
+      '</br>' +
       '</div><div class="col-xs-2">' +
       '<button class="secondary" id="lookup-' + complaint_entry.entry_id + '" onclick="WebCat.RepLookup.queryWhoIs(\'' + url + '\')">Lookup</button><br/>' +
       '<button class="secondary" id="history-' + complaint_entry.entry_id + '" onclick="history_dialog(' + complaint_entry.entry_id  + ',\'' + url + '\')">History</button><br/>' +
