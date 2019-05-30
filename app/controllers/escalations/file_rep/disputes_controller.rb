@@ -5,7 +5,7 @@ class Escalations::FileRep::DisputesController < ApplicationController
       format.html {  }
       format.json do
         render json: FileRepDatatable.new(params,
-                                          search_params.merge('search_conditions' => search_conditions),
+                                          initialize_params,
                                           user: current_user)
       end
       format.xlsx do
@@ -24,11 +24,19 @@ class Escalations::FileRep::DisputesController < ApplicationController
 
   private
 
-  def search_params
-    params.permit(:search_type, :search_name)
+  def datatables_search_params
+    params.require(:search).permit(:value)
+  end
+
+  def robust_search_params
+    params.permit(:search, :search_type, :search_name)
   end
 
   def search_conditions
     params.has_key?('search_conditions') ? params.require('search_conditions').permit! : nil
+  end
+
+  def initialize_params
+    robust_search_params.merge(datatables_search_params).merge('search_conditions' => search_conditions)
   end
 end

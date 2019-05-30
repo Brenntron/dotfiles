@@ -1,10 +1,11 @@
 class FileRepDatatable < AjaxDatatablesRails::ActiveRecord
 
-  def initialize(params, search_params, user:)
+  def initialize(params, initialize_params, user:)
     @user = user
-    @search_type = search_params['search_type']
-    @search_name = search_params['search_name']
-    @search_conditions = search_params['search_conditions']
+    @search_string = initialize_params['value'] # Native datatables search string
+    @search_type = initialize_params['search_type']
+    @search_name = initialize_params['search_name']
+    @search_conditions = initialize_params['search_conditions']
     super(params, {})
   end
 
@@ -111,11 +112,17 @@ class FileRepDatatable < AjaxDatatablesRails::ActiveRecord
   end
 
   def filter_records(records)
+    base_search =
+        if @search_string.present?
+          FileReputationDispute.robust_search('contains', params: { 'value' => @search_string }, user: @user)
+        else
+          super
+        end
 
     if @search_type
-      super.robust_search(@search_type, search_name: @search_name, params: @search_conditions, user: @user)
+      base_search.robust_search(@search_type, search_name: @search_name, params: @search_conditions, user: @user)
     else
-      super
+      base_search
     end
   end
 end
