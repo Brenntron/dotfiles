@@ -508,34 +508,9 @@ module API
 
                 # Pull category from SDS
                 sds_params = {}
-                sds_params["query_string"] = "/score/wbrs;webcat/json?url=#{complaint_entry.uri}"
-                sds_response = JSON.parse(SbApi.remote_lookup_sds(sds_params))
-                sds_category = sds_response['short_description']
-
-                  # We are no longer trying to match WBRS data with SDS data, but leaving this in just in case
-                  # wbrs_response = Wbrs::Prefix.get_certainty_sources_for_urls([complaint_entry.uri])
-                  #
-                  # if !wbrs_response.empty? && wbrs_response[complaint_entry.uri].present?
-                  #   certainty_data_for_sds = []
-                  #   sds_category_match = wbrs_response[complaint_entry.uri].select {|entry| entry['description'] == sds_category}
-                  #
-                  #   if sds_category_match.any?
-                  #     sds_category_match.each do |match|
-                  #       certainty = match['certainty']
-                  #       confidence = match['confidence']
-                  #       source_mnemonic = match['source_mnemonic']
-                  #       source_description = match['source_description']
-                  #
-                  #       certainty_data_for_sds << {certainty: certainty, confidence: confidence, source_mnemonic: source_mnemonic,
-                  #                                 source_description: source_description}
-                  #     end
-                  #
-                  #     # Sort certainty data by descending order
-                  #     certainty_data_for_sds.sort_by! {|data| data['certainty']}.reverse
-                  #   end
-                #   end
-                # end
-
+                params = {}
+                params['url'] = complaint_entry.uri
+                sds_category = Sbrs::ManualSbrs.call_wbrs_webcat(params, type: 'wbrs')
                 {master_categories: master_categories, current_category_data: wbrs_categories,
                  sds_category: sds_category }.to_json
               end

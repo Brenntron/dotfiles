@@ -749,23 +749,13 @@ format = (complaint_entry_row) ->
   tooltip_table_end = '</tbody></table>'
   tooltip_wrapper_end = '</span></div>'
 
-  # SDS Tooltip Table
-
-  sds_tooltip_table = ''
-  sds_tooltip_all = ''
-  sds_tooltip_wrapper_start = '<div class="tooltip_templates"><span id="sds_'
-  sds_tooltip_table_start = '<table class="category-tooltip-table"><thead><tr><th>Certainty</th><th>Source</th><th>Description</th></tr></thead><tbody>'
-  sds_tooltip_table_guts = ''
-  sds_tooltip_table_end = '</tbody></table>'
-  sds_tooltip_wrapper_end = '</span></div>'
-
   std_msg_ajax(
     method: 'POST'
     url: '/escalations/api/v1/escalations/webcat/complaint_entries/retrieve_current_categories'
     data: {'id': complaint_entry.entry_id}
     success: (response) ->
       $('#loader-modal').modal 'hide'
-      { current_category_data : current_categories, master_categories, sds_category, certainty_data_for_sds} = JSON.parse(response)
+      { current_category_data : current_categories, master_categories, sds_category} = JSON.parse(response)
 
       sds_category == '' unless sds_category != null
 
