@@ -822,9 +822,9 @@ format = (complaint_entry_row) ->
 
   complaint_entry_html =
       complaint_table_row_html +
-      '<div class="col-xs-12 col-sm-9 nested-complaint-static-data">' +
+      '<div class="col-xs-12 col-sm-6 nested-complaint-static-data">' +
       '<div class="row">' +
-      '<div class="col-xs-3 col-with-divider">' +
+      '<div class="col-xs-5 col-with-divider">' +
       '<div class="screenshot-thumb-wrapper">' +
       '<img id="screenshot_id_' + complaint_entry.entry_id + '" class="screenshot-thumb-img" title="' + screen_shot_error + '" data-toggle="popover" onclick="enlarge_image(' + complaint_entry.entry_id + ',\'complaint_entries/serve_image?complaint_entry_id=' + complaint_entry.entry_id + '\')" src="complaint_entries/serve_image?complaint_entry_id=' + complaint_entry.entry_id + '" />' +
       '</div>' +
@@ -848,9 +848,9 @@ format = (complaint_entry_row) ->
       '<button class="secondary" id="history-' + complaint_entry.entry_id + '" onclick="history_dialog(' + complaint_entry.entry_id  + ',\'' + url + '\')">History</button><br/>' +
       '<button class="secondary" id="domain-' + complaint_entry.entry_id + '" onclick="domain_whois(\'' + whois_lookup + '\')">Domain</domain>' +
       '</div></div>' +
-      '</div><div class="col-xs-12 col-sm-3 nested-complaint-editable-data">' +
+      '</div><div class="col-xs-12 col-sm-6 nested-complaint-editable-data">' +
       '<div class="row">' +
-      '<div class="col-xs-12">' +
+      '<div class="col-xs-6 col-with-divider">' +
       '<label class="content-label-sm">Edit URI</label><br/>' +
       '<input class="nested-table-input" id="complaint_prefix_' + complaint_entry.entry_id +
       '" type="text" onclick="this.select()" value="' + host +
@@ -858,19 +858,19 @@ format = (complaint_entry_row) ->
       '<button class="secondary inline-button" onclick="updateURI(event,' + complaint_entry.entry_id + ')">Update URI</button><br/>' +
       '<div class="complaint-selectize-col-wrapper">' +
       '<label class="content-label-sm">Edit Categories / Confidence Order</label>' +
-      '<fieldset id="'+input_cat+'" ' + entry_status + '  name="['+input_cat+'][]" class="selectize" placeholder="Enter up to 5 categories" value="" style="margin-bottom: 20px;">' +
+      '<fieldset id="'+input_cat+'" ' + entry_status + '  name="['+input_cat+'][]" class="selectize" placeholder="Enter up to 5 categories" value="">' +
       '</div>' +
       '<div class="domain-categories" >' +
       '<label class="content-label-sm">Inherit Categories From Main Domain</label><br/>' +
       '<ul id="main-domain-categories_' + complaint_entry.entry_id + '"></ul>'+
       '<button class="secondary inline-button" onclick="inheritCategories(' + complaint_entry.entry_id + ')">Inherit</button><br/>' +
-      '</div>' +'</div><div class="col-xs-8">' +
+      '</div>' +'</div><div class="col-xs-4 col-with-divider">' +
       '<label class="content-label-sm">Internal Comment</label><br/>' +
       '<input class="nested-table-input complaint-comment-input" id="complaint_comment_' + complaint_entry.entry_id + '" type="text" onclick="this.select()" class="nested-table-input" value="' + internal_comment + '" placeholder="Add a comment." ' + entry_status + '><br/>'  +
       '<label class="content-label-sm customer-label">Customer Facing Comment</label><br/>' +
       '<input class="nested-table-input complaint-comment-input" id="complaint_resolution_comment_' + complaint_entry.entry_id + '" type="text" onclick="this.select()" value="' + resolution_comment + '" placeholder="Add a comment for the customer." ' + entry_status + '>' +
       '</div>' +
-      '<div class="col-xs-4">' +
+      '<div class="col-xs-2">' +
       '<label class="content-label-sm">Resolution</label><br/>' +
       complaint_submission_html +
       '</div></div></div></div></td></tr></table>'

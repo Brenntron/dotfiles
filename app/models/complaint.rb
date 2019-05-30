@@ -452,32 +452,27 @@ class Complaint < ApplicationRecord
   end
 
   def self.get_latest_wbnp_complaints
-    begin
 
       all_complaints = Wbrs::RuleUiComplaint.where({:add_channels => [WBNP_CHANNEL], :statuses => ['new']})["data"]
 
-      new_complaints = []
+      #all_complaints.each do |rule_ui_complaint|
+      #  uri_to_test = compile_parts_to_uri(rule_ui_complaint)
+      #  rule_ui_complaint_exists = ComplaintEntry.where("uri like ?", "%" + uri_to_test + "%")
 
-      all_complaints.each do |rule_ui_complaint|
-        uri_to_test = compile_parts_to_uri(rule_ui_complaint)
-        rule_ui_complaint_exists = ComplaintEntry.where("uri like ?", "%" + uri_to_test + "%")
+      #  if rule_ui_complaint_exists.blank? && rule_ui_complaint['add_channel'] == WBNP_CHANNEL
+      #    new_complaints << rule_ui_complaint
+      #  end
+      #end
 
-        if rule_ui_complaint_exists.blank? && rule_ui_complaint['add_channel'] == WBNP_CHANNEL
-          new_complaints << rule_ui_complaint
-        end
-      end
 
-      if new_complaints.present?
-        bugzilla_rest_session = BugzillaRest::Session.default_session
-        new_complaints.each do |new_ui_complaint|
+      bugzilla_rest_session = BugzillaRest::Session.default_session
+      all_complaints.each do |new_ui_complaint|
+        if new_ui_complaint['add_channel'] == WBNP_CHANNEL
           rule_ui_wbnp_create_action(new_ui_complaint, bugzilla_rest_session: bugzilla_rest_session)
         end
-
       end
 
-    rescue
-      #no wbnp response
-    end
+
   end
 
   def self.compile_parts_to_uri(parts)
@@ -488,7 +483,7 @@ class Complaint < ApplicationRecord
     end
     uri = "#{subdomain}#{parts["domain"]}#{parts["path"]}"
 
-    uri
+    URI.escape(uri)
   end
 
   def self.rule_ui_wbnp_create_action(rule_ui_complaint, bugzilla_rest_session:)
@@ -532,12 +527,21 @@ class Complaint < ApplicationRecord
                                      ticket_source: Complaint::SOURCE_RULEUI,
                                      ticket_source_key: rule_ui_complaint["complaint_id"])
 
-    #ComplaintEntry.create_complaint_entry(new_complaint, uri, User.where(display_name:"Vrt Incoming").first)
-    ComplaintEntry.create_wbnp_complaint_entry(new_complaint, uri, rule_ui_complaint, User.where(display_name:"Vrt Incoming").first)
+    begin
+      category_data = ComplaintEntry.get_category_data(uri)
+    rescue
+      category_data = []
+    end
 
+    if category_data.empty?
+      primary_category = nil
+    else
+      primary_category = category_data[:category_names][0]
+    end
+
+    ComplaintEntry.create_wbnp_complaint_entry(new_complaint, uri, rule_ui_complaint, User.where(display_name:"Vrt Incoming").first, ComplaintEntry::NEW, primary_category)
 
     Wbrs::RuleUiComplaint.assign_tickets({:complaint_ids => [rule_ui_complaint["complaint_id"]], :user => "admatter"})
-
   end
 
   def self.create_action(bugzilla_rest_session, ips_urls, description, customer, tags, status=NEW, categories = nil)
