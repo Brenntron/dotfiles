@@ -121,16 +121,16 @@ class FileRepDatatable < AjaxDatatablesRails::ActiveRecord
 
   def sort_records(records)
     case datatable.orders.first.column.sort_query
-    when 'file_reputation_disputes.assigned'
-      FileReputationDispute.joins(:user).order("users.cvs_username #{datatable.orders.first.direction}")
-    when 'file_reputation_disputes.customer_name'
-      FileReputationDispute.joins(:customer).order("customers.name #{datatable.orders.first.direction}")
-    when 'file_reputation_disputes.customer_email'
-      FileReputationDispute.joins(:customer).order("customers.email #{datatable.orders.first.direction}")
-    when 'file_reputation_disputes.customer_company_name'
-      FileReputationDispute.joins(customer: :company).order("companies.name #{datatable.orders.first.direction}")
-    else
-      super
+      when 'file_reputation_disputes.assigned'
+        FileReputationDispute.joins(:user).order("users.cvs_username #{datatable.orders.first.direction}")
+      when 'file_reputation_disputes.customer_name'
+        FileReputationDispute.joins(:customer).order("customers.name #{datatable.orders.first.direction}")
+      when 'file_reputation_disputes.customer_email'
+        FileReputationDispute.joins(:customer).order("customers.email #{datatable.orders.first.direction}")
+      when 'file_reputation_disputes.customer_company_name'
+        FileReputationDispute.joins(customer: :company).order("companies.name #{datatable.orders.first.direction}")
+      else
+        super
     end
   end
 end
