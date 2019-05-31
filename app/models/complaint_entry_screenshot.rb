@@ -14,11 +14,12 @@ class ComplaintEntryScreenshot < ApplicationRecord
       driver.manage.window.resize_to(800, 800)
 
       #save the screenshot hopefully in the database so we dont have to worry about disk usage
-      self.update(screenshot: driver.screenshot_as(:png))
+      self.update(screenshot: driver.screenshot_as(:png), error_message: "")
 
     rescue Exception => ex
       puts ("oops there was a screen capture error")
       puts ("#{ex.class}: #{ex.message}")
+      raise("Screenshot Error: #{ex.class}:: #{ex.message}")
     ensure # this is a good practice to get into so that the driver will always exit, even if there is an error
       driver.quit
     end
