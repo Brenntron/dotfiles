@@ -1687,7 +1687,7 @@ $ ->
 
   $('#complaints_check_box').click ->
     if $('#complaints_check_box').prop('checked')
-      $('#complaints-index').DataTable().rows().select()
+      $('#complaints-index').DataTable().rows( { page: 'current' } ).select()
     else
       $('#complaints-index').DataTable().rows().deselect()
     return
