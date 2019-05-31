@@ -30,7 +30,6 @@ class Escalations::FileRep::DisputesController < ApplicationController
       file_contents = "No Sandbox report found."
     end
 
-
     respond_to do |format|
 
       format.html { render body: file_contents }
