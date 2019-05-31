@@ -297,6 +297,12 @@ window.get_sandbox_report = (runid, sha256_hash) ->
       full_report = JSON.stringify(response.json, null, 2)
       $('#sb-full').text(full_report)
 
+      # Adding link to see sandbox html report
+      $('#sb-report-html').attr('data-sha', sha256_hash)
+      $('#sb-report-html').attr('data-runid', runid)
+      $('#sb-report-html').attr('href', "/escalations/file_rep/sandbox-html-report?run_id=" + runid + "&sha256_hash=" + sha256_hash)
+      $('#sb-report-html-download').attr('href', "/escalations/file_rep/sandbox-html-report.gzip?run_id=" + runid + "&sha256_hash=" + sha256_hash)
+
 
       # dbinebri: Convert the Talos Sandbox full_report to a downloadable file, add the Download button hyperlink
       # build a formatted date string to add into the filename for download
