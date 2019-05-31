@@ -111,9 +111,6 @@ Rails.configuration.rules_repo_url      = env_config['svn']['rules_repo_url']
 Rails.configuration.ruledocs_repo_url   = env_config['svn']['ruledocs_repo_url']
 Rails.configuration.snort_rule_path     = Rails.root.join(env_config['svn']['snort_rule_path'])
 
-talos_intelligence = env_config.fetch('talos_intelligence', {})
-Rails.configuration.talos_intelligence  = ApiRequester::ApiRequester.config_of(talos_intelligence)
-
 
 wbrs_config = env_config['wbrs']
 raise 'config.yml missing wbrs section' unless wbrs_config
