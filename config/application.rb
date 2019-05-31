@@ -52,11 +52,6 @@ module AnalystConsoleEscalations
         config.amq_snort_all_result = :snort_all_rules_test_result
         config.amq_snort_local_result = :snort_local_rules_test_result
 
-        config.publish_screenshot = "/queue/AnalystConsole.Snort.Run.Screenshot.Test.Result"
-        config.subscribe_screenshot = "/queue/AnalystConsole.Snort.Run.Screenshot.Test"
-        config.amq_screenshot_result = :snort_screenshot_test_results
-        config.amq_screenshot = :snort_screenshot_test
-
         config.amq_snort_commit_result = :snort_commit_test_result
       when "freebsd"
         config.publish_local_result = "/queue/AnalystConsole.Snort.Run.Local.Stage.Result"
@@ -67,11 +62,6 @@ module AnalystConsoleEscalations
         config.amq_snort_all = :snort_all_rules_stage_work
         config.amq_snort_all_result = :snort_all_rules_stage_result
         config.amq_snort_local_result = :snort_local_rules_stage_result
-
-        config.publish_screenshot = "/queue/AnalystConsole.Snort.Run.Screenshot.Stage.Result"
-        config.subscribe_screenshot = "/queue/AnalystConsole.Snort.Run.Screenshot.Stage"
-        config.amq_screenshot_result = :snort_screenshot_test_results
-        config.amq_screenshot = :snort_screenshot_test
 
         config.amq_snort_commit_result = :snort_commit_stage_result
       when "staging"
@@ -84,11 +74,6 @@ module AnalystConsoleEscalations
         config.amq_snort_all = :snort_all_rules_stage_work
         config.amq_snort_all_result = :snort_all_rules_stage_result
         config.amq_snort_local_result = :snort_local_rules_stage_result
-
-        config.publish_screenshot = "/queue/AnalystConsole.Snort.Run.Screenshot.Stage.Result"
-        config.subscribe_screenshot = "/queue/AnalystConsole.Snort.Run.Screenshot.Stage"
-        config.amq_screenshot_result = :snort_screenshot_test_results
-        config.amq_screenshot = :snort_screenshot_test
 
         config.amq_snort_commit_result = :snort_commit_stage_result
 
@@ -103,11 +88,6 @@ module AnalystConsoleEscalations
         config.amq_snort_all_result = :snort_all_rules_result
         config.amq_snort_local_result = :snort_local_rules_result
 
-        config.publish_screenshot = "/queue/AnalystConsole.Snort.Run.Screenshot.Result"
-        config.subscribe_screenshot = "/queue/AnalystConsole.Snort.Run.Screenshot"
-        config.amq_screenshot_result = :snort_screenshot_results
-        config.amq_screenshot = :snort_screenshot
-
         config.amq_snort_commit_result = :snort_commit_result
       when "test"
         config.publish_local_result = "/queue/AnalystConsole.Snort.Run.Local.Test.Result"
@@ -119,11 +99,6 @@ module AnalystConsoleEscalations
         config.amq_snort_all = :snort_all_rules_test_work
         config.amq_snort_all_result = :snort_all_rules_test_result
         config.amq_snort_local_result = :snort_local_rules_test_result
-
-        config.publish_screenshot = "/queue/AnalystConsole.Snort.Run.Screenshot.Test.Result"
-        config.subscribe_screenshot = "/queue/AnalystConsole.Snort.Run.Screenshot.Test"
-        config.amq_screenshot_result = :snort_screenshot_test_results
-        config.amq_screenshot = :snort_screenshot_test
 
         config.amq_snort_commit_result = :snort_commit_test_result
     end
