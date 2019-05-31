@@ -1,5 +1,5 @@
 class DisputeEmail < ApplicationRecord
-  belongs_to :dispute
+  belongs_to :dispute, touch: true
   has_many :dispute_email_attachments
 
   EMAIL_DOMAIN = "dispute.talosintelligence.com"

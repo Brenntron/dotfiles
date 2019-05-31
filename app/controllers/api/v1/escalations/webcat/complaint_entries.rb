@@ -70,29 +70,18 @@ module API
 
                 complaint_entries.each do |complaint_entry|
                   complaint_entry_packet = {}
-                  complaint_age_int = (Time.now - complaint_entry.created_at).to_i
+                  complaint_age = Time.now - complaint_entry.created_at
+                  humanized_age = ComplaintEntry.humanize_secs(complaint_age)
 
-                  # complaint is less than an hour
-                  if complaint_age_int < 3600
-                    complaint_entry_packet[:age] = '<1h'
-                  # complaint is more than an hour, less than 120 hours
-                  elsif complaint_age_int > 3600 and complaint_age_int < 432000
-                    refined_words_age = ComplaintEntry.what_time_is_it(complaint_age_int)
-                    # complaint is over 3 hours, less than 12 hours
-                    if complaint_age_int >= 10800 and complaint_age_int < 43200
-                      complaint_entry_packet[:age] = '<span class="ticket-age-over3hr">' + refined_words_age + '</span>'
-                    # complaint is over 12 hours, less than 120 hours
-                    elsif complaint_age_int > 43200
-                      complaint_entry_packet[:age] = '<span class="ticket-age-over12hr">' + refined_words_age + '</span>'
-                    else
-                      complaint_entry_packet[:age] = refined_words_age
-                    end
-                  # complaint is more than 120 hours
-                  elsif complaint_age_int  > 432000
-                    complaint_entry_packet[:age] = '<span class="ticket-age-over12hr"> >120h </span>'
-                  else
-                    complaint_entry_packet[:age] = complaint_age_int
-                  end
+                  complaint_entry_packet[:age] =
+                      case
+                      when complaint_age  > 43200
+                        "<span class=\"ticket-age-over12hr\">#{humanized_age}</span>"
+                      when complaint_age > 10800
+                        "<span class=\"ticket-age-over3hr\">#{humanized_age}</span>"
+                      else
+                        "<span class=\"ticket-age-under3hr\">#{humanized_age}</span>"
+                      end
 
                   complaint_entry_packet[:uri] = complaint_entry.uri
                   complaint_entry_packet[:age_int] = (Time.now - complaint_entry.created_at).to_i
@@ -204,6 +193,24 @@ module API
                uri: entry.uri, domain: entry.domain, subdomain: entry.subdomain, path: entry.path}.to_json
             end
 
+            desc 'Bulk update entry resolutions'
+            params do
+              requires :complaint_entry_ids, type: Array[Integer], desc: 'ComplaintEntry ids'
+              requires :resolution_name, type: String
+            end
+            post 'bulk_update_entry_resolution' do
+              begin
+                permitted_params['complaint_entry_ids'].each do |id|
+                  ComplaintEntry.update(id, :resolution => params[:resolution_name], :status => ComplaintEntry::STATUS_COMPLETED)
+                end
+              rescue Exception => e
+                Rails.logger.error "Failed to take entry: error=> #{e.message}"
+                error = "#{e.message}"
+                return {:error => error}.to_json
+              end
+              params[:complaint_entry_ids].to_json
+            end
+
 
             desc 'update a high telemetry entry'
             params do
@@ -233,7 +240,7 @@ module API
                 return e.message
               end
               {entry_id: entry.id, domain: entry.domain, subdomain: entry.subdomain, path: entry.path,
-               categories: permitted_params['categories'], uri: entry.uri, status:entry.status,
+               categories: entry.url_primary_category, uri: entry.uri, status:entry.status,
                entry_resolution:permitted_params['commit'], was_dismissed: entry.was_dismissed?}.to_json
             end
 
@@ -480,14 +487,50 @@ module API
               end
             end
 
-            desc 'Retrieve historic_category_information from expanding a complaint entry row'
+            desc 'Retrieve current categories from expanding a complaint entry row'
             params do
               requires :id, type: Integer
             end
             post 'retrieve_current_categories' do
               std_api_v2 do
                 complaint_entry = ComplaintEntry.find(params[:id])
-                complaint_entry.current_category_data.to_json
+
+                if complaint_entry.subdomain.present? || complaint_entry.path.present?
+                  master_categories = complaint_entry.get_category_names_from_master
+                else
+                  master_categories = []
+                end
+
+                wbrs_categories = complaint_entry.current_category_data
+
+                # Pull category from SDS
+                sds_params = {}
+                sds_params['url'] = complaint_entry.uri
+                sds_category = Sbrs::ManualSbrs.call_wbrs_webcat(sds_params, type: 'wbrs')
+                {master_categories: master_categories, current_category_data: wbrs_categories,
+                 sds_category: sds_category }.to_json
+              end
+            end
+
+            desc 'Retrieve category names from master domain'
+            params do
+              requires :id, type: Integer
+            end
+            post 'retrieve_category_names_from_master' do
+              std_api_v2 do
+                complaint_entry = ComplaintEntry.find(params[:id])
+                complaint_entry.get_category_names.to_json
+              end
+            end
+
+            desc 'Inherit categories from master domain'
+            params do
+              requires :id, type: Integer
+            end
+            post 'inherit_categories_from_master_domain' do
+              std_api_v2 do
+                complaint_entry = ComplaintEntry.find(params[:id])
+                complaint_entry.inherit_categories(ip_or_uri: complaint_entry.uri, description:'Inherited from master domain', user: current_user.email)
               end
             end
 
