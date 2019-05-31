@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 2019_05_22_184329) do
+ActiveRecord::Schema.define(version: 2019_04_29_210708) do
 
   create_table "alerts", options: "ENGINE=InnoDB DEFAULT CHARSET=utf8", force: :cascade do |t|
     t.datetime "created_at", null: false
@@ -31,7 +31,6 @@ ActiveRecord::Schema.define(version: 2019_05_22_184329) do
     t.text "public_notes"
     t.string "contact"
     t.integer "table_sequence"
-    t.index ["table_sequence"], name: "index_amp_naming_conventions_on_table_sequence", unique: true
   end
 
   create_table "attachments", options: "ENGINE=InnoDB DEFAULT CHARSET=utf8", force: :cascade do |t|
