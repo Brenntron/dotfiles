@@ -257,10 +257,6 @@ $ ->
 
 
   window.delete_amp_naming_convention = (id, pattern) ->
-    # DELETE WHEN BACKEND IS READY
-    console.log ('Delete this ' + pattern)
-    console.log ('id: ' + id)
-
     std_msg_ajax(
       method: 'DELETE'
       url: "/escalations/api/v1/escalations/file_rep/amp_naming_convention/" + id
