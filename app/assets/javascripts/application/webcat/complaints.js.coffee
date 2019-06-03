@@ -394,14 +394,14 @@ window.updateEntryColumns = (entry_id,row_id) ->
 window.reopenComplaint = (entry_id) ->
   debugger
   std_msg_ajax(
-    url: '/escalations/api/v1/escalations/webcat/complaint_entries/reopen'
+    url: '/escalations/api/v1/escalations/webcat/complaint_entries/reopen_complaint_entry'
     method: 'POST'
-    data: entry_id
+    data: {'complaint_entry_id': entry_id}
     success_reload: true
     success: (response) ->
       debugger
-      json = $.parseJSON(response)
-      console.log 'reopening'
+#      json = $.parseJSON(response)
+      console.log response
     error: (response) ->
       debugger
       std_msg_error(response,"", reload: false)
