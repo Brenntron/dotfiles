@@ -391,22 +391,44 @@ window.updateEntryColumns = (entry_id,row_id) ->
     , this)
 
 
-window.reopenComplaint = (entry_id) ->
-  debugger
+window.reopenComplaint = (entry_id, button) ->
+  $('#loader-modal').modal({
+    keyboard: false
+  })
+
+  # Getting all the fields that need to be interactive if reopened
+  editable_stuff = $(button).parents('.nested-complaint-editable-data')[0]
+  inputs = $(editable_stuff).find('.nested-table-input')
+  radios = $(editable_stuff).find('.resolution_radio_button')
+  wrapper = $(button).parents('.nested-complaint-data-wrapper')[0]
+  nested_row = $(wrapper).parents('tr')[0]
+  parent_row = $(nested_row).prev()
+  status_col = $(parent_row).find('.state-col')
+
   std_msg_ajax(
     url: '/escalations/api/v1/escalations/webcat/complaint_entries/reopen_complaint_entry'
     method: 'POST'
     data: {'complaint_entry_id': entry_id}
-    success_reload: true
     success: (response) ->
       debugger
-#      json = $.parseJSON(response)
-      console.log response
-    error: (response) ->
-      debugger
-      std_msg_error(response,"", reload: false)
-  , this)
+      $('#loader-modal').modal 'hide'
+      $(inputs).each ->
+        $(this).prop('disabled', false)
+      $(radios).each ->
+        $(this).prop('disabled', false)
+      $('#input_cat_' + entry_id).selectize 'enable'
+      $('#input_cat_' + entry_id).selectize 'unlock'
+      $('#input_cat_' + entry_id).selectize 'refreshItems'
 
+      $("#reopen_" + entry_id).addClass('hidden')
+      $("#submit_changes_" + entry_id).removeClass('hidden')
+
+
+      $(status_col).text('REOPENED')
+
+    error: (response) ->
+      std_msg_error(response,"", reload: false)
+  )
 
 window.take_selected = ()->
   selected_rows = $('#complaints-index').DataTable().rows('.selected')
@@ -845,7 +867,7 @@ format = (complaint_entry_row) ->
         '<input type="radio" class="resolution_radio_button" id="invalid' + complaint_entry.entry_id + '" name="resolution' + complaint_entry.entry_id + '" value="INVALID" ' + invalid_radio + entry_status + '> Invalid' +
         '<br/>' +
         '<button class="tertiary submit_changes ' + submit_class + '" id="submit_changes_' + complaint_entry.entry_id + '" onclick="updateEntryColumns(' + complaint_entry.entry_id + ',' + row_id + ')">Submit Changes</button>' +
-        '<button class="tertiary ' + reopen_class + '" id="reopen_' + complaint_entry.entry_id + '" onclick="reopenComplaint(' + complaint_entry.entry_id + ')">Reopen Complaint</button>' +
+        '<button class="tertiary ' + reopen_class + '" id="reopen_' + complaint_entry.entry_id + '" onclick="reopenComplaint(' + complaint_entry.entry_id + ', this)">Reopen Complaint</button>' +
         '</div>'
 
 
