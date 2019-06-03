@@ -262,7 +262,7 @@ class DisputeEntry < ApplicationRecord
         begin
           self.uri.blank? ? xbrs = Xbrs::GetXbrs.by_ip4(self.ip_address) : xbrs = Xbrs::GetXbrs.by_domain(self.uri.gsub(/\r\n?/, "\n").strip)
         rescue
-          xbrs = [{}, {'data' => []}]
+          xbrs = [{}, {'data' => [], 'legend' => []}]
         end
       end
     end
