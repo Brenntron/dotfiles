@@ -613,7 +613,7 @@ module API
 
             post 'reopen_complaint_entry' do
               begin
-                entry = ComplaintEntry.where(:id => permitted_params[:complaint_entry_id])
+                entry = ComplaintEntry.where(:id => permitted_params[:complaint_entry_id]).first
                 if entry.reopen
                   {:status => "success"}
                 else
