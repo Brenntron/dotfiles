@@ -306,7 +306,11 @@ window.updatePending = (id,row_id) ->
   , this)
 
 window.updateEntryColumns = (entry_id,row_id) ->
-  $("#submit_changes_#{entry_id}").prop("disabled",true)
+#   Change to hide submission button and show the 'Reopen' button
+#  $("#submit_changes_#{entry_id}").prop("disabled",true)
+  $("#submit_changes_#{entry_id}").hide()
+  $("#reopen_#{entry_id}").removeClass('hidden')
+
   prefix = $('#complaint_prefix_'+entry_id)[0].value
   categories = $('#input_cat_'+entry_id).val().toString()
   category_name = $('#input_cat_' + entry_id).next('.selectize-control').find('.item')
@@ -322,7 +326,9 @@ window.updateEntryColumns = (entry_id,row_id) ->
   unchanged = $("#unchanged#{entry_id}").is(':checked')
   if categories.length == 0 && status != 'INVALID' && unchanged == false
     std_msg_error("Must include at least one category.","", reload: false)
-    $("#submit_changes_#{entry_id}").prop("disabled",false)
+#    $("#submit_changes_#{entry_id}").prop("disabled",false)
+    $("#submit_changes_#{entry_id}").show()
+    $("#reopen_#{entry_id}").addClass('hidden')
   else
     std_msg_ajax(
       url: '/escalations/api/v1/escalations/webcat/complaint_entries/update'
@@ -382,7 +388,9 @@ window.updateEntryColumns = (entry_id,row_id) ->
             td.classList.add('nested-complaint-data-wrapper')
 
       error: (response) ->
-        $("#submit_changes_#{entry_id}").prop("disabled",false)
+#        $("#submit_changes_#{entry_id}").prop("disabled",false)
+        $("#submit_changes_#{entry_id}").show()
+        $("#reopen_#{entry_id}").addClass('hidden')
         std_msg_error(response,"", reload: false)
     , this)
 
@@ -755,6 +763,13 @@ format = (complaint_entry_row) ->
     data: {'id': complaint_entry.entry_id}
     success: (response) ->
       $('#loader-modal').modal 'hide'
+
+      if complaint_entry.status == "COMPLETED"
+        submit_id = '#submit_changes_' + complaint_entry.entry_id
+        reopen_id = '#reopen_' + complaint_entry.entry_id
+        $(submit_id).hide()
+        $(reopen_id).removeClass('hidden')
+
       { current_category_data : current_categories, master_categories, sds_category} = JSON.parse(response)
 
       sds_category == '' unless sds_category != null
@@ -808,7 +823,9 @@ format = (complaint_entry_row) ->
     complaint_submission_html =
         '<input type="radio" name="resolution_review_' + complaint_entry.entry_id + '" value="commit" > Commit <br/>' +
         '<input type="radio" name="resolution_review_' + complaint_entry.entry_id + '" value="decline" checked="checked"> Decline' +
-        '<br/><button class="tertiary" onclick="updatePending(' + complaint_entry.entry_id + ',' + row_id + ')"> Submit </button></div>'
+        '<br/>' +
+        '<button class="tertiary" onclick="updatePending(' + complaint_entry.entry_id + ',' + row_id + ')"> Submit </button>' +
+        '</div>'
   else
     complaint_table_row_html = '<table class="active_table"><tr class="active_master_submit" type="submit_changes" entry_id="' + complaint_entry.entry_id + '"  row_id = "' + row_id + '"><td class="no_pad"><div class="row">'
     complaint_submission_html =
@@ -816,7 +833,8 @@ format = (complaint_entry_row) ->
         '<input type="radio" class="resolution_radio_button" id="fixed' + complaint_entry.entry_id + '" name="resolution' + complaint_entry.entry_id + '" value="FIXED"  ' + fixed_radio + entry_status + '> Fixed  <br/> ' +
         '<input type="radio" class="resolution_radio_button" id="invalid' + complaint_entry.entry_id + '" name="resolution' + complaint_entry.entry_id + '" value="INVALID" ' + invalid_radio + entry_status + '> Invalid' +
         '<br/>' +
-        '<button class="tertiary submit_changes" id="submit_changes_' + complaint_entry.entry_id + '" onclick="updateEntryColumns(' + complaint_entry.entry_id + ',' + row_id + ')" ' + entry_status + '>Submit Changes</button>' +
+        '<button class="tertiary submit_changes" id="submit_changes_' + complaint_entry.entry_id + '" onclick="updateEntryColumns(' + complaint_entry.entry_id + ',' + row_id + ')">Submit Changes</button>' +
+        '<button class="tertiary hidden" id="reopen_' + complaint_entry.entry_id + '" onclick="reopenComplaint(' + complaint_entry.entry_id + ',' + row_id + ')">Reopen Complaint</button>' +
         '</div>'
 
 
@@ -892,7 +910,6 @@ window.history_dialog = (id, url) ->
         notice_html = "<p>Something went wrong: #{json.error}</p>"
         alert(json.error)
       else
-        ## Build the History Dialog
         history_dialog_content =
           '<div class="dialog-content-wrapper">' +
           '<h4>' + url + '</h4>' +
