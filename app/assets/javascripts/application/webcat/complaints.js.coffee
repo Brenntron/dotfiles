@@ -306,9 +306,7 @@ window.updatePending = (id,row_id) ->
   , this)
 
 window.updateEntryColumns = (entry_id,row_id) ->
-#   Change to hide submission button and show the 'Reopen' button
-#  $("#submit_changes_#{entry_id}").prop("disabled",true)
-  $("#submit_changes_#{entry_id}").hide()
+  $("#submit_changes_#{entry_id}").addClass('hidden')
   $("#reopen_#{entry_id}").removeClass('hidden')
 
   prefix = $('#complaint_prefix_'+entry_id)[0].value
@@ -326,8 +324,7 @@ window.updateEntryColumns = (entry_id,row_id) ->
   unchanged = $("#unchanged#{entry_id}").is(':checked')
   if categories.length == 0 && status != 'INVALID' && unchanged == false
     std_msg_error("Must include at least one category.","", reload: false)
-#    $("#submit_changes_#{entry_id}").prop("disabled",false)
-    $("#submit_changes_#{entry_id}").show()
+    $("#submit_changes_#{entry_id}").removeClass('hidden')
     $("#reopen_#{entry_id}").addClass('hidden')
   else
     std_msg_ajax(
@@ -388,11 +385,27 @@ window.updateEntryColumns = (entry_id,row_id) ->
             td.classList.add('nested-complaint-data-wrapper')
 
       error: (response) ->
-#        $("#submit_changes_#{entry_id}").prop("disabled",false)
-        $("#submit_changes_#{entry_id}").show()
+        $("#submit_changes_#{entry_id}").removeClass('hidden')
         $("#reopen_#{entry_id}").addClass('hidden')
         std_msg_error(response,"", reload: false)
     , this)
+
+
+window.reopenComplaint = (entry_id) ->
+  debugger
+  std_msg_ajax(
+    url: '/escalations/api/v1/escalations/webcat/complaint_entries/reopen'
+    method: 'POST'
+    data: entry_id
+    success_reload: true
+    success: (response) ->
+      debugger
+      json = $.parseJSON(response)
+      console.log 'reopening'
+    error: (response) ->
+      debugger
+      std_msg_error(response,"", reload: false)
+  , this)
 
 
 window.take_selected = ()->
@@ -683,8 +696,12 @@ format = (complaint_entry_row) ->
     uri = missing_data
 
   entry_status = ""
+  reopen_class = "hidden"
+  submit_class = ""
   if complaint_entry.status == "COMPLETED"
     entry_status = "disabled='true'"
+    reopen_class = ""
+    submit_class = "hidden"
   wbrs_score = ''
   if complaint_entry.wbrs_score
     wbrs_score = complaint_entry.wbrs_score
@@ -757,19 +774,13 @@ format = (complaint_entry_row) ->
   tooltip_table_end = '</tbody></table>'
   tooltip_wrapper_end = '</span></div>'
 
+
   std_msg_ajax(
     method: 'POST'
     url: '/escalations/api/v1/escalations/webcat/complaint_entries/retrieve_current_categories'
     data: {'id': complaint_entry.entry_id}
     success: (response) ->
       $('#loader-modal').modal 'hide'
-
-      if complaint_entry.status == "COMPLETED"
-        submit_id = '#submit_changes_' + complaint_entry.entry_id
-        reopen_id = '#reopen_' + complaint_entry.entry_id
-        $(submit_id).hide()
-        $(reopen_id).removeClass('hidden')
-
       { current_category_data : current_categories, master_categories, sds_category} = JSON.parse(response)
 
       sds_category == '' unless sds_category != null
@@ -833,8 +844,8 @@ format = (complaint_entry_row) ->
         '<input type="radio" class="resolution_radio_button" id="fixed' + complaint_entry.entry_id + '" name="resolution' + complaint_entry.entry_id + '" value="FIXED"  ' + fixed_radio + entry_status + '> Fixed  <br/> ' +
         '<input type="radio" class="resolution_radio_button" id="invalid' + complaint_entry.entry_id + '" name="resolution' + complaint_entry.entry_id + '" value="INVALID" ' + invalid_radio + entry_status + '> Invalid' +
         '<br/>' +
-        '<button class="tertiary submit_changes" id="submit_changes_' + complaint_entry.entry_id + '" onclick="updateEntryColumns(' + complaint_entry.entry_id + ',' + row_id + ')">Submit Changes</button>' +
-        '<button class="tertiary hidden" id="reopen_' + complaint_entry.entry_id + '" onclick="reopenComplaint(' + complaint_entry.entry_id + ',' + row_id + ')">Reopen Complaint</button>' +
+        '<button class="tertiary submit_changes ' + submit_class + '" id="submit_changes_' + complaint_entry.entry_id + '" onclick="updateEntryColumns(' + complaint_entry.entry_id + ',' + row_id + ')">Submit Changes</button>' +
+        '<button class="tertiary ' + reopen_class + '" id="reopen_' + complaint_entry.entry_id + '" onclick="reopenComplaint(' + complaint_entry.entry_id + ')">Reopen Complaint</button>' +
         '</div>'
 
 
