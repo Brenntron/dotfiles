@@ -339,3 +339,16 @@ Feature: Disputes
     And I click ".inline-return-ticket-1"
     Then I should not see "ERROR UPDATING TICKET."
     Then I should see "Unassigned"
+
+  @javascript
+  Scenario: a user sees a properly worded time stamp on a comment under the Communications tab
+    Given the following users exist
+    |id| cvs_username |
+    |1 | vrtincom     |
+    Given a user with role "filerep user" exists and is logged in
+    And A FileRep Dispute with trait "assigned" exists
+    And A FileRep Dispute comment with trait "new" exists
+    When I go to "/escalations/file_rep/disputes/1"
+    And I click "#communication-tab-link"
+    Then I should see content "seconds ago." within ".author-notation"
+    Then I should not see "1 hour"
