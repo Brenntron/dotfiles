@@ -256,24 +256,16 @@ $ ->
       window.update_amp_naming_conventions([rows_to_update])
 
 
-
   window.delete_amp_naming_convention = (id, pattern) ->
-    # DELETE WHEN BACKEND IS READY
-    console.log ('Delete this ' + pattern)
-    console.log ('id: ' + id)
-
-#    UNCOMMENT OUT WHEN BACKEND IS READY
-#    std_msg_ajax(
-#      method: 'POST'
-#      url: "/escalations/api/v1/escalations/file_rep/amp_naming_convention/delete"
-#      data:
-#        id: id
-#      success: (response) ->
-#        std_msg_success('AMP Naming Convention Below Has Been Deleted.', [pattern], reload: false)
-#      error: (response) ->
-#        std_msg_error('Error Deleting ' + pattern, [response.responseText], reload: false)
-#    )
-
+    std_msg_ajax(
+      method: 'DELETE'
+      url: "/escalations/api/v1/escalations/file_rep/amp_naming_convention/" + id
+      data: {}
+      success: (response) ->
+        std_msg_success('AMP Naming Convention Below Has Been Deleted.', [pattern], reload: false)
+      error: (response) ->
+        std_msg_error('Error Deleting ' + pattern, [response.responseText], reload: false)
+    )
 
 
   window.create_amp_naming_conventions = ([data]) ->
@@ -285,24 +277,19 @@ $ ->
     else
       response_data = data[0].pattern
 
-    # DELETE WHEN BACKEND IS READY
-    console.log data
-    console.log response_data
-
-    #    UNCOMMENT OUT WHEN BACKEND IS READY
-#    std_msg_ajax(
-#      method: 'POST'
-#      url: "/escalations/api/v1/escalations/file_rep/amp_naming_convention/create"
-#      data: data
-#      success: (response) ->
-#        std_msg_success('The Following AMP Naming Conventions Have Been Created:', [response_data], reload: false)
-#      error: (response) ->
-#        std_msg_error('Error Creating AMP Naming Conventions', [response.responseText], reload: false)
-#    )
+    std_msg_ajax(
+      method: 'POST'
+      url: "/escalations/api/v1/escalations/file_rep/amp_naming_convention"
+      data: { patterns: data }
+      success: (response) ->
+        std_msg_success('The Following AMP Naming Conventions Have Been Created:', [response_data], reload: false)
+      error: (response) ->
+        std_msg_error('Error Creating AMP Naming Conventions', [response.responseText], reload: false)
+    )
 
 
   window.update_amp_naming_conventions = ([data]) ->
-  # Pulling out just patterns for response message
+    # Pulling out just patterns for response message
     response_data = ""
     if data.length > 1
       $(data).each ->
@@ -310,18 +297,13 @@ $ ->
     else
       response_data = data[0].pattern
 
-    # DELETE WHEN BACKEND IS READY
-    console.log data
-    console.log response_data
-
-    #    UNCOMMENT OUT WHEN BACKEND IS READY
-#    std_msg_ajax(
-#      method: 'PUT'
-#      url: "/escalations/api/v1/escalations/file_rep/amp_naming_convention/update"
-#      data: data
-#      success: (response) ->
-#        std_msg_success('The Following AMP Naming Conventions Have Been Updated:', [response_data], reload: false)
-#      error: (response) ->
-#        std_msg_error('Error Updating AMP Naming Conventions', [response.responseText], reload: false)
-#    )
+    std_msg_ajax(
+      method: 'PATCH'
+      url: "/escalations/api/v1/escalations/file_rep/amp_naming_convention"
+      data: { patterns: data }
+      success: (response) ->
+        std_msg_success('The Following AMP Naming Conventions Have Been Updated:', [response_data], reload: false)
+      error: (response) ->
+        std_msg_error('Error Updating AMP Naming Conventions', [response.responseText], reload: false)
+    )
 
