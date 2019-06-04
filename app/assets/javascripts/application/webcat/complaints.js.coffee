@@ -245,7 +245,6 @@ window.filterByStatus = (filter) ->
   populate_webcat_index_table(filter)
 
 window.updatePending = (id,row_id) ->
-  debugger
   prefix = $('#complaint_prefix_'+id)[0].value
   status = $('[name=resolution_review_'+id+']:checked').val()
   comment = $('#complaint_comment_'+id)[0].value
