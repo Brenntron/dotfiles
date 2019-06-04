@@ -8323,6 +8323,35 @@ hr.thin.form-divider {
   font-size: 12px;
 }
 
+
+.complaint-selectize-col-wrapper .selectize-control {
+  padding-bottom: 6px;
+}
+
+.nested-complaint-editable-table {
+  label.content-label-sm {
+    padding-top: 0 !important;
+  }
+  input[type="radio"].resolution_radio_button {
+    margin-right: 3px;
+  }
+}
+
+input[type="radio"].resolution_radio_button {
+  margin-right: 3px;
+}
+
+// tweak to make sure orange star icon aligns
+.certainty-flag {
+  max-width: 40px;
+}
+
+// fix margin on this button
+.nested-complaint-data-wrapper button.tertiary {
+  margin: 12px 0 6px 0;
+}
+
+
 // dbinebri: webcat/complaints - nested table tweaks below
 //.complaint-selectize-col-wrapper .selectize-control {
 //  padding-bottom: 6px;
