@@ -143,8 +143,12 @@ class FileReputationDispute < ApplicationRecord
     # Check if the ticket can be resolved by matching suggested disposition and AMP disposition
     if file_rep.disposition_suggested.downcase == 'malicious' && file_rep.disposition == 'malicious'
       file_rep.status = STATUS_RESOLVED
+
+      # Kick off the bridge event to communicate: resolution, resolution message, and status
     elsif file_rep.disposition_suggested.downcase == 'clean'&& file_rep.disposition == 'clean'
       file_rep.status = STATUS_RESOLVED
+
+      # Kick off the bridge event to communicate: resolution, resolution message, and status
     end
 
     if file_rep.save!
@@ -199,8 +203,12 @@ class FileReputationDispute < ApplicationRecord
     # Check if the ticket can be resolved by matching suggested disposition and AMP disposition
     if file_rep.disposition_suggested == 'Malicious' && file_rep.disposition == 'malicious'
       file_rep.status = STATUS_RESOLVED
+
+      # Kick off the bridge event to communicate: resolution, resolution message, and status
     elsif file_rep.disposition_suggested == 'Clean'&& file_rep.disposition == 'clean'
       file_rep.status = STATUS_RESOLVED
+
+      # Kick off the bridge event to communicate: resolution, resolution message, and status
     end
 
     if file_rep.save!
