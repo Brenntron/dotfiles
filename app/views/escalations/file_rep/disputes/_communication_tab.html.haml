@@ -285,7 +285,7 @@
               Written by
               %span.author-username
                 =comment.user.cec_username
-              = distance_of_time_in_words(Time.now.utc, comment.created_at) + " ago."
+              = distance_of_time_in_words(Time.now.utc, comment.created_at.utc) + " ago."
             %br.hidden-break
             .note-info-item.time-stamp
               = format_timestamp(comment.created_at)
