@@ -115,6 +115,7 @@ Feature: Disputes
   @javascript
   Scenario: a user visits the FileRep Dispute Show page which launches off API calls that also sets the TG score on the record
     Given a user with role "filerep user" exists and is logged in
+    And vrtincoming exists
     And A FileRep Dispute with trait "default" exists
     Then I go to "/escalations/file_rep/disputes/1"
     And I wait for "25" seconds
@@ -273,10 +274,8 @@ Feature: Disputes
 
   @javascript
   Scenario: a user visits the FileRep Dispute show page and takes a ticket
-    Given the following users exist
-    |id| cvs_username |
-    |1 | vrtincom     |
-    And a user with role "filerep user" exists and is logged in
+    Given a user with role "filerep user" exists and is logged in
+    And vrtincoming exists
     And A FileRep Dispute with trait "default" exists
     When I go to "/escalations/file_rep/disputes/1"
     And I click ".take-ticket-button"
@@ -285,10 +284,8 @@ Feature: Disputes
 
   @javascript
   Scenario: a user visits the FileRep Dispute show page and returns a ticket
-    Given the following users exist
-    |id| cvs_username |
-    |1 | vrtincom     |
-    And a user with role "filerep user" exists and is logged in
+    Given a user with role "filerep user" exists and is logged in
+    And vrtincoming exists
     And A FileRep Dispute with trait "default" exists
     When I go to "/escalations/file_rep/disputes/1"
     And I click ".take-ticket-button"
@@ -328,10 +325,8 @@ Feature: Disputes
 
   @javascript
   Scenario: a user visits the FileRep Dispute index page and takes a ticket
-    Given the following users exist
-    |id| cvs_username |
-    |1 | vrtincom     |
-    And a user with role "filerep user" exists and is logged in
+    Given a user with role "filerep user" exists and is logged in
+    And vrtincoming exists
     And A FileRep Dispute with trait "assigned" exists
     When I go to "/escalations/file_rep/disputes/"
     And I click "#file-index-table-show-columns-button"
@@ -342,10 +337,8 @@ Feature: Disputes
 
   @javascript
   Scenario: a user sees a properly worded time stamp on a comment under the Communications tab
-    Given the following users exist
-    |id| cvs_username |
-    |1 | vrtincom     |
     Given a user with role "filerep user" exists and is logged in
+    And vrtincoming exists
     And A FileRep Dispute with trait "assigned" exists
     And A FileRep Dispute comment with trait "new" exists
     When I go to "/escalations/file_rep/disputes/1"
