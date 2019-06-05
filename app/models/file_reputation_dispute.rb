@@ -138,8 +138,16 @@ class FileReputationDispute < ApplicationRecord
     }
     file_rep.assign_attributes(attributes)
 
+    file_rep.update_scores
+
+    # Check if the ticket can be resolved by matching suggested disposition and AMP disposition
+    if file_rep.disposition_suggested.downcase == 'malicious' && file_rep.disposition == 'malicious'
+      file_rep.status = STATUS_RESOLVED
+    elsif file_rep.disposition_suggested.downcase == 'clean'&& file_rep.disposition == 'clean'
+      file_rep.status = STATUS_RESOLVED
+    end
+
     if file_rep.save!
-      file_rep.update_scores
       file_rep
     else
       error_messages = file_rep.errors.full_messages.join('; ')
@@ -185,9 +193,21 @@ class FileReputationDispute < ApplicationRecord
 
     file_rep.assign_attributes(attributes)
 
+    file_rep.update_scores
+    file_rep.populate_fields_from_rl
+
+    # Check if the ticket can be resolved by matching suggested disposition and AMP disposition
+    if file_rep.disposition_suggested.downcase == 'malicious' && file_rep.disposition == 'malicious'
+      file_rep.status = STATUS_RESOLVED
+    elsif file_rep.disposition_suggested.downcase == 'clean'&& file_rep.disposition == 'clean'
+      file_rep.status = STATUS_RESOLVED
+    end
+
     if file_rep.save!
-      file_rep.update_scores
-      file_rep.populate_fields_from_rl
+      file_rep
+    else
+      error_messages = file_rep.errors.full_messages.join('; ')
+      render plain: "\"Error(s) creating file rep -- #{error_messages}\"", status: :internal_server_error
     end
   end
 
