@@ -74,8 +74,8 @@ class Ability
       can :manage, User do |user| #no delete UI is implemented
         user.ancestors.include?(current_user)
       end
-      can [:create, :update, :read, :delete], [FileReputationDispute, DisputeEmail]
-      can [:delete], [FileRepComment]
+      can [:create, :update, :read], [FileReputationDispute, DisputeEmail]
+      can [:manage], [FileRepComment]
       can :take, FileReputationDispute do |filerep_dispute|
         [FileReputationDispute::STATUS_NEW, FileReputationDispute::STATUS_REOPENED].include?(filerep_dispute.status) && filerep_dispute.assigned.cvs_username == 'vrtincom'
       end
