@@ -822,7 +822,7 @@ format = (complaint_entry_row) ->
 
   complaint_entry_html =
       complaint_table_row_html +
-      '<div class="col-xs-12 col-sm-9 nested-complaint-static-data">' +
+      '<div class="col-xs-12 col-sm-8 nested-complaint-static-data">' +
       '<div class="row">' +
       '<div class="col-xs-3 col-with-divider">' +
       '<div class="screenshot-thumb-wrapper">' +
@@ -840,7 +840,7 @@ format = (complaint_entry_row) ->
       '<label class="content-label-sm">Customer Description</label>' +
       '<span class="nested-complaint-data">' + customer_description + '</span>' +
       '</div></div><div class="col-xs-7 col-with-divider">' +
-      '<table class="simple-nested-table" id="' + complaint_entry.entry_id + '"><thead><tr><th class="col-sm-1">Conf</th><th class="col-sm-4">WBRS Categories</th><th class="col-sm-2">WBRS Certainty</th><th class="col-sm-5">SDS Category</tr></thead>' +
+      '<table class="simple-nested-table" id="' + complaint_entry.entry_id + '"><thead><tr><th class="col-sm-1">Conf</th><th class="col-sm-4">WBRS Categories</th><th class="col-sm-3">WBRS Certainty</th><th class="col-sm-4">SDS Category</tr></thead>' +
       '</table>' +
       '</br>' +
       '</div><div class="col-xs-2">' +
@@ -848,11 +848,11 @@ format = (complaint_entry_row) ->
       '<button class="secondary" id="history-' + complaint_entry.entry_id + '" onclick="history_dialog(' + complaint_entry.entry_id  + ',\'' + url + '\')">History</button><br/>' +
       '<button class="secondary" id="domain-' + complaint_entry.entry_id + '" onclick="domain_whois(\'' + whois_lookup + '\')">Domain</domain>' +
       '</div></div>' +
-      '</div><div class="col-xs-12 col-sm-3 nested-complaint-editable-data">' +
+      '</div><div class="col-xs-12 col-sm-4 nested-complaint-editable-data">' +
       '<div class="row">' +
       '<div class="col-xs-12">' +
       '<label class="content-label-sm">Edit URI</label><br/>' +
-      '<input class="nested-table-input" id="complaint_prefix_' + complaint_entry.entry_id +
+      '<input class="nested-table-input complaint-uri-input" id="complaint_prefix_' + complaint_entry.entry_id +
       '" type="text" onclick="this.select()" value="' + host +
       '"' + entry_status + '>' +
       '<button class="secondary inline-button" onclick="updateURI(event,' + complaint_entry.entry_id + ')">Update URI</button><br/>' +

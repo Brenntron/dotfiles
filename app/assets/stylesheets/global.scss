@@ -8351,6 +8351,10 @@ input[type="radio"].resolution_radio_button {
   margin: 12px 0 6px 0;
 }
 
+// more width so this aligns with the comment fields and for long URIs
+.complaint-uri-input {
+  width: 65%;
+}
 
 // dbinebri: webcat/complaints - nested table tweaks below
 //.complaint-selectize-col-wrapper .selectize-control {
