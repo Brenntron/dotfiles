@@ -367,4 +367,4 @@ Feature: Disputes
     And I go to "/escalations/file_rep/disputes/"
     Then I should see content "RESOLVED" within "#status_10101"
     And I should see content "Malicious" within ".malicious"
-    And the first FileRep Dispute has a populated 'resolution_comment'
+    And FileRep Dispute has the appropriate 'resolution_comment' for auto-resolved entries
