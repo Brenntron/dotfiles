@@ -1,1 +1,1 @@
-ALTER TABLE `file_reputation_disputes` ADD `resolution_comment` varchar(255)
+ALTER TABLE `file_reputation_disputes` ADD `resolution_comment` text
