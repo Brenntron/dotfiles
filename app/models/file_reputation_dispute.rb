@@ -201,13 +201,8 @@ class FileReputationDispute < ApplicationRecord
     file_rep.populate_fields_from_rl
 
     # Check if the ticket can be resolved by matching suggested disposition and disposition (AMP)
-    if file_rep.suggested_clean? && file_rep.clean?
-      file_rep.status = STATUS_RESOLVED
-      file_rep.resolution = RESOLUTION_AUTORESOLVED
-    elsif file_rep.suggested_malicious? && file_rep.malicious?
-      file_rep.status = STATUS_RESOLVED
-      file_rep.resolution = RESOLUTION_AUTORESOLVED
-    end
+
+    file_rep.auto_resolve_on_matching_disposition
 
     if file_rep.save!
       file_rep
@@ -578,41 +573,45 @@ class FileReputationDispute < ApplicationRecord
       if FileReputationDispute.threaded?
         Thread.new do
           new_dispute.update_scores
-          new_dispute.auto_resolve_on_matching_disposition
+          new_dispute.auto_resolve_on_matching_disposition(source: 'TI')
         end
       else
         new_dispute.update_scores
-        new_dispute.auto_resolve_on_matching_disposition
+        new_dispute.auto_resolve_on_matching_disposition(source: 'TI')
       end
     end
 
     new_dispute
   end
 
-  def auto_resolve_on_matching_disposition
-    if self.clean? && self.suggested_clean?
-      self.update(status: STATUS_RESOLVED, resolution: RESOLUTION_AUTORESOLVED, resolution_comment: RESOLUTION_AUTORESOLVED_COMMENT)
+  def auto_resolve_on_matching_disposition(source: 'ACE')
+      auto_resolved_boolean = false
 
-      envelope = {}
-      envelope[:payload] = {}
+      if (self.clean? && self.suggested_clean?) || (self.malicious? && self.suggested_malicious?)
+        self.update(status: STATUS_RESOLVED, resolution: RESOLUTION_AUTORESOLVED, resolution_comment: RESOLUTION_AUTORESOLVED_COMMENT)
 
-      envelope[:addressee_id] = self.id
-      envelope[:addressee_status] = self.status
-      envelope[:payload] = {resolution: self.resolution, resolution_comment: self.resolution_comment}
+        auto_resolved_boolean = true
 
-      Bridge::FilerepAutoResolveEvent.new(envelope).post
-    elsif self.malicious? && self.suggested_malicious?
-      self.update(status: STATUS_RESOLVED, resolution: RESOLUTION_AUTORESOLVED, resolution_comment: RESOLUTION_AUTORESOLVED_COMMENT)
+        envelope = {}
+        envelope[:payload] = {}
 
-      envelope = {}
-      envelope[:payload] = {}
+        envelope[:addressee_id] = self.id
+        envelope[:addressee_status] = self.status
+        envelope[:payload] = {resolution: self.resolution, resolution_comment: self.resolution_comment}
+      end
 
-      envelope[:addressee_id] = self.id
-      envelope[:addressee_status] = self.status
-      envelope[:payload] = {resolution: self.resolution, resolution_comment: self.resolution_comment}
+      if source == 'TI'
+        envelope = {}
+        envelope[:payload] = {}
 
-      Bridge::FilerepAutoResolveEvent.new(envelope).post
-    end
+        envelope[:addressee_id] = self.id
+        envelope[:addressee_status] = self.status
+        envelope[:payload] = {resolution: self.resolution, resolution_comment: self.resolution_comment}
+
+        Bridge::FilerepAutoResolveEvent.new(envelope).post
+      end
+
+      auto_resolved_boolean
   end
 
   def self.take_tickets(dispute_ids, user:)
