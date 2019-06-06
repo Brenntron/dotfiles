@@ -347,7 +347,12 @@ $ ->
     data = {
       search_type: ''
       search_name: ''
+      selected_cases: []
     }
+
+    $('.dispute_check_box:checked').each ->
+      case_id =  $(this).attr('value')
+      data.selected_cases.push(case_id)
 
     if location.search != ''
 #      if the location.search has value, it is a standard search
