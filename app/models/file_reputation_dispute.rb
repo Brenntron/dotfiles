@@ -11,26 +11,29 @@ class FileReputationDispute < ApplicationRecord
 
   delegate :name, :email, :company, :company_name, :company_id, to: :customer, allow_nil: true, prefix: true
 
-  STATUS_NEW                = 'NEW'
-  STATUS_ASSIGNED           = 'ASSIGNED'
-  STATUS_RESEARCHING        = 'RESEARCHING'
-  STATUS_ESCALATED          = 'ESCALATED'
-  STATUS_PENDING            = 'PENDING'
-  STATUS_ONHOLD             = 'ONHOLD'
-  STATUS_RESOLVED           = 'RESOLVED'
-  STATUS_REOPENED           = 'RE-OPENED'
-  STATUS_CUSTOMER_PENDING   = "CUSTOMER_PENDING"
-  STATUS_CUSTOMER_UPDATE    = "CUSTOMER_UPDATE"
+  STATUS_NEW                        = 'NEW'
+  STATUS_ASSIGNED                   = 'ASSIGNED'
+  STATUS_RESEARCHING                = 'RESEARCHING'
+  STATUS_ESCALATED                  = 'ESCALATED'
+  STATUS_PENDING                    = 'PENDING'
+  STATUS_ONHOLD                     = 'ONHOLD'
+  STATUS_RESOLVED                   = 'RESOLVED'
+  STATUS_REOPENED                   = 'RE-OPENED'
+  STATUS_CUSTOMER_PENDING           = "CUSTOMER_PENDING"
+  STATUS_CUSTOMER_UPDATE            = "CUSTOMER_UPDATE"
 
-  DISPOSITION_UNSEEN        = 'unseen'
-  DISPOSITION_UNKNOWN       = 'unknown'
-  DISPOSITION_MALICIOUS     = 'malicious'
-  DISPOSITION_COMMON        = 'common'
-  DISPOSITION_CLEAN         = 'clean'
+  DISPOSITION_UNSEEN                = 'unseen'
+  DISPOSITION_UNKNOWN               = 'unknown'
+  DISPOSITION_MALICIOUS             = 'malicious'
+  DISPOSITION_COMMON                = 'common'
+  DISPOSITION_CLEAN                 = 'clean'
 
-  SUBMITTER_TYPE_AC_FORM    = 'AC-Form'
-  SUBMITTER_TYPE_TI_FORM    = 'TI-Form'
-  SUBMITTER_TYPE_TI_API     = 'TI-API'
+  SUBMITTER_TYPE_AC_FORM            = 'AC-Form'
+  SUBMITTER_TYPE_TI_FORM            = 'TI-Form'
+  SUBMITTER_TYPE_TI_API             = 'TI-API'
+
+  RESOLUTION_AUTORESOLVED           = 'Auto Resolved'
+  RESOLUTION_AUTORESOLVED_COMMENT   = 'This ticket has been auto-resolved, suggestion disposition and disposition already match.'
 
   validates :status, :sha256_hash, :disposition_suggested, presence: true
 
@@ -144,11 +147,25 @@ class FileReputationDispute < ApplicationRecord
     if file_rep.disposition_suggested.downcase == 'malicious' && file_rep.disposition == 'malicious'
       file_rep.status = STATUS_RESOLVED
 
-      # Kick off the bridge event to communicate: resolution, resolution message, and status
+      envelope = {}
+      envelope[:payload] = {}
+
+      envelope[:addressee_id] = self.id
+      envelope[:addressee_status] = file_rep.status
+      envelope[:payload] = {resolution: file_rep.resolution, resolution_comment: file_rep.resolution_comment}
+
+      Bridge::FilerepAutoResolveEvent.new(envelope).post
     elsif file_rep.disposition_suggested.downcase == 'clean'&& file_rep.disposition == 'clean'
       file_rep.status = STATUS_RESOLVED
 
-      # Kick off the bridge event to communicate: resolution, resolution message, and status
+      envelope = {}
+      envelope[:payload] = {}
+
+      envelope[:addressee_id] = self.id
+      envelope[:addressee_status] = file_rep.status
+      envelope[:payload] = {resolution: file_rep.resolution, resolution_comment: file_rep.resolution_comment}
+
+      Bridge::FilerepAutoResolveEvent.new(envelope).post
     end
 
     if file_rep.save!
@@ -203,12 +220,8 @@ class FileReputationDispute < ApplicationRecord
     # Check if the ticket can be resolved by matching suggested disposition and AMP disposition
     if file_rep.disposition_suggested == 'Malicious' && file_rep.disposition == 'malicious'
       file_rep.status = STATUS_RESOLVED
-
-      # Kick off the bridge event to communicate: resolution, resolution message, and status
     elsif file_rep.disposition_suggested == 'Clean'&& file_rep.disposition == 'clean'
       file_rep.status = STATUS_RESOLVED
-
-      # Kick off the bridge event to communicate: resolution, resolution message, and status
     end
 
     if file_rep.save!
@@ -570,6 +583,37 @@ class FileReputationDispute < ApplicationRecord
         new_dispute.disposition_suggested = message_payload[:disposition_suggested]
         new_dispute.source = message_payload[:source]
         new_dispute.platform = message_payload[:platform]
+
+        # Hit AMP API to get disposition
+        amp_api_response = FileReputationApi::Detection.get_bulk(message_payload[:sha256_hash])
+
+        if amp_api_response.present?
+          disposition = amp_api_response.disposition
+        end
+
+        if disposition == 'malicious' && new_dispute.disposition_suggested.downcase == 'malicious'
+          new_dispute.status = STATUS_RESOLVED
+
+          envelope = {}
+          envelope[:payload] = {}
+
+          envelope[:addressee_id] = new_dispute.id
+          envelope[:addressee_status] = new_dispute.status
+          envelope[:payload] = {resolution: RESOLUTION_AUTORESOLVED, resolution_comment: RESOLUTION_AUTORESOLVED_COMMENT}
+
+          Bridge::FilerepAutoResolveEvent.new(envelope).post
+        elsif disposition == 'clean' && new_dispute.disposition_suggested.downcase == 'clean'
+          new_dispute.status = STATUS_RESOLVED
+
+          envelope = {}
+          envelope[:payload] = {}
+
+          envelope[:addressee_id] = new_dispute.id
+          envelope[:addressee_status] = new_dispute.status
+          envelope[:payload] = {resolution: RESOLUTION_AUTORESOLVED, resolution_comment: RESOLUTION_AUTORESOLVED_COMMENT}
+
+          Bridge::FilerepAutoResolveEvent.new(envelope).post
+        end
 
         new_dispute.save
 
