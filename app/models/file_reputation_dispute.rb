@@ -591,7 +591,7 @@ class FileReputationDispute < ApplicationRecord
 
   def auto_resolve_on_matching_disposition
     if self.clean? && self.suggested_clean?
-      self.update(status: STATUS_RESOLVED)
+      self.update(status: STATUS_RESOLVED, resolution: RESOLUTION_AUTORESOLVED)
 
       envelope = {}
       envelope[:payload] = {}
@@ -602,8 +602,7 @@ class FileReputationDispute < ApplicationRecord
 
       Bridge::FilerepAutoResolveEvent.new(envelope).post
     elsif self.malicious? && self.suggested_malicious?
-      binding.pry
-      self.update(status: STATUS_RESOLVED)
+      self.update(status: STATUS_RESOLVED, resolution: RESOLUTION_AUTORESOLVED)
 
       envelope = {}
       envelope[:payload] = {}
