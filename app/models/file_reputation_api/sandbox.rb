@@ -5,6 +5,11 @@ class FileReputationApi::Sandbox
   set_default_request_type :query_string
   set_default_headers({})
 
+  def self.submitter_api_key(submitter_type)
+    Rails.configuration.file_reputation_sandbox.api_keys[submitter_type] ||
+        raise("Missing #{submitter_type} sandbox API key")
+  end
+
   def self.sandbox_score(sha256)
 
     endpoint = "/api/2/disposition"
