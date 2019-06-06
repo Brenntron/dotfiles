@@ -26,6 +26,7 @@
   .form-group
     %label.content-label-sm SHA256
     %textarea#shas_list{required: true, rows: '4'}
+    %span#sha_errors_list{style: "color:red; font-weight:400"}
   .form-group
     %label.content-label-sm Suggested Disposition
     %select.form-control#disposition_suggested
