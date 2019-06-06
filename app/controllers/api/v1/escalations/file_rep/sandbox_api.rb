@@ -15,7 +15,11 @@ module API
               requires :sha256_hash, type: String, desc: "SHA256 hash"
             end
             get "/sandbox_score/:sha256_hash" do
-              api_response = FileReputationApi::Sandbox.sandbox_score(params[:sha256_hash])
+              api_response =
+                  FileReputationApi::Sandbox.sandbox_score(
+                      params[:sha256_hash],
+                      api_key_type: FileReputationDispute::SUBMITTER_TYPE_AC_REFRESH
+                  )
               render json: api_response
             end
 
@@ -33,7 +37,11 @@ module API
               requires :sha256_hash, type: String, desc: "SHA256 hash"
             end
             get "/sandbox_latest_report/:sha256_hash" do
-              api_response = FileReputationApi::Sandbox.sandbox_latest_report(params[:sha256_hash])
+              api_response =
+                  FileReputationApi::Sandbox.sandbox_latest_report(
+                      params[:sha256_hash],
+                      api_key_type: FileReputationDispute::SUBMITTER_TYPE_AC_REFRESH
+                  )
               render json: api_response
             end
 
@@ -44,7 +52,12 @@ module API
             end
             get "/sandbox_report/:run_id/:sha256_hash" do
               sha256_hash = params[:sha256_hash]
-              api_response = FileReputationApi::Sandbox.full_report(sha256_hash, params[:run_id])
+              api_response =
+                  FileReputationApi::Sandbox.full_report(
+                      sha256_hash,
+                      params[:run_id],
+                      api_key_type: FileReputationDispute::SUBMITTER_TYPE_AC_REFRESH
+                  )
 
               begin
                 sandbox_score = api_response[:data]['score']

@@ -28,6 +28,7 @@ class FileReputationDispute < ApplicationRecord
   DISPOSITION_COMMON        = 'common'
   DISPOSITION_CLEAN         = 'clean'
 
+  SUBMITTER_TYPE_AC_REFRESH = 'AC-Refresh'
   SUBMITTER_TYPE_AC_FORM    = 'AC-Form'
   SUBMITTER_TYPE_TI_FORM    = 'TI-Form'
   SUBMITTER_TYPE_TI_API     = 'TI-API'
@@ -439,8 +440,8 @@ class FileReputationDispute < ApplicationRecord
     end
   end
 
-  def update_sandbox_score
-    sandbox_score = FileReputationApi::Sandbox.score(self.sha256_hash)
+  def update_sandbox_score(api_key_type: self.submitter_type)
+    sandbox_score = FileReputationApi::Sandbox.score(self.sha256_hash, api_key_type: api_key_type)
     sandbox_threshold = self.pdf? ? 90.0 : 61.0
     update!(sandbox_score: sandbox_score, sandbox_threshold: sandbox_threshold)
   rescue => except
@@ -469,7 +470,7 @@ class FileReputationDispute < ApplicationRecord
   def update_superfecta
     update_threadgrid_score
     update_reversing_labs_score
-    update_sandbox_score
+    update_sandbox_score(api_key_type: SUBMITTER_TYPE_AC_REFRESH)
     update_sample_zoo
   end
 

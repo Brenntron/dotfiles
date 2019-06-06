@@ -1,22 +1,22 @@
-class FileReputationApi::Sandbox 
+class FileReputationApi::Sandbox
   include ApiRequester::ApiRequester
 
   set_api_requester_config Rails.configuration.file_reputation_sandbox
   set_default_request_type :query_string
   set_default_headers({})
 
-  def self.submitter_api_key(submitter_type)
-    Rails.configuration.file_reputation_sandbox.api_keys[submitter_type] ||
-        raise("Missing #{submitter_type} sandbox API key")
+  def self.type_based_api_key(api_key_type)
+    Rails.configuration.file_reputation_sandbox.api_keys[api_key_type] ||
+        raise("Missing #{api_key_type} sandbox API key")
   end
 
-  def self.sandbox_score(sha256)
+  def self.sandbox_score(sha256, api_key_type:)
 
     endpoint = "/api/2/disposition"
     #endpoint = "/ntu/1/disposition"
     query_string = {
         "hash" => sha256,
-        "apikey" => api_key
+        "apikey" => type_based_api_key(api_key_type)
     }
     begin
       response = call_request_parsed(:get, endpoint, :input => query_string)
@@ -34,7 +34,7 @@ class FileReputationApi::Sandbox
     endpoint = "/ntu/1/disposition"
     query_string = {
         "hash" => sha256,
-        "apikey" => api_key,
+        "apikey" => type_based_api_key(FileReputationDispute::SUBMITTER_TYPE_AC_REFRESH)
     }
     begin
       response = call_request_parsed(:get, endpoint, :input => query_string)
@@ -65,12 +65,12 @@ class FileReputationApi::Sandbox
     data
   end
 
-  def self.sandbox_latest_report(sha256)
+  def self.sandbox_latest_report(sha256, api_key_type:)
     endpoint = "/api/2/report/latest"
 
     query_string = {
         "hash" => sha256,
-        "apikey" => api_key
+        "apikey" => type_based_api_key(api_key_type)
     }
 
     begin
@@ -84,13 +84,13 @@ class FileReputationApi::Sandbox
 
   end
 
-  def self.full_report(sha256, runid)
+  def self.full_report(sha256, runid, api_key_type:)
     endpoint = "/api/2/report"
 
     query_string = {
         "hash" => sha256,
         "runid" => runid,
-        "apikey" => api_key
+        "apikey" => type_based_api_key(api_key_type)
     }
 
     begin
@@ -109,7 +109,7 @@ class FileReputationApi::Sandbox
     query_string = {
         "hash" => sha256,
         "runid" => runid,
-        "apikey" => api_key
+        "apikey" => type_based_api_key(FileReputationDispute::SUBMITTER_TYPE_AC_REFRESH)
     }
 
     begin
@@ -122,10 +122,10 @@ class FileReputationApi::Sandbox
     data
   end
 
-  def self.score(sha256_hash)
-    latest_report = FileReputationApi::Sandbox.sandbox_latest_report(sha256_hash)
+  def self.score(sha256_hash, api_key_type:)
+    latest_report = FileReputationApi::Sandbox.sandbox_latest_report(sha256_hash, api_key_type: api_key_type)
     run_id = latest_report[:data]['runid']
-    full_report = FileReputationApi::Sandbox.full_report(sha256_hash, run_id)
+    full_report = FileReputationApi::Sandbox.full_report(sha256_hash, run_id, api_key_type: api_key_type)
     full_report[:data]['score']
   end
 
@@ -134,7 +134,7 @@ class FileReputationApi::Sandbox
 
     query_string = {
         "hash" => sha256_hash,
-        "apikey" => api_key
+        "apikey" => type_based_api_key(FileReputationDispute::SUBMITTER_TYPE_AC_REFRESH)
     }
 
     begin
