@@ -17,8 +17,8 @@ Feature: Disputes
   Scenario: an analyst tries to create a FileRep ticket
     Given a user with role "filerep user" exists and is logged in
     And the following customers exist:
-    |id| name           |
-    |1 | Dispute Analyst|
+    |id| name            |
+    |1 | Dispute Analyst |
     And bugzilla rest api always saves
     And ThreatGrid API call is stubbed
     And Reversing Labs certificates API call is stubbed
@@ -348,17 +348,23 @@ Feature: Disputes
   @javascript
   Scenario: a user creates a new FileRep Dispute through the form and the ticket is auto-resolved
     Given a user with role "filerep user" exists and is logged in
+    And the following customers exist:
+    |id| name            |
+    |1 | Dispute Analyst |
     And bugzilla rest api always saves
     And ThreatGrid API call is stubbed
     And Reversing Labs certificates API call is stubbed
     And Sandbox API call is stubbed
     And ReversingLabs API call is stubbed
-    And AMP API call is stubbed
+    And AMP API call is stubbed and returns a disposition of, "malicious"
+    And Sample Zoo API call is stubbed
+    And ReversingLabs Creation Data API call is stubbed
     When I go to "/escalations/file_rep/disputes/"
     And I click "#new-dispute"
     And I fill in "shas_list" with "b7d2790048f5cacbf03ee9e36a6b6bc9ffabfc1e449bde0c507d3667064ea791"
     And I select "Malicious" from "disposition_suggested"
     And I click "#file_rep_submit"
-    And I wait for "20" seconds
-    Then take a screenshot
-    Then I should see content "RESOLVED" within "status_1"
+    And I go to "/escalations/file_rep/disputes/"
+    Then I should see content "RESOLVED" within "#status_10101"
+    And I should see content "Malicious" within ".malicious"
+    And the first FileRep Dispute has a populated 'resolution_comment'

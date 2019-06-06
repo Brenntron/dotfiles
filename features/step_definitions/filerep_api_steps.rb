@@ -16,6 +16,13 @@ Given (/^Sandbox API call is stubbed$/) do
   FileReputationApi::Sandbox.stub(:score).and_return(nil)
 end
 
+Given (/^AMP API call is stubbed and returns a disposition of, "(.*?)"$/) do |disposition|
+  book = FileReputationApi::Detection.new
+  book.disposition = disposition
+
+  FileReputationApi::Detection.stub(:get_bulk).and_return(book)
+end
+
 Given (/^AMP API call is stubbed$/) do
   FileReputationApi::Detection.stub(:get_bulk).and_return(nil)
 end

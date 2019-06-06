@@ -35,3 +35,7 @@ end
 Given(/^A FileRep Dispute with trait "(.*?)" exists$/) do |trait_name|
   FactoryBot.create(:file_reputation_dispute,trait_name.to_sym)
 end
+
+Given(/^the first FileRep Dispute has a populated 'resolution_comment'$/) do
+  expect(FileReputationDispute.first.resolution_comment.present?).to eq(true)
+end
