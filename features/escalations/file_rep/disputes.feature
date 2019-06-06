@@ -16,11 +16,17 @@ Feature: Disputes
   @javascript
   Scenario: an analyst tries to create a FileRep ticket
     Given a user with role "filerep user" exists and is logged in
+    And the following customers exist:
+    |id| name           |
+    |1 | Dispute Analyst|
     And bugzilla rest api always saves
     And ThreatGrid API call is stubbed
     And Reversing Labs certificates API call is stubbed
     And Sandbox API call is stubbed
     And ReversingLabs API call is stubbed
+    And AMP API call is stubbed
+    And Sample Zoo API call is stubbed
+    And ReversingLabs Creation Data API call is stubbed
     When I go to "/escalations/file_rep/disputes"
     And I click "#new-dispute"
     And I fill in "shas_list" with "343518b26e0a872772808605f9f28aa75f64d86a6608e1347c979d033a72cb54"
@@ -28,8 +34,7 @@ Feature: Disputes
     Then a FileRep Ticket should have been created
     And that FileRep Ticket should have a SHA256 of "343518b26e0a872772808605f9f28aa75f64d86a6608e1347c979d033a72cb54"
     And that FileRep Ticket should have an assignee of current user
-    # Change this step when we settle on a list of suggested dispositions
-    And that FileRep Ticket should have a suggested disposition of "Option 1"
+    And that FileRep Ticket should have a suggested disposition of "Clean"
     And I should see "FILE REPUTATION TICKET CREATED."
 
   @javascript
@@ -339,3 +344,21 @@ Feature: Disputes
     And I click ".inline-return-ticket-1"
     Then I should not see "ERROR UPDATING TICKET."
     Then I should see "Unassigned"
+
+  @javascript
+  Scenario: a user creates a new FileRep Dispute through the form and the ticket is auto-resolved
+    Given a user with role "filerep user" exists and is logged in
+    And bugzilla rest api always saves
+    And ThreatGrid API call is stubbed
+    And Reversing Labs certificates API call is stubbed
+    And Sandbox API call is stubbed
+    And ReversingLabs API call is stubbed
+    And AMP API call is stubbed
+    When I go to "/escalations/file_rep/disputes/"
+    And I click "#new-dispute"
+    And I fill in "shas_list" with "b7d2790048f5cacbf03ee9e36a6b6bc9ffabfc1e449bde0c507d3667064ea791"
+    And I select "Malicious" from "disposition_suggested"
+    And I click "#file_rep_submit"
+    And I wait for "20" seconds
+    Then take a screenshot
+    Then I should see content "RESOLVED" within "status_1"
