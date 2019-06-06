@@ -33,7 +33,7 @@ class FileReputationDispute < ApplicationRecord
   SUBMITTER_TYPE_TI_API             = 'TI-API'
 
   RESOLUTION_AUTORESOLVED           = 'Auto Resolved'
-  RESOLUTION_AUTORESOLVED_COMMENT   = 'This ticket has been auto-resolved, suggestion disposition and disposition already match.'
+  RESOLUTION_AUTORESOLVED_COMMENT   = 'This ticket has been auto-resolved, suggested disposition and disposition already match.'
 
   validates :status, :sha256_hash, :disposition_suggested, presence: true
 
@@ -77,6 +77,14 @@ class FileReputationDispute < ApplicationRecord
 
   def suggested_malicious?
     self.disposition_suggested&.downcase == DISPOSITION_MALICIOUS.downcase
+  end
+
+  def clean?
+    self.disposition&.downcase == DISPOSITION_CLEAN.downcase
+  end
+
+  def suggested_clean?
+    self.disposition_suggested&.downcase == DISPOSITION_CLEAN.downcase
   end
 
   def update_status(status)
@@ -143,31 +151,6 @@ class FileReputationDispute < ApplicationRecord
 
     file_rep.update_scores
 
-    # Check if the ticket can be resolved by matching suggested disposition and AMP disposition
-    if file_rep.disposition_suggested.downcase == 'malicious' && file_rep.disposition == 'malicious'
-      file_rep.status = STATUS_RESOLVED
-
-      envelope = {}
-      envelope[:payload] = {}
-
-      envelope[:addressee_id] = self.id
-      envelope[:addressee_status] = file_rep.status
-      envelope[:payload] = {resolution: file_rep.resolution, resolution_comment: file_rep.resolution_comment}
-
-      Bridge::FilerepAutoResolveEvent.new(envelope).post
-    elsif file_rep.disposition_suggested.downcase == 'clean'&& file_rep.disposition == 'clean'
-      file_rep.status = STATUS_RESOLVED
-
-      envelope = {}
-      envelope[:payload] = {}
-
-      envelope[:addressee_id] = self.id
-      envelope[:addressee_status] = file_rep.status
-      envelope[:payload] = {resolution: file_rep.resolution, resolution_comment: file_rep.resolution_comment}
-
-      Bridge::FilerepAutoResolveEvent.new(envelope).post
-    end
-
     if file_rep.save!
       file_rep
     else
@@ -217,11 +200,13 @@ class FileReputationDispute < ApplicationRecord
     file_rep.update_scores
     file_rep.populate_fields_from_rl
 
-    # Check if the ticket can be resolved by matching suggested disposition and AMP disposition
-    if file_rep.disposition_suggested == 'Malicious' && file_rep.disposition == 'malicious'
+    # Check if the ticket can be resolved by matching suggested disposition and disposition (AMP)
+    if file_rep.suggested_clean? && file_rep.clean?
       file_rep.status = STATUS_RESOLVED
-    elsif file_rep.disposition_suggested == 'Clean'&& file_rep.disposition == 'clean'
+      file_rep.resolution = RESOLUTION_AUTORESOLVED
+    elsif file_rep.suggested_malicious? && file_rep.malicious?
       file_rep.status = STATUS_RESOLVED
+      file_rep.resolution = RESOLUTION_AUTORESOLVED
     end
 
     if file_rep.save!
@@ -584,37 +569,6 @@ class FileReputationDispute < ApplicationRecord
         new_dispute.source = message_payload[:source]
         new_dispute.platform = message_payload[:platform]
 
-        # Hit AMP API to get disposition
-        amp_api_response = FileReputationApi::Detection.get_bulk(message_payload[:sha256_hash])
-
-        if amp_api_response.present?
-          disposition = amp_api_response.disposition
-        end
-
-        if disposition == 'malicious' && new_dispute.disposition_suggested.downcase == 'malicious'
-          new_dispute.status = STATUS_RESOLVED
-
-          envelope = {}
-          envelope[:payload] = {}
-
-          envelope[:addressee_id] = new_dispute.id
-          envelope[:addressee_status] = new_dispute.status
-          envelope[:payload] = {resolution: RESOLUTION_AUTORESOLVED, resolution_comment: RESOLUTION_AUTORESOLVED_COMMENT}
-
-          Bridge::FilerepAutoResolveEvent.new(envelope).post
-        elsif disposition == 'clean' && new_dispute.disposition_suggested.downcase == 'clean'
-          new_dispute.status = STATUS_RESOLVED
-
-          envelope = {}
-          envelope[:payload] = {}
-
-          envelope[:addressee_id] = new_dispute.id
-          envelope[:addressee_status] = new_dispute.status
-          envelope[:payload] = {resolution: RESOLUTION_AUTORESOLVED, resolution_comment: RESOLUTION_AUTORESOLVED_COMMENT}
-
-          Bridge::FilerepAutoResolveEvent.new(envelope).post
-        end
-
         new_dispute.save
 
       end #transaction
@@ -624,13 +578,42 @@ class FileReputationDispute < ApplicationRecord
       if FileReputationDispute.threaded?
         Thread.new do
           new_dispute.update_scores
+          new_dispute.auto_resolve_on_matching_disposition
         end
       else
         new_dispute.update_scores
+        new_dispute.auto_resolve_on_matching_disposition
       end
     end
 
     new_dispute
+  end
+
+  def auto_resolve_on_matching_disposition
+    if self.clean? && self.suggested_clean?
+      self.update(status: STATUS_RESOLVED)
+
+      envelope = {}
+      envelope[:payload] = {}
+
+      envelope[:addressee_id] = self.id
+      envelope[:addressee_status] = self.status
+      envelope[:payload] = {resolution: RESOLUTION_AUTORESOLVED, resolution_comment: RESOLUTION_AUTORESOLVED_COMMENT}
+
+      Bridge::FilerepAutoResolveEvent.new(envelope).post
+    elsif self.malicious? && self.suggested_malicious?
+      binding.pry
+      self.update(status: STATUS_RESOLVED)
+
+      envelope = {}
+      envelope[:payload] = {}
+
+      envelope[:addressee_id] = self.id
+      envelope[:addressee_status] = self.status
+      envelope[:payload] = {resolution: RESOLUTION_AUTORESOLVED, resolution_comment: RESOLUTION_AUTORESOLVED_COMMENT}
+
+      Bridge::FilerepAutoResolveEvent.new(envelope).post
+    end
   end
 
   def self.take_tickets(dispute_ids, user:)
