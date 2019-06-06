@@ -915,6 +915,9 @@ $ ->
   $('#create-detection-dialog').dialog
     autoOpen: false,
     minWidth: 520,
+    minHeight: 560,
+    resizable: false,
+
     classes: {
       "ui-dialog": "form-dialog"
     },
