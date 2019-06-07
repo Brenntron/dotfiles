@@ -252,11 +252,33 @@ module API
 
             post 'fetch_wbnp_data' do
               std_api_v2 do
-
-                Complaint.get_latest_wbnp_complaints
-                {:status => "success"}.to_json
-
+                begin
+                  new_report = Complaint.get_latest_wbnp_complaints
+                  {:status => "success", :wbnp_report_id => new_report.id}
+                rescue
+                  {:status => "error"}.to_json
+                end
               end
+            end
+
+            params do
+              optional :wbnp_report_id, type: Integer
+            end
+
+            get 'wbnp_report_status' do
+              report = WbnpReport.all.last
+              if permitted_params[:wbnp_report_id].blank?
+                report = WbnpReport.active_reports.last
+              else
+                report = WbnpReport.where(:id => permitted_params[:wbnp_report_id]).first
+              end
+
+              if report.present?
+                {:status => "success", :data => report.to_json}
+              else
+                {:status => "success", :data => {}}
+              end
+
             end
 
             params do

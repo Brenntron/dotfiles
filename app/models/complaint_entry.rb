@@ -318,38 +318,46 @@ class ComplaintEntry < ApplicationRecord
     end
 
     ComplaintEntryPreload.generate_preload_from_complaint_entry(new_complaint_entry)
-    max_wait_for_job = 15 #seconds
-    begin
-      screenshot_data =  ""
-      Timeout::timeout(max_wait_for_job) do
-        screenshot_data = CapybaraSpider.low_capture("#{new_complaint_entry.hostlookup}")
-      end
-      ces = ComplaintEntryScreenshot.new
-      ces.complaint_entry_id = new_complaint_entry.id
-      ces.screenshot = Base64.decode64(screenshot_data)
-      ces.save!
-    rescue Timeout::Error => e
-      #couldnt complete in time
-      Rails.logger.error( "#{e} --- Timed out waiting for screenshot for #{new_complaint_entry.hostlookup} to finish")
-      ces = ComplaintEntryScreenshot.new
-      ces.error_message = e.message
-      ces.complaint_entry_id = new_complaint_entry.id
-      open("app/assets/images/failed_screenshot.jpg") do |f|
-        ces.screenshot = f.read
-      end
-      ces.save!
-    rescue Exception => e
-      Rails.logger.error("#{e.message}")
-      #do nothing, it was worth a try. kittens are sad now
-      ces = ComplaintEntryScreenshot.new
-      ces.error_message = e.message
-      ces.complaint_entry_id = new_complaint_entry.id
-      open("app/assets/images/failed_screenshot.jpg") do |f|
-        ces.screenshot = f.read
-      end
-      ces.save!
-    end
 
+    delay.capture_screenshot(new_complaint_entry.hostlookup, new_complaint_entry.id)
+  end
+
+  class << self
+    def capture_screenshot(uri, complaint_entry_id)
+      max_wait_for_job = 15 #seconds
+      begin
+        screenshot_data =  ""
+        Timeout::timeout(max_wait_for_job) do
+          screenshot_data = CapybaraSpider.low_capture("#{uri}")
+        end
+        ces = ComplaintEntryScreenshot.new
+        ces.complaint_entry_id = complaint_entry_id
+        ces.screenshot = Base64.decode64(screenshot_data)
+        ces.save!
+      rescue Timeout::Error => e
+        #couldnt complete in time
+        Rails.logger.error( "#{e} --- Timed out waiting for screenshot for #{uri} to finish")
+        ces = ComplaintEntryScreenshot.new
+        ces.error_message = e.message
+        ces.complaint_entry_id = complaint_entry_id
+        open("app/assets/images/failed_screenshot.jpg") do |f|
+          ces.screenshot = f.read
+        end
+        ces.save!
+      rescue Exception => e
+        Rails.logger.error("#{e.message}")
+        #do nothing, it was worth a try. kittens are sad now
+        ces = ComplaintEntryScreenshot.new
+        ces.error_message = e.message
+        ces.complaint_entry_id = complaint_entry_id
+        open("app/assets/images/failed_screenshot.jpg") do |f|
+          ces.screenshot = f.read
+        end
+        ces.save!
+      end
+
+    end
+    handle_asynchronously :capture_screenshot
   end
 
 
