@@ -79,11 +79,14 @@ Rails.application.routes.draw do
 
       get 'dashboard', to: 'disputes#dashboard'
       get 'research', to: 'disputes#research'
+      get :export_selected_dispute_rows, to: 'disputes#export_selected_dispute_rows'
+      get :export_selected_dispute_entry_rows, to: 'disputes#export_selected_dispute_entry_rows'
     end
 
     namespace :file_rep do
       root 'disputes#index'
       resources :disputes, only: [:index, :show]
+      get 'sandbox-html-report', to: 'disputes#sandbox_html_report'
     end
 
 

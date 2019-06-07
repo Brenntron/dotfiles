@@ -515,6 +515,8 @@ $ ->
           $(new_delete).append(new_delete_image)
           $('.filerep-named-search-list').append(new_tr)
 
+
+
     processing: true
     serverSide: true
     ajax:
@@ -585,7 +587,7 @@ $ ->
       }
       {
         data: 'sha256_hash'
-        render: (data, type, full, meta) ->
+        render: (data) ->
           return '<span id="' + data + '_sha" title="' + data + '" class="esc-tooltipped file_rep_sha">' + data + '</span>'
       }
       {
@@ -657,9 +659,57 @@ $ ->
       }
       {
         data: 'reversing_labs_score'
+        className: 'rl-col'
         render: (data, type, full, meta) ->
-          if data
-            return '<span class="score-col text-center">' + data + ' / ' + full['reversing_labs_count'] + '</span>'
+          if full['reversing_labs_count'] == '0'
+            return '<span class="missing-data">Not in RL</span>'
+          else if data
+            score_id_selector = full['id']
+            scanner_list = full['reversing_labs_scanners']
+            rl_score = data
+            rl_count = full['reversing_labs_count']
+            score_id_selector = '#rl-score-id-' + score_id_selector
+            rl_hover_table = ''
+
+            if rl_count == "0"
+              $(score_id_selector).tooltipster
+                theme: [
+                  'tooltipster-borderless'
+                  'tooltipster-borderless-customized'
+                ]
+                side: 'bottom'
+                content: 'Not in Reversing Labs.'
+                trigger: 'hover'
+
+            else
+              scanners_list = scanner_list
+              # file_rep_datatable.rb is doing a .to_json but it needs a fix
+              scanners_list = scanners_list.replace(/&quot;/g,'"')
+
+              obj_scanners = JSON.parse(scanners_list)
+
+              mal_results = []
+              unk_results = []
+
+              # each scanner entry, this is where to handle the logic for each scanner
+              $(obj_scanners).each ->
+                if this.result == ""
+                  unk_results.push(this)
+                else
+                  mal_results.push(this)
+
+              rl_hover_table +=
+                '<table class=\'rl-header\'><tr class=\'top\'><td colspan=\'2\'>Reversing Labs Details ' +
+                  '<span id=\'rl-score-hover\'>' + rl_score + '/' + rl_count + '</span></td></tr>' +
+                  '<tr class=\'second\'><td class=\'left\'>AV Vendor</td><td class=\'right\'>Results</td></tr></table>' +
+                  '<table class=\'rl-content\'>'
+
+              $(mal_results).each ->
+                rl_hover_table += '<tr><td class=\'left\'>' + this.name + '</td><td class=\'right rl-scanner-mal\'>' + this.result + '</td></tr>'
+              $(unk_results).each ->
+                rl_hover_table += '<tr><td class=\'left\'>' + this.name + '</td><td class=\'right rl-scanner-unk\'>Not Detected</td></tr>'
+
+            return '<span title="' + rl_hover_table + '" class="score-col text-center rl-hover" ' + 'id="rl-score-id-' + full['id'] + '" ><a>' + data + ' / ' + full['reversing_labs_count'] + '</a></span>'
           else
             return ''
       }
@@ -678,7 +728,7 @@ $ ->
         data: 'created_at'
         render: (data) ->
           if data
-            return moment(new Date(data)).format('MMM D, YYYY h:mm A')
+            return moment(data, "YYYY-MM-DD HH:mm").format("YYYY-MM-DD HH:mm")
           else
             return ''
       }
@@ -701,6 +751,32 @@ $ ->
             return data
       }
     ]
+
+#
+  $('#file-rep-datatable').on 'draw.dt', ->
+    $('.rl-hover').tooltipster
+      theme: [
+        'tooltipster-borderless'
+        'tooltipster-borderless-customized'
+        'tooltipster-rl-hover'
+      ]
+      side: 'bottom'
+      contentAsHTML: true
+      autoClose: false
+      trigger: 'custom'
+      triggerOpen:
+        mouseenter: true
+        click: true
+      triggerClose:
+        mouseleave: true
+        click: true
+        scroll: true
+      interactive: true
+      updateAnimation: false
+
+    return
+
+
 
   $('.toggle-vis-file-rep').each ->
 #       toggle visible columns
@@ -832,26 +908,16 @@ $ ->
         }
     })
 
-# dbinebri: adding in checkbox toggle column visible + widths on Show Page, Research tab
-  $('#data-show-sandbox-cb').click -> $('#sandbox-report-wrapper').toggle()
-  $('#data-show-tg-cb').click -> $('#threatgrid-report-wrapper').toggle()
-  $('#data-show-reversing-cb').click -> $('#reversing-labs-report-wrapper').toggle()
-
-  $('#data-show-sandbox-cb, #data-show-tg-cb, #data-show-reversing-cb').click ->
-    if $('.dataset-cb:checked').length == 1
-      $('#sandbox-report-wrapper, #threatgrid-report-wrapper, #reversing-labs-report-wrapper').removeClass('col-sm-4 col-sm-6').addClass('col-sm-12')
-    else if $('.dataset-cb:checked').length == 2
-      $('#sandbox-report-wrapper, #threatgrid-report-wrapper, #reversing-labs-report-wrapper').removeClass('col-sm-4 col-sm-12').addClass('col-sm-6')
-    else if $('.dataset-cb:checked').length == 3
-      $('#sandbox-report-wrapper, #threatgrid-report-wrapper, #reversing-labs-report-wrapper').removeClass('col-sm-6 col-sm-12').addClass('col-sm-4')
-    return
-
 
 $ ->
+
   ## Create detection form dialog
   $('#create-detection-dialog').dialog
     autoOpen: false,
     minWidth: 520,
+    minHeight: 560,
+    resizable: false,
+
     classes: {
       "ui-dialog": "form-dialog"
     },
@@ -915,6 +981,8 @@ $ ->
     else
       detection_array = {disposition: new_disp}
 
+    dispute_id = parseInt($('#dispute_id').text())
+    old_disposition = $('.disposition').text()
     comment = $('#new-amp-detection-comment').val()
 
     # Grab sha data
@@ -952,8 +1020,12 @@ $ ->
       method: 'POST'
       data: {
         'sha256_hashes': sha256_hashes
+        'old_disposition': old_disposition
         'disposition': new_disp
         'detection_name': new_detection_name
+        'comment': comment
+        'dispute_id': dispute_id
+
       }
       success: (response) ->
         $('#create-detection-dialog').dialog('close')
@@ -1038,13 +1110,48 @@ $ ->
     curr_sha256_hash = $('#sha256_hash').text()
     detection_now(curr_sha256_hash)
 
+    $('select[name="file-rep-datatable_length"]').on "change", ->
+      data = {}
+      data['entriesperpage'] = $('select[name="file-rep-datatable_length"]').val()
+      std_msg_ajax(
+        url: "/escalations/api/v1/escalations/user_preferences/update"
+        method: 'POST'
+        data: {data, name: 'FileRepEntriesPerPage'}
+        dataType: 'json'
+        success: (response) ->
+      )
+
+    $('#file-rep-datatable_paginate').on "click", ->
+      data = {}
+      data['currentpage'] = $('#file-rep-datatable').DataTable().page()
+      std_msg_ajax(
+        url: "/escalations/api/v1/escalations/user_preferences/update"
+        method: 'POST'
+        data: {data, name: 'FileRepCurrentPage'}
+        dataType: 'json'
+        success: (response) ->
+      )
+
+    $('#file-rep-datatable th').on "click", ->
+      setTimeout (-> # Wait until after the sorting event is finished before saving the result
+        data = {}
+        data['sortorder'] = $('#file-rep-datatable').DataTable().order()
+        std_msg_ajax(
+          url: "/escalations/api/v1/escalations/user_preferences/update"
+          method: 'POST'
+          data: {data, name: 'FileRepSortOrder'}
+          dataType: 'json'
+          success: (response) ->
+        )
+      ), 100
+
+
     $('.toggle-vis-file-rep').on "click", ->
       data = {}
-      data['id'] = $("#id-checkbox").is(':checked')
       data['status'] = $("#status-checkbox").is(':checked')
       data['resolution'] = $("#resolution-checkbox").is(':checked')
       data['file-name'] = $("#file-name-checkbox").is(':checked')
-      data['sha256'] = $("#sha256-checkbox").is(':checked')
+#      data['sha256'] = $("#sha256-checkbox").is(':checked')
       data['file-size'] = $("#file-size-checkbox").is(':checked')
       data['sample-type'] = $("#sample-type-checkbox").is(':checked')
       data['amp-disp'] = $("#amp-disp-checkbox").is(':checked')
@@ -1115,3 +1222,35 @@ $ ->
       complete: () ->
         $('.amp-area .inline-loader-wrapper').hide()
     )
+
+
+      std_msg_ajax(
+        method: 'POST'
+        url: "/escalations/api/v1/escalations/user_preferences/"
+        data: {name: 'FileRepSortOrder'}
+        success: (response) ->
+          response = JSON.parse(response)
+          $('#file-rep-datatable').DataTable().order(response.sortorder).draw()
+      )
+
+      std_msg_ajax(
+        method: 'POST'
+        url: "/escalations/api/v1/escalations/user_preferences/"
+        data: {name: 'FileRepCurrentPage'}
+        success: (response) ->
+          response = JSON.parse(response)
+          $('#file-rep-datatable').DataTable().page(response.currentpage).draw('page')
+      )
+
+      std_msg_ajax(
+        method: 'POST'
+        url: "/escalations/api/v1/escalations/user_preferences/"
+        data: {name: 'FileRepEntriesPerPage'}
+        success: (response) ->
+          response = JSON.parse(response)
+          $('#file-rep-datatable').DataTable().page.len(response.entriesperpage).draw('page')
+      )
+
+
+
+

@@ -116,9 +116,9 @@
               %label.content-label-sm
                 Suggested Disposition
               - if @file_rep_dispute.suggested_malicious?
-                .disposition.disp-negative= @file_rep_dispute.disposition_suggested
+                .suggested-disposition.disp-negative= @file_rep_dispute.disposition_suggested
               - else
-                .disposition= @file_rep_dispute.disposition_suggested
+                .suggested-disposition= @file_rep_dispute.disposition_suggested
 
         .col-xs-12.col-sm-12.col-md-12.col-lg-7.col-with-divider.col-ticket-right
           .row

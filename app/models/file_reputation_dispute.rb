@@ -28,6 +28,10 @@ class FileReputationDispute < ApplicationRecord
   DISPOSITION_COMMON        = 'common'
   DISPOSITION_CLEAN         = 'clean'
 
+  SUBMITTER_TYPE_AC_FORM    = 'AC-Form'
+  SUBMITTER_TYPE_TI_FORM    = 'TI-Form'
+  SUBMITTER_TYPE_TI_API     = 'TI-API'
+
   validates :status, :sha256_hash, :disposition_suggested, presence: true
 
   scope :by_customer, ->(customer_name: nil, customer_email: nil, company_name: nil) {
@@ -96,7 +100,7 @@ class FileReputationDispute < ApplicationRecord
   def dispute_emails
     DisputeEmail.where(file_reputation_dispute_id: self.id)
   end
-  
+
   def self.create_action(bugzilla_rest_session, sha256_hash, file_name, file_size, sample_type, disposition_suggested, source, platform, sha256_checksum)
 
     file_rep = FileReputationDispute.new
@@ -143,7 +147,7 @@ class FileReputationDispute < ApplicationRecord
     end
   end
 
-  def self.create_through_form(bugzilla_rest_session, sha256_hash, disposition_suggested, assignee)
+  def self.create_through_form(bugzilla_rest_session, sha256_hash, disposition_suggested, assignee, current_user)
 
     summary = "New File Rep Dispute generated at #{DateTime.now.utc.strftime("%Y-%m-%d %H:%M")}"
 
@@ -166,19 +170,31 @@ class FileReputationDispute < ApplicationRecord
 
     file_rep = FileReputationDispute.new
 
+    customer = Customer.where(name: 'Dispute Analyst').first
+
     attributes = {
         id: bug_proxy.id,
         file_name: 'N/A',
         sha256_hash: sha256_hash,
         disposition_suggested: disposition_suggested,
-        user_id: User.where(cvs_username: assignee).first.id
+        user_id: User.where(cvs_username: assignee).first.id,
+        submitter_type: SUBMITTER_TYPE_AC_FORM,
+        customer_id: customer.id,
+        status: STATUS_ASSIGNED
     }
 
     file_rep.assign_attributes(attributes)
 
     if file_rep.save!
       file_rep.update_scores
+      file_rep.populate_fields_from_rl
     end
+  end
+
+  def populate_fields_from_rl
+    api_response = FileReputationApi::ReversingLabs.get_creation_data(self.sha256_hash)
+
+    self.update(file_size: api_response[:file_size], sample_type: api_response[:sample_type])
   end
 
   def self.save_named_search(search_name, params, user:, project_type:)
@@ -411,7 +427,8 @@ class FileReputationDispute < ApplicationRecord
   end
 
   def update_reversing_labs_score
-    update!(FileReputationApi::ReversingLabs.score(self.sha256_hash))
+    rev_lab = FileReputationApi::ReversingLabs.lookup(self.sha256_hash)
+    rev_lab.update_database
   rescue => except
     Rails.logger.error("Error updating reversing labs score on id #{self.id} -- #{except.message}")
   end
@@ -437,17 +454,32 @@ class FileReputationDispute < ApplicationRecord
     Rails.logger.error("Error updating amp disposition on #{self.id} -- #{except.message}")
   end
 
-  def update_trifecta
+  # Update scores when refreshing data on show page
+  def update_sample_zoo
+    zoo_response = FileReputationApi::SampleZoo.sha256_lookup(self.sha256_hash)
+    begin
+      attributes = FileReputationApi::SampleZoo.query_from_data(zoo_response)
+      update!(attributes)
+    end
+  rescue => except
+    Rails.logger.error("Error updating sample zoo flag for id #{self.id} -- #{except.message}")
+  end
+
+  # Initialize all data as when creating a dispute record
+  def update_superfecta
     update_threadgrid_score
     update_reversing_labs_score
     update_sandbox_score
+    update_sample_zoo
   end
 
   def update_scores
+    update_amp_disposition
     update_threadgrid_score
     update_ticode_certs
     update_reversing_labs_score
     update_sandbox_score
+    update_sample_zoo
   end
 
   def ack_create(envelope_params, sender_params)
@@ -519,11 +551,9 @@ class FileReputationDispute < ApplicationRecord
     if new_dispute
       if FileReputationDispute.threaded?
         Thread.new do
-          new_dispute.update_amp_disposition
           new_dispute.update_scores
         end
       else
-        new_dispute.update_amp_disposition
         new_dispute.update_scores
       end
     end

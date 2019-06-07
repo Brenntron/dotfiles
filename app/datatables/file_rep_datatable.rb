@@ -1,10 +1,11 @@
 class FileRepDatatable < AjaxDatatablesRails::ActiveRecord
 
-  def initialize(params, search_params, user:)
+  def initialize(params, initialize_params, user:)
     @user = user
-    @search_type = search_params['search_type']
-    @search_name = search_params['search_name']
-    @search_conditions = search_params['search_conditions']
+    @search_string = initialize_params['value'] # Native datatables search string
+    @search_type = initialize_params['search_type']
+    @search_name = initialize_params['search_name']
+    @search_conditions = initialize_params['search_conditions']
     super(params, {})
   end
 
@@ -15,7 +16,7 @@ class FileRepDatatable < AjaxDatatablesRails::ActiveRecord
       updated_at:         { data: :updated_at, source: 'FileReputationDispute.updated_at', cond: :date_range },
       status:             { data: :status, source: 'FileReputationDispute.status', cond: :string_eq },
       resolution:         { data: :resolution, source: 'FileReputationDispute.resolution', cond: :string_eq },
-      assigned:           { data: :assigned, source: 'FileReputationDispute.assigned', cond: :string_eq },
+      assigned:           { data: :assigned, source: 'FileReputationDispute.assigned', cond: :string_eq, orderable: false },
       file_name:          { data: :file_name, source: 'FileReputationDispute.file_name', cond: :like },
       file_size:          { data: :file_size, source: 'FileReputationDispute.file_size', searchable: false },
       sha256_hash:        { data: :sha256_hash, source: 'FileReputationDispute.sha256_hash', cond: :like },
@@ -36,12 +37,14 @@ class FileRepDatatable < AjaxDatatablesRails::ActiveRecord
       threatgrid_threshold: { data: :threatgrid_threshold, source: 'FileReputationDispute.threatgrid_threshold', cond: :like },
       threatgrid_under:   { data: :threatgrid_under, source: 'FileReputationDispute.threatgrid_under', cond: :like },
       threatgrid_signer:  { data: :threatgrid_signer, source: 'FileReputationDispute.threatgrid_signer', cond: :like },
-      reversing_labs_score: { data: :reversing_labs_score, source: 'FileReputationDispute.reversing_labs_score', cond: :like },
+      reversing_labs_score: { data: :reversing_labs_score, source: 'FileReputationDispute.reversing_labs_score', searchable: false },
+      reversing_labs_count: { data: :reversing_labs_count, source: 'FileReputationDispute.reversing_labs_count', searchable: false },
+      reversing_labs_scanners: { data: :reversing_labs_scanners, source: 'FileReputationDispute.reversing_labs_scanners', searchable: false },
       reversing_labs_signer: { data: :reversing_labs_signer, source: 'FileReputationDispute.reversing_labs_signer', cond: :like },
       submitter_type: { data: :submitter_type, source: 'FileReputationDispute.submitter_type', cond: :like},
-      customer_name:      { data: :customer_name, source: 'FileReputationDispute.customer_name', cond: :like },
-      customer_email:     { data: :customer_email, source: 'FileReputationDispute.customer_email', cond: :like },
-      customer_company_name: { data: :customer_company_name, source: 'FileReputationDispute.customer_company_name', cond: :like },
+      customer_name:      { data: :customer_name, source: 'FileReputationDispute.customer_name', cond: :like, orderable: false },
+      customer_email:     { data: :customer_email, source: 'FileReputationDispute.customer_email', cond: :like, orderable: false },
+      customer_company_name: { data: :customer_company_name, source: 'FileReputationDispute.customer_company_name', cond: :like, orderable: false },
     }
   end
 
@@ -55,6 +58,13 @@ class FileRepDatatable < AjaxDatatablesRails::ActiveRecord
       threatgrid_under =
           if file_rep.threatgrid_score && file_rep.threatgrid_threshold
             file_rep.threatgrid_score < file_rep.threatgrid_threshold
+          end
+
+      rl_scanners =
+          if file_rep.reversing_labs_raw
+            rev_lab = FileReputationApi::ReversingLabs.new(sha256_hash: file_rep.sha256_hash,
+                                                           raw_json: file_rep.reversing_labs_raw)
+            rev_lab.scanners
           end
 
       {
@@ -85,6 +95,7 @@ class FileRepDatatable < AjaxDatatablesRails::ActiveRecord
           threatgrid_signer:            file_rep.threatgrid_signer,
           reversing_labs_score:         file_rep.reversing_labs_score,
           reversing_labs_count:         file_rep.reversing_labs_count,
+          reversing_labs_scanners:      rl_scanners.to_json,
           reversing_labs_signer:        file_rep.reversing_labs_signer,
           submitter_type:               file_rep.submitter_type,
           customer_name:                file_rep.customer&.name,
@@ -101,11 +112,32 @@ class FileRepDatatable < AjaxDatatablesRails::ActiveRecord
   end
 
   def filter_records(records)
+    base_search =
+        if @search_string.present?
+          FileReputationDispute.robust_search('contains', params: { 'value' => @search_string }, user: @user)
+        else
+          super
+        end
 
     if @search_type
-      super.robust_search(@search_type, search_name: @search_name, params: @search_conditions, user: @user)
+      base_search.robust_search(@search_type, search_name: @search_name, params: @search_conditions, user: @user)
     else
-      super
+      base_search
+    end
+  end
+
+  def sort_records(records)
+    case datatable.orders.first.column.sort_query
+      when 'file_reputation_disputes.assigned'
+        FileReputationDispute.joins(:user).order("users.cvs_username #{datatable.orders.first.direction}")
+      when 'file_reputation_disputes.customer_name'
+        FileReputationDispute.joins(:customer).order("customers.name #{datatable.orders.first.direction}")
+      when 'file_reputation_disputes.customer_email'
+        FileReputationDispute.joins(:customer).order("customers.email #{datatable.orders.first.direction}")
+      when 'file_reputation_disputes.customer_company_name'
+        FileReputationDispute.joins(customer: :company).order("companies.name #{datatable.orders.first.direction}")
+      else
+        super
     end
   end
 end

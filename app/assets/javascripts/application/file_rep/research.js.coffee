@@ -1,7 +1,7 @@
 $ ->
 ########### GRAB SHA NEEDED FOR REPORTS ############
 #  If html body is on the show page (do not call on other pages)
-  if $('body').hasClass('show-action')
+  if $('body').hasClass('escalations--file_rep--disputes-controller') && $('body').hasClass('show-action')
     # On the show page we can pull the sha from the FILE OVERVIEW section
     # This prepares all the remaining functions for data fetches / updates
     sha256_hash = $('#sha256_hash')[0].innerText
@@ -23,6 +23,41 @@ window.research_data = (sha256_hash) ->
   window.get_threatgrid_data(sha256_hash)
   window.get_reversinglabs_data(sha256_hash)
   window.get_run_status(sha256_hash)
+  window.get_zoo_status(sha256_hash)
+
+
+########### SAMPLE ZOO STATUS ############
+window.get_zoo_status = (sha256_hash) ->
+  # check SHA256 against Sample Zoo
+  $('#zoo-loader').show()
+  std_msg_ajax(
+    method: 'GET'
+    url: "/escalations/api/v1/escalations/file_rep/sample_zoo/" + sha256_hash
+    success_reload: false
+    success: (response) ->
+
+      $('#zoo-loader').hide()
+      zoo_present = $('.zoo-data-present').find('span')
+      zoo_missing = $('.zoo-data-notfound').find('span')
+
+      unless response.json.error?
+        if response.json.in_zoo == true
+          zoo_present.addClass('glyphicon')
+          zoo_present.addClass('glyphicon-ok')
+        else
+          zoo_missing.addClass('glyphicon')
+          zoo_missing.addClass('glyphicon-remove')
+      else
+        $(zoo_present).show()
+        $(zoo_missing).hide()
+
+    error: (response) ->
+      # $('#rl-loader').hide()
+      std_api_error(response, "There was a problem retrieving data from the Sample Zoo", reload: false)
+  )
+
+
+
 
 
 ########### THREATGRID REPORT ############
@@ -262,6 +297,12 @@ window.get_sandbox_report = (runid, sha256_hash) ->
       full_report = JSON.stringify(response.json, null, 2)
       $('#sb-full').text(full_report)
 
+      # Adding link to see sandbox html report
+      $('#sb-report-html').attr('data-sha', sha256_hash)
+      $('#sb-report-html').attr('data-runid', runid)
+      $('#sb-report-html').attr('href', "/escalations/file_rep/sandbox-html-report?run_id=" + runid + "&sha256_hash=" + sha256_hash)
+      $('#sb-report-html-download').attr('href', "/escalations/file_rep/sandbox-html-report.gzip?run_id=" + runid + "&sha256_hash=" + sha256_hash)
+
 
       # dbinebri: Convert the Talos Sandbox full_report to a downloadable file, add the Download button hyperlink
       # build a formatted date string to add into the filename for download
@@ -281,8 +322,6 @@ window.get_sandbox_report = (runid, sha256_hash) ->
       $('#sb-loader').hide()
       std_api_error(response, "There was a problem retrieving data from Talos Sandbox", reload: false)
   )
-
-
 
 
 ########### TALOS SANDBOX:: RUN SAMPLE & GET REPORT ############
@@ -418,3 +457,19 @@ window.update_file_rep_data = () ->
 $ ->
   # dbinebri: on page load - setting the collapsed + height state for both json reports
   $('#collapse_sb_json, #collapse_tg_json').toggleClass("in").css("height", "300px").attr("aria-expanded", "false")
+
+
+  # dbinebri: refactoring this. this is checkbox toggle column visible + widths on Show Page, Research tab
+  $('#data-show-sandbox-cb').click -> $('#sandbox-report-wrapper').toggle()
+  $('#data-show-tg-cb').click -> $('#threatgrid-report-wrapper').toggle()
+  $('#data-show-reversing-cb').click -> $('#reversing-labs-report-wrapper').toggle()
+
+  wrapper_list = $('#sandbox-report-wrapper, #threatgrid-report-wrapper, #reversing-labs-report-wrapper')
+
+  $('#data-show-sandbox-cb, #data-show-tg-cb, #data-show-reversing-cb').click ->
+    if $('.dataset-cb:checked').length == 1
+      $(wrapper_list).removeClass('col-sm-4 col-sm-6').addClass('col-sm-12')
+    else if $('.dataset-cb:checked').length == 2
+      $(wrapper_list).removeClass('col-sm-4 col-sm-12').addClass('col-sm-6')
+    else if $('.dataset-cb:checked').length == 3
+      $(wrapper_list).removeClass('col-sm-6 col-sm-12').addClass('col-sm-4')

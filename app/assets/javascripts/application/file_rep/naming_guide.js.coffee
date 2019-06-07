@@ -1,12 +1,15 @@
-# dbinebri: for file rep - naming guide dialog
 $ ->
-  $('#dialog-naming-guide').dialog
-    autoOpen: false,
-    width: 800,
-    height: 500,
+  # dbinebri: file rep, naming guide dialog. includes fix for height resizing bug.
+  $('#naming-guide-dialog').dialog
+    autoOpen: false
+    width: 800
+    minWidth: 700
+    height: 500
+    minHeight: 300
     position:
-      my: "left bottom"
+      at: "right top"
+    resize: () ->
+      $('#naming-guide-dialog').css('height', 'calc(100% - 40px)')
 
-  $('#nav-banner a#naming-guide').click ->
-    $('#dialog-naming-guide').dialog('open')
-
+  $('#nav-banner #naming-guide').click ->
+    $('#naming-guide-dialog').dialog('open')
