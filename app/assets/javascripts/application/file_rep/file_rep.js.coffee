@@ -1089,30 +1089,29 @@ $ ->
 
       )
 
-  # get amp detection data for file rep show page, top right area
+
+  # AMP detection data for File Rep > Show page, top right area
   window.detection_now = (sha256_hash) ->
     std_msg_ajax(
       method: 'GET'
       url: '/escalations/api/v1/escalations/file_rep/detections/' + sha256_hash + '/now'
       success_reload: false
-      error_reload: false
-      success: (response) ->
-        #  REPLICATE THIS RUBY LOGIC IN JS BELOW
-        # %label.content-label-sm AMP Disposition
-        # - unless  @file_rep_dispute.disposition.nil?
-        #   - if @file_rep_dispute.malicious?
-        #     .top-info-data.disposition.disp-negative
-        #   - else
-        #   .top-info-data.disposition
-        if response.disposition == 'malicious'
-          $('.amp-area .disposition').addClass('disp-negative')
 
-        $('.amp-area .disposition').html('<p>' + response.disposition + '</p>')
-        $('.amp-area .detection-name').html('<p>' + response.detection_name + '</p>')
-        $('.amp-area .detection-date').html('<p>&nbsp;</p>')
-        $('.amp-area .inline-loader-wrapper').hide()
+      success: (response) ->
+        unless response.disposition == ''
+          if response.disposition == 'malicious'
+            $('.amp-area .disposition').addClass('disp-negative')
+
+          $('.amp-area .disposition').text(response.disposition)
+          $('.amp-area .detection-name').text(response.detection_name)
+
+          # BACK-END TODO: we need TWO dates below, one for Last Updated and Last Pulled, need these from the back-end
+          $('.amp-area .detection-last-updated').html('')
+          $('.amp-area .detection-last-pulled').html('')
+
       error: () ->
-        $('.amp-area .disposition').html('<p>There was an error retrieving the AMP data.</p>')
+        std_msg_error('Error with AMP', ['There was an error retrieving the AMP data.'])
+
       complete: () ->
         $('.amp-area .inline-loader-wrapper').hide()
     )

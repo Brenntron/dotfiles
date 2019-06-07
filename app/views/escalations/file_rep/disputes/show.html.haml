@@ -175,23 +175,23 @@
               = inline_svg 'icon_gears_loader.svg', class: 'gears-loader'
             %span.loader-msg Loading data...
 
+          -# dbinebri: error handling for these moved to JS detection_now func, restore the orig ruby error logic if needed
           %label.content-label-sm AMP Disposition
-          - unless  @file_rep_dispute.disposition.nil?
-            - if @file_rep_dispute.malicious?
-              .top-info-data.disposition.disp-negative
-            - else
-              .top-info-data.disposition
-            %label.content-label-sm AMP Detection Name
-            .top-info-data.detection-name
-            %label.content-label-sm AMP Detection Created
-            .top-info-data.detection-date
-            %label.content-label-sm In Sample Zoo
-            - if @file_rep_dispute.in_zoo == true
-              .top-info-data#sample-zoo-status{'data-zoo-status': 'YES'}
-                %span.glyphicon.glyphicon-ok
-            - else
-              .top-info-data#sample-zoo-status{'data-zoo-status': 'NO'}
-                %span.glyphicon.glyphicon-remove
+          .top-info-data.disposition
+          %label.content-label-sm AMP Detection Name
+          .top-info-data.detection-name
+          %label.content-label-sm AMP Detection Last Updated
+          .top-info-data.detection-last-updated
+          %label.content-label-sm AMP Detection Date Last Pulled
+          .top-info-data.detection-last-pulled
+
+          %label.content-label-sm In Sample Zoo
+          - if @file_rep_dispute.in_zoo == true
+            .top-info-data#sample-zoo-status{'data-zoo-status': 'YES'}
+              %span.glyphicon.glyphicon-ok
+          - else
+            .top-info-data#sample-zoo-status{'data-zoo-status': 'NO'}
+              %span.glyphicon.glyphicon-remove
 
 
 -# End of top overview information
