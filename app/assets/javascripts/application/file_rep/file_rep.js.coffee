@@ -1082,7 +1082,7 @@ $ ->
         data: {current_user_id: current_user_id}
         success_reload: true
         error: (response) ->
-          std_msg_error("Note could not be deleted", [response.responseJSON.error], reload: false)
+          std_msg_error("Note could not be deleted", [response.responseJSON.message], reload: false)
           $('.confirm').hide()
       )
 
