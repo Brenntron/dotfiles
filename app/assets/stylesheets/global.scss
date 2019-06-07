@@ -8804,6 +8804,7 @@ button.secondary.view-report-external-button {
 }
 
 #dialog-naming-guide {
+  display: none;
   font-family: 'Open Sans', sans-serif;
   padding: 10px;
   table th {
@@ -9308,4 +9309,18 @@ div[aria-describedby='create-detection-dialog'] {
   background-image: url(/assets/icon_sandbox_report.svg);
   background-position: 6px center;
   padding-left: 15px;
+}
+
+.amp-area .disposition {
+  text-transform: capitalize;
+}
+
+// making sure this string doesn't break
+.amp-area .detection-name {
+  word-break: break-all;
+}
+
+.amp-area .inline-loader-wrapper {
+  display: block;
+  margin-bottom: 40px;
 }

@@ -1034,6 +1034,10 @@ $ ->
 
   $(document).ready ->
 
+    # dbinebri: get amp detection data for show page
+    curr_sha256_hash = $('#sha256_hash').text()
+    detection_now(curr_sha256_hash)
+
     $('.toggle-vis-file-rep').on "click", ->
       data = {}
       data['id'] = $("#id-checkbox").is(':checked')
@@ -1085,12 +1089,30 @@ $ ->
 
       )
 
+  # get amp detection data for file rep show page, top right area
   window.detection_now = (sha256_hash) ->
     std_msg_ajax(
       method: 'GET'
       url: '/escalations/api/v1/escalations/file_rep/detections/' + sha256_hash + '/now'
-      success: (detection_data) ->
-        debugger
-        alert(detection_data.disposition)
-        alert(detection_data.detection_name)
+      success_reload: false
+      error_reload: false
+      success: (response) ->
+        #  REPLICATE THIS RUBY LOGIC IN JS BELOW
+        # %label.content-label-sm AMP Disposition
+        # - unless  @file_rep_dispute.disposition.nil?
+        #   - if @file_rep_dispute.malicious?
+        #     .top-info-data.disposition.disp-negative
+        #   - else
+        #   .top-info-data.disposition
+        if response.disposition == 'malicious'
+          $('.amp-area .disposition').addClass('disp-negative')
+
+        $('.amp-area .disposition').html('<p>' + response.disposition + '</p>')
+        $('.amp-area .detection-name').html('<p>' + response.detection_name + '</p>')
+        $('.amp-area .detection-date').html('<p>&nbsp;</p>')
+        $('.amp-area .inline-loader-wrapper').hide()
+      error: () ->
+        $('.amp-area .disposition').html('<p>There was an error retrieving the AMP data.</p>')
+      complete: () ->
+        $('.amp-area .inline-loader-wrapper').hide()
     )
