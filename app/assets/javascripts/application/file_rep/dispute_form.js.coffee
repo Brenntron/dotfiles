@@ -3,7 +3,7 @@ $ ->
   $('#sha_errors_list').hide()
 
   $('#shas_list').on 'change', (e) ->
-    $('#sha_errors_list').html("")
+    $('#sha_errors_list .sha-msg').remove()
     $("#file_rep_submit").attr("disabled", true)
     $('#sha_errors_list').hide()
     shas_input_type = $('#shas_type_text').attr('name')
@@ -28,11 +28,11 @@ $ ->
         i++
 
     if sha_validation_errors.length > 0
-      $('#sha_errors_list').append("<p>The following are not valid SHAs:</p>")
+#      $('#sha_errors_list').append("<p>The following are not valid SHAs:</p>")
       $('#sha_errors_list').show()
       i = 0
       while i < sha_validation_errors.length
-        $('#sha_errors_list').append("<p>"+sha_validation_errors[i]+"</p>")
+        $('#sha_errors_list').append("<p class='sha-msg'>"+sha_validation_errors[i]+"</p>")
         i++
 
     else

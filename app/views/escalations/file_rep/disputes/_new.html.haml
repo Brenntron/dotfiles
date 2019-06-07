@@ -22,11 +22,15 @@
       -#    %button.attachment-button.attachment-label.new-attachment
 
   -#%hr.thin
+  .form-group
+    %span#sha_errors_list
+      %label.content-label-sm.error-label
+        The following are not valid SHAs:
 
   .form-group
     %label.content-label-sm SHA256
     %textarea#shas_list{required: true, rows: '4'}
-    %span#sha_errors_list{style: "color:red; font-weight:400"}
+
   .form-group
     %label.content-label-sm Suggested Disposition
     %select.form-control#disposition_suggested
