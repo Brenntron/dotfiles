@@ -84,6 +84,11 @@ $ ->
     $('.receiver-email')[1].innerHTML = email.from
     $('.email-msg-content')[0].innerHTML = email.body
 
+    $('.receiver-email').each(() ->
+      if (this.innerHTML.indexOf("bounces+") != -1)
+        $(this).prepend("<span class='badge badge-warning'>Bounced</span> ")
+    )
+
 
     date = moment.utc(email.created_at)
     $('.email-datetime')[0].innerHTML = moment(date).format('YYYY-MM-DD') + "<br>" + moment(date).format('HH:mm:ss')
