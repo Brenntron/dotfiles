@@ -90,7 +90,8 @@ class Ability
       can [:delete], [FileRepComment]
 
       can :take, FileReputationDispute do |filerep_dispute|
-        [FileReputationDispute::STATUS_NEW, FileReputationDispute::STATUS_REOPENED].include?(filerep_dispute.status) && filerep_dispute&.assigned&.cvs_username == 'vrtincom'
+        [FileReputationDispute::STATUS_NEW, FileReputationDispute::STATUS_REOPENED].include?(filerep_dispute.status) &&
+            filerep_dispute.user_id == User.vrtincoming.id
       end
 
       can :change_assignee, FileReputationDispute do |filerep_dispute|
