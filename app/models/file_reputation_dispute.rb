@@ -608,6 +608,10 @@ class FileReputationDispute < ApplicationRecord
                                       params: search_params['search_conditions'],
                                       user: current_user)
 
+    if search_params['selected_cases'].length > 0
+      file_rep_disputes = file_rep_disputes.where(id: search_params['selected_cases'])
+    end
+
     workbook = RubyXL::Workbook.new
     worksheet = workbook[0]
 

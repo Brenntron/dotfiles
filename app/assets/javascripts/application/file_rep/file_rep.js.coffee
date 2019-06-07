@@ -347,7 +347,12 @@ $ ->
     data = {
       search_type: ''
       search_name: ''
+      selected_cases: []
     }
+
+    $('.dispute_check_box:checked').each ->
+      case_id =  $(this).attr('value')
+      data.selected_cases.push(case_id)
 
     if location.search != ''
 #      if the location.search has value, it is a standard search
@@ -915,6 +920,9 @@ $ ->
   $('#create-detection-dialog').dialog
     autoOpen: false,
     minWidth: 520,
+    minHeight: 560,
+    resizable: false,
+
     classes: {
       "ui-dialog": "form-dialog"
     },

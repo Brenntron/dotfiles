@@ -9467,7 +9467,6 @@ table.rl-content {
   font-size: 12px;
 }
 
-
 .error-label {
   background-image: url(image_path('icon_error.svg'));
   background-repeat: no-repeat;
@@ -9490,4 +9489,9 @@ table.rl-content {
 #sha_errors_list {
   margin-bottom: 20px;
   display: block;
+
+}
+
+.rl-col {
+  text-align: center;
 }
