@@ -259,6 +259,10 @@ $ ->
 
 
   window.delete_amp_naming_convention = (id, pattern) ->
+    # remove the selected row from the page
+    deleted_row = 'tr[data-id=' + id + ']'
+    $(deleted_row).remove()
+
     std_msg_ajax(
       method: 'DELETE'
       url: "/escalations/api/v1/escalations/file_rep/amp_naming_convention/" + id
