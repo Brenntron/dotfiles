@@ -246,7 +246,7 @@ $ ->
         $(i).closest('.form-group').addClass('hidden')
 
       if $(i).hasClass('ui-slider')
-        values = [ 25, 75 ]
+        values = [ 0, 100 ]
         $(i).slider({
           values: values
         })
@@ -862,7 +862,7 @@ $ ->
       range: true,
       min: 0,
       max: 100,
-      values: [ 25, 75 ]
+      values: [ 0, 100 ]
       create: (ui) ->
         values = $(this).slider("values")
 
@@ -890,7 +890,7 @@ $ ->
       range: true,
       min: 0,
       max: 100,
-      values: [ 25, 75 ]
+      values: [ 0, 100 ]
       create: (ui) ->
         values = $(this).slider("values")
 
