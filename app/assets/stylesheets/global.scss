@@ -4173,6 +4173,10 @@ button.tertiary {
   outline: 1px solid darken($faint-neutral-color, 5%);
 }
 
+.col-bulk-dispute:focus{
+  background-color: $faint-alt-highlight;
+  line-height: 1.5em;
+}
 #advanced-search-dropdown .form-group input[type='checkbox'] {
   border: none;
   outline: none;
@@ -5033,7 +5037,7 @@ input.table-entry-input:focus {
 }
 .research-table th{
   color: $type-darkest;
-  border-bottom: 1px solid $dark-neutral-color;
+  border-bottom: 2px solid $faint-neutral-color!important;
   padding: 3px 0 0 10px;
 }
 
@@ -5295,6 +5299,11 @@ td.left-bordered {
   display:flex;
   height: 60px;
 }
+
+#select-all-bulk{
+  margin: -8px;
+}
+
 .entry-details-table {
   margin: 20px;
   padding-left: 7px;

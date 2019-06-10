@@ -13,7 +13,8 @@ $ ->
 
   # Add Rows to Quick lookup research table
   researchTable = $('.research-table').DataTable({
-    ordering: false
+    "ordering": false,
+    "paging": false,
     columnDefs: [
       "targets": [ 0 ],
       "visible": false
@@ -40,6 +41,8 @@ $ ->
     row_data = researchTable.rows().data()
     text_list = text.filter( (string) -> return string != '')
     parent_index = parseInt(parent_index)
+    parent_dispute = researchTable.row( parent_index ).data()[2]
+    parent_text = $( parent_dispute ).text()
 
     i = 0
     researchTable.rows().every () ->
@@ -56,14 +59,14 @@ $ ->
     if text_list.length == 0
       text_list = ['']
     else
-      text_list.push('')
+      if parent_index == 0 && parent_text == '' || parent_text != ''
+        text_list.push('')
 
     text_list = text_list.filter (item, index) ->  return text_list.indexOf item == index
-
     parent_row = $( row_data[0][2] ).attr('data')
 
     for i in [0...text_list.length]
-      if parent_index == 0 && parent_row == undefined
+      if parent_index == 0 && parent_row == undefined || parent_text == ''
         new_index = parent_index + i
       else
         new_index = parent_index + 1 + i
@@ -97,12 +100,17 @@ $ ->
     #  replace all rows with updated data and redraw
     i = 0
     researchTable.rows().every () ->
+
       this.invalidate()
       this.data( row_data[i] )
       i++
 
     researchTable.draw()
     focus_row = $('.col-bulk-dispute')[new_index]
+
+    if $( focus_row ).text() != ''
+      focus_row = $('.col-bulk-dispute')[new_index + 1]
+
     focus_row.focus()
 
 
