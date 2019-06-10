@@ -39,14 +39,88 @@ RSpec.describe API::V1::Escalations::FileRep::Disputes, type: :request do
           assignee: @current_user.cvs_username
       }
 
-      post '/escalations/api/v1/escalations/file_rep/disputes/form', as: :json, headers: { 'Token' => @auth_token },
-           params: create_form_params
+      expect do
+        post '/escalations/api/v1/escalations/file_rep/disputes/form', as: :json, headers: { 'Token' => @auth_token },
+             params: create_form_params
+      end.to change { FileReputationDispute.count }.by(1)
 
-      expect(response).to be_success
+      expect(response).to be_successful
     end
 
-    it 'rejects spaces in SHAs'
-    it 'rejects SHAs which are too long'
-    it 'rejects SHAs which are too short'
+    it 'rejects SHAs which are not hex' do
+      allow(BugzillaRest::Session).to receive(:new).and_return(creater_session)
+      allow(FileReputationDispute).to receive(:new).and_return(file_rep_noscore)
+      create_form_params = {
+          shas_array: %w[
+            ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789+/
+          ],
+          disposition_suggested: FileReputationDispute::DISPOSITION_MALICIOUS,
+          assignee: @current_user.cvs_username
+      }
+
+      expect do
+        post '/escalations/api/v1/escalations/file_rep/disputes/form', as: :json, headers: { 'Token' => @auth_token },
+             params: create_form_params
+      end.to change { FileReputationDispute.count }.by(0)
+
+      expect(response).to_not be_successful
+    end
+
+    it 'rejects SHAs which are too short' do
+      allow(BugzillaRest::Session).to receive(:new).and_return(creater_session)
+      allow(FileReputationDispute).to receive(:new).and_return(file_rep_noscore)
+      create_form_params = {
+          shas_array: %w[
+            da8aa2429715ea57c142186130706315c8fc10b1b1fb2d416e63a2ed27
+          ],
+          disposition_suggested: FileReputationDispute::DISPOSITION_MALICIOUS,
+          assignee: @current_user.cvs_username
+      }
+
+      expect do
+        post '/escalations/api/v1/escalations/file_rep/disputes/form', as: :json, headers: { 'Token' => @auth_token },
+             params: create_form_params
+      end.to change { FileReputationDispute.count }.by(0)
+
+      expect(response).to_not be_successful
+    end
+
+    it 'rejects SHAs which are too long' do
+      allow(BugzillaRest::Session).to receive(:new).and_return(creater_session)
+      allow(FileReputationDispute).to receive(:new).and_return(file_rep_noscore)
+      create_form_params = {
+          shas_array: %w[
+            da8aa2429715ea57c142186130706315c8fc10b1b1fb2d416e63a2ed2734e104688ded
+          ],
+          disposition_suggested: FileReputationDispute::DISPOSITION_MALICIOUS,
+          assignee: @current_user.cvs_username
+      }
+
+      expect do
+        post '/escalations/api/v1/escalations/file_rep/disputes/form', as: :json, headers: { 'Token' => @auth_token },
+             params: create_form_params
+      end.to change { FileReputationDispute.count }.by(0)
+
+      expect(response).to_not be_successful
+    end
+
+    it 'rejects spaces in SHAs' do
+      allow(BugzillaRest::Session).to receive(:new).and_return(creater_session)
+      allow(FileReputationDispute).to receive(:new).and_return(file_rep_noscore)
+      create_form_params = {
+          shas_array: %w[
+            da8aa2429715ea57c14218613070631 5c8fc10b1b1fb2d416e63a2ed2734e104
+          ],
+          disposition_suggested: FileReputationDispute::DISPOSITION_MALICIOUS,
+          assignee: @current_user.cvs_username
+      }
+
+      expect do
+        post '/escalations/api/v1/escalations/file_rep/disputes/form', as: :json, headers: { 'Token' => @auth_token },
+             params: create_form_params
+      end.to change { FileReputationDispute.count }.by(0)
+
+      expect(response).to_not be_successful
+    end
   end
 end

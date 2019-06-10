@@ -33,6 +33,7 @@ class FileReputationDispute < ApplicationRecord
   SUBMITTER_TYPE_TI_API     = 'TI-API'
 
   validates :status, :sha256_hash, :disposition_suggested, presence: true
+  validates :sha256_hash, format: { with: /\A\h{64}\z/, message: "only 64 nibble (256 bit) hex code" }
 
   scope :by_customer, ->(customer_name: nil, customer_email: nil, company_name: nil) {
     result =
