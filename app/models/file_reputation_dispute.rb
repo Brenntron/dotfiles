@@ -152,7 +152,7 @@ class FileReputationDispute < ApplicationRecord
     summary = "New File Rep Dispute generated at #{DateTime.now.utc.strftime("%Y-%m-%d %H:%M")}"
 
     full_description = %Q{
-          File name: N/A
+          File name: ''
           SHA256 hash: #{sha256_hash}
     }
 
@@ -174,7 +174,7 @@ class FileReputationDispute < ApplicationRecord
 
     attributes = {
         id: bug_proxy.id,
-        file_name: 'N/A',
+        file_name: '',
         sha256_hash: sha256_hash,
         disposition_suggested: disposition_suggested,
         user_id: User.where(cvs_username: assignee).first.id,
