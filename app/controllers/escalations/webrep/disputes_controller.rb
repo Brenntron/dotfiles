@@ -34,16 +34,16 @@ class Escalations::Webrep::DisputesController < ApplicationController
           end
         end
 
-        dispute_headers = ['Priority', 'Case ID', 'Status', 'Entry Count', 'Owner', 'Customer Name', 'Customer Email', 'Customer Company', 'Company URL', 'Time Submitted', 'Age', 'Dispute Entry', 'Dispute Entry Status', 'Suggested Disposition', 'Category', 'WBRS Score', 'WBRS Total Rule Hits', 'SBRS Score', 'SBRS Total Rule Hits', 'Important?', 'Resolution', 'Resolution Comments']
+        dispute_headers = ['Priority', 'Case ID', 'Status', 'Entry Count', 'Owner', 'Customer Name', 'Customer Email', 'Customer Company', 'Company URL', 'Time Submitted', 'Last Updated', 'Age', 'Dispute Entry', 'Dispute Entry Status', 'Suggested Disposition', 'Category', 'WBRS Score', 'WBRS Total Rule Hits', 'SBRS Score', 'SBRS Total Rule Hits', 'Important?', 'Resolution', 'Resolution Comments']
         singlesheet_insert_row_with_data(dispute_headers, "h1")
 
         @disputes.each do |dispute|
           dispute.dispute_entries.each do |dispute_entry|
-            singlesheet_insert_row_with_data([ dispute_entry.dispute.priority, dispute_entry.dispute.case_id_str, dispute_entry.dispute.status, dispute_entry.dispute.dispute_entries.count, dispute_entry.dispute.user.cvs_username, dispute_entry.dispute.customer.name, dispute_entry.dispute.customer.email, dispute_entry.dispute.customer.company.name, dispute_entry.dispute.org_domain ,dispute_entry.dispute.case_opened_at.strftime("%FT%T"), ApplicationRecord.humanize_secs(Time.now - dispute_entry.dispute.case_opened_at), dispute_entry.hostlookup, dispute_entry.status, dispute_entry.suggested_disposition, dispute_entry.primary_category, dispute_entry.wbrs_score, dispute_entry.dispute_rule_hits.wbrs_rule_hits.count, dispute_entry.sbrs_score, dispute_entry.dispute_rule_hits.sbrs_rule_hits.count, dispute_entry.is_important, dispute_entry.resolution, dispute_entry.resolution_comment ])
+            singlesheet_insert_row_with_data([ dispute_entry.dispute.priority, dispute_entry.dispute.case_id_str, dispute_entry.dispute.status, dispute_entry.dispute.dispute_entries.count, dispute_entry.dispute.user.cvs_username, dispute_entry.dispute.customer.name, dispute_entry.dispute.customer.email, dispute_entry.dispute.customer.company.name, dispute_entry.dispute.org_domain ,dispute_entry.dispute.case_opened_at.strftime("%FT%T"), dispute_entry.dispute.updated_at.strftime("%FT%T"), ApplicationRecord.humanize_secs(Time.now - dispute_entry.dispute.case_opened_at), dispute_entry.hostlookup, dispute_entry.status, dispute_entry.suggested_disposition, dispute_entry.primary_category, dispute_entry.wbrs_score, dispute_entry.dispute_rule_hits.wbrs_rule_hits.count, dispute_entry.sbrs_score, dispute_entry.dispute_rule_hits.sbrs_rule_hits.count, dispute_entry.is_important, dispute_entry.resolution, dispute_entry.resolution_comment ])
           end
         end
 
-        send_data contents.stream.string, filename: "disputes_search_#{Time.now}.xlsx", disposition: 'attachment'
+        send_data contents.stream.string, filename: "disputes_search_#{Time.now.utc.iso8601}.xlsx", disposition: 'attachment'
       end
     end
   end
@@ -512,6 +512,55 @@ class Escalations::Webrep::DisputesController < ApplicationController
     send_data contents
   end
 
+  def export_selected_dispute_entry_rows
+    @dispute_entries = DisputeEntry.where(id: params[:ids])
+    contents = CSV.generate do |csv|
+      csv << [
+          'Host',
+          'WBRS',
+          'WBRS Rule Hits',
+          'WBRS Rules',
+          'SBRS',
+          'SBRS Rule Hits',
+          'SBRS Rules',
+          'XBRS History',
+          'Crosslisted URLs',
+          'VirusTotal Negatives',
+          'VirusTotal Total',
+          'RepTool Class',
+          'Blacklist Status',
+          'Blacklist Comment',
+          'WL/BL',
+          'Umbrella',
+          'Referenced On',
+          'Last Submitted'
+      ]
+      @dispute_entries.each do |entry|
+        csv << [
+            entry.hostlookup,
+            entry.wbrs_score,
+            entry.dispute_rule_hits.wbrs_rule_hits.count,
+            "\"#{entry.dispute_rule_hits.wbrs_rule_hits.map {|wbrs_hit| wbrs_hit.name}.join(', ')}\"",
+            entry.sbrs_score,
+            entry.dispute_rule_hits.sbrs_rule_hits.count,
+            "\"#{entry.dispute_rule_hits.sbrs_rule_hits.map {|wbrs_hit| wbrs_hit.name}.join(', ')}\"",
+            entry.hostlookup && entry.find_xbrs[1]['data'].count,
+            entry.wbrs_xlist.count,
+            entry.virustotals_negatives_count,
+            entry.virustotals.count,
+            entry.classifications.first,
+            entry.classifications.first && entry.blacklist.status,
+            entry.classifications.first && entry.blacklist.metadata&.fetch('VRT', {})['comment'],
+            entry.wbrs_list_type,
+            entry.umbrellaresult,
+            entry.referenced_tickets.count,
+            entry.last_submitted.to_s,
+        ]
+      end
+    end
+    send_data contents, filename: "export.csv"
+  end
+
   def resolution_report
     @report = DisputeReport::ResolutionReport.new(date_from: params['report']['date_from'],
                                                   date_to: params['report']['date_to'],
@@ -590,6 +639,42 @@ class Escalations::Webrep::DisputesController < ApplicationController
       end
     end
     send_data contents
+  end
+
+  def export_selected_dispute_rows
+    @disputes = Dispute.where(id: params[:ids])
+
+    contents = RubyXL::Workbook.new
+    @worksheet = contents[0]
+
+    def singlesheet_insert_row_with_data(data, format = nil)
+      data_insertion_index = @worksheet.sheet_data.rows.count
+      data.each_with_index do |new_data, i|
+        @worksheet.add_cell(data_insertion_index, i, new_data)
+        case format
+        when "bold"
+          @worksheet.sheet_data[data_insertion_index][i].change_font_bold(true)
+        when "h1"
+          @worksheet.sheet_data[data_insertion_index][i].change_font_bold(true)
+          @worksheet.sheet_data[data_insertion_index][i].change_font_size(14)
+        when "h2"
+          @worksheet.sheet_data[data_insertion_index][i].change_font_bold(true)
+          @worksheet.sheet_data[data_insertion_index][i].change_font_size(12)
+        end
+      end
+    end
+
+    dispute_headers = ['Priority', 'Case ID', 'Status', 'Entry Count', 'Owner', 'Customer Name', 'Customer Email', 'Customer Company', 'Company URL', 'Time Submitted', 'Age', 'Dispute Entry', 'Dispute Entry Status', 'Suggested Disposition', 'Category', 'WBRS Score', 'WBRS Total Rule Hits', 'SBRS Score', 'SBRS Total Rule Hits', 'Important?', 'Resolution', 'Resolution Comments']
+    singlesheet_insert_row_with_data(dispute_headers, "h1")
+
+    @disputes.each do |dispute|
+      dispute.dispute_entries.each do |dispute_entry|
+        singlesheet_insert_row_with_data([ dispute_entry.dispute.priority, dispute_entry.dispute.case_id_str, dispute_entry.dispute.status, dispute_entry.dispute.dispute_entries.count, dispute_entry.dispute.user.cvs_username, dispute_entry.dispute.customer.name, dispute_entry.dispute.customer.email, dispute_entry.dispute.customer.company.name, dispute_entry.dispute.org_domain ,dispute_entry.dispute.case_opened_at.strftime("%FT%T"), ApplicationRecord.humanize_secs(Time.now - dispute_entry.dispute.case_opened_at), dispute_entry.hostlookup, dispute_entry.status, dispute_entry.suggested_disposition, dispute_entry.primary_category, dispute_entry.wbrs_score, dispute_entry.dispute_rule_hits.wbrs_rule_hits.count, dispute_entry.sbrs_score, dispute_entry.dispute_rule_hits.sbrs_rule_hits.count, dispute_entry.is_important, dispute_entry.resolution, dispute_entry.resolution_comment ])
+      end
+    end
+
+    send_data contents.stream.string, filename: "disputes_search_#{Time.now.utc.iso8601}.xlsx", disposition: 'attachment'
+
   end
 
   private

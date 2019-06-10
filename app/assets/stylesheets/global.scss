@@ -1490,12 +1490,18 @@ fieldset.tight {
   background-color: $faint-alt-highlight !important;
 }
 
-.selectize-control.multi .selectize-input {
-
+.selectize-control.multi .selectize-input > div {
+  margin-top: 2px;
 }
 
-.selectize-control.multi .selectize-input > div {
-  margin-top: 2px ;
+// small override tweaks below for consistent AC selectize branding, need !important flags
+.selectize-control.multi .selectize-input .item {
+  margin: 5px 2px !important;
+}
+
+.selectize-control.multi .selectize-input [data-value].active {
+  background: darken($primary-section-color, 25%) !important;
+  border: none;
 }
 
 .form-col-list {
@@ -5047,6 +5053,22 @@ input.table-entry-input:focus {
 #top_bar_extended_info p {
   font-weight: 300;
 }
+.domain-categories{
+  &{
+    display: none;
+    margin-top: 10px;
+  }
+  ul{
+    display: inline-block;
+    min-width: 140px;
+  }
+  li {
+    border-bottom: 1px solid #f2f2f2;
+    border-top: none;
+    padding: 5px;
+    margin-right: 5px
+  }
+}
 
 #top_bar_extended_info .col-with-divider {
   border-right-color: $faint-neutral-color;
@@ -5360,6 +5382,10 @@ h5.entry-details-table-header {
 
 .inline-dropdown-menu ul li.selected, .toolbar-dropdown ul li.selected {
   background-color: #90d8f594;
+}
+
+input[type="radio"].ticket-status-radio {
+  margin-top: 0;
 }
 
 .radio-label {
@@ -7642,6 +7668,10 @@ td.text-center span {
     margin-top: 0;
     display: inline-block;
     padding: 0 15px;
+    &:last-of-type {
+      position: relative;
+      top: 5px;
+    }
 
     span {
       color: $primary-section-color;
@@ -7706,6 +7736,7 @@ td.text-center span {
 .copycat_tool_dialog {
   min-width: 400px;
   min-height: 135px;
+  font-family: 'Open Sans', sans-serif !important;
 }
 
 .copycat_tool_dialog .ui-dialog-titlebar {
@@ -7717,6 +7748,7 @@ td.text-center span {
   padding-left: 40px;
   border: none;
   width: 100%;
+  font-weight: bold;
 }
 
 #copycat-categories-selectized {
@@ -7730,23 +7762,33 @@ td.text-center span {
   display: flex;
   justify-content: space-evenly;
   padding: 0 25px 15px 25px;
+  font-size: 12px;
+
+  .copycat-paste-btn, .copycat-clear-btn {
+    font-family: 'Open Sans', sans-serif;
+    font-size: 12px;
+    transition: background-color 0.2s;
+  }
 
   .copycat-paste-btn {
     background-color: $primary-section-color;
     background-size: 15px;
     background-position: 10px center;
     color: white;
-    font-size: 12px;
-    padding: 10px 20px 10px 35px;
-
+    padding: 12px 20px 12px 35px;
+    &:hover {
+      background-color: darken($primary-section-color, 10%)
+    }
   }
 
   .copycat-clear-btn {
     background-color: $nav-toolbar-color;
     background-size: 22px;
     background-position: 10px center;
-    font-size: 12px;
-    padding: 10px 20px 10px 45px;
+    padding: 12px 20px 12px 45px;
+    &:hover {
+      background-color: darken($nav-toolbar-color, 10%)
+    }
   }
 }
 
@@ -8335,6 +8377,7 @@ hr.thin.form-divider {
   background-color: $content-bg-color;
 }
 
+
 // dbinebri: the new ticket file rep container needs to be wide and slightly positioned to the right
 .escalations--file_rep--disputes-controller .nav-tools-dropdown {
   min-width: 540px;
@@ -8472,7 +8515,6 @@ hr.thin.form-divider {
       margin-bottom: 20px;
     }
   }
-
 }
 
 .top-case-info h4 {
@@ -8783,9 +8825,9 @@ button.secondary.view-report-external-button {
   }
 }
 
-//dbinebri: file rep - naming guide dialog specific styles here
-.escalations--file_rep--disputes-controller .ui-dialog[aria-describedby=dialog-naming-guide] {
-  margin-top: 60px;
+// dbinebri: wrapper for naming-guide-dialog, jquery generates this, leave this here
+.ui-dialog[aria-describedby=naming-guide-dialog] {
+  margin-top: 55px;
   margin-right: 20px;
   border-radius: 5px;
   border: 0;
@@ -8803,9 +8845,11 @@ button.secondary.view-report-external-button {
   }
 }
 
-#dialog-naming-guide {
+// dbinebri: file rep - naming guide dialog internal specific styles here
+#naming-guide-dialog {
   font-family: 'Open Sans', sans-serif;
   padding: 10px;
+
   table th {
     text-transform: uppercase;
     font-weight: bold;
@@ -8817,7 +8861,7 @@ button.secondary.view-report-external-button {
         background-position: center center;
         top: 10px;
         right: 10px;
-        color: #444;
+        color: darken($content-bg-color, 5%);
         font-weight: normal;
         font-size: 19px;
       }
@@ -8829,7 +8873,7 @@ button.secondary.view-report-external-button {
     font-size: 10px;
     color: darken($type-lighter-color, 5%);
 
-    // "pattern" column below needs special code formatting
+    // "pattern" column below needs special "code" formatting
     &:first-of-type {
       span {
         font-family: 'Fira Mono', monospace;
@@ -8856,8 +8900,10 @@ button.secondary.view-report-external-button {
       }
     }
   }
-
 }
+
+
+
 
 
 // dbinebri: the tooltips for modals on file rep get too wide, limit the max-width a little bit
@@ -8912,6 +8958,8 @@ button.secondary.view-report-external-button {
   color: $second-section-color;
   font-weight: 600;
   padding-left: 22px !important;
+  // dbinebri: ensure RL result data strings wrap correctly
+  word-break: break-all;
 }
 
 .scanner-mal::before {
@@ -8928,9 +8976,11 @@ button.secondary.view-report-external-button {
   margin-left: -22px;
 }
 
+// dbinebri: fix for "not detected" left padding in RL table on Show
 .scanner-unk {
-  padding-left: 28px !important;
+  padding-left: 22px !important;
   color: $type-lighter-color;
+  font-style: italic;
 }
 
 .inline-loader-wrapper {
@@ -9340,6 +9390,11 @@ div[aria-describedby='create-detection-dialog'] {
   }
 }
 
+// dbinebri: add file rep datatable bg color white in case all cols are showing
+#file-rep-datatable {
+  background-color: $content-bg-color;
+}
+
 // need a separate th class so the bg sort icon isn't affected by generic .text-center
 #file-rep-datatable_wrapper .th-center {
   text-align: center;
@@ -9408,4 +9463,128 @@ div[aria-describedby='create-detection-dialog'] {
     border-width: 5px;
     margin-left: -5px;
   }
+}
+
+
+// dbinebri: INDEX, RL HOVER TABLE STYLES HERE, this is a one-off tooltip as of now
+// top row for rl hover table
+table.rl-header {
+  padding: 0;
+  width: 500px;
+  text-transform: uppercase;
+  text-align: left;
+  font-size: 12px;
+  font-weight: bold;
+  .top {
+    span {
+      float: right;
+    }
+    td {
+      border: none;
+      padding: 4px 8px;
+      background: darken($table-dark-body, 10%);
+    }
+  }
+  .second {
+    border-bottom: solid 1px darken($table-dark-body, 5%);
+    td {
+      padding: 2px 8px;
+      border: none;
+      &.left {
+        width: 165px;
+      }
+      &.right {
+        width: 335px;
+      }
+    }
+  }
+}
+
+// this is the actual rl hover table contents
+table.rl-content {
+  display: block;
+  padding: 0;
+  width: 500px;
+  height: 260px;
+  overflow-x: hidden;
+  overflow-y: scroll;
+  tr {
+    td {
+      border: none;
+      padding: 2px 8px;
+      text-align: left;
+      font-size: 10px;
+      &.left {
+        width: 190px;
+        text-transform: uppercase;
+      }
+      &.right {
+        width: 310px;
+      }
+    }
+    // need special scanner-mal and scanner-unk styles here, can't reuse from show page
+    .rl-scanner-mal {
+      color: $content-bg-color;
+      &::before {
+        content: '';
+        display: block;
+        float: left;
+        background-repeat: no-repeat;
+        background-image: url(/assets/icon_malicious_dark.svg);
+        width: 14px;
+        height: 14px;
+        margin-top: 2px;
+        margin-bottom: 0;
+        margin-right: 4px;
+        margin-left: -16px;
+      }
+    }
+    .rl-scanner-unk {
+      color: $content-bg-color;
+      padding-left: 10px;
+      font-style: italic;
+    }
+  }
+}
+
+// index, special underline fix for rl hover, normal underline is too tight
+.rl-hover a {
+  border-bottom: dotted 1px lighten($table-dark-body, 40%);
+  &:hover {
+    text-decoration: none;
+    color: $table-dark-body;
+  }
+}
+
+
+// dbinebri: this is the WRAPPER for the RENDERED full rl table hover, remove padding and add border radius
+.tooltipster-sidetip.tooltipster-borderless.tooltipster-borderless-customized.tooltipster-rl-hover .tooltipster-content {
+  padding: 0;
+  border-radius: 5px;
+}
+
+// this is the triangle, make color match the top row of rl hover table
+.tooltipster-sidetip.tooltipster-borderless.tooltipster-borderless-customized.tooltipster-rl-hover.tooltipster-bottom .tooltipster-arrow-border {
+  border-bottom-color: darken($table-dark-body, 5%);
+}
+
+// dbinebri: ensuring create new report button gets icon
+.create-new-run-button {
+  background-image: url(/assets/icon_sandbox_report.svg);
+  background-position: 6px center;
+  padding-left: 15px;
+}
+
+.line-up{
+  display: flex;
+  flex-direction: row;
+}
+
+// dbinebri: small tweak for copycat placeholder text
+.selectize-input #copycat-categories-selectized {
+  font-size: 12px;
+}
+
+.rl-col {
+  text-align: center;
 }

@@ -4,7 +4,7 @@ class DisputeEntry < ApplicationRecord
   attr_writer :wbrs_xlist
 
   has_paper_trail on: [:update], ignore: [:updated_at, :entry_type]
-  belongs_to :dispute
+  belongs_to :dispute, touch: true
   belongs_to :user, optional: true
   has_many :dispute_rule_hits
   has_one  :dispute_entry_preload
@@ -176,7 +176,7 @@ class DisputeEntry < ApplicationRecord
 
   def parse_url(url = self.hostlookup)
     uri = URI.parse(URI.parse(url).scheme.nil? ? "http://#{url}" : url)
-    domain = PublicSuffix.parse(uri.host)
+    domain = PublicSuffix.parse(uri.host, :ignore_private => true)
     subdomain = uri.host.gsub(Regexp.new("\\.?#{domain.domain}$"), '')
 
     {
@@ -229,7 +229,7 @@ class DisputeEntry < ApplicationRecord
 
   def assign_url_parts(url = self.hostlookup)
     uri = URI.parse(URI.parse(url).scheme.nil? ? "http://#{url}" : url)
-    domain = PublicSuffix.parse(uri.host)
+    domain = PublicSuffix.parse(uri.host, :ignore_private => true)
 
     self.subdomain                      = uri.host.gsub(Regexp.new("\\.?#{domain.domain}$"), '')
     self.domain                         = domain.domain
@@ -293,6 +293,41 @@ class DisputeEntry < ApplicationRecord
   def find_xbrs(reload: false)
     @xbrs = nil if reload
     @xbrs ||= get_xbrs_value
+
+    formatted_data = []
+    formatted_data << {}
+    formatted_data << {}
+    formatted_data.last['data'] = []
+    formatted_data.last['legend'] = @xbrs.last['legend']
+    data = @xbrs.last['data']
+    columns = @xbrs.last['legend']
+
+    mtime_column_index = 0
+    ctime_column_index = 0
+
+    columns.each_with_index do |col, index|
+      if col == 'ctime'
+        ctime_column_index = index
+      end
+      if col == 'mtime'
+        mtime_column_index = index
+      end  
+    end 
+
+
+    data.each do |datum|
+      if ctime_column_index != 0
+        datum[ctime_column_index] = Time.at(datum[ctime_column_index])
+      end
+      if
+        datum[mtime_column_index] = Time.at(datum[mtime_column_index])
+      end 
+
+      formatted_data.last['data'] << datum 
+    end  
+
+    formatted_data 
+
   end
 
   def blacklist(reload: false)

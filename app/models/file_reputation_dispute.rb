@@ -1,5 +1,6 @@
 # class FileReputationTicket < ApplicationRecord
 class FileReputationDispute < ApplicationRecord
+  has_paper_trail on: [:update], ignore: [:updated_at]
 
   belongs_to :customer, optional:true
   has_many :file_rep_comments
@@ -8,7 +9,7 @@ class FileReputationDispute < ApplicationRecord
   has_many :digital_signers
   has_many :file_rep_comments
 
-  delegate :name, :company, :company_id, to: :customer, allow_nil: true, prefix: true
+  delegate :name, :email, :company, :company_name, :company_id, to: :customer, allow_nil: true, prefix: true
 
   STATUS_NEW                = 'NEW'
   STATUS_ASSIGNED           = 'ASSIGNED'
@@ -26,6 +27,10 @@ class FileReputationDispute < ApplicationRecord
   DISPOSITION_MALICIOUS     = 'malicious'
   DISPOSITION_COMMON        = 'common'
   DISPOSITION_CLEAN         = 'clean'
+
+  SUBMITTER_TYPE_AC_FORM    = 'AC-Form'
+  SUBMITTER_TYPE_TI_FORM    = 'TI-Form'
+  SUBMITTER_TYPE_TI_API     = 'TI-API'
 
   validates :status, :sha256_hash, :disposition_suggested, presence: true
 
@@ -81,7 +86,21 @@ class FileReputationDispute < ApplicationRecord
 
     Bridge::FilerepUpdateStatusEvent.new(envelope).post
   end
-  
+
+  def compose_versioned_items
+
+    versioned_items = [self]
+
+    file_rep_comments.includes(:versions).map{ |dc| versioned_items << dc}
+
+    versioned_items
+
+  end
+
+  def dispute_emails
+    DisputeEmail.where(file_reputation_dispute_id: self.id)
+  end
+
   def self.create_action(bugzilla_rest_session, sha256_hash, file_name, file_size, sample_type, disposition_suggested, source, platform, sha256_checksum)
 
     file_rep = FileReputationDispute.new
@@ -128,7 +147,7 @@ class FileReputationDispute < ApplicationRecord
     end
   end
 
-  def self.create_through_form(bugzilla_rest_session, sha256_hash, disposition_suggested, assignee)
+  def self.create_through_form(bugzilla_rest_session, sha256_hash, disposition_suggested, assignee, current_user)
 
     summary = "New File Rep Dispute generated at #{DateTime.now.utc.strftime("%Y-%m-%d %H:%M")}"
 
@@ -151,19 +170,31 @@ class FileReputationDispute < ApplicationRecord
 
     file_rep = FileReputationDispute.new
 
+    customer = Customer.where(name: 'Dispute Analyst').first
+
     attributes = {
         id: bug_proxy.id,
         file_name: 'N/A',
         sha256_hash: sha256_hash,
         disposition_suggested: disposition_suggested,
-        user_id: User.where(cvs_username: assignee).first.id
+        user_id: User.where(cvs_username: assignee).first.id,
+        submitter_type: SUBMITTER_TYPE_AC_FORM,
+        customer_id: customer.id,
+        status: STATUS_ASSIGNED
     }
 
     file_rep.assign_attributes(attributes)
 
     if file_rep.save!
       file_rep.update_scores
+      file_rep.populate_fields_from_rl
     end
+  end
+
+  def populate_fields_from_rl
+    api_response = FileReputationApi::ReversingLabs.get_creation_data(self.sha256_hash)
+
+    self.update(file_size: api_response[:file_size], sample_type: api_response[:sample_type])
   end
 
   def self.save_named_search(search_name, params, user:, project_type:)
@@ -187,6 +218,9 @@ class FileReputationDispute < ApplicationRecord
       end
     end
   end
+
+
+
 
   # omits fields with empty strings and nil as values
   # @param [Hash|ActionController::Parameters] fields input which may contain blank values
@@ -303,15 +337,16 @@ class FileReputationDispute < ApplicationRecord
   def self.standard_search(search_name, user:)
     case search_name
     # when 'recently_viewed'
-    #   joins(:dispute_peeks).where(dispute_peeks: {assigned_id: user.id})
+    #   joins(:dispute_peeks).where(dispute_peeks: {user_id: user.id})
     when 'my_open'
-      where.not(status: STATUS_RESOLVED).where(assigned_id: user.id)
+      where.not(status: STATUS_RESOLVED).where(user_id: user.id)
     when 'my_disputes'
-      where(assigned_id: user.id)
+      where(user_id: user.id)
     # when 'team_disputes'
-    #   where(assigned_id: user.my_team)
+    #   where(user_id: user.my_team)
     when 'unassigned'
-      where(assigned_id: nil).where.not(status: STATUS_RESOLVED)
+      vrtincoming = User.vrtincoming
+      where(user_id: [nil, vrtincoming]).where.not(status: STATUS_RESOLVED)
     when 'open'
       where.not(status: STATUS_RESOLVED)
     when 'closed'
@@ -379,7 +414,7 @@ class FileReputationDispute < ApplicationRecord
   end
 
   def update_ticode_certs
-    certificates = Ticloud::FileAnalysis.certificates(self.sha256_hash)
+    certificates = FileReputationApi::ReversingLabs.certificates(self.sha256_hash)
 
     if certificates&.any?
       certificates.each do |certificate|
@@ -392,7 +427,8 @@ class FileReputationDispute < ApplicationRecord
   end
 
   def update_reversing_labs_score
-    update!(FileReputationApi::ReversingLabs.score(self.sha256_hash))
+    rev_lab = FileReputationApi::ReversingLabs.lookup(self.sha256_hash)
+    rev_lab.update_database
   rescue => except
     Rails.logger.error("Error updating reversing labs score on id #{self.id} -- #{except.message}")
   end
@@ -411,17 +447,39 @@ class FileReputationDispute < ApplicationRecord
     Rails.logger.error("Error updating sandbox score on id #{self.id} -- #{except.message}")
   end
 
-  def update_trifecta
+  def update_amp_disposition
+    detection = FileReputationApi::Detection.get_bulk(self.sha256_hash)
+    update!(disposition: detection.disposition)
+  rescue => except
+    Rails.logger.error("Error updating amp disposition on #{self.id} -- #{except.message}")
+  end
+
+  # Update scores when refreshing data on show page
+  def update_sample_zoo
+    zoo_response = FileReputationApi::SampleZoo.sha256_lookup(self.sha256_hash)
+    begin
+      attributes = FileReputationApi::SampleZoo.query_from_data(zoo_response)
+      update!(attributes)
+    end
+  rescue => except
+    Rails.logger.error("Error updating sample zoo flag for id #{self.id} -- #{except.message}")
+  end
+
+  # Initialize all data as when creating a dispute record
+  def update_superfecta
     update_threadgrid_score
     update_reversing_labs_score
     update_sandbox_score
+    update_sample_zoo
   end
 
   def update_scores
+    update_amp_disposition
     update_threadgrid_score
     update_ticode_certs
     update_reversing_labs_score
     update_sandbox_score
+    update_sample_zoo
   end
 
   def ack_create(envelope_params, sender_params)
@@ -506,7 +564,7 @@ class FileReputationDispute < ApplicationRecord
   def self.take_tickets(dispute_ids, user:)
     FileReputationDispute.transaction do
       unless 0 == FileReputationDispute.where(id: dispute_ids).where.not(user_id: User.vrtincoming.id).count
-        raise 'Some of these ticket are already assigned.'
+        raise 'This ticket is already assigned'
       end
       FileReputationDispute.assign(dispute_ids, user: user)
     end
@@ -535,5 +593,64 @@ class FileReputationDispute < ApplicationRecord
     if file_size.present?
       self.file_size/1024
     end
+  end
+
+  def self.export_xlsx(search_params_json, current_user:)
+    fields = %w{id status resolution file_name sha256_hash file_size sample_type
+                disposition detection_name detection_created_at
+                in_zoo sandbox_score threatgrid_score reversing_labs_score reversing_labs_count
+                disposition_suggested created_at submitter_type
+                customer_name company_name customer_email user_id}
+    search_params = JSON.parse(search_params_json)
+
+    file_rep_disputes = robust_search(search_params['search_type'],
+                                      search_name: search_params['search_name'],
+                                      params: search_params['search_conditions'],
+                                      user: current_user)
+
+    if search_params['selected_cases'].length > 0
+      file_rep_disputes = file_rep_disputes.where(id: search_params['selected_cases'])
+    end
+
+    workbook = RubyXL::Workbook.new
+    worksheet = workbook[0]
+
+    %w{Case\ ID Status Resolution File\ Name SHA256 File\ Size Sample\ Type
+       AMP\ Disposition AMP\ Detection\ Name AMP\ Detection\ Created
+       In\ Zoo Sandbox\ Score TG\ Score Reversing\ Labs\ Hits RL\ Scanners\ Total
+       Suggested\ Disposition Time\ Submitted Submitter\ Type
+       Customer\ Name Customer\ Organization Customer\ email Assignee}.each_with_index do |field_name, col_index|
+      worksheet.add_cell(0, col_index, field_name)
+      worksheet.sheet_data[0][col_index].change_font_bold(true)
+    end
+
+    file_rep_disputes.each_with_index do |fr_dispute, row_index|
+      fields.each_with_index do |field_name, col_index|
+
+        cell_data =
+            case field_name
+            when 'detection_created_at'
+              fr_dispute.detection_created_at&.utc&.iso8601
+            when 'in_zoo'
+              fr_dispute.in_zoo? ? 'True' : 'False'
+            when 'created_at'
+              fr_dispute.created_at.utc.iso8601
+            when 'customer_name'
+              fr_dispute.customer_name
+            when 'customer_email'
+              fr_dispute.customer_email
+            when 'company_name'
+              fr_dispute.customer_company_name
+            when 'user_id'
+              fr_dispute.user.cvs_username
+            else
+              fr_dispute.attributes[field_name]
+            end
+
+        worksheet.add_cell(row_index + 1, col_index, cell_data)
+      end
+    end
+
+    workbook
   end
 end

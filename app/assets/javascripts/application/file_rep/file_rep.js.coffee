@@ -31,9 +31,12 @@ window.update_file_rep_status = () ->
       status: status
       comment: comment
       resolution: resolution
-    success_reload: false
     success: (response) ->
-      std_msg_success('File Reputation Ticket statuses updated.', [], reload: true)
+      if checked_disputes.length == 1
+        std_msg_success('File Reputation Ticket status updated', [])
+      else if checked_disputes.length > 1
+        std_msg_success('File Reputation Ticket statuses updated', [])
+      window.location.reload()
     error: (response) ->
       std_msg_error('Unable to update File Reputation Ticket status.')
   )
@@ -66,7 +69,8 @@ window.update_file_rep_status_on_show = () ->
       resolution: resolution
     success_reload: false
     success: (response) ->
-      std_msg_success('File Reputation Ticket statuses updated.', [], reload: true)
+      std_msg_success('File Reputation Ticket status updated', [])
+      window.location.reload()
     error: (response) ->
       std_msg_error('Unable to update File Reputation Ticket status.', [])
   )
@@ -86,7 +90,7 @@ window.filerep_take_disputes = () ->
     method: 'PATCH'
     url: "/escalations/api/v1/escalations/file_rep/disputes/take_disputes"
     data: { dispute_ids: dispute_ids }
-    error_prefix: 'Error updating ticket.'
+    error_prefix: 'Error updating ticket'
     success: (response) ->
       for dispute_id in response.dispute_ids
         # dbinebri: adding the take/return button swap logic here
@@ -132,7 +136,7 @@ window.file_rep_take_dispute = (dispute_id) ->
     url: "/escalations/api/v1/escalations/file_rep/disputes/take_dispute/" + dispute_id
     data: {}
     dispute_id: dispute_id
-    error_prefix: 'Error updating ticket.'
+    error_prefix: 'Error updating ticket'
     success: (response) ->
       $('.inline-take-dispute-' + dispute_id).replaceWith("<button class='return-ticket-button inline-return-ticket-#{dispute_id}' title='Assign this ticket to me' onclick='file_rep_return_dispute(#{dispute_id});'></button>")
       $("#owner_#{dispute_id}").text(response.username).removeClass('missing-data')
@@ -145,7 +149,7 @@ window.file_rep_return_dispute = (dispute_id) ->
     url: "/escalations/api/v1/escalations/file_rep/disputes/return_dispute/" + dispute_id
     data: {}
     dispute_id: dispute_id
-    error_prefix: 'Error updating ticket.'
+    error_prefix: 'Error updating ticket'
     success: (response) ->
       $('.inline-return-ticket-' + dispute_id).replaceWith("<button class='take-ticket-button inline-take-dispute-#{dispute_id}' title='Assign this ticket to me' onclick='file_rep_take_dispute(#{dispute_id});'></button>")
       $("#owner_#{dispute_id}").text("Unassigned").addClass('missing-data')
@@ -158,11 +162,12 @@ window.file_rep_show_take_dispute = (dispute_id) ->
     url: "/escalations/api/v1/escalations/file_rep/disputes/take_dispute/" + dispute_id
     data: {}
     dispute_id: dispute_id
-    error_prefix: 'Error updating ticket.'
+    error_prefix: 'Error updating ticket'
     success: (response) ->
       $("#dispute-assignee").text(response.username).removeClass('missing-data')
       $('#show-edit-ticket-status-button').text("ASSIGNED")
       $('.take-ticket-button').replaceWith("<button class='return-ticket-button' title='Return ticket to open queue' onclick='file_rep_show_return_dispute(#{dispute_id});'></button>")
+      $('#index_change_assign').replaceWith("<span id='replace-button'>")
   )
 
 window.file_rep_show_return_dispute = (dispute_id) ->
@@ -171,11 +176,12 @@ window.file_rep_show_return_dispute = (dispute_id) ->
     url: "/escalations/api/v1/escalations/file_rep/disputes/return_dispute/" + dispute_id
     data: {}
     dispute_id: dispute_id
-    error_prefix: 'Error updating ticket.'
+    error_prefix: 'Error updating ticket'
     success: (response) ->
       $("#dispute-assignee").text("Unassigned").addClass('missing-data')
       $("#show-edit-ticket-status-button").text("NEW")
       $(".return-ticket-button").replaceWith("<button class='take-ticket-button' title='Assign this ticket to me' onclick='file_rep_show_take_dispute(#{dispute_id});'></button>")
+      $('#replace-button').replaceWith('<button aria-expanded="false" aria-haspopup="true" class="dispute-inline-buttons ticket-owner-button dropdown-toggle esc-tooltipped tooltipstered" data-toggle="dropdown" id="index_change_assign"></button>')
   )
 
 window.file_rep_show_change_assignee = (dispute_id) ->
@@ -191,7 +197,7 @@ window.file_rep_show_change_assignee = (dispute_id) ->
     url: "/escalations/api/v1/escalations/file_rep/disputes/change_assignee/"
     data: data
     dispute_id: dispute_id
-    error_prefix: 'Error updating ticket.'
+    error_prefix: 'Error updating ticket'
     success: (response) ->
       window.location.reload()
   )
@@ -199,10 +205,14 @@ window.file_rep_show_change_assignee = (dispute_id) ->
 $ ->
   file_rep_url = $('#file-rep-datatable').data('source')
   current_url = window.location.href
+  sorting_request = false
   time_submitted = ''
   last_updated = ''
   sandbox_score = ''
   threatgrid_score = ''
+
+  $(document).on 'click', '.sorting[aria-controls="file-rep-datatable"]', () ->
+    sorting_request = true
 
   window.triggerTooltips = (item) ->
     $('.tooltip_content').show()
@@ -213,6 +223,7 @@ $ ->
       ]
       side: 'bottom'
     return
+
   window.reset_slider = (slider) ->
     if slider == "sandbox"
       sandbox_score = ''
@@ -235,7 +246,7 @@ $ ->
         $(i).closest('.form-group').addClass('hidden')
 
       if $(i).hasClass('ui-slider')
-        values = [ 25, 75 ]
+        values = [ 0, 100 ]
         $(i).slider({
           values: values
         })
@@ -287,7 +298,20 @@ $ ->
 
 
   window.build_advanced_data = () ->
-    form = $('#filerep_disputes-advanced-search-form')
+    form = $('#filerep_disputes-advanced-search-form .form-group')
+
+    #  if form groups are hidden, wipe their values
+    $('#filerep_disputes-advanced-search-form .form-group.hidden').find('input').val('')
+
+    if $('#tg-score-input').closest('.form-group').hasClass('.hidden')
+      threatgrid_score = {}
+    if $('#sandbox_score-input').closest('.form-group').hasClass('.hidden')
+      sandbox_score = {}
+    if $('time_submitted-input').closest('.form-group').hasClass('.hidden')
+      last_updated = {}
+    if $('last-updated-input').closest('.form-group').hasClass('.hidden')
+      time_submitted = {}
+
     localStorage.search_type = 'advanced'
     localStorage.search_name = form.find('input[name="search_name"]').val()
     localStorage.search_conditions = JSON.stringify(
@@ -323,7 +347,12 @@ $ ->
     data = {
       search_type: ''
       search_name: ''
+      selected_cases: []
     }
+
+    $('.dispute_check_box:checked').each ->
+      case_id =  $(this).attr('value')
+      data.selected_cases.push(case_id)
 
     if location.search != ''
 #      if the location.search has value, it is a standard search
@@ -436,6 +465,14 @@ $ ->
         new_header = 'All File Reputation Tickets'
       $('#filerep-index-title')[0].innerHTML = new_header
 
+  window.export_file_rep = () ->
+    data = build_data()
+    if 'advanced' == data.search_type
+      data.search_name = null
+    data_json = JSON.stringify(data)
+    $('#index-export-data-input').val(data_json)
+    return true
+
   $('#file-rep-datatable').dataTable
     drawCallback: ( settings ) ->
       if localStorage.search_name
@@ -483,11 +520,29 @@ $ ->
           $(new_delete).append(new_delete_image)
           $('.filerep-named-search-list').append(new_tr)
 
+
+
     processing: true
     serverSide: true
     ajax:
       url: file_rep_url
       data: build_data()
+      error: (error) ->
+
+        if sorting_request
+          error_msg = 'Unable to process sorting request.'
+        else
+          if localStorage.search_type || location.search != ''
+            error_msg = 'Unable to process search request.'
+          else
+            error_msg = 'Unable to process request.'
+
+        error_msg = error.statusText + ': ' + error_msg
+
+        std_msg_error('Error Occurred', [error_msg])
+
+        sorting_request = false
+
     order: [ [
       16
       'desc'
@@ -537,7 +592,7 @@ $ ->
       }
       {
         data: 'sha256_hash'
-        render: (data, type, full, meta) ->
+        render: (data) ->
           return '<span id="' + data + '_sha" title="' + data + '" class="esc-tooltipped file_rep_sha">' + data + '</span>'
       }
       {
@@ -565,9 +620,12 @@ $ ->
             return data
       }
       {
-        data: null
-        render: () ->
-          return '<span>Detection created</span>'
+        data: 'detection_created_at'
+        render: (data) ->
+          if data
+            return moment(new Date(data)).format('MMM D, YYYY h:mm A')
+          else
+            return ''
       }
       {
         data: 'in_zoo'
@@ -606,9 +664,57 @@ $ ->
       }
       {
         data: 'reversing_labs_score'
+        className: 'rl-col'
         render: (data, type, full, meta) ->
-          if data
-            return '<span class="score-col text-center">' + data + ' / ' + full['reversing_labs_count'] + '</span>'
+          if full['reversing_labs_count'] == '0'
+            return '<span class="missing-data">Not in RL</span>'
+          else if data
+            score_id_selector = full['id']
+            scanner_list = full['reversing_labs_scanners']
+            rl_score = data
+            rl_count = full['reversing_labs_count']
+            score_id_selector = '#rl-score-id-' + score_id_selector
+            rl_hover_table = ''
+
+            if rl_count == "0"
+              $(score_id_selector).tooltipster
+                theme: [
+                  'tooltipster-borderless'
+                  'tooltipster-borderless-customized'
+                ]
+                side: 'bottom'
+                content: 'Not in Reversing Labs.'
+                trigger: 'hover'
+
+            else
+              scanners_list = scanner_list
+              # file_rep_datatable.rb is doing a .to_json but it needs a fix
+              scanners_list = scanners_list.replace(/&quot;/g,'"')
+
+              obj_scanners = JSON.parse(scanners_list)
+
+              mal_results = []
+              unk_results = []
+
+              # each scanner entry, this is where to handle the logic for each scanner
+              $(obj_scanners).each ->
+                if this.result == ""
+                  unk_results.push(this)
+                else
+                  mal_results.push(this)
+
+              rl_hover_table +=
+                '<table class=\'rl-header\'><tr class=\'top\'><td colspan=\'2\'>Reversing Labs Details ' +
+                  '<span id=\'rl-score-hover\'>' + rl_score + '/' + rl_count + '</span></td></tr>' +
+                  '<tr class=\'second\'><td class=\'left\'>AV Vendor</td><td class=\'right\'>Results</td></tr></table>' +
+                  '<table class=\'rl-content\'>'
+
+              $(mal_results).each ->
+                rl_hover_table += '<tr><td class=\'left\'>' + this.name + '</td><td class=\'right rl-scanner-mal\'>' + this.result + '</td></tr>'
+              $(unk_results).each ->
+                rl_hover_table += '<tr><td class=\'left\'>' + this.name + '</td><td class=\'right rl-scanner-unk\'>Not Detected</td></tr>'
+
+            return '<span title="' + rl_hover_table + '" class="score-col text-center rl-hover" ' + 'id="rl-score-id-' + full['id'] + '" ><a>' + data + ' / ' + full['reversing_labs_count'] + '</a></span>'
           else
             return ''
       }
@@ -627,15 +733,13 @@ $ ->
         data: 'created_at'
         render: (data) ->
           if data
-            return moment(new Date(data)).format('MMM D, YYYY h:mm A')
+            return moment(data, "YYYY-MM-DD HH:mm").format("YYYY-MM-DD HH:mm")
           else
             return ''
       }
       {
-#        Submitter Type
-        data: null
-        render: () ->
-          return "Submitter Type"
+        data: 'submitter_type'
+
       }
       { data: 'customer_name' }
       { data: 'customer_company_name' }
@@ -652,6 +756,32 @@ $ ->
             return data
       }
     ]
+
+#
+  $('#file-rep-datatable').on 'draw.dt', ->
+    $('.rl-hover').tooltipster
+      theme: [
+        'tooltipster-borderless'
+        'tooltipster-borderless-customized'
+        'tooltipster-rl-hover'
+      ]
+      side: 'bottom'
+      contentAsHTML: true
+      autoClose: false
+      trigger: 'custom'
+      triggerOpen:
+        mouseenter: true
+        click: true
+      triggerClose:
+        mouseleave: true
+        click: true
+        scroll: true
+      interactive: true
+      updateAnimation: false
+
+    return
+
+
 
   $('.toggle-vis-file-rep').each ->
 #       toggle visible columns
@@ -671,6 +801,8 @@ $ ->
       $(checkbox).prop 'checked', !checkbox.prop('checked')
       return
     return
+
+
 
   $(document).on 'click ','.file_rep_sha', (e) ->
 #      copy SHA on click
@@ -730,7 +862,7 @@ $ ->
       range: true,
       min: 0,
       max: 100,
-      values: [ 25, 75 ]
+      values: [ 0, 100 ]
       create: (ui) ->
         values = $(this).slider("values")
 
@@ -758,7 +890,7 @@ $ ->
       range: true,
       min: 0,
       max: 100,
-      values: [ 25, 75 ]
+      values: [ 0, 100 ]
       create: (ui) ->
         values = $(this).slider("values")
 
@@ -781,26 +913,16 @@ $ ->
         }
     })
 
-# dbinebri: adding in checkbox toggle column visible + widths on Show Page, Research tab
-  $('#data-show-sandbox-cb').click -> $('#sandbox-report-wrapper').toggle()
-  $('#data-show-tg-cb').click -> $('#threatgrid-report-wrapper').toggle()
-  $('#data-show-reversing-cb').click -> $('#reversing-labs-report-wrapper').toggle()
-
-  $('#data-show-sandbox-cb, #data-show-tg-cb, #data-show-reversing-cb').click ->
-    if $('.dataset-cb:checked').length == 1
-      $('#sandbox-report-wrapper, #threatgrid-report-wrapper, #reversing-labs-report-wrapper').removeClass('col-sm-4 col-sm-6').addClass('col-sm-12')
-    else if $('.dataset-cb:checked').length == 2
-      $('#sandbox-report-wrapper, #threatgrid-report-wrapper, #reversing-labs-report-wrapper').removeClass('col-sm-4 col-sm-12').addClass('col-sm-6')
-    else if $('.dataset-cb:checked').length == 3
-      $('#sandbox-report-wrapper, #threatgrid-report-wrapper, #reversing-labs-report-wrapper').removeClass('col-sm-6 col-sm-12').addClass('col-sm-4')
-    return
-
 
 $ ->
+
   ## Create detection form dialog
   $('#create-detection-dialog').dialog
     autoOpen: false,
     minWidth: 520,
+    minHeight: 560,
+    resizable: false,
+
     classes: {
       "ui-dialog": "form-dialog"
     },
@@ -864,6 +986,8 @@ $ ->
     else
       detection_array = {disposition: new_disp}
 
+    dispute_id = parseInt($('#dispute_id').text())
+    old_disposition = $('.disposition').text()
     comment = $('#new-amp-detection-comment').val()
 
     # Grab sha data
@@ -891,14 +1015,29 @@ $ ->
       alert('Where are you? How did you trigger this? Stahp it.')
       return false
 
+    # Small format prep for success message:
+    detection_name_msg = ''
+    unless new_detection_name == ''
+      detection_name_msg = ': ' + new_detection_name
+
     std_msg_ajax(
       url: '/escalations/api/v1/escalations/file_rep/detections'
       method: 'POST'
       data: {
         'sha256_hashes': sha256_hashes
+        'old_disposition': old_disposition
         'disposition': new_disp
         'detection_name': new_detection_name
+        'comment': comment
+        'dispute_id': dispute_id
+
       }
+      success: (response) ->
+        $('#create-detection-dialog').dialog('close')
+        std_msg_success("Detection successfully created", ['<span class="code-snippet">' + sha256_hashes + '</span>', 'set to <span class="text-capitalize">' + new_disp + '</span> ' + detection_name_msg ], reload: true)
+      error: (response) ->
+        $('#create-detection-dialog').dialog('close')
+        std_api_error(response, "Detection not created", reload: false)
     )
 
     return false
@@ -968,3 +1107,123 @@ $ ->
       error: (response) ->
         std_api_error(response, "Note could not be updated.", reload: false)
     )
+
+
+  $(document).ready ->
+
+    $('select[name="file-rep-datatable_length"]').on "change", ->
+      data = {}
+      data['entriesperpage'] = $('select[name="file-rep-datatable_length"]').val()
+      std_msg_ajax(
+        url: "/escalations/api/v1/escalations/user_preferences/update"
+        method: 'POST'
+        data: {data, name: 'FileRepEntriesPerPage'}
+        dataType: 'json'
+        success: (response) ->
+      )
+
+    $('#file-rep-datatable_paginate').on "click", ->
+      data = {}
+      data['currentpage'] = $('#file-rep-datatable').DataTable().page()
+      std_msg_ajax(
+        url: "/escalations/api/v1/escalations/user_preferences/update"
+        method: 'POST'
+        data: {data, name: 'FileRepCurrentPage'}
+        dataType: 'json'
+        success: (response) ->
+      )
+
+    $('#file-rep-datatable th').on "click", ->
+      setTimeout (-> # Wait until after the sorting event is finished before saving the result
+        data = {}
+        data['sortorder'] = $('#file-rep-datatable').DataTable().order()
+        std_msg_ajax(
+          url: "/escalations/api/v1/escalations/user_preferences/update"
+          method: 'POST'
+          data: {data, name: 'FileRepSortOrder'}
+          dataType: 'json'
+          success: (response) ->
+        )
+      ), 100
+
+
+    $('.toggle-vis-file-rep').on "click", ->
+      data = {}
+      data['status'] = $("#status-checkbox").is(':checked')
+      data['resolution'] = $("#resolution-checkbox").is(':checked')
+      data['file-name'] = $("#file-name-checkbox").is(':checked')
+#      data['sha256'] = $("#sha256-checkbox").is(':checked')
+      data['file-size'] = $("#file-size-checkbox").is(':checked')
+      data['sample-type'] = $("#sample-type-checkbox").is(':checked')
+      data['amp-disp'] = $("#amp-disp-checkbox").is(':checked')
+      data['amp-name'] = $("#amp-name-checkbox").is(':checked')
+      data['amp-date'] = $("#amp-date-checkbox").is(':checked')
+      data['in-zoo'] = $("#in-zoo-checkbox").is(':checked')
+      data['sandbox-score'] = $("#sandbox-score-checkbox").is(':checked')
+      data['threatgrid-score'] = $("#threatgrid-score-checkbox").is(':checked')
+      data['reversing-labs'] = $("#reversing-labs-checkbox").is(':checked')
+      data['suggested-disp'] = $("#suggested-disp-checkbox").is(':checked')
+      data['time-submitted'] = $("#time-submitted-checkbox").is(':checked')
+      data['submitter-type'] = $("#submitter-type-checkbox").is(':checked')
+      data['customer-name'] = $("#customer-name-checkbox").is(':checked')
+      data['customer-org'] = $("#customer-org-checkbox").is(':checked')
+      data['customer-email'] = $("#customer-email-checkbox").is(':checked')
+      data['assignee'] = $("#assignee-checkbox").is(':checked')
+
+
+      std_msg_ajax(
+        url: "/escalations/api/v1/escalations/user_preferences/update"
+        method: 'POST'
+        data: {data, name: 'FileRepColumns'}
+        dataType: 'json'
+        success: (response) ->
+      )
+
+    if window.location.pathname == '/escalations/file_rep/disputes'
+      std_msg_ajax(
+        method: 'POST'
+        url: "/escalations/api/v1/escalations/user_preferences/"
+        data: {name: 'FileRepColumns'}
+        success: (response) ->
+          response = JSON.parse(response)
+
+          $.each response, (column, state) ->
+            if state == true
+              $("##{column}-checkbox").prop('checked', true)
+              $('#file-rep-datatable').DataTable().column("##{column}").visible true
+            else
+              $("##{column}-checkbox").prop('checked', false)
+              $('#file-rep-datatable').DataTable().column("##{column}").visible false
+
+      )
+
+      std_msg_ajax(
+        method: 'POST'
+        url: "/escalations/api/v1/escalations/user_preferences/"
+        data: {name: 'FileRepSortOrder'}
+        success: (response) ->
+          response = JSON.parse(response)
+          $('#file-rep-datatable').DataTable().order(response.sortorder).draw()
+      )
+
+      std_msg_ajax(
+        method: 'POST'
+        url: "/escalations/api/v1/escalations/user_preferences/"
+        data: {name: 'FileRepCurrentPage'}
+        success: (response) ->
+          response = JSON.parse(response)
+          $('#file-rep-datatable').DataTable().page(response.currentpage).draw('page')
+      )
+
+      std_msg_ajax(
+        method: 'POST'
+        url: "/escalations/api/v1/escalations/user_preferences/"
+        data: {name: 'FileRepEntriesPerPage'}
+        success: (response) ->
+          response = JSON.parse(response)
+          $('#file-rep-datatable').DataTable().page.len(response.entriesperpage).draw('page')
+      )
+
+
+
+

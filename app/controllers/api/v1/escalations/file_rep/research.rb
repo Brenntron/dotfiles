@@ -38,7 +38,7 @@ module API
 
               filerep = FileReputationDispute.where(:id => permitted_params[:id]).first
               if filerep.present?
-                filerep.update_trifecta
+                filerep.update_superfecta
               end
 
               render json: {}

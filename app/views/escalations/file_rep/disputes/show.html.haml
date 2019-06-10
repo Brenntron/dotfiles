@@ -91,15 +91,16 @@
                 - else
                   %span#dispute-assignee= @file_rep_dispute.assigned.cvs_username
 
-                - if can? :update, FileReputationDispute
+                - if can? :update, @file_rep_dispute
                   .dispute-owner-buttons-wrapper
-                    - if @file_rep_dispute.assigned == current_user
-                      %button.return-ticket-button.esc-tooltipped{title: 'Return ticket to open queue', onclick: "file_rep_show_return_dispute(#{@file_rep_dispute.id});"}
-                    - else
+                    - if can? :take, @file_rep_dispute
                       %button.take-ticket-button#show_ticket_assign.esc-tooltipped{title: 'Assign this ticket to me', onclick: "file_rep_show_take_dispute(#{@file_rep_dispute.id});"}
 
                     %span.dropdown
-                      %button#index_change_assign.dispute-inline-buttons.ticket-owner-button.dropdown-toggle.esc-tooltipped{title: 'Change Assignee', 'data-toggle': 'dropdown', 'aria-haspopup': 'true', 'aria-expanded': 'false'}
+                      - if can? :change_assignee, @file_rep_dispute
+                        %button#index_change_assign.dispute-inline-buttons.ticket-owner-button.dropdown-toggle.esc-tooltipped{title: 'Change Assignee', 'data-toggle': 'dropdown', 'aria-haspopup': 'true', 'aria-expanded': 'false'}
+                      - else
+                        %span#replace-button
                       .dropdown-menu#show-change-assign-dropdown{'aria-labelledby': 'index_change_assign'}
                         .change-assignee-dropdown-wrapper
                           %h3 Change Assignee
@@ -115,9 +116,9 @@
               %label.content-label-sm
                 Suggested Disposition
               - if @file_rep_dispute.suggested_malicious?
-                .disposition.disp-negative= @file_rep_dispute.disposition_suggested
+                .suggested-disposition.disp-negative= @file_rep_dispute.disposition_suggested
               - else
-                .disposition= @file_rep_dispute.disposition_suggested
+                .suggested-disposition= @file_rep_dispute.disposition_suggested
 
         .col-xs-12.col-sm-12.col-md-12.col-lg-7.col-with-divider.col-ticket-right
           .row
@@ -170,7 +171,7 @@
 
         .col-xs-4
           %label.content-label-sm AMP Disposition
-          - unless  @file_rep_dispute.disposition.nil?
+          - unless @file_rep_dispute.disposition.nil?
             - if @file_rep_dispute.malicious?
               .top-info-data.disposition.disp-negative= @file_rep_dispute.disposition
             - else
@@ -181,14 +182,17 @@
             %label.content-label-sm AMP Detection Created
             .top-info-data
               = @file_rep_dispute.detection_created_at
-            %label.content-label-sm In Sample Zoo
-            - if @file_rep_dispute.in_zoo == true
-              .top-info-data#sample-zoo-status{'data-zoo-status': 'YES'}
-                %span.glyphicon.glyphicon-ok
-            - else
-              .top-info-data#sample-zoo-status{'data-zoo-status': 'NO'}
-                %span.glyphicon.glyphicon-remove
-
+          %hr
+          %label.content-label-sm In Sample Zoo
+          #zoo-loader
+            .inline-loader-wrapper
+              .gear-loader-wrapper
+                = inline_svg 'icon_gears_loader.svg', class: 'gears-loader'
+              %span.loader-msg Loading data...
+          .zoo-data-present{'data-zoo-status': 'YES'}
+            %span
+          .zoo-data-notfound{'data-zoo-status': 'NO'}
+            %span
 
 -# End of top overview information
 

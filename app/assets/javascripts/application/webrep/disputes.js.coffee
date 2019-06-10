@@ -128,6 +128,20 @@ window.populate_webrep_index_table = (data = {}, reload = false) ->
           searchId = 'saved_search_' + json.search_id
           if $('#saved-search-tbody tr#' + searchId).length == 0
             $('#saved-search-tbody').append(named_search_tag(json.search_name, json.search_id))
+
+
+        std_msg_ajax(
+          method: 'POST'
+          url: "/escalations/api/v1/escalations/user_preferences/"
+          data: {name: 'WebRepSortOrder'}
+          success: (response) ->
+            response = JSON.parse(response)
+            $('#disputes-index').DataTable().order(response.sortorder).draw()
+        )
+
+
+
+
         $('#loader-modal').modal 'hide'
 
     error: (response) ->
@@ -1046,10 +1060,12 @@ $ ->
       { data: 'submitter_name' }
       { data: 'submitter_email' }
       { data: 'status_comment' }
+      { data: 'updated_at' }
       {
         data: 'age_int'
         visible: false
       }
+
 
 
     ])
@@ -1231,6 +1247,18 @@ $ ->
 
 $ ->
 
+
+  $('#disputes-index').DataTable().on 'length.dt', (e, settings, len) ->
+    data = {}
+    data['entriesperpage'] = $('select[name="disputes-index_length"]').val()
+    std_msg_ajax(
+      url: "/escalations/api/v1/escalations/user_preferences/update"
+      method: 'POST'
+      data: {data, name: 'WebRepEntriesPerPage'}
+      dataType: 'json'
+      success: (response) ->
+    )
+
   $('#new-dispute').click ->
     std_msg_ajax(
       method: 'GET'
@@ -1238,6 +1266,32 @@ $ ->
       success: (response) ->
         for user in response.json.assignees
           $('#assignee-list').append '<option value=\'' + user.cvs_username + '\'></option>'
+    )
+
+
+  $('#disputes-index th').on "click", ->
+    setTimeout (-> # Wait until after the sorting event is finished before saving the result
+      data = {}
+      data['sortorder'] = $('#disputes-index').DataTable().order()
+      std_msg_ajax(
+        url: "/escalations/api/v1/escalations/user_preferences/update"
+        method: 'POST'
+        data: {data, name: 'WebRepSortOrder'}
+        dataType: 'json'
+        success: (response) ->
+      )
+    ), 100
+
+
+  $('#disputes-index_paginate').on "click", ->
+    data = {}
+    data['currentpage'] = $('#disputes-index').DataTable().page()
+    std_msg_ajax(
+      url: "/escalations/api/v1/escalations/user_preferences/update"
+      method: 'POST'
+      data: {data, name: 'WebRepCurrentPage'}
+      dataType: 'json'
+      success: (response) ->
     )
 
   $('#advanced-search-button').click ->
@@ -1302,6 +1356,11 @@ $ ->
               window.dispute_table.column("##{column}").visible false
 
       )
+
+
+
+
+
 
     $('.toggle-vis').on "click", ->
       data = {}
@@ -1444,6 +1503,34 @@ window.populate_resolution_dropdown = (dispute_id) ->
 window.disputes_select_all_check_box = () ->
   $('.dispute_check_box').prop('checked', $('#disputes_check_box').prop('checked'))
 
+window.webrep_export_selected_rows = () ->
+  checked_boxes = $('.dispute_check_box:checked').get()
+
+  if checked_boxes.length > 0
+    ids = checked_boxes.map (checkbox) -> parseInt(checkbox.value)
+
+    query_string = '?'
+    for id in ids
+      query_string += "ids[]=#{id}&"
+
+    window.open("/escalations/webrep/export_selected_dispute_rows#{query_string}", "_blank")
+  else
+    std_msg_error('Error',['Please select at least one row before exporting'])
+
+window.webrep_research_export_selected_rows = () ->
+  checked_boxes = $('.dispute_check_box:checked').get()
+
+  if checked_boxes.length > 0
+    ids = checked_boxes.map (checkbox) -> parseInt(checkbox.getAttribute('data-entry-id'))
+
+    query_string = '?'
+    for id in ids
+      query_string += "ids[]=#{id}&"
+
+    window.open("/escalations/webrep/export_selected_dispute_entry_rows#{query_string}", "_blank")
+  else
+    std_msg_error('Error',['Please select at least one row before exporting'])
+
 $ ->
   $('#advanced-search-button').click ->
     $('#advanced-search-dropdown').show()
@@ -1496,7 +1583,26 @@ $ ->
 # Create Dashboard Initial Table (My Open Tickets)
 $ ->
 
-#
+  std_msg_ajax(
+    method: 'POST'
+    url: "/escalations/api/v1/escalations/user_preferences/"
+    data: {name: 'WebRepEntriesPerPage'}
+    success: (response) ->
+      response = JSON.parse(response)
+      $('select[name="disputes-index_length"]').val(response.entriesperpage)
+      $('#disputes-index').DataTable().page.len(response.entriesperpage).draw('page')
+      pageLength = response.entriesperpage
+  )
+
+  std_msg_ajax(
+    method: 'POST'
+    url: "/escalations/api/v1/escalations/user_preferences/"
+    data: {name: 'WebRepCurrentPage'}
+    success: (response) ->
+      response = JSON.parse(response)
+      $('#disputes-index').DataTable().page(response.currentpage).draw('page')
+  )
+
   window.open_dashboard_dispute_table = $('#table-user-disputes-open').DataTable(
     dom: '<t>'
     paging: false

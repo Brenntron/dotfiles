@@ -42,11 +42,18 @@ module API
             end
             post "form" do
               std_api_v2 do
-                permitted_params['shas_array'].each do |sha256|
-                  FileReputationDispute.create_through_form(bugzilla_rest_session,
-                                                            sha256,
-                                                            params[:disposition_suggested],
-                                                            params[:assignee])
+                user_validation = User.where(cvs_username: params[:assignee])
+
+                if user_validation.present?
+                  permitted_params['shas_array'].each do |sha256|
+                    FileReputationDispute.create_through_form(bugzilla_rest_session,
+                                                              sha256,
+                                                              params[:disposition_suggested],
+                                                              params[:assignee],
+                                                              current_user)
+                  end
+                else
+                  raise "Invalid assignee or assignee does not exist. Please try again."
                 end
 
                 render json: {status: 'Success'}
@@ -192,8 +199,10 @@ module API
                 assignee = User.find(params[:new_assignee]).cvs_username
 
                 disputes = FileReputationDispute.assign(params[:dispute_ids], user: params[:new_assignee])
-                if disputes.length == 0
-                  raise ('The selected dispute tickets are already assigned.')
+                if params[:dispute_ids].length == 1 && disputes.length == 0
+                  raise ('The selected dispute ticket is already assigned')
+                elsif params[:dispute_ids].length > 1 && disputes.length == 0
+                  raise ('The selected dispute tickets are already assigned')
                 end
                 {:status => "success", :data => disputes, :assignee => assignee}.to_json
               end

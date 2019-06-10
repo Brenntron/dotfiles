@@ -25,6 +25,10 @@
         %label.toolbar-section-label Data
         %button.toolbar-button.sync-button#file-rep-sync-button.esc-tooltipped{title: 'Refresh Data'}
           %span.toolbar-button-text Refresh Data
+      %div
+        %label.toolbar-section-label Reports
+        %button.toolbar-button.esc-tooltipped.create-new-run-button{title: 'Create New Sandbox Run', onclick: 'run_sample_in_sandbox()'}
+          %span.toolbar-button-text Create New Sandbox Run
 
 .row
   .col-xs-12.col-sm-4#sandbox-report-wrapper
@@ -76,6 +80,14 @@
             %label.data-report-label Processes
         %hr.thin
         .row
+          .col-xs-12.text-center
+            -#%a{href: '#', target: '_blank'}
+            -#%button.secondary.view-report-external-button.data-report-button#sb-report-html{onclick: 'sandbox_html_report();'}
+            %a.btn.view-report-external-button.data-report-button#sb-report-html{href: "/escalations/file_rep/sandbox-html-report", target: "_blank"}
+              View HTML Report
+            %a.btn.view-report-external-button.data-report-button#sb-report-html-download{href: ""}
+              Download HTML Report
+        %hr.thin
         .row
           .col-xs-6
             %label.data-report-label Full Json
