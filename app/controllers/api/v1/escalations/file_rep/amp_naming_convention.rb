@@ -13,10 +13,10 @@ module API
                 requires :pattern, type: String
                 requires :example, type: String
                 requires :engine, type: String
-                requires :engine_description, type: String
-                requires :notes, type: String
-                requires :public_notes, type: String
-                requires :contact, type: String
+                optional :engine_description, type: String
+                optional :notes, type: String
+                optional :public_notes, type: String
+                optional :contact, type: String
                 optional :table_sequence, type: Integer
               end
             end
@@ -36,10 +36,10 @@ module API
                 requires :pattern, type: String
                 requires :example, type: String
                 requires :engine, type: String
-                requires :engine_description, type: String
-                requires :notes, type: String
-                requires :public_notes, type: String
-                requires :contact, type: String
+                optional :engine_description, type: String
+                optional :notes, type: String
+                optional :public_notes, type: String
+                optional :contact, type: String
                 optional :table_sequence, type: Integer
               end
             end
