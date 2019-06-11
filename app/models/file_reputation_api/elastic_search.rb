@@ -13,7 +13,7 @@ class FileReputationApi::ElasticSearch
 
 
     begin
-      response = client.search index: 'pokes',
+      response = client.search index: 'pokes', size: 1,
                                body: {
                                    query: {
                                        bool: {
@@ -33,7 +33,7 @@ class FileReputationApi::ElasticSearch
 
 
       disposition_last_set = Time.at(response['hits']['hits'][0]['_source']['time'])
-
+      binding.pry
       disposition_last_set
     rescue
       return 'No history to display'
