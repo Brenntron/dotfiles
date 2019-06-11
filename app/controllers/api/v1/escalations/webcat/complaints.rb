@@ -254,7 +254,7 @@ module API
               std_api_v2 do
                 begin
                   new_report = Complaint.get_latest_wbnp_complaints
-                  {:status => "success", :wbnp_report_id => new_report.id}
+                  {:status => "success", :wbnp_report_id => new_report.id}.to_json
                 rescue
                   {:status => "error"}.to_json
                 end
@@ -266,15 +266,19 @@ module API
             end
 
             get 'wbnp_report_status' do
-              report = WbnpReport.all.last
+
               if permitted_params[:wbnp_report_id].blank?
                 report = WbnpReport.active_reports.last
               else
                 report = WbnpReport.where(:id => permitted_params[:wbnp_report_id]).first
               end
 
+              if report.blank?
+                report = WbnpReport.all.last
+              end
+
               if report.present?
-                {:status => "success", :data => report.to_json}
+                {:status => "success", :data => report}
               else
                 {:status => "success", :data => {}}
               end

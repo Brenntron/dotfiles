@@ -455,7 +455,7 @@ class Complaint < ApplicationRecord
 
       new_report = WbnpReport.new
 
-      all_complaints = Wbrs::RuleUiComplaint.where({:add_channels => [WBNP_CHANNEL], :statuses => ['new']})["data"]
+      all_complaints = Wbrs::RuleUiComplaint.where({:add_channels => [WBNP_CHANNEL], :statuses => ['new']})["data"].first(3)
 
       #all_complaints.each do |rule_ui_complaint|
       #  uri_to_test = compile_parts_to_uri(rule_ui_complaint)
@@ -465,23 +465,33 @@ class Complaint < ApplicationRecord
       #    new_complaints << rule_ui_complaint
       #  end
       #end
-      new_report.total_new_cases = all_complaint.size
+      new_report.notes = ""
+      new_report.cases_imported = 0
+      new_report.cases_failed = 0
+      new_report.total_new_cases = all_complaints.size
       new_report.status = WbnpReport::ACTIVE
       new_report.save
 
-      start_wbnp_pull(new_report, all_complaints)
+      start_wbnp_pull(new_report.id)
 
       new_report
 
   end
 
   class << self
-    def start_wbnp_pull(new_report, all_complaints)
+    def start_wbnp_pull(new_report_id)
+      new_report = WbnpReport.find(new_report_id)
       begin
+        all_complaints = Wbrs::RuleUiComplaint.where({:add_channels => [WBNP_CHANNEL], :statuses => ['new']})["data"].first(3)
         bugzilla_rest_session = BugzillaRest::Session.default_session
         all_complaints.each do |new_ui_complaint|
           if new_ui_complaint['add_channel'] == WBNP_CHANNEL
-            rule_ui_wbnp_create_action(new_ui_complaint, new_report, bugzilla_rest_session: bugzilla_rest_session)
+            begin
+              rule_ui_wbnp_create_action(new_ui_complaint, new_report, bugzilla_rest_session: bugzilla_rest_session)
+            rescue => e
+              new_report.notes += "uri: #{uri} | failure: #{e.message}\n"
+              new_report.save
+            end
           end
         end
 
@@ -490,7 +500,6 @@ class Complaint < ApplicationRecord
       rescue => e
         new_report.status = WbnpReport::ERROR
         new_report.notes += "\n\n----------\nPull suddenly ended with error: #{e.message}\n\n"
-        new_report.notes += "#{e.stacktrace}\n\n----------\n"
         new_report.save
       end
 
@@ -570,7 +579,6 @@ class Complaint < ApplicationRecord
     rescue => e
       wbnp_report.cases_failed += 1
       wbnp_report.notes += "\n\n uri: #{uri} | failure: #{e.message}\n"
-      wbnp_report.notes += "#{e.backtrace}"
     end
 
     wbnp_report.save
