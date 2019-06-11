@@ -36,9 +36,16 @@ Given(/^A FileRep Dispute with trait "(.*?)" exists$/) do |trait_name|
   FactoryBot.create(:file_reputation_dispute,trait_name.to_sym)
 end
 
+Given(/^FileRep Dispute has the appropriate 'resolution_comment' for auto-resolved entries$/) do
+  expect(FileReputationDispute.first.resolution_comment).to eq(FileReputationDispute::RESOLUTION_AUTORESOLVED_COMMENT)
+  expect(FileReputationDispute.first.resolution_comment).not_to eq(nil)
+end
+
 Then(/^no FileRep dispute comments exists$/) do
   expect(FileRepComment.count).to eq(0)
+end
 
 Given(/^A FileRep Dispute comment with trait "(.*?)" exists$/) do |trait_name|
   FactoryBot.create(:file_rep_comment,trait_name.to_sym)
 end
+
