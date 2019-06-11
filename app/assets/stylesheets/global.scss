@@ -8847,6 +8847,7 @@ button.secondary.view-report-external-button {
 
 // dbinebri: file rep - naming guide dialog internal specific styles here
 #naming-guide-dialog {
+  display: none;
   font-family: 'Open Sans', sans-serif;
   padding: 10px;
 
@@ -9587,4 +9588,26 @@ table.rl-content {
 
 .rl-col {
   text-align: center;
+}
+
+.delete-patterns-area {
+  font-size: 11px;
+  .panel {
+    margin-top: 10px;
+    margin-right: 10px;
+  }
+  .panel-heading {
+    padding-top: 12px;
+    font-size: 12px;
+    font-weight: bold;
+  }
+}
+
+.delete-pattern {
+  font-family: 'Fira Mono', monospace;
+  font-weight: bold;
+  border-radius: 2px;
+  padding: 4px;
+  background: darken($content-bg-color, 5%);
+  margin-right: 5px;
 }

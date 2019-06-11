@@ -59,6 +59,11 @@ $ ->
 
 
   window.cancel_amp_naming_conventions = () ->
+    # on cancel, restore the ready-to-delete rows
+    $('#amp-naming-details-table').find('.hidden').removeClass('hidden')
+    $('.delete-patterns-area').addClass('hidden')
+    $('.delete-patterns-queue').empty()
+
     # Delete any new rows that were not saved
     rows = $('#amp-naming-details-table tbody').find('tr')
     $(rows).each ->
@@ -113,8 +118,9 @@ $ ->
   window.add_amp_naming_conventions = () ->
     number_of_rows = $('#amp-naming-details-table tbody').find('tr').length
     new_sequence_number = number_of_rows + 1
+    unsaved_row_number = new_sequence_number + 1
     new_row =
-      '<tr data-sort-sequence="' + new_sequence_number + '" data-id="">' +
+      '<tr data-sort-sequence="' + new_sequence_number + '" data-id="" data-unsaved-id="' + unsaved_row_number + '">' +
       '<td class="amp-pattern">' +
       '<span class="table-content"><span class="table-code"></span></span>' +
       '<span class="table-form-content"><input type="text"></input></span>' +
@@ -142,6 +148,7 @@ $ ->
       '<td class="amp-contact">' +
       '<span class="table-content"></span>' +
       '<span class="table-form-content"><textarea></textarea></span>' +
+      '<span class="delete-button" onclick="delete_amp_naming_convention(' + unsaved_row_number + ')"></span>' +
       '</td>' +
       '</tr>'
 
@@ -258,19 +265,51 @@ $ ->
       window.update_amp_naming_conventions([rows_to_update])
 
 
+  # delete an existing naming convention
   window.delete_amp_naming_convention = (id, pattern) ->
-    std_msg_ajax(
-      method: 'DELETE'
-      url: "/escalations/api/v1/escalations/file_rep/amp_naming_convention/" + id
-      data: {}
-      success: (response) ->
-        # remove the selected row from the page
-        deleted_row = 'tr[data-id=' + id + ']'
-        $(deleted_row).remove()
-        std_msg_success('AMP Naming Convention Below Has Been Deleted.', [pattern], reload: false)
-      error: (response) ->
-        std_msg_error('Error Deleting ' + pattern, [response.responseText], reload: false)
-    )
+    deleted_pattern_array = []
+    # First, hide the row that was deleted and get the Pattern from that row
+    deleted_row = 'tr[data-id=' + id + ']'
+    $(deleted_row).addClass('hidden')
+
+    # Show this area now and prepare the queue for ajax batch call
+    $('.delete-patterns-area').removeClass('hidden')
+
+    # Get the Pattern from that row and append into this area
+    deleted_pattern_html = '<span class="delete-pattern">' + pattern + '</span>'
+    $('.delete-patterns-queue').append(deleted_pattern_html)
+
+    deleted_pattern_array.push(pattern)
+
+    my_string = ''
+
+    my_length = $('.delete-pattern').length
+    console.log my_length
+
+    $('.delete-pattern').each (index, element) ->
+      if index == my_length
+        my_string += $(this).text()
+      else
+        my_string += $(this).text() + ','
+
+    console.log my_string
+    my_array = my_string.split(',')
+    console.log my_array
+
+    # marlin, here is the below array
+
+#    TODO: below is the logic for the one-at-a-time DELETE logic, change to BATCH DELETE
+#    TODO: below is the logic for the one-at-a-time DELETE logic, change to BATCH DELETE
+#    std_msg_ajax(
+#      method: 'DELETE'
+#      url: "/escalations/api/v1/escalations/file_rep/amp_naming_convention/" + id
+#      data: {}
+#      success: (response) ->
+#        $(deleted_row).remove()
+#        std_msg_success('AMP Naming Convention Below Has Been Deleted.', [pattern], reload: false)
+#      error: (response) ->
+#        std_msg_error('Error Deleting ' + pattern, [response.responseText], reload: false)
+#    )
 
 
   window.create_amp_naming_conventions = ([data]) ->
