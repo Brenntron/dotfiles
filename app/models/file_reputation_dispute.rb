@@ -573,34 +573,27 @@ class FileReputationDispute < ApplicationRecord
       if FileReputationDispute.threaded?
         Thread.new do
           new_dispute.update_scores
-          new_dispute.auto_resolve_on_matching_disposition(source: 'TI')
+          new_dispute.auto_resolve_on_matching_disposition(from: 'TI')
         end
       else
         new_dispute.update_scores
-        new_dispute.auto_resolve_on_matching_disposition(source: 'TI')
+        new_dispute.auto_resolve_on_matching_disposition(from: 'TI')
       end
     end
 
     new_dispute
   end
 
-  def auto_resolve_on_matching_disposition(source: 'ACE')
+  def auto_resolve_on_matching_disposition(from: 'ACE')
       auto_resolved_boolean = false
 
       if (self.clean? && self.suggested_clean?) || (self.malicious? && self.suggested_malicious?)
         self.update(status: STATUS_RESOLVED, resolution: RESOLUTION_AUTORESOLVED, resolution_comment: RESOLUTION_AUTORESOLVED_COMMENT)
 
         auto_resolved_boolean = true
-
-        envelope = {}
-        envelope[:payload] = {}
-
-        envelope[:addressee_id] = self.id
-        envelope[:addressee_status] = self.status
-        envelope[:payload] = {resolution: self.resolution, resolution_comment: self.resolution_comment}
       end
 
-      if source == 'TI'
+      if from == 'TI'
         envelope = {}
         envelope[:payload] = {}
 
