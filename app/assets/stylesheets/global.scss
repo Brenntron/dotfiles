@@ -9599,13 +9599,13 @@ table.rl-content {
   .panel-heading {
     padding-top: 12px;
     font-size: 12px;
-    font-weight: bold;
+    font-weight: normal;
   }
 }
 
 .delete-pattern {
   font-family: 'Fira Mono', monospace;
-  font-weight: bold;
+  font-weight: normal;
   border-radius: 2px;
   padding: 4px;
   background: darken($content-bg-color, 5%);

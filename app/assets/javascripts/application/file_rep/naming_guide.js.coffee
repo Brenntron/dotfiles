@@ -118,9 +118,9 @@ $ ->
   window.add_amp_naming_conventions = () ->
     number_of_rows = $('#amp-naming-details-table tbody').find('tr').length
     new_sequence_number = number_of_rows + 1
-    unsaved_row_number = new_sequence_number + 1
+    unsaved_id = number_of_rows + 99
     new_row =
-      '<tr data-sort-sequence="' + new_sequence_number + '" data-id="" data-unsaved-id="' + unsaved_row_number + '">' +
+      '<tr data-sort-sequence="' + new_sequence_number + '" data-id="" data-unsaved-id="' + unsaved_id + '">' +
       '<td class="amp-pattern">' +
       '<span class="table-content"><span class="table-code"></span></span>' +
       '<span class="table-form-content"><input type="text"></input></span>' +
@@ -148,7 +148,7 @@ $ ->
       '<td class="amp-contact">' +
       '<span class="table-content"></span>' +
       '<span class="table-form-content"><textarea></textarea></span>' +
-      '<span class="delete-button" onclick="delete_amp_naming_convention(' + unsaved_row_number + ')"></span>' +
+      '<span class="delete-button" onclick="delete_unsaved_convention(' + unsaved_id + ')"></span>' +
       '</td>' +
       '</tr>'
 
@@ -265,48 +265,56 @@ $ ->
       window.update_amp_naming_conventions([rows_to_update])
 
 
-  # delete an existing naming convention
+  # delete an unsaved naming convention
+  window.delete_unsaved_convention = (id) ->
+    deleted_row = 'tr[data-unsaved-id=' + id + ']'
+    curr_pattern = $(deleted_row).find('.table-code').text()
+    empty_input_length = $(deleted_row).find('input:empty, textarea:empty').length
+    $(deleted_row).addClass('hidden')
+
+
+  # delete an saved naming convention
   window.delete_amp_naming_convention = (id, pattern) ->
-    deleted_pattern_array = []
-    # First, hide the row that was deleted and get the Pattern from that row
+
+    # store these id's in an array in localstorage?
+    deleted_id_array = []
+
+    # set counter variable, gets iterated each time this is called
+    # for loop counter
+    # for each call of this func
+#      my_counter++
+
+    deleted_pattern_string = ''
+
+    $('.delete-patterns-area').removeClass('hidden')
+
+    # First, hide the row that was deleted and put the Pattern from that row into the delete panel
     deleted_row = 'tr[data-id=' + id + ']'
     $(deleted_row).addClass('hidden')
 
-    # Show this area now and prepare the queue for ajax batch call
-    $('.delete-patterns-area').removeClass('hidden')
-
-    # Get the Pattern from that row and append into this area
     deleted_pattern_html = '<span class="delete-pattern">' + pattern + '</span>'
     $('.delete-patterns-queue').append(deleted_pattern_html)
 
-    deleted_pattern_array.push(pattern)
+    # Next, build an array of id's
+    deleted_id_array.push(id)
+    console.log deleted_id_array
 
-    my_string = ''
+#    $('.delete-pattern').each (index, element) ->
+#      if index == ($('.delete-pattern').length - 1)
+#        deleted_pattern_string += $(this).text()
+#      else
+#        deleted_pattern_string += $(this).text() + ','
 
-    my_length = $('.delete-pattern').length
-    console.log my_length
+    # marlin, below is the name of the array, after you modify the back-end, you can send back to me and I'll finish this off
+#    console.log deleted_id_array
 
-    $('.delete-pattern').each (index, element) ->
-      if index == my_length
-        my_string += $(this).text()
-      else
-        my_string += $(this).text() + ','
-
-    console.log my_string
-    my_array = my_string.split(',')
-    console.log my_array
-
-    # marlin, here is the below array
-
-#    TODO: below is the logic for the one-at-a-time DELETE logic, change to BATCH DELETE
-#    TODO: below is the logic for the one-at-a-time DELETE logic, change to BATCH DELETE
+#    TODO: below is the logic that needs to change to BATCH DELETE
 #    std_msg_ajax(
 #      method: 'DELETE'
 #      url: "/escalations/api/v1/escalations/file_rep/amp_naming_convention/" + id
-#      data: {}
+#      data: { deleted_id_array }
 #      success: (response) ->
-#        $(deleted_row).remove()
-#        std_msg_success('AMP Naming Convention Below Has Been Deleted.', [pattern], reload: false)
+#        std_msg_success('AMP Naming Convention(s) Below Have Been Deleted.', [pattern], reload: false)
 #      error: (response) ->
 #        std_msg_error('Error Deleting ' + pattern, [response.responseText], reload: false)
 #    )
