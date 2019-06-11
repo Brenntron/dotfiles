@@ -455,6 +455,14 @@ class FileReputationDispute < ApplicationRecord
     Rails.logger.error("Error updating amp disposition on #{self.id} -- #{except.message}")
   end
 
+  def update_amp_detection_last_set
+    detection_last_set = FileReputationApi::ElasticSearch.query(self.sha256_hash)
+
+    update!(detection_last_set: detection_last_set)
+  rescue => except
+    Rails.logger.error("Error updating amp detection last set on #{self.id} -- #{except.message}")
+  end
+
   # Update scores when refreshing data on show page
   def update_sample_zoo
     zoo_response = FileReputationApi::SampleZoo.sha256_lookup(self.sha256_hash)
@@ -476,6 +484,7 @@ class FileReputationDispute < ApplicationRecord
 
   def update_scores
     update_amp_disposition
+    update_amp_detection_last_set
     update_threadgrid_score
     update_ticode_certs
     update_reversing_labs_score
