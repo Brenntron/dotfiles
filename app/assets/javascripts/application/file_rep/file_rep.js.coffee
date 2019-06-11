@@ -246,7 +246,7 @@ $ ->
         $(i).closest('.form-group').addClass('hidden')
 
       if $(i).hasClass('ui-slider')
-        values = [ 25, 75 ]
+        values = [ 0, 100 ]
         $(i).slider({
           values: values
         })
@@ -347,7 +347,12 @@ $ ->
     data = {
       search_type: ''
       search_name: ''
+      selected_cases: []
     }
+
+    $('.dispute_check_box:checked').each ->
+      case_id =  $(this).attr('value')
+      data.selected_cases.push(case_id)
 
     if location.search != ''
 #      if the location.search has value, it is a standard search
@@ -857,7 +862,7 @@ $ ->
       range: true,
       min: 0,
       max: 100,
-      values: [ 25, 75 ]
+      values: [ 0, 100 ]
       create: (ui) ->
         values = $(this).slider("values")
 
@@ -885,7 +890,7 @@ $ ->
       range: true,
       min: 0,
       max: 100,
-      values: [ 25, 75 ]
+      values: [ 0, 100 ]
       create: (ui) ->
         values = $(this).slider("values")
 
@@ -915,6 +920,9 @@ $ ->
   $('#create-detection-dialog').dialog
     autoOpen: false,
     minWidth: 520,
+    minHeight: 560,
+    resizable: false,
+
     classes: {
       "ui-dialog": "form-dialog"
     },
@@ -1103,6 +1111,42 @@ $ ->
 
   $(document).ready ->
 
+    $('select[name="file-rep-datatable_length"]').on "change", ->
+      data = {}
+      data['entriesperpage'] = $('select[name="file-rep-datatable_length"]').val()
+      std_msg_ajax(
+        url: "/escalations/api/v1/escalations/user_preferences/update"
+        method: 'POST'
+        data: {data, name: 'FileRepEntriesPerPage'}
+        dataType: 'json'
+        success: (response) ->
+      )
+
+    $('#file-rep-datatable_paginate').on "click", ->
+      data = {}
+      data['currentpage'] = $('#file-rep-datatable').DataTable().page()
+      std_msg_ajax(
+        url: "/escalations/api/v1/escalations/user_preferences/update"
+        method: 'POST'
+        data: {data, name: 'FileRepCurrentPage'}
+        dataType: 'json'
+        success: (response) ->
+      )
+
+    $('#file-rep-datatable th').on "click", ->
+      setTimeout (-> # Wait until after the sorting event is finished before saving the result
+        data = {}
+        data['sortorder'] = $('#file-rep-datatable').DataTable().order()
+        std_msg_ajax(
+          url: "/escalations/api/v1/escalations/user_preferences/update"
+          method: 'POST'
+          data: {data, name: 'FileRepSortOrder'}
+          dataType: 'json'
+          success: (response) ->
+        )
+      ), 100
+
+
     $('.toggle-vis-file-rep').on "click", ->
       data = {}
       data['status'] = $("#status-checkbox").is(':checked')
@@ -1152,3 +1196,34 @@ $ ->
               $('#file-rep-datatable').DataTable().column("##{column}").visible false
 
       )
+
+      std_msg_ajax(
+        method: 'POST'
+        url: "/escalations/api/v1/escalations/user_preferences/"
+        data: {name: 'FileRepSortOrder'}
+        success: (response) ->
+          response = JSON.parse(response)
+          $('#file-rep-datatable').DataTable().order(response.sortorder).draw()
+      )
+
+      std_msg_ajax(
+        method: 'POST'
+        url: "/escalations/api/v1/escalations/user_preferences/"
+        data: {name: 'FileRepCurrentPage'}
+        success: (response) ->
+          response = JSON.parse(response)
+          $('#file-rep-datatable').DataTable().page(response.currentpage).draw('page')
+      )
+
+      std_msg_ajax(
+        method: 'POST'
+        url: "/escalations/api/v1/escalations/user_preferences/"
+        data: {name: 'FileRepEntriesPerPage'}
+        success: (response) ->
+          response = JSON.parse(response)
+          $('#file-rep-datatable').DataTable().page.len(response.entriesperpage).draw('page')
+      )
+
+
+
+
