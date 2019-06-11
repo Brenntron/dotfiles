@@ -384,3 +384,13 @@ Feature: Disputes
     And I click ".primary"
     Then I should see "Unable to delete a note written by another user."
 
+  @javascript
+  Scenario: a user sees a properly worded time stamp on a comment under the Communications tab
+    Given a user with role "filerep user" exists and is logged in
+    And vrtincoming exists
+    And A FileRep Dispute with trait "assigned" exists
+    And A FileRep Dispute comment with trait "new" exists
+    When I go to "/escalations/file_rep/disputes/1"
+    And I click "#communication-tab-link"
+    Then I should see content "seconds ago." within ".author-notation"
+    Then I should not see "1 hour"

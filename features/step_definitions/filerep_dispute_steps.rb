@@ -38,4 +38,7 @@ end
 
 Then(/^no FileRep dispute comments exists$/) do
   expect(FileRepComment.count).to eq(0)
+
+Given(/^A FileRep Dispute comment with trait "(.*?)" exists$/) do |trait_name|
+  FactoryBot.create(:file_rep_comment,trait_name.to_sym)
 end
