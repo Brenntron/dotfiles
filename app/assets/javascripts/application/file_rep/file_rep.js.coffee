@@ -1076,6 +1076,8 @@ $ ->
 
 
   $('.filerep-note-delete-button').on "click", ->
+    $('.confirm').show()
+
     comment_id = $(this).attr('comment_id')
     current_user_id = $('input[name="current_user_id"]').val()
 
@@ -1088,7 +1090,8 @@ $ ->
         data: {current_user_id: current_user_id}
         success_reload: true
         error: (response) ->
-          std_api_error(response, "Note could not be deleted.", reload: false)
+          std_msg_error("Note could not be deleted", [response.responseJSON.message], reload: false)
+          $('.confirm').hide()
       )
 
   # Editing a Note
