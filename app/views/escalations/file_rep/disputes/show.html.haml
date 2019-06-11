@@ -179,9 +179,10 @@
             %label.content-label-sm AMP Detection Name
             .top-info-data
               = @file_rep_dispute.detection_name
-            %label.content-label-sm AMP Detection Created
-            .top-info-data
-              = @file_rep_dispute.detection_created_at
+            - if @file_rep_dispute.disposition == 'malicious'
+              %label.content-label-sm AMP Detection Last Set Date
+              .top-info-data
+                = @file_rep_dispute.detection_last_set
           %hr
           %label.content-label-sm In Sample Zoo
           #zoo-loader
