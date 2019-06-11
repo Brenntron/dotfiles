@@ -9595,11 +9595,13 @@ table.rl-content {
   .panel {
     margin-top: 10px;
     margin-right: 10px;
+    word-wrap: break-word;
+    line-height: 22px;
   }
   .panel-heading {
     padding-top: 12px;
     font-size: 12px;
-    font-weight: normal;
+    font-weight: bold;
   }
 }
 
