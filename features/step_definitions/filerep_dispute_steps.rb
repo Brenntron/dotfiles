@@ -35,3 +35,7 @@ end
 Given(/^A FileRep Dispute with trait "(.*?)" exists$/) do |trait_name|
   FactoryBot.create(:file_reputation_dispute,trait_name.to_sym)
 end
+
+Given(/^A FileRep Dispute comment with trait "(.*?)" exists$/) do |trait_name|
+  FactoryBot.create(:file_rep_comment,trait_name.to_sym)
+end
