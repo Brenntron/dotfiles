@@ -36,6 +36,7 @@ class FileReputationDispute < ApplicationRecord
   RESOLUTION_AUTORESOLVED_COMMENT   = 'This ticket has been auto-resolved, suggested disposition and disposition already match.'
 
   validates :status, :sha256_hash, :disposition_suggested, presence: true
+  validates :sha256_hash, format: { with: /\A\h{64}\z/, message: "only 64 nibble (256 bit) hex code" }
 
   scope :by_customer, ->(customer_name: nil, customer_email: nil, company_name: nil) {
     result =
@@ -159,8 +160,7 @@ class FileReputationDispute < ApplicationRecord
     end
   end
 
-  def self.create_through_form(bugzilla_rest_session, sha256_hash, disposition_suggested, assignee, current_user)
-
+  def self.create_through_form(bugzilla_rest_session, sha256_hash, disposition_suggested, assignee_id)
     summary = "New File Rep Dispute generated at #{DateTime.now.utc.strftime("%Y-%m-%d %H:%M")}"
 
     full_description = %Q{
@@ -189,7 +189,7 @@ class FileReputationDispute < ApplicationRecord
         file_name: 'N/A',
         sha256_hash: sha256_hash,
         disposition_suggested: disposition_suggested,
-        user_id: User.where(cvs_username: assignee).first.id,
+        user_id: assignee_id,
         submitter_type: SUBMITTER_TYPE_AC_FORM,
         customer_id: customer.id,
         status: STATUS_ASSIGNED

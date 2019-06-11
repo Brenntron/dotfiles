@@ -339,6 +339,55 @@ Feature: Disputes
     And I click ".inline-return-ticket-1"
     Then I should not see "ERROR UPDATING TICKET."
     Then I should see "Unassigned"
+    And I should see my username
+
+  # Need to stub API calls on show page
+  @javascript
+  Scenario: a user with the role, 'filerep manager', visits a FileRep Dispute show page and deletes someone else's comment
+    Given a user with role "filerep manager" exists and is logged in
+    And the following users exist
+    |id|
+    |2 |
+    And A FileRep Dispute with trait "default" exists
+    And the following FileRep dispute comments exist:
+    |id| user_id |
+    |1 | 2       |
+    When I go to "/escalations/file_rep/disputes/1"
+    And I click "#communication-tab-link"
+    And I click ".filerep-note-delete-button"
+    And I click ".primary"
+    Then no FileRep dispute comments exists
+
+  # Need to stub API calls on show page
+  @javascript
+  Scenario: a user with the role, 'filerep user', visits a FileRep Dispute show page and deletes their own comment
+    Given a user with role "filerep user" exists and is logged in
+    And A FileRep Dispute with trait "default" exists
+    And the following FileRep dispute comments exist:
+    |id|
+    |1 |
+    When I go to "/escalations/file_rep/disputes/1"
+    And I click "#communication-tab-link"
+    And I click ".filerep-note-delete-button"
+    And I click ".primary"
+    Then no FileRep dispute comments exists
+
+  # Need to stub API calls on show page
+  @javascript
+  Scenario: a user with the role, 'filerep user', visits a FileRep Dispute show page and deletes someone else's comment
+    Given a user with role "filerep user" exists and is logged in
+    And the following users exist
+    |id|
+    |2 |
+    And A FileRep Dispute with trait "default" exists
+    And the following FileRep dispute comments exist:
+    |id| user_id |
+    |1 | 2       |
+    When I go to "/escalations/file_rep/disputes/1"
+    And I click "#communication-tab-link"
+    And I click ".filerep-note-delete-button"
+    And I click ".primary"
+    Then I should see "Unable to delete a note written by another user."
 
   @javascript
   Scenario: a user creates a new FileRep Dispute through the form and the ticket is auto-resolved
