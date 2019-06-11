@@ -4,10 +4,10 @@ class FileReputationApi::ElasticSearch
 
   def self.query(sha256)
     client = Elasticsearch::Client.new hosts: [
-        { host: 'ava-esqulb-01prd.vrt.sourcefire.com',
-          port: '443',
-          user: 'REDACTED',
-          password: 'REDACTED',
+        { host: Rails.configuration.elastic.host,
+          port: Rails.configuration.elastic.port,
+          user: Rails.configuration.elastic.username ,
+          password: Rails.configuration.elastic.password,
           scheme: 'https'
         }], log: true, transport_options: { ssl: { verify: false}}
 
@@ -32,11 +32,12 @@ class FileReputationApi::ElasticSearch
                                }
 
 
-    disposition_last_set = Time.at(response['hits']['hits'][0]['_source']['time'])
+      disposition_last_set = Time.at(response['hits']['hits'][0]['_source']['time'])
 
-    disposition_last_set
+      disposition_last_set
     rescue
       return 'No history to display'
     end
   end
+
 end
