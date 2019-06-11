@@ -450,7 +450,7 @@ class FileReputationDispute < ApplicationRecord
   def update_amp_disposition
     detection = FileReputationApi::Detection.get_bulk(self.sha256_hash)
 
-    update!(disposition: detection.disposition, detection_name: detection.name, last_fetched: DateTime.now)
+    update!(disposition: detection.disposition, detection_name: detection.name)
   rescue => except
     Rails.logger.error("Error updating amp disposition on #{self.id} -- #{except.message}")
   end
@@ -458,7 +458,7 @@ class FileReputationDispute < ApplicationRecord
   def update_amp_detection_last_set
     detection_last_set = FileReputationApi::ElasticSearch.query(self.sha256_hash)
 
-    update!(detection_last_set: detection_last_set)
+    update!(detection_last_set: detection_last_set, last_fetched: DateTime.now)
   rescue => except
     Rails.logger.error("Error updating amp detection last set on #{self.id} -- #{except.message}")
   end
