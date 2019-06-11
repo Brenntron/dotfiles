@@ -119,7 +119,7 @@ $ ->
     number_of_rows = $('#amp-naming-details-table tbody').find('tr').length
     new_sequence_number = number_of_rows + 1
     new_row =
-      '<tr data-sort-sequence="' + new_sequence_number + '" data-unsaved-id="' + new_sequence_number + '">' +
+      '<tr class="amp-naming-row" data-sort-sequence="' + new_sequence_number + '" data-id="" data-unsaved-id="' + new_sequence_number + '">' +
       '<td class="amp-pattern">' +
       '<span class="table-content"><span class="table-code"></span></span>' +
       '<span class="table-form-content"><input type="text"></input></span>' +
@@ -147,7 +147,7 @@ $ ->
       '<td class="amp-contact">' +
       '<span class="table-content"></span>' +
       '<span class="table-form-content"><textarea></textarea></span>' +
-      '<span class="delete-button" onclick="delete_unsaved_convention(' + unsaved_id + ')"></span>' +
+      '<span class="delete-button" onclick="delete_amp_naming_convention(' + new_sequence_number + ', \'\')"></span>' +
       '</td>' +
       '</tr>'
 
@@ -264,52 +264,50 @@ $ ->
       window.update_amp_naming_conventions([rows_to_update])
 
 
-  # delete a saved naming convention
+  # Delete one or more naming conventions
   window.delete_amp_naming_convention = (id, pattern) ->
-    deleted_id_array = []
-    deleted_id_list = ''
-
-    # First, show the delete panel area
-    $('.delete-patterns-area').removeClass('hidden')
+    delete_id_array = []
+    delete_id_list = ''
 
     # Hide the row that was deleted
-    deleted_row = 'tr[data-id=' + id + ']'
-    $(deleted_row).addClass('hidden')
+    delete_row = 'tr[data-id=' + id + ']'
+    $(delete_row).addClass('hidden')
 
-    # Append the pattern from that row into the delete area in top right
-    deleted_pattern_html = '<span class="delete-pattern" data-delete-id="' + id + '">' + pattern + '</span>'
-    $('.delete-patterns-queue').append(deleted_pattern_html)
+    # If unsaved row, store this id for logic below
+    unsaved_id = $('tr[data-unsaved-id=' + id + ']').attr('data-unsaved-id')
 
-    # Next, build the array of id's to pass to back-end for bulk delete
-    deleted_id_array =
-      $('.delete-pattern').each (index, element) ->
-        if (index == ($('.delete-pattern').length - 1))
-          deleted_id_list += $(this).attr('data-delete-id')
-        else
-          deleted_id_list += $(this).attr('data-delete-id') + ','
+    # If this is a new and unsaved row, just remove it from page
+    if unsaved_id != undefined
+      delete_row = 'tr[data-unsaved-id=' + id + ']'
+      $(delete_row).addClass('hidden')
+    else
+      $('.delete-patterns-area').removeClass('hidden')
 
-    # marlin: below is the array of id's to delete, after you modify the back-end, re-assign to me and I'll finish this off
-    deleted_id_array = deleted_id_list.split(',')
-    console.log deleted_id_array
+      delete_pattern_html = '<span class="delete-pattern" data-delete-id="' + id + '">' + pattern + '</span>'
+      $('.delete-patterns-queue').append(delete_pattern_html)
 
-#    marlin: below is the logic that you or I can change after delete_batch changes made on back-end, let me know
-#    std_msg_ajax(
-#      method: 'DELETE'
-#      url: "/escalations/api/v1/escalations/file_rep/amp_naming_convention/" + id
-#      data: {}
-#      success: (response) ->
-#        $(deleted_row).remove()
-#        std_msg_success('AMP Naming Convention Below Has Been Deleted.', [pattern], reload: false)
-#      error: (response) ->
-#        std_msg_error('Error Deleting ' + pattern, [response.responseText], reload: false)
-#    )
+      # Next, build the array of ID's to pass to back-end for bulk delete
+      delete_id_array =
+        $('.delete-pattern').each (index, element) ->
+          if (index == ($('.delete-pattern').length - 1))
+            delete_id_list += $(this).attr('data-delete-id')
+          else
+            delete_id_list += $(this).attr('data-delete-id') + ','
 
+      # marlin: below is the array of integers (ID's) to batch-delete, re-assign to me after you're done and I'll finish this JS
+      delete_id_array = delete_id_list.split(',')
 
-  # delete an unsaved naming convention
-  window.delete_unsaved_convention = (id) ->
-    deleted_row = 'tr[data-unsaved-id=' + id + ']'
-    $(deleted_row).addClass('hidden')
-
+  #    marlin: below is the logic that you or I can change after delete_batch changes made on back-end, let me know
+  #    std_msg_ajax(
+  #      method: 'DELETE'
+  #      url: "/escalations/api/v1/escalations/file_rep/amp_naming_convention/" + id
+  #      data: {}
+  #      success: (response) ->
+  #        $(delete_row).remove()
+  #        std_msg_success('AMP Naming Convention Below Has Been Deleted.', [pattern], reload: false)
+  #      error: (response) ->
+  #        std_msg_error('Error Deleting ' + pattern, [response.responseText], reload: false)
+  #    )
 
 
   window.create_amp_naming_conventions = ([data]) ->
