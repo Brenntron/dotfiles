@@ -2,7 +2,7 @@
   Escalations - File Reputation - Analyst Console
 
 - content_for(:nav_banner) do
-  .nav-tool-blocks.nav-page-button-wrapper.col-xs-3.col-sm-2.col-lg-1
+  .nav-tool-blocks.nav-page-button-wrapper.col-xs-3.col-sm-2.col-lg-2
     %a#queue.nav-page-button{href: '/escalations/file_rep/disputes', class: ('active' if current_page?('/escalations/file_rep/disputes'))}
       %span.nav-toolbar-icon-large.icon-queue
 
@@ -82,7 +82,7 @@
 
 
 
-  .nav-tool-blocks.col-xs-3.col-sm-3.col-md-3.col-lg-5.search-wrapper
+  .nav-tool-blocks.col-xs-3.col-sm-3.col-md-3.col-lg-4.search-wrapper
     .input-group.search-group#file-rep-search
       = form_tag('/tickets', method: :get, onsubmit: 'build_contains_search();return false;') do
         = text_field_tag 'case[id]', "#{}", class: 'search-box'
