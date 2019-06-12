@@ -1,8 +1,8 @@
 .content-wrapper
   .row
     .col-xs-6.button-row-left.amp-edit-buttons
-      -# If user has role to edit AMP Naming Conventions, show this button
       %h1 AMP Naming Conventions Details
+      -# TODO If user has role to edit AMP Naming Conventions, show this button
       %button.primary.edit-button#amp-edit-button{onclick: 'edit_amp_naming_conventions();'} Edit AMP Naming Conventions
       .active-editing-buttons
         %button.primary.save-button#amp-save-button{onclick: 'save_amp_naming_conventions();'} Save Changes
@@ -11,10 +11,8 @@
 
     .col-xs-6
       %span.delete-patterns-area.hidden
-        .panel.panel-default
-          .panel-heading
-            Conventions to be deleted:
-          .panel-body.delete-patterns-queue
+        STAGED FOR DELETION:
+        .delete-patterns-queue
 
   .row
     .col-xs-12
@@ -30,7 +28,6 @@
             %th Point of Contact
         %tbody
           - @conventions.each do |convention|
-            -# Hard coding this temporarily. Need to convert to database and actual data
             %tr.amp-naming-row{'data-sort-sequence': "#{convention.table_sequence}", 'data-id': "#{convention.id}"}
               %td.amp-pattern
                 %span.table-content

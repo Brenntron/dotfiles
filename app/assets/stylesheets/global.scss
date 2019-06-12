@@ -9592,17 +9592,27 @@ table.rl-content {
 
 .delete-patterns-area {
   font-size: 11px;
-  .panel {
-    margin-top: 10px;
-    margin-right: 10px;
-    word-wrap: break-word;
-    line-height: 22px;
-  }
-  .panel-heading {
-    padding-top: 12px;
-    font-size: 12px;
-    font-weight: bold;
-  }
+  font-weight: 600;
+  color: $warning-accent-color;
+  display: block;
+  margin-top: 70px;
+}
+
+.delete-patterns-area::before {
+  display: block;
+  float: left;
+  content: '';
+  margin-right: 2px;
+  width: 20px;
+  height: 20px;
+  background-repeat: no-repeat;
+  background-image: url(image_path('icon_delete_orange.svg'));
+}
+
+.delete-patterns-queue {
+  display: inline-block;
+  margin-left: 8px;
+  margin-top: 4px;
 }
 
 .delete-pattern {
@@ -9612,4 +9622,5 @@ table.rl-content {
   padding: 4px;
   background: darken($content-bg-color, 5%);
   margin-right: 5px;
+  color: $type-base-color;
 }
