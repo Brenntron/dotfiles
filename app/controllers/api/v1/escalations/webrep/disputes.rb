@@ -825,6 +825,31 @@ module API
               render json: {assignees: assignees}
             end
 
+            ## for bulk lookup
+
+            desc 'super simple endpoint for bulk lookup to consume'
+            params do
+              requires :uri, type: String
+            end
+
+            get 'wbrs_info' do
+              data = {}
+              data[:score] = nil
+              data[:rulehits] = []
+
+              url_to_test = permitted_params[:uri]
+
+              begin
+                results = Sbrs::ManualSbrs.call_wbrs({'url' => url_to_test}, 'wbrs')
+                data[:score] = results["wbrs"]["score"]
+                data[:rulehits] = Sbrs::ManualSbrs.get_rule_names_from_rulehits(results)
+                render json: {:status => "success", :data => data}
+              rescue
+                render json: {:status => "error", :data => data}
+              end
+
+            end
+
           end
         end
       end

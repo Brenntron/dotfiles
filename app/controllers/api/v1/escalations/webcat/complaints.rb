@@ -271,6 +271,24 @@ module API
               end
             end
 
+            params do
+              requires :uri, type: String
+            end
+
+            get 'uri_cat_info' do
+              data = {}
+
+              uri = permitted_params[:uri]
+              begin
+                data = ComplaintEntry.current_category_data_for_uri(uri)
+                return {:status => 'success', :data => data}.to_json
+              rescue
+                return {:status => 'error', :data => data}.to_json
+              end
+
+
+            end
+
           end
         end
       end
