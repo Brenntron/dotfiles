@@ -10,6 +10,7 @@ FactoryBot.define do
     status                { FileReputationDispute::STATUS_NEW }
     sha256_hash           { 'efb947a43bfe6d0812d105f6afdeb9774f4d79254dd48f89f1e95ffdf8732928' }
     disposition_suggested {'Malicious'}
+    user_id               {User.vrtincoming.id}
   end
 
   trait :resolved do
