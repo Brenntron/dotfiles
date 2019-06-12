@@ -263,6 +263,34 @@ $ ->
     if rows_to_update.length > 0
       window.update_amp_naming_conventions([rows_to_update])
 
+    # Bulk delete on save, are records ready for deletion? then pass id's array to back-end
+    if $('.delete-pattern').length > 0
+      delete_id_array = []
+      delete_id_list = ''
+      delete_pattern_list = ''
+
+      $('.delete-pattern').each (index, element) ->
+        if (index == ($('.delete-pattern').length - 1))
+          delete_pattern_list += '"' + $(this).text() + '"'
+          delete_id_list += $(this).attr('data-delete-id')
+        else
+          delete_pattern_list += '"' + $(this).text() + '", '
+          delete_id_list += $(this).attr('data-delete-id') + ','
+
+      $('.delete-patterns-area').addClass('hidden').empty()
+      delete_id_array = delete_id_list.split(',')
+
+      # Delete ajax call
+      std_msg_ajax(
+        method: 'DELETE'
+        url: "/escalations/api/v1/escalations/file_rep/amp_naming_convention"
+        data: { 'ids': delete_id_array }
+        success: (response) ->
+          std_msg_success('AMP Naming Convention(s) Below Has Been Deleted.', [delete_pattern_list], reload: false)
+        error: (response) ->
+          std_msg_error('Error Deleting ' + delete_pattern_list, [response.responseText], reload: false)
+      )
+
 
   # Delete one or more naming conventions
   window.delete_amp_naming_convention = (id, pattern) ->
@@ -286,27 +314,6 @@ $ ->
       delete_pattern_html = '<span class="delete-pattern" data-delete-id="' + id + '">' + pattern + '</span>'
       $('.delete-patterns-queue').append(delete_pattern_html)
 
-      # Next, build the array of ID's to pass to back-end for bulk delete
-      delete_id_array =
-        $('.delete-pattern').each (index, element) ->
-          if (index == ($('.delete-pattern').length - 1))
-            delete_id_list += $(this).attr('data-delete-id')
-          else
-            delete_id_list += $(this).attr('data-delete-id') + ','
-
-      # marlin: below is the array of integers (ID's) to batch-delete, re-assign to me after you're done and I'll finish this JS
-      delete_id_array = delete_id_list.split(',')
-
-      std_msg_ajax(
-        method: 'DELETE'
-        url: "/escalations/api/v1/escalations/file_rep/amp_naming_convention"
-        data: { 'ids': delete_id_array }
-        success: (response) ->
-          $(delete_row).remove()
-          std_msg_success('AMP Naming Convention Below Has Been Deleted.', [pattern], reload: false)
-        error: (response) ->
-          std_msg_error('Error Deleting ' + pattern, [response.responseText], reload: false)
-      )
 
 
   window.create_amp_naming_conventions = ([data]) ->
