@@ -77,12 +77,10 @@ class Ability
       can [:create, :update, :read], [FileReputationDispute, DisputeEmail]
       can [:manage], [FileRepComment]
       can :take, FileReputationDispute do |filerep_dispute|
-        [FileReputationDispute::STATUS_NEW, FileReputationDispute::STATUS_REOPENED].include?(filerep_dispute.status) && filerep_dispute&.assigned&.cvs_username == 'vrtincom'
+        filerep_dispute.user_id == User.vrtincoming.id
       end
 
-      can :change_assignee, FileReputationDispute do |filerep_dispute|
-        [FileReputationDispute::STATUS_NEW, FileReputationDispute::STATUS_REOPENED].include?(filerep_dispute.status)
-      end
+      can :change_assignee, FileReputationDispute
     end
 
     if role_names.include?('filerep user')
@@ -90,12 +88,7 @@ class Ability
       can [:delete], [FileRepComment]
 
       can :take, FileReputationDispute do |filerep_dispute|
-        [FileReputationDispute::STATUS_NEW, FileReputationDispute::STATUS_REOPENED].include?(filerep_dispute.status) &&
-            filerep_dispute.user_id == User.vrtincoming.id
-      end
-
-      can :change_assignee, FileReputationDispute do |filerep_dispute|
-        [FileReputationDispute::STATUS_NEW, FileReputationDispute::STATUS_REOPENED].include?(filerep_dispute.status)
+        filerep_dispute.user_id == User.vrtincoming.id
       end
     end
 

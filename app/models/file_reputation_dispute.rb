@@ -622,7 +622,7 @@ class FileReputationDispute < ApplicationRecord
     user_id = user.kind_of?(User) ? user.id : user
 
     FileReputationDispute.transaction do
-      disputes = FileReputationDispute.where(id: dispute_ids, status: [FileReputationDispute::STATUS_NEW, FileReputationDispute::STATUS_REOPENED])
+      disputes = FileReputationDispute.where(id: dispute_ids)
       disputes_ary = disputes.all.to_a
 
       disputes.update_all(user_id: user_id, status: FileReputationDispute::STATUS_ASSIGNED)
