@@ -59,6 +59,11 @@ $ ->
 
 
   window.cancel_amp_naming_conventions = () ->
+    # on cancel, restore the ready-to-delete rows
+    $('#amp-naming-details-table').find('.hidden').removeClass('hidden')
+    $('.delete-patterns-area').addClass('hidden')
+    $('.delete-patterns-queue').empty()
+
     # Delete any new rows that were not saved
     rows = $('#amp-naming-details-table tbody').find('tr')
     $(rows).each ->
@@ -114,7 +119,7 @@ $ ->
     number_of_rows = $('#amp-naming-details-table tbody').find('tr').length
     new_sequence_number = number_of_rows + 1
     new_row =
-      '<tr data-sort-sequence="' + new_sequence_number + '" data-id="">' +
+      '<tr class="amp-naming-row" data-sort-sequence="' + new_sequence_number + '" data-id="" data-unsaved-id="' + new_sequence_number + '">' +
       '<td class="amp-pattern">' +
       '<span class="table-content"><span class="table-code"></span></span>' +
       '<span class="table-form-content"><input type="text"></input></span>' +
@@ -142,6 +147,7 @@ $ ->
       '<td class="amp-contact">' +
       '<span class="table-content"></span>' +
       '<span class="table-form-content"><textarea></textarea></span>' +
+      '<span class="delete-button" onclick="delete_amp_naming_convention(' + new_sequence_number + ', \'\')"></span>' +
       '</td>' +
       '</tr>'
 
@@ -257,17 +263,57 @@ $ ->
     if rows_to_update.length > 0
       window.update_amp_naming_conventions([rows_to_update])
 
+    # Bulk delete on save, are records ready for deletion? then pass id's array to back-end
+    if $('.delete-pattern').length > 0
+      delete_id_array = []
+      delete_id_list = ''
+      delete_pattern_list = ''
 
+      $('.delete-pattern').each (index, element) ->
+        if (index == ($('.delete-pattern').length - 1))
+          delete_pattern_list += '"' + $(this).text() + '"'
+          delete_id_list += $(this).attr('data-delete-id')
+        else
+          delete_pattern_list += '"' + $(this).text() + '", '
+          delete_id_list += $(this).attr('data-delete-id') + ','
+
+      $('.delete-patterns-area').addClass('hidden').empty()
+      delete_id_array = delete_id_list.split(',')
+
+      # Delete ajax call
+      std_msg_ajax(
+        method: 'DELETE'
+        url: "/escalations/api/v1/escalations/file_rep/amp_naming_convention"
+        data: { 'ids': delete_id_array }
+        success: (response) ->
+          std_msg_success('AMP Naming Convention(s) Below Has Been Deleted.', [delete_pattern_list], reload: false)
+        error: (response) ->
+          std_msg_error('Error Deleting ' + delete_pattern_list, [response.responseText], reload: false)
+      )
+
+
+  # Delete one or more naming conventions
   window.delete_amp_naming_convention = (id, pattern) ->
-    std_msg_ajax(
-      method: 'DELETE'
-      url: "/escalations/api/v1/escalations/file_rep/amp_naming_convention/" + id
-      data: {}
-      success: (response) ->
-        std_msg_success('AMP Naming Convention Below Has Been Deleted.', [pattern], reload: false)
-      error: (response) ->
-        std_msg_error('Error Deleting ' + pattern, [response.responseText], reload: false)
-    )
+    delete_id_array = []
+    delete_id_list = ''
+
+    # Hide the row that was deleted
+    delete_row = 'tr[data-id=' + id + ']'
+    $(delete_row).addClass('hidden')
+
+    # If unsaved row, store this id for logic below
+    unsaved_id = $('tr[data-unsaved-id=' + id + ']').attr('data-unsaved-id')
+
+    # If this is a new and unsaved row, just remove it from page
+    if unsaved_id != undefined
+      delete_row = 'tr[data-unsaved-id=' + id + ']'
+      $(delete_row).addClass('hidden')
+    else
+      $('.delete-patterns-area').removeClass('hidden')
+
+      delete_pattern_html = '<span class="delete-pattern" data-delete-id="' + id + '">' + pattern + '</span>'
+      $('.delete-patterns-queue').append(delete_pattern_html)
+
 
 
   window.create_amp_naming_conventions = ([data]) ->
