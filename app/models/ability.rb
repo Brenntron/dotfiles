@@ -80,6 +80,10 @@ class Ability
         filerep_dispute.user_id == User.vrtincoming.id
       end
 
+      can :return, FileReputationDispute do |filerep_dispute|
+        filerep_dispute.user_id == current_user.id
+      end
+
       can :change_assignee, FileReputationDispute
     end
 
@@ -89,6 +93,10 @@ class Ability
 
       can :take, FileReputationDispute do |filerep_dispute|
         filerep_dispute.user_id == User.vrtincoming.id
+      end
+
+      can :return, FileReputationDispute do |filerep_dispute|
+        filerep_dispute.user_id == current_user.id
       end
     end
 
