@@ -56,11 +56,12 @@ class TiApi::AmpNamingPattern < TiApi::Base
     self.class.call_request(:put, 'api/v1/amp_naming_patterns', input: input)
   end
 
-  def self.delete_on_ti!(position)
+  def self.delete_on_ti!(positions)
     input_here = {
         ticode: Rails.configuration.talos_intelligence.api_key,
+        positions: positions.join(',')
     }
-    call_request(:delete, "api/v1/amp_naming_patterns/#{position}", input: input_here, request_type: :query_string)
+    call_request(:delete, "api/v1/amp_naming_patterns", input: input_here, request_type: :query_string)
     return true
 
   # If you are trying to delete and it's not there, then joy!

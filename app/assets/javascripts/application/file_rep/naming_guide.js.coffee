@@ -297,17 +297,16 @@ $ ->
       # marlin: below is the array of integers (ID's) to batch-delete, re-assign to me after you're done and I'll finish this JS
       delete_id_array = delete_id_list.split(',')
 
-  #    marlin: below is the logic that you or I can change after delete_batch changes made on back-end, let me know
-  #    std_msg_ajax(
-  #      method: 'DELETE'
-  #      url: "/escalations/api/v1/escalations/file_rep/amp_naming_convention/" + id
-  #      data: {}
-  #      success: (response) ->
-  #        $(delete_row).remove()
-  #        std_msg_success('AMP Naming Convention Below Has Been Deleted.', [pattern], reload: false)
-  #      error: (response) ->
-  #        std_msg_error('Error Deleting ' + pattern, [response.responseText], reload: false)
-  #    )
+      std_msg_ajax(
+        method: 'DELETE'
+        url: "/escalations/api/v1/escalations/file_rep/amp_naming_convention"
+        data: { 'ids': delete_id_array }
+        success: (response) ->
+          $(delete_row).remove()
+          std_msg_success('AMP Naming Convention Below Has Been Deleted.', [pattern], reload: false)
+        error: (response) ->
+          std_msg_error('Error Deleting ' + pattern, [response.responseText], reload: false)
+      )
 
 
   window.create_amp_naming_conventions = ([data]) ->
