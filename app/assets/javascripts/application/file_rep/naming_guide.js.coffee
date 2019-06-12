@@ -286,6 +286,7 @@ $ ->
       success: (response) ->
         std_msg_success('The Following AMP Naming Conventions Have Been Created:', [response_data], reload: false)
       error: (response) ->
+        # TODO: remove those rows from the table because we have a fail
         std_msg_error('Error Creating AMP Naming Conventions', [response.responseText], reload: false)
     )
 
@@ -306,6 +307,7 @@ $ ->
       success: (response) ->
         std_msg_success('The Following AMP Naming Conventions Have Been Updated:', [response_data], reload: false)
       error: (response) ->
+        # TODO: remove those rows from the table because we have a fail
         std_msg_error('Error Updating AMP Naming Conventions', [response.responseText], reload: false)
     )
 
