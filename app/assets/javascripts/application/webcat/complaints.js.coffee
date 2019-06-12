@@ -305,8 +305,12 @@ window.updatePending = (id,row_id) ->
       notice_html = "<p>Something went wrong: #{response.responseText}</p>"
   , this)
 
+
+## Called when user submits categories / information to close a ticket
 window.updateEntryColumns = (entry_id,row_id) ->
-  $("#submit_changes_#{entry_id}").prop("disabled",true)
+  $("#submit_changes_#{entry_id}").addClass('hidden')
+  $("#reopen_#{entry_id}").removeClass('hidden')
+
   prefix = $('#complaint_prefix_'+entry_id)[0].value
   categories = $('#input_cat_'+entry_id).val().toString()
   category_name = $('#input_cat_' + entry_id).next('.selectize-control').find('.item')
@@ -322,7 +326,8 @@ window.updateEntryColumns = (entry_id,row_id) ->
   unchanged = $("#unchanged#{entry_id}").is(':checked')
   if categories.length == 0 && status != 'INVALID' && unchanged == false
     std_msg_error("Must include at least one category.","", reload: false)
-    $("#submit_changes_#{entry_id}").prop("disabled",false)
+    $("#submit_changes_#{entry_id}").removeClass('hidden')
+    $("#reopen_#{entry_id}").addClass('hidden')
   else
     std_msg_ajax(
       url: '/escalations/api/v1/escalations/webcat/complaint_entries/update'
@@ -348,16 +353,7 @@ window.updateEntryColumns = (entry_id,row_id) ->
           temp_row.invalidate().page(table_page).draw(false)
           temp_row.child().remove()
           temp_row.child(format(temp_row)).show()
-          $('#input_cat_'+ temp_row.data().entry_id).selectize {
-            persist: false,
-            create: false,
-            maxItems: 5
-            valueField: 'category_id',
-            labelField: 'category_name',
-            searchField: ['category_name', 'category_code'],
-            options: AC.WebCat.createSelectOptions()
-            items: selected_options(temp_row.data().category_names)
-          }
+
           $('#input_cat_pending'+ temp_row.data().entry_id).selectize {
             persist: false,
             create: false,
@@ -368,6 +364,32 @@ window.updateEntryColumns = (entry_id,row_id) ->
             options: AC.WebCat.createSelectOptions()
             items: selected_options(temp_row.data().category_names)
           }
+          unless status == 'COMPLETED'
+            $('#input_cat_'+ temp_row.data().entry_id).selectize {
+              persist: false,
+              create: false,
+              maxItems: 5
+              valueField: 'category_id',
+              labelField: 'category_name',
+              searchField: ['category_name', 'category_code'],
+              options: AC.WebCat.createSelectOptions()
+              items: selected_options(temp_row.data().category_names)
+            }
+          else
+            # For entries that are 'Completed', we need to initialize the selectize function
+            # and then disable it
+            $completed_selectize = $('#input_cat_'+ temp_row.data().entry_id).selectize {
+              persist: false,
+              create: false,
+              maxItems: 5
+              valueField: 'category_id',
+              labelField: 'category_name',
+              searchField: ['category_name', 'category_code'],
+              options: AC.WebCat.createSelectOptions()
+              items: selected_options(temp_row.data().category_names)
+            }
+            select_complete = $completed_selectize[0].selectize
+            select_complete.disable()
 
           $("#complaint_prefix_#{entry_id}").val(uri)
           $("#domain_#{entry_id}").text(domain)
@@ -382,9 +404,47 @@ window.updateEntryColumns = (entry_id,row_id) ->
             td.classList.add('nested-complaint-data-wrapper')
 
       error: (response) ->
-        $("#submit_changes_#{entry_id}").prop("disabled",false)
+        $("#submit_changes_#{entry_id}").removeClass('hidden')
+        $("#reopen_#{entry_id}").addClass('hidden')
         std_msg_error(response,"", reload: false)
     , this)
+
+
+## Allows analyst to set ticket status to reopened and allows them to interact with the submission form
+window.reopenComplaint = (entry_id, button) ->
+  $('#loader-modal').modal({
+    keyboard: false
+  })
+  # Getting all the fields that need to be interactive if reopened
+  # Changing these on the fly so the full page doesn't need to be reloaded
+  editable_stuff = $(button).parents('.nested-complaint-editable-data')[0]
+  inputs = $(editable_stuff).find('.nested-table-input')
+  radios = $(editable_stuff).find('.resolution_radio_button')
+  wrapper = $(button).parents('.nested-complaint-data-wrapper')[0]
+  nested_row = $(wrapper).parents('tr')[0]
+  parent_row = $(nested_row).prev()
+  status_col = $(parent_row).find('.state-col')
+
+  std_msg_ajax(
+    url: '/escalations/api/v1/escalations/webcat/complaint_entries/reopen_complaint_entry'
+    method: 'POST'
+    data: {'complaint_entry_id': entry_id}
+    success: (response) ->
+      $('#loader-modal').modal 'hide'
+      $(inputs).each ->
+        $(this).prop('disabled', false)
+      $(radios).each ->
+        $(this).prop('disabled', false)
+      select_input =   $('#input_cat_' + entry_id)[0].selectize
+      select_input.enable()
+      $("#reopen_" + entry_id).addClass('hidden')
+      $("#submit_changes_" + entry_id).removeClass('hidden')
+      $(status_col).text('REOPENED')
+
+    error: (response) ->
+      std_msg_error(response,"", reload: false)
+  )
+
 
 
 window.take_selected = ()->
@@ -675,8 +735,15 @@ format = (complaint_entry_row) ->
     uri = missing_data
 
   entry_status = ""
+  reopen_class = "hidden"
+  submit_class = ""
+  status_class = ""
+  # Disabling all interactive elements if entry is 'Completed'
   if complaint_entry.status == "COMPLETED"
     entry_status = "disabled='true'"
+    reopen_class = ""
+    submit_class = "hidden"
+    status_class = "completed"
   wbrs_score = ''
   if complaint_entry.wbrs_score
     wbrs_score = complaint_entry.wbrs_score
@@ -749,6 +816,7 @@ format = (complaint_entry_row) ->
   tooltip_table_end = '</tbody></table>'
   tooltip_wrapper_end = '</span></div>'
 
+
   std_msg_ajax(
     method: 'POST'
     url: '/escalations/api/v1/escalations/webcat/complaint_entries/retrieve_current_categories'
@@ -808,7 +876,9 @@ format = (complaint_entry_row) ->
     complaint_submission_html =
         '<input type="radio" name="resolution_review_' + complaint_entry.entry_id + '" value="commit" > Commit <br/>' +
         '<input type="radio" name="resolution_review_' + complaint_entry.entry_id + '" value="decline" checked="checked"> Decline' +
-        '<br/><button class="tertiary" onclick="updatePending(' + complaint_entry.entry_id + ',' + row_id + ')"> Submit </button></div>'
+        '<br/>' +
+        '<button class="tertiary" onclick="updatePending(' + complaint_entry.entry_id + ',' + row_id + ')"> Submit </button>' +
+        '</div>'
   else
     complaint_table_row_html = '<table class="active_table"><tr class="active_master_submit" type="submit_changes" entry_id="' + complaint_entry.entry_id + '"  row_id = "' + row_id + '"><td class="no_pad"><div class="row">'
     complaint_submission_html =
@@ -816,7 +886,8 @@ format = (complaint_entry_row) ->
         '<input type="radio" class="resolution_radio_button" id="fixed' + complaint_entry.entry_id + '" name="resolution' + complaint_entry.entry_id + '" value="FIXED"  ' + fixed_radio + entry_status + '> Fixed  <br/> ' +
         '<input type="radio" class="resolution_radio_button" id="invalid' + complaint_entry.entry_id + '" name="resolution' + complaint_entry.entry_id + '" value="INVALID" ' + invalid_radio + entry_status + '> Invalid' +
         '<br/>' +
-        '<button class="tertiary submit_changes" id="submit_changes_' + complaint_entry.entry_id + '" onclick="updateEntryColumns(' + complaint_entry.entry_id + ',' + row_id + ')" ' + entry_status + '>Submit Changes</button>' +
+        '<button class="tertiary submit_changes ' + submit_class + '" id="submit_changes_' + complaint_entry.entry_id + '" onclick="updateEntryColumns(' + complaint_entry.entry_id + ',' + row_id + ')">Submit Changes</button>' +
+        '<button class="tertiary ' + reopen_class + '" id="reopen_' + complaint_entry.entry_id + '" onclick="reopenComplaint(' + complaint_entry.entry_id + ', this)">Reopen Complaint</button>' +
         '</div>'
 
 
@@ -858,7 +929,7 @@ format = (complaint_entry_row) ->
       '<button class="secondary inline-button" onclick="updateURI(event,' + complaint_entry.entry_id + ')">Update URI</button><br/>' +
       '<div class="complaint-selectize-col-wrapper">' +
       '<label class="content-label-sm">Edit Categories / Confidence Order</label>' +
-      '<fieldset id="'+input_cat+'" ' + entry_status + '  name="['+input_cat+'][]" class="selectize" placeholder="Enter up to 5 categories" value="" style="margin-bottom: 20px">' +
+      '<select id="'+input_cat+'" name="['+input_cat+'][]" class="' + status_class + '" placeholder="Enter up to 5 categories" value=""></select>' +
       '</div>' +
       '<div class="domain-categories" >' +
       '<label class="content-label-sm">Inherit Categories From Main Domain</label><br/>' +
@@ -892,7 +963,6 @@ window.history_dialog = (id, url) ->
         notice_html = "<p>Something went wrong: #{json.error}</p>"
         alert(json.error)
       else
-        ## Build the History Dialog
         history_dialog_content =
           '<div class="dialog-content-wrapper">' +
           '<h4>' + url + '</h4>' +
@@ -1166,24 +1236,42 @@ window.click_table_buttons = (complaint_table, button)->
     td = $(tr).next('tr').find('td:first')
     unless $(td).hasClass 'nested-complaint-data-wrapper'
       $(td).addClass 'nested-complaint-data-wrapper'
-    $('#input_cat_'+ row.data().entry_id).selectize {
-      persist: false,
-      create: false,
-      maxItems: 5,
-      valueField: 'category_id',
-      labelField: 'category_name',
-      searchField: ['category_name', 'category_code'],
-      options: AC.WebCat.createSelectOptions(),
-      items: selected_options(row.data().category),
-      onItemAdd: ->
-        if verifyMasterSubmit() == true
-          $('#master-submit').prop('disabled', false)
-      onItemRemove: ->
-        if verifyMasterSubmit() == true
-          $('#master-submit').prop('disabled', false)
-        else
-          $('#master-submit').prop('disabled', true)
-    }
+
+    cat_select = '#input_cat_'+ row.data().entry_id
+    unless $(cat_select).hasClass('completed')
+      $(cat_select).selectize {
+        persist: false,
+        create: false,
+        maxItems: 5,
+        valueField: 'category_id',
+        labelField: 'category_name',
+        searchField: ['category_name', 'category_code'],
+        options: AC.WebCat.createSelectOptions(),
+        items: selected_options(row.data().category),
+        onItemAdd: ->
+          if verifyMasterSubmit() == true
+            $('#master-submit').prop('disabled', false)
+        onItemRemove: ->
+          if verifyMasterSubmit() == true
+            $('#master-submit').prop('disabled', false)
+          else
+            $('#master-submit').prop('disabled', true)
+      }
+    else
+      # need to initialize the selectize function but disable it here if entry is completed
+      $completed_selectize = $(cat_select).selectize {
+        persist: false,
+        create: false,
+        maxItems: 5,
+        valueField: 'category_id',
+        labelField: 'category_name',
+        searchField: ['category_name', 'category_code'],
+        options: AC.WebCat.createSelectOptions(),
+        items: selected_options(row.data().category),
+      }
+      select_complete = $completed_selectize[0].selectize
+      select_complete.disable()
+
     # Check to see which columns should be displayed
     $('.toggle-vis-nested').each ->
       checkbox_trigger = $(button).attr('data-column')

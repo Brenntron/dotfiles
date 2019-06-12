@@ -607,6 +607,24 @@ module API
               {:status => "success", :data => formatted_data, :columns => columns}
             end
 
+            desc "Reopen a complaint entry"
+            params do
+              requires :complaint_entry_id, type: Integer
+            end
+
+            post 'reopen_complaint_entry' do
+              begin
+                entry = ComplaintEntry.where(:id => permitted_params[:complaint_entry_id]).first
+                if entry.reopen
+                  {:status => "success"}
+                else
+                  {:status => "error"}
+                end
+              rescue
+                {:status => "error"}
+              end
+            end
+
           end
         end
       end
