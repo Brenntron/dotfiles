@@ -246,7 +246,7 @@ $ ->
         $(i).closest('.form-group').addClass('hidden')
 
       if $(i).hasClass('ui-slider')
-        values = [ 25, 75 ]
+        values = [ 0, 100 ]
         $(i).slider({
           values: values
         })
@@ -347,7 +347,12 @@ $ ->
     data = {
       search_type: ''
       search_name: ''
+      selected_cases: []
     }
+
+    $('.dispute_check_box:checked').each ->
+      case_id =  $(this).attr('value')
+      data.selected_cases.push(case_id)
 
     if location.search != ''
 #      if the location.search has value, it is a standard search
@@ -859,7 +864,7 @@ $ ->
       range: true,
       min: 0,
       max: 100,
-      values: [ 25, 75 ]
+      values: [ 0, 100 ]
       create: (ui) ->
         values = $(this).slider("values")
 
@@ -887,7 +892,7 @@ $ ->
       range: true,
       min: 0,
       max: 100,
-      values: [ 25, 75 ]
+      values: [ 0, 100 ]
       create: (ui) ->
         values = $(this).slider("values")
 
@@ -917,6 +922,9 @@ $ ->
   $('#create-detection-dialog').dialog
     autoOpen: false,
     minWidth: 520,
+    minHeight: 560,
+    resizable: false,
+
     classes: {
       "ui-dialog": "form-dialog"
     },
@@ -980,6 +988,8 @@ $ ->
     else
       detection_array = {disposition: new_disp}
 
+    dispute_id = parseInt($('#dispute_id').text())
+    old_disposition = $('.disposition').text()
     comment = $('#new-amp-detection-comment').val()
 
     # Grab sha data
@@ -1017,8 +1027,12 @@ $ ->
       method: 'POST'
       data: {
         'sha256_hashes': sha256_hashes
+        'old_disposition': old_disposition
         'disposition': new_disp
         'detection_name': new_detection_name
+        'comment': comment
+        'dispute_id': dispute_id
+
       }
       success: (response) ->
         $('#create-detection-dialog').dialog('close')
@@ -1064,6 +1078,8 @@ $ ->
 
 
   $('.filerep-note-delete-button').on "click", ->
+    $('.confirm').show()
+
     comment_id = $(this).attr('comment_id')
     current_user_id = $('input[name="current_user_id"]').val()
 
@@ -1076,7 +1092,8 @@ $ ->
         data: {current_user_id: current_user_id}
         success_reload: true
         error: (response) ->
-          std_api_error(response, "Note could not be deleted.", reload: false)
+          std_msg_error("Note could not be deleted", [response.responseJSON.message], reload: false)
+          $('.confirm').hide()
       )
 
   # Editing a Note
@@ -1098,6 +1115,42 @@ $ ->
 
 
   $(document).ready ->
+
+    $('select[name="file-rep-datatable_length"]').on "change", ->
+      data = {}
+      data['entriesperpage'] = $('select[name="file-rep-datatable_length"]').val()
+      std_msg_ajax(
+        url: "/escalations/api/v1/escalations/user_preferences/update"
+        method: 'POST'
+        data: {data, name: 'FileRepEntriesPerPage'}
+        dataType: 'json'
+        success: (response) ->
+      )
+
+    $('#file-rep-datatable_paginate').on "click", ->
+      data = {}
+      data['currentpage'] = $('#file-rep-datatable').DataTable().page()
+      std_msg_ajax(
+        url: "/escalations/api/v1/escalations/user_preferences/update"
+        method: 'POST'
+        data: {data, name: 'FileRepCurrentPage'}
+        dataType: 'json'
+        success: (response) ->
+      )
+
+    $('#file-rep-datatable th').on "click", ->
+      setTimeout (-> # Wait until after the sorting event is finished before saving the result
+        data = {}
+        data['sortorder'] = $('#file-rep-datatable').DataTable().order()
+        std_msg_ajax(
+          url: "/escalations/api/v1/escalations/user_preferences/update"
+          method: 'POST'
+          data: {data, name: 'FileRepSortOrder'}
+          dataType: 'json'
+          success: (response) ->
+        )
+      ), 100
+
 
     $('.toggle-vis-file-rep').on "click", ->
       data = {}
@@ -1148,3 +1201,34 @@ $ ->
               $('#file-rep-datatable').DataTable().column("##{column}").visible false
 
       )
+
+      std_msg_ajax(
+        method: 'POST'
+        url: "/escalations/api/v1/escalations/user_preferences/"
+        data: {name: 'FileRepSortOrder'}
+        success: (response) ->
+          response = JSON.parse(response)
+          $('#file-rep-datatable').DataTable().order(response.sortorder).draw()
+      )
+
+      std_msg_ajax(
+        method: 'POST'
+        url: "/escalations/api/v1/escalations/user_preferences/"
+        data: {name: 'FileRepCurrentPage'}
+        success: (response) ->
+          response = JSON.parse(response)
+          $('#file-rep-datatable').DataTable().page(response.currentpage).draw('page')
+      )
+
+      std_msg_ajax(
+        method: 'POST'
+        url: "/escalations/api/v1/escalations/user_preferences/"
+        data: {name: 'FileRepEntriesPerPage'}
+        success: (response) ->
+          response = JSON.parse(response)
+          $('#file-rep-datatable').DataTable().page.len(response.entriesperpage).draw('page')
+      )
+
+
+
+

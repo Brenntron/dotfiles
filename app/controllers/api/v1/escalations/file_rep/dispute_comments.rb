@@ -58,35 +58,26 @@ module API
               end
             end
 
-
-
-
-
-
-
             desc "delete a dispute comment"
             params do
               requires :id, type: Integer, desc: "The dispute comment's id in the database."
               requires :current_user_id, type: Integer, desc: "The id of the current user."
             end
 
+
             delete ":id", root: "dispute_comment" do
-              authorize!(:delete, FileRepComment)
-              @dispute_comment = FileRepComment.find(permitted_params[:id])
-              if @dispute_comment.user.id == permitted_params[:current_user_id]
-                @dispute_comment.destroy
-              else
-                raise 'Unable to delete a note written by another user.'
+              std_api_v2 do
+                authorize!(:delete, FileRepComment)
+                @dispute_comment = FileRepComment.find(permitted_params[:id])
+                filerep_manager = Role.where(role: 'filerep manager').first
+
+                if @dispute_comment.user.id == permitted_params[:current_user_id] || current_user.roles.include?(filerep_manager)
+                  @dispute_comment.destroy
+                else
+                  raise 'Unable to delete a note written by another user.'
+                end
               end
             end
-
-
-
-
-
-
-
-
 
           end
         end

@@ -11,28 +11,32 @@ class FileReputationDispute < ApplicationRecord
 
   delegate :name, :email, :company, :company_name, :company_id, to: :customer, allow_nil: true, prefix: true
 
-  STATUS_NEW                = 'NEW'
-  STATUS_ASSIGNED           = 'ASSIGNED'
-  STATUS_RESEARCHING        = 'RESEARCHING'
-  STATUS_ESCALATED          = 'ESCALATED'
-  STATUS_PENDING            = 'PENDING'
-  STATUS_ONHOLD             = 'ONHOLD'
-  STATUS_RESOLVED           = 'RESOLVED'
-  STATUS_REOPENED           = 'RE-OPENED'
-  STATUS_CUSTOMER_PENDING   = "CUSTOMER_PENDING"
-  STATUS_CUSTOMER_UPDATE    = "CUSTOMER_UPDATE"
+  STATUS_NEW                        = 'NEW'
+  STATUS_ASSIGNED                   = 'ASSIGNED'
+  STATUS_RESEARCHING                = 'RESEARCHING'
+  STATUS_ESCALATED                  = 'ESCALATED'
+  STATUS_PENDING                    = 'PENDING'
+  STATUS_ONHOLD                     = 'ONHOLD'
+  STATUS_RESOLVED                   = 'RESOLVED'
+  STATUS_REOPENED                   = 'RE-OPENED'
+  STATUS_CUSTOMER_PENDING           = "CUSTOMER_PENDING"
+  STATUS_CUSTOMER_UPDATE            = "CUSTOMER_UPDATE"
 
-  DISPOSITION_UNSEEN        = 'unseen'
-  DISPOSITION_UNKNOWN       = 'unknown'
-  DISPOSITION_MALICIOUS     = 'malicious'
-  DISPOSITION_COMMON        = 'common'
-  DISPOSITION_CLEAN         = 'clean'
+  DISPOSITION_UNSEEN                = 'unseen'
+  DISPOSITION_UNKNOWN               = 'unknown'
+  DISPOSITION_MALICIOUS             = 'malicious'
+  DISPOSITION_COMMON                = 'common'
+  DISPOSITION_CLEAN                 = 'clean'
 
-  SUBMITTER_TYPE_AC_FORM    = 'AC-Form'
-  SUBMITTER_TYPE_TI_FORM    = 'TI-Form'
-  SUBMITTER_TYPE_TI_API     = 'TI-API'
+  SUBMITTER_TYPE_AC_FORM            = 'AC-Form'
+  SUBMITTER_TYPE_TI_FORM            = 'TI-Form'
+  SUBMITTER_TYPE_TI_API             = 'TI-API'
+
+  RESOLUTION_AUTORESOLVED           = 'Auto Resolved'
+  RESOLUTION_AUTORESOLVED_COMMENT   = 'This ticket has been auto-resolved, suggested disposition and disposition already match.'
 
   validates :status, :sha256_hash, :disposition_suggested, presence: true
+  validates :sha256_hash, format: { with: /\A\h{64}\z/, message: "only 64 nibble (256 bit) hex code" }
 
   scope :by_customer, ->(customer_name: nil, customer_email: nil, company_name: nil) {
     result =
@@ -74,6 +78,14 @@ class FileReputationDispute < ApplicationRecord
 
   def suggested_malicious?
     self.disposition_suggested&.downcase == DISPOSITION_MALICIOUS.downcase
+  end
+
+  def clean?
+    self.disposition&.downcase == DISPOSITION_CLEAN.downcase
+  end
+
+  def suggested_clean?
+    self.disposition_suggested&.downcase == DISPOSITION_CLEAN.downcase
   end
 
   def update_status(status)
@@ -138,8 +150,9 @@ class FileReputationDispute < ApplicationRecord
     }
     file_rep.assign_attributes(attributes)
 
+    file_rep.update_scores
+
     if file_rep.save!
-      file_rep.update_scores
       file_rep
     else
       error_messages = file_rep.errors.full_messages.join('; ')
@@ -147,12 +160,10 @@ class FileReputationDispute < ApplicationRecord
     end
   end
 
-  def self.create_through_form(bugzilla_rest_session, sha256_hash, disposition_suggested, assignee, current_user)
-
+  def self.create_through_form(bugzilla_rest_session, sha256_hash, disposition_suggested, assignee_id)
     summary = "New File Rep Dispute generated at #{DateTime.now.utc.strftime("%Y-%m-%d %H:%M")}"
 
     full_description = %Q{
-          File name: N/A
           SHA256 hash: #{sha256_hash}
     }
 
@@ -174,10 +185,9 @@ class FileReputationDispute < ApplicationRecord
 
     attributes = {
         id: bug_proxy.id,
-        file_name: nil,
         sha256_hash: sha256_hash,
         disposition_suggested: disposition_suggested,
-        user_id: User.where(cvs_username: assignee).first.id,
+        user_id: assignee_id,
         submitter_type: SUBMITTER_TYPE_AC_FORM,
         customer_id: customer.id,
         status: STATUS_ASSIGNED
@@ -185,9 +195,18 @@ class FileReputationDispute < ApplicationRecord
 
     file_rep.assign_attributes(attributes)
 
+    file_rep.update_scores
+    file_rep.populate_fields_from_rl
+
+    # Check if the ticket can be resolved by matching suggested disposition and disposition (AMP)
+
+    file_rep.auto_resolve_on_matching_disposition
+
     if file_rep.save!
-      file_rep.update_scores
-      file_rep.populate_fields_from_rl
+      file_rep
+    else
+      error_messages = file_rep.errors.full_messages.join('; ')
+      render plain: "\"Error(s) creating file rep -- #{error_messages}\"", status: :internal_server_error
     end
   end
 
@@ -552,13 +571,38 @@ class FileReputationDispute < ApplicationRecord
       if FileReputationDispute.threaded?
         Thread.new do
           new_dispute.update_scores
+          new_dispute.auto_resolve_on_matching_disposition(from: 'TI')
         end
       else
         new_dispute.update_scores
+        new_dispute.auto_resolve_on_matching_disposition(from: 'TI')
       end
     end
 
     new_dispute
+  end
+
+  def auto_resolve_on_matching_disposition(from: 'ACE')
+      auto_resolved_boolean = false
+
+      if (self.clean? && self.suggested_clean?) || (self.malicious? && self.suggested_malicious?)
+        self.update(status: STATUS_RESOLVED, resolution: RESOLUTION_AUTORESOLVED, resolution_comment: RESOLUTION_AUTORESOLVED_COMMENT)
+
+        auto_resolved_boolean = true
+      end
+
+      if from == 'TI'
+        envelope = {}
+        envelope[:payload] = {}
+
+        envelope[:addressee_id] = self.id
+        envelope[:addressee_status] = self.status
+        envelope[:payload] = {resolution: self.resolution, resolution_comment: self.resolution_comment}
+
+        Bridge::FilerepAutoResolveEvent.new(envelope).post
+      end
+
+      auto_resolved_boolean
   end
 
   def self.take_tickets(dispute_ids, user:)
@@ -607,6 +651,10 @@ class FileReputationDispute < ApplicationRecord
                                       search_name: search_params['search_name'],
                                       params: search_params['search_conditions'],
                                       user: current_user)
+
+    if search_params['selected_cases'].length > 0
+      file_rep_disputes = file_rep_disputes.where(id: search_params['selected_cases'])
+    end
 
     workbook = RubyXL::Workbook.new
     worksheet = workbook[0]

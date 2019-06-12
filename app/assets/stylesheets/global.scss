@@ -8825,9 +8825,9 @@ button.secondary.view-report-external-button {
   }
 }
 
-//dbinebri: file rep - naming guide dialog specific styles here
-.escalations--file_rep--disputes-controller .ui-dialog[aria-describedby=dialog-naming-guide] {
-  margin-top: 60px;
+// dbinebri: wrapper for naming-guide-dialog, jquery generates this, leave this here
+.ui-dialog[aria-describedby=naming-guide-dialog] {
+  margin-top: 55px;
   margin-right: 20px;
   border-radius: 5px;
   border: 0;
@@ -8845,9 +8845,11 @@ button.secondary.view-report-external-button {
   }
 }
 
-#dialog-naming-guide {
+// dbinebri: file rep - naming guide dialog internal specific styles here
+#naming-guide-dialog {
   font-family: 'Open Sans', sans-serif;
   padding: 10px;
+
   table th {
     text-transform: uppercase;
     font-weight: bold;
@@ -8859,7 +8861,7 @@ button.secondary.view-report-external-button {
         background-position: center center;
         top: 10px;
         right: 10px;
-        color: #444;
+        color: darken($content-bg-color, 5%);
         font-weight: normal;
         font-size: 19px;
       }
@@ -8871,7 +8873,7 @@ button.secondary.view-report-external-button {
     font-size: 10px;
     color: darken($type-lighter-color, 5%);
 
-    // "pattern" column below needs special code formatting
+    // "pattern" column below needs special "code" formatting
     &:first-of-type {
       span {
         font-family: 'Fira Mono', monospace;
@@ -8898,8 +8900,10 @@ button.secondary.view-report-external-button {
       }
     }
   }
-
 }
+
+
+
 
 
 // dbinebri: the tooltips for modals on file rep get too wide, limit the max-width a little bit
@@ -8954,6 +8958,8 @@ button.secondary.view-report-external-button {
   color: $second-section-color;
   font-weight: 600;
   padding-left: 22px !important;
+  // dbinebri: ensure RL result data strings wrap correctly
+  word-break: break-all;
 }
 
 .scanner-mal::before {
@@ -9273,6 +9279,11 @@ div[aria-describedby='create-detection-dialog'] {
   }
 }
 
+// dbinebri: add file rep datatable bg color white in case all cols are showing
+#file-rep-datatable {
+  background-color: $content-bg-color;
+}
+
 // need a separate th class so the bg sort icon isn't affected by generic .text-center
 #file-rep-datatable_wrapper .th-center {
   text-align: center;
@@ -9466,4 +9477,33 @@ table.rl-content {
 // dbinebri: small tweak for copycat placeholder text
 .selectize-input #copycat-categories-selectized {
   font-size: 12px;
+}
+
+.error-label {
+  background-image: url(image_path('icon_error.svg'));
+  background-repeat: no-repeat;
+  background-position: left top;
+  background-size: 20px 20px;
+  padding-left: 24px;
+  font-size: 8pt;
+  color: $type-lighter-color;
+}
+
+.sha-msg {
+  color: $warning-accent-color;
+  font-family: 'Fira Mono', monospace;
+  font-size: 9pt;
+  font-weight: 400;
+  padding-left: 24px;
+  line-height: 1.4em;
+}
+
+#sha_errors_list {
+  margin-bottom: 20px;
+  display: block;
+
+}
+
+.rl-col {
+  text-align: center;
 }
