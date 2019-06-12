@@ -224,7 +224,9 @@ class FileReputationDispute < ApplicationRecord
 
     params.each do |field_name, value|
       case
-      when value.kind_of?(Hash)
+      when value.blank?
+        #do nothing
+      when value.kind_of?(Hash) || value.kind_of?(ActionController::Parameters)
         value.each do |sub_field_name, sub_value|
           named_search.named_search_criteria.create(field_name: "#{field_name}~#{sub_field_name}", value: sub_value)
         end
