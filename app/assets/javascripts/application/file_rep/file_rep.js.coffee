@@ -167,7 +167,6 @@ window.file_rep_show_take_dispute = (dispute_id) ->
       $("#dispute-assignee").text(response.username).removeClass('missing-data')
       $('#show-edit-ticket-status-button').text("ASSIGNED")
       $('.take-ticket-button').replaceWith("<button class='return-ticket-button' title='Return ticket to open queue' onclick='file_rep_show_return_dispute(#{dispute_id});'></button>")
-      $('#index_change_assign').replaceWith("<span id='replace-button'>")
   )
 
 window.file_rep_show_return_dispute = (dispute_id) ->
