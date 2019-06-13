@@ -74,6 +74,9 @@ $ ->
         $('#loader-modal').modal 'hide'
         $('.modal-backdrop').hide()
         std_msg_success('File Reputation Ticket created.', [], reload: true)
+
+        # Add code here for handling duplicates/unique variables from JSON
+
       error: (response) ->
         $('#loader-modal').modal 'hide'
         $('.modal-backdrop').hide()
