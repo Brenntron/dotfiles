@@ -184,6 +184,7 @@
           .top-info-data.detection-last-updated
           %label.content-label-sm AMP Detection - Date Last Pulled
           .top-info-data.detection-last-pulled
+            = @file_rep_dispute.last_fetched.utc.strftime("%b %e, %Y %l:%M %p")
 
           %label.content-label-sm In Sample Zoo
           - if @file_rep_dispute.in_zoo == true
