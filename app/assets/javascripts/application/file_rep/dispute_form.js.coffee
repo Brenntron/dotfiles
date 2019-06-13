@@ -77,7 +77,9 @@ $ ->
       error: (response) ->
         $('#loader-modal').modal 'hide'
         $('.modal-backdrop').hide()
-        std_msg_error('Unable to create File Reputation Ticket', [response.responseJSON.message], reload: false)
+        parsed_message = response.responseJSON.message.split('@newline')
+
+        std_msg_error('Unable to create File Reputation Ticket', parsed_message, reload: false)
     )
 
   validateSha = (sha) ->
