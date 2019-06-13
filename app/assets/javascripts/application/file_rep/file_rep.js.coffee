@@ -1052,10 +1052,8 @@ $ ->
 
           $('.amp-area .disposition').text(response.disposition)
           $('.amp-area .detection-name').text(response.detection_name)
-
-          # BACK-END TODO: we need TWO dates below, one for Last Updated and Last Pulled, need these from the back-end
-          $('.amp-area .detection-last-updated').html('')
-          $('.amp-area .detection-last-pulled').html('')
+          $('.amp-area .detection-last-updated').text(response.detection_last_set)
+          $('.amp-area .detection-last-pulled').text(response.last_fetched)
 
       error: () ->
         std_msg_error('Error with AMP', ['There was an error retrieving the AMP data.'])

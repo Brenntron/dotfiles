@@ -35,8 +35,8 @@ module API
             get ":sha256_hash/now" do
               std_api_v2 do
                 detection = FileReputationApi::Detection.get_bulk(params['sha256_hash'])
-                detection_last_set = FileReputationApi::ElasticSearch.query(params['256_hash'])
-                last_fetched = DateTime.now
+                detection_last_set = FileReputationApi::ElasticSearch.query(params['sha256_hash'])
+                last_fetched = Time.now.utc
 
                 begin
                   FileReputationDispute.where(sha256_hash: detection.sha256_hash)
@@ -49,7 +49,7 @@ module API
                 end
 
                 { detection_name: detection.name, disposition: detection.disposition, detection_last_set: detection_last_set,
-                  last_fetched: last_fetched}
+                  last_fetched: last_fetched.strftime("%b %e, %Y %l:%M %p")}
               end
             end
           end
