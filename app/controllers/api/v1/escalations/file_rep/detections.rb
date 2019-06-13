@@ -35,16 +35,21 @@ module API
             get ":sha256_hash/now" do
               std_api_v2 do
                 detection = FileReputationApi::Detection.get_bulk(params['sha256_hash'])
+                detection_last_set = FileReputationApi::ElasticSearch.query(params['256_hash'])
+                last_fetched = DateTime.now
 
                 begin
                   FileReputationDispute.where(sha256_hash: detection.sha256_hash)
                       .update_all(disposition: detection.disposition,
-                                  detection_name: detection.name)
+                                  detection_name: detection.name,
+                                  detection_last_set: detection_last_set,
+                                  last_fetched: last_fetched)
                 rescue
                   Rails.logger.error("Error saving updated detection information -- #{$!.message}")
                 end
 
-                { detection_name: detection.name, disposition: detection.disposition }
+                { detection_name: detection.name, disposition: detection.disposition, detection_last_set: detection_last_set,
+                  last_fetched: last_fetched}
               end
             end
           end
