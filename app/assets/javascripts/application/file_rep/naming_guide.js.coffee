@@ -280,7 +280,7 @@ $ ->
       $('.delete-patterns-area').addClass('hidden').empty()
       delete_id_array = delete_id_list.split(',')
 
-      # Delete ajax call
+      # Delete ajax call, only do a bulk delete on Save Changes.
       std_msg_ajax(
         method: 'DELETE'
         url: "/escalations/api/v1/escalations/file_rep/amp_naming_convention"
@@ -329,6 +329,8 @@ $ ->
       method: 'POST'
       url: "/escalations/api/v1/escalations/file_rep/amp_naming_convention"
       data: { patterns: data }
+      success_reload: true
+      error_reload: false
       success: (response) ->
         std_msg_success('The Following AMP Naming Conventions Have Been Created:', [response_data], reload: false)
       error: (response) ->
@@ -350,7 +352,7 @@ $ ->
       url: "/escalations/api/v1/escalations/file_rep/amp_naming_convention"
       data: { patterns: data }
       success: (response) ->
-        std_msg_success('The Following AMP Naming Conventions Have Been Updated:', [response_data], reload: false)
+        std_msg_success('The Following AMP Naming Conventions Have Been Updated:', [response_data], reload: true)
       error: (response) ->
         std_msg_error('Error Updating AMP Naming Conventions', [response.responseText], reload: false)
     )
