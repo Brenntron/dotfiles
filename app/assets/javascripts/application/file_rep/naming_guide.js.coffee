@@ -280,7 +280,7 @@ $ ->
       $('.delete-patterns-area').addClass('hidden').empty()
       delete_id_array = delete_id_list.split(',')
 
-      # Delete ajax call, only do a bulk delete on Save Changes.
+      # Delete ajax call
       std_msg_ajax(
         method: 'DELETE'
         url: "/escalations/api/v1/escalations/file_rep/amp_naming_convention"
