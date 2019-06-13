@@ -33,6 +33,12 @@ $ ->
 
   # Show editing buttons and make table rows movable (sortable)
   window.edit_amp_naming_conventions = () ->
+    i = 0
+    input_vals_array = []
+    input_vals_string = ''
+    input_new_entry = ''
+    my_var = ''
+
     $('#amp-edit-button').hide()
     $('.active-editing-buttons').show()
     window.get_original_sort_array()
@@ -46,16 +52,22 @@ $ ->
         return
     ).disableSelection()
 
-    # ON EDIT, get all the orig values for these inputs so we can revert if ajax error fail later
-    i = 0
-    my_array = []
-    my_string = ''
+    # on edit, save all the orig values for inputs + textareas to localStorage so we can revert if ajax error fail later
     $('#amp-naming-details-table :input').each ->
-      my_array.push $(this).val()
-      return
-    my_string = my_array.join()
-    localStorage.setItem 'my_inputs', my_string
-    console.log 'localstorage should now be set, check it...'
+      # TODO: IF THE TEXT FOR THIS INPUT IS A PATTERN, IT WILL NEED SPECIAL FORMATTING LATER
+      curr_class = $(this).attr('class')
+      if curr_class == 'code-input'
+        input_new_entry = 'pattern-' + $(this).val() + ", "
+      else
+        input_new_entry = $(this).val() + ", "
+
+      input_vals_array.push(input_new_entry)
+
+    input_vals_string = input_vals_array.join('')
+
+    console.log input_vals_string
+
+    localStorage.setItem('amp_input_values', input_vals_string)
 
 
 
@@ -357,28 +369,51 @@ $ ->
     else
       response_data = data[0].pattern
 
-    i = 0
-    my_string = ''
-    my_array = []
-
-
     std_msg_ajax(
       method: 'PATCH'
       url: "/escalations/api/v1/escalations/file_rep/amp_naming_convention"
       data: { patterns: data }
       success: (response) ->
-        std_msg_success('The Following AMP Naming Conventions Have Been Updated:', [response_data], reload: false)
+        std_msg_success('The Following AMP Naming Conventions Have Been Updated:', [response_data], reload: true)
       error: (response) ->
-        # TODO: ON AJAX ERROR, revert to localstorage object
-        # store the sort order for all the rows and restore that too
-        my_string = localStorage.getItem('my_inputs')
-        console.log 'okay, on update lets get the localstorage'
-        my_array = my_string.split(',')
-        console.log my_array
-        $('#amp-naming-details-table td').each ->
-          $(this).html(my_array[i])
-          i++
+        # revert the sort order so we can repopulate all the original input values
+        window.get_original_sort_array()
+
+        # TODO: code this function
+#        window.restore_original_inputs()
+
+        text_count = 0
+        text_form_count = 0
+        updated_pattern = ''
+
+        input_vals_string = ''
+        input_vals_array = []
+
+        input_vals_string = localStorage.getItem('amp_input_values')  # works, gets a huge string
+
+        input_vals_array = input_vals_string.split(',')   # works
+        console.log input_vals_array
+
+        $('#amp-naming-details-table td span.table-content').each ->
+          if input_vals_array[text_count].includes('pattern-')
+            updated_pattern = input_vals_array[text_count].replace('pattern-','')
+            $(this).html('<span class="table-content"><span class="table-code">' + updated_pattern + '</span></span>')
+          else
+            $(this).html('<span class="table-content">' + input_vals_array[text_count] + '</span>')
+          text_count++
+
+        $('#amp-naming-details-table td span.table-form-content').each ->
+          # handle this differently for inputs vs textareas
+          if input_vals_array[text_form_count].includes('pattern-')
+            updated_pattern = input_vals_array[text_form_count].replace('pattern-','')
+            $(this).html('<input type="text" value="' + input_vals_array[text_form_count] + '">')
+          else
+            $(this).html('<span class="table-content">' + input_vals_array[text_form_count] + '</span>')
+          text_form_count++
+
+        # finally, now show the error message
         std_msg_error('Error Updating AMP Naming Conventions', [response.responseText], reload: false)
+
     )
 
 
