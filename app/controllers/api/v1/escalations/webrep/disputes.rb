@@ -840,7 +840,7 @@ module API
               url_to_test = permitted_params[:uri]
 
               begin
-                results = Sbrs::ManualSbrs.call_wbrs({'url' => url_to_test}, 'wbrs')
+                results = Sbrs::ManualSbrs.call_wbrs({'url' => url_to_test}, type: 'wbrs')
                 data[:score] = results["wbrs"]["score"]
                 data[:rulehits] = Sbrs::ManualSbrs.get_rule_names_from_rulehits(results)
                 render json: {:status => "success", :data => data}
