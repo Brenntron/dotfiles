@@ -4,28 +4,64 @@ $(document).on 'click', '.paginate_button', ->
   table = $('#complaints-index').DataTable()
   table_page = table.page.info().page
 
-##wbnp stuff##
+
+
+#### WBNP Reporting ####
+$(document).ready ->
+  window.fetch_wbnp_data()
+
+# WBNP - Get report id
+window.fetch_wbnp_data = () ->
+  $('#fetch_wbnp').attr('disabled', true)
+  std_msg_ajax(
+    method: 'POST'
+    url: '/escalations/api/v1/escalations/webcat/complaints/fetch_wbnp_data'
+    data: {}
+    success: (response) ->
+      json = $.parseJSON(response)
+      wbnp_report_id = json.wbnp_report_id
+      check_wbnp_status(wbnp_report_id)
+
+    error: (response) ->
+#      $('#loader-modal').modal 'hide'
+      std_api_error(response, 'Error fetching wbnp data complaints.', reload: false)
+  )
+
+
+# WBNP - Check report info
 window.check_wbnp_status = (wbnp_report_id) ->
   std_msg_ajax(
     method: 'GET'
     url: "/escalations/api/v1/escalations/webcat/complaints/wbnp_report_status"
     data: {wbnp_report_id: wbnp_report_id }
     success: (response) ->
+      total_new_cases = response.data.total_new_cases
+      cases_imported = response.data.cases_imported
+      cases_failed = response.data.cases_failed
+      status = response.data.status
 
-      report = response.json
-      total_new_cases = report.total_new_cases
-      cases_imported = report.cases_imported
-      cases_failed = report.cases_failed
-      status = report.status
+      # Turn of loader indicator
+      $('.wbnp-loading-spinner').hide()
+
+      # Add fields to table & header
+      $('.wbnp-report-status').text(status)
+      $('#wbnp-report-attempted').text(total_new_cases)
+      $('#wbnp-report-succeeded').text(cases_imported)
+      $('#wbnp-report-rejected').text(cases_failed)
+
+      # Unless status is active, re-enable fetch button
+      unless status == 'active'
+        $('#fetch_wbnp').attr('disabled', false)
 
       #code should go here to:
       #1. display on the top banner
       #2. determine if wbnp button needs to be locked
     error: (response) ->
-      #$('#loader-modal').modal 'hide'
+      $('.wbnp-loading-spinner').hide()
       std_msg_error("Unable to pull wbnp status", [], reload: false)
-
   )
+
+
 
 window.updateURI = (event, complaint_entry_id) ->
   event.preventDefault()
@@ -1291,24 +1327,6 @@ window.display_preview_window = (entry) ->
   document.getElementById('preview_window').src = loc
   document.getElementById('preview_window_header_p').innerHTML = loc
   document.getElementById('preview_window_header_a').href = loc
-
-window.fetch_wbnp_data = () ->
-  $('#loader-modal').modal({
-    keyboard: false
-  })
-  std_msg_ajax(
-    method: 'POST'
-    url: '/escalations/api/v1/escalations/webcat/complaints/fetch_wbnp_data'
-    data: {}
-    success: (response) ->
-      $('#loader-modal').modal 'hide'
-      window.latest_report_id = response.json.wbnp_report_id
-      #std_msg_success('WBNP Complaints successfully retrieved from RuleUI.', [], reload: true)
-      std_msg_success('WBNP Complaints fetch process has started.', [], reload: true)
-    error: (response) ->
-      $('#loader-modal').modal 'hide'
-      std_api_error(response, 'Error fetching wbnp data complaints.', reload: false)
-  )
 
 window.fetch_complaints = () ->
   std_msg_ajax(
