@@ -2,7 +2,7 @@ $ ->
   $("#file_rep_submit").attr("disabled", true)
   $('#sha_errors_list').hide()
 
-  $('#shas_list').on 'change', (e) ->
+  $('#shas_list').on 'input', (e) ->
     $('#sha_errors_list .sha-msg').remove()
     $("#file_rep_submit").attr("disabled", true)
     $('#sha_errors_list').hide()
