@@ -329,8 +329,6 @@ $ ->
       method: 'POST'
       url: "/escalations/api/v1/escalations/file_rep/amp_naming_convention"
       data: { patterns: data }
-      success_reload: true
-      error_reload: false
       success: (response) ->
         std_msg_success('The Following AMP Naming Conventions Have Been Created:', [response_data], reload: false)
       error: (response) ->
