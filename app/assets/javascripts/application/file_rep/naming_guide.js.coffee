@@ -14,7 +14,6 @@ $ ->
 
 
 
-
 ####### FUNCTIONS FOR THE NAMING GUIDE PAGE #######
   # Keep columns of rows consistent while they are moved
   maintain_col_width = (e, ui) ->
@@ -47,6 +46,18 @@ $ ->
         return
     ).disableSelection()
 
+    # ON EDIT, get all the orig values for these inputs so we can revert if ajax error fail later
+    i = 0
+    my_array = []
+    my_string = ''
+    $('#amp-naming-details-table :input').each ->
+      my_array.push $(this).val()
+      return
+    my_string = my_array.join()
+    localStorage.setItem 'my_inputs', my_string
+    console.log 'localstorage should now be set, check it...'
+
+
 
   # Update sequence numbers if rows are moved
   window.update_sequence_numbers = (row_order) ->
@@ -59,7 +70,7 @@ $ ->
 
 
   window.cancel_amp_naming_conventions = () ->
-    # on cancel, restore the ready-to-delete rows
+    # On cancel, restore the ready-to-delete rows
     $('#amp-naming-details-table').find('.hidden').removeClass('hidden')
     $('.delete-patterns-area').addClass('hidden')
     $('.delete-patterns-queue').empty()
@@ -263,7 +274,7 @@ $ ->
     if rows_to_update.length > 0
       window.update_amp_naming_conventions([rows_to_update])
 
-    # Bulk delete on save, are records ready for deletion? then pass id's array to back-end
+    # Bulk delete on save, are records ready for deletion? Then pass id's array to back-end
     if $('.delete-pattern').length > 0
       delete_id_array = []
       delete_id_list = ''
@@ -332,7 +343,7 @@ $ ->
       success: (response) ->
         std_msg_success('The Following AMP Naming Conventions Have Been Created:', [response_data], reload: false)
       error: (response) ->
-        # TODO: remove those rows from the table because we have a fail
+        $('tr[data-unsaved-id]').hide()
         std_msg_error('Error Creating AMP Naming Conventions', [response.responseText], reload: false)
     )
 
@@ -346,6 +357,11 @@ $ ->
     else
       response_data = data[0].pattern
 
+    i = 0
+    my_string = ''
+    my_array = []
+
+
     std_msg_ajax(
       method: 'PATCH'
       url: "/escalations/api/v1/escalations/file_rep/amp_naming_convention"
@@ -353,7 +369,15 @@ $ ->
       success: (response) ->
         std_msg_success('The Following AMP Naming Conventions Have Been Updated:', [response_data], reload: false)
       error: (response) ->
-        # TODO: remove those rows from the table because we have a fail
+        # TODO: ON AJAX ERROR, revert to localstorage object
+        # store the sort order for all the rows and restore that too
+        my_string = localStorage.getItem('my_inputs')
+        console.log 'okay, on update lets get the localstorage'
+        my_array = my_string.split(',')
+        console.log my_array
+        $('#amp-naming-details-table td').each ->
+          $(this).html(my_array[i])
+          i++
         std_msg_error('Error Updating AMP Naming Conventions', [response.responseText], reload: false)
     )
 
