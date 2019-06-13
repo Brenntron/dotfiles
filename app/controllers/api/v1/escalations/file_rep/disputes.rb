@@ -61,9 +61,11 @@ module API
                     end
                   end
 
-                  if duplicates.any?
+                  if duplicates.any? && uniques.any?
                     raise "The following SHA256 hashes were created successfully: " + uniques.join(', ').to_s +
                     "@newline The following SHA256 hashes were duplicates and were not created: " + duplicates.join(', ').to_s
+                  elsif duplicates.any? && !uniques.any?
+                    "The following SHA256 hashes were duplicates and were not created: " + duplicates.join(', ').to_s
                   end
                 else
                   raise "Invalid assignee or assignee does not exist. Please try again."
