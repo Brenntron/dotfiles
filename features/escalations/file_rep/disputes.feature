@@ -16,11 +16,17 @@ Feature: Disputes
   @javascript
   Scenario: an analyst tries to create a FileRep ticket
     Given a user with role "filerep user" exists and is logged in
+    And the following customers exist:
+    |id| name            |
+    |1 | Dispute Analyst |
     And bugzilla rest api always saves
     And ThreatGrid API call is stubbed
     And Reversing Labs certificates API call is stubbed
     And Sandbox API call is stubbed
     And ReversingLabs API call is stubbed
+    And AMP API call is stubbed
+    And Sample Zoo API call is stubbed
+    And ReversingLabs Creation Data API call is stubbed
     When I go to "/escalations/file_rep/disputes"
     And I click "#new-dispute"
     And I fill in "shas_list" with "343518b26e0a872772808605f9f28aa75f64d86a6608e1347c979d033a72cb54"
@@ -28,8 +34,7 @@ Feature: Disputes
     Then a FileRep Ticket should have been created
     And that FileRep Ticket should have a SHA256 of "343518b26e0a872772808605f9f28aa75f64d86a6608e1347c979d033a72cb54"
     And that FileRep Ticket should have an assignee of current user
-    # Change this step when we settle on a list of suggested dispositions
-    And that FileRep Ticket should have a suggested disposition of "Option 1"
+    And that FileRep Ticket should have a suggested disposition of "Clean"
     And I should see "FILE REPUTATION TICKET CREATED."
 
   @javascript
@@ -115,6 +120,7 @@ Feature: Disputes
   @javascript
   Scenario: a user visits the FileRep Dispute Show page which launches off API calls that also sets the TG score on the record
     Given a user with role "filerep user" exists and is logged in
+    And vrtincoming exists
     And A FileRep Dispute with trait "default" exists
     Then I go to "/escalations/file_rep/disputes/1"
     And I wait for "25" seconds
@@ -273,10 +279,8 @@ Feature: Disputes
 
   @javascript
   Scenario: a user visits the FileRep Dispute show page and takes a ticket
-    Given the following users exist
-    |id| cvs_username |
-    |1 | vrtincom     |
-    And a user with role "filerep user" exists and is logged in
+    Given a user with role "filerep user" exists and is logged in
+    And vrtincoming exists
     And A FileRep Dispute with trait "default" exists
     When I go to "/escalations/file_rep/disputes/1"
     And I click ".take-ticket-button"
@@ -285,10 +289,8 @@ Feature: Disputes
 
   @javascript
   Scenario: a user visits the FileRep Dispute show page and returns a ticket
-    Given the following users exist
-    |id| cvs_username |
-    |1 | vrtincom     |
-    And a user with role "filerep user" exists and is logged in
+    Given a user with role "filerep user" exists and is logged in
+    And vrtincoming exists
     And A FileRep Dispute with trait "default" exists
     When I go to "/escalations/file_rep/disputes/1"
     And I click ".take-ticket-button"
@@ -328,10 +330,8 @@ Feature: Disputes
 
   @javascript
   Scenario: a user visits the FileRep Dispute index page and takes a ticket
-    Given the following users exist
-    |id| cvs_username |
-    |1 | vrtincom     |
-    And a user with role "filerep user" exists and is logged in
+    Given a user with role "filerep user" exists and is logged in
+    And vrtincoming exists
     And A FileRep Dispute with trait "assigned" exists
     When I go to "/escalations/file_rep/disputes/"
     And I click "#file-index-table-show-columns-button"
@@ -339,3 +339,87 @@ Feature: Disputes
     And I click ".inline-return-ticket-1"
     Then I should not see "ERROR UPDATING TICKET."
     Then I should see "Unassigned"
+    And I should see my username
+
+  # Need to stub API calls on show page
+  @javascript
+  Scenario: a user with the role, 'filerep manager', visits a FileRep Dispute show page and deletes someone else's comment
+    Given a user with role "filerep manager" exists and is logged in
+    And the following users exist
+    |id|
+    |2 |
+    And A FileRep Dispute with trait "default" exists
+    And the following FileRep dispute comments exist:
+    |id| user_id |
+    |1 | 2       |
+    When I go to "/escalations/file_rep/disputes/1"
+    And I click "#communication-tab-link"
+    And I click ".filerep-note-delete-button"
+    And I click ".primary"
+    Then no FileRep dispute comments exists
+
+  # Need to stub API calls on show page
+  @javascript
+  Scenario: a user with the role, 'filerep user', visits a FileRep Dispute show page and deletes their own comment
+    Given a user with role "filerep user" exists and is logged in
+    And A FileRep Dispute with trait "default" exists
+    And the following FileRep dispute comments exist:
+    |id|
+    |1 |
+    When I go to "/escalations/file_rep/disputes/1"
+    And I click "#communication-tab-link"
+    And I click ".filerep-note-delete-button"
+    And I click ".primary"
+    Then no FileRep dispute comments exists
+
+  # Need to stub API calls on show page
+  @javascript
+  Scenario: a user with the role, 'filerep user', visits a FileRep Dispute show page and deletes someone else's comment
+    Given a user with role "filerep user" exists and is logged in
+    And the following users exist
+    |id|
+    |2 |
+    And A FileRep Dispute with trait "default" exists
+    And the following FileRep dispute comments exist:
+    |id| user_id |
+    |1 | 2       |
+    When I go to "/escalations/file_rep/disputes/1"
+    And I click "#communication-tab-link"
+    And I click ".filerep-note-delete-button"
+    And I click ".primary"
+    Then I should see "Unable to delete a note written by another user."
+
+  @javascript
+  Scenario: a user creates a new FileRep Dispute through the form and the ticket is auto-resolved
+    Given a user with role "filerep user" exists and is logged in
+    And the following customers exist:
+    |id| name            |
+    |1 | Dispute Analyst |
+    And bugzilla rest api always saves
+    And ThreatGrid API call is stubbed
+    And Reversing Labs certificates API call is stubbed
+    And Sandbox API call is stubbed
+    And ReversingLabs API call is stubbed
+    And AMP API call is stubbed and returns a disposition of, "malicious"
+    And Sample Zoo API call is stubbed
+    And ReversingLabs Creation Data API call is stubbed
+    When I go to "/escalations/file_rep/disputes/"
+    And I click "#new-dispute"
+    And I fill in "shas_list" with "b7d2790048f5cacbf03ee9e36a6b6bc9ffabfc1e449bde0c507d3667064ea791"
+    And I select "Malicious" from "disposition_suggested"
+    And I click "#file_rep_submit"
+    And I go to "/escalations/file_rep/disputes/"
+    Then I should see content "RESOLVED" within "#status_10101"
+    And I should see content "Malicious" within ".malicious"
+    And FileRep Dispute has the appropriate 'resolution_comment' for auto-resolved entries
+
+  @javascript
+  Scenario: a user sees a properly worded time stamp on a comment under the Communications tab
+    Given a user with role "filerep user" exists and is logged in
+    And vrtincoming exists
+    And A FileRep Dispute with trait "assigned" exists
+    And A FileRep Dispute comment with trait "new" exists
+    When I go to "/escalations/file_rep/disputes/1"
+    And I click "#communication-tab-link"
+    Then I should see content "seconds ago." within ".author-notation"
+    Then I should not see "1 hour"

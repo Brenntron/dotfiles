@@ -9466,3 +9466,32 @@ table.rl-content {
 .selectize-input #copycat-categories-selectized {
   font-size: 12px;
 }
+
+.error-label {
+  background-image: url(image_path('icon_error.svg'));
+  background-repeat: no-repeat;
+  background-position: left top;
+  background-size: 20px 20px;
+  padding-left: 24px;
+  font-size: 8pt;
+  color: $type-lighter-color;
+}
+
+.sha-msg {
+  color: $warning-accent-color;
+  font-family: 'Fira Mono', monospace;
+  font-size: 9pt;
+  font-weight: 400;
+  padding-left: 24px;
+  line-height: 1.4em;
+}
+
+#sha_errors_list {
+  margin-bottom: 20px;
+  display: block;
+
+}
+
+.rl-col {
+  text-align: center;
+}
