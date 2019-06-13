@@ -1,6 +1,7 @@
+require 'elasticsearch'
+require 'hashie'
+
 class FileReputationApi::ElasticSearch
-  require 'elasticsearch'
-  require 'hashie'
 
   def self.query(sha256)
     client = Elasticsearch::Client.new hosts: [
