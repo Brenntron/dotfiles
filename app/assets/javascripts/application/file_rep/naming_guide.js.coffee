@@ -306,7 +306,11 @@ $ ->
         success: (response) ->
           std_msg_success('AMP Naming Convention(s) Below Has Been Deleted.', [delete_pattern_list], reload: false)
         error: (response) ->
-          std_msg_error('Error Deleting ' + delete_pattern_list, [response.responseText], reload: false)
+          # On ajax error, restore the ready-to-delete rows
+          $('#amp-naming-details-table').find('.hidden').removeClass('hidden')
+          $('.delete-patterns-area').addClass('hidden')
+          $('.delete-patterns-queue').empty()
+          std_msg_error('Error Deleting ' + delete_pattern_list, [response.responseText], reload: true)
       )
 
 
@@ -405,11 +409,9 @@ $ ->
         $(this).html('<input type="text" value="' + input_vals_array[form_count] + '">')
       form_count++
 
-    # restore the ready-to-be-deleted rows too
-    $('#amp-naming-details-table').find('.hidden').removeClass('hidden')
-    $('.delete-patterns-area').addClass('hidden')
-    $('.delete-patterns-queue').empty()
+    # RESTORE JUST DELETED ROWS HERE TOO!! IN CASE
 
+    #    window.cancel_amp_naming_conventions()
 
 
   $('#nav-banner #naming-guide').click ->
