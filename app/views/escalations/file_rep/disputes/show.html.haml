@@ -180,9 +180,16 @@
             %label.content-label-sm AMP Detection Name
             .top-info-data
               = @file_rep_dispute.detection_name
-            %label.content-label-sm AMP Detection Created
-            .top-info-data
-              = @file_rep_dispute.detection_created_at
+            - if @file_rep_dispute.disposition == 'malicious'
+              %label.content-label-sm AMP Detection - Last Set Date
+              .top-info-data
+                - if  @file_rep_dispute.detection_last_set.present?
+                  = @file_rep_dispute.detection_last_set
+                - else
+                  No history to display
+          %label.content-label-sm AMP Detection - Date Last Pulled
+          .top-info-data
+            = @file_rep_dispute.last_fetched
           %hr
           %label.content-label-sm In Sample Zoo
           #zoo-loader

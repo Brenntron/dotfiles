@@ -473,9 +473,18 @@ class FileReputationDispute < ApplicationRecord
 
   def update_amp_disposition
     detection = FileReputationApi::Detection.get_bulk(self.sha256_hash)
-    update!(disposition: detection.disposition)
+
+    update!(disposition: detection.disposition, detection_name: detection.name)
   rescue => except
     Rails.logger.error("Error updating amp disposition on #{self.id} -- #{except.message}")
+  end
+
+  def update_amp_detection_last_set
+    detection_last_set = FileReputationApi::ElasticSearch.query(self.sha256_hash)
+
+    update!(detection_last_set: detection_last_set, last_fetched: DateTime.now)
+  rescue => except
+    Rails.logger.error("Error updating amp detection last set on #{self.id} -- #{except.message}")
   end
 
   # Update scores when refreshing data on show page
@@ -499,6 +508,7 @@ class FileReputationDispute < ApplicationRecord
 
   def update_scores
     update_amp_disposition
+    update_amp_detection_last_set
     update_threadgrid_score
     update_ticode_certs
     update_reversing_labs_score
@@ -713,7 +723,7 @@ class FileReputationDispute < ApplicationRecord
 
   def self.export_xlsx(search_params_json, current_user:)
     fields = %w{id status resolution file_name sha256_hash file_size sample_type
-                disposition detection_name detection_created_at
+                disposition detection_name detection_last_set
                 in_zoo sandbox_score threatgrid_score reversing_labs_score reversing_labs_count
                 disposition_suggested created_at submitter_type
                 customer_name company_name customer_email user_id}
@@ -745,8 +755,8 @@ class FileReputationDispute < ApplicationRecord
 
         cell_data =
             case field_name
-            when 'detection_created_at'
-              fr_dispute.detection_created_at&.utc&.iso8601
+            when 'detection_last_set'
+              fr_dispute.detection_last_set&.utc&.iso8601
             when 'in_zoo'
               fr_dispute.in_zoo? ? 'True' : 'False'
             when 'created_at'

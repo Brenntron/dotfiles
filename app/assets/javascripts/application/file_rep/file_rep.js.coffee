@@ -620,7 +620,7 @@ $ ->
             return data
       }
       {
-        data: 'detection_created_at'
+        data: 'detection_last_set'
         render: (data) ->
           if data
             return moment(new Date(data)).format('MMM D, YYYY h:mm A')
@@ -1160,7 +1160,7 @@ $ ->
       data['sample-type'] = $("#sample-type-checkbox").is(':checked')
       data['amp-disp'] = $("#amp-disp-checkbox").is(':checked')
       data['amp-name'] = $("#amp-name-checkbox").is(':checked')
-      data['amp-date'] = $("#amp-date-checkbox").is(':checked')
+      data['amp-last-set'] = $("#amp-last-set-checkbox").is(':checked')
       data['in-zoo'] = $("#in-zoo-checkbox").is(':checked')
       data['sandbox-score'] = $("#sandbox-score-checkbox").is(':checked')
       data['threatgrid-score'] = $("#threatgrid-score-checkbox").is(':checked')
