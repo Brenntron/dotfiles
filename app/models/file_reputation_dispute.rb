@@ -670,8 +670,6 @@ class FileReputationDispute < ApplicationRecord
     envelope[:addressee_status] = new_dispute.status
     envelope[:payload] = {resolution: new_dispute.resolution, resolution_comment: new_dispute.resolution_comment}
 
-    binding.pry
-
     Bridge::FilerepAutoResolveEvent.new(envelope).post
 
     new_dispute
