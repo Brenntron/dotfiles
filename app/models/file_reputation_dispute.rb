@@ -32,8 +32,8 @@ class FileReputationDispute < ApplicationRecord
   SUBMITTER_TYPE_TI_FORM            = 'TI-Form'
   SUBMITTER_TYPE_TI_API             = 'TI-API'
 
-  RESOLUTION_AUTORESOLVED           = 'Auto Resolved'
-  RESOLUTION_DUPLICATE              = 'Duplicate'
+  RESOLUTION_AUTORESOLVED           = 'AUTO-RESOLVED'
+  RESOLUTION_DUPLICATE              = 'DUPLICATE'
 
   RESOLUTION_AUTORESOLVED_COMMENT   = 'This ticket has been auto-resolved, suggested disposition and disposition already match.'
   RESOLUTION_DUPLICATE_COMMENT      = 'This ticket has been auto-resolved. A ticket with the same SHA256 hash already exists and is still open.'
