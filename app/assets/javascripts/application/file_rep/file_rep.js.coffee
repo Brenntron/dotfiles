@@ -588,7 +588,9 @@ $ ->
       {
         data: 'file_name'
         render: (data, type, full, meta) ->
-          return '<a href="/escalations/file_rep/disputes/' + full['id'] + '">' + data + '</a>'
+          if data == "N/A" || data == "Unknown" || data == "Missing" || data == ""
+            data = '<span class="missing-data unknown-file"></span>'
+          return data
       }
       {
         data: 'sha256_hash'
@@ -643,7 +645,7 @@ $ ->
         render: (data, type, full, meta) ->
           data = parseInt(data)
           if isNaN(data)
-            return '<span class="score-col missing-data text-center"> No Score</span>'
+            return '<span class="score-col missing-data text-center no-score"></span>'
           else
             if full['sandbox_under'] == "true"
               return '<span class="score-col text-center">' + parseInt(data) + '</span>'
@@ -655,7 +657,7 @@ $ ->
         render: (data, type, full, meta) ->
           data = parseInt(data)
           if isNaN(data)
-            return '<span class="score-col missing-data text-center"> No Score</span>'
+            return '<span class="score-col missing-data text-center no-score"></span>'
           else
             if full['threatgrid_under'] == "true"
               return '<span class="score-col text-center">' + data + '</span>'

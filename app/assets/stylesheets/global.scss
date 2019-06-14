@@ -2212,7 +2212,7 @@ a.static-nav-item {
 }
 
 .missing-info, .missing-data {
-  color: $type-lighter-color;
+  color: lighten($type-lighter-color, 20%);
   font-style: italic;
 }
 
@@ -9455,6 +9455,18 @@ table.rl-content {
   background-image: url(/assets/icon_sandbox_report.svg);
   background-position: 6px center;
   padding-left: 15px;
+}
+
+// Datatables special display to get rid of sorting by placeholder 'Na' or 'Missing' etc. values
+
+.no-score::before {
+  content:'No Score';
+  display: block;
+}
+
+.unknown-file::before {
+  content: 'Unknown';
+  display: block;
 }
 
 .line-up{
