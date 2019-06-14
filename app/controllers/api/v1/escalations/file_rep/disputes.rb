@@ -42,21 +42,29 @@ module API
             end
             post "form" do
               std_api_v2 do
+                duplicates = []
+                uniques = []
                 user_validation = User.where(cvs_username: params[:assignee])
 
-                if user_validation.present?
+                if user_validation.exists?
                   permitted_params['shas_array'].each do |sha256|
-                    FileReputationDispute.create_through_form(bugzilla_rest_session,
-                                                              sha256,
-                                                              params[:disposition_suggested],
-                                                              params[:assignee],
-                                                              current_user)
+                    check_for_duplicate = FileReputationDispute.where(sha256_hash: sha256).where.not(status: FileReputationDispute::STATUS_RESOLVED)
+
+                    if !check_for_duplicate.any?
+                      FileReputationDispute.create_through_form(bugzilla_rest_session,
+                                                                sha256,
+                                                                params[:disposition_suggested],
+                                                                params[:assignee])
+                      uniques << sha256
+                    else
+                      duplicates << sha256
+                    end
                   end
+
+                  render json: {duplicates: duplicates, uniques: uniques}
                 else
                   raise "Invalid assignee or assignee does not exist. Please try again."
                 end
-
-                render json: {status: 'Success'}
               end
             end
 

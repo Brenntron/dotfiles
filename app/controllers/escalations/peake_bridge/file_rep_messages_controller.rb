@@ -8,7 +8,14 @@ class Escalations::PeakeBridge::FileRepMessagesController < ApplicationControlle
 
     message_payload = file_rep_params
     message_payload[:bugzilla_rest_session] = bugzilla_rest_session
-    new_dispute = FileReputationDispute.process_bridge_payload(message_payload, customer_params)
+
+    check_for_duplicate = FileReputationDispute.where(sha256_hash: message_payload[:sha256_hash]).where.not(status: FileReputationDispute::STATUS_RESOLVED)
+
+    if !check_for_duplicate.any?
+      new_dispute = FileReputationDispute.process_bridge_payload(message_payload, customer_params)
+    else
+      new_dispute = FileReputationDispute.auto_resolve_on_duplicate(message_payload, customer_params)
+    end
 
     if new_dispute.new_record?
       error_messages = new_dispute.errors.full_messages.join('; ')

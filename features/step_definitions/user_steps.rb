@@ -30,6 +30,10 @@ Given(/^a user with role "(.*?)" exists and is logged in$/) do |role|
   sign_in_user
 end
 
+Given(/^vrtincoming exists$/) do
+  FactoryBot.create(:vrt_incoming_user)
+end
+
 Given(/^a user with role "(.*?)" exists with cvs_username, "(.*?)", exists and is logged in$/) do |role, username|
   @user = FactoryBot.create(:current_user, confirmed: true, cvs_username: username)
   @user.roles << FactoryBot.create(:role, role: role)
