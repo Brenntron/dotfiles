@@ -61,11 +61,7 @@ $ ->
         input_new_entry = $(this).val()
       input_vals_array.push(input_new_entry)
 
-    console.log input_vals_array
-
-    # Convert array to string here, put in localStorage
     input_vals_string = input_vals_array.join(',')
-    console.log input_vals_string
     localStorage.setItem('amp_input_values', input_vals_string)
 
 
@@ -382,51 +378,33 @@ $ ->
 
 
   window.restore_input_values = () ->
-    # remove vars here?
-    text_count = 0
-    text_form_count = 0
-    orig_pattern = ''
-    orig_text = ''
-#    curr_value = ''
+    count = 0
+    form_count = 0
 
     input_vals_string = ''
     input_vals_array = []
 
     input_vals_string = localStorage.getItem('amp_input_values')
     input_vals_array = input_vals_string.split(',')
-    console.log input_vals_array
 
     $('#amp-naming-details-table td span.table-content').each ->
-#      console.log input_vals_array[text_count]
-
-      # CLEAN UP EVERYTHING AS SOON AS YOU CAN, MAKE AS DRY AS POSSIBLE
-
-      if input_vals_array[text_count].indexOf('pattern-') == 0
-        orig_pattern = input_vals_array[text_count].replace('pattern-','')
-        $(this).html('<span class="table-content"><span class="table-code">' + orig_pattern + '</span></span>')
-      else if input_vals_array[text_count].indexOf('textarea-') == 0
-        orig_pattern = input_vals_array[text_count].replace('textarea-','')
-        $(this).html('<span class="table-content">' + orig_pattern + '</span>')
+      if input_vals_array[count].indexOf('pattern-') == 0
+        $(this).html('<span class="table-content"><span class="table-code">' + input_vals_array[count].replace('pattern-','') + '</span></span>')
+      else if input_vals_array[count].indexOf('textarea-') == 0
+        $(this).html('<span class="table-content">' + input_vals_array[count].replace('textarea-','') + '</span>')
       else
-        $(this).html('<span class="table-content">' + input_vals_array[text_count] + '</span>')
-
-      text_count++
+        $(this).html('<span class="table-content">' + input_vals_array[count] + '</span>')
+      count++
 
     $('#amp-naming-details-table td span.table-form-content').each ->
-#      console.log 'the following should be all the values for inputs and textareas'
-#      curr_value = input_vals_array[text_form_count]
-#      console.log curr_value.indexOf('pattern-')
-
-      if input_vals_array[text_form_count].indexOf('pattern-') == 0
-        orig_pattern = input_vals_array[text_form_count].replace('pattern-','')
-        $(this).html('<input type="text" class="code-input" value="' + orig_pattern + '">')
-      else if input_vals_array[text_form_count].indexOf('textarea-') == 0
-        orig_pattern = input_vals_array[text_form_count].replace('textarea-','')
-        $(this).html('<textarea class="notes-input">' + orig_pattern + '</textarea>')
+      if input_vals_array[form_count].indexOf('pattern-') == 0
+        $(this).html('<input type="text" class="code-input" value="' + input_vals_array[form_count].replace('pattern-','') + '">')
+      else if input_vals_array[form_count].indexOf('textarea-') == 0
+        $(this).html('<textarea class="notes-input">' + input_vals_array[form_count].replace('textarea-','') + '</textarea>')
       else
-        $(this).html('<input type="text" value="' + input_vals_array[text_form_count] + '">')
+        $(this).html('<input type="text" value="' + input_vals_array[form_count] + '">')
+      form_count++
 
-      text_form_count++
 
 
   $('#nav-banner #naming-guide').click ->
