@@ -607,7 +607,7 @@ class FileReputationDispute < ApplicationRecord
 
   def self.export_xlsx(search_params_json, current_user:)
     fields = %w{id status resolution file_name sha256_hash file_size sample_type
-                disposition detection_name detection_created_at
+                disposition detection_name detection_last_set
                 in_zoo sandbox_score threatgrid_score reversing_labs_score reversing_labs_count
                 disposition_suggested created_at submitter_type
                 customer_name company_name customer_email user_id}
@@ -639,8 +639,8 @@ class FileReputationDispute < ApplicationRecord
 
         cell_data =
             case field_name
-            when 'detection_created_at'
-              fr_dispute.detection_created_at&.utc&.iso8601
+            when 'detection_last_set'
+              fr_dispute.detection_last_set&.utc&.iso8601
             when 'in_zoo'
               fr_dispute.in_zoo? ? 'True' : 'False'
             when 'created_at'
