@@ -178,10 +178,13 @@
           -# dbinebri: error handling for these moved to JS detection_now func, restore the orig ruby error logic if needed
           %label.content-label-sm AMP Disposition
           .top-info-data.disposition
+            = @file_rep_dispute.disposition
           %label.content-label-sm AMP Detection Name
           .top-info-data.detection-name
+            = @file_rep_dispute&.detection_name
           %label.content-label-sm AMP Detection - Last Set Date
           .top-info-data.detection-last-updated
+            = @file_rep_dispute&.detection_last_set
           %label.content-label-sm AMP Detection - Date Last Pulled
           .top-info-data.detection-last-pulled
             = @file_rep_dispute&.last_fetched&.utc&.strftime("%b %e, %Y %l:%M %p")
