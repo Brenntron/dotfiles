@@ -166,8 +166,7 @@ window.file_rep_show_take_dispute = (dispute_id) ->
     success: (response) ->
       $("#dispute-assignee").text(response.username).removeClass('missing-data')
       $('#show-edit-ticket-status-button').text("ASSIGNED")
-      $('.take-ticket-button').replaceWith("<button class='return-ticket-button' title='Return ticket to open queue' onclick='file_rep_show_return_dispute(#{dispute_id});'></button>")
-      $('#index_change_assign').replaceWith("<span id='replace-button'>")
+      $('.take-ticket-button').replaceWith("<button class='return-ticket-button esc-tooltipped' title='Return ticket to open queue' onclick='file_rep_show_return_dispute(#{dispute_id});'></button>")
   )
 
 window.file_rep_show_return_dispute = (dispute_id) ->
@@ -180,8 +179,7 @@ window.file_rep_show_return_dispute = (dispute_id) ->
     success: (response) ->
       $("#dispute-assignee").text("Unassigned").addClass('missing-data')
       $("#show-edit-ticket-status-button").text("NEW")
-      $(".return-ticket-button").replaceWith("<button class='take-ticket-button' title='Assign this ticket to me' onclick='file_rep_show_take_dispute(#{dispute_id});'></button>")
-      $('#replace-button').replaceWith('<button aria-expanded="false" aria-haspopup="true" class="dispute-inline-buttons ticket-owner-button dropdown-toggle esc-tooltipped tooltipstered" data-toggle="dropdown" id="index_change_assign"></button>')
+      $(".return-ticket-button").replaceWith("<button class='take-ticket-button esc-tooltipped' title='Assign this ticket to me' onclick='file_rep_show_take_dispute(#{dispute_id});'></button>")
   )
 
 window.file_rep_show_change_assignee = (dispute_id) ->

@@ -318,9 +318,10 @@ Feature: Disputes
     Then I should see "FILE REPUTATION TICKET STATUSES UPDATED."
 
   @javascript
-  Scenario: a user visits the FileRep Dispute show page and changes assignee
-    Given a user with role "filerep user" exists within org subset "file rep" and is logged in
-    And A FileRep Dispute with trait "default" exists
+  Scenario: a user visits the FileRep Dispute show page with 'filerep manager' role and changes assignee
+    Given a user with role "filerep manager" exists within org subset "file rep" and is logged in
+    And vrtincoming exists
+    And A FileRep Dispute with trait "unassigned" exists
     When I go to "/escalations/file_rep/disputes/1"
     And I click "#index_change_assign"
     And I click "#button_reassign"
@@ -328,10 +329,18 @@ Feature: Disputes
     And I should see my username
 
   @javascript
+  Scenario: a user visits the FileRep Dispute show page with 'filerep user' role the 'change assignee' button is hidden
+    Given a user with role "filerep user" exists within org subset "file rep" and is logged in
+    And vrtincoming exists
+    And A FileRep Dispute with trait "unassigned" exists
+    When I go to "/escalations/file_rep/disputes/1"
+    Then I should not see button with class ".ticket-owner-button"
+
+  @javascript
   Scenario: a user visits the FileRep Dispute show page and takes a ticket
     Given a user with role "filerep user" exists and is logged in
     And vrtincoming exists
-    And A FileRep Dispute with trait "default" exists
+    And A FileRep Dispute with trait "unassigned" exists
     When I go to "/escalations/file_rep/disputes/1"
     And I click ".take-ticket-button"
     Then I should not see "ERROR UPDATING TICKET."
@@ -341,7 +350,7 @@ Feature: Disputes
   Scenario: a user visits the FileRep Dispute show page and returns a ticket
     Given a user with role "filerep user" exists and is logged in
     And vrtincoming exists
-    And A FileRep Dispute with trait "default" exists
+    And A FileRep Dispute with trait "unassigned" exists
     When I go to "/escalations/file_rep/disputes/1"
     And I click ".take-ticket-button"
     Then I should not see "ERROR UPDATING TICKET."
