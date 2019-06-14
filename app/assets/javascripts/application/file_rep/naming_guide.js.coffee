@@ -33,11 +33,9 @@ $ ->
 
   # Show editing buttons and make table rows movable (sortable)
   window.edit_amp_naming_conventions = () ->
-    i = 0
     input_vals_array = []
     input_vals_string = ''
     input_new_entry = ''
-    my_var = ''
 
     $('#amp-edit-button').hide()
     $('.active-editing-buttons').show()
@@ -52,21 +50,22 @@ $ ->
         return
     ).disableSelection()
 
-    # on edit, save all the orig values for inputs + textareas to localStorage so we can revert if ajax error fail later
+    # Inputs: Save the original state of inputs + textareas in case of Ajax error on Save.
     $('#amp-naming-details-table :input').each ->
-      # TODO: IF THE TEXT FOR THIS INPUT IS A PATTERN, IT WILL NEED SPECIAL FORMATTING LATER
       curr_class = $(this).attr('class')
       if curr_class == 'code-input'
-        input_new_entry = 'pattern-' + $(this).val() + ", "
+        input_new_entry = 'pattern-' + $(this).val()
+      else if $(this).is("textarea")
+        input_new_entry = 'textarea-' + $(this).val()
       else
-        input_new_entry = $(this).val() + ", "
-
+        input_new_entry = $(this).val()
       input_vals_array.push(input_new_entry)
 
-    input_vals_string = input_vals_array.join('')
+    console.log input_vals_array
 
+    # Convert array to string here, put in localStorage
+    input_vals_string = input_vals_array.join(',')
     console.log input_vals_string
-
     localStorage.setItem('amp_input_values', input_vals_string)
 
 
@@ -376,45 +375,58 @@ $ ->
       success: (response) ->
         std_msg_success('The Following AMP Naming Conventions Have Been Updated:', [response_data], reload: true)
       error: (response) ->
-        # revert the sort order so we can repopulate all the original input values
         window.get_original_sort_array()
-
-        # TODO: code this function
-#        window.restore_original_inputs()
-
-        text_count = 0
-        text_form_count = 0
-        updated_pattern = ''
-
-        input_vals_string = ''
-        input_vals_array = []
-
-        input_vals_string = localStorage.getItem('amp_input_values')  # works, gets a huge string
-
-        input_vals_array = input_vals_string.split(',')   # works
-        console.log input_vals_array
-
-        $('#amp-naming-details-table td span.table-content').each ->
-          if input_vals_array[text_count].includes('pattern-')
-            updated_pattern = input_vals_array[text_count].replace('pattern-','')
-            $(this).html('<span class="table-content"><span class="table-code">' + updated_pattern + '</span></span>')
-          else
-            $(this).html('<span class="table-content">' + input_vals_array[text_count] + '</span>')
-          text_count++
-
-        $('#amp-naming-details-table td span.table-form-content').each ->
-          # handle this differently for inputs vs textareas
-          if input_vals_array[text_form_count].includes('pattern-')
-            updated_pattern = input_vals_array[text_form_count].replace('pattern-','')
-            $(this).html('<input type="text" value="' + input_vals_array[text_form_count] + '">')
-          else
-            $(this).html('<span class="table-content">' + input_vals_array[text_form_count] + '</span>')
-          text_form_count++
-
-        # finally, now show the error message
-        std_msg_error('Error Updating AMP Naming Conventions', [response.responseText], reload: false)
-
+        window.restore_input_values()
+        std_msg_error('Error Updating AMP Naming Conventions', [response.responseText], reload: true)
     )
+
+
+  window.restore_input_values = () ->
+    # remove vars here?
+    text_count = 0
+    text_form_count = 0
+    orig_pattern = ''
+    orig_text = ''
+#    curr_value = ''
+
+    input_vals_string = ''
+    input_vals_array = []
+
+    input_vals_string = localStorage.getItem('amp_input_values')
+    input_vals_array = input_vals_string.split(',')
+    console.log input_vals_array
+
+    $('#amp-naming-details-table td span.table-content').each ->
+#      console.log input_vals_array[text_count]
+
+      # CLEAN UP EVERYTHING AS SOON AS YOU CAN, MAKE AS DRY AS POSSIBLE
+
+      if input_vals_array[text_count].indexOf('pattern-') == 0
+        orig_pattern = input_vals_array[text_count].replace('pattern-','')
+        $(this).html('<span class="table-content"><span class="table-code">' + orig_pattern + '</span></span>')
+      else if input_vals_array[text_count].indexOf('textarea-') == 0
+        orig_pattern = input_vals_array[text_count].replace('textarea-','')
+        $(this).html('<span class="table-content">' + orig_pattern + '</span>')
+      else
+        $(this).html('<span class="table-content">' + input_vals_array[text_count] + '</span>')
+
+      text_count++
+
+    $('#amp-naming-details-table td span.table-form-content').each ->
+#      console.log 'the following should be all the values for inputs and textareas'
+#      curr_value = input_vals_array[text_form_count]
+#      console.log curr_value.indexOf('pattern-')
+
+      if input_vals_array[text_form_count].indexOf('pattern-') == 0
+        orig_pattern = input_vals_array[text_form_count].replace('pattern-','')
+        $(this).html('<input type="text" class="code-input" value="' + orig_pattern + '">')
+      else if input_vals_array[text_form_count].indexOf('textarea-') == 0
+        orig_pattern = input_vals_array[text_form_count].replace('textarea-','')
+        $(this).html('<textarea class="notes-input">' + orig_pattern + '</textarea>')
+      else
+        $(this).html('<input type="text" value="' + input_vals_array[text_form_count] + '">')
+
+      text_form_count++
 
 
   $('#nav-banner #naming-guide').click ->

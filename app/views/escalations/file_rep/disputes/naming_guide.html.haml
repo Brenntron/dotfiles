@@ -48,7 +48,7 @@
                 %span.table-content
                   = convention.engine_description
                 %span.table-form-content
-                  %textarea.description-input
+                  %textarea.description-textarea
                     = convention.engine_description
               %td.amp-notes
                 %span.table-content
@@ -60,12 +60,12 @@
                 %span.table-content
                   = convention.public_notes
                 %span.table-form-content
-                  %textarea.notes-public-input
+                  %textarea.notes-public-textarea
                     = convention.public_notes
               %td.amp-contact
                 %span.table-content
                   = convention.contact
                 %span.table-form-content
-                  %textarea.contact-input
+                  %textarea.contact-textarea
                     = convention.contact
                   %span.delete-button{onclick: "delete_amp_naming_convention(#{convention.id}, '#{convention.pattern}');"}
