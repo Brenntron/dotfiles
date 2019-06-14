@@ -14,8 +14,7 @@ class Escalations::PeakeBridge::FileRepMessagesController < ApplicationControlle
     if !check_for_duplicate.any?
       new_dispute = FileReputationDispute.process_bridge_payload(message_payload, customer_params)
     else
-      # Handle duplicate ticket
-      # 1. Send a bridge event to TI to notify it of its updated status and include a resolution message detailing that its a duplicate
+      new_dispute = FileReputationDispute.auto_resolve_on_duplicate(message_payload, customer_params)
     end
 
     if new_dispute.new_record?
