@@ -48,9 +48,9 @@ module API
 
                 if user_validation.exists?
                   permitted_params['shas_array'].each do |sha256|
-                    check_for_duplicate = FileReputationDispute.where(sha256_hash: sha256).where.not(status: FileReputationDispute::STATUS_RESOLVED).count
+                    check_for_duplicate = FileReputationDispute.where(sha256_hash: sha256).where.not(status: FileReputationDispute::STATUS_RESOLVED)
 
-                    if check_for_duplicate == 0
+                    if !check_for_duplicate.any?
                       FileReputationDispute.create_through_form(bugzilla_rest_session,
                                                                 sha256,
                                                                 params[:disposition_suggested],
