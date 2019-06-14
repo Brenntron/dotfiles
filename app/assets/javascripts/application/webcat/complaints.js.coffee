@@ -23,13 +23,19 @@ window.fetch_wbnp_data = () ->
       check_wbnp_status(wbnp_report_id)
 
     error: (response) ->
-#      $('#loader-modal').modal 'hide'
       std_api_error(response, 'Error fetching wbnp data complaints.', reload: false)
   )
 
 
 # WBNP - Check report info
-window.check_wbnp_status = (wbnp_report_id) ->
+check_wbnp = window.check_wbnp_status = (wbnp_report_id) ->
+  # Turn on loader indicator
+  $('.wbnp-loading-spinner').show()
+
+  # Set status on header to checking
+  top_status = $('.top-area-bar').find('.wbnp-report-status')[0]
+  $(top_status).text('Checking...')
+
   std_msg_ajax(
     method: 'GET'
     url: "/escalations/api/v1/escalations/webcat/complaints/wbnp_report_status"
@@ -49,13 +55,14 @@ window.check_wbnp_status = (wbnp_report_id) ->
       $('#wbnp-report-succeeded').text(cases_imported)
       $('#wbnp-report-rejected').text(cases_failed)
 
-      # Unless status is active, re-enable fetch button
-      unless status == 'active'
+      # If status is active, fetch button should be disabled
+      if status == 'active'
+        $('#fetch_wbnp').attr('disabled', true)
+        # Check in 5 minutes to see if report has finished
+        setTimeout(check_wbnp, 300000)
+      else
         $('#fetch_wbnp').attr('disabled', false)
 
-      #code should go here to:
-      #1. display on the top banner
-      #2. determine if wbnp button needs to be locked
     error: (response) ->
       $('.wbnp-loading-spinner').hide()
       std_msg_error("Unable to pull wbnp status", [], reload: false)
