@@ -33,6 +33,8 @@ class FileReputationDispute < ApplicationRecord
   SUBMITTER_TYPE_TI_API             = 'TI-API'
 
   RESOLUTION_AUTORESOLVED           = 'Auto Resolved'
+  RESOLUTION_DUPLICATE              = 'Duplicate'
+
   RESOLUTION_AUTORESOLVED_COMMENT   = 'This ticket has been auto-resolved, suggested disposition and disposition already match.'
   RESOLUTION_DUPLICATE_COMMENT      = 'This ticket has been auto-resolved. A ticket with the same SHA256 hash already exists and is still open.'
 
@@ -650,7 +652,7 @@ class FileReputationDispute < ApplicationRecord
       new_dispute.user_id = user.id
       new_dispute.sha256_hash = message_payload[:sha256_hash]
       new_dispute.status = STATUS_RESOLVED
-      new_dispute.resolution = RESOLUTION_AUTORESOLVED
+      new_dispute.resolution = RESOLUTION_DUPLICATE
       new_dispute.resolution_comment = RESOLUTION_DUPLICATE_COMMENT
       new_dispute.file_name = message_payload[:file_name]
       new_dispute.customer_id = customer.id
