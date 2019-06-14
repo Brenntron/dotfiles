@@ -114,20 +114,17 @@ $ ->
     focus_row.focus()
 
 
-  $( document ).on 'keydown', '.col-bulk-dispute', (e) ->
+  $( document ).on 'keydown focusout', '.col-bulk-dispute', (e) ->
+    { which: key, type } = e
 
-    key = e.which
-    text = this.innerText.trim()
+    text = this.innerText.trim().replace( /\n/g, " " ).split( " " )
     row = this.closest('tr')
+    text = text.filter((el) -> return el != "" )
+    parent_row = researchTable.row( row ).data()
 
     if key == 13 && e.shiftKey == false
-      $( this ).blur()
-      text = text.replace( /\n/g, " " ).split( " " )
-      parent_index = researchTable.row( row ).data()[0]
-
-      buildRow(text, parent_index)
-
-    if key == 8 && text == ''
+      buildRow(text, parent_row[0])
+    if key == 8 && text[0] == ''
       researchTable.rows( row ).remove()
       researchTable.draw()
 
