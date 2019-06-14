@@ -350,7 +350,7 @@ $ ->
       url: "/escalations/api/v1/escalations/file_rep/amp_naming_convention"
       data: { patterns: data }
       success: (response) ->
-        std_msg_success('The Following AMP Naming Conventions Have Been Updated:', [response_data], reload: false)
+        std_msg_success('The Following AMP Naming Conventions Have Been Updated:', [response_data], reload: true)
       error: (response) ->
         std_msg_error('Error Updating AMP Naming Conventions', [response.responseText], reload: false)
     )
