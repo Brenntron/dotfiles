@@ -47,6 +47,13 @@ class TiApi::AmpNamingPattern < TiApi::Base
     data_set.map{ |data_elem| data_elem.record }
   end
 
+  def all_valid?
+    data_set.all? do |data_elem|
+      byebug
+      data_elem.record.valid?
+    end
+  end
+
   def update_ti!
     naming_pattern_set = data_set.map {|data_elem| data_elem.to_ti_params}
     input = {

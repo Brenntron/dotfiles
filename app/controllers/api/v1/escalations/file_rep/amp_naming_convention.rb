@@ -23,7 +23,7 @@ module API
             post "" do
               std_api_v2 do
                 ti_pattern = TiApi::AmpNamingPattern.new(params['patterns'])
-                if ti_pattern.all? { |pattern| pattern.valid? }
+                if ti_pattern.all_valid?
                   ti_pattern.update_ti!
                   ::AmpNamingConvention.save_batch(ti_pattern.records)
 
