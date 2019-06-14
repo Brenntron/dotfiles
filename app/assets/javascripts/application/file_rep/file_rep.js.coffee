@@ -1132,9 +1132,10 @@ $ ->
 
   $(document).ready ->
 
-    # dbinebri: get amp detection data for show page
-    curr_sha256_hash = $('#sha256_hash').text()
-    detection_now(curr_sha256_hash)
+    # dbinebri: get amp detection data for show page, make sure you're on show page
+    if $('body.escalations--file_rep--disputes-controller').hasClass('show-action')
+      curr_sha256_hash = $('#sha256_hash').text()
+      detection_now(curr_sha256_hash)
 
     $('select[name="file-rep-datatable_length"]').on "change", ->
       data = {}
