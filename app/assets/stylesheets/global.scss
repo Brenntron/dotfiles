@@ -8851,6 +8851,11 @@ button.secondary.view-report-external-button {
   font-family: 'Open Sans', sans-serif;
   padding: 10px;
 
+  // make sure these icons show the right cursor
+  .esc-tooltipped {
+    cursor: default;
+  }
+
   table th {
     text-transform: uppercase;
     font-weight: bold;

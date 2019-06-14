@@ -38,34 +38,34 @@
                 %span.table-content
                   = convention.example
                 %span.table-form-content
-                  %input{type: 'text', value: "#{convention.example}"}
+                  %input.example-input{type: 'text', value: "#{convention.example}"}
               %td.amp-engine
                 %span.table-content
                   = convention.engine
                 %span.table-form-content
-                  %input{type: 'text', value: "#{convention.engine}"}
+                  %input.engine-input{type: 'text', value: "#{convention.engine}"}
               %td.amp-engine-description
                 %span.table-content
                   = convention.engine_description
                 %span.table-form-content
-                  %textarea
+                  %textarea.description-textarea
                     = convention.engine_description
               %td.amp-notes
                 %span.table-content
                   = convention.notes
                 %span.table-form-content
-                  %textarea
+                  %textarea.notes-input
                     = convention.notes
               %td.amp-public-notes
                 %span.table-content
                   = convention.public_notes
                 %span.table-form-content
-                  %textarea
+                  %textarea.notes-public-textarea
                     = convention.public_notes
               %td.amp-contact
                 %span.table-content
                   = convention.contact
                 %span.table-form-content
-                  %textarea
+                  %textarea.contact-textarea
                     = convention.contact
                   %span.delete-button{onclick: "delete_amp_naming_convention(#{convention.id}, '#{convention.pattern}');"}

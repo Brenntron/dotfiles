@@ -14,7 +14,6 @@ $ ->
 
 
 
-
 ####### FUNCTIONS FOR THE NAMING GUIDE PAGE #######
   # Keep columns of rows consistent while they are moved
   maintain_col_width = (e, ui) ->
@@ -34,6 +33,10 @@ $ ->
 
   # Show editing buttons and make table rows movable (sortable)
   window.edit_amp_naming_conventions = () ->
+    inputs_array = []
+    inputs_string = ''
+    input_new = ''
+
     $('#amp-edit-button').hide()
     $('.active-editing-buttons').show()
     window.get_original_sort_array()
@@ -47,6 +50,20 @@ $ ->
         return
     ).disableSelection()
 
+    # Inputs: Save the original state of inputs + textareas in case of Ajax error on Save.
+    $('#amp-naming-details-table :input').each ->
+      if $(this).attr('class') == 'code-input'
+        input_new = 'pattern-' + $(this).val()
+      else if $(this).is("textarea")
+        input_new = 'textarea-' + $(this).val()
+      else
+        input_new = $(this).val()
+      inputs_array.push(input_new)
+
+    inputs_string = inputs_array.join(',')
+    localStorage.setItem('amp_input_values', inputs_string)
+
+
 
   # Update sequence numbers if rows are moved
   window.update_sequence_numbers = (row_order) ->
@@ -59,7 +76,7 @@ $ ->
 
 
   window.cancel_amp_naming_conventions = () ->
-    # on cancel, restore the ready-to-delete rows
+    # On cancel, restore the ready-to-delete rows
     $('#amp-naming-details-table').find('.hidden').removeClass('hidden')
     $('.delete-patterns-area').addClass('hidden')
     $('.delete-patterns-queue').empty()
@@ -263,7 +280,7 @@ $ ->
     if rows_to_update.length > 0
       window.update_amp_naming_conventions([rows_to_update])
 
-    # Bulk delete on save, are records ready for deletion? then pass id's array to back-end
+    # Bulk delete on save, are records ready for deletion? Then pass id's array to back-end
     if $('.delete-pattern').length > 0
       delete_id_array = []
       delete_id_list = ''
@@ -288,7 +305,11 @@ $ ->
         success: (response) ->
           std_msg_success('AMP Naming Convention(s) Below Has Been Deleted.', [delete_pattern_list], reload: false)
         error: (response) ->
-          std_msg_error('Error Deleting ' + delete_pattern_list, [response.responseText], reload: false)
+          # On ajax error, restore the ready-to-delete rows
+          $('#amp-naming-details-table').find('.hidden').removeClass('hidden')
+          $('.delete-patterns-area').addClass('hidden')
+          $('.delete-patterns-queue').empty()
+          std_msg_error('Error Deleting ' + delete_pattern_list, [response.responseText], reload: true)
       )
 
 
@@ -332,6 +353,7 @@ $ ->
       success: (response) ->
         std_msg_success('The Following AMP Naming Conventions Have Been Created:', [response_data], reload: false)
       error: (response) ->
+        $('tr[data-unsaved-id]').hide()
         std_msg_error('Error Creating AMP Naming Conventions', [response.responseText], reload: false)
     )
 
@@ -352,8 +374,45 @@ $ ->
       success: (response) ->
         std_msg_success('The Following AMP Naming Conventions Have Been Updated:', [response_data], reload: true)
       error: (response) ->
-        std_msg_error('Error Updating AMP Naming Conventions', [response.responseText], reload: false)
+        window.get_original_sort_array()
+        window.restore_input_values()
+        std_msg_error('Error Updating AMP Naming Conventions', [response.responseText], reload: true)
     )
+
+
+  window.restore_input_values = () ->
+    count = 0
+    form_count = 0
+
+    inputs_string = ''
+    inputs_array = []
+    text_array = []
+    text_form_array = []
+
+    inputs_string = localStorage.getItem('amp_input_values')
+    inputs_array = inputs_string.split(',')
+
+    text_array = $('#amp-naming-details-table td span.table-content')
+    text_form_array = $('#amp-naming-details-table td span.table-form-content')
+
+    text_array.each ->
+      if inputs_array[count].indexOf('pattern-') == 0
+        $(this).html('<span class="table-content"><span class="table-code">' + inputs_array[count].replace('pattern-','') + '</span></span>')
+      else if inputs_array[count].indexOf('textarea-') == 0
+        $(this).html('<span class="table-content">' + inputs_array[count].replace('textarea-','') + '</span>')
+      else
+        $(this).html('<span class="table-content">' + inputs_array[count] + '</span>')
+      count++
+
+    text_form_array.each ->
+      if inputs_array[form_count].indexOf('pattern-') == 0
+        $(this).html('<input type="text" class="code-input" value="' + inputs_array[form_count].replace('pattern-','') + '">')
+      else if inputs_array[form_count].indexOf('textarea-') == 0
+        $(this).html('<textarea class="notes-input">' + inputs_array[form_count].replace('textarea-','') + '</textarea>')
+      else
+        $(this).html('<input type="text" value="' + inputs_array[form_count] + '">')
+      form_count++
+
 
 
   $('#nav-banner #naming-guide').click ->
