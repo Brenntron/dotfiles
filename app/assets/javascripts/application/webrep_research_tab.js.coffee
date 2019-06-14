@@ -35,11 +35,11 @@ $ ->
     bulk_value = select_vals.every( (col) -> return col)
     $('#select-all-bulk').prop('checked', bulk_value)
 
-
   window.buildRow = ( text, parent_index ) ->
 
     row_data = researchTable.rows().data()
     text_list = text.filter( (string) -> return string != '')
+    console.log text_list
     parent_index = parseInt(parent_index)
     parent_dispute = researchTable.row( parent_index ).data()[2]
     parent_text = $( parent_dispute ).text()
@@ -50,8 +50,8 @@ $ ->
       data = researchTable.data(this)[0]
       every_row = researchTable.data(this)[i][2]
       text_list = text_list.filter (text) ->
-        return text != $(every_row).attr('data')
-
+        if text != $(every_row).attr('data')
+          return text
       if typeof data[0] == 'string'
         researchTable.row().remove(this)
       i++
@@ -121,12 +121,34 @@ $ ->
     row = this.closest('tr')
     text = text.filter((el) -> return el != "" )
     parent_row = researchTable.row( row ).data()
-
     if key == 13 && e.shiftKey == false
       buildRow(text, parent_row[0])
-    if key == 8 && text[0] == ''
+    if key == 8 && !text.length
       researchTable.rows( row ).remove()
       researchTable.draw()
+#    if type == 'focusout' && text.length && parent_row[0][2] != undefined
+#      console.log 'iniinin'
+##      new_data = [
+##        new_index,
+##        '<div class="col-select-all">' +
+##          '<span class="checkbox-wrapper">' +
+##          '<input type="checkbox" checked>' +
+##          '</span>' +
+##          '</div>',
+##        '<p class="col-bulk-dispute" contenteditable="true" data=' + text_list[i] + '>' + text_list[i] + '</p>',
+##        '<div class="col-wbrs"></div>',
+##        '<div class="col-wbrs-rule-hits"></div>',
+##        '<div class="col-wbrs-rules"></div>',
+##        '<div class="col-category"></div>',
+##        '<div class="col-wlbl"></div>',
+##        '<div class="col-reptool-class"></div>',
+##        '<div class="col-actions"></div>'
+##      ]
+#      researchTable.row( row ).data()[0][2] = '<p class="col-bulk-dispute" contenteditable="true" data=' + text[0] + '>' + text[0] + '</p>'
+#      console.log researchTable.row( row ).data()[0][2]
+#      researchTable.rows().invalidate()
+#      researchTable.draw()
+#      console.log 'inininin'
 
 ->
 
