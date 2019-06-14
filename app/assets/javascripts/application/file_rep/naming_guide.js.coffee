@@ -405,6 +405,11 @@ $ ->
         $(this).html('<input type="text" value="' + input_vals_array[form_count] + '">')
       form_count++
 
+    # restore the ready-to-be-deleted rows too
+    $('#amp-naming-details-table').find('.hidden').removeClass('hidden')
+    $('.delete-patterns-area').addClass('hidden')
+    $('.delete-patterns-queue').empty()
+
 
 
   $('#nav-banner #naming-guide').click ->
