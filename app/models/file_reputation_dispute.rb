@@ -32,8 +32,11 @@ class FileReputationDispute < ApplicationRecord
   SUBMITTER_TYPE_TI_FORM            = 'TI-Form'
   SUBMITTER_TYPE_TI_API             = 'TI-API'
 
-  RESOLUTION_AUTORESOLVED           = 'Auto Resolved'
+  RESOLUTION_AUTORESOLVED           = 'AUTO-RESOLVED'
+  RESOLUTION_DUPLICATE              = 'DUPLICATE'
+
   RESOLUTION_AUTORESOLVED_COMMENT   = 'This ticket has been auto-resolved, suggested disposition and disposition already match.'
+  RESOLUTION_DUPLICATE_COMMENT      = 'This ticket has been auto-resolved. A ticket with the same SHA256 hash already exists and is still open.'
 
   validates :status, :sha256_hash, :disposition_suggested, presence: true
   validates :sha256_hash, format: { with: /\A\h{64}\z/, message: "only 64 nibble (256 bit) hex code" }
@@ -605,6 +608,73 @@ class FileReputationDispute < ApplicationRecord
       end
 
       auto_resolved_boolean
+  end
+
+  def self.auto_resolve_on_duplicate(message_payload, customer_payload)
+    new_dispute = nil
+
+    user = User.where(cvs_username:"vrtincom").first
+    ActiveRecord::Base.transaction do
+
+      guest = Company.where(:name => "Guest").first
+      opened_at = Time.now
+
+      customer = Customer.file_rep_process_and_get_customer(customer_payload)
+
+      bugzilla_rest_session = message_payload[:bugzilla_rest_session]
+
+      summary = "New File Reputation Reputation Dispute generated at #{DateTime.now.utc.strftime("%Y-%m-%d %H:%M")}"
+
+      full_description = <<~HEREDOC
+          File name: #{message_payload[:file_name]}
+          File Rep Sha: #{message_payload[:sha256_hash]}
+
+
+      HEREDOC
+
+      bug_attrs = {
+          'product' => 'Escalations Console',
+          'component' => 'AMP Disputes',
+          'summary' => summary,
+          'version' => 'unspecified', #self.version,
+          'description' => full_description,
+          'priority' => 'Unspecified',
+          'classification' => 'unclassified',
+      }
+      logger.debug "Creating bugzilla bug"
+
+      bug_proxy = bugzilla_rest_session.create_bug(bug_attrs)
+
+      logger.debug "Creating dispute"
+      new_dispute = FileReputationDispute.new
+
+      new_dispute.id = bug_proxy.id
+      new_dispute.user_id = user.id
+      new_dispute.sha256_hash = message_payload[:sha256_hash]
+      new_dispute.status = STATUS_RESOLVED
+      new_dispute.resolution = RESOLUTION_DUPLICATE
+      new_dispute.resolution_comment = RESOLUTION_DUPLICATE_COMMENT
+      new_dispute.file_name = message_payload[:file_name]
+      new_dispute.customer_id = customer.id
+      new_dispute.file_size = message_payload[:file_size]
+      new_dispute.sample_type = message_payload[:sample_type]
+      new_dispute.disposition_suggested = message_payload[:disposition_suggested]
+      new_dispute.source = message_payload[:source]
+      new_dispute.platform = message_payload[:platform]
+
+      new_dispute.save
+    end
+
+    envelope = {}
+    envelope[:payload] = {}
+
+    envelope[:addressee_id] = new_dispute.id
+    envelope[:addressee_status] = new_dispute.status
+    envelope[:payload] = {resolution: new_dispute.resolution, resolution_comment: new_dispute.resolution_comment}
+
+    Bridge::FilerepAutoResolveEvent.new(envelope).post
+
+    new_dispute
   end
 
   def self.take_tickets(dispute_ids, user:)

@@ -2,7 +2,7 @@ $ ->
   $("#file_rep_submit").attr("disabled", true)
   $('#sha_errors_list').hide()
 
-  $('#shas_list').on 'change', (e) ->
+  $('#shas_list').on 'input', (e) ->
     $('#sha_errors_list .sha-msg').remove()
     $("#file_rep_submit").attr("disabled", true)
     $('#sha_errors_list').hide()
@@ -43,13 +43,9 @@ $ ->
 
   $('#new-file-rep-form').on 'submit', (e) ->
     e.preventDefault()
-
     $('#loader-modal').modal({
       keyboard: false,
     })
-
-    $('#loader-modal').show()
-    $('.modal-backdrop').show()
 
     shas_input_type = $('#shas_type_text').attr('name')
     shas_full_text = $('#shas_list').val()
@@ -72,12 +68,28 @@ $ ->
         shas_input_type: shas_input_type
       success: (response) ->
         $('#loader-modal').modal 'hide'
-        $('.modal-backdrop').hide()
-        std_msg_success('File Reputation Ticket created.', [], reload: true)
+        uniques = response.json.uniques
+        duplicates = response.json.duplicates
+        uniques_stat = false
+
+        if uniques.length > 0
+          success_message = 'Tickets have been created for the following SHA256 hashes:'
+          uniques_stat = true
+          uniques_string = uniques.join '<br/>'
+
+        if duplicates.length > 0
+          dup_message = 'The following SHA256 hashes are duplicates (no ticket created):'
+          duplicates_string = duplicates.join '<br/>'
+
+        if uniques_stat == true
+          std_msg_error('Unable to create all File Reputation Tickets', [success_message, '<span class="code-content">' + uniques_string + '</span>', dup_message, '<span class="code-content">' + duplicates_string + '</span>'], reload: true)
+        else
+          std_msg_error('Unable to create File Reputation Tickets', [dup_message, '<span class="code-content">' + duplicates_string + '</span>'], reload: true)
+
       error: (response) ->
+        message = response.responseJSON.message
         $('#loader-modal').modal 'hide'
-        $('.modal-backdrop').hide()
-        std_msg_error('Unable to create File Reputation Ticket', [response.responseJSON.message], reload: false)
+        std_msg_error('Unable to create File Reputation Ticket', [message], reload: false)
     )
 
   validateSha = (sha) ->
