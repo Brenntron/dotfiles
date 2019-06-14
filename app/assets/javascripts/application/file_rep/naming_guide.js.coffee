@@ -33,9 +33,9 @@ $ ->
 
   # Show editing buttons and make table rows movable (sortable)
   window.edit_amp_naming_conventions = () ->
-    input_vals_array = []
-    input_vals_string = ''
-    input_new_entry = ''
+    inputs_array = []
+    inputs_string = ''
+    input_new = ''
 
     $('#amp-edit-button').hide()
     $('.active-editing-buttons').show()
@@ -52,17 +52,16 @@ $ ->
 
     # Inputs: Save the original state of inputs + textareas in case of Ajax error on Save.
     $('#amp-naming-details-table :input').each ->
-      curr_class = $(this).attr('class')
-      if curr_class == 'code-input'
-        input_new_entry = 'pattern-' + $(this).val()
+      if $(this).attr('class') == 'code-input'
+        input_new = 'pattern-' + $(this).val()
       else if $(this).is("textarea")
-        input_new_entry = 'textarea-' + $(this).val()
+        input_new = 'textarea-' + $(this).val()
       else
-        input_new_entry = $(this).val()
-      input_vals_array.push(input_new_entry)
+        input_new = $(this).val()
+      inputs_array.push(input_new)
 
-    input_vals_string = input_vals_array.join(',')
-    localStorage.setItem('amp_input_values', input_vals_string)
+    inputs_string = inputs_array.join(',')
+    localStorage.setItem('amp_input_values', inputs_string)
 
 
 
@@ -385,33 +384,35 @@ $ ->
     count = 0
     form_count = 0
 
-    input_vals_string = ''
-    input_vals_array = []
+    inputs_string = ''
+    inputs_array = []
+    text_array = []
+    text_form_array = []
 
-    input_vals_string = localStorage.getItem('amp_input_values')
-    input_vals_array = input_vals_string.split(',')
+    inputs_string = localStorage.getItem('amp_input_values')
+    inputs_array = inputs_string.split(',')
 
-    $('#amp-naming-details-table td span.table-content').each ->
-      if input_vals_array[count].indexOf('pattern-') == 0
-        $(this).html('<span class="table-content"><span class="table-code">' + input_vals_array[count].replace('pattern-','') + '</span></span>')
-      else if input_vals_array[count].indexOf('textarea-') == 0
-        $(this).html('<span class="table-content">' + input_vals_array[count].replace('textarea-','') + '</span>')
+    text_array = $('#amp-naming-details-table td span.table-content')
+    text_form_array = $('#amp-naming-details-table td span.table-form-content')
+
+    text_array.each ->
+      if inputs_array[count].indexOf('pattern-') == 0
+        $(this).html('<span class="table-content"><span class="table-code">' + inputs_array[count].replace('pattern-','') + '</span></span>')
+      else if inputs_array[count].indexOf('textarea-') == 0
+        $(this).html('<span class="table-content">' + inputs_array[count].replace('textarea-','') + '</span>')
       else
-        $(this).html('<span class="table-content">' + input_vals_array[count] + '</span>')
+        $(this).html('<span class="table-content">' + inputs_array[count] + '</span>')
       count++
 
-    $('#amp-naming-details-table td span.table-form-content').each ->
-      if input_vals_array[form_count].indexOf('pattern-') == 0
-        $(this).html('<input type="text" class="code-input" value="' + input_vals_array[form_count].replace('pattern-','') + '">')
-      else if input_vals_array[form_count].indexOf('textarea-') == 0
-        $(this).html('<textarea class="notes-input">' + input_vals_array[form_count].replace('textarea-','') + '</textarea>')
+    text_form_array.each ->
+      if inputs_array[form_count].indexOf('pattern-') == 0
+        $(this).html('<input type="text" class="code-input" value="' + inputs_array[form_count].replace('pattern-','') + '">')
+      else if inputs_array[form_count].indexOf('textarea-') == 0
+        $(this).html('<textarea class="notes-input">' + inputs_array[form_count].replace('textarea-','') + '</textarea>')
       else
-        $(this).html('<input type="text" value="' + input_vals_array[form_count] + '">')
+        $(this).html('<input type="text" value="' + inputs_array[form_count] + '">')
       form_count++
 
-    # RESTORE JUST DELETED ROWS HERE TOO!! IN CASE
-
-    #    window.cancel_amp_naming_conventions()
 
 
   $('#nav-banner #naming-guide').click ->
