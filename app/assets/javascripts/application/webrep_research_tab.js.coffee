@@ -94,7 +94,7 @@ $ ->
             '<input type="checkbox" checked>' +
           '</span>' +
         '</div>',
-        '<p class="col-bulk-dispute" contenteditable="true" data=' + text_list[i] + '>' + text_list[i] + '</p>',
+        '<div class="col-bulk-dispute" contenteditable="true" data=' + text_list[i] + '>' + text_list[i] + '</div>',
         '<div class="col-wbrs"></div>',
         '<div class="col-wbrs-rule-hits"></div>',
         '<div class="col-wbrs-rules"></div>',
