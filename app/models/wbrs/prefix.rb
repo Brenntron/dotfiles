@@ -125,7 +125,8 @@ class Wbrs::Prefix < Wbrs::Base
     options[:urls] = urls
     options[:strict_matching] = 1
 
-    response = Wbrs::Prefix.post_request(path: '/v1/wbrsrulelib/cat/rules', body: Wbrs::Prefix.stringkey_params(options))
+    response = Wbrs::Prefix.post_request(path: '/v1/wbrsrulelib/cat/rules',
+                                         body: Wbrs::Prefix.stringkey_params(options))
     response_body = JSON.parse(response.body)
     response_body
   end
