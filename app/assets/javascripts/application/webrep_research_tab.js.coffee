@@ -3,7 +3,13 @@ $ ->
     localStorage.setItem 'lastTab', $(this).attr('id')
     return
 
+
   $(document).on 'ready page:load', (e) ->
+    tab = location.href
+    if tab.includes('detail')
+      $('#research-page-toolbar').show()
+    else
+      $('#research-page-toolbar').hide()
     lastTab = localStorage.getItem('lastTab')
     if lastTab
       $('#' + lastTab).tab('show');
@@ -21,6 +27,12 @@ $ ->
     ]
   });
 
+  $(document).on 'click', '.research-header-wrapper li', (e) ->
+    tab = location.href
+    if tab.includes('detail')
+      $('#research-page-toolbar').show()
+    else
+      $('#research-page-toolbar').hide()
   $(document).on 'change', '#select-all-bulk', (e) ->
     e_val = e.currentTarget.checked
     select_cols = $('.col-select-all input')
@@ -36,17 +48,14 @@ $ ->
     $('#select-all-bulk').prop('checked', bulk_value)
 
   window.buildRow = ( text, parent_index ) ->
-
     row_data = researchTable.rows().data()
     text_list = text.filter( (string) -> return string != '')
-    console.log text_list
     parent_index = parseInt(parent_index)
     parent_dispute = researchTable.row( parent_index ).data()[2]
     parent_text = $( parent_dispute ).text()
 
     i = 0
     researchTable.rows().every () ->
-
       data = researchTable.data(this)[0]
       every_row = researchTable.data(this)[i][2]
       text_list = text_list.filter (text) ->
@@ -62,14 +71,21 @@ $ ->
       if parent_index == 0 && parent_text == '' || parent_text != ''
         text_list.push('')
 
-    text_list = text_list.filter (item, index) ->  return text_list.indexOf item == index
+    text_list = text_list.filter (item, index) ->
+      return text_list.indexOf item == index
+
     parent_row = $( row_data[0][2] ).attr('data')
 
     for i in [0...text_list.length]
-      if parent_index == 0 && parent_row == undefined || parent_text == ''
-        new_index = parent_index + i
-      else
+      if parent_text == '' && text_list.length == 1 && parent_index > 0
         new_index = parent_index + 1 + i
+      else if parent_index == 0 && parent_text != ''
+        new_index = parent_index + 1 + i
+      else
+        if parent_index == 0 || parent_text == '' || text_list.length == 2
+          new_index = parent_index + i
+        else
+          new_index = parent_index + 1 + i
 
       new_data = [
         new_index,
@@ -100,19 +116,13 @@ $ ->
     #  replace all rows with updated data and redraw
     i = 0
     researchTable.rows().every () ->
-
       this.invalidate()
       this.data( row_data[i] )
       i++
 
     researchTable.draw()
     focus_row = $('.col-bulk-dispute')[new_index]
-
-    if $( focus_row ).text() != ''
-      focus_row = $('.col-bulk-dispute')[new_index + 1]
-
     focus_row.focus()
-
 
   $( document ).on 'keydown focusout', '.col-bulk-dispute', (e) ->
     { which: key, type } = e
@@ -121,35 +131,41 @@ $ ->
     row = this.closest('tr')
     text = text.filter((el) -> return el != "" )
     parent_row = researchTable.row( row ).data()
+
     if key == 13 && e.shiftKey == false
       buildRow(text, parent_row[0])
     if key == 8 && !text.length
       researchTable.rows( row ).remove()
+      i = 0
+      researchTable.rows().every () ->
+        researchTable.row( this ).data()[0] = i
+        i++
+      researchTable.rows().invalidate()
       researchTable.draw()
-#    if type == 'focusout' && text.length && parent_row[0][2] != undefined
-#      console.log 'iniinin'
-##      new_data = [
-##        new_index,
-##        '<div class="col-select-all">' +
-##          '<span class="checkbox-wrapper">' +
-##          '<input type="checkbox" checked>' +
-##          '</span>' +
-##          '</div>',
-##        '<p class="col-bulk-dispute" contenteditable="true" data=' + text_list[i] + '>' + text_list[i] + '</p>',
-##        '<div class="col-wbrs"></div>',
-##        '<div class="col-wbrs-rule-hits"></div>',
-##        '<div class="col-wbrs-rules"></div>',
-##        '<div class="col-category"></div>',
-##        '<div class="col-wlbl"></div>',
-##        '<div class="col-reptool-class"></div>',
-##        '<div class="col-actions"></div>'
-##      ]
-#      researchTable.row( row ).data()[0][2] = '<p class="col-bulk-dispute" contenteditable="true" data=' + text[0] + '>' + text[0] + '</p>'
-#      console.log researchTable.row( row ).data()[0][2]
-#      researchTable.rows().invalidate()
-#      researchTable.draw()
-#      console.log 'inininin'
 
+    if type == 'focusout'  && text.length && parent_row != undefined
+      if text.length == 1
+        new_data = [
+          parent_row[0],
+          '<div class="col-select-all">' +
+            '<span class="checkbox-wrapper">' +
+            '<input type="checkbox" checked>' +
+            '</span>' +
+            '</div>',
+          '<p class="col-bulk-dispute" contenteditable="true" data=' + text[0] + '>' + text[0] + '</p>',
+          '<div class="col-wbrs"></div>',
+          '<div class="col-wbrs-rule-hits"></div>',
+          '<div class="col-wbrs-rules"></div>',
+          '<div class="col-category"></div>',
+          '<div class="col-wlbl"></div>',
+          '<div class="col-reptool-class"></div>',
+          '<div class="col-actions"></div>'
+        ]
+        researchTable.row( row ).data(new_data)
+        researchTable.rows().invalidate()
+        researchTable.draw()
+      else
+        buildRow(text, parent_row[0])
 ->
 
   $('#edit-dispute-entry-button').click ->
