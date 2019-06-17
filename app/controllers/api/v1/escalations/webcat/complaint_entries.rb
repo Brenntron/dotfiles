@@ -478,6 +478,14 @@ module API
                 return { image_data: Base64.encode64(record.screenshot) }.to_json
               end
             end
+            get ':complaint_entry_id/retake_screenshot' do
+              std_api_v2 do
+                entry = ComplaintEntry.find(params[:complaint_entry_id])
+                ces = entry.complaint_entry_screenshot
+                ces.update(error_message:"Retaking screenshot please wait.", screenshot:nil)
+                ces.grab_screenshot
+              end
+            end
 
             desc 'Retrieve current categories from expanding a complaint entry row'
             params do

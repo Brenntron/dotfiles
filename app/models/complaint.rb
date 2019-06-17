@@ -329,24 +329,9 @@ class Complaint < ApplicationRecord
 
 
           begin
-            screenshot_data =  ""
-            Timeout::timeout(max_wait_for_job) do
-              screenshot_data = CapybaraSpider.low_capture("#{new_complaint_entry.hostlookup}")
-            end
-            ces = ComplaintEntryScreenshot.new
-            ces.complaint_entry_id = new_complaint_entry.id
-            ces.screenshot = Base64.decode64(screenshot_data)
-            ces.save!
-          rescue Timeout::Error => e
-            #couldnt complete in time
-            Rails.logger.error( "#{e} --- Timed out waiting for screenshot for #{new_complaint_entry.hostlookup} to finish")
-            ces = ComplaintEntryScreenshot.new
-            ces.error_message = e.message
-            ces.complaint_entry_id = new_complaint_entry.id
-            open("app/assets/images/timeout_screenshot.jpg") do |f|
-              ces.screenshot = f.read
-            end
-            ces.save!
+            ces = ComplaintEntryScreenshot.create(complaint_entry_id: new_complaint_entry.id )
+            # CALL SCREENSHOT BACKGROUND JOB! with ces.id and new_complaint_entry.hostlookup
+            ces.grab_screenshot
           rescue Exception => e
             Rails.logger.error("#{e.message}")
             ces = ComplaintEntryScreenshot.new
@@ -399,24 +384,9 @@ class Complaint < ApplicationRecord
           ComplaintEntryPreload.generate_preload_from_complaint_entry(new_complaint_entry)
 
           begin
-            screenshot_data = ""
-            Timeout::timeout(max_wait_for_job) do
-              screenshot_data = CapybaraSpider.low_capture("#{new_complaint_entry.hostlookup}")
-            end
-            ces = ComplaintEntryScreenshot.new
-            ces.complaint_entry_id = new_complaint_entry.id
-            ces.screenshot = Base64.decode64(screenshot_data)
-            ces.save!
-          rescue Timeout::Error => e
-            #couldnt complete in time
-            Rails.logger.error( "#{e} --- Timed out waiting for screenshot for #{new_complaint_entry.hostlookup} to finish")
-            ces = ComplaintEntryScreenshot.new
-            ces.error_message = e.message
-            ces.complaint_entry_id = new_complaint_entry.id
-            open("app/assets/images/timeout_screenshot.jpg") do |f|
-              ces.screenshot = f.read
-            end
-            ces.save!
+            ces = ComplaintEntryScreenshot.create(complaint_entry_id: new_complaint_entry.id )
+            # CALL SCREENSHOT BACKGROUND JOB! with ces.id and new_complaint_entry.hostlookup
+            ces.grab_screenshot
           rescue Exception => e
             ces = ComplaintEntryScreenshot.new
             ces.error_message = e.message

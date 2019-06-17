@@ -401,14 +401,9 @@ class ComplaintEntry < ApplicationRecord
     ComplaintEntryPreload.generate_preload_from_complaint_entry(new_complaint_entry)
     max_wait_for_job = 15 #seconds
     begin
-      screenshot_data =  ""
-      Timeout::timeout(max_wait_for_job) do
-        screenshot_data = CapybaraSpider.low_capture("#{new_complaint_entry.hostlookup}")
-      end
-      ces = ComplaintEntryScreenshot.new
-      ces.complaint_entry_id = new_complaint_entry.id
-      ces.screenshot = Base64.decode64(screenshot_data)
-      ces.save!
+      #this is where screen grabs happen.
+      screenshot_entry = ComplaintEntryScreenshot.create!(complaint_entry_id:new_complaint_entry.id)
+      screenshot_entry.grab_screenshot
     rescue Timeout::Error => e
       #couldnt complete in time
       Rails.logger.error( "#{e} --- Timed out waiting for screenshot for #{new_complaint_entry.hostlookup} to finish")

@@ -539,13 +539,34 @@ $('html').on 'click', (e) ->
   if typeof $(e.target).data('original-title') == 'undefined' and !$(e.target).parents().is('.popover.in')
     $('[data-original-title]').popover 'hide'
 
-window.enlarge_image = (id,image)->
+
+$(document).on 'click', ".popover .retake-screenshot", ->
+  $('[data-original-title]').popover 'hide'
+  se_id = this.id.slice(6)
+  std_msg_ajax(
+    method: 'GET'
+    url: '/escalations/api/v1/escalations/webcat/complaint_entries/' + se_id + '/retake_screenshot'
+    data: {}
+    error_prefix: 'Error retaking screenshot.'
+    success: (response) ->
+      std_msg_success('Screenshot job initiated. Check back in about 10 seconds.', [], reload: true)
+  )
+
+$(document).on 'click', ".popover .reload-screenshot", ->
+  location.reload(true)
+
+
+window.enlarge_image = (id,image,retake_in_progress)->
+  image_content = ""
+  if retake_in_progress
+    image_content = '<img src="' + image + '"><p><a class="btn-sm reload-screenshot">Reload Page</a></p>'
+  else
+    image_content = '<img src="' + image + '"><p><a class="btn-sm retake-screenshot" id="se_id_' + id + '">Retake Screenshot</a></p>'
   $('#screenshot_id_'+ id).popover(
     html: true
     container: 'body'
     trigger: 'focus'
-    content: '<img src="' + image + '">').popover 'show'
-
+    content: image_content).popover 'show'
 window.lookup_prefix = () ->
 
   $('#loader-modal').modal({
@@ -890,6 +911,9 @@ format = (complaint_entry_row) ->
         '<button class="tertiary ' + reopen_class + '" id="reopen_' + complaint_entry.entry_id + '" onclick="reopenComplaint(' + complaint_entry.entry_id + ', this)">Reopen Complaint</button>' +
         '</div>'
 
+  retake_in_progress = false
+  if complaint_entry.screen_shot_error == "Retaking screenshot please wait."
+    retake_in_progress = true
 
   complaint_entry_html =
       complaint_table_row_html +
@@ -897,7 +921,7 @@ format = (complaint_entry_row) ->
       '<div class="row">' +
       '<div class="col-xs-3 col-with-divider">' +
       '<div class="screenshot-thumb-wrapper">' +
-      '<img id="screenshot_id_' + complaint_entry.entry_id + '" class="screenshot-thumb-img" title="' + screen_shot_error + '" data-toggle="popover" onclick="enlarge_image(' + complaint_entry.entry_id + ',\'complaint_entries/serve_image?complaint_entry_id=' + complaint_entry.entry_id + '\')" src="complaint_entries/serve_image?complaint_entry_id=' + complaint_entry.entry_id + '" />' +
+      '<img id="screenshot_id_' + complaint_entry.entry_id + '" class="screenshot-thumb-img" title="' + screen_shot_error + '" data-toggle="popover" onclick="enlarge_image(' + complaint_entry.entry_id + ',\'complaint_entries/serve_image?complaint_entry_id=' + complaint_entry.entry_id + '\',' + retake_in_progress + '\)" src="complaint_entries/serve_image?complaint_entry_id=' + complaint_entry.entry_id + '" />' +
       '</div>' +
       '<div class="complaint-entry-info">' +
       '<label class="content-label-sm">Case ID</label>' +

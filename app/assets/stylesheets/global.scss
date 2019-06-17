@@ -6392,6 +6392,18 @@ table.dispute-entry-table tbody tr.selected {
 .popover{
     max-width: 100%; /* Max Width of the popover (depending on the container!) */
 }
+.retake-screenshot{
+  background-color: $type-lighter-color;
+  color: $content-bg-color;
+  font-weight: 300;
+}
+.retake-screenshot:hover{
+  background-color: darken($type-lighter-color, 8%);
+  color: $content-bg-color;
+  text-decoration: none;
+  font-weight: 300;
+}
+
 
 .nested-complaint-static-data .col-with-divider {
   border-color: darken($faint-neutral-color, 15%);

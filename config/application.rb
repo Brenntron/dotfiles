@@ -58,7 +58,6 @@ module AnalystConsoleEscalations
         config.publish_all_result = "/queue/AnalystConsole.Snort.Run.All.Stage.Result"
         config.subscribe_local_work = "/queue/AnalystConsole.Snort.Run.Local.Stage.Work"
         config.subscribe_all_work = "/queue/AnalystConsole.Snort.Run.All.Stage.Work"
-
         config.amq_snort_local = :snort_local_rules_stage_work
         config.amq_snort_all = :snort_all_rules_stage_work
         config.amq_snort_all_result = :snort_all_rules_stage_result
