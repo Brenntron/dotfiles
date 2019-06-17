@@ -48,7 +48,7 @@ class Escalations::PeakeBridge::FileRepMessagesController < ApplicationControlle
 
   def file_rep_params
     params.require(:message).require(:file_rep).permit(:sha256_hash, :file_name, :file_size, :sample_type,
-                                                       :disposition_suggested, :source, :platform)
+                                                       :disposition_suggested, :source, :platform, :submitter_type)
   end
 
   def customer_params

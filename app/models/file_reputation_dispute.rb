@@ -576,6 +576,7 @@ class FileReputationDispute < ApplicationRecord
         new_dispute.disposition_suggested = message_payload[:disposition_suggested]
         new_dispute.source = message_payload[:source]
         new_dispute.platform = message_payload[:platform]
+        new_dispute.submitter_type = message_payload['submitter_type']
 
         new_dispute.save
 
