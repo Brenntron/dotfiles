@@ -49,7 +49,6 @@ class TiApi::AmpNamingPattern < TiApi::Base
 
   def all_valid?
     data_set.all? do |data_elem|
-      byebug
       data_elem.record.valid?
     end
   end
