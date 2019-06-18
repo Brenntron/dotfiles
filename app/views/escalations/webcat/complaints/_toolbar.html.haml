@@ -20,10 +20,14 @@
   %div
     %label.toolbar-section-label
       View Nested Data
+    %button.toolbar-button.collapse-button.esc-tooltipped{onclick: 'collapse_selected()', type: 'button', title: 'Collapse Selected'}
+      %span.toolbar-button-text Collapse Selected
     %button.toolbar-button.collapse-all.esc-tooltipped{onclick: 'collapse_all()', type: 'button', title: 'Collapse All'}
       %span.toolbar-button-text Collapse All
     %button.toolbar-button.expand-row-button.esc-tooltipped{onclick: 'expand_selected()', type: 'button', title: 'Expand Selected'}
       %span.toolbar-button-text Expand Selected
+    %button.toolbar-button.expand-all.esc-tooltipped{type: 'button', title: 'Expand All'}
+      %span.toolbar-button-text Expand All
   %div
     %label.toolbar-section-label Data
     %button.toolbar-button.sync-button#fetch.esc-tooltipped{ onclick: 'fetch_complaints();', title: 'Fetch Complaints'}
@@ -33,21 +37,8 @@
 
   %div
     %label.toolbar-section-label Bulk
-    %span.dropdown
-      %button#complaint_ticket_status.toolbar-button.ticket-status-button.dropdown-button-margin-right.dropdown-toggle.esc-tooltipped{title: 'Edit Ticket Resolution', 'data-toggle': 'dropdown', 'aria-haspopup': 'true', 'aria-expanded': 'false'}
-        %span.toolbar-button-text
-          Edit Ticket Resolution
-      .dropdown-menu.toolbar-dropdown#complaint-edit-ticket-status-dropdown{'aria-labelledby': 'complaint_ticket_status'}
-        %ul
-          %li.status-radio-wrapper
-            %input.ticket-status-radio{type: 'radio', name: 'ticket-status', id: 'UNCHANGED', value:'UNCHANGED' }
-            %label.ticket-status-radio-label.radio-label{for: 'UNCHANGED'} Unchanged
-          %li.status-radio-wrapper
-            %input.ticket-status-radio{type: 'radio', name: 'ticket-status', id: 'FIXED', value: 'FIXED'}
-            %label.ticket-status-radio-label.radio-label{for: 'FIXED'} Fixed
-          %li.status-radio-wrapper
-            %input.ticket-status-radio{type: 'radio', name: 'ticket-status', id: 'INVALID', value: 'INVALID'}
-            %label.ticket-status-radio-label.radio-label{for: 'INVALID'} Invalid
+    %button.toolbar-button.master-submit-button#master-submit.esc-tooltipped{ onclick: 'master_submit();', title: 'Submit Changes', disabled: true}
+      %span.toolbar-button-text Submit Changes
 
 
 
