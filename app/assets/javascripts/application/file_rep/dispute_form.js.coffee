@@ -72,10 +72,14 @@ $ ->
         duplicates = response.json.duplicates
         uniques_stat = false
 
-        if uniques.length > 0
+        if Object.keys(uniques).length > 0
           success_message = 'Tickets have been created for the following SHA256 hashes:'
           uniques_stat = true
-          uniques_string = uniques.join '<br/>'
+
+          uniques_string = ''
+
+          for k,v of uniques
+            uniques_string += "<a href='/escalations/file_rep/disputes/#{k}'>#{v}</a></br>"
 
         if duplicates.length > 0
           dup_message = 'The following SHA256 hashes are duplicates (no ticket created):'
