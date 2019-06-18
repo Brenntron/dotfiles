@@ -280,7 +280,7 @@ module API
               if report.present?
                 {:status => "success", :data => report}
               else
-                {:status => "success", :data => {}}
+                {:status => "success", :data => WbnpReport.null_report}
               end
 
             end

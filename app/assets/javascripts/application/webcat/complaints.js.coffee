@@ -8,7 +8,7 @@ $(document).on 'click', '.paginate_button', ->
 
 #### WBNP Reporting ####
 $(document).ready ->
-  window.fetch_wbnp_data()
+  window.check_wbnp_status()
 
 # WBNP - Get report id
 window.fetch_wbnp_data = () ->
@@ -59,7 +59,7 @@ check_wbnp = window.check_wbnp_status = (wbnp_report_id) ->
       if status == 'active'
         $('#fetch_wbnp').attr('disabled', true)
         # Check in 5 minutes to see if report has finished
-        setTimeout(check_wbnp, 300000)
+        setTimeout(check_wbnp, 120000)
       else
         $('#fetch_wbnp').attr('disabled', false)
 
