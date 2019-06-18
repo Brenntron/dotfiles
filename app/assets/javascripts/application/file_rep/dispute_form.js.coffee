@@ -71,6 +71,7 @@ $ ->
         uniques = response.json.uniques
         duplicates = response.json.duplicates
         uniques_stat = false
+        duplicates_stat = false
 
         if Object.keys(uniques).length > 0
           success_message = 'Tickets have been created for the following SHA256 hashes:'
@@ -83,10 +84,14 @@ $ ->
 
         if duplicates.length > 0
           dup_message = 'The following SHA256 hashes are duplicates (no ticket created):'
+          duplicates_stat = true
+
           duplicates_string = duplicates.join '<br/>'
 
-        if uniques_stat == true
+        if uniques_stat == true && duplicates_stat == true
           std_msg_error('Unable to create all File Reputation Tickets', [success_message, '<span class="code-content">' + uniques_string + '</span>', dup_message, '<span class="code-content">' + duplicates_string + '</span>'], reload: true)
+        else if uniques_stat == true && duplicates_stat == false
+          std_msg_error('Unable to create all File Reputation Tickets', [success_message, '<span class="code-content">' + uniques_string + '</span>'], reload: true)
         else
           std_msg_error('Unable to create File Reputation Tickets', [dup_message, '<span class="code-content">' + duplicates_string + '</span>'], reload: true)
 
