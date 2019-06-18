@@ -92,6 +92,9 @@ gem 'addressable', '~> 2.5.2'
 
 gem 'dotiw'
 
+gem 'elasticsearch'
+gem 'hashie'
+
 group :development do
   gem 'thin', '1.7.2'
   gem 'puma', '3.12.0'

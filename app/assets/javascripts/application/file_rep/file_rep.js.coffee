@@ -166,8 +166,7 @@ window.file_rep_show_take_dispute = (dispute_id) ->
     success: (response) ->
       $("#dispute-assignee").text(response.username).removeClass('missing-data')
       $('#show-edit-ticket-status-button').text("ASSIGNED")
-      $('.take-ticket-button').replaceWith("<button class='return-ticket-button' title='Return ticket to open queue' onclick='file_rep_show_return_dispute(#{dispute_id});'></button>")
-      $('#index_change_assign').replaceWith("<span id='replace-button'>")
+      $('.take-ticket-button').replaceWith("<button class='return-ticket-button esc-tooltipped' title='Return ticket to open queue' onclick='file_rep_show_return_dispute(#{dispute_id});'></button>")
   )
 
 window.file_rep_show_return_dispute = (dispute_id) ->
@@ -180,8 +179,7 @@ window.file_rep_show_return_dispute = (dispute_id) ->
     success: (response) ->
       $("#dispute-assignee").text("Unassigned").addClass('missing-data')
       $("#show-edit-ticket-status-button").text("NEW")
-      $(".return-ticket-button").replaceWith("<button class='take-ticket-button' title='Assign this ticket to me' onclick='file_rep_show_take_dispute(#{dispute_id});'></button>")
-      $('#replace-button').replaceWith('<button aria-expanded="false" aria-haspopup="true" class="dispute-inline-buttons ticket-owner-button dropdown-toggle esc-tooltipped tooltipstered" data-toggle="dropdown" id="index_change_assign"></button>')
+      $(".return-ticket-button").replaceWith("<button class='take-ticket-button esc-tooltipped' title='Assign this ticket to me' onclick='file_rep_show_take_dispute(#{dispute_id});'></button>")
   )
 
 window.file_rep_show_change_assignee = (dispute_id) ->
@@ -588,7 +586,9 @@ $ ->
       {
         data: 'file_name'
         render: (data, type, full, meta) ->
-          return '<a href="/escalations/file_rep/disputes/' + full['id'] + '">' + data + '</a>'
+          if data == "N/A" || data == "Unknown" || data == "Missing" || data == ""
+            data = '<span class="missing-data unknown-file"></span>'
+          return data
       }
       {
         data: 'sha256_hash'
@@ -620,7 +620,7 @@ $ ->
             return data
       }
       {
-        data: 'detection_created_at'
+        data: 'detection_last_set'
         render: (data) ->
           if data
             return moment(new Date(data)).format('MMM D, YYYY h:mm A')
@@ -643,7 +643,7 @@ $ ->
         render: (data, type, full, meta) ->
           data = parseInt(data)
           if isNaN(data)
-            return '<span class="score-col missing-data text-center"> No Score</span>'
+            return '<span class="score-col missing-data text-center no-score"></span>'
           else
             if full['sandbox_under'] == "true"
               return '<span class="score-col text-center">' + parseInt(data) + '</span>'
@@ -655,7 +655,7 @@ $ ->
         render: (data, type, full, meta) ->
           data = parseInt(data)
           if isNaN(data)
-            return '<span class="score-col missing-data text-center"> No Score</span>'
+            return '<span class="score-col missing-data text-center no-score"></span>'
           else
             if full['threatgrid_under'] == "true"
               return '<span class="score-col text-center">' + data + '</span>'
@@ -1160,7 +1160,7 @@ $ ->
       data['sample-type'] = $("#sample-type-checkbox").is(':checked')
       data['amp-disp'] = $("#amp-disp-checkbox").is(':checked')
       data['amp-name'] = $("#amp-name-checkbox").is(':checked')
-      data['amp-date'] = $("#amp-date-checkbox").is(':checked')
+      data['amp-last-set'] = $("#amp-last-set-checkbox").is(':checked')
       data['in-zoo'] = $("#in-zoo-checkbox").is(':checked')
       data['sandbox-score'] = $("#sandbox-score-checkbox").is(':checked')
       data['threatgrid-score'] = $("#threatgrid-score-checkbox").is(':checked')

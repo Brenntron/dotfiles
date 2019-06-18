@@ -95,7 +95,8 @@
                   .dispute-owner-buttons-wrapper
                     - if can? :take, @file_rep_dispute
                       %button.take-ticket-button#show_ticket_assign.esc-tooltipped{title: 'Assign this ticket to me', onclick: "file_rep_show_take_dispute(#{@file_rep_dispute.id});"}
-
+                    - elsif can? :return, @file_rep_dispute
+                      %button.return-ticket-button.esc-tooltipped{title: 'Return ticket to open queue', onclick: "file_rep_show_return_dispute(#{@file_rep_dispute.id});"}
                     %span.dropdown
                       - if can? :change_assignee, @file_rep_dispute
                         %button#index_change_assign.dispute-inline-buttons.ticket-owner-button.dropdown-toggle.esc-tooltipped{title: 'Change Assignee', 'data-toggle': 'dropdown', 'aria-haspopup': 'true', 'aria-expanded': 'false'}
@@ -179,9 +180,16 @@
             %label.content-label-sm AMP Detection Name
             .top-info-data
               = @file_rep_dispute.detection_name
-            %label.content-label-sm AMP Detection Created
-            .top-info-data
-              = @file_rep_dispute.detection_created_at
+            - if @file_rep_dispute.disposition == 'malicious'
+              %label.content-label-sm AMP Detection - Last Set Date
+              .top-info-data
+                - if  @file_rep_dispute.detection_last_set.present?
+                  = @file_rep_dispute.detection_last_set
+                - else
+                  No history to display
+          %label.content-label-sm AMP Detection - Date Last Pulled
+          .top-info-data
+            = @file_rep_dispute.last_fetched
           %hr
           %label.content-label-sm In Sample Zoo
           #zoo-loader

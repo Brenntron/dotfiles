@@ -30,12 +30,62 @@ Feature: Disputes
     When I go to "/escalations/file_rep/disputes"
     And I click "#new-dispute"
     And I fill in "shas_list" with "343518b26e0a872772808605f9f28aa75f64d86a6608e1347c979d033a72cb54"
+    And I wait for "12" seconds
     And I click ".primary"
     Then a FileRep Ticket should have been created
     And that FileRep Ticket should have a SHA256 of "343518b26e0a872772808605f9f28aa75f64d86a6608e1347c979d033a72cb54"
     And that FileRep Ticket should have an assignee of current user
     And that FileRep Ticket should have a suggested disposition of "Clean"
     And I should see "FILE REPUTATION TICKET CREATED."
+
+  @javascript
+  Scenario: an analyst tries to create a FileRep ticket but it is flagged as a duplicate and not processed
+    Given a user with role "filerep user" exists and is logged in
+    And the following customers exist:
+    |id| name            |
+    |1 | Dispute Analyst |
+    And the following FileRep disputes exist:
+    | sha256_hash                                                       |
+    | 343518b26e0a872772808605f9f28aa75f64d86a6608e1347c979d033a72cb54  |
+    And bugzilla rest api always saves
+    And ThreatGrid API call is stubbed
+    And Reversing Labs certificates API call is stubbed
+    And Sandbox API call is stubbed
+    And ReversingLabs API call is stubbed
+    And AMP API call is stubbed
+    And Sample Zoo API call is stubbed
+    And ReversingLabs Creation Data API call is stubbed
+    When I go to "/escalations/file_rep/disputes"
+    And I click "#new-dispute"
+    And I fill in "shas_list" with "343518b26e0a872772808605f9f28aa75f64d86a6608e1347c979d033a72cb54"
+    And I click ".primary"
+    And I should see "The following SHA256 hashes were duplicates and were not created: 343518b26e0a872772808605f9f28aa75f64d86a6608e1347c979d033a72cb54"
+    And I should not see "The following SHA256 hashes were created successfully:"
+
+  @javascript
+  Scenario: an analyst tries to create a FileRep ticket but one SHA25 is flagged as a duplicate and not processed, but the rest process
+    Given a user with role "filerep user" exists and is logged in
+    And the following customers exist:
+      |id| name            |
+      |1 | Dispute Analyst |
+    And the following FileRep disputes exist:
+      | sha256_hash                                                       |
+      | 343518b26e0a872772808605f9f28aa75f64d86a6608e1347c979d033a72cb54  |
+    And bugzilla rest api always saves
+    And ThreatGrid API call is stubbed
+    And Reversing Labs certificates API call is stubbed
+    And Sandbox API call is stubbed
+    And ReversingLabs API call is stubbed
+    And AMP API call is stubbed
+    And Sample Zoo API call is stubbed
+    And ReversingLabs Creation Data API call is stubbed
+    When I go to "/escalations/file_rep/disputes"
+    And I click "#new-dispute"
+    And I fill in "shas_list" with "343518b26e0a872772808605f9f28aa75f64d86a6608e1347c979d033a72cb54 123518b26e0a872772808605f9f28aa75f64d86a6608e1347c979d033a72cb54"
+    And I click ".primary"
+    And I should see "The following SHA256 hashes were created successfully: 123518b26e0a872772808605f9f28aa75f64d86a6608e1347c979d033a72cb54"
+    And I should see "The following SHA256 hashes were duplicates and were not created: 343518b26e0a872772808605f9f28aa75f64d86a6608e1347c979d033a72cb54"
+
 
   @javascript
   Scenario: a user tries to visit the FileRep disputes page with a FileRep role
@@ -268,9 +318,10 @@ Feature: Disputes
     Then I should see "FILE REPUTATION TICKET STATUSES UPDATED."
 
   @javascript
-  Scenario: a user visits the FileRep Dispute show page and changes assignee
-    Given a user with role "filerep user" exists within org subset "file rep" and is logged in
-    And A FileRep Dispute with trait "default" exists
+  Scenario: a user visits the FileRep Dispute show page with 'filerep manager' role and changes assignee
+    Given a user with role "filerep manager" exists within org subset "file rep" and is logged in
+    And vrtincoming exists
+    And A FileRep Dispute with trait "unassigned" exists
     When I go to "/escalations/file_rep/disputes/1"
     And I click "#index_change_assign"
     And I click "#button_reassign"
@@ -278,10 +329,18 @@ Feature: Disputes
     And I should see my username
 
   @javascript
+  Scenario: a user visits the FileRep Dispute show page with 'filerep user' role the 'change assignee' button is hidden
+    Given a user with role "filerep user" exists within org subset "file rep" and is logged in
+    And vrtincoming exists
+    And A FileRep Dispute with trait "unassigned" exists
+    When I go to "/escalations/file_rep/disputes/1"
+    Then I should not see button with class ".ticket-owner-button"
+
+  @javascript
   Scenario: a user visits the FileRep Dispute show page and takes a ticket
     Given a user with role "filerep user" exists and is logged in
     And vrtincoming exists
-    And A FileRep Dispute with trait "default" exists
+    And A FileRep Dispute with trait "unassigned" exists
     When I go to "/escalations/file_rep/disputes/1"
     And I click ".take-ticket-button"
     Then I should not see "ERROR UPDATING TICKET."
@@ -291,7 +350,7 @@ Feature: Disputes
   Scenario: a user visits the FileRep Dispute show page and returns a ticket
     Given a user with role "filerep user" exists and is logged in
     And vrtincoming exists
-    And A FileRep Dispute with trait "default" exists
+    And A FileRep Dispute with trait "unassigned" exists
     When I go to "/escalations/file_rep/disputes/1"
     And I click ".take-ticket-button"
     Then I should not see "ERROR UPDATING TICKET."
