@@ -482,3 +482,24 @@ Feature: Disputes
     And I click "#communication-tab-link"
     Then I should see content "seconds ago." within ".author-notation"
     Then I should not see "1 hour"
+
+  @javascript
+  Scenario: a user with the role 'amp pattern namer' visits the AMP Naming Convention page and sees the edit button
+    Given a user with role "amp pattern namer" exists and is logged in
+    When I go to "/escalations/file_rep/naming_guide"
+    Then I should see "EDIT AMP NAMING CONVENTIONS"
+
+  @javascript
+  Scenario: a user with the role 'amp pattern namer' visits the AMP Naming Convention page and sees the edit button
+    Given a user with role "amp pattern namer" exists and is logged in
+    When I go to "/escalations/file_rep/naming_guide"
+    And I click "#amp-edit-button"
+    And I click "#amp-new-button"
+    Then I should see content "" within ".amp-pattern"
+    Then I should see content "" within ".amp-example"
+    Then I should see content "" within ".amp-engine"
+    Then I should see content "" within ".amp-engine-description"
+    Then I should see content "" within ".amp-notes"
+    Then I should see content "" within ".amp-public-notes"
+    Then I should see content "" within ".amp-contact"
+
