@@ -188,7 +188,7 @@
             = @file_rep_dispute&.detection_last_set
           %label.content-label-sm AMP Detection - Date Last Pulled
           .top-info-data.detection-last-pulled
-            = @file_rep_dispute&.last_fetched
+            = @file_rep_dispute&.last_fetched&.utc&.strftime("%b %e, %Y %l:%M %p %Z")
           %label.content-label-sm In Sample Zoo
           - if @file_rep_dispute.in_zoo == true
             .top-info-data#sample-zoo-status{'data-zoo-status': 'YES'}
