@@ -482,7 +482,7 @@ class FileReputationDispute < ApplicationRecord
   def update_amp_detection_last_set
     detection_last_set = FileReputationApi::ElasticSearch.query(self.sha256_hash)
 
-    update!(detection_last_set: detection_last_set, last_fetched: DateTime.now)
+    update!(detection_last_set: detection_last_set, last_fetched: DateTime.now.utc)
   rescue => except
     Rails.logger.error("Error updating amp detection last set on #{self.id} -- #{except.message}")
   end
