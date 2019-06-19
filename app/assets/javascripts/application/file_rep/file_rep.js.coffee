@@ -1058,7 +1058,7 @@ $ ->
           $('.amp-area .disposition').text(response.disposition)
           $('.amp-area .detection-name').text(response.detection_name)
           $('.amp-area .detection-last-updated').text(response.detection_last_set)
-          $('.amp-area .detection-last-pulled').text(response.last_fetched)
+          $('.amp-area .detection-last-pulled').text(response.last_fetched).append(' UTC')
 
       error: () ->
         std_msg_error('Error with AMP', ['There was an error retrieving the AMP data.'])
