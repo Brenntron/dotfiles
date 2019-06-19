@@ -1043,6 +1043,32 @@ $ ->
     return false
 
 
+  # AMP detection data for File Rep > Show page, top right area
+  window.detection_now = (sha256_hash) ->
+    std_msg_ajax(
+      method: 'GET'
+      url: '/escalations/api/v1/escalations/file_rep/detections/' + sha256_hash + '/now'
+      success_reload: false
+
+      success: (response) ->
+        unless response.disposition == ''
+          if response.disposition == 'malicious'
+            $('.amp-area .disposition').addClass('disp-negative')
+
+          $('.amp-area .disposition').text(response.disposition)
+          $('.amp-area .detection-name').text(response.detection_name)
+          $('.amp-area .detection-last-updated').text(response.detection_last_set).append(' UTC')
+          $('.amp-area .detection-last-pulled').text(response.last_fetched).append(' UTC')
+
+      error: () ->
+        std_msg_error('Error with AMP', ['There was an error retrieving the AMP data.'])
+
+      complete: () ->
+        $('.amp-area .inline-loader-wrapper').hide()
+    )
+
+
+
 # TODO: This stuff maybe should be moved into its own file later, but dropping here because convenient
 # (it's all for the comms tab of the show page)
 
@@ -1114,6 +1140,11 @@ $ ->
 
   $(document).ready ->
 
+    # dbinebri: get amp detection data for show page, make sure you're on show page
+    if $('body.escalations--file_rep--disputes-controller').hasClass('show-action')
+      curr_sha256_hash = $('#sha256_hash').text()
+      detection_now(curr_sha256_hash)
+
     $('select[name="file-rep-datatable_length"]').on "change", ->
       data = {}
       data['entriesperpage'] = $('select[name="file-rep-datatable_length"]').val()
@@ -1180,6 +1211,7 @@ $ ->
         data: {data, name: 'FileRepColumns'}
         dataType: 'json'
         success: (response) ->
+        error: () ->
       )
 
     if window.location.pathname == '/escalations/file_rep/disputes'
@@ -1200,6 +1232,8 @@ $ ->
 
       )
 
+
+
       std_msg_ajax(
         method: 'POST'
         url: "/escalations/api/v1/escalations/user_preferences/"
@@ -1207,6 +1241,7 @@ $ ->
         success: (response) ->
           response = JSON.parse(response)
           $('#file-rep-datatable').DataTable().order(response.sortorder).draw()
+        error: () ->
       )
 
       std_msg_ajax(
@@ -1216,6 +1251,7 @@ $ ->
         success: (response) ->
           response = JSON.parse(response)
           $('#file-rep-datatable').DataTable().page(response.currentpage).draw('page')
+        error: () ->
       )
 
       std_msg_ajax(
@@ -1225,6 +1261,7 @@ $ ->
         success: (response) ->
           response = JSON.parse(response)
           $('#file-rep-datatable').DataTable().page.len(response.entriesperpage).draw('page')
+        error: () ->
       )
 
 
