@@ -91,7 +91,7 @@ $ ->
         if uniques_stat == true && duplicates_stat == true
           std_msg_error('Unable to create all File Reputation Tickets', [success_message, '<span class="code-content">' + uniques_string + '</span>', dup_message, '<span class="code-content">' + duplicates_string + '</span>'], reload: true)
         else if uniques_stat == true && duplicates_stat == false
-          std_msg_error('Unable to create all File Reputation Tickets', [success_message, '<span class="code-content">' + uniques_string + '</span>'], reload: true)
+          std_msg_success('File Reputation Tickets Created', [success_message, '<span class="code-content">' + uniques_string + '</span>'], reload: true)
         else
           std_msg_error('Unable to create File Reputation Tickets', [dup_message, '<span class="code-content">' + duplicates_string + '</span>'], reload: true)
 
