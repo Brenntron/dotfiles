@@ -13,6 +13,8 @@ $(document).ready ->
 # WBNP - Get report id
 window.fetch_wbnp_data = () ->
   $('#fetch_wbnp').attr('disabled', true)
+  $('#fetch_wbnp').addClass('esc-tooltipped')
+  $('.wbnp-loading-spinner').show()
   std_msg_ajax(
     method: 'POST'
     url: '/escalations/api/v1/escalations/webcat/complaints/fetch_wbnp_data'
@@ -58,10 +60,12 @@ check_wbnp = window.check_wbnp_status = (wbnp_report_id) ->
       # If status is active, fetch button should be disabled
       if status == 'active'
         $('#fetch_wbnp').attr('disabled', true)
+        $('#fetch_wbnp').removeClass('esc-tooltipped')
         # Check in 5 minutes to see if report has finished
         setTimeout(check_wbnp, 120000)
       else
         $('#fetch_wbnp').attr('disabled', false)
+        $('#fetch_wbnp').addClass('esc-tooltipped')
 
     error: (response) ->
       $('.wbnp-loading-spinner').hide()
