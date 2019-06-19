@@ -11,32 +11,36 @@ class FileReputationDispute < ApplicationRecord
 
   delegate :name, :email, :company, :company_name, :company_id, to: :customer, allow_nil: true, prefix: true
 
-  STATUS_NEW                        = 'NEW'
-  STATUS_ASSIGNED                   = 'ASSIGNED'
-  STATUS_RESEARCHING                = 'RESEARCHING'
-  STATUS_ESCALATED                  = 'ESCALATED'
-  STATUS_PENDING                    = 'PENDING'
-  STATUS_ONHOLD                     = 'ONHOLD'
-  STATUS_RESOLVED                   = 'RESOLVED'
-  STATUS_REOPENED                   = 'RE-OPENED'
-  STATUS_CUSTOMER_PENDING           = "CUSTOMER_PENDING"
-  STATUS_CUSTOMER_UPDATE            = "CUSTOMER_UPDATE"
+  STATUS_NEW                = 'NEW'
+  STATUS_ASSIGNED           = 'ASSIGNED'
+  STATUS_RESEARCHING        = 'RESEARCHING'
+  STATUS_ESCALATED          = 'ESCALATED'
+  STATUS_PENDING            = 'PENDING'
+  STATUS_ONHOLD             = 'ONHOLD'
+  STATUS_RESOLVED           = 'RESOLVED'
+  STATUS_REOPENED           = 'RE-OPENED'
+  STATUS_CUSTOMER_PENDING   = 'CUSTOMER_PENDING'
+  STATUS_CUSTOMER_UPDATE    = 'CUSTOMER_UPDATE'
 
-  DISPOSITION_UNSEEN                = 'unseen'
-  DISPOSITION_UNKNOWN               = 'unknown'
-  DISPOSITION_MALICIOUS             = 'malicious'
-  DISPOSITION_COMMON                = 'common'
-  DISPOSITION_CLEAN                 = 'clean'
+  DISPOSITION_UNSEEN        = 'unseen'
+  DISPOSITION_UNKNOWN       = 'unknown'
+  DISPOSITION_MALICIOUS     = 'malicious'
+  DISPOSITION_COMMON        = 'common'
+  DISPOSITION_CLEAN         = 'clean'
 
-  SUBMITTER_TYPE_AC_FORM            = 'AC-Form'
-  SUBMITTER_TYPE_TI_FORM            = 'TI-Form'
-  SUBMITTER_TYPE_TI_API             = 'TI-API'
+  SUBMITTER_TYPE_AC_REFRESH = 'AC-Refresh'
+  SUBMITTER_TYPE_AC_FORM    = 'AC-Form'
+  SUBMITTER_TYPE_TI_FORM    = 'TI-Form'
+  SUBMITTER_TYPE_TI_API     = 'TI-API'
 
-  RESOLUTION_AUTORESOLVED           = 'AUTO-RESOLVED'
+  RESOLUTION_AUTORESOLVED               = 'Auto Resolved'
   RESOLUTION_DUPLICATE              = 'DUPLICATE'
-
-  RESOLUTION_AUTORESOLVED_COMMENT   = 'This ticket has been auto-resolved, suggested disposition and disposition already match.'
-  RESOLUTION_DUPLICATE_COMMENT      = 'This ticket has been auto-resolved. A ticket with the same SHA256 hash already exists and is still open.'
+  RESOLUTION_AUTORESOLVED_COMMENT       = <<~HEREDOC
+    This ticket has been auto-resolved, suggested disposition and disposition already match.
+  HEREDOC
+  RESOLUTION_DUPLICATE_COMMENT          = <<~HEREDOC
+    This ticket has been auto-resolved. A ticket with the same SHA256 hash already exists and is still open.
+  HEREDOC
 
   validates :status, :sha256_hash, :disposition_suggested, presence: true
   validates :sha256_hash, format: { with: /\A\h{64}\z/, message: "only 64 nibble (256 bit) hex code" }
@@ -463,8 +467,8 @@ class FileReputationDispute < ApplicationRecord
     end
   end
 
-  def update_sandbox_score
-    sandbox_score = FileReputationApi::Sandbox.score(self.sha256_hash)
+  def update_sandbox_score(api_key_type: self.submitter_type)
+    sandbox_score = FileReputationApi::Sandbox.score(self.sha256_hash, api_key_type: api_key_type)
     sandbox_threshold = self.pdf? ? 90.0 : 61.0
     update!(sandbox_score: sandbox_score, sandbox_threshold: sandbox_threshold)
   rescue => except
@@ -502,7 +506,7 @@ class FileReputationDispute < ApplicationRecord
   def update_superfecta
     update_threadgrid_score
     update_reversing_labs_score
-    update_sandbox_score
+    update_sandbox_score(api_key_type: SUBMITTER_TYPE_AC_REFRESH)
     update_sample_zoo
   end
 
@@ -576,7 +580,7 @@ class FileReputationDispute < ApplicationRecord
         new_dispute.disposition_suggested = message_payload[:disposition_suggested]
         new_dispute.source = message_payload[:source]
         new_dispute.platform = message_payload[:platform]
-        new_dispute.submitter_type = message_payload['submitter_type']
+        new_dispute.submitter_type = message_payload[:submitter_type]
 
         new_dispute.save
 
