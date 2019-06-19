@@ -1057,7 +1057,7 @@ $ ->
 
           $('.amp-area .disposition').text(response.disposition)
           $('.amp-area .detection-name').text(response.detection_name)
-          $('.amp-area .detection-last-updated').text(response.detection_last_set)
+          $('.amp-area .detection-last-updated').text(response.detection_last_set).append(' UTC')
           $('.amp-area .detection-last-pulled').text(response.last_fetched).append(' UTC')
 
       error: () ->
