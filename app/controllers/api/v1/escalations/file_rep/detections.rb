@@ -48,8 +48,10 @@ module API
                   Rails.logger.error("Error saving updated detection information -- #{$!.message}")
                 end
 
-                { detection_name: detection.name, disposition: detection.disposition, detection_last_set: detection_last_set,
-                  last_fetched: last_fetched.strftime("%b %e, %Y %l:%M %p")}
+                { detection_name: detection.name,
+                  disposition: detection.disposition,
+                  detection_last_set: detection_last_set,
+                  last_fetched: last_fetched.strftime("%b %e, %Y %l:%M %p %Z")}
               end
             end
           end
