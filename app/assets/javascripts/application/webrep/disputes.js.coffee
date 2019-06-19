@@ -1589,10 +1589,11 @@ $ ->
     url: "/escalations/api/v1/escalations/user_preferences/"
     data: {name: 'WebRepEntriesPerPage'}
     success: (response) ->
-      response = JSON.parse(response)
-      $('select[name="disputes-index_length"]').val(response.entriesperpage)
-      $('#disputes-index').DataTable().page.len(response.entriesperpage).draw('page')
-      pageLength = response.entriesperpage
+      unless $('body').hasClass('escalations--file_rep--disputes-controller')
+        response = JSON.parse(response)
+        $('select[name="disputes-index_length"]').val(response.entriesperpage)
+        $('#disputes-index').DataTable().page.len(response.entriesperpage).draw('page')
+        pageLength = response.entriesperpage
   )
 
   std_msg_ajax(

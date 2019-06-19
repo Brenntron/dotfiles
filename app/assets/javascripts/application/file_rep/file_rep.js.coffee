@@ -1211,6 +1211,7 @@ $ ->
         data: {data, name: 'FileRepColumns'}
         dataType: 'json'
         success: (response) ->
+        error: () ->
       )
 
     if window.location.pathname == '/escalations/file_rep/disputes'
@@ -1250,6 +1251,7 @@ $ ->
         success: (response) ->
           response = JSON.parse(response)
           $('#file-rep-datatable').DataTable().page(response.currentpage).draw('page')
+        error: () ->
       )
 
       std_msg_ajax(
@@ -1259,6 +1261,7 @@ $ ->
         success: (response) ->
           response = JSON.parse(response)
           $('#file-rep-datatable').DataTable().page.len(response.entriesperpage).draw('page')
+        error: () ->
       )
 
 
