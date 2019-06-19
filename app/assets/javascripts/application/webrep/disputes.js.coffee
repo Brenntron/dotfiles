@@ -137,6 +137,7 @@ window.populate_webrep_index_table = (data = {}, reload = false) ->
           success: (response) ->
             response = JSON.parse(response)
             $('#disputes-index').DataTable().order(response.sortorder).draw()
+          error: () ->
         )
 
 
@@ -1599,8 +1600,9 @@ $ ->
     url: "/escalations/api/v1/escalations/user_preferences/"
     data: {name: 'WebRepCurrentPage'}
     success: (response) ->
-      response = JSON.parse(response)
-      $('#disputes-index').DataTable().page(response.currentpage).draw('page')
+      unless $('body').hasClass('escalations--file_rep--disputes-controller')
+        response = JSON.parse(response)
+        $('#disputes-index').DataTable().page(response.currentpage).draw('page')
   )
 
   window.open_dashboard_dispute_table = $('#table-user-disputes-open').DataTable(
