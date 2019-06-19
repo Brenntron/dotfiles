@@ -1233,7 +1233,6 @@ $ ->
 
 
 
-
       std_msg_ajax(
         method: 'POST'
         url: "/escalations/api/v1/escalations/user_preferences/"
@@ -1241,6 +1240,7 @@ $ ->
         success: (response) ->
           response = JSON.parse(response)
           $('#file-rep-datatable').DataTable().order(response.sortorder).draw()
+        error: () ->
       )
 
       std_msg_ajax(
