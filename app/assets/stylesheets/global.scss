@@ -6710,7 +6710,6 @@ table#duplicates a {
 
 //Crappy temporary hack to keep the annoying insane amt of entries for xbrs from taking over and ruining the whole page
 .xbrs-details-table .dataTables_scrollBody {
-  max-width: 1200px !important;
   overflow-y: scroll !important;
 }
 
@@ -8366,4 +8365,25 @@ input[type="radio"].resolution_radio_button {
 // more width so this aligns with the comment fields and for long URIs
 .complaint-uri-input {
   width: 65%;
+}
+
+// ensure the XBRS history thead is aligned properly and sticks while scrolling
+#DataTables_Table_0_wrapper .dataTables_scrollBody {
+  word-break: break-all;
+  thead tr th {
+    word-break: break-all;
+    position: -webkit-sticky;
+    position: sticky;
+    top: 0;
+    background: #4e4e4e;  // chg to hex
+    border-bottom: 1px solid #333;
+    div.dataTables_sizing {
+      min-height: 30px !important;
+      padding: 6px !important;
+    }
+    tbody tr td {
+      word-break: break-all;
+      padding: 2px;
+    }
+  }
 }

@@ -366,3 +366,10 @@ $(document).ready ->
       $('.ticket-resolution-radio').prop('checked', false)
       $('#show-ticket-resolution-submenu').hide()
       $(res_comment[0]).val('')
+
+
+  # XBRS history: showing the correct table headers, removing inline styles
+  xbrs_table = $('#DataTables_Table_0_wrapper')
+  xbrs_table.find('.dataTables_scrollHead').addClass('hidden')
+  xbrs_table.find('.dataTables_scrollBody thead tr').removeAttr('style')
+  xbrs_table.find('.dataTables_scrollBody th.sorting_disabled, .dataTables_scrollBody th.sorting_disabled div').removeAttr('style')
