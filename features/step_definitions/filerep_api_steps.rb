@@ -36,5 +36,5 @@ Given (/^ReversingLabs Creation Data API call is stubbed$/) do
 end
 
 Given(/^TI AMP Naming Convention API call is stubbed$/) do
-  Threatgrid::Search.stub(:update_ti!).and_return([])
+  TiApi::AmpNamingPattern.stub(:call_request).and_return([])
 end
