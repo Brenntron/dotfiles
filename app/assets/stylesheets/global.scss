@@ -7618,7 +7618,12 @@ td.text-center span {
     padding: 0 15px;
     &:last-of-type {
       position: relative;
-      top: 5px;
+      top: 6px;
+    }
+    @-moz-document url-prefix() {
+      &:last-of-type {
+        top: 7px;
+      }
     }
 
     span {
