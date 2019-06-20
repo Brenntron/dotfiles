@@ -18,14 +18,14 @@ $ ->
     return
 
   # Add Rows to Quick lookup research table
-  researchTable = $('.research-table').DataTable({
-    "ordering": false,
-    "paging": false,
-    columnDefs: [
-      "targets": [ 0 ],
-      "visible": false
-    ]
-  });
+#  researchTable = $('.research-table').DataTable({
+#    "ordering": false,
+#    "paging": false,
+#    columnDefs: [
+#      "targets": [ 0 ],
+#      "visible": false
+#    ]
+#  });
 
   $(document).on 'click', '.research-header-wrapper li', (e) ->
     tab = location.href
@@ -47,78 +47,41 @@ $ ->
     bulk_value = select_vals.every( (col) -> return col)
     $('#select-all-bulk').prop('checked', bulk_value)
 
-  window.buildRow = ( text_list, parent_index ) ->
+  window.buildRow = ( text_list, parent_row) ->
+    tbody = document.querySelector('.research-table tbody')
+    existing_rows = $(tbody).find('tr')
+    disputes = []
+    parent_index = parent_row.rowIndex - 1
 
-    row_data = researchTable.rows().data()
-    parent_index = parseInt(parent_index)
-    parent_dispute = researchTable.row( parent_index ).data()[2]
-    parent_text = $( parent_dispute ).text()
-    parent_data = $(parent_dispute).attr('data')
-
-    if parent_data == undefined
-      parent_data = ''
-
-    existing_url = $(document).find('.col-bulk-dispute')
-    $(existing_url).each ->
-      url = $(this).attr('data')
-      if url != ''
-        text_list = text_list.filter( (text) -> return text != url && text != '')
-
-    i = 0
-    researchTable.rows().every () ->
-      data = researchTable.data(this)[0][0]
-      if typeof data == 'string'
-        researchTable.row().remove(this)
-      i++
-
-    if !text_list.length
-      text_list = ['']
+    $(existing_rows).each ->
+      dispute_col = $(this).find('.col-bulk-dispute')[0]
+      data = $(dispute_col).context.attributes.data.value
+      if data != ''
+        disputes.push(data)
+    if disputes.length
+      for i in [0...text_list.length]
+        disputes.splice parent_index + i, 0, text_list[i]
     else
-      if parent_index == 0 && parent_text == '' || parent_text != ''
-        text_list.push('')
-
-    parent_data_check = parent_data == text_list[0]
-
-    for i in [0...text_list.length]
-      new_index = parent_index + i
-      if !parent_data_check && parent_data != ''
-        new_index = new_index + 1
-      new_data = [
-        new_index,
-        '<div class="col-select-all">' +
+      for i in [0...text_list.length]
+        disputes.push(text_list[i])
+    tbody.innerHTML = ''
+    for i in [0...disputes.length]
+      tbody.innerHTML +=
+        '<tr>' +
+          '<td class="col-select-all">' +
           '<span class="checkbox-wrapper">' +
             '<input type="checkbox" checked>' +
           '</span>' +
-        '</div>',
-        '<div class="col-bulk-dispute" contenteditable="true" data=' + text_list[i] + '>' + text_list[i] + '</div>',
-        '<div class="col-wbrs"></div>',
-        '<div class="col-wbrs-rule-hits"></div>',
-        '<div class="col-wbrs-rules"></div>',
-        '<div class="col-category"></div>',
-        '<div class="col-wlbl"></div>',
-        '<div class="col-reptool-class"></div>',
-        '<div class="col-actions"></div>'
-      ]
-
-      # insert new data in array at index it will be displayed in
-      row_data.splice new_index, 0, new_data
-      # set index row to match new placement in datatable
-      for i in [0...row_data.length]
-        row_data[i][0] = i
-
-      #  add new row(s) to datatable, delay redraw of table til row data is updated
-      researchTable.row.add(new_data).draw('false')
-    #  replace all rows with updated data and redraw
-    i = 0
-    researchTable.rows().every () ->
-      this.invalidate()
-      this.data( row_data[i] )
-      i++
-
-    researchTable.draw()
-
-    focus_row = $('.col-bulk-dispute')[new_index]
-    focus_row.focus()
+          '</<td>'+
+          '<td class="col-bulk-dispute" contenteditable="true" data=' + disputes[i] + '>' + disputes[i] + '</td>'+
+          '<td class="col-wbrs"></td>'+
+          '<td class="col-wbrs-rule-hits"></td>'+
+          '<td class="col-wbrs-rules"></td>'+
+          '<td class="col-category"></td>'+
+          '<td class="col-wlbl"></td>'+
+          '<td class="col-reptool-class"></td>'+
+          '<td class="col-actions"></td>' +
+        '</tr>'
 
   window.bindControls = () ->
     $(document).unbind('focusout')
@@ -127,50 +90,31 @@ $ ->
     , 250
 
   set_row_text = (e, el) ->
-    { which: key, type } = e
-    text = el.innerText.trim().replace( /\n/g, " " ).split(" ")
+    { which: key, type, shiftKey } = e
+    text = el.innerText.trim()
+    text_list = text.replace( /\n/g, ", " ).split(", ")
     row = el.closest('tr')
+    tbody = row.closest('tbody')
 
-    text = text.filter( (item, index) -> return text.indexOf item == index)
-    parent_row = researchTable.row( row ).data()
+    text_list = text_list.filter( (item, index) ->
+      if item != ''
+        return text_list.indexOf item == index
+    )
 
-    if key == 13 && !e.shiftKey
-      bindControls()
-      buildRow(text, parent_row[0])
+    switch( key )
+      when 13
+        if !shiftKey && text_list.length
+            bindControls()
+            buildRow(text_list, row)
+            $('#empty_row').remove()
+      when 0
+        if text_list.length > 1
+          buildRow(text_list, row)
+          $('#empty_row').remove()
 
-    if key == 8 && text.length == 1 &&  text[0] == ''
-      researchTable.rows( row ).remove()
-
-      i = 0
-      researchTable.rows().every () ->
-        researchTable.row( this).data()[0] = i
-        i++
-      researchTable.rows().invalidate()
-      researchTable.draw()
-
-    if key == 0 && parent_row != undefined
-      if text.length > 1
-        buildRow(text, parent_row[0])
-      else
-        new_data = [
-          parent_row[0],
-          '<div class="col-select-all">' +
-            '<span class="checkbox-wrapper">' +
-            '<input type="checkbox" checked>' +
-            '</span>' +
-            '</div>',
-          '<div class="col-bulk-dispute" contenteditable="true" data=' + text[0] + '>' + text[0] + '</div>',
-          '<div class="col-wbrs"></div>',
-          '<div class="col-wbrs-rule-hits"></div>',
-          '<div class="col-wbrs-rules"></div>',
-          '<div class="col-category"></div>',
-          '<div class="col-wlbl"></div>',
-          '<div class="col-reptool-class"></div>',
-          '<div class="col-actions"></div>'
-        ]
-      researchTable.row( row ).data(new_data)
-      researchTable.rows().invalidate()
-      researchTable.draw()
+      when 8
+        if text == '' && $(tbody).children().length > 1
+          $(row).remove()
 
   $( document ).on 'keydown focusout', '.col-bulk-dispute', (e) -> set_row_text(e, this)
 ->
