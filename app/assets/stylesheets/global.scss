@@ -8368,22 +8368,31 @@ input[type="radio"].resolution_radio_button {
 }
 
 // ensure the XBRS history thead is aligned properly and sticks while scrolling
-#DataTables_Table_0_wrapper .dataTables_scrollBody {
-  word-break: break-all;
-  thead tr th {
-    word-break: break-all;
+.entry-details-table.xbrs-details-table {
+  table > thead > tr > th {
     position: -webkit-sticky;
     position: sticky;
     top: 0;
-    background: #4e4e4e;  // chg to hex
-    border-bottom: 1px solid #333;
-    div.dataTables_sizing {
-      min-height: 30px !important;
-      padding: 6px !important;
+    background-color: $table-dark-body;
+    border-bottom: $type-base-color 1px solid;
+  }
+}
+
+// laptop screen width - ensure xbrs table fits on-screen
+@media screen and (max-width: 1600px) {
+  .entry-details-table.xbrs-details-table {
+    th {
+      font-size: 9px;
+      padding: 8px 6px;
     }
-    tbody tr td {
-      word-break: break-all;
-      padding: 2px;
+    td {
+      padding: 6px 8px;
     }
   }
+}
+
+// specific fixes for one-off XBRS headers
+.entry-details-table.xbrs-details-table .dataTables_wrapper .dataTables_scroll div.dataTables_scrollBody > table > thead > tr > th > div.dataTables_sizing {
+  min-height: 30px !important;
+  padding: 8px !important;
 }
