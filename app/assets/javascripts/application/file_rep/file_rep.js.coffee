@@ -1051,7 +1051,7 @@ $ ->
       success_reload: false
 
       success: (response) ->
-        unless response.disposition == ''
+        unless response.disposition == '' || response.disposition == 'unseen'
           if response.disposition == 'malicious'
             $('.amp-area .disposition').addClass('disp-negative')
 
@@ -1065,6 +1065,18 @@ $ ->
 
       complete: () ->
         $('.amp-area .inline-loader-wrapper').hide()
+    )
+
+  # ancheng3 - Setting up the AJAX call for Dan to implement the AMP History modal
+  window.get_amp_history = (sha256_hash) ->
+    std_msg_ajax(
+      method: 'GET'
+      url: '/escalations/api/v1/escalations/file_rep/detections/' + sha256_hash + '/history'
+      success_reload: false
+      success: (response) ->
+        debugger
+      error: (response) ->
+       std_msg_error('Error with AMP', ['There was an error retrieving the AMP history.'])
     )
 
 
@@ -1139,11 +1151,12 @@ $ ->
 
 
   $(document).ready ->
-
     # dbinebri: get amp detection data for show page, make sure you're on show page
     if $('body.escalations--file_rep--disputes-controller').hasClass('show-action')
       curr_sha256_hash = $('#sha256_hash').text()
+
       detection_now(curr_sha256_hash)
+      get_amp_history(curr_sha256_hash)
 
     $('select[name="file-rep-datatable_length"]').on "change", ->
       data = {}
