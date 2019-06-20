@@ -9,6 +9,13 @@ $(window).load ->
 
   $(".email-row[email_id="+most_recent_email+"]").click()
 
+
+
+  $('.case-history-author').each(() ->
+    if (this.innerHTML.indexOf("bounces+") != -1)
+      $(this).html("Bounced")
+  )
+
 $ ->
 
   $('#history-sort-dropdown').on 'change', ->
@@ -76,6 +83,7 @@ $ ->
     )
 
   populate_communication_details = (email, attachments, case_email) ->
+    $(".reply-button").show()
     dispute_id = $('input[name="dispute_id"]').val()
     $('input[type=text].reply-subject').val("Talosintelligence.com support request " + dispute_id)
     $('.communication-subject')[0].innerHTML = email.subject
@@ -86,8 +94,18 @@ $ ->
 
     $('.receiver-email').each(() ->
       if (this.innerHTML.indexOf("bounces+") != -1)
-        $(this).prepend("<span class='badge badge-warning'>Bounced</span> ")
+        $(this).html("<span class='badge badge-warning'>Bounced</span> ")
+        $(".reply-button").hide()
+
     )
+
+    $('.author-username').each(() ->
+      if (this.innerHTML.indexOf("bounces+") != -1)
+        $(this).html("<span class='badge badge-warning'>Bounced</span> ")
+        $(".reply-button").hide()
+    )
+
+
 
 
     date = moment.utc(email.created_at)
