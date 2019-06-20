@@ -139,31 +139,31 @@ $ ->
       '<tr class="amp-naming-row" data-sort-sequence="' + new_sequence_number + '" data-id="" data-unsaved-id="' + new_sequence_number + '">' +
       '<td class="amp-pattern">' +
       '<span class="table-content"><span class="table-code"></span></span>' +
-      '<span class="table-form-content"><input type="text"></input></span>' +
+      '<span class="table-form-content"><input class="code-input" type="text"></input></span>' +
       '</td>' +
       '<td class="amp-example">' +
       '<span class="table-content"></span>' +
-      '<span class="table-form-content"><input type="text"></input></span>' +
+      '<span class="table-form-content"><input class="example-input" type="text"></input></span>' +
       '</td>' +
       '<td class="amp-engine">' +
       '<span class="table-content"></span>' +
-      '<span class="table-form-content"><input type="text"></input></span>' +
+      '<span class="table-form-content"><input class="engine-input" type="text"></input></span>' +
       '</td>' +
       '<td class="amp-engine-description">' +
       '<span class="table-content"></span>' +
-      '<span class="table-form-content"><textarea></textarea></span>' +
+      '<span class="table-form-content"><textarea class="description-textarea" ></textarea></span>' +
       '</td>' +
       '<td class="amp-notes">' +
       '<span class="table-content"></span>' +
-      '<span class="table-form-content"><textarea></textarea></span>' +
+      '<span class="table-form-content"><textarea class="notes-input"></textarea></span>' +
       '</td>' +
       '<td class="amp-public-notes">' +
       '<span class="table-content"></span>' +
-      '<span class="table-form-content"><textarea></textarea></span>' +
+      '<span class="table-form-content"><textarea class="notes-public-textarea"></textarea></span>' +
       '</td>' +
       '<td class="amp-contact">' +
       '<span class="table-content"></span>' +
-      '<span class="table-form-content"><textarea></textarea></span>' +
+      '<span class="table-form-content"><textarea class="contact-textarea"></textarea></span>' +
       '<span class="delete-button" onclick="delete_amp_naming_convention(' + new_sequence_number + ', \'\')"></span>' +
       '</td>' +
       '</tr>'

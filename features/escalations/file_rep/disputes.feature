@@ -503,3 +503,19 @@ Feature: Disputes
     Then I should see content "" within ".amp-public-notes"
     Then I should see content "" within ".amp-contact"
 
+  @javascript
+  Scenario: a user with the role 'amp pattern namer' visits the AMP Naming Convention page and saves an entry
+    Given a user with role "amp pattern namer" exists and is logged in
+    And TI AMP Naming Convention API call is stubbed
+    When I go to "/escalations/file_rep/naming_guide"
+    And I click "#amp-edit-button"
+    And I click "#amp-new-button"
+    And I fill in element, ".code-input" with "Code"
+    And I fill in element, ".example-input" with "Example"
+    And I fill in element, ".engine-input" with "Engine"
+    And I fill in element, ".description-textarea" with "Description"
+    And I fill in element, ".notes-input" with "Notes"
+    And I fill in element, ".notes-public-textarea" with "Public Notes"
+    And I fill in element, ".contact-textarea" with "Contact"
+    And I click "#amp-save-button"
+    Then I should see "THE FOLLOWING AMP NAMING CONVENTIONS HAVE BEEN CREATED:"
