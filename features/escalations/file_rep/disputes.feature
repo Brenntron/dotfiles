@@ -490,7 +490,7 @@ Feature: Disputes
     Then I should see "EDIT AMP NAMING CONVENTIONS"
 
   @javascript
-  Scenario: a user with the role 'amp pattern namer' visits the AMP Naming Convention page and sees the edit button
+  Scenario: a user with the role 'amp pattern namer' visits the AMP Naming Convention page and clicks the edit button and a blank row is created
     Given a user with role "amp pattern namer" exists and is logged in
     When I go to "/escalations/file_rep/naming_guide"
     And I click "#amp-edit-button"
