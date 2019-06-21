@@ -368,9 +368,6 @@ $(document).ready ->
       $(res_comment[0]).val('')
 
 
-  # XBRS history: showing the correct table headers, removing inline styles
-  xbrs_table = $('.xbrs-details-table[data-entry-id]')
-  xbrs_table.find('.dataTables_scrollHead').addClass('hidden')
-
-  xbrs_table.find('.dataTables_scrollBody thead tr').removeAttr('style')
-  xbrs_table.find('.dataTables_scrollBody th.sorting_disabled, .dataTables_scrollBody th.sorting_disabled div').removeAttr('style')
+  # XBRS history on webrep: fixes to ensure showing the correct table headers, removing conflicting inline styles
+  $('.xbrs-details-table .dataTables_scrollHead').addClass('hidden')
+  $('.xbrs-details-table .dataTables_scrollBody').find('thead tr, th, th div').removeAttr('style')

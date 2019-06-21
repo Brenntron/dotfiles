@@ -8367,14 +8367,19 @@ input[type="radio"].resolution_radio_button {
   width: 65%;
 }
 
-// ensure the XBRS history thead is aligned properly and sticks while scrolling
-.entry-details-table.xbrs-details-table {
+// ensure the XBRS history headers are accurate and stay put while scrolling
+.entry-details-table.xbrs-details-table .dataTables_wrapper .dataTables_scrollBody {
   table > thead > tr > th {
     position: -webkit-sticky;
     position: sticky;
     top: 0;
     background-color: $table-dark-body;
     border-bottom: $type-base-color 1px solid;
+    // sizing overrides needed here
+    .dataTables_sizing {
+      min-height: 30px !important;
+      padding: 8px !important;
+    }
   }
 }
 
@@ -8382,17 +8387,11 @@ input[type="radio"].resolution_radio_button {
 @media screen and (max-width: 1600px) {
   .entry-details-table.xbrs-details-table {
     th {
-      font-size: 9px;
       padding: 8px 6px;
     }
     td {
       padding: 6px 8px;
+      word-break: break-word;
     }
   }
-}
-
-// specific fixes for one-off XBRS headers
-.entry-details-table.xbrs-details-table .dataTables_wrapper .dataTables_scroll div.dataTables_scrollBody > table > thead > tr > th > div.dataTables_sizing {
-  min-height: 30px !important;
-  padding: 8px !important;
 }
