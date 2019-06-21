@@ -17,16 +17,6 @@ $ ->
       $('#communication-tab-link').tab('show')
     return
 
-  # Add Rows to Quick lookup research table
-#  researchTable = $('.research-table').DataTable({
-#    "ordering": false,
-#    "paging": false,
-#    columnDefs: [
-#      "targets": [ 0 ],
-#      "visible": false
-#    ]
-#  });
-
   $(document).on 'click', '.research-header-wrapper li', (e) ->
     tab = location.href
     if tab.includes('detail')
@@ -53,17 +43,33 @@ $ ->
     disputes = []
     parent_index = parent_row.rowIndex - 1
 
+    text_list.push(' ')
+
     $(existing_rows).each ->
       dispute_col = $(this).find('.col-bulk-dispute')[0]
       data = $(dispute_col).context.attributes.data.value
       if data != ''
         disputes.push(data)
+
+    text_list = text_list.filter( (text)-> return !disputes.includes(text) )
+
     if disputes.length
-      for i in [0...text_list.length]
-        disputes.splice parent_index + i, 0, text_list[i]
+      parent_index = parent_index + 1
+      if text_list.length == 1 && text_list[0] != ''
+        console.log 'in first', text_list, disputes
+        for i in [0...text_list.length]
+          disputes.splice parent_index + i, 0, text_list[i]
+          focus_index = parent_index + i
+      else
+        console.log 'in second'
+        for i in [0...text_list.length]
+          disputes.splice parent_index + i, 0, text_list[i]
+          focus_index = parent_index + i
     else
       for i in [0...text_list.length]
         disputes.push(text_list[i])
+        focus_index = i
+
     tbody.innerHTML = ''
     for i in [0...disputes.length]
       tbody.innerHTML +=
@@ -83,6 +89,9 @@ $ ->
           '<td class="col-actions"></td>' +
         '</tr>'
 
+      new_focus = $(tbody).find('tr')[focus_index]
+      $(new_focus).find('.col-bulk-dispute').focus()
+
   window.bindControls = () ->
     $(document).unbind('focusout')
     setTimeout () ->
@@ -100,18 +109,16 @@ $ ->
       if item != ''
         return text_list.indexOf item == index
     )
-
     switch( key )
       when 13
         if !shiftKey && text_list.length
             bindControls()
             buildRow(text_list, row)
-            $('#empty_row').remove()
       when 0
         if text_list.length > 1
           buildRow(text_list, row)
-          $('#empty_row').remove()
-
+        else
+          $(row).data(text)
       when 8
         if text == '' && $(tbody).children().length > 1
           $(row).remove()
