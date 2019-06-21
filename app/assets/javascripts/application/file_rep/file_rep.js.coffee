@@ -623,7 +623,7 @@ $ ->
         data: 'detection_last_set'
         render: (data) ->
           if data
-            return moment(new Date(data)).utc().format('MMM D, YYYY H:mm') + ' UTC'
+            return moment(new Date(data)).utc().format('MMM D, YYYY h:mm  A z')
           else
             return ''
       }
