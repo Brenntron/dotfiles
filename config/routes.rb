@@ -22,6 +22,10 @@ Rails.application.routes.draw do
       end
     end
 
+    namespace :other_admin_tools do
+      root 'tools#index'
+    end
+
     namespace :webcat do
       root 'root#index'
       resources :complaints, only: [:index, :show, :update] do
