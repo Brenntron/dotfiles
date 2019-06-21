@@ -723,7 +723,7 @@ $ ->
         render: (data) ->
           if data == null
             return
-          if data == 'malicious'
+          if data.toLowerCase() == 'malicious'
             return '<span class="malicious text-capitalize"> malicious</span>'
           else
             return  '<span class="text-capitalize"> ' + data + ' </span>'
