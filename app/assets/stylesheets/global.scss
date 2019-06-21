@@ -5035,10 +5035,13 @@ input.table-entry-input:focus {
 .primary#submit-rep-changes:hover, .primary#submit-rep-changes:focus {
   background: $warning-dark-color
 }
-.research-table th{
-  color: $type-darkest;
-  border-bottom: 2px solid $faint-neutral-color!important;
-  padding: 3px 0 0 10px;
+
+#research-table {
+  th {
+    color: $type-darkest;
+    border-bottom: 1px solid $faint-neutral-color!important;
+    padding: 8px;
+  }
 }
 
 .col-bulk-dispute{
@@ -5133,7 +5136,7 @@ input.table-entry-input:focus {
 }
 .search-options-col#lookup-quick {
   background: $ac-nav-bg-color;
-  margin: -30px;
+  margin: -30px -30px -150px -30px;
   padding: 50px 10px 0 10px;
 }
 .research-search-form .button_primary {
@@ -5299,10 +5302,6 @@ td.left-bordered {
 .toolbar-quicklookup{
   display:flex;
   height: 60px;
-}
-
-#select-all-bulk{
-  margin: -8px;
 }
 
 .entry-details-table {

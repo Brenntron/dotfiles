@@ -37,38 +37,38 @@ $ ->
     bulk_value = select_vals.every( (col) -> return col)
     $('#select-all-bulk').prop('checked', bulk_value)
 
+  window.isEmpty = (str) -> return /^\s*$/.test(str)
+
   window.buildRow = ( text_list, parent_row) ->
     tbody = document.querySelector('.research-table tbody')
-    existing_rows = $(tbody).find('tr')
     disputes = []
-    parent_index = parent_row.rowIndex - 1
-
-    text_list.push(' ')
+    existing_rows = $(tbody).find('tr')
+    parent_data = $(parent_row).find('.col-bulk-dispute').attr('data')
+    parent_index = parent_row.rowIndex
+    prev_row = existing_rows.eq(parent_index - 2)[0].innerText
 
     $(existing_rows).each ->
-      dispute_col = $(this).find('.col-bulk-dispute')[0]
-      data = $(dispute_col).context.attributes.data.value
-      if data != ''
+      data = $(this).find('.col-bulk-dispute').attr('data')
+      if !isEmpty(data)
         disputes.push(data)
 
+    if !isEmpty(parent_data) && !text_list.includes(parent_data)
+      index = disputes.indexOf(parent_data);
+      disputes.splice(index, 1);
+      parent_index = parent_index - 1
+
     text_list = text_list.filter( (text)-> return !disputes.includes(text) )
+    text_list.push(' ')
+    enter_check = isEmpty(prev_row) && text_list.length == 1 && parent_index > 1 || isEmpty(parent_data)
 
     if disputes.length
-      parent_index = parent_index + 1
-      if text_list.length == 1 && text_list[0] != ''
-        console.log 'in first', text_list, disputes
-        for i in [0...text_list.length]
-          disputes.splice parent_index + i, 0, text_list[i]
-          focus_index = parent_index + i
-      else
-        console.log 'in second'
-        for i in [0...text_list.length]
-          disputes.splice parent_index + i, 0, text_list[i]
-          focus_index = parent_index + i
+      if enter_check
+        parent_index = parent_index - 1
+      for i in [0...text_list.length]
+        disputes.splice parent_index + i, 0, text_list[i]
     else
       for i in [0...text_list.length]
         disputes.push(text_list[i])
-        focus_index = i
 
     tbody.innerHTML = ''
     for i in [0...disputes.length]
@@ -89,8 +89,14 @@ $ ->
           '<td class="col-actions"></td>' +
         '</tr>'
 
-      new_focus = $(tbody).find('tr')[focus_index]
-      $(new_focus).find('.col-bulk-dispute').focus()
+      col_dispute = $(tbody).find('tr .col-bulk-dispute')
+      col_dispute.each ->
+        if isEmpty( $(this).attr('data') )
+          this.focus()
+
+      setTimeout () ->
+        $("br").remove()
+      , 20
 
   window.bindControls = () ->
     $(document).unbind('focusout')
@@ -101,7 +107,7 @@ $ ->
   set_row_text = (e, el) ->
     { which: key, type, shiftKey } = e
     text = el.innerText.trim()
-    text_list = text.replace( /\n/g, ", " ).split(", ")
+    text_list = text.replace( /\n|\s/g, ", " ).split(", ")
     row = el.closest('tr')
     tbody = row.closest('tbody')
 
@@ -120,7 +126,7 @@ $ ->
         else
           $(row).data(text)
       when 8
-        if text == '' && $(tbody).children().length > 1
+        if isEmpty(text) && $(tbody).children().length > 1
           $(row).remove()
 
   $( document ).on 'keydown focusout', '.col-bulk-dispute', (e) -> set_row_text(e, this)
