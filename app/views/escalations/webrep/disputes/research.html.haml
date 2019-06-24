@@ -45,7 +45,11 @@
             %button.primary#submit-rep-changes Submit Reputation Changes
             %span.small.note-repsubmit
               * NOTE: Submitting reputation changes will automatically create a closed ticket
-
+              
+          .col-xs-4.ajax-message-div
+            .loader-gears
+              =inline_svg 'icon_gears_loader.svg'
+            %span.loader-msg Loading data...
           %table#research-table.research-table
             %colgroup
               %col
