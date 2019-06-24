@@ -1096,7 +1096,6 @@ $ ->
       success: (response) ->
         # Response.json is an array of objects with AMP poke data
         amp_hist_array = response.json
-        console.log amp_hist_array
         amp_html = ''
         curr_row = ''
 
