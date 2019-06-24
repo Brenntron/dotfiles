@@ -1063,16 +1063,23 @@ $ ->
       success_reload: false
       success: (response) ->
         unless response.disposition == '' || response.disposition == 'unseen'
-          $('.amp-area .disposition').text(response.disposition)
+          $('.amp-area')
+            .find('.disposition').text(response.disposition)
+            .find('.detection-name').text(response.detection_name).append(' UTC')
+            .find('.detection-last-updated').text(response.detection_last_set).append(' UTC')
+            .find('.detection-last-pulled').text(response.last_fetched)
+
           if response.disposition == 'malicious'
             $('.amp-area .disposition').addClass('disp-negative')
-          $('.amp-area .detection-name').text(response.detection_name)
-          $('.amp-area .detection-last-updated').text(response.detection_last_set).append(' UTC')
-          $('.amp-area .detection-last-updated').append('<span class="amp-history-icon esc-tooltipped tooltipstered" title="View full available AMP history"></span>')
-          $('.amp-area .detection-last-pulled').text(response.last_fetched).append(' UTC')
-          # Retain this event listener below, need to ensure the previous succeeds first
+
+          # Add the history icon here since we have an AMP detection success
+          history_icon = '<span class="amp-history-icon esc-tooltipped tooltipstered" title="View full available AMP history"></span>'
+          $('.amp-area .detection-last-updated').append(history_icon)
+
+          # Retain this event listener below, need to ensure all previous succeeds first
           $('.amp-history-icon').click ->
             $('#amp-history-dialog').dialog('open')
+
       error: () ->
         std_msg_error('Error with AMP', ['There was an error retrieving the AMP data.'])
       complete: () ->
@@ -1081,6 +1088,7 @@ $ ->
 
 
   window.get_amp_history = (sha256_hash) ->
+    # Fetch the AMP history, build the table and load into #amp-history-dialog
     std_msg_ajax(
       method: 'GET'
       url: '/escalations/api/v1/escalations/file_rep/detections/' + sha256_hash + '/history'
