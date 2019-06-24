@@ -915,6 +915,17 @@ $ ->
 
 
 $ ->
+  # AMP history dialog init here
+  $('#amp-history-dialog').dialog
+    autoOpen: false
+    minWidth: 800
+    minHeight: 400
+    resizable: true
+    classes: {
+#      "ui-dialog": "form-dialog"
+    }
+    position: { my: "right+40 top+40", at: "right+40 top+40", of: window }
+
 
   ## Create detection form dialog
   $('#create-detection-dialog').dialog
@@ -1049,32 +1060,63 @@ $ ->
       method: 'GET'
       url: '/escalations/api/v1/escalations/file_rep/detections/' + sha256_hash + '/now'
       success_reload: false
-
       success: (response) ->
         unless response.disposition == '' || response.disposition == 'unseen'
           if response.disposition == 'malicious'
             $('.amp-area .disposition').addClass('disp-negative')
-
           $('.amp-area .disposition').text(response.disposition)
           $('.amp-area .detection-name').text(response.detection_name)
           $('.amp-area .detection-last-updated').text(response.detection_last_set).append(' UTC')
           $('.amp-area .detection-last-pulled').text(response.last_fetched).append(' UTC')
+          # TODO: add in the amp history icon here if success + results are more than 0 for amp poke set array, add an if/else
+          $('.amp-area .detection-last-updated').append('<span id="amp-history-icon" class="esc-tooltipped tooltipstered" title="View full available AMP history"></span>')
+
 
       error: () ->
         std_msg_error('Error with AMP', ['There was an error retrieving the AMP data.'])
-
       complete: () ->
         $('.amp-area .inline-loader-wrapper').hide()
     )
 
-  # ancheng3 - Setting up the AJAX call for Dan to implement the AMP History modal
+
+  # TODO: finish building the dialog box based on this
   window.get_amp_history = (sha256_hash) ->
     std_msg_ajax(
       method: 'GET'
       url: '/escalations/api/v1/escalations/file_rep/detections/' + sha256_hash + '/history'
       success_reload: false
       success: (response) ->
-        debugger
+        # add an event listener here now that the icon exists
+#        $('#amp-history-icon').on 'click', ->
+#          $('#amp-history-dialog').dialog('open')
+
+        console.log response  # object
+        amp_history_array = response.json  # array
+
+        curr_row = ''
+        my_html = ''
+
+        # if response.json.length is 0 then $('#amp-history-icon').hide()
+
+        # remove dupes if you see them?
+        # if response.json is 1 or more, do below
+
+        # retain the _source convention, sometimes we need one level higher for other info
+        for entry in amp_history_array
+          curr_date = moment.unix(entry._source.time).format("MMMM DD, YYYY h:mm A")
+          # if disposition = malicious, add orange + bold
+          curr_disp = entry._source.disposition
+          curr_name = entry._source.name
+          curr_user = entry._source.user
+          curr_server = entry._source._poke_server
+          curr_mode = entry._source.mode.toUpperCase()
+
+          curr_row = '<tr><td>' + curr_date + '</td><td>' + curr_disp + '</td><td>' + curr_name + '</td><td>' + curr_user + '</td><td>' + curr_server + '</td><td>' + curr_mode + '</td></tr>'
+
+          my_html += curr_row
+
+        $('#amp-history-dialog table tbody').append(my_html)
+
       error: (response) ->
        std_msg_error('Error with AMP', ['There was an error retrieving the AMP history.'])
     )
@@ -1280,3 +1322,10 @@ $ ->
 
 
 
+$ ->
+  setTimeout (->
+    console.log 'ready'
+
+    $('#amp-history-icon').on 'click', ->
+      $('#amp-history-dialog').dialog 'open'
+  ), 2000
