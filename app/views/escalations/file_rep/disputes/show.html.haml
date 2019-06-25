@@ -185,7 +185,7 @@
             = @file_rep_dispute&.detection_name
           %label.content-label-sm AMP Detection - Last Set Date
           .top-info-data.detection-last-updated
-            = @file_rep_dispute&.detection_last_set
+            = @file_rep_dispute&.detection_last_set&.utc&.strftime("%b %e, %Y %l:%M %p %Z")
           %label.content-label-sm AMP Detection - Date Last Pulled
           .top-info-data.detection-last-pulled
             = @file_rep_dispute&.last_fetched&.utc&.strftime("%b %e, %Y %l:%M %p %Z")
