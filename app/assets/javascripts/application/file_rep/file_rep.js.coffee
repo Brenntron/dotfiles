@@ -1064,11 +1064,10 @@ $ ->
         # Object destructuring below for the response, enables cleaner code
         { disposition, detection_name, detection_last_set, last_fetched } = response
         unless disposition == '' || disposition == 'unseen'
-          $('.amp-area')
-            .find('.disposition').text(disposition)
-            .find('.detection-name').text(detection_name)
-            .find('.detection-last-updated').text(detection_last_set)
-            .find('.detection-last-pulled').text(last_fetched)
+          $('.amp-area .disposition').text(disposition)
+          $('.amp-area .detection-name').text(detection_name)
+          $('.amp-area .detection-last-updated').text(detection_last_set)
+          $('.amp-area .detection-last-pulled').text(last_fetched)
 
           if disposition == 'malicious'
             $('.amp-area .disposition').addClass('disp-negative')
