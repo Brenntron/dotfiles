@@ -300,7 +300,7 @@ module API
             end
             post "reptool_bl" do
               std_api_v2 do
-                params["classifications"].slice! "No active classifications,"
+                params["classifications"][0].slice! "No active classifications,"
                 RepApi::Blacklist.adjust_from_params(permitted_params, username: current_user.cvs_username)
                 true
               end
