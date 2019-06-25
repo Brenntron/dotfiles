@@ -9513,4 +9513,9 @@ table.rl-content {
   display: inline-block;
   margin: 4px 0 12px 0;
   font-size: 8pt;
+  a {
+    color: $warning-accent-color;
+    text-decoration: underline;
+  }
 }
+
