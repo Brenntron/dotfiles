@@ -570,6 +570,7 @@ ActiveRecord::Schema.define(version: 2019_05_14_195201) do
     t.datetime "case_responded_at"
     t.integer "reversing_labs_count"
     t.text "reversing_labs_raw", limit: 16777215
+    t.string "submitter_type"
     t.index ["created_at"], name: "index_file_reputation_disputes_on_created_at"
     t.index ["customer_id"], name: "index_file_reputation_disputes_on_customer_id"
     t.index ["sha256_hash"], name: "index_file_reputation_disputes_on_sha256_hash"

@@ -41,4 +41,43 @@ class FileReputationApi::ElasticSearch
     end
   end
 
+  def self.get_history(sha256)
+    client = Elasticsearch::Client.new hosts: [
+        { host: Rails.configuration.elastic.host,
+          port: Rails.configuration.elastic.port,
+          user: Rails.configuration.elastic.username ,
+          password: Rails.configuration.elastic.password,
+          scheme: 'https'
+        }], log: true, transport_options: { ssl: { verify: false}}
+
+
+    begin
+      response = client.search index: 'pokes', size: 1000,
+                               body: {
+                                   query: {
+                                       bool: {
+                                           must: [
+                                               { term: {hash: sha256}},
+                                           ],
+                                           should: [],
+                                           must_not: [
+                                               term: { mode: 'fetch'}
+                                           ]
+                                       }
+                                   },
+                                   sort: {
+                                       time: { order: 'desc'},
+                                   }
+                               }
+
+
+
+      history = response['hits']['hits']
+
+      history
+    rescue
+      return 'No history to display'
+    end
+  end
+
 end
