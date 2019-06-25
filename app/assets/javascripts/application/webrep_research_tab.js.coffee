@@ -205,23 +205,6 @@ $ ->
     info: false
   })
 
-  $('.xbrs-short-scrollable').DataTable({
-    scrollX: '90%',
-    paging: false,
-    searching: false,
-    ordering: false,
-    info: false
-  })
-
-  $('.xbrs-long-scrollable').DataTable({
-    scrollY: 200,
-    scrollX: '70%',
-    paging: false,
-    searching: false,
-    ordering: false,
-    info: false
-  })
-
 
 #  Rule escalations email
   $('.wbrs-rule-trigger').click ->
@@ -366,3 +349,8 @@ $(document).ready ->
       $('.ticket-resolution-radio').prop('checked', false)
       $('#show-ticket-resolution-submenu').hide()
       $(res_comment[0]).val('')
+
+
+  # XBRS history on webrep: fixes to ensure showing the correct table headers, removing conflicting inline styles
+  $('.xbrs-details-table .dataTables_scrollHead').addClass('hidden')
+  $('.xbrs-details-table .dataTables_scrollBody').find('thead tr, th, th div').removeAttr('style')
