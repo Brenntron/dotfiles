@@ -546,7 +546,7 @@ $ ->
     $('#edit-email-template').removeClass('hidden')
     $('#cancel-edit-email-template').removeClass('hidden')
     $('#edit-template-form-wrapper').animate {
-      height: 255
+      height: 256
       borderWidth: '1px'
     }, 300
 
