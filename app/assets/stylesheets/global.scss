@@ -9508,6 +9508,20 @@ table.rl-content {
   text-align: center;
 }
 
+.amp-area .disposition {
+  text-transform: capitalize;
+}
+
+// making sure this string doesn't break
+.amp-area .detection-name {
+  word-break: break-all;
+}
+
+.amp-area .inline-loader-wrapper {
+  display: block;
+  margin-bottom: 40px;
+}
+
 .message-div .code-content {
   line-height: 1.5em;
   display: inline-block;
@@ -9518,4 +9532,3 @@ table.rl-content {
     text-decoration: underline;
   }
 }
-
