@@ -28,6 +28,7 @@ $ ->
     for col in select_cols
       $(col).prop('checked', e_val)
 
+
   $(document).on 'change', '.col-select-all input', (e) ->
     select_cols = $('.col-select-all input')
     select_vals = []
@@ -35,6 +36,29 @@ $ ->
       select_vals.push( $(col).prop('checked') )
     bulk_value = select_vals.every( (col) -> return col)
     $('#select-all-bulk').prop('checked', bulk_value)
+
+  window.open_adjust_reptool = () ->
+    dropdown = $('#reptool_entries_bl_dropdown')
+    list = $(dropdown).find('ul')
+    reptool_options = [ "attackers", "bogon", "bots", "cnc", "cryptomining",
+              "dga", "exploit_kit", "malware", "open_proxy", "open_relay",
+              "phishing", "response", "spam", "suspicious", "tor_exit_node"]
+
+    if !$(list).has('label').length
+
+      for opt in reptool_options
+        li = document.createElement("li");
+        label= document.createElement("label");
+        description = document.createTextNode(opt);
+        checkbox = document.createElement("input");
+        checkbox.type = "checkbox";
+        checkbox.name = opt + '_adjust';
+        checkbox.value = opt;
+        label.appendChild(checkbox);
+        label.appendChild(description);
+        li.appendChild(label);
+        $(list).append(li)
+
 
   window.isEmpty = (item) ->
     type = typeof item

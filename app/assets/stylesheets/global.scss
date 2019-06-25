@@ -5447,6 +5447,64 @@ h5.entry-details-table-header {
 
 }
 
+#reptool_entries_bl_dropdown {
+  &{
+    min-width: 360px;
+  }
+  hr{
+    opacity: 1;
+  }
+  label{
+    color: $type-darkest;
+    display: flex;
+    align-content: center;
+    align-items: center;
+  }
+  input{
+    margin-right: 5px;
+  }
+  .reptool-section-label{
+    color: $content-label-color !important;
+    font-size: 7pt;
+    display: flex;
+    justify-content: center;
+  }
+}
+.set-status-bl{
+  margin-left: 8px;
+  hr{
+    
+    margin: 0 0 8px -10px;
+  }
+}
+.set-status-bl, .set-action-bl{
+  display: flex;
+  justify-content: center;
+  .reptool-section-label {
+    height: 100%;
+    display: flex;
+    justify-content: center;
+  }
+}
+
+#reptool_entries_bl_dropdown .set-action-bl{
+  &{
+    border-top: 1px solid white;
+    background: $faint-neutral-color;
+  }
+}
+.dropdown-reptool-list{
+  &{
+    min-width: 360px;
+    -webkit-column-count: 3;
+    -moz-column-count: 3;
+    column-count: 3;
+    background: $faint-neutral-color;
+  }
+  input{
+     margin-right: 5px;
+  }
+}
 .inline-dropdown-menu .submenu-left-wrapper ul li:hover, .toolbar-dropdown .submenu-left-wrapper ul li:hover {
   background-color: darken($bug-section-color, 5%);
 }

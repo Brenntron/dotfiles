@@ -33,8 +33,50 @@
                 %label.toolbar-section-label Adjust Reputation
                 %button#wlbl_entries_button.toolbar-button.adjust-wlbl-button.dropdown-toggle.esc-tooltipped.dropdown-button-margin-left{title: 'Adjust WL/BL', 'data-toggle': 'dropdown', 'aria-haspopup': 'true', 'aria-expanded': 'false', onclick: 'bulk_get_current_wlbl("research")'}
                   %span.toolbar-button-text Adjust WL/BL
-                %button#reptool_entries_button.toolbar-button.adjust-reptool-button.dropdown-toggle.esc-tooltipped{title: 'Adjust RepTool BL', 'data-toggle': 'dropdown', 'aria-haspopup': 'true', 'aria-expanded': 'false', onclick: 'bulk_get_current_reptool("research");'}
-                  %span.toolbar-button-text Adjust RepTool WL/BL
+                %button#reptool_entries_button.toolbar-button.adjust-reptool-button.dropdown-toggle.esc-tooltipped{title: 'Adjust RepTool BL', 'data-toggle': 'dropdown', 'aria-haspopup': 'true', 'aria-expanded': 'false', onclick: 'open_adjust_reptool();'}
+                  %span.toolbar-button-text Adjust RepTool BL
+
+                .dropdown-menu.toolbar-dropdown#reptool_entries_bl_dropdown{'aria-labelledby': 'adjust_reptool_bl'}
+
+                  .col-xs-12.set-status-bl
+                    .col-xs-6
+                      %label
+                        %input{name: "maintain_bl", type: "radio", value: "maintain_bl"}
+                          Maintain current blacklist/s
+                    .col-xs-6
+                      %label
+                        %input{name: "override_bl", type: "radio", value: "override_bl"}
+                          Override current blacklist/s
+                  .col-xs-4
+                    %label.reptool-section-label Blacklists
+
+                  .col-xs-12
+                    %hr.thin.form-divider
+                  %ul.dropdown-reptool-list
+
+                  .col-xs-12.set-action-bl
+
+                    .col-xs-4
+                      %label.reptool-section-label.text-center Status
+                    .col-xs-4
+                      %label
+                        %input{name: "status_active_bl", type: "radio", value: "status_active_bl"}
+                          set to ACTIVE
+                    .col-xs-4
+                      %label
+                        %input{name: "status_expired_bl", type: "radio", value: "status_expired_bl"}
+                          set to EXPIRED
+                  .col-xs-12
+                    .comment-wrapper
+                      %label.content-label-sm RepTool Comment
+                      %textarea.dropdown-comment.adjust-reptool-bl-input.comment-input
+                      .col-x-3
+                      .col-x-6
+                        %hr.thin
+                      .button-row-center
+                        %button.primary.dropdown-submit-button{type: 'button', onclick: '', disabled: true}
+                          Submit Changes
+
               %div
                 %label.toolbar-section-label File
                 %button.toolbar-button.export-button.esc-tooltipped{title: 'Export to CSV'}
