@@ -921,9 +921,7 @@ $ ->
     width: 900
     height: 400
     minWidth: 900
-    maxWidth: 1600
     minHeight: 400
-    maxHeight: 800
     resizable: true
     position: { at: "right top" }
 
