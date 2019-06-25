@@ -33,7 +33,7 @@ module API
             desc "update file rep columns"
             params do
               requires :id, type: Integer, desc: "file rep id"
-            endgit
+            end
             post "update_file_rep_data" do
 
               filerep = FileReputationDispute.where(:id => permitted_params[:id]).first
