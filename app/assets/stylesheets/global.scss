@@ -8394,3 +8394,8 @@ input[type="radio"].resolution_radio_button {
     }
   }
 }
+
+// ensuring no column overlap in Case History due to long strings
+#case-history .case-history-preview, #case-history .case-history-author {
+  word-break: break-word;
+}
