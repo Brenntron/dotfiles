@@ -5353,11 +5353,13 @@ h5.entry-details-table-header {
 .ajax-message-div{
   &{
     display: none;
-    width: 180px;
+    justify-content: center;
+    align-items: center;
   }
   .loader-gears {
     height: 40px;
     width: 40px;
+    margin: 5px;
   }
 }
 
