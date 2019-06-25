@@ -478,6 +478,14 @@ module API
                 return { image_data: Base64.encode64(record.screenshot) }.to_json
               end
             end
+            get ':complaint_entry_id/retake_screenshot' do
+              std_api_v2 do
+                entry = ComplaintEntry.find(params[:complaint_entry_id])
+                ces = entry.complaint_entry_screenshot
+                ces.update(error_message:"Retaking screenshot please wait.", screenshot:nil)
+                ces.grab_screenshot
+              end
+            end
 
             desc 'Retrieve current categories from expanding a complaint entry row'
             params do
@@ -575,6 +583,7 @@ module API
             post 'xbrs' do
               #raise 'simulated breakage'
               response = Xbrs::GetXbrs.by_domain(permitted_params['url'])
+              return [] if response.is_a?(Hash) && response[:error].present?
               data = response.last['data']
               columns = response.last['legend']
 
@@ -604,6 +613,24 @@ module API
               end
 
               {:status => "success", :data => formatted_data, :columns => columns}
+            end
+
+            desc "Reopen a complaint entry"
+            params do
+              requires :complaint_entry_id, type: Integer
+            end
+
+            post 'reopen_complaint_entry' do
+              begin
+                entry = ComplaintEntry.where(:id => permitted_params[:complaint_entry_id]).first
+                if entry.reopen
+                  {:status => "success"}
+                else
+                  {:status => "error"}
+                end
+              rescue
+                {:status => "error"}
+              end
             end
 
           end
