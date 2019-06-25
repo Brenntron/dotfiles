@@ -6708,9 +6708,7 @@ table#duplicates a {
   text-decoration: underline;
 }
 
-//Crappy temporary hack to keep the annoying insane amt of entries for xbrs from taking over and ruining the whole page
 .xbrs-details-table .dataTables_scrollBody {
-  max-width: 1200px !important;
   overflow-y: scroll !important;
 }
 
@@ -8366,4 +8364,38 @@ input[type="radio"].resolution_radio_button {
 // more width so this aligns with the comment fields and for long URIs
 .complaint-uri-input {
   width: 65%;
+}
+
+// ensure the XBRS history headers are accurate and stay put while scrolling
+.entry-details-table.xbrs-details-table .dataTables_wrapper .dataTables_scrollBody {
+  table > thead > tr > th {
+    position: -webkit-sticky;
+    position: sticky;
+    top: 0;
+    background-color: $table-dark-body;
+    border-bottom: $type-base-color 1px solid;
+    // sizing overrides needed here
+    .dataTables_sizing {
+      min-height: 30px !important;
+      padding: 8px !important;
+    }
+  }
+}
+
+// laptop screen width - ensure xbrs table fits on-screen
+@media screen and (max-width: 1600px) {
+  .entry-details-table.xbrs-details-table {
+    th {
+      padding: 8px 6px;
+    }
+    td {
+      padding: 6px 8px;
+      word-break: break-word;
+    }
+  }
+}
+
+// ensuring no column overlap in Case History due to long strings
+#case-history .case-history-preview, #case-history .case-history-author {
+  word-break: break-word;
 }

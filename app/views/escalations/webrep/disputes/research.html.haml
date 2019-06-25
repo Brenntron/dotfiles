@@ -642,30 +642,9 @@
                                       %th
                                         %span.missing-data
                                           No XBRS data available.
-                              - elsif entry.find_xbrs[1]['data'].count < 8
-                                %table.xbrs-short-scrollable
-                                  %thead
-                                    %tr
-                                      - entry.find_xbrs[1]['legend'].each do |header|
-                                        %th= header
-                                  %tbody
-                                    - unless entry.hostlookup.nil?
-                                      - entry.find_xbrs[1]['data'].each do |data|
-                                        %tr
-                                          - data.each do |datapoint|
-                                            %td= datapoint
                               - else
-                                %table.xbrs-long-scrollable
-                                  %thead
-                                    %tr
-                                      - entry.find_xbrs[1]['legend'].each do |header|
-                                        %th= header
-                                  %tbody
-                                    - unless entry.hostlookup.nil?
-                                      - entry.find_xbrs[1]['data'].each do |data|
-                                        %tr
-                                          - data.each do |datapoint|
-                                            %td= datapoint
+                                %table
+
 
                             .entry-details-table.crosslisted-details-table{'data-entry-id': "#{entry.id}"}
                               %h5.entry-details-table-header
