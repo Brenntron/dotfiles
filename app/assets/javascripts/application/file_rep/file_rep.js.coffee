@@ -1059,18 +1059,20 @@ $ ->
       method: 'GET'
       url: '/escalations/api/v1/escalations/file_rep/detections/' + sha256_hash + '/now'
       success_reload: false
-      success: (response) ->
-        unless response.disposition == '' || response.disposition == 'unseen'
-          $('.amp-area')
-            .find('.disposition').text(response.disposition)
-            .find('.detection-name').text(response.detection_name).append(' UTC')
-            .find('.detection-last-updated').text(response.detection_last_set).append(' UTC')
-            .find('.detection-last-pulled').text(response.last_fetched)
 
-          if response.disposition == 'malicious'
+      success: (response) ->
+        # Object destructuring below for the response, enables cleaner code
+        { disposition, detection_name, detection_last_set, last_fetched } = response
+        unless disposition == '' || disposition == 'unseen'
+          $('.amp-area')
+            .find('.disposition').text(disposition)
+            .find('.detection-name').text(detection_name)
+            .find('.detection-last-updated').text(detection_last_set).append(' UTC')
+            .find('.detection-last-pulled').text(last_fetched)
+
+          if disposition == 'malicious'
             $('.amp-area .disposition').addClass('disp-negative')
 
-          # Add the history icon here since we have an AMP detection success
           history_icon = '<span class="amp-history-icon esc-tooltipped tooltipstered" title="View full available AMP history"></span>'
           $('.amp-area .detection-last-updated').append(history_icon)
 
@@ -1100,19 +1102,14 @@ $ ->
         if amp_hist_array.length == 0 || amp_hist_array == undefined
           $('#amp-history-icon').hide()
         else if amp_hist_array.length > 0
-          # Each entry, build a new html row with that source data
+          # Each entry, build a new html row with that source data using object destructuring
           for entry in amp_hist_array
-            source = entry._source
-            date = moment.unix(source.time).format("MMMM DD, YYYY h:mm A")
-            disp = source.disposition
-            if disp == 'malicious'
-              disp = '<span class="disp-negative">' + disp + '</span>'
-            name = source.name
-            user = source.user
-            server = source._poke_server
-            mode = source.mode.toUpperCase()
+            {time, disposition, name, user, _poke_server, mode} = entry._source
+            datetime = moment.unix(time).format("MMMM DD, YYYY h:mm A")
+            if disposition == 'malicious'
+              disposition = '<span class="disp-negative">' + disposition + '</span>'
 
-            curr_row = '<tr><td>' + date + '</td><td class="capitalize">' + disp + '</td><td>' + name + '</td><td>' + user + '</td><td>' + server + '</td><td>' + mode + '</td></tr>'
+            curr_row = '<tr><td>' + datetime + '</td><td class="capitalize">' + disposition + '</td><td>' + name + '</td><td>' + user + '</td><td>' + _poke_server + '</td><td>' + mode.toUpperCase() + '</td></tr>'
 
             amp_html += curr_row
         else
