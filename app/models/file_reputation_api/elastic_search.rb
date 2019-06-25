@@ -35,7 +35,7 @@ class FileReputationApi::ElasticSearch
 
       disposition_last_set = Time.at(response['hits']['hits'][0]['_source']['time'])
 
-      disposition_last_set
+      disposition_last_set.utc.strftime("%b %e, %Y %l:%M %p")
     rescue
       return 'No history to display'
     end

@@ -17,6 +17,8 @@ class FileReputationApi::Detection
   # "name"=>"Test.69F3E339C0.rgh.tht.Talos",
   # "samples_name"=>"Test.69F3E339C0.rgh.tht.Talos"}
 
+  DISPOSITION_UNSEEN        = 'unseen'
+  DISPOSITION_UNKNOWN       = 'unknown'
   DISPOSITION_MALICIOUS     = 'malicious'
   DISPOSITION_COMMON        = 'common'
   DISPOSITION_CLEAN         = 'clean'
@@ -133,18 +135,19 @@ class FileReputationApi::Detection
 
   def self.update_detection(sha256_hash:, disposition:, detection_name: nil)
     detection = get_bulk(sha256_hash)
-    detection.update(disposition: disposition, detection_name: detection_name)
+    result = detection.update(disposition: disposition, detection_name: detection_name)
+    if result[:success]
+      FileReputationDispute.where(sha256_hash: sha256_hash).update_all(disposition: detection.disposition,
+                                                                       detection_name: detection.name)
+    end
+    result
   end
 
   def self.create_action(sha256_hashes:, disposition:, detection_name: nil)
     sha256_hashes.map do |sha256_hash|
-      result = update_detection(sha256_hash: sha256_hash,
-                                disposition: disposition,
-                                detection_name: detection_name)
-      if result[:success]
-        FileReputationDispute.where(sha256_hash: sha256_hash).update_all(disposition: disposition)
-      end
-      result
+      update_detection(sha256_hash: sha256_hash,
+                       disposition: disposition,
+                       detection_name: detection_name)
     end
   end
 end
