@@ -205,23 +205,6 @@ $ ->
     info: false
   })
 
-  $('.xbrs-short-scrollable').DataTable({
-    scrollX: '90%',
-    paging: false,
-    searching: false,
-    ordering: false,
-    info: false
-  })
-
-  $('.xbrs-long-scrollable').DataTable({
-    scrollY: 200,
-    scrollX: '70%',
-    paging: false,
-    searching: false,
-    ordering: false,
-    info: false
-  })
-
 
 #  Rule escalations email
   $('.wbrs-rule-trigger').click ->
