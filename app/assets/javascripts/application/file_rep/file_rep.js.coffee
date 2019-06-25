@@ -1067,7 +1067,7 @@ $ ->
           $('.amp-area')
             .find('.disposition').text(disposition)
             .find('.detection-name').text(detection_name)
-            .find('.detection-last-updated').text(detection_last_set).append(' UTC')
+            .find('.detection-last-updated').text(detection_last_set)
             .find('.detection-last-pulled').text(last_fetched)
 
           if disposition == 'malicious'
