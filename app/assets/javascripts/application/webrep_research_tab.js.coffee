@@ -79,7 +79,7 @@ $ ->
             '<input type="checkbox" checked>' +
           '</span>' +
           '</<td>'+
-          '<td class="col-bulk-dispute" contenteditable="true" data=' + disputes[i] + '>' + disputes[i] + '</td>'+
+          '<td class="col-bulk-dispute" contenteditable="true" data=' + disputes[i] + '><p>' + disputes[i] + '</p></td>'+
           '<td class="col-wbrs"></td>'+
           '<td class="col-wbrs-rule-hits"></td>'+
           '<td class="col-wbrs-rules"></td>'+
@@ -106,6 +106,7 @@ $ ->
 
   set_row_text = (e, el) ->
     { which: key, type, shiftKey } = e
+
     text = el.innerText.trim()
     text_list = text.replace( /\n|\s/g, ", " ).split(", ")
     row = el.closest('tr')
@@ -129,7 +130,10 @@ $ ->
         if isEmpty(text) && $(tbody).children().length > 1
           $(row).remove()
 
-  $( document ).on 'keydown focusout', '.col-bulk-dispute', (e) -> set_row_text(e, this)
+  $( document ).on 'keydown focusout', '.col-bulk-dispute', (e) ->
+    set_row_text(e, this)
+    e.stopPropagation()
+
 ->
 
   $('#edit-dispute-entry-button').click ->
