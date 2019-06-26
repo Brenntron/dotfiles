@@ -52,6 +52,18 @@ module API
                   last_fetched: last_fetched.strftime("%b %e, %Y %l:%M %p")}
               end
             end
+
+            desc 'Get history of detection data'
+            params do
+              requires :sha256_hash, type: String, desc: "SHA256 hash"
+            end
+            get ":sha256_hash/history" do
+              std_api_v2 do
+                history = FileReputationApi::ElasticSearch.get_history(params['sha256_hash'])
+
+                render json: history
+              end
+            end
           end
         end
       end
