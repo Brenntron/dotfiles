@@ -5439,7 +5439,6 @@ h5.entry-details-table-header {
 
 .submenu-left-wrapper {
   background-color: $bug-section-color;
-
 }
 
 #reptool_entries_bl_dropdown {
@@ -5448,6 +5447,7 @@ h5.entry-details-table-header {
   }
   hr{
     opacity: 1;
+    margin-top: 10px -3px;
   }
   label{
     color: $type-darkest;
@@ -5456,45 +5456,62 @@ h5.entry-details-table-header {
     align-items: center;
   }
   input{
-    margin-right: 5px;
+    margin: 0 10px;
   }
   .reptool-section-label{
     color: $content-label-color !important;
     font-size: 7pt;
-    display: flex;
-    justify-content: center;
   }
-}
-.set-status-bl{
-  margin-left: 8px;
-  hr{
-    
-    margin: 0 0 8px -10px;
+  .comment-wrapper{
+    margin: 16px!important;
   }
-}
-.set-status-bl, .set-action-bl{
-  display: flex;
-  justify-content: center;
-  .reptool-section-label {
-    height: 100%;
-    display: flex;
-    justify-content: center;
+  .comment-wrapper .reptool-section-label{
+    justify-content: unset;
+    margin-left: 1px!important;
+  }
+  textarea{
+    margin-top: 5px;
+    min-height: 60px;
+  }
+  .dropdown-submit-button{
+    margin: 0
   }
 }
 
-#reptool_entries_bl_dropdown .set-action-bl{
+.set-status-bl, .set-action-bl{
   &{
-    border-top: 1px solid white;
-    background: $faint-neutral-color;
+    display: flex;
+    justify-content: center;
+  }
+  .reptool-section-label {
+    height: 100%;
+    display: flex;
+    margin-right: unset
   }
 }
+
+.set-action-bl{
+  border-top: 1px solid white;
+  background: $faint-neutral-color;
+}
+.set-status-bl{
+  &{
+    margin: 0 1px -7px 1px;
+    padding: 8px!important;
+  }
+  hr{
+    margin: 0 0 8px -10px;
+  }
+}
+
 .dropdown-reptool-list{
   &{
-    min-width: 360px;
+    width: 100%;
     -webkit-column-count: 3;
     -moz-column-count: 3;
     column-count: 3;
     background: $faint-neutral-color;
+    padding: 13px 0;
   }
   input{
      margin-right: 5px;

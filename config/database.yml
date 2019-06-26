@@ -2,14 +2,14 @@
 development:
   adapter: mysql2
   encoding: utf8
-  database: ac_dev
+  database: analyst_console
   username: root
   host: localhost
 
 profile:
   adapter: mysql2
   encoding: utf8
-  database: ac_dev
+  database: analyst_console
   username: root
   host: localhost
 

@@ -45,16 +45,16 @@ $ ->
     dropdown = $('#reptool_entries_bl_dropdown')
     list = $(dropdown).find('ul')
     reptool_options = [ "attackers", "bogon", "bots", "cnc", "cryptomining",
-              "dga", "exploit_kit", "malware", "open_proxy", "open_relay",
+              "dga", "exploit kit", "malware", "open_proxy", "open_relay",
               "phishing", "response", "spam", "suspicious", "tor_exit_node"]
 
     if !$(list).has('label').length
-
       for opt in reptool_options
         li = document.createElement("li");
         label= document.createElement("label");
         description = document.createTextNode(opt);
         checkbox = document.createElement("input");
+        $(checkbox).addClass('adjust_reptool_checkbox')
         checkbox.type = "checkbox";
         checkbox.name = opt + '_adjust';
         checkbox.value = opt;
@@ -62,6 +62,13 @@ $ ->
         label.appendChild(description);
         li.appendChild(label);
         $(list).append(li)
+
+  $(document).on 'change', '.adjust_reptool_checkbox', () ->
+    submit_btn = $('#reptool_entries_bl_dropdown .dropdown-submit-button')
+    if $('.adjust_reptool_checkbox:checked').length
+      submit_btn.prop('disabled', false)
+    else
+      submit_btn.prop('disabled', true)
 
 
   window.isEmpty = (item) ->
