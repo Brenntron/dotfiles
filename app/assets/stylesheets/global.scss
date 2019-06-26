@@ -5464,6 +5464,7 @@ h5.entry-details-table-header {
   .reptool-section-label{
     color: $content-label-color !important;
     font-size: 7pt;
+    margin-left: 12px!important
   }
   .comment-wrapper{
     margin: 16px!important;
@@ -5494,8 +5495,15 @@ h5.entry-details-table-header {
 }
 
 .set-action-bl{
-  border-top: 1px solid white;
-  background: $faint-neutral-color;
+  & {
+    border-top: 1px solid white!important;
+    background: $faint-neutral-color;
+  }
+  .reptool-section-label {
+    position: relative;
+    left: -3px;
+  }
+
 }
 .set-status-bl{
   &{
