@@ -1,11 +1,15 @@
 $ ->
-  # go back to the last tab after reload
-
   $('a[data-toggle="tab"]').on 'shown.bs.tab', (e) ->
     localStorage.setItem 'lastTab', $(this).attr('id')
     return
 
+
   $(document).on 'ready page:load', (e) ->
+    tab = location.href
+    if tab.includes('detail')
+      $('#research-page-toolbar').show()
+    else
+      $('#research-page-toolbar').hide()
     lastTab = localStorage.getItem('lastTab')
     if lastTab
       $('#' + lastTab).tab('show');
@@ -13,12 +17,131 @@ $ ->
       $('#communication-tab-link').tab('show')
     return
 
+  $(document).on 'click', '.research-header-wrapper li', (e) ->
+    tab = location.href
+    if tab.includes('detail')
+      $('#research-page-toolbar').show()
+    else
+      $('#research-page-toolbar').hide()
+  $(document).on 'change', '#select-all-bulk', (e) ->
+    e_val = e.currentTarget.checked
+    select_cols = $('.col-select-all input')
+    for col in select_cols
+      $(col).prop('checked', e_val)
+
+  $(document).on 'change', '.col-select-all input', (e) ->
+    select_cols = $('.col-select-all input')
+    select_vals = []
+    for col in select_cols
+      select_vals.push( $(col).prop('checked') )
+    bulk_value = select_vals.every( (col) -> return col)
+    $('#select-all-bulk').prop('checked', bulk_value)
+
+  window.isEmpty = (str) -> return /^\s*$/.test(str)
+
+  window.buildRow = ( text_list, parent_row) ->
+    tbody = document.querySelector('.research-table tbody')
+    disputes = []
+    existing_rows = $(tbody).find('tr')
+    parent_data = $(parent_row).find('.col-bulk-dispute').attr('data')
+    parent_index = parent_row.rowIndex
+    prev_row = existing_rows.eq(parent_index - 2)[0].innerText
+
+    $(existing_rows).each ->
+      data = $(this).find('.col-bulk-dispute').attr('data')
+      if !isEmpty(data)
+        disputes.push(data)
+
+    if !isEmpty(parent_data) && !text_list.includes(parent_data)
+      index = disputes.indexOf(parent_data);
+      disputes.splice(index, 1);
+      parent_index = parent_index - 1
+
+    text_list = text_list.filter( (text)-> return !disputes.includes(text) )
+    text_list.push(' ')
+    enter_check = isEmpty(prev_row) && text_list.length == 1 && parent_index > 1 || isEmpty(parent_data)
+
+    if disputes.length
+      if enter_check
+        parent_index = parent_index - 1
+      for i in [0...text_list.length]
+        disputes.splice parent_index + i, 0, text_list[i]
+    else
+      for i in [0...text_list.length]
+        disputes.push(text_list[i])
+
+    tbody.innerHTML = ''
+    for i in [0...disputes.length]
+      tbody.innerHTML +=
+        '<tr>' +
+          '<td class="col-select-all">' +
+          '<span class="checkbox-wrapper">' +
+            '<input type="checkbox" checked>' +
+          '</span>' +
+          '</<td>'+
+          '<td class="col-bulk-dispute" contenteditable="true" data=' + disputes[i] + '><p>' + disputes[i] + '</p></td>'+
+          '<td class="col-wbrs"></td>'+
+          '<td class="col-wbrs-rule-hits"></td>'+
+          '<td class="col-wbrs-rules"></td>'+
+          '<td class="col-category"></td>'+
+          '<td class="col-wlbl"></td>'+
+          '<td class="col-reptool-class"></td>'+
+          '<td class="col-actions"></td>' +
+        '</tr>'
+
+      col_dispute = $(tbody).find('tr .col-bulk-dispute')
+      col_dispute.each ->
+        if isEmpty( $(this).attr('data') )
+          this.focus()
+
+      setTimeout () ->
+        $("br").remove()
+      , 20
+
+  window.bindControls = () ->
+    $(document).unbind('focusout')
+    setTimeout () ->
+      $( document ).on 'focusout', '.col-bulk-dispute', (e) -> set_row_text(e, this)
+    , 250
+
+  set_row_text = (e, el) ->
+    { which: key, type, shiftKey } = e
+
+    text = el.innerText.trim()
+    text_list = text.replace( /\n|\s/g, ", " ).split(", ")
+    row = el.closest('tr')
+    tbody = row.closest('tbody')
+
+    text_list = text_list.filter( (item, index) ->
+      if item != ''
+        return text_list.indexOf item == index
+    )
+    switch( key )
+      when 13
+        if !shiftKey && text_list.length
+            bindControls()
+            buildRow(text_list, row)
+      when 0
+        if text_list.length > 1
+          buildRow(text_list, row)
+        else
+          $(row).data(text)
+      when 8
+        if isEmpty(text) && $(tbody).children().length > 1
+          $(row).remove()
+
+  $( document ).on 'keydown focusout', '.col-bulk-dispute', (e) ->
+    set_row_text(e, this)
+    e.stopPropagation()
+
+->
 
   $('#edit-dispute-entry-button').click ->
 
     if ($('.dispute_check_box:checked').length > 0)
       $('.edit-entries-buttons').removeClass('hidden')
       $('.dispute_check_box').each ->
+
         if $(this).prop('checked')
           entry_row = $(this).parents('.research-table-row')[0]
           $(entry_row).addClass('editing-row')
@@ -39,7 +162,6 @@ $ ->
         $('.cancel-changes').click()
       else
         e.preventDefault()
-
 
 
   $('.cancel-changes').click ->
@@ -116,7 +238,6 @@ $ ->
     else
       $('.ticket-resolution-submenu').hide()
 
-
 # Expand All Rows
   $('#expand-all-rows').click ->
     $('.research-table-row-wrapper').each ->
@@ -143,7 +264,6 @@ $ ->
     nested_row = $(entry_row).find('.nested-data-row')[0]
     $(nested_row).toggle()
     $(expand_button).toggleClass('shown')
-
 
 
   ##  Populating the toolbar Adjust RepTool BL dropdown

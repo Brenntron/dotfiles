@@ -4173,6 +4173,10 @@ button.tertiary {
   outline: 1px solid darken($faint-neutral-color, 5%);
 }
 
+.col-bulk-dispute:focus{
+  background-color: $faint-alt-highlight;
+  line-height: 1.5em;
+}
 #advanced-search-dropdown .form-group input[type='checkbox'] {
   border: none;
   outline: none;
@@ -5031,15 +5035,20 @@ input.table-entry-input:focus {
 .primary#submit-rep-changes:hover, .primary#submit-rep-changes:focus {
   background: $warning-dark-color
 }
-.research-table th{
-  color: $type-darkest;
-  border-bottom: 1px solid $dark-neutral-color;
-  padding: 3px 0 0 10px;
+
+#research-table {
+  th {
+    color: $type-darkest;
+    border-bottom: 1px solid $faint-neutral-color!important;
+    padding: 8px;
+  }
 }
 
-.col-dispute{
-  width: 30%
+.col-bulk-dispute{
+  min-width: 150px;
+  min-height: 12px;
 }
+
 .research-toolbar{
   color: $type-darkest;
   width: unset;
@@ -5060,7 +5069,8 @@ input.table-entry-input:focus {
 
 .research-table{
   margin: 100px auto;
-  width: 96%!important
+  width: 96%!important;
+  color: $type-darkest
 }
 .search-options-col .research-table label {
   text-transform: uppercase;
@@ -5121,7 +5131,7 @@ input.table-entry-input:focus {
 }
 .search-options-col#lookup-quick {
   background: $ac-nav-bg-color;
-  margin: -30px;
+  margin: -30px -30px -150px -30px;
   padding: 50px 10px 0 10px;
 }
 .research-search-form .button_primary {
@@ -5288,6 +5298,7 @@ td.left-bordered {
   display:flex;
   height: 60px;
 }
+
 .entry-details-table {
   margin: 20px;
   padding-left: 7px;
