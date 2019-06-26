@@ -135,7 +135,6 @@ module API
                 file_rep_disputes = FileReputationDispute.where(id: dispute_ids)
 
                 file_rep_disputes.each do |dispute|
-                  dispute.update_status(status)
 
                   if comment.present?
                     FileRepComment.create!(comment: comment, file_reputation_dispute_id: dispute.id, user_id: current_user.id)
@@ -146,7 +145,9 @@ module API
                   end
                 end
 
-                render json: {status: 'Success'}
+                FileReputationDispute.process_status_changes(file_rep_disputes, status, resolution, comment, current_user)
+                {:status => "success"}.to_json
+
               end
             end
 
