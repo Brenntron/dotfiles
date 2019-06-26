@@ -5347,6 +5347,8 @@ h5.entry-details-table-header {
 
 .ajax-message-div{
   &{
+    position: absolute;
+    top: 148px;
     display: none;
     justify-content: center;
     align-items: center;
