@@ -193,7 +193,7 @@ class FileReputationDispute < ApplicationRecord
     attributes = {
         id: bug_proxy.id,
         sha256_hash: sha256_hash,
-        disposition_suggested: disposition_suggested,
+        disposition_suggested: disposition_suggested.downcase,
         user_id: assignee_id,
         submitter_type: SUBMITTER_TYPE_AC_FORM,
         customer_id: customer.id,
