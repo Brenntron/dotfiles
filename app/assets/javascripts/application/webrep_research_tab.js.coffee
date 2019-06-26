@@ -1,4 +1,5 @@
 $ ->
+  # go back to the last tab after reload
   $('a[data-toggle="tab"]').on 'shown.bs.tab', (e) ->
     localStorage.setItem 'lastTab', $(this).attr('id')
     return
@@ -7,6 +8,7 @@ $ ->
     hide_toolbar()
 
   hide_toolbar = () ->
+  # hides toolbar depending on which tab in bulk research panel is open
     tab = window.location.href
     if tab.includes('quick')
       $('#research-page-toolbar').hide()
@@ -23,6 +25,7 @@ $ ->
     return
 
   $(document).on 'change', '#select-all-bulk', (e) ->
+    # handles selection of all checkboxes in quicklookup table
     e_val = e.currentTarget.checked
     select_cols = $('.col-select-all input')
     for col in select_cols
@@ -30,6 +33,7 @@ $ ->
 
 
   $(document).on 'change', '.col-select-all input', (e) ->
+    # handles selection of sindlge checkboxes in quicklookup table
     select_cols = $('.col-select-all input')
     select_vals = []
     for col in select_cols
@@ -61,6 +65,7 @@ $ ->
 
 
   window.isEmpty = (item) ->
+    # function to check whether or not objects and strings are empty, more variable types can be added as needed
     type = typeof item
     switch(type)
       when 'object'
@@ -69,6 +74,7 @@ $ ->
         return /^\s*$/.test(item)
 
   window.buildRow = ( text_list, parent_row) ->
+    # build and append new rows to the HTML in quick lookup
     tbody = document.querySelector('.research-table tbody')
     disputes = []
     disputes_data = []
@@ -101,8 +107,10 @@ $ ->
       for i in [0...text_list.length]
         disputes.push(text_list[i])
 
+    # reset the innerHTML to nothing
     tbody.innerHTML = ''
     for i in [0...disputes.length]
+      # if the dispute is not an HTML object, set the HTML of the new row to the below
       if typeof disputes[i] != 'object'
         tbody.innerHTML +=
           '<tr>' +
@@ -110,8 +118,8 @@ $ ->
             '<span class="checkbox-wrapper">' +
             '<input type="checkbox" checked>' +
             '</span>' +
-            '</<td>'+
-            '<td class="col-bulk-dispute" contenteditable="true" data=' + disputes[i] + '>' + disputes[i] + '</td>'+
+            '</td>'+
+            '<td class="col-bulk-dispute" contenteditable="true" data=' + disputes[i] + '><p>' + disputes[i] + '</p></td>'+
             '<td class="col-wbrs"></td>'+
             '<td class="col-wbrs-rule-hits"></td>'+
             '<td class="col-wbrs-rules"></td>'+
@@ -121,8 +129,10 @@ $ ->
             '<td class="col-actions"></td>' +
             '</tr>'
       else
+        # if the dispute is an HTML object, set it as OuterHTML to avoid formatting issues
         tbody.innerHTML += disputes[i].outerHTML
 
+      # Once the table has been rebuilt, find the empty row and focus on it
       col_dispute = $(tbody).find('tr .col-bulk-dispute')
       col_dispute.each ->
         if isEmpty( $(this).attr('data') )
@@ -133,6 +143,7 @@ $ ->
       , 20
 
   window.bindControls = () ->
+    # unbind and rebind focusout to prevent the rebuilding of the table from being stuck in a loop
     $(document).unbind('focusout')
     setTimeout () ->
       $( document ).on 'focusout', '.col-bulk-dispute', (e) -> set_row_text(e, this)
@@ -140,6 +151,7 @@ $ ->
 
   set_row_text = (e, el) ->
     { which: key, type, shiftKey } = e
+
     text = el.innerText.trim()
     text_list = text.replace( /\n|\s/g, ", " ).split(", ")
     row = el.closest('tr')
@@ -163,9 +175,14 @@ $ ->
         if isEmpty(text) && $(tbody).children().length > 1
           $(row).remove()
 
-  $( document ).on 'keydown focusout', '.col-bulk-dispute', (e) -> set_row_text(e, this)
+  $( document ).on 'keydown focusout', '.col-bulk-dispute', (e) ->
+    set_row_text(e, this)
+    e.stopPropagation()
+
   $(document).ajaxStop ()->
+    # Once all ajax calls have been completed, hide the  on page loader svg
     $('.ajax-message-div').hide()
+
   $(document).on 'click', '#get-rep-data', (e) ->
     e.preventDefault()
     search_items = []
@@ -183,7 +200,9 @@ $ ->
       row = rows[i]
 
       if !isEmpty(item)
-        $('.ajax-message-div').css('display':'flex','align-items':'center')
+        $('.ajax-message-div').css('display':'flex')
+        # for each search item, call a promise to get the data. If success, the first then runs, setting the data in the rows.
+        # if it fails, the secon runs, catching the error
         new get_reptool(item, headers)
           .then ( set_reptool.bind( null, item, row) )
           .then null, (err) -> console.log err

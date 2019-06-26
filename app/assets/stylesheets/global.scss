@@ -5045,13 +5045,8 @@ input.table-entry-input:focus {
 }
 
 .col-bulk-dispute{
-  & {
-    min-width: 150px;
-    min-height: 12px;
-  }
-  div {
-    display: none;
-  }
+  min-width: 150px;
+  min-height: 12px;
 }
 
 .research-toolbar{
