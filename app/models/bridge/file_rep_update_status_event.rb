@@ -4,10 +4,16 @@ class Bridge::FileRepUpdateStatusEvent < Bridge::BaseMessage
           addressee: 'talos-intelligence')
   end
 
-  def post(payload, source_authority: @source_authority, source_key: @source_key)
+  def post(dispute, source_authority: @source_authority, source_key: @source_key)
+    return_payload = {}
+    return_payload[dispute.sha256_hash] = {
+        resolution: dispute.resolution,
+        resolution_message: dispute.resolution_comment,
+        status: dispute.status
+    }
     super(message: {source_authority: source_authority,
                     source_key: source_key,
-                    ticket_entries: payload
+                    ticket_entries: return_payload
     })
   end
 

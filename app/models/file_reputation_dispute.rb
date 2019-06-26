@@ -99,18 +99,8 @@ class FileReputationDispute < ApplicationRecord
     self.disposition_suggested&.downcase == DISPOSITION_CLEAN.downcase
   end
 
-  def update_status(status)
-    self.update!(status: status)
-
-    return_payload = {}
-    return_payload[self.sha256_hash] = {
-        resolution: self.resolution,
-        resolution_comment: self.resolution_comment,
-        status: self.status
-    }
-
-    conn = ::Bridge::FileRepUpdateStatusEvent.new(addressee: "talos-intelligence")
-    conn.post(return_payload, source_authority: "talos-intelligence", source_key: self.ticket_source_key)
+  def is_assigned?
+    (!self.user.blank? && self.user.email != 'vrt-incoming@sourcefire.com')
   end
 
   def compose_versioned_items
@@ -664,6 +654,37 @@ class FileReputationDispute < ApplicationRecord
 
     conn = ::Bridge::FileRepCreatedEvent.new(addressee: "talos-intelligence", source_authority: "talos-intelligence", source_key: dispute.source_key)
     conn.post(return_payload)
+  end
+
+  def self.process_status_changes(disputes, status, resolution = nil, comment = nil, current_user = nil)
+    resolved_at = Time.now
+    disputes.each do |dispute|
+      dispute.status = status
+      if resolution.present?
+        dispute.resolution = resolution
+        dispute.resolution_comment = comment
+        dispute.case_closed_at = resolved_at
+      else
+        dispute.resolution = nil
+        dispute.resolution_comment = nil
+      end
+
+      unless [STATUS_NEW, STATUS_ASSIGNED].include?(dispute.status)
+        dispute.user_id = current_user.id unless dispute.is_assigned?
+      end
+
+      dispute.save!
+
+      if comment.present?
+        FileRepComment.create(:user_id => current_user.id, :comment => comment, :file_reputation_dispute_id => dispute.id)
+      end
+
+      dispute.reload
+
+      conn = ::Bridge::FileRepUpdateStatusEvent.new(addressee: "talos-intelligence")
+      conn.post(dispute, source_authority: "talos-intelligence", source_key: dispute.ticket_source_key)
+
+    end
   end
 
   def self.take_tickets(dispute_ids, user:)
