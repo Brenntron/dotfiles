@@ -41,11 +41,11 @@
                   .col-xs-12.set-status-bl
                     .col-xs-6
                       %label
-                        %input{name: "maintain_bl", type: "radio", value: "maintain_bl", checked:'checked'}
+                        %input{name: "maintain_bl", class:"maintain_bl", type: "radio", value: "maintain", checked:'checked'}
                           Maintain current Blacklist/s
                     .col-xs-6
                       %label
-                        %input{name: "maintain_bl", type: "radio", value: "override_bl"}
+                        %input{name: "maintain_bl", class:"maintain_bl", type: "radio", value: "override"}
                           Override current Blacklist/s
 
                   .col-xs-12
@@ -60,11 +60,11 @@
                     .col-xs-10.reptool-section-container
                       .col-xs-5
                         %label
-                          %input{name: "status_bl", type: "radio", value: "status_active_bl", checked:'checked'}
+                          %input{name: "status_bl", class:"status_bl", type: "radio", value: "active", checked:'checked'}
                             Set to ACTIVE
                       .col-xs-5
                         %label
-                          %input{name: "status_bl", type: "radio", value: "status_expired_bl"}
+                          %input{name: "status_bl", class:"status_bl", type: "radio", value: "expired"}
                             Set to EXPIRED
                   .col-xs-12
                     .comment-wrapper
@@ -74,7 +74,7 @@
                       .col-x-6
                         %hr.thin
                       .button-row-center
-                        %button.primary.dropdown-submit-button{type: 'button', onclick: '', disabled: true}
+                        %button.primary.dropdown-submit-button{type: 'button', onclick: '', disabled: true, onclick: 'set_action_col();'}
                           Add Action to Entries
 
               %div

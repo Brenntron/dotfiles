@@ -42,6 +42,7 @@ $ ->
     $('#select-all-bulk').prop('checked', bulk_value)
 
   window.open_adjust_reptool = () ->
+
     dropdown = $('#reptool_entries_bl_dropdown')
     list = $(dropdown).find('ul')
     reptool_options = [ "attackers", "bogon", "bots", "cnc", "cryptomining",
@@ -49,19 +50,15 @@ $ ->
               "phishing", "response", "spam", "suspicious", "tor_exit_node"]
 
     if !$(list).has('label').length
+      # the checkbox list for the dropdown is built here when the dropdown is first opened
+      # because I don't want to type the same html element over and over
       for opt in reptool_options
-        li = document.createElement("li");
-        label= document.createElement("label");
-        description = document.createTextNode(opt);
-        checkbox = document.createElement("input");
-        $(checkbox).addClass('adjust_reptool_checkbox')
-        checkbox.type = "checkbox";
-        checkbox.name = opt + '_adjust';
-        checkbox.value = opt;
-        label.appendChild(checkbox);
-        label.appendChild(description);
-        li.appendChild(label);
-        $(list).append(li)
+        checkbox =
+          '<li> <label>' +
+            '<input name="' + opt + '" value="' + opt + '"type ="checkbox" class="adjust_reptool_checkbox"/>'+ opt +
+          '</label> </li>'
+
+        $(list).append(checkbox)
 
   $(document).on 'change', '.adjust_reptool_checkbox', () ->
     submit_btn = $('#reptool_entries_bl_dropdown .dropdown-submit-button')
@@ -70,6 +67,34 @@ $ ->
     else
       submit_btn.prop('disabled', true)
 
+  window.set_action_col = () ->
+    dropdown = $('#reptool_entries_bl_dropdown')
+    selected_rows = $('.col-select-all input:checked')
+    checked_bl = $(dropdown).find('.adjust_reptool_checkbox:checked')
+    check_list = []
+    current_bl = $('.maintain_bl:checked').val()
+    status_bl = $('.status_bl:checked').val().toUpperCase();
+#    Set (whatever is checked) blacklist to ACTIVE or EXPIRED
+    for item in checked_bl
+
+      check_name = "<span class='col-tag'>" + $(item).val() + "</span> "
+      check_list.push(check_name)
+
+    if check_list.length == 2
+      check_list = check_list.join(' and ')
+    else
+      check_list = check_list.join(', ').replace(/, ([^,]*)$/, ', and $1')
+
+    col_dialog = "<p>Set " + check_list + " <span class='col-status-tag'> to " + status_bl + "</span> <p>"
+
+    selected_rows.each ()->
+      row = $(this).closest('tr')
+      console.log $(this).closest('tr')
+      data = row.find('.col-bulk-dispute').text()
+      action_col = row.find('.col-actions')
+
+      if !isEmpty(data)
+        $(action_col).html(col_dialog)
 
   window.isEmpty = (item) ->
     # function to check whether or not objects and strings are empty, more variable types can be added as needed

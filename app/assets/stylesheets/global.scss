@@ -5037,6 +5037,9 @@ input.table-entry-input:focus {
 }
 
 #research-table {
+  &{
+    line-height: 1.6em;
+  }
   th {
     color: $type-darkest;
     border-bottom: 1px solid $faint-neutral-color!important;
@@ -8289,7 +8292,19 @@ th.sorting_1, th.sorting_asc, th.sorting_desc {
   }
 }
 
-
+.col-tag{
+  background: $medium-neutral-color;
+  font-weight: 200;
+  padding: 0 3px;
+}
+.col-status-tag{
+  white-space: nowrap
+}
+.col-actions {
+  & {
+    max-width: 300px;
+  }
+}
 .dispute-wlbl-adjust-wrapper .inline-tool-content-wrapper, .dispute-reptool-adjust-wrapper .inline-tool-content-wrapper {
   padding: 6px 10px !important;
 }
