@@ -267,8 +267,6 @@ class ComplaintEntry < ApplicationRecord
 
   def self.create_wbnp_complaint_entry(complaint, ip_url, url_parts, user = nil, status = NEW, categories = nil)
 
-
-
     new_complaint_entry = ComplaintEntry.new
     new_complaint_entry.complaint_id = complaint.id
     new_complaint_entry.status = status

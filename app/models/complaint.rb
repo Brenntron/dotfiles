@@ -426,7 +426,7 @@ class Complaint < ApplicationRecord
 
       new_report = WbnpReport.new
 
-      all_complaints = Wbrs::RuleUiComplaint.where({:add_channels => [WBNP_CHANNEL], :statuses => ['new']})["data"]
+      all_complaints = Wbrs::RuleUiComplaint.where({:add_channels => [WBNP_CHANNEL], :statuses => ['new']})["data"].first(60)
 
       #all_complaints.each do |rule_ui_complaint|
       #  uri_to_test = compile_parts_to_uri(rule_ui_complaint)
@@ -453,14 +453,15 @@ class Complaint < ApplicationRecord
     def start_wbnp_pull(new_report_id)
       new_report = WbnpReport.find(new_report_id)
       begin
-        all_complaints = Wbrs::RuleUiComplaint.where({:add_channels => [WBNP_CHANNEL], :statuses => ['new']})["data"]
+        all_complaints = Wbrs::RuleUiComplaint.where({:add_channels => [WBNP_CHANNEL], :statuses => ['new']})["data"].first(60)
         bugzilla_rest_session = BugzillaRest::Session.default_session
         all_complaints.each do |new_ui_complaint|
           if new_ui_complaint['add_channel'] == WBNP_CHANNEL
             begin
               rule_ui_wbnp_create_action(new_ui_complaint, new_report, bugzilla_rest_session: bugzilla_rest_session)
             rescue => e
-              new_report.notes += "uri: #{new_ui_complaint.inspect} | failure: #{e.message}\n"
+              new_report.cases_failed += 1
+              new_report.notes += "SWP \n uri: #{new_ui_complaint.inspect} | failure: #{e.message} #{e.backtrace.join("\n")}\n"
               new_report.save
             end
           end
@@ -470,7 +471,7 @@ class Complaint < ApplicationRecord
         new_report.save
       rescue => e
         new_report.status = WbnpReport::ERROR
-        new_report.notes += "\n\n----------\nPull suddenly ended with error: #{e.message}\n\n"
+        new_report.notes += "\n\n----------\nPull suddenly ended with error: #{e.message} #{e.backtrace.join("\n")}\n\n"
         new_report.save
       end
 
@@ -547,9 +548,9 @@ class Complaint < ApplicationRecord
       Wbrs::RuleUiComplaint.assign_tickets({:complaint_ids => [rule_ui_complaint["complaint_id"]], :user => "admatter"})
       wbnp_report.cases_imported += 1
 
-    rescue => e
+    rescue Exception => e
       wbnp_report.cases_failed += 1
-      wbnp_report.notes += "\n\n uri: #{uri} | failure: #{e.message}\n"
+      wbnp_report.notes += "\n\nRUWCA\n uri: #{uri} | failure: #{e.message} \n #{e.backtrace.join("\n")}"
     end
 
     wbnp_report.save
