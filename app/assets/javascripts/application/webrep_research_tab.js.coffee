@@ -1,15 +1,22 @@
 $ ->
+  # go back to the last tab after reload
   $('a[data-toggle="tab"]').on 'shown.bs.tab', (e) ->
     localStorage.setItem 'lastTab', $(this).attr('id')
     return
 
+  $('.reputation-research-search-wrapper a').on 'click', () ->
+    hide_toolbar()
+
+  hide_toolbar = () ->
+  # hides toolbar depending on which tab in bulk research panel is open
+    tab = window.location.href
+    if tab.includes('quick')
+      $('#research-page-toolbar').hide()
+    else
+      $('#research-page-toolbar').show()
 
   $(document).on 'ready page:load', (e) ->
-    tab = location.href
-    if tab.includes('detail')
-      $('#research-page-toolbar').show()
-    else
-      $('#research-page-toolbar').hide()
+    hide_toolbar()
     lastTab = localStorage.getItem('lastTab')
     if lastTab
       $('#' + lastTab).tab('show');
@@ -17,19 +24,15 @@ $ ->
       $('#communication-tab-link').tab('show')
     return
 
-  $(document).on 'click', '.research-header-wrapper li', (e) ->
-    tab = location.href
-    if tab.includes('detail')
-      $('#research-page-toolbar').show()
-    else
-      $('#research-page-toolbar').hide()
   $(document).on 'change', '#select-all-bulk', (e) ->
+    # handles selection of all checkboxes in quicklookup table
     e_val = e.currentTarget.checked
     select_cols = $('.col-select-all input')
     for col in select_cols
       $(col).prop('checked', e_val)
 
   $(document).on 'change', '.col-select-all input', (e) ->
+    # handles selection of sindlge checkboxes in quicklookup table
     select_cols = $('.col-select-all input')
     select_vals = []
     for col in select_cols
@@ -37,11 +40,20 @@ $ ->
     bulk_value = select_vals.every( (col) -> return col)
     $('#select-all-bulk').prop('checked', bulk_value)
 
-  window.isEmpty = (str) -> return /^\s*$/.test(str)
+  window.isEmpty = (item) ->
+    # function to check whether or not objects and strings are empty, more variable types can be added as needed
+    type = typeof item
+    switch(type)
+      when 'object'
+        return !Object.keys(item).length
+      when 'string'
+        return /^\s*$/.test(item)
 
   window.buildRow = ( text_list, parent_row) ->
+    # build and append new rows to the HTML in quick lookup
     tbody = document.querySelector('.research-table tbody')
     disputes = []
+    disputes_data = []
     existing_rows = $(tbody).find('tr')
     parent_data = $(parent_row).find('.col-bulk-dispute').attr('data')
     parent_index = parent_row.rowIndex
@@ -50,14 +62,15 @@ $ ->
     $(existing_rows).each ->
       data = $(this).find('.col-bulk-dispute').attr('data')
       if !isEmpty(data)
-        disputes.push(data)
+        disputes_data.push(data)
+        disputes.push(this)
 
     if !isEmpty(parent_data) && !text_list.includes(parent_data)
       index = disputes.indexOf(parent_data);
       disputes.splice(index, 1);
       parent_index = parent_index - 1
 
-    text_list = text_list.filter( (text)-> return !disputes.includes(text) )
+    text_list = text_list.filter( (text)-> return !disputes_data.includes(text) )
     text_list.push(' ')
     enter_check = isEmpty(prev_row) && text_list.length == 1 && parent_index > 1 || isEmpty(parent_data)
 
@@ -70,25 +83,32 @@ $ ->
       for i in [0...text_list.length]
         disputes.push(text_list[i])
 
+    # reset the innerHTML to nothing
     tbody.innerHTML = ''
     for i in [0...disputes.length]
-      tbody.innerHTML +=
-        '<tr>' +
-          '<td class="col-select-all">' +
-          '<span class="checkbox-wrapper">' +
+      # if the dispute is not an HTML object, set the HTML of the new row to the below
+      if typeof disputes[i] != 'object'
+        tbody.innerHTML +=
+          '<tr>' +
+            '<td class="col-select-all">' +
+            '<span class="checkbox-wrapper">' +
             '<input type="checkbox" checked>' +
-          '</span>' +
-          '</<td>'+
-          '<td class="col-bulk-dispute" contenteditable="true" data=' + disputes[i] + '><p>' + disputes[i] + '</p></td>'+
-          '<td class="col-wbrs"></td>'+
-          '<td class="col-wbrs-rule-hits"></td>'+
-          '<td class="col-wbrs-rules"></td>'+
-          '<td class="col-category"></td>'+
-          '<td class="col-wlbl"></td>'+
-          '<td class="col-reptool-class"></td>'+
-          '<td class="col-actions"></td>' +
-        '</tr>'
+            '</span>' +
+            '</td>'+
+            '<td class="col-bulk-dispute" contenteditable="true" data=' + disputes[i] + '><p>' + disputes[i] + '</p></td>'+
+            '<td class="col-wbrs"></td>'+
+            '<td class="col-wbrs-rule-hits"></td>'+
+            '<td class="col-wbrs-rules"></td>'+
+            '<td class="col-category"></td>'+
+            '<td class="col-wlbl"></td>'+
+            '<td class="col-reptool-class"></td>'+
+            '<td class="col-actions"></td>' +
+            '</tr>'
+      else
+        # if the dispute is an HTML object, set it as OuterHTML to avoid formatting issues
+        tbody.innerHTML += disputes[i].outerHTML
 
+      # Once the table has been rebuilt, find the empty row and focus on it
       col_dispute = $(tbody).find('tr .col-bulk-dispute')
       col_dispute.each ->
         if isEmpty( $(this).attr('data') )
@@ -99,6 +119,7 @@ $ ->
       , 20
 
   window.bindControls = () ->
+    # unbind and rebind focusout to prevent the rebuilding of the table from being stuck in a loop
     $(document).unbind('focusout')
     setTimeout () ->
       $( document ).on 'focusout', '.col-bulk-dispute', (e) -> set_row_text(e, this)
@@ -119,8 +140,8 @@ $ ->
     switch( key )
       when 13
         if !shiftKey && text_list.length
-            bindControls()
-            buildRow(text_list, row)
+          bindControls()
+          buildRow(text_list, row)
       when 0
         if text_list.length > 1
           buildRow(text_list, row)
@@ -133,6 +154,145 @@ $ ->
   $( document ).on 'keydown focusout', '.col-bulk-dispute', (e) ->
     set_row_text(e, this)
     e.stopPropagation()
+
+  $(document).ajaxStop ()->
+    # Once all ajax calls have been completed, hide the  on page loader svg
+    $('.ajax-message-div').hide()
+
+  $(document).on 'click', '#get-rep-data', (e) ->
+    e.preventDefault()
+    search_items = []
+    rows = $('.research-table tbody tr')
+    headers = { 'Token': $('input[name="token"]').val(),'Xmlrpc-Token': $('input[name="xml_token"]').val() }
+
+    $('.col-bulk-dispute').each( ( ) ->
+      text = $(this).text()
+      if text != ''
+        search_items.push(text)
+    )
+
+    for i in [0...search_items.length]
+      item = search_items[i]
+      row = rows[i]
+
+      if !isEmpty(item)
+        $('.ajax-message-div').css('display':'flex')
+        # for each search item, call a promise to get the data. If success, the first then runs, setting the data in the rows.
+        # if it fails, the secon runs, catching the error
+        new get_reptool(item, headers)
+          .then ( set_reptool.bind( null, item, row) )
+          .then null, (err) -> console.log err
+        new get_wlbl(item, headers)
+          .then( set_wlbl.bind( null, item, row) )
+          .then null, (err) -> console.log err
+        new get_cat(item, headers)
+          .then ( set_cat.bind( null, item, row) )
+          .then null, (err) -> console.log err
+        new get_wrbs(item, headers)
+          .then( set_wrbs.bind( null, item, row) )
+          .then null, (err) -> console.log err
+
+  window.set_reptool = ( item, row, data) ->
+    { classification } = JSON.parse(data)[0]
+    col_reptool = $(row).children('.col-reptool-class')
+
+    if classification != 'No active classifications'
+      new_reptool = classification.toString()
+      col_reptool.text( new_reptool )
+    else
+      col_reptool.text( 'Not on RepTool' )
+      col_reptool.addClass('missing-data')
+
+  window.set_wlbl = ( item, row, data) ->
+    { data } = JSON.parse(data)
+    col_wlbl = $(row).children('.col-wlbl')
+
+    if data.length > 1
+      data = data.join(', ')
+    col_wlbl.text( data )
+
+  window.set_cat = ( item, row, data) ->
+    { data } = JSON.parse(data)
+    cat_col = $(row).children('.col-category')
+
+    if !isEmpty(data)
+      categories = ''
+      for key, value of data
+        { descr } = value
+        categories += descr + ', '
+      categories = categories.substring(0, categories.length - 2)
+      cat_col.text( categories )
+    else
+      cat_col.text('No data')
+      cat_col.addClass('missing-data')
+
+  window.set_wrbs = ( item, row, data) ->
+    { score, rulehits } = data.json.data
+    col_wbrs = $(row).children('.col-wbrs')
+    col_wbrs_rule = $(row).children('.col-wbrs-rules')
+    col_wbrs_hits = $(row).children('.col-wbrs-rule-hits')
+
+    col_wbrs_rule.text( rulehits.join(', ') )
+    col_wbrs_hits.text( rulehits.length )
+    if score != 'noscore'
+      col_wbrs.text( score )
+    else
+      col_wbrs.text( '0.0' )
+
+
+  window.get_reptool = (item, headers) ->
+    data = {'ip_uris':[item]}
+    $.ajax(
+      url: '/escalations/api/v1/escalations/webrep/disputes/bulk_reptool_get_info_for_form'
+      method: 'POST'
+      data: data
+      headers: headers
+      success: (response) ->
+        return response
+      error: (response) ->
+        return response
+    )
+
+  window.get_wlbl = (item, headers) ->
+    data = {'entry': item}
+    $.ajax(
+      url: '/escalations/api/v1/escalations/webrep/disputes/rule_ui_wlbl_get_info_for_form'
+      method: 'GET'
+      headers: headers
+      data: data
+      dataType: 'json'
+      success: (response) ->
+        return response
+      error: (response) ->
+        return response
+    )
+  window.get_wrbs = (item, headers) ->
+    data = {'uri': item}
+    $.ajax(
+      url: '/escalations/api/v1/escalations/webrep/disputes/wbrs_info'
+      method: 'GET'
+      headers: headers
+      data: data
+      dataType: 'json'
+      success: (response) ->
+        return response
+      error: (response) ->
+        return response
+    )
+
+  window.get_cat = (item, headers) ->
+    data = {'uri': item}
+    $.ajax(
+      url: '/escalations/api/v1/escalations/webcat/complaints/uri_cat_info'
+      method: 'GET'
+      headers: headers
+      data: data
+      dataType: 'json'
+      success: (response) ->
+        return response
+      error: (response) ->
+        return response
+    )
 
 ->
 
@@ -163,7 +323,6 @@ $ ->
       else
         e.preventDefault()
 
-
   $('.cancel-changes').click ->
     $('.editing-row').each ->
       editing_inputs = $(this).find('.table-entry-input')
@@ -191,14 +350,14 @@ $ ->
       $(this).removeClass('editing-row')
       $('.edit-entries-buttons').addClass('hidden')
 
-#   Need to add save function after editing.
-#        When they hit save it should send the update to the ticket,
+  #   Need to add save function after editing.
+  #        When they hit save it should send the update to the ticket,
   #      populate everywhere / reload the page,
-#        and set the entry span to match the content of the input
-#
+  #        and set the entry span to match the content of the input
+  #
 
 
-# Inline Edit Button
+  # Inline Edit Button
   $('.inline-edit-entry-button').click ->
     edit_button = $(this)
     entry_row = $(this).parents('.research-table-row')[0]
@@ -214,7 +373,7 @@ $ ->
     if $('.edit-entries-buttons').hasClass('hidden')
       $('.edit-entries-buttons').removeClass('hidden')
 
-# Inline Edit Status
+  # Inline Edit Status
   $('.radio-label').click ->
     radio_button = $(this).prev('input[type="radio"]')
     $(radio_button[0]).trigger('click')
@@ -238,7 +397,7 @@ $ ->
     else
       $('.ticket-resolution-submenu').hide()
 
-# Expand All Rows
+  # Expand All Rows
   $('#expand-all-rows').click ->
     $('.research-table-row-wrapper').each ->
       expand_inline_toggle = $(this).find('.expand-row-button-inline')
@@ -247,7 +406,7 @@ $ ->
       expandable_row = $(this).find('.nested-data-row')[0]
       $(expandable_row).show()
 
-# Collapse All Rows
+  # Collapse All Rows
   $('#collapse-all-rows').click ->
     $('.research-table-row-wrapper').each ->
       expand_inline_toggle = $(this).find('.expand-row-button-inline')
@@ -256,7 +415,7 @@ $ ->
       expandable_row = $(this).find('.nested-data-row')[0]
       $(expandable_row).hide()
 
-#  Expand / Collapse the expandable row (inline button)
+  #  Expand / Collapse the expandable row (inline button)
   $('.expand-row-button-inline').click ->
     expand_button = $(this)
     entry_id = $(this).attr('data-entry-id')
@@ -269,7 +428,7 @@ $ ->
   ##  Populating the toolbar Adjust RepTool BL dropdown
   window.bulk_get_current_reptool = (page) ->
 
-    # Define the variables based on the page
+# Define the variables based on the page
     if page == "show" || page == "research"
       checkbox = $('.dispute_check_box:checked')
     else if page == "index"
@@ -391,7 +550,7 @@ $ ->
       data = {'entries': []}
       wbrs = ''
       $(entries_checked).each ->
-        # Slightly different structure to get the actual entry content
+# Slightly different structure to get the actual entry content
         if row == '.research-table-row'
           entry_row = $(this).parents('.research-table-row')[0]
           entry_content = $(entry_row).find('.entry-data-content').text()
@@ -504,7 +663,7 @@ $ ->
           $(submit_button).attr("disabled", false)
 
 
-# Show / hide the different research tables in the expanded row
+  # Show / hide the different research tables in the expanded row
   $('.research-row-checkbox').click ->
     entry_id = $(this).val()
     entry_row = $(this).parents('.research-table-row')[0]
@@ -554,7 +713,7 @@ $ ->
 
 
 
-# Scrollable tables in the expanded rows
+  # Scrollable tables in the expanded rows
   $('.table-scrollable').DataTable({
     scrollY: 200,
 #    scrollCollapse: true,
@@ -582,7 +741,7 @@ $ ->
   })
 
 
-#  Rule escalations email
+  #  Rule escalations email
   $('.wbrs-rule-trigger').click ->
     rule_id = $(this).attr('data-id')
     std_msg_ajax(
@@ -641,12 +800,11 @@ $ ->
     )
     return
 
-
   # Sync / refresh entry data. Initiate modal / animation
   $('#sync-data-button').click ->
-    #    If cannot connect to resync data
-    #    Show error message modal
-    #    Else
+#    If cannot connect to resync data
+#    Show error message modal
+#    Else
     $('#loader-modal').modal({
       backdrop: 'static',
       keyboard: false
@@ -672,15 +830,15 @@ $ ->
         window.location.reload()
     )
 
-#    When data is finish loading
-#    $('#loading-div').hide()
-#    $('#api-msg').show()
-#    $('#loader-modal.hidden).removeClass('hidden')
-#    Display success message in modal
+  #    When data is finish loading
+  #    $('#loading-div').hide()
+  #    $('#api-msg').show()
+  #    $('#loader-modal.hidden).removeClass('hidden')
+  #    Display success message in modal
 
   window.researchfilter = (element) ->
     query = $(element).val();
-#    Rather than doing the javascript .each for this, let's use CSS
+    #    Rather than doing the javascript .each for this, let's use CSS
     $('.entry-data-content:not(:contains(' + query + '))').parents('.research-table-row').hide()
     $('.entry-data-content:contains(' + query + ')').parents('.research-table-row').show()
 

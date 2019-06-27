@@ -5345,6 +5345,21 @@ h5.entry-details-table-header {
   font-weight: 600;
 }
 
+.ajax-message-div{
+  &{
+    position: absolute;
+    top: 148px;
+    display: none;
+    justify-content: center;
+    align-items: center;
+  }
+  .loader-gears {
+    height: 40px;
+    width: 40px;
+    margin: 5px;
+  }
+}
+
 .nested-table-tally {
   float: right;
   font-weight: 300;

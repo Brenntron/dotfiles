@@ -48,6 +48,23 @@ class ComplaintEntry < ApplicationRecord
     altered_set.merge(changeset)
   end
 
+  def self.current_category_data_for_uri(uri)
+    prefix = Wbrs::Prefix.where({:urls => [URI.escape(uri)]})&.first
+    return {} unless prefix
+
+    current_categories = prefix.categories
+    current_categories.inject({}) do |data, category|
+      data[category.category_id] = {
+          category_id: category.category_id,
+          desc_long: category.desc_long,
+          descr: category.descr,
+          mnem: category.mnem,
+          is_active: category.is_active,
+          confidence: category.confidence }
+      data
+    end
+  end
+
   def compose_versions
     for_view = {}
     versions.each do |version|
