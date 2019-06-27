@@ -460,7 +460,7 @@ class Complaint < ApplicationRecord
             begin
               rule_ui_wbnp_create_action(new_ui_complaint, new_report, bugzilla_rest_session: bugzilla_rest_session)
             rescue => e
-              new_report.notes += "uri: #{uri} | failure: #{e.message}\n"
+              new_report.notes += "uri: #{new_ui_complaint.inspect} | failure: #{e.message}\n"
               new_report.save
             end
           end
