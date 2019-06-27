@@ -31,6 +31,7 @@ $ ->
     for col in select_cols
       $(col).prop('checked', e_val)
 
+
   $(document).on 'change', '.col-select-all input', (e) ->
     # handles selection of sindlge checkboxes in quicklookup table
     select_cols = $('.col-select-all input')
@@ -39,6 +40,81 @@ $ ->
       select_vals.push( $(col).prop('checked') )
     bulk_value = select_vals.every( (col) -> return col)
     $('#select-all-bulk').prop('checked', bulk_value)
+
+  window.open_adjust_reptool = () ->
+
+    dropdown = $('#reptool_entries_bl_dropdown')
+    list = $(dropdown).find('ul')
+    reptool_options = [ "attackers", "bogon", "bots", "cnc", "cryptomining",
+              "dga", "exploit kit", "malware", "open_proxy", "open_relay",
+              "phishing", "response", "spam", "suspicious", "tor_exit_node"]
+
+    if !$(list).has('label').length
+      # the checkbox list for the dropdown is built here when the dropdown is first opened
+      # because I don't want to type the same html element over and over
+      for opt in reptool_options
+        checkbox =
+          '<li> <label>' +
+            '<input name="' + opt + '" value="' + opt + '"type ="checkbox" class="adjust_reptool_checkbox"/>'+ opt +
+          '</label> </li>'
+
+        $(list).append(checkbox)
+
+  $(document).on 'change', '.adjust_reptool_checkbox, .status_bl', () ->
+    submit_btn = $('#reptool_entries_bl_dropdown .dropdown-submit-button')
+    class_bl = $('.status_bl:checked').val().replace('reptool-', '')
+
+    switch (class_bl)
+      when 'maintain'
+        $('#reptool_entries_bl_dropdown .reptool-class-radio-row').show()
+        $('#reptool_entries_bl_dropdown .reptool-classifications-row').show()
+      when 'override'
+        $('#reptool_entries_bl_dropdown .reptool-class-radio-row').hide()
+        $('#reptool_entries_bl_dropdown .reptool-classifications-row').show()
+      when 'drop'
+        $('#reptool_entries_bl_dropdown .reptool-classifications-row').hide()
+
+    if $('.adjust_reptool_checkbox:checked').length || class_bl == 'drop'
+      submit_btn.prop('disabled', false)
+    else
+      submit_btn.prop('disabled', true)
+
+  window.set_action_col = () ->
+    dropdown = $('#reptool_entries_bl_dropdown')
+    selected_rows = $('.col-select-all input:checked')
+    checked_bl = $(dropdown).find('.adjust_reptool_checkbox:checked')
+    check_list = []
+    class_bl = $('.status_bl:checked').val().replace('reptool-', '')
+    reptool_add  = $('.add-bl:checked').val()
+    status_string = 'Add classifications: '
+
+    for item in checked_bl
+      check_name = "<span class='col-tag'>" + $(item).val() + "</span> "
+      check_list.push(check_name)
+
+    if check_list.length == 2
+      check_list = check_list.join(' and ')
+    else
+      check_list = check_list.join(', ').replace(/, ([^,]*)$/, ', and $1')
+
+
+    switch(class_bl)
+      when 'maintain'
+        if reptool_add == 'remove'
+          status_string = 'Remove classifications: '
+      when 'drop'
+        status_string = 'Drop all classifications (set entry to EXPIRED)'
+        check_list = ''
+
+    col_dialog = "<p>" + status_string + check_list + "<p>"
+
+    selected_rows.each ()->
+      row = $(this).closest('tr')
+      data = row.find('.col-bulk-dispute').text()
+      action_col = row.find('.col-actions')
+
+      if !isEmpty(data)
+        $(action_col).html(col_dialog)
 
   window.isEmpty = (item) ->
     # function to check whether or not objects and strings are empty, more variable types can be added as needed

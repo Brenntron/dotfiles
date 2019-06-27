@@ -35,10 +35,50 @@
             .toolbar.research-toolbar
               %div
                 %label.toolbar-section-label Adjust Reputation
-                %button#wlbl_entries_button.toolbar-button.adjust-wlbl-button.dropdown-toggle.esc-tooltipped.dropdown-button-margin-left{title: 'Adjust WL/BL', 'data-toggle': 'dropdown', 'aria-haspopup': 'true', 'aria-expanded': 'false', onclick: 'bulk_get_current_wlbl("research")'}
+                %button#wlbl_entries_button.toolbar-button.adjust-wlbl-button.dropdown-toggle.esc-tooltipped.dropdown-button-margin-left{title: 'Adjust WL/BL', 'data-toggle': 'dropdown', 'aria-haspopup': 'true', 'aria-expanded': 'false'}
                   %span.toolbar-button-text Adjust WL/BL
-                %button#reptool_entries_button.toolbar-button.adjust-reptool-button.dropdown-toggle.esc-tooltipped{title: 'Adjust RepTool BL', 'data-toggle': 'dropdown', 'aria-haspopup': 'true', 'aria-expanded': 'false', onclick: 'bulk_get_current_reptool("research");'}
-                  %span.toolbar-button-text Adjust RepTool WL/BL
+                %span.dropdown
+                  %button#reptool_entries_button.toolbar-button.adjust-reptool-button.dropdown-toggle.esc-tooltipped{title: 'Adjust RepTool BL', 'data-toggle': 'dropdown', 'aria-haspopup': 'true', 'aria-expanded': 'false', onclick: 'open_adjust_reptool();'}
+                    %span.toolbar-button-text Adjust RepTool BL
+                  .dropdown-menu.toolbar-dropdown#reptool_entries_bl_dropdown{'aria-labelledby': 'adjust_reptool_bl'}
+                    .dropdown-tool-text-divider.secondary-text-divider
+                      Adjust Reptool Classification
+                    .inline-tool-content-wrapper
+                      .row
+                        .col-xs-12
+                          .row
+                            %input{type: 'radio', name: 'reptool-action-radio', class: 'status_bl', id: 'reptool-maintain', value: 'reptool-maintain', checked: true}
+                            %label.radio-label{for: 'reptool-maintain'} Maintain current classifications
+                          .row
+                            %input{type: 'radio', name: 'reptool-action-radio', class: 'status_bl', id: 'reptool-override', value: 'reptool-override'}
+                            %label.radio-label{for: 'reptool-override'} Replace current classifications
+                          .row
+                            %input{type: 'radio', name: 'reptool-action-radio', class: 'status_bl', id: 'reptool-drop', value: 'reptool-drop'}
+                            %label.radio-label{for: 'reptool-drop'} Drop all classifications (set entry to EXPIRED)
+                      %hr.thin.form-divider
+                      .row.reptool-classifications-row
+                        .col-xs-12
+                          %label.content-label-sm.reptool-section-label{for: "reptool-class-type-select"} Classifications
+                          .row.dropdown-tool-grey-row.nested-radio-row.reptool-class-radio-row
+                            .col-xs-6
+                              %input{type: 'radio', name: 'reptool-classes-radio', class:"add-bl", id: 'reptool-classes-add', value: 'add', checked: true}
+                              %label.radio-label{for: 'reptool-classes-add'} Add selected classifications
+                            .col-xs-6
+                              %input{type: 'radio', name: 'reptool-classes-radio', class:"add-bl", id: 'reptool-classes-remove', value: 'remove'}
+                              %label.radio-label{for: 'reptool-classes-remove'} Remove selected classifications
+                          %ul.dropdown-reptool-list
+
+                    .col-xs-12
+                      .comment-wrapper
+                        %label.col-x-3.reptool-section-label{required: true} RepTool Comment
+                        %textarea.dropdown-comment.adjust-reptool-bl-input.comment-input
+                        .col-x-3
+                        .col-x-6
+                          %hr.thin
+                        .button-row-center
+                          %button.primary.dropdown-submit-button{type: 'button', onclick: '', disabled: true, onclick: 'set_action_col();'}
+                            Add Action to Entries
+
               %div
                 %label.toolbar-section-label File
                 %button.toolbar-button.export-button.esc-tooltipped{title: 'Export to CSV'}

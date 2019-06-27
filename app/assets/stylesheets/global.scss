@@ -5037,6 +5037,9 @@ input.table-entry-input:focus {
 }
 
 #research-table {
+  &{
+    line-height: 1.6em;
+  }
   th {
     color: $type-darkest;
     border-bottom: 1px solid $faint-neutral-color!important;
@@ -5441,9 +5444,98 @@ h5.entry-details-table-header {
 
 .submenu-left-wrapper {
   background-color: $bug-section-color;
-
 }
 
+#reptool_entries_bl_dropdown {
+  &{
+    min-width: 400px;
+  }
+  hr{
+    opacity: 1;
+    margin-top: 10px -3px;
+  }
+  label{
+    color: $type-darkest;
+    display: flex;
+    align-content: center;
+    align-items: center;
+  }
+  input{
+    margin: 0 10px;
+  }
+  .reptool-section-label{
+    color: $content-label-color !important;
+    font-size: 7pt;
+    margin-left: 12px!important
+  }
+  .comment-wrapper{
+    margin: 16px!important;
+  }
+  .comment-wrapper .reptool-section-label{
+    justify-content: unset;
+    margin-left: 1px!important;
+  }
+  textarea{
+    margin-top: 5px;
+    min-height: 60px;
+  }
+  .dropdown-submit-button{
+    margin: 0
+  }
+  .dropdown-tool-grey-row{
+    margin: 0 -6px !important
+  }
+  .nested-radio-row .col-xs-6:first-of-type{
+    padding-left: 8px!important;
+  }
+}
+
+.set-status-bl, .set-action-bl{
+  &{
+    display: flex;
+    justify-content: center;
+  }
+  .reptool-section-label {
+    height: 100%;
+    display: flex;
+    margin-right: unset
+  }
+}
+
+.set-action-bl{
+  & {
+    border-top: 1px solid white!important;
+    background: $faint-neutral-color;
+  }
+  .reptool-section-label {
+    position: relative;
+    left: -3px;
+  }
+
+}
+.set-status-bl{
+  &{
+    margin: 0 1px -7px 1px;
+    padding: 8px!important;
+  }
+  hr{
+    margin: 0 0 8px -10px;
+  }
+}
+
+.dropdown-reptool-list{
+  &{
+    -webkit-column-count: 3;
+    -moz-column-count: 3;
+    column-count: 3;
+    background: $faint-neutral-color;
+    margin: 2px -6px;
+    padding: 13px 8px;
+  }
+  input{
+     margin-right: 5px;
+  }
+}
 .inline-dropdown-menu .submenu-left-wrapper ul li:hover, .toolbar-dropdown .submenu-left-wrapper ul li:hover {
   background-color: darken($bug-section-color, 5%);
 }
@@ -8216,7 +8308,21 @@ th.sorting_1, th.sorting_asc, th.sorting_desc {
   }
 }
 
-
+.col-tag{
+  background: $faint-neutral-color;
+  font-weight: 200;
+  padding: 0 3px;
+  font-size: 8pt;
+  font-family: "Fira Mono", monospace;
+}
+.col-status-tag{
+  white-space: nowrap
+}
+.col-actions {
+  & {
+    max-width: 300px;
+  }
+}
 .dispute-wlbl-adjust-wrapper .inline-tool-content-wrapper, .dispute-reptool-adjust-wrapper .inline-tool-content-wrapper {
   padding: 6px 10px !important;
 }
