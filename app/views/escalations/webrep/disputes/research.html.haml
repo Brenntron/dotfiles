@@ -26,6 +26,10 @@
           .col-xs-8.col-sm-9.col-md-10.col-lg-10.col-xl-11
             = search_form.text_area(:uri, class: 'search-box', placeholder: 'URI or IP Address', autofocus: 'true')
         .search-options-col.tab-pane#lookup-quick{role:'tabpanel'}
+          .col-xs-12.ajax-message-div
+            .loader-gears
+              =inline_svg 'icon_gears_loader.svg'
+            %span.loader-msg Loading data...
           .col-xs-12.toolbar-quicklookup
             %button.primary#get-rep-data Get Reputation Data
             .toolbar.research-toolbar
@@ -84,10 +88,6 @@
             %button.primary#submit-rep-changes Submit Reputation Changes
             %span.small.note-repsubmit
               * NOTE: Submitting reputation changes will automatically create a closed ticket
-          .col-xs-12.ajax-message-div
-            .loader-gears
-              =inline_svg 'icon_gears_loader.svg'
-            %span.loader-msg Loading data...
           %table#research-table.research-table
             %colgroup
               %col
