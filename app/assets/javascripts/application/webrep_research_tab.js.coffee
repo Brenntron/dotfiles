@@ -64,7 +64,17 @@ $ ->
     submit_btn = $('#reptool_entries_bl_dropdown .dropdown-submit-button')
     class_bl = $('.status_bl:checked').val().replace('reptool-', '')
 
-    if $('.adjust_reptool_checkbox:checked').length || status_bl == 'drop'
+    switch (class_bl)
+      when 'maintain'
+        $('#reptool_entries_bl_dropdown .reptool-class-radio-row').show()
+        $('#reptool_entries_bl_dropdown .reptool-classifications-row').show()
+      when 'override'
+        $('#reptool_entries_bl_dropdown .reptool-class-radio-row').hide()
+        $('#reptool_entries_bl_dropdown .reptool-classifications-row').show()
+      when 'drop'
+        $('#reptool_entries_bl_dropdown .reptool-classifications-row').hide()
+
+    if $('.adjust_reptool_checkbox:checked').length || class_bl == 'drop'
       submit_btn.prop('disabled', false)
     else
       submit_btn.prop('disabled', true)
@@ -85,14 +95,11 @@ $ ->
     else
       check_list = check_list.join(', ').replace(/, ([^,]*)$/, ', and $1')
 
-    switch (class_bl)
-      when 'maintain'
-        status_string = 'Add classifications: '
-      when 'override'
-        status_string = 'Remove classifications: '
-      when 'drop'
-        status_string = 'Drop all classifications (set entry to EXPIRED)'
-        check_list = ''
+    if class_bl == 'maintain' || class_bl == 'override'
+      status_string = 'Add classifications: '
+    else
+      status_string = 'Drop all classifications (set entry to EXPIRED)'
+      check_list = ''
 
     col_dialog = "<p>" + status_string + check_list + "<p>"
 
