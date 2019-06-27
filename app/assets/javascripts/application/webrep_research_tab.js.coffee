@@ -60,9 +60,11 @@ $ ->
 
         $(list).append(checkbox)
 
-  $(document).on 'change', '.adjust_reptool_checkbox', () ->
+  $(document).on 'change', '.adjust_reptool_checkbox, .status_bl', () ->
     submit_btn = $('#reptool_entries_bl_dropdown .dropdown-submit-button')
-    if $('.adjust_reptool_checkbox:checked').length
+    class_bl = $('.status_bl:checked').val().replace('reptool-', '')
+
+    if $('.adjust_reptool_checkbox:checked').length || status_bl == 'drop'
       submit_btn.prop('disabled', false)
     else
       submit_btn.prop('disabled', true)
@@ -72,11 +74,9 @@ $ ->
     selected_rows = $('.col-select-all input:checked')
     checked_bl = $(dropdown).find('.adjust_reptool_checkbox:checked')
     check_list = []
-    current_bl = $('.maintain_bl:checked').val()
-    status_bl = $('.status_bl:checked').val().toUpperCase();
-#    Set (whatever is checked) blacklist to ACTIVE or EXPIRED
-    for item in checked_bl
+    class_bl = $('.status_bl:checked').val().replace('reptool-', '')
 
+    for item in checked_bl
       check_name = "<span class='col-tag'>" + $(item).val() + "</span> "
       check_list.push(check_name)
 
@@ -85,11 +85,19 @@ $ ->
     else
       check_list = check_list.join(', ').replace(/, ([^,]*)$/, ', and $1')
 
-    col_dialog = "<p>Set " + check_list + " <span class='col-status-tag'> to " + status_bl + "</span> <p>"
+    switch (class_bl)
+      when 'maintain'
+        status_string = 'Add classifications: '
+      when 'override'
+        status_string = 'Remove classifications: '
+      when 'drop'
+        status_string = 'Drop all classifications (set entry to EXPIRED)'
+        check_list = ''
+
+    col_dialog = "<p>" + status_string + check_list + "<p>"
 
     selected_rows.each ()->
       row = $(this).closest('tr')
-      console.log $(this).closest('tr')
       data = row.find('.col-bulk-dispute').text()
       action_col = row.find('.col-actions')
 
