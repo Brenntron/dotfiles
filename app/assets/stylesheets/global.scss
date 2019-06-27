@@ -9577,3 +9577,8 @@ table.rl-content {
     padding-left: 15px;
   }
 }
+
+// ensure AMP disposition on File Rep > Show is capitalized
+.amp-area label:first-of-type + div {
+  text-transform: capitalize;
+}
