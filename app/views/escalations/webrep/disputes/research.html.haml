@@ -35,51 +35,66 @@
             .toolbar.research-toolbar
               %div
                 %label.toolbar-section-label Adjust Reputation
-                %button#wlbl_entries_button.toolbar-button.adjust-wlbl-button.dropdown-toggle.esc-tooltipped.dropdown-button-margin-left{title: 'Adjust WL/BL', 'data-toggle': 'dropdown', 'aria-haspopup': 'true', 'aria-expanded': 'false'}
-                  %span.toolbar-button-text Adjust WL/BL
-                %button#reptool_entries_button.toolbar-button.adjust-reptool-button.dropdown-toggle.esc-tooltipped{title: 'Adjust RepTool BL', 'data-toggle': 'dropdown', 'aria-haspopup': 'true', 'aria-expanded': 'false', onclick: 'open_adjust_reptool();'}
-                  %span.toolbar-button-text Adjust RepTool BL
-
-                .dropdown-menu.toolbar-dropdown#reptool_entries_bl_dropdown{'aria-labelledby': 'adjust_reptool_bl'}
-
-                  .col-xs-12.set-status-bl
-                    .col-xs-6
-                      %label
-                        %input{name: "maintain_bl", class:"maintain_bl", type: "radio", value: "maintain", checked:'checked'}
-                          Maintain current Blacklist/s
-                    .col-xs-6
-                      %label
-                        %input{name: "maintain_bl", class:"maintain_bl", type: "radio", value: "override"}
-                          Override current Blacklist/s
-
-                  .col-xs-12
-                    %hr.thin.form-divider
-                  .col-xs-3
-                    %label.reptool-section-label Blacklists
-                  %ul.dropdown-reptool-list
-
-                  .col-xs-12.set-action-bl
-                    .col-xs-2
-                      %label.reptool-section-label.text-center Status
-                    .col-xs-10.reptool-section-container
-                      .col-xs-5
+                %span.dropdown
+                  %button#wlbl_entries_button.toolbar-button.adjust-wlbl-button.dropdown-toggle.esc-tooltipped.dropdown-button-margin-left{title: 'Adjust RepTool WL/BL', 'data-toggle': 'dropdown', 'aria-haspopup': 'true', 'aria-expanded': 'false'}
+                    %span.toolbar-button-text Adjust WL/BL
+                  .dropdown-menu.toolbar-dropdown#reptool_entries_bl_dropdown{'aria-labelledby': 'reptool_entries_button'}
+                    .col-xs-12.set-status-bl
+                      .col-xs-6
                         %label
-                          %input{name: "status_bl", class:"status_bl", type: "radio", value: "active", checked:'checked'}
-                            Set to ACTIVE
-                      .col-xs-5
+                          %input{name: "maintain_bl", class:"maintain_bl", type: "radio", value: "maintain", checked:'checked'}
+                            Maintain current Blacklist/s
+                      .col-xs-6
                         %label
-                          %input{name: "status_bl", class:"status_bl", type: "radio", value: "expired"}
-                            Set to EXPIRED
-                  .col-xs-12
-                    .comment-wrapper
-                      %label.col-x-3.reptool-section-label{required: true} RepTool Comment
-                      %textarea.dropdown-comment.adjust-reptool-bl-input.comment-input
-                      .col-x-3
-                      .col-x-6
-                        %hr.thin
-                      .button-row-center
-                        %button.primary.dropdown-submit-button{type: 'button', onclick: '', disabled: true, onclick: 'set_action_col();'}
-                          Add Action to Entries
+                          %input{name: "maintain_bl", class:"maintain_bl", type: "radio", value: "override"}
+                            Override current Blacklist/s
+
+                    .col-xs-12
+                      %hr.thin.form-divider
+                    .col-xs-3
+                      %label.reptool-section-label Blacklists
+                    %ul.dropdown-reptool-list
+
+                    .col-xs-12.set-action-bl
+                      .col-xs-2
+                        %label.reptool-section-label.text-center Status
+                      .col-xs-10.reptool-section-container
+                        .col-xs-5
+                          %label
+                            %input{name: "status_bl", class:"status_bl", type: "radio", value: "active", checked:'checked'}
+                              Set to ACTIVE
+                        .col-xs-5
+                          %label
+                            %input{name: "status_bl", class:"status_bl", type: "radio", value: "expired"}
+                              Set to EXPIRED
+                    .col-xs-12
+                      .comment-wrapper
+                        %label.col-x-3.reptool-section-label{required: true} RepTool Comment
+                        %textarea.dropdown-comment.adjust-reptool-bl-input.comment-input
+                        .col-x-3
+                        .col-x-6
+                          %hr.thin
+                        .button-row-center
+                          %button.primary.dropdown-submit-button{type: 'button', onclick: '', disabled: true, onclick: 'set_action_col();'}
+                            Add Action to Entries
+
+                %span.dropdown
+                  %button#reptool_entries_button.toolbar-button.adjust-reptool-button.dropdown-toggle.esc-tooltipped{title: 'Adjust RepTool BL', 'data-toggle': 'dropdown', 'aria-haspopup': 'true', 'aria-expanded': 'false', onclick: 'open_adjust_reptool();'}
+                    %span.toolbar-button-text Adjust RepTool BL
+                  .dropdown-menu.toolbar-dropdown#wlbl_entries_dropdown{'aria-labelledby': 'wlbl_entries_button'}
+                    .col-xs-12.set-status-bl
+                      .col-xs-12.set-action-bl
+                      .col-xs-2
+                        %label.reptool-section-label.text-center Status
+                      .col-xs-10.reptool-section-container
+                        .col-xs-5
+                          %label
+                            %input{name: "status_bl", class:"status_bl", type: "radio", value: "active", checked:'checked'}
+                              Add to List
+                        .col-xs-5
+                          %label
+                            %input{name: "status_bl", class:"status_bl", type: "radio", value: "expired"}
+                              Remove Ffrom List
 
               %div
                 %label.toolbar-section-label File
