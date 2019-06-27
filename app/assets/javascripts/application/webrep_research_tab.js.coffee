@@ -42,36 +42,46 @@ $ ->
     $('#select-all-bulk').prop('checked', bulk_value)
 
   window.open_adjust_reptool = () ->
-
     dropdown = $('#reptool_entries_bl_dropdown')
     list = $(dropdown).find('ul')
     reptool_options = [ "attackers", "bogon", "bots", "cnc", "cryptomining",
               "dga", "exploit kit", "malware", "open_proxy", "open_relay",
               "phishing", "response", "spam", "suspicious", "tor_exit_node"]
-
     if !$(list).has('label').length
-      # the checkbox list for the dropdown is built here when the dropdown is first opened
-      # because I don't want to type the same html element over and over
-      for opt in reptool_options
-        checkbox =
-          '<li> <label>' +
-            '<input name="' + opt + '" value="' + opt + '"type ="checkbox" class="adjust_reptool_checkbox"/>'+ opt +
-          '</label> </li>'
+      build_checkbox_list(reptool_options, list)
 
-        $(list).append(checkbox)
+  window.open_wlbl = () ->
+    dropdown = $('#wlbl_entries_dropdown')
+    list = $(dropdown).find('ul')
+    wlbl_options = [ "WL - Weak", "WL - Medium", "WL - Heavy",
+                     "BL - Weak", "BL - Medium", "BL - Heavy"]
+    if !$(list).has('label').length
+      build_checkbox_list(wlbl_options, list)
+
+  window.build_checkbox_list = (arr, list) ->
+    # the checkbox list for the dropdown is built here when the dropdown is first opened
+    # because I don't want to type the same html element over and over
+    for opt in arr
+      checkbox =
+        '<li> <label>' +
+          '<input name="' + opt + '" value="' + opt + '"type ="checkbox" class="adjust_reptool_checkbox"/>'+ opt +
+        '</label> </li>'
+      $(list).append(checkbox)
 
   $(document).on 'change', '.adjust_reptool_checkbox, .status_bl', () ->
     submit_btn = $('#reptool_entries_bl_dropdown .dropdown-submit-button')
     class_bl = $('.status_bl:checked').val().replace('reptool-', '')
 
-    if $('.adjust_reptool_checkbox:checked').length || status_bl == 'drop'
+    if $('.adjust_reptool_checkbox:checked').length || class_bl == 'drop'
       submit_btn.prop('disabled', false)
     else
       submit_btn.prop('disabled', true)
-
+  window.set_action_wlbl_col = () ->
+    
   window.set_action_col = () ->
     dropdown = $('#reptool_entries_bl_dropdown')
     selected_rows = $('.col-select-all input:checked')
+
     checked_bl = $(dropdown).find('.adjust_reptool_checkbox:checked')
     check_list = []
     class_bl = $('.status_bl:checked').val().replace('reptool-', '')
@@ -102,7 +112,7 @@ $ ->
       action_col = row.find('.col-actions')
 
       if !isEmpty(data)
-        $(action_col).html(col_dialog)
+        $(action_col).append(col_dialog)
 
   window.isEmpty = (item) ->
     # function to check whether or not objects and strings are empty, more variable types can be added as needed

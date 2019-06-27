@@ -35,8 +35,37 @@
             .toolbar.research-toolbar
               %div
                 %label.toolbar-section-label Adjust Reputation
-                %button#wlbl_entries_button.toolbar-button.adjust-wlbl-button.dropdown-toggle.esc-tooltipped.dropdown-button-margin-left{title: 'Adjust WL/BL', 'data-toggle': 'dropdown', 'aria-haspopup': 'true', 'aria-expanded': 'false'}
-                  %span.toolbar-button-text Adjust WL/BL
+                %span.dropdown
+                  %button#wlbl_entries_button.toolbar-button.adjust-wlbl-button.dropdown-toggle.esc-tooltipped.dropdown-button-margin-left{title: 'Adjust WL/BL', 'data-toggle': 'dropdown', 'aria-haspopup': 'true', 'aria-expanded': 'false', onclick:'open_wlbl();'}
+                    %span.toolbar-button-text Adjust WL/BL
+                  .dropdown-menu.toolbar-dropdown#wlbl_entries_dropdown{'aria-labelledby': 'wlbl_reptool'}
+                    .col-xs-12
+                      .inline-tool-content-wrapper
+                        .row.nested-radio-row.reptool-class-radio-row
+                          .col-xs-2
+                            %label.content-label-sm.reptool-section-label{for: "reptool-class-type-select"} Action
+                          .col-xs-5
+                            %input{type: 'radio', name: 'wlbl-radio', id: 'wlbl-reptool-add', value: 'add', checked: true}
+                            %label.radio-label{for: 'wlbl-reptool-add'} Add to List
+                          .col-xs-5
+                            %input{type: 'radio', name: 'wlbl-radio', id: 'wlbl-reptool-remove', value: 'remove'}
+                            %label.radio-label{for: 'wlbl-reptool-remove'} Remove from List
+                        .row.reptool-classifications-row
+                          .col-xs-12
+                            %label.content-label-sm.reptool-section-label{for: "reptool-class-type-select"} Lists
+                            %ul.dropdown-wlbl-list
+                      .col-xs-12
+                        .comment-wrapper
+                          %label.col-x-3.reptool-section-label{required: true} WL/BL Comment
+                          %textarea.dropdown-comment.adjust-reptool-bl-input.comment-input
+                          .col-x-3
+                          .col-x-6
+                            %hr.thin
+                          .button-row-center
+                            %button.primary.dropdown-submit-button{type: 'button', onclick: '', disabled: true, onclick: 'set_action_col();'}
+                              Add Action to Entries
+
+
                 %span.dropdown
                   %button#reptool_entries_button.toolbar-button.adjust-reptool-button.dropdown-toggle.esc-tooltipped{title: 'Adjust RepTool BL', 'data-toggle': 'dropdown', 'aria-haspopup': 'true', 'aria-expanded': 'false', onclick: 'open_adjust_reptool();'}
                     %span.toolbar-button-text Adjust RepTool BL
