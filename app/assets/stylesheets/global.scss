@@ -9580,6 +9580,6 @@ table.rl-content {
 }
 
 // ensure AMP disposition on File Rep > Show is capitalized
-.amp-area label:first-of-type + div {
+.amp-area label:first-of-type + div, #create-detection-dialog .top-info-data {
   text-transform: capitalize;
 }
