@@ -7,6 +7,7 @@ class Bridge::FileRepUpdateStatusEvent < Bridge::BaseMessage
   def post(dispute, source_authority: @source_authority, source_key: @source_key)
     return_payload = {}
     return_payload[dispute.sha256_hash] = {
+        ac_id: dispute.id,
         resolution: dispute.resolution,
         resolution_message: dispute.resolution_comment,
         status: dispute.status
