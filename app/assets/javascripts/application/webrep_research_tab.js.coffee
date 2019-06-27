@@ -85,6 +85,8 @@ $ ->
     checked_bl = $(dropdown).find('.adjust_reptool_checkbox:checked')
     check_list = []
     class_bl = $('.status_bl:checked').val().replace('reptool-', '')
+    reptool_add  = $('.add-bl:checked').val()
+    status_string = 'Add classifications: '
 
     for item in checked_bl
       check_name = "<span class='col-tag'>" + $(item).val() + "</span> "
@@ -95,11 +97,14 @@ $ ->
     else
       check_list = check_list.join(', ').replace(/, ([^,]*)$/, ', and $1')
 
-    if class_bl == 'maintain' || class_bl == 'override'
-      status_string = 'Add classifications: '
-    else
-      status_string = 'Drop all classifications (set entry to EXPIRED)'
-      check_list = ''
+
+    switch(class_bl)
+      when 'maintain'
+        if reptool_add == 'remove'
+          status_string = 'Remove classifications: '
+      when 'drop'
+        status_string = 'Drop all classifications (set entry to EXPIRED)'
+        check_list = ''
 
     col_dialog = "<p>" + status_string + check_list + "<p>"
 
