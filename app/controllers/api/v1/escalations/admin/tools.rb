@@ -17,7 +17,10 @@ module API
             end
 
             post "execute_task" do
-              authorize!(:manage, Admin)
+              #authorize!(:manage, Admin)
+              unless current_user.has_role?('admin')
+                return {:status => 'error', :message => 'you do not have permissions to run this'}.to_json
+              end
 
               task = permitted_params[:task]
               args = permitted_params[:args]
