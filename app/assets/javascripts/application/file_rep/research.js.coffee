@@ -84,9 +84,24 @@ window.get_threatgrid_data = (sha256_hash) ->
 
         # Load the top data
         $('#tg-submission-date').text(tg_formatted_submitted_date)
-        $('#tg-run-status').text(file_data.state)
-        $('#tg-score').text(file_data.analysis.threat_score)
         $('#tg-tags').text(file_data.tags.join(', '))
+
+        # check if file_data object has a property
+
+
+        # dbinebri: if TG has a state fail, don't show most of the stuff
+        if file_data.state == 'fail'
+          $('#tg-run-status').text('Failure')
+          $('#tg-score').siblings().hide()
+          $('#tg-tags').closest('div.row').nextAll().hide()
+        else
+          $('#tg-run-status').text(file_data.state)
+
+        # TODO: on TG fail this threat_score might not exist
+        # TODO: on TG fail this threat_score might not exist
+        # TODO: on TG fail this threat_score might not exist
+        if file_data.analysis
+          $('#tg-score').text(file_data.analysis.threat_score)
 
         # Adding behaviors
         behaviors = ""
@@ -126,6 +141,8 @@ window.get_reversinglabs_data = (sha256_hash) ->
     method: 'GET'
     url: "/escalations/api/v1/escalations/filerep/reversing_labs/" + sha256_hash
     success_reload: false
+    # TODO: NEED TO DO SOMETHING IF RUN STATUS == 'fail'
+
     success: (response) ->
       $('#rl-loader').hide()
       report_present = $('#reversing-labs-report-wrapper').find('.rl-data-present')[0]
