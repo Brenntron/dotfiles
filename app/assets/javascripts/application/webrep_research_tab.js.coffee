@@ -19,7 +19,7 @@ $ ->
     hide_toolbar()
     lastTab = localStorage.getItem('lastTab')
     if lastTab
-      $('#' + lastTab).tab('show');
+      $('#' + lastTab).tab('show')
     else
       $('#communication-tab-link').tab('show')
     return
@@ -31,7 +31,6 @@ $ ->
     for col in select_cols
       $(col).prop('checked', e_val)
 
-
   $(document).on 'change', '.col-select-all input', (e) ->
     # handles selection of sindlge checkboxes in quicklookup table
     select_cols = $('.col-select-all input')
@@ -40,25 +39,6 @@ $ ->
       select_vals.push( $(col).prop('checked') )
     bulk_value = select_vals.every( (col) -> return col)
     $('#select-all-bulk').prop('checked', bulk_value)
-
-  window.open_adjust_reptool = () ->
-
-    dropdown = $('#reptool_entries_bl_dropdown')
-    list = $(dropdown).find('ul')
-    reptool_options = [ "attackers", "bogon", "bots", "cnc", "cryptomining",
-              "dga", "exploit kit", "malware", "open_proxy", "open_relay",
-              "phishing", "response", "spam", "suspicious", "tor_exit_node"]
-
-    if !$(list).has('label').length
-      # the checkbox list for the dropdown is built here when the dropdown is first opened
-      # because I don't want to type the same html element over and over
-      for opt in reptool_options
-        checkbox =
-          '<li> <label>' +
-            '<input name="' + opt + '" value="' + opt + '"type ="checkbox" class="adjust_reptool_checkbox"/>'+ opt +
-          '</label> </li>'
-
-        $(list).append(checkbox)
 
   $(document).on 'change', '.adjust_reptool_checkbox, .status_bl', () ->
     submit_btn = $('#reptool_entries_bl_dropdown .dropdown-submit-button')
@@ -79,13 +59,83 @@ $ ->
     else
       submit_btn.prop('disabled', true)
 
+
+  $(document).on 'change', '.adjust_wlbl_checkbox', () ->
+    submit_btn = $('#wlbl_entries_dropdown .dropdown-submit-button')
+    if $('.adjust_wlbl_checkbox:checked').length
+      submit_btn.prop('disabled', false)
+    else
+      submit_btn.prop('disabled', true)
+
+  window.open_adjust_reptool = () ->
+    dropdown = $('#reptool_entries_bl_dropdown')
+    list = $(dropdown).find('ul')
+    type = 'reptool'
+    reptool_options = [ "attackers", "bogon", "bots", "cnc", "cryptomining",
+              "dga", "exploit kit", "malware", "open_proxy", "open_relay",
+              "phishing", "response", "spam", "suspicious", "tor_exit_node"]
+    if !$(list).has('label').length
+      build_checkbox_list(reptool_options, list, type)
+
+  window.open_wlbl = () ->
+    dropdown = $('#wlbl_entries_dropdown')
+    list = $(dropdown).find('ul')
+    type = 'wlbl'
+    wlbl_options = [ "WL - Weak", "WL - Medium", "WL - Heavy",
+                     "BL - Weak", "BL - Medium", "BL - Heavy"]
+    if !$(list).has('label').length
+      build_checkbox_list(wlbl_options, list, type)
+
+  window.build_checkbox_list = (arr, list, type) ->
+    # the checkbox list for the dropdown is built here when the dropdown is first opened
+    # because I don't want to type the same html element over and over
+    for opt in arr
+      checkbox =
+        '<li> <label>' +
+          '<input name="' + opt + '" value="' + opt + '"type ="checkbox" class="adjust_' + type + '_checkbox"/>'+ opt +
+        '</label> </li>'
+      $(list).append(checkbox)
+
+  window.set_action_wlbl_col = () ->
+    dropdown = $('#wlbl_entries_dropdown')
+    selected_rows = $('.col-select-all input:checked')
+    list_action = $('.wlbl-radio-add:checked').val()
+
+    if list_action == 'add'
+      list_action = 'Add to: '
+    else
+      list_action = 'Remove from: '
+
+    checked_bl = $('.adjust_wlbl_checkbox:checked')
+    check_list = []
+    for item in checked_bl
+      check_name = "<span class='col-tag'>" + $(item).val() + "</span> "
+      check_list.push(check_name)
+
+    if check_list.length == 2
+      check_list = check_list.join(' and ')
+    else
+      check_list = check_list.join(', ').replace(/, ([^,]*)$/, ', and $1')
+
+    col_dialog = "<p class='wlbl-action-col'>" + list_action + check_list + "<p>"
+
+    selected_rows.each ()->
+      row = $(this).closest('tr')
+      data = row.find('.col-bulk-dispute').text()
+      action_col = row.find('.col-actions')
+      existing_p = action_col.find('.wlbl-action-col')
+
+      if !isEmpty(data)
+        $(existing_p).remove()
+        $(action_col).append(col_dialog)
+
   window.set_action_col = () ->
     dropdown = $('#reptool_entries_bl_dropdown')
     selected_rows = $('.col-select-all input:checked')
     checked_bl = $(dropdown).find('.adjust_reptool_checkbox:checked')
     check_list = []
     class_bl = $('.status_bl:checked').val().replace('reptool-', '')
-    reptool_add  = $('.add-bl:checked').val()
+    reptool_add  = $('.reptool-add:checked').val()
     status_string = 'Add classifications: '
 
     for item in checked_bl
@@ -106,15 +156,16 @@ $ ->
         status_string = 'Drop all classifications (set entry to EXPIRED)'
         check_list = ''
 
-    col_dialog = "<p>" + status_string + check_list + "<p>"
+    col_dialog = "<p class='reptool-action-col'>" + status_string + check_list + "<p>"
 
     selected_rows.each ()->
-      row = $(this).closest('tr')
-      data = row.find('.col-bulk-dispute').text()
-      action_col = row.find('.col-actions')
-
-      if !isEmpty(data)
-        $(action_col).html(col_dialog)
+        row = $(this).closest('tr')
+        data = row.find('.col-bulk-dispute').text()
+        action_col = row.find('.col-actions')
+        existing_p = action_col.find('.reptool-action-col')
+        if !isEmpty(data)
+          $( existing_p).remove()
+          $(action_col).append(col_dialog)
 
   window.isEmpty = (item) ->
     # function to check whether or not objects and strings are empty, more variable types can be added as needed
@@ -142,7 +193,7 @@ $ ->
         disputes.push(this)
 
     if !isEmpty(parent_data) && !text_list.includes(parent_data)
-      index = disputes.indexOf(parent_data);
+      index = disputes.indexOf(parent_data)
       disputes.splice(index, 1);
       parent_index = parent_index - 1
 
@@ -178,7 +229,7 @@ $ ->
             '<td class="col-category"></td>'+
             '<td class="col-wlbl"></td>'+
             '<td class="col-reptool-class"></td>'+
-            '<td class="col-actions"></td>' +
+            '<td class="col-actions" data=""></td>' +
             '</tr>'
       else
         # if the dispute is an HTML object, set it as OuterHTML to avoid formatting issues

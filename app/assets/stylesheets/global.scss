@@ -8265,7 +8265,15 @@ th.sorting_1, th.sorting_asc, th.sorting_desc {
 .wlbl-table-result {
   display: inline-block;
 }
+.reptool-action-col{
 
+}
+#wlbl-entries-dropdown{
+  textarea{
+    margin-top: 5px;
+    min-height: 60px;
+  }
+}
 #edit-dispute-button {
   background-color: $faint-neutral-color;
 }
@@ -8283,15 +8291,18 @@ th.sorting_1, th.sorting_asc, th.sorting_desc {
 }
 
 .inline-tool-content-wrapper {
-  input[type="radio"] {
-    margin-top: 3px !important;
+  input {
+    &[type="radio"]{
+      margin-top: 3px !important;
+    }
+    &[type="checkbox"] {
+      margin-right: 6px;
+    }
   }
   .radio-label {
     margin-top: 4px;
   }
-  input[type="checkbox"] {
-    margin-right: 6px;
-  }
+
   ul li {
     padding-left: 4px;
     padding-right: 4px;
@@ -8308,12 +8319,62 @@ th.sorting_1, th.sorting_asc, th.sorting_desc {
   }
 }
 
+.dropdown-wlbl-list{
+  &{
+    -webkit-column-count: 2;
+    -moz-column-count: 2;
+    column-count: 2;
+    background: $faint-neutral-color;
+    margin: auto -17px;
+    padding: 10px 25px;
+  }
+
+}
+#wlbl_entries_dropdown{
+  &{
+    min-width: 305px;
+    padding: 0 8px !important;
+  }
+  .wlbl-radio-add{
+    margin-right: 5px
+  }
+  .adjust_reptool_checkbox, .radio-label{
+    color: unset;
+  }
+  li label{
+    color: unset;
+  }
+  .reptool-section-label, .comment-wrapper>label.reptool-section-label{
+    color: $content-label-color!important;
+    font-size: 7pt;
+  }
+  .comment-wrapper>label.reptool-section-label{
+   padding: 5px!important;
+  }
+  textarea{
+    min-height: 60px;
+  }
+  hr.thin{
+    opacity: 1;
+  }
+  .reptool-class-radio-row{
+    .reptool-section-label{
+      padding: 4px 0!important;
+    }
+  }
+}
+
 .col-tag{
   background: $faint-neutral-color;
   font-weight: 200;
   padding: 0 3px;
   font-size: 8pt;
   font-family: "Fira Mono", monospace;
+}
+.wlbl-tag{
+  //font-size: 8pt;
+  font-family: "Fira Mono", monospace;
+  font-weight: bold;
 }
 .col-status-tag{
   white-space: nowrap
