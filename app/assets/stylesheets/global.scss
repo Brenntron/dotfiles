@@ -9577,3 +9577,8 @@ table.rl-content {
     padding-left: 15px;
   }
 }
+
+// File rep show, threatgrid fail status may need additional formatting, keep a class here
+.tg-fail-status {
+  font-weight: bold;
+}

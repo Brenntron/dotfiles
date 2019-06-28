@@ -86,30 +86,26 @@ window.get_threatgrid_data = (sha256_hash) ->
         $('#tg-submission-date').text(tg_formatted_submitted_date)
         $('#tg-tags').text(file_data.tags.join(', '))
 
-        # check if file_data object has a property
-
-
-        # dbinebri: if TG has a state fail, don't show most of the stuff
+        # if TG has a fail state, don't show most of the stuff
         if file_data.state == 'fail'
-          $('#tg-run-status').text('Failure')
+          $('#tg-run-status').html('<span class="tg-fail-status">Failure</span>')
           $('#tg-score').siblings().hide()
           $('#tg-tags').closest('div.row').nextAll().hide()
         else
           $('#tg-run-status').text(file_data.state)
 
-        # TODO: on TG fail this threat_score might not exist
-        # TODO: on TG fail this threat_score might not exist
-        # TODO: on TG fail this threat_score might not exist
-        if file_data.analysis
+        # Ensure the analysis property exists first, it will not if there is a TG fail state
+        unless !file_data.hasOwnProperty('analysis')
+          # Adding threat score
           $('#tg-score').text(file_data.analysis.threat_score)
 
-        # Adding behaviors
-        behaviors = ""
-        $(file_data.analysis.behaviors).each ->
-          behaviors += '<tr>'
-          behaviors += '<td>' + this.name + '</td><td>' + this.threat + '</td><td>' + this.title + '</td>'
-          behaviors += '</tr>'
-        $('#tg-behaviors').append('<tbody>' + behaviors + '</tbody>')
+          # Adding behaviors
+          behaviors = ""
+          $(file_data.analysis.behaviors).each ->
+            behaviors += '<tr>'
+            behaviors += '<td>' + this.name + '</td><td>' + this.threat + '</td><td>' + this.title + '</td>'
+            behaviors += '</tr>'
+          $('#tg-behaviors').append('<tbody>' + behaviors + '</tbody>')
 
         # Adding full json report in case it's needed
         full_report = JSON.stringify(response.json, null, 2)
