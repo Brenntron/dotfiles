@@ -137,6 +137,7 @@ $ ->
     class_bl = $('.status_bl:checked').val().replace('reptool-', '')
     reptool_add  = $('.reptool-add:checked').val()
     status_string = 'Add classifications: '
+
     for item in checked_bl
       check_name = "<span class='col-tag'>" + $(item).val() + "</span> "
       check_list.push(check_name)
