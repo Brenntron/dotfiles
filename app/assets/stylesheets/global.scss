@@ -8265,6 +8265,9 @@ th.sorting_1, th.sorting_asc, th.sorting_desc {
 .wlbl-table-result {
   display: inline-block;
 }
+.reptool-action-col{
+
+}
 #wlbl-entries-dropdown{
   textarea{
     margin-top: 5px;
@@ -8345,6 +8348,11 @@ th.sorting_1, th.sorting_asc, th.sorting_desc {
   padding: 0 3px;
   font-size: 8pt;
   font-family: "Fira Mono", monospace;
+}
+.wlbl-tag{
+  //font-size: 8pt;
+  font-family: "Fira Mono", monospace;
+  font-weight: bold;
 }
 .col-status-tag{
   white-space: nowrap

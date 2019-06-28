@@ -45,10 +45,10 @@
                           .col-xs-2
                             %label.content-label-sm.reptool-section-label{for: "reptool-class-type-select"} Action
                           .col-xs-5
-                            %input{type: 'radio', name: 'wlbl-radio', id: 'wlbl-reptool-add', value: 'add', checked: true}
+                            %input{type: 'radio', class:'wlbl-radio-add', name: 'wlbl-radio', id: 'wlbl-reptool-add', value: 'add', checked: true}
                             %label.radio-label{for: 'wlbl-reptool-add'} Add to List
                           .col-xs-5
-                            %input{type: 'radio', name: 'wlbl-radio', id: 'wlbl-reptool-remove', value: 'remove'}
+                            %input{type: 'radio', class:'wlbl-radio-add', name: 'wlbl-radio', id: 'wlbl-reptool-remove', value: 'remove'}
                             %label.radio-label{for: 'wlbl-reptool-remove'} Remove from List
                         .row.reptool-classifications-row
                           .col-xs-12
@@ -62,7 +62,7 @@
                           .col-x-6
                             %hr.thin
                           .button-row-center
-                            %button.primary.dropdown-submit-button{type: 'button', onclick: '', disabled: true, onclick: 'set_action_col();'}
+                            %button.primary.dropdown-submit-button{type: 'button', onclick: '', disabled: true, onclick: 'set_action_wlbl_col();'}
                               Add Action to Entries
 
 
