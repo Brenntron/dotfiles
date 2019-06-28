@@ -505,8 +505,15 @@ module API
 
                 # Pull category from SDS
                 sds_params = {}
-                sds_params['url'] = complaint_entry.uri
+
+                if complaint_entry.entry_type == 'URI/DOMAIN'
+                  sds_params['url'] = complaint_entry.uri
+                elsif complaint_entry.entry_type == 'IP'
+                  sds_params['url'] = complaint_entry.ip_address
+                end
+
                 sds_category = Sbrs::ManualSbrs.call_wbrs_webcat(sds_params, type: 'wbrs')
+
                 {master_categories: master_categories, current_category_data: wbrs_categories,
                  sds_category: sds_category }.to_json
               end
