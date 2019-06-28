@@ -8346,6 +8346,10 @@ th.sorting_1, th.sorting_asc, th.sorting_desc {
   }
   .reptool-section-label, .comment-wrapper>label.reptool-section-label{
     color: $content-label-color!important;
+    font-size: 7pt;
+  }
+  .comment-wrapper>label.reptool-section-label{
+   padding: 5px!important;
   }
   textarea{
     min-height: 60px;
@@ -8354,9 +8358,6 @@ th.sorting_1, th.sorting_asc, th.sorting_desc {
     opacity: 1;
   }
   .reptool-class-radio-row{
-    & {
-      margin-bottom: 5px;
-    }
     .reptool-section-label{
       padding: 4px 0!important;
     }
