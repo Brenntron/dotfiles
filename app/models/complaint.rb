@@ -426,7 +426,7 @@ class Complaint < ApplicationRecord
 
       new_report = WbnpReport.new
 
-      all_complaints = Wbrs::RuleUiComplaint.where({:add_channels => [WBNP_CHANNEL], :statuses => ['new']})["data"].first(60)
+      all_complaints = Wbrs::RuleUiComplaint.where({:add_channels => [WBNP_CHANNEL], :statuses => ['new']})["data"]
 
       #all_complaints.each do |rule_ui_complaint|
       #  uri_to_test = compile_parts_to_uri(rule_ui_complaint)
@@ -453,7 +453,7 @@ class Complaint < ApplicationRecord
     def start_wbnp_pull(new_report_id)
       new_report = WbnpReport.find(new_report_id)
       begin
-        all_complaints = Wbrs::RuleUiComplaint.where({:add_channels => [WBNP_CHANNEL], :statuses => ['new']})["data"].first(60)
+        all_complaints = Wbrs::RuleUiComplaint.where({:add_channels => [WBNP_CHANNEL], :statuses => ['new']})["data"]
         bugzilla_rest_session = BugzillaRest::Session.default_session
         all_complaints.each do |new_ui_complaint|
           if new_ui_complaint['add_channel'] == WBNP_CHANNEL
