@@ -70,7 +70,7 @@ class Sbrs::ManualSbrs < Sbrs::Base
     webcatlist = parse_wbrs(request_sds(path: '/labels/webcat/json', body: params, type: type))
 
     if sds_response["webcat"]["cat"] == 'nocat'
-      nil
+      nil.to_s
     else
       webcatlist["#{sds_response["webcat"]["cat"]}"]["name"]
     end
