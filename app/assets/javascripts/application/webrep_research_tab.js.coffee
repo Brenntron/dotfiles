@@ -43,10 +43,22 @@ $ ->
   $(document).on 'change', '.adjust_reptool_checkbox, .status_bl', () ->
     submit_btn = $('#reptool_entries_bl_dropdown .dropdown-submit-button')
     class_bl = $('.status_bl:checked').val().replace('reptool-', '')
+
+    switch (class_bl)
+      when 'maintain'
+        $('#reptool_entries_bl_dropdown .reptool-class-radio-row').show()
+        $('#reptool_entries_bl_dropdown .reptool-classifications-row').show()
+      when 'override'
+        $('#reptool_entries_bl_dropdown .reptool-class-radio-row').hide()
+        $('#reptool_entries_bl_dropdown .reptool-classifications-row').show()
+      when 'drop'
+        $('#reptool_entries_bl_dropdown .reptool-classifications-row').hide()
+
     if $('.adjust_reptool_checkbox:checked').length || class_bl == 'drop'
       submit_btn.prop('disabled', false)
     else
       submit_btn.prop('disabled', true)
+
 
   $(document).on 'change', '.adjust_wlbl_checkbox', () ->
     submit_btn = $('#wlbl_entries_dropdown .dropdown-submit-button')
@@ -120,11 +132,11 @@ $ ->
   window.set_action_col = () ->
     dropdown = $('#reptool_entries_bl_dropdown')
     selected_rows = $('.col-select-all input:checked')
-
     checked_bl = $(dropdown).find('.adjust_reptool_checkbox:checked')
     check_list = []
     class_bl = $('.status_bl:checked').val().replace('reptool-', '')
-
+    reptool_add  = $('.reptool-add:checked').val()
+    status_string = 'Add classifications: '
     for item in checked_bl
       check_name = "<span class='col-tag'>" + $(item).val() + "</span> "
       check_list.push(check_name)
@@ -134,11 +146,11 @@ $ ->
     else
       check_list = check_list.join(', ').replace(/, ([^,]*)$/, ', and $1')
 
-    switch (class_bl)
+
+    switch(class_bl)
       when 'maintain'
-        status_string = 'Add classifications: '
-      when 'override'
-        status_string = 'Remove classifications: '
+        if reptool_add == 'remove'
+          status_string = 'Remove classifications: '
       when 'drop'
         status_string = 'Drop all classifications (set entry to EXPIRED)'
         check_list = ''
@@ -146,13 +158,13 @@ $ ->
     col_dialog = "<p class='reptool-action-col'>" + status_string + check_list + "<p>"
 
     selected_rows.each ()->
-      row = $(this).closest('tr')
-      data = row.find('.col-bulk-dispute').text()
-      action_col = row.find('.col-actions')
-      existing_p = action_col.find('.reptool-action-col')
-      if !isEmpty(data)
-        $( existing_p).remove()
-        $(action_col).append(col_dialog)
+        row = $(this).closest('tr')
+        data = row.find('.col-bulk-dispute').text()
+        action_col = row.find('.col-actions')
+        existing_p = action_col.find('.reptool-action-col')
+        if !isEmpty(data)
+          $( existing_p).remove()
+          $(action_col).append(col_dialog)
 
   window.isEmpty = (item) ->
     # function to check whether or not objects and strings are empty, more variable types can be added as needed
