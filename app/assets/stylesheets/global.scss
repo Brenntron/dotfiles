@@ -8325,12 +8325,19 @@ th.sorting_1, th.sorting_asc, th.sorting_desc {
     -moz-column-count: 2;
     column-count: 2;
     background: $faint-neutral-color;
-    margin: 2px -9px;
-    padding: 13px 8px;
+    margin: auto -17px;
+    padding: 10px 25px;
   }
 
 }
 #wlbl_entries_dropdown{
+  &{
+    min-width: 305px;
+    padding: 0 8px !important;
+  }
+  .wlbl-radio-add{
+    margin-right: 5px
+  }
   .adjust_reptool_checkbox, .radio-label{
     color: unset;
   }
@@ -8339,6 +8346,20 @@ th.sorting_1, th.sorting_asc, th.sorting_desc {
   }
   .reptool-section-label, .comment-wrapper>label.reptool-section-label{
     color: $content-label-color!important;
+  }
+  textarea{
+    min-height: 60px;
+  }
+  hr.thin{
+    opacity: 1;
+  }
+  .reptool-class-radio-row{
+    & {
+      margin-bottom: 5px;
+    }
+    .reptool-section-label{
+      padding: 4px 0!important;
+    }
   }
 }
 
