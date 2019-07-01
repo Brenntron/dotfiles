@@ -1183,7 +1183,6 @@ window.click_table_buttons = (complaint_table, button)->
             $('#master-submit').prop('disabled', true)
       }
     else
-      debugger
       $('#input_cat_'+ row.data().entry_id).selectize {
         persist: false,
         create: false,
