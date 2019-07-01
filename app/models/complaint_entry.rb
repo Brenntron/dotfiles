@@ -9,7 +9,7 @@ class ComplaintEntry < ApplicationRecord
   has_one :complaint_entry_screenshot
   has_one :complaint_entry_preload
 
-  delegate :customer_name, to: :complaint, allow_nil: true, prefix: false
+  delegate :customer_name, :customer_company_name, to: :complaint, allow_nil: true, prefix: false
   delegate :cvs_username, :display_name, to: :user, allow_nil: true, prefix: true
 
   scope :assigned_count , -> {where(status:"ASSIGNED").count}

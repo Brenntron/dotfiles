@@ -6,6 +6,8 @@ class Customer < ApplicationRecord
 
   validates :email, presence: true, uniqueness: true
 
+  delegate :name, to: :company, allow_nil: true, prefix: true
+
   def self.thread_safe_find_or_create_by(attributes)
     with_advisory_lock("customer_create", timeout_seconds: 20) do
       find_by(email: attributes[:email]) || create(attributes)

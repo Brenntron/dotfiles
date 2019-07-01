@@ -5,7 +5,7 @@ class Complaint < ApplicationRecord
 
   has_paper_trail on: [:update], ignore: [:updated_at]
 
-  delegate :name, to: :customer, allow_nil: true, prefix: true
+  delegate :name, :company_name, to: :customer, allow_nil: true, prefix: true
 
   RESOLUTION_FIXED                      = 'FIXED'
   RESOLUTION_INVALID                    = 'INVALID'
