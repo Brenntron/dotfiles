@@ -33,7 +33,7 @@ Rails.application.routes.draw do
           get :contains_search
         end
       end
-      resources :complaint_entries do
+      resources :complaint_entries, only: [:index, :show, :update] do
         collection do
           get :serve_image
         end
