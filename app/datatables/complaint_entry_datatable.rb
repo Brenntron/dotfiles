@@ -1,63 +1,109 @@
-class ComplaintEntryDatatable < AjaxDatatablesRails::Base
+class ComplaintEntryDatatable < AjaxDatatablesRails::ActiveRecord
 
-  def_delegators :@view, :link_to, :edit_escalations_webcat_complaint_path, :escalations_webcat_complaints_path, :content_tag, :concat
+  def initialize(params, initialize_params, user:)
+    @user = user
+    @search_string = initialize_params['value'] # Native datatables search string
+    @search_type = initialize_params['search_type']
+    @search_name = initialize_params['search_name']
+    @search_conditions = initialize_params['search_conditions']
+    super(params, {})
+  end
 
   def view_columns
     # Declare strings in this format: ModelName.column_name
     # or in aliased_join_table.column_name format
-    @view_columns ||={
-        complaint_id:   {source: "ComplaintEntry.complaint_id", cond: :eq, searchable: true, orderable: true},
-        entry_id:       {source: "ComplaintEntry.entry_id", cond: :eq, searchable: true, orderable: true},
-        age:            {source: "ComplaintEntry.age", cond: :eq, searchable: true, orderable: true},
-        status:         {source: "ComplaintEntry.status", cond: :eq, searchable: true, orderable: true},
-        customer_name:  {source: "ComplaintEntry.customer_name", cond: :eq, searchable: true, orderable: true},
-        category:       {source: "ComplaintEntry.category", cond: :eq, searchable: true, orderable: true},
-        wbrs_score:     {source: "ComplaintEntry.wbrs_score", cond: :eq, searchable: true, orderable: true},
-        subdomain:      {source: "ComplaintEntry.subdomain", cond: :eq, searchable: true, orderable: true},
-        domain:         {source: "ComplaintEntry.domain", cond: :eq, searchable: true, orderable: true},
-        path:           {source: "ComplaintEntry.path", cond: :eq, searchable: true, orderable: true},
-        ip_address:     {source: "ComplaintEntry.ip_address", cond: :eq, searchable: true, orderable: true},
-        assigned_to:    {source: "ComplaintEntry.assigned_to", cond: :eq, searchable: true, orderable: true},
-
+    @view_columns ||= {
+        entry_id:           {source: "ComplaintEntry.entry_id", data: :entry_id, cond: :like},
+        created_at:         {source: "ComplaintEntry.created_at", data: :created_at, cond: :date_range},
+        age_int:            {source: "ComplaintEntry.age_int", data: :age_int, searchable: false, orderable: false},
+        age:                {source: "ComplaintEntry.age", data: :age, searchable: false, orderable: false},
+        status:             {source: "ComplaintEntry.status", data: :status, cond: :string_eq},
+        subdomain:          {source: "ComplaintEntry.subdomain", data: :subdomain, cond: :like},
+        domain:             {source: "ComplaintEntry.domain", data: :domain, cond: :like},
+        ip_address:         {source: "ComplaintEntry.ip_address", data: :ip_address, cond: :like},
+        path:               {source: "ComplaintEntry.path", data: :path, cond: :like},
+        category:           {source: "ComplaintEntry.category", data: :category, cond: :string_eq},
+        suggested_category: {source: "ComplaintEntry.suggested_category", data: :suggested_category, cond: :string_eq},
+        suggested_category_count:       {source: "ComplaintEntry.suggested_category_count", data: :suggested_category_count, searchable: false, orderable: false},
+        wbrs_score:         {source: "ComplaintEntry.wbrs_score", data: :wbrs_score, cond: :eq},
+        customer_name:      {source: "ComplaintEntry.customer_name", data: :customer_name, cond: :like},
+        company_name:       {source: "ComplaintEntry.company_name", data: :company_name, cond: :like},
+        assigned_to:        {source: "ComplaintEntry.assigned_to", data: :assigned_to, cond: :date_range},
+        uri:                {source: "ComplaintEntry.uri", data: :uri, cond: :like},
+        resolution:         {source: "ComplaintEntry.resolution", data: :resolution, cond: :string_eq},
+        internal_comment:   {source: "ComplaintEntry.internal_comment", data: :internal_comment, cond: :like},
+        resolution_comment: {source: "ComplaintEntry.resolution_comment", data: :resolution_comment, cond: :like},
+        is_important:       {source: "ComplaintEntry.is_important", data: :is_important, searchable: false, orderable: false},
+        was_dismissed:      {source: "ComplaintEntry.was_dismissed", data: :was_dismissed, searchable: false, orderable: false},
+        viewable:           {source: "ComplaintEntry.viewable", data: :viewable, searchable: false, orderable: false},
+        complaint_id:       {source: "ComplaintEntry.complaint_id", data: :complaint_id, cond: :like},
+        tags:               {source: "ComplaintEntry.tags", data: :tags, searchable: false, orderable: false},
+        submitter_type:     {source: "ComplaintEntry.submitter_type", data: :submitter_type, cond: :string_eq},
+        description:        {source: "ComplaintEntry.description", data: :description, cond: :like},
     }
   end
 
   def data
-    records.map do |record|
+    records.map do |complaint_entry|
+      complaint = complaint_entry.complaint
+
       {
-          complaint_id: record.complaint_id,
-          entry_id:         record.entry_id,
-          age:        record.age,
-          status:     record.status,
-          customer_name:   record.customer.name,
-          category:       record.category,
-          wbrs_score:     record.wbrs_score,
-          subdomain:      record.subdomain,
-          domain:         record.domain,
-          path:           record.path,
-          ip_address:     record.ip_address,
-          assigned_to:     record.assigned_to,
+          entry_id:         complaint_entry.id,
+          created_at:       complaint_entry.created_at,
+          age_int:          (Time.now - complaint_entry.created_at).to_i,
+          age:              ComplaintEntry.humanize_secs(Time.now - complaint_entry.created_at),
+          status:           complaint_entry.status,
+          subdomain:        complaint_entry.subdomain,
+          domain:           complaint_entry.domain,
+          ip_address:       complaint_entry.ip_address,
+          path:             complaint_entry.path,
+          category:         complaint_entry.url_primary_category,
+          suggested_category:           suggested_dispositions&.first,
+          suggested_category_count:     suggested_dispositions ? suggested_dispositions.count : 0,
+          wbrs_score:       complaint_entry.wbrs_score ? complaint_entry.wbrs_score.to_d.truncate(2).to_s : '',
+          customer_name:    complaint_entry.customer_name,
+          company_name:     complaint_entry.customer_company_name,
+          assigned_to:      complaint_entry.user&.display_name,
+
+          uri:              complaint_entry.uri,
+          resolution:       complaint_entry.resolution,
+          internal_comment: complaint_entry.internal_comment,
+          resolution_comment:           complaint_entry.resolution_comment,
+          is_important:     complaint_entry.is_important,
+          was_dismissed:    complaint_entry.was_dismissed?,
+          viewable:         complaint_entry.viewable,
+
+          complaint_id:     complaint_entry.complaint_id,
+          tags:             complaint.complaint_tags.map{|tag| tag&.name },
+          submitter_type:   complaint.submitter_type,
+          description:      complaint.description,
       }
     end
   end
 
-  private
+  # private
 
   def get_raw_records
     ComplaintEntry.all
   end
 
-  # ==== These methods represent the basic operations to perform on records
-  # and feel free to override them
+  def filter_records(records)
+    base_search =
+        if @search_string.present?
+          FileReputationDispute.robust_search('contains', params: { 'value' => @search_string }, user: @user)
+        else
+          super
+        end
 
-  # def filter_records(records)
-  # end
+    if @search_type
+      base_search.robust_search(@search_type, search_name: @search_name, params: @search_conditions, user: @user)
+    else
+      base_search
+    end
+  end
 
+  # Override for sensitive sorting fields.
   # def sort_records(records)
+  #   super
   # end
-
-  # def paginate_records(records)
-  # end
-
-  # ==== Insert 'presenter'-like methods below if necessary
 end
