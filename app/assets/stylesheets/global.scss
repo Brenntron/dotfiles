@@ -654,6 +654,14 @@ button {
 .commit-button, .committer-label, .commit-logs-label, .commit-label  {background-image: url(image_path('icon_committer.svg'));}
 .research-label   {background-image: url(image_path('icon_researcher.svg'));}
 .export-button    {background-image: url(image_path('icon_export.svg'));}
+.clear-button    {background-image: url(image_path('icon_clear.svg'));}
+.clear-action-button {
+    background-image: url(image_path('icon_delete_grey.svg'));
+    height: 20px;
+    width: 20px;
+    border: none;
+    background-color: unset;
+  }
 .expand-button    {background-image: url(image_path('icon_expand.svg'));}
 .expand-row-button {background-image: url(image_path('icon_expand2.svg'));}
 .add-file-button  {background-image: url(image_path('icon_add_file.svg'));}
@@ -8370,7 +8378,21 @@ th.sorting_1, th.sorting_asc, th.sorting_desc {
   padding: 0 3px;
   font-size: 8pt;
   font-family: "Fira Mono", monospace;
+  .clear-action-button{
+    display: inline-block;
+    background-color: white;
+    height: 15px;
+    width: 15px;
+    position: relative;
+    top: 3px;
+    left: 3px;
+  }
+  .clear-action-button:hover{
+    cursor: pointer;
+  }
+
 }
+
 .wlbl-tag{
   //font-size: 8pt;
   font-family: "Fira Mono", monospace;

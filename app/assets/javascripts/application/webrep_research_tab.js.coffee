@@ -7,6 +7,59 @@ $ ->
   $('.reputation-research-search-wrapper a').on 'click', () ->
     hide_toolbar()
 
+  $(document).on 'click', '#clear-all-actions', (e) ->
+    e.preventDefault()
+    selected_rows = $('.col-select-all input:checked')
+    $( selected_rows ).each ()->
+      row = $( this ).closest('tr')
+      $( row ).find('.col-actions').empty()
+      $( row ).find('.col-clear-actions').empty()
+
+  $(document).on 'click', '.row-action-clear', (e) ->
+    e.preventDefault()
+    { target } = e
+    row = $(target).closest('tr')
+    col_actions = row.find('.col-actions')
+    $(target).remove()
+    $( col_actions ).empty()
+
+  $(document).on 'click', '.remove-action', (e) ->
+    { target } = e
+    action = $(target).closest('.col-tag').text()
+    p_tag = $(target).closest('p')
+
+    data = p_tag[0].attributes.data.value.split(',')
+    data = $.map( data , $.trim)
+
+    data = data.filter( (item)-> return action != item)
+    if data.length > 1
+      data_string = data.join(' and ')
+    else
+      data_string = data.join(', ').replace(/, ([^,]*)$/, ', and $1')
+
+    if $( p_tag ).hasClass('reptool-action-col')
+      string = 'Drop all classifications (set entry to EXPIRED)' + data_string
+    else
+      string = 'Add classifications: ' + data_string
+
+#    check_list = check_list.join(' and ')
+#    check_list = check_list.join(', ').replace(/, ([^,]*)$/, ', and $1')
+  #    action.remove()
+
+  $(document).on 'mouseover', '.col-tag', (e) ->
+    { target } = e
+    if $('.remove-action').length == 0
+      $( target ).append('<span class="remove-action clear-action-button"></span>')
+
+  $(document).on 'mouseout', '.col-tag', (e) ->
+    setTimeout ()->
+      $('.remove-action').remove()
+    , 3500
+
+  $(document).on 'mouseout', '.remove-action', (e) ->
+    { target } = e
+    $( target ).remove()
+
   hide_toolbar = () ->
   # hides toolbar depending on which tab in bulk research panel is open
     tab = window.location.href
@@ -67,6 +120,11 @@ $ ->
     else
       submit_btn.prop('disabled', true)
 
+  $(document).on 'click', 'clear_all_actions', (e) ->
+    e.preventDefault()
+    location.reload(false)
+
+
   window.open_adjust_reptool = () ->
     dropdown = $('#reptool_entries_bl_dropdown')
     list = $(dropdown).find('ul')
@@ -108,45 +166,54 @@ $ ->
 
     checked_bl = $('.adjust_wlbl_checkbox:checked')
     check_list = []
-    for item in checked_bl
-      check_name = "<span class='col-tag'>" + $(item).val() + "</span> "
-      check_list.push(check_name)
+    data_checked_bl = []
 
+    for item in checked_bl
+      val = $( item ).val()
+      check_name = "<span class='col-tag'>" + val + "</span> "
+      check_list.push(check_name)
+      data_checked_bl.push(val)
     if check_list.length == 2
       check_list = check_list.join(' and ')
     else
       check_list = check_list.join(', ').replace(/, ([^,]*)$/, ', and $1')
 
-    col_dialog = "<p class='wlbl-action-col'>" + list_action + check_list + "<p>"
+    data_checked_bl = data_checked_bl.join(',')
+    col_dialog = "<p class='wlbl-action-col' data='" + data_checked_bl + "'>" + list_action + check_list + "<p>"
 
     selected_rows.each ()->
       row = $(this).closest('tr')
       data = row.find('.col-bulk-dispute').text()
       action_col = row.find('.col-actions')
       existing_p = action_col.find('.wlbl-action-col')
-
+      clear_col = row.find('.col-clear-actions')
+      delete_button = '<button class="clear-action-button"></button>'
       if !isEmpty(data)
         $(existing_p).remove()
         $(action_col).append(col_dialog)
+        if !$(clear_col).has(".clear-action-button").length
+          $(clear_col).append(delete_button)
 
   window.set_action_col = () ->
     dropdown = $('#reptool_entries_bl_dropdown')
     selected_rows = $('.col-select-all input:checked')
     checked_bl = $(dropdown).find('.adjust_reptool_checkbox:checked')
     check_list = []
+    reptool_list = []
     class_bl = $('.status_bl:checked').val().replace('reptool-', '')
     reptool_add  = $('.reptool-add:checked').val()
     status_string = 'Add classifications: '
 
     for item in checked_bl
-      check_name = "<span class='col-tag'>" + $(item).val() + "</span> "
+      val = $(item).val()
+      check_name = "<span class='col-tag'>" + val + "</span> "
       check_list.push(check_name)
-
+      reptool_list.push( val )
+    reptool_list = reptool_list.join(',')
     if check_list.length == 2
       check_list = check_list.join(' and ')
     else
       check_list = check_list.join(', ').replace(/, ([^,]*)$/, ', and $1')
-
 
     switch(class_bl)
       when 'maintain'
@@ -156,16 +223,22 @@ $ ->
         status_string = 'Drop all classifications (set entry to EXPIRED)'
         check_list = ''
 
-    col_dialog = "<p class='reptool-action-col'>" + status_string + check_list + "<p>"
+    col_dialog = "<p class='reptool-action-col' data=' " + reptool_list + " '>" + status_string + check_list + "<p>"
 
     selected_rows.each ()->
         row = $(this).closest('tr')
         data = row.find('.col-bulk-dispute').text()
         action_col = row.find('.col-actions')
+        clear_col = row.find('.col-clear-actions')
         existing_p = action_col.find('.reptool-action-col')
+        delete_button = '<button class="clear-action-button row-action-clear"></button>'
+
         if !isEmpty(data)
+          $( clear_col ).show()
           $( existing_p).remove()
           $(action_col).append(col_dialog)
+          if !$(clear_col).has(".clear-action-button").length
+            $(clear_col).append(delete_button)
 
   window.isEmpty = (item) ->
     # function to check whether or not objects and strings are empty, more variable types can be added as needed
@@ -218,9 +291,9 @@ $ ->
         tbody.innerHTML +=
           '<tr>' +
             '<td class="col-select-all">' +
-            '<span class="checkbox-wrapper">' +
-            '<input type="checkbox" checked>' +
-            '</span>' +
+              '<span class="checkbox-wrapper">' +
+                '<input type="checkbox" checked>' +
+              '</span>' +
             '</td>'+
             '<td class="col-bulk-dispute" contenteditable="true" data=' + disputes[i] + '><p>' + disputes[i] + '</p></td>'+
             '<td class="col-wbrs"></td>'+
@@ -230,7 +303,8 @@ $ ->
             '<td class="col-wlbl"></td>'+
             '<td class="col-reptool-class"></td>'+
             '<td class="col-actions" data=""></td>' +
-            '</tr>'
+            '<td class="col-clear-actions"></td>' +
+          '</tr>'
       else
         # if the dispute is an HTML object, set it as OuterHTML to avoid formatting issues
         tbody.innerHTML += disputes[i].outerHTML
@@ -260,10 +334,10 @@ $ ->
     row = el.closest('tr')
     tbody = row.closest('tbody')
 
-    text_list = text_list.filter( (item, index) ->
+    text_list = text_list.filter (item, index) ->
       if item != ''
         return text_list.indexOf item == index
-    )
+
     switch( key )
       when 13
         if !shiftKey && text_list.length
@@ -292,11 +366,10 @@ $ ->
     rows = $('.research-table tbody tr')
     headers = { 'Token': $('input[name="token"]').val(),'Xmlrpc-Token': $('input[name="xml_token"]').val() }
 
-    $('.col-bulk-dispute').each( ( ) ->
+    $('.col-bulk-dispute').each ( ) ->
       text = $(this).text()
-      if text != ''
+      if !isEmpty(text)
         search_items.push(text)
-    )
 
     for i in [0...search_items.length]
       item = search_items[i]
