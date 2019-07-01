@@ -10,8 +10,6 @@ class ComplaintEntryDatatable < AjaxDatatablesRails::ActiveRecord
   end
 
   def view_columns
-    # Declare strings in this format: ModelName.column_name
-    # or in aliased_join_table.column_name format
     @view_columns ||= {
         entry_id:           {source: "ComplaintEntry.entry_id", data: :entry_id, cond: :like},
         created_at:         {source: "ComplaintEntry.created_at", data: :created_at, cond: :date_range},
@@ -77,6 +75,8 @@ class ComplaintEntryDatatable < AjaxDatatablesRails::ActiveRecord
           tags:             complaint.complaint_tags.map{|tag| tag&.name },
           submitter_type:   complaint.submitter_type,
           description:      complaint.description,
+
+          DT_RowId:         complaint_entry.id,
       }
     end
   end
