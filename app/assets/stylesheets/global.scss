@@ -628,6 +628,10 @@ button {
   height: 20px;
 }
 
+.toolbar-button:disabled {
+  cursor: not-allowed;
+}
+
 .dashboard-tickets-wrapper .toolbar-button-label {
   background-size: 16px 16px;
   background-position: 17px 2px;
@@ -685,6 +689,7 @@ button {
 .ticket-owner-button {background-image: url(image_path('icon_user_grey.svg'));}
 .sort-by-button {background-image: url(image_path('icon_sort_by.svg'));}
 .sync-button {background-image: url(image_path('icon_sync.svg'));}
+.sync-button-white {background-image: url(image_path('icon_sync_white.svg'));}
 
 .master-submit-button {
   color: $content-bg-color;
@@ -8338,6 +8343,34 @@ hr.thin.form-divider {
   font-size: 12px;
 }
 
+.wbnp-loader-message {
+  position: absolute;
+  right: 15px;
+  top: 10px;
+  .wbnp-report-status {
+    margin-top: 6px;
+    display: inline-block;
+    font-size: 9pt;
+  }
+}
+
+.wbnp-report-status {
+  text-transform: capitalize;
+}
+
+.wbnp-report-label {
+  float: left;
+  margin-right: 8px;
+}
+
+.wbnp-loading-spinner {
+  width: 20px;
+  height: 20px;
+  float: left;
+  margin-right: 5px;
+  display: block;
+  background-repeat: no-repeat;
+}
 
 .complaint-selectize-col-wrapper .selectize-control {
   padding-bottom: 6px;

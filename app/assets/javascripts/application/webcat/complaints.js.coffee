@@ -4,6 +4,76 @@ $(document).on 'click', '.paginate_button', ->
   table = $('#complaints-index').DataTable()
   table_page = table.page.info().page
 
+
+
+#### WBNP Reporting ####
+$(document).ready ->
+  window.check_wbnp_status()
+
+# WBNP - Get report id
+window.fetch_wbnp_data = () ->
+  $('#fetch_wbnp').attr('disabled', true)
+  $('#fetch_wbnp').addClass('esc-tooltipped')
+  $('.wbnp-loading-spinner').show()
+  std_msg_ajax(
+    method: 'POST'
+    url: '/escalations/api/v1/escalations/webcat/complaints/fetch_wbnp_data'
+    data: {}
+    success: (response) ->
+      json = $.parseJSON(response)
+      wbnp_report_id = json.wbnp_report_id
+      check_wbnp_status(wbnp_report_id)
+
+    error: (response) ->
+      std_api_error(response, 'Error fetching wbnp data complaints.', reload: false)
+  )
+
+
+# WBNP - Check report info
+check_wbnp = window.check_wbnp_status = (wbnp_report_id) ->
+  # Turn on loader indicator
+  $('.wbnp-loading-spinner').show()
+
+  # Set status on header to checking
+  top_status = $('.top-area-bar').find('.wbnp-report-status')[0]
+  $(top_status).text('Checking...')
+
+  std_msg_ajax(
+    method: 'GET'
+    url: "/escalations/api/v1/escalations/webcat/complaints/wbnp_report_status"
+    data: {wbnp_report_id: wbnp_report_id }
+    success: (response) ->
+      total_new_cases = response.data.total_new_cases
+      cases_imported = response.data.cases_imported
+      cases_failed = response.data.cases_failed
+      status = response.data.status
+
+      # Turn of loader indicator
+      $('.wbnp-loading-spinner').hide()
+
+      # Add fields to table & header
+      $('.wbnp-report-status').text(status)
+      $('#wbnp-report-attempted').text(total_new_cases)
+      $('#wbnp-report-succeeded').text(cases_imported)
+      $('#wbnp-report-rejected').text(cases_failed)
+
+      # If status is active, fetch button should be disabled
+      if status == 'active'
+        $('#fetch_wbnp').attr('disabled', true)
+        $('#fetch_wbnp').removeClass('esc-tooltipped')
+        # Check in 5 minutes to see if report has finished
+        setTimeout(check_wbnp, 120000)
+      else
+        $('#fetch_wbnp').attr('disabled', false)
+        $('#fetch_wbnp').addClass('esc-tooltipped')
+
+    error: (response) ->
+      $('.wbnp-loading-spinner').hide()
+      std_msg_error("Unable to pull wbnp status", [], reload: false)
+  )
+
+
+
 window.updateURI = (event, complaint_entry_id) ->
   event.preventDefault()
 
@@ -1385,22 +1455,6 @@ window.display_preview_window = (entry) ->
   document.getElementById('preview_window').src = loc
   document.getElementById('preview_window_header_p').innerHTML = loc
   document.getElementById('preview_window_header_a').href = loc
-
-window.fetch_wbnp_data = () ->
-  $('#loader-modal').modal({
-    keyboard: false
-  })
-  std_msg_ajax(
-    method: 'POST'
-    url: '/escalations/api/v1/escalations/webcat/complaints/fetch_wbnp_data'
-    data: {}
-    success: (response) ->
-      $('#loader-modal').modal 'hide'
-      std_msg_success('WBNP Complaints successfully retrieved from RuleUI.', [], reload: true)
-    error: (response) ->
-      $('#loader-modal').modal 'hide'
-      std_api_error(response, 'Error fetching wbnp data complaints.', reload: false)
-  )
 
 window.fetch_complaints = () ->
   std_msg_ajax(
