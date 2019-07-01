@@ -641,7 +641,6 @@ window.drop_current_categories = () ->
 )
 
 format = (complaint_entry_row) ->
-
   $('#loader-modal').modal({
     keyboard: false,
   })
@@ -1163,24 +1162,45 @@ window.click_table_buttons = (complaint_table, button)->
     td = $(tr).next('tr').find('td:first')
     unless $(td).hasClass 'nested-complaint-data-wrapper'
       $(td).addClass 'nested-complaint-data-wrapper'
-    $('#input_cat_'+ row.data().entry_id).selectize {
-      persist: false,
-      create: false,
-      maxItems: 5,
-      valueField: 'category_id',
-      labelField: 'category_name',
-      searchField: ['category_name', 'category_code'],
-      options: AC.WebCat.createSelectOptions(),
-      items: selected_options(row.data().category),
-      onItemAdd: ->
-        if verifyMasterSubmit() == true
-          $('#master-submit').prop('disabled', false)
-      onItemRemove: ->
-        if verifyMasterSubmit() == true
-          $('#master-submit').prop('disabled', false)
-        else
-          $('#master-submit').prop('disabled', true)
-    }
+
+    if row.data().is_important == true
+      $('#input_cat_'+ row.data().entry_id).selectize {
+        persist: false,
+        create: false,
+        maxItems: 5,
+        valueField: 'category_id',
+        labelField: 'category_name',
+        searchField: ['category_name', 'category_code'],
+        options: AC.WebCat.createSelectOptions(),
+        items: AC.WebCat.getCategoryIds(selected_options(row.data().category)),
+        onItemAdd: ->
+          if verifyMasterSubmit() == true
+            $('#master-submit').prop('disabled', false)
+        onItemRemove: ->
+          if verifyMasterSubmit() == true
+            $('#master-submit').prop('disabled', false)
+          else
+            $('#master-submit').prop('disabled', true)
+      }
+    else
+      debugger
+      $('#input_cat_'+ row.data().entry_id).selectize {
+        persist: false,
+        create: false,
+        maxItems: 5,
+        valueField: 'category_id',
+        labelField: 'category_name',
+        searchField: ['category_name', 'category_code'],
+        options: AC.WebCat.createSelectOptions(),
+        onItemAdd: ->
+          if verifyMasterSubmit() == true
+            $('#master-submit').prop('disabled', false)
+        onItemRemove: ->
+          if verifyMasterSubmit() == true
+            $('#master-submit').prop('disabled', false)
+          else
+            $('#master-submit').prop('disabled', true)
+      }
     # Check to see which columns should be displayed
     $('.toggle-vis-nested').each ->
       checkbox_trigger = $(button).attr('data-column')
