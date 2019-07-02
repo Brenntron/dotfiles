@@ -10,6 +10,10 @@ Given(/^I fill in "(.*?)" with "(.*?)"$/) do |field_label, value|
   fill_in field_label, :with => value
 end
 
+Given(/^I fill in element, "(.*?)" with "(.*?)"$/) do |identifier, value|
+  page.find(identifier).set(value)
+end
+
 Given(/^I fill in "(.*?)" with "(.*?)" and "(.*?)" separated by blank lines$/) do |field_label, value, value_2|
   fill_in field_label, :with => value + "\n" + value_2
 end
