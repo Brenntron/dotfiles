@@ -1104,7 +1104,7 @@ $ ->
           # Each entry, build a new html row with that source data using object destructuring
           for entry in amp_hist_array
             {time, disposition, name, user, _poke_server, mode} = entry._source
-            datetime = moment.unix(time).format("MMMM DD, YYYY h:mm A")
+            datetime = moment.utc(moment.unix(time)).format("MMMM DD, YYYY h:mm A z")
             if disposition == 'malicious'
               disposition = '<span class="disp-negative">' + disposition + '</span>'
 
