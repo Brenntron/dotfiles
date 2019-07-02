@@ -27,6 +27,43 @@ module API
                 result.to_json
               end
             end
+
+            desc 'Get updated detection data'
+            params do
+              requires :sha256_hash, type: String, desc: "SHA256 hash"
+            end
+            get ":sha256_hash/now" do
+              std_api_v2 do
+                detection = FileReputationApi::Detection.get_bulk(params['sha256_hash'])
+                detection_last_set = FileReputationApi::ElasticSearch.query(params['sha256_hash'])
+                last_fetched = Time.now.utc
+
+                begin
+                  FileReputationDispute.where(sha256_hash: detection.sha256_hash)
+                      .update_all(disposition: detection.disposition,
+                                  detection_name: detection.name,
+                                  detection_last_set: detection_last_set,
+                                  last_fetched: last_fetched)
+                rescue
+                  Rails.logger.error("Error saving updated detection information -- #{$!.message}")
+                end
+
+                { detection_name: detection.name, disposition: detection.disposition, detection_last_set: detection_last_set,
+                  last_fetched: last_fetched.strftime("%b %e, %Y %l:%M %p")}
+              end
+            end
+
+            desc 'Get history of detection data'
+            params do
+              requires :sha256_hash, type: String, desc: "SHA256 hash"
+            end
+            get ":sha256_hash/history" do
+              std_api_v2 do
+                history = FileReputationApi::ElasticSearch.get_history(params['sha256_hash'])
+
+                render json: history
+              end
+            end
           end
         end
       end

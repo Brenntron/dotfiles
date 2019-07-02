@@ -723,7 +723,7 @@ $ ->
         render: (data) ->
           if data == null
             return
-          if data == 'malicious'
+          if data.toLowerCase() == 'malicious'
             return '<span class="malicious text-capitalize"> malicious</span>'
           else
             return  '<span class="text-capitalize"> ' + data + ' </span>'
@@ -915,6 +915,16 @@ $ ->
 
 
 $ ->
+  # AMP history dialog init here
+  $('#amp-history-dialog').dialog
+    autoOpen: false
+    width: 900
+    height: 400
+    minWidth: 900
+    minHeight: 400
+    resizable: true
+    position: { at: "right top" }
+
 
   ## Create detection form dialog
   $('#create-detection-dialog').dialog
@@ -1043,6 +1053,75 @@ $ ->
     return false
 
 
+  # AMP detection data for File Rep > Show page, top right area
+  window.detection_now = (sha256_hash) ->
+    std_msg_ajax(
+      method: 'GET'
+      url: '/escalations/api/v1/escalations/file_rep/detections/' + sha256_hash + '/now'
+      success_reload: false
+
+      success: (response) ->
+        # Object destructuring below for the response, enables cleaner code
+        { disposition, detection_name, detection_last_set, last_fetched } = response
+        unless disposition == '' || disposition == 'unseen'
+          $('.amp-area .disposition').text(disposition)
+          $('.amp-area .detection-name').text(detection_name)
+          $('.amp-area .detection-last-updated').text(detection_last_set)
+          $('.amp-area .detection-last-pulled').text(last_fetched)
+
+          if disposition == 'malicious'
+            $('.amp-area .disposition').addClass('disp-negative')
+
+          history_icon = '<span class="amp-history-icon esc-tooltipped tooltipstered" title="View full available AMP history"></span>'
+          $('.amp-area .detection-last-updated').append(history_icon)
+
+          # Retain this event listener below, need to ensure all previous succeeds first
+          $('.amp-history-icon').click ->
+            $('#amp-history-dialog').dialog('open')
+
+      error: () ->
+        std_msg_error('Error with AMP', ['There was an error retrieving the AMP data.'])
+      complete: () ->
+        $('.amp-area .inline-loader-wrapper').hide()
+    )
+
+
+  window.get_amp_history = (sha256_hash) ->
+    # Fetch the AMP history, build the table and load into #amp-history-dialog
+    std_msg_ajax(
+      method: 'GET'
+      url: '/escalations/api/v1/escalations/file_rep/detections/' + sha256_hash + '/history'
+      success_reload: false
+      success: (response) ->
+        # Response.json is an array of objects with AMP poke data
+        amp_hist_array = response.json
+        amp_html = ''
+        curr_row = ''
+
+        if amp_hist_array.length == 0 || amp_hist_array == undefined
+          $('#amp-history-icon').hide()
+        else if amp_hist_array.length > 0
+          # Each entry, build a new html row with that source data using object destructuring
+          for entry in amp_hist_array
+            {time, disposition, name, user, _poke_server, mode} = entry._source
+            datetime = moment.unix(time).format("MMMM DD, YYYY h:mm A")
+            if disposition == 'malicious'
+              disposition = '<span class="disp-negative">' + disposition + '</span>'
+
+            curr_row = '<tr><td>' + datetime + '</td><td class="capitalize">' + disposition + '</td><td>' + name + '</td><td>' + user + '</td><td>' + _poke_server + '</td><td>' + mode.toUpperCase() + '</td></tr>'
+
+            amp_html += curr_row
+        else
+          amp_html = '<br><p>There was an error retrieving the AMP history.</p>'
+
+        $('#amp-history-dialog table tbody').append(amp_html)
+
+      error: (response) ->
+       std_msg_error('Error with AMP', ['There was an error retrieving the AMP history.'])
+    )
+
+
+
 # TODO: This stuff maybe should be moved into its own file later, but dropping here because convenient
 # (it's all for the comms tab of the show page)
 
@@ -1113,6 +1192,13 @@ $ ->
 
 
   $(document).ready ->
+    # Make sure you're on show page to fetch the AMP data
+    if $('body.escalations--file_rep--disputes-controller').hasClass('show-action')
+      curr_sha256_hash = $('#sha256_hash').text()
+
+      # Retrieve current AMP info and history
+      detection_now(curr_sha256_hash)
+      get_amp_history(curr_sha256_hash)
 
     $('select[name="file-rep-datatable_length"]').on "change", ->
       data = {}
@@ -1180,6 +1266,7 @@ $ ->
         data: {data, name: 'FileRepColumns'}
         dataType: 'json'
         success: (response) ->
+        error: () ->
       )
 
     if window.location.pathname == '/escalations/file_rep/disputes'
@@ -1200,6 +1287,8 @@ $ ->
 
       )
 
+
+
       std_msg_ajax(
         method: 'POST'
         url: "/escalations/api/v1/escalations/user_preferences/"
@@ -1207,6 +1296,7 @@ $ ->
         success: (response) ->
           response = JSON.parse(response)
           $('#file-rep-datatable').DataTable().order(response.sortorder).draw()
+        error: () ->
       )
 
       std_msg_ajax(
@@ -1216,6 +1306,7 @@ $ ->
         success: (response) ->
           response = JSON.parse(response)
           $('#file-rep-datatable').DataTable().page(response.currentpage).draw('page')
+        error: () ->
       )
 
       std_msg_ajax(
@@ -1225,6 +1316,7 @@ $ ->
         success: (response) ->
           response = JSON.parse(response)
           $('#file-rep-datatable').DataTable().page.len(response.entriesperpage).draw('page')
+        error: () ->
       )
 
 

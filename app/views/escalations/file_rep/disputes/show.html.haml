@@ -170,37 +170,33 @@
             = @file_rep_dispute.bytes_to_kb
             KB
 
-        .col-xs-4
+        .col-xs-4.amp-area
+          .inline-loader-wrapper
+            .gear-loader-wrapper
+              = inline_svg 'icon_gears_loader.svg', class: 'gears-loader'
+            %span.loader-msg Loading data...
+
+          -# dbinebri: error handling for these moved to JS detection_now func, restore the orig ruby error logic if needed
           %label.content-label-sm AMP Disposition
-          - unless @file_rep_dispute.disposition.nil?
-            - if @file_rep_dispute.malicious?
-              .top-info-data.disposition.disp-negative= @file_rep_dispute.disposition
-            - else
-              .top-info-data.disposition= @file_rep_dispute.disposition
-            %label.content-label-sm AMP Detection Name
-            .top-info-data
-              = @file_rep_dispute.detection_name
-            - if @file_rep_dispute.disposition == 'malicious'
-              %label.content-label-sm AMP Detection - Last Set Date
-              .top-info-data
-                - if  @file_rep_dispute.detection_last_set.present?
-                  = @file_rep_dispute.detection_last_set
-                - else
-                  No history to display
+          .top-info-data.disposition
+            = @file_rep_dispute&.disposition
+          %label.content-label-sm AMP Detection Name
+          .top-info-data.detection-name
+            = @file_rep_dispute&.detection_name
+          %label.content-label-sm AMP Detection - Last Set Date
+          .top-info-data.detection-last-updated
+            = @file_rep_dispute&.detection_last_set
           %label.content-label-sm AMP Detection - Date Last Pulled
-          .top-info-data
-            = @file_rep_dispute.last_fetched
-          %hr
+          .top-info-data.detection-last-pulled
+            = @file_rep_dispute&.last_fetched&.utc&.strftime("%b %e, %Y %l:%M %p")
           %label.content-label-sm In Sample Zoo
-          #zoo-loader
-            .inline-loader-wrapper
-              .gear-loader-wrapper
-                = inline_svg 'icon_gears_loader.svg', class: 'gears-loader'
-              %span.loader-msg Loading data...
-          .zoo-data-present{'data-zoo-status': 'YES'}
-            %span
-          .zoo-data-notfound{'data-zoo-status': 'NO'}
-            %span
+          - if @file_rep_dispute.in_zoo == true
+            .top-info-data#sample-zoo-status{'data-zoo-status': 'YES'}
+              %span.glyphicon.glyphicon-ok
+          - else
+            .top-info-data#sample-zoo-status{'data-zoo-status': 'NO'}
+              %span.glyphicon.glyphicon-remove
+
 
 -# End of top overview information
 
@@ -223,3 +219,4 @@
 
 
 = render 'escalations/file_rep/disputes/create_detection_dialog'
+= render 'escalations/file_rep/disputes/amp_history_dialog'

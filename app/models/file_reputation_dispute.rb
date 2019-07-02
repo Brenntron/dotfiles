@@ -11,32 +11,40 @@ class FileReputationDispute < ApplicationRecord
 
   delegate :name, :email, :company, :company_name, :company_id, to: :customer, allow_nil: true, prefix: true
 
-  STATUS_NEW                        = 'NEW'
-  STATUS_ASSIGNED                   = 'ASSIGNED'
-  STATUS_RESEARCHING                = 'RESEARCHING'
-  STATUS_ESCALATED                  = 'ESCALATED'
-  STATUS_PENDING                    = 'PENDING'
-  STATUS_ONHOLD                     = 'ONHOLD'
-  STATUS_RESOLVED                   = 'RESOLVED'
-  STATUS_REOPENED                   = 'RE-OPENED'
-  STATUS_CUSTOMER_PENDING           = "CUSTOMER_PENDING"
-  STATUS_CUSTOMER_UPDATE            = "CUSTOMER_UPDATE"
+  STATUS_NEW                = 'NEW'
+  STATUS_ASSIGNED           = 'ASSIGNED'
+  STATUS_RESEARCHING        = 'RESEARCHING'
+  STATUS_ESCALATED          = 'ESCALATED'
+  STATUS_PENDING            = 'PENDING'
+  STATUS_ONHOLD             = 'ONHOLD'
+  STATUS_RESOLVED           = 'RESOLVED'
+  STATUS_REOPENED           = 'RE-OPENED'
+  STATUS_CUSTOMER_PENDING   = 'CUSTOMER_PENDING'
+  STATUS_CUSTOMER_UPDATE    = 'CUSTOMER_UPDATE'
 
-  DISPOSITION_UNSEEN                = 'unseen'
-  DISPOSITION_UNKNOWN               = 'unknown'
-  DISPOSITION_MALICIOUS             = 'malicious'
-  DISPOSITION_COMMON                = 'common'
-  DISPOSITION_CLEAN                 = 'clean'
+  DISPOSITION_UNSEEN        = 'unseen'
+  DISPOSITION_UNKNOWN       = 'unknown'
+  DISPOSITION_MALICIOUS     = 'malicious'
+  DISPOSITION_COMMON        = 'common'
+  DISPOSITION_CLEAN         = 'clean'
 
-  SUBMITTER_TYPE_AC_FORM            = 'AC-Form'
-  SUBMITTER_TYPE_TI_FORM            = 'TI-Form'
-  SUBMITTER_TYPE_TI_API             = 'TI-API'
+  SUBMITTER_TYPE_AC_REFRESH = 'AC-Refresh'
+  SUBMITTER_TYPE_AC_FORM    = 'AC-Form'
+  SUBMITTER_TYPE_TI_FORM    = 'TI-Form'
+  SUBMITTER_TYPE_TI_API     = 'TI-API'
 
-  RESOLUTION_AUTORESOLVED           = 'AUTO-RESOLVED'
+  RESOLUTION_AUTORESOLVED               = 'Auto Resolved'
   RESOLUTION_DUPLICATE              = 'DUPLICATE'
+  RESOLUTION_AUTORESOLVED_COMMENT       = <<~HEREDOC
+    This ticket has been auto-resolved, suggested disposition and disposition already match.
+  HEREDOC
+  RESOLUTION_DUPLICATE_COMMENT          = <<~HEREDOC
+    This ticket has been auto-resolved. A ticket with the same SHA256 hash already exists and is still open.
+  HEREDOC
 
-  RESOLUTION_AUTORESOLVED_COMMENT   = 'This ticket has been auto-resolved, suggested disposition and disposition already match.'
-  RESOLUTION_DUPLICATE_COMMENT      = 'This ticket has been auto-resolved. A ticket with the same SHA256 hash already exists and is still open.'
+  AC_SUCCESS = 'CREATE_ACK'
+  AC_FAILED = 'CREATE_FAILED'
+  AC_PENDING = 'CREATE_PENDING'
 
   validates :status, :sha256_hash, :disposition_suggested, presence: true
   validates :sha256_hash, format: { with: /\A\h{64}\z/, message: "only 64 nibble (256 bit) hex code" }
@@ -91,15 +99,8 @@ class FileReputationDispute < ApplicationRecord
     self.disposition_suggested&.downcase == DISPOSITION_CLEAN.downcase
   end
 
-  def update_status(status)
-    self.update!(status: status)
-
-    envelope = {}
-
-    envelope[:addressee_id] = self.id
-    envelope[:addressee_status] = self.status
-
-    Bridge::FilerepUpdateStatusEvent.new(envelope).post
+  def is_assigned?
+    (!self.user.blank? && self.user.email != 'vrt-incoming@sourcefire.com')
   end
 
   def compose_versioned_items
@@ -189,7 +190,7 @@ class FileReputationDispute < ApplicationRecord
     attributes = {
         id: bug_proxy.id,
         sha256_hash: sha256_hash,
-        disposition_suggested: disposition_suggested,
+        disposition_suggested: disposition_suggested.downcase,
         user_id: assignee_id,
         submitter_type: SUBMITTER_TYPE_AC_FORM,
         customer_id: customer.id,
@@ -463,8 +464,8 @@ class FileReputationDispute < ApplicationRecord
     end
   end
 
-  def update_sandbox_score
-    sandbox_score = FileReputationApi::Sandbox.score(self.sha256_hash)
+  def update_sandbox_score(api_key_type: self.submitter_type)
+    sandbox_score = FileReputationApi::Sandbox.score(self.sha256_hash, api_key_type: api_key_type)
     sandbox_threshold = self.pdf? ? 90.0 : 61.0
     update!(sandbox_score: sandbox_score, sandbox_threshold: sandbox_threshold)
   rescue => except
@@ -482,7 +483,7 @@ class FileReputationDispute < ApplicationRecord
   def update_amp_detection_last_set
     detection_last_set = FileReputationApi::ElasticSearch.query(self.sha256_hash)
 
-    update!(detection_last_set: detection_last_set, last_fetched: DateTime.now)
+    update!(detection_last_set: detection_last_set, last_fetched: DateTime.now.utc)
   rescue => except
     Rails.logger.error("Error updating amp detection last set on #{self.id} -- #{except.message}")
   end
@@ -502,7 +503,7 @@ class FileReputationDispute < ApplicationRecord
   def update_superfecta
     update_threadgrid_score
     update_reversing_labs_score
-    update_sandbox_score
+    update_sandbox_score(api_key_type: SUBMITTER_TYPE_AC_REFRESH)
     update_sample_zoo
   end
 
@@ -527,8 +528,13 @@ class FileReputationDispute < ApplicationRecord
   end
 
   #for support with incoming bridge messages from TI coming into messages_controller
-  def self.process_bridge_payload(message_payload, customer_payload)
+  def self.process_bridge_payload(message_payload)
     new_dispute = nil
+    customer_payload = {
+        customer_name: message_payload[:payload][:customer_name],
+        customer_email: message_payload[:payload][:customer_email],
+        company_name: message_payload[:payload][:company_name]
+    }
 
     user = User.where(cvs_username:"vrtincom").first
       ActiveRecord::Base.transaction do
@@ -543,8 +549,8 @@ class FileReputationDispute < ApplicationRecord
         summary = "New File Reputation Reputation Dispute generated at #{DateTime.now.utc.strftime("%Y-%m-%d %H:%M")}"
 
         full_description = <<~HEREDOC
-          File name: #{message_payload[:file_name]}
-          File Rep Sha: #{message_payload[:sha256_hash]}
+          File name: #{message_payload[:payload][:file_name]}
+          File Rep Sha: #{message_payload[:payload][:sha256]}
           
 
         HEREDOC
@@ -567,17 +573,26 @@ class FileReputationDispute < ApplicationRecord
 
         new_dispute.id = bug_proxy.id
         new_dispute.user_id = user.id
-        new_dispute.sha256_hash = message_payload[:sha256_hash]
+        new_dispute.sha256_hash = message_payload[:payload][:sha256]
         new_dispute.status = STATUS_NEW
-        new_dispute.file_name = message_payload[:file_name]
+        new_dispute.file_name = message_payload[:payload][:file_name]
         new_dispute.customer_id = customer.id
-        new_dispute.file_size = message_payload[:file_size]
-        new_dispute.sample_type = message_payload[:sample_type]
-        new_dispute.disposition_suggested = message_payload[:disposition_suggested]
-        new_dispute.source = message_payload[:source]
-        new_dispute.platform = message_payload[:platform]
+        new_dispute.file_size = message_payload[:payload][:file_size]
+        new_dispute.sample_type = message_payload[:payload][:sample_type]
+        new_dispute.disposition_suggested = message_payload[:payload][:disposition_suggested]
+        new_dispute.source = message_payload[:payload][:source]
+        new_dispute.platform = message_payload[:payload][:platform]
+        new_dispute.submitter_type = message_payload[:payload][:submitter_type]
+        new_dispute.ticket_source_key = message_payload[:source_key]
+        new_dispute.description = message_payload[:payload][:summary_description]
 
-        new_dispute.save
+
+        check_for_duplicate = FileReputationDispute.where(sha256_hash: message_payload[:payload][:sha256]).where.not(status: FileReputationDispute::STATUS_RESOLVED)
+        if check_for_duplicate.any?
+          auto_resolve_on_duplicate(new_dispute)
+        else
+          new_dispute.save
+        end
 
       end #transaction
 
@@ -607,84 +622,69 @@ class FileReputationDispute < ApplicationRecord
       end
 
       if from == 'TI'
-        envelope = {}
-        envelope[:payload] = {}
+        return_payload = {}
+        return_payload[self.sha256_hash] = {
+            resolution: self.resolution,
+            resolution_comment: self.resolution_comment,
+            status: self.status
+        }
 
-        envelope[:addressee_id] = self.id
-        envelope[:addressee_status] = self.status
-        envelope[:payload] = {resolution: self.resolution, resolution_comment: self.resolution_comment}
-
-        Bridge::FilerepAutoResolveEvent.new(envelope).post
+        conn = ::Bridge::FileRepCreatedEvent.new(addressee: "talos-intelligence", source_authority: "talos-intelligence", source_key: self.ticket_source_key)
+        conn.post(return_payload)
       end
 
       auto_resolved_boolean
   end
 
-  def self.auto_resolve_on_duplicate(message_payload, customer_payload)
-    new_dispute = nil
+  def self.auto_resolve_on_duplicate(dispute)
+    dispute.status = STATUS_RESOLVED
+    dispute.resolution = RESOLUTION_DUPLICATE
+    dispute.resolution_comment = RESOLUTION_DUPLICATE_COMMENT
 
-    user = User.where(cvs_username:"vrtincom").first
-    ActiveRecord::Base.transaction do
+    dispute.save
 
-      guest = Company.where(:name => "Guest").first
-      opened_at = Time.now
+    return_payload = {}
 
-      customer = Customer.file_rep_process_and_get_customer(customer_payload)
+    return_payload[dispute.sha256_hash] =
+        {
+        resolution: dispute.resolution,
+        resolution_message: dispute.resolution_comment,
+        status: dispute.status
+        }
 
-      bugzilla_rest_session = message_payload[:bugzilla_rest_session]
+    conn = ::Bridge::FileRepCreatedEvent.new(addressee: "talos-intelligence", source_authority: "talos-intelligence", source_key: dispute.source_key)
+    conn.post(return_payload)
+  end
 
-      summary = "New File Reputation Reputation Dispute generated at #{DateTime.now.utc.strftime("%Y-%m-%d %H:%M")}"
+  def self.process_status_changes(disputes, status, resolution = nil, comment = nil, current_user = nil)
+    resolved_at = Time.now
+    disputes.each do |dispute|
+      dispute.status = status
+      if resolution.present?
+        dispute.resolution = resolution
+        dispute.resolution_comment = comment
+        dispute.case_closed_at = resolved_at
+      else
+        dispute.resolution = nil
+        dispute.resolution_comment = nil
+      end
 
-      full_description = <<~HEREDOC
-          File name: #{message_payload[:file_name]}
-          File Rep Sha: #{message_payload[:sha256_hash]}
+      unless [STATUS_NEW, STATUS_ASSIGNED].include?(dispute.status)
+        dispute.user_id = current_user.id unless dispute.is_assigned?
+      end
 
+      dispute.save!
 
-      HEREDOC
+      if comment.present?
+        FileRepComment.create(:user_id => current_user.id, :comment => comment, :file_reputation_dispute_id => dispute.id)
+      end
 
-      bug_attrs = {
-          'product' => 'Escalations Console',
-          'component' => 'AMP Disputes',
-          'summary' => summary,
-          'version' => 'unspecified', #self.version,
-          'description' => full_description,
-          'priority' => 'Unspecified',
-          'classification' => 'unclassified',
-      }
-      logger.debug "Creating bugzilla bug"
+      dispute.reload
 
-      bug_proxy = bugzilla_rest_session.create_bug(bug_attrs)
+      conn = ::Bridge::FileRepUpdateStatusEvent.new(addressee: "talos-intelligence")
+      conn.post(dispute, source_authority: "talos-intelligence", source_key: dispute.ticket_source_key)
 
-      logger.debug "Creating dispute"
-      new_dispute = FileReputationDispute.new
-
-      new_dispute.id = bug_proxy.id
-      new_dispute.user_id = user.id
-      new_dispute.sha256_hash = message_payload[:sha256_hash]
-      new_dispute.status = STATUS_RESOLVED
-      new_dispute.resolution = RESOLUTION_DUPLICATE
-      new_dispute.resolution_comment = RESOLUTION_DUPLICATE_COMMENT
-      new_dispute.file_name = message_payload[:file_name]
-      new_dispute.customer_id = customer.id
-      new_dispute.file_size = message_payload[:file_size]
-      new_dispute.sample_type = message_payload[:sample_type]
-      new_dispute.disposition_suggested = message_payload[:disposition_suggested]
-      new_dispute.source = message_payload[:source]
-      new_dispute.platform = message_payload[:platform]
-
-      new_dispute.save
     end
-
-    envelope = {}
-    envelope[:payload] = {}
-
-    envelope[:addressee_id] = new_dispute.id
-    envelope[:addressee_status] = new_dispute.status
-    envelope[:payload] = {resolution: new_dispute.resolution, resolution_comment: new_dispute.resolution_comment}
-
-    Bridge::FilerepAutoResolveEvent.new(envelope).post
-
-    new_dispute
   end
 
   def self.take_tickets(dispute_ids, user:)
