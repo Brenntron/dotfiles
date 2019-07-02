@@ -107,12 +107,26 @@ class Sbrs::ManualSbrs < Sbrs::Base
     response = {}
 
     rw = request_sds(path: '/score/wbrs;wbrs-rulehits/json?url=', body: params, type: 'wbrs')
-    rw = JSON.parse(rw.body)[0]["response"]
 
-    response = response.merge(rw)
+    begin
+      data = JSON.parse(rw.body)[0]["response"]
+    rescue
+      # Return dummy data since we assume that the request_sds call failed
+
+      if JSON.parse(rw)['response'].present?
+        data = {}
+        data['wbrs-rulehits'] = nil
+        data['wbrs'] = {}
+        data['wbrs']['score'] = nil
+
+      end
+    end
+
+    response = response.merge(data)
+
+    binding.pry
 
     response
-
   end
 
   def self.get_sbrs_data(conditions)
