@@ -56,6 +56,8 @@ class Escalations::Webrep::DisputesController < ApplicationController
                            'SBRS Total Rule Hits',
                            'Important?',
                            'Resolution',
+                           'Last Comment Date',
+                           'Comment Count',
                            'Resolution Comments']
         singlesheet_insert_row_with_data(dispute_headers, "h1")
 
@@ -83,6 +85,8 @@ class Escalations::Webrep::DisputesController < ApplicationController
                                                dispute_entry.dispute_rule_hits.sbrs_rule_hits.count,
                                                dispute_entry.is_important,
                                                dispute_entry.resolution,
+                                               dispute_entry.latest_comment_date,
+                                               dispute_entry.dispute.dispute_comments.count,
                                                dispute_entry.resolution_comment ])
           end
         end
@@ -757,8 +761,8 @@ class Escalations::Webrep::DisputesController < ApplicationController
                                            dispute_entry.dispute_rule_hits.sbrs_rule_hits.count,
                                            dispute_entry.is_important,
                                            dispute_entry.resolution,
-                                           dispute_entry.dispute.dispute_comment.last.updated_at.strftime("%FT%T"),
-                                           dispute_entry.dispute.dispute_comment.count,
+                                           dispute_entry.latest_comment_date,
+                                           dispute_entry.dispute.dispute_comments.count,
                                            dispute_entry.resolution_comment ])
       end
     end
