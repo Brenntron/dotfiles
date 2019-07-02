@@ -1162,8 +1162,7 @@ window.click_table_buttons = (complaint_table, button)->
     td = $(tr).next('tr').find('td:first')
     unless $(td).hasClass 'nested-complaint-data-wrapper'
       $(td).addClass 'nested-complaint-data-wrapper'
-
-    if row.data().is_important == true
+    if row.data().status == "PENDING"
       $('#input_cat_'+ row.data().entry_id).selectize {
         persist: false,
         create: false,
