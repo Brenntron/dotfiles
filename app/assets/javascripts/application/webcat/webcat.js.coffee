@@ -20,6 +20,7 @@ $ ->
   if $('#complaints-index').length
     complaint_table = $('#complaints-index').DataTable(
       'rowCallback': (row, data, index) ->
+        = data
         $node = @api().row(row).nodes().to$()
         $node.addClass 'not-shown'
         if  data.subdomain && data.subdomain.length > 0
@@ -78,7 +79,7 @@ $ ->
           orderable: false
           searchable: false
           sortable: false
-          'render':(data)->
+          render:(data)->
             return '<button class="expand-row-button-inline expand-row-button-' + data.entry_id + '"></button>'
         }
         {
@@ -88,7 +89,7 @@ $ ->
           sortable: false
           defaultContent: '<span></span>'
           width: '24px'
-          'render': (data)->
+          render: (data)->
             if data.is_important
 
               if data.was_dismissed
@@ -112,7 +113,7 @@ $ ->
           className: 'state-col'
         }
         {
-          'render':(data,type,full,meta)->
+          render:(data,type,full,meta)->
             tags = full.tags
             tag_items = ''
             if tags.length > 0
@@ -124,7 +125,7 @@ $ ->
             tag_items
         }
         {
-          'render':(data,type,full,meta)->
+          render:(data,type,full,meta)->
             subdomain = full.subdomain
 
             if subdomain
@@ -134,7 +135,7 @@ $ ->
           width: '50px'
         }
         {
-          'render':(data,type,full,meta)->
+          render:(data,type,full,meta)->
             domain = full.domain
             ip_address = full.ip_address
             if domain
@@ -145,14 +146,14 @@ $ ->
         }
         {
           data: 'path'
-          'render': (data, type, full, meta) ->
+          render: (data, type, full, meta) ->
             full_data = data
             if type == 'display'
               full_data = td_truncate(data, 20)
             return '<span class="esc-tooltipped td-truncate" id="path_' + full.entry_id + '" title="' + data + '">' + full_data + '</span>'
         }
         {
-          'render': (data, type, full, meta) ->
+          render: (data, type, full, meta) ->
             categories = ''
             category = ''
             plus = ''
@@ -169,12 +170,12 @@ $ ->
         {
           data: 'wbrs_score'
           width: '20px'
-          'render': (data, type, full, meta) ->
+          render: (data, type, full, meta) ->
             '<span id="wbrs_score_' + full.entry_id + '">' + data + '</span>'
         }
         {
           data: 'submitter_type'
-          'render': (data) ->
+          render: (data) ->
             if data == 'CUSTOMER'
               '<button class="complaint-submitter-type icon-custom-star esc-tooltipped" title="Customer"></button>'
             else
