@@ -579,8 +579,8 @@ module API
               data = response.last['data']
               columns = response.last['legend']
 
-              mtime_column_index = 0
-              ctime_column_index = 0
+              mtime_column_index = nil
+              ctime_column_index = nil
 
               columns.each_with_index do |col, index|
                 if col == 'ctime'
@@ -594,10 +594,10 @@ module API
               formatted_data = []
 
               data.each do |datum|
-                if ctime_column_index != 0
+                if ctime_column_index
                   datum[ctime_column_index] = Time.at(datum[ctime_column_index])
                 end
-                if mtime_column_index != 0
+                if mtime_column_index
                   datum[mtime_column_index] = Time.at(datum[mtime_column_index])
                 end
 

@@ -311,7 +311,7 @@ class DisputeEntry < ApplicationRecord
     columns = @xbrs.last['legend']
 
     mtime_column_index = nil
-    ctime_column_index = 0
+    ctime_column_index = nil
 
     columns.each_with_index do |col, index|
       if col == 'ctime'
@@ -324,7 +324,7 @@ class DisputeEntry < ApplicationRecord
 
 
     data.each do |datum|
-      if ctime_column_index != 0
+      if ctime_column_index
         datum[ctime_column_index] = Time.at(datum[ctime_column_index])
       end
       if mtime_column_index
