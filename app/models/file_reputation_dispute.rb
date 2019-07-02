@@ -629,7 +629,7 @@ class FileReputationDispute < ApplicationRecord
             status: self.status
         }
 
-        conn = ::Bridge::FileRepCreatedEvent.new(addressee: "talos-intelligence", source_authority: "talos-intelligence", source_key: self.ticket_source_key)
+        conn = ::Bridge::FileRepCreatedEvent.new(addressee: "talos-intelligence", source_authority: "talos-intelligence", source_key: self.ticket_source_key, ac_id: self.id)
         conn.post(return_payload)
       end
 
@@ -652,7 +652,7 @@ class FileReputationDispute < ApplicationRecord
         status: dispute.status
         }
 
-    conn = ::Bridge::FileRepCreatedEvent.new(addressee: "talos-intelligence", source_authority: "talos-intelligence", source_key: dispute.source_key)
+    conn = ::Bridge::FileRepCreatedEvent.new(addressee: "talos-intelligence", source_authority: "talos-intelligence", source_key: dispute.source_key, ac_id: dispute.id)
     conn.post(return_payload)
   end
 

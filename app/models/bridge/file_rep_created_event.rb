@@ -6,8 +6,9 @@ class Bridge::FileRepCreatedEvent < Bridge::BaseMessage
     @source_key = source_key
   end
 
-  def post(payload, source_authority: @source_authority, source_key: @source_key)
-    super(message: {source_authority: source_authority,
+  def post(payload, source_authority: @source_authority, source_key: @source_key, ac_id:)
+    super(message: {ac_id: ac_id,
+                    source_authority: source_authority,
                     source_key: source_key,
                     ticket_entries: payload,
                     ac_status: FileReputationDispute::AC_SUCCESS
