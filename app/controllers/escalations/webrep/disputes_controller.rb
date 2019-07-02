@@ -34,12 +34,56 @@ class Escalations::Webrep::DisputesController < ApplicationController
           end
         end
 
-        dispute_headers = ['Priority', 'Case ID', 'Status', 'Entry Count', 'Owner', 'Customer Name', 'Customer Email', 'Customer Company', 'Company URL', 'Time Submitted', 'Last Updated', 'Age', 'Dispute Entry', 'Dispute Entry Status', 'Suggested Disposition', 'Category', 'WBRS Score', 'WBRS Total Rule Hits', 'SBRS Score', 'SBRS Total Rule Hits', 'Important?', 'Resolution', 'Resolution Comments']
+        dispute_headers = ['Priority',
+                           'Case ID',
+                           'Status',
+                           'Entry Count',
+                           'Owner',
+                           'Customer Name',
+                           'Customer Email',
+                           'Customer Company',
+                           'Company URL',
+                           'Time Submitted',
+                           'Last Updated',
+                           'Age',
+                           'Dispute Entry',
+                           'Dispute Entry Status',
+                           'Suggested Disposition',
+                           'Category',
+                           'WBRS Score',
+                           'WBRS Total Rule Hits',
+                           'SBRS Score',
+                           'SBRS Total Rule Hits',
+                           'Important?',
+                           'Resolution',
+                           'Resolution Comments']
         singlesheet_insert_row_with_data(dispute_headers, "h1")
 
         @disputes.each do |dispute|
           dispute.dispute_entries.each do |dispute_entry|
-            singlesheet_insert_row_with_data([ dispute_entry.dispute.priority, dispute_entry.dispute.case_id_str, dispute_entry.dispute.status, dispute_entry.dispute.dispute_entries.count, dispute_entry.dispute.user.cvs_username, dispute_entry.dispute.customer.name, dispute_entry.dispute.customer.email, dispute_entry.dispute.customer.company.name, dispute_entry.dispute.org_domain ,dispute_entry.dispute.case_opened_at.strftime("%FT%T"), dispute_entry.dispute.updated_at.strftime("%FT%T"), ApplicationRecord.humanize_secs(Time.now - dispute_entry.dispute.case_opened_at), dispute_entry.hostlookup, dispute_entry.status, dispute_entry.suggested_disposition, dispute_entry.primary_category, dispute_entry.wbrs_score, dispute_entry.dispute_rule_hits.wbrs_rule_hits.count, dispute_entry.sbrs_score, dispute_entry.dispute_rule_hits.sbrs_rule_hits.count, dispute_entry.is_important, dispute_entry.resolution, dispute_entry.resolution_comment ])
+            singlesheet_insert_row_with_data([ dispute_entry.dispute.priority,
+                                               dispute_entry.dispute.case_id_str,
+                                               dispute_entry.dispute.status,
+                                               dispute_entry.dispute.dispute_entries.count,
+                                               dispute_entry.dispute.user.cvs_username,
+                                               dispute_entry.dispute.customer.name,
+                                               dispute_entry.dispute.customer.email,
+                                               dispute_entry.dispute.customer.company.name,
+                                               dispute_entry.dispute.org_domain,
+                                               dispute_entry.dispute.case_opened_at.strftime("%FT%T"),
+                                               dispute_entry.dispute.updated_at.strftime("%FT%T"),
+                                               ApplicationRecord.humanize_secs(Time.now - dispute_entry.dispute.case_opened_at),
+                                               dispute_entry.hostlookup,
+                                               dispute_entry.status,
+                                               dispute_entry.suggested_disposition,
+                                               dispute_entry.primary_category,
+                                               dispute_entry.wbrs_score,
+                                               dispute_entry.dispute_rule_hits.wbrs_rule_hits.count,
+                                               dispute_entry.sbrs_score,
+                                               dispute_entry.dispute_rule_hits.sbrs_rule_hits.count,
+                                               dispute_entry.is_important,
+                                               dispute_entry.resolution,
+                                               dispute_entry.resolution_comment ])
           end
         end
 
@@ -664,12 +708,58 @@ class Escalations::Webrep::DisputesController < ApplicationController
       end
     end
 
-    dispute_headers = ['Priority', 'Case ID', 'Status', 'Entry Count', 'Owner', 'Customer Name', 'Customer Email', 'Customer Company', 'Company URL', 'Time Submitted', 'Age', 'Dispute Entry', 'Dispute Entry Status', 'Suggested Disposition', 'Category', 'WBRS Score', 'WBRS Total Rule Hits', 'SBRS Score', 'SBRS Total Rule Hits', 'Important?', 'Resolution', 'Resolution Comments']
+    dispute_headers = ['Priority',
+                       'Case ID',
+                       'Status',
+                       'Entry Count',
+                       'Owner',
+                       'Customer Name',
+                       'Customer Email',
+                       'Customer Company',
+                       'Company URL',
+                       'Time Submitted',
+                       'Age',
+                       'Dispute Entry',
+                       'Dispute Entry Status',
+                       'Suggested Disposition',
+                       'Category',
+                       'WBRS Score',
+                       'WBRS Total Rule Hits',
+                       'SBRS Score',
+                       'SBRS Total Rule Hits',
+                       'Important?',
+                       'Resolution',
+                       'Last Comment Date',
+                       'Comment Count',
+                       'Resolution Comments']
     singlesheet_insert_row_with_data(dispute_headers, "h1")
 
     @disputes.each do |dispute|
       dispute.dispute_entries.each do |dispute_entry|
-        singlesheet_insert_row_with_data([ dispute_entry.dispute.priority, dispute_entry.dispute.case_id_str, dispute_entry.dispute.status, dispute_entry.dispute.dispute_entries.count, dispute_entry.dispute.user.cvs_username, dispute_entry.dispute.customer.name, dispute_entry.dispute.customer.email, dispute_entry.dispute.customer.company.name, dispute_entry.dispute.org_domain ,dispute_entry.dispute.case_opened_at.strftime("%FT%T"), ApplicationRecord.humanize_secs(Time.now - dispute_entry.dispute.case_opened_at), dispute_entry.hostlookup, dispute_entry.status, dispute_entry.suggested_disposition, dispute_entry.primary_category, dispute_entry.wbrs_score, dispute_entry.dispute_rule_hits.wbrs_rule_hits.count, dispute_entry.sbrs_score, dispute_entry.dispute_rule_hits.sbrs_rule_hits.count, dispute_entry.is_important, dispute_entry.resolution, dispute_entry.resolution_comment ])
+        singlesheet_insert_row_with_data([ dispute_entry.dispute.priority,
+                                           dispute_entry.dispute.case_id_str,
+                                           dispute_entry.dispute.status,
+                                           dispute_entry.dispute.dispute_entries.count,
+                                           dispute_entry.dispute.user.cvs_username,
+                                           dispute_entry.dispute.customer.name,
+                                           dispute_entry.dispute.customer.email,
+                                           dispute_entry.dispute.customer.company.name,
+                                           dispute_entry.dispute.org_domain,
+                                           dispute_entry.dispute.case_opened_at.strftime("%FT%T"),
+                                           ApplicationRecord.humanize_secs(Time.now - dispute_entry.dispute.case_opened_at),
+                                           dispute_entry.hostlookup,
+                                           dispute_entry.status,
+                                           dispute_entry.suggested_disposition,
+                                           dispute_entry.primary_category,
+                                           dispute_entry.wbrs_score,
+                                           dispute_entry.dispute_rule_hits.wbrs_rule_hits.count,
+                                           dispute_entry.sbrs_score,
+                                           dispute_entry.dispute_rule_hits.sbrs_rule_hits.count,
+                                           dispute_entry.is_important,
+                                           dispute_entry.resolution,
+                                           dispute_entry.dispute.dispute_comment.last.updated_at.strftime("%FT%T"),
+                                           dispute_entry.dispute.dispute_comment.count,
+                                           dispute_entry.resolution_comment ])
       end
     end
 
