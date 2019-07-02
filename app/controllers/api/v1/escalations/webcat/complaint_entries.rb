@@ -371,15 +371,27 @@ module API
             post 'categorize_urls_history' do
               std_api_v2 do
                 begin
-                  prefix_id = Wbrs::Prefix.where(:urls => [permitted_params['url']]).first.prefix_id
-                  response = Wbrs::HistoryRecord.where({:prefix_id => prefix_id}).sort_by {|history| DateTime.parse(history.time)}.reverse
-                  render response.to_json
+                  url = Complaint.parse_url(permitted_params['url'])
+
+                  prefix_history = []
+                  prefixes = Wbrs::Prefix.where(:urls => [url[:domain]])
+
+                  prefixes.each do |prefix|
+                    if prefix.subdomain == url[:subdomain] && prefix.path == url[:path]
+                      prefix_id = prefix.prefix_id
+                      response = Wbrs::HistoryRecord.where({:prefix_id => prefix_id}).sort_by {|history| DateTime.parse(history.time)}.reverse
+                      response.each do |resp|
+                        prefix_history << resp
+                      end
+                    end
+                  end
+
+                  render prefix_history.to_json
                 rescue
                   raise 'The URL you provided does not have available data.'
                 end
               end
             end
-
 
             desc 'get the lookup info about a url(rule)'
             params do
