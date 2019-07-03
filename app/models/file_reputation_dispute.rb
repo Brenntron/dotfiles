@@ -1,6 +1,6 @@
 # class FileReputationTicket < ApplicationRecord
 class FileReputationDispute < ApplicationRecord
-  has_paper_trail on: [:update], ignore: [:updated_at]
+  has_paper_trail on: [:update], ignore: [:updated_at, :user_id]
 
   belongs_to :customer, optional:true
   has_many :file_rep_comments
