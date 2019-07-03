@@ -382,7 +382,11 @@ window.updateEntryColumns = (entry_id,row_id) ->
   $("#reopen_#{entry_id}").removeClass('hidden')
 
   prefix = $('#complaint_prefix_'+entry_id)[0].value
-  categories = $('#input_cat_'+entry_id).val().toString()
+  if $('#input_cat_'+entry_id).val() == null
+    categories = ""
+  else
+    categories = $('#input_cat_'+entry_id).val().toString()
+
   category_name = $('#input_cat_' + entry_id).next('.selectize-control').find('.item')
   category_names = []
   category_name.each ->
