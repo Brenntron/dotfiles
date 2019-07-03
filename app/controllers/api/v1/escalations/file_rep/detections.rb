@@ -39,11 +39,14 @@ module API
                 last_fetched = Time.now.utc
 
                 begin
-                  FileReputationDispute.where(sha256_hash: detection.sha256_hash)
-                      .update_all(disposition: detection.disposition,
-                                  detection_name: detection.name,
-                                  detection_last_set: detection_last_set,
-                                  last_fetched: last_fetched)
+                  file_rep_dispute = FileReputationDispute.where(sha256_hash: detection.sha256_hash)
+                  if detection_last_set == 'No history to display' && file_rep_dispute.detection_last_set
+                    detection_last_set = file_rep_dispute.detection_last_set
+                  end
+                  file_rep_dispute.update_all(disposition: detection.disposition,
+                                              detection_name: detection.name,
+                                              detection_last_set: detection_last_set,
+                                              last_fetched: last_fetched)
                 rescue
                   Rails.logger.error("Error saving updated detection information -- #{$!.message}")
                 end
