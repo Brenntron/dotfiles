@@ -9579,7 +9579,9 @@ table.rl-content {
   }
 }
 
-// ensure AMP disposition on File Rep > Show is capitalized
-.amp-area label:first-of-type + div, #create-detection-dialog .top-info-data {
+// ensure AMP disposition on File Rep > Show is capitalized in all 3 instances
+#create-detection-dialog .top-info-data,
+.amp-area label:first-of-type + div,
+.suggested-disposition {
   text-transform: capitalize;
 }
