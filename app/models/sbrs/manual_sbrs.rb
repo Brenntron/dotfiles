@@ -124,8 +124,6 @@ class Sbrs::ManualSbrs < Sbrs::Base
 
     response = response.merge(data)
 
-    binding.pry
-
     response
   end
 
