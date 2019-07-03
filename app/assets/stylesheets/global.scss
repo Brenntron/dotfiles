@@ -8551,6 +8551,7 @@ hr.thin.form-divider {
 .disp-negative {
   font-weight: 600;
   color: $warning-accent-color;
+  text-transform: capitalize;
 }
 
 .top-case-info .content-label-sm {
@@ -9576,4 +9577,11 @@ table.rl-content {
     font-weight: 600;
     padding-left: 15px;
   }
+}
+
+// ensure AMP disposition on File Rep > Show is capitalized in all 3 instances
+#create-detection-dialog .top-info-data,
+.amp-area label:first-of-type + div,
+.suggested-disposition {
+  text-transform: capitalize;
 }
