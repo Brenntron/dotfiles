@@ -90,7 +90,7 @@ class ComplaintEntryDatatable < AjaxDatatablesRails::ActiveRecord
   def filter_records(records)
     base_search =
         if @search_string.present?
-          FileReputationDispute.robust_search('contains', params: { 'value' => @search_string }, user: @user)
+          ComplaintEntry.robust_search('contains', params: { 'value' => @search_string }, user: @user)
         else
           super
         end
