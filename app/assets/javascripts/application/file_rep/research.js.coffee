@@ -137,8 +137,6 @@ window.get_reversinglabs_data = (sha256_hash) ->
     method: 'GET'
     url: "/escalations/api/v1/escalations/filerep/reversing_labs/" + sha256_hash
     success_reload: false
-    # TODO: NEED TO DO SOMETHING IF RUN STATUS == 'fail'
-
     success: (response) ->
       $('#rl-loader').hide()
       report_present = $('#reversing-labs-report-wrapper').find('.rl-data-present')[0]
