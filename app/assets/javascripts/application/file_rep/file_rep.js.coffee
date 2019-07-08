@@ -572,7 +572,6 @@ $ ->
           return '<input type="checkbox" onclick="toggleRow(this)" name="cbox" class="dispute_check_box" id="cbox' + data + '" value="' + data + '" data-sha="' + full['sha256_hash'] + '"/>'
       }
       {
-#        need to zeropad this thing
         data: 'id'
         render: (data, type, full, meta) ->
           return '<a href="/escalations/file_rep/disputes/' + data + '">' + parseInt(data).pad(6) + '</a>'
@@ -607,9 +606,9 @@ $ ->
           if data == null
             return
           if data == 'malicious'
-            return '<span class="malicious text-capitalize"> malicious </span>'
+            return '<span class="malicious text-capitalize">' + data + '</span>'
           else
-            return  '<span class="text-capitalize"> ' + data + ' </span>'
+            return  '<span class="text-capitalize">' + data + '</span>'
       }
       {
         data: 'detection_name'
@@ -724,9 +723,13 @@ $ ->
           if data == null
             return
           if data.toLowerCase() == 'malicious'
-            return '<span class="malicious text-capitalize"> malicious</span>'
+            return '<span class="malicious text-capitalize">' + data + '</span>'
           else
-            return  '<span class="text-capitalize"> ' + data + ' </span>'
+            return  '<span class="text-capitalize">' + data + '</span>'
+
+      }
+      {
+        data: 'description'
 
       }
       {
