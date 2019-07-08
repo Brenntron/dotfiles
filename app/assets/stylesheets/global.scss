@@ -9579,6 +9579,36 @@ table.rl-content {
   }
 }
 
+// stylize the HTML buttons on File Rep > Show > SB report
+.data-report-button {
+  border-radius: 2px;
+  border: none;
+  font-size: 12px;
+  padding: 6px 12px 6px 32px;
+  margin-bottom: 10px;
+  color: $content-bg-color;
+  background-color: $bug-section-color;
+  background-repeat: no-repeat;
+  background-position: 7px 3px;
+  &#sb-report-html {
+    background-image: url(image_path('icon_open_viewable_white.svg'));
+    background-size: 19px 19px;
+  }
+  &#sb-report-html-download {
+    background-image: url(image_path('icon_download_white.svg'));
+    background-size: 20px 20px;
+  }
+  &:hover, &:active {
+    background-color: darken($bug-section-color, 10%);
+    color: $content-bg-color;
+  }
+}
+
+// fix to ensure there is no flash of dialog text on page load
+#naming-guide-dialog {
+  display: none;
+}
+
 // ensure AMP disposition on File Rep > Show is capitalized in all 3 instances
 #create-detection-dialog .top-info-data,
 .amp-area label:first-of-type + div,
