@@ -1514,6 +1514,7 @@ window.commit_marked = () ->
 
 
 window.advanced_webcat_index_table = () ->
+  console.log 'inininin'
   complaint_save_search_format = /[!@#$%^&*()_+\-=\[\]{};':"\\|,.<>\/?]/
   data = {
     customer: {
@@ -1546,6 +1547,7 @@ window.advanced_webcat_index_table = () ->
 
 
 window.populate_advanced_webcat_index_table = (data = {}) ->
+  console.log data
   $('#loader-modal').modal({
     keyboard: false
   })
@@ -1557,6 +1559,7 @@ window.populate_advanced_webcat_index_table = (data = {}) ->
     data: data
     data_json: JSON.stringify(data)
     success: (response) ->
+
       json = $.parseJSON(response)
       if json.error
         notice_html = "<p>Something went wrong: #{json.error}</p>"
