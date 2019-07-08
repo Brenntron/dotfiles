@@ -30,7 +30,7 @@ class FileReputationApi::ReversingLabs
   def scanners
     unless @scanners
       @scanners =
-          if entries.any?
+          if entries&.any?
             record_time = entries.map{|entry| entry['record_time']}.sort.last
             entry = entries.find{|entry| record_time == entry['record_time']}
             entry.dig('scanners')
@@ -98,6 +98,9 @@ class FileReputationApi::ReversingLabs
     JSON.parse!(response.body)
 
     new(sha256_hash: sha256_hash, raw_json: response.body)
+
+  rescue ApiRequester::ApiRequester::ApiRequesterNotFoundError
+    new(sha256_hash: sha256_hash, raw_json: "{\"error\":\"Not in RL\"}")
   end
 
   # Makes an immediate call to get up to date reversing labs results and stores data in cache and database.
