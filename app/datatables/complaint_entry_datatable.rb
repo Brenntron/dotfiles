@@ -21,8 +21,8 @@ class ComplaintEntryDatatable < AjaxDatatablesRails::ActiveRecord
         ip_address:         {source: "ComplaintEntry.ip_address", data: :ip_address, cond: :like},
         path:               {source: "ComplaintEntry.path", data: :path, cond: :like},
         category:           {source: "ComplaintEntry.category", data: :category, cond: :string_eq},
-        suggested_category: {source: "ComplaintEntry.suggested_category", data: :suggested_category, cond: :string_eq},
-        suggested_category_count:       {source: "ComplaintEntry.suggested_category_count", data: :suggested_category_count, searchable: false, orderable: false},
+        # suggested_category: {source: "ComplaintEntry.suggested_category", data: :suggested_category, cond: :string_eq},
+        # suggested_category_count:       {source: "ComplaintEntry.suggested_category_count", data: :suggested_category_count, searchable: false, orderable: false},
         wbrs_score:         {source: "ComplaintEntry.wbrs_score", data: :wbrs_score, cond: :eq},
         customer_name:      {source: "ComplaintEntry.customer_name", data: :customer_name, cond: :like},
         company_name:       {source: "ComplaintEntry.company_name", data: :company_name, cond: :like},
@@ -56,8 +56,8 @@ class ComplaintEntryDatatable < AjaxDatatablesRails::ActiveRecord
           ip_address:       complaint_entry.ip_address,
           path:             complaint_entry.path,
           category:         complaint_entry.url_primary_category,
-          suggested_category:           suggested_dispositions&.first,
-          suggested_category_count:     suggested_dispositions ? suggested_dispositions.count : 0,
+          # suggested_category:           suggested_dispositions&.first,
+          # suggested_category_count:     suggested_dispositions ? suggested_dispositions.count : 0,
           wbrs_score:       complaint_entry.wbrs_score ? complaint_entry.wbrs_score.to_d.truncate(2).to_s : '',
           customer_name:    complaint_entry.customer_name,
           company_name:     complaint_entry.customer_company_name,
@@ -103,7 +103,8 @@ class ComplaintEntryDatatable < AjaxDatatablesRails::ActiveRecord
   end
 
   # Override for sensitive sorting fields.
-  # def sort_records(records)
-  #   super
-  # end
+  def sort_records(records)
+    # super
+    records
+  end
 end
