@@ -14,9 +14,14 @@ module API
                 api_response = FileReputationApi::SampleZoo.sha256_lookup(sha256_hash)
                 begin
                   attributes = FileReputationApi::SampleZoo.query_from_data(api_response)
-                  FileReputationDispute.where(sha256_hash: sha256_hash).update_all(attributes)
-                rescue => except
+
+                  file_rep_dispute = FileReputationDispute.where(sha256_hash: sha256_hash).first
+                  unless file_rep_dispute&.in_zoo
+                    file_rep_dispute.update_all(attributes)
+                  end
+                rescue Exception => except
                   Rails.logger.error("Error looking to Samplezoo for sha256 hash #{sha256_hash} -- #{except.message}")
+                  std_exception(except)
                 end
 
                 render json: attributes

@@ -476,14 +476,16 @@ class FileReputationDispute < ApplicationRecord
     detection = FileReputationApi::Detection.get_bulk(self.sha256_hash)
 
     update!(disposition: detection.disposition, detection_name: detection.name)
+
   rescue => except
     Rails.logger.error("Error updating amp disposition on #{self.id} -- #{except.message}")
   end
 
   def update_amp_detection_last_set
     detection_last_set = FileReputationApi::ElasticSearch.query(self.sha256_hash)
-
-    update!(detection_last_set: detection_last_set, last_fetched: DateTime.now.utc)
+    if detection_last_set != 'No history to display' || self.detection_last_set.nil?
+      update!(detection_last_set: detection_last_set, last_fetched: DateTime.now.utc)
+    end
   rescue => except
     Rails.logger.error("Error updating amp detection last set on #{self.id} -- #{except.message}")
   end
@@ -494,9 +496,9 @@ class FileReputationDispute < ApplicationRecord
     begin
       attributes = FileReputationApi::SampleZoo.query_from_data(zoo_response)
       update!(attributes)
+    rescue Exception => except
+      Rails.logger.error("Error updating sample zoo flag for id #{self.id} -- #{except.message}")
     end
-  rescue => except
-    Rails.logger.error("Error updating sample zoo flag for id #{self.id} -- #{except.message}")
   end
 
   # Initialize all data as when creating a dispute record

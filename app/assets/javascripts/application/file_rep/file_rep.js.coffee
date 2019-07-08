@@ -1079,8 +1079,8 @@ $ ->
           $('.amp-history-icon').click ->
             $('#amp-history-dialog').dialog('open')
 
-      error: () ->
-        std_msg_error('Error with AMP', ['There was an error retrieving the AMP data.'])
+      error: (response) ->
+        std_msg_error('Error with an API', ['There was an error retrieving data. Error - '+ response.responseJSON.message])
       complete: () ->
         $('.amp-area .inline-loader-wrapper').hide()
     )
