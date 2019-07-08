@@ -30,7 +30,7 @@ class FileReputationApi::ReversingLabs
   def scanners
     unless @scanners
       @scanners =
-          if entries.any?
+          if @entries&.any?
             record_time = entries.map{|entry| entry['record_time']}.sort.last
             entry = entries.find{|entry| record_time == entry['record_time']}
             entry.dig('scanners')

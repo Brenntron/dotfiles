@@ -45,6 +45,7 @@ module API
                 duplicates = []
                 uniques = {}
                 user_validation = User.where(cvs_username: params[:assignee])
+                assignee_id = User.where(cvs_username: params[:assignee]).first.id
 
                 if user_validation.exists?
                   permitted_params['shas_array'].each do |sha256|
@@ -54,7 +55,7 @@ module API
                       file_rep = FileReputationDispute.create_through_form(bugzilla_rest_session,
                                                                 sha256,
                                                                 params[:disposition_suggested],
-                                                                params[:assignee])
+                                                                assignee_id)
                       uniques[file_rep.id] = sha256
                     else
                       duplicates << sha256
