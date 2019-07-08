@@ -4,7 +4,6 @@ class Escalations::Webcat::ComplaintEntriesController < Escalations::WebcatContr
     respond_to do |format|
       format.html
       format.json do
-        byebug
         render json: ComplaintEntryDatatable.new(params,
                                                  initialize_params,
                                                  user: current_user)

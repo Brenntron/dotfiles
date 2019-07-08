@@ -1,7 +1,6 @@
 class ComplaintEntryDatatable < AjaxDatatablesRails::ActiveRecord
 
   def initialize(params, initialize_params, user:)
-    byebug
     @user = user
     @search_string = initialize_params['value'] # Native datatables search string
     @search_type = initialize_params['search_type']
@@ -43,7 +42,6 @@ class ComplaintEntryDatatable < AjaxDatatablesRails::ActiveRecord
   end
 
   def data
-    byebug
     records.map do |complaint_entry|
       complaint = complaint_entry.complaint
 
@@ -86,7 +84,6 @@ class ComplaintEntryDatatable < AjaxDatatablesRails::ActiveRecord
   # private
 
   def get_raw_records
-    byebug
     ComplaintEntry.all
   end
 
