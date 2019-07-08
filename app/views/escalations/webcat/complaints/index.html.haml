@@ -15,7 +15,7 @@
           .grid-header{:style => "width:100%"}
       %input{:name => "token", :type => "hidden", :value => "#{current_user.authentication_token}"}/
 
-      %table.table.responsive.no-wrap#complaints-index{role: 'datatable'}
+      %table.table.responsive.no-wrap#complaints-index{role: 'datatable', 'data-source': escalations_webcat_complaint_entries_path }
         %thead
           %tr
             %th.sorting_disabled

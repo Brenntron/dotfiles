@@ -19,39 +19,28 @@ $ ->
   headers = {'Token': $('input[name="token"]').val(), 'Xmlrpc-Token': $('input[name="xml_token"]').val()}
   #        url: '/escalations/api/v1/escalations/webcat/complaint_entries'
   window.get_ajax_data = () ->
+    url = $('#complaints-index').data('source')
     headers = {'Token': $('input[name="token"]').val(), 'Xmlrpc-Token': $('input[name="xml_token"]').val()}
     $.ajax(
-      url: '/escalations/api/v1/escalations/webcat/complaint_entries'
+      url: '/escalations/webcat/complaint_entries.json'
       method: 'GET'
       headers: headers
       success: (response) ->
-        data = JSON.parse(response).data
-        console.log data
-        return  data
+        console.log 'inininin', response
+        return  response
       error: (response) ->
         console.log response
     , this)
 
   window.build_complaints_table = ( response) ->
-      new_data = JSON.parse(response).data
+      new_data = response
       complaint_table = $('#complaints-index').DataTable(
         ajax: ( data, callback, settings )->
           data = []
           for row in new_data
             new_row = Object.keys(row).map((key) -> return row[key])
             data.push(new_row)
-#            dataSrc: (json)->
-#              data_array = JSON.parse( json ).data
-#              console.log data_array
-#              new_data = []
-#              for obj in data_array
-#                result = Object.keys(obj).map((key) -> return obj[key])
-#                obj = result
-#                new_data.push(result)
-#
-#              return data_array
-
-          count = new_data.length
+          count = 10
           setTimeout( ()->
             callback( {
               draw: data.draw,
@@ -60,14 +49,9 @@ $ ->
               recordsFiltered: count
             } );
           , 150 )
-
+        serverSide: true,
         processing: true,
-
-#        scrollY: 500,
-#        scroller: {
-#          loadingIndicator: true
-#        },
-
+        paging: true,
         order: [ [
           3
           'desc'
@@ -79,60 +63,61 @@ $ ->
         }
         rowCallback: (row, data) ->
             cell = @api().row(row).nodes().to$()
-            {is_important, was_dismissed} = data
+            is_important = data[19]
+            was_dismissed = data[18]
             if is_important
               cell.addClass 'highlight-second-review'
             if was_dismissed
               cell.addClass 'highlight-was-dismissed'
 
-#          columnDefs: [
-#            {
-#              targets: [ 0 ]
-#              className: 'expandable-row-column'
-#              orderable: false
-#              searchable: false
-#            }
-#            {
-#              targets: [1]
-#              className: 'important-flag-col'
-#              orderable: false
-#              searchable: false
-#            }
-#            {
-#              targets: [ 2 ]
-#              className: 'entry-id-col'
-#            }
-#            {
-#              targets: [ 3 ]
-#              orderData: 15
-#            }
-#            {
-#              targets: [ 12 ]
-#              className: 'submitter-col'
-#            }
-#          ]
+          columnDefs: [
+            {
+              targets: [ 0 ]
+              className: 'expandable-row-column'
+              orderable: false
+              searchable: false
+            }
+            {
+              targets: [1]
+              className: 'important-flag-col'
+              orderable: false
+              searchable: false
+            }
+            {
+              targets: [ 2 ]
+              className: 'entry-id-col'
+            }
+            {
+              targets: [ 3 ]
+              orderData: 15
+            }
+            {
+              targets: [ 12 ]
+              className: 'submitter-col'
+            }
+          ]
         columns: [
             {
-              data: null
+#             checkbox column
               width: '14px'
               orderable: false
               searchable: false
               sortable: false
-              'render':(data,type,full,meta)->
+              render: (data,type,full,meta)->
                 entry_id = full[11]
                 return '<button class="expand-row-button-inline expand-row-button-' + entry_id + '"></button>'
             }
             {
-              data: null
+#             is-important, was-reviewed icon column
               orderable: false
               searchable: false
               sortable: false
               defaultContent: '<span></span>'
               width: '24px'
-              'render': (data,type,full,meta)->
-                console.log data
+              render: (data,type,full,meta)->
                 is_important = full[19]
                 was_dismissed = full[18]
+
                 if is_important
                   if was_dismissed
                     return '<div class="container-important-tags">' +
@@ -143,25 +128,26 @@ $ ->
                     return '<span class="esc-tooltipped is-important" tooltip title="Important"></span>'
             }
             {
-              data: 'entry_id'
+#             column entry_id
               render: (data,type,full,meta)->
                  full[4]
               width: '50px'
             }
             {
-              data: 'age'
+#             age column
               width: '40px'
               render: (data,type,full,meta)->
                 full[0]
               width: '50px'
             }
             {
-              data: 'status'
+#             status column
               className: 'state-col'
               render: (data,type,full,meta)->
                 full[10]
             }
             {
+#              tag column
               render: (data,type,full,meta)->
                 tags = full[24]
                 tag_items = ''
@@ -175,6 +161,7 @@ $ ->
                   tag_items
             }
             {
+#             subdomin column
               render:(data,type,full,meta)->
                 subdomain = full[13]
                 entry_id = full[4]
@@ -185,6 +172,7 @@ $ ->
               width: '50px'
             }
             {
+#             domain/ip column
               render:(data,type,full,meta)->
                 domain = full[1]
                 ip_address = full[16]
@@ -196,37 +184,44 @@ $ ->
 
             }
             {
-              data: 'path'
+#             path column
               render: (data, type, full, meta) ->
-                full_data = full
+                path = full[15]
                 entry_id = full[4]
-                if type == 'display'
-                  full_data = td_truncate(full, 20)
-                return '<span class="esc-tooltipped td-truncate" id="path_' + entry_id + '" title="' + full + '">' + full_data + '</span>'
+                if path == null
+                  path = ''
+                return '<span class="esc-tooltipped" id="path_' + entry_id + '" title="' +  path + '">' +  path + '</span>'
+              width: '50px'
             }
             {
+#             categories column
               render: (data, type, full, meta) ->
                 categories = full[9]
                 entry_id = full[4]
                 plus = ''
                 if categories != null
-                  for category in categories
-                    if category == "Not in our list"
-                      category = ""
+                  if categories.replace(/,/g, '') != ''
+                    for category in categories
+                      if category == "Not in our list"
+                        category = ""
+                  else
+                    categories = ""
                 else
-                  categories = ''
+                  categories = ""
+                categories = categories.replace(/,/g, ', ')
+
                 return '<span id="category_' + entry_id + '">' + categories + '</span>'
             }
             {
-              data: 'suggested_category'
+#             suggested_category column
               render: (data, type, full, meta)->
                 category = full[21]
                 if category
-                  category = category.replace('+', '')
+                  category = category.replace('+', '').replace(',', ', ')
                 category
             }
             {
-              data: 'wbrs_score'
+#             wbrs_score column
               width: '20px'
               render: (data, type, full, meta) ->
                 wbrs_score = full[17]
@@ -235,7 +230,7 @@ $ ->
                 '<span id="wbrs_score_' + entry_id + '">' + wbrs_score + '</span>'
             }
             {
-              data: 'submitter_type'
+#             submitter_type column
               render: (data, type, full, meta) ->
                 submitter_type = full[22]
                 if submitter_type == 'CUSTOMER'
@@ -244,18 +239,18 @@ $ ->
                   data
             }
             {
-              data: 'company_name'
+#             company name column
               render: (data, type, full, meta) ->
                 full[23]
 
             }
             {
-              data: 'assigned_to'
+#             assigned_to column
               render: (data, type, full, meta) ->
                 full[5]
             }
             {
-              data: 'age_int'
+#             age column
               render: (data, type, full, meta) ->
                 full[2]
               visible: false
@@ -265,7 +260,8 @@ $ ->
         responsive: true)
 
   if $('#complaints-index').length
-    get_ajax_data().then( (response)-> build_complaints_table(response) )
+    get_ajax_data()
+#    .then( (response)-> build_complaints_table(response) )
 
     $('#complaints-index_filter input').addClass('table-search-input');
 
