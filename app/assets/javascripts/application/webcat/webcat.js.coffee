@@ -33,14 +33,13 @@ $ ->
 
   window.build_complaints_table = ( ) ->
 #      new_data = response
-      complaint_table = $('#complaints-index').DataTable(
-        ajax:
-          url: '/escalations/webcat/complaint_entries.json'
-          method: 'GET'
-          headers: headers
-        serverSide: true,
-        processing: true,
-        paging: true,
+        complaint_table = $('#complaints-index').DataTable(
+          processing: true
+          serverSide: true
+          ajax:
+            url: '/escalations/webcat/complaint_entries.json'
+          pagingType: 'full_numbers'
+
 #        order: [ [
 #          3
 #          'desc'
