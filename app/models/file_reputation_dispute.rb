@@ -626,10 +626,11 @@ class FileReputationDispute < ApplicationRecord
         return_payload[self.sha256_hash] = {
             resolution: self.resolution,
             resolution_comment: self.resolution_comment,
-            status: self.status
+            status: self.status,
+            sugg_type: self.disposition_suggested
         }
 
-        conn = ::Bridge::FileRepCreatedEvent.new(addressee: "talos-intelligence", source_authority: "talos-intelligence", source_key: self.ticket_source_key)
+        conn = ::Bridge::FileRepCreatedEvent.new(addressee: "talos-intelligence", source_authority: "talos-intelligence", source_key: self.ticket_source_key, ac_id: self.id)
         conn.post(return_payload)
       end
 
@@ -649,10 +650,11 @@ class FileReputationDispute < ApplicationRecord
         {
         resolution: dispute.resolution,
         resolution_message: dispute.resolution_comment,
-        status: dispute.status
+        status: dispute.status,
+        sugg_type: dispute.disposition_suggested
         }
 
-    conn = ::Bridge::FileRepCreatedEvent.new(addressee: "talos-intelligence", source_authority: "talos-intelligence", source_key: dispute.source_key)
+    conn = ::Bridge::FileRepCreatedEvent.new(addressee: "talos-intelligence", source_authority: "talos-intelligence", source_key: dispute.ticket_source_key, ac_id: dispute.id)
     conn.post(return_payload)
   end
 
