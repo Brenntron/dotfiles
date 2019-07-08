@@ -599,7 +599,11 @@ $ ->
         render: (data) ->
           return data + ' KB'
       }
-      { data: 'sample_type'}
+      {
+        data: 'sample_type'
+        render: (data) ->
+          return '<span title="' + data + '" class="esc-tooltipped">' + data + '</span>'
+      }
       {
         data: 'disposition'
         render: (data) ->
@@ -730,7 +734,8 @@ $ ->
       }
       {
         data: 'description'
-
+        render: (data) ->
+          return '<span title="' + data + '" class="esc-tooltipped dispute-description">' + data + '</span>'
       }
       {
         data: 'created_at'
@@ -1255,6 +1260,7 @@ $ ->
       data['threatgrid-score'] = $("#threatgrid-score-checkbox").is(':checked')
       data['reversing-labs'] = $("#reversing-labs-checkbox").is(':checked')
       data['suggested-disp'] = $("#suggested-disp-checkbox").is(':checked')
+      data['description'] = $("#dispute-details-checkbox").is(':checked')
       data['time-submitted'] = $("#time-submitted-checkbox").is(':checked')
       data['submitter-type'] = $("#submitter-type-checkbox").is(':checked')
       data['customer-name'] = $("#customer-name-checkbox").is(':checked')

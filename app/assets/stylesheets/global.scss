@@ -6047,7 +6047,19 @@ td.in_zoo{
   word-break: break-all;
   display: block !important;
   //  temporarily adding till we figure out a better solution
-  width: 100px;
+  width: auto;
+  max-width: 200px;
+}
+
+.esc-tooltipped.dispute-description {
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  overflow: hidden;
+  word-wrap: break-word;
+  word-break: break-all;
+  display: block !important;
+  width: auto;
+  max-width: 200px;
 }
 
 .filter-cases{
