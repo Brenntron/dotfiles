@@ -26,6 +26,9 @@ $ ->
       headers: headers
       success: (response) ->
         data = JSON.parse(response).data
+        console.log data
+        if data.subdomain != '' && data.subdomain != undefined
+          console.log data.subdomain
         return  data
       error: (response) ->
         console.log response
@@ -37,17 +40,20 @@ $ ->
         ajax: ( data, callback, settings )->
           data = []
           for row in new_data
+            console.log row.subdomain
             new_row = Object.keys(row).map((key) -> return row[key])
             data.push(new_row)
-            dataSrc: (json)->
-              data_array = JSON.parse( json ).data
-              new_data = []
-              for obj in data_array
-                result = Object.keys(obj).map((key) -> return obj[key])
-                obj = result
-                new_data.push(result)
-              console.log new_data
-              return data_array
+#            dataSrc: (json)->
+#              data_array = JSON.parse( json ).data
+#              console.log data_array
+#              new_data = []
+#              for obj in data_array
+#                result = Object.keys(obj).map((key) -> return obj[key])
+#                obj = result
+#                new_data.push(result)
+#
+#              return data_array
+
           count = new_data.length
           setTimeout( ()->
             callback( {
@@ -82,32 +88,32 @@ $ ->
             if was_dismissed
               cell.addClass 'highlight-was-dismissed'
 
-          columnDefs: [
-            {
-              targets: [ 0 ]
-              className: 'expandable-row-column'
-              orderable: false
-              searchable: false
-            }
-            {
-              targets: [1]
-              className: 'important-flag-col'
-              orderable: false
-              searchable: false
-            }
-            {
-              targets: [ 2 ]
-              className: 'entry-id-col'
-            }
-            {
-              targets: [ 3 ]
-              orderData: 15
-            }
-            {
-              targets: [ 12 ]
-              className: 'submitter-col'
-            }
-          ]
+#          columnDefs: [
+#            {
+#              targets: [ 0 ]
+#              className: 'expandable-row-column'
+#              orderable: false
+#              searchable: false
+#            }
+#            {
+#              targets: [1]
+#              className: 'important-flag-col'
+#              orderable: false
+#              searchable: false
+#            }
+#            {
+#              targets: [ 2 ]
+#              className: 'entry-id-col'
+#            }
+#            {
+#              targets: [ 3 ]
+#              orderData: 15
+#            }
+#            {
+#              targets: [ 12 ]
+#              className: 'submitter-col'
+#            }
+#          ]
         columns: [
             {
               data: null
@@ -116,7 +122,8 @@ $ ->
               searchable: false
               sortable: false
               'render':(data)->
-                return '<button class="expand-row-button-inline expand-row-button-' + data.entry_id + '"></button>'
+                entry_id = data[11]
+                return '<button class="expand-row-button-inline expand-row-button-' + entry_id + '"></button>'
             }
             {
               data: null
@@ -126,8 +133,10 @@ $ ->
               defaultContent: '<span></span>'
               width: '24px'
               'render': (data)->
-                if data.is_important
-                  if data.was_dismissed
+                is_important = data[14]
+                was_dismissed = data[26]
+                if is_important
+                  if was_dismissed
                     return '<div class="container-important-tags">' +
                       '<div class="esc-tooltipped is-important" tooltip title="Important"></div>' +
                       '<div class="esc-tooltipped was-reviewed" tooltip title="Reviewed"></div>' +
@@ -138,20 +147,24 @@ $ ->
             {
               data: 'entry_id'
               render: (data,type,full,meta)->
-                 full[1]
+                 full[11]
               width: '50px'
             }
             {
               data: 'age'
               width: '40px'
+              render: (data,type,full,meta)->
+                full[0]
+              width: '50px'
             }
             {
               data: 'status'
               className: 'state-col'
+              render: (data,type,full,meta)->
+                full[10]
             }
             {
               render: (data,type,full,meta)->
-                console.log data,type,full,meta
                 tags = full[24]
                 tag_items = ''
                 if tags
@@ -166,7 +179,6 @@ $ ->
             {
               render:(data,type,full,meta)->
                 subdomain = full.subdomain
-
                 if subdomain
                   '<span id="subdomain_' + full.entry_id + '">' + subdomain + '</span>'
                 else
