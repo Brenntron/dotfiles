@@ -12,7 +12,7 @@ class ComplaintEntryDatatable < AjaxDatatablesRails::ActiveRecord
 
   def view_columns
     @view_columns ||= {
-        entry_id:           {source: "ComplaintEntry.entry_id", data: :entry_id, cond: :like},
+        entry_id:           {source: "ComplaintEntry.id", data: :entry_id, cond: :like},
         created_at:         {source: "ComplaintEntry.created_at", data: :created_at, cond: :date_range},
         age_int:            {source: "ComplaintEntry.age_int", data: :age_int, searchable: false, orderable: false},
         age:                {source: "ComplaintEntry.age", data: :age, searchable: false, orderable: false},

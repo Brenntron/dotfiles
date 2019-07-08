@@ -39,7 +39,7 @@ class Escalations::Webcat::ComplaintEntriesController < Escalations::WebcatContr
   end
 
   def datatables_search_params
-    params.require(:search).permit(:value)
+    params.fetch(:search, {value: ''}).permit(:value)
   end
 
   def robust_search_params
