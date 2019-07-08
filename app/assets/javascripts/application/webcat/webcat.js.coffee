@@ -27,8 +27,6 @@ $ ->
       success: (response) ->
         data = JSON.parse(response).data
         console.log data
-        if data.subdomain != '' && data.subdomain != undefined
-          console.log data.subdomain
         return  data
       error: (response) ->
         console.log response
@@ -40,7 +38,6 @@ $ ->
         ajax: ( data, callback, settings )->
           data = []
           for row in new_data
-            console.log row.subdomain
             new_row = Object.keys(row).map((key) -> return row[key])
             data.push(new_row)
 #            dataSrc: (json)->
@@ -121,8 +118,8 @@ $ ->
               orderable: false
               searchable: false
               sortable: false
-              'render':(data)->
-                entry_id = data[11]
+              'render':(data,type,full,meta)->
+                entry_id = full[11]
                 return '<button class="expand-row-button-inline expand-row-button-' + entry_id + '"></button>'
             }
             {
@@ -132,9 +129,10 @@ $ ->
               sortable: false
               defaultContent: '<span></span>'
               width: '24px'
-              'render': (data)->
-                is_important = data[14]
-                was_dismissed = data[26]
+              'render': (data,type,full,meta)->
+                console.log data
+                is_important = full[19]
+                was_dismissed = full[18]
                 if is_important
                   if was_dismissed
                     return '<div class="container-important-tags">' +
@@ -147,7 +145,7 @@ $ ->
             {
               data: 'entry_id'
               render: (data,type,full,meta)->
-                 full[11]
+                 full[4]
               width: '50px'
             }
             {
@@ -178,19 +176,21 @@ $ ->
             }
             {
               render:(data,type,full,meta)->
-                subdomain = full.subdomain
+                subdomain = full[13]
+                entry_id = full[4]
                 if subdomain
-                  '<span id="subdomain_' + full.entry_id + '">' + subdomain + '</span>'
+                  '<span id="subdomain_' + entry_id + '">' + subdomain + '</span>'
                 else
-                  '<span id="subdomain_' + full.entry_id + '">' + '</span>'
+                  '<span id="subdomain_' + entry_id + '">' + '</span>'
               width: '50px'
             }
             {
               render:(data,type,full,meta)->
-                domain = full.domain
-                ip_address = full.ip_address
+                domain = full[1]
+                ip_address = full[16]
+                entry_id = full[4]
                 if domain
-                  '<p class="input-truncate esc-tooltipped" id="domain_' + full.entry_id + '" title="' + domain + '">' + domain + '</p>'
+                  '<p class="input-truncate esc-tooltipped" id="domain_' + entry_id + '" title="' + domain + '">' + domain + '</p>'
                 else
                   '<a href="http://' + ip_address + '" target="blank">' + ip_address + '</a>'
 
@@ -198,48 +198,66 @@ $ ->
             {
               data: 'path'
               render: (data, type, full, meta) ->
-                full_data = data
+                full_data = full
+                entry_id = full[4]
                 if type == 'display'
-                  full_data = td_truncate(data, 20)
-                return '<span class="esc-tooltipped td-truncate" id="path_' + full.entry_id + '" title="' + data + '">' + full_data + '</span>'
+                  full_data = td_truncate(full, 20)
+                return '<span class="esc-tooltipped td-truncate" id="path_' + entry_id + '" title="' + full + '">' + full_data + '</span>'
             }
             {
               render: (data, type, full, meta) ->
-                categories = ''
-                category = ''
+                categories = full[9]
+                entry_id = full[4]
                 plus = ''
-                if full.category
-                  categories = full.category.split(',')
-                  category = categories[0]
-                  if category == "Not in our list"
-                    category = ""
-                '<span id="category_' + full.entry_id + '">' + category + '</span>'
+                if categories != null
+                  for category in categories
+                    if category == "Not in our list"
+                      category = ""
+                else
+                  categories = ''
+                return '<span id="category_' + entry_id + '">' + categories + '</span>'
             }
             {
               data: 'suggested_category'
+              render: (data, type, full, meta)->
+                category = full[21]
+                if category
+                  category = category.replace('+', '')
+                category
             }
             {
               data: 'wbrs_score'
               width: '20px'
               render: (data, type, full, meta) ->
-                '<span id="wbrs_score_' + full.entry_id + '">' + data + '</span>'
+                wbrs_score = full[17]
+                entry_id = full[4]
+
+                '<span id="wbrs_score_' + entry_id + '">' + wbrs_score + '</span>'
             }
             {
               data: 'submitter_type'
-              render: (data) ->
-                if data == 'CUSTOMER'
+              render: (data, type, full, meta) ->
+                submitter_type = full[22]
+                if submitter_type == 'CUSTOMER'
                   '<button class="complaint-submitter-type icon-custom-star esc-tooltipped" title="Customer"></button>'
                 else
                   data
             }
             {
               data: 'company_name'
+              render: (data, type, full, meta) ->
+                full[23]
+
             }
             {
               data: 'assigned_to'
+              render: (data, type, full, meta) ->
+                full[5]
             }
             {
               data: 'age_int'
+              render: (data, type, full, meta) ->
+                full[2]
               visible: false
             }
           ]
