@@ -11,6 +11,9 @@
                 Case ID
               .top-info-data.case-id-tag#dispute_id
                 = @file_rep_dispute.id.to_s.rjust(10, '0')
+              %label.content-label-sm Date/Time Submitted
+              .top-info-data= @file_rep_dispute.created_at.strftime("%b %e, %Y %l:%M %p")
+
               %label.content-label-sm
                 Status
               -#  Add ruby code for status here
@@ -82,6 +85,7 @@
                         %button.primary.change_ticket_status_button{type:'button', id:'webrep_change_ticket_status', onclick:'update_file_rep_status_on_show();'}
                           Submit
 
+
             .col-xs-6.col-sm-6.col-md-6.col-lg-6.col-xl-6.col-with-divider.col-assignee
               %label.content-label-sm
                 Assignee
@@ -112,6 +116,7 @@
                                 =select_tag :index_target_assignee, options_from_collection_for_select(User.joins(roles: :org_subset).where(org_subsets: { name: 'file rep' }).distinct.order(:cvs_username), :id, :cvs_username), class: 'toolbar-select'
                               %button{class: 'primary', type:'button', id: 'button_reassign', onclick:'file_rep_show_change_assignee();'}
                                 Assign
+
 
 
               %label.content-label-sm
@@ -146,10 +151,8 @@
                   %span.missing-data No customer record
 
             .col-xs-6.col-sm-6.col-md-6
-              %label.content-label-sm Date/Time Submitted
-              .top-info-data= @file_rep_dispute.created_at.strftime("%b %e, %Y %l:%M %p")
               %label.content-label-sm Dispute Details
-              .top-info-data
+              .top-info-data.top-info-details
                 - if @file_rep_dispute.description
                   = @file_rep_dispute.description
                 - else
