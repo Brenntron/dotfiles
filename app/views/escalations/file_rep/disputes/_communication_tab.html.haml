@@ -79,15 +79,19 @@
           -#  Manage Email Templates
 
     .row
-      .col-xs-12.email-header-information.hidden
+      .col-xs-12.email-header-information
         .email-header-data
           .communication-subject
+            Talosintelligence.com support request #{@file_rep_dispute.id}
           .sender-receiver-info
             %span.content-label-sm From
             %span.author-username
+              =@file_rep_dispute.customer.email
+
             %br
             %span.content-label-sm To
             %span.receiver-email
+              rep_disputes_#{@file_rep_dispute.id}@dispute.talosintelligence.com
             %br
             %span.attachment-label#incoming-attachment.hidden
             %span.email-attachments
@@ -97,6 +101,9 @@
             %button.reply-button
             %button.forward-button
           %span.email-datetime
+            =@file_rep_dispute.created_at.strftime("%Y-%m-%d")
+            %br
+            =@file_rep_dispute.created_at.strftime("%H:%M:%S")
     .row
       .col-xs-12.email-msg-body
         %pre.email-msg-content
@@ -218,17 +225,20 @@
                     .sender-receiver-info
                       %span.reply-symbol
                       %span.receiver-email
-                  .col-xs-8
-                    .template-select-wrapper
-                      .template-label
-                        Select a Template
+                        =@file_rep_dispute.customer.email
 
-                    %select.dropdown.email-template-select#select-reply-template
-                      -if EmailTemplate.all.empty?
-                        %option.hidden{value:'', disabled: true, selected: true} No Templates Created
-                      -else
-                        %option.hidden{value:'', disabled: true, selected: true} No Template Selected
-                        =options_for_select(EmailTemplate.all.pluck(:template_name, :id))
+                  -# Add in after we have email template functionality
+                  .col-xs-8
+                    -#.template-select-wrapper
+                    -#  .template-label
+                    -#    Select a Template
+                    -#
+                    -#%select.dropdown.email-template-select#select-reply-template
+                    -#  -if EmailTemplate.all.empty?
+                    -#    %option.hidden{value:'', disabled: true, selected: true} No Templates Created
+                    -#  -else
+                    -#    %option.hidden{value:'', disabled: true, selected: true} No Template Selected
+                    -#    =options_for_select(EmailTemplate.all.pluck(:template_name, :id))
 
                     .email-reply-button-wrapper
                       .email-reply-buttons
@@ -236,8 +246,7 @@
                         %button.delete-email
                 .row
                   .col-xs-12
-                    %input.communication-subject.reply-subject{type: 'text'}
-
+                    %input.communication-subject.reply-subject{type: 'text', value: "Talosintelligence.com support request #{@file_rep_dispute.id}"}
                 .row
                   .col-xs-12.file-wrapper-reply
                     #file-fields

@@ -3617,6 +3617,7 @@ input.communication-subject {
 
 #email-reply input.communication-subject {
   padding: 6px;
+  width: 100%;
 }
 
 .email-reply-body-wrapper {
@@ -3841,7 +3842,8 @@ input.communication-subject {
 }
 
 #email-reply .sender-receiver-info {
-  margin-top: 0;
+  margin-top: 6px;
+  margin-left: -15px;
 }
 
 .add-case-note-button {
@@ -3910,6 +3912,8 @@ input.communication-subject {
 
 .email-reply-header-information .email-reply-buttons {
   float: left;
+  padding-top: 4px;
+  margin-right: -12px;
 }
 
 .email-reply-header-information .content-label-sm-sub {
@@ -3921,8 +3925,9 @@ input.communication-subject {
   margin: 6px auto 1px auto;
 }
 
-.email-reply-header-information .email-reply-buttons {
+#newEmailDialog .email-reply-buttons {
   padding-top: 8px;
+  margin-right: 0;
 }
 
 .email-attachments a {
@@ -4386,6 +4391,7 @@ button.tertiary {
 
 .template-select-wrapper {
   display: inline-block;
+  margin-top: 4px;
 }
 
 #newEmailDialog .template-select-wrapper {
