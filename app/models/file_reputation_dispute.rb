@@ -772,7 +772,10 @@ class FileReputationDispute < ApplicationRecord
             when 'company_name'
               fr_dispute.customer_company_name
             when 'user_id'
-              fr_dispute.user.cvs_username
+              if fr_dispute.user.cvs_username.present?
+                fr_dispute.user.cvs_username
+              else
+                fr_dispute.user.id
             else
               fr_dispute.attributes[field_name]
             end
