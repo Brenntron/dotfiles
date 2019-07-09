@@ -38,7 +38,7 @@ $ ->
           }
           rowCallback: (row, data) ->
             cell = @api().row(row).nodes().to$()
-            { is_important, was_dismissed } = data
+            { is_important, was_dismissed, age_int } = data
             if is_important
               cell.addClass 'highlight-second-review'
             if was_dismissed
@@ -104,8 +104,35 @@ $ ->
                 width: '50px'
               }
               {
-                data: 'age'
+#               age column
                 width: '40px'
+                render: ( data, type, full, meta) ->
+                  { age, case_opened_at } = full
+                  if age != "<1 hr"
+                    dispute_duration = moment( case_opened_at ).fromNow()
+                  if dispute_duration.includes('minute')
+                    dispute_latency = age
+                  if dispute_duration.includes('hour')
+                    hours = parseInt(dispute_duration.replace(/[^0-9]/g, ''))
+                  if hours <= 3
+                    dispute_latency = age
+                  else
+                    dispute_latency = '<span class="ticket-age-over3hr">' + age + '</span>'
+                  if hours > 12
+                    dispute_latency = '<span class="ticket-age-over12hr">' + age + '</span>'
+                  else
+                    dispute_latency = '<span class="ticket-age-over12hr">' + age + '</span>'
+                  if dispute_duration.includes('day')
+                    day = parseInt(age.replace(/[^0-9]/g, ''))
+                  if day >= 1
+                    dispute_latency = '<span class="ticket-age-over12hr">' + age + '</span>'
+                  if dispute_duration.includes('months')
+                    month = parseInt(age.replace(/[^0-9]/g, ''))
+                    dispute_latency = '<span class="ticket-age-over12hr">' + age + '</span>'
+                  if dispute_duration.includes('year')
+                    year = parseInt(age.replace(/[^0-9]/g, ''))
+                    dispute_latency = '<span class="ticket-age-over12hr">' + age + '</span>'
+                  dispute_latency
               }
               {
                 data: 'status'
@@ -141,12 +168,10 @@ $ ->
               {
                 render:( data, type, full, meta )->
                   { domain, ip_address, entry_id } = full
-
                   if domain
                     '<p class="input-truncate esc-tooltipped" id="domain_' + entry_id + '" title="' + domain + '">' + domain + '</p>'
                   else
                     '<a href="http://' + ip_address + '" target="blank">' + ip_address + '</a>'
-
               }
               {
                 data: 'path'
