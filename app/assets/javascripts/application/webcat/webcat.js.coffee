@@ -31,13 +31,14 @@ $ ->
         console.log response
     , this)
 
-  window.build_complaints_table = ( ) ->
+  window.build_complaints_table = (  ) ->
 #      new_data = response
+        url = $('#complaints-index').data('source')
         complaint_table = $('#complaints-index').DataTable(
           processing: true
           serverSide: true
           ajax:
-            url: '/escalations/webcat/complaint_entries.json'
+            url: url
           pagingType: 'full_numbers'
 
 #        order: [ [
@@ -49,43 +50,72 @@ $ ->
 #          search: "_INPUT_"
 #          searchPlaceholder: "Search within table"
 #        }
-#        rowCallback: (row, data) ->
-#            cell = @api().row(row).nodes().to$()
-#            is_important = data[19]
-#            was_dismissed = data[18]
-#            if is_important
-#              cell.addClass 'highlight-second-review'
-#            if was_dismissed
-#              cell.addClass 'highlight-was-dismissed'
-#
-#          columnDefs: [
-#            {
-#              targets: [ 0 ]
-#              className: 'expandable-row-column'
-#              orderable: false
-#              searchable: false
-#            }
-#            {
-#              targets: [1]
-#              className: 'important-flag-col'
-#              orderable: false
-#              searchable: false
-#            }
-#            {
-#              targets: [ 2 ]
-#              className: 'entry-id-col'
-#            }
-#            {
-#              targets: [ 3 ]
-#              orderData: 15
-#            }
-#            {
-#              targets: [ 12 ]
-#              className: 'submitter-col'
-#            }
-#          ]
+          rowCallback: (row, data) ->
+            cell = @api().row(row).nodes().to$()
+            is_important = data[19]
+            was_dismissed = data[18]
+            if is_important
+              cell.addClass 'highlight-second-review'
+            if was_dismissed
+              cell.addClass 'highlight-was-dismissed'
+
+          columnDefs: [
+            {
+              targets: [ 0 ]
+              className: 'expandable-row-column'
+              orderable: false
+              searchable: false
+            }
+            {
+              targets: [1]
+              className: 'important-flag-col'
+              orderable: false
+              searchable: false
+            }
+            {
+              targets: [ 2 ]
+              className: 'entry-id-col'
+            }
+            {
+              targets: [ 3 ]
+              orderData: 15
+            }
+            {
+              targets: [ 12 ]
+              className: 'submitter-col'
+            }
+          ]
           columns: [
-            {data: null},
+            {
+              data: null
+              width: '14px'
+              orderable: false
+              searchable: false
+              sortable: false
+              render: (data,type,full,meta)->
+                entry_id = full[11]
+                return '<button class="expand-row-button-inline expand-row-button-' + entry_id + '"></button>'
+            }
+            {
+              data: null
+              orderable: false
+              searchable: false
+              sortable: false
+              defaultContent: '<span></span>'
+              width: '24px'
+              render: (data,type,full,meta)->
+                is_important = full[19]
+                was_dismissed = full[18]
+
+                if is_important
+                  if was_dismissed
+                    return '<div class="container-important-tags">' +
+                      '<div class="esc-tooltipped is-important" tooltip title="Important"></div>' +
+                      '<div class="esc-tooltipped was-reviewed" tooltip title="Reviewed"></div>' +
+                      '</div>'
+                  else
+                    return '<span class="esc-tooltipped is-important" tooltip title="Important"></span>'
+            },
             {data: 'entry_id'},
             {data: 'created_at'},
             {data: 'age_int'},
@@ -112,40 +142,9 @@ $ ->
             {data: 'viewable'},
             {data: 'complaint_id'},
             {data: 'tags'},
-            {data: 'submitter_type'},
-            {data: 'description'},
+#            {data: 'submitter_type'},
+#            {data: 'description'},
             ]
-
-#            {
-##             checkbox column
-#              width: '14px'
-#              orderable: false
-#              searchable: false
-#              sortable: false
-#              render: (data,type,full,meta)->
-#                entry_id = full[11]
-#                return '<button class="expand-row-button-inline expand-row-button-' + entry_id + '"></button>'
-#            }
-#            {
-##             is-important, was-reviewed icon column
-#              orderable: false
-#              searchable: false
-#              sortable: false
-#              defaultContent: '<span></span>'
-#              width: '24px'
-#              render: (data,type,full,meta)->
-#                is_important = full[19]
-#                was_dismissed = full[18]
-#
-#                if is_important
-#                  if was_dismissed
-#                    return '<div class="container-important-tags">' +
-#                      '<div class="esc-tooltipped is-important" tooltip title="Important"></div>' +
-#                      '<div class="esc-tooltipped was-reviewed" tooltip title="Reviewed"></div>' +
-#                      '</div>'
-#                  else
-#                    return '<span class="esc-tooltipped is-important" tooltip title="Important"></span>'
-#            }
 #            {
 ##             column entry_id
 #              render: (data,type,full,meta)->
@@ -279,9 +278,9 @@ $ ->
         responsive: true)
 
   if $('#complaints-index').length
-    get_ajax_data()
     build_complaints_table()
-#    .then( (response)-> build_complaints_table(response) )
+#    build_complaints_table()
+##    .then( (response)-> build_complaints_table(response) )
 
     $('#complaints-index_filter input').addClass('table-search-input');
 
