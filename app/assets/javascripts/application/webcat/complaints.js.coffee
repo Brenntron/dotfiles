@@ -320,7 +320,9 @@ window.updatePending = (id,row_id) ->
   comment = $('#complaint_comment_'+id)[0].value
   resolution_comment = $('#complaint_resolution_comment_'+id)[0].value
   resolution = $('.complaint-resolution'+id).text()
-  categories = $('#input_cat_'+id).val().toString()
+  categories = ""
+  if $('#input_cat_'+id).val()
+    categories = $('#input_cat_'+id).val().toString()
 
   headers = {'Token': $('input[name="token"]').val(), 'Xmlrpc-Token': $('input[name="xml_token"]').val()}
   $.ajax(
@@ -1685,9 +1687,11 @@ window.master_submit = () ->
     if type == 'submit_changes' && entry_id && row_id
       prefix = $(this).find("#complaint_prefix_#{entry_id}")[0].value
 
-      categories = $(this).find("#input_cat_#{entry_id}").val().toString()
-      category_name = $(this).find("#input_cat_#{entry_id}").next('.selectize-control').find('.item')
       category_names = []
+      categories = ""
+      if $(this).find("#input_cat_#{entry_id}").val()
+        categories = $(this).find("#input_cat_#{entry_id}").val().toString()
+      category_name = $(this).find("#input_cat_#{entry_id}").next('.selectize-control').find('.item')
       category_name.each ->
         category_names.push($(this).text())
       category_names = category_names.toString()
@@ -1701,6 +1705,7 @@ window.master_submit = () ->
         data.push({entry_id: entry_id, error: false, row_id: row_id, prefix: prefix, categories: categories, category_names: category_names, status: status, comment: comment, resolution_comment: resolution_comment})
       else if (categories.length == 0) && status == 'FIXED'
         data.push({entry_id, error: true, reason: 'nil_categories'})
+
 
   std_msg_ajax(
     method: 'POST'
