@@ -18,7 +18,7 @@ module API
               api_response =
                   FileReputationApi::Sandbox.sandbox_score(
                       params[:sha256_hash],
-                      api_key_type: FileReputationDispute::SUBMITTER_TYPE_AC_REFRESH
+                      api_key_type: FileReputationDispute::SANDBOX_KEY_AC_REFRESH
                   )
               render json: api_response
             end
@@ -40,7 +40,7 @@ module API
               api_response =
                   FileReputationApi::Sandbox.sandbox_latest_report(
                       params[:sha256_hash],
-                      api_key_type: FileReputationDispute::SUBMITTER_TYPE_AC_REFRESH
+                      api_key_type: FileReputationDispute::SANDBOX_KEY_AC_REFRESH
                   )
               render json: api_response
             end
@@ -56,7 +56,7 @@ module API
                   FileReputationApi::Sandbox.full_report(
                       sha256_hash,
                       params[:run_id],
-                      api_key_type: FileReputationDispute::SUBMITTER_TYPE_AC_REFRESH
+                      api_key_type: FileReputationDispute::SANDBOX_KEY_AC_REFRESH
                   )
 
               begin

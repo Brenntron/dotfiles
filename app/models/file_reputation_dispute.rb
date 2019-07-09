@@ -33,6 +33,10 @@ class FileReputationDispute < ApplicationRecord
   SANDBOX_KEY_TI_FORM    = 'TI-Form'
   SANDBOX_KEY_TI_API     = 'TI-API'
 
+  SUBMITTER_TYPE_CUSTOMER = "CUSTOMER"
+  SUBMITTER_TYPE_NONCUSTOMER = "NON-CUSTOMER"
+  SUBMITTER_TYPE_INTERNAL = "INTERNAL"
+
   RESOLUTION_AUTORESOLVED               = 'Auto Resolved'
   RESOLUTION_DUPLICATE              = 'DUPLICATE'
   RESOLUTION_AUTORESOLVED_COMMENT       = <<~HEREDOC
@@ -150,7 +154,8 @@ class FileReputationDispute < ApplicationRecord
         disposition_suggested: disposition_suggested,
         source: source,
         platform: platform,
-        customer: customer
+        customer: customer,
+        submitter_type: SUBMITTER_TYPE_INTERNAL
     }
     file_rep.assign_attributes(attributes)
 
@@ -194,7 +199,8 @@ class FileReputationDispute < ApplicationRecord
         user_id: assignee_id,
         sandbox_key: SANDBOX_KEY_AC_FORM,
         customer_id: customer.id,
-        status: STATUS_ASSIGNED
+        status: STATUS_ASSIGNED,
+        submitter_type: SUBMITTER_TYPE_INTERNAL
     }
 
     file_rep.assign_attributes(attributes)
@@ -587,6 +593,9 @@ class FileReputationDispute < ApplicationRecord
         new_dispute.sandbox_key = message_payload[:payload][:sandbox_key]
         new_dispute.ticket_source_key = message_payload[:source_key]
         new_dispute.description = message_payload[:payload][:summary_description]
+
+        new_dispute.customer_id = customer&.id
+        new_dispute.submitter_type = (new_dispute.customer.nil? || new_dispute.customer&.company_id == guest.id) ? SUBMITTER_TYPE_NONCUSTOMER : SUBMITTER_TYPE_CUSTOMER
 
 
         check_for_duplicate = FileReputationDispute.where(sha256_hash: message_payload[:payload][:sha256]).where.not(status: FileReputationDispute::STATUS_RESOLVED)
