@@ -44,6 +44,7 @@ class ComplaintEntryDatatable < AjaxDatatablesRails::ActiveRecord
   def data
     records.map do |complaint_entry|
       complaint = complaint_entry.complaint
+      suggested_dispositions = complaint_entry.suggested_disposition&.split(',')
 
       {
           entry_id:         complaint_entry.id,
@@ -103,7 +104,8 @@ class ComplaintEntryDatatable < AjaxDatatablesRails::ActiveRecord
   end
 
   # Override for sensitive sorting fields.
-  # def sort_records(records)
-  #   super
-  # end
+  def sort_records(records)
+    # super
+    records
+  end
 end

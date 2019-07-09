@@ -85,6 +85,7 @@ $ ->
 #            }
 #          ]
           columns: [
+            {data: null},
             {data: 'entry_id'},
             {data: 'created_at'},
             {data: 'age_int'},
@@ -113,7 +114,6 @@ $ ->
             {data: 'tags'},
             {data: 'submitter_type'},
             {data: 'description'},
-            {data: 'DT_RowId'}
             ]
 
 #            {
