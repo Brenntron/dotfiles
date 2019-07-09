@@ -1,16 +1,20 @@
-window.submit_wbrs_call = (arg, path) ->
+window.submit_wbrs_call = (arg, path, output) ->
+  headers = {'Token': $('input[name="token"]').val(), 'Xmlrpc-Token': $('input[name="xml_token"]').val()}
+
+
   $.ajax(
     url: '/escalations/api/v1/escalations/admin/tools/wbrs_call'
     method: 'POST'
     headers: headers
-    data: {'user_arg': arg, 'path': 'webcat1'}
+    data: {'user_arg': arg, 'path': path}
 
     success: (response) ->
-      json = $.parseJSON(response)
-      if json.status == 'error'
-        $(output).html("ERROR:" + json.message)
+      #json = $.parseJSON(response)
+      if response.status == 'error'
+        $(output).html("ERROR:" + response.message)
       else
-        $(output).html(json.message)
+        $(output).html(response.message)
+
     error: (response) ->
       $(output).html('An error occurred attempting to execute task')
   , this)
@@ -45,72 +49,72 @@ $ ->
     window.submit_task();
 
 
-  $("#execute_task-button-1").click ->
+  $("#execute-task-button-1").click ->
     arg = $(".1-args").val();
     path = 'webcat1'
-    output = '#1-output'
+    output = '#output-1'
 
     window.submit_wbrs_call(arg, path, output)
 
-  $("#execute_task-button-2").click ->
+  $("#execute-task-button-2").click ->
     arg = $(".2-args").val();
     path = 'webcat2'
-    output = '#2-output'
+    output = '#output-2'
 
     window.submit_wbrs_call(arg, path, output)
 
-  $("#execute_task-button-3").click ->
+  $("#execute-task-button-3").click ->
     arg = $(".3-args").val();
     path = 'webcat3'
-    output = '#3-output'
+    output = '#output-3'
 
     window.submit_wbrs_call(arg, path, output)
 
-  $("#execute_task-button-4").click ->
+  $("#execute-task-button-4").click ->
     arg = $(".4-args").val();
     path = 'webcat4'
-    output = '#4-output'
+    output = '#output-4'
 
     window.submit_wbrs_call(arg, path, output)
 
-  $("#execute_task-button-5").click ->
+  $("#execute-task-button-5").click ->
     arg = $(".5-args").val();
     path = 'webcat5'
-    output = '#5-output'
+    output = '#output-5'
 
     window.submit_wbrs_call(arg, path, output)
 
-  $("#execute_task-button-6").click ->
+  $("#execute-task-button-6").click ->
     arg = $(".6-args").val();
     path = 'webcat6'
-    output = '#6-output'
+    output = '#output-6'
 
     window.submit_wbrs_call(arg, path, output)
 
-  $("#execute_task-button-7").click ->
+  $("#execute-task-button-7").click ->
     arg = $(".7-args").val();
     path = 'webcat7'
-    output = '#7-output'
+    output = '#output-7'
 
     window.submit_wbrs_call(arg, path, output)
 
-  $("#execute_task-button-8").click ->
+  $("#execute-task-button-8").click ->
     arg = $(".8-args").val();
     path = 'webrep8'
-    output = '#8-output'
+    output = '#output-8'
 
     window.submit_wbrs_call(arg, path, output)
 
-  $("#execute_task-button-9").click ->
+  $("#execute-task-button-9").click ->
     arg = $(".9-args").val();
     path = 'webrep9'
-    output = '#9-output'
+    output = '#output-9'
 
     window.submit_wbrs_call(arg, path, output)
 
-  $("#execute_task-button-10").click ->
+  $("#execute-task-button-10").click ->
     arg = $(".10-args").val();
     path = 'webrep10'
-    output = '#10-output'
+    output = '#output-10'
 
     window.submit_wbrs_call(arg, path, output)

@@ -49,16 +49,17 @@ module API
             end
 
             post "wbrs_call" do
-              begin
+              #begin
                 path = permitted_params[:path]
                 arg = nil
-                arg = permitted_params[:user_arg]
-                response = WbrsAdminTool.process(path, arg)
+                arg = permitted_params[:user_arg] unless permitted_params[:user_arg].blank?
+                response = WbrsAdminTool.process(path, arg).to_json
+
                 {:status => 'success', :message => response}
 
-              rescue
-                {:status => 'error', :message => 'something went fucky'}
-              end
+              #rescue
+              #  {:status => 'error', :message => 'something went fucky'}
+              #end
 
 
             end

@@ -25,6 +25,7 @@ Rails.application.routes.draw do
     namespace :other_admin_tools do
       root 'tools#index'
       get 'tasks', to: 'tools#tasks'
+      get 'rule_api', to: 'tools#rule_api'
     end
 
     namespace :webcat do

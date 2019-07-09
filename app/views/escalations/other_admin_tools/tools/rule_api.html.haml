@@ -13,50 +13,57 @@
   %label /v1/cat/rules/get:
   = text_field "admin_tools", "args", :class => '1-args'
   %button#execute-task-button-1 Go!
-.control-banner#1-output
-%br%br
+.control-banner#output-1
+%br
+%br
 
 .control-banner
   %label /v1/wbrsrulelib/cat/sources:
   = text_field "admin_tools", "args", :class => '2-args'
   %button#execute-task-button-2 Go!
-.control-banner#2-output
-%br%br
+.control-banner#output-2
+%br
+%br
 
 .control-banner
   %label /v1/wbrsrulelib/cat/rules:
   = text_field "admin_tools", "args", :class => '3-args'
   %button#execute-task-button-3 Go!
-.control-banner#3-output
-%br%br
+.control-banner#output-3
+%br
+%br
 
 .control-banner
   %label /v1/cat/rules/audit:
   = text_field "admin_tools", "args", :class => '4-args'
   %button#execute-task-button-4 Go!
-.control-banner#4-output
-%br%br
+.control-banner#output-4
+%br
+%br
 
 .control-banner
   %label /v1/clusters/get:
   = text_field "admin_tools", "args", :class => '5-args'
   %button#execute-task-button-5 Go!
-.control-banner#5-output
-%br%br
+.control-banner#output-5
+%br
+%br
 
 .control-banner
   %label /v1/cat/categories:
   = text_field "admin_tools", "args", :class => '6-args'
   %button#execute-task-button-6 Go!
-.control-banner#6-output
-%br%br
+.control-banner#output-6
+%br
+%br
 
 .control-banner
   %label /v1/cat/urls/top:
   = text_field "admin_tools", "args", :class => '7-args'
   %button#execute-task-button-7 Go!
-.control-banner#7-output
-%br%br
+.control-banner#output-7
+%br
+%br
 
 
 %h3 Webrep RuleAPI
@@ -65,39 +72,25 @@
   %label GET /v1/rep/wlbl/get:
   = text_field "admin_tools", "args", :class => '8-args'
   %button#execute-task-button-8 Go!
-.control-banner#8-output
-%br%br
+.control-banner#output-8
+%br
+%br
 
 .control-banner
   %label POST /v1/rep/wlbl/get:
   = text_field "admin_tools", "args", :class => '9-args'
   %button#execute-task-button-9 Go!
-.control-banner#9-output
-%br%br
+.control-banner#output-9
+%br
+%br
 
 .control-banner
   %label /v1/rep/complaints/score:
   = text_field "admin_tools", "args", :class => '10-args'
   %button#execute-task-button-10 Go!
-.control-banner#10-output
-%br%br
+.control-banner#output-10
 
 
 
 
 
-%p Choose from list of available tasks, enter any arguments in json format (NOTE: must use double quotes when defining keys and values in JSON)
-%p Correct: {"test_key":"test value"}
-%p Incorrect: {'test_key':'test value'}
-%br
-%br
-#task-msg
-
-.control-banner
-  %label Available Tasks:
-  = select_tag "task", options_for_select(@available_tasks, ""), :class => 'task-name'
-  = text_field "admin_tools", "args", :class => 'task-args'
-  %button#execute-task-button Go!
-.control-banner
-  Link to morsel:
-  #morsel-output
