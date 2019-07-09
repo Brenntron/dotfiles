@@ -87,7 +87,7 @@ $ ->
                 searchable: false
                 sortable: false
                 defaultContent: '<span></span>'
-                width: '24px'
+                width: '10px'
                 render: ( data )->
                   { is_important, was_dismissed } = data
                   if is_important
@@ -156,6 +156,7 @@ $ ->
               }
               {
 #                subdomain column
+                data: 'subdomain'
                 render:(data,type,full,meta)->
                   {subdomain, entry_id} = full
 
@@ -166,6 +167,7 @@ $ ->
                 width: '50px'
               }
               {
+                data: 'domain'
                 render:( data, type, full, meta )->
                   { domain, ip_address, entry_id } = full
                   if domain
@@ -182,6 +184,7 @@ $ ->
                   return '<span class="esc-tooltipped td-truncate" id="path_' + entry_id + '" title="' + path + '">' + path + '</span>'
               }
               {
+                data: 'category'
                 render: ( data, type, full, meta ) ->
                   categories = ''
                   category = ''

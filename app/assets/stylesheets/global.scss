@@ -5979,7 +5979,9 @@ td.ticket-total::before {
   background-repeat: no-repeat;
   width: 20px;
   height: 20px;
-
+}
+.highlight-second-review .important-flag-col{
+  max-width: 50px!important;
 }
 .container-important-tags{
   display: inline-flex;
@@ -6719,10 +6721,6 @@ table#duplicates a {
   height: 20px;
   background-repeat: no-repeat;
   content: '';
-}
-
-.highlight-was-dismissed .important-flag-col {
-  min-width: 50px;
 }
 
 #dispute-index-title {
