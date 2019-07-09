@@ -29,6 +29,7 @@ $ ->
         search_type: search_type
         search_conditions: search_conditions
       }
+      console.log data
     return data
 
   refresh_url = (href) ->
@@ -60,7 +61,10 @@ $ ->
           serverSide: true
           ajax:
             url: url
-            data: build_data()
+            data: {
+              search_type: 'contains'
+              search_conditions: {value: 'tys.blob'}
+            }
           pagingType: 'full_numbers'
 
           order: [ [
