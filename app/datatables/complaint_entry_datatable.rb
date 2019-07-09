@@ -104,8 +104,8 @@ class ComplaintEntryDatatable < AjaxDatatablesRails::ActiveRecord
   end
 
   # Override for sensitive sorting fields.
-  def sort_records(records)
-    # super
-    records
-  end
+  # def sort_records(records)
+  #   # super
+  #   records
+  # end
 end
