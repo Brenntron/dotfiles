@@ -77,8 +77,9 @@ $ ->
                 orderable: false
                 searchable: false
                 sortable: false
-                'render':(data)->
-                  return '<button class="expand-row-button-inline expand-row-button-' + data.entry_id + '"></button>'
+                render: ( data ) ->
+                  { entry_id } = data
+                  return '<button class="expand-row-button-inline expand-row-button-' + entry_id + '"></button>'
               }
               {
                 data: null
@@ -87,10 +88,10 @@ $ ->
                 sortable: false
                 defaultContent: '<span></span>'
                 width: '24px'
-                'render': (data)->
-                  if data.is_important
-
-                    if data.was_dismissed
+                render: ( data )->
+                  { is_important, was_dismissed } = data
+                  if is_important
+                    if was_dismissed
                       return '<div class="container-important-tags">' +
                         '<div class="esc-tooltipped is-important" tooltip title="Important"></div>' +
                         '<div class="esc-tooltipped was-reviewed" tooltip title="Reviewed"></div>' +
@@ -112,11 +113,11 @@ $ ->
               }
               {
                 data: 'tags'
-                'render':(data,type,full,meta)->
-                  tags = data.substring(1, data.length-1).replace(/&quot;/g,'');
+                render: ( data )->
+                  tags = data.substring( 1, data.length-1 ).replace(/&quot;/g,'');
                   tag_items = ''
-                  tag_list = tags.split(',').map (tag) -> return tag.trim();
-                  tag_list = tag_list.filter (tag, index)-> return tag_list.indexOf(tag) == index && tag != ''
+                  tag_list = tags.split(',').map ( tag ) -> return tag.trim();
+                  tag_list = tag_list.filter ( tag, index )-> return tag_list.indexOf( tag ) == index && tag != ''
 
                   if tag_list.length
                     for tag in tag_list
@@ -128,7 +129,7 @@ $ ->
               }
               {
 #                subdomain column
-                'render':(data,type,full,meta)->
+                render:(data,type,full,meta)->
                   {subdomain, entry_id} = full
 
                   if subdomain
@@ -138,8 +139,8 @@ $ ->
                 width: '50px'
               }
               {
-                'render':(data,type,full,meta)->
-                  { domain, ip_address, entry_id }= full
+                render:( data, type, full, meta )->
+                  { domain, ip_address, entry_id } = full
 
                   if domain
                     '<p class="input-truncate esc-tooltipped" id="domain_' + entry_id + '" title="' + domain + '">' + domain + '</p>'
@@ -149,14 +150,14 @@ $ ->
               }
               {
                 data: 'path'
-                'render': (data, type, full, meta) ->
+                render: ( data, type, full, meta ) ->
                   { path , entry_id } = full
                   if type == 'display'
                     path = td_truncate(data, 20)
                   return '<span class="esc-tooltipped td-truncate" id="path_' + entry_id + '" title="' + path + '">' + path + '</span>'
               }
               {
-                'render': (data, type, full, meta) ->
+                render: ( data, type, full, meta ) ->
                   categories = ''
                   category = ''
                   plus = ''
@@ -174,12 +175,13 @@ $ ->
               {
                 data: 'wbrs_score'
                 width: '20px'
-                'render': (data, type, full, meta) ->
-                  '<span id="wbrs_score_' + full.entry_id + '">' + data + '</span>'
+                render: ( data, type, full, meta ) ->
+                  { wbrs_score, entry_id } = full
+                  '<span id="wbrs_score_' + entry_id + '">' + wbrs_score + '</span>'
               }
               {
                 data: 'submitter_type'
-                'render': (data) ->
+                render: (data) ->
                   if data == 'CUSTOMER'
                     '<button class="complaint-submitter-type icon-custom-star esc-tooltipped" title="Customer"></button>'
                   else
