@@ -7,17 +7,38 @@ window.td_truncate = (str, max, long) ->
 
 $ ->
 
-  window.build_webcat_contains_search = () ->
-    search_string = $('#web-cat-search .search-box').val()
-    console.log search_string
-    if search_string == ''
-#      refresh_localStorage()
-#      refresh_url()
-    else
-      localStorage.search_type = 'contains'
-      localStorage.search_name = ''
-      localStorage.search_conditions = JSON.stringify({value:search_string})
-#    refresh_url()
+  $('#web-cat-search #general_search').on 'keyup', (e) ->
+    { keyCode }= e
+    if keyCode == 13
+      search_string = $('#web-cat-search .search-box').val()
+      search_string
+      if search_string == ''
+#       refresh_localStorage()
+#       refresh_url()
+      else
+        localStorage.search_type = 'contains'
+        localStorage.search_name = ''
+        localStorage.search_conditions = JSON.stringify({value:search_string})
+      refresh_url()
+
+  build_data = () ->
+    { search_type, search_name, search_conditions } = localStorage
+    if search_type == 'contains'
+      search_conditions = JSON.parse(search_conditions)
+      data = {
+        search_type: search_type
+        search_conditions: search_conditions
+      }
+    return data
+
+  refresh_url = (href) ->
+    { search_type, search_name } = localStorage
+    url_check = current_url.split('/escalations/file_rep/disputes/')[0]
+    new_url = '/escalations/file_rep/disputes'
+    if href != undefined
+      window.location.replace(new_url + href)
+    if !href && typeof parseInt(url_check) == 'number'
+      window.location.replace('/escalations/webcat/complaints')
 
   $('.cat_new_url').selectize {
     persist: false,
@@ -29,14 +50,17 @@ $ ->
     options: AC.WebCat.createSelectOptions()
   }
 
+  url = $('#complaints-index').data('source')
+  current_url = window.location.href
   complaint_table = ''
+
   build_complaints_table = () ->
-        url = $('#complaints-index').data('source')
         complaint_table = $('#complaints-index').DataTable(
           processing: true
           serverSide: true
           ajax:
             url: url
+            data: build_data()
           pagingType: 'full_numbers'
 
           order: [ [
