@@ -33,6 +33,7 @@ class ComplaintEntry < ApplicationRecord
   end
 
   def self.is_ip?(ip)
+    ip = ip.scan(/(?:[0-9]{1,3}\.){3}[0-9]{1,3}/)[0] # When testing for IP address, don't include other parts of the url (e.g. 192.168.1.1/test.html is still a valid IP)
     !!IPAddr.new(ip) rescue false
   end
 
