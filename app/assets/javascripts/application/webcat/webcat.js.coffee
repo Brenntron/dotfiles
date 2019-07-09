@@ -16,23 +16,9 @@ $ ->
     searchField: ['category_name', 'category_code'],
     options: AC.WebCat.createSelectOptions()
   }
-  headers = {'Token': $('input[name="token"]').val(), 'Xmlrpc-Token': $('input[name="xml_token"]').val()}
-  #        url: '/escalations/api/v1/escalations/webcat/complaint_entries'
-  window.get_ajax_data = () ->
-    url = $('#complaints-index').data('source')
-    headers = {'Token': $('input[name="token"]').val(), 'Xmlrpc-Token': $('input[name="xml_token"]').val()}
-    $.ajax(
-      url: '/escalations/webcat/complaint_entries.json'
-      method: 'GET'
-      headers: headers
-      success: (response) ->
-        return  response
-      error: (response) ->
-        console.log response
-    , this)
 
-  window.build_complaints_table = (  ) ->
-#      new_data = response
+  complaint_table = ''
+  build_complaints_table = () ->
         url = $('#complaints-index').data('source')
         complaint_table = $('#complaints-index').DataTable(
           processing: true
@@ -41,19 +27,18 @@ $ ->
             url: url
           pagingType: 'full_numbers'
 
-#        order: [ [
-#          3
-#          'desc'
-#        ] ]
-#        dom: '<"datatable-top-tools no-margin-datatable-top-tool"lf>t<ip>'
-#        language: {
-#          search: "_INPUT_"
-#          searchPlaceholder: "Search within table"
-#        }
+          order: [ [
+            3
+            'desc'
+          ] ]
+          dom: '<"datatable-top-tools no-margin-datatable-top-tool"lf>t<ip>'
+          language: {
+            search: "_INPUT_"
+            searchPlaceholder: "Search within table"
+          }
           rowCallback: (row, data) ->
             cell = @api().row(row).nodes().to$()
-            is_important = data[19]
-            was_dismissed = data[18]
+            { is_important, was_dismissed } = data
             if is_important
               cell.addClass 'highlight-second-review'
             if was_dismissed
@@ -86,201 +71,136 @@ $ ->
             }
           ]
           columns: [
-            {
-              data: null
-              width: '14px'
-              orderable: false
-              searchable: false
-              sortable: false
-              render: (data,type,full,meta)->
-                entry_id = full[11]
-                return '<button class="expand-row-button-inline expand-row-button-' + entry_id + '"></button>'
-            }
-            {
-              data: null
-              orderable: false
-              searchable: false
-              sortable: false
-              defaultContent: '<span></span>'
-              width: '24px'
-              render: (data,type,full,meta)->
-                is_important = full[19]
-                was_dismissed = full[18]
+              {
+                data: null
+                width: '14px'
+                orderable: false
+                searchable: false
+                sortable: false
+                'render':(data)->
+                  return '<button class="expand-row-button-inline expand-row-button-' + data.entry_id + '"></button>'
+              }
+              {
+                data: null
+                orderable: false
+                searchable: false
+                sortable: false
+                defaultContent: '<span></span>'
+                width: '24px'
+                'render': (data)->
+                  if data.is_important
 
-                if is_important
-                  if was_dismissed
-                    return '<div class="container-important-tags">' +
-                      '<div class="esc-tooltipped is-important" tooltip title="Important"></div>' +
-                      '<div class="esc-tooltipped was-reviewed" tooltip title="Reviewed"></div>' +
-                      '</div>'
+                    if data.was_dismissed
+                      return '<div class="container-important-tags">' +
+                        '<div class="esc-tooltipped is-important" tooltip title="Important"></div>' +
+                        '<div class="esc-tooltipped was-reviewed" tooltip title="Reviewed"></div>' +
+                        '</div>'
+                    else
+                      return '<span class="esc-tooltipped is-important" tooltip title="Important"></span>'
+              }
+              {
+                data: 'entry_id'
+                width: '50px'
+              }
+              {
+                data: 'age'
+                width: '40px'
+              }
+              {
+                data: 'status'
+                className: 'state-col'
+              }
+              {
+                data: 'tags'
+                'render':(data,type,full,meta)->
+                  tags = data.substring(1, data.length-1).replace(/&quot;/g,'');
+                  tag_items = ''
+                  tag_list = tags.split(',').map (tag) -> return tag.trim();
+                  tag_list = tag_list.filter (tag, index)-> return tag_list.indexOf(tag) == index && tag != ''
+
+                  if tag_list.length
+                    for tag in tag_list
+                      item = '<span class="tag-capsule">' + tag + '</span>'
+                      tag_items += item
                   else
-                    return '<span class="esc-tooltipped is-important" tooltip title="Important"></span>'
-            },
-            {data: 'entry_id'},
-            {data: 'created_at'},
-            {data: 'age_int'},
-            {data: 'age'},
-            {data: 'status'},
-            {data: 'subdomain'},
-            {data: 'domain'},
-            {data: 'ip_address'},
-            {data: 'path'},
-            {data: 'category'},
-            {data: 'suggested_category'},
-            {data: 'suggested_category_count'},
-            {data: 'wbrs_score'},
-            {data: 'customer_name'},
-            {data: 'company_name'},
-            {data: 'assigned_to'},
-            {data: 'uri'},
-            {data: 'resolution'},
-            {data: 'path'},
-            {data: 'internal_comment'},
-            {data: 'resolution_comment'},
-            {data: 'is_important'},
-            {data: 'was_dismissed'},
-            {data: 'viewable'},
-            {data: 'complaint_id'},
-            {data: 'tags'},
-#            {data: 'submitter_type'},
-#            {data: 'description'},
-            ]
-#            {
-##             column entry_id
-#              render: (data,type,full,meta)->
-#                 full[4]
-#              width: '50px'
-#            }
-#            {
-##             age column
-#              width: '40px'
-#              render: (data,type,full,meta)->
-#                full[0]
-#              width: '50px'
-#            }
-#            {
-##             status column
-#              className: 'state-col'
-#              render: (data,type,full,meta)->
-#                full[10]
-#            }
-#            {
-##              tag column
-#              render: (data,type,full,meta)->
-#                tags = full[24]
-#                tag_items = ''
-#                if tags
-#                  if tags.length
-#                    for tag in tags
-#                      item = '<span class="tag-capsule">' + tag + '</span>'
-#                      tag_items = tag_items + item
-#                  else
-#                    tag_items = '<span class="missing-data">No tags</span>'
-#                  tag_items
-#            }
-#            {
-##             subdomin column
-#              render:(data,type,full,meta)->
-#                subdomain = full[13]
-#                entry_id = full[4]
-#                if subdomain
-#                  '<span id="subdomain_' + entry_id + '">' + subdomain + '</span>'
-#                else
-#                  '<span id="subdomain_' + entry_id + '">' + '</span>'
-#              width: '50px'
-#            }
-#            {
-##             domain/ip column
-#              render:(data,type,full,meta)->
-#                domain = full[1]
-#                ip_address = full[16]
-#                entry_id = full[4]
-#                if domain
-#                  '<p class="input-truncate esc-tooltipped" id="domain_' + entry_id + '" title="' + domain + '">' + domain + '</p>'
-#                else
-#                  '<a href="http://' + ip_address + '" target="blank">' + ip_address + '</a>'
-#
-#            }
-#            {
-##             path column
-#              render: (data, type, full, meta) ->
-#                path = full[15]
-#                entry_id = full[4]
-#                if path == null
-#                  path = ''
-#                return '<span class="esc-tooltipped" id="path_' + entry_id + '" title="' +  path + '">' +  path + '</span>'
-#              width: '50px'
-#            }
-#            {
-##             categories column
-#              render: (data, type, full, meta) ->
-#                categories = full[9]
-#                entry_id = full[4]
-#                plus = ''
-#                if categories != null
-#                  if categories.replace(/,/g, '') != ''
-#                    for category in categories
-#                      if category == "Not in our list"
-#                        category = ""
-#                  else
-#                    categories = ""
-#                else
-#                  categories = ""
-#                categories = categories.replace(/,/g, ', ')
-#
-#                return '<span id="category_' + entry_id + '">' + categories + '</span>'
-#            }
-#            {
-##             suggested_category column
-#              render: (data, type, full, meta)->
-#                category = full[21]
-#                if category
-#                  category = category.replace('+', '').replace(',', ', ')
-#                category
-#            }
-#            {
-##             wbrs_score column
-#              width: '20px'
-#              render: (data, type, full, meta) ->
-#                wbrs_score = full[17]
-#                entry_id = full[4]
-#
-#                '<span id="wbrs_score_' + entry_id + '">' + wbrs_score + '</span>'
-#            }
-#            {
-##             submitter_type column
-#              render: (data, type, full, meta) ->
-#                submitter_type = full[22]
-#                if submitter_type == 'CUSTOMER'
-#                  '<button class="complaint-submitter-type icon-custom-star esc-tooltipped" title="Customer"></button>'
-#                else
-#                  data
-#            }
-#            {
-##             company name column
-#              render: (data, type, full, meta) ->
-#                full[23]
-#
-#            }
-#            {
-##             assigned_to column
-#              render: (data, type, full, meta) ->
-#                full[5]
-#            }
-#            {
-##             age column
-#              render: (data, type, full, meta) ->
-#                full[2]
-#              visible: false
-#            }
+                    tag_items = '<span class="missing-data">No tags</span>'
+                  tag_items
+              }
+              {
+#                subdomain column
+                'render':(data,type,full,meta)->
+                  {subdomain, entry_id} = full
 
+                  if subdomain
+                    '<span id="subdomain_' + entry_id + '">' + subdomain + '</span>'
+                  else
+                    '<span id="subdomain_' + entry_id + '">' + '</span>'
+                width: '50px'
+              }
+              {
+                'render':(data,type,full,meta)->
+                  { domain, ip_address, entry_id }= full
+
+                  if domain
+                    '<p class="input-truncate esc-tooltipped" id="domain_' + entry_id + '" title="' + domain + '">' + domain + '</p>'
+                  else
+                    '<a href="http://' + ip_address + '" target="blank">' + ip_address + '</a>'
+
+              }
+              {
+                data: 'path'
+                'render': (data, type, full, meta) ->
+                  { path , entry_id } = full
+                  if type == 'display'
+                    path = td_truncate(data, 20)
+                  return '<span class="esc-tooltipped td-truncate" id="path_' + entry_id + '" title="' + path + '">' + path + '</span>'
+              }
+              {
+                'render': (data, type, full, meta) ->
+                  categories = ''
+                  category = ''
+                  plus = ''
+                  { category , entry_id } = full
+                  if category
+                    categories = category.split(',')
+                    category = categories[0]
+                    if category == "Not in our list"
+                      category = ""
+                  '<span id="category_' + entry_id + '">' + category + '</span>'
+              }
+              {
+                data: 'suggested_category'
+              }
+              {
+                data: 'wbrs_score'
+                width: '20px'
+                'render': (data, type, full, meta) ->
+                  '<span id="wbrs_score_' + full.entry_id + '">' + data + '</span>'
+              }
+              {
+                data: 'submitter_type'
+                'render': (data) ->
+                  if data == 'CUSTOMER'
+                    '<button class="complaint-submitter-type icon-custom-star esc-tooltipped" title="Customer"></button>'
+                  else
+                    data
+              }
+              {
+                data: 'company_name'
+              }
+              {
+                data: 'assigned_to'
+              }
+              {
+                data: 'age_int'
+                visible: false
+              }
+            ]
         select: 'style': 'os'
         responsive: true)
 
   if $('#complaints-index').length
     build_complaints_table()
-#    build_complaints_table()
-##    .then( (response)-> build_complaints_table(response) )
 
     $('#complaints-index_filter input').addClass('table-search-input');
 
