@@ -572,7 +572,6 @@ $ ->
           return '<input type="checkbox" onclick="toggleRow(this)" name="cbox" class="dispute_check_box" id="cbox' + data + '" value="' + data + '" data-sha="' + full['sha256_hash'] + '"/>'
       }
       {
-#        need to zeropad this thing
         data: 'id'
         render: (data, type, full, meta) ->
           return '<a href="/escalations/file_rep/disputes/' + data + '">' + parseInt(data).pad(6) + '</a>'
@@ -600,16 +599,20 @@ $ ->
         render: (data) ->
           return data + ' KB'
       }
-      { data: 'sample_type'}
+      {
+        data: 'sample_type'
+        render: (data) ->
+          return '<span title="' + data + '" class="esc-tooltipped">' + data + '</span>'
+      }
       {
         data: 'disposition'
         render: (data) ->
           if data == null
             return
           if data == 'malicious'
-            return '<span class="malicious text-capitalize"> malicious </span>'
+            return '<span class="malicious text-capitalize">' + data + '</span>'
           else
-            return  '<span class="text-capitalize"> ' + data + ' </span>'
+            return  '<span class="text-capitalize">' + data + '</span>'
       }
       {
         data: 'detection_name'
@@ -724,10 +727,15 @@ $ ->
           if data == null
             return
           if data.toLowerCase() == 'malicious'
-            return '<span class="malicious text-capitalize"> malicious</span>'
+            return '<span class="malicious text-capitalize">' + data + '</span>'
           else
-            return  '<span class="text-capitalize"> ' + data + ' </span>'
+            return  '<span class="text-capitalize">' + data + '</span>'
 
+      }
+      {
+        data: 'description'
+        render: (data) ->
+          return '<span title="' + data + '" class="esc-tooltipped dispute-description">' + data + '</span>'
       }
       {
         data: 'created_at'
@@ -1252,6 +1260,7 @@ $ ->
       data['threatgrid-score'] = $("#threatgrid-score-checkbox").is(':checked')
       data['reversing-labs'] = $("#reversing-labs-checkbox").is(':checked')
       data['suggested-disp'] = $("#suggested-disp-checkbox").is(':checked')
+      data['dispute-details'] = $("#dispute-details-checkbox").is(':checked')
       data['time-submitted'] = $("#time-submitted-checkbox").is(':checked')
       data['submitter-type'] = $("#submitter-type-checkbox").is(':checked')
       data['customer-name'] = $("#customer-name-checkbox").is(':checked')

@@ -26,27 +26,29 @@
             %input{type: 'checkbox', id: 'amp-last-set-checkbox'} AMP Detection Last Set
           %li.toggle-vis-file-rep{'data-column':'11'}
             %input{type: 'checkbox', id: 'in-zoo-checkbox'} In Zoo
-
-        %ul
           %li.toggle-vis-file-rep{'data-column':'12'}
             %input{type: 'checkbox', checked: true, id: 'sandbox-score-checkbox' } Sandbox Score
+
+        %ul
           %li.toggle-vis-file-rep{'data-column':'13'}
             %input{type: 'checkbox', checked: true, id: 'threatgrid-score-checkbox'} TG Score
           %li.toggle-vis-file-rep{'data-column':'14'}
             %input{type: 'checkbox', checked: true, id: 'reversing-labs-checkbox'} Reversing Labs
           %li.toggle-vis-file-rep{'data-column':'15'}
             %input{type: 'checkbox', checked: true, id: 'suggested-disp-checkbox'} Suggested Disposition
-          %li.toggle-vis-file-rep{'data-column':'16'}
-            %input{type: 'checkbox', id: 'time-submitted-checkbox'} Time Submitted
+          %li.toggle-vis-file-rep{'data-column': '16'}
+            %input{type: 'checkbox', id: 'dispute-details-checkbox'} Dispute Details
           %li.toggle-vis-file-rep{'data-column':'17'}
-            %input{type: 'checkbox', id: 'submitter-type-checkbox'} Submitter Type
+            %input{type: 'checkbox', id: 'time-submitted-checkbox'} Time Submitted
           %li.toggle-vis-file-rep{'data-column':'18'}
-            %input{type: 'checkbox', id: 'customer-name-checkbox'} Customer Name
+            %input{type: 'checkbox', id: 'submitter-type-checkbox'} Submitter Type
           %li.toggle-vis-file-rep{'data-column':'19'}
-            %input{type: 'checkbox', id: 'customer-org-checkbox'} Customer Organization
+            %input{type: 'checkbox', id: 'customer-name-checkbox'} Customer Name
           %li.toggle-vis-file-rep{'data-column':'20'}
-            %input{type: 'checkbox', checked: true, id: 'customer-email-checkbox'} Customer Email
+            %input{type: 'checkbox', id: 'customer-org-checkbox'} Customer Organization
           %li.toggle-vis-file-rep{'data-column':'21'}
+            %input{type: 'checkbox', checked: true, id: 'customer-email-checkbox'} Customer Email
+          %li.toggle-vis-file-rep{'data-column':'22'}
             %input{type: 'checkbox', id: 'assignee-checkbox'} Assignee
 
   - if can?(:update, FileReputationDispute)
