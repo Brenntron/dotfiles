@@ -1512,84 +1512,84 @@ window.commit_marked = () ->
       popup_response_error(response, 'Error committing marked entries.')
   )
 
+#
+#window.advanced_webcat_index_table = () ->
+#  console.log 'inininin'
+#  complaint_save_search_format = /[!@#$%^&*()_+\-=\[\]{};':"\\|,.<>\/?]/
+#  data = {
+#    customer: {
+#      name: $('#cat_named_search').find('input[id="name-input"]').val()
+#      email: $('#cat_named_search').find('input[id="email-input"]').val()
+#      company_name: $('#cat_named_search').find('input[id="company-input"]').val()
+#    }
+#    complaint_entries: {
+#      ip_or_uri: $('#cat_named_search').find('input[id="complaint-input"]').val()
+#      resolution: $('#cat_named_search').find('input[id="resolution-input"]').val()
+#      category: $('#cat_named_search').find('input[id="category-input"]').val()
+#      status: $('#cat_named_search').find('input[id="status-input"]').val()
+#      complaint_id: $('#cat_named_search').find('input[id="complaintid-input"]').val().split(",")
+#    }
+#    search_type: 'advanced'
+#    search_name: $('#cat_named_search').find('input[name="search_name"]').val()
+#    description: $('#cat_named_search').find('input[id="desc-input"]').val()
+#    channel: $('#cat_named_search').find('input[id="channel-input"]').val()
+#    tags: $('#cat_named_search').find('select[id="tags-input"]').val() || []
+#    submitted_older: $('#cat_named_search').find('input[id="submitted-older-input"]').val()
+#    submitted_newer: $('#cat_named_search').find('input[id="submitted-newer-input"]').val()
+#    modified_older: $('#cat_named_search').find('input[id="modified-older-input"]').val()
+#    modified_newer: $('#cat_named_search').find('input[id="modified-newer-input"]').val()
+#  }
 
-window.advanced_webcat_index_table = () ->
-  console.log 'inininin'
-  complaint_save_search_format = /[!@#$%^&*()_+\-=\[\]{};':"\\|,.<>\/?]/
-  data = {
-    customer: {
-      name: $('#cat_named_search').find('input[id="name-input"]').val()
-      email: $('#cat_named_search').find('input[id="email-input"]').val()
-      company_name: $('#cat_named_search').find('input[id="company-input"]').val()
-    }
-    complaint_entries: {
-      ip_or_uri: $('#cat_named_search').find('input[id="complaint-input"]').val()
-      resolution: $('#cat_named_search').find('input[id="resolution-input"]').val()
-      category: $('#cat_named_search').find('input[id="category-input"]').val()
-      status: $('#cat_named_search').find('input[id="status-input"]').val()
-      complaint_id: $('#cat_named_search').find('input[id="complaintid-input"]').val().split(",")
-    }
-    search_type: 'advanced'
-    search_name: $('#cat_named_search').find('input[name="search_name"]').val()
-    description: $('#cat_named_search').find('input[id="desc-input"]').val()
-    channel: $('#cat_named_search').find('input[id="channel-input"]').val()
-    tags: $('#cat_named_search').find('select[id="tags-input"]').val() || []
-    submitted_older: $('#cat_named_search').find('input[id="submitted-older-input"]').val()
-    submitted_newer: $('#cat_named_search').find('input[id="submitted-newer-input"]').val()
-    modified_older: $('#cat_named_search').find('input[id="modified-older-input"]').val()
-    modified_newer: $('#cat_named_search').find('input[id="modified-newer-input"]').val()
-  }
+#  if complaint_save_search_format.test(data.search_name) == true
+#    std_msg_error('save search name error', ['Please enter a name without any special character', 'Example: !@#$%^&*()'])
+#  else
+#    window.populate_advanced_webcat_index_table(data)
 
-  if complaint_save_search_format.test(data.search_name) == true
-    std_msg_error('save search name error', ['Please enter a name without any special character', 'Example: !@#$%^&*()'])
-  else
-    window.populate_advanced_webcat_index_table(data)
-
-
-window.populate_advanced_webcat_index_table = (data = {}) ->
-  console.log data
-  $('#loader-modal').modal({
-    keyboard: false
-  })
-  headers = {'Token': $('input[name="token"]').val(), 'Xmlrpc-Token': $('input[name="xml_token"]').val()}
-  $.ajax(
-    url: '/escalations/api/v1/escalations/webcat/complaint_entries'
-    method: 'GET'
-    headers: headers
-    data: data
-    data_json: JSON.stringify(data)
-    success: (response) ->
-
-      json = $.parseJSON(response)
-      if json.error
-        notice_html = "<p>Something went wrong: #{json.error}</p>"
-        $('#loader-modal').modal 'hide'
-        alert(json.error)
-      else
-        if json.search_name.length > 0
-          searchId = 'saved_search_' + json.search_id
-          if $('#saved-search-tbody tr#' + searchId).length == 0
-            $('#saved-search-tbody').append(complaint_named_search_tag(json.search_name, json.search_id))
-
-        $('.tickets-totals-table').trigger("click") #close open dropdowns
-        datatable = $('#complaints-index').DataTable()
-        datatable.clear();
-        datatable.rows.add(json.data);
-        datatable.draw();
-        $('#loader-modal').modal 'hide'
-
-      error: (response) ->
-        $('#loader-modal').modal 'hide'
-        std_api_error(response, "There was an error loading search results.", reload: false)
-  , this)
+#
+#window.populate_advanced_webcat_index_table = (data = {}) ->
+#  console.log data
+#  $('#loader-modal').modal({
+#    keyboard: false
+#  })
+#  headers = {'Token': $('input[name="token"]').val(), 'Xmlrpc-Token': $('input[name="xml_token"]').val()}
+#  $.ajax(
+#    url: '/escalations/api/v1/escalations/webcat/complaint_entries'
+#    method: 'GET'
+#    headers: headers
+#    data: data
+#    data_json: JSON.stringify(data)
+#    success: (response) ->
+#
+#      json = $.parseJSON(response)
+#      if json.error
+#        notice_html = "<p>Something went wrong: #{json.error}</p>"
+#        $('#loader-modal').modal 'hide'
+#        alert(json.error)
+#      else
+#        if json.search_name.length > 0
+#          searchId = 'saved_search_' + json.search_id
+#          if $('#saved-search-tbody tr#' + searchId).length == 0
+#            $('#saved-search-tbody').append(complaint_named_search_tag(json.search_name, json.search_id))
+#
+#        $('.tickets-totals-table').trigger("click") #close open dropdowns
+#        datatable = $('#complaints-index').DataTable()
+#        datatable.clear();
+#        datatable.rows.add(json.data);
+#        datatable.draw();
+#        $('#loader-modal').modal 'hide'
+#
+#      error: (response) ->
+#        $('#loader-modal').modal 'hide'
+#        std_api_error(response, "There was an error loading search results.", reload: false)
+#  , this)
 
 
-window.named_webcat_index_table = (search_name) ->
-  data = {
-    search_type: 'named'
-    search_name: search_name
-  }
-  window.populate_advanced_webcat_index_table(data)
+#window.named_webcat_index_table = (search_name) ->
+#  data = {
+#    search_type: 'named'
+#    search_name: search_name
+#  }
+#  window.populate_advanced_webcat_index_table(data)
 
 
 window.load_screenshot = (img_tag, complaint_entry_id) ->

@@ -20,6 +20,40 @@ $ ->
         localStorage.search_conditions = JSON.stringify({value:search_string})
       refresh_url()
 
+  window.set_webcat_advanced = () ->
+    # creating form object from array made from advanced dropdown form
+    form = {}
+    for item in $('#cat_named_search').serializeArray()
+      { name, value } = item
+      name = name.toLowerCase().replace(/-/g, '_')
+      form[name] = value
+
+    localStorage.search_type = 'advanced'
+    localStorage.search_name = form.name
+    localStorage.search_conditions = JSON.stringify(
+      status: form.status
+      description: form.description
+      ip_address: form.complaint_id
+      resolution: form.resolution
+      channel: form.channel
+      category: form.category
+      customer_name: form.customer_name
+      customer_email: form.customer_email
+      company: form.company
+      tags: form.tags
+      submitted_older: form.date_submitted_older
+      submitted_newer: form.date_submitted_newer
+      modified_older: form.date_modified_newer
+      modified_newer: form.date_modified_older
+    )
+#    refresh_url()
+  window.build_named_search = (search_name) ->
+    localStorage.search_type = 'named'
+    localStorage.search_name = search_name
+    localStorage.removeItem('search_conditions')
+
+    refresh_url()
+
   build_data = () ->
     { search_type, search_name, search_conditions } = localStorage
     { search } = location
@@ -28,18 +62,27 @@ $ ->
       search_type = 'standard'
 
     switch(search_type)
-      when 'contains'
-        search_conditions = JSON.parse(search_conditions)
+      when 'advanced'
         data = {
           search_type: search_type
-          search_conditions: search_conditions
+          search_name : search_name
+          search_conditions: JSON.parse(search_conditions)
+        }
+      when 'contains'
+        data = {
+          search_type: search_type
+          search_conditions: JSON.parse(search_conditions)
         }
       when 'standard'
         data = {
           search_type: search_type
           search_name: search.replace('?f=', '')
         }
-    console.log data
+      when 'named'
+        data = {
+          search_type: search_type
+          search_name: search.replace('?f=', '')
+        }
     data
 
   refresh_url = (href) ->
@@ -69,7 +112,6 @@ $ ->
   url = $('#complaints-index').data('source')
   current_url = window.location.href
   complaint_table = ''
-
 
   build_complaints_table = () ->
         complaint_table = $('#complaints-index').DataTable(
