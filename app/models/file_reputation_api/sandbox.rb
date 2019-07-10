@@ -34,7 +34,7 @@ class FileReputationApi::Sandbox
     endpoint = "/ntu/1/disposition"
     query_string = {
         "hash" => sha256,
-        "apikey" => type_based_api_key(FileReputationDispute::SUBMITTER_TYPE_AC_REFRESH)
+        "apikey" => type_based_api_key(FileReputationDispute::SANDBOX_KEY_AC_REFRESH)
     }
     begin
       response = call_request_parsed(:get, endpoint, :input => query_string)
@@ -109,7 +109,7 @@ class FileReputationApi::Sandbox
     query_string = {
         "hash" => sha256,
         "runid" => runid,
-        "apikey" => type_based_api_key(FileReputationDispute::SUBMITTER_TYPE_AC_REFRESH)
+        "apikey" => type_based_api_key(FileReputationDispute::SANDBOX_KEY_AC_REFRESH)
     }
 
     begin
@@ -134,7 +134,7 @@ class FileReputationApi::Sandbox
 
     query_string = {
         "hash" => sha256_hash,
-        "apikey" => type_based_api_key(FileReputationDispute::SUBMITTER_TYPE_AC_REFRESH)
+        "apikey" => type_based_api_key(FileReputationDispute::SANDBOX_KEY_AC_REFRESH)
     }
 
     begin

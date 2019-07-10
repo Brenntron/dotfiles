@@ -28,10 +28,14 @@ class FileReputationDispute < ApplicationRecord
   DISPOSITION_COMMON        = 'common'
   DISPOSITION_CLEAN         = 'clean'
 
-  SUBMITTER_TYPE_AC_REFRESH = 'AC-Refresh'
-  SUBMITTER_TYPE_AC_FORM    = 'AC-Form'
-  SUBMITTER_TYPE_TI_FORM    = 'TI-Form'
-  SUBMITTER_TYPE_TI_API     = 'TI-API'
+  SANDBOX_KEY_AC_REFRESH = 'AC-Refresh'
+  SANDBOX_KEY_AC_FORM    = 'AC-Form'
+  SANDBOX_KEY_TI_FORM    = 'TI-Form'
+  SANDBOX_KEY_TI_API     = 'TI-API'
+
+  SUBMITTER_TYPE_CUSTOMER = "CUSTOMER"
+  SUBMITTER_TYPE_NONCUSTOMER = "NON-CUSTOMER"
+  SUBMITTER_TYPE_INTERNAL = "INTERNAL"
 
   RESOLUTION_AUTORESOLVED               = 'Auto Resolved'
   RESOLUTION_DUPLICATE              = 'DUPLICATE'
@@ -150,7 +154,8 @@ class FileReputationDispute < ApplicationRecord
         disposition_suggested: disposition_suggested,
         source: source,
         platform: platform,
-        customer: customer
+        customer: customer,
+        submitter_type: SUBMITTER_TYPE_INTERNAL
     }
     file_rep.assign_attributes(attributes)
 
@@ -192,9 +197,10 @@ class FileReputationDispute < ApplicationRecord
         sha256_hash: sha256_hash,
         disposition_suggested: disposition_suggested.downcase,
         user_id: assignee_id,
-        submitter_type: SUBMITTER_TYPE_AC_FORM,
+        sandbox_key: SANDBOX_KEY_AC_FORM,
         customer_id: customer.id,
-        status: STATUS_ASSIGNED
+        status: STATUS_ASSIGNED,
+        submitter_type: SUBMITTER_TYPE_INTERNAL
     }
 
     file_rep.assign_attributes(attributes)
@@ -464,7 +470,7 @@ class FileReputationDispute < ApplicationRecord
     end
   end
 
-  def update_sandbox_score(api_key_type: self.submitter_type)
+  def update_sandbox_score(api_key_type: self.sandbox_key)
     sandbox_score = FileReputationApi::Sandbox.score(self.sha256_hash, api_key_type: api_key_type)
     sandbox_threshold = self.pdf? ? 90.0 : 61.0
     update!(sandbox_score: sandbox_score, sandbox_threshold: sandbox_threshold)
@@ -505,7 +511,7 @@ class FileReputationDispute < ApplicationRecord
   def update_superfecta
     update_threadgrid_score
     update_reversing_labs_score
-    update_sandbox_score(api_key_type: SUBMITTER_TYPE_AC_REFRESH)
+    update_sandbox_score(api_key_type: SANDBOX_KEY_AC_REFRESH)
     update_sample_zoo
   end
 
@@ -584,9 +590,12 @@ class FileReputationDispute < ApplicationRecord
         new_dispute.disposition_suggested = message_payload[:payload][:disposition_suggested]
         new_dispute.source = message_payload[:payload][:source]
         new_dispute.platform = message_payload[:payload][:platform]
-        new_dispute.submitter_type = message_payload[:payload][:submitter_type]
+        new_dispute.sandbox_key = message_payload[:payload][:sandbox_key]
         new_dispute.ticket_source_key = message_payload[:source_key]
         new_dispute.description = message_payload[:payload][:summary_description]
+
+        new_dispute.customer_id = customer&.id
+        new_dispute.submitter_type = (new_dispute.customer.nil? || new_dispute.customer&.company_id == guest.id) ? SUBMITTER_TYPE_NONCUSTOMER : SUBMITTER_TYPE_CUSTOMER
 
 
         check_for_duplicate = FileReputationDispute.where(sha256_hash: message_payload[:payload][:sha256]).where.not(status: FileReputationDispute::STATUS_RESOLVED)
