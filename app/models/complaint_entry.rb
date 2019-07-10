@@ -444,8 +444,8 @@ class ComplaintEntry < ApplicationRecord
         advanced_search(params, search_name: search_name, user: user)
       when 'named'
         named_search(search_name, user: user)
-      when 'filter'
-        filter_search(params, user: user)
+      when 'standard'
+        standard_search(search_name, user: user)
       when 'contains'
         contains_search(params[:value])
       else
@@ -485,8 +485,8 @@ class ComplaintEntry < ApplicationRecord
   # Searches specific to quick generic button filters.
   # @param [ActiveRecord::Relation] base_relation relation to chain this search onto.
   # @return [ActiveRecord::Relation]
-  def self.filter_search(params, user:)
-    case params[:filter_by]
+  def self.standard_search(search_name, user:)
+    case search_name
       when "NEW"
         where(status:"NEW")
       when "COMPLETED"
