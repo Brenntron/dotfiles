@@ -198,7 +198,7 @@ class Escalations::Webrep::DisputesController < ApplicationController
 
 
           # Build the headers of each individual worksheet
-          my_open_tickets_headers = ['Case ID', 'Submitter Type', 'Ticket Type', 'Priority', 'Dispute Preview', 'Last Comment', 'Last Comment Date', 'Comment Count', 'Entry Count']
+          my_open_tickets_headers = ['Case ID', 'Submitter Type', 'Ticket Type', 'Priority', 'Dispute Preview', 'Last Comment Date', 'Comment Count', 'Entry Count']
           my_closed_tickets_headers = ['Case ID', 'Submitter Type', 'Ticket Type', 'Priority', 'Dispute Preview', 'Time to Close', 'Entry Count']
           total_ticket_entries_closed_headers = ['Date', 'Web', 'Email', 'Web_Email', 'Total']
           time_to_close_tickets_headers = ['Ticket', 'Time (hrs)']
@@ -218,7 +218,7 @@ class Escalations::Webrep::DisputesController < ApplicationController
           # My Open Tickets
           my_open_tickets_data = Dispute.open_tickets_report([current_user], params[:startdate], params[:enddate])
           my_open_tickets_data[:table_data].each do |d|
-            data_values = [d[:case_number], d[:submitter_type], d[:submission_type], d[:priority], ActionController::Base.helpers.strip_tags(d[:d_entry_preview]).gsub(/ *\d+$/, ''), d[:last_comment], d[:last_comment_date], d[:comment_count], ActionController::Base.helpers.strip_tags(d[:d_entry_preview]).scan(/\d+/).last]
+            data_values = [d[:case_number], d[:submitter_type], d[:submission_type], d[:priority], ActionController::Base.helpers.strip_tags(d[:d_entry_preview]).gsub(/ *\d+$/, ''), d[:last_comment_date], d[:comment_count], ActionController::Base.helpers.strip_tags(d[:d_entry_preview]).scan(/\d+/).last]
             # The Rails `strip_tags` method doesn't work directly in this controller and I don't know why.
             insert_row_with_data(data_values, mytickets_xlsx, mytickets_workbook_names[:my_open_tickets])
           end
@@ -328,7 +328,6 @@ class Escalations::Webrep::DisputesController < ApplicationController
               'Ticket Type',
               'Priority',
               'Dispute Preview',
-              'Last Comment',
               'Last Comment Date',
               'Comment Count',
               'Entry Count']
@@ -364,7 +363,6 @@ class Escalations::Webrep::DisputesController < ApplicationController
                 d[:submission_type],
                 d[:priority],
                 ActionController::Base.helpers.strip_tags(d[:d_entry_preview]).gsub(/ *\d+$/, ''),
-                d[:last_comment],
                 d[:last_comment_date],
                 d[:comment_count],
                 ActionController::Base.helpers.strip_tags(d[:d_entry_preview]).scan(/\d+/).last
