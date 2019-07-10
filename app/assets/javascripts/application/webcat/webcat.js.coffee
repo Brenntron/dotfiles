@@ -8,12 +8,12 @@ window.td_truncate = (str, max, long) ->
 $ ->
 
   $('#web-cat-search #general_search').on 'keyup', (e) ->
-    { keyCode }= e
+    { keyCode } = e
+    { search_type, search_name, search_conditions }= localStorage
     if keyCode == 13
       search_string = $('#web-cat-search .search-box').val()
       if search_string == ''
        refresh_localStorage()
-       refresh_url()
       else
         localStorage.search_type = 'contains'
         localStorage.search_name = ''
@@ -63,27 +63,26 @@ $ ->
 
     switch(search_type)
       when 'advanced'
-        data = {
+        return {
           search_type: search_type
           search_name : search_name
           search_conditions: JSON.parse(search_conditions)
         }
       when 'contains'
-        data = {
+        return {
           search_type: search_type
           search_conditions: JSON.parse(search_conditions)
         }
       when 'standard'
-        data = {
+        return {
           search_type: search_type
           search_name: search.replace('?f=', '')
         }
       when 'named'
-        data = {
+        return {
           search_type: search_type
           search_name: search.replace('?f=', '')
         }
-    data
 
   refresh_url = (href) ->
     { search_type, search_name } = localStorage
@@ -121,7 +120,6 @@ $ ->
             url: url
             data: build_data()
           pagingType: 'full_numbers'
-
           order: [ [
             3
             'desc'
