@@ -379,10 +379,8 @@ module API
                   prefixes.each do |prefix|
                     if prefix.subdomain == url[:subdomain] && prefix.path == url[:path]
                       prefix_id = prefix.prefix_id
-                      response = Wbrs::HistoryRecord.where({:prefix_id => prefix_id}).sort_by {|history| DateTime.parse(history.time)}.reverse
-                      response.each do |resp|
-                        prefix_history << resp
-                      end
+
+                      prefix_history = Wbrs::HistoryRecord.where({:prefix_id => prefix_id}).sort_by {|history| DateTime.parse(history.time)}.reverse
                     end
                   end
 
