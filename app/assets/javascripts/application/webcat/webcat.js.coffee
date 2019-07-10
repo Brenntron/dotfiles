@@ -25,7 +25,7 @@ $ ->
     { search } = location
 
     if search != ''
-      search_type = 'filter'
+      search_type = 'standard'
 
     switch(search_type)
       when 'contains'
@@ -34,10 +34,10 @@ $ ->
           search_type: search_type
           search_conditions: search_conditions
         }
-      when 'filter'
+      when 'standard'
         data = {
           search_type: search_type
-          filter_by: search.replace('?f=', '')
+          search_name: search.replace('?f=', '')
         }
     console.log data
     data
