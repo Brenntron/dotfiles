@@ -11,10 +11,9 @@ $ ->
     { keyCode }= e
     if keyCode == 13
       search_string = $('#web-cat-search .search-box').val()
-      search_string
       if search_string == ''
-#       refresh_localStorage()
-#       refresh_url()
+       refresh_localStorage()
+       refresh_url()
       else
         localStorage.search_type = 'contains'
         localStorage.search_name = ''
@@ -29,7 +28,6 @@ $ ->
         search_type: search_type
         search_conditions: search_conditions
       }
-      console.log data
     return data
 
   refresh_url = (href) ->
@@ -40,6 +38,11 @@ $ ->
       window.location.replace(new_url + href)
     if !href && typeof parseInt(url_check) == 'number'
       window.location.replace('/escalations/webcat/complaints')
+
+  refresh_localStorage = () ->
+    localStorage.removeItem('search_type')
+    localStorage.removeItem('search_name')
+    localStorage.removeItem('search_conditions')
 
   $('.cat_new_url').selectize {
     persist: false,
@@ -61,10 +64,7 @@ $ ->
           serverSide: true
           ajax:
             url: url
-            data: {
-              search_type: 'contains'
-              search_conditions: {value: 'tys.blob'}
-            }
+            data: build_data()
           pagingType: 'full_numbers'
 
           order: [ [
