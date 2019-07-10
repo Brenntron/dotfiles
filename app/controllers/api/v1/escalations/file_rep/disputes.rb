@@ -54,7 +54,7 @@ module API
                       file_rep = FileReputationDispute.create_through_form(bugzilla_rest_session,
                                                                 sha256,
                                                                 params[:disposition_suggested],
-                                                                params[:assignee])
+                                                                user_validation.first.id)
                       uniques[file_rep.id] = sha256
                     else
                       duplicates << sha256
