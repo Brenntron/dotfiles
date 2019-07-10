@@ -447,7 +447,7 @@ class ComplaintEntry < ApplicationRecord
       when 'filter'
         filter_search(params, user: user)
       when 'contains'
-        contains_search(params[:search])
+        contains_search(params[:value])
       else
         where({})
     end
