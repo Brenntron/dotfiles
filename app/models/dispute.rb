@@ -1308,7 +1308,9 @@ class Dispute < ApplicationRecord
                       :submission_type => result.submission_type.upcase,
                       :last_comment => last_comment_preview,
                       :owner => ticket_user,
-                      :priority => result.priority
+                      :priority => result.priority,
+                      :last_comment_date => result.latest_comment_date,
+                      :comment_count => result.dispute.dispute_comments.count
       }
     end
 
