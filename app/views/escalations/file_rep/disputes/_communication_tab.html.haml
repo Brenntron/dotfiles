@@ -82,7 +82,7 @@
       .col-xs-12.email-header-information
         .email-header-data
           .communication-subject
-            Talosintelligence.com support request #{@file_rep_dispute.id}
+            Talosintelligence.com File Support Request #{@file_rep_dispute.id}
           .sender-receiver-info
             %span.content-label-sm From
             %span.author-username
@@ -98,8 +98,11 @@
 
         .email-response-button-wrapper
           .email-response-buttons
-            %button.reply-button
-            %button.forward-button
+            - if @file_rep_dispute.dispute_emails.blank?
+              %button.reply-button.first-reply-button.esc-tooltipped{title: 'Begin email chain with customer'}
+            - else
+              %button.reply-button
+              %button.forward-button
           %span.email-datetime
             =@file_rep_dispute.created_at.strftime("%Y-%m-%d")
             %br
@@ -246,13 +249,25 @@
                         %button.delete-email
                 .row
                   .col-xs-12
-                    %input.communication-subject.reply-subject{type: 'text', value: "Talosintelligence.com support request #{@file_rep_dispute.id}"}
+                    %input.communication-subject.reply-subject{type: 'text', value: "Talosintelligence.com File Support Request #{@file_rep_dispute.id}"}
                 .row
                   .col-xs-12.file-wrapper-reply
                     #file-fields
             .row
               .col-xs-12.email-reply-body-wrapper
                 %textarea.email-reply-body.reply-body{autofocus: true, maxlength: 64000}
+                  - if @file_rep_dispute.dispute_emails.blank?
+                    Talosintelligence.com File Support Request #{@file_rep_dispute.id}
+                    &#013;
+                    \--------------------------------------------------------------------------
+                    &#013;
+                    SHA256 Submitted: #{@file_rep_dispute.sha256_hash}
+                    &#013;
+                    Suggested Disposition: #{@file_rep_dispute.disposition_suggested}
+                    &#013;
+
+                    - if @file_rep_dispute.ticket_source_key
+                      Ticket: https://talosintelligence.com/tickets/#{@file_rep_dispute.ticket_source_key}
 
         .row
           .col-xs-12.text-center

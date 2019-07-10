@@ -3687,6 +3687,8 @@ input.communication-subject {
 .reply-button   {background-image: url(image_path('icon_reply_white.svg'));}
 .forward-button {background-image: url(image_path('icon_forward_white.svg'));}
 
+.reply-button.first-reply-button {background-image: url(image_path('icon_email_new_white.svg'));}
+
 .new-email-button {
   background-image: url(image_path('icon_email_new_white.svg'));
   background-repeat: no-repeat;
