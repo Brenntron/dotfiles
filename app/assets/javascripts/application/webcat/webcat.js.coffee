@@ -22,13 +22,25 @@ $ ->
 
   build_data = () ->
     { search_type, search_name, search_conditions } = localStorage
-    if search_type == 'contains'
-      search_conditions = JSON.parse(search_conditions)
-      data = {
-        search_type: search_type
-        search_conditions: search_conditions
-      }
-    return data
+    { search } = location
+
+    if search != ''
+      search_type = 'standard'
+
+    switch(search_type)
+      when 'contains'
+        search_conditions = JSON.parse(search_conditions)
+        data = {
+          search_type: search_type
+          search_conditions: search_conditions
+        }
+      when 'standard'
+        data = {
+          search_type: search_type
+          search_name: search.replace('?f=', '')
+        }
+    console.log data
+    data
 
   refresh_url = (href) ->
     { search_type, search_name } = localStorage
@@ -57,6 +69,7 @@ $ ->
   url = $('#complaints-index').data('source')
   current_url = window.location.href
   complaint_table = ''
+
 
   build_complaints_table = () ->
         complaint_table = $('#complaints-index').DataTable(
@@ -181,18 +194,19 @@ $ ->
               {
                 data: 'tags'
                 render: ( data )->
-                  tags = data.substring( 1, data.length-1 ).replace(/&quot;/g,'');
-                  tag_items = ''
-                  tag_list = tags.split(',').map ( tag ) -> return tag.trim();
-                  tag_list = tag_list.filter ( tag, index )-> return tag_list.indexOf( tag ) == index && tag != ''
+                  if data
+                    tags = data.substring( 1, data.length-1 ).replace(/&quot;/g,'');
+                    tag_items = ''
+                    tag_list = tags.split(',').map ( tag ) -> return tag.trim();
+                    tag_list = tag_list.filter ( tag, index )-> return tag_list.indexOf( tag ) == index && tag != ''
 
-                  if tag_list.length
-                    for tag in tag_list
-                      item = '<span class="tag-capsule">' + tag + '</span>'
-                      tag_items += item
-                  else
-                    tag_items = '<span class="missing-data">No tags</span>'
-                  tag_items
+                    if tag_list.length
+                      for tag in tag_list
+                        item = '<span class="tag-capsule">' + tag + '</span>'
+                        tag_items += item
+                    else
+                      tag_items = '<span class="missing-data">No tags</span>'
+                    tag_items
               }
               {
 #                subdomain column
