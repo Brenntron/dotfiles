@@ -296,38 +296,6 @@ $ ->
     $('#complaints-index tbody').on 'click', 'td.expandable-row-column', ->
       click_table_buttons complaint_table, this
 
-#    $('#general_search').on 'keyup', (e) ->
-#      if event.keyCode == 13
-#        # do the ajax call
-#        $('#loader-modal').modal({
-#          keyboard: false
-#        })
-#        filter = this.value
-#        headers = {'Token': $('input[name="token"]').val(), 'Xmlrpc-Token': $('input[name="xml_token"]').val()}
-#        $.ajax(
-#          url: 'escalations/webcat/complaint_entries'
-#          method: 'GET'
-#          headers: headers
-#          success: (response) ->
-#
-#            json = $.parseJSON(response)
-#            if json.error
-#              $('#loader-modal').modal 'hide'
-#              notice_html = "<p>Something went wrong: #{json.error}</p>"
-#              alert(json.error)
-#            else
-#              datatable = $('#complaints-index').DataTable()
-#              datatable.clear();
-#              datatable.rows.add(json.data);
-#              datatable.draw();
-#              $('#loader-modal').modal 'hide'
-#
-#          error: (response) ->
-#            $('#loader-modal').modal 'hide'
-#            std_api_error(response, "There was an error loading search results.", reload: false)
-#        , this)
-
-
     # advanced search tags
     createSelectOptions = ->
       tags = $('#search_tag_list')[0]
