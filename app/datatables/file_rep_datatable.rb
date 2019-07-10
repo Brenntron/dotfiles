@@ -122,22 +122,22 @@ class FileRepDatatable < AjaxDatatablesRails::ActiveRecord
         end
 
     if @search_type
-      @search_results = base_search.robust_search(@search_type, search_name: @search_name, params: @search_conditions, user: @user)
+      base_search.robust_search(@search_type, search_name: @search_name, params: @search_conditions, user: @user)
     else
-      @search_results = base_search
+      base_search
     end
   end
 
   def sort_records(records)
     case datatable.orders.first.column.sort_query
       when 'file_reputation_disputes.assigned'
-        @search_results.joins(:user).order("users.cvs_username #{datatable.orders.first.direction}")
+        super.joins(:user).order("users.cvs_username #{datatable.orders.first.direction}")
       when 'file_reputation_disputes.customer_name'
-        @search_results.joins(:customer).order("customers.name #{datatable.orders.first.direction}")
+        super.joins(:customer).order("customers.name #{datatable.orders.first.direction}")
       when 'file_reputation_disputes.customer_email'
-        @search_results.joins(:customer).order("customers.email #{datatable.orders.first.direction}")
+        super.joins(:customer).order("customers.email #{datatable.orders.first.direction}")
       when 'file_reputation_disputes.customer_company_name'
-        @search_results.joins(customer: :company).order("companies.name #{datatable.orders.first.direction}")
+        super.joins(customer: :company).order("companies.name #{datatable.orders.first.direction}")
       else
         super
     end
