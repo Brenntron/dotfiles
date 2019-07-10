@@ -160,7 +160,8 @@ $ ->
     form_data.append('dispute_id', $('input[name="dispute_id"]').val())
     form_data.append('to', $('.receiver-email')[1].textContent)
     form_data.append('subject', $('input[type=text].reply-subject').val())
-    form_data.append('dispute_email_id', $('.current-email-view').attr('email_id'))
+    form_data.append('dispute_email_id', $('.current-email-view').attr('email_id')) if $('.current-email-view').attr('email_id')
+    form_data.append('dispute_type', $('input[name="dispute_type"]').val())
 
 
     $.ajax(
