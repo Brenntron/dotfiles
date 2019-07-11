@@ -49,7 +49,7 @@ $ ->
       modified_older: form.date_modified_newer
       modified_newer: form.date_modified_older
     )
-    
+
     refresh_url()
 
   window.build_named_search = (search_name) ->
