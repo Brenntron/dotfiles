@@ -73,10 +73,8 @@
         .communication-toolbar
           %button.new-email-button
             Compose New Email
-
-          -#  Uncomment if / when we decide to have email templates
-          -#%button.mng-templates-button
-          -#  Manage Email Templates
+          %button.mng-templates-button
+            Manage Email Templates
 
     .row
       .col-xs-12.email-header-information.hidden
@@ -156,55 +154,54 @@
     -#      Cancel
 
 
-    -###### Below is the dialog for managing email template responses pulled over from web rep, this can be added in later
+    -#### TODO - Create File Rep Email Template stuff on the back end and hook up here
+    #manageTemplatesDialog{title: 'Manage Email Templates'}
+      %table.table
+        %thead
+          %tr.table-header-highlight
+            %th Template Name
+            %th Description
+            %th.min70
+          -EmailTemplate.all.each do |template|
+            %tr
+              %td=template.template_name
+              %td=template.description
+              %td
+                %button.table-button.edit-button.edit-template{template_id: template.id, name: 'edit-template'}
+                %button.table-button.delete-button.delete-template{template_id: template.id, name: 'delete-template'}
 
-    -##manageTemplatesDialog{title: 'Manage Email Templates'}
-    -#  %table.table
-    -#    %thead
-    -#      %tr.table-header-highlight
-    -#        %th Template Name
-    -#        %th Description
-    -#        %th.min70
-    -#      -EmailTemplate.all.each do |template|
-    -#        %tr
-    -#          %td=template.template_name
-    -#          %td=template.description
-    -#          %td
-    -#            %button.table-button.edit-button.edit-template{template_id: template.id, name: 'edit-template'}
-    -#            %button.table-button.delete-button.delete-template{template_id: template.id, name: 'delete-template'}
-    -#
-    -#  #new-template-form-wrapper
-    -#    %h4.dialog-inset-header New Email Template
-    -#    %form
-    -#      .dialog-form-information
-    -#        %span.content-label-sm Name
-    -#        %input#new-template-name{autofocus: true, required: true, type: 'text', name: 'template-name'}
-    -#        %span.content-label-sm Description
-    -#        %input#new-template-desc{required: true, type: 'text', name: 'template-description'}
-    -#      .template-content-wrapper
-    -#        %textarea.template-content#new-template-body
-    -#
-    -#  #edit-template-form-wrapper
-    -#    %h4.dialog-inset-header Edit Email Template
-    -#    %form
-    -#      .dialog-form-information
-    -#        %span.content-label-sm Name
-    -#        %input#edit-template-name{autofocus: true, required: true, type: 'text', name: 'template-name'}
-    -#        %span.content-label-sm Description
-    -#        %input#edit-template-desc{required: true, type: 'text', name: 'template-description'}
-    -#        %input.hidden#template-id
-    -#      .template-content-wrapper
-    -#        %textarea.template-content#edit-template-body
-    -#
-    -#  .dialog-section-divider
-    -#    %button.primary#save-email-template.hidden
-    -#      Save Template
-    -#    %button.secondary#create-email-template
-    -#      Create New Template
-    -#    %button.primary#edit-email-template.hidden
-    -#      Update Template
-    -#    %button.secondary.hidden#cancel-edit-email-template
-    -#      Cancel
+      #new-template-form-wrapper
+        %h4.dialog-inset-header New Email Template
+        %form
+          .dialog-form-information
+            %span.content-label-sm Name
+            %input#new-template-name{autofocus: true, required: true, type: 'text', name: 'template-name'}
+            %span.content-label-sm Description
+            %input#new-template-desc{required: true, type: 'text', name: 'template-description'}
+          .template-content-wrapper
+            %textarea.template-content#new-template-body
+
+      #edit-template-form-wrapper
+        %h4.dialog-inset-header Edit Email Template
+        %form
+          .dialog-form-information
+            %span.content-label-sm Name
+            %input#edit-template-name{autofocus: true, required: true, type: 'text', name: 'template-name'}
+            %span.content-label-sm Description
+            %input#edit-template-desc{required: true, type: 'text', name: 'template-description'}
+            %input.hidden#template-id
+          .template-content-wrapper
+            %textarea.template-content#edit-template-body
+
+      .dialog-section-divider
+        %button.primary#save-email-template.hidden
+          Save Template
+        %button.secondary#create-email-template
+          Create New Template
+        %button.primary#edit-email-template.hidden
+          Update Template
+        %button.secondary.hidden#cancel-edit-email-template
+          Cancel
 
 
     .row
