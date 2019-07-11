@@ -48,10 +48,6 @@
     %datalist#customerCompanyList
     %button.remove-input
   .form-group.search-item.hidden
-    %label.content-label-sm Description
-    %input.form-control#desc-input{name: 'description'}
-    %button.remove-input
-  .form-group.search-item.hidden
     %label.content-label-sm Date Submitted (Newer)
     %input.form-control#submitted-newer-input{type: 'date', name: 'date-submitted-newer'}
     %button.remove-input
@@ -113,10 +109,6 @@
           %label.search-criteria-label
             %input.search-checkbox#company-cb{type: 'checkbox', name: 'search-criteria', value: 'Company', for: 'company-input'}
             Company
-        %li
-          %label.search-criteria-label
-            %input.search-checkbox#desc-cb{type: 'checkbox', name: 'search-criteria', value: 'Description', for: 'desc-input'}
-            Description
         %li
           %label.search-criteria-label
             %input.search-checkbox#submitted-newer-cb{type: 'checkbox', name: 'search-criteria', value: 'Date Submitted (Newer)', for: 'submitted-newer-input'}

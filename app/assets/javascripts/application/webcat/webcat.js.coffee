@@ -22,17 +22,20 @@ $ ->
 
   window.set_webcat_advanced = () ->
     # creating form object from array made from advanced dropdown form
-    form = {}
+    form = {
+      tags: tag_input[0].selectize.items.join(',')
+    }
+
     for item in $('#cat_named_search').serializeArray()
       { name, value } = item
       name = name.toLowerCase().replace(/-/g, '_')
-      form[name] = value
+      if name != 'tags'
+        form[name] = value
 
     localStorage.search_type = 'advanced'
-    localStorage.search_name = form.name
+    localStorage.search_name = form.search_name
     localStorage.search_conditions = JSON.stringify(
       status: form.status
-      description: form.description
       ip_address: form.complaint_id
       resolution: form.resolution
       channel: form.channel
@@ -46,7 +49,9 @@ $ ->
       modified_older: form.date_modified_newer
       modified_newer: form.date_modified_older
     )
+
 #    refresh_url()
+
   window.build_named_search = (search_name) ->
     localStorage.search_type = 'named'
     localStorage.search_name = search_name
@@ -433,7 +438,7 @@ $ ->
           options.push {name: x}
         return options
 
-    $('#tags-input').selectize {
+    tag_input = $('#tags-input').selectize {
       persist: false
       create: false
       maxItmes: null
