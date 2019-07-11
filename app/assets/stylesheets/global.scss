@@ -9442,7 +9442,7 @@ table.rl-content {
         display: block;
         float: left;
         background-repeat: no-repeat;
-        background-image: url(/assets/icon_malicious_dark.svg);
+        background-image: url(image_path('icon_malicious_dark.svg'));
         width: 14px;
         height: 14px;
         margin-top: 2px;
@@ -9482,7 +9482,7 @@ table.rl-content {
 
 // dbinebri: ensuring create new report button gets icon
 .create-new-run-button {
-  background-image: url(/assets/icon_sandbox_report.svg);
+  background-image: url(image_path('icon_sandbox_report.svg'));
   background-position: 6px center;
   padding-left: 15px;
 }
