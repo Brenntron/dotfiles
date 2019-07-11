@@ -590,7 +590,7 @@ class ComplaintEntry < ApplicationRecord
     company_name = nil
     customer_params = params.fetch('customer', {}).slice(*%w{name email company_name})
     customer_params = customer_params.select{|ignore_key, value| value.present?}
-    if customer_params.any?
+    unless customer_params.empty?
       if customer_params['company_name'].present?
         company_name = customer_params.delete('company_name')
         relation = relation.joins(complaint: [customer: :company])
@@ -612,7 +612,7 @@ class ComplaintEntry < ApplicationRecord
     end
 
     entry_params = entry_params.select{|ignore_key, value| value.present?}
-    if entry_params.any?
+    unless entry_params.empty?
       complaint_entry_fields = entry_params.slice(*%w{complaint_id resolution status})
       ip_or_uri = entry_params['ip_or_uri']
       category = entry_params['category']
