@@ -23,7 +23,7 @@ $ ->
   window.set_webcat_advanced = () ->
     # creating form object from array made from advanced dropdown form
     form = {
-      tags: tag_input[0].selectize.items
+      tags: tag_input[0].selectize.items.join()
     }
 
     for item in $('#cat_named_search').serializeArray()
@@ -49,7 +49,7 @@ $ ->
       modified_older: form.date_modified_newer
       modified_newer: form.date_modified_older
     )
-
+    
     refresh_url()
 
   window.build_named_search = (search_name) ->
