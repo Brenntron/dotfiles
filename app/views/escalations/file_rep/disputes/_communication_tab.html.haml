@@ -79,24 +79,34 @@
           -#  Manage Email Templates
 
     .row
-      .col-xs-12.email-header-information.hidden
+      .col-xs-12.email-header-information
         .email-header-data
           .communication-subject
+            Talosintelligence.com File Support Request #{@file_rep_dispute.id}
           .sender-receiver-info
             %span.content-label-sm From
             %span.author-username
+              =@file_rep_dispute.customer.email
+
             %br
             %span.content-label-sm To
             %span.receiver-email
+              rep_disputes_#{@file_rep_dispute.id}@dispute.talosintelligence.com
             %br
             %span.attachment-label#incoming-attachment.hidden
             %span.email-attachments
 
         .email-response-button-wrapper
           .email-response-buttons
-            %button.reply-button
-            %button.forward-button
+            - if @file_rep_dispute.dispute_emails.blank?
+              %button.reply-button.first-reply-button.esc-tooltipped{title: 'Begin email chain with customer'}
+            - else
+              %button.reply-button
+              %button.forward-button
           %span.email-datetime
+            =@file_rep_dispute.created_at.strftime("%Y-%m-%d")
+            %br
+            =@file_rep_dispute.created_at.strftime("%H:%M:%S")
     .row
       .col-xs-12.email-msg-body
         %pre.email-msg-content
@@ -218,17 +228,20 @@
                     .sender-receiver-info
                       %span.reply-symbol
                       %span.receiver-email
-                  .col-xs-8
-                    .template-select-wrapper
-                      .template-label
-                        Select a Template
+                        =@file_rep_dispute.customer.email
 
-                    %select.dropdown.email-template-select#select-reply-template
-                      -if EmailTemplate.all.empty?
-                        %option.hidden{value:'', disabled: true, selected: true} No Templates Created
-                      -else
-                        %option.hidden{value:'', disabled: true, selected: true} No Template Selected
-                        =options_for_select(EmailTemplate.all.pluck(:template_name, :id))
+                  -# Add in after we have email template functionality
+                  .col-xs-8
+                    -#.template-select-wrapper
+                    -#  .template-label
+                    -#    Select a Template
+                    -#
+                    -#%select.dropdown.email-template-select#select-reply-template
+                    -#  -if EmailTemplate.all.empty?
+                    -#    %option.hidden{value:'', disabled: true, selected: true} No Templates Created
+                    -#  -else
+                    -#    %option.hidden{value:'', disabled: true, selected: true} No Template Selected
+                    -#    =options_for_select(EmailTemplate.all.pluck(:template_name, :id))
 
                     .email-reply-button-wrapper
                       .email-reply-buttons
@@ -236,14 +249,25 @@
                         %button.delete-email
                 .row
                   .col-xs-12
-                    %input.communication-subject.reply-subject{type: 'text'}
-
+                    %input.communication-subject.reply-subject{type: 'text', value: "Talosintelligence.com File Support Request #{@file_rep_dispute.id}"}
                 .row
                   .col-xs-12.file-wrapper-reply
                     #file-fields
             .row
               .col-xs-12.email-reply-body-wrapper
                 %textarea.email-reply-body.reply-body{autofocus: true, maxlength: 64000}
+                  - if @file_rep_dispute.dispute_emails.blank?
+                    Talosintelligence.com File Support Request #{@file_rep_dispute.id}
+                    &#013;
+                    \--------------------------------------------------------------------------
+                    &#013;
+                    SHA256 Submitted: #{@file_rep_dispute.sha256_hash}
+                    &#013;
+                    Suggested Disposition: #{@file_rep_dispute.disposition_suggested}
+                    &#013;
+
+                    - if @file_rep_dispute.ticket_source_key
+                      Ticket: https://talosintelligence.com/tickets/#{@file_rep_dispute.ticket_source_key}
 
         .row
           .col-xs-12.text-center
@@ -310,6 +334,7 @@
     %input{:type => "hidden", :name => "xml_token", :value => "#{xml_token}"}
     %input{:name => "dispute_id", :type => "hidden", :value => "#{@file_rep_dispute.id}"}
     %input{:name => "current_user_id", :type => "hidden", :value => "#{current_user.id}"}
+    %input{:name => "dispute_type", :type => "hidden", :value => "FileReputationDispute"}
 
   :javascript
     AC.Helpers.clipboard()
