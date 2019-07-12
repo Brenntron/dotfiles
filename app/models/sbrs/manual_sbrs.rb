@@ -68,7 +68,12 @@ class Sbrs::ManualSbrs < Sbrs::Base
   def self.call_wbrs_webcat(params, type: nil)
     sds_response = parse_wbrs(request_sds(path: '/score/webcat/json?url=', body: params, type: type))
     webcatlist = parse_wbrs(request_sds(path: '/labels/webcat/json', body: params, type: type))
-    webcatlist["#{sds_response["webcat"]["cat"]}"]["name"]
+
+    if sds_response["webcat"]["cat"] == 'nocat'
+      nil.to_s
+    else
+      webcatlist["#{sds_response["webcat"]["cat"]}"]["name"]
+    end
   end
 
   def self.where(conditions = {}, raw = false)

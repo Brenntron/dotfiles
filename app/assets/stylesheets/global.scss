@@ -635,6 +635,8 @@ button {
 
 .toolbar-button-spacer {
   margin-right: 3px;
+.toolbar-button:disabled {
+  cursor: not-allowed;
 }
 
 .dashboard-tickets-wrapper .toolbar-button-label {
@@ -707,6 +709,7 @@ button {
   top: 2px;
   left: 7px;}
 .reset-filter:hover {background-image: url(image_path('icon_reset_blue.svg'));}
+.sync-button-white {background-image: url(image_path('icon_sync_white.svg'));}
 
 .master-submit-button {
   color: $content-bg-color;
@@ -6796,9 +6799,7 @@ table#duplicates a {
   text-decoration: underline;
 }
 
-//Crappy temporary hack to keep the annoying insane amt of entries for xbrs from taking over and ruining the whole page
 .xbrs-details-table .dataTables_scrollBody {
-  max-width: 1200px !important;
   overflow-y: scroll !important;
 }
 
@@ -7706,7 +7707,12 @@ td.text-center span {
     padding: 0 15px;
     &:last-of-type {
       position: relative;
-      top: 5px;
+      top: 6px;
+    }
+    @-moz-document url-prefix() {
+      &:last-of-type {
+        top: 7px;
+      }
     }
 
     span {
@@ -9657,6 +9663,34 @@ table.rl-content {
   font-weight: bold;
 }
 
+.wbnp-loader-message {
+  position: absolute;
+  right: 15px;
+  top: 10px;
+  .wbnp-report-status {
+    margin-top: 6px;
+    display: inline-block;
+    font-size: 9pt;
+  }
+}
+
+.wbnp-report-status {
+  text-transform: capitalize;
+}
+
+.wbnp-report-label {
+  float: left;
+  margin-right: 8px;
+}
+
+.wbnp-loading-spinner {
+  width: 20px;
+  height: 20px;
+  float: left;
+  margin-right: 5px;
+  display: block;
+  background-repeat: no-repeat;
+}
 
 .complaint-selectize-col-wrapper .selectize-control {
   padding-bottom: 6px;
@@ -9688,4 +9722,38 @@ input[type="radio"].resolution_radio_button {
 // more width so this aligns with the comment fields and for long URIs
 .complaint-uri-input {
   width: 65%;
+}
+
+// ensure the XBRS history headers are accurate and stay put while scrolling
+.entry-details-table.xbrs-details-table .dataTables_wrapper .dataTables_scrollBody {
+  table > thead > tr > th {
+    position: -webkit-sticky;
+    position: sticky;
+    top: 0;
+    background-color: $table-dark-body;
+    border-bottom: $type-base-color 1px solid;
+    // sizing overrides needed here
+    .dataTables_sizing {
+      min-height: 30px !important;
+      padding: 8px !important;
+    }
+  }
+}
+
+// laptop screen width - ensure xbrs table fits on-screen
+@media screen and (max-width: 1600px) {
+  .entry-details-table.xbrs-details-table {
+    th {
+      padding: 8px 6px;
+    }
+    td {
+      padding: 6px 8px;
+      word-break: break-word;
+    }
+  }
+}
+
+// ensuring no column overlap in Case History due to long strings
+#case-history .case-history-preview, #case-history .case-history-author {
+  word-break: break-word;
 }
