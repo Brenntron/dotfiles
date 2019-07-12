@@ -3,7 +3,7 @@
 
 - content_for(:nav_banner) do
   .nav-tool-blocks.nav-page-button-wrapper.col-xs-3.col-sm-3.col-lg-2
-    %a#userpage.nav-page-button{href: "/users/#{current_user[:id]}", class: ("active" if current_page?("/users/#{current_user[:id]}"))}
+    %a#userpage.nav-page-button{href: "/escalations/users/#{current_user[:id]}", class: ("active" if current_page?("/escalations/users/#{current_user[:id]}"))}
       %span.nav-toolbar-icon-large.icon-user-page
 
     %a#related-users.nav-page-button{href: '/escalations/users', class: ("active" if current_page?('/escalations/users'))}
