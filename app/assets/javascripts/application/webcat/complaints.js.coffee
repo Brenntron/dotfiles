@@ -1,8 +1,10 @@
 table_page = 0
 
 $(document).on 'click', '.paginate_button', ->
-  table = $('#complaints-index').DataTable()
-  table_page = table.page.info().page
+  complaint_table = $('#complaints-index').DataTable().context
+  if complaint_table.length > 0
+    table = $('#complaints-index').DataTable()
+    table_page = table.page.info().page
 
 
 

@@ -20,6 +20,7 @@
 
 
       .button-group
+        -#do we really want to berate users in the confirm message?
         %button{value: "submit", class: "call-to-action save", data: { confirm: 'Are you really really sure?? This might fuck shit up.'}} Save
         = link_to  admin_notes_path do
           %button{title: "Cancel", class: "secondary cancel"} Cancel

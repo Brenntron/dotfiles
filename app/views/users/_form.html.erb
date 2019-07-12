@@ -35,6 +35,19 @@
   </div>
   <% end %>
 
+  <div class="row">
+    <div class="col-sm-4 form-group">
+      <%= user_form.input :threatgrid_api_key, class: "form-control create-input", required: false,
+                          :input_html => {class: "form-control create-input", minlength: 1}  %>
+    </div>
+    <div class="col-sm-4 form-group">
+      <%= user_form.input :sandbox_api_key, class: "form-control create-input", required: false,
+                          :input_html => {class: "form-control create-input", minlength: 1}  %>
+    </div>
+    <div class="col-sm-4 form-group">
+    </div>
+  </div>
+
     <div class="row">
       <div class="col-sm-12 form-group">
         <button class="btn btn-success edit-user" value="submit">Save</button>

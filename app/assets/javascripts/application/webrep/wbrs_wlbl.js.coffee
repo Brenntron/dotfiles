@@ -149,6 +149,7 @@ window.bulk_get_current_wlbl = (page) ->
     case_id = $('#dispute_id').text()
 
   else if page == 'research'
+    dropdown_wrapper = $('#wlbl_adjust_entries')
     checkbox = '.dispute_check_box'
     row = '.research-table-row'
     current_wbrs = '.current-wbrs-score'

@@ -5,7 +5,7 @@ Rails.application.routes.draw do
 
   namespace :escalations, except: [:destroy, :edit] do
     get 'sb_api/query_lookup' => 'sb_api#query_lookup'
-    
+
     resources :rulehit_resolution_mailer_templates, only: [:new, :index, :create, :show, :update, :destroy, :edit]
     resources :sessions, controller: '/sessions', only: [:new, :create, :destroy]
 
@@ -88,6 +88,13 @@ Rails.application.routes.draw do
       get :export_selected_dispute_entry_rows, to: 'disputes#export_selected_dispute_entry_rows'
     end
 
+    namespace :file_rep do
+      root 'disputes#index'
+      resources :disputes, only: [:index, :show]
+      get 'sandbox-html-report', to: 'disputes#sandbox_html_report'
+    end
+
+
     resources :users, controller: '/users', only: [:index, :show, :update] do
       resource :bugzilla_api_key, controller: '/bugzilla_api_keys', only: [:edit, :update]
 
@@ -117,6 +124,7 @@ Rails.application.routes.draw do
         collection do
           get 'poll-from-bridge/messages', to: 'messages#get_messages'
           post 'ticket-event/messages', to: 'messages#messages_from_bridge'
+          post 'file-rep-create/messages', to: 'file_rep_messages#create'
         end
         resources :messages, only: [:create]
       end

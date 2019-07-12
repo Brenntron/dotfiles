@@ -1,0 +1,232 @@
+-#view single record
+.row
+  .col-xs-12.col-sm-6
+    .content-wrapper.top-case-info.ticket-overview-wrapper
+      %h4 Ticket Overview
+      .row
+        .col-xs-12.col-sm-12.col-md-12.col-lg-5.col-ticket-left
+          .row
+            .col-xs-6.col-sm-6.col-md-6.col-lg-6.col-xl-6.col-with-divider
+              %label.content-label-sm
+                Case ID
+              .top-info-data.case-id-tag#dispute_id
+                = @file_rep_dispute.id.to_s.rjust(10, '0')
+              %label.content-label-sm Date/Time Submitted
+              .top-info-data= @file_rep_dispute.created_at.strftime("%b %e, %Y %l:%M %p")
+
+              %label.content-label-sm
+                Status
+              -#  Add ruby code for status here
+              %span.dropdown.top-info-data
+                %button#show-edit-ticket-status-button.inline-select-dropdown.ticket-status-button.dropdown-toggle{title:'Edit Ticket Status', 'data-toggle': 'dropdown', 'aria-haspopup': 'true', 'aria-expanded': 'false',  }
+                  - if @file_rep_dispute.status.nil?
+                    NEW
+                  - else
+                    = @file_rep_dispute.status
+
+                .dropdown-menu.inline-dropdown-menu#show-edit-ticket-status-dropdown{'aria-labelledby': 'show-edit-ticket-status-button'}
+                  %ul
+                    %li.status-radio-wrapper
+                      %input.fr-ticket-status-radio{type: 'radio', name: 'file-dispute-status', id: 'file-status-new', value: 'NEW'}
+                      %label.radio-label.fr-ticket-status-radio-label{for:'file-status-new'} New
+                    %li.status-radio-wrapper
+                      %input.fr-ticket-status-radio{type: 'radio', name: 'file-dispute-status', id: 'file-status-researching', value: 'RESEARCHING'}
+                      %label.radio-label.fr-ticket-status-radio-label{for:'file-status-researching'} Researching
+                    %li.status-radio-wrapper
+                      %input.fr-ticket-status-radio{type: 'radio', name: 'file-dispute-status', id: 'file-status-escalated', value: 'ESCALATED'}
+                      %label.radio-label.fr-ticket-status-radio-label{for:'file-status-escalated'} Escalated
+                    %li.status-radio-wrapper
+                      %input.fr-ticket-status-radio{type: 'radio', name: 'file-dispute-status', id: 'file-status-pending', value: 'PENDING'}
+                      %label.radio-label.fr-ticket-status-radio-label{for:'file-status-pending'} Customer Pending
+                    %li.status-radio-wrapper
+                      %input.fr-ticket-status-radio{type: 'radio', name: 'file-dispute-status', id: 'file-status-onhold', value: 'ON_HOLD'}
+                      %label.radio-label.fr-ticket-status-radio-label{for:'file-status-onhold'} On Hold
+                    %li.status-radio-wrapper
+                      %input.fr-ticket-status-radio{type: 'radio', name: 'file-dispute-status', id: 'file-status-closed', value: 'RESOLVED_CLOSED'}
+                      %label.radio-label.fr-ticket-status-radio-label{for:'file-status-closed'} Resolved / Closed
+                      .dropdown-menu#show-ticket-resolution-submenu
+                        .col-xs-6.submenu-left-wrapper
+                          .submenu-header
+                            Ticket Resolution
+                          %ul
+                            %li
+                              %input.ticket-resolution-radio{type: 'radio', name: 'dispute-resolution', id: "#{Dispute::STATUS_RESOLVED_FIXED_FP}", value: "#{Dispute::STATUS_RESOLVED_FIXED_FP}"}
+                              %label.ticket-res-radio-label.radio-label{for: "#{Dispute::STATUS_RESOLVED_FIXED_FP}"} Fixed - FP
+                            %li
+                              %input.ticket-resolution-radio{type: 'radio', name: 'dispute-resolution', id: "#{Dispute::STATUS_RESOLVED_FIXED_FN}", value: "#{Dispute::STATUS_RESOLVED_FIXED_FN}"}
+                              %label.ticket-res-radio-label.radio-label{for: "#{Dispute::STATUS_RESOLVED_FIXED_FN}"} Fixed - FN
+                            %li
+                              %input.ticket-resolution-radio{type: 'radio', name: 'dispute-resolution', id: "#{Dispute::STATUS_RESOLVED_UNCHANGED}", value: "#{Dispute::STATUS_RESOLVED_UNCHANGED}"}
+                              %label.ticket-res-radio-label.radio-label{for: "#{Dispute::STATUS_RESOLVED_UNCHANGED}"} Unchanged
+                            %li
+                              %input.ticket-resolution-radio{type: 'radio', name: 'dispute-resolution', id: "#{Dispute::STATUS_RESOLVED_INVALID}", value: "#{Dispute::STATUS_RESOLVED_INVALID}"}
+                              %label.ticket-res-radio-label.radio-label{for: "#{Dispute::STATUS_RESOLVED_INVALID}"} Invalid / Junk Mail
+                            %li
+                              %input.ticket-resolution-radio{type: 'radio', name: 'dispute-resolution', id: "#{Dispute::STATUS_RESOLVED_TEST}", value: "#{Dispute::STATUS_RESOLVED_TEST}"}
+                              %label.ticket-res-radio-label.radio-label{for: "#{Dispute::STATUS_RESOLVED_TEST}"} Test / Training
+                            %li
+                              %input.ticket-resolution-radio{type: 'radio', name: 'dispute-resolution', id: "#{Dispute::STATUS_RESOLVED_OTHER}", value: "#{Dispute::STATUS_RESOLVED_OTHER}"}
+                              %label.ticket-res-radio-label.radio-label{for: "#{Dispute::STATUS_RESOLVED_OTHER}"} Other
+                        .col-xs-6.submenu-right-wrapper
+                          .resolution-comment-wrapper
+                            %label.content-label-sm
+                              Comment
+                            %textarea.resolution-status-comment
+                            %button.primary{onClick: 'update_file_rep_status_on_show()'}
+                              Submit
+                    %li.status-radio-wrapper
+                      %input.fr-ticket-status-radio{type: 'radio', name: 'file-dispute-status', id: 'file-status-assigned', value: 'RE-OPENED'}
+                      %label.radio-label.fr-ticket-status-radio-label{for:'RE-OPENED'} Re-Opened
+                    %li.non-resolution-submit-wrapper#ticket-non-res-submit
+                      %label.content-label-sm
+                        Comment
+                      %textarea.ticket-status-comment
+                      .button-row-center
+                        %button.primary.change_ticket_status_button{type:'button', id:'webrep_change_ticket_status', onclick:'update_file_rep_status_on_show();'}
+                          Submit
+
+
+            .col-xs-6.col-sm-6.col-md-6.col-lg-6.col-xl-6.col-with-divider.col-assignee
+              %label.content-label-sm
+                Assignee
+              .top-info-data
+                - if @file_rep_dispute.assigned.nil? || @file_rep_dispute.assigned == 'Unassigned' || @file_rep_dispute.assigned.cvs_username == 'vrtincom'
+                  %span.missing-data#dispute-assignee Unassigned
+                - else
+                  %span#dispute-assignee= @file_rep_dispute.assigned.cvs_username
+
+                - if can? :update, @file_rep_dispute
+                  .dispute-owner-buttons-wrapper
+                    - if can? :take, @file_rep_dispute
+                      %button.take-ticket-button#show_ticket_assign.esc-tooltipped{title: 'Assign this ticket to me', onclick: "file_rep_show_take_dispute(#{@file_rep_dispute.id});"}
+                    - elsif can? :return, @file_rep_dispute
+                      %button.return-ticket-button.esc-tooltipped{title: 'Return ticket to open queue', onclick: "file_rep_show_return_dispute(#{@file_rep_dispute.id});"}
+                    %span.dropdown
+                      - if can? :change_assignee, @file_rep_dispute
+                        %button#index_change_assign.dispute-inline-buttons.ticket-owner-button.dropdown-toggle.esc-tooltipped{title: 'Change Assignee', 'data-toggle': 'dropdown', 'aria-haspopup': 'true', 'aria-expanded': 'false'}
+                      - else
+                        %span#replace-button
+                      .dropdown-menu#show-change-assign-dropdown{'aria-labelledby': 'index_change_assign'}
+                        .change-assignee-dropdown-wrapper
+                          %h3 Change Assignee
+                          .inline-tool-content-wrapper
+                            .toolbar
+                              %div
+                                %label.toolbar-section-label Assignee
+                                =select_tag :index_target_assignee, options_from_collection_for_select(User.joins(roles: :org_subset).where(org_subsets: { name: 'file rep' }).distinct.order(:cvs_username), :id, :cvs_username), class: 'toolbar-select'
+                              %button{class: 'primary', type:'button', id: 'button_reassign', onclick:'file_rep_show_change_assignee();'}
+                                Assign
+
+
+
+              %label.content-label-sm
+                Suggested Disposition
+              - if @file_rep_dispute.suggested_malicious?
+                .suggested-disposition.disp-negative= @file_rep_dispute.disposition_suggested
+              - else
+                .suggested-disposition= @file_rep_dispute.disposition_suggested
+
+        .col-xs-12.col-sm-12.col-md-12.col-lg-7.col-with-divider.col-ticket-right
+          .row
+            .col-xs-6.col-sm-6.col-md-6.col-with-divider
+              %label.content-label-sm Customer Name
+              .top-info-data
+                - unless @file_rep_dispute.customer.nil?
+                  = @file_rep_dispute.customer.name
+                - else
+                  %span.missing-data No customer record
+
+              %label.content-label-sm Customer Company
+              .top-info-data
+                - unless @file_rep_dispute.customer.nil? || @file_rep_dispute.customer.company.nil?
+                  = @file_rep_dispute.customer.company.name
+                - else
+                  %span.missing-data No customer record
+
+              %label.content-label-sm Customer Email
+              .top-info-data
+                - unless @file_rep_dispute.customer.nil?
+                  = @file_rep_dispute.customer.email
+                - else
+                  %span.missing-data No customer record
+
+            .col-xs-6.col-sm-6.col-md-6
+              %label.content-label-sm Dispute Details
+              .top-info-data.top-info-details
+                - if @file_rep_dispute.description
+                  = @file_rep_dispute.description
+                - else
+                  %span.missing-data No details submitted.
+
+
+  .col-xs-12.col-sm-6
+    .content-wrapper.top-case-info
+      %h4 File Overview
+      .file-edit-buttons-wrapper
+        %button.secondary.create-det-button{onclick: 'amp_detection_dialog(event);'}
+          Create or Change Detection
+
+      .row
+        .col-xs-8.col-with-divider
+          %label.content-label-sm SHA256
+          .top-info-data.code-snippet.code-string-break#sha256_hash= @file_rep_dispute.sha256_hash
+          %label.content-label-sm File Type
+          .top-info-data= @file_rep_dispute.sample_type
+          %label.content-label-sm File Name
+          .top-info-data= @file_rep_dispute.file_name
+          %label.content-label-sm File Size
+          .top-info-data
+            -# TODO find out what file size we will get & convert to unit the analysts want
+            = @file_rep_dispute.bytes_to_kb
+            KB
+
+        .col-xs-4.amp-area
+          .inline-loader-wrapper
+            .gear-loader-wrapper
+              = inline_svg 'icon_gears_loader.svg', class: 'gears-loader'
+            %span.loader-msg Loading data...
+
+          -# dbinebri: error handling for these moved to JS detection_now func, restore the orig ruby error logic if needed
+          %label.content-label-sm AMP Disposition
+          .top-info-data.disposition
+            = @file_rep_dispute&.disposition
+          %label.content-label-sm AMP Detection Name
+          .top-info-data.detection-name
+            = @file_rep_dispute&.detection_name
+          %label.content-label-sm AMP Detection - Last Set Date
+          .top-info-data.detection-last-updated
+            = @file_rep_dispute&.detection_last_set&.utc&.strftime("%b %e, %Y %l:%M %p %Z")
+          %label.content-label-sm AMP Detection - Date Last Pulled
+          .top-info-data.detection-last-pulled
+            = @file_rep_dispute&.last_fetched&.utc&.strftime("%b %e, %Y %l:%M %p %Z")
+          %label.content-label-sm In Sample Zoo
+          - if @file_rep_dispute.in_zoo == true
+            .top-info-data#sample-zoo-status{'data-zoo-status': 'YES'}
+              %span.glyphicon.glyphicon-ok
+          - else
+            .top-info-data#sample-zoo-status{'data-zoo-status': 'NO'}
+              %span.glyphicon.glyphicon-remove
+
+
+-# End of top overview information
+
+
+
+%ul.nav.nav-tabs{role: 'tablist'}
+  %li.nav-item{role:'presentation', tab: 'research'}
+    %a.nav-link#research-tab-link{href: '#research_tab', 'aria-controls': 'research', role: 'tab', 'data-toggle': 'tab'}
+      Research
+  %li.nav-item{role:'presentation'}
+    %a.nav-link#communication-tab-link{href: '#communication_tab', 'aria-controls': 'communication', role: 'tab', 'data-toggle': 'tab'}
+      Communication
+
+
+.tab-content.content-wrapper#bug-tab-content
+  .tab-pane#research_tab{role: 'tabpanel'}
+    = render 'escalations/file_rep/disputes/research_tab'
+  .tab-pane#communication_tab{role: 'tabpanel'}
+    = render 'escalations/file_rep/disputes/communication_tab'
+
+
+= render 'escalations/file_rep/disputes/create_detection_dialog'
+= render 'escalations/file_rep/disputes/amp_history_dialog'
