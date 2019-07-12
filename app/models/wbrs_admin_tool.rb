@@ -21,6 +21,8 @@ class WbrsAdminTool
         return Wbrs::Category.all
       when 'webcat7'
         return Wbrs::TopUrl.check_urls(arg)
+      when 'webcat71'
+        return Wbrs::RuleUiComplaint.where(arg)["data"]
       when 'webrep8'
         id = arg['id']
         return Wbrs::ManualWlbl.find(id)

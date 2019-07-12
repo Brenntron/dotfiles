@@ -98,6 +98,13 @@ $ ->
 
     window.submit_wbrs_call(arg, path, output)
 
+  $("#execute-task-button-71").click ->
+    arg = $(".71-args").val();
+    path = 'webcat71'
+    output = '#output-71'
+
+    window.submit_wbrs_call(arg, path, output)
+
   $("#execute-task-button-8").click ->
     arg = $(".8-args").val();
     path = 'webrep8'
