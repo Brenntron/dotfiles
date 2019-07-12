@@ -183,7 +183,8 @@ $ ->
     form_data.append('dispute_id', $('input[name="dispute_id"]').val())
     form_data.append('to', $('.receiver-email')[1].textContent)
     form_data.append('subject', $('input[type=text].reply-subject').val())
-    form_data.append('dispute_email_id', $('.current-email-view').attr('email_id'))
+    form_data.append('dispute_email_id', $('.current-email-view').attr('email_id')) if $('.current-email-view').attr('email_id')
+    form_data.append('dispute_type', $('input[name="dispute_type"]').val())
 
 
     $.ajax(
@@ -228,7 +229,6 @@ $ ->
 
 
   $('#send-new-email').on 'click', (e) ->
-
     headers = {'Token': $('input[name="token"]').val(), 'Xmlrpc-Token': $('input[name="xml_token"]').val()}
 
     form_data = new FormData()
@@ -240,10 +240,14 @@ $ ->
     form_data.append('to', $('.new-receiver').val())
     form_data.append('subject', $('.new-subject').val())
     form_data.append('cc', $('.cc-email').val())
+    
+    if window.location.href.includes('/file_rep/disputes')
+      form_data.append('dispute_type', "FileReputationDispute")
+    else if  window.location.href.includes('/webrep/disputes')
+      form_data.append('dispute_type', "WebReputationDispute")
 
     dispute_id = $('input[name="dispute_id"]').val()
-
-
+    
     if $('form')[0].checkValidity() == true
       e.preventDefault()
       if dispute_id
@@ -359,6 +363,9 @@ $ ->
       )
     else
       std_msg_error("Note is blank. Delete note?",'')
+
+
+
 
 
   $('#newEmailDialog').dialog

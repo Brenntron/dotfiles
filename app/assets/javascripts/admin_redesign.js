@@ -33,6 +33,7 @@
 //= require application/chart.pieceLabel.min
 //= require application/chartjs-plugin-annotation.min
 //= require application/chartjs-plugin-datalabels.min
+//= require application/jquery-ui.min
 //= require application/daterangepicker
 //= require application/webrep_advanced_search
 //= require application/webcat/complaints
@@ -44,6 +45,12 @@
 //= require application/webcat/categories
 //= require application/webcat/webCatRepLookup
 //= require application/webrep/webrep-report-engine
+//= require application/file_rep/file_rep
+//= require application/file_rep/naming_guide
+//= require application/file_rep/research
+//= require application/file_rep/file_rep_research_tab
+//= require application/file_rep/dispute_form
+
 //= require application/webrep/reptool
 //= require application/webrep/wbrs_wlbl
 //= require admin/admin-tools

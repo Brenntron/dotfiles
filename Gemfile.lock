@@ -65,8 +65,8 @@ GEM
       tzinfo (~> 1.1)
     addressable (2.5.2)
       public_suffix (>= 2.0.2, < 4.0)
-    ajax-datatables-rails (0.4.3)
-      railties (>= 4.0)
+    ajax-datatables-rails (1.0.0)
+      railties (>= 4.2)
     arel (9.0.0)
     autoprefixer-rails (9.5.1.1)
       execjs
@@ -176,6 +176,14 @@ GEM
     dotiw (4.0.1)
       actionpack (>= 4)
       i18n
+    elasticsearch (7.1.0)
+      elasticsearch-api (= 7.1.0)
+      elasticsearch-transport (= 7.1.0)
+    elasticsearch-api (7.1.0)
+      multi_json
+    elasticsearch-transport (7.1.0)
+      faraday
+      multi_json
     equalizer (0.0.11)
     erubi (1.8.0)
     eventmachine (1.2.7)
@@ -531,7 +539,7 @@ DEPENDENCIES
   active_model_serializers (= 0.10.8)
   activerecord-session_store (= 1.1.1)
   addressable (~> 2.5.2)
-  ajax-datatables-rails (~> 0.4.0)
+  ajax-datatables-rails (~> 1.0.0)
   awesome_nested_set (= 3.1.4)
   awesome_print (= 1.8.0)
   aws-sdk (= 2.11.170)
@@ -557,6 +565,7 @@ DEPENDENCIES
   diffy (= 3.2.1)
   dotenv-rails (= 2.5.0)
   dotiw
+  elasticsearch
   factory_bot (= 4.11.1)
   factory_bot_rails (= 4.11.1)
   faker (= 1.9.1)
@@ -570,6 +579,7 @@ DEPENDENCIES
   guard-cucumber (~> 2.1.2)
   gzip (= 1.0)
   haml (~> 5.0.4)
+  hashie
   hashie-forbidden_attributes (~> 0.1.1)
   her (= 1.0.3)
   httparty (~> 0.15.3)
