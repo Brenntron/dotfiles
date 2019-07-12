@@ -6480,6 +6480,18 @@ table.dispute-entry-table tbody tr.selected {
 .popover{
   max-width: 100%; /* Max Width of the popover (depending on the container!) */
 }
+.retake-screenshot{
+  background-color: $type-lighter-color;
+  color: $content-bg-color;
+  font-weight: 300;
+}
+.retake-screenshot:hover{
+  background-color: darken($type-lighter-color, 8%);
+  color: $content-bg-color;
+  text-decoration: none;
+  font-weight: 300;
+}
+
 
 .nested-complaint-static-data .col-with-divider {
   border-color: darken($faint-neutral-color, 15%);
@@ -9643,4 +9655,37 @@ table.rl-content {
 
 .tg-fail-status {
   font-weight: bold;
+}
+
+
+.complaint-selectize-col-wrapper .selectize-control {
+  padding-bottom: 6px;
+}
+
+.nested-complaint-editable-table {
+  label.content-label-sm {
+    padding-top: 0 !important;
+  }
+  input[type="radio"].resolution_radio_button {
+    margin-right: 3px;
+  }
+}
+
+input[type="radio"].resolution_radio_button {
+  margin-right: 3px;
+}
+
+// tweak to make sure orange star icon aligns
+.certainty-flag {
+  max-width: 40px;
+}
+
+// fix margin on this button
+.nested-complaint-data-wrapper button.tertiary {
+  margin: 12px 0 6px 0;
+}
+
+// more width so this aligns with the comment fields and for long URIs
+.complaint-uri-input {
+  width: 65%;
 }

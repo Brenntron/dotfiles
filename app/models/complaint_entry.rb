@@ -21,7 +21,7 @@ class ComplaintEntry < ApplicationRecord
   NEW = "NEW"
   PENDING = "PENDING"
   STATUS_COMPLETED = "COMPLETED"
-
+  STATUS_REOPENED = "REOPENED"
   STATUS_RESOLVED_FIXED_FN = "FIXED FN"
   STATUS_RESOLVED_FIXED_FP = "FIXED FP"
   STATUS_RESOLVED_FIXED_UNCHANGED = "UNCHANGED"
@@ -401,14 +401,9 @@ class ComplaintEntry < ApplicationRecord
     ComplaintEntryPreload.generate_preload_from_complaint_entry(new_complaint_entry)
     max_wait_for_job = 15 #seconds
     begin
-      screenshot_data =  ""
-      Timeout::timeout(max_wait_for_job) do
-        screenshot_data = CapybaraSpider.low_capture("#{new_complaint_entry.hostlookup}")
-      end
-      ces = ComplaintEntryScreenshot.new
-      ces.complaint_entry_id = new_complaint_entry.id
-      ces.screenshot = Base64.decode64(screenshot_data)
-      ces.save!
+      #this is where screen grabs happen.
+      screenshot_entry = ComplaintEntryScreenshot.create!(complaint_entry_id:new_complaint_entry.id)
+      screenshot_entry.grab_screenshot
     rescue Timeout::Error => e
       #couldnt complete in time
       Rails.logger.error( "#{e} --- Timed out waiting for screenshot for #{new_complaint_entry.hostlookup} to finish")
@@ -694,7 +689,7 @@ class ComplaintEntry < ApplicationRecord
   def self.get_category_data(uri)
     prefix_results = Wbrs::Prefix.where({:urls => [uri]})
 
-    return [] unless prefix_results
+    return {} unless prefix_results.any?
 
     parsed_uri = Complaint.parse_url(uri)
     parsed_uri['path'] = '' unless parsed_uri['path'].present?
@@ -708,7 +703,7 @@ class ComplaintEntry < ApplicationRecord
       end
     end
 
-    return [] unless final_results
+    return {} unless final_results.any?
 
     category_ids = final_results.first.categories.sort_by(&:confidence).map {|category| category.category_id}
     category_names = final_results.first.categories.sort_by(&:confidence).map {|category| category.descr}
@@ -785,7 +780,7 @@ class ComplaintEntry < ApplicationRecord
           source = category_certainty[category.category_id].first[:source_description]
 
         end
-        data[category.category_id] = {
+        data[category.confidence] = {
             category_id: category.category_id,
             desc_long: category.desc_long,
             descr: category.descr,
@@ -915,6 +910,29 @@ class ComplaintEntry < ApplicationRecord
       if save!
         {status: 'success'}
       end
+    end
+  end
+
+  def reopen
+    if self&.status != STATUS_COMPLETED
+      return false
+    end
+
+    self.status = STATUS_REOPENED
+    self.resolution = nil
+    self.resolution_comment = self.resolution_comment + "<br />" + " --This dispute has been re-opened."
+    if save
+      if self.complaint.status == Complaint::COMPLETED
+        self.complaint.status = Complaint::REOPENED
+        self.complaint.save
+      end
+
+      message = Bridge::ComplaintUpdateStatusEvent.new
+      message.post_complaint(self.complaint)
+
+      return true
+    else
+      return false
     end
   end
 end

@@ -228,6 +228,11 @@ class DisputeEntry < ApplicationRecord
   end
 
   def assign_url_parts(url = self.hostlookup)
+
+    if !url.starts_with?("http")
+      url = "http://" + url
+    end  
+    
     uri = URI.parse(URI.parse(url).scheme.nil? ? "http://#{url}" : url)
     domain = PublicSuffix.parse(uri.host, :ignore_private => true)
 
@@ -257,11 +262,14 @@ class DisputeEntry < ApplicationRecord
         begin
           self.uri.blank? ? xbrs = Xbrs::GetXbrs.by_ip4(self.ip_address) : xbrs = Xbrs::GetXbrs.by_domain(self.uri.gsub(/\r\n?/, "\n").strip)
         rescue
-          xbrs = [{}, {'data' => []}]
+          xbrs = [{}, {'data' => [], 'legend' => []}]
         end
       end
     end
-    
+    if xbrs[1].blank?
+      xbrs = [{}, {'data' => [], 'legend' => []}]
+    end
+
     # Starting here, we are cleaning up this data to remove columns that are completely empty.
     datacounter = 0
     @columns_to_remove = []
