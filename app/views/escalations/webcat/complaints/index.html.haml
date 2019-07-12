@@ -9,7 +9,8 @@
   .row.top-margin
     .col-xs-12
       %h1#webcat-index-title All Web Categorization Tickets
-    #webcat_searchref_container
+    .col-xs-12
+      #webcat_searchref_container{onmouseover: "triggerTooltips(this)"}
   .row
     .col-xs-12
       = render "toolbar"

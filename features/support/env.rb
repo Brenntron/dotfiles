@@ -34,7 +34,12 @@ require 'capybara/poltergeist'
 require 'paper_trail/frameworks/cucumber'
 require 'will_paginate/array'
 
-Capybara.javascript_driver = :poltergeist
+Capybara.javascript_driver = :selenium
+Selenium::WebDriver.logger.level = :error
+
+# This setting is required for DataTables to be compatible with Selenium
+Capybara.server = :puma
+
 # Capybara defaults to CSS3 selectors rather than XPath.
 # If you'd prefer to use XPath, just uncomment this line and adjust any
 # selectors in your step definitions to use the XPath syntax.

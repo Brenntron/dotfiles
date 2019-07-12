@@ -1,0 +1,55 @@
+%form#new-file-rep-form{method: 'get', 'accept-charset': 'UTF-8'}
+
+  .form-group
+    %input{type:'hidden', name: 'token', value: "#{current_user.authentication_token}"}
+    %input{type:'hidden', name: 'xml_token', value: "#{xml_token}"}
+    %input{type:'hidden', name: 'current_user', value: "#{current_user.authentication_token}"}
+
+  -# This will be implemented later
+
+  -#.form-group
+  -#  %label.content-label-sm File Submission Type
+  -#  .row.file-rep-radio-wrapper
+  -#    .col-xs-3
+  -#      %input#shas_type_text{type: 'radio', name: 'sha256', value: 'text', checked: true}
+  -#      %label.radio-label{for: 'shas_input_type'} SHA256
+
+      -# keep this: uncomment below block when ready to wire up attachment/upload option
+      -#.col-xs-4
+      -#  %input#shas_type_attachment{type: 'radio', name: 'shas_input_type', id: 'shas_input_type', value: 'attachment'}
+      -#  %label.radio-label{for: 'shas_input_type'} Attachment
+      -#  %span.file-rep-attachment{class: 'hidden'}
+      -#    %button.attachment-button.attachment-label.new-attachment
+
+  -#%hr.thin
+  .form-group
+    %span#sha_errors_list
+      %label.content-label-sm.error-label
+        The following are not valid SHAs:
+
+  .form-group
+    %label.content-label-sm SHA256
+    %textarea#shas_list{required: true, rows: '4'}
+
+  .form-group
+    %label.content-label-sm Suggested Disposition
+    %select.form-control#disposition_suggested
+      %option{:selected => 'selected'} Clean
+      %option Common
+      %option Malicious
+      %option Unknown
+      %option Unseen
+  .form-group
+    %label.content-label-sm Assignee
+    %input.form-control#assignee{name: 'assignee', list: 'assignee-list', required: true, value: "#{current_user.cvs_username}"}
+    %datalist#assignee-list
+
+  .form-group.text-center
+    -if bugzilla_rest_logged_in?(bugzilla_rest_session)
+      %button.primary#file_rep_submit{value: 'submit', type: 'submit'}
+        Create Ticket
+    -else
+      %button.primary#file_rep_submit{value: 'submit', type: 'submit', disabled: true}
+        Create Ticket
+      .form-group.text-center
+        %label.content-label-sm You must be logged into Bugzilla to create a new ticket

@@ -52,6 +52,10 @@ $ ->
 
     refresh_url()
 
+  window.webcat_refresh = ()->
+    refresh_localStorage()
+    refresh_url()
+
   window.build_named_search = (search_name) ->
     localStorage.search_type = 'named'
     localStorage.search_name = search_name
@@ -119,10 +123,14 @@ $ ->
   current_url = window.location.href
   complaint_table = ''
 
+  window.webcat_refresh = ()->
+    refresh_localStorage()
+    refresh_url()
+
   build_header = (data) ->
     container = $('#webcat_searchref_container')
     if data != undefined && container.length > 0
-      reset_icon = '<span id="refresh-filter-button" class="reset-filter esc-tooltipped" title="Clear Search Results"></span>'
+      reset_icon = '<span id="refresh-filter-button" class="reset-filter esc-tooltipped" title="Clear Search Results" onclick="webcat_refresh()"></span>'
       {search_type, search_name} = data
 
       if search_type == 'standard'

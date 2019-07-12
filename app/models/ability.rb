@@ -70,6 +70,36 @@ class Ability
       can :publish_to_bugzilla, Note
     end
 
+    if role_names.include?('filerep manager')
+      can :manage, User do |user| #no delete UI is implemented
+        user.ancestors.include?(current_user)
+      end
+      can [:create, :update, :read], [FileReputationDispute, DisputeEmail]
+      can [:manage], [FileRepComment]
+      can :take, FileReputationDispute do |filerep_dispute|
+        filerep_dispute.user_id == User.vrtincoming.id
+      end
+
+      can :return, FileReputationDispute do |filerep_dispute|
+        filerep_dispute.user_id == current_user.id
+      end
+
+      can :change_assignee, FileReputationDispute
+    end
+
+    if role_names.include?('filerep user')
+      can [:create, :update, :read], [FileReputationDispute, DisputeEmail, FileRepComment]
+      can [:delete], [FileRepComment]
+
+      can :take, FileReputationDispute do |filerep_dispute|
+        filerep_dispute.user_id == User.vrtincoming.id
+      end
+
+      can :return, FileReputationDispute do |filerep_dispute|
+        filerep_dispute.user_id == current_user.id
+      end
+    end
+
     if role_names.include?('ips escalator manager')
       can :manage, User do |user| #no delete UI is implemented
         user.ancestors.include?(current_user)

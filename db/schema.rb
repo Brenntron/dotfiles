@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 2019_01_29_160213) do
+ActiveRecord::Schema.define(version: 2019_06_24_135313) do
 
   create_table "alerts", options: "ENGINE=InnoDB DEFAULT CHARSET=utf8", force: :cascade do |t|
     t.datetime "created_at", null: false
@@ -20,16 +20,6 @@ ActiveRecord::Schema.define(version: 2019_01_29_160213) do
     t.integer "attachment_id", null: false
     t.string "policy"
     t.index ["test_group", "attachment_id", "rule_id"], name: "index_alerts_on_test_group_and_attachment_id_and_rule_id"
-  end
-
-  create_table "amp_false_positives", options: "ENGINE=InnoDB DEFAULT CHARSET=utf8", force: :cascade do |t|
-    t.integer "sr_id"
-    t.text "payload"
-    t.datetime "created_at", null: false
-    t.datetime "updated_at", null: false
-    t.bigint "file_reputation_ticket_id"
-    t.index ["file_reputation_ticket_id"], name: "index_amp_false_positives_on_file_reputation_ticket_id"
-    t.index ["payload"], name: "index_amp_false_positives_on_payload", length: 15
   end
 
   create_table "attachments", options: "ENGINE=InnoDB DEFAULT CHARSET=utf8", force: :cascade do |t|
@@ -71,6 +61,7 @@ ActiveRecord::Schema.define(version: 2019_01_29_160213) do
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
     t.index ["link_type", "link_id"], name: "index_bug_reference_rule_links_on_link_type_and_link_id"
+    t.index ["reference_id", "link_type"], name: "index_reference_links_on_reference_and_link_type"
   end
 
   create_table "bugs", options: "ENGINE=InnoDB DEFAULT CHARSET=utf8", force: :cascade do |t|
@@ -156,7 +147,7 @@ ActiveRecord::Schema.define(version: 2019_01_29_160213) do
     t.string "domain"
     t.string "path"
     t.float "wbrs_score"
-    t.string "url_primary_category", limit: 1000
+    t.string "url_primary_category", limit: 2000
     t.string "resolution"
     t.text "resolution_comment"
     t.datetime "complaint_entry_resolved_at"
@@ -169,7 +160,7 @@ ActiveRecord::Schema.define(version: 2019_01_29_160213) do
     t.string "suggested_disposition"
     t.string "ip_address"
     t.string "entry_type"
-    t.string "category", limit: 1000
+    t.string "category", limit: 2000
     t.integer "user_id"
     t.boolean "is_important"
     t.datetime "case_resolved_at"
@@ -290,6 +281,17 @@ ActiveRecord::Schema.define(version: 2019_01_29_160213) do
     t.index ["priority", "run_at"], name: "delayed_jobs_priority"
   end
 
+  create_table "digital_signers", options: "ENGINE=InnoDB DEFAULT CHARSET=utf8", force: :cascade do |t|
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.bigint "file_reputation_dispute_id", null: false
+    t.string "issuer"
+    t.string "subject"
+    t.datetime "valid_from"
+    t.datetime "valid_to"
+    t.index ["file_reputation_dispute_id"], name: "index_digital_signers_on_file_reputation_dispute_id"
+  end
+
   create_table "dispute_comments", options: "ENGINE=InnoDB DEFAULT CHARSET=utf8", force: :cascade do |t|
     t.integer "dispute_id"
     t.text "comment"
@@ -321,7 +323,9 @@ ActiveRecord::Schema.define(version: 2019_01_29_160213) do
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
     t.datetime "email_sent_at"
+    t.bigint "file_reputation_dispute_id"
     t.index ["dispute_id"], name: "index_dispute_emails_on_dispute_id"
+    t.index ["file_reputation_dispute_id"], name: "index_dispute_emails_on_file_reputation_dispute_id"
   end
 
   create_table "dispute_entries", options: "ENGINE=InnoDB DEFAULT CHARSET=utf8", force: :cascade do |t|
@@ -524,15 +528,55 @@ ActiveRecord::Schema.define(version: 2019_01_29_160213) do
     t.string "source"
   end
 
-  create_table "file_reputation_tickets", options: "ENGINE=InnoDB DEFAULT CHARSET=utf8", force: :cascade do |t|
+  create_table "file_rep_comments", options: "ENGINE=InnoDB DEFAULT CHARSET=utf8", force: :cascade do |t|
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.bigint "file_reputation_dispute_id", null: false
+    t.bigint "user_id", null: false
+    t.text "comment"
+    t.index ["file_reputation_dispute_id", "user_id"], name: "index_file_rep_comments_on_file_reputation_dispute_id"
+  end
+
+  create_table "file_reputation_disputes", options: "ENGINE=InnoDB DEFAULT CHARSET=utf8", force: :cascade do |t|
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
     t.bigint "customer_id"
-    t.string "status"
+    t.string "status", default: "NEW", null: false
     t.string "source"
     t.string "platform"
     t.string "description"
-    t.bigint "reputation_file_id"
-    t.index ["customer_id"], name: "index_file_reputation_tickets_on_customer_id"
-    t.index ["reputation_file_id"], name: "index_file_reputation_tickets_on_reputation_file_id"
+    t.string "file_name"
+    t.integer "file_size"
+    t.string "sha256_hash"
+    t.string "sample_type"
+    t.string "disposition"
+    t.string "disposition_suggested"
+    t.bigint "user_id"
+    t.float "sandbox_score"
+    t.float "sandbox_threshold"
+    t.string "sandbox_signer"
+    t.boolean "has_sample"
+    t.boolean "in_zoo"
+    t.float "threatgrid_score"
+    t.float "threatgrid_threshold"
+    t.string "threatgrid_signer"
+    t.boolean "threatgrid_private"
+    t.integer "reversing_labs_score"
+    t.string "reversing_labs_signer"
+    t.string "resolution"
+    t.string "detection_name"
+    t.datetime "detection_created_at"
+    t.datetime "case_closed_at"
+    t.datetime "case_responded_at"
+    t.integer "reversing_labs_count"
+    t.text "reversing_labs_raw", limit: 16777215
+    t.string "submitter_type"
+    t.integer "ticket_source_key"
+    t.index ["created_at"], name: "index_file_reputation_disputes_on_created_at"
+    t.index ["customer_id"], name: "index_file_reputation_disputes_on_customer_id"
+    t.index ["sha256_hash"], name: "index_file_reputation_disputes_on_sha256_hash"
+    t.index ["updated_at"], name: "index_file_reputation_disputes_on_updated_at"
+    t.index ["user_id"], name: "index_file_reputation_disputes_on_user_id"
   end
 
   create_table "fp_file_refs", options: "ENGINE=InnoDB DEFAULT CHARSET=latin1", force: :cascade do |t|
@@ -551,10 +595,6 @@ ActiveRecord::Schema.define(version: 2019_01_29_160213) do
     t.bigint "gib_id"
     t.index ["bug_id", "gib_type", "gib_id"], name: "index_giblets_on_bug_id_and_gib_type_and_gib_id"
     t.index ["gib_type", "gib_id"], name: "index_giblets_on_gib_type_and_gib_id"
-  end
-
-  create_table "immunet_false_positives", options: "ENGINE=InnoDB DEFAULT CHARSET=utf8", force: :cascade do |t|
-    t.string "version"
   end
 
   create_table "morsels", options: "ENGINE=InnoDB DEFAULT CHARSET=latin1", force: :cascade do |t|
@@ -577,6 +617,7 @@ ActiveRecord::Schema.define(version: 2019_01_29_160213) do
     t.datetime "updated_at", null: false
     t.integer "user_id"
     t.string "name"
+    t.string "project_type"
     t.index ["user_id", "name"], name: "index_named_searches_on_user_id_and_name", unique: true
   end
 
@@ -616,13 +657,6 @@ ActiveRecord::Schema.define(version: 2019_01_29_160213) do
     t.datetime "updated_at"
     t.integer "fail_count"
     t.index ["reference_type_id"], name: "index_references_on_reference_type_id"
-  end
-
-  create_table "reputation_files", options: "ENGINE=InnoDB DEFAULT CHARSET=utf8", force: :cascade do |t|
-    t.integer "bugzilla_attachment_id"
-    t.string "sha256"
-    t.string "file_path"
-    t.string "file_name"
   end
 
   create_table "resolution_message_templates", options: "ENGINE=InnoDB DEFAULT CHARSET=latin1", force: :cascade do |t|
@@ -670,6 +704,8 @@ ActiveRecord::Schema.define(version: 2019_01_29_160213) do
     t.datetime "updated_at"
     t.text "policies"
     t.boolean "is_community"
+    t.string "snort_doc_status", default: "NOTYET"
+    t.string "snort_on_off", default: "on"
     t.index ["rule_id"], name: "index_rule_docs_on_rule_id"
   end
 
@@ -743,23 +779,6 @@ ActiveRecord::Schema.define(version: 2019_01_29_160213) do
     t.datetime "updated_at", null: false
     t.index ["session_id"], name: "index_sessions_on_session_id", unique: true
     t.index ["updated_at"], name: "index_sessions_on_updated_at"
-  end
-
-  create_table "snort_false_positives", options: "ENGINE=InnoDB DEFAULT CHARSET=utf8", force: :cascade do |t|
-    t.integer "bug_id"
-    t.string "user_email"
-    t.string "sid"
-    t.text "description"
-    t.string "source_authority"
-    t.string "source_key"
-    t.string "os"
-    t.string "version"
-    t.string "built_from"
-    t.string "pcap_lib"
-    t.string "cmd_line_options"
-    t.datetime "created_at", null: false
-    t.datetime "updated_at", null: false
-    t.index ["source_authority", "source_key"], name: "index_snort_false_positives_on_source_authority_and_source_key"
   end
 
   create_table "snort_researches", options: "ENGINE=InnoDB DEFAULT CHARSET=utf8", force: :cascade do |t|
@@ -868,6 +887,8 @@ ActiveRecord::Schema.define(version: 2019_01_29_160213) do
     t.datetime "created_at"
     t.datetime "updated_at"
     t.string "bugzilla_api_key"
+    t.string "threatgrid_api_key"
+    t.string "sandbox_api_key"
     t.index ["cvs_username"], name: "index_users_on_cvs_username", unique: true
     t.index ["email"], name: "index_users_on_email", unique: true
     t.index ["lft"], name: "index_users_on_lft"

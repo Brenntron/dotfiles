@@ -11,9 +11,12 @@
 #       set_api_requester_config Rails.configuration.wbrs
 #       set_default_request_type :json
 #       set_default_headers "Authorization" => "Bearer #{Rails.configuration.wbrs.auth_token}"
+#       set_basic_auth
 #     end
 #
 # Call call_request_parsed or call_request to make an HTTP request.
+#
+# Use ApiRequester::ApiRequester.config_of() in config_yml.rb initializer
 #
 #
 # == WARNING ==
@@ -33,14 +36,32 @@
 #
 module ApiRequester::ApiRequester
 
+  # Curl::Err::HostResolutionError
+
+  # base class of exceptions for this mixin
   class ApiRequesterError < StandardError
   end
 
+  # exception class for other exceptions re-wrapped as ApiRequesterError.  See `cause` method for original exception.
+  class ApiRequesterExternalError < ApiRequesterError
+  end
+
+  # 401 Unauthenticated
+  class ApiRequesterNotAuthorized < ApiRequesterError
+  end
+
+  # 403 Forbidden or Unauthorized
+  class ApiRequesterForbidden < ApiRequesterError
+  end
+
+  # 404 Not found
   class ApiRequesterNotFoundError < ApiRequesterError
   end
 
-  class ApiRequesterNotAuthorized < ApiRequesterError
+  # 429/420 Exceeded Rate Limit
+  class ApiRequesterExceededRate < ApiRequesterError
   end
+
 
   # Convenience method for reading config.
   # Reads standard settings, such as host, verify_mode, and ca_cert_file
@@ -48,16 +69,16 @@ module ApiRequester::ApiRequester
   # @return [OpenStruct] an open struct with standard values set, which can be added to for custom settings.
   def self.config_of(hash)
     struct = OpenStruct.new
-    %w{host verify_mode port gssnegotiate ca_cert_file api_key}.each do |key|
+    %w{host verify_mode port gssnegotiate ca_cert_file api_key username password}.each do |key|
       struct.send((key + '=').to_sym, hash[key])
     end
 
     struct.tls =
         case struct.verify_mode
-        when 'no-tls', 'no-ssl'
-          false
-        else
+        when 'verify-none', 'verify-peer'
           true
+        else
+          false
         end
 
     struct.port ||= struct.tls ? 443 : 80
@@ -66,7 +87,6 @@ module ApiRequester::ApiRequester
   end
 
   module ClassMethods
-    attr_reader :default_headers
 
     # Sets the configuration.
     #
@@ -91,6 +111,10 @@ module ApiRequester::ApiRequester
       end
     end
 
+    def default_headers
+      @default_headers || {}
+    end
+
     def default_request_type=(default_request_type)
       @default_request_type = default_request_type
     end
@@ -106,6 +130,19 @@ module ApiRequester::ApiRequester
 
     def default_request_type
       @default_request_type || :json
+    end
+
+    def set_basic_auth(username: nil, password: nil)
+      @basic_auth_username = username || request_config.username
+      @basic_auth_password = password || request_config.password
+    end
+
+    def basic_auth_username
+      @basic_auth_username
+    end
+
+    def basic_auth_password
+      @basic_auth_password
     end
 
     def tls?
@@ -166,19 +203,24 @@ module ApiRequester::ApiRequester
     def new_request(path, query = nil)
 
       request = HTTPI::Request.new(uri(path, query))
+      request.auth.gssnegotiate
 
       case verify_mode
       when 'verify-peer'
         request.ssl = true
+        request.auth.ssl.ssl_version = :TLSv1
         request.auth.ssl.verify_mode = :peer
         request.auth.ssl.ca_cert_file = ca_cert_file if ca_cert_file
       when 'verify-none'
         request.ssl = true
+        request.auth.ssl.ssl_version = :TLSv1
         request.auth.ssl.verify_mode = :none
       else #no-tls, no-ssl
         request.ssl = false
         # request.auth.ssl.verify_mode = :none
       end
+
+      request.auth.basic( basic_auth_username, basic_auth_password ) if basic_auth_username
 
       request
     end
@@ -204,27 +246,56 @@ module ApiRequester::ApiRequester
       request
     end
 
+    def exception_message_of(exception)
+      case
+      when exception.message.present?
+        exception.message
+      when exception.kind_of?(HTTPI::SSLError) && exception.original
+        "#{exception.class.name} -> " + exception_message_of(exception.original)
+      when exception.cause
+        "#{exception.class.name} -> " + exception_message_of(exception.cause)
+      else
+        exception.class.name
+      end
+    end
+
     def call_by_method(method, request)
       HTTPI.send(method, request, :curb)
+    rescue => exception
+      raise ApiRequesterExternalError, exception_message_of(exception)
     end
 
     def error_body(response)
       body = JSON.parse(response.body)
-      body['Error']
+      body['message']
     rescue
       nil
     end
 
+    def specific_error_class(code)
+      case code
+      when 401
+        ApiRequesterNotAuthorized
+      when 403
+        ApiRequesterForbidden
+      when 404
+        ApiRequesterNotFoundError
+      when 420
+        ApiRequesterExceededRate
+      when 429
+        ApiRequesterExceededRate
+      else
+        ApiRequesterError
+      end
+    end
+
     def request_error_handling(response)
+      error_class = specific_error_class(response.code)
       case
       when 400 > response.code
         response
-      when 401 == response.code
-        raise ApiRequesterNotAuthorized, "HTTP response #{response.code} #{error_body(response)}"
-      when 404 == response.code
-        raise ApiRequesterNotFoundError, "HTTP response #{response.code} #{error_body(response)}"
       else
-        raise ApiRequesterError, "HTTP response #{response.code} #{error_body(response)}"
+        raise error_class, "HTTP response #{response.code} #{error_body(response)}"
       end
     end
 
@@ -287,6 +358,7 @@ module ApiRequester::ApiRequester
     # @raise [ApiRequester::ApiRequester::ApiRequesterError]
     def call_request_parsed(method = :get, path, request_type: default_request_type, input: nil, headers: {})
       response = call_request(method, path, request_type: request_type, input: input, headers: headers)
+      return nil if response.body.blank?
       JSON.parse(response.body)
     end
 

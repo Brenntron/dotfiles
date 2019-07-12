@@ -460,6 +460,15 @@ class DisputeEntry < ApplicationRecord
     return 'Unable to resolve'
   end
 
+  def latest_comment_date
+    comment = self.dispute.dispute_comments.last
+    if comment.present?
+      return comment.updated_at.strftime("%FT%T")
+    else
+      "None"
+    end
+  end
+
   def assign_from_auto_resolve(address:, total_hits:, resolved_at:, dispute_entry:)
 
     self.status = NEW
@@ -528,7 +537,7 @@ class DisputeEntry < ApplicationRecord
   def last_submitted
     if self.referenced_tickets.count > 0
 
-      last_submitted = referenced_tickets.last.created_at
+      last_submitted = referenced_tickets.order(:created_at).last.created_at
     else
       last_submitted = "N/A"
     end
