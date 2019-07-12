@@ -7,7 +7,11 @@
     = render "escalations/webcat/shared/telemetry"
 
   .row.top-margin
-    .col-xs-12.temp-spacer
+    .col-xs-12
+      %h1#webcat-index-title All Web Categorization Tickets
+    #webcat_searchref_container
+  .row
+    .col-xs-12
       = render "toolbar"
 
       %div{:style => "position:relative"}
@@ -37,5 +41,3 @@
             %th Submitter Type
             %th Submitter Org
             %th Assigned To
-
-
