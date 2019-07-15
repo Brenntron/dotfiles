@@ -399,7 +399,7 @@ window.updateEntryColumns = (entry_id,row_id) ->
   headers = {'Token': $('input[name="token"]').val(), 'Xmlrpc-Token': $('input[name="xml_token"]').val()}
   fixed_flag = $('#fixed'+entry_id).is(':checked')
 
-  # Allow marking entries as invalid to pass through without categories assigned
+  # If resolution is set to fixed, make sure it has categories applied
   if categories == null && fixed_flag == true
     std_msg_error("Must include at least one category.","", reload: false)
     $("#submit_changes_#{entry_id}").removeClass('hidden')
