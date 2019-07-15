@@ -384,7 +384,10 @@ window.updateEntryColumns = (entry_id,row_id) ->
   $("#reopen_#{entry_id}").removeClass('hidden')
 
   prefix = $('#complaint_prefix_'+entry_id)[0].value
-  categories = $('#input_cat_'+entry_id).val().toString()
+  if $('#input_cat_'+entry_id).val() != null
+    categories = $('#input_cat_'+entry_id).val().toString()
+  else
+    categories = null
   category_name = $('#input_cat_' + entry_id).next('.selectize-control').find('.item')
   category_names = []
   category_name.each ->
@@ -394,9 +397,10 @@ window.updateEntryColumns = (entry_id,row_id) ->
   comment = $('#complaint_comment_'+entry_id)[0].value
   resolution_comment = $('#complaint_resolution_comment_'+entry_id)[0].value
   headers = {'Token': $('input[name="token"]').val(), 'Xmlrpc-Token': $('input[name="xml_token"]').val()}
+  fixed_flag = $('#fixed'+entry_id).is(':checked')
 
-  unchanged = $("#unchanged#{entry_id}").is(':checked')
-  if categories.length == 0 && status != 'INVALID' && unchanged == false
+  # Allow marking entries as invalid to pass through without categories assigned
+  if categories == null && fixed_flag == true
     std_msg_error("Must include at least one category.","", reload: false)
     $("#submit_changes_#{entry_id}").removeClass('hidden')
     $("#reopen_#{entry_id}").addClass('hidden')
