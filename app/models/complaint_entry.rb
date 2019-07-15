@@ -145,6 +145,7 @@ class ComplaintEntry < ApplicationRecord
 
             current_status = "ASSIGNED"
             update(status:current_status,
+                   url_primary_category: nil,
                    internal_comment: comment,
                    resolution_comment: resolution_comment,
                    case_assigned_at: Time.now,

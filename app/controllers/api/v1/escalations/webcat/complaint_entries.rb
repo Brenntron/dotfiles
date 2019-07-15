@@ -190,7 +190,7 @@ module API
                   return {error:e.message}.to_json
               end
               {display_name: current_user.display_name, status: entry.status, entry_resolution: permitted_params['status'],
-               uri: entry.uri, domain: entry.domain, subdomain: entry.subdomain, path: entry.path}.to_json
+               uri: entry.uri, domain: entry.domain, subdomain: entry.subdomain, path: entry.path, categories: params[:categories]}.to_json
             end
 
             desc 'Bulk update entry resolutions'
