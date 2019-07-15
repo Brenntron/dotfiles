@@ -9,6 +9,13 @@ $(window).load ->
 
   $(".email-row[email_id="+most_recent_email+"]").click()
 
+
+
+  $('.case-history-author').each(() ->
+    if (this.innerHTML.indexOf("bounces+") != -1)
+      $(this).html("Bounced")
+  )
+
 $ ->
 
   $('#history-sort-dropdown').on 'change', ->
@@ -76,6 +83,7 @@ $ ->
     )
 
   populate_communication_details = (email, attachments, case_email) ->
+    $(".reply-button").show()
     dispute_id = $('input[name="dispute_id"]').val()
     $('input[type=text].reply-subject').val("Talosintelligence.com support request " + dispute_id)
     $('.communication-subject')[0].innerHTML = email.subject
@@ -83,6 +91,21 @@ $ ->
     $('.receiver-email')[0].innerHTML = (email.to || case_email)
     $('.receiver-email')[1].innerHTML = email.from
     $('.email-msg-content')[0].innerHTML = email.body
+
+    $('.receiver-email').each(() ->
+      if (this.innerHTML.indexOf("bounces+") != -1)
+        $(this).html("<span class='badge badge-warning'>Bounced</span> ")
+        $(".reply-button").hide()
+
+    )
+
+    $('.author-username').each(() ->
+      if (this.innerHTML.indexOf("bounces+") != -1)
+        $(this).html("<span class='badge badge-warning'>Bounced</span> ")
+        $(".reply-button").hide()
+    )
+
+
 
 
     date = moment.utc(email.created_at)
@@ -160,7 +183,8 @@ $ ->
     form_data.append('dispute_id', $('input[name="dispute_id"]').val())
     form_data.append('to', $('.receiver-email')[1].textContent)
     form_data.append('subject', $('input[type=text].reply-subject').val())
-    form_data.append('dispute_email_id', $('.current-email-view').attr('email_id'))
+    form_data.append('dispute_email_id', $('.current-email-view').attr('email_id')) if $('.current-email-view').attr('email_id')
+    form_data.append('dispute_type', $('input[name="dispute_type"]').val())
 
 
     $.ajax(
@@ -552,7 +576,7 @@ $ ->
     $('#edit-email-template').removeClass('hidden')
     $('#cancel-edit-email-template').removeClass('hidden')
     $('#edit-template-form-wrapper').animate {
-      height: 200
+      height: 256
       borderWidth: '1px'
     }, 300
 

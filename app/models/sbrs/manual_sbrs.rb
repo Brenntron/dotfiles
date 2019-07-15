@@ -48,8 +48,12 @@ class Sbrs::ManualSbrs < Sbrs::Base
 
   def self.parse_wbrs(wbrs_response)
     wbrs_return = JSON.parse(wbrs_response.body)
-    wbrs_return = wbrs_return[0]['response']
-
+    #sometimes we get responses back that are arrays
+    #sometimes we get responses that are hashes...
+    #i hate the wubya bee arr ess API
+    if wbrs_return.kind_of?(Array)
+      wbrs_return = wbrs_return[0]['response']
+    end
     wbrs_return
   end
 
@@ -59,6 +63,17 @@ class Sbrs::ManualSbrs < Sbrs::Base
 
   def self.call_wbrs(params, type: nil)
     parse_wbrs(request_sds(path: '/score/wbrs;wbrs-rulehits/json?url=', body: params, type: type))
+  end
+
+  def self.call_wbrs_webcat(params, type: nil)
+    sds_response = parse_wbrs(request_sds(path: '/score/webcat/json?url=', body: params, type: type))
+    webcatlist = parse_wbrs(request_sds(path: '/labels/webcat/json', body: params, type: type))
+
+    if sds_response["webcat"]["cat"] == 'nocat'
+      nil.to_s
+    else
+      webcatlist["#{sds_response["webcat"]["cat"]}"]["name"]
+    end
   end
 
   def self.where(conditions = {}, raw = false)
