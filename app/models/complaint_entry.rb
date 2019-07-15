@@ -281,6 +281,7 @@ class ComplaintEntry < ApplicationRecord
     end
 
     if is_ip?(ip_url)
+      ip_url.chomp!("/")
       ip_network = ip_url.scan(/(?:[0-9]{1,3}\.){3}[0-9]{1,3}/)[0]
       ip_path = ip_url.sub(ip_network, '')
       new_complaint_entry.ip_address = ip_network
@@ -372,6 +373,7 @@ class ComplaintEntry < ApplicationRecord
 
 
       if is_ip?(ip_url)
+        ip_url.chomp!("/")
         ip_network = ip_url.scan(/(?:[0-9]{1,3}\.){3}[0-9]{1,3}/)[0]
         ip_path = ip_url.sub(ip_network, '')
         new_complaint_entry.ip_address = ip_network
