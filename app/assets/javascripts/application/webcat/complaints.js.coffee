@@ -1348,7 +1348,7 @@ window.click_table_buttons = (complaint_table, button)->
     unless $(td).hasClass 'nested-complaint-data-wrapper'
       $(td).addClass 'nested-complaint-data-wrapper'
 
-    if row.data().status == "PENDING" || ['NEW','ASSIGNED'].includes(row.data().status)
+    if ['NEW','ASSIGNED','PENDING'].includes(row.data().status)
       $('#input_cat_'+ row.data().entry_id).selectize {
         persist: false,
         create: false,
