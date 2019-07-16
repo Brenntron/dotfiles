@@ -9756,3 +9756,19 @@ input[type="radio"].resolution_radio_button {
 #case-history .case-history-preview, #case-history .case-history-author {
   word-break: break-word;
 }
+
+
+// webrep and webcat toolbars - between 1800px and 1600px needs corrections to prevent breaking/wrapping
+@media screen and (max-width: 1800px) and (min-width: 1600px) {
+  #webrep-index-toolbar, #webcat-index-toolbar {
+    .toolbar-button {
+      min-height: 25px;
+      background-position: 4px 6px;
+      padding-left: 13px;
+      padding-right: 7px;
+      background-size: 14px 14px; // icon size
+      transition: background-color 0.2s;
+    }
+  }
+}
+
