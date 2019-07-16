@@ -53,3 +53,4 @@
 
 //= require application/webrep/reptool
 //= require application/webrep/wbrs_wlbl
+//= require admin/admin-tools

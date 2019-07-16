@@ -1,5 +1,5 @@
 class Admin::MorselsController < Admin::HomeController
-  load_and_authorize_resource class: 'Admin'
+  load_and_authorize_resource
 
   before_action :set_scheduled_task, only: [:destroy]
 

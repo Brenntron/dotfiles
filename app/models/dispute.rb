@@ -7,11 +7,11 @@ class Dispute < ApplicationRecord
   belongs_to :user, :optional => true
   belongs_to :related_dispute, class_name: 'Dispute', foreign_key: :related_id, required: false
 
-  has_many :relating_disputes, class_name: 'Dispute', foreign_key: :related_id
-  has_many :dispute_comments
-  has_many :dispute_emails
-  has_many :dispute_entries, dependent: :destroy
-  has_many :dispute_peeks, -> { order("dispute_peeks.updated_at desc") }
+  has_many :relating_disputes, class_name: 'Dispute', foreign_key: :related_id, dependent: :nullify
+  has_many :dispute_comments, dependent: :destroy
+  has_many :dispute_emails, dependent: :destroy
+  has_many :dispute_entries, dependent: :restrict_with_exception
+  has_many :dispute_peeks, -> { order("dispute_peeks.updated_at desc") }, dependent: :destroy
   has_many :recent_dispute_views, class_name: 'User', through: :dispute_peeks, source: :user
 
   delegate :cvs_username, to: :user, allow_nil: true
@@ -1308,7 +1308,9 @@ class Dispute < ApplicationRecord
                       :submission_type => result.submission_type.upcase,
                       :last_comment => last_comment_preview,
                       :owner => ticket_user,
-                      :priority => result.priority
+                      :priority => result.priority,
+                      :last_comment_date => result.dispute_comments&.last&.updated_at&.strftime("%FT%T"),
+                      :comment_count => result.dispute_comments&.count
       }
     end
 

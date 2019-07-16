@@ -93,7 +93,7 @@ RSpec.describe "Peake-Bridge dispute messages channels", type: :request do
 
     post '/escalations/peake_bridge/channels/ticket-event/messages', as: :json, params: dispute_message_json
 
-    expect(response).to be_success
+    expect(response).to be_successful
     dispute = Dispute.where(ticket_source_key: 1001).first
     expect(dispute).to_not be_nil
     expect(dispute.dispute_entries.count).to eq(4)
@@ -133,7 +133,7 @@ RSpec.describe "Peake-Bridge dispute messages channels", type: :request do
 
     post '/escalations/peake_bridge/channels/ticket-event/messages', as: :json, params: dispute_message_json
 
-    expect(response).to be_success
+    expect(response).to be_successful
     dispute = Dispute.where(ticket_source_key: 1001).first
     expect(dispute).to_not be_nil
     expect(dispute.dispute_entries.count).to eq(4)
@@ -150,7 +150,7 @@ RSpec.describe "Peake-Bridge dispute messages channels", type: :request do
 
     post '/escalations/peake_bridge/channels/ticket-event/messages', as: :json, params: dispute_message_json
 
-    expect(response).to be_success
+    expect(response).to be_successful
     dispute = Dispute.where(ticket_source_key: 1001).first
     expect(dispute).to_not be_nil
     expect(dispute.dispute_entries.count).to eq(4)
@@ -161,7 +161,7 @@ RSpec.describe "Peake-Bridge dispute messages channels", type: :request do
   end
 end
 
-# expect(response.code).to be_success
+# expect(response.code).to be_successful
 # expect(response.code).to be_error
 # expect(response.code).to be_missing
 # expect(response.code).to be_redirect

@@ -70,29 +70,18 @@ module API
 
                 complaint_entries.each do |complaint_entry|
                   complaint_entry_packet = {}
-                  complaint_age_int = (Time.now - complaint_entry.created_at).to_i
+                  complaint_age = Time.now - complaint_entry.created_at
+                  humanized_age = ComplaintEntry.humanize_secs(complaint_age)
 
-                  # complaint is less than an hour
-                  if complaint_age_int < 3600
-                    complaint_entry_packet[:age] = '<1h'
-                  # complaint is more than an hour, less than 120 hours
-                  elsif complaint_age_int > 3600 and complaint_age_int < 432000
-                    refined_words_age = ComplaintEntry.what_time_is_it(complaint_age_int)
-                    # complaint is over 3 hours, less than 12 hours
-                    if complaint_age_int >= 10800 and complaint_age_int < 43200
-                      complaint_entry_packet[:age] = '<span class="ticket-age-over3hr">' + refined_words_age + '</span>'
-                    # complaint is over 12 hours, less than 120 hours
-                    elsif complaint_age_int > 43200
-                      complaint_entry_packet[:age] = '<span class="ticket-age-over12hr">' + refined_words_age + '</span>'
-                    else
-                      complaint_entry_packet[:age] = refined_words_age
-                    end
-                  # complaint is more than 120 hours
-                  elsif complaint_age_int  > 432000
-                    complaint_entry_packet[:age] = '<span class="ticket-age-over12hr"> >120h </span>'
-                  else
-                    complaint_entry_packet[:age] = complaint_age_int
-                  end
+                  complaint_entry_packet[:age] =
+                      case
+                      when complaint_age  > 43200
+                        "<span class=\"ticket-age-over12hr\">#{humanized_age}</span>"
+                      when complaint_age > 10800
+                        "<span class=\"ticket-age-over3hr\">#{humanized_age}</span>"
+                      else
+                        "<span class=\"ticket-age-under3hr\">#{humanized_age}</span>"
+                      end
 
                   complaint_entry_packet[:uri] = complaint_entry.uri
                   complaint_entry_packet[:age_int] = (Time.now - complaint_entry.created_at).to_i
@@ -201,7 +190,7 @@ module API
                   return {error:e.message}.to_json
               end
               {display_name: current_user.display_name, status: entry.status, entry_resolution: permitted_params['status'],
-               uri: entry.uri, domain: entry.domain, subdomain: entry.subdomain, path: entry.path}.to_json
+               uri: entry.uri, domain: entry.domain, subdomain: entry.subdomain, path: entry.path, categories: params[:categories]}.to_json
             end
 
             desc 'Bulk update entry resolutions'
@@ -489,6 +478,14 @@ module API
                 return { image_data: Base64.encode64(record.screenshot) }.to_json
               end
             end
+            get ':complaint_entry_id/retake_screenshot' do
+              std_api_v2 do
+                entry = ComplaintEntry.find(params[:complaint_entry_id])
+                ces = entry.complaint_entry_screenshot
+                ces.update(error_message:"Retaking screenshot please wait.", screenshot:nil)
+                ces.grab_screenshot
+              end
+            end
 
             desc 'Retrieve current categories from expanding a complaint entry row'
             params do
@@ -504,7 +501,21 @@ module API
                   master_categories = []
                 end
 
-                {master_categories: master_categories, current_category_data: complaint_entry.current_category_data }.to_json
+                wbrs_categories = complaint_entry.current_category_data
+
+                # Pull category from SDS
+                sds_params = {}
+
+                if complaint_entry.entry_type == 'URI/DOMAIN'
+                  sds_params['url'] = complaint_entry.uri
+                elsif complaint_entry.entry_type == 'IP'
+                  sds_params['url'] = complaint_entry.ip_address
+                end
+
+                sds_category = Sbrs::ManualSbrs.call_wbrs_webcat(sds_params, type: 'wbrs')
+
+                {master_categories: master_categories, current_category_data: wbrs_categories,
+                 sds_category: sds_category }.to_json
               end
             end
 
@@ -579,11 +590,12 @@ module API
             post 'xbrs' do
               #raise 'simulated breakage'
               response = Xbrs::GetXbrs.by_domain(permitted_params['url'])
+              return [] if response.is_a?(Hash) && response[:error].present?
               data = response.last['data']
               columns = response.last['legend']
 
-              mtime_column_index = 0
-              ctime_column_index = 0
+              mtime_column_index = nil
+              ctime_column_index = nil
 
               columns.each_with_index do |col, index|
                 if col == 'ctime'
@@ -597,10 +609,10 @@ module API
               formatted_data = []
 
               data.each do |datum|
-                if ctime_column_index != 0
+                if ctime_column_index
                   datum[ctime_column_index] = Time.at(datum[ctime_column_index])
                 end
-                if mtime_column_index != 0
+                if mtime_column_index
                   datum[mtime_column_index] = Time.at(datum[mtime_column_index])
                 end
 
@@ -608,6 +620,24 @@ module API
               end
 
               {:status => "success", :data => formatted_data, :columns => columns}
+            end
+
+            desc "Reopen a complaint entry"
+            params do
+              requires :complaint_entry_id, type: Integer
+            end
+
+            post 'reopen_complaint_entry' do
+              begin
+                entry = ComplaintEntry.where(:id => permitted_params[:complaint_entry_id]).first
+                if entry.reopen
+                  {:status => "success"}
+                else
+                  {:status => "error"}
+                end
+              rescue
+                {:status => "error"}
+              end
             end
 
           end
