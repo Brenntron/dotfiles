@@ -161,6 +161,7 @@ class FileReputationDispute < ApplicationRecord
     file_rep.assign_attributes(attributes)
 
     file_rep.update_scores
+    file_rep.populate_fields_from_rl
 
     if file_rep.save!
       file_rep
