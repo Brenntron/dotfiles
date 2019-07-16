@@ -328,7 +328,7 @@ class DisputeEntry < ApplicationRecord
         datum[ctime_column_index] = Time.at(datum[ctime_column_index])
       end
       if mtime_column_index
-        datum[mtime_column_index] = Time.at(datum[mtime_column_index - 1])
+        datum[mtime_column_index] = Time.at(datum[mtime_column_index])
       end 
 
       formatted_data.last['data'] << datum 
