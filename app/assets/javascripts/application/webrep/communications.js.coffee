@@ -593,6 +593,7 @@ $ ->
     $('#edit-template-form-wrapper').contents().show()
     $('#create-email-template').hide()
     $('#edit-email-template').removeClass('hidden')
+    $('#edit-filerep-email-template').removeClass('hidden')
     $('#cancel-edit-email-template').removeClass('hidden')
     $('#edit-template-form-wrapper').animate {
       height: 200
@@ -607,6 +608,7 @@ $ ->
     $('#create-email-template').show()
     $('#cancel-edit-email-template').addClass('hidden')
     $('#edit-email-template').addClass('hidden')
+    $('#edit-filerep-email-template').addClass('hidden')
     $('#edit-template-form-wrapper').animate {
       height: 0
       borderWidth: 0

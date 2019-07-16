@@ -28,7 +28,6 @@ module API
             put ":id", root: "email_template" do
               authorize!(:update, EmailTemplate)
               template = FileRepEmailTemplate.find(permitted_params[:id])
-              authorize!(:update, template)
               template.update_attributes(permitted_params)
             end
 
@@ -55,7 +54,6 @@ module API
             delete ":id", root: "email_template" do
               authorize!(:delete, EmailTemplate)
               template = FileRepEmailTemplate.find(permitted_params[:id])
-              authorize!(:delete, template)
               template.destroy
             end
           end
