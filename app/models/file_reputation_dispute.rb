@@ -41,7 +41,7 @@ class FileReputationDispute < ApplicationRecord
   RESOLUTION_AUTORESOLVED               = 'Auto Resolved'
   RESOLUTION_DUPLICATE              = 'DUPLICATE'
   RESOLUTION_AUTORESOLVED_COMMENT       = <<~HEREDOC
-    This ticket has been auto-resolved, suggested disposition and disposition already match.
+    This ticket has been auto-resolved, the suggested disposition and the cloud disposition of the file already match.  If your device or endpoint client is not reflecting this disposition, please open a TAC case for the Advanced Threat Team at http://support.cisco.com
   HEREDOC
   RESOLUTION_DUPLICATE_COMMENT          = <<~HEREDOC
     This ticket has been auto-resolved. A ticket with the same SHA256 hash already exists and is still open.
