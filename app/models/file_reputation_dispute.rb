@@ -614,14 +614,29 @@ class FileReputationDispute < ApplicationRecord
         Thread.new do
           new_dispute.update_scores
           new_dispute.auto_resolve_on_matching_disposition(from: 'TI')
+          new_dispute.send_created_ack
         end
       else
         new_dispute.update_scores
         new_dispute.auto_resolve_on_matching_disposition(from: 'TI')
+        new_dispute.send_created_ack
       end
     end
 
     new_dispute
+  end
+
+  def send_created_ack
+    return_payload = {}
+    return_payload[self.sha256_hash] = {
+        resolution: self.resolution,
+        resolution_comment: self.resolution_comment,
+        status: self.status,
+        sugg_type: self.disposition_suggested
+    }
+
+    conn = ::Bridge::FileRepCreatedEvent.new(addressee: "talos-intelligence", source_authority: "talos-intelligence", source_key: self.ticket_source_key, ac_id: self.id)
+    conn.post(return_payload)
   end
 
   def auto_resolve_on_matching_disposition(from: 'ACE')
@@ -633,20 +648,83 @@ class FileReputationDispute < ApplicationRecord
         auto_resolved_boolean = true
       end
 
-      if from == 'TI'
-        return_payload = {}
-        return_payload[self.sha256_hash] = {
-            resolution: self.resolution,
-            resolution_comment: self.resolution_comment,
-            status: self.status,
-            sugg_type: self.disposition_suggested
-        }
+      return true if auto_resolved_boolean
 
-        conn = ::Bridge::FileRepCreatedEvent.new(addressee: "talos-intelligence", source_authority: "talos-intelligence", source_key: self.ticket_source_key, ac_id: self.id)
-        conn.post(return_payload)
+      threatgrid_present = false
+      sandbox_present = true
+      reversinglab_present = true
+      malware_zoo_present = false
+
+
+      ##query sources for file sample existence
+      threatgrid_response = Threatgrid::Search.query(self.sha256_hash)
+      if threatgrid_response[:threatgrid_score].present?
+        threatgrid_present = true
       end
 
+      rev_lab = FileReputationApi::ReversingLabs.lookup(self.sha256_hash)
+      rev_lab_json = JSON.parse(rev_lab.raw_json)
+
+      if rev_lab_json[:error].present? && rev_lab_json[:error] == "Not in RL"
+        reversinglab_present = false
+      end
+
+      zoo_response = FileReputationApi::SampleZoo.sha256_lookup(self.sha256_hash)
+      malware_zoo_present = FileReputationApi::SampleZoo.query_from_data(zoo_response)[:in_zoo]
+
+      sandbox_response = FileReputationApi::Sandbox.score(self.sha256_hash, :api_key_type => self.sandbox_key)
+      if sandbox_response.blank?
+        sandbox_present = false
+      end
+
+      if [threatgrid_present, sandbox_present, reversinglab_present, malware_zoo_present].any? {|prez| prez == false } && [threatgrid_present, sandbox_present, reversinglab_present, malware_zoo_present].any? {|prez| prez == true }
+        self.status = STATUS_NEW
+        self.save
+        return auto_resolved_boolean
+      end
+
+      if [threatgrid_present, sandbox_present, reversinglab_present, malware_zoo_present].all? {|prez| prez == false }
+        #notify customer that there is no sample and to escalate via TAC with sample
+        self.status = STATUS_RESOLVED
+        self.resolution = RESOLUTION_AUTORESOLVED
+        self.resolution_comment = "placeholder for no sample auto resolution"
+        self.save
+
+        return auto_resolved_boolean
+      end
+
+      FileReputationApi::Sandbox.run_sample(self.sha256_hash)
+
+      FileReputationDispute.check_case_for_auto_resolve(self.id)
+      self.status = AUTORESOLVE_BEING_PROCESSED
+      self.save
+
+
       auto_resolved_boolean
+  end
+
+  class << self
+    def check_case_for_auto_resolve(file_rep_id)
+      file_rep = FileReputationDispute.find(file_rep_id)
+
+      detection = FileReputationApi::Detection.get_bulk(file_rep.sha256_hash)
+      if detection.malicious?
+        #notify customer that there is no sample and to escalate via TAC with sample
+        file_rep.disposition = DISPOSITION_MALICIOUS
+        file_rep.status = STATUS_RESOLVED
+        file_rep.resolution = RESOLUTION_AUTORESOLVED
+        file_rep.resolution_comment = "placeholder for re run malicious"
+
+        conn = ::Bridge::FileRepUpdateStatusEvent.new(addressee: "talos-intelligence")
+        conn.post(file_rep, source_authority: "talos-intelligence", source_key: file_rep.ticket_source_key)
+
+      else
+        file_rep.status = STATUS_NEW
+      end
+      file_rep.save
+
+    end
+    handle_asynchronously :check_case_for_auto_resolve, :run_at => Proc.new { 20.minutes.from_now }
   end
 
   def self.auto_resolve_on_duplicate(dispute)
