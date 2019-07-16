@@ -9757,8 +9757,7 @@ input[type="radio"].resolution_radio_button {
   word-break: break-word;
 }
 
-
-// webrep and webcat toolbars - between 1800px and 1600px needs corrections to prevent breaking/wrapping
+// webrep and webcat toolbars - between 1800px and 1600px, prevent breaking/wrapping of the buttons
 @media screen and (max-width: 1800px) and (min-width: 1600px) {
   #webrep-index-toolbar, #webcat-index-toolbar {
     .toolbar-button {
@@ -9771,4 +9770,3 @@ input[type="radio"].resolution_radio_button {
     }
   }
 }
-
