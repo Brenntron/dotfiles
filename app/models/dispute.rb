@@ -12,7 +12,7 @@ class Dispute < ApplicationRecord
   has_many :dispute_emails, dependent: :destroy
   has_many :dispute_entries, dependent: :restrict_with_exception
   has_many :dispute_peeks, -> { order("dispute_peeks.updated_at desc") }, dependent: :destroy
-  has_many :recent_dispute_views, class_name: 'User', through: :dispute_peeks, source: :user, dependent: :destroy
+  has_many :recent_dispute_views, class_name: 'User', through: :dispute_peeks, source: :user
 
   delegate :cvs_username, to: :user, allow_nil: true
 
