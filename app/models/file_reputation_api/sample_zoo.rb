@@ -31,12 +31,10 @@ class FileReputationApi::SampleZoo
       else
         in_zoo = false
       end
-
-      file_name = api_response&.dig('hits','hits')[0]&.dig('_source','originalfilename')
     rescue Exception => e
         raise(e.message)
     end
 
-    {in_zoo: in_zoo, file_name: file_name}
+    {in_zoo: in_zoo}
   end
 end
