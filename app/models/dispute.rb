@@ -7,11 +7,11 @@ class Dispute < ApplicationRecord
   belongs_to :user, :optional => true
   belongs_to :related_dispute, class_name: 'Dispute', foreign_key: :related_id, required: false
 
-  has_many :relating_disputes, class_name: 'Dispute', foreign_key: :related_id
-  has_many :dispute_comments
-  has_many :dispute_emails
-  has_many :dispute_entries, dependent: :destroy
-  has_many :dispute_peeks, -> { order("dispute_peeks.updated_at desc") }
+  has_many :relating_disputes, class_name: 'Dispute', foreign_key: :related_id, dependent: :nullify
+  has_many :dispute_comments, dependent: :destroy
+  has_many :dispute_emails, dependent: :destroy
+  has_many :dispute_entries, dependent: :restrict_with_exception
+  has_many :dispute_peeks, -> { order("dispute_peeks.updated_at desc") }, dependent: :destroy
   has_many :recent_dispute_views, class_name: 'User', through: :dispute_peeks, source: :user
 
   delegate :cvs_username, to: :user, allow_nil: true
@@ -203,7 +203,7 @@ class Dispute < ApplicationRecord
   end
 
   def each_duplicate(&block)
-    if related_dispute && Dispute::DUPLICATE == self.resolution
+    if related_dispute
       #block.call(related_dispute)
       related_dispute.relating_disputes.where(resolution: Dispute::DUPLICATE).where.not(id: self.id).each(&block)
     else
@@ -268,6 +268,9 @@ class Dispute < ApplicationRecord
     possibles = Dispute.includes(:dispute_entries).where(:customer_id => dispute.customer_id).select {|dispute| dispute.status != RESOLVED || dispute.status != DUPLICATE}
     candidates = []
 
+    all_resolved = true
+
+    # If all possible Disputes are Resolved or Duplicate, do not register as a duplicate
     possibles.each do |poss|
 
       ips = poss.dispute_entries.select{ |entry| entry.entry_type == "IP"}.pluck(:ip_address).sort
@@ -278,16 +281,27 @@ class Dispute < ApplicationRecord
       end
     end
 
-    if candidates.present?
+    if candidates.find{ |candidate| candidate.status != RESOLVED }
+      all_resolved = false
+    end
+
+    if candidates.any?
       best_candidate = candidates.sort_by {|candidate| candidate.id}.first
       response[:authority] = best_candidate
       response[:is_dupe] = true
+      response[:all_resolved] = all_resolved
     else
       response[:is_dupe] = false
     end
 
     response
 
+  end
+
+  def self.manage_all_resolved_duplicate_dispute(dispute, authority_dispute)
+    dispute.related_id = authority_dispute.id
+    dispute.related_at = Time.now
+    dispute.save!
   end
 
   def self.manage_duplicate_dispute(dispute, authority_dispute, new_entries_ips, new_entries_urls, source_key)
@@ -476,9 +490,11 @@ class Dispute < ApplicationRecord
 
         response = is_possible_customer_duplicate?(new_dispute, new_entries_ips, new_entries_urls)
 
-        if response[:is_dupe] == true
+        if response[:is_dupe] == true && response[:all_resolved] == false
           manage_duplicate_dispute(new_dispute, response[:authority], new_entries_ips, new_entries_urls, message_payload["source_key"] )
           return
+        elsif response[:is_dupe] == true && response[:all_resolved] == true
+          manage_all_resolved_duplicate_dispute(new_dispute, response[:authority])
         end
 
         #IPS and URL/DOMAIN entries are almost virtually the same, maybe this is worthy of refactoring into it's own method.
@@ -1292,7 +1308,9 @@ class Dispute < ApplicationRecord
                       :submission_type => result.submission_type.upcase,
                       :last_comment => last_comment_preview,
                       :owner => ticket_user,
-                      :priority => result.priority
+                      :priority => result.priority,
+                      :last_comment_date => result.dispute_comments&.last&.updated_at&.strftime("%FT%T"),
+                      :comment_count => result.dispute_comments&.count
       }
     end
 

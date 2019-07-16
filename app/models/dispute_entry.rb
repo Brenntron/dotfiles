@@ -228,6 +228,11 @@ class DisputeEntry < ApplicationRecord
   end
 
   def assign_url_parts(url = self.hostlookup)
+
+    if !url.starts_with?("http")
+      url = "http://" + url
+    end  
+    
     uri = URI.parse(URI.parse(url).scheme.nil? ? "http://#{url}" : url)
     domain = PublicSuffix.parse(uri.host, :ignore_private => true)
 
@@ -257,11 +262,14 @@ class DisputeEntry < ApplicationRecord
         begin
           self.uri.blank? ? xbrs = Xbrs::GetXbrs.by_ip4(self.ip_address) : xbrs = Xbrs::GetXbrs.by_domain(self.uri.gsub(/\r\n?/, "\n").strip)
         rescue
-          xbrs = [{}, {'data' => []}]
+          xbrs = [{}, {'data' => [], 'legend' => []}]
         end
       end
     end
-    
+    if xbrs[1].blank?
+      xbrs = [{}, {'data' => [], 'legend' => []}]
+    end
+
     # Starting here, we are cleaning up this data to remove columns that are completely empty.
     datacounter = 0
     @columns_to_remove = []
@@ -293,6 +301,41 @@ class DisputeEntry < ApplicationRecord
   def find_xbrs(reload: false)
     @xbrs = nil if reload
     @xbrs ||= get_xbrs_value
+
+    formatted_data = []
+    formatted_data << {}
+    formatted_data << {}
+    formatted_data.last['data'] = []
+    formatted_data.last['legend'] = @xbrs.last['legend']
+    data = @xbrs.last['data']
+    columns = @xbrs.last['legend']
+
+    mtime_column_index = nil
+    ctime_column_index = nil
+
+    columns.each_with_index do |col, index|
+      if col == 'ctime'
+        ctime_column_index = index
+      end
+      if col == 'mtime'
+        mtime_column_index = index
+      end  
+    end 
+
+
+    data.each do |datum|
+      if ctime_column_index
+        datum[ctime_column_index] = Time.at(datum[ctime_column_index])
+      end
+      if mtime_column_index
+        datum[mtime_column_index] = Time.at(datum[mtime_column_index])
+      end 
+
+      formatted_data.last['data'] << datum 
+    end  
+
+    formatted_data 
+
   end
 
   def blacklist(reload: false)
@@ -417,6 +460,15 @@ class DisputeEntry < ApplicationRecord
     return 'Unable to resolve'
   end
 
+  def latest_comment_date
+    comment = self.dispute.dispute_comments.last
+    if comment.present?
+      return comment.updated_at.strftime("%FT%T")
+    else
+      "None"
+    end
+  end
+
   def assign_from_auto_resolve(address:, total_hits:, resolved_at:, dispute_entry:)
 
     self.status = NEW
@@ -485,7 +537,7 @@ class DisputeEntry < ApplicationRecord
   def last_submitted
     if self.referenced_tickets.count > 0
 
-      last_submitted = referenced_tickets.last.created_at
+      last_submitted = referenced_tickets.order(:created_at).last.created_at
     else
       last_submitted = "N/A"
     end

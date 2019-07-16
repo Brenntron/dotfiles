@@ -12,6 +12,8 @@
         %label.content-label-sm
           Case ID
         .bug-top-id
+          -# Creating notation for future change. This is neither a link nor part of a dropdown. Should be changed
+          -# to a span and have the dropdown class removed.
           %a.case-id-tag.related-dropdown-text#dispute_id= @dispute.case_id_str
 
 
@@ -116,7 +118,7 @@
                         .resolution-comment-wrapper
                           %label.content-label-sm
                             Comment
-                          %textarea
+                          %textarea.ticket-resolution-comment
                           %button.primary{onClick: 'show_page_edit_status()'}
                             Submit
                   %li.status-radio-wrapper
