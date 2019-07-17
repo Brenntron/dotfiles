@@ -639,7 +639,7 @@ $(document).on 'click', ".popover .screenshot-reload-button", ->
   location.reload(true)
 
 $(document).on 'click', ".screenshot-close-button", ->
-  $('.popover-content').hide()
+  $('.webcat-screenshot').hide()
 
 window.enlarge_image = (id,image,retake_in_progress)->
   image_content = ""
@@ -648,13 +648,11 @@ window.enlarge_image = (id,image,retake_in_progress)->
   else
     image_content = '<img src="' + image + '"><span class="screenshot-button screenshot-retake-button esc-tooltipped" id="se_id_' + id + '" title="Retake Screenshot"></span><span class="screenshot-button screenshot-close-button"></span>'
 
-  $('.popover-content').show()
-
   $('#screenshot_id_'+ id).popover(
     html: true
-    class: 'complaint_screenshot'
     container: 'body'
     trigger: 'focus'
+    template: '<div class="popover webcat-screenshot"><div class="arrow"></div><div class="popover-inner"><h3 class="popover-title"></h3><div class="popover-content"><p></p></div></div></div>'
     content: image_content).popover 'show'
 
 window.lookup_prefix = () ->
