@@ -9,15 +9,15 @@ $ ->
 
   $('#web-cat-search #general_search').on 'keyup', (e) ->
     { keyCode } = e
-    { search_type, search_name, search_conditions }= localStorage
+    { webcat_search_type, webcat_search_name, webcat_search_conditions }= localStorage
     if keyCode == 13
-      search_string = $('#web-cat-search .search-box').val()
-      if search_string == ''
+      webcat_search_string = $('#web-cat-search .search-box').val()
+      if webcat_search_string == ''
        refresh_localStorage()
       else
-        localStorage.search_type = 'contains'
-        localStorage.search_name = ''
-        localStorage.search_conditions = JSON.stringify({value:search_string})
+        localStorage.webcat_search_type = 'contains'
+        localStorage.webcat_search_name = ''
+        localStorage.webcat_search_conditions = JSON.stringify({value:search_string})
       refresh_url()
 
   window.set_webcat_advanced = () ->
@@ -32,9 +32,9 @@ $ ->
       if name != 'tags'
         form[name] = value
 
-    localStorage.search_type = 'advanced'
-    localStorage.search_name = form.search_name
-    localStorage.search_conditions = JSON.stringify(
+    localStorage.webcat_search_type = 'advanced'
+    localStorage.webcat_search_name = form.search_name
+    localStorage.webcat_search_conditions = JSON.stringify(
       status: form.status
       ip_address: form.complaint_id
       resolution: form.resolution
@@ -57,46 +57,46 @@ $ ->
     refresh_url()
 
   window.build_named_search = (search_name) ->
-    localStorage.search_type = 'named'
-    localStorage.search_name = search_name
-    localStorage.removeItem('search_conditions')
+    localStorage.webcat_search_type = 'named'
+    localStorage.webcat_search_name = search_name
+    localStorage.removeItem('webcat_search_conditions')
 
     refresh_url()
 
   build_data = () ->
-    { search_type, search_name, search_conditions } = localStorage
+    { webcat_search_type, webcat_search_name, webcat_search_conditions } = localStorage
     { search } = location
 
     if search != ''
-      search_type = 'standard'
+      webcat_search_type = 'standard'
 
-    switch(search_type)
+    switch(webcat_search_type)
       when 'advanced'
         data = {
-          search_type: search_type
-          search_name : search_name
-          search_conditions: JSON.parse(search_conditions)
+          webcat_search_type: webcat_search_type
+          webcat_search_name : webcat_search_name
+          webcat_search_conditions: JSON.parse(webcat_search_conditions)
         }
       when 'contains'
         data = {
-          search_type: search_type
-          search_conditions: JSON.parse(search_conditions)
+          webcat_search_type: webcat_search_type
+          webcat_search_conditions: JSON.parse(webcat_search_conditions)
         }
       when 'standard'
         data = {
-          search_type: search_type
-          search_name: search.replace('?f=', '')
+          webcat_search_type: webcat_search_type
+          webcat_search_name: search.replace('?f=', '')
         }
       when 'named'
         data = {
-          search_type: search_type
-          search_name: search.replace('?f=', '')
+          webcat_search_type: webcat_search_type
+          webcat_search_name: search.replace('?f=', '')
         }
     build_header(data)
     return data
 
   refresh_url = (href) ->
-    { search_type, search_name } = localStorage
+    { webcat_search_type, webcat_search_name } = localStorage
     url_check = current_url.split('/escalations/file_rep/disputes/')[0]
     new_url = '/escalations/file_rep/disputes'
     if href != undefined
@@ -105,9 +105,9 @@ $ ->
       window.location.replace('/escalations/webcat/complaints')
 
   refresh_localStorage = () ->
-    localStorage.removeItem('search_type')
-    localStorage.removeItem('search_name')
-    localStorage.removeItem('search_conditions')
+    localStorage.removeItem('webcat_search_type')
+    localStorage.removeItem('webcat_search_name')
+    localStorage.removeItem('webcat_search_conditions')
 
   $('.cat_new_url').selectize {
     persist: false,
@@ -131,24 +131,24 @@ $ ->
     container = $('#webcat_searchref_container')
     if data != undefined && container.length > 0
       reset_icon = '<span id="refresh-filter-button" class="reset-filter esc-tooltipped" title="Clear Search Results" onclick="webcat_refresh()"></span>'
-      {search_type, search_name} = data
+      {webcat_search_type, webcat_search_name} = data
 
-      if search_type == 'standard'
+      if webcat_search_type == 'standard'
         new_header =
           '<div>' +
-            '<span class="text-capitalize">' + search_name.replace(/_/g, " ") + ' tickets </span>' +
+            '<span class="text-capitalize">' + webcat_search_name.replace(/_/g, " ") + ' tickets </span>' +
             reset_icon +
             '</div>'
 
-      else if search_type == 'advanced'
+      else if webcat_search_type == 'advanced'
         search_condition_tooltip = []
-        search_conditions = JSON.parse(localStorage.search_conditions)
+        webcat_search_conditions = JSON.parse(localStorage.webcat_search_conditions)
         new_header =
           '<div>Results for Advanced Search ' +
             reset_icon +
             '</div>'
 
-        for condition_name, condition of search_conditions
+        for condition_name, condition of webcat_search_conditions
           if condition != ''
             condition_name = condition_name.replace(/_/g, " ").toUpperCase()
             condition_name_HTML = '<span class="search-condition-name text-uppercase">' + condition_name + ': </span>'
@@ -174,17 +174,17 @@ $ ->
           $(list).hide()
           container.attr('data-tooltip-content', '.tooltip_content')
 
-      else if search_type == 'named'
+      else if webcat_search_type == 'named'
 
         new_header =
-          '<div>Results for "' + search_name + '" Saved Search' +
+          '<div>Results for "' + webcat_search_name + '" Saved Search' +
             reset_icon +
             '</div>'
 
-      else if search_type == 'contains'
-        search_conditions = JSON.parse(localStorage.search_conditions)
+      else if webcat_search_type == 'contains'
+        webcat_search_conditions = JSON.parse(localStorage.webcat_search_conditions)
         new_header =
-          '<div>Results for "' + search_conditions.value + '" '+
+          '<div>Results for "' + webcat_search_conditions.value + '" '+
             reset_icon +
             '</div>'
       else
@@ -198,6 +198,46 @@ $ ->
           ajax:
             url: url
             data: build_data()
+          drawCallback: ( settings ) ->
+            if localStorage.webcat_search_name
+              {webcat_search_type, webcat_search_name, webcat_search_conditions } = localStorage
+              last_tr = $('.webcat-named-search-list .saved-search').last().text()
+              ### check variables below
+                  text_check makes sure that the last table row doesn't match the named search being saved now
+                  search_name_check makes sure that the search is being saved as a named search
+                  Not super complicated, but that if statement was looking gross and confusing
+              ###
+              text_check = last_tr.trim() != webcat_search_name.trim()
+              search_name_check = webcat_search_name != ''
+              if webcat_search_type == 'advanced' && search_name_check && text_check
+                ###
+                  creating temporary tr for the filter dropdown
+                  attributes added then onclick events
+                ###
+                new_tr = document.createElement('tr')
+                new_td = document.createElement('td')
+                new_link =  document.createElement('a')
+                new_delete_image = document.createElement('img')
+                new_delete = document.createElement('a')
+
+                $(new_tr).attr('id','temp_row')
+                $(new_link).addClass('input-truncate saved-search esc-tooltipped')
+                  .attr('title', webcat_search_name)
+                  .text(webcat_search_name)
+                $(new_delete).addClass("delete-search")
+                $(new_delete_image).addClass('delete-search-image')
+
+                $(new_link).on 'click', () ->
+                  window.build_named_search(webcat_search_name)
+                $(new_delete).on 'click', () ->
+                  window.delete_disputes_named_search(this,  webcat_search_name)
+                  refresh_localStorage()
+                $(new_tr).append(new_td)
+                $(new_td).append(new_link)
+                $(new_td).append(new_delete)
+                $(new_delete).append(new_delete_image)
+                $('.webcat-named-search-list').append(new_tr)
+
           pagingType: 'full_numbers'
           order: [ [
             3
