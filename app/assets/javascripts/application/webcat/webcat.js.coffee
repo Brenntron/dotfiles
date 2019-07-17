@@ -73,24 +73,24 @@ $ ->
     switch(webcat_search_type)
       when 'advanced'
         data = {
-          webcat_search_type: webcat_search_type
-          webcat_search_name : webcat_search_name
-          webcat_search_conditions: JSON.parse(webcat_search_conditions)
+          search_type: webcat_search_type
+          search_name : webcat_search_name
+          search_conditions: JSON.parse(webcat_search_conditions)
         }
       when 'contains'
         data = {
-          webcat_search_type: webcat_search_type
-          webcat_search_conditions: JSON.parse(webcat_search_conditions)
+          search_type: webcat_search_type
+          search_conditions: JSON.parse(webcat_search_conditions)
         }
       when 'standard'
         data = {
-          webcat_search_type: webcat_search_type
-          webcat_search_name: search.replace('?f=', '')
+          search_type: webcat_search_type
+          search_name: search.replace('?f=', '')
         }
       when 'named'
         data = {
-          webcat_search_type: webcat_search_type
-          webcat_search_name: search.replace('?f=', '')
+          search_type: webcat_search_type
+          search_name: search.replace('?f=', '')
         }
     build_header(data)
     return data
