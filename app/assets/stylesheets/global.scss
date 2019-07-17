@@ -1671,7 +1671,6 @@ button.close {
 }
 
 #sidenav-icons-div .sidenav-icons {
-  background: $sidebar-nav-base;
   height: 100%;
 }
 
@@ -9755,4 +9754,26 @@ input[type="radio"].resolution_radio_button {
 // ensuring no column overlap in Case History due to long strings
 #case-history .case-history-preview, #case-history .case-history-author {
   word-break: break-word;
+}
+
+// adding styles for talos logo + copyright info in bottom-left of side nav
+.copyright-area {
+  margin: 10px auto;
+  text-align: center;
+  position: absolute;
+  bottom: 15px;
+  .talos-logo {
+    width: 70%;
+    margin: 5px auto;
+    padding-left: 2px;
+  }
+  .copyright {
+    width: 150px;
+    margin: 0 auto;
+    font-size: 9px;
+    font-weight: normal;
+    text-transform: none;
+    line-height: 14px;
+    color: #ddd;
+  }
 }

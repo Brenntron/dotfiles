@@ -142,7 +142,6 @@
               %a{href: 'escalations/admin'}
                 Escalations Admin    
 
-
       %li{class: 'nav-docs'}
         %a{class: 'static-nav-item', 'data-toggle': 'collapse', href:'.doc-subnav', role:'button', 'aria-expanded':'false', 'aria-controls':'doc-subnav doc-subnav-icons'}
           Docs
@@ -154,3 +153,12 @@
               %a{href: "https://git.vrt.sourcefire.com/talosweb/analyst-console/releases/tag/v#{@version}"} V #{@version}
             - else
               %a{href: "https://git.vrt.sourcefire.com/talosweb/analyst-console/releases/"} Release Notes
+
+      .copyright-area
+        = image_tag('logo_talos_white.svg', class: 'talos-logo', alt: 'Talos Logo')
+        %p.copyright
+          &copy;
+          = Date.today.year
+          Cisco Systems Inc. and/or its affiliates.
+          %br/
+          All rights reserved.
