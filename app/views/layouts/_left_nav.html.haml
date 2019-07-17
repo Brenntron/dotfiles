@@ -154,11 +154,10 @@
             - else
               %a{href: "https://git.vrt.sourcefire.com/talosweb/analyst-console/releases/"} Release Notes
 
+
       .copyright-area
         = image_tag('logo_talos_white.svg', class: 'talos-logo', alt: 'Talos Logo')
         %p.copyright
-          &copy;
-          = Date.today.year
-          Cisco Systems Inc. and/or its affiliates.
-          %br/
+          &copy #{ Date.today.year } Cisco Systems Inc. and/or its affiliates.
+          %br
           All rights reserved.

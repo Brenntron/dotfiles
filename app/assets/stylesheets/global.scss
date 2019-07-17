@@ -9758,22 +9758,37 @@ input[type="radio"].resolution_radio_button {
 
 // adding styles for talos logo + copyright info in bottom-left of side nav
 .copyright-area {
-  margin: 10px auto;
+  width: 200px;
+  height: 100px;
+  position: fixed;
+  bottom: 20px;
+  left: 25px;
   text-align: center;
-  position: absolute;
-  bottom: 15px;
+  z-index: -1;
+  opacity: 0;
+  transition: opacity 500ms;
   .talos-logo {
-    width: 70%;
-    margin: 5px auto;
-    padding-left: 2px;
+    width: 150px;
+    height: auto;
+    display: block;
   }
   .copyright {
-    width: 150px;
-    margin: 0 auto;
+    width: 130px;
+    padding-left: 20px;
     font-size: 9px;
     font-weight: normal;
     text-transform: none;
     line-height: 14px;
-    color: #ddd;
+    color: darken($content-bg-color, 10%);
   }
+}
+
+// ensure the logo + copyright sticks to bottom of sidenav container
+#sidenav-menu-div .nav-container {
+  height: 100vh;
+}
+
+#nav-trigger:checked ~ #sidenav-menu-div .copyright-area {
+  opacity: 1;
+  transition-delay: 350ms;
 }
