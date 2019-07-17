@@ -8368,6 +8368,11 @@ hr.thin.form-divider {
   background-image: url(image_path('icon_bugzilla_loggedout.svg'));
 }
 
+// WebCat Screenshot icon
+.escape-button {
+  background-image: url(image_path('icon_cancel.svg'));
+  background-repeat: no-repeat;
+}
 
 // Tab styles for tabs on dialog boxes
 .nav-tabs.dialog-tabs {

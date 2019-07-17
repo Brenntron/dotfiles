@@ -638,18 +638,25 @@ $(document).on 'click', ".popover .retake-screenshot", ->
 $(document).on 'click', ".popover .reload-screenshot", ->
   location.reload(true)
 
+$(document).on 'click', ".escape-button", ->
+  $('.popover-content').hide()
 
 window.enlarge_image = (id,image,retake_in_progress)->
   image_content = ""
   if retake_in_progress
     image_content = '<img src="' + image + '"><p><a class="btn-sm reload-screenshot">Reload Page</a></p>'
   else
-    image_content = '<img src="' + image + '"><p><a class="btn-sm retake-screenshot" id="se_id_' + id + '">Retake Screenshot</a></p>'
+    image_content = '<img src="' + image + '"><p><a class="btn-sm retake-screenshot" id="se_id_' + id + '">Retake Screenshot</a><span class="btn-sm escape-button"></span></p>'
+
+  $('.popover-content').show()
+
   $('#screenshot_id_'+ id).popover(
     html: true
+    class: 'complaint_screenshot'
     container: 'body'
     trigger: 'focus'
     content: image_content).popover 'show'
+
 window.lookup_prefix = () ->
 
   $('#loader-modal').modal({
