@@ -8,12 +8,11 @@ $ ->
     window.research_data(sha256_hash)
 
 # Update the research reports and the items in the db
-$('#file-rep-sync-button').click ->
+window.refresh_research_data = (sha256_hash) ->
   sha256_hash = $('#sha256_hash')[0].innerText
   window.research_data(sha256_hash)
   window.update_file_rep_data()
 
-    
 
 ########### COMPILE RESEARCH REPORTS ############
 # Grabs the initial data for all three reports / datasets
