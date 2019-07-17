@@ -188,7 +188,7 @@
               - current_user.named_searches.where('project_type = ? OR project_type IS ?', 'Complaint', nil).order(:id).each do |named_search|
                 %tr{id: "saved_search_#{named_search.id}"}
                   %td
-                    %a.input-truncate.saved-search.esc-tooltipped{onclick: "named_webcat_index_table('#{named_search.name}');", title: named_search.name}
+                    %a.input-truncate.saved-search.esc-tooltipped{onclick: "build_webcat_named_search('#{named_search.name}');", title: named_search.name}
                       = named_search.name
                     %a.delete-search{title: 'Delete Saved Search', onclick: "delete_disputes_named_search(this, '#{named_search.name}');"}
                       = image_tag('icon_cancel_grey.svg')

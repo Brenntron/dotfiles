@@ -56,7 +56,7 @@ $ ->
     refresh_localStorage()
     refresh_url()
 
-  window.build_named_search = (search_name) ->
+  window.build_webcat_named_search = (search_name) ->
     localStorage.webcat_search_type = 'named'
     localStorage.webcat_search_name = search_name
     localStorage.removeItem('webcat_search_conditions')
@@ -90,7 +90,7 @@ $ ->
       when 'named'
         data = {
           search_type: webcat_search_type
-          search_name: search.replace('?f=', '')
+          search_name: webcat_search_name
         }
     build_header(data)
     return data
@@ -131,16 +131,16 @@ $ ->
     container = $('#webcat_searchref_container')
     if data != undefined && container.length > 0
       reset_icon = '<span id="refresh-filter-button" class="reset-filter esc-tooltipped" title="Clear Search Results" onclick="webcat_refresh()"></span>'
-      {webcat_search_type, webcat_search_name} = data
+      {search_type, search_name} = data
 
-      if webcat_search_type == 'standard'
+      if search_type == 'standard'
         new_header =
           '<div>' +
-            '<span class="text-capitalize">' + webcat_search_name.replace(/_/g, " ") + ' tickets </span>' +
+            '<span class="text-capitalize">' + search_name.replace(/_|%20/g, " ") + ' tickets </span>' +
             reset_icon +
             '</div>'
 
-      else if webcat_search_type == 'advanced'
+      else if search_type == 'advanced'
         search_condition_tooltip = []
         webcat_search_conditions = JSON.parse(localStorage.webcat_search_conditions)
         new_header =
@@ -174,21 +174,21 @@ $ ->
           $(list).hide()
           container.attr('data-tooltip-content', '.tooltip_content')
 
-      else if webcat_search_type == 'named'
+      else if search_type == 'named'
 
         new_header =
-          '<div>Results for "' + webcat_search_name + '" Saved Search' +
+          '<div>Results for "' + search_name + '" Saved Search' +
             reset_icon +
             '</div>'
 
-      else if webcat_search_type == 'contains'
+      else if search_type == 'contains'
         webcat_search_conditions = JSON.parse(localStorage.webcat_search_conditions)
         new_header =
           '<div>Results for "' + webcat_search_conditions.value + '" '+
             reset_icon +
             '</div>'
       else
-        new_header = 'All File Reputation Tickets'
+        new_header = 'All Web Categorization Tickets'
       $('#webcat-index-title')[0].innerHTML = new_header
 
   build_complaints_table = () ->
@@ -228,7 +228,7 @@ $ ->
                 $(new_delete_image).addClass('delete-search-image')
 
                 $(new_link).on 'click', () ->
-                  window.build_named_search(webcat_search_name)
+                  window.build_webcat_named_search(webcat_search_name)
                 $(new_delete).on 'click', () ->
                   window.delete_disputes_named_search(this,  webcat_search_name)
                   refresh_localStorage()
@@ -236,7 +236,7 @@ $ ->
                 $(new_td).append(new_link)
                 $(new_td).append(new_delete)
                 $(new_delete).append(new_delete_image)
-                $('.webcat-named-search-list').append(new_tr)
+                $('.webcat-named-search-list tbody').append(new_tr)
 
           pagingType: 'full_numbers'
           order: [ [
@@ -353,19 +353,21 @@ $ ->
               {
                 data: 'tags'
                 render: ( data )->
-                  if data
-                    tags = data.substring( 1, data.length-1 ).replace(/&quot;/g,'');
-                    tag_items = ''
-                    tag_list = tags.split(',').map ( tag ) -> return tag.trim();
-                    tag_list = tag_list.filter ( tag, index )-> return tag_list.indexOf( tag ) == index && tag != ''
 
-                    if tag_list.length
+                  tag_items = '<span class="missing-data">No tags</span>'
+
+                  if data && typeof data == 'string'
+                    tags = data.substring( 1, data.length-1 ).replace(/&quot;/g,'');
+                    tag_list = tags.split(',').map ( tag ) -> return tag.trim();
+
+                    if tag_list.length > 1
+                      tag_items = ''
+                      tag_list = tag_list.filter ( tag, index )-> return tag_list.indexOf( tag ) == index && tag != ''
                       for tag in tag_list
                         item = '<span class="tag-capsule">' + tag + '</span>'
                         tag_items += item
-                    else
-                      tag_items = '<span class="missing-data">No tags</span>'
-                    tag_items
+
+                  tag_items
               }
               {
 #                subdomain column

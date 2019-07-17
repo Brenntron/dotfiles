@@ -3,7 +3,7 @@ function complaint_named_search_tag(search_name, search_id) {
 
     search_link =
         '<a class="saved-search"' +
-        ' onclick="named_webcat_index_table(\'' + search_name + '\');">' + search_name + '</a>'
+        ' onclick="build_webcat_named_search(\'' + search_name + '\');">' + search_name + '</a>'
     delete_image = '<%= image_tag('icon_cancel_grey.svg') %>'
     delete_link = '<a class="delete-search"' +
         ' onclick="delete_disputes_named_search(this, \'' + search_name + '\');"' +
