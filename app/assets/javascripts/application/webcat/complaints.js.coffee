@@ -639,7 +639,7 @@ $(document).on 'click', ".popover .reload-screenshot", ->
   location.reload(true)
 
 $(document).on 'click', ".escape-button", ->
-  $('.popover').hide()
+  $('.webcat-screenshot').hide()
 
 window.enlarge_image = (id,image,retake_in_progress)->
   image_content = ""
@@ -652,6 +652,7 @@ window.enlarge_image = (id,image,retake_in_progress)->
     html: true
     container: 'body'
     trigger: 'focus'
+    template: '<div class="popover webcat-screenshot"><div class="arrow"></div><div class="popover-inner"><h3 class="popover-title"></h3><div class="popover-content"><p></p></div></div></div>'
     content: image_content).popover 'show'
 
 window.lookup_prefix = () ->
