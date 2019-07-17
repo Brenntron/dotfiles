@@ -687,13 +687,14 @@ class FileReputationDispute < ApplicationRecord
         #notify customer that there is no sample and to escalate via TAC with sample
         self.status = STATUS_RESOLVED
         self.resolution = RESOLUTION_AUTORESOLVED
-        self.resolution_comment = "placeholder for no sample auto resolution"
+        self.resolution_comment = "At this time Talos cannot make a conclusion because we lack a sample of the file-in-question. If you would like Talos to look into this request further, please open a TAC case and provide a sample for review."
         self.save
 
         return auto_resolved_boolean
       end
 
       FileReputationApi::Sandbox.run_sample(self.sha256_hash)
+      #placeholder for invoking re analysis in threatgrid
 
       FileReputationDispute.check_case_for_auto_resolve(self.id)
       self.status = AUTORESOLVE_BEING_PROCESSED
@@ -713,7 +714,7 @@ class FileReputationDispute < ApplicationRecord
         file_rep.disposition = DISPOSITION_MALICIOUS
         file_rep.status = STATUS_RESOLVED
         file_rep.resolution = RESOLUTION_AUTORESOLVED
-        file_rep.resolution_comment = "placeholder for re run malicious"
+        file_rep.resolution_comment = "Talos has concluded that the file is unsafe due to malicious activity; the file has been marked malicious. This update will be publicly visible in the next 24 hours. If your device or endpoint client is not reflecting this disposition, please open a TAC case."
 
         conn = ::Bridge::FileRepUpdateStatusEvent.new(addressee: "talos-intelligence")
         conn.post(file_rep, source_authority: "talos-intelligence", source_key: file_rep.ticket_source_key)
@@ -724,7 +725,8 @@ class FileReputationDispute < ApplicationRecord
       file_rep.save
 
     end
-    handle_asynchronously :check_case_for_auto_resolve, :run_at => Proc.new { 20.minutes.from_now }
+    #20 minutes to allow sandbox to run, since best case is 10 minutes and its rarely that fast
+    handle_asynchronously :check_case_for_auto_resolve, :run_at => Proc.new { 1.minutes.from_now }
   end
 
   def self.auto_resolve_on_duplicate(dispute)
