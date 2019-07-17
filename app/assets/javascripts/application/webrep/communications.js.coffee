@@ -168,7 +168,7 @@ $ ->
       url: "/escalations/api/v1/escalations/file_rep/email_templates/#{template_id}"
       success_reload: false
       success: (response) ->
-        $('.reply-body').val(response[0].body)
+        $('.reply-body').prepend(response[0].body + "&#013; &#013;")
       error: (response) ->
         std_api_error(response, "There was a problem retrieving email template.", reload: false)
     )
