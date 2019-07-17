@@ -9,6 +9,7 @@ $ ->
 
 # Update the research reports and the items in the db
 window.refresh_research_data = (sha256_hash) ->
+  sha256_hash = $('#sha256_hash')[0].innerText
   window.research_data(sha256_hash)
   window.update_file_rep_data()
 
