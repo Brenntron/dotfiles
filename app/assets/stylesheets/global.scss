@@ -9761,3 +9761,37 @@ input[type="radio"].resolution_radio_button {
 #case-history .case-history-preview, #case-history .case-history-author {
   word-break: break-word;
 }
+
+
+// webcat screenshot buttons
+.screenshot-button {
+  width: 30px;
+  height: 30px;
+  display: block;
+  position: absolute;
+  background-repeat: no-repeat;
+  background-position: center center;
+  background-color: $content-bg-color;
+  border-radius: 4px;
+  opacity: .9;
+  right: 4px;
+  cursor: pointer;
+}
+
+.screenshot-close-button {
+  background-image: url(image_path('icon_cancel_lt_grey.svg'));
+  background-size: 28px 28px;
+  top: 4px;
+}
+
+.screenshot-retake-button {
+  background-image: url(image_path('icon_screenshot_lt_grey.svg'));
+  background-size: 28px 28px;
+  top: 38px;
+}
+
+.screenshot-reload-button {
+  background-image: url(image_path('icon_sync_lt_grey.svg'));
+  background-size: 28px 28px;
+  top: 38px;
+}

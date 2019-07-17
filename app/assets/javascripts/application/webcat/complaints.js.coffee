@@ -623,7 +623,7 @@ $('html').on 'click', (e) ->
     $('[data-original-title]').popover 'hide'
 
 
-$(document).on 'click', ".popover .retake-screenshot", ->
+$(document).on 'click', ".popover .screenshot-retake-button", ->
   $('[data-original-title]').popover 'hide'
   se_id = this.id.slice(6)
   std_msg_ajax(
@@ -635,18 +635,18 @@ $(document).on 'click', ".popover .retake-screenshot", ->
       std_msg_success('Screenshot job initiated. Check back in about 10 seconds.', [], reload: true)
   )
 
-$(document).on 'click', ".popover .reload-screenshot", ->
+$(document).on 'click', ".popover .screenshot-reload-button", ->
   location.reload(true)
 
-$(document).on 'click', ".escape-button", ->
+$(document).on 'click', ".screenshot-close-button", ->
   $('.popover-content').hide()
 
 window.enlarge_image = (id,image,retake_in_progress)->
   image_content = ""
   if retake_in_progress
-    image_content = '<img src="' + image + '"><p><a class="btn-sm reload-screenshot">Reload Page</a></p>'
+    image_content = '<img src="' + image + '"><span class="screenshot-button screenshot-reload-button esc-tooltipped" title="Reload Page">Reload Page</span>'
   else
-    image_content = '<img src="' + image + '"><p><a class="btn-sm retake-screenshot" id="se_id_' + id + '">Retake Screenshot</a><span class="btn-sm escape-button"></span></p>'
+    image_content = '<img src="' + image + '"><span class="screenshot-button screenshot-retake-button esc-tooltipped" id="se_id_' + id + '" title="Retake Screenshot"></span><span class="screenshot-button screenshot-close-button"></span>'
 
   $('.popover-content').show()
 
