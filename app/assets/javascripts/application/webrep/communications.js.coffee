@@ -1,5 +1,4 @@
 $(window).load ->
-
   most_recent_email = 0
 
   $('.email-row').each(() ->
@@ -17,7 +16,6 @@ $(window).load ->
   )
 
 $ ->
-
   $('#history-sort-dropdown').on 'change', ->
     sort_on = this.options[this.selectedIndex].id
     list = $("#case-history tr").get();
@@ -160,6 +158,7 @@ $ ->
         std_api_error(response, "There was a problem retrieving email template.", reload: false)
     )
 
+
   $('#select-filerep-reply-template').on 'change', ->
     template_id = this.value
 
@@ -168,7 +167,7 @@ $ ->
       url: "/escalations/api/v1/escalations/file_rep/email_templates/#{template_id}"
       success_reload: false
       success: (response) ->
-        $('.reply-body').prepend(response[0].body + "&#013; &#013;")
+        $('.reply-body').val(response[0].body + "\n \n" + window.reply_body)
       error: (response) ->
         std_api_error(response, "There was a problem retrieving email template.", reload: false)
     )
