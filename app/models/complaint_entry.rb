@@ -175,7 +175,7 @@ class ComplaintEntry < ApplicationRecord
                case_resolved_at: Time.now,user:current_user)
         complaint.set_status(current_status)
         #this is where we should send off the category to the API
-        if !["INVALID","UNCHANGED"].include?(entry_status) && categories_string != ''
+        if !["INVALID","UNCHANGED"].include?(entry_status) && !categories_string.blank?
           commit_category(ip_or_uri: prefix,
                           categories_string: categories_string,
                           description: comment,
