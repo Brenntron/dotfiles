@@ -1671,7 +1671,6 @@ button.close {
 }
 
 #sidenav-icons-div .sidenav-icons {
-  background: $sidebar-nav-base;
   height: 100%;
 }
 
@@ -9790,4 +9789,34 @@ input[type="radio"].resolution_radio_button {
     display: none;
     margin-left: 8px;
   }
+}
+
+// adding styles for talos logo + copyright info in bottom-left of side nav
+.copyright-area {
+  width: 150px;
+  height: 100px;
+  position: sticky;
+  bottom: 20px;
+  left: 25px;
+  text-align: center;
+  z-index: -1;
+  opacity: 0;
+  transition: opacity 500ms;
+  .talos-logo {
+    width: 150px;
+    height: auto;
+    display: block;
+  }
+  .copyright {
+    font-size: 10px;
+    font-weight: normal;
+    text-transform: none;
+    line-height: 16px;
+    color: darken($content-bg-color, 10%);
+  }
+}
+
+#nav-trigger:checked ~ #sidenav-menu-div .copyright-area {
+  opacity: 1;
+  transition-delay: 350ms;
 }
