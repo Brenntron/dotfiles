@@ -113,7 +113,6 @@ class ComplaintEntry < ApplicationRecord
                       resolution_comment,
                       current_user,
                       commit_pending)
-    categories = categories_string&.split(',')
     ActiveRecord::Base.transaction do
       # If the prefix is a high telemetry value then the status needs to be set to PENDING
       if self.is_important && entry_status != Complaint::RESOLUTION_UNCHANGED
@@ -123,15 +122,14 @@ class ComplaintEntry < ApplicationRecord
 
             current_status = "COMPLETED"
             self.case_assigned_at ||= Time.now
-            update(resolution:entry_status,
-                   status:current_status,
+            update(status:current_status,
                    internal_comment: comment,
                    resolution_comment: resolution_comment,
                    case_resolved_at: Time.now,
                    user:current_user)
             complaint.set_status(current_status)
             #this is where we should send off the category to the API
-            if entry_status != "INVALID" && categories_string != ''
+            if self.resolution != "INVALID" && categories_string != ''
               commit_category(ip_or_uri: prefix,
                               categories_string: categories_string,
                               description: comment,
