@@ -608,7 +608,7 @@ class ComplaintEntry < ApplicationRecord
       relation = relation.joins(complaint: [customer: :company]).where(customer_where)
     end
 
-    entry_params = params.fetch('complaint_entries', {})
+    entry_params = params.clone
 
     if entry_params['complaint_id'] == [""]
       entry_params.delete('complaint_id')
