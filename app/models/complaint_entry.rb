@@ -25,6 +25,7 @@ class ComplaintEntry < ApplicationRecord
   STATUS_RESOLVED_FIXED_FN = "FIXED FN"
   STATUS_RESOLVED_FIXED_FP = "FIXED FP"
   STATUS_RESOLVED_FIXED_UNCHANGED = "UNCHANGED"
+  STATUS_RESOLVED_FIXED_INVALID = "INVALID"
   STATUS_RESOLVED_DUPLICATE = "DUPLICATE"
 
 
@@ -129,7 +130,7 @@ class ComplaintEntry < ApplicationRecord
                    user:current_user)
             complaint.set_status(current_status)
             #this is where we should send off the category to the API
-            if self.resolution != "INVALID" && categories_string != ''
+            if self.resolution != STATUS_RESOLVED_FIXED_INVALID && categories_string.blank?
               commit_category(ip_or_uri: prefix,
                               categories_string: categories_string,
                               description: comment,
@@ -175,7 +176,7 @@ class ComplaintEntry < ApplicationRecord
                case_resolved_at: Time.now,user:current_user)
         complaint.set_status(current_status)
         #this is where we should send off the category to the API
-        if !["INVALID","UNCHANGED"].include?(entry_status) && !categories_string.blank?
+        if ![STATUS_RESOLVED_FIXED_INVALID,STATUS_RESOLVED_FIXED_UNCHANGED].include?(entry_status) && !categories_string.blank?
           commit_category(ip_or_uri: prefix,
                           categories_string: categories_string,
                           description: comment,
