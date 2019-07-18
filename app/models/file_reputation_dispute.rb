@@ -22,6 +22,7 @@ class FileReputationDispute < ApplicationRecord
   STATUS_REOPENED           = 'RE-OPENED'
   STATUS_CUSTOMER_PENDING   = 'CUSTOMER_PENDING'
   STATUS_CUSTOMER_UPDATE    = 'CUSTOMER_UPDATE'
+  STATUS_PROCESSING         = 'PROCESSING'
 
   DISPOSITION_UNSEEN        = 'unseen'
   DISPOSITION_UNKNOWN       = 'unknown'
@@ -46,6 +47,13 @@ class FileReputationDispute < ApplicationRecord
   RESOLUTION_DUPLICATE_COMMENT          = <<~HEREDOC
     This ticket has been auto-resolved. A ticket with the same SHA256 hash already exists and is still open.
   HEREDOC
+  RESOLUTION_AUTORESOLVED_NO_FILE_COMMENT       = <<~HEREDOC
+    At this time Talos cannot make a conclusion because we lack a sample of the file-in-question. If you would like Talos to look into this request further, please open a TAC case and provide a sample for review.
+  HEREDOC
+  RESOLUTION_AUTORESOLVED_MALICIOUS_COMMENT       = <<~HEREDOC
+    Talos has concluded that the file is unsafe due to malicious activity; the file has been marked malicious. This update will be publicly visible in the next 24 hours. If your device or endpoint client is not reflecting this disposition, please open a TAC case.
+  HEREDOC
+
 
   AC_SUCCESS = 'CREATE_ACK'
   AC_FAILED = 'CREATE_FAILED'
@@ -665,17 +673,14 @@ class FileReputationDispute < ApplicationRecord
       rev_lab = FileReputationApi::ReversingLabs.lookup(self.sha256_hash)
       rev_lab_json = JSON.parse(rev_lab.raw_json)
 
-      if rev_lab_json[:error].present? && rev_lab_json[:error] == "Not in RL"
+      if rev_lab_json["error"].present? && rev_lab_json["error"] == "Not in RL"
         reversinglab_present = false
       end
 
       zoo_response = FileReputationApi::SampleZoo.sha256_lookup(self.sha256_hash)
       malware_zoo_present = FileReputationApi::SampleZoo.query_from_data(zoo_response)[:in_zoo]
 
-      sandbox_response = FileReputationApi::Sandbox.score(self.sha256_hash, :api_key_type => self.sandbox_key)
-      if sandbox_response.blank?
-        sandbox_present = false
-      end
+      sandbox_present = FileReputationApi::Sandbox.sample_exists(self.sha256_hash, :api_key_type => self.sandbox_key)
 
       if [threatgrid_present, sandbox_present, reversinglab_present, malware_zoo_present].any? {|prez| prez == false } && [threatgrid_present, sandbox_present, reversinglab_present, malware_zoo_present].any? {|prez| prez == true }
         self.status = STATUS_NEW
@@ -687,7 +692,7 @@ class FileReputationDispute < ApplicationRecord
         #notify customer that there is no sample and to escalate via TAC with sample
         self.status = STATUS_RESOLVED
         self.resolution = RESOLUTION_AUTORESOLVED
-        self.resolution_comment = "At this time Talos cannot make a conclusion because we lack a sample of the file-in-question. If you would like Talos to look into this request further, please open a TAC case and provide a sample for review."
+        self.resolution_comment = RESOLUTION_AUTORESOLVED_NO_FILE_COMMENT
         self.save
 
         return auto_resolved_boolean
@@ -695,11 +700,12 @@ class FileReputationDispute < ApplicationRecord
 
       FileReputationApi::Sandbox.run_sample(self.sha256_hash)
       #placeholder for invoking re analysis in threatgrid
+      FileReputationApi::Magic.run_analysis(self.sha256_hash)
+
 
       FileReputationDispute.check_case_for_auto_resolve(self.id)
-      self.status = AUTORESOLVE_BEING_PROCESSED
+      self.status = STATUS_PROCESSING
       self.save
-
 
       auto_resolved_boolean
   end
@@ -714,19 +720,19 @@ class FileReputationDispute < ApplicationRecord
         file_rep.disposition = DISPOSITION_MALICIOUS
         file_rep.status = STATUS_RESOLVED
         file_rep.resolution = RESOLUTION_AUTORESOLVED
-        file_rep.resolution_comment = "Talos has concluded that the file is unsafe due to malicious activity; the file has been marked malicious. This update will be publicly visible in the next 24 hours. If your device or endpoint client is not reflecting this disposition, please open a TAC case."
-
+        file_rep.resolution_comment = RESOLUTION_AUTORESOLVED_MALICIOUS_COMMENT
+        file_rep.save
         conn = ::Bridge::FileRepUpdateStatusEvent.new(addressee: "talos-intelligence")
         conn.post(file_rep, source_authority: "talos-intelligence", source_key: file_rep.ticket_source_key)
 
       else
         file_rep.status = STATUS_NEW
+        file_rep.save
       end
-      file_rep.save
 
     end
     #20 minutes to allow sandbox to run, since best case is 10 minutes and its rarely that fast
-    handle_asynchronously :check_case_for_auto_resolve, :run_at => Proc.new { 1.minutes.from_now }
+    handle_asynchronously :check_case_for_auto_resolve, :run_at => Proc.new { 20.minutes.from_now }
   end
 
   def self.auto_resolve_on_duplicate(dispute)

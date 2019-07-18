@@ -129,6 +129,28 @@ class FileReputationApi::Sandbox
     full_report[:data]['score']
   end
 
+  def self.sample_exists(sha256_hash, api_key_type:)
+    #DOES NOT EXIST
+    #{:success=>false, :data=>{}}  doesn't exist
+
+    #EXISTS
+    #{:success=>true,
+    #:data=>
+    #    {"status"=>"Error - Unsupported File Type",
+    #     "sample"=>
+    #         {"SHA256"=>"7F83B1657FF1FC53B92DC18148A1D65DFC2D4B1FA3D677284ADDD200126D9069",
+    #          "MD5"=>"ED076287532E86365E841E92BFC50D8C",
+    #          "SHA1"=>"2EF7BDE608CE5404E97D5F042F95F89F1C232871"},
+    #     "runid"=>303066885,
+    #     "platform"=>{"os"=>"Windows XP - SP3", "arch"=>"i386"},
+    #     "date"=>"2018-03-22T19:45:31Z",
+    #     "updated"=>"2018-03-22T19:45:31Z"}}
+
+
+    latest_report = FileReputationApi::Sandbox.sandbox_latest_report(sha256_hash, api_key_type: api_key_type)
+    return latest_report[:success]
+  end
+
   def self.run_sample(sha256_hash)
     endpoint = "/api/2/run/hash"
 
