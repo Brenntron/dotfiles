@@ -1093,7 +1093,6 @@ $ ->
         $('.amp-area .inline-loader-wrapper').hide()
     )
 
-
   window.get_amp_history = (sha256_hash) ->
     # Fetch the AMP history, build the table and load into #amp-history-dialog
     std_msg_ajax(

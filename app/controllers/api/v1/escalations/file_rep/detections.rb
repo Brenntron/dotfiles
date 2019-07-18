@@ -34,6 +34,11 @@ module API
             end
             get ":sha256_hash/now" do
               std_api_v2 do
+                # Sends an error on staging that notifies the user that AMP is disabled on staging
+                if Rails.env == 'staging'
+                  raise "AMP Poke API is disabled on staging"
+                end
+
                 detection = FileReputationApi::Detection.get_bulk(params['sha256_hash'])
                 detection_last_set = FileReputationApi::ElasticSearch.query(params['sha256_hash'])
                 last_fetched = Time.now.utc
