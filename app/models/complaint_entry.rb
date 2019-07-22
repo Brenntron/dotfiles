@@ -620,7 +620,7 @@ class ComplaintEntry < ApplicationRecord
       ip_or_uri = entry_params['ip_or_uri']
       category = entry_params['category']
 
-      relation = relation.group(:id)
+      #relation = relation.group(:id)
       relation = relation.where(complaint_entry_fields) if complaint_entry_fields.present?
 
       if category.present?
