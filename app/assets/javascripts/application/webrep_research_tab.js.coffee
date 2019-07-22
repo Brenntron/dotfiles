@@ -199,34 +199,44 @@ $ ->
     dropdown = $('#reptool_entries_bl_dropdown')
     selected_rows = $('.col-select-all input:checked')
     checked_bl = $(dropdown).find('.adjust_reptool_checkbox:checked')
-    check_list = []
+    check_list_array = []
     reptool_list = []
     class_bl = $('.status_bl:checked').val().replace('reptool-', '')
     reptool_add  = $('.reptool-add:checked').val()
-    status_string = 'Add classifications: '
 
     for item in checked_bl
       val = $(item).val()
       check_name = "<span class='col-tag'>" + val + "</span> "
-      check_list.push(check_name)
+      check_list_array.push(check_name)
       reptool_list.push( val )
     reptool_list = reptool_list.join(',')
-    if check_list.length == 2
-      check_list = check_list.join(' and ')
+    if check_list_array.length == 2
+      check_list = check_list_array.join(' and ')
     else
-      check_list = check_list.join(', ').replace(/, ([^,]*)$/, ', and $1')
+      check_list = check_list_array.join(', ').replace(/, ([^,]*)$/, ', and $1')
 
-    switch(class_bl)
+    message_list = []
+    existing_reptool = $('.col-reptool-class:not(.missing-data)')
+    existing_reptool.each () ->
+      rep_list = this.innerText.split(',')
+      if reptool_add == 'remove'
+        rep_list = rep_list.filter( (rep)-> return !check_list_array.includes(rep))
+
+    switch (class_bl)
       when 'maintain'
-        if reptool_add == 'remove'
-          status_string = 'Remove classifications: '
+        reptool_add = reptool_add.charAt(0).toUpperCase() + reptool_add.slice(1)
+        status_string = reptool_add + ' classifications: '
       when 'drop'
         status_string = 'Drop all classifications (set entry to EXPIRED)'
         check_list = ''
+      when 'replace'
+        status_string = 'Add classifications: '
+
+
 
     col_dialog = "<p class='reptool-action-col' data=' " + reptool_list + " '>" + status_string + check_list + "<p>"
 
-    selected_rows.each ()->
+    selected_rows.each () ->
         row = $(this).closest('tr')
         data = row.find('.col-bulk-dispute').text()
         action_col = row.find('.col-actions')
