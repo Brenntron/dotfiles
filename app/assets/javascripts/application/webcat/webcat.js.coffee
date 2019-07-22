@@ -92,6 +92,7 @@ $ ->
           search_type: webcat_search_type
           search_name: webcat_search_name
         }
+    console.log data
     build_header(data)
     return data
 
@@ -175,7 +176,6 @@ $ ->
           container.attr('data-tooltip-content', '.tooltip_content')
 
       else if search_type == 'named'
-
         new_header =
           '<div>Results for "' + search_name + '" Saved Search' +
             reset_icon +
