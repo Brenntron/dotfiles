@@ -699,7 +699,7 @@ class FileReputationDispute < ApplicationRecord
       end
 
       FileReputationApi::Sandbox.run_sample(self.sha256_hash)
-      #placeholder for invoking re analysis in threatgrid
+      FileReputationApi::Sandbox.send_to_threatgrid(self.sha256_hash, api_key_type: self.sandbox_key)
       FileReputationApi::Magic.run_analysis(self.sha256_hash)
 
 
