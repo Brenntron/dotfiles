@@ -29,6 +29,23 @@ class FileReputationApi::Sandbox
       
   end
 
+  def self.send_to_threatgrid(sha256, api_key_type:)
+    endpoint = "/ntu/1/tgsubmit"
+    query_string = {
+        "hash" => sha256,
+        "apikey" => type_based_api_key(api_key_type)
+    }
+    begin
+      response = call_request_parsed(:post, endpoint, :input => query_string)
+      data = {:success => true, :data => response["value"]}
+    rescue
+      data = {:success => false, :data => {}}
+    end
+
+    data
+
+  end
+
   def self.sandbox_disposition(sha256)
 
     endpoint = "/ntu/1/disposition"

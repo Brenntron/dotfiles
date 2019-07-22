@@ -192,3 +192,16 @@ namespace 'AC.WebCat', (exports) ->
       code = x.split(' - ')[0]
       options2.push {category_id: y, category_name: value_name, category_code: code}
     return options2
+
+  exports.getCategoryIds = (category_names) ->
+
+    category_ids = []
+
+    for name in category_names
+      for x, y of categories2
+        value_name = x.split(' - ')[1]
+
+        if name == value_name
+          category_ids.push(y)
+
+    return category_ids

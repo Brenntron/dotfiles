@@ -1,4 +1,4 @@
-.toolbar
+.toolbar#webrep-index-toolbar
   %div
     %label.toolbar-section-label
       Table View
@@ -423,7 +423,7 @@
       File
     %form#disputes-index-export-form{action: escalations_webrep_disputes_path(format: :xlsx), method: :get}
       = hidden_field_tag('data_json', '{}', id: 'disputes-index-export-data-input')
-      %button.toolbar-button.export-button.esc-tooltipped{title: 'Export to CSV'}
+      %button.toolbar-button.dropdown-button-margin-right.export-button.esc-tooltipped{title: 'Export to CSV'}
         %span.toolbar-button-text
           Export to CSV
     %button.toolbar-button.export-button.esc-tooltipped{title: 'Export Selected to CSV', onclick: 'webrep_export_selected_rows();'}

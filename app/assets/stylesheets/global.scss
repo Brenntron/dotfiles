@@ -1671,7 +1671,6 @@ button.close {
 }
 
 #sidenav-icons-div .sidenav-icons {
-  background: $sidebar-nav-base;
   height: 100%;
 }
 
@@ -9755,4 +9754,69 @@ input[type="radio"].resolution_radio_button {
 // ensuring no column overlap in Case History due to long strings
 #case-history .case-history-preview, #case-history .case-history-author {
   word-break: break-word;
+}
+
+// webrep and webcat toolbars - between 1800px and 1600px, prevent breaking/wrapping of the buttons
+@media screen and (max-width: 1800px) and (min-width: 1600px) {
+  #webrep-index-toolbar, #webcat-index-toolbar {
+    .toolbar-button {
+      background-position: 4px 6px;
+      padding-left: 13px;
+      padding-right: 7px;
+      min-height: 25px;
+      background-size: 14px 14px; // icon size
+      transition: background-color 0.2s;
+    }
+  }
+}
+
+// webrep - research tab toolbar - between 1600px and 1400px, prevent breaking/wrapping buttons, this needs to be separate
+@media screen and (max-width: 1600px) and (min-width: 1401px) {
+  #research-tab-toolbar {
+    .toolbar-button {
+      background-position: 6px 6px;
+      padding-left: 9px;
+      padding-right: 8px;
+      min-height: 25px;
+      background-size: 14px 14px; // icon size
+      transition: background-color 0.2s;
+    }
+  }
+}
+// fix the collapse breakpoint
+@media screen and (max-width: 1400px) {
+  #research-tab-toolbar .toolbar-button-text {
+    display: none;
+    margin-left: 8px;
+  }
+}
+
+// adding styles for talos logo + copyright info in bottom-left of side nav
+.copyright-area {
+  width: 150px;
+  height: 100px;
+  position: sticky;
+  bottom: 20px;
+  left: 25px;
+  text-align: center;
+  z-index: -1;
+  opacity: 0;
+  transition: opacity 500ms;
+  .talos-logo {
+    width: 150px;
+    height: auto;
+    display: block;
+  }
+  .copyright {
+    font-size: 10px;
+    font-weight: normal;
+    text-transform: none;
+    line-height: 16px;
+    color: darken($content-bg-color, 10%);
+  }
+}
+
+#nav-trigger:checked ~ #sidenav-menu-div .copyright-area {
+  opacity: 1;
+  transition-delay: 350ms;
 }
