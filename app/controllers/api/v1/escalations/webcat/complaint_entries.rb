@@ -190,7 +190,7 @@ module API
                   return {error:e.message}.to_json
               end
               {display_name: current_user.display_name, status: entry.status, entry_resolution: permitted_params['status'],
-               uri: entry.uri, domain: entry.domain, subdomain: entry.subdomain, path: entry.path}.to_json
+               uri: entry.uri, domain: entry.domain, subdomain: entry.subdomain, path: entry.path, categories: params[:categories]}.to_json
             end
 
             desc 'Bulk update entry resolutions'
@@ -505,8 +505,15 @@ module API
 
                 # Pull category from SDS
                 sds_params = {}
-                sds_params['url'] = complaint_entry.uri
+
+                if complaint_entry.entry_type == 'URI/DOMAIN'
+                  sds_params['url'] = complaint_entry.uri
+                elsif complaint_entry.entry_type == 'IP'
+                  sds_params['url'] = complaint_entry.ip_address
+                end
+
                 sds_category = Sbrs::ManualSbrs.call_wbrs_webcat(sds_params, type: 'wbrs')
+
                 {master_categories: master_categories, current_category_data: wbrs_categories,
                  sds_category: sds_category }.to_json
               end
@@ -587,8 +594,8 @@ module API
               data = response.last['data']
               columns = response.last['legend']
 
-              mtime_column_index = 0
-              ctime_column_index = 0
+              mtime_column_index = nil
+              ctime_column_index = nil
 
               columns.each_with_index do |col, index|
                 if col == 'ctime'
@@ -602,10 +609,10 @@ module API
               formatted_data = []
 
               data.each do |datum|
-                if ctime_column_index != 0
+                if ctime_column_index
                   datum[ctime_column_index] = Time.at(datum[ctime_column_index])
                 end
-                if mtime_column_index != 0
+                if mtime_column_index
                   datum[mtime_column_index] = Time.at(datum[mtime_column_index])
                 end
 

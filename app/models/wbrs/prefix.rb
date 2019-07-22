@@ -1,5 +1,6 @@
 class Wbrs::Prefix < Wbrs::Base
-  FIELD_NAMES = %w{prefix_id domain is_active path path_hashed port protocol subdomain truncated category descr mnem category_id}
+  FIELD_NAMES = %w{prefix_id domain is_active path path_hashed port protocol subdomain truncated category
+                   descr desc_long mnem category_id}
   FIELD_SYMS = FIELD_NAMES.map{|name| name.to_sym}
 
   attr_accessor *FIELD_SYMS
@@ -125,7 +126,8 @@ class Wbrs::Prefix < Wbrs::Base
     options[:urls] = urls
     options[:strict_matching] = 1
 
-    response = Wbrs::Prefix.post_request(path: '/v1/wbrsrulelib/cat/rules', body: Wbrs::Prefix.stringkey_params(options))
+    response = Wbrs::Prefix.post_request(path: '/v1/wbrsrulelib/cat/rules',
+                                         body: Wbrs::Prefix.stringkey_params(options))
     response_body = JSON.parse(response.body)
     response_body
   end

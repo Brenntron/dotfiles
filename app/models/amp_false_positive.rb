@@ -23,8 +23,8 @@ class AmpFalsePositive < ApplicationRecord
     #                                 sha256: params["sha256"],
     #                                 file_path: params["file_path"],
     #                                 file_name:["file_name"])
-    #   Create FileReputationTicket
-    # file_ticket = FileReputationTicket.create(customer: c,
+    #   Create FileReputationDispute
+    # file_ticket = FileReputationDispute.create(customer: c,
     #                                           status: params["status"],
     #                                           source: params["source"],
     #                                           description: params["description"],

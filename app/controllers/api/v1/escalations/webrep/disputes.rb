@@ -300,6 +300,7 @@ module API
             end
             post "reptool_bl" do
               std_api_v2 do
+                params["classifications"][0].slice! "No active classifications,"
                 RepApi::Blacklist.adjust_from_params(permitted_params, username: current_user.cvs_username)
                 true
               end
@@ -312,6 +313,7 @@ module API
             post "maintain_reptool_bl" do
               std_api_v2 do
                 permitted_params['data'].each do |entry|
+                  entry["classifications"][0].slice! "No active classifications,"
                   RepApi::Blacklist.adjust_from_params(entry, username: current_user.cvs_username)
                 end
                 true

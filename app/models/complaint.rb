@@ -1,6 +1,6 @@
 class Complaint < ApplicationRecord
   belongs_to :customer, optional: true
-  has_many :complaint_entries
+  has_many :complaint_entries, dependent: :restrict_with_exception
   has_and_belongs_to_many :complaint_tags, dependent: :destroy
 
   has_paper_trail on: [:update], ignore: [:updated_at]
@@ -424,6 +424,8 @@ class Complaint < ApplicationRecord
 
   def self.get_latest_wbnp_complaints
 
+      new_report = WbnpReport.new
+
       all_complaints = Wbrs::RuleUiComplaint.where({:add_channels => [WBNP_CHANNEL], :statuses => ['new']})["data"]
 
       #all_complaints.each do |rule_ui_complaint|
@@ -434,15 +436,47 @@ class Complaint < ApplicationRecord
       #    new_complaints << rule_ui_complaint
       #  end
       #end
+      new_report.notes = ""
+      new_report.cases_imported = 0
+      new_report.cases_failed = 0
+      new_report.total_new_cases = all_complaints.size
+      new_report.status = WbnpReport::ACTIVE
+      new_report.save
 
+      start_wbnp_pull(new_report.id)
 
-      bugzilla_rest_session = BugzillaRest::Session.default_session
-      all_complaints.each do |new_ui_complaint|
-        if new_ui_complaint['add_channel'] == WBNP_CHANNEL
-          rule_ui_wbnp_create_action(new_ui_complaint, bugzilla_rest_session: bugzilla_rest_session)
+      new_report
+
+  end
+
+  class << self
+    def start_wbnp_pull(new_report_id)
+      new_report = WbnpReport.find(new_report_id)
+      begin
+        all_complaints = Wbrs::RuleUiComplaint.where({:add_channels => [WBNP_CHANNEL], :statuses => ['new']})["data"]
+        bugzilla_rest_session = BugzillaRest::Session.default_session
+        all_complaints.each do |new_ui_complaint|
+          if new_ui_complaint['add_channel'] == WBNP_CHANNEL
+            begin
+              rule_ui_wbnp_create_action(new_ui_complaint, new_report, bugzilla_rest_session: bugzilla_rest_session)
+            rescue => e
+              new_report.cases_failed += 1
+              new_report.notes += "SWP \n uri: #{new_ui_complaint.inspect} | failure: #{e.message} #{e.backtrace.join("\n")}\n"
+              new_report.save
+            end
+          end
         end
+
+        new_report.status = WbnpReport::COMPLETE
+        new_report.save
+      rescue => e
+        new_report.status = WbnpReport::ERROR
+        new_report.notes += "\n\n----------\nPull suddenly ended with error: #{e.message} #{e.backtrace.join("\n")}\n\n"
+        new_report.save
       end
 
+    end
+    handle_asynchronously :start_wbnp_pull
 
   end
 
@@ -457,7 +491,7 @@ class Complaint < ApplicationRecord
     URI.escape(uri)
   end
 
-  def self.rule_ui_wbnp_create_action(rule_ui_complaint, bugzilla_rest_session:)
+  def self.rule_ui_wbnp_create_action(rule_ui_complaint, wbnp_report, bugzilla_rest_session:)
     #"#{{"add_channel"=>"wbnp", "comment"=>"", "complaint_id"=>105, "complaint_type"=>"unknown", "customer_name"=>"ORANGE BUSINES SERVICES", "description"=>"",
     # "domain"=>"fmp-usmba.ac.ma", "path"=>"/cdim/mediatheque/e_theses/257-16.pdf", "port"=>0, "protocol"=>"http", "region"=>"", "resolution"=>nil, "state"=>"new",
     # "subdomain"=>"scolarite", "tag"=>nil, "url_query_string"=>"", "when_added"=>"Thu, 30 Aug 2018 15:00:05 GMT", "when_last_updated"=>"Thu, 30 Aug 2018 15:00:05 GMT",
@@ -509,10 +543,17 @@ class Complaint < ApplicationRecord
     else
       primary_category = category_data[:category_names][0]
     end
+    begin
+      ComplaintEntry.create_wbnp_complaint_entry(new_complaint, uri, rule_ui_complaint, User.where(display_name:"Vrt Incoming").first, ComplaintEntry::NEW, primary_category)
+      Wbrs::RuleUiComplaint.assign_tickets({:complaint_ids => [rule_ui_complaint["complaint_id"]], :user => "admatter"})
+      wbnp_report.cases_imported += 1
 
-    ComplaintEntry.create_wbnp_complaint_entry(new_complaint, uri, rule_ui_complaint, User.where(display_name:"Vrt Incoming").first, ComplaintEntry::NEW, primary_category)
+    rescue Exception => e
+      wbnp_report.cases_failed += 1
+      wbnp_report.notes += "\n\nRUWCA\n uri: #{uri} | failure: #{e.message} \n #{e.backtrace.join("\n")}"
+    end
 
-    Wbrs::RuleUiComplaint.assign_tickets({:complaint_ids => [rule_ui_complaint["complaint_id"]], :user => "admatter"})
+    wbnp_report.save
   end
 
   def self.create_action(bugzilla_rest_session, ips_urls, description, customer, tags, status=NEW, categories = nil)

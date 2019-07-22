@@ -199,6 +199,10 @@ h1.inline-header {
   color: $type-lighter-color;
 }
 
+.capitalize {
+  text-transform: capitalize;
+}
+
 h4 {
   font-weight: 500;
   margin-bottom: 8px;
@@ -230,7 +234,6 @@ h5 {
   word-break: keep-all;
   white-space: nowrap;
 }
-
 
 /**** Tables ****/
 
@@ -329,7 +332,7 @@ table.dataTable.no-footer {
   label {
     height: 100%;
   }
- }
+}
 
 .table-search-input {
   width: 400px;
@@ -590,6 +593,7 @@ button {
   border-radius: 2px;
   height: 100%;
   display: inline-block;
+  float: left;
   padding-right: 10px;
   padding-top: 2px;
   padding-left: 20px;
@@ -614,6 +618,7 @@ button {
 
 .toolbar-section-label {
   position: absolute;
+  display: block;
   margin-top: -18px;
   color: $content-label-color !important;
   font-size: 7pt;
@@ -626,6 +631,13 @@ button {
   margin-right: 6px;
   min-width: 36px;
   height: 20px;
+}
+
+.toolbar-button-spacer {
+  margin-right: 3px;
+}
+.toolbar-button:disabled {
+  cursor: not-allowed;
 }
 
 .dashboard-tickets-wrapper .toolbar-button-label {
@@ -685,6 +697,20 @@ button {
 .ticket-owner-button {background-image: url(image_path('icon_user_grey.svg'));}
 .sort-by-button {background-image: url(image_path('icon_sort_by.svg'));}
 .sync-button {background-image: url(image_path('icon_sync.svg'));}
+.detection-button {background-image: url(image_path('icon_target.svg'));}
+.disposition-button {background-image: url(image_path('icon_hazard.svg'));}
+.take-ticket-button-full {background-image: url(image_path('icon_take.svg'));}
+.icon-unassigned-bugs {background-image: url(image_path('icon_unassigned.svg'));}
+.reset-filter {
+  background-image: url(image_path('icon_reset_grey.svg'));
+  display: inline-block;
+  height: 25px;
+  width: 25px;
+  position: relative;
+  top: 2px;
+  left: 7px;}
+.reset-filter:hover {background-image: url(image_path('icon_reset_blue.svg'));}
+.sync-button-white {background-image: url(image_path('icon_sync_white.svg'));}
 
 .master-submit-button {
   color: $content-bg-color;
@@ -928,6 +954,10 @@ thead th.sorting.center {
   line-height: 1em;
 }
 
+.toolbar span.dropdown {
+  float: left;
+}
+
 .toolbar-button-text {
   display: none;
 }
@@ -1103,7 +1133,7 @@ thead th.sorting.center {
   height: 10px;
   position: absolute;
   background-color: white;
-  z-index: 50;
+  z-index: 1;
   margin-top: 43px;
   border-top-right-radius: 2px;
   margin-left: -1px;
@@ -1197,7 +1227,7 @@ thead th.sorting.center {
   }
 
   .modal-content {
-    border: 2px solid #f2f2f2;
+    border: 2px solid $faint-neutral-color;
     border-radius: 2px;
   }
 }
@@ -1641,7 +1671,6 @@ button.close {
 }
 
 #sidenav-icons-div .sidenav-icons {
-  background: $sidebar-nav-base;
   height: 100%;
 }
 
@@ -1854,7 +1883,6 @@ a.static-nav-item {
 #login-div {
   text-align: right;
 }
-
 .nav-toolbar-icon, .nav-dropdown-icon, .nav-dropdown-content-icon {
   background-repeat: no-repeat;
   display: inline-block;
@@ -1910,6 +1938,11 @@ a.static-nav-item {
 .icon-submit{background-image: url("icon_submit_arrow.svg")}
 .icon-custom-star {background-image: url(image_path('icon_customer_star.svg'));}
 .icon-guest-user {background-image: url(image_path('icon_guest_grey.svg'));}
+.icon-talos-sandbox {background-image: url(image_path('icon_sandbox2.svg'));}
+.icon-threat-grid {background-image: url(image_path('icon_grid.svg'));}
+.icon-reversing-labs {background-image: url(image_path('icon_reverse.svg'));}
+.icon-show-as-columns {background-image: url(image_path('icon_vertical.svg'));}
+.icon-show-as-stacked {background-image: url(image_path('icon_horizontal.svg'));}
 
 .saved-search {
   text-transform: none !important;
@@ -1958,7 +1991,7 @@ a.static-nav-item {
   background-color: $bug-section-color;
   border: none;
   border-radius: 4px;
-  padding: 10px;
+  padding: 15px;
   margin-left: 25%;
   padding-bottom: 0
 }
@@ -1986,8 +2019,8 @@ a.static-nav-item {
 }
 
 .nav-tool-content-wrapper {
-  margin-left: -10px;
-  margin-right: -10px;
+  margin-left: -15px;
+  margin-right: -15px;
   background-color: $ac-nav-bg-color;
   padding: 20px;
   border-bottom-left-radius: 4px;
@@ -1996,7 +2029,7 @@ a.static-nav-item {
 
 #saved-searches-wrapper {
   float: right;
-  margin-top: -10px;
+  margin-top: -15px;
   border-top-right-radius: 4px;
   border-bottom-left-radius: 0;
   min-height: 388px;
@@ -2098,6 +2131,7 @@ a.static-nav-item {
 
 #advanced-search-dropdown {
   min-width: 400px;
+  z-index: 51;
 }
 #advanced-search-dropdown {
   .selectize-dropdown.multi.form-control.selectize{
@@ -2143,6 +2177,10 @@ a.static-nav-item {
   text-transform: none;
 }
 
+.content-label-sm.content-label-fullwidth {
+  width: 100%;
+}
+
 .content-label-sm.multi-input-form-row {
   position: absolute;
   margin-top: -26px;
@@ -2157,8 +2195,8 @@ a.static-nav-item {
 }
 
 .content-row {
-  border-top: 2px solid #f2f2f2;
-  border-bottom: 2px solid #f2f2f2;
+  border-top: 2px solid $faint-neutral-color;
+  border-bottom: 2px solid $faint-neutral-color;
   width: 100%;
   padding: 4px 0;
   min-height: 34px;
@@ -2181,7 +2219,7 @@ a.static-nav-item {
 }
 
 .missing-info, .missing-data {
-  color: $type-lighter-color;
+  color: lighten($type-lighter-color, 20%);
   font-style: italic;
 }
 
@@ -3426,7 +3464,7 @@ fieldset.top-content {
   height: 10px;
   position: absolute;
   background-color: $table-dark-body;
-  z-index: 60;
+  z-index: 1;
   width: 100%;
   margin-top: -12px;
 }
@@ -3494,7 +3532,7 @@ fieldset.top-content {
   font-size: 9pt !important;
   line-height: 1.4;
   color: $type-lighter-color;
-  }
+}
 
 .email-reply-body {
   min-height: 300px;
@@ -3533,6 +3571,7 @@ fieldset.top-content {
 .nav-tabs > li > a#communication-tab-link {background-image: url(image_path('icon_communication.svg'));}
 .nav-tabs > li > a#research-tab-link {background-image: url(image_path('icon_research_tab.svg'));}
 .nav-tabs > li > a#related-tab-link {background-image: url(image_path('icon_duplicate_tab.svg'));}
+.nav-tabs > li > a#history-tab-link {background-image: url(image_path('icon_history_tab.svg'));}
 
 .email-msg-body pre {
   background-color: $content-bg-color;
@@ -3581,6 +3620,7 @@ input.communication-subject {
 
 #email-reply input.communication-subject {
   padding: 6px;
+  width: 100%;
 }
 
 .email-reply-body-wrapper {
@@ -3650,6 +3690,8 @@ input.communication-subject {
 .reply-button   {background-image: url(image_path('icon_reply_white.svg'));}
 .forward-button {background-image: url(image_path('icon_forward_white.svg'));}
 
+.reply-button.first-reply-button {background-image: url(image_path('icon_email_new_white.svg'));}
+
 .new-email-button {
   background-image: url(image_path('icon_email_new_white.svg'));
   background-repeat: no-repeat;
@@ -3697,7 +3739,7 @@ input.communication-subject {
   font-size: 9pt;
   top: 23px;
   position: absolute;
- }
+}
 
 .select-a-template{
   margin-left: 26px;
@@ -3743,7 +3785,7 @@ input.communication-subject {
 
 .note-edit-button {background-image: url(image_path('icon_edit.svg'));}
 .note-copy-button {background-image: url(image_path('icon_copy.svg'));}
-.note-delete-button {background-image: url(image_path('icon_delete.svg'));}
+.note-delete-button, .filerep-note-delete-button {background-image: url(image_path('icon_delete.svg'));}
 .note-save-button {background-image: url(image_path('icon_save_grey.svg'));}
 .note-cancel-button {background-image: url(image_path('icon_cancel.svg'));}
 
@@ -3805,7 +3847,8 @@ input.communication-subject {
 }
 
 #email-reply .sender-receiver-info {
-  margin-top: 0;
+  margin-top: 6px;
+  margin-left: -15px;
 }
 
 .add-case-note-button {
@@ -3874,6 +3917,8 @@ input.communication-subject {
 
 .email-reply-header-information .email-reply-buttons {
   float: left;
+  padding-top: 4px;
+  margin-right: -12px;
 }
 
 .email-reply-header-information .content-label-sm-sub {
@@ -3885,8 +3930,9 @@ input.communication-subject {
   margin: 6px auto 1px auto;
 }
 
-.email-reply-header-information .email-reply-buttons {
+#newEmailDialog .email-reply-buttons {
   padding-top: 8px;
+  margin-right: 0;
 }
 
 .email-attachments a {
@@ -4030,72 +4076,70 @@ td.wbrs-highlight, td.sbrs-highlight {
   margin: 0;
 }
 
-.escalations--webrep--disputes-controller #nav-banner, .escalations--webcat--complaints-controller #nav-banner, .escalations--webcat--reports-controller #nav-banner {
-  background-color: $table-dark-body;
-  color: $content-bg-color;
+// TODO We should consolidate these soon and make a single class that just covers all this
+.escalations--webrep--disputes-controller,
+.escalations--webcat--complaints-controller,
+.escalations--webcat--reports-controller,
+.escalations--file_rep--disputes-controller {
+  #nav-banner {
+    background-color: $table-dark-body;
+    color: $content-bg-color;
+
+    a {
+      color: $content-bg-color;
+    }
+
+    .nav-tool-blocks {
+      border: none;
+    }
+
+    .nav-page-button {
+      display: inline-block;
+      width: 44px;
+    }
+    .nav-page-button.active {
+      background-color: $bug-section-color;
+    }
+    .nav-page-button:hover, a:hover, .dropdown.open {
+      background-color: lighten($table-dark-body, 10%);
+    }
+  }
+
+  #advanced-search-button {
+    background-color: darken($faint-neutral-color, 5%);
+    color: $type-lighter-color;
+    text-transform: uppercase;
+    font-weight: 600;
+    margin: -3px 0 0 0;
+    height: 28px;
+    border-radius: 0 4px 4px 0;
+    padding: 0 16px;
+    position: absolute;
+    right: 0;
+  }
+  #advanced-search-button::before {
+    display: none;
+  }
+  .search-box {
+    background-image: url(image_path('layout/search_icon_lighter.svg'));
+  }
 }
 
-.escalations--webrep--disputes-controller #nav-banner a, .escalations--webcat--complaints-controller #nav-banner a, .escalations--webcat--reports-controller #nav-banner a {
-  color: $content-bg-color;
-}
-
-.escalations--webrep--disputes-controller .nav-tool-blocks, .escalations--webcat--complaints-controller .nav-tool-blocks, .escalations--webcat--reports-controller .nav-tool-blocks {
-  border: none;
-}
-
-.escalations--webrep--disputes-controller #nav-banner .nav-page-button, .escalations--webcat--complaints-controller #nav-banner .nav-page-button, .escalations--webcat--reports-controller #nav-banner .nav-page-button {
-  display: inline-block;
-  width: 44px;
-}
-
-.escalations--webrep--disputes-controller #nav-banner .nav-page-button.active, .escalations--webcat--complaints-controller #nav-banner .nav-page-button.active, .escalations--webcat--reports-controller #nav-banner .nav-page-button.active {
-  background-color: $bug-section-color;
-}
-
-.escalations--webrep--disputes-controller #nav-banner .nav-page-button:hover,
-.escalations--webrep--disputes-controller #nav-banner a:hover,
-.escalations--webrep--disputes-controller .dropdown.open,
-.escalations--webcat--complaints-controller #nav-banner .nav-page-button:hover,
-.escalations--webcat--complaints-controller #nav-banner a:hover,
-.escalations--webcat--complaints-controller .dropdown.open,
-.escalations--webcat--reports-controller #nav-banner .nav-page-button:hover,
-.escalations--webcat--reports-controller #nav-banner a:hover,
-.escalations--webcat--reports-controller .dropdown.open
-{
-  background-color: lighten($table-dark-body, 10%);
-}
 
 .research-table-details-wrapper .dropdown.open {
   background-color: transparent;
 }
 
-.escalations--webrep--disputes-controller #advanced-search-button, .escalations--webcat--complaints-controller #advanced-search-button, .escalations--webcat--reports-controller #advanced-search-button  {
-  background-color: darken($faint-neutral-color, 5%);
-  color: $type-lighter-color;
-  text-transform: uppercase;
-  font-weight: 600;
-  margin: -3px 0 0 0;
-  height: 28px;
-  border-radius: 0 4px 4px 0;
-  padding: 0 16px;
-  position: absolute;
-  right: 0;
-}
 
-.escalations--webrep--disputes-controller  #advanced-search-button::before, .escalations--webcat--complaints-controller  #advanced-search-button::before, .escalations--webcat--reports-controller  #advanced-search-button::before {
-  display: none;
-}
-
-
-.escalations--webrep--disputes-controller .search-box, .escalations--webcat--complaints-controller .search-box, .escalations--webcat--reports-controller .search-box {
-  background-image: url(image_path('layout/search_icon_lighter.svg'));
-}
 
 .search-group, .search-group form, .search-box {
   width: 100%;
 }
 
-#advanced-search-wrapper input, #new-complaint-form input, #categorize-urls-form-wrapper input, #new-dispute-form input {
+#advanced-search-wrapper input,
+#new-complaint-form input,
+#categorize-urls-form-wrapper input,
+#new-dispute-form input {
   margin-bottom: 8px;
   background-color: transparent;
   border: 1px solid darken($faint-neutral-color, 5%);
@@ -4201,7 +4245,7 @@ button.tertiary {
   outline: 1px solid darken($faint-neutral-color, 5%);
 }
 
-#advanced-search-dropdown .form-group input[type='checkbox'] {
+#advanced-search-dropdown .form-group input[type='checkbox']:not(#in-sample-zoo-input) {
   border: none;
   outline: none;
   width: auto;
@@ -4264,6 +4308,8 @@ button.tertiary {
 .icon-reports {background-image: url(image_path('icon_reports.svg'));}
 .icon-new-white {background-image: url(image_path('icon_new_white.svg'));}
 .icon-categorize-white {background-image: url(image_path('icon_categorize_white.svg'));}
+.icon-naming-white {background-image: url(image_path('icon_naming_list_white2.svg'));}
+.icon-notes {background-image: url(image_path('icon_status_comment.svg'));}
 
 .remove-input {
   background-image: url(image_path('icon_minus_blue.svg'));
@@ -4274,7 +4320,7 @@ button.tertiary {
   border: none;
   float: right;
   margin-top: 3px;
-  margin-right: -26px;
+  margin-right: -33px;
 }
 
 .remove-input.remove-radio-input {
@@ -4350,6 +4396,7 @@ button.tertiary {
 
 .template-select-wrapper {
   display: inline-block;
+  margin-top: 4px;
 }
 
 #newEmailDialog .template-select-wrapper {
@@ -4596,16 +4643,13 @@ table > tbody > tr > td.dispute_rep_tools {
   border-radius: 2px;
   border: none;
   background-repeat: no-repeat;
-  margin:0 1px;
+  margin:0 3px;
   display: inline-block;
 }
 
 .dropdown.open .ticket-owner-button {
   background-color: $bug-section-color;
   border-radius: 2px 2px 0 0 ;
-}
-.ticket-owner-button {
-  margin: 0px 4px;
 }
 
 .toolbar-button.adjust-wlbl-button    {
@@ -4735,10 +4779,15 @@ table > tbody > tr > td.dispute_rep_tools {
   border: 1px solid $faint-neutral-color !important;;
 }
 
-.dropdown-comment {
+.dropdown-comment, .form-comment-box {
   width: 100%;
   min-height: 20px;
   border: 1px solid darken($faint-neutral-color, 5%);
+}
+
+.form-comment-box {
+  display: block;
+  min-height: 90px;
 }
 
 .datatable-top-tools {
@@ -5037,7 +5086,7 @@ input.table-entry-input:focus {
 }
 
 #top_bar_extended_info .col-with-divider {
-  border-right-color: #f2f2f2;
+  border-right-color: $faint-neutral-color;
 }
 
 #top_bar_toggle {
@@ -5417,8 +5466,6 @@ td.data-table-emph {
   height: 0 !important;
 }
 
-.entry-details-table
-
 .clean-site-result {
   width: 45%;
 }
@@ -5635,7 +5682,7 @@ table.dispute_tool_current tr:last-of-type td {
   padding-bottom: 10px;
 }
 
-  /* These below can be deleted after redesign merge, or after the existing style sheet is ported. They exist in the admin redesign stylesheet. */
+/* These below can be deleted after redesign merge, or after the existing style sheet is ported. They exist in the admin redesign stylesheet. */
 .dispute-submission-type {
   background-repeat: no-repeat;
   width: 20px;
@@ -5784,7 +5831,7 @@ td.ticket-total::before {
   left: 19px;
   margin-top: -4px;
 }
- 
+
 .dashboard-left-data {
   border-right: 1px solid $content-bg-color;
 }
@@ -5853,12 +5900,12 @@ td.ticket-total::before {
   width: 170px !important;
 }
 
-#index-change-assign-dropdown{
+#index-change-assign-dropdown, #file-disp-dropdown{
   margin-left: 0;
   min-width: 0;
 }
 
-#index-change-assign-dropdown .toolbar {
+#index-change-assign-dropdown .toolbar, #file-disp-dropdown .toolbar {
   margin-bottom: 5px;
 }
 .secondary.ticket-owner-unassigned-button{
@@ -5876,7 +5923,7 @@ td.ticket-total::before {
   display: flex;
   margin: 6% 0;
   padding-top: 1%;
-  border-top: 1px solid #f2f2f2;
+  border-top: 1px solid $faint-neutral-color;
 }
 #index-edit-ticket-status-dropdown .radio-label, #index-edit-entry-status-dropdown .radio-label {
   margin-top: 6px;
@@ -5981,18 +6028,60 @@ td.ticket-total::before {
   height: 20px;
 
 }
+td.in_zoo{
+  text-align: center;
+}
 .container-important-tags{
   display: inline-flex;
 }
 .highlight-second-review .important-flag-col span {
   display: block;
 }
+.font-weight-bold{
+  font-weight: bold;
+}
 
+.file_rep_sha{
+  color:$type-base-color;
+  font-family: 'Fira Mono', monospace;
+  line-height: 1.5em;
+  padding: 0 5px;
+  font-weight: 400;
+  background-color:$faint-neutral-color;
+  border-radius: 0;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  overflow: hidden;
+  word-wrap: break-word;
+  word-break: break-all;
+  display: block !important;
+  //  temporarily adding till we figure out a better solution
+  width: auto;
+  max-width: 200px;
+}
+
+.esc-tooltipped.dispute-description {
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  overflow: hidden;
+  word-wrap: break-word;
+  word-break: break-all;
+  display: block !important;
+  width: auto;
+  max-width: 200px;
+}
+
+.filter-cases{
+  cursor: pointer;
+}
 .ticket-age-over3hr {
   color: $warning-accent-color;
   font-weight: bold;
 }
-
+.malicious {
+  color: $warning-accent-color;
+  font-weight: 600;
+}
 .overdue {
   color: $second-section-color;
   font-weight: bold;
@@ -6059,8 +6148,8 @@ table.dispute-entry-table tbody tr.selected {
   border: none;
   background-color: #6dbcdb;
   min-width: 200px;
-  top: 16px;
-  left: 4px;
+  top: 18px;
+  left: 3px;
 }
 
 .dispute-owner-buttons-wrapper h3 {
@@ -6390,7 +6479,7 @@ table.dispute-entry-table tbody tr.selected {
 }
 
 .popover{
-    max-width: 100%; /* Max Width of the popover (depending on the container!) */
+  max-width: 100%; /* Max Width of the popover (depending on the container!) */
 }
 .retake-screenshot{
   background-color: $type-lighter-color;
@@ -6708,9 +6797,7 @@ table#duplicates a {
   text-decoration: underline;
 }
 
-//Crappy temporary hack to keep the annoying insane amt of entries for xbrs from taking over and ruining the whole page
 .xbrs-details-table .dataTables_scrollBody {
-  max-width: 1200px !important;
   overflow-y: scroll !important;
 }
 
@@ -6830,7 +6917,7 @@ table#duplicates a {
 }
 
 .bug-tabs .nav-tabs li a {
-  background-color: #f2f2f2 !important;
+  background-color: $faint-neutral-color!important;
 }
 
 .bug-tabs .nav-tabs li.active a {
@@ -7385,47 +7472,47 @@ td.text-center span {
 }
 .graph-section {
   border-left: 1px solid $faint-neutral-color;
+}
+
+.graph-bar-legend {
+  padding: 0 10px;
+  border: 1px solid $faint-neutral-color;
+  float: right;
+
+  .custom-legend {
+    padding: 4px 0 20px 4px;
   }
 
-  .graph-bar-legend {
-    padding: 0 10px;
-    border: 1px solid $faint-neutral-color;
-    float: right;
-
-    .custom-legend {
-      padding: 4px 0 20px 4px;
-    }
-
-    .graph-legend-circle::before {
-      content: '';
-      float: left;
-      display: block;
-      height: 8px;
-      width: 8px;
-      border-radius: 50%;
-      margin-right: 6px;
-      margin-top: 2px;
-    }
-
-    .skyblue-legend-color::before {
-      background-color: $primary-section-color-light;
-    }
-    .yellow-legend-color::before{
-      background-color: $yellow-graph-bar
-    }
-
-    .navyblue-legend-color::before {
-      background-color: $content-tab-color;
-    }
-
-    .lightgray-legend-color::before {
-      background-color: $content-label-color;
-    }
-
-    .orange-legend-color::before {
-      background-color: $warning-accent-color;
-    }
+  .graph-legend-circle::before {
+    content: '';
+    float: left;
+    display: block;
+    height: 8px;
+    width: 8px;
+    border-radius: 50%;
+    margin-right: 6px;
+    margin-top: 2px;
   }
+
+  .skyblue-legend-color::before {
+    background-color: $primary-section-color-light;
+  }
+  .yellow-legend-color::before{
+    background-color: $yellow-graph-bar
+  }
+
+  .navyblue-legend-color::before {
+    background-color: $content-tab-color;
+  }
+
+  .lightgray-legend-color::before {
+    background-color: $content-label-color;
+  }
+
+  .orange-legend-color::before {
+    background-color: $warning-accent-color;
+  }
+}
 
 .graph-header-icon-stg {
   background-repeat: no-repeat;
@@ -7618,7 +7705,12 @@ td.text-center span {
     padding: 0 15px;
     &:last-of-type {
       position: relative;
-      top: 5px;
+      top: 6px;
+    }
+    @-moz-document url-prefix() {
+      &:last-of-type {
+        top: 7px;
+      }
     }
 
     span {
@@ -7700,10 +7792,10 @@ td.text-center span {
 }
 
 #copycat-categories-selectized {
-    width: 100%;
-    height: 30px;
-    padding: 0 10px;
-    border: 1px solid #e0e0e0;
+  width: 100%;
+  height: 30px;
+  padding: 0 10px;
+  border: 1px solid #e0e0e0;
 }
 
 .copycat-tool-footer {
@@ -8275,6 +8367,11 @@ hr.thin.form-divider {
   background-image: url(image_path('icon_bugzilla_loggedout.svg'));
 }
 
+// WebCat Screenshot icon
+.escape-button {
+  background-image: url(image_path('icon_cancel.svg'));
+  background-repeat: no-repeat;
+}
 
 // Tab styles for tabs on dialog boxes
 .nav-tabs.dialog-tabs {
@@ -8325,6 +8422,1104 @@ hr.thin.form-divider {
   background-color: $content-bg-color;
 }
 
+
+// dbinebri: the new ticket file rep container needs to be wide and slightly positioned to the right
+.escalations--file_rep--disputes-controller .nav-tools-dropdown {
+  min-width: 540px;
+  margin-left: 35px;
+}
+
+#filerep_searchref_container{
+  & {
+    color: $primary-section-color;
+    max-width: 100%;
+    font-size: 8pt ;
+    display: none;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    margin-bottom: 30px;
+  }
+  .search-condition{
+    padding: 1px
+  }
+
+  .search-condition:not(:last-child):after {
+    content: ", ";
+  }
+  .search-condition-name{
+    text-transform: uppercase;
+    font-weight: bold;
+  }
+}
+.in-sample-zoo_container{
+  label{
+    position: relative;
+    top: 10px;
+  }
+  #in-sample-zoo-input{
+    border: none;
+    outline: none;
+  }
+}
+
+// dbinebri: file reputation - new ticket specific styles inside the new ticket container
+.escalations--file_rep--disputes-controller .dropdown-menu #new-file-rep-form {
+
+  // radio specific styles
+  .file-rep-radio-wrapper {
+    input[type="radio"] {
+      border: none;
+      outline: none;
+      width: unset;
+    }
+
+    .radio-label {
+      font-size: 8pt;
+      padding-left: 8px;
+    }
+  }
+
+  // file rep new ticket text input styles
+  input {
+    margin-bottom: 8px;
+    background-color: transparent;
+    border: 1px solid darken($faint-neutral-color, 5%);
+    border-radius: 1px;
+    min-width: unset;
+    padding: 5px;
+
+    &:focus {
+      background-color: $faint-alt-highlight;
+      border: 3px solid $content-bg-color;
+      outline: 1px solid darken($faint-neutral-color, 5%);
+      padding: 3px;
+    }
+  }
+
+  // new ticket: need to allow multiple (up to 100) shas at a time here
+  textarea#shas_list {
+    font-family: 'Fira Mono', monospace;
+    font-size: 11.5px;
+    min-height: 200px;
+  }
+
+  // radio button padding tweaks
+  .pad-horiz-small {
+    padding-right: 2px;
+
+    &:last-of-type {
+      padding-left: 2px;
+    }
+  }
+
+  #file-rep-assignee {
+    padding-left: 10px;
+
+    &:focus {
+      padding-left: 8px;
+    }
+  }
+  .in-sample-zoo_container{
+
+  }
+
+  .tooltipster-base{
+    white-space: nowrap;
+  }
+
+  // this attachment button/icon should be hidden on page load and
+  // displayed when radio button clicked, js/jquery handles this display logic
+  .file-rep-attachment button {
+    width: 18px;
+    height: 18px;
+    background-color: transparent;
+    border: none;
+  }
+
+  // minor positioning for the attachment icon
+  .attachment-label {
+    position: relative;
+    top: 3px;
+    left: 4px;
+  }
+
+  // tiny firefox fix
+  @-moz-document url-prefix() {
+    .attachment-label {
+      top: -3px;
+    }
+  }
+
+  hr.thin {
+    margin-top: 10px;
+    margin-bottom: 10px;
+
+    &:last-of-type {
+      margin-top: 30px;
+      margin-bottom: 20px;
+    }
+  }
+}
+
+.top-case-info h4 {
+  text-transform: uppercase;
+  font-weight: 700 !important;
+  color: $type-lighter-color;
+  font-size: 10pt;
+  margin-bottom: 20px;
+}
+
+.case-id-tag {
+  font-weight: 700;
+  font-size: 12pt;
+}
+
+.ticket-overview-wrapper {
+  margin-bottom: 24px;
+}
+
+.ticket-overview-wrapper .inline-select-dropdown {
+  min-width: 100px !important;
+}
+
+.code-string-break {
+  word-wrap: break-word;
+  word-break: break-all;
+  display: block !important;
+}
+
+.disp-negative {
+  font-weight: 600;
+  color: $warning-accent-color;
+  text-transform: capitalize;
+}
+
+.top-case-info .content-label-sm {
+  width: 100%;
+  padding-bottom: 2px;
+}
+
+.top-info-data {
+  margin-bottom: 10px;
+}
+
+.top-info-details {
+  font-size: 8.5pt;
+  line-height: 1.35em;
+}
+
+.file-edit-buttons-wrapper {
+  display: inline-block;
+  position: absolute;
+  right: 26px;
+  top: 0;
+  margin-top: 0;
+  button {
+    padding: 10px 14px 10px 30px;
+    margin-right: 0;
+    margin-bottom: 0;
+    margin-top: 8px;
+  }
+}
+
+@media (min-width: 768px) {
+  .file-edit-buttons-wrapper {
+    position: relative;
+    margin-top: -20px;
+    margin-left: 20px;
+    margin-bottom: 10px;
+  }
+}
+
+@media (min-width: 992px) {
+  .file-edit-buttons-wrapper {
+    position: absolute;
+    right: 26px;
+    top: 0;
+    margin-top: 0;
+  }
+}
+
+.create-det-button, .change-disp-button {
+  background-repeat: no-repeat;
+  background-size: 20px 20px;
+  background-position: 6px center;
+}
+
+.create-det-button {background-image: url(image_path('icon_target_white.svg'));}
+.change-disp-button {background-image: url(image_path('icon_hazard_white.svg'));}
+
+#file-index-table-show-columns-dropdown {
+  min-width: 390px;
+}
+
+#file-index-table-show-columns-dropdown ul {
+  display: block;
+  padding: 10px;
+}
+
+#file-index-table-show-columns-dropdown ul:first-of-type {
+  float: left;
+}
+
+#file-index-table-show-columns-dropdown ul li {
+  padding: 4px 12px;
+  font-size: 9pt;
+}
+
+#file-index-table-show-columns-dropdown ul li input {
+  margin-right: 8px;
+}
+
+.file-rep-index-toolbar {
+  .ticket-owner-button {
+    margin: 0;
+  }
+  .toolbar-dropdown {
+    margin-top: 0;
+    margin-left: 0;
+  }
+}
+
+.plain-inline-dropdown-wrapper {
+  padding: 10px !important;
+}
+
+.full-row-label {
+  width: 100%;
+  display: block;
+  margin-bottom: 0;
+  padding-bottom: 0;
+}
+
+.plain-inline-dropdown-wrapper {
+  select {
+    margin: 0;
+    height: 24px;
+    width: 100%;
+    border: none !important;
+    outline: 1px solid darken($faint-neutral-color, 10%);
+  }
+  select:focus {
+    margin: 0;
+    height: 24px;
+    border: none !important;
+    outline: 1px solid $bug-section-color !important;
+    box-shadow: none !important;
+  }
+  .text-input {
+    height: 26px;
+    margin-top: -1px;
+    width: 100%;
+  }
+  hr.thin {
+    margin-right: 2px;
+    margin-left: 2px;
+  }
+}
+
+.toolbar  .inline-tool-content-wrapper.plain-inline-dropdown-wrapper .row {
+  margin-left: 2px;
+  margin-right: 2px;
+}
+.file-name-extension {
+  float: none !important;
+  padding-left: 0 !important;
+  line-height: 2em !important;
+  color: $type-lighter-color;
+}
+
+.toolbar .plain-inline-dropdown-wrapper div {
+  //padding: 0;
+}
+
+
+.research-data-header {
+  font-weight: 700;
+  color: $type-lighter-color;
+  margin-top: 14px;
+  padding-bottom: 4px;
+  border-bottom: 4px solid;
+  background-repeat: no-repeat;
+  padding-left: 32px;
+  background-size: 24px 24px;
+  background-position: left -2px;
+}
+
+.sandbox-header {
+  border-bottom-color: $warning-accent-color;
+  background-image: url(image_path('icon_sandbox2.svg'));
+}
+
+.threatgrid-header {
+  border-bottom-color: $communication-accent-color;
+  background-image: url(image_path('icon_grid.svg'));
+}
+
+.reversing-labs-header {
+  border-bottom-color: $success-color;
+  background-image: url(image_path('icon_reverse.svg'));
+}
+
+.sample-present-true, .sample-present-false {
+  width: 30px;
+  height: 40px;
+  background-repeat: no-repeat;
+  position: absolute;
+  display: block;
+  right: 12px;
+  top: 10px;
+}
+
+.sample-present-true {background-image: url(image_path('icon_check_grey.svg'));}
+.sample-present-false {background-image: url(image_path('icon_cancel_grey.svg'));}
+
+.data-report-wrapper {
+  font-size: 8.5pt;
+  margin-top: 20px;
+}
+
+.data-report-label {
+  width: 100%;
+  text-transform: uppercase;
+  font-weight: 700;
+  color: $type-lighter-color;
+  padding-bottom: 5px;
+}
+
+.data-report-score {
+  font-weight: 700;
+  font-size: 14pt;
+}
+
+button.secondary.view-report-external-button {
+  font-size: 9pt;
+  padding: 10px 12px 10px 28px;
+  margin: 1px 0 0 0;
+  background-size: 18px 18px;
+  background-repeat: no-repeat;
+  background-position: 6px 6px;
+  background-image: url(image_path('icon_export_white.svg'));
+}
+
+.text-right .content-label-sm {
+  margin-right: 0;
+}
+
+.toolbar-select-wrapper .toolbar-button-text {
+  padding-left: 22px;
+  padding-right: 6px;
+  line-height: 1.65em;
+}
+
+// dbinebri: updates below for file rep navbar layout new
+.escalations--file_rep--disputes-controller {
+
+  .nav-tool-blocks.search-wrapper {
+    padding: 7px 7px 7px 40px;
+    text-align: left;
+  }
+
+  .input-group.search-group {
+    padding: 3px 3px 3px 5px;
+    margin: 0 0 0 20px;
+    width: 100%;
+    min-width: 200px;
+    max-width: 450px;
+  }
+
+  // search input field
+  .input-group.search-group .search-box {
+    height: 24px;
+    margin: 0px -3px;
+    padding-left: 30px;
+    padding-top: 0;
+    background-size: 20px;
+    background-position: 4px center;
+  }
+
+  // advanced search button
+  .input-group.search-group #advanced-search-button {
+    padding: 0 12px 0 18px;
+    height: 30px;
+  }
+
+  // adding the down caret icon using the sort_by svg for advanced search button
+  .input-group.search-group #advanced-search-button::after {
+    content: '';
+    display: block;
+    width: 16px;
+    height: 14px;
+    right: 0;
+    background-image: url(image_path('icon_sort_by.svg'));
+    background-repeat: no-repeat;
+    background-position: 30% 92%;
+    background-size: 26px 26px;
+    float: right;
+  }
+
+  // file rep navbar specific styles - minor width adjustments, col-lg-1 is too tight, col-lg-2 too wide
+  @media screen and (min-width: 1200px) {
+    .col-lg-1.nav-naming-guide, .col-lg-1.nav-new-ticket {
+      width: 12%;
+    }
+    // below ensures the navbar widths adds up correctly
+    .col-lg-2.nav-username {
+      width: 17%;
+    }
+  }
+
+  // dbinebri: the tooltips for file rep get too wide, limit the max-width
+  .tooltipster-sidetip {
+    max-width: 410px !important;
+  }
+}
+
+// dbinebri: wrapper for naming-guide-dialog, jquery generates this, leave this here
+.ui-dialog[aria-describedby=naming-guide-dialog] {
+  margin-top: 55px;
+  margin-right: 20px;
+  border-radius: 5px;
+  border: 0;
+  box-shadow: 0 5px 15px rgba(0, 0, 0, 0.2);
+
+  .ui-dialog-titlebar {
+    font-family: 'Open Sans', sans-serif;
+    font-weight: 600;
+    padding-left: 40px;
+    padding-top: 11px;
+    background-image: url(image_path('icon_naming_list_white2.svg'));
+    background-size: 20px 20px;
+    background-repeat: no-repeat;
+    background-position: 11px 9px;
+  }
+}
+
+// dbinebri: file rep - naming guide dialog internal specific styles here
+#naming-guide-dialog {
+  font-family: 'Open Sans', sans-serif;
+  padding: 10px;
+
+  table th {
+    text-transform: uppercase;
+    font-weight: bold;
+    font-size: 13px;
+    &:last-of-type {
+      padding-right: 15px;
+      button.close {
+        background-image: url(image_path('icon_cancel_white.svg'));
+        background-position: center center;
+        top: 10px;
+        right: 10px;
+        color: darken($content-bg-color, 5%);
+        font-weight: normal;
+        font-size: 19px;
+      }
+    }
+  }
+  table td {
+    padding-top: 10px;
+    font-weight: 500;
+    font-size: 10px;
+    color: darken($type-lighter-color, 5%);
+
+    // "pattern" column below needs special "code" formatting
+    &:first-of-type {
+      span {
+        font-family: 'Fira Mono', monospace;
+        font-weight: 500;
+        background: darken($content-bg-color, 5%);
+        letter-spacing: 0.1px;
+      }
+      table th {
+        text-transform: uppercase;
+        font-weight: bold;
+        font-size: 13px;
+      }
+      table td {
+        padding-top: 10px;
+        font-weight: normal;
+        font-size: 10px;
+        color: $type-lighter-color;
+
+        // pattern column below needs special formatting
+        &:first-of-type span {
+          font-weight: bold;
+          background: darken($content-bg-color, 5%);
+        }
+      }
+    }
+  }
+}
+
+
+
+
+
+// dbinebri: the tooltips for modals on file rep get too wide, limit the max-width a little bit
+.tooltipster-sidetip .tooltipster-box {
+  max-width: 410px !important;
+}
+
+.data-report-wrapper hr.thin {
+  margin-top: 10px;
+}
+
+.data-report-table {
+  font-size: 8pt;
+  margin-top: 5px;
+  margin-bottom: 10px;
+}
+
+.data-report-table > tbody > tr > td, .data-report-table > thead > tr > th  {
+  padding: 6px 6px;
+}
+
+.data-report-table tr:last-of-type td {
+  border-bottom: none;
+}
+
+.data-report-content {
+  line-height: 1.35;
+  font-size: 8pt;
+}
+
+.data-report-code-content {
+  padding: 8px 6px;
+  font-family: "Fira Mono", monospace;
+  border-radius: 0;
+  line-height: 1.25em;
+}
+
+.tg-data-present, .tg-data-missing, .rl-data-present, .rl-data-missing, .sb-data-present, .sb-data-missing, .sb-report-run {
+  display: none;
+}
+
+.tg-data-missing, .sb-data-missing, .rl-data-missing, .sb-report-run {
+  margin-top: 40px;
+}
+
+.sb-report-run .data-report-wrapper {
+  margin-top: 60px;
+}
+
+// Reversing labs styles
+.scanner-mal {
+  color: $second-section-color;
+  font-weight: 600;
+  padding-left: 22px !important;
+  // dbinebri: ensure RL result data strings wrap correctly
+  word-break: break-all;
+}
+
+.scanner-mal::before {
+  content: '';
+  display: block;
+  float: left;
+  background-repeat: no-repeat;
+  background-image: url(image_path('icon_malicious.svg'));
+  width: 18px;
+  height: 18px;
+  margin-top: -4px;
+  margin-bottom: -4px;
+  margin-right: 4px;
+  margin-left: -22px;
+}
+
+// dbinebri: fix for "not detected" left padding in RL table on Show
+.scanner-unk {
+  padding-left: 22px !important;
+  color: $type-lighter-color;
+  font-style: italic;
+}
+
+.inline-loader-wrapper {
+  display: block;
+  position: relative;
+  width: 170px;
+  margin: auto;
+  .loader-msg {
+    display: inline-block;
+    margin-top: 14px;
+    font-style: italic;
+    float: left;
+  }
+  .gear-loader-wrapper {
+    float: left;
+    margin-right: 5px;
+  }
+}
+
+#rl-loader, #tg-loader, #sb-loader {
+  width: 100%;
+}
+
+// Specific styles for sandbox report
+.vertical-data-report-table {
+  margin: 10px 0 15px 0;
+  tr td, tr th {
+    border-bottom: none;
+    padding: 4px;
+    font-size: 8pt;
+  }
+  .code-wrap-col {
+    padding-top: 2px;
+    padding-bottom: 2px;
+  }
+  .code-snippet {
+    font-size: 8pt;
+  }
+}
+
+
+// dbinebri: adding a minor tweak for the toolbar labels on show page > research tab
+@media screen and (min-width: 1600px) {
+  #research-tab-toolbar .toolbar-button-label .toolbar-button-text {
+    padding-top: 1px;
+  }
+}
+#temp_row .delete-search-image{
+  background-image: url(image_path('icon_cancel_grey.svg'));
+  display: block;
+  padding: 7px;
+  margin-right: 15px;
+}
+
+.score-col {
+  width: 100%;
+  display: block;
+}
+
+
+// Overriding standard button styles in order to animate the syncer
+#file-rep-sync-button {
+  background-image: none;
+  padding-left: 4px;
+  .toolbar-button-text {
+    line-height: 2em;
+    margin-left: 0;
+  }
+}
+
+#file-rep-sync-button::before {
+  content: '';
+  display: block;
+  width: 21px;
+  height: 21px;
+  background-image: url(image_path('icon_sync.svg'));
+  background-repeat: no-repeat;
+  float: left;
+  margin-top: 1px;
+}
+
+#file-rep-sync-button.syncing, #file-rep-sync-button.syncing:hover {
+  background-color: $bug-section-color !important;
+  color: $content-bg-color;
+}
+
+#file-rep-sync-button.syncing::before {
+  background-image: url(image_path('icon_sync_white.svg'));
+  -webkit-animation: rotate_clockwise 1.5s linear infinite;
+  -moz-animation: rotate_clockwise 1.5s linear infinite;
+  -ms-animation: rotate_clockwise 1.5s linear infinite;
+  -o-animation: rotate_clockwise 1.5s linear infinite;
+  animation: rotate_clockwise 1.5s linear infinite;
+}
+
+// kh: overwriting jquery ui slider styles
+.ui-slider.form-control.nav-tool-content-wrapper{
+  background: white!important;
+  margin-bottom: 10px
+}
+.ui-slider.form-control{
+  background: white!important;
+  margin-bottom: 10px
+}
+.ui-slider .ui-slider-handle {
+  width: 1.75em;
+  height: 2.8em;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.form-control .ui-slider-handle.ui-state-focus{
+  background: #44a9d1;
+  color: white;
+  border: none;
+}
+.form-control .ui-slider-handle.ui-state-active{
+  background: $primary-section-color;
+  border: none;
+}
+
+// Creating form dialog for when we want to use a dialog instead of a dropdown
+.form-dialog {
+  font-family: 'Open Sans', sans-serif !important;
+  border-radius: 4px;
+  border: none !important;
+  .ui-dialog-titlebar {
+    background-color: $bug-section-color;
+    line-height: 2.25em;
+    height: 54px;
+    padding-left: 15px;
+
+    .ui-dialog-title {
+      font-size: 14pt;
+      font-weight: 300;
+    }
+  }
+  .form-wrapper {
+    padding: 20px;
+  }
+  .form-control, input, textarea {
+    background-color: transparent;
+    border: 4px solid $content-bg-color;
+    outline: 1px solid darken($faint-neutral-color, 12%);
+  }
+  input {
+    height: 24px;
+    margin-top: 1px;
+  }
+  input:focus, textarea:focus {
+    outline: 1px solid darken($faint-neutral-color, 12%);
+    border: 4px solid $content-bg-color;
+  }
+  input:focus {
+    height: 28px;
+    margin-top: -1px;
+  }
+}
+
+div[aria-describedby='create-detection-dialog'] {
+  .ui-dialog-title {
+    padding-left: 36px;
+    background-size: 26px 26px;
+    background-repeat: no-repeat;
+    background-position: left center;
+    background-image: url(image_path('icon_target_white.svg'));
+  }
+}
+
+.form-group {
+  .nested-col-row {
+    margin-right: -4px;
+    margin-left: -4px;
+  }
+  .nested-col {
+    padding: 0 4px;
+  }
+}
+
+.uneditable-formfield {
+  line-height: 2em;
+  color: $type-lighter-color;
+}
+
+
+#file-det-dropdown {
+  min-width: 420px;
+}
+
+#new-amp-detection-name-section{ display: none;}
+#new-amp-detection-name-dd-section {
+  display: none;
+  select.form-control {
+    font-size: 8pt;
+    height: 25px;
+  }
+  select.form-control:focus {
+    margin-top: -6px;
+    height: 25px;
+  }
+  input {
+    height: 25px;
+    margin-top: -6px;
+    width: 100%;
+  }
+  .nested-col-row {
+    margin-top: 4px;
+    margin-right: -2px !important;
+    margin-left: -2px;
+  }
+  .uneditable-formfield {
+    font-size: 8pt;
+  }
+}
+
+.toolbar .dropdown.open .toolbar-button.detection-button {
+  background-image: url(image_path('icon_target_white.svg'));
+}
+
+.tg-data-present, .tg-data-missing, .sb-data-present, .sb-data-missing, .rl-data-present, .rl-data-missing {
+  display: none;
+}
+
+
+// dbinebri: adding button here for download json buttons
+.download-small-button {
+  background-image: url(image_path('icon_download.svg'));
+  background-repeat: no-repeat;
+  width: 20px;
+  height: 23px;
+  float: right;
+  display: inline-block;
+  border: none;
+}
+
+// make sure the full json areas stay visible in collapsed state
+.data-report-wrapper {
+  .collapse {
+    display: block;
+    visibility: visible;
+    overflow: scroll;
+    &.in {  // .in is expanded state
+      overflow-y: hidden;
+    }
+  }
+}
+
+// ensure json areas stay at a min-height on collapse, and gray on expand/collapse transition
+#collapse_tg_json, #collapse_sb_json {
+  min-height: 300px;
+  margin: 0 2px;
+  background: darken($content-bg-color, 4%);
+  .report-size {
+    padding: 0;
+    width: initial;
+  }
+}
+
+
+// ensure the button here has the right font
+#create-detection-dialog button.primary {
+  font-family: "Open Sans", sans-serif;
+}
+
+
+// add a few tweaks for this dropdown so no overlap with last character and down caret at breakpoints
+// super wide width
+@media screen and (min-width: 1801px) {
+  #show-edit-ticket-status-button {
+    padding-right: 16px;
+    &.inline-select-dropdown {
+      background-position: right 0 center;
+    }
+  }
+}
+
+// medium wide width
+@media screen and (max-width: 1800px) {
+  #show-edit-ticket-status-button {
+    padding-left: 4px;
+    padding-right: 12px;
+    font-size: 11px;
+    &.inline-select-dropdown {
+      background-size: 14px;
+      background-position: right -1px center;
+    }
+  }
+}
+
+// FF - tiny vertical alignment fix for 2nd button in this panel
+@-moz-document url-prefix() {
+  .dispute-owner-buttons-wrapper button#index_change_assign {
+    position: relative;
+    top: -2px;
+  }
+}
+
+// dbinebri: add file rep datatable bg color white in case all cols are showing
+#file-rep-datatable {
+  background-color: $content-bg-color;
+}
+
+// need a separate th class so the bg sort icon isn't affected by generic .text-center
+#file-rep-datatable_wrapper .th-center {
+  text-align: center;
+}
+
+// dbinebri: on Show, assignee column width fix on laptop screens
+@media screen and (max-width: 1700px) and (min-width: 1201px){
+  .ticket-overview-wrapper {
+    .col-ticket-left {
+      width: 50%;
+    }
+    .col-ticket-right {
+      width: 50%
+    }
+    .col-assignee {
+      padding-right: 2%;
+    }
+    .missing-data {
+      font-size: 12px;
+    }
+    .dispute-owner-buttons-wrapper {
+      margin-left: 1px;
+    }
+  }
+}
+
+// dbinebri: on Index, ensure "Unassigned" and buttons can exist w/o breaking in the Assignee col
+.table > tbody > tr > td.assignee-col, table > tbody > tr > td.assignee-col {
+  min-width: 90px !important;
+}
+
+ // dbinebri: adding a specific on-click sha tooltip
+.copied-sha-tooltip {
+  opacity: 0;
+  width: 100px;
+  background-color: $table-dark-body;
+  font-family: 'Open Sans', sans-serif;
+  font-size: 12px;
+  color: $content-bg-color;
+  padding: 4px 8px;
+  border-radius: 5px;
+  border: none;
+  position: absolute;
+  cursor: default;
+  margin-top: 10px;
+  box-shadow: 5px 5px 8px rgba(0, 0, 0, 0.1);
+  text-align: center;
+  &:after {
+    // little triangle
+    bottom: 100%;
+    left: 50%;
+    content: " ";
+    height: 0;
+    width: 0;
+    position: absolute;
+    pointer-events: none;
+    border-style: solid;
+    border-color: transparent transparent $table-dark-body transparent;
+    border-width: 5px;
+    margin-left: -5px;
+  }
+}
+
+
+// dbinebri: INDEX, RL HOVER TABLE STYLES HERE, this is a one-off tooltip as of now
+// top row for rl hover table
+table.rl-header {
+  padding: 0;
+  width: 500px;
+  text-transform: uppercase;
+  text-align: left;
+  font-size: 12px;
+  font-weight: bold;
+  .top {
+    span {
+      float: right;
+    }
+    td {
+      border: none;
+      padding: 4px 8px;
+      background: darken($table-dark-body, 10%);
+    }
+  }
+  .second {
+    border-bottom: solid 1px darken($table-dark-body, 5%);
+    td {
+      padding: 2px 8px;
+      border: none;
+      &.left {
+        width: 165px;
+      }
+      &.right {
+        width: 335px;
+      }
+    }
+  }
+}
+
+// this is the actual rl hover table contents
+table.rl-content {
+  display: block;
+  padding: 0;
+  width: 500px;
+  height: 260px;
+  overflow-x: hidden;
+  overflow-y: scroll;
+  tr {
+    td {
+      border: none;
+      padding: 2px 8px;
+      text-align: left;
+      font-size: 10px;
+      &.left {
+        width: 190px;
+        text-transform: uppercase;
+      }
+      &.right {
+        width: 310px;
+      }
+    }
+    // need special scanner-mal and scanner-unk styles here, can't reuse from show page
+    .rl-scanner-mal {
+      color: $content-bg-color;
+      &::before {
+        content: '';
+        display: block;
+        float: left;
+        background-repeat: no-repeat;
+        background-image: url(image_path('icon_malicious_dark.svg'));
+        width: 14px;
+        height: 14px;
+        margin-top: 2px;
+        margin-bottom: 0;
+        margin-right: 4px;
+        margin-left: -16px;
+      }
+    }
+    .rl-scanner-unk {
+      color: $content-bg-color;
+      padding-left: 10px;
+      font-style: italic;
+    }
+  }
+}
+
+// index, special underline fix for rl hover, normal underline is too tight
+.rl-hover a {
+  border-bottom: dotted 1px lighten($table-dark-body, 40%);
+  &:hover {
+    text-decoration: none;
+    color: $table-dark-body;
+  }
+}
+
+
+// dbinebri: this is the WRAPPER for the RENDERED full rl table hover, remove padding and add border radius
+.tooltipster-sidetip.tooltipster-borderless.tooltipster-borderless-customized.tooltipster-rl-hover .tooltipster-content {
+  padding: 0;
+  border-radius: 5px;
+}
+
+// this is the triangle, make color match the top row of rl hover table
+.tooltipster-sidetip.tooltipster-borderless.tooltipster-borderless-customized.tooltipster-rl-hover.tooltipster-bottom .tooltipster-arrow-border {
+  border-bottom-color: darken($table-dark-body, 5%);
+}
+
+// dbinebri: ensuring create new report button gets icon
+.create-new-run-button {
+  background-image: url(image_path('icon_sandbox_report.svg'));
+  background-position: 6px center;
+  padding-left: 15px;
+}
+
+// Datatables special display to get rid of sorting by placeholder 'Na' or 'Missing' etc. values
+
+.no-score::before {
+  content:'No Score';
+  display: block;
+}
+
+.unknown-file::before {
+  content: 'Unknown';
+  display: block;
+}
+
 .line-up{
   display: flex;
   flex-direction: row;
@@ -8335,6 +9530,170 @@ hr.thin.form-divider {
   font-size: 12px;
 }
 
+.error-label {
+  background-image: url(image_path('icon_error.svg'));
+  background-repeat: no-repeat;
+  background-position: left top;
+  background-size: 20px 20px;
+  padding-left: 24px;
+  font-size: 8pt;
+  color: $type-lighter-color;
+}
+
+.sha-msg {
+  color: $warning-accent-color;
+  font-family: 'Fira Mono', monospace;
+  font-size: 9pt;
+  font-weight: 400;
+  padding-left: 24px;
+  line-height: 1.4em;
+}
+
+#sha_errors_list {
+  margin-bottom: 20px;
+  display: block;
+
+}
+
+.rl-col {
+  text-align: center;
+}
+
+.amp-area .disposition {
+  text-transform: capitalize;
+}
+
+// making sure this string doesn't break
+.amp-area .detection-name {
+  word-break: break-all;
+}
+
+.amp-area .inline-loader-wrapper {
+  display: block;
+  margin-bottom: 40px;
+}
+
+.message-div .code-content {
+  line-height: 1.5em;
+  display: inline-block;
+  margin: 4px 0 12px 0;
+  font-size: 8pt;
+  a {
+    color: $warning-accent-color;
+    text-decoration: underline;
+  }
+}
+
+
+.amp-history-icon {
+  background-image: url(image_path('icon_history.svg'));
+  display: inline-block;
+  width: 22px;
+  height: 15px;
+  vertical-align: middle;
+  position: relative;
+  bottom: 2px;
+  background-repeat: no-repeat;
+  background-position: 50% 50%;
+  background-color: transparent;
+}
+
+// dialog for AMP history on File Rep > Show in top right area
+#amp-history-dialog {
+  font-family: 'Open Sans', sans-serif;
+  padding: 15px;
+  p {
+    padding: 5px 5px 15px;
+    font-size: 12px;
+    font-style: italic;
+    color: $disabled-txt;
+  }
+}
+
+// AMP history dialog positioning - jquery overrides
+.ui-dialog[aria-describedby=amp-history-dialog] {
+  margin-top: 55px;
+  margin-right: 15px;
+  border-radius: 5px;
+  border: 0;
+  box-shadow: 0 5px 15px rgba(0, 0, 0, 0.2);
+  .ui-dialog-titlebar {
+    font-family: 'Open Sans', sans-serif;
+    font-size: 14px;
+    font-weight: 600;
+    padding-left: 15px;
+  }
+}
+
+// stylize the HTML buttons on File Rep > Show > SB report
+.data-report-button {
+  border-radius: 2px;
+  border: none;
+  font-size: 12px;
+  padding: 6px 12px 6px 32px;
+  margin-bottom: 10px;
+  color: $content-bg-color;
+  background-color: $bug-section-color;
+  background-repeat: no-repeat;
+  background-position: 7px 3px;
+  &#sb-report-html {
+    background-image: url(image_path('icon_open_viewable_white.svg'));
+    background-size: 19px 19px;
+  }
+  &#sb-report-html-download {
+    background-image: url(image_path('icon_download_white.svg'));
+    background-size: 20px 20px;
+  }
+  &:hover, &:active {
+    background-color: darken($bug-section-color, 10%);
+    color: $content-bg-color;
+  }
+}
+
+// fix to ensure there is no flash of dialog text on page load
+#naming-guide-dialog {
+  display: none;
+}
+
+// ensure AMP disposition on File Rep > Show is capitalized in all 3 instances
+#create-detection-dialog .top-info-data,
+.amp-area label:first-of-type + div,
+.suggested-disposition {
+  text-transform: capitalize;
+}
+
+.tg-fail-status {
+  font-weight: bold;
+}
+
+.wbnp-loader-message {
+  position: absolute;
+  right: 15px;
+  top: 10px;
+  .wbnp-report-status {
+    margin-top: 6px;
+    display: inline-block;
+    font-size: 9pt;
+  }
+}
+
+.wbnp-report-status {
+  text-transform: capitalize;
+}
+
+.wbnp-report-label {
+  float: left;
+  margin-right: 8px;
+}
+
+.wbnp-loading-spinner {
+  width: 20px;
+  height: 20px;
+  float: left;
+  margin-right: 5px;
+  display: block;
+  background-repeat: no-repeat;
+}
 
 .complaint-selectize-col-wrapper .selectize-control {
   padding-bottom: 6px;
@@ -8366,4 +9725,137 @@ input[type="radio"].resolution_radio_button {
 // more width so this aligns with the comment fields and for long URIs
 .complaint-uri-input {
   width: 65%;
+}
+
+// ensure the XBRS history headers are accurate and stay put while scrolling
+.entry-details-table.xbrs-details-table .dataTables_wrapper .dataTables_scrollBody {
+  table > thead > tr > th {
+    position: -webkit-sticky;
+    position: sticky;
+    top: 0;
+    background-color: $table-dark-body;
+    border-bottom: $type-base-color 1px solid;
+    // sizing overrides needed here
+    .dataTables_sizing {
+      min-height: 30px !important;
+      padding: 8px !important;
+    }
+  }
+}
+
+// laptop screen width - ensure xbrs table fits on-screen
+@media screen and (max-width: 1600px) {
+  .entry-details-table.xbrs-details-table {
+    th {
+      padding: 8px 6px;
+    }
+    td {
+      padding: 6px 8px;
+      word-break: break-word;
+    }
+  }
+}
+
+// ensuring no column overlap in Case History due to long strings
+#case-history .case-history-preview, #case-history .case-history-author {
+  word-break: break-word;
+}
+
+
+// webcat screenshot buttons
+.screenshot-button {
+  width: 30px;
+  height: 30px;
+  display: block;
+  position: absolute;
+  background-repeat: no-repeat;
+  background-position: center center;
+  background-color: $content-bg-color;
+  border-radius: 4px;
+  opacity: .9;
+  right: 4px;
+  cursor: pointer;
+}
+
+.screenshot-close-button {
+  background-image: url(image_path('icon_cancel_lt_grey.svg'));
+  background-size: 28px 28px;
+  top: 4px;
+}
+
+.screenshot-retake-button {
+  background-image: url(image_path('icon_screenshot_lt_grey.svg'));
+  background-size: 28px 28px;
+  top: 38px;
+}
+
+.screenshot-reload-button {
+  background-image: url(image_path('icon_sync_lt_grey.svg'));
+  background-size: 28px 28px;
+  top: 4px;
+}
+
+// webrep and webcat toolbars - between 1800px and 1600px, prevent breaking/wrapping of the buttons
+@media screen and (max-width: 1800px) and (min-width: 1600px) {
+  #webrep-index-toolbar, #webcat-index-toolbar {
+    .toolbar-button {
+      background-position: 4px 6px;
+      padding-left: 13px;
+      padding-right: 7px;
+      min-height: 25px;
+      background-size: 14px 14px; // icon size
+      transition: background-color 0.2s;
+    }
+  }
+}
+
+// webrep - research tab toolbar - between 1600px and 1400px, prevent breaking/wrapping buttons, this needs to be separate
+@media screen and (max-width: 1600px) and (min-width: 1401px) {
+  #research-tab-toolbar {
+    .toolbar-button {
+      background-position: 6px 6px;
+      padding-left: 9px;
+      padding-right: 8px;
+      min-height: 25px;
+      background-size: 14px 14px; // icon size
+      transition: background-color 0.2s;
+    }
+  }
+}
+// fix the collapse breakpoint
+@media screen and (max-width: 1400px) {
+  #research-tab-toolbar .toolbar-button-text {
+    display: none;
+    margin-left: 8px;
+  }
+}
+
+// adding styles for talos logo + copyright info in bottom-left of side nav
+.copyright-area {
+  width: 150px;
+  height: 100px;
+  position: sticky;
+  bottom: 20px;
+  left: 25px;
+  text-align: center;
+  z-index: -1;
+  opacity: 0;
+  transition: opacity 500ms;
+  .talos-logo {
+    width: 150px;
+    height: auto;
+    display: block;
+  }
+  .copyright {
+    font-size: 10px;
+    font-weight: normal;
+    text-transform: none;
+    line-height: 16px;
+    color: darken($content-bg-color, 10%);
+  }
+}
+
+#nav-trigger:checked ~ #sidenav-menu-div .copyright-area {
+  opacity: 1;
+  transition-delay: 350ms;
 }

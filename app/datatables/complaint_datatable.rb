@@ -1,4 +1,5 @@
 class ComplaintDatatable < AjaxDatatablesRails::Base
+  extend Forwardable
 
   def_delegators :@view, :link_to, :edit_escalations_webcat_complaint_path, :escalations_webcat_complaints_path, :content_tag, :concat
 

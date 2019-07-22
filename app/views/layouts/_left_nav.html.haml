@@ -26,7 +26,7 @@
           - if can?(:read, Admin)
             %li{class: 'cat-link'}
               %a.disabled-link= inline_svg 'icon_cat.svg'
-    - if can?(:read, Admin) || can?(:index, EscalationBug) || can?(:index, Dispute) || can?(:index, Complaint)
+    - if can?(:read, Admin) || can?(:index, any: [EscalationBug, FileReputationDispute, Dispute, Complaint])
       %li{class: 'nav-escalations'}
         %a{class: 'static-nav-item', 'data-toggle': 'collapse', href:'.esc-subnav', role:'button', 'aria-expanded':'false', 'aria-controls':'esc-subnav esc-subnav-icons'}
           = image_tag('layout/icon_escalations.svg', class: 'sidenav-icon', alt: 'Escalations')
@@ -38,9 +38,10 @@
           - if can?(:read, Admin)
             %li{class: 'clam-link'}
               %a.disabled-link= inline_svg 'icon_clam.svg'
-          - if can?(:read, Admin)
+          - if can?(:index, FileReputationDispute)
             %li{class: 'amp-link'}
-              %a.disabled-link= inline_svg 'icon_amp.svg'
+              %a{href: escalations_file_rep_disputes_path}
+                = inline_svg 'icon_amp.svg'
           - if can?(:index, Dispute)
             %li{class: 'rep-link'}
               %a{href: escalations_webrep_disputes_path}
@@ -106,7 +107,7 @@
               %li{class: 'cat-link'}
                 %a.disabled-link Categorization
 
-      - if can?(:read, Admin) || can?(:index, EscalationBug) || can?(:index, Dispute) || can?(:index, Complaint)
+      - if can?(:read, Admin) || can?(:index, any: [EscalationBug, FileReputationDispute, Dispute, Complaint])
         %li{class: 'nav-escalations'}
           %a{class: 'static-nav-item', 'data-toggle': 'collapse', href:'.esc-subnav', role:'button', 'aria-expanded':'false', 'aria-controls':'esc-subnav esc-subnav-icons'}
             Escalations
@@ -117,15 +118,15 @@
             - if can?(:read, Admin)
               %li{class: 'clam-link'}
                 %a.disabled-link Clam
-            - if can?(:read, Admin)
+            - if can?(:index, FileReputationDispute)
               %li{class: 'amp-link'}
-                %a.disabled-link AMP
+                %a{href: escalations_file_rep_disputes_path} File Reputation
             - if can?(:index, Dispute)
               %li{class: 'rep-link'}
-                %a{href: escalations_webrep_disputes_path} Reputation
+                %a{href: escalations_webrep_disputes_path} Web Reputation
             - if can?(:index, Complaint)
               %li{class: 'cat-link'}
-                %a{href: escalations_webcat_complaints_path} Categorization
+                %a{href: escalations_webcat_complaints_path} Web Categorization
       %li{class: 'nav-users static-nav-item'}
         %a{href: escalations_users_path}
           Users
@@ -141,7 +142,6 @@
               %a{href: 'escalations/admin'}
                 Escalations Admin    
 
-
       %li{class: 'nav-docs'}
         %a{class: 'static-nav-item', 'data-toggle': 'collapse', href:'.doc-subnav', role:'button', 'aria-expanded':'false', 'aria-controls':'doc-subnav doc-subnav-icons'}
           Docs
@@ -153,3 +153,11 @@
               %a{href: "https://git.vrt.sourcefire.com/talosweb/analyst-console/releases/tag/v#{@version}"} V #{@version}
             - else
               %a{href: "https://git.vrt.sourcefire.com/talosweb/analyst-console/releases/"} Release Notes
+
+
+    .copyright-area
+      = image_tag('logo_talos_white.svg', class: 'talos-logo', alt: 'Talos Logo')
+      %p.copyright
+        &copy #{ Date.today.year } Cisco Systems Inc. and/or its affiliates.
+        %br
+        All rights reserved.
