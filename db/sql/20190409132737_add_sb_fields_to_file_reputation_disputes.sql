@@ -1,0 +1,11 @@
+ALTER TABLE `file_reputation_disputes` ADD `resolution` varchar(255);
+ALTER TABLE `file_reputation_disputes` ADD `detection_name` varchar(255);
+ALTER TABLE `file_reputation_disputes` ADD `detection_created_at` datetime;
+ALTER TABLE `file_reputation_disputes` ADD `in_zoo` tinyint(1);
+ALTER TABLE `file_reputation_disputes` ADD `assigned_id` bigint;
+ALTER TABLE `file_reputation_disputes` ADD `created_at` datetime NOT NULL;
+ALTER TABLE `file_reputation_disputes` ADD `updated_at` datetime NOT NULL;
+CREATE  INDEX `index_file_reputation_disputes_on_assigned_id`  ON `file_reputation_disputes` (`assigned_id`);
+CREATE  INDEX `index_file_reputation_disputes_on_created_at`  ON `file_reputation_disputes` (`created_at`);
+CREATE  INDEX `index_file_reputation_disputes_on_updated_at`  ON `file_reputation_disputes` (`updated_at`);
+INSERT INTO `schema_migrations` (`version`) VALUES ('20190409132737');

@@ -68,7 +68,12 @@ class Sbrs::ManualSbrs < Sbrs::Base
   def self.call_wbrs_webcat(params, type: nil)
     sds_response = parse_wbrs(request_sds(path: '/score/webcat/json?url=', body: params, type: type))
     webcatlist = parse_wbrs(request_sds(path: '/labels/webcat/json', body: params, type: type))
-    webcatlist["#{sds_response["webcat"]["cat"]}"]["name"]
+
+    if sds_response["webcat"]["cat"] == 'nocat'
+      nil.to_s
+    else
+      webcatlist["#{sds_response["webcat"]["cat"]}"]["name"]
+    end
   end
 
   def self.where(conditions = {}, raw = false)
@@ -102,12 +107,24 @@ class Sbrs::ManualSbrs < Sbrs::Base
     response = {}
 
     rw = request_sds(path: '/score/wbrs;wbrs-rulehits/json?url=', body: params, type: 'wbrs')
-    rw = JSON.parse(rw.body)[0]["response"]
 
-    response = response.merge(rw)
+    begin
+      data = JSON.parse(rw.body)[0]["response"]
+    rescue
+      # Return dummy data since we assume that the request_sds call failed
+
+      if JSON.parse(rw)['response'].present?
+        data = {}
+        data['wbrs-rulehits'] = nil
+        data['wbrs'] = {}
+        data['wbrs']['score'] = nil
+
+      end
+    end
+
+    response = response.merge(data)
 
     response
-
   end
 
   def self.get_sbrs_data(conditions)

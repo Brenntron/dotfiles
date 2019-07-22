@@ -9,7 +9,7 @@
     #research-tab-toolbar.toolbar
       %div
         %label.toolbar-section-label Table View
-        %button.toolbar-button.expand-row-button#expand-all-rows
+        %button.toolbar-button.expand-row-button.toolbar-button-spacer#expand-all-rows
           %span.toolbar-button-text Expand All Rows
         %button.toolbar-button.collapse-button#collapse-all-rows
           %span.toolbar-button-text Collapse All Rows
@@ -40,7 +40,7 @@
         %div
           %label.toolbar-section-label Reputation
           %span.dropdown
-            %button#wlbl_entries_button.toolbar-button.adjust-wlbl-button.dropdown-toggle.esc-tooltipped.dropdown-button-margin-left{title: 'Adjust WL/BL', 'data-toggle': 'dropdown', 'aria-haspopup': 'true', 'aria-expanded': 'false', onclick: 'bulk_get_current_wlbl("show")'}
+            %button#wlbl_entries_button.toolbar-button.adjust-wlbl-button.dropdown-toggle.esc-tooltipped.toolbar-button-spacer{title: 'Adjust WL/BL', 'data-toggle': 'dropdown', 'aria-haspopup': 'true', 'aria-expanded': 'false', onclick: 'bulk_get_current_wlbl("show")'}
               %span.toolbar-button-text Adjust WL/BL
             .dropdown-menu.toolbar-dropdown#wlbl_adjust_entries{'aria-labelledby': 'wlbl_entries_button'}
               = form_for :wlbl, html: {class: 'adjust-wlbl-form'} do |wlbl_form|
@@ -210,12 +210,12 @@
 
       %div
         %label.toolbar-section-label Data
-        %button.toolbar-button.sync-button#sync-data-button
+        %button.toolbar-button.sync-button#sync-data-button.toolbar-button-spacer
           %span.toolbar-button-text Refresh Data
         %form#dispute_research_export_form{action: export_escalations_webrep_dispute_path(@dispute, format: :csv), method: 'get'}
           %button.toolbar-button.export-button
             %span.toolbar-button-text Export
-        %button.toolbar-button.export-button.esc-tooltipped{title: 'Export Selected to CSV', onclick: 'webrep_research_export_selected_rows();'}
+        %button.toolbar-button.export-button.esc-tooltipped.toolbar-button-spacer{title: 'Export Selected to CSV', onclick: 'webrep_research_export_selected_rows();'}
           %span.toolbar-button-text Export Selected to CSV
 
       .edit-button-wrapper.edit-entries-buttons.hidden
@@ -656,7 +656,7 @@
                         %td#last-submitted
                           = entry.last_submitted
                 %tr.nested-data-row{'data-entry-id': "#{entry.id}"}
-                  %td.expanded-row{colspan: '8'}
+                  %td.expanded-row{colspan: '9'}
                     .expanded-row-data-wrapper
                       .row
                         .col-sm-3

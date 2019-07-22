@@ -6,7 +6,10 @@
       %h5.left-space= current_user.display_name
       %p.dashboard-details.left-space
         = link_to "#{@current_user.cvs_username}", escalations_users_path(current_user[:id])
-
+    .wbnp-loader-message
+      %span.wbnp-loading-spinner.sync-button-white.sync_rotate
+      %h5.wbnp-report-label WBNP Report Status:
+      %span.wbnp-report-status Checking...
 .row#top_bar_extended_info
   .col-xs-2
     %table.tickets-totals-table.table-condensed
@@ -14,75 +17,68 @@
         %th{colspan: '2'}
           %span.ticket-type-label Submitter Type
       %tr
-        %td
-          Customer
-        %td
-          =@ti_comp_cust
+        %td Customer
+        %td=@ti_comp_cust
       %tr
-        %td
-          Guest
-        %td
-          =@ti_comp_guest
+        %td Guest
+        %td=@ti_comp_guest
       %tr
-        %td
-          Internal
-        %td
-          =@int_comp_entries
+        %td Internal
+        %td=@int_comp_entries
       %tr
-        %td
-          WBNP
-        %td
-          =@wbnp
+        %td WBNP
+        %td=@wbnp
   .col-xs-2
     %table.tickets-totals-table.table-condensed
       %tr
         %th{colspan: '2'}
           %span.ticket-type-label Entries
       %tr
-        %td
-          Assigned
-        %td
-          =@assigned
+        %td Assigned
+        %td=@assigned
       %tr
-        %td
-          Pending
-        %td
-          =@pending
+        %td Pending
+        %td=@pending
       %tr
-        %td
-          New
-        %td
-          =@new
+        %td New
+        %td=@new
       %tr
-        %td
-          Overdue
-        %td
-          =@overdue
+        %td Overdue
+        %td=@overdue
   .col-xs-2
     %table.tickets-totals-table.table-condensed
       %tr
         %th
           %span.ticket-type-label Complaints
       %tr
-        %td
-          New
-        %td
-          =@new_comp
+        %td New
+        %td=@new_comp
       %tr
-        %td
-          Active
-        %td
-          =@active_comp
+        %td Active
+        %td=@active_comp
       %tr
-        %td
-          Overdue
-        %td
-          =@overdue_comp
+        %td Overdue
+        %td=@overdue_comp
       %tr
-        %td
-          Completed
-        %td
-          =@completed_comp
+        %td Completed
+        %td=@completed_comp
+  .col-xs-2
+    %table.tickets-totals-table.table-condensed
+      %tr
+        %th{colspan: '2'}
+          %span.ticket-type-label WBNP Reports
+      %tr
+        %td Status
+        %td.wbnp-report-status
+      %tr
+        %td Total Attempted
+        %td#wbnp-report-attempted
+      %tr
+        %td Number Succeeded
+        %td#wbnp-report-succeeded
+      %tr
+        %td Number Rejected
+        %td#wbnp-report-rejected
 
 
 .row

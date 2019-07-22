@@ -297,6 +297,7 @@
     %input{:type => "hidden", :name => "xml_token", :value => "#{xml_token}"}
     %input{:name => "dispute_id", :type => "hidden", :value => "#{@dispute.id}"}
     %input{:name => "current_user_id", :type => "hidden", :value => "#{current_user.id}"}
+    %input{:name => "dispute_type", :type => "hidden", :value => "Dispute"}
 
   :javascript
     AC.Helpers.clipboard()

@@ -1,10 +1,12 @@
 class Customer < ApplicationRecord
-  belongs_to :company
+  belongs_to :company, optional:true
   has_many :complaints
   has_many :disputes
   has_many :file_reputation_tickets
 
   validates :email, presence: true, uniqueness: true
+
+  delegate :name, to: :company, allow_nil: true, prefix: true
 
   def self.thread_safe_find_or_create_by(attributes)
     with_advisory_lock("customer_create", timeout_seconds: 20) do
@@ -46,11 +48,38 @@ class Customer < ApplicationRecord
   end
 
   def self.process_and_get_customer(payload)
+
+    if payload[:customer].present?
+      if payload[:customer][:company_name] && payload[:customer][:name]
+        customer_exists =
+            find_or_create_customer(customer_email: payload[:customer][:customer_email],
+                                    company_name: payload[:customer][:company_name],
+                                    name: payload[:customer][:name])
+      else
+        customer_exists = Customer.thread_safe_find_or_create_by(email: "guest@cisco.com", name: "Guest", company:Company.find_by_name("Guest"))
+      end
+
+      return customer_exists
+    end
+
     if payload["payload"] && payload["payload"]["email"] && payload["payload"]["user_company"] && payload["payload"]["name"]
       customer_exists =
           find_or_create_customer(customer_email: payload["payload"]["email"],
                                   company_name: payload["payload"]["user_company"],
                                   name: payload["payload"]["name"])
+    else
+      customer_exists = Customer.thread_safe_find_or_create_by(email: "guest@cisco.com", name: "Guest", company:Company.find_by_name("Guest"))
+    end
+
+    customer_exists
+  end
+
+  def self.file_rep_process_and_get_customer(payload)
+    if payload[:customer_name].present? && payload[:company_name].present? && payload[:customer_email]
+      customer_exists =
+          find_or_create_customer(customer_email: payload[:customer_email],
+                                  company_name: payload[:company_name],
+                                  name: payload[:customer_name])
     else
       customer_exists = Customer.thread_safe_find_or_create_by(email: "guest@cisco.com", name: "Guest", company:Company.find_by_name("Guest"))
     end
