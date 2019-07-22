@@ -24,6 +24,7 @@ $ ->
     $( col_actions ).empty()
 
   $(document).on 'click', '.remove-action', (e) ->
+    e.preventDefault()
     { target } = e
     action = $(target).closest('.col-tag').text()
     p_tag = $(target).closest('p')
