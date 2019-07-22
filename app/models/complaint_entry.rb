@@ -546,7 +546,8 @@ class ComplaintEntry < ApplicationRecord
 
     present_params = params.select{|ignore_key, value| value.present?}
 
-    relation = where({})
+    simple_params = present_params.slice(*%w{complaint_id resolution status})
+    relation = where(simple_params)
 
     if params['submitted_newer'].present?
       relation =
@@ -617,38 +618,26 @@ class ComplaintEntry < ApplicationRecord
       end
     end
 
-    entry_params = params.clone
+    #relation = relation.group(:id)
 
-    if entry_params['complaint_id'] == [""]
-      entry_params.delete('complaint_id')
+    category = present_params['category']
+    if category.present?
+      relation = relation.where('category like :category', category: "%#{category}%")
     end
 
-    entry_params = entry_params.select{|ignore_key, value| value.present?}
-    unless entry_params.empty?
-      complaint_entry_fields = entry_params.slice(*%w{complaint_id resolution status})
-      ip_or_uri = entry_params['ip_or_uri']
-      category = entry_params['category']
-
-      #relation = relation.group(:id)
-      relation = relation.where(complaint_entry_fields) if complaint_entry_fields.present?
-
-      if category.present?
-        relation = relation.where('category like :category', category: "%#{category}%")
-      end
-
-      if ip_or_uri.present?
-        ip_or_uri_clause = "ip_address = :ip_or_uri OR uri like :ip_or_uri_pattern OR domain like :ip_or_uri_pattern"
-        relation = relation.where(ip_or_uri_clause, ip_or_uri: ip_or_uri, ip_or_uri_pattern: "%#{ip_or_uri}%")
-      end
+    ip_or_uri = present_params['ip_or_uri']
+    if ip_or_uri.present?
+      ip_or_uri_clause = "ip_address = :ip_or_uri OR uri like :ip_or_uri_pattern OR domain like :ip_or_uri_pattern"
+      relation = relation.where(ip_or_uri_clause, ip_or_uri: ip_or_uri, ip_or_uri_pattern: "%#{ip_or_uri}%")
     end
 
-    complaint_fields = params.to_h.slice(*%w{description channel})
-
-    complaint_fields = complaint_fields.select{|ignore_key, value| value.present?}
-    relation = relation.includes(:complaint).where(complaints: complaint_fields) if complaint_fields.present?
+    complaint_fields = present_params.to_h.slice(*%w{description channel})
+    if complaint_fields.present?
+      relation = relation.includes(:complaint).where(complaints: complaint_fields)
+    end
 
     # Save this search as a named search
-    if params.present? && search_name.present?
+    if present_params.present? && search_name.present?
       Dispute.save_named_search(search_name, params, user: user, project_type: 'Complaint')
     end
     relation
