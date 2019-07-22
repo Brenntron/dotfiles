@@ -19,6 +19,28 @@ window.submit_wbrs_call = (arg, path, output) ->
       $(output).html('An error occurred attempting to execute task')
   , this)
 
+window.submit_wbnp_report_destroy = (id)->
+  headers = {'Token': $('input[name="token"]').val(), 'Xmlrpc-Token': $('input[name="xml_token"]').val()}
+
+
+  $.ajax(
+    url: '/escalations/api/v1/escalations/admin/tools/delete_wbnp_report'
+    method: 'POST'
+    headers: headers
+    data: {'id': id}
+
+    success: (response) ->
+#json = $.parseJSON(response)
+      if response.status == 'error'
+        $(output).html("ERROR:" + response.message)
+      else
+        #$(output).html(response.message)
+        window.location.reload()
+
+    error: (response) ->
+      $(output).html('An error occurred attempting to execute task')
+  , this)
+
 
 window.submit_task = ()->
   headers = {'Token': $('input[name="token"]').val(), 'Xmlrpc-Token': $('input[name="xml_token"]').val()}
@@ -45,6 +67,15 @@ window.submit_task = ()->
   , this)
 
 $ ->
+  $(".wbnp_delete_button").click ->
+    alert(this)
+    id = $(this).data("id")  #<button data-id="123">delete</button>
+    if window.confirm("are you sure")
+      alert('confirmed')
+      window.submit_wbnp_report_destroy(id)
+    else
+      alert('not confirmed')
+
   $("#execute-task-button").click ->
     window.submit_task();
 

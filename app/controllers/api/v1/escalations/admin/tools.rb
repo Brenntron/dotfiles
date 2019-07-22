@@ -64,6 +64,22 @@ module API
 
             end
 
+            params do
+              requires :id, type: Integer
+            end
+
+            post "delete_wbnp_report" do
+              wbnp_report = WbnpReport.where(:id => permitted_params[:id])
+
+              if wbnp_report.present?
+                wbnp_report.destroy
+                {:status => 'success', :message => 'report has been obliterated'}
+              else
+                {:status => 'error', :message => 'report not found'}
+              end
+            end
+
+
 
           end
         end
