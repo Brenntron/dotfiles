@@ -543,7 +543,9 @@ class ComplaintEntry < ApplicationRecord
   # @param [ActiveRecord::Relation] base_relation relation to chain this search onto.
   # @return [ActiveRecord::Relation]
   def self.advanced_search(params, search_name:, user:)
-    
+
+    present_params = params.select{|ignore_key, value| value.present?}
+
     relation = where({})
 
     if params['submitted_newer'].present?
@@ -592,23 +594,27 @@ class ComplaintEntry < ApplicationRecord
       relation = relation.joins(complaint: :complaint_tags).where(complaint_tags: {name: params['tags']})
     end
 
-
-    company_name = nil
-    customer_params = params.fetch('customer', {}).slice(*%w{name email company_name})
-    customer_params = customer_params.select{|ignore_key, value| value.present?}
+    customer_params = present_params.slice(*%w{customer_name customer_email company_name})
     unless customer_params.empty?
+      company_name = nil
       if customer_params['company_name'].present?
         company_name = customer_params.delete('company_name')
-        relation = relation.joins(complaint: [customer: :company])
+        relation = relation.joins(complaint: {customer: :company})
       else
         relation = relation.joins(complaint: :customer)
       end
 
-      customer_where = { customers: customer_params }
-      if company_name.present?
-        customer_where = { companies: {name: company_name} }
+      if customer_params['customer_name'].present?
+        relation = relation.where(customers: {name: customer_params['customer_name']})
       end
-      relation = relation.joins(complaint: [customer: :company]).where(customer_where)
+
+      if customer_params['customer_email'].present?
+        relation = relation.where(customers: {email: customer_params['customer_email']})
+      end
+
+      if company_name.present?
+        relation = relation.where(companies: {name: company_name})
+      end
     end
 
     entry_params = params.clone
