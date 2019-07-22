@@ -548,12 +548,14 @@ class ComplaintEntry < ApplicationRecord
 
     if params['submitted_newer'].present?
       relation =
-          relation.joins(:complaint).where('complaints.created_at >= :submitted_newer', submitted_newer: params['submitted_newer'])
+          relation.joins(:complaint).where('complaints.created_at >= :submitted_newer',
+                                           submitted_newer: params['submitted_newer'])
     end
 
     if params['submitted_older'].present?
       relation =
-          relation.joins(:complaint).where('complaints.created_at < :submitted_older', submitted_older: params['submitted_older']+1)
+          relation.joins(:complaint).where('complaints.created_at < DATE_ADD(:submitted_older, INTERVAL 1 DAY)',
+                                           submitted_older: params['submitted_older'])
     end
 
     if params['age_newer'].present?
@@ -577,16 +579,17 @@ class ComplaintEntry < ApplicationRecord
 
     if params['modified_newer'].present?
       relation =
-          relation.joins(:complaint).where('complaints.updated_at >= :modified_newer', modified_newer: params['modified_newer'])
+          relation.joins(:complaint).where('complaints.updated_at >= :modified_newer',
+                                           modified_newer: params['modified_newer'])
     end
 
     if params['modified_older'].present?
-      relation =
-          relation.joins(:complaint).where('complaints.updated_at < :modified_older', modified_older: params['modified_older']+1)
+      relation = relation.joins(:complaint).where('complaints.updated_at < DATE_ADD(:modified_older, INTERVAL 1 DAY)',
+                                                  modified_older: params['modified_older'])
     end
 
     if params['tags'].present?
-      relation = relation.joins(complaint: :complaint_tags).where('complaint_tags.name IN (?)', params['tags'])
+      relation = relation.joins(complaint: :complaint_tags).where(complaint_tags: {name: params['tags']})
     end
 
 
