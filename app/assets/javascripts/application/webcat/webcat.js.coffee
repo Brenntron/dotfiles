@@ -17,7 +17,7 @@ $ ->
       else
         localStorage.webcat_search_type = 'contains'
         localStorage.webcat_search_name = ''
-        localStorage.webcat_search_conditions = JSON.stringify({value:search_string})
+        localStorage.webcat_search_conditions = JSON.stringify({value:webcat_search_string})
       refresh_url()
 
   window.set_webcat_advanced = () ->
@@ -36,13 +36,14 @@ $ ->
     localStorage.webcat_search_name = form.search_name
     localStorage.webcat_search_conditions = JSON.stringify(
       status: form.status
-      ip_address: form.complaint_id
+      complaint_id: form.complaint_id
       resolution: form.resolution
       channel: form.channel
       category: form.category
       customer_name: form.customer_name
       customer_email: form.customer_email
-      company: form.company
+      company_name: form.company
+      domain: form.domain
       tags: form.tags
       submitted_older: form.date_submitted_older
       submitted_newer: form.date_submitted_newer
@@ -92,6 +93,7 @@ $ ->
           search_type: webcat_search_type
           search_name: webcat_search_name
         }
+    console.log data
     build_header(data)
     return data
 
@@ -100,7 +102,7 @@ $ ->
     url_check = current_url.split('/escalations/file_rep/disputes/')[0]
     new_url = '/escalations/file_rep/disputes'
     if href != undefined
-      window.location.replace(new_url + href)
+      window.location.replace( new_url + href )
     if !href && typeof parseInt(url_check) == 'number'
       window.location.replace('/escalations/webcat/complaints')
 
@@ -175,7 +177,6 @@ $ ->
           container.attr('data-tooltip-content', '.tooltip_content')
 
       else if search_type == 'named'
-
         new_header =
           '<div>Results for "' + search_name + '" Saved Search' +
             reset_icon +
