@@ -6,7 +6,7 @@ class ComplaintEntryScreenshot < ApplicationRecord
       options = Selenium::WebDriver::Firefox::Options.new(args: ['-headless'])
       driver = Selenium::WebDriver.for(:firefox, options: options)
 
-      raise Exception if driver.nil?
+      raise Exception.new('Cant start Selenium driver') if driver.nil?
 
       #go to the url provided (it needs http or https on it.)
       host_lookup = self.complaint_entry.hostlookup
@@ -28,7 +28,7 @@ class ComplaintEntryScreenshot < ApplicationRecord
       end
       self.update(screenshot: file_data, error_message: ex.message)
     ensure # this is a good practice to get into so that the driver will always exit, even if there is an error
-      driver.quit
+      driver.quit unless driver.nil?
     end
   end
 
