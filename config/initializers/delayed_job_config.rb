@@ -1,4 +1,4 @@
 Delayed::Worker.sleep_delay = 60
-Delayed::Worker.max_attempts = 3
-Delayed::Worker.max_run_time = 5.minutes
-Delayed::Worker.read_ahead = 10
+Delayed::Worker.max_attempts = 25
+Delayed::Worker.max_run_time = 4.hours
+Delayed::Worker.read_ahead = 5
