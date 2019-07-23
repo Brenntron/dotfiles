@@ -212,6 +212,12 @@ $ ->
   $(document).on 'click', '.sorting[aria-controls="file-rep-datatable"]', () ->
     sorting_request = true
 
+  $('.fr-ticket-status-radio').click ->
+    if $(this).attr('id') == 'file-status-closed'
+      $('#show-ticket-resolution-submenu').show()
+    else
+      $('#show-ticket-resolution-submenu').hide()
+
   window.triggerTooltips = (item) ->
     $('.tooltip_content').show()
     $('.nested-tooltipped').tooltipster
