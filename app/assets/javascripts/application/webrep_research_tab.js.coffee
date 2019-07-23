@@ -217,6 +217,7 @@ $ ->
 
     message_list = []
     existing_reptool = $('.col-reptool-class:not(.missing-data)')
+    
     existing_reptool.each () ->
       rep_list = this.innerText.split(',')
       if reptool_add == 'remove'
@@ -232,16 +233,14 @@ $ ->
       when 'replace'
         status_string = 'Add classifications: '
 
-
-
-    col_dialog = "<p class='reptool-action-col' data=' " + reptool_list + " '>" + status_string + check_list + "<p>"
+    col_dialog = "<p class='" + reptool_add + " reptool-action-col' data=' " + reptool_list + " '>" + status_string + check_list + "<p>"
 
     selected_rows.each () ->
         row = $(this).closest('tr')
         data = row.find('.col-bulk-dispute').text()
         action_col = row.find('.col-actions')
         clear_col = row.find('.col-clear-actions')
-        existing_p = action_col.find('.reptool-action-col')
+        existing_p = action_col.find( reptool_add + ' .reptool-action-col')
         delete_button = '<button class="clear-action-button row-action-clear"></button>'
 
         if !isEmpty(data)
