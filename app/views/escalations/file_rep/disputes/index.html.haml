@@ -33,3 +33,9 @@
             %th.file-rep-sorting#customer-email Customer Email
             %th.file-rep-sorting#assignee Assignee
         %tbody
+
+- if !params[:f]
+  :javascript
+    $(document).ready(function(){
+      window.location.replace('/escalations/file_rep/disputes?f=open');
+    })

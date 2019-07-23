@@ -407,7 +407,7 @@ window.updateEntryColumns = (entry_id,row_id) ->
       headers: headers
       data: {'id': entry_id, 'prefix': prefix, 'categories':categories, 'category_names':category_names, 'status':resolution_status, 'comment':comment, 'resolution_comment': resolution_comment }
       success: (response) ->
-        {error, uri, domain, subdomain, path, status, display_name} = $.parseJSON(response)
+        {categories, error, uri, domain, subdomain, path, status, display_name} = $.parseJSON(response)
 
         if !error
           table = $('#complaints-index').DataTable()
@@ -426,6 +426,17 @@ window.updateEntryColumns = (entry_id,row_id) ->
           temp_row.child().remove()
           temp_row.child(format(temp_row)).show()
 
+          $('#input_cat_'+ temp_row.data().entry_id).selectize {
+            persist: false,
+            create: false,
+            maxItems: 5
+            valueField: 'category_id',
+            labelField: 'category_name',
+            searchField: ['category_name', 'category_code'],
+            options: AC.WebCat.createSelectOptions()
+            items: selected_options(categories)
+          }
+  
           $('#input_cat_pending'+ temp_row.data().entry_id).selectize {
             persist: false,
             create: false,
@@ -434,7 +445,7 @@ window.updateEntryColumns = (entry_id,row_id) ->
             labelField: 'category_name',
             searchField: ['category_name', 'category_code'],
             options: AC.WebCat.createSelectOptions()
-            items: selected_options(temp_row.data().category_names)
+            items: selected_options(categories)
           }
           unless status == 'COMPLETED'
             $('#input_cat_'+ temp_row.data().entry_id).selectize {
@@ -612,7 +623,7 @@ $('html').on 'click', (e) ->
     $('[data-original-title]').popover 'hide'
 
 
-$(document).on 'click', ".popover .retake-screenshot", ->
+$(document).on 'click', ".popover .screenshot-retake-button", ->
   $('[data-original-title]').popover 'hide'
   se_id = this.id.slice(6)
   std_msg_ajax(
@@ -624,21 +635,26 @@ $(document).on 'click', ".popover .retake-screenshot", ->
       std_msg_success('Screenshot job initiated. Check back in about 10 seconds.', [], reload: true)
   )
 
-$(document).on 'click', ".popover .reload-screenshot", ->
+$(document).on 'click', ".popover .screenshot-reload-button", ->
   location.reload(true)
 
+$(document).on 'click', ".screenshot-close-button", ->
+  $('.webcat-screenshot').hide()
 
 window.enlarge_image = (id,image,retake_in_progress)->
   image_content = ""
   if retake_in_progress
-    image_content = '<img src="' + image + '"><p><a class="btn-sm reload-screenshot">Reload Page</a></p>'
+    image_content = '<img src="' + image + '"><span class="screenshot-button screenshot-reload-button esc-tooltipped" title="Reload Page">Reload Page</span>'
   else
-    image_content = '<img src="' + image + '"><p><a class="btn-sm retake-screenshot" id="se_id_' + id + '">Retake Screenshot</a></p>'
+    image_content = '<img src="' + image + '"><span class="screenshot-button screenshot-retake-button esc-tooltipped" id="se_id_' + id + '" title="Retake Screenshot"></span><span class="screenshot-button screenshot-close-button"></span>'
+
   $('#screenshot_id_'+ id).popover(
     html: true
     container: 'body'
     trigger: 'focus'
+    template: '<div class="popover webcat-screenshot"><div class="arrow"></div><div class="popover-inner"><h3 class="popover-title"></h3><div class="popover-content"><p></p></div></div></div>'
     content: image_content).popover 'show'
+
 window.lookup_prefix = () ->
 
   $('#loader-modal').modal({
@@ -792,7 +808,6 @@ window.drop_current_categories = () ->
 )
 
 format = (complaint_entry_row) ->
-
   $('#loader-modal').modal({
     keyboard: false,
   })
@@ -1338,9 +1353,8 @@ window.click_table_buttons = (complaint_table, button)->
     unless $(td).hasClass 'nested-complaint-data-wrapper'
       $(td).addClass 'nested-complaint-data-wrapper'
 
-    cat_select = '#input_cat_'+ row.data().entry_id
-    unless $(cat_select).hasClass('completed')
-      $(cat_select).selectize {
+    if ['NEW','ASSIGNED','PENDING'].includes(row.data().status)
+      $('#input_cat_'+ row.data().entry_id).selectize {
         persist: false,
         create: false,
         maxItems: 5,
@@ -1348,7 +1362,7 @@ window.click_table_buttons = (complaint_table, button)->
         labelField: 'category_name',
         searchField: ['category_name', 'category_code'],
         options: AC.WebCat.createSelectOptions(),
-        items: selected_options(row.data().category),
+        items: AC.WebCat.getCategoryIds(selected_options(row.data().category)),
         onItemAdd: ->
           if verifyMasterSubmit() == true
             $('#master-submit').prop('disabled', false)

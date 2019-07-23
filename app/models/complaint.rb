@@ -1,6 +1,6 @@
 class Complaint < ApplicationRecord
   belongs_to :customer, optional: true
-  has_many :complaint_entries
+  has_many :complaint_entries, dependent: :restrict_with_exception
   has_and_belongs_to_many :complaint_tags, dependent: :destroy
 
   has_paper_trail on: [:update], ignore: [:updated_at]
