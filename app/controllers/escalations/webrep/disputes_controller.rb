@@ -177,6 +177,7 @@ class Escalations::Webrep::DisputesController < ApplicationController
         @spreadsheet_directory = Dir.mktmpdir
 
         if params['mytickets'] == "true"
+          file_name = "my-tickets_#{Time.now}.xlsx"
           mytickets_file = File.new("#{@spreadsheet_directory}/my-tickets_#{Time.now}.xlsx", 'w+')
           mytickets_xlsx = RubyXL::Workbook.new
           mytickets_workbook_names = {
@@ -292,10 +293,11 @@ class Escalations::Webrep::DisputesController < ApplicationController
 
           mytickets_xlsx.write(mytickets_file)
           mytickets_file.rewind
-          @mytickets_output_file = mytickets_file.read
+          @output_file = mytickets_file
         end
 
         if params['myteamtickets'] == "true"
+          file_name = "my-team-tickets_#{Time.now}.xlsx"
           myteamtickets_file = File.new("#{@spreadsheet_directory}/my-team-tickets_#{Time.now}.xlsx", 'w+')
           myteamtickets_xlsx = RubyXL::Workbook.new
           myteamtickets_workbook_names = {
@@ -463,7 +465,7 @@ class Escalations::Webrep::DisputesController < ApplicationController
 
           myteamtickets_xlsx.write(myteamtickets_file)
           myteamtickets_file.rewind
-          @myteamtickets_output_file = myteamtickets_file.read
+          @output_file = myteamtickets_file
         end
 
         input_filenames = Dir.entries(@spreadsheet_directory).select {|f| !File.directory? f}
@@ -495,7 +497,13 @@ class Escalations::Webrep::DisputesController < ApplicationController
           end
 
         else
-          send_file File.join(@spreadsheet_directory, input_filenames[0]), :disposition => 'attachment'
+          # Delete the file after sending
+          puts(@output_file.path)
+          File.open(@output_file.path, 'r') do |f|
+            send_data f.read, :filename => file_name
+          end
+
+          File.delete(mytickets_file.path)
         end
 
         if params['alltickets'] == "true"
