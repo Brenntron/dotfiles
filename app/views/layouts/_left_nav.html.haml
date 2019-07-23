@@ -40,7 +40,7 @@
               %a.disabled-link= inline_svg 'icon_clam.svg'
           - if can?(:index, FileReputationDispute)
             %li{class: 'amp-link'}
-              %a{href: escalations_file_rep_disputes_path}
+              %a{href: escalations_file_rep_disputes_path + "?f=open"}
                 = inline_svg 'icon_amp.svg'
           - if can?(:index, Dispute)
             %li{class: 'rep-link'}
@@ -120,7 +120,7 @@
                 %a.disabled-link Clam
             - if can?(:index, FileReputationDispute)
               %li{class: 'amp-link'}
-                %a{href: escalations_file_rep_disputes_path} File Reputation
+                %a{href: escalations_file_rep_disputes_path + "?f=open"} File Reputation
             - if can?(:index, Dispute)
               %li{class: 'rep-link'}
                 %a{href: escalations_webrep_disputes_path} Web Reputation
