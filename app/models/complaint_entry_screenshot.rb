@@ -6,6 +6,8 @@ class ComplaintEntryScreenshot < ApplicationRecord
       options = Selenium::WebDriver::Firefox::Options.new(args: ['-headless'])
       driver = Selenium::WebDriver.for(:firefox, options: options)
 
+      raise Exception if driver.nil?
+
       #go to the url provided (it needs http or https on it.)
       host_lookup = self.complaint_entry.hostlookup
       url = host_lookup.match(/^(http|https):\/\//) ? host_lookup : "http://#{host_lookup}"
