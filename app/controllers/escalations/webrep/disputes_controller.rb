@@ -177,8 +177,8 @@ class Escalations::Webrep::DisputesController < ApplicationController
         @spreadsheet_directory = Dir.mktmpdir
 
         if params['mytickets'] == "true"
-          file_name = "my-tickets_#{Time.now}.xlsx"
-          mytickets_file = File.new("#{@spreadsheet_directory}/my-tickets_#{Time.now}.xlsx", 'w+')
+          file_name = "my-tickets_#{Time.now.utc.iso8601}.xlsx"
+          mytickets_file = File.new("#{@spreadsheet_directory}/my-tickets_#{Time.now.utc.iso8601}.xlsx", 'w+')
           mytickets_xlsx = RubyXL::Workbook.new
           mytickets_workbook_names = {
               :my_open_tickets => 'My Open Tickets',
@@ -297,8 +297,8 @@ class Escalations::Webrep::DisputesController < ApplicationController
         end
 
         if params['myteamtickets'] == "true"
-          file_name = "my-team-tickets_#{Time.now}.xlsx"
-          myteamtickets_file = File.new("#{@spreadsheet_directory}/my-team-tickets_#{Time.now}.xlsx", 'w+')
+          file_name = "my-team-tickets_#{Time.now.utc.iso8601}.xlsx"
+          myteamtickets_file = File.new("#{@spreadsheet_directory}/my-team-tickets_#{Time.now.utc.iso8601}.xlsx", 'w+')
           myteamtickets_xlsx = RubyXL::Workbook.new
           myteamtickets_workbook_names = {
               :open_team_tickets => 'Open Tickets',
