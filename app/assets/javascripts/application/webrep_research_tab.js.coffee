@@ -195,54 +195,82 @@ $ ->
         if !$(clear_col).has(".clear-action-button").length
           $(clear_col).append(delete_button)
 
-  window.set_action_col = () ->
-    dropdown = $('#reptool_entries_bl_dropdown')
-    selected_rows = $('.col-select-all input:checked')
-    checked_bl = $(dropdown).find('.adjust_reptool_checkbox:checked')
+  window.col_tag_format = (array) ->
+    console.log array
     check_list_array = []
-    reptool_list = []
-    class_bl = $('.status_bl:checked').val().replace('reptool-', '')
-    reptool_add  = $('.reptool-add:checked').val()
-
-    for item in checked_bl
-      val = $(item).val()
+    check_list = ''
+    for val in array
       check_name = "<span class='col-tag'>" + val + "</span> "
       check_list_array.push(check_name)
-      reptool_list.push( val )
-    reptool_list = reptool_list.join(',')
     if check_list_array.length == 2
       check_list = check_list_array.join(' and ')
     else
       check_list = check_list_array.join(', ').replace(/, ([^,]*)$/, ', and $1')
+    return check_list
+
+  window.set_action_col = () ->
+    dropdown = $('#reptool_entries_bl_dropdown')
+    selected_rows = $('.col-select-all input:checked')
+    checked_bl = $(dropdown).find('.adjust_reptool_checkbox:checked')
+    check_vals = []
+    check_list_array = []
+    reptool_list = []
+    class_bl = $('.status_bl:checked').val().replace('reptool-', '')
+    reptool_add  = $('.reptool-add:checked').val()
+    reptool_class = reptool_add
+
+    for item in checked_bl
+      val = $(item).val()
+      check_vals.push(val)
+      reptool_list.push( val )
+    reptool_list = reptool_list.join(',')
+
 
     message_list = []
     existing_reptool = $('.col-reptool-class:not(.missing-data)')
-    
     existing_reptool.each () ->
+      actions = $(this).closest('tr').find('.col-actions')
+      existing_actions = []
+      if !$(actions).has('.drop').length
+        $(actions).find('.col-tag').each ->
+          existing_actions.push( this.innerText )
       rep_list = this.innerText.split(',')
-      if reptool_add == 'remove'
-        rep_list = rep_list.filter( (rep)-> return !check_list_array.includes(rep))
+      existing_actions = existing_actions.concat()
+      rep_list = existing_actions.concat(this.innerText.split(','))
+      rep_list = Array.from( new Set(rep_list))
 
+#      rep_list = rep_list.filter( (rep)->
+#        console.log rep, check_vals
+#        return !check_vals.includes(rep) && !isEmpty(rep))
+      console.log rep_list
+      check_list = col_tag_format(rep_list)
+      console.log check_list
     switch (class_bl)
       when 'maintain'
         reptool_add = reptool_add.charAt(0).toUpperCase() + reptool_add.slice(1)
         status_string = reptool_add + ' classifications: '
       when 'drop'
         status_string = 'Drop all classifications (set entry to EXPIRED)'
+        reptool_add = 'drop'
+        reptool_class = 'drop'
         check_list = ''
-      when 'replace'
+      when 'override'
         status_string = 'Add classifications: '
 
-    col_dialog = "<p class='" + reptool_add + " reptool-action-col' data=' " + reptool_list + " '>" + status_string + check_list + "<p>"
+    col_dialog = "<p class='" + reptool_class + " reptool-action-col' data=' " + reptool_list + " '>" + status_string + "<p>"
 
     selected_rows.each () ->
         row = $(this).closest('tr')
         data = row.find('.col-bulk-dispute').text()
         action_col = row.find('.col-actions')
         clear_col = row.find('.col-clear-actions')
-        existing_p = action_col.find( reptool_add + ' .reptool-action-col')
+        existing_p = action_col.find('.' + reptool_class + '.reptool-action-col')
         delete_button = '<button class="clear-action-button row-action-clear"></button>'
 
+        if class_bl == 'drop'
+          $( action_col ).empty()
+        else
+          $( '.drop.reptool-action-col' ).remove()
         if !isEmpty(data)
           $( clear_col ).show()
           $( existing_p).remove()
