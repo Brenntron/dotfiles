@@ -502,7 +502,10 @@ class Escalations::Webrep::DisputesController < ApplicationController
             send_data f.read, :filename => file_name
           end
 
-          File.delete(output_file.path)
+          puts "Temp Dir: #{Dir.mktmpdir}"
+          puts "File path: #{output_file.path}"
+
+          # File.delete(output_file.path)
         end
 
         if params['alltickets'] == "true"
