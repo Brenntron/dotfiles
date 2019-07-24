@@ -293,7 +293,7 @@ class Escalations::Webrep::DisputesController < ApplicationController
 
           mytickets_xlsx.write(mytickets_file)
           mytickets_file.rewind
-          @output_file = mytickets_file
+          output_file = mytickets_file
         end
 
         if params['myteamtickets'] == "true"
@@ -465,7 +465,7 @@ class Escalations::Webrep::DisputesController < ApplicationController
 
           myteamtickets_xlsx.write(myteamtickets_file)
           myteamtickets_file.rewind
-          @output_file = myteamtickets_file
+          output_file = myteamtickets_file
         end
 
         input_filenames = Dir.entries(@spreadsheet_directory).select {|f| !File.directory? f}
@@ -497,13 +497,12 @@ class Escalations::Webrep::DisputesController < ApplicationController
           end
 
         else
-          # Delete the file after sending
-          puts(@output_file.path)
-          File.open(@output_file.path, 'r') do |f|
+          # Delete the generated spreadsheet after sending
+          File.open(output_file.path, 'r') do |f|
             send_data f.read, :filename => file_name
           end
 
-          File.delete(mytickets_file.path)
+          File.delete(output_file.path)
         end
 
         if params['alltickets'] == "true"
