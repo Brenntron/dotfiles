@@ -504,7 +504,7 @@ class Escalations::Webrep::DisputesController < ApplicationController
 
         elsif input_filenames.count == 1
           # Delete the generated spreadsheet after sending
-          File.open(output_file.path, 'r') do |f|
+          File.open(single_output_file.path, 'r') do |f|
             send_data f.read, :filename => file_name
           end
 
