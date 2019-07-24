@@ -41,7 +41,7 @@ class FileReputationDispute < ApplicationRecord
   RESOLUTION_AUTORESOLVED               = 'Auto Resolved'
   RESOLUTION_DUPLICATE              = 'DUPLICATE'
   RESOLUTION_AUTORESOLVED_COMMENT       = <<~HEREDOC
-    This ticket has been auto-resolved, suggested disposition and disposition already match.
+    This ticket has been auto-resolved, the suggested disposition and the cloud disposition of the file already match.  If your device or endpoint client is not reflecting this disposition, please open a TAC case for the Advanced Threat Team at http://support.cisco.com
   HEREDOC
   RESOLUTION_DUPLICATE_COMMENT          = <<~HEREDOC
     This ticket has been auto-resolved. A ticket with the same SHA256 hash already exists and is still open.
@@ -586,18 +586,14 @@ class FileReputationDispute < ApplicationRecord
         new_dispute.status = STATUS_NEW
         new_dispute.file_name = message_payload[:payload][:file_name]
         new_dispute.customer_id = customer.id
-        new_dispute.file_size = message_payload[:payload][:file_size]
-        new_dispute.sample_type = message_payload[:payload][:sample_type]
         new_dispute.disposition_suggested = message_payload[:payload][:disposition_suggested]
         new_dispute.source = message_payload[:payload][:source]
         new_dispute.platform = message_payload[:payload][:platform]
         new_dispute.sandbox_key = message_payload[:payload][:sandbox_key]
         new_dispute.ticket_source_key = message_payload[:source_key]
         new_dispute.description = message_payload[:payload][:summary_description]
-
         new_dispute.customer_id = customer&.id
         new_dispute.submitter_type = (new_dispute.customer.nil? || new_dispute.customer&.company_id == guest.id) ? SUBMITTER_TYPE_NONCUSTOMER : SUBMITTER_TYPE_CUSTOMER
-
 
         check_for_duplicate = FileReputationDispute.where(sha256_hash: message_payload[:payload][:sha256]).where.not(status: FileReputationDispute::STATUS_RESOLVED)
         if check_for_duplicate.any?
@@ -613,10 +609,12 @@ class FileReputationDispute < ApplicationRecord
       if FileReputationDispute.threaded?
         Thread.new do
           new_dispute.update_scores
+          new_dispute.populate_fields_from_rl
           new_dispute.auto_resolve_on_matching_disposition(from: 'TI')
         end
       else
         new_dispute.update_scores
+        new_dispute.populate_fields_from_rl
         new_dispute.auto_resolve_on_matching_disposition(from: 'TI')
       end
     end

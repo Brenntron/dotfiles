@@ -3,7 +3,7 @@
 
 - content_for(:nav_banner) do
   .nav-tool-blocks.nav-page-button-wrapper.col-xs-3.col-sm-2.col-lg-1
-    %a#queue.nav-page-button{href: '/escalations/file_rep/disputes', class: ("active" if current_page?('/escalations/file_rep/disputes'))}
+    %a#queue.nav-page-button{href: '/escalations/file_rep/disputes?f=open', class: ("active" if current_page?('/escalations/file_rep/disputes'))}
       %span.nav-toolbar-icon-large.icon-queue
 
     -# dbinebri: leave this commented out until research feature is ready
