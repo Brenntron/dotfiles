@@ -9,6 +9,7 @@
 %p try clearing the last report object generated (highest id).
 %br
 %br
+#wbnp_report_index_error
 #task-msg
 .content-wrapper
   .row
@@ -31,7 +32,7 @@
           %tbody
             %tr
               %td
-                %button{"data-id"=> "#{report.id}"} Delete this report
+                %button.wbnp_delete_button{"data-id"=> "#{report.id}"} Delete this report
               %td= report.id
               %td= report.total_new_cases
               %td= report.cases_imported

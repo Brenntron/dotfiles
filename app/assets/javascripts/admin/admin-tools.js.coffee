@@ -32,13 +32,13 @@ window.submit_wbnp_report_destroy = (id)->
     success: (response) ->
 #json = $.parseJSON(response)
       if response.status == 'error'
-        $(output).html("ERROR:" + response.message)
+        $('#wbnp_report_index_error').html("ERROR:" + response.message)
       else
         #$(output).html(response.message)
         window.location.reload()
 
     error: (response) ->
-      $(output).html('An error occurred attempting to execute task')
+      $("#wbnp_report_index_error").html('An error occurred attempting to execute task')
   , this)
 
 
@@ -68,13 +68,10 @@ window.submit_task = ()->
 
 $ ->
   $(".wbnp_delete_button").click ->
-    alert(this)
+
     id = $(this).data("id")  #<button data-id="123">delete</button>
     if window.confirm("are you sure")
-      alert('confirmed')
       window.submit_wbnp_report_destroy(id)
-    else
-      alert('not confirmed')
 
   $("#execute-task-button").click ->
     window.submit_task();

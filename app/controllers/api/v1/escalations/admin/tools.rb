@@ -69,7 +69,7 @@ module API
             end
 
             post "delete_wbnp_report" do
-              wbnp_report = WbnpReport.where(:id => permitted_params[:id])
+              wbnp_report = WbnpReport.where(:id => permitted_params[:id]).first
 
               if wbnp_report.present?
                 wbnp_report.destroy

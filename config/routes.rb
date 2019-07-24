@@ -26,6 +26,7 @@ Rails.application.routes.draw do
       root 'tools#index'
       get 'tasks', to: 'tools#tasks'
       get 'rule_api', to: 'tools#rule_api'
+      get 'wbnp_reports', to: 'tools#wbnp_reports'
     end
 
     namespace :webcat do
