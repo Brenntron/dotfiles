@@ -295,7 +295,7 @@ class Escalations::Webrep::DisputesController < ApplicationController
 
           mytickets_xlsx.write(mytickets_file)
           mytickets_file.rewind
-          output_file = mytickets_file
+          single_output_file = mytickets_file
         end
 
         if params['myteamtickets'] == "true"
@@ -467,7 +467,7 @@ class Escalations::Webrep::DisputesController < ApplicationController
 
           myteamtickets_xlsx.write(myteamtickets_file)
           myteamtickets_file.rewind
-          output_file = myteamtickets_file
+          single_output_file = myteamtickets_file
         end
 
         input_filenames = Dir.entries(@spreadsheet_directory).select {|f| !File.directory? f}
@@ -496,18 +496,19 @@ class Escalations::Webrep::DisputesController < ApplicationController
             #Close and delete the temp file
             temp_file.close
             temp_file.unlink
+
+            #Delete the spreadsheets
+            File.delete(myteamtickets_file.path)
+            File.delete(mytickets_file.path)
           end
 
-        else
+        elsif input_filenames.count == 1
           # Delete the generated spreadsheet after sending
           File.open(output_file.path, 'r') do |f|
             send_data f.read, :filename => file_name
           end
 
-          puts "Temp Dir: #{Dir.mktmpdir}"
-          puts "File path: #{output_file.path}"
-
-          # File.delete(output_file.path)
+          File.delete(single_output_file.path)
         end
 
         if params['alltickets'] == "true"
