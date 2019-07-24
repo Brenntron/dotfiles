@@ -120,6 +120,8 @@ class Escalations::Webrep::DisputesController < ApplicationController
   def update
   end
 
+  # TODO We should not have a 400 line method in a controller.
+  # TODO avoid defining methods in the body of other methods.
   def dashboard
     respond_to do |format|
       format.html
