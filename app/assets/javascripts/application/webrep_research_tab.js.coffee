@@ -261,7 +261,8 @@ $ ->
       row = $(this).closest('tr')
       data = row.find('.col-bulk-dispute').text()
       action_col = row.find('.col-actions')
-
+      reptool_classes = row.find('.col-reptool-class:not(.missing-data)').text().split()
+      console.log reptool_classes
       if !isEmpty(data)
         if reptool_add  == 'drop'
           $( action_col ).empty()
@@ -269,17 +270,20 @@ $ ->
           $( '.drop.reptool-action-col' ).remove()
           actions = row.find('.col-actions')
           existing_actions = []
+
           if reptool_add.toLowerCase() == 'add'
               check_class = '.remove'
           else
-              check_class = '.add'
-          console.log reptool_add
+            check_class = '.add'
+            existing_actions = existing_actions.concat(reptool_classes)
+
           $(actions).find(check_class + ' .col-tag').each () ->
             existing_actions.push( this.innerText )
-          console.log existing_actions
-          check_list = check_list.filter((rep)-> return !existing_actions.includes(rep))
 
-
+          if reptool_add.toLowerCase() == 'remove'
+            check_list = check_list.filter((rep)-> return reptool_classes.includes(rep))
+          else
+            check_list = check_list.filter((rep)-> return !existing_actions.includes(rep) && !reptool_classes.includes(rep))
         clear_col = $( row.find('.col-clear-actions') )
         existing_p = action_col.find('.' + reptool_class + '.reptool-action-col')
         delete_button = '<button class="clear-action-button row-action-clear"></button>'
