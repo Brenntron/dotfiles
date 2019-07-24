@@ -81,7 +81,6 @@ gem 'clipboard-rails', '1.7.1'
 gem 'capybara', '2.11.0'
 gem 'poltergeist', '1.18.1'
 gem 'selenium-webdriver'
-
 gem 'inline_svg', '1.3.1'
 
 
@@ -92,6 +91,9 @@ gem 'public_suffix', '~> 3.0'
 gem 'addressable', '~> 2.5.2'
 
 gem 'dotiw'
+
+gem 'elasticsearch'
+gem 'hashie'
 
 group :development do
   gem 'thin', '1.7.2'

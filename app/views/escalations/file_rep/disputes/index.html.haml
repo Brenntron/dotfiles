@@ -1,0 +1,41 @@
+.content-wrapper
+  %h1#filerep-index-title All File Reputation Tickets
+  #filerep_searchref_container{onmouseover: "triggerTooltips(this)"}
+  = render('index_toolbar')
+
+  .row
+    .col-xs-12
+      %table.table.responsive#file-rep-datatable{'data-source': escalations_file_rep_disputes_path(format: :json)}
+        %thead
+          %tr
+            %th
+            -#  Checkbox column
+            %th.file-rep-sorting#case-id Case ID
+            %th.file-rep-sorting#status Status
+            %th.file-rep-sorting#resolution Resolution
+            %th.file-rep-sorting#file-name File Name
+            %th.file-rep-sorting#sha256 SHA256
+            %th.file-rep-sorting#file-size File Size
+            %th.file-rep-sorting#sample-type Sample Type
+            %th.file-rep-sorting#amp-disp AMP Disp
+            %th.file-rep-sorting#amp-name AMP Detection Name
+            %th.file-rep-sorting#amp-last-set AMP Detection Last Set
+            %th.file-rep-sorting#in-zoo In Zoo
+            %th.file-rep-sorting#sandbox-score.th-center Sandbox Score
+            %th.file-rep-sorting#threatgrid-score.th-center TG Score
+            %th.file-rep-sorting#reversing-labs.th-center Reversing Labs
+            %th.file-rep-sorting#suggested-disp Suggested Disp
+            %th.file-rep-sorting#dispute-details Dispute Details
+            %th.file-rep-sorting#time-submitted Time Submitted
+            %th.file-rep-sorting#submitter-type Submitter Type
+            %th.file-rep-sorting#customer-name Customer Name
+            %th.file-rep-sorting#customer-org Customer Organization
+            %th.file-rep-sorting#customer-email Customer Email
+            %th.file-rep-sorting#assignee Assignee
+        %tbody
+
+- if !params[:f]
+  :javascript
+    $(document).ready(function(){
+      window.location.replace('/escalations/file_rep/disputes?f=open');
+    })

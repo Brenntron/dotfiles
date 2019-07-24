@@ -43,17 +43,17 @@
       .toolbar.cluster-table-toolbar
         %div
           %label.toolbar-section-label View
-          %button.toolbar-button.icon-opened-selected.esc-tooltipped{title: 'Open Viewable', onclick: 'open_selected_clusters()'}
+          %button.toolbar-button.icon-opened-selected.esc-tooltipped.toolbar-button-spacer{title: 'Open Viewable', onclick: 'open_selected_clusters()'}
             %span.toolbar-button-text Open Selected
           %button.toolbar-button.icon-open-all.esc-tooltipped{title: 'Open All', onclick: 'open_all_clusters()'}
             %span.toolbar-button-text Open All
         %div
           %label.toolbar-section-label View Nested Data
-          %button.toolbar-button.collapse-button.esc-tooltipped{onclick: 'collapse_selected_clusters("clusters-index")', type: 'button', title: 'Collapse Selected'}
+          %button.toolbar-button.collapse-button.esc-tooltipped.toolbar-button-spacer{onclick: 'collapse_selected_clusters("clusters-index")', type: 'button', title: 'Collapse Selected'}
             %span.toolbar-button-text Collapse Selected
-          %button.toolbar-button.collapse-all.esc-tooltipped{onclick: 'collapse_all_clusters("clusters-index")', type: 'button', title: 'Collapse All'}
+          %button.toolbar-button.collapse-all.esc-tooltipped.toolbar-button-spacer{onclick: 'collapse_all_clusters("clusters-index")', type: 'button', title: 'Collapse All'}
             %span.toolbar-button-text Collapse All
-          %button.toolbar-button.expand-row-button.esc-tooltipped{onclick: 'expand_selected_clusters("clusters-index")', type: 'button', title: 'Expand Selected'}
+          %button.toolbar-button.expand-row-button.esc-tooltipped.toolbar-button-spacer{onclick: 'expand_selected_clusters("clusters-index")', type: 'button', title: 'Expand Selected'}
             %span.toolbar-button-text Expand Selected
           %button.toolbar-button.expand-all.esc-tooltipped{onclick: 'expand_all_clusters("clusters-index")', type: 'button', title: 'Expand All'}
             %span.toolbar-button-text Expand All

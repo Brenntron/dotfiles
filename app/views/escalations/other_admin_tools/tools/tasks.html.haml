@@ -1,0 +1,21 @@
+%h1 Run Tasks Page
+
+%input#user_id{type: 'hidden', name: 'user_id', value: "#{current_user.id}"}
+%input{:name => "token", :type => "hidden", :value => "#{current_user.authentication_token}"}
+%input{:type => "hidden", :name => "xml_token", :value => "#{xml_token}"}
+
+%p Choose from list of available tasks, enter any arguments in json format (NOTE: must use double quotes when defining keys and values in JSON)
+%p Correct: {"test_key":"test value"}
+%p Incorrect: {'test_key':'test value'}
+%br
+%br
+#task-msg
+
+.control-banner
+  %label Available Tasks:
+  = select_tag "task", options_for_select(@available_tasks, ""), :class => 'task-name'
+  = text_field "admin_tools", "args", :class => 'task-args'
+  %button#execute-task-button Go!
+.control-banner
+  Link to morsel:
+  #morsel-output

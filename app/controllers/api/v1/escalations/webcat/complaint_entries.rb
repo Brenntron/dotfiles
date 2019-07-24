@@ -190,7 +190,7 @@ module API
                   return {error:e.message}.to_json
               end
               {display_name: current_user.display_name, status: entry.status, entry_resolution: permitted_params['status'],
-               uri: entry.uri, domain: entry.domain, subdomain: entry.subdomain, path: entry.path}.to_json
+               uri: entry.uri, domain: entry.domain, subdomain: entry.subdomain, path: entry.path, categories: params[:categories]}.to_json
             end
 
             desc 'Bulk update entry resolutions'
@@ -371,15 +371,25 @@ module API
             post 'categorize_urls_history' do
               std_api_v2 do
                 begin
-                  prefix_id = Wbrs::Prefix.where(:urls => [permitted_params['url']]).first.prefix_id
-                  response = Wbrs::HistoryRecord.where({:prefix_id => prefix_id}).sort_by {|history| DateTime.parse(history.time)}.reverse
-                  render response.to_json
+                  url = Complaint.parse_url(permitted_params['url'])
+
+                  prefix_history = []
+                  prefixes = Wbrs::Prefix.where(:urls => [url[:domain]])
+
+                  prefixes.each do |prefix|
+                    if prefix.subdomain == url[:subdomain] && prefix.path == url[:path]
+                      prefix_id = prefix.prefix_id
+
+                      prefix_history = Wbrs::HistoryRecord.where({:prefix_id => prefix_id}).sort_by {|history| DateTime.parse(history.time)}.reverse
+                    end
+                  end
+
+                  render prefix_history.to_json
                 rescue
                   raise 'The URL you provided does not have available data.'
                 end
               end
             end
-
 
             desc 'get the lookup info about a url(rule)'
             params do
@@ -594,8 +604,8 @@ module API
               data = response.last['data']
               columns = response.last['legend']
 
-              mtime_column_index = 0
-              ctime_column_index = 0
+              mtime_column_index = nil
+              ctime_column_index = nil
 
               columns.each_with_index do |col, index|
                 if col == 'ctime'
@@ -609,10 +619,10 @@ module API
               formatted_data = []
 
               data.each do |datum|
-                if ctime_column_index != 0
+                if ctime_column_index
                   datum[ctime_column_index] = Time.at(datum[ctime_column_index])
                 end
-                if mtime_column_index != 0
+                if mtime_column_index
                   datum[mtime_column_index] = Time.at(datum[mtime_column_index])
                 end
 

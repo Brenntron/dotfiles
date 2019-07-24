@@ -1,0 +1,132 @@
+- content_for(:title) do
+  Escalations - File Reputation - Analyst Console
+
+- content_for(:nav_banner) do
+  .nav-tool-blocks.nav-page-button-wrapper.col-xs-3.col-sm-2.col-lg-1
+    %a#queue.nav-page-button{href: '/escalations/file_rep/disputes?f=open', class: ("active" if current_page?('/escalations/file_rep/disputes'))}
+      %span.nav-toolbar-icon-large.icon-queue
+
+    -# dbinebri: leave this commented out until research feature is ready
+    -#%a#research.nav-page-button{href: '/escalations/file_rep/research', class: ("active" if current_page?('/escalations/file_rep/research'))}
+      %span.nav-toolbar-icon-large.icon-research
+
+
+  .nav-tool-blocks.col-xs-2.col-sm-2.col-md-2.col-lg-1.dropdown.nav-new-ticket
+    %a{href: '#', class: 'dropdown-toggle', id: 'new-dispute', 'data-toggle': 'dropdown', 'aria-haspopup': 'true', 'aria-expanded': 'false'}
+      %span{class: 'nav-toolbar-icon icon-new-white'}
+      New Ticket
+    .dropdown-menu.nav-tools-dropdown{'aria-labelledby': 'new-dispute'}
+      %h3.nav-tool-dropdown-header.inverse
+        New File Reputation Ticket
+      .nav-tool-content-wrapper#new-dispute-wrapper
+        = render 'escalations/file_rep/disputes/new'
+
+
+  .nav-tool-blocks.col-xs-2.col-sm-2.col-md-2.col-lg-1.dropdown.nav-naming-guide
+    %a{href: '#', id: 'naming-guide', 'aria-haspopup': 'true', 'aria-expanded': 'false'}
+      %span{class: 'nav-toolbar-icon icon-naming-white'}
+      Naming Guide
+
+      = render 'escalations/file_rep/disputes/naming_guide_dialog'
+
+
+  -# dbinebri: moving Filter closer to search field
+  .nav-tool-blocks.col-xs-1.col-sm-1.col-lg-1.dropdown
+    %a{href: '#', class: 'dropdown-toggle', id: 'filter-cases', 'data-toggle': 'dropdown', 'aria-haspopup': 'true', 'aria-expanded': 'false'}
+      %span{class: 'nav-toolbar-icon icon-filter-white'}
+      Filter
+    .dropdown-menu.nav-tools-dropdown#filter-dropdown{'aria-labelledby': 'filter-cases'}
+      %ul#filter-cases-list
+        %li{class: ("selected" if params[:f] == "my_disputes")}
+          %a{class:"filter-cases", onclick: 'refresh_url("?f=my_disputes")'}
+            %span.nav-dropdown-icon.icon-my-bugs
+            My Tickets
+        %li{class: ("selected" if params[:f] == "my_open")}
+          %a{class:"filter-cases", onclick: 'refresh_url("?f=my_open")'}
+            %span.nav-dropdown-icon.icon-my-open-bugs
+            My Open Tickets
+        %li{class: ("selected" if params[:f] == "unassigned")}
+          %a{class:"filter-cases", onclick: 'refresh_url("?f=unassigned")'}
+            %span.nav-dropdown-icon.icon-unassigned-bugs
+            Unassigned Tickets
+        %li{class: ("selected" if params[:f] == "open")}
+          %a{class:"filter-cases", onclick: 'refresh_url("?f=open")'}
+            %span.nav-dropdown-icon.icon-open-bugs
+            Open Tickets
+        %li{class: ("selected" if params[:f] == "closed")}
+          %a{class:"filter-cases", onclick: 'refresh_url("?f=closed")'}
+            %span.nav-dropdown-icon.icon-fixed-bugs
+            Closed Tickets
+        %li{class: ("selected" if params[:f] == "all")}
+          %a{class:"filter-cases", onclick: 'refresh_url("?f=all")'}
+            %span.nav-dropdown-icon.icon-all-tickets
+            All Tickets
+
+      #saved-searches-wrapper.nav-tool-content-wrapper
+        %h3.nav-tool-dropdown-header
+          %span.nav-dropdown-content-icon.icon-saved-search
+          My Saved Searches
+        %table#saved-search.table
+          %tbody#saved-search-tbody.filerep-named-search-list
+            - if current_user.named_searches.any?
+              - current_user.named_searches.where('project_type = ? OR project_type IS ?', 'FileReputationDispute', nil).order(:id).each do |named_search|
+                %tr{id: "saved_search_#{named_search.id}"}
+                  %td
+                    %a.input-truncate.saved-search.esc-tooltipped{onclick: "build_named_search('#{named_search.name}');", title: named_search.name}
+                      = named_search.name
+                    %a.delete-search{title: 'Delete Saved Search', onclick: "delete_disputes_named_search(this, '#{named_search.name}');"}
+                      = image_tag('icon_cancel_grey.svg')
+
+
+
+  .nav-tool-blocks.col-xs-3.col-sm-3.col-md-3.col-lg-5.search-wrapper
+    .input-group.search-group#file-rep-search
+      = form_tag('/tickets', method: :get, onsubmit: 'build_contains_search();return false;') do
+        = text_field_tag 'case[id]', "#{}", class: 'search-box'
+
+      %button#advanced-search-button.btn.btn-default.nav-tool-button.dropdown-toggle{'data-toggle': 'dropdown', 'aria-haspopup': 'true', 'aria-expanded': 'false'}
+        Advanced
+      .dropdown-menu.nav-tools-dropdown#advanced-search-dropdown{'aria-labelledby': 'advanced-search-button'}
+        %h3.nav-tool-dropdown-header.inverse
+          Advanced Search
+        #advanced-search-wrapper.nav-tool-content-wrapper
+          = render 'escalations/file_rep/disputes/advanced_search'
+
+
+
+
+
+  - if current_user
+    #login-div.nav-tool-block.col-sm-2.col-md-2.col-lg-2.nav-username
+      = bugzilla_rest_login_icon(bugzilla_rest_session)
+      %span.dropdown
+        %span#user-settings-dropdown-button.dropdown-toggle.esc-tooltipped{'title': 'Login to Bugzilla', 'data-toggle': 'dropdown', 'aria-expanded': 'false', 'aria-haspopup': 'true', type: 'button'}
+        #user-settings-dropdown.dropdown-menu{'aria-labelledby': 'user-settings-dropdown-button'}
+          -#    If user is logged into Bugzilla
+          -#.message-text Log out of Bugzilla
+          -# Logout button
+
+          -#-#    Else
+          .message-text Log into Bugzilla
+          %form#top_banner_bugzilla_login_form
+            .form-group.text-left
+              %label.content-label-sm Username
+              %input.form-control{name: 'username', autofocus: 'true'}
+            .form-group.text-left
+              %lable.content-label-sm Password
+              %input.form-control{type: 'password', name: 'password'}
+            .form-group.text-center
+              %button#top_banner_bugzilla_login_button.panel-button.primary{'aria-label': 'Login', onclick: 'top_banner_bugzilla_login(); return false;'} Login
+
+          %a{href: "/users/#{current_user[:id]}"}
+            Login settings
+
+      %a.nav-username{href: "/users/#{current_user[:id]}"}
+        = current_user[:display_name]
+
+
+    -##username= current_user.cvs_username
+
+
+= render template: "layouts/rocket"
+

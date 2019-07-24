@@ -25,6 +25,7 @@ FactoryBot.define do
       cvs_username                      { ENV['authenticate_cvs_username'] }
       kerberos_login                    { ENV['remote_user'] }
       email                             { ENV['authenticate_email'] }
+      authentication_token              { SecureRandom.hex(10) }
     end
 
     factory :fake_user do

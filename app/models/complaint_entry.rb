@@ -145,6 +145,7 @@ class ComplaintEntry < ApplicationRecord
 
             current_status = "ASSIGNED"
             update(status:current_status,
+                   url_primary_category: nil,
                    internal_comment: comment,
                    resolution_comment: resolution_comment,
                    case_assigned_at: Time.now,
@@ -267,89 +268,92 @@ class ComplaintEntry < ApplicationRecord
 
   def self.create_wbnp_complaint_entry(complaint, ip_url, url_parts, user = nil, status = NEW, categories = nil)
 
+    new_complaint_entry = ComplaintEntry.new
+    new_complaint_entry.complaint_id = complaint.id
+    new_complaint_entry.status = status
+
     begin
-      new_complaint_entry = ComplaintEntry.new
-      new_complaint_entry.complaint_id = complaint.id
-      new_complaint_entry.status = status
-
-      begin
-        wbrs_stuff = Sbrs::ManualSbrs.get_wbrs_data({:url => URI.escape(ip_url)})
-        wbrs_score = wbrs_stuff["wbrs"]["score"]
-        new_complaint_entry.wbrs_score = wbrs_score
-      rescue
-        #do nothing continue with saving the entry
-      end
-
-      if is_ip?(ip_url)
-        new_complaint_entry.ip_address = ip_url
-        new_complaint_entry.entry_type = "IP"
-
-      else
-        new_complaint_entry.uri = ip_url
-        new_complaint_entry.entry_type = "URI/DOMAIN"
-        new_complaint_entry.subdomain = url_parts["subdomain"]
-        new_complaint_entry.domain = url_parts["domain"]
-        new_complaint_entry.path = url_parts["path"]
-      end
-      #lets query the top url API endpoint to determine if this is an important site or not
-      # but you better believe i dont trust this API so we have some checks to ensure the entry gets created
-      begin
-        importance = self_importance(ip_url)
-        new_complaint_entry.is_important = importance if importance
-      rescue
-        #do nothing keep building entry
-      end
-      new_complaint_entry.user = user
-      new_complaint_entry.case_assigned_at ||= Time.now if user && user.display_name != "Vrt Incoming"
-
-      if status == PENDING # occurs when attempt to categorized a Top URl without a complaint
-        new_complaint_entry.url_primary_category = categories
-        new_complaint_entry.category = categories
-      else
-        current_category = new_complaint_entry.set_current_category
-        new_complaint_entry.url_primary_category = current_category
-        new_complaint_entry.category = current_category
-      end
-
-      new_complaint_entry.save
-
-    rescue Exception => e
-      raise Exception.new("{ComplaintEntry creation error: {content: #{ip_url},error:#{e}}}")
+      wbrs_stuff = Sbrs::ManualSbrs.get_wbrs_data({:url => URI.escape(ip_url)})
+      wbrs_score = wbrs_stuff["wbrs"]["score"]
+      new_complaint_entry.wbrs_score = wbrs_score
+    rescue
+      #do nothing continue with saving the entry
     end
+
+    if is_ip?(ip_url)
+      new_complaint_entry.ip_address = ip_url
+      new_complaint_entry.entry_type = "IP"
+
+    else
+      new_complaint_entry.uri = ip_url
+      new_complaint_entry.entry_type = "URI/DOMAIN"
+      new_complaint_entry.subdomain = url_parts["subdomain"]
+      new_complaint_entry.domain = url_parts["domain"]
+      new_complaint_entry.path = url_parts["path"]
+    end
+    #lets query the top url API endpoint to determine if this is an important site or not
+    # but you better believe i dont trust this API so we have some checks to ensure the entry gets created
+    begin
+      importance = self_importance(ip_url)
+      new_complaint_entry.is_important = importance if importance
+    rescue
+      #do nothing keep building entry
+    end
+    new_complaint_entry.user = user
+    new_complaint_entry.case_assigned_at ||= Time.now if user && user.display_name != "Vrt Incoming"
+
+    if status == PENDING # occurs when attempt to categorized a Top URl without a complaint
+      new_complaint_entry.url_primary_category = categories
+      new_complaint_entry.category = categories
+    else
+      current_category = new_complaint_entry.set_current_category
+      new_complaint_entry.url_primary_category = current_category
+      new_complaint_entry.category = current_category
+    end
+
+    new_complaint_entry.save
 
     ComplaintEntryPreload.generate_preload_from_complaint_entry(new_complaint_entry)
-    max_wait_for_job = 15 #seconds
-    begin
-      screenshot_data =  ""
-      Timeout::timeout(max_wait_for_job) do
-        screenshot_data = CapybaraSpider.low_capture("#{new_complaint_entry.hostlookup}")
-      end
-      ces = ComplaintEntryScreenshot.new
-      ces.complaint_entry_id = new_complaint_entry.id
-      ces.screenshot = Base64.decode64(screenshot_data)
-      ces.save!
-    rescue Timeout::Error => e
-      #couldnt complete in time
-      Rails.logger.error( "#{e} --- Timed out waiting for screenshot for #{new_complaint_entry.hostlookup} to finish")
-      ces = ComplaintEntryScreenshot.new
-      ces.error_message = e.message
-      ces.complaint_entry_id = new_complaint_entry.id
-      open("app/assets/images/failed_screenshot.jpg") do |f|
-        ces.screenshot = f.read
-      end
-      ces.save!
-    rescue Exception => e
-      Rails.logger.error("#{e.message}")
-      #do nothing, it was worth a try. kittens are sad now
-      ces = ComplaintEntryScreenshot.new
-      ces.error_message = e.message
-      ces.complaint_entry_id = new_complaint_entry.id
-      open("app/assets/images/failed_screenshot.jpg") do |f|
-        ces.screenshot = f.read
-      end
-      ces.save!
-    end
 
+    delay.capture_screenshot(new_complaint_entry.hostlookup, new_complaint_entry.id)
+  end
+
+  class << self
+    def capture_screenshot(uri, complaint_entry_id)
+      max_wait_for_job = 15 #seconds
+      begin
+        screenshot_data =  ""
+        Timeout::timeout(max_wait_for_job) do
+          screenshot_data = CapybaraSpider.low_capture("#{uri}")
+        end
+        ces = ComplaintEntryScreenshot.new
+        ces.complaint_entry_id = complaint_entry_id
+        ces.screenshot = Base64.decode64(screenshot_data)
+        ces.save!
+      rescue Timeout::Error => e
+        #couldnt complete in time
+        Rails.logger.error( "#{e} --- Timed out waiting for screenshot for #{uri} to finish")
+        ces = ComplaintEntryScreenshot.new
+        ces.error_message = e.message
+        ces.complaint_entry_id = complaint_entry_id
+        open("app/assets/images/failed_screenshot.jpg") do |f|
+          ces.screenshot = f.read
+        end
+        ces.save!
+      rescue Exception => e
+        Rails.logger.error("#{e.message}")
+        #do nothing, it was worth a try. kittens are sad now
+        ces = ComplaintEntryScreenshot.new
+        ces.error_message = e.message
+        ces.complaint_entry_id = complaint_entry_id
+        open("app/assets/images/failed_screenshot.jpg") do |f|
+          ces.screenshot = f.read
+        end
+        ces.save!
+      end
+
+    end
+    handle_asynchronously :capture_screenshot
   end
 
 
