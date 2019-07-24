@@ -158,6 +158,7 @@ $ ->
   window.set_action_wlbl_col = () ->
     selected_rows = $('.col-select-all input:checked')
     list_action = $('.wlbl-radio-add:checked').val()
+    list_class = '.' + list_action
     action_desc = 'Add to: '
     if list_action == 'remove'
       action_desc = 'Remove from: '
