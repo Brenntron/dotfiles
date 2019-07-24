@@ -31,13 +31,15 @@ module API
 
               if args.present?
                 begin
-                  args_hash = JSON.parse(args)
+                  args_hash = JSON.parse(args, symbolize_names: true)
                 rescue JSON::ParserError
                   return {:status => 'error', :message => "your arguments' json format sucks"}.to_json 
-                end  
+                end
+              else
+                args_hash = {}
               end 
 
-              morsel = AdminTask.execute_task(task, args)
+              morsel = AdminTask.execute_task(task, args_hash)
 
               {:status => 'success', :morsel_id => morsel.id}.to_json
 
