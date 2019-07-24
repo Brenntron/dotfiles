@@ -140,8 +140,8 @@ $ ->
     dropdown = $('#wlbl_entries_dropdown')
     list = $(dropdown).find('ul')
     type = 'wlbl'
-    wlbl_options = [ "WL - Weak", "WL - Medium", "WL - Heavy",
-                     "BL - Weak", "BL - Medium", "BL - Heavy"]
+    wlbl_options = [ "WL-weak", "WL-med", "WL-heavy",
+                     "BL-weak", "BL-med", "BL-heavy"]
     if !$(list).has('label').length
       build_checkbox_list(wlbl_options, list, type)
 
@@ -156,40 +156,36 @@ $ ->
       $(list).append(checkbox)
 
   window.set_action_wlbl_col = () ->
-    dropdown = $('#wlbl_entries_dropdown')
     selected_rows = $('.col-select-all input:checked')
     list_action = $('.wlbl-radio-add:checked').val()
-
-    if list_action == 'add'
-      list_action = 'Add to: '
-    else
-      list_action = 'Remove from: '
-
-    checked_bl = $('.adjust_wlbl_checkbox:checked')
-    check_list = []
-    data_checked_bl = []
-
-    for item in checked_bl
-      val = $( item ).val()
-      check_name = "<span class='col-tag'>" + val + "</span> "
-      check_list.push(check_name)
-      data_checked_bl.push(val)
-    if check_list.length == 2
-      check_list = check_list.join(' and ')
-    else
-      check_list = check_list.join(', ').replace(/, ([^,]*)$/, ', and $1')
-
-    data_checked_bl = data_checked_bl.join(',')
-    col_dialog = "<p class='wlbl-action-col' data='" + data_checked_bl + "'>" + list_action + check_list + "<p>"
-
+    action_desc = 'Add to: '
+    if list_action == 'remove'
+      action_desc = 'Remove from: '
+    checked_bl = $('.adjust_wlbl_checkbox:checked').map( () -> return $(this).val() ).get()
     selected_rows.each ()->
       row = $(this).closest('tr')
       data = row.find('.col-bulk-dispute').text()
-      action_col = row.find('.col-actions')
-      existing_p = action_col.find('.wlbl-action-col')
-      clear_col = row.find('.col-clear-actions')
-      delete_button = '<button class="clear-action-button"></button>'
       if !isEmpty(data)
+        action_col = row.find('.col-actions')
+        existing_p = action_col.find('.wlbl-action-col')
+        clear_col = row.find('.col-clear-actions')
+        wlbl_col = row.find('.col-wlbl').text().split(',')
+
+        checked_bl = checked_bl.filter( (wlbl)->
+          if list_action == 'add'
+            return !wlbl_col.includes(wlbl)
+          else
+            return wlbl_col.includes(wlbl)
+        )
+
+        check_list = col_tag_format(checked_bl)
+
+        col_dialog = "<p class='wlbl-action-col' data='" + checked_bl + "'>" + action_desc + check_list + "<p>"
+
+        delete_button = '<button class="clear-action-button"></button>'
+#        if list_action == 'add'
+#          co
+
         $(existing_p).remove()
         $(action_col).append(col_dialog)
         if !$(clear_col).has(".clear-action-button").length
@@ -207,48 +203,19 @@ $ ->
       check_list = check_list_array.join(' and ')
     else
       check_list = check_list_array.join(', ').replace(/, ([^,]*)$/, ', and $1')
-
     return check_list
 
   window.set_action_col = () ->
-    dropdown = $('#reptool_entries_bl_dropdown')
     selected_rows = $('.col-select-all input:checked')
-    checked_bl = $(dropdown).find('.adjust_reptool_checkbox:checked')
-    check_vals = []
-    reptool_list = ''
-    class_bl = $('.status_bl:checked').val().replace('reptool-', '')
+    check_vals = $('.adjust_reptool_checkbox:checked').map( () -> return $(this).val() ).get()
+    class_reptool = $('.status_bl:checked').val().replace('reptool-', '')
     reptool_add  = $('.reptool-add:checked').val()
     reptool_class = reptool_add
 
-    for item in checked_bl
-      val = $(item).val()
-      check_vals.push(val)
-
-    reptool_list = check_vals.join(',')
-    rep_list = []
-
-    existing_reptool = $('.col-reptool-class:not(.missing-data)')
-
-    existing_reptool.each () ->
-      actions = $(this).closest('tr').find('.col-actions')
-      $(actions).children().each ->
-        data = $(this).attr('data')
-        if data
-          rep_list = data.trim().split(',')
-
-      existing_actions = []
-      rep_list = this.innerText.split(',')
-      rep_list = rep_list.filter( (rep)-> return !check_vals.includes(rep))
-
-    if !isEmpty(rep_list[0])
-      check_list = rep_list
-    else
-      check_list = reptool_list.split(',')
-
-    switch (class_bl)
+    switch (class_reptool)
       when 'maintain'
-        reptool_add = reptool_add.charAt(0).toUpperCase() + reptool_add.slice(1)
-        status_string = reptool_add + ' classifications: '
+        reptool_dialog = reptool_add.charAt(0).toUpperCase() + reptool_add.slice(1)
+        status_string = reptool_dialog + ' classifications: '
       when 'drop'
         status_string = 'Drop all classifications (set entry to EXPIRED)'
         reptool_add = 'drop'
@@ -261,8 +228,18 @@ $ ->
       row = $(this).closest('tr')
       data = row.find('.col-bulk-dispute').text()
       action_col = row.find('.col-actions')
-      reptool_classes = row.find('.col-reptool-class:not(.missing-data)').text().split()
-      console.log reptool_classes
+      existing_reptool = row.find('.col-reptool-class:not(.missing-data)')
+      rep_list = []
+      existing_reptool.each () ->
+        actions = $(this).closest('tr').find('.col-actions')
+        $(actions).children().each ->
+          data = $(this).attr('data')
+          if data
+            rep_list = data.trim().split(',')
+
+        existing_actions = []
+        rep_list = this.innerText.split(',')
+
       if !isEmpty(data)
         if reptool_add  == 'drop'
           $( action_col ).empty()
@@ -272,24 +249,24 @@ $ ->
           existing_actions = []
 
           if reptool_add.toLowerCase() == 'add'
-              check_class = '.remove'
+            check_class = '.remove'
           else
             check_class = '.add'
-            existing_actions = existing_actions.concat(reptool_classes)
+            existing_actions = existing_actions.concat(rep_list)
 
           $(actions).find(check_class + ' .col-tag').each () ->
             existing_actions.push( this.innerText )
-
           if reptool_add.toLowerCase() == 'remove'
-            check_list = check_list.filter((rep)-> return reptool_classes.includes(rep))
+            check_list = check_vals.filter((rep)-> return rep_list.includes(rep))
           else
-            check_list = check_list.filter((rep)-> return !existing_actions.includes(rep) && !reptool_classes.includes(rep))
+            check_list = check_vals.filter((rep)-> return !existing_actions.includes(rep) && !rep_list.includes(rep))
+
         clear_col = $( row.find('.col-clear-actions') )
         existing_p = action_col.find('.' + reptool_class + '.reptool-action-col')
         delete_button = '<button class="clear-action-button row-action-clear"></button>'
 
-        col_dialog = "<p class='" + reptool_class + " reptool-action-col' data=' " + reptool_list + " '>" + status_string + col_tag_format(check_list) + "<p>"
-        if check_list.length
+        col_dialog = "<p class='" + reptool_class + " reptool-action-col' data=' " + check_list + " '>" + status_string + col_tag_format(check_list) + "<p>"
+        if check_list.length || reptool_add  == 'drop'
           clear_col.show()
           $( existing_p ).remove()
           $( action_col ).append(col_dialog)
