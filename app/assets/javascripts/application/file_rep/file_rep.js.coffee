@@ -273,7 +273,7 @@ $ ->
 
   $(document).on 'click', '#refresh-filter-button', (e) ->
     refresh_localStorage()
-    refresh_url()
+    window.location.replace('/escalations/file_rep/disputes?f=all')
 
   window.build_named_search = (search_name) ->
     localStorage.search_type = 'named'
@@ -398,6 +398,8 @@ $ ->
       {search_type, search_name} = data
 
       if search_type == 'standard'
+        if search_name == 'all'
+            reset_icon = ''
         new_header =
           '<div>' +
           '<span class="text-capitalize">' + search_name.replace(/_/g, " ") + ' tickets </span>' +
