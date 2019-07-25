@@ -37,6 +37,7 @@ module API
                 # Check whether AMP API is disabled
                 if Rails.configuration.amp_poke.host.blank?
                   raise "AMP Poke API is disabled or not configured"
+                # If we're on staging, test to see whether AMP API is enabled
                 elsif Rails.env == 'staging'
                   begin
                     FileReputationApi::Detection.get_bulk('1eba23049d725aabd84b63f8cd4b079c78f26cde6f7bb8be1d2477df0c0d1234')
