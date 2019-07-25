@@ -9834,7 +9834,8 @@ input[type="radio"].resolution_radio_button {
 .copyright-area {
   width: 150px;
   height: 100px;
-  position: fixed;
+  position: -webkit-sticky;
+  position: sticky;
   bottom: 20px;
   left: 22px;
   text-align: center;
@@ -9860,6 +9861,7 @@ input[type="radio"].resolution_radio_button {
   opacity: 1;
   transition-delay: 500ms;
   left: 25px;
+  bottom: 20px;
 }
 
 #sidenav-icons-div ul {
