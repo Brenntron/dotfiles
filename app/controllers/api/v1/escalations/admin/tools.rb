@@ -79,6 +79,34 @@ module API
               end
             end
 
+            params do
+              optional :ids, type: String
+              requires :escalation_type, type: String
+              optional :all, type: Boolean
+            end
+
+            post "sync_collection" do
+              ids = []
+              if permitted_params[:ids].present?
+                permitted_params[:ids].split(",").each do |id|
+                  ids << id.strip.to_i
+                end
+              end
+              klass = permitted_params[:escalation_type].constantize
+              if permitted_params[:all].present? && permitted_params[:all] == true
+                klass.sync_all
+                return {:status => "success", :message => "batching sync for all tickets of type #{permitted_params[:escalation_type]} has started"}
+              end
+
+              tix = klass.where(:id => ids)
+              tix.each do |tic|
+                tic.manual_sync
+              end
+
+              return {:status => "success", :message => "Syncing specified tickets of type #{permitted_params[:escalation_type]}"}
+
+            end
+
 
 
           end

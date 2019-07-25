@@ -606,6 +606,16 @@ class Complaint < ApplicationRecord
       complaint.complaint_tags << new_tag
     end
   end
+
+  def self.sync_all
+    puts 'HERE1'
+    #nicolette's admin task call here, no args
+  end
+
+  def manual_sync
+    message = Bridge::ComplaintUpdateStatusEvent.new
+    message.post_complaint(self)
+  end
 end
 
 

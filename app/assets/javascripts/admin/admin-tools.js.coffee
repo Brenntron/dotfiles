@@ -66,7 +66,69 @@ window.submit_task = ()->
       $('#task-msg').html('An error occurred attempting to execute task')
   , this)
 
+
+window.submit_all_ticket_sync = (escalation_type)->
+  headers = {'Token': $('input[name="token"]').val(), 'Xmlrpc-Token': $('input[name="xml_token"]').val()}
+  $.ajax(
+    url: '/escalations/api/v1/escalations/admin/tools/sync_collection'
+    method: 'POST'
+    headers: headers
+    data: {'all': true, 'escalation_type': escalation_type}
+
+    success: (response) ->
+      json = response
+
+      if json.status == 'error'
+        $('#output-1').html("ERROR:" + json.message)
+      else
+        $('#output-1').html(json.message)
+
+    error: (response) ->
+      $('#output-1').html('An error occurred attempting to execute task')
+  , this)
+
+window.submit_ticket_sync = (escalation_type, ids)->
+  headers = {'Token': $('input[name="token"]').val(), 'Xmlrpc-Token': $('input[name="xml_token"]').val()}
+  $.ajax(
+    url: '/escalations/api/v1/escalations/admin/tools/sync_collection'
+    method: 'POST'
+    headers: headers
+    data: {'escalation_type': escalation_type, 'ids': ids}
+
+    success: (response) ->
+      json = response
+      if json.status == 'error'
+        $('#output-1').html("ERROR:" + json.message)
+      else
+        $('#output-1').html(json.message)
+
+    error: (response) ->
+      $('#output-1').html('An error occurred attempting to execute task')
+  , this)
+
 $ ->
+
+  $("#sync-all-disputes").click ->
+    window.submit_all_ticket_sync("Dispute")
+  $("#sync-all-complaints").click ->
+    window.submit_all_ticket_sync("Complaint")
+  $("#sync-all-file-reps").click ->
+    window.submit_all_ticket_sync("FileReputationDispute")
+
+  $("#sync-disputes").click ->
+    ids = $(".sync_dispute_field").val()
+    window.submit_ticket_sync("Dispute", ids)
+
+  $("#sync-complaints").click ->
+    ids = $(".sync_complaint_field").val()
+    window.submit_ticket_sync("Complaint", ids)
+
+  $("#sync-file-disputes").click ->
+    ids = $(".sync_filerep_field").val()
+    window.submit_ticket_sync("FileReputationDispute", ids)
+
+
+
   $(".wbnp_delete_button").click ->
 
     id = $(this).data("id")  #<button data-id="123">delete</button>

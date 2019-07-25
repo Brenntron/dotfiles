@@ -791,4 +791,14 @@ class FileReputationDispute < ApplicationRecord
 
     workbook
   end
+
+  def self.sync_all
+    puts 'HERE3'
+    #nicolette's admin task call here, no args
+  end
+
+  def manual_sync
+    conn = ::Bridge::FileRepUpdateStatusEvent.new(addressee: "talos-intelligence")
+    conn.post(self, source_authority: "talos-intelligence", source_key: dispute.ticket_source_key)
+  end
 end

@@ -1802,5 +1802,15 @@ class Dispute < ApplicationRecord
 
   end
 
+  def self.sync_all
+    puts 'HERE2'
+    #nicolette's admin task call here, no args
+  end
+
+  def manual_sync
+    message = Bridge::DisputeEntryUpdateStatusEvent.new
+    message.post_entries(self.dispute_entries)
+  end
+
 end
 
