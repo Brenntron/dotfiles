@@ -276,6 +276,7 @@ Feature: Webcat complaints
     And I should see "DOMAIN HISTORY"
     And I should see "Tue, 12 May 2015 17:39:53 GMT"
 
+  # Test should work after WEB-5077 is complete
   @javascript
   Scenario: a user looks up a complaint's entry history with an invalid URL
     Given a user with role "webcat user" exists and is logged in
@@ -286,6 +287,7 @@ Feature: Webcat complaints
     And I wait for "5" seconds
     Then I should see "No history associated with this url."
 
+  # Test should work after WEB-5077 is complete
   @javascript
   Scenario: a user looks up a complaint's entry history with an invalid URL in the third position (make sure that the notification appears in the right spot)
     Given a user with role "webcat user" exists and is logged in
@@ -345,8 +347,9 @@ Feature: Webcat complaints
     And I click "#cat-urls-same"
     And I fill in "categorize_urls" with "joseph.com" and "mary.com" separated by blank lines
     And I fill in selectized with "Adult"
+    And I click "#cat-urls-same"
     And I click ".primary"
-    And I wait for "45" seconds
+    And I wait for "20" seconds
     Then I should see "SUCCESS"
     And I should see "URLs/IPs successfully categorized."
 
@@ -357,8 +360,8 @@ Feature: Webcat complaints
     And I click "#categorize-urls"
     And I click "#cat-urls-same"
     And I fill in selectized with "Adult"
+    And I click "#cat-urls-same"
     And I click ".primary"
-    And I wait for "5" seconds
     Then I should see "ERROR"
     Then I should see "Please check that a URL/IP has been inputted and that at least one category was selected."
 
@@ -387,10 +390,10 @@ Feature: Webcat complaints
     Given a user with role "webcat user" exists and is logged in
     When I goto "/escalations/webcat/complaints?f=ALL"
     And I click "#categorize-urls"
-    And I fill in "url_1" with "cisco.com"
+    And I fill in "url_1" with "chabad.org"
     And I click ".current-categories-button"
     Then I wait for "15" seconds
-    Then I should see "Computers and Internet"
+    Then I should see "Religion"
 
   @javascript
   Scenario: a users tries to drop current categories on a URL
