@@ -1803,8 +1803,7 @@ class Dispute < ApplicationRecord
   end
 
   def self.sync_all
-    puts 'HERE2'
-    #nicolette's admin task call here, no args
+    AdminTask.execute_task(:sync_disputes_with_ti, {})
   end
 
   def manual_sync

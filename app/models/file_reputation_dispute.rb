@@ -793,8 +793,7 @@ class FileReputationDispute < ApplicationRecord
   end
 
   def self.sync_all
-    puts 'HERE3'
-    #nicolette's admin task call here, no args
+    AdminTask.execute_task(:sync_file_rep_disp_with_ti, {})
   end
 
   def manual_sync

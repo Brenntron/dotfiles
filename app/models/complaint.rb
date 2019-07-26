@@ -608,8 +608,7 @@ class Complaint < ApplicationRecord
   end
 
   def self.sync_all
-    puts 'HERE1'
-    #nicolette's admin task call here, no args
+    AdminTask.execute_task(:sync_complaints_with_ti, {})
   end
 
   def manual_sync
