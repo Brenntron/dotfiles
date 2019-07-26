@@ -158,6 +158,10 @@ reversing_labs_config = env_config['reversing_labs']
 raise 'config.yml missing ReversingLabs section' unless reversing_labs_config
 Rails.configuration.reversing_labs      = ApiRequester::ApiRequester.config_of(reversing_labs_config)
 
+magic_api_config = env_config['magic_api']
+raise 'config.yml missing MAgic section' unless magic_api_config
+Rails.configuration.magic_api           = ApiRequester::ApiRequester.config_of(magic_api_config)
+
 threatgrid = env_config.fetch('threatgrid', {})
 raise 'config.yml missing threatgrid section' unless threatgrid
 Rails.configuration.threatgrid          = ApiRequester::ApiRequester.config_of(threatgrid)

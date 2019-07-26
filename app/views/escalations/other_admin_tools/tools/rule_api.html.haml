@@ -11,7 +11,7 @@
 
 .control-banner
   %label /v1/cat/rules/get:
-  = text_field "admin_tools", "args", :class => '1-args'
+  = text_field "admin_tools", "args", :value => '{"prefix_ids": [21345]}', :class => '1-args'
   %button#execute-task-button-1 Go!
 .control-banner#output-1
 %br
@@ -19,7 +19,7 @@
 
 .control-banner
   %label /v1/wbrsrulelib/cat/sources:
-  = text_field "admin_tools", "args", :class => '2-args'
+  = text_field "admin_tools", "args", :value => '{}', :class => '2-args'
   %button#execute-task-button-2 Go!
 .control-banner#output-2
 %br
@@ -27,7 +27,7 @@
 
 .control-banner
   %label /v1/wbrsrulelib/cat/rules:
-  = text_field "admin_tools", "args", :class => '3-args'
+  = text_field "admin_tools", "args", :value => '["cs.co"]', :class => '3-args'
   %button#execute-task-button-3 Go!
 .control-banner#output-3
 %br
@@ -35,7 +35,7 @@
 
 .control-banner
   %label /v1/cat/rules/audit:
-  = text_field "admin_tools", "args", :class => '4-args'
+  = text_field "admin_tools", "args", :value => '{"prefix_id": 23}', :class => '4-args'
   %button#execute-task-button-4 Go!
 .control-banner#output-4
 %br
@@ -43,7 +43,7 @@
 
 .control-banner
   %label /v1/clusters/get:
-  = text_field "admin_tools", "args", :class => '5-args'
+  = text_field "admin_tools", "args", :value => '["test"]', :class => '5-args'
   %button#execute-task-button-5 Go!
 .control-banner#output-5
 %br
@@ -51,7 +51,7 @@
 
 .control-banner
   %label /v1/cat/categories:
-  = text_field "admin_tools", "args", :class => '6-args'
+  = text_field "admin_tools", "args", :value => '{}', :class => '6-args'
   %button#execute-task-button-6 Go!
 .control-banner#output-6
 %br
@@ -59,7 +59,7 @@
 
 .control-banner
   %label /v1/cat/urls/top:
-  = text_field "admin_tools", "args", :class => '7-args'
+  = text_field "admin_tools", "args", :value => '["edzo.us"]', :class => '7-args'
   %button#execute-task-button-7 Go!
 .control-banner#output-7
 %br
@@ -67,7 +67,7 @@
 
 .control-banner
   %label /v1/cat/complaints/get:
-  = text_field "admin_tools", "args", :class => '71-args'
+  = text_field "admin_tools", "args", :value => '{"urls": [{"url": "cs.co"}]}', :class => '71-args'
   %button#execute-task-button-71 Go!
 .control-banner#output-71
 %br
@@ -78,7 +78,7 @@
 
 .control-banner
   %label GET /v1/rep/wlbl/get:
-  = text_field "admin_tools", "args", :class => '8-args'
+  = text_field "admin_tools", "args", :value => '{"id": "1223"}', :class => '8-args'
   %button#execute-task-button-8 Go!
 .control-banner#output-8
 %br
@@ -86,7 +86,7 @@
 
 .control-banner
   %label POST /v1/rep/wlbl/get:
-  = text_field "admin_tools", "args", :class => '9-args'
+  = text_field "admin_tools", "args", :value => '{"url": "http://cisco.com"}', :class => '9-args'
   %button#execute-task-button-9 Go!
 .control-banner#output-9
 %br
@@ -94,7 +94,7 @@
 
 .control-banner
   %label /v1/rep/complaints/score:
-  = text_field "admin_tools", "args", :class => '10-args'
+  = text_field "admin_tools", "args", :value => '{"url": "cs.co", "add": [], "remove": []}', :class => '10-args'
   %button#execute-task-button-10 Go!
 .control-banner#output-10
 
