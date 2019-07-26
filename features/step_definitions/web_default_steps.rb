@@ -393,7 +393,7 @@ Then(/^I see "(.*?)" in element "(.*?)"/) do |content, element|
 end
 
 Then /I click "(.*?)" and switch to the new window/ do |target|
-  page.switch_to_window(page.window_opened_by{find(target).trigger('click')})
+  page.switch_to_window(page.window_opened_by{find(target).click})
 end
 
 Then (/^I should receive a file of type "(.*?)"/) do |type|
