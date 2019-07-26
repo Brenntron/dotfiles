@@ -195,6 +195,7 @@ Feature: Webcat complaints
     And I wait for "5" seconds
     Then I should see "MUST INCLUDE AT LEAST ONE CATEGORY."
 
+  # Test should work after WEB-5001 is merged
   @javascript
   Scenario: a user attempts to submit changes with resolution set to 'Unchanged'
     Given a user with role "webcat user" exists and is logged in
