@@ -636,7 +636,18 @@ button {
   background-position: 17px 2px;
 }
 
+.error_modal {
+  .modal-dialog{
+    width: unset!important;
+  }
+  .modal-body>div{
+    line-height: 1.2em;
+  }
+}
 
+[aria-describedby="commit-modal"] {
+  width: unset!important;
+}
 #edit-button, .edit-button      {background-image: url(image_path('icon_edit.svg'));}
 .related-button   {background-image: url(image_path('icon_related.svg'));}
 .delete-button    {background-image: url(image_path('icon_delete.svg'));}

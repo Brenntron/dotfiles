@@ -157,40 +157,55 @@ $ ->
 
   window.set_action_wlbl_col = () ->
     selected_rows = $('.col-select-all input:checked')
+    $('.error_modal').dialog();
+    $('.error_modal').dialog( "destroy" );
     list_action = $('.wlbl-radio-add:checked').val()
     list_class = '.' + list_action
     action_desc = 'Add to: '
     if list_action == 'remove'
       action_desc = 'Remove from: '
     checked_bl = $('.adjust_wlbl_checkbox:checked').map( () -> return $(this).val() ).get()
+    error_array = []
+    error_header = '<h4>Cannot ' + list_action + 'the following actions <h4> '
     selected_rows.each ()->
       row = $(this).closest('tr')
       data = row.find('.col-bulk-dispute').text()
+      error_message = data + ': '
       if !isEmpty(data)
         action_col = row.find('.col-actions')
-        existing_p = action_col.find('.wlbl-action-col')
+        existing_p = action_col.find( list_class + '.wlbl-action-col')
         clear_col = row.find('.col-clear-actions')
-        wlbl_col = row.find('.col-wlbl').text().split(',')
-
-        checked_bl = checked_bl.filter( (wlbl)->
-          if list_action == 'add'
-            return !wlbl_col.includes(wlbl)
-          else
-            return wlbl_col.includes(wlbl)
+        wlbl_col = row.find('.col-wlbl').text().replace(/ /g, '').split(',')
+#        pick random from wlbl for testing wlbl_col = wlbl_col[Math.floor(Math.random()*wlbl_col.length)]
+        check_list_array = checked_bl.filter( (wlbl)->
+          switch(list_action)
+            when 'add'
+              if wlbl_col.includes(wlbl)
+                error_message += wlbl + ', '
+              return !wlbl_col.includes(wlbl)
+            when 'remove'
+              if !wlbl_col.includes(wlbl)
+                error_message += '<span class="col-tag">' + wlbl + '</span>, '
+              return wlbl_col.includes(wlbl)
         )
 
-        check_list = col_tag_format(checked_bl)
+        check_list = col_tag_format(check_list_array)
+        col_dialog = "<p class='wlbl-action-col " +  list_action + "' data='" + check_list_array + "'>" + action_desc + check_list + "<p>"
+        delete_button = '<button class="clear-action-button row-action-clear"></button>'
+        if error_message.endsWith(', ')
+          error_message = error_message.slice(0, error_message.length - 2);
+          error_html = '<div>' + error_message + '<div>'
+          error_array.push(error_html)
+        if check_list_array.length
+          $(existing_p).remove()
+          $(action_col).append(col_dialog)
+          if !$(clear_col).has(".clear-action-button").length
+            $(clear_col).append(delete_button)
 
-        col_dialog = "<p class='wlbl-action-col' data='" + checked_bl + "'>" + action_desc + check_list + "<p>"
-
-        delete_button = '<button class="clear-action-button"></button>'
-#        if list_action == 'add'
-#          co
-
-        $(existing_p).remove()
-        $(action_col).append(col_dialog)
-        if !$(clear_col).has(".clear-action-button").length
-          $(clear_col).append(delete_button)
+    if  error_array.length
+      $( '.error_modal' ).dialog()
+      $( '.error_modal .modal-header' ).innerHTML = error_header
+      $( '.error_modal .modal-body' ).append(error_array)
 
   window.col_tag_format = (array) ->
     if typeof array == 'string'

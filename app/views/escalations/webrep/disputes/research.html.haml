@@ -118,6 +118,14 @@
             %button.primary#submit-rep-changes Submit Reputation Changes
             %span.small.note-repsubmit
               * NOTE: Submitting reputation changes will automatically create a closed ticket
+
+
+          #error_modal.modal.error_modal{tabindex:"-1", role:"dialog"}
+            .modal-header
+              %h4.modal-title#commit-modal-title Duplicate Dispute Requests
+            .modal-body
+
+
           %table#research-table.research-table
             %colgroup
               %col
