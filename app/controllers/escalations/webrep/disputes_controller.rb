@@ -179,7 +179,6 @@ class Escalations::Webrep::DisputesController < ApplicationController
         @spreadsheet_directory = Dir.mktmpdir
 
         if params['mytickets'] == "true"
-          file_name = "my-tickets_#{Time.now.utc.iso8601}.xlsx"
           mytickets_file = File.new("#{@spreadsheet_directory}/my-tickets_#{Time.now.utc.iso8601}.xlsx", 'w+')
           mytickets_xlsx = RubyXL::Workbook.new
           mytickets_workbook_names = {
@@ -299,7 +298,6 @@ class Escalations::Webrep::DisputesController < ApplicationController
         end
 
         if params['myteamtickets'] == "true"
-          file_name = "my-team-tickets_#{Time.now.utc.iso8601}.xlsx"
           myteamtickets_file = File.new("#{@spreadsheet_directory}/my-team-tickets_#{Time.now.utc.iso8601}.xlsx", 'w+')
           myteamtickets_xlsx = RubyXL::Workbook.new
           myteamtickets_workbook_names = {
@@ -497,15 +495,15 @@ class Escalations::Webrep::DisputesController < ApplicationController
             temp_file.close
             temp_file.unlink
 
-            #Delete the spreadsheets
-            File.delete(myteamtickets_file.path)
-            File.delete(mytickets_file.path)
+            #Delete all generated spreadsheets
+            input_filenames.each do |file|
+              File.delete(File.join(@spreadsheet_directory, file))
+            end
           end
 
         elsif input_filenames.count == 1
-          # Delete the generated spreadsheet after sending
           File.open(single_output_file.path, 'r') do |f|
-            send_data f.read, :filename => file_name
+            send_data f.read, :filename => input_filenames[0]
           end
 
           File.delete(single_output_file.path)
