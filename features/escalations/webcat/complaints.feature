@@ -180,7 +180,8 @@ Feature: Webcat complaints
     And I fill in "complaint_entry_report_to" with "2018-08-12"
     Then I click "#complaint_entry_report" and switch to the new window
     Then I should see "Webcat Complaint Entry Report"
-    
+
+  # Test should work after WEB-5072 is complete
   @javascript
   Scenario: a user attempts to submit changes without categories and receives expected error alert
     Given a user with role "webcat user" exists and is logged in
