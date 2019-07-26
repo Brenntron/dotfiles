@@ -411,7 +411,7 @@ Feature: Webcat complaints
     When I goto "/escalations/webcat/complaints?f=ALL"
     And I click "#fetch_wbnp"
     And I wait for "10" seconds
-    Then I should see "WBNP COMPLAINTS SUCCESSFULLY RETRIEVED FROM RULEUI."
+    Then I should see content "Active" within ".wbnp-report-status"
 
   @javascript
   Scenario: a users tries to update URI
@@ -423,17 +423,18 @@ Feature: Webcat complaints
     And I fill in "complaint_prefix_1" with "cisco.com"
     And I click ".inline-button"
     And I wait for "10" seconds
-    Then I should see "SUCCESS"
-    Then I should see "URI updated."
+    And I goto "/escalations/webcat/complaints?f=ALL"
+    And I should see content "cisco.com" within "#domain_1"
+
 
   # This will eventually need to be stubbed, because the response from SDS might update
   @javascript
   Scenario: a user expands a Complaint Entry and sees SDS data when WBRS data is not present
     Given a user with role "webcat user" exists and is logged in
     And the following complaint entries exist:
-    | uri             | domain        | path |
-    | baumpflege.ac   | baumpflege.ac |      |
+    | uri             | domain        | subdomain | path | entry_type |
+    | baumpflege.ac   | baumpflege.ac |           |      | URI/DOMAIN |
     When I goto "/escalations/webcat/complaints?f=ALL"
-    And I click ".expand-row-button-1"
-    And I wait for "5" seconds
-    Then I should see content "Games" within ".sds_category"
+    And I click ".expand-row-button-inline"
+    And I wait for "8" seconds
+    Then I should see content "Nature" within ".sds_category"
