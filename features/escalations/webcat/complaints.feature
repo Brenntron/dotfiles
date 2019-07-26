@@ -38,7 +38,7 @@ Feature: Webcat complaints
     Then I wait for "3" seconds
     And I should see "Arts"
     Then I should not see "Update"
-    And I click ".expand-all"
+    And I click ".expand-row-button-inline"
     Then I wait for "3" seconds
     Then I should see "Commit"
     Then I should see "Decline"
@@ -51,8 +51,9 @@ Feature: Webcat complaints
     And a complaint entry preload exists
     And I goto "/escalations/webcat/complaints?f=ALL"
     Then I should not see "Update"
-    And I click ".expand-all"
-    And I trigger-click "#fixed1"
+    And I click ".expand-row-button-inline"
+    And I wait for "5" seconds
+    And I click "#fixed1"
     And I should see "Update"
     And I should not see "commit"
     When I click "#submit_changes_1"
@@ -187,7 +188,7 @@ Feature: Webcat complaints
     And a complaint entry preload exists
     And I goto "/escalations/webcat/complaints?f=ALL"
     And I wait for "5" seconds
-    And I click ".expand-all"
+    And I click ".expand-row-button-inline"
     And I wait for "5" seconds
     And I click "#submit_changes_1"
     And I wait for "5" seconds
@@ -200,7 +201,7 @@ Feature: Webcat complaints
     And a complaint entry preload exists
     And I goto "/escalations/webcat/complaints?f=ALL"
     And I wait for "5" seconds
-    And I click ".expand-all"
+    And I click ".expand-row-button-inline"
     And I wait for "5" seconds
     And I click "#unchanged1"
     And I click "#submit_changes_1"
@@ -214,7 +215,7 @@ Feature: Webcat complaints
     And a complaint entry preload exists
     And I goto "/escalations/webcat/complaints?f=ALL"
     And I wait for "5" seconds
-    And I click ".expand-all"
+    And I click ".expand-row-button-inline"
     And I wait for "5" seconds
     Then I click "#domain-1"
     Then I should see "Domain Information"
@@ -250,7 +251,7 @@ Feature: Webcat complaints
     |1 |
     And a complaint entry preload exists
     And I goto "/escalations/webcat/complaints?f=ALL"
-    And I click ".expand-all"
+    And I click ".expand-row-button-inline"
     Then I should see "Description for testing"
 
   @javascript
@@ -342,7 +343,7 @@ Feature: Webcat complaints
     And I click "#cat-urls-same"
     And I fill in "categorize_urls" with "joseph.com" and "mary.com" separated by blank lines
     And I fill in selectized with "Adult"
-    And I trigger-click ".primary"
+    And I click ".primary"
     And I wait for "45" seconds
     Then I should see "SUCCESS"
     And I should see "URLs/IPs successfully categorized."
@@ -354,7 +355,7 @@ Feature: Webcat complaints
     And I click "#categorize-urls"
     And I click "#cat-urls-same"
     And I fill in selectized with "Adult"
-    And I trigger-click ".primary"
+    And I click ".primary"
     And I wait for "5" seconds
     Then I should see "ERROR"
     Then I should see "Please check that a URL/IP has been inputted and that at least one category was selected."
@@ -366,7 +367,7 @@ Feature: Webcat complaints
     And I click "#categorize-urls"
     And I click "#cat-urls-same"
     And I fill in "categorize_urls" with "cisco.com"
-    And I trigger-click ".primary"
+    And I click ".primary"
     Then I should see "ERROR"
     Then I should see "Please check that a URL/IP has been inputted and that at least one category was selected."
 
@@ -413,9 +414,9 @@ Feature: Webcat complaints
     And a complaint entry with trait "new_entry" exists
     And a complaint entry preload exists
     When I goto "/escalations/webcat/complaints?f=ALL"
-    And I click ".expand-all"
+    And I click ".expand-row-button-inline"
     And I fill in "complaint_prefix_1" with "cisco.com"
-    And I trigger-click ".inline-button"
+    And I click ".inline-button"
     And I wait for "10" seconds
     Then I should see "SUCCESS"
     Then I should see "URI updated."
