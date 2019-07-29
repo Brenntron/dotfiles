@@ -9,5 +9,9 @@ class Escalations::OtherAdminTools::ToolsController < ApplicationController
     @available_tasks = AdminTask.available_tasks 
   end
 
+  def rule_api
+
+  end
+
 end
 
