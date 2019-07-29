@@ -468,7 +468,7 @@ class Escalations::Webrep::DisputesController < ApplicationController
 
         input_filenames = Dir.entries(@spreadsheet_directory).select {|f| !File.directory? f}
         if input_filenames.count > 1
-          filename = "webrep_export-#{Time.now}.zip"
+          filename = "webrep_export-#{Time.now.utc.iso8601}.zip"
           temp_file = Tempfile.new(filename)
 
           begin
