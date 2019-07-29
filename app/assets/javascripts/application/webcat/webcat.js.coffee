@@ -23,10 +23,11 @@ $ ->
   window.set_webcat_advanced = () ->
     # creating form object from array made from advanced dropdown form
     form = {
-      tags: tag_input[0].selectize.items.join()
+      tags: $(tag_input).is(':hidden') tag_input[0].selectize.items.join()
     }
-
-    for item in $('#cat_named_search').serializeArray()
+    debugger
+    console.log $(tag_input)
+    for item in $('#cat_named_search :input:not(:hidden)').serializeArray()
       { name, value } = item
       name = name.toLowerCase().replace(/-/g, '_')
       if name != 'tags'
@@ -93,7 +94,6 @@ $ ->
           search_type: webcat_search_type
           search_name: webcat_search_name
         }
-    console.log data
     build_header(data)
     return data
 
@@ -304,14 +304,17 @@ $ ->
                 width: '10px'
                 render: ( data )->
                   { is_important, was_dismissed } = data
-                  if is_important
-                    if was_dismissed
+                  html = ''
+
+                  if is_important && was_dismissed
                       return '<div class="container-important-tags">' +
                         '<div class="esc-tooltipped is-important" tooltip title="Important"></div>' +
                         '<div class="esc-tooltipped was-reviewed" tooltip title="Reviewed"></div>' +
                         '</div>'
-                    else
-                      return '<span class="esc-tooltipped is-important" tooltip title="Important"></span>'
+                  else if is_important && !was_dismissed
+                    return '<span class="esc-tooltipped is-important" tooltip title="Important"></span>'
+                  else if !is_important && was_dismissed
+                    return '<span class="esc-tooltipped was-reviewed" tooltip title="Reviewed"></span>'
               }
               {
                 data: 'entry_id'
@@ -496,6 +499,4 @@ $ ->
 
 $('#exampleModal').on 'shown.bs.modal', ->
   $('button.toolbar-button.cat-btn').addClass('active')
-
-#$('.toolbar-button').on 'click', ->
 

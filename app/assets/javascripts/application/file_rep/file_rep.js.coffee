@@ -353,11 +353,13 @@ $ ->
       data.selected_cases.push(case_id)
 
     if location.search != ''
+      urlParams = new URLSearchParams(location.search);
 #      if the location.search has value, it is a standard search
       data ={
         search_type : 'standard'
-        search_name : location.search.replace('?f=', '')
+        search_name : urlParams.get('f')
       }
+
       refresh_localStorage()
 
     else if localStorage.search_type
