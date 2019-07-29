@@ -31,4 +31,4 @@ Feature: Send to Threatgrid
     Then I click "button.close"
     Then I click "#research-tab-link"
     Then I click "send-to-threatgrid"
-    Then I should see "PROBLEM RETRIEVING DATA"
+    Then I should see "Sample successfully sent to ThreatGrid"
