@@ -643,9 +643,12 @@ button {
   .modal-body>div{
     line-height: 1.2em;
   }
+  .modal-header {
+    text-transform: capitalize;
+  }
 }
 
-[aria-describedby="commit-modal"] {
+[aria-describedby="error_modal"] {
   width: unset!important;
 }
 #edit-button, .edit-button      {background-image: url(image_path('icon_edit.svg'));}

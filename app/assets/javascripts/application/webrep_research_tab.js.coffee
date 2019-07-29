@@ -47,7 +47,7 @@ $ ->
 #    check_list = check_list.join(', ').replace(/, ([^,]*)$/, ', and $1')
   #    action.remove()
 
-  $(document).on 'mouseover', '.col-tag', (e) ->
+  $(document).on 'mouseover', '.col-tag:not(.dialog-tag)', (e) ->
     { target } = e
     if $('.remove-action').length == 0
       $( target ).append('<span class="remove-action clear-action-button"></span>')
@@ -157,8 +157,9 @@ $ ->
 
   window.set_action_wlbl_col = () ->
     selected_rows = $('.col-select-all input:checked')
-    $('.error_modal').dialog();
-    $('.error_modal').dialog( "destroy" );
+    $('.error_modal').dialog()
+    $( '.error_modal .modal-body' ).empty()
+    $('.error_modal').dialog( "destroy" )
     list_action = $('.wlbl-radio-add:checked').val()
     list_class = '.' + list_action
     action_desc = 'Add to: '
@@ -166,12 +167,12 @@ $ ->
       action_desc = 'Remove from: '
     checked_bl = $('.adjust_wlbl_checkbox:checked').map( () -> return $(this).val() ).get()
     error_array = []
-    error_header = '<h4>Cannot ' + list_action + 'the following actions <h4> '
+    error_header = '<h4>Cannot ' + list_action + ' the following Reptool Classification disputes <h4> '
     selected_rows.each ()->
       row = $(this).closest('tr')
       data = row.find('.col-bulk-dispute').text()
-      error_message = data + ': '
       if !isEmpty(data)
+        error_message = data + ': '
         action_col = row.find('.col-actions')
         existing_p = action_col.find( list_class + '.wlbl-action-col')
         clear_col = row.find('.col-clear-actions')
@@ -181,11 +182,11 @@ $ ->
           switch(list_action)
             when 'add'
               if wlbl_col.includes(wlbl)
-                error_message += wlbl + ', '
+                error_message += '<span class="col-tag dialog-tag">' + wlbl + '</span>, '
               return !wlbl_col.includes(wlbl)
             when 'remove'
               if !wlbl_col.includes(wlbl)
-                error_message += '<span class="col-tag">' + wlbl + '</span>, '
+                error_message += '<span class="col-tag dialog-tag">' + wlbl + '</span>, '
               return wlbl_col.includes(wlbl)
         )
 
@@ -204,8 +205,8 @@ $ ->
 
     if  error_array.length
       $( '.error_modal' ).dialog()
-      $( '.error_modal .modal-header' ).innerHTML = error_header
-      $( '.error_modal .modal-body' ).append(error_array)
+      $( '.error_modal .modal-header' ).html( error_header )
+      $( '.error_modal .modal-body' ).append( error_array )
 
   window.col_tag_format = (array) ->
     if typeof array == 'string'
@@ -222,10 +223,15 @@ $ ->
     return check_list
 
   window.set_action_col = () ->
-    selected_rows = $('.col-select-all input:checked')
-    check_vals = $('.adjust_reptool_checkbox:checked').map( () -> return $(this).val() ).get()
-    class_reptool = $('.status_bl:checked').val().replace('reptool-', '')
-    reptool_add  = $('.reptool-add:checked').val()
+
+    $( '.error_modal' ).dialog()
+    $( '.error_modal .modal-body' ).empty()
+    $( '.error_modal' ).dialog( 'destroy' )
+
+    selected_rows = $( '.col-select-all input:checked' )
+    check_vals = $( '.adjust_reptool_checkbox:checked' ).map( () -> return $(this).val() ).get()
+    class_reptool = $( '.status_bl:checked' ).val().replace( 'reptool-' , '' )
+    reptool_add  = $( '.reptool-add:checked' ).val()
     reptool_class = reptool_add
 
     switch (class_reptool)
@@ -239,6 +245,9 @@ $ ->
         check_list = ''
       when 'override'
         status_string = 'Add classifications: '
+
+    error_array = []
+    error_header = '<h4>Cannot ' + reptool_add + ' the following WLBL disputes <h4> '
 
     selected_rows.each () ->
       row = $(this).closest('tr')
@@ -256,6 +265,7 @@ $ ->
         existing_actions = []
         rep_list = this.innerText.split(',')
 
+      error_message = data + ': '
       if !isEmpty(data)
         if reptool_add  == 'drop'
           $( action_col ).empty()
@@ -270,17 +280,27 @@ $ ->
             check_class = '.add'
             existing_actions = existing_actions.concat(rep_list)
 
-          $(actions).find(check_class + ' .col-tag').each () ->
-            existing_actions.push( this.innerText )
+          $(actions).find(check_class + ' .col-tag').each () -> existing_actions.push( this.innerText )
+
           if reptool_add.toLowerCase() == 'remove'
-            check_list = check_vals.filter((rep)-> return rep_list.includes(rep))
+            check_list = check_vals.filter((rep)->
+              if !rep_list.includes(rep)
+                error_message += '<span class="col-tag dialog-tag">' + rep + '</span>, '
+              return rep_list.includes(rep)
+            )
           else
-            check_list = check_vals.filter((rep)-> return !existing_actions.includes(rep) && !rep_list.includes(rep))
+            check_list = check_vals.filter((rep)->
+              if existing_actions.includes(rep) || rep_list.includes(rep)
+                error_message += '<span class="col-tag dialog-tag">' + rep + '</span>, '
+              return !existing_actions.includes(rep) && !rep_list.includes(rep))
 
         clear_col = $( row.find('.col-clear-actions') )
         existing_p = action_col.find('.' + reptool_class + '.reptool-action-col')
         delete_button = '<button class="clear-action-button row-action-clear"></button>'
-
+        if error_message.endsWith(', ')
+          error_message = error_message.slice(0, error_message.length - 2);
+          error_html = '<div>' + error_message + '<div>'
+          error_array.push(error_html)
         col_dialog = "<p class='" + reptool_class + " reptool-action-col' data=' " + check_list + " '>" + status_string + col_tag_format(check_list) + "<p>"
         if check_list.length || reptool_add  == 'drop'
           clear_col.show()
@@ -288,6 +308,11 @@ $ ->
           $( action_col ).append(col_dialog)
           if !clear_col.has(".clear-action-button").length
             clear_col.append(delete_button)
+
+    if  error_array.length
+      $( '.error_modal' ).dialog()
+      $( '.error_modal .modal-header' ).html( error_header )
+      $( '.error_modal .modal-body' ).append(error_array)
 
   window.isEmpty = (item) ->
     # function to check whether or not objects and strings are empty, more variable types can be added as needed
@@ -316,7 +341,7 @@ $ ->
 
     if !isEmpty(parent_data) && !text_list.includes(parent_data)
       index = disputes.indexOf(parent_data)
-      disputes.splice(index, 1);
+      disputes.splice(index, 1)
       parent_index = parent_index - 1
 
     text_list = text_list.filter( (text)-> return !disputes_data.includes(text) )
@@ -413,7 +438,7 @@ $ ->
     e.preventDefault()
     search_items = []
     rows = $('.research-table tbody tr')
-    headers = { 'Token': $('input[name="token"]').val(),'Xmlrpc-Token': $('input[name="xml_token"]').val() }
+    headers = { 'Token': $('input[name="token"]').val(),'Xmlrpc-Token': $('input[name="xml_token"]').val() };
 
     $('.col-bulk-dispute').each ( ) ->
       text = $(this).text()
