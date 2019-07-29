@@ -104,17 +104,28 @@
                         .col-x-6
                           %hr.thin
                         .button-row-center
-                          %button.primary.dropdown-submit-button{type: 'button', onclick: '', disabled: true, onclick: 'set_action_col();'}
+                          %button.primary.dropdown-submit-button{type: 'button', disabled: true, onclick: 'set_action_col();'}
                             Add Action to Entries
-
-
               %div
                 %label.toolbar-section-label File
                 %button.toolbar-button.export-button.esc-tooltipped{title: 'Export to CSV'}
                   %span.toolbar-button-text Export to CSV
+              %div
+                %label.toolbar-section-label Actions
+                %button#clear-all-actions.toolbar-button.clear-button.esc-tooltipped{title: 'Clear all actions'}
+                  %span.toolbar-button-text Clear All Actions
+
             %button.primary#submit-rep-changes Submit Reputation Changes
             %span.small.note-repsubmit
               * NOTE: Submitting reputation changes will automatically create a closed ticket
+
+
+          #error_modal.modal.error_modal{tabindex:"-1", role:"dialog"}
+            .modal-header
+              %h4.modal-title#commit-modal-title Duplicate Dispute Requests
+            .modal-body
+
+
           %table#research-table.research-table
             %colgroup
               %col
@@ -125,6 +136,7 @@
               %col.alt-col
               %col.alt-col
               %col.alt-col
+              %col
               %col
             %thead
               %tr
@@ -139,6 +151,7 @@
                 %th WLBL
                 %th Reptool Classification
                 %th Actions
+                %th
             %tbody
               %tr
                 %td.col-select-all
@@ -151,6 +164,7 @@
                 %td.col-wlbl
                 %td.col-reptool-class
                 %td.col-actions
+                %td.col-clear-actions
   .row
     .col-xs-12
       - if params['search']

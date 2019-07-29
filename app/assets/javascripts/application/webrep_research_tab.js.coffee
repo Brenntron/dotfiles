@@ -7,6 +7,57 @@ $ ->
   $('.reputation-research-search-wrapper a').on 'click', () ->
     hide_toolbar()
 
+  $(document).on 'click', '#clear-all-actions', (e) ->
+    e.preventDefault()
+    selected_rows = $('.col-select-all input:checked')
+    $( selected_rows ).each ()->
+      row = $( this ).closest('tr')
+      $( row ).find('.col-actions').empty()
+      $( row ).find('.col-clear-actions').empty()
+
+  $(document).on 'click', '.row-action-clear', (e) ->
+    e.preventDefault()
+    { target } = e
+    row = $(target).closest('tr')
+    col_actions = row.find('.col-actions')
+    $(target).remove()
+    $( col_actions ).empty()
+
+  $(document).on 'click', '.remove-action', (e) ->
+    e.preventDefault()
+    { target } = e
+    action = $(target).closest('.col-tag').text()
+    p_tag = $(target).closest('p')
+
+    data = p_tag[0].attributes.data.value.split(',')
+    data = $.map( data , $.trim)
+
+    data = data.filter( (item)-> return action != item)
+    if data.length > 1
+      data_string = data.join(' and ')
+    else
+      data_string = data.join(', ').replace(/, ([^,]*)$/, ', and $1')
+
+    if $( p_tag ).hasClass('reptool-action-col')
+      string = 'Drop all classifications (set entry to EXPIRED)' + data_string
+    else
+      string = 'Add classifications: ' + data_string
+
+
+  $(document).on 'click', '.col-tag:not(.dialog-tag)', (e) ->
+    { target } = e
+    action = $(target).text()
+    action_p = $(target).closest('p')
+    action_edit = action_p.text().split(':')[0];
+    data = $(action_p).attr('data').split(',')
+    $(target).remove()
+
+    data = data.filter((data_actions)-> return action != data_actions)
+    col_dialog = action_edit + ': ' + col_tag_format(data)
+
+    $(action_p).attr('data', data)
+    $(action_p).innerText = col_dialog
+
   hide_toolbar = () ->
   # hides toolbar depending on which tab in bulk research panel is open
     tab = window.location.href
@@ -81,8 +132,8 @@ $ ->
     dropdown = $('#wlbl_entries_dropdown')
     list = $(dropdown).find('ul')
     type = 'wlbl'
-    wlbl_options = [ "WL - Weak", "WL - Medium", "WL - Heavy",
-                     "BL - Weak", "BL - Medium", "BL - Heavy"]
+    wlbl_options = [ "WL-weak", "WL-med", "WL-heavy",
+                     "BL-weak", "BL-med", "BL-heavy"]
     if !$(list).has('label').length
       build_checkbox_list(wlbl_options, list, type)
 
@@ -97,75 +148,183 @@ $ ->
       $(list).append(checkbox)
 
   window.set_action_wlbl_col = () ->
-    dropdown = $('#wlbl_entries_dropdown')
     selected_rows = $('.col-select-all input:checked')
+    $('.error_modal').dialog()
+    $( '.error_modal .modal-body' ).empty()
+    $('.error_modal').dialog( "destroy" )
     list_action = $('.wlbl-radio-add:checked').val()
-
-    if list_action == 'add'
-      list_action = 'Add to: '
-    else
-      list_action = 'Remove from: '
-
-    checked_bl = $('.adjust_wlbl_checkbox:checked')
-    check_list = []
-    for item in checked_bl
-      check_name = "<span class='col-tag'>" + $(item).val() + "</span> "
-      check_list.push(check_name)
-
-    if check_list.length == 2
-      check_list = check_list.join(' and ')
-    else
-      check_list = check_list.join(', ').replace(/, ([^,]*)$/, ', and $1')
-
-    col_dialog = "<p class='wlbl-action-col'>" + list_action + check_list + "<p>"
-
+    list_class = '.' + list_action
+    action_desc = 'Add to: '
+    if list_action == 'remove'
+      action_desc = 'Remove from: '
+    checked_bl = $('.adjust_wlbl_checkbox:checked').map( () -> return $(this).val() ).get()
+    error_array = []
+    error_header = '<h4>Cannot ' + list_action + ' the following Reptool Classification disputes <h4> '
     selected_rows.each ()->
       row = $(this).closest('tr')
       data = row.find('.col-bulk-dispute').text()
-      action_col = row.find('.col-actions')
-      existing_p = action_col.find('.wlbl-action-col')
-
       if !isEmpty(data)
-        $(existing_p).remove()
-        $(action_col).append(col_dialog)
+        error_message = data + ': '
+        action_col = row.find('.col-actions')
+        existing_p = action_col.find( list_class + '.wlbl-action-col')
+        clear_col = row.find('.col-clear-actions')
+        wlbl_col = row.find('.col-wlbl').text().replace(/ /g, '').split(',')
+        
+        check_list_array = checked_bl.filter( (wlbl)->
+          switch(list_action)
+            when 'add'
+              if wlbl_col.includes(wlbl)
+                error_message += '<span class="col-tag dialog-tag">' + wlbl + '</span>, '
+              return !wlbl_col.includes(wlbl)
+            when 'remove'
+              if !wlbl_col.includes(wlbl)
+                error_message += '<span class="col-tag dialog-tag">' + wlbl + '</span>, '
+              return wlbl_col.includes(wlbl)
+        )
+
+        check_list = col_tag_format(check_list_array)
+        col_dialog = "<p class='wlbl-action-col " +  list_action + "' data='" + check_list_array + "'>" + action_desc + check_list + "<p>"
+        delete_button = '<button class="clear-action-button row-action-clear"></button>'
+        if error_message.endsWith(', ')
+          error_message = error_message.slice(0, error_message.length - 2);
+          error_html = '<div>' + error_message + '<div>'
+          error_array.push(error_html)
+        if check_list_array.length
+          $(existing_p).remove()
+          $(action_col).append(col_dialog)
+          if !$(clear_col).has(".clear-action-button").length
+            $(clear_col).append(delete_button)
+
+    if  error_array.length
+      $( '.error_modal' ).dialog(
+         position:
+           my: "right",
+           at: "top+15%",
+           of: window
+      )
+      $( '.error_modal .modal-header' ).html( error_header )
+      $( '.error_modal .modal-body' ).append( error_array )
+
+  window.col_tag_format = (array) ->
+    if typeof array == 'string'
+      array = array.split(',')
+    check_list_array = []
+    check_list = ''
+    for val in array
+      check_name = "<span class='col-tag'>" + val + "</span> "
+      check_list_array.push(check_name)
+    if check_list_array.length == 2
+      check_list = check_list_array.join(' and ')
+    else
+      check_list = check_list_array.join(', ').replace(/, ([^,]*)$/, ', and $1')
+    return check_list
 
   window.set_action_col = () ->
-    dropdown = $('#reptool_entries_bl_dropdown')
-    selected_rows = $('.col-select-all input:checked')
-    checked_bl = $(dropdown).find('.adjust_reptool_checkbox:checked')
-    check_list = []
-    class_bl = $('.status_bl:checked').val().replace('reptool-', '')
-    reptool_add  = $('.reptool-add:checked').val()
-    status_string = 'Add classifications: '
 
-    for item in checked_bl
-      check_name = "<span class='col-tag'>" + $(item).val() + "</span> "
-      check_list.push(check_name)
+    $( '.error_modal' ).dialog(
+      position:
+        my: "right",
+        at: "top+15%",
+        of: window
+    )
+    $( '.error_modal .modal-body' ).empty()
+    $( '.error_modal' ).dialog( 'destroy' )
 
-    if check_list.length == 2
-      check_list = check_list.join(' and ')
-    else
-      check_list = check_list.join(', ').replace(/, ([^,]*)$/, ', and $1')
+    selected_rows = $( '.col-select-all input:checked' )
+    check_vals = $( '.adjust_reptool_checkbox:checked' ).map( () -> return $(this).val() ).get()
+    class_reptool = $( '.status_bl:checked' ).val().replace( 'reptool-' , '' )
+    reptool_add  = $( '.reptool-add:checked' ).val()
+    reptool_class = reptool_add
 
-
-    switch(class_bl)
+    switch (class_reptool)
       when 'maintain'
-        if reptool_add == 'remove'
-          status_string = 'Remove classifications: '
+        reptool_dialog = reptool_add.charAt(0).toUpperCase() + reptool_add.slice(1)
+        status_string = reptool_dialog + ' classifications: '
       when 'drop'
         status_string = 'Drop all classifications (set entry to EXPIRED)'
+        reptool_add = 'drop'
+        reptool_class = 'drop'
         check_list = ''
+      when 'override'
+        status_string = 'Add classifications: '
 
-    col_dialog = "<p class='reptool-action-col'>" + status_string + check_list + "<p>"
+    error_array = []
+    error_header = '<h4>Cannot ' + reptool_add + ' the following Reptool Classification disputes <h4> '
 
-    selected_rows.each ()->
-        row = $(this).closest('tr')
-        data = row.find('.col-bulk-dispute').text()
-        action_col = row.find('.col-actions')
-        existing_p = action_col.find('.reptool-action-col')
-        if !isEmpty(data)
-          $( existing_p).remove()
-          $(action_col).append(col_dialog)
+    selected_rows.each () ->
+      row = $(this).closest('tr')
+      data = row.find('.col-bulk-dispute').text()
+      action_col = row.find('.col-actions')
+      existing_reptool = row.find('.col-reptool-class:not(.missing-data)')
+      rep_list = []
+      existing_reptool.each () ->
+        actions = $(this).closest('tr').find('.col-actions')
+        $(actions).children().each ->
+          action_data = $(this).attr('data')
+          if action_data
+            rep_list = action_data.trim().split(',')
+
+        existing_actions = []
+        rep_list = this.innerText.split(',')
+
+      error_message = data + ': '
+      if !isEmpty(data)
+
+        if reptool_add == 'drop'
+          if existing_reptool.length
+            $( action_col ).empty()
+          else
+            error_message = data + ' has no classifications to drop.'
+        if reptool_add != 'drop'
+          $( '.drop.reptool-action-col' ).remove()
+          actions = row.find('.col-actions')
+          existing_actions = []
+
+          if reptool_add.toLowerCase() == 'add'
+            check_class = '.remove'
+          else
+            check_class = '.add'
+            existing_actions = existing_actions.concat(rep_list)
+
+          $(actions).find(check_class + ' .col-tag').each () -> existing_actions.push( this.innerText )
+
+          if reptool_add.toLowerCase() == 'remove'
+            check_list = check_vals.filter( (rep)->
+              if !rep_list.includes(rep)
+                error_message += '<span class="col-tag dialog-tag">' + rep + '</span>, '
+              return rep_list.includes(rep)
+            )
+          else if reptool_add.toLowerCase() == 'add'
+            check_list = check_vals.filter( (rep)->
+              if existing_actions.includes(rep) || rep_list.includes(rep)
+                error_message += '<span class="col-tag dialog-tag">' + rep + '</span>, '
+              return !existing_actions.includes(rep) && !rep_list.includes(rep))
+          else
+
+        clear_col = $( row.find('.col-clear-actions') )
+        existing_p = action_col.find('.' + reptool_class + '.reptool-action-col')
+        delete_button = '<button class="clear-action-button row-action-clear"></button>'
+        if error_message.endsWith(', ')
+          error_message = error_message.slice(0, error_message.length - 2);
+          error_html = '<div>' + error_message + '<div>'
+          error_array.push(error_html)
+        else if error_message.includes('has no classifications to drop')
+          error_html = '<div>' + error_message + '<div>'
+          error_array.push(error_html)
+
+        col_dialog = "<p class='" + reptool_class + " reptool-action-col' data=' " + check_list + " '>" + status_string + col_tag_format(check_list) + "<p>"
+        drop_check = reptool_add  == 'drop' && existing_reptool.length
+        if check_list.length || drop_check
+          clear_col.show()
+          $( existing_p ).remove()
+          $( action_col ).append( col_dialog )
+          if !clear_col.has(".clear-action-button").length
+            clear_col.append(delete_button)
+
+    if  error_array.length
+      $( '.error_modal' ).dialog().position('top')
+      $( '.error_modal .modal-header' ).html( error_header )
+      $( '.error_modal .modal-body' ).append(error_array)
 
   window.isEmpty = (item) ->
     # function to check whether or not objects and strings are empty, more variable types can be added as needed
@@ -194,7 +353,7 @@ $ ->
 
     if !isEmpty(parent_data) && !text_list.includes(parent_data)
       index = disputes.indexOf(parent_data)
-      disputes.splice(index, 1);
+      disputes.splice(index, 1)
       parent_index = parent_index - 1
 
     text_list = text_list.filter( (text)-> return !disputes_data.includes(text) )
@@ -218,9 +377,9 @@ $ ->
         tbody.innerHTML +=
           '<tr>' +
             '<td class="col-select-all">' +
-            '<span class="checkbox-wrapper">' +
-            '<input type="checkbox" checked>' +
-            '</span>' +
+              '<span class="checkbox-wrapper">' +
+                '<input type="checkbox" checked>' +
+              '</span>' +
             '</td>'+
             '<td class="col-bulk-dispute" contenteditable="true" data=' + disputes[i] + '><p>' + disputes[i] + '</p></td>'+
             '<td class="col-wbrs"></td>'+
@@ -230,7 +389,8 @@ $ ->
             '<td class="col-wlbl"></td>'+
             '<td class="col-reptool-class"></td>'+
             '<td class="col-actions" data=""></td>' +
-            '</tr>'
+            '<td class="col-clear-actions"></td>' +
+          '</tr>'
       else
         # if the dispute is an HTML object, set it as OuterHTML to avoid formatting issues
         tbody.innerHTML += disputes[i].outerHTML
@@ -260,10 +420,10 @@ $ ->
     row = el.closest('tr')
     tbody = row.closest('tbody')
 
-    text_list = text_list.filter( (item, index) ->
+    text_list = text_list.filter (item, index) ->
       if item != ''
         return text_list.indexOf item == index
-    )
+
     switch( key )
       when 13
         if !shiftKey && text_list.length
@@ -290,13 +450,12 @@ $ ->
     e.preventDefault()
     search_items = []
     rows = $('.research-table tbody tr')
-    headers = { 'Token': $('input[name="token"]').val(),'Xmlrpc-Token': $('input[name="xml_token"]').val() }
+    headers = { 'Token': $('input[name="token"]').val(),'Xmlrpc-Token': $('input[name="xml_token"]').val() };
 
-    $('.col-bulk-dispute').each( ( ) ->
+    $('.col-bulk-dispute').each ( ) ->
       text = $(this).text()
-      if text != ''
+      if !isEmpty(text)
         search_items.push(text)
-    )
 
     for i in [0...search_items.length]
       item = search_items[i]

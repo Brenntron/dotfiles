@@ -636,7 +636,22 @@ button {
   background-position: 17px 2px;
 }
 
+.error_modal {
+  .modal-dialog{
+    width: unset!important;
+  }
+  .modal-body>div{
+    line-height: 1.2em;
+  }
+  .modal-header {
+    text-transform: capitalize;
+  }
+}
 
+[aria-describedby="error_modal"] {
+  width: unset!important;
+  z-index: 9000
+}
 #edit-button, .edit-button      {background-image: url(image_path('icon_edit.svg'));}
 .related-button   {background-image: url(image_path('icon_related.svg'));}
 .delete-button    {background-image: url(image_path('icon_delete.svg'));}
@@ -654,6 +669,14 @@ button {
 .commit-button, .committer-label, .commit-logs-label, .commit-label  {background-image: url(image_path('icon_committer.svg'));}
 .research-label   {background-image: url(image_path('icon_researcher.svg'));}
 .export-button    {background-image: url(image_path('icon_export.svg'));}
+.clear-button    {background-image: url(image_path('icon_clear.svg'));}
+.clear-action-button {
+    background-image: url(image_path('icon_delete_grey.svg'));
+    height: 20px;
+    width: 20px;
+    border: none;
+    background-color: unset;
+  }
 .expand-button    {background-image: url(image_path('icon_expand.svg'));}
 .expand-row-button {background-image: url(image_path('icon_expand2.svg'));}
 .add-file-button  {background-image: url(image_path('icon_add_file.svg'));}
@@ -8371,8 +8394,17 @@ th.sorting_1, th.sorting_asc, th.sorting_desc {
   font-size: 8pt;
   font-family: "Fira Mono", monospace;
 }
+
+.col-tag:not(.dialog-tag):hover:after{
+  content: ' | X ';
+  height: 20px;
+  width: 20px;
+  border: none;
+  background-color: unset;
+  cursor: pointer;
+}
+
 .wlbl-tag{
-  //font-size: 8pt;
   font-family: "Fira Mono", monospace;
   font-weight: bold;
 }
