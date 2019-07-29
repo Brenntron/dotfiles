@@ -136,6 +136,7 @@ $ ->
       {search_type, search_name} = data
 
       if search_type == 'standard'
+        search_name = search_name.toLowerCase()
         new_header =
           '<div>' +
             '<span class="text-capitalize">' + search_name.replace(/_|%20/g, " ") + ' tickets </span>' +
