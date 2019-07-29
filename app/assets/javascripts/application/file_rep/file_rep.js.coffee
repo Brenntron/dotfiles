@@ -212,6 +212,36 @@ $ ->
   $(document).on 'click', '.sorting[aria-controls="file-rep-datatable"]', () ->
     sorting_request = true
 
+  # Displays comment/resolution modal for FileRep Status radio labels
+  $('.fr-ticket-status-radio-label').click ->
+    radio_button = $(this).prev('.fr-ticket-status-radio')
+    $(radio_button[0]).trigger('click')
+    if $(radio_button).attr('id') == 'file-status-closed'
+      $('#show-ticket-resolution-submenu').show()
+      stat_comment = $('#ticket-non-res-submit').find('.ticket-status-comment')
+      $('#ticket-non-res-submit').hide()
+      $(stat_comment).val('')
+    else
+      $('#ticket-non-res-submit').show()
+      res_comment = $('.resolution-comment-wrapper').find('.ticket-status-comment')
+      $('.ticket-resolution-radio').prop('checked', false)
+      $('#show-ticket-resolution-submenu').hide()
+      $(res_comment[0]).val('')
+
+  # Displays comment/resolution modal depending for FileRep Status radio buttons
+  $('.fr-ticket-status-radio').click ->
+    if $(this)[0].id == 'file-status-closed'
+      $('#show-ticket-resolution-submenu').show()
+      stat_comment = $('#ticket-non-res-submit').find('.ticket-status-comment')
+      $('#ticket-non-res-submit').hide()
+      $(stat_comment).val('')
+    else
+      $('#ticket-non-res-submit').show()
+      res_comment = $('.resolution-comment-wrapper').find('.ticket-status-comment')
+      $('.ticket-resolution-radio').prop('checked', false)
+      $('#show-ticket-resolution-submenu').hide()
+      $(res_comment[0]).val('')
+
   window.triggerTooltips = (item) ->
     $('.tooltip_content').show()
     $('.nested-tooltipped').tooltipster
