@@ -650,6 +650,7 @@ button {
 
 [aria-describedby="error_modal"] {
   width: unset!important;
+  z-index: 9000
 }
 #edit-button, .edit-button      {background-image: url(image_path('icon_edit.svg'));}
 .related-button   {background-image: url(image_path('icon_related.svg'));}

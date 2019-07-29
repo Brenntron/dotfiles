@@ -196,7 +196,12 @@ $ ->
             $(clear_col).append(delete_button)
 
     if  error_array.length
-      $( '.error_modal' ).dialog()
+      $( '.error_modal' ).dialog(
+         position:
+           my: "right",
+           at: "top+15%",
+           of: window
+      )
       $( '.error_modal .modal-header' ).html( error_header )
       $( '.error_modal .modal-body' ).append( error_array )
 
@@ -216,7 +221,12 @@ $ ->
 
   window.set_action_col = () ->
 
-    $( '.error_modal' ).dialog()
+    $( '.error_modal' ).dialog(
+      position:
+        my: "right",
+        at: "top+15%",
+        of: window
+    )
     $( '.error_modal .modal-body' ).empty()
     $( '.error_modal' ).dialog( 'destroy' )
 
@@ -312,7 +322,7 @@ $ ->
             clear_col.append(delete_button)
 
     if  error_array.length
-      $( '.error_modal' ).dialog()
+      $( '.error_modal' ).dialog().position('top')
       $( '.error_modal .modal-header' ).html( error_header )
       $( '.error_modal .modal-body' ).append(error_array)
 
