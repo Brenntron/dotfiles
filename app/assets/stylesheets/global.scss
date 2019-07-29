@@ -8392,23 +8392,18 @@ th.sorting_1, th.sorting_asc, th.sorting_desc {
   padding: 0 3px;
   font-size: 8pt;
   font-family: "Fira Mono", monospace;
-  .clear-action-button{
-    display: inline-block;
-    background-color: white;
-    height: 15px;
-    width: 15px;
-    position: relative;
-    top: 3px;
-    left: 3px;
-  }
-  .clear-action-button:hover{
-    cursor: pointer;
-  }
+}
 
+.col-tag:not(.dialog-tag):hover:after{
+  content: ' | X ';
+  height: 20px;
+  width: 20px;
+  border: none;
+  background-color: unset;
+  cursor: pointer;
 }
 
 .wlbl-tag{
-  //font-size: 8pt;
   font-family: "Fira Mono", monospace;
   font-weight: bold;
 }

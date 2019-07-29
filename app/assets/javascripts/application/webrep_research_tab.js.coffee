@@ -43,14 +43,20 @@ $ ->
     else
       string = 'Add classifications: ' + data_string
 
-#    check_list = check_list.join(' and ')
-#    check_list = check_list.join(', ').replace(/, ([^,]*)$/, ', and $1')
-  #    action.remove()
 
-  $(document).on 'mouseover', '.col-tag:not(.dialog-tag)', (e) ->
+  $(document).on 'click', '.col-tag:not(.dialog-tag)', (e) ->
     { target } = e
-    if $('.remove-action').length == 0
-      $( target ).append('<span class="remove-action clear-action-button"></span>')
+    action = $(target).text()
+    action_p = $(target).closest('p')
+    action_edit = action_p.text().split(':')[0];
+    data = $(action_p).attr('data').split(',')
+    $(target).remove()
+
+    data = data.filter((data_actions)-> return action != data_actions)
+    col_dialog = action_edit + ': ' + col_tag_format(data)
+
+    $(action_p).attr('data', data)
+    $(action_p).innerText = col_dialog
 
   $(document).on 'mouseout', '.col-tag', (e) ->
     setTimeout ()->
