@@ -23,10 +23,11 @@ $ ->
   window.set_webcat_advanced = () ->
     # creating form object from array made from advanced dropdown form
     form = {
-      tags: tag_input[0].selectize.items.join()
+      tags: $(tag_input).is(':hidden') tag_input[0].selectize.items.join()
     }
-
-    for item in $('#cat_named_search').serializeArray()
+    debugger
+    console.log $(tag_input)
+    for item in $('#cat_named_search :input:not(:hidden)').serializeArray()
       { name, value } = item
       name = name.toLowerCase().replace(/-/g, '_')
       if name != 'tags'
@@ -93,7 +94,6 @@ $ ->
           search_type: webcat_search_type
           search_name: webcat_search_name
         }
-    console.log data
     build_header(data)
     return data
 
@@ -305,7 +305,6 @@ $ ->
                 render: ( data )->
                   { is_important, was_dismissed } = data
                   html = ''
-                  console.log is_important && was_dismissed
 
                   if is_important && was_dismissed
                       return '<div class="container-important-tags">' +
