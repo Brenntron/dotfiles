@@ -304,14 +304,18 @@ $ ->
                 width: '10px'
                 render: ( data )->
                   { is_important, was_dismissed } = data
-                  if is_important
-                    if was_dismissed
+                  html = ''
+                  console.log is_important && was_dismissed
+
+                  if is_important && was_dismissed
                       return '<div class="container-important-tags">' +
                         '<div class="esc-tooltipped is-important" tooltip title="Important"></div>' +
                         '<div class="esc-tooltipped was-reviewed" tooltip title="Reviewed"></div>' +
                         '</div>'
-                    else
-                      return '<span class="esc-tooltipped is-important" tooltip title="Important"></span>'
+                  else if is_important && !was_dismissed
+                    return '<span class="esc-tooltipped is-important" tooltip title="Important"></span>'
+                  else if !is_important && was_dismissed
+                    return '<span class="esc-tooltipped was-reviewed" tooltip title="Reviewed"></span>'
               }
               {
                 data: 'entry_id'
@@ -496,6 +500,4 @@ $ ->
 
 $('#exampleModal').on 'shown.bs.modal', ->
   $('button.toolbar-button.cat-btn').addClass('active')
-
-#$('.toolbar-button').on 'click', ->
 
