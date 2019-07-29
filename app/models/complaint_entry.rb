@@ -502,9 +502,9 @@ class ComplaintEntry < ApplicationRecord
       when "MY COMPLAINTS"
         where(user_id: user.id)
       when "MY OPEN COMPLAINTS"
-        where(user_id: user.id).where.not(status: STATUS_COMPLETED)
+        where(user_id: user.id).where.not(status: [STATUS_COMPLETED, RESOLVED])
       when "MY CLOSED COMPLAINTS"
-        where(user_id: user.id, status:"COMPLETED")
+        where(user_id: user.id, status: [STATUS_COMPLETED, RESOLVED])
       when "ALL"
         all
       else
