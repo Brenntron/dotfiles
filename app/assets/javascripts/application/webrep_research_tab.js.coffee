@@ -58,15 +58,6 @@ $ ->
     $(action_p).attr('data', data)
     $(action_p).innerText = col_dialog
 
-  $(document).on 'mouseout', '.col-tag', (e) ->
-    setTimeout ()->
-      $('.remove-action').remove()
-    , 3500
-
-  $(document).on 'mouseout', '.remove-action', (e) ->
-    { target } = e
-    $( target ).remove()
-
   hide_toolbar = () ->
   # hides toolbar depending on which tab in bulk research panel is open
     tab = window.location.href
@@ -126,11 +117,6 @@ $ ->
       submit_btn.prop('disabled', false)
     else
       submit_btn.prop('disabled', true)
-
-  $(document).on 'click', 'clear_all_actions', (e) ->
-    e.preventDefault()
-    location.reload(false)
-
 
   window.open_adjust_reptool = () ->
     dropdown = $('#reptool_entries_bl_dropdown')
