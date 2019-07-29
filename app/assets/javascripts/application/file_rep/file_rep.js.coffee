@@ -359,8 +359,7 @@ $ ->
         search_type : 'standard'
         search_name : urlParams.get('f')
       }
-      console.log data
-      debugger
+
       refresh_localStorage()
 
     else if localStorage.search_type
