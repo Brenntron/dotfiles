@@ -169,7 +169,7 @@ $ ->
         existing_p = action_col.find( list_class + '.wlbl-action-col')
         clear_col = row.find('.col-clear-actions')
         wlbl_col = row.find('.col-wlbl').text().replace(/ /g, '').split(',')
-#        pick random from wlbl for testing wlbl_col = wlbl_col[Math.floor(Math.random()*wlbl_col.length)]
+        
         check_list_array = checked_bl.filter( (wlbl)->
           switch(list_action)
             when 'add'
