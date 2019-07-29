@@ -247,7 +247,7 @@ $ ->
         status_string = 'Add classifications: '
 
     error_array = []
-    error_header = '<h4>Cannot ' + reptool_add + ' the following WLBL disputes <h4> '
+    error_header = '<h4>Cannot ' + reptool_add + ' the following Reptool Classification disputes <h4> '
 
     selected_rows.each () ->
       row = $(this).closest('tr')
@@ -258,18 +258,22 @@ $ ->
       existing_reptool.each () ->
         actions = $(this).closest('tr').find('.col-actions')
         $(actions).children().each ->
-          data = $(this).attr('data')
-          if data
-            rep_list = data.trim().split(',')
+          action_data = $(this).attr('data')
+          if action_data
+            rep_list = action_data.trim().split(',')
 
         existing_actions = []
         rep_list = this.innerText.split(',')
 
       error_message = data + ': '
       if !isEmpty(data)
-        if reptool_add  == 'drop'
-          $( action_col ).empty()
-        else
+
+        if reptool_add == 'drop'
+          if existing_reptool.length
+            $( action_col ).empty()
+          else
+            error_message = data + ' has no classifications to drop.'
+        if reptool_add != 'drop'
           $( '.drop.reptool-action-col' ).remove()
           actions = row.find('.col-actions')
           existing_actions = []
@@ -283,16 +287,17 @@ $ ->
           $(actions).find(check_class + ' .col-tag').each () -> existing_actions.push( this.innerText )
 
           if reptool_add.toLowerCase() == 'remove'
-            check_list = check_vals.filter((rep)->
+            check_list = check_vals.filter( (rep)->
               if !rep_list.includes(rep)
                 error_message += '<span class="col-tag dialog-tag">' + rep + '</span>, '
               return rep_list.includes(rep)
             )
-          else
-            check_list = check_vals.filter((rep)->
+          else if reptool_add.toLowerCase() == 'add'
+            check_list = check_vals.filter( (rep)->
               if existing_actions.includes(rep) || rep_list.includes(rep)
                 error_message += '<span class="col-tag dialog-tag">' + rep + '</span>, '
               return !existing_actions.includes(rep) && !rep_list.includes(rep))
+          else
 
         clear_col = $( row.find('.col-clear-actions') )
         existing_p = action_col.find('.' + reptool_class + '.reptool-action-col')
@@ -301,11 +306,16 @@ $ ->
           error_message = error_message.slice(0, error_message.length - 2);
           error_html = '<div>' + error_message + '<div>'
           error_array.push(error_html)
+        else if error_message.includes('has no classifications to drop')
+          error_html = '<div>' + error_message + '<div>'
+          error_array.push(error_html)
+
         col_dialog = "<p class='" + reptool_class + " reptool-action-col' data=' " + check_list + " '>" + status_string + col_tag_format(check_list) + "<p>"
-        if check_list.length || reptool_add  == 'drop'
+        drop_check = reptool_add  == 'drop' && existing_reptool.length
+        if check_list.length || drop_check
           clear_col.show()
           $( existing_p ).remove()
-          $( action_col ).append(col_dialog)
+          $( action_col ).append( col_dialog )
           if !clear_col.has(".clear-action-button").length
             clear_col.append(delete_button)
 
