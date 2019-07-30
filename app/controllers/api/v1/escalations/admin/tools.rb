@@ -43,6 +43,28 @@ module API
 
             end
 
+            params do
+              requires :path, type: String
+              optional :user_arg, type: String
+            end
+
+            post "wbrs_call" do
+              #begin
+                path = permitted_params[:path]
+                arg = nil
+                arg = permitted_params[:user_arg] unless permitted_params[:user_arg].blank?
+                response = WbrsAdminTool.process(path, arg).to_json
+
+                {:status => 'success', :message => response}
+
+              #rescue
+              #  {:status => 'error', :message => 'something went fucky'}
+              #end
+
+
+            end
+
+
           end
         end
       end

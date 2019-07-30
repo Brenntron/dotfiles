@@ -33,6 +33,7 @@ class ComplaintEntry < ApplicationRecord
   end
 
   def self.is_ip?(ip)
+    ip = ip.scan(/(?:[0-9]{1,3}\.){3}[0-9]{1,3}/)[0] # When testing for IP address, don't include other parts of the url (e.g. 192.168.1.1/test.html is still a valid IP)
     !!IPAddr.new(ip) rescue false
   end
 
@@ -177,7 +178,7 @@ class ComplaintEntry < ApplicationRecord
                case_resolved_at: Time.now,user:current_user)
         complaint.set_status(current_status)
         #this is where we should send off the category to the API
-        if entry_status != "INVALID" && categories_string != ''
+        if !["INVALID","UNCHANGED"].include?(entry_status) && categories_string != ''
           commit_category(ip_or_uri: prefix,
                           categories_string: categories_string,
                           description: comment,
@@ -281,7 +282,11 @@ class ComplaintEntry < ApplicationRecord
     end
 
     if is_ip?(ip_url)
-      new_complaint_entry.ip_address = ip_url
+      ip_url.chomp!("/")
+      ip_network = ip_url.scan(/(?:[0-9]{1,3}\.){3}[0-9]{1,3}/)[0]
+      ip_path = ip_url.sub(ip_network, '')
+      new_complaint_entry.ip_address = ip_network
+      new_complaint_entry.path = ip_path
       new_complaint_entry.entry_type = "IP"
 
     else
@@ -369,9 +374,12 @@ class ComplaintEntry < ApplicationRecord
 
 
       if is_ip?(ip_url)
-        new_complaint_entry.ip_address = ip_url
+        ip_url.chomp!("/")
+        ip_network = ip_url.scan(/(?:[0-9]{1,3}\.){3}[0-9]{1,3}/)[0]
+        ip_path = ip_url.sub(ip_network, '')
+        new_complaint_entry.ip_address = ip_network
+        new_complaint_entry.path = ip_path
         new_complaint_entry.entry_type = "IP"
-
       else
         url_parts = Complaint.parse_url(ip_url)
         new_complaint_entry.uri = ip_url
@@ -502,9 +510,9 @@ class ComplaintEntry < ApplicationRecord
       when "MY COMPLAINTS"
         where(user_id: user.id)
       when "MY OPEN COMPLAINTS"
-        where(user_id: user.id).where.not(status: STATUS_COMPLETED)
+        where(user_id: user.id).where.not(status: [STATUS_COMPLETED, RESOLVED])
       when "MY CLOSED COMPLAINTS"
-        where(user_id: user.id, status:"COMPLETED")
+        where(user_id: user.id, status: [STATUS_COMPLETED, RESOLVED])
       when "ALL"
         all
       else

@@ -368,7 +368,7 @@ Then(/^I do some debugging$/) do
 end
 
 And(/^I resize the browser to "(.*?)" X "(.*?)"$/) do |x,y|
-  Capybara.page.driver.browser.resize(x,y)
+  page.current_window.resize_to(x, y)
 end
 
 Then(/^open inspector$/) do
@@ -393,7 +393,7 @@ Then(/^I see "(.*?)" in element "(.*?)"/) do |content, element|
 end
 
 Then /I click "(.*?)" and switch to the new window/ do |target|
-  page.switch_to_window(page.window_opened_by{find(target).trigger('click')})
+  page.switch_to_window(page.window_opened_by{find(target).click})
 end
 
 Then (/^I should receive a file of type "(.*?)"/) do |type|

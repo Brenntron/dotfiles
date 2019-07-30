@@ -84,6 +84,7 @@ $ ->
           search_conditions: JSON.parse(webcat_search_conditions)
         }
       when 'standard'
+        urlParams = new URLSearchParams(location.search);
         data = {
           search_type: webcat_search_type
           search_name: urlParams.get('f')
