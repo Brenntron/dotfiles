@@ -242,7 +242,7 @@ module ApiRequester::ApiRequester
     def new_query_body_request(path, query:, headers: {})
       request = new_request(path)
       request.headers = default_headers.merge(headers).merge("Content-Type" => "application/x-www-form-urlencoded")
-      request.body = query_string(query)
+      request.body = URI.encode(query_string(query))
       request
     end
 

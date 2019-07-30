@@ -318,8 +318,8 @@ Then(/^I click the link with data-target "(.*?)"$/) do |target|
   find("a[data-target='#{target}']").click
 end
 
-Then(/^I click the span with data-target "(.*?)"$/) do |target|
-  find("span[data-target='#{target}']").click
+Then(/^I click the button with data-target "(.*?)"$/) do |target|
+  find("button[data-target='#{target}']").click
 end
 
 And(/^"(.*?)" should be in the "(.*?)" dropdown list$/) do |value, field|
@@ -368,7 +368,7 @@ Then(/^I do some debugging$/) do
 end
 
 And(/^I resize the browser to "(.*?)" X "(.*?)"$/) do |x,y|
-  Capybara.page.driver.browser.resize(x,y)
+  page.current_window.resize_to(x, y)
 end
 
 Then(/^open inspector$/) do
@@ -393,15 +393,19 @@ Then(/^I see "(.*?)" in element "(.*?)"/) do |content, element|
 end
 
 Then /I click "(.*?)" and switch to the new window/ do |target|
-  page.switch_to_window(page.window_opened_by{find(target).trigger('click')})
+  page.switch_to_window(page.window_opened_by{find(target).click})
 end
 
 Then (/^I should receive a file of type "(.*?)"/) do |type|
   result = page.response_headers['Content-Type'].should == type
 end
 
+Then (/^I hit enter within "(.*?)"/) do |element|
+  find(element).native.send_keys(:return)
+end
+
 Then(/^There is only one element of class, "(.*?)"$/) do |value|
-    expect(page.evaluate_script("$('.#{value}').length")).to eq(1)
+  expect(page.evaluate_script("$('.#{value}').length")).to eq(1)
 end
 
 Given(/^I click on element "(.*?)" with alt "(.*?)"$/) do |element, alt|
