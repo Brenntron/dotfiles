@@ -14,6 +14,7 @@ module API
         mount API::V1::Escalations::FileRep::SandboxApi
         mount API::V1::Escalations::FileRep::Disputes
         mount API::V1::Escalations::FileRep::DisputeComments
+        mount API::V1::Escalations::FileRep::EmailTemplates
         mount API::V1::Escalations::FileRep::SampleZoo
         mount API::V1::Escalations::Webrep::Disputes
         mount API::V1::Escalations::Webrep::DisputeEmails

@@ -1,0 +1,106 @@
+- content_for(:title) do
+  User #{@user[:display_name]} - Analyst Console
+
+
+.content-wrapper
+  .row
+    .col-xs-4.col-with-divider
+      .user-profile-wrapper
+        %label.content-label-sm User Profile
+        %h1.username_header=@user.cvs_username
+        %label.content-label-md=@user[:display_name]
+        %br
+        %span.data_small_emphasis
+          =@user.roles.map(&:role).join(', ')
+
+
+        -# Check Marlin's commit on Dec 18 regarding user role and api key
+        - if current_user.has_role?('api user')
+          %hr.thin
+          .user-access-wrapper
+            %label.content-label-sm Access
+            %label.content-label-md Application Token
+            %pre.code-snippet
+              = current_user.authentication_token
+            %label.content-label-md.extra-space Bugzilla Token
+            %pre.code-snippet
+              = xml_token
+
+      .user-buttons
+        - if @user != current_user
+          %a{href: "mailto:#{@user.email}"}
+            %button.toolbar-button.email-button.tooltipped{title: "Send Message to #{@user.cvs_username}"}
+        - if can?(:manage, @user)
+          %button.toolbar-button.edit-button.tooltipped{title: "Edit #{@user.cvs_username}'s roles", 'data-toggle': 'modal', 'data-target': "#roleModal_#{@user.id}"}
+        - if @user == current_user && @user.has_role?('manager')
+          = link_to escalations_users_path do
+            %button.toolbar-button.manage-button.tooltipped{title: "Manage Team"}
+
+    .col-xs-8.col-with-divider
+      .row
+        .col-xs-12
+          %label.content-label-md.team-label
+            Team
+      .row
+        - if @user.has_role?('manager')
+          .col-xs-12.user-col-wrapper
+            .user-relationship-wrapper
+              %h5.content-label-sm Reports
+              %div.user-col-layout{style: "column-count: #{(@children_col.to_f).ceil}"}
+                - @user.children.each do |user|
+                  %div
+                    = link_to user.display_name, user_path(user), class: 'related-user'
+                    %br
+                    = link_to user.cvs_username, user_path(user), class: 'related-username'
+
+            - if @user.parent.present?
+              .user-relationship-wrapper
+                %h5.content-label-sm Manager
+                %div.user-col-layout{style: 'column-count: 1'}
+                  %div
+                    %span.related-user
+                      = link_for_manager(current_user, @user, display_name: current_user.parent.display_name)
+                    %br
+                    = link_for_manager(current_user, @user, display_name: current_user.parent.cvs_username)
+
+            - if @user.child?
+              .user-relationship-wrapper
+                %h5.content-label-sm Peers
+                %div.user-col-layout.last{style: "column-count: #{(@sibling_col.to_f).ceil}"}
+                  - @user.siblings.each do |user|
+                    %div
+                      = link_to user.display_name, user_path(user), class: 'related-user'
+                      %br
+                      = link_to user.cvs_username, user_path(user), class: 'related-username'
+
+        - else
+          .col-xs-12.user-col-wrapper
+            - if @user.parent.present?
+              .user-relationship-wrapper
+                %h5.content-label-sm Manager
+                %div.user-col-layout{style: 'column-count: 1'}
+                  %div
+                    %span.related-user
+                      = link_for_manager(current_user, @user, display_name: current_user.parent.display_name)
+                    %br
+                    = link_for_manager(current_user, @user, display_name: current_user.parent.cvs_username)
+            - if @user.child?
+              .user-relationship-wrapper
+                %h5.content-label-sm Peers
+                %div.user-col-layout.last{style: "column-count: #{(@sibling_col.to_f).ceil}", 'data-division': "#{@sibling_col}"}
+                  - @user.siblings.each do |user|
+                    %div
+                      = link_to user.display_name, user_path(user), class: 'related-user'
+                      %br
+                      = link_to user.cvs_username, user_path(user), class: 'related-username'
+
+
+.modal.fade{id: "roleModal_#{@user.id}", tabindex: '-1', role: 'dialog', 'aria-hidden': 'true'}
+  .modal-dialog{role: 'document'}
+    .modal-content
+      .modal-header
+        %button.close{type: 'button', 'data-dismiss': 'modal', 'aria-label': 'Close'}
+        %h4.modal-title
+          Update Role(s) for
+          = @user.cvs_username
+      =render 'shared/role_form', user: @user

@@ -34,6 +34,7 @@ class ComplaintEntry < ApplicationRecord
   end
 
   def self.is_ip?(ip)
+    ip = ip.scan(/(?:[0-9]{1,3}\.){3}[0-9]{1,3}/)[0] # When testing for IP address, don't include other parts of the url (e.g. 192.168.1.1/test.html is still a valid IP)
     !!IPAddr.new(ip) rescue false
   end
 
@@ -280,7 +281,11 @@ class ComplaintEntry < ApplicationRecord
     end
 
     if is_ip?(ip_url)
-      new_complaint_entry.ip_address = ip_url
+      ip_url.chomp!("/")
+      ip_network = ip_url.scan(/(?:[0-9]{1,3}\.){3}[0-9]{1,3}/)[0]
+      ip_path = ip_url.sub(ip_network, '')
+      new_complaint_entry.ip_address = ip_network
+      new_complaint_entry.path = ip_path
       new_complaint_entry.entry_type = "IP"
 
     else
@@ -368,9 +373,12 @@ class ComplaintEntry < ApplicationRecord
 
 
       if is_ip?(ip_url)
-        new_complaint_entry.ip_address = ip_url
+        ip_url.chomp!("/")
+        ip_network = ip_url.scan(/(?:[0-9]{1,3}\.){3}[0-9]{1,3}/)[0]
+        ip_path = ip_url.sub(ip_network, '')
+        new_complaint_entry.ip_address = ip_network
+        new_complaint_entry.path = ip_path
         new_complaint_entry.entry_type = "IP"
-
       else
         url_parts = Complaint.parse_url(ip_url)
         new_complaint_entry.uri = ip_url
