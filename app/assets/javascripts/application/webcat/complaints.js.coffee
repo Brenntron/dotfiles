@@ -322,15 +322,14 @@ window.updatePending = (id,row_id) ->
   comment = $('#complaint_comment_'+id)[0].value
   resolution_comment = $('#complaint_resolution_comment_'+id)[0].value
   resolution = $('.complaint-resolution'+id).text()
-  categories = ""
-  if $('#input_cat_'+id).val()
+  if $('#input_cat_'+id).val() == null
+    categories = null
+  else
     categories = $('#input_cat_'+id).val().toString()
 
-  headers = {'Token': $('input[name="token"]').val(), 'Xmlrpc-Token': $('input[name="xml_token"]').val()}
-  $.ajax(
+  std_msg_ajax(
     url: '/escalations/api/v1/escalations/webcat/complaint_entries/update_pending'
     method: 'POST'
-    headers: headers
     data: {'id': id,'prefix': prefix,'commit':status,'status':resolution,'comment':comment, 'resolution_comment': resolution_comment, 'categories': categories }
     success: (response) ->
       {uri, domain, subdomain, path, categories, error, entry_id, was_dismissed, status} = $.parseJSON(response)
@@ -1051,7 +1050,7 @@ format = (complaint_entry_row) ->
       '<button class="secondary inline-button" onclick="updateURI(event,' + complaint_entry.entry_id + ')">Update URI</button><br/>' +
       '<div class="complaint-selectize-col-wrapper">' +
       '<label class="content-label-sm">Edit Categories / Confidence Order</label>' +
-      '<select id="'+input_cat+'" name="['+input_cat+'][]" class="' + status_class + '" placeholder="Enter up to 5 categories" value=""></select>' +
+      '<select id="' + input_cat + '" name="[' + input_cat + '][]" class="' + status_class + '" placeholder="Enter up to 5 categories" value=""></select>' +
       '</div>' +
       '<div class="domain-categories" >' +
       '<label class="content-label-sm">Inherit Categories From Main Domain</label><br/>' +
@@ -1342,6 +1341,8 @@ window.lookup_dialog  = (id) ->
 window.click_table_buttons = (complaint_table, button)->
   tr = $(button).closest('tr')
   row = complaint_table.row(tr)
+  data = row.data()
+  cat_select = '#input_cat_'+ data.entry_id
   if row.child.isShown()       # This row is already open - close it
     row.child.hide()
     tr.removeClass 'shown'
@@ -1359,8 +1360,8 @@ window.click_table_buttons = (complaint_table, button)->
     unless $(td).hasClass 'nested-complaint-data-wrapper'
       $(td).addClass 'nested-complaint-data-wrapper'
 
-    if ['NEW','ASSIGNED','PENDING'].includes(row.data().status)
-      $('#input_cat_'+ row.data().entry_id).selectize {
+    if ['NEW','ASSIGNED','PENDING', 'REOPENED', 'ACTIVE'].includes(data.status)
+      $( cat_select ).selectize {
         persist: false,
         create: false,
         maxItems: 5,
@@ -1368,7 +1369,7 @@ window.click_table_buttons = (complaint_table, button)->
         labelField: 'category_name',
         searchField: ['category_name', 'category_code'],
         options: AC.WebCat.createSelectOptions(),
-        items: AC.WebCat.getCategoryIds(selected_options(row.data().category)),
+        items: AC.WebCat.getCategoryIds(selected_options(data.category)),
         onItemAdd: ->
           if verifyMasterSubmit() == true
             $('#master-submit').prop('disabled', false)
@@ -1380,7 +1381,7 @@ window.click_table_buttons = (complaint_table, button)->
       }
     else
       # need to initialize the selectize function but disable it here if entry is completed
-      $completed_selectize = $(cat_select).selectize {
+      $completed_selectize = $( cat_select ).selectize {
         persist: false,
         create: false,
         maxItems: 5,
@@ -1388,7 +1389,7 @@ window.click_table_buttons = (complaint_table, button)->
         labelField: 'category_name',
         searchField: ['category_name', 'category_code'],
         options: AC.WebCat.createSelectOptions(),
-        items: selected_options(row.data().category),
+        items: selected_options(data.category),
       }
       select_complete = $completed_selectize[0].selectize
       select_complete.disable()
