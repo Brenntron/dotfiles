@@ -199,11 +199,15 @@ $ ->
       $( '.error_modal' ).dialog(
          position:
            my: "right",
+
            at: "top+15%",
            of: window
       )
       $( '.error_modal .modal-header' ).html( error_header )
       $( '.error_modal .modal-body' ).append( error_array )
+
+  window.submit_quick_lookup = () ->
+    console.log 'inininininni'
 
   window.col_tag_format = (array) ->
     if typeof array == 'string'
