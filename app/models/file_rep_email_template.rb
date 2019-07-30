@@ -1,0 +1,2 @@
+class FileRepEmailTemplate < ApplicationRecord
+end

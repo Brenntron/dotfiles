@@ -19,16 +19,16 @@
 
       -##### Add in later after templates and template management is created
 
-      -#.template-select-wrapper
-      -#  .template-label
-      -#    Select a Template
-      -#
-      -#  %select.dropdown.email-template-select#select-new-template
-      -#    -if EmailTemplate.all.empty?
-      -#      %option.hidden{value:'', disabled: true, selected: true} No Templates Created
-      -#    -else
-      -#      %option.hidden{value:'', disabled: true, selected: true} No Template Selected
-      -#      =options_for_select(EmailTemplate.all.pluck(:template_name, :id))
+      .template-select-wrapper
+        .template-label
+          Select a Template
+
+        %select.dropdown.email-template-select#select-new-filerep-template
+          -if FileRepEmailTemplate.all.empty?
+            %option.hidden{value:'', disabled: true, selected: true} No Templates Created
+          -else
+            %option.hidden{value:'', disabled: true, selected: true} No Template Selected
+            =options_for_select(FileRepEmailTemplate.all.pluck(:template_name, :id))
 
 
       #file-fields-new

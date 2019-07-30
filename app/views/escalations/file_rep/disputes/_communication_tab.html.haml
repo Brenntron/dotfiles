@@ -38,7 +38,7 @@
                 %span.case-history-icon.note-icon{:data => {:history_kind => "note"}}
               %td
                 %span.case-history-author
-                  =comment.user.cec_username
+                  =comment.user.cvs_username
                 %span.case-history-preview
                   =comment.comment.truncate(75, omission: '...')
               %td.alt-col.case-history-datetime{:data => {:db_date => comment.created_at}}
@@ -73,10 +73,8 @@
         .communication-toolbar
           %button.new-email-button
             Compose New Email
-
-          -#  Uncomment if / when we decide to have email templates
-          -#%button.mng-templates-button
-          -#  Manage Email Templates
+          %button.mng-templates-button
+            Manage Email Templates
 
     .row
       .col-xs-12.email-header-information
@@ -166,55 +164,54 @@
     -#      Cancel
 
 
-    -###### Below is the dialog for managing email template responses pulled over from web rep, this can be added in later
+    -#### TODO - Create File Rep Email Template stuff on the back end and hook up here
+    #manageTemplatesDialog{title: 'Manage Email Templates'}
+      %table.table
+        %thead
+          %tr.table-header-highlight
+            %th Template Name
+            %th Description
+            %th.min70
+          -FileRepEmailTemplate.all.each do |template|
+            %tr
+              %td=template.template_name
+              %td=template.description
+              %td
+                %button.table-button.edit-button.edit-filerep-template{template_id: template.id, name: 'edit-template'}
+                %button.table-button.delete-button.delete-filerep-template{template_id: template.id, name: 'delete-template'}
 
-    -##manageTemplatesDialog{title: 'Manage Email Templates'}
-    -#  %table.table
-    -#    %thead
-    -#      %tr.table-header-highlight
-    -#        %th Template Name
-    -#        %th Description
-    -#        %th.min70
-    -#      -EmailTemplate.all.each do |template|
-    -#        %tr
-    -#          %td=template.template_name
-    -#          %td=template.description
-    -#          %td
-    -#            %button.table-button.edit-button.edit-template{template_id: template.id, name: 'edit-template'}
-    -#            %button.table-button.delete-button.delete-template{template_id: template.id, name: 'delete-template'}
-    -#
-    -#  #new-template-form-wrapper
-    -#    %h4.dialog-inset-header New Email Template
-    -#    %form
-    -#      .dialog-form-information
-    -#        %span.content-label-sm Name
-    -#        %input#new-template-name{autofocus: true, required: true, type: 'text', name: 'template-name'}
-    -#        %span.content-label-sm Description
-    -#        %input#new-template-desc{required: true, type: 'text', name: 'template-description'}
-    -#      .template-content-wrapper
-    -#        %textarea.template-content#new-template-body
-    -#
-    -#  #edit-template-form-wrapper
-    -#    %h4.dialog-inset-header Edit Email Template
-    -#    %form
-    -#      .dialog-form-information
-    -#        %span.content-label-sm Name
-    -#        %input#edit-template-name{autofocus: true, required: true, type: 'text', name: 'template-name'}
-    -#        %span.content-label-sm Description
-    -#        %input#edit-template-desc{required: true, type: 'text', name: 'template-description'}
-    -#        %input.hidden#template-id
-    -#      .template-content-wrapper
-    -#        %textarea.template-content#edit-template-body
-    -#
-    -#  .dialog-section-divider
-    -#    %button.primary#save-email-template.hidden
-    -#      Save Template
-    -#    %button.secondary#create-email-template
-    -#      Create New Template
-    -#    %button.primary#edit-email-template.hidden
-    -#      Update Template
-    -#    %button.secondary.hidden#cancel-edit-email-template
-    -#      Cancel
+      #new-template-form-wrapper
+        %h4.dialog-inset-header New Email Template
+        %form
+          .dialog-form-information
+            %span.content-label-sm Name
+            %input#new-template-name{autofocus: true, required: true, type: 'text', name: 'template-name'}
+            %span.content-label-sm Description
+            %input#new-template-desc{required: true, type: 'text', name: 'template-description'}
+          .template-content-wrapper
+            %textarea.template-content#new-template-body
+
+      #edit-template-form-wrapper
+        %h4.dialog-inset-header Edit Email Template
+        %form
+          .dialog-form-information
+            %span.content-label-sm Name
+            %input#edit-template-name{autofocus: true, required: true, type: 'text', name: 'template-name'}
+            %span.content-label-sm Description
+            %input#edit-template-desc{required: true, type: 'text', name: 'template-description'}
+            %input.hidden#template-id
+          .template-content-wrapper
+            %textarea.template-content#edit-template-body
+
+      .dialog-section-divider
+        %button.primary#save-filerep-email-template.hidden
+          Save Template
+        %button.secondary#create-email-template
+          Create New Template
+        %button.primary#edit-filerep-email-template.hidden
+          Update Template
+        %button.secondary.hidden#cancel-edit-email-template
+          Cancel
 
 
     .row
@@ -232,16 +229,16 @@
 
                   -# Add in after we have email template functionality
                   .col-xs-8
-                    -#.template-select-wrapper
-                    -#  .template-label
-                    -#    Select a Template
-                    -#
-                    -#%select.dropdown.email-template-select#select-reply-template
-                    -#  -if EmailTemplate.all.empty?
-                    -#    %option.hidden{value:'', disabled: true, selected: true} No Templates Created
-                    -#  -else
-                    -#    %option.hidden{value:'', disabled: true, selected: true} No Template Selected
-                    -#    =options_for_select(EmailTemplate.all.pluck(:template_name, :id))
+                    .template-select-wrapper
+                      .template-label
+                        Select a Template
+
+                    %select.dropdown.email-template-select#select-filerep-reply-template
+                      -if FileRepEmailTemplate.all.empty?
+                        %option.hidden{value:'', disabled: true, selected: true} No Templates Created
+                      -else
+                        %option.hidden{value:'', disabled: true, selected: true} No Template Selected
+                        =options_for_select(FileRepEmailTemplate.all.pluck(:template_name, :id))
 
                     .email-reply-button-wrapper
                       .email-reply-buttons
@@ -308,7 +305,7 @@
             .note-info-item.author-notation
               Written by
               %span.author-username
-                =comment.user.cec_username
+                =comment.user.cvs_username
               = distance_of_time_in_words(Time.now.utc, comment.created_at.utc) + " ago."
             %br.hidden-break
             .note-info-item.time-stamp
@@ -321,7 +318,7 @@
 
         .row
           .col-xs-12
-            - if comment.user.cec_username == current_user.cec_username
+            - if comment.user.cvs_username == current_user.cvs_username
               .note-block.content-editable{class: "note-block#{comment.id}", comment_id: "#{comment.id}", contenteditable: true}
                 %pre=comment.comment
             - else
@@ -348,5 +345,8 @@
       for (var i = 0; i < list.length; i++) {
           list[i].parentNode.appendChild(list[i]);
       }
+
+      window.reply_body = $('.email-reply-body').val()
     })
+
 

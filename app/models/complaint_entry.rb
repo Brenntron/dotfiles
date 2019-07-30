@@ -25,6 +25,7 @@ class ComplaintEntry < ApplicationRecord
   STATUS_RESOLVED_FIXED_FN = "FIXED FN"
   STATUS_RESOLVED_FIXED_FP = "FIXED FP"
   STATUS_RESOLVED_FIXED_UNCHANGED = "UNCHANGED"
+  STATUS_RESOLVED_FIXED_INVALID = "INVALID"
   STATUS_RESOLVED_DUPLICATE = "DUPLICATE"
 
 
@@ -33,6 +34,7 @@ class ComplaintEntry < ApplicationRecord
   end
 
   def self.is_ip?(ip)
+    ip = ip.scan(/(?:[0-9]{1,3}\.){3}[0-9]{1,3}/)[0] # When testing for IP address, don't include other parts of the url (e.g. 192.168.1.1/test.html is still a valid IP)
     !!IPAddr.new(ip) rescue false
   end
 
@@ -113,7 +115,6 @@ class ComplaintEntry < ApplicationRecord
                       resolution_comment,
                       current_user,
                       commit_pending)
-    categories = categories_string&.split(',')
     ActiveRecord::Base.transaction do
       # If the prefix is a high telemetry value then the status needs to be set to PENDING
       if self.is_important && entry_status != Complaint::RESOLUTION_UNCHANGED
@@ -123,15 +124,14 @@ class ComplaintEntry < ApplicationRecord
 
             current_status = "COMPLETED"
             self.case_assigned_at ||= Time.now
-            update(resolution:entry_status,
-                   status:current_status,
+            update(status:current_status,
                    internal_comment: comment,
                    resolution_comment: resolution_comment,
                    case_resolved_at: Time.now,
                    user:current_user)
             complaint.set_status(current_status)
             #this is where we should send off the category to the API
-            if entry_status != "INVALID" && categories_string != ''
+            if self.resolution != STATUS_RESOLVED_FIXED_INVALID && !categories_string.blank?
               commit_category(ip_or_uri: prefix,
                               categories_string: categories_string,
                               description: comment,
@@ -177,7 +177,7 @@ class ComplaintEntry < ApplicationRecord
                case_resolved_at: Time.now,user:current_user)
         complaint.set_status(current_status)
         #this is where we should send off the category to the API
-        if entry_status != "INVALID" && categories_string != ''
+        if ![STATUS_RESOLVED_FIXED_INVALID,STATUS_RESOLVED_FIXED_UNCHANGED].include?(entry_status) && !categories_string.blank?
           commit_category(ip_or_uri: prefix,
                           categories_string: categories_string,
                           description: comment,
@@ -281,7 +281,11 @@ class ComplaintEntry < ApplicationRecord
     end
 
     if is_ip?(ip_url)
-      new_complaint_entry.ip_address = ip_url
+      ip_url.chomp!("/")
+      ip_network = ip_url.scan(/(?:[0-9]{1,3}\.){3}[0-9]{1,3}/)[0]
+      ip_path = ip_url.sub(ip_network, '')
+      new_complaint_entry.ip_address = ip_network
+      new_complaint_entry.path = ip_path
       new_complaint_entry.entry_type = "IP"
 
     else
@@ -369,9 +373,12 @@ class ComplaintEntry < ApplicationRecord
 
 
       if is_ip?(ip_url)
-        new_complaint_entry.ip_address = ip_url
+        ip_url.chomp!("/")
+        ip_network = ip_url.scan(/(?:[0-9]{1,3}\.){3}[0-9]{1,3}/)[0]
+        ip_path = ip_url.sub(ip_network, '')
+        new_complaint_entry.ip_address = ip_network
+        new_complaint_entry.path = ip_path
         new_complaint_entry.entry_type = "IP"
-
       else
         url_parts = Complaint.parse_url(ip_url)
         new_complaint_entry.uri = ip_url

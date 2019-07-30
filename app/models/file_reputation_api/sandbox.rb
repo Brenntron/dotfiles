@@ -29,6 +29,23 @@ class FileReputationApi::Sandbox
       
   end
 
+  def self.send_to_threatgrid(sha256, api_key_type:)
+    endpoint = "/ntu/1/tgsubmit"
+    query_string = {
+        "hash" => sha256,
+        "apikey" => type_based_api_key(api_key_type)
+    }
+    begin
+      response = call_request_parsed(:post, endpoint, :input => query_string)
+      data = {:success => true, :data => response["value"]}
+    rescue
+      data = {:success => false, :data => {}}
+    end
+
+    data
+
+  end
+
   def self.sandbox_disposition(sha256)
 
     endpoint = "/ntu/1/disposition"
@@ -127,6 +144,28 @@ class FileReputationApi::Sandbox
     run_id = latest_report[:data]['runid']
     full_report = FileReputationApi::Sandbox.full_report(sha256_hash, run_id, api_key_type: api_key_type)
     full_report[:data]['score']
+  end
+
+  def self.sample_exists(sha256_hash, api_key_type:)
+    #DOES NOT EXIST
+    #{:success=>false, :data=>{}}  doesn't exist
+
+    #EXISTS
+    #{:success=>true,
+    #:data=>
+    #    {"status"=>"Error - Unsupported File Type",
+    #     "sample"=>
+    #         {"SHA256"=>"7F83B1657FF1FC53B92DC18148A1D65DFC2D4B1FA3D677284ADDD200126D9069",
+    #          "MD5"=>"ED076287532E86365E841E92BFC50D8C",
+    #          "SHA1"=>"2EF7BDE608CE5404E97D5F042F95F89F1C232871"},
+    #     "runid"=>303066885,
+    #     "platform"=>{"os"=>"Windows XP - SP3", "arch"=>"i386"},
+    #     "date"=>"2018-03-22T19:45:31Z",
+    #     "updated"=>"2018-03-22T19:45:31Z"}}
+
+
+    latest_report = FileReputationApi::Sandbox.sandbox_latest_report(sha256_hash, api_key_type: api_key_type)
+    return latest_report[:success]
   end
 
   def self.run_sample(sha256_hash)
