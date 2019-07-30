@@ -1341,7 +1341,7 @@ window.click_table_buttons = (complaint_table, button)->
   tr = $(button).closest('tr')
   row = complaint_table.row(tr)
   data = row.data()
-  cat_select = '#input_cat_'+ data .entry_id
+  cat_select = '#input_cat_'+ data.entry_id
   if row.child.isShown()       # This row is already open - close it
     row.child.hide()
     tr.removeClass 'shown'
