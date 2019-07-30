@@ -45,8 +45,8 @@ class Complaint < ApplicationRecord
   scope :from_ti, -> { includes(:complaint_entries).where(channel: TI_CHANNEL) }
   scope :from_int, -> { includes(:complaint_entries).where(channel: INT_CHANNEL) }
   scope :from_wbnp, -> { includes(:complaint_entries).where(channel: WBNP_CHANNEL) }
-  scope :by_guest, -> { joins(customer: :company).where('companies.name = ?', 'Guest')}
-  scope :by_cust, -> { joins(customer: :company).where('companies.name != ?', 'Guest')}
+  scope :by_guest, -> { joins(:customer).where(customers: {company_id: Company.guest.id}) }
+  scope :by_cust, -> { joins(:customer).where.not(customers: {company_id: Company.guest.id}) }
 
   def set_status(new_status)
     status_list = complaint_entries.map{|entry| entry.status}
