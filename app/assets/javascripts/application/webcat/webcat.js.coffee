@@ -25,8 +25,7 @@ $ ->
     form = {
       tags: $(tag_input).is(':hidden') tag_input[0].selectize.items.join()
     }
-    debugger
-    console.log $(tag_input)
+
     for item in $('#cat_named_search :input:not(:hidden)').serializeArray()
       { name, value } = item
       name = name.toLowerCase().replace(/-/g, '_')
@@ -71,7 +70,7 @@ $ ->
 
     if search != ''
       webcat_search_type = 'standard'
-
+      urlParams = new URLSearchParams(location.search);
     switch(webcat_search_type)
       when 'advanced'
         data = {
@@ -87,7 +86,7 @@ $ ->
       when 'standard'
         data = {
           search_type: webcat_search_type
-          search_name: search.replace('?f=', '')
+          search_name: urlParams.get('f')
         }
       when 'named'
         data = {
