@@ -313,9 +313,6 @@ window.domain_whois = (IP_Domain) ->
       notice_html = "<p>Something went wrong: #{response.responseText}</p>"
   , this)
 
-window.filterByStatus = (filter) ->
-  populate_webcat_index_table(filter)
-
 window.updatePending = (id,row_id) ->
   prefix = $('#complaint_prefix_'+id)[0].value
   status = $('[name=resolution_review_'+id+']:checked').val()
@@ -1406,37 +1403,6 @@ window.click_table_buttons = (complaint_table, button)->
 
     if verifyMasterSubmit() == true
       $('#master-submit').prop('disabled', false)
-
-window.populate_webcat_index_table = (filter) ->
-  if !filter
-    filter = "NEW"
-
-  if $('body.index-action').length
-    self_review = $('#self_review')[0].checked
-    headers = {'Token': $('input[name="token"]').val(), 'Xmlrpc-Token': $('input[name="xml_token"]').val()}
-    $.ajax(
-      url: '/escalations/api/v1/escalations/webcat/complaint_entries?filter_by='+filter+'&self_review='+self_review
-      method: 'GET'
-      headers: headers
-      success: (response) ->
-
-        json = $.parseJSON(response)
-        if json.error
-          notice_html = "<p>Something went wrong: #{json.error}</p>"
-          alert(json.error)
-        else
-          datatable = $('#complaints-index').DataTable()
-          datatable.clear();
-
-          datatable.rows.add(json.data);
-          datatable.draw();
-
-      error: (response) ->
-        notice_html = "<p>Something went wrong: #{response.responseText}</p>"
-        #$("#alert_message").addClass('alert alert-danger alert-dismissable').append(notice_html)
-        #$("#create_research_submit_wait").addClass('hidden').hide()
-        #$("#create_research_submit").show()
-    , this)
 
 window.display_preview_window = (entry) ->
 
