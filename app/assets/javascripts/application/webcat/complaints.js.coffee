@@ -1368,7 +1368,7 @@ window.click_table_buttons = (complaint_table, button)->
         labelField: 'category_name',
         searchField: ['category_name', 'category_code'],
         options: AC.WebCat.createSelectOptions(),
-        items: AC.WebCat.getCategoryIds(selected_options(data .category)),
+        items: AC.WebCat.getCategoryIds(selected_options(data.category)),
         onItemAdd: ->
           if verifyMasterSubmit() == true
             $('#master-submit').prop('disabled', false)
