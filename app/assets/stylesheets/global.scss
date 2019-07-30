@@ -462,12 +462,17 @@ th {
   background-color: lighten( $faint-neutral-color, 2% );
 }
 
+.alt-col.lighter-alt-col {
+  background-color: lighten( $faint-neutral-color, 5% );
+}
+
 th.alt-col {
   background-color: transparent;
 }
 
 .user-col-divider {
   border-right: 2px solid $content-bg-color;
+  min-width: 140px;
 }
 
 /**** Col Width Mins *****/
@@ -730,6 +735,7 @@ button {
 .expand-all {background-image: url(image_path('icon_expand_all.svg'));}
 .dropdown.open .mark-related-button {background-image: url(image_path('icon_related_white.svg'));}
 .url-cat-button {background-image: url(image_path('icon_categorize.svg'));}
+.add-user-button {background-image: url(image_path('icon_add_user_grey.svg'));}
 .export-button-white {background-image: url(image_path('icon_export_white.svg'));}
 .delete-search {
   display: inline-block;
@@ -767,6 +773,7 @@ button {
 
 .table-button-row {
   padding: 0 !important;
+  min-width: 100px;
 }
 
 .expand-toggle-button {
@@ -2890,8 +2897,15 @@ fieldset.top-content {
   column-count: 7;
 }
 
+.user-relationship-wrapper {
+  display: inline-block;
+  float: left;
+}
+
 .user-col-layout div {
   padding-bottom: 6px;
+  white-space: nowrap;
+  page-break-inside: avoid
 }
 
 .user-col-layout {
@@ -2951,6 +2965,11 @@ fieldset.top-content {
   padding: 0;
   display: block;
   margin-bottom: 2px;
+}
+
+.user-buttons .email-button {
+  margin-top: 0;
+  margin-left: 0;
 }
 
 /*** Tooltips ********/
@@ -4078,10 +4097,13 @@ td.wbrs-highlight, td.sbrs-highlight {
   margin: 0;
 }
 
+// These styles are for the dark top navigation used in escalations section. After the site is updated across the board
+// we can consolidate these to be the master styles for the top nav instead of being controller dependant.
 // TODO We should consolidate these soon and make a single class that just covers all this
 .escalations--webrep--disputes-controller,
 .escalations--webcat--complaints-controller,
 .escalations--webcat--reports-controller,
+.users-controller,
 .escalations--file_rep--disputes-controller {
   #nav-banner {
     background-color: $table-dark-body;
@@ -4099,6 +4121,7 @@ td.wbrs-highlight, td.sbrs-highlight {
       display: inline-block;
       width: 44px;
     }
+
     .nav-page-button.active {
       background-color: $bug-section-color;
     }
@@ -4127,12 +4150,9 @@ td.wbrs-highlight, td.sbrs-highlight {
   }
 }
 
-
 .research-table-details-wrapper .dropdown.open {
   background-color: transparent;
 }
-
-
 
 .search-group, .search-group form, .search-box {
   width: 100%;
@@ -4310,6 +4330,8 @@ button.tertiary {
 .icon-reports {background-image: url(image_path('icon_reports.svg'));}
 .icon-new-white {background-image: url(image_path('icon_new_white.svg'));}
 .icon-categorize-white {background-image: url(image_path('icon_categorize_white.svg'));}
+.icon-user-page {background-image: url(image_path('icon_user_white.svg'));}
+.icon-related-users {background-image: url(image_path('icon_team_white.svg'));}
 .icon-naming-white {background-image: url(image_path('icon_naming_list_white2.svg'));}
 .icon-notes {background-image: url(image_path('icon_status_comment.svg'));}
 
@@ -4534,7 +4556,7 @@ input.file_attachment {
 }
 
 .table-button.delete-button {
-  background-image: url(image_path('icon_delete_simple.svg'));
+  background-image: url(image_path('icon_delete_simple_grey.svg'));
 }
 
 .table-header-highlight {
@@ -8162,6 +8184,87 @@ th.sorting_1, th.sorting_asc, th.sorting_desc {
   white-space: nowrap;
   overflow: hidden;
   width: 160px !important;
+}
+
+.user-access-wrapper label {
+  width: 100%;
+}
+
+.user-access-wrapper .content-label-md.extra-space {
+  margin-top: 12px;
+}
+
+.manager-row-indicator {
+  padding: 0 0 0 8px !important;
+}
+
+.manager-row-indicator span {
+  display: inline-block;
+  padding-top: 8px;
+}
+
+.expand-manager-row-button {
+  background-image: url(image_path('icon_expand_table_grey.svg'));
+  background-repeat: no-repeat;
+  background-position: center center;
+  background-size: 20px 20px;
+  width: 33px;
+  height: 33px;
+  float: right;
+  border: none;
+}
+
+.expand-manager-row-button.up {
+  transform: rotate(180deg);
+}
+
+.blank-white-cell {
+  border: none !important;
+  background-color: transparent;
+}
+
+.manage-child-row .user-displayname-col {
+  padding-left: 16px !important;
+}
+
+.manage-grandchild-row .user-displayname-col {
+  padding-left: 26px !important
+}
+
+.table-button-row .dropdown-menu {
+  top: 30px;
+  right: 0;
+  left: auto;
+  border-radius: 4px 0 4px 4px;
+  border: none;
+}
+
+.table-button-row .dropdown-menu h3 {
+  color: #fff;
+  padding: 6px 10px;
+  font-weight: 400;
+  font-size: 9pt;
+  background-color: $bug-section-color;
+  min-width: 275px;
+  border-radius: 4px 0 0 0;
+  margin-top: -5px;
+  margin-bottom: 0;
+}
+
+.table-button-row .dropdown-menu .toolbar-select {
+  width: 100%;
+}
+
+.select-wrapper {
+  width: 100%;
+}
+
+.table-button-row .dropdown-menu button {
+  padding: 8px 30px;
+}
+
+.table-button-row .dropdown.open {
+  background-color: $bug-section-color;
 }
 
 .hidden-sortable-data {

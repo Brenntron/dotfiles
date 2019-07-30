@@ -264,7 +264,6 @@ class DisputeEmail < ApplicationRecord
         end
     dispute.status = Dispute::STATUS_CUSTOMER_PENDING
     dispute.save
-
     conn = ::Bridge::SendEmailEvent.new(addressee: 'talos-intelligence')
     conn.post(email_args, attachments_to_mail)
 

@@ -1,0 +1,17 @@
+.content-wrapper
+  %h1.index-table-header All Users
+  %table.table.responsive.index-table
+    %thead
+      %tr
+        %th Name
+        %th Username
+        %th Email
+    %tbody
+      - @users.each do |user|
+        %tr
+          %td.alt-col.user-col-divider= user.display_name
+          - if current_user.has_role?('admin')
+            %td.alt-col.user-name-col.user-col-divider= link_to user.cvs_username, user_path(user)
+          - else
+            %td.alt-col.user-name-col.user-col-divider= user.cvs_username
+          %td.alt-col= user.email
