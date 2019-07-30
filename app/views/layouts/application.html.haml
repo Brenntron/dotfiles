@@ -30,15 +30,9 @@
               = render 'layouts/escalations_layout'
             - else
               = render 'layouts/bugs_layout'
-          - elsif controller_name == "users"
-            = render 'layouts/users_layout'
-          - elsif controller_name == "user_searches"
-            = render 'layouts/users_layout'
-          - elsif controller_name == "relationships"
-            = render 'layouts/relationships_layout'
           - elsif controller_name == "rule_docs"
             = render 'layouts/rule_docs_layout'
           - elsif ac_namespace == "escalations/webrep"
             = render 'layouts/webrep_disputes_layout'
-    - unless %w{bugs users user_searches relationships}.include?(controller_name)
+    - unless %w{bugs}.include?(controller_name)
       = yield
