@@ -120,6 +120,8 @@ class Escalations::Webrep::DisputesController < ApplicationController
   def update
   end
 
+  # TODO We should not have a 400 line method in a controller.
+  # TODO avoid defining methods in the body of other methods.
   def dashboard
     respond_to do |format|
       format.html
@@ -177,7 +179,7 @@ class Escalations::Webrep::DisputesController < ApplicationController
         @spreadsheet_directory = Dir.mktmpdir
 
         if params['mytickets'] == "true"
-          mytickets_file = File.new("#{@spreadsheet_directory}/my-tickets_#{Time.now}.xlsx", 'w+')
+          mytickets_file = File.new("#{@spreadsheet_directory}/my-tickets_#{Time.now.utc.iso8601}.xlsx", 'w+')
           mytickets_xlsx = RubyXL::Workbook.new
           mytickets_workbook_names = {
               :my_open_tickets => 'My Open Tickets',
@@ -292,11 +294,10 @@ class Escalations::Webrep::DisputesController < ApplicationController
 
           mytickets_xlsx.write(mytickets_file)
           mytickets_file.rewind
-          @mytickets_output_file = mytickets_file.read
         end
 
         if params['myteamtickets'] == "true"
-          myteamtickets_file = File.new("#{@spreadsheet_directory}/my-team-tickets_#{Time.now}.xlsx", 'w+')
+          myteamtickets_file = File.new("#{@spreadsheet_directory}/my-team-tickets_#{Time.now.utc.iso8601}.xlsx", 'w+')
           myteamtickets_xlsx = RubyXL::Workbook.new
           myteamtickets_workbook_names = {
               :open_team_tickets => 'Open Tickets',
@@ -463,12 +464,11 @@ class Escalations::Webrep::DisputesController < ApplicationController
 
           myteamtickets_xlsx.write(myteamtickets_file)
           myteamtickets_file.rewind
-          @myteamtickets_output_file = myteamtickets_file.read
         end
 
         input_filenames = Dir.entries(@spreadsheet_directory).select {|f| !File.directory? f}
         if input_filenames.count > 1
-          filename = "webrep_export-#{Time.now}.zip"
+          filename = "webrep_export-#{Time.now.utc.iso8601}.zip"
           temp_file = Tempfile.new(filename)
 
           begin
@@ -492,10 +492,19 @@ class Escalations::Webrep::DisputesController < ApplicationController
             #Close and delete the temp file
             temp_file.close
             temp_file.unlink
+
+            #Delete all generated spreadsheets
+            input_filenames.each do |file|
+              File.delete(File.join(@spreadsheet_directory, file))
+            end
           end
 
-        else
-          send_file File.join(@spreadsheet_directory, input_filenames[0]), :disposition => 'attachment'
+        elsif input_filenames.count == 1
+          File.open((File.join(@spreadsheet_directory, input_filenames[0])), 'r') do |f|
+            send_data f.read, :filename => input_filenames[0]
+          end
+
+          File.delete(File.join(@spreadsheet_directory, input_filenames[0]))
         end
 
         if params['alltickets'] == "true"

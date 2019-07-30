@@ -84,8 +84,8 @@ Feature: User Accounts
 
   @javascript
   Scenario: A non-manager user can go to the users index page and see only their co-workers.
-            Assigned bugs should be on users show page.
-            A non-manager cannot get to the relationships section.
+  Assigned bugs should be on users show page.
+  A non-manager cannot get to the relationships section.
     Given a user with role "analyst" exists and is logged in
     And the following users exist
       | id | email                      | cvs_username | display_name        | parent_id | cec_username |
@@ -138,7 +138,7 @@ Feature: User Accounts
 
   @javascript
   Scenario: A user can download their bugs from bugzilla,
-            but not go to another users page and download their bugs.
+  but not go to another users page and download their bugs.
     Given a user with role "analyst" exists and is logged in
     And the following users exist
       | id | email                | cvs_username | display_name        | parent_id |
@@ -226,7 +226,7 @@ Feature: User Accounts
 
   @javascript
   Scenario: A manager user can go to the users index page and see only their co-workers and team members.
-            A manager can access the relationships page.
+  A manager can access the relationships page.
     Given a manager exists and is logged in
     And the following users exist
       | id | email                | cvs_username | display_name        | parent_id |

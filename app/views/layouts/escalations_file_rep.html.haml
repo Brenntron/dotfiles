@@ -69,7 +69,7 @@
         %table#saved-search.table
           %tbody#saved-search-tbody.filerep-named-search-list
             - if current_user.named_searches.any?
-              - current_user.named_searches.where('project_type = ? OR project_type IS ?', 'FileReputationDispute', nil).order(:id).each do |named_search|
+              - current_user.named_searches.where('project_type = :project', project: 'FileReputationDispute').order(:id).each do |named_search|
                 %tr{id: "saved_search_#{named_search.id}"}
                   %td
                     %a.input-truncate.saved-search.esc-tooltipped{onclick: "build_named_search('#{named_search.name}');", title: named_search.name}

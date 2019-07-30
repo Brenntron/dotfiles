@@ -2,7 +2,7 @@ $ ->
   $('#child_id').on 'change', ->
     newTeamMember = $('#child_id option:selected')
     $.ajax
-      url: '/escalations/relationships/member_status'
+      url: "/escalations/users/#{newTeamMember.val()}/relationships/member_status"
       method: 'GET'
       data: 'new_member': newTeamMember.val()
       success: (res, status, xhr) ->
