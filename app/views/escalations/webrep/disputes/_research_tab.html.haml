@@ -215,7 +215,7 @@
         %form#dispute_research_export_form{action: export_escalations_webrep_dispute_path(@dispute, format: :csv), method: 'get'}
           %button.toolbar-button.export-button
             %span.toolbar-button-text Export
-        %button.toolbar-button.export-button.esc-tooltipped{title: 'Export Selected to CSV', onclick: 'webrep_research_export_selected_rows();'}
+        %button.toolbar-button.export-button.esc-tooltipped.toolbar-button-spacer{title: 'Export Selected to CSV', onclick: 'webrep_research_export_selected_rows();'}
           %span.toolbar-button-text Export Selected to CSV
 
       .edit-button-wrapper.edit-entries-buttons.hidden

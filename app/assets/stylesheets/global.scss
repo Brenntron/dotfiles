@@ -462,12 +462,17 @@ th {
   background-color: lighten( $faint-neutral-color, 2% );
 }
 
+.alt-col.lighter-alt-col {
+  background-color: lighten( $faint-neutral-color, 5% );
+}
+
 th.alt-col {
   background-color: transparent;
 }
 
 .user-col-divider {
   border-right: 2px solid $content-bg-color;
+  min-width: 140px;
 }
 
 /**** Col Width Mins *****/
@@ -728,6 +733,7 @@ button {
 .expand-all {background-image: url(image_path('icon_expand_all.svg'));}
 .dropdown.open .mark-related-button {background-image: url(image_path('icon_related_white.svg'));}
 .url-cat-button {background-image: url(image_path('icon_categorize.svg'));}
+.add-user-button {background-image: url(image_path('icon_add_user_grey.svg'));}
 .export-button-white {background-image: url(image_path('icon_export_white.svg'));}
 .delete-search {
   display: inline-block;
@@ -765,6 +771,7 @@ button {
 
 .table-button-row {
   padding: 0 !important;
+  min-width: 100px;
 }
 
 .expand-toggle-button {
@@ -1671,7 +1678,6 @@ button.close {
 }
 
 #sidenav-icons-div .sidenav-icons {
-  background: $sidebar-nav-base;
   height: 100%;
 }
 
@@ -2889,8 +2895,15 @@ fieldset.top-content {
   column-count: 7;
 }
 
+.user-relationship-wrapper {
+  display: inline-block;
+  float: left;
+}
+
 .user-col-layout div {
   padding-bottom: 6px;
+  white-space: nowrap;
+  page-break-inside: avoid
 }
 
 .user-col-layout {
@@ -2950,6 +2963,11 @@ fieldset.top-content {
   padding: 0;
   display: block;
   margin-bottom: 2px;
+}
+
+.user-buttons .email-button {
+  margin-top: 0;
+  margin-left: 0;
 }
 
 /*** Tooltips ********/
@@ -4077,10 +4095,13 @@ td.wbrs-highlight, td.sbrs-highlight {
   margin: 0;
 }
 
+// These styles are for the dark top navigation used in escalations section. After the site is updated across the board
+// we can consolidate these to be the master styles for the top nav instead of being controller dependant.
 // TODO We should consolidate these soon and make a single class that just covers all this
 .escalations--webrep--disputes-controller,
 .escalations--webcat--complaints-controller,
 .escalations--webcat--reports-controller,
+.users-controller,
 .escalations--file_rep--disputes-controller {
   #nav-banner {
     background-color: $table-dark-body;
@@ -4098,6 +4119,7 @@ td.wbrs-highlight, td.sbrs-highlight {
       display: inline-block;
       width: 44px;
     }
+
     .nav-page-button.active {
       background-color: $bug-section-color;
     }
@@ -4126,12 +4148,9 @@ td.wbrs-highlight, td.sbrs-highlight {
   }
 }
 
-
 .research-table-details-wrapper .dropdown.open {
   background-color: transparent;
 }
-
-
 
 .search-group, .search-group form, .search-box {
   width: 100%;
@@ -4309,6 +4328,8 @@ button.tertiary {
 .icon-reports {background-image: url(image_path('icon_reports.svg'));}
 .icon-new-white {background-image: url(image_path('icon_new_white.svg'));}
 .icon-categorize-white {background-image: url(image_path('icon_categorize_white.svg'));}
+.icon-user-page {background-image: url(image_path('icon_user_white.svg'));}
+.icon-related-users {background-image: url(image_path('icon_team_white.svg'));}
 .icon-naming-white {background-image: url(image_path('icon_naming_list_white2.svg'));}
 .icon-notes {background-image: url(image_path('icon_status_comment.svg'));}
 
@@ -8165,6 +8186,87 @@ th.sorting_1, th.sorting_asc, th.sorting_desc {
   width: 160px !important;
 }
 
+.user-access-wrapper label {
+  width: 100%;
+}
+
+.user-access-wrapper .content-label-md.extra-space {
+  margin-top: 12px;
+}
+
+.manager-row-indicator {
+  padding: 0 0 0 8px !important;
+}
+
+.manager-row-indicator span {
+  display: inline-block;
+  padding-top: 8px;
+}
+
+.expand-manager-row-button {
+  background-image: url(image_path('icon_expand_table_grey.svg'));
+  background-repeat: no-repeat;
+  background-position: center center;
+  background-size: 20px 20px;
+  width: 33px;
+  height: 33px;
+  float: right;
+  border: none;
+}
+
+.expand-manager-row-button.up {
+  transform: rotate(180deg);
+}
+
+.blank-white-cell {
+  border: none !important;
+  background-color: transparent;
+}
+
+.manage-child-row .user-displayname-col {
+  padding-left: 16px !important;
+}
+
+.manage-grandchild-row .user-displayname-col {
+  padding-left: 26px !important
+}
+
+.table-button-row .dropdown-menu {
+  top: 30px;
+  right: 0;
+  left: auto;
+  border-radius: 4px 0 4px 4px;
+  border: none;
+}
+
+.table-button-row .dropdown-menu h3 {
+  color: #fff;
+  padding: 6px 10px;
+  font-weight: 400;
+  font-size: 9pt;
+  background-color: $bug-section-color;
+  min-width: 275px;
+  border-radius: 4px 0 0 0;
+  margin-top: -5px;
+  margin-bottom: 0;
+}
+
+.table-button-row .dropdown-menu .toolbar-select {
+  width: 100%;
+}
+
+.select-wrapper {
+  width: 100%;
+}
+
+.table-button-row .dropdown-menu button {
+  padding: 8px 30px;
+}
+
+.table-button-row .dropdown.open {
+  background-color: $bug-section-color;
+}
+
 .hidden-sortable-data {
   opacity: 0;
   position: absolute;
@@ -8368,6 +8470,11 @@ hr.thin.form-divider {
   background-image: url(image_path('icon_bugzilla_loggedout.svg'));
 }
 
+// WebCat Screenshot icon
+.escape-button {
+  background-image: url(image_path('icon_cancel.svg'));
+  background-repeat: no-repeat;
+}
 
 // Tab styles for tabs on dialog boxes
 .nav-tabs.dialog-tabs {
@@ -9755,4 +9862,103 @@ input[type="radio"].resolution_radio_button {
 // ensuring no column overlap in Case History due to long strings
 #case-history .case-history-preview, #case-history .case-history-author {
   word-break: break-word;
+}
+
+
+// webcat screenshot buttons
+.screenshot-button {
+  width: 30px;
+  height: 30px;
+  display: block;
+  position: absolute;
+  background-repeat: no-repeat;
+  background-position: center center;
+  background-color: $content-bg-color;
+  border-radius: 4px;
+  opacity: .9;
+  right: 4px;
+  cursor: pointer;
+}
+
+.screenshot-close-button {
+  background-image: url(image_path('icon_cancel_lt_grey.svg'));
+  background-size: 28px 28px;
+  top: 4px;
+}
+
+.screenshot-retake-button {
+  background-image: url(image_path('icon_screenshot_lt_grey.svg'));
+  background-size: 28px 28px;
+  top: 38px;
+}
+
+.screenshot-reload-button {
+  background-image: url(image_path('icon_sync_lt_grey.svg'));
+  background-size: 28px 28px;
+  top: 4px;
+}
+
+// webrep and webcat toolbars - between 1800px and 1600px, prevent breaking/wrapping of the buttons
+@media screen and (max-width: 1800px) and (min-width: 1600px) {
+  #webrep-index-toolbar, #webcat-index-toolbar {
+    .toolbar-button {
+      background-position: 4px 6px;
+      padding-left: 13px;
+      padding-right: 7px;
+      min-height: 25px;
+      background-size: 14px 14px; // icon size
+      transition: background-color 0.2s;
+    }
+  }
+}
+
+// webrep - research tab toolbar - between 1600px and 1400px, prevent breaking/wrapping buttons, this needs to be separate
+@media screen and (max-width: 1600px) and (min-width: 1401px) {
+  #research-tab-toolbar {
+    .toolbar-button {
+      background-position: 6px 6px;
+      padding-left: 9px;
+      padding-right: 8px;
+      min-height: 25px;
+      background-size: 14px 14px; // icon size
+      transition: background-color 0.2s;
+    }
+  }
+}
+// fix the collapse breakpoint
+@media screen and (max-width: 1400px) {
+  #research-tab-toolbar .toolbar-button-text {
+    display: none;
+    margin-left: 8px;
+  }
+}
+
+// adding styles for talos logo + copyright info in bottom-left of side nav
+.copyright-area {
+  width: 150px;
+  height: 100px;
+  position: sticky;
+  bottom: 20px;
+  left: 25px;
+  text-align: center;
+  z-index: -1;
+  opacity: 0;
+  transition: opacity 500ms;
+  .talos-logo {
+    width: 150px;
+    height: auto;
+    display: block;
+  }
+  .copyright {
+    font-size: 10px;
+    font-weight: normal;
+    text-transform: none;
+    line-height: 16px;
+    color: darken($content-bg-color, 10%);
+  }
+}
+
+#nav-trigger:checked ~ #sidenav-menu-div .copyright-area {
+  opacity: 1;
+  transition-delay: 350ms;
 }

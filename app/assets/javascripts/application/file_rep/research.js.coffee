@@ -1,4 +1,19 @@
 $ ->
+
+  $('#send-to-threatgrid').on 'click', ->
+    sha256_hash = $('#sha256_hash')[0].innerText
+    std_msg_ajax(
+      method: 'GET'
+      url: "/escalations/api/v1/escalations/file_rep/sandbox_api/send_to_threatgrid/" + sha256_hash
+      success_reload: false
+      success: (response) ->
+        std_msg_success('Sample successfully sent to ThreatGrid. Please wait 3-5 minutes and reload page to view data.', [], reload: true)
+      error: (response) ->
+        std_api_error(response, "There was a problem retrieving data from the Sample Zoo", reload: false)
+    )
+
+
+
 ########### GRAB SHA NEEDED FOR REPORTS ############
 #  If html body is on the show page (do not call on other pages)
   if $('body').hasClass('escalations--file_rep--disputes-controller') && $('body').hasClass('show-action')
@@ -8,12 +23,11 @@ $ ->
     window.research_data(sha256_hash)
 
 # Update the research reports and the items in the db
-$('#file-rep-sync-button').click ->
+window.refresh_research_data = (sha256_hash) ->
   sha256_hash = $('#sha256_hash')[0].innerText
   window.research_data(sha256_hash)
   window.update_file_rep_data()
 
-    
 
 ########### COMPILE RESEARCH REPORTS ############
 # Grabs the initial data for all three reports / datasets
@@ -126,6 +140,7 @@ window.get_threatgrid_data = (sha256_hash) ->
       $('#tg-loader').hide()
       std_api_error(response, "There was a problem retrieving data from ThreatGrid", reload: false)
   )
+
 
 
 
