@@ -322,13 +322,14 @@ window.updatePending = (id,row_id) ->
   comment = $('#complaint_comment_'+id)[0].value
   resolution_comment = $('#complaint_resolution_comment_'+id)[0].value
   resolution = $('.complaint-resolution'+id).text()
-  categories = $('#input_cat_'+id).val().toString()
+  if $('#input_cat_'+id).val() == null
+    categories = null
+  else
+    categories = $('#input_cat_'+id).val().toString()
 
-  headers = {'Token': $('input[name="token"]').val(), 'Xmlrpc-Token': $('input[name="xml_token"]').val()}
-  $.ajax(
+  std_msg_ajax(
     url: '/escalations/api/v1/escalations/webcat/complaint_entries/update_pending'
     method: 'POST'
-    headers: headers
     data: {'id': id,'prefix': prefix,'commit':status,'status':resolution,'comment':comment, 'resolution_comment': resolution_comment, 'categories': categories }
     success: (response) ->
       {uri, domain, subdomain, path, categories, error, entry_id, was_dismissed, status} = $.parseJSON(response)
