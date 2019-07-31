@@ -4,7 +4,6 @@ class Admin::NotesController < Admin::HomeController
   def index
     respond_to do |format|
       format.html
-      format.json { render json: NoteDatatable.new(view_context) }
     end
 
   end
