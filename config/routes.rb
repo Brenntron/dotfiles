@@ -12,17 +12,7 @@ Rails.application.routes.draw do
     resources :sessions, controller: '/sessions', only: [:new, :create, :destroy]
 
     # TODO These may be reimplemented in the research passenger instance, and then removed from here
-    root 'bugs#index'
-    resources :escalation_bugs, controller: 'bugs'
-    resources :bugs do
-      member do
-        # post :create_rules
-        post :add_tag
-        post :add_whiteboard
-        patch :remove_tag
-        patch :remove_whiteboard
-      end
-    end
+    root '/pages#index'
 
     namespace :other_admin_tools do
       root 'tools#index'
