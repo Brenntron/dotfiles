@@ -1309,7 +1309,7 @@ class Dispute < ApplicationRecord
                       :last_comment => last_comment_preview,
                       :owner => ticket_user,
                       :priority => result.priority,
-                      :last_comment_date => result.dispute_comments&.last&.updated_at&.strftime("%FT%T"),
+                      :last_email_date => result.dispute_emails&.last&.updated_at&.strftime("%FT%T"),
                       :comment_count => result.dispute_comments&.count
       }
     end

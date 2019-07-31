@@ -329,7 +329,7 @@ class Escalations::Webrep::DisputesController < ApplicationController
               'Ticket Type',
               'Priority',
               'Dispute Preview',
-              'Last Comment Date',
+              'Last Email Date',
               'Comment Count',
               'Entry Count']
           closed_team_tickets_headers = ['Case ID', 'Owner', 'Submitter Type', 'Ticket Type', 'Priority', 'Dispute Preview', 'Time to Close', 'Entry Count']
@@ -364,7 +364,7 @@ class Escalations::Webrep::DisputesController < ApplicationController
                 d[:submission_type],
                 d[:priority],
                 ActionController::Base.helpers.strip_tags(d[:d_entry_preview]).gsub(/ *\d+$/, ''),
-                d[:last_comment_date],
+                d[:last_email_date],
                 d[:comment_count],
                 ActionController::Base.helpers.strip_tags(d[:d_entry_preview]).scan(/\d+/).last
             ]
@@ -761,7 +761,7 @@ class Escalations::Webrep::DisputesController < ApplicationController
                        'SBRS Total Rule Hits',
                        'Important?',
                        'Resolution',
-                       'Last Comment Date',
+                       'Last Email Date',
                        'Comment Count',
                        'Resolution Comments']
     singlesheet_insert_row_with_data(dispute_headers, "h1")
@@ -789,7 +789,7 @@ class Escalations::Webrep::DisputesController < ApplicationController
                                            dispute_entry.dispute_rule_hits.sbrs_rule_hits.count,
                                            dispute_entry.is_important,
                                            dispute_entry.resolution,
-                                           dispute_entry.latest_comment_date,
+                                           dispute_entry.latest_email_date,
                                            dispute_entry.dispute.dispute_comments.count,
                                            dispute_entry.resolution_comment ])
       end
