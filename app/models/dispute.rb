@@ -1802,5 +1802,14 @@ class Dispute < ApplicationRecord
 
   end
 
+  def self.sync_all
+    AdminTask.execute_task(:sync_disputes_with_ti, {})
+  end
+
+  def manual_sync
+    message = Bridge::DisputeEntryUpdateStatusEvent.new
+    message.post_entries(self.dispute_entries)
+  end
+
 end
 
