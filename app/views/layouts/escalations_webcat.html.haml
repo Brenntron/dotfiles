@@ -148,19 +148,15 @@
         %li{class: ("selected" if params[:f] == "MY COMPLAINTS")}
           %a{href: '?f=MY COMPLAINTS'}
             %span.nav-dropdown-icon.icon-my-bugs
-            My Complaints
+            My Tickets
         %li{class: ("selected" if params[:f] == "MY OPEN COMPLAINTS")}
           %a{href: '?f=MY OPEN COMPLAINTS'}
-            %span.nav-dropdown-icon.icon-my-bugs
-            My Open Complaints
+            %span.nav-dropdown-icon.icon-my-open-bugs
+            My Open Tickets
         %li{class: ("selected" if params[:f] == "MY CLOSED COMPLAINTS")}
           %a{href: '?f=MY CLOSED COMPLAINTS'}
-            %span.nav-dropdown-icon.icon-my-bugs
-            My Closed Complaints
-        %li{class: ("selected" if params[:f] == "COMPLETED")}
-          %a{href: '?f=COMPLETED'}
-            %span.nav-dropdown-icon.icon-my-bugs
-            Completed
+            %span.nav-dropdown-icon.icon-fixed-bugs
+            My Closed Tickets
         %li{class: ("selected" if params[:f] == "ACTIVE")}
           %a{href: '?f=ACTIVE'}
             %span.nav-dropdown-icon.icon-team-bugs
@@ -171,8 +167,12 @@
             New
         %li{class: ("selected" if params[:f] == "REVIEW")}
           %a{href: '?f=REVIEW'}
+            %span.nav-dropdown-icon.icon-pending-bugs
+            Waiting for Review
+        %li{class: ("selected" if params[:f] == "COMPLETED")}
+          %a{href: '?f=COMPLETED'}
             %span.nav-dropdown-icon.icon-fixed-bugs
-            Review
+            Completed
         %li{class: ("selected" if params[:f] == "ALL")}
           %a{href: '?f=ALL'}
             %span.nav-dropdown-icon.icon-recently-viewed
