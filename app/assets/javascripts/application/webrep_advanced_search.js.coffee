@@ -9,7 +9,6 @@ $(document).ready ->
     false
 
   $('#add-search-criteria').click ->
-    console.log 'ininin', 'dude come on'
     add_button = $('#add-search-items-button')
     selected_checkboxes = []
     $('.search-checkbox:checked').each ->
