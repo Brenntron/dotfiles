@@ -1,2 +1,0 @@
-class Morsel < ApplicationRecord
-end

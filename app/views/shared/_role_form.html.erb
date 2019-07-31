@@ -1,9 +1,9 @@
-<%= form_for user do |f| %>
+<%= form_for user, url: escalations_user_path(user) do |f| %>
   <div class="modal-body">
     <% if current_user.has_role?('admin') %>
       <div class="row">
         <div class="col-xs-12 text-right">
-          <%=link_to 'Edit Roles', admin_roles_path %>
+          <%=link_to 'Edit Roles', escalations_roles_path %>
         </div>
       </div>
     <% end %>

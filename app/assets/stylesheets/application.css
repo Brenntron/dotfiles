@@ -13,7 +13,6 @@
  *= require datatables
  *= require custom-bootstrap
  *= require jquery-ui
- *= require bugs
  *= require selectize
  *= require selectize.default
  *= require bootstrap-multiselect

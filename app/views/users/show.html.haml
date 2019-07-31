@@ -90,9 +90,9 @@
                 %div.user-col-layout.last{style: "column-count: #{(@sibling_col.to_f).ceil}", 'data-division': "#{@sibling_col}"}
                   - @user.siblings.each do |user|
                     %div
-                      = link_to user.display_name, user_path(user), class: 'related-user'
+                      = link_to user.display_name, escalations_user_path(user), class: 'related-user'
                       %br
-                      = link_to user.cvs_username, user_path(user), class: 'related-username'
+                      = link_to user.cvs_username, escalations_user_path(user), class: 'related-username'
 
 
 .modal.fade{id: "roleModal_#{@user.id}", tabindex: '-1', role: 'dialog', 'aria-hidden': 'true'}

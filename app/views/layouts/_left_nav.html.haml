@@ -11,9 +11,9 @@
         %a{class: 'static-nav-item', 'data-toggle': 'collapse', href:'.bugs-subnav', role:'button', 'aria-expanded':'false', 'aria-controls':'bugs-subnav bugs-subnav-icons'}
           = image_tag('layout/bugs_icon.svg', class: 'sidenav-icon', alt: 'Bugs')
         %ul{class: 'sub-nav collapse bugs-subnav', id: 'bugs-subnav-icons'}
-          - if can?(:index, ResearchBug)
+          - if is_rule_user?
             %li{class: 'ips-link'}
-              %a{href: bugs_path}= inline_svg 'icon_snort.svg'
+              %a{href: '/bugs'}= inline_svg 'icon_snort.svg'
           - if can?(:read, Admin)
             %li{class: 'clam-link'}
               %a.disabled-link= inline_svg 'icon_clam.svg'
@@ -31,9 +31,9 @@
         %a{class: 'static-nav-item', 'data-toggle': 'collapse', href:'.esc-subnav', role:'button', 'aria-expanded':'false', 'aria-controls':'esc-subnav esc-subnav-icons'}
           = image_tag('layout/icon_escalations.svg', class: 'sidenav-icon', alt: 'Escalations')
         %ul{class: 'sub-nav collapse esc-subnav', id: 'esc-subnav-icons'}
-          - if can?(:index, EscalationBug)
+          - if is_rule_user?
             %li{class: 'ips-link'}
-              %a{href: escalations_bugs_path}
+              %a{href: '/escalation_bugs'}
                 =inline_svg 'icon_snort.svg'
           - if can?(:read, Admin)
             %li{class: 'clam-link'}
@@ -91,9 +91,9 @@
             Bugs
 
           %ul{class: 'sub-nav collapse bugs-subnav', id: 'bugs-subnav'}
-            - if can?(:index, ResearchBug)
+            - if is_rule_user?
               %li{class: 'ips-link'}
-                %a{href: bugs_path} IPS
+                %a{href: '/bugs'} IPS
             - if can?(:read, Admin)
               %li{class: 'clam-link'}
                 %a.disabled-link Clam
@@ -112,9 +112,9 @@
           %a{class: 'static-nav-item', 'data-toggle': 'collapse', href:'.esc-subnav', role:'button', 'aria-expanded':'false', 'aria-controls':'esc-subnav esc-subnav-icons'}
             Escalations
           %ul{class: 'sub-nav collapse esc-subnav', id: 'esc-subnav'}
-            - if can?(:index, EscalationBug)
+            - if is_rule_user?
               %li{class: 'ips-link'}
-                %a{href: escalations_bugs_path} IPS
+                %a{href: '/escalation_bugs'} IPS
             - if can?(:read, Admin)
               %li{class: 'clam-link'}
                 %a.disabled-link Clam

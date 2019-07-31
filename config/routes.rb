@@ -6,6 +6,8 @@ Rails.application.routes.draw do
   namespace :escalations, except: [:destroy, :edit] do
     get 'sb_api/query_lookup' => 'sb_api#query_lookup'
 
+    resources :roles, except: [:show], controller: '/admin/roles'
+
     resources :rulehit_resolution_mailer_templates, only: [:new, :index, :create, :show, :update, :destroy, :edit]
     resources :sessions, controller: '/sessions', only: [:new, :create, :destroy]
 
@@ -128,76 +130,7 @@ Rails.application.routes.draw do
     end
   end #namespace :escalations
 
-  namespace :admin do
-    root 'home#index'
-    resources :roles, except: [:show]
-    resources :org_subsets, except: [:show]
-    resources :migrations, only: [:index]
-    resources :morsels, only: [:index, :show]
-    resources :delayed_jobs, only: [:index]
-    resources :notes, only: [:index, :edit, :update, :destroy] do
-      member do
-        get :related
-      end
-    end
-  end
-
-  resources :events, only: [] do
-    collection { get :send_event }
-  end
-
-  # TODO some of these named routes need to be rethought to conform to rails conventions
-  post "sessions/create" => "sessions#create"
-  post "/attachments" => "attachments#create"
   root 'pages#index'
-
-
-
-  resources :users, only: [:index, :show, :update] do
-
-    collection do
-      get :results
-    end
-    get :status_metrics, defaults: {format: :json}
-    get :time_metrics, defaults: {format: :json}
-    get :pending_team_metrics, defaults: {format: :json}
-    get :resolved_team_metrics, defaults: {format: :json}
-    get :time_team_metrics, defaults: {format: :json}
-    get :component_team_metrics, defaults: {format: :json}
-    patch :add_to_team
-    patch :remove_from_team
-    resources :relationships, only: [:index, :show] do
-      collection do
-        get :member_status
-      end
-    end
-  end
-
-  resources :research_bugs, controller: 'bugs'
-  resources :bugs, only: [:index, :new, :create, :show, :update] do
-    member do
-      # post :create_rules
-      post :add_tag
-      post :add_whiteboard
-      patch :remove_tag
-      patch :remove_whiteboard
-    end
-    get :bug_metrics, defaults: { format: :json }
-  end
-
-
-  resources :notes, only: [:create] do
-    collection do
-      put :publish_to_bugzilla
-    end
-  end
-
-
   mount API::Base => '/escalations/api'
-
-  # Hack to test permissions to Admin page
-  if Rails.env.test?
-    get '/version', to: 'users#index'
-  end
 
 end

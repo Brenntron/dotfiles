@@ -1,4 +1,0 @@
-CREATE TABLE `cves` (`id` bigint NOT NULL AUTO_INCREMENT PRIMARY KEY, `created_at` datetime NOT NULL, `updated_at` datetime NOT NULL, `reference_id` int NOT NULL, `year` varchar(255) NOT NULL, `cve_key` varchar(255) NOT NULL, `description` text, `severity` varchar(255), `base_score` float, `impact_score` float, `exploit_score` float, `confidentiality_impact` varchar(255), `integrity_impact` varchar(255), `availability_impact` varchar(255), `vector_string` varchar(255), `access_vector` varchar(255), `access_complexity` varchar(255), `authentication` varchar(255), `affected_systems` longtext) ENGINE=InnoDB;
-CREATE UNIQUE INDEX `index_cves_on_reference_id`  ON `cves` (`reference_id`);
-CREATE UNIQUE INDEX `index_cves_on_cve_key`  ON `cves` (`cve_key`);
-INSERT INTO `schema_migrations` (`version`) VALUES ('20171205153810');
