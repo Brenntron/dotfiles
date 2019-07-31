@@ -884,6 +884,6 @@ class FileReputationDispute < ApplicationRecord
 
   def manual_sync
     conn = ::Bridge::FileRepUpdateStatusEvent.new(addressee: "talos-intelligence")
-    conn.post(self, source_authority: "talos-intelligence", source_key: dispute.ticket_source_key)
+    conn.post(self, source_authority: "talos-intelligence", source_key: self.ticket_source_key)
   end
 end
