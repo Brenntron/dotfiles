@@ -606,6 +606,15 @@ class Complaint < ApplicationRecord
       complaint.complaint_tags << new_tag
     end
   end
+
+  def self.sync_all
+    AdminTask.execute_task(:sync_complaints_with_ti, {})
+  end
+
+  def manual_sync
+    message = Bridge::ComplaintUpdateStatusEvent.new
+    message.post_complaint(self)
+  end
 end
 
 
