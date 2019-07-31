@@ -6,7 +6,7 @@
     %li{class: 'nav-item nav-ac static-nav-item'}
       = image_tag('layout/analyst_console_icon.svg', class: 'sidenav-icon', alt: 'Analyst Console')
     %li{class: 'nav-menu-spacer static-nav-item'}
-    - if can?(:read, Admin) || can?(:index, ResearchBug)
+    - if is_rule_user?
       %li{class: 'nav-bugs'}
         %a{class: 'static-nav-item', 'data-toggle': 'collapse', href:'.bugs-subnav', role:'button', 'aria-expanded':'false', 'aria-controls':'bugs-subnav bugs-subnav-icons'}
           = image_tag('layout/bugs_icon.svg', class: 'sidenav-icon', alt: 'Bugs')
@@ -26,7 +26,7 @@
           - if can?(:read, Admin)
             %li{class: 'cat-link'}
               %a.disabled-link= inline_svg 'icon_cat.svg'
-    - if can?(:read, Admin) || can?(:index, any: [EscalationBug, FileReputationDispute, Dispute, Complaint])
+    - if is_rule_user? || can?(:index, any: [FileReputationDispute, Dispute, Complaint])
       %li{class: 'nav-escalations'}
         %a{class: 'static-nav-item', 'data-toggle': 'collapse', href:'.esc-subnav', role:'button', 'aria-expanded':'false', 'aria-controls':'esc-subnav esc-subnav-icons'}
           = image_tag('layout/icon_escalations.svg', class: 'sidenav-icon', alt: 'Escalations')
@@ -85,7 +85,7 @@
       %li{class: 'nav-ac static-nav-item'}
         = image_tag('layout/ac_logo_text.svg', class: 'ac-logo-text', alt: 'Analyst Console')
       %li{class: 'static-nav-item'}
-      - if can?(:read, Admin) || can?(:index, ResearchBug)
+      - if is_rule_user?
         %li{class: 'nav-bugs'}
           %a{class: 'static-nav-item', 'data-toggle': 'collapse', href:'.bugs-subnav', role:'button', 'aria-expanded':'false', 'aria-controls':'bugs-subnav bugs-subnav-icons'}
             Bugs
@@ -107,7 +107,7 @@
               %li{class: 'cat-link'}
                 %a.disabled-link Categorization
 
-      - if can?(:read, Admin) || can?(:index, any: [EscalationBug, FileReputationDispute, Dispute, Complaint])
+      - if is_rule_user? || can?(:index, any: [ FileReputationDispute, Dispute, Complaint ])
         %li{class: 'nav-escalations'}
           %a{class: 'static-nav-item', 'data-toggle': 'collapse', href:'.esc-subnav', role:'button', 'aria-expanded':'false', 'aria-controls':'esc-subnav esc-subnav-icons'}
             Escalations
