@@ -22,9 +22,10 @@ $ ->
 
   window.set_webcat_advanced = () ->
     # creating form object from array made from advanced dropdown form
-    form = {
-      tags: $(tag_input).is(':hidden') tag_input[0].selectize.items.join()
-    }
+    form = {}
+
+    if !$('.selectize-control').closest('.form-group').hasClass('hidden')
+      form['tags'] = tag_input[0].selectize.items.join()
 
     for item in $('#cat_named_search :input:not(:hidden)').serializeArray()
       { name, value } = item
@@ -136,10 +137,17 @@ $ ->
       {search_type, search_name} = data
 
       if search_type == 'standard'
-        search_name = search_name.toLowerCase()
+
+        search_name = search_name.toLowerCase().replace('complaints', 'tickets')
+        if search_name == 'all'
+          search_name += ' web categorization tickets'
+
+        if !search_name.endsWith('tickets')
+          search_name += ' tickets'
+
         new_header =
           '<div>' +
-            '<span class="text-capitalize">' + search_name.replace(/_|%20/g, " ") + ' tickets </span>' +
+            '<span class="text-capitalize">' + search_name.replace(/_|%20/g, " ") + ' </span>' +
             reset_icon +
             '</div>'
 
@@ -192,7 +200,8 @@ $ ->
       else
         new_header = 'All Web Categorization Tickets'
       $('#webcat-index-title')[0].innerHTML = new_header
-
+    else
+      $('#webcat-index-title')[0].innerHTML = 'All Web Categorization Tickets'
   build_complaints_table = () ->
         complaint_table = $('#complaints-index').DataTable(
           processing: true

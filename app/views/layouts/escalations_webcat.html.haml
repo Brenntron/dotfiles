@@ -140,11 +140,7 @@
       Filter
     .dropdown-menu.nav-tools-dropdown#filter-dropdown{'aria-labelledby': 'filter-cases'}
       %ul#filter-cases-list
-        -# add this in later
-        -#%li
-        -#  %a{onclick: 'standard_webrep_index_table("my_open");'}
-        -#    %span.nav-dropdown-icon.icon-my-open-bugs
-        -#    My Open Tickets
+
         %li{class: ("selected" if params[:f] == "MY COMPLAINTS")}
           %a{href: '?f=MY COMPLAINTS'}
             %span.nav-dropdown-icon.icon-my-bugs
@@ -160,11 +156,11 @@
         %li{class: ("selected" if params[:f] == "ACTIVE")}
           %a{href: '?f=ACTIVE'}
             %span.nav-dropdown-icon.icon-team-bugs
-            Active
+            Active Tickets
         %li{class: ("selected" if params[:f] == "NEW")}
           %a{href: '?f=NEW'}
             %span.nav-dropdown-icon.icon-open-bugs
-            New
+            New Tickets
         %li{class: ("selected" if params[:f] == "REVIEW")}
           %a{href: '?f=REVIEW'}
             %span.nav-dropdown-icon.icon-pending-bugs
@@ -172,11 +168,11 @@
         %li{class: ("selected" if params[:f] == "COMPLETED")}
           %a{href: '?f=COMPLETED'}
             %span.nav-dropdown-icon.icon-fixed-bugs
-            Completed
+            Completed Tickets
         %li{class: ("selected" if params[:f] == "ALL")}
           %a{href: '?f=ALL'}
             %span.nav-dropdown-icon.icon-recently-viewed
-            All
+            All Tickets
 
       #saved-searches-wrapper.webcat-named-search-list.nav-tool-content-wrapper
         %h3.nav-tool-dropdown-header

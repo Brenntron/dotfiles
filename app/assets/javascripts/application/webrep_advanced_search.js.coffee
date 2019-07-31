@@ -9,17 +9,18 @@ $(document).ready ->
     false
 
   $('#add-search-criteria').click ->
+    console.log 'ininin', 'dude come on'
     add_button = $('#add-search-items-button')
     selected_checkboxes = []
     $('.search-checkbox:checked').each ->
       cb_for = $(this).attr('for')
       search_criteria_group = $('#advanced-search-wrapper').find('.form-group')
-
       $(search_criteria_group).each ->
         group_id = $(this).attr('id')
         input = $(this).find('.form-control')
         select = $(this).find('select')
-        if $(input).attr('id') == cb_for || $(select).attr('id') == cb_for || group_id == cb_for
+        selectize = $(this).find('select.selectize')
+        if $(input).attr('id') == cb_for || $(select).attr('id') == cb_for || group_id == cb_for || cb_for.startsWith( $(selectize).attr('id') )
           $(this).removeClass('hidden')
 
       $($(this).parent()).parent().addClass('hidden')
