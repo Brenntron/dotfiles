@@ -188,7 +188,7 @@ $ ->
         new_header =
           '<div>Results for "' + webcat_search_conditions.value + '" '+
             reset_icon +
-            '</div>'
+          '</div>'
       else
         new_header = 'All Web Categorization Tickets'
       $('#webcat-index-title')[0].innerHTML = new_header
