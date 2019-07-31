@@ -56,8 +56,8 @@ class Escalations::Webrep::DisputesController < ApplicationController
                            'SBRS Total Rule Hits',
                            'Important?',
                            'Resolution',
-                           'Last Comment Date',
-                           'Comment Count',
+                           'Last Email Date',
+                           'Email Count',
                            'Resolution Comments']
         singlesheet_insert_row_with_data(dispute_headers, "h1")
 
@@ -85,8 +85,8 @@ class Escalations::Webrep::DisputesController < ApplicationController
                                                dispute_entry.dispute_rule_hits.sbrs_rule_hits.count,
                                                dispute_entry.is_important,
                                                dispute_entry.resolution,
-                                               dispute_entry.latest_comment_date,
-                                               dispute_entry.dispute.dispute_comments.count,
+                                               dispute_entry.latest_email_date,
+                                               dispute_entry.dispute.dispute_emails.count,
                                                dispute_entry.resolution_comment ])
           end
         end
@@ -200,7 +200,7 @@ class Escalations::Webrep::DisputesController < ApplicationController
 
 
           # Build the headers of each individual worksheet
-          my_open_tickets_headers = ['Case ID', 'Submitter Type', 'Ticket Type', 'Priority', 'Dispute Preview', 'Last Comment Date', 'Comment Count', 'Entry Count']
+          my_open_tickets_headers = ['Case ID', 'Submitter Type', 'Ticket Type', 'Priority', 'Dispute Preview', 'Last Email Date', 'Email Count', 'Entry Count']
           my_closed_tickets_headers = ['Case ID', 'Submitter Type', 'Ticket Type', 'Priority', 'Dispute Preview', 'Time to Close', 'Entry Count']
           total_ticket_entries_closed_headers = ['Date', 'Web', 'Email', 'Web_Email', 'Total']
           time_to_close_tickets_headers = ['Ticket', 'Time (hrs)']
@@ -220,7 +220,7 @@ class Escalations::Webrep::DisputesController < ApplicationController
           # My Open Tickets
           my_open_tickets_data = Dispute.open_tickets_report([current_user], params[:startdate], params[:enddate])
           my_open_tickets_data[:table_data].each do |d|
-            data_values = [d[:case_number], d[:submitter_type], d[:submission_type], d[:priority], ActionController::Base.helpers.strip_tags(d[:d_entry_preview]).gsub(/ *\d+$/, ''), d[:last_comment_date], d[:comment_count], ActionController::Base.helpers.strip_tags(d[:d_entry_preview]).scan(/\d+/).last]
+            data_values = [d[:case_number], d[:submitter_type], d[:submission_type], d[:priority], ActionController::Base.helpers.strip_tags(d[:d_entry_preview]).gsub(/ *\d+$/, ''), d[:last_email_date], d[:total_email_count], ActionController::Base.helpers.strip_tags(d[:d_entry_preview]).scan(/\d+/).last]
             # The Rails `strip_tags` method doesn't work directly in this controller and I don't know why.
             insert_row_with_data(data_values, mytickets_xlsx, mytickets_workbook_names[:my_open_tickets])
           end
@@ -330,7 +330,7 @@ class Escalations::Webrep::DisputesController < ApplicationController
               'Priority',
               'Dispute Preview',
               'Last Email Date',
-              'Comment Count',
+              'Email Count',
               'Entry Count']
           closed_team_tickets_headers = ['Case ID', 'Owner', 'Submitter Type', 'Ticket Type', 'Priority', 'Dispute Preview', 'Time to Close', 'Entry Count']
           average_time_to_close_by_owner_headers = ['Owner', 'Time (hrs)']
@@ -365,7 +365,7 @@ class Escalations::Webrep::DisputesController < ApplicationController
                 d[:priority],
                 ActionController::Base.helpers.strip_tags(d[:d_entry_preview]).gsub(/ *\d+$/, ''),
                 d[:last_email_date],
-                d[:comment_count],
+                d[:total_email_count],
                 ActionController::Base.helpers.strip_tags(d[:d_entry_preview]).scan(/\d+/).last
             ]
             # The Rails `strip_tags` method doesn't work directly in this controller and I don't know why.
@@ -762,7 +762,7 @@ class Escalations::Webrep::DisputesController < ApplicationController
                        'Important?',
                        'Resolution',
                        'Last Email Date',
-                       'Comment Count',
+                       'Email Count',
                        'Resolution Comments']
     singlesheet_insert_row_with_data(dispute_headers, "h1")
 
@@ -790,7 +790,7 @@ class Escalations::Webrep::DisputesController < ApplicationController
                                            dispute_entry.is_important,
                                            dispute_entry.resolution,
                                            dispute_entry.latest_email_date,
-                                           dispute_entry.dispute.dispute_comments.count,
+                                           dispute_entry.dispute.dispute_emails.count,
                                            dispute_entry.resolution_comment ])
       end
     end

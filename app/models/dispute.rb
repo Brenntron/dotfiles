@@ -1310,7 +1310,7 @@ class Dispute < ApplicationRecord
                       :owner => ticket_user,
                       :priority => result.priority,
                       :last_email_date => result.dispute_emails&.last&.updated_at&.strftime("%FT%T"),
-                      :comment_count => result.dispute_comments&.count
+                      :total_email_count => result.dispute_emails&.count
       }
     end
 
