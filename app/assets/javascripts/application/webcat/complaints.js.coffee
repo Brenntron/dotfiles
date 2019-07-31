@@ -10,7 +10,9 @@ $(document).on 'click', '.paginate_button', ->
 
 #### WBNP Reporting ####
 $(document).ready ->
-  window.check_wbnp_status()
+  if ($('body').hasClass('escalations--webcat--complaints-controller') || $('body').hasClass('escalations--webcat--reports-controller')) &&
+     $('body').hasClass('index-action')
+    window.check_wbnp_status()
 
 # WBNP - Get report id
 window.fetch_wbnp_data = () ->
