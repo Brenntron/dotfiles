@@ -18,7 +18,7 @@
         %tr
           %td.user-group Manager
           %td.alt-col.user-col-divider.user-displayname-col= current_user.parent.display_name
-          %td.alt-col.user-col-divider.user-name-col.current-user= link_to current_user.parent.cvs_username, user_path(current_user.parent)
+          %td.alt-col.user-col-divider.user-name-col.current-user= link_to current_user.parent.cvs_username, escalations_user_path(current_user.parent)
           %td.alt-col.user-col-divider=current_user.parent.children.length
           %td.alt-col=current_user.parent.descendants.length
           %td.data_small_emphasis= current_user.parent.roles.map(&:role).join(', ')
@@ -28,7 +28,7 @@
         %tr
           %td#team-cell.user-group{rowspan: "#{team_total}", 'data-rowspan': "#{team_total}"} Team
           %td.alt-col.user-col-divider.user-displayname-col= current_user.display_name
-          %td.alt-col.user-col-divider.user-name-col.current-user= link_to current_user.cvs_username, user_path(current_user)
+          %td.alt-col.user-col-divider.user-name-col.current-user= link_to current_user.cvs_username, escalations_user_path(current_user)
           %td.alt-col.user-col-divider=current_user.children.length
           %td.alt-col=current_user.descendants.length
           %td.data_small_emphasis=current_user.roles.map(&:role).join(', ')
@@ -44,7 +44,7 @@
                     = current_user.display_name
                     \'s team
                   .inline-tool-content-wrapper
-                    =form_tag user_add_to_team_path(current_user), method: :patch do
+                    =form_tag escalations_user_add_to_team_path(current_user), method: :patch do
                       .toolbar
                         %div.select-wrapper
                           %label.toolbar-section-label{for: 'users-selection'} Users
@@ -144,13 +144,13 @@
           - else
             %tr
               %td.alt-col.user-col-divider.user-displayname-col= user.display_name
-              %td.alt-col.user-col-divider.user-name-col= link_to user.cvs_username, user_path(user)
+              %td.alt-col.user-col-divider.user-name-col= link_to user.cvs_username, escalations_user_path(user)
               %td.alt-col.user-col-divider=user.children.length
               %td.alt-col=user.descendants.length
               %td.data_small_emphasis=user.roles.map(&:role).join(', ')
               %td.text-right.table-button-row
                 %button.edit-button.table-row-button.tooltipped{title: "Edit #{user.cvs_username}'s roles", 'data-toggle': 'modal', 'data-target': "#roleModal_#{user.id}"}
-                = link_to user_remove_from_team_path(user_id: user.id), method: :patch, data: {confirm: "Remove #{user.display_name} from team?"} do
+                = link_to escalations_user_remove_from_team_path(user_id: user.id), method: :patch, data: {confirm: "Remove #{user.display_name} from team?"} do
                   %button.remove-button.table-row-button.tooltipped{title: "Remove #{user.cvs_username} from this team"}
 
 
@@ -168,7 +168,7 @@
         %tr
           %td.user-group
           %td.alt-col.user-col-divider.user-displayname-col= current_user.display_name
-          %td.alt-col.user-col-divider.user-name-col.current-user= link_to current_user.cvs_username, user_path(current_user)
+          %td.alt-col.user-col-divider.user-name-col.current-user= link_to current_user.cvs_username, escalations_user_path(current_user)
           %td.alt-col.user-col-divider=current_user.children.length
           %td.alt-col=current_user.descendants.length
           %td.data_small_emphasis=current_user.roles.map(&:role).join(', ')
@@ -182,7 +182,7 @@
               %td.user-group{rowspan: "#{coworkers_total}"}
                 Coworkers
             %td.alt-col.user-col-divider.user-displayname-col= user.display_name
-            %td.alt-col.user-col-divider.user-name-col= link_to user.cvs_username, user_path(user)
+            %td.alt-col.user-col-divider.user-name-col= link_to user.cvs_username, escalations_user_path(user)
             %td.alt-col.user-col-divider=user.children.length
             %td.alt-col=user.descendants.length
             %td.data_small_emphasis= user.roles.map(&:role).join(', ')
