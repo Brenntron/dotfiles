@@ -22,21 +22,15 @@ class ComplaintEntryScreenshot < ApplicationRecord
       puts ("done with #{url}")
     rescue Net::ReadTimeout => ex
       puts ("Hey! There was a Net Read Timeout error")
+      file_data = File.open("app/assets/images/timeout_screenshot.jpg").read()
       self.update(screenshot: file_data, error_message: ex.message)
-      file_data = ""
-      open("app/assets/images/failed_screenshot.jpg") do |f|
-        file_data = f.read
-      end
     rescue Exception => ex
       unless driver.nil?
         driver.close()
       end
       puts ("oops there was a screen capture error")
       puts ("#{ex.class}: #{ex.message}")
-      file_data = ""
-      open("app/assets/images/failed_screenshot.jpg") do |f|
-        file_data = f.read
-      end
+      file_data = File.open("app/assets/images/failed_screenshot.jpg").read()
       self.update(screenshot: file_data, error_message: ex.message)
     ensure # this is a good practice to get into so that the driver will always exit, even if there is an error
       unless driver.nil?
