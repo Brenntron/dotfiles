@@ -32,58 +32,8 @@
         </div>
       </div>
     </div>
-    <% if @user.children.any? %>
-      <div class="row">
-        <div class="col-xs-11"><hr/></div>
-        <div class='col-xs-12'>
-          <div class='col-xs-11'>
-            <h4>Metrics <a href="#" class="tiny text-muted change_metrics_timeframe"><em>change timeframe</em></a></h4>
-            <p class="tiny text-muted"><em>click legend items to show/hide data</em></p>
-            <%= render 'shared/change_metrics_timeframe_form' %>
-            <div id="msg"></div>
-          </div>
-        </div>
-        <div class="col-lg-5 col-md-6">
-          <div class="user-metrics-manager" id='<%=current_user.id%>'></div>
-          <p>Bug status set to <i>Pending</i> last <%=current_user.chart_timeframe_preference%> days</p>
-          <canvas id="pendingChart"></canvas>
-        </div>
-        <div class="col-lg-5 col-md-6">
-          <p>Bug status set to <i>Resolved</i> last <%=current_user.chart_timeframe_preference%> days</p>
-          <canvas id="resolvedChart"></canvas>
-        </div>
-      </div>
-      <div class="row">
-        <div class="col-xs-11"><hr/></div>
-        <div class='col-xs-12'>
-          <div class='col-xs-11'>
-            <div id="msg"></div>
-          </div>
-        </div>
-        <div class="col-lg-5 col-md-6">
-          <p>Average Work Time by Team Member</p>
-          <canvas id="worktimeChart"></canvas>
-          <br>
-          <div class="col-xs-12">
-            <p class="text-muted small"><em>* Averages rounded to the nearest whole number.</em></p>
-          </div>
-        </div>
-        <div class="col-lg-5 col-md-6">
-          <p>Average Work Time by Component</p>
-          <canvas id="componenttimeChart"></canvas>
-          <br>
-          <div class="col-xs-12">
-            <p class="text-muted small"><em>* Averages rounded to the nearest whole number.</em></p>
-          </div>
-        </div>
-      </div>
-      <div class="footer-spacer"></div>
-      <input type="hidden" name="token" value="<%= current_user.authentication_token %>">
-      <input type="hidden" name="xml_token" value="<%= xml_token %>">
-      <input type="hidden" name="current_user" value="<%= current_user.id%>">
-    </div>
-    <% end %>
   </div>
+</div>
 
 <div id="new_member_modal" class="modal" role="dialog">
   <div class="modal-dialog modal-sm">

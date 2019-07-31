@@ -440,6 +440,8 @@ $ ->
               }
               {
                 data: 'assigned_to'
+                render: (data) ->
+                  data
               }
               {
                 data: 'age_int'
