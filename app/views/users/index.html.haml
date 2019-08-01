@@ -48,8 +48,8 @@
                       .toolbar
                         %div.select-wrapper
                           %label.toolbar-section-label{for: 'users-selection'} Users
-                          = select_tag 'child_id', options_for_select(nested_set_options(current_user.available_users) {|i| "#{'-' * i.level} #{i.display_name} (#{i.cvs_username})"} ), {prompt: "Choose Team Member", class: "toolbar-select"}
-                        = hidden_field_tag :user_id, value: current_user.id
+                          = select_tag "users_for_#{current_user.id}", options_for_select(nested_set_options(current_user.available_users) {|i| "#{'-' * i.level} #{i.display_name} (#{i.cvs_username})"} ), {prompt: "Choose Team Member", class: "toolbar-select select-team-members", name: 'child_id'}
+                        = hidden_field_tag "manager_id_#{current_user.id}", current_user.id
                       .button-row-center
                         %button.primary.dropdown-submit-button{type: 'submit'} Add User
 
@@ -81,8 +81,8 @@
                             .toolbar
                               %div.select-wrapper
                                 %label.toolbar-section-label{for: 'users-selection'} Users
-                                = select_tag 'child_id', options_for_select(nested_set_options(user.available_users) {|i| "#{'-' * i.level} #{i.display_name} (#{i.cvs_username})"} ), {prompt: "Choose Team Member", class: "toolbar-select"}
-                              = hidden_field_tag :user_id, value: user.id
+                                = select_tag "users_for_#{user.id}", options_for_select(nested_set_options(user.available_users) {|i| "#{'-' * i.level} #{i.display_name} (#{i.cvs_username})"} ), {prompt: "Choose Team Member", class: "toolbar-select select-team-members", name: 'child_id'}
+                              = hidden_field_tag "manager_id_#{user.id}", user.id
                             .button-row-center
                               %button.primary.dropdown-submit-button{type: 'submit'} Add User
               - else
@@ -108,55 +108,83 @@
                             .toolbar
                               %div.select-wrapper
                                 %label.toolbar-section-label{for: 'users-selection'} Users
-                                = select_tag 'child_id', options_for_select(nested_set_options(user.available_users) {|i| "#{'-' * i.level} #{i.display_name} (#{i.cvs_username})"} ), {prompt: "Choose Team Member", class: "toolbar-select"}
-                              = hidden_field_tag :user_id, value: user.id
+                                = select_tag "users_for_#{user.id}", options_for_select(nested_set_options(user.available_users) {|i| "#{'-' * i.level} #{i.display_name} (#{i.cvs_username})"} ), {prompt: "Choose Team Member", class: "toolbar-select select-team-members", name: 'child_id'}
+                              = hidden_field_tag "manager_id_#{user.id}", user.id
                             .button-row-center
                               %button.primary.dropdown-submit-button{type: 'submit'} Add User
 
 
             - user.children.each do |child|
               - if child.has_role?('manager')
-                %tr.manage-child-row{'data-user-child': "#{user.id}"}
-                  %td.alt-col.lighter-alt-col.user-col-divider.user-displayname-col.manager-row-indicator
-                    %span= child.display_name
-                    %button.expand-manager-row-button.up{'data-user-manager': "#{child.id}"}
-                  %td.alt-col.user-col-divider.user-name-col.lighter-alt-col= link_to child.cvs_username, user_path(child)
-                  %td.alt-col.user-col-divider.lighter-alt-col=child.children.length
-                  %td.alt-col.lighter-alt-col=child.descendants.length
-                  %td.data_small_emphasis=child.roles.map(&:role).join(', ')
-                  %td.text-right.table-button-row
-                    %button.edit-button.table-row-button.tooltipped{title: "Edit #{child.cvs_username}'s roles", 'data-toggle': 'modal', 'data-target': "#roleModal_#{child.id}"}
-                    = link_to user_remove_from_team_path(user_id: child.id), method: :patch, data: {confirm: "Remove #{child.display_name} from team?"} do
-                      %button.remove-button.table-row-button.tooltipped{title: "Remove #{child.cvs_username} from this team"}
-                    %span.dropdown
-                      %button.add-user-button.table-row-button.tooltipped{title: "Add user to #{child.display_name}'s team'", id: "add_user_button_#{child.id}", 'data-toggle': 'dropdown', 'aria-haspopup': 'true', 'aria-expanded': 'false'}
-                      .dropdown-menu{id: "add_user_dropdown_#{child.id}", 'aria-labelledby': "add_user_button_#{child.id}"}
-                        .user-select-wrapper
-                          %h3
-                            Add members to
-                            = child.display_name
-                            \'s team
-                          .inline-tool-content-wrapper
-                            =form_tag user_add_to_team_path(child), method: :patch do
-                              .toolbar
-                                %div.select-wrapper
-                                  %label.toolbar-section-label{for: 'users-selection'} Users
-                                  = select_tag 'child_id', options_for_select(nested_set_options(child.available_users) {|i| "#{'-' * i.level} #{i.display_name} (#{i.cvs_username})"} ), {prompt: "Choose Team Member", class: "toolbar-select"}
-                                = hidden_field_tag :user_id, value: child.id
-                              .button-row-center
-                                %button.primary.dropdown-submit-button{type: 'submit'} Add User
-                - child.children.each do |grandchild|
-                  %tr.manage-child-row.manage-grandchild-row{'data-user-child': "#{user.id} #{child.id}"}
-                    %td.alt-col.user-col-divider.user-displayname-col.lighter-alt-col= grandchild.display_name
-                    %td.alt-col.user-col-divider.user-name-col.lighter-alt-col= link_to grandchild.cvs_username, user_path(grandchild)
-                    %td.alt-col.user-col-divider.lighter-alt-col=grandchild.children.length
-                    %td.alt-col.lighter-alt-col=grandchild.descendants.length
-                    %td.data_small_emphasis=grandchild.roles.map(&:role).join(', ')
+                - if child.children.length > 0
+                  %tr.manage-child-row{'data-user-child': "#{user.id}", 'data-whatever': 'at least one child'}
+                    %td.alt-col.lighter-alt-col.user-col-divider.user-displayname-col.manager-row-indicator
+                      %span= child.display_name
+                      %button.expand-manager-row-button.up{'data-user-manager': "#{child.id}"}
+                    %td.alt-col.user-col-divider.user-name-col.lighter-alt-col= link_to child.cvs_username, user_path(child)
+                    %td.alt-col.user-col-divider.lighter-alt-col=child.children.length
+                    %td.alt-col.lighter-alt-col=child.descendants.length
+                    %td.data_small_emphasis=child.roles.map(&:role).join(', ')
                     %td.text-right.table-button-row
-                      %button.edit-button.table-row-button.tooltipped{title: "Edit #{grandchild.cvs_username}'s roles", 'data-toggle': 'modal', 'data-target': "#roleModal_#{grandchild.id}"}
-                      = link_to user_remove_from_team_path(user_id: grandchild.id), method: :patch, data: {confirm: "Remove #{grandchild.display_name} from team?"} do
-                        %button.remove-button.table-row-button.tooltipped{title: "Remove #{grandchild.cvs_username} from this team"}
-
+                      %button.edit-button.table-row-button.tooltipped{title: "Edit #{child.cvs_username}'s roles", 'data-toggle': 'modal', 'data-target': "#roleModal_#{child.id}"}
+                      = link_to user_remove_from_team_path(user_id: child.id), method: :patch, data: {confirm: "Remove #{child.display_name} from team?"} do
+                        %button.remove-button.table-row-button.tooltipped{title: "Remove #{child.cvs_username} from this team"}
+                      %span.dropdown
+                        %button.add-user-button.table-row-button.tooltipped{title: "Add user to #{child.display_name}'s team'", id: "add_user_button_#{child.id}", 'data-toggle': 'dropdown', 'aria-haspopup': 'true', 'aria-expanded': 'false'}
+                        .dropdown-menu{id: "add_user_dropdown_#{child.id}", 'aria-labelledby': "add_user_button_#{child.id}"}
+                          .user-select-wrapper
+                            %h3
+                              Add members to
+                              = child.display_name
+                              \'s team
+                            .inline-tool-content-wrapper
+                              =form_tag user_add_to_team_path(child), method: :patch do
+                                .toolbar
+                                  %div.select-wrapper
+                                    %label.toolbar-section-label{for: 'users-selection'} Users
+                                    = select_tag "users_for_#{child.id}", options_for_select(nested_set_options(child.available_users) {|i| "#{'-' * i.level} #{i.display_name} (#{i.cvs_username})"} ), {prompt: "Choose Team Member", class: "toolbar-select select-team-members", name: 'child_id'}
+                                  = hidden_field_tag "manager_id_#{child.id}", child.id
+                                .button-row-center
+                                  %button.primary.dropdown-submit-button{type: 'submit'} Add User
+                  - child.children.each do |grandchild|
+                    %tr.manage-child-row.manage-grandchild-row{'data-user-child': "#{user.id} #{child.id}"}
+                      %td.alt-col.user-col-divider.user-displayname-col.lighter-alt-col= grandchild.display_name
+                      %td.alt-col.user-col-divider.user-name-col.lighter-alt-col= link_to grandchild.cvs_username, user_path(grandchild)
+                      %td.alt-col.user-col-divider.lighter-alt-col=grandchild.children.length
+                      %td.alt-col.lighter-alt-col=grandchild.descendants.length
+                      %td.data_small_emphasis=grandchild.roles.map(&:role).join(', ')
+                      %td.text-right.table-button-row
+                        %button.edit-button.table-row-button.tooltipped{title: "Edit #{grandchild.cvs_username}'s roles", 'data-toggle': 'modal', 'data-target': "#roleModal_#{grandchild.id}"}
+                        = link_to user_remove_from_team_path(user_id: grandchild.id), method: :patch, data: {confirm: "Remove #{grandchild.display_name} from team?"} do
+                          %button.remove-button.table-row-button.tooltipped{title: "Remove #{grandchild.cvs_username} from this team"}
+                - else
+                  %tr.manage-child-row{'data-user-child': "#{user.id}", 'data-whatever': 'no children yet'}
+                    %td.alt-col.user-col-divider.user-displayname-col.lighter-alt-col= child.display_name
+                    %td.alt-col.user-col-divider.user-name-col.lighter-alt-col= link_to child.cvs_username, user_path(child)
+                    %td.alt-col.user-col-divider.lighter-alt-col=child.children.length
+                    %td.alt-col.lighter-alt-col=child.descendants.length
+                    %td.data_small_emphasis=child.roles.map(&:role).join(', ')
+                    %td.text-right.table-button-row
+                      %button.edit-button.table-row-button.tooltipped{title: "Edit #{child.cvs_username}'s roles", 'data-toggle': 'modal', 'data-target': "#roleModal_#{child.id}"}
+                      = link_to user_remove_from_team_path(user_id: child.id), method: :patch, data: {confirm: "Remove #{child.display_name} from team?"} do
+                        %button.remove-button.table-row-button.tooltipped{title: "Remove #{child.cvs_username} from this team"}
+                      %span.dropdown
+                        %button.add-user-button.table-row-button.tooltipped{title: "Add user to #{child.display_name}'s team'", id: "add_user_button_#{child.id}", 'data-toggle': 'dropdown', 'aria-haspopup': 'true', 'aria-expanded': 'false'}
+                        .dropdown-menu{id: "add_user_dropdown_#{child.id}", 'aria-labelledby': "add_user_button_#{child.id}"}
+                          .user-select-wrapper
+                            %h3
+                              Add members to
+                              = child.display_name
+                              \'s team
+                            .inline-tool-content-wrapper
+                              =form_tag user_add_to_team_path(child), method: :patch do
+                                .toolbar
+                                  %div.select-wrapper
+                                    %label.toolbar-section-label{for: 'users-selection'} Users
+                                    = select_tag "users_for_#{child.id}", options_for_select(nested_set_options(child.available_users) {|i| "#{'-' * i.level} #{i.display_name} (#{i.cvs_username})"} ), {prompt: "Choose Team Member", class: "toolbar-select select-team-members", name: 'child_id'}
+                                  = hidden_field_tag "manager_id_#{child.id}", child.id
+                                .button-row-center
+                                  %button.primary.dropdown-submit-button{type: 'submit'} Add User
 
               - else
                 %tr.manage-child-row{'data-user-child': "#{user.id}"}
