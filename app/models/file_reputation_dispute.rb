@@ -616,9 +616,16 @@ class FileReputationDispute < ApplicationRecord
     if new_dispute
       if FileReputationDispute.threaded?
         Thread.new do
-          new_dispute.update_scores
-          new_dispute.populate_fields_from_rl
-          new_dispute.auto_resolve_on_matching_disposition(from: 'TI')
+          begin
+            new_dispute.update_scores
+            new_dispute.populate_fields_from_rl
+            new_dispute.auto_resolve_on_matching_disposition(from: 'TI')
+          rescue
+            #do nothing for now, come back and improve this....somehow.
+            #in this case if something catastrophic happens with auto resolve, the fallback
+            #is that the dispute is created with a status of new, going into the pile for humans
+            #to do manually.
+          end
           new_dispute.send_created_ack
         end
       else
