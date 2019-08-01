@@ -29,7 +29,9 @@ $ ->
 
     for item in $('#cat_named_search :input:not(:hidden)').serializeArray()
       { name, value } = item
+
       name = name.toLowerCase().replace(/-/g, '_')
+
       if name != 'tags'
         form[name] = value
 
@@ -38,6 +40,7 @@ $ ->
     localStorage.webcat_search_conditions = JSON.stringify(
       status: form.status
       complaint_id: form.complaint_id
+      ip_or_uri: form.ip_or_uri
       resolution: form.resolution
       channel: form.channel
       category: form.category
