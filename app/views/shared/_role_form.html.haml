@@ -1,0 +1,20 @@
+= form_for user do |f|
+  .modal-body
+    - if current_user.has_role?('admin')
+      .row
+        .col-xs-12.text-right
+          =link_to 'Edit Roles', admin_roles_path
+
+    .row
+      .col-xs-12
+        .multi-col
+          %ul
+            = f.collection_check_boxes(:role_ids, role_options_for(current_user), :id, :role) do |r| 
+              %li
+                = r.label { r.check_box + ' ' + r.text }
+
+  .modal-footer
+    .confirmation-buttons.col-xs-12
+      %button.panel-button.primary.confirm.wide{name: 'submit', 'aria-label': 'Save Roles'} Save Roles
+      -#  =f.submit 'Save Roles', class: 'panel-button primary confirm wide', type: 'button'
+      %button.panel-button.secondary.cancel.wide{'data-dismiss': 'modal', 'aria-label': 'Cancel'} Cancel
