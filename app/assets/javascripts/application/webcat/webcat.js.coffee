@@ -6,6 +6,17 @@ window.td_truncate = (str, max, long) ->
   if typeof str == 'string' and str.length > max then str.substring(0, max) + long else str
 
 $ ->
+  $('#advanced-search-button').on 'click', ->
+
+    $('#category-input').selectize {
+        persist: false,
+        create: false,
+        maxItems: 5,
+        valueField: 'category_id',
+        labelField: 'category_name',
+        searchField: ['category_name', 'category_code'],
+        options: AC.WebCat.createSelectOptions(),
+    }
 
   $('#web-cat-search #general_search').on 'keyup', (e) ->
     { keyCode } = e
@@ -40,6 +51,7 @@ $ ->
     localStorage.webcat_search_conditions = JSON.stringify(
       status: form.status
       complaint_id: form.complaint_id
+#      entry_id: form.entry_id
       ip_or_uri: form.ip_or_uri
       resolution: form.resolution
       channel: form.channel
@@ -487,8 +499,9 @@ $ ->
 
     $('#complaints-index tbody').on 'click', 'td.expandable-row-column', ->
       click_table_buttons complaint_table, this
-
-    # advanced search tags
+    $('#advanced-search-button').on 'click', ->
+      console.log 'ininin'
+      # advanced search tags
     createSelectOptions = ->
       tags = $('#search_tag_list')[0]
       if tags

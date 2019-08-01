@@ -1494,6 +1494,10 @@ fieldset.tight {
   box-shadow: none !important;
 }
 
+#advanced-search-wrapper .form-control{
+  z-index: 0!important;
+}
+
 .selectize-input.focus {
   border: none !important;
   box-shadow: none !important;
@@ -2142,6 +2146,9 @@ a.static-nav-item {
 #advanced-search-dropdown {
   min-width: 400px;
   z-index: 51;
+}
+.selectize-dropdown{
+  z-index: 4000;
 }
 #advanced-search-dropdown {
   .selectize-dropdown.multi.form-control.selectize{
