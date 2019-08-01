@@ -108,11 +108,11 @@ class ComplaintEntryDatatable < AjaxDatatablesRails::ActiveRecord
     when 'complaint_entries.age_int'
       records.order("complaint_entries.created_at #{datatable.orders.first.direction}")
     when 'complaint_entries.submitter_type'
-      records.joins(:complaint).order("complaints.submitter_type #{datatable.orders.first.direction}")
+      records.left_joins(:complaint).order("complaints.submitter_type #{datatable.orders.first.direction}")
     when 'complaint_entries.company_name'
-      records.joins(complaint: {customer: :company}).order("companies.name #{datatable.orders.first.direction}")
+      records.left_joins(complaint: {customer: :company}).order("companies.name #{datatable.orders.first.direction}")
     when 'complaint_entries.assigned_to'
-      records.joins(:user).order("users.display_name #{datatable.orders.first.direction}")
+      records.left_joins(:user).order("users.display_name #{datatable.orders.first.direction}")
     else
       super
     end
