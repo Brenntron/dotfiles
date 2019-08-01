@@ -1,0 +1,43 @@
+%h1 WBNP Reports Management
+
+%input#user_id{type: 'hidden', name: 'user_id', value: "#{current_user.id}"}
+%input{:name => "token", :type => "hidden", :value => "#{current_user.authentication_token}"}
+%input{:type => "hidden", :name => "xml_token", :value => "#{xml_token}"}
+
+%p Table of WBNP Reports
+%p If a WBNP pull is stuck in active, it's because a WBNP report state is stuck, 
+%p try clearing the last report object generated (highest id).
+%br
+%br
+#wbnp_report_index_error
+#task-msg
+.content-wrapper
+  .row
+    .col-sm-8
+      %h2 WBNP Reports
+      %table.table.table-responsive
+        %thead
+          %tr
+            %th actions
+            %th id
+            %th total new cases
+            %th cases imported
+            %th cases failed
+            %th status
+            %th created at
+            %th updated at
+            %th notes
+
+        - @wbnp_reports.each do |report|
+          %tbody
+            %tr
+              %td
+                %button.wbnp_delete_button{"data-id"=> "#{report.id}"} Delete this report
+              %td= report.id
+              %td= report.total_new_cases
+              %td= report.cases_imported
+              %td= report.cases_failed
+              %td= report.status
+              %td= report.created_at
+              %td= report.updated_at
+              %td= report.notes

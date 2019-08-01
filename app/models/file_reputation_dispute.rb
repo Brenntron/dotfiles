@@ -877,4 +877,13 @@ class FileReputationDispute < ApplicationRecord
 
     workbook
   end
+
+  def self.sync_all
+    AdminTask.execute_task(:sync_file_rep_disp_with_ti, {})
+  end
+
+  def manual_sync
+    conn = ::Bridge::FileRepUpdateStatusEvent.new(addressee: "talos-intelligence")
+    conn.post(self, source_authority: "talos-intelligence", source_key: self.ticket_source_key)
+  end
 end
