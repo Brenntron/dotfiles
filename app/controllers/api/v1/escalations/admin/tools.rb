@@ -31,13 +31,15 @@ module API
 
               if args.present?
                 begin
-                  args_hash = JSON.parse(args)
+                  args_hash = JSON.parse(args, symbolize_names: true)
                 rescue JSON::ParserError
                   return {:status => 'error', :message => "your arguments' json format sucks"}.to_json 
-                end  
+                end
+              else
+                args_hash = {}
               end 
 
-              morsel = AdminTask.execute_task(task, args)
+              morsel = AdminTask.execute_task(task, args_hash)
 
               {:status => 'success', :morsel_id => morsel.id}.to_json
 
@@ -63,6 +65,50 @@ module API
 
 
             end
+
+            params do
+              requires :id, type: Integer
+            end
+
+            post "delete_wbnp_report" do
+              wbnp_report = WbnpReport.where(:id => permitted_params[:id]).first
+
+              if wbnp_report.present?
+                wbnp_report.destroy
+                {:status => 'success', :message => 'report has been obliterated'}
+              else
+                {:status => 'error', :message => 'report not found'}
+              end
+            end
+
+            params do
+              optional :ids, type: String
+              requires :escalation_type, type: String
+              optional :all, type: Boolean
+            end
+
+            post "sync_collection" do
+              ids = []
+              if permitted_params[:ids].present?
+                permitted_params[:ids].split(",").each do |id|
+                  ids << id.strip.to_i
+                end
+              end
+              klass = permitted_params[:escalation_type].constantize
+              if permitted_params[:all].present? && permitted_params[:all] == true
+                klass.sync_all
+                return {:status => "success", :message => "batching sync for all tickets of type #{permitted_params[:escalation_type]} has started"}
+              end
+
+              tix = klass.where(:id => ids)
+              tix.each do |tic|
+                tic.manual_sync
+              end
+
+              return {:status => "success", :message => "Syncing specified tickets of type #{permitted_params[:escalation_type]}"}
+
+            end
+
 
 
           end

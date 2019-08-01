@@ -349,7 +349,7 @@ class Dispute < ApplicationRecord
       new_dispute_entry.save
     end
 
-    conn = ::Bridge::DisputeCreatedEvent.new(addressee: "talos-intelligence", source_authority: "talos-intelligence", source_key: source_key)
+    conn = ::Bridge::DisputeCreatedEvent.new(addressee: "talos-intelligence", source_authority: "talos-intelligence", source_key: source_key, ac_id: dispute.id)
     conn.post(return_payload, "")
 
   end
@@ -664,7 +664,7 @@ class Dispute < ApplicationRecord
 
         case_email = DisputeEmail.generate_case_email_address(new_dispute.id)
         logger.debug("Sending reply to bridge")
-        conn = ::Bridge::DisputeCreatedEvent.new(addressee: "talos-intelligence", source_authority: "talos-intelligence", source_key: message_payload["source_key"])
+        conn = ::Bridge::DisputeCreatedEvent.new(addressee: "talos-intelligence", source_authority: "talos-intelligence", source_key: message_payload["source_key"], ac_id: new_dispute.id)
         conn.post(return_payload, case_email)
 
       end
@@ -1800,6 +1800,15 @@ class Dispute < ApplicationRecord
 
     results
 
+  end
+
+  def self.sync_all
+    AdminTask.execute_task(:sync_disputes_with_ti, {})
+  end
+
+  def manual_sync
+    message = Bridge::DisputeEntryUpdateStatusEvent.new
+    message.post_entries(self.dispute_entries)
   end
 
 end

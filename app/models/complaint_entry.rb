@@ -27,6 +27,7 @@ class ComplaintEntry < ApplicationRecord
   STATUS_RESOLVED_FIXED_FN = "FIXED FN"
   STATUS_RESOLVED_FIXED_FP = "FIXED FP"
   STATUS_RESOLVED_FIXED_UNCHANGED = "UNCHANGED"
+  STATUS_RESOLVED_FIXED_INVALID = "INVALID"
   STATUS_RESOLVED_DUPLICATE = "DUPLICATE"
 
 
@@ -116,7 +117,6 @@ class ComplaintEntry < ApplicationRecord
                       resolution_comment,
                       current_user,
                       commit_pending)
-    categories = categories_string&.split(',')
     ActiveRecord::Base.transaction do
       # If the prefix is a high telemetry value then the status needs to be set to PENDING
       if self.is_important && entry_status != Complaint::RESOLUTION_UNCHANGED
@@ -126,15 +126,14 @@ class ComplaintEntry < ApplicationRecord
 
             current_status = "COMPLETED"
             self.case_assigned_at ||= Time.now
-            update(resolution:entry_status,
-                   status:current_status,
+            update(status:current_status,
                    internal_comment: comment,
                    resolution_comment: resolution_comment,
                    case_resolved_at: Time.now,
                    user:current_user)
             complaint.set_status(current_status)
             #this is where we should send off the category to the API
-            if entry_status != "INVALID" && categories_string != ''
+            if self.resolution != STATUS_RESOLVED_FIXED_INVALID && !categories_string.blank?
               commit_category(ip_or_uri: prefix,
                               categories_string: categories_string,
                               description: comment,
@@ -168,7 +167,6 @@ class ComplaintEntry < ApplicationRecord
         end
       else
         # not important case or resolution is "unchanged"
-
         current_status = "COMPLETED"
         self.case_assigned_at ||= Time.now
         update(resolution: entry_status,
@@ -180,7 +178,7 @@ class ComplaintEntry < ApplicationRecord
                case_resolved_at: Time.now,user:current_user)
         complaint.set_status(current_status)
         #this is where we should send off the category to the API
-        if !["INVALID","UNCHANGED"].include?(entry_status) && categories_string != ''
+        if ![STATUS_RESOLVED_FIXED_INVALID,STATUS_RESOLVED_FIXED_UNCHANGED].include?(entry_status) && !categories_string.blank?
           commit_category(ip_or_uri: prefix,
                           categories_string: categories_string,
                           description: comment,
@@ -191,15 +189,17 @@ class ComplaintEntry < ApplicationRecord
         update(url_primary_category: cat_from_wbrs, category: cat_from_wbrs)
       end
     end
+
   end
 
   def commit_category(ip_or_uri:, categories_string:, description:, user:, casenumber: nil)
     # Look for existing prefix
+    is_ip_address = !!(ip_or_uri  =~ Resolv::IPv4::Regex)
+
     url_parts = Complaint.parse_url(ip_or_uri)
     existing_prefixes = Wbrs::Prefix.where({urls: [ip_or_uri]})
     existing_prefix = nil
-    
-    if existing_prefixes.present?
+    if existing_prefixes.present? && !is_ip_address
       existing_prefixes.each do |prefix_found|
         if prefix_found.subdomain == url_parts[:subdomain]
           if prefix_found.path == url_parts[:path]
@@ -209,12 +209,19 @@ class ComplaintEntry < ApplicationRecord
       end
     end
 
+    if is_ip_address
+      existing_prefixes.each do |prefix_found|
+        if prefix_found.domain == ip_or_uri
+          existing_prefix = prefix_found
+        end
+      end
+    end
+
     category_ids_array = categories_string.split(',').map {|cat| cat.to_i}
 
     if description.present? && casenumber.present?
       description = description + "--Case Number: #{casenumber} User: #{user}"
     end
-
     if existing_prefix.present?
       prefix_object = Wbrs::Prefix.new
       prefix_object.set_categories(category_ids_array, prefix_id: existing_prefix.prefix_id, user: user, description: description)

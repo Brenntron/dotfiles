@@ -9934,17 +9934,17 @@ input[type="radio"].resolution_radio_button {
   }
 }
 
-// adding styles for talos logo + copyright info in bottom-left of side nav
+// styles for talos logo + copyright info in bottom-left of side nav
 .copyright-area {
   width: 150px;
   height: 100px;
-  position: sticky;
-  bottom: 20px;
-  left: 25px;
   text-align: center;
   z-index: -1;
   opacity: 0;
-  transition: opacity 500ms;
+  position: fixed;
+  left: -200px;
+  bottom: 20px;
+  transition: left 430ms cubic-bezier(0.4, 0.0, 0.2, 1), opacity 600ms ease-out;
   .talos-logo {
     width: 150px;
     height: auto;
@@ -9959,7 +9959,14 @@ input[type="radio"].resolution_radio_button {
   }
 }
 
-#nav-trigger:checked ~ #sidenav-menu-div .copyright-area {
+// fade in the copyright area using css animation
+#nav-trigger:checked ~ .copyright-area {
   opacity: 1;
-  transition-delay: 350ms;
+  left: 25px;
+  bottom: 20px;
+  transition-delay: 50ms;
+}
+
+#sidenav-icons-div ul {
+  margin-bottom: 0;
 }

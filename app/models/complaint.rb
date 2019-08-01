@@ -222,7 +222,7 @@ class Complaint < ApplicationRecord
       new_complaint_entry.save
     end
 
-    conn = ::Bridge::DisputeCreatedEvent.new(addressee: "talos-intelligence", source_authority: "talos-intelligence", source_key: source_key)
+    conn = ::Bridge::DisputeCreatedEvent.new(addressee: "talos-intelligence", source_authority: "talos-intelligence", source_key: source_key, ac_id: complaint.id)
     conn.post(return_payload, "")
 
   end
@@ -398,7 +398,7 @@ class Complaint < ApplicationRecord
           end
         end
 
-        conn = ::Bridge::ComplaintCreatedEvent.new(addressee: "talos-intelligence", source_authority: "talos-intelligence", source_key: message_payload["source_key"])
+        conn = ::Bridge::ComplaintCreatedEvent.new(addressee: "talos-intelligence", source_authority: "talos-intelligence", source_key: message_payload["source_key"], ac_id: new_complaint.id)
         conn.post(return_payload)
 
         #change this
@@ -605,6 +605,15 @@ class Complaint < ApplicationRecord
       new_tag = ComplaintTag.find_or_create_by(name: tag)
       complaint.complaint_tags << new_tag
     end
+  end
+
+  def self.sync_all
+    AdminTask.execute_task(:sync_complaints_with_ti, {})
+  end
+
+  def manual_sync
+    message = Bridge::ComplaintUpdateStatusEvent.new
+    message.post_complaint(self)
   end
 end
 
