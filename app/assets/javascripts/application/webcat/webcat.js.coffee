@@ -139,8 +139,6 @@ $ ->
       if search_type == 'standard'
 
         search_name = search_name.toLowerCase().replace('complaints', 'tickets')
-        if search_name == 'all'
-          search_name += ' web categorization tickets'
 
         if !search_name.endsWith('tickets')
           search_name += ' tickets'
@@ -198,10 +196,10 @@ $ ->
             reset_icon +
           '</div>'
       else
-        new_header = 'All Web Categorization Tickets'
+        new_header = 'All Tickets'
       $('#webcat-index-title')[0].innerHTML = new_header
     else
-      $('#webcat-index-title')[0].innerHTML = 'All Web Categorization Tickets'
+      $('#webcat-index-title')[0].innerHTML = 'All Tickets'
   build_complaints_table = () ->
         complaint_table = $('#complaints-index').DataTable(
           processing: true
