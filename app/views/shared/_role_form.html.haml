@@ -8,12 +8,10 @@
     .row
       .col-xs-12
         .multi-col
-          = user.id
           %ul
             = f.collection_check_boxes(:role_ids, role_options_for(current_user), :id, :role) do |r|
               %li
-                = r.label { r.check_box + ' ' + r.text }
-
+                = r.label(for: "user_#{user.id}_role_#{r.value}") { r.check_box(id: "user_#{user.id}_role_#{r.value}") + ' ' + r.text }
   .modal-footer
     .confirmation-buttons.col-xs-12
       %button.panel-button.primary.confirm.wide{name: 'submit', 'aria-label': 'Save Roles'} Save Roles
