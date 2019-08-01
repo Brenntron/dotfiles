@@ -1702,6 +1702,7 @@ $ ->
       }
       { data: 'd_entry_preview' }
       { data: 'time_to_close' }
+      { data: 'total_email_count' }
     ]
   )
 
@@ -1807,6 +1808,7 @@ $ ->
       }
       { data: 'd_entry_preview' }
       { data: 'time_to_close' }
+      { data: 'total_email_count' }
     ]
   )
 
