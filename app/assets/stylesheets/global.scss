@@ -640,7 +640,7 @@ button {
   background-position: 17px 2px;
 }
 
-.error_modal {
+#error_modal {
   .modal-dialog{
     width: unset!important;
   }
@@ -649,6 +649,14 @@ button {
   }
   .modal-header {
     text-transform: capitalize;
+  }
+}
+#confirmation-modal {
+  .modal-header{
+    background: $primary-section-color;
+  }
+  .modal-content{
+    overflow: hidden;
   }
 }
 

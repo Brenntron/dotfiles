@@ -149,9 +149,9 @@ $ ->
 
   window.set_action_wlbl_col = () ->
     selected_rows = $('.col-select-all input:checked')
-    $('.error_modal').dialog()
-    $( '.error_modal .modal-body' ).empty()
-    $('.error_modal').dialog( "destroy" )
+    $('#error_modal').dialog()
+    $( '#error_modal .modal-body' ).empty()
+    $('#error_modal').dialog( "destroy" )
     list_action = $('.wlbl-radio-add:checked').val()
     list_class = '.' + list_action
     action_desc = 'Add to: '
@@ -203,12 +203,11 @@ $ ->
            at: "top+15%",
            of: window
       )
-      $( '.error_modal .modal-header' ).html( error_header )
-      $( '.error_modal .modal-body' ).append( error_array )
+      $( '#error_modal .modal-header' ).html( error_header )
+      $( '#error_modal .modal-body' ).append( error_array )
 
   window.submit_quick_lookup = () ->
-    console.log 'inininininni'
-
+    $('#confirmation-modal').modal()
   window.col_tag_format = (array) ->
     if typeof array == 'string'
       array = array.split(',')
@@ -225,14 +224,14 @@ $ ->
 
   window.set_action_col = () ->
 
-    $( '.error_modal' ).dialog(
+    $( '#error_modal' ).dialog(
       position:
         my: "right",
         at: "top+15%",
         of: window
     )
-    $( '.error_modal .modal-body' ).empty()
-    $( '.error_modal' ).dialog( 'destroy' )
+    $( '#error_modal .modal-body' ).empty()
+    $( '#error_modal' ).dialog( 'destroy' )
 
     selected_rows = $( '.col-select-all input:checked' )
     check_vals = $( '.adjust_reptool_checkbox:checked' ).map( () -> return $(this).val() ).get()
@@ -326,9 +325,9 @@ $ ->
             clear_col.append(delete_button)
 
     if  error_array.length
-      $( '.error_modal' ).dialog().position('top')
-      $( '.error_modal .modal-header' ).html( error_header )
-      $( '.error_modal .modal-body' ).append(error_array)
+      $( '#error_modal' ).dialog().position('top')
+      $( '#error_modal .modal-header' ).html( error_header )
+      $( '#error_modal .modal-body' ).append(error_array)
 
   window.isEmpty = (item) ->
     # function to check whether or not objects and strings are empty, more variable types can be added as needed
