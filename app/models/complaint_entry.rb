@@ -12,6 +12,8 @@ class ComplaintEntry < ApplicationRecord
   delegate :customer_name, :customer_company_name, to: :complaint, allow_nil: true, prefix: false
   delegate :cvs_username, :display_name, to: :user, allow_nil: true, prefix: true
 
+  scope :open, -> { where.not(status: [STATUS_COMPLETED, RESOLVED]) }
+  scope :closed, -> { where(status: [STATUS_COMPLETED, RESOLVED]) }
   scope :assigned_count , -> {where(status:"ASSIGNED").count}
   scope :pending_count , -> {where(status:"PENDING").count}
   scope :new_count , -> {where(status:"NEW").count}
@@ -502,17 +504,17 @@ class ComplaintEntry < ApplicationRecord
       when "NEW"
         where(status:"NEW")
       when "COMPLETED"
-        where(status:"COMPLETED")
+        closed
       when "ACTIVE"
-        where.not(status:"COMPLETED").where.not(status:"NEW")
+        open.where.not(status:"NEW")
       when "REVIEW"
         where(status: "PENDING")
       when "MY COMPLAINTS"
         where(user_id: user.id)
       when "MY OPEN COMPLAINTS"
-        where(user_id: user.id).where.not(status: [STATUS_COMPLETED, RESOLVED])
+        open.where(user_id: user.id)
       when "MY CLOSED COMPLAINTS"
-        where(user_id: user.id, status: [STATUS_COMPLETED, RESOLVED])
+        closed.where(user_id: user.id)
       when "ALL"
         all
       else
