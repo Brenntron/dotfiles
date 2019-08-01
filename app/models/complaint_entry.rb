@@ -564,7 +564,7 @@ class ComplaintEntry < ApplicationRecord
 
     present_params = params.select{|ignore_key, value| value.present?}
 
-    simple_params = present_params.slice(*%w{complaint_id resolution status})
+    simple_params = present_params.slice(*%w{id complaint_id resolution status})
     relation = where(simple_params)
 
     if params['submitted_newer'].present?
