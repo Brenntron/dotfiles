@@ -824,7 +824,7 @@ class FileReputationDispute < ApplicationRecord
                 disposition detection_name detection_last_set
                 in_zoo sandbox_score threatgrid_score reversing_labs_score reversing_labs_count
                 disposition_suggested created_at submitter_type
-                customer_name company_name customer_email user_id}
+                customer_name company_name customer_email user_id description}
     search_params = JSON.parse(search_params_json)
 
     file_rep_disputes = robust_search(search_params['search_type'],
@@ -843,7 +843,7 @@ class FileReputationDispute < ApplicationRecord
        AMP\ Disposition AMP\ Detection\ Name AMP\ Detection\ Created
        In\ Zoo Sandbox\ Score TG\ Score Reversing\ Labs\ Hits RL\ Scanners\ Total
        Suggested\ Disposition Time\ Submitted Submitter\ Type
-       Customer\ Name Customer\ Organization Customer\ email Assignee}.each_with_index do |field_name, col_index|
+       Customer\ Name Customer\ Organization Customer\ email Assignee\ Dispute Summary/Details}.each_with_index do |field_name, col_index|
       worksheet.add_cell(0, col_index, field_name)
       worksheet.sheet_data[0][col_index].change_font_bold(true)
     end
