@@ -1,19 +1,17 @@
 = form_for NamedSearch.new, url: escalations_webcat_complaint_entries_path, method: 'get', 'accept-charset': 'UTF-8', html: {id: 'cat_named_search'} do |named_form|
   .form-group.search-item
-    %label.content-label-sm Complaint ID(s) (comma separate multiples)
-    %input.form-control#complaintid-input{name: 'complaint_id'}
+    %label.content-label-sm Entry ID
+    %input.form-control#entryid-input{name: 'entry_id'}
     %button.remove-input
-  -#.form-group.search-item
-  -#  %label.content-label-sm Entry ID(s) (comma separate multiples)
-  -#  %input.form-control#entryid-input{name: 'entry_id'}
-  -#  %button.remove-input
+  .form-group.search-item
+    %label.content-label-sm Tags
+    %br
+    %select.form-control.selectize#tags-input{placeholder: "Search tags", multiple: "multiple", tabindex:"-1", name: 'tags'}
+    %input.hidden#search_tag_list{value: ComplaintTag.all.map { |tag| tag.name }.join(','), name: 'tags'}
+    %button.remove-input
   .form-group.search-item
     %label.content-label-sm Complaint (URL/IP/Domain)
     %input.form-control#complaint-input{name: 'ip_or_uri'}
-    %button.remove-input
-  .form-group.search-item
-    %label.content-label-sm Category
-    %select.form-control.selectize#category-input{name: '[category-input][]', placeholder: "Enter up to 5 categories", multiple: "multiple", tabindex:"-1"}
     %button.remove-input
   .form-group.search-item
     %label.content-label-sm Status
@@ -21,10 +19,12 @@
     %datalist#status-input-list
     %button.remove-input
   .form-group.search-item
-    %label.content-label-sm Tags
-    %br
-    %select.form-control.selectize#tags-input{placeholder: "Search tags", multiple: "multiple", tabindex:"-1", name: 'tags'}
-    %input.hidden#search_tag_list{value: ComplaintTag.all.map { |tag| tag.name }.join(','), name: 'tags'}
+    %label.content-label-sm Category
+    %select.form-control.selectize#category-input{name: '[category-input][]', placeholder: "Enter up to 5 categories", multiple: "multiple", tabindex:"-1"}
+    %button.remove-input
+  .form-group.search-item.hidden
+    %label.content-label-sm Complaint ID(s) (comma separate multiples)
+    %input.form-control#complaintid-input{name: 'complaint_id'}
     %button.remove-input
   .form-group.search-item.hidden
     %label.content-label-sm Resolution
@@ -73,11 +73,11 @@
   #search-criteria-options
     .multicol-2
       %ul
-        -#%li.hidden
-        -#  %label.search-criteria-label
-        -#    %input.search-checkbox#entry-id-cb{type: 'checkbox', name: 'search-criteria', value: 'Entry ID', for: 'entryid-input'}
-        -#    Entry ID
         %li.hidden
+          %label.search-criteria-label
+            %input.search-checkbox#entry-id-cb{type: 'checkbox', name: 'search-criteria', value: 'Entry ID', for: 'entryid-input'}
+            Entry ID
+        %li
           %label.search-criteria-label
             %input.search-checkbox#complaint-id-cb{type: 'checkbox', name: 'search-criteria', value: 'Complaint ID', for: 'complaintid-input'}
             Complaint ID

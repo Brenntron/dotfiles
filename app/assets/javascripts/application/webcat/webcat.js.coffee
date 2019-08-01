@@ -6,17 +6,6 @@ window.td_truncate = (str, max, long) ->
   if typeof str == 'string' and str.length > max then str.substring(0, max) + long else str
 
 $ ->
-  $('#advanced-search-button').on 'click', ->
-
-    $('#category-input').selectize {
-        persist: false,
-        create: false,
-        maxItems: 5,
-        valueField: 'category_id',
-        labelField: 'category_name',
-        searchField: ['category_name', 'category_code'],
-        options: AC.WebCat.createSelectOptions(),
-    }
 
   $('#web-cat-search #general_search').on 'keyup', (e) ->
     { keyCode } = e
@@ -36,14 +25,17 @@ $ ->
     form = {}
 
     if !$('.selectize-control').closest('.form-group').hasClass('hidden')
-      form['tags'] = tag_input[0].selectize.items.join()
+      tags = tag_input[0].selectize.items
+      { items, options }= category_input[0].selectize
+      if tags.length
+        form['tags'] = tags.join()
+      if items.length
+        form['category'] = items.map( (cat) -> options[cat].category_name).join(', ')
 
     for item in $('#cat_named_search :input:not(:hidden)').serializeArray()
       { name, value } = item
-
       name = name.toLowerCase().replace(/-/g, '_')
-
-      if name != 'tags'
+      if name != 'tags' && name != 'category'
         form[name] = value
 
     localStorage.webcat_search_type = 'advanced'
@@ -51,7 +43,7 @@ $ ->
     localStorage.webcat_search_conditions = JSON.stringify(
       status: form.status
       complaint_id: form.complaint_id
-#      entry_id: form.entry_id
+      id: form.entry_id
       ip_or_uri: form.ip_or_uri
       resolution: form.resolution
       channel: form.channel
@@ -174,6 +166,8 @@ $ ->
 
         for condition_name, condition of webcat_search_conditions
           if condition != ''
+            if condition_name == 'id'
+              condition_name = 'Entry Id'
             condition_name = condition_name.replace(/_/g, " ").toUpperCase()
             condition_name_HTML = '<span class="search-condition-name text-uppercase">' + condition_name + ': </span>'
 
@@ -520,6 +514,15 @@ $ ->
       labelField: 'name'
       searchField: 'name'
       options: createSelectOptions()
+    }
+    category_input = $('#category-input').selectize {
+      persist: false,
+      create: false,
+      maxItems: 5,
+      valueField: 'category_id',
+      labelField: 'category_name',
+      searchField: ['category_name', 'category_code'],
+      options: AC.WebCat.createSelectOptions()
     }
 
 $('#exampleModal').on 'shown.bs.modal', ->
