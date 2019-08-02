@@ -1,0 +1,42 @@
+= simple_form_for @user, url: escalations_user_path(@user) do |user_form|
+
+  .row
+    .col-sm-4.form-group
+      = user_form.input :cvs_username, label: 'CVS Username', class: "form-control create-input",
+                          required: true, :input_html => {class: "form-control create-input", minlength: 1}
+    .col-sm-4.form-group
+      = user_form.input :cec_username, label: 'CEC Username', class: "form-control create-input",
+                          :input_html => {class: "form-control create-input", minlength: 1}
+    .col-sm-4.form-group
+      = user_form.input :kerberos_login, class: "form-control create-input",
+                          :input_html => {class: "form-control create-input", minlength: 1}
+  .row
+    .col-sm-4.form-group">
+      = user_form.input :display_name, class: "form-control create-input", required: true,
+                          :input_html => {class: "form-control create-input", minlength: 1}
+    .col-sm-4.form-group
+      = user_form.input :email, class: "form-control create-input", required: true,
+                          :input_html => {class: "form-control create-input", minlength: 1}
+    .col-sm-4.form-group
+      -#    spacer
+
+  = user_form.simple_fields_for :user_api_key do |user_api_key_form|
+    .row
+      .col-sm-4.form-group
+        = user_api_key_form.input :api_key, label: 'API Key', required: false,
+                                  :input_html => {class: "create-input", size: 84, value: @user.user_api_key&.api_key, placeholder: "Click save to generate an api key if you dont already have one."}
+    .row
+      .col-sm-4.form-group
+        = user_form.input :threatgrid_api_key, class: "form-control create-input", required: false,
+                          :input_html => {class: "form-control create-input", minlength: 1}
+      .col-sm-4.form-group
+        = user_form.input :sandbox_api_key, class: "form-control create-input", required: false,
+                          :input_html => {class: "form-control create-input", minlength: 1}
+
+    .row
+      .col-sm-12.form-group
+        %button.btn.btn-success.edit-user{value: 'submit'} Save
+        %button.select-sm.btn.btn-default.hidden#synching_user_form_button
+          %span.glyphicon.glyphicon-refresh.glyphicon-refresh-animate sinking
+        %button.select-sm.btn.btn-default.hidden#saving_user
+          %span.glyphicon.glyphicon-refresh.glyphicon-refresh-animate saving
