@@ -4,6 +4,7 @@ class RelationshipsController < ApplicationController
   # REVIEWER - I don't think we need this anymore, pls to confirm.
   # Some of it might need to be ported to the users controller since all relationship stuff is consolidated there
   # Also may need to check for other OLD references to no longer used relationship items
+  # routes and tests probably need to be updated too
 
   before_action :require_login
   before_action :manager_only_access
