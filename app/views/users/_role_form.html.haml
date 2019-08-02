@@ -1,4 +1,9 @@
 = form_for user do |f|
+
+  -# combine forms, admins and managers should be able to edit roles. Only admins should be able to edit the other shit
+  -# hide the edit button otherwise
+
+  -# Check on displaying the buttons that trigger this form on the index page
   .modal-body
     - if current_user.has_role?('admin')
       .row
