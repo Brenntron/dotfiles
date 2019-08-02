@@ -1,0 +1,28 @@
+# Read about fixtures at http://api.rubyonrails.org/classes/ActiveRecord/FixtureSet.html
+
+vrtincom:
+  id: 1
+  cvs_username: "vrtincom"
+  cec_username: "vrtincom"
+  kerberos_login: "vrtincom"
+  display_name: "Vrt Incoming"
+  committer: true
+  confirmed: true
+  email: "vrt-incoming@sourcefire.com"
+  class_level: "unclassified"
+  created_at: "2017-06-27 19:00:06"
+  updated_at: "2017-06-27 19:00:06"
+
+vrtqa:
+  id: 2
+  cvs_username: "vrtqa"
+  cec_username: "vrtqa"
+  kerberos_login: "vrtqa"
+  display_name: "Vrt quality assurance"
+  committer: true
+  confirmed: true
+  email: "vrt-qa@sourcefire.com"
+  class_level: "unclassified"
+  created_at: "2017-06-27 19:00:06"
+  updated_at: "2017-06-27 19:00:06"
+
