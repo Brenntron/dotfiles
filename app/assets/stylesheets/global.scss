@@ -8540,8 +8540,8 @@ hr.thin.form-divider {
     max-width: 100%;
     font-size: 8pt ;
     display: none;
+    overflow-y: hidden;
     white-space: nowrap;
-    overflow: hidden;
     text-overflow: ellipsis;
     margin-bottom: 30px;
   }
