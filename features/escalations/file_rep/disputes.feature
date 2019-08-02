@@ -35,7 +35,7 @@ Feature: Disputes
     Then a FileRep Ticket should have been created
     And that FileRep Ticket should have a SHA256 of "343518b26e0a872772808605f9f28aa75f64d86a6608e1347c979d033a72cb54"
     And that FileRep Ticket should have an assignee of current user
-    And that FileRep Ticket should have a suggested disposition of "Clean"
+    And that FileRep Ticket should have a suggested disposition of "clean"
     And I should see "FILE REPUTATION TICKET CREATED."
 
   @javascript
@@ -148,6 +148,7 @@ Feature: Disputes
   @javascript
   Scenario: a user visits a FileRep Dispute Show Page and confirms that the layout is properly rendered
     Given a user with role "filerep user" exists and is logged in
+    And vrtincoming exists
     And A FileRep Dispute with trait "default" exists
     When I go to "/escalations/file_rep/disputes/1"
     Then I should see "TICKET OVERVIEW"
@@ -195,6 +196,7 @@ Feature: Disputes
   @javascript
   Scenario: a user visits the FileRep Dispute Show page and confirms that ThreatGrid data was populated
     Given a user with role "filerep user" exists and is logged in
+    And vrtincoming exists
     And A FileRep Dispute with trait "default" exists
     When I go to "/escalations/file_rep/disputes/1"
     And I click "#research-tab-link"
@@ -207,6 +209,7 @@ Feature: Disputes
   @javascript
   Scenario: a user visits the FileRep Dispute Show page and confirms that Sandbox data was populated
     Given a user with role "filerep user" exists and is logged in
+    And vrtincoming exists
     And A FileRep Dispute with trait "default" exists
     When I go to "/escalations/file_rep/disputes/1"
     And I click "#research-tab-link"
@@ -224,6 +227,7 @@ Feature: Disputes
   @javascript
   Scenario: a user visits the FileRep Dispute Show page and confirms that ReversingLabs data was populated
     Given a user with role "filerep user" exists and is logged in
+    And vrtincoming exists
     And A FileRep Dispute with trait "default" exists
     When I go to "/escalations/file_rep/disputes/1"
     And I click "#research-tab-link"
@@ -246,6 +250,7 @@ Feature: Disputes
   @javascript
   Scenario: a user visits the FileRep Dispute Communications tab and tries to adds a note
     Given a user with role "filerep user" exists and is logged in
+    And vrtincoming exists
     And A FileRep Dispute with trait "default" exists
     When I go to "/escalations/file_rep/disputes/1"
     And I click "#communication-tab-link"
@@ -310,6 +315,7 @@ Feature: Disputes
   @javascript
   Scenario: a user visits the FileRep Dispute show page and edits its status
     Given a user with role "filerep user" exists and is logged in
+    And vrtincoming exists
     And A FileRep Dispute with trait "default" exists
     When I go to "/escalations/file_rep/disputes/1"
     And I click "#show-edit-ticket-status-button"
@@ -363,6 +369,7 @@ Feature: Disputes
   @javascript
   Scenario: a user visits the FileRep Dispute Communication tab and sends an email
     Given a user with role "filerep user" exists and is logged in
+    And vrtincoming exists
     And A FileRep Dispute with trait "default" exists
     When I go to "/escalations/file_rep/disputes/1"
     And I click "#communication-tab-link"
@@ -404,13 +411,14 @@ Feature: Disputes
   @javascript
   Scenario: a user with the role, 'filerep manager', visits a FileRep Dispute show page and deletes someone else's comment
     Given a user with role "filerep manager" exists and is logged in
+    And vrtincoming exists
     And the following users exist
     |id|
-    |2 |
+    |22|
     And A FileRep Dispute with trait "default" exists
     And the following FileRep dispute comments exist:
     |id| user_id |
-    |1 | 2       |
+    |1 | 22      |
     When I go to "/escalations/file_rep/disputes/1"
     And I click "#communication-tab-link"
     And I click ".filerep-note-delete-button"
@@ -421,6 +429,7 @@ Feature: Disputes
   @javascript
   Scenario: a user with the role, 'filerep user', visits a FileRep Dispute show page and deletes their own comment
     Given a user with role "filerep user" exists and is logged in
+    And vrtincoming exists
     And A FileRep Dispute with trait "default" exists
     And the following FileRep dispute comments exist:
     |id|
@@ -435,13 +444,14 @@ Feature: Disputes
   @javascript
   Scenario: a user with the role, 'filerep user', visits a FileRep Dispute show page and deletes someone else's comment
     Given a user with role "filerep user" exists and is logged in
+    And vrtincoming exists
     And the following users exist
     |id|
-    |2 |
+    |22|
     And A FileRep Dispute with trait "default" exists
     And the following FileRep dispute comments exist:
     |id| user_id |
-    |1 | 2       |
+    |1 |    22   |
     When I go to "/escalations/file_rep/disputes/1"
     And I click "#communication-tab-link"
     And I click ".filerep-note-delete-button"
