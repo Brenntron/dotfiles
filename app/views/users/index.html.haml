@@ -257,3 +257,13 @@
               Update Role(s) for
               = current_user.cvs_username
           =render 'shared/role_form', user: current_user
+
+
+  #new_member_modal.modal{role: 'dialog'}
+    .modal-dialog.modal-sm
+      .modal-content
+        .modal-header.user
+          %h4.modal-title Information Alert
+        .modal-body.center-block.info-alert
+        .modal-footer
+          %button.btn.btn-primary{type: 'button', 'data-dismiss': 'modal'} Ok
