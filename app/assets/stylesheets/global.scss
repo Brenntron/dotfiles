@@ -8536,11 +8536,12 @@ hr.thin.form-divider {
 
 #filerep_searchref_container, #webcat_searchref_container{
   & {
-    color: $primary-section-color;
+    color: #6dbcdb;
     max-width: 100%;
-    font-size: 8pt ;
-    display: none;
-    overflow-y: hidden;
+    font-size: 8pt;
+    display: inline-block;
+    overflow: hidden;
+    padding: 2px 0;
     white-space: nowrap;
     text-overflow: ellipsis;
     margin-bottom: 30px;
