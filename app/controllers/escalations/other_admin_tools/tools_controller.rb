@@ -13,5 +13,12 @@ class Escalations::OtherAdminTools::ToolsController < ApplicationController
 
   end
 
+  def wbnp_reports
+    @wbnp_reports = WbnpReport.all
+  end
+
+  def manage_escalations_sync
+
+  end
 end
 

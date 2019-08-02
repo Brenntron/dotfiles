@@ -616,15 +616,29 @@ class FileReputationDispute < ApplicationRecord
     if new_dispute
       if FileReputationDispute.threaded?
         Thread.new do
-          new_dispute.update_scores
-          new_dispute.populate_fields_from_rl
-          new_dispute.auto_resolve_on_matching_disposition(from: 'TI')
+          begin
+            new_dispute.update_scores
+            new_dispute.populate_fields_from_rl
+            new_dispute.auto_resolve_on_matching_disposition(from: 'TI')
+          rescue
+            #do nothing for now, come back and improve this....somehow.
+            #in this case if something catastrophic happens with auto resolve, the fallback
+            #is that the dispute is created with a status of new, going into the pile for humans
+            #to do manually.
+          end
           new_dispute.send_created_ack
         end
       else
-        new_dispute.update_scores
-        new_dispute.populate_fields_from_rl
-        new_dispute.auto_resolve_on_matching_disposition(from: 'TI')
+        begin
+          new_dispute.update_scores
+          new_dispute.populate_fields_from_rl
+          new_dispute.auto_resolve_on_matching_disposition(from: 'TI')
+        rescue
+          #do nothing for now, come back and improve this....somehow.
+          #in this case if something catastrophic happens with auto resolve, the fallback
+          #is that the dispute is created with a status of new, going into the pile for humans
+          #to do manually.
+        end
         new_dispute.send_created_ack
       end
     end
@@ -876,5 +890,14 @@ class FileReputationDispute < ApplicationRecord
     end
 
     workbook
+  end
+
+  def self.sync_all
+    AdminTask.execute_task(:sync_file_rep_disp_with_ti, {})
+  end
+
+  def manual_sync
+    conn = ::Bridge::FileRepUpdateStatusEvent.new(addressee: "talos-intelligence")
+    conn.post(self, source_authority: "talos-intelligence", source_key: self.ticket_source_key)
   end
 end
