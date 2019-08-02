@@ -7,6 +7,118 @@ window.td_truncate = (str, max, long) ->
 
 $ ->
 
+  $('#web-cat-search #general_search').on 'keyup', (e) ->
+    { keyCode } = e
+    { webcat_search_type, webcat_search_name, webcat_search_conditions }= localStorage
+    if keyCode == 13
+      webcat_search_string = $('#web-cat-search .search-box').val()
+      if webcat_search_string == ''
+       refresh_localStorage()
+      else
+        localStorage.webcat_search_type = 'contains'
+        localStorage.webcat_search_name = ''
+        localStorage.webcat_search_conditions = JSON.stringify({value:webcat_search_string})
+      refresh_url()
+
+  window.set_webcat_advanced = () ->
+    # creating form object from array made from advanced dropdown form
+    form = {}
+
+    if !$('.selectize-control').closest('.form-group').hasClass('hidden')
+      tags = tag_input[0].selectize.items
+      { items, options }= category_input[0].selectize
+      if tags.length
+        form['tags'] = tags.join()
+      if items.length
+        form['category'] = items.map( (cat) -> options[cat].category_name).join(', ')
+
+    for item in $('#cat_named_search :input:not(:hidden)').serializeArray()
+      { name, value } = item
+      name = name.toLowerCase().replace(/-/g, '_')
+      if name != 'tags' && name != 'category'
+        form[name] = value
+
+    localStorage.webcat_search_type = 'advanced'
+    localStorage.webcat_search_name = form.search_name
+    localStorage.webcat_search_conditions = JSON.stringify(
+      status: form.status
+      complaint_id: form.complaint_id
+      id: form.entry_id
+      ip_or_uri: form.ip_or_uri
+      resolution: form.resolution
+      channel: form.channel
+      category: form.category
+      customer_name: form.customer_name
+      customer_email: form.customer_email
+      company_name: form.company
+      domain: form.domain
+      tags: form.tags
+      submitted_older: form.date_submitted_older
+      submitted_newer: form.date_submitted_newer
+      modified_older: form.date_modified_newer
+      modified_newer: form.date_modified_older
+    )
+
+    refresh_url()
+
+  window.webcat_refresh = ()->
+    refresh_localStorage()
+    refresh_url()
+
+  window.build_webcat_named_search = (search_name) ->
+    localStorage.webcat_search_type = 'named'
+    localStorage.webcat_search_name = search_name
+    localStorage.removeItem('webcat_search_conditions')
+
+    refresh_url()
+
+  build_data = () ->
+    { webcat_search_type, webcat_search_name, webcat_search_conditions } = localStorage
+    { search } = location
+
+    if search != ''
+      webcat_search_type = 'standard'
+      urlParams = new URLSearchParams(location.search);
+    switch(webcat_search_type)
+      when 'advanced'
+        data = {
+          search_type: webcat_search_type
+          search_name : webcat_search_name
+          search_conditions: JSON.parse(webcat_search_conditions)
+        }
+      when 'contains'
+        data = {
+          search_type: webcat_search_type
+          search_conditions: JSON.parse(webcat_search_conditions)
+        }
+      when 'standard'
+        urlParams = new URLSearchParams(location.search);
+        data = {
+          search_type: webcat_search_type
+          search_name: urlParams.get('f')
+        }
+      when 'named'
+        data = {
+          search_type: webcat_search_type
+          search_name: webcat_search_name
+        }
+    build_header(data)
+    return data
+
+  refresh_url = (href) ->
+    { webcat_search_type, webcat_search_name } = localStorage
+    url_check = current_url.split('/escalations/file_rep/disputes/')[0]
+    new_url = '/escalations/file_rep/disputes'
+    if href != undefined
+      window.location.replace( new_url + href )
+    if !href && typeof parseInt(url_check) == 'number'
+      window.location.replace('/escalations/webcat/complaints')
+
+  refresh_localStorage = () ->
+    localStorage.removeItem('webcat_search_type')
+    localStorage.removeItem('webcat_search_name')
+    localStorage.removeItem('webcat_search_conditions')
+
   $('.cat_new_url').selectize {
     persist: false,
     create: false,
@@ -17,16 +129,134 @@ $ ->
     options: AC.WebCat.createSelectOptions()
   }
 
+  url = $('#complaints-index').data('source')
+  current_url = window.location.href
   complaint_table = ''
+
+  window.webcat_refresh = ()->
+    refresh_localStorage()
+    refresh_url()
+
+  build_header = (data) ->
+    container = $('#webcat_searchref_container')
+    if data != undefined && container.length > 0
+      reset_icon = '<span id="refresh-filter-button" class="reset-filter esc-tooltipped" title="Clear Search Results" onclick="webcat_refresh()"></span>'
+      {search_type, search_name} = data
+
+      if search_type == 'standard'
+
+        search_name = search_name.toLowerCase().replace('complaints', 'tickets')
+
+        if !search_name.endsWith('tickets')
+          search_name += ' tickets'
+
+        new_header =
+          '<div>' +
+            '<span class="text-capitalize">' + search_name.replace(/_|%20/g, " ") + ' </span>' +
+            reset_icon +
+            '</div>'
+
+      else if search_type == 'advanced'
+        search_condition_tooltip = []
+        webcat_search_conditions = JSON.parse(localStorage.webcat_search_conditions)
+        new_header =
+          '<div>Results for Advanced Search ' +
+            reset_icon +
+            '</div>'
+
+        for condition_name, condition of webcat_search_conditions
+          if condition != ''
+            if condition_name == 'id'
+              condition_name = 'Entry Id'
+            condition_name = condition_name.replace(/_/g, " ").toUpperCase()
+            condition_name_HTML = '<span class="search-condition-name text-uppercase">' + condition_name + ': </span>'
+
+            if typeof condition == 'object'
+              condition_HTML = '<span>' + condition.from  + ' - ' + condition.to+ '</span>'
+            else
+              condition_HTML = '<span>' + condition + '</span>'
+
+            search_condition_tooltip.push(condition_name + ': ' + $(condition_HTML).text())
+            container.append('<span class="search-condition">' + condition_name_HTML + condition_HTML + '</span>')
+
+        if search_condition_tooltip.length > 0
+          container.css('display', 'inline-block')
+          container.addClass('esc-tooltipped')
+          list = document.createElement('ul')
+          $(list).addClass('tooltip_content')
+          for  li in search_condition_tooltip
+            item = document.createElement('li')
+            item.appendChild(document.createTextNode(li))
+            list.appendChild(item)
+          container.prepend(list)
+          $(list).hide()
+          container.attr('data-tooltip-content', '.tooltip_content')
+
+      else if search_type == 'named'
+        new_header =
+          '<div>Results for "' + search_name + '" Saved Search' +
+            reset_icon +
+            '</div>'
+
+      else if search_type == 'contains'
+        webcat_search_conditions = JSON.parse(localStorage.webcat_search_conditions)
+        new_header =
+          '<div>Results for "' + webcat_search_conditions.value + '" '+
+            reset_icon +
+          '</div>'
+      else
+        new_header = 'All Tickets'
+      $('#webcat-index-title')[0].innerHTML = new_header
+    else
+      $('#webcat-index-title')[0].innerHTML = 'All Tickets'
   build_complaints_table = () ->
-        url = $('#complaints-index').data('source')
         complaint_table = $('#complaints-index').DataTable(
           processing: true
           serverSide: true
           ajax:
             url: url
-          pagingType: 'full_numbers'
+            data: build_data()
+          drawCallback: ( settings ) ->
+            if localStorage.webcat_search_name
+              {webcat_search_type, webcat_search_name, webcat_search_conditions } = localStorage
+              last_tr = $('.webcat-named-search-list .saved-search').last().text()
+              ### check variables below
+                  text_check makes sure that the last table row doesn't match the named search being saved now
+                  search_name_check makes sure that the search is being saved as a named search
+                  Not super complicated, but that if statement was looking gross and confusing
+              ###
+              text_check = last_tr.trim() != webcat_search_name.trim()
+              search_name_check = webcat_search_name != ''
+              if webcat_search_type == 'advanced' && search_name_check && text_check
+                ###
+                  creating temporary tr for the filter dropdown
+                  attributes added then onclick events
+                ###
+                new_tr = document.createElement('tr')
+                new_td = document.createElement('td')
+                new_link =  document.createElement('a')
+                new_delete_image = document.createElement('img')
+                new_delete = document.createElement('a')
 
+                $(new_tr).attr('id','temp_row')
+                $(new_link).addClass('input-truncate saved-search esc-tooltipped')
+                  .attr('title', webcat_search_name)
+                  .text(webcat_search_name)
+                $(new_delete).addClass("delete-search")
+                $(new_delete_image).addClass('delete-search-image')
+
+                $(new_link).on 'click', () ->
+                  window.build_webcat_named_search(webcat_search_name)
+                $(new_delete).on 'click', () ->
+                  window.delete_disputes_named_search(this,  webcat_search_name)
+                  refresh_localStorage()
+                $(new_tr).append(new_td)
+                $(new_td).append(new_link)
+                $(new_td).append(new_delete)
+                $(new_delete).append(new_delete_image)
+                $('.webcat-named-search-list tbody').append(new_tr)
+
+          pagingType: 'full_numbers'
           order: [ [
             3
             'desc'
@@ -38,7 +268,7 @@ $ ->
           }
           rowCallback: (row, data) ->
             cell = @api().row(row).nodes().to$()
-            { is_important, was_dismissed, age_int } = data
+            { is_important, was_dismissed } = data
             if is_important
               cell.addClass 'highlight-second-review'
             if was_dismissed
@@ -90,14 +320,17 @@ $ ->
                 width: '10px'
                 render: ( data )->
                   { is_important, was_dismissed } = data
-                  if is_important
-                    if was_dismissed
+                  html = ''
+
+                  if is_important && was_dismissed
                       return '<div class="container-important-tags">' +
                         '<div class="esc-tooltipped is-important" tooltip title="Important"></div>' +
                         '<div class="esc-tooltipped was-reviewed" tooltip title="Reviewed"></div>' +
                         '</div>'
-                    else
-                      return '<span class="esc-tooltipped is-important" tooltip title="Important"></span>'
+                  else if is_important && !was_dismissed
+                    return '<span class="esc-tooltipped is-important" tooltip title="Important"></span>'
+                  else if !is_important && was_dismissed
+                    return '<span class="esc-tooltipped was-reviewed" tooltip title="Reviewed"></span>'
               }
               {
                 data: 'entry_id'
@@ -141,17 +374,20 @@ $ ->
               {
                 data: 'tags'
                 render: ( data )->
-                  tags = data.substring( 1, data.length-1 ).replace(/&quot;/g,'');
-                  tag_items = ''
-                  tag_list = tags.split(',').map ( tag ) -> return tag.trim();
-                  tag_list = tag_list.filter ( tag, index )-> return tag_list.indexOf( tag ) == index && tag != ''
 
-                  if tag_list.length
-                    for tag in tag_list
-                      item = '<span class="tag-capsule">' + tag + '</span>'
-                      tag_items += item
-                  else
-                    tag_items = '<span class="missing-data">No tags</span>'
+                  tag_items = '<span class="missing-data">No tags</span>'
+
+                  if data && typeof data == 'string'
+                    tags = data.substring( 1, data.length-1 ).replace(/&quot;/g,'');
+                    tag_list = tags.split(',').map ( tag ) -> return tag.trim();
+
+                    if tag_list.length > 1
+                      tag_items = ''
+                      tag_list = tag_list.filter ( tag, index )-> return tag_list.indexOf( tag ) == index && tag != ''
+                      for tag in tag_list
+                        item = '<span class="tag-capsule">' + tag + '</span>'
+                        tag_items += item
+
                   tag_items
               }
               {
@@ -220,6 +456,8 @@ $ ->
               }
               {
                 data: 'assigned_to'
+                render: (data) ->
+                  data
               }
               {
                 data: 'age_int'
@@ -256,39 +494,6 @@ $ ->
     $('#complaints-index tbody').on 'click', 'td.expandable-row-column', ->
       click_table_buttons complaint_table, this
 
-    $('#general_search').on 'keyup', (e) ->
-      if event.keyCode == 13
-        # do the ajax call
-        $('#loader-modal').modal({
-          keyboard: false
-        })
-        filter = this.value
-        headers = {'Token': $('input[name="token"]').val(), 'Xmlrpc-Token': $('input[name="xml_token"]').val()}
-        $.ajax(
-          url: 'escalations/webcat/complaint_entries'
-          method: 'GET'
-          headers: headers
-          success: (response) ->
-
-            json = $.parseJSON(response)
-            if json.error
-              $('#loader-modal').modal 'hide'
-              notice_html = "<p>Something went wrong: #{json.error}</p>"
-              alert(json.error)
-            else
-              datatable = $('#complaints-index').DataTable()
-              datatable.clear();
-              datatable.rows.add(json.data);
-              datatable.draw();
-              $('#loader-modal').modal 'hide'
-
-          error: (response) ->
-            $('#loader-modal').modal 'hide'
-            std_api_error(response, "There was an error loading search results.", reload: false)
-        , this)
-
-
-    # advanced search tags
     createSelectOptions = ->
       tags = $('#search_tag_list')[0]
       if tags
@@ -299,7 +504,7 @@ $ ->
           options.push {name: x}
         return options
 
-    $('#tags-input').selectize {
+    tag_input = $('#tags-input').selectize {
       persist: false
       create: false
       maxItmes: null
@@ -308,9 +513,16 @@ $ ->
       searchField: 'name'
       options: createSelectOptions()
     }
+    category_input = $('#category-input').selectize {
+      persist: false,
+      create: false,
+      maxItems: 5,
+      valueField: 'category_id',
+      labelField: 'category_name',
+      searchField: ['category_name', 'category_code'],
+      options: AC.WebCat.createSelectOptions()
+    }
 
 $('#exampleModal').on 'shown.bs.modal', ->
   $('button.toolbar-button.cat-btn').addClass('active')
-
-#$('.toolbar-button').on 'click', ->
 
