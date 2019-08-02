@@ -493,9 +493,7 @@ $ ->
 
     $('#complaints-index tbody').on 'click', 'td.expandable-row-column', ->
       click_table_buttons complaint_table, this
-    $('#advanced-search-button').on 'click', ->
-      console.log 'ininin'
-      # advanced search tags
+
     createSelectOptions = ->
       tags = $('#search_tag_list')[0]
       if tags

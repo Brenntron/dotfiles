@@ -34,11 +34,13 @@ $(document).ready ->
     field_name = field.find('input').attr('id') || field.find('select').attr('id')
     field_wrapper = field.attr('id')
     $('.search-checkbox').each ->
-      if $(this).attr('for') == field_name
-        $($(this).parent()).parent().removeClass('hidden')
-      else if $(this).attr('for') == field_wrapper
-        $($(this).parent()).parent().removeClass('hidden')
-    $($(this).parent()).addClass('hidden')
+      parent = $(this).parent()
+      attr_for = $(this).attr('for')
+      if field_name.endsWith('-selectized')
+        field_name = field_name.replace('-selectized', '')
+      if attr_for == field_name || attr_for == field_wrapper
+        $( parent ).parent().removeClass('hidden')
+    $( field ).addClass('hidden')
     false
 
   $('#search-webrep-cases-form').on 'click', '.remove-input', ->
