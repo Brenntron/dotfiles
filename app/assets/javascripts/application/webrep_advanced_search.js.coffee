@@ -36,8 +36,8 @@ $(document).ready ->
     $('.search-checkbox').each ->
       parent = $(this).parent()
       attr_for = $(this).attr('for')
-      if field_name.endsWith('-selectized')
-        field_name = field_name.replace('-selectized', '')
+      if field_name == 'category-input-selectized'
+        field_name = 'category-input'
       if attr_for == field_name || attr_for == field_wrapper
         $( parent ).parent().removeClass('hidden')
     $( field ).addClass('hidden')
