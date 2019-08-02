@@ -1,7 +1,7 @@
 # Read about fixtures at http://api.rubyonrails.org/classes/ActiveRecord/FixtureSet.html
 
 vrtincom:
-  id: 1
+  id: 1000001
   cvs_username: "vrtincom"
   cec_username: "vrtincom"
   kerberos_login: "vrtincom"
@@ -14,7 +14,7 @@ vrtincom:
   updated_at: "2017-06-27 19:00:06"
 
 vrtqa:
-  id: 2
+  id: 1000002
   cvs_username: "vrtqa"
   cec_username: "vrtqa"
   kerberos_login: "vrtqa"
