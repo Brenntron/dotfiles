@@ -24,7 +24,7 @@
           %td.data_small_emphasis= current_user.parent.roles.map(&:role).join(', ')
           %td
       - if current_user.has_role?('manager')
-        - team_total = current_user.descendants.length + 1
+        - team_total = current_user.descendants.length
         %tr
           %td#team-cell.user-group{rowspan: "#{team_total}", 'data-rowspan': "#{team_total}"} Team
           %td.alt-col.user-col-divider.user-displayname-col= current_user.display_name
