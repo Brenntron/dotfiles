@@ -5,6 +5,12 @@
   -# hide the edit button otherwise
 
   -# Check on displaying the buttons that trigger this form on the index page
+
+
+  - if current_user.has_role?('admin')
+    -# Add the user form stuff here
+
+
   .modal-body
     - if current_user.has_role?('admin')
       .row
