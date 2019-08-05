@@ -1,4 +1,4 @@
-= form_for user do |f|
+= simple_form_for user do |f|
 
   -# combine forms, admins and managers should be able to edit roles.
   -# Only admins should be able to edit the other shit, diff between 'simple form' and regular form
@@ -9,6 +9,40 @@
 
   - if current_user.has_role?('admin')
     -# Add the user form stuff here
+    .row
+      .col-sm-4.form-group
+        = f.input :cvs_username, label: 'CVS Username', class: "form-control create-input",
+                            required: true, :input_html => {class: "form-control create-input", minlength: 1}
+      .col-sm-4.form-group
+        = f.input :cec_username, label: 'CEC Username', class: "form-control create-input",
+                            :input_html => {class: "form-control create-input", minlength: 1}
+      .col-sm-4.form-group
+        = f.input :kerberos_login, class: "form-control create-input",
+                            :input_html => {class: "form-control create-input", minlength: 1}
+    .row
+      .col-sm-4.form-group
+        = f.input :display_name, class: "form-control create-input", required: true,
+                            :input_html => {class: "form-control create-input", minlength: 1}
+      .col-sm-4.form-group
+        = f.input :email, class: "form-control create-input", required: true,
+                            :input_html => {class: "form-control create-input", minlength: 1}
+      .col-sm-4.form-group
+        -#    spacer
+
+
+
+  = f.simple_fields_for :user_api_key do |user_api_key_form|
+    .row
+      .col-sm-4.form-group
+        = user_api_key_form.input :api_key, label: 'API Key', required: false,
+                                  :input_html => {class: "create-input", size: 84, value: user.user_api_key&.api_key, placeholder: "Click save to generate an api key if you dont already have one."}
+    .row
+      .col-sm-4.form-group
+        = f.input :threatgrid_api_key, class: "form-control create-input", required: false,
+                          :input_html => {class: "form-control create-input", minlength: 1}
+      .col-sm-4.form-group
+        = f.input :sandbox_api_key, class: "form-control create-input", required: false,
+                          :input_html => {class: "form-control create-input", minlength: 1}
 
 
   .modal-body
