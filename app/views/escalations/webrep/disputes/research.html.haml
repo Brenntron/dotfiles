@@ -115,7 +115,7 @@
                 %button#clear-all-actions.toolbar-button.clear-button.esc-tooltipped{title: 'Clear all actions'}
                   %span.toolbar-button-text Clear All Actions
 
-            %button.primary#submit-rep-changes{onclick:'submit_quick_lookup();return false;'} Submit Reputation Changes
+            %button.primary#submit-rep-changes{onclick:'submit_quick_lookup();return false;', disabled: true} Submit Reputation Changes
             %span.small.note-repsubmit
               * NOTE: Submitting reputation changes will automatically create a closed ticket
 
@@ -124,13 +124,22 @@
             .modal-dialog
               .modal-content
                 .modal-header
-                  %h4.modal-title#commit-modal-title Duplicate Dispute Requests
-                  %button.close{ 'data-dismiss': "modal"}
+                  %h4.modal-title#commit-modal-title New Reputation Dispute Ticket
                 .modal-body
-
-                .button-group
-                  %button.primary{value: "submit" } Submit
-                  %button{title: "Cancel", class: "secondary"} Cancel
+                  %table
+                    %thead
+                      %tr
+                        %td.bold Dispute
+                        %td.bold Actions
+                    %tbody
+                  .comment-wrapper
+                    %label.content-label-sm
+                      Comment
+                    %textarea.dropdown-comment.confirm-rep-input.comment-input
+                  .modal-footer
+                    .button-group
+                      %button.primary{value: "submit", id:'confirm-rep-changes' } Confirm Reputation Changes
+                      %button{title: "Cancel", class: "secondary"} Cancel
 
 
           #error_modal.modal.error_modal{tabindex:"-1", role:"dialog"}

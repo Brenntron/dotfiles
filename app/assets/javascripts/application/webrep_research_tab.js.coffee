@@ -22,6 +22,7 @@ $ ->
     col_actions = row.find('.col-actions')
     $(target).remove()
     $( col_actions ).empty()
+    submit_rep_check()
 
   $(document).on 'click', '.remove-action', (e) ->
     e.preventDefault()
@@ -44,7 +45,7 @@ $ ->
       string = 'Add classifications: ' + data_string
 
 
-  $(document).on 'click', '.col-tag:not(.dialog-tag)', (e) ->
+  $(document).on 'click', '.col-actions .col-tag', (e) ->
     { target } = e
     action = $(target).text()
     action_p = $(target).closest('p')
@@ -205,9 +206,26 @@ $ ->
       )
       $( '#error_modal .modal-header' ).html( error_header )
       $( '#error_modal .modal-body' ).append( error_array )
-
+    submit_rep_check()
   window.submit_quick_lookup = () ->
+    $('#confirmation-modal tbody').empty()
+    rows = $( '.col-select-all' ).closest('tr')
     $('#confirmation-modal').modal()
+    ugh = []
+    $(rows).each ->
+      new_data = $(this).find('.col-bulk-dispute').text()
+      if !isEmpty(new_data) && new_data != undefined
+        children = $( this ).find('.col-actions').children()
+        if children.length
+          html = '<tr> <td>' + new_data + '</td> <td>'
+          for child in children
+            if child != '<p></p>'
+              html +=  '<div>' + $(child).html() + '</div>'
+          html += '</td> </tr>'
+          ugh.push( html )
+    $('#confirmation-modal tbody').append(ugh)
+
+
   window.col_tag_format = (array) ->
     if typeof array == 'string'
       array = array.split(',')
@@ -222,6 +240,17 @@ $ ->
       check_list = check_list_array.join(', ').replace(/, ([^,]*)$/, ', and $1')
     return check_list
 
+  window.submit_rep_check = () ->
+    selected_rows = $( '.col-select-all input:checked' )
+    col_length = 0
+    selected_rows.each () ->
+      row = $(this).closest('tr')
+      col_actions = row.find('.col-actions').children().length
+      col_length = col_length + col_actions
+    if col_length > 1
+      $('#submit-rep-changes').attr('disabled', false)
+    else
+      $('#submit-rep-changes').attr('disabled', true)
   window.set_action_col = () ->
 
     $( '#error_modal' ).dialog(
@@ -324,6 +353,7 @@ $ ->
           if !clear_col.has(".clear-action-button").length
             clear_col.append(delete_button)
 
+    submit_rep_check()
     if  error_array.length
       $( '#error_modal' ).dialog().position('top')
       $( '#error_modal .modal-header' ).html( error_header )
