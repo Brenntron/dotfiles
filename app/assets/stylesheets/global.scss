@@ -228,6 +228,8 @@ h5 {
 
 .break-word {
   word-break: break-all;
+  word-wrap: break-word;
+  white-space: normal;
 }
 
 .no-word-break {
@@ -2907,8 +2909,6 @@ fieldset.top-content {
 }
 
 .user-col-layout {
-  display: inline-block;
-  float: left;
   margin-right: 12px;
   padding-right: 12px;
   border-right: 1px solid $faint-neutral-color;
@@ -2919,12 +2919,12 @@ fieldset.top-content {
   margin-right: 0;
 }
 
-.user-col-wrapper {
-  padding-right: 0;
-}
-
 .user-profile-wrapper {
   margin-right: 28px;
+}
+
+.related-user-list li {
+  margin-bottom: 8px;
 }
 
 // This is used only in Admin and Rule Docs, will need to be removed when
@@ -10048,4 +10048,8 @@ input[type="radio"].resolution_radio_button {
 
 hr.thin.extra-bottom-marg {
   margin-bottom: 30px;
+}
+
+.user-access-wrapper pre.code-snippet {
+
 }

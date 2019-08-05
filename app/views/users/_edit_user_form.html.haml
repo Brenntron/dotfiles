@@ -1,11 +1,5 @@
 = simple_form_for user do |f|
 
-  -# combine forms, admins and managers should be able to edit roles.
-  -# Only admins should be able to edit the other shit, diff between 'simple form' and regular form
-  -# hide the edit button otherwise
-
-  -# Check on displaying the buttons that trigger this form on the index page
-
   - if current_user.has_role?('admin')
     -# Add the user form stuff here
     .row
@@ -58,9 +52,9 @@
         .form-group
           %label.content-label-sm{for: "user_#{user.id}_sb_api"} Sandbox API Key
           %input.form-control.code{type: 'text', name: 'user[sandbox_api_key]', id: "user_#{user.id}_sb_api", value: "#{user.sandbox_api_key}"}
+    %hr.thin
 
 
-  %hr.thin
   .row
     .col-xs-12
       .multi-col
@@ -78,5 +72,5 @@
   %hr.thin
   .row
     .col-xs-12.text-center
-      %button.primary{name: 'submit', 'aria-label': 'Save Roles'} Save Roles
+      %button.primary{name: 'submit', 'aria-label': 'Save Roles'} Save
       %button.secondary{'data-dismiss': 'modal', 'aria-label': 'Cancel'} Cancel

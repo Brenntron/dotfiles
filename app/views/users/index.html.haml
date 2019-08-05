@@ -33,8 +33,7 @@
           %td.alt-col=current_user.descendants.length
           %td.data_small_emphasis=current_user.roles.map(&:role).join(', ')
           %td.text-right.table-button-row
-            - if current_user.has_role?('admin')
-              %button.edit-button.table-row-button.tooltipped{title: "Edit #{current_user.cvs_username}'s roles", 'data-toggle': 'modal', 'data-target': "#roleModal_#{current_user.id}"}
+            %button.edit-button.table-row-button.tooltipped{title: "Edit #{current_user.cvs_username}'s roles", 'data-toggle': 'modal', 'data-target': "#roleModal_#{current_user.id}"}
             %span.dropdown
               %button.add-user-button.table-row-button.tooltipped{title: "Add user to #{current_user.display_name}'s team'", id: "add_user_button_#{current_user.id}", 'data-toggle': 'dropdown', 'aria-haspopup': 'true', 'aria-expanded': 'false'}
               .dropdown-menu{id: "add_user_dropdown_#{current_user.id}", 'aria-labelledby': "add_user_button_#{current_user.id}"}
@@ -248,7 +247,7 @@
             %td
 
 
-  - if current_user.has_role?('admin')
+  - if current_user.has_role?('admin') || current_user == user.parent
     .modal.fade.user-form-modal{id: "roleModal_#{current_user.id}", tabindex: '-1', role: 'dialog', 'aria-hidden': 'true'}
       .modal-dialog{role: 'document'}
         .modal-content
