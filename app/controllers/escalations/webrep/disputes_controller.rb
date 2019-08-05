@@ -56,8 +56,8 @@ class Escalations::Webrep::DisputesController < ApplicationController
                            'SBRS Total Rule Hits',
                            'Important?',
                            'Resolution',
-                           'Last Comment Date',
-                           'Comment Count',
+                           'Last Email Date',
+                           'Email Count',
                            'Resolution Comments']
         singlesheet_insert_row_with_data(dispute_headers, "h1")
 
@@ -85,8 +85,8 @@ class Escalations::Webrep::DisputesController < ApplicationController
                                                dispute_entry.dispute_rule_hits.sbrs_rule_hits.count,
                                                dispute_entry.is_important,
                                                dispute_entry.resolution,
-                                               dispute_entry.latest_comment_date,
-                                               dispute_entry.dispute.dispute_comments.count,
+                                               dispute_entry.latest_email_date,
+                                               dispute_entry.dispute.dispute_emails.count,
                                                dispute_entry.resolution_comment ])
           end
         end
@@ -200,8 +200,8 @@ class Escalations::Webrep::DisputesController < ApplicationController
 
 
           # Build the headers of each individual worksheet
-          my_open_tickets_headers = ['Case ID', 'Submitter Type', 'Ticket Type', 'Priority', 'Dispute Preview', 'Last Comment Date', 'Comment Count', 'Entry Count']
-          my_closed_tickets_headers = ['Case ID', 'Submitter Type', 'Ticket Type', 'Priority', 'Dispute Preview', 'Time to Close', 'Entry Count']
+          my_open_tickets_headers = ['Case ID', 'Submitter Type', 'Ticket Type', 'Priority', 'Dispute Preview', 'Last Email Date', 'Entry Count']
+          my_closed_tickets_headers = ['Case ID', 'Submitter Type', 'Ticket Type', 'Priority', 'Dispute Preview', 'Last Email Date', 'Email Count', 'Time to Close', 'Entry Count']
           total_ticket_entries_closed_headers = ['Date', 'Web', 'Email', 'Web_Email', 'Total']
           time_to_close_tickets_headers = ['Ticket', 'Time (hrs)']
           ticket_submitted_by_submitter_type_headers = ['Date', 'Customer', 'Guest']
@@ -220,7 +220,7 @@ class Escalations::Webrep::DisputesController < ApplicationController
           # My Open Tickets
           my_open_tickets_data = Dispute.open_tickets_report([current_user], params[:startdate], params[:enddate])
           my_open_tickets_data[:table_data].each do |d|
-            data_values = [d[:case_number], d[:submitter_type], d[:submission_type], d[:priority], ActionController::Base.helpers.strip_tags(d[:d_entry_preview]).gsub(/ *\d+$/, ''), d[:last_comment_date], d[:comment_count], ActionController::Base.helpers.strip_tags(d[:d_entry_preview]).scan(/\d+/).last]
+            data_values = [d[:case_number], d[:submitter_type], d[:submission_type], d[:priority], ActionController::Base.helpers.strip_tags(d[:d_entry_preview]).gsub(/ *\d+$/, ''), d[:last_email_date], ActionController::Base.helpers.strip_tags(d[:d_entry_preview]).scan(/\d+/).last]
             # The Rails `strip_tags` method doesn't work directly in this controller and I don't know why.
             insert_row_with_data(data_values, mytickets_xlsx, mytickets_workbook_names[:my_open_tickets])
           end
@@ -229,7 +229,7 @@ class Escalations::Webrep::DisputesController < ApplicationController
           # My Closed Tickets
           my_closed_tickets_data = Dispute.closed_tickets_report([current_user], params[:startdate], params[:enddate])
           my_closed_tickets_data[:table_data].each do |d|
-            data_values = [d[:case_number], d[:submitter_type], d[:submission_type], d[:priority], ActionController::Base.helpers.strip_tags(d[:d_entry_preview]).gsub(/ *\d+$/, ''), d[:time_to_close], ActionController::Base.helpers.strip_tags(d[:d_entry_preview]).scan(/\d+/).last]
+            data_values = [d[:case_number], d[:submitter_type], d[:submission_type], d[:priority], ActionController::Base.helpers.strip_tags(d[:d_entry_preview]).gsub(/ *\d+$/, ''), d[:last_email_date], d[:total_email_count], d[:time_to_close], ActionController::Base.helpers.strip_tags(d[:d_entry_preview]).scan(/\d+/).last]
             insert_row_with_data(data_values, mytickets_xlsx, mytickets_workbook_names[:my_closed_tickets])
           end
 
@@ -329,10 +329,9 @@ class Escalations::Webrep::DisputesController < ApplicationController
               'Ticket Type',
               'Priority',
               'Dispute Preview',
-              'Last Comment Date',
-              'Comment Count',
+              'Last Email Date',
               'Entry Count']
-          closed_team_tickets_headers = ['Case ID', 'Owner', 'Submitter Type', 'Ticket Type', 'Priority', 'Dispute Preview', 'Time to Close', 'Entry Count']
+          closed_team_tickets_headers = ['Case ID', 'Owner', 'Submitter Type', 'Ticket Type', 'Priority', 'Dispute Preview', 'Last Email Date', 'Email Count', 'Time to Close', 'Entry Count']
           average_time_to_close_by_owner_headers = ['Owner', 'Time (hrs)']
           ticket_resolution_by_owner_headers = ['Owner', 'Fixed FP', 'Fixed FN', 'Unchanged', 'Other']
           rule_hits_for_false_positive_resolutions_headers = ['Rules', 'Rule Hits']
@@ -364,8 +363,7 @@ class Escalations::Webrep::DisputesController < ApplicationController
                 d[:submission_type],
                 d[:priority],
                 ActionController::Base.helpers.strip_tags(d[:d_entry_preview]).gsub(/ *\d+$/, ''),
-                d[:last_comment_date],
-                d[:comment_count],
+                d[:last_email_date],
                 ActionController::Base.helpers.strip_tags(d[:d_entry_preview]).scan(/\d+/).last
             ]
             # The Rails `strip_tags` method doesn't work directly in this controller and I don't know why.
@@ -375,7 +373,7 @@ class Escalations::Webrep::DisputesController < ApplicationController
           # Closed Tickets
           closed_team_tickets_data = Dispute.closed_tickets_report(current_user.my_team, params[:startdate], params[:enddate])
           closed_team_tickets_data[:table_data].each do |d|
-            data_values = [d[:case_number], d[:owner], d[:submitter_type], d[:submission_type], d[:priority], ActionController::Base.helpers.strip_tags(d[:d_entry_preview]).gsub(/ *\d+$/, ''), d[:time_to_close], ActionController::Base.helpers.strip_tags(d[:d_entry_preview]).scan(/\d+/).last]
+            data_values = [d[:case_number], d[:owner], d[:submitter_type], d[:submission_type], d[:priority], ActionController::Base.helpers.strip_tags(d[:d_entry_preview]).gsub(/ *\d+$/, ''), d[:last_email_date], d[:total_email_count], d[:time_to_close], ActionController::Base.helpers.strip_tags(d[:d_entry_preview]).scan(/\d+/).last]
             insert_row_with_data(data_values, myteamtickets_xlsx, myteamtickets_workbook_names[:closed_team_tickets])
           end
 
@@ -761,8 +759,8 @@ class Escalations::Webrep::DisputesController < ApplicationController
                        'SBRS Total Rule Hits',
                        'Important?',
                        'Resolution',
-                       'Last Comment Date',
-                       'Comment Count',
+                       'Last Email Date',
+                       'Email Count',
                        'Resolution Comments']
     singlesheet_insert_row_with_data(dispute_headers, "h1")
 
@@ -789,8 +787,8 @@ class Escalations::Webrep::DisputesController < ApplicationController
                                            dispute_entry.dispute_rule_hits.sbrs_rule_hits.count,
                                            dispute_entry.is_important,
                                            dispute_entry.resolution,
-                                           dispute_entry.latest_comment_date,
-                                           dispute_entry.dispute.dispute_comments.count,
+                                           dispute_entry.latest_email_date,
+                                           dispute_entry.dispute.dispute_emails.count,
                                            dispute_entry.resolution_comment ])
       end
     end

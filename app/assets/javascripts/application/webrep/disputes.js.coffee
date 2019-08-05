@@ -1654,7 +1654,7 @@ $ ->
             return '<span class="esc-tooltipped dispute-submission-type dispute-' + data  + '" title="Email/Web"></span><span class="hidden-sortable-data">' + data + '</span>'
       }
       { data: 'd_entry_preview' }
-      { data: 'last_comment' }
+      { data: 'last_email_date' }
     ]
   )
 
@@ -1702,6 +1702,8 @@ $ ->
       }
       { data: 'd_entry_preview' }
       { data: 'time_to_close' }
+      { data: 'last_email_date' }
+      { data: 'total_email_count' }
     ]
   )
 
@@ -1754,7 +1756,7 @@ $ ->
             return '<span class="esc-tooltipped dispute-submission-type dispute-' + data  + '" title="Email/Web"></span><span class="hidden-sortable-data">' + data + '</span>'
       }
       { data: 'd_entry_preview' }
-      { data: 'last_comment' }
+      { data: 'last_email_date' }
     ]
   )
 
@@ -1807,6 +1809,8 @@ $ ->
       }
       { data: 'd_entry_preview' }
       { data: 'time_to_close' }
+      { data: 'last_email_date' }
+      { data: 'total_email_count' }
     ]
   )
 
