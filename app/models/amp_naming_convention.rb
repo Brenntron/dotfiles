@@ -15,4 +15,15 @@ class AmpNamingConvention < ApplicationRecord
       record.save!
     end
   end
+
+  def self.send_all_to_ti
+    amp_patterns = all.map do |record|
+      attrs = record.attributes.slice(*%w[pattern example engine_description notes table_sequence engine])
+      attrs['description'] = attrs.delete('engine_description')
+      attrs['position'] = attrs.delete('table_sequence')
+      attrs
+    end
+    message = Bridge::AmpPatternUpdateEvent.new
+    message.post(amp_patterns: amp_patterns)
+  end
 end
