@@ -190,7 +190,7 @@ $ ->
     $('#confirmation-modal tbody').empty()
     rows = $( '.col-select-all' ).closest('tr')
     $('#confirmation-modal').modal()
-    ugh = []
+    confirmation_dialog = []
     $(rows).each ->
       new_data = $(this).find('.col-bulk-dispute').text()
       if !isEmpty(new_data) && new_data != undefined
@@ -201,8 +201,8 @@ $ ->
             if child != '<p></p>'
               html +=  '<div>' + $(child).html() + '</div>'
           html += '</td> </tr>'
-          ugh.push( html )
-    $('#confirmation-modal tbody').append(ugh)
+          confirmation_dialog.push( html )
+    $('#confirmation-modal tbody').append(confirmation_dialog)
 
 
   window.col_tag_format = (array) ->
