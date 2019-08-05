@@ -105,6 +105,17 @@ window.submit_ticket_sync = (escalation_type, ids)->
     error: (response) ->
       $('#output-1').html('An error occurred attempting to execute task')
   , this)
+window.purge_mozprofiles =() ->
+  headers = {'Token': $('input[name="token"]').val(), 'Xmlrpc-Token': $('input[name="xml_token"]').val()}
+  std_msg_ajax(
+    method: 'POST'
+    headers: headers
+    url: "/escalations/api/v1/escalations/admin/tools/purge_mozprofiles"
+    success: (response) ->
+      std_msg_success("mozprofiles have been purged!","", reload: false)
+    error: (response) ->
+      std_msg_error("there was an error when attempting to purge mozprofiles.",[response.responseText], reload: false)
+  , this)
 
 $ ->
 

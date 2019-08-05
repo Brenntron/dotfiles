@@ -82,6 +82,13 @@ module API
             end
 
             params do
+              optional :profile_id, type: String
+            end
+            post "purge_mozprofiles" do
+              
+            end
+
+            params do
               optional :ids, type: String
               requires :escalation_type, type: String
               optional :all, type: Boolean

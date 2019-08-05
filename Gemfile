@@ -41,7 +41,7 @@ gem 'xmlrpc'
 gem 'libv8', '3.16.14.19'
 
 
-gem 'rails_admin', '~> 1.3'
+gem 'rails_admin', '~> 1.4.2'
 
 # System Management
 gem 'foreman', '0.85.0'
