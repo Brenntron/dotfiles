@@ -330,9 +330,8 @@ class Escalations::Webrep::DisputesController < ApplicationController
               'Priority',
               'Dispute Preview',
               'Last Email Date',
-              'Email Count',
               'Entry Count']
-          closed_team_tickets_headers = ['Case ID', 'Owner', 'Submitter Type', 'Ticket Type', 'Priority', 'Dispute Preview', 'Time to Close', 'Entry Count']
+          closed_team_tickets_headers = ['Case ID', 'Owner', 'Submitter Type', 'Ticket Type', 'Priority', 'Dispute Preview', 'Last Email Date', 'Email Count', 'Time to Close', 'Entry Count']
           average_time_to_close_by_owner_headers = ['Owner', 'Time (hrs)']
           ticket_resolution_by_owner_headers = ['Owner', 'Fixed FP', 'Fixed FN', 'Unchanged', 'Other']
           rule_hits_for_false_positive_resolutions_headers = ['Rules', 'Rule Hits']
@@ -365,7 +364,6 @@ class Escalations::Webrep::DisputesController < ApplicationController
                 d[:priority],
                 ActionController::Base.helpers.strip_tags(d[:d_entry_preview]).gsub(/ *\d+$/, ''),
                 d[:last_email_date],
-                d[:total_email_count],
                 ActionController::Base.helpers.strip_tags(d[:d_entry_preview]).scan(/\d+/).last
             ]
             # The Rails `strip_tags` method doesn't work directly in this controller and I don't know why.
@@ -375,7 +373,7 @@ class Escalations::Webrep::DisputesController < ApplicationController
           # Closed Tickets
           closed_team_tickets_data = Dispute.closed_tickets_report(current_user.my_team, params[:startdate], params[:enddate])
           closed_team_tickets_data[:table_data].each do |d|
-            data_values = [d[:case_number], d[:owner], d[:submitter_type], d[:submission_type], d[:priority], ActionController::Base.helpers.strip_tags(d[:d_entry_preview]).gsub(/ *\d+$/, ''), d[:time_to_close], ActionController::Base.helpers.strip_tags(d[:d_entry_preview]).scan(/\d+/).last]
+            data_values = [d[:case_number], d[:owner], d[:submitter_type], d[:submission_type], d[:priority], ActionController::Base.helpers.strip_tags(d[:d_entry_preview]).gsub(/ *\d+$/, ''), d[:last_email_date], d[:total_email_count], d[:time_to_close], ActionController::Base.helpers.strip_tags(d[:d_entry_preview]).scan(/\d+/).last]
             insert_row_with_data(data_values, myteamtickets_xlsx, myteamtickets_workbook_names[:closed_team_tickets])
           end
 

@@ -1702,6 +1702,7 @@ $ ->
       }
       { data: 'd_entry_preview' }
       { data: 'time_to_close' }
+      { data: 'last_email_date' }
       { data: 'total_email_count' }
     ]
   )
@@ -1808,6 +1809,7 @@ $ ->
       }
       { data: 'd_entry_preview' }
       { data: 'time_to_close' }
+      { data: 'last_email_date' }
       { data: 'total_email_count' }
     ]
   )
