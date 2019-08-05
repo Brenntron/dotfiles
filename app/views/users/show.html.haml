@@ -96,12 +96,13 @@
 
 
 
-.modal.fade{id: "roleModal_#{@user.id}", tabindex: '-1', role: 'dialog', 'aria-hidden': 'true'}
+.modal.fade.user-form-modal{id: "roleModal_#{@user.id}", tabindex: '-1', role: 'dialog', 'aria-hidden': 'true'}
   .modal-dialog{role: 'document'}
     .modal-content
       .modal-header
         %button.close{type: 'button', 'data-dismiss': 'modal', 'aria-label': 'Close'}
-        %h4.modal-title
-          Update Role(s) for
-          = @user.cvs_username
-      =render 'role_form', user: @user
+        %h3.modal-title
+          Edit User
+          = @user.cvs_username.capitalize
+      .modal-body
+        =render 'edit_user_form', user: @user
