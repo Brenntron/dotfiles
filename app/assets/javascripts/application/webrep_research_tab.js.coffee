@@ -24,27 +24,6 @@ $ ->
     $( col_actions ).empty()
     submit_rep_check()
 
-  $(document).on 'click', '.remove-action', (e) ->
-    e.preventDefault()
-    { target } = e
-    action = $(target).closest('.col-tag').text()
-    p_tag = $(target).closest('p')
-
-    data = p_tag[0].attributes.data.value.split(',')
-    data = $.map( data , $.trim)
-
-    data = data.filter( (item)-> return action != item)
-    if data.length > 1
-      data_string = data.join(' and ')
-    else
-      data_string = data.join(', ').replace(/, ([^,]*)$/, ', and $1')
-
-    if $( p_tag ).hasClass('reptool-action-col')
-      string = 'Drop all classifications (set entry to EXPIRED)' + data_string
-    else
-      string = 'Add classifications: ' + data_string
-
-
   $(document).on 'click', '.col-actions .col-tag', (e) ->
     { target } = e
     action = $(target).text()
@@ -57,7 +36,7 @@ $ ->
     col_dialog = action_edit + ': ' + col_tag_format(data)
 
     $(action_p).attr('data', data)
-    $(action_p).innerText = col_dialog
+    $(action_p).html(col_dialog)
 
   hide_toolbar = () ->
   # hides toolbar depending on which tab in bulk research panel is open
