@@ -91,12 +91,15 @@ $ ->
       submit_btn.prop('disabled', true)
 
 
+
   $(document).on 'change', '.adjust_wlbl_checkbox', () ->
     submit_btn = $('#wlbl_entries_dropdown .dropdown-submit-button')
     if $('.adjust_wlbl_checkbox:checked').length
       submit_btn.prop('disabled', false)
     else
       submit_btn.prop('disabled', true)
+
+  window.confirm_rep_changes = () ->
 
   window.open_adjust_reptool = () ->
     dropdown = $('#reptool_entries_bl_dropdown')
@@ -186,6 +189,10 @@ $ ->
       $( '#error_modal .modal-header' ).html( error_header )
       $( '#error_modal .modal-body' ).append( error_array )
     submit_rep_check()
+
+  wlbl_values= []
+  reptool_values= []
+
   window.submit_quick_lookup = () ->
     $('#confirmation-modal tbody').empty()
     rows = $( '.col-select-all' ).closest('tr')
@@ -198,7 +205,8 @@ $ ->
         if children.length
           html = '<tr> <td>' + new_data + '</td> <td>'
           for child in children
-            if child != '<p></p>'
+            if !isEmpty(child.classList.value)
+              console.log child.classList
               html +=  '<div>' + $(child).html() + '</div>'
           html += '</td> </tr>'
           confirmation_dialog.push( html )
