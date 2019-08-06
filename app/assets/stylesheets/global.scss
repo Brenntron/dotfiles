@@ -10015,8 +10015,15 @@ input[type="radio"].resolution_radio_button {
   }
   .edit-roles-button {
     padding: 8px 12px;
-    margin-left: 0;
-    margin-bottom: 12px;
+    margin: 12px 0;
+    background-color: lighten($type-lighter-color, 10%);
+    text-transform: uppercase;
+    border-radius: 2px;
+    font-weight: 600;
+    font-size: 9.5pt;
+    border: none !important;
+    color: #fff;
+    display: inline-block;
   }
   hr.thin{
     margin: 12px 0;
@@ -10029,6 +10036,7 @@ input[type="radio"].resolution_radio_button {
 .regenerate-key {
   background-image: url(image_path('icon_new_key_white.svg'));
   background-repeat: no-repeat;
+  background-color: lighten($type-lighter-color, 10%);
   width: 28px;
   height: 28px;
   display: block;
