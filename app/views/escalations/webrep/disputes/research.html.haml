@@ -76,14 +76,14 @@
                       .row
                         .col-xs-12
                           .row
-                            %input{type: 'radio', name: 'reptool-action-radio', class: 'status_bl', id: 'reptool-maintain', value: 'reptool-maintain', checked: true}
-                            %label.radio-label{for: 'reptool-maintain'} Maintain current classifications
+                            %input{type: 'radio', name: 'reptool-action-radio', class: 'status_bl', id: 'adjust-reptool-maintain', value: 'reptool-maintain', checked: true}
+                            %label.radio-label{for: 'adjust-reptool-maintain'} Maintain current classifications
                           .row
-                            %input{type: 'radio', name: 'reptool-action-radio', class: 'status_bl', id: 'reptool-override', value: 'reptool-override'}
-                            %label.radio-label{for: 'reptool-override'} Replace current classifications
+                            %input{type: 'radio', name: 'reptool-action-radio', class: 'status_bl', id: 'adjust-reptool-override', value: 'reptool-override'}
+                            %label.radio-label{for: 'adjust-reptool-override'} Replace current classifications
                           .row
-                            %input{type: 'radio', name: 'reptool-action-radio', class: 'status_bl', id: 'reptool-drop', value: 'reptool-drop'}
-                            %label.radio-label{for: 'reptool-drop'} Drop all classifications (set entry to EXPIRED)
+                            %input{type: 'radio', name: 'reptool-action-radio', class: 'status_bl', id: 'adjust-reptool-drop', value: 'reptool-drop'}
+                            %label.radio-label{for: 'adjust-reptool-drop'} Drop all classifications (set entry to EXPIRED)
                       %hr.thin.form-divider
                       .row.reptool-classifications-row
                         .col-xs-12
@@ -300,10 +300,10 @@
                         %label.content-label-sm{for: "reptool-class-type-select"} Classifications
                         .row.dropdown-tool-grey-row.nested-radio-row.reptool-class-radio-row
                           .col-xs-6
-                            %input{type: 'radio', name: 'reptool-classes-radio', id: 'reptool-classes-add', value: 'add', checked: true}
+                            %input{type: 'radio', name: 'reptool-classes-radio', value: 'add', checked: true}
                             %label.radio-label{for: 'reptool-classes-add'} Add selected classifications
                           .col-xs-6
-                            %input{type: 'radio', name: 'reptool-classes-radio', id: 'reptool-classes-remove', value: 'remove'}
+                            %input{type: 'radio', name: 'reptool-classes-radio', value: 'remove'}
                             %label.radio-label{for: 'reptool-classes-remove'} Remove selected classifications
                         %hr.thin.form-divider
                         .row.dropdown-tool-grey-row.checkbox-wrapper-row
