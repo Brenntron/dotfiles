@@ -436,7 +436,7 @@ $ ->
                   '<span id="category_' + entry_id + '">' + category + '</span>'
               }
               {
-                data: 'suggested_category'
+                data: 'suggested_disposition'
               }
               {
                 data: 'wbrs_score'
