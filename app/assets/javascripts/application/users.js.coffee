@@ -1,3 +1,20 @@
+window.generate_user_api_key = () ->
+  headers = {'Token': $('input[name="token"]').val(), 'Xmlrpc-Token': $('input[name="xml_token"]').val()}
+  user_id = $('input[name="user[kerberos_login]"]').val()
+  std_msg_ajax(
+    method: 'POST'
+    url: "/escalations/api/v1/escalations/user_preferences/generateAPIkey/"
+    headers: headers
+    data:
+      id: user_id
+    success: (response) ->
+      $('#roleModal_4').modal('show')
+      $('input[name="user[user_api_key][api_key]"]').val(response['key'])
+    error: (response) ->
+      std_api_error(response, "There was an error generating API key.", reload: false)
+  )
+
+
 $ ->
   $('#child_id').on 'change', ->
     newTeamMember = $('#child_id option:selected')

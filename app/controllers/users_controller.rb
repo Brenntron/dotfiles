@@ -38,18 +38,6 @@ class UsersController < ApplicationController
   def update
     @user = User.find(params[:id])
     @user.update(user_params)
-    if user_api_key_params[:api_key]
-      user_api_key = user_api_key_params[:api_key].strip
-      if @user.user_api_key && !user_api_key.blank?
-        @user.user_api_key.update(user_api_key_params)
-      elsif @user.user_api_key && user_api_key.blank?
-        @user.user_api_key.destroy
-      elsif !@user.user_api_key && !user_api_key.blank?
-        @user.create_user_api_key(user_api_key_params)
-      else
-        @user.create_user_api_key
-      end
-    end
     redirect_back(fallback_location: :back)
     if @user.save
       flash[:notice] = "#{@user.cvs_username} updated successfully."

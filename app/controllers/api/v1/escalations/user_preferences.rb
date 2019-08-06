@@ -19,6 +19,21 @@ module API
 
           end
 
+          desc "Generates an API Key"
+          params do
+            requires :id, type: String
+          end
+          post "generateAPIkey", root: :user_preferences do
+            @user = User.where(kerberos_login: params[:id]).first
+            if @user.user_api_key
+              @user.user_api_key.destroy
+              @user.create_user_api_key
+            else
+              @user.create_user_api_key
+            end
+            {'key': @user.user_api_key.api_key}
+          end
+
           desc "Update a preference for current user"
           params do
             requires :name, type: String, desc: "A string containing the type of preference to return"
