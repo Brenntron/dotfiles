@@ -24,6 +24,7 @@ $ ->
           lengthMenu: [[50, 100, 150, -1], [50, 100, 150, "All"]]
           processing: true
           serverSide: true
+          stateSave: true
           ajax:
             url: url
           pagingType: 'full_numbers'
