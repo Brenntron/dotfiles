@@ -22,15 +22,14 @@ module API
             end
             post "" do
               std_api_v2 do
-                ti_pattern = TiApi::AmpNamingPattern.new(params['patterns'])
-                if ti_pattern.all_valid?
-                  ti_pattern.update_ti!
-                  ::AmpNamingConvention.save_batch(ti_pattern.records)
-
-                  render json: {status: 'Success'}
-                else
-                  render json: {status: 'Error', id: conv.id}, status: :not_acceptable
+                ::AmpNamingConvention.transaction do
+                  ti_pattern = TiApi::AmpNamingPattern.new(params['patterns'])
+                  ::AmpNamingConvention.delete_all
+                  ti_pattern.records.each {|rec| rec.save!}
+                  ::AmpNamingConvention.send_all_to_ti
                 end
+
+                render json: {status: 'Success'}
               end
             end
 
@@ -49,9 +48,12 @@ module API
             end
             patch "" do
               std_api_v2 do
-                ti_pattern = TiApi::AmpNamingPattern.new(params['patterns'])
-                ti_pattern.update_ti!
-                ::AmpNamingConvention.save_batch(ti_pattern.records)
+                ::AmpNamingConvention.transaction do
+                  ti_pattern = TiApi::AmpNamingPattern.new(params['patterns'])
+                  ::AmpNamingConvention.delete_all
+                  ti_pattern.records.each {|rec| rec.save!}
+                  ::AmpNamingConvention.send_all_to_ti
+                end
 
                 render json: {status: 'Success'}
               end
@@ -63,10 +65,11 @@ module API
             end
             delete "" do
               std_api_v2 do
-                patterns = ::AmpNamingConvention.where(id: params['ids'])
-                positions = patterns.pluck(:table_sequence)
-                TiApi::AmpNamingPattern.delete_on_ti!(positions)
-                patterns.destroy_all
+                ::AmpNamingConvention.transaction do
+                  patterns = ::AmpNamingConvention.where(id: params['ids'])
+                  patterns.destroy_all
+                  ::AmpNamingConvention.send_all_to_ti
+                end
 
                 render json: {status: 'Success'}
               end
