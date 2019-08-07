@@ -23,9 +23,8 @@ module API
             post "" do
               std_api_v2 do
                 ::AmpNamingConvention.transaction do
-                  ti_pattern = TiApi::AmpNamingPattern.new(params['patterns'])
-                  ::AmpNamingConvention.delete_all
-                  ti_pattern.records.each {|rec| rec.save!}
+                  Rails.logger.debug("\n\n*** POST #{params['patterns']}\n\n")
+                  ::AmpNamingConvention.create_from_params(params['patterns'])
                   ::AmpNamingConvention.send_all_to_ti
                 end
 
@@ -49,9 +48,8 @@ module API
             patch "" do
               std_api_v2 do
                 ::AmpNamingConvention.transaction do
-                  ti_pattern = TiApi::AmpNamingPattern.new(params['patterns'])
-                  ::AmpNamingConvention.delete_all
-                  ti_pattern.records.each {|rec| rec.save!}
+                  Rails.logger.debug("\n\n*** PATCH #{params['patterns']}\n\n")
+                  ::AmpNamingConvention.save_from_params(params['patterns'])
                   ::AmpNamingConvention.send_all_to_ti
                 end
 
@@ -67,6 +65,7 @@ module API
               std_api_v2 do
                 ::AmpNamingConvention.transaction do
                   patterns = ::AmpNamingConvention.where(id: params['ids'])
+                  Rails.logger.debug("*** DELETE #{params['ids']}")
                   patterns.destroy_all
                   ::AmpNamingConvention.send_all_to_ti
                 end
