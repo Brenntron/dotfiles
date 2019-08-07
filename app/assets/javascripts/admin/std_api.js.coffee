@@ -81,7 +81,7 @@ window.std_api_ajax =(ajax_data) ->
   if ajax_data.processData == undefined
     ajax_data.processData = true
 
-  if ajax_data.contentType == 'application/json'
+  if ajax_data.contentType == 'application/json' && 'GET' != ajax_data.method
     ajax_data.data = JSON.stringify(ajax_data.data)
 
   if ajax_data.error_prefix == undefined
