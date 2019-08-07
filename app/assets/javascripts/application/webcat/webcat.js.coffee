@@ -74,9 +74,13 @@ $ ->
     refresh_url()
 
   build_data = () ->
+    ###
+    # This function builds the argument to get data from the backend for DataTables
+    # Depending on the search type and arguments
+    # build_header is called at the bottom of this function to format the search header
+    ###
     { webcat_search_type, webcat_search_name, webcat_search_conditions } = localStorage
     { search } = location
-
     if search != ''
       webcat_search_type = 'standard'
       urlParams = new URLSearchParams(location.search);
@@ -99,7 +103,6 @@ $ ->
           search_name: urlParams.get('f')
         }
       when 'named'
-
         data = {
           search_type: webcat_search_type
           search_name: webcat_search_name
@@ -175,6 +178,11 @@ $ ->
       container.attr('data-tooltip-content', '.tooltip_content')
 
   build_header = (data) ->
+    ###
+    # Depending on the data, this function builds the search header
+    # With the search header the reset filter button is attached
+    # If the search_type is 'named' or 'advanced', a subheader with search definitions will be made with the build_subheader function
+    ###
     container = $('#webcat_searchref_container')
     if data != undefined && container.length > 0
       reset_icon = '<span id="refresh-filter-button" class="reset-filter esc-tooltipped" title="Clear Search Results" onclick="webcat_refresh()"></span>'
@@ -225,6 +233,7 @@ $ ->
       $('#webcat-index-title')[0].innerHTML = new_header
     else
       $('#webcat-index-title')[0].innerHTML = 'All Tickets'
+
   build_complaints_table = () ->
         complaint_table = $('#complaints-index').DataTable(
           lengthMenu: [[50, 100, 150, -1], [50, 100, 150, "All"]]
@@ -235,6 +244,10 @@ $ ->
             url: url
             data: build_data()
             error: () ->
+              ###
+                If there is an error with the build_data call, the localstorage and url will be blown away
+                This will reset the search and filters
+              ###
               refresh_localStorage()
               refresh_url()
           drawCallback: ( settings ) ->
