@@ -236,7 +236,7 @@ $ ->
 
   build_complaints_table = () ->
         complaint_table = $('#complaints-index').DataTable(
-          lengthMenu: [[50, 100, 150, -1], [50, 100, 150, "All"]]
+          lengthMenu: [[50, 100, 150], [50, 100, 150]]
           processing: true
           serverSide: true
           stateSave: true
