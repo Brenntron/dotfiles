@@ -212,7 +212,6 @@ $ ->
           confirmation_dialog.push( html )
     $('#confirmation-modal tbody').append(confirmation_dialog)
 
-
   window.col_tag_format = (array) ->
     if typeof array == 'string'
       array = array.split(',')
@@ -238,8 +237,8 @@ $ ->
       $('#submit-rep-changes').attr('disabled', false)
     else
       $('#submit-rep-changes').attr('disabled', true)
-  window.set_action_col = () ->
 
+  window.set_action_col = () ->
     $( '#error_modal' ).dialog(
       position:
         my: "right",

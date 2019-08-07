@@ -590,7 +590,7 @@ window.submit_bulk_reptool = () ->
             'action': 'expired'
             'entries': [this.entry]
           }
-          array_of_datas.push(temp_data)
+          F.push(temp_data)
           data = array_of_datas
 
   # send separate api calls for each type of submission
