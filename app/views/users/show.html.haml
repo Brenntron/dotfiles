@@ -7,7 +7,11 @@
     .col-xs-4.col-with-divider
       .user-profile-wrapper
         %label.content-label-sm User Profile
+        %br
         %h1.username_header=@user.cvs_username
+        .users-flash-wrapper.profile-flash-wrapper
+          = render partial: 'users_flash_messages', flash: flash
+        %br
         %label.content-label-md=@user[:display_name]
         %br
         %span.data_small_emphasis

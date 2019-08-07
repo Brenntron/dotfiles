@@ -1,5 +1,7 @@
 .content-wrapper
   %h1.index-table-header Related Users
+  .users-flash-wrapper.team-flash-wrapper
+    = render partial: 'users_flash_messages', flash: flash
 
   %table.table.responsive.index-table
     %thead

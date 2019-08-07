@@ -167,6 +167,7 @@ h1.tab-header {
 h1.username_header {
   margin-top: -10px;
   padding-bottom: 10px;
+  display: inline-block;
 }
 
 h1.inline-header {
@@ -10060,4 +10061,66 @@ hr.thin.extra-bottom-marg {
 
 .user-access-wrapper pre.code-snippet {
 
+}
+
+.users-flash-wrapper {
+  display: inline-block;
+}
+
+.team-flash-wrapper {
+  margin-left: 20px;
+  margin-top: 17px;
+  margin-bottom: -17px;
+}
+
+.profile-flash-wrapper {
+  position: absolute;
+  margin-left: 3px;
+  margin-top: 7px;
+}
+
+.flash-msg {
+  font-weight: 400;
+  font-size: 9pt;
+  color: $type-lighter-color;
+  padding: 0;
+  border: none;
+  margin: 0;
+}
+
+.flash-msg::before {
+  content: '';
+  display: block;
+  width: 22px;
+  height: 22px;
+  background-repeat: no-repeat;
+  background-position: center;
+  float: left;
+  margin-top: -6px;
+  margin-right: 4px;
+}
+
+.flash-msg-alert-info::before {
+  background-image: url(image_path('icon_success.svg'));
+}
+
+.flash-msg-alert-danger::before, .flash-type-alert-error::before {
+  background-image: url(image_path('icon_error.svg'));
+}
+
+.small-flash-button {
+  display: block;
+  width: 13px;
+  height: 13px;
+  background-repeat: no-repeat;
+  background-position: center;
+  background-image: url(image_path('icon_cancel_grey.svg'));
+  float: right;
+  border: none;
+  margin-left: 3px;
+  opacity: 0.6;
+}
+
+.small-flash-button:hover {
+  opacity: 1;
 }

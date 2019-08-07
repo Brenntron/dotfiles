@@ -14,10 +14,21 @@ window.generate_user_api_key = (user_id, user_kerberos) ->
       std_api_error(response, "There was an error generating API key.", reload: false)
   )
 
-
-#window.update_user = () ->
-#  debugger
-
+# initial conversion so we can use an ajax call and modal responses instead of flash
+window.update_user = (user_id) ->
+  debugger
+#  std_msg_ajax(
+#    method: 'POST'
+#    url: "/escalations/api/v1/users/"
+#    headers: headers
+#    data:
+#      id: user_kerberos
+#    success: (response) ->
+#      $(user_modal).modal('show')
+#      $('input[name="user[user_api_key][api_key]"]').val(response['key'])
+#    error: (response) ->
+#      std_api_error(response, "There was an error generating API key.", reload: false)
+#  )
 
 $ ->
   $('#child_id').on 'change', ->
