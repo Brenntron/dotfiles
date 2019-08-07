@@ -66,16 +66,21 @@ $ ->
     refresh_url()
 
   window.build_webcat_named_search = (search_name) ->
+    link_el = $('.saved-search:contains(' + search_name + ')').closest('tr').attr('id')
     localStorage.webcat_search_type = 'named'
     localStorage.webcat_search_name = search_name
-    localStorage.removeItem('webcat_search_conditions')
+    localStorage.webcat_search_conditions = '#' + link_el
 
     refresh_url()
 
   build_data = () ->
+    ###
+    # This function builds the argument to get data from the backend for DataTables
+    # Depending on the search type and arguments
+    # build_header is called at the bottom of this function to format the search header
+    ###
     { webcat_search_type, webcat_search_name, webcat_search_conditions } = localStorage
     { search } = location
-
     if search != ''
       webcat_search_type = 'standard'
       urlParams = new URLSearchParams(location.search);
@@ -137,7 +142,47 @@ $ ->
     refresh_localStorage()
     refresh_url()
 
+  build_subheader = (subheader) ->
+
+    if typeof subheader == 'string'
+      subheader = JSON.parse(subheader)
+
+    container = $('#webcat_searchref_container')
+    search_condition_tooltip = []
+    for condition_name, condition of subheader
+      if condition != ''
+        if condition_name == 'id'
+          condition_name = 'Entry Id'
+        condition_name = condition_name.replace(/_/g, " ").toUpperCase()
+        condition_name_HTML = '<span class="search-condition-name text-uppercase">' + condition_name + ': </span>'
+
+        if typeof condition == 'object'
+          condition_HTML = '<span>' + condition.from  + ' - ' + condition.to+ '</span>'
+        else
+          condition_HTML = '<span>' + condition + '</span>'
+
+        search_condition_tooltip.push(condition_name + ': ' + $(condition_HTML).text())
+        container.append('<span class="search-condition">' + condition_name_HTML + condition_HTML + '</span>')
+
+    if search_condition_tooltip.length > 0
+      container.css('display', 'inline-block')
+      container.addClass('esc-tooltipped')
+      list = document.createElement('ul')
+      $(list).addClass('tooltip_content')
+      for  li in search_condition_tooltip
+        item = document.createElement('li')
+        item.appendChild(document.createTextNode(li))
+        list.appendChild(item)
+      container.prepend(list)
+      $(list).hide()
+      container.attr('data-tooltip-content', '.tooltip_content')
+
   build_header = (data) ->
+    ###
+    # Depending on the data, this function builds the search header
+    # With the search header the reset filter button is attached
+    # If the search_type is 'named' or 'advanced', a subheader with search definitions will be made with the build_subheader function
+    ###
     container = $('#webcat_searchref_container')
     if data != undefined && container.length > 0
       reset_icon = '<span id="refresh-filter-button" class="reset-filter esc-tooltipped" title="Clear Search Results" onclick="webcat_refresh()"></span>'
@@ -157,46 +202,25 @@ $ ->
             '</div>'
 
       else if search_type == 'advanced'
-        search_condition_tooltip = []
+
         webcat_search_conditions = JSON.parse(localStorage.webcat_search_conditions)
         new_header =
           '<div>Results for Advanced Search ' +
             reset_icon +
             '</div>'
-
-        for condition_name, condition of webcat_search_conditions
-          if condition != ''
-            if condition_name == 'id'
-              condition_name = 'Entry Id'
-            condition_name = condition_name.replace(/_/g, " ").toUpperCase()
-            condition_name_HTML = '<span class="search-condition-name text-uppercase">' + condition_name + ': </span>'
-
-            if typeof condition == 'object'
-              condition_HTML = '<span>' + condition.from  + ' - ' + condition.to+ '</span>'
-            else
-              condition_HTML = '<span>' + condition + '</span>'
-
-            search_condition_tooltip.push(condition_name + ': ' + $(condition_HTML).text())
-            container.append('<span class="search-condition">' + condition_name_HTML + condition_HTML + '</span>')
-
-        if search_condition_tooltip.length > 0
-          container.css('display', 'inline-block')
-          container.addClass('esc-tooltipped')
-          list = document.createElement('ul')
-          $(list).addClass('tooltip_content')
-          for  li in search_condition_tooltip
-            item = document.createElement('li')
-            item.appendChild(document.createTextNode(li))
-            list.appendChild(item)
-          container.prepend(list)
-          $(list).hide()
-          container.attr('data-tooltip-content', '.tooltip_content')
+        build_subheader(webcat_search_conditions)
 
       else if search_type == 'named'
         new_header =
           '<div>Results for "' + search_name + '" Saved Search' +
             reset_icon +
             '</div>'
+        el = localStorage.webcat_search_conditions
+        if !el.includes('temp_row')
+          subheader = $(el + ' .saved-search')[0].dataset.search_conditions
+        else
+          subheader = $('#saved-search-tbody').last('tr').find('.saved-search').attr('data-search_conditions')
+        build_subheader(subheader)
 
       else if search_type == 'contains'
         webcat_search_conditions = JSON.parse(localStorage.webcat_search_conditions)
@@ -209,13 +233,23 @@ $ ->
       $('#webcat-index-title')[0].innerHTML = new_header
     else
       $('#webcat-index-title')[0].innerHTML = 'All Tickets'
+
   build_complaints_table = () ->
         complaint_table = $('#complaints-index').DataTable(
+          lengthMenu: [[50, 100, 150], [50, 100, 150]]
           processing: true
           serverSide: true
+          stateSave: true
           ajax:
             url: url
             data: build_data()
+            error: () ->
+              ###
+                If there is an error with the build_data call, the localstorage and url will be blown away
+                This will reset the search and filters
+              ###
+              refresh_localStorage()
+              refresh_url()
           drawCallback: ( settings ) ->
             if localStorage.webcat_search_name
               {webcat_search_type, webcat_search_name, webcat_search_conditions } = localStorage
@@ -434,7 +468,9 @@ $ ->
                   '<span id="category_' + entry_id + '">' + category + '</span>'
               }
               {
-                data: 'suggested_category'
+                data: 'suggested_disposition'
+                render: ( data, type, full, meta ) ->
+                  return data.replace(',', ', ')
               }
               {
                 data: 'wbrs_score'

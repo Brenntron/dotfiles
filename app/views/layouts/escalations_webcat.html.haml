@@ -180,14 +180,13 @@
           My Saved Searches
         %table{class: 'table', id: 'saved-search'}
           %tbody#saved-search-tbody
-            - if current_user.named_searches.any?
-              - current_user.named_searches.where('project_type = ? OR project_type IS ?', 'Complaint', nil).order(:id).each do |named_search|
-                %tr{id: "saved_search_#{named_search.id}"}
-                  %td
-                    %a.input-truncate.saved-search.esc-tooltipped{onclick: "build_webcat_named_search('#{named_search.name}');", title: named_search.name}
-                      = named_search.name
-                    %a.delete-search{title: 'Delete Saved Search', onclick: "delete_disputes_named_search(this, '#{named_search.name}');"}
-                      = image_tag('icon_cancel_grey.svg')
+            - current_user.named_searches.where_project_type('Complaint').order(:name).each do |named_search|
+              %tr{id: "saved_search_#{named_search.id}"}
+                %td
+                  %a.input-truncate.saved-search.esc-tooltipped{onclick: "build_webcat_named_search('#{named_search.name}');", title: named_search.name, :'data-search_conditions' => search_condition_json(named_search)}
+                    = named_search.name
+                  %a.delete-search{title: 'Delete Saved Search', onclick: "delete_disputes_named_search(this, '#{named_search.name}');"}
+                    = image_tag('icon_cancel_grey.svg')
 
   .nav-tool-blocks.col-xs-2.col-sm-3.col-lg-4.search-wrapper
     .input-group.search-group#web-cat-search
