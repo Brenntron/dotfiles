@@ -506,7 +506,6 @@ Feature: Disputes
   @javascript
   Scenario: a user with the role 'amp pattern namer' visits the AMP Naming Convention page and saves an entry
     Given a user with role "amp pattern namer" exists and is logged in
-    And TI AMP Naming Convention API call is stubbed
     When I go to "/escalations/file_rep/naming_guide"
     And I click "#amp-edit-button"
     And I click "#amp-new-button"
@@ -544,7 +543,6 @@ Feature: Disputes
   @javascript
   Scenario: a user with the role 'amp pattern namer' visits the AMP Naming Convention page and edits an entry
     Given a user with role "amp pattern namer" exists and is logged in
-    And TI AMP Naming Convention API call is stubbed
     And the following AMP Naming Conventions exist:
     |id|
     |1 |

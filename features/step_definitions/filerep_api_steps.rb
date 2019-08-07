@@ -34,7 +34,3 @@ end
 Given (/^ReversingLabs Creation Data API call is stubbed$/) do
   FileReputationApi::ReversingLabs.stub(:get_creation_data).and_return(file_size: 1188, sample_type: 'Bogus')
 end
-
-Given(/^TI AMP Naming Convention API call is stubbed$/) do
-  TiApi::AmpNamingPattern.stub(:call_request).and_return([])
-end
