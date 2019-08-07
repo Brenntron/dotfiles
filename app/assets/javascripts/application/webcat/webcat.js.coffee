@@ -469,6 +469,8 @@ $ ->
               }
               {
                 data: 'suggested_disposition'
+                render: ( data, type, full, meta ) ->
+                  return data.replace(',', ', ')
               }
               {
                 data: 'wbrs_score'
