@@ -32,7 +32,13 @@
             .col-md-12
               %div.section-wrapper.section-top-info-offset
                 %h1 Admin Extras
-                %p this is where we will put extra admin buttons and things for escalations.
+                %h4 this is where we will put extra admin buttons and things for escalations.
 
                 %label This button will remove rust_mosprofile directories from /tmp
-                %button#id.class{onclick: 'purge_mozprofiles()', title: 'purge profiles'} purge mozprofiles!
+                %button#id1.class{onclick: 'purge_mozprofiles()', title: 'purge profiles'} purge mozprofiles!
+
+                %p
+
+                %label This button will remove firefox core files
+                %button#id2.class{onclick: 'purge_mozilla_corefiles()', title: 'purge cores'} purge Cores!
+                %input{type: 'checkbox', id: 'purgeCore-checkbox'} keep one?
