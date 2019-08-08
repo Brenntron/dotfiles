@@ -4585,7 +4585,9 @@ table > tbody > tr > td.dispute_rep_tools {
 #wlbl_adjust_entries.dropdown-menu li:hover, #wlbl_adjust_entries_index.dropdown-menu li:hover{
   background-color: transparent;
 }
-
+#wlbl_entries_dropdown .dropdown-tool-text-divider{
+  margin: 0 -8px!important;
+}
 .dispute_rep_tools .dropdown-menu {
   top: 16px;
   right: 1px;
