@@ -639,17 +639,19 @@ button {
 }
 
 .toolbar-button-spacer {
-  margin-right: 3px;
+  margin-right: 3px
 }
 .toolbar-button:disabled {
   cursor: not-allowed;
 }
+  .toolbar-button:disabled {
+    cursor: not-allowed;
+  }
 
-.dashboard-tickets-wrapper .toolbar-button-label {
-  background-size: 16px 16px;
-  background-position: 17px 2px;
-}
-
+  .dashboard-tickets-wrapper .toolbar-button-label {
+    background-size: 16px 16px;
+    background-position: 17px 2px;
+  }
 
 #edit-button, .edit-button      {background-image: url(image_path('icon_edit.svg'));}
 .related-button   {background-image: url(image_path('icon_related.svg'));}
@@ -1491,7 +1493,6 @@ fieldset.tight {
   min-height: 0 !important;
   box-shadow: none !important;
 }
-
 .selectize-input.focus {
   border: none !important;
   box-shadow: none !important;
@@ -1919,6 +1920,7 @@ a.static-nav-item {
 .icon-import {background-image: url(image_path('icon_import.svg'));}
 .icon-filter {background-image: url(image_path('icon_filter.svg'));}
 .icon-my-bugs      {background-image: url(image_path('icon_mybugs.svg'));}
+.icon-pending-bugs      {background-image: url(image_path('icon_pendingbugs.svg'));}
 .icon-my-open-bugs {background-image: url(image_path('icon_myopenbugs.svg'));}
 .icon-team-bugs    {background-image: url(image_path('icon_teambugs.svg'));}
 .icon-pending-bugs {background-image: url(image_path('icon_pendingbugs.svg'));}
@@ -2140,11 +2142,10 @@ a.static-nav-item {
   min-width: 400px;
   z-index: 51;
 }
+.selectize-dropdown{
+  z-index: 4000;
+}
 #advanced-search-dropdown {
-  .selectize-dropdown.multi.form-control.selectize{
-    position: absolute;
-    transform:translateY(15px);
-  }
   .nav-tool-content-wrapper .form-control.selectize{
     min-height: 26px;
     height: 100%;
@@ -2155,6 +2156,8 @@ a.static-nav-item {
     border-radius: 4px;
     -webkit-box-shadow: 0 6px 12px rgba(0, 0, 0, 0.175);
     box-shadow: 0 6px 12px rgba(0, 0, 0, 0.175);
+    position: absolute;
+    transform:translateY(15px);
   }
   .selectize-control.form-control.selectize.multi{
     padding-top: 3px !important;
@@ -2162,6 +2165,7 @@ a.static-nav-item {
     background: white;
     z-index: 3;
   }
+
 }
 
 .search-group form {
@@ -6048,7 +6052,9 @@ td.ticket-total::before {
   background-repeat: no-repeat;
   width: 20px;
   height: 20px;
-
+}
+.highlight-second-review .important-flag-col{
+  max-width: 50px!important;
 }
 td.in_zoo{
   text-align: center;
@@ -6830,10 +6836,6 @@ table#duplicates a {
   height: 20px;
   background-repeat: no-repeat;
   content: '';
-}
-
-.highlight-was-dismissed .important-flag-col {
-  min-width: 50px;
 }
 
 #dispute-index-title {
@@ -8532,14 +8534,15 @@ hr.thin.form-divider {
   margin-left: 35px;
 }
 
-#filerep_searchref_container{
+#filerep_searchref_container, #webcat_searchref_container{
   & {
-    color: $primary-section-color;
+    color: #6dbcdb;
     max-width: 100%;
-    font-size: 8pt ;
-    display: none;
-    white-space: nowrap;
+    font-size: 8pt;
+    display: inline-block;
     overflow: hidden;
+    padding: 2px 0;
+    white-space: nowrap;
     text-overflow: ellipsis;
     margin-bottom: 30px;
   }
@@ -9305,6 +9308,9 @@ div[aria-describedby='create-detection-dialog'] {
   }
 }
 
+#advanced-search-dropdown .form-group {
+  margin-bottom: 35px;
+}
 .form-group {
   .nested-col-row {
     margin-right: -4px;

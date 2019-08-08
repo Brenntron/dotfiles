@@ -140,58 +140,53 @@
       Filter
     .dropdown-menu.nav-tools-dropdown#filter-dropdown{'aria-labelledby': 'filter-cases'}
       %ul#filter-cases-list
-        -# add this in later
-        -#%li
-        -#  %a{onclick: 'standard_webrep_index_table("my_open");'}
-        -#    %span.nav-dropdown-icon.icon-my-open-bugs
-        -#    My Open Tickets
+
         %li{class: ("selected" if params[:f] == "MY COMPLAINTS")}
           %a{href: '?f=MY COMPLAINTS'}
             %span.nav-dropdown-icon.icon-my-bugs
-            My Complaints
+            My Tickets
         %li{class: ("selected" if params[:f] == "MY OPEN COMPLAINTS")}
           %a{href: '?f=MY OPEN COMPLAINTS'}
-            %span.nav-dropdown-icon.icon-my-bugs
-            My Open Complaints
+            %span.nav-dropdown-icon.icon-my-open-bugs
+            My Open Tickets
         %li{class: ("selected" if params[:f] == "MY CLOSED COMPLAINTS")}
           %a{href: '?f=MY CLOSED COMPLAINTS'}
-            %span.nav-dropdown-icon.icon-my-bugs
-            My Closed Complaints
-        %li{class: ("selected" if params[:f] == "COMPLETED")}
-          %a{href: '?f=COMPLETED'}
-            %span.nav-dropdown-icon.icon-my-bugs
-            Completed
+            %span.nav-dropdown-icon.icon-fixed-bugs
+            My Closed Tickets
         %li{class: ("selected" if params[:f] == "ACTIVE")}
           %a{href: '?f=ACTIVE'}
             %span.nav-dropdown-icon.icon-team-bugs
-            Active
+            Active Tickets
         %li{class: ("selected" if params[:f] == "NEW")}
           %a{href: '?f=NEW'}
             %span.nav-dropdown-icon.icon-open-bugs
-            New
+            New Tickets
         %li{class: ("selected" if params[:f] == "REVIEW")}
           %a{href: '?f=REVIEW'}
+            %span.nav-dropdown-icon.icon-pending-bugs
+            Waiting for Review
+        %li{class: ("selected" if params[:f] == "COMPLETED")}
+          %a{href: '?f=COMPLETED'}
             %span.nav-dropdown-icon.icon-fixed-bugs
-            Review
+            Completed Tickets
         %li{class: ("selected" if params[:f] == "ALL")}
           %a{href: '?f=ALL'}
             %span.nav-dropdown-icon.icon-recently-viewed
-            All
+            All Tickets
 
-      #saved-searches-wrapper.nav-tool-content-wrapper
+      #saved-searches-wrapper.webcat-named-search-list.nav-tool-content-wrapper
         %h3.nav-tool-dropdown-header
           %span.nav-dropdown-content-icon.icon-saved-search
           My Saved Searches
         %table{class: 'table', id: 'saved-search'}
           %tbody#saved-search-tbody
-            - if current_user.named_searches.any?
-              - current_user.named_searches.where('project_type = ? OR project_type IS ?', 'Complaint', nil).order(:id).each do |named_search|
-                %tr{id: "saved_search_#{named_search.id}"}
-                  %td
-                    %a.input-truncate.saved-search.esc-tooltipped{onclick: "named_webcat_index_table('#{named_search.name}');", title: named_search.name}
-                      = named_search.name
-                    %a.delete-search{title: 'Delete Saved Search', onclick: "delete_disputes_named_search(this, '#{named_search.name}');"}
-                      = image_tag('icon_cancel_grey.svg')
+            - current_user.named_searches.where_project_type('Complaint').order(:name).each do |named_search|
+              %tr{id: "saved_search_#{named_search.id}"}
+                %td
+                  %a.input-truncate.saved-search.esc-tooltipped{onclick: "build_webcat_named_search('#{named_search.name}');", title: named_search.name, :'data-search_conditions' => search_condition_json(named_search)}
+                    = named_search.name
+                  %a.delete-search{title: 'Delete Saved Search', onclick: "delete_disputes_named_search(this, '#{named_search.name}');"}
+                    = image_tag('icon_cancel_grey.svg')
 
   .nav-tool-blocks.col-xs-2.col-sm-3.col-lg-4.search-wrapper
     .input-group.search-group#web-cat-search
@@ -270,9 +265,3 @@
 
 
 = render template: "layouts/rocket"
-
-- if params[:f]
-  :javascript
-    $(document).ready(function(){
-      filterByStatus("#{params[:f]}")
-    })

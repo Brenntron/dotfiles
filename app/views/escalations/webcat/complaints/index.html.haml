@@ -8,22 +8,26 @@
     = render "escalations/webcat/shared/telemetry"
 
   .row.top-margin
-    .col-xs-12.temp-spacer
+    .col-xs-12
+      %h1#webcat-index-title
+    .col-xs-12
+      #webcat_searchref_container{onmouseover: "triggerTooltips(this)"}
+  .row
+    .col-xs-12
       = render "toolbar"
 
       %div{:style => "position:relative"}
         %div{:style => "width:600px;"}
           .grid-header{:style => "width:100%"}
       %input{:name => "token", :type => "hidden", :value => "#{current_user.authentication_token}"}/
-      %table.table.responsive.no-wrap#complaints-index{role: 'datatable'}
+
+      %table.table.responsive.no-wrap#complaints-index{role: 'datatable', 'data-source': escalations_webcat_complaint_entries_path(format: :json) }
         %thead
           %tr
             %th.sorting_disabled
               -#  Expandable button area
               %input#complaints_check_box{type: 'checkbox'}
             %th
-            -#    icons
-            -#%th Case ID
             %th Entry ID
             %th Age
             %th Status
@@ -36,7 +40,4 @@
             %th WBRS
             %th Submitter Type
             %th Submitter Org
-
-            -#%th Category
             %th Assigned To
-
