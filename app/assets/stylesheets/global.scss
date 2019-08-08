@@ -8473,7 +8473,7 @@ hr.thin.form-divider {
 }
 #confirmation-modal{
   .modal-body{
-    color: black;
+    color: $type-darkest;
     margin-top: 2%;
   }
   .modal-dialog{
@@ -8481,13 +8481,13 @@ hr.thin.form-divider {
   }
   thead{
     padding: 10%;
-    border-bottom: 1px solid #f2f2f2;
+    border-bottom: 1px solid $faint-neutral-color;
     td{
       padding: 15px 0 12px 7px;
     }
   }
   table{
-    border-bottom: 1px solid #f2f2f2;
+    border-bottom: 1px solid $faint-neutral-color;
     margin-bottom: 20px;
   }
   label{
