@@ -106,11 +106,9 @@ $ ->
 
     $( confirmation_rows ).each ->
       dispute = $( this ).find('td').first().text()
-      console.log dispute, dispute_changes
       action_col = $( this ).find('td').last().children()
 
       for action in action_col
-        console.log action
         if typeof $(action).attr('class') == 'string'
           classList = $(action).attr('class').split(/\s+/)
         def_list = []
@@ -133,10 +131,6 @@ $ ->
           data.classifications = def_list
 
         dispute_changes.push(data)
-
-      console.log dispute_changes
-
-      debugger
 
   window.close_modal = () ->
     $('#confirmation-modal').modal('toggle')
