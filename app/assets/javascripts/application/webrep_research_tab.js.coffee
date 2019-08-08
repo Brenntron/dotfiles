@@ -711,6 +711,7 @@ $ ->
     $(expand_button).toggleClass('shown')
 
 
+<<<<<<< HEAD
   ##  Populating the toolbar Adjust RepTool BL dropdown
   window.bulk_get_current_reptool = (page) ->
 
@@ -1009,23 +1010,6 @@ $ ->
     info: false
   })
 
-  $('.xbrs-short-scrollable').DataTable({
-    scrollX: '90%',
-    paging: false,
-    searching: false,
-    ordering: false,
-    info: false
-  })
-
-  $('.xbrs-long-scrollable').DataTable({
-    scrollY: 200,
-    scrollX: '70%',
-    paging: false,
-    searching: false,
-    ordering: false,
-    info: false
-  })
-
 
   #  Rule escalations email
   $('.wbrs-rule-trigger').click ->
@@ -1150,7 +1134,7 @@ $(document).ready ->
   $('.esc-tooltipped').tooltipster theme: [
     'tooltipster-borderless'
     'tooltipster-borderless-customized'
-  ]
+    ]
 
   $('.ticket-status-radio').click ->
     all_stat_radios = $('#show-edit-ticket-status-dropdown').find('.status-radio-wrapper')
@@ -1169,3 +1153,8 @@ $(document).ready ->
       $('.ticket-resolution-radio').prop('checked', false)
       $('#show-ticket-resolution-submenu').hide()
       $(res_comment[0]).val('')
+
+
+  # XBRS history on webrep: fixes to ensure showing the correct table headers, removing conflicting inline styles
+  $('.xbrs-details-table .dataTables_scrollHead').addClass('hidden')
+  $('.xbrs-details-table .dataTables_scrollBody').find('thead tr, th, th div').removeAttr('style')

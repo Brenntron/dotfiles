@@ -11,135 +11,13 @@ module API
               PaperTrail.request.whodunnit = current_user.id if current_user.present?
             end
 
-            desc 'get all complaint entries'
-            params do
-              optional :filter_by, type: String, desc: 'filter entries by this value'
-              optional :self_review, type: Boolean, desc: 'a flag that allows users to review their own categorizations'
-              optional :search, type: String, desc: 'search entries by this value'
-
-              optional :customer, type: Hash do
-                optional :name, type: String
-                optional :email, type: String
-                optional :company_name, type: String
-              end
-
-              optional :complaint_entries, type: Hash do
-                optional :ip_or_uri, type: String
-                optional :resolution, type: String
-                optional :category, type: String
-                optional :status, type: String
-                optional :complaint_id, type: Array
-              end
-              optional :search_type, type: String
-              optional :search_name, type: String
-              optional :description, type: String
-              optional :submitted_older, type: Date
-              optional :submitted_newer, type: Date
-              optional :modified_older, type: Date
-              optional :modified_newer, type: Date
-              optional :channel, type: String
-              optional :tags, type: Array
-            end
-
-            get "" do
-              json_packet = []
-
-              search_type = ComplaintEntry.get_search_type(permitted_params)
-              search_name = permitted_params[:search_name] ? permitted_params[:search_name] : nil
-              #complaint_entries = ComplaintEntry.first(5)ComplaintEntry.robust_search(search_type,
-              complaint_entries = ComplaintEntry.includes(:complaint_entry_screenshot, :user, {:complaint => [:complaint_tags, {:customer => :company}]}).robust_search(search_type,
-                                                               search_name: search_name,
-                                                               params: permitted_params,
-                                                               user: current_user)
-
-              if complaint_entries
-                complaint_entries.each do |complaint_entry|
-                  complaint_entry_packet = {}
-                  complaint_entry_packet[:age] = ComplaintEntry.what_time_is_it((Time.now - complaint_entry.created_at).to_i)
-                  complaint_entry_packet[:age_int] = (Time.now - complaint_entry.created_at).to_i
-                  complaint_entry_packet[:complaint_id] = complaint_entry&.complaint.id
-                  complaint_entry_packet[:entry_id] = complaint_entry.id
-
-                  complaint_entry_packet[:assigned_to] = complaint_entry.user&.display_name
-                  complaint_entry_packet[:status] = complaint_entry.status
-                  complaint_entry_packet[:created_at] = complaint_entry.created_at.strftime('%Y-%m-%d %H:%M:%S')
-                  complaint_entry_packet[:customer_name] = complaint_entry.complaint&.customer&.name # Customer name
-
-                  complaint_entry_packet[:category] = complaint_entry.url_primary_category
-                  complaint_entry_packet[:resolution]= complaint_entry.resolution
-                  complaint_entry_packet[:internal_comment] = complaint_entry.internal_comment
-                  complaint_entry_packet[:resolution_comment] = complaint_entry.resolution_comment
-
-                  complaint_entry_packet[:subdomain] = complaint_entry.subdomain
-                  complaint_entry_packet[:domain] = complaint_entry.domain
-                  complaint_entry_packet[:path] = complaint_entry.path
-                  complaint_entry_packet[:ip_address] = complaint_entry.ip_address
-                  if complaint_entry.wbrs_score.present?
-                    complaint_entry_packet[:wbrs_score] = complaint_entry.wbrs_score.to_d.truncate(2).to_f
-                  else
-                    complaint_entry_packet[:wbrs_score] = ''
-                  end
-                  complaint_entry_packet[:is_important] = complaint_entry.is_important
-                  complaint_entry_packet[:was_dismissed] = complaint_entry.was_dismissed?
-                  complaint_entry_packet[:viewable] = complaint_entry.viewable
-
-                  if !complaint_entry.suggested_disposition.nil?
-                    first_category = complaint_entry.suggested_disposition.split(',')
-                    if first_category.length > 1
-                      complaint_entry_packet[:suggested_category] = '<span class= "esc-tooltipped" title=" ' + complaint_entry.suggested_disposition.gsub(',',', ') + ' "> '  + first_category.first + ' + </span>'
-                    else
-                      complaint_entry_packet[:suggested_category] = first_category.first
-                    end
-                  else
-                    complaint_entry_packet[:suggested_category] = ''
-                  end
-
-                  complaint_entry_packet[:submitter_type] = complaint_entry.complaint.submitter_type
-                  complaint_entry_packet[:company_name] = complaint_entry.complaint&.customer&.company&.name
-                  complaint_entry_packet[:tags] = {}
-                  complaint_entry_packet[:tags] = complaint_entry.complaint.complaint_tags.map{|tag| tag&.name }
-
-                  complaint_entry_packet[:screen_shot_error] = complaint_entry&.complaint_entry_screenshot&.error_message
-
-                  complaint_entry_packet[:description] = complaint_entry&.complaint&.description
-
-                  # Need to rip this out, because if current category information changes, preload data will be out of date
-
-                  #fake it til they make it
-                  # fake_ass_bullshit = {}
-                  # fake_ass_bullshit[77] = {:is_active => 1, :mnemonic => "alc", :category_id => 77, :prefix_id => 12, :confidence => 1, :name => "Alcohol", :long_description => "Good ole fun juice"}
-                  # fake_ass_bullshit[77][:certainty] = [{:source => "iwf", :source_category => "busi - Business and Industry", :source_certainty => '1000'}, {:source => "other_multi_eka", :source_category => "ngo - Non-government Organization", :source_certainty => '1000'}]
-                  # fake_ass_bullshit[88] = {:is_active => 1, :mnemonic => "auct", :category_id => 88, :prefix_id => 12, :confidence => 2, :name => "Auctions", :long_description => "Buy stuff from cool people who yell."}
-                  # fake_ass_bullshit[88][:certainty] = [{:source => "iwf", :source_category => "busi - Business and Industry", :source_certainty => '500'}, {:source => "other_multi_eka", :source_category => "ngo - Non-government Organization", :source_certainty => '1000'}]
-                  #
-                  # complaint_entry_packet[:current_categories] = fake_ass_bullshit
-
-                  #each row has available to it: action, confidence, description, even_id, prefix_id, time, user, category.   "category" has its own hash
-                  #which has available to it: mnem, descr, category_id, desc_long
-
-                  complaint_entry_packet[:entry_history] = {}
-
-                  complaint_entry_packet[:entry_history][:domain_history]
-                  complaint_entry_packet[:entry_history][:complaint_history] = {}#complaint_entry.compose_versions
-
-                  json_packet << complaint_entry_packet
-                end
-              end
-
-              if permitted_params['search_name'].present?
-                search_name = permitted_params['search_name']
-                named_search = NamedSearch.where(user: current_user, name: search_name).first
-              end
-
-                {:status => "success", :search_name => search_name, :search_id => named_search&.id, :data => json_packet}.to_json
-            end
-
 
             desc 'update an entry '
             params do
               requires :id, type: Integer, desc:'complaint entry id'
               requires :prefix, type: String, desc: 'the url to categorize'
               requires :categories, type: String, desc: 'a list of categories to assign to this prefix'
+              requires :category_names, type: String, desc: 'a list of category names to assign to Complaint Entry record'
               requires :status, type: String, desc: 'setting the status of the entry'
               optional :comment, type: String, desc: 'internal comment'
               optional :resolution_comment, type: String, desc: 'resolution comment for the customer'
@@ -147,11 +25,13 @@ module API
             post 'update'do
               begin
                 entry = ComplaintEntry.find(permitted_params['id'])
-                entry.change_category( permitted_params['prefix'],permitted_params['categories'],
-                                         permitted_params['status'],
-                                         permitted_params['comment'],
-                                         permitted_params['resolution_comment'],
-                                         current_user, "")
+                entry.change_category( permitted_params['prefix'],
+                                       permitted_params['categories'],
+                                       permitted_params['category_names'],
+                                       permitted_params['status'],
+                                       permitted_params['comment'],
+                                       permitted_params['resolution_comment'],
+                                       current_user, "")
                 ComplaintEntryPreload.generate_preload_from_complaint_entry(entry)
                 if entry.complaint.ticket_source != Complaint::SOURCE_RULEUI
                   message = Bridge::ComplaintUpdateStatusEvent.new
@@ -161,7 +41,26 @@ module API
               rescue Exception => e
                   return {error:e.message}.to_json
               end
-              {display_name: current_user.display_name, status:entry.status, entry_resolution:permitted_params['status']}.to_json
+              {display_name: current_user.display_name, status: entry.status, entry_resolution: permitted_params['status'],
+               uri: entry.uri, domain: entry.domain, subdomain: entry.subdomain, path: entry.path, categories: params[:categories]}.to_json
+            end
+
+            desc 'Bulk update entry resolutions'
+            params do
+              requires :complaint_entry_ids, type: Array[Integer], desc: 'ComplaintEntry ids'
+              requires :resolution_name, type: String
+            end
+            post 'bulk_update_entry_resolution' do
+              begin
+                permitted_params['complaint_entry_ids'].each do |id|
+                  ComplaintEntry.update(id, :resolution => params[:resolution_name], :status => ComplaintEntry::STATUS_COMPLETED)
+                end
+              rescue Exception => e
+                Rails.logger.error "Failed to take entry: error=> #{e.message}"
+                error = "#{e.message}"
+                return {:error => error}.to_json
+              end
+              params[:complaint_entry_ids].to_json
             end
 
 
@@ -178,9 +77,12 @@ module API
             post 'update_pending' do
               begin
                 entry = ComplaintEntry.find(permitted_params['id'])
-                entry.change_category( permitted_params['prefix'], permitted_params['categories'],
-                                    permitted_params['status'],
-                                    permitted_params['comment'],permitted_params['resolution_comment'],
+
+                entry.change_category(permitted_params['prefix'],
+                                      permitted_params['categories'],
+                                      nil,
+                                      permitted_params['status'],
+                                      permitted_params['comment'],permitted_params['resolution_comment'],
                                     current_user, permitted_params['commit'])
 
                 message = Bridge::ComplaintUpdateStatusEvent.new
@@ -189,7 +91,9 @@ module API
               rescue Exception => e
                 return e.message
               end
-              {status:entry.status, entry_resolution:permitted_params['commit'], was_dismissed: entry.was_dismissed?}.to_json
+              {entry_id: entry.id, domain: entry.domain, subdomain: entry.subdomain, path: entry.path,
+               categories: entry.url_primary_category, uri: entry.uri, status:entry.status,
+               entry_resolution:permitted_params['commit'], was_dismissed: entry.was_dismissed?}.to_json
             end
 
 
@@ -319,15 +223,25 @@ module API
             post 'categorize_urls_history' do
               std_api_v2 do
                 begin
-                  prefix_id = Wbrs::Prefix.where(:urls => [permitted_params['url']]).first.prefix_id
-                  response = Wbrs::HistoryRecord.where({:prefix_id => prefix_id}).sort_by {|history| DateTime.parse(history.time)}.reverse
-                  render response.to_json
+                  url = Complaint.parse_url(permitted_params['url'])
+
+                  prefix_history = []
+                  prefixes = Wbrs::Prefix.where(:urls => [url[:domain]])
+
+                  prefixes.each do |prefix|
+                    if prefix.subdomain == url[:subdomain] && prefix.path == url[:path]
+                      prefix_id = prefix.prefix_id
+
+                      prefix_history = Wbrs::HistoryRecord.where({:prefix_id => prefix_id}).sort_by {|history| DateTime.parse(history.time)}.reverse
+                    end
+                  end
+
+                  render prefix_history.to_json
                 rescue
                   raise 'The URL you provided does not have available data.'
                 end
               end
             end
-
 
             desc 'get the lookup info about a url(rule)'
             params do
@@ -426,15 +340,66 @@ module API
                 return { image_data: Base64.encode64(record.screenshot) }.to_json
               end
             end
+            get ':complaint_entry_id/retake_screenshot' do
+              std_api_v2 do
+                entry = ComplaintEntry.find(params[:complaint_entry_id])
+                ces = entry.complaint_entry_screenshot
+                ces.update(error_message:"Retaking screenshot please wait.", screenshot:nil)
+                ces.grab_screenshot
+              end
+            end
 
-            desc 'Retrieve historic_category_information from expanding a complaint entry row'
+            desc 'Retrieve current categories from expanding a complaint entry row'
             params do
               requires :id, type: Integer
             end
             post 'retrieve_current_categories' do
               std_api_v2 do
                 complaint_entry = ComplaintEntry.find(params[:id])
-                complaint_entry.current_category_data.to_json
+
+                if complaint_entry.subdomain.present? || complaint_entry.path.present?
+                  master_categories = complaint_entry.get_category_names_from_master
+                else
+                  master_categories = []
+                end
+
+                wbrs_categories = complaint_entry.current_category_data
+
+                # Pull category from SDS
+                sds_params = {}
+
+                if complaint_entry.entry_type == 'URI/DOMAIN'
+                  sds_params['url'] = complaint_entry.uri
+                elsif complaint_entry.entry_type == 'IP'
+                  sds_params['url'] = complaint_entry.ip_address
+                end
+
+                sds_category = Sbrs::ManualSbrs.call_wbrs_webcat(sds_params, type: 'wbrs')
+
+                {master_categories: master_categories, current_category_data: wbrs_categories,
+                 sds_category: sds_category }.to_json
+              end
+            end
+
+            desc 'Retrieve category names from master domain'
+            params do
+              requires :id, type: Integer
+            end
+            post 'retrieve_category_names_from_master' do
+              std_api_v2 do
+                complaint_entry = ComplaintEntry.find(params[:id])
+                complaint_entry.get_category_names.to_json
+              end
+            end
+
+            desc 'Inherit categories from master domain'
+            params do
+              requires :id, type: Integer
+            end
+            post 'inherit_categories_from_master_domain' do
+              std_api_v2 do
+                complaint_entry = ComplaintEntry.find(params[:id])
+                complaint_entry.inherit_categories(ip_or_uri: complaint_entry.uri, description:'Inherited from master domain', user: current_user.email)
               end
             end
 
@@ -450,7 +415,9 @@ module API
                   begin
                     if entry['error'] == false
                       complaint_entry = ComplaintEntry.find(entry['entry_id'])
-                      complaint_entry.change_category( entry['prefix'],entry['categories'],
+                      complaint_entry.change_category( entry['prefix'],
+                                                       entry['categories'],
+                                                       nil,
                                                        entry['status'],
                                                        entry['comment'],
                                                        entry['resolution_comment'],
@@ -474,6 +441,64 @@ module API
                   end
                 end
                 response.to_json
+              end
+            end
+
+            desc 'Get XBRS data on complaint url'
+            params do
+              requires :url, type: String
+            end
+
+            post 'xbrs' do
+              #raise 'simulated breakage'
+              response = Xbrs::GetXbrs.by_domain(permitted_params['url'])
+              return [] if response.is_a?(Hash) && response[:error].present?
+              data = response.last['data']
+              columns = response.last['legend']
+
+              mtime_column_index = nil
+              ctime_column_index = nil
+
+              columns.each_with_index do |col, index|
+                if col == 'ctime'
+                  ctime_column_index = index
+                end
+                if col == 'mtime'
+                  mtime_column_index = index
+                end
+              end
+
+              formatted_data = []
+
+              data.each do |datum|
+                if ctime_column_index
+                  datum[ctime_column_index] = Time.at(datum[ctime_column_index])
+                end
+                if mtime_column_index
+                  datum[mtime_column_index] = Time.at(datum[mtime_column_index])
+                end
+
+                formatted_data << datum
+              end
+
+              {:status => "success", :data => formatted_data, :columns => columns}
+            end
+
+            desc "Reopen a complaint entry"
+            params do
+              requires :complaint_entry_id, type: Integer
+            end
+
+            post 'reopen_complaint_entry' do
+              begin
+                entry = ComplaintEntry.where(:id => permitted_params[:complaint_entry_id]).first
+                if entry.reopen
+                  {:status => "success"}
+                else
+                  {:status => "error"}
+                end
+              rescue
+                {:status => "error"}
               end
             end
 

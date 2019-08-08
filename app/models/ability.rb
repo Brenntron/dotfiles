@@ -70,6 +70,36 @@ class Ability
       can :publish_to_bugzilla, Note
     end
 
+    if role_names.include?('filerep manager')
+      can :manage, User do |user| #no delete UI is implemented
+        user.ancestors.include?(current_user)
+      end
+      can [:create, :update, :read], [FileReputationDispute, DisputeEmail]
+      can [:manage], [FileRepComment]
+      can :take, FileReputationDispute do |filerep_dispute|
+        filerep_dispute.user_id == User.vrtincoming.id
+      end
+
+      can :return, FileReputationDispute do |filerep_dispute|
+        filerep_dispute.user_id == current_user.id
+      end
+
+      can :change_assignee, FileReputationDispute
+    end
+
+    if role_names.include?('filerep user')
+      can [:create, :update, :read], [FileReputationDispute, DisputeEmail, FileRepComment]
+      can [:delete], [FileRepComment]
+
+      can :take, FileReputationDispute do |filerep_dispute|
+        filerep_dispute.user_id == User.vrtincoming.id
+      end
+
+      can :return, FileReputationDispute do |filerep_dispute|
+        filerep_dispute.user_id == current_user.id
+      end
+    end
+
     if role_names.include?('ips escalator manager')
       can :manage, User do |user| #no delete UI is implemented
         user.ancestors.include?(current_user)
@@ -91,15 +121,14 @@ class Ability
       can :manage, User do |user| #no delete UI is implemented
         user.ancestors.include?(current_user)
       end
-      can :read, [ResearchBug, Rule]
+      can :read, [ResearchBug]
     end
 
     if role_names.include?('committer')
       can [:manage, :acknowledge_bug, :import, :toggle_liberty], ResearchBug do |bug|
         bug.check_permission(current_user)
       end
-      can :manage, [EscalationLink, Attachment, Note, Rule]
-      can :publish, Rule
+      can :manage, [EscalationLink, Attachment, Note]
       can :publish_to_bugzilla, Note
     end
 
@@ -108,7 +137,6 @@ class Ability
         bug.check_permission(current_user)
       end
       can :manage, [Attachment, Note]
-      can [:read, :create, :update, :destroy], Rule #CRUD but no publish/commit
       # TODO When implementing escalation bugs re-enable
       # can [:manage, :acknowledge_bug, :import], EscalationBug
       # can :manage, EscalationLink
@@ -119,8 +147,8 @@ class Ability
     end
 
     if role_names.include?('build coordinator')
-      cannot [:update, :destroy, :create], [Bug, Rule, Attachment, Note]
-      can :read, [ResearchBug, Attachment, Note, Rule]
+      cannot [:update, :destroy, :create], [Bug, Attachment, Note]
+      can :read, [ResearchBug, Attachment, Note]
     end
   end
 end

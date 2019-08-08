@@ -50,7 +50,7 @@
             %th.esc-tooltipped{title: 'Ticket Type'}
             -#  Ticket type
             %th Dispute Preview
-            %th Last Comment Date
+            %th Last Email Date
 
       .ticket-entries-totals-wrapper
         %label.totals-label
@@ -100,6 +100,8 @@
             -#  Ticket type
             %th Dispute Preview
             %th Time to Close
+            %th Last Email Date
+            %th Total Email Count
 
       .ticket-entries-totals-wrapper
         %label.totals-label
@@ -132,7 +134,7 @@
 
   .col-xl-6.col-lg-5.col-xs-12.graph-section
     .row
-      .col-md-12.col-lg-7
+      .col-md-12
 
         .reports-graph-info-container
           %h5 Ticket Entries Closed by Ticket Owner
@@ -147,7 +149,7 @@
         .reports-graph-info-container
           %h5 Ticket Resolution by Ticket Owner
           .graph-bar-legend.ticket-resolution-legend
-            %label.navyblue-legend-color.graph-legend-circle Fixed FN
+            %label.yellow-legend-color.graph-legend-circle Fixed FN
             %label.skyblue-legend-color.graph-legend-circle Fixed FP
             %label.lightgray-legend-color.graph-legend-circle Unchanged
             %label.orange-legend-color.graph-legend-circle Other
@@ -161,7 +163,7 @@
 
 
 
-      .col-md-12.col-lg-5.graph-section
+      .col-md-12.graph-section
 
         .reports-graph-info-container
           %h5 Total Ticket Entries Closed
@@ -202,7 +204,7 @@
 
             .graph-bar-legend
               %label.skyblue-legend-color.graph-legend-circle Customer
-              %label.navyblue-legend-color.graph-legend-circle Guest
+              %label.orange-legend-color.graph-legend-circle Guest
           .reports-graph-wrapper.graph-with-small-menu
             %canvas#graph-multiuser-ticket-entries-submitter
 
@@ -219,7 +221,7 @@
             %tbody
 
         .reports-graph-info-container
-          %h5.dispute-E-grey.graph-header-icon-stg Closed Web Entries by Resolution
+          %h5.dispute-W-grey.graph-header-icon-stg Closed Web Entries by Resolution
           .reports-graph-wrapper.pie-graph-wrapper
             %canvas#multi-web-entries-by-resolution-piechart
           %table.table#multi-closed-web-entries-resolution-table

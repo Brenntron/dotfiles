@@ -8,7 +8,7 @@ class SbApi < ApplicationRecord
   def self.sds_host
     Rails.configuration.sds.host
   end
-
+  
   def self.get_auth_key(user,pass,retried = nil)
 
     if Rails.cache.read(:auth_token).present? and retried.blank?

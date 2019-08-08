@@ -48,6 +48,7 @@ namespace 'AC.WebCat', (exports) ->
     'news - News',
     'ngo - Non-governmental Organisations',
     'nsn - Non-sexual Nudity',
+    'nact - Not Actionable',
     'comm - Online Communities',
     'meet - Online Meetings',
     'osb - Online Storage and Backup',
@@ -135,6 +136,7 @@ namespace 'AC.WebCat', (exports) ->
     'news - News': 58,
     'ngo - Non-governmental Organisations': 87,
     'nsn - Non-sexual Nudity': 60,
+    'nact - Not Actionable': 103,
     'comm - Online Communities': 24,
     'meet - Online Meetings': 100,
     'osb - Online Storage and Backup': 66,
@@ -190,3 +192,16 @@ namespace 'AC.WebCat', (exports) ->
       code = x.split(' - ')[0]
       options2.push {category_id: y, category_name: value_name, category_code: code}
     return options2
+
+  exports.getCategoryIds = (category_names) ->
+
+    category_ids = []
+
+    for name in category_names
+      for x, y of categories2
+        value_name = x.split(' - ')[1]
+
+        if name == value_name
+          category_ids.push(y)
+
+    return category_ids

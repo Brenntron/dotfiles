@@ -18,7 +18,8 @@ class Bridge::DisputeEntryUpdateStatusEvent < Bridge::BaseMessage
     post(message: {
         source_authority: 'talos-intelligence',
         source_key: dispute.ticket_source_key,
-        ticket_entries: payload
+        ticket_entries: payload,
+        ac_id: dispute.id
     })
   end
 

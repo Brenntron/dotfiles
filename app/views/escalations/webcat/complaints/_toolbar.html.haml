@@ -2,43 +2,56 @@
   %div
     %label.toolbar-section-label
       Open in New Tab
-    %button.toolbar-button.open-viewable.esc-tooltipped{onclick: 'open_viewable()', type: 'button', title: 'Open Viewable'}
+    %button.toolbar-button.open-viewable.esc-tooltipped.toolbar-button-spacer{onclick: 'open_viewable()', type: 'button', title: 'Open Viewable'}
       %span.toolbar-button-text Open Viewable
-    %button.toolbar-button.open-nonviewable.esc-tooltipped{onclick: 'open_nonviewable()', type: 'button', title: 'Open Nonviewable'}
+    %button.toolbar-button.open-nonviewable.esc-tooltipped.toolbar-button-spacer{onclick: 'open_nonviewable()', type: 'button', title: 'Open Nonviewable'}
       %span.toolbar-button-text Open Nonviewable
-    %button.toolbar-button.open-selected.esc-tooltipped{onclick: 'open_selected()', type: 'button', title: 'Open Selected'}
+    %button.toolbar-button.open-selected.esc-tooltipped.toolbar-button-spacer{onclick: 'open_selected()', type: 'button', title: 'Open Selected'}
       %span.toolbar-button-text Open Selected
     %button.toolbar-button.open-all.esc-tooltipped{onclick: 'open_all()', type: 'button', title: 'Open All'}
       %span.toolbar-button-text Open All
   %div
     %label.toolbar-section-label
       Edit
-    %button.toolbar-button.take-ticket-toolbar-button.esc-tooltipped{onclick: 'take_selected()', type: 'button', title: 'Take'}
+    %button.toolbar-button.take-ticket-toolbar-button.esc-tooltipped.toolbar-button-spacer{onclick: 'take_selected()', type: 'button', title: 'Take'}
       %span.toolbar-button-text Take
     %button.toolbar-button.return-ticket-toolbar-button.esc-tooltipped{onclick: 'return_selected()', type: 'button', title: 'Return'}
       %span.toolbar-button-text Return
   %div
     %label.toolbar-section-label
       View Nested Data
-    %button.toolbar-button.collapse-button.esc-tooltipped{onclick: 'collapse_selected()', type: 'button', title: 'Collapse Selected'}
+    %button.toolbar-button.collapse-button.esc-tooltipped.toolbar-button-spacer{onclick: 'collapse_selected()', type: 'button', title: 'Collapse Selected'}
       %span.toolbar-button-text Collapse Selected
-    %button.toolbar-button.collapse-all.esc-tooltipped{onclick: 'collapse_all()', type: 'button', title: 'Collapse All'}
+    %button.toolbar-button.collapse-all.esc-tooltipped.toolbar-button-spacer{onclick: 'collapse_all()', type: 'button', title: 'Collapse All'}
       %span.toolbar-button-text Collapse All
-    %button.toolbar-button.expand-row-button.esc-tooltipped{onclick: 'expand_selected()', type: 'button', title: 'Expand Selected'}
+    %button.toolbar-button.expand-row-button.esc-tooltipped.toolbar-button-spacer{onclick: 'expand_selected()', type: 'button', title: 'Expand Selected'}
       %span.toolbar-button-text Expand Selected
-    %button.toolbar-button.expand-all.esc-tooltipped{type: 'button', title: 'Expand All'}
-      %span.toolbar-button-text Expand All
   %div
     %label.toolbar-section-label Data
-    %button.toolbar-button.sync-button#fetch.esc-tooltipped{ onclick: 'fetch_complaints();', title: 'Fetch Complaints'}
+    %button.toolbar-button.sync-button#fetch.esc-tooltipped.toolbar-button-spacer{ onclick: 'fetch_complaints();', title: 'Fetch Complaints'}
       %span.toolbar-button-text Fetch Complaints
     %button.toolbar-button.sync-button#fetch_wbnp.esc-tooltipped{ onclick: 'fetch_wbnp_data();', title: 'Fetch WBNP Data'}
       %span.toolbar-button-text Fetch WBNP Data
 
   %div
     %label.toolbar-section-label Bulk
-    %button.toolbar-button.master-submit-button#master-submit.esc-tooltipped{ onclick: 'master_submit();', title: 'Submit Changes', disabled: true}
-      %span.toolbar-button-text Submit Changes
+    %span.dropdown
+      %button#complaint_ticket_status.toolbar-button.ticket-status-button.dropdown-button-margin-right.dropdown-toggle.esc-tooltipped{title: 'Edit Ticket Resolution', 'data-toggle': 'dropdown', 'aria-haspopup': 'true', 'aria-expanded': 'false'}
+        %span.toolbar-button-text
+          Edit Ticket Resolution
+      .dropdown-menu.toolbar-dropdown#complaint-edit-ticket-status-dropdown{'aria-labelledby': 'complaint_ticket_status'}
+        %ul
+          %li.status-radio-wrapper
+            %input.ticket-status-radio{type: 'radio', name: 'ticket-status', id: 'UNCHANGED', value:'UNCHANGED' }
+            %label.ticket-status-radio-label.radio-label{for: 'UNCHANGED'} Unchanged
+          %li.status-radio-wrapper
+            %input.ticket-status-radio{type: 'radio', name: 'ticket-status', id: 'FIXED', value: 'FIXED'}
+            %label.ticket-status-radio-label.radio-label{for: 'FIXED'} Fixed
+          %li.status-radio-wrapper
+            %input.ticket-status-radio{type: 'radio', name: 'ticket-status', id: 'INVALID', value: 'INVALID'}
+            %label.ticket-status-radio-label.radio-label{for: 'INVALID'} Invalid
+
+
 
   %div.toolbar-checkbox-wrapper
     %input{type: 'checkbox', checked: true, id:'self_review'}

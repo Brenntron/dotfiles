@@ -11,5 +11,9 @@ FactoryBot.define do
     factory :committer_role do
       role          { 'committer' }
     end
+
+    factory :file_rep_role do
+      role          { 'filerep user' }
+    end
   end
 end

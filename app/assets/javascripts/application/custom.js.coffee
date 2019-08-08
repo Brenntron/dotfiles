@@ -4,6 +4,9 @@ $ ->
     $('.login-area').toggleClass("shifted--left")
     $('.sidebar').toggleClass("nav--active")
 
+  # ensure side nav is always correct viewport height in all browsers
+  $('#sidenav-icons-div').css("height", $(document).height())
+
   #remove whitespace from search form
   $('#search_form').submit ->
     bug_id = $('#bug_id').val().trim()

@@ -12,6 +12,8 @@
         %label.content-label-sm
           Case ID
         .bug-top-id
+          -# Creating notation for future change. This is neither a link nor part of a dropdown. Should be changed
+          -# to a span and have the dropdown class removed.
           %a.case-id-tag.related-dropdown-text#dispute_id= @dispute.case_id_str
 
 
@@ -45,9 +47,11 @@
                             =select_tag :index_target_assignee, options_from_collection_for_select(User.joins(roles: :org_subset).where(org_subsets: { name: 'webrep' }).distinct.order(:cvs_username), :id, :cvs_username), class: 'toolbar-select'
                           %button{class: 'primary', type:'button', id: 'button_reassign', onclick:'toolbar_show_change_assignee();'}
                             Assign
-                          - if (@dispute.assignee != 'Unassigned')
-                            %button{class: 'secondary', type: 'button', id: 'unassign-dispute-button', onclick: 'toolbar_unassign_dispute();'}
-                              Unassign
+
+          - if (@dispute.assignee != 'Unassigned')
+            .container_unassign
+              %button{class: 'secondary ticket-owner-unassigned-button', type: 'button', id: 'unassign-dispute-button', onclick: 'toolbar_unassign_dispute();'}
+                Unassign
 
     .col-xs-3.col-with-divider
       .dispute-status-col-wrapper
@@ -62,7 +66,7 @@
                 NEW
               - else
                 = @dispute.status
-                
+
             - if can? :update, Dispute
               .dropdown-menu.inline-dropdown-menu#show-edit-ticket-status-dropdown{'aria-labelledby': 'show-edit-ticket-status-button'}
                 %ul
@@ -114,7 +118,7 @@
                         .resolution-comment-wrapper
                           %label.content-label-sm
                             Comment
-                          %textarea
+                          %textarea.ticket-resolution-comment
                           %button.primary{onClick: 'show_page_edit_status()'}
                             Submit
                   %li.status-radio-wrapper
@@ -171,7 +175,7 @@
         %br
         %label.content-label-sm
           Age
-        %div= @dispute.case_opened_at && distance_of_time_in_words(Time.now, @dispute.case_opened_at)
+        %div=@dispute.dispute_age
       - if (@dispute.resolution != Dispute::DUPLICATE) && (@dispute.status != Dispute::RESOLVED)
         .top-info-buttons-wrapper
           %button.edit-button.dispute-top-buttons#edit-dispute-button.esc-tooltipped{title: 'Edit ticket information'}

@@ -1,20 +1,7 @@
-= form_for NamedSearch.new, url: escalations_webcat_complaints_path, method: 'get', 'accept-charset': 'UTF-8', html: {id: 'cat_named_search'} do |named_form|
+= form_for NamedSearch.new, url: escalations_webcat_complaint_entries_path, method: 'get', 'accept-charset': 'UTF-8', html: {id: 'cat_named_search'} do |named_form|
   .form-group.search-item
-    %label.content-label-sm Complaint ID(s) (comma separate multiples)
-    %input.form-control#complaintid-input{name: 'complaint_id'}
-    %button.remove-input
-  .form-group.search-item
-    %label.content-label-sm Complaint (URL/IP/Domain)
-    %input.form-control#complaint-input{name: 'ip_or_url'}
-    %button.remove-input
-  .form-group.search-item
-    %label.content-label-sm Category
-    %input.form-control#category-input{name: 'category'}
-    %button.remove-input
-  .form-group.search-item
-    %label.content-label-sm Status
-    %select.form-control#status-input{name: 'status'}
-      =options_for_select([['Any Status', '', { class: 'default-placeholder' }], Complaint::NEW, Complaint::RESOLVED, Complaint::ASSIGNED, Complaint::ACTIVE, Complaint::COMPLETED, Complaint::PENDING])
+    %label.content-label-sm Entry ID
+    %input.form-control#entryid-input{name: 'entry_id'}
     %button.remove-input
   .form-group.search-item
     %label.content-label-sm Tags
@@ -22,15 +9,32 @@
     %select.form-control.selectize#tags-input{placeholder: "Search tags", multiple: "multiple", tabindex:"-1", name: 'tags'}
     %input.hidden#search_tag_list{value: ComplaintTag.all.map { |tag| tag.name }.join(','), name: 'tags'}
     %button.remove-input
+  .form-group.search-item
+    %label.content-label-sm Complaint (URL/IP/Domain)
+    %input.form-control#complaint-input{name: 'ip_or_uri'}
+    %button.remove-input
+  .form-group.search-item
+    %label.content-label-sm Status
+    %input.form-control#status-input{name: 'Status', list: 'status-input-list'}
+    %datalist#status-input-list
+    %button.remove-input
+  .form-group.search-item
+    %label.content-label-sm Category
+    %select.form-control.selectize#category-input{name: 'category-input', placeholder: "Enter up to 5 categories", multiple: "multiple", tabindex:"-1"}
+    %button.remove-input
+  .form-group.search-item.hidden
+    %label.content-label-sm Complaint ID(s) (comma separate multiples)
+    %input.form-control#complaintid-input{name: 'complaint_id'}
+    %button.remove-input
   .form-group.search-item.hidden
     %label.content-label-sm Resolution
-    %select.form-control#resolution-input{name: 'resolution'}
-      =options_for_select(['', Complaint::RESOLUTION_FIXED, Complaint::RESOLUTION_INVALID, Complaint::RESOLUTION_UNCHANGED, Complaint::RESOLUTION_DUPLICATE])
+    %input.form-control#resolution-input{name: 'resolution', list: 'resolution-input-list'}
+    %datalist#resolution-input-list
     %button.remove-input
   .form-group.search-item.hidden
     %label.content-label-sm Added Through Channel
-    %select.form-control#channel-input{name: 'channel'}
-      =options_for_select(['', "Internal", "TalosIntel", "WBNP"])
+    %input.form-control#channel-input{name: 'Channel', list: 'channel-input-list'}
+    %datalist#channel-input-list
     %button.remove-input
   .form-group.search-item.hidden
     %label.content-label-sm Customer Name
@@ -46,10 +50,6 @@
     %label.content-label-sm Company
     %input.form-control#company-input{name: 'company', list: 'customerCompanyList'}
     %datalist#customerCompanyList
-    %button.remove-input
-  .form-group.search-item.hidden
-    %label.content-label-sm Description
-    %input.form-control#desc-input{name: 'description'}
     %button.remove-input
   .form-group.search-item.hidden
     %label.content-label-sm Date Submitted (Newer)
@@ -74,6 +74,10 @@
     .multicol-2
       %ul
         %li.hidden
+          %label.search-criteria-label
+            %input.search-checkbox#entry-id-cb{type: 'checkbox', name: 'search-criteria', value: 'Entry ID', for: 'entryid-input'}
+            Entry ID
+        %li
           %label.search-criteria-label
             %input.search-checkbox#complaint-id-cb{type: 'checkbox', name: 'search-criteria', value: 'Complaint ID', for: 'complaintid-input'}
             Complaint ID
@@ -113,11 +117,6 @@
           %label.search-criteria-label
             %input.search-checkbox#company-cb{type: 'checkbox', name: 'search-criteria', value: 'Company', for: 'company-input'}
             Company
-
-        %li
-          %label.search-criteria-label
-            %input.search-checkbox#desc-cb{type: 'checkbox', name: 'search-criteria', value: 'Description', for: 'desc-input'}
-            Description
         %li
           %label.search-criteria-label
             %input.search-checkbox#submitted-newer-cb{type: 'checkbox', name: 'search-criteria', value: 'Date Submitted (Newer)', for: 'submitted-newer-input'}
@@ -147,7 +146,7 @@
       Add Name to save this search criteria to My Saved Searches
     %input.form-control{name: 'search_name', :type => 'text', :maxlength => '50'}
   .form-group.text-center
-    %button.primary#submit-advanced-search{type: 'button', value: 'submit', onclick: 'advanced_webcat_index_table();'}
+    %button.primary#submit-advanced-search{type: 'button', value: 'submit', onclick: 'set_webcat_advanced();'}
       Submit Search
     %button.secondary#reset-advanced-search.reset{type: 'button', onclick: 'webcat_reset_search();'}
       Reset Search

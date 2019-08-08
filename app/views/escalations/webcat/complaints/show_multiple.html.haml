@@ -1,6 +1,7 @@
+- content_for(:webcat_page) do
+  Complaints Show
+
 .content-wrapper
-  - content_for(:webcat_page) do
-    Complaints Show
 
   %input{type: 'hidden', name: 'token', value: "#{current_user.authentication_token}"}
   %input{type: 'hidden', name: 'current_user_id', value: "#{current_user.id}"}

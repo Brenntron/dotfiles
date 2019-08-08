@@ -48,7 +48,7 @@ RSpec.describe "Peake-Bridge dispute email messages channels", type: :request do
 
     post '/escalations/peake_bridge/channels/ticket-event/messages', as: :json, params: dispute_email_params
 
-    expect(response).to be_success
+    expect(response).to be_successful
     dispute_email = DisputeEmail.where(dispute_id: dispute.id).first
     expect(dispute_email).to_not be_nil
   end
