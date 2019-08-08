@@ -38,7 +38,7 @@ Feature: Webcat complaints
     Then I wait for "3" seconds
     And I should see "Arts"
     Then I should not see "Update"
-    And I click ".expand-all"
+    And I click ".expand-row-button-inline"
     Then I wait for "3" seconds
     Then I should see "Commit"
     Then I should see "Decline"
@@ -51,8 +51,9 @@ Feature: Webcat complaints
     And a complaint entry preload exists
     And I goto "/escalations/webcat/complaints?f=ALL"
     Then I should not see "Update"
-    And I click ".expand-all"
-    And I trigger-click "#fixed1"
+    And I click ".expand-row-button-inline"
+    And I wait for "5" seconds
+    And I click "#fixed1"
     And I should see "Update"
     And I should not see "commit"
     When I click "#submit_changes_1"
@@ -179,7 +180,8 @@ Feature: Webcat complaints
     And I fill in "complaint_entry_report_to" with "2018-08-12"
     Then I click "#complaint_entry_report" and switch to the new window
     Then I should see "Webcat Complaint Entry Report"
-    
+
+  # Test should work after WEB-5072 is complete
   @javascript
   Scenario: a user attempts to submit changes without categories and receives expected error alert
     Given a user with role "webcat user" exists and is logged in
@@ -187,12 +189,13 @@ Feature: Webcat complaints
     And a complaint entry preload exists
     And I goto "/escalations/webcat/complaints?f=ALL"
     And I wait for "5" seconds
-    And I click ".expand-all"
+    And I click ".expand-row-button-inline"
     And I wait for "5" seconds
     And I click "#submit_changes_1"
     And I wait for "5" seconds
     Then I should see "MUST INCLUDE AT LEAST ONE CATEGORY."
 
+  # Test should work after WEB-5001 is merged
   @javascript
   Scenario: a user attempts to submit changes with resolution set to 'Unchanged'
     Given a user with role "webcat user" exists and is logged in
@@ -200,7 +203,7 @@ Feature: Webcat complaints
     And a complaint entry preload exists
     And I goto "/escalations/webcat/complaints?f=ALL"
     And I wait for "5" seconds
-    And I click ".expand-all"
+    And I click ".expand-row-button-inline"
     And I wait for "5" seconds
     And I click "#unchanged1"
     And I click "#submit_changes_1"
@@ -214,7 +217,7 @@ Feature: Webcat complaints
     And a complaint entry preload exists
     And I goto "/escalations/webcat/complaints?f=ALL"
     And I wait for "5" seconds
-    And I click ".expand-all"
+    And I click ".expand-row-button-inline"
     And I wait for "5" seconds
     Then I click "#domain-1"
     Then I should see "Domain Information"
@@ -250,7 +253,7 @@ Feature: Webcat complaints
     |1 |
     And a complaint entry preload exists
     And I goto "/escalations/webcat/complaints?f=ALL"
-    And I click ".expand-all"
+    And I click ".expand-row-button-inline"
     Then I should see "Description for testing"
 
   @javascript
@@ -273,6 +276,7 @@ Feature: Webcat complaints
     And I should see "DOMAIN HISTORY"
     And I should see "Tue, 12 May 2015 17:39:53 GMT"
 
+  # Test should work after WEB-5077 is complete
   @javascript
   Scenario: a user looks up a complaint's entry history with an invalid URL
     Given a user with role "webcat user" exists and is logged in
@@ -283,6 +287,7 @@ Feature: Webcat complaints
     And I wait for "5" seconds
     Then I should see "No history associated with this url."
 
+  # Test should work after WEB-5077 is complete
   @javascript
   Scenario: a user looks up a complaint's entry history with an invalid URL in the third position (make sure that the notification appears in the right spot)
     Given a user with role "webcat user" exists and is logged in
@@ -342,8 +347,9 @@ Feature: Webcat complaints
     And I click "#cat-urls-same"
     And I fill in "categorize_urls" with "joseph.com" and "mary.com" separated by blank lines
     And I fill in selectized with "Adult"
-    And I trigger-click ".primary"
-    And I wait for "45" seconds
+    And I click "#cat-urls-same"
+    And I click ".primary"
+    And I wait for "20" seconds
     Then I should see "SUCCESS"
     And I should see "URLs/IPs successfully categorized."
 
@@ -354,8 +360,8 @@ Feature: Webcat complaints
     And I click "#categorize-urls"
     And I click "#cat-urls-same"
     And I fill in selectized with "Adult"
-    And I trigger-click ".primary"
-    And I wait for "5" seconds
+    And I click "#cat-urls-same"
+    And I click ".primary"
     Then I should see "ERROR"
     Then I should see "Please check that a URL/IP has been inputted and that at least one category was selected."
 
@@ -366,7 +372,7 @@ Feature: Webcat complaints
     And I click "#categorize-urls"
     And I click "#cat-urls-same"
     And I fill in "categorize_urls" with "cisco.com"
-    And I trigger-click ".primary"
+    And I click ".primary"
     Then I should see "ERROR"
     Then I should see "Please check that a URL/IP has been inputted and that at least one category was selected."
 
@@ -384,10 +390,10 @@ Feature: Webcat complaints
     Given a user with role "webcat user" exists and is logged in
     When I goto "/escalations/webcat/complaints?f=ALL"
     And I click "#categorize-urls"
-    And I fill in "url_1" with "cisco.com"
+    And I fill in "url_1" with "chabad.org"
     And I click ".current-categories-button"
     Then I wait for "15" seconds
-    Then I should see "Computers and Internet"
+    Then I should see "Religion"
 
   @javascript
   Scenario: a users tries to drop current categories on a URL
@@ -405,7 +411,7 @@ Feature: Webcat complaints
     When I goto "/escalations/webcat/complaints?f=ALL"
     And I click "#fetch_wbnp"
     And I wait for "10" seconds
-    Then I should see "WBNP COMPLAINTS SUCCESSFULLY RETRIEVED FROM RULEUI."
+    Then I should see content "Active" within ".wbnp-report-status"
 
   @javascript
   Scenario: a users tries to update URI
@@ -413,9 +419,22 @@ Feature: Webcat complaints
     And a complaint entry with trait "new_entry" exists
     And a complaint entry preload exists
     When I goto "/escalations/webcat/complaints?f=ALL"
-    And I click ".expand-all"
+    And I click ".expand-row-button-inline"
     And I fill in "complaint_prefix_1" with "cisco.com"
-    And I trigger-click ".inline-button"
+    And I click ".inline-button"
     And I wait for "10" seconds
-    Then I should see "SUCCESS"
-    Then I should see "URI updated."
+    And I goto "/escalations/webcat/complaints?f=ALL"
+    And I should see content "cisco.com" within "#domain_1"
+
+
+  # This will eventually need to be stubbed, because the response from SDS might update
+  @javascript
+  Scenario: a user expands a Complaint Entry and sees SDS data when WBRS data is not present
+    Given a user with role "webcat user" exists and is logged in
+    And the following complaint entries exist:
+    | uri             | domain        | subdomain | path | entry_type |
+    | baumpflege.ac   | baumpflege.ac |           |      | URI/DOMAIN |
+    When I goto "/escalations/webcat/complaints?f=ALL"
+    And I click ".expand-row-button-inline"
+    And I wait for "8" seconds
+    Then I should see content "Nature" within ".sds_category"

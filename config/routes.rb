@@ -22,6 +22,14 @@ Rails.application.routes.draw do
       end
     end
 
+    namespace :other_admin_tools do
+      root 'tools#index'
+      get 'tasks', to: 'tools#tasks'
+      get 'rule_api', to: 'tools#rule_api'
+      get 'wbnp_reports', to: 'tools#wbnp_reports'
+      get 'manage_escalations_sync', to: 'tools#manage_escalations_sync'
+    end
+
     namespace :webcat do
       root 'root#index'
       resources :complaints, only: [:index, :show, :update] do
@@ -96,20 +104,16 @@ Rails.application.routes.draw do
       resource :bugzilla_api_key, controller: '/bugzilla_api_keys', only: [:edit, :update]
 
       collection do
+        get :all
+      end
+
+      collection do
         get :results
       end
 
-      # TODO Review metrics for applicability to escalations users
-      get :status_metrics, defaults: {format: :json}
-      get :time_metrics, defaults: {format: :json}
-      get :pending_team_metrics, defaults: {format: :json}
-      get :resolved_team_metrics, defaults: {format: :json}
-      get :time_team_metrics, defaults: {format: :json}
-      get :component_team_metrics, defaults: {format: :json}
-
       patch :add_to_team
       patch :remove_from_team
-      resources :relationships, only: [:index, :show] do
+      resources :relationships, controller: '/relationships', only: [:index, :show] do
         collection do
           get :member_status
         end
@@ -150,6 +154,7 @@ Rails.application.routes.draw do
   post "sessions/create" => "sessions#create"
   post "/attachments" => "attachments#create"
   root 'pages#index'
+
 
 
   resources :users, only: [:index, :show, :update] do

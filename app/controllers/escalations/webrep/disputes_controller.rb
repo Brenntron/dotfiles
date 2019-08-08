@@ -34,12 +34,60 @@ class Escalations::Webrep::DisputesController < ApplicationController
           end
         end
 
-        dispute_headers = ['Priority', 'Case ID', 'Status', 'Entry Count', 'Owner', 'Customer Name', 'Customer Email', 'Customer Company', 'Company URL', 'Time Submitted', 'Last Updated', 'Age', 'Dispute Entry', 'Dispute Entry Status', 'Suggested Disposition', 'Category', 'WBRS Score', 'WBRS Total Rule Hits', 'SBRS Score', 'SBRS Total Rule Hits', 'Important?', 'Resolution', 'Resolution Comments']
+        dispute_headers = ['Priority',
+                           'Case ID',
+                           'Status',
+                           'Entry Count',
+                           'Owner',
+                           'Customer Name',
+                           'Customer Email',
+                           'Customer Company',
+                           'Company URL',
+                           'Time Submitted',
+                           'Last Updated',
+                           'Age',
+                           'Dispute Entry',
+                           'Dispute Entry Status',
+                           'Suggested Disposition',
+                           'Category',
+                           'WBRS Score',
+                           'WBRS Total Rule Hits',
+                           'SBRS Score',
+                           'SBRS Total Rule Hits',
+                           'Important?',
+                           'Resolution',
+                           'Last Email Date',
+                           'Email Count',
+                           'Resolution Comments']
         singlesheet_insert_row_with_data(dispute_headers, "h1")
 
         @disputes.each do |dispute|
           dispute.dispute_entries.each do |dispute_entry|
-            singlesheet_insert_row_with_data([ dispute_entry.dispute.priority, dispute_entry.dispute.case_id_str, dispute_entry.dispute.status, dispute_entry.dispute.dispute_entries.count, dispute_entry.dispute.user.cvs_username, dispute_entry.dispute.customer.name, dispute_entry.dispute.customer.email, dispute_entry.dispute.customer.company.name, dispute_entry.dispute.org_domain ,dispute_entry.dispute.case_opened_at.strftime("%FT%T"), dispute_entry.dispute.updated_at.strftime("%FT%T"), ApplicationRecord.humanize_secs(Time.now - dispute_entry.dispute.case_opened_at), dispute_entry.hostlookup, dispute_entry.status, dispute_entry.suggested_disposition, dispute_entry.primary_category, dispute_entry.wbrs_score, dispute_entry.dispute_rule_hits.wbrs_rule_hits.count, dispute_entry.sbrs_score, dispute_entry.dispute_rule_hits.sbrs_rule_hits.count, dispute_entry.is_important, dispute_entry.resolution, dispute_entry.resolution_comment ])
+            singlesheet_insert_row_with_data([ dispute_entry.dispute.priority,
+                                               dispute_entry.dispute.case_id_str,
+                                               dispute_entry.dispute.status,
+                                               dispute_entry.dispute.dispute_entries.count,
+                                               dispute_entry.dispute.user.cvs_username,
+                                               dispute_entry.dispute.customer.name,
+                                               dispute_entry.dispute.customer.email,
+                                               dispute_entry.dispute.customer.company.name,
+                                               dispute_entry.dispute.org_domain,
+                                               dispute_entry.dispute.case_opened_at.strftime("%FT%T"),
+                                               dispute_entry.dispute.updated_at.strftime("%FT%T"),
+                                               ApplicationRecord.humanize_secs(Time.now - dispute_entry.dispute.case_opened_at),
+                                               dispute_entry.hostlookup,
+                                               dispute_entry.status,
+                                               dispute_entry.suggested_disposition,
+                                               dispute_entry.primary_category,
+                                               dispute_entry.wbrs_score,
+                                               dispute_entry.dispute_rule_hits.wbrs_rule_hits.count,
+                                               dispute_entry.sbrs_score,
+                                               dispute_entry.dispute_rule_hits.sbrs_rule_hits.count,
+                                               dispute_entry.is_important,
+                                               dispute_entry.resolution,
+                                               dispute_entry.latest_email_date,
+                                               dispute_entry.dispute.dispute_emails.count,
+                                               dispute_entry.resolution_comment ])
           end
         end
 
@@ -72,6 +120,8 @@ class Escalations::Webrep::DisputesController < ApplicationController
   def update
   end
 
+  # TODO We should not have a 400 line method in a controller.
+  # TODO avoid defining methods in the body of other methods.
   def dashboard
     respond_to do |format|
       format.html
@@ -129,7 +179,7 @@ class Escalations::Webrep::DisputesController < ApplicationController
         @spreadsheet_directory = Dir.mktmpdir
 
         if params['mytickets'] == "true"
-          mytickets_file = File.new("#{@spreadsheet_directory}/my-tickets_#{Time.now}.xlsx", 'w+')
+          mytickets_file = File.new("#{@spreadsheet_directory}/my-tickets_#{Time.now.utc.iso8601}.xlsx", 'w+')
           mytickets_xlsx = RubyXL::Workbook.new
           mytickets_workbook_names = {
               :my_open_tickets => 'My Open Tickets',
@@ -150,8 +200,8 @@ class Escalations::Webrep::DisputesController < ApplicationController
 
 
           # Build the headers of each individual worksheet
-          my_open_tickets_headers = ['Case ID', 'Submitter Type', 'Ticket Type', 'Priority', 'Dispute Preview', 'Last Comment Date', 'Entry Count']
-          my_closed_tickets_headers = ['Case ID', 'Submitter Type', 'Ticket Type', 'Priority', 'Dispute Preview', 'Time to Close', 'Entry Count']
+          my_open_tickets_headers = ['Case ID', 'Submitter Type', 'Ticket Type', 'Priority', 'Dispute Preview', 'Last Email Date', 'Entry Count']
+          my_closed_tickets_headers = ['Case ID', 'Submitter Type', 'Ticket Type', 'Priority', 'Dispute Preview', 'Last Email Date', 'Email Count', 'Time to Close', 'Entry Count']
           total_ticket_entries_closed_headers = ['Date', 'Web', 'Email', 'Web_Email', 'Total']
           time_to_close_tickets_headers = ['Ticket', 'Time (hrs)']
           ticket_submitted_by_submitter_type_headers = ['Date', 'Customer', 'Guest']
@@ -170,7 +220,7 @@ class Escalations::Webrep::DisputesController < ApplicationController
           # My Open Tickets
           my_open_tickets_data = Dispute.open_tickets_report([current_user], params[:startdate], params[:enddate])
           my_open_tickets_data[:table_data].each do |d|
-            data_values = [d[:case_number], d[:submitter_type], d[:submission_type], d[:priority], ActionController::Base.helpers.strip_tags(d[:d_entry_preview]).gsub(/ *\d+$/, ''), d[:last_comment], ActionController::Base.helpers.strip_tags(d[:d_entry_preview]).scan(/\d+/).last]
+            data_values = [d[:case_number], d[:submitter_type], d[:submission_type], d[:priority], ActionController::Base.helpers.strip_tags(d[:d_entry_preview]).gsub(/ *\d+$/, ''), d[:last_email_date], ActionController::Base.helpers.strip_tags(d[:d_entry_preview]).scan(/\d+/).last]
             # The Rails `strip_tags` method doesn't work directly in this controller and I don't know why.
             insert_row_with_data(data_values, mytickets_xlsx, mytickets_workbook_names[:my_open_tickets])
           end
@@ -179,7 +229,7 @@ class Escalations::Webrep::DisputesController < ApplicationController
           # My Closed Tickets
           my_closed_tickets_data = Dispute.closed_tickets_report([current_user], params[:startdate], params[:enddate])
           my_closed_tickets_data[:table_data].each do |d|
-            data_values = [d[:case_number], d[:submitter_type], d[:submission_type], d[:priority], ActionController::Base.helpers.strip_tags(d[:d_entry_preview]).gsub(/ *\d+$/, ''), d[:time_to_close], ActionController::Base.helpers.strip_tags(d[:d_entry_preview]).scan(/\d+/).last]
+            data_values = [d[:case_number], d[:submitter_type], d[:submission_type], d[:priority], ActionController::Base.helpers.strip_tags(d[:d_entry_preview]).gsub(/ *\d+$/, ''), d[:last_email_date], d[:total_email_count], d[:time_to_close], ActionController::Base.helpers.strip_tags(d[:d_entry_preview]).scan(/\d+/).last]
             insert_row_with_data(data_values, mytickets_xlsx, mytickets_workbook_names[:my_closed_tickets])
           end
 
@@ -244,11 +294,10 @@ class Escalations::Webrep::DisputesController < ApplicationController
 
           mytickets_xlsx.write(mytickets_file)
           mytickets_file.rewind
-          @mytickets_output_file = mytickets_file.read
         end
 
         if params['myteamtickets'] == "true"
-          myteamtickets_file = File.new("#{@spreadsheet_directory}/my-team-tickets_#{Time.now}.xlsx", 'w+')
+          myteamtickets_file = File.new("#{@spreadsheet_directory}/my-team-tickets_#{Time.now.utc.iso8601}.xlsx", 'w+')
           myteamtickets_xlsx = RubyXL::Workbook.new
           myteamtickets_workbook_names = {
               :open_team_tickets => 'Open Tickets',
@@ -273,8 +322,16 @@ class Escalations::Webrep::DisputesController < ApplicationController
 
           # Build headers of each individual worksheet
 
-          open_team_tickets_headers = ['Case ID', 'Owner', 'Submitter Type', 'Ticket Type', 'Priority', 'Dispute Preview', 'Last Comment', 'Entry Count']
-          closed_team_tickets_headers = ['Case ID', 'Owner', 'Submitter Type', 'Ticket Type', 'Priority', 'Dispute Preview', 'Time to Close', 'Entry Count']
+          open_team_tickets_headers = [
+              'Case ID',
+              'Owner',
+              'Submitter Type',
+              'Ticket Type',
+              'Priority',
+              'Dispute Preview',
+              'Last Email Date',
+              'Entry Count']
+          closed_team_tickets_headers = ['Case ID', 'Owner', 'Submitter Type', 'Ticket Type', 'Priority', 'Dispute Preview', 'Last Email Date', 'Email Count', 'Time to Close', 'Entry Count']
           average_time_to_close_by_owner_headers = ['Owner', 'Time (hrs)']
           ticket_resolution_by_owner_headers = ['Owner', 'Fixed FP', 'Fixed FN', 'Unchanged', 'Other']
           rule_hits_for_false_positive_resolutions_headers = ['Rules', 'Rule Hits']
@@ -299,7 +356,16 @@ class Escalations::Webrep::DisputesController < ApplicationController
           # My Team [open] Tickets
           open_team_tickets_data = Dispute.open_tickets_report(current_user.my_team, params[:startdate], params[:enddate])
           open_team_tickets_data[:table_data].each do |d|
-            data_values = [d[:case_number], d[:owner], d[:submitter_type], d[:submission_type], d[:priority], ActionController::Base.helpers.strip_tags(d[:d_entry_preview]).gsub(/ *\d+$/, ''), d[:last_comment], ActionController::Base.helpers.strip_tags(d[:d_entry_preview]).scan(/\d+/).last]
+            data_values = [
+                d[:case_number],
+                d[:owner],
+                d[:submitter_type],
+                d[:submission_type],
+                d[:priority],
+                ActionController::Base.helpers.strip_tags(d[:d_entry_preview]).gsub(/ *\d+$/, ''),
+                d[:last_email_date],
+                ActionController::Base.helpers.strip_tags(d[:d_entry_preview]).scan(/\d+/).last
+            ]
             # The Rails `strip_tags` method doesn't work directly in this controller and I don't know why.
             insert_row_with_data(data_values, myteamtickets_xlsx, myteamtickets_workbook_names[:open_team_tickets])
           end
@@ -307,7 +373,7 @@ class Escalations::Webrep::DisputesController < ApplicationController
           # Closed Tickets
           closed_team_tickets_data = Dispute.closed_tickets_report(current_user.my_team, params[:startdate], params[:enddate])
           closed_team_tickets_data[:table_data].each do |d|
-            data_values = [d[:case_number], d[:owner], d[:submitter_type], d[:submission_type], d[:priority], ActionController::Base.helpers.strip_tags(d[:d_entry_preview]).gsub(/ *\d+$/, ''), d[:time_to_close], ActionController::Base.helpers.strip_tags(d[:d_entry_preview]).scan(/\d+/).last]
+            data_values = [d[:case_number], d[:owner], d[:submitter_type], d[:submission_type], d[:priority], ActionController::Base.helpers.strip_tags(d[:d_entry_preview]).gsub(/ *\d+$/, ''), d[:last_email_date], d[:total_email_count], d[:time_to_close], ActionController::Base.helpers.strip_tags(d[:d_entry_preview]).scan(/\d+/).last]
             insert_row_with_data(data_values, myteamtickets_xlsx, myteamtickets_workbook_names[:closed_team_tickets])
           end
 
@@ -396,12 +462,11 @@ class Escalations::Webrep::DisputesController < ApplicationController
 
           myteamtickets_xlsx.write(myteamtickets_file)
           myteamtickets_file.rewind
-          @myteamtickets_output_file = myteamtickets_file.read
         end
 
         input_filenames = Dir.entries(@spreadsheet_directory).select {|f| !File.directory? f}
         if input_filenames.count > 1
-          filename = "webrep_export-#{Time.now}.zip"
+          filename = "webrep_export-#{Time.now.utc.iso8601}.zip"
           temp_file = Tempfile.new(filename)
 
           begin
@@ -425,10 +490,19 @@ class Escalations::Webrep::DisputesController < ApplicationController
             #Close and delete the temp file
             temp_file.close
             temp_file.unlink
+
+            #Delete all generated spreadsheets
+            input_filenames.each do |file|
+              File.delete(File.join(@spreadsheet_directory, file))
+            end
           end
 
-        else
-          send_file File.join(@spreadsheet_directory, input_filenames[0]), :disposition => 'attachment'
+        elsif input_filenames.count == 1
+          File.open((File.join(@spreadsheet_directory, input_filenames[0])), 'r') do |f|
+            send_data f.read, :filename => input_filenames[0]
+          end
+
+          File.delete(File.join(@spreadsheet_directory, input_filenames[0]))
         end
 
         if params['alltickets'] == "true"
@@ -664,12 +738,58 @@ class Escalations::Webrep::DisputesController < ApplicationController
       end
     end
 
-    dispute_headers = ['Priority', 'Case ID', 'Status', 'Entry Count', 'Owner', 'Customer Name', 'Customer Email', 'Customer Company', 'Company URL', 'Time Submitted', 'Age', 'Dispute Entry', 'Dispute Entry Status', 'Suggested Disposition', 'Category', 'WBRS Score', 'WBRS Total Rule Hits', 'SBRS Score', 'SBRS Total Rule Hits', 'Important?', 'Resolution', 'Resolution Comments']
+    dispute_headers = ['Priority',
+                       'Case ID',
+                       'Status',
+                       'Entry Count',
+                       'Owner',
+                       'Customer Name',
+                       'Customer Email',
+                       'Customer Company',
+                       'Company URL',
+                       'Time Submitted',
+                       'Age',
+                       'Dispute Entry',
+                       'Dispute Entry Status',
+                       'Suggested Disposition',
+                       'Category',
+                       'WBRS Score',
+                       'WBRS Total Rule Hits',
+                       'SBRS Score',
+                       'SBRS Total Rule Hits',
+                       'Important?',
+                       'Resolution',
+                       'Last Email Date',
+                       'Email Count',
+                       'Resolution Comments']
     singlesheet_insert_row_with_data(dispute_headers, "h1")
 
     @disputes.each do |dispute|
       dispute.dispute_entries.each do |dispute_entry|
-        singlesheet_insert_row_with_data([ dispute_entry.dispute.priority, dispute_entry.dispute.case_id_str, dispute_entry.dispute.status, dispute_entry.dispute.dispute_entries.count, dispute_entry.dispute.user.cvs_username, dispute_entry.dispute.customer.name, dispute_entry.dispute.customer.email, dispute_entry.dispute.customer.company.name, dispute_entry.dispute.org_domain ,dispute_entry.dispute.case_opened_at.strftime("%FT%T"), ApplicationRecord.humanize_secs(Time.now - dispute_entry.dispute.case_opened_at), dispute_entry.hostlookup, dispute_entry.status, dispute_entry.suggested_disposition, dispute_entry.primary_category, dispute_entry.wbrs_score, dispute_entry.dispute_rule_hits.wbrs_rule_hits.count, dispute_entry.sbrs_score, dispute_entry.dispute_rule_hits.sbrs_rule_hits.count, dispute_entry.is_important, dispute_entry.resolution, dispute_entry.resolution_comment ])
+        singlesheet_insert_row_with_data([ dispute_entry.dispute.priority,
+                                           dispute_entry.dispute.case_id_str,
+                                           dispute_entry.dispute.status,
+                                           dispute_entry.dispute.dispute_entries.count,
+                                           dispute_entry.dispute.user.cvs_username,
+                                           dispute_entry.dispute.customer.name,
+                                           dispute_entry.dispute.customer.email,
+                                           dispute_entry.dispute.customer.company.name,
+                                           dispute_entry.dispute.org_domain,
+                                           dispute_entry.dispute.case_opened_at.strftime("%FT%T"),
+                                           ApplicationRecord.humanize_secs(Time.now - dispute_entry.dispute.case_opened_at),
+                                           dispute_entry.hostlookup,
+                                           dispute_entry.status,
+                                           dispute_entry.suggested_disposition,
+                                           dispute_entry.primary_category,
+                                           dispute_entry.wbrs_score,
+                                           dispute_entry.dispute_rule_hits.wbrs_rule_hits.count,
+                                           dispute_entry.sbrs_score,
+                                           dispute_entry.dispute_rule_hits.sbrs_rule_hits.count,
+                                           dispute_entry.is_important,
+                                           dispute_entry.resolution,
+                                           dispute_entry.latest_email_date,
+                                           dispute_entry.dispute.dispute_emails.count,
+                                           dispute_entry.resolution_comment ])
       end
     end
 

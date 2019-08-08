@@ -462,12 +462,17 @@ th {
   background-color: lighten( $faint-neutral-color, 2% );
 }
 
+.alt-col.lighter-alt-col {
+  background-color: lighten( $faint-neutral-color, 5% );
+}
+
 th.alt-col {
   background-color: transparent;
 }
 
 .user-col-divider {
   border-right: 2px solid $content-bg-color;
+  min-width: 140px;
 }
 
 /**** Col Width Mins *****/
@@ -636,6 +641,9 @@ button {
 .toolbar-button-spacer {
   margin-right: 3px;
 }
+.toolbar-button:disabled {
+  cursor: not-allowed;
+}
 
 .dashboard-tickets-wrapper .toolbar-button-label {
   background-size: 16px 16px;
@@ -707,6 +715,7 @@ button {
   top: 2px;
   left: 7px;}
 .reset-filter:hover {background-image: url(image_path('icon_reset_blue.svg'));}
+.sync-button-white {background-image: url(image_path('icon_sync_white.svg'));}
 
 .master-submit-button {
   color: $content-bg-color;
@@ -724,6 +733,7 @@ button {
 .expand-all {background-image: url(image_path('icon_expand_all.svg'));}
 .dropdown.open .mark-related-button {background-image: url(image_path('icon_related_white.svg'));}
 .url-cat-button {background-image: url(image_path('icon_categorize.svg'));}
+.add-user-button {background-image: url(image_path('icon_add_user_grey.svg'));}
 .export-button-white {background-image: url(image_path('icon_export_white.svg'));}
 .delete-search {
   display: inline-block;
@@ -761,6 +771,7 @@ button {
 
 .table-button-row {
   padding: 0 !important;
+  min-width: 100px;
 }
 
 .expand-toggle-button {
@@ -1667,7 +1678,6 @@ button.close {
 }
 
 #sidenav-icons-div .sidenav-icons {
-  background: $sidebar-nav-base;
   height: 100%;
 }
 
@@ -2885,8 +2895,15 @@ fieldset.top-content {
   column-count: 7;
 }
 
+.user-relationship-wrapper {
+  display: inline-block;
+  float: left;
+}
+
 .user-col-layout div {
   padding-bottom: 6px;
+  white-space: nowrap;
+  page-break-inside: avoid
 }
 
 .user-col-layout {
@@ -2946,6 +2963,11 @@ fieldset.top-content {
   padding: 0;
   display: block;
   margin-bottom: 2px;
+}
+
+.user-buttons .email-button {
+  margin-top: 0;
+  margin-left: 0;
 }
 
 /*** Tooltips ********/
@@ -3617,6 +3639,7 @@ input.communication-subject {
 
 #email-reply input.communication-subject {
   padding: 6px;
+  width: 100%;
 }
 
 .email-reply-body-wrapper {
@@ -3685,6 +3708,8 @@ input.communication-subject {
 
 .reply-button   {background-image: url(image_path('icon_reply_white.svg'));}
 .forward-button {background-image: url(image_path('icon_forward_white.svg'));}
+
+.reply-button.first-reply-button {background-image: url(image_path('icon_email_new_white.svg'));}
 
 .new-email-button {
   background-image: url(image_path('icon_email_new_white.svg'));
@@ -3841,7 +3866,8 @@ input.communication-subject {
 }
 
 #email-reply .sender-receiver-info {
-  margin-top: 0;
+  margin-top: 6px;
+  margin-left: -15px;
 }
 
 .add-case-note-button {
@@ -3910,6 +3936,8 @@ input.communication-subject {
 
 .email-reply-header-information .email-reply-buttons {
   float: left;
+  padding-top: 4px;
+  margin-right: -12px;
 }
 
 .email-reply-header-information .content-label-sm-sub {
@@ -3921,8 +3949,9 @@ input.communication-subject {
   margin: 6px auto 1px auto;
 }
 
-.email-reply-header-information .email-reply-buttons {
+#newEmailDialog .email-reply-buttons {
   padding-top: 8px;
+  margin-right: 0;
 }
 
 .email-attachments a {
@@ -4066,10 +4095,13 @@ td.wbrs-highlight, td.sbrs-highlight {
   margin: 0;
 }
 
+// These styles are for the dark top navigation used in escalations section. After the site is updated across the board
+// we can consolidate these to be the master styles for the top nav instead of being controller dependant.
 // TODO We should consolidate these soon and make a single class that just covers all this
 .escalations--webrep--disputes-controller,
 .escalations--webcat--complaints-controller,
 .escalations--webcat--reports-controller,
+.users-controller,
 .escalations--file_rep--disputes-controller {
   #nav-banner {
     background-color: $table-dark-body;
@@ -4087,6 +4119,7 @@ td.wbrs-highlight, td.sbrs-highlight {
       display: inline-block;
       width: 44px;
     }
+
     .nav-page-button.active {
       background-color: $bug-section-color;
     }
@@ -4115,12 +4148,9 @@ td.wbrs-highlight, td.sbrs-highlight {
   }
 }
 
-
 .research-table-details-wrapper .dropdown.open {
   background-color: transparent;
 }
-
-
 
 .search-group, .search-group form, .search-box {
   width: 100%;
@@ -4298,6 +4328,8 @@ button.tertiary {
 .icon-reports {background-image: url(image_path('icon_reports.svg'));}
 .icon-new-white {background-image: url(image_path('icon_new_white.svg'));}
 .icon-categorize-white {background-image: url(image_path('icon_categorize_white.svg'));}
+.icon-user-page {background-image: url(image_path('icon_user_white.svg'));}
+.icon-related-users {background-image: url(image_path('icon_team_white.svg'));}
 .icon-naming-white {background-image: url(image_path('icon_naming_list_white2.svg'));}
 .icon-notes {background-image: url(image_path('icon_status_comment.svg'));}
 
@@ -4386,6 +4418,7 @@ button.tertiary {
 
 .template-select-wrapper {
   display: inline-block;
+  margin-top: 4px;
 }
 
 #newEmailDialog .template-select-wrapper {
@@ -4521,7 +4554,7 @@ input.file_attachment {
 }
 
 .table-button.delete-button {
-  background-image: url(image_path('icon_delete_simple.svg'));
+  background-image: url(image_path('icon_delete_simple_grey.svg'));
 }
 
 .table-header-highlight {
@@ -5455,8 +5488,6 @@ td.data-table-emph {
   height: 0 !important;
 }
 
-.entry-details-table
-
 .clean-site-result {
   width: 45%;
 }
@@ -6047,7 +6078,19 @@ td.in_zoo{
   word-break: break-all;
   display: block !important;
   //  temporarily adding till we figure out a better solution
-  width: 100px;
+  width: auto;
+  max-width: 200px;
+}
+
+.esc-tooltipped.dispute-description {
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  overflow: hidden;
+  word-wrap: break-word;
+  word-break: break-all;
+  display: block !important;
+  width: auto;
+  max-width: 200px;
 }
 
 .filter-cases{
@@ -6460,6 +6503,18 @@ table.dispute-entry-table tbody tr.selected {
 .popover{
   max-width: 100%; /* Max Width of the popover (depending on the container!) */
 }
+.retake-screenshot{
+  background-color: $type-lighter-color;
+  color: $content-bg-color;
+  font-weight: 300;
+}
+.retake-screenshot:hover{
+  background-color: darken($type-lighter-color, 8%);
+  color: $content-bg-color;
+  text-decoration: none;
+  font-weight: 300;
+}
+
 
 .nested-complaint-static-data .col-with-divider {
   border-color: darken($faint-neutral-color, 15%);
@@ -6764,9 +6819,7 @@ table#duplicates a {
   text-decoration: underline;
 }
 
-//Crappy temporary hack to keep the annoying insane amt of entries for xbrs from taking over and ruining the whole page
 .xbrs-details-table .dataTables_scrollBody {
-  max-width: 1200px !important;
   overflow-y: scroll !important;
 }
 
@@ -7674,7 +7727,12 @@ td.text-center span {
     padding: 0 15px;
     &:last-of-type {
       position: relative;
-      top: 5px;
+      top: 6px;
+    }
+    @-moz-document url-prefix() {
+      &:last-of-type {
+        top: 7px;
+      }
     }
 
     span {
@@ -8128,6 +8186,87 @@ th.sorting_1, th.sorting_asc, th.sorting_desc {
   width: 160px !important;
 }
 
+.user-access-wrapper label {
+  width: 100%;
+}
+
+.user-access-wrapper .content-label-md.extra-space {
+  margin-top: 12px;
+}
+
+.manager-row-indicator {
+  padding: 0 0 0 8px !important;
+}
+
+.manager-row-indicator span {
+  display: inline-block;
+  padding-top: 8px;
+}
+
+.expand-manager-row-button {
+  background-image: url(image_path('icon_expand_table_grey.svg'));
+  background-repeat: no-repeat;
+  background-position: center center;
+  background-size: 20px 20px;
+  width: 33px;
+  height: 33px;
+  float: right;
+  border: none;
+}
+
+.expand-manager-row-button.up {
+  transform: rotate(180deg);
+}
+
+.blank-white-cell {
+  border: none !important;
+  background-color: transparent;
+}
+
+.manage-child-row .user-displayname-col {
+  padding-left: 16px !important;
+}
+
+.manage-grandchild-row .user-displayname-col {
+  padding-left: 26px !important
+}
+
+.table-button-row .dropdown-menu {
+  top: 30px;
+  right: 0;
+  left: auto;
+  border-radius: 4px 0 4px 4px;
+  border: none;
+}
+
+.table-button-row .dropdown-menu h3 {
+  color: #fff;
+  padding: 6px 10px;
+  font-weight: 400;
+  font-size: 9pt;
+  background-color: $bug-section-color;
+  min-width: 275px;
+  border-radius: 4px 0 0 0;
+  margin-top: -5px;
+  margin-bottom: 0;
+}
+
+.table-button-row .dropdown-menu .toolbar-select {
+  width: 100%;
+}
+
+.select-wrapper {
+  width: 100%;
+}
+
+.table-button-row .dropdown-menu button {
+  padding: 8px 30px;
+}
+
+.table-button-row .dropdown.open {
+  background-color: $bug-section-color;
+}
+
 .hidden-sortable-data {
   opacity: 0;
   position: absolute;
@@ -8331,6 +8470,11 @@ hr.thin.form-divider {
   background-image: url(image_path('icon_bugzilla_loggedout.svg'));
 }
 
+// WebCat Screenshot icon
+.escape-button {
+  background-image: url(image_path('icon_cancel.svg'));
+  background-repeat: no-repeat;
+}
 
 // Tab styles for tabs on dialog boxes
 .nav-tabs.dialog-tabs {
@@ -8551,6 +8695,7 @@ hr.thin.form-divider {
 .disp-negative {
   font-weight: 600;
   color: $warning-accent-color;
+  text-transform: capitalize;
 }
 
 .top-case-info .content-label-sm {
@@ -8560,6 +8705,11 @@ hr.thin.form-divider {
 
 .top-info-data {
   margin-bottom: 10px;
+}
+
+.top-info-details {
+  font-size: 8.5pt;
+  line-height: 1.35em;
 }
 
 .file-edit-buttons-wrapper {
@@ -9540,7 +9690,7 @@ table.rl-content {
         display: block;
         float: left;
         background-repeat: no-repeat;
-        background-image: url(/assets/icon_malicious_dark.svg);
+        background-image: url(image_path('icon_malicious_dark.svg'));
         width: 14px;
         height: 14px;
         margin-top: 2px;
@@ -9580,7 +9730,7 @@ table.rl-content {
 
 // dbinebri: ensuring create new report button gets icon
 .create-new-run-button {
-  background-image: url(/assets/icon_sandbox_report.svg);
+  background-image: url(image_path('icon_sandbox_report.svg'));
   background-position: 6px center;
   padding-left: 15px;
 }
@@ -9735,4 +9885,246 @@ table.rl-content {
     font-weight: 600;
     padding-left: 15px;
   }
+}
+
+// stylize the HTML buttons on File Rep > Show > SB report
+.data-report-button {
+  border-radius: 2px;
+  border: none;
+  font-size: 12px;
+  padding: 6px 12px 6px 32px;
+  margin-bottom: 10px;
+  color: $content-bg-color;
+  background-color: $bug-section-color;
+  background-repeat: no-repeat;
+  background-position: 7px 3px;
+  &#sb-report-html {
+    background-image: url(image_path('icon_open_viewable_white.svg'));
+    background-size: 19px 19px;
+  }
+  &#sb-report-html-download {
+    background-image: url(image_path('icon_download_white.svg'));
+    background-size: 20px 20px;
+  }
+  &:hover, &:active {
+    background-color: darken($bug-section-color, 10%);
+    color: $content-bg-color;
+  }
+}
+
+// fix to ensure there is no flash of dialog text on page load
+#naming-guide-dialog {
+  display: none;
+}
+
+// ensure AMP disposition on File Rep > Show is capitalized in all 3 instances
+#create-detection-dialog .top-info-data,
+.amp-area label:first-of-type + div,
+.suggested-disposition {
+  text-transform: capitalize;
+}
+
+.tg-fail-status {
+  font-weight: bold;
+}
+
+.wbnp-loader-message {
+  position: absolute;
+  right: 15px;
+  top: 10px;
+  .wbnp-report-status {
+    margin-top: 6px;
+    display: inline-block;
+    font-size: 9pt;
+  }
+}
+
+.wbnp-report-status {
+  text-transform: capitalize;
+}
+
+.wbnp-report-label {
+  float: left;
+  margin-right: 8px;
+}
+
+.wbnp-loading-spinner {
+  width: 20px;
+  height: 20px;
+  float: left;
+  margin-right: 5px;
+  display: block;
+  background-repeat: no-repeat;
+}
+
+.complaint-selectize-col-wrapper .selectize-control {
+  padding-bottom: 6px;
+}
+
+.nested-complaint-editable-table {
+  label.content-label-sm {
+    padding-top: 0 !important;
+  }
+  input[type="radio"].resolution_radio_button {
+    margin-right: 3px;
+  }
+}
+
+input[type="radio"].resolution_radio_button {
+  margin-right: 3px;
+}
+
+// tweak to make sure orange star icon aligns
+.certainty-flag {
+  max-width: 40px;
+}
+
+// fix margin on this button
+.nested-complaint-data-wrapper button.tertiary {
+  margin: 12px 0 6px 0;
+}
+
+// more width so this aligns with the comment fields and for long URIs
+.complaint-uri-input {
+  width: 65%;
+}
+
+// ensure the XBRS history headers are accurate and stay put while scrolling
+.entry-details-table.xbrs-details-table .dataTables_wrapper .dataTables_scrollBody {
+  table > thead > tr > th {
+    position: -webkit-sticky;
+    position: sticky;
+    top: 0;
+    background-color: $table-dark-body;
+    border-bottom: $type-base-color 1px solid;
+    // sizing overrides needed here
+    .dataTables_sizing {
+      min-height: 30px !important;
+      padding: 8px !important;
+    }
+  }
+}
+
+// laptop screen width - ensure xbrs table fits on-screen
+@media screen and (max-width: 1600px) {
+  .entry-details-table.xbrs-details-table {
+    th {
+      padding: 8px 6px;
+    }
+    td {
+      padding: 6px 8px;
+      word-break: break-word;
+    }
+  }
+}
+
+// ensuring no column overlap in Case History due to long strings
+#case-history .case-history-preview, #case-history .case-history-author {
+  word-break: break-word;
+}
+
+
+// webcat screenshot buttons
+.screenshot-button {
+  width: 30px;
+  height: 30px;
+  display: block;
+  position: absolute;
+  background-repeat: no-repeat;
+  background-position: center center;
+  background-color: $content-bg-color;
+  border-radius: 4px;
+  opacity: .9;
+  right: 4px;
+  cursor: pointer;
+}
+
+.screenshot-close-button {
+  background-image: url(image_path('icon_cancel_lt_grey.svg'));
+  background-size: 28px 28px;
+  top: 4px;
+}
+
+.screenshot-retake-button {
+  background-image: url(image_path('icon_screenshot_lt_grey.svg'));
+  background-size: 28px 28px;
+  top: 38px;
+}
+
+.screenshot-reload-button {
+  background-image: url(image_path('icon_sync_lt_grey.svg'));
+  background-size: 28px 28px;
+  top: 4px;
+}
+
+// webrep and webcat toolbars - between 1800px and 1600px, prevent breaking/wrapping of the buttons
+@media screen and (max-width: 1800px) and (min-width: 1600px) {
+  #webrep-index-toolbar, #webcat-index-toolbar {
+    .toolbar-button {
+      background-position: 4px 6px;
+      padding-left: 13px;
+      padding-right: 7px;
+      min-height: 25px;
+      background-size: 14px 14px; // icon size
+      transition: background-color 0.2s;
+    }
+  }
+}
+
+// webrep - research tab toolbar - between 1600px and 1400px, prevent breaking/wrapping buttons, this needs to be separate
+@media screen and (max-width: 1600px) and (min-width: 1401px) {
+  #research-tab-toolbar {
+    .toolbar-button {
+      background-position: 6px 6px;
+      padding-left: 9px;
+      padding-right: 8px;
+      min-height: 25px;
+      background-size: 14px 14px; // icon size
+      transition: background-color 0.2s;
+    }
+  }
+}
+// fix the collapse breakpoint
+@media screen and (max-width: 1400px) {
+  #research-tab-toolbar .toolbar-button-text {
+    display: none;
+    margin-left: 8px;
+  }
+}
+
+// styles for talos logo + copyright info in bottom-left of side nav
+.copyright-area {
+  width: 150px;
+  height: 100px;
+  text-align: center;
+  z-index: -1;
+  opacity: 0;
+  position: fixed;
+  left: -200px;
+  bottom: 20px;
+  transition: left 430ms cubic-bezier(0.4, 0.0, 0.2, 1), opacity 600ms ease-out;
+  .talos-logo {
+    width: 150px;
+    height: auto;
+    display: block;
+  }
+  .copyright {
+    font-size: 10px;
+    font-weight: normal;
+    text-transform: none;
+    line-height: 16px;
+    color: darken($content-bg-color, 10%);
+  }
+}
+
+// fade in the copyright area using css animation
+#nav-trigger:checked ~ .copyright-area {
+  opacity: 1;
+  left: 25px;
+  bottom: 20px;
+  transition-delay: 50ms;
+}
+
+#sidenav-icons-div ul {
+  margin-bottom: 0;
 }

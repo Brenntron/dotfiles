@@ -54,7 +54,7 @@ module API
                       file_rep = FileReputationDispute.create_through_form(bugzilla_rest_session,
                                                                 sha256,
                                                                 params[:disposition_suggested],
-                                                                params[:assignee])
+                                                                user_validation.first.id)
                       uniques[file_rep.id] = sha256
                     else
                       duplicates << sha256
@@ -135,11 +135,6 @@ module API
                 file_rep_disputes = FileReputationDispute.where(id: dispute_ids)
 
                 file_rep_disputes.each do |dispute|
-
-                  if comment.present?
-                    FileRepComment.create!(comment: comment, file_reputation_dispute_id: dispute.id, user_id: current_user.id)
-                  end
-
                   if resolution.present?
                     dispute.update(resolution: resolution)
                   end

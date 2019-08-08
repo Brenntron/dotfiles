@@ -153,13 +153,17 @@ file_reputation_sandbox = env_config['file_reputation_sandbox']
 raise 'config.yml missing file reputation sandbox section' unless file_reputation_sandbox
 Rails.configuration.file_reputation_sandbox        = ApiRequester::ApiRequester.config_of(file_reputation_sandbox)
 sandbox_api_keys = file_reputation_sandbox.fetch('api_keys', {})
-sandbox_api_keys[FileReputationDispute::SUBMITTER_TYPE_AC_REFRESH] ||=
-    sandbox_api_keys[FileReputationDispute::SUBMITTER_TYPE_AC_FORM]
+sandbox_api_keys[FileReputationDispute::SANDBOX_KEY_AC_REFRESH] ||=
+    sandbox_api_keys[FileReputationDispute::SANDBOX_KEY_AC_FORM]
 Rails.configuration.file_reputation_sandbox.api_keys = sandbox_api_keys
 
 reversing_labs_config = env_config['reversing_labs']
 raise 'config.yml missing ReversingLabs section' unless reversing_labs_config
 Rails.configuration.reversing_labs      = ApiRequester::ApiRequester.config_of(reversing_labs_config)
+
+magic_api_config = env_config['magic_api']
+raise 'config.yml missing MAgic section' unless magic_api_config
+Rails.configuration.magic_api           = ApiRequester::ApiRequester.config_of(magic_api_config)
 
 threatgrid = env_config.fetch('threatgrid', {})
 raise 'config.yml missing threatgrid section' unless threatgrid

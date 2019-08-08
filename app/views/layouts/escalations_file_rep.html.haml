@@ -2,8 +2,8 @@
   Escalations - File Reputation - Analyst Console
 
 - content_for(:nav_banner) do
-  .nav-tool-blocks.nav-page-button-wrapper.col-xs-3.col-sm-2.col-lg-2
-    %a#queue.nav-page-button{href: '/escalations/file_rep/disputes', class: ('active' if current_page?('/escalations/file_rep/disputes'))}
+  .nav-tool-blocks.nav-page-button-wrapper.col-xs-3.col-sm-2.col-lg-1
+    %a#queue.nav-page-button{href: '/escalations/file_rep/disputes?f=open', class: ("active" if current_page?('/escalations/file_rep/disputes'))}
       %span.nav-toolbar-icon-large.icon-queue
 
     %a#amp-naming-page.nav-page-button{href: '/escalations/file_rep/naming_guide', class: ('active' if current_page?('/escalations/file_rep/naming_guide'))}
@@ -72,7 +72,7 @@
         %table#saved-search.table
           %tbody#saved-search-tbody.filerep-named-search-list
             - if current_user.named_searches.any?
-              - current_user.named_searches.where('project_type = ? OR project_type IS ?', 'FileReputationDispute', nil).order(:id).each do |named_search|
+              - current_user.named_searches.where('project_type = :project', project: 'FileReputationDispute').order(:id).each do |named_search|
                 %tr{id: "saved_search_#{named_search.id}"}
                   %td
                     %a.input-truncate.saved-search.esc-tooltipped{onclick: "build_named_search('#{named_search.name}');", title: named_search.name}

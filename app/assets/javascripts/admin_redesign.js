@@ -43,13 +43,14 @@
 //= require application/webrep_research_tab
 //= require application/webcat/webcat
 //= require application/webcat/categories
+//= require application/escalations_users
 //= require application/webcat/webCatRepLookup
 //= require application/webrep/webrep-report-engine
 //= require application/file_rep/file_rep
 //= require application/file_rep/naming_guide
 //= require application/file_rep/research
-//= require application/file_rep/file_rep_research_tab
 //= require application/file_rep/dispute_form
 
 //= require application/webrep/reptool
 //= require application/webrep/wbrs_wlbl
+//= require admin/admin-tools

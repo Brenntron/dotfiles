@@ -34,22 +34,39 @@ module API
             end
             get ":sha256_hash/now" do
               std_api_v2 do
+                # Check whether AMP API is disabled
+                if Rails.configuration.amp_poke.host.blank?
+                  raise "AMP Poke API is disabled or not configured"
+                # If we're on staging, test to see whether AMP API is enabled
+                elsif Rails.env == 'staging'
+                  begin
+                    FileReputationApi::Detection.get_bulk('1eba23049d725aabd84b63f8cd4b079c78f26cde6f7bb8be1d2477df0c0d1234')
+                  rescue Exception
+                    raise "AMP Poke API is currently disabled on staging"
+                  end
+                end
+
                 detection = FileReputationApi::Detection.get_bulk(params['sha256_hash'])
                 detection_last_set = FileReputationApi::ElasticSearch.query(params['sha256_hash'])
                 last_fetched = Time.now.utc
 
                 begin
-                  FileReputationDispute.where(sha256_hash: detection.sha256_hash)
-                      .update_all(disposition: detection.disposition,
-                                  detection_name: detection.name,
-                                  detection_last_set: detection_last_set,
-                                  last_fetched: last_fetched)
+                  file_rep_disputes = FileReputationDispute.where(sha256_hash: detection.sha256_hash)
+                  file_rep_dispute = file_rep_disputes.first
+                  if detection_last_set == 'No history to display' && !file_rep_dispute.detection_last_set.nil?
+                    detection_last_set = file_rep_dispute.detection_last_set
+                  end
+                  file_rep_disputes.update_all(disposition: detection.disposition,
+                                              detection_name: detection.name,
+                                              detection_last_set: detection_last_set,
+                                              last_fetched: last_fetched)
                 rescue
                   Rails.logger.error("Error saving updated detection information -- #{$!.message}")
                 end
-
-                { detection_name: detection.name, disposition: detection.disposition, detection_last_set: detection_last_set,
-                  last_fetched: last_fetched.strftime("%b %e, %Y %l:%M %p")}
+                { detection_name: detection.name,
+                  disposition: detection.disposition,
+                  detection_last_set: detection_last_set,
+                  last_fetched: last_fetched.strftime("%b %e, %Y %l:%M %p %Z")}
               end
             end
 

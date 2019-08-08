@@ -7,11 +7,11 @@ class Dispute < ApplicationRecord
   belongs_to :user, :optional => true
   belongs_to :related_dispute, class_name: 'Dispute', foreign_key: :related_id, required: false
 
-  has_many :relating_disputes, class_name: 'Dispute', foreign_key: :related_id
-  has_many :dispute_comments
-  has_many :dispute_emails
-  has_many :dispute_entries, dependent: :destroy
-  has_many :dispute_peeks, -> { order("dispute_peeks.updated_at desc") }
+  has_many :relating_disputes, class_name: 'Dispute', foreign_key: :related_id, dependent: :nullify
+  has_many :dispute_comments, dependent: :destroy
+  has_many :dispute_emails, dependent: :destroy
+  has_many :dispute_entries, dependent: :restrict_with_exception
+  has_many :dispute_peeks, -> { order("dispute_peeks.updated_at desc") }, dependent: :destroy
   has_many :recent_dispute_views, class_name: 'User', through: :dispute_peeks, source: :user
 
   delegate :cvs_username, to: :user, allow_nil: true
@@ -349,7 +349,7 @@ class Dispute < ApplicationRecord
       new_dispute_entry.save
     end
 
-    conn = ::Bridge::DisputeCreatedEvent.new(addressee: "talos-intelligence", source_authority: "talos-intelligence", source_key: source_key)
+    conn = ::Bridge::DisputeCreatedEvent.new(addressee: "talos-intelligence", source_authority: "talos-intelligence", source_key: source_key, ac_id: dispute.id)
     conn.post(return_payload, "")
 
   end
@@ -664,7 +664,7 @@ class Dispute < ApplicationRecord
 
         case_email = DisputeEmail.generate_case_email_address(new_dispute.id)
         logger.debug("Sending reply to bridge")
-        conn = ::Bridge::DisputeCreatedEvent.new(addressee: "talos-intelligence", source_authority: "talos-intelligence", source_key: message_payload["source_key"])
+        conn = ::Bridge::DisputeCreatedEvent.new(addressee: "talos-intelligence", source_authority: "talos-intelligence", source_key: message_payload["source_key"], ac_id: new_dispute.id)
         conn.post(return_payload, case_email)
 
       end
@@ -1299,6 +1299,11 @@ class Dispute < ApplicationRecord
       end
 
       ticket_user = result.user.cvs_username
+      if !result.dispute_emails.present?
+        dispute_emails_count = 0
+      else
+        dispute_emails_count = result.dispute_emails&.count
+      end
       report_data[:table_data] << {:case_number => result.id,
                       :case_link => "<a href='/escalations/webrep/disputes/#{result.id}'>#{result.case_id_str}</a>",
                       :status => result.status,
@@ -1308,7 +1313,9 @@ class Dispute < ApplicationRecord
                       :submission_type => result.submission_type.upcase,
                       :last_comment => last_comment_preview,
                       :owner => ticket_user,
-                      :priority => result.priority
+                      :priority => result.priority,
+                      :last_email_date => result.dispute_emails&.last&.updated_at&.strftime("%FT%T"),
+                      :total_email_count => dispute_emails_count
       }
     end
 
@@ -1357,6 +1364,12 @@ class Dispute < ApplicationRecord
       entry_preview.to_s.inspect
       ticket_user = result.user.cvs_username
 
+      if !result.dispute_emails.present?
+        dispute_emails_count = 0
+      else
+        dispute_emails_count = result.dispute_emails&.count
+      end
+
       report_data[:table_data] << {:case_number => result.id,
                       :case_link => "<a href='/escalations/webrep/disputes/#{result.id}'>#{result.case_id_str}</a>",
                       # :dispute => result.dispute_entries.first.hostlookup,
@@ -1367,7 +1380,9 @@ class Dispute < ApplicationRecord
                       :submitter_type => result.submitter_type.downcase,
                       :submission_type => result.submission_type.upcase,
                       :priority => result.priority,
-                      :owner => ticket_user
+                      :owner => ticket_user,
+                      :last_email_date => result.dispute_emails&.last&.updated_at&.strftime("%FT%T"),
+                      :total_email_count => dispute_emails_count
       }
     end
 
@@ -1798,6 +1813,15 @@ class Dispute < ApplicationRecord
 
     results
 
+  end
+
+  def self.sync_all
+    AdminTask.execute_task(:sync_disputes_with_ti, {})
+  end
+
+  def manual_sync
+    message = Bridge::DisputeEntryUpdateStatusEvent.new
+    message.post_entries(self.dispute_entries)
   end
 
 end

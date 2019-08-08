@@ -212,6 +212,36 @@ $ ->
   $(document).on 'click', '.sorting[aria-controls="file-rep-datatable"]', () ->
     sorting_request = true
 
+  # Displays comment/resolution modal for FileRep Status radio labels
+  $('.fr-ticket-status-radio-label').click ->
+    radio_button = $(this).prev('.fr-ticket-status-radio')
+    $(radio_button[0]).trigger('click')
+    if $(radio_button).attr('id') == 'file-status-closed'
+      $('#show-ticket-resolution-submenu').show()
+      stat_comment = $('#ticket-non-res-submit').find('.ticket-status-comment')
+      $('#ticket-non-res-submit').hide()
+      $(stat_comment).val('')
+    else
+      $('#ticket-non-res-submit').show()
+      res_comment = $('.resolution-comment-wrapper').find('.ticket-status-comment')
+      $('.ticket-resolution-radio').prop('checked', false)
+      $('#show-ticket-resolution-submenu').hide()
+      $(res_comment[0]).val('')
+
+  # Displays comment/resolution modal depending for FileRep Status radio buttons
+  $('.fr-ticket-status-radio').click ->
+    if $(this)[0].id == 'file-status-closed'
+      $('#show-ticket-resolution-submenu').show()
+      stat_comment = $('#ticket-non-res-submit').find('.ticket-status-comment')
+      $('#ticket-non-res-submit').hide()
+      $(stat_comment).val('')
+    else
+      $('#ticket-non-res-submit').show()
+      res_comment = $('.resolution-comment-wrapper').find('.ticket-status-comment')
+      $('.ticket-resolution-radio').prop('checked', false)
+      $('#show-ticket-resolution-submenu').hide()
+      $(res_comment[0]).val('')
+
   window.triggerTooltips = (item) ->
     $('.tooltip_content').show()
     $('.nested-tooltipped').tooltipster
@@ -273,7 +303,7 @@ $ ->
 
   $(document).on 'click', '#refresh-filter-button', (e) ->
     refresh_localStorage()
-    refresh_url()
+    window.location.replace('/escalations/file_rep/disputes?f=all')
 
   window.build_named_search = (search_name) ->
     localStorage.search_type = 'named'
@@ -398,6 +428,8 @@ $ ->
       {search_type, search_name} = data
 
       if search_type == 'standard'
+        if search_name == 'all'
+            reset_icon = ''
         new_header =
           '<div>' +
           '<span class="text-capitalize">' + search_name.replace(/_/g, " ") + ' tickets </span>' +
@@ -572,7 +604,6 @@ $ ->
           return '<input type="checkbox" onclick="toggleRow(this)" name="cbox" class="dispute_check_box" id="cbox' + data + '" value="' + data + '" data-sha="' + full['sha256_hash'] + '"/>'
       }
       {
-#        need to zeropad this thing
         data: 'id'
         render: (data, type, full, meta) ->
           return '<a href="/escalations/file_rep/disputes/' + data + '">' + parseInt(data).pad(6) + '</a>'
@@ -600,16 +631,20 @@ $ ->
         render: (data) ->
           return data + ' KB'
       }
-      { data: 'sample_type'}
+      {
+        data: 'sample_type'
+        render: (data) ->
+          return '<span title="' + data + '" class="esc-tooltipped">' + data + '</span>'
+      }
       {
         data: 'disposition'
         render: (data) ->
           if data == null
             return
           if data == 'malicious'
-            return '<span class="malicious text-capitalize"> malicious </span>'
+            return '<span class="malicious text-capitalize">' + data + '</span>'
           else
-            return  '<span class="text-capitalize"> ' + data + ' </span>'
+            return  '<span class="text-capitalize">' + data + '</span>'
       }
       {
         data: 'detection_name'
@@ -623,7 +658,7 @@ $ ->
         data: 'detection_last_set'
         render: (data) ->
           if data
-            return moment(new Date(data)).format('MMM D, YYYY h:mm A')
+            return moment(new Date(data)).utc().format('MMM D, YYYY h:mm A z')
           else
             return ''
       }
@@ -724,10 +759,15 @@ $ ->
           if data == null
             return
           if data.toLowerCase() == 'malicious'
-            return '<span class="malicious text-capitalize"> malicious</span>'
+            return '<span class="malicious text-capitalize">' + data + '</span>'
           else
-            return  '<span class="text-capitalize"> ' + data + ' </span>'
+            return  '<span class="text-capitalize">' + data + '</span>'
 
+      }
+      {
+        data: 'description'
+        render: (data) ->
+          return '<span title="' + data + '" class="esc-tooltipped dispute-description">' + data + '</span>'
       }
       {
         data: 'created_at'
@@ -1079,12 +1119,11 @@ $ ->
           $('.amp-history-icon').click ->
             $('#amp-history-dialog').dialog('open')
 
-      error: () ->
-        std_msg_error('Error with AMP', ['There was an error retrieving the AMP data.'])
+      error: (response) ->
+        std_msg_error('Error with an API', ['There was an error retrieving data. Error - '+ response.responseJSON.message])
       complete: () ->
         $('.amp-area .inline-loader-wrapper').hide()
     )
-
 
   window.get_amp_history = (sha256_hash) ->
     # Fetch the AMP history, build the table and load into #amp-history-dialog
@@ -1104,7 +1143,7 @@ $ ->
           # Each entry, build a new html row with that source data using object destructuring
           for entry in amp_hist_array
             {time, disposition, name, user, _poke_server, mode} = entry._source
-            datetime = moment.unix(time).format("MMMM DD, YYYY h:mm A")
+            datetime = moment.utc(moment.unix(time)).format("MMMM DD, YYYY h:mm A z")
             if disposition == 'malicious'
               disposition = '<span class="disp-negative">' + disposition + '</span>'
 
@@ -1252,6 +1291,7 @@ $ ->
       data['threatgrid-score'] = $("#threatgrid-score-checkbox").is(':checked')
       data['reversing-labs'] = $("#reversing-labs-checkbox").is(':checked')
       data['suggested-disp'] = $("#suggested-disp-checkbox").is(':checked')
+      data['dispute-details'] = $("#dispute-details-checkbox").is(':checked')
       data['time-submitted'] = $("#time-submitted-checkbox").is(':checked')
       data['submitter-type'] = $("#submitter-type-checkbox").is(':checked')
       data['customer-name'] = $("#customer-name-checkbox").is(':checked')

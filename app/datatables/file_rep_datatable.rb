@@ -23,6 +23,7 @@ class FileRepDatatable < AjaxDatatablesRails::ActiveRecord
       sample_type:        { data: :sample_type, source: 'FileReputationDispute.sample_type', cond: :string_eq },
       disposition:        { data: :disposition, source: 'FileReputationDispute.disposition', cond: :string_eq },
       disposition_suggested: { data: :disposition_suggested, source: 'FileReputationDispute.disposition_suggested', cond: :string_eq },
+      description:        { data: :description, source: 'FileReputationDispute.description', cond: :string_eq},
       source:             { data: :source, source: 'FileReputationDispute.source', cond: :like },
       platform:           { data: :platform, source: 'FileReputationDispute.platform', cond: :like },
       sandbox_score:      { data: :sandbox_score, source: 'FileReputationDispute.sandbox_score', cond: :eq },
@@ -80,6 +81,7 @@ class FileRepDatatable < AjaxDatatablesRails::ActiveRecord
           sample_type:                  file_rep.sample_type,
           disposition:                  file_rep.disposition,
           disposition_suggested:        file_rep.disposition_suggested,
+          description:                  file_rep.description,
           source:                       file_rep.source,
           platform:                     file_rep.platform,
           sandbox_score:                file_rep.sandbox_score,
@@ -129,13 +131,13 @@ class FileRepDatatable < AjaxDatatablesRails::ActiveRecord
   def sort_records(records)
     case datatable.orders.first.column.sort_query
       when 'file_reputation_disputes.assigned'
-        FileReputationDispute.joins(:user).order("users.cvs_username #{datatable.orders.first.direction}")
+        records.left_joins(:user).order("users.cvs_username #{datatable.orders.first.direction}")
       when 'file_reputation_disputes.customer_name'
-        FileReputationDispute.joins(:customer).order("customers.name #{datatable.orders.first.direction}")
+        records.left_joins(:customer).order("customers.name #{datatable.orders.first.direction}")
       when 'file_reputation_disputes.customer_email'
-        FileReputationDispute.joins(:customer).order("customers.email #{datatable.orders.first.direction}")
+        records.left_joins(:customer).order("customers.email #{datatable.orders.first.direction}")
       when 'file_reputation_disputes.customer_company_name'
-        FileReputationDispute.joins(customer: :company).order("companies.name #{datatable.orders.first.direction}")
+        records.left_joins(customer: :company).order("companies.name #{datatable.orders.first.direction}")
       else
         super
     end

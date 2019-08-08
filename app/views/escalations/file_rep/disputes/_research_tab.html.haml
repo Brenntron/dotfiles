@@ -23,7 +23,7 @@
               Reversing Labs
       %div
         %label.toolbar-section-label Data
-        %button.toolbar-button.sync-button#file-rep-sync-button.esc-tooltipped{title: 'Refresh Data'}
+        %button.toolbar-button.sync-button#file-rep-sync-button.esc-tooltipped{title: 'Refresh Data', onclick: 'refresh_research_data()'}
           %span.toolbar-button-text Refresh Data
       %div
         %label.toolbar-section-label Reports
@@ -159,8 +159,8 @@
       %div.data-report-wrapper
         %span.missing-data Not in ThreatGrid
         %br
-        -#%button.primary
-        -#  Push Sample to ThreatGrid
+        %button.primary#send-to-threatgrid
+          Push Sample to ThreatGrid
 
 
   .col-xs-12.col-sm-4#reversing-labs-report-wrapper

@@ -1,4 +1,19 @@
 $ ->
+
+  $('#send-to-threatgrid').on 'click', ->
+    sha256_hash = $('#sha256_hash')[0].innerText
+    std_msg_ajax(
+      method: 'GET'
+      url: "/escalations/api/v1/escalations/file_rep/sandbox_api/send_to_threatgrid/" + sha256_hash
+      success_reload: false
+      success: (response) ->
+        std_msg_success('Sample successfully sent to ThreatGrid. Please wait 3-5 minutes and reload page to view data.', [], reload: true)
+      error: (response) ->
+        std_api_error(response, "There was a problem retrieving data from the Sample Zoo", reload: false)
+    )
+
+
+
 ########### GRAB SHA NEEDED FOR REPORTS ############
 #  If html body is on the show page (do not call on other pages)
   if $('body').hasClass('escalations--file_rep--disputes-controller') && $('body').hasClass('show-action')
@@ -8,12 +23,11 @@ $ ->
     window.research_data(sha256_hash)
 
 # Update the research reports and the items in the db
-$('#file-rep-sync-button').click ->
+window.refresh_research_data = (sha256_hash) ->
   sha256_hash = $('#sha256_hash')[0].innerText
   window.research_data(sha256_hash)
   window.update_file_rep_data()
 
-    
 
 ########### COMPILE RESEARCH REPORTS ############
 # Grabs the initial data for all three reports / datasets
@@ -84,36 +98,38 @@ window.get_threatgrid_data = (sha256_hash) ->
 
         # Load the top data
         $('#tg-submission-date').text(tg_formatted_submitted_date)
-        $('#tg-run-status').text(file_data.state)
-        $('#tg-score').text(file_data.analysis.threat_score)
         $('#tg-tags').text(file_data.tags.join(', '))
 
-        # Adding behaviors
-        behaviors = ""
-        $(file_data.analysis.behaviors).each ->
-          behaviors += '<tr>'
-          behaviors += '<td>' + this.name + '</td><td>' + this.threat + '</td><td>' + this.title + '</td>'
-          behaviors += '</tr>'
-        $('#tg-behaviors').append('<tbody>' + behaviors + '</tbody>')
+        # if TG has a fail state, don't show most of the stuff
+        if file_data.state == 'fail'
+          $('#tg-run-status').html('<span class="tg-fail-status">Failure</span>')
+          $('#tg-score').siblings().hide()
+          $('#tg-tags').closest('div.row').nextAll().hide()
+        else
+          $('#tg-run-status').text(file_data.state)
+
+        # Ensure the analysis property exists first, it will not if there is a TG fail state
+        unless !file_data.hasOwnProperty('analysis')
+          # Adding threat score
+          $('#tg-score').text(file_data.analysis.threat_score)
+
+          # Adding behaviors
+          behaviors = ""
+          $(file_data.analysis.behaviors).each ->
+            behaviors += '<tr>'
+            behaviors += '<td>' + this.name + '</td><td>' + this.threat + '</td><td>' + this.title + '</td>'
+            behaviors += '</tr>'
+          $('#tg-behaviors').append('<tbody>' + behaviors + '</tbody>')
 
         # Adding full json report in case it's needed
         full_report = JSON.stringify(response.json, null, 2)
         $('#tg-full').text(full_report)
 
-
         # dbinebri: Convert the Threatgrid full_report to a downloadable file, add the Download button hyperlink
-        # build a formatted date string to add into the filename for download
-        tg_today = new Date()
-        tg_formatted_day =
-          String(tg_today.getMonth() + 1).padStart(2, '0') + '_' +
-          String(tg_today.getDate()).padStart(2, '0') + '_' + tg_today.getFullYear()
-
-        # create a downloadable file out of the json with the filename preset
         tg_json_file = 'text/json; charset=utf-8,' + encodeURIComponent(full_report)
-        tg_filename = 'threatgrid_' + tg_formatted_day + '.json'
+        tg_filename = 'threatgrid_' + moment(new Date()).format('MM_DD_YYYY') + '.json'
         tg_json_link = '<a href="data:' + tg_json_file + '" download="' + tg_filename + '"></a>'
         $('#download-tg-json').wrap tg_json_link
-
 
       else
         $(report_present).hide()
@@ -124,6 +140,7 @@ window.get_threatgrid_data = (sha256_hash) ->
       $('#tg-loader').hide()
       std_api_error(response, "There was a problem retrieving data from ThreatGrid", reload: false)
   )
+
 
 
 

@@ -1,0 +1,45 @@
+%h1 Manage Escalations Sync Page
+
+%input#user_id{type: 'hidden', name: 'user_id', value: "#{current_user.id}"}
+%input{:name => "token", :type => "hidden", :value => "#{current_user.authentication_token}"}
+%input{:type => "hidden", :name => "xml_token", :value => "#{xml_token}"}
+
+.control-banner#output-1
+
+%h3 Sync Escalations
+
+%button#sync-all-disputes Sync All Disputes
+%br
+%br
+%br
+%button#sync-all-complaints Sync All Complaints
+%br
+%br
+%br
+%button#sync-all-file-reps Sync All File Reputation Disputes
+%br
+%br
+%br
+.control-banner
+  %label Sync Dispute IDs:
+  = text_field "admin_tools", "args", :class => 'sync_dispute_field'
+  %button#sync-disputes Go!
+%br
+%br
+.control-banner
+  %label Sync Complaint IDs:
+  = text_field "admin_tools", "args", :class => 'sync_complaint_field'
+  %button#sync-complaints Go!
+%br
+%br
+.control-banner
+  %label Sync File Reputation Dispute IDs:
+  = text_field "admin_tools", "args", :class => 'sync_filerep_field'
+  %button#sync-file-disputes Go!
+%br
+%br
+
+
+
+
+
