@@ -100,6 +100,46 @@ $ ->
       submit_btn.prop('disabled', true)
 
   window.confirm_rep_changes = () ->
+    confirmation_rows = $('#confirmation-modal tbody').find('tr')
+    comment = $('.confirm-rep-input').val()
+    dispute_changes = []
+
+    $( confirmation_rows ).each ->
+      dispute = $( this ).find('td').first().text()
+      console.log dispute, dispute_changes
+      action_col = $( this ).find('td').last().children()
+
+      for action in action_col
+        console.log action
+        if typeof $(action).attr('class') == 'string'
+          classList = $(action).attr('class').split(/\s+/)
+        def_list = []
+        action_list = ['add', 'remove', 'drop']
+        action_taken = classList.filter( (el)-> action_list.includes(el)).join()
+        $(action).find('.col-tag').each -> def_list.push( $(this).text() )
+
+        data = {
+          action: action_taken,
+          comment: comment
+        }
+
+        if classList.includes('wlbl-action-col')
+          data.dispute_type = 'wlbl'
+          data.url = dispute
+          data.targt_list = def_list
+        else
+          data.dispute_type = 'reptool'
+          data.target = dispute
+          data.classifications = def_list
+
+        dispute_changes.push(data)
+
+      console.log dispute_changes
+
+      debugger
+
+  window.close_modal = () ->
+    $('#confirmation-modal').modal('toggle')
 
   window.open_adjust_reptool = () ->
     dropdown = $('#reptool_entries_bl_dropdown')
@@ -205,9 +245,9 @@ $ ->
         if children.length
           html = '<tr> <td>' + new_data + '</td> <td>'
           for child in children
-            if !isEmpty(child.classList.value)
-              console.log child.classList
-              html +=  '<div>' + $(child).html() + '</div>'
+            classes = $(child).attr("class")
+            if !isEmpty(classes) && classes != undefined
+              html +=  '<div class="' + classes + '">' + $(child).html() + '</div>'
           html += '</td> </tr>'
           confirmation_dialog.push( html )
     $('#confirmation-modal tbody').append(confirmation_dialog)
@@ -290,10 +330,10 @@ $ ->
 
         if reptool_add == 'drop'
           if existing_reptool.length
-            $( action_col ).empty()
+            row.find( '.reptool-action-col' ).empty()
           else
             error_message = data + ' has no classifications to drop.'
-        if reptool_add != 'drop'
+        else
           $( '.drop.reptool-action-col' ).remove()
           actions = row.find('.col-actions')
           existing_actions = []

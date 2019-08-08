@@ -139,7 +139,7 @@
                   .modal-footer
                     .button-group
                       %button.primary{value: "submit", id:'confirm-rep-changes', onclick: 'confirm_rep_changes()' } Confirm Reputation Changes
-                      %button{title: "Cancel", class: "secondary", onclick: 'return false'} Cancel
+                      %button{title: "Cancel", class: "secondary", onclick: "close_modal(); return false;"} Cancel
 
 
           #error_modal.modal.error_modal{tabindex:"-1", role:"dialog"}
