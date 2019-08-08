@@ -249,17 +249,16 @@
             %td
 
 
-  - if current_user.has_role?('admin') || current_user == user.parent
-    .modal.fade.user-form-modal{id: "roleModal_#{current_user.id}", tabindex: '-1', role: 'dialog', 'aria-hidden': 'true'}
-      .modal-dialog{role: 'document'}
-        .modal-content
-          .modal-header
-            %button.close{type: 'button', 'data-dismiss': 'modal', 'aria-label': 'Close'}
-            %h3.modal-title
-              Edit User
-              = current_user.cvs_username.capitalize
-          .modal-body
-            =render 'edit_user_form', user: current_user
+  .modal.fade.user-form-modal{id: "roleModal_#{current_user.id}", tabindex: '-1', role: 'dialog', 'aria-hidden': 'true'}
+    .modal-dialog{role: 'document'}
+      .modal-content
+        .modal-header
+          %button.close{type: 'button', 'data-dismiss': 'modal', 'aria-label': 'Close'}
+          %h3.modal-title
+            Edit User
+            = current_user.cvs_username.capitalize
+        .modal-body
+          =render 'edit_user_form', user: current_user
 
 
   -# I ported this over, but need to confirm its actually needed / when it gets called
