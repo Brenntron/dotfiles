@@ -492,8 +492,6 @@ $ ->
         $(reptool_submit[0]).attr('disabled', true)
 
 # Submit Bulk changes to Reptool
-
-
 window.submit_bulk_reptool = () ->
   bulk_reptool_menu = $('#reptool_adjust_entries')
   submission_action = $("input[name='reptool-action-radio']:checked").val()
@@ -522,7 +520,6 @@ window.submit_bulk_reptool = () ->
       'entry': $(entry).text()
       'classifications': current_classes
     }
-    
   # If user wants to override existing classes we only need what they've checked
   if submission_action == "reptool-override"
     data = {
@@ -590,7 +587,7 @@ window.submit_bulk_reptool = () ->
             'action': 'expired'
             'entries': [this.entry]
           }
-          F.push(temp_data)
+          array_of_datas.push(temp_data)
           data = array_of_datas
 
   # send separate api calls for each type of submission
