@@ -491,6 +491,7 @@ $ ->
       else
         $(reptool_submit[0]).attr('disabled', true)
 
+
 # Submit Bulk changes to Reptool
 window.submit_bulk_reptool = () ->
   bulk_reptool_menu = $('#reptool_adjust_entries')
@@ -520,6 +521,7 @@ window.submit_bulk_reptool = () ->
       'entry': $(entry).text()
       'classifications': current_classes
     }
+    
   # If user wants to override existing classes we only need what they've checked
   if submission_action == "reptool-override"
     data = {
