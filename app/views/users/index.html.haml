@@ -269,14 +269,3 @@
             = current_user.cvs_username.capitalize
         .modal-body
           =render 'edit_user_form', user: current_user
-
-
-  -# I ported this over, but need to confirm its actually needed / when it gets called
-  #new_member_modal.modal{role: 'dialog'}
-    .modal-dialog.modal-sm
-      .modal-content
-        .modal-header.user
-          %h4.modal-title Information Alert
-        .modal-body.center-block.info-alert
-        .modal-footer
-          %button.btn.btn-primary{type: 'button', 'data-dismiss': 'modal'} Ok
