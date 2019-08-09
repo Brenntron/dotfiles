@@ -199,6 +199,16 @@
                     = link_to user_remove_from_team_path(user_id: child.id), method: :patch, data: {confirm: "Remove #{child.display_name} from team?"} do
                       %button.remove-button.table-row-button.tooltipped{title: "Remove #{child.cvs_username} from this team"}
 
+              .modal.fade.user-form-modal{id: "roleModal_#{child.id}", tabindex: '-1', role: 'dialog', 'aria-hidden': 'true'}
+                .modal-dialog{role: 'document'}
+                  .modal-content
+                    .modal-header
+                      %button.close{type: 'button', 'data-dismiss': 'modal', 'aria-label': 'Close'}
+                      %h3.modal-title
+                        Edit User
+                        = child.cvs_username.capitalize
+                    .modal-body
+                      =render 'edit_user_form', user: child
 
           - else
             %tr
