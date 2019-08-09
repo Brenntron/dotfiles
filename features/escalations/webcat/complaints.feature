@@ -71,7 +71,6 @@ Feature: Webcat complaints
     Then I wait for "3" seconds
     Then I should see "ASSIGNED"
 
-  @now
   @javascript
   Scenario: a user tries to take multiple complaints one of which is invalid
     Given a user with role "webcat user" exists and is logged in

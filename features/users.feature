@@ -47,7 +47,7 @@ Feature: User Accounts
     And a user with id "1" has a parent with id "2"
 
     Then I wait for "3" seconds
-    And  I goto "escalations/users"
+    And  I goto "/users"
     Then I click "h_clinton"
     And  I should not see "edit-button"
 
@@ -69,13 +69,12 @@ Feature: User Accounts
     And a user with id "1" has a parent with id "2"
 
     Then I wait for "3" seconds
-    And  I goto "escalations/users"
-    Then I click "h_clinton"
+    And  I goto "/users/3"
     Then I click the button with data-target "#roleModal_3"
     And I wait for "1" seconds
-    And I should see "Update Role(s) for h_clinton"
+    And I should see "Edit User H_clinton"
     And I check "analyst"
-    Then I click "Save changes"
+    Then I click "Save"
     And I should see "h_clinton updated successfully"
     And I should see "analyst"
 
@@ -97,20 +96,18 @@ Feature: User Accounts
     And a user with id "1" has a parent with id "3"
 
     Then I wait for "3" seconds
-    And  I goto "/users/1"
-    Then I click "h_clinton"
-    Then I click the span with data-target "#roleModal_3"
+    And  I goto "/users/3"
+    Then I click the button with data-target "#roleModal_3"
     And I wait for "1" seconds
-    And I should see "Update Role(s) for h_clinton"
+    And I should see "Edit User H_clinton"
     And I check "admin"
-    Then I click "Save changes"
+    Then I click "Save"
     And I should see "h_clinton updated successfully"
     And I should see "admin"
 
 
   @javascript
   Scenario: A manager user can go to the users index page and see only their co-workers and team members.
-  A manager can access the relationships page.
     Given a manager exists and is logged in
     And the following users exist
       | id | email                | cvs_username | display_name        | parent_id |
@@ -128,11 +125,9 @@ Feature: User Accounts
     And  I should see "rainbow_b"
 
 
-  @javascript
-  Scenario: A manager can add and remove team members on the users page.
-    Then pending
-    Given a manager exists and is logged in
-    And the following users exist
+  @now @javascript
+  Scenario: A manager can add and remove team members on the users index page.
+    Given the following users exist
       | id | email                | cvs_username  | display_name        | parent_id | cec_username |
       | 2  | rainbows@email.com   | rainbow_b     | Rainbow Brite       |  1        | rainbow_b    |
       | 3  | hclinton@email.com   | h_clinton     | Hillary Clinton     |  2        | h_clinton    |
@@ -140,18 +135,20 @@ Feature: User Accounts
       | 5  | gjohns@email.com     | g_johnson     | Gary Johnson        |           | g_johnson    |
       | 6  | tbeary@email.com     | t_bear        | Teddy Bear          |  5        | t_bear       |
 
-
-    Then I wait for "3" seconds
+    And  a user with id "2" has a role "manager" and is logged in
     And  I goto "/users"
     And  I should see "h_clinton"
-    And  "-- Hillary Clinton (h_clinton)" should not be in the "child_id" dropdown list
-    And  I select "Donald Trump (d_drumph)" from "child_id"
+    And  I click "#add_user_button_2"
+#    Then I wait for "1" seconds
+#    And I click "#add_user_dropdown_2"
+    And  "Hillary Clinton (h_clinton)" should not be in the "add_user_dropdown_2" dropdown list
+    And  I select "Donald Trump (d_drumph)" from "add_user_dropdown_2"
     Then I click "Add"
     Then I should see "d_drumph successfully added"
 
 
   @javascript
-  Scenario: A manager can edit roles of team members on relationships page.
+  Scenario: A manager can edit roles of team members on users index page.
     Given a manager exists and is logged in
     And the following users exist
       | id | email                | cvs_username  | display_name        | parent_id | cec_username |
@@ -220,7 +217,7 @@ Feature: User Accounts
 
   ### Scenarios User search
 
-  @javascript
+  @now @javascript
   Scenario: A user can search using email
     Given a user with role "manager" exists and is logged in
     And I wait for "3" seconds
@@ -231,15 +228,14 @@ Feature: User Accounts
       | porsche@cisco.com  |
       | bentley@cisco.com  |
     When I goto "/users"
-    Then I should see a user search form
     Given I fill in "user_search_name" with "CAR"
-    When I click button "search"
+    When I hit enter within "#user_search_name"
     Then I see a user_searches result for name "carlzipp@cisco.com"
     And I see a user_searches result for name "davecarr@cisco.com"
     And I do not see a user_searches result for name "porsche@cisco.com"
     And I do not see a user_searches result for name "bentley@cisco.com"
 
-  @javascript
+  @now @javascript
   Scenario: A user can search using a users display name
     Given a user with role "manager" exists and is logged in
     And I wait for "3" seconds
@@ -249,15 +245,15 @@ Feature: User Accounts
       | email2@cisco.com | David Carr          |
       | email3@cisco.com | Porsche Bugatti     |
       | email4@cisco.com | Bentley Ford        |
-    Given I goto "/users"
+    When I goto "/users"
     Given I fill in "user_search_name" with "CAR"
-    When I click button "search"
+    When I hit enter within "#user_search_name"
     Then I see a user_searches result for name "Carl Zipp"
     And I see a user_searches result for name "David Carr"
     And I do not see a user_searches result for name "Porsche Bugatti"
     And I do not see a user_searches result for name "Bentley Ford"
 
-  @javascript
+  @now @javascript
   Scenario: A user can search using CVS user name
     Given a user with role "manager" exists and is logged in
     And I wait for "3" seconds
@@ -267,15 +263,15 @@ Feature: User Accounts
       | email2@cisco.com | davecarr     |
       | email3@cisco.com | porsche      |
       | email4@cisco.com | bentley      |
-    Given I goto "/users"
+    When I goto "/users"
     Given I fill in "user_search_name" with "CAR"
-    When I click button "search"
+    When I hit enter within "#user_search_name"
     Then I see a user_searches result for name "email1@cisco.com"
     And I see a user_searches result for name "email2@cisco.com"
     And I do not see a user_searches result for name "email3@cisco.com"
     And I do not see a user_searches result for name "email4@cisco.com"
 
-  @javascript
+  @now @javascript
   Scenario: A user can search using CEC username
     Given a user with role "manager" exists and is logged in
     And I wait for "3" seconds
@@ -285,15 +281,15 @@ Feature: User Accounts
       | email2@cisco.com | davecarr     |
       | email3@cisco.com | porsche      |
       | email4@cisco.com | bentley      |
-    Given I goto "/users"
+    When I goto "/users"
     Given I fill in "user_search_name" with "CAR"
-    When I click button "search"
+    When I hit enter within "#user_search_name"
     Then I see a user_searches result for name "email1@cisco.com"
     And I see a user_searches result for name "email2@cisco.com"
     And I do not see a user_searches result for name "email3@cisco.com"
     And I do not see a user_searches result for name "email4@cisco.com"
 
-  @javascript
+  @now @javascript
   Scenario: A user can search using Kerberos Login
     Given a user with role "manager" exists and is logged in
     And I wait for "3" seconds
@@ -303,9 +299,9 @@ Feature: User Accounts
       | email2@cisco.com | davecarr       |
       | email3@cisco.com | porsche        |
       | email4@cisco.com | bentley        |
-    Given I goto "/users"
+    When I goto "/users"
     Given I fill in "user_search_name" with "CAR"
-    When I click button "search"
+    When I hit enter within "#user_search_name"
     Then I see a user_searches result for name "email1@cisco.com"
     And I see a user_searches result for name "email2@cisco.com"
     And I do not see a user_searches result for name "email3@cisco.com"
