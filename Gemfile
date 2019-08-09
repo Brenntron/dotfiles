@@ -2,7 +2,6 @@ source 'https://rubygems.org'
 
 # Web-framework
 gem 'rails', '5.2.1'
-gem 'libv8', '3.16.14.19'
 gem 'rack-cors', '0.4.1', require: 'rack/cors'
 gem 'active_model_serializers', '0.10.8'
 gem 'grape', '1.1.0'
@@ -14,6 +13,7 @@ gem 'activerecord-session_store', '1.1.1'
 gem 'simple_form', '4.0.1'
 
 gem 'haml', '~> 5.0.4'
+gem 'libv8', '3.16.14.19'
 
 
 gem 'kaminari', '1.1.1'
