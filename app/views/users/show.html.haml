@@ -49,9 +49,9 @@
               %div.user-col-layout{style: "column-count: #{(@children_col.to_f).ceil}"}
                 - @user.children.each do |user|
                   %div
-                    = link_to user.display_name, user_path(user), class: 'related-user'
+                    = link_to user.display_name, escalations_user_path(user), class: 'related-user'
                     %br
-                    = link_to user.cvs_username, user_path(user), class: 'related-username'
+                    = link_to user.cvs_username, escalations_user_path(user), class: 'related-username'
 
             - if @user.parent.present?
               .user-relationship-wrapper
@@ -69,9 +69,9 @@
                 %div.user-col-layout.last{style: "column-count: #{(@sibling_col.to_f).ceil}"}
                   - @user.siblings.each do |user|
                     %div
-                      = link_to user.display_name, user_path(user), class: 'related-user'
+                      = link_to user.display_name, escalations_user_path(user), class: 'related-user'
                       %br
-                      = link_to user.cvs_username, user_path(user), class: 'related-username'
+                      = link_to user.cvs_username, escalations_user_path(user), class: 'related-username'
 
         - else
           .col-xs-12.user-col-wrapper

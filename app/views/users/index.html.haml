@@ -59,7 +59,7 @@
               %td.alt-col.user-col-divider.user-displayname-col.manager-row-indicator
                 %span= user.display_name
                 %button.expand-manager-row-button.up{'data-user-manager': "#{user.id}"}
-              %td.alt-col.user-col-divider.user-name-col= link_to user.cvs_username, user_path(user)
+              %td.alt-col.user-col-divider.user-name-col= link_to user.cvs_username, escalations_user_path(user)
               %td.alt-col.user-col-divider=user.children.length
               %td.alt-col=user.descendants.length
               %td.data_small_emphasis=user.roles.map(&:role).join(', ')
@@ -91,7 +91,7 @@
                   %td.alt-col.lighter-alt-col.user-col-divider.user-displayname-col.manager-row-indicator
                     %span= child.display_name
                     %button.expand-manager-row-button.up{'data-user-manager': "#{child.id}"}
-                  %td.alt-col.user-col-divider.user-name-col.lighter-alt-col= link_to child.cvs_username, user_path(child)
+                  %td.alt-col.user-col-divider.user-name-col.lighter-alt-col= link_to child.cvs_username, escalations_user_path(child)
                   %td.alt-col.user-col-divider.lighter-alt-col=child.children.length
                   %td.alt-col.lighter-alt-col=child.descendants.length
                   %td.data_small_emphasis=child.roles.map(&:role).join(', ')
@@ -119,7 +119,7 @@
                 - child.children.each do |grandchild|
                   %tr.manage-child-row.manage-grandchild-row{'data-user-child': "#{user.id} #{child.id}"}
                     %td.alt-col.user-col-divider.user-displayname-col.lighter-alt-col= grandchild.display_name
-                    %td.alt-col.user-col-divider.user-name-col.lighter-alt-col= link_to grandchild.cvs_username, user_path(grandchild)
+                    %td.alt-col.user-col-divider.user-name-col.lighter-alt-col= link_to grandchild.cvs_username, escalations_user_path(grandchild)
                     %td.alt-col.user-col-divider.lighter-alt-col=grandchild.children.length
                     %td.alt-col.lighter-alt-col=grandchild.descendants.length
                     %td.data_small_emphasis=grandchild.roles.map(&:role).join(', ')
@@ -131,7 +131,7 @@
               - else
                 %tr.manage-child-row{'data-user-child': "#{user.id}"}
                   %td.alt-col.user-col-divider.user-displayname-col.lighter-alt-col= child.display_name
-                  %td.alt-col.user-col-divider.user-name-col.lighter-alt-col= link_to child.cvs_username, user_path(child)
+                  %td.alt-col.user-col-divider.user-name-col.lighter-alt-col= link_to child.cvs_username, escalations_user_path(child)
                   %td.alt-col.user-col-divider.lighter-alt-col=child.children.length
                   %td.alt-col.lighter-alt-col=child.descendants.length
                   %td.data_small_emphasis=child.roles.map(&:role).join(', ')
