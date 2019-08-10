@@ -125,36 +125,32 @@ Feature: User Accounts
     And  I should see "rainbow_b"
 
 
-  @now @javascript
-  Scenario: A manager can add and remove team members on the users index page.
-    Given the following users exist
+  @javascript
+  Scenario: A manager can add and remove their team members on the users index page.
+    Given a user with id "2" has a role "manager" and is logged in
+    And the following users exist
       | id | email                | cvs_username  | display_name        | parent_id | cec_username |
-      | 2  | rainbows@email.com   | rainbow_b     | Rainbow Brite       |  1        | rainbow_b    |
       | 3  | hclinton@email.com   | h_clinton     | Hillary Clinton     |  2        | h_clinton    |
       | 4  | dtrump@email.com     | d_drumph      | Donald Trump        |           | d_drumph     |
       | 5  | gjohns@email.com     | g_johnson     | Gary Johnson        |           | g_johnson    |
       | 6  | tbeary@email.com     | t_bear        | Teddy Bear          |  5        | t_bear       |
 
-    And  a user with id "2" has a role "manager" and is logged in
     And  I goto "/users"
     And  I should see "h_clinton"
     And  I click "#add_user_button_2"
-#    Then I wait for "1" seconds
-#    And I click "#add_user_dropdown_2"
-    And  "Hillary Clinton (h_clinton)" should not be in the "add_user_dropdown_2" dropdown list
-    And  I select "Donald Trump (d_drumph)" from "add_user_dropdown_2"
-    Then I click "Add"
+    And  "Hillary Clinton (h_clinton)" should not be in the "users_for_2" dropdown list
+    And  I select "Donald Trump (d_drumph)" from "users_for_2"
+    Then I click "Add User"
     Then I should see "d_drumph successfully added"
 
 
   @javascript
-  Scenario: A manager can edit roles of team members on users index page.
-    Given a manager exists and is logged in
+  Scenario: A manager can edit roles of their team members on users index page.
+    Given a user with id "2" has a role "manager" and is logged in
     And the following users exist
       | id | email                | cvs_username  | display_name        | parent_id | cec_username |
-      | 2  | rainbows@email.com   | rainbow_b     | Rainbow Brite       | 1         | rainbow_b    |
       | 3  | hclinton@email.com   | h_clinton     | Hillary Clinton     | 2         | h_clinton    |
-      | 4  | dtrump@email.com     | d_drumph      | Donald Trump        | 1         | d_drumph     |
+      | 4  | dtrump@email.com     | d_drumph      | Donald Trump        | 2         | d_drumph     |
       | 5  | gjohns@email.com     | g_johnson     | Gary Johnson        |           | g_johnson    |
       | 6  | tbeary@email.com     | t_bear        | Teddy Bear          | 2         | t_bear       |
 
@@ -166,58 +162,60 @@ Feature: User Accounts
     Then I wait for "3" seconds
     And  I goto "/users"
     And  I should see "h_clinton"
-    And  "Hillary Clinton (h_clinton)" should not be in the "child_id" dropdown list
     Then I click the button with data-target "#roleModal_3"
     Then I wait for "1" seconds
-    Then I should see "Update Role(s) for h_clinton"
+    Then I should see "Edit User H_clinton"
     Then I check "analyst"
-    Then I click "Save changes"
+    Then I click "Save"
     Then I should see "h_clinton updated successfully."
     And I should see "analyst"
     And I should not see "committer"
     And I click the button with data-target "#roleModal_4"
     Then I wait for "1" seconds
-    Then I should see "Update Role(s) for d_drumph"
+    Then I should see "Edit User D_drumph"
     Then I check "analyst"
     Then I check "committer"
-    Then I click "Save changes"
+    Then I click "Save"
     Then I should see "d_drumph updated successfully."
     Then I should see "analyst, committer"
 
-  @javascript
+
+  @now @javascript
   Scenario: A manager can edit members subordinate manager teams on users page.
-    Given a manager exists and is logged in
+    Given a user with id "2" has a role "manager" and is logged in
     And the following users exist
       | id | email                | cvs_username  | display_name        | parent_id | cec_username |
-      | 2  | rainbows@email.com   | rainbow_b     | Rainbow Brite       | 1         | rainbow_b    |
       | 3  | hclinton@email.com   | h_clinton     | Hillary Clinton     | 2         | h_clinton    |
-      | 4  | dtrump@email.com     | d_drumph      | Donald Trump        | 1         | d_drumph     |
+      | 4  | dtrump@email.com     | d_drumph      | Donald Trump        | 2         | d_drumph     |
       | 5  | gjohns@email.com     | g_johnson     | Gary Johnson        |           | g_johnson    |
-      | 6  | tbeary@email.com     | t_bear        | Teddy Bear          | 2         | t_bear       |
+      | 6  | tbeary@email.com     | t_bear        | Teddy Bear          | 3         | t_bear       |
 
     And the following roles exist:
       | role           |
       | analyst        |
       | committer      |
 
-    And a user with id "2" has a role of "manager"
-
+    And  I goto "/users"
+    And  I should see "h_clinton"
+    Then I click the button with data-target "#roleModal_3"
+    Then I wait for "1" seconds
+    Then I should see "Edit User H_clinton"
+    Then I check "manager"
+    Then I click "Save"
+    Then I should see "h_clinton updated successfully."
     Then I wait for "3" seconds
     And  I goto "/users"
-    Then I click the link with data-target "#teamModal_2"
-    Then I wait for "1" seconds
-    Then I should see "Add to rainbow_b's team"
-    Then select "Gary Johnson (g_johnson)" from "child_id" within ".modal-body"
-    Then click button "Add" within ".modal-body"
+    And  I click "#add_user_button_3"
+    And  "Hillary Clinton (h_clinton)" should not be in the "users_for_3" dropdown list
+    And  I select "Gary Johnson (g_johnson)" from "users_for_3"
+    Then I click "Add User"
     Then I should see "g_johnson successfully added"
-
-
 
 
 
   ### Scenarios User search
 
-  @now @javascript
+  @javascript
   Scenario: A user can search using email
     Given a user with role "manager" exists and is logged in
     And I wait for "3" seconds
@@ -235,7 +233,7 @@ Feature: User Accounts
     And I do not see a user_searches result for name "porsche@cisco.com"
     And I do not see a user_searches result for name "bentley@cisco.com"
 
-  @now @javascript
+  @javascript
   Scenario: A user can search using a users display name
     Given a user with role "manager" exists and is logged in
     And I wait for "3" seconds
@@ -253,7 +251,7 @@ Feature: User Accounts
     And I do not see a user_searches result for name "Porsche Bugatti"
     And I do not see a user_searches result for name "Bentley Ford"
 
-  @now @javascript
+  @javascript
   Scenario: A user can search using CVS user name
     Given a user with role "manager" exists and is logged in
     And I wait for "3" seconds
@@ -271,7 +269,7 @@ Feature: User Accounts
     And I do not see a user_searches result for name "email3@cisco.com"
     And I do not see a user_searches result for name "email4@cisco.com"
 
-  @now @javascript
+  @javascript
   Scenario: A user can search using CEC username
     Given a user with role "manager" exists and is logged in
     And I wait for "3" seconds
@@ -289,7 +287,7 @@ Feature: User Accounts
     And I do not see a user_searches result for name "email3@cisco.com"
     And I do not see a user_searches result for name "email4@cisco.com"
 
-  @now @javascript
+  @javascript
   Scenario: A user can search using Kerberos Login
     Given a user with role "manager" exists and is logged in
     And I wait for "3" seconds
