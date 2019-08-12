@@ -100,6 +100,10 @@ Before('@no-js-errors') do
   end
 end
 
+Before('@poltergeist') do
+  Capybara.javascript_driver = :poltergeist
+end
+
 
 # Possible values are :truncation and :transaction
 # The :transaction strategy is faster, but might give you threading problems.

@@ -580,6 +580,22 @@ Feature: User Accounts
     And I do not see a user_searches result for name "email4@cisco.com"
 
 
+  @javascript
+  Scenario: An admin user can view Delayed Jobs Management
+    Given a user with role "admin" exists and is logged in
+      And I goto "/admin/delayed_job"
+      Then I should see "Overview"
+      And I should see "Enqueued Jobs"
+
+
+  @javascript @poltergeist @allow-rescue
+  Scenario: A non admin user cannot view Delayed Jobs Management
+    Given a user with role "webcat user" exists and is logged in
+    And I goto "/admin/delayed_job"
+    Then I should receive a "404" status
+
+
+
   ### Scenarios User Role access ###
 
 # The /admin route is no longer valid.  We could re-write this for /escalations/admin

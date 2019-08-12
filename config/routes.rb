@@ -131,6 +131,10 @@ Rails.application.routes.draw do
   end #namespace :escalations
 
   namespace :admin do
+    constraints AccessDelayedJobWeb do
+      mount DelayedJobWeb, at: "delayed_job"
+      match "/delayed_job" => DelayedJobWeb, :anchor => false, :via => [:get, :post]
+    end
     root 'home#index'
     resources :roles, except: [:show]
     resources :org_subsets, except: [:show]
