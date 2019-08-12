@@ -122,6 +122,31 @@ Rails.application.routes.draw do
     end
   end #namespace :escalations
 
+  namespace :admin do
+    constraints AccessDelayedJobWeb do
+      mount DelayedJobWeb, at: "delayed_job"
+      match "/delayed_job" => DelayedJobWeb, :anchor => false, :via => [:get, :post]
+    end
+    root 'home#index'
+    resources :roles, except: [:show]
+    resources :org_subsets, except: [:show]
+    resources :migrations, only: [:index]
+    resources :morsels, only: [:index, :show]
+    resources :delayed_jobs, only: [:index]
+    resources :notes, only: [:index, :edit, :update, :destroy] do
+      member do
+        get :related
+      end
+    end
+  end
+
+  resources :events, only: [] do
+    collection { get :send_event }
+  end
+
+  # TODO some of these named routes need to be rethought to conform to rails conventions
+  post "sessions/create" => "sessions#create"
+  post "/attachments" => "attachments#create"
   root 'pages#index'
   mount API::Base => '/escalations/api'
 

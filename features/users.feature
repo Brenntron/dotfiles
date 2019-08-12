@@ -36,45 +36,6 @@ Feature: User Accounts
   ### Scenarios User management ###
 
   @javascript
-  Scenario: A regular user should see a not found flash message
-    Then pending
-    Given a user with role "analyst" exists and is logged in
-    Given I wait for "3" seconds
-    When I goto "/users/1001"
-    Then I should see could not find user "1001" flash massage
-    When I goto "/users/malformed"
-    Then I should see could not find user "malformed" flash massage
-
-
-  @javascript
-  Scenario: A non-manager user can go to the users index page and see only their co-workers.
-  Assigned bugs should be on users show page.
-  A non-manager cannot get to the relationships section.
-    Given a user with role "analyst" exists and is logged in
-    And the following users exist
-      | id | email                      | cvs_username | display_name        | parent_id | cec_username |
-      | 2  | rainbows@email.com         | rainbow_b    | Rainbow Brite       |           | rainbow_b    |
-      | 3  | hclinton@email.com         | h_clinton    | Hillary Clinton     |  2        | h_clinton    |
-      | 4  | dtrump@email.com           | d_drumph     | Donald Trump        |           | d_drumph     |
-
-    And a user with id "1" has a parent with id "2"
-
-    Then I wait for "3" seconds
-    And  I goto "/escalations/users"
-    And  I should see "h_clinton"
-    And  I should not see "d_drumph"
-    And  I should see a user search form
-    Then I click "h_clinton"
-    And  I should see "[BP][NSS] fixed bug"
-    And  I should not see "[TELUS] broken bug"
-    Then I goto "/escalations/users/4"
-    And  I should see "You are not authorized to view that user."
-    Then I goto "/escalations/users/1"
-    And  I should see "[TELUS] broken bug"
-    And  I goto "/escalations/users/1/relationships"
-    And  I should see "You must be a manager to access that page."
-
-  @javascript
   Scenario: A non-manager non-admin user cannot edit the role for any user.
     Given a user with role "analyst" exists and is logged in
     And the following users exist
@@ -86,9 +47,10 @@ Feature: User Accounts
     And a user with id "1" has a parent with id "2"
 
     Then I wait for "3" seconds
-    And  I goto "/escalations/users"
+    And  I goto "escalations/users"
     Then I click "h_clinton"
-    And  I should not see "glyphicon-pencil"
+    And  I should not see "edit-button"
+
 
   @javascript
   Scenario: A non-manager admin user can edit the role for any user.
@@ -107,13 +69,12 @@ Feature: User Accounts
     And a user with id "1" has a parent with id "2"
 
     Then I wait for "3" seconds
-    And  I goto "/escalations/users"
-    Then I click "h_clinton"
-    Then I click the span with data-target "#roleModal_3"
+    And  I goto "escalations/users/3"
+    Then I click the button with data-target "#roleModal_3"
     And I wait for "1" seconds
-    And I should see "Update Role(s) for h_clinton"
+    And I should see "Edit User H_clinton"
     And I check "analyst"
-    Then I click "Save changes"
+    Then I click "Save"
     And I should see "h_clinton updated successfully"
     And I should see "analyst"
 
@@ -135,19 +96,18 @@ Feature: User Accounts
     And a user with id "1" has a parent with id "3"
 
     Then I wait for "3" seconds
-    And  I goto "/escalations/users/1"
-    Then I click "h_clinton"
-    Then I click the span with data-target "#roleModal_3"
+    And  I goto "escalations/users/3"
+    Then I click the button with data-target "#roleModal_3"
     And I wait for "1" seconds
-    And I should see "Update Role(s) for h_clinton"
+    And I should see "Edit User H_clinton"
     And I check "admin"
-    Then I click "Save changes"
+    Then I click "Save"
     And I should see "h_clinton updated successfully"
     And I should see "admin"
 
+
   @javascript
   Scenario: A manager user can go to the users index page and see only their co-workers and team members.
-  A manager can access the relationships page.
     Given a manager exists and is logged in
     And the following users exist
       | id | email                | cvs_username | display_name        | parent_id |
@@ -159,48 +119,38 @@ Feature: User Accounts
     And a user with id "1" has a parent with id "5"
 
     Then I wait for "3" seconds
-    And  I goto "/escalations/users"
+    And  I goto "escalations/users"
     And  I should see "h_clinton"
     And  I should see "d_drumph"
     And  I should see "rainbow_b"
-    Then I goto "/escalations/users/1/relationships"
-    And  I should see "d_drumph"
+
 
   @javascript
-  Scenario: A manager can add and remove team members on the relationships page.
-    Then pending
-    Given a manager exists and is logged in
+  Scenario: A manager can add and remove their team members on the users index page.
+    Given a user with id "2" has a role "manager" and is logged in
     And the following users exist
       | id | email                | cvs_username  | display_name        | parent_id | cec_username |
-      | 2  | rainbows@email.com   | rainbow_b     | Rainbow Brite       |  1        | rainbow_b    |
       | 3  | hclinton@email.com   | h_clinton     | Hillary Clinton     |  2        | h_clinton    |
       | 4  | dtrump@email.com     | d_drumph      | Donald Trump        |           | d_drumph     |
       | 5  | gjohns@email.com     | g_johnson     | Gary Johnson        |           | g_johnson    |
       | 6  | tbeary@email.com     | t_bear        | Teddy Bear          |  5        | t_bear       |
 
-
-    Then I wait for "3" seconds
-    And  I goto "/escalations/users/1/relationships"
-    And I click ".glyphicon-chevron-right"
+    And  I goto "escalations/users"
     And  I should see "h_clinton"
-    And  "-- Hillary Clinton (h_clinton)" should not be in the "child_id" dropdown list
-    And  I select "Donald Trump (d_drumph)" from "child_id"
-    Then I click "Add"
+    And  I click "#add_user_button_2"
+    And  "Hillary Clinton (h_clinton)" should not be in the "users_for_2" dropdown list
+    And  I select "Donald Trump (d_drumph)" from "users_for_2"
+    Then I click "Add User"
     Then I should see "d_drumph successfully added"
-    And  I select "- Teddy Bear (t_bear)" from "child_id"
-    Then I should see "- Teddy Bear (t_bear) is on a team already. Are you sure you want to move - Teddy Bear (t_bear) to another team?"
-    Then I click "Ok"
-    Then I click "Add"
-    And  I should see "t_bear successfully added"
+
 
   @javascript
-  Scenario: A manager can edit roles of team members on relationships page.
-    Given a manager exists and is logged in
+  Scenario: A manager can edit roles of their team members on users index page.
+    Given a user with id "2" has a role "manager" and is logged in
     And the following users exist
       | id | email                | cvs_username  | display_name        | parent_id | cec_username |
-      | 2  | rainbows@email.com   | rainbow_b     | Rainbow Brite       | 1         | rainbow_b    |
       | 3  | hclinton@email.com   | h_clinton     | Hillary Clinton     | 2         | h_clinton    |
-      | 4  | dtrump@email.com     | d_drumph      | Donald Trump        | 1         | d_drumph     |
+      | 4  | dtrump@email.com     | d_drumph      | Donald Trump        | 2         | d_drumph     |
       | 5  | gjohns@email.com     | g_johnson     | Gary Johnson        |           | g_johnson    |
       | 6  | tbeary@email.com     | t_bear        | Teddy Bear          | 2         | t_bear       |
 
@@ -210,53 +160,55 @@ Feature: User Accounts
       | committer      |
 
     Then I wait for "3" seconds
-    And  I goto "/escalations/users/1/relationships"
-    And I click ".glyphicon-chevron-right"
+    And  I goto "escalations/users"
     And  I should see "h_clinton"
-    And  "Hillary Clinton (h_clinton)" should not be in the "child_id" dropdown list
-    Then I click the link with data-target "#roleModal_3"
+    Then I click the button with data-target "#roleModal_3"
     Then I wait for "1" seconds
-    Then I should see "Update Role(s) for h_clinton"
+    Then I should see "Edit User H_clinton"
     Then I check "analyst"
-    Then I click "Save changes"
+    Then I click "Save"
     Then I should see "h_clinton updated successfully."
-    Then I click ".glyphicon-chevron-right"
     And I should see "analyst"
     And I should not see "committer"
-    And I click the link with data-target "#roleModal_4"
+    And I click the button with data-target "#roleModal_4"
     Then I wait for "1" seconds
-    Then I should see "Update Role(s) for d_drumph"
+    Then I should see "Edit User D_drumph"
     Then I check "analyst"
     Then I check "committer"
-    Then I click "Save changes"
+    Then I click "Save"
     Then I should see "d_drumph updated successfully."
     Then I should see "analyst, committer"
 
-  @javascript
-  Scenario: A manager can edit members subordinate manager teams on relationships page.
-    Given a manager exists and is logged in
+
+  @now @javascript
+  Scenario: A manager can edit members subordinate manager teams on users page.
+    Given a user with id "2" has a role "manager" and is logged in
     And the following users exist
       | id | email                | cvs_username  | display_name        | parent_id | cec_username |
-      | 2  | rainbows@email.com   | rainbow_b     | Rainbow Brite       | 1         | rainbow_b    |
       | 3  | hclinton@email.com   | h_clinton     | Hillary Clinton     | 2         | h_clinton    |
-      | 4  | dtrump@email.com     | d_drumph      | Donald Trump        | 1         | d_drumph     |
+      | 4  | dtrump@email.com     | d_drumph      | Donald Trump        | 2         | d_drumph     |
       | 5  | gjohns@email.com     | g_johnson     | Gary Johnson        |           | g_johnson    |
-      | 6  | tbeary@email.com     | t_bear        | Teddy Bear          | 2         | t_bear       |
+      | 6  | tbeary@email.com     | t_bear        | Teddy Bear          | 3         | t_bear       |
 
     And the following roles exist:
       | role           |
       | analyst        |
       | committer      |
 
-    And a user with id "2" has a role of "manager"
-
-    Then I wait for "3" seconds
-    And  I goto "/escalations/users/1/relationships"
-    Then I click the link with data-target "#teamModal_2"
+    And  I goto "escalations/users"
+    And  I should see "h_clinton"
+    Then I click the button with data-target "#roleModal_3"
     Then I wait for "1" seconds
-    Then I should see "Add to rainbow_b's team"
-    Then select "Gary Johnson (g_johnson)" from "child_id" within ".modal-body"
-    Then click button "Add" within ".modal-body"
+    Then I should see "Edit User H_clinton"
+    Then I check "manager"
+    Then I click "Save"
+    Then I should see "h_clinton updated successfully."
+    Then I wait for "3" seconds
+    And  I goto "/users"
+    And  I click "#add_user_button_3"
+    And  "Hillary Clinton (h_clinton)" should not be in the "users_for_3" dropdown list
+    And  I select "Gary Johnson (g_johnson)" from "users_for_3"
+    Then I click "Add User"
     Then I should see "g_johnson successfully added"
 
 
@@ -265,8 +217,6 @@ Feature: User Accounts
 
   @javascript
   Scenario: A user can search using email
-    #there is no longer a search button
-    Given pending
     Given a user with role "manager" exists and is logged in
     And I wait for "3" seconds
     And the following users exist
@@ -275,10 +225,9 @@ Feature: User Accounts
       | davecarr@cisco.com |
       | porsche@cisco.com  |
       | bentley@cisco.com  |
-    When I goto "/escalations/users"
-    Then I should see a user search form
+    When I goto "escalations/users"
     Given I fill in "user_search_name" with "CAR"
-    When I click button "search"
+    When I hit enter within "#user_search_name"
     Then I see a user_searches result for name "carlzipp@cisco.com"
     And I see a user_searches result for name "davecarr@cisco.com"
     And I do not see a user_searches result for name "porsche@cisco.com"
@@ -286,8 +235,6 @@ Feature: User Accounts
 
   @javascript
   Scenario: A user can search using a users display name
-    #there is no longer a search button
-    Given pending
     Given a user with role "manager" exists and is logged in
     And I wait for "3" seconds
     And the following users exist
@@ -296,9 +243,9 @@ Feature: User Accounts
       | email2@cisco.com | David Carr          |
       | email3@cisco.com | Porsche Bugatti     |
       | email4@cisco.com | Bentley Ford        |
-    Given I goto "/escalations/users"
+    When I goto "escalations/users"
     Given I fill in "user_search_name" with "CAR"
-    When I click button "search"
+    When I hit enter within "#user_search_name"
     Then I see a user_searches result for name "Carl Zipp"
     And I see a user_searches result for name "David Carr"
     And I do not see a user_searches result for name "Porsche Bugatti"
@@ -306,8 +253,6 @@ Feature: User Accounts
 
   @javascript
   Scenario: A user can search using CVS user name
-    #there is no longer a search button
-    Given pending
     Given a user with role "manager" exists and is logged in
     And I wait for "3" seconds
     And the following users exist
@@ -316,9 +261,9 @@ Feature: User Accounts
       | email2@cisco.com | davecarr     |
       | email3@cisco.com | porsche      |
       | email4@cisco.com | bentley      |
-    Given I goto "/escalations/users"
+    When I goto "escalations/users"
     Given I fill in "user_search_name" with "CAR"
-    When I click button "search"
+    When I hit enter within "#user_search_name"
     Then I see a user_searches result for name "email1@cisco.com"
     And I see a user_searches result for name "email2@cisco.com"
     And I do not see a user_searches result for name "email3@cisco.com"
@@ -326,8 +271,6 @@ Feature: User Accounts
 
   @javascript
   Scenario: A user can search using CEC username
-    #there is no longer a search button
-    Given pending
     Given a user with role "manager" exists and is logged in
     And I wait for "3" seconds
     And the following users exist
@@ -336,9 +279,9 @@ Feature: User Accounts
       | email2@cisco.com | davecarr     |
       | email3@cisco.com | porsche      |
       | email4@cisco.com | bentley      |
-    Given I goto "/escalations/users"
+    When I goto "escalations/users"
     Given I fill in "user_search_name" with "CAR"
-    When I click button "search"
+    When I hit enter within "#user_search_name"
     Then I see a user_searches result for name "email1@cisco.com"
     And I see a user_searches result for name "email2@cisco.com"
     And I do not see a user_searches result for name "email3@cisco.com"
@@ -346,20 +289,38 @@ Feature: User Accounts
 
   @javascript
   Scenario: A user can search using Kerberos Login
-    #there is no longer a search button
-    Given pending
     Given a user with role "manager" exists and is logged in
-    #And I wait for "3" seconds
+    And I wait for "3" seconds
     And the following users exist
       | email            | kerberos_login |
       | email1@cisco.com | carlzipp       |
       | email2@cisco.com | davecarr       |
       | email3@cisco.com | porsche        |
       | email4@cisco.com | bentley        |
-    Given I goto "/escalations/users"
+    When I goto "escalations/users"
     Given I fill in "user_search_name" with "CAR"
-    When I click button "search"
+    When I hit enter within "#user_search_name"
     Then I see a user_searches result for name "email1@cisco.com"
     And I see a user_searches result for name "email2@cisco.com"
     And I do not see a user_searches result for name "email3@cisco.com"
     And I do not see a user_searches result for name "email4@cisco.com"
+
+
+  ### Scenarios User Role access ###
+
+# The /admin route is no longer valid.  We could re-write this for /escalations/admin
+#  @javascript
+#  Scenario: An Admin user should be able to get to the admin section
+#    Given a user with role "admin" exists and is logged in
+#    And I wait for "3" seconds
+#    And I go to "/admin"
+#    Then I should see "Admin Page"
+#
+#
+#  @javascript
+#  Scenario: An non Admin user should not be able to get to the admin section
+#    Given a user with role "analyst" exists and is logged in
+#    And I wait for "3" seconds
+#    And I go to "/admin"
+#    Then I should not see "Admin Page"
+#    And I should see "You are not authorized"
