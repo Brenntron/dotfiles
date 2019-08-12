@@ -26,7 +26,7 @@ class ComplaintEntryScreenshot < ApplicationRecord
       open("app/assets/images/failed_screenshot.jpg") do |f|
         file_data = f.read
       end
-      self.update(screenshot: file_data, error_message: ex.message)
+      self.update(screenshot: file_data, error_message: ex.message.truncate(1000000))
     ensure # this is a good practice to get into so that the driver will always exit, even if there is an error
       driver.quit unless driver.nil?
     end
