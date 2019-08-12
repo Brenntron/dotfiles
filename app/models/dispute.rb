@@ -1765,6 +1765,21 @@ class Dispute < ApplicationRecord
       end
     end
 
+    rulehit_types.reject! {|k, v| %w"dotq
+      alx_cln
+      tuse
+      a500
+      deli
+      csdw
+      suwl
+      ciwl
+      vsvd
+      wlh
+      wlm
+      wlw".include? k } # According to Jayme, hit counts for these rules can be omitted (https://jira.vrt.sourcefire.com/browse/WEB-5082)
+
+    rulehit_types = Hash[rulehit_types.sort_by {|k,v| v}[0..24].reverse] # Limit rule hits to the top 25
+
     final_data = {}
     final_data[:rules] = []
     final_data[:rule_hits] = []
@@ -1773,7 +1788,6 @@ class Dispute < ApplicationRecord
       final_data[:rules] << k
       final_data[:rule_hits] << v
     end
-
 
     final_data
 

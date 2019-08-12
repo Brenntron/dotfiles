@@ -336,34 +336,34 @@ class ComplaintEntry < ApplicationRecord
     def capture_screenshot(uri, complaint_entry_id)
       max_wait_for_job = 15 #seconds
       begin
-        screenshot_data =  ""
-        Timeout::timeout(max_wait_for_job) do
-          screenshot_data = CapybaraSpider.low_capture("#{uri}")
-        end
-        ces = ComplaintEntryScreenshot.new
-        ces.complaint_entry_id = complaint_entry_id
-        ces.screenshot = Base64.decode64(screenshot_data)
-        ces.save!
+        #screenshot_data =  ""
+        #Timeout::timeout(max_wait_for_job) do
+        #  screenshot_data = CapybaraSpider.low_capture("#{uri}")
+        #end
+        #ces = ComplaintEntryScreenshot.new
+        #ces.complaint_entry_id = complaint_entry_id
+        #ces.screenshot = Base64.decode64(screenshot_data)
+        #ces.save!
       rescue Timeout::Error => e
         #couldnt complete in time
-        Rails.logger.error( "#{e} --- Timed out waiting for screenshot for #{uri} to finish")
-        ces = ComplaintEntryScreenshot.new
-        ces.error_message = e.message
-        ces.complaint_entry_id = complaint_entry_id
-        open("app/assets/images/failed_screenshot.jpg") do |f|
-          ces.screenshot = f.read
-        end
-        ces.save!
+        #Rails.logger.error( "#{e} --- Timed out waiting for screenshot for #{uri} to finish")
+        #ces = ComplaintEntryScreenshot.new
+        #ces.error_message = e.message
+        #ces.complaint_entry_id = complaint_entry_id
+        #open("app/assets/images/failed_screenshot.jpg") do |f|
+        #  ces.screenshot = f.read
+        #end
+        #ces.save!
       rescue Exception => e
-        Rails.logger.error("#{e.message}")
+        #Rails.logger.error("#{e.message}")
         #do nothing, it was worth a try. kittens are sad now
-        ces = ComplaintEntryScreenshot.new
-        ces.error_message = e.message
-        ces.complaint_entry_id = complaint_entry_id
-        open("app/assets/images/failed_screenshot.jpg") do |f|
-          ces.screenshot = f.read
-        end
-        ces.save!
+        #ces = ComplaintEntryScreenshot.new
+        #ces.error_message = e.message
+        #ces.complaint_entry_id = complaint_entry_id
+        #open("app/assets/images/failed_screenshot.jpg") do |f|
+        #  ces.screenshot = f.read
+        #end
+        #ces.save!
       end
 
     end
@@ -423,28 +423,28 @@ class ComplaintEntry < ApplicationRecord
     max_wait_for_job = 15 #seconds
     begin
       #this is where screen grabs happen.
-      screenshot_entry = ComplaintEntryScreenshot.create!(complaint_entry_id:new_complaint_entry.id)
-      screenshot_entry.grab_screenshot
+      #screenshot_entry = ComplaintEntryScreenshot.create!(complaint_entry_id:new_complaint_entry.id)
+      #screenshot_entry.grab_screenshot
     rescue Timeout::Error => e
       #couldnt complete in time
-      Rails.logger.error( "#{e} --- Timed out waiting for screenshot for #{new_complaint_entry.hostlookup} to finish")
-      ces = ComplaintEntryScreenshot.new
-      ces.error_message = e.message
-      ces.complaint_entry_id = new_complaint_entry.id
-      open("app/assets/images/failed_screenshot.jpg") do |f|
-        ces.screenshot = f.read
-      end
-      ces.save!
+      #Rails.logger.error( "#{e} --- Timed out waiting for screenshot for #{new_complaint_entry.hostlookup} to finish")
+      #ces = ComplaintEntryScreenshot.new
+      #ces.error_message = e.message
+      #ces.complaint_entry_id = new_complaint_entry.id
+      #open("app/assets/images/failed_screenshot.jpg") do |f|
+      #  ces.screenshot = f.read
+      #end
+      #ces.save!
     rescue Exception => e
-      Rails.logger.error("#{e.message}")
+      #Rails.logger.error("#{e.message}")
       #do nothing, it was worth a try. kittens are sad now
-      ces = ComplaintEntryScreenshot.new
-      ces.error_message = e.message
-      ces.complaint_entry_id = new_complaint_entry.id
-      open("app/assets/images/failed_screenshot.jpg") do |f|
-        ces.screenshot = f.read
-      end
-      ces.save!
+      #ces = ComplaintEntryScreenshot.new
+      #ces.error_message = e.message
+      #ces.complaint_entry_id = new_complaint_entry.id
+      #open("app/assets/images/failed_screenshot.jpg") do |f|
+      #  ces.screenshot = f.read
+      #end
+      #ces.save!
     end
   end
 
