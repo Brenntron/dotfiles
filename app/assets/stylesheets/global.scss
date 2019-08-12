@@ -167,6 +167,7 @@ h1.tab-header {
 h1.username_header {
   margin-top: -10px;
   padding-bottom: 10px;
+  display: inline-block;
 }
 
 h1.inline-header {
@@ -228,6 +229,8 @@ h5 {
 
 .break-word {
   word-break: break-all;
+  word-wrap: break-word;
+  white-space: normal;
 }
 
 .no-word-break {
@@ -2911,8 +2914,6 @@ fieldset.top-content {
 }
 
 .user-col-layout {
-  display: inline-block;
-  float: left;
   margin-right: 12px;
   padding-right: 12px;
   border-right: 1px solid $faint-neutral-color;
@@ -2923,12 +2924,12 @@ fieldset.top-content {
   margin-right: 0;
 }
 
-.user-col-wrapper {
-  padding-right: 0;
-}
-
 .user-profile-wrapper {
   margin-right: 28px;
+}
+
+.related-user-list li {
+  margin-bottom: 8px;
 }
 
 // This is used only in Admin and Rule Docs, will need to be removed when
@@ -9974,4 +9975,154 @@ input[type="radio"].resolution_radio_button {
 
 #sidenav-icons-div ul {
   margin-bottom: 0;
+}
+
+// Edit user form in users page (modal)
+.user-form-modal {
+  .modal-header {
+    background-color: $primary-section-color;
+    border: none;
+    border-radius: 4px 4px 0 0;
+    padding: 15px;
+  }
+  h3 {
+    color: $content-bg-color;
+    font-size: 14pt;
+    font-weight: 300;
+    line-height: 1.25em;
+    padding: 5px 10px 0 5px;
+    margin-bottom: 0;
+  }
+  .close {
+    background-image: url(image_path('icon_cancel_white.svg'));
+    margin: 5px;
+    opacity: 1;
+    width: 40px;
+    height: 40px;
+    background-size: 40px 40px;
+    background-position: right 4px;
+  }
+  .form-control {
+    background-color: transparent;
+    border: 1px solid darken($faint-neutral-color, 5%);
+    font-family: 'Open Sans', sans-serif;
+    font-weight: 500;
+    font-size: 10pt;
+    padding: 5px;
+    outline: none;
+  }
+  .form-control.code {
+    font-size: 8.65pt;
+    font-family: 'Fira Mono', monospace;
+  }
+  .regenerate-key {
+    float: right;
+    margin: -10px 0 0 0;
+    padding: 0 !important;
+  }
+  .edit-roles-button {
+    padding: 8px 12px;
+    margin: 12px 0;
+    background-color: lighten($type-lighter-color, 10%);
+    text-transform: uppercase;
+    border-radius: 2px;
+    font-weight: 600;
+    font-size: 9.5pt;
+    border: none !important;
+    color: #fff;
+    display: inline-block;
+  }
+  hr.thin{
+    margin: 12px 0;
+  }
+  .multi-col {
+    margin-top: 6px;
+  }
+}
+
+.regenerate-key {
+  background-image: url(image_path('icon_new_key_white.svg'));
+  background-repeat: no-repeat;
+  background-color: lighten($type-lighter-color, 10%);
+  width: 28px;
+  height: 28px;
+  display: block;
+  padding: 0;
+  background-size: 24px 24px;
+  background-position: center center;
+}
+
+.role-list span {
+  width: 100%;
+  display: block;
+  padding: 3px;
+  input {
+    margin-right: 3px;
+  }
+}
+
+hr.thin.extra-bottom-marg {
+  margin-bottom: 30px;
+}
+
+.users-flash-wrapper {
+  display: inline-block;
+}
+
+.team-flash-wrapper {
+  margin-left: 20px;
+  margin-top: 17px;
+  margin-bottom: -17px;
+}
+
+.profile-flash-wrapper {
+  position: absolute;
+  margin-left: 3px;
+  margin-top: 7px;
+}
+
+.flash-msg {
+  font-weight: 400;
+  font-size: 9pt;
+  color: $type-lighter-color;
+  padding: 0;
+  border: none;
+  margin: 0;
+}
+
+.flash-msg::before {
+  content: '';
+  display: block;
+  width: 22px;
+  height: 22px;
+  background-repeat: no-repeat;
+  background-position: center;
+  float: left;
+  margin-top: -6px;
+  margin-right: 4px;
+}
+
+.flash-msg-alert-info::before {
+  background-image: url(image_path('icon_success.svg'));
+}
+
+.flash-msg-alert-danger::before, .flash-type-alert-error::before {
+  background-image: url(image_path('icon_error.svg'));
+}
+
+.small-flash-button {
+  display: block;
+  width: 13px;
+  height: 13px;
+  background-repeat: no-repeat;
+  background-position: center;
+  background-image: url(image_path('icon_cancel_grey.svg'));
+  float: right;
+  border: none;
+  margin-left: 3px;
+  opacity: 0.6;
+}
+
+.small-flash-button:hover {
+  opacity: 1;
 }
