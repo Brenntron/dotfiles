@@ -11,7 +11,9 @@
         %tr
           %td.alt-col.user-col-divider= user.display_name
           - if current_user.has_role?('admin')
-            %td.alt-col.user-name-col.user-col-divider= link_to user.cvs_username, user_path(user)
+            %td.alt-col.user-name-col.user-col-divider= link_to user.cvs_username, escalations_user_path(user)
           - else
             %td.alt-col.user-name-col.user-col-divider= user.cvs_username
           %td.alt-col= user.email
+
+%input{:name => "token", :type => "hidden", :value => "#{current_user.authentication_token}"}

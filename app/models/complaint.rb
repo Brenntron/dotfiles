@@ -5,7 +5,7 @@ class Complaint < ApplicationRecord
 
   has_paper_trail on: [:update], ignore: [:updated_at]
 
-  delegate :name, to: :customer, allow_nil: true, prefix: true
+  delegate :name, :company_name, to: :customer, allow_nil: true, prefix: true
 
   RESOLUTION_FIXED                      = 'FIXED'
   RESOLUTION_INVALID                    = 'INVALID'
@@ -45,8 +45,8 @@ class Complaint < ApplicationRecord
   scope :from_ti, -> { includes(:complaint_entries).where(channel: TI_CHANNEL) }
   scope :from_int, -> { includes(:complaint_entries).where(channel: INT_CHANNEL) }
   scope :from_wbnp, -> { includes(:complaint_entries).where(channel: WBNP_CHANNEL) }
-  scope :by_guest, -> { joins(customer: :company).where('companies.name = ?', 'Guest')}
-  scope :by_cust, -> { joins(customer: :company).where('companies.name != ?', 'Guest')}
+  scope :by_guest, -> { joins(:customer).where(customers: {company_id: Company.guest.id}) }
+  scope :by_cust, -> { joins(:customer).where.not(customers: {company_id: Company.guest.id}) }
 
   def set_status(new_status)
     status_list = complaint_entries.map{|entry| entry.status}
@@ -605,6 +605,15 @@ class Complaint < ApplicationRecord
       new_tag = ComplaintTag.find_or_create_by(name: tag)
       complaint.complaint_tags << new_tag
     end
+  end
+
+  def self.sync_all
+    AdminTask.execute_task(:sync_complaints_with_ti, {})
+  end
+
+  def manual_sync
+    message = Bridge::ComplaintUpdateStatusEvent.new
+    message.post_complaint(self)
   end
 end
 

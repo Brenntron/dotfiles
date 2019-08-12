@@ -18,6 +18,8 @@ Rails.application.routes.draw do
       root 'tools#index'
       get 'tasks', to: 'tools#tasks'
       get 'rule_api', to: 'tools#rule_api'
+      get 'wbnp_reports', to: 'tools#wbnp_reports'
+      get 'manage_escalations_sync', to: 'tools#manage_escalations_sync'
     end
 
     namespace :webcat do
@@ -31,7 +33,7 @@ Rails.application.routes.draw do
           get :contains_search
         end
       end
-      resources :complaint_entries do
+      resources :complaint_entries, only: [:index, :show, :update] do
         collection do
           get :serve_image
         end

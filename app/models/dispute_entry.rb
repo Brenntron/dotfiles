@@ -469,6 +469,15 @@ class DisputeEntry < ApplicationRecord
     end
   end
 
+  def latest_email_date
+    comment = self.dispute.dispute_emails.last
+    if comment.present?
+      return comment.updated_at.strftime("%FT%T")
+    else
+      "None"
+    end
+  end
+
   def assign_from_auto_resolve(address:, total_hits:, resolved_at:, dispute_entry:)
 
     self.status = NEW

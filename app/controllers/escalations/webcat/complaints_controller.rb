@@ -4,7 +4,6 @@ class Escalations::Webcat::ComplaintsController < Escalations::WebcatController
   def index
     respond_to do |format|
       format.html
-      format.json { render json: ComplaintDatatable.new(view_context) }
     end
   end
 

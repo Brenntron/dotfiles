@@ -301,7 +301,7 @@ $ ->
     if !href && typeof parseInt(url_check) == 'number'
       window.location.replace('/escalations/file_rep/disputes')
 
-  $(document).on 'click', '#refresh-filter-button', (e) ->
+  window.filerep_refresh = ()->
     refresh_localStorage()
     window.location.replace('/escalations/file_rep/disputes?f=all')
 
@@ -383,11 +383,13 @@ $ ->
       data.selected_cases.push(case_id)
 
     if location.search != ''
+      urlParams = new URLSearchParams(location.search);
 #      if the location.search has value, it is a standard search
       data ={
         search_type : 'standard'
-        search_name : location.search.replace('?f=', '')
+        search_name : urlParams.get('f')
       }
+
       refresh_localStorage()
 
     else if localStorage.search_type
@@ -424,7 +426,7 @@ $ ->
   window.format_filerep_header = (data) ->
     container = $('#filerep_searchref_container')
     if data != undefined && container.length > 0
-      reset_icon = '<span id="refresh-filter-button" class="reset-filter esc-tooltipped" title="Clear Search Results"></span>'
+      reset_icon = '<span id="refresh-filter-button" class="reset-filter esc-tooltipped" title="Clear Search Results" onclick="filerep_refresh()"></span>'
       {search_type, search_name} = data
 
       if search_type == 'standard'

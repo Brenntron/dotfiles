@@ -15,3 +15,5 @@
           - else
             %td.alt-col.user-name-col.user-col-divider= user.cvs_username
           %td.alt-col= user.email
+
+%input{:name => "token", :type => "hidden", :value => "#{current_user.authentication_token}"}
