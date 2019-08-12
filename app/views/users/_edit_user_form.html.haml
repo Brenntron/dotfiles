@@ -1,4 +1,4 @@
-= simple_form_for user do |f|
+= simple_form_for user, url: escalations_user_path(user) do |f|
 
   - if current_user.has_role?('admin')
     -# Add the user form stuff here

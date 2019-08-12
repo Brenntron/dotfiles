@@ -204,7 +204,7 @@ Feature: User Accounts
     Then I click "Save"
     Then I should see "h_clinton updated successfully."
     Then I wait for "3" seconds
-    And  I goto "/users"
+    And  I goto "escalations/users"
     And  I click "#add_user_button_3"
     And  "Hillary Clinton (h_clinton)" should not be in the "users_for_3" dropdown list
     And  I select "Gary Johnson (g_johnson)" from "users_for_3"
