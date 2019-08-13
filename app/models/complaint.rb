@@ -52,11 +52,11 @@ class Complaint < ApplicationRecord
     status_list = complaint_entries.map{|entry| entry.status}
     case new_status
       when NEW
-        update(status: status_list.any? {|item| [ASSIGNED,PENDING,COMPLETED].include? item}? ACTIVE: NEW)
+        update!(status: status_list.any? {|item| [ASSIGNED,PENDING,COMPLETED].include? item}? ACTIVE: NEW)
       when ASSIGNED || PENDING
-        update(status:ACTIVE)
+        update!(status:ACTIVE)
       when COMPLETED
-        update(status: status_list.any? {|item| [ASSIGNED,PENDING,NEW].include? item}? ACTIVE: COMPLETED)
+        update!(status: status_list.any? {|item| [ASSIGNED,PENDING,NEW].include? item}? ACTIVE: COMPLETED)
     end
   end
 

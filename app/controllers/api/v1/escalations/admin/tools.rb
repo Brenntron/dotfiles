@@ -1,3 +1,4 @@
+require "pathname"
 module API
   module V1
     module Escalations
@@ -78,6 +79,34 @@ module API
                 {:status => 'success', :message => 'report has been obliterated'}
               else
                 {:status => 'error', :message => 'report not found'}
+              end
+            end
+
+            params do
+              optional :profile_id, type: String
+            end
+            post "purge_mozprofiles" do
+              std_api_v2 do
+                rust_directories = Pathname.new('/tmp').children.select { |c| c.directory? }.collect { |p| p.to_s if p.to_s.include?("rust_mozprofile") }.reject! { |k, v| k.nil? }
+                rust_directories.each do |rusty_dir|
+                  FileUtils.rm_rf(Dir[rusty_dir])
+                end
+                {:status => "success", :message => "Following folders were deleted #{rust_directories.to_sentence}"}
+              end
+            end
+            params do
+              optional :keep_one, type: Boolean
+            end
+            post "purge_mozilla_corefiles" do
+              std_api_v2 do
+                firefox_cores = Pathname.new('/tmp').children.select { |c| c.file? }.collect { |p| p.to_s if p.to_s.include?("firefox") }.reject! { |k, v| k.nil? }
+                if params[:keep_one]
+                  firefox_cores.pop
+                end
+                firefox_cores.each do |core|
+                  FileUtils.rm_rf(Dir[core])
+                end
+                {:status => "success", :message => "Following cores were deleted #{firefox_cores.to_sentence}"}
               end
             end
 
