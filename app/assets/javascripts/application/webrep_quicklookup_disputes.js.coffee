@@ -1,4 +1,16 @@
+
 $ ->
+  completed_counter = 0
+  $(document).bind(
+    ajaxStart: () ->
+      $('.ajax-message-div').css('display', 'flex')
+    ajaxComplete: () ->
+      completed_counter++
+      selected_rows = $('.col-select-all input:checked').length * 4 - 1
+      if completed_counter == selected_rows
+        $('.ajax-message-div').hide()
+  )
+
   $(document).on 'click', '#clear-all-actions', (e) ->
     e.preventDefault()
     selected_rows = $('.col-select-all input:checked')
@@ -155,7 +167,7 @@ $ ->
               wlbl_dispute_changes.push(data)
 
     wlbl_dispute_changes = wlbl_dispute_changes.filter( (x)-> return x != undefined )
-    reptool_dispute_changes = reptool_dispute_changes.filter( (x)-> return x != undefined )riL
+    reptool_dispute_changes = reptool_dispute_changes.filter( (x)-> return x != undefined )
 
   window.close_modal = () ->
     $('#confirmation-modal').modal('toggle')
@@ -206,6 +218,7 @@ $ ->
     error_header = '<h4>Cannot ' + list_action + ' the following Reptool Classification disputes <h4> '
     selected_rows.each ()->
       row = $(this).closest('tr')
+      selected_rows = $('.col-select-all input:checked')
       data = row.find('.col-bulk-dispute').text()
       if !isEmpty(data)
         error_message = data + ': '
@@ -546,15 +559,15 @@ $ ->
     set_row_text(e, this)
     e.stopPropagation()
 
-  $(document).ajaxStop ()->
-    # Once all ajax calls have been completed, hide the  on page loader svg
-    $('.ajax-message-div').hide()
-
+  $(document).bind( "ajaxStart", () ->
+    console.log 'in'
+    $('.ajax-message-div').css('display','flex')
+  )
   $(document).on 'click', '#get-rep-data', (e) ->
     e.preventDefault()
     search_items = []
     rows = $('.research-table tbody tr')
-    headers = { 'Token': $('input[name="token"]').val(),'Xmlrpc-Token': $('input[name="xml_token"]').val() };
+    headers = { 'Token': $('input[name="token"]').val(),'Xmlrpc-Token': $('input[name="xml_token"]').val() }
 
     $('.col-bulk-dispute').each ( ) ->
       text = $(this).text()
@@ -566,7 +579,7 @@ $ ->
       row = rows[i]
 
       if !isEmpty(item)
-        $('.ajax-message-div').css('display':'flex')
+        $('.ajax-message-div').css('display', 'flex')
         # for each search item, call a promise to get the data. If success, the first then runs, setting the data in the rows.
         # if it fails, the secon runs, catching the error
         new get_reptool(item, headers)
