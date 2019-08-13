@@ -1,17 +1,25 @@
 
 $ ->
+
+
   completed_counter = 0
   $(document).bind(
+    ###
+      This controls the show/hide of the loading wheel depending on if all ajax calls have been completed.
+      There were issues with using ajaxStop, but this works
+    ###
     ajaxStart: () ->
       $('.ajax-message-div').css('display', 'flex')
     ajaxComplete: () ->
       completed_counter++
-      selected_rows = $('.col-select-all input:checked').length * 4 - 1
+      selected_rows = $('.col-select-all input:checked').length * 4 - 4
+      console.log completed_counter, selected_rows
       if completed_counter == selected_rows
         $('.ajax-message-div').hide()
   )
 
   $(document).on 'click', '#clear-all-actions', (e) ->
+    #this clears actions from every row
     e.preventDefault()
     selected_rows = $('.col-select-all input:checked')
     $( selected_rows ).each ()->
@@ -20,6 +28,7 @@ $ ->
       $( row ).find('.col-clear-actions').empty()
 
   $(document).on 'click', '.row-action-clear', (e) ->
+    #This removes all actions from a single row
     e.preventDefault()
     { target } = e
     row = $(target).closest('tr')
@@ -29,6 +38,7 @@ $ ->
     submit_rep_check()
 
   $(document).on 'click', '.col-actions .col-tag', (e) ->
+    # This handles deleting individual actions from an action column and reformatting the div it lives in
     { target } = e
     action = $(target).text()
     action_p = $(target).closest('p')
@@ -43,14 +53,14 @@ $ ->
     $(action_p).html(col_dialog)
 
   $(document).on 'change', '#select-all-bulk', (e) ->
-# handles selection of all checkboxes in quicklookup table
+    # handles selection of all checkboxes in quicklookup table
     e_val = e.currentTarget.checked
     select_cols = $('.col-select-all input')
     for col in select_cols
       $(col).prop('checked', e_val)
 
   $(document).on 'change', '.col-select-all input', (e) ->
-# handles selection of sindlge checkboxes in quicklookup table
+    # handles selection of sindlge checkboxes in quicklookup table
     select_cols = $('.col-select-all input')
     select_vals = []
     for col in select_cols
@@ -59,6 +69,7 @@ $ ->
     $('#select-all-bulk').prop('checked', bulk_value)
 
   $(document).on 'change', '.adjust_reptool_checkbox, .status_bl', () ->
+#    depending on what radio button is selected, the available actions in the reptool dropdown will change
     submit_btn = $('#reptool_entries_bl_dropdown .dropdown-submit-button')
     class_bl = $('.status_bl:checked').val().replace('reptool-', '')
 
@@ -86,6 +97,7 @@ $ ->
 
 
   window.confirm_rep_changes = () ->
+    #  confirm actions to be taken, data is prepared and  final submission of disputes to be made
     confirmation_rows = $('#confirmation-modal tbody').find('tr')
     comment = $('.confirm-rep-input').val()
     reptool_dispute_changes = []
@@ -194,8 +206,8 @@ $ ->
       build_checkbox_list(wlbl_options, list, type)
 
   window.build_checkbox_list = (arr, list, type) ->
-# the checkbox list for the dropdown is built here when the dropdown is first opened
-# because I don't want to type the same html element over and over
+  # the checkbox list for the dropdown is built here when the dropdown is first opened
+  # because I don't want to type the same html element over and over
     for opt in arr
       checkbox =
         '<li> <label>' +
@@ -204,13 +216,15 @@ $ ->
       $(list).append(checkbox)
 
   window.set_action_wlbl_col = () ->
-    selected_rows = $('.col-select-all input:checked')
     $('#error_modal').dialog()
-    $( '#error_modal .modal-body' ).empty()
+    $('#error_modal .modal-body' ).empty()
     $('#error_modal').dialog( "destroy" )
+
+    selected_rows = $('.col-select-all input:checked')
     list_action = $('.wlbl-radio-add:checked').val()
     list_class = '.' + list_action
     action_desc = 'Add to: '
+
     if list_action == 'remove'
       action_desc = 'Remove from: '
     checked_bl = $('.adjust_wlbl_checkbox:checked').map( () -> return $(this).val() ).get()
@@ -220,6 +234,7 @@ $ ->
       row = $(this).closest('tr')
       selected_rows = $('.col-select-all input:checked')
       data = row.find('.col-bulk-dispute').text()
+
       if !isEmpty(data)
         error_message = data + ': '
         action_col = row.find('.col-actions')
@@ -242,6 +257,7 @@ $ ->
         check_list = col_tag_format(check_list_array)
         col_dialog = "<p class='wlbl-action-col " +  list_action + "' data='" + check_list_array + "'>" + action_desc + check_list + "<p>"
         delete_button = '<button class="clear-action-button row-action-clear"></button>'
+
         if error_message.endsWith(', ')
           error_message = error_message.slice(0, error_message.length - 2);
           error_html = '<div>' + error_message + '<div>'
@@ -567,7 +583,7 @@ $ ->
     e.preventDefault()
     search_items = []
     rows = $('.research-table tbody tr')
-    headers = { 'Token': $('input[name="token"]').val(),'Xmlrpc-Token': $('input[name="xml_token"]').val() }
+    headers =  'Token': $('input[name="token"]').val(),'Xmlrpc-Token': $('input[name="xml_token"]').val()
 
     $('.col-bulk-dispute').each ( ) ->
       text = $(this).text()
@@ -595,6 +611,66 @@ $ ->
           .then( set_wrbs.bind( null, item, row) )
           .then null, (err) -> console.log err
 
+
+
+
+
+
+  window.get_reptool = (item, headers) ->
+    data = {'ip_uris':[item]}
+    $.ajax(
+      url: '/escalations/api/v1/escalations/webrep/disputes/bulk_reptool_get_info_for_form'
+      method: 'POST'
+      data: data
+      headers: headers
+      success: (response) ->
+        return response
+      error: (response) ->
+        return response
+    )
+
+  window.get_wlbl = (item, headers) ->
+    data = {'entry': item}
+    $.ajax(
+      url: '/escalations/api/v1/escalations/webrep/disputes/rule_ui_wlbl_get_info_for_form'
+      method: 'GET'
+      headers: headers
+      data: data
+      dataType: 'json'
+      success: (response) ->
+        return response
+      error: (response) ->
+        return response
+    )
+
+  window.get_wrbs = (item, headers) ->
+    data = {'uri': item}
+    $.ajax(
+      url: '/escalations/api/v1/escalations/webrep/disputes/wbrs_info'
+      method: 'GET'
+      headers: headers
+      data: data
+      dataType: 'json'
+      success: (response) ->
+        return response
+      error: (response) ->
+        return response
+    )
+
+  window.get_cat = (item, headers) ->
+    data = {'uri': item}
+    $.ajax(
+      url: '/escalations/api/v1/escalations/webcat/complaints/uri_cat_info'
+      method: 'GET'
+      headers: headers
+      data: data
+      dataType: 'json'
+      success: (response) ->
+        return response
+      error: (response) ->
+        return response
+    )
+
   window.set_reptool = ( item, row, data) ->
     { classification } = JSON.parse(data)[0]
     col_reptool = $(row).children('.col-reptool-class')
@@ -610,7 +686,7 @@ $ ->
     { data } = JSON.parse(data)
     col_wlbl = $(row).children('.col-wlbl')
 
-    if data.length > 1
+    if data.length
       data = data.join(', ')
     col_wlbl.text( data )
 
@@ -641,58 +717,3 @@ $ ->
       col_wbrs.text( score )
     else
       col_wbrs.text( '0.0' )
-
-
-  window.get_reptool = (item, headers) ->
-    data = {'ip_uris':[item]}
-    $.ajax(
-      url: '/escalations/api/v1/escalations/webrep/disputes/bulk_reptool_get_info_for_form'
-      method: 'POST'
-      data: data
-      headers: headers
-      success: (response) ->
-        return response
-      error: (response) ->
-        return response
-    )
-
-  window.get_wlbl = (item, headers) ->
-    data = {'entry': item}
-    $.ajax(
-      url: '/escalations/api/v1/escalations/webrep/disputes/rule_ui_wlbl_get_info_for_form'
-      method: 'GET'
-      headers: headers
-      data: data
-      dataType: 'json'
-      success: (response) ->
-        return response
-      error: (response) ->
-        return response
-    )
-  window.get_wrbs = (item, headers) ->
-    data = {'uri': item}
-    $.ajax(
-      url: '/escalations/api/v1/escalations/webrep/disputes/wbrs_info'
-      method: 'GET'
-      headers: headers
-      data: data
-      dataType: 'json'
-      success: (response) ->
-        return response
-      error: (response) ->
-        return response
-    )
-
-  window.get_cat = (item, headers) ->
-    data = {'uri': item}
-    $.ajax(
-      url: '/escalations/api/v1/escalations/webcat/complaints/uri_cat_info'
-      method: 'GET'
-      headers: headers
-      data: data
-      dataType: 'json'
-      success: (response) ->
-        return response
-      error: (response) ->
-        return response
-    )
