@@ -88,7 +88,7 @@ class Ability
       can [:delete], [FileRepComment]
 
       can :take, FileReputationDispute do |filerep_dispute|
-        filerep_dispute.user_id == User.vrtincoming.id
+        filerep_dispute.user_id == User.vrtincoming&.id
       end
 
       can :return, FileReputationDispute do |filerep_dispute|

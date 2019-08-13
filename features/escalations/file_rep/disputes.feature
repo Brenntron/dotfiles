@@ -6,7 +6,7 @@ Feature: Disputes
   @javascript
   Scenario: a user visits their profile page and edits their ThreatGrid and Sandbox API Keys
     Given a user with role "admin" exists and is logged in
-    And I go to "/users/1"
+    And I go to "/escalations/users/1"
     When I fill in "user_threatgrid_api_key" with "Let's go."
     And I fill in "user_sandbox_api_key" with "One more time."
     And I click ".btn-success"

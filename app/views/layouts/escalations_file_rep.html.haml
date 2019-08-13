@@ -118,10 +118,10 @@
             .form-group.text-center
               %button#top_banner_bugzilla_login_button.panel-button.primary{'aria-label': 'Login', onclick: 'top_banner_bugzilla_login(); return false;'} Login
 
-          %a{href: "/users/#{current_user[:id]}"}
+          %a{href: "/escalations/users/#{current_user[:id]}"}
             Login settings
 
-      %a.nav-username{href: "/users/#{current_user[:id]}"}
+      %a.nav-username{href: "/escalations/users/#{current_user[:id]}"}
         = current_user[:display_name]
 
 
