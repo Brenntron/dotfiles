@@ -78,25 +78,29 @@ $ ->
     comment = $('.confirm-rep-input').val()
     reptool_dispute_changes = []
     wlbl_dispute_changes = []
+
     $( confirmation_rows ).each ->
       dispute = $( this ).find('td').first().text()
       action_col = $( this ).find('td').last().children()
+
       for action in action_col
         classList = $(action).attr('class').split(/\s+/)
         def_list = []
         action_taken = classList.filter( (el)-> ['add', 'remove', 'drop'].includes(el)).join()
         $(action).find('.col-tag').each -> def_list.push( $(this).text() )
-        if $(action).hasClass('reptool-action-col')
 
+        if $(action).hasClass('reptool-action-col')
           if typeof $(action).attr('class') == 'string'
             submission_action = classList.filter( ( class_list )-> return class_list.endsWith('-submission')).join().replace('-submission','')
 
           if reptool_dispute_changes.length
             existing_dispute = false
+
             for i in [0...reptool_dispute_changes.length]
               { action, classifications } = reptool_dispute_changes[i]
               class_check = JSON.stringify(classifications) == JSON.stringify(def_list)
               action_check = action == action_taken
+
               if action_check && class_check
                 existing_dispute = true
                 reptool_dispute_changes[i].entries.push(dispute)
@@ -118,10 +122,13 @@ $ ->
               comment: comment
             }
             reptool_dispute_changes.push(data)
+
         else
           wlbl_existing_dispute = false
+
           if wlbl_dispute_changes.length
             wlbl_existing_dispute = false
+
             for i in [0...wlbl_dispute_changes.length]
               { action, classifications } = wlbl_dispute_changes[i]
               class_check = JSON.stringify(classifications) == JSON.stringify(def_list)
@@ -146,13 +153,9 @@ $ ->
                 comment: comment
               }
               wlbl_dispute_changes.push(data)
+
     wlbl_dispute_changes = wlbl_dispute_changes.filter( (x)-> return x != undefined )
-    reptool_dispute_changes = reptool_dispute_changes.filter( (x)-> return x != undefined )
-    for dispute in wlbl_dispute_changes
-        button_tag = false
-        toolbar_adjust_reptool_bl_button_research(button_tag, dispute)
-    for dispute in reptool_dispute_changes
-        submit_bulk_reptool(dispute)
+    reptool_dispute_changes = reptool_dispute_changes.filter( (x)-> return x != undefined )riL
 
   window.close_modal = () ->
     $('#confirmation-modal').modal('toggle')
