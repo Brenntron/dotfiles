@@ -3,8 +3,21 @@ class ComplaintEntryScreenshot < ApplicationRecord
 
   def grab_screenshot
     begin
-      options = Selenium::WebDriver::Firefox::Options.new(args: ['-headless'])
-      driver = Selenium::WebDriver.for(:firefox, options: options)
+
+      options = Selenium::WebDriver::Chrome::Options.new
+      options.add_argument('--ignore-certificate-errors')
+      options.add_argument('--disable-popup-blocking')
+      options.add_argument('--disable-translate')
+      options.add_argument('--disable-crash-reporter')
+      options.add_argument('--headless')
+      # options.add_argument('--cast-initial-screen-width=800')
+      # options.add_argument('--cast-initial-screen-height=600')
+      options.add_argument("--window-size=800,600")
+      # options to consider
+      # --user-data-dir     Directory where the browser stores the user profile.
+      # --profile-directory Selects directory of profile to associate with the first browser launched.
+      # more are here https://peter.sh/experiments/chromium-command-line-switches/
+      driver = Selenium::WebDriver.for :chrome, options: options
 
       raise Exception.new('Cant start Selenium driver') if driver.nil?
 
@@ -12,14 +25,12 @@ class ComplaintEntryScreenshot < ApplicationRecord
       host_lookup = self.complaint_entry.hostlookup
       url = host_lookup.match(/^(http|https):\/\//) ? host_lookup : "http://#{host_lookup}"
       driver.navigate.to url
-
-      #set the size to something respectable
-      driver.manage.window.resize_to(800, 800)
-
+      
       #save the screenshot hopefully in the database so we dont have to worry about disk usage
       self.update(screenshot: driver.screenshot_as(:png), error_message: "")
 
     rescue Exception => ex
+      driver.close unless driver.nil?
       puts ("oops there was a screen capture error")
       puts ("#{ex.class}: #{ex.message}")
       file_data = ""
