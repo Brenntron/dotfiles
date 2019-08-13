@@ -72,38 +72,87 @@ $ ->
     else
       submit_btn.prop('disabled', true)
 
+
   window.confirm_rep_changes = () ->
     confirmation_rows = $('#confirmation-modal tbody').find('tr')
     comment = $('.confirm-rep-input').val()
-    dispute_changes = []
-
+    reptool_dispute_changes = []
+    wlbl_dispute_changes = []
     $( confirmation_rows ).each ->
       dispute = $( this ).find('td').first().text()
       action_col = $( this ).find('td').last().children()
-
       for action in action_col
-        if typeof $(action).attr('class') == 'string'
-          classList = $(action).attr('class').split(/\s+/)
+        classList = $(action).attr('class').split(/\s+/)
         def_list = []
-        action_list = ['add', 'remove', 'drop']
-        action_taken = classList.filter( (el)-> action_list.includes(el)).join()
+        action_taken = classList.filter( (el)-> ['add', 'remove', 'drop'].includes(el)).join()
         $(action).find('.col-tag').each -> def_list.push( $(this).text() )
+        if $(action).hasClass('reptool-action-col')
 
-        data = {
-          action: action_taken,
-          comment: comment
-        }
+          if typeof $(action).attr('class') == 'string'
+            submission_action = classList.filter( ( class_list )-> return class_list.endsWith('-submission')).join().replace('-submission','')
 
-        if classList.includes('wlbl-action-col')
-          data.dispute_type = 'wlbl'
-          data.url = dispute
-          data.targt_list = def_list
+          if reptool_dispute_changes.length
+            existing_dispute = false
+            for i in [0...reptool_dispute_changes.length]
+              { action, classifications } = reptool_dispute_changes[i]
+              class_check = JSON.stringify(classifications) == JSON.stringify(def_list)
+              action_check = action == action_taken
+              if action_check && class_check
+                existing_dispute = true
+                reptool_dispute_changes[i].entries.push(dispute)
+
+            if !existing_dispute
+              data = {
+                entries: [dispute]
+                classifications: def_list
+                classification_action: action_taken
+                submission_action: submission_action
+                comment: comment
+              }
+              reptool_dispute_changes.push(data)
+          else
+            data = {
+              entries: [dispute]
+              classifications: def_list
+              submission_action: submission_action
+              comment: comment
+            }
+            reptool_dispute_changes.push(data)
         else
-          data.dispute_type = 'reptool'
-          data.target = dispute
-          data.classifications = def_list
+          wlbl_existing_dispute = false
+          if wlbl_dispute_changes.length
+            wlbl_existing_dispute = false
+            for i in [0...wlbl_dispute_changes.length]
+              { action, classifications } = wlbl_dispute_changes[i]
+              class_check = JSON.stringify(classifications) == JSON.stringify(def_list)
+              action_check = action == action_taken
+              if action_check && class_check
+                wlbl_existing_dispute = true
+                wlbl_dispute_changes[i].entries.push(dispute)
 
-        dispute_changes.push(data)
+            if !wlbl_existing_dispute
+              data = {
+                action:  action_taken
+                entries: [dispute]
+                classifications: def_list
+                comment: comment
+              }
+              wlbl_dispute_changes.push(data)
+          else
+              data = {
+                action:  action_taken
+                entries: [dispute]
+                classifications: def_list
+                comment: comment
+              }
+              wlbl_dispute_changes.push(data)
+    wlbl_dispute_changes = wlbl_dispute_changes.filter( (x)-> return x != undefined )
+    reptool_dispute_changes = reptool_dispute_changes.filter( (x)-> return x != undefined )
+    for dispute in wlbl_dispute_changes
+        button_tag = false
+        toolbar_adjust_reptool_bl_button_research(button_tag, dispute)
+    for dispute in reptool_dispute_changes
+        submit_bulk_reptool(dispute)
 
   window.close_modal = () ->
     $('#confirmation-modal').modal('toggle')
@@ -112,9 +161,11 @@ $ ->
     dropdown = $('#reptool_entries_bl_dropdown')
     list = $(dropdown).find('ul')
     type = 'reptool'
+
     reptool_options = [ "attackers", "bogon", "bots", "cnc", "cryptomining",
       "dga", "exploit kit", "malware", "open_proxy", "open_relay",
       "phishing", "response", "spam", "suspicious", "tor_exit_node"]
+
     if !$(list).has('label').length
       build_checkbox_list(reptool_options, list, type)
 
@@ -189,7 +240,6 @@ $ ->
       $( '.error_modal' ).dialog(
         position:
           my: "right",
-
           at: "top+15%",
           of: window
       )
@@ -202,21 +252,39 @@ $ ->
 
   window.submit_quick_lookup = () ->
     $('#confirmation-modal tbody').empty()
-    rows = $( '.col-select-all' ).closest('tr')
     $('#confirmation-modal').modal()
+
+    rows = $( '.col-select-all' ).closest('tr')
     confirmation_dialog = []
+
     $(rows).each ->
       new_data = $(this).find('.col-bulk-dispute').text()
+      actions_col = $( this ).find('.col-actions')
+
+      existing_reptool = ''
+      if actions_col.attr('reptool_classes') != undefined
+        existing_reptool = 'reptool_classes =' + actions_col.attr('reptool_classes')
+
       if !isEmpty(new_data) && new_data != undefined
-        children = $( this ).find('.col-actions').children()
+        actions_col = $( this ).find('.col-actions')
+        children = actions_col.children()
+        existing_actions = actions_col
         if children.length
-          html = '<tr> <td>' + new_data + '</td> <td>'
+
+          html =
+            '<tr> <td>' +
+            new_data +
+            '</td> <td>'
+
           for child in children
             classes = $(child).attr("class")
             if !isEmpty(classes) && classes != undefined
-              html +=  '<div class="' + classes + '">' + $(child).html() + '</div>'
+              html +=  '<div ' + existing_reptool + ' class="' + classes + '">' + $(child).html() + '</div>'
+
           html += '</td> </tr>'
+
           confirmation_dialog.push( html )
+
     $('#confirmation-modal tbody').append(confirmation_dialog)
 
   window.col_tag_format = (array) ->
@@ -265,13 +333,18 @@ $ ->
       when 'maintain'
         reptool_dialog = reptool_add.charAt(0).toUpperCase() + reptool_add.slice(1)
         status_string = reptool_dialog + ' classifications: '
+        status_class = 'reptool-maintain-submission'
       when 'drop'
         status_string = 'Drop all classifications (set entry to EXPIRED)'
         reptool_add = 'drop'
         reptool_class = 'drop'
         check_list = ''
+        status_class = 'reptool-drop-submission'
       when 'override'
         status_string = 'Add classifications: '
+        status_class = 'reptool-override-submission'
+        reptool_add  = $( '.reptool-add:checked' ).val()
+        reptool_class = reptool_add
 
     error_array = []
     error_header = '<h4>Cannot ' + reptool_add + ' the following Reptool Classification disputes <h4> '
@@ -282,15 +355,17 @@ $ ->
       action_col = row.find('.col-actions')
       existing_reptool = row.find('.col-reptool-class:not(.missing-data)')
       rep_list = []
+      actions = $(this).closest('tr').find('.col-actions')
       existing_reptool.each () ->
-        actions = $(this).closest('tr').find('.col-actions')
         $(actions).children().each ->
           action_data = $(this).attr('data')
           if action_data
             rep_list = action_data.trim().split(',')
 
-        existing_actions = []
         rep_list = this.innerText.split(',')
+        if class_reptool == 'maintain' && existing_reptool.length && !isEmpty(data)
+          reptool_classes =  $(existing_reptool).text()
+          $(action_col).attr( 'reptool_classes', reptool_classes )
 
       error_message = data + ': '
       if !isEmpty(data)
@@ -337,7 +412,7 @@ $ ->
           error_html = '<div>' + error_message + '<div>'
           error_array.push(error_html)
 
-        col_dialog = "<p class='" + reptool_class + " reptool-action-col' data=' " + check_list + " '>" + status_string + col_tag_format(check_list) + "<p>"
+        col_dialog = "<p class='" + reptool_class + ' ' + status_class + " reptool-action-col' data=' " + check_list + " '>" + status_string + col_tag_format(check_list) + "<p>"
         drop_check = reptool_add  == 'drop' && existing_reptool.length
         if check_list.length || drop_check
           clear_col.show()

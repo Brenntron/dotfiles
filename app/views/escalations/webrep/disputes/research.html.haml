@@ -140,7 +140,7 @@
                     %textarea.dropdown-comment.confirm-rep-input.comment-input
                   .modal-footer
                     .button-group
-                      %button.primary{value: "submit", id:'confirm-rep-changes', onclick: 'confirm_rep_changes()' } Confirm Reputation Changes
+                      %button.primary{value: "submit", id:'confirm-rep-changes', onclick: 'confirm_rep_changes(); return false;' } Confirm Reputation Changes
                       %button{title: "Cancel", class: "secondary", onclick: "close_modal(); return false;"} Cancel
 
 
@@ -210,7 +210,7 @@
             .dropdown-menu.toolbar-dropdown#add_to_ticket_dropdown{'aria-labelledby': 'add-to-ticket-button'}
               Dropdown information
           %span.dropdown
-            %button#wlbl_entries_button.toolbar-button.adjust-wlbl-button.dropdown-toggle.esc-tooltipped.dropdown-button-margin-left{title: 'Adjust WL/BL', 'data-toggle': 'dropdown', 'aria-haspopup': 'true', 'aria-expanded': 'false', onclick: 'bulk_get_current_wlbl("research")'}
+            %button#wlbl_entries_button.toolbar-button.adjust-wlbl-button.dropdown-toggle.esc-tooltipped.dropdown-button-margin-left{title: 'Adjust WL/BL', 'data-toggle': 'dropdown', 'aria-haspopup': 'true', 'aria-expanded': 'false', onclick: 'window.bulk_get_current_wlbl("research")'}
               %span.toolbar-button-text Adjust WBRS WL/BL
             .dropdown-menu.toolbar-dropdown#wlbl_adjust_entries{'aria-labelledby': 'wlbl_entries_button'}
               = form_for :wlbl, html: {class: 'adjust-wlbl-form'} do |wlbl_form|

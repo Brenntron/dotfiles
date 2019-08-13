@@ -24,10 +24,8 @@ $ ->
       $('#communication-tab-link').tab('show')
     return
 
-->
-
+$ ->
   $('#edit-dispute-entry-button').click ->
-
     if ($('.dispute_check_box:checked').length > 0)
       $('.edit-entries-buttons').removeClass('hidden')
       $('.dispute_check_box').each ->
