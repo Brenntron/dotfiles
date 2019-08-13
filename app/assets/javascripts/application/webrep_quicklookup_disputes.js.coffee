@@ -17,6 +17,41 @@ $ ->
       if completed_counter == selected_rows
         $('.ajax-message-div').hide()
   )
+  window.isEmpty = (item) ->
+# function to check whether or not objects and strings are empty, more variable types can be added as needed
+    type = typeof item
+    switch(type)
+      when 'object'
+        return !Object.keys(item).length
+      when 'string'
+        return /^\s*$/.test(item)
+
+  window.close_modal = () ->
+    $('#confirmation-modal').modal('toggle')
+
+  window.build_checkbox_list = (arr, list, type) ->
+# the checkbox list for the dropdown is built here when the dropdown is first opened
+# because I don't want to type the same html element over and over
+    for opt in arr
+      checkbox =
+        '<li> <label>' +
+          '<input name="' + opt + '" value="' + opt + '"type ="checkbox" class="adjust_' + type + '_checkbox"/>'+ opt +
+          '</label> </li>'
+      $(list).append(checkbox)
+
+  window.col_tag_format = (array) ->
+    if typeof array == 'string'
+      array = array.split(',')
+    check_list_array = []
+    check_list = ''
+    for val in array
+      check_name = "<span class='col-tag'>" + val + "</span> "
+      check_list_array.push(check_name)
+    if check_list_array.length == 2
+      check_list = check_list_array.join(' and ')
+    else
+      check_list = check_list_array.join(', ').replace(/, ([^,]*)$/, ', and $1')
+    return check_list
 
   $(document).on 'click', '#clear-all-actions', (e) ->
     #this clears actions from every row
@@ -98,6 +133,7 @@ $ ->
 
   window.confirm_rep_changes = () ->
     #  confirm actions to be taken, data is prepared and  final submission of disputes to be made
+    # this is going to need to be changed and refactored
     confirmation_rows = $('#confirmation-modal tbody').find('tr')
     comment = $('.confirm-rep-input').val()
     reptool_dispute_changes = []
@@ -181,9 +217,6 @@ $ ->
     wlbl_dispute_changes = wlbl_dispute_changes.filter( (x)-> return x != undefined )
     reptool_dispute_changes = reptool_dispute_changes.filter( (x)-> return x != undefined )
 
-  window.close_modal = () ->
-    $('#confirmation-modal').modal('toggle')
-
   window.open_adjust_reptool = () ->
     dropdown = $('#reptool_entries_bl_dropdown')
     list = $(dropdown).find('ul')
@@ -205,15 +238,6 @@ $ ->
     if !$(list).has('label').length
       build_checkbox_list(wlbl_options, list, type)
 
-  window.build_checkbox_list = (arr, list, type) ->
-  # the checkbox list for the dropdown is built here when the dropdown is first opened
-  # because I don't want to type the same html element over and over
-    for opt in arr
-      checkbox =
-        '<li> <label>' +
-          '<input name="' + opt + '" value="' + opt + '"type ="checkbox" class="adjust_' + type + '_checkbox"/>'+ opt +
-          '</label> </li>'
-      $(list).append(checkbox)
 
   window.set_action_wlbl_col = () ->
     $('#error_modal').dialog()
@@ -318,20 +342,6 @@ $ ->
           confirmation_dialog.push( html )
 
     $('#confirmation-modal tbody').append(confirmation_dialog)
-
-  window.col_tag_format = (array) ->
-    if typeof array == 'string'
-      array = array.split(',')
-    check_list_array = []
-    check_list = ''
-    for val in array
-      check_name = "<span class='col-tag'>" + val + "</span> "
-      check_list_array.push(check_name)
-    if check_list_array.length == 2
-      check_list = check_list_array.join(' and ')
-    else
-      check_list = check_list_array.join(', ').replace(/, ([^,]*)$/, ', and $1')
-    return check_list
 
   window.submit_rep_check = () ->
     selected_rows = $( '.col-select-all input:checked' )
@@ -458,15 +468,6 @@ $ ->
       $( '#error_modal' ).dialog().position('top')
       $( '#error_modal .modal-header' ).html( error_header )
       $( '#error_modal .modal-body' ).append(error_array)
-
-  window.isEmpty = (item) ->
-# function to check whether or not objects and strings are empty, more variable types can be added as needed
-    type = typeof item
-    switch(type)
-      when 'object'
-        return !Object.keys(item).length
-      when 'string'
-        return /^\s*$/.test(item)
 
   window.buildRow = ( text_list, parent_row) ->
 # build and append new rows to the HTML in quick lookup
@@ -610,10 +611,6 @@ $ ->
         new get_wrbs(item, headers)
           .then( set_wrbs.bind( null, item, row) )
           .then null, (err) -> console.log err
-
-
-
-
 
 
   window.get_reptool = (item, headers) ->
