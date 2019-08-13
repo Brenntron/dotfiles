@@ -1299,6 +1299,11 @@ class Dispute < ApplicationRecord
       end
 
       ticket_user = result.user.cvs_username
+      if !result.dispute_emails.present?
+        dispute_emails_count = 0
+      else
+        dispute_emails_count = result.dispute_emails&.count
+      end
       report_data[:table_data] << {:case_number => result.id,
                       :case_link => "<a href='/escalations/webrep/disputes/#{result.id}'>#{result.case_id_str}</a>",
                       :status => result.status,
@@ -1309,8 +1314,8 @@ class Dispute < ApplicationRecord
                       :last_comment => last_comment_preview,
                       :owner => ticket_user,
                       :priority => result.priority,
-                      :last_comment_date => result.dispute_comments&.last&.updated_at&.strftime("%FT%T"),
-                      :comment_count => result.dispute_comments&.count
+                      :last_email_date => result.dispute_emails&.last&.updated_at&.strftime("%FT%T"),
+                      :total_email_count => dispute_emails_count
       }
     end
 
@@ -1359,6 +1364,12 @@ class Dispute < ApplicationRecord
       entry_preview.to_s.inspect
       ticket_user = result.user.cvs_username
 
+      if !result.dispute_emails.present?
+        dispute_emails_count = 0
+      else
+        dispute_emails_count = result.dispute_emails&.count
+      end
+
       report_data[:table_data] << {:case_number => result.id,
                       :case_link => "<a href='/escalations/webrep/disputes/#{result.id}'>#{result.case_id_str}</a>",
                       # :dispute => result.dispute_entries.first.hostlookup,
@@ -1369,7 +1380,9 @@ class Dispute < ApplicationRecord
                       :submitter_type => result.submitter_type.downcase,
                       :submission_type => result.submission_type.upcase,
                       :priority => result.priority,
-                      :owner => ticket_user
+                      :owner => ticket_user,
+                      :last_email_date => result.dispute_emails&.last&.updated_at&.strftime("%FT%T"),
+                      :total_email_count => dispute_emails_count
       }
     end
 
@@ -1752,6 +1765,21 @@ class Dispute < ApplicationRecord
       end
     end
 
+    rulehit_types.reject! {|k, v| %w"dotq
+      alx_cln
+      tuse
+      a500
+      deli
+      csdw
+      suwl
+      ciwl
+      vsvd
+      wlh
+      wlm
+      wlw".include? k } # According to Jayme, hit counts for these rules can be omitted (https://jira.vrt.sourcefire.com/browse/WEB-5082)
+
+    rulehit_types = Hash[rulehit_types.sort_by {|k,v| v}[0..24].reverse] # Limit rule hits to the top 25
+
     final_data = {}
     final_data[:rules] = []
     final_data[:rule_hits] = []
@@ -1760,7 +1788,6 @@ class Dispute < ApplicationRecord
       final_data[:rules] << k
       final_data[:rule_hits] << v
     end
-
 
     final_data
 

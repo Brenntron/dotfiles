@@ -31,7 +31,8 @@ class ComplaintEntryScreenshot < ApplicationRecord
       Rails.logger.error ("oops there was a screen capture error")
       Rails.logger.error ("#{ex.class}: #{ex.message}")
       file_data = File.open("app/assets/images/failed_screenshot.jpg").read()
-      self.update(screenshot: file_data, error_message: ex.message)
+      self.update(screenshot: file_data, error_message: ex.message.truncate(1000000))
+
     ensure # this is a good practice to get into so that the driver will always exit, even if there is an error
       unless driver.nil?
         driver.quit()

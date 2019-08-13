@@ -1,11 +1,13 @@
 class Escalations::Webcat::ComplaintEntriesController < Escalations::WebcatController
 
-
-
   def index
     respond_to do |format|
       format.html
-      format.json { render json: ComplaintEntryDatatable.new(view_context) }
+      format.json do
+        render json: ComplaintEntryDatatable.new(params,
+                                                 initialize_params,
+                                                 user: current_user)
+      end
     end
   end
 
@@ -14,29 +16,6 @@ class Escalations::Webcat::ComplaintEntriesController < Escalations::WebcatContr
   end
 
   def update
-  end
-
-  def rules
-  end
-
-  def reports
-  end
-
-  def show_multiple
-    ids = params["selected_ids"]&.split(',') || nil
-    @complaints = Complaint.where(id:ids)
-  end
-  def advanced_search
-
-  end
-
-  def named_search
-  end
-
-  def standard_search
-  end
-
-  def contains_search
   end
 
   def serve_image
@@ -53,10 +32,25 @@ class Escalations::Webcat::ComplaintEntriesController < Escalations::WebcatContr
 
   private
 
-
   def index_params
     params.fetch(:dispute, {}).permit(:customer_name, :customer_email, :customer_company_name,
                                       :status, :resolution, :subject,
                                       :value)
+  end
+
+  def datatables_search_params
+    params.fetch(:search, {value: ''}).permit(:value)
+  end
+
+  def robust_search_params
+    params.permit(:search, :search_type, :search_name)
+  end
+
+  def search_conditions
+    params.has_key?('search_conditions') ? params.require('search_conditions').permit! : nil
+  end
+
+  def initialize_params
+    robust_search_params.merge(datatables_search_params).merge('search_conditions' => search_conditions)
   end
 end

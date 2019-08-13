@@ -315,9 +315,6 @@ window.domain_whois = (IP_Domain) ->
       notice_html = "<p>Something went wrong: #{response.responseText}</p>"
   , this)
 
-window.filterByStatus = (filter) ->
-  populate_webcat_index_table(filter)
-
 window.updatePending = (id,row_id) ->
   prefix = $('#complaint_prefix_'+id)[0].value
   status = $('[name=resolution_review_'+id+']:checked').val()
@@ -1412,37 +1409,6 @@ window.click_table_buttons = (complaint_table, button)->
     if verifyMasterSubmit() == true
       $('#master-submit').prop('disabled', false)
 
-window.populate_webcat_index_table = (filter) ->
-  if !filter
-    filter = "NEW"
-
-  if $('body.index-action').length
-    self_review = $('#self_review')[0].checked
-    headers = {'Token': $('input[name="token"]').val(), 'Xmlrpc-Token': $('input[name="xml_token"]').val()}
-    $.ajax(
-      url: '/escalations/api/v1/escalations/webcat/complaint_entries?filter_by='+filter+'&self_review='+self_review
-      method: 'GET'
-      headers: headers
-      success: (response) ->
-
-        json = $.parseJSON(response)
-        if json.error
-          notice_html = "<p>Something went wrong: #{json.error}</p>"
-          alert(json.error)
-        else
-          datatable = $('#complaints-index').DataTable()
-          datatable.clear();
-
-          datatable.rows.add(json.data);
-          datatable.draw();
-
-      error: (response) ->
-        notice_html = "<p>Something went wrong: #{response.responseText}</p>"
-        #$("#alert_message").addClass('alert alert-danger alert-dismissable').append(notice_html)
-        #$("#create_research_submit_wait").addClass('hidden').hide()
-        #$("#create_research_submit").show()
-    , this)
-
 window.display_preview_window = (entry) ->
 
   $('#complaint_id_x_prefix')[0].value = entry.domain
@@ -1492,23 +1458,21 @@ window.fetch_complaints = () ->
 
 
 open_selected = (selected_rows, toggle) ->
-  i = 0
-  while i < selected_rows[0].length
-    if selected_rows.data()[i].viewable == toggle
-      subdomain = ""
-      domain = ""
-      path = ""
-      if selected_rows.data()[i].subdomain
-        subdomain = selected_rows.data()[i].subdomain + "."
-      if selected_rows.data()[i].domain
-        domain = selected_rows.data()[i].domain
-      if selected_rows.data()[i].path
-        path = selected_rows.data()[i].path
-      if selected_rows.data()[i].domain
-        window.open("http://"+ subdomain + domain + path)
+  for i in selected_rows[0].length
+    { viewable, subdomain, domain, path, ip_address } = selected_rows.data()[i]
+    if viewable == toggle
+      new_subdomain = ""
+      new_domain = ""
+      new_path = ""
+      if path
+        new_path = path
+      if subdomain
+        new_subdomain = subdomain + "."
+      if domain
+        new_domain = domain
+        window.open("http://"+ new_subdomain + new_domain + new_path)
       else
         window.open("http://"+selected_rows.data()[i].ip_address)
-    i++
 
 window.open_viewable = () ->
   selected_rows = $('#complaints-index').DataTable().rows()
@@ -1591,83 +1555,6 @@ window.commit_marked = () ->
       popup_response_error(response, 'Error committing marked entries.')
   )
 
-
-window.advanced_webcat_index_table = () ->
-  complaint_save_search_format = /[!@#$%^&*()_+\-=\[\]{};':"\\|,.<>\/?]/
-  data = {
-    customer: {
-      name: $('#cat_named_search').find('input[id="name-input"]').val()
-      email: $('#cat_named_search').find('input[id="email-input"]').val()
-      company_name: $('#cat_named_search').find('input[id="company-input"]').val()
-    }
-    complaint_entries: {
-      ip_or_uri: $('#cat_named_search').find('input[id="complaint-input"]').val()
-      resolution: $('#cat_named_search').find('input[id="resolution-input"]').val()
-      category: $('#cat_named_search').find('input[id="category-input"]').val()
-      status: $('#cat_named_search').find('input[id="status-input"]').val()
-      complaint_id: $('#cat_named_search').find('input[id="complaintid-input"]').val().split(",")
-    }
-    search_type: 'advanced'
-    search_name: $('#cat_named_search').find('input[name="search_name"]').val()
-    description: $('#cat_named_search').find('input[id="desc-input"]').val()
-    channel: $('#cat_named_search').find('input[id="channel-input"]').val()
-    tags: $('#cat_named_search').find('select[id="tags-input"]').val() || []
-    submitted_older: $('#cat_named_search').find('input[id="submitted-older-input"]').val()
-    submitted_newer: $('#cat_named_search').find('input[id="submitted-newer-input"]').val()
-    modified_older: $('#cat_named_search').find('input[id="modified-older-input"]').val()
-    modified_newer: $('#cat_named_search').find('input[id="modified-newer-input"]').val()
-  }
-
-  if complaint_save_search_format.test(data.search_name) == true
-    std_msg_error('save search name error', ['Please enter a name without any special character', 'Example: !@#$%^&*()'])
-  else
-    window.populate_advanced_webcat_index_table(data)
-
-
-window.populate_advanced_webcat_index_table = (data = {}) ->
-  $('#loader-modal').modal({
-    keyboard: false
-  })
-  headers = {'Token': $('input[name="token"]').val(), 'Xmlrpc-Token': $('input[name="xml_token"]').val()}
-  $.ajax(
-    url: '/escalations/api/v1/escalations/webcat/complaint_entries'
-    method: 'GET'
-    headers: headers
-    data: data
-    data_json: JSON.stringify(data)
-    success: (response) ->
-      json = $.parseJSON(response)
-      if json.error
-        notice_html = "<p>Something went wrong: #{json.error}</p>"
-        $('#loader-modal').modal 'hide'
-        alert(json.error)
-      else
-        if json.search_name.length > 0
-          searchId = 'saved_search_' + json.search_id
-          if $('#saved-search-tbody tr#' + searchId).length == 0
-            $('#saved-search-tbody').append(complaint_named_search_tag(json.search_name, json.search_id))
-
-        $('.tickets-totals-table').trigger("click") #close open dropdowns
-        datatable = $('#complaints-index').DataTable()
-        datatable.clear();
-        datatable.rows.add(json.data);
-        datatable.draw();
-        $('#loader-modal').modal 'hide'
-
-      error: (response) ->
-        $('#loader-modal').modal 'hide'
-        std_api_error(response, "There was an error loading search results.", reload: false)
-  , this)
-
-
-window.named_webcat_index_table = (search_name) ->
-  data = {
-    search_type: 'named'
-    search_name: search_name
-  }
-  window.populate_advanced_webcat_index_table(data)
-
-
 window.load_screenshot = (img_tag, complaint_entry_id) ->
   std_msg_ajax(
     method: 'GET'
@@ -1698,7 +1585,7 @@ window.master_submit = () ->
     keyboard: false
   })
 
-  $('.nested-complaint-data-wrapper:visible').each ->
+  $('.selected + tr td.nested-complaint-data-wrapper').each ->
     entry_id = $(this).find('tr').attr('entry_id')
     row_id = $(this).find('tr').attr('row_id')
     type = $(this).find('tr').attr('type')
@@ -1706,9 +1593,11 @@ window.master_submit = () ->
     if type == 'submit_changes' && entry_id && row_id
       prefix = $(this).find("#complaint_prefix_#{entry_id}")[0].value
 
-      categories = $(this).find("#input_cat_#{entry_id}").val().toString()
-      category_name = $(this).find("#input_cat_#{entry_id}").next('.selectize-control').find('.item')
       category_names = []
+      categories = ""
+      if $(this).find("#input_cat_#{entry_id}").val()
+        categories = $(this).find("#input_cat_#{entry_id}").val().toString()
+      category_name = $(this).find("#input_cat_#{entry_id}").next('.selectize-control').find('.item')
       category_name.each ->
         category_names.push($(this).text())
       category_names = category_names.toString()
@@ -1722,6 +1611,7 @@ window.master_submit = () ->
         data.push({entry_id: entry_id, error: false, row_id: row_id, prefix: prefix, categories: categories, category_names: category_names, status: status, comment: comment, resolution_comment: resolution_comment})
       else if (categories.length == 0) && status == 'FIXED'
         data.push({entry_id, error: true, reason: 'nil_categories'})
+
 
   std_msg_ajax(
     method: 'POST'

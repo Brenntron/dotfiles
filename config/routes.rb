@@ -42,7 +42,7 @@ Rails.application.routes.draw do
           get :contains_search
         end
       end
-      resources :complaint_entries do
+      resources :complaint_entries, only: [:index, :show, :update] do
         collection do
           get :serve_image
         end
@@ -132,6 +132,10 @@ Rails.application.routes.draw do
   end #namespace :escalations
   mount RailsAdmin::Engine => '/escalations/admin', as: 'rails_admin'
   namespace :admin do
+    constraints AccessDelayedJobWeb do
+      mount DelayedJobWeb, at: "delayed_job"
+      match "/delayed_job" => DelayedJobWeb, :anchor => false, :via => [:get, :post]
+    end
     root 'home#index'
     resources :roles, except: [:show]
     resources :org_subsets, except: [:show]

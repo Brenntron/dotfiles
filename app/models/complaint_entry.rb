@@ -9,9 +9,11 @@ class ComplaintEntry < ApplicationRecord
   has_one :complaint_entry_screenshot
   has_one :complaint_entry_preload
 
-  delegate :customer_name, to: :complaint, allow_nil: true, prefix: false
+  delegate :customer_name, :customer_company_name, to: :complaint, allow_nil: true, prefix: false
   delegate :cvs_username, :display_name, to: :user, allow_nil: true, prefix: true
 
+  scope :open, -> { where.not(status: [STATUS_COMPLETED, RESOLVED]) }
+  scope :closed, -> { where(status: [STATUS_COMPLETED, RESOLVED]) }
   scope :assigned_count , -> {where(status:"ASSIGNED").count}
   scope :pending_count , -> {where(status:"PENDING").count}
   scope :new_count , -> {where(status:"NEW").count}
@@ -337,34 +339,34 @@ class ComplaintEntry < ApplicationRecord
     def capture_screenshot(uri, complaint_entry_id)
       max_wait_for_job = 15 #seconds
       begin
-        screenshot_data =  ""
-        Timeout::timeout(max_wait_for_job) do
-          screenshot_data = CapybaraSpider.low_capture("#{uri}")
-        end
-        ces = ComplaintEntryScreenshot.new
-        ces.complaint_entry_id = complaint_entry_id
-        ces.screenshot = Base64.decode64(screenshot_data)
-        ces.save!
+        #screenshot_data =  ""
+        #Timeout::timeout(max_wait_for_job) do
+        #  screenshot_data = CapybaraSpider.low_capture("#{uri}")
+        #end
+        #ces = ComplaintEntryScreenshot.new
+        #ces.complaint_entry_id = complaint_entry_id
+        #ces.screenshot = Base64.decode64(screenshot_data)
+        #ces.save!
       rescue Timeout::Error => e
         #couldnt complete in time
-        Rails.logger.error( "#{e} --- Timed out waiting for screenshot for #{uri} to finish")
-        ces = ComplaintEntryScreenshot.new
-        ces.error_message = e.message
-        ces.complaint_entry_id = complaint_entry_id
-        open("app/assets/images/failed_screenshot.jpg") do |f|
-          ces.screenshot = f.read
-        end
-        ces.save!
+        #Rails.logger.error( "#{e} --- Timed out waiting for screenshot for #{uri} to finish")
+        #ces = ComplaintEntryScreenshot.new
+        #ces.error_message = e.message
+        #ces.complaint_entry_id = complaint_entry_id
+        #open("app/assets/images/failed_screenshot.jpg") do |f|
+        #  ces.screenshot = f.read
+        #end
+        #ces.save!
       rescue Exception => e
-        Rails.logger.error("#{e.message}")
+        #Rails.logger.error("#{e.message}")
         #do nothing, it was worth a try. kittens are sad now
-        ces = ComplaintEntryScreenshot.new
-        ces.error_message = e.message
-        ces.complaint_entry_id = complaint_entry_id
-        open("app/assets/images/failed_screenshot.jpg") do |f|
-          ces.screenshot = f.read
-        end
-        ces.save!
+        #ces = ComplaintEntryScreenshot.new
+        #ces.error_message = e.message
+        #ces.complaint_entry_id = complaint_entry_id
+        #open("app/assets/images/failed_screenshot.jpg") do |f|
+        #  ces.screenshot = f.read
+        #end
+        #ces.save!
       end
 
     end
@@ -424,28 +426,28 @@ class ComplaintEntry < ApplicationRecord
     max_wait_for_job = 15 #seconds
     begin
       #this is where screen grabs happen.
-      screenshot_entry = ComplaintEntryScreenshot.create!(complaint_entry_id:new_complaint_entry.id)
-      screenshot_entry.grab_screenshot
+      #screenshot_entry = ComplaintEntryScreenshot.create!(complaint_entry_id:new_complaint_entry.id)
+      #screenshot_entry.grab_screenshot
     rescue Timeout::Error => e
       #couldnt complete in time
-      Rails.logger.error( "#{e} --- Timed out waiting for screenshot for #{new_complaint_entry.hostlookup} to finish")
-      ces = ComplaintEntryScreenshot.new
-      ces.error_message = e.message
-      ces.complaint_entry_id = new_complaint_entry.id
-      open("app/assets/images/failed_screenshot.jpg") do |f|
-        ces.screenshot = f.read
-      end
-      ces.save!
+      #Rails.logger.error( "#{e} --- Timed out waiting for screenshot for #{new_complaint_entry.hostlookup} to finish")
+      #ces = ComplaintEntryScreenshot.new
+      #ces.error_message = e.message
+      #ces.complaint_entry_id = new_complaint_entry.id
+      #open("app/assets/images/failed_screenshot.jpg") do |f|
+      #  ces.screenshot = f.read
+      #end
+      #ces.save!
     rescue Exception => e
-      Rails.logger.error("#{e.message}")
+      #Rails.logger.error("#{e.message}")
       #do nothing, it was worth a try. kittens are sad now
-      ces = ComplaintEntryScreenshot.new
-      ces.error_message = e.message
-      ces.complaint_entry_id = new_complaint_entry.id
-      open("app/assets/images/failed_screenshot.jpg") do |f|
-        ces.screenshot = f.read
-      end
-      ces.save!
+      #ces = ComplaintEntryScreenshot.new
+      #ces.error_message = e.message
+      #ces.complaint_entry_id = new_complaint_entry.id
+      #open("app/assets/images/failed_screenshot.jpg") do |f|
+      #  ces.screenshot = f.read
+      #end
+      #ces.save!
     end
   end
 
@@ -466,10 +468,10 @@ class ComplaintEntry < ApplicationRecord
         advanced_search(params, search_name: search_name, user: user)
       when 'named'
         named_search(search_name, user: user)
-      when 'filter'
-        filter_search(params, user: user)
+      when 'standard'
+        standard_search(search_name, user: user)
       when 'contains'
-        contains_search(params[:search])
+        contains_search(params[:value])
       else
         where({})
     end
@@ -507,22 +509,22 @@ class ComplaintEntry < ApplicationRecord
   # Searches specific to quick generic button filters.
   # @param [ActiveRecord::Relation] base_relation relation to chain this search onto.
   # @return [ActiveRecord::Relation]
-  def self.filter_search(params, user:)
-    case params[:filter_by]
+  def self.standard_search(search_name, user:)
+    case search_name
       when "NEW"
         where(status:"NEW")
       when "COMPLETED"
-        where(status:"COMPLETED")
+        closed
       when "ACTIVE"
-        where.not(status:"COMPLETED").where.not(status:"NEW")
+        open.where.not(status:"NEW")
       when "REVIEW"
         where(status: "PENDING")
       when "MY COMPLAINTS"
         where(user_id: user.id)
       when "MY OPEN COMPLAINTS"
-        where(user_id: user.id).where.not(status: STATUS_COMPLETED)
+        open.where(user_id: user.id)
       when "MY CLOSED COMPLAINTS"
-        where(user_id: user.id, status:"COMPLETED")
+        closed.where(user_id: user.id)
       when "ALL"
         all
       else
@@ -562,17 +564,22 @@ class ComplaintEntry < ApplicationRecord
   # @param [ActiveRecord::Relation] base_relation relation to chain this search onto.
   # @return [ActiveRecord::Relation]
   def self.advanced_search(params, search_name:, user:)
-    
-    relation = where({})
+
+    present_params = params.select{|ignore_key, value| value.present?}
+
+    simple_params = present_params.slice(*%w{id complaint_id resolution status})
+    relation = where(simple_params)
 
     if params['submitted_newer'].present?
       relation =
-          relation.joins(:complaint).where('complaints.created_at >= :submitted_newer', submitted_newer: params['submitted_newer'])
+          relation.joins(:complaint).where('complaints.created_at >= :submitted_newer',
+                                           submitted_newer: params['submitted_newer'])
     end
 
     if params['submitted_older'].present?
       relation =
-          relation.joins(:complaint).where('complaints.created_at < :submitted_older', submitted_older: params['submitted_older']+1)
+          relation.joins(:complaint).where('complaints.created_at < DATE_ADD(:submitted_older, INTERVAL 1 DAY)',
+                                           submitted_older: params['submitted_older'])
     end
 
     if params['age_newer'].present?
@@ -596,69 +603,62 @@ class ComplaintEntry < ApplicationRecord
 
     if params['modified_newer'].present?
       relation =
-          relation.joins(:complaint).where('complaints.updated_at >= :modified_newer', modified_newer: params['modified_newer'])
+          relation.joins(:complaint).where('complaints.updated_at >= :modified_newer',
+                                           modified_newer: params['modified_newer'])
     end
 
     if params['modified_older'].present?
-      relation =
-          relation.joins(:complaint).where('complaints.updated_at < :modified_older', modified_older: params['modified_older']+1)
+      relation = relation.joins(:complaint).where('complaints.updated_at < DATE_ADD(:modified_older, INTERVAL 1 DAY)',
+                                                  modified_older: params['modified_older'])
     end
 
     if params['tags'].present?
-      relation = relation.joins(complaint: :complaint_tags).where('complaint_tags.name IN (?)', params['tags'])
+      relation = relation.joins(complaint: :complaint_tags).where(complaint_tags: {name: params['tags']})
     end
 
-
-    company_name = nil
-    customer_params = params.fetch('customer', {}).slice(*%w{name email company_name})
-    customer_params = customer_params.select{|ignore_key, value| value.present?}
-    if customer_params.any?
+    customer_params = present_params.slice(*%w{customer_name customer_email company_name})
+    unless customer_params.empty?
+      company_name = nil
       if customer_params['company_name'].present?
         company_name = customer_params.delete('company_name')
-        relation = relation.joins(complaint: [customer: :company])
+        relation = relation.joins(complaint: {customer: :company})
       else
         relation = relation.joins(complaint: :customer)
       end
 
-      customer_where = { customers: customer_params }
+      if customer_params['customer_name'].present?
+        relation = relation.where(customers: {name: customer_params['customer_name']})
+      end
+
+      if customer_params['customer_email'].present?
+        relation = relation.where(customers: {email: customer_params['customer_email']})
+      end
+
       if company_name.present?
-        customer_where = { companies: {name: company_name} }
-      end
-      relation = relation.joins(complaint: [customer: :company]).where(customer_where)
-    end
-
-    entry_params = params.fetch('complaint_entries', {})
-
-    if entry_params['complaint_id'] == [""]
-      entry_params.delete('complaint_id')
-    end
-
-    entry_params = entry_params.select{|ignore_key, value| value.present?}
-    if entry_params.any?
-      complaint_entry_fields = entry_params.slice(*%w{complaint_id resolution status})
-      ip_or_uri = entry_params['ip_or_uri']
-      category = entry_params['category']
-
-      relation = relation.group(:id)
-      relation = relation.where(complaint_entry_fields) if complaint_entry_fields.present?
-
-      if category.present?
-        relation = relation.where('category like :category', category: "%#{category}%")
-      end
-
-      if ip_or_uri.present?
-        ip_or_uri_clause = "ip_address = :ip_or_uri OR uri like :ip_or_uri_pattern OR domain like :ip_or_uri_pattern"
-        relation = relation.where(ip_or_uri_clause, ip_or_uri: ip_or_uri, ip_or_uri_pattern: "%#{ip_or_uri}%")
+        relation = relation.where(companies: {name: company_name})
       end
     end
 
-    complaint_fields = params.to_h.slice(*%w{description channel})
+    #relation = relation.group(:id)
 
-    complaint_fields = complaint_fields.select{|ignore_key, value| value.present?}
-    relation = relation.includes(:complaint).where(complaints: complaint_fields) if complaint_fields.present?
+    category = present_params['category']
+    if category.present?
+      relation = relation.where('category like :category', category: "%#{category}%")
+    end
+
+    ip_or_uri = present_params['ip_or_uri']
+    if ip_or_uri.present?
+      ip_or_uri_clause = "ip_address = :ip_or_uri OR uri like :ip_or_uri_pattern OR domain like :ip_or_uri_pattern"
+      relation = relation.where(ip_or_uri_clause, ip_or_uri: ip_or_uri, ip_or_uri_pattern: "%#{ip_or_uri}%")
+    end
+
+    complaint_fields = present_params.to_h.slice(*%w{description channel})
+    if complaint_fields.present?
+      relation = relation.includes(:complaint).where(complaints: complaint_fields)
+    end
 
     # Save this search as a named search
-    if params.present? && search_name.present?
+    if present_params.present? && search_name.present?
       Dispute.save_named_search(search_name, params, user: user, project_type: 'Complaint')
     end
     relation
