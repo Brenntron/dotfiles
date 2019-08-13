@@ -5,6 +5,9 @@ raise "config.yml missing #{Rails.env} section" unless env_config
 
 Rails.configuration.app_name = Rails.application.engine_name.gsub(/_application/,'')
 
+amp_poke = env_config.fetch('amp_poke', {})
+Rails.configuration.amp_poke            = ApiRequester::ApiRequester.config_of(amp_poke)
+
 raise "config.yml missing amq section" unless env_config['amq']
 Rails.configuration.amq_host            = env_config['amq']['host']
 
@@ -63,7 +66,6 @@ Rails.configuration.snort_json_path     = Rails.root.join(env_config['perl']['sn
 Rails.configuration.cve2x_path          = Rails.root.join(env_config['perl']['cve2x_path'])
 Rails.configuration.rule2yaml_path      = Rails.root.join(env_config['perl']['rule2yaml_path'])
 
-# byebug
 rep_api = env_config['rep_api']
 raise 'config.yml missing rep_api section' unless rep_api
 Rails.configuration.rep_api                = OpenStruct.new
@@ -74,6 +76,7 @@ Rails.configuration.rep_api.ca_cert_file   = rep_api['ca_cert_file']
 Rails.configuration.rep_api.gssnegotiate   = rep_api['gssnegotiate']
 
 
+# TODO Check if unused
 raise "config.yml missing ruletest section" unless env_config['ruletest']
 Rails.configuration.ruletest_server     = env_config['ruletest']['url']
 
@@ -83,12 +86,14 @@ if sds_config
   Rails.configuration.sds.host          = sds_config['host']
   Rails.configuration.sds.cert_file     = sds_config['cert_file']
   Rails.configuration.sds.pkey_file     = sds_config['pkey_file']
-  Rails.configuration.sds.user          = sds_config['user']
-  Rails.configuration.sds.pass          = sds_config['pass']
+  Rails.configuration.sds.user          = sds_config['user']                    # TODO unused?
+  Rails.configuration.sds.pass          = sds_config['pass']                    # TODO unused?
 end
 
+# TODO Check if unused
 Rails.configuration.snort_doc_max_fails = env_config['snort_doc_max_fails'] || 3
 
+# TODO Check if unused
 snort_org_config = env_config['snort_org']
 raise 'config.yml missing snort_org section' unless snort_org_config
 Rails.configuration.snort_org           = OpenStruct.new
@@ -98,6 +103,7 @@ if env_config['snort_org']
   Rails.configuration.snort_org.api_key   = snort_org_config['api_key']
 end
 
+# TODO Check if unused
 raise "config.yml missing svn section" unless env_config['svn']
 Rails.configuration.svn_cmd             = env_config['svn']['cmd']
 Rails.configuration.svn_pwd             = env_config['svn']['password']
@@ -108,12 +114,8 @@ Rails.configuration.snort_rule_path     = Rails.root.join(env_config['svn']['sno
 
 wbrs_config = env_config['wbrs']
 raise 'config.yml missing wbrs section' unless wbrs_config
-Rails.configuration.wbrs                = OpenStruct.new
-Rails.configuration.wbrs.host           = wbrs_config['host']
-Rails.configuration.wbrs.port           = wbrs_config['port']
-Rails.configuration.wbrs.verify_mode    = wbrs_config['verify_mode'] || wbrs_config['tls_mode']
-Rails.configuration.wbrs.ca_cert_file   = wbrs_config['ca_cert_file']
-Rails.configuration.wbrs.gssnegotiate   = wbrs_config['gssnegotiate']
+Rails.configuration.wbrs                = ApiRequester::ApiRequester.config_of(wbrs_config)
+# TODO convert auth_token to api_key so it is set by config_of method.
 Rails.configuration.wbrs.auth_token     = wbrs_config['auth_token']
 
 xbrs_config = env_config['xbrs']
@@ -143,3 +145,38 @@ Rails.configuration.bls                = OpenStruct.new
 Rails.configuration.bls.host           = bls_config['host']
 Rails.configuration.bls.port           = bls_config['port']
 
+
+file_reputation_sandbox = env_config['file_reputation_sandbox']
+raise 'config.yml missing file reputation sandbox section' unless file_reputation_sandbox
+Rails.configuration.file_reputation_sandbox        = ApiRequester::ApiRequester.config_of(file_reputation_sandbox)
+sandbox_api_keys = file_reputation_sandbox.fetch('api_keys', {})
+sandbox_api_keys[FileReputationDispute::SANDBOX_KEY_AC_REFRESH] ||=
+    sandbox_api_keys[FileReputationDispute::SANDBOX_KEY_AC_FORM]
+Rails.configuration.file_reputation_sandbox.api_keys = sandbox_api_keys
+
+reversing_labs_config = env_config['reversing_labs']
+raise 'config.yml missing ReversingLabs section' unless reversing_labs_config
+Rails.configuration.reversing_labs      = ApiRequester::ApiRequester.config_of(reversing_labs_config)
+
+magic_api_config = env_config['magic_api']
+raise 'config.yml missing MAgic section' unless magic_api_config
+Rails.configuration.magic_api           = ApiRequester::ApiRequester.config_of(magic_api_config)
+
+threatgrid = env_config.fetch('threatgrid', {})
+raise 'config.yml missing threatgrid section' unless threatgrid
+Rails.configuration.threatgrid          = ApiRequester::ApiRequester.config_of(threatgrid)
+
+ticloud = env_config.fetch('ticloud', {})
+raise 'config.yml missing ticloud section' unless ticloud
+Rails.configuration.ticloud             = ApiRequester::ApiRequester.config_of(ticloud)
+
+elastic_config = env_config['elastic']
+raise 'config.yml missing elastic section' unless elastic_config
+Rails.configuration.elastic              = OpenStruct.new
+Rails.configuration.elastic.host         = elastic_config['host']
+Rails.configuration.elastic.port         = elastic_config['port']
+Rails.configuration.elastic.verify_mode  = elastic_config['verify_mode']
+Rails.configuration.elastic.ca_cert_file = elastic_config['ca_cert_file']
+Rails.configuration.elastic.username     = elastic_config['username']
+Rails.configuration.elastic.password     = elastic_config['password']
+Rails.configuration.elastic.tls          = true

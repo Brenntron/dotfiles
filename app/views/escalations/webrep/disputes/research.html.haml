@@ -2,7 +2,7 @@
   .reputation-research-search-wrapper
     .research-header-wrapper
       %span.icon-research.top-info-icon
-      %h1 Reputation
+      %h1 Reputation Research
       %ul{class:"nav nav-tabs", role:'tablist'}
         %li{role:"presentation", class: "active"}
           %a{href:'#lookup-detail','aria-controls':'lookup-detail', 'aria-label': 'Detail lookup tab','data-toggle':'tab', role:"tab"}
@@ -17,10 +17,10 @@
         .search-options-col.tab-pane.active#lookup-detail
           .col-xs-4.col-sm-3.col-md-2.col-lg-2.col-xl-1
             = search_form.radio_button(:scope, 'strict', id: 'research-search-strict', checked: params['search'] && params['search']['scope'].eql?("strict"))
-            %label{for: 'research-search-strict'} Strict Search
+            %label.esc-tooltipped{title: 'Strict Search returns the inputted URI/IP as an entry, in addition to all entries that match the URL pattern.', for: 'research-search-strict'} Strict Search
             %br
             = search_form.radio_button(:scope, 'broad', id: 'research-search-broad', checked: !params['search'] || params['search']['scope'].eql?("broad"))
-            %label{for: 'research-search-broad'} Broad Search
+            %label.esc-tooltipped{title: 'Broad Search returns all records matching the URL pattern.', for: 'research-search-broad'} Broad Search
             %hr.thin
             =search_form.submit(:Submit, id: 'submit-button', class: 'button_primary')
           .col-xs-8.col-sm-9.col-md-10.col-lg-10.col-xl-11
@@ -189,6 +189,7 @@
                 %td.col-reptool-class
                 %td.col-actions
                 %td.col-clear-actions
+
   .row
     .col-xs-12
       - if params['search']
@@ -198,7 +199,7 @@
       #research-page-toolbar.toolbar
         %div
           %label.toolbar-section-label Table View
-          %button.toolbar-button.expand-row-button#expand-all-rows.esc-tooltipped{title: 'Expand All Rows'}
+          %button.toolbar-button.expand-row-button#expand-all-rows.esc-tooltipped.toolbar-button-spacer{title: 'Expand All Rows'}
             %span.toolbar-button-text Expand All Rows
           %button.toolbar-button.collapse-button#collapse-all-rows.esc-tooltipped{title: 'Collapse All Rows'}
             %span.toolbar-button-text Collapse All Rows
@@ -210,7 +211,7 @@
             .dropdown-menu.toolbar-dropdown#add_to_ticket_dropdown{'aria-labelledby': 'add-to-ticket-button'}
               Dropdown information
           %span.dropdown
-            %button#wlbl_entries_button.toolbar-button.adjust-wlbl-button.dropdown-toggle.esc-tooltipped.dropdown-button-margin-left{title: 'Adjust WL/BL', 'data-toggle': 'dropdown', 'aria-haspopup': 'true', 'aria-expanded': 'false', onclick: 'window.bulk_get_current_wlbl("research")'}
+            %button#wlbl_entries_button.toolbar-button.adjust-wlbl-button.dropdown-toggle.esc-tooltipped.toolbar-button-spacer{title: 'Adjust WL/BL', 'data-toggle': 'dropdown', 'aria-haspopup': 'true', 'aria-expanded': 'false', onclick: 'bulk_get_current_wlbl("research")'}
               %span.toolbar-button-text Adjust WBRS WL/BL
             .dropdown-menu.toolbar-dropdown#wlbl_adjust_entries{'aria-labelledby': 'wlbl_entries_button'}
               = form_for :wlbl, html: {class: 'adjust-wlbl-form'} do |wlbl_form|
@@ -816,30 +817,9 @@
                                       %th
                                         %span.missing-data
                                           No XBRS data available.
-                              - elsif entry.find_xbrs[1]['data'].count < 8
-                                %table.xbrs-short-scrollable
-                                  %thead
-                                    %tr
-                                      - entry.find_xbrs[1]['legend'].each do |header|
-                                        %th= header
-                                  %tbody
-                                    - unless entry.hostlookup.nil?
-                                      - entry.find_xbrs[1]['data'].each do |data|
-                                        %tr
-                                          - data.each do |datapoint|
-                                            %td= datapoint
                               - else
-                                %table.xbrs-long-scrollable
-                                  %thead
-                                    %tr
-                                      - entry.find_xbrs[1]['legend'].each do |header|
-                                        %th= header
-                                  %tbody
-                                    - unless entry.hostlookup.nil?
-                                      - entry.find_xbrs[1]['data'].each do |data|
-                                        %tr
-                                          - data.each do |datapoint|
-                                            %td= datapoint
+                                %table
+
 
                             .entry-details-table.crosslisted-details-table{'data-entry-id': "#{entry.id}"}
                               %h5.entry-details-table-header

@@ -1,0 +1,16 @@
+<div class="container-fluid users-page">
+  <div class="col-xs-9 col-sm-9 col-md-10 col-lg-10 item-details-column">
+    <div class="row header">
+      <!-- action links -->
+      <div class="col-xs-12 actions-bar">
+        <%= link_to escalations_user_path(@user) do %>
+            <button class="btn btn-link icon-link custom-icon"><i class="glyphicon glyphicon-user"></i> Home</button>
+        <% end %>
+      </div>
+      <% if current_user.has_role?('committer') %>
+          <!-- committer specific links-->
+      <% end %>
+    </div>
+    <%= render template: "layouts/rocket" %>
+  </div>
+</div>

@@ -1,11 +1,11 @@
 class Complaint < ApplicationRecord
   belongs_to :customer, optional: true
-  has_many :complaint_entries
+  has_many :complaint_entries, dependent: :restrict_with_exception
   has_and_belongs_to_many :complaint_tags, dependent: :destroy
 
   has_paper_trail on: [:update], ignore: [:updated_at]
 
-  delegate :name, to: :customer, allow_nil: true, prefix: true
+  delegate :name, :company_name, to: :customer, allow_nil: true, prefix: true
 
   RESOLUTION_FIXED                      = 'FIXED'
   RESOLUTION_INVALID                    = 'INVALID'
@@ -19,6 +19,7 @@ class Complaint < ApplicationRecord
   COMPLETED = 'COMPLETED'
   PENDING = 'PENDING'
   DUPLICATE = "DUPLICATE"
+  REOPENED = "REOPENED"
 
   TI_NEW = 'PENDING'
   TI_RESOLVED = 'RESOLVED'
@@ -44,8 +45,8 @@ class Complaint < ApplicationRecord
   scope :from_ti, -> { includes(:complaint_entries).where(channel: TI_CHANNEL) }
   scope :from_int, -> { includes(:complaint_entries).where(channel: INT_CHANNEL) }
   scope :from_wbnp, -> { includes(:complaint_entries).where(channel: WBNP_CHANNEL) }
-  scope :by_guest, -> { joins(customer: :company).where('companies.name = ?', 'Guest')}
-  scope :by_cust, -> { joins(customer: :company).where('companies.name != ?', 'Guest')}
+  scope :by_guest, -> { joins(:customer).where(customers: {company_id: Company.guest.id}) }
+  scope :by_cust, -> { joins(:customer).where.not(customers: {company_id: Company.guest.id}) }
 
   def set_status(new_status)
     status_list = complaint_entries.map{|entry| entry.status}
@@ -78,10 +79,13 @@ class Complaint < ApplicationRecord
   end
 
   def self.parse_url(url)
+    if !url.starts_with?("http")
+      url = "http://" + url
+    end  
     url = URI.escape(url)
     uri = URI.parse(URI.parse(url).scheme.nil? ? "http://#{url}" : url)
-    domain = PublicSuffix.parse(uri.host)
-    subdomain = uri.host.gsub(Regexp.new("\\.?#{domain.domain}$"), '')
+    domain = PublicSuffix.parse(uri.host, :ignore_private => true)
+    subdomain = uri.host.gsub(/\A[0-9]*www[0-9]*\./, '').gsub(Regexp.new("\\.?#{domain.domain}$"), '')
 
     {
         subdomain: subdomain,
@@ -218,7 +222,7 @@ class Complaint < ApplicationRecord
       new_complaint_entry.save
     end
 
-    conn = ::Bridge::DisputeCreatedEvent.new(addressee: "talos-intelligence", source_authority: "talos-intelligence", source_key: source_key)
+    conn = ::Bridge::DisputeCreatedEvent.new(addressee: "talos-intelligence", source_authority: "talos-intelligence", source_key: source_key, ac_id: complaint.id)
     conn.post(return_payload, "")
 
   end
@@ -293,7 +297,7 @@ class Complaint < ApplicationRecord
 
           prefix_response = Wbrs::Prefix.where({:urls => [key]})
           new_payload_item = {}
-          new_payload_item[:sugg_type] = entry['wbrs']["cat_sugg"]
+          new_payload_item[:sugg_type] = entry['wbrs']["cat_sugg"] unless entry['wbrs']['cat_sugg'].blank?
           new_payload_item[:status] = TI_NEW
           new_payload_item[:resolution_message] = ""
           new_payload_item[:resolution] = ""
@@ -306,10 +310,10 @@ class Complaint < ApplicationRecord
           new_complaint_entry.ip_address = key
           new_complaint_entry.wbrs_score = entry[:wbrs]["WBRS_SCORE"]
           new_complaint_entry.entry_type = "IP"
-          new_complaint_entry.suggested_disposition = entry['wbrs']["cat_sugg"].join(",")
+          new_complaint_entry.suggested_disposition = entry['wbrs']["cat_sugg"].join(",") unless entry['wbrs']['cat_sugg'].blank?
 
           if prefix_response.first&.is_active == 1
-            new_complaint_entry.url_primary_category = entry['wbrs']["current_cat"]
+            new_complaint_entry.url_primary_category = entry['wbrs']["current_cat"] unless entry['wbrs']['current_cat'].blank?
           else
             new_complaint_entry.url_primary_category = nil
           end
@@ -325,24 +329,9 @@ class Complaint < ApplicationRecord
 
 
           begin
-            screenshot_data =  ""
-            Timeout::timeout(max_wait_for_job) do
-              screenshot_data = CapybaraSpider.low_capture("#{new_complaint_entry.hostlookup}")
-            end
-            ces = ComplaintEntryScreenshot.new
-            ces.complaint_entry_id = new_complaint_entry.id
-            ces.screenshot = Base64.decode64(screenshot_data)
-            ces.save!
-          rescue Timeout::Error => e
-            #couldnt complete in time
-            Rails.logger.error( "#{e} --- Timed out waiting for screenshot for #{new_complaint_entry.hostlookup} to finish")
-            ces = ComplaintEntryScreenshot.new
-            ces.error_message = e.message
-            ces.complaint_entry_id = new_complaint_entry.id
-            open("app/assets/images/timeout_screenshot.jpg") do |f|
-              ces.screenshot = f.read
-            end
-            ces.save!
+            ces = ComplaintEntryScreenshot.create(complaint_entry_id: new_complaint_entry.id )
+            # CALL SCREENSHOT BACKGROUND JOB! with ces.id and new_complaint_entry.hostlookup
+            ces.grab_screenshot
           rescue Exception => e
             Rails.logger.error("#{e.message}")
             ces = ComplaintEntryScreenshot.new
@@ -362,14 +351,14 @@ class Complaint < ApplicationRecord
           new_complaint_entry = ComplaintEntry.new
           new_complaint_entry.complaint_id = new_complaint.id
           new_complaint_entry.user_id = user.id
-          new_complaint_entry.uri = key.gsub(/\Awww\./, '')
+          new_complaint_entry.uri = key.gsub(/\Ahttp[s]*\:\/\//, '').gsub(/\A[0-9]*www[0-9]*\./, '')
           new_complaint_entry.entry_type = "URI/DOMAIN"
           new_complaint_entry.wbrs_score = entry['WBRS_SCORE']
-          new_complaint_entry.suggested_disposition = entry["cat_sugg"].join(",")
+          new_complaint_entry.suggested_disposition = entry["cat_sugg"].join(",") unless entry['cat_sugg'].blank?
 
 
           if prefix_response.first&.is_active?
-            new_complaint_entry.url_primary_category = entry["current_cat"]
+            new_complaint_entry.url_primary_category = entry["current_cat"] unless entry['current_cat'].blank?
           else
             new_complaint_entry.url_primary_category = nil
           end
@@ -385,7 +374,7 @@ class Complaint < ApplicationRecord
           new_complaint_entry.save!
 
           new_payload_item = {}
-          new_payload_item[:sugg_type] = entry["cat_sugg"].join(",")
+          new_payload_item[:sugg_type] = entry["cat_sugg"].join(",") unless entry['cat_sugg'].blank?
           new_payload_item[:status] = TI_NEW
           new_payload_item[:resolution_message] = ""
           new_payload_item[:resolution] = ""
@@ -395,24 +384,9 @@ class Complaint < ApplicationRecord
           ComplaintEntryPreload.generate_preload_from_complaint_entry(new_complaint_entry)
 
           begin
-            screenshot_data = ""
-            Timeout::timeout(max_wait_for_job) do
-              screenshot_data = CapybaraSpider.low_capture("#{new_complaint_entry.hostlookup}")
-            end
-            ces = ComplaintEntryScreenshot.new
-            ces.complaint_entry_id = new_complaint_entry.id
-            ces.screenshot = Base64.decode64(screenshot_data)
-            ces.save!
-          rescue Timeout::Error => e
-            #couldnt complete in time
-            Rails.logger.error( "#{e} --- Timed out waiting for screenshot for #{new_complaint_entry.hostlookup} to finish")
-            ces = ComplaintEntryScreenshot.new
-            ces.error_message = e.message
-            ces.complaint_entry_id = new_complaint_entry.id
-            open("app/assets/images/timeout_screenshot.jpg") do |f|
-              ces.screenshot = f.read
-            end
-            ces.save!
+            ces = ComplaintEntryScreenshot.create(complaint_entry_id: new_complaint_entry.id )
+            # CALL SCREENSHOT BACKGROUND JOB! with ces.id and new_complaint_entry.hostlookup
+            ces.grab_screenshot
           rescue Exception => e
             ces = ComplaintEntryScreenshot.new
             ces.error_message = e.message
@@ -424,7 +398,7 @@ class Complaint < ApplicationRecord
           end
         end
 
-        conn = ::Bridge::ComplaintCreatedEvent.new(addressee: "talos-intelligence", source_authority: "talos-intelligence", source_key: message_payload["source_key"])
+        conn = ::Bridge::ComplaintCreatedEvent.new(addressee: "talos-intelligence", source_authority: "talos-intelligence", source_key: message_payload["source_key"], ac_id: new_complaint.id)
         conn.post(return_payload)
 
         #change this
@@ -449,43 +423,75 @@ class Complaint < ApplicationRecord
   end
 
   def self.get_latest_wbnp_complaints
-    begin
+
+      new_report = WbnpReport.new
 
       all_complaints = Wbrs::RuleUiComplaint.where({:add_channels => [WBNP_CHANNEL], :statuses => ['new']})["data"]
 
-      new_complaints = []
+      #all_complaints.each do |rule_ui_complaint|
+      #  uri_to_test = compile_parts_to_uri(rule_ui_complaint)
+      #  rule_ui_complaint_exists = ComplaintEntry.where("uri like ?", "%" + uri_to_test + "%")
 
-      all_complaints.each do |rule_ui_complaint|
-        rule_ui_complaint_exists = ComplaintEntry.where(:uri => compile_parts_to_uri(rule_ui_complaint))
-        if rule_ui_complaint_exists.blank? && rule_ui_complaint['add_channel'] == WBNP_CHANNEL
-          new_complaints << rule_ui_complaint
-        end
-      end
+      #  if rule_ui_complaint_exists.blank? && rule_ui_complaint['add_channel'] == WBNP_CHANNEL
+      #    new_complaints << rule_ui_complaint
+      #  end
+      #end
+      new_report.notes = ""
+      new_report.cases_imported = 0
+      new_report.cases_failed = 0
+      new_report.total_new_cases = all_complaints.size
+      new_report.status = WbnpReport::ACTIVE
+      new_report.save
 
-      if new_complaints.present?
+      start_wbnp_pull(new_report.id)
+
+      new_report
+
+  end
+
+  class << self
+    def start_wbnp_pull(new_report_id)
+      new_report = WbnpReport.find(new_report_id)
+      begin
+        all_complaints = Wbrs::RuleUiComplaint.where({:add_channels => [WBNP_CHANNEL], :statuses => ['new']})["data"]
         bugzilla_rest_session = BugzillaRest::Session.default_session
-        new_complaints.each do |new_ui_complaint|
-          rule_ui_wbnp_create_action(new_ui_complaint, bugzilla_rest_session: bugzilla_rest_session)
+        all_complaints.each do |new_ui_complaint|
+          if new_ui_complaint['add_channel'] == WBNP_CHANNEL
+            begin
+              rule_ui_wbnp_create_action(new_ui_complaint, new_report, bugzilla_rest_session: bugzilla_rest_session)
+            rescue => e
+              new_report.cases_failed += 1
+              new_report.notes += "SWP \n uri: #{new_ui_complaint.inspect} | failure: #{e.message} #{e.backtrace.join("\n")}\n"
+              new_report.save
+            end
+          end
         end
 
+        new_report.status = WbnpReport::COMPLETE
+        new_report.save
+      rescue => e
+        new_report.status = WbnpReport::ERROR
+        new_report.notes += "\n\n----------\nPull suddenly ended with error: #{e.message} #{e.backtrace.join("\n")}\n\n"
+        new_report.save
       end
 
-    rescue
-      #no wbnp response
     end
+    handle_asynchronously :start_wbnp_pull
+
   end
 
   def self.compile_parts_to_uri(parts)
     subdomain = ""
     if parts["subdomain"].present?
       subdomain = "#{parts["subdomain"]}."
+      subdomain = subdomain.gsub(/\A[0-9]*www[0-9]*\./, '')
     end
-    uri = "#{parts["protocol"]}://#{subdomain}#{parts["domain"]}#{parts["path"]}"
+    uri = "#{subdomain}#{parts["domain"]}#{parts["path"]}"
 
-    uri
+    URI.escape(uri)
   end
 
-  def self.rule_ui_wbnp_create_action(rule_ui_complaint, bugzilla_rest_session:)
+  def self.rule_ui_wbnp_create_action(rule_ui_complaint, wbnp_report, bugzilla_rest_session:)
     #"#{{"add_channel"=>"wbnp", "comment"=>"", "complaint_id"=>105, "complaint_type"=>"unknown", "customer_name"=>"ORANGE BUSINES SERVICES", "description"=>"",
     # "domain"=>"fmp-usmba.ac.ma", "path"=>"/cdim/mediatheque/e_theses/257-16.pdf", "port"=>0, "protocol"=>"http", "region"=>"", "resolution"=>nil, "state"=>"new",
     # "subdomain"=>"scolarite", "tag"=>nil, "url_query_string"=>"", "when_added"=>"Thu, 30 Aug 2018 15:00:05 GMT", "when_last_updated"=>"Thu, 30 Aug 2018 15:00:05 GMT",
@@ -526,11 +532,28 @@ class Complaint < ApplicationRecord
                                      ticket_source: Complaint::SOURCE_RULEUI,
                                      ticket_source_key: rule_ui_complaint["complaint_id"])
 
-    ComplaintEntry.create_complaint_entry(new_complaint, uri, User.where(display_name:"Vrt Incoming").first)
+    begin
+      category_data = ComplaintEntry.get_category_data(uri)
+    rescue
+      category_data = []
+    end
 
+    if category_data.empty?
+      primary_category = nil
+    else
+      primary_category = category_data[:category_names][0]
+    end
+    begin
+      ComplaintEntry.create_wbnp_complaint_entry(new_complaint, uri, rule_ui_complaint, User.where(display_name:"Vrt Incoming").first, ComplaintEntry::NEW, primary_category)
+      Wbrs::RuleUiComplaint.assign_tickets({:complaint_ids => [rule_ui_complaint["complaint_id"]], :user => "admatter"})
+      wbnp_report.cases_imported += 1
 
-    Wbrs::RuleUiComplaint.assign_tickets({:complaint_ids => [rule_ui_complaint["complaint_id"]], :user => "admatter"})
+    rescue Exception => e
+      wbnp_report.cases_failed += 1
+      wbnp_report.notes += "\n\nRUWCA\n uri: #{uri} | failure: #{e.message} \n #{e.backtrace.join("\n")}"
+    end
 
+    wbnp_report.save
   end
 
   def self.create_action(bugzilla_rest_session, ips_urls, description, customer, tags, status=NEW, categories = nil)
@@ -582,6 +605,15 @@ class Complaint < ApplicationRecord
       new_tag = ComplaintTag.find_or_create_by(name: tag)
       complaint.complaint_tags << new_tag
     end
+  end
+
+  def self.sync_all
+    AdminTask.execute_task(:sync_complaints_with_ti, {})
+  end
+
+  def manual_sync
+    message = Bridge::ComplaintUpdateStatusEvent.new
+    message.post_complaint(self)
   end
 end
 

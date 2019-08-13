@@ -1,0 +1,198 @@
+%input{type:'hidden', name: 'token', value: "#{current_user.authentication_token}"}
+%input{type:'hidden', name: 'xml_token', value: "#{xml_token}"}
+%input{type:'hidden', name: 'current_user', value: "#{current_user.authentication_token}"}
+
+%h1 Research Data
+.row
+  .col-xs-12
+    #research-tab-toolbar.toolbar
+      %div
+        %label.toolbar-section-label View Datasets
+        %span.toolbar-select-wrapper
+          %label.toolbar-button-label.esc-tooltipped.icon-talos-sandbox{for: 'data-show-sandbox-cb', title: 'Talos Sandbox'}
+            %input.dataset-cb.toolbar-checkbox#data-show-sandbox-cb{type: 'checkbox', checked: 'checked'}
+            %span.toolbar-button-text
+              Talos Sandbox
+          %label.toolbar-button-label.esc-tooltipped.icon-threat-grid{for: 'data-show-tg-cb', title: 'Threat Grid'}
+            %input.dataset-cb.toolbar-checkbox#data-show-tg-cb{type: 'checkbox', checked: 'checked'}
+            %span.toolbar-button-text
+              Threat Grid
+          %label.toolbar-button-label.esc-tooltipped.icon-reversing-labs{for: 'data-show-reversing-cb', title: 'Reversing Labs'}
+            %input.dataset-cb.toolbar-checkbox#data-show-reversing-cb{type: 'checkbox', checked: 'checked'}
+            %span.toolbar-button-text
+              Reversing Labs
+      %div
+        %label.toolbar-section-label Data
+        %button.toolbar-button.sync-button#file-rep-sync-button.esc-tooltipped{title: 'Refresh Data', onclick: 'refresh_research_data()'}
+          %span.toolbar-button-text Refresh Data
+      %div
+        %label.toolbar-section-label Reports
+        %button.toolbar-button.esc-tooltipped.create-new-run-button{title: 'Create New Sandbox Run', onclick: 'run_sample_in_sandbox()'}
+          %span.toolbar-button-text Create New Sandbox Run
+
+.row
+  .col-xs-12.col-sm-4#sandbox-report-wrapper
+    %h2.research-data-header.sandbox-header Talos Sandbox
+    #sb-loader
+      .inline-loader-wrapper
+        .gear-loader-wrapper
+          = inline_svg 'icon_gears_loader.svg', class: 'gears-loader'
+        %span.loader-msg Loading data...
+    .sb-data-present
+      %span.sample-present-true
+      %div.data-report-wrapper
+        .row
+          .col-xs-4.col-lg-5
+            %label.data-report-label Latest Run
+            %span.data-report-content#sb-run-date
+          .col-xs-4.col-lg-3
+            %label.data-report-label Run Status
+            %span.data-report-content#sb-run-status
+          -#  TODO Add html report call information here
+          -#.col-xs-4
+          -#  %button.secondary.view-report-external-button
+          -#    View HTML Report
+          .col-xs-4.col-lg-4.text-right
+            .data-report-score#sb-score
+            %label.content-label-sm Sandbox Score
+        %hr.thin
+        .row
+          .col-xs-12
+            %label.data-report-label Contacted IPs
+            %div.data-report-content.multi-col#sb-contacted-ips
+        %hr.thin
+        .row
+          .col-xs-12
+            %label.data-report-label Contacted Domain Names
+            %div.data-report-content.multi-col#sb-contacted-domains
+        %hr.thin
+        .row
+          .col-xs-12#sb-ioc-col
+            %label.data-report-label Indicators of Compromise
+
+        %hr.thin
+        .row
+          .col-xs-12#sb-dropped-files-col
+            %label.data-report-label Dropped Files
+        %hr.thin
+        .row
+          .col-xs-12#sb-processes-col
+            %label.data-report-label Processes
+        %hr.thin
+        .row
+          .col-xs-12.text-center
+            -#%a{href: '#', target: '_blank'}
+            -#%button.secondary.view-report-external-button.data-report-button#sb-report-html{onclick: 'sandbox_html_report();'}
+            %a.btn.view-report-external-button.data-report-button#sb-report-html{href: "/escalations/file_rep/sandbox-html-report", target: "_blank"}
+              View HTML Report
+            %a.btn.view-report-external-button.data-report-button#sb-report-html-download{href: ""}
+              Download HTML Report
+        %hr.thin
+        .row
+          .col-xs-6
+            %label.data-report-label Full Json
+          .col-xs-6
+            %button.expand-toggle-button.tooltipped{'data-toggle': 'collapse', 'aria-expanded': true, 'data-target': "#collapse_sb_json", 'aria-controls': "collapse_sb_json", 'title': 'Expand / Collapse'}
+            %a.download-small-button.tooltipped#download-sb-json{'title': 'Download JSON'}
+        .row.collapse_area.collapse.in#collapse_sb_json
+          .col-xs-12.report-size
+            %pre.data-report-code-content#sb-full
+    .sb-data-missing.text-center
+      %span.sample-present-false
+      %div.data-report-wrapper
+        %span.missing-data#sandbox-status-message
+        %br
+        %button.primary#sandbox-run-button{onclick: 'run_sample_in_sandbox()'}
+          Push Sample to Sandbox and Run
+    .sb-report-run.text-center
+      %div.data-report-wrapper.missing-data
+        Sample is running.
+        %br Running a sample can take 10 minutes or longer.
+
+  .col-xs-12.col-sm-4#threatgrid-report-wrapper
+    %h2.research-data-header.threatgrid-header Threat Grid
+    #tg-loader
+      .inline-loader-wrapper
+        .gear-loader-wrapper
+          = inline_svg 'icon_gears_loader.svg', class: 'gears-loader'
+        %span.loader-msg Loading data...
+    .tg-data-present
+      %span.sample-present-true
+      %div.data-report-wrapper
+        .row
+          .col-xs-4.col-xl-4
+            %label.data-report-label Submitted to TG
+            %span.data-report-content#tg-submission-date
+          .col-xs-4.col-xl-5
+            %label.data-report-label Run Status
+            %span.data-report-content#tg-run-status
+          .col-xs-4.col-xl-3.text-right
+            .data-report-score#tg-score
+            %label.content-label-sm TG Score
+        %hr.thin
+        .row
+          .col-xs-12
+            %label.data-report-label Tags
+            %span.data-report-content#tg-tags
+        %hr.thin
+        .row
+          .col-xs-12
+            %label.data-report-label Behaviors
+            %table.data-report-table#tg-behaviors
+              %thead
+                %tr
+                  %th Name
+                  %th Threat
+                  %th Title
+        %hr.thin
+        .row
+          .col-xs-6
+            %label.data-report-label Full Json
+          .col-xs-6#tg-full-json
+            %button.expand-toggle-button.tooltipped{'data-toggle': 'collapse', 'aria-expanded': true, 'data-target': "#collapse_tg_json", 'aria-controls': "collapse_tg_json", 'title': 'Expand / Collapse'}
+            %button.download-small-button.tooltipped#download-tg-json{'title': 'Download JSON'}
+        .row.collapse_area.collapse.in#collapse_tg_json
+          .col-xs-12.report-size
+            %pre.data-report-code-content#tg-full
+    .tg-data-missing.text-center
+      %span.sample-present-false
+      %div.data-report-wrapper
+        %span.missing-data Not in ThreatGrid
+        %br
+        %button.primary#send-to-threatgrid
+          Push Sample to ThreatGrid
+
+
+  .col-xs-12.col-sm-4#reversing-labs-report-wrapper
+    %h2.research-data-header.reversing-labs-header Reversing Labs
+    #rl-loader
+      .inline-loader-wrapper
+        .gear-loader-wrapper
+          = inline_svg 'icon_gears_loader.svg', class: 'gears-loader'
+        %span.loader-msg Loading data...
+    .rl-data-present
+      %span.sample-present-true
+      %div.data-report-wrapper
+        .row
+          .col-xs-4.col-lg-4
+            %label.data-report-label First Seen
+            %span.data-report-content#rl-first-seen-date
+          .col-xs-4.col-lg-5
+            %label.data-report-label Most Recent Scan
+            %span.data-report-content#rl-most-recent-date
+          .col-xs-4.col-lg-3.text-right
+            .data-report-score#rl-scanner-results
+            %label.content-label-sm Scanner Results
+        %hr.thin
+        .row
+          .col-xs-12
+            %table.data-report-table#rl-scanner-table
+              %thead
+                %tr
+                  %th AV Vendor
+                  %th Time Scanned
+                  %th Results
+    .rl-data-missing.text-center
+      %span.sample-present-false
+      %div.data-report-wrapper
+        %span.missing-data Not in Reversing Labs

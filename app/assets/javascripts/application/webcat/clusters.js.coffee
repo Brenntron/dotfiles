@@ -28,9 +28,8 @@ window.populate_clusters_index_table = (filter) ->
           datatable.clear();
           datatable.rows.add(json.data);
           datatable.draw();
-
           selectize_category_inputs();
-  
+
           $("#total_results").html(json.meta.rows_found)
 
       error: (response) ->

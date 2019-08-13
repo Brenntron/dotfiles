@@ -25,6 +25,7 @@ window.top_banner_bugzilla_login =() ->
       $('form#top_banner_bugzilla_login_form').find('input[name=username]').val('')
       $('form#top_banner_bugzilla_login_form').find('input[name=password]').val('')
       $('#user-settings-dropdown-button').click()
+      window.location.reload()
   )
 
 
@@ -80,7 +81,7 @@ window.std_api_ajax =(ajax_data) ->
   if ajax_data.processData == undefined
     ajax_data.processData = true
 
-  if ajax_data.contentType == 'application/json'
+  if ajax_data.contentType == 'application/json' && 'GET' != ajax_data.method
     ajax_data.data = JSON.stringify(ajax_data.data)
 
   if ajax_data.error_prefix == undefined

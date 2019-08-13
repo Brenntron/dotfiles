@@ -6,4 +6,6 @@ class NamedSearch < ApplicationRecord
 
   validates :user_id, :name, presence: true
 
+  scope :where_project_type, ->(project_type) { where(project_type: project_type) }
+
 end

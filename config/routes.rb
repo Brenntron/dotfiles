@@ -5,7 +5,7 @@ Rails.application.routes.draw do
 
   namespace :escalations, except: [:destroy, :edit] do
     get 'sb_api/query_lookup' => 'sb_api#query_lookup'
-    
+
     resources :rulehit_resolution_mailer_templates, only: [:new, :index, :create, :show, :update, :destroy, :edit]
     resources :sessions, controller: '/sessions', only: [:new, :create, :destroy]
 
@@ -22,6 +22,14 @@ Rails.application.routes.draw do
       end
     end
 
+    namespace :other_admin_tools do
+      root 'tools#index'
+      get 'tasks', to: 'tools#tasks'
+      get 'rule_api', to: 'tools#rule_api'
+      get 'wbnp_reports', to: 'tools#wbnp_reports'
+      get 'manage_escalations_sync', to: 'tools#manage_escalations_sync'
+    end
+
     namespace :webcat do
       root 'root#index'
       resources :complaints, only: [:index, :show, :update] do
@@ -33,7 +41,7 @@ Rails.application.routes.draw do
           get :contains_search
         end
       end
-      resources :complaint_entries do
+      resources :complaint_entries, only: [:index, :show, :update] do
         collection do
           get :serve_image
         end
@@ -79,26 +87,31 @@ Rails.application.routes.draw do
 
       get 'dashboard', to: 'disputes#dashboard'
       get 'research', to: 'disputes#research'
+      get :export_selected_dispute_rows, to: 'disputes#export_selected_dispute_rows'
+      get :export_selected_dispute_entry_rows, to: 'disputes#export_selected_dispute_entry_rows'
     end
+
+    namespace :file_rep do
+      root 'disputes#index'
+      resources :disputes, only: [:index, :show]
+      get 'sandbox-html-report', to: 'disputes#sandbox_html_report'
+    end
+
 
     resources :users, controller: '/users', only: [:index, :show, :update] do
       resource :bugzilla_api_key, controller: '/bugzilla_api_keys', only: [:edit, :update]
 
       collection do
+        get :all
+      end
+
+      collection do
         get :results
       end
 
-      # TODO Review metrics for applicability to escalations users
-      get :status_metrics, defaults: {format: :json}
-      get :time_metrics, defaults: {format: :json}
-      get :pending_team_metrics, defaults: {format: :json}
-      get :resolved_team_metrics, defaults: {format: :json}
-      get :time_team_metrics, defaults: {format: :json}
-      get :component_team_metrics, defaults: {format: :json}
-
       patch :add_to_team
       patch :remove_from_team
-      resources :relationships, only: [:index, :show] do
+      resources :relationships, controller: '/relationships', only: [:index, :show] do
         collection do
           get :member_status
         end
@@ -110,6 +123,7 @@ Rails.application.routes.draw do
         collection do
           get 'poll-from-bridge/messages', to: 'messages#get_messages'
           post 'ticket-event/messages', to: 'messages#messages_from_bridge'
+          post 'file-rep-create/messages', to: 'file_rep_messages#create'
         end
         resources :messages, only: [:create]
       end
@@ -128,40 +142,18 @@ Rails.application.routes.draw do
         get :related
       end
     end
-    resources :rules, only: [:index, :edit, :update] do
-      collection do
-        get :validations
-      end
-      member do
-        get :related
-      end
-    end
   end
 
   resources :events, only: [] do
     collection { get :send_event }
   end
 
-  namespace :api_test do
-    resources :jobs, only: [:index, :create], :defaults => {:format => 'json'}
-    resources :pcaps, only: [:index, :create], :defaults => {:format => 'json'}
-    resources :engines, only: [:index], :defaults => {:format => 'json'}
-    resources :engine_types, only: [:index], :defaults => {:format => 'json'}
-    resources :snort_configurations, only: [:index], :defaults => {:format => 'json'}
-    resources :rule_configurations, only: [:index], :defaults => {:format => 'json'}
-  end
-
   # TODO some of these named routes need to be rethought to conform to rails conventions
-  get 'rules/get_impact' => 'rules#get_impact', format: 'js'
-  get 'rules/export' => 'rules#export'
   post "sessions/create" => "sessions#create"
   post "/attachments" => "attachments#create"
   root 'pages#index'
 
 
-  # resources :rules, param: :sid
-
-  # resources :tests
 
   resources :users, only: [:index, :show, :update] do
 
