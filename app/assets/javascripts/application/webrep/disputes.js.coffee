@@ -945,7 +945,9 @@ $ ->
       'desc'
     ] ]
     dom: '<"datatable-top-tools no-margin-datatable-top-tool"lf>t<ip>'
+    stateSave: true
     language: {
+
       search: "_INPUT_"
       searchPlaceholder: "Search within table"
     }
@@ -1602,7 +1604,8 @@ $ ->
     success: (response) ->
       unless $('body').hasClass('escalations--file_rep--disputes-controller')
         response = JSON.parse(response)
-        $('#disputes-index').DataTable().page(response.currentpage).draw('page')
+        if response
+          $('#disputes-index').DataTable().page(response.currentpage).draw('page')
   )
 
   window.open_dashboard_dispute_table = $('#table-user-disputes-open').DataTable(
