@@ -628,6 +628,7 @@ button {
   position: absolute;
   display: block;
   margin-top: -18px;
+  white-space: nowrap;
   color: $content-label-color !important;
   font-size: 7pt;
   background: $ac-nav-bg-color;
@@ -8681,7 +8682,7 @@ th.sorting_1, th.sorting_asc, th.sorting_desc {
 
 #wlbl_entries_dropdown{
   &{
-    min-width: 305px;
+    min-width: 310px;
     padding: 0 8px !important;
   }
   .wlbl-radio-add{
