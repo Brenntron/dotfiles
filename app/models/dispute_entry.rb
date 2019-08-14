@@ -297,7 +297,8 @@ class DisputeEntry < ApplicationRecord
 
     xbrs
   end
-
+  #TODO: find a better way to handle large xbrs results
+  #right now it's capped at 100 entries if data size is greater than 1,000. I suspect that will not fly with analysts in the long run.
   def find_xbrs(reload: false)
     @xbrs = nil if reload
     @xbrs ||= get_xbrs_value
@@ -322,8 +323,12 @@ class DisputeEntry < ApplicationRecord
       end  
     end 
 
-
-    data.each do |datum|
+    if data.size > 1000
+      doable_data = data.first(100)
+    else
+      doable_data = data
+    end
+    doable_data.each do |datum|
       if ctime_column_index
         datum[ctime_column_index] = Time.at(datum[ctime_column_index])
       end
