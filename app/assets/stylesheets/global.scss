@@ -159,7 +159,6 @@ h3 {
 }
 
 h4 {
-  font-weight: 600 !important;
   font-size: 12pt;
 }
 
@@ -629,6 +628,7 @@ button {
   position: absolute;
   display: block;
   margin-top: -18px;
+  white-space: nowrap;
   color: $content-label-color !important;
   font-size: 7pt;
   background: $ac-nav-bg-color;
@@ -658,6 +658,25 @@ button {
   background-position: 17px 2px;
 }
 
+#error_modal {
+  .modal-dialog{
+    width: unset!important;
+  }
+  .modal-body>div{
+    line-height: 1.2em;
+  }
+  .modal-header {
+    text-transform: capitalize;
+  }
+}
+#confirmation-modal {
+  .modal-header{
+    background: $primary-section-color;
+  }
+  .modal-content{
+    overflow: hidden;
+  }
+}
 
 #edit-button, .edit-button      {background-image: url(image_path('icon_edit.svg'));}
 .related-button   {background-image: url(image_path('icon_related.svg'));}
@@ -4688,7 +4707,9 @@ table > tbody > tr > td.dispute_rep_tools {
 #wlbl_adjust_entries.dropdown-menu li:hover, #wlbl_adjust_entries_index.dropdown-menu li:hover{
   background-color: transparent;
 }
-
+#wlbl_entries_dropdown .dropdown-tool-text-divider{
+  margin: 0 -8px!important;
+}
 .dispute_rep_tools .dropdown-menu {
   top: 20px;
   right: 1px;
@@ -5180,7 +5201,7 @@ input.table-entry-input:focus {
   -ms-transform: rotate(180deg);
   transform: rotate(180deg);
 }
-.primary#submit-rep-changes {
+.primary#submit-rep-changes, #confirm-rep-changes {
   background: $warning-accent-color;
 }
 #submit-rep-changes, #get-rep-data{
@@ -5507,6 +5528,7 @@ h5.entry-details-table-header {
     position: absolute;
     top: 148px;
     display: none;
+    width: 90%;
     justify-content: center;
     align-items: center;
   }
@@ -8660,7 +8682,7 @@ th.sorting_1, th.sorting_asc, th.sorting_desc {
 
 #wlbl_entries_dropdown{
   &{
-    min-width: 305px;
+    min-width: 310px;
     padding: 0 8px !important;
   }
   .wlbl-radio-add{
@@ -8700,7 +8722,7 @@ th.sorting_1, th.sorting_asc, th.sorting_desc {
   font-family: "Fira Mono", monospace;
 }
 
-.col-tag:not(.dialog-tag):hover:after{
+.col-actions .col-tag:hover:after{
   content: ' | X ';
   height: 20px;
   width: 20px;
@@ -8783,7 +8805,45 @@ hr.thin.form-divider {
 .nested-radio-row .col-xs-6:first-of-type {
   padding-left: 15px;
 }
+#confirmation-modal{
+  .modal-body{
+    color: $type-darkest;
+    margin-top: 2%;
+  }
+  .modal-dialog{
+    width: 650px;
+  }
+  thead{
+    padding: 10%;
+    border-bottom: 1px solid $faint-neutral-color;
+    td{
+      padding: 15px 0 12px 7px;
+    }
+  }
+  table{
+    border-bottom: 1px solid $faint-neutral-color;
+    margin-bottom: 20px;
+  }
+  label{
+    color: #999;
+    margin-left: 0;
+  }
+  textarea{
+    min-height: 100px;
+  }
+  td{
+    width: 50%;
+    padding-bottom: 10px;
+    border-bottom: unset!important;
+    line-height: 1.4em;
+  }
+  .button-group{
+    button{
+      width: 46%
+    }
+  }
 
+}
 .nested-radio-row {
   padding-top: 3px !important;
   padding-bottom: 3px !important;
