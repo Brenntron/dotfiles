@@ -2,14 +2,14 @@ Feature: Disputes
   In order to interact with FileRep disputes
   as a user
   I will provide ways to interact with disputes
-
   @javascript
   Scenario: a user visits their profile page and edits their ThreatGrid and Sandbox API Keys
     Given a user with role "admin" exists and is logged in
-    And I go to "/users/1"
-    When I fill in "user_threatgrid_api_key" with "Let's go."
-    And I fill in "user_sandbox_api_key" with "One more time."
-    And I click ".btn-success"
+    And I go to "/escalations/users/1"
+    And I click ".edit-button"
+    When I fill in "user[threatgrid_api_key]" with "Let's go."
+    And I fill in "user[sandbox_api_key]" with "One more time."
+    And I click "Save"
     And I wait for "3" seconds
     Then I should see "updated successfully."
 
@@ -117,6 +117,7 @@ Feature: Disputes
   Scenario: a user visits the FileRep disputes index page and sees all elements of the intended layout
     Given a user with role "filerep user" exists and is logged in
     And I go to "/escalations/file_rep/disputes"
+    And I dismiss modal "#msg-modal" if needed
     Then I should see "STATUS"
     Then I should see "FILE NAME"
     Then I should see "SHA256"
@@ -133,6 +134,7 @@ Feature: Disputes
   Scenario: a user disables the File Name column from the FileRep disputes index page
     Given a user with role "filerep user" exists and is logged in
     And I go to "/escalations/file_rep/disputes"
+    And I dismiss modal "#msg-modal" if needed
     When I click "#file-index-table-show-columns-button"
     And I click "#file-name-checkbox"
     Then I should not see "FILE NAME"
@@ -141,6 +143,7 @@ Feature: Disputes
   Scenario: a user enables the Resolution column from the FileRep disputes index page
     Given a user with role "filerep user" exists and is logged in
     And I go to "/escalations/file_rep/disputes"
+    And I dismiss modal "#msg-modal" if needed
     When I click "#file-index-table-show-columns-button"
     And I click "#resolution-checkbox"
     Then I should see "RESOLUTION"
@@ -161,6 +164,7 @@ Feature: Disputes
     And I should see "Case History"
     And I should see "Compose New Email"
     And I should see "Notes"
+    And I dismiss modal "#msg-modal" if needed
     When I click "#research-tab-link"
     Then I should see "Research Data"
     And I should see "TALOS SANDBOX"
@@ -174,6 +178,7 @@ Feature: Disputes
     And vrtincoming exists
     And A FileRep Dispute with trait "default" exists
     Then I go to "/escalations/file_rep/disputes/1"
+    And I click "#msg-modal"
     And I wait for "25" seconds
     And a FileRep Ticket should have a TG score
 
@@ -182,6 +187,7 @@ Feature: Disputes
     Given a user with role "filerep user" exists and is logged in
     And A FileRep Dispute with trait "default" exists
     Then I go to "/escalations/file_rep/disputes/1"
+    And I click "#msg-modal"
     And I wait for "25" seconds
     And a FileRep Ticket should have a Sandbox score
 
@@ -190,17 +196,19 @@ Feature: Disputes
     Given a user with role "filerep user" exists and is logged in
     And A FileRep Dispute with trait "default" exists
     Then I go to "/escalations/file_rep/disputes/1"
+    And I click "#msg-modal"
     And I wait for "25" seconds
     And a FileRep Ticket should have a RL score
-
+ @now
   @javascript
   Scenario: a user visits the FileRep Dispute Show page and confirms that ThreatGrid data was populated
     Given a user with role "filerep user" exists and is logged in
     And vrtincoming exists
     And A FileRep Dispute with trait "default" exists
     When I go to "/escalations/file_rep/disputes/1"
+    And I click "#msg-modal"
     And I click "#research-tab-link"
-    And I wait for "25" seconds
+    And I wait for "15" seconds
     Then I should see "THREAT GRID"
     And I should see "TG Score"
     And I should see "TAGS"
@@ -212,8 +220,9 @@ Feature: Disputes
     And vrtincoming exists
     And A FileRep Dispute with trait "default" exists
     When I go to "/escalations/file_rep/disputes/1"
+    And I click "#msg-modal"
     And I click "#research-tab-link"
-    And I wait for "25" seconds
+    And I wait for "15" seconds
     Then I should see "TALOS SANDBOX"
     And I should see "LATEST RUN"
     And I should see "Sandbox Score"
@@ -230,8 +239,9 @@ Feature: Disputes
     And vrtincoming exists
     And A FileRep Dispute with trait "default" exists
     When I go to "/escalations/file_rep/disputes/1"
+    And I click "#msg-modal"
     And I click "#research-tab-link"
-    And I wait for "25" seconds
+    And I wait for "15" seconds
     Then I should see "REVERSING LABS"
     And I should see "FIRST SEEN"
     And I should see "MOST RECENT SCAN"
@@ -253,6 +263,7 @@ Feature: Disputes
     And vrtincoming exists
     And A FileRep Dispute with trait "default" exists
     When I go to "/escalations/file_rep/disputes/1"
+    And I click "#msg-modal"
     And I click "#communication-tab-link"
     And I click "#new-filerep-case-note-button"
     And I fill a content-editable field ".new-case-note-textarea" with "Here we go, again."
@@ -318,6 +329,7 @@ Feature: Disputes
     And vrtincoming exists
     And A FileRep Dispute with trait "default" exists
     When I go to "/escalations/file_rep/disputes/1"
+    And I click "#msg-modal"
     And I click "#show-edit-ticket-status-button"
     And I click on element "label" with accessor "for" of "file-status-escalated"
     And I click ".primary"
@@ -329,6 +341,7 @@ Feature: Disputes
     And vrtincoming exists
     And A FileRep Dispute with trait "unassigned" exists
     When I go to "/escalations/file_rep/disputes/1"
+    And I click "#msg-modal"
     And I click "#index_change_assign"
     And I click "#button_reassign"
     Then I should not see "ERROR UPDATING TICKET."
@@ -340,6 +353,7 @@ Feature: Disputes
     And vrtincoming exists
     And A FileRep Dispute with trait "unassigned" exists
     When I go to "/escalations/file_rep/disputes/1"
+    And I click "#msg-modal"
     Then I should not see button with class ".ticket-owner-button"
 
   @javascript
@@ -348,6 +362,7 @@ Feature: Disputes
     And vrtincoming exists
     And A FileRep Dispute with trait "unassigned" exists
     When I go to "/escalations/file_rep/disputes/1"
+    And I click "#msg-modal"
     And I click ".take-ticket-button"
     Then I should not see "ERROR UPDATING TICKET."
     And I should see my username
@@ -358,6 +373,7 @@ Feature: Disputes
     And vrtincoming exists
     And A FileRep Dispute with trait "unassigned" exists
     When I go to "/escalations/file_rep/disputes/1"
+    And I click "#msg-modal"
     And I click ".take-ticket-button"
     Then I should not see "ERROR UPDATING TICKET."
     And I should see my username
@@ -372,6 +388,7 @@ Feature: Disputes
     And vrtincoming exists
     And A FileRep Dispute with trait "default" exists
     When I go to "/escalations/file_rep/disputes/1"
+    And I click "#msg-modal"
     And I click "#communication-tab-link"
     And I click ".new-email-button"
     And I fill in "receiver" with "generic@cisco.com"
@@ -420,6 +437,7 @@ Feature: Disputes
     |id| user_id |
     |1 | 22      |
     When I go to "/escalations/file_rep/disputes/1"
+    And I click "#msg-modal"
     And I click "#communication-tab-link"
     And I click ".filerep-note-delete-button"
     And I click ".primary"
@@ -435,6 +453,7 @@ Feature: Disputes
     |id|
     |1 |
     When I go to "/escalations/file_rep/disputes/1"
+    And I click "#msg-modal"
     And I click "#communication-tab-link"
     And I click ".filerep-note-delete-button"
     And I click ".primary"
@@ -453,6 +472,7 @@ Feature: Disputes
     |id| user_id |
     |1 |    22   |
     When I go to "/escalations/file_rep/disputes/1"
+    And I click "#msg-modal"
     And I click "#communication-tab-link"
     And I click ".filerep-note-delete-button"
     And I click ".primary"
@@ -489,6 +509,7 @@ Feature: Disputes
     And A FileRep Dispute with trait "assigned" exists
     And A FileRep Dispute comment with trait "new" exists
     When I go to "/escalations/file_rep/disputes/1"
+    And I click "#msg-modal"
     And I click "#communication-tab-link"
     Then I should see content "seconds ago." within ".author-notation"
     Then I should not see "1 hour"
