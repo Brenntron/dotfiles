@@ -34,17 +34,9 @@
             %button.primary#get-rep-data Get Reputation Data
             .toolbar.research-toolbar
               %div
-                %label.toolbar-section-label File
-                %button.toolbar-button.export-button.esc-tooltipped{title: 'Export to CSV'}
-                  %span.toolbar-button-text Export to CSV
-              %div
-                %label.toolbar-section-label Actions
-                %button#clear-all-actions.toolbar-button.clear-button.esc-tooltipped{title: 'Clear all actions'}
-                  %span.toolbar-button-text Clear All Actions
-              %div
                 %label.toolbar-section-label Adjust Reputation
                 %span.dropdown
-                  %button#wlbl_entries_button.toolbar-button.adjust-wlbl-button.dropdown-toggle.esc-tooltipped.dropdown-button-margin-left{title: 'Adjust WL/BL', 'data-toggle': 'dropdown', 'aria-haspopup': 'true', 'aria-expanded': 'false', onclick:'open_wlbl();'}
+                  %button#wlbl_entries_button.toolbar-button.toolbar-button-spacer.adjust-wlbl-button.dropdown-toggle.esc-tooltipped.dropdown-button-margin-left{title: 'Adjust WL/BL', 'data-toggle': 'dropdown', 'aria-haspopup': 'true', 'aria-expanded': 'false', onclick:'open_wlbl();'}
                     %span.toolbar-button-text Adjust WL/BL
                   .dropdown-menu.toolbar-dropdown#wlbl_entries_dropdown{'aria-labelledby': 'wlbl_reptool'}
                     .dropdown-tool-text-divider.secondary-text-divider
@@ -116,6 +108,14 @@
                         .button-row-center
                           %button.primary.dropdown-submit-button{type: 'button', disabled: true, onclick: 'set_action_col();'}
                             Add Action to Entries
+              %div
+                %label.toolbar-section-label File
+                %button.toolbar-button.export-button.esc-tooltipped{title: 'Export to CSV'}
+                  %span.toolbar-button-text Export to CSV
+              %div
+                %label.toolbar-section-label Actions
+                %button#clear-all-actions.toolbar-button.clear-button.esc-tooltipped{title: 'Clear all actions'}
+                  %span.toolbar-button-text Clear All Actions
 
             %button.primary#submit-rep-changes{onclick:'submit_quick_lookup();return false;', disabled: true} Submit Reputation Changes
             %span.small.note-repsubmit
