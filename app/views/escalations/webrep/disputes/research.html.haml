@@ -26,7 +26,7 @@
           .col-xs-8.col-sm-9.col-md-10.col-lg-10.col-xl-11
             = search_form.text_area(:uri, class: 'search-box', placeholder: 'URI or IP Address', autofocus: 'true')
         .search-options-col.tab-pane#lookup-quick{role:'tabpanel'}
-          .col-xs-12.ajax-message-div
+          .ajax-message-div
             .loader-gears
               =inline_svg 'icon_gears_loader.svg'
             %span.loader-msg Loading data...
