@@ -10,7 +10,9 @@ $ ->
     ###
     ajaxStart: () ->
       $('.ajax-message-div').css('display', 'flex')
-    ajaxComplete: () ->
+    ajaxStop: () ->
+      $('.ajax-message-div').hide() 
+    ajaxComplete: () -> 
       completed_counter++
       selected_rows = $('.col-select-all input:checked').length * 4 - 4
       console.log completed_counter, selected_rows
