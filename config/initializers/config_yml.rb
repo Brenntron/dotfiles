@@ -16,7 +16,6 @@ Rails.configuration.amq_host            = env_config['amq']['host']
 
 auto_resolve = env_config['auto_resolve']
 raise "config.yml missing auto_resolve section" unless auto_resolve
-
 complaints                              = OpenStruct.new
 if auto_resolve['complaints']
   complaints.check                      = auto_resolve['complaints']['check']
@@ -36,8 +35,13 @@ end
 Rails.configuration.umbrella            = umbrella
 
 
-
+# New apirequester interface
+# bugzilla_config = env_config.fetch('bugzilla', {})
+# raise "config.yml missing bugzilla section" unless bugzilla_config
+# Rails.configuration.bugzilla            = ApiRequester::ApiRequester.config_of(bugzilla_config)
 raise "config.yml missing bugzilla section" unless env_config['bugzilla']
+
+
 Rails.configuration.bugzilla_host       = ENV['Bugzilla_host']   || env_config['bugzilla']['host']
 Rails.configuration.bugzilla_api_key    = env_config['bugzilla']['api_key']
 Rails.configuration.bugzilla_username   = ENV['Bugzilla_login']  || env_config['bugzilla']['login']
@@ -47,6 +51,12 @@ raise "config.yml missing cert section" unless env_config['cert']
 Rails.configuration.cert_file           = env_config['cert']['vrt']
 
 
+# New apirequester interface
+# peakebridge_config = env_config.fetch('peakebridge', {})
+# raise "config.yml missing peakebridge section" unless peakebridge_config
+# Rails.configuration.peakebridge       = ApiRequester::ApiRequester.config_of(peakebridge_config)
+# pb_sources = peakebridge_config.fetch('sources', {})
+# Rails.configuration.peakebridge.sources = pb_sources
 peakebridge_config = env_config['peakebridge']
 raise "config.yml missing peakebridge section" unless peakebridge_config
 peakebridge                             = OpenStruct.new
@@ -68,8 +78,13 @@ Rails.configuration.snort_json_path     = Rails.root.join(env_config['perl']['sn
 Rails.configuration.cve2x_path          = Rails.root.join(env_config['perl']['cve2x_path'])
 Rails.configuration.rule2yaml_path      = Rails.root.join(env_config['perl']['rule2yaml_path'])
 
+# New apirequester interface
+# rep_api = env_config.fetch('rep_api', {})
+# raise 'config.yml missing rep_api section' unless rep_api
+# Rails.configuration.rep_api              = ApiRequester::ApiRequester.config_of(rep_api)
 rep_api = env_config['rep_api']
 raise 'config.yml missing rep_api section' unless rep_api
+
 Rails.configuration.rep_api                = OpenStruct.new
 Rails.configuration.rep_api.host           = rep_api['host']
 Rails.configuration.rep_api.port           = rep_api['port']
@@ -96,9 +111,14 @@ end
 Rails.configuration.snort_doc_max_fails = env_config['snort_doc_max_fails'] || 3
 
 # TODO Check if unused
+# New apirequester interface
+# snort_org_config = env_config.fetch('snort_org', {})
+# raise 'config.yml missing snort_org section' unless snort_org_config
+# Rails.configuration.snort_org           = ApiRequester::ApiRequester.config_of(snort_org_config)
+#
 snort_org_config = env_config['snort_org']
 raise 'config.yml missing snort_org section' unless snort_org_config
-Rails.configuration.snort_org           = OpenStruct.new
+Rails.configuration.snort_org             = OpenStruct.new
 if env_config['snort_org']
   Rails.configuration.snort_org.host      = snort_org_config['host']
   Rails.configuration.snort_org.port      = snort_org_config['port']
@@ -120,6 +140,10 @@ Rails.configuration.wbrs                = ApiRequester::ApiRequester.config_of(w
 # TODO convert auth_token to api_key so it is set by config_of method.
 Rails.configuration.wbrs.auth_token     = wbrs_config['auth_token']
 
+# New apirequester interface
+# xbrs_config = env_config.fetch('xbrs', {})
+# raise 'config.yml missing xbrs section' unless xbrs_config
+# Rails.configuration.xbrs        = ApiRequester::ApiRequester.config_of(xbrs_config)
 xbrs_config = env_config['xbrs']
 raise 'config.yml missing xbrs section' unless xbrs_config
 Rails.configuration.xbrs                = OpenStruct.new
@@ -127,7 +151,13 @@ Rails.configuration.xbrs.host           = xbrs_config['host']
 Rails.configuration.xbrs.port           = xbrs_config['port']
 Rails.configuration.xbrs.verify_mode    = xbrs_config['verify_mode'] || xbrs_config['tls_mode']
 Rails.configuration.xbrs.gssnegotiate   = xbrs_config['gssnegotiate']
+Rails.configuration.xbrs.consumer_key   = xbrs_config['consumer_key']
 
+
+# New apirequester interface
+# virustotal = env_config.fetch('virustotal', {})
+# raise 'config.yml missing virustotal section' unless virustotal
+# Rails.configuration.virustotal        = ApiRequester::ApiRequester.config_of(virustotal)
 raise 'config.yml missing virus_total section' unless env_config['virustotal']
 virus_total                             = OpenStruct.new
 virus_total.check                       = auto_resolve['virus_total']['check']
@@ -141,6 +171,10 @@ Rails.configuration.virustotal.host     = virustotal['host']
 Rails.configuration.virustotal.port     = virustotal['port']
 Rails.configuration.virustotal.api_key  = virustotal['api_key']
 
+# New apirequester interface
+# bls_config = env_config.fetch('bls', {})
+# raise 'config.yml missing bls section' unless bls_config
+# Rails.configuration.bls              = ApiRequester::ApiRequester.config_of(bls_config)
 bls_config = env_config['bls']
 raise 'config.yml missing bls section' unless bls_config
 Rails.configuration.bls                = OpenStruct.new
@@ -172,6 +206,10 @@ ticloud = env_config.fetch('ticloud', {})
 raise 'config.yml missing ticloud section' unless ticloud
 Rails.configuration.ticloud             = ApiRequester::ApiRequester.config_of(ticloud)
 
+# New apirequester interface
+# elastic_config = env_config.fetch('elastic', {})
+# raise 'config.yml missing elastic section' unless elastic_config
+# Rails.configuration.elastic              = ApiRequester::ApiRequester.config_of(elastic_config)
 elastic_config = env_config['elastic']
 raise 'config.yml missing elastic section' unless elastic_config
 Rails.configuration.elastic              = OpenStruct.new
