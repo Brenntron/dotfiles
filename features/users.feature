@@ -180,7 +180,7 @@ Feature: User Accounts
     Then I should see "analyst, committer"
 
 
-  @now @javascript
+  @javascript
   Scenario: A manager can edit members subordinate manager teams on users page.
     Given a user with id "2" has a role "manager" and is logged in
     And the following users exist

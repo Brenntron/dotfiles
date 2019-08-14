@@ -34,7 +34,7 @@ Feature: RuleHit Resolution Mailer Templates
     Then I fill in "rulehit_resolution_mailer_template[cc]" with "cisco@cisco.com"
     Then I fill in "rulehit_resolution_mailer_template[subject]" with "Cucumber"
     Then I fill in "rulehit_resolution_mailer_template[body]" with "This is a test."
-    Then I trigger-click ".btn"
+    Then I click ".btn"
     Then I should see "Rulehit resolution mailer template was successfully created."
 
   @javascript
@@ -47,7 +47,7 @@ Feature: RuleHit Resolution Mailer Templates
     And I fill in "rulehit_resolution_mailer_template[cc]" with "hr@cisco.com"
     And I fill in "rulehit_resolution_mailer_template[subject]" with "Capybara"
     And I fill in "rulehit_resolution_mailer_template[body]" with "Run the test."
-    And I trigger-click ".btn"
+    And I click ".btn"
     Then I should see "Rulehit resolution mailer template was successfully updated."
 
   @javascript

@@ -392,6 +392,14 @@ Then(/^I see "(.*?)" in element "(.*?)"/) do |content, element|
   end
 end
 
+Then(/^I dismiss modal "(.*?)" if needed$/) do |modal_name|
+  begin
+    page.find("#{modal_name}").click
+  rescue Capybara::ElementNotFound => e
+    #dont need to dismiss the modal if it doesnt exist
+  end
+end
+
 Then /I click "(.*?)" and switch to the new window/ do |target|
   page.switch_to_window(page.window_opened_by{find(target).click})
 end
