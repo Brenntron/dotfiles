@@ -282,9 +282,11 @@ $ ->
 
                 $(new_link).on 'click', () ->
                   window.build_webcat_named_search(webcat_search_name)
+
                 $(new_delete).on 'click', () ->
                   window.delete_disputes_named_search(this,  webcat_search_name)
                   refresh_localStorage()
+
                 $(new_tr).append(new_td)
                 $(new_td).append(new_link)
                 $(new_td).append(new_delete)
@@ -308,19 +310,18 @@ $ ->
               cell.addClass 'highlight-second-review'
             if was_dismissed
               cell.addClass 'highlight-was-dismissed'
-
           columnDefs: [
             {
               targets: [ 0 ]
               className: 'expandable-row-column'
-              orderable: false
               searchable: false
+              orderable: false
             }
             {
               targets: [1]
               className: 'important-flag-col'
-              orderable: false
               searchable: false
+              orderable: false
             }
             {
               targets: [ 2 ]
@@ -355,17 +356,15 @@ $ ->
                 width: '10px'
                 render: ( data )->
                   { is_important, was_dismissed } = data
-                  html = ''
-
-                  if is_important && was_dismissed
-                      return '<div class="container-important-tags">' +
-                        '<div class="esc-tooltipped is-important" tooltip title="Important"></div>' +
-                        '<div class="esc-tooltipped was-reviewed" tooltip title="Reviewed"></div>' +
+                  if is_important == "true" && was_dismissed == "true"
+                      return '<div class="container-important-tags ">' +
+                        '<div class="esc-tooltipped is-important highlight-second-review" tooltip title="Important"></div>' +
+                        '<div class="esc-tooltipped was-reviewed highlight-was-dismissed" tooltip title="Reviewed"></div>' +
                         '</div>'
-                  else if is_important && !was_dismissed
-                    return '<span class="esc-tooltipped is-important" tooltip title="Important"></span>'
-                  else if !is_important && was_dismissed
-                    return '<span class="esc-tooltipped was-reviewed" tooltip title="Reviewed"></span>'
+                  else if is_important == "true" && was_dismissed == "false"
+                    return '<span class="esc-tooltipped is-important highlight-second-review" tooltip title="Important"></span>'
+                  else if is_important == "false" && was_dismissed == "true"
+                    return '<span class="esc-tooltipped was-reviewed highlight-was-dismissed" tooltip title="Reviewed"></span>'
               }
               {
                 data: 'entry_id'
@@ -493,8 +492,6 @@ $ ->
               }
               {
                 data: 'assigned_to'
-                render: (data) ->
-                  data
               }
               {
                 data: 'age_int'
@@ -505,9 +502,8 @@ $ ->
         responsive: true)
 
   if $('#complaints-index').length
-    build_complaints_table()
-
     $('#complaints-index_filter input').addClass('table-search-input');
+    build_complaints_table()
 
     $('#complaints-index tbody').on 'click', ' .nested-complaint-data', ->
       $(this).focus()
