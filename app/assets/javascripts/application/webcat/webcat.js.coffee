@@ -240,6 +240,7 @@ $ ->
           processing: true
           serverSide: true
           stateSave: true
+          select: true
           ajax:
             url: url
             data: build_data()
