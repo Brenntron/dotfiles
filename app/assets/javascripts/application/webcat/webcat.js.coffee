@@ -282,9 +282,11 @@ $ ->
 
                 $(new_link).on 'click', () ->
                   window.build_webcat_named_search(webcat_search_name)
+
                 $(new_delete).on 'click', () ->
                   window.delete_disputes_named_search(this,  webcat_search_name)
                   refresh_localStorage()
+
                 $(new_tr).append(new_td)
                 $(new_td).append(new_link)
                 $(new_td).append(new_delete)
@@ -312,14 +314,14 @@ $ ->
             {
               targets: [ 0 ]
               className: 'expandable-row-column'
-              orderable: false
               searchable: false
+              orderable: false
             }
             {
               targets: [1]
               className: 'important-flag-col'
-              orderable: false
               searchable: false
+              orderable: false
             }
             {
               targets: [ 2 ]
@@ -331,7 +333,6 @@ $ ->
             }
             {
               targets: [ 12 ]
-              className: 'submitter-col'
             }
           ]
           columns: [
@@ -490,8 +491,6 @@ $ ->
               }
               {
                 data: 'assigned_to'
-                render: (data) ->
-                  data
               }
               {
                 data: 'age_int'
@@ -503,8 +502,6 @@ $ ->
 
   if $('#complaints-index').length
     build_complaints_table()
-
-    $('#complaints-index_filter input').addClass('table-search-input');
 
     $('#complaints-index tbody').on 'click', ' .nested-complaint-data', ->
       $(this).focus()
