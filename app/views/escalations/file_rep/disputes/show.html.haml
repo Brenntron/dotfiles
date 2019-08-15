@@ -1,4 +1,7 @@
 -#view single record
+- unless @file_rep_dispute.customer.nil? || @file_rep_dispute.customer.company.nil?
+  %input{type:'hidden', name: 'filerep-dispute-customer-company-name', value: "#{@file_rep_dispute.customer.company.name}"}
+
 .row
   .col-xs-12.col-sm-6
     .content-wrapper.top-case-info.ticket-overview-wrapper
