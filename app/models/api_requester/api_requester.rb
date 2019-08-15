@@ -187,6 +187,14 @@ module ApiRequester::ApiRequester
       request_config.api_key
     end
 
+    def read_timeout
+      request_config.read_timeout
+    end
+
+    def open_timeout
+      request_config.open_timeout
+    end
+
     def stringkey_params(conditions = {})
       conditions.inject({}) do |params, (key, value)|
         params[key.to_s] = value if value
@@ -210,6 +218,9 @@ module ApiRequester::ApiRequester
 
       request = HTTPI::Request.new(uri(path, query))
       request.auth.gssnegotiate
+
+      request.read_timeout = read_timeout
+      request.open_timeout = open_timeout
 
       case verify_mode
       when 'verify-peer'

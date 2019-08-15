@@ -25,6 +25,13 @@ class Xbrs::Base
     @ca_cert_file ||= Rails.configuration.xbrs.ca_cert_file
   end
 
+  def self.read_timeout
+    @read_timeout ||= Rails.configuration.xbrs.read_timeout
+  end
+  def self.open_timeout
+    @open_timeout ||= Rails.configuration.xbrs.open_timeout
+  end
+
   def self.stringkey_params(conditions = {})
     conditions.inject({}) do |params, (key, value)|
       params[key.to_s] = value if value
@@ -51,6 +58,9 @@ class Xbrs::Base
         end
 
     request = HTTPI::Request.new("#{protocol}://#{host}:#{port}#{path}?consumer=#{self.consumer_key}")
+
+    request.read_timeout = read_timeout
+    request.open_timeout = open_timeout
 
     case tls_mode
       when 'verify-peer'
