@@ -163,7 +163,7 @@ $ ->
       }
     ]
   )
-#  $('#clusters-index_filter input').addClass('table-search-input');
+  $('#clusters-index_filter input').addClass('table-search-input');
   window.populate_clusters_index_table()
 
 $ ->

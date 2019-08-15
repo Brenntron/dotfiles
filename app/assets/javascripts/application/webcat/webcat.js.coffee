@@ -333,6 +333,7 @@ $ ->
             }
             {
               targets: [ 12 ]
+              className: 'submitter-col'
             }
           ]
           columns: [
@@ -501,6 +502,7 @@ $ ->
         responsive: true)
 
   if $('#complaints-index').length
+    $('#complaints-index_filter input').addClass('table-search-input');
     build_complaints_table()
 
     $('#complaints-index tbody').on 'click', ' .nested-complaint-data', ->
