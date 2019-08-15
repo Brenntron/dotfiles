@@ -188,7 +188,7 @@ class ComplaintEntry < ApplicationRecord
         cat_from_wbrs = self.set_current_category
         update!(url_primary_category: cat_from_wbrs, category: cat_from_wbrs)
       end
-      if self.status == "COMPLETED"
+      if self.status == "COMPLETED" && self.complaint_entry_screenshot.present?
         self.complaint_entry_screenshot.destroy
       end
     end
