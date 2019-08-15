@@ -1362,5 +1362,12 @@ $ ->
       )
 
 
-
-
+# file rep index - toggle all cb's and highlight rows
+window.file_rep_select_all = () ->
+  table = $('#file-rep-datatable')
+  if $('#file-rep-cb-all').is(':checked')
+    $(table).find(':checkbox').prop('checked', true)
+    $(table).find('tr').addClass('selected')
+  else
+    $(table).find(':checkbox').prop('checked', false)
+    $(table).find('tr').removeClass('selected')
