@@ -648,9 +648,9 @@ $(document).on 'click', ".screenshot-close-button", ->
 window.enlarge_image = (id,image,retake_in_progress)->
   image_content = ""
   if retake_in_progress
-    image_content = '<img src="' + image + '"><span class="screenshot-button screenshot-reload-button esc-tooltipped" title="Reload Page">Reload Page</span>'
+    image_content = '<img height=600 width=800 src="' + image + '"><span class="screenshot-button screenshot-reload-button esc-tooltipped" title="Reload Page">Reload Page</span>'
   else
-    image_content = '<img src="' + image + '"><span class="screenshot-button screenshot-retake-button esc-tooltipped" id="se_id_' + id + '" title="Retake Screenshot"></span><span class="screenshot-button screenshot-close-button"></span>'
+    image_content = '<img height=600 width=800 src="' + image + '"><span class="screenshot-button screenshot-retake-button esc-tooltipped" id="se_id_' + id + '" title="Retake Screenshot"></span><span class="screenshot-button screenshot-close-button"></span>'
 
   $('#screenshot_id_'+ id).popover(
     html: true
