@@ -5,7 +5,7 @@ raise "config.yml missing #{Rails.env} section" unless env_config
 
 Rails.configuration.app_name = Rails.application.engine_name.gsub(/_application/,'')
 
-Rails.configuration.api_master_timeout  = env_config['api_timeout']['timeout'] || 25
+Rails.configuration.api_master_timeout  = env_config['api_timeout']['timeout'] || 20
 
 amp_poke = env_config.fetch('amp_poke', {})
 Rails.configuration.amp_poke            = ApiRequester::ApiRequester.config_of(amp_poke)
