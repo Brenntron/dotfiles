@@ -497,7 +497,20 @@ $ ->
         new_header = 'All File Reputation Tickets'
       $('#filerep-index-title')[0].innerHTML = new_header
 
-  window.export_file_rep = () ->
+
+  window.export_file_rep_all = () ->
+    data = {
+      search_type: ''
+      search_name: ''
+      selected_cases: []
+    }
+    if 'advanced' == data.search_type
+      data.search_name = null
+    data_json = JSON.stringify(data)
+    $('#index-export-data-input').val(data_json)
+    return true
+
+  window.export_file_rep_selected = () ->
     data = build_data()
     if 'advanced' == data.search_type
       data.search_name = null

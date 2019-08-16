@@ -261,7 +261,9 @@
       File
     %form#disputes-index-export-form{action: escalations_file_rep_disputes_path(format: :xlsx), method: :get}
       = hidden_field_tag('data_json', '{}', id: 'index-export-data-input')
-      %button.toolbar-button.export-button.esc-tooltipped{onclick: 'export_file_rep();', title: 'Export to CSV'}
+      %button.toolbar-button.export-button.esc-tooltipped{onclick: 'export_file_rep_all();', title: 'Export All to CSV'}
         %span.toolbar-button-text
-          Export to CSV
-
+          Export All to CSV
+      %button.toolbar-button.export-button.esc-tooltipped{onclick: 'export_file_rep_selected();', title: 'Export Selected to CSV'}
+        %span.toolbar-button-text
+          Export Selected to CSV
