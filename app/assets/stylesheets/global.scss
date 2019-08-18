@@ -6316,11 +6316,17 @@ table.dispute-entry-table tbody tr.selected {
 }
 
 #show-ticket-resolution-submenu {
-  left: 100%;
+  left: 159px;
   border-radius: 0 4px 4px 4px;
-  width: 350px;
+  width: 600px;
   margin-top: -55px;
   padding: 0;
+  textarea{
+    height: 105px;
+  }
+  button.primary{
+    margin: 2% 0px 0px 33%
+  }
 }
 
 #show-ticket-resolution-submenu .radio-label {
