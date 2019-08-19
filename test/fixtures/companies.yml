@@ -1,0 +1,7 @@
+# Read about fixtures at http://api.rubyonrails.org/classes/ActiveRecord/FixtureSet.html
+
+guest:
+  id: 3
+  name: "Guest"
+  created_at: "2018-09-24 15:47:45"
+  updated_at: "2018-09-24 15:47:45"

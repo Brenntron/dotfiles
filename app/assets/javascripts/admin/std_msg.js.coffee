@@ -1,11 +1,12 @@
 
 window.std_msg_set_class =(new_class, selector = '#api-msg') ->
   api_msg = $(selector)[0]
-  api_msg.classList.remove('hidden-msg')
-  api_msg.classList.remove('success-msg')
-  api_msg.classList.remove('error-msg')
-  api_msg.classList.remove('fail-msg')
-  api_msg.classList.add(new_class)
+  if api_msg
+    api_msg.classList.remove('hidden-msg')
+    api_msg.classList.remove('success-msg')
+    api_msg.classList.remove('error-msg')
+    api_msg.classList.remove('fail-msg')
+    api_msg.classList.add(new_class)
 
 
 window.array_to_ul =(items) ->

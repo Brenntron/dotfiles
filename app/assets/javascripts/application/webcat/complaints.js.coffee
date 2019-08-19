@@ -14,6 +14,7 @@ $(document).ready ->
      $('body').hasClass('index-action')
     window.check_wbnp_status()
 
+
 # WBNP - Get report id
 window.fetch_wbnp_data = () ->
   $('#fetch_wbnp').attr('disabled', true)

@@ -1,0 +1,44 @@
+- content_for(:title) do
+  Admin - Analyst Console
+
+!!! html
+%html
+  %head
+    %title= content_for?(:title) ? content_for(:title) : 'Analyst Console'
+    %link{rel: "shortcut icon", href: image_path('analyst-console-favicon.ico')}
+    = stylesheet_link_tag("admin_redesign", media: "all", "data-turbolinks-track" => true)
+    = javascript_include_tag("admin_redesign", "data-turbolinks-track" => true)
+    = csrf_meta_tags
+  %body{class: "rocket-layout #{controller_path.gsub('/', '--')}-controller #{action_name}-action"}
+    %input#user_id{type: 'hidden', name: 'user_id', value: "#{current_user.id}"}
+    %input{:name => "token", :type => "hidden", :value => "#{current_user.authentication_token}"}
+    %input{:type => "hidden", :name => "xml_token", :value => "#{xml_token}"}
+    = render '/shared/alert_modal'
+    = render '/shared/loader_modal'
+    = render partial: "shared/flash_messages", flash: flash
+
+    #page-wrapper
+      #page-content-wrapper
+        %nav.navbar.navbar-default.navbar-fixed-top
+          .container-fluid
+            .collapse.navbar-collapse#secondary-navigation
+              %ul.nav.navbar-nav.navbar-right.root_links
+                %li= link_to "Extras"
+                %li= link_to "Dashboard", "/escalations/admin"
+                %li= link_to "Home", "/escalations"
+
+        .container-fluid
+          .row
+            .col-md-12
+              %div.section-wrapper.section-top-info-offset
+                %h1 Admin Extras
+                %h4 this is where we will put extra admin buttons and things for escalations.
+
+                %label This button will remove rust_mosprofile directories from /tmp
+                %button#id1.class{onclick: 'purge_mozprofiles()', title: 'purge profiles'} purge mozprofiles!
+
+                %p
+
+                %label This button will remove firefox core files
+                %button#id2.class{onclick: 'purge_mozilla_corefiles()', title: 'purge cores'} purge Cores!
+                %input{type: 'checkbox', id: 'purgeCore-checkbox'} keep one?

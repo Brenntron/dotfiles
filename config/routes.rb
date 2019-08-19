@@ -1,9 +1,10 @@
 Rails.application.routes.draw do
 
-  mount RailsAdmin::Engine => '/escalations/admin', as: 'rails_admin'
+
   devise_for :users, controllers: {sessions: 'sessions'}
 
   namespace :escalations, except: [:destroy, :edit] do
+    get 'admin/extras' => 'admin#index'
     get 'sb_api/query_lookup' => 'sb_api#query_lookup'
 
     resources :roles, except: [:show], controller: '/admin/roles'
@@ -121,7 +122,7 @@ Rails.application.routes.draw do
       end
     end
   end #namespace :escalations
-
+  mount RailsAdmin::Engine => '/escalations/admin', as: 'rails_admin'
   namespace :admin do
     constraints AccessDelayedJobWeb do
       mount DelayedJobWeb, at: "delayed_job"
