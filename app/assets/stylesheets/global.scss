@@ -6321,8 +6321,9 @@ table.dispute-entry-table tbody tr.selected {
   width: 600px;
   margin-top: -55px;
   padding: 0;
-  textarea{
+  .resolution-status-comment{
     height: 105px;
+    font-size: 12px;
   }
   button.primary{
     margin: 2% 0px 0px 33%
