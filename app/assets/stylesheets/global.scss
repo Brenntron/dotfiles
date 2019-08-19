@@ -6773,6 +6773,13 @@ hr.condensed {
   .history-button.inline-button {
     margin-left: 4px;
   }
+  // FF needs a tiny alignment correction
+  @-moz-document url-prefix() {
+    .history-button.inline-button {
+      position: relative;
+      bottom: 2px;
+    }
+  }
 }
 
 .nav-tool-content-wrapper#categorize-urls-form-wrapper {
