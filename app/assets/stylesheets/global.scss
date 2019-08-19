@@ -6762,9 +6762,17 @@ hr.condensed {
 }
 
 .categorize-radio-wrapper.row {
-  margin-right: -10px;
-  margin-left: -10px;
   padding: 12px 6px;
+}
+
+// webcat > categorize urls dropdown in top nav
+#categorize-diff-form {
+  .current-categories-button {
+    margin-right: 3px;
+  }
+  .history-button.inline-button {
+    margin-left: 4px;
+  }
 }
 
 .nav-tool-content-wrapper#categorize-urls-form-wrapper {
