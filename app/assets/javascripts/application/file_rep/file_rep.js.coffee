@@ -498,21 +498,32 @@ $ ->
       $('#filerep-index-title')[0].innerHTML = new_header
 
   window.export_file_rep_all = () ->
+    form = document.getElementById("disputes-index-export-form")
     data = {
       search_type: ''
       search_name: ''
       selected_cases: []
     }
+
+    $('.dispute_check_box').each ->
+      case_id =  $(this).attr('value')
+      data.selected_cases.push(case_id)
+
     if 'advanced' == data.search_type
       data.search_name = null
     data_json = JSON.stringify(data)
     $('#index-export-data-input').val(data_json)
-    document.getElementById("disputes-index-export-form").onsubmit = ""
+    form.onsubmit = ""
     form.submit()
-    return true
+    form.onsubmit = () ->
+      return false
+
+  $(document).on 'change', '.dispute_check_box', ->
+    document.getElementById("disputes-index-export-form").onsubmit = () ->
+      return false
+
 
   window.export_file_rep_selected = () ->
-    form = $('#disputes-index-export-form')
     data = build_data()
     if data.selected_cases.length <= 0
       std_msg_error('Error: Nothing selected.',"", reload: false)
@@ -521,10 +532,10 @@ $ ->
       data.search_name = null
     data_json = JSON.stringify(data)
     $('#index-export-data-input').val(data_json)
-
     document.getElementById("disputes-index-export-form").onsubmit = ""
-    form.submit()
-    return true
+
+
+
 
   $('#file-rep-datatable').dataTable
     drawCallback: ( settings ) ->
@@ -1254,7 +1265,7 @@ $ ->
 
 
   $(document).ready ->
-    # Make sure you're on show page to fetch the AMP data
+  # Make sure you're on show page to fetch the AMP data
     if $('body.escalations--file_rep--disputes-controller').hasClass('show-action')
       curr_sha256_hash = $('#sha256_hash').text()
 
