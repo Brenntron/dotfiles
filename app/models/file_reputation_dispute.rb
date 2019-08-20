@@ -53,6 +53,12 @@ class FileReputationDispute < ApplicationRecord
   RESOLUTION_AUTORESOLVED_MALICIOUS_COMMENT       = <<~HEREDOC
     Talos has concluded that the file is unsafe due to malicious activity; the file has been marked malicious. This update will be publicly visible in the next 24 hours. If your device or endpoint client is not reflecting this disposition, please open a TAC case.
   HEREDOC
+  RESOLUTION_AUTORESOLVED_FP_CLEAN         = <<~HEREDOC
+    Cisco Talos has concluded that the file is safe to access at this time. This update will be publicly visible in the next 24 hours. If your device or endpoint client is not reflecting this disposition, please open a TAC case.
+  HEREDOC
+  RESOLUTION_AUTORESOLVED_UNCHANGED         = <<~HEREDOC
+    Cisco Talos has not found sufficient evidence to modify the current disposition of the file-in-question; we cannot change the file’s disposition because it can negatively affect our customers. However, a customer has the option of locally changing a file’s disposition, if they understand the risks in doing so. If you need further assistance, please open a TAC case and provide additional details.
+  HEREDOC
 
 
   AC_SUCCESS = 'CREATE_ACK'
@@ -645,6 +651,33 @@ class FileReputationDispute < ApplicationRecord
     conn.post(return_payload)
   end
 
+  def auto_resolve_fn(from)
+
+    auto_resolved_boolean = false
+
+    FileReputationApi::Sandbox.run_sample(self.sha256_hash)
+    FileReputationApi::Sandbox.send_to_threatgrid(self.sha256_hash, api_key_type: self.sandbox_key)
+    FileReputationApi::Magic.run_analysis(self.sha256_hash)
+
+
+    FileReputationDispute.check_case_for_auto_resolve(self.id)
+    self.status = STATUS_PROCESSING
+    self.save
+
+    auto_resolved_boolean
+  end
+
+  def auto_resolve_fp(from)
+    FileReputationApi::Sandbox.run_sample(self.sha256_hash)
+    FileReputationApi::Sandbox.send_to_threatgrid(self.sha256_hash, api_key_type: self.sandbox_key)
+    FileReputationApi::Magic.run_analysis(self.sha256_hash)
+
+
+    FileReputationDispute.check_case_for_auto_resolve_fp(self.id)
+    self.status = STATUS_PROCESSING
+    self.save
+  end
+
   def auto_resolve_on_matching_disposition(from: 'ACE')
       auto_resolved_boolean = false
 
@@ -696,14 +729,13 @@ class FileReputationDispute < ApplicationRecord
         return auto_resolved_boolean
       end
 
-      FileReputationApi::Sandbox.run_sample(self.sha256_hash)
-      FileReputationApi::Sandbox.send_to_threatgrid(self.sha256_hash, api_key_type: self.sandbox_key)
-      FileReputationApi::Magic.run_analysis(self.sha256_hash)
+      if self.suggested_malicious?
+        return auto_resolve_fn(from)
+      end
 
-
-      FileReputationDispute.check_case_for_auto_resolve(self.id)
-      self.status = STATUS_PROCESSING
-      self.save
+      if self.suggested_clean?
+        return auto_resolve_fp(from)
+      end
 
       auto_resolved_boolean
   end
@@ -731,6 +763,66 @@ class FileReputationDispute < ApplicationRecord
     end
     #20 minutes to allow sandbox to run, since best case is 10 minutes and its rarely that fast
     handle_asynchronously :check_case_for_auto_resolve, :run_at => Proc.new { 20.minutes.from_now }
+
+
+    def check_case_for_auto_resolve_fp(file_rep_id)
+      file_rep = FileReputationDispute.find(file_rep_id)
+
+      if FileReputationApi::ReversingLabs.has_trusted_signature?(file_rep.sha256_hash)
+
+        #POKE CLEAN HERE
+        #FileReputationApi::Detection.update_detection(self.sha256_hash, FileReputationApi::Detection::DISPOSITION_CLEAN)
+        file_rep.disposition = DISPOSITION_CLEAN
+        file_rep.status = STATUS_RESOLVED
+        file_rep.resolution = RESOLUTION_AUTORESOLVED
+        file_rep.resolution_comment = RESOLUTION_AUTORESOLVED_FP_CLEAN
+        file_rep.save
+
+        FileReputationApi::ReversingLabs.subscribe(file_rep.sha256_hash)
+
+        conn = ::Bridge::FileRepUpdateStatusEvent.new(addressee: "talos-intelligence")
+        conn.post(file_rep, source_authority: "talos-intelligence", source_key: file_rep.ticket_source_key)
+
+        return
+      end
+
+      is_malicious = false
+
+      results = JSON.parse(FileReputationApi::ReversingLabs.lookup_immediate(file_rep.sha256_hash).raw_json)["rl"]["sample"]["xref"]["entries"].first["scanners"]
+      mal_results = []
+      critical_mals = []
+      results.each do |result|
+        if result["result"] != ""
+          mal_results << result["name"]
+          #note: antivir is actually Avira
+          if ['kaspersky', 'sophos', 'bitdefender', 'antivir', 'mcafee', 'clamav'].include?(result["name"])
+            critical_mals << result["name"]
+          end
+        end
+      end
+
+      if mal_results.size >= 15
+        is_malicious = true
+      end
+
+      if critical_mals.size >= 2
+        is_malicious = true
+      end
+
+      if is_malicious == true
+        file_rep.status = STATUS_RESOLVED
+        file_rep.resolution = RESOLUTION_AUTORESOLVED
+        file_rep.resolution_comment = RESOLUTION_AUTORESOLVED_UNCHANGED
+        file_rep.save
+
+        conn = ::Bridge::FileRepUpdateStatusEvent.new(addressee: "talos-intelligence")
+        conn.post(file_rep, source_authority: "talos-intelligence", source_key: file_rep.ticket_source_key)
+
+      end
+
+    end
+    #20 minutes to allow sandbox to run, since best case is 10 minutes and its rarely that fast
+    handle_asynchronously :check_case_for_auto_resolve_fp, :run_at => Proc.new { 20.minutes.from_now }
   end
 
   def self.auto_resolve_on_duplicate(dispute)
@@ -886,4 +978,35 @@ class FileReputationDispute < ApplicationRecord
     conn = ::Bridge::FileRepUpdateStatusEvent.new(addressee: "talos-intelligence")
     conn.post(self, source_authority: "talos-intelligence", source_key: self.ticket_source_key)
   end
+
+  def self.check_for_rep_updates
+    results = FileReputationApi::ReversingLabs.check_for_updates["entries"]
+    user = User.where(cvs_username:"vrtincom").first
+
+    if results.any?
+      results.each do |result|
+        if result.key_exists?("sha256") && result["updated_sections"].include?("malware_presence")
+          file_rep_case = FileReputationDispute.where(:sha256_hash => result['sha256'])
+          if file_rep_case.present? && file_rep_case.disposition == FileReputationDispute::DISPOSITION_CLEAN
+            category = FileReputationApi::ReversingLabs.get_signature_category(file_rep_case.sha256_hash)
+            if category != FileReputationDispute::DISPOSITION_CLEAN
+              new_comment = FileRepComment.new
+              new_comment.comment = "Auto resolve monitoring picked up a change in disposition from Reversing Labs [ #{file_rep_case.disposition} -> #{category} ].  Reopening Ticket.  Investigation from an analyst is required. "
+              new_comment.user_id = user.id
+              new_comment.file_reputation_dispute_id = file_rep_case.id
+              new_comment.save
+
+              file_rep_case.disposition = category
+              file_rep_case.status = FileReputationDispute::STATUS_REOPENED
+              file_rep_case.save
+            end
+          end
+        end
+      end
+    end
+
+  end
+
+
+
 end
