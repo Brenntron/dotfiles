@@ -497,7 +497,6 @@ $ ->
         new_header = 'All File Reputation Tickets'
       $('#filerep-index-title')[0].innerHTML = new_header
 
-
   window.export_file_rep_all = () ->
     data = {
       search_type: ''
@@ -508,14 +507,23 @@ $ ->
       data.search_name = null
     data_json = JSON.stringify(data)
     $('#index-export-data-input').val(data_json)
+    document.getElementById("disputes-index-export-form").onsubmit = ""
+    form.submit()
     return true
 
   window.export_file_rep_selected = () ->
+    form = $('#disputes-index-export-form')
     data = build_data()
+    if data.selected_cases.length <= 0
+      std_msg_error('Error: Nothing selected.',"", reload: false)
+      return false
     if 'advanced' == data.search_type
       data.search_name = null
     data_json = JSON.stringify(data)
     $('#index-export-data-input').val(data_json)
+
+    document.getElementById("disputes-index-export-form").onsubmit = ""
+    form.submit()
     return true
 
   $('#file-rep-datatable').dataTable
