@@ -38,7 +38,7 @@ class Escalations::Webrep::DisputesController < ApplicationController
                            'Case ID',
                            'Status',
                            'Entry Count',
-                           'Owner',
+                           'Assignee',
                            'Customer Name',
                            'Customer Email',
                            'Customer Company',
@@ -303,7 +303,7 @@ class Escalations::Webrep::DisputesController < ApplicationController
               :open_team_tickets => 'Open Tickets',
               :closed_team_tickets => 'Closed Tickets',
               :average_time_to_close_tickets_by_owner => 'Average Time to Close Tickets',
-              :ticket_resolution_by_owner => 'Ticket Resolution by Owner',
+              :ticket_resolution_by_owner => 'Ticket Resolution by Assignee',
               :rule_hits_for_false_positive_resolutions => 'Rule Hits for False Positive Resolutions',
               :total_ticket_entries_closed => 'Total Ticket Entries Closed',
               :ticket_submitted_by_submitter_type => 'Tickets Submitted by Submitter Type',
@@ -324,7 +324,7 @@ class Escalations::Webrep::DisputesController < ApplicationController
 
           open_team_tickets_headers = [
               'Case ID',
-              'Owner',
+              'Assignee',
               'Submitter Type',
               'Ticket Type',
               'Priority',
