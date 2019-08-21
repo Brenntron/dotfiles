@@ -378,9 +378,6 @@ $ ->
       selected_cases: []
     }
 
-    $('.dispute_check_box:checked').each ->
-      case_id =  $(this).attr('value')
-      data.selected_cases.push(case_id)
 
     if location.search != ''
       urlParams = new URLSearchParams(location.search);
@@ -388,6 +385,7 @@ $ ->
       data ={
         search_type : 'standard'
         search_name : urlParams.get('f')
+        selected_cases: []
       }
 
       refresh_localStorage()
@@ -407,18 +405,27 @@ $ ->
             search_type: search_type
             search_name: search_name
             search_conditions: search_conditions
-          }
+            selected_cases: []
+        }
       else if search_type == 'named'
         data = {
           search_type: search_type
           search_name: search_name
+          selected_cases: []
         }
       else if search_type == 'contains'
         search_conditions = JSON.parse(search_conditions)
         data = {
           search_type: search_type
           search_conditions: search_conditions
+          selected_cases: []
         }
+
+
+    $('.dispute_check_box:checked').each ->
+      case_id =  $(this).attr('value')
+      data.selected_cases.push(case_id)
+
 
     format_filerep_header(data)
     return data
