@@ -10,7 +10,7 @@
     %input.form-control#dispute-input{name: 'ip_or_uri'}
     %button.remove-input
   .form-group.search-item
-    %label.content-label-sm Case Owner
+    %label.content-label-sm Assignee
     %input.form-control#owner-input{name: 'username', list: 'user-list'}
     %datalist#user-list
     %button.remove-input
@@ -110,7 +110,7 @@
         %li.hidden
           %label.search-criteria-label
             %input.search-checkbox#owner-cb{type: 'checkbox', name: 'search-criteria', value: 'Case Owner', for: 'owner-input'}
-            Case Owner
+            Assignee
         %li.hidden
           %label.search-criteria-label
             %input.search-checkbox#status-cb{type: 'checkbox', name: 'search-criteria', value: 'Status', for: 'status-input'}
