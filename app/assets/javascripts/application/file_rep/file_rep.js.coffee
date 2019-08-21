@@ -432,6 +432,7 @@ $ ->
 
   window.format_filerep_header = (data) ->
     container = $('#filerep_searchref_container')
+    container.html("")
     if data != undefined && container.length > 0
       reset_icon = '<span id="refresh-filter-button" class="reset-filter esc-tooltipped" title="Clear Search Results" onclick="filerep_refresh()"></span>'
       {search_type, search_name} = data
