@@ -21,5 +21,5 @@ class Bridge::FileRepUpdateStatusEvent < Bridge::BaseMessage
     })
   end
 
-  handle_asynchronously :post, :queue => "filerep_status_update"
+  handle_asynchronously :post, :queue => "filerep_status_update", :priority => 2
 end

@@ -41,5 +41,5 @@ class ComplaintEntryScreenshot < ApplicationRecord
   end
 
 
-  handle_asynchronously :grab_screenshot, :queue => "screen_grab"
+  handle_asynchronously :grab_screenshot, :queue => "screen_grab", :priority => 20
 end
