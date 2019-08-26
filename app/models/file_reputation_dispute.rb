@@ -39,6 +39,7 @@ class FileReputationDispute < ApplicationRecord
   SUBMITTER_TYPE_NONCUSTOMER = "NON-CUSTOMER"
   SUBMITTER_TYPE_INTERNAL = "INTERNAL"
 
+  RESOLUTION_AUTORESOLVED_STATUS_FP = "AUTO_FIXED_FP"
   RESOLUTION_AUTORESOLVED               = 'Auto Resolved'
   RESOLUTION_DUPLICATE              = 'DUPLICATE'
   RESOLUTION_AUTORESOLVED_COMMENT       = <<~HEREDOC
@@ -782,7 +783,7 @@ class FileReputationDispute < ApplicationRecord
         end
         file_rep.disposition = DISPOSITION_CLEAN
         file_rep.status = STATUS_RESOLVED
-        file_rep.resolution = RESOLUTION_AUTORESOLVED
+        file_rep.resolution = RESOLUTION_AUTORESOLVED_STATUS_FP
         file_rep.resolution_comment = RESOLUTION_AUTORESOLVED_FP_CLEAN
         file_rep.save
 
@@ -1042,6 +1043,11 @@ class FileReputationDispute < ApplicationRecord
     end
   end
 
-
+  def self.check_and_unsubscribe
+    candidates = FileReputationDispute.where({:status => STATUS_RESOLVED, :resolution => RESOLUTION_AUTORESOLVED_STATUS_FP}).where("case_closed_at <= '#{3.months.ago}'")
+    candidates.each do |candidate|
+      FileReputationApi::ReversingLabs.unsubscribe(candidate.sha256_hash)
+    end
+  end
 
 end

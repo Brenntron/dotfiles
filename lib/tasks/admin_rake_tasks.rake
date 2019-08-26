@@ -4,7 +4,12 @@ require 'rake'
 namespace :escalations do
   task :check_file_reputations do
     FileReputationDispute.check_for_rep_updates
-  end  
+  end
+
+  task :check_and_unsubscribe do
+    FileReputationDispute.check_and_unsubscribe
+  end
+end
 
 namespace :bugs do
   task :update_in_summary_flag => :environment do
