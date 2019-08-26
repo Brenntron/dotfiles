@@ -5,6 +5,7 @@ raise "config.yml missing #{Rails.env} section" unless env_config
 
 Rails.configuration.app_name = Rails.application.engine_name.gsub(/_application/,'')
 
+raise "config.yml missing timeout section" unless env_config['api_timeout']
 Rails.configuration.api_master_timeout  = env_config['api_timeout']['timeout'] || 20
 
 amp_poke = env_config.fetch('amp_poke', {})
@@ -48,7 +49,7 @@ Rails.configuration.cert_file           = env_config['cert']['vrt']
 
 # New apirequester interface
 peakebridge_config = env_config.fetch('peakebridge', {})
-raise "config.yml missing peakebridge section" unless peakebridge_config
+raise "config.yml missing peakebridge section" unless peakebridge_config.empty?
 Rails.configuration.peakebridge       = ApiRequester::ApiRequester.config_of(peakebridge_config)
 pb_sources = peakebridge_config.fetch('sources', {})
 Rails.configuration.peakebridge.sources = pb_sources
