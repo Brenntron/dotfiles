@@ -69,8 +69,10 @@ module ApiRequester::ApiRequester
   # @return [OpenStruct] an open struct with standard values set, which can be added to for custom settings.
   def self.config_of(hash)
     struct = OpenStruct.new
-    %w{host verify_mode tls_mode ssl_mode port gssnegotiate ca_cert_file api_key username password timeout}.each do |key|
-      struct.send((key + '=').to_sym, hash[key])
+    sliced_hash = hash.slice(*%w{host port verify_mode tls_mode ssl_mode
+                                 gssnegotiate ca_cert_file api_key username password timeout})
+    sliced_hash.each_pair do |key, value|
+      struct.send((key + '=').to_sym, value)
     end
     struct.verify_mode = struct.verify_mode || struct.tls_mode || struct.ssl_mode
     struct.tls =
@@ -86,9 +88,6 @@ module ApiRequester::ApiRequester
     struct.open_timeout = struct.timeout || Rails.configuration.api_master_timeout
     struct.read_timeout = struct.timeout || Rails.configuration.api_master_timeout
 
-    %w{host verify_mode tls_mode ssl_mode port gssnegotiate ca_cert_file api_key username password timeout}.each do |key|
-      struct.delete_field(key.to_sym) if struct.send(key.to_sym).nil?
-    end
     struct
   end
 
