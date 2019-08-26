@@ -1,6 +1,9 @@
 development:
   amq: #active message queue
     host: "localhost"
+    timeout: 2
+  api_timeout:
+    timeout: 15
   auto_resolve:
     complaints:
       check: true
