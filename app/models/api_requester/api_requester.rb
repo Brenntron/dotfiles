@@ -73,7 +73,6 @@ module ApiRequester::ApiRequester
     sliced_hash.each_pair do |key, value|
       struct.send((key + '=').to_sym, value)
     end
-    # struct.verify_mode = struct.verify_mode || struct.tls_mode || struct.ssl_mode
     struct.verify_mode = hash['verify_mode'] || hash['tls_mode'] || hash['ssl_mode']
     struct.tls =
         case struct.verify_mode
