@@ -69,12 +69,12 @@ module ApiRequester::ApiRequester
   # @return [OpenStruct] an open struct with standard values set, which can be added to for custom settings.
   def self.config_of(hash)
     struct = OpenStruct.new
-    sliced_hash = hash.slice(*%w{host port verify_mode tls_mode ssl_mode
-                                 gssnegotiate ca_cert_file api_key username password timeout})
+    sliced_hash = hash.slice(*%w{host port gssnegotiate ca_cert_file api_key username password timeout})
     sliced_hash.each_pair do |key, value|
       struct.send((key + '=').to_sym, value)
     end
-    struct.verify_mode = struct.verify_mode || struct.tls_mode || struct.ssl_mode
+    # struct.verify_mode = struct.verify_mode || struct.tls_mode || struct.ssl_mode
+    struct.verify_mode = hash['verify_mode'] || hash['tls_mode'] || hash['ssl_mode']
     struct.tls =
         case struct.verify_mode
         when 'verify-none', 'verify-peer'

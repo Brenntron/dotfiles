@@ -14,7 +14,7 @@ class Xbrs::Base
   end
 
   def self.tls_mode
-    @tls_mode ||= Rails.configuration.xbrs.tls_mode || 'no-tls'
+    @tls_mode ||= Rails.configuration.xbrs.verify_mode || 'no-tls'
   end
 
   def self.gssnegotiate?
