@@ -1,5 +1,11 @@
 require 'pry'
 require 'rake'
+
+namespace :escalations do
+  task :check_file_reputations do
+    FileReputationDispute.check_for_rep_updates
+  end  
+
 namespace :bugs do
   task :update_in_summary_flag => :environment do
     bugs = Bug.all
