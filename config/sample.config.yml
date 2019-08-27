@@ -123,6 +123,9 @@ development:
 test:
   amq: #active message queue
     host: "localhost"
+    timeout: 2
+  api_timeout:
+    timeout: 15
   auto_resolve:
     complaints:
       check: true
@@ -238,6 +241,9 @@ test:
 staging:
   amq:
     host: "fmd-actmq-01stg.vrt.sourcefire.com"
+    timeout: 2
+  api_timeout:
+    timeout: 15
   auto_resolve:
     complaints:
       check: true
@@ -358,6 +364,9 @@ staging:
 production:
   amq: #active message queue
     host: "mq.vrt.sourcefire.com"
+    timeout: 2
+  api_timeout:
+    timeout: 15
   auto_resolve:
     complaints:
       check: true
