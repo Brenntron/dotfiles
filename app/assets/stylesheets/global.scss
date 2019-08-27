@@ -6318,11 +6318,19 @@ table.dispute-entry-table tbody tr.selected {
 }
 
 #show-ticket-resolution-submenu {
-  left: 100%;
+  left: 159px;
   border-radius: 0 4px 4px 4px;
-  width: 350px;
+  width: 600px;
   margin-top: -55px;
   padding: 0;
+  .resolution-status-comment{
+    height: 105px;
+    font-size: 12px;
+    line-height: 1.4em;
+  }
+  button.primary{
+    margin: 2% 0px 0px 33%
+  }
 }
 
 #show-ticket-resolution-submenu .radio-label {
