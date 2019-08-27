@@ -1,6 +1,8 @@
 class Umbrella::Scan
   def self.new_request(address)
     request = HTTPI::Request.new(Rails.configuration.umbrella.url)
+    request.read_timeout = read_timeout
+    request.open_timeout = open_timeout
     request.ssl = true
     request.auth.ssl.verify_mode = :peer
     request.headers['Authorization'] = "Bearer #{Rails.configuration.umbrella.api_key}"

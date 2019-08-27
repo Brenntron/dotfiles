@@ -14,7 +14,7 @@ class Xbrs::Base
   end
 
   def self.tls_mode
-    @tls_mode ||= Rails.configuration.xbrs.tls_mode || 'no-tls'
+    @tls_mode ||= Rails.configuration.xbrs.verify_mode || 'no-tls'
   end
 
   def self.gssnegotiate?
@@ -23,6 +23,13 @@ class Xbrs::Base
 
   def self.ca_file
     @ca_cert_file ||= Rails.configuration.xbrs.ca_cert_file
+  end
+
+  def self.read_timeout
+    @read_timeout ||= Rails.configuration.xbrs.read_timeout
+  end
+  def self.open_timeout
+    @open_timeout ||= Rails.configuration.xbrs.open_timeout
   end
 
   def self.stringkey_params(conditions = {})
@@ -51,6 +58,9 @@ class Xbrs::Base
         end
 
     request = HTTPI::Request.new("#{protocol}://#{host}:#{port}#{path}?consumer=#{self.consumer_key}")
+
+    request.read_timeout = read_timeout
+    request.open_timeout = open_timeout
 
     case tls_mode
       when 'verify-peer'
