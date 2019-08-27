@@ -1044,7 +1044,7 @@ class FileReputationDispute < ApplicationRecord
   end
 
   def self.check_and_unsubscribe
-    candidates = FileReputationDispute.where({:status => STATUS_RESOLVED, :resolution => RESOLUTION_AUTORESOLVED_STATUS_FP}).where("case_closed_at <= '#{3.months.ago}'")
+    candidates = FileReputationDispute.where({:status => STATUS_RESOLVED, :resolution => RESOLUTION_AUTORESOLVED_STATUS_FP}).where("case_closed_at <= '#{90.days.ago}' and case_closed_at >= '#{97.days.ago}'")
     candidates.each do |candidate|
       FileReputationApi::ReversingLabs.unsubscribe(candidate.sha256_hash)
     end
