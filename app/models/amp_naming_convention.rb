@@ -40,14 +40,22 @@ class AmpNamingConvention < ApplicationRecord
     end
   end
 
-  def self.send_all_to_ti
+  # Note: pass timestamp argument to insure that timestamp is determined within transaction.
+  def self.send_all_to_ti(timestamp:)
     amp_patterns = all.map do |record|
       attrs = record.attributes.slice(*%w[pattern example engine_description notes table_sequence engine])
       attrs['description'] = attrs.delete('engine_description')
       attrs['position'] = attrs.delete('table_sequence')
+      attrs['message_timestamp'] = timestamp.utc.iso8601
       attrs
     end
     message = Bridge::AmpPatternUpdateEvent.new
     message.post(amp_patterns: amp_patterns)
+  rescue => ex
+    if ex.message.present?
+      raise
+    else
+      raise ex.class, ex.class.name
+    end
   end
 end

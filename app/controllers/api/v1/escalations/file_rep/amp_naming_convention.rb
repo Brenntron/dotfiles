@@ -23,9 +23,10 @@ module API
             post "" do
               std_api_v2 do
                 ::AmpNamingConvention.transaction do
+                  timestamp = Time.now
                   Rails.logger.debug("\n\n*** POST #{params['patterns']}\n\n")
                   ::AmpNamingConvention.create_from_params(params['patterns'])
-                  ::AmpNamingConvention.send_all_to_ti
+                  ::AmpNamingConvention.send_all_to_ti(timestamp: timestamp)
                 end
 
                 render json: {status: 'Success'}
@@ -48,9 +49,10 @@ module API
             patch "" do
               std_api_v2 do
                 ::AmpNamingConvention.transaction do
+                  timestamp = Time.now
                   Rails.logger.debug("\n\n*** PATCH #{params['patterns']}\n\n")
                   ::AmpNamingConvention.save_from_params(params['patterns'])
-                  ::AmpNamingConvention.send_all_to_ti
+                  ::AmpNamingConvention.send_all_to_ti(timestamp: timestamp)
                 end
 
                 render json: {status: 'Success'}
@@ -64,10 +66,11 @@ module API
             delete "" do
               std_api_v2 do
                 ::AmpNamingConvention.transaction do
+                  timestamp = Time.now
                   patterns = ::AmpNamingConvention.where(id: params['ids'])
                   Rails.logger.debug("*** DELETE #{params['ids']}")
                   patterns.destroy_all
-                  ::AmpNamingConvention.send_all_to_ti
+                  ::AmpNamingConvention.send_all_to_ti(timestamp: timestamp)
                 end
 
                 render json: {status: 'Success'}
