@@ -16,5 +16,5 @@ class Bridge::FileRepCreatedEvent < Bridge::BaseMessage
     })
   end
 
-  handle_asynchronously :post, :queue => "file_reputation_dispute_created"
+  handle_asynchronously :post, :queue => "file_reputation_dispute_created", :priority => 1
 end

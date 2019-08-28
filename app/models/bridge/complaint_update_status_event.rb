@@ -24,12 +24,12 @@ class Bridge::ComplaintUpdateStatusEvent < Bridge::BaseMessage
     })
   end
 
-  handle_asynchronously :post_entries, :queue => "complaint_update"
+  handle_asynchronously :post_entries, :queue => "complaint_update", :priority => 2
 
   def post_complaint(complaint)
     if complaint.ticket_source_key.present?
       post_entries(complaint.complaint_entries, source_key: complaint.ticket_source_key, ac_id: complaint.id)
     end
   end
-  handle_asynchronously :post_complaint, :queue => "complaint_update"
+  handle_asynchronously :post_complaint, :queue => "complaint_update", :priority => 2
 end

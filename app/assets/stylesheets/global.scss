@@ -6318,11 +6318,19 @@ table.dispute-entry-table tbody tr.selected {
 }
 
 #show-ticket-resolution-submenu {
-  left: 100%;
+  left: 159px;
   border-radius: 0 4px 4px 4px;
-  width: 350px;
+  width: 600px;
   margin-top: -55px;
   padding: 0;
+  .resolution-status-comment{
+    height: 105px;
+    font-size: 12px;
+    line-height: 1.4em;
+  }
+  button.primary{
+    margin: 2% 0px 0px 33%
+  }
 }
 
 #show-ticket-resolution-submenu .radio-label {
@@ -6762,9 +6770,24 @@ hr.condensed {
 }
 
 .categorize-radio-wrapper.row {
-  margin-right: -10px;
-  margin-left: -10px;
   padding: 12px 6px;
+}
+
+// webcat > categorize urls dropdown in top nav
+#categorize-diff-form {
+  .current-categories-button {
+    margin-right: 3px;
+  }
+  .history-button.inline-button {
+    margin-left: 4px;
+  }
+  // FF needs a tiny alignment correction
+  @-moz-document url-prefix() {
+    .history-button.inline-button {
+      position: relative;
+      bottom: 2px;
+    }
+  }
 }
 
 .nav-tool-content-wrapper#categorize-urls-form-wrapper {
@@ -9007,8 +9030,14 @@ button.secondary.view-report-external-button {
 
 // dbinebri: file rep - naming guide dialog internal specific styles here
 #naming-guide-dialog {
+  display: none;
   font-family: 'Open Sans', sans-serif;
   padding: 10px;
+
+  // make sure these icons show the right cursor
+  .esc-tooltipped {
+    cursor: default;
+  }
 
   table th {
     text-transform: uppercase;
@@ -9403,6 +9432,117 @@ div[aria-describedby='create-detection-dialog'] {
   }
 }
 
+.amp-edit-buttons {
+  button {
+    background-repeat: no-repeat;
+    background-size: 20px;
+    background-position: 10px center;
+    padding: 10px 20px 10px 40px;
+    margin: 20px 0;
+  }
+}
+
+#amp-edit-button {
+  background-image: url(image_path('icon_edit_white.svg'));
+}
+#amp-new-button {
+  background-image: url(image_path('icon_add_white.svg'));
+}
+.active-editing-buttons {
+  display: none;
+}
+
+#amp-naming-details-table {
+  thead > tr > th {
+    border-bottom: none;
+  }
+  tr:first-of-type td {
+    border-top: 1px solid $faint-neutral-color;
+  }
+  tr {
+    background-color: $content-bg-color;
+  }
+  tr td:first-of-type, tr th:first-of-type {
+    padding-left: 20px;
+  }
+  .table-code {
+    font-family: 'Fira Mono', monospace;
+    font-weight: 500;
+    background: darken($content-bg-color, 5%);
+    letter-spacing: 0.1px;
+    padding: 2px 4px;
+  }
+  .table-content {
+    display: block;
+  }
+  .table-form-content {
+    display: none;
+  }
+  // Below styles displayed when 'edit' is clicked
+  .ui-sortable {
+    font-size: 8.75pt;
+
+    .table-form-content {
+      display: block;
+    }
+    .table-content {
+      display: none;
+    }
+    .ui-sortable-handle {
+      cursor: grab;
+    }
+    .ui-sortable-handle:active {
+      cursor: grabbing;
+      background-color: #fff7cd63 !important;
+    }
+    .ui-sortable-helper.selected td {
+      background-color: #fff7cd63 !important;
+      border-top: 1px solid $faint-neutral-color;
+      border-bottom: 1px solid $faint-neutral-color;
+    }
+    .sortable-placeholder {
+      background-color: #f5f2e5;
+    }
+    tr td:first-of-type {
+      background-repeat: no-repeat;
+      background-size: 20px 20px;
+      background-image: url(image_path('icon_sortable.svg'));
+      background-position: -4px 10px;
+    }
+    tr td {
+      border-top: 1px solid $faint-neutral-color;
+      border-bottom: 1px solid $faint-neutral-color;
+    }
+    tr:first-of-type td {
+      border-top: 1px solid #bcdce8;
+    }
+    tr:last-of-type td {
+      border-bottom: 1px solid #bcdce8;
+    }
+    tr td:last-of-type {
+      .table-form-content {
+        margin-right: 20px;
+      }
+    }
+    .delete-button {
+      width: 22px;
+      height: 22px;
+      display: block;
+      float: right;
+      position: absolute;
+      right: 14px;
+      margin-top: -36px;
+      cursor: pointer;
+    }
+    input, textarea {
+      width: 100%;
+      padding: 2px 4px;
+    }
+    textarea {
+      border: 1px solid darken($faint-neutral-color, 10%);
+    }
+  }
+}
 
 // ensure the button here has the right font
 #create-detection-dialog button.primary {
@@ -9472,6 +9612,13 @@ div[aria-describedby='create-detection-dialog'] {
     }
   }
 }
+
+.code-input {
+      font-family: 'Fira Mono', monospace;
+      font-weight: 500;
+      letter-spacing: 0.1px;
+    }
+
 
 // dbinebri: on Index, ensure "Unassigned" and buttons can exist w/o breaking in the Assignee col
 .table > tbody > tr > td.assignee-col, table > tbody > tr > td.assignee-col {
@@ -9669,6 +9816,41 @@ table.rl-content {
 
 .rl-col {
   text-align: center;
+}
+
+.delete-patterns-area {
+  font-size: 11px;
+  font-weight: 600;
+  color: $warning-accent-color;
+  display: block;
+  margin-top: 70px;
+}
+
+.delete-patterns-area::before {
+  display: block;
+  float: left;
+  content: '';
+  margin-right: 2px;
+  width: 20px;
+  height: 20px;
+  background-repeat: no-repeat;
+  background-image: url(image_path('icon_delete_orange.svg'));
+}
+
+.delete-patterns-queue {
+  display: inline-block;
+  margin-left: 8px;
+  margin-top: 4px;
+}
+
+.delete-pattern {
+  font-family: 'Fira Mono', monospace;
+  font-weight: normal;
+  border-radius: 2px;
+  padding: 4px;
+  background: darken($content-bg-color, 5%);
+  margin-right: 5px;
+  color: $type-base-color;
 }
 
 .amp-area .disposition {

@@ -69,10 +69,11 @@ module ApiRequester::ApiRequester
   # @return [OpenStruct] an open struct with standard values set, which can be added to for custom settings.
   def self.config_of(hash)
     struct = OpenStruct.new
-    %w{host verify_mode port gssnegotiate ca_cert_file api_key username password}.each do |key|
-      struct.send((key + '=').to_sym, hash[key])
+    sliced_hash = hash.slice(*%w{host port gssnegotiate ca_cert_file api_key username password timeout})
+    sliced_hash.each_pair do |key, value|
+      struct.send((key + '=').to_sym, value)
     end
-
+    struct.verify_mode = hash['verify_mode'] || hash['tls_mode'] || hash['ssl_mode']
     struct.tls =
         case struct.verify_mode
         when 'verify-none', 'verify-peer'
@@ -82,6 +83,9 @@ module ApiRequester::ApiRequester
         end
 
     struct.port ||= struct.tls ? 443 : 80
+
+    struct.open_timeout = struct.timeout || Rails.configuration.api_master_timeout
+    struct.read_timeout = struct.timeout || Rails.configuration.api_master_timeout
 
     struct
   end
@@ -181,6 +185,14 @@ module ApiRequester::ApiRequester
       request_config.api_key
     end
 
+    def read_timeout
+      request_config.read_timeout
+    end
+
+    def open_timeout
+      request_config.open_timeout
+    end
+
     def stringkey_params(conditions = {})
       conditions.inject({}) do |params, (key, value)|
         params[key.to_s] = value if value
@@ -204,6 +216,9 @@ module ApiRequester::ApiRequester
 
       request = HTTPI::Request.new(uri(path, query))
       request.auth.gssnegotiate
+
+      request.read_timeout = read_timeout
+      request.open_timeout = open_timeout
 
       case verify_mode
       when 'verify-peer'

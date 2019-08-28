@@ -44,7 +44,6 @@ class FileReputationApi::ReversingLabs
 
   def self.get_creation_data(sha256)
     api_response = call_request_parsed(:get, "api/databrowser/rldata/query/sha256/#{sha256}", input: {format: 'json'})
-
     {file_size: api_response['rl']['sample']['sample_size'], sample_type: api_response['rl']['sample']['xref']['sample_type']}
 
   rescue JSON::ParserError
@@ -87,6 +86,31 @@ class FileReputationApi::ReversingLabs
     FileReputationDispute.where(sha256_hash: self.sha256_hash).update_all(attributes)
   end
 
+  def self.has_trusted_signature?(sha256)
+    results = get_malware_data(sha256)
+    return results["rl"]["malware_presence"]["trust_factor"] == 0
+
+  end
+
+  def self.get_signature_category(sha256)
+    results = get_malware_data(sha256)
+
+    trust_factor = results["rl"]["malware_presence"]["trust_factor"]
+    if trust_factor == 0
+      return FileReputationDispute::DISPOSITION_CLEAN
+    end
+    if trust_factor == 5
+      return FileReputationDispute::DISPOSITION_MALICIOUS
+    end
+    return FileReputationDispute::DISPOSITION_UNKNOWN
+  end
+
+  def self.get_malware_data(sha256)
+    api_response = call_request_parsed(:get, "api/databrowser/malware_presence/query/sha256/#{sha256}", input: {format: 'json', extended: 'true'})
+    api_response
+  end
+
+
   # Makes an immediate direct call to reversing labs and creates an object.
   # Does not read or write cache or database.
   # @param [String] sah256_hash the SHA256 hash checksum.
@@ -125,5 +149,38 @@ class FileReputationApi::ReversingLabs
     else
       new(sha256_hash: sha256_hash, raw_json: cached_json)
     end
+  end
+
+  def self.subscribe(sha256_hash)
+    url = "api/subscription/data_change/v1/bulk_query/subscribe/json"
+    json_package = {}
+    json_package["rl"] = {}
+    json_package["rl"]["query"] = {}
+    json_package["rl"]["query"]["hash_type"] = "sha256"
+    json_package["rl"]["query"]["hashes"] = [sha256_hash]
+    response = call_request_parsed(:post, url, request_type: :json, input: json_package)
+    response
+  end
+
+  def self.unsubscribe(sha256_hash)
+    url = "api/subscription/data_change/v1/bulk_query/unsubscribe/json"
+    json_package = {}
+    json_package["rl"] = {}
+    json_package["rl"]["query"] = {}
+    json_package["rl"]["query"]["hash_type"] = "sha256"
+    json_package["rl"]["query"]["hashes"] = [sha256_hash]
+    response = call_request_parsed(:post, url,request_type: :json, input: json_package)
+    response
+  end
+
+  #{"rl"=>{"data_change_feed"=>{"entries"=>[{"record_on"=>"2019-08-20T11:55:20", "sha1"=>"2953bc5e896ed5dc0253c9525cbd2a04956570aa", "updated_sections"=>["malware_presence"]}], "last_timestamp"=>1566302120, "time_range"=>{"to"=>"2019-08-20T11:55:20", "from"=>"2019-08-20T11:55:17"}}}}
+
+  #{"rl"=>{"data_change_feed"=>{"entries"=>[], "last_timestamp"=>1566302141, "time_range"=>{"to"=>"2019-08-20T11:55:41", "from"=>"2019-08-20T11:55:31"}}}}
+  def self.check_for_updates()
+
+    url = "/api/feed/data_change/v3/pull?events=malware_presence&format=json"
+
+    response = call_request_parsed(:get, url, input: nil)
+    response["rl"]["data_change_feed"]
   end
 end

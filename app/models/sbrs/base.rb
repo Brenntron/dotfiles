@@ -28,11 +28,19 @@ class Sbrs::Base
   end
 
   def self.tls_mode
-    @tls_mode ||= Rails.configuration.sbrs.tls_mode || 'no-tls'
+    @tls_mode ||= Rails.configuration.sbrs.verify_mode || 'no-tls'
   end
 
   def self.gssnegotiate?
     @gssnegotiate ||= false
+  end
+
+
+  def self.read_timeout
+    @read_timeout ||= Rails.configuration.sbrs.read_timeout
+  end
+  def self.open_timeout
+    @open_timeout ||= Rails.configuration.sbrs.open_timeout
   end
 
   # def self.sds_cert
@@ -77,6 +85,10 @@ class Sbrs::Base
       request_string = "https://" + sds_host + query_string + uri_item
       uri = URI.parse(request_string)
       request = Net::HTTP::Get.new(uri)
+
+      request.read_timeout = read_timeout
+      request.open_timeout = open_timeout
+
       request["X-SDS-Categories-Version"] = "v8"     # <-- dude totally deal with this mess ::: SDS CATEGORY VERSION
       request["X-Client-ID"] = "talosweb"
       request["X-Product-ID"] = "talosintelligence"
