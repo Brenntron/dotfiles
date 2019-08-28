@@ -17,19 +17,14 @@
         %span.data_small_emphasis
           =@user.roles.map(&:role).join(', ')
 
-
-        -# Check Marlin's commit on Dec 18 regarding user role and api key
-        - if @user.has_role?('api user')
+        - if @user == current_user && @user.has_role?('api user')
           %hr.thin
           .user-access-wrapper
             %label.content-label-sm Access
             %label.content-label-md Application Token
             %pre.code-snippet.break-word
               = @user.authentication_token
-            - if xml_token
-              %label.content-label-md.extra-space Bugzilla Token
-              %pre.code-snippet.break-word
-                = xml_token
+
 
             -# Only show api keys to admins or current user
             - if @user == current_user || current_user.has_role?('admin')
