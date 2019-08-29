@@ -834,6 +834,16 @@ module API
               render json: {assignees: assignees}
             end
 
+            params do
+              requires :uri, type: String
+            end
+            desc 'Grab threat categories from SDSv3 API'
+            post 'threat_categories' do
+              response = SbApi.remote_call_sds_v3(permitted_params[:uri],'wbrs')
+
+              response
+            end
+
           end
         end
       end
