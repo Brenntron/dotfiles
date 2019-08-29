@@ -25,6 +25,7 @@ Given(/^an admin user with role "(.*?)" exists and is logged in$/) do |role|
 end
 
 Given(/^a user with role "(.*?)" exists and is logged in$/) do |role|
+  FactoryBot.create(:guest_company)
   @user = FactoryBot.create(:current_user, confirmed: true)
   @user.roles << FactoryBot.create(:role, role: role)
   sign_in_user

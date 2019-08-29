@@ -1459,9 +1459,10 @@ window.fetch_complaints = () ->
 
 
 open_selected = (selected_rows, toggle) ->
-  for i in selected_rows[0].length
-    { viewable, subdomain, domain, path, ip_address } = selected_rows.data()[i]
+  for selected_row in selected_rows.data()
+    { viewable, subdomain, domain, path, ip_address } = selected_row
     if viewable == toggle
+
       new_subdomain = ""
       new_domain = ""
       new_path = ""
@@ -1473,23 +1474,23 @@ open_selected = (selected_rows, toggle) ->
         new_domain = domain
         window.open("http://"+ new_subdomain + new_domain + new_path)
       else
-        window.open("http://"+selected_rows.data()[i].ip_address)
+        window.open("http://"+selected_row.ip_address)
 
 window.open_viewable = () ->
   selected_rows = $('#complaints-index').DataTable().rows()
-  open_selected(selected_rows, true)
+  open_selected(selected_rows, "true")
 window.open_nonviewable = () ->
   selected_rows = $('#complaints-index').DataTable().rows()
-  open_selected(selected_rows, false)
+  open_selected(selected_rows, "false")
 window.open_selected = () ->
   selected_rows = $('#complaints-index').DataTable().rows('.selected')
   if selected_rows[0].length == 0
     std_msg_error('No rows selected', ['Please select at least one row.'])
   else
-    open_selected(selected_rows, true)
+    open_selected(selected_rows, "true")
 window.open_all = () ->
   selected_rows = $('#complaints-index').DataTable().rows()
-  open_selected(selected_rows, true)
+  open_selected(selected_rows, "true")
 
 toggle_selected = (selectedRows, expand)->
   selectState = $('.selected')
