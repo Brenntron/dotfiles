@@ -1539,7 +1539,7 @@ window.get_threat_categories = (uri) ->
     method: 'POST'
     data: data
     success: (response) ->
-      console.log(JSON.parse(response))
+      return response
   )
 
 $ ->
