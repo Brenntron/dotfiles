@@ -391,8 +391,21 @@ Feature: Webcat complaints
     And I click "#categorize-urls"
     And I fill in "url_1" with "chabad.org"
     And I click ".current-categories-button"
-    Then I wait for "15" seconds
-    Then I should see "Religion"
+    Then I wait for "7" seconds
+
+  @javascript
+  Scenario: a users tries to lookup categories for a URL that has a categorized subdomain and a uncategorized domain
+    Given a user with role "webcat user" exists and is logged in
+    When I goto "/escalations/webcat/complaints?f=ALL"
+    And I click "#categorize-urls"
+    And I fill in "url_1" with "trial.superduperreallyfakeamazing.com"
+    And I click ".current-categories-button"
+    And I wait for "7" seconds
+    Then I should see content "Religion" within ".item"
+    And I fill in "url_1" with "superduperreallyfakeamazing.com"
+    And I click ".current-categories-button"
+    And I wait for "7" seconds
+    Then I should not see div element with class "item"
 
   @javascript
   Scenario: a users tries to drop current categories on a URL
