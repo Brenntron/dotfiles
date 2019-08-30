@@ -361,19 +361,21 @@ class SbApi < ApplicationRecord
   end
 
   def self.build_sds_v3_response(response, webcat_list, threatcat_list)
+    # Disabled returning categories since it may not be used in ACE
+
     parsed_response = {}
-    parsed_response['categories'] = []
+    # parsed_response['categories'] = []
     parsed_response['threat_categories'] = []
 
-    categories = pluck_sds_v3_webcat_code(response)
+    # categories = pluck_sds_v3_webcat_code(response)
     threat_categories = pluck_sds_v3_threat_category_codes(response)
 
-    if categories.present?
-      categories.each do |category|
-        matched_category = webcat_list[category.to_s]
-        parsed_response['categories'] << {short_description: matched_category['name'], long_description: matched_category['description']}
-      end
-    end
+    # if categories.present?
+    #   categories.each do |category|
+    #     matched_category = webcat_list[category.to_s]
+    #     parsed_response['categories'] << {short_description: matched_category['name'], long_description: matched_category['description']}
+    #   end
+    # end
 
     if threat_categories.present?
       # Convert threat_category_ids to labels
