@@ -191,11 +191,11 @@ module API
                 if url.strip != ''
                   parsed_url = Complaint.parse_url(url)
 
-                  prefix_records = Wbrs::Prefix.where(:urls => [url])
+                  prefix_records = Wbrs::Prefix.where(:urls => DisputeEntry.domain_of_with_path([url]))
 
                   if !prefix_records.empty?
                     prefix_records.each do |prefix_record|
-                      if prefix_record.domain == parsed_url[:domain] && prefix_record.subdomain == parsed_url[:subdomain]
+                      if prefix_record.domain == parsed_url[:domain] && ((prefix_record.subdomain == parsed_url[:subdomain]) || (prefix_record.subdomain.blank? && parsed_url[:subdomain] = 'www')) && prefix_record.path == parsed_url[:path]
                         prefix_ids[position + 1] = prefix_record.prefix_id
                       end
                     end
