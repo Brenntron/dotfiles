@@ -1542,6 +1542,16 @@ window.get_threat_categories = (uri) ->
       return response
   )
 
+window.get_threat_levels = (uri) ->
+  data = {'uri': uri}
+  std_msg_ajax(
+    url: '/escalations/api/v1/escalations/webrep/disputes/threat_levels'
+    method: 'POST'
+    data: data
+    success: (response) ->
+      return response
+  )
+
 $ ->
   $('#advanced-search-button').click ->
     $('#advanced-search-dropdown').show()

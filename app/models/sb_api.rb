@@ -189,6 +189,7 @@ class SbApi < ApplicationRecord
           response = Net::HTTP.start(uri.hostname, uri.port, req_options) do |http|
             http.request(request)
           end
+
           if response.code != "200"  #there was an issue
             '{"response": "request failed"}'
           else
@@ -295,6 +296,17 @@ class SbApi < ApplicationRecord
     end
   end
 
+  def self.determine_sds_uri(sds_type)
+    # think about making this a case/switch?
+    if sds_type == "sbrs"
+      "/score/sbrs/json?ip="
+    elsif sds_type == "webcat_labels"
+      "/labels/webcat/json"
+    else
+      "/score/wbrs;wbrs-rulehits;webcat/json?url="
+    end
+  end
+
   def self.determine_sds_v3_uri(sds_type)
     # Add more endpoints as needed
     case sds_type
@@ -307,6 +319,16 @@ class SbApi < ApplicationRecord
     end
   end
 
+  def self.build_sds_request(sds_item, sds_type, full_response = false)
+    uri_query                  = {}
+    uri_query["hostname"]      = SbApi.sds_host
+    uri_query["query_string"]  = self.determine_sds_uri(sds_type)
+    uri_query["uri_item"]      = sds_item
+    uri_query["sds_type"]      = sds_type
+    uri_query["full_response"] = full_response
+    uri_query
+  end
+
   def self.build_sds_v3_request(sds_item, sds_type)
     uri_query                  = {}
     uri_query["hostname"]      = SbApi.sds_v3_host
@@ -314,6 +336,28 @@ class SbApi < ApplicationRecord
     uri_query["uri_item"]      = sds_item
     uri_query["sds_type"]      = sds_type
     uri_query
+  end
+
+  def self.build_sds_response(response, webcat_list, request_type)
+    threat_level = {}
+    threat_level["response"] = "Unavailable"
+    # eb["short_description"] = "-"
+    # eb["long_description"] = "-"
+
+    begin
+      score_plucked = pluck_score(response)
+      threat_level["response"] = score_to_text(score_plucked, request_type)
+      if score_plucked == "noscore"
+        threat_level["show"] = "0"
+      end
+
+      # Disabling returning categories from SDSv2 call in ACE since it may not be used
+      # cat_match = webcat_list[pluck_webcat_code(response)]
+      # eb["short_description"] = cat_match["name"]
+      # eb["long_description"] = cat_match["description"]
+    rescue
+    end
+    threat_level.to_json
   end
 
   def self.build_sds_v3_response(response, webcat_list, threatcat_list)
@@ -365,7 +409,93 @@ class SbApi < ApplicationRecord
     threat_categories
   end
 
+  def self.remote_call_sds(sds_item, sds_type, full_response = false)
+    self.remote_lookup_sds(self.build_sds_request(sds_item, sds_type, full_response))
+  end
+
   def self.remote_call_sds_v3(sds_item, sds_type)
     self.remote_lookup_sds_v3(self.build_sds_v3_request(sds_item, sds_type))
+  end
+
+  def self.score_to_text(original_score, score_type = "wbrs")
+    txt = 'Unavailable'
+    begin
+      if score_type == "sbrs" or score_type == "ip"
+        txt = sbrs_to_text(original_score)
+      elsif score_type == "wbrs" or score_type == "url"
+        # Returns an array with the new and old threat levels
+        txt = [wbrs_to_new_threat_level(original_score), wbrs_to_old_threat_level(original_score)]
+      end
+    rescue
+      txt = 'Unavailable'
+    end
+    txt
+  end
+
+  def self.wbrs_to_old_threat_level(original_score)
+    score = original_score.to_f
+
+    old_level = 'Unavailable'
+    begin
+      old_level = 'Neutral'
+      case
+      when score >= 3   #  10 to 3
+        old_level = 'Good'
+      when score > -6  # between 2.9 and -5.9, including "noscore"
+        old_level = 'Neutral'
+      else             # between -6 and -10
+        old_level = 'Poor'
+      end
+    rescue
+      old_level = 'Unavailable'
+    end
+
+    old_level
+  end
+
+  def self.wbrs_to_new_threat_level(original_score)
+    score = original_score.to_f
+
+    new_level = 'Unavailable'
+    begin
+      new_level = 'Neutral'
+      case
+      when score >= 6                 # 6.0 to 10.0
+        new_level = 'Trusted'
+      when score > 0                  # 5.9 to 0.1
+        new_level = 'Favorable'
+      when score >= -3                # 0 to -3.0
+        new_level = 'Neutral'
+      when score > -6                 # -3.1 to -5.9
+        new_level = 'Questionable'
+      else                            # -6.0 to -10.0
+        new_level = 'Untrusted'
+      end
+    rescue
+      new_level = 'Unavailable'
+    end
+
+    new_level
+  end
+
+  def self.pluck_webcat_version(webcat_list)
+    webcat_list["META_CATEGORIES_VERSION"]["current_version"].to_s
+  end
+
+  def self.pluck_score(response)
+    begin
+      result = JSON.parse(response.body)
+      if result[0]["response"]["wbrs"]
+        result[0]["response"]["wbrs"]["score"].to_s
+      else
+        if result[0]["response"]["sbrs"]
+          result[0]["response"]["sbrs"]["score"].to_s
+        else
+          "noscore_"
+        end
+      end
+    rescue
+      "noscore-"
+    end
   end
 end

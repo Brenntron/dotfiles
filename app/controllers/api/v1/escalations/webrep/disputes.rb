@@ -844,6 +844,16 @@ module API
               response
             end
 
+            params do
+              requires :uri, type: String
+            end
+            desc 'Grab threat levels from SDSv2 API'
+            post 'threat_levels' do
+              response = SbApi.remote_call_sds(permitted_params[:uri],'wbrs')
+
+              response
+            end
+
           end
         end
       end
