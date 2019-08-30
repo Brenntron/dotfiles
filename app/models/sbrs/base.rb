@@ -37,10 +37,10 @@ class Sbrs::Base
 
 
   def self.read_timeout
-    @read_timeout ||= Rails.configuration.sbrs.read_timeout
+    @read_timeout ||= Rails.configuration.sds.read_timeout
   end
   def self.open_timeout
-    @open_timeout ||= Rails.configuration.sbrs.open_timeout
+    @open_timeout ||= Rails.configuration.sds.open_timeout
   end
 
   # def self.sds_cert
