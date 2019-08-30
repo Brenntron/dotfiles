@@ -278,7 +278,8 @@ window.submit_individual_wlbl =(button_tag) ->
 
   data = {
     'urls': [ wlbl_form.getElementsByClassName('dispute-entry-content')[0].value ]
-    'trgt_list': list_types
+    'trgt_list': list_types,
+    'thrt_cat_ids': [ parseInt(document.getElementById('wlbl_thrt_cat_id').value) ]
     'note': wlbl_form.getElementsByClassName('note-input')[0].value
   }
 

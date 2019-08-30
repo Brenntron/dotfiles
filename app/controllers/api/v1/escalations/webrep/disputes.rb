@@ -253,7 +253,7 @@ module API
             params do
               requires :urls, type: Array[String], desc: "uris to wl/bl"
               requires :trgt_list, type: Array[String], desc: "type of WL/BL"
-              optional :thrt_cats, type: Array[String], desc: "threat categories"
+              optional :thrt_cat_ids, type: Array[Integer], desc: "threat categories"
               requires :note, type: String, desc: "note"
             end
             post "uri_wlbl" do
@@ -262,6 +262,7 @@ module API
               true
             end
 
+            # TODO: unused?
             desc "Adjust a WL/BL entry"
             params do
               requires :dispute_entry_ids, type: Array[Integer], desc: "analyst-console database id"
@@ -277,6 +278,7 @@ module API
               true
             end
 
+            # TODO: unused?
             desc "Adjust a WL/BL entry"
             params do
               requires :dispute_ids, type: Array[Integer], desc: "analyst-console database id"
