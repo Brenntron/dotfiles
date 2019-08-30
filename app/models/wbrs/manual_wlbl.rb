@@ -201,7 +201,11 @@ class Wbrs::ManualWlbl < Wbrs::Base
 
     if target_list.present?
       target_list.each do |wlbl|
-        new_wlbl_from_params({'urls' => params_urls, 'usr' => username, 'note' => params[:note], 'trgt_list' => wlbl })
+        new_wlbl_from_params('urls' => params_urls,
+                             'usr' => username,
+                             'note' => params[:note],
+                             'trgt_list' => wlbl,
+                             'thrt_cats' => params['thrt_cat_ids'])
       end
     end
 
