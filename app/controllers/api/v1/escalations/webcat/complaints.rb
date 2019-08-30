@@ -185,12 +185,20 @@ module API
               categories = {}
 
               # Grab prefix id for each URL
-              permitted_params['urls'].each_with_index do |param, position|
-                if param.strip != ''
-                  prefix_record = Wbrs::Prefix.where(:urls => DisputeEntry.domain_of_with_path([param]))
+              permitted_params['urls'].each_with_index do |url, position|
+                url = url.strip
 
-                  if !prefix_record.empty? && prefix_record.first.is_active == 1
-                    prefix_ids[position + 1] = prefix_record.first.prefix_id
+                if url.strip != ''
+                  parsed_url = Complaint.parse_url(url)
+
+                  prefix_records = Wbrs::Prefix.where(:urls => [url])
+
+                  if !prefix_records.empty?
+                    prefix_records.each do |prefix_record|
+                      if prefix_record.domain == parsed_url[:domain] && prefix_record.subdomain == parsed_url[:subdomain]
+                        prefix_ids[position + 1] = prefix_record.prefix_id
+                      end
+                    end
                   end
                 end
               end
