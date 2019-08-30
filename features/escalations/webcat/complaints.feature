@@ -2,6 +2,9 @@ Feature: Webcat complaints
   In order to manage web cat complaints
   I will provide a complaints interface
 
+  Background:
+    Given a guest company exists
+
   #TODO: we need to update the user role on these tests
 
   @javascript
@@ -391,7 +394,7 @@ Feature: Webcat complaints
     And I click "#categorize-urls"
     And I fill in "url_1" with "chabad.org"
     And I click ".current-categories-button"
-    Then I wait for "7" seconds
+    Then I wait for "5" seconds
 
   @javascript
   Scenario: a users tries to lookup categories for a URL that has a categorized subdomain and a uncategorized domain
@@ -400,12 +403,12 @@ Feature: Webcat complaints
     And I click "#categorize-urls"
     And I fill in "url_1" with "trial.superduperreallyfakeamazing.com"
     And I click ".current-categories-button"
-    And I wait for "7" seconds
+    And I wait for "5" seconds
     Then I should see content "Religion" within ".item"
     And I fill in "url_1" with "superduperreallyfakeamazing.com"
     And I click ".current-categories-button"
-    And I wait for "7" seconds
-    Then I should not see div element with class "item"
+    And I wait for "5" seconds
+    Then I should not see div element with class ".item"
 
   @javascript
   Scenario: a users tries to drop current categories on a URL
