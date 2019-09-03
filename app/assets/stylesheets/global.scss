@@ -10310,3 +10310,9 @@ hr.thin.extra-bottom-marg {
 .small-flash-button:hover {
   opacity: 1;
 }
+
+// webrep dispute index > dispute entries table - ensure break/wrap properly for long url's containing parameters
+#disputes-index .entry-col-content {
+  word-break: break-all;
+  max-width: 350px;
+}
