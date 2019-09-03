@@ -24,11 +24,11 @@ else
 end
 Rails.configuration.complaints          = complaints
 
-umbrella = env_config.fetch('umbrella', nil)
+umbrella = env_config.fetch('auto_resolve',{}).fetch('umbrella', nil)
 raise 'config.yml missing umbrella section' unless umbrella
 Rails.configuration.umbrella            = ApiRequester::ApiRequester.config_of(umbrella)
-Rails.configuration.umbrella.check      = virustotal['check'] || false
-Rails.configuration.umbrella.url        = virustotal['url']
+Rails.configuration.umbrella.check      = umbrella['check'] || false
+Rails.configuration.umbrella.url        = umbrella['url']
 
 raise "config.yml missing bugzilla section" unless env_config['bugzilla']
 
@@ -108,7 +108,7 @@ Rails.configuration.xbrs                = ApiRequester::ApiRequester.config_of(x
 Rails.configuration.xbrs.consumer_key   = xbrs_config['consumer_key']
 
 
-virustotal = env_config.fetch('virustotal', nil)
+virustotal = env_config.fetch('auto_resolve',{}).fetch('virus_total', nil)
 raise 'config.yml missing virus_total section' unless virustotal
 Rails.configuration.virustotal          = ApiRequester::ApiRequester.config_of(virustotal)
 Rails.configuration.virustotal.check    = virustotal['check']
