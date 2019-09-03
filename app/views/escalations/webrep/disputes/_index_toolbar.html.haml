@@ -308,6 +308,10 @@
                             %input.bl-heavy-checkbox.wl-bl-list-inline{type: 'checkbox', name: 'wl-bl-list-inline', value: "BL-heavy"}
                               BL - Heavy
 
+                .row
+                  = wlbl_form.select(:thrt_cat_id, Wbrs::ThreatCategory.selections, {include_blank: true}, class: 'wlbl_thrt_cat_id')
+
+
               .comment-wrapper
                 %label.content-label-sm Comment
                 %textarea.dropdown-comment.adjust-wlbl-input.note-input
