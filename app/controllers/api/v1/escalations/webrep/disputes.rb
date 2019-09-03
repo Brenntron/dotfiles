@@ -749,6 +749,7 @@ module API
               requires :ip_uris, type: Array[String]
               requires :list_types, type: Array[String]
               requires :note, type: String
+              optional :thrt_cat_ids, type: Array[Integer], desc: "threat categories"
             end
 
             post 'bulk_rule_ui_wlbl_add' do
@@ -762,7 +763,8 @@ module API
                         urls: unique_ip_uris,
                         trgt_list: permitted_params['list_types'],
                         note: permitted_params['note'],
-                        usr: current_user.cvs_username
+                        usr: current_user.cvs_username,
+                        thrt_cat_ids: permitted_params['thrt_cat_ids']
                     }
 
                 Wbrs::ManualWlbl.bulk_new_wlbl_from_params(wlbl_params)
