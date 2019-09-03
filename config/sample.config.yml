@@ -75,8 +75,10 @@ development:
     url: "https://localhost:3000/api_test"
   sds:
     host: "v2.sds.cisco.com"
-    cert_file: "/usr/local/etc/sds-certificate.pem"
+    ca_cert_file: "/usr/local/etc/sds-certificate.pem"
     pkey_file: "/usr/local/etc/sds-pkey.pem"
+    username: 'REDACTED'
+    password: "REDACTED"
   snort_doc_max_fails: 3
   snort_org:
     host: "localhost"
