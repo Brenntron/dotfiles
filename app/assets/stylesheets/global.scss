@@ -10315,8 +10315,7 @@ hr.thin.extra-bottom-marg {
 .dispute-wlbl-adjust-wrapper {
   width: 500px;
 }
-
-.toolbar div.dropdown-tool-grey-row li {
+  .toolbar div.dropdown-tool-grey-row li {
   padding: 2px 2px 6px 10px;
 }
 
@@ -10340,7 +10339,7 @@ hr.thin.extra-bottom-marg {
   }
 }
 
-.threat-cat-required {
+.toolbar span.threat-cat-required {
   color: $warning-accent-color;
   font-size: 7pt;
   padding-left: 2px;

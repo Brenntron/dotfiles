@@ -265,6 +265,11 @@ $ ->
     else
       wlbl_submit.attr('disabled', true)
 
+  # limit the number of checked checkboxes in the wl/bl dropdown to 5
+  $('.threat-cat-cb input').change ->
+    if $('.threat-cat-cb input:checked').length > 5
+      $('.threat-cat-required').css('font-weight','bold')
+      this.checked = false
 
 
 #### SUBMISSION OF WL/BL CHANGES TO WBRS ####
