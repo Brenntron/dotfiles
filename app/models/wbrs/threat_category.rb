@@ -24,6 +24,6 @@ class Wbrs::ThreatCategory < Wbrs::Base
   end
 
   def self.selections
-    @selections ||= all.sort_by { |thrt_cat| thrt_cat.mnem }.map{ |thrt_cat| [thrt_cat.mnem, thrt_cat.id] }
+    @selections ||= all.sort_by { |thrt_cat| thrt_cat.desc }.map{ |thrt_cat| [thrt_cat.desc, thrt_cat.id] }
   end
 end
