@@ -10343,5 +10343,10 @@ hr.thin.extra-bottom-marg {
   color: $warning-accent-color;
   font-size: 7pt;
   padding-left: 2px;
-  padding-top: 1px
+  padding-top: 1px;
+}
+
+.toolbar span.threat-cat-required.required-bold {
+  font-weight: bold;
+  color: darken($warning-accent-color, 5%)
 }

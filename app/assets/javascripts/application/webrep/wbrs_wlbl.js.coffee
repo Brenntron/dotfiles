@@ -267,9 +267,12 @@ $ ->
 
   # limit the number of checked checkboxes in the wl/bl dropdown to 5
   $('.threat-cat-cb input').change ->
-    if $('.threat-cat-cb input:checked').length > 5
-      $('.threat-cat-required').css('font-weight','bold')
+    num_checked = $('.threat-cat-cb input:checked').length
+    if num_checked > 5
       this.checked = false
+      $('.threat-cat-required').addClass('required-bold')
+    else if num_checked <= 5
+      $('.threat-cat-required').removeClass('required-bold')
 
 
 #### SUBMISSION OF WL/BL CHANGES TO WBRS ####
