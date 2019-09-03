@@ -971,7 +971,15 @@ thead th.sorting.center {
 .form-group {
   line-height: initial;
 }
-
+#research-page-toolbar textarea {
+  padding: 4px;
+  color: #666;
+  font-size: 9.5pt;
+  font-weight: 400;
+  line-height: 1.25em;
+  min-height: 100px;
+  margin-bottom: 15px;
+}
 .toolbar .input-label {
   margin: 8px 4px;
   color: $content-label-color;

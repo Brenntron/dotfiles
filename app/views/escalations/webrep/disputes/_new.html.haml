@@ -7,14 +7,14 @@
 
   .form-group
     %label.content-label-sm URLs/IP Addresses
-    %textarea#ips_urls{required: true}
+    %textarea#ips_urls{required: true, name:'ips_urls'}
   .form-group
     %label.content-label-sm Assignee
     %input.form-control#assignee{name: 'assignee', list: 'assignee-list', required: true, value: "#{current_user.cvs_username}"}
     %datalist#assignee-list
   .form-group
     %label.content-label-sm Priority
-    %select.form-control#priority
+    %select.form-control#priority{name:'priority'}
       %option P1
       %option P2
       %option{:selected => 'selected'} P3
@@ -22,14 +22,14 @@
       %option P5
   .form-group
     %label.content-label-sm Ticket Type
-    %select.form-control#ticket-type-dropdown
+    %select.form-control#ticket-type-dropdown{name:'ticket_type'}
       %option{:selected => 'selected'} Web
       %option Email
       %option Email & Web
 
   %hr.thin
   .form-group.text-center
-    %button.primary{value: 'submit', type: 'submit'}
+    %button.primary{value: 'submit', type: 'button', onclick: 'submit_new_dispute(this)'}
       Create
     %button.secondary#cancel_dispute{type: 'button'}
       Cancel

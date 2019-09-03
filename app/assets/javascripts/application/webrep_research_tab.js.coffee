@@ -1,3 +1,4 @@
+
 $ ->
   # go back to the last tab after reload
   $('a[data-toggle="tab"]').on 'shown.bs.tab', (e) ->
@@ -50,6 +51,22 @@ $ ->
         $('.cancel-changes').click()
       else
         e.preventDefault()
+
+  $('#add-to-ticket-button').on 'click', (e)->
+    { currentTarget } = e
+
+    text = $('#research-page-toolbar #ips_urls').text()
+    new_val = ''
+    $('#disputes-research-table .dispute_check_box:checked').each ->
+      tr = $( this ).closest('tr')
+      url = $(tr).find('.entry-data-content').text().trim()
+
+      if new_val != ''
+        new_val = text += '&#10' + url
+      else
+        new_val = url
+    console.log new_val
+    $('#research-page-toolbar #ips_urls').html( new_val.trim() )
 
   $('.cancel-changes').click ->
     $('.editing-row').each ->
@@ -552,6 +569,8 @@ $ ->
     $('.entry-data-content:not(:contains(' + query + '))').parents('.research-table-row').hide()
     $('.entry-data-content:contains(' + query + ')').parents('.research-table-row').show()
 
+
+  $('.ajax-message-div').css('display', 'flex')
 $(document).ready ->
 
   ### Using 'tooltipped' class instead of 'tooltip' so that it doesn't interfere with Bootstrap ###
