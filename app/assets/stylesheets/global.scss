@@ -8398,7 +8398,7 @@ th.sorting_1, th.sorting_asc, th.sorting_desc {
 }
 
 .toolbar div.dropdown-tool-grey-row li, .dispute-reptool-adjust-wrapper .dropdown-tool-grey-row li {
-  padding: 2px 12px;
+  padding: 2px 2px 4px 10px;
 }
 
 .dropdown-tool-grey-row li:hover {
@@ -10309,4 +10309,40 @@ hr.thin.extra-bottom-marg {
 
 .small-flash-button:hover {
   opacity: 1;
+}
+
+// needs more width to encompass all threat categories now
+.dispute-wlbl-adjust-wrapper {
+  width: 500px;
+}
+
+.toolbar div.dropdown-tool-grey-row li {
+  padding: 2px 2px 6px 10px;
+}
+
+.toolbar div.dropdown-tool-grey-row.margin-bottom-med {
+  margin-bottom: 10px;
+}
+
+.toolbar div.dropdown-tool-grey-row li.threat-cat-cb {
+  padding-top: 6px;
+  input {
+    display: inline-block;
+    width: 12px;
+    margin-top: 1px;
+    margin-right: 4px;
+  }
+  label {
+    display: inline-block;
+    width: 120px;
+    vertical-align: top;
+    padding-top: 1px;
+  }
+}
+
+.threat-cat-required {
+  color: $warning-accent-color;
+  font-size: 7pt;
+  padding-left: 2px;
+  padding-top: 1px
 }

@@ -263,6 +263,7 @@
                   %th.content-label-sm Dispute
                   %th.content-label-sm.no-word-break Current WL/BL List
                   %th.text-center.content-label-sm.no-word-break Current WBRS Score
+                  %th.content-label-sm.no-word-break Threat Category
               %tbody
 
               -# TODO Hook up ability to preview scores based on changes in WL/BL
@@ -272,48 +273,126 @@
 
             .inline-tool-content-wrapper
               .row
-                .col-xs-2
-                  %label.content-label-sm Action
-                .col-xs-5
+                .col-xs-4
                   %input{type: 'radio', name: 'wlbl-action-radio', id: 'wlbl-add', value: 'wlbl-add', checked: true}
                   %label.radio-label{for: 'wlbl-add'} Add to list
-                .col-xs-5
+                .col-xs-8
                   %input{type: 'radio', name: 'wlbl-action-radio', id: 'wlbl-remove', value: 'wlbl-remove'}
                   %label.radio-label{for: 'wlbl-remove'} Remove from list
 
                 .row
                   .col-xs-12
                     %label.content-label-sm{for: "wlbl-list-type-select"} Lists
-                    .row.dropdown-tool-grey-row
-                      .col-xs-5.col-xs-offset-2
+                    .row.dropdown-tool-grey-row.margin-bottom-med
+                      .col-xs-4
                         %ul
                           %li
-                            %input.wl-weak-checkbox.wl-bl-list-inline{type: 'checkbox', name: 'wl-bl-list-inline', value: "WL-weak"}
-                              WL - Weak
+                            %input.wl-weak-checkbox.wl-bl-list-inline{type: 'checkbox', name: 'wl-bl-list-inline', value: "WL-weak"} WL - Weak
                           %li
-                            %input.wl-med-checkbox.wl-bl-list-inline{type: 'checkbox', name: 'wl-bl-list-inline', value: "WL-med"}
-                              WL - Medium
-                          %li
-                            %input.wl-heavy-checkbox.wl-bl-list-inline{type: 'checkbox', name: 'wl-bl-list-inline', value: "WL-heavy"}
-                              WL - Heavy
-                      .col-xs-5
+                            %input.bl-weak-checkbox.wl-bl-list-inline{type: 'checkbox', name: 'wl-bl-list-inline', value: "BL-weak"} BL - Weak
+                      .col-xs-4
                         %ul
                           %li
-                            %input.bl-weak-checkbox.wl-bl-list-inline{type: 'checkbox', name: 'wl-bl-list-inline', value: "BL-weak"}
-                              BL - Weak
+                            %input.wl-med-checkbox.wl-bl-list-inline{type: 'checkbox', name: 'wl-bl-list-inline', value: "WL-med"} WL - Medium
                           %li
-                            %input.bl-med-checkbox.wl-bl-list-inline{type: 'checkbox', name: 'wl-bl-list-inline', value: "BL-med"}
-                              BL - Medium
+                            %input.bl-med-checkbox.wl-bl-list-inline{type: 'checkbox', name: 'wl-bl-list-inline', value: "BL-med"} BL - Medium
+                      .col-xs-4
+                        %ul
                           %li
-                            %input.bl-heavy-checkbox.wl-bl-list-inline{type: 'checkbox', name: 'wl-bl-list-inline', value: "BL-heavy"}
-                              BL - Heavy
+                            %input.wl-heavy-checkbox.wl-bl-list-inline{type: 'checkbox', name: 'wl-bl-list-inline', value: "WL-heavy"} WL - Heavy
+                          %li
+                            %input.bl-heavy-checkbox.wl-bl-list-inline{type: 'checkbox', name: 'wl-bl-list-inline', value: "BL-heavy"} BL - Heavy
+
+                .row
+                  .col-xs-12
+                    %label.content-label-sm{for: "threat-cat-select"}
+                      Threat Categories -
+                      %span.threat-cat-required *Required for adding to any blacklist. Up to 5 can be selected.
+
+                    .row.dropdown-tool-grey-row.threat-cat-row
+                      .col-xs-4
+                        %ul
+                          %li.threat-cat-cb
+                            %input.wl-bl-list-inline{type: 'checkbox', name: 'threat-cat-list', value: "threat-cat-bogon"}
+                            %label Bogon
+                          %li.threat-cat-cb
+                            %input.wl-bl-list-inline{type: 'checkbox', name: 'threat-cat-list', value: "threat-cat-botnets"}
+                            %label Botnets
+                          %li.threat-cat-cb
+                            %input.wl-bl-list-inline{type: 'checkbox', name: 'threat-cat-list', value: "threat-cat-crypto"}
+                            %label Cryptojacking
+                          %li.threat-cat-cb
+                            %input.wl-bl-list-inline{type: 'checkbox', name: 'threat-cat-list', value: "threat-cat-domain"}
+                            %label Domain Generated Algorithm
+                          %li.threat-cat-cb
+                            %input.wl-bl-list-inline{type: 'checkbox', name: 'threat-cat-list', value: "threat-cat-dnstunneling"}
+                            %label DNS Tunneling
+                          %li.threat-cat-cb
+                            %input.wl-bl-list-inline{type: 'checkbox', name: 'threat-cat-list', value: "threat-cat-dynamicdns"}
+                            %label Dynamic DNS
+                          %li.threat-cat-cb
+                            %input.wl-bl-list-inline{type: 'checkbox', name: 'threat-cat-list', value: "threat-cat-ebanking"}
+                            %label Ebanking/Fraud
+                          %li.threat-cat-cb
+                            %input.wl-bl-list-inline{type: 'checkbox', name: 'threat-cat-list', value: "threat-cat-exploits"}
+                            %label Exploits
+                      .col-xs-4
+                        %ul
+                          %li.threat-cat-cb
+                            %input.wl-bl-list-inline{type: 'checkbox', name: 'threat-cat-list', value: "threat-cat-ioc"}
+                            %label IOC
+                          %li.threat-cat-cb
+                            %input.wl-bl-list-inline{type: 'checkbox', name: 'threat-cat-list', value: "threat-cat-highrisk"}
+                            %label High Risk
+                          %li.threat-cat-cb
+                            %input.wl-bl-list-inline{type: 'checkbox', name: 'threat-cat-list', value: "threat-cat-linkshare"}
+                            %label Linkshare
+                          %li.threat-cat-cb
+                            %input.wl-bl-list-inline{type: 'checkbox', name: 'threat-cat-list', value: "threat-cat-malicious"}
+                            %label Malicious
+                          %li.threat-cat-cb
+                            %input.wl-bl-list-inline{type: 'checkbox', name: 'threat-cat-list', value: "threat-cat-malware"}
+                            %label Malware
+                          %li.threat-cat-cb
+                            %input.wl-bl-list-inline{type: 'checkbox', name: 'threat-cat-list', value: "threat-cat-dynamicdns"}
+                            %label Mobile Threats
+                          %li.threat-cat-cb
+                            %input.wl-bl-list-inline{type: 'checkbox', name: 'threat-cat-list', value: "threat-cat-ebanking"}
+                            %label Newly Seen
+                          %li.threat-cat-cb
+                            %input.wl-bl-list-inline{type: 'checkbox', name: 'threat-cat-list', value: "threat-cat-openhttp"}
+                            %label Open HTTP Proxy
+                      .col-xs-4
+                        %ul
+                          %li.threat-cat-cb
+                            %input.wl-bl-list-inline{type: 'checkbox', name: 'threat-cat-list', value: "threat-cat-openmail"}
+                            %label Open Mail Relay
+                          %li.threat-cat-cb
+                            %input.wl-bl-list-inline{type: 'checkbox', name: 'threat-cat-list', value: "threat-cat-p2pmalware"}
+                            %label P2P Malware Node
+                          %li.threat-cat-cb
+                            %input.wl-bl-list-inline{type: 'checkbox', name: 'threat-cat-list', value: "threat-cat-phishing"}
+                            %label Phishing
+                          %li.threat-cat-cb
+                            %input.wl-bl-list-inline{type: 'checkbox', name: 'threat-cat-list', value: "threat-cat-potentialdns"}
+                            %label Potential DNS Rebinding
+                          %li.threat-cat-cb
+                            %input.wl-bl-list-inline{type: 'checkbox', name: 'threat-cat-list', value: "threat-cat-spam"}
+                            %label Spam
+                          %li.threat-cat-cb
+                            %input.wl-bl-list-inline{type: 'checkbox', name: 'threat-cat-list', value: "threat-cat-spyware"}
+                            %label Spyware/Adware
+                          %li.threat-cat-cb
+                            %input.wl-bl-list-inline{type: 'checkbox', name: 'threat-cat-list', value: "threat-cat-torexitnodes"}
+                            %label TOR exit Nodes
+
 
               .comment-wrapper
                 %label.content-label-sm Comment
                 %textarea.dropdown-comment.adjust-wlbl-input.note-input
               .button-row-center
                 %button.primary.dropdown-submit-button{type: 'button', disabled: true, onclick:'submit_bulk_wlbl("index");'}
-                  Submit Reputation Changes
+                  Submit Changes
 
     %span.dropdown
       %button.toolbar-button.adjust-reptool-button.dropdown-toggle#reptool_index_entries_button.esc-tooltipped{title: 'Adjust RepTool BL', 'data-toggle': 'dropdown', 'aria-haspopup': 'true', 'aria-expanded': 'false', onclick: 'bulk_get_current_reptool("index");'}

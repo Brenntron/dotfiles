@@ -240,9 +240,10 @@ window.bulk_get_current_wlbl = (page) ->
       error: (response) ->
         std_msg_error( 'Error retrieving WL/BL Data', response)
     )
-  else
-    std_msg_error('No rows selected', ['Please select at least one entry row.'])
-    return false
+# dbinebri: RESTORE BELOW
+#  else
+#    std_msg_error('No rows selected', ['Please select at least one entry row.'])
+#    return false
 
 
 
