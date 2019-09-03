@@ -35,6 +35,13 @@ class Sbrs::Base
     @gssnegotiate ||= false
   end
 
+  def self.ca_cert_file
+    @ca_cert_file ||= Rails.configuration.sds.ca_cert_file
+  end
+
+  def self.pkey_file
+    @pkey_file ||= Rails.configuration.sds.pkey_file
+  end
 
   def self.read_timeout
     @read_timeout ||= Rails.configuration.sds.read_timeout
@@ -69,10 +76,10 @@ class Sbrs::Base
   def self.request_sds(path:, body:, type: nil)
     # adapted from TI/sb_api, then heavily modified
     query_string = path
-    cert = File.open(Rails.configuration.sds.cert_file, 'r') do |file|
+    cert = File.open(ca_cert_file, 'r') do |file|
       file.read
     end
-    pkey = File.open(Rails.configuration.sds.pkey_file, 'r') do |file|
+    pkey = File.open(pkey_file, 'r') do |file|
       file.read
     end
     if /\/score\// =~ query_string ? true : false
