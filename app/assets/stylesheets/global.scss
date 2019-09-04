@@ -10313,10 +10313,10 @@ hr.thin.extra-bottom-marg {
 
 // needs more width to encompass all threat categories now
 .dispute-wlbl-adjust-wrapper {
-  width: 500px;
+  width: 480px;
 }
-  .toolbar div.dropdown-tool-grey-row li {
-  padding: 2px 2px 6px 10px;
+.toolbar div.dropdown-tool-grey-row li {
+  padding: 2px 2px 6px 12px;
 }
 
 .toolbar div.dropdown-tool-grey-row.margin-bottom-med {
@@ -10325,6 +10325,7 @@ hr.thin.extra-bottom-marg {
 
 .toolbar div.dropdown-tool-grey-row li.threat-cat-cb {
   padding-top: 6px;
+  padding-bottom: 8px;
   input {
     display: inline-block;
     width: 12px;
