@@ -60,6 +60,21 @@ Feature: Webcat complaints
     Then I should not see "commit"
 
   @javascript
+  Scenario: a user can open selected ips in new tabs
+    Given a user with role "webcat user" exists and is logged in
+    And a complaint entry with trait "not_important" exists
+    And a complaint entry preload exists
+    And I goto "/escalations/webcat/complaints?f=ALL"
+    Then I select row "1"
+    When I click "Open Selected"
+    And I wait for "2" seconds
+    Then a new window should be opened
+    When I switch to the new window
+    And I should see "Company news"
+
+
+
+  @javascript
   Scenario: a user can take a complaint
     Given a user with role "webcat user" exists and is logged in
     And a new complaint entry with trait "not_important" exists
