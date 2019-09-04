@@ -253,7 +253,7 @@ module API
             params do
               requires :urls, type: Array[String], desc: "uris to wl/bl"
               requires :trgt_list, type: Array[String], desc: "type of WL/BL"
-              optional :thrt_cats, type: Array[String], desc: "threat categories"
+              optional :thrt_cat_ids, type: Array[Integer], desc: "threat categories"
               requires :note, type: String, desc: "note"
             end
             post "uri_wlbl" do
@@ -262,6 +262,7 @@ module API
               true
             end
 
+            # TODO: unused?
             desc "Adjust a WL/BL entry"
             params do
               requires :dispute_entry_ids, type: Array[Integer], desc: "analyst-console database id"
@@ -277,6 +278,7 @@ module API
               true
             end
 
+            # TODO: unused?
             desc "Adjust a WL/BL entry"
             params do
               requires :dispute_ids, type: Array[Integer], desc: "analyst-console database id"
@@ -747,6 +749,7 @@ module API
               requires :ip_uris, type: Array[String]
               requires :list_types, type: Array[String]
               requires :note, type: String
+              optional :thrt_cat_ids, type: Array[Integer], desc: "threat categories"
             end
 
             post 'bulk_rule_ui_wlbl_add' do
@@ -760,7 +763,8 @@ module API
                         urls: unique_ip_uris,
                         trgt_list: permitted_params['list_types'],
                         note: permitted_params['note'],
-                        usr: current_user.cvs_username
+                        usr: current_user.cvs_username,
+                        thrt_cat_ids: permitted_params['thrt_cat_ids']
                     }
 
                 Wbrs::ManualWlbl.bulk_new_wlbl_from_params(wlbl_params)

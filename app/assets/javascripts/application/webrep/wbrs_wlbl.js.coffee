@@ -287,7 +287,8 @@ window.submit_individual_wlbl =(button_tag) ->
 
   data = {
     'urls': [ wlbl_form.getElementsByClassName('dispute-entry-content')[0].value ]
-    'trgt_list': list_types
+    'trgt_list': list_types,
+    'thrt_cat_ids': [ parseInt(wlbl_form.getElementsByClassName('wlbl_thrt_cat_id')[0].value) ]
     'note': wlbl_form.getElementsByClassName('note-input')[0].value
   }
 
@@ -319,13 +320,14 @@ window.submit_bulk_wlbl = (page) ->
 
     entries = $(dropdown).find('.wlbl-entry-content')
     wlbl_comment = $(dropdown).find('.adjust-wlbl-input').val()
+    thrt_cat_ids = [ $(dropdown).find('.wlbl_thrt_cat_id').val() ]
 
     if $(entries).length > 0
       $(entries).each ->
         entry = $(this).text()
         ip_uris.push(entry)
 
-    data = {ip_uris: ip_uris, list_types: list_types, note: wlbl_comment}
+    data = {ip_uris: ip_uris, list_types: list_types, note: wlbl_comment, thrt_cat_ids: thrt_cat_ids}
 
     if $('#wlbl-remove').prop('checked') == true
       std_msg_ajax(

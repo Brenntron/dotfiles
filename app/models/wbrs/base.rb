@@ -113,14 +113,16 @@ class Wbrs::Base
 
   def self.request_error_handling(response)
     case
-      when 300 > response.code
-        response
-      when 404 == response.code
-        body = JSON.parse(response.body)
-        raise Wbrs::WbrsNotFoundError, "HTTP response #{response.code} #{body['Error']}"
-      else
-        body = JSON.parse(response.body)
-        raise Wbrs::WbrsError, "HTTP response #{response.code} #{body['Error']}"
+    when 300 > response.code
+      response
+    when 404 == response.code
+      body = JSON.parse(response.body) rescue nil
+      error = body ? body['Error'] : nil
+      raise Wbrs::WbrsNotFoundError, "HTTP response #{response.code} #{error}"
+    else
+      body = JSON.parse(response.body) rescue nil
+      error = body ? body['Error'] : nil
+      raise Wbrs::WbrsError, "HTTP response #{response.code} #{error}"
     end
   end
 
