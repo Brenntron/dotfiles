@@ -311,6 +311,10 @@
                 .row
                   = wlbl_form.select(:thrt_cat_id, Wbrs::ThreatCategory.selections, {include_blank: true}, class: 'wlbl_thrt_cat_id')
 
+                .row
+                  - Wbrs::ThreatCategory.selections.each do |label, value|
+                    = wlbl_form.check_box(:thrt_cat_id, {id: nil, class: 'wlbl_thrt_cat_id'}, value)
+                    = label
 
               .comment-wrapper
                 %label.content-label-sm Comment
