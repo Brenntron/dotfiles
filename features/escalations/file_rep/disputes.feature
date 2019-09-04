@@ -199,7 +199,7 @@ Feature: Disputes
     And I click "#msg-modal"
     And I wait for "25" seconds
     And a FileRep Ticket should have a RL score
- @now
+
   @javascript
   Scenario: a user visits the FileRep Dispute Show page and confirms that ThreatGrid data was populated
     Given a user with role "filerep user" exists and is logged in
