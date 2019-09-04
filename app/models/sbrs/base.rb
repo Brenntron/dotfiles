@@ -93,9 +93,6 @@ class Sbrs::Base
       uri = URI.parse(request_string)
       request = Net::HTTP::Get.new(uri)
 
-      request.read_timeout = read_timeout
-      request.open_timeout = open_timeout
-
       request["X-SDS-Categories-Version"] = "v8"     # <-- dude totally deal with this mess ::: SDS CATEGORY VERSION
       request["X-Client-ID"] = "talosweb"
       request["X-Product-ID"] = "talosintelligence"
@@ -104,7 +101,9 @@ class Sbrs::Base
           cert: OpenSSL::X509::Certificate.new(cert),
           key: OpenSSL::PKey::RSA.new(pkey),
           # ca_file: Rails.configuration.sds.cert_file,
-          verify_mode: OpenSSL::SSL::VERIFY_NONE
+          verify_mode: OpenSSL::SSL::VERIFY_NONE,
+          read_timeout: read_timeout,
+          open_timeout: open_timeout
       }
       begin
         response = Net::HTTP.start(uri.hostname, uri.port, req_options) do |http|
