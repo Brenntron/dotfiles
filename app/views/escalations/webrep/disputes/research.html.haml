@@ -214,7 +214,10 @@
             %button.toolbar-button.add-to-ticket-button#add-to-ticket-button.esc-tooltipped{title: 'Add to Ticket', 'data-toggle': 'dropdown', 'aria-haspopup': 'true', 'aria-expanded': 'false'}
               %span.toolbar-button-text Add to Ticket
             .dropdown-menu.toolbar-dropdown#add_to_ticket_dropdown{'aria-labelledby': 'add-to-ticket-button'}
-              = render 'escalations/webrep/disputes/new'
+              .dispute-wlbl-adjust-wrapper
+                .dropdown-tool-text-divider.primary-text-divider
+                  Current WBRS Reputation
+                = render 'escalations/webrep/disputes/new'
           %span.dropdown
             %button#wlbl_entries_button.toolbar-button.adjust-wlbl-button.dropdown-toggle.esc-tooltipped.toolbar-button-spacer{title: 'Adjust WL/BL', 'data-toggle': 'dropdown', 'aria-haspopup': 'true', 'aria-expanded': 'false', onclick: 'bulk_get_current_wlbl("research")'}
               %span.toolbar-button-text Adjust WBRS WL/BL

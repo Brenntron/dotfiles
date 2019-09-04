@@ -62,7 +62,7 @@ $ ->
       url = $(tr).find('.entry-data-content').text().trim()
 
       if new_val != ''
-        new_val = text += '&#10' + url
+        new_val = new_val += '&#10' + url
       else
         new_val = url
     console.log new_val
