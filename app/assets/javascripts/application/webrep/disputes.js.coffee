@@ -972,6 +972,14 @@ $ ->
         className: 'state-col'
       }
       {
+        targets: [ 7 ]
+        className: 'dispute-entry-col'
+      }
+      {
+        targets: [ 8 ]
+        className: 'owner-col'
+      }
+      {
         targets: [
           2
           6
@@ -1025,7 +1033,7 @@ $ ->
         render: (data) ->
           # data here is an html string with a span for count, see models/dispute.rb for details, extract the text for the tooltip
           tooltip_text = data.slice(0, data.indexOf('<span'))
-          '<p class="input-truncate esc-tooltipped tooltipsterred" title="' + tooltip_text + '">' + data + '</p>'
+          '<span class="input-truncate esc-tooltipped tooltipsterred" title="' + tooltip_text + '">' + data + '</span>'
       }
       { data: 'assigned_to' }
       { data: 'case_opened_at' }
