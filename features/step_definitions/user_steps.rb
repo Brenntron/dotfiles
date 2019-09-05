@@ -25,6 +25,7 @@ Given(/^an admin user with role "(.*?)" exists and is logged in$/) do |role|
 end
 
 Given(/^a user with role "(.*?)" exists and is logged in$/) do |role|
+  FactoryBot.create(:guest_company)
   @user = FactoryBot.create(:current_user, confirmed: true)
   @user.roles << FactoryBot.create(:role, role: role)
   sign_in_user
@@ -42,8 +43,8 @@ Given(/^a user with role "(.*?)" exists with cvs_username, "(.*?)", exists and i
 end
 
 Given(/^a user with id "(.*?)" has a role "(.*?)" and is logged in$/) do |user_id, role|
-  @user = User.find(user_id)
-  @role = Role.find_by_role(role)
+  @role = FactoryBot.create(:role, role: role)
+  @user = FactoryBot.create(:current_user, confirmed: true, id: user_id)
   @user.roles << @role
   sign_in_user
 end

@@ -143,7 +143,7 @@ class ComplaintEntry < ApplicationRecord
 
             current_status = "COMPLETED"
             self.case_assigned_at ||= Time.now
-            update(status:current_status,
+            update!(status:current_status,
                    internal_comment: comment,
                    resolution_comment: resolution_comment,
                    case_resolved_at: Time.now,
@@ -158,12 +158,12 @@ class ComplaintEntry < ApplicationRecord
                               casenumber: self.complaint.id)
             end
             cat_from_wbrs = self.set_current_category
-            update(url_primary_category: cat_from_wbrs, category: cat_from_wbrs)
+            update!(url_primary_category: cat_from_wbrs, category: cat_from_wbrs)
           else
             # dismiss from pending of important case
 
             current_status = "ASSIGNED"
-            update(status:current_status,
+            update!(status:current_status,
                    url_primary_category: nil,
                    internal_comment: comment,
                    resolution_comment: resolution_comment,
@@ -174,7 +174,7 @@ class ComplaintEntry < ApplicationRecord
           # important not from pending
 
           current_status = "PENDING"
-          update(resolution: entry_status,
+          update!(resolution: entry_status,
                  url_primary_category: category_names_string,
                  category: categories_string,
                  status:current_status,
@@ -186,7 +186,7 @@ class ComplaintEntry < ApplicationRecord
         # not important case or resolution is "unchanged"
         current_status = "COMPLETED"
         self.case_assigned_at ||= Time.now
-        update(resolution: entry_status,
+        update!(resolution: entry_status,
                url_primary_category: categories_string,
                category: categories_string,
                status: current_status,
@@ -203,7 +203,10 @@ class ComplaintEntry < ApplicationRecord
                           casenumber: self.complaint.id )
         end
         cat_from_wbrs = self.set_current_category
-        update(url_primary_category: cat_from_wbrs, category: cat_from_wbrs)
+        update!(url_primary_category: cat_from_wbrs, category: cat_from_wbrs)
+      end
+      if self.status == "COMPLETED" && self.complaint_entry_screenshot.present?
+        self.complaint_entry_screenshot.destroy
       end
     end
 
@@ -353,34 +356,34 @@ class ComplaintEntry < ApplicationRecord
     def capture_screenshot(uri, complaint_entry_id)
       max_wait_for_job = 15 #seconds
       begin
-        screenshot_data =  ""
-        Timeout::timeout(max_wait_for_job) do
-          screenshot_data = CapybaraSpider.low_capture("#{uri}")
-        end
-        ces = ComplaintEntryScreenshot.new
-        ces.complaint_entry_id = complaint_entry_id
-        ces.screenshot = Base64.decode64(screenshot_data)
-        ces.save!
+        #screenshot_data =  ""
+        #Timeout::timeout(max_wait_for_job) do
+        #  screenshot_data = CapybaraSpider.low_capture("#{uri}")
+        #end
+        #ces = ComplaintEntryScreenshot.new
+        #ces.complaint_entry_id = complaint_entry_id
+        #ces.screenshot = Base64.decode64(screenshot_data)
+        #ces.save!
       rescue Timeout::Error => e
         #couldnt complete in time
-        Rails.logger.error( "#{e} --- Timed out waiting for screenshot for #{uri} to finish")
-        ces = ComplaintEntryScreenshot.new
-        ces.error_message = e.message
-        ces.complaint_entry_id = complaint_entry_id
-        open("app/assets/images/failed_screenshot.jpg") do |f|
-          ces.screenshot = f.read
-        end
-        ces.save!
+        #Rails.logger.error( "#{e} --- Timed out waiting for screenshot for #{uri} to finish")
+        #ces = ComplaintEntryScreenshot.new
+        #ces.error_message = e.message
+        #ces.complaint_entry_id = complaint_entry_id
+        #open("app/assets/images/failed_screenshot.jpg") do |f|
+        #  ces.screenshot = f.read
+        #end
+        #ces.save!
       rescue Exception => e
-        Rails.logger.error("#{e.message}")
+        #Rails.logger.error("#{e.message}")
         #do nothing, it was worth a try. kittens are sad now
-        ces = ComplaintEntryScreenshot.new
-        ces.error_message = e.message
-        ces.complaint_entry_id = complaint_entry_id
-        open("app/assets/images/failed_screenshot.jpg") do |f|
-          ces.screenshot = f.read
-        end
-        ces.save!
+        #ces = ComplaintEntryScreenshot.new
+        #ces.error_message = e.message
+        #ces.complaint_entry_id = complaint_entry_id
+        #open("app/assets/images/failed_screenshot.jpg") do |f|
+        #  ces.screenshot = f.read
+        #end
+        #ces.save!
       end
 
     end
@@ -440,28 +443,28 @@ class ComplaintEntry < ApplicationRecord
     max_wait_for_job = 15 #seconds
     begin
       #this is where screen grabs happen.
-      screenshot_entry = ComplaintEntryScreenshot.create!(complaint_entry_id:new_complaint_entry.id)
-      screenshot_entry.grab_screenshot
+      #screenshot_entry = ComplaintEntryScreenshot.create!(complaint_entry_id:new_complaint_entry.id)
+      #screenshot_entry.grab_screenshot
     rescue Timeout::Error => e
       #couldnt complete in time
-      Rails.logger.error( "#{e} --- Timed out waiting for screenshot for #{new_complaint_entry.hostlookup} to finish")
-      ces = ComplaintEntryScreenshot.new
-      ces.error_message = e.message
-      ces.complaint_entry_id = new_complaint_entry.id
-      open("app/assets/images/failed_screenshot.jpg") do |f|
-        ces.screenshot = f.read
-      end
-      ces.save!
+      #Rails.logger.error( "#{e} --- Timed out waiting for screenshot for #{new_complaint_entry.hostlookup} to finish")
+      #ces = ComplaintEntryScreenshot.new
+      #ces.error_message = e.message
+      #ces.complaint_entry_id = new_complaint_entry.id
+      #open("app/assets/images/failed_screenshot.jpg") do |f|
+      #  ces.screenshot = f.read
+      #end
+      #ces.save!
     rescue Exception => e
-      Rails.logger.error("#{e.message}")
+      #Rails.logger.error("#{e.message}")
       #do nothing, it was worth a try. kittens are sad now
-      ces = ComplaintEntryScreenshot.new
-      ces.error_message = e.message
-      ces.complaint_entry_id = new_complaint_entry.id
-      open("app/assets/images/failed_screenshot.jpg") do |f|
-        ces.screenshot = f.read
-      end
-      ces.save!
+      #ces = ComplaintEntryScreenshot.new
+      #ces.error_message = e.message
+      #ces.complaint_entry_id = new_complaint_entry.id
+      #open("app/assets/images/failed_screenshot.jpg") do |f|
+      #  ces.screenshot = f.read
+      #end
+      #ces.save!
     end
   end
 
@@ -485,7 +488,7 @@ class ComplaintEntry < ApplicationRecord
       when 'standard'
         standard_search(search_name, user: user)
       when 'contains'
-        contains_search(params[:value])
+        contains_search(params['value'])
       else
         where({})
     end

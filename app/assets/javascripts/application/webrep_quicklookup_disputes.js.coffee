@@ -1,7 +1,7 @@
 
 $ ->
 
-
+  console.log 'inininin'
   completed_counter = 0
   $(document).bind(
     ###

@@ -2,12 +2,12 @@ FactoryBot.define do
   factory :complaint_entry do
     complaint       {  FactoryBot.create(:complaint)}
     subdomain       { 'www' }
-    domain          { 'testing.com' }
-    path            { '/downloads' }
+    domain          { 'google.com' }
+    path            { '/about' }
     wbrs_score      { 2 }
     url_primary_category {''}
     sbrs_score      { 10 }
-    ip_address      { '1.1.1.1' }
+    ip_address      { '8.8.8.8' }
     category        { 'bogus_category' }
 
     trait :high_telemetry do

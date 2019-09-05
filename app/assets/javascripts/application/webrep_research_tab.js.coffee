@@ -13,8 +13,10 @@ $ ->
     tab = window.location.href
     if tab.includes('quick')
       $('#research-page-toolbar').hide()
+      $('.research_results').hide()
     else
       $('#research-page-toolbar').show()
+      $('.research_results').show()
 
   $(document).on 'ready page:load', (e) ->
     hide_toolbar()
@@ -27,7 +29,7 @@ $ ->
 
 $ ->
   $('#edit-dispute-entry-button').click ->
-    if ($('.dispute_check_box:checked').length > 0)
+    if $('.dispute_check_box:checked').length > 0
       $('.edit-entries-buttons').removeClass('hidden')
       $('.dispute_check_box').each ->
 
@@ -65,7 +67,6 @@ $ ->
         new_val = new_val += '&#10' + url
       else
         new_val = url
-    console.log new_val
     $('#research-page-toolbar #ips_urls').html( new_val.trim() )
 
   $('.cancel-changes').click ->

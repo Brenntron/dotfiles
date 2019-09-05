@@ -8,12 +8,12 @@ gem 'grape', '1.1.0'
 gem 'grape-swagger', '0.31.1'
 gem 'grape-swagger-rails', '0.3.0'
 gem 'grape-active_model_serializers', '1.5.2'
+gem 'hashie-forbidden_attributes', '~> 0.1.1'
+gem 'activerecord-session_store', '1.1.1'
+gem 'simple_form', '4.0.1'
 
 gem 'haml', '~> 5.0.4'
-gem 'activerecord-session_store', '1.1.1'
-
-gem 'hashie-forbidden_attributes', '~> 0.1.1'
-
+gem 'libv8', '3.16.14.19'
 
 
 gem 'kaminari', '1.1.1'
@@ -38,10 +38,9 @@ gem 'rmagick', '~> 2.16.0'
 gem 'bugzilla', require: 'bugzilla'
 
 gem 'xmlrpc'
-gem 'libv8', '3.16.14.19'
 
 
-gem 'rails_admin', '~> 1.3'
+gem 'rails_admin', '~> 1.4.2'
 
 # System Management
 gem 'foreman', '0.85.0'
@@ -51,13 +50,13 @@ gem 'dotenv-rails', '2.5.0'
 gem 'with_advisory_lock', '~> 4.0'
 gem 'delayed_job', '4.1.5'
 gem 'delayed_job_active_record', '4.1.3'
+gem 'delayed_job_web', '1.4.3'
 
 # Micellaneous
 gem 'pry', '0.12.2'
 gem 'pry-remote', '~> 0.1.8'
 
 
-gem 'simple_form', '4.0.1'
 gem 'jbuilder', '2.8.0'
 gem 'diffy', '3.2.1'
 

@@ -14,6 +14,7 @@ $(document).ready ->
      $('body').hasClass('index-action')
     window.check_wbnp_status()
 
+
 # WBNP - Get report id
 window.fetch_wbnp_data = () ->
   $('#fetch_wbnp').attr('disabled', true)
@@ -1458,9 +1459,10 @@ window.fetch_complaints = () ->
 
 
 open_selected = (selected_rows, toggle) ->
-  for i in selected_rows[0].length
-    { viewable, subdomain, domain, path, ip_address } = selected_rows.data()[i]
+  for selected_row in selected_rows.data()
+    { viewable, subdomain, domain, path, ip_address } = selected_row
     if viewable == toggle
+
       new_subdomain = ""
       new_domain = ""
       new_path = ""
@@ -1472,23 +1474,23 @@ open_selected = (selected_rows, toggle) ->
         new_domain = domain
         window.open("http://"+ new_subdomain + new_domain + new_path)
       else
-        window.open("http://"+selected_rows.data()[i].ip_address)
+        window.open("http://"+selected_row.ip_address)
 
 window.open_viewable = () ->
   selected_rows = $('#complaints-index').DataTable().rows()
-  open_selected(selected_rows, true)
+  open_selected(selected_rows, "true")
 window.open_nonviewable = () ->
   selected_rows = $('#complaints-index').DataTable().rows()
-  open_selected(selected_rows, false)
+  open_selected(selected_rows, "false")
 window.open_selected = () ->
   selected_rows = $('#complaints-index').DataTable().rows('.selected')
   if selected_rows[0].length == 0
     std_msg_error('No rows selected', ['Please select at least one row.'])
   else
-    open_selected(selected_rows, true)
+    open_selected(selected_rows, "true")
 window.open_all = () ->
   selected_rows = $('#complaints-index').DataTable().rows()
-  open_selected(selected_rows, true)
+  open_selected(selected_rows, "true")
 
 toggle_selected = (selectedRows, expand)->
   selectState = $('.selected')
@@ -1585,7 +1587,7 @@ window.master_submit = () ->
     keyboard: false
   })
 
-  $('.nested-complaint-data-wrapper:visible').each ->
+  $('.selected + tr td.nested-complaint-data-wrapper').each ->
     entry_id = $(this).find('tr').attr('entry_id')
     row_id = $(this).find('tr').attr('row_id')
     type = $(this).find('tr').attr('type')
@@ -1593,9 +1595,11 @@ window.master_submit = () ->
     if type == 'submit_changes' && entry_id && row_id
       prefix = $(this).find("#complaint_prefix_#{entry_id}")[0].value
 
-      categories = $(this).find("#input_cat_#{entry_id}").val().toString()
-      category_name = $(this).find("#input_cat_#{entry_id}").next('.selectize-control').find('.item')
       category_names = []
+      categories = ""
+      if $(this).find("#input_cat_#{entry_id}").val()
+        categories = $(this).find("#input_cat_#{entry_id}").val().toString()
+      category_name = $(this).find("#input_cat_#{entry_id}").next('.selectize-control').find('.item')
       category_name.each ->
         category_names.push($(this).text())
       category_names = category_names.toString()
@@ -1609,6 +1613,7 @@ window.master_submit = () ->
         data.push({entry_id: entry_id, error: false, row_id: row_id, prefix: prefix, categories: categories, category_names: category_names, status: status, comment: comment, resolution_comment: resolution_comment})
       else if (categories.length == 0) && status == 'FIXED'
         data.push({entry_id, error: true, reason: 'nil_categories'})
+
 
   std_msg_ajax(
     method: 'POST'

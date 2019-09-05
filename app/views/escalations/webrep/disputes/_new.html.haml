@@ -9,7 +9,7 @@
     %label.content-label-sm URLs/IP Addresses
     %textarea#ips_urls{required: true, name:'ips_urls'}
   .form-group
-    %label.content-label-sm Assignee
+    %label.content-label-sm.assignee-label Assignee
     %input.form-control#assignee{name: 'assignee', list: 'assignee-list', required: true, value: "#{current_user.cvs_username}"}
     %datalist#assignee-list
   .form-group

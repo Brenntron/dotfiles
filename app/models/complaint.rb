@@ -52,11 +52,11 @@ class Complaint < ApplicationRecord
     status_list = complaint_entries.map{|entry| entry.status}
     case new_status
       when NEW
-        update(status: status_list.any? {|item| [ASSIGNED,PENDING,COMPLETED].include? item}? ACTIVE: NEW)
+        update!(status: status_list.any? {|item| [ASSIGNED,PENDING,COMPLETED].include? item}? ACTIVE: NEW)
       when ASSIGNED || PENDING
-        update(status:ACTIVE)
+        update!(status:ACTIVE)
       when COMPLETED
-        update(status: status_list.any? {|item| [ASSIGNED,PENDING,NEW].include? item}? ACTIVE: COMPLETED)
+        update!(status: status_list.any? {|item| [ASSIGNED,PENDING,NEW].include? item}? ACTIVE: COMPLETED)
     end
   end
 
@@ -329,18 +329,18 @@ class Complaint < ApplicationRecord
 
 
           begin
-            ces = ComplaintEntryScreenshot.create(complaint_entry_id: new_complaint_entry.id )
+            #ces = ComplaintEntryScreenshot.create(complaint_entry_id: new_complaint_entry.id )
             # CALL SCREENSHOT BACKGROUND JOB! with ces.id and new_complaint_entry.hostlookup
-            ces.grab_screenshot
+            #ces.grab_screenshot
           rescue Exception => e
-            Rails.logger.error("#{e.message}")
-            ces = ComplaintEntryScreenshot.new
-            ces.error_message = e.message
-            ces.complaint_entry_id = new_complaint_entry.id
-            open("app/assets/images/failed_screenshot.jpg") do |f|
-              ces.screenshot = f.read
-            end
-            ces.save!
+            #Rails.logger.error("#{e.message}")
+            #ces = ComplaintEntryScreenshot.new
+            #ces.error_message = e.message
+            #ces.complaint_entry_id = new_complaint_entry.id
+            #open("app/assets/images/failed_screenshot.jpg") do |f|
+            #  ces.screenshot = f.read
+            #end
+            #ces.save!
           end
         end
 
@@ -384,17 +384,17 @@ class Complaint < ApplicationRecord
           ComplaintEntryPreload.generate_preload_from_complaint_entry(new_complaint_entry)
 
           begin
-            ces = ComplaintEntryScreenshot.create(complaint_entry_id: new_complaint_entry.id )
+            #ces = ComplaintEntryScreenshot.create(complaint_entry_id: new_complaint_entry.id )
             # CALL SCREENSHOT BACKGROUND JOB! with ces.id and new_complaint_entry.hostlookup
-            ces.grab_screenshot
+            #ces.grab_screenshot
           rescue Exception => e
-            ces = ComplaintEntryScreenshot.new
-            ces.error_message = e.message
-            ces.complaint_entry_id = new_complaint_entry.id
-            open("app/assets/images/failed_screenshot.jpg") do |f|
-              ces.screenshot = f.read
-            end
-            ces.save!
+            #ces = ComplaintEntryScreenshot.new
+            #ces.error_message = e.message
+            #ces.complaint_entry_id = new_complaint_entry.id
+            #open("app/assets/images/failed_screenshot.jpg") do |f|
+            #  ces.screenshot = f.read
+            #end
+            #ces.save!
           end
         end
 

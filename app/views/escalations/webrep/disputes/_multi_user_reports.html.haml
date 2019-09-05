@@ -45,7 +45,7 @@
             %th Case ID
             %th.esc-tooltipped{title: 'Submitter Type'}
             -#  Submitter type
-            %th Owner
+            %th Assignee
             %th Status
             %th.esc-tooltipped{title: 'Ticket Type'}
             -#  Ticket type
@@ -95,7 +95,7 @@
             %th Case ID
             %th.esc-tooltipped{title: 'Submitter Type'}
             -#  Submitter type
-            %th Owner
+            %th Assignee
             %th.esc-tooltipped{title: 'Ticket Type'}
             -#  Ticket type
             %th Dispute Preview
@@ -137,17 +137,17 @@
       .col-md-12
 
         .reports-graph-info-container
-          %h5 Ticket Entries Closed by Ticket Owner
+          %h5 Ticket Entries Closed by Ticket Assignee
           .reports-graph-wrapper
             %canvas#ticket-entries-closed-by-owner
 
         .reports-graph-info-container
-          %h5 Average Time to Close Tickets by Ticket Owner
+          %h5 Average Time to Close Tickets by Ticket Assignee
           .reports-graph-wrapper
             %canvas#avg-time-to-close-tickets
 
         .reports-graph-info-container
-          %h5 Ticket Resolution by Ticket Owner
+          %h5 Ticket Resolution by Ticket Assignee
           .graph-bar-legend.ticket-resolution-legend
             %label.yellow-legend-color.graph-legend-circle Fixed FN
             %label.skyblue-legend-color.graph-legend-circle Fixed FP

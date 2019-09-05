@@ -190,28 +190,28 @@
                 %td.col-actions
                 %td.col-clear-actions
 
-  .row
+  .row.research_results
     .col-xs-12
-      .ajax-message-div
-        .loader-gears
-          =inline_svg 'icon_gears_loader.svg'
-        %span.loader-msg Loading data...
+      -#.ajax-message-div
+      -#  .loader-gears
+      -#    =inline_svg 'icon_gears_loader.svg'
+      -#  %span.loader-msg Loading data...
 
       - if params['search']
         %h4 Entry Search Results for
         %span.searched-for-url #{params['search']['uri']}
         (#{@entries.count} found)
       #research-page-toolbar.toolbar
-        %div
-          %label.toolbar-section-label Table View
-          %button.toolbar-button.expand-row-button#expand-all-rows.esc-tooltipped.toolbar-button-spacer{title: 'Expand All Rows'}
-            %span.toolbar-button-text Expand All Rows
-          %button.toolbar-button.collapse-button#collapse-all-rows.esc-tooltipped{title: 'Collapse All Rows'}
-            %span.toolbar-button-text Collapse All Rows
+        -#%div
+        -#  %label.toolbar-section-label Table View
+        -#  %button.toolbar-button.expand-row-button#expand-all-rows.esc-tooltipped.toolbar-button-spacer{title: 'Expand All Rows'}
+        -#    %span.toolbar-button-text Expand All Rows
+        -#  %button.toolbar-button.collapse-button#collapse-all-rows.esc-tooltipped{title: 'Collapse All Rows'}
+        -#    %span.toolbar-button-text Collapse All Rows
         %div
           %label.toolbar-section-label Edit
           %span.dropdown
-            %button.toolbar-button.add-to-ticket-button#add-to-ticket-button.esc-tooltipped{title: 'Add to Ticket', 'data-toggle': 'dropdown', 'aria-haspopup': 'true', 'aria-expanded': 'false'}
+            %button.toolbar-button.add-to-ticket-button#add-to-ticket-button.esc-tooltipped{title: 'Add to Ticket','data-toggle': 'dropdown', 'aria-haspopup': 'true', 'aria-expanded': 'false', disabled: true}
               %span.toolbar-button-text Add to Ticket
             .dropdown-menu.toolbar-dropdown#add_to_ticket_dropdown{'aria-labelledby': 'add-to-ticket-button'}
               .dispute-wlbl-adjust-wrapper
@@ -379,7 +379,9 @@
         %div
           %label.toolbar-section-label Type to filter results
           %input#research-page-filter{'type': "text", 'onKeyUp': "researchfilter(this)"}
-  .row
+        %button.primary#submit-strict-changes{onclick:'submit_quick_lookup();return false;', disabled: true} Submit Reputation Changes
+        %span.small.note-repsubmit * NOTE: Submitting reputation changes will automatically create a closed ticket
+  .row.research_results
     .col-xs-12
       %table#disputes-research-table.table.table-sm.bfrp-table
         %tbody

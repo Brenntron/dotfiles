@@ -14,9 +14,12 @@ class Bridge::FileRepUpdateStatusEvent < Bridge::BaseMessage
     }
     super(message: {source_authority: source_authority,
                     source_key: source_key,
-                    ticket_entries: return_payload
+                    ticket_entries: return_payload,
+                    ac_id: dispute.id,
+                    status: dispute.status,
+                    ticket_type: "FileReputationDispute"  # So TI knows to send escalated email if ticket originates on AC
     })
   end
 
-  handle_asynchronously :post, :queue => "filerep_status_update"
+  handle_asynchronously :post, :queue => "filerep_status_update", :priority => 2
 end
