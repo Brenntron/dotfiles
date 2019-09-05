@@ -19,10 +19,8 @@ $ ->
         method: 'POST'
         data: data
         success: (response) ->
-          console
-          $(dropdown).dropdown('toggle')
+          $(dropdown).dropdown 'toggle'
           $('#loader-modal').modal 'hide'
-
           if response.json.errors.length > 0
             std_msg_error("Duplicate",["Unable to create duplicate entries: #{response.json.errors}. The other entries (if any) were successfully created."], reload: true)
           else
@@ -39,4 +37,4 @@ $ ->
   $('#cancel_dispute').on 'click', ->
     $('#ips_urls').val('')
     $('#assignee').val('')
-    $('#new-dispute').dropdown('toggle')
+    $(dropdown).dropdown 'toggle'
