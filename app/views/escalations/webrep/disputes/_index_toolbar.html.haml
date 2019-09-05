@@ -283,7 +283,7 @@
                 .row
                   .col-xs-12
                     %label.content-label-sm{for: "wlbl-list-type-select"} Lists
-                    .row.dropdown-tool-grey-row.margin-bottom-med
+                    .row.dropdown-tool-grey-row.lists-row
                       .col-xs-4
                         %ul
                           %li
@@ -303,97 +303,20 @@
                           %li
                             %input.bl-heavy-checkbox.wl-bl-list-inline{type: 'checkbox', name: 'wl-bl-list-inline', value: "BL-heavy"} BL - Heavy
 
-                .row
+                .row.threat-cat-note
                   .col-xs-12
-                    %label.content-label-sm{for: "threat-cat-select"}
+                    %label.content-label-sm
                       Threat Categories -
-                      %span.threat-cat-required *Required for adding to any blacklist. Up to 5 can be selected.
+                      %span.threat-cat-required
+                        *Required for adding to any blacklist.
+                        %span.five-note Up to 5 can be selected.
 
-                    .row.dropdown-tool-grey-row.threat-cat-row
-                      .col-xs-4
-                        %ul
-                          %li.threat-cat-cb
-                            %input.wl-bl-list-inline{type: 'checkbox', name: 'threat-cat-list', value: "threat-cat-bogon"}
-                            %label Bogon
-                          %li.threat-cat-cb
-                            %input.wl-bl-list-inline{type: 'checkbox', name: 'threat-cat-list', value: "threat-cat-botnets"}
-                            %label Botnets
-                          %li.threat-cat-cb
-                            %input.wl-bl-list-inline{type: 'checkbox', name: 'threat-cat-list', value: "threat-cat-crypto"}
-                            %label Cryptojacking
-                          %li.threat-cat-cb
-                            %input.wl-bl-list-inline{type: 'checkbox', name: 'threat-cat-list', value: "threat-cat-domain"}
-                            %label Domain Generated Algorithm
-                          %li.threat-cat-cb
-                            %input.wl-bl-list-inline{type: 'checkbox', name: 'threat-cat-list', value: "threat-cat-dnstunneling"}
-                            %label DNS Tunneling
-                          %li.threat-cat-cb
-                            %input.wl-bl-list-inline{type: 'checkbox', name: 'threat-cat-list', value: "threat-cat-dynamicdns"}
-                            %label Dynamic DNS
-                          %li.threat-cat-cb
-                            %input.wl-bl-list-inline{type: 'checkbox', name: 'threat-cat-list', value: "threat-cat-ebanking"}
-                            %label Ebanking/Fraud
-                          %li.threat-cat-cb
-                            %input.wl-bl-list-inline{type: 'checkbox', name: 'threat-cat-list', value: "threat-cat-exploits"}
-                            %label Exploits
-                      .col-xs-4
-                        %ul
-                          %li.threat-cat-cb
-                            %input.wl-bl-list-inline{type: 'checkbox', name: 'threat-cat-list', value: "threat-cat-ioc"}
-                            %label IOC
-                          %li.threat-cat-cb
-                            %input.wl-bl-list-inline{type: 'checkbox', name: 'threat-cat-list', value: "threat-cat-highrisk"}
-                            %label High Risk
-                          %li.threat-cat-cb
-                            %input.wl-bl-list-inline{type: 'checkbox', name: 'threat-cat-list', value: "threat-cat-linkshare"}
-                            %label Linkshare
-                          %li.threat-cat-cb
-                            %input.wl-bl-list-inline{type: 'checkbox', name: 'threat-cat-list', value: "threat-cat-malicious"}
-                            %label Malicious
-                          %li.threat-cat-cb
-                            %input.wl-bl-list-inline{type: 'checkbox', name: 'threat-cat-list', value: "threat-cat-malware"}
-                            %label Malware
-                          %li.threat-cat-cb
-                            %input.wl-bl-list-inline{type: 'checkbox', name: 'threat-cat-list', value: "threat-cat-dynamicdns"}
-                            %label Mobile Threats
-                          %li.threat-cat-cb
-                            %input.wl-bl-list-inline{type: 'checkbox', name: 'threat-cat-list', value: "threat-cat-ebanking"}
-                            %label Newly Seen
-                          %li.threat-cat-cb
-                            %input.wl-bl-list-inline{type: 'checkbox', name: 'threat-cat-list', value: "threat-cat-openhttp"}
-                            %label Open HTTP Proxy
-                      .col-xs-4
-                        %ul
-                          %li.threat-cat-cb
-                            %input.wl-bl-list-inline{type: 'checkbox', name: 'threat-cat-list', value: "threat-cat-openmail"}
-                            %label Open Mail Relay
-                          %li.threat-cat-cb
-                            %input.wl-bl-list-inline{type: 'checkbox', name: 'threat-cat-list', value: "threat-cat-p2pmalware"}
-                            %label P2P Malware Node
-                          %li.threat-cat-cb
-                            %input.wl-bl-list-inline{type: 'checkbox', name: 'threat-cat-list', value: "threat-cat-phishing"}
-                            %label Phishing
-                          %li.threat-cat-cb
-                            %input.wl-bl-list-inline{type: 'checkbox', name: 'threat-cat-list', value: "threat-cat-potentialdns"}
-                            %label Potential DNS Rebinding
-                          %li.threat-cat-cb
-                            %input.wl-bl-list-inline{type: 'checkbox', name: 'threat-cat-list', value: "threat-cat-spam"}
-                            %label Spam
-                          %li.threat-cat-cb
-                            %input.wl-bl-list-inline{type: 'checkbox', name: 'threat-cat-list', value: "threat-cat-spyware"}
-                            %label Spyware/Adware
-                          %li.threat-cat-cb
-                            %input.wl-bl-list-inline{type: 'checkbox', name: 'threat-cat-list', value: "threat-cat-torexitnodes"}
-                            %label TOR exit Nodes
-
-
-                .row
-                  = wlbl_form.select(:thrt_cat_id, Wbrs::ThreatCategory.selections, {include_blank: true}, class: 'wlbl_thrt_cat_id')
-
-                .row
+                -# threat category row for adjust wl/bl dropdown here
+                .row.dropdown-tool-grey-row.threat-cat-row
                   - Wbrs::ThreatCategory.selections.each do |label, value|
-                    = wlbl_form.check_box(:thrt_cat_id, {id: nil, class: 'wlbl_thrt_cat_id'}, value)
-                    = label
+                    .threat-cat-cell
+                      = wlbl_form.check_box(:thrt_cat_id, {id: nil, class: 'wlbl_thrt_cat_id'}, value)
+                      = label
 
               .comment-wrapper
                 %label.content-label-sm Comment

@@ -10319,7 +10319,7 @@ hr.thin.extra-bottom-marg {
   padding: 2px 2px 6px 12px;
 }
 
-.toolbar div.dropdown-tool-grey-row.margin-bottom-med {
+.toolbar div.dropdown-tool-grey-row.lists-row {
   margin-bottom: 10px;
 }
 
@@ -10340,14 +10340,43 @@ hr.thin.extra-bottom-marg {
   }
 }
 
-.toolbar span.threat-cat-required {
+.toolbar span.threat-cat-required, .toolbar span.threat-cat-required .five-note {
   color: $warning-accent-color;
   font-size: 7pt;
   padding-left: 2px;
+}
+.toolbar span.threat-cat-required {
   padding-top: 1px;
 }
+.toolbar span.threat-cat-required .five-note {
+  padding-top: 0;
+}
 
-.toolbar span.threat-cat-required.required-bold {
+.toolbar span.threat-cat-required .five-note.required-bold {
   font-weight: bold;
   color: darken($warning-accent-color, 5%)
+}
+
+.toolbar div.dropdown-tool-grey-row.threat-cat-row {
+  padding: 5px;
+  height: 250px;
+  display: flex;  // use flex to alphabetize the threat cats correctly
+  flex-wrap: wrap;
+  flex-direction: column;
+}
+
+.toolbar div.dropdown-tool-grey-row.threat-cat-row .threat-cat-cell {
+  width: 33%;
+  font-size: 8pt;
+  line-height: 11pt;
+  padding: 5px 0 5px 10px;
+  input[type='checkbox'] {
+    float: left;
+    position: relative;
+    bottom: 3px;
+  }
+}
+
+.toolbar div.row.threat-cat-note {
+  margin-top: 10px;
 }

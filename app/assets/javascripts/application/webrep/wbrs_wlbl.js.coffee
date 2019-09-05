@@ -240,10 +240,9 @@ window.bulk_get_current_wlbl = (page) ->
       error: (response) ->
         std_msg_error( 'Error retrieving WL/BL Data', response)
     )
-# dbinebri: RESTORE BELOW
-#  else
-#    std_msg_error('No rows selected', ['Please select at least one entry row.'])
-#    return false
+  else
+    std_msg_error('No rows selected', ['Please select at least one entry row.'])
+    return false
 
 
 
@@ -251,6 +250,18 @@ window.bulk_get_current_wlbl = (page) ->
 
 ## WL/BL Form manipulation
 $ ->
+  # adjust wl/bl dropdown > on page-load, hide these
+  $('.threat-cat-row, .threat-cat-note').hide()
+
+  # show/hide the threat category row if a BL checkbox clicked
+  $('.lists-row input[class^="bl-"]').click ->
+    if $('.lists-row input[class^="bl-"]:checked').length == 0
+      $('.threat-cat-row, .threat-cat-note').hide()
+    else
+      $('.threat-cat-row, .threat-cat-note').show()
+
+
+  # if clicking any wl or bl checkbox in the lists row
   $('.wl-bl-list-inline').click ->
     page = ''
     if $('#wlbl_adjust_entries_index').length > 0
@@ -260,19 +271,38 @@ $ ->
 
     wlbl_entries = $(page).find('.wlbl-dropdown-row')
     wlbl_submit = $(page).find('.dropdown-submit-button')
+
+    # enable the submit button after certain criteria are met for WL checkboxes, MAKE SURE THIS DOESN'T INCLUDE BL CHECKBOXES
     if wlbl_entries.length > 0 && $('.wl-bl-list-inline:checked').length > 0
       wlbl_submit.attr('disabled', false)
     else
       wlbl_submit.attr('disabled', true)
 
+
+  # BELOW NEED A NEW FUNCTION THAT IS SPECIFIC LOGIC FOR BL CHECKBOXES + THREAT CAT CHECKBOXES
+  # BELOW NEED A NEW FUNCTION THAT IS SPECIFIC LOGIC FOR BL CHECKBOXES + THREAT CAT CHECKBOXES
+  # BELOW NEED A NEW FUNCTION THAT IS SPECIFIC LOGIC FOR BL CHECKBOXES + THREAT CAT CHECKBOXES
+  $('.lists-row input[class^="bl-"], .threat-cat-row input').click ->
+    num_checked_bl = $('.lists-row input[class^="bl-"]:checked').length
+    num_checked_threat_cats = $('.threat-cat-row input:checked').length
+
+    # enable the submit button after certain criteria are met, clicking a BL also means a threat cat(s) must be checked
+    if num_checked_bl > 0 && num_checked_threat_cats > 0
+      wlbl_submit.attr('disabled', false)
+    else
+      wlbl_submit.attr('disabled', true)
+
+
+
+
   # limit the number of checked checkboxes in the wl/bl dropdown to 5
-  $('.threat-cat-cb input').change ->
-    num_checked = $('.threat-cat-cb input:checked').length
+  $('.threat-cat-row input').change ->
+    num_checked = $('.threat-cat-row input:checked').length
     if num_checked > 5
       this.checked = false
-      $('.threat-cat-required').addClass('required-bold')
+      $('.threat-cat-required .five-note').addClass('required-bold')
     else if num_checked <= 5
-      $('.threat-cat-required').removeClass('required-bold')
+      $('.threat-cat-required .five-note').removeClass('required-bold')
 
 
 #### SUBMISSION OF WL/BL CHANGES TO WBRS ####
