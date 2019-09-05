@@ -974,7 +974,7 @@ thead th.sorting.center {
 
 #research-page-toolbar textarea {
   padding: 4px;
-  border: 4px solid #fff;
+  border: 4px solid $content-bg-color;
   outline: 1px solid #e5e5e5;
   width: 100%;
   font-size: 9.5pt;
@@ -1747,7 +1747,7 @@ button.close {
   background-color: $sidebar-nav-base;
   display: block;
   position: absolute;
-  color: #fff;
+  color: $content-bg-color;
   text-transform: uppercase;
   font-weight: 700;
   line-height: $sidebar-width;
@@ -1766,7 +1766,7 @@ button.close {
 }
 
 #sidenav-menu-div a {
-  color: #fff;
+  color: $content-bg-color;
   display: block;
   width: 100%;
   height:100%;
@@ -1861,7 +1861,7 @@ button.close {
 }
 
 .nav-container li, .sidenav-icons li {
-  border-bottom: 1px solid #fff;
+  border-bottom: 1px solid $content-bg-color;
 }
 
 li.static-nav-item {
@@ -3175,7 +3175,7 @@ fieldset.top-content {
   width: 0;
   pointer-events: none;
   border-color: rgba(136, 183, 213, 0);
-  border-right-color: #fff;
+  border-right-color: $content-bg-color;
   border-width: 10px;
   margin-top: -32px;
   margin-right: -1px;
@@ -5857,6 +5857,28 @@ td.data-table-emph {
 
 .dispute-wlbl-adjust-wrapper, .dispute-reptool-adjust-wrapper {
   padding: 0 !important;
+}
+#research-page-toolbar {
+  #add_to_ticket_dropdown{
+    background: $primary-section-color;
+    width: 300px;
+    border-radius: 3px;
+  }
+
+  #new-dispute-form{
+    height: 100%;
+    width: 100%;
+    padding-top: 1px;
+  }
+  .dispute-wlbl-adjust-wrapper form{
+    background: $content-bg-color;
+    border-bottom-left-radius: 3px;
+    border-bottom-right-radius: 3px;
+  }
+  .form-group{
+    padding:0 10px!important;
+    background: $content-bg-color
+  }
 }
 
 .dispute-wlbl-adjust-wrapper button, .dispute-reptool-adjust-wrapper button {

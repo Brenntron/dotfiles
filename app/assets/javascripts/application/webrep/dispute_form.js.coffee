@@ -2,7 +2,7 @@ $ ->
   window.submit_new_dispute = (submit_btn) ->
     data = {}
     form_values = $(submit_btn).closest('form').serializeArray()
-
+    dropdown = $(submit_btn).closest(".dropdown-menu").prev()
     $('#loader-modal').modal({
       keyboard: false
     })
@@ -19,7 +19,8 @@ $ ->
         method: 'POST'
         data: data
         success: (response) ->
-          $('#new-dispute').dropdown('toggle')
+          console
+          $(dropdown).dropdown('toggle')
           $('#loader-modal').modal 'hide'
 
           if response.json.errors.length > 0
