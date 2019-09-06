@@ -1532,6 +1532,26 @@ window.webrep_research_export_selected_rows = () ->
   else
     std_msg_error('Error',['Please select at least one row before exporting'])
 
+window.get_threat_categories = (uri) ->
+  data = {'uri': uri}
+  std_msg_ajax(
+    url: '/escalations/api/v1/escalations/webrep/disputes/threat_categories'
+    method: 'POST'
+    data: data
+    success: (response) ->
+      return response
+  )
+
+window.get_threat_levels = (uri) ->
+  data = {'uri': uri}
+  std_msg_ajax(
+    url: '/escalations/api/v1/escalations/webrep/disputes/threat_levels'
+    method: 'POST'
+    data: data
+    success: (response) ->
+      return response
+  )
+
 $ ->
   $('#advanced-search-button').click ->
     $('#advanced-search-dropdown').show()
