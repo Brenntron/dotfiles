@@ -10311,6 +10311,36 @@ hr.thin.extra-bottom-marg {
   opacity: 1;
 }
 
+// webrep dispute index > ensure break/wrap properly for long url's containing parameters
+#disputes-index .entry-col-content {
+  word-break: break-all;
+  max-width: 250px;
+}
+
+// webrep disputes index table, domain or ip column
+span.input-truncate {
+  display: inline-block;
+  position: relative;
+  padding-right: 25px;
+  width: 200px !important;
+}
+
+// webrep dispute index > ensure the dispute count is to the right of the domain entry
+.dispute-count {
+  position: absolute;
+  left: 180px;
+  float: none;
+  border-radius: 5px;
+  padding: 1px 5px;
+}
+
+.dispute-entry-col {
+  min-width: 200px;
+}
+
+.owner-col {
+  min-width: 80px;
+}
 // needs more width to encompass all threat categories now
 .dispute-wlbl-adjust-wrapper {
   width: 480px;

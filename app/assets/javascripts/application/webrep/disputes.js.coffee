@@ -972,6 +972,14 @@ $ ->
         className: 'state-col'
       }
       {
+        targets: [ 7 ]
+        className: 'dispute-entry-col'
+      }
+      {
+        targets: [ 8 ]
+        className: 'owner-col'
+      }
+      {
         targets: [
           2
           6
@@ -1020,7 +1028,13 @@ $ ->
             title = 'Email Web'
           '<span class="dispute-submission-type esc-tooltipped dispute-' + data + '" title="' + title + '">' + data + '</span>'
       }
-      { data: 'd_entry_preview' }
+      {
+        data: 'd_entry_preview'
+        render: (data) ->
+          # data here is an html string with a span for count, see models/dispute.rb for details, extract the text for the tooltip
+          tooltip_text = data.slice(0, data.indexOf('<span'))
+          '<span class="input-truncate esc-tooltipped" title="' + tooltip_text + '">' + data + '</span>'
+      }
       { data: 'assigned_to' }
       { data: 'case_opened_at' }
       {

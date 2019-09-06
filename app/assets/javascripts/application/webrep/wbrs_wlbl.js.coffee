@@ -251,8 +251,8 @@ window.bulk_get_current_wlbl = (page) ->
             else
               threat_cats = threat_cats.join(', ')
 
-            $('.wlbl-threat-cats').text(threat_cats)  # this line will place threat cats in the toolbar bulk dropdown, but not the inlines
-          ), 1000
+            $('.wlbl-threat-cats').html(threat_cats)  # this line will place threat cats in the toolbar bulk dropdown, but not the inlines
+          ), 500
           # END THE THREAT CAT STUFF
 
           $(tbody).append('<tr class="wlbl-dropdown-row">' + '<td class="wlbl-entry-content">' + ip_uri + '</td><td class="wlbl-entry-wlbl">' + list_types + '</td>' + '<td class="wlbl-current-entry-wbrs text-center">' + wbrs_score + '</td><td class="wlbl-threat-cats">' + '' + '</td>')
