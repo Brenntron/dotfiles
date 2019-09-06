@@ -224,14 +224,7 @@ window.bulk_get_current_wlbl = (page) ->
           ip_uri = entry['ip_uri']
           list_types = entry['list_types']
           wbrs_score = entry['wbrs_score']
-
-          # TODO: below api call is throwing a cert/back-end error, needs back-end assistance asap. for now everything will say 'No category'
-#          threat_cats = get_threat_categories(ip_uri)
-
           threat_cats = ''
-
-          if threat_cats == '' || threat_cats == undefined
-            threat_cats = '<span class="threat-cat-no-data">No category</span>'
 
           comment = entry['notes']
           if list_types
@@ -244,8 +237,26 @@ window.bulk_get_current_wlbl = (page) ->
           if comment == null
             comment = ''
 
-          # build the table row for the adjust wl/bl dropdown, table in top blue area in dropdown
-          $(tbody).append('<tr class="wlbl-dropdown-row">' + '<td class="wlbl-entry-content">' + ip_uri + '</td><td class="wlbl-entry-wlbl">' + list_types + '</td>' + '<td class="wlbl-current-entry-wbrs text-center">' + wbrs_score + '</td>' + '<td class="wlbl-threat-cats">' + threat_cats + '</td>')
+          # dbinebri: START THE THREAT CAT STUFF
+          threat_cat_json = get_threat_categories(ip_uri)
+
+          # TODO: convert SETTIMEOUT to a PROMISE/THEN
+          # my_var = your_function(arg).then(() -> morefunctionality here ).catch(() -> catch errors )
+          setTimeout ( ->
+            threat_cat_obj = JSON.parse(threat_cat_json.responseJSON)
+            threat_cats = threat_cat_obj.threat_categories
+
+            if threat_cats.length == 0 || threat_cats == undefined
+              threat_cats = '<span class="threat-cat-no-data">No Category</span>'
+            else
+              threat_cats = threat_cats.join(', ')
+
+            $('.wlbl-threat-cats').text(threat_cats)  # this line will place threat cats in the toolbar bulk dropdown, but not the inlines
+          ), 1000
+          # END THE THREAT CAT STUFF
+
+          $(tbody).append('<tr class="wlbl-dropdown-row">' + '<td class="wlbl-entry-content">' + ip_uri + '</td><td class="wlbl-entry-wlbl">' + list_types + '</td>' + '<td class="wlbl-current-entry-wbrs text-center">' + wbrs_score + '</td><td class="wlbl-threat-cats">' + '' + '</td>')
+
         comment_box.text(comment_trail)
       error: (response) ->
         std_msg_error( 'Error retrieving WL/BL Data', response)
@@ -260,37 +271,37 @@ window.bulk_get_current_wlbl = (page) ->
 
 ## WL/BL Form manipulation
 $ ->
-  # adjust wl/bl code below: this should affect all 5 places with an "adjust wl/bl" button
-  # WL: enable submit: if wl cb length is more than 0 and no bl cbs are checked
-  $('.lists-row input[class^="wl-"]').change ->
-    if $('.lists-row input[class^="wl-"]:checked').length > 0
-      $('.dropdown-submit-button').prop('disabled', false)
+  # WL + BL checkbox logic in WL/BL dropdowns
+  $('.lists-row input').change ->
+    cb_class = $(this).attr('class').split(' ')[0]  # each input has a few classes, get the first one
+    if cb_class.includes('bl-')
+      # bl checkbox: show threat cat row or hide
+      if $('.lists-row input[class^="bl-"]:checked').length == 0
+        $('.threat-cat-row, .threat-cat-note').hide()
+      else
+        $('.threat-cat-row, .threat-cat-note').show()
     else
-      $('.dropdown-submit-button').prop('disabled', true)
+      # wl checkbox: enable submit button logic
+      if $('.lists-row input[class^="wl-"]:checked').length > 0
+        $('.dropdown-submit-button').prop('disabled', false)
+      else
+        $('.dropdown-submit-button').prop('disabled', true)
 
-  # BL: enable submit + limit 5 tc's
+  # BL: enable submit + limit 5 tc's + bold the note
   $('.threat-cat-row input').change ->
     if $('.lists-row input[class^="bl-"]:checked').length > 0 && $('.threat-cat-row input:checked').length > 0
       $('.dropdown-submit-button').prop('disabled', false)
     else
       $('.dropdown-submit-button').prop('disabled', true)
 
-    if $('.threat-cat-row input:checked').length > 5   # limit threat cats checked to 5, bold the note
+    if $('.threat-cat-row input:checked').length > 5
       this.checked = false
       $('.threat-cat-required .five-note').addClass('required-bold')
     else
       $('.threat-cat-required .five-note').removeClass('required-bold')
 
-  # BL: show threat cat row: show/hide the threat cat row if a bl cb clicked
-  $('.lists-row input[class^="bl-"]').change ->
-    if $('.lists-row input[class^="bl-"]:checked').length == 0
-      $('.threat-cat-row, .threat-cat-note').hide()
-    else
-      $('.threat-cat-row, .threat-cat-note').show()
-
-  # Threat Cats: on page-load, hide these inside the dropdown
+  # page-load: threat cats hide these inside the dropdown
   $('.threat-cat-row, .threat-cat-note').hide()
-
 
 
 #### SUBMISSION OF WL/BL CHANGES TO WBRS ####
