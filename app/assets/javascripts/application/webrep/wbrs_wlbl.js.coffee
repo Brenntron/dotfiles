@@ -224,6 +224,13 @@ window.bulk_get_current_wlbl = (page) ->
           ip_uri = entry['ip_uri']
           list_types = entry['list_types']
           wbrs_score = entry['wbrs_score']
+
+          # TODO: below does not work to get threat cats (taken from TI), need someone to provide correct query URL to get this in ACE
+          # threat_cats = Talos.RepLookup.reputationLookup('/score/wbrs;webcat/json?url=', ip_uri)
+          threat_cats = ''
+          if threat_cats == '' || threat_cats == undefined
+            threat_cats = '<span class="threat-cat-no-data">No category</span>'
+
           comment = entry['notes']
           if list_types
             list_types = entry['list_types']
@@ -235,7 +242,8 @@ window.bulk_get_current_wlbl = (page) ->
           if comment == null
             comment = ''
 
-          $(tbody).append('<tr class="wlbl-dropdown-row">' + '<td class="wlbl-entry-content">' + ip_uri + '</td><td class="wlbl-entry-wlbl">' + list_types + '</td>' + '<td class="wlbl-current-entry-wbrs text-center">' + wbrs_score + '</td>')
+          # build the table row for the adjust wl/bl dropdown, table in top blue area in dropdown
+          $(tbody).append('<tr class="wlbl-dropdown-row">' + '<td class="wlbl-entry-content">' + ip_uri + '</td><td class="wlbl-entry-wlbl">' + list_types + '</td>' + '<td class="wlbl-current-entry-wbrs text-center">' + wbrs_score + '</td>' + '<td class="wlbl-threat-cats">' + threat_cats + '</td>')
         comment_box.text(comment_trail)
       error: (response) ->
         std_msg_error( 'Error retrieving WL/BL Data', response)
@@ -250,59 +258,37 @@ window.bulk_get_current_wlbl = (page) ->
 
 ## WL/BL Form manipulation
 $ ->
-  # adjust wl/bl dropdown > on page-load, hide these
-  $('.threat-cat-row, .threat-cat-note').hide()
+  # adjust wl/bl code below: this should affect all 5 places with an "adjust wl/bl" button
+  # WL: enable submit: if wl cb length is more than 0 and no bl cbs are checked
+  $('.lists-row input[class^="wl-"]').change ->
+    if $('.lists-row input[class^="wl-"]:checked').length > 0
+      $('.dropdown-submit-button').prop('disabled', false)
+    else
+      $('.dropdown-submit-button').prop('disabled', true)
 
-  # show/hide the threat category row if a BL checkbox clicked
-  $('.lists-row input[class^="bl-"]').click ->
+  # BL: enable submit + limit 5 tc's
+  $('.threat-cat-row input').change ->
+    if $('.lists-row input[class^="bl-"]:checked').length > 0 && $('.threat-cat-row input:checked').length > 0
+      $('.dropdown-submit-button').prop('disabled', false)
+    else
+      $('.dropdown-submit-button').prop('disabled', true)
+
+    if $('.threat-cat-row input:checked').length > 5   # limit threat cats checked to 5, bold the note
+      this.checked = false
+      $('.threat-cat-required .five-note').addClass('required-bold')
+    else
+      $('.threat-cat-required .five-note').removeClass('required-bold')
+
+  # BL: show threat cat row: show/hide the threat cat row if a bl cb clicked
+  $('.lists-row input[class^="bl-"]').change ->
     if $('.lists-row input[class^="bl-"]:checked').length == 0
       $('.threat-cat-row, .threat-cat-note').hide()
     else
       $('.threat-cat-row, .threat-cat-note').show()
 
+  # Threat Cats: on page-load, hide these inside the dropdown
+  $('.threat-cat-row, .threat-cat-note').hide()
 
-  # if clicking any wl or bl checkbox in the lists row
-  $('.wl-bl-list-inline').click ->
-    page = ''
-    if $('#wlbl_adjust_entries_index').length > 0
-      page = $('#wlbl_adjust_entries_index')
-    else if $('#wlbl_adjust_entries').length > 0
-      page = $('#wlbl_adjust_entries')
-
-    wlbl_entries = $(page).find('.wlbl-dropdown-row')
-    wlbl_submit = $(page).find('.dropdown-submit-button')
-
-    # enable the submit button after certain criteria are met for WL checkboxes, MAKE SURE THIS DOESN'T INCLUDE BL CHECKBOXES
-    if wlbl_entries.length > 0 && $('.wl-bl-list-inline:checked').length > 0
-      wlbl_submit.attr('disabled', false)
-    else
-      wlbl_submit.attr('disabled', true)
-
-
-  # BELOW NEED A NEW FUNCTION THAT IS SPECIFIC LOGIC FOR BL CHECKBOXES + THREAT CAT CHECKBOXES
-  # BELOW NEED A NEW FUNCTION THAT IS SPECIFIC LOGIC FOR BL CHECKBOXES + THREAT CAT CHECKBOXES
-  # BELOW NEED A NEW FUNCTION THAT IS SPECIFIC LOGIC FOR BL CHECKBOXES + THREAT CAT CHECKBOXES
-  $('.lists-row input[class^="bl-"], .threat-cat-row input').click ->
-    num_checked_bl = $('.lists-row input[class^="bl-"]:checked').length
-    num_checked_threat_cats = $('.threat-cat-row input:checked').length
-
-    # enable the submit button after certain criteria are met, clicking a BL also means a threat cat(s) must be checked
-    if num_checked_bl > 0 && num_checked_threat_cats > 0
-      wlbl_submit.attr('disabled', false)
-    else
-      wlbl_submit.attr('disabled', true)
-
-
-
-
-  # limit the number of checked checkboxes in the wl/bl dropdown to 5
-  $('.threat-cat-row input').change ->
-    num_checked = $('.threat-cat-row input:checked').length
-    if num_checked > 5
-      this.checked = false
-      $('.threat-cat-required .five-note').addClass('required-bold')
-    else if num_checked <= 5
-      $('.threat-cat-required .five-note').removeClass('required-bold')
 
 
 #### SUBMISSION OF WL/BL CHANGES TO WBRS ####

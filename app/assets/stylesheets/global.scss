@@ -10359,8 +10359,10 @@ hr.thin.extra-bottom-marg {
 
 .toolbar div.dropdown-tool-grey-row.threat-cat-row {
   padding: 5px;
-  height: 250px;
-  display: flex;  // use flex to alphabetize the threat cats correctly
+  height: 248px;
+  margin-left: -10px !important;  // need important overrides here
+  margin-right: -10px !important;
+  display: flex;  // flex to alphabetize + sort the threat cats easily
   flex-wrap: wrap;
   flex-direction: column;
 }
@@ -10368,7 +10370,7 @@ hr.thin.extra-bottom-marg {
 .toolbar div.dropdown-tool-grey-row.threat-cat-row .threat-cat-cell {
   width: 33%;
   font-size: 8pt;
-  line-height: 11pt;
+  line-height: 10pt;
   padding: 5px 0 5px 10px;
   input[type='checkbox'] {
     float: left;
@@ -10379,4 +10381,22 @@ hr.thin.extra-bottom-marg {
 
 .toolbar div.row.threat-cat-note {
   margin-top: 10px;
+}
+
+.toolbar td.wlbl-threat-cats {
+  font-size: 8pt;
+  line-height: 11pt;
+  padding-left: 2px;
+  span.threat-cat-no-data {
+    float: none;
+    font-size: 8pt;
+    font-style: italic;
+    color: $content-label-color;
+  }
+}
+
+// adjust wl/bl dropdown - ensure long dispute url's break/wrap properly
+.dispute_tool_current .wlbl-dropdown-row td.wlbl-entry-content {
+  max-width: 160px;
+  word-break: break-all;
 }

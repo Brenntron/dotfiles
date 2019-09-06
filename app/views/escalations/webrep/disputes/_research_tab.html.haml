@@ -54,6 +54,7 @@
                         %th.content-label-sm Dispute
                         %th.content-label-sm.no-word-break Current WL/BL List
                         %th.text-center.content-label-sm.no-word-break Current WBRS Score
+                        %th.content-label-sm Threat Category
                     %tbody
 
                       -# TODO Hook up ability to preview scores based on changes in WL/BL
@@ -72,35 +73,47 @@
                         %input{type: 'radio', name: 'wlbl-action-radio', id: 'wlbl-remove', value: 'wlbl-remove'}
                         %label.radio-label{for: 'wlbl-remove'} Remove from list
 
-                    .row
+
+                    -# BEGIN: WL BL LISTS ROW + THREAT CATS ROW (place this 1 indent past 'inline-tool')
+                    .row.lists-row
                       .col-xs-12
                         %label.content-label-sm{for: "wlbl-list-type-select"} Lists
                         .row.dropdown-tool-grey-row
-                          .col-xs-5.col-xs-offset-2
+                          .col-xs-4
                             %ul
                               %li
-                                %input.wl-weak-checkbox.wl-bl-list-inline{type: 'checkbox', name: 'wl-bl-list-inline', value: "WL-weak"}
-                                  WL - Weak
+                                %input.wl-weak-checkbox.wl-bl-list-inline{type: 'checkbox', name: 'wl-bl-list-inline', value: "WL-weak"} WL - Weak
                               %li
-                                %input.wl-med-checkbox.wl-bl-list-inline{type: 'checkbox', name: 'wl-bl-list-inline', value: "WL-med"}
-                                  WL - Medium
-                              %li
-                                %input.wl-heavy-checkbox.wl-bl-list-inline{type: 'checkbox', name: 'wl-bl-list-inline', value: "WL-heavy"}
-                                  WL - Heavy
-                          .col-xs-5
+                                %input.bl-weak-checkbox.wl-bl-list-inline{type: 'checkbox', name: 'wl-bl-list-inline', value: "BL-weak"} BL - Weak
+                          .col-xs-4
                             %ul
                               %li
-                                %input.bl-weak-checkbox.wl-bl-list-inline{type: 'checkbox', name: 'wl-bl-list-inline', value: "BL-weak"}
-                                  BL - Weak
+                                %input.wl-med-checkbox.wl-bl-list-inline{type: 'checkbox', name: 'wl-bl-list-inline', value: "WL-med"} WL - Medium
                               %li
-                                %input.bl-med-checkbox.wl-bl-list-inline{type: 'checkbox', name: 'wl-bl-list-inline', value: "BL-med"}
-                                  BL - Medium
+                                %input.bl-med-checkbox.wl-bl-list-inline{type: 'checkbox', name: 'wl-bl-list-inline', value: "BL-med"} BL - Medium
+                          .col-xs-4
+                            %ul
                               %li
-                                %input.bl-heavy-checkbox.wl-bl-list-inline{type: 'checkbox', name: 'wl-bl-list-inline', value: "BL-heavy"}
-                                  BL - Heavy
+                                %input.wl-heavy-checkbox.wl-bl-list-inline{type: 'checkbox', name: 'wl-bl-list-inline', value: "WL-heavy"} WL - Heavy
+                              %li
+                                %input.bl-heavy-checkbox.wl-bl-list-inline{type: 'checkbox', name: 'wl-bl-list-inline', value: "BL-heavy"} BL - Heavy
 
-                    .row
-                      = wlbl_form.select(:thrt_cat_id, Wbrs::ThreatCategory.selections, {include_blank: true}, class: 'wlbl_thrt_cat_id')
+                    .row.threat-cat-note
+                      .col-xs-12
+                        %label.content-label-sm
+                          Threat Categories -
+                          %span.threat-cat-required
+                            *Required for adding to any blacklist.
+                            %span.five-note Up to 5 can be selected.
+
+                    .row.dropdown-tool-grey-row.threat-cat-row
+                      - Wbrs::ThreatCategory.selections.each do |label, value|
+                        .threat-cat-cell
+                          = wlbl_form.check_box(:thrt_cat_id, {id: nil, class: 'wlbl_thrt_cat_id'}, value)
+                          = label
+                    -# END: WL BL LISTS ROW + THREAT CATS ROW
+
+
 
                     .comment-wrapper
                       %label.content-label-sm WL/BL Comment
