@@ -225,8 +225,8 @@ window.bulk_get_current_wlbl = (page) ->
           list_types = entry['list_types']
           wbrs_score = entry['wbrs_score']
 
-          # TODO: below does not work to get threat cats (taken from TI), need someone to provide correct query URL to get this in ACE
-          # threat_cats = Talos.RepLookup.reputationLookup('/score/wbrs;webcat/json?url=', ip_uri)
+          # TODO: need to chat with a back-end dev to get the query URL to get existing Threat Cat(s) for each entry
+          # threat_cats = (needs a AC.lookup here), for now everything will say 'No category'
           threat_cats = ''
           if threat_cats == '' || threat_cats == undefined
             threat_cats = '<span class="threat-cat-no-data">No category</span>'
