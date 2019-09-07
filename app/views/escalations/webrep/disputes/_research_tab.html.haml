@@ -381,7 +381,7 @@
                                     %td.wlbl-entry-wlbl
                                     %td.wlbl-current-entry-wbrs.text-center
                                     %td.wlbl-projected-entry-wbrs.text-center
-                                    %td.wlbl-threat-cats-inline
+                                    %td.wlbl-threat-cat-inline
 
                               .inline-tool-content-wrapper
                                 .row
@@ -564,7 +564,7 @@
                 %tr.research-overview-row
                   %td
                     -#Expander area
-                  %td.research-table-details-wrapper{colspan: '8'}
+                  %td.research-table-details-wrapper{colspan: '9'}
                     %table
                       %tr
                         %td.input-col
@@ -623,11 +623,14 @@
                             %span.wlbl-table-result
                               = entry.wbrs_list_type
                             %button.dispute-inline-buttons.history-button.esc-tooltipped{title: 'WL/BL History', onclick: "wlbl_history_dialog(#{entry.id})"}
+                        %td.left-bordered
+                          %label Threat Category
+                        %td.threat-cat-wlbl-research
 
                         %td.left-bordered
                           %label Referenced on
                         %td.referenced-tickets-col
-                          - if entry.referenced_tickets.count < 1 
+                          - if entry.referenced_tickets.count < 1
                             %span.missing-data
                               Not on any other tickets
                           - else

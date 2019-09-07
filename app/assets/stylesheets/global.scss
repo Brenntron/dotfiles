@@ -10312,36 +10312,10 @@ hr.thin.extra-bottom-marg {
 }
 
 // webrep dispute index > ensure break/wrap properly for long url's containing parameters
-#disputes-index .entry-col-content {
-  word-break: break-all;
-  max-width: 250px;
-}
-
-// webrep disputes index table, domain or ip column
-span.input-truncate {
-  display: inline-block;
-  position: relative;
-  padding-right: 25px;
-  width: 200px !important;
-}
-
-// webrep dispute index > ensure the dispute count is to the right of the domain entry
-.dispute-count {
-  position: absolute;
-  left: 180px;
-  float: none;
-  border-radius: 5px;
-  padding: 1px 5px;
-}
-
 .dispute-entry-col {
   min-width: 200px;
 }
 
-.owner-col {
-  min-width: 80px;
-}
-// webrep dispute index > ensure break/wrap properly for long url's containing parameters
 #disputes-index .entry-col-content {
   word-break: break-all;
   max-width: 250px;
@@ -10358,7 +10332,7 @@ span.input-truncate {
 // webrep dispute index > ensure the dispute count is to the right of the domain entry
 .dispute-count {
   position: absolute;
-  left: 180px;
+  left: 175px;
   float: none;
   border-radius: 5px;
   padding: 1px 5px;
@@ -10375,8 +10349,6 @@ span.input-truncate {
 .dispute-wlbl-adjust-wrapper {
   width: 480px;
 }
-
-
 
 span.threat-cat-required, span.threat-cat-required .five-note {
   color: $warning-accent-color;
@@ -10445,17 +10417,19 @@ form.adjust-wlbl-form {
   div.row.threat-cat-note {
     margin-top: 10px;
   }
-  td.wlbl-threat-cats {
+  td.wlbl-threat-cat {
     font-size: 8pt;
     line-height: 11pt;
     padding-left: 2px;
-    span.threat-cat-no-data {
-      float: none;
-      font-size: 8pt;
-      font-style: italic;
-      color: $content-label-color;
-    }
   }
+}
+
+span.threat-cat-no-data {
+  float: none;
+  font-size: 8pt;
+  font-style: italic;
+  color: $content-label-color;
+  padding-left: 2px;
 }
 
 // adjust wl/bl dropdown - ensure long dispute url's break/wrap properly

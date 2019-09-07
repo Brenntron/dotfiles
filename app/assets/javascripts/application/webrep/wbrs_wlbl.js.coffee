@@ -225,6 +225,7 @@ window.bulk_get_current_wlbl = (page) ->
           list_types = entry['list_types']
           wbrs_score = entry['wbrs_score']
           threat_cats = ''
+          place_threat_category(ip_uri)
 
           comment = entry['notes']
           if list_types
@@ -237,25 +238,8 @@ window.bulk_get_current_wlbl = (page) ->
           if comment == null
             comment = ''
 
-          # dbinebri: START THE THREAT CAT STUFF
-          threat_cat_json = get_threat_categories(ip_uri)
-
-          # TODO: convert SETTIMEOUT to a PROMISE/THEN
-          # my_var = your_function(arg).then(() -> morefunctionality here ).catch(() -> catch errors )
-          setTimeout ( ->
-            threat_cat_obj = JSON.parse(threat_cat_json.responseJSON)
-            threat_cats = threat_cat_obj.threat_categories
-
-            if threat_cats.length == 0 || threat_cats == undefined
-              threat_cats = '<span class="threat-cat-no-data">No Category</span>'
-            else
-              threat_cats = threat_cats.join(', ')
-
-            $('.wlbl-threat-cats').html(threat_cats)  # this line will place threat cats in the toolbar bulk dropdown, but not the inlines
-          ), 500
-          # END THE THREAT CAT STUFF
-
-          $(tbody).append('<tr class="wlbl-dropdown-row">' + '<td class="wlbl-entry-content">' + ip_uri + '</td><td class="wlbl-entry-wlbl">' + list_types + '</td>' + '<td class="wlbl-current-entry-wbrs text-center">' + wbrs_score + '</td><td class="wlbl-threat-cats">' + '' + '</td>')
+          # TODO: NEEDS TO BE FIXED ASAP TO PLACE RIGHT SCORE + THREAT CAT PER ROW, always repeats the last score for all rows!!
+          $(tbody).append('<tr class="wlbl-dropdown-row">' + '<td class="wlbl-entry-content">' + ip_uri + '</td><td class="wlbl-entry-wlbl">' + list_types + '</td>' + '<td class="wlbl-current-entry-wbrs text-center">' + wbrs_score + '</td>' + '<td class="wlbl-threat-cat">' + '' + '</td>')
 
         comment_box.text(comment_trail)
       error: (response) ->
@@ -267,10 +251,45 @@ window.bulk_get_current_wlbl = (page) ->
 
 
 
+#### THREAT CATEGORY(s) PLACED IN: ADJUST WL/BL BULK, ADJUST WL/BL INLINE, RESEARCH TAB + BFRP RESULTS ####
+window.place_threat_category = (uri) ->
+  if uri != undefined
+    threat_cat_json = get_threat_categories(uri)  # API CALL HERE, CHANGE TO PROMISE IN CASE ITS SLOW!!
+
+    setTimeout ( ->
+      threat_cat_obj = JSON.parse(threat_cat_json.responseJSON)
+      threat_cats = threat_cat_obj.threat_categories
+
+      if threat_cats.length == 0 || threat_cats == undefined
+        threat_cats = '<span class="threat-cat-no-data">No Category</span>'
+      else
+        threat_cats = threat_cats.join(', ')
+
+      $('.wlbl-threat-cat').html(threat_cats)  # bulk adjust wl/bl dropdown + inline
+      $('.threat-cat-wlbl-research').html(threat_cats)  # research-related rows
+    ), 500
+
+    return threat_cats  # return in case it's needed anywhere else
+
+  else
+    # if the uri is undefined, no threat cats
+    threat_cats = '<span class="threat-cat-no-data">No Category</span>'
+    $('.wlbl-threat-cat').html(threat_cats)
+    $('.threat-cat-wlbl-research').html(threat_cats)
+    return
+
+
+
+
 #### FORM MANIPULATION ####
 
 ## WL/BL Form manipulation
 $ ->
+  # research tab or bfrp page? place the threat category(s) on bfrp result rows and research tab result rows
+  ip_uri = $('.searched-for-url').text()
+  if ip_uri != undefined
+    place_threat_category(ip_uri)
+
   # WL + BL checkbox logic in WL/BL dropdowns
   $('.lists-row input').change ->
     cb_class = $(this).attr('class').split(' ')[0]  # each input has a few classes, get the first one
