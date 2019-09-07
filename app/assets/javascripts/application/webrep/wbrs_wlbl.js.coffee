@@ -253,37 +253,34 @@ window.bulk_get_current_wlbl = (page) ->
     return false
 
 
-
 #### THREAT CATEGORY(s) PLACED IN: ADJUST WL/BL BULK, ADJUST WL/BL INLINE, RESEARCH TAB + BFRP RESULTS ####
 window.place_threat_category = (uri) ->
-  threat_cats = []
-  threat_cat_json = get_threat_categories(uri)  # API CALL HERE, CHANGE TO PROMISE IN CASE ITS SLOW!!
+  ip_uri = uri
+  threat_cat_json = get_threat_categories(uri)
 
-  setTimeout ( ->
-    threat_cat_obj = JSON.parse(threat_cat_json.responseJSON)
-    threat_cats = threat_cat_obj.threat_categories
+  # use a promise for the get threat cat api call, could take up to 1-2 seconds
+  threatCatPromise = new Promise (resolve, reject) ->
+    threat_cat_json = get_threat_categories(ip_uri)
+    if threat_cat_json
+      resolve threat_cat_json
 
-    if threat_cats == undefined || threat_cats.length == 0
+  threatCatPromise.then (result) ->
+    threat_cat_obj = JSON.parse(result)
+    threat_cat_array = threat_cat_obj.threat_categories
+
+    if threat_cat_array == undefined || threat_cat_array.length == 0
       threat_cats = '<span class="threat-cat-no-data">No Category</span>'
     else
-      threat_cats = threat_cats.join(', ')
+      threat_cats = threat_cat_array.join(', ')
 
-    # add threat cats to bulk wl/bl adjust, inline wl/bl adjust, and research rows for bfrp and research tab
     $('.wlbl-threat-cat, .wlbl-threat-cat-inline, .threat-cat-wlbl-research').html(threat_cats)
-  ), 500
+
 
 
 #### FORM MANIPULATION ####
 
 ## WL/BL Form manipulation
 $ ->
-  # research tab or bfrp page? place the threat category(s) on bfrp result rows and research tab result rows
-  $('.dispute-entry-ip-uri').ready ->   # research tab page load needs a threat cat
-    place_threat_category($('.dispute-entry-ip-uri').text())
-
-  $('.searched-for-url').ready ->   # bfrp results needs a threat cat
-    place_threat_category($('.searched-for-url').text())
-
 
   # WL + BL checkbox logic in WL/BL dropdowns
   $('.lists-row input').change ->
@@ -316,6 +313,13 @@ $ ->
 
   # page-load: threat cats hide these inside the dropdown
   $('.threat-cat-row, .threat-cat-note').hide()
+
+    # research tab wbrs results row or bfrp page results row? place the threat category(s), as its a separate api call
+  $('.dispute-entry-ip-uri').ready ->   # research tab page load needs a threat cat
+    place_threat_category($('.dispute-entry-ip-uri').text())
+
+  $('.searched-for-url').ready ->   # bfrp results needs a threat cat
+    place_threat_category($('.searched-for-url').text())
 
 
 #### SUBMISSION OF WL/BL CHANGES TO WBRS ####
