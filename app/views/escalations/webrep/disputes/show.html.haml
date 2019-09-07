@@ -160,7 +160,7 @@
     .col-xs-2.col-with-divider
       %label.content-label-sm
         Dispute Entries
-      %div
+      %div.dispute-entry-ip-uri
         = @entries.first.hostlookup if @entries.present?
         -#- @entries.each do |entry|
         -#  = entry.hostlookup

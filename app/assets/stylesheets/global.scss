@@ -10445,3 +10445,8 @@ span.threat-cat-no-data {
 table.dispute_tool_current th.pad-left-xl {
   padding-left: 2px !important;
 }
+
+// ensure vertical alignment on narrow screens
+.research-table-details-wrapper table tr:first-of-type td {
+  vertical-align: middle;
+}
