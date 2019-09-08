@@ -98,21 +98,20 @@
                               %li
                                 %input.bl-heavy-checkbox.wl-bl-list-inline{type: 'checkbox', name: 'wl-bl-list-inline', value: "BL-heavy"} BL - Heavy
 
-                    .row.threat-cat-note
-                      .col-xs-12
+                    .row.dropdown-tool-grey-row.threat-cat-row.hidden
+                      .threat-cat-note
                         %label.content-label-sm
                           Threat Categories -
                           %span.threat-cat-required
                             *Required for adding to any blacklist.
-                            %span.five-note Up to 5 can be selected.
+                            %span.five-note Up to 5 can be selected
 
-                    .row.dropdown-tool-grey-row.threat-cat-row
-                      - Wbrs::ThreatCategory.selections.each do |label, value|
-                        .threat-cat-cell
-                          = wlbl_form.check_box(:thrt_cat_id, {id: nil, class: 'wlbl_thrt_cat_id'}, value)
-                          = label
+                      .threat-cat-area
+                        - Wbrs::ThreatCategory.selections.each do |label, value|
+                          .threat-cat-cell
+                            = wlbl_form.check_box(:thrt_cat_id, {id: nil, class: 'wlbl_thrt_cat_id'}, value)
+                            = label
                     -# END: WL BL LISTS ROW + THREAT CATS ROW
-
 
 
                     .comment-wrapper
@@ -381,7 +380,7 @@
                                     %td.wlbl-entry-wlbl
                                     %td.wlbl-current-entry-wbrs.text-center
                                     %td.wlbl-projected-entry-wbrs.text-center
-                                    %td.wlbl-threat-cat-inline
+                                    %td.wlbl-threat-cat-inline.pad-left-xl
 
                               .inline-tool-content-wrapper
                                 .row
@@ -431,19 +430,18 @@
                                   %button.reset-form-button.esc-tooltipped{type: 'button', title: 'Reset list toggles.', onclick: 'reset_score_preview(this)'}
 
                                 -# BEGIN: THREAT CATS ROW
-                                .row.threat-cat-note
-                                  .col-xs-12
+                                .row.dropdown-tool-grey-row.threat-cat-row.hidden
+                                  .threat-cat-note
                                     %label.content-label-sm
                                       Threat Categories -
                                       %span.threat-cat-required
                                         *Required for adding to any blacklist.
-                                        %span.five-note Up to 5 can be selected.
-
-                                .row.dropdown-tool-grey-row.threat-cat-row
-                                  - Wbrs::ThreatCategory.selections.each do |label, value|
-                                    .threat-cat-cell
-                                      = wlbl_form.check_box(:thrt_cat_id, {id: nil, class: 'wlbl_thrt_cat_id'}, value)
-                                      = label
+                                        %span.five-note Up to 5 can be selected
+                                  .threat-cat-area
+                                    - Wbrs::ThreatCategory.selections.each do |label, value|
+                                      .threat-cat-cell
+                                        = wlbl_form.check_box(:thrt_cat_id, {id: nil, class: 'wlbl_thrt_cat_id'}, value)
+                                        = label
                                 -# END: THREAT CATS ROW
 
                                 %hr.thin

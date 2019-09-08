@@ -26,9 +26,6 @@ window.get_current_wlbl = (button) ->
   preview_button = $(dropdown).find('.preview-wbrs-button')
   preview_score = $(dropdown).find('.wlbl-projected-entry-wbrs')
 
-  # hide threat cat row each time dropdown is drawn
-  $('.threat-cat-row, .threat-cat-note').hide()
-
   # inline adjust wl/bl, place the threat cat in the blue table at top of dropdown
   place_threat_category(entry_content)
 
@@ -104,17 +101,14 @@ window.get_current_wlbl = (button) ->
             initial_wl_heavy_status = wl_heavy_status
           if String(this) == 'BL-weak'
             $(bl_weak[0]).prop('checked', true)
-            $('.threat-cat-row, .threat-cat-note').show()
             bl_weak_status = 'true'
             initial_bl_weak_stats = bl_weak_status
           if String(this) == 'BL-med'
             $(bl_med[0]).prop('checked', true)
-            $('.threat-cat-row, .threat-cat-note').show()
             bl_med_status = 'true'
             initial_bl_med_status = bl_med_status
           if String(this) == 'BL-heavy'
             $(bl_heavy[0]).prop('checked', true)
-            $('.threat-cat-row, .threat-cat-note').show()
             bl_heavy_status = 'true'
             initial_bl_heavy_status = bl_heavy_status
 
@@ -141,6 +135,10 @@ window.bulk_get_current_wlbl = (page) ->
   current_wbrs = ''
   comment_box = ''
   dropdown_wrapper = ''
+
+  # each time dropdown is toggled, ensure threat cat stuff is hidden
+  $('.threat-cat-row').addClass('hidden')
+  $('.lists-row input').prop('checked', false)
 
   # Define variables based on what page we're on
   if page == 'index'
@@ -247,8 +245,8 @@ window.bulk_get_current_wlbl = (page) ->
           if comment == null
             comment = ''
 
-          # TODO: LOGIC ERROR HERE, FIX THIS
-          $(tbody).append('<tr class="wlbl-dropdown-row">' + '<td class="wlbl-entry-content">' + ip_uri + '</td><td class="wlbl-entry-wlbl">' + list_types + '</td>' + '<td class="wlbl-current-entry-wbrs text-center">' + wbrs_score + '</td>' + '<td class="wlbl-threat-cat"></td>')
+          # TODO: LOGIC ERROR HERE FOR LAST ROW HERE, NEEDS CORRECTION IN SEPARATE TICKET
+          $(tbody).append('<tr class="wlbl-dropdown-row">' + '<td class="wlbl-entry-content">' + ip_uri + '</td><td class="wlbl-entry-wlbl">' + list_types + '</td>' + '<td class="wlbl-current-entry-wbrs text-center">' + wbrs_score + '</td>' + '<td class="wlbl-threat-cat pad-left-xl"></td>')
 
         comment_box.text(comment_trail)
       error: (response) ->
@@ -257,6 +255,19 @@ window.bulk_get_current_wlbl = (page) ->
   else
     std_msg_error('No rows selected', ['Please select at least one entry row.'])
     return false
+
+
+# ensure the WL/BL checkboxes are toggled correctly
+window.wlbl_checkbox_update = () ->
+  wl_bl_str = ''
+  cb_array = []
+
+  wl_bl_str = $('.wlbl-entry-wlbl').text().toLowerCase()
+  cb_array = wl_bl_str.split(',')
+
+  $(cb_array).each ->
+    curr_checkbox = '.lists-row input[class*="' + this + '"]'
+    $(curr_checkbox).prop('checked', true)
 
 
 #### THREAT CATEGORY(s) - ADJUST WL/BL BULK, ADJUST WL/BL INLINE, RESEARCH TAB + BFRP RESULTS ####
@@ -269,7 +280,7 @@ window.place_threat_category = (uri) ->
   threatCatPromise = new Promise (resolve, reject) ->
     threat_cat_json = get_threat_categories(ip_uri)
     if threat_cat_json
-      resolve threat_cat_json  # resolve goes to then
+      resolve threat_cat_json  # resolve then goes to .then()
 
   threatCatPromise.then (result) ->
     threat_cat_obj = JSON.parse(result)
@@ -279,12 +290,17 @@ window.place_threat_category = (uri) ->
       threat_cat_str = '<span class="threat-cat-no-data">No Category</span>'
     else
       threat_cat_str = threat_cat_array.join(', ')
+
       # toggle the threat cat cb's in the dropdown
       $(threat_cat_array).each ->
         curr_cat = '.threat-cat-cell:contains(' + this.toString() + ')'
         $(curr_cat).find('input').prop('checked', true)
 
+      wlbl_checkbox_update()
+      $('.threat-cat-row').removeClass('hidden')
+
     $('.wlbl-threat-cat, .wlbl-threat-cat-inline, .threat-cat-wlbl-research').html(threat_cat_str)
+
 
 
 
@@ -293,21 +309,15 @@ window.place_threat_category = (uri) ->
 
 ## WL/BL Form manipulation
 $ ->
-
-  # page-load: threat cats hide these inside the dropdown
-  $('.threat-cat-row, .threat-cat-note').hide()
-
   # WL + BL checkbox logic in WL/BL dropdowns
   $('.lists-row input').change ->
     cb_class = $(this).attr('class').split(' ')[0]  # each input has a few classes, get the first one
-    if cb_class.includes('bl-')
-      # bl checkbox: show threat cat row or hide
+    if cb_class.includes('bl-')  # bl checkbox: show threat cat row or hide
       if $('.lists-row input[class^="bl-"]:checked').length == 0
-        $('.threat-cat-row, .threat-cat-note').hide()
+        $('.threat-cat-row').addClass('hidden')
       else
-        $('.threat-cat-row, .threat-cat-note').show()
-    else
-      # wl checkbox: enable submit button logic
+        $('.threat-cat-row').removeClass('hidden')
+    else   # wl checkbox: enable submit button logic
       if $('.lists-row input[class^="wl-"]:checked').length > 0
         $('.dropdown-submit-button').prop('disabled', false)
       else
@@ -325,6 +335,15 @@ $ ->
       $('.threat-cat-required .five-note').addClass('required-bold')
     else
       $('.threat-cat-required .five-note').removeClass('required-bold')
+
+  # add to list clicked or re-clicked? re-show the threat cat row
+  $('#wlbl-add').click ->
+    if $('.lists-row input[class^="bl-"]:checked').length > 0
+      $('.threat-cat-row').removeClass('hidden')
+
+  # remove from list clicked? hide the threat cat row
+  $('#wlbl-remove').click ->
+    $('.threat-cat-row').addClass('hidden')
 
     # page-load for research tab results row or bfrp page results row? place the threat cat(s), its a separate api call
   $('.dispute-entry-ip-uri').ready ->

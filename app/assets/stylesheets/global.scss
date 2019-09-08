@@ -10350,25 +10350,8 @@ span.input-truncate {
   width: 480px;
 }
 
-span.threat-cat-required, span.threat-cat-required .five-note {
-  color: $warning-accent-color;
-  font-size: 7pt;
-  padding-left: 2px;
-}
-span.threat-cat-required {
-  padding-top: 1px;
-}
-span.threat-cat-required .five-note {
-  padding-top: 0;
-}
-
-span.threat-cat-required .five-note.required-bold {
-  font-weight: bold;
-  color: darken($warning-accent-color, 5%)
-}
-
-
-form.adjust-wlbl-form {
+// threat category stuff goes inside this wl/bl form
+.adjust-wlbl-form {
   .dropdown-tool-grey-row {
     li {
       padding: 2px 2px 6px 12px;
@@ -10379,49 +10362,75 @@ form.adjust-wlbl-form {
   }
   // threat categories row in adjust wl/bl
   .dropdown-tool-grey-row.threat-cat-row {
-    padding: 5px;
-    height: 248px;
-    margin-left: -10px !important;  // need important overrides here
+    margin-left: -10px !important; // need important overrides here
     margin-right: -10px !important;
-    display: flex;  // flex to alphabetize + sort the threat cats easily
-    flex-wrap: wrap;
-    flex-direction: column;
-    .threat-cat-cell {
-      width: 33%;
-      font-size: 8pt;
-      line-height: 10pt;
-      padding: 5px 0 5px 10px;
-      input[type='checkbox'] {
-        float: left;
-        position: relative;
-        bottom: 3px;
-      }
-      li.threat-cat-cb {
-        padding-top: 6px;
-        padding-bottom: 8px;
-        input {
-          display: inline-block;
-          width: 12px;
-          margin-top: 1px;
-          margin-right: 4px;
+
+    .threat-cat-note {
+      background-color: $content-bg-color;
+      padding-top: 15px;
+    }
+    .threat-cat-area {
+      padding: 5px;
+      height: 248px;
+      display: flex; // flex to alphabetize + sort the threat cats easily
+      flex-wrap: wrap;
+      flex-direction: column;
+
+      .threat-cat-cell {
+        width: 33%;
+        font-size: 8pt;
+        line-height: 10pt;
+        padding: 5px 0 5px 10px;
+
+        input[type='checkbox'] {
+          float: left;
+          position: relative;
+          bottom: 3px;
         }
-        label {
-          display: inline-block;
-          width: 120px;
-          vertical-align: top;
-          padding-top: 1px;
+
+        li.threat-cat-cb {
+          padding-top: 6px;
+          padding-bottom: 8px;
+
+          input {
+            display: inline-block;
+            width: 12px;
+            margin-top: 1px;
+            margin-right: 4px;
+          }
+
+          label {
+            display: inline-block;
+            width: 120px;
+            vertical-align: top;
+            padding-top: 1px;
+          }
         }
       }
     }
+
+    td.wlbl-threat-cat {
+      font-size: 8pt;
+      line-height: 11pt;
+      padding-left: 2px;
+    }
   }
-  div.row.threat-cat-note {
-    margin-top: 10px;
-  }
-  td.wlbl-threat-cat {
-    font-size: 8pt;
-    line-height: 11pt;
-    padding-left: 2px;
-  }
+}
+
+span.threat-cat-required {
+  padding-top: 1px;
+}
+span.threat-cat-required .five-note {
+  padding-top: 0;
+}
+span.threat-cat-required, span.threat-cat-required .five-note {
+  color: $warning-accent-color;
+  font-size: 7pt;
+  padding-left: 2px;
+}
+span.threat-cat-required .five-note.required-bold {
+  font-weight: bold;
+  color: darken($warning-accent-color, 5%)
 }
 
 span.threat-cat-no-data {
@@ -10442,7 +10451,8 @@ span.threat-cat-no-data {
   margin-bottom: 8px;
 }
 
-table.dispute_tool_current th.pad-left-xl {
+
+.dispute-wlbl-adjust-wrapper .pad-left-xl {
   padding-left: 2px !important;
 }
 
