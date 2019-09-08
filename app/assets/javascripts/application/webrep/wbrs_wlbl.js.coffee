@@ -9,7 +9,6 @@
 ## Populating the inline Adjust WL/BL dropdown for
 ## research page and research tab (individual submission form)
 window.get_current_wlbl = (button) ->
-
   # Get entry content
   research_row = $(button).parents('.research-table-row')[0]
   entry_wrapper = $(research_row).find('.entry-data-content')[0]
@@ -26,6 +25,12 @@ window.get_current_wlbl = (button) ->
   dropdown = $(button).next('.dropdown-menu')[0]
   preview_button = $(dropdown).find('.preview-wbrs-button')
   preview_score = $(dropdown).find('.wlbl-projected-entry-wbrs')
+
+  # hide threat cat row each time dropdown is drawn
+  $('.threat-cat-row, .threat-cat-note').hide()
+
+  # inline adjust wl/bl, place the threat cat in the blue table at top of dropdown
+  place_threat_category(entry_content)
 
   # Reset the preview button and any leftover preview score
   $(preview_button).attr('disabled', true)
@@ -73,9 +78,6 @@ window.get_current_wlbl = (button) ->
     'entry': entry_content
   }
 
-  # inline adjust wl/bl, place the threat cat in the blue table at top of dropdown
-  place_threat_category(entry_content)
-
   headers = {'Token': $('input[name="token"]').val(), 'Xmlrpc-Token': $('input[name="xml_token"]').val()}
   $.ajax(
     url: '/escalations/api/v1/escalations/webrep/disputes/rule_ui_wlbl_get_info_for_form'
@@ -102,14 +104,17 @@ window.get_current_wlbl = (button) ->
             initial_wl_heavy_status = wl_heavy_status
           if String(this) == 'BL-weak'
             $(bl_weak[0]).prop('checked', true)
+            $('.threat-cat-row, .threat-cat-note').show()
             bl_weak_status = 'true'
             initial_bl_weak_stats = bl_weak_status
           if String(this) == 'BL-med'
             $(bl_med[0]).prop('checked', true)
+            $('.threat-cat-row, .threat-cat-note').show()
             bl_med_status = 'true'
             initial_bl_med_status = bl_med_status
           if String(this) == 'BL-heavy'
             $(bl_heavy[0]).prop('checked', true)
+            $('.threat-cat-row, .threat-cat-note').show()
             bl_heavy_status = 'true'
             initial_bl_heavy_status = bl_heavy_status
 
@@ -228,6 +233,7 @@ window.bulk_get_current_wlbl = (page) ->
           ip_uri = entry['ip_uri']
           list_types = entry['list_types']
           wbrs_score = entry['wbrs_score']
+
           place_threat_category(ip_uri)
 
           comment = entry['notes']
@@ -241,8 +247,8 @@ window.bulk_get_current_wlbl = (page) ->
           if comment == null
             comment = ''
 
-          # TODO: LOGIC ERROR HERE, FIX THIS!!!
-          $(tbody).append('<tr class="wlbl-dropdown-row">' + '<td class="wlbl-entry-content">' + ip_uri + '</td><td class="wlbl-entry-wlbl">' + list_types + '</td>' + '<td class="wlbl-current-entry-wbrs text-center">' + wbrs_score + '</td>' + '<td class="wlbl-threat-cat"> </td>')
+          # TODO: LOGIC ERROR HERE, FIX THIS
+          $(tbody).append('<tr class="wlbl-dropdown-row">' + '<td class="wlbl-entry-content">' + ip_uri + '</td><td class="wlbl-entry-wlbl">' + list_types + '</td>' + '<td class="wlbl-current-entry-wbrs text-center">' + wbrs_score + '</td>' + '<td class="wlbl-threat-cat"></td>')
 
         comment_box.text(comment_trail)
       error: (response) ->
@@ -253,27 +259,33 @@ window.bulk_get_current_wlbl = (page) ->
     return false
 
 
-#### THREAT CATEGORY(s) PLACED IN: ADJUST WL/BL BULK, ADJUST WL/BL INLINE, RESEARCH TAB + BFRP RESULTS ####
+#### THREAT CATEGORY(s) - ADJUST WL/BL BULK, ADJUST WL/BL INLINE, RESEARCH TAB + BFRP RESULTS ####
 window.place_threat_category = (uri) ->
   ip_uri = uri
+  threat_cat_str = ''  # used only for display purposes
   threat_cat_json = get_threat_categories(uri)
 
   # use a promise for the get threat cat api call, could take up to 1-2 seconds
   threatCatPromise = new Promise (resolve, reject) ->
     threat_cat_json = get_threat_categories(ip_uri)
     if threat_cat_json
-      resolve threat_cat_json
+      resolve threat_cat_json  # resolve goes to then
 
   threatCatPromise.then (result) ->
     threat_cat_obj = JSON.parse(result)
     threat_cat_array = threat_cat_obj.threat_categories
 
     if threat_cat_array == undefined || threat_cat_array.length == 0
-      threat_cats = '<span class="threat-cat-no-data">No Category</span>'
+      threat_cat_str = '<span class="threat-cat-no-data">No Category</span>'
     else
-      threat_cats = threat_cat_array.join(', ')
+      threat_cat_str = threat_cat_array.join(', ')
+      # toggle the threat cat cb's in the dropdown
+      $(threat_cat_array).each ->
+        curr_cat = '.threat-cat-cell:contains(' + this.toString() + ')'
+        $(curr_cat).find('input').prop('checked', true)
 
-    $('.wlbl-threat-cat, .wlbl-threat-cat-inline, .threat-cat-wlbl-research').html(threat_cats)
+    $('.wlbl-threat-cat, .wlbl-threat-cat-inline, .threat-cat-wlbl-research').html(threat_cat_str)
+
 
 
 
@@ -281,6 +293,9 @@ window.place_threat_category = (uri) ->
 
 ## WL/BL Form manipulation
 $ ->
+
+  # page-load: threat cats hide these inside the dropdown
+  $('.threat-cat-row, .threat-cat-note').hide()
 
   # WL + BL checkbox logic in WL/BL dropdowns
   $('.lists-row input').change ->
@@ -311,14 +326,11 @@ $ ->
     else
       $('.threat-cat-required .five-note').removeClass('required-bold')
 
-  # page-load: threat cats hide these inside the dropdown
-  $('.threat-cat-row, .threat-cat-note').hide()
-
-    # research tab wbrs results row or bfrp page results row? place the threat category(s), as its a separate api call
-  $('.dispute-entry-ip-uri').ready ->   # research tab page load needs a threat cat
+    # page-load for research tab results row or bfrp page results row? place the threat cat(s), its a separate api call
+  $('.dispute-entry-ip-uri').ready ->
     place_threat_category($('.dispute-entry-ip-uri').text())
 
-  $('.searched-for-url').ready ->   # bfrp results needs a threat cat
+  $('.searched-for-url').ready ->
     place_threat_category($('.searched-for-url').text())
 
 
@@ -405,7 +417,7 @@ window.submit_bulk_wlbl = (page) ->
 
 # Prepping for previewing WBRS Score
 window.prepare_for_wbrs_preview = (toggle) ->
-  # Get the current wl/bl settings
+# Get the current wl/bl settings
   dropdown = $(toggle).parents('.dispute-wlbl-adjust-wrapper')[0]
   current_lists = $($(dropdown).find('.wlbl-entry-wlbl')[0]).text()
   list = current_lists.split(',')

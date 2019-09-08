@@ -40,7 +40,7 @@
                         %th.content-label-sm Dispute
                         %th.content-label-sm.no-word-break Current WL/BL List
                         %th.text-center.content-label-sm.no-word-break Current WBRS Score
-                        %th.content-label-sm.no-word-break Threat Category
+                        %th.content-label-sm.no-word-break.pad-left-xl Threat Category
                     %tbody
 
                   -# TODO Hook up ability to preview scores based on changes in WL/BL
@@ -258,10 +258,13 @@
                                     %tr
                                       %th.content-label-sm.no-word-break Current WL/BL List
                                       %th.text-center.content-label-sm.no-word-break Current WBRS Score
+                                      %th.content-label-sm.no-word-break.pad-left-xl Threat Category
+
                                   %tbody
                                     %tr
                                       %td.wlbl-entry-wlbl
                                       %td.wlbl-current-entry-wbrs.text-center
+                                      %td.wlbl-threat-cat-inline
 
                                     -#    Removing for now. We can't do a preview until the api is updated to provide that info
                                     -#%td.text-center
@@ -272,43 +275,65 @@
                                   .row
                                     .col-xs-12
                                       %label.content-label-sm{for: "wlbl-list-type-select"} Adjust WL/BL List
-                                  .row
-                                    .col-xs-6
+                                  .row.lists-row
+                                    .col-xs-4
                                       %ul.wlbl-toggle-list
                                         %li
                                           %label.toggle-switch
-                                            %input.wl-weak-checkbox{type: 'checkbox', name: 'wl-bl-list-inline', class: 'wl-bl-list-inline', value: "WL-weak"}
+                                            %input.wl-weak-checkbox{type: 'checkbox', name: 'wl-bl-list-inline', class: 'wl-bl-list-inline', value: 'WL-weak', onclick: 'prepare_for_wbrs_preview(this)'}
                                             %span.toggle-slider
                                           WL - Weak
                                         %li
                                           %label.toggle-switch
-                                            %input.wl-med-checkbox{type: 'checkbox', name: 'wl-bl-list-inline', class: 'wl-bl-list-inline', value: "WL-med"}
+                                            %input.bl-weak-checkbox{type: 'checkbox', name: 'wl-bl-list-inline', class: 'wl-bl-list-inline', value: 'BL-weak', onclick: 'prepare_for_wbrs_preview(this)'}
+                                            %span.toggle-slider
+                                          BL - Weak
+                                    .col-xs-4
+                                      %ul.wlbl-toggle-list
+                                        %li
+                                          %label.toggle-switch
+                                            %input.wl-med-checkbox{type: 'checkbox', name: 'wl-bl-list-inline', class: 'wl-bl-list-inline', value: 'WL-med', onclick: 'prepare_for_wbrs_preview(this)'}
                                             %span.toggle-slider
                                           WL - Medium
                                         %li
                                           %label.toggle-switch
-                                            %input.wl-heavy-checkbox{type: 'checkbox', name: 'wl-bl-list-inline', class: 'wl-bl-list-inline', value: "WL-heavy"}
+                                            %input.bl-med-checkbox{type: 'checkbox', name: 'wl-bl-list-inline', class: 'wl-bl-list-inline', value: 'BL-med', onclick: 'prepare_for_wbrs_preview(this)'}
                                             %span.toggle-slider
-                                          WL - Heavy
-                                    .col-xs-6
+                                          BL - Medium
+                                    .col-xs-4
                                       %ul.wlbl-toggle-list
                                         %li
                                           %label.toggle-switch
-                                            %input.bl-weak-checkbox{type: 'checkbox', name: 'wl-bl-list-inline', class: 'wl-bl-list-inline', value: "BL-weak"}
+                                            %input.wl-heavy-checkbox{type: 'checkbox', name: 'wl-bl-list-inline', class: 'wl-bl-list-inline', value: 'WL-heavy', onclick: 'prepare_for_wbrs_preview(this)'}
                                             %span.toggle-slider
-                                          BL - Weak
+                                          WL - Heavy
                                         %li
                                           %label.toggle-switch
-                                            %input.bl-med-checkbox{type: 'checkbox', name: 'wl-bl-list-inline', class: 'wl-bl-list-inline', value: "BL-med"}
-                                            %span.toggle-slider
-                                          BL - Medium
-                                        %li
-                                          %label.toggle-switch
-                                            %input.bl-heavy-checkbox{type: 'checkbox', name: 'wl-bl-list-inline', class: 'wl-bl-list-inline', value: "BL-heavy"}
+                                            %input.bl-heavy-checkbox{type: 'checkbox', name: 'wl-bl-list-inline', class: 'wl-bl-list-inline', value: 'BL-heavy', onclick: 'prepare_for_wbrs_preview(this)'}
                                             %span.toggle-slider
                                           BL - Heavy
 
-                                  = wlbl_form.select(:thrt_cat_id, Wbrs::ThreatCategory.selections, {include_blank: true}, class: 'wlbl_thrt_cat_id')
+                                  .button-row-center
+                                    %button.preview-wbrs-button{type: 'button', disabled: true, onclick: 'preview_wbrs_score(this);', 'data-add': '', 'data-remove': ''}
+                                      Preview Projected Score
+                                    %button.reset-form-button.esc-tooltipped{type: 'button', title: 'Reset list toggles.', onclick: 'reset_score_preview(this)'}
+
+                                  -# BEGIN: THREAT CATS ROW
+                                  .row.threat-cat-note
+                                    .col-xs-12
+                                      %label.content-label-sm
+                                        Threat Categories -
+                                        %span.threat-cat-required
+                                          *Required for adding to any blacklist.
+                                          %span.five-note Up to 5 can be selected.
+
+                                  .row.dropdown-tool-grey-row.threat-cat-row
+                                    - Wbrs::ThreatCategory.selections.each do |label, value|
+                                      .threat-cat-cell
+                                        = wlbl_form.check_box(:thrt_cat_id, {id: nil, class: 'wlbl_thrt_cat_id'}, value)
+                                        = label
+                                  -# END: THREAT CATS ROW
+
 
                                   .comment-wrapper
                                     %label.content-label-sm Comment
