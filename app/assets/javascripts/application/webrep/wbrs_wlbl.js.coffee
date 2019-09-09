@@ -281,6 +281,8 @@ window.place_threat_category = (uri) ->
     threat_cat_json = get_threat_categories(ip_uri)
     if threat_cat_json
       resolve threat_cat_json  # resolve then goes to .then()
+    else
+      reject
 
   threatCatPromise.then (result) ->
     threat_cat_obj = JSON.parse(result)
@@ -309,9 +311,15 @@ window.place_threat_category = (uri) ->
       $('span.threat-cat-wlbl-research').html(threat_cat_str)
       $('.wlbl-and-threat-area').css('width', '250px')  # ensure width to handle mult threat cats
 
-    # if wl entry, no need for threat cats at all
+    # on research rows, if wl entry, no need for threat cats at all
     else if $('.wlbl-table-result').text().includes('WL-')
       $('span.threat-cat-wlbl-research').remove()
+
+  .then null, (err) ->
+    std_msg_error('WL/BL Error',['There was an error retrieving Threat Categories.'])
+
+  .catch (err) ->
+    std_msg_error('WL/BL Error',['There was an error retrieving Threat Categories.'])
 
 
 
