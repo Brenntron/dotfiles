@@ -10311,37 +10311,6 @@ hr.thin.extra-bottom-marg {
   opacity: 1;
 }
 
-// webrep dispute index > ensure break/wrap properly for long url's containing parameters
-.dispute-entry-col {
-  min-width: 200px;
-}
-
-#disputes-index .entry-col-content {
-  word-break: break-all;
-  max-width: 250px;
-}
-
-// webrep disputes index table, domain or ip column
-span.input-truncate {
-  display: inline-block;
-  position: relative;
-  padding-right: 25px;
-  width: 200px !important;
-}
-
-// webrep dispute index > ensure the dispute count is to the right of the domain entry
-.dispute-count {
-  position: absolute;
-  left: 175px;
-  float: none;
-  border-radius: 5px;
-  padding: 1px 5px;
-}
-
-.dispute-entry-col {
-  min-width: 200px;
-}
-
 .owner-col {
   min-width: 80px;
 }
@@ -10373,10 +10342,11 @@ span.input-truncate {
     }
     .threat-cat-area {
       padding: 5px;
-      height: 248px;
+      height: 250px;
       display: flex; // flex to alphabetize + sort the threat cats easily
       flex-wrap: wrap;
       flex-direction: column;
+      justify-content: space-around;
 
       .threat-cat-cell {
         width: 33%;
@@ -10474,4 +10444,36 @@ span.threat-cat-no-data {
 
 .wlbl-table-result {
   max-width: 100px;
+}
+
+// webrep dispute index > ensure break/wrap properly for long url's containing parameters
+.dispute-entry-col {
+  min-width: 200px;
+}
+
+#disputes-index .entry-col-content {
+  word-break: break-all;
+  max-width: 250px;
+}
+
+// webrep dispute index > ensure the dispute count is to the right of the domain entry
+#disputes-index span.input-truncate {
+  display: inline-block;
+  position: relative;
+  padding-right: 40px;
+  max-height: 20px !important;
+  max-width: 100% !important;
+  min-width: 98%;
+  .dispute-count {
+    border-radius: 5px;
+    padding: 1px 5px;
+    position: absolute;
+    right: 2px;
+    top: 0;
+  }
+}
+
+
+.dispute-entry-col {
+  min-width: 200px;
 }

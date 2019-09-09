@@ -26,9 +26,6 @@ window.get_current_wlbl = (button) ->
   preview_button = $(dropdown).find('.preview-wbrs-button')
   preview_score = $(dropdown).find('.wlbl-projected-entry-wbrs')
 
-  # inline adjust wl/bl, place the threat cat in the blue table at top of dropdown
-  place_threat_category(entry_content)
-
   # Reset the preview button and any leftover preview score
   $(preview_button).attr('disabled', true)
   $(preview_button).attr('data-remove', '')
@@ -256,13 +253,17 @@ window.bulk_get_current_wlbl = (page) ->
     std_msg_error('No rows selected', ['Please select at least one entry row.'])
     return false
 
-
 # ensure the WL/BL checkboxes are toggled correctly
 window.wlbl_checkbox_update = () ->
   wl_bl_str = ''
   cb_array = []
 
-  wl_bl_str = $('.wlbl-entry-wlbl').text().toLowerCase()
+  # get the existing lists "WL-heavy, BL-weak, etc"
+  if $('.wlbl-entry-wlbl').length > 0 ||
+    wl_bl_str = $('.wlbl-entry-wlbl').text().toLowerCase()
+  else if $('.wlbl-table-result').length > 0
+    wl_bl_str = $('.wlbl-table-result').text().toLowerCase()
+
   cb_array = wl_bl_str.split(',')
 
   $(cb_array).each ->
