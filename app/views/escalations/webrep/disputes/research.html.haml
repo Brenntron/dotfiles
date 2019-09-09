@@ -202,16 +202,18 @@
         %span.searched-for-url #{params['search']['uri']}
         (#{@entries.count} found)
       #research-page-toolbar.toolbar
-        -#%div
-        -#  %label.toolbar-section-label Table View
-        -#  %button.toolbar-button.expand-row-button#expand-all-rows.esc-tooltipped.toolbar-button-spacer{title: 'Expand All Rows'}
-        -#    %span.toolbar-button-text Expand All Rows
-        -#  %button.toolbar-button.collapse-button#collapse-all-rows.esc-tooltipped{title: 'Collapse All Rows'}
-        -#    %span.toolbar-button-text Collapse All Rows
+        %div
+          %label.toolbar-section-label Table View
+          %button.toolbar-button.expand-row-button#expand-all-rows.esc-tooltipped.toolbar-button-spacer{title: 'Expand All Rows'}
+            %span.toolbar-button-text Expand All Rows
+          %button.toolbar-button.collapse-button#collapse-all-rows.esc-tooltipped.hidden{title: 'Collapse All Rows'}
+            %span.toolbar-button-text Collapse All Rows
+          %input#select-all-entries.esc-tooltipped{type:'checkbox',title: 'Select All', 'onclick':'select_all_detailed(this)'}
+            %span.toolbar-button-text Select All
         %div
           %label.toolbar-section-label Edit
           %span.dropdown
-            %button.toolbar-button.add-to-ticket-button#add-to-ticket-button.esc-tooltipped{title: 'Add to Ticket','data-toggle': 'dropdown', 'aria-haspopup': 'true', 'aria-expanded': 'false', disabled: true}
+            %button.toolbar-button.add-to-ticket-button#add-to-ticket-button.esc-tooltipped{title: 'Add to Ticket','data-toggle': 'dropdown', 'aria-haspopup': 'true', 'aria-expanded': 'false'}
               %span.toolbar-button-text Add to Ticket
             .dropdown-menu.toolbar-dropdown#add_to_ticket_dropdown{'aria-labelledby': 'add-to-ticket-button'}
               .dispute-wlbl-adjust-wrapper
@@ -383,6 +385,7 @@
         %span.small.note-repsubmit * NOTE: Submitting reputation changes will automatically create a closed ticket
   .row.research_results
     .col-xs-12
+
       %table#disputes-research-table.table.table-sm.bfrp-table
         %tbody
           - @entries.each do |entry|
@@ -591,133 +594,134 @@
                     -#Expander area
                     %td.research-table-details-wrapper{colspan: '7'}
                       %table
-                        %tr
-                          %td.input-col
-                            %span.research-table-input-wrapper.wbrs-input-wrapper
-                              %input.research-row-checkbox.wbrs-checkbox{type: 'checkbox', checked: 'true', value: "#{entry.id}"}
-                            %label WBRS
-                          %td.text-center.entry-data-wbrs-score
-                            = entry.wbrs_score.to_d.truncate(2).to_f if entry.wbrs_score
-                          %td
-                            %label WBRS Rule Hits
-                          %td.text-center
-                            = entry.dispute_rule_hits.select{|hit| hit.rule_type == 'WBRS'}.count
-                          %td
-                            %label WBRS Rules
-                          %td.rule-hits-col-list
-                            - if entry.dispute_rule_hits.select{|hit| hit.rule_type == 'WBRS'}.count == 0
-                              %span.missing-data No rule hits
-                            - else
-                              - entry.dispute_rule_hits.select{|hit| hit.rule_type == 'WBRS'}.each do |wbrs_hit|
-                                - unless RulehitResolutionMailerTemplate.select{|template| template.mnemonic == wbrs_hit.name}.count == 0
-                                  %a.adhoc-email-trigger{href: '#', 'data-url': "#{entry.uri}", 'data-name': wbrs_hit.name}
+                        %tbody
+                          %tr
+                            %td.input-col
+                              %span.research-table-input-wrapper.wbrs-input-wrapper
+                                %input.research-row-checkbox.wbrs-checkbox{type: 'checkbox', checked: 'true', value: "#{entry.id}"}
+                              %label WBRS
+                            %td.text-center.entry-data-wbrs-score
+                              = entry.wbrs_score.to_d.truncate(2).to_f if entry.wbrs_score
+                            %td
+                              %label WBRS Rule Hits
+                            %td.text-center
+                              = entry.dispute_rule_hits.select{|hit| hit.rule_type == 'WBRS'}.count
+                            %td
+                              %label WBRS Rules
+                            %td.rule-hits-col-list
+                              - if entry.dispute_rule_hits.select{|hit| hit.rule_type == 'WBRS'}.count == 0
+                                %span.missing-data No rule hits
+                              - else
+                                - entry.dispute_rule_hits.select{|hit| hit.rule_type == 'WBRS'}.each do |wbrs_hit|
+                                  - unless RulehitResolutionMailerTemplate.select{|template| template.mnemonic == wbrs_hit.name}.count == 0
+                                    %a.adhoc-email-trigger{href: '#', 'data-url': "#{entry.uri}", 'data-name': wbrs_hit.name}
+                                      = wbrs_hit.name
+                                      - unless wbrs_hit.equal? entry.dispute_rule_hits.select {|rule_hit| rule_hit.rule_type == "WBRS" }.last
+                                        = ","
+                                  - else
                                     = wbrs_hit.name
                                     - unless wbrs_hit.equal? entry.dispute_rule_hits.select {|rule_hit| rule_hit.rule_type == "WBRS" }.last
                                       = ","
-                                - else
-                                  = wbrs_hit.name
-                                  - unless wbrs_hit.equal? entry.dispute_rule_hits.select {|rule_hit| rule_hit.rule_type == "WBRS" }.last
-                                    = ","
-                          %td.input-col
-                            %span.research-table-input-wrapper.xbrs-input-wrapper
-                              %input.research-row-checkbox.xbrs-checkbox{type: 'checkbox', checked: 'true', value: "#{entry.id}"}
-                            %label XBRS History
-                          %td.text-center
-                            - unless entry.hostlookup.nil?
-                              = entry.find_xbrs[1]['data'].count
-                          %td.input-col
-                            %span.research-table-input-wrapper.virus-total-input-wrapper
-                              %input.research-row-checkbox.virus-total-checkbox{type: 'checkbox', checked: 'true', value: "#{entry.id}"}
-                            %label Virustotal
-                          %td.text-center
-                            - if entry.virustotals.count == 0
-                              %span.missing-data N/A
-                            - else
-                              = entry.virustotals.count {|vt| vt[:result] != "clean site" && vt[:result] != "unrated site" }
-                              \\
-                              = entry.virustotals.count
-                          %td.left-bordered
-                            %label WL/BL
-                          %td
-                            - if !entry.respond_to?(:consolidated_wlbl_strings)
-                              %span.missing-data Not currently on a list
-                            - else
-                              %span.wlbl-table-result
-                                = entry.consolidated_wlbl_strings
-                              %button.dispute-inline-buttons.history-button.esc-tooltipped{title: 'WL/BL History', onclick: "wlbl_history_dialog('#{entry.hostlookup}')"}
-
-
-                          %td.left-bordered
-                            %label Referenced on
-                          %td
-                            - referenced_entries = entry.research_referenced_tickets
-                            - referenced_entries_size = referenced_entries.size
-                            - if referenced_entries_size < 1
-                              %span.missing-data
-                              Not on any other tickets
-                            - else
-                              %span.dropdown
-                                %button.show_references.dropdown-toggle.references-dropdown-button{title: 'Referenced on', 'data-toggle': 'dropdown', 'aria-haspopup': 'true', 'aria-expanded': 'false'}
-                                  = "#{referenced_entries_size} ticket(s)"
-                                .dropdown-menu.references-dropdown{'aria-labelledby': 'show_references'}
-                                  %table
-                                    - referenced_entries.each do |reference|
-                                      %tr
-                                        %td
-                                          %a{href: escalations_webrep_dispute_path(reference.id)}
-                                            = reference.id
-                                        %td
-                                          = reference.case_opened_at
-                        %tr
-                          %td.input-col
-                            %span.research-table-input-wrapper.sbrs-input-wrapper
-                              %input.research-row-checkbox.sbrs-checkbox{type: 'checkbox', checked: 'true', value: "#{entry.id}"}
-                            %label SBRS
-                          %td.text-center= entry.sbrs_score.to_d.truncate(2).to_f if entry.sbrs_score
-                          %td
-                            %label SBRS Rule Hits
-                          %td.text-center
-                            = entry.dispute_rule_hits.select{|hit| hit.rule_type == 'SBRS'}.count
-                          %td
-                            %label SBRS Rules
-                          %td.rule-hits-col-list
-                            - if entry.dispute_rule_hits.select{|hit| hit.rule_type == 'SBRS'}.count == 0
-                              %span.missing-data No rule hits
-                            - else
-                              - entry.dispute_rule_hits.select{|hit| hit.rule_type == 'SBRS'}.each do |sbrs_hit|
-                                - unless RulehitResolutionMailerTemplate.select{|template| template.mnemonic == sbrs_hit.name}.count == 0
-                                  %a.adhoc-email-trigger{href: '#', 'data-url': "#{entry.uri}", 'data-name': sbrs_hit.name}
-                                    = sbrs_hit.name
-                                    - unless sbrs_hit.equal? entry.dispute_rule_hits.select {|rule_hit| rule_hit.rule_type == "SBRS" }.last
-                                      = ","
-                                - else
-                                  = sbrs_hit.name
-                                  - unless sbrs_hit.equal? entry.dispute_rule_hits.select {|rule_hit| rule_hit.rule_type == "WBRS" }.last
-                                    = ","
-                          %td.input-col
-                            %span.research-table-input-wrapper.crosslisted-input-wrapper
-                              %input.research-row-checkbox.crosslisted-checkbox{type: 'checkbox', checked: 'true', value: "#{entry.id}"}
-                            %label Crosslisted URLs
-                          %td.text-center
-                            = entry.wbrs_xlist.count
-                          %td.input-col
-                            %span.research-table-input-wrapper.reptool-input-wrapper
-                              %input.research-row-checkbox.reptool-checkbox{type: 'checkbox', checked: 'true', value: "#{entry.id}"}
-                            %label RepTool Class
-                            %td.entry-reptool-data
-                              - if entry.classifications.first.nil?
-                                %span.missing-data.entry-reptool-class Not on RepTool
-                              - else
-                                %span.inline-col-breakup.entry-reptool-class
-                                  = entry.classifications.first
-                                %span.inline-col-breakup.entry-reptool-status
-                                  = entry.blacklist.status
-                                %span.inline-col-breakup.entry-reptool-comment
-                                  = entry.blacklist.metadata&.fetch('VRT', {})['comment']
-                            %td.left-bordered
-                              %label Umbrella
+                            %td.input-col
+                              %span.research-table-input-wrapper.xbrs-input-wrapper
+                                %input.research-row-checkbox.xbrs-checkbox{type: 'checkbox', checked: 'true', value: "#{entry.id}"}
+                              %label XBRS History
                             %td.text-center
-                              = entry.umbrellaresult
+                              - unless entry.hostlookup.nil?
+                                = entry.find_xbrs[1]['data'].count
+                            %td.input-col
+                              %span.research-table-input-wrapper.virus-total-input-wrapper
+                                %input.research-row-checkbox.virus-total-checkbox{type: 'checkbox', checked: 'true', value: "#{entry.id}"}
+                              %label Virustotal
+                            %td.text-center
+                              - if entry.virustotals.count == 0
+                                %span.missing-data N/A
+                              - else
+                                = entry.virustotals.count {|vt| vt[:result] != "clean site" && vt[:result] != "unrated site" }
+                                \\
+                                = entry.virustotals.count
+                            %td.left-bordered
+                              %label WL/BL
+                            %td
+                              - if !entry.respond_to?(:consolidated_wlbl_strings)
+                                %span.missing-data Not currently on a list
+                              - else
+                                %span.wlbl-table-result
+                                  = entry.consolidated_wlbl_strings
+                                %button.dispute-inline-buttons.history-button.esc-tooltipped{title: 'WL/BL History', onclick: "wlbl_history_dialog('#{entry.hostlookup}')"}
+
+
+                            %td.left-bordered
+                              %label Referenced on
+                            %td
+                              - referenced_entries = entry.research_referenced_tickets
+                              - referenced_entries_size = referenced_entries.size
+                              - if referenced_entries_size < 1
+                                %span.missing-data
+                                Not on any other tickets
+                              - else
+                                %span.dropdown
+                                  %button.show_references.dropdown-toggle.references-dropdown-button{title: 'Referenced on', 'data-toggle': 'dropdown', 'aria-haspopup': 'true', 'aria-expanded': 'false'}
+                                    = "#{referenced_entries_size} ticket(s)"
+                                  .dropdown-menu.references-dropdown{'aria-labelledby': 'show_references'}
+                                    %table
+                                      - referenced_entries.each do |reference|
+                                        %tr
+                                          %td
+                                            %a{href: escalations_webrep_dispute_path(reference.id)}
+                                              = reference.id
+                                          %td
+                                            = reference.case_opened_at
+                          %tr
+                            %td.input-col
+                              %span.research-table-input-wrapper.sbrs-input-wrapper
+                                %input.research-row-checkbox.sbrs-checkbox{type: 'checkbox', checked: 'true', value: "#{entry.id}"}
+                              %label SBRS
+                            %td.text-center= entry.sbrs_score.to_d.truncate(2).to_f if entry.sbrs_score
+                            %td
+                              %label SBRS Rule Hits
+                            %td.text-center
+                              = entry.dispute_rule_hits.select{|hit| hit.rule_type == 'SBRS'}.count
+                            %td
+                              %label SBRS Rules
+                            %td.rule-hits-col-list
+                              - if entry.dispute_rule_hits.select{|hit| hit.rule_type == 'SBRS'}.count == 0
+                                %span.missing-data No rule hits
+                              - else
+                                - entry.dispute_rule_hits.select{|hit| hit.rule_type == 'SBRS'}.each do |sbrs_hit|
+                                  - unless RulehitResolutionMailerTemplate.select{|template| template.mnemonic == sbrs_hit.name}.count == 0
+                                    %a.adhoc-email-trigger{href: '#', 'data-url': "#{entry.uri}", 'data-name': sbrs_hit.name}
+                                      = sbrs_hit.name
+                                      - unless sbrs_hit.equal? entry.dispute_rule_hits.select {|rule_hit| rule_hit.rule_type == "SBRS" }.last
+                                        = ","
+                                  - else
+                                    = sbrs_hit.name
+                                    - unless sbrs_hit.equal? entry.dispute_rule_hits.select {|rule_hit| rule_hit.rule_type == "WBRS" }.last
+                                      = ","
+                            %td.input-col
+                              %span.research-table-input-wrapper.crosslisted-input-wrapper
+                                %input.research-row-checkbox.crosslisted-checkbox{type: 'checkbox', checked: 'true', value: "#{entry.id}"}
+                              %label Crosslisted URLs
+                            %td.text-center
+                              = entry.wbrs_xlist.count
+                            %td.input-col
+                              %span.research-table-input-wrapper.reptool-input-wrapper
+                                %input.research-row-checkbox.reptool-checkbox{type: 'checkbox', checked: 'true', value: "#{entry.id}"}
+                              %label RepTool Class
+                              %td.entry-reptool-data
+                                - if entry.classifications.first.nil?
+                                  %span.missing-data.entry-reptool-class Not on RepTool
+                                - else
+                                  %span.inline-col-breakup.entry-reptool-class
+                                    = entry.classifications.first
+                                  %span.inline-col-breakup.entry-reptool-status
+                                    = entry.blacklist.status
+                                  %span.inline-col-breakup.entry-reptool-comment
+                                    = entry.blacklist.metadata&.fetch('VRT', {})['comment']
+                              %td.left-bordered
+                                %label Umbrella
+                              %td.text-center
+                                = entry.umbrellaresult
                   %tr.nested-data-row{'data-entry-id': "#{entry.id}"}
                     %td.expanded-row{colspan: '8'}
                       .expanded-row-data-wrapper

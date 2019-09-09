@@ -1,7 +1,6 @@
 
 $ ->
 
-  console.log 'inininin'
   completed_counter = 0
   $(document).bind(
     ###
@@ -26,6 +25,14 @@ $ ->
         return !Object.keys(item).length
       when 'string'
         return /^\s*$/.test(item)
+  window.select_all_detailed = (check)->
+    is_checked = $(check).prop('checked')
+    $('.dispute_check_box').prop('checked', is_checked)
+
+  $(document).on 'click', '.dispute_check_box', (e) ->
+    is_checked = $(e.target).prop('checked')
+    $('#select-all-entries').prop('checked', is_checked)
+
 
   window.close_modal = () ->
     $('#confirmation-modal').modal('toggle')
