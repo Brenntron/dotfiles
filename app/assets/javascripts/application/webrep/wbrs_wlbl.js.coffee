@@ -296,15 +296,18 @@ window.place_threat_category = (uri) ->
         curr_cat = '.threat-cat-cell:contains(' + this.toString() + ')'
         $(curr_cat).find('input').prop('checked', true)
 
+      # double-check the wl/bl checkboxes are checked
       wlbl_checkbox_update()
-      $('.threat-cat-row').removeClass('hidden')
+
+      unless $('.wlbl-and-threat-area').text().includes('WL-')
+        $('.threat-cat-row').removeClass('hidden')
 
     $('.wlbl-threat-cat, .wlbl-threat-cat-inline').html(threat_cat_str)
 
     # on research rows, only place the threat cat if it's on a bl, add threat cats into that table cell
     if $('.wlbl-table-result').text().includes('BL-')
       $('span.threat-cat-wlbl-research').html(threat_cat_str)
-      $('.wlbl-threat-cat-td').css('width', '250px')  # ensure width to handle mult threat cats
+      $('.wlbl-and-threat-area').css('width', '250px')  # ensure width to handle mult threat cats
 
     # if wl entry, no need for threat cats at all
     else if $('.wlbl-table-result').text().includes('WL-')

@@ -491,7 +491,7 @@
                               = entry.virustotals.count
                           %td.left-bordered
                             %label WL/BL
-                          %td.wlbl-threat-cat-td
+                          %td.wlbl-and-threat-area
                             - if !entry.respond_to?(:consolidated_wlbl_strings)
                               %span.missing-data Not currently on a list
                             - else
