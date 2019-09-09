@@ -52,7 +52,7 @@
                     .row
                       .col-xs-2
                         %label.content-label-sm Action
-                      .col-xs-5
+                      .col-xs-3
                         %input{type: 'radio', name: 'wlbl-action-radio', id: 'wlbl-add', value: 'wlbl-add', checked: true}
                         %label.radio-label{for: 'wlbl-add'} Add to list
                       .col-xs-5
@@ -491,16 +491,14 @@
                               = entry.virustotals.count
                           %td.left-bordered
                             %label WL/BL
-                          %td
+                          %td.wlbl-threat-cat-td
                             - if !entry.respond_to?(:consolidated_wlbl_strings)
                               %span.missing-data Not currently on a list
                             - else
                               %span.wlbl-table-result
                                 = entry.consolidated_wlbl_strings
                               %button.dispute-inline-buttons.history-button.esc-tooltipped{title: 'WL/BL History', onclick: "wlbl_history_dialog('#{entry.hostlookup}')"}
-                          %td.left-bordered
-                            %label Threat Category
-                          %td.threat-cat-wlbl-research
+                            %span.threat-cat-wlbl-research
 
 
                           %td.left-bordered

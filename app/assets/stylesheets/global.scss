@@ -10368,6 +10368,8 @@ span.input-truncate {
     .threat-cat-note {
       background-color: $content-bg-color;
       padding-top: 15px;
+      padding-bottom: 0;
+      margin-bottom: 0;
     }
     .threat-cat-area {
       padding: 5px;
@@ -10451,6 +10453,9 @@ span.threat-cat-no-data {
   margin-bottom: 8px;
 }
 
+.threat-cat-note label.content-label-sm {
+  margin-bottom: 2px;
+}
 
 .dispute-wlbl-adjust-wrapper .pad-left-xl {
   padding-left: 2px !important;
@@ -10459,4 +10464,14 @@ span.threat-cat-no-data {
 // ensure vertical alignment on narrow screens
 .research-table-details-wrapper table tr:first-of-type td {
   vertical-align: middle;
+}
+
+#disputes-research-table .threat-cat-wlbl-research {
+  margin-left: 10px;
+  width: 100px;
+  float: right;
+}
+
+.wlbl-table-result {
+  width: 100px;
 }

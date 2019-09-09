@@ -299,8 +299,16 @@ window.place_threat_category = (uri) ->
       wlbl_checkbox_update()
       $('.threat-cat-row').removeClass('hidden')
 
-    $('.wlbl-threat-cat, .wlbl-threat-cat-inline, .threat-cat-wlbl-research').html(threat_cat_str)
+    $('.wlbl-threat-cat, .wlbl-threat-cat-inline').html(threat_cat_str)
 
+    # on research rows, only place the threat cat if it's on a bl, add threat cats into that table cell
+    if $('.wlbl-table-result').text().includes('BL-')
+      $('span.threat-cat-wlbl-research').html(threat_cat_str)
+      $('.wlbl-threat-cat-td').css('width', '250px')  # ensure width to handle mult threat cats
+
+    # if wl entry, no need for threat cats at all
+    else if $('.wlbl-table-result').text().includes('WL-')
+      $('span.threat-cat-wlbl-research').remove()
 
 
 
