@@ -282,8 +282,6 @@ window.place_threat_category = (uri) ->
     threat_cat_json = get_threat_categories(ip_uri)
     if threat_cat_json
       resolve threat_cat_json  # resolve then goes to .then()
-    else
-      reject
 
   threatCatPromise.then (result) ->
     threat_cat_obj = JSON.parse(result)
@@ -291,6 +289,7 @@ window.place_threat_category = (uri) ->
 
     if threat_cat_array == undefined || threat_cat_array.length == 0
       threat_cat_str = '<span class="threat-cat-no-data">No Category</span>'
+
     else
       threat_cat_str = threat_cat_array.join(', ')
 
@@ -299,11 +298,11 @@ window.place_threat_category = (uri) ->
         curr_cat = '.threat-cat-cell:contains(' + this.toString() + ')'
         $(curr_cat).find('input').prop('checked', true)
 
-      # double-check the wl/bl checkboxes are checked
-      wlbl_checkbox_update()
-
       unless $('.wlbl-and-threat-area').text().includes('WL-')
         $('.threat-cat-row').removeClass('hidden')
+
+    # double-check the wl/bl checkboxes are checked
+    wlbl_checkbox_update()
 
     $('.wlbl-threat-cat, .wlbl-threat-cat-inline').html(threat_cat_str)
 
@@ -317,9 +316,6 @@ window.place_threat_category = (uri) ->
       $('span.threat-cat-wlbl-research').remove()
 
   .then null, (err) ->
-    std_msg_error('WL/BL Error',['There was an error retrieving Threat Categories.'])
-
-  .catch (err) ->
     std_msg_error('WL/BL Error',['There was an error retrieving Threat Categories.'])
 
 
