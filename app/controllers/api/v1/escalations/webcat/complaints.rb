@@ -325,6 +325,62 @@ module API
               end
             end
 
+            #####REPORT STATS######
+
+            # curl -X POST -k -H "Authorization: Basic Y2xhY2xhaXI6RG91cGlleGVpOEFu" -H "Token: spMbfr4zXYPyyt3yRrRq" https://analyst-console.vrt.sourcefire.com/escalations/api/v1/escalations/user_preferences/
+            # curl -X POST -k -H "Token: spMbfr4zXYPyyt3yRrRq" --negotiate -u : https://analyst-console.vrt.sourcefire.com/escalations/api/v1/escalations/user_preferences/
+            # curl -X GET -k -H "Token: spMbfr4zXYPyyt3yRrRq" "localhost:3000/escalations/api/v1/escalations/webcat/complaints/complaint_report_stats?date_from=2019-04-07+12:23:23&date_to=2019-04-20+12:23:23"
+            params do
+              requires :date_from, type: DateTime
+              requires :date_to, type: DateTime
+            end
+            get 'complaint_report_stats' do
+
+              created_array = []
+              assigned_array = []
+              resolved_array = []
+
+              to = permitted_params[:date_to]
+              from = permitted_params[:date_from]
+
+              window = "(case_resolved_at between '#{from}' and '#{to}') or (case_assigned_at between '#{from}' and '#{to}') or (created_at between '#{from}' and '#{to}')"
+
+              tix = ComplaintEntry.where(window)
+
+              tix.each do |tic|
+                if tic.case_resolved_at.present?
+                  if tic.case_resolved_at >= from && tic.case_resolved_at <= to
+                    resolved_array << tic
+                  end
+                end
+
+                if tic.case_assigned_at.present?
+                  if tic.case_assigned_at >= from && tic.case_assigned_at <= to
+                    assigned_array << tic
+                  end
+                end
+
+                if tic.created_at >= from && tic.created_at <= to
+                  created_array << tic
+                end
+              end
+
+              total = created_array + assigned_array + resolved_array
+
+              {:count => total.size, :data => total}.to_json
+
+            end
+
+            params do
+              requires :date_from, type: DateTime
+              requires :date_to, type: DateTime
+            end
+            get 'rule_report_stats' do
+              #TODO: filed a feature request with the Ukraine team
+              # https://jira.sco.cisco.com/browse/SAWEB-3063
+
+            end
+
           end
         end
       end
