@@ -238,12 +238,12 @@ window.bulk_get_current_wlbl = (page) ->
             list_types = ''
             wbrs_score = wbrs
           if wbrs_score == null
-            wbrs_score = '<span class="missing-data">No score.</span>'
+            wbrs_score = '<span class="missing-data text-left">No Score</span>'
           if comment == null
             comment = ''
 
           # TODO: LOGIC ERROR HERE FOR LAST ROW (REPEATS SAME SCORE FOR ALL ROWS), NEEDS CORRECTION IN SEPARATE TICKET
-          $(tbody).append('<tr class="wlbl-dropdown-row">' + '<td class="wlbl-entry-content">' + ip_uri + '</td><td class="wlbl-entry-wlbl">' + list_types + '</td>' + '<td class="wlbl-current-entry-wbrs text-center">' + wbrs_score + '</td>' + '<td class="wlbl-threat-cat pad-left-xl"></td>')
+          $(tbody).append('<tr class="wlbl-dropdown-row">' + '<td class="wlbl-entry-content">' + ip_uri + '</td><td class="wlbl-entry-wlbl">' + list_types.join(', ') + '</td>' + '<td class="wlbl-current-entry-wbrs text-center">' + wbrs_score + '</td>' + '<td class="wlbl-threat-cat pad-left-xl"></td>')
 
         comment_box.text(comment_trail)
       error: (response) ->
