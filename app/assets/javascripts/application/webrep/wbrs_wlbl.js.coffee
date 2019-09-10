@@ -110,7 +110,7 @@ window.get_current_wlbl = (button) ->
             initial_bl_heavy_status = bl_heavy_status
 
         $(wbrs_score).text(wbrs)
-        $(wlbl_list[0]).text(response.data)
+        $(wlbl_list[0]).text(response.data.join(', '))
         $(submit_button[0]).attr('disabled', false)
       else
         $(wbrs_score).text(wbrs)
@@ -242,7 +242,7 @@ window.bulk_get_current_wlbl = (page) ->
           if comment == null
             comment = ''
 
-          # TODO: LOGIC ERROR HERE FOR LAST ROW HERE, NEEDS CORRECTION IN SEPARATE TICKET
+          # TODO: LOGIC ERROR HERE FOR LAST ROW (REPEATS SAME SCORE FOR ALL ROWS), NEEDS CORRECTION IN SEPARATE TICKET
           $(tbody).append('<tr class="wlbl-dropdown-row">' + '<td class="wlbl-entry-content">' + ip_uri + '</td><td class="wlbl-entry-wlbl">' + list_types + '</td>' + '<td class="wlbl-current-entry-wbrs text-center">' + wbrs_score + '</td>' + '<td class="wlbl-threat-cat pad-left-xl"></td>')
 
         comment_box.text(comment_trail)
