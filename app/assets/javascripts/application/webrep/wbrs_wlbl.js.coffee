@@ -233,7 +233,7 @@ window.bulk_get_current_wlbl = (page) ->
 
           comment = entry['notes']
           if list_types
-            list_types = entry['list_types']
+            list_types = entry['list_types'].join(', ')
           else
             list_types = ''
             wbrs_score = wbrs
@@ -243,7 +243,7 @@ window.bulk_get_current_wlbl = (page) ->
             comment = ''
 
           # TODO: LOGIC ERROR HERE FOR LAST ROW (REPEATS SAME SCORE FOR ALL ROWS), NEEDS CORRECTION IN SEPARATE TICKET
-          $(tbody).append('<tr class="wlbl-dropdown-row">' + '<td class="wlbl-entry-content">' + ip_uri + '</td><td class="wlbl-entry-wlbl">' + list_types.join(', ') + '</td>' + '<td class="wlbl-current-entry-wbrs text-center">' + wbrs_score + '</td>' + '<td class="wlbl-threat-cat pad-left-xl"></td>')
+          $(tbody).append('<tr class="wlbl-dropdown-row">' + '<td class="wlbl-entry-content">' + ip_uri + '</td><td class="wlbl-entry-wlbl">' + list_types + '</td>' + '<td class="wlbl-current-entry-wbrs text-center">' + wbrs_score + '</td>' + '<td class="wlbl-threat-cat pad-left-xl"></td>')
 
         comment_box.text(comment_trail)
       error: (response) ->
