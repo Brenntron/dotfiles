@@ -211,6 +211,21 @@ module API
                 {:status => "success", :data => disputes, :assignee => assignee}.to_json
               end
             end
+
+            params do
+              requires :sha256_hash, type: String
+            end
+
+            post 'submit_for_evaluation' do
+              std_api_v2 do
+                authorize!(:update, FileReputationDispute)
+
+                FileReputationDispute.submit_for_evaluation(permitted_params[:sha256_hash])
+
+                {:status => "success"}.to_json
+
+              end
+            end
           end
         end
       end

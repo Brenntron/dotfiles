@@ -28,6 +28,25 @@ window.refresh_research_data = (sha256_hash) ->
   window.research_data(sha256_hash)
   window.update_file_rep_data()
 
+# Resubmit hash to all the analysis engines
+window.evaluate_file = (sha256_hash) ->
+  sha256_hash = $('#sha256_hash')[0].innerText
+  std_msg_ajax(
+    method: 'GET'
+    url: "/escalations/api/v1/escalations/file_rep/submit_for_evaluation/"
+    data: {sha256_hash: sha256_hash}
+    success_reload: false
+    success: (response) ->
+
+
+    error: (response) ->
+  # $('#rl-loader').hide()
+      std_api_error(response, "There was a problem retrieving data from the Sample Zoo", reload: false)
+  )
+
+
+
+
 
 ########### COMPILE RESEARCH REPORTS ############
 # Grabs the initial data for all three reports / datasets
