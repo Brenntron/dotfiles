@@ -13,7 +13,7 @@ class Threatgrid::Search
     threat_score = api_response&.dig('data','items')[0]&.dig('item','analysis','threat_score')
     threatgrid_private = api_response&.dig('data','items')[0]&.dig('item','private')
 
-    {threatgrid_score: threat_score, threatgrid_private: threatgrid_private, threatgrid_threshold: 95.0}
+    {threatgrid_score: threat_score, threatgrid_private: threatgrid_private, threatgrid_threshold: 90.0}
   end
 
   def self.data(sha256_hash)
