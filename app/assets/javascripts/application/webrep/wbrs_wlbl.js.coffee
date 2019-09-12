@@ -67,6 +67,9 @@ window.get_current_wlbl = (button) ->
   initial_bl_med_status = ''
   initial_bl_heavy_status = ''
 
+  # get and place the threat category for wl/bl inline
+  place_threat_category(entry_content, 'inline')
+
   # Send entry content to wbrs
   data = {
     'entry': entry_content
@@ -229,7 +232,8 @@ window.bulk_get_current_wlbl = (page) ->
           list_types = entry['list_types']
           wbrs_score = entry['wbrs_score']
 
-          place_threat_category(ip_uri)
+          # get and place the threat category for wl/bl bulk adjust
+          place_threat_category(ip_uri, 'bulk')
 
           comment = entry['notes']
           if list_types
@@ -259,20 +263,21 @@ window.wlbl_checkbox_update = () ->
   cb_array = []
 
   # get the existing lists "WL-heavy, BL-weak, etc"
-  if $('.wlbl-entry-wlbl').length > 0 ||
+  if $('.wlbl-entry-wlbl').length > 0
     wl_bl_str = $('.wlbl-entry-wlbl').text().toLowerCase()
   else if $('.wlbl-table-result').length > 0
     wl_bl_str = $('.wlbl-table-result').text().toLowerCase()
 
-  cb_array = wl_bl_str.split(',')
+  cb_array = wl_bl_str.split(', ')  # string of list entries (i.e.: Wl-weak, Bl-med, etc)
 
   $(cb_array).each ->
-    curr_checkbox = '.lists-row input[class*="' + this + '"]'
+    curr_checkbox = '.lists-row input[class*="' + this + '"]'  # i.e. this checkbox has "wl-weak"
     $(curr_checkbox).prop('checked', true)
 
 
 #### THREAT CATEGORY(s) - ADJUST WL/BL BULK, ADJUST WL/BL INLINE, RESEARCH TAB + BFRP RESULTS ####
-window.place_threat_category = (uri) ->
+# where_string is where should the threat category to be placed?
+window.place_threat_category = (uri, page) ->
   ip_uri = uri
   threat_cat_str = ''  # used only for display purposes
   threat_cat_json = get_threat_categories(uri)
@@ -301,72 +306,27 @@ window.place_threat_category = (uri) ->
       unless $('.wlbl-and-threat-area').text().includes('WL-')
         $('.threat-cat-row').removeClass('hidden')
 
-    # double-check the wl/bl checkboxes are checked
+    # where should threat category be placed? bulk dropdown, inline dropdown, or research row
+    if page == 'bulk'
+      $('.wlbl-threat-cat').html(threat_cat_str)
+    else if page == 'inline'
+      $('.wlbl-threat-cat-inline').html(threat_cat_str)
+    else if page == 'research-bfrp' || page == 'research-show'
+      $('.threat-cat-wlbl-research').html(threat_cat_str)
+      if $('.wlbl-table-result').text().includes('BL-')  # blacklist? ensure enough space
+        $('span.threat-cat-wlbl-research').html(threat_cat_str)
+        $('.wlbl-and-threat-area').css('width', '250px')
+      else if $('.wlbl-table-result').text().includes('WL-')  # whitelist? remove the TC span
+        $('span.threat-cat-wlbl-research').remove()
+
+    # double-check the wl/bl checkboxes are correctly checked
     wlbl_checkbox_update()
 
-    $('.wlbl-threat-cat, .wlbl-threat-cat-inline').html(threat_cat_str)
-
-    # on research rows, only place the threat cat if it's on a bl, add threat cats into that table cell
-    if $('.wlbl-table-result').text().includes('BL-')
-      $('span.threat-cat-wlbl-research').html(threat_cat_str)
-      $('.wlbl-and-threat-area').css('width', '250px')  # ensure width to handle mult threat cats
-
-    # on research rows, if wl entry, no need for threat cats at all
-    else if $('.wlbl-table-result').text().includes('WL-')
-      $('span.threat-cat-wlbl-research').remove()
-
+# error handling for bad json response
   .then null, (err) ->
-    std_msg_error('WL/BL Error',['There was an error retrieving Threat Categories.'])
+    tc_elements = '.wlbl-threat-cat, .wlbl-threat-cat-inline, .threat-cat-wlbl-research'
+    $(tc_elements).html('<span class="error-threat-cat"></span>')
 
-
-
-
-#### FORM MANIPULATION ####
-
-## WL/BL Form manipulation
-$ ->
-  # WL + BL checkbox logic in WL/BL dropdowns
-  $('.lists-row input').change ->
-    cb_class = $(this).attr('class').split(' ')[0]  # each input has a few classes, get the first one
-    if cb_class.includes('bl-')  # bl checkbox: show threat cat row or hide
-      if $('.lists-row input[class^="bl-"]:checked').length == 0
-        $('.threat-cat-row').addClass('hidden')
-      else
-        $('.threat-cat-row').removeClass('hidden')
-    else   # wl checkbox: enable submit button logic
-      if $('.lists-row input[class^="wl-"]:checked').length > 0
-        $('.dropdown-submit-button').prop('disabled', false)
-      else
-        $('.dropdown-submit-button').prop('disabled', true)
-
-  # BL: enable submit + limit 5 tc's + bold the note
-  $('.threat-cat-row input').change ->
-    if $('.lists-row input[class^="bl-"]:checked').length > 0 && $('.threat-cat-row input:checked').length > 0
-      $('.dropdown-submit-button').prop('disabled', false)
-    else
-      $('.dropdown-submit-button').prop('disabled', true)
-
-    if $('.threat-cat-row input:checked').length > 5
-      this.checked = false
-      $('.threat-cat-required .five-note').addClass('required-bold')
-    else
-      $('.threat-cat-required .five-note').removeClass('required-bold')
-
-  # add to list clicked or re-clicked? re-show the threat cat row
-  $('#wlbl-add').click ->
-    if $('.lists-row input[class^="bl-"]:checked').length > 0
-      $('.threat-cat-row').removeClass('hidden')
-
-  # remove from list clicked? hide the threat cat row
-  $('#wlbl-remove').click ->
-    $('.threat-cat-row').addClass('hidden')
-
-    # page-load for research tab results row or bfrp page results row? place the threat cat(s), its a separate api call
-  $('.dispute-entry-ip-uri').ready ->
-    place_threat_category($('.dispute-entry-ip-uri').text())
-
-  $('.searched-for-url').ready ->
-    place_threat_category($('.searched-for-url').text())
 
 
 #### SUBMISSION OF WL/BL CHANGES TO WBRS ####
@@ -657,3 +617,82 @@ window.wlbl_history_dialog = (id) ->
     error: (response) ->
       notice_html = "<p>Something went wrong: #{response.responseText}</p>"
   , this)
+
+
+# WL/BL dropdowns checkbox logic
+window.addWlBlListeners = () ->
+
+  # WL OR BL LIST CHECKBOX change? lots of logic/scenarios for these checkboxes
+  $('.dispute-wlbl-adjust-wrapper input').change ->
+    cb_value = ''
+    cb_class = ''
+
+    cb_value = $(this).prop('value')
+    if $(this).prop('class').length > 0
+      cb_class = $(this).prop('class').split(' ')[0]  # first class for that element
+
+    # do a find THIS CURRENT ROW for each below
+    wl_num = $('.lists-row input[value^="WL-"]:checked').length
+    bl_num = $('.lists-row input[value^="BL-"]:checked').length
+    tc_num = $('.threat-cat-row input:checked').length
+    all_cbs = $('.dispute-wlbl-adjust-wrapper input[type="checkbox"]')
+    submit_button = $('.dropdown-submit-button')
+
+    # submit button should always be disabled except for certain criteria
+    submit_button.prop('disabled', true)
+
+    #### SUBMIT BUTTON LOGIC BELOW ####
+    #### SUBMIT BUTTON LOGIC BELOW ####
+    # few scenarios where the submit button is unlocked
+    if cb_value.includes('WL-') && wl_num > 0
+      submit_button.prop('disabled', false)
+    if cb_value.includes('BL-') && $('#wlbl-remove').prop('checked') == true
+      submit_button.prop('disabled', false)
+    if cb_class.includes('wlbl_thrt_cat_id') && bl_num > 0
+      submit_button.prop('disabled', false)
+
+    ##### ADD TO or REMOVE FROM #####
+    ##### ADD TO or REMOVE FROM #####
+    if $(this).attr('id') == 'wlbl-add' || $(this).attr('id') == 'wlbl-remove'
+      console.log 'you clicked add or remove radio buttons'
+
+      $(all_cbs).prop('checked', false)
+      $('.threat-cat-row').addClass('hidden')
+      if bl_num > 0 && $(this).attr('id') == 'wlbl-add'  # if BL checkbox + Add to list click
+        $('.threat-cat-row').removeClass('hidden')
+
+
+    #### LISTS ROW STUFF BELOW ####
+    #### LISTS ROW STUFF BELOW ####
+    # BL CHECKBOX click: show the threat cat row if "add to list" is toggled
+    if cb_value.includes('BL-') && $('#wlbl-add').prop('checked') == true
+      console.log 'you clicked a BL checkbox'
+      $('.threat-cat-row').removeClass('hidden')
+      if bl_num == 0
+        $('.threat-cat-row input').prop('checked', false)
+        $('.threat-cat-row').addClass('hidden')
+
+
+    ##### THREAT CATEGORY ROW BELOW ####
+    ##### THREAT CATEGORY ROW BELOW ####
+    if cb_class.includes('wlbl_thrt_cat_id')
+      if tc_num > 5    # limit to 5 threat cats + bold the note
+        this.checked = false
+        $('.five-note').addClass('required-bold')
+      else
+        $('.five-note').removeClass('required-bold')
+
+
+  # BFRP RESEARCH ROW specific class - place the threat cat
+  $('.searched-for-url').ready ->
+    place_threat_category($('.searched-for-url').text(), 'research-bfrp')
+
+  # RESEARCH TAB RESEARCH ROW specific class - place the threat cat
+  $('.dispute-entry-ip-uri').ready ->
+    place_threat_category($('.dispute-entry-ip-uri').text(), 'research-show')
+
+
+# on page load, add the wl/bl input event listeners inside the dropdowns
+$ ->
+  addWlBlListeners()
+
