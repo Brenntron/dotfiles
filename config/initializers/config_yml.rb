@@ -41,12 +41,17 @@ raise "config.yml missing cert section" unless env_config['cert']
 Rails.configuration.cert_file           = env_config['cert']['vrt']
 
 
-# New apirequester interface
 peakebridge_config = env_config.fetch('peakebridge', {})
-raise "config.yml missing peakebridge section" if peakebridge_config.empty?
-Rails.configuration.peakebridge         = ApiRequester::ApiRequester.config_of(peakebridge_config)
-pb_sources = peakebridge_config.fetch('sources', {})
-Rails.configuration.peakebridge.sources = pb_sources
+peakebridge                             = OpenStruct.new
+peakebridge.host                        = peakebridge_config['host']
+peakebridge.port                        = peakebridge_config['port']
+peakebridge.verify_mode                 = peakebridge_config['verify_mode'] || peakebridge_config['tls_mode'] || peakebridge_config['ssl_mode']
+peakebridge.uri_base                    = peakebridge_config['uri_base']
+peakebridge.ca_cert_file                = peakebridge_config['ca_cert_file']
+peakebridge.sources                     = peakebridge_config['sources'] || []
+peakebridge.open_timeout = peakebridge_config['timeout'] || Rails.configuration.api_master_timeout
+peakebridge.read_timeout = peakebridge_config['timeout'] || Rails.configuration.api_master_timeout
+Rails.configuration.peakebridge         = peakebridge
 
 
 raise "config.yml missing perl section" unless env_config['perl']
@@ -71,6 +76,7 @@ Rails.configuration.ruletest_server     = env_config['ruletest']['url']
 sds_config = env_config.fetch('sds', nil)
 raise 'config.yml missing SDS section' unless sds_config
 Rails.configuration.sds                 = ApiRequester::ApiRequester.config_of(sds_config)
+Rails.configuration.sds.cert_file       = sds_config['cert_file'] || sds_config['ca_cert_file']
 Rails.configuration.sds.pkey_file       = sds_config['pkey_file']
 
 
@@ -108,11 +114,12 @@ Rails.configuration.xbrs                = ApiRequester::ApiRequester.config_of(x
 Rails.configuration.xbrs.consumer_key   = xbrs_config['consumer_key']
 
 
+virustotal = env_config.fetch('virustotal', nil)
+Rails.configuration.virus_total          = ApiRequester::ApiRequester.config_of(virustotal)
+Rails.configuration.virus_total.url      = virustotal['url']
 virustotal = env_config.fetch('auto_resolve',{}).fetch('virus_total', nil)
 raise 'config.yml missing virus_total section' unless virustotal
-Rails.configuration.virustotal          = ApiRequester::ApiRequester.config_of(virustotal)
-Rails.configuration.virustotal.check    = virustotal['check']
-Rails.configuration.virustotal.url      = virustotal['url']
+Rails.configuration.virus_total.check    = virustotal['check']
 
 # New apirequester interface
 bls_config = env_config.fetch('bls', {})
