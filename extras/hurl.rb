@@ -2,6 +2,7 @@
 
 require 'fileutils'
 require 'digest'
+require 'pry'
 
 
 # This is an install system which, unlike deploy_api.rb, avoids using the talosweb service account.
@@ -29,7 +30,7 @@ require 'digest'
 
 
 class HurlArgs
-  attr_reader :source_arg, :project, :build_base, :output_tar_path, :env, :version
+  attr_reader :source_arg, :project, :build_base, :output_tar_path, :env, :version, :user, :host
   attr_reader :do_vendor_bundle, :do_precompile_assets, :do_upload, :do_disgorge
 
   def self.usage
@@ -52,6 +53,7 @@ class HurlArgs
     puts "--no-disgorge      app will not be expanded on the server"
     puts "--version=<ver>    use ver as VERSION, for name of disgorged tar file"
     puts "--user=<usr>       use the specified user directory to build AC"
+    puts "--host=<host>    use the specified server host to upload the build"
     exit
   end
 
@@ -67,6 +69,7 @@ class HurlArgs
     @do_disgorge            = true
     @bundler_version        = '_1.16.1_'
     @user                   = `whoami`.chomp
+    @host                   = 'rulesuitest'
   end
 
   def scan_args(args)
@@ -109,6 +112,9 @@ class HurlArgs
         when /\A--user=(?<user>.*)\z/
           /\A--user=(?<user>.*)\z/ =~ arg
           @user = user
+        when /\A--host=(?<host>.*)\z/
+          /\A--host=(?<host>.*)\z/ =~ arg
+          @host = host
         when /\A-/
           puts "One of your flags '#{arg}' is not valid. Ignored, use -h or --help"
           self.class.usage
@@ -204,6 +210,11 @@ class HurlArgs
   def gen_output_tar_path
     "#{build_base}/#{base_dir}.tar.gz"
   end
+
+  def host
+    @host
+  end
+
 end
 
 
@@ -266,8 +277,8 @@ class Hurl
 
   def hurl(tar_path, relative_dir: args.relative_dir)
     puts "* hurling tar to remote system."
-    puts "scp #{tar_path} rulesuitest.vrt.sourcefire.com:#{relative_dir}"
-    system "scp #{tar_path} rulesuitest.vrt.sourcefire.com:#{relative_dir}"
+    puts "scp #{tar_path} #{@args.host}.vrt.sourcefire.com:#{relative_dir}"
+    system "scp #{tar_path} #{@args.host}.vrt.sourcefire.com:#{relative_dir}"
   end
 
   def disgorge_cmd
@@ -281,7 +292,7 @@ class Hurl
 
   def disgorge(args)
     puts disgorge_cmd
-    system "ssh rulesuitest.vrt.sourcefire.com '#{disgorge_cmd}'"
+    system "ssh #{@args.host}.vrt.sourcefire.com '#{disgorge_cmd}'"
   end
 
   def run
@@ -292,8 +303,8 @@ class Hurl
         output_tar_path = args.input_tar_path
       else
         output_tar_path = args.gen_output_tar_path
-        puts "curl -Lk https://git.vrt.sourcefire.com/talosweb/#{args.project}/tarball/#{args.base_dir} > #{output_tar_path}"
-        system "curl -Lk https://git.vrt.sourcefire.com/talosweb/#{args.project}/tarball/#{args.base_dir} > #{output_tar_path}"
+        puts "curl -Lku #{@args.user} https://git.vrt.sourcefire.com/talosweb/#{args.project}/tarball/#{args.base_dir} > #{output_tar_path}"
+        system "curl -Lku #{@args.user} https://git.vrt.sourcefire.com/talosweb/#{args.project}/tarball/#{args.base_dir} > #{output_tar_path}"
       end
     end
 
