@@ -87,7 +87,7 @@
                     .row.dropdown-tool-grey-row.threat-cat-row.hidden
                       .threat-cat-note
                         %label.content-label-sm
-                          Threat Categories -
+                          Threat Categories
                           %span.threat-cat-required
                             *Required for adding to any blacklist.
                             %span.five-note Up to 5 can be selected
@@ -245,7 +245,8 @@
                       %span.dispute_rep_tools_wrapper
                         %span.dropdown
                           %button.dispute-inline-buttons.adjust-wlbl-button.bfrp-inline-wlbl-button.dropdown-toggle{title: 'Adjust WL/BL', 'data-toggle': 'dropdown', 'aria-haspopup': 'true', 'aria-expanded': 'false', onclick: 'get_current_wlbl(this);'}
-                          .dropdown-menu
+                          -# adding a unique id for this wl/bl dropdown + strip out special chars
+                          .dropdown-menu{id: "wlbl_adjust_#{entry.hostlookup.gsub!(/[.:\/]/,'')}"}
                             = form_for :wlbl, html: {class: 'adjust-wlbl-form'} do |wlbl_form|
                               .dispute-wlbl-adjust-wrapper
                                 %input.adjust-wlbl-input.dispute-entry-content{type: 'hidden', value: "#{entry.hostlookup}" }
@@ -313,7 +314,7 @@
                                   .row.dropdown-tool-grey-row.threat-cat-row.hidden
                                     .threat-cat-note
                                       %label.content-label-sm
-                                        Threat Categories -
+                                        Threat Categories
                                         %span.threat-cat-required
                                           *Required for adding to any blacklist.
                                           %span.five-note Up to 5 can be selected

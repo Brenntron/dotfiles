@@ -609,37 +609,60 @@ window.place_threat_category = (uri, placement) ->
 
 
 
-# WL/BL dropdowns checkbox logic
-window.addCbListeners = () ->
-  # checkboxes inside bulk/inline/research adjust wl/bl dropdowns pass through here
+# WL/BL dropdowns checkbox validation logic, these get added for these dropdowns on page load
+window.addValidationListeners = () ->
 
-  # 'THIS dropdown' LOGIC NEEDS TO BE ADDED HERE
-  # 'THIS dropdown' LOGIC NEEDS TO BE ADDED HERE
-  # 'THIS dropdown' LOGIC NEEDS TO BE ADDED HERE
-  $('.dispute-wlbl-adjust-wrapper input').click (e) ->
+  # after a click inside wl/bl dropdown, fig out where you are, get the dropdown id for the validation inside that specific dropdown
+  $('.dispute-wlbl-adjust-wrapper input').click ->
     cb_value = ''
     cb_class = ''
+    curr_dropdown_id = ''
+
+    # determine page user is on to get the id of the dropdown this input is in, use that id for input validation
+    if $('#wlbl_adjust_entries_index').length > 0  # INDEX PAGE BULK
+      curr_dropdown_id = '#wlbl_adjust_entries_index'  # dropdown: INDEX > BULK
+    else if $('#research_tab').length > 0 && $(this).closest('.dispute-wlbl-adjust-wrapper').has('.toggle-slider').length == 0  # RESEARCH TAB BULK
+      curr_dropdown_id = '#' + $(this).closest('.dropdown-menu').attr('id')  #  dropdown: RESEARCH TAB > BULK, use this id below to do validation
+    else if $('#research_tab').length > 0 && $(this).closest('.dispute-wlbl-adjust-wrapper').has('.toggle-slider').length > 0  # RESEARCH TAB INLINE
+      curr_dropdown_id = '#' + $(this).closest('.dropdown-menu').attr('id')  # dropdown: RESEARCH TAB > INLINE
+    else if $('.reputation-research-search-wrapper').length > 0 && $(this).closest('.dispute-wlbl-adjust-wrapper').has('.toggle-slider').length == 0  # BFRP BULK
+      curr_dropdown_id = '#' + $(this).closest('.dropdown-menu').attr('id')  # dropdown: BFRP BULK
+    else if $('.reputation-research-search-wrapper').length > 0 && $(this).closest('.dispute-wlbl-adjust-wrapper').has('.toggle-slider').length > 0  # BFRP INLINE
+      curr_dropdown_id = '#' + $(this).closest('.dropdown-menu').attr('id')  # dropdown: BFRP INLINE
+
 
     cb_value = $(this).attr('value')
     if $(this).prop('class').length > 0
       cb_class = $(this).attr('class').split(' ')[0]  # first class for that element
 
-    # do a find THIS CURRENT ROW for each below
-    wl_num = $('.lists-row input[value^="WL-"]:checked').length
-    bl_num = $('.lists-row input[value^="BL-"]:checked').length
-    tc_row = $('.threat-cat-row')
-    tc_num = $('.threat-cat-row input:checked').length
-    all_cbs = $('.dispute-wlbl-adjust-wrapper input[type="checkbox"]')
-    submit_button = $('.dropdown-submit-button')
+    # PREFIX ALL OF THESE WITH curr_dropdown_id, CHANGE THIS FOR ALL $('') SELECTORS BELOW THIS LINE
+    wl_num = $(curr_dropdown_id).find('.lists-row input[value^="WL-"]:checked').length
+    bl_num = $(curr_dropdown_id).find('.lists-row input[value^="BL-"]:checked').length
+    tc_row = $(curr_dropdown_id).find('.threat-cat-row')
+    tc_num = $(curr_dropdown_id).find('.threat-cat-row input:checked').length
+    all_cbs = $(curr_dropdown_id).find('.dispute-wlbl-adjust-wrapper input[type="checkbox"]')
+    submit_button = $(curr_dropdown_id).find('.dropdown-submit-button')
+
+#    console.log wl_num + ' wl num'
+#    console.log bl_num + ' bl num'
+#    console.log tc_num + ' tc num'
 
     # submit button should be disabled for ALL clicks EXCEPT for certain criteria unlocks it
     submit_button.prop('disabled', true)
 
     # clean slate this
-    $('#wlbl-add, #wlbl-remove').click ->
+    $(curr_dropdown_id).find('#wlbl-add, #wlbl-remove').click ->
       submit_button.prop('disabled', true)
-      $(tc_row).addClass('hidden')
-      $(all_cbs).prop('checked', false)
+      $(curr_dropdown_id).find(tc_row).addClass('hidden')
+      $(curr_dropdown_id).find(all_cbs).prop('checked', false)
+
+    # if add to list is toggled, ensure the note inside tc row is visible
+    if $(curr_dropdown_id).find('#wlbl-add').prop('checked')
+      $(curr_dropdown_id).find('.threat-cat-required').removeClass('hidden')
+
+      # if remove from list is toggled, ensure the note inside tc row is hidden
+    if $(curr_dropdown_id).find('#wlbl-remove').prop('checked')
+      $(curr_dropdown_id).find('.threat-cat-required').addClass('hidden')
 
     # enable submit: 4 scenarios to unlock it
     if wl_num == 0 && bl_num > 0 && tc_num > 0
@@ -651,27 +674,28 @@ window.addCbListeners = () ->
     else if wl_num > 0 && bl_num > 0 && tc_num > 0
       submit_button.prop('disabled', false)
 
-    else if $('#wlbl-remove').prop('checked') && bl_num > 0 && tc_num == 0
+    else if $(curr_dropdown_id).find('#wlbl-remove').prop('checked') && bl_num > 0 && tc_num == 0
       # scenario: Remove from list, allow a BL to be removed w/ no TC's checked
       submit_button.prop('disabled', false)
-
 
     # TC CHECKBOX click: if already 5 tc's checked, stop them, bold the note, max is 5
     if cb_class.includes('wlbl_thrt_cat_id')
       if tc_num > 5
         this.checked = false
-        $('.five-note').addClass('required-bold')
+        $(curr_dropdown_id).find('.five-note').addClass('required-bold')
       else
-        $('.five-note').removeClass('required-bold')
+        $(curr_dropdown_id).find('.five-note').removeClass('required-bold')
 
     # BL CHECKBOX click: show the threat cat row if "add to list" is toggled
     if cb_value.includes('BL-') && bl_num > 0
-      $(tc_row).removeClass('hidden')
+      $(curr_dropdown_id).find(tc_row).removeClass('hidden')
 
     else if cb_value.includes('BL-') && bl_num == 0
       $('.threat-cat-row input').prop('checked', false)
-      $(tc_row).addClass('hidden')
+      $(curr_dropdown_id).find(tc_row).addClass('hidden')
 
+
+  # below are not dropdown specific, they exist on the page itself
   # BFRP RESEARCH specific selector - place the threat cat
   $('.searched-for-url').ready ->
     place_threat_category($('.searched-for-url').text(), 'research-row')
@@ -681,7 +705,8 @@ window.addCbListeners = () ->
     place_threat_category($('.dispute-entry-ip-uri').text(), 'research-row')
 
 
+
 # on page load, add the wl/bl + tc input event listeners inside the dropdowns
 $ ->
-  addCbListeners()
+  addValidationListeners()
 
