@@ -41,15 +41,6 @@ raise "config.yml missing cert section" unless env_config['cert']
 Rails.configuration.cert_file           = env_config['cert']['vrt']
 
 
-# New apirequester interface
-peakebridge_config = env_config.fetch('peakebridge', {})
-raise "config.yml missing peakebridge section" if peakebridge_config.empty?
-Rails.configuration.peakebridge         = ApiRequester::ApiRequester.config_of(peakebridge_config)
-pb_sources = peakebridge_config.fetch('sources', {})
-Rails.configuration.peakebridge.sources = pb_sources
-
-
-
 peakebridge_config = env_config.fetch('peakebridge', {})
 peakebridge                             = OpenStruct.new
 peakebridge.host                        = peakebridge_config['host']
