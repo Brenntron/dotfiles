@@ -10395,6 +10395,7 @@ span.threat-cat-required {
 span.threat-cat-required .five-note {
   padding-top: 0;
 }
+
 span.threat-cat-required, span.threat-cat-required .five-note {
   color: $warning-accent-color;
   font-size: 7pt;
@@ -10475,4 +10476,8 @@ span.threat-cat-no-data {
 
 .dispute-entry-col {
   min-width: 200px;
+}
+
+table.dispute_tool_current th.th-threat-cat {
+  padding-left: 2px !important;  // override needed
 }

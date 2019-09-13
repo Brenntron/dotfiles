@@ -257,81 +257,6 @@ window.bulk_get_current_wlbl = (page) ->
     std_msg_error('No rows selected', ['Please select at least one entry row.'])
     return false
 
-# ensure the WL/BL checkboxes are toggled correctly
-window.wlbl_checkbox_verify = () ->
-  wl_bl_str = ''  # str will contain wl/bl list: "bl-heavy, bl-weak"
-  cb_array = []
-
-  # get the existing lists "WL-heavy, BL-weak, etc"
-  if $('.wlbl-entry-wlbl').length > 0
-    wl_bl_str = $('.wlbl-entry-wlbl').text().toLowerCase()
-  else if $('.wlbl-table-result').length > 0
-    wl_bl_str = $('.wlbl-table-result').text().toLowerCase()
-
-  cb_array = wl_bl_str.split(', ')  # string of list entries (i.e.: Wl-weak, Bl-med, etc)
-
-  $(cb_array).each ->
-    curr_checkbox = '.lists-row input[class*="' + this + '"]'  # i.e. this checkbox has "wl-weak"
-    $(curr_checkbox).prop('checked', true)
-
-  # is the wlbl text is empty? ensure no toggle the threat cat row or threat cab checkboxes
-  if $('.wlbl-entry-wlbl').length > 0 && $('.wlbl-entry-wlbl').text() == ''
-    $('.threat-cat-row').addClass('hidden')
-    $('.threat-cat-row input').prop('checked', false)
-    $('.wlbl-threat-cat').empty()
-
-
-#### THREAT CATEGORY(s) - ADJUST WL/BL BULK, ADJUST WL/BL INLINE, RESEARCH TAB + BFRP RESULTS ####
-# page is where should the threat category to be placed
-window.place_threat_category = (uri, page) ->
-  ip_uri = uri
-  threat_cat_str = ''  # will be used only for display purposes
-  threat_cat_json = get_threat_categories(uri)
-
-  # use a promise for the threat cat api call, could take up to 1-2 seconds
-  threatCatPromise = new Promise (resolve, reject) ->
-    threat_cat_json = get_threat_categories(ip_uri)
-    if threat_cat_json
-      resolve threat_cat_json  # resolve goes to .then() below
-
-  threatCatPromise.then (result) ->
-    threat_cat_obj = JSON.parse(result)
-    threat_cat_array = threat_cat_obj.threat_categories
-
-    if threat_cat_array == undefined || threat_cat_array.length == 0
-      threat_cat_str = '<span class="threat-cat-no-data">No Category</span>'
-    else
-      threat_cat_str = threat_cat_array.join(', ')
-
-      # toggle the threat cat cb's in the dropdown
-      $(threat_cat_array).each ->
-        curr_cat = '.threat-cat-cell:contains(' + this.toString() + ')'
-        $(curr_cat).find('input').prop('checked', true)
-
-      unless $('.wlbl-and-threat-area').text().includes('WL-')
-        $('.threat-cat-row').removeClass('hidden')
-
-    # which dropdown or row to place the threat category(s)? bulk dropdown, inline dropdown, or research row (show page or bfrp)
-    if page == 'bulk'
-      $('.wlbl-threat-cat').html(threat_cat_str)
-    else if page == 'inline'
-      $('.wlbl-threat-cat-inline').html(threat_cat_str)
-    else if page == 'research-bfrp' || page == 'research-show'
-      $('.threat-cat-wlbl-research').html(threat_cat_str)
-      if $('.wlbl-table-result').text().includes('BL-')  # blacklist? ensure enough space
-        $('span.threat-cat-wlbl-research').html(threat_cat_str)
-        $('.wlbl-and-threat-area').css('width', '250px')  # ensure enough width for all lists + TC's
-      else if $('.wlbl-table-result').text().includes('WL-')  # whitelist? remove the TC span
-        $('span.threat-cat-wlbl-research').remove()
-
-    # double-check the wl/bl checkboxes are correctly checked
-    wlbl_checkbox_verify()
-
-  # error handling for the json response, leave the empty span
-  .then null, (err) ->
-    tc_elements = '.wlbl-threat-cat, .wlbl-threat-cat-inline, .threat-cat-wlbl-research'
-    $(tc_elements).html('<span class="error-threat-cat"></span>')
-
 
 
 #### SUBMISSION OF WL/BL CHANGES TO WBRS ####
@@ -624,6 +549,57 @@ window.wlbl_history_dialog = (id) ->
   , this)
 
 
+#### THREAT CATEGORY(s) - ADJUST WL/BL BULK, ADJUST WL/BL INLINE, RESEARCH TAB + BFRP RESULTS ####
+# page is where should the threat category to be placed
+window.place_threat_category = (uri, page) ->
+  ip_uri = uri
+  threat_cat_str = ''  # will be used only for display purposes
+  threat_cat_json = get_threat_categories(uri)
+
+  # use a promise for the threat cat api call, could take up to 1-2 seconds
+  threatCatPromise = new Promise (resolve, reject) ->
+    threat_cat_json = get_threat_categories(ip_uri)
+    if threat_cat_json
+      resolve threat_cat_json  # resolve goes to .then() below
+
+  threatCatPromise.then (result) ->
+    threat_cat_obj = JSON.parse(result)
+    threat_cat_array = threat_cat_obj.threat_categories
+
+    if threat_cat_array == undefined || threat_cat_array.length == 0
+      threat_cat_str = '<span class="threat-cat-no-data">No Category</span>'
+    else
+      threat_cat_str = threat_cat_array.join(', ')
+
+    # which dropdown or row to place the threat category(s)? bulk dropdown, inline dropdown, or research row (show page or bfrp)
+    if page == 'bulk'
+      $('.wlbl-threat-cat').html(threat_cat_str)
+
+    else if page == 'inline'
+      $('.wlbl-threat-cat-inline').html(threat_cat_str)
+
+    else if page == 'research-bfrp' || page == 'research-show'
+      $('.threat-cat-wlbl-research').html(threat_cat_str)
+
+      if $('.wlbl-table-result').text().includes('BL-')  # blacklist? ensure enough space
+        $('span.threat-cat-wlbl-research').html(threat_cat_str)
+        $('.wlbl-and-threat-area').css('width', '250px')  # ensure enough width for all lists + TC's
+      else if $('.wlbl-table-result').text().includes('WL-')  # whitelist? remove the TC span
+        $('span.threat-cat-wlbl-research').remove()
+
+    # fix the 1234computer.com problem scenario, dont show threat cat stuff if no BL exists
+    if $('.wlbl-entry-wlbl').length > 0 && $('.wlbl-entry-wlbl').text() == ''
+      $('.threat-cat-row').addClass('hidden')
+      $('.threat-cat-row input').prop('checked', false)
+      $('.wlbl-threat-cat').empty()
+
+  # error handling for the json response, leave the empty span
+  .then null, (err) ->
+    tc_elements = '.wlbl-threat-cat, .wlbl-threat-cat-inline, .threat-cat-wlbl-research'
+    $(tc_elements).html('<span class="error-threat-cat"></span>')
+
+
+
 # WL/BL dropdowns checkbox logic
 window.addCbListeners = () ->
   # checkboxes inside bulk/inline/research adjust wl/bl dropdowns pass through here
@@ -631,14 +607,11 @@ window.addCbListeners = () ->
   # 'THIS dropdown' LOGIC NEEDS TO BE ADDED HERE
   # 'THIS dropdown' LOGIC NEEDS TO BE ADDED HERE
   # 'THIS dropdown' LOGIC NEEDS TO BE ADDED HERE
-  $('.dispute-wlbl-adjust-wrapper input').change ->
+  $('.dispute-wlbl-adjust-wrapper input').click (e) ->
     cb_value = ''
     cb_class = ''
-    radio_id = ''   # radio_id will exist when click radio button
 
     cb_value = $(this).attr('value')
-    if $(this).prop('id').length > 0
-      radio_id = $(this).attr('id')
     if $(this).prop('class').length > 0
       cb_class = $(this).attr('class').split(' ')[0]  # first class for that element
 
@@ -649,79 +622,42 @@ window.addCbListeners = () ->
     tc_num = $('.threat-cat-row input:checked').length
     all_cbs = $('.dispute-wlbl-adjust-wrapper input[type="checkbox"]')
     submit_button = $('.dropdown-submit-button')
-    remove_radio = $('#wlbl-remove')
-    add_radio = $('#wlbl-add')
 
-    console.log 'num of wl checked ' + wl_num
-    console.log 'num of bl checked ' + bl_num
-    console.log 'num of tc checked ' + tc_num
-
-    # submit button should be disabled for all clicks except for certain criteria unlocks it
+    # submit button should be disabled for ALL clicks EXCEPT for certain criteria unlocks it
     submit_button.prop('disabled', true)
 
-    # clean slate this
-    add_radio.click ->
-      $('.lists-row input').prop('checked', false)
-      $('.threat-cat-row input').prop('checked', false)
+#     clean slate this
+    $('#wlbl-add, #wlbl-remove').click ->
       submit_button.prop('disabled', true)
-
-    # clean slate this
-    remove_radio.click ->
-      $('.lists-row input').prop('checked', false)
-      $('.threat-cat-row input').prop('checked', false)
-      submit_button.prop('disabled', true)
-
-    # TODO: CHANGE THIS TO A SWITCH
-    # TODO: CHANGE THIS TO A SWITCH
-    #### ENABLE SUBMIT BUTTON CRITERIA STATES ####
-    if radio_id == 'wlbl-add'
-      all_cbs.prop('checked', false)
-      submit_button.prop('disabled', true)
-
-    if wl_num > 0 && cb_value.includes('WL-')
-      submit_button.prop('disabled', false)
-
-    if bl_num > 0 && cb_class.includes('wlbl_thrt_cat_id')
-      submit_button.prop('disabled', false)
-
-    if bl_num > 0 && tc_num > 0
-      submit_button.prop('disabled', false)
-
-    if $('#wlbl-remove').prop('checked') && bl_num > 0
-      submit_button.prop('disabled', false)
-      $(tc_row).find('input').prop('checked', false)  # threat cat row is hidden, but de-toggle all cb's anyway
-
-    if $('#wlbl-remove').prop('checked') && bl_num == 0
-      submit_button.prop('disabled', true)
-
-    if $('#wlbl-remove').prop('checked') == true && wl_num > 0
-      submit_button.prop('disabled', false)
-
-    # end the logic for submit button here
-
-
-    ##### ADD TO or REMOVE FROM #####
-    if radio_id == 'wlbl-add' || radio_id == 'wlbl-remove'
-      all_cbs.prop('checked', false)
       $(tc_row).addClass('hidden')
-      if radio_id == 'wlbl-add' && bl_num > 0
-        $(tc_row).removeClass('hidden')
+      $('.lists-row input').prop('checked', false)
+      $('.threat-cat-row input').prop('checked', false)
 
+    # enable submit: 3 scenarios to unlock it
+    if wl_num == 0 && bl_num > 0 && tc_num > 0
+      submit_button.prop('disabled', false)
 
-    # BL CHECKBOX click: show the threat cat row if "add to list" is toggled
-    if cb_value.includes('BL-') && $('#wlbl-add').prop('checked') == true
-      $(tc_row).removeClass('hidden')
-      if bl_num == 0
-        $('.threat-cat-row input').prop('checked', false)
-        $(tc_row).addClass('hidden')
+    else if wl_num > 0 && bl_num == 0 && tc_num == 0
+      submit_button.prop('disabled', false)
 
-    ##### THREAT CATEGORY ROW ####
+    else if wl_num > 0 && bl_num > 0 && tc_num > 0
+      submit_button.prop('disabled', false)
+
+    # TC CHECKBOX click: if already 5 tc's checked, stop them, bold the note, max is 5
     if cb_class.includes('wlbl_thrt_cat_id')
-      if tc_num > 5    # limit to 5 threat cats + bold the note
+      if tc_num > 5
         this.checked = false
         $('.five-note').addClass('required-bold')
       else
         $('.five-note').removeClass('required-bold')
+
+    # BL CHECKBOX click: show the threat cat row if "add to list" is toggled
+    if cb_value.includes('BL-') && bl_num > 0
+      $(tc_row).removeClass('hidden')
+
+    else if cb_value.includes('BL-') && bl_num == 0
+      $('.threat-cat-row input').prop('checked', false)
+      $(tc_row).addClass('hidden')
 
   # BFRP RESEARCH ROW specific class - place the threat cat
   $('.searched-for-url').ready ->
@@ -732,7 +668,7 @@ window.addCbListeners = () ->
     place_threat_category($('.dispute-entry-ip-uri').text(), 'research-show')
 
 
-# on page load, add the wl/bl input event listeners inside the dropdowns
+# on page load, add the wl/bl + tc input event listeners inside the dropdowns
 $ ->
   addCbListeners()
 
