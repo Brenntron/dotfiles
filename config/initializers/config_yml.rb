@@ -114,11 +114,12 @@ Rails.configuration.xbrs                = ApiRequester::ApiRequester.config_of(x
 Rails.configuration.xbrs.consumer_key   = xbrs_config['consumer_key']
 
 
+virustotal = env_config.fetch('virustotal', nil)
+Rails.configuration.virus_total          = ApiRequester::ApiRequester.config_of(virustotal)
+Rails.configuration.virus_total.url      = virustotal['url']
 virustotal = env_config.fetch('auto_resolve',{}).fetch('virus_total', nil)
 raise 'config.yml missing virus_total section' unless virustotal
-Rails.configuration.virustotal          = ApiRequester::ApiRequester.config_of(virustotal)
-Rails.configuration.virustotal.check    = virustotal['check']
-Rails.configuration.virustotal.url      = virustotal['url']
+Rails.configuration.virus_total.check    = virustotal['check']
 
 # New apirequester interface
 bls_config = env_config.fetch('bls', {})
