@@ -645,38 +645,39 @@ window.addWlBlListeners = () ->
         $('.threat-cat-row input').prop('checked', false)
         $(dropdown_id).find('.threat-cat-row').addClass('hidden')
 
+      # Add / Remove - clean slate on either click
+      $(add_radio,remove_radio).click ->
+        clearAllInputs()
+        disableSubmit()
+
       # Add to list CLICK - clean slate + hide the tc row
       add_radio.click ->
         $(tc_row).addClass('hidden')
-        clearAllInputs()
-        disableSubmit()
 
       # Remove from list CLICK - keep the tc row open for user convenience to only remove specific tc's
       remove_radio.click ->
         $(tc_row).removeClass('hidden')
-        clearAllInputs()
-        disableSubmit()
 
       # show/hide the note about 5 tc's when you are Adding to list
       if add_radio.prop('checked')
         $(this).find('.threat-cat-required').removeClass('hidden')
       else $(this).find('.threat-cat-required').addClass('hidden')
 
-      # TC checkbox click: if already 5 tc's checked, stop them, bold the note, max is 5
+      # tc checkbox click: if already 5 tc's checked, bold the note, max is 5
       if cb_class.includes('wlbl_thrt_cat_id') and tc_num > 5
         $(this).find('.five-note').addClass('required-bold')
       else $(this).find('.five-note').removeClass('required-bold')
 
-      # submit button critieria: very specific scenarios to enable submit. fyi: there are 2 radios * 6 lists * 20 threat cats
-      if wl_num > 0 and bl_num == 0 and tc_num == 0
-        enableSubmit()
-      else if wl_num == 0 and bl_num > 0 and tc_num > 0 and tc_num <= 5
-        enableSubmit()
-      else if wl_num > 0 and bl_num > 0 and tc_num > 0 and tc_num <= 5
-        enableSubmit()
-      else if add_radio.prop('checked') and bl_num > 0 and tc_num == 0
-        enableSubmit()
-      else if remove_radio.prop('checked') and bl_num == 0 and tc_num > 0 and tc_num <= 5
+      # scenarios to enable the submit button
+      conditionsArray = [
+        wl_num > 0 and bl_num == 0 and tc_num == 0,
+        bl_num > 0 and tc_num > 0 and tc_num <= 5,
+        add_radio.prop('checked') and bl_num > 0 and tc_num > 0,
+        remove_radio.prop('checked') and bl_num > 0 and tc_num == 0,
+        remove_radio.prop('checked') and bl_num == 0 and tc_num > 0 and tc_num <= 5
+      ]
+
+      if conditionsArray.indexOf(true) >= 0
         enableSubmit()
 
 
