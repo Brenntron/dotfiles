@@ -247,7 +247,7 @@ window.bulk_get_current_wlbl = (page) ->
             comment = ''
 
           # TODO: LOGIC ERROR HERE FOR LAST ROW (REPEATS SAME SCORE FOR ALL ROWS), NEEDS CORRECTION IN SEPARATE TICKET
-          $(tbody).append('<tr class="wlbl-dropdown-row">' + '<td class="wlbl-entry-content">' + ip_uri + '</td><td class="wlbl-entry-wlbl">' + list_types + '</td>' + '<td class="wlbl-current-entry-wbrs text-center">' + wbrs_score + '</td>' + '<td class="wlbl-threat-cat pad-left-xl"></td>')
+          $(tbody).append('<tr class="wlbl-dropdown-row">' + '<td class="wlbl-entry-content">' + ip_uri + '</td><td class="wlbl-entry-wlbl">' + list_types + '</td>' + '<td class="wlbl-current-entry-wbrs text-center">' + wbrs_score + '</td>' + '<td class="wlbl-threat-cat"></td>')
 
         comment_box.text(comment_trail)
       error: (response) ->
@@ -556,7 +556,6 @@ window.place_threat_category = (uri, placement) ->
   threat_cat_str = ''  # will be used only for display purposes
   threat_cat_json = get_threat_categories(uri)
 
-
   # use a promise for the threat cat api call, could take up to 1-2 seconds
   threatCatPromise = new Promise (resolve, reject) ->
     threat_cat_json = get_threat_categories(ip_uri)
@@ -567,49 +566,46 @@ window.place_threat_category = (uri, placement) ->
     threat_cat_obj = JSON.parse(result)
     threat_cat_array = threat_cat_obj.threat_categories
 
+    bulk_tc = $('.wlbl-threat-cat')
+    inline_tc = $('.wlbl-threat-cat-inline')
+    bfrp_search = $('.reputation-research-search-wrapper')
+    research_row_full = $('.wlbl-and-tc-area')  # this is the wl/bl area inside of a research row (wbrs row)
+    research_row_left = $('.wlbl-table-result')
+    research_row_right = $('.wlbl-tc-research-span')
+
     if threat_cat_array == undefined or threat_cat_array.length == 0
       threat_cat_str = '<span class="threat-cat-no-data">No Category</span>'
     else
       threat_cat_str = threat_cat_array.join(', ')
 
-
     # DO THE SAME DROPDOWN ID LOGIC HERE TOO
-    # DO THE SAME DROPDOWN ID LOGIC HERE TOO
-    # DO THE SAME DROPDOWN ID LOGIC HERE TOO
-    bulk_place = $('.wlbl-threat-cat')
-
     # which place to add the threat category(s): bulk dropdown, inline dropdown, or research row (show page or bfrp)
     switch placement
       when 'bulk'
-        # MAYBE PLACE IN THE DROPDOWN ID???
-        $('.wlbl-threat-cat').html(threat_cat_str)  # THIS IS THE PLACEMENT
-        if $('.wlbl-and-threat-area').text().includes('No') or ($('.wlbl-and-threat-area').length > 0 and $('.wlbl-and-threat-area').text() == '')
-          $('.wlbl-threat-cat').empty()  # verify not showing threat cats if not on BL (1234computer.com issue)
+        bulk_tc.html(threat_cat_str)
+        if research_row_full.text().includes('No') or (research_row_full.length > 0 and research_row_full.text() == '')
+          research_row_full.empty()  # no show tc's if no bl (1234computer.com issue)
 
-      when 'inline'  # verify same thing (1234computer.com issue)
-        $('.wlbl-threat-cat-inline').html(threat_cat_str)  # THIS IS THE PLACEMENT
+        if $('.wlbl-entry-wlbl').length > 0 and $('.wlbl-entry-wlbl').text() == ''
+          bulk_tc.empty()
+
+      when 'inline'
+        inline_tc.html(threat_cat_str)
         if $('.wlbl-entry-wlbl').text().includes('No') or ($('.wlbl-entry-wlbl').length > 0 and $('.wlbl-entry-wlbl').text() == '')
-          $('.wlbl-threat-cat').empty()
+          inline_tc.empty()
 
       when 'research'
-        console.log threat_cat_str
-        $('.threat-cat-wlbl-research').html(threat_cat_str)  # THIS IS THE PLACEMENT
-        # BFRP SPECIFIC research row
-        if $('.wlbl-table-result').text().includes('BL-')
-          $('.wlbl-and-threat-area').css('width', '250px')  # ensure enough width for all lists + TC's
-        else if $('.wlbl-table-result').text().includes('WL-')  # WL? remove the TC span
-          $('.threat-cat-wlbl-research').remove()
+        research_row_right.html(threat_cat_str)
+        if bfrp_search.length > 0 && (research_row_left.text() == '' || research_row_left.text().includes('WL'))
+          research_row_right.remove()  # if on bfrp and no wl's or bl's, then no threat cats should show
+        else
+          research_row_right.html(threat_cat_str)
+          research_row_full.addClass('ensure-tc-width')  # ensure enough width for all lists + TC's
 
-    # verify same thing (1234computer.com issue)
-    if $('.wlbl-entry-wlbl').length > 0 and $('.wlbl-entry-wlbl').text() == ''
-      $('.wlbl-threat-cat').empty()
-    # verify if on bfrp and no wl's or bl's, then no threat cats should show
-    else if $('.reputation-research-search-wrapper').length > 0 and $('.wlbl-table-result').text() == ''
-      $('.threat-cat-wlbl-research').empty()
 
   # error handling for the json response, leave the empty span
   .then null, (err) ->
-    tc_elements = '.wlbl-threat-cat, .wlbl-threat-cat-inline, .threat-cat-wlbl-research'
+    tc_elements = '.wlbl-threat-cat, .wlbl-threat-cat-inline, .wlbl-tc-research-span'
     $(tc_elements).html('<span class="error-threat-cat"></span>')
 
 
@@ -641,8 +637,6 @@ window.addWlBlListeners = () ->
       enableSubmit = () -> $(submit_button).prop('disabled', false)
       disableSubmit = () -> $(submit_button).prop('disabled', true)
 
-      disableSubmit()
-
       clearAllInputs = () ->
         $(all_cbs).prop('checked', false)
         disableSubmit()
@@ -672,11 +666,14 @@ window.addWlBlListeners = () ->
         $(this).find('.five-note').addClass('required-bold')
       else $(this).find('.five-note').removeClass('required-bold')
 
+      # every click, disable submit unless certain criteria is met
+      disableSubmit()
+
       # scenarios to enable the submit button
       conditionsArray = [
         wl_num > 0 and bl_num == 0 and tc_num == 0,
         bl_num > 0 and tc_num > 0 and tc_num <= 5,
-        add_radio.prop('checked') and bl_num > 0 and tc_num > 0,
+        add_radio.prop('checked') and bl_num > 0 and tc_num > 0 and tc_num <= 5,
         remove_radio.prop('checked') and bl_num > 0 and tc_num == 0,
         remove_radio.prop('checked') and bl_num == 0 and tc_num > 0 and tc_num <= 5
       ]

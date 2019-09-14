@@ -40,7 +40,7 @@
                         %th.content-label-sm Dispute
                         %th.content-label-sm.no-word-break Current WL/BL List
                         %th.text-center.content-label-sm.no-word-break Current WBRS Score
-                        %th.content-label-sm.no-word-break.pad-left-xl Threat Category
+                        %th.content-label-sm.no-word-break.th-threat-cat Threat Category
                     %tbody
 
                   -# TODO Hook up ability to preview scores based on changes in WL/BL
@@ -256,13 +256,13 @@
                                     %tr
                                       %th.content-label-sm.no-word-break Current WL/BL List
                                       %th.text-center.content-label-sm.no-word-break Current WBRS Score
-                                      %th.content-label-sm.no-word-break.pad-left-xl Threat Category
+                                      %th.content-label-sm.no-word-break.th-threat-cat Threat Category
 
                                   %tbody
                                     %tr
                                       %td.wlbl-entry-wlbl
                                       %td.wlbl-current-entry-wbrs.text-center
-                                      %td.wlbl-threat-cat-inline.pad-left-xl
+                                      %td.wlbl-threat-cat-inline
 
                                     -#    Removing for now. We can't do a preview until the api is updated to provide that info
                                     -#%td.text-center
@@ -487,14 +487,14 @@
                               = entry.virustotals.count
                           %td.left-bordered
                             %label WL/BL
-                          %td.wlbl-and-threat-area
+                          %td.wlbl-and-tc-area
                             - if !entry.respond_to?(:consolidated_wlbl_strings)
                               %span.missing-data Not currently on a list
                             - else
                               %span.wlbl-table-result
                                 = entry.consolidated_wlbl_strings
                               %button.dispute-inline-buttons.history-button.esc-tooltipped{title: 'WL/BL History', onclick: "wlbl_history_dialog('#{entry.hostlookup}')"}
-                            %span.threat-cat-wlbl-research
+                            %span.wlbl-tc-research-span
 
 
                           %td.left-bordered

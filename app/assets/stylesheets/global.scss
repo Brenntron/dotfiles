@@ -10429,23 +10429,15 @@ span.threat-cat-no-data {
   margin-bottom: 2px;
 }
 
-.dispute-wlbl-adjust-wrapper .pad-left-xl {
-  padding-left: 2px !important;
-}
-
 // ensure vertical alignment on narrow screens
 .research-table-details-wrapper table tr:first-of-type td {
   vertical-align: middle;
 }
 
-#disputes-research-table .threat-cat-wlbl-research {
+#disputes-research-table .wlbl-tc-research-span {
   margin-left: 10px;
   width: 100px;
   float: right;
-}
-
-.wlbl-table-result {
-  max-width: 100px;
 }
 
 // webrep dispute index > ensure break/wrap properly for long url's containing parameters
@@ -10475,14 +10467,14 @@ span.threat-cat-no-data {
   }
 }
 
-.dispute-entry-col {
-  min-width: 200px;
-}
-
-table.dispute_tool_current th.th-threat-cat {
-  padding-left: 2px !important;  // override needed
-}
-
-.ensure-width {
+.ensure-tc-width {
   width: 250px;
+}
+
+.wlbl-table-result {
+  max-width: 100px;
+}
+
+.wlbl-threat-cat, .wlbl-threat-cat-inline, table.dispute_tool_current th.th-threat-cat {
+  padding-left: 2px !important;
 }

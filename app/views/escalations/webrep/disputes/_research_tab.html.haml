@@ -54,7 +54,7 @@
                         %th.content-label-sm Dispute
                         %th.content-label-sm.no-word-break Current WL/BL List
                         %th.text-center.content-label-sm.no-word-break Current WBRS Score
-                        %th.content-label-sm.no-word-break.pad-left-xl Threat Category
+                        %th.content-label-sm.no-word-break.th-threat-cat Threat Category
                     %tbody
 
                       -# TODO Hook up ability to preview scores based on changes in WL/BL
@@ -369,13 +369,13 @@
                                     %th.content-label-sm.no-word-break Current WL/BL List
                                     %th.text-center.content-label-sm.no-word-break Current WBRS Score
                                     %th.text-center.content-label-sm.no-word-break Projected Score
-                                    %th.content-label-sm.no-word-break.pad-left-xl Threat Category
+                                    %th.content-label-sm.no-word-break.th-threat-cat Threat Category
                                 %tbody
                                   %tr
                                     %td.wlbl-entry-wlbl
                                     %td.wlbl-current-entry-wbrs.text-center
                                     %td.wlbl-projected-entry-wbrs.text-center
-                                    %td.wlbl-threat-cat-inline.pad-left-xl
+                                    %td.wlbl-threat-cat-inline
 
                               .inline-tool-content-wrapper
                                 .row
@@ -616,7 +616,7 @@
                             %span.wlbl-table-result
                               = entry.wbrs_list_type
                             %button.dispute-inline-buttons.history-button.esc-tooltipped{title: 'WL/BL History', onclick: "wlbl_history_dialog(#{entry.id})"}
-                          %span.threat-cat-wlbl-research
+                          %span.wlbl-tc-research-span
 
                         %td.left-bordered
                           %label Referenced on
