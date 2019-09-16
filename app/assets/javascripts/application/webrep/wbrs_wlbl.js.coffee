@@ -67,7 +67,7 @@ window.get_current_wlbl = (button) ->
   initial_bl_med_status = ''
   initial_bl_heavy_status = ''
 
-  # (dbinebri: retain for now, will delete later) Place the threat category for wl/bl inline in this row, its a separate api call
+  # (dbinebri: Retain commented code for now, will delete later. Place the threat cat for wl/bl inline in this row
   #  place_threat_category(entry_content, 'inline')
 
   # Send entry content to wbrs
@@ -124,7 +124,7 @@ window.get_current_wlbl = (button) ->
             bl_heavy_status = 'true'
             initial_bl_heavy_status = bl_heavy_status
 
-          # show the TC row and toggle the existing threat cats if BL exists
+          # inline dropdowns only: if BL exists, show the tc row and toggle the existing tc's
           switch String(this)
             when 'BL-weak', 'BL-med', 'BL-heavy'
               inline_toggle_threat_cats()
@@ -152,10 +152,6 @@ window.bulk_get_current_wlbl = (page) ->
   current_wbrs = ''
   comment_box = ''
   dropdown_wrapper = ''
-
-  # each time dropdown is toggled, ensure threat cat stuff is hidden
-#  $('.threat-cat-row').addClass('hidden')
-#  $('.lists-row input').prop('checked', false)
 
   # Define variables based on what page we're on
   if page == 'index'
@@ -249,8 +245,8 @@ window.bulk_get_current_wlbl = (page) ->
           list_types = entry['list_types']
           wbrs_score = entry['wbrs_score']
 
-          # (dbinebri: retain for now, will delete later) get and place the threat category for wl/bl bulk adjust
-#          place_threat_category(ip_uri, 'bulk')
+          # (dbinebri: Retain commented code for now, will delete later) Bulk adjust threat cat placement
+          #  place_threat_category(ip_uri, 'bulk')
 
           comment = entry['notes']
           if list_types
@@ -568,10 +564,7 @@ window.wlbl_history_dialog = (id) ->
 
 #### THREAT CATEGORY - uses a separate API call - needs to be handled asynchronously ####
 # use this uri + place the threat cat(s) in adjust wl/bl bulk dropdown, inline dropdown, or research row (bfrp / show page)
-window.place_threat_category = (uri, placement, dropdown_id) ->
-  ip_uri = uri
-  threat_cat_str = ''  # will be used only for display purposes
-  threat_cat_json = get_threat_categories(uri)
+window.place_threat_category = (ip_uri, placement, dropdown_id) ->
 
   # use a promise for the threat cat api call, could take up to 1-2 seconds
   threatCatPromise = new Promise (resolve, reject) ->
@@ -596,8 +589,7 @@ window.place_threat_category = (uri, placement, dropdown_id) ->
     else
       threat_cat_str = threat_cat_array.join(', ')
 
-    # DO THE SAME DROPDOWN ID LOGIC HERE TOO
-    # which place to add the threat category(s): bulk dropdown, inline dropdown, or research row (show page or bfrp)
+    # place to add the threat category(s): bulk dropdown, inline dropdown, or research row (show page or bfrp)
     switch placement
       when 'bulk'
         bulk_tc.html(threat_cat_str)
@@ -608,6 +600,8 @@ window.place_threat_category = (uri, placement, dropdown_id) ->
         inline_tc.html(threat_cat_str)
         if bfrp_search.length == 0 and ($('.wlbl-entry-wlbl').text().includes('No') or $('.wlbl-entry-wlbl').text().trim() == '')
           inline_tc.empty()  # bfrp page inline?
+        else if bfrp_search.length == 0 and research_row_left.text().trim() == ''
+          research_row_right.remove()   # if on research tab and no wl's or bl's, then no tc's should show (1234computer.com issue)
 
       when 'research'
         if bfrp_search.length > 0 and research_row_left.text().trim() == ''
@@ -672,7 +666,10 @@ window.addWlBlListeners = () ->
         clearAllInputs()
 
       remove_radio.click ->
-        tc_row.removeClass('hidden')  # keep the tc row open for removal convenience
+        if ($('.wlbl-threat-cat').text().trim() or $('.wlbl-threat-cat-inline').text().trim()) == ''
+          tc_row.addClass('hidden')  # keep the tc row open for removal convenience
+        else
+          tc_row.removeClass('hidden')  # keep the tc row open for removal convenience
         clearAllInputs()
 
       # show/hide the note about 5 tc's when you are Adding to list
@@ -699,17 +696,14 @@ window.addWlBlListeners = () ->
         enableSubmit()
 
 
-  #### PLACEMENTS FOR THREAT CATEGORIES - done through separate api call, all triggered by page load or click
-  #### because threat cats is a separate api call, lets keep this all modular and self-contained
-
-  # CHANGE THIS TO A PROMISE, YOU'RE TRYING TO GET SOMETHING THAT DOESNT EXIST ON-CLICK!
+  ## PLACEMENTS FOR THREAT CATEGORIES - keeping these modular and self-contained - because threat cats is a separate api call
   # CLICK - BULK INDEX
   $('#index-adjust-wlbl').click ->
     dropdown_id = '#wlbl_adjust_entries_index'
     setTimeout ( ->
       ip_uri = $('.dispute-entry-checkbox:checked').parent().next().text()
       place_threat_category(ip_uri, 'bulk', dropdown_id)
-    ), 1500
+    ), 1000
 
   # CLICK - BULK NON-INDEX (this means research tab bulk or bfrp bulk)
   $('#wlbl_entries_button').click ->
@@ -720,7 +714,7 @@ window.addWlBlListeners = () ->
       else if $('.reputation-research-search-wrapper').length > 0
         ip_uri = $('.searched-for-url').text().trim().split(',')[0]  # get the first entry in this div
       place_threat_category(ip_uri, 'bulk', dropdown_id)
-    ), 1500
+    ), 1000
 
   # CLICK - INLINE - RESEARCH TAB OR BFRP
   $('.dispute-inline-buttons.adjust-wlbl-button').click ->
@@ -729,21 +723,22 @@ window.addWlBlListeners = () ->
     setTimeout ( ->
       $(dropdown_id).find('.dropdown-submit-button').prop('disabled', true)
       place_threat_category(ip_uri, 'inline', dropdown_id)
-    ), 1500
+    ), 1000
 
   # PAGE LOAD - RESEARCH TAB
   if $('#research-tab').length > 0
     setTimeout ( ->
       ip_uri = $('.dispute-entry-ip-uri').text().trim().split(',')[0]
-      place_threat_category(ip_uri, 'research', '')
-    ), 1500
+      unless $('.wlbl-table-result').text().trim() == ''   # handle the no-bl don't show tc's (1234computer.com issue)
+        place_threat_category(ip_uri, 'research', '')
+    ), 1000
 
   # PAGE LOAD - BFRP RESEARCH
   if $('.reputation-research-search-wrapper').length > 0
     setTimeout ( ->
       ip_uri = $('.searched-for-url').text().trim().split(',')[0]
       place_threat_category(ip_uri, 'research', '')
-    ), 1500
+    ), 1000
 
 
 # on page load, add the wl/bl + tc input event listeners inside the dropdowns
