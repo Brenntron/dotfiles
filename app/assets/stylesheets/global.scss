@@ -10407,12 +10407,20 @@ span.threat-cat-required .five-note.required-bold {
   color: darken($warning-accent-color, 5%)
 }
 
+
 span.threat-cat-no-data {
   float: none;
   font-size: 8pt;
   font-style: italic;
   color: $content-label-color;
   padding-left: 2px;
+}
+
+span.tc-change-note {
+  font-size: 7pt;
+  color: $warning-accent-color;
+  padding-left: 2px;
+  float: none;
 }
 
 // adjust wl/bl dropdown - ensure long dispute url's break/wrap properly
