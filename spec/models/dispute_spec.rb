@@ -753,4 +753,14 @@ describe Dispute do
     expect(dispute_entry.status).to eql(DisputeEntry::RESOLVED)
     expect(dispute_entry.resolution).to eql(DisputeEntry::STATUS_RESOLVED_UNCHANGED)
   end
+
+  it 'should be able to handle newline and space split urls for BFRP searches' do
+
+    #a cheap test, but the 14 results include domains that contain 'stupid', 'dumb', and 'idiot'
+
+    args = {'uri' => "stupid.com\r\ndumb.com idiot.com", 'scope' => 'strict'}
+    result = DisputeEntry.research_results(args)
+    expect(result.size).to eql(14)
+
+  end
 end
