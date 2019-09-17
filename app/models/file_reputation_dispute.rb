@@ -1013,9 +1013,21 @@ class FileReputationDispute < ApplicationRecord
     conn.post(self, source_authority: "talos-intelligence", source_key: self.ticket_source_key)
   end
 
-  def self.submit_for_evaluation(sha256_hash)
-    FileReputationApi::Sandbox.run_sample(sha256_hash)
-    FileReputationApi::Sandbox.send_to_threatgrid(sha256_hash, api_key_type: SANDBOX_KEY_AC_REFRESH)
+  def self.submit_for_evaluation(sha256_hash, service)
+    services = service.split(" ")
+
+    if services.include?("sandbox")
+      FileReputationApi::Sandbox.run_sample(sha256_hash)
+    end
+    if services.include?("threatgrid")
+      FileReputationApi::Sandbox.send_to_threatgrid(sha256_hash, api_key_type: SANDBOX_KEY_AC_REFRESH)
+    end
+
+    ##placeholder
+    if services.include?("reversinglab")
+
+    end
+
     FileReputationApi::Magic.run_analysis(sha256_hash)
   end
 

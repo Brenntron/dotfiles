@@ -214,13 +214,14 @@ module API
 
             params do
               requires :sha256_hash, type: String
+              requires :service, type: String
             end
 
             post 'submit_for_evaluation' do
               std_api_v2 do
                 authorize!(:update, FileReputationDispute)
 
-                FileReputationDispute.submit_for_evaluation(permitted_params[:sha256_hash])
+                FileReputationDispute.submit_for_evaluation(permitted_params[:sha256_hash], permitted_params[:service])
 
                 {:status => "success"}.to_json
 
