@@ -697,17 +697,21 @@ window.addWlBlListeners = () ->
 
       # Add / Remove - clean slate on either click
       add_radio.click ->
+        $('.tc-change-note').addClass('hidden')
         lists_row.removeClass('hidden')
         tc_row.addClass('hidden')
         clearAllInputs()
 
       remove_radio.click ->
+        $('.tc-change-note').addClass('hidden')
         lists_row.removeClass('hidden')
         tc_row.addClass('hidden')
         clearAllInputs()
 
       change_radio.click ->
         # pre-toggle all the tc cb's
+        $('.tc-change-note').removeClass('hidden')
+
         tc_array = $('.wlbl-threat-cat').text().trim().split(', ')
         $(dropdown_id).find('.threat-cat-cell').each ->
           curr_text = $(this).text().trim()
