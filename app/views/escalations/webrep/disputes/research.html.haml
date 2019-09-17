@@ -58,8 +58,9 @@
                       .col-xs-4
                         %input{type: 'radio', name: 'wlbl-action-radio', id: 'wlbl-remove', value: 'wlbl-remove'}
                         %label.radio-label{for: 'wlbl-remove'} Remove from list
-                      .col-xs-5.change-tc-radio.hidden
-                        %input{type: 'radio', name: 'wlbl-action-radio', id: 'wlbl-change', value: 'wlbl-change'}
+                      .col-xs-3.change-tc-radio.hidden
+                        -# the 'change tcs' needs to retain value 'wlbl-add'
+                        %input{type: 'radio', name: 'wlbl-action-radio', id: 'wlbl-change', value: 'wlbl-add'}
                         %label.radio-label{for: 'wlbl-change'} Change threat categories
 
                     .row.tc-change-note.hidden
