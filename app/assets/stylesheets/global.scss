@@ -10416,13 +10416,6 @@ span.threat-cat-no-data {
   padding-left: 2px;
 }
 
-span.tc-change-note {
-  font-size: 7pt;
-  color: $warning-accent-color;
-  padding-left: 2px;
-  float: none;
-}
-
 // adjust wl/bl dropdown - ensure long dispute url's break/wrap properly
 .dispute_tool_current .wlbl-dropdown-row td.wlbl-entry-content {
   max-width: 160px;
@@ -10485,4 +10478,11 @@ span.tc-change-note {
 
 .wlbl-threat-cat, .wlbl-threat-cat-inline, table.dispute_tool_current th.th-threat-cat {
   padding-left: 2px !important;
+}
+
+.tc-change-note span {
+  font-size: 7pt;
+  color: $warning-accent-color;
+  padding-left: 2px;
+  float: none;
 }

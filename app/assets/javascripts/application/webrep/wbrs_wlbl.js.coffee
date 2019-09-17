@@ -611,7 +611,8 @@ window.place_threat_category = (ip_uri, type, wrapper_id) ->
       when 'bulk'
         # REFACTOR THIS OUT
         bulk_tc.html(tc_str)
-        $('.change-tc-radio').removeClass('hidden')
+        if $('.wlbl-entry-wlbl').length > 0 and $('.wlbl-entry-wlbl').text().trim().includes('BL-')
+          $('.change-tc-radio').removeClass('hidden')  # show the 'change threat categories' radio button in dropdown
         if $('.wlbl-entry-wlbl').length > 0 and ($('.wlbl-entry-wlbl').length > 0 and $('.wlbl-entry-wlbl').text().trim() == '')
           bulk_tc.empty()
         if bfrp_search.length > 0 and $('.wlbl-table-result').text().trim() == ''
@@ -637,6 +638,19 @@ window.place_threat_category = (ip_uri, type, wrapper_id) ->
 
 # WL/BL dropdowns checkbox validation logic, these get added for these dropdowns on page load
 window.addWlBlListeners = () ->
+  # change_radio only exists if 1 or more BL's exist
+  $('#wlbl-change').click ->
+    $('.lists-row, .tc-change-note').addClass('hidden')
+    $('.threat-cat-row').removeClass('hidden')
+    $('.dropdown-menu input:checkbox').prop('checked', false)
+    $('.dropdown-submit-button').prop('disabled', true)
+
+  $('#index-adjust-wlbl').click ->
+    $('.threat-cat-row, .tc-change-note, .change-tc-radio').addClass('hidden')
+    $('.lists-row').removeClass('hidden')
+    $('.dropdown-menu input:checkbox').prop('checked', false)
+    $('.dropdown-submit-button').prop('disabled', true)
+
   # after a click inside wl/bl dropdown, fig out where you are, get the dropdown id for the validation inside that specific dropdown
   $('.dispute-wlbl-adjust-wrapper input').click ->
     cb_value = $(this).attr('value')
@@ -673,9 +687,11 @@ window.addWlBlListeners = () ->
 
       # BL click? show/hide the threat cat row if 'Add to list' is toggled
       if cb_value.includes('BL-') and bl_num > 0
-        tc_row.removeClass('hidden')
+        unless $(dropdown_id).find('#wlbl-remove').prop('checked') == true
+          # if the remove is toggled inside this dropdown, dont do below
+          tc_row.removeClass('hidden')
 
-      else if cb_value.includes('BL-') and bl_num == 0 and add_radio.prop('checked')
+      else if cb_value.includes('BL-') and bl_num == 0 and add_radio.prop('checked') == true
         $('.threat-cat-row input').prop('checked', false)
         tc_row.addClass('hidden')
 
@@ -690,36 +706,31 @@ window.addWlBlListeners = () ->
         tc_row.addClass('hidden')
         clearAllInputs()
 
-      # ENSURE IF ALL TC'S ARE REMOVED, ALERT AND SAY 'BL-'S WILL BE REMOVED TOO
-      # ENSURE IF ALL TC'S ARE REMOVED, ALERT AND SAY 'BL-'S WILL BE REMOVED TOO
-      # ENSURE IF ALL TC'S ARE REMOVED, ALERT AND SAY 'BL-'S WILL BE REMOVED TOO
-      # Change current threat categories - clean slate on either click
       change_radio.click ->
-        lists_row.addClass('hidden')
-        tc_row.removeClass('hidden')
-        $('.tc-change-note').removeClass('hidden')
-        clearAllInputs()
-
-        $(this).find('input:checkbox').prop('checked', true)
-
-        # step 2, toggle the tc checkboxes in the .threat-cat-row
-#        $(dropdown_id).find('.threat-cat-cell').each ->
-#          curr_text = $(this).text().trim()
-#          curr_input = $(this).find('input:checkbox').prop('checked', true)
-#          $(threat_categories).each (i, value) ->
-#            if value == curr_text then curr_input.prop('checked', true)
-
-
+        # pre-toggle all the tc cb's
+        tc_array = $('.wlbl-threat-cat').text().trim().split(', ')
+        $(dropdown_id).find('.threat-cat-cell').each ->
+          curr_text = $(this).text().trim()
+          curr_input = $(this).find('input:checkbox')
+          $(tc_array).each (i, value) ->
+            if value == curr_text then curr_input.prop('checked', true)  # toggle all the tc cb's
+        disableSubmit()
 
       # show/hide the note about 5 tc's when you are Adding to list
       if add_radio.prop('checked') then tc_note.removeClass('hidden') else tc_note.addClass('hidden')
 
-      # if change the threat categories, notify user this will remove all BL's too!
+      # Change Threat Categories:
+      # if change is checked and no tc's, then no bl's should be checked, ensure this
       if change_radio.prop('checked') and tc_num == 0
+        $(this).find('.lists-row input[value^="BL-"]').prop('checked', false)
 
-        bl_num = 0
+      # tc cb click inside change tc's? show the "bls will be removed" note + clear the bl cb's in background
+      # this submit form (change is checked) will simply function as if "add to list" is toggled
+      if cb_class.includes('wlbl_thrt_cat_id') and change_radio.prop('checked') and tc_num == 0
+        $('.tc-change-note').removeClass('hidden')  # Note: No threat categories are checked, if you Submit
+        bl_num = 0  # set the blacklists all to zero, if tc_num is 0, bl_num is 0
 
-      # tc checkbox click: if already 5 tc's checked, bold the note, max is 5
+      # threat category checkbox click: if already 5 tc's checked, bold the note, max is 5
       if cb_class.includes('wlbl_thrt_cat_id') and tc_num > 5
         $(this).find('.five-note').addClass('required-bold')
       else $(this).find('.five-note').removeClass('required-bold')
@@ -732,17 +743,15 @@ window.addWlBlListeners = () ->
         wl_num > 0 && bl_num == 0 && tc_num == 0,
         bl_num > 0 && tc_num > 0 && tc_num <= 5,
         add_radio.prop('checked') && bl_num > 0 && tc_num > 0 && tc_num <= 5,
-        remove_radio.prop('checked') && bl_num > 0 && tc_num == 0,
-        remove_radio.prop('checked') && bl_num == 0 && tc_num > 0 && tc_num <= 5
-        change_radio.prop('checked') && tc_num > 0 && tc_num <= 5
+        remove_radio.prop('checked') && bl_num > 0,
+        change_radio.prop('checked') && bl_num == 0 && tc_num == 0,  # no tc's? no bl's either then, let them submit
+        change_radio.prop('checked') && tc_num > 0 && tc_num <= 5  # user can change existing tc's
       ]
 
       if conditionsArray.indexOf(true) >= 0
         enableSubmit()
 
-  # PAGE LOAD - RESEARCH TAB - CONFIRMED WORKING - LEAVE HERE OR REFACTOR????
-  # REFACTOR THESE
-  # REFACTOR THESE
+  # PAGE LOAD - RESEARCH TAB - CONFIRMED WORKING - LEAVE HERE OR REFACTOR?
   if $('#research-tab').length > 0
     setTimeout ( ->
       row_id = '#' + $(this).siblings('.dropdown-menu').attr('id')
@@ -751,7 +760,7 @@ window.addWlBlListeners = () ->
         place_threat_category(ip_uri, 'research', '')
     ), 1500
 
-  # PAGE LOAD - BFRP RESEARCH - LEAVE HERE OR REFACTOR????
+  # PAGE LOAD - BFRP RESEARCH - LEAVE HERE OR REFACTOR?
   if $('.reputation-research-search-wrapper').length > 0
     setTimeout ( ->
       ip_uri = $('.searched-for-url').text().trim().split(',')[0]

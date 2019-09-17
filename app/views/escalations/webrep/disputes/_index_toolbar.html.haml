@@ -283,8 +283,10 @@
                   %input{type: 'radio', name: 'wlbl-action-radio', id: 'wlbl-change', value: 'wlbl-change'}
                   %label.radio-label{for: 'wlbl-change'} Change threat categories
 
-              .row.hidden.tc-change-note
-                Note: No tcs are checked, if you submit, all bls will be removed too.
+              .row.tc-change-note.hidden
+                .col-xs-12
+                  %span
+                    Note: If you Submit, all threat categories and associated blacklists will be removed too.
 
               -# BEGIN: WL BL LISTS ROW + THREAT CATS ROW (place this 1 indent past 'inline-tool')
               .row.lists-row
