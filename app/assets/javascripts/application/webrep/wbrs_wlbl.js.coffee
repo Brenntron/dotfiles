@@ -639,17 +639,17 @@ window.place_threat_category = (ip_uri, type, wrapper_id) ->
 # WL/BL dropdowns checkbox validation logic, these get added for these dropdowns on page load
 window.addWlBlListeners = () ->
   # change_radio only exists if 1 or more BL's exist
-  $('#wlbl-change').click ->
-    $('.lists-row, .tc-change-note').addClass('hidden')
-    $('.threat-cat-row').removeClass('hidden')
-    $('.dropdown-menu input:checkbox').prop('checked', false)
-    $('.dropdown-submit-button').prop('disabled', true)
+  $('.dispute-wlbl-adjust-wrapper #wlbl-change').click ->
+    $('.dispute-wlbl-adjust-wrapper .dispute-wlbl-adjust-wrapper .lists-row, .dispute-wlbl-adjust-wrapper .tc-change-note').addClass('hidden')
+    $('.dispute-wlbl-adjust-wrapper .threat-cat-row').removeClass('hidden')
+    $('.dispute-wlbl-adjust-wrapper .dispute-wlbl-adjust-wrapper .dropdown-menu input:checkbox').prop('checked', false)
+    $('.dispute-wlbl-adjust-wrapper .dropdown-submit-button').prop('disabled', true)
 
   $('#index-adjust-wlbl').click ->
-    $('.threat-cat-row, .tc-change-note, .change-tc-radio').addClass('hidden')
-    $('.lists-row').removeClass('hidden')
-    $('.dropdown-menu input:checkbox').prop('checked', false)
-    $('.dropdown-submit-button').prop('disabled', true)
+    $('.dispute-wlbl-adjust-wrapper .threat-cat-row, .dispute-wlbl-adjust-wrapper .tc-change-note, .dispute-wlbl-adjust-wrapper .change-tc-radio').addClass('hidden')
+    $('.dispute-wlbl-adjust-wrapper .lists-row').removeClass('hidden')
+    $('.dispute-wlbl-adjust-wrapper .dispute-wlbl-adjust-wrapper .dropdown-menu input:checkbox').prop('checked', false)
+    $('.dispute-wlbl-adjust-wrapper .dropdown-submit-button').prop('disabled', true)
 
   # after a click inside wl/bl dropdown, fig out where you are, get the dropdown id for the validation inside that specific dropdown
   $('.dispute-wlbl-adjust-wrapper input').click ->
