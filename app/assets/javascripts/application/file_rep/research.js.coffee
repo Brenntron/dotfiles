@@ -29,12 +29,14 @@ window.refresh_research_data = (sha256_hash) ->
   window.update_file_rep_data()
 
 # Resubmit hash to all the analysis engines
-window.evaluate_file = (sha256_hash) ->
+# services: sandbox threatgrid reversinglabs
+# space delimited
+window.evaluate_file = (sha256_hash, services) ->
   sha256_hash = $('#sha256_hash')[0].innerText
   std_msg_ajax(
     method: 'GET'
     url: "/escalations/api/v1/escalations/file_rep/submit_for_evaluation/"
-    data: {sha256_hash: sha256_hash}
+    data: {sha256_hash: sha256_hash, service: services}
     success_reload: false
     success: (response) ->
 
