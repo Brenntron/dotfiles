@@ -29,6 +29,9 @@ Rails.application.routes.draw do
       get 'rule_api', to: 'tools#rule_api'
       get 'wbnp_reports', to: 'tools#wbnp_reports'
       get 'manage_escalations_sync', to: 'tools#manage_escalations_sync'
+
+      mount DelayedJobWeb, at: "delayed_job"
+      match "/delayed_job" => DelayedJobWeb, :anchor => false, :via => [:get, :post]
     end
 
     namespace :webcat do
@@ -134,10 +137,6 @@ Rails.application.routes.draw do
   end #namespace :escalations
   mount RailsAdmin::Engine => '/escalations/admin', as: 'rails_admin'
   namespace :admin do
-    constraints AccessDelayedJobWeb do
-      mount DelayedJobWeb, at: "delayed_job"
-      match "/delayed_job" => DelayedJobWeb, :anchor => false, :via => [:get, :post]
-    end
     root 'home#index'
     resources :roles, except: [:show]
     resources :org_subsets, except: [:show]
