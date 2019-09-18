@@ -265,7 +265,7 @@ window.bulk_get_current_wlbl = (page) ->
           if comment == null
             comment = ''
 
-          # because of threat cat, don't write out the table row until that threat cat is resolved
+          # wait until that tc is resolved to write out the table row
           tc_promise = new Promise (resolve, reject) ->
             tc_json = get_threat_categories(ip_uri)
             if tc_json then resolve tc_json  # resolve goes to .then() below
@@ -274,10 +274,17 @@ window.bulk_get_current_wlbl = (page) ->
             {threat_categories} = JSON.parse(result)
             tc_str = threat_categories.join(', ')
 
-            # step 2 WRITE OUT THE LAST BIT OF THE ROW PER ENTRY
-            $(tbody).append('<tr class="wlbl-dropdown-row">' + '<td class="wlbl-entry-content">' + ip_uri + '</td><td class="wlbl-entry-wlbl">' + list_types + '</td>' + '<td class="wlbl-current-entry-wbrs text-center">' + wbrs_score + '</td>' + '<td class="wlbl-threat-cat">' + tc_str + '</td>')
+            table_row =
+            '<tr class="wlbl-dropdown-row">' +
+            '<td class="wlbl-entry-content">' + ip_uri + '</td>' +
+            '<td class="wlbl-entry-wlbl">' + list_types + '</td>' +
+            '<td class="wlbl-current-entry-wbrs text-center">' + wbrs_score + '</td>' +
+            '<td class="wlbl-threat-cat">' + tc_str + '</td></tr>'
 
-          comment_box.text(comment_trail)
+            $(tbody).append(table_row)
+
+        comment_box.text(comment_trail)
+
       error: (response) ->
         std_msg_error( 'Error retrieving WL/BL Data', response)
     )
