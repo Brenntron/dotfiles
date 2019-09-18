@@ -240,8 +240,6 @@ window.bulk_get_current_wlbl = (page) ->
     else if page == "index"
       comment_trail = '\n \n------------------------------- \nBULK SUBMISSION: \n' + comment_array.join('\n')
 
-
-
     std_msg_ajax(
       url: '/escalations/api/v1/escalations/webrep/disputes/bulk_rule_ui_wlbl_get_info_for_form'
       method: 'POST'
@@ -250,15 +248,13 @@ window.bulk_get_current_wlbl = (page) ->
         $(tbody).empty()
         response = JSON.parse(response)
         for entry in response
-          # wait until that tc is resolved to write out the table row
-          tc_promise = new Promise (resolve, reject) ->
+          tc_promise = new Promise (resolve, reject) ->   # wait until that tc is resolved to write out the table row
             tc_json = get_threat_categories(entry.ip_uri)
             if tc_json then resolve tc_json  # resolve goes to .then() below
 
-          .then( buildThreatRow.bind(null, entry, tbody))
+          .then(build_wlbl_row.bind(null, entry, tbody))   # bind() is promise/.then() specific
           .then null, (err) ->
-            # handle error
-            console.log err
+            std_msg_error( 'Error retrieving WL/BL Data', response)  # handle this error more silently if needed
 
         comment_box.text(comment_trail)
 
@@ -269,8 +265,8 @@ window.bulk_get_current_wlbl = (page) ->
     std_msg_error('No rows selected', ['Please select at least one entry row.'])
     return false
 
-  buildThreatRow = (entry, tbody, result) ->
-    console.error
+  # ensures the table row w/ tc gets built correctly (KH refactor)
+  build_wlbl_row = (entry, tbody, result) ->
     { threat_categories } = JSON.parse(result)
     { ip_uri, list_types, wbrs_score, comment } = entry
     tc_str = threat_categories.join(', ')
@@ -652,7 +648,13 @@ window.addWlBlListeners = () ->
     $('.dispute-wlbl-adjust-wrapper input:checkbox').prop('checked', false)
     $('.dispute-wlbl-adjust-wrapper #wlbl-add').prop('checked', true)
     $('.dispute-wlbl-adjust-wrapper .tc-change-note').addClass('hidden')
-    $('.dispute-wlbl-adjust-wrapper .threat-cat-row, .dispute-wlbl-adjust-wrapper .change-tc-radio').addClass('hidden')
+    $('.dispute-wlbl-adjust-wrapper .threat-cat-row').addClass('hidden')
+
+    # FIX THIS LINE
+    # FIX THIS LINE
+    # FIX THIS LINE, add logic
+    $('.dispute-wlbl-adjust-wrapper .change-tc-radio').addClass('hidden')
+
     $('.dispute-wlbl-adjust-wrapper .lists-row').removeClass('hidden')
     $('.dispute-wlbl-adjust-wrapper .dropdown-submit-button').prop('disabled', true)
 
@@ -692,8 +694,14 @@ window.addWlBlListeners = () ->
       disableSubmit = () -> $(submit_button).prop('disabled', true)
 
       clearAllInputs = () ->
-        $(all_cbs).prop('checked', false)
-        $('.tc-change-note').addClass('hidden')
+        # CHANGE RADIO BUTTON FIX!
+        # CHANGE RADIO BUTTON FIX!
+        # CHANGE RADIO BUTTON FIX!
+        # CHANGE RADIO BUTTON FIX!
+
+        $('.dispute-wlbl-adjust-wrapper input:checkbox').prop('checked', false)
+        $('.dispute-wlbl-adjust-wrapper #wlbl-add').prop('checked', true)
+        $('.dispute-wlbl-adjust-wrapper .tc-change-note').addClass('hidden')
         disableSubmit()
 
       # BL click? show/hide the threat cat row if 'Add to list' is toggled
