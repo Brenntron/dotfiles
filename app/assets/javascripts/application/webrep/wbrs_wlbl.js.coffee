@@ -250,38 +250,15 @@ window.bulk_get_current_wlbl = (page) ->
         $(tbody).empty()
         response = JSON.parse(response)
         for entry in response
-          ip_uri = entry['ip_uri']
-          list_types = entry['list_types']
-          wbrs_score = entry['wbrs_score']
-          comment = entry['notes']
-
-          if list_types
-            list_types = entry['list_types'].join(', ')
-          else
-            list_types = ''
-            wbrs_score = wbrs
-          if wbrs_score == null
-            wbrs_score = '<span class="missing-data text-left">No Score</span>'
-          if comment == null
-            comment = ''
-
           # wait until that tc is resolved to write out the table row
           tc_promise = new Promise (resolve, reject) ->
-            tc_json = get_threat_categories(ip_uri)
+            tc_json = get_threat_categories(entry.ip_uri)
             if tc_json then resolve tc_json  # resolve goes to .then() below
 
-          tc_promise.then (result) ->
-            {threat_categories} = JSON.parse(result)
-            tc_str = threat_categories.join(', ')
-
-            table_row =
-            '<tr class="wlbl-dropdown-row">' +
-            '<td class="wlbl-entry-content">' + ip_uri + '</td>' +
-            '<td class="wlbl-entry-wlbl">' + list_types + '</td>' +
-            '<td class="wlbl-current-entry-wbrs text-center">' + wbrs_score + '</td>' +
-            '<td class="wlbl-threat-cat">' + tc_str + '</td></tr>'
-
-            $(tbody).append(table_row)
+          .then( buildThreatRow.bind(null, entry, tbody))
+          .then null, (err) ->
+            # handle error
+            console.log err
 
         comment_box.text(comment_trail)
 
@@ -292,7 +269,31 @@ window.bulk_get_current_wlbl = (page) ->
     std_msg_error('No rows selected', ['Please select at least one entry row.'])
     return false
 
+  buildThreatRow = (entry, tbody, result) ->
+    console.error
+    { threat_categories } = JSON.parse(result)
+    { ip_uri, list_types, wbrs_score, comment } = entry
+    tc_str = threat_categories.join(', ')
 
+    if list_types
+      list_types = entry['list_types'].join(', ')
+    else
+      list_types = ''
+      wbrs_score = wbrs
+    if !wbrs_score
+      wbrs_score = '<span class="missing-data text-left">No Score</span>'
+    if !comment
+      comment = ''
+
+    table_row =
+      '<tr class="wlbl-dropdown-row">' +
+        '<td class="wlbl-entry-content">' + ip_uri + '</td>' +
+        '<td class="wlbl-entry-wlbl">' + list_types + '</td>' +
+        '<td class="wlbl-current-entry-wbrs text-center">' + wbrs_score + '</td>' +
+        '<td class="wlbl-threat-cat">' + tc_str + '</td>' +
+      '</tr>'
+
+    $(tbody).append(table_row)
 
 #### SUBMISSION OF WL/BL CHANGES TO WBRS ####
 
