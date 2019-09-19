@@ -86,7 +86,7 @@ class Dispute < ApplicationRecord
       ticket_type = 'ew'
     end
 
-    customer = Customer.where(name: 'Dispute Analyst').first
+    customer = Customer.where(name: 'Dispute Analyst').first_or_create(name: 'Dispute Analyst')
 
     summary = "New WebRep Dispute generated at #{DateTime.now.utc.strftime("%Y-%m-%d %H:%M")}"
 
@@ -113,10 +113,10 @@ class Dispute < ApplicationRecord
                                      submission_type: ticket_type,
                                      submitter_type: 'Internal',
                                      status: status,
-                                     customer_id: customer.id,
+                                     customer_id: customer.id || 1,
                                      case_opened_at: Time.now)
 
-    ips_urls.split(' ').each do |ip_url|
+    ips_urls.each do |ip_url|
       if DisputeEntry.check_for_duplicates(ip_url) == false
         DisputeEntry.create_dispute_entry(new_dispute, ip_url, status)
       end
