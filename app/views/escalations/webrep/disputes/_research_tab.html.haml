@@ -64,17 +64,15 @@
 
                   .inline-tool-content-wrapper
                     .row
-                      .col-xs-2
-                        %label.content-label-sm Action
                       .col-xs-3
                         %input{type: 'radio', name: 'wlbl-action-radio', id: 'wlbl-add', value: 'wlbl-add', checked: true}
                         %label.radio-label{for: 'wlbl-add'} Add to list
                       .col-xs-4
                         %input{type: 'radio', name: 'wlbl-action-radio', id: 'wlbl-remove', value: 'wlbl-remove'}
                         %label.radio-label{for: 'wlbl-remove'} Remove from list
-                      .col-xs-3.replace-tc-radio.hidden
-                        %input{type: 'radio', name: 'wlbl-action-radio', id: 'wlbl-change', value: 'wlbl-change'}
-                        %label.radio-label{for: 'wlbl-change'} Replace threat categories
+                      .col-xs-5.replace-tc-radio.hidden
+                        %input{type: 'radio', name: 'wlbl-action-radio', id: 'wlbl-replace', value: 'wlbl-replace'}
+                        %label.radio-label{for: 'wlbl-replace'} Replace threat categories
 
                     .row.tc-replace-note
                       .col-xs-12
