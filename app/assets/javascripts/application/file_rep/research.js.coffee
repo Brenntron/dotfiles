@@ -32,6 +32,7 @@ window.refresh_research_data = (sha256_hash) ->
 # services: sandbox threatgrid reversinglabs
 # space delimited
 window.evaluate_file = (sha256_hash, services) ->
+  console.log services
   sha256_hash = $('#sha256_hash')[0].innerText
   std_msg_ajax(
     method: 'GET'

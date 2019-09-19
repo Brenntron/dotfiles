@@ -25,12 +25,10 @@
         %label.toolbar-section-label Data
         %button.toolbar-button.sync-button#file-rep-sync-button.esc-tooltipped{title: 'Refresh Data', onclick: 'refresh_research_data()'}
           %span.toolbar-button-text Refresh Data
-        %button.toolbar-button.sync-button#file-rep-resubmit-evaluate-button.esc-tooltipped{title: 'Re-evaluate File', onclick: 'evaluate_file()'}
-          %span.toolbar-button-text Re-evaluate File
       %div
         %label.toolbar-section-label Reports
-        %button.toolbar-button.esc-tooltipped.create-new-run-button{title: 'Create New Sandbox Run', onclick: 'run_sample_in_sandbox()'}
-          %span.toolbar-button-text Create New Sandbox Run
+        %button.toolbar-button.icon-reports#file-rep-resubmit-evaluate-button.esc-tooltipped{title: 'Resubmit to Resources', onclick: 'evaluate_file()'}
+          %span.toolbar-button-text Resubmit to Resources
 
 .row
   .col-xs-12.col-sm-4#sandbox-report-wrapper
