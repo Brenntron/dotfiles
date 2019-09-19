@@ -224,6 +224,42 @@ Feature: Disputes
     Then I wait for "3" seconds
     Then I should receive a file of type "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet"
 
+    
+
+  @javascript
+  Scenario: a user wants to verify threat categories column appears in adjust wl/bl dropdown
+    Given a user with role "webrep user" exists and is logged in
+    And the following disputes exist and have entries:
+      | id | submission_type |
+      | 1  | w               |
+    When I goto "escalations/webrep/disputes?f=open"
+    And I wait for "2" seconds
+    And I click ".expand-row-button-inline"
+    And I click ".dispute-entry-checkbox"
+    And I click "#index-adjust-wlbl"
+    And I wait for "2" seconds
+    And I should see "Threat Category"
+
+  @javascript @now
+  Scenario: a user wants to see available threat categories to add to blacklists
+    Given a user with role "webrep user" exists and is logged in
+    And the following disputes exist and have entries:
+      | id | submission_type |
+      | 1  | w               |
+    When I goto "escalations/webrep/disputes?f=open"
+    And I wait for "5" seconds
+    And I click ".expand-row-button-inline"
+    And I click ".dispute-entry-checkbox"
+    And I click "#index-adjust-wlbl"
+    And I wait for "5" seconds
+    And I click ".bl-weak-checkbox"
+    And I wait for "5" seconds
+    Then I should see "Bogon"
+    Then I should see "Cryptojacking"
+    Then I should see "Phishing"
+
+
+
   @javascript
   Scenario: a user tries to export selected dispute entries on the Research tab
     Given a user with role "webrep user" exists and is logged in
