@@ -270,19 +270,16 @@ window.bulk_get_current_wlbl = (page) ->
     { ip_uri, list_types, wbrs_score, comment } = entry
     tc_str = threat_categories.join(', ')
 
-#    if wlbl_entry.length > 0 and wlbl_entry.text().trim().includes('BL-')
-#      $('.change-tc-radio').removeClass('hidden')  # show the 'change threat categories' radio button in dropdown
-    $('.change-tc-radio').removeClass('hidden')  # show the 'change threat categories' radio button in dropdown
-
     if list_types
       list_types = entry['list_types'].join(', ')
+      if list_types.includes('BL-')  # show 'replace tc' radio if bl exists
+        $('.replace-tc-radio').removeClass('hidden')
     else
       list_types = ''
       wbrs_score = wbrs
     if !wbrs_score
       wbrs_score = '<span class="missing-data text-left">No Score</span>'
-    if !comment
-      comment = ''
+    if !comment then comment = ''
 
     table_row =
       '<tr class="wlbl-dropdown-row">' +
@@ -617,7 +614,7 @@ window.place_threat_category = (ip_uri, type) ->
         return tc_str
 #        bulk_tc.html(tc_str)
 #        if wlbl_entry.length > 0 and wlbl_entry.text().trim().includes('BL-')
-#          $('.change-tc-radio').removeClass('hidden')  # show the 'change threat categories' radio button in dropdown
+#          $('.replace-tc-radio').removeClass('hidden')  # show the 'change threat categories' radio button in dropdown
 #        if wlbl_entry.length > 0 and wlbl_entry.length > 0 and wlbl_entry.text().trim() == ''
 #          bulk_tc.empty()
 #        if bfrp_search.length > 0 and research_row_left.text().trim() == ''
@@ -648,14 +645,14 @@ window.addWlBlListeners = () ->
   $('#index-adjust-wlbl, #wlbl_entries_button').click ->
     $('.dispute-wlbl-adjust-wrapper input:checkbox').prop('checked', false)
     $('.dispute-wlbl-adjust-wrapper #wlbl-add').prop('checked', true)
-    $('.dispute-wlbl-adjust-wrapper .tc-change-note').addClass('hidden')
+    $('.dispute-wlbl-adjust-wrapper .tc-replace-note').addClass('hidden')
     $('.dispute-wlbl-adjust-wrapper .threat-cat-row').addClass('hidden')
-    $('.dispute-wlbl-adjust-wrapper .change-tc-radio').addClass('hidden')
+    $('.dispute-wlbl-adjust-wrapper .replace-tc-radio').addClass('hidden')
     $('.dispute-wlbl-adjust-wrapper .lists-row').removeClass('hidden')
     $('.dispute-wlbl-adjust-wrapper .dropdown-submit-button').prop('disabled', true)
 
   $('.dispute-wlbl-adjust-wrapper #wlbl-change').click ->
-    $('.dispute-wlbl-adjust-wrapper .lists-row, .dispute-wlbl-adjust-wrapper .tc-change-note').addClass('hidden')
+    $('.dispute-wlbl-adjust-wrapper .lists-row, .dispute-wlbl-adjust-wrapper .tc-replace-note').addClass('hidden')
     $('.dispute-wlbl-adjust-wrapper .threat-cat-row').removeClass('hidden')
     $('.dispute-wlbl-adjust-wrapper .dispute-wlbl-adjust-wrapper .dropdown-menu input:checkbox').prop('checked', false)
     $('.dispute-wlbl-adjust-wrapper .dropdown-submit-button').prop('disabled', true)
@@ -691,7 +688,7 @@ window.addWlBlListeners = () ->
 
       clearAllInputs = () ->
         $('.dropdown-menu .dispute-wlbl-adjust-wrapper input:checkbox').prop('checked', false)
-        $('.dispute-wlbl-adjust-wrapper .tc-change-note').addClass('hidden')
+        $('.dispute-wlbl-adjust-wrapper .tc-replace-note').addClass('hidden')
         disableSubmit()
 
       # BL click? show/hide the threat cat row if 'Add to list' is toggled
@@ -706,19 +703,19 @@ window.addWlBlListeners = () ->
 
       # Add / Remove - clean slate on either click
       add_radio.click ->
-        $('.tc-change-note').addClass('hidden')
+        $('.tc-replace-note').addClass('hidden')
         lists_row.removeClass('hidden')
         tc_row.addClass('hidden')
         clearAllInputs()
 
       remove_radio.click ->
-        $('.tc-change-note').addClass('hidden')
+        $('.tc-replace-note').addClass('hidden')
         lists_row.removeClass('hidden')
         tc_row.addClass('hidden')
         clearAllInputs()
 
       change_radio.click ->
-        $('.tc-change-note').removeClass('hidden')  # pre-toggle all the tc cb's
+        $('.tc-replace-note').removeClass('hidden')  # pre-toggle all the tc cb's
 
         tc_array = $('.wlbl-threat-cat').text().trim().split(', ')
         $(dropdown_id).find('.threat-cat-cell').each ->
@@ -734,7 +731,7 @@ window.addWlBlListeners = () ->
 
       # if tc's exist, show the change tc's radio button
 #      if $(this).find('.wlbl-threat-cat').text().trim() != ''
-#        $('.dispute-wlbl-adjust-wrapper .tc-change-note').removeClass('hidden')
+#        $('.dispute-wlbl-adjust-wrapper .tc-replace-note').removeClass('hidden')
 
 
 
@@ -745,7 +742,7 @@ window.addWlBlListeners = () ->
       # tc cb click inside change tc's? show the "bls will be removed" note + clear the bl cb's in background
       # this submit form (change is checked) will simply function as if "add to list" is toggled
       if cb_class.includes('wlbl_thrt_cat_id') and change_radio.prop('checked') and tc_num == 0
-        $('.tc-change-note').removeClass('hidden')
+        $('.tc-replace-note').removeClass('hidden')
         bl_num = 0
 
       # threat category checkbox click: if already 5 tc's checked, bold the note, max is 5

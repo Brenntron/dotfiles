@@ -224,10 +224,10 @@ Feature: Disputes
     Then I wait for "3" seconds
     Then I should receive a file of type "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet"
 
-    
+
 
   @javascript
-  Scenario: a user wants to verify threat categories column appears in adjust wl/bl dropdown
+  Scenario: a user wants to verify threat categories column appears in adjust wl/bl dropdown on webrep index
     Given a user with role "webrep user" exists and is logged in
     And the following disputes exist and have entries:
       | id | submission_type |
@@ -241,6 +241,17 @@ Feature: Disputes
     And I should see "Threat Category"
 
   @javascript @now
+  Scenario: a user wants to verify threat categories column appears in adjust wl/bl dropdown on research tab
+    Given a user with role "webrep user" exists and is logged in
+    And the following disputes exist and have entries:
+      | id   | submission_type |
+      | 123  | w               |
+    When I goto "escalations/webrep/disputes/123"
+    And I wait for "2" seconds
+    And I click ".bfrp-inline-wlbl-button"
+    And I should see "Threat Category"
+
+  @javascript
   Scenario: a user wants to see available threat categories to add to blacklists
     Given a user with role "webrep user" exists and is logged in
     And the following disputes exist and have entries:
@@ -257,6 +268,8 @@ Feature: Disputes
     Then I should see "Bogon"
     Then I should see "Cryptojacking"
     Then I should see "Phishing"
+
+
 
 
 
