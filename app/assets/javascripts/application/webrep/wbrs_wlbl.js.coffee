@@ -149,7 +149,7 @@ window.get_current_wlbl = (button) ->
   )
 
 
-## Populating the toolbar Adjust WL/BL dropdown
+## Populating the toolbar Adjust WL/BL dropdown BULK
 ## This works for index, research page, and research tab of show page
 window.bulk_get_current_wlbl = (page) ->
   entries_checked = []
@@ -252,12 +252,11 @@ window.bulk_get_current_wlbl = (page) ->
             tc_json = get_threat_categories(entry.ip_uri)
             if tc_json then resolve tc_json  # resolve goes to .then() below
 
-          .then(build_wlbl_row.bind(null, entry, tbody))   # bind() is promise/.then() specific
+          .then(build_tc_row.bind(null, entry, tbody))   # bind() is promise/.then() specific
           .then null, (err) ->
             std_msg_error( 'Error retrieving WL/BL Data', response)  # handle this error more silently if needed
 
-        comment_box.text(comment_trail)
-
+          comment_box.text(comment_trail)
       error: (response) ->
         std_msg_error( 'Error retrieving WL/BL Data', response)
     )
@@ -266,10 +265,14 @@ window.bulk_get_current_wlbl = (page) ->
     return false
 
   # ensures the table row w/ tc gets built correctly (KH refactor)
-  build_wlbl_row = (entry, tbody, result) ->
+  build_tc_row = (entry, tbody, result) ->
     { threat_categories } = JSON.parse(result)
     { ip_uri, list_types, wbrs_score, comment } = entry
     tc_str = threat_categories.join(', ')
+
+#    if wlbl_entry.length > 0 and wlbl_entry.text().trim().includes('BL-')
+#      $('.change-tc-radio').removeClass('hidden')  # show the 'change threat categories' radio button in dropdown
+    $('.change-tc-radio').removeClass('hidden')  # show the 'change threat categories' radio button in dropdown
 
     if list_types
       list_types = entry['list_types'].join(', ')
@@ -345,10 +348,8 @@ window.submit_bulk_wlbl = (page) ->
 
     data = {ip_uris: ip_uris, list_types: list_types, note: wlbl_comment, thrt_cat_ids: thrt_cat_ids}
 
-    # dbinebri: here is where the add/remove forms are being handled
-    # dbinebri: here is where the add/remove forms are being handled
-    # dbinebri: here is where the add/remove forms are being handled
-    if $('#wlbl-remove').prop('checked') == true
+    # dbinebri: back-end form submissions handled from here
+    if $('#wlbl-remove').prop('checked')
       std_msg_ajax(
         url: '/escalations/api/v1/escalations/webrep/disputes/bulk_rule_ui_wlbl_remove'
         method: 'POST'
@@ -358,7 +359,7 @@ window.submit_bulk_wlbl = (page) ->
         error: (response) ->
           std_api_error(response, 'Error retrieving WL/BL Data')
       )
-    else if $('#wlbl-add').prop('checked') == true or $('#wlbl-change').prop('checked') == true
+    else if $('#wlbl-add').prop('checked') or $('#wlbl-change').prop('checked')
       std_msg_ajax(
         url: '/escalations/api/v1/escalations/webrep/disputes/bulk_rule_ui_wlbl_add'
         method: 'POST'
@@ -643,18 +644,13 @@ window.place_threat_category = (ip_uri, type) ->
 # WL/BL dropdowns checkbox validation logic, these get added for these dropdowns on page load
 window.addWlBlListeners = () ->
 
-  # WILL REFACTOR THESE: ensure each dropdown is super clean when toggled
+  # clean slate each adjust wl/bl dropdown on click
   $('#index-adjust-wlbl, #wlbl_entries_button').click ->
     $('.dispute-wlbl-adjust-wrapper input:checkbox').prop('checked', false)
     $('.dispute-wlbl-adjust-wrapper #wlbl-add').prop('checked', true)
     $('.dispute-wlbl-adjust-wrapper .tc-change-note').addClass('hidden')
     $('.dispute-wlbl-adjust-wrapper .threat-cat-row').addClass('hidden')
-
-    # FIX THIS LINE
-    # FIX THIS LINE
-    # FIX THIS LINE, add logic
     $('.dispute-wlbl-adjust-wrapper .change-tc-radio').addClass('hidden')
-
     $('.dispute-wlbl-adjust-wrapper .lists-row').removeClass('hidden')
     $('.dispute-wlbl-adjust-wrapper .dropdown-submit-button').prop('disabled', true)
 
@@ -694,20 +690,14 @@ window.addWlBlListeners = () ->
       disableSubmit = () -> $(submit_button).prop('disabled', true)
 
       clearAllInputs = () ->
-        # CHANGE RADIO BUTTON FIX!
-        # CHANGE RADIO BUTTON FIX!
-        # CHANGE RADIO BUTTON FIX!
-        # CHANGE RADIO BUTTON FIX!
-
-        $('.dispute-wlbl-adjust-wrapper input:checkbox').prop('checked', false)
-        $('.dispute-wlbl-adjust-wrapper #wlbl-add').prop('checked', true)
+        $('.dropdown-menu .dispute-wlbl-adjust-wrapper input:checkbox').prop('checked', false)
         $('.dispute-wlbl-adjust-wrapper .tc-change-note').addClass('hidden')
         disableSubmit()
 
       # BL click? show/hide the threat cat row if 'Add to list' is toggled
       if cb_value.includes('BL-') and bl_num > 0
         unless $(dropdown_id).find('#wlbl-remove').prop('checked') == true
-          # if the remove is toggled inside this dropdown, dont do below
+          # if the remove radio is toggled inside this dropdown, dont do below
           tc_row.removeClass('hidden')
 
       else if cb_value.includes('BL-') and bl_num == 0 and add_radio.prop('checked') == true
@@ -728,8 +718,7 @@ window.addWlBlListeners = () ->
         clearAllInputs()
 
       change_radio.click ->
-        # pre-toggle all the tc cb's
-        $('.tc-change-note').removeClass('hidden')
+        $('.tc-change-note').removeClass('hidden')  # pre-toggle all the tc cb's
 
         tc_array = $('.wlbl-threat-cat').text().trim().split(', ')
         $(dropdown_id).find('.threat-cat-cell').each ->
@@ -741,6 +730,13 @@ window.addWlBlListeners = () ->
 
       # show/hide the note about 5 tc's when you are Adding to list
       if add_radio.prop('checked') then tc_note.removeClass('hidden') else tc_note.addClass('hidden')
+
+
+      # if tc's exist, show the change tc's radio button
+#      if $(this).find('.wlbl-threat-cat').text().trim() != ''
+#        $('.dispute-wlbl-adjust-wrapper .tc-change-note').removeClass('hidden')
+
+
 
       # if change is checked and no tc's, then no bl's should be checked, ensure this
       if change_radio.prop('checked') and tc_num == 0
@@ -779,6 +775,7 @@ window.addWlBlListeners = () ->
       row_id = '#' + $(this).siblings('.dropdown-menu').attr('id')
       ip_uri = $('.dispute-entry-ip-uri').text().trim().split(',')[0]
       unless $('.wlbl-table-result').text().trim() == ''   # handle the no-bl don't show tc's (1234computer.com issue)
+
         place_threat_category(ip_uri, 'research')
     ), 1500
 

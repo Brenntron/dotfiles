@@ -10473,7 +10473,10 @@ span.threat-cat-no-data {
 }
 
 .wlbl-table-result {
-  max-width: 100px;
+  /* handles existing bug for wl/bl list duplicate entries */
+  max-width: 150px;
+  max-height: 45px;
+  overflow-y: hidden;
 }
 
 .wlbl-threat-cat, .wlbl-threat-cat-inline, table.dispute_tool_current th.th-threat-cat {
