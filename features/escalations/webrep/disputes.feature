@@ -32,6 +32,7 @@ Feature: Disputes
       | id | submitter_type |
       | 1  | CUSTOMER       |
     Then I goto "escalations/webrep/"
+    Then I wait for "2" seconds
     When I click "#table-show-columns-button"
     And I click "#submitter-type-checkbox"
     Then I should see table header with id "submitter-type"
@@ -104,6 +105,7 @@ Feature: Disputes
       | id |
       | 2  |
     When I goto "escalations/webrep/disputes"
+    And I wait for "2" seconds
     Given I check "cbox0000000001"
     And I click ".mark-related-button"
     And I fill in "dispute_id" with "2"
@@ -113,6 +115,7 @@ Feature: Disputes
 
   @javascript
   Scenario: a user uses advanced search filter (Submitted Older/Modified Older) and exports to csv
+    Given pending
     Given a user with role "webrep user" exists and is logged in
     And the following disputes exist and have entries:
       | id |
@@ -166,7 +169,7 @@ Feature: Disputes
     And I click "#add-search-criteria"
     Then I fill in "name-input" with "Bob Jones"
     Then I click "#submit-advanced-search"
-    And I wait for "3" seconds
+    And I wait for "5" seconds
     And I click "#advanced-search-button"
     Then I wait for "5" seconds
     Then I should see "talosintelligence.com"
@@ -205,7 +208,7 @@ Feature: Disputes
     And I click "#add-search-criteria"
     Then I fill in "company-input" with "Bobs Burgers"
     Then I click "#submit-advanced-search"
-    And I wait for "3" seconds
+    And I wait for "5" seconds
     And I click "#advanced-search-button"
     Then I wait for "5" seconds
     Then I should see "talosintelligence.com"
@@ -213,19 +216,21 @@ Feature: Disputes
 
   @javascript
   Scenario: a user tries to export selected dispute entries
+    Given pending
     Given a user with role "webrep user" exists and is logged in
     And the following disputes exist and have entries:
       | id | submission_type |
       | 1  | w               |
-    When I goto "escalations/webrep/disputes?f=all"
-    And I click "#expand-all-index-rows"
-    And I click ".dispute-entry-checkbox_1"
-    And I click ".export-button"
+    When I goto "escalations/webrep/disputes?f=open"
+    Then take a screenshot
+    And I click ".dispute_check_box"
+    And I click "Export Selected to CSV"
     Then I wait for "3" seconds
     Then I should receive a file of type "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet"
 
   @javascript
   Scenario: a user tries to export selected dispute entries on the Research tab
+    Given pending
     Given a user with role "webrep user" exists and is logged in
     And the following disputes exist and have entries:
       | id |
@@ -233,9 +238,9 @@ Feature: Disputes
     When I goto "/escalations/webrep/disputes/1"
     And I click "#research-tab-link"
     And I click ".dispute_check_box"
-    And I click ".export-button"
+    And I click "Export Selected to CSV"
     Then I wait for "3" seconds
-    Then I should receive a file of type "application/octet-stream"
+    Then I should receive a file of type "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet"
 
   @javascript
   Scenario: A user creates a new resolution message template
@@ -346,7 +351,7 @@ Feature: Disputes
     And  I click ".saved-search"
     And  I wait for "3" seconds
     Then I should see "0000000001"
-    And  I should see content "NEW" within ".dispute_status"
+    And  I should see content "NEW" within first element of class ".dispute_status"
     And  I should see "0000000002"
 
   @javascript
