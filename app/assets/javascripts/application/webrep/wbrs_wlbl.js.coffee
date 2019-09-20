@@ -597,7 +597,7 @@ window.wlbl_history_dialog = (id) ->
 
 
 #### THREAT CATEGORY - uses a separate API call - needs to be handled asynchronously ####
-# use this uri + place the threat cat(s) in adjust wl/bl bulk dropdown, inline dropdown, or research row (bfrp / show page)
+# this function and add wl/bl listeners function will continue to be refactored, fyi
 window.place_threat_category = (ip_uri, type) ->
   # use a promise for the threat cat api call, could take up to 1-2 seconds
   tc_promise = new Promise (resolve, reject) ->
@@ -621,16 +621,13 @@ window.place_threat_category = (ip_uri, type) ->
       tc_str = '<span class="threat-cat-no-data">No Category</span>'
     else tc_str = threat_categories.join(', ')
 
-    # type of place to add the threat cat(s): bulk, inline, or research row on page-load (show page or bfrp)
-    switch type
-      when 'research'
-        if bfrp_search.length > 0 and research_row_left.text().trim() == ''  # on bfrp page
-          research_row_right.html('').remove()   # if on bfrp and no wl's or bl's, then no tc's should show (1234computer.com issue)
-          $('.dropdown-menu .wlbl-threat-cat-inline').remove()  #    use a $(wrapper_id)
-        else if bfrp_search.length > 0 and research_row_left.text().includes('BL')  # on research tab show page
-          research_row_right.html(tc_str)
-          research_row_full.addClass('ensure-tc-width')  # ensure enough width for all lists + TC's
-        else research_row_right.html(tc_str)
+    if type == 'research'  # for research rows
+      if bfrp_search.length > 0 and research_row_left.text().trim() == ''  # on bfrp page
+        research_row_right.html('').remove()   # if on bfrp and no wl's or bl's, then no tc's should show (1234computer.com issue)
+        $('.dropdown-menu .wlbl-threat-cat-inline').remove()  #    use a $(wrapper_id)
+      else if bfrp_search.length > 0 and research_row_left.text().includes('BL')  # on research tab show page
+        research_row_right.html(tc_str)
+      else research_row_right.html(tc_str)
 
   # error handling for the json response, leave the empty error span
   .then null, (err) ->
@@ -641,7 +638,7 @@ window.place_threat_category = (ip_uri, type) ->
 
 # WL/BL dropdowns checkbox validation logic, these get added for these dropdowns on page load
 window.addWlBlListeners = () ->
-  # CLICK - bulk adjust click - ensure clean slate each time
+  # bulk adjust click - ensure clean slate each time
   $('#index-adjust-wlbl, #wlbl_entries_button').click ->
     dd = $(this).next('.dropdown-menu')
     $(dd).find('input:checkbox').prop('checked', false)
@@ -650,12 +647,12 @@ window.addWlBlListeners = () ->
     $(dd).find('.tc-replace-note, .threat-cat-row, .replace-tc-radio').addClass('hidden')
     $(dd).find('.dropdown-submit-button').prop('disabled', true)
 
-  # CLICK - inline adjust click
+  # inline adjust click
   $('.bfrp-inline-wlbl-button').click ->
     dd = $(this).next('.dropdown-menu')
     $(dd).find('.lists-row').removeClass('hidden')
 
-  # CLICK - replace radio - ensure clean slate each time
+  # replace radio click - ensure clean slate each time
   $('.dispute-wlbl-adjust-wrapper #wlbl-replace').click ->
     dd = $(this).next('.dropdown-menu')
     $(dd).find('.threat-cat-row').removeClass('hidden')
@@ -663,14 +660,14 @@ window.addWlBlListeners = () ->
     $(dd).find('.dispute-wlbl-adjust-wrapper .dropdown-menu input:checkbox').prop('checked', false)
     $(dd).find('.dropdown-submit-button').prop('disabled', true)
 
-  # PAGE LOAD - RESEARCH TAB
+  # page load - research tab
   if $('#research-tab').length
     row_id = '#' + $(this).siblings('.dropdown-menu').attr('id')
     ip_uri = $('.dispute-entry-ip-uri').text().trim().split(',')[0]
     unless $('.wlbl-table-result').text().trim() == ''   # handle the no-bl don't show tc's (1234computer.com issue)
       place_threat_category(ip_uri, 'research')
 
-  # PAGE LOAD - BFRP RESEARCH
+  # page load - bfrp page
   if $('.reputation-research-search-wrapper').length
     ip_uri = $('.searched-for-url').text().trim().split(',')[0]
     place_threat_category(ip_uri, 'research',)

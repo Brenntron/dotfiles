@@ -10407,7 +10407,6 @@ span.threat-cat-required .five-note.required-bold {
   color: darken($warning-accent-color, 5%)
 }
 
-
 span.threat-cat-no-data {
   float: none;
   font-size: 8pt;
@@ -10433,12 +10432,6 @@ span.threat-cat-no-data {
 // ensure vertical alignment on narrow screens
 .research-table-details-wrapper table tr:first-of-type td {
   vertical-align: middle;
-}
-
-#disputes-research-table .wlbl-tc-research-span {
-  margin-left: 10px;
-  width: 100px;
-  float: right;
 }
 
 // webrep dispute index > ensure break/wrap properly for long url's containing parameters
@@ -10468,19 +10461,40 @@ span.threat-cat-no-data {
   }
 }
 
-.ensure-tc-width {
-  width: 250px;
-}
-
-.wlbl-table-result {
-  /* handles existing bug for wl/bl list duplicate entries */
-  max-width: 150px;
-  max-height: 45px;
-  overflow-y: hidden;
-}
 
 .wlbl-threat-cat, .wlbl-threat-cat-inline, table.dispute_tool_current th.th-threat-cat {
   padding-left: 2px !important;
+}
+
+// the main area in the research row to handle threat cats + wl/bls
+.wlbl-and-tc-area {
+  vertical-align: middle;
+
+  width: 250px;
+}
+
+/* handles existing bug for wl/bl list duplicate entries */
+.wlbl-table-result {
+  display: inline-block;
+  width: 100px;
+  max-width: 150px;
+  max-height: 45px;
+  overflow-y: hidden;
+  padding-bottom: 4px;
+  vertical-align: middle;
+}
+
+.wlbl-tc-research-span {
+  display: inline-block;
+  width: 100px;
+  padding-left: 5px;
+  padding-bottom: 4px;
+  vertical-align: middle;
+}
+
+.wlbl-and-tc-area .dispute-inline-buttons.history-button {
+  float: none;
+  margin-bottom: 1px;
 }
 
 .tc-replace-note span {
