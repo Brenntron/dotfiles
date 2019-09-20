@@ -238,9 +238,9 @@ Feature: Disputes
     And I click ".dispute-entry-checkbox"
     And I click "#index-adjust-wlbl"
     And I wait for "2" seconds
-    And I should see "Threat Category"
+    Then I should see "Threat Category"
 
-  @javascript @now
+  @javascript
   Scenario: a user wants to verify threat categories column appears in adjust wl/bl dropdown on research tab
     Given a user with role "webrep user" exists and is logged in
     And the following disputes exist and have entries:
@@ -250,6 +250,16 @@ Feature: Disputes
     And I wait for "2" seconds
     And I click ".bfrp-inline-wlbl-button"
     And I should see "Threat Category"
+
+  @javascript
+  Scenario: a user wants to verify threat categories appear on page load on BFRP
+    Given a user with role "webrep user" exists and is logged in
+    When I goto "escalations/webrep/research"
+    Then I fill in "search_uri" with "g-oogl-e.com"
+    And I click "#submit-button"
+    And I wait for "5" seconds
+    Then I should see "Malware Sites"
+    Then I should see "Exploits"
 
   @javascript
   Scenario: a user wants to see available threat categories to add to blacklists
