@@ -336,33 +336,47 @@ window.submit_bulk_wlbl = (page) ->
 
     entries = $(dropdown).find('.wlbl-entry-content')
     wlbl_comment = $(dropdown).find('.adjust-wlbl-input').val()
-    thrt_cat_ids = [ $(dropdown).find('.wlbl_thrt_cat_id').val() ]
 
     if $(entries).length > 0
       $(entries).each ->
         entry = $(this).text()
         ip_uris.push(entry)
 
+    thrt_cat_ids = []
+    thrt_cat_names = []
+    thrt_cat_array = $(dropdown).find('.wlbl_thrt_cat_id')
+
+    $(thrt_cat_array).each ->
+      if $(this).prop('checked')  # if tc cb checked, add the value to this id array (val == id)
+        thrt_cat_ids.push($(this).val())
+        thrt_cat_names.push($(this).parent().text().trim())
+
+#    console.log thrt_cat_ids
+
     data = {ip_uris: ip_uris, list_types: list_types, note: wlbl_comment, thrt_cat_ids: thrt_cat_ids}
 
-    # dbinebri: back-end form submissions handled from here
-    if $('#wlbl-remove').prop('checked')
+    full_string = ''
+    full_string = '<br><strong>Threat Category(s) added: </strong>' + thrt_cat_names.join(', ')
+
+    # dbinebri: back-end form submissions handled from here (waypoint), SOMETHING IS STILL MESSED UP
+    # ADD REPLACE TO THIS CLAUSE
+    if $('#wlbl-add').prop('checked')
+      std_msg_ajax(
+        url: '/escalations/api/v1/escalations/webrep/disputes/bulk_rule_ui_wlbl_add'
+        method: 'POST'
+        data: data
+        success: (response) ->
+          std_msg_success("The following entries have been added to " + list_types, [ip_uris, full_string])
+        error: (response) ->
+          std_api_error(response, 'Error retrieving WL/BL Data')
+      )
+    else if $('#wlbl-remove').prop('checked')
       std_msg_ajax(
         url: '/escalations/api/v1/escalations/webrep/disputes/bulk_rule_ui_wlbl_remove'
         method: 'POST'
         data: data
         success: (response) ->
           std_msg_success("The following entries have been removed from " + list_types, ip_uris)
-        error: (response) ->
-          std_api_error(response, 'Error retrieving WL/BL Data')
-      )
-    else if $('#wlbl-add').prop('checked') or $('#wlbl-replace').prop('checked')
-      std_msg_ajax(
-        url: '/escalations/api/v1/escalations/webrep/disputes/bulk_rule_ui_wlbl_add'
-        method: 'POST'
-        data: data
-        success: (response) ->
-          std_msg_success("The following entries have been added to " + list_types, ip_uris)
         error: (response) ->
           std_api_error(response, 'Error retrieving WL/BL Data')
       )
@@ -627,25 +641,27 @@ window.place_threat_category = (ip_uri, type) ->
 
 # WL/BL dropdowns checkbox validation logic, these get added for these dropdowns on page load
 window.addWlBlListeners = () ->
-  # clean slate each adjust wl/bl dropdown on click, WILL CLEAN THESE UP
-  # clean slate each adjust wl/bl dropdown on click, WILL CLEAN THESE UP
-  # clean slate each adjust wl/bl dropdown on click, WILL CLEAN THESE UP
+  # CLICK - bulk adjust click - ensure clean slate each time
   $('#index-adjust-wlbl, #wlbl_entries_button').click ->
     dd = $(this).next('.dropdown-menu')
     $(dd).find('input:checkbox').prop('checked', false)
-    $(dd).find('#wlbl-add').prop('checked', true)
-    $(dd).find('.tc-replace-note').addClass('hidden')
-    $(dd).find('.threat-cat-row').addClass('hidden')
-    $(dd).find('.replace-tc-radio').addClass('hidden')
     $(dd).find('.lists-row').removeClass('hidden')
+    $(dd).find('#wlbl-add').prop('checked', true)
+    $(dd).find('.tc-replace-note, .threat-cat-row, .replace-tc-radio').addClass('hidden')
     $(dd).find('.dropdown-submit-button').prop('disabled', true)
 
+  # CLICK - inline adjust click
+  $('.bfrp-inline-wlbl-button').click ->
+    dd = $(this).next('.dropdown-menu')
+    $(dd).find('.lists-row').removeClass('hidden')
+
+  # CLICK - replace radio - ensure clean slate each time
   $('.dispute-wlbl-adjust-wrapper #wlbl-replace').click ->
-    dropdown = $(this).next('.dropdown-menu')
-    $(dropdown).find('.lists-row, .dispute-wlbl-adjust-wrapper .tc-replace-note').addClass('hidden')
-    $(dropdown).find('.threat-cat-row').removeClass('hidden')
-    $(dropdown).find('.dispute-wlbl-adjust-wrapper .dropdown-menu input:checkbox').prop('checked', false)
-    $(dropdown).find('.dropdown-submit-button').prop('disabled', true)
+    dd = $(this).next('.dropdown-menu')
+    $(dd).find('.threat-cat-row').removeClass('hidden')
+    $(dd).find('.lists-row, .dispute-wlbl-adjust-wrapper .tc-replace-note').addClass('hidden')
+    $(dd).find('.dispute-wlbl-adjust-wrapper .dropdown-menu input:checkbox').prop('checked', false)
+    $(dd).find('.dropdown-submit-button').prop('disabled', true)
 
   # PAGE LOAD - RESEARCH TAB
   if $('#research-tab').length
@@ -670,7 +686,7 @@ window.addWlBlListeners = () ->
     # define the wrapper id, either a dropdown id or a row id, depending where a threat cat needs to go
     dropdown_id = '#' + $(this).closest('.dropdown-menu').attr('id')  # get the dropdown id for the input just clicked
 
-    # below this line, $(this) refers to the active dropdown, so we don't select all existing dropdowns in the dom
+    # below this line, $(this) refers to the active dropdown, so we don't select all existing dropdowns in the DOM
     $(dropdown_id).ready ->
       lists_row = $(this).find('.lists-row')
       wl_num = $(this).find('.lists-row input[value^="WL-"]:checked').length
@@ -718,15 +734,15 @@ window.addWlBlListeners = () ->
 
       replace_radio.click ->
         tc_note_replace.removeClass('hidden')
-        tc_note_max.addClass('hidden')  # pre-toggle all the tc cb's
+        tc_note_max.addClass('hidden')
         tc_array = $('.wlbl-threat-cat').text().trim().split(', ')
         lists_row.addClass('hidden')
         tc_row.removeClass('hidden')
         $(dropdown_id).find('.threat-cat-cell').each ->
           curr_text = $(this).text().trim()
           curr_input = $(this).find('input:checkbox')
-          $(tc_array).each (i, value) ->
-            if value == curr_text then curr_input.prop('checked', true)  # toggle all the tc cb's
+          $(tc_array).each (i, value) ->  # pre-toggle all the tc cb's
+            if value == curr_text then curr_input.prop('checked', true)
         disableSubmit()
 
       # show/hide the note about 5 tc's when you are Adding to list
@@ -736,10 +752,9 @@ window.addWlBlListeners = () ->
       if replace_radio.prop('checked') and tc_num == 0
         $(this).find('.lists-row input[value^="BL-"]').prop('checked', false)
 
-      # tc cb click inside change tc's? show the "bls will be removed" note + clear the bl cb's in background
       # this submit form (change is checked) will simply function as if "add to list" is toggled
       if cb_class.includes('wlbl_thrt_cat_id') and replace_radio.prop('checked') and tc_num == 0
-        $('.tc-replace-note').removeClass('hidden')
+        tc_note_replace.removeClass('hidden')
         bl_num = 0
 
       # threat category checkbox click: if already 5 tc's checked, bold the note, max is 5
