@@ -351,12 +351,10 @@ window.submit_bulk_wlbl = (page) ->
         thrt_cat_ids.push($(this).val())
         thrt_cat_names.push($(this).parent().text().trim())
 
-#    console.log thrt_cat_ids
-
+    console.log thrt_cat_ids + ' these ids are getting passed to back-end'
     data = {ip_uris: ip_uris, list_types: list_types, note: wlbl_comment, thrt_cat_ids: thrt_cat_ids}
 
-    full_string = ''
-    full_string = '<br><strong>Threat Category(s) added: </strong>' + thrt_cat_names.join(', ')
+    tc_full_string = '<br><p>With the following Threat Categories: ' + thrt_cat_names.join(', ') + '</p>'
 
     # dbinebri: back-end form submissions handled from here (waypoint), SOMETHING IS STILL MESSED UP
     # ADD REPLACE TO THIS CLAUSE
@@ -366,7 +364,7 @@ window.submit_bulk_wlbl = (page) ->
         method: 'POST'
         data: data
         success: (response) ->
-          std_msg_success("The following entries have been added to " + list_types, [ip_uris, full_string])
+          std_msg_success("The following entries have been added to " + list_types, [ip_uris, tc_full_string])
         error: (response) ->
           std_api_error(response, 'Error retrieving WL/BL Data')
       )
