@@ -113,7 +113,7 @@ class Dispute < ApplicationRecord
                                      submission_type: ticket_type,
                                      submitter_type: 'Internal',
                                      status: status,
-                                     customer_id: customer.id || 1,
+                                     customer_id: customer.id,
                                      case_opened_at: Time.now)
 
     ips_urls.each do |ip_url|
