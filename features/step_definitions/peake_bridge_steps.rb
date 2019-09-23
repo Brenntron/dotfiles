@@ -27,3 +27,10 @@ Given(/^PeakeBridge poll is stubbed$/) do
   ::Bridge::DirectRequest.stub(:poll).and_return(success)
 end
 
+
+Given(/^"(.*)" bridge message should be in the delayed job queue$/) do |number|
+  raise("Messages not properly queued") if DelayedJob.all.count != number.to_i
+end
+
+
+
