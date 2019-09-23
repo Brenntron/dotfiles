@@ -45,4 +45,3 @@ Feature: Webrep, the BFRP
     And I click "#submit-button"
     And I wait for "5" seconds
     Then I should see "Malware Sites"
-    Then I should see "Exploits"
