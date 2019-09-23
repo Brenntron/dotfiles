@@ -61,7 +61,7 @@ Feature: Disputes
     And I click "#research-tab-link"
     And I click "#data-resubmit-tg-cb"
     And I click "#file-rep-resubmit-evaluate-button"
-    And I should see content "Successfully resubmitted to selected services: sandbox" within ".modal-dialog"
+    And I should see content "Successfully resubmitted to selected services: Talos Sandbox" within ".modal-dialog"
 
   @javascript
   Scenario: an analyst tries to create a FileRep ticket but it is flagged as a duplicate and not processed
