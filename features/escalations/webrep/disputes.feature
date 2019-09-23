@@ -238,9 +238,9 @@ Feature: Disputes
     And I click ".dispute-entry-checkbox"
     And I click "#index-adjust-wlbl"
     And I wait for "2" seconds
-    And I should see "Threat Category"
+    Then I should see "Threat Category"
 
-  @javascript @now
+  @javascript
   Scenario: a user wants to verify threat categories column appears in adjust wl/bl dropdown on research tab
     Given a user with role "webrep user" exists and is logged in
     And the following disputes exist and have entries:

@@ -111,13 +111,11 @@ window.get_current_wlbl = (button) ->
             initial_bl_heavy_status = bl_heavy_status
 
           # inline dropdowns only: if BL exists, show the tc row and toggle the existing tc's
-          switch String(this)
+          switch this.toString()
             when 'BL-weak', 'BL-med', 'BL-heavy'
-              # for bl's, show the threat cat row
               $(dropdown).find('.threat-cat-row').removeClass('hidden')
 
-              # get and set the threat categories with a promise
-              tc_promise = new Promise (resolve, reject) ->
+              tc_promise = new Promise (resolve, reject) ->   # get and set the threat categories with a promise
                 tc_json = get_threat_categories(entry_content)
                 if tc_json then resolve tc_json  # resolve goes to .then() below
               tc_promise.then (result) ->
@@ -126,10 +124,8 @@ window.get_current_wlbl = (button) ->
                   tc_str = '<span class="threat-cat-no-data">No Category</span>'
                 else tc_str = threat_categories.join(', ')
 
-                # step 1, place the threat cats in the html after the promise is ready
-                $(tc_cell).html(tc_str)
-                # step 2, toggle the tc checkboxes in the .threat-cat-row
-                $(dropdown).find('.threat-cat-cell').each ->
+                $(tc_cell).html(tc_str)  # 1) place the tc's in the html after promise resolves
+                $(dropdown).find('.threat-cat-cell').each ->  # 2) toggle the tc cb's in the threat-cat-row
                   curr_text = $(this).text().trim()
                   curr_input = $(this).find('input:checkbox')
                   $(threat_categories).each (i, value) ->
@@ -252,7 +248,7 @@ window.bulk_get_current_wlbl = (page) ->
             tc_json = get_threat_categories(entry.ip_uri)
             if tc_json then resolve tc_json  # resolve goes to .then() below
 
-          .then(build_tc_row.bind(null, entry, tbody))   # bind() is promise/.then() specific
+          .then( build_tc_row.bind(null, entry, tbody) )   # build the tc rows separately + bind them here
           .then null, (err) ->
             std_msg_error( 'Error retrieving WL/BL Data', response)  # handle this error more silently if needed
 
@@ -271,7 +267,7 @@ window.bulk_get_current_wlbl = (page) ->
     tc_str = threat_categories.join(', ')
 
     if list_types
-      list_types = entry['list_types'].join(', ')
+      list_types = entry['list_types'].sort().join(', ')
       if list_types.includes('BL-')  # show 'replace tc' radio if bl exists
         $('.replace-tc-radio').removeClass('hidden')
     else
@@ -283,10 +279,10 @@ window.bulk_get_current_wlbl = (page) ->
 
     table_row =
       '<tr class="wlbl-dropdown-row">' +
-        '<td class="wlbl-entry-content">' + ip_uri + '</td>' +
-        '<td class="wlbl-entry-wlbl">' + list_types + '</td>' +
-        '<td class="wlbl-current-entry-wbrs text-center">' + wbrs_score + '</td>' +
-        '<td class="wlbl-threat-cat">' + tc_str + '</td>' +
+      '<td class="wlbl-entry-content">' + ip_uri + '</td>' +
+      '<td class="wlbl-entry-wlbl">' + list_types + '</td>' +
+      '<td class="wlbl-current-entry-wbrs text-center">' + wbrs_score + '</td>' +
+      '<td class="wlbl-threat-cat">' + tc_str + '</td>' +
       '</tr>'
 
     $(tbody).append(table_row)
@@ -328,7 +324,6 @@ window.submit_bulk_wlbl = (page) ->
   dropdown = ''
 
   if $('.wl-bl-list-inline:checkbox:checked').length > 0
-
     if page == 'index'
       dropdown = $('#wlbl_adjust_entries_index')
     else if page == 'show' || page == 'research'
@@ -351,20 +346,25 @@ window.submit_bulk_wlbl = (page) ->
         thrt_cat_ids.push($(this).val())
         thrt_cat_names.push($(this).parent().text().trim())
 
+    # TODO: need BACK-END ASSISTANCE for below, array is passed to back-end, something is broken
     console.log thrt_cat_ids + ' these ids are getting passed to back-end'
     data = {ip_uris: ip_uris, list_types: list_types, note: wlbl_comment, thrt_cat_ids: thrt_cat_ids}
 
-    tc_full_string = '<br><p>With the following Threat Categories: ' + thrt_cat_names.join(', ') + '</p>'
+    if thrt_cat_ids.length  # if tc's were involved, and adding/replacing, add these strings, removing is just for wl/bl
+      tc_added_str = '<br><p>With the following Threat Category(s): ' + thrt_cat_names.join(', ') + '</p>'
+      tc_replaced_str = '<br><p>With the following Threat Category(s) replaced: ' + thrt_cat_names.join(', ') + '</p>'
+    else
+      tc_added_str = ''
+      tc_replaced_str = ''
 
-    # dbinebri: back-end form submissions handled from here (waypoint), SOMETHING IS STILL MESSED UP
-    # ADD REPLACE TO THIS CLAUSE
-    if $('#wlbl-add').prop('checked')
+    # add to list and replace threat cats use the same thing below
+    if $('#wlbl-add').prop('checked') or $('#wlbl-replace').prop('checked')
       std_msg_ajax(
         url: '/escalations/api/v1/escalations/webrep/disputes/bulk_rule_ui_wlbl_add'
         method: 'POST'
         data: data
         success: (response) ->
-          std_msg_success("The following entries have been added to " + list_types, [ip_uris, tc_full_string])
+          std_msg_success("The following entries have been added to " + list_types, [ip_uris, tc_added_str])
         error: (response) ->
           std_api_error(response, 'Error retrieving WL/BL Data')
       )
@@ -595,7 +595,7 @@ window.wlbl_history_dialog = (id) ->
 
 
 #### THREAT CATEGORY - uses a separate API call - needs to be handled asynchronously ####
-# use this uri + place the threat cat(s) in adjust wl/bl bulk dropdown, inline dropdown, or research row (bfrp / show page)
+# this function and add wl/bl listeners function will continue to be refactored, fyi
 window.place_threat_category = (ip_uri, type) ->
   # use a promise for the threat cat api call, could take up to 1-2 seconds
   tc_promise = new Promise (resolve, reject) ->
@@ -619,16 +619,13 @@ window.place_threat_category = (ip_uri, type) ->
       tc_str = '<span class="threat-cat-no-data">No Category</span>'
     else tc_str = threat_categories.join(', ')
 
-    # type of place to add the threat cat(s): bulk, inline, or research row on page-load (show page or bfrp)
-    switch type
-      when 'research'
-        if bfrp_search.length > 0 and research_row_left.text().trim() == ''  # on bfrp page
-          research_row_right.html('').remove()   # if on bfrp and no wl's or bl's, then no tc's should show (1234computer.com issue)
-          $('.dropdown-menu .wlbl-threat-cat-inline').remove()  #    use a $(wrapper_id)
-        else if bfrp_search.length > 0 and research_row_left.text().includes('BL')  # on research tab show page
-          research_row_right.html(tc_str)
-          research_row_full.addClass('ensure-tc-width')  # ensure enough width for all lists + TC's
-        else research_row_right.html(tc_str)
+    if type == 'research'  # for research rows
+      if bfrp_search.length > 0 and research_row_left.text().trim() == ''  # on bfrp page
+        research_row_right.html('').remove()   # if on bfrp and no wl's or bl's, then no tc's should show (1234computer.com issue)
+        $('.dropdown-menu .wlbl-threat-cat-inline').remove()  #    use a $(wrapper_id)
+      else if bfrp_search.length > 0 and research_row_left.text().includes('BL')  # on research tab show page
+        research_row_right.html(tc_str)
+      else research_row_right.html(tc_str)
 
   # error handling for the json response, leave the empty error span
   .then null, (err) ->
@@ -638,42 +635,41 @@ window.place_threat_category = (ip_uri, type) ->
 
 
 # WL/BL dropdowns checkbox validation logic, these get added for these dropdowns on page load
-window.addWlBlListeners = () ->
-  # CLICK - bulk adjust click - ensure clean slate each time
+window.add_wlbl_listeners = () ->
+  # bulk adjust click - ensure clean slate each time
   $('#index-adjust-wlbl, #wlbl_entries_button').click ->
     dd = $(this).next('.dropdown-menu')
-    $(dd).find('input:checkbox').prop('checked', false)
     $(dd).find('.lists-row').removeClass('hidden')
     $(dd).find('#wlbl-add').prop('checked', true)
-    $(dd).find('.tc-replace-note, .threat-cat-row, .replace-tc-radio').addClass('hidden')
+    $(dd).find('input:checkbox').prop('checked', false)
     $(dd).find('.dropdown-submit-button').prop('disabled', true)
+    $(dd).find('.tc-replace-note, .threat-cat-row, .replace-tc-radio').addClass('hidden')
 
-  # CLICK - inline adjust click
+  # inline adjust click
   $('.bfrp-inline-wlbl-button').click ->
-    dd = $(this).next('.dropdown-menu')
-    $(dd).find('.lists-row').removeClass('hidden')
+    $(this).next('.dropdown-menu').find('.lists-row').removeClass('hidden')
 
-  # CLICK - replace radio - ensure clean slate each time
+  # replace radio click - ensure clean slate each time
   $('.dispute-wlbl-adjust-wrapper #wlbl-replace').click ->
     dd = $(this).next('.dropdown-menu')
-    $(dd).find('.threat-cat-row').removeClass('hidden')
     $(dd).find('.lists-row, .dispute-wlbl-adjust-wrapper .tc-replace-note').addClass('hidden')
     $(dd).find('.dispute-wlbl-adjust-wrapper .dropdown-menu input:checkbox').prop('checked', false)
+    $(dd).find('.threat-cat-row').removeClass('hidden')
     $(dd).find('.dropdown-submit-button').prop('disabled', true)
 
-  # PAGE LOAD - RESEARCH TAB
+  # results page load - research tab
   if $('#research-tab').length
     row_id = '#' + $(this).siblings('.dropdown-menu').attr('id')
     ip_uri = $('.dispute-entry-ip-uri').text().trim().split(',')[0]
     unless $('.wlbl-table-result').text().trim() == ''   # handle the no-bl don't show tc's (1234computer.com issue)
       place_threat_category(ip_uri, 'research')
 
-  # PAGE LOAD - BFRP RESEARCH
+  # results page load - bfrp page
   if $('.reputation-research-search-wrapper').length
     ip_uri = $('.searched-for-url').text().trim().split(',')[0]
-    place_threat_category(ip_uri, 'research',)
+    place_threat_category(ip_uri, 'research')
 
-  # after a click inside wl/bl dropdown, fig out where you are, get the dropdown id for the validation inside that specific dropdown
+  # after a click inside wl/bl dropdown, get dropdown_id and handle wl/bl + tc validation
   $('.dispute-wlbl-adjust-wrapper input').click ->
     cb_value = $(this).attr('value')
 
@@ -681,7 +677,7 @@ window.addWlBlListeners = () ->
       cb_class = $(this).attr('class').split(' ')[0]
     else cb_class = ''
 
-    # define the wrapper id, either a dropdown id or a row id, depending where a threat cat needs to go
+    # define the wrapper id depending where a threat cat needs to go
     dropdown_id = '#' + $(this).closest('.dropdown-menu').attr('id')  # get the dropdown id for the input just clicked
 
     # below this line, $(this) refers to the active dropdown, so we don't select all existing dropdowns in the DOM
@@ -694,7 +690,6 @@ window.addWlBlListeners = () ->
       add_radio = $(this).find('#wlbl-add')
       remove_radio = $(this).find('#wlbl-remove')
       replace_radio = $(this).find('#wlbl-replace')
-      all_cbs = $(this).find('input:checkbox')
       submit_button = $(this).find('.dropdown-submit-button')
       tc_note_max = $(this).find('.threat-cat-required')
       tc_note_replace = $(this).find('.tc-replace-note')
@@ -717,30 +712,29 @@ window.addWlBlListeners = () ->
         $('.threat-cat-row input').prop('checked', false)
         tc_row.addClass('hidden')
 
-      # Add / Remove - clean slate on either click
-      add_radio.click ->
-        tc_note_replace.removeClass('hidden')
+      # Add / Remove - clean slate on either click, .merge() allows selecting mult vars in jquery
+      $.merge(add_radio, remove_radio).click ->
         lists_row.removeClass('hidden')
-        tc_row.addClass('hidden')
-        clearAllInputs()
-
-      remove_radio.click ->
-        tc_note_replace.addClass('hidden')
-        lists_row.removeClass('hidden')
-        tc_row.addClass('hidden')
+        $.merge(tc_row, tc_note_replace).addClass('hidden')
         clearAllInputs()
 
       replace_radio.click ->
-        tc_note_replace.removeClass('hidden')
-        tc_note_max.addClass('hidden')
-        tc_array = $('.wlbl-threat-cat').text().trim().split(', ')
-        lists_row.addClass('hidden')
-        tc_row.removeClass('hidden')
-        $(dropdown_id).find('.threat-cat-cell').each ->
-          curr_text = $(this).text().trim()
-          curr_input = $(this).find('input:checkbox')
-          $(tc_array).each (i, value) ->  # pre-toggle all the tc cb's
-            if value == curr_text then curr_input.prop('checked', true)
+        tc_array = $('.wlbl-threat-cat').text().trim().split(', ')  # tc_array is the text array of 'Bogon', 'Botnets', etc
+        tc_cell_array = $(dropdown_id).find('.threat-cat-cell').toArray()
+
+        $.merge(lists_row, tc_note_max).addClass('hidden')
+        $.merge(tc_row, tc_note_replace).removeClass('hidden')
+
+        # get a filtered array of tc's to toggle the checkboxes
+        tc_final_array = tc_cell_array.filter((entry) ->  # entry of tc html elements, entry is an html element w/ label + input
+          entry_matches = false
+          $(tc_array).each (i, value) ->
+            if value == $(entry).text().trim() then entry_matches = true
+          if entry_matches then return entry
+        )
+
+        $(tc_final_array).each -> $(this).find('input:checkbox').prop('checked', true)
+
         disableSubmit()
 
       # show/hide the note about 5 tc's when you are Adding to list
@@ -753,7 +747,6 @@ window.addWlBlListeners = () ->
       # this submit form (change is checked) will simply function as if "add to list" is toggled
       if cb_class.includes('wlbl_thrt_cat_id') and replace_radio.prop('checked') and tc_num == 0
         tc_note_replace.removeClass('hidden')
-        bl_num = 0
 
       # threat category checkbox click: if already 5 tc's checked, bold the note, max is 5
       if cb_class.includes('wlbl_thrt_cat_id') and tc_num > 5
@@ -778,5 +771,5 @@ window.addWlBlListeners = () ->
 
 # on page load, add the wl/bl + tc input event listeners inside the dropdowns
 $ ->
-  addWlBlListeners()
+  add_wlbl_listeners()
 

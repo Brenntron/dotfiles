@@ -618,8 +618,8 @@
                             %span.wlbl-table-result
                               -# below, temp fix to ensure no duplicates in this wl/bl array, back-end should review/fix this issue
                               = entry.wbrs_list_type.split.reverse.uniq.reverse.sort.join(' ')
+                            %span.wlbl-tc-research-span
                             %button.dispute-inline-buttons.history-button.esc-tooltipped{title: 'WL/BL History', onclick: "wlbl_history_dialog(#{entry.id})"}
-                          %span.wlbl-tc-research-span
 
                         %td.left-bordered
                           %label Referenced on
