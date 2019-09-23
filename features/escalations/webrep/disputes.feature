@@ -38,17 +38,14 @@ Feature: Disputes
       | id |   subject     | status |
       | 1  |    test 2     |  NEW   |
     Given the following dispute_entries exist:
-      | id |      uri     | status |
-      | 1  | 123.63.22.24 |  NEW   |
+      | id |      ip_address     | status |
+      | 1  | 123.63.22.24        |  NEW   |
     Given a dispute exists and is related to disputes with ID, "1":
     When I go to "/escalations/webrep/disputes"
     And I wait for "2" seconds
     Then I click "new-dispute"
     And I fill in "ips_urls" with "123.63.22.24"
     And I fill in "assignee" with "nherbert"
-    When I click "submit"
-    And I wait for "20" seconds
-    Then I click "new-dispute"
     When I click "submit"
     Then I should see "Unable to create the following duplicate dispute entries: 123.63.22.24"
 
