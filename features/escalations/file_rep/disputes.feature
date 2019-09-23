@@ -38,12 +38,15 @@ Feature: Disputes
     And that FileRep Ticket should have a suggested disposition of "clean"
     And I should see "FILE REPUTATION TICKET CREATED."
 
-  @javascript @now
+  @javascript
   Scenario: a user visits the FileRep Dispute show page and takes a ticket
     Given a user with role "filerep user" exists and is logged in
     And the following customers exist:
       |id| name            |
       |1 | Dispute Analyst |
+    And the following FileRep disputes exist:
+      | sha256_hash                                                       |
+      | 343518b26e0a872772808605f9f28aa75f64d86a6608e1347c979d033a72cb54  |
     And bugzilla rest api always saves
     And ThreatGrid API call is stubbed
     And Reversing Labs certificates API call is stubbed
@@ -52,21 +55,12 @@ Feature: Disputes
     And AMP API call is stubbed
     And Sample Zoo API call is stubbed
     And ReversingLabs Creation Data API call is stubbed
-    When I go to "/escalations/file_rep/disputes"
-    And I click "#new-dispute"
-    And I fill in "shas_list" with "343518b26e0a872772808605f9f28aa75f64d86a6608e1347c979d033a72cb54 123518b26e0a872772808605f9f28aa75f64d86a6608e1347c979d033a72cb54"
-    And I wait for "1" seconds
-    And I click ".primary"
-    Then a FileRep Ticket should have been created
-    And I wait for "12" seconds
-#    And I should see "FILE REPUTATION TICKET CREATED."
-#    Then I wait for "4" seconds
-#    And I go to "/escalations/file_rep/disputes/1"
-#    And I should see "Research Data"
-#    And I dismiss modal "#msg-modal" if needed
-#    And I click "#file-rep-resubmit-evaluate-button"
-#    Then I wait for "4" seconds
-#    And I should see content "RESUBMISSION SUCCESSFUL" within ".modal-dialog"
+    And I go to "/escalations/file_rep/disputes/1"
+    And I should see "Research Data"
+    And I dismiss modal "#msg-modal" if needed
+    And I click "#file-rep-resubmit-evaluate-button"
+    Then I wait for "4" seconds
+    And I should see content "RESUBMISSION SUCCESSFUL" within ".modal-dialog"
 
   @javascript
   Scenario: an analyst tries to create a FileRep ticket but it is flagged as a duplicate and not processed
