@@ -396,9 +396,7 @@ Feature: Disputes
 
   @javascript
   Scenario: A user visits the Dashboard page and sees correct ticket counts
-    # The dashboard was redesigned and no longer works this way
-    Given pending
-    Given a user with role "webrep user" exists with cvs_username, "Cucumber", exists and is logged in
+    Given a user with id "1" has a role "webrep user" and is logged in
     And the following disputes exist and have entries:
       | id   | status   | user_id |
       | 5370 | ASSIGNED | 1       |
@@ -427,15 +425,13 @@ Feature: Disputes
       | id   | status          | user_id |
       | 5378 | RESOLVED_CLOSED | 1       |
     When I goto "/escalations/webrep/dashboard"
-    Then I should see content "3" within ".open"
-    Then I should see content "2" within ".in-progress"
-    Then I should see content "4" within ".closed"
+    And I click "#ticket-view-shortcut"
+    Then I should see content "3" within "#open_single_ticket_count"
+    Then I should see content "4" within "#closed_single_ticket_count"
 
   @javascript
   Scenario: A user visits the Dashboard page and sees correct ticket counts for their team
-    # The dashboard was redesigned and no longer works this way
-    Given pending
-    Given a user with role "webrep user" exists with cvs_username, "Cucumber", exists and is logged in
+    Given a user with id "1" has a role "webrep user" and is logged in
     And I add a test user to current user's team
     And the following disputes exist and have entries:
       | id   | status   | user_id |
@@ -465,12 +461,12 @@ Feature: Disputes
       | id   | status          | user_id |
       | 5378 | RESOLVED_CLOSED | 2       |
     When I goto "/escalations/webrep/dashboard"
-    Then I should see content "2" within ".open"
-    Then I should see content "1" within ".in-progress"
-    Then I should see content "3" within ".closed"
-    Then I should see content "3" within ".open-team"
-    Then I should see content "2" within ".in-progress-team"
-    Then I should see content "4" within ".closed-team"
+    And I click "#ticket-view-shortcut"
+    Then I should see content "2" within "#open_single_ticket_count"
+    Then I should see content "3" within "#closed_single_ticket_count"
+    Then I click "My Team Tickets"
+    Then I should see content "3" within "#open_multi_ticket_count"
+    Then I should see content "4" within "#closed_multi_ticket_count"
 
   @javascript
   Scenario: A user tries to update a dispute
