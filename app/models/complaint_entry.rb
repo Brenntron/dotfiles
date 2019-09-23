@@ -950,8 +950,10 @@ class ComplaintEntry < ApplicationRecord
         self.complaint.save
       end
 
-      message = Bridge::ComplaintUpdateStatusEvent.new
-      message.post_complaint(self.complaint)
+      if self.complaint.ticket_source != ::Complaint::SOURCE_RULEUI
+        message = Bridge::ComplaintUpdateStatusEvent.new
+        message.post_complaint(self.complaint)
+      end
 
       return true
     else
