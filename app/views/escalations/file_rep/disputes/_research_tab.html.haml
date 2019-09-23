@@ -36,12 +36,12 @@
             %input.dataset-cb.toolbar-checkbox#data-resubmit-tg-cb{type: 'checkbox', checked: 'checked', 'data-service': 'threatgrid'}
             %span.toolbar-button-text
               Threat Grid
-          %label.toolbar-button-label.esc-tooltipped.icon-reversing-labs{for: 'data-resubmit-reversing-cb', title: 'Reversing Labs'}
+          %label.toolbar-button-label.esc-tooltipped.icon-reversing-labs-light.not-available{for: 'data-resubmit-reversing-cb', title: 'Reversing Labs'}
             %input.dataset-cb.toolbar-checkbox#data-resubmit-reversing-cb{type: 'checkbox', 'data-service':'reversinglab', disabled:true}
             %span.toolbar-button-text
               Reversing Labs
-        %button.toolbar-button.icon-reports#file-rep-resubmit-evaluate-button.esc-tooltipped{title: 'Resubmit Reports', onclick: 'evaluate_file()'}
-          %span.toolbar-button-text Resubmit Reports
+        %button.toolbar-button.icon-reports#file-rep-resubmit-evaluate-button.esc-tooltipped{title: 'Rerun Sample', onclick: 'evaluate_file()'}
+          %span.toolbar-button-text Rerun Sample
 
 .row
   .col-xs-12.col-sm-4#sandbox-report-wrapper
@@ -177,7 +177,7 @@
 
 
   .col-xs-12.col-sm-4#reversing-labs-report-wrapper
-    %h2.research-data-header.reversing-labs-header Reversing Labs
+    %h2.research-data-header.reversinglab-header Reversing Labs
     #rl-loader
       .inline-loader-wrapper
         .gear-loader-wrapper

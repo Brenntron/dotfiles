@@ -35,24 +35,27 @@ window.evaluate_file = ()  ->
   sha256_hash = $('#sha256_hash')[0].innerText
   services = []
   $('#resubmit-to-resources input:checked').each ->
-    services += $(this).attr('data-service') + ' '
-  $('#loader-modal').modal({
-    keyboard: false,
-  })
+    service = $(this).attr('data-service')
+    services += service + ' '
+    if service == 'sandbox'
+      $('#sb-loader').show();
+    if service == 'threatgrid'
+      $('#tg-loader').show();
+    if service == 'reversinglab'
+      $('#rl-loader').show();
+
   data = {
       sha256_hash: sha256_hash,
       service: services
     }
+
   std_msg_ajax(
     method: 'POST'
     url: "/escalations/api/v1/escalations/file_rep/disputes/submit_for_evaluation/"
     data: data
     success: (response) ->
-      $('#loader-modal').modal('hide')
-
       std_msg_success('Resubmission Successful', ['Successfully resubmitted to selected services: ' + formatList( services ) ], reload: true)
     error: (response) ->
-      $('#loader-modal').modal('hide')
       std_api_error( response, "Submission Error", reload: false)
   )
 formatList = (list) ->
@@ -61,10 +64,13 @@ formatList = (list) ->
     switch list_item
       when 'sandbox'
         list[i] = 'Talos Sandbox'
+        $('#sb-loader').show();
       when 'threatgrid'
         list[i] = 'Threat Grid'
+        $('#tg-loader').hide();
       when 'reversinglab'
         list[i] = 'Reversing Labs'
+        $('#rl-loader').hide();
   if list.length == 2
     list = list.join(' and ')
   else

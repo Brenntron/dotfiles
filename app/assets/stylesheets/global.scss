@@ -1955,6 +1955,7 @@ a.static-nav-item {
 .icon-talos-sandbox {background-image: url(image_path('icon_sandbox2.svg'));}
 .icon-threat-grid {background-image: url(image_path('icon_grid.svg'));}
 .icon-reversing-labs {background-image: url(image_path('icon_reverse.svg'));}
+.icon-reversing-labs-light {background-image: url(image_path('icon_reverse_light.svg'));}
 .icon-show-as-columns {background-image: url(image_path('icon_vertical.svg'));}
 .icon-show-as-stacked {background-image: url(image_path('icon_horizontal.svg'));}
 
@@ -6581,7 +6582,12 @@ table.dispute-entry-table tbody tr.selected {
   font-weight: 300;
   width: auto;
 }
-
+.not-available{
+  .toolbar-button-text{
+    color: $type-faint-accent!important;
+    cursor: not-allowed;
+  }
+}
 .nested-complaint-data-wrapper button.secondary:disabled {
   color: $content-bg-color;
 }
@@ -8900,7 +8906,7 @@ hr.thin.form-divider {
   background-image: url(image_path('icon_grid.svg'));
 }
 
-.reversing-labs-header {
+.reversinglab-header {
   border-bottom-color: $success-color;
   background-image: url(image_path('icon_reverse.svg'));
 }
