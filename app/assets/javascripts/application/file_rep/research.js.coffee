@@ -31,26 +31,33 @@ window.refresh_research_data = (sha256_hash) ->
 # Resubmit hash to all the analysis engines
 # services: sandbox threatgrid reversinglabs
 # space delimited
-window.evaluate_file = (sha256_hash, services) ->
-  console.log services
+window.evaluate_file =  (services ) ->
   sha256_hash = $('#sha256_hash')[0].innerText
+  services = []
+  $('#resubmit-to-resources input:checked').each ->
+    services += $(this).attr('data-service') + ' '
+  $('#loader-modal').modal({
+    keyboard: false,
+  })
   std_msg_ajax(
-    method: 'GET'
-    url: "/escalations/api/v1/escalations/file_rep/submit_for_evaluation/"
+    method: 'POST'
+    url: "/escalations/api/v1/escalations/file_rep/disputes/submit_for_evaluation/"
     data: {sha256_hash: sha256_hash, service: services}
     success_reload: false
     success: (response) ->
-
-
+      $('#loader-modal').modal('hide')
+      std_msg_success('Resubmission Successful', ['Successfully resubmitted to selected services: ' + formatList( services ) ], reload: true)
     error: (response) ->
-  # $('#rl-loader').hide()
-      std_api_error(response, "There was a problem retrieving data from the Sample Zoo", reload: false)
+      $('#loader-modal').modal('hide')
+      std_api_error( response, "Submission Error", reload: false)
   )
-
-
-
-
-
+formatList = (list) ->
+  list = list.trim().split(/[ ,]+/)
+  if list.length == 2
+    list = list.join(' and ')
+  else
+    list = list.join(', ').replace(/, ([^,]*)$/, ', and $1')
+  return list
 ########### COMPILE RESEARCH REPORTS ############
 # Grabs the initial data for all three reports / datasets
 # Loads on page load

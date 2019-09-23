@@ -4356,6 +4356,16 @@ button.tertiary {
 .remove-input.remove-radio-input {
   margin-top: -28px;
 }
+#resubmit-to-resources{
+  .toolbar-select-wrapper{
+    width: fit-content;
+    float: left;
+  }
+  #file-rep-resubmit-evaluate-button{
+    float: right!important;
+    margin-left: 4px;
+  }
+}
 
 #login-div a:hover {
   background-color: transparent !important;
