@@ -14,7 +14,7 @@ Feature: Disputes index, Research tab
     And I click "#research-tab-link"
     Then ".expandable-row-column" should not be visible
 
-  @javascript @now
+  @javascript
   Scenario: a user wants to verify threat categories appear on page load on show page > research tab
     Given a user with role "webrep user" exists and is logged in
     And the following disputes exist:
