@@ -29,8 +29,11 @@ Feature: Webcat complaints
     And I fill in "customers" with "Cisco:Talos Person:talos@cisco.com"
     And I fill in selectized with "urgent"
     And I click "Create"
-    And I wait for "15" seconds
+    And I wait for "5" seconds
     And I should see "COMPLAINT CREATED"
+    And I click ".close"
+    Then I wait for "5" seconds
+    And I should see "urgent"
 
   @javascript
   Scenario: A user must review a high telemetry site
