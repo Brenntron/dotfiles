@@ -103,11 +103,15 @@ module API
                 end
                 if non_duplicated_entries.any?
                   if user_validation.present?
+                    begin
                     dispute = Dispute.create_action(bugzilla_rest_session,
                                                     non_duplicated_entries,
                                             permitted_params[:assignee],
                                             permitted_params[:priority],
                                             permitted_params[:ticket_type])
+                    rescue Exception => e
+                      raise ("Could not create the Dispute because of this error: #{e.message}")
+                    end
                     render json: {status: 'Success', case_id: dispute.id, errors: duplicates}
                   else
                     raise ("Invalid assignee or assignee does not exist. Please try again.")
