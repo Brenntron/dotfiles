@@ -108,7 +108,6 @@ class Dispute < ApplicationRecord
     
     bug_proxy = bugzilla_rest_session.create_bug(bug_attrs)
     ActiveRecord::Base.transaction do
-      #add a transaction block here if dispute entry fails then the dispute shoudl also fail.
       new_dispute = Dispute.create!(id: bug_proxy.id,
                                        user_id: user.id,
                                        priority: priority,
