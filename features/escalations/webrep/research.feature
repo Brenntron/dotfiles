@@ -38,6 +38,18 @@ Feature: Webrep, the BFRP
     Then I should see "3 ticket(s)"
 
   @javascript
+  Scenario: a user wants to verify threat categories appear inside inline adjust wl/bl dropdown
+    Given a user with role "webrep user" exists and is logged in
+    When I goto "escalations/webrep/research"
+    Then I fill in "search_uri" with "g-oogl-e.com"
+    And I click "#submit-button"
+    And I wait for "5" seconds
+    And I click ".bfrp-inline-wlbl-button"
+    And I wait for "5" seconds
+    Then I should see "Malware Sites"
+    And I should see "Bogon"
+
+  @javascript
   Scenario: a user wants to verify threat categories appear on page load on BFRP
     Given a user with role "webrep user" exists and is logged in
     When I goto "escalations/webrep/research"
