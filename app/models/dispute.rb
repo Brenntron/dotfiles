@@ -104,21 +104,23 @@ class Dispute < ApplicationRecord
         'priority' => priority,
         'classification' => 'unclassified',
     }
-
+    new_dispute = nil
+    
     bug_proxy = bugzilla_rest_session.create_bug(bug_attrs)
-
-    new_dispute = Dispute.create!(id: bug_proxy.id,
-                                     user_id: user.id,
-                                     priority: priority,
-                                     submission_type: ticket_type,
-                                     submitter_type: 'Internal',
-                                     status: status,
-                                     customer_id: customer.id,
-                                     case_opened_at: Time.now)
-
-    ips_urls.each do |ip_url|
-      if DisputeEntry.check_for_duplicates(ip_url) == false
-        DisputeEntry.create_dispute_entry(new_dispute, ip_url, status)
+    ActiveRecord::Base.transaction do
+      #add a transaction block here if dispute entry fails then the dispute shoudl also fail.
+      new_dispute = Dispute.create!(id: bug_proxy.id,
+                                       user_id: user.id,
+                                       priority: priority,
+                                       submission_type: ticket_type,
+                                       submitter_type: 'Internal',
+                                       status: status,
+                                       customer_id: customer.id,
+                                       case_opened_at: Time.now)
+      ips_urls.each do |ip_url|
+        if DisputeEntry.check_for_duplicates(ip_url) == false
+          DisputeEntry.create_dispute_entry(new_dispute, ip_url, status)
+        end
       end
     end
 
