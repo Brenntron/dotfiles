@@ -236,19 +236,24 @@ window.bulk_get_current_wlbl = (page) ->
     else if page == "index"
       comment_trail = '\n \n------------------------------- \nBULK SUBMISSION: \n' + comment_array.join('\n')
 
+    # add some loading text while the tbody gets built
+    $(tbody).empty().html('<tr class="loading-tbody"><td>Loading... ' +
+      '<div class="glyphicon glyphicon-refresh mini-loader"></div></td></tr>')
+
     std_msg_ajax(
       url: '/escalations/api/v1/escalations/webrep/disputes/bulk_rule_ui_wlbl_get_info_for_form'
       method: 'POST'
       data: data
       success: (response) ->
-        $(tbody).empty()
         response = JSON.parse(response)
         for entry in response
           tc_promise = new Promise (resolve, reject) ->   # wait until that tc is resolved to write out the table row
             tc_json = get_threat_categories(entry.ip_uri)
             if tc_json then resolve tc_json  # resolve goes to .then() below
 
-          .then( build_tc_row.bind(null, entry, tbody) )   # build the tc rows separately + bind them here
+          .then( build_tc_row.bind(null, entry, tbody))
+          .then( sort_tc_rows() )
+
           .then null, (err) ->
             std_msg_error( 'Error retrieving WL/BL Data', response)  # handle this error more silently if needed
 
@@ -279,13 +284,16 @@ window.bulk_get_current_wlbl = (page) ->
 
     table_row =
       '<tr class="wlbl-dropdown-row">' +
-      '<td class="wlbl-entry-content">' + ip_uri + '</td>' +
-      '<td class="wlbl-entry-wlbl">' + list_types + '</td>' +
-      '<td class="wlbl-current-entry-wbrs text-center">' + wbrs_score + '</td>' +
-      '<td class="wlbl-threat-cat">' + tc_str + '</td>' +
+        '<td class="wlbl-entry-content">' + ip_uri + '</td>' +
+        '<td class="wlbl-entry-wlbl">' + list_types + '</td>' +
+        '<td class="wlbl-current-entry-wbrs text-center">' + wbrs_score + '</td>' +
+        '<td class="wlbl-threat-cat">' + tc_str + '</td>' +
       '</tr>'
 
     $(tbody).append(table_row)
+    $(tbody).find('.loading-tbody').addClass('hidden')
+
+
 
 #### SUBMISSION OF WL/BL CHANGES TO WBRS ####
 
@@ -635,8 +643,12 @@ window.add_wlbl_threat_cat_listeners = () ->
 
   # after a click inside a wl/bl dropdown, lets handle wl/bl + tc validation for bulk or inline adjust wl/bl
   $('.dispute-wlbl-adjust-wrapper input').click ->
+    cb_class = ''
     cb_value = $(this).attr('value')
-    if $(this).attr('class').length then cb_class = $(this).attr('class').split(' ')[0] else cb_class = ''
+
+    if $(this).prop('class').length
+      cb_class = $(this).prop('class').split(' ')[0]
+    else cb_class = ''
 
     dropdown_id = '#' + $(this).closest('.dropdown-menu').attr('id')  # get the dropdown id for the input just clicked
 

@@ -10502,3 +10502,23 @@ span.threat-cat-no-data {
   padding-left: 2px;
   float: none;
 }
+
+.adjust-wlbl-form table.dispute_tool_current td {
+  padding: 8px 10px 4px;
+}
+
+.mini-loader {
+  width: 12px;
+  height: 12px;
+  margin: 0;
+  transform-origin: 70% 45%;
+  animation-name: mini-spin;
+  animation-duration: 2000ms;
+  animation-iteration-count: infinite;
+  animation-timing-function: linear;
+}
+
+@keyframes mini-spin {
+  from { transform:rotate(0deg) }
+  to { transform:rotate(360deg) }
+}
