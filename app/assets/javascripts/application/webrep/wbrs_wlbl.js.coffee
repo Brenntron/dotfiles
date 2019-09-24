@@ -594,93 +594,52 @@ window.wlbl_history_dialog = (id) ->
   , this)
 
 
-#### THREAT CATEGORY - uses a separate API call - needs to be handled asynchronously ####
-# this function and add wl/bl listeners function will continue to be refactored, fyi
-window.place_threat_category = (ip_uri, type) ->
-  # use a promise for the threat cat api call, could take up to 1-2 seconds
-  tc_promise = new Promise (resolve, reject) ->
-    tc_json = get_threat_categories(ip_uri)
-    if tc_json then resolve tc_json  # resolve goes to .then() below
+# WL/BL dropdowns checkbox validation logic, these get added to the adjust wl/bl dropdowns on page load
+window.add_wlbl_threat_cat_listeners = () ->
+  wlbl_dropdowns = $('.dropdown-menu .dispute-wlbl-adjust-wrapper')
 
-  tc_promise.then (result) ->
-    {threat_categories} = JSON.parse(result)
+  # clean slate all adjust wl/bl dropdowns
+  $('#index-adjust-wlbl, #wlbl_entries_button, .bfrp-inline-wlbl-button').click ->
+    $(wlbl_dropdowns).find('input:checkbox').prop('checked', false)
+    $(this).next('.dropdown-menu').find('.lists-row').removeClass('hidden')
 
-    bulk_tc = $('.wlbl-threat-cat')
-    inline_tc = $('.wlbl-threat-cat-inline')
-    inline_wlbl_list = $('.wlbl-entry-wlbl')  # this is the wl/bl list, not a tc list
-    bfrp_search = $('.reputation-research-search-wrapper')
-    wlbl_entry = $('.wlbl-entry-wlbl')
-
-    research_row_full = $('.wlbl-and-tc-area')  # this is the wl/bl area inside of a research row (wbrs row)
-    research_row_left = $('.wlbl-table-result')
-    research_row_right = $('.wlbl-tc-research-span')
-
-    if threat_categories.length == 0
-      tc_str = '<span class="threat-cat-no-data">No Category</span>'
-    else tc_str = threat_categories.join(', ')
-
-    if type == 'research'  # for research rows
-      if bfrp_search.length > 0 and research_row_left.text().trim() == ''  # on bfrp page
-        research_row_right.html('').remove()   # if on bfrp and no wl's or bl's, then no tc's should show (1234computer.com issue)
-        $('.dropdown-menu .wlbl-threat-cat-inline').remove()  #    use a $(wrapper_id)
-      else if bfrp_search.length > 0 and research_row_left.text().includes('BL')  # on research tab show page
-        research_row_right.html(tc_str)
-      else research_row_right.html(tc_str)
-
-  # error handling for the json response, leave the empty error span
-  .then null, (err) ->
-    tc_elements = '.wlbl-threat-cat, .wlbl-threat-cat-inline, .wlbl-tc-research-span'
-    $(tc_elements).html('<span class="error-threat-cat"></span>')
-
-
-
-# WL/BL dropdowns checkbox validation logic, these get added for these dropdowns on page load
-window.add_wlbl_listeners = () ->
-  # bulk adjust click - ensure clean slate each time
+  # bulk adjust click, clean slate
   $('#index-adjust-wlbl, #wlbl_entries_button').click ->
     dd = $(this).next('.dropdown-menu')
-    $(dd).find('.lists-row').removeClass('hidden')
     $(dd).find('#wlbl-add').prop('checked', true)
     $(dd).find('input:checkbox').prop('checked', false)
     $(dd).find('.dropdown-submit-button').prop('disabled', true)
     $(dd).find('.tc-replace-note, .threat-cat-row, .replace-tc-radio').addClass('hidden')
 
-  # inline adjust click
-  $('.bfrp-inline-wlbl-button').click ->
-    $(this).next('.dropdown-menu').find('.lists-row').removeClass('hidden')
+  # research rows: on page load, verify we're on research tab or bfrp, and then verify the wl/bl has text
+  if ($('#research-tab').length or $('.reputation-research-search-wrapper').length) and $('.wlbl-table-result').text().trim() != ''
+    $('.research-table-row').each ->
+      ip_uri = $(this).find('.entry-data-content').text().trim()
+      tc_area = $(this).find('.wlbl-tc-research-span')
 
-  # replace radio click - ensure clean slate each time
-  $('.dispute-wlbl-adjust-wrapper #wlbl-replace').click ->
-    dd = $(this).next('.dropdown-menu')
-    $(dd).find('.lists-row, .dispute-wlbl-adjust-wrapper .tc-replace-note').addClass('hidden')
-    $(dd).find('.dispute-wlbl-adjust-wrapper .dropdown-menu input:checkbox').prop('checked', false)
-    $(dd).find('.threat-cat-row').removeClass('hidden')
-    $(dd).find('.dropdown-submit-button').prop('disabled', true)
+      # threat category(s) - uses a separate API call - needs to be handled asynchronously (w/ a js promise)
+      tc_promise = new Promise (resolve, reject) ->
+        tc_json = get_threat_categories(ip_uri)  # inside each row, get a promise for the tc's for this uri on page load
+        if tc_json then resolve tc_json
 
-  # results page load - research tab
-  if $('#research-tab').length
-    row_id = '#' + $(this).siblings('.dropdown-menu').attr('id')
-    ip_uri = $('.dispute-entry-ip-uri').text().trim().split(',')[0]
-    unless $('.wlbl-table-result').text().trim() == ''   # handle the no-bl don't show tc's (1234computer.com issue)
-      place_threat_category(ip_uri, 'research')
+      tc_promise.then (result) ->
+        {threat_categories} = JSON.parse(result)
+        if threat_categories.length == 0
+          tc_str = '<span class="threat-cat-no-data">No Category</span>'
+        else tc_str = threat_categories.join(', ')
 
-  # results page load - bfrp page
-  if $('.reputation-research-search-wrapper').length
-    ip_uri = $('.searched-for-url').text().trim().split(',')[0]
-    place_threat_category(ip_uri, 'research')
+        tc_area.html(tc_str)  # do the actual placement of the threat cat
 
-  # after a click inside wl/bl dropdown, get dropdown_id and handle wl/bl + tc validation
+      .then null, (err) ->
+        tc_area.html('<span class="error-threat-cat"></span>')
+
+  # after a click inside a wl/bl dropdown, lets handle wl/bl + tc validation for bulk or inline adjust wl/bl
   $('.dispute-wlbl-adjust-wrapper input').click ->
     cb_value = $(this).attr('value')
+    if $(this).attr('class').length then cb_class = $(this).attr('class').split(' ')[0] else cb_class = ''
 
-    if $(this).prop('class').length
-      cb_class = $(this).attr('class').split(' ')[0]
-    else cb_class = ''
-
-    # define the wrapper id depending where a threat cat needs to go
     dropdown_id = '#' + $(this).closest('.dropdown-menu').attr('id')  # get the dropdown id for the input just clicked
 
-    # below this line, $(this) refers to the active dropdown, so we don't select all existing dropdowns in the DOM
     $(dropdown_id).ready ->
       lists_row = $(this).find('.lists-row')
       wl_num = $(this).find('.lists-row input[value^="WL-"]:checked').length
@@ -698,60 +657,57 @@ window.add_wlbl_listeners = () ->
       disableSubmit = () -> $(submit_button).prop('disabled', true)
 
       clearAllInputs = () ->
-        $('.dropdown-menu .dispute-wlbl-adjust-wrapper input:checkbox').prop('checked', false)
-        $('.dispute-wlbl-adjust-wrapper .tc-replace-note').addClass('hidden')
+        $(wlbl_dropdowns).find('input:checkbox').prop('checked', false)
+        $(wlbl_dropdowns).find('.tc-replace-note').addClass('hidden')
         disableSubmit()
 
-      # BL click? show/hide the threat cat row if 'Add to list' is toggled
       if cb_value.includes('BL-') and bl_num > 0
-        unless $(dropdown_id).find('#wlbl-remove').prop('checked') == true
-          # if the remove radio is toggled inside this dropdown, dont do below
+        unless $(dropdown_id).find('#wlbl-remove').prop('checked')
           tc_row.removeClass('hidden')
 
-      else if cb_value.includes('BL-') and bl_num == 0 and add_radio.prop('checked') == true
-        $('.threat-cat-row input').prop('checked', false)
+      else if cb_value.includes('BL-') and bl_num == 0 and add_radio.prop('checked')
+        $(dropdown_id).find('.threat-cat-row input').prop('checked', false)
         tc_row.addClass('hidden')
 
-      # Add / Remove - clean slate on either click, .merge() allows selecting mult vars in jquery
+      # Add / Remove - clean slate on click, .merge() allows selecting mult vars in jquery
       $.merge(add_radio, remove_radio).click ->
         lists_row.removeClass('hidden')
         $.merge(tc_row, tc_note_replace).addClass('hidden')
         clearAllInputs()
 
       replace_radio.click ->
-        tc_array = $('.wlbl-threat-cat').text().trim().split(', ')  # tc_array is the text array of 'Bogon', 'Botnets', etc
+        tc_text_array = $('.wlbl-threat-cat').text().trim().split(', ')  # tc_text_array is the text array of 'Bogon', 'Botnets', etc
         tc_cell_array = $(dropdown_id).find('.threat-cat-cell').toArray()
-
         $.merge(lists_row, tc_note_max).addClass('hidden')
         $.merge(tc_row, tc_note_replace).removeClass('hidden')
+        $(dropdown_id).find('.dropdown-menu .dispute-wlbl-adjust-wrapper input:checkbox').prop('checked', false)
+
+        disableSubmit()
 
         # get a filtered array of tc's to toggle the checkboxes
-        tc_final_array = tc_cell_array.filter((entry) ->  # entry of tc html elements, entry is an html element w/ label + input
+        tc_toggle_array = tc_cell_array.filter((entry) ->  # entry of tc html elements, entry is an html element w/ label + input
           entry_matches = false
-          $(tc_array).each (i, value) ->
+          $(tc_text_array).each (i, value) ->
             if value == $(entry).text().trim() then entry_matches = true
           if entry_matches then return entry
         )
 
-        $(tc_final_array).each -> $(this).find('input:checkbox').prop('checked', true)
+        $(tc_toggle_array).each -> $(this).find('input:checkbox').prop('checked', true)
 
-        disableSubmit()
-
-      # show/hide the note about 5 tc's when you are Adding to list
       if add_radio.prop('checked') then tc_note_max.removeClass('hidden') else tc_note_max.addClass('hidden')
 
       # if change is checked and no tc's, then no bl's should be checked, ensure this
       if replace_radio.prop('checked') and tc_num == 0
         $(this).find('.lists-row input[value^="BL-"]').prop('checked', false)
 
-      # this submit form (change is checked) will simply function as if "add to list" is toggled
-      if cb_class.includes('wlbl_thrt_cat_id') and replace_radio.prop('checked') and tc_num == 0
-        tc_note_replace.removeClass('hidden')
-
-      # threat category checkbox click: if already 5 tc's checked, bold the note, max is 5
-      if cb_class.includes('wlbl_thrt_cat_id') and tc_num > 5
-        $(this).find('.five-note').addClass('required-bold')
-      else $(this).find('.five-note').removeClass('required-bold')
+      # this is the class for tc cb's
+      if cb_class.includes('wlbl_thrt_cat_id')
+        if replace_radio.prop('checked') and tc_num == 0
+          tc_note_replace.removeClass('hidden')
+        else if tc_num > 5
+          $(this).find('.five-note').addClass('required-bold')
+        else if tc_num <= 5 and tc_num > 0
+          $(this).find('.five-note').removeClass('required-bold')
 
       # every input click, disable submit unless certain criteria is met
       disableSubmit()
@@ -769,7 +725,8 @@ window.add_wlbl_listeners = () ->
       if conditionsArray.indexOf(true) >= 0
         enableSubmit()
 
+
 # on page load, add the wl/bl + tc input event listeners inside the dropdowns
 $ ->
-  add_wlbl_listeners()
+  add_wlbl_threat_cat_listeners()
 

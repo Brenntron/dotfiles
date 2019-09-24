@@ -85,8 +85,10 @@ module API
                                       permitted_params['comment'],permitted_params['resolution_comment'],
                                     current_user, permitted_params['commit'])
 
-                message = Bridge::ComplaintUpdateStatusEvent.new
-                message.post_complaint(entry.complaint)
+                if entry.complaint.ticket_source != Complaint::SOURCE_RULEUI
+                  message = Bridge::ComplaintUpdateStatusEvent.new
+                  message.post_complaint(entry.complaint)
+                end
 
               rescue Exception => e
                 return e.message

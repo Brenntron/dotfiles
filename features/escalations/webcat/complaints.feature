@@ -468,3 +468,47 @@ Feature: Webcat complaints
     And I click ".expand-row-button-inline"
     And I wait for "8" seconds
     Then I should see content "Nature" within ".sds_category"
+
+
+  @javascript
+  Scenario: when a complaint in the WBNP queue is resolved,
+            a bridge message should not be sent
+    Given a user with role "webcat user" exists and is logged in
+    And the following complaints exist:
+      | ticket_source | id | status |
+      | RuleUI        | 1  | NEW    |
+    And the following complaint entries exist:
+      | uri             | domain        | subdomain | path | entry_type | complaint_id |
+      | baumpflege.ac   | baumpflege.ac |           |      | URI/DOMAIN |  1           |
+    And a complaint entry preload exists
+    And I goto "/escalations/webcat/complaints?f=ALL"
+    And I wait for "5" seconds
+    And I click ".expand-row-button-inline"
+    And I wait for "5" seconds
+    And I click "#unchanged1"
+    And I click "#submit_changes_1"
+    And I wait for "5" seconds
+    Then I should see "COMPLETED"
+    And "0" bridge message should be in the delayed job queue
+
+
+  @javascript
+  Scenario: when a complaint in the talos-intelligence queue is resolved,
+  a bridge message should be sent via delayed jobs
+    Given a user with role "webcat user" exists and is logged in
+    And the following complaints exist:
+      | ticket_source             | id | status |
+      | talos-intelligence        | 1  | NEW    |
+    And the following complaint entries exist:
+      | uri             | domain        | subdomain | path | entry_type | complaint_id |
+      | baumpflege.ac   | baumpflege.ac |           |      | URI/DOMAIN |  1           |
+    And a complaint entry preload exists
+    And I goto "/escalations/webcat/complaints?f=ALL"
+    And I wait for "5" seconds
+    And I click ".expand-row-button-inline"
+    And I wait for "5" seconds
+    And I click "#unchanged1"
+    And I click "#submit_changes_1"
+    And I wait for "5" seconds
+    Then I should see "COMPLETED"
+    And "1" bridge message should be in the delayed job queue

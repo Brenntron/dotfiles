@@ -89,32 +89,35 @@ module API
 
             post "" do
               std_api_v2 do
-                errors = []
-
                 user_validation = User.where(cvs_username: permitted_params['assignee'])
-
                 separated_entries = permitted_params[:ips_urls].split("\n")
+                non_duplicated_entries = []
+                duplicates = []
 
                 separated_entries.each do |entry|
                   if DisputeEntry.check_for_duplicates(entry)
-                    permitted_params[:ips_urls] = permitted_params[:ips_urls].gsub(entry+"\n","")
-                    errors << entry
+                    duplicates << entry
+                  else
+                    non_duplicated_entries << entry
                   end
                 end
-
-                if separated_entries.length > errors.length
+                if non_duplicated_entries.any?
                   if user_validation.present?
+                    begin
                     dispute = Dispute.create_action(bugzilla_rest_session,
-                                            permitted_params[:ips_urls],
+                                                    non_duplicated_entries,
                                             permitted_params[:assignee],
                                             permitted_params[:priority],
                                             permitted_params[:ticket_type])
-                    render json: {status: 'Success', case_id: dispute.id, errors: errors}
+                    rescue Exception => e
+                      raise ("Could not create the Dispute because of this error: #{e.message}")
+                    end
+                    render json: {status: 'Success', case_id: dispute.id, errors: duplicates}
                   else
                     raise ("Invalid assignee or assignee does not exist. Please try again.")
                   end
                 else
-                  raise ("Unable to create the following duplicate dispute entries: #{errors.join("\n")}")
+                  raise ("Unable to create the following duplicate dispute entries: #{duplicates.join("\n")}")
                 end
               end
             end

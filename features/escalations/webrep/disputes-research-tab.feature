@@ -15,6 +15,20 @@ Feature: Disputes index, Research tab
     Then ".expandable-row-column" should not be visible
 
   @javascript
+  Scenario: a user wants to verify threat categories appear on page load on show page > research tab
+    Given a user with role "webrep user" exists and is logged in
+    And the following disputes exist:
+      |id|
+      |1 |
+    And the following dispute_entries exist:
+      |dispute_id   |uri            |entry_type |
+      |1            |g-oogl-e.com   |URI/DOMAIN |
+    When I goto "escalations/webrep/disputes/1"
+    And I wait for "5" seconds
+    Then I click "#research-tab-link"
+    Then I should see "Malware Sites"
+
+  @javascript
   Scenario: Dispute entries with preloaded data display correctly
     Given a user with role "webrep user" exists with cvs_username, "Cucumber", exists and is logged in
     Given the following users exist
