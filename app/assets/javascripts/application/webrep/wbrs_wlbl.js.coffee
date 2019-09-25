@@ -251,8 +251,12 @@ window.bulk_get_current_wlbl = (page) ->
             tc_json = get_threat_categories(entry.ip_uri)
             if tc_json then resolve tc_json  # resolve goes to .then() below
 
-          .then( build_tc_row.bind(null, entry, tbody))
-          .then( sort_tc_rows() )
+          .then(
+            build_tc_row.bind(null, entry, tbody)
+
+          )
+          .then( add_order_ids() )
+          .then( order_rows() )
 
           .then null, (err) ->
             std_msg_error( 'Error retrieving WL/BL Data', response)  # handle this error more silently if needed
@@ -264,6 +268,36 @@ window.bulk_get_current_wlbl = (page) ->
   else
     std_msg_error('No rows selected', ['Please select at least one entry row.'])
     return false
+
+
+  # sort the rows in the mini-table in the dropdown after table is built
+  add_order_ids = () ->
+    row_id = 0
+    setTimeout ( ->   # convert timeout to a promise
+      $('#disputes-index').find('.dispute-entry-checkbox:checked').each ->
+        ip_uri = $(this).closest('tr').find('.entry-col-content').text().trim()  # get the url from the left row
+        $(this).closest('tr').attr('data-order-id', row_id)  # add row-id to the checked row
+
+        $('#wlbl_adjust_entries_index').find('.wlbl-entry-content').each ->
+          if $(this).text().includes(ip_uri)
+            $(this).closest('tr').attr('data-order-id', row_id)
+        row_id++
+    ), 2000  # 3000
+
+  order_rows = () ->
+    setTimeout ( ->   # convert timeout to a promise
+      tbody = $('#wlbl_adjust_entries_index tbody')
+      rows = $(tbody).find('tr')
+      rows.sort (a, b) ->
+        keyA = $(a).attr('data-order-id')
+        keyB = $(b).attr('data-order-id')
+        keyA - keyB
+
+      $.each rows, (i, row) ->
+        tbody.append(row)
+        return
+    ), 3000  #4000
+
 
   # ensures the table row w/ tc gets built correctly (KH refactor)
   build_tc_row = (entry, tbody, result) ->
