@@ -126,10 +126,10 @@ window.get_current_wlbl = (button) ->
 
                 $(tc_cell).html(tc_str)  # 1) place the tc's in the html after promise resolves
                 $(dropdown).find('.threat-cat-cell').each ->  # 2) pre-toggle the tc cb's in the threat-cat-row
-                  curr_text = $(this).text().trim()
-                  curr_input = $(this).find('input:checkbox')
+                  text = $(this).text().trim()
+                  input = $(this).find('input:checkbox')
                   $(threat_categories).each (i, value) ->
-                    if value == curr_text then curr_input.prop('checked', true)
+                    if value == text then input.prop('checked', true)
 
         $(wbrs_score).text(wbrs)
         $(wlbl_list[0]).text(response.data.join(', '))
@@ -537,7 +537,7 @@ window.reset_score_preview = (button) ->
 
   # Grab original 'current' lists
   current_lists = $($(dropdown).find('.wlbl-entry-wlbl')[0]).text()
-  list = current_lists.split(',')
+  list = current_lists.split(', ')
 
   # If current entry isn't on a list, all toggles should be 'off'
   if current_lists == "Not on a list"
@@ -567,10 +567,10 @@ window.reset_score_preview = (button) ->
   $(projected_score[0]).text('')
 
   # Make checkboxes be on or off depending on original lists
-#  $(current_on).each ->
-#    $(this).prop('checked', true)
-#  $(current_off).each ->
-#    $(this).prop('checked', false)
+  $(current_on).each ->
+    $(this).prop('checked', true)
+  $(current_off).each ->
+    $(this).prop('checked', false)
 
   # Reset preview button to original state
   $(preview_button[0]).attr('disabled', true)
@@ -578,37 +578,21 @@ window.reset_score_preview = (button) ->
   $(preview_button[0]).attr('data-add', '')
 
   # reset to original state for all checkboxes - lists + tcs
-  curr_tcs = $(dropdown).find('.wlbl-threat-cat-inline')  # existing tc's, reset to this state
-  wlbl_text = $(dropdown).find('.wlbl-entry-wlbl')  # existing lists, reset to this state
-  tc_checkboxes = $(dropdown).find('.wlbl_thrt_cat_id')
-  tc_row = $(dropdown).find('.threat-cat-row')
+  tc_cbs = $(dropdown).find('.wlbl_thrt_cat_id')
+  tc_array = $(dropdown).find('.wlbl-threat-cat-inline').text().trim().split(', ')
 
-  tc_array = $(curr_tcs).text().trim().split(', ')   # tc orig state: 'Malware Sites, Phishing'
+  $(tc_cbs).prop('checked', false)
 
-  list_array = list.join('').toLowerCase().split(' ')  # do lowercase for each, list of 'bl-heavy', 'bl-med'
-
-  $(dropdown).find('.wl-bl-list-inline').each ->  # pre-toggle (reset to orig state) the tc cb's
-    curr_cb_value = $(this).attr('value').toLowerCase()  # 'bl-heavy' string is the value of the current checkbox
-    curr_input = $(this)   # the current checkbox
-
-    $(this).prop('checked', false)
-    $(list_array).each (i, value) ->   # for each item in the text above 'WL-heavy, BL-med'
-      if value == curr_cb_value
-        curr_input.prop('checked', true)
-
-  # if BL, reset to tc orig state
-  if $(wlbl_text).text().trim().includes('BL-')
-    $(tc_checkboxes).prop('checked', false)
-
-    $(dropdown).find('.threat-cat-cell').each ->  # 2) pre-toggle (reset to orig state) the tc cb's
-      curr_text = $(this).text().trim()
-      curr_input = $(this).find('input:checkbox')
+  if current_lists.includes('BL-')
+    $(dropdown).find('.threat-cat-cell').each ->
+      curr_tc = $(this)  # reset tc cb's to orig state, below
       $(tc_array).each (i, value) ->
-        if value == curr_text then curr_input.prop('checked', true)
+        if value == $(curr_tc).text().trim()
+          $(curr_tc).find(':checkbox').prop('checked', true)
 
-  else   # if WL or not on list, clean slate
-    $(tc_row).addClass('hidden')
-    $(tc_checkboxes).prop('checked', false)
+  else   # if WL or no list, clean slate the tc's
+    $(dropdown).find('.threat-cat-row').addClass('hidden')
+    $(tc_cbs).prop('checked', false)
 
 
 #### WL/BL HISTORY ####
