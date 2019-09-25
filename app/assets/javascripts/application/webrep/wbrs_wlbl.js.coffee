@@ -125,7 +125,7 @@ window.get_current_wlbl = (button) ->
                 else tc_str = threat_categories.join(', ')
 
                 $(tc_cell).html(tc_str)  # 1) place the tc's in the html after promise resolves
-                $(dropdown).find('.threat-cat-cell').each ->  # 2) toggle the tc cb's in the threat-cat-row
+                $(dropdown).find('.threat-cat-cell').each ->  # 2) pre-toggle the tc cb's in the threat-cat-row
                   curr_text = $(this).text().trim()
                   curr_input = $(this).find('input:checkbox')
                   $(threat_categories).each (i, value) ->
@@ -282,7 +282,7 @@ window.bulk_get_current_wlbl = (page) ->
           if $(this).text().includes(ip_uri)
             $(this).closest('tr').attr('data-order-id', row_id)
         row_id++
-    ), 2000  # 3000
+    ), 2000
 
   order_rows = () ->
     setTimeout ( ->   # convert timeout to a promise
@@ -296,7 +296,7 @@ window.bulk_get_current_wlbl = (page) ->
       $.each rows, (i, row) ->
         tbody.append(row)
         return
-    ), 3000  #4000
+    ), 3000
 
 
   # ensures the table row w/ tc gets built correctly (KH refactor)
@@ -306,7 +306,7 @@ window.bulk_get_current_wlbl = (page) ->
     tc_str = threat_categories.join(', ')
 
     if list_types
-      list_types = entry['list_types'].sort().join(', ')
+      list_types = entry['list_types'].sort().reverse().join(', ')
       if list_types.includes('BL-')  # show 'replace tc' radio if bl exists
         $('.replace-tc-radio').removeClass('hidden')
     else
@@ -567,16 +567,54 @@ window.reset_score_preview = (button) ->
   $(projected_score[0]).text('')
 
   # Make checkboxes be on or off depending on original lists
-  $(current_on).each ->
-    $(this).prop('checked', true)
-  $(current_off).each ->
-    $(this).prop('checked', false)
+#  $(current_on).each ->
+#    $(this).prop('checked', true)
+#  $(current_off).each ->
+#    $(this).prop('checked', false)
 
   # Reset preview button to original state
   $(preview_button[0]).attr('disabled', true)
   $(preview_button[0]).attr('data-remove', '')
   $(preview_button[0]).attr('data-add', '')
 
+  # reset to original state for all checkboxes - lists + tcs
+  curr_tcs = $(dropdown).find('.wlbl-threat-cat-inline')  # existing tc's, reset to this state
+  wlbl_text = $(dropdown).find('.wlbl-entry-wlbl')  # existing lists, reset to this state
+  tc_checkboxes = $(dropdown).find('.wlbl_thrt_cat_id')
+  tc_row = $(dropdown).find('.threat-cat-row')
+
+  tc_array = $(curr_tcs).text().trim().split(', ')   # tc orig state: 'Malware Sites, Phishing'
+
+  list_array = list.join('').toLowerCase().split(' ')  # do lowercase for each, list of 'bl-heavy', 'bl-med'
+  console.log list_array
+
+  # HANDLE THE WL/BL RESET, FOR EACH wl-weak CHECKBOX
+  $(dropdown).find('.wl-bl-list-inline').each ->  # 2) pre-toggle (reset to orig state) the tc cb's
+
+    curr_cb_value = $(this).attr('value').toLowerCase()  # 'bl-heavy' string is the value of the current checkbox
+    curr_input = $(this)   # the current checkbox
+    console.log curr_cb_value  # THIS IS WORKING
+
+    $(this).prop('checked', false)
+
+    $(list_array).each (i, value) ->   # for each item in the text above 'WL-heavy, BL-med'
+      if value == curr_cb_value
+        console.log 'we got a match'
+        curr_input.prop('checked', true)
+
+  # if BL, reset to tc orig state
+  if $(wlbl_text).text().trim().includes('BL-')
+    $(tc_checkboxes).prop('checked', false)
+
+    $(dropdown).find('.threat-cat-cell').each ->  # 2) pre-toggle (reset to orig state) the tc cb's
+      curr_text = $(this).text().trim()
+      curr_input = $(this).find('input:checkbox')
+      $(tc_array).each (i, value) ->
+        if value == curr_text then curr_input.prop('checked', true)
+
+  else   # if WL or not on list, clean slate
+    $(tc_row).addClass('hidden')
+    $(tc_checkboxes).prop('checked', false)
 
 
 #### WL/BL HISTORY ####
@@ -730,7 +768,7 @@ window.add_wlbl_threat_cat_listeners = () ->
 
         disableSubmit()
 
-        # get a filtered array of tc's to toggle the checkboxes
+        # get a filtered array of tc's to pre-toggle the checkboxes
         tc_toggle_array = tc_cell_array.filter((entry) ->  # entry of tc html elements, entry is an html element w/ label + input
           entry_matches = false
           $(tc_text_array).each (i, value) ->
