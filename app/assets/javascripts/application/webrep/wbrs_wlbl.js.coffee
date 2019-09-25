@@ -577,20 +577,19 @@ window.reset_score_preview = (button) ->
   $(preview_button[0]).attr('data-remove', '')
   $(preview_button[0]).attr('data-add', '')
 
-  # reset to original state for all checkboxes - lists + tcs
+  # Reset to original state for all threat category checkboxes
   tc_cbs = $(dropdown).find('.wlbl_thrt_cat_id')
   tc_array = $(dropdown).find('.wlbl-threat-cat-inline').text().trim().split(', ')
-
   $(tc_cbs).prop('checked', false)
 
+  # BL? then reset the state of the tc cb's to orig state
   if current_lists.includes('BL-')
     $(dropdown).find('.threat-cat-cell').each ->
-      curr_tc = $(this)  # reset tc cb's to orig state, below
+      curr_tc = $(this)
       $(tc_array).each (i, value) ->
-        if value == $(curr_tc).text().trim()
+        if value == $(curr_tc).text().trim()   # 'bl-weak == bl-weak'
           $(curr_tc).find(':checkbox').prop('checked', true)
-
-  else   # if WL or no list, clean slate the tc's
+  else  # WL or no list, clean slate the tc's
     $(dropdown).find('.threat-cat-row').addClass('hidden')
     $(tc_cbs).prop('checked', false)
 
