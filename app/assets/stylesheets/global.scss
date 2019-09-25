@@ -10341,8 +10341,8 @@ hr.thin.extra-bottom-marg {
       margin-bottom: 0;
     }
     .threat-cat-area {
-      padding: 5px;
-      height: 250px;
+      padding: 3px;
+      height: 200px;
       display: flex; // flex to alphabetize + sort the threat cats easily
       flex-wrap: wrap;
       flex-direction: column;
@@ -10352,7 +10352,7 @@ hr.thin.extra-bottom-marg {
         width: 33%;
         font-size: 8pt;
         line-height: 10pt;
-        padding: 5px 0 5px 10px;
+        padding: 3px 0 3px 10px;
 
         input[type='checkbox'] {
           float: left;

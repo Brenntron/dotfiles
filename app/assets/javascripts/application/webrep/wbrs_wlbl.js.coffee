@@ -289,9 +289,9 @@ window.bulk_get_current_wlbl = (page) ->
       tbody = $('#wlbl_adjust_entries_index tbody')
       rows = $(tbody).find('tr')
       rows.sort (a, b) ->
-        keyA = $(a).attr('data-order-id')
-        keyB = $(b).attr('data-order-id')
-        keyA - keyB
+        x = $(a).attr('data-order-id')
+        y = $(b).attr('data-order-id')
+        x - y
 
       $.each rows, (i, row) ->
         tbody.append(row)
