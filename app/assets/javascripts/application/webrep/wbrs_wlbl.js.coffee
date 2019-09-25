@@ -306,7 +306,7 @@ window.bulk_get_current_wlbl = (page) ->
     tc_str = threat_categories.join(', ')
 
     if list_types
-      list_types = entry['list_types'].sort().reverse().join(', ')
+      list_types = entry['list_types'].sort().reverse().join(', ')  # sort by weak, then med, then heavy
       if list_types.includes('BL-')  # show 'replace tc' radio if bl exists
         $('.replace-tc-radio').removeClass('hidden')
     else
@@ -586,20 +586,14 @@ window.reset_score_preview = (button) ->
   tc_array = $(curr_tcs).text().trim().split(', ')   # tc orig state: 'Malware Sites, Phishing'
 
   list_array = list.join('').toLowerCase().split(' ')  # do lowercase for each, list of 'bl-heavy', 'bl-med'
-  console.log list_array
 
-  # HANDLE THE WL/BL RESET, FOR EACH wl-weak CHECKBOX
-  $(dropdown).find('.wl-bl-list-inline').each ->  # 2) pre-toggle (reset to orig state) the tc cb's
-
+  $(dropdown).find('.wl-bl-list-inline').each ->  # pre-toggle (reset to orig state) the tc cb's
     curr_cb_value = $(this).attr('value').toLowerCase()  # 'bl-heavy' string is the value of the current checkbox
     curr_input = $(this)   # the current checkbox
-    console.log curr_cb_value  # THIS IS WORKING
 
     $(this).prop('checked', false)
-
     $(list_array).each (i, value) ->   # for each item in the text above 'WL-heavy, BL-med'
       if value == curr_cb_value
-        console.log 'we got a match'
         curr_input.prop('checked', true)
 
   # if BL, reset to tc orig state
