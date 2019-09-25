@@ -255,7 +255,7 @@ $ ->
           drawCallback: ( settings ) ->
             if localStorage.webcat_reset_page
               localStorage.removeItem('webcat_reset_page')
-              
+
               setTimeout () ->
                 $('#complaints-index').DataTable().page(0).draw( true )
               , 100
