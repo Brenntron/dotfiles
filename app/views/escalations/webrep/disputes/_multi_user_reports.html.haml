@@ -26,10 +26,10 @@
             %input#tickets-multi-show-web-cb.tickets-show-web-cb.toolbar-checkbox.show-tickets-cb{type: 'checkbox', checked: 'checked'}
             %span.toolbar-button-text
               Web Tickets
-          %label.toolbar-button-label.dispute-EW-grey.esc-tooltipped{for:'tickets-multi-show-email-web-cb', title: 'Email / Web Tickets'}
-            %input#tickets-multi-show-email-web-cb.tickets-show-email-web-cb.toolbar-checkbox.show-tickets-cb{type: 'checkbox', checked: 'checked'}
-            %span.toolbar-button-text
-              Email / Web Tickets
+          -#%label.toolbar-button-label.dispute-EW-grey.esc-tooltipped{for:'tickets-multi-show-email-web-cb', title: 'Email / Web Tickets'}
+          -#  %input#tickets-multi-show-email-web-cb.tickets-show-email-web-cb.toolbar-checkbox.show-tickets-cb{type: 'checkbox', checked: 'checked'}
+          -#  %span.toolbar-button-text
+          -#    Email / Web Tickets
 
     .tickets-section-wrapper.open-tickets-wrapper
       .open-tickets-header
@@ -76,10 +76,10 @@
             Web Entries
           %span.ticket-entry-total#open_multi_web_count
 
-        .ticket-entry-total-block
-          %label.content-label-sm.dispute-EW-grey
-            Email/Web Entries
-          %span.ticket-entry-total#open_multi_email_web_count
+        -#.ticket-entry-total-block
+        -#  %label.content-label-sm.dispute-EW-grey
+        -#    Email/Web Entries
+        -#  %span.ticket-entry-total#open_multi_email_web_count
 
     .tickets-section-wrapper.closed-tickets-wrapper
       .closed-tickets-header
@@ -126,10 +126,10 @@
             Web Entries
           %span.ticket-entry-total#closed_multi_web_count
 
-        .ticket-entry-total-block
-          %label.content-label-sm.dispute-EW-grey
-            Email/Web Entries
-          %span.ticket-entry-total#closed_multi_email_web_count
+        -#.ticket-entry-total-block
+        -#  %label.content-label-sm.dispute-EW-grey
+        -#    Email/Web Entries
+        -#  %span.ticket-entry-total#closed_multi_email_web_count
 
 
   .col-xl-6.col-lg-5.col-xs-12.graph-section
@@ -186,7 +186,7 @@
                 %input.group-ticket{:type => "checkbox",:checked => "checked", :onclick => 'updateGraph(["E", "W", "EW"], "multiuser_ticket_type_totals", this)', autocomplete: 'off'}/
                 %label.dispute-E.legend-option
                 %label.dispute-W.legend-option
-                %label.dispute-EW.legend-option
+                -#%label.dispute-EW.legend-option
                 Entries By Ticket Types
           .reports-graph-wrapper.graph-with-small-menu
             %canvas#graph-multiuser-ticket-entries-closed
