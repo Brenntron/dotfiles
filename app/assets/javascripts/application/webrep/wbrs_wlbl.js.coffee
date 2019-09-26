@@ -589,6 +589,7 @@ window.reset_score_preview = (button) ->
       $(tc_array).each (i, value) ->
         if value == $(curr_tc).text().trim()   # 'bl-weak == bl-weak'
           $(curr_tc).find(':checkbox').prop('checked', true)
+
   else  # WL or no list, clean slate the tc's
     $(dropdown).find('.threat-cat-row').addClass('hidden')
     $(tc_cbs).prop('checked', false)
@@ -689,6 +690,10 @@ window.add_wlbl_threat_cat_listeners = () ->
 
       .then null, (err) ->
         tc_area.html('<span class="error-threat-cat"></span>')
+
+  # click on the label in a tc cell, toggle the cb
+  $('.dispute-wlbl-adjust-wrapper .threat-cat-cell:not(input)').click ->
+    $(this).find('input:checkbox').click()
 
   # after a click inside a wl/bl dropdown, lets handle wl/bl + tc validation for bulk or inline adjust wl/bl
   $('.dispute-wlbl-adjust-wrapper input').click ->
