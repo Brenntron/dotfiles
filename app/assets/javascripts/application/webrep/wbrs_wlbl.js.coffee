@@ -252,7 +252,7 @@ window.bulk_get_current_wlbl = (page) ->
             if tc_json then resolve tc_json  # resolve goes to .then() below
           .then(
             build_tc_row.bind(null, entry, tbody)
-            order_rows()
+            order_wlbl_table_rows()
           )
           .then null, (err) ->
             std_msg_error( 'Error retrieving WL/BL Data', response)  # handle this error silently if needed
@@ -266,28 +266,32 @@ window.bulk_get_current_wlbl = (page) ->
     return false
 
 
-  order_rows = () ->
-    # TODO: FIX THIS SETTIMEOUT
-    # TODO: FIX THIS SETTIMEOUT
+  order_wlbl_table_rows = () ->
+    # in post-render dom for wl/bl dropdown table rows
     setTimeout ( ->
-      row_id = 0
-      $('#disputes-index').find('.dispute-entry-checkbox:checked').each ->  # add the order ids to left and right sides
-        ip_uri = $(this).closest('tr').find('.entry-col-content').text().trim()  # get the url from the left row
-        $(this).closest('tr').attr('data-order-id', row_id)  # add row-id to the checked row
+      if $('#wlbl_adjust_entries_index').length > 0  # order index dd
+        curr_dd = $('#wlbl_adjust_entries_index')
+        left_cbs = $('#disputes-index .dispute-entry-checkbox:checked')
+        url_entry = '.entry-col-content'
+      else  # order show page dd
+        curr_dd = $('#wlbl_adjust_entries')
+        left_cbs = $('#disputes-research-table .dispute_check_box:checked')
+        url_entry = '.entry-data-content'
 
-        $('#wlbl_adjust_entries_index').find('.wlbl-entry-content').each ->
+      $(left_cbs).each (i) ->  # add the order ids to left and right sides
+        ip_uri = $(this).closest('tr').find(url_entry).text().trim()
+        $(this).closest('tr').attr('data-order-id', i)  # add row-id to the left
+        $(curr_dd).find('.wlbl-entry-content').each ->
           if $(this).text().includes(ip_uri)
-            $(this).closest('tr').attr('data-order-id', row_id)
-        row_id++
+            $(this).closest('tr').attr('data-order-id', i)  # add row-id to the right
 
-        tbody = $('#wlbl_adjust_entries_index tbody')  # then order the right side accordingly
-        rows = $(tbody).find('tr')
-        rows.sort (a, b) ->
-          x = $(a).attr('data-order-id')
-          y = $(b).attr('data-order-id')
-          x - y
-        $.each rows, (i, row) ->
-          tbody.append(row)
+      table_dd = $(curr_dd).find('tbody')  # order id's are added, now sort the tr's
+      rows = $(table_dd).find('tr')
+      rows.sort (a, b) ->
+        x = $(a).attr('data-order-id')
+        y = $(b).attr('data-order-id')
+        x - y
+      $(rows).each (i, row) -> table_dd.append(row)
     ), 500
 
 
@@ -317,7 +321,7 @@ window.bulk_get_current_wlbl = (page) ->
       '</tr>'
 
     $(tbody).append(table_row)
-    $(tbody).find('.loading-tbody').addClass('hidden')
+#    $(tbody).find('.loading-tbody').addClass('hidden')
 
 
 
