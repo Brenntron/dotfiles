@@ -250,14 +250,10 @@ window.bulk_get_current_wlbl = (page) ->
           tc_promise = new Promise (resolve, reject) ->   # wait until that tc is resolved to write out the table row
             tc_json = get_threat_categories(entry.ip_uri)
             if tc_json then resolve tc_json  # resolve goes to .then() below
-
           .then(
             build_tc_row.bind(null, entry, tbody)
-
+            order_rows()
           )
-          .then( add_order_ids() )
-          .then( order_rows() )
-
           .then null, (err) ->
             std_msg_error( 'Error retrieving WL/BL Data', response)  # handle this error more silently if needed
 
@@ -270,11 +266,11 @@ window.bulk_get_current_wlbl = (page) ->
     return false
 
 
-  # sort the rows in the mini-table in the dropdown after table is built
-  add_order_ids = () ->
-    row_id = 0
+  order_rows = () ->
+
     setTimeout ( ->   # convert timeout to a promise
-      $('#disputes-index').find('.dispute-entry-checkbox:checked').each ->
+      row_id = 0
+      $('#disputes-index').find('.dispute-entry-checkbox:checked').each ->  # add the order ids to left and right sides
         ip_uri = $(this).closest('tr').find('.entry-col-content').text().trim()  # get the url from the left row
         $(this).closest('tr').attr('data-order-id', row_id)  # add row-id to the checked row
 
@@ -282,21 +278,16 @@ window.bulk_get_current_wlbl = (page) ->
           if $(this).text().includes(ip_uri)
             $(this).closest('tr').attr('data-order-id', row_id)
         row_id++
-    ), 2000
 
-  order_rows = () ->
-    setTimeout ( ->   # convert timeout to a promise
-      tbody = $('#wlbl_adjust_entries_index tbody')
-      rows = $(tbody).find('tr')
-      rows.sort (a, b) ->
-        x = $(a).attr('data-order-id')
-        y = $(b).attr('data-order-id')
-        x - y
-
-      $.each rows, (i, row) ->
-        tbody.append(row)
-        return
-    ), 3000
+        tbody = $('#wlbl_adjust_entries_index tbody')  # then order the right side accordingly
+        rows = $(tbody).find('tr')
+        rows.sort (a, b) ->
+          x = $(a).attr('data-order-id')
+          y = $(b).attr('data-order-id')
+          x - y
+        $.each rows, (i, row) ->
+          tbody.append(row)
+    ), 500
 
 
   # ensures the table row w/ tc gets built correctly (KH refactor)
@@ -392,7 +383,7 @@ window.submit_bulk_wlbl = (page) ->
     console.log thrt_cat_ids + ' these ids are getting passed to back-end'
     data = {ip_uris: ip_uris, list_types: list_types, note: wlbl_comment, thrt_cat_ids: thrt_cat_ids}
 
-    if thrt_cat_ids.length  # if tc's were involved, and adding/replacing, add these strings, removing is just for wl/bl
+    if thrt_cat_ids.length
       tc_added_str = '<br><p>With the following Threat Category(s): ' + thrt_cat_names.join(', ') + '</p>'
       tc_replaced_str = '<br><p>With the following Threat Category(s) replaced: ' + thrt_cat_names.join(', ') + '</p>'
     else
@@ -691,9 +682,10 @@ window.add_wlbl_threat_cat_listeners = () ->
       .then null, (err) ->
         tc_area.html('<span class="error-threat-cat"></span>')
 
-  # click on the label in a tc cell, toggle the cb
-  $('.dispute-wlbl-adjust-wrapper .threat-cat-cell:not(input)').click ->
-    $(this).find('input:checkbox').click()
+  # click inside a tc cell, toggle the cb for better ux
+  $('.dispute-wlbl-adjust-wrapper .threat-cat-cell').click (event) ->
+    unless event.target.nodeName.toLowerCase() == 'input'
+      $(this).find('input:checkbox').click()
 
   # after a click inside a wl/bl dropdown, lets handle wl/bl + tc validation for bulk or inline adjust wl/bl
   $('.dispute-wlbl-adjust-wrapper input').click ->
