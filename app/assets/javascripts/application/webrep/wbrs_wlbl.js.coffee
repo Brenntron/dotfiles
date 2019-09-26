@@ -115,7 +115,7 @@ window.get_current_wlbl = (button) ->
             when 'BL-weak', 'BL-med', 'BL-heavy'
               $(dropdown).find('.threat-cat-row').removeClass('hidden')
 
-              tc_promise = new Promise (resolve, reject) ->   # get and set the threat categories with a promise
+              tc_promise = new Promise (resolve, reject) ->   # get and set the tc's with a promise
                 tc_json = get_threat_categories(entry_content)
                 if tc_json then resolve tc_json  # resolve goes to .then() below
               tc_promise.then (result) ->
@@ -124,15 +124,15 @@ window.get_current_wlbl = (button) ->
                   tc_str = '<span class="threat-cat-no-data">No Category</span>'
                 else tc_str = threat_categories.join(', ')
 
-                $(tc_cell).html(tc_str)  # 1) place the tc's in the html after promise resolves
-                $(dropdown).find('.threat-cat-cell').each ->  # 2) pre-toggle the tc cb's in the threat-cat-row
-                  text = $(this).text().trim()
-                  input = $(this).find('input:checkbox')
+                $(tc_cell).html(tc_str)  # add the tc's to dom
+                $(dropdown).find('.threat-cat-cell').each ->
+                  curr = $(this)  # pre-toggle the tc cb's in the tc row below
                   $(threat_categories).each (i, value) ->
-                    if value == text then input.prop('checked', true)
+                    if value == $(curr).text().trim()
+                      $(curr).find('input:checkbox').prop('checked', true)
 
         $(wbrs_score).text(wbrs)
-        $(wlbl_list[0]).text(response.data.join(', '))
+        $(wlbl_list[0]).text(response.data.sort().reverse().join(', '))
         $('.wlbl-entry-wlbl').text(response.data.join(', '))
         $(submit_button[0]).attr('disabled', true)
       else
@@ -246,8 +246,8 @@ window.bulk_get_current_wlbl = (page) ->
       data: data
       success: (response) ->
         response = JSON.parse(response)
-        for entry in response
-          tc_promise = new Promise (resolve, reject) ->   # wait until that tc is resolved to write out the table row
+        for entry in response   # wait until tc's are resolved to write out the full table rows
+          tc_promise = new Promise (resolve, reject) ->
             tc_json = get_threat_categories(entry.ip_uri)
             if tc_json then resolve tc_json  # resolve goes to .then() below
           .then(
@@ -255,7 +255,7 @@ window.bulk_get_current_wlbl = (page) ->
             order_rows()
           )
           .then null, (err) ->
-            std_msg_error( 'Error retrieving WL/BL Data', response)  # handle this error more silently if needed
+            std_msg_error( 'Error retrieving WL/BL Data', response)  # handle this error silently if needed
 
           comment_box.text(comment_trail)
       error: (response) ->
@@ -267,8 +267,9 @@ window.bulk_get_current_wlbl = (page) ->
 
 
   order_rows = () ->
-
-    setTimeout ( ->   # convert timeout to a promise
+    # TODO: FIX THIS SETTIMEOUT
+    # TODO: FIX THIS SETTIMEOUT
+    setTimeout ( ->
       row_id = 0
       $('#disputes-index').find('.dispute-entry-checkbox:checked').each ->  # add the order ids to left and right sides
         ip_uri = $(this).closest('tr').find('.entry-col-content').text().trim()  # get the url from the left row
@@ -666,9 +667,14 @@ window.add_wlbl_threat_cat_listeners = () ->
       ip_uri = $(this).find('.entry-data-content').text().trim()
       tc_area = $(this).find('.wlbl-tc-research-span')
 
-      # threat category(s) - uses a separate API call - needs to be handled asynchronously (w/ a js promise)
+      # sort the curr wl/bl lists by weak to heavy
+      lists_orig = $(this).find('.wlbl-table-result').text().trim()
+      lists_sort = lists_orig.split(', ').sort().reverse().join(', ')
+      $(this).find('.wlbl-table-result').html(lists_sort)
+
+      # threat category(s) - uses a separate API call - needs to be handled w/ a js promise (1-2 sec lag)
       tc_promise = new Promise (resolve, reject) ->
-        tc_json = get_threat_categories(ip_uri)  # inside each row, get a promise for the tc's for this uri on page load
+        tc_json = get_threat_categories(ip_uri)  # this is the actual api call
         if tc_json then resolve tc_json
 
       tc_promise.then (result) ->
