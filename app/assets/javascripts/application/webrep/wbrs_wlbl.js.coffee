@@ -43,6 +43,7 @@ window.get_current_wlbl = (button) ->
   bl_med = $(dropdown).find('.bl-med-checkbox')
   bl_heavy = $(dropdown).find('.bl-heavy-checkbox')
 
+
   # Clearing data to start in case user has page open for a while
   # and data needs to be regrabbed
   $(wlbl_list[0]).empty()
@@ -67,6 +68,9 @@ window.get_current_wlbl = (button) ->
   initial_bl_weak_status = ''
   initial_bl_med_status = ''
   initial_bl_heavy_status = ''
+
+  # Add loading message while wl/bl rows are being built
+  $(wlbl_list).html('<span class="loading-rows">Loading...<span class="mini-loader"></span></span>')
 
   # Send entry content to wbrs
   data = {
@@ -237,8 +241,7 @@ window.bulk_get_current_wlbl = (page) ->
       comment_trail = '\n \n------------------------------- \nBULK SUBMISSION: \n' + comment_array.join('\n')
 
     # add some loading text while the tbody gets built
-    $(tbody).empty().html('<tr class="loading-tbody"><td>Loading... ' +
-      '<div class="glyphicon glyphicon-refresh mini-loader"></div></td></tr>')
+    $(tbody).empty().html('<tr class="loading-rows"><td>Loading...<div class="mini-loader"></div></td></tr>')
 
     std_msg_ajax(
       url: '/escalations/api/v1/escalations/webrep/disputes/bulk_rule_ui_wlbl_get_info_for_form'
@@ -267,13 +270,13 @@ window.bulk_get_current_wlbl = (page) ->
 
 
   order_wlbl_table_rows = () ->
-    # in post-render dom for wl/bl dropdown table rows
+    # wait 0.5s to sort (todo: convert this func to a promise/then)
     setTimeout ( ->
-      if $('#wlbl_adjust_entries_index').length > 0  # order index dd
+      if $('#wlbl_adjust_entries_index').length > 0  # index dropdown
         curr_dd = $('#wlbl_adjust_entries_index')
         left_cbs = $('#disputes-index .dispute-entry-checkbox:checked')
         url_entry = '.entry-col-content'
-      else  # order show page dd
+      else  # show page dropdown
         curr_dd = $('#wlbl_adjust_entries')
         left_cbs = $('#disputes-research-table .dispute_check_box:checked')
         url_entry = '.entry-data-content'
@@ -287,6 +290,8 @@ window.bulk_get_current_wlbl = (page) ->
 
       table_dd = $(curr_dd).find('tbody')  # order id's are added, now sort the tr's
       rows = $(table_dd).find('tr')
+
+      # basic sort by order-id/integer
       rows.sort (a, b) ->
         x = $(a).attr('data-order-id')
         y = $(b).attr('data-order-id')
@@ -321,7 +326,7 @@ window.bulk_get_current_wlbl = (page) ->
       '</tr>'
 
     $(tbody).append(table_row)
-#    $(tbody).find('.loading-tbody').addClass('hidden')
+    $(tbody).find('.loading-rows').addClass('hidden')
 
 
 

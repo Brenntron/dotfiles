@@ -10336,7 +10336,7 @@ hr.thin.extra-bottom-marg {
 
     .threat-cat-note {
       background-color: $content-bg-color;
-      padding-top: 15px;
+      padding-top: 10px;
       padding-bottom: 0;
       margin-bottom: 0;
     }
@@ -10508,19 +10508,29 @@ span.threat-cat-no-data {
   padding: 8px 10px 4px;
 }
 
-/* loader gif, but smaller, this can be used anywhere */
-.mini-loader {
-  width: 12px;
-  height: 12px;
-  margin: 0;
-  transform-origin: 70% 45%;
+/* loader gif, but smaller, for dropdowns */
+.dropdown-menu .mini-loader {
+  display: inline-block;
+  width: 12px !important;
+  height: 12px !important;
+  position: relative;
+  top: 2px;
+  left: 4px;
+  background-size: 12px 12px;
   animation-name: mini-spin;
-  animation-duration: 2000ms;
+  animation-duration: 800ms;
   animation-iteration-count: infinite;
   animation-timing-function: linear;
+  background-image: url(image_path('icon_sync.svg'));
 }
 
 @keyframes mini-spin {
   from { transform:rotate(0deg) }
   to { transform:rotate(360deg) }
+}
+
+.loading-rows {
+  color: $type-lighter-color;
+  font-size: 8.5pt;
+  font-style: italic;
 }
