@@ -253,10 +253,8 @@ window.bulk_get_current_wlbl = (page) ->
           tc_promise = new Promise (resolve, reject) ->
             tc_json = get_threat_categories(entry.ip_uri)
             if tc_json then resolve tc_json  # resolve goes to .then() below
-          .then(
-            build_tc_row.bind(null, entry, tbody)
+          .then( build_tc_row.bind(null, entry, tbody)).then ->
             order_wlbl_table_rows()
-          )
           .then null, (err) ->
             std_msg_error( 'Error retrieving WL/BL Data', response)  # handle this error silently if needed
 
@@ -267,38 +265,6 @@ window.bulk_get_current_wlbl = (page) ->
   else
     std_msg_error('No rows selected', ['Please select at least one entry row.'])
     return false
-
-
-  order_wlbl_table_rows = () ->
-    # wait 0.5s to sort (todo: convert this func to a promise/then)
-    setTimeout ( ->
-      if $('#wlbl_adjust_entries_index').length > 0  # index dropdown
-        curr_dd = $('#wlbl_adjust_entries_index')
-        left_cbs = $('#disputes-index .dispute-entry-checkbox:checked')
-        url_entry = '.entry-col-content'
-      else  # show page dropdown
-        curr_dd = $('#wlbl_adjust_entries')
-        left_cbs = $('#disputes-research-table .dispute_check_box:checked')
-        url_entry = '.entry-data-content'
-
-      $(left_cbs).each (i) ->  # add the order ids to left and right sides
-        ip_uri = $(this).closest('tr').find(url_entry).text().trim()
-        $(this).closest('tr').attr('data-order-id', i)  # add row-id to the left
-        $(curr_dd).find('.wlbl-entry-content').each ->
-          if $(this).text().includes(ip_uri)
-            $(this).closest('tr').attr('data-order-id', i)  # add row-id to the right
-
-      table_dd = $(curr_dd).find('tbody')  # order id's are added, now sort the tr's
-      rows = $(table_dd).find('tr')
-
-      # basic sort by order-id/integer
-      rows.sort (a, b) ->
-        x = $(a).attr('data-order-id')
-        y = $(b).attr('data-order-id')
-        x - y
-      $(rows).each (i, row) -> table_dd.append(row)
-    ), 500
-
 
   # ensures the table row w/ tc gets built correctly (KH refactor)
   build_tc_row = (entry, tbody, result) ->
@@ -318,15 +284,45 @@ window.bulk_get_current_wlbl = (page) ->
     if !comment then comment = ''
 
     table_row =
-      '<tr class="wlbl-dropdown-row">' +
-        '<td class="wlbl-entry-content">' + ip_uri + '</td>' +
-        '<td class="wlbl-entry-wlbl">' + list_types + '</td>' +
-        '<td class="wlbl-current-entry-wbrs text-center">' + wbrs_score + '</td>' +
-        '<td class="wlbl-threat-cat">' + tc_str + '</td>' +
-      '</tr>'
+      "<tr class='wlbl-dropdown-row'>
+      <td class='wlbl-entry-content'>#{ip_uri}</td>
+      <td class='wlbl-entry-wlbl'>#{list_types}</td>
+      <td class='wlbl-current-entry-wbrs text-center'>#{wbrs_score}</td>
+      <td class='wlbl-threat-cat'>#{tc_str}</td>
+      </tr>"
 
     $(tbody).append(table_row)
     $(tbody).find('.loading-rows').addClass('hidden')
+
+  # order the rows after the build to ensure correct order
+  order_wlbl_table_rows = () ->
+    # index dropdown
+    if $('#wlbl_adjust_entries_index').length > 0
+      curr_dd = '#wlbl_adjust_entries_index'
+      left_cbs = '#disputes-index .dispute-entry-checkbox:checked'
+      url_entry = '.entry-col-content'
+    else  # show page dropdown
+      curr_dd = '#wlbl_adjust_entries'
+      left_cbs = '#disputes-research-table .dispute_check_box:checked'
+      url_entry = '.entry-data-content'
+
+    $(left_cbs).each (i) ->  # add the order ids to left and right sides
+      ip_uri = $(this).closest('tr').find(url_entry).text().trim()
+      $(this).closest('tr').attr('data-order-id', i)  # add row-id to the left
+      $(curr_dd).find('.wlbl-entry-content').each ->
+        if $(this).text().includes(ip_uri)
+          $(this).closest('tr').attr('data-order-id', i)  # add row-id to the right
+
+    table_dd = $(curr_dd).find('tbody')  # order id's are added, now sort the tr's
+    rows = $(table_dd).find('tr')
+
+    # basic sort by order-id/integer
+    rows.sort (a, b) ->
+      x = $(a).attr('data-order-id')
+      y = $(b).attr('data-order-id')
+      x - y
+    $(rows).each (i, row) -> table_dd.append(row)
+
 
 
 
@@ -394,8 +390,8 @@ window.submit_bulk_wlbl = (page) ->
     data = {ip_uris: ip_uris, list_types: list_types, note: wlbl_comment, thrt_cat_ids: thrt_cat_ids}
 
     if thrt_cat_ids.length
-      tc_added_str = '<br><p>With the following Threat Category(s): ' + thrt_cat_names.join(', ') + '</p>'
-      tc_replaced_str = '<br><p>With the following Threat Category(s) replaced: ' + thrt_cat_names.join(', ') + '</p>'
+      tc_added_str = "<br><p>With the following Threat Category(s): #{thrt_cat_names.join(', ')} </p>"
+      tc_replaced_str = "<br><p>With the following Threat Category(s) replaced: #{thrt_cat_names.join(', ')} </p>"
     else
       tc_added_str = ''
       tc_replaced_str = ''
@@ -688,8 +684,7 @@ window.add_wlbl_threat_cat_listeners = () ->
 
       tc_promise.then (result) ->
         {threat_categories} = JSON.parse(result)
-        if threat_categories.length == 0
-          tc_str = '<span class="threat-cat-no-data">No Category</span>'
+        if threat_categories.length == 0 then tc_str = '<span class="threat-cat-no-data">No Category</span>'
         else tc_str = threat_categories.join(', ')
 
         tc_area.html(tc_str)  # do the actual placement of the threat cat
@@ -697,9 +692,9 @@ window.add_wlbl_threat_cat_listeners = () ->
       .then null, (err) ->
         tc_area.html('<span class="error-threat-cat"></span>')
 
-  # click inside a tc cell, toggle the cb for better ux
-  $('.dispute-wlbl-adjust-wrapper .threat-cat-cell').click (event) ->
-    unless event.target.nodeName.toLowerCase() == 'input'
+  # click the text in a tc cell, also toggle the cb
+  $('.dispute-wlbl-adjust-wrapper .threat-cat-cell').click (e) ->
+    unless e.target.nodeName.toLowerCase() == 'input'
       $(this).find('input:checkbox').click()
 
   # after a click inside a wl/bl dropdown, lets handle wl/bl + tc validation for bulk or inline adjust wl/bl
@@ -709,7 +704,6 @@ window.add_wlbl_threat_cat_listeners = () ->
 
     if $(this).prop('class').length
       cb_class = $(this).prop('class').split(' ')[0]
-    else cb_class = ''
 
     dropdown_id = '#' + $(this).closest('.dropdown-menu').attr('id')  # get the dropdown id for the input just clicked
 
@@ -753,7 +747,7 @@ window.add_wlbl_threat_cat_listeners = () ->
         tc_cell_array = $(dropdown_id).find('.threat-cat-cell').toArray()
         $.merge(lists_row, tc_note_max).addClass('hidden')
         $.merge(tc_row, tc_note_replace).removeClass('hidden')
-        $(dropdown_id).find('.dropdown-menu .dispute-wlbl-adjust-wrapper input:checkbox').prop('checked', false)
+        $(dropdown_id).find('.dispute-wlbl-adjust-wrapper input:checkbox').prop('checked', false)
 
         disableSubmit()
 
@@ -767,7 +761,9 @@ window.add_wlbl_threat_cat_listeners = () ->
 
         $(tc_toggle_array).each -> $(this).find('input:checkbox').prop('checked', true)
 
-      if add_radio.prop('checked') then tc_note_max.removeClass('hidden') else tc_note_max.addClass('hidden')
+      # tc note show/hide about 5 tc's max
+      if add_radio.prop('checked') then tc_note_max.removeClass('hidden')
+      else tc_note_max.addClass('hidden')
 
       # if change is checked and no tc's, then no bl's should be checked, ensure this
       if replace_radio.prop('checked') and tc_num == 0
