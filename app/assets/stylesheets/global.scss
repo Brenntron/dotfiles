@@ -10418,7 +10418,7 @@ span.threat-cat-no-data {
 
 // adjust wl/bl dropdown - ensure long dispute url's break/wrap properly
 .dispute_tool_current .wlbl-dropdown-row td.wlbl-entry-content {
-  max-width: 160px;
+  max-width: 180px;
   word-break: break-all;
 }
 
@@ -10505,7 +10505,7 @@ span.threat-cat-no-data {
 }
 
 .adjust-wlbl-form table.dispute_tool_current td {
-  padding: 8px 10px 4px;
+  padding: 8px 4px 4px 10px;
 }
 
 /* loader gif, but smaller, for dropdowns */

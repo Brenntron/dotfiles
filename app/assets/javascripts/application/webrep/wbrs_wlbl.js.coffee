@@ -48,6 +48,7 @@ window.get_current_wlbl = (button) ->
   # and data needs to be regrabbed
   $(wlbl_list[0]).empty()
   $(wbrs_score[0]).empty()
+  $(tc_cell).empty()
   $(wl_weak[0]).prop('checked', false)
   $(wl_med[0]).prop('checked', false)
   $(wl_heavy[0]).prop('checked', false)
@@ -122,6 +123,7 @@ window.get_current_wlbl = (button) ->
               tc_promise = new Promise (resolve, reject) ->   # get and set the tc's with a promise
                 tc_json = get_threat_categories(entry_content)
                 if tc_json then resolve tc_json  # resolve goes to .then() below
+
               tc_promise.then (result) ->
                 {threat_categories} = JSON.parse(result)
                 if threat_categories.length == 0
@@ -296,8 +298,7 @@ window.bulk_get_current_wlbl = (page) ->
 
   # order the rows after the build to ensure correct order
   order_wlbl_table_rows = () ->
-    # index dropdown
-    if $('#wlbl_adjust_entries_index').length > 0
+    if $('#wlbl_adjust_entries_index').length > 0  # index dropdown
       curr_dd = '#wlbl_adjust_entries_index'
       left_cbs = '#disputes-index .dispute-entry-checkbox:checked'
       url_entry = '.entry-col-content'
