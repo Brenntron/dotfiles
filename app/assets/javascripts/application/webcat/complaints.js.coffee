@@ -341,7 +341,6 @@ window.updatePending = (id,row_id) ->
       if i < cat_array.length
         named_categories += ", "
 
-#  debugger
   std_msg_ajax(
     url: '/escalations/api/v1/escalations/webcat/complaint_entries/update_pending'
     method: 'POST'

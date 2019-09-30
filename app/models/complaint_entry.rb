@@ -127,6 +127,7 @@ class ComplaintEntry < ApplicationRecord
             current_status = "COMPLETED"
             self.case_assigned_at ||= Time.now
             update!(status:current_status,
+                   category: categories_string,
                    internal_comment: comment,
                    resolution_comment: resolution_comment,
                    case_resolved_at: Time.now,
@@ -147,7 +148,7 @@ class ComplaintEntry < ApplicationRecord
 
             current_status = "ASSIGNED"
             update!(status:current_status,
-                   url_primary_category: nil,
+                   url_primary_category: self.category,
                    internal_comment: comment,
                    resolution_comment: resolution_comment,
                    case_assigned_at: Time.now,
@@ -159,7 +160,6 @@ class ComplaintEntry < ApplicationRecord
           current_status = "PENDING"
           update!(resolution: entry_status,
                  url_primary_category: category_names_string,
-                 category: categories_string,
                  status:current_status,
                  internal_comment: comment,
                  resolution_comment: resolution_comment,

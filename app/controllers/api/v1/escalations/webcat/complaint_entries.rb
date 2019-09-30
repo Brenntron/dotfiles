@@ -415,7 +415,6 @@ module API
                 response = []
                 permitted_params['data'].each do |entry|
                   begin
-                    binding.pry
                     if entry['error'] == false
                       complaint_entry = ComplaintEntry.find(entry['entry_id'])
                       complaint_entry.change_category( entry['prefix'],
