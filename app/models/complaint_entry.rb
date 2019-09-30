@@ -145,7 +145,6 @@ class ComplaintEntry < ApplicationRecord
             update!(url_primary_category: cat_from_wbrs, category: cat_from_wbrs)
           else
             # dismiss from pending of important case
-
             current_status = "ASSIGNED"
             update!(status:current_status,
                    url_primary_category: self.category,
@@ -156,7 +155,6 @@ class ComplaintEntry < ApplicationRecord
           end
         else
           # important not from pending
-
           current_status = "PENDING"
           update!(resolution: entry_status,
                  url_primary_category: category_names_string,
