@@ -29,15 +29,15 @@
         %label.toolbar-section-label Reports
         %span.toolbar-select-wrapper
           %label.toolbar-button-label.esc-tooltipped.icon-talos-sandbox{for: 'data-resubmit-sandbox-cb', title: 'Talos Sandbox'}
-            %input.dataset-cb.toolbar-checkbox#data-resubmit-sandbox-cb{type: 'checkbox', checked: 'checked', 'data-service': 'sandbox'}
+            %input.rerun-dataset-cb.toolbar-checkbox#data-resubmit-sandbox-cb{type: 'checkbox', checked: 'checked', 'data-service': 'sandbox'}
             %span.toolbar-button-text
               Talos Sandbox
           %label.toolbar-button-label.esc-tooltipped.icon-threat-grid{for: 'data-resubmit-tg-cb', title: 'Threat Grid'}
-            %input.dataset-cb.toolbar-checkbox#data-resubmit-tg-cb{type: 'checkbox', checked: 'checked', 'data-service': 'threatgrid'}
+            %input.rerun-dataset-cb.toolbar-checkbox#data-resubmit-tg-cb{type: 'checkbox', checked: 'checked', 'data-service': 'threatgrid'}
             %span.toolbar-button-text
               Threat Grid
           %label.toolbar-button-label.esc-tooltipped.icon-reversing-labs-light.not-available{for: 'data-resubmit-reversing-cb', title: 'Reversing Labs'}
-            %input.dataset-cb.toolbar-checkbox#data-resubmit-reversing-cb{type: 'checkbox', 'data-service':'reversinglab', disabled:true}
+            %input.rerun-dataset-cb.toolbar-checkbox#data-resubmit-reversing-cb{type: 'checkbox', 'data-service':'reversinglab', disabled:true}
             %span.toolbar-button-text
               Reversing Labs
         %button.toolbar-button.icon-reports#file-rep-resubmit-evaluate-button.esc-tooltipped{title: 'Rerun Sample', onclick: 'evaluate_file()'}

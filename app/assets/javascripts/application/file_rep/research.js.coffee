@@ -12,7 +12,15 @@ $ ->
         std_api_error(response, "There was a problem retrieving data from the Sample Zoo", reload: false)
     )
 
+  $('.rerun-dataset-cb').on 'change', ->
+    checked = $('.rerun-dataset-cb:checked').length;
 
+    if checked > 0
+      $('#file-rep-resubmit-evaluate-button').attr('disabled', false)
+      $('#file-rep-resubmit-evaluate-button.esc-tooltipped').tooltipster('enable')
+    else
+      $('#file-rep-resubmit-evaluate-button').attr('disabled', true)
+      $('#file-rep-resubmit-evaluate-button.esc-tooltipped').tooltipster('disable')
 
 ########### GRAB SHA NEEDED FOR REPORTS ############
 #  If html body is on the show page (do not call on other pages)
@@ -41,8 +49,14 @@ window.evaluate_file = ()  ->
     if service == 'sandbox'
       $('#sb-loader').show();
       refresh_magic = false;
+      run_sample_in_sandbox()
     if service == 'threatgrid'
       $('#tg-loader').show();
+      report_present = $('#threatgrid-report-wrapper').find('.tg-data-present')[0]
+      report_missing = $('#threatgrid-report-wrapper').find('.tg-data-missing')[0]
+      $(report_present).hide()
+      $(report_missing).hide()
+      get_threatgrid_data(sha256_hash)
     if service == 'reversinglab'
       $('#rl-loader').show();
 
@@ -56,8 +70,9 @@ window.evaluate_file = ()  ->
     method: 'POST'
     url: "/escalations/api/v1/escalations/file_rep/disputes/submit_for_evaluation/"
     data: data
+    success_reload: false
     success: (response) ->
-      std_msg_success('Resubmission Successful', ['Successfully resubmitted to selected services: ' + formatList( services ) ], reload: true)
+      std_msg_success('Resubmission Successful', ['Successfully resubmitted to selected services: ' + formatList( services ) ], reload: false)
     error: (response) ->
       std_api_error( response, "Submission Error", reload: false)
   )

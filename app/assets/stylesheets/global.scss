@@ -645,11 +645,8 @@ button {
   margin-right: 3px
 }
 .toolbar-button:disabled {
-  cursor: not-allowed;
+  cursor: not-allowed!important;
 }
-  .toolbar-button:disabled {
-    cursor: not-allowed;
-  }
 
   .dashboard-tickets-wrapper .toolbar-button-label {
     background-size: 16px 16px;
@@ -4334,6 +4331,7 @@ button.tertiary {
 .icon-import-white {background-image: url(image_path('icon_import_white.svg'));}
 .icon-categories {background-image: url(image_path('icon_categories.svg'));}
 .icon-reports {background-image: url(image_path('icon_reports.svg'));}
+.icon-reports:disabled {background-image: url(image_path('icon_reports_grey.svg'));}
 .icon-reports-white {background-image: url(image_path('icon_reports_white.svg'));}
 .icon-new-white {background-image: url(image_path('icon_new_white.svg'));}
 .icon-categorize-white {background-image: url(image_path('icon_categorize_white.svg'));}
