@@ -34,11 +34,13 @@ window.refresh_research_data = (sha256_hash) ->
 window.evaluate_file = ()  ->
   sha256_hash = $('#sha256_hash')[0].innerText
   services = []
+  refresh_magic = true;
   $('#resubmit-to-resources input:checked').each ->
     service = $(this).attr('data-service')
     services += service + ' '
     if service == 'sandbox'
       $('#sb-loader').show();
+      refresh_magic = false;
     if service == 'threatgrid'
       $('#tg-loader').show();
     if service == 'reversinglab'
@@ -47,6 +49,7 @@ window.evaluate_file = ()  ->
   data = {
       sha256_hash: sha256_hash,
       service: services
+      refresh_magic: refresh_magic
     }
 
   std_msg_ajax(
