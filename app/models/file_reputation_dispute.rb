@@ -1016,7 +1016,7 @@ class FileReputationDispute < ApplicationRecord
     conn.post(self, source_authority: "talos-intelligence", source_key: self.ticket_source_key)
   end
 
-  def self.submit_for_evaluation(sha256_hash, service)
+  def self.submit_for_evaluation(sha256_hash, service, refresh_magic)
     services = service.split(" ")
     if services.include?("sandbox")
       FileReputationApi::Sandbox.run_sample(sha256_hash)
@@ -1028,8 +1028,9 @@ class FileReputationDispute < ApplicationRecord
     if services.include?("reversinglab")
 
     end
-
-    FileReputationApi::Magic.run_analysis(sha256_hash)
+    if refresh_magic == "true"
+      FileReputationApi::Magic.run_analysis(sha256_hash)
+    end
   end
 
   def self.check_for_rep_updates
