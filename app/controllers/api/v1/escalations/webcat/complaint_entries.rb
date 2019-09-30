@@ -71,20 +71,20 @@ module API
               requires :commit, type: String, desc: 'set this if you want to commit a pending complaint'
               requires :status, type: String, desc: 'this is the status of this complaint Entry'
               requires :categories, type: String, desc: 'a list of categories to assign to this prefix'
+              requires :category_names,type: String, desc: 'a list of category names to assign to Complaint Entry record'
               optional :comment, type: String, desc: 'resolution comment for the customer'
               optional :resolution_comment, type:String, desc: 'an internal comment'
             end
             post 'update_pending' do
               begin
                 entry = ComplaintEntry.find(permitted_params['id'])
-
-                entry.change_category(permitted_params['prefix'],
-                                      permitted_params['categories'],
-                                      nil,
-                                      permitted_params['status'],
-                                      permitted_params['comment'],permitted_params['resolution_comment'],
-                                    current_user, permitted_params['commit'])
-
+                entry.change_category( permitted_params['prefix'],
+                                       permitted_params['categories'],
+                                       permitted_params['category_names'],
+                                       permitted_params['status'],
+                                       permitted_params['comment'],
+                                       permitted_params['resolution_comment'],
+                                       current_user, permitted_params['commit'])
                 if entry.complaint.ticket_source != Complaint::SOURCE_RULEUI
                   message = Bridge::ComplaintUpdateStatusEvent.new
                   message.post_complaint(entry.complaint)
@@ -415,11 +415,12 @@ module API
                 response = []
                 permitted_params['data'].each do |entry|
                   begin
+                    binding.pry
                     if entry['error'] == false
                       complaint_entry = ComplaintEntry.find(entry['entry_id'])
                       complaint_entry.change_category( entry['prefix'],
                                                        entry['categories'],
-                                                       nil,
+                                                       entry['category_names'],
                                                        entry['status'],
                                                        entry['comment'],
                                                        entry['resolution_comment'],

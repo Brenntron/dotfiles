@@ -322,15 +322,30 @@ window.updatePending = (id,row_id) ->
   comment = $('#complaint_comment_'+id)[0].value
   resolution_comment = $('#complaint_resolution_comment_'+id)[0].value
   resolution = $('.complaint-resolution'+id).text()
+  #get the selectize control for the category input
+  selectizeControl = $('#input_cat_'+id).selectize()[0].selectize
   if $('#input_cat_'+id).val() == null
     categories = null
   else
     categories = $('#input_cat_'+id).val().toString()
 
+  named_categories = ""
+  i = 0
+  if categories == null
+    cat_array = []
+  else
+    cat_array = categories.split(',')
+    while i < cat_array.length
+      named_categories = named_categories + selectizeControl.getItem(cat_array[i]).text()
+      i++
+      if i < cat_array.length
+        named_categories += ", "
+
+#  debugger
   std_msg_ajax(
     url: '/escalations/api/v1/escalations/webcat/complaint_entries/update_pending'
     method: 'POST'
-    data: {'id': id,'prefix': prefix,'commit':status,'status':resolution,'comment':comment, 'resolution_comment': resolution_comment, 'categories': categories }
+    data: {'id': id,'prefix': prefix,'commit':status,'status':resolution,'comment':comment, 'resolution_comment': resolution_comment, 'categories': categories, 'category_names':named_categories }
     success: (response) ->
       {uri, domain, subdomain, path, categories, error, entry_id, was_dismissed, status} = $.parseJSON(response)
       if error
@@ -618,6 +633,7 @@ window.edit_selected_complaints = () ->
     std_msg_error("alert",["There was an error. Please select an entry to edit"])
 
 selected_options = (category_names) ->
+
   options = []
   if category_names
     options = category_names.split(',')
@@ -1359,7 +1375,7 @@ window.click_table_buttons = (complaint_table, button)->
     td = $(tr).next('tr').find('td:first')
     unless $(td).hasClass 'nested-complaint-data-wrapper'
       $(td).addClass 'nested-complaint-data-wrapper'
-
+#    debugger
     if ['NEW','ASSIGNED','PENDING', 'REOPENED', 'ACTIVE'].includes(data.status)
       $( cat_select ).selectize {
         persist: false,
@@ -1613,7 +1629,6 @@ window.master_submit = () ->
         data.push({entry_id: entry_id, error: false, row_id: row_id, prefix: prefix, categories: categories, category_names: category_names, status: status, comment: comment, resolution_comment: resolution_comment})
       else if (categories.length == 0) && status == 'FIXED'
         data.push({entry_id, error: true, reason: 'nil_categories'})
-
 
   std_msg_ajax(
     method: 'POST'
