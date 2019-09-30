@@ -10419,6 +10419,7 @@ span.threat-cat-no-data {
 // adjust wl/bl dropdown - ensure long dispute url's break/wrap properly
 .dispute_tool_current .wlbl-dropdown-row td.wlbl-entry-content {
   max-width: 180px;
+  min-width: 140px;
   word-break: break-all;
 }
 
@@ -10472,7 +10473,7 @@ span.threat-cat-no-data {
   padding-top: 2px;
 }
 
-/* handles existing bug for wl/bl list duplicate entries */
+/* handles existing bug for wl/bl list duplicate entries (a.com issue) */
 .wlbl-table-result {
   display: inline-block;
   min-width: 80px;
