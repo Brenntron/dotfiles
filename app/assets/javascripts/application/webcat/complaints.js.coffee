@@ -97,13 +97,13 @@ window.updateURI = (event, complaint_entry_id) ->
 
       $('#loader-modal').modal 'hide'
 
-      $(".simple-nested-table##{complaint_entry_id} tbody > tr").remove()
+      $(".simple-nested-table#entry-table-#{complaint_entry_id} tbody > tr").remove()
 
       if 'ip' == status
         std_msg_error("Cannot edit IP entries.","")
       else
         $.each current_categories, (key, entry) ->
-          $(".simple-nested-table##{complaint_entry_id}").append("<tr><td>#{entry.confidence}</td><td>#{entry.mnem} - #{entry.descr}</td><td>#{entry.top_certainty}</span></td></tr>")
+          $(".simple-nested-table#entry-table-#{complaint_entry_id}").append("<tr><td>#{entry.confidence}</td><td>#{entry.mnem} - #{entry.descr}</td><td>#{entry.top_certainty}</span></td></tr>")
 
         $("#domain_#{complaint_entry_id}").text(domain)
         $("#subdomain_#{complaint_entry_id}").text(subdomain)
@@ -936,6 +936,7 @@ format = (complaint_entry_row) ->
     data: {'id': complaint_entry.entry_id}
     success: (response) ->
       $('#loader-modal').modal 'hide'
+    
       { current_category_data : current_categories, master_categories, sds_category} = JSON.parse(response)
 
       sds_category == '' unless sds_category != null
@@ -963,14 +964,14 @@ format = (complaint_entry_row) ->
 
           if key == '1.0'
             category_row = '<tr><td>' + confidence + '</td><td>' + mnemonic + ' - ' + name + '</td><td><span class="certainty-flag nested-tooltipped" onmouseover="triggerTooltips(this)" data-tooltip-content="#certainty_table' + complaint_entry.entry_id + '_' + cat_id + '">' + top_certainty + '</span>' + tooltip_all + '</td><td class=sds_category>' + sds_category + '</td></tr>'
-            $(".simple-nested-table" + "#" + complaint_entry.entry_id).append(category_row)
+            $(".simple-nested-table" + "#entry-table-" + complaint_entry.entry_id).append(category_row)
           else
             category_row = '<tr><td>' + confidence + '</td><td>' + mnemonic + ' - ' + name + '</td><td><span class="certainty-flag nested-tooltipped" onmouseover="triggerTooltips(this)" data-tooltip-content="#certainty_table' + complaint_entry.entry_id + '_' + cat_id + '">' + top_certainty + '</span>' + tooltip_all + '</td></tr>'
-            $(".simple-nested-table" + "#" + complaint_entry.entry_id).append(category_row)
+            $(".simple-nested-table" + "#entry-table-" + complaint_entry.entry_id).append(category_row)
 
       if jQuery.isEmptyObject(current_categories) == true && sds_category
         category_row = '<tr><td><td></td><td></td><td class=sds_category>' + sds_category + '</td></tr>'
-        $(".simple-nested-table" + "#" + complaint_entry.entry_id).append(category_row)
+        $(".simple-nested-table" + "#entry-table-" + complaint_entry.entry_id).append(category_row)
 
     error: (response) ->
       $('#loader-modal').modal 'hide'
@@ -1032,7 +1033,7 @@ format = (complaint_entry_row) ->
       '<label class="content-label-sm">Customer Description</label>' +
       '<span class="nested-complaint-data">' + customer_description + '</span>' +
       '</div></div><div class="col-xs-7 col-with-divider">' +
-      '<table class="simple-nested-table" id="' + complaint_entry.entry_id + '"><thead><tr><th class="col-sm-1">Conf</th><th class="col-sm-4">WBRS Categories</th><th class="col-sm-3">WBRS Certainty</th><th class="col-sm-4">SDS Category</tr></thead>' +
+      '<table class="simple-nested-table" id="entry-table-' + complaint_entry.entry_id + '"><thead><tr><th class="col-sm-1">Conf</th><th class="col-sm-4">WBRS Categories</th><th class="col-sm-3">WBRS Certainty</th><th class="col-sm-4">SDS Category</tr></thead>' +
       '</table>' +
       '</br>' +
       '</div><div class="col-xs-2">' +
