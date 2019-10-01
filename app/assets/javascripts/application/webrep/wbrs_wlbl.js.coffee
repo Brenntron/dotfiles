@@ -70,7 +70,7 @@ window.get_current_wlbl = (button) ->
   initial_bl_med_status = ''
   initial_bl_heavy_status = ''
 
-  # Add loading message while wl/bl rows are being built
+  # Add loading message while wl/bl rows are being built, this gets removed after data is loaded
   $(wlbl_list).html('<span class="loading-rows">Loading...<span class="mini-loader"></span></span>')
 
   # Send entry content to wbrs
@@ -117,7 +117,7 @@ window.get_current_wlbl = (button) ->
 
           # inline dropdowns only: if BL exists, show the tc row and toggle the existing tc's
           switch this.toString()
-            when 'BL-weak', 'BL-med', 'BL-heavy'
+            when 'BL-weak', 'BL-med', 'BL-heavy'   # entry is on a BL?
               $(dropdown).find('.threat-cat-row').removeClass('hidden')
 
               tc_promise = new Promise (resolve, reject) ->   # get and set the tc's with a promise
@@ -130,7 +130,7 @@ window.get_current_wlbl = (button) ->
                   tc_str = '<span class="threat-cat-no-data">No Category</span>'
                 else tc_str = threat_categories.join(', ')
 
-                $(tc_cell).html(tc_str)  # add the tc's to dom
+                $(tc_cell).html(tc_str)  # place the TC's in the html
                 $(dropdown).find('.threat-cat-cell').each ->
                   curr = $(this)  # pre-toggle the tc cb's in the tc row below
                   $(threat_categories).each (i, value) ->
@@ -138,7 +138,7 @@ window.get_current_wlbl = (button) ->
                       $(curr).find('input:checkbox').prop('checked', true)
 
         $(wbrs_score).text(wbrs)
-        $(wlbl_list[0]).text(response.data.sort().reverse().join(', '))
+        $(wlbl_list[0]).text(response.data.sort().reverse().join(', '))   # sort the lists from weak to heavy
         $('.wlbl-entry-wlbl').text(response.data.join(', '))
         $(submit_button[0]).attr('disabled', true)
       else
@@ -296,7 +296,7 @@ window.bulk_get_current_wlbl = (page) ->
     $(tbody).append(table_row)
     $(tbody).find('.loading-rows').addClass('hidden')
 
-  # order the rows after the build to ensure correct order
+  # order the rows after the build to ensure correct order on left and right sides
   order_wlbl_table_rows = () ->
     if $('#wlbl_adjust_entries_index').length > 0  # index dropdown
       curr_dd = '#wlbl_adjust_entries_index'
@@ -314,7 +314,7 @@ window.bulk_get_current_wlbl = (page) ->
         if $(this).text().includes(ip_uri)
           $(this).closest('tr').attr('data-order-id', i)  # add row-id to the right
 
-    table_dd = $(curr_dd).find('tbody')  # order id's are added, now sort the tr's
+    table_dd = $(curr_dd).find('tbody')
     rows = $(table_dd).find('tr')
 
     # basic sort by order-id/integer
@@ -380,6 +380,8 @@ window.submit_bulk_wlbl = (page) ->
     thrt_cat_ids = []
     thrt_cat_names = []
     thrt_cat_array = $(dropdown).find('.wlbl_thrt_cat_id')
+    tc_added_str = ''
+    tc_replaced_str = ''
 
     $(thrt_cat_array).each ->
       if $(this).prop('checked')  # if tc cb checked, add the value to this id array (val == id)
@@ -387,18 +389,16 @@ window.submit_bulk_wlbl = (page) ->
         thrt_cat_names.push($(this).parent().text().trim())
 
     # TODO: need BACK-END ASSISTANCE for below, array is passed to back-end, something is broken
-    console.log thrt_cat_ids + ' these ids are getting passed to back-end'
     data = {ip_uris: ip_uris, list_types: list_types, note: wlbl_comment, thrt_cat_ids: thrt_cat_ids}
 
     if thrt_cat_ids.length
-      tc_added_str = "<br><p>With the following Threat Category(s): #{thrt_cat_names.join(', ')} </p>"
-      tc_replaced_str = "<br><p>With the following Threat Category(s) replaced: #{thrt_cat_names.join(', ')} </p>"
-    else
-      tc_added_str = ''
-      tc_replaced_str = ''
+      console.log thrt_cat_ids + ' these threat cat ids (if any) are getting passed to back-end'
+      tc_added_str = "<br><p>With the following Threat Category(s): <em>#{thrt_cat_names.join(', ')}</em> </p>"
+      tc_replaced_str = "<br><p>With the following Threat Category(s) replaced: <em>#{thrt_cat_names.join(', ')}</em> </p>"
 
-    # add to list and replace threat cats use the same thing below
-    if $('#wlbl-add').prop('checked') or $('#wlbl-replace').prop('checked')
+    # form submit: add to list and replace threat cats use the same thing below
+    # ADD LOGIC BELOW
+    if $('#wlbl-add').prop('checked')
       std_msg_ajax(
         url: '/escalations/api/v1/escalations/webrep/disputes/bulk_rule_ui_wlbl_add'
         method: 'POST'
@@ -406,18 +406,46 @@ window.submit_bulk_wlbl = (page) ->
         success: (response) ->
           std_msg_success("The following entries have been added to " + list_types, [ip_uris, tc_added_str])
         error: (response) ->
-          std_api_error(response, 'Error retrieving WL/BL Data')
+          std_api_error(response, 'Error adding WL/BL Data')
+        completed: () ->
+          $('.dispute-wlbl-adjust-wrapper .dropdown-submit-button').html('Submit Changes')
       )
-    else if $('#wlbl-remove').prop('checked')
+    # REMOVE LOGIC BELOW
+    else if $('#wlbl-remove').prop('checked')   # if a BL is checked to be removed, empty the threat cat array
       std_msg_ajax(
         url: '/escalations/api/v1/escalations/webrep/disputes/bulk_rule_ui_wlbl_remove'
         method: 'POST'
-        data: data
+        data: {ip_uris: ip_uris, list_types: list_types, note: wlbl_comment, thrt_cat_ids: thrt_cat_ids}
         success: (response) ->
           std_msg_success("The following entries have been removed from " + list_types, ip_uris)
         error: (response) ->
-          std_api_error(response, 'Error retrieving WL/BL Data')
+          std_api_error(response, 'Error removing WL/BL Data')
+        completed: () ->
+          $('.dispute-wlbl-adjust-wrapper .dropdown-submit-button').html('Submit Changes')
       )
+      # remove the lists AND the threat cats
+      if $('.bl-weak-checkbox, .bl-med-checkbox .bl-heavy-checkbox').is(':checked')  # check if either of these 3 is checked
+        console.log 'I see a BL is checked, now we will remove the tcs too'
+#        std_msg_ajax(
+#          url: '/escalations/api/v1/escalations/webrep/disputes/bulk_rule_ui_wlbl_add'
+#          method: 'POST'
+#          data: {ip_uris: ip_uris, list_types: list_types, note: wlbl_comment, thrt_cat_ids: []}
+#        )
+
+    # REPLACE LOGIC BELOW
+    else if $('#wlbl-replace').prop('checked')   # "replace" is only for threat categories
+      std_msg_ajax(
+        url: '/escalations/api/v1/escalations/webrep/disputes/bulk_rule_ui_wlbl_add'
+        method: 'POST'
+        data: data
+        success: (response) ->
+          std_msg_success("The following threat categories have been replaced", [tc_replaced_str])
+        error: (response) ->
+          std_api_error(response, 'Error replacing threat categories')
+        completed: () ->
+          $('.dispute-wlbl-adjust-wrapper .dropdown-submit-button').html('Submit Changes')
+      )
+
 
 
 
@@ -666,6 +694,11 @@ window.add_wlbl_threat_cat_listeners = () ->
     $(dd).find('input:checkbox').prop('checked', false)
     $(dd).find('.dropdown-submit-button').prop('disabled', true)
     $(dd).find('.tc-replace-note, .threat-cat-row, .replace-tc-radio').addClass('hidden')
+    $('.dispute-wlbl-adjust-wrapper .dropdown-submit-button').html('Submit Changes')
+
+  # submit button clicked inside wl/bl dropdown, add mini loader
+  $('.dispute-wlbl-adjust-wrapper .dropdown-submit-button').click ->
+    $(this).html('Processing...<span class="mini-loader loader-white"></span>')
 
   # research rows: on page load, verify we're on research tab or bfrp, and then verify the wl/bl has text
   if ($('#research-tab').length or $('.reputation-research-search-wrapper').length) and $('.wlbl-table-result').text().trim() != ''
@@ -688,13 +721,13 @@ window.add_wlbl_threat_cat_listeners = () ->
         if threat_categories.length == 0 then tc_str = '<span class="threat-cat-no-data">No Category</span>'
         else tc_str = threat_categories.join(', ')
 
-        tc_area.html(tc_str)  # do the actual placement of the threat cat
+        tc_area.html(tc_str)  # place the TC's in the html
 
       .then null, (err) ->
         tc_area.html('<span class="error-threat-cat"></span>')
 
-  # click the text in a tc cell, also toggle the cb
-  $('.dispute-wlbl-adjust-wrapper .threat-cat-cell').click (e) ->
+  # click the text in a list cell or tc cell, also toggle the cb
+  $('.dispute-wlbl-adjust-wrapper').find('.threat-cat-cell, .lists-row li').click (e) ->
     unless e.target.nodeName.toLowerCase() == 'input'
       $(this).find('input:checkbox').click()
 
@@ -709,6 +742,7 @@ window.add_wlbl_threat_cat_listeners = () ->
     dropdown_id = '#' + $(this).closest('.dropdown-menu').attr('id')  # get the dropdown id for the input just clicked
 
     $(dropdown_id).ready ->
+      # Dropdown for adjust wl/bl, add some shortcuts for all these vars
       lists_row = $(this).find('.lists-row')
       wl_num = $(this).find('.lists-row input[value^="WL-"]:checked').length
       bl_num = $(this).find('.lists-row input[value^="BL-"]:checked').length
@@ -753,12 +787,11 @@ window.add_wlbl_threat_cat_listeners = () ->
         disableSubmit()
 
         # get a filtered array of tc's to pre-toggle the checkboxes
-        tc_toggle_array = tc_cell_array.filter((entry) ->  # entry of tc html elements, entry is an html element w/ label + input
+        tc_toggle_array = tc_cell_array.filter (entry) ->  # entry of tc html elements, entry is an html element w/ label + input
           entry_matches = false
           $(tc_text_array).each (i, value) ->
             if value == $(entry).text().trim() then entry_matches = true
           if entry_matches then return entry
-        )
 
         $(tc_toggle_array).each -> $(this).find('input:checkbox').prop('checked', true)
 
@@ -774,7 +807,7 @@ window.add_wlbl_threat_cat_listeners = () ->
       if cb_class.includes('wlbl_thrt_cat_id')
         if replace_radio.prop('checked') and tc_num == 0
           tc_note_replace.removeClass('hidden')
-        else if tc_num > 5
+        if tc_num > 5
           $(this).find('.five-note').addClass('required-bold')
         else if tc_num <= 5 and tc_num > 0
           $(this).find('.five-note').removeClass('required-bold')
