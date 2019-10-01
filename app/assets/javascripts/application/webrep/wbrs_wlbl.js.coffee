@@ -681,6 +681,8 @@ window.wlbl_history_dialog = (id) ->
 # WL/BL dropdowns checkbox validation logic, these get added to the adjust wl/bl dropdowns on page load
 window.add_wlbl_threat_cat_listeners = () ->
   wlbl_dropdowns = $('.dropdown-menu .dispute-wlbl-adjust-wrapper')
+  list_els = $('#index-adjust-wlbl, #wlbl_entries_button').next('.dropdown-menu').find('.lists-row li')
+  tc_els = $('.dispute-wlbl-adjust-wrapper .threat-cat-cell')
 
   # clean slate all adjust wl/bl dropdowns
   $('#index-adjust-wlbl, #wlbl_entries_button, .bfrp-inline-wlbl-button').click ->
@@ -695,6 +697,11 @@ window.add_wlbl_threat_cat_listeners = () ->
     $(dd).find('.dropdown-submit-button').prop('disabled', true)
     $(dd).find('.tc-replace-note, .threat-cat-row, .replace-tc-radio').addClass('hidden')
     $('.dispute-wlbl-adjust-wrapper .dropdown-submit-button').html('Submit Changes')
+
+  # in wl/bl dropdowns, click a wl/bl list or tc and it will toggle the adjacent cb
+  $.merge(list_els, tc_els).click (e) ->
+    unless e.target.nodeName.toLowerCase() == 'input'
+      $(this).find('input:checkbox').click()
 
   # submit button clicked inside wl/bl dropdown, add mini loader
   $('.dispute-wlbl-adjust-wrapper .dropdown-submit-button').click ->
@@ -726,18 +733,15 @@ window.add_wlbl_threat_cat_listeners = () ->
       .then null, (err) ->
         tc_area.html('<span class="error-threat-cat"></span>')
 
-  # click the text in a list cell or tc cell, also toggle the cb
-  $('.dispute-wlbl-adjust-wrapper').find('.threat-cat-cell, .lists-row li').click (e) ->
-    unless e.target.nodeName.toLowerCase() == 'input'
-      $(this).find('input:checkbox').click()
 
   # after a click inside a wl/bl dropdown, lets handle wl/bl + tc validation for bulk or inline adjust wl/bl
   $('.dispute-wlbl-adjust-wrapper input').click ->
-    cb_class = ''
     cb_value = $(this).attr('value')
 
     if $(this).prop('class').length
       cb_class = $(this).prop('class').split(' ')[0]
+    else
+      cb_class = ''
 
     dropdown_id = '#' + $(this).closest('.dropdown-menu').attr('id')  # get the dropdown id for the input just clicked
 
