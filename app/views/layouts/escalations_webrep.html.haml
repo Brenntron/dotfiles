@@ -29,43 +29,43 @@
     .dropdown-menu.nav-tools-dropdown#filter-dropdown{'aria-labelledby': 'filter-cases'}
       %ul#filter-cases-list
         %li{class: ("selected" if params[:f] == "recently_viewed")}
-          %a{href: '../../../escalations/webrep/disputes?f=recently_viewed'}
+          %a{href: "#{escalations_webrep_disputes_path}?f=recently_viewed"}
             %span.nav-dropdown-icon.icon-recently-viewed
             Recently Viewed
         %li{class: ("selected" if params[:f] == "my_disputes")}
-          %a{href: '../../../escalations/webrep/disputes?f=my_disputes'}
+          %a{href: "#{escalations_webrep_disputes_path}f=my_disputes"}
             %span.nav-dropdown-icon.icon-my-bugs
             My Tickets
         %li{class: ("selected" if params[:f] == "my_open")}
-          %a{href: '../../../escalations/webrep/disputes?f=my_open'}
+          %a{href: "#{escalations_webrep_disputes_path}?f=my_open"}
             %span.nav-dropdown-icon.icon-my-open-bugs
             My Open Tickets
         %li{class: ("selected" if params[:f] == "team_disputes")}
-          %a{href: '../../../escalations/webrep/disputes?f=team_disputes'}
+          %a{href: "#{escalations_webrep_disputes_path}?f=team_disputes"}
             %span.nav-dropdown-icon.icon-team-bugs
             My Team Tickets
         %li{class: ("selected" if params[:f] == "unassigned")}
-          %a{href: '../../../escalations/webrep/disputes?f=unassigned'}
+          %a{href: "#{escalations_webrep_disputes_path}?f=unassigned"}
             %span.nav-dropdown-icon.icon-unassigned-bugs
             Unassigned Tickets
         %li{class: ("selected" if params[:f] == "open")}
-          %a{href: '../../../escalations/webrep/disputes?f=open'}
+          %a{href: "#{escalations_webrep_disputes_path}?f=open"}
             %span.nav-dropdown-icon.icon-open-bugs
             Open Tickets
         %li{class: ("selected" if params[:f] == "open_email")}
-          %a{href: '../../../escalations/webrep/disputes?f=open_email'}
+          %a{href: "#{escalations_webrep_disputes_path}?f=open_email"}
             %span.nav-dropdown-icon.icon-email-tix
             Open Email Tickets
         %li{class: ("selected" if params[:f] == "open_web")}
-          %a{href: '../../../escalations/webrep/disputes?f=open_web'}
+          %a{href: "#{escalations_webrep_disputes_path}?f=open_web"}
             %span.nav-dropdown-icon.icon-web-tix
             Open Web Tickets
         %li{class: ("selected" if params[:f] == "closed")}
-          %a{href: '../../../escalations/webrep/disputes?f=closed'}
+          %a{href: "#{escalations_webrep_disputes_path}?f=closed"}
             %span.nav-dropdown-icon.icon-fixed-bugs
             Closed Tickets
         %li{class: ("selected" if params[:f] == "all")}
-          %a{href: '../../../escalations/webrep/disputes?f=all'}
+          %a{href: "#{escalations_webrep_disputes_path}?f=all"}
             %span.nav-dropdown-icon.icon-all-tickets
             All Tickets
 
