@@ -393,8 +393,8 @@ window.submit_bulk_wlbl = (page) ->
 
     if thrt_cat_ids.length
       console.log thrt_cat_ids + ' these threat cat ids are getting passed to back-end'
-      tc_added_str = "<br><p>With the following threat category: <em>#{ thrt_cat_names.join(', ') }</em> </p>"
-      tc_replaced_str = "<br><p>With the following threat category replaced: <em>#{ thrt_cat_names.join(', ')}</em> </p>"
+      tc_added_str = "<br><p>With the following threat categories: <em>#{ thrt_cat_names.join(', ') }</em> </p>"
+      tc_replaced_str = "<br><p>With the following threat categories replaced: <em>#{ thrt_cat_names.join(', ')}</em> </p>"
 
     # form submit
     # add to list
@@ -403,16 +403,19 @@ window.submit_bulk_wlbl = (page) ->
         url: '/escalations/api/v1/escalations/webrep/disputes/bulk_rule_ui_wlbl_add'
         method: 'POST'
         data: data
-        success: (response) -> std_msg_success("The following entries have been added to " + list_types, [ip_uris, tc_added_str])
-        error: (response) -> std_api_error(response, 'Error adding WL/BL Data')
-        completed: () -> $('.dispute-wlbl-adjust-wrapper .dropdown-submit-button').html('Submit Changes').prop('disabled', false)
+        success: (response) ->
+          std_msg_success("The following entries have been added to " + list_types, [ip_uris, tc_added_str])
+        error: (response) ->
+          std_api_error(response, 'Error adding WL/BL Data')
+        completed: () ->
+          $('.dispute-wlbl-adjust-wrapper .dropdown-submit-button').html('Submit Changes').prop('disabled', false)
       )
-    # remove from lists (and remove relevant threat cats)
+    # remove from lists (and remove relevant threat cats): TODO: back-end assistance needed, to remove/replace specific TC's
     else if $('#wlbl-remove').prop('checked')   # if a BL is checked to be removed, empty the threat cat array
       std_msg_ajax(
         url: '/escalations/api/v1/escalations/webrep/disputes/bulk_rule_ui_wlbl_remove'
         method: 'POST'
-        data: {ip_uris: ip_uris, list_types: list_types, note: wlbl_comment, thrt_cat_ids: thrt_cat_ids}
+        data: data
         success: (response) ->
           std_msg_success("The following entries have been removed from " + list_types, ip_uris)
         error: (response) ->
@@ -420,7 +423,7 @@ window.submit_bulk_wlbl = (page) ->
         completed: () ->
           $('.dispute-wlbl-adjust-wrapper .dropdown-submit-button').html('Submit Changes')
       )
-    # replace threat cats
+    # replace threat cats: TODO: back-end assistance needed, to remove/replace specific TC's
     else if $('#wlbl-replace').prop('checked')   # "replace" is only for threat categories
       std_msg_ajax(
         url: '/escalations/api/v1/escalations/webrep/disputes/bulk_rule_ui_wlbl_add'
@@ -804,16 +807,12 @@ window.add_wlbl_threat_cat_listeners = () ->
 
       # every input click, disable submit unless certain criteria is met
       disableSubmit()
-#
-#      console.log wl_num
-#      console.log bl_num
-#      console.log $(dropdown_id).find('.toggle-slider').length
 
       # scenarios to enable the submit button
       conditionsArray = [
         wl_num > 0 && bl_num == 0 && tc_num == 0,
         bl_num > 0 && tc_num > 0 && tc_num <= 5,
-        wl_num == 0 && bl_num == 0 && $(dropdown_id).find('.toggle-slider').length > 0  # inline dd's: de-toggle all wl's + bl's can submit
+        wl_num == 0 && bl_num == 0 && $(dropdown_id).find('.toggle-slider').length > 0  # inline: de-toggle all wl/bl's? allow submit
         add_radio.prop('checked') && bl_num > 0 && tc_num > 0 && tc_num <= 5,
         remove_radio.prop('checked') && bl_num > 0,
         replace_radio.prop('checked') && bl_num == 0 && tc_num == 0,  # no tc's? no bl's either then, let them submit
