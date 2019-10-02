@@ -392,25 +392,22 @@ window.submit_bulk_wlbl = (page) ->
     data = {ip_uris: ip_uris, list_types: list_types, note: wlbl_comment, thrt_cat_ids: thrt_cat_ids}
 
     if thrt_cat_ids.length
-      console.log thrt_cat_ids + ' these threat cat ids (if any) are getting passed to back-end'
-      tc_added_str = "<br><p>With the following Threat Category(s): <em>#{thrt_cat_names.join(', ')}</em> </p>"
-      tc_replaced_str = "<br><p>With the following Threat Category(s) replaced: <em>#{thrt_cat_names.join(', ')}</em> </p>"
+      console.log thrt_cat_ids + ' these threat cat ids are getting passed to back-end'
+      tc_added_str = "<br><p>With the following threat category: <em>#{ thrt_cat_names.join(', ') }</em> </p>"
+      tc_replaced_str = "<br><p>With the following threat category replaced: <em>#{ thrt_cat_names.join(', ')}</em> </p>"
 
-    # form submit: add to list and replace threat cats use the same thing below
-    # ADD LOGIC BELOW
+    # form submit
+    # add to list
     if $('#wlbl-add').prop('checked')
       std_msg_ajax(
         url: '/escalations/api/v1/escalations/webrep/disputes/bulk_rule_ui_wlbl_add'
         method: 'POST'
         data: data
-        success: (response) ->
-          std_msg_success("The following entries have been added to " + list_types, [ip_uris, tc_added_str])
-        error: (response) ->
-          std_api_error(response, 'Error adding WL/BL Data')
-        completed: () ->
-          $('.dispute-wlbl-adjust-wrapper .dropdown-submit-button').html('Submit Changes')
+        success: (response) -> std_msg_success("The following entries have been added to " + list_types, [ip_uris, tc_added_str])
+        error: (response) -> std_api_error(response, 'Error adding WL/BL Data')
+        completed: () -> $('.dispute-wlbl-adjust-wrapper .dropdown-submit-button').html('Submit Changes').prop('disabled', false)
       )
-    # REMOVE LOGIC BELOW
+    # remove from lists (and remove relevant threat cats)
     else if $('#wlbl-remove').prop('checked')   # if a BL is checked to be removed, empty the threat cat array
       std_msg_ajax(
         url: '/escalations/api/v1/escalations/webrep/disputes/bulk_rule_ui_wlbl_remove'
@@ -423,16 +420,7 @@ window.submit_bulk_wlbl = (page) ->
         completed: () ->
           $('.dispute-wlbl-adjust-wrapper .dropdown-submit-button').html('Submit Changes')
       )
-      # remove the lists AND the threat cats
-      if $('.bl-weak-checkbox, .bl-med-checkbox .bl-heavy-checkbox').is(':checked')  # check if either of these 3 is checked
-        console.log 'I see a BL is checked, now we will remove the tcs too'
-#        std_msg_ajax(
-#          url: '/escalations/api/v1/escalations/webrep/disputes/bulk_rule_ui_wlbl_add'
-#          method: 'POST'
-#          data: {ip_uris: ip_uris, list_types: list_types, note: wlbl_comment, thrt_cat_ids: []}
-#        )
-
-    # REPLACE LOGIC BELOW
+    # replace threat cats
     else if $('#wlbl-replace').prop('checked')   # "replace" is only for threat categories
       std_msg_ajax(
         url: '/escalations/api/v1/escalations/webrep/disputes/bulk_rule_ui_wlbl_add'
@@ -445,7 +433,6 @@ window.submit_bulk_wlbl = (page) ->
         completed: () ->
           $('.dispute-wlbl-adjust-wrapper .dropdown-submit-button').html('Submit Changes')
       )
-
 
 
 
@@ -681,8 +668,8 @@ window.wlbl_history_dialog = (id) ->
 # WL/BL dropdowns checkbox validation logic, these get added to the adjust wl/bl dropdowns on page load
 window.add_wlbl_threat_cat_listeners = () ->
   wlbl_dropdowns = $('.dropdown-menu .dispute-wlbl-adjust-wrapper')
-  list_els = $('#index-adjust-wlbl, #wlbl_entries_button').next('.dropdown-menu').find('.lists-row li')
-  tc_els = $('.dispute-wlbl-adjust-wrapper .threat-cat-cell')
+  list_cells = $('#index-adjust-wlbl, #wlbl_entries_button').next('.dropdown-menu').find('.lists-row li')
+  tc_cells = $('.dispute-wlbl-adjust-wrapper .threat-cat-cell')
 
   # clean slate all adjust wl/bl dropdowns
   $('#index-adjust-wlbl, #wlbl_entries_button, .bfrp-inline-wlbl-button').click ->
@@ -698,14 +685,14 @@ window.add_wlbl_threat_cat_listeners = () ->
     $(dd).find('.tc-replace-note, .threat-cat-row, .replace-tc-radio').addClass('hidden')
     $('.dispute-wlbl-adjust-wrapper .dropdown-submit-button').html('Submit Changes')
 
-  # in wl/bl dropdowns, click a wl/bl list or tc and it will toggle the adjacent cb
-  $.merge(list_els, tc_els).click (e) ->
+  # wl/bl dropdowns, click a wl/bl list cell or tc cell and it will toggle the adjacent cb
+  $.merge(list_cells, tc_cells).click (e) ->
     unless e.target.nodeName.toLowerCase() == 'input'
       $(this).find('input:checkbox').click()
 
   # submit button clicked inside wl/bl dropdown, add mini loader
   $('.dispute-wlbl-adjust-wrapper .dropdown-submit-button').click ->
-    $(this).html('Processing...<span class="mini-loader loader-white"></span>')
+    $(this).html('Processing...<span class="mini-loader loader-white"></span>').prop('disabled', true)
 
   # research rows: on page load, verify we're on research tab or bfrp, and then verify the wl/bl has text
   if ($('#research-tab').length or $('.reputation-research-search-wrapper').length) and $('.wlbl-table-result').text().trim() != ''
@@ -740,13 +727,12 @@ window.add_wlbl_threat_cat_listeners = () ->
 
     if $(this).prop('class').length
       cb_class = $(this).prop('class').split(' ')[0]
-    else
-      cb_class = ''
+    else cb_class = ''
 
     dropdown_id = '#' + $(this).closest('.dropdown-menu').attr('id')  # get the dropdown id for the input just clicked
 
+    # Dropdown for adjust wl/bl, add some shortcuts for all these vars
     $(dropdown_id).ready ->
-      # Dropdown for adjust wl/bl, add some shortcuts for all these vars
       lists_row = $(this).find('.lists-row')
       wl_num = $(this).find('.lists-row input[value^="WL-"]:checked').length
       bl_num = $(this).find('.lists-row input[value^="BL-"]:checked').length

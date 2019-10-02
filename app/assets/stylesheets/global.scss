@@ -10333,7 +10333,6 @@ hr.thin.extra-bottom-marg {
   .dropdown-tool-grey-row.threat-cat-row {
     margin-left: -10px !important; // need important overrides here
     margin-right: -10px !important;
-
     .threat-cat-note {
       background-color: $content-bg-color;
       padding-top: 10px;
@@ -10347,31 +10346,26 @@ hr.thin.extra-bottom-marg {
       flex-wrap: wrap;
       flex-direction: column;
       justify-content: space-around;
-
       .threat-cat-cell {
         width: 33%;
         font-size: 8pt;
         line-height: 10pt;
         padding: 3px 0 3px 10px;
         cursor: default;
-
         input[type='checkbox'] {
           float: left;
           position: relative;
           bottom: 3px;
         }
-
         li.threat-cat-cb {
           padding-top: 6px;
           padding-bottom: 8px;
-
           input {
             display: inline-block;
             width: 12px;
             margin-top: 1px;
             margin-right: 4px;
           }
-
           label {
             display: inline-block;
             width: 120px;
@@ -10381,7 +10375,6 @@ hr.thin.extra-bottom-marg {
         }
       }
     }
-
     td.wlbl-threat-cat {
       font-size: 8pt;
       line-height: 11pt;
@@ -10393,19 +10386,17 @@ hr.thin.extra-bottom-marg {
 span.threat-cat-required {
   margin-left: 5px;
   margin-top: 1px;
-}
-span.threat-cat-required .five-note {
-  margin-top: 0;
-}
-
-span.threat-cat-required, span.threat-cat-required .five-note {
   color: $warning-accent-color;
   font-size: 7pt;
   padding-left: 2px;
-}
-span.threat-cat-required .five-note.required-bold {
-  font-weight: bold;
-  color: darken($warning-accent-color, 5%)
+  .five-note {
+    margin-top: 0;
+    font-size: 7pt;
+  }
+  .required-bold {
+    font-weight: bold;
+    color: darken($warning-accent-color, 5%)
+  }
 }
 
 span.threat-cat-no-data {
@@ -10545,3 +10536,8 @@ span.threat-cat-no-data {
 .lists-row ul li {
   cursor: default;
 }
+
+//.dispute-wlbl-adjust-wrapper .dropdown-submit-button:disabled {
+//  background-color: $disabled-bg !important;
+//  color: $disabled-txt !important;
+//}
