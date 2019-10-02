@@ -19,7 +19,8 @@ $ ->
         localStorage.webcat_search_name = ''
         localStorage.webcat_search_conditions = JSON.stringify({value:webcat_search_string})
       refresh_url()
-
+  $('#filter-cases-list a').on 'click', (e)->
+    localStorage.setItem('webcat_reset_page', true)
   window.set_webcat_advanced = () ->
     # creating form object from array made from advanced dropdown form
     form = {}
