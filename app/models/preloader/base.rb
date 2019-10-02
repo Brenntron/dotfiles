@@ -46,7 +46,7 @@ class Preloader::Base
 
     while counter < TRIES
       begin
-        wbrs_list_type ||= Wbrs::ManualWlbl.where({:url => host}).select{ |wlbl| wlbl.state == "active" && wlbl.url == self.uri}.map{ |wlbl| wlbl.list_type }.join(', ')
+        wbrs_list_type ||= Wbrs::ManualWlbl.where({:url => host}).select{ |wlbl| wlbl.state == "active" && wlbl.url == host}.map{ |wlbl| wlbl.list_type }.join(', ')
         break
       rescue
         counter = counter + 1
