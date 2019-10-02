@@ -804,11 +804,16 @@ window.add_wlbl_threat_cat_listeners = () ->
 
       # every input click, disable submit unless certain criteria is met
       disableSubmit()
+#
+#      console.log wl_num
+#      console.log bl_num
+#      console.log $(dropdown_id).find('.toggle-slider').length
 
       # scenarios to enable the submit button
       conditionsArray = [
         wl_num > 0 && bl_num == 0 && tc_num == 0,
         bl_num > 0 && tc_num > 0 && tc_num <= 5,
+        wl_num == 0 && bl_num == 0 && $(dropdown_id).find('.toggle-slider').length > 0  # inline dd's: de-toggle all wl's + bl's can submit
         add_radio.prop('checked') && bl_num > 0 && tc_num > 0 && tc_num <= 5,
         remove_radio.prop('checked') && bl_num > 0,
         replace_radio.prop('checked') && bl_num == 0 && tc_num == 0,  # no tc's? no bl's either then, let them submit
