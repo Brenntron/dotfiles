@@ -135,6 +135,33 @@ class DisputeEntry < ApplicationRecord
 
   end
 
+  def self.get_primary_category(uri)
+    prefix_results = Wbrs::Prefix.where({:urls => [uri]})
+
+    return {} unless prefix_results.any?
+
+    parsed_uri = Complaint.parse_url(uri)
+    parsed_uri['path'] = '' unless parsed_uri['path'].present?
+    parsed_uri['subdomain'] = '' unless parsed_uri['subdomain'].present?
+
+    final_results = []
+
+    prefix_results.each do |prefix_result|
+      if ((prefix_result.subdomain == parsed_uri['subdomain']) || (parsed_uri['subdomain'] == 'www')) && prefix_result.path == parsed_uri['path']
+        final_results << prefix_result
+      end
+    end
+
+    return {} unless final_results.any?
+
+    # category_ids = final_results.first.categories.sort_by(&:confidence).map {|category| category.category_id}
+    category_names = final_results.first.categories.sort_by(&:confidence).map {|category| category.descr}
+    category_names[0]
+    # {category_ids: category_ids, category_names: category_names}
+  end
+
+
+
   def self.is_ip?(ip)
     !!IPAddr.new(ip) rescue false
   end
@@ -684,94 +711,157 @@ class DisputeEntry < ApplicationRecord
     []
   end
 
+  ######################################################################################
+  def self.process_research_for_uri(research_params)
+    url = research_params['uri'].gsub(/\r\n?/, "\n").strip # Remove all white spaces and newlines
+    domain_of_url = DisputeEntry.domain_of(url)
+    entries = entries_of_url(url)
+
+    # BEGIN LOGIC TO CONSOLIDATE WLBL INFO TO UNIQUE URIS
+    entries.each do |entry|
+      entry.class.module_eval { attr_accessor :consolidated_wlbl_strings}
+      entry.consolidated_wlbl_strings = entry.wbrs_list_type
+      entry.primary_category = DisputeEntry.get_primary_category(entry.hostlookup)
+    end
+
+    unique_entries = entries.uniq{|e| e.hostlookup}
+    duplicate_entries = entries - unique_entries
+
+    duplicate_entries.each do |duplicate_entry|
+      unique_entries.select{ |e| e.hostlookup == duplicate_entry.hostlookup}.map{ |e| e.consolidated_wlbl_strings << ", " + duplicate_entry.consolidated_wlbl_strings}
+    end
+
+    #entries = unique_entries
+
+    #get rid of weird entries
+
+    final_entries = []
+    rejected_entries = []
+    unique_entries.each do |r_entry|
+      entry_domain = DisputeEntry.domain_of(r_entry.hostlookup)
+      if entry_domain.include?(domain_of_url)
+        final_entries << r_entry
+      else
+        rejected_entries << r_entry
+      end
+    end
+
+    entries = final_entries
+
+    # END WLBL LOGIC, WE SHOULD ONLY HAVE UNIQUE URIS NOW
+
+    if research_params['scope'] == "strict"
+      unless entries.find{|entry| url == entry.uri}
+        entries << DisputeEntry.new(uri: url)
+      end
+    end
+
+
+    if research_params['scope'] == "broad" || entries.find{|entry| url == entry.uri}
+      entries.each do |entry|
+        is_ip_address = !!(entry.uri  =~ Resolv::IPv4::Regex)
+        wbrs_stuff = Sbrs::ManualSbrs.get_wbrs_data({:url => entry.uri})
+        wbrs_stuff_rulehits = Sbrs::ManualSbrs.get_rule_names_from_rulehits(wbrs_stuff)
+
+        ip_addr = IPSocket.getaddress(entry.uri) rescue nil
+        if ip_addr
+          wbrs_stuff_ip = Sbrs::ManualSbrs.get_wbrs_data(url: ip_addr)
+          wbrs_stuff_rulehits = wbrs_stuff_rulehits + Sbrs::ManualSbrs.get_rule_names_from_rulehits(wbrs_stuff_ip)
+          wbrs_stuff_rulehits = wbrs_stuff_rulehits.uniq
+        end
+
+        entry.wbrs_score = wbrs_stuff["wbrs"]["score"]
+        wbrs_stuff_rulehits.each do |rule_hit|
+          new_rule_hit = DisputeRuleHit.new
+          new_rule_hit.dispute_entry_id = entry.id
+          new_rule_hit.name = rule_hit.strip
+          new_rule_hit.rule_type = "WBRS"
+          entry.dispute_rule_hits << new_rule_hit
+        end
+
+        if is_ip_address === true
+          sbrs_stuff = Sbrs::ManualSbrs.get_sbrs_data({:ip => entry.uri})
+          entry.sbrs_score = sbrs_stuff["sbrs"]["score"]
+          sbrs_stuff_rules = Sbrs::GetSbrs.get_sbrs_rules_for_ip(entry.uri)
+
+
+          sbrs_stuff_rules.each do |rule_hit|
+            new_rule_hit = DisputeRuleHit.new
+            new_rule_hit.dispute_entry_id = entry.id
+            new_rule_hit.name = rule_hit.strip
+            new_rule_hit.rule_type = "SBRS"
+            entry.dispute_rule_hits << new_rule_hit
+          end
+
+        end
+
+      end
+
+    end
+
+    entries
+  end
+
+
   # If the research page is served from the DisputesController, this method is here.
   # If the controller action is moved to another controller, move this method to another class.
   def self.research_results(research_params)
     if research_params.present? && research_params['uri'].strip != ''
-      url = research_params['uri'].gsub(/\r\n?/, "\n").strip # Remove all white spaces and newlines
-      domain_of_url = DisputeEntry.domain_of(url)
-      entries = entries_of_url(url)
+      total_uris = research_params['uri'].split("\r\n")
+      final_uris = []
 
-      # BEGIN LOGIC TO CONSOLIDATE WLBL INFO TO UNIQUE URIS
-      entries.each do |entry|
-        entry.class.module_eval { attr_accessor :consolidated_wlbl_strings}
-        entry.consolidated_wlbl_strings = entry.wbrs_list_type
-      end
+      total_uris.each do |uri|
+        result_r = uri.split("\r")
+        result_n = uri.split("\n")
+        result_s = uri.split(" ")
 
-      unique_entries = entries.uniq{|e| e.hostlookup}
-      duplicate_entries = entries - unique_entries
 
-      duplicate_entries.each do |duplicate_entry|
-        unique_entries.select{ |e| e.hostlookup == duplicate_entry.hostlookup}.map{ |e| e.consolidated_wlbl_strings << ", " + duplicate_entry.consolidated_wlbl_strings}
-      end
+        final_result = []
 
-      #entries = unique_entries
+        was_split = false
 
-      #get rid of weird entries
-
-      final_entries = []
-      rejected_entries = []
-      unique_entries.each do |r_entry|
-        entry_domain = DisputeEntry.domain_of(r_entry.hostlookup)
-        if entry_domain.include?(domain_of_url)
-          final_entries << r_entry
-        else
-          rejected_entries << r_entry
+        if result_r.size > 1
+          final_result += result_r
+          was_split = true
         end
-      end
 
-      entries = final_entries
-
-      # END WLBL LOGIC, WE SHOULD ONLY HAVE UNIQUE URIS NOW
-
-      if research_params['scope'] == "strict"
-        unless entries.find{|entry| url == entry.uri}
-          entries << DisputeEntry.new(uri: url)
+        if result_n.size > 1
+          final_result += result_n
+          was_split = true
         end
-      end
 
-      if research_params['scope'] == "broad" || entries.find{|entry| url == entry.uri}
-        entries.each do |entry|
-          is_ip_address = !!(entry.uri  =~ Resolv::IPv4::Regex)
-          wbrs_stuff = Sbrs::ManualSbrs.get_wbrs_data({:url => entry.uri})
-          wbrs_stuff_rulehits = Sbrs::ManualSbrs.get_rule_names_from_rulehits(wbrs_stuff)
+        if result_s.size > 1
+          final_result += result_s
+          was_split = true
+        end
 
-          ip_addr = IPSocket.getaddress(entry.uri) rescue nil
-          if ip_addr
-            wbrs_stuff_ip = Sbrs::ManualSbrs.get_wbrs_data(url: ip_addr)
-            wbrs_stuff_rulehits = wbrs_stuff_rulehits + Sbrs::ManualSbrs.get_rule_names_from_rulehits(wbrs_stuff_ip)
-            wbrs_stuff_rulehits = wbrs_stuff_rulehits.uniq
-          end
+        if was_split == false
+          final_uris << uri
+        end
 
-          entry.wbrs_score = wbrs_stuff["wbrs"]["score"]
-          wbrs_stuff_rulehits.each do |rule_hit|
-            new_rule_hit = DisputeRuleHit.new
-            new_rule_hit.dispute_entry_id = entry.id
-            new_rule_hit.name = rule_hit.strip
-            new_rule_hit.rule_type = "WBRS"
-            entry.dispute_rule_hits << new_rule_hit
-          end
+        final_result = final_result.uniq
 
-          if is_ip_address === true
-            sbrs_stuff = Sbrs::ManualSbrs.get_sbrs_data({:ip => entry.uri})
-            entry.sbrs_score = sbrs_stuff["sbrs"]["score"]
-            sbrs_stuff_rules = Sbrs::GetSbrs.get_sbrs_rules_for_ip(entry.uri)
-
-            sbrs_stuff_rules.each do |rule_hit|
-              new_rule_hit = DisputeRuleHit.new
-              new_rule_hit.dispute_entry_id = entry.id
-              new_rule_hit.name = rule_hit.strip
-              new_rule_hit.rule_type = "SBRS"
-              entry.dispute_rule_hits << new_rule_hit
-            end
-
-          end
-
+        if final_result.size > 1
+          final_uris += final_result
         end
 
       end
 
-      entries
+      final_uris = final_uris.flatten
+
+      result_set = []
+
+      final_uris.each do |uri|
+        args = {}
+        args['uri'] = uri
+        args['scope'] = research_params['scope']
+        search_results = process_research_for_uri(args)
+        result_set += search_results
+      end
+
+      result_set = result_set.flatten
+
+      result_set
     else
       []
     end
