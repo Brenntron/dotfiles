@@ -225,6 +225,7 @@ module API
             post 'categorize_urls_history' do
               std_api_v2 do
                 begin
+
                   url = Complaint.parse_url(permitted_params['url'])
 
                   prefix_history = []
@@ -237,7 +238,9 @@ module API
                       prefix_history = Wbrs::HistoryRecord.where({:prefix_id => prefix_id}).sort_by {|history| DateTime.parse(history.time)}.reverse
                     end
                   end
-
+                  if prefix_history.empty?
+                    raise "The URL you provided does not have available data."
+                  end
                   render prefix_history.to_json
                 rescue
                   raise 'The URL you provided does not have available data.'
