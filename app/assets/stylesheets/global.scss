@@ -2070,6 +2070,10 @@ a.static-nav-item {
   min-width: 450px;
 }
 
+#filter-dropdown li a {
+  height: 35px;
+}
+
 .nav-tool-content-wrapper .form-control {
   background-color: $medium-neutral-color;
   border-radius: 2px;
@@ -3119,7 +3123,7 @@ fieldset.top-content {
   border-color: rgba(136, 183, 213, 0);
   border-right-color: #fff;
   border-width: 10px;
-  margin-top: -32px;
+  margin-top: -24px;
   margin-right: -1px;
   float: right;
 }
