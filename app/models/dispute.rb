@@ -7,11 +7,11 @@ class Dispute < ApplicationRecord
   belongs_to :user, :optional => true
   belongs_to :related_dispute, class_name: 'Dispute', foreign_key: :related_id, required: false
 
-  has_many :relating_disputes, class_name: 'Dispute', foreign_key: :related_id
-  has_many :dispute_comments
-  has_many :dispute_emails
-  has_many :dispute_entries, dependent: :destroy
-  has_many :dispute_peeks, -> { order("dispute_peeks.updated_at desc") }
+  has_many :relating_disputes, class_name: 'Dispute', foreign_key: :related_id, dependent: :nullify
+  has_many :dispute_comments, dependent: :destroy
+  has_many :dispute_emails, dependent: :destroy
+  has_many :dispute_entries, dependent: :restrict_with_exception
+  has_many :dispute_peeks, -> { order("dispute_peeks.updated_at desc") }, dependent: :destroy
   has_many :recent_dispute_views, class_name: 'User', through: :dispute_peeks, source: :user
 
   delegate :cvs_username, to: :user, allow_nil: true
@@ -71,6 +71,8 @@ class Dispute < ApplicationRecord
   scope :my_team, ->(user) { where(user_id: user.my_team) }
   scope :sbrs_disputes, -> { where(submission_type: ['e', 'ew'])}
   scope :wbrs_disputes, -> { where(submission_type: ['w', 'ew'])}
+
+  validates_with DisputeValidator
 
   def self.create_action(bugzilla_rest_session, ips_urls, assignee, priority, ticket_type, status=NEW, categories = nil)
     user = User.where(cvs_username: assignee).first
@@ -173,8 +175,8 @@ class Dispute < ApplicationRecord
       "%dd %dh" % [dd, hh]
     elsif hh > 0
       "%dh %dm" % [hh, mm]
-    else
-      "%dm %ds" % [mm, ss]
+    elsif hh == 0
+      "<1 hr"
     end
   end
 
@@ -201,7 +203,7 @@ class Dispute < ApplicationRecord
   end
 
   def each_duplicate(&block)
-    if related_dispute && Dispute::DUPLICATE == self.resolution
+    if related_dispute
       #block.call(related_dispute)
       related_dispute.relating_disputes.where(resolution: Dispute::DUPLICATE).where.not(id: self.id).each(&block)
     else
@@ -266,6 +268,9 @@ class Dispute < ApplicationRecord
     possibles = Dispute.includes(:dispute_entries).where(:customer_id => dispute.customer_id).select {|dispute| dispute.status != RESOLVED || dispute.status != DUPLICATE}
     candidates = []
 
+    all_resolved = true
+
+    # If all possible Disputes are Resolved or Duplicate, do not register as a duplicate
     possibles.each do |poss|
 
       ips = poss.dispute_entries.select{ |entry| entry.entry_type == "IP"}.pluck(:ip_address).sort
@@ -276,16 +281,27 @@ class Dispute < ApplicationRecord
       end
     end
 
-    if candidates.present?
+    if candidates.find{ |candidate| candidate.status != RESOLVED }
+      all_resolved = false
+    end
+
+    if candidates.any?
       best_candidate = candidates.sort_by {|candidate| candidate.id}.first
       response[:authority] = best_candidate
       response[:is_dupe] = true
+      response[:all_resolved] = all_resolved
     else
       response[:is_dupe] = false
     end
 
     response
 
+  end
+
+  def self.manage_all_resolved_duplicate_dispute(dispute, authority_dispute)
+    dispute.related_id = authority_dispute.id
+    dispute.related_at = Time.now
+    dispute.save!
   end
 
   def self.manage_duplicate_dispute(dispute, authority_dispute, new_entries_ips, new_entries_urls, source_key)
@@ -310,7 +326,7 @@ class Dispute < ApplicationRecord
       new_dispute_entry.dispute_id = dispute.id
       new_dispute_entry.ip_address = ip
       new_dispute_entry.entry_type = "IP"
-      new_dispute_entry.status = DisputeEntry::RESOLVED
+      new_dispute_entry.status = DisputeEntry::STATUS_RESOLVED
       new_dispute_entry.resolution = DisputeEntry::STATUS_RESOLVED_DUPLICATE
       new_dispute_entry.case_closed_at = resolved_at
       new_dispute_entry.case_resolved_at = resolved_at
@@ -326,14 +342,14 @@ class Dispute < ApplicationRecord
       new_dispute_entry.dispute_id = dispute.id
       new_dispute_entry.uri = url
       new_dispute_entry.entry_type = "URI/DOMAIN"
-      new_dispute_entry.status = DisputeEntry::RESOLVED
+      new_dispute_entry.status = DisputeEntry::STATUS_RESOLVED
       new_dispute_entry.resolution = DisputeEntry::STATUS_RESOLVED_DUPLICATE
       new_dispute_entry.case_closed_at = resolved_at
       new_dispute_entry.case_resolved_at = resolved_at
       new_dispute_entry.save
     end
 
-    conn = ::Bridge::DisputeCreatedEvent.new(addressee: "talos-intelligence", source_authority: "talos-intelligence", source_key: source_key)
+    conn = ::Bridge::DisputeCreatedEvent.new(addressee: "talos-intelligence", source_authority: "talos-intelligence", source_key: source_key, ac_id: dispute.id)
     conn.post(return_payload, "")
 
   end
@@ -356,7 +372,7 @@ class Dispute < ApplicationRecord
     is_resolved = true
 
     self.dispute_entries.each do |entry|
-      if entry.status != DisputeEntry::RESOLVED
+      if entry.status != DisputeEntry::STATUS_RESOLVED
         is_resolved = false
         break
       end
@@ -474,9 +490,11 @@ class Dispute < ApplicationRecord
 
         response = is_possible_customer_duplicate?(new_dispute, new_entries_ips, new_entries_urls)
 
-        if response[:is_dupe] == true
+        if response[:is_dupe] == true && response[:all_resolved] == false
           manage_duplicate_dispute(new_dispute, response[:authority], new_entries_ips, new_entries_urls, message_payload["source_key"] )
           return
+        elsif response[:is_dupe] == true && response[:all_resolved] == true
+          manage_all_resolved_duplicate_dispute(new_dispute, response[:authority])
         end
 
         #IPS and URL/DOMAIN entries are almost virtually the same, maybe this is worthy of refactoring into it's own method.
@@ -487,7 +505,7 @@ class Dispute < ApplicationRecord
 
           false_negative_claim = false
 
-          if ["Malicious", "Poor"].include?(entry[:sbrs]["rep_sugg"])
+          if ["Suspicious sites", "High risk","Poor"].include?(entry[:sbrs]["rep_sugg"])
             false_negative_claim = true
           end
 
@@ -569,7 +587,7 @@ class Dispute < ApplicationRecord
 
           false_negative_claim = false
 
-          if ["Malicious", "Poor"].include?(entry["rep_sugg"])
+          if ["Suspicious sites", "High risk","Poor"].include?(entry["rep_sugg"])
             false_negative_claim = true
           end
 
@@ -646,7 +664,7 @@ class Dispute < ApplicationRecord
 
         case_email = DisputeEmail.generate_case_email_address(new_dispute.id)
         logger.debug("Sending reply to bridge")
-        conn = ::Bridge::DisputeCreatedEvent.new(addressee: "talos-intelligence", source_authority: "talos-intelligence", source_key: message_payload["source_key"])
+        conn = ::Bridge::DisputeCreatedEvent.new(addressee: "talos-intelligence", source_authority: "talos-intelligence", source_key: message_payload["source_key"], ac_id: new_dispute.id)
         conn.post(return_payload, case_email)
 
       end
@@ -679,7 +697,7 @@ class Dispute < ApplicationRecord
       begin
         auto_resolve_verdict = blacklist.first
         if auto_resolve_verdict.malicious?
-          auto_resolve_verdict.publish_to_rep_api
+          auto_resolve_verdict.publish_to_rep_api(dispute_id: blacklist.last.dispute_id)
 
           dispute_entry = blacklist.last
 
@@ -947,7 +965,7 @@ class Dispute < ApplicationRecord
       when 'team_disputes'
         where(user_id: user.my_team)
       when 'unassigned'
-        where(status: [STATUS_NEW, STATUS_REOPENED])
+        where(status: [STATUS_NEW, STATUS_REOPENED], user_id: User.where(display_name: 'Vrt Incoming').first.id)
       when 'open'
         where(status: [STATUS_NEW, STATUS_REOPENED, STATUS_CUSTOMER_PENDING, STATUS_CUSTOMER_UPDATE, STATUS_ON_HOLD, STATUS_RESEARCHING, STATUS_ESCALATED, STATUS_ASSIGNED])
       when 'open_email'
@@ -1009,6 +1027,11 @@ class Dispute < ApplicationRecord
         dispute.status_comment = comment
       end
 
+      unless [STATUS_NEW, STATUS_ASSIGNED].include?(dispute.status)
+        dispute.user_id = current_user.id unless dispute.is_assigned?
+      end
+
+      dispute.save!
       dispute.dispute_entries.each do |entry|
         if resolution.present? && entry.status != Dispute::STATUS_RESOLVED
           entry.resolution = resolution
@@ -1020,7 +1043,6 @@ class Dispute < ApplicationRecord
         entry.save
       end
 
-      dispute.save
       if comment.present?
         DisputeComment.create(:user_id => current_user.id, :comment => comment, :dispute_id => dispute.id)
       end
@@ -1098,6 +1120,7 @@ class Dispute < ApplicationRecord
       dispute_packet[:submitter_name] = dispute.customer_name
       dispute_packet[:submitter_email] = dispute.customer_email
       dispute_packet[:dispute_domain] = dispute.org_domain
+      dispute_packet[:updated_at] = dispute.updated_at.strftime("%F %T")
       unless dispute.dispute_entries.empty?
         unless dispute.dispute_entries.first[:hostname].nil?
           dispute_packet[:dispute_domain] = dispute.dispute_entries.first[:hostname]
@@ -1180,69 +1203,48 @@ class Dispute < ApplicationRecord
     end
   end
 
-  def take_ticket(user:)
-    raise 'This ticket is already assigned.' unless self.user_id.nil? || User.vrtincoming&.id == self.user_id
+  # Assigns a user to given disputes
+  # @param [User|Integer] user the user to assign this dispute to
+  # @param [Array<Integer>|Integer] dispute_ids the disputes to assign
+  # @return [Array<Dispute>] the disputes updated
+  def self.assign(user, dispute_ids)
+    user_id = user.kind_of?(User) ? user.id : user
+    accepted_at = Time.now
 
-    # Atomic update statement to handle possible race condition.
-    Dispute.where(id: self.id,
-                  user_id: self.user_id).update_all(user_id: user.id)
+    disputes_ary = []
+    Dispute.transaction do
+      disputes = Dispute.where(id: dispute_ids, status: [Dispute::STATUS_NEW, Dispute::STATUS_REOPENED])
+      disputes_ary = disputes.all.to_a
+      disputes.update_all(user_id: user_id, status: Dispute::STATUS_ASSIGNED, case_accepted_at: accepted_at)
 
-    dispute = Dispute.find(self.id)
-
-    if dispute.status == Dispute::STATUS_NEW || dispute.status == Dispute::STATUS_REOPENED
-      accepted_at = Time.now
-      dispute.update(status: Dispute::STATUS_ASSIGNED, case_accepted_at: accepted_at)
-
-      dispute.dispute_entries.each do |entry|
-        if entry.status == DisputeEntry::NEW || entry.status == DisputeEntry::STATUS_REOPENED
-          entry.update(status: DisputeEntry::ASSIGNED, case_accepted_at: accepted_at)
-        end
+      entries = DisputeEntry.where(dispute: disputes_ary, status: [DisputeEntry::NEW, DisputeEntry::STATUS_REOPENED])
+      entries_ary = entries.all.to_a
+      if entries_ary.any?
+        entries.update_all(status: DisputeEntry::ASSIGNED, case_accepted_at: accepted_at)
+        Bridge::DisputeEntryUpdateStatusEvent.new.post_entries(entries_ary)
       end
-
-      message = Bridge::DisputeEntryUpdateStatusEvent.new
-      message.post_entries(dispute.dispute_entries)
     end
-    raise 'This record changed while you were editing.' unless dispute.user_id == user.id
+
+    disputes_ary
   end
 
   def self.take_tickets(dispute_ids, user:)
     Dispute.transaction do
-      unless Dispute.where(id: dispute_ids, user_id: User.vrtincoming.id)
+      unless 0 == Dispute.where(id: dispute_ids).where.not(user_id: User.vrtincoming.id).count
         raise 'Some of these ticket are already assigned.'
       end
-      Dispute.where(id: dispute_ids,
-                    user_id:  User.vrtincoming.id).update_all(user_id: user.id)
-
-      queries = Dispute.where(id: dispute_ids, user_id: user.id)
-      queries.each do |query|
-        if query.status == Dispute::STATUS_NEW || query.status == Dispute::STATUS_REOPENED
-          accepted_at = Time.now
-          query.update(status: Dispute::STATUS_ASSIGNED, case_accepted_at: accepted_at)
-          query.dispute_entries.each do |entry|
-            if entry.status == DisputeEntry::NEW || entry.status == DisputeEntry::STATUS_REOPENED
-              entry.update(status: DisputeEntry::ASSIGNED, case_accepted_at: accepted_at)
-            end
-          end
-
-          message = Bridge::DisputeEntryUpdateStatusEvent.new
-          message.post_entries(query.dispute_entries)
-        end
-      end
-
-      unless dispute_ids.count == Dispute.where(id: dispute_ids, user_id: user.id).count
-        raise 'This record changed while you were editing and may be already assigned'
-      end
+      Dispute.assign(user, dispute_ids)
     end
   end
 
   def return_dispute
     update(user_id: User.vrtincoming.id)
 
-    if status == 'ASSIGNED'
+    if status == STATUS_ASSIGNED
       update(status: 'NEW', case_accepted_at: nil)
 
       dispute_entries.each do |dispute_entry|
-        if dispute_entry.status == 'ASSIGNED'
+        if dispute_entry.status == DisputeEntry::ASSIGNED
           dispute_entry.update(status: 'NEW', case_accepted_at: nil)
         end
       end
@@ -1297,6 +1299,11 @@ class Dispute < ApplicationRecord
       end
 
       ticket_user = result.user.cvs_username
+      if !result.dispute_emails.present?
+        dispute_emails_count = 0
+      else
+        dispute_emails_count = result.dispute_emails&.count
+      end
       report_data[:table_data] << {:case_number => result.id,
                       :case_link => "<a href='/escalations/webrep/disputes/#{result.id}'>#{result.case_id_str}</a>",
                       :status => result.status,
@@ -1306,7 +1313,9 @@ class Dispute < ApplicationRecord
                       :submission_type => result.submission_type.upcase,
                       :last_comment => last_comment_preview,
                       :owner => ticket_user,
-                      :priority => result.priority
+                      :priority => result.priority,
+                      :last_email_date => result.dispute_emails&.last&.updated_at&.strftime("%FT%T"),
+                      :total_email_count => dispute_emails_count
       }
     end
 
@@ -1355,6 +1364,12 @@ class Dispute < ApplicationRecord
       entry_preview.to_s.inspect
       ticket_user = result.user.cvs_username
 
+      if !result.dispute_emails.present?
+        dispute_emails_count = 0
+      else
+        dispute_emails_count = result.dispute_emails&.count
+      end
+
       report_data[:table_data] << {:case_number => result.id,
                       :case_link => "<a href='/escalations/webrep/disputes/#{result.id}'>#{result.case_id_str}</a>",
                       # :dispute => result.dispute_entries.first.hostlookup,
@@ -1365,7 +1380,9 @@ class Dispute < ApplicationRecord
                       :submitter_type => result.submitter_type.downcase,
                       :submission_type => result.submission_type.upcase,
                       :priority => result.priority,
-                      :owner => ticket_user
+                      :owner => ticket_user,
+                      :last_email_date => result.dispute_emails&.last&.updated_at&.strftime("%FT%T"),
+                      :total_email_count => dispute_emails_count
       }
     end
 
@@ -1796,6 +1813,15 @@ class Dispute < ApplicationRecord
 
     results
 
+  end
+
+  def self.sync_all
+    AdminTask.execute_task(:sync_disputes_with_ti, {})
+  end
+
+  def manual_sync
+    message = Bridge::DisputeEntryUpdateStatusEvent.new
+    message.post_entries(self.dispute_entries)
   end
 
 end

@@ -7,6 +7,18 @@ module ApplicationHelper
     current_user&.bugzilla_api_key
   end
 
+  def bugzilla_rest_logged_in?(session)
+    session.logged_in?
+  end
+
+  def bugzilla_rest_login_icon(session)
+    if bugzilla_rest_logged_in?(session)
+      content_tag(:span, '', class: ['bugzilla-status', 'bugzilla-logged-in', 'esc-tooltipped'], title: 'Logged into Bugzilla')
+    else
+      content_tag(:span, '', class: ['bugzilla-status', 'bugzilla-logged-out', 'esc-tooltipped'], title: 'Not logged into Bugzilla')
+    end
+  end
+
   def bootstrap_class_for(flash_type)
     case flash_type
       when "success"
@@ -55,9 +67,9 @@ module ApplicationHelper
     end
   end
 
-  def link_for_manager(session_user, viewed_user)
+  def link_for_manager(session_user, viewed_user, display_name:)
     if session_user.has_role?('admin')
-      link_to viewed_user.parent.cvs_username, escalations_user_path(viewed_user.parent)
+      link_to display_name, escalations_user_path(viewed_user.parent), class: 'related-username'
     else
       viewed_user.parent.cvs_username
     end

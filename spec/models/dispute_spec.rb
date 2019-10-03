@@ -89,14 +89,14 @@ describe Dispute do
                             'WBRS_SCORE' => '1.58',
                             'WBRS_Rule_Hits' => "alx_cln, vsvd",
                             'Hostname_ips' => '',
-                            'rep_sugg' => "Malicious",
+                            'rep_sugg' => "High risk",
                             'category' => "Shopping"
                         },
                         "sbrs" => {
                             "SBRS_SCORE"=>"No score",
                             "SBRS_Rule_Hits"=>"",
                             "Hostname"=>"www.pretenders.com",
-                            'rep_sugg' => "Malicious",
+                            'rep_sugg' => "High risk",
                             "category"=>"Search Engines and Portals"
                         },
                     }
@@ -159,7 +159,7 @@ describe Dispute do
                         'WBRS_SCORE' => '1.58',
                         'WBRS_Rule_Hits' => "alx_cln, vsvd",
                         'Hostname_ips' => '',
-                        'rep_sugg' => "Malicious",
+                        'rep_sugg' => "High risk",
                         'category' => "Shopping"
 
                     }
@@ -511,57 +511,8 @@ describe Dispute do
     expect(dispute).to_not be_nil
     expect(dispute.dispute_entries.count).to eq(1)
     dispute_entry = dispute.dispute_entries.first
-    expect(dispute_entry.status).to eql(DisputeEntry::RESOLVED)
+    expect(dispute_entry.status).to eql(DisputeEntry::STATUS_RESOLVED)
     expect(dispute_entry.resolution).to eql(DisputeEntry::STATUS_RESOLVED_FIXED_FN)
-  end
-
-  it 'processes fp ip auto-acquit bridge payload' do
-    allow(RepApi::Base)
-        .to receive(:call_json_request)
-                .with(:post, '/blacklist/get', body: anything)
-                .and_return(blacklist_response)
-    # TODO remove redundant API call
-    allow(Wbrs::Base)
-        .to receive(:call_json_request)
-                .with(:post, '/v1/cat/urls/top', body: anything)
-                .and_return(top_url_response_response)
-    # TODO remove redundant API call
-    allow(Virustotal::Base)
-        .to receive(:call_request)
-                .with(:get, anything) # TODO .with(:get, "/vtapi/v2/url/report?resource=#{target_ip_address}")
-                .and_return(virustotal_response)
-    # TODO remove redundant API call
-    allow(Umbrella::Scan)
-        .to receive(:scan_result)
-                .with(address: target_ip_address)
-                .and_return(umbrella_clear_response)
-    allow(AutoResolve)
-        .to receive(:create_from_payload)
-                .with('IP', target_ip_address, anything, anything)
-                .and_return(auto_acquit)
-    allow(Wbrs::Base)
-        .to receive(:post_request)
-                .with(path: '/v1/rep/wlbl/get', body: anything)
-                .and_return(manual_wlbl_response)
-    allow(Xbrs::Base)
-        .to receive(:call_request)
-                .with(:get, anything)
-                .and_return(xbrs_domain_response)
-    allow(Bridge::DisputeCreatedEvent).to receive(:new).and_return(double('Bridge::DisputeCreatedEvent', post: nil))
-    bugzilla_rest_session = BugzillaRest::Session.default_session
-    expect(bugzilla_rest_session).to receive(:create_bug).and_return(bugzilla_rest_session.build_bug(id: 1001))
-    fp_ip_dispute_message_payload[:bugzilla_rest_session] = bugzilla_rest_session
-
-    dispute = nil
-    expect do
-      dispute = Dispute.process_bridge_payload(fp_ip_dispute_message_payload)
-    end.to change { Dispute.count }.from(0).to(1)
-
-    expect(dispute).to_not be_nil
-    expect(dispute.dispute_entries.count).to eq(1)
-    dispute_entry = dispute.dispute_entries.first
-    expect(dispute_entry.status).to eql(DisputeEntry::RESOLVED)
-    expect(dispute_entry.resolution).to eql(DisputeEntry::STATUS_RESOLVED_UNCHANGED)
   end
 
   it 'processes fn url bridge payload' do
@@ -701,9 +652,10 @@ describe Dispute do
     expect(dispute).to_not be_nil
     expect(dispute.dispute_entries.count).to eq(1)
     dispute_entry = dispute.dispute_entries.first
-    expect(dispute_entry.status).to eql(DisputeEntry::RESOLVED)
+    expect(dispute_entry.status).to eql(DisputeEntry::STATUS_RESOLVED)
     expect(dispute_entry.resolution).to eql(DisputeEntry::STATUS_RESOLVED_FIXED_FN)
   end
+
 
   it 'processes fp url auto-acquit bridge payload' do
     allow(RepApi::Base)
@@ -763,4 +715,5 @@ describe Dispute do
     expect(result.size).to eql(14)
 
   end
+
 end

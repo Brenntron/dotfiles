@@ -50,6 +50,7 @@ module API
             desc "create a dispute email"
             params do
               requires :dispute_id, type: Integer, desc: "The id of the dispute the email should be linked to"
+              optional :dispute_type, type: String, desc: "Class for id, Dispute or FileReputationDispute"
               requires :to, type: String, desc: "The email address the email is send to"
               requires :body, type: String, desc: "The body of the email"
               requires :subject, type: String, desc: "The subject of the email"
@@ -59,13 +60,13 @@ module API
               optional :cc, type: String, desc: "string of emails for CC"
             end
 
-            post "", root: "dispute_email" do
+            post "", root: "dispute_emails" do
               std_api_v2 do
                 authorize!(:create, DisputeEmail)
                 begin
                   ActiveRecord::Base.transaction do
                     #temporary, for development, don't wanna be sending these to actual customers
-                    if Rails.env == "development"
+                    if Rails.env.development? || Rails.env.test?
                       params[:to] = current_user.email
                     end
 
@@ -83,7 +84,12 @@ module API
                     # end
 
                     if params[:dispute_id].present?
-                      dispute = Dispute.find(params[:dispute_id])
+                          case params[:dispute_type]
+                          when 'FileReputationDispute'
+                            dispute = FileReputationDispute.find(params[:dispute_id])
+                          else #'Dispute'
+                            dispute = Dispute.find(params[:dispute_id])
+                          end
                       unless dispute.case_responded_at
                         dispute.update!(case_responded_at: Time.now)
                       end

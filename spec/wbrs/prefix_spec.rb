@@ -198,7 +198,7 @@ describe 'A prefix' do
     {
         "data": [
             {
-                "category": 5,
+                "category_id": 5,
                 "desc_long": "Education-related sites and web pages such as schools, colleges, universities, teaching materials, teachers resources; technical and vocational training; online training; education issues and policies;  financial aid; school funding; standards and testing.",
                 "descr": "Education",
                 "mnem": "edu",
@@ -214,7 +214,7 @@ describe 'A prefix' do
                 "truncated": false
             },
             {
-                "category": 6,
+                "category_id": 6,
                 "desc_long": "Galleries and exhibitions; artists and art; photography; literature and books; performing arts and theater; musicals; ballet; museums; design; architecture.  Cinema and television are classified as Entertainment.",
                 "descr": "Arts",
                 "mnem": "art",
@@ -308,10 +308,10 @@ describe 'A prefix' do
     expect(categories).to be_a_kind_of(Array)
     expect(categories.count).to eql(2)
     categories = categories.sort_by{ |cat| cat.id }
-    expect(categories[0]).to be_a_kind_of(Wbrs::Category)
-    expect(categories[0].id).to eql(5)
-    expect(categories[1]).to be_a_kind_of(Wbrs::Category)
-    expect(categories[1].id).to eql(6)
+    expect(categories[0]).to be_a_kind_of(Wbrs::AssociatedCategory)
+    expect(categories[0].category_id).to eql(5)
+    expect(categories[1]).to be_a_kind_of(Wbrs::AssociatedCategory)
+    expect(categories[1].category_id).to eql(6)
   end
 
   it 'should handle errors listing its categories' do

@@ -4,13 +4,15 @@ class DisputeEntry < ApplicationRecord
   attr_writer :wbrs_xlist
 
   has_paper_trail on: [:update], ignore: [:updated_at, :entry_type]
-  belongs_to :dispute
+  belongs_to :dispute, touch: true
   belongs_to :user, optional: true
   has_many :dispute_rule_hits
   has_one  :dispute_entry_preload
 
   RESOLVED = "RESOLVED"
   NEW = "NEW"
+  ASSIGNED = "ASSIGNED"
+  CLOSED = "CLOSED"
 
   STATUS_RESEARCHING = "RESEARCHING"
   STATUS_ESCALATED = "ESCALATED"
@@ -31,8 +33,6 @@ class DisputeEntry < ApplicationRecord
 
   delegate :cvs_username, to: :dispute, allow_nil: true
 
-  ASSIGNED = "ASSIGNED"
-  CLOSED = "CLOSED"
 
   scope :open_entries, -> { where(status: NEW) }
   scope :assigned_entries, -> { where(status: ASSIGNED) }
@@ -203,7 +203,7 @@ class DisputeEntry < ApplicationRecord
 
   def parse_url(url = self.hostlookup)
     uri = URI.parse(URI.parse(url).scheme.nil? ? "http://#{url}" : url)
-    domain = PublicSuffix.parse(uri.host)
+    domain = PublicSuffix.parse(uri.host, :ignore_private => true)
     subdomain = uri.host.gsub(Regexp.new("\\.?#{domain.domain}$"), '')
 
     {
@@ -223,9 +223,45 @@ class DisputeEntry < ApplicationRecord
     clean_host.sub(/^www\./, '')
   end
 
+  def self.domain_of_with_path(urls)
+    if urls.kind_of?(String)
+      if !urls.start_with?( 'http', 'https')
+        urls = "http://" + urls
+      end
+
+      clean_url = Addressable::URI.parse(urls.strip)
+      clean_host = clean_url.host.sub(/^www\./, '')
+      clean_host = clean_host + clean_url.path
+
+      response = clean_host
+    elsif urls.kind_of?(Array)
+      response = []
+      urls.each do |url|
+        if url.strip != ''
+          if !url.start_with?( 'http', 'https')
+            url = "http://" + url
+          end
+
+          clean_url = Addressable::URI.parse(url.strip)
+          clean_host = clean_url.host.sub(/^www\./, '')
+          clean_host = clean_host + clean_url.path
+
+          response << clean_host
+        end
+      end
+    end
+
+    response
+  end
+
   def assign_url_parts(url = self.hostlookup)
+
+    if !url.starts_with?("http")
+      url = "http://" + url
+    end  
+    
     uri = URI.parse(URI.parse(url).scheme.nil? ? "http://#{url}" : url)
-    domain = PublicSuffix.parse(uri.host)
+    domain = PublicSuffix.parse(uri.host, :ignore_private => true)
 
     self.subdomain                      = uri.host.gsub(Regexp.new("\\.?#{domain.domain}$"), '')
     self.domain                         = domain.domain
@@ -253,11 +289,14 @@ class DisputeEntry < ApplicationRecord
         begin
           self.uri.blank? ? xbrs = Xbrs::GetXbrs.by_ip4(self.ip_address) : xbrs = Xbrs::GetXbrs.by_domain(self.uri.gsub(/\r\n?/, "\n").strip)
         rescue
-          xbrs = [{}, {'data' => []}]
+          xbrs = [{}, {'data' => [], 'legend' => []}]
         end
       end
     end
-    
+    if xbrs[1].blank?
+      xbrs = [{}, {'data' => [], 'legend' => []}]
+    end
+
     # Starting here, we are cleaning up this data to remove columns that are completely empty.
     datacounter = 0
     @columns_to_remove = []
@@ -289,6 +328,41 @@ class DisputeEntry < ApplicationRecord
   def find_xbrs(reload: false)
     @xbrs = nil if reload
     @xbrs ||= get_xbrs_value
+
+    formatted_data = []
+    formatted_data << {}
+    formatted_data << {}
+    formatted_data.last['data'] = []
+    formatted_data.last['legend'] = @xbrs.last['legend']
+    data = @xbrs.last['data']
+    columns = @xbrs.last['legend']
+
+    mtime_column_index = nil
+    ctime_column_index = nil
+
+    columns.each_with_index do |col, index|
+      if col == 'ctime'
+        ctime_column_index = index
+      end
+      if col == 'mtime'
+        mtime_column_index = index
+      end  
+    end 
+
+
+    data.each do |datum|
+      if ctime_column_index
+        datum[ctime_column_index] = Time.at(datum[ctime_column_index])
+      end
+      if mtime_column_index
+        datum[mtime_column_index] = Time.at(datum[mtime_column_index])
+      end 
+
+      formatted_data.last['data'] << datum 
+    end  
+
+    formatted_data 
+
   end
 
   def blacklist(reload: false)
@@ -318,18 +392,19 @@ class DisputeEntry < ApplicationRecord
   end
 
   def wbrs_xlist
-    if dispute_entry_preload.present? && dispute_entry_preload.crosslisted_urls.present?
-      @wbrs_xlist = Wbrs::ManualWlbl.load_from_prefetch(dispute_entry_preload.crosslisted_urls)
-      return @wbrs_xlist
-    end
-    @wbrs_xlist ||= Wbrs::ManualWlbl.where({:url => hostlookup})
+    @wbrs_xlist ||=
+        if dispute_entry_preload.present? && dispute_entry_preload.crosslisted_urls.present?
+          Wbrs::ManualWlbl.load_from_prefetch(dispute_entry_preload.crosslisted_urls)
+        else
+          Wbrs::ManualWlbl.where({:url => DisputeEntry.domain_of(hostlookup)})
+        end
   rescue => except
-
     Rails.logger.warn "Populating xlist from Wbrs failed."
+    Rails.logger.warn "Hostlookup:" + hostlookup
     Rails.logger.warn except
     Rails.logger.warn except.backtrace.join("\n")
 
-    []
+    return []
   end
 
   def virustotals
@@ -403,6 +478,31 @@ class DisputeEntry < ApplicationRecord
     end
 
     pretty_umbrella_status
+  rescue => except
+    Rails.logger.warn "Populating umbrella failed"
+    Rails.logger.warn "Hostlookup:" + hostlookup
+    Rails.logger.warn except
+    Rails.logger.warn except.backtrace.join("\n")
+
+    return 'Unable to resolve'
+  end
+
+  def latest_comment_date
+    comment = self.dispute.dispute_comments.last
+    if comment.present?
+      return comment.updated_at.strftime("%FT%T")
+    else
+      "None"
+    end
+  end
+
+  def latest_email_date
+    comment = self.dispute.dispute_emails.last
+    if comment.present?
+      return comment.updated_at.strftime("%FT%T")
+    else
+      "None"
+    end
   end
 
   def assign_from_auto_resolve(address:, total_hits:, resolved_at:, dispute_entry:)
@@ -473,7 +573,7 @@ class DisputeEntry < ApplicationRecord
   def last_submitted
     if self.referenced_tickets.count > 0
 
-      last_submitted = referenced_tickets.last.created_at
+      last_submitted = referenced_tickets.order(:created_at).last.created_at
     else
       last_submitted = "N/A"
     end
@@ -656,6 +756,7 @@ class DisputeEntry < ApplicationRecord
       end
     end
 
+
     if research_params['scope'] == "broad" || entries.find{|entry| url == entry.uri}
       entries.each do |entry|
         is_ip_address = !!(entry.uri  =~ Resolv::IPv4::Regex)
@@ -682,6 +783,7 @@ class DisputeEntry < ApplicationRecord
           sbrs_stuff = Sbrs::ManualSbrs.get_sbrs_data({:ip => entry.uri})
           entry.sbrs_score = sbrs_stuff["sbrs"]["score"]
           sbrs_stuff_rules = Sbrs::GetSbrs.get_sbrs_rules_for_ip(entry.uri)
+
 
           sbrs_stuff_rules.each do |rule_hit|
             new_rule_hit = DisputeRuleHit.new

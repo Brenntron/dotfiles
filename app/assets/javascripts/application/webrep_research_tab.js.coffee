@@ -1,24 +1,35 @@
 $ ->
   # go back to the last tab after reload
-
   $('a[data-toggle="tab"]').on 'shown.bs.tab', (e) ->
     localStorage.setItem 'lastTab', $(this).attr('id')
     return
 
+  $('.reputation-research-search-wrapper a').on 'click', () ->
+    hide_toolbar()
+
+  hide_toolbar = () ->
+  # hides toolbar depending on which tab in bulk research panel is open
+    tab = window.location.href
+    if tab.includes('quick')
+      $('#research-page-toolbar').hide()
+    else
+      $('#research-page-toolbar').show()
+
   $(document).on 'ready page:load', (e) ->
+    hide_toolbar()
     lastTab = localStorage.getItem('lastTab')
     if lastTab
-      $('#' + lastTab).tab('show');
+      $('#' + lastTab).tab('show')
     else
       $('#communication-tab-link').tab('show')
     return
 
-
+$ ->
   $('#edit-dispute-entry-button').click ->
-
     if ($('.dispute_check_box:checked').length > 0)
       $('.edit-entries-buttons').removeClass('hidden')
       $('.dispute_check_box').each ->
+
         if $(this).prop('checked')
           entry_row = $(this).parents('.research-table-row')[0]
           $(entry_row).addClass('editing-row')
@@ -39,8 +50,6 @@ $ ->
         $('.cancel-changes').click()
       else
         e.preventDefault()
-
-
 
   $('.cancel-changes').click ->
     $('.editing-row').each ->
@@ -69,14 +78,14 @@ $ ->
       $(this).removeClass('editing-row')
       $('.edit-entries-buttons').addClass('hidden')
 
-#   Need to add save function after editing.
-#        When they hit save it should send the update to the ticket,
+  #   Need to add save function after editing.
+  #        When they hit save it should send the update to the ticket,
   #      populate everywhere / reload the page,
-#        and set the entry span to match the content of the input
-#
+  #        and set the entry span to match the content of the input
+  #
 
 
-# Inline Edit Button
+  # Inline Edit Button
   $('.inline-edit-entry-button').click ->
     edit_button = $(this)
     entry_row = $(this).parents('.research-table-row')[0]
@@ -92,7 +101,7 @@ $ ->
     if $('.edit-entries-buttons').hasClass('hidden')
       $('.edit-entries-buttons').removeClass('hidden')
 
-# Inline Edit Status
+  # Inline Edit Status
   $('.radio-label').click ->
     radio_button = $(this).prev('input[type="radio"]')
     $(radio_button[0]).trigger('click')
@@ -116,8 +125,7 @@ $ ->
     else
       $('.ticket-resolution-submenu').hide()
 
-
-# Expand All Rows
+  # Expand All Rows
   $('#expand-all-rows').click ->
     $('.research-table-row-wrapper').each ->
       expand_inline_toggle = $(this).find('.expand-row-button-inline')
@@ -126,7 +134,7 @@ $ ->
       expandable_row = $(this).find('.nested-data-row')[0]
       $(expandable_row).show()
 
-# Collapse All Rows
+  # Collapse All Rows
   $('#collapse-all-rows').click ->
     $('.research-table-row-wrapper').each ->
       expand_inline_toggle = $(this).find('.expand-row-button-inline')
@@ -135,7 +143,7 @@ $ ->
       expandable_row = $(this).find('.nested-data-row')[0]
       $(expandable_row).hide()
 
-#  Expand / Collapse the expandable row (inline button)
+  #  Expand / Collapse the expandable row (inline button)
   $('.expand-row-button-inline').click ->
     expand_button = $(this)
     entry_id = $(this).attr('data-entry-id')
@@ -144,12 +152,10 @@ $ ->
     $(nested_row).toggle()
     $(expand_button).toggleClass('shown')
 
-
-
   ##  Populating the toolbar Adjust RepTool BL dropdown
   window.bulk_get_current_reptool = (page) ->
 
-    # Define the variables based on the page
+# Define the variables based on the page
     if page == "show" || page == "research"
       checkbox = $('.dispute_check_box:checked')
     else if page == "index"
@@ -271,7 +277,7 @@ $ ->
       data = {'entries': []}
       wbrs = ''
       $(entries_checked).each ->
-        # Slightly different structure to get the actual entry content
+# Slightly different structure to get the actual entry content
         if row == '.research-table-row'
           entry_row = $(this).parents('.research-table-row')[0]
           entry_content = $(entry_row).find('.entry-data-content').text()
@@ -384,7 +390,7 @@ $ ->
           $(submit_button).attr("disabled", false)
 
 
-# Show / hide the different research tables in the expanded row
+  # Show / hide the different research tables in the expanded row
   $('.research-row-checkbox').click ->
     entry_id = $(this).val()
     entry_row = $(this).parents('.research-table-row')[0]
@@ -434,7 +440,7 @@ $ ->
 
 
 
-# Scrollable tables in the expanded rows
+  # Scrollable tables in the expanded rows
   $('.table-scrollable').DataTable({
     scrollY: 200,
 #    scrollCollapse: true,
@@ -444,25 +450,8 @@ $ ->
     info: false
   })
 
-  $('.xbrs-short-scrollable').DataTable({
-    scrollX: '90%',
-    paging: false,
-    searching: false,
-    ordering: false,
-    info: false
-  })
 
-  $('.xbrs-long-scrollable').DataTable({
-    scrollY: 200,
-    scrollX: '70%',
-    paging: false,
-    searching: false,
-    ordering: false,
-    info: false
-  })
-
-
-#  Rule escalations email
+  #  Rule escalations email
   $('.wbrs-rule-trigger').click ->
     rule_id = $(this).attr('data-id')
     std_msg_ajax(
@@ -521,12 +510,11 @@ $ ->
     )
     return
 
-
   # Sync / refresh entry data. Initiate modal / animation
   $('#sync-data-button').click ->
-    #    If cannot connect to resync data
-    #    Show error message modal
-    #    Else
+#    If cannot connect to resync data
+#    Show error message modal
+#    Else
     $('#loader-modal').modal({
       backdrop: 'static',
       keyboard: false
@@ -552,15 +540,15 @@ $ ->
         window.location.reload()
     )
 
-#    When data is finish loading
-#    $('#loading-div').hide()
-#    $('#api-msg').show()
-#    $('#loader-modal.hidden).removeClass('hidden')
-#    Display success message in modal
+  #    When data is finish loading
+  #    $('#loading-div').hide()
+  #    $('#api-msg').show()
+  #    $('#loader-modal.hidden).removeClass('hidden')
+  #    Display success message in modal
 
   window.researchfilter = (element) ->
     query = $(element).val();
-#    Rather than doing the javascript .each for this, let's use CSS
+    #    Rather than doing the javascript .each for this, let's use CSS
     $('.entry-data-content:not(:contains(' + query + '))').parents('.research-table-row').hide()
     $('.entry-data-content:contains(' + query + ')').parents('.research-table-row').show()
 
@@ -586,7 +574,7 @@ $(document).ready ->
   $('.esc-tooltipped').tooltipster theme: [
     'tooltipster-borderless'
     'tooltipster-borderless-customized'
-  ]
+    ]
 
   $('.ticket-status-radio').click ->
     all_stat_radios = $('#show-edit-ticket-status-dropdown').find('.status-radio-wrapper')
@@ -605,3 +593,8 @@ $(document).ready ->
       $('.ticket-resolution-radio').prop('checked', false)
       $('#show-ticket-resolution-submenu').hide()
       $(res_comment[0]).val('')
+
+
+  # XBRS history on webrep: fixes to ensure showing the correct table headers, removing conflicting inline styles
+  $('.xbrs-details-table .dataTables_scrollHead').addClass('hidden')
+  $('.xbrs-details-table .dataTables_scrollBody').find('thead tr, th, th div').removeAttr('style')

@@ -29,7 +29,7 @@
                 %span.case-history-preview
                   =email.subject
               %td.alt-col.case-history-datetime{:data => {:db_date => email.created_at}}
-                =email.created_at.strftime("%Y-%d-%m")
+                = format_date(email.created_at)
                 %br
                 =email.created_at.strftime("%H:%M:%S")
           -@dispute.dispute_comments.recent_first.each do |comment|
@@ -38,11 +38,11 @@
                 %span.case-history-icon.note-icon{:data => {:history_kind => "note"}}
               %td
                 %span.case-history-author
-                  =comment.user.cec_username
+                  =comment.user.cvs_username
                 %span.case-history-preview
                   =comment.comment.truncate(75, omission: '...')
               %td.alt-col.case-history-datetime{:data => {:db_date => comment.created_at}}
-                =comment.created_at.strftime("%Y-%d-%m")
+                = format_date(comment.created_at)
                 %br
                 =comment.created_at.strftime("%H:%M:%S")
           -@versioned_items.each do |item|
@@ -60,7 +60,7 @@
                       to
                       %span.emphasize #{changed_to}.
                 %td.alt-col.case-history-datetime{:data => {:db_date => version.created_at}}
-                  =version.created_at.strftime("%Y-%d-%m")
+                  = format_date(version.created_at)
                   %br
                   =version.created_at.strftime("%H:%M:%S")
 
@@ -271,11 +271,11 @@
             .note-info-item.author-notation
               Written by
               %span.author-username
-                =comment.user.cec_username
+                =comment.user.cvs_username
               = distance_of_time_in_words(Time.now, comment.created_at) + " ago."
             %br.hidden-break
             .note-info-item.time-stamp
-              =comment.created_at.strftime("%Y-%d-%m %H:%M:%S")
+              = format_timestamp(comment.created_at)
             .note-info-item.note-tool-buttons
               %button.hidden.note-save-button.update-note{class: "note-save-button#{comment.id}", comment_id: "#{comment.id}"}
               %button.hidden.note-cancel-button{class: "note-cancel-button#{comment.id}", comment_id: "#{comment.id}"}
@@ -284,7 +284,7 @@
 
         .row
           .col-xs-12
-            - if comment.user.cec_username == current_user.cec_username
+            - if comment.user.cvs_username == current_user.cvs_username
               .note-block.content-editable{class: "note-block#{comment.id}", comment_id: "#{comment.id}", contenteditable: true}
                 %pre=comment.comment
             - else
@@ -297,6 +297,7 @@
     %input{:type => "hidden", :name => "xml_token", :value => "#{xml_token}"}
     %input{:name => "dispute_id", :type => "hidden", :value => "#{@dispute.id}"}
     %input{:name => "current_user_id", :type => "hidden", :value => "#{current_user.id}"}
+    %input{:name => "dispute_type", :type => "hidden", :value => "Dispute"}
 
   :javascript
     AC.Helpers.clipboard()

@@ -2,7 +2,7 @@
   .reputation-research-search-wrapper
     .research-header-wrapper
       %span.icon-research.top-info-icon
-      %h1 Reputation
+      %h1 Reputation Research
       %ul{class:"nav nav-tabs", role:'tablist'}
         %li{role:"presentation", class: "active"}
           %a{href:'#lookup-detail','aria-controls':'lookup-detail', 'aria-label': 'Detail lookup tab','data-toggle':'tab', role:"tab"}
@@ -12,58 +12,162 @@
           %a{href:'#lookup-quick', 'aria-controls':'lookup-quick','aria-label': 'Quick lookup tab','data-toggle':'tab', role:"tab"}
             %span.icon-lookup-quick.top-info-icon
             Quick Lookup
-
-
     .research-search-form.row.tab-content
       = form_for(:search, method: "get") do |search_form|
         .search-options-col.tab-pane.active#lookup-detail
           .col-xs-4.col-sm-3.col-md-2.col-lg-2.col-xl-1
             = search_form.radio_button(:scope, 'strict', id: 'research-search-strict', checked: params['search'] && params['search']['scope'].eql?("strict"))
-            %label{for: 'research-search-strict'} Strict Search
+            %label.esc-tooltipped{title: 'Strict Search returns the inputted URI/IP as an entry, in addition to all entries that match the URL pattern.', for: 'research-search-strict'} Strict Search
             %br
             = search_form.radio_button(:scope, 'broad', id: 'research-search-broad', checked: !params['search'] || params['search']['scope'].eql?("broad"))
-            %label{for: 'research-search-broad'} Broad Search
+            %label.esc-tooltipped{title: 'Broad Search returns all records matching the URL pattern.', for: 'research-search-broad'} Broad Search
             %hr.thin
             =search_form.submit(:Submit, id: 'submit-button', class: 'button_primary')
           .col-xs-8.col-sm-9.col-md-10.col-lg-10.col-xl-11
             = search_form.text_area(:uri, class: 'search-box', placeholder: 'URI or IP Address', autofocus: 'true')
-
         .search-options-col.tab-pane#lookup-quick{role:'tabpanel'}
+          .ajax-message-div
+            .loader-gears
+              =inline_svg 'icon_gears_loader.svg'
+            %span.loader-msg Loading data...
           .col-xs-12.toolbar-quicklookup
             %button.primary#get-rep-data Get Reputation Data
             .toolbar.research-toolbar
               %div
                 %label.toolbar-section-label Adjust Reputation
-                %button#wlbl_entries_button.toolbar-button.adjust-wlbl-button.dropdown-toggle.esc-tooltipped.dropdown-button-margin-left{title: 'Adjust WL/BL', 'data-toggle': 'dropdown', 'aria-haspopup': 'true', 'aria-expanded': 'false', onclick: 'bulk_get_current_wlbl("research")'}
-                  %span.toolbar-button-text Adjust WL/BL
-                %button#reptool_entries_button.toolbar-button.adjust-reptool-button.dropdown-toggle.esc-tooltipped{title: 'Adjust RepTool BL', 'data-toggle': 'dropdown', 'aria-haspopup': 'true', 'aria-expanded': 'false', onclick: 'bulk_get_current_reptool("research");'}
-                  %span.toolbar-button-text Adjust RepTool WL/BL
+                %span.dropdown
+                  %button#wlbl_entries_button.toolbar-button.toolbar-button-spacer.adjust-wlbl-button.dropdown-toggle.esc-tooltipped{title: 'Adjust WL/BL', 'data-toggle': 'dropdown', 'aria-haspopup': 'true', 'aria-expanded': 'false', onclick:'open_wlbl();'}
+                    %span.toolbar-button-text Adjust WL/BL
+                  .dropdown-menu.toolbar-dropdown#wlbl_entries_dropdown{'aria-labelledby': 'wlbl_reptool'}
+                    .dropdown-tool-text-divider.secondary-text-divider
+                      Adjust WL/BL
+                    .col-xs-12
+                      .inline-tool-content-wrapper
+                        .row.nested-radio-row.reptool-class-radio-row
+                          .col-xs-2
+                            %label.content-label-sm.reptool-section-label{for: "reptool-class-type-select"} Action
+                          .col-xs-5
+                            %input{type: 'radio', class:'wlbl-radio-add', name: 'wlbl-radio', id: 'wlbl-reptool-add', value: 'add', checked: true}
+                            %label.radio-label{for: 'wlbl-reptool-add'} Add to List
+                          .col-xs-5
+                            %input{type: 'radio', class:'wlbl-radio-add', name: 'wlbl-radio', id: 'wlbl-reptool-remove', value: 'remove'}
+                            %label.radio-label{for: 'wlbl-reptool-remove'} Remove from List
+                        .row.reptool-classifications-row
+                          .col-xs-12
+                            %label.content-label-sm.reptool-section-label{for: "reptool-class-type-select"} Lists
+                            %ul.dropdown-wlbl-list
+                      .col-xs-12
+                        .comment-wrapper
+                          %label.col-x-3.reptool-section-label{required: true} WL/BL Comment
+                          %textarea.dropdown-comment.adjust-reptool-bl-input.comment-input
+                          .col-x-3
+                          .col-x-6
+                            %hr.thin
+                          .button-row-center
+                            %button.primary.dropdown-submit-button{type: 'button', onclick: '', disabled: true, onclick: 'set_action_wlbl_col();'}
+                              Add Action to Entries
+
+
+                %span.dropdown
+                  %button#reptool_entries_button.toolbar-button.adjust-reptool-button.dropdown-toggle.esc-tooltipped{title: 'Adjust RepTool BL', 'data-toggle': 'dropdown', 'aria-haspopup': 'true', 'aria-expanded': 'false', onclick: 'open_adjust_reptool();'}
+                    %span.toolbar-button-text Adjust RepTool BL
+                  .dropdown-menu.toolbar-dropdown#reptool_entries_bl_dropdown{'aria-labelledby': 'adjust_reptool_bl'}
+                    .dropdown-tool-text-divider.secondary-text-divider
+                      Adjust Reptool Classification
+                    .inline-tool-content-wrapper
+                      .row
+                        .col-xs-12
+                          .row
+                            %input{type: 'radio', name: 'reptool-action-radio', class: 'status_bl', id: 'adjust-reptool-maintain', value: 'reptool-maintain', checked: true}
+                            %label.radio-label{for: 'adjust-reptool-maintain'} Maintain current classifications
+                          .row
+                            %input{type: 'radio', name: 'reptool-action-radio', class: 'status_bl', id: 'adjust-reptool-override', value: 'reptool-override'}
+                            %label.radio-label{for: 'adjust-reptool-override'} Replace current classifications
+                          .row
+                            %input{type: 'radio', name: 'reptool-action-radio', class: 'status_bl', id: 'adjust-reptool-drop', value: 'reptool-drop'}
+                            %label.radio-label{for: 'adjust-reptool-drop'} Drop all classifications (set entry to EXPIRED)
+                      %hr.thin.form-divider
+                      .row.reptool-classifications-row
+                        .col-xs-12
+                          %label.content-label-sm.reptool-section-label{for: "reptool-class-type-select"} Classifications
+                          .row.dropdown-tool-grey-row.nested-radio-row.reptool-class-radio-row
+                            .col-xs-6
+                              %input{type: 'radio', class:'reptool-add', name: 'reptool-classes-radio', id: 'reptool-classes-add', value: 'add', checked: true}
+                              %label.radio-label{for: 'reptool-classes-add'} Add selected classifications
+                            .col-xs-6
+                              %input{type: 'radio', class:'reptool-add', name: 'reptool-classes-radio', id: 'reptool-classes-remove', value: 'remove'}
+                              %label.radio-label{for: 'reptool-classes-remove'} Remove selected classifications
+                          %ul.dropdown-reptool-list
+                    .col-xs-12
+                      .comment-wrapper
+                        %label.col-x-3.reptool-section-label{required: true} RepTool Comment
+                        %textarea.dropdown-comment.adjust-reptool-bl-input.comment-input
+                        .col-x-3
+                        .col-x-6
+                          %hr.thin
+                        .button-row-center
+                          %button.primary.dropdown-submit-button{type: 'button', disabled: true, onclick: 'set_action_col();'}
+                            Add Action to Entries
               %div
                 %label.toolbar-section-label File
                 %button.toolbar-button.export-button.esc-tooltipped{title: 'Export to CSV'}
                   %span.toolbar-button-text Export to CSV
-            %button.primary#submit-rep-changes Submit Reputation Changes
+              %div
+                %label.toolbar-section-label Actions
+                %button#clear-all-actions.toolbar-button.clear-button.esc-tooltipped{title: 'Clear all actions'}
+                  %span.toolbar-button-text Clear All Actions
+
+            %button.primary#submit-rep-changes{onclick:'submit_quick_lookup();return false;', disabled: true} Submit Reputation Changes
             %span.small.note-repsubmit
               * NOTE: Submitting reputation changes will automatically create a closed ticket
 
-          .row
-            %table.research-table
-              %colgroup
-                %col.col-dispute
-                %col.alt-col
-                %col.alt-col
-                %col.alt-col
-                %col.alt-col
-                %col.alt-col
-                %col.alt-col
-                %col
+
+          #confirmation-modal.modal.fade{role:"dialog"}
+            .modal-dialog
+              .modal-content
+                .modal-header
+                  %h4.modal-title#commit-modal-title New Reputation Dispute Ticket
+                .modal-body
+                  %table
+                    %thead
+                      %tr
+                        %td.bold Dispute
+                        %td.bold Actions
+                    %tbody
+                  .comment-wrapper
+                    %label.content-label-sm
+                      Comment
+                    %textarea.dropdown-comment.confirm-rep-input.comment-input
+                  .modal-footer
+                    .button-group
+                      %button.primary{value: "submit", id:'confirm-rep-changes', onclick: 'confirm_rep_changes(); return false;' } Confirm Reputation Changes
+                      %button{title: "Cancel", class: "secondary", onclick: "close_modal(); return false;"} Cancel
+
+
+          #error_modal.modal.error_modal{tabindex:"-1", role:"dialog"}
+            .modal-header
+              %h4.modal-title#commit-modal-title Duplicate Dispute Requests
+            .modal-body
+
+
+          %table#research-table.research-table
+            %colgroup
+              %col
+              %col
+              %col.alt-col
+              %col.alt-col
+              %col.alt-col
+              %col.alt-col
+              %col.alt-col
+              %col.alt-col
+              %col
+              %col
+            %thead
               %tr
                 %th
                   %span.checkbox-wrapper
-                    %input{ :type=>"checkbox" }
-                      %span
-                        %label Dispute
-
+                    %input#select-all-bulk{ :type=>"checkbox", checked: "true" }
+                %th Dispute
                 %th WBRS
                 %th WBRS Rule Hits
                 %th WBRS Rules
@@ -71,14 +175,20 @@
                 %th WLBL
                 %th Reptool Classification
                 %th Actions
-
-              %tr.empty-tr
+                %th
+            %tbody
+              %tr
+                %td.col-select-all
                 %td
-                %td{colspan:'6'}
-                %td
-
-
-
+                  %p.col-bulk-dispute{ contenteditable:"true", data:''}
+                %td.col-wbrs
+                %td.col-wbrs-rule-hits
+                %td.col-wbrs-rules
+                %td.col-category
+                %td.col-wlbl
+                %td.col-reptool-class
+                %td.col-actions
+                %td.col-clear-actions
 
   .row
     .col-xs-12
@@ -89,7 +199,7 @@
       #research-page-toolbar.toolbar
         %div
           %label.toolbar-section-label Table View
-          %button.toolbar-button.expand-row-button#expand-all-rows.esc-tooltipped{title: 'Expand All Rows'}
+          %button.toolbar-button.expand-row-button#expand-all-rows.esc-tooltipped.toolbar-button-spacer{title: 'Expand All Rows'}
             %span.toolbar-button-text Expand All Rows
           %button.toolbar-button.collapse-button#collapse-all-rows.esc-tooltipped{title: 'Collapse All Rows'}
             %span.toolbar-button-text Collapse All Rows
@@ -101,14 +211,13 @@
             .dropdown-menu.toolbar-dropdown#add_to_ticket_dropdown{'aria-labelledby': 'add-to-ticket-button'}
               Dropdown information
           %span.dropdown
-            %button#wlbl_entries_button.toolbar-button.adjust-wlbl-button.dropdown-toggle.esc-tooltipped.dropdown-button-margin-left{title: 'Adjust WL/BL', 'data-toggle': 'dropdown', 'aria-haspopup': 'true', 'aria-expanded': 'false', onclick: 'bulk_get_current_wlbl("research")'}
+            %button#wlbl_entries_button.toolbar-button.adjust-wlbl-button.dropdown-toggle.esc-tooltipped.toolbar-button-spacer{title: 'Adjust WL/BL', 'data-toggle': 'dropdown', 'aria-haspopup': 'true', 'aria-expanded': 'false', onclick: 'bulk_get_current_wlbl("research")'}
               %span.toolbar-button-text Adjust WBRS WL/BL
             .dropdown-menu.toolbar-dropdown#wlbl_adjust_entries{'aria-labelledby': 'wlbl_entries_button'}
               = form_for :wlbl, html: {class: 'adjust-wlbl-form'} do |wlbl_form|
                 .dispute-wlbl-adjust-wrapper
                   .dropdown-tool-text-divider.primary-text-divider
                     Current WBRS Reputation
-
                   %table.dispute_tool_current
                     %thead
                       %tr
@@ -116,12 +225,9 @@
                         %th.content-label-sm.no-word-break Current WL/BL List
                         %th.text-center.content-label-sm.no-word-break Current WBRS Score
                     %tbody
-
                   -# TODO Hook up ability to preview scores based on changes in WL/BL
-
                   .dropdown-tool-text-divider.secondary-text-divider
                     Adjust WBRS Reputation
-
                   .inline-tool-content-wrapper
                     .row
                       .col-xs-2
@@ -132,7 +238,6 @@
                       .col-xs-5
                         %input{type: 'radio', name: 'wlbl-action-radio', id: 'wlbl-remove', value: 'wlbl-remove'}
                         %label.radio-label{for: 'wlbl-remove'} Remove from list
-
                     .row
                       .col-xs-12
                         %label.content-label-sm{for: "wlbl-list-type-select"} Lists
@@ -159,14 +264,12 @@
                               %li
                                 %input.bl-heavy-checkbox.wl-bl-list-inline{type: 'checkbox', name: 'wl-bl-list-inline', value: "BL-heavy"}
                                   BL - Heavy
-
                     .comment-wrapper
                       %label.content-label-sm WL/BL Comment
                       %textarea.dropdown-comment.adjust-wlbl-input.note-input
                     .button-row-center
-                      %button.primary.dropdown-submit-button{type: 'button', onclick:'bulk_adjust_wlbl("research");', disabled: true}
+                      %button.primary.dropdown-submit-button{type: 'button', onclick:'submit_bulk_wlbl("research");', disabled: true}
                         Submit Reputation Changes
-
           %span.dropdown
             %button#reptool_entries_button.toolbar-button.adjust-reptool-button.dropdown-toggle.esc-tooltipped{title: 'Adjust RepTool BL', 'data-toggle': 'dropdown', 'aria-haspopup': 'true', 'aria-expanded': 'false', onclick: 'bulk_get_current_reptool("research");'}
               %span.toolbar-button-text Adjust RepTool WL/BL
@@ -183,88 +286,85 @@
                         %th.content-label-sm Comment
                     %tbody
                   -# Each checked entry will populate information here
-
                   .dropdown-tool-text-divider.secondary-text-divider
                     Adjust Reptool Classification
-
                   .inline-tool-content-wrapper
                     .row
                       .col-xs-12
-                        %input{type: 'radio', name: 'reptool-action-radio', id: 'reptool-maintain', value: 'reptool-maintain', checked: true}
+                        %input{type: 'radio', name: 'reptool-action-radio', id: 'reptool-maintain', value: 'reptool-maintain', checked: true, onclick: 'reptool_form_prep(this, "bulk")'}
                         %label.radio-label{for: 'reptool-maintain'} Maintain current classifications
-                        %input{type: 'radio', name: 'reptool-action-radio', id: 'reptool-override', value: 'reptool-override'}
+                        %input{type: 'radio', name: 'reptool-action-radio', id: 'reptool-override', value: 'reptool-override', onclick: 'reptool_form_prep(this, "bulk")'}
                         %label.radio-label{for: 'reptool-override'} Replace current classifications
-                        %input{type: 'radio', name: 'reptool-action-radio', id: 'reptool-drop', value: 'reptool-drop'}
+                        %input{type: 'radio', name: 'reptool-action-radio', id: 'reptool-drop', value: 'reptool-drop', onclick: 'reptool_form_prep(this, "bulk")'}
                         %label.radio-label{for: 'reptool-drop'} Drop all classifications (set entry to EXPIRED)
                     %hr.thin.form-divider
-                    .row#reptool-classifications-row
+                    .row.reptool-classifications-row
                       .col-xs-12
                         %label.content-label-sm{for: "reptool-class-type-select"} Classifications
-                        .row.dropdown-tool-grey-row.nested-radio-row#reptool-class-radio-row
+                        .row.dropdown-tool-grey-row.nested-radio-row.reptool-class-radio-row
                           .col-xs-6
-                            %input{type: 'radio', name: 'reptool-classes-radio', id: 'reptool-classes-add', value: 'add', checked: true}
+                            %input{type: 'radio', name: 'reptool-classes-radio', value: 'add', checked: true}
                             %label.radio-label{for: 'reptool-classes-add'} Add selected classifications
                           .col-xs-6
-                            %input{type: 'radio', name: 'reptool-classes-radio', id: 'reptool-classes-remove', value: 'remove'}
+                            %input{type: 'radio', name: 'reptool-classes-radio', value: 'remove'}
                             %label.radio-label{for: 'reptool-classes-remove'} Remove selected classifications
                         %hr.thin.form-divider
                         .row.dropdown-tool-grey-row.checkbox-wrapper-row
                           .col-xs-4
                             %ul
                               %li
-                                %input.reptool-class-cb{type: 'checkbox', name: 'classification', value: 'attackers'}
+                                %input.reptool-class-cb{type: 'checkbox', name: 'classification', value: 'attackers', onclick: 'reptool_form_prep(this, "bulk")'}
                                   attackers
                               %li
-                                %input.reptool-class-cb{type: 'checkbox', name: 'classification', value: 'bogon'}
+                                %input.reptool-class-cb{type: 'checkbox', name: 'classification', value: 'bogon', onclick: 'reptool_form_prep(this, "bulk")'}
                                   bogon
                               %li
-                                %input.reptool-class-cb{type: 'checkbox', name: 'classification', value: 'bots'}
+                                %input.reptool-class-cb{type: 'checkbox', name: 'classification', value: 'bots', onclick: 'reptool_form_prep(this, "bulk")'}
                                   bots
                               %li
-                                %input.reptool-class-cb{type: 'checkbox', name: 'classification', value: 'cnc'}
+                                %input.reptool-class-cb{type: 'checkbox', name: 'classification', value: 'cnc', onclick: 'reptool_form_prep(this, "bulk")'}
                                   cnc
                               %li
-                                %input.reptool-class-cb{type: 'checkbox', name: 'classification', value: 'cryptomining'}
+                                %input.reptool-class-cb{type: 'checkbox', name: 'classification', value: 'cryptomining', onclick: 'reptool_form_prep(this, "bulk")'}
                                   cryptomining
                           .col-xs-4
                             %ul
                               %li
-                                %input.reptool-class-cb{type: 'checkbox', name: 'classification', value: 'dga'}
+                                %input.reptool-class-cb{type: 'checkbox', name: 'classification', value: 'dga', onclick: 'reptool_form_prep(this, "bulk")'}
                                   dga
                               %li
-                                %input.reptool-class-cb{type: 'checkbox', name: 'classification', value: 'exploitkit'}
+                                %input.reptool-class-cb{type: 'checkbox', name: 'classification', value: 'exploitkit', onclick: 'reptool_form_prep(this, "bulk")'}
                                   exploitkit
                               %li
-                                %input.reptool-class-cb{type: 'checkbox', name: 'classification', value: 'malware'}
+                                %input.reptool-class-cb{type: 'checkbox', name: 'classification', value: 'malware', onclick: 'reptool_form_prep(this, "bulk")'}
                                   malware
                               %li
-                                %input.reptool-class-cb{type: 'checkbox', name: 'classification', value: 'open_proxy'}
+                                %input.reptool-class-cb{type: 'checkbox', name: 'classification', value: 'open_proxy', onclick: 'reptool_form_prep(this, "bulk")'}
                                   open_proxy
                               %li
-                                %input.reptool-class-cb{type: 'checkbox', name: 'classification', value: 'open_relay'}
+                                %input.reptool-class-cb{type: 'checkbox', name: 'classification', value: 'open_relay', onclick: 'reptool_form_prep(this, "bulk")'}
                                   open_relay
                           .col-xs-4
                             %ul
                               %li
-                                %input.reptool-class-cb{type: 'checkbox', name: 'classification', value: 'phishing'}
+                                %input.reptool-class-cb{type: 'checkbox', name: 'classification', value: 'phishing', onclick: 'reptool_form_prep(this, "bulk")'}
                                   phishing
                               %li
-                                %input.reptool-class-cb{type: 'checkbox', name: 'classification', value: 'response'}
+                                %input.reptool-class-cb{type: 'checkbox', name: 'classification', value: 'response', onclick: 'reptool_form_prep(this, "bulk")'}
                                   response
                               %li
-                                %input.reptool-class-cb{type: 'checkbox', name: 'classification', value: 'spam'}
+                                %input.reptool-class-cb{type: 'checkbox', name: 'classification', value: 'spam', onclick: 'reptool_form_prep(this, "bulk")'}
                                   spam
                               %li
-                                %input.reptool-class-cb{type: 'checkbox', name: 'classification', value: 'suspicious'}
+                                %input.reptool-class-cb{type: 'checkbox', name: 'classification', value: 'suspicious', onclick: 'reptool_form_prep(this, "bulk")'}
                                   suspicious
                               %li
-                                %input.reptool-class-cb{type: 'checkbox', name: 'classification', value: 'tor_exit_node'}
+                                %input.reptool-class-cb{type: 'checkbox', name: 'classification', value: 'tor_exit_node', onclick: 'reptool_form_prep(this, "bulk")'}
                                   tor_exit_node
-
                     .comment-wrapper
                       %label.content-label-sm RepTool Comment
                       %textarea.dropdown-comment.adjust-reptool-bl-input.comment-input
-                    %hr.thin
+                      %hr.thin
                     .button-row-center
                       %button.primary.dropdown-submit-button{type: 'button', onclick: 'submit_bulk_reptool();'}
                         Submit Changes
@@ -305,7 +405,7 @@
                     %td.dispute_rep_tools
                       %span.dispute_rep_tools_wrapper
                         %span.dropdown
-                          %button.dispute-inline-buttons.adjust-wlbl-button.bfrp-inline-wlbl-button.dropdown-toggle{title: 'Adjust WL/BL', 'data-toggle': 'dropdown', 'aria-haspopup': 'true', 'aria-expanded': 'false'}
+                          %button.dispute-inline-buttons.adjust-wlbl-button.bfrp-inline-wlbl-button.dropdown-toggle{title: 'Adjust WL/BL', 'data-toggle': 'dropdown', 'aria-haspopup': 'true', 'aria-expanded': 'false', onclick: 'get_current_wlbl(this);'}
                           .dropdown-menu
                             = form_for :wlbl, html: {class: 'adjust-wlbl-form'} do |wlbl_form|
                               .dispute-wlbl-adjust-wrapper
@@ -370,59 +470,112 @@
                                     %label.content-label-sm Comment
                                     %textarea.dropdown-comment.adjust-wlbl-input.note-input
                                   .button-row-center
-                                    %button.primary.dropdown-submit-button{type: 'button', disabled: true, onclick:'row_research_adjust_wlbl_button(this);'}
+                                    %button.primary.dropdown-submit-button{type: 'button', disabled: true, onclick:'submit_individual_wlbl(this);'}
                                       Submit Changes
 
                         %span.dropdown
-                        %button.dispute-inline-buttons.adjust-reptool-button.dropdown-toggle{onclick: "inline_load_reptool_button(this)", id: "reptool_button_#{entry.id}", title: 'Adjust RepTool BL', 'data-toggle': 'dropdown', 'aria-haspopup': 'true', 'aria-expanded': 'false'}
-                        .dropdown-menu{id: "reptool_adjust_#{entry.id}", 'aria-labelledby': "reptool_button_#{entry.id}"}
-                          = form_for :reptool, html: {class: 'adjust-reptool-form'} do |rep_form|
-                            .dispute-reptool-adjust-wrapper
-                              %input.adjust-reptool-bl-input.dispute-entry-id{type: 'hidden', value: "#{entry.id}" }
-                              %input.adjust-reptool-bl-input.dispute-entry-content{type: 'hidden', value: "#{entry.hostlookup}" }
-                              %h3 Adjust RepTool WL/BL
-                              %table.dispute_tool_current
-                                %tr
-                                  %td
-                                    %label.content-label-sm Classification
-                                    %br
-                                    - if entry.classifications.empty?
-                                      %span.missing-data Not on RepTool
-                                    - else
-                                      %span.entry-reptool-class
-                                        = entry.classifications.first
-                                  %td
-                                    %label.content-label-sm Expiration
-                                    %br
-                                    - if entry.blacklist&.expiration.nil?
-                                      %span.missing-data N/A
-                                    - else
-                                      %span.entry-reptool-expiration
-                                        = entry.blacklist&.expiration
-                              .inline-tool-content-wrapper
-                                .toolbar
-                                  %div
-                                    %label.toolbar-section-label{for:"entry-#{entry.id}-blacklist-action-select"} Status
-                                    -# Need to add an 'N/A' option in the dropdown for if an item has no classifications
-                                    -# in RepTool
-                                    = rep_form.select(:action, ['ACTIVE', 'EXPIRED'],
-                                      {selected: entry.blacklist ? 'Active' : 'Expired'},
-                                      class: 'toolbar-select select-status adjust-reptool-bl-input action-input',
-                                      title: 'RepTool Rule Status',
-                                      id: "entry-#{entry.id}-blacklist-action-select")
-                                  %div
-                                    %label.toolbar-section-label{for: "entry-#{entry.id}-blacklist-classifications-select"} RepTool WL/BL
-                                    = rep_form.select(:classification, RepApi::Blacklist.classifications,
-                                      {selected: entry.classifications&.first,
-                                        include_blank: 'Not on RepTool'},
-                                      class: 'toolbar-select select-rt-rule adjust-reptool-bl-input classifications-input',
-                                      title: "RepTool BL Rules",
-                                      id: "entry-#{entry.id}-blacklist-classifications-select")
-                                .comment-wrapper
-                                  %label.content-label-sm Comment
-                                  %textarea.dropdown-comment.adjust-reptool-bl-input.comment-input
-                                .button-row-center
-                                  %button.primary.dropdown-submit-button{type: 'button', onclick: 'row_adust_reptool_bl_button_research(this)', disabled: true} Submit Changes
+                          %button.dispute-inline-buttons.adjust-reptool-button.dropdown-toggle{onclick: "get_current_reptool(this, 'research')", id: "reptool_button_#{entry.id}", title: 'Adjust RepTool BL', 'data-toggle': 'dropdown', 'aria-haspopup': 'true', 'aria-expanded': 'false'}
+                          .dropdown-menu.toolbar-dropdown.reptool-inline-dropdown{id: "reptool_adjust_#{entry.id}", 'aria-labelledby': "reptool_button_#{entry.id}"}
+                            = form_for :reptool, html: {class: 'adjust-reptool-form'} do |rep_form|
+                              .dispute-reptool-adjust-wrapper
+                                %input.adjust-reptool-bl-input.dispute-entry-id{type: 'hidden', value: "#{entry.id}" }
+                                %input.adjust-reptool-bl-input.dispute-entry-content{type: 'hidden', value: "#{entry.hostlookup}" }
+                                %h3 Adjust RepTool Classification
+                                %table.dispute_tool_current
+                                  %thead
+                                    %tr
+                                      %th.content-label-sm Active Classes
+                                      %th.content-label-sm Expiration
+                                      %th.content-label-sm Comment
+                                  %tbody
+                                  -#  Will call up-to-date information from the api
+                                .inline-tool-content-wrapper
+                                  .row
+                                    .col-xs-12
+                                      %input{type: 'radio', name: 'reptool-action-radio', id: "reptool-maintain-inline-#{entry.id}", value: 'reptool-maintain', checked: true, onclick: 'reptool_form_prep(this, "individual")'}
+                                      %label.radio-label{for: "reptool-maintain-inline-#{entry.id}"} Maintain current classifications
+                                      %input{type: 'radio', name: 'reptool-action-radio', id: "reptool-override-inline-#{entry.id}", value: 'reptool-override', onclick: 'reptool_form_prep(this, "individual")'}
+                                      %label.radio-label{for: "reptool-override-inline-#{entry.id}"} Replace current classifications
+                                      %input{type: 'radio', name: 'reptool-action-radio', id: "reptool-drop-inline-#{entry.id}", value: 'reptool-drop', onclick: 'reptool_form_prep(this, "individual")'}
+                                      %label.radio-label{for: "reptool-drop-inline-#{entry.id}"} Drop all classifications (set entry to EXPIRED)
+                                  %hr.thin.form-divider
+                                  .row.reptool-classifications-row
+                                    .col-xs-12
+                                      %label.content-label-sm{for: 'reptool-class-type-select'} Classifications
+                                      .row.dropdown-tool-grey-row.nested-radio-row.reptool-class-radio-row
+                                        .col-xs-6
+                                          %input{type: 'radio', name: 'reptool-classes-radio', id: "reptool-classes-add-inline-#{entry.id}", value: 'add', checked: true}
+                                          %label.radio-label{for: "reptool-classes-add-inline-#{entry.id}"} Add selected classifications
+                                        .col-xs-6
+                                          %input{type: 'radio', name: 'reptool-classes-radio', id: "reptool-classes-remove-inline-#{entry.id}", value: 'remove'}
+                                          %label.radio-label{for: "reptool-classes-remove-inline-#{entry.id}"} Remove selected classifications
+                                      %hr.thin.form-divider
+                                      .row.dropdown-tool-grey-row
+                                        .col-xs-4
+                                          %ul
+                                            %li
+                                              %input.reptool-class-cb{type: 'checkbox', name: 'classification', value: 'attackers', onclick: 'reptool_form_prep(this, "individual")'}
+                                                attackers
+                                            %li
+                                              %input.reptool-class-cb{type: 'checkbox', name: 'classification', value: 'bogon', onclick: 'reptool_form_prep(this, "individual")'}
+                                                bogon
+                                            %li
+                                              %input.reptool-class-cb{type: 'checkbox', name: 'classification', value: 'bots', onclick: 'reptool_form_prep(this, "individual")'}
+                                                bots
+                                            %li
+                                              %input.reptool-class-cb{type: 'checkbox', name: 'classification', value: 'cnc', onclick: 'reptool_form_prep(this, "individual")'}
+                                                cnc
+                                            %li
+                                              %input.reptool-class-cb{type: 'checkbox', name: 'classification', value: 'cryptomining', onclick: 'reptool_form_prep(this, "individual")'}
+                                                cryptomining
+                                        .col-xs-4
+                                          %ul
+                                            %li
+                                              %input.reptool-class-cb{type: 'checkbox', name: 'classification', value: 'dga', onclick: 'reptool_form_prep(this, "individual")'}
+                                                dga
+                                            %li
+                                              %input.reptool-class-cb{type: 'checkbox', name: 'classification', value: 'exploitkit', onclick: 'reptool_form_prep(this, "individual")'}
+                                                exploitkit
+                                            %li
+                                              %input.reptool-class-cb{type: 'checkbox', name: 'classification', value: 'malware', onclick: 'reptool_form_prep(this, "individual")'}
+                                                malware
+                                            %li
+                                              %input.reptool-class-cb{type: 'checkbox', name: 'classification', value: 'open_proxy', onclick: 'reptool_form_prep(this, "individual")'}
+                                                open_proxy
+                                            %li
+                                              %input.reptool-class-cb{type: 'checkbox', name: 'classification', value: 'open_relay', onclick: 'reptool_form_prep(this, "individual")'}
+                                                open_relay
+                                        .col-xs-4
+                                          %ul
+                                            %li
+                                              %input.reptool-class-cb{type: 'checkbox', name: 'classification', value: 'phishing', onclick: 'reptool_form_prep(this, "individual")'}
+                                                phishing
+                                            %li
+                                              %input.reptool-class-cb{type: 'checkbox', name: 'classification', value: 'response', onclick: 'reptool_form_prep(this, "individual")'}
+                                                response
+                                            %li
+                                              %input.reptool-class-cb{type: 'checkbox', name: 'classification', value: 'spam', onclick: 'reptool_form_prep(this, "individual")'}
+                                                spam
+                                            %li
+                                              %input.reptool-class-cb{type: 'checkbox', name: 'classification', value: 'suspicious', onclick: 'reptool_form_prep(this, "individual")'}
+                                                suspicious
+                                            %li
+                                              %input.reptool-class-cb{type: 'checkbox', name: 'classification', value: 'tor_exit_node', onclick: 'reptool_form_prep(this, "individual")'}
+                                                tor_exit_node
+                                  .comment-wrapper
+                                    %label.content-label-sm RepTool Comment
+                                    %textarea.dropdown-comment.adjust-reptool-bl-input.comment-input
+                                      \
+                                      \
+                                      \--------------------------
+                                      INDIVIDUAL RESEARCH SUBMISSION:
+                                      &#x000A; #{entry.hostlookup}
+                                    %hr.thin
+                                  .button-row-center
+                                    %button.primary.dropdown-submit-button{type: 'button', onclick: 'submit_individual_reptool(this)', disabled: true}
+                                      Submit Changes
+
+
                   %tr.research-overview-row
                     %td
                     -#Expander area
@@ -664,30 +817,9 @@
                                       %th
                                         %span.missing-data
                                           No XBRS data available.
-                              - elsif entry.find_xbrs[1]['data'].count < 8
-                                %table.xbrs-short-scrollable
-                                  %thead
-                                    %tr
-                                      - entry.find_xbrs[1]['legend'].each do |header|
-                                        %th= header
-                                  %tbody
-                                    - unless entry.hostlookup.nil?
-                                      - entry.find_xbrs[1]['data'].each do |data|
-                                        %tr
-                                          - data.each do |datapoint|
-                                            %td= datapoint
                               - else
-                                %table.xbrs-long-scrollable
-                                  %thead
-                                    %tr
-                                      - entry.find_xbrs[1]['legend'].each do |header|
-                                        %th= header
-                                  %tbody
-                                    - unless entry.hostlookup.nil?
-                                      - entry.find_xbrs[1]['data'].each do |data|
-                                        %tr
-                                          - data.each do |datapoint|
-                                            %td= datapoint
+                                %table
+
 
                             .entry-details-table.crosslisted-details-table{'data-entry-id': "#{entry.id}"}
                               %h5.entry-details-table-header
@@ -716,7 +848,7 @@
                                     - entry.wbrs_xlist.each do |cross_listed|
                                       %tr
                                         %td= cross_listed.id
-                                        %td= cross_listed.url
+                                        %td.esc-tooltipped{:title => cross_listed.url}= truncate(cross_listed.url, :length=>20)
                                         %td= cross_listed.list_type
                                         %td -
                                         %td= cross_listed.username
@@ -737,7 +869,7 @@
                                     - entry.wbrs_xlist.each do |cross_listed|
                                       %tr
                                         %td= cross_listed.id
-                                        %td= cross_listed.url
+                                        %td.esc-tooltipped{:title => cross_listed.url}= truncate(cross_listed.url, :length=>20)
                                         %td= cross_listed.list_type
                                         %td -
                                         %td= cross_listed.username

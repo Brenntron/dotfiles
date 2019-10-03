@@ -1,4 +1,5 @@
 class RuleDatatable < AjaxDatatablesRails::Base
+  extend Forwardable
 
   def_delegators :@view, :link_to, :edit_admin_rule_path, :related_admin_rule_path, :content_tag, :concat
 

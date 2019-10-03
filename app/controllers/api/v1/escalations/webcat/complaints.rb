@@ -186,11 +186,12 @@ module API
 
               # Grab prefix id for each URL
               permitted_params['urls'].each_with_index do |param, position|
-                prefix_record = Wbrs::Prefix.where(:urls => [param])
-                if !prefix_record.empty? && prefix_record.first.is_active == 1
-                  prefix_ids[position + 1] = prefix_record.first.prefix_id
-                else
-                  prefix_ids[position + 1 ] = nil
+                if param.strip != ''
+                  prefix_record = Wbrs::Prefix.where(:urls => DisputeEntry.domain_of_with_path([param]))
+
+                  if !prefix_record.empty? && prefix_record.first.is_active == 1
+                    prefix_ids[position + 1] = prefix_record.first.prefix_id
+                  end
                 end
               end
 
@@ -206,12 +207,13 @@ module API
               # Convert the API response to JSON
               responses.each do |position, response|
                 responses[position] = JSON.parse(response.body)
+                responses[position] = responses[position]['data'].sort_by! { |key| key['confidence'] }
               end
 
               # Loop through each individual response's categories and add their name to a hash
               responses.each do |position, response|
                 categories[position] = {}
-                response['data'].each_with_index do |data, category_position|
+                response.each_with_index do |data, category_position|
                   categories[position][category_position] = data['category_id']
                 end
               end
@@ -250,11 +252,37 @@ module API
 
             post 'fetch_wbnp_data' do
               std_api_v2 do
-
-                Complaint.get_latest_wbnp_complaints
-                {:status => "success"}.to_json
-
+                begin
+                  new_report = Complaint.get_latest_wbnp_complaints
+                  {:status => "success", :wbnp_report_id => new_report.id}.to_json
+                rescue
+                  {:status => "error"}.to_json
+                end
               end
+            end
+
+            params do
+              optional :wbnp_report_id, type: Integer
+            end
+
+            get 'wbnp_report_status' do
+
+              if permitted_params[:wbnp_report_id].blank?
+                report = WbnpReport.active_reports.last
+              else
+                report = WbnpReport.where(:id => permitted_params[:wbnp_report_id]).first
+              end
+
+              if report.blank?
+                report = WbnpReport.all.last
+              end
+
+              if report.present?
+                {:status => "success", :data => report}
+              else
+                {:status => "success", :data => WbnpReport.null_report}
+              end
+
             end
 
             params do
@@ -264,10 +292,37 @@ module API
 
             post 'update_uri' do
               std_api_v2 do
-                authorize!(:update, ComplaintEntry)
-                complaint_entry = ComplaintEntry.find(permitted_params[:complaint_entry_id])
+                begin
+                  authorize!(:update, ComplaintEntry)
+                  complaint_entry = ComplaintEntry.find(permitted_params[:complaint_entry_id])
 
-                complaint_entry.update_uri(permitted_params[:uri])
+                  if (permitted_params[:uri] =~ Resolv::IPv4::Regex) == nil
+                    status = complaint_entry.update_uri(permitted_params[:uri])
+                  end
+
+                  if status[:status] != 'ip'
+                    current_categories = complaint_entry.current_category_data
+                    wbrs_response = Sbrs::ManualSbrs.get_wbrs_data({:url => URI.escape(complaint_entry.domain)})
+                    wbrs_score = wbrs_response["wbrs"]["score"]
+
+                    complaint_entry.wbrs_score = wbrs_score
+                    complaint_entry.category = complaint_entry.set_current_category
+
+                    complaint_entry.save
+
+                    domain = complaint_entry.domain
+                    subdomain = complaint_entry.subdomain
+                    category = complaint_entry.category
+                    path = complaint_entry.path
+                  end
+
+                  render json: {current_categories: current_categories, status: status[:status],
+                                domain: domain, subdomain: subdomain, path: path,
+                                category: category, wbrs_score: wbrs_score}
+                rescue
+                  raise ("Please confirm that a valid URI was given.")
+                end
+
               end
             end
 

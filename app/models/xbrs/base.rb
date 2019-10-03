@@ -104,20 +104,21 @@ class Xbrs::Base
   end
 
   def self.request_error_handling(response)
+    
     case
       when 300 > response.code
         response
       when 404 == response.code
         body = JSON.parse(response.body)
-        raise Xbrs::XbrsNotFoundError, "HTTP response #{response.code} #{body['Error']}"
+        return {:error => "HTTP response #{response.code} #{body['Error']}"}
       else
         begin
-          body = JSON.parse(response.body)
+          return JSON.parse(response.body)
         rescue
           body = response.body
-          raise Xbrs::XbrsError, "HTTP response #{response.code} #{body}"
+          return {:error => "HTTP response #{response.code} #{body} or url"}
         end
-        raise Xbrs::XbrsError, "HTTP response #{response.code} #{body['Error']}"
+        return {:error => "HTTP response #{response.code} #{body['Error']}"}
     end
   end
 
@@ -129,11 +130,17 @@ class Xbrs::Base
 
     response = request_error_handling(call_request(method, request))
     # transform the response body into valid JSON, from the YAML provided by the API
-    response_body = response.body.gsub("\n---\n",",")
-    response_body = response_body.gsub("---\n", "")
-    response_body = response_body.prepend("[").concat("]")
-    return response_body if raw == true
-    response_body = JSON.parse(response_body)
+    unless response.is_a?(Hash)
+      response_body = response.body.gsub("\n---\n",",")
+      response_body = response_body.gsub("---\n", "")
+      response_body = response_body.prepend("[").concat("]")
+
+      return response_body if raw == true
+      response_body = JSON.parse(response_body)
+    else
+      return response.to_json if raw == true
+      response
+    end
   end
 
   def call_xbrs_request(method, path, body:)

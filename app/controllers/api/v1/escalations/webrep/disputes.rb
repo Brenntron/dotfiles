@@ -66,6 +66,19 @@ module API
 
             end
 
+            desc 'project new score'
+            params do
+              requires :url, type: String
+              requires :add, type: Array(String)
+              requires :remove, type: Array(String)
+            end
+
+            post "project_new_score" do
+              new_score = Wbrs::ManualWlbl.project_new_score(permitted_params[:url], permitted_params[:add], permitted_params[:remove])
+              data = {status: "success", score: new_score}
+              data.to_json
+            end
+
             desc 'create a dispute'
             params do
               requires :ips_urls, type: String, desc: 'List of URLs to create entries'
@@ -92,10 +105,10 @@ module API
                 if separated_entries.length > errors.length
                   if user_validation.present?
                     dispute = Dispute.create_action(bugzilla_rest_session,
-                                            permitted_params[:ips_urls],
-                                            permitted_params[:assignee],
-                                            permitted_params[:priority],
-                                            permitted_params[:ticket_type])
+                                                    permitted_params[:ips_urls],
+                                                    permitted_params[:assignee],
+                                                    permitted_params[:priority],
+                                                    permitted_params[:ticket_type])
                     render json: {status: 'Success', case_id: dispute.id, errors: errors}
                   else
                     raise ("Invalid assignee or assignee does not exist. Please try again.")
@@ -203,23 +216,9 @@ module API
               requires :new_assignee, type: Integer, desc: "User ID of new assignee"
             end
             post "change_assignee" do
-              json_packet = []
-              params[:dispute_ids].each do |dispute|
-                Dispute.where(id: dispute).update_all(user_id: params[:new_assignee])
-                d = Dispute.find_by(id: dispute)
-                if d.status == Dispute::STATUS_NEW || d.status == Dispute::STATUS_REOPENED
-                  accepted_at = Time.now
-                  d.update(status: Dispute::STATUS_ASSIGNED, case_accepted_at: accepted_at)
-                  d.dispute_entries.each do |entry|
-                    if entry.status == DisputeEntry::NEW || entry.status == DisputeEntry::STATUS_REOPENED
-                      entry.update(status: DisputeEntry::ASSIGNED, case_accepted_at: accepted_at)
-                    end
-                  end
-                end
-                raise "This record changed while you were editing. To continue this operation anyway, reload the page and make your assignment again." unless d.user_id == params[:new_assignee]
-                json_packet << d
-              end
-              {:status => "success", :data => json_packet}.to_json
+              authorize!(:update, Dispute)
+              disputes = Dispute.assign(params[:new_assignee], params[:dispute_ids])
+              {:status => "success", :data => disputes}.to_json
             end
 
             desc "Remove assignee from a group of dispute IDs (revert to vrtincoming)"
@@ -301,6 +300,7 @@ module API
             end
             post "reptool_bl" do
               std_api_v2 do
+                params["classifications"][0].slice! "No active classifications,"
                 RepApi::Blacklist.adjust_from_params(permitted_params, username: current_user.cvs_username)
                 true
               end
@@ -313,6 +313,7 @@ module API
             post "maintain_reptool_bl" do
               std_api_v2 do
                 permitted_params['data'].each do |entry|
+                  entry["classifications"][0].slice! "No active classifications,"
                   RepApi::Blacklist.adjust_from_params(entry, username: current_user.cvs_username)
                 end
                 true
@@ -336,14 +337,14 @@ module API
               requires :dispute_id
             end
             post "sync_data" do
-                
-                dispute = Dispute.where({:id => params[:dispute_id]}).first
-                dispute.dispute_entries.each do |dispute_entry|
 
-                  dispute_entry.sync_up
+              dispute = Dispute.where({:id => params[:dispute_id]}).first
+              dispute.dispute_entries.each do |dispute_entry|
 
-                end
-                {:status => "success"}.to_json
+                dispute_entry.sync_up
+
+              end
+              {:status => "success"}.to_json
 
             end
 
@@ -362,7 +363,9 @@ module API
                 dispute = Dispute.find(permitted_params['dispute_id'])
                 authorize!(:update, dispute)
 
-                dispute.take_ticket(user: current_user)
+                raise 'This ticket is already assigned.' unless dispute.user_id.nil? || User.vrtincoming&.id == dispute.user_id
+
+                Dispute.assign(current_user, permitted_params['dispute_id'])
 
                 { username: current_user.cvs_username, dispute_id: dispute.id }
               end
@@ -611,7 +614,7 @@ module API
 
               if information[params[:entry].gsub('http://', '').gsub('https://', '')] == "NOT_FOUND"
                 return {:entry => params[:entry], :classification => "not found", :expiration => "", :status => "", :comment => ""}.to_json
-              # TODO Make expiration human readable - Just the date
+                # TODO Make expiration human readable - Just the date
               else
                 expiration = ""
                 begin
@@ -619,7 +622,7 @@ module API
                 rescue
                   expiration = information[params[:entry].gsub('http://', '').gsub('https://', '')]["expiration"]
                 end
-                return {:entry => params[:entry], :classification => information[params[:entry].gsub('http://', '').gsub('https://', '')]["classifications"].first, :expiration => expiration, :status => information[params[:entry].gsub('http://', '').gsub('https://', '')]["status"], :comment => information[params[:entry].gsub('http://', '').gsub('https://', '')]["metadata"]["VRT"]["comment"]}.to_json
+                return {:entry => params[:entry], :classification => information[params[:entry].gsub('http://', '').gsub('https://', '')]["classifications"], :expiration => expiration, :status => information[params[:entry].gsub('http://', '').gsub('https://', '')]["status"], :comment => information[params[:entry].gsub('http://', '').gsub('https://', '')]["metadata"]["VRT"]["comment"]}.to_json
               end
 
             end
@@ -644,7 +647,12 @@ module API
                     rescue
                       expiration = value["expiration"]
                     end
-                    return_data.push(:entry => key, :classification => value["classifications"], :expiration => expiration, :status => value["status"], :comment => value["metadata"]["VRT"]["comment"]).to_json
+
+                    comment = ""
+
+		                comment = value["metadata"].fetch("VRT", {}).fetch("comment", "")
+
+                    return_data.push(:entry => key, :classification => value["classifications"], :expiration => expiration, :status => value["status"], :comment => comment).to_json
                   end
                 end
                 return_data.to_json
@@ -657,7 +665,7 @@ module API
 
             get 'rule_ui_wlbl_get_info_for_form' do
               params[:entry] = params[:entry].strip
-              
+
               information = Wbrs::ManualWlbl.where({:url => params[:entry]})
 
               if information.blank?
@@ -688,7 +696,7 @@ module API
             post 'bulk_rule_ui_wlbl_get_info_for_form' do
               std_api_v2 do
 
-                params[:entries] = params[:entries].map {|entry| entry.strip}
+                params[:entries] = params[:entries].map {|entry| DisputeEntry.domain_of_with_path(entry.strip)}
 
                 data = []
                 list_types = {}
@@ -699,7 +707,7 @@ module API
                   api_responses = Wbrs::ManualWlbl.where({:url => entry})
 
                   api_responses.each do |response|
-                    if response.url == entry
+                    if DisputeEntry.domain_of_with_path(response.url) == entry
                       if response.state == "active"
                         list_types[entry] << response.list_type
                       end
@@ -744,9 +752,12 @@ module API
             post 'bulk_rule_ui_wlbl_add' do
               std_api_v2 do
                 authorize!(:update, Wbrs::ManualWlbl)
+                parsed_ip_uris = permitted_params['ip_uris'].map{|ip_uri| DisputeEntry.domain_of_with_path(ip_uri).strip}
+                unique_ip_uris = parsed_ip_uris.uniq
+
                 wlbl_params =
                     {
-                        urls: permitted_params['ip_uris'].map {|ip_uri| ip_uri.strip},
+                        urls: unique_ip_uris,
                         trgt_list: permitted_params['list_types'],
                         note: permitted_params['note'],
                         usr: current_user.cvs_username
@@ -785,22 +796,20 @@ module API
                 entry = params[:entry]
               end
 
-              information = Wbrs::ManualWlbl.where({:url => entry})
+              api_response = Wbrs::ManualWlbl.where({:url => entry})
 
-              information.each do |info_entry|
-                if info_entry.url == entry
-                  details = Wbrs::ManualWlbl.find(info_entry.id)
-                  details.notes.each do |note|
-                    date = ''
-                    date = Date.parse(note['ctime']).to_s unless note['ctime'].blank?
-                    note_entries << {:state => info_entry.state, :date => date, :list_type => info_entry.list_type, :note => "#{note['user']} - #{note['ctime']}: #{note['note']}"}
-                  end
+              api_response.each do |response|
+                begin
+                  note_entries = note_entries + Wbrs::ManualWlbl.gather_history_entries(response, entry)
+                rescue
+                  note_entries = note_entries + Wbrs::ManualWlbl.add_to_history_modal(response,'')
+                  next
                 end
               end
 
+              note_entries = note_entries.sort_by{|vn| vn[:sort_date]}.reverse
 
               return {:status => "success", :data => note_entries}.to_json
-
             end
 
             desc 'Autopopulate fields on Advanced Search'

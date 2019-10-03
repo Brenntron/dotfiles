@@ -1,0 +1,352 @@
+.row
+  .col-sm-3
+    %h1 Case History
+    .row.table-toolbar
+      .col-xs-5
+        %label Sort:
+        %select#history-sort-dropdown
+          %option#date-desc="Date, Desc"
+          %option#date-asc="Date, Asc"
+          %option#author="Author"
+          %option#kind="Kind"
+      .col-xs-7
+        %label Show:
+        %select#history-display-dropdown
+          %option#all="Everything"
+          %option#email="Email"
+          %option#note-history="Notes"
+          %option#version="Status"
+    .row
+      .col-xs-12
+        %table#case-history
+          -@file_rep_dispute.dispute_emails.each do |email|
+            %tr.email-row{class: "email-#{email.status}", email_id: "#{email.id}"}
+              %td.alt-col.icon-col
+                %span.case-history-icon.email-icon{:data => {:history_kind => "email"}}
+              %td
+                %span.case-history-author
+                  =email.from
+                %span.case-history-preview
+                  =email.subject
+              %td.alt-col.case-history-datetime{:data => {:db_date => email.created_at}}
+                = format_date(email.created_at)
+                %br
+                =email.created_at.strftime("%H:%M:%S")
+          -@file_rep_dispute.file_rep_comments.recent_first.each do |comment|
+            %tr.note-history-row
+              %td.alt-col.icon-col
+                %span.case-history-icon.note-icon{:data => {:history_kind => "note"}}
+              %td
+                %span.case-history-author
+                  =comment.user.cvs_username
+                %span.case-history-preview
+                  =comment.comment.truncate(75, omission: '...')
+              %td.alt-col.case-history-datetime{:data => {:db_date => comment.created_at}}
+                = format_date(comment.created_at)
+                %br
+                =comment.created_at.strftime("%H:%M:%S")
+          -@versioned_items.each do |item|
+            -item.versions.each do |version|
+              %tr.version-row
+                %td.alt-col.icon-col
+                  %span.case-history-icon.disp-status-icon{:data => {:history_kind => "version"}}
+                %td
+                  %span.case-history-author
+                    =whodunnit_helper(version)
+                  -version.changeset.each do |field, (changed_from, changed_to) |
+                    %span.case-history-preview
+                      =field_changeset_handler(field, changed_from)
+                      %span.emphasize #{changed_from}
+                      to
+                      %span.emphasize #{changed_to}.
+                %td.alt-col.case-history-datetime{:data => {:db_date => version.created_at}}
+                  = format_date(version.created_at)
+                  %br
+                  =version.created_at.strftime("%H:%M:%S")
+
+  .col-sm-6.border-section
+    .row
+      .col-xs-12.highlighted-section-header
+        %h1 Communication
+        .email-notice-block.customer-facing-notice
+          Customer Facing Message
+        .communication-toolbar
+          %button.new-email-button
+            Compose New Email
+          %button.mng-templates-button
+            Manage Email Templates
+
+    .row
+      .col-xs-12.email-header-information
+        .email-header-data
+          .communication-subject
+            Talosintelligence.com File Support Request #{@file_rep_dispute.id}
+          .sender-receiver-info
+            %span.content-label-sm From
+            %span.author-username
+              =@file_rep_dispute.customer.email
+
+            %br
+            %span.content-label-sm To
+            %span.receiver-email
+              rep_disputes_#{@file_rep_dispute.id}@dispute.talosintelligence.com
+            %br
+            %span.attachment-label#incoming-attachment.hidden
+            %span.email-attachments
+
+        .email-response-button-wrapper
+          .email-response-buttons
+            - if @file_rep_dispute.dispute_emails.blank?
+              %button.reply-button.first-reply-button.esc-tooltipped{title: 'Begin email chain with customer'}
+            - else
+              %button.reply-button
+              %button.forward-button
+          %span.email-datetime
+            =@file_rep_dispute.created_at.strftime("%Y-%m-%d")
+            %br
+            =@file_rep_dispute.created_at.strftime("%H:%M:%S")
+    .row
+      .col-xs-12.email-msg-body
+        %pre.email-msg-content
+
+    = render 'escalations/file_rep/disputes/new_email_dialog'
+
+
+
+    -###### Below is the dialog for managing resolution messages, not sure if we need this or not
+
+    -##manageResolutionMessageTemplatesDialog{title: 'Manage Resolution Message Templates'}
+    -#  %table.table
+    -#    %thead
+    -#      %tr.table-header-highlight
+    -#        %th Template Name
+    -#        %th Description
+    -#        %th.min70
+    -#      -ResolutionMessageTemplate.all.each do |template|
+    -#        %tr
+    -#          %td=template.name
+    -#          %td=template.description
+    -#          %td
+    -#            %button.table-button.edit-button.edit-resolution-message-template{resolution_message_template_id: template.id, name: 'edit-resolution-message-template'}
+    -#            %button.table-button.rmt-delete-button.delete-resolution-message-template{resolution_message_template_id: template.id, name: 'delete-resolution-message-template'}
+    -#
+    -#  #new-resolution-message-template-form-wrapper
+    -#    %h4.dialog-inset-header New Resolution Message Template
+    -#    %form
+    -#      .dialog-form-information
+    -#        %span.content-label-sm Name
+    -#        %input#new-resolution-message-template-name{autofocus: true, required: true, type: 'text', name: 'template-name', maxlength: 100}
+    -#        %span.content-label-sm Description
+    -#        %input#new-resolution-message-template-desc{required: true, type: 'text', name: 'template-description', maxlength: 200}
+    -#      .template-content-wrapper
+    -#        %textarea.template-content#new-resolution-message-template-body{maxlength: 300}
+    -#
+    -#  #edit-resolution-message-template-form-wrapper
+    -#    %h4.dialog-inset-header Edit Resolution Message Template
+    -#    %form
+    -#      .dialog-form-information
+    -#        %span.content-label-sm Name
+    -#        %input#edit-resolution-message-template-name{autofocus: true, required: true, type: 'text', name: 'template-name', maxlength: 100}
+    -#        %span.content-label-sm Description
+    -#        %input#edit-resolution-message-template-desc{required: true, type: 'text', name: 'template-description', maxlength: 200}
+    -#        %input.hidden#resolution-message-template-id
+    -#      .template-content-wrapper
+    -#        %textarea.template-content#edit-resolution-message-template-body{maxlength: 300}
+    -#
+    -#  .dialog-section-divider
+    -#    %button.primary#save-resolution-message-template.hidden{onclick: 'save_resolution_message_template()'}
+    -#      Save Template
+    -#    %button.secondary#create-resolution-message-template{onclick: 'create_new_resolution_message_template()'}
+    -#      Create New Template
+    -#    %button.primary#edit-resolution-message-template.hidden{onclick: 'update_resolution_message_template()'}
+    -#      Update Template
+    -#    %button.secondary.hidden#cancel-edit-resolution-message-template{onclick: 'cancel_edit_resolution_message_template()'}
+    -#      Cancel
+
+
+    -#### TODO - Create File Rep Email Template stuff on the back end and hook up here
+    #manageTemplatesDialog{title: 'Manage Email Templates'}
+      %table.table
+        %thead
+          %tr.table-header-highlight
+            %th Template Name
+            %th Description
+            %th.min70
+          -FileRepEmailTemplate.all.each do |template|
+            %tr
+              %td=template.template_name
+              %td=template.description
+              %td
+                %button.table-button.edit-button.edit-filerep-template{template_id: template.id, name: 'edit-template'}
+                %button.table-button.delete-button.delete-filerep-template{template_id: template.id, name: 'delete-template'}
+
+      #new-template-form-wrapper
+        %h4.dialog-inset-header New Email Template
+        %form
+          .dialog-form-information
+            %span.content-label-sm Name
+            %input#new-template-name{autofocus: true, required: true, type: 'text', name: 'template-name'}
+            %span.content-label-sm Description
+            %input#new-template-desc{required: true, type: 'text', name: 'template-description'}
+          .template-content-wrapper
+            %textarea.template-content#new-template-body
+
+      #edit-template-form-wrapper
+        %h4.dialog-inset-header Edit Email Template
+        %form
+          .dialog-form-information
+            %span.content-label-sm Name
+            %input#edit-template-name{autofocus: true, required: true, type: 'text', name: 'template-name'}
+            %span.content-label-sm Description
+            %input#edit-template-desc{required: true, type: 'text', name: 'template-description'}
+            %input.hidden#template-id
+          .template-content-wrapper
+            %textarea.template-content#edit-template-body
+
+      .dialog-section-divider
+        %button.primary#save-filerep-email-template.hidden
+          Save Template
+        %button.secondary#create-email-template
+          Create New Template
+        %button.primary#edit-filerep-email-template.hidden
+          Update Template
+        %button.secondary.hidden#cancel-edit-email-template
+          Cancel
+
+
+    .row
+      .col-xs-12#email-reply.hidden
+        .row
+          .col-xs-12.email-reply-content-wrapper
+            .row
+              .col-xs-12.email-reply-header-information
+                .row
+                  .col-xs-4
+                    .sender-receiver-info
+                      %span.reply-symbol
+                      %span.receiver-email
+                        =@file_rep_dispute.customer.email
+
+                  -# Add in after we have email template functionality
+                  .col-xs-8
+                    .template-select-wrapper
+                      .template-label
+                        Select a Template
+
+                    %select.dropdown.email-template-select#select-filerep-reply-template
+                      -if FileRepEmailTemplate.all.empty?
+                        %option.hidden{value:'', disabled: true, selected: true} No Templates Created
+                      -else
+                        %option.hidden{value:'', disabled: true, selected: true} No Template Selected
+                        =options_for_select(FileRepEmailTemplate.all.pluck(:template_name, :id))
+
+                    .email-reply-button-wrapper
+                      .email-reply-buttons
+                        %button.attachment-button.attachment-label.attachment-reply
+                        %button.delete-email
+                .row
+                  .col-xs-12
+                    %input.communication-subject.reply-subject{type: 'text', value: "Talosintelligence.com File Support Request #{@file_rep_dispute.id}"}
+                .row
+                  .col-xs-12.file-wrapper-reply
+                    #file-fields
+            .row
+              .col-xs-12.email-reply-body-wrapper
+                %textarea.email-reply-body.reply-body{autofocus: true, maxlength: 64000}
+                  - if @file_rep_dispute.dispute_emails.blank?
+                    Talosintelligence.com File Support Request #{@file_rep_dispute.id}
+                    &#013;
+                    \--------------------------------------------------------------------------
+                    &#013;
+                    SHA256 Submitted: #{@file_rep_dispute.sha256_hash}
+                    &#013;
+                    Suggested Disposition: #{@file_rep_dispute.disposition_suggested}
+                    &#013;
+
+                    - if @file_rep_dispute.ticket_source_key
+                      Ticket: https://talosintelligence.com/tickets/#{@file_rep_dispute.ticket_source_key}
+
+        .row
+          .col-xs-12.text-center
+            %button.primary#send-reply
+              Send
+
+
+
+  .col-sm-3
+    -##### Check to see if duplicate file rep tickets are possible, if not we just need to check to see if a ticket is resolved
+    -#- if (@dispute.resolution != Dispute::DUPLICATE) && (@dispute.status != Dispute::RESOLVED)
+
+    %h1.notes-header Notes
+    %button.add-case-note-button#new-filerep-case-note-button
+      Add Note
+
+
+    .note-wrapper.new-case-note-row
+      .row
+        .col-xs-12
+          .note-info-item.author-notation
+            Creating new note
+          .note-info-item.note-tool-buttons
+            %button.note-save-button.new-filerep-case-note-save-button
+            %button.note-cancel-button.new-filerep-case-note-cancel-button
+            %button.note-copy-button
+      .row
+        .col-xs-12
+          .note-block.content-editable.new-case-note-textarea{contenteditable: true}
+            %pre
+
+
+
+    -@file_rep_dispute.file_rep_comments.recent_first.each do |comment|
+      .note-wrapper
+        .row
+          .col-xs-12
+            .note-info-item.author-notation
+              Written by
+              %span.author-username
+                =comment.user.cvs_username
+              = distance_of_time_in_words(Time.now.utc, comment.created_at.utc) + " ago."
+            %br.hidden-break
+            .note-info-item.time-stamp
+              = format_timestamp(comment.created_at)
+            .note-info-item.note-tool-buttons
+              %button.hidden.note-save-button.filerep-update-note{class: "note-save-button#{comment.id}", comment_id: "#{comment.id}"}
+              %button.hidden.note-cancel-button{class: "note-cancel-button#{comment.id}", comment_id: "#{comment.id}"}
+              %button.note-copy-button.clipboard.clipboard-btn{comment_id: "#{comment.id}", "data-clipboard-action"=> "copy", "data-clipboard-text"=> "#{comment.comment}"}
+              %button.filerep-note-delete-button{comment_id: "#{comment.id}"}
+
+        .row
+          .col-xs-12
+            - if comment.user.cvs_username == current_user.cvs_username
+              .note-block.content-editable{class: "note-block#{comment.id}", comment_id: "#{comment.id}", contenteditable: true}
+                %pre=comment.comment
+            - else
+              .note-block{comment_id: "#{comment.id}"}
+                %pre=comment.comment
+
+
+
+    %input{:name => "token", :type => "hidden", :value => "#{current_user.authentication_token}"}
+    %input{:type => "hidden", :name => "xml_token", :value => "#{xml_token}"}
+    %input{:name => "dispute_id", :type => "hidden", :value => "#{@file_rep_dispute.id}"}
+    %input{:name => "current_user_id", :type => "hidden", :value => "#{current_user.id}"}
+    %input{:name => "dispute_type", :type => "hidden", :value => "FileReputationDispute"}
+
+  :javascript
+    AC.Helpers.clipboard()
+    // Default sort of case history
+    $(document).ready(function(){
+      list = $("#case-history tr").get();
+      sort_function = function(a, b) {
+        return $(".case-history-datetime", b).data().dbDate.localeCompare($(".case-history-datetime", a).data().dbDate);
+      };
+      list.sort(sort_function);
+      for (var i = 0; i < list.length; i++) {
+          list[i].parentNode.appendChild(list[i]);
+      }
+
+      window.reply_body = $('.email-reply-body').val()
+    })
+
+

@@ -105,6 +105,7 @@ describe Complaint do
   let(:audit_response) { double('HTTPI::Response', code: 200, body: audit_json) }
   let(:categories_response) { double('HTTPI::Response', code: 200, body: categories_json) }
   let(:top_url_response_response) { double('HTTPI::Response', code: 200, body: top_url_response_json) }
+  let(:certainty_response) { double('HTTPI::Response', code: 200, body: [].to_json) }
   let(:bug_factory) do
     double('Bugzilla::Bug', create: { "id" => 101 })
   end
@@ -125,6 +126,10 @@ describe Complaint do
         .to receive(:post_request)
                 .with(path: '/v1/cat/rules/audit', body: anything)
                 .and_return(audit_response)
+    allow(Wbrs::Base)
+        .to receive(:post_request)
+                .with(path: '/v1/wbrsrulelib/cat/rules', body: anything)
+                .and_return(certainty_response)
     allow(Wbrs::Base)
         .to receive(:call_json_request)
                 .with(:get, '/v1/cat/categories', body: anything)
@@ -155,6 +160,10 @@ describe Complaint do
         .to receive(:post_request)
                 .with(path: '/v1/cat/rules/audit', body: anything)
                 .and_return(audit_response)
+    allow(Wbrs::Base)
+        .to receive(:post_request)
+                .with(path: '/v1/wbrsrulelib/cat/rules', body: anything)
+                .and_return(certainty_response)
     allow(Wbrs::Base)
         .to receive(:call_json_request)
                 .with(:get, '/v1/cat/categories', body: anything)

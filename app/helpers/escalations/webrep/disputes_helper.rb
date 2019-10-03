@@ -6,4 +6,12 @@ module Escalations::Webrep::DisputesHelper
       rule_hit.name
     end
   end
+
+  def format_date(timestamp)
+    timestamp.strftime("%Y-%m-%d")
+  end
+
+  def format_timestamp(timestamp)
+    timestamp.strftime("%Y-%m-%d %H:%M:%S")
+  end
 end

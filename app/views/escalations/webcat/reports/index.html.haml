@@ -1,8 +1,9 @@
+- content_for(:webcat_page) do
+  Reports
+- content_for(:webcat_icon) do
+  icon-reports
+
 .content-wrapper
-  - content_for(:webcat_page) do
-    Reports
-  - content_for(:webcat_icon) do
-    icon-reports
   .complaint-mgt-top-area
     = render "escalations/webcat/shared/telemetry"
 
