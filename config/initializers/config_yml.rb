@@ -70,16 +70,10 @@ Rails.configuration.magic_api           = ApiRequester::ApiRequester.config_of(m
 
 
 peakebridge_config = env_config.fetch('peakebridge', {})
-peakebridge                             = OpenStruct.new
-peakebridge.host                        = peakebridge_config['host']
-peakebridge.port                        = peakebridge_config['port']
-peakebridge.verify_mode                 = peakebridge_config['verify_mode'] || peakebridge_config['tls_mode'] || peakebridge_config['ssl_mode']
-peakebridge.uri_base                    = peakebridge_config['uri_base']
-peakebridge.ca_cert_file                = peakebridge_config['ca_cert_file']
-peakebridge.sources                     = peakebridge_config['sources'] || []
-peakebridge.open_timeout = peakebridge_config['timeout'] || Rails.configuration.api_master_timeout
-peakebridge.read_timeout = peakebridge_config['timeout'] || Rails.configuration.api_master_timeout
-Rails.configuration.peakebridge         = peakebridge
+raise "config.yml missing peakebridge section" if peakebridge_config.empty?
+Rails.configuration.peakebridge       = ApiRequester::ApiRequester.config_of(peakebridge_config)
+pb_sources = peakebridge_config.fetch('sources', {})
+Rails.configuration.peakebridge.sources = pb_sources
 
 
 raise "config.yml missing perl section" unless env_config['perl']
@@ -95,7 +89,6 @@ Rails.configuration.rule2yaml_path      = Rails.root.join(env_config['perl']['ru
 rep_api = env_config.fetch('rep_api', nil)
 raise 'config.yml missing rep_api section' unless rep_api
 Rails.configuration.rep_api             = ApiRequester::ApiRequester.config_of(rep_api)
-
 
 sds_config = env_config.fetch('sds', nil)
 raise 'config.yml missing SDS section' unless sds_config
@@ -139,7 +132,6 @@ sandbox_api_keys = file_reputation_sandbox.fetch('api_keys', {})
 sandbox_api_keys[FileReputationDispute::SANDBOX_KEY_AC_REFRESH] ||=
     sandbox_api_keys[FileReputationDispute::SANDBOX_KEY_AC_FORM]
 Rails.configuration.file_reputation_sandbox.api_keys = sandbox_api_keys
->>>>>>> master
 
 reversing_labs_config = env_config['reversing_labs']
 raise 'config.yml missing ReversingLabs section' unless reversing_labs_config

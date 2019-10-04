@@ -49,7 +49,6 @@ Feature: User Accounts
 
   @javascript
   Scenario: A non-manager user can go to the users index page and see only their co-workers.
-  Assigned bugs should be on users show page.
   A non-manager cannot get to the relationships section.
     Given a user with role "analyst" exists and is logged in
     And the following users exist
@@ -57,7 +56,6 @@ Feature: User Accounts
       | 2  | rainbows@email.com         | rainbow_b    | Rainbow Brite       |           | rainbow_b    |
       | 3  | hclinton@email.com         | h_clinton    | Hillary Clinton     |  2        | h_clinton    |
       | 4  | dtrump@email.com           | d_drumph     | Donald Trump        |           | d_drumph     |
-
     And a user with id "1" has a parent with id "2"
 
     Then I wait for "3" seconds
@@ -66,17 +64,12 @@ Feature: User Accounts
     And  I should not see "d_drumph"
     And  I should see a user search form
     Then I click "h_clinton"
-    And  I should see "[BP][NSS] fixed bug"
-    And  I should not see "[TELUS] broken bug"
     Then I goto "/escalations/users/4"
     And  I should see "You are not authorized to view that user."
-    Then I goto "/escalations/users/1"
-    And  I should see "[TELUS] broken bug"
     And  I goto "/escalations/users/1/relationships"
     And  I should see "You must be a manager to access that page."
 
   @javascript
-
   Scenario: A non-manager non-admin user cannot edit the role for any user.
     Given a user with role "analyst" exists and is logged in
     And the following users exist
