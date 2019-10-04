@@ -19,7 +19,8 @@ $ ->
         localStorage.webcat_search_name = ''
         localStorage.webcat_search_conditions = JSON.stringify({value:webcat_search_string})
       refresh_url()
-
+  $('#filter-cases-list a').on 'click', (e)->
+    localStorage.setItem('webcat_reset_page', true)
   window.set_webcat_advanced = () ->
     # creating form object from array made from advanced dropdown form
     form = {}
@@ -118,6 +119,7 @@ $ ->
       window.location.replace( new_url + href )
     if !href && typeof parseInt(url_check) == 'number'
       window.location.replace('/escalations/webcat/complaints')
+    localStorage.setItem('webcat_reset_page', true)
 
   refresh_localStorage = () ->
     localStorage.removeItem('webcat_search_type')
@@ -252,6 +254,12 @@ $ ->
               refresh_localStorage()
               refresh_url()
           drawCallback: ( settings ) ->
+            if localStorage.webcat_reset_page
+              localStorage.removeItem('webcat_reset_page')
+
+              setTimeout () ->
+                $('#complaints-index').DataTable().page(0).draw( true )
+              , 100
             if localStorage.webcat_search_name
               {webcat_search_type, webcat_search_name, webcat_search_conditions } = localStorage
               last_tr = $('.webcat-named-search-list .saved-search').last().text()
