@@ -236,7 +236,7 @@ $ ->
 
   build_complaints_table = () ->
         complaint_table = $('#complaints-index').DataTable(
-          lengthMenu: [[50, 100, 150], [50, 100, 150]]
+          lengthMenu: [[25, 50, 100, 150, 200], [25, 50, 100, 150, 200]]
           processing: true
           serverSide: true
           stateSave: true
@@ -415,7 +415,7 @@ $ ->
                     tags = data.substring( 1, data.length-1 ).replace(/&quot;/g,'');
                     tag_list = tags.split(',').map ( tag ) -> return tag.trim();
 
-                    if tag_list.length > 1
+                    if tag_list.length >= 1
                       tag_items = ''
                       tag_list = tag_list.filter ( tag, index )-> return tag_list.indexOf( tag ) == index && tag != ''
                       for tag in tag_list

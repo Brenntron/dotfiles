@@ -10,6 +10,10 @@ Given(/^I fill in "(.*?)" with "(.*?)"$/) do |field_label, value|
   fill_in field_label, :with => value
 end
 
+Given(/^I fill in element, "(.*?)" with "(.*?)"$/) do |identifier, value|
+  page.find(identifier).set(value)
+end
+
 Given(/^I fill in "(.*?)" with "(.*?)" and "(.*?)" separated by blank lines$/) do |field_label, value, value_2|
   fill_in field_label, :with => value + "\n" + value_2
 end
@@ -25,6 +29,18 @@ When(/^I click "(.*?)"$/) do |target|
     rescue Capybara::ElementNotFound => e
       page.find("#{target}").click
     end
+end
+When(/^I select row "(.*?)"$/) do |target|
+  page.execute_script("$('##{target}').addClass('selected')")
+end
+
+Then (/^a new window should be opened$/) do
+  raise("Page did not open") if page.driver.browser.window_handles.count <= 1
+end
+
+When (/^I switch to the new window$/) do
+  popup = page.driver.browser.window_handles.last
+  page.driver.browser.switch_to.window(popup)
 end
 
 When(/^I click first element of class "(.*?)"$/) do |target|

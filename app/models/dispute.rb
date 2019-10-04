@@ -86,7 +86,7 @@ class Dispute < ApplicationRecord
       ticket_type = 'ew'
     end
 
-    customer = Customer.where(name: 'Dispute Analyst').first
+    customer = Customer.where(name: 'Dispute Analyst').first_or_create(name: 'Dispute Analyst')
 
     summary = "New WebRep Dispute generated at #{DateTime.now.utc.strftime("%Y-%m-%d %H:%M")}"
 
@@ -104,21 +104,22 @@ class Dispute < ApplicationRecord
         'priority' => priority,
         'classification' => 'unclassified',
     }
-
+    new_dispute = nil
+    
     bug_proxy = bugzilla_rest_session.create_bug(bug_attrs)
-
-    new_dispute = Dispute.create!(id: bug_proxy.id,
-                                     user_id: user.id,
-                                     priority: priority,
-                                     submission_type: ticket_type,
-                                     submitter_type: 'Internal',
-                                     status: status,
-                                     customer_id: customer.id,
-                                     case_opened_at: Time.now)
-
-    ips_urls.split(' ').each do |ip_url|
-      if DisputeEntry.check_for_duplicates(ip_url) == false
-        DisputeEntry.create_dispute_entry(new_dispute, ip_url, status)
+    ActiveRecord::Base.transaction do
+      new_dispute = Dispute.create!(id: bug_proxy.id,
+                                       user_id: user.id,
+                                       priority: priority,
+                                       submission_type: ticket_type,
+                                       submitter_type: 'Internal',
+                                       status: status,
+                                       customer_id: customer.id,
+                                       case_opened_at: Time.now)
+      ips_urls.each do |ip_url|
+        if DisputeEntry.check_for_duplicates(ip_url) == false
+          DisputeEntry.create_dispute_entry(new_dispute, ip_url, status)
+        end
       end
     end
 
@@ -1151,7 +1152,7 @@ class Dispute < ApplicationRecord
       end
       dispute_packet[:dispute_entries] = dispute.dispute_entries.map{ |de| {entry: de, wbrs_rule_hits: de.dispute_rule_hits.select {|hit| hit.rule_type == "WBRS"}.pluck(:name), sbrs_rule_hits: de.dispute_rule_hits.select {|hit| hit.rule_type == "SBRS"}.pluck(:name)}}
       dispute_packet[:submission_type] = dispute.submission_type
-      dispute_packet[:d_entry_preview] = "<span class='dispute_entry_content_first'>" + dispute_packet[:dispute_entry_content].first.to_s + "</span><span class='dispute-count'>" + dispute_packet[:dispute_count] + "</span>"
+      dispute_packet[:d_entry_preview] = dispute_packet[:dispute_entry_content].first.to_s + "<span class='dispute-count'>" + dispute_packet[:dispute_count] + "</span>"
       case
         when dispute.assignee == 'Unassigned'
           dispute_packet[:assigned_to] =

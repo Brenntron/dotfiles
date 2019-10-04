@@ -38,7 +38,7 @@ class Escalations::Webrep::DisputesController < ApplicationController
                            'Case ID',
                            'Status',
                            'Entry Count',
-                           'Owner',
+                           'Assignee',
                            'Customer Name',
                            'Customer Email',
                            'Customer Company',
@@ -105,6 +105,10 @@ class Escalations::Webrep::DisputesController < ApplicationController
     @entries.each do |entry|
       if entry.dispute_entry_preload.blank?
         Preloader::Base.fetch_all_api_data(entry.hostlookup, entry.id)
+      end
+
+      if entry.primary_category.blank?
+        entry.primary_category = DisputeEntry.get_primary_category(entry.hostlookup)
       end
     end
 
@@ -303,7 +307,7 @@ class Escalations::Webrep::DisputesController < ApplicationController
               :open_team_tickets => 'Open Tickets',
               :closed_team_tickets => 'Closed Tickets',
               :average_time_to_close_tickets_by_owner => 'Average Time to Close Tickets',
-              :ticket_resolution_by_owner => 'Ticket Resolution by Owner',
+              :ticket_resolution_by_owner => 'Ticket Resolution by Assignee',
               :rule_hits_for_false_positive_resolutions => 'Rule Hits for False Positive Resolutions',
               :total_ticket_entries_closed => 'Total Ticket Entries Closed',
               :ticket_submitted_by_submitter_type => 'Tickets Submitted by Submitter Type',
@@ -324,16 +328,16 @@ class Escalations::Webrep::DisputesController < ApplicationController
 
           open_team_tickets_headers = [
               'Case ID',
-              'Owner',
+              'Assignee',
               'Submitter Type',
               'Ticket Type',
               'Priority',
               'Dispute Preview',
               'Last Email Date',
               'Entry Count']
-          closed_team_tickets_headers = ['Case ID', 'Owner', 'Submitter Type', 'Ticket Type', 'Priority', 'Dispute Preview', 'Last Email Date', 'Email Count', 'Time to Close', 'Entry Count']
-          average_time_to_close_by_owner_headers = ['Owner', 'Time (hrs)']
-          ticket_resolution_by_owner_headers = ['Owner', 'Fixed FP', 'Fixed FN', 'Unchanged', 'Other']
+          closed_team_tickets_headers = ['Case ID', 'Assignee', 'Submitter Type', 'Ticket Type', 'Priority', 'Dispute Preview', 'Last Email Date', 'Email Count', 'Time to Close', 'Entry Count']
+          average_time_to_close_by_owner_headers = ['Assignee', 'Time (hrs)']
+          ticket_resolution_by_owner_headers = ['Assignee', 'Fixed FP', 'Fixed FN', 'Unchanged', 'Other']
           rule_hits_for_false_positive_resolutions_headers = ['Rules', 'Rule Hits']
           total_ticket_entries_closed_headers = ['Date', 'Web', 'Email', 'Web_Email', 'Total']
           ticket_submitted_by_submitter_type_headers = ['Date', 'Customer', 'Guest']
@@ -742,7 +746,7 @@ class Escalations::Webrep::DisputesController < ApplicationController
                        'Case ID',
                        'Status',
                        'Entry Count',
-                       'Owner',
+                       'Assignee',
                        'Customer Name',
                        'Customer Email',
                        'Customer Company',

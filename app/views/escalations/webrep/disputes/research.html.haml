@@ -218,7 +218,7 @@
                           = entry.hostlookup
                     %td
                       %label Category
-                      - unless entry[:primary_category].nil?
+                      - if entry[:primary_category] != "{}"
                         = entry[:primary_category]
                       - else
                         %span.missing-data No Data

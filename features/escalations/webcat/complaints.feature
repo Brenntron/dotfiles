@@ -2,6 +2,9 @@ Feature: Webcat complaints
   In order to manage web cat complaints
   I will provide a complaints interface
 
+  Background:
+    Given a guest company exists
+
   #TODO: we need to update the user role on these tests
 
   @javascript
@@ -26,8 +29,11 @@ Feature: Webcat complaints
     And I fill in "customers" with "Cisco:Talos Person:talos@cisco.com"
     And I fill in selectized with "urgent"
     And I click "Create"
-    And I wait for "15" seconds
+    And I wait for "5" seconds
     And I should see "COMPLAINT CREATED"
+    And I click ".close"
+    Then I wait for "5" seconds
+    And I should see "urgent"
 
   @javascript
   Scenario: A user must review a high telemetry site
@@ -58,6 +64,21 @@ Feature: Webcat complaints
     And I should not see "commit"
     When I click "#submit_changes_1"
     Then I should not see "commit"
+
+  @javascript
+  Scenario: a user can open selected ips in new tabs
+    Given a user with role "webcat user" exists and is logged in
+    And a complaint entry with trait "not_important" exists
+    And a complaint entry preload exists
+    And I goto "/escalations/webcat/complaints?f=ALL"
+    Then I select row "1"
+    When I click "Open Selected"
+    And I wait for "2" seconds
+    Then a new window should be opened
+    When I switch to the new window
+    And I should see "Company news"
+
+
 
   @javascript
   Scenario: a user can take a complaint
@@ -391,8 +412,21 @@ Feature: Webcat complaints
     And I click "#categorize-urls"
     And I fill in "url_1" with "chabad.org"
     And I click ".current-categories-button"
-    Then I wait for "15" seconds
-    Then I should see "Religion"
+    Then I wait for "5" seconds
+
+  @javascript
+  Scenario: a users tries to lookup categories for a URL that has a categorized subdomain and a uncategorized domain
+    Given a user with role "webcat user" exists and is logged in
+    When I goto "/escalations/webcat/complaints?f=ALL"
+    And I click "#categorize-urls"
+    And I fill in "url_1" with "trial.superduperreallyfakeamazing.com"
+    And I click ".current-categories-button"
+    And I wait for "5" seconds
+    Then I should see content "Religion" within ".item"
+    And I fill in "url_1" with "superduperreallyfakeamazing.com"
+    And I click ".current-categories-button"
+    And I wait for "5" seconds
+    Then I should not see div element with class ".item"
 
   @javascript
   Scenario: a users tries to drop current categories on a URL
@@ -437,3 +471,47 @@ Feature: Webcat complaints
     And I click ".expand-row-button-inline"
     And I wait for "8" seconds
     Then I should see content "Nature" within ".sds_category"
+
+
+  @javascript
+  Scenario: when a complaint in the WBNP queue is resolved,
+            a bridge message should not be sent
+    Given a user with role "webcat user" exists and is logged in
+    And the following complaints exist:
+      | ticket_source | id | status |
+      | RuleUI        | 1  | NEW    |
+    And the following complaint entries exist:
+      | uri             | domain        | subdomain | path | entry_type | complaint_id |
+      | baumpflege.ac   | baumpflege.ac |           |      | URI/DOMAIN |  1           |
+    And a complaint entry preload exists
+    And I goto "/escalations/webcat/complaints?f=ALL"
+    And I wait for "5" seconds
+    And I click ".expand-row-button-inline"
+    And I wait for "5" seconds
+    And I click "#unchanged1"
+    And I click "#submit_changes_1"
+    And I wait for "5" seconds
+    Then I should see "COMPLETED"
+    And "0" bridge message should be in the delayed job queue
+
+
+  @javascript
+  Scenario: when a complaint in the talos-intelligence queue is resolved,
+  a bridge message should be sent via delayed jobs
+    Given a user with role "webcat user" exists and is logged in
+    And the following complaints exist:
+      | ticket_source             | id | status |
+      | talos-intelligence        | 1  | NEW    |
+    And the following complaint entries exist:
+      | uri             | domain        | subdomain | path | entry_type | complaint_id |
+      | baumpflege.ac   | baumpflege.ac |           |      | URI/DOMAIN |  1           |
+    And a complaint entry preload exists
+    And I goto "/escalations/webcat/complaints?f=ALL"
+    And I wait for "5" seconds
+    And I click ".expand-row-button-inline"
+    And I wait for "5" seconds
+    And I click "#unchanged1"
+    And I click "#submit_changes_1"
+    And I wait for "5" seconds
+    Then I should see "COMPLETED"
+    And "1" bridge message should be in the delayed job queue

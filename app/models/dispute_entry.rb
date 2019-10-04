@@ -61,9 +61,11 @@ class DisputeEntry < ApplicationRecord
         sbrs_api_rulehit_response =  Sbrs::GetSbrs.get_sbrs_rules_for_ip(ip_url)
         wbrs_prefix_response = ComplaintEntry.get_category(params['ip'])
 
+
+
         new_dispute_entry.ip_address = ip_url
         new_dispute_entry.entry_type = "IP"
-        new_dispute_entry.primary_category = wbrs_prefix_response
+        new_dispute_entry.primary_category = get_primary_category(ip_url)
 
 
         # Populate WBRS/SBRS Scores
@@ -94,7 +96,7 @@ class DisputeEntry < ApplicationRecord
         new_dispute_entry.domain = url_parts[:domain]
         new_dispute_entry.path = url_parts[:path]
 
-        new_dispute_entry.primary_category = wbrs_prefix_response
+        new_dispute_entry.primary_category = get_primary_category(ip_url)
 
         # Populate WBRS/SBRS Scores
 
@@ -133,6 +135,31 @@ class DisputeEntry < ApplicationRecord
     end
 
 
+  end
+
+  def self.get_primary_category(uri)
+    prefix_results = Wbrs::Prefix.where({:urls => [uri]})
+
+    return {} unless prefix_results.any?
+
+    parsed_uri = Complaint.parse_url(uri)
+    parsed_uri['path'] = '' unless parsed_uri['path'].present?
+    parsed_uri['subdomain'] = '' unless parsed_uri['subdomain'].present?
+
+    final_results = []
+
+    prefix_results.each do |prefix_result|
+      if ((prefix_result.subdomain == parsed_uri['subdomain']) || (parsed_uri['subdomain'] == 'www')) && prefix_result.path == parsed_uri['path']
+        final_results << prefix_result
+      end
+    end
+
+    return {} unless final_results.any?
+
+    # category_ids = final_results.first.categories.sort_by(&:confidence).map {|category| category.category_id}
+    category_names = final_results.first.categories.sort_by(&:confidence).map {|category| category.descr}
+    category_names[0]
+    # {category_ids: category_ids, category_names: category_names}
   end
 
   def self.is_ip?(ip)
@@ -366,7 +393,7 @@ class DisputeEntry < ApplicationRecord
   end
 
   def wbrs_list_type
-    @wbrs_list_type ||= wbrs_xlist.map{ |wlbl| wlbl.list_type }.join(', ')
+    @wbrs_list_type ||= wbrs_xlist.select{ |wlbl| wlbl.state == "active" && wlbl.url == self.uri}.map{ |wlbl| wlbl.list_type }.join(', ')
   end
 
   def wbrs_xlist
@@ -701,13 +728,25 @@ class DisputeEntry < ApplicationRecord
       entries.each do |entry|
         entry.class.module_eval { attr_accessor :consolidated_wlbl_strings}
         entry.consolidated_wlbl_strings = entry.wbrs_list_type
+        entry.primary_category = DisputeEntry.get_primary_category(entry.hostlookup)
       end
 
       unique_entries = entries.uniq{|e| e.hostlookup}
       duplicate_entries = entries - unique_entries
 
       duplicate_entries.each do |duplicate_entry|
-        unique_entries.select{ |e| e.hostlookup == duplicate_entry.hostlookup}.map{ |e| e.consolidated_wlbl_strings << ", " + duplicate_entry.consolidated_wlbl_strings}
+        
+        unique_entries.select{ |e| e.hostlookup == duplicate_entry.hostlookup}.map do |e|
+
+          if e.consolidated_wlbl_strings.blank? && duplicate_entry.consolidated_wlbl_strings.present?
+            e.consolidated_wlbl_strings << duplicate_entry.consolidated_wlbl_strings
+          elsif e.consolidated_wlbl_strings.present? && duplicate_entry.consolidated_wlbl_strings.present?
+            e.consolidated_wlbl_strings << ", " + duplicate_entry.consolidated_wlbl_strings
+          end
+
+        end
+
+
       end
 
       #entries = unique_entries

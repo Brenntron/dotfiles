@@ -1,4 +1,7 @@
 -#view single record
+- unless @file_rep_dispute.customer.nil? || @file_rep_dispute.customer.company.nil?
+  %input{type:'hidden', name: 'filerep-dispute-customer-company-name', value: "#{@file_rep_dispute.customer.company.name}"}
+
 .row
   .col-xs-12.col-sm-6
     .content-wrapper.top-case-info.ticket-overview-wrapper
@@ -45,7 +48,7 @@
                       %input.fr-ticket-status-radio{type: 'radio', name: 'file-dispute-status', id: 'file-status-closed', value: 'RESOLVED_CLOSED'}
                       %label.radio-label.fr-ticket-status-radio-label{for:'file-status-closed'} Resolved / Closed
                       .dropdown-menu#show-ticket-resolution-submenu
-                        .col-xs-6.submenu-left-wrapper
+                        .col-xs-4.submenu-left-wrapper#filerep-resolution-selector
                           .submenu-header
                             Ticket Resolution
                           %ul
@@ -67,7 +70,7 @@
                             %li
                               %input.ticket-resolution-radio{type: 'radio', name: 'dispute-resolution', id: "#{Dispute::STATUS_RESOLVED_OTHER}", value: "#{Dispute::STATUS_RESOLVED_OTHER}"}
                               %label.ticket-res-radio-label.radio-label{for: "#{Dispute::STATUS_RESOLVED_OTHER}"} Other
-                        .col-xs-6.submenu-right-wrapper
+                        .col-xs-8.submenu-right-wrapper
                           .resolution-comment-wrapper
                             %label.content-label-sm
                               Comment

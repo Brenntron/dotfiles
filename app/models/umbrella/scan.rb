@@ -13,4 +13,5 @@ class Umbrella::Scan
     request = new_request(address)
     HTTPI.post(request)
   end
+
 end

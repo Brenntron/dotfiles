@@ -16,5 +16,5 @@ class Bridge::DisputeCreatedEvent < Bridge::BaseMessage
                     ac_id: ac_id
                     })
   end
-  handle_asynchronously :post, :queue => "dispute_created"
+  handle_asynchronously :post, :queue => "dispute_created", :priority => 1
 end
