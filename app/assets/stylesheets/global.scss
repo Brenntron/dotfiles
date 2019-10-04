@@ -631,7 +631,15 @@ button {
   color: $content-label-color !important;
   font-size: 7pt;
 }
-
+.tg-data-run{
+  display: none;
+  width: 245px;
+  margin: 60px auto;
+  .data-report-wrapper{
+    display: flex;
+    width: 100%;
+  }
+}
 .toolbar-button-label {
   background-repeat: no-repeat;
   background-size: 20px 20px;

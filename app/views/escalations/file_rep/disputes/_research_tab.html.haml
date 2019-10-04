@@ -170,11 +170,14 @@
     .tg-data-missing.text-center
       %span.sample-present-false
       %div.data-report-wrapper
-        %span.missing-data Not in ThreatGrid
+        %span.missing-data#threatgrid-status-message Not in ThreatGrid
         %br
         %button.primary#send-to-threatgrid
           Push Sample to ThreatGrid
-
+    .tg-data-run.text-center
+      %div.data-report-wrapper.missing-data
+        Sample is running.
+        %br Running a sample can take 10 minutes or longer.
 
   .col-xs-12.col-sm-4#reversing-labs-report-wrapper
     %h2.research-data-header.reversinglab-header Reversing Labs
