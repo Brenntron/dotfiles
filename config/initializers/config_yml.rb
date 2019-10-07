@@ -70,10 +70,16 @@ Rails.configuration.magic_api           = ApiRequester::ApiRequester.config_of(m
 
 
 peakebridge_config = env_config.fetch('peakebridge', {})
-raise "config.yml missing peakebridge section" if peakebridge_config.empty?
-Rails.configuration.peakebridge       = ApiRequester::ApiRequester.config_of(peakebridge_config)
-pb_sources = peakebridge_config.fetch('sources', {})
-Rails.configuration.peakebridge.sources = pb_sources
+peakebridge                             = OpenStruct.new
+peakebridge.host                        = peakebridge_config['host']
+peakebridge.port                        = peakebridge_config['port']
+peakebridge.verify_mode                 = peakebridge_config['verify_mode'] || peakebridge_config['tls_mode'] || peakebridge_config['ssl_mode']
+peakebridge.uri_base                    = peakebridge_config['uri_base']
+peakebridge.ca_cert_file                = peakebridge_config['ca_cert_file']
+peakebridge.sources                     = peakebridge_config['sources'] || []
+peakebridge.open_timeout = peakebridge_config['timeout'] || Rails.configuration.api_master_timeout
+peakebridge.read_timeout = peakebridge_config['timeout'] || Rails.configuration.api_master_timeout
+Rails.configuration.peakebridge         = peakebridge
 
 
 raise "config.yml missing perl section" unless env_config['perl']
