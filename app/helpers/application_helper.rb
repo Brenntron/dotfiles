@@ -59,6 +59,10 @@ module ApplicationHelper
   end
 
 
+  def is_rule_user?
+    current_user&.has_role?(['admin', 'analyst', 'committer', 'build coordinator', 'manager'])
+  end
+
   def role_options_for(user)
     if user.has_role?('admin')
       Role.all

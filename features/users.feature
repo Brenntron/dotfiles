@@ -36,6 +36,40 @@ Feature: User Accounts
   ### Scenarios User management ###
 
   @javascript
+
+  Scenario: A regular user should see a not found flash message
+    Then pending
+    Given a user with role "analyst" exists and is logged in
+    Given I wait for "3" seconds
+    When I goto "/escalations/users/1001"
+    Then I should see could not find user "1001" flash massage
+    When I goto "/escalations/users/malformed"
+    Then I should see could not find user "malformed" flash massage
+
+
+  @javascript
+  Scenario: A non-manager user can go to the users index page and see only their co-workers.
+  A non-manager cannot get to the relationships section.
+    Given a user with role "analyst" exists and is logged in
+    And the following users exist
+      | id | email                      | cvs_username | display_name        | parent_id | cec_username |
+      | 2  | rainbows@email.com         | rainbow_b    | Rainbow Brite       |           | rainbow_b    |
+      | 3  | hclinton@email.com         | h_clinton    | Hillary Clinton     |  2        | h_clinton    |
+      | 4  | dtrump@email.com           | d_drumph     | Donald Trump        |           | d_drumph     |
+    And a user with id "1" has a parent with id "2"
+
+    Then I wait for "3" seconds
+    And  I goto "/escalations/users"
+    And  I should see "h_clinton"
+    And  I should not see "d_drumph"
+    And  I should see a user search form
+    Then I click "h_clinton"
+    Then I goto "/escalations/users/4"
+    And  I should see "You are not authorized to view that user."
+    And  I goto "/escalations/users/1/relationships"
+    And  I should see "You must be a manager to access that page."
+
+  @javascript
   Scenario: A non-manager non-admin user cannot edit the role for any user.
     Given a user with role "analyst" exists and is logged in
     And the following users exist
@@ -47,7 +81,7 @@ Feature: User Accounts
     And a user with id "1" has a parent with id "2"
 
     Then I wait for "3" seconds
-    And  I goto "/users"
+    And  I goto "escalations/users"
     Then I click "h_clinton"
     And  I should not see "edit-button"
 
@@ -69,7 +103,7 @@ Feature: User Accounts
     And a user with id "1" has a parent with id "2"
 
     Then I wait for "3" seconds
-    And  I goto "/users/3"
+    And  I goto "escalations/users/3"
     Then I click the button with data-target "#roleModal_3"
     And I wait for "1" seconds
     And I should see "Edit User H_clinton"
@@ -96,7 +130,7 @@ Feature: User Accounts
     And a user with id "1" has a parent with id "3"
 
     Then I wait for "3" seconds
-    And  I goto "/users/3"
+    And  I goto "escalations/users/3"
     Then I click the button with data-target "#roleModal_3"
     And I wait for "1" seconds
     And I should see "Edit User H_clinton"
@@ -119,7 +153,7 @@ Feature: User Accounts
     And a user with id "1" has a parent with id "5"
 
     Then I wait for "3" seconds
-    And  I goto "/users"
+    And  I goto "escalations/users"
     And  I should see "h_clinton"
     And  I should see "d_drumph"
     And  I should see "rainbow_b"
@@ -135,7 +169,7 @@ Feature: User Accounts
       | 5  | gjohns@email.com     | g_johnson     | Gary Johnson        |           | g_johnson    |
       | 6  | tbeary@email.com     | t_bear        | Teddy Bear          |  5        | t_bear       |
 
-    And  I goto "/users"
+    And  I goto "escalations/users"
     And  I should see "h_clinton"
     And  I click "#add_user_button_2"
     And  "Hillary Clinton (h_clinton)" should not be in the "users_for_2" dropdown list
@@ -160,7 +194,7 @@ Feature: User Accounts
       | committer      |
 
     Then I wait for "3" seconds
-    And  I goto "/users"
+    And  I goto "escalations/users"
     And  I should see "h_clinton"
     Then I click the button with data-target "#roleModal_3"
     Then I wait for "1" seconds
@@ -195,7 +229,7 @@ Feature: User Accounts
       | analyst        |
       | committer      |
 
-    And  I goto "/users"
+    And  I goto "escalations/users"
     And  I should see "h_clinton"
     Then I click the button with data-target "#roleModal_3"
     Then I wait for "1" seconds
@@ -204,7 +238,7 @@ Feature: User Accounts
     Then I click "Save"
     Then I should see "h_clinton updated successfully."
     Then I wait for "3" seconds
-    And  I goto "/users"
+    And  I goto "escalations/users"
     And  I click "#add_user_button_3"
     And  "Hillary Clinton (h_clinton)" should not be in the "users_for_3" dropdown list
     And  I select "Gary Johnson (g_johnson)" from "users_for_3"
@@ -225,7 +259,7 @@ Feature: User Accounts
       | davecarr@cisco.com |
       | porsche@cisco.com  |
       | bentley@cisco.com  |
-    When I goto "/users"
+    When I goto "escalations/users"
     Given I fill in "user_search_name" with "CAR"
     When I hit enter within "#user_search_name"
     Then I see a user_searches result for name "carlzipp@cisco.com"
@@ -243,7 +277,7 @@ Feature: User Accounts
       | email2@cisco.com | David Carr          |
       | email3@cisco.com | Porsche Bugatti     |
       | email4@cisco.com | Bentley Ford        |
-    When I goto "/users"
+    When I goto "escalations/users"
     Given I fill in "user_search_name" with "CAR"
     When I hit enter within "#user_search_name"
     Then I see a user_searches result for name "Carl Zipp"
@@ -261,7 +295,7 @@ Feature: User Accounts
       | email2@cisco.com | davecarr     |
       | email3@cisco.com | porsche      |
       | email4@cisco.com | bentley      |
-    When I goto "/users"
+    When I goto "escalations/users"
     Given I fill in "user_search_name" with "CAR"
     When I hit enter within "#user_search_name"
     Then I see a user_searches result for name "email1@cisco.com"
@@ -279,7 +313,7 @@ Feature: User Accounts
       | email2@cisco.com | davecarr     |
       | email3@cisco.com | porsche      |
       | email4@cisco.com | bentley      |
-    When I goto "/users"
+    When I goto "escalations/users"
     Given I fill in "user_search_name" with "CAR"
     When I hit enter within "#user_search_name"
     Then I see a user_searches result for name "email1@cisco.com"
@@ -297,7 +331,7 @@ Feature: User Accounts
       | email2@cisco.com | davecarr       |
       | email3@cisco.com | porsche        |
       | email4@cisco.com | bentley        |
-    When I goto "/users"
+    When I goto "escalations/users"
     Given I fill in "user_search_name" with "CAR"
     When I hit enter within "#user_search_name"
     Then I see a user_searches result for name "email1@cisco.com"
@@ -332,4 +366,3 @@ Feature: User Accounts
 #    And I go to "/admin"
 #    Then I should not see "Admin Page"
 #    And I should see "You are not authorized"
-

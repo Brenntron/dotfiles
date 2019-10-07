@@ -46,7 +46,7 @@
                 %br
                 =comment.created_at.strftime("%H:%M:%S")
           -@versioned_items.each do |item|
-            -item.versions.each do |version|
+            -item&.versions.each do |version|
               %tr.version-row
                 %td.alt-col.icon-col
                   %span.case-history-icon.disp-status-icon{:data => {:history_kind => "version"}}
@@ -62,7 +62,7 @@
                 %td.alt-col.case-history-datetime{:data => {:db_date => version.created_at}}
                   = format_date(version.created_at)
                   %br
-                  =version.created_at.strftime("%H:%M:%S")
+                  =version&.created_at.strftime("%H:%M:%S")
 
   .col-sm-6.border-section
     .row
@@ -96,15 +96,15 @@
 
         .email-response-button-wrapper
           .email-response-buttons
-            - if @file_rep_dispute.dispute_emails.blank?
+            - if @file_rep_dispute&.dispute_emails.blank?
               %button.reply-button.first-reply-button.esc-tooltipped{title: 'Begin email chain with customer'}
             - else
               %button.reply-button
               %button.forward-button
           %span.email-datetime
-            =@file_rep_dispute.created_at.strftime("%Y-%m-%d")
+            =@file_rep_dispute&.created_at.strftime("%Y-%m-%d")
             %br
-            =@file_rep_dispute.created_at.strftime("%H:%M:%S")
+            =@file_rep_dispute&.created_at.strftime("%H:%M:%S")
     .row
       .col-xs-12.email-msg-body
         %pre.email-msg-content
@@ -305,7 +305,7 @@
             .note-info-item.author-notation
               Written by
               %span.author-username
-                =comment.user.cvs_username
+                =comment&.user&.cvs_username
               = distance_of_time_in_words(Time.now.utc, comment.created_at.utc) + " ago."
             %br.hidden-break
             .note-info-item.time-stamp
@@ -318,7 +318,7 @@
 
         .row
           .col-xs-12
-            - if comment.user.cvs_username == current_user.cvs_username
+            - if comment&.user&.cvs_username == current_user.cvs_username
               .note-block.content-editable{class: "note-block#{comment.id}", comment_id: "#{comment.id}", contenteditable: true}
                 %pre=comment.comment
             - else
