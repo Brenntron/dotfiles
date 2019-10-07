@@ -20,7 +20,7 @@
       .container-fluid
         .row
           - if current_user
-            %a{href: "/users/#{current_user[:id]}"}
+            %a{href: "/escalations/users/#{current_user[:id]}"}
               %p.login-area
                 %span.login-label
                   %strong.current_user= current_user[:display_name]
