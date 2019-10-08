@@ -238,8 +238,12 @@ module API
                 result = Threatgrid::Search.data(permitted_params[:sha256_hash])
 
                 status = "complete"
-                if result["data"]["items"].first["item"]["state"] != "succ"
-                  status = "incomplete"
+                begin
+                  if result["data"]["items"].first["item"]["state"] != "succ"
+                    status = "incomplete"
+                  end
+                rescue
+                  status = "norunning"
                 end
 
                 {:status => status}.to_json
