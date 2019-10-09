@@ -31,7 +31,7 @@ window.refresh_research_data = (sha256_hash) ->
 # Resubmit hash to all the analysis engines
 # services: sandbox threatgrid reversinglabs
 # space delimited
-window.evaluate_file = ()  ->
+window.evaluate_file =  (services ) ->
   sha256_hash = $('#sha256_hash')[0].innerText
   services = []
   $('#resubmit-to-resources input:checked').each ->
@@ -39,17 +39,13 @@ window.evaluate_file = ()  ->
   $('#loader-modal').modal({
     keyboard: false,
   })
-  data = {
-      sha256_hash: sha256_hash,
-      service: services
-    }
   std_msg_ajax(
     method: 'POST'
     url: "/escalations/api/v1/escalations/file_rep/disputes/submit_for_evaluation/"
-    data: data
+    data: {sha256_hash: sha256_hash, service: services}
+    success_reload: false
     success: (response) ->
       $('#loader-modal').modal('hide')
-
       std_msg_success('Resubmission Successful', ['Successfully resubmitted to selected services: ' + formatList( services ) ], reload: true)
     error: (response) ->
       $('#loader-modal').modal('hide')
@@ -57,14 +53,6 @@ window.evaluate_file = ()  ->
   )
 formatList = (list) ->
   list = list.trim().split(/[ ,]+/)
-  for list_item, i in list
-    switch list_item
-      when 'sandbox'
-        list[i] = 'Talos Sandbox'
-      when 'threatgrid'
-        list[i] = 'Threat Grid'
-      when 'reversinglab'
-        list[i] = 'Reversing Labs'
   if list.length == 2
     list = list.join(' and ')
   else
