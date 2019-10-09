@@ -172,7 +172,7 @@
       %div.data-report-wrapper
         %span.missing-data#threatgrid-status-message Not in ThreatGrid
         %br
-        %button.primary#send-to-threatgrid
+        %button.primary#send-to-threatgrid{ onclick:'window.send_to_threadgrid()' }
           Push Sample to ThreatGrid
     .tg-data-run.text-center
       %div.data-report-wrapper.missing-data

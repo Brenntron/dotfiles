@@ -12,15 +12,7 @@ $ ->
         std_api_error(response, "There was a problem retrieving data from the Sample Zoo", reload: false)
     )
 
-  $('.rerun-dataset-cb').on 'change', ->
-    checked = $('.rerun-dataset-cb:checked').length;
-    button = '#file-rep-resubmit-evaluate-button'
-    if checked > 0
-      $( button ).attr('disabled', false)
-      $( button + '.esc-tooltipped').tooltipster('enable')
-    else
-      $( button ).attr('disabled', true)
-      $( button + '.esc-tooltipped').tooltipster('disable')
+
 
 ########### GRAB SHA NEEDED FOR REPORTS ############
 #  If html body is on the show page (do not call on other pages)
@@ -41,35 +33,26 @@ window.refresh_research_data = (sha256_hash) ->
 # space delimited
 window.evaluate_file = ()  ->
   sha256_hash = $('#sha256_hash')[0].innerText
-  services = [];
-  refresh_magic = true;
+  services = []
   $('#resubmit-to-resources input:checked').each ->
-    service = $(this).attr('data-service')
-    services += service + ' '
-    if service == 'sandbox'
-      $('#sb-loader').show();
-      refresh_magic = false;
-      run_sample_in_sandbox()
-    if service == 'threatgrid'
-      $('#tg-loader').show();
-      $('.tg-data-run').show();
-      get_tg_run_status();
-    if service == 'reversinglab'
-      $('#rl-loader').show();
-
+    services += $(this).attr('data-service') + ' '
+  $('#loader-modal').modal({
+    keyboard: false,
+  })
   data = {
-      sha256_hash: sha256_hash
+      sha256_hash: sha256_hash,
       service: services
-      refresh_magic: refresh_magic
     }
-
   std_msg_ajax(
     method: 'POST'
     url: "/escalations/api/v1/escalations/file_rep/disputes/submit_for_evaluation/"
     data: data
-    success_reload: false
     success: (response) ->
+      $('#loader-modal').modal('hide')
+
+      std_msg_success('Resubmission Successful', ['Successfully resubmitted to selected services: ' + formatList( services ) ], reload: true)
     error: (response) ->
+      $('#loader-modal').modal('hide')
       std_api_error( response, "Submission Error", reload: false)
   )
 formatList = (list) ->
@@ -78,13 +61,10 @@ formatList = (list) ->
     switch list_item
       when 'sandbox'
         list[i] = 'Talos Sandbox'
-        $('#sb-loader').show();
       when 'threatgrid'
         list[i] = 'Threat Grid'
-        $('#tg-loader').hide();
       when 'reversinglab'
         list[i] = 'Reversing Labs'
-        $('#rl-loader').hide();
   if list.length == 2
     list = list.join(' and ')
   else
@@ -95,10 +75,12 @@ formatList = (list) ->
 # Loads on page load
 # Report functions defined immediately below
 window.research_data = (sha256_hash) ->
+  window.get_threatgrid_data(sha256_hash)
   window.get_reversinglabs_data(sha256_hash)
   window.get_run_status(sha256_hash)
   window.get_zoo_status(sha256_hash)
-  window.get_tg_run_status(sha256_hash)
+
+
 ########### SAMPLE ZOO STATUS ############
 window.get_zoo_status = (sha256_hash) ->
   # check SHA256 against Sample Zoo
@@ -108,9 +90,11 @@ window.get_zoo_status = (sha256_hash) ->
     url: "/escalations/api/v1/escalations/file_rep/sample_zoo/" + sha256_hash
     success_reload: false
     success: (response) ->
+
       $('#zoo-loader').hide()
       zoo_present = $('.zoo-data-present').find('span')
       zoo_missing = $('.zoo-data-notfound').find('span')
+
       unless response.json.error?
         if response.json.in_zoo == true
           zoo_present.addClass('glyphicon')
@@ -127,63 +111,79 @@ window.get_zoo_status = (sha256_hash) ->
       std_api_error(response, "There was a problem retrieving data from the Sample Zoo", reload: false)
   )
 
+
+
+
+
 ########### THREATGRID REPORT ############
 window.get_threatgrid_data = (sha256_hash) ->
-  sha256_hash = $('#sha256_hash')[0].innerText
   # Send sha to ThreatGrid, get data
+  $('#tg-loader').show()
   std_msg_ajax(
     method: 'POST'
     url: "/escalations/api/v1/escalations/filerep/research/"
     data: {sha256_hash: sha256_hash}
     success_reload: false
     success: (response) ->
-          if response.json.data.current_item_count > 0
-            file_data = response.json.data.items[0].item
+      $('#tg-loader').hide()
+      report_present = $('#threatgrid-report-wrapper').find('.tg-data-present')[0]
+      report_missing = $('#threatgrid-report-wrapper').find('.tg-data-missing')[0]
 
-            # dbinebri: use moment.js to make date readable, convert string to Date object first for best practice
-            tg_formatted_submitted_date = moment(new Date(file_data.submitted_at)).format('MMM D, YYYY h:mm A')
+      if response.json.data.current_item_count > 0
+        $(report_present).show()
+        $(report_missing).hide()
+        file_data = response.json.data.items[0].item
 
-            # Load the top data
-            $('#tg-submission-date').text(tg_formatted_submitted_date)
-            $('#tg-tags').text(file_data.tags.join(', '))
+        # dbinebri: use moment.js to make date readable, convert string to Date object first for best practice
+        tg_formatted_submitted_date = moment(new Date(file_data.submitted_at)).format('MMM D, YYYY h:mm A')
 
-            # if TG has a fail state, don't show most of the stuff
-            if file_data.state == 'fail'
-              $('#tg-run-status').html('<span class="tg-fail-status">Failure</span>')
-              $('#tg-score').siblings().hide()
-              $('#tg-tags').closest('div.row').nextAll().hide()
-            else
-              $('#tg-run-status').text(file_data.state)
+        # Load the top data
+        $('#tg-submission-date').text(tg_formatted_submitted_date)
+        $('#tg-tags').text(file_data.tags.join(', '))
 
-            # Ensure the analysis property exists first, it will not if there is a TG fail state
-            unless !file_data.hasOwnProperty('analysis')
-  # Adding threat score
-              $('#tg-score').text(file_data.analysis.threat_score)
+        # if TG has a fail state, don't show most of the stuff
+        if file_data.state == 'fail'
+          $('#tg-run-status').html('<span class="tg-fail-status">Failure</span>')
+          $('#tg-score').siblings().hide()
+          $('#tg-tags').closest('div.row').nextAll().hide()
+        else
+          $('#tg-run-status').text(file_data.state)
 
-              # Adding behaviors
-              behaviors = ""
-              $(file_data.analysis.behaviors).each ->
-                behaviors +=
-                  '<tr>' +
-                    '<td>' + this.name + '</td><td>' + this.threat + '</td><td>' + this.title + '</td>' +
-                    '</tr>'
-              $('#tg-behaviors').append('<tbody>' + behaviors + '</tbody>')
+        # Ensure the analysis property exists first, it will not if there is a TG fail state
+        unless !file_data.hasOwnProperty('analysis')
+          # Adding threat score
+          $('#tg-score').text(file_data.analysis.threat_score)
 
-            # Adding full json report in case it's needed
-            full_report = JSON.stringify(response.json, null, 2)
-            $('#tg-full').text(full_report)
+          # Adding behaviors
+          behaviors = ""
+          $(file_data.analysis.behaviors).each ->
+            behaviors += '<tr>'
+            behaviors += '<td>' + this.name + '</td><td>' + this.threat + '</td><td>' + this.title + '</td>'
+            behaviors += '</tr>'
+          $('#tg-behaviors').append('<tbody>' + behaviors + '</tbody>')
 
-            # dbinebri: Convert the Threatgrid full_report to a downloadable file, add the Download button hyperlink
-            tg_json_file = 'text/json; charset=utf-8,' + encodeURIComponent(full_report)
-            tg_filename = 'threatgrid_' + moment(new Date()).format('MM_DD_YYYY') + '.json'
-            tg_json_link = '<a href="data:' + tg_json_file + '" download="' + tg_filename + '"></a>'
-            $('#download-tg-json').wrap tg_json_link
+        # Adding full json report in case it's needed
+        full_report = JSON.stringify(response.json, null, 2)
+        $('#tg-full').text(full_report)
 
-  #        TODO Set up ability to push to ThreatGrid if sample does not come back
+        # dbinebri: Convert the Threatgrid full_report to a downloadable file, add the Download button hyperlink
+        tg_json_file = 'text/json; charset=utf-8,' + encodeURIComponent(full_report)
+        tg_filename = 'threatgrid_' + moment(new Date()).format('MM_DD_YYYY') + '.json'
+        tg_json_link = '<a href="data:' + tg_json_file + '" download="' + tg_filename + '"></a>'
+        $('#download-tg-json').wrap tg_json_link
+
+      else
+        $(report_present).hide()
+        $(report_missing).show()
+#        TODO Set up ability to push to ThreatGrid if sample does not come back
+
     error: (response) ->
       $('#tg-loader').hide()
       std_api_error(response, "There was a problem retrieving data from ThreatGrid", reload: false)
   )
+
+
+
 
 ########### REVERSING LABS REPORT ############
 window.get_reversinglabs_data = (sha256_hash) ->
@@ -253,7 +253,6 @@ window.get_reversinglabs_data = (sha256_hash) ->
 ########### TALOS SANDBOX REPORT ############
 # Sandbox report api, get full report (json) from runid returned from the sandbox call above
 window.get_sandbox_report = (runid, sha256_hash) ->
-
   report_present = $('#sandbox-report-wrapper').find('.sb-data-present')[0]
   report_missing = $('#sandbox-report-wrapper').find('.sb-data-missing')[0]
   report_running = $('#sandbox-report-wrapper').find('.sb-report-run')[0]
@@ -295,6 +294,7 @@ window.get_sandbox_report = (runid, sha256_hash) ->
       else
         $('#sb-contacted-domains').html('<span class="missing-data">No domains contacted</span>')
 
+
       # Indicators of compromise (IOC's)
       iocs = sb_report.ioc
       unless iocs.length > 0
@@ -305,6 +305,7 @@ window.get_sandbox_report = (runid, sha256_hash) ->
           ioc_table += '<tr><td>' + this.name + '</td><td class="text-center overdue">' + this.alerts.length + '</td></tr>'
         ioc_table += '</tbody></table>'
         $('#sb-ioc-col').append(ioc_table)
+
 
       # Dropped Files
       dropped_files = sb_report.dropped_files
@@ -412,6 +413,7 @@ window.run_sample_in_sandbox = () ->
       std_api_error(response, "There was a problem retrieving data from Talos Sandbox", reload: false)
 )
 
+
 ########### GET SANDBOX CURRENT RUN STATUS & MOST RECENT RUN ID ############
 #### This is needed prior to getting full report & needed for checking a report status
 get_run_status = window.get_run_status = (sha256_hash) ->
@@ -427,9 +429,11 @@ get_run_status = window.get_run_status = (sha256_hash) ->
     url: "/escalations/api/v1/escalations/file_rep/sandbox_api/sandbox_latest_report/" + sha256_hash
     success_reload: false
     success: (response) ->
-      if response.success != undefined && !response.success
+      unless response.json.success == false
         run_id = response.json.data.runid
         status = response.json.data.status
+        console.log status
+
         # If report status is complete, send runid to get report
         if status == "Complete"
           clearInterval(get_run_status)
@@ -443,7 +447,6 @@ get_run_status = window.get_run_status = (sha256_hash) ->
           clearInterval(get_run_status)
           $('#sb-loader').hide()
           $(report_missing).show()
-
           $('#sandbox-status-message').text('Unsupported file type. Report not generated.')
         else if status == "Cancelled"
           clearInterval(get_run_status)
@@ -471,61 +474,6 @@ get_run_status = window.get_run_status = (sha256_hash) ->
       std_api_error(response, "There was a problem retrieving data from Talos Sandbox", reload: false)
   )
 
-get_tg_run_status = window.get_tg_run_status = () ->
-# Sandbox - send file hash, show loader while fetching data
-  sha256_hash = $('#sha256_hash')[0].innerText
-  loader = $('#tg-loader')
-  loader.show()
-  $('.tg-data-run').show();
-  wrapper = $('#threatgrid-report-wrapper')
-  report_running = wrapper.find('.tg-data-run')[0]
-  report_present = wrapper.find('.tg-data-present')[0]
-  report_missing = wrapper.find('.tg-data-missing')[0]
-#    $('#tg-loader').show()
-#  $('#tg-loader').hide()
-  $(report_present).hide()
-  std_msg_ajax(
-    method: 'POST'
-    url: "/escalations/api/v1/escalations/file_rep/disputes/get_tg_status/"
-    data:
-      sha256_hash: sha256_hash
-    success_reload: false
-    success: (response) ->
-      { status } = JSON.parse(response)
-      console.log 'status', status
-      switch(status)
-        when 'complete'
-          loader.hide()
-          $(report_present).show()
-          $('.tg-data-run').hide();
-          clearInterval(get_tg_run_status)
-          get_threatgrid_data()
-        when 'error'
-          clearInterval(get_tg_run_status)
-          loader.hide()
-          $('.tg-data-run').hide();
-          $(report_missing).show()
-          $('#threatgrid-status-message').text('Error running sample. Report not generated.')
-        when "Unsupported File Type"
-          clearInterval(get_tg_run_status)
-          loader.hide()
-          $('.tg-data-run').hide();
-          $(report_missing).show()
-          $('#threatgrid-status-message').text('Unsupported file type. Report not generated.')
-        when "Cancelled"
-          clearInterval(get_tg_run_status)
-          loader.hide()
-          $('.tg-data-run').hide();
-          $(report_missing).show()
-          $('#threatgrid-status-message').text('Report was cancelled.')
-        when "Running" || "JoeBox Analysis Running" || "Reports Generating" || "Enqueued to Report Generation"
-          $(report_running).show()
-      setTimeout(get_run_status, 60000)
-
-    error: (response) ->
-      std_api_error(response, "There was a problem retrieving data from Threat Grid", reload: false)
-  )
-
 
 
 ##### UPDATE FILE REP DATA #####
@@ -533,11 +481,12 @@ get_tg_run_status = window.get_tg_run_status = () ->
 window.update_file_rep_data = () ->
   file_rep_id = $(".case-id-tag")[0].innerText
   # Hide current data
-
-  services = ['sb', 'tg', 'rl']
-  for service in services
-    $($('.' + service  + '-data-present')[0]).hide()
-    $($('.' + service  + '-data-missing')[0]).hide()
+  sb_data_true = $($('.sb-data-present')[0]).hide()
+  sb_data_false = $($('.sb-data-missing')[0]).hide()
+  tg_data_true = $($('.tg-data-present')[0]).hide()
+  tg_data_false = $($('.tg-data-missing')[0]).hide()
+  rl_data_true = $($('.rl-data-present')[0]).hide()
+  rl_data_false = $($('.rl-data-missing')[0]).hide()
 
   # Round and round it goes
   sync_button = $('#file-rep-sync-button')
@@ -550,12 +499,14 @@ window.update_file_rep_data = () ->
     data: {id: file_rep_id}
     success_reload: false
     success: (response) ->
-      for service in services
-        $('#' + service +'-loader').hide()
+      $('#tg-loader').hide()
+      $('#sb-loader').hide()
+      $('#rl-loader').hide()
       $(sync_button).removeClass('syncing')
     error: (response) ->
-      for service in services
-        $('#' + service +'-loader').hide()
+      $('#tg-loader').hide()
+      $('#sb-loader').hide()
+      $('#rl-loader').hide()
       $(sync_button).removeClass('syncing')
       std_api_error(response, "There was a problem refreshing some research data", reload: false)
   )
