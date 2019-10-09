@@ -114,7 +114,7 @@ GEM
       railties (> 3.1)
     chartkick (2.2.5)
     childprocess (2.0.0)
-        rake(< 13.0)
+       rake(< 13.0)
     clipboard-rails (1.7.1)
     cliver (0.3.2)
     coderay (1.1.2)
@@ -310,7 +310,7 @@ GEM
       sprockets (> 2, < 4)
       tilt
     libv8 (3.16.14.19)
-    listen (3.2.0)
+    listen (3.1.5)
       rb-fsevent (~> 0.9, >= 0.9.4)
       rb-inotify (~> 0.9, >= 0.9.7)
       ruby_dep (~> 1.2)
