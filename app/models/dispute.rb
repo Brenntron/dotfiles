@@ -322,6 +322,7 @@ class Dispute < ApplicationRecord
       new_payload_item[:resolution_message] = "This is a duplicate of a currently active ticket."
       new_payload_item[:resolution] = "DUPLICATE"
       new_payload_item[:status] = TI_RESOLVED
+      new_payload_item[:sugg_type] = entry["rep_sugg"]
       return_payload[ip] = new_payload_item
       new_dispute_entry = DisputeEntry.new
       new_dispute_entry.dispute_id = dispute.id
@@ -338,6 +339,7 @@ class Dispute < ApplicationRecord
       new_payload_item[:resolution_message] = "This is a duplicate of a currently active ticket."
       new_payload_item[:resolution] = "DUPLICATE"
       new_payload_item[:status] = TI_RESOLVED
+      new_payload_item[:sugg_type] = entry["rep_sugg"]
       return_payload[url] = new_payload_item
       new_dispute_entry = DisputeEntry.new
       new_dispute_entry.dispute_id = dispute.id

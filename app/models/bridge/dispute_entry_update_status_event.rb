@@ -11,7 +11,8 @@ class Bridge::DisputeEntryUpdateStatusEvent < Bridge::BaseMessage
           company_dup: entry.is_possible_company_duplicate?,
           status: entry.status,
           resolution: entry.resolution,
-          resolution_message: entry.resolution_comment
+          resolution_message: entry.resolution_comment,
+          sugg_type: entry.suggested_disposition
       }
       message_data
     end

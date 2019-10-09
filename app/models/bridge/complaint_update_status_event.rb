@@ -11,7 +11,7 @@ class Bridge::ComplaintUpdateStatusEvent < Bridge::BaseMessage
           status: entry.status,
           resolution: entry.resolution,
           resolution_message: entry.resolution_comment,
-          suggested_disposition: entry.suggested_disposition,
+          sugg_type: entry.suggested_disposition,
           category_list: entry.url_primary_category
       }
       message_data

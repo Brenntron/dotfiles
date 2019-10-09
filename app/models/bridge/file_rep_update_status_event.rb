@@ -10,7 +10,8 @@ class Bridge::FileRepUpdateStatusEvent < Bridge::BaseMessage
         ac_id: dispute.id,
         resolution: dispute.resolution,
         resolution_message: dispute.resolution_comment,
-        status: dispute.status
+        status: dispute.status,
+        sugg_type: dispute.disposition_suggested
     }
     super(message: {source_authority: source_authority,
                     source_key: source_key,
