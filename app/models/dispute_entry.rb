@@ -393,7 +393,7 @@ class DisputeEntry < ApplicationRecord
   end
 
   def wbrs_list_type
-    @wbrs_list_type ||= wbrs_xlist.map{ |wlbl| wlbl.list_type }.join(', ')
+    @wbrs_list_type ||= wbrs_xlist.select{ |wlbl| wlbl.state == "active" && wlbl.url == self.uri}.map{ |wlbl| wlbl.list_type }.join(', ')
   end
 
   def wbrs_xlist
@@ -735,7 +735,18 @@ class DisputeEntry < ApplicationRecord
       duplicate_entries = entries - unique_entries
 
       duplicate_entries.each do |duplicate_entry|
-        unique_entries.select{ |e| e.hostlookup == duplicate_entry.hostlookup}.map{ |e| e.consolidated_wlbl_strings << ", " + duplicate_entry.consolidated_wlbl_strings}
+        
+        unique_entries.select{ |e| e.hostlookup == duplicate_entry.hostlookup}.map do |e|
+
+          if e.consolidated_wlbl_strings.blank? && duplicate_entry.consolidated_wlbl_strings.present?
+            e.consolidated_wlbl_strings << duplicate_entry.consolidated_wlbl_strings
+          elsif e.consolidated_wlbl_strings.present? && duplicate_entry.consolidated_wlbl_strings.present?
+            e.consolidated_wlbl_strings << ", " + duplicate_entry.consolidated_wlbl_strings
+          end
+
+        end
+
+
       end
 
       #entries = unique_entries
