@@ -1,19 +1,5 @@
 $ ->
 
-  $('#send-to-threatgrid').on 'click', ->
-    sha256_hash = $('#sha256_hash')[0].innerText
-    std_msg_ajax(
-      method: 'GET'
-      url: "/escalations/api/v1/escalations/file_rep/sandbox_api/send_to_threatgrid/" + sha256_hash
-      success_reload: false
-      success: (response) ->
-        std_msg_success('Sample successfully sent to ThreatGrid. Please wait 3-5 minutes and reload page to view data.', [], reload: true)
-      error: (response) ->
-        std_api_error(response, "There was a problem retrieving data from the Sample Zoo", reload: false)
-    )
-
-
-
 ########### GRAB SHA NEEDED FOR REPORTS ############
 #  If html body is on the show page (do not call on other pages)
   if $('body').hasClass('escalations--file_rep--disputes-controller') && $('body').hasClass('show-action')
@@ -35,57 +21,74 @@ window.refresh_research_data = (sha256_hash) ->
 # space delimited
 window.evaluate_file =  (services) ->
   sha256_hash = $('#sha256_hash')[0].innerText
-  services = []
+  unless services == 'threatgrid'
+    services = []
   this_api = 'false'
   magic = 'true'
 
-  $('#resubmit-to-resources input:checked').each ->
-    service = $(this).attr('data-service')
+  # Submitted via individual button
+  if services == 'threatgrid'
+    tg_report_present = $('#threatgrid-report-wrapper').find('.tg-data-present')[0]
+    tg_report_missing = $('#threatgrid-report-wrapper').find('.tg-data-missing')[0]
+    tg_report_running = $('#threatgrid-report-wrapper').find('.tg-report-run')[0]
+    $(tg_report_present).hide()
+    $(tg_report_missing).hide()
+    # Clear residual data
+    $(tg_report_present).find('.data-report-content').each ->
+      $(this).empty()
+    $(tg_report_running).show()
+    $('#tg-loader').show()
+    this_api = 'true'
 
-    if service == 'threatgrid'
-      tg_report_present = $('#threatgrid-report-wrapper').find('.tg-data-present')[0]
-      tg_report_missing = $('#threatgrid-report-wrapper').find('.tg-data-missing')[0]
-      tg_report_running = $('#threatgrid-report-wrapper').find('.tg-report-run')[0]
-      $(tg_report_present).hide()
-      $(tg_report_missing).hide()
-      # Clear residual data
-      $(tg_report_present).find('.data-report-content').each ->
-        $(this).empty()
-      $(tg_report_running).show()
-      $('#tg-loader').show()
-      services += service + ' '
-      this_api = 'true'
+  # Multiple submission checkboxes / buttons
+  else
+    $('#resubmit-to-resources input:checked').each ->
+      service = $(this).attr('data-service')
 
-    else if service == 'reversinglab'
-      # When this is enabled some of the html structure needs to be changed
-      # The submit to RL and the loading information will need to be added
-      rl_report_present = $('#reversing-labs-report-wrapper').find('.rl-data-present')[0]
-      rl_report_missing = $('#reversing-labs-report-wrapper').find('.rl-data-missing')[0]
-      rl_report_running = $('#reversing-rllabs-report-wrapper').find('.rl-report-run')[0]
-      $(rl_report_present).hide()
-      $(rl_report_missing).hide()
-      # Clear residual data
-      $(rl_report_present).find('.data-report-content').each ->
-        $(this).empty()
-      $(rl_report_running).show()
-      $('#rl-loader').show()
-      services += service + ' '
-      this_api = 'true'
+      if service == 'threatgrid'
+        tg_report_present = $('#threatgrid-report-wrapper').find('.tg-data-present')[0]
+        tg_report_missing = $('#threatgrid-report-wrapper').find('.tg-data-missing')[0]
+        tg_report_running = $('#threatgrid-report-wrapper').find('.tg-report-run')[0]
+        $(tg_report_present).hide()
+        $(tg_report_missing).hide()
+        # Clear residual data
+        $(tg_report_present).find('.data-report-content').each ->
+          $(this).empty()
+        $(tg_report_running).show()
+        $('#tg-loader').show()
+        services += service + ' '
+        this_api = 'true'
 
-    else if service == 'sandbox'
-      sb_report_present = $('#sandbox-report-wrapper').find('.sb-data-present')[0]
-      sb_report_missing = $('#sandbox-report-wrapper').find('.sb-data-missing')[0]
-      sb_report_running = $('#sandbox-report-wrapper').find('.sb-report-run')[0]
-      $(sb_report_present).hide()
-      $(sb_report_missing).hide()
-      # Clear residual data
-      $(sb_report_present).find('.data-report-content').each ->
-        $(this).empty()
-      $(sb_report_running).show()
-      $('#sb-loader').show()
-      magic = 'false'
-      # Sandbox hits a different api endpoint than TG and RL
-      run_sample_in_sandbox()
+      else if service == 'reversinglab'
+        # When this is enabled some of the html structure needs to be changed
+        # The submit to RL and the loading information will need to be added
+        rl_report_present = $('#reversing-labs-report-wrapper').find('.rl-data-present')[0]
+        rl_report_missing = $('#reversing-labs-report-wrapper').find('.rl-data-missing')[0]
+        rl_report_running = $('#reversing-labs-report-wrapper').find('.rl-report-run')[0]
+        $(rl_report_present).hide()
+        $(rl_report_missing).hide()
+        # Clear residual data
+        $(rl_report_present).find('.data-report-content').each ->
+          $(this).empty()
+        $(rl_report_running).show()
+        $('#rl-loader').show()
+        services += service + ' '
+        this_api = 'true'
+
+      else if service == 'sandbox'
+        sb_report_present = $('#sandbox-report-wrapper').find('.sb-data-present')[0]
+        sb_report_missing = $('#sandbox-report-wrapper').find('.sb-data-missing')[0]
+        sb_report_running = $('#sandbox-report-wrapper').find('.sb-report-run')[0]
+        $(sb_report_present).hide()
+        $(sb_report_missing).hide()
+        # Clear residual data
+        $(sb_report_present).find('.data-report-content').each ->
+          $(this).empty()
+        $(sb_report_running).show()
+        $('#sb-loader').show()
+        magic = 'false'
+        # Sandbox hits a different api endpoint than TG and RL
+        run_sample_in_sandbox()
 
   if this_api == 'true'
     std_msg_ajax(
@@ -163,20 +166,25 @@ get_threat_data = window.get_threatgrid_data = () ->
     data: {sha256_hash: sha256_hash}
     success_reload: false
     success: (response) ->
-      file_data = response.json.data.items[0].item
-      console.log file_data.state
-      # if TG has a fail state, don't show most of the stuff
-      if file_data.state == 'fail'
-        $('#tg-run-status').html('<span class="tg-fail-status">Failure</span>')
-        $('#tg-score').siblings().hide()
-        $('#tg-tags').closest('div.row').nextAll().hide()
+      console.log response
+      report_present = $('#threatgrid-report-wrapper').find('.tg-data-present')[0]
+      report_missing = $('#threatgrid-report-wrapper').find('.tg-data-missing')[0]
 
-      else if file_data.state == 'succ'
-        $('#tg-loader').hide()
-        report_present = $('#threatgrid-report-wrapper').find('.tg-data-present')[0]
-        report_missing = $('#threatgrid-report-wrapper').find('.tg-data-missing')[0]
+      if response.json.data.current_item_count > 0
+        file_data = response.json.data.items[0].item
+        console.log file_data.state
+        # if TG has a fail state, don't show most of the stuff
+        if file_data.state == 'fail'
+          $('#tg-run-status').html('<span class="tg-fail-status">Failure</span>')
+          $('#tg-score').siblings().hide()
+          $('#tg-tags').closest('div.row').nextAll().hide()
+          $(tg_report_running).hide()
+          $(report_present).show()
+          $(report_missing).hide()
 
-        if response.json.data.current_item_count > 0
+        else if file_data.state == 'succ'
+          $('#tg-loader').hide()
+          $(tg_report_running).hide()
           $(report_present).show()
           $(report_missing).hide()
 
@@ -201,22 +209,29 @@ get_threat_data = window.get_threatgrid_data = () ->
               behaviors += '</tr>'
             $('#tg-behaviors').append('<tbody>' + behaviors + '</tbody>')
 
-          # Adding full json report in case it's needed
-          full_report = JSON.stringify(response.json, null, 2)
-          $('#tg-full').text(full_report)
+            # Adding full json report in case it's needed
+            full_report = JSON.stringify(response.json, null, 2)
+            $('#tg-full').text(full_report)
 
-          # dbinebri: Convert the Threatgrid full_report to a downloadable file, add the Download button hyperlink
-          tg_json_file = 'text/json; charset=utf-8,' + encodeURIComponent(full_report)
-          tg_filename = 'threatgrid_' + moment(new Date()).format('MM_DD_YYYY') + '.json'
-          tg_json_link = '<a href="data:' + tg_json_file + '" download="' + tg_filename + '"></a>'
-          $('#download-tg-json').wrap tg_json_link
-        else
+            # dbinebri: Convert the Threatgrid full_report to a downloadable file, add the Download button hyperlink
+            tg_json_file = 'text/json; charset=utf-8,' + encodeURIComponent(full_report)
+            tg_filename = 'threatgrid_' + moment(new Date()).format('MM_DD_YYYY') + '.json'
+            tg_json_link = '<a href="data:' + tg_json_file + '" download="' + tg_filename + '"></a>'
+            $('#download-tg-json').wrap tg_json_link
+
+        else if file_data.state == 'wait'
+          debugger
+          $(report_missing).hide()
           $(report_present).hide()
-          $(report_missing).show()
+          $(tg_report_running).show()
+          $('#tg-loader').show()
+          setTimeout get_threatgrid_data, 600000
 
-      else if file_data.state == 'wait'
-        $(tg_report_running).show()
-        setTimeout get_threatgrid_data, 600000
+      else
+        $(report_present).hide()
+        $(report_missing).show()
+        $('#tg-loader').hide()
+        $(tg_report_running).hide()
 
     error: (response) ->
       $('#tg-loader').hide()
