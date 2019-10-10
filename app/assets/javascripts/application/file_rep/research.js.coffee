@@ -28,36 +28,85 @@ window.refresh_research_data = (sha256_hash) ->
   window.research_data(sha256_hash)
   window.update_file_rep_data()
 
-# Resubmit hash to all the analysis engines
-# services: sandbox threatgrid reversinglabs
+
+
+# Resubmit file sha hash to all the analysis engines
+# services: threatgrid reversinglab or seperately, sandbox
 # space delimited
-window.evaluate_file =  (services ) ->
+window.evaluate_file =  (services) ->
   sha256_hash = $('#sha256_hash')[0].innerText
   services = []
+  this_api = 'false'
+  magic = 'true'
+
   $('#resubmit-to-resources input:checked').each ->
-    services += $(this).attr('data-service') + ' '
-  $('#loader-modal').modal({
-    keyboard: false,
-  })
-  std_msg_ajax(
-    method: 'POST'
-    url: "/escalations/api/v1/escalations/file_rep/disputes/submit_for_evaluation/"
-    data: {sha256_hash: sha256_hash, service: services}
-    success_reload: false
-    success: (response) ->
-      $('#loader-modal').modal('hide')
-      std_msg_success('Resubmission Successful', ['Successfully resubmitted to selected services: ' + formatList( services ) ], reload: true)
-    error: (response) ->
-      $('#loader-modal').modal('hide')
-      std_api_error( response, "Submission Error", reload: false)
-  )
-formatList = (list) ->
-  list = list.trim().split(/[ ,]+/)
-  if list.length == 2
-    list = list.join(' and ')
-  else
-    list = list.join(', ').replace(/, ([^,]*)$/, ', and $1')
-  return list
+    service = $(this).attr('data-service')
+
+    if service == 'threatgrid'
+      tg_report_present = $('#threatgrid-report-wrapper').find('.tg-data-present')[0]
+      tg_report_missing = $('#threatgrid-report-wrapper').find('.tg-data-missing')[0]
+      tg_report_running = $('#threatgrid-report-wrapper').find('.tg-report-run')[0]
+      $(tg_report_present).hide()
+      $(tg_report_missing).hide()
+      # Clear residual data
+      $(tg_report_present).find('.data-report-content').each ->
+        $(this).empty()
+      $(tg_report_running).show()
+      $('#tg-loader').show()
+      services += service + ' '
+      this_api = 'true'
+
+    else if service == 'reversinglab'
+      # When this is enabled some of the html structure needs to be changed
+      # The submit to RL and the loading information will need to be added
+      rl_report_present = $('#reversing-labs-report-wrapper').find('.rl-data-present')[0]
+      rl_report_missing = $('#reversing-labs-report-wrapper').find('.rl-data-missing')[0]
+      rl_report_running = $('#reversing-rllabs-report-wrapper').find('.rl-report-run')[0]
+      $(rl_report_present).hide()
+      $(rl_report_missing).hide()
+      # Clear residual data
+      $(rl_report_present).find('.data-report-content').each ->
+        $(this).empty()
+      $(rl_report_running).show()
+      $('#rl-loader').show()
+      services += service + ' '
+      this_api = 'true'
+
+    else if service == 'sandbox'
+      sb_report_present = $('#sandbox-report-wrapper').find('.sb-data-present')[0]
+      sb_report_missing = $('#sandbox-report-wrapper').find('.sb-data-missing')[0]
+      sb_report_running = $('#sandbox-report-wrapper').find('.sb-report-run')[0]
+      $(sb_report_present).hide()
+      $(sb_report_missing).hide()
+      # Clear residual data
+      $(sb_report_present).find('.data-report-content').each ->
+        $(this).empty()
+      $(sb_report_running).show()
+      $('#sb-loader').show()
+      magic = 'false'
+      # Sandbox hits a different api endpoint than TG and RL
+      run_sample_in_sandbox()
+
+  if this_api == 'true'
+    std_msg_ajax(
+      method: 'POST'
+      url: "/escalations/api/v1/escalations/file_rep/disputes/submit_for_evaluation/"
+      data: {sha256_hash: sha256_hash, service: services, refresh_magic: magic}
+      success_reload: false
+      success: (response) ->
+        if services.includes('threatgrid')
+          setTimeout get_threatgrid_data, 600000
+#        Add later when RL api is enabled
+#        else if services.includes('reversinglab')
+#          setTimeout(get_reversinglabs_data(sha256_hash), 600000)
+      error: (response) ->
+        std_api_error( response, "Submission Error", reload: false)
+    )
+
+
+
+
+
 ########### COMPILE RESEARCH REPORTS ############
 # Grabs the initial data for all three reports / datasets
 # Loads on page load
@@ -95,7 +144,6 @@ window.get_zoo_status = (sha256_hash) ->
         $(zoo_missing).hide()
 
     error: (response) ->
-      # $('#rl-loader').hide()
       std_api_error(response, "There was a problem retrieving data from the Sample Zoo", reload: false)
   )
 
@@ -104,8 +152,10 @@ window.get_zoo_status = (sha256_hash) ->
 
 
 ########### THREATGRID REPORT ############
-window.get_threatgrid_data = (sha256_hash) ->
+get_threat_data = window.get_threatgrid_data = () ->
   # Send sha to ThreatGrid, get data
+  sha256_hash = $('#sha256_hash')[0].innerText
+  tg_report_running = $('#threatgrid-report-wrapper').find('.tg-report-run')[0]
   $('#tg-loader').show()
   std_msg_ajax(
     method: 'POST'
@@ -113,57 +163,60 @@ window.get_threatgrid_data = (sha256_hash) ->
     data: {sha256_hash: sha256_hash}
     success_reload: false
     success: (response) ->
-      $('#tg-loader').hide()
-      report_present = $('#threatgrid-report-wrapper').find('.tg-data-present')[0]
-      report_missing = $('#threatgrid-report-wrapper').find('.tg-data-missing')[0]
+      file_data = response.json.data.items[0].item
+      console.log file_data.state
+      # if TG has a fail state, don't show most of the stuff
+      if file_data.state == 'fail'
+        $('#tg-run-status').html('<span class="tg-fail-status">Failure</span>')
+        $('#tg-score').siblings().hide()
+        $('#tg-tags').closest('div.row').nextAll().hide()
 
-      if response.json.data.current_item_count > 0
-        $(report_present).show()
-        $(report_missing).hide()
-        file_data = response.json.data.items[0].item
+      else if file_data.state == 'succ'
+        $('#tg-loader').hide()
+        report_present = $('#threatgrid-report-wrapper').find('.tg-data-present')[0]
+        report_missing = $('#threatgrid-report-wrapper').find('.tg-data-missing')[0]
 
-        # dbinebri: use moment.js to make date readable, convert string to Date object first for best practice
-        tg_formatted_submitted_date = moment(new Date(file_data.submitted_at)).format('MMM D, YYYY h:mm A')
+        if response.json.data.current_item_count > 0
+          $(report_present).show()
+          $(report_missing).hide()
 
-        # Load the top data
-        $('#tg-submission-date').text(tg_formatted_submitted_date)
-        $('#tg-tags').text(file_data.tags.join(', '))
+          # dbinebri: use moment.js to make date readable, convert string to Date object first for best practice
+          tg_formatted_submitted_date = moment(new Date(file_data.submitted_at)).format('MMM D, YYYY h:mm A')
 
-        # if TG has a fail state, don't show most of the stuff
-        if file_data.state == 'fail'
-          $('#tg-run-status').html('<span class="tg-fail-status">Failure</span>')
-          $('#tg-score').siblings().hide()
-          $('#tg-tags').closest('div.row').nextAll().hide()
-        else
+          # Load the top data
+          $('#tg-submission-date').text(tg_formatted_submitted_date)
+          $('#tg-tags').text(file_data.tags.join(', '))
           $('#tg-run-status').text(file_data.state)
 
-        # Ensure the analysis property exists first, it will not if there is a TG fail state
-        unless !file_data.hasOwnProperty('analysis')
-          # Adding threat score
-          $('#tg-score').text(file_data.analysis.threat_score)
+          # Ensure the analysis property exists first, it will not if there is a TG fail state
+          unless !file_data.hasOwnProperty('analysis')
+            # Adding threat score
+            $('#tg-score').text(file_data.analysis.threat_score)
 
-          # Adding behaviors
-          behaviors = ""
-          $(file_data.analysis.behaviors).each ->
-            behaviors += '<tr>'
-            behaviors += '<td>' + this.name + '</td><td>' + this.threat + '</td><td>' + this.title + '</td>'
-            behaviors += '</tr>'
-          $('#tg-behaviors').append('<tbody>' + behaviors + '</tbody>')
+            # Adding behaviors
+            behaviors = ""
+            $(file_data.analysis.behaviors).each ->
+              behaviors += '<tr>'
+              behaviors += '<td>' + this.name + '</td><td>' + this.threat + '</td><td>' + this.title + '</td>'
+              behaviors += '</tr>'
+            $('#tg-behaviors').append('<tbody>' + behaviors + '</tbody>')
 
-        # Adding full json report in case it's needed
-        full_report = JSON.stringify(response.json, null, 2)
-        $('#tg-full').text(full_report)
+          # Adding full json report in case it's needed
+          full_report = JSON.stringify(response.json, null, 2)
+          $('#tg-full').text(full_report)
 
-        # dbinebri: Convert the Threatgrid full_report to a downloadable file, add the Download button hyperlink
-        tg_json_file = 'text/json; charset=utf-8,' + encodeURIComponent(full_report)
-        tg_filename = 'threatgrid_' + moment(new Date()).format('MM_DD_YYYY') + '.json'
-        tg_json_link = '<a href="data:' + tg_json_file + '" download="' + tg_filename + '"></a>'
-        $('#download-tg-json').wrap tg_json_link
+          # dbinebri: Convert the Threatgrid full_report to a downloadable file, add the Download button hyperlink
+          tg_json_file = 'text/json; charset=utf-8,' + encodeURIComponent(full_report)
+          tg_filename = 'threatgrid_' + moment(new Date()).format('MM_DD_YYYY') + '.json'
+          tg_json_link = '<a href="data:' + tg_json_file + '" download="' + tg_filename + '"></a>'
+          $('#download-tg-json').wrap tg_json_link
+        else
+          $(report_present).hide()
+          $(report_missing).show()
 
-      else
-        $(report_present).hide()
-        $(report_missing).show()
-#        TODO Set up ability to push to ThreatGrid if sample does not come back
+      else if file_data.state == 'wait'
+        $(tg_report_running).show()
+        setTimeout get_threatgrid_data, 600000
 
     error: (response) ->
       $('#tg-loader').hide()

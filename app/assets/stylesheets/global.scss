@@ -9153,15 +9153,30 @@ button.secondary.view-report-external-button {
   line-height: 1.25em;
 }
 
-.tg-data-present, .tg-data-missing, .rl-data-present, .rl-data-missing, .sb-data-present, .sb-data-missing, .sb-report-run {
+.tg-data-present,
+.tg-data-missing,
+.tg-report-run,
+.rl-data-present,
+.rl-data-missing,
+.rl-report-run,
+.sb-data-present,
+.sb-data-missing,
+.sb-report-run {
   display: none;
 }
 
-.tg-data-missing, .sb-data-missing, .rl-data-missing, .sb-report-run {
+.tg-data-missing,
+.sb-data-missing,
+.rl-data-missing,
+.sb-report-run,
+.tg-report-run,
+.rl-report-run {
   margin-top: 40px;
 }
 
-.sb-report-run .data-report-wrapper {
+.sb-report-run .data-report-wrapper,
+.tg-report-run .data-report-wrapper,
+.rl-report-run .data-report-wrapper {
   margin-top: 60px;
 }
 
