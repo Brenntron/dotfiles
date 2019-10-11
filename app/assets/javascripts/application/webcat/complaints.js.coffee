@@ -1505,8 +1505,10 @@ window.open_selected = () ->
   else
     open_selected(selected_rows, "true")
 window.open_all = () ->
-  selected_rows = $('#complaints-index').DataTable().rows()
-  open_selected(selected_rows, "true")
+  open_all = confirm("Are you sure you want to open ALL the windows on this page?!!")
+  if (open_all == true)
+    selected_rows = $('#complaints-index').DataTable().rows()
+    open_selected(selected_rows, "true")
 
 toggle_selected = (selectedRows, expand)->
   selectState = $('.selected')
