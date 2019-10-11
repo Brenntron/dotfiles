@@ -1,6 +1,5 @@
 $ ->
   window.submit_new_dispute = (submit_btn) ->
-    console.log 'in'
     data = {}
     form_values = $(submit_btn).closest('form').serializeArray()
     dropdown = $(submit_btn).closest(".dropdown-menu").prev()
@@ -15,14 +14,13 @@ $ ->
         data[name] = value
 
     if data.ips_urls.trim().length > 0
-      console.log 'we in here'
       std_msg_ajax(
         url: '/escalations/api/v1/escalations/webrep/disputes'
         method: 'POST'
         data: data
         success: (response) ->
-          console.log 'success response', response
           {case_id, errors } = response.json
+          console.log response
           ticket_num = '<a href="/escalations/webrep/disputes/' + case_id + '#research_tab">' + case_id + '</a>'
           ips_urls = data.ips_urls.replace(/\n/g, ",").split(",")
 
