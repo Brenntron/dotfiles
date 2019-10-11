@@ -334,6 +334,7 @@ window.submit_bulk_wlbl = (page) ->
         method: 'POST'
         data: data
         success: (response) ->
+          console.log response
           std_msg_success("The following entries have been added to " + list_types, ip_uris)
         error: (response) ->
           std_api_error(response, 'Error retrieving WL/BL Data')
