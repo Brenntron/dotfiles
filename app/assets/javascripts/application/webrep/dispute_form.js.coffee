@@ -1,7 +1,8 @@
 $ ->
   window.submit_new_dispute = (submit_btn) ->
     data = {}
-    form_values = $(submit_btn).closest('form').serializeArray()
+    form = $(submit_btn).closest('form')
+    form_values = form.serializeArray()
     dropdown = $(submit_btn).closest(".dropdown-menu").prev()
     $('#loader-modal').modal({
       keyboard: false
@@ -18,38 +19,44 @@ $ ->
         url: '/escalations/api/v1/escalations/webrep/disputes'
         method: 'POST'
         data: data
+        success_reload: false
         success: (response) ->
-          {case_id, errors } = response.json
-          console.log response
+          { case_id, errors } = response.json
           ticket_num = '<a href="/escalations/webrep/disputes/' + case_id + '#research_tab">' + case_id + '</a>'
           ips_urls = data.ips_urls.replace(/\n/g, ",").split(",")
-
           $(dropdown).dropdown 'toggle'
           $('#loader-modal').modal 'hide'
-
           if errors.length > 0
             successful_entries = []
-            if ips_urls not in errors
-              successful_entries.push(ips_urls)
-            if successful_entries > 0
-              std_msg_error("Duplicate",["Unable to create duplicate entries: #{errors}. The other entries (#{successful_entries}) were successfully created."], reload: true)
-            else
-              std_msg_error("Duplicate",["Unable to create duplicate entries: #{errors}."], reload: true)
+            for url in ips_urls
+              if url not in errors
+                successful_entries.push(url)
+
+            if successful_entries.length > 0
+              url_list = ""
+              for url in successful_entries
+                url_list += '<li>' + url + '</li>'
+              url_list = '<ul>' + url_list + '</ul>'
+
+              message_html =
+                "<p>The following entries referenced on ticket number " + ticket_num + "</p>" +
+                "<p>" + url_list + "</p>"
+              std_msg_error("Duplicate",["Duplicate entries were not processed <br/><span class='ugh'>#{errors.join(', ')}</span>  #{message_html}"], reload: true)
           else
               url_list = ""
               for url in ips_urls
                 url_list += '<li>' + url + '</li>'
               url_list = '<ul>' + url_list + '</ul>  '
               message_html =
-                "<p>The following entries referenced on ticket number " + ticket_num + "</p>" +
+                "<p class='ugh'>The following entries referenced on ticket number " + ticket_num + "</p>" +
                 "<p>" + url_list + "</p>"
-              std_msg_success('All entries were successfully created.', [message_html])
+              std_msg_success('All entries were successfully created.', [message_html], reload: true)
+          form.trigger('reset');
         error: (response) ->
           $('#loader-modal').modal 'hide'
-          console.log 'success response', response
-          std_msg_error("Error",[response.responseJSON], reload: false)
+          std_msg_error("Error",[response.responseJSON.message], reload: false)
+          form.trigger('reset');
       )
-
     else
       $('#loader-modal').modal 'hide'
       std_msg_error("Error",["Cannot submit form while URLs/IP Addresses field is empty. "])

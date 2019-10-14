@@ -15,5 +15,9 @@ FactoryBot.define do
     factory :file_rep_role do
       role          { 'filerep user' }
     end
+
+    factory :web_cat_role do
+      role          { 'webcat user' }
+    end
   end
 end

@@ -3,6 +3,8 @@ Feature: Disputes
   as a user
   I will provide ways to interact with disputes
 
+
+
   @javascript
   Scenario: a user visits the duplicate cases tab and sees a table of duplicate cases
     Given a user with role "webrep user" exists and is logged in
@@ -13,6 +15,41 @@ Feature: Disputes
     And I go to "/escalations/webrep/disputes/1"
     Then I click "#related-tab-link"
     Then I should see "0000000002"
+
+  @javascript
+  Scenario: A user cannot create a duplicate url Dispute
+    Given a user with role "webrep user" exists and is logged in
+    Given the following disputes exist and have entries:
+      | id |
+      | 1  |
+    Given a dispute exists and is related to disputes with ID, "1":
+    When I go to "/escalations/webrep/disputes"
+    And I wait for "2" seconds
+    Then I click "new-dispute"
+    And I fill in "ips_urls" with "talosintelligence.com"
+    And I fill in "assignee" with "nherbert"
+    When I click "submit"
+    Then I should see "Unable to create the following duplicate dispute entries: talosintelligence.com"
+    
+  @javascript
+  Scenario: A user cannot create a duplicate IP Dispute
+    Given a user with role "webrep user" exists and is logged in
+    Given the following disputes exist:
+      | id |   subject     | status |
+      | 1  |    test 2     |  NEW   |
+    Given the following dispute_entries exist:
+      | id |      ip_address     | status |
+      | 1  | 123.63.22.24        |  NEW   |
+    Given a dispute exists and is related to disputes with ID, "1":
+    When I go to "/escalations/webrep/disputes"
+    And I wait for "2" seconds
+    Then I click "new-dispute"
+    And I fill in "ips_urls" with "123.63.22.24"
+    And I fill in "assignee" with "nherbert"
+    When I click "submit"
+    Then I should see "Unable to create the following duplicate dispute entries: 123.63.22.24"
+
+
 
   @javascript
   Scenario: the last submitted field returns data

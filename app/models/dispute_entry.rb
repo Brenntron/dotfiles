@@ -61,9 +61,11 @@ class DisputeEntry < ApplicationRecord
         sbrs_api_rulehit_response =  Sbrs::GetSbrs.get_sbrs_rules_for_ip(ip_url)
         wbrs_prefix_response = ComplaintEntry.get_category(params['ip'])
 
+
+
         new_dispute_entry.ip_address = ip_url
         new_dispute_entry.entry_type = "IP"
-        new_dispute_entry.primary_category = wbrs_prefix_response
+        new_dispute_entry.primary_category = get_primary_category(ip_url)
 
 
         # Populate WBRS/SBRS Scores
@@ -94,7 +96,7 @@ class DisputeEntry < ApplicationRecord
         new_dispute_entry.domain = url_parts[:domain]
         new_dispute_entry.path = url_parts[:path]
 
-        new_dispute_entry.primary_category = wbrs_prefix_response
+        new_dispute_entry.primary_category = get_primary_category(ip_url)
 
         # Populate WBRS/SBRS Scores
 
@@ -159,8 +161,6 @@ class DisputeEntry < ApplicationRecord
     category_names[0]
     # {category_ids: category_ids, category_names: category_names}
   end
-
-
 
   def self.is_ip?(ip)
     !!IPAddr.new(ip) rescue false
@@ -722,21 +722,12 @@ class DisputeEntry < ApplicationRecord
     domain_of_url = DisputeEntry.domain_of(url)
     entries = entries_of_url(url)
 
-    # BEGIN LOGIC TO CONSOLIDATE WLBL INFO TO UNIQUE URIS
-    entries.each do |entry|
-      entry.class.module_eval { attr_accessor :consolidated_wlbl_strings}
-      entry.consolidated_wlbl_strings = entry.wbrs_list_type
-      entry.primary_category = DisputeEntry.get_primary_category(entry.hostlookup)
-    end
-
-    unique_entries = entries.uniq{|e| e.hostlookup}
-    duplicate_entries = entries - unique_entries
-
-    duplicate_entries.each do |duplicate_entry|
-      unique_entries.select{ |e| e.hostlookup == duplicate_entry.hostlookup}.map{ |e| e.consolidated_wlbl_strings << ", " + duplicate_entry.consolidated_wlbl_strings}
-    end
-
-    #entries = unique_entries
+      # BEGIN LOGIC TO CONSOLIDATE WLBL INFO TO UNIQUE URIS
+      entries.each do |entry|
+        entry.class.module_eval { attr_accessor :consolidated_wlbl_strings}
+        entry.consolidated_wlbl_strings = entry.wbrs_list_type
+        entry.primary_category = DisputeEntry.get_primary_category(entry.hostlookup)
+      end
 
     #get rid of weird entries
 

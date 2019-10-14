@@ -106,6 +106,10 @@ class Escalations::Webrep::DisputesController < ApplicationController
       if entry.dispute_entry_preload.blank?
         Preloader::Base.fetch_all_api_data(entry.hostlookup, entry.id)
       end
+
+      if entry.primary_category.blank?
+        entry.primary_category = DisputeEntry.get_primary_category(entry.hostlookup)
+      end
     end
 
     @dispute.peek(user: current_user)

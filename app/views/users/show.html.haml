@@ -18,37 +18,31 @@
           =@user.roles.map(&:role).join(', ')
 
 
-        -# Check Marlin's commit on Dec 18 regarding user role and api key
-        - if @user.has_role?('api user')
+        - if (@user == current_user && @user.has_role?('api user')) || current_user.has_role?('admin')
           %hr.thin
           .user-access-wrapper
             %label.content-label-sm Access
             %label.content-label-md Application Token
             %pre.code-snippet.break-word
               = @user.authentication_token
-            - if xml_token
-              %label.content-label-md.extra-space Bugzilla Token
-              %pre.code-snippet.break-word
-                = xml_token
 
             -# Only show api keys to admins or current user
-            - if @user == current_user || current_user.has_role?('admin')
-              - if current_user.user_api_key&.api_key.present?
-                %label.content-label-md.extra-space Analyst Console User API Key
-                %pre.code-snippet.break-word
-                  = current_user.user_api_key&.api_key
-              - if current_user.bugzilla_api_key.present?
-                %label.content-label-md.extra-space Bugzilla REST API Key
-                %pre.code-snippet.break-word
-                  = current_user.bugzilla_api_key
-              - if current_user.threatgrid_api_key.present?
-                %label.content-label-md.extra-space Threatgrid API Key
-                %pre.code-snippet.break-word
-                  = current_user.threatgrid_api_key
-              - if current_user.sandbox_api_key.present?
-                %label.content-label-md.extra-space Sandbox API Key
-                %pre.code-snippet.break-word
-                  = current_user.sandbox_api_key
+            - if current_user.user_api_key&.api_key.present?
+              %label.content-label-md.extra-space Analyst Console User API Key
+              %pre.code-snippet.break-word
+                = current_user.user_api_key&.api_key
+            - if current_user.bugzilla_api_key.present?
+              %label.content-label-md.extra-space Bugzilla REST API Key
+              %pre.code-snippet.break-word
+                = current_user.bugzilla_api_key
+            - if current_user.threatgrid_api_key.present?
+              %label.content-label-md.extra-space Threatgrid API Key
+              %pre.code-snippet.break-word
+                = current_user.threatgrid_api_key
+            - if current_user.sandbox_api_key.present?
+              %label.content-label-md.extra-space Sandbox API Key
+              %pre.code-snippet.break-word
+                = current_user.sandbox_api_key
 
 
       .user-buttons

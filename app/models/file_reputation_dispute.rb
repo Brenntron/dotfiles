@@ -559,7 +559,7 @@ class FileReputationDispute < ApplicationRecord
         customer_email: message_payload[:payload][:customer_email],
         company_name: message_payload[:payload][:company_name]
     }
-
+    is_duplicate = false
     user = User.where(cvs_username:"vrtincom").first
       ActiveRecord::Base.transaction do
 
@@ -613,12 +613,15 @@ class FileReputationDispute < ApplicationRecord
         check_for_duplicate = FileReputationDispute.where(sha256_hash: message_payload[:payload][:sha256]).where.not(status: FileReputationDispute::STATUS_RESOLVED)
         if check_for_duplicate.any?
           auto_resolve_on_duplicate(new_dispute)
+          is_duplicate = true
         else
           new_dispute.save
         end
 
       end #transaction
-
+    if is_duplicate == true
+      return new_dispute
+    end
     # This is so the tests can stub out the `threaded?` method and test synchronously.
     if new_dispute
       if FileReputationDispute.threaded?
