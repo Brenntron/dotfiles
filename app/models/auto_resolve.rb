@@ -11,6 +11,7 @@ class AutoResolve
   STATUS_MALICIOUS          = 'MALICIOUS'
   STATUS_NONMALICIOUS       = 'CLEAR'
 
+
   # @return (Boolean) true if address type is IP.
   def ip?
     ADDRESS_TYPE_IP == self.address_type
@@ -305,4 +306,65 @@ class AutoResolve
                                      author: author,
                                      comment: comment)
   end
+
+
+  ########################################
+  #for custom email based auto resolve
+  ########################################
+
+  def self.publish_to_rep_api(dispute = nil, uri, author: 'reptooluser')
+    if dispute.present?
+      comment = "TE SecHub-Auto-#{dispute_id}"
+    else
+      comment = "TE SecHub-Auto"
+    end
+
+    RepApi::Blacklist.add_from_hosts(hostnames: [ uri ],
+                                     classifications: [ 'malware' ],
+                                     author: author,
+                                     comment: comment)
+  end
+
+  def self.bad_email_mnem?(rule_hit)
+    ["Sbl", "Pbl", "Cbl", "iaH", "Dh"].include?(rule_hit)
+  end
+
+  def self.build_resolution_message(rule_hits)
+
+    message = ""
+    if rule_hits.include?("iaH") || rule_hits.include?("Dh")
+      message += "Our worldwide sensor network indicates that spam originated from your IP. "
+      if rule_hits.include?("Dh")
+        message += "] In addition, our sensors indicate server access attempts from this IP to mail servers within our Sensor Network. This behavior is indicative of email directory harvesting attempts and also results in reputation impact to the IP. Directory harvest detection fires when you are sending to invalid email addresses. "
+      end
+      message += "It is possible that your network or a system in your network may be compromised by a trojan spam virus, or perhaps there is an open port 25 through which a spammer may be gaining access and sending out spam. The last possibility is that one of your users is sending spam through the IP. We suggest checking these possibilities to help isolate the root cause of the spam and mail server access attempts originating from your IP.In general, once all issues have been addressed (fixed), reputation recovery can take anywhere from a few hours to just over one week to improve, depending on the specifics of the situation, and how much email volume the IP sends. Complaint ratios determine the amount of risk for receiving mail from an IP, so logically, reputation improves as the ratio of legitimate mails increases with respect to the number of complaints. Speeding up the process is not really possible. Talos Intelligence Reputation is an automated system over which we have very little manual influence."
+    end
+
+    if rule_hits.include?("Sbl") || rule_hits.include?("Pbl") || rule_hits.include?("Cbl")
+      message += "Your IP has a poor Talos Intelligence Reputation due to currently being listed on Spamhaus (http://www.spamhaus.org/) Review the status and reason(s) by visiting https://www.spamhaus.org/lookup/and entering your IP. Please contact Spamhaus directly to resolve this listing issue. Once delisted, the Talos Intelligence Reputation for the IP should improve within 24 hours."
+    end
+
+    message
+  end
+
+  def self.auto_resolve_email(dispute_entry, rule_hits)
+    bad_mnems = rule_hits.select{|rule_hit| bad_email_mnem?(rule_hit)}
+    if bad_mnems.any?
+      dispute_entry.resolution = DisputeEntry::STATUS_RESOLVED_FIXED_FN
+      dispute_entry.status = DisputeEntry::STATUS_RESOLVED
+      dispute_entry.case_closed_at = Time.now
+      dispute_entry.case_resolved_at = Time.now
+
+      dispute_entry.resolution_comment = build_resolution_message(rule_hits)
+      dispute_entry.save
+
+      return true
+
+    end
+
+    return false
+
+  end
+
+
 end
