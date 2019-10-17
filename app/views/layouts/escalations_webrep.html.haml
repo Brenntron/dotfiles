@@ -33,7 +33,7 @@
             %span.nav-dropdown-icon.icon-recently-viewed
             Recently Viewed
         %li{class: ("selected" if params[:f] == "my_disputes")}
-          %a{href: "#{escalations_webrep_disputes_path}f=my_disputes"}
+          %a{href: "#{escalations_webrep_disputes_path}?f=my_disputes"}
             %span.nav-dropdown-icon.icon-my-bugs
             My Tickets
         %li{class: ("selected" if params[:f] == "my_open")}
