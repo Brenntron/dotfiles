@@ -388,54 +388,58 @@ window.submit_bulk_wlbl = (page) ->
         thrt_cat_ids.push($(this).val())
         thrt_cat_names.push($(this).parent().text().trim())
 
-    # TODO: need BACK-END ASSISTANCE for below, array is passed to back-end, something is broken
-    data = {ip_uris: ip_uris, list_types: list_types, note: wlbl_comment, thrt_cat_ids: thrt_cat_ids}
-
     if thrt_cat_ids.length
       console.log thrt_cat_ids + ' these threat cat ids are getting passed to back-end'
       tc_added_str = "<br><p>With the following threat categories: <em>#{ thrt_cat_names.join(', ') }</em> </p>"
       tc_replaced_str = "<br><p>With the following threat categories replaced: <em>#{ thrt_cat_names.join(', ')}</em> </p>"
 
-    # form submit
-    # add to list
+
+    # form submit an object to micah for threat cats
     if $('#wlbl-add').prop('checked')
-      std_msg_ajax(
-        url: '/escalations/api/v1/escalations/webrep/disputes/bulk_rule_ui_wlbl_add'
-        method: 'POST'
-        data: data
-        success: (response) ->
-          std_msg_success("The following entries have been added to " + list_types, [ip_uris, tc_added_str])
-        error: (response) ->
-          std_api_error(response, 'Error adding WL/BL Data')
-        completed: () ->
-          $('.dispute-wlbl-adjust-wrapper .dropdown-submit-button').html('Submit Changes').prop('disabled', false)
-      )
-    # remove from lists (and remove relevant threat cats): TODO: back-end assistance needed, to remove/replace specific TC's
+      adjustment_type = 'add'
     else if $('#wlbl-remove').prop('checked')   # if a BL is checked to be removed, empty the threat cat array
-      std_msg_ajax(
-        url: '/escalations/api/v1/escalations/webrep/disputes/bulk_rule_ui_wlbl_remove'
-        method: 'POST'
-        data: data
-        success: (response) ->
-          std_msg_success("The following entries have been removed from " + list_types, ip_uris)
-        error: (response) ->
-          std_api_error(response, 'Error removing WL/BL Data')
-        completed: () ->
-          $('.dispute-wlbl-adjust-wrapper .dropdown-submit-button').html('Submit Changes')
-      )
-    # replace threat cats: TODO: back-end assistance needed, to remove/replace specific TC's
+      adjustment_type = 'remove'
     else if $('#wlbl-replace').prop('checked')   # "replace" is only for threat categories
-      std_msg_ajax(
-        url: '/escalations/api/v1/escalations/webrep/disputes/bulk_rule_ui_wlbl_add'
-        method: 'POST'
-        data: data
-        success: (response) ->
-          std_msg_success("The following threat categories have been replaced", [tc_replaced_str])
-        error: (response) ->
-          std_api_error(response, 'Error replacing threat categories')
-        completed: () ->
-          $('.dispute-wlbl-adjust-wrapper .dropdown-submit-button').html('Submit Changes')
-      )
+      adjustment_type = 'replace'
+
+
+
+    # LEGACY OBJECT BEING BUILT
+    # data = {ip_uris: ip_uris, list_types: list_types, note: wlbl_comment, thrt_cat_ids: thrt_cat_ids}
+
+    data = {
+      adjustment_type: adjustment_type,   # 'add'
+      lists: lists,   # 'BL-weak', 'BL-med', 'WL-heavy'
+      note: wlbl_comment,   # here is a comment long string
+      thrt_cat_ids: thrt_cat_ids,   # [ 9, 1, 4]
+      dispute_entries: [ 12345, 23423, 33333 ]   # [ 12345, 456789, 33333 ]  this is array of the cb id's
+    }
+
+    # make sure the object you're building matches with
+    console.log data
+
+    ### build an object like looks like this:
+      {
+        adjustment_type: "add", // 'add,' 'remove,' or 'replace'
+        lists: ["BL-Weak," "BL-Med"],
+        thrt_cats: [11, 22, 9] // An array of threat category IDs, the way you're sending them now
+        note: "I am the content of the text box"
+        dispute_entries: [88889, 88890, 88891] // 'Bulk update' support; send as many dispute entries as you have. I will ascertain the URLs.
+      }
+    ###
+
+    std_msg_ajax(
+      url: '/escalations/api/v1/escalations/webrep/disputes/bulk_rule_ui_wlbl_add'
+      method: 'POST'
+      data: data
+      success: (response) ->
+        std_msg_success("The following entries have been added to " + list_types, [ip_uris, tc_added_str])
+      error: (response) ->
+        std_api_error(response, 'Error adding WL/BL Data')
+      completed: () ->
+        $('.dispute-wlbl-adjust-wrapper .dropdown-submit-button').html('Submit Changes').prop('disabled', false)
+    )
+
 
 
 
