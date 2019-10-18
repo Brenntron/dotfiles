@@ -265,6 +265,75 @@ module API
               true
             end
 
+
+
+            
+            desc "Bulk adjust WL/BLs and BL threat categories"
+            params do
+              requires :adjustment_type, type: String, desc: "Add, remove, or replace"
+              requires :dispute_entries, type: Array[Integer], desc: "analyst-console database id"
+              requires :lists, type: Array[String], desc: "type of WL/BL"
+              optional :thrt_cats, type: Array[String], desc: "threat categories"
+              requires :note, type: String, desc: "note"
+            end
+            post "bulk_wlbl_threatcat_adjust" do
+              authorize!(:update, Wbrs::ManualWlbl)
+
+              # 1. Turn dispute entries list into 'ips_uris' list
+              ip_uris = []
+              params[:dispute_entries].each do |dispute_entry|
+                ip_uris << dispute_entry.uri
+              end
+
+              case params[:adjustment_type]
+              when "add"
+                parsed_ip_uris = ip_uris.map{|ip_uri| DisputeEntry.domain_of_with_path(ip_uri).strip}
+                unique_ip_uris = parsed_ip_uris.uniq
+
+                wlbl_params =
+                    {
+                        urls: unique_ip_uris,
+                        trgt_list: params['lists'],
+                        note: params['note'],
+                        usr: current_user.cvs_username,
+                        thrt_cat_ids: permitted_params['thrt_cats']
+                    }
+
+                Wbrs::ManualWlbl.bulk_new_wlbl_from_params(wlbl_params)
+              when "remove"
+                list_types = params['lists']
+
+                Wbrs::ManualWlbl.destroy_from_params(ip_uris, list_types, username: current_user.cvs_username)
+              when "replace"
+                replace_params_formatted =
+                {
+                    dispute_entry_ids: params[:dispute_entries],
+                    trgt_list: params[:lists],
+                    thrt_cats: params[:thrt_cats],
+                    note: params[:note]
+                }
+
+                Wbrs::ManualWlbl.adjust_entries_from_params(permitted_params, username: current_user.cvs_username)
+                # dispute = DisputeEntry.where({:id => params[:dispute_entry_ids].first}).first.dispute
+                # DisputeComment.create(:dispute_id => dispute.id, :user_id => current_user.id, :comment => params[:note])
+                true
+              else
+                "No valid adjustment type"
+              end
+
+              # TODO: When the above completes, don't forget to add the notes to the parent disputes
+
+            end
+
+
+
+
+
+
+
+
+
+
             # TODO: unused?
             desc "Adjust a WL/BL entry"
             params do
@@ -275,6 +344,7 @@ module API
             end
             post "entry_wlbl" do
               authorize!(:update, Wbrs::ManualWlbl)
+              binding.pry
               Wbrs::ManualWlbl.adjust_entries_from_params(permitted_params, username: current_user.cvs_username)
               dispute = DisputeEntry.where({:id => params[:dispute_entry_ids].first}).first.dispute
               DisputeComment.create(:dispute_id => dispute.id, :user_id => current_user.id, :comment => params[:note])
