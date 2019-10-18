@@ -331,21 +331,49 @@ window.bulk_get_current_wlbl = (page) ->
 
 ## Individual submission of WL/BL changes - INLINE row dropdown form
 ## Research page and research tab of show page
-window.submit_individual_wlbl =(button_tag) ->
+
+
+
+
+# INLINE ADJUST WL/BL + THREAT CATS FUNCTION
+window.submit_individual_wlbl = (button_tag) ->
+
+  # TODO: FIX THIS TOO
+  # TODO: FIX THIS TOO
+  # TODO: FIX THIS TOO
+
   list_types = $('.wl-bl-list-inline:checkbox:checked').map(() ->
     this.value
   ).toArray()
   wlbl_form = button_tag.form;
 
+
+  # OLD DATA OBJECT
+  # OLD DATA OBJECT
+  # OLD DATA OBJECT
+#  data = {
+#    'urls': [ wlbl_form.getElementsByClassName('dispute-entry-content')[0].value ]
+#    'trgt_list': list_types,
+#    'thrt_cat_ids': [ parseInt(wlbl_form.getElementsByClassName('wlbl_thrt_cat_id')[0].value) ]
+#    'note': wlbl_form.getElementsByClassName('note-input')[0].value
+#  }
+
+  # NEW DATA OBJECT - GET THESE CHECKBOXES IN THE SAME WAY AS THE BULK METHOD, BUT GET DIFF IDS AND CLASSES FROM THE PAGE
+  # NEW DATA OBJECT - GET THESE CHECKBOXES IN THE SAME WAY AS THE BULK METHOD, BUT GET DIFF IDS AND CLASSES FROM THE PAGE
+  # NEW DATA OBJECT - GET THESE CHECKBOXES IN THE SAME WAY AS THE BULK METHOD, BUT GET DIFF IDS AND CLASSES FROM THE PAGE
   data = {
-    'urls': [ wlbl_form.getElementsByClassName('dispute-entry-content')[0].value ]
-    'trgt_list': list_types,
-    'thrt_cat_ids': [ parseInt(wlbl_form.getElementsByClassName('wlbl_thrt_cat_id')[0].value) ]
-    'note': wlbl_form.getElementsByClassName('note-input')[0].value
+    adjustment_type: adjustment_type,
+    lists: list_types,
+    thrt_cat_ids: thrt_cat_ids,
+    note: wlbl_form.getElementsByClassName('note-input')[0].value,
+    dispute_entries: disputes_array
   }
 
+  console.log data    # make sure the object you're building matches with MM object
+
+
   std_msg_ajax(
-    url: '/escalations/api/v1/escalations/webrep/disputes/uri_wlbl'
+    url: '/escalations/api/v1/escalations/webrep/disputes/bulk_wlbl_threatcat_adjust'
     method: 'POST'
     data: data
     error_prefix: 'Error adjusting WL/BL.'
@@ -381,8 +409,7 @@ window.submit_bulk_wlbl = (page) ->
     thrt_cat_ids = []
     thrt_cat_names = []
     thrt_cat_array = $(dropdown).find('.wlbl_thrt_cat_id')
-    tc_added_str = ''
-    tc_replaced_str = ''
+    tc_updated_str = ''
 
     $(thrt_cat_array).each ->
       if $(this).prop('checked')  # if tc cb checked, add the value to this id array (val == id)
@@ -390,62 +417,41 @@ window.submit_bulk_wlbl = (page) ->
         thrt_cat_names.push($(this).parent().text().trim())
 
     if thrt_cat_ids.length
-#      console.log thrt_cat_ids + ' these threat cat ids are getting passed to back-end'
-      tc_added_str = "<br><p>With the following threat categories: <em>#{ thrt_cat_names.join(', ') }</em> </p>"
-      tc_replaced_str = "<br><p>With the following threat categories replaced: <em>#{ thrt_cat_names.join(', ')}</em> </p>"
+      tc_updated_str =
+        "<br><p>With the following threat categories updated:
+         <em>#{ thrt_cat_names.join(', ') }</em></p>"
 
-
-    # determine adjustment type
+    # determine adjustment type - add / remove / replace
     if $('#wlbl-add').prop('checked') then adjustment_type = 'add'
     else if $('#wlbl-remove').prop('checked') then adjustment_type = 'remove'
     else if $('#wlbl-replace').prop('checked') then adjustment_type = 'replace'
 
-    # OLD OBJECT:
-#    data = {
-#      ip_uris: ip_uris,
-#      list_types: list_types,
-#      note: wlbl_comment,
-#      thrt_cat_ids: thrt_cat_ids
-#    }
+    if $('body').hasClass('index-action')  # index page cb's
+      disputes_array = $('.dispute-entry-checkbox:checked').map(-> this.id).toArray()
+    else if $('body').hasClass('show-action')  # show page cb's
+      disputes_array = $('.dispute_check_box:checked').map( -> this.data-entry-id).toArray()
 
-    ### build an object looks like this:
-      {
-        adjustment_type: "add", // 'add,' 'remove,' or 'replace'
-        lists: ["BL-Weak," "BL-Med"],
-        thrt_cats: [11, 22, 9] // An array of threat category IDs, the way you're sending them now
-        note: "I am the content of the text box"
-        dispute_entries: [88889, 88890, 88891] // 'Bulk update' support; send as many dispute entries as you have. I will ascertain the URLs.
-      }
-    ###
-
-#    array = array.map( (element) => return element.trim())
-    # TODO: COLLECT THE DISPUTE_ENTRIES ID'S FROM ALL CB'S! ON INDEX AND SHOW PAGE HANDLE THAT CORRECTLY
-
-    disputes_array = $('.dispute-entry-checkbox:checked').map( -> this.id ).toArray()
-#    console.log disputes_array  # [ 12345, 456789, 33333 ]
-
-    # NEW OBJECT:
+    # new data object for MM, passed to backend
     data = {
-      adjustment_type: adjustment_type,   # 'add/remove/replace'
-      lists: list_types,   # ['BL-weak', 'BL-med'], etc
-      thrt_cat_ids: thrt_cat_ids,   # [ 9, 1, 4]
-      note: wlbl_comment,   # same comment string as before
-      dispute_entries: disputes_array   # [ 12345, 456789, 33333 ]  this is array of the cb id's
+      adjustment_type: adjustment_type,
+      lists: list_types,
+      thrt_cat_ids: thrt_cat_ids,
+      note: wlbl_comment,
+      dispute_entries: disputes_array
     }
 
-    # make sure the object you're building matches with MM object
-    console.log data
+    console.log data    # make sure the object you're building matches with MM object
 
-    
-    # this ajax api call now handles replace lists + replace threat cats, if you remove all tc's you *should* remove all bl's and vice versa
+    # this ajax api call now does all add/remove/replace of lists + tc's
+    # if you remove all tc's you *should* remove all bl's and vice versa
     std_msg_ajax(
       url: '/escalations/api/v1/escalations/webrep/disputes/bulk_wlbl_threatcat_adjust'
       method: 'POST'
       data: data
       success: (response) ->
-        std_msg_success("Entries have been updated." + list_types, [ip_uris, tc_added_str])
+        std_msg_success("Entries have been updated " + list_types, [ip_uris, tc_updated_str])
       error: (response) ->
-        std_api_error(response, 'Error adding WL/BL Data')
+        std_api_error(response, 'Error updating these entries.')
       completed: () ->
         $('.dispute-wlbl-adjust-wrapper .dropdown-submit-button').html('Submit Changes').prop('disabled', false)
     )
