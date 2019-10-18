@@ -302,7 +302,6 @@ module API
                         usr: current_user.cvs_username,
                         thrt_cat_ids: permitted_params['thrt_cat_ids']
                     }
-                binding.pry
                 Wbrs::ManualWlbl.bulk_new_wlbl_from_params(wlbl_params)
               when "remove"
                 Wbrs::ManualWlbl.destroy_from_params(ip_uris, params['lists'], username: current_user.cvs_username)
