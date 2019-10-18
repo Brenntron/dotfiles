@@ -267,7 +267,7 @@ module API
 
 
 
-            
+
             desc "Bulk adjust WL/BLs and BL threat categories"
             params do
               requires :adjustment_type, type: String, desc: "Add, remove, or replace"
@@ -279,7 +279,6 @@ module API
             post "bulk_wlbl_threatcat_adjust" do
               authorize!(:update, Wbrs::ManualWlbl)
 
-              # 1. Turn dispute entries list into 'ips_uris' list
               ip_uris = []
               params[:dispute_entries].each do |dispute_entry|
                 ip_uris << dispute_entry.uri
@@ -314,14 +313,17 @@ module API
                 }
 
                 Wbrs::ManualWlbl.adjust_entries_from_params(permitted_params, username: current_user.cvs_username)
-                # dispute = DisputeEntry.where({:id => params[:dispute_entry_ids].first}).first.dispute
-                # DisputeComment.create(:dispute_id => dispute.id, :user_id => current_user.id, :comment => params[:note])
+
                 true
               else
                 "No valid adjustment type"
               end
 
-              # TODO: When the above completes, don't forget to add the notes to the parent disputes
+              params[:dispute_entries].each do |dispute_entry|
+                dispute = DisputeEntry.where({:id => dispute_entry}).first.dispute
+                DisputeComment.create(:dispute_id => dispute.id, :user_id => current_user.id, :comment => params[:note])
+              end
+
 
             end
 
