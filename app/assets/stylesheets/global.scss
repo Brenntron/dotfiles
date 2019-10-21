@@ -10546,3 +10546,11 @@ span.threat-cat-no-data {
 //  color: $disabled-txt !important;
 //}
 
+.tc-sentence {
+  font-style: normal;
+  em {
+    font-style: italic;
+    display: block;
+    line-height: 11pt;
+  }
+}

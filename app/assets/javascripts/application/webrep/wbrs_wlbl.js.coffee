@@ -365,7 +365,7 @@ window.submit_individual_wlbl = (button_tag) ->
     adjustment_type: adjustment_type,
     lists: list_types,
     thrt_cat_ids: thrt_cat_ids,
-    note: wlbl_form.getElementsByClassName('note-input')[0].value,
+    note: wlbl_form.getElementsByClassName('note-input')[0].value,  # FIX THIS
     dispute_entries: disputes_array
   }
 
@@ -418,7 +418,7 @@ window.submit_bulk_wlbl = (page) ->
 
     if thrt_cat_ids.length
       tc_updated_str =
-        "<br><p>With the following threat categories updated:
+        "<p class='tc-sentence'>With the following threat categories updated:
          <em>#{ thrt_cat_names.join(', ') }</em></p>"
 
     # determine adjustment type - add / remove / replace
@@ -429,7 +429,19 @@ window.submit_bulk_wlbl = (page) ->
     if $('body').hasClass('index-action')  # index page cb's
       disputes_array = $('.dispute-entry-checkbox:checked').map(-> this.id).toArray()
     else if $('body').hasClass('show-action')  # show page cb's
-      disputes_array = $('.dispute_check_box:checked').map( -> this.data-entry-id).toArray()
+      # FIX BELOW
+      # FIX BELOW
+      # FIX BELOW
+      # FIX BELOW
+      disputes_array = $('.dispute_check_box:checked').map( ->
+        this['data-entry-id']
+        console.log this['data-entry-id']
+      ).toArray()
+      # get list of checkboxes on show page for bulk adjust
+      console.log 'below is the disputes_array, it SHOULD NOT BE BLANK'
+      console.log disputes_array
+
+#    return
 
     # new data object for MM, passed to backend
     data = {
@@ -449,7 +461,7 @@ window.submit_bulk_wlbl = (page) ->
       method: 'POST'
       data: data
       success: (response) ->
-        std_msg_success("Entries have been updated " + list_types, [ip_uris, tc_updated_str])
+        std_msg_success("Entries have been updated for: " + list_types, [ip_uris, tc_updated_str])
       error: (response) ->
         std_api_error(response, 'Error updating these entries.')
       completed: () ->
