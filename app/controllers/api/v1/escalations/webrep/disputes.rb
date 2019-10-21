@@ -273,7 +273,7 @@ module API
               requires :adjustment_type, type: String, desc: "Add, remove, or replace"
               requires :dispute_entries, type: Array[Integer], desc: "analyst-console database id"
               requires :lists, type: Array[String], desc: "type of WL/BL"
-              optional :thrt_cat_ids, type: Array[String], desc: "threat categories"
+              optional :thrt_cat_ids, type: Array[Integer], desc: "threat categories"
               requires :note, type: String, desc: "note"
             end
             post "bulk_wlbl_threatcat_adjust" do
