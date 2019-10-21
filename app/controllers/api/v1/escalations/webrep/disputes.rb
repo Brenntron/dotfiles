@@ -313,7 +313,7 @@ module API
                     thrt_cats: params[:thrt_cat_ids],
                     note: params[:note]
                 }
-                Wbrs::ManualWlbl.adjust_entries_from_params(permitted_params, username: current_user.cvs_username)
+                Wbrs::ManualWlbl.adjust_entries_from_params(replace_params_formatted, username: current_user.cvs_username)
               else
                 "No valid adjustment type"
               end
