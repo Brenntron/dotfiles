@@ -1318,8 +1318,17 @@ thead th.sorting.center {
   text-transform: uppercase;
   line-height: normal;
 }
-.ugh{
+.dupe_list, .url_ip_list {
   font-style: oblique;
+  background-color: #f2f2f2;
+  max-height: 200px;
+  overflow-y: scroll;
+  width: 90%;
+  padding: 5px 10px;
+  margin: 1px auto;
+}
+.ugh{
+  margin-top: 20px
 }
 #modal-login-form {
   margin-top: 20px;
@@ -10826,6 +10835,7 @@ span.input-truncate {
   position: absolute;
   left: 180px;
   float: none;
+  z-index: 111;
   border-radius: 5px;
   padding: 1px 5px;
 }

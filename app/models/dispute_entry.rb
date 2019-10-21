@@ -729,6 +729,32 @@ class DisputeEntry < ApplicationRecord
         entry.primary_category = DisputeEntry.get_primary_category(entry.hostlookup)
       end
 
+
+
+
+    unique_entries = entries.uniq{|e| e.hostlookup}
+    duplicate_entries = entries - unique_entries
+
+    duplicate_entries.each do |duplicate_entry|
+
+      unique_entries.select{ |e| e.hostlookup == duplicate_entry.hostlookup}.map do |e|
+
+        if e.consolidated_wlbl_strings.blank? && duplicate_entry.consolidated_wlbl_strings.present?
+          e.consolidated_wlbl_strings << duplicate_entry.consolidated_wlbl_strings
+        elsif e.consolidated_wlbl_strings.present? && duplicate_entry.consolidated_wlbl_strings.present?
+          e.consolidated_wlbl_strings << ", " + duplicate_entry.consolidated_wlbl_strings
+        end
+
+      end
+
+
+    end
+
+
+
+
+
+
     #get rid of weird entries
 
     final_entries = []
