@@ -32,8 +32,11 @@ $ ->
 
   $(document).on 'click', '.dispute_check_box', (e) ->
     is_checked = $(e.target).prop('checked')
-    $('#select-all-entries').prop('checked', is_checked)
-
+    if $('.dispute_check_box').not(':checked').length > 0
+      $('#select-all-entries').prop('checked', false)
+    else
+      $('#select-all-entries').prop('checked', true)
+      
   window.close_modal = () ->
     $('#confirmation-modal').modal('toggle')
 
