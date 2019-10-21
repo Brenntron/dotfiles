@@ -29,7 +29,7 @@
 
   %hr.thin
   .form-group.text-center
-    %button.primary{value: 'submit', type: 'button', onclick: 'submit_new_dispute(this)'}
+    %button.primary{value: 'submit', type: 'button', id:'submit_new_dispute', onclick: 'submit_new_dispute(this); return false;'}
       Create
     %button.secondary#cancel_dispute{type: 'button'}
       Cancel
