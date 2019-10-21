@@ -203,13 +203,15 @@
         (#{@entries.count} found)
       #research-page-toolbar.toolbar
         %div
+          %label.toolbar-section-label Row Select
+          %input#select-all-entries.esc-tooltipped{type:'checkbox',title: 'Select All', 'onclick':'select_all_detailed(this)'}
+          %label.toolbar-button-text Select All Rows
+        %div
           %label.toolbar-section-label Table View
           %button.toolbar-button.expand-row-button#expand-all-rows.esc-tooltipped.toolbar-button-spacer{title: 'Expand All Rows'}
             %span.toolbar-button-text Expand All Rows
           %button.toolbar-button.collapse-button#collapse-all-rows.esc-tooltipped.hidden{title: 'Collapse All Rows'}
             %span.toolbar-button-text Collapse All Rows
-          %input#select-all-entries.esc-tooltipped{type:'checkbox',title: 'Select All', 'onclick':'select_all_detailed(this)'}
-            %span.toolbar-button-text Select All
         %div
           %label.toolbar-section-label Edit
           %span.dropdown

@@ -36,7 +36,7 @@ $ ->
       $('#select-all-entries').prop('checked', false)
     else
       $('#select-all-entries').prop('checked', true)
-      
+
   window.close_modal = () ->
     $('#confirmation-modal').modal('toggle')
 
