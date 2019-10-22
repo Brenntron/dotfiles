@@ -140,8 +140,10 @@ module API
               std_api_v2 do
                 params["data"].each do |item, prefix|
                   if prefix["url"].present?
+                    binding.pry
                     Complaint.commit_without_complaint(ip_or_uri: prefix["url"],
-                                                       categories_string: prefix["cats"].join(','),
+                                                       category_ids_string: prefix["category_ids"].join(','),
+                                                       category_names_string: prefix["category_names"].join(','),
                                                        description: '',
                                                        user: current_user.email,
                                                        bugzilla_rest_session: bugzilla_rest_session)
@@ -158,9 +160,11 @@ module API
             end
             post 'multi_cat_new_url' do
               std_api_v2 do
+                binding.pry
                 permitted_params['urls'].each do |prefix|
                   Complaint.commit_without_complaint(ip_or_uri: prefix,
-                                                     categories_string: permitted_params["cats"].join(','),
+                                                     category_ids_string: permitted_params["cats"].join(','),
+                                                     category_names_string: nil,
                                                      description: '',
                                                      user: current_user.email,
                                                      bugzilla_rest_session: bugzilla_rest_session)

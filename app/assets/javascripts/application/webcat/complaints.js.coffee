@@ -130,9 +130,14 @@ window.cat_new_url = ()->
 
   for i in [1...6] by 1
 
-    data[i] = {url: $("#url_#{i}").val(), cats: $("#cat_new_url_#{i}").text()}
+    categories = []
+    for j in [0...5] by 1
+      if $("#cat_new_url_#{i}")[0][j]
+        categories.push($("#cat_new_url_#{i}")[0][j].text)
 
-    if data[i].url.length > 0 && data[i].cats != null
+    data[i] = {url: $("#url_#{i}").val(), category_names: categories, category_ids: $("#cat_new_url_#{i}").val()}
+
+    if data[i].url.length > 0 && data[i].category_ids != null
       isEmpty = false
 
   if isEmpty == false
