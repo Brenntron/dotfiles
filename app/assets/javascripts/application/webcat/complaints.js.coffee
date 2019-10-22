@@ -176,9 +176,15 @@ window.webcat_reset_search = ()->
 window.multiple_url_categorization = ()->
 
   urls = $("#categorize_urls").val().split(/\n/)
-  cats = $("#multi_cat_url_cats").val()
+  category_ids = $("#multi_cat_url_cats").val()
+  category_names = []
 
-  if $("#categorize_urls").val() != "" && cats != null
+  for category in $("#multi_cat_url_cats")
+    for i in [0..5] by 1
+      if category[i]
+        category_names.push(category[i].text)
+
+  if $("#categorize_urls").val() != "" && category_ids != null && category_names != null
     $('#loader-modal').modal({
       keyboard: false
     })
@@ -186,7 +192,7 @@ window.multiple_url_categorization = ()->
     std_msg_ajax(
       url:'/escalations/api/v1/escalations/webcat/complaints/multi_cat_new_url'
       method: 'POST'
-      data: {urls: urls, cats: cats}
+      data: {urls: urls, category_names: category_names, category_ids: category_ids}
       success: (response) ->
         $('#loader-modal').modal 'hide'
         std_msg_success('Success',["URLs/IPs successfully categorized."], reload: true)
