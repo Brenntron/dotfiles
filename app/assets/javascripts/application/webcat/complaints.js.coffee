@@ -130,7 +130,7 @@ window.cat_new_url = ()->
 
   for i in [1...6] by 1
 
-    data[i] = {url: $("#url_#{i}").val(), cats: $("#cat_new_url_#{i}").val()}
+    data[i] = {url: $("#url_#{i}").val(), cats: $("#cat_new_url_#{i}").text()}
 
     if data[i].url.length > 0 && data[i].cats != null
       isEmpty = false
