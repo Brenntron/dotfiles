@@ -34,7 +34,9 @@ Feature: Disputes
   @javascript
   Scenario: A user can create new disputes with urls found through lookup detail
     Given a user with role "webrep user" exists and is logged in
+    And vrtincoming exists
     And bugzilla rest api always saves
+    And Dispute Analyst customer exists
     When I go to "/escalations/webrep/research#lookup-detail"
     And I fill in "search_uri" with "ough.com"
     Then I click "submit-button rep-research"
@@ -43,8 +45,7 @@ Feature: Disputes
     Then I click "#select-all-entries"
     Then I click "add-to-ticket-button"
     When I click "submit_new_dispute"
-    And I wait for "10" seconds
-    And take a screenshot
+    And I wait for "30" seconds
     Then I should see "All entries were successfully created."
 
 

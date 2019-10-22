@@ -3,3 +3,7 @@ Given(/^the following customers exist:$/) do |customers|
     FactoryBot.create(:customer, customer)
   end
 end
+
+Given(/^Dispute Analyst customer exists$/) do
+  FactoryBot.create(:dispute_analyst)
+end
