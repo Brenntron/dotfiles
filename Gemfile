@@ -40,7 +40,6 @@ gem 'bugzilla', require: 'bugzilla'
 gem 'xmlrpc'
 gem 'libv8', '3.16.14.19'
 
-
 gem 'rails_admin', '~> 1.3'
 
 # System Management
@@ -51,10 +50,12 @@ gem 'dotenv-rails', '2.5.0'
 gem 'with_advisory_lock', '~> 4.0'
 gem 'delayed_job', '4.1.5'
 gem 'delayed_job_active_record', '4.1.3'
+gem 'delayed_job_web', '1.4.3'
 
 # Micellaneous
 gem 'pry', '0.12.2'
 gem 'pry-remote', '~> 0.1.8'
+
 
 
 gem 'simple_form', '4.0.1'
@@ -74,6 +75,7 @@ gem 'whois-parser', '1.1.0'
 gem 'will_paginate', '3.1.6'
 
 gem 'jquery-datatables', '~> 1.10.19'
+gem "sassc", '2.0.1'
 gem "sassc-rails", '~> 2.0'
 gem 'ajax-datatables-rails', '~> 1.0.0'
 gem 'clipboard-rails', '1.7.1'
