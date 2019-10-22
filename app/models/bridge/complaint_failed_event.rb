@@ -11,5 +11,5 @@ class Bridge::ComplaintFailedEvent < Bridge::BaseMessage
                     ac_status: ac_status})
   end
 
-  handle_asynchronously :post, :queue => "complaint_failed"
+  handle_asynchronously :post, :queue => "complaint_failed", :priority => 1
 end

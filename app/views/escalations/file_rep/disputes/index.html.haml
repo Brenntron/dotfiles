@@ -9,7 +9,7 @@
         %thead
           %tr
             %th
-            -#  Checkbox column
+              %input#file-rep-cb-all{type: 'checkbox', onclick: 'file_rep_select_all();'}
             %th.file-rep-sorting#case-id Case ID
             %th.file-rep-sorting#status Status
             %th.file-rep-sorting#resolution Resolution

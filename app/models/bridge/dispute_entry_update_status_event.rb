@@ -11,7 +11,8 @@ class Bridge::DisputeEntryUpdateStatusEvent < Bridge::BaseMessage
           company_dup: entry.is_possible_company_duplicate?,
           status: entry.status,
           resolution: entry.resolution,
-          resolution_message: entry.resolution_comment
+          resolution_message: entry.resolution_comment,
+          sugg_type: entry.suggested_disposition
       }
       message_data
     end
@@ -23,11 +24,11 @@ class Bridge::DisputeEntryUpdateStatusEvent < Bridge::BaseMessage
     })
   end
 
-  handle_asynchronously :post_entries, :queue => "dispute_update"
+  handle_asynchronously :post_entries, :queue => "dispute_update", :priority => 2
 
   def post_entry(entry)
     post_entries([ entry ])
   end
 
-  handle_asynchronously :post_entry, :queue => "dispute_update"
+  handle_asynchronously :post_entry, :queue => "dispute_update", :priority => 2
 end

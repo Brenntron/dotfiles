@@ -36,7 +36,7 @@ Feature: WebRep Reports
     And I fill in "report[date_from]" with "2018-01-01"
     And I fill in "report[date_to]" with "2018-12-31"
   And I click ".create-report" and switch to the new window
-  Then I trigger-click ".per-resolution-export"
+  Then I click ".per-resolution-export"
   Then I wait for "3" seconds
   Then I should receive a file of type "application/octet-stream"
 
@@ -53,7 +53,7 @@ Feature: WebRep Reports
     And I fill in "report[date_from]" with "2018-01-01"
     And I fill in "report[date_to]" with "2018-12-31"
     And I click ".create-report" and switch to the new window
-    Then I trigger-click ".per-engineer-export"
+    Then I click ".per-engineer-export"
     Then I wait for "3" seconds
     Then I should receive a file of type "application/octet-stream"
 
@@ -70,7 +70,7 @@ Feature: WebRep Reports
     And I fill in "report[date_from]" with "2018-01-01"
     And I fill in "report[date_to]" with "2018-12-31"
     And I click ".create-report" and switch to the new window
-    Then I trigger-click ".per-customer-export"
+    Then I click ".per-customer-export"
     Then I wait for "3" seconds
     Then I should receive a file of type "application/octet-stream"
 
@@ -86,6 +86,6 @@ Feature: WebRep Reports
     When I goto "/escalations/webrep/disputes/resolution_age_report?customer_id=1&date_from=2018-01-01&date_to=2018-12-30"
     Then I should see "Resolution Age Report"
     Then I should see "Number of resolved complaints per resolution"
-    Then I trigger-click ".resolution-age-export"
+    Then I click ".resolution-age-export"
     Then I wait for "3" seconds
     Then I should receive a file of type "application/octet-stream"

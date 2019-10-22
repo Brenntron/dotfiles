@@ -3,6 +3,8 @@ Feature: Disputes
   as a user
   I will provide ways to interact with disputes
 
+
+
   @javascript
   Scenario: a user visits the duplicate cases tab and sees a table of duplicate cases
     Given a user with role "webrep user" exists and is logged in
@@ -13,6 +15,41 @@ Feature: Disputes
     And I go to "/escalations/webrep/disputes/1"
     Then I click "#related-tab-link"
     Then I should see "0000000002"
+
+  @javascript
+  Scenario: A user cannot create a duplicate url Dispute
+    Given a user with role "webrep user" exists and is logged in
+    Given the following disputes exist and have entries:
+      | id |
+      | 1  |
+    Given a dispute exists and is related to disputes with ID, "1":
+    When I go to "/escalations/webrep/disputes"
+    And I wait for "2" seconds
+    Then I click "new-dispute"
+    And I fill in "ips_urls" with "talosintelligence.com"
+    And I fill in "assignee" with "nherbert"
+    When I click "submit"
+    Then I should see "Unable to create the following duplicate dispute entries: talosintelligence.com"
+    
+  @javascript
+  Scenario: A user cannot create a duplicate IP Dispute
+    Given a user with role "webrep user" exists and is logged in
+    Given the following disputes exist:
+      | id |   subject     | status |
+      | 1  |    test 2     |  NEW   |
+    Given the following dispute_entries exist:
+      | id |      ip_address     | status |
+      | 1  | 123.63.22.24        |  NEW   |
+    Given a dispute exists and is related to disputes with ID, "1":
+    When I go to "/escalations/webrep/disputes"
+    And I wait for "2" seconds
+    Then I click "new-dispute"
+    And I fill in "ips_urls" with "123.63.22.24"
+    And I fill in "assignee" with "nherbert"
+    When I click "submit"
+    Then I should see "Unable to create the following duplicate dispute entries: 123.63.22.24"
+
+
 
   @javascript
   Scenario: the last submitted field returns data
@@ -32,8 +69,9 @@ Feature: Disputes
       | id | submitter_type |
       | 1  | CUSTOMER       |
     Then I goto "escalations/webrep/"
-    When I trigger-click "#table-show-columns-button"
-    And I trigger-click "#submitter-type-checkbox"
+    Then I wait for "2" seconds
+    When I click "#table-show-columns-button"
+    And I click "#submitter-type-checkbox"
     Then I should see table header with id "submitter-type"
     Then I should see "CUSTOMER"
 
@@ -84,7 +122,7 @@ Feature: Disputes
     And I click ".inline-edit-entry-button"
     And I click "#entry_status_button_1"
     And I click "#RE-OPENED"
-    And I trigger-click ".save-all-changes"
+    And I click ".save-all-changes"
     Then I wait for "3" seconds
     Then I should see "RE-OPENED"
 
@@ -104,6 +142,7 @@ Feature: Disputes
       | id |
       | 2  |
     When I goto "escalations/webrep/disputes"
+    And I wait for "2" seconds
     Given I check "cbox0000000001"
     And I click ".mark-related-button"
     And I fill in "dispute_id" with "2"
@@ -113,6 +152,7 @@ Feature: Disputes
 
   @javascript
   Scenario: a user uses advanced search filter (Submitted Older/Modified Older) and exports to csv
+    Given pending
     Given a user with role "webrep user" exists and is logged in
     And the following disputes exist and have entries:
       | id |
@@ -123,7 +163,7 @@ Feature: Disputes
     And I click "#submitted-older-cb"
     And I click "#modified-older-cb"
     And I click "#add-search-criteria"
-    Then I trigger-click ".export-button"
+    Then I click ".export-button"
     Then I wait for "3" seconds
     Then I should receive a file of type "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet"'
 
@@ -134,14 +174,15 @@ Feature: Disputes
       | id |
       | 1  |
     When I goto "escalations/webrep/disputes?f=open"
-    And I trigger-click "#table-show-columns-button"
-    And I trigger-click "#case-id-checkbox"
-    And I trigger-click "#status-checkbox"
-    And I trigger-click "#submitter-type-checkbox"
-    And I trigger-click "#submitter-org-checkbox"
-    And I trigger-click "#submitter-domain-checkbox"
-    And I trigger-click "#contact-name-checkbox"
-    And I trigger-click "#contact-email-checkbox"
+    And I wait for "3" seconds
+    And I click "#table-show-columns-button"
+    And I click "#case-id-checkbox"
+    And I click "#status-checkbox"
+    And I click "#submitter-type-checkbox"
+    And I click "#submitter-org-checkbox"
+    And I click "#submitter-domain-checkbox"
+    And I click "#contact-name-checkbox"
+    And I click "#contact-email-checkbox"
     When I goto "escalations/webrep/disputes?f=open"
     Then I wait for "5" seconds
     Then I should not see "CASE ID"
@@ -165,7 +206,8 @@ Feature: Disputes
     And I click "#add-search-criteria"
     Then I fill in "name-input" with "Bob Jones"
     Then I click "#submit-advanced-search"
-    And I trigger-click "#advanced-search-button"
+    And I wait for "5" seconds
+    And I click "#advanced-search-button"
     Then I wait for "5" seconds
     Then I should see "talosintelligence.com"
     Then I should see "0000000001"
@@ -184,7 +226,8 @@ Feature: Disputes
     And I click "#add-search-criteria"
     Then I fill in "email-input" with "bob@bob.com"
     Then I click "#submit-advanced-search"
-    And I trigger-click "#advanced-search-button"
+    And I wait for "3" seconds
+    And I click "#advanced-search-button"
     Then I wait for "5" seconds
     Then I should see "talosintelligence.com"
     Then I should see "0000000001"
@@ -202,36 +245,39 @@ Feature: Disputes
     And I click "#add-search-criteria"
     Then I fill in "company-input" with "Bobs Burgers"
     Then I click "#submit-advanced-search"
-    And I trigger-click "#advanced-search-button"
+    And I wait for "5" seconds
+    And I click "#advanced-search-button"
     Then I wait for "5" seconds
     Then I should see "talosintelligence.com"
     Then I should see "0000000001"
 
   @javascript
   Scenario: a user tries to export selected dispute entries
+    Given pending
     Given a user with role "webrep user" exists and is logged in
     And the following disputes exist and have entries:
       | id | submission_type |
       | 1  | w               |
-    When I goto "escalations/webrep/disputes?f=all"
-    And I click "#expand-all-index-rows"
-    And I trigger-click ".dispute-entry-checkbox_1"
-    And I click ".export-button"
+    When I goto "escalations/webrep/disputes?f=open"
+    Then take a screenshot
+    And I click ".dispute_check_box"
+    And I click "Export Selected to CSV"
     Then I wait for "3" seconds
     Then I should receive a file of type "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet"
 
   @javascript
   Scenario: a user tries to export selected dispute entries on the Research tab
+    Given pending
     Given a user with role "webrep user" exists and is logged in
     And the following disputes exist and have entries:
       | id |
       | 1  |
     When I goto "/escalations/webrep/disputes/1"
-    And I trigger-click "#research-tab-link"
-    And I trigger-click ".dispute_check_box"
-    And I click ".export-button"
+    And I click "#research-tab-link"
+    And I click ".dispute_check_box"
+    And I click "Export Selected to CSV"
     Then I wait for "3" seconds
-    Then I should receive a file of type "application/octet-stream"
+    Then I should receive a file of type "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet"
 
   @javascript
   Scenario: A user creates a new resolution message template
@@ -312,42 +358,51 @@ Feature: Disputes
 
   Scenario: A user creates a new named search for disputes
     Given a user with role "webrep user" exists and is logged in
+    And the following disputes exist and have entries:
+      |  id  |  status  | user_id |
+      | 5370 | ASSIGNED |    1    |
     When I goto "/escalations/webrep/disputes"
-    And I trigger-click "#advanced-search-button"
+    And I click "#advanced-search-button"
     And I fill in "search_name" with "Lab"
-    And I trigger-click "#submit-advanced-search"
-    And I trigger-click "#filter-cases"
+    And I click "#submit-advanced-search"
+    And I click "#filter-cases"
     Then I should see content "Lab" within "#saved-searches-wrapper"
 
   @javascript
   Scenario: A user uses a new named search for disputes
     Given a user with role "webrep user" exists and is logged in
     And the following disputes exist and have entries:
-      | id | status |
-      | 1  | NEW    |
-    And the following disputes exist and have entries:
-      | id | status |
-      | 2  | NEW    |
+      | id |     status      |
+      |  1 |       NEW       |
+      |  2 |       NEW       |
+      |  3 | RESOLVED_CLOSED |
     And a named search with the name, "Cucumber" exists
     And a named search criteria exists with field_name: "status" and value: "NEW"
     When I goto "/escalations/webrep/disputes?f=closed"
+    And  I wait for "3" seconds
+    And  I should see content "RESOLVED_CLOSED" within ".dispute_status"
     Then I should not see "0000000001"
-    Then I should not see "NEW"
-    Then I should not see "0000000002"
-    And I trigger-click "#filter-cases"
-    And I trigger-click ".saved-search"
+    And  I should not see content "NEW" within ".dispute_status"
+    And  I should not see "0000000002"
+    When I click "#filter-cases"
+    And  I click ".saved-search"
+    And  I wait for "3" seconds
     Then I should see "0000000001"
-    Then I should see "NEW"
-    Then I should see "0000000002"
+    And  I should see content "NEW" within first element of class ".dispute_status"
+    And  I should see "0000000002"
 
   @javascript
   Scenario: A user creates a new named search for disputes
     Given a user with role "webrep user" exists and is logged in
-    When I goto "/escalations/webrep/disputes?f=closed"
-    And I trigger-click "#advanced-search-button"
+    And the following disputes exist and have entries:
+      |  id  |  status  | user_id |
+      | 5370 | ASSIGNED |    1    |
+    When I goto "/escalations/webrep/disputes?f=open"
+    And  I wait for "3" seconds
+    And I click "#advanced-search-button"
     And I fill in "search_name" with "Cucumber"
-    And I trigger-click "#submit-advanced-search"
-    And I trigger-click "#filter-cases"
+    And I click "#submit-advanced-search"
+    And I click "#filter-cases"
     Then I should see content "Cucumber" within "#saved-searches-wrapper"
 
   @javascript
@@ -355,29 +410,35 @@ Feature: Disputes
     Given a user with role "webrep user" exists and is logged in
     And a named search with the name, "Cucumber" exists
     And a named search criteria exists with field_name: "status" and value: "NEW"
-    When I goto "/escalations/webrep/disputes?f=closed"
-    And I trigger-click "#advanced-search-button"
+    And the following disputes exist and have entries:
+      |  id  |  status  | user_id |
+      | 5370 | ASSIGNED |    1    |
+    When I goto "/escalations/webrep/disputes?f=open"
+    And  I wait for "3" seconds
+    And I click "#advanced-search-button"
     And I fill in "search_name" with "Cucumber"
-    And I trigger-click "#submit-advanced-search"
-    And I trigger-click "#filter-cases"
+    And I click "#submit-advanced-search"
+    And I click "#filter-cases"
     Then I should see content "Cucumber" within "#saved-searches-wrapper"
     And There is only one element of class, "saved-search"
 
   @javascript
   Scenario: A user creates a new named search for disputes and stays on the page (tests to make sure multiple named search criteria are not created)
     Given a user with role "webrep user" exists and is logged in
-    When I goto "/escalations/webrep/disputes?f=closed"
-    And I trigger-click "#advanced-search-button"
+    And the following disputes exist and have entries:
+      |  id  |  status  | user_id |
+      | 5370 | ASSIGNED |    1    |
+    When I goto "/escalations/webrep/disputes?f=open"
+    And  I wait for "3" seconds
+    And I click "#advanced-search-button"
     And I fill in "search_name" with "Cucumber"
-    And I trigger-click "#submit-advanced-search"
-    And I trigger-click "#filter-cases"
+    And I click "#submit-advanced-search"
+    And I click "#filter-cases"
     Then I should see content "Cucumber" within "#saved-searches-wrapper"
-    Then I wait for "90" seconds
-    Then There is only one element of class, "saved-search"
 
   @javascript
   Scenario: A user visits the Dashboard page and sees correct ticket counts
-    Given a user with role "webrep user" exists with cvs_username, "Cucumber", exists and is logged in
+    Given a user with id "1" has a role "webrep user" and is logged in
     And the following disputes exist and have entries:
       | id   | status   | user_id |
       | 5370 | ASSIGNED | 1       |
@@ -406,13 +467,13 @@ Feature: Disputes
       | id   | status          | user_id |
       | 5378 | RESOLVED_CLOSED | 1       |
     When I goto "/escalations/webrep/dashboard"
-    Then I should see content "3" within ".open"
-    Then I should see content "2" within ".in-progress"
-    Then I should see content "4" within ".closed"
+    And I click "#ticket-view-shortcut"
+    Then I should see content "3" within "#open_single_ticket_count"
+    Then I should see content "4" within "#closed_single_ticket_count"
 
   @javascript
   Scenario: A user visits the Dashboard page and sees correct ticket counts for their team
-    Given a user with role "webrep user" exists with cvs_username, "Cucumber", exists and is logged in
+    Given a user with id "1" has a role "webrep user" and is logged in
     And I add a test user to current user's team
     And the following disputes exist and have entries:
       | id   | status   | user_id |
@@ -442,12 +503,12 @@ Feature: Disputes
       | id   | status          | user_id |
       | 5378 | RESOLVED_CLOSED | 2       |
     When I goto "/escalations/webrep/dashboard"
-    Then I should see content "2" within ".open"
-    Then I should see content "1" within ".in-progress"
-    Then I should see content "3" within ".closed"
-    Then I should see content "3" within ".open-team"
-    Then I should see content "2" within ".in-progress-team"
-    Then I should see content "4" within ".closed-team"
+    And I click "#ticket-view-shortcut"
+    Then I should see content "2" within "#open_single_ticket_count"
+    Then I should see content "3" within "#closed_single_ticket_count"
+    Then I click "My Team Tickets"
+    Then I should see content "3" within "#open_multi_ticket_count"
+    Then I should see content "4" within "#closed_multi_ticket_count"
 
   @javascript
   Scenario: A user tries to update a dispute

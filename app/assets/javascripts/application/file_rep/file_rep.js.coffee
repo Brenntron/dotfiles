@@ -242,6 +242,28 @@ $ ->
       $('#show-ticket-resolution-submenu').hide()
       $(res_comment[0]).val('')
 
+
+  $('#filerep-resolution-selector input[type=radio][name=dispute-resolution]').change ->
+    if $('input[name=filerep-dispute-customer-company-name]').val() != 'Guest'
+      is_customer = true
+
+    $(".resolution-status-comment").html('')
+    resolution_comment = ''
+    switch @value
+      when 'FIXED_FP'
+        resolution_comment += "Talos has concluded that the file is safe to access at this time; the file has been marked unknown/clean. This update will be publicly visible in the next 24 hours."
+        if is_customer
+          resolution_comment += " If your device or endpoint client is not reflecting this disposition, please open a TAC case."
+      when 'FIXED_FN'
+        resolution_comment += "Talos has concluded that the file is unsafe due to malicious activity; the file has been marked malicious. This update will be publicly visible in the next 24 hours."
+        if is_customer
+          resolution_comment += " If your device or endpoint client is not reflecting this disposition, please open a TAC case."
+      when 'UNCHANGED'
+        resolution_comment += "Talos has not found sufficient evidence to modify the current disposition of the file-in-question; we cannot change the file’s disposition because it can negatively affect our customers. However, a customer has the option of locally changing a file’s disposition, if they understand the risks in doing so."
+        if is_customer
+          resolution_comment += " Please open a TAC case and provide additional details if you need further assistance."
+    $(".resolution-status-comment").html(resolution_comment)
+
   window.triggerTooltips = (item) ->
     $('.tooltip_content').show()
     $('.nested-tooltipped').tooltipster
@@ -378,9 +400,6 @@ $ ->
       selected_cases: []
     }
 
-    $('.dispute_check_box:checked').each ->
-      case_id =  $(this).attr('value')
-      data.selected_cases.push(case_id)
 
     if location.search != ''
       urlParams = new URLSearchParams(location.search);
@@ -388,6 +407,7 @@ $ ->
       data ={
         search_type : 'standard'
         search_name : urlParams.get('f')
+        selected_cases: []
       }
 
       refresh_localStorage()
@@ -407,24 +427,34 @@ $ ->
             search_type: search_type
             search_name: search_name
             search_conditions: search_conditions
-          }
+            selected_cases: []
+        }
       else if search_type == 'named'
         data = {
           search_type: search_type
           search_name: search_name
+          selected_cases: []
         }
       else if search_type == 'contains'
         search_conditions = JSON.parse(search_conditions)
         data = {
           search_type: search_type
           search_conditions: search_conditions
+          selected_cases: []
         }
+
+
+    $('.dispute_check_box:checked').each ->
+      case_id =  $(this).attr('value')
+      data.selected_cases.push(case_id)
+
 
     format_filerep_header(data)
     return data
 
   window.format_filerep_header = (data) ->
     container = $('#filerep_searchref_container')
+    container.html("")
     if data != undefined && container.length > 0
       reset_icon = '<span id="refresh-filter-button" class="reset-filter esc-tooltipped" title="Clear Search Results" onclick="filerep_refresh()"></span>'
       {search_type, search_name} = data
@@ -497,13 +527,45 @@ $ ->
         new_header = 'All File Reputation Tickets'
       $('#filerep-index-title')[0].innerHTML = new_header
 
-  window.export_file_rep = () ->
-    data = build_data()
+  window.export_file_rep_all = () ->
+    form = document.getElementById("disputes-index-export-form")
+    data = {
+      search_type: ''
+      search_name: ''
+      selected_cases: []
+    }
+
+    $('.dispute_check_box').each ->
+      case_id =  $(this).attr('value')
+      data.selected_cases.push(case_id)
+
     if 'advanced' == data.search_type
       data.search_name = null
     data_json = JSON.stringify(data)
     $('#index-export-data-input').val(data_json)
-    return true
+    form.onsubmit = ""
+    form.submit()
+    form.onsubmit = () ->
+      return false
+
+  $(document).on 'change', '.dispute_check_box', ->
+    document.getElementById("disputes-index-export-form").onsubmit = () ->
+      return false
+
+
+  window.export_file_rep_selected = () ->
+    data = build_data()
+    if data.selected_cases.length <= 0
+      std_msg_error('Error: Nothing selected.',"", reload: false)
+      return false
+    if 'advanced' == data.search_type
+      data.search_name = null
+    data_json = JSON.stringify(data)
+    $('#index-export-data-input').val(data_json)
+    document.getElementById("disputes-index-export-form").onsubmit = ""
+
+
+
 
   $('#file-rep-datatable').dataTable
     drawCallback: ( settings ) ->
@@ -1233,7 +1295,7 @@ $ ->
 
 
   $(document).ready ->
-    # Make sure you're on show page to fetch the AMP data
+  # Make sure you're on show page to fetch the AMP data
     if $('body.escalations--file_rep--disputes-controller').hasClass('show-action')
       curr_sha256_hash = $('#sha256_hash').text()
 
@@ -1362,5 +1424,12 @@ $ ->
       )
 
 
-
-
+# file rep index - toggle all cb's and highlight rows
+window.file_rep_select_all = () ->
+  table = $('#file-rep-datatable')
+  if $('#file-rep-cb-all').is(':checked')
+    $(table).find(':checkbox').prop('checked', true)
+    $(table).find('tr').addClass('selected')
+  else
+    $(table).find(':checkbox').prop('checked', false)
+    $(table).find('tr').removeClass('selected')

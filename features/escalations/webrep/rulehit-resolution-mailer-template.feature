@@ -28,33 +28,33 @@ Feature: RuleHit Resolution Mailer Templates
   @javascript
   Scenario: A user creates a new RuleHit Resolution Mailer Template
     Given a user with role "webrep user" exists and is logged in
-    When I goto "/rulehit_resolution_mailer_templates/new"
+    When I goto "/escalations/rulehit_resolution_mailer_templates/new"
     Then I fill in "rulehit_resolution_mailer_template[mnemonic]" with "sqdk"
     Then I fill in "rulehit_resolution_mailer_template[to]" with "cisco@cisco.com"
     Then I fill in "rulehit_resolution_mailer_template[cc]" with "cisco@cisco.com"
     Then I fill in "rulehit_resolution_mailer_template[subject]" with "Cucumber"
     Then I fill in "rulehit_resolution_mailer_template[body]" with "This is a test."
-    Then I trigger-click ".btn"
+    Then I click ".btn"
     Then I should see "Rulehit resolution mailer template was successfully created."
 
   @javascript
   Scenario: A user updates RuleHit Resolution Mailer Template
     Given a user with role "webrep user" exists and is logged in
     And a RuleHit Resolution Mailer template exists with mnemonic, "sqdk", and body of "Temple Gates"
-    When I goto "/rulehit_resolution_mailer_templates/1/edit"
+    When I goto "/escalations/rulehit_resolution_mailer_templates/1/edit"
     And I fill in "rulehit_resolution_mailer_template[mnemonic]" with "sqdk"
     And I fill in "rulehit_resolution_mailer_template[to]" with "jobs@cisco.com"
     And I fill in "rulehit_resolution_mailer_template[cc]" with "hr@cisco.com"
     And I fill in "rulehit_resolution_mailer_template[subject]" with "Capybara"
     And I fill in "rulehit_resolution_mailer_template[body]" with "Run the test."
-    And I trigger-click ".btn"
+    And I click ".btn"
     Then I should see "Rulehit resolution mailer template was successfully updated."
 
   @javascript
   Scenario: A user deletes RuleHit Resolution Mailer Template
     Given a user with role "webrep user" exists and is logged in
     And a RuleHit Resolution Mailer template exists with mnemonic, "sqdk", and body of "Temple Gates"
-    When I goto "/rulehit_resolution_mailer_templates/"
+    When I goto "/escalations/rulehit_resolution_mailer_templates/"
     And I click through "#delete-1" and accept confirmation
     Then I should see "Rulehit resolution mailer template was successfully destroyed."
 

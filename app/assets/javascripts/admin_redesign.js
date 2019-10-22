@@ -51,7 +51,7 @@
 //= require application/file_rep/naming_guide
 //= require application/file_rep/research
 //= require application/file_rep/dispute_form
-
+//= require application/users
 //= require application/webrep/reptool
 //= require application/webrep/wbrs_wlbl
 //= require admin/admin-tools

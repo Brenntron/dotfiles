@@ -26,3 +26,18 @@ $ ->
     else
       new_rowspan = original_rowspan - hidden_rows
       $("#team-cell").attr('rowspan', new_rowspan)
+
+
+  $('.select-team-members').on 'change', ->
+    team_member_id = $(this).val()
+    team_member_name = $(this).children('option:selected').text()
+    $.ajax
+      url: "/escalations/users/#{team_member_id}/relationships/member_status"
+      method: 'GET'
+      data: 'new_member': team_member_id
+      success: (res, status, xhr) ->
+        if xhr.getResponseHeader('New-Member') == 'false'
+          $('.info-alert').eq(0).html( "<p> #{team_member_name} is on a team already. Are you sure you want to move #{team_member_name} to another team? </p>" )
+          $('#new_member_modal').appendTo('body').modal 'show'
+        return
+    return

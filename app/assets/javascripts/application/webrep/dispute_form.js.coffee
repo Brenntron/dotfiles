@@ -22,13 +22,16 @@ $ ->
           priority: priority,
           ticket_type: ticket_type
         success: (response) ->
+          console.log response
           $('#new-dispute').dropdown('toggle')
           $('#loader-modal').modal 'hide'
-
           if response.json.errors.length > 0
             std_msg_error("Duplicate",["Unable to create duplicate entries: #{response.json.errors}. The other entries (if any) were successfully created."], reload: true)
+          else
+            std_msg_success("Success", ["All entries were successfully created."], reload: true)
 
         error: (response) ->
+          console.log response
           $('#loader-modal').modal 'hide'
           std_msg_error("Error",[response.responseJSON.message], reload: false)
       )

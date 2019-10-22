@@ -24,7 +24,8 @@ class Escalations::Webcat::ComplaintEntriesController < Escalations::WebcatContr
     if data
       send_data data, type: 'image/jpeg'
     else
-      send_data "", type: 'image/jpeg'
+      file_data = File.open("app/assets/images/removed_screenshot.jpg").read()
+      send_data file_data, type: 'image/jpeg'
     end
   end
 

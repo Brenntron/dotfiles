@@ -1,6 +1,9 @@
 development:
   amq: #active message queue
     host: "localhost"
+    timeout: 2
+  api_timeout:
+    timeout: 15
   auto_resolve:
     complaints:
       check: true
@@ -72,8 +75,10 @@ development:
     url: "https://localhost:3000/api_test"
   sds:
     host: "v2.sds.cisco.com"
-    cert_file: "/usr/local/etc/sds-certificate.pem"
+    ca_cert_file: "/usr/local/etc/sds-certificate.pem"
     pkey_file: "/usr/local/etc/sds-pkey.pem"
+    username: "tidev"
+    password: "REDACTED"
   snort_doc_max_fails: 3
   snort_org:
     host: "localhost"
@@ -120,6 +125,9 @@ development:
 test:
   amq: #active message queue
     host: "localhost"
+    timeout: 2
+  api_timeout:
+    timeout: 15
   auto_resolve:
     complaints:
       check: true
@@ -190,8 +198,10 @@ test:
     url: "https://localhost:3000/api_test"
   sds:
     host: "v2.sds.cisco.com"
-    cert_file: "/usr/local/etc/sds-certificate.pem"
+    ca_cert_file: "/usr/local/etc/sds-certificate.pem"
     pkey_file: "/usr/local/etc/sds-pkey.pem"
+    username: "tidev"
+    password: "REDACTED"
   snort_doc_max_fails: 1
   snort_org:
     host: "localhost"
@@ -235,6 +245,9 @@ test:
 staging:
   amq:
     host: "fmd-actmq-01stg.vrt.sourcefire.com"
+    timeout: 2
+  api_timeout:
+    timeout: 15
   auto_resolve:
     complaints:
       check: true
@@ -304,8 +317,8 @@ staging:
     host: "v2.sds.cisco.com"
     cert_file: "/usr/local/etc/sds-certificate.pem"
     pkey_file: "/usr/local/etc/sds-pkey.pem"
-    user: 'tidev'
-    pass: "redacted"
+    username: "tidev"
+    passname: "redacted"
   snort_doc_max_fails: 3
   snort_org:
     host: "localhost"
@@ -355,6 +368,9 @@ staging:
 production:
   amq: #active message queue
     host: "mq.vrt.sourcefire.com"
+    timeout: 2
+  api_timeout:
+    timeout: 15
   auto_resolve:
     complaints:
       check: true
@@ -423,6 +439,8 @@ production:
     host: "v2.sds.cisco.com"
     cert_file: "/usr/local/etc/sds-certificate.pem"
     pkey_file: "/usr/local/etc/sds-pkey.pem"
+    username: "tidev"
+    passname: "redacted"
   snort_doc_max_fails: 10
   snort_org:
     host: "snort.org"

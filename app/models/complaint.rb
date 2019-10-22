@@ -52,11 +52,11 @@ class Complaint < ApplicationRecord
     status_list = complaint_entries.map{|entry| entry.status}
     case new_status
       when NEW
-        update(status: status_list.any? {|item| [ASSIGNED,PENDING,COMPLETED].include? item}? ACTIVE: NEW)
+        update!(status: status_list.any? {|item| [ASSIGNED,PENDING,COMPLETED].include? item}? ACTIVE: NEW)
       when ASSIGNED || PENDING
-        update(status:ACTIVE)
+        update!(status:ACTIVE)
       when COMPLETED
-        update(status: status_list.any? {|item| [ASSIGNED,PENDING,NEW].include? item}? ACTIVE: COMPLETED)
+        update!(status: status_list.any? {|item| [ASSIGNED,PENDING,NEW].include? item}? ACTIVE: COMPLETED)
     end
   end
 
@@ -154,7 +154,7 @@ class Complaint < ApplicationRecord
     new_ips = new_entries_ips.keys.sort
 
     response = {}
-    possibles = complaint.customer.complaints.where.not(status: [ RESOLVED, DUPLICATE ])
+    possibles = complaint.customer.complaints.where.not(status: [ RESOLVED, DUPLICATE, COMPLETED ])
     candidates = []
 
     possibles.each do |poss|
@@ -192,6 +192,7 @@ class Complaint < ApplicationRecord
       new_payload_item[:resolution_message] = "This is a duplicate of a currently active ticket."
       new_payload_item[:resolution] = "DUPLICATE"
       new_payload_item[:status] = TI_RESOLVED
+      new_payload_item[:sugg_type] = entry["cat_sugg"]&.join(', ')
       return_payload[ip] = new_payload_item
       new_complaint_entry = ComplaintEntry.new
       new_complaint_entry.complaint_id = complaint.id
@@ -207,6 +208,7 @@ class Complaint < ApplicationRecord
       new_payload_item[:resolution_message] = "This is a duplicate of a currently active ticket."
       new_payload_item[:resolution] = "DUPLICATE"
       new_payload_item[:status] = TI_RESOLVED
+      new_payload_item[:sugg_type] = entry["cat_sugg"]&.join(', ')
       return_payload[url] = new_payload_item
       url_parts = parse_url(url)
       new_complaint_entry = ComplaintEntry.new
@@ -329,18 +331,18 @@ class Complaint < ApplicationRecord
 
 
           begin
-            ces = ComplaintEntryScreenshot.create(complaint_entry_id: new_complaint_entry.id )
+            #ces = ComplaintEntryScreenshot.create(complaint_entry_id: new_complaint_entry.id )
             # CALL SCREENSHOT BACKGROUND JOB! with ces.id and new_complaint_entry.hostlookup
-            ces.grab_screenshot
+            #ces.grab_screenshot
           rescue Exception => e
-            Rails.logger.error("#{e.message}")
-            ces = ComplaintEntryScreenshot.new
-            ces.error_message = e.message
-            ces.complaint_entry_id = new_complaint_entry.id
-            open("app/assets/images/failed_screenshot.jpg") do |f|
-              ces.screenshot = f.read
-            end
-            ces.save!
+            #Rails.logger.error("#{e.message}")
+            #ces = ComplaintEntryScreenshot.new
+            #ces.error_message = e.message
+            #ces.complaint_entry_id = new_complaint_entry.id
+            #open("app/assets/images/failed_screenshot.jpg") do |f|
+            #  ces.screenshot = f.read
+            #end
+            #ces.save!
           end
         end
 
@@ -384,17 +386,17 @@ class Complaint < ApplicationRecord
           ComplaintEntryPreload.generate_preload_from_complaint_entry(new_complaint_entry)
 
           begin
-            ces = ComplaintEntryScreenshot.create(complaint_entry_id: new_complaint_entry.id )
+            #ces = ComplaintEntryScreenshot.create(complaint_entry_id: new_complaint_entry.id )
             # CALL SCREENSHOT BACKGROUND JOB! with ces.id and new_complaint_entry.hostlookup
-            ces.grab_screenshot
+            #ces.grab_screenshot
           rescue Exception => e
-            ces = ComplaintEntryScreenshot.new
-            ces.error_message = e.message
-            ces.complaint_entry_id = new_complaint_entry.id
-            open("app/assets/images/failed_screenshot.jpg") do |f|
-              ces.screenshot = f.read
-            end
-            ces.save!
+            #ces = ComplaintEntryScreenshot.new
+            #ces.error_message = e.message
+            #ces.complaint_entry_id = new_complaint_entry.id
+            #open("app/assets/images/failed_screenshot.jpg") do |f|
+            #  ces.screenshot = f.read
+            #end
+            #ces.save!
           end
         end
 

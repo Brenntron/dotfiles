@@ -1,9 +1,0 @@
-<%=form_tag user_add_to_team_path(user), method: :patch do %>
-  <div class="form-group"><div class="form-inline">
-    <%= select_tag 'child_id', options_for_select(nested_set_options(user.available_users) {|i| "#{'-' * i.level} #{i.display_name} (#{i.cvs_username})"} ), {prompt: "Choose Team Member", class: "form-control"} %>
-    <%= hidden_field_tag :user_id, value: user.id %>
-    <%= submit_tag 'Add', class: 'btn btn-primary' %>
-    <p class="help-block text-nowrap">Any member of a team can view other members of the team they belong to.</p>
-  </div>
-</div>
-<% end %>

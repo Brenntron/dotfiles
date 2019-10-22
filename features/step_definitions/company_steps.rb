@@ -3,3 +3,7 @@ Given(/^the following companies exist:$/) do |companies|
     FactoryBot.create(:company, company)
   end
 end
+
+Given(/^a guest company exists$/) do
+  FactoryBot.create(:guest_company)
+end
