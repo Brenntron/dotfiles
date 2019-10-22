@@ -160,7 +160,6 @@ module API
             end
             post 'multi_cat_new_url' do
               std_api_v2 do
-                binding.pry
                 permitted_params['urls'].each do |prefix|
                   Complaint.commit_without_complaint(ip_or_uri: prefix,
                                                      category_ids_string: permitted_params["cats"].join(','),
