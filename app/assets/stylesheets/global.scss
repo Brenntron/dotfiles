@@ -10527,8 +10527,8 @@ span.threat-cat-no-data {
 
 
 @keyframes mini-spin {
-  from { transform:rotate(0deg) }
-  to { transform:rotate(360deg) }
+  from { transform: rotate(0deg) }
+  to { transform: rotate(360deg) }
 }
 
 .loading-rows {
@@ -10541,16 +10541,22 @@ span.threat-cat-no-data {
   cursor: default;
 }
 
+.tc-sentence {
+  font-style: italic;
+  margin: 10px 5px 0;
+  em {
+    font-style: normal;
+    display: block;
+    line-height: 11pt;
+    margin: 5px 5px 0;
+  }
+}
+
+.message-div ul {
+  margin-top: 15px;
+}
+
 //.dispute-wlbl-adjust-wrapper .dropdown-submit-button:disabled {
 //  background-color: $disabled-bg !important;
 //  color: $disabled-txt !important;
 //}
-
-.tc-sentence {
-  font-style: normal;
-  em {
-    font-style: italic;
-    display: block;
-    line-height: 11pt;
-  }
-}

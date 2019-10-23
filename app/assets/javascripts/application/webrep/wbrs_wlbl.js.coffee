@@ -334,50 +334,49 @@ window.bulk_get_current_wlbl = (page) ->
 
 
 
-
-# INLINE ADJUST WL/BL + THREAT CATS FUNCTION
+# inline adjust wl/bl and threat categories
 window.submit_individual_wlbl = (button_tag) ->
-
-  # TODO: FIX THIS TOO
-  # TODO: FIX THIS TOO
-  # TODO: FIX THIS TOO
+  wlbl_form = button_tag.form;
+  dispute_entry = $(wlbl_form).parents('.research-table-row').attr('data-entry-id')
 
   list_types = $('.wl-bl-list-inline:checkbox:checked').map(() ->
     this.value
   ).toArray()
-  wlbl_form = button_tag.form;
 
+  thrt_cat_ids = []
+  thrt_cat_names = []
+  thrt_cat_array = $(wlbl_form).find('.wlbl_thrt_cat_id:checked')
+  thrt_cat_str = ''
 
-  # OLD DATA OBJECT
-  # OLD DATA OBJECT
-  # OLD DATA OBJECT
-#  data = {
-#    'urls': [ wlbl_form.getElementsByClassName('dispute-entry-content')[0].value ]
-#    'trgt_list': list_types,
-#    'thrt_cat_ids': [ parseInt(wlbl_form.getElementsByClassName('wlbl_thrt_cat_id')[0].value) ]
-#    'note': wlbl_form.getElementsByClassName('note-input')[0].value
-#  }
+  $(thrt_cat_array).each ->
+    thrt_cat_ids.push($(this).val())
+    thrt_cat_names.push($(this).parent().text().trim())
 
-  # NEW DATA OBJECT - GET THESE CHECKBOXES IN THE SAME WAY AS THE BULK METHOD, BUT GET DIFF IDS AND CLASSES FROM THE PAGE
-  # NEW DATA OBJECT - GET THESE CHECKBOXES IN THE SAME WAY AS THE BULK METHOD, BUT GET DIFF IDS AND CLASSES FROM THE PAGE
-  # NEW DATA OBJECT - GET THESE CHECKBOXES IN THE SAME WAY AS THE BULK METHOD, BUT GET DIFF IDS AND CLASSES FROM THE PAGE
+  if thrt_cat_ids.length
+    tc_updated_str =   # for the confirmation modal only
+      "<p class='tc-sentence'>With the following threat categories updated:
+       <em>#{ thrt_cat_names.join(', ') }</em></p>"
+
   data = {
-    adjustment_type: adjustment_type,
+    adjustment_type: 'replace',
     lists: list_types,
     thrt_cat_ids: thrt_cat_ids,
-    note: wlbl_form.getElementsByClassName('note-input')[0].value,  # FIX THIS
-    dispute_entries: disputes_array
+    note: wlbl_form.getElementsByClassName('note-input')[0].value,
+    dispute_entries: [ dispute_entry ]  # not 'entries' because its only one entry
   }
-
-  console.log data    # make sure the object you're building matches with MM object
-
 
   std_msg_ajax(
     url: '/escalations/api/v1/escalations/webrep/disputes/bulk_wlbl_threatcat_adjust'
     method: 'POST'
     data: data
-    error_prefix: 'Error adjusting WL/BL.'
+    error_prefix: 'Error adjusting WL/BL information.'
     success_reload: true
+    success: (response) ->
+      std_msg_success("Entry has been updated for: " + list_types, [thrt_cat_str])
+    error: (response) ->
+      std_api_error(response, 'Error updating these entries.')
+    completed: () ->
+      $('.dispute-wlbl-adjust-wrapper .dropdown-submit-button').html('Submit Changes')
   )
 
 
@@ -392,7 +391,7 @@ window.submit_bulk_wlbl = (page) ->
   wlbl_comment = ''
   dropdown = ''
 
-  if $('.wl-bl-list-inline:checkbox:checked').length > 0
+  if $('.wl-bl-list-inline:checkbox:checked').length or $('.wlbl_thrt_cat_id:checked').length
     if page == 'index'
       dropdown = $('#wlbl_adjust_entries_index')
     else if page == 'show' || page == 'research'
@@ -408,13 +407,12 @@ window.submit_bulk_wlbl = (page) ->
 
     thrt_cat_ids = []
     thrt_cat_names = []
-    thrt_cat_array = $(dropdown).find('.wlbl_thrt_cat_id')
+    thrt_cat_array = $(dropdown).find('.wlbl_thrt_cat_id:checked')
     tc_updated_str = ''
 
     $(thrt_cat_array).each ->
-      if $(this).prop('checked')  # if tc cb checked, add the value to this id array (val == id)
-        thrt_cat_ids.push($(this).val())
-        thrt_cat_names.push($(this).parent().text().trim())
+      thrt_cat_ids.push($(this).val())
+      thrt_cat_names.push($(this).parent().text().trim())
 
     if thrt_cat_ids.length
       tc_updated_str =
@@ -426,13 +424,9 @@ window.submit_bulk_wlbl = (page) ->
     else if $('#wlbl-remove').prop('checked') then adjustment_type = 'remove'
     else if $('#wlbl-replace').prop('checked') then adjustment_type = 'replace'
 
-    if $('body').hasClass('index-action')  # index page cb's
+    if page == 'index'
       disputes_array = $('.dispute-entry-checkbox:checked').map(-> this.id).toArray()
-    else if $('body').hasClass('show-action')  # show page cb's
-      # FIX BELOW
-      # FIX BELOW
-      # FIX BELOW
-      # FIX BELOW
+    else if page == 'show'
       disputes_array = $('.dispute_check_box:checked').map( ->
         this['data-entry-id']
         console.log this['data-entry-id']
@@ -440,8 +434,6 @@ window.submit_bulk_wlbl = (page) ->
       # get list of checkboxes on show page for bulk adjust
       console.log 'below is the disputes_array, it SHOULD NOT BE BLANK'
       console.log disputes_array
-
-#    return
 
     # new data object for MM, passed to backend
     data = {
@@ -454,8 +446,10 @@ window.submit_bulk_wlbl = (page) ->
 
     console.log data    # make sure the object you're building matches with MM object
 
+    return
+
     # this ajax api call now does all add/remove/replace of lists + tc's
-    # if you remove all tc's you *should* remove all bl's and vice versa
+    # if you remove all tc's it should remove all bl's and vice versa
     std_msg_ajax(
       url: '/escalations/api/v1/escalations/webrep/disputes/bulk_wlbl_threatcat_adjust'
       method: 'POST'
