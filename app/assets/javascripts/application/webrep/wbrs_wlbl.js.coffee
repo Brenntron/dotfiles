@@ -332,8 +332,6 @@ window.bulk_get_current_wlbl = (page) ->
 ## Individual submission of WL/BL changes - INLINE row dropdown form
 ## Research page and research tab of show page
 
-
-
 # inline adjust wl/bl and threat categories
 window.submit_individual_wlbl = (button_tag) ->
   wlbl_form = button_tag.form;
@@ -431,11 +429,7 @@ window.submit_bulk_wlbl = (page) ->
         this['data-entry-id']
         console.log this['data-entry-id']
       ).toArray()
-      # get list of checkboxes on show page for bulk adjust
-      console.log 'below is the disputes_array, it SHOULD NOT BE BLANK'
-      console.log disputes_array
 
-    # new data object for MM, passed to backend
     data = {
       adjustment_type: adjustment_type,
       lists: list_types,
@@ -445,8 +439,6 @@ window.submit_bulk_wlbl = (page) ->
     }
 
     console.log data    # make sure the object you're building matches with MM object
-
-    return
 
     # this ajax api call now does all add/remove/replace of lists + tc's
     # if you remove all tc's it should remove all bl's and vice versa
