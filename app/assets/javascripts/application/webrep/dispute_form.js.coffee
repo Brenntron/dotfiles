@@ -54,7 +54,9 @@ $ ->
               reset_form(form)
               std_msg_success('All entries were successfully created.', [message_html], reload: true)
 
+
         error: (response) ->
+          console.log response
           $('#loader-modal').modal 'hide'
           reset_form(form)
           error_list = response.responseJSON.message.split(': ')[1].trim().split(' ')

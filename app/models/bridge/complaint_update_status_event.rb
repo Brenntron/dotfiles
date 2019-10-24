@@ -11,7 +11,7 @@ class Bridge::ComplaintUpdateStatusEvent < Bridge::BaseMessage
           status: entry.status,
           resolution: entry.resolution,
           resolution_message: entry.resolution_comment,
-          suggested_disposition: entry.suggested_disposition,
+          sugg_type: entry.suggested_disposition,
           category_list: entry.url_primary_category
       }
       message_data
@@ -27,7 +27,7 @@ class Bridge::ComplaintUpdateStatusEvent < Bridge::BaseMessage
   handle_asynchronously :post_entries, :queue => "complaint_update", :priority => 2
 
   def post_complaint(complaint)
-    if complaint.ticket_source_key.present?
+    if complaint.ticket_source_key.present? && complaint.ticket_source != ::Complaint::SOURCE_RULEUI
       post_entries(complaint.complaint_entries, source_key: complaint.ticket_source_key, ac_id: complaint.id)
     end
   end

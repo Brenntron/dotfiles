@@ -67,10 +67,10 @@
             .multi-col
               %ul.related-user-list
                 - @user.children.each do |user|
-                  %li
-                    = link_to user.display_name, user_path(user), class: 'related-user'
+                  %div
+                    = link_to user.display_name, escalations_user_path(user), class: 'related-user'
                     %br
-                    = link_to user.cvs_username, user_path(user), class: 'related-username'
+                    = link_to user.cvs_username, escalations_user_path(user), class: 'related-username'
 
           .col-xs-6.user-col-wrapper
             - if @user.parent.present?
@@ -89,9 +89,9 @@
                 %div.user-col-layout.last{style: "column-count: #{(@sibling_col.to_f).ceil}"}
                   - @user.siblings.each do |user|
                     %div
-                      = link_to user.display_name, user_path(user), class: 'related-user'
+                      = link_to user.display_name, escalations_user_path(user), class: 'related-user'
                       %br
-                      = link_to user.cvs_username, user_path(user), class: 'related-username'
+                      = link_to user.cvs_username, escalations_user_path(user), class: 'related-username'
 
         - else
           .col-xs-12.user-col-wrapper
@@ -110,12 +110,11 @@
                 %div.user-col-layout.last{style: "column-count: #{(@sibling_col.to_f).ceil}", 'data-division': "#{@sibling_col}"}
                   - @user.siblings.each do |user|
                     %div
-                      = link_to user.display_name, user_path(user), class: 'related-user'
+                      = link_to user.display_name, escalations_user_path(user), class: 'related-user'
                       %br
-                      = link_to user.cvs_username, user_path(user), class: 'related-username'
+                      = link_to user.cvs_username, escalations_user_path(user), class: 'related-username'
 
-
-
+%input{:name => "token", :type => "hidden", :value => "#{current_user.authentication_token}"}
 .modal.fade.user-form-modal{id: "roleModal_#{@user.id}", tabindex: '-1', role: 'dialog', 'aria-hidden': 'true'}
   .modal-dialog{role: 'document'}
     .modal-content

@@ -10,9 +10,6 @@ Rails.configuration.api_master_timeout  = env_config.fetch('api_timeout', {}).fe
 amp_poke = env_config.fetch('amp_poke', {})
 Rails.configuration.amp_poke            = ApiRequester::ApiRequester.config_of(amp_poke)
 
-raise "config.yml missing amq section" unless env_config['amq']
-Rails.configuration.amq_host            = env_config['amq']['host']
-
 
 auto_resolve = env_config['auto_resolve']
 raise "config.yml missing auto_resolve section" unless auto_resolve
@@ -30,6 +27,13 @@ Rails.configuration.umbrella            = ApiRequester::ApiRequester.config_of(u
 Rails.configuration.umbrella.check      = umbrella['check'] || false
 Rails.configuration.umbrella.url        = umbrella['url']
 
+bls_config = env_config['bls']
+raise 'config.yml missing bls section' unless bls_config
+Rails.configuration.bls                = OpenStruct.new
+Rails.configuration.bls.host           = bls_config['host']
+Rails.configuration.bls.port           = bls_config['port']
+
+
 raise "config.yml missing bugzilla section" unless env_config['bugzilla']
 
 Rails.configuration.bugzilla_host       = ENV['Bugzilla_host']   || env_config['bugzilla']['host']
@@ -37,8 +41,32 @@ Rails.configuration.bugzilla_api_key    = env_config['bugzilla']['api_key']
 Rails.configuration.bugzilla_username   = ENV['Bugzilla_login']  || env_config['bugzilla']['login']
 Rails.configuration.bugzilla_password   = ENV['Bugzilla_secret'] || env_config['bugzilla']['password']
 
+
 raise "config.yml missing cert section" unless env_config['cert']
 Rails.configuration.cert_file           = env_config['cert']['vrt']
+
+
+# New apirequester interface
+elastic_config = env_config.fetch('elastic', nil)
+raise 'config.yml missing elastic section' unless elastic_config
+Rails.configuration.elastic             = ApiRequester::ApiRequester.config_of(elastic_config)
+Rails.configuration.elastic.username    = elastic_config['username']
+Rails.configuration.elastic.password    = elastic_config['password']
+Rails.configuration.elastic.tls         = true
+
+
+file_reputation_sandbox = env_config['file_reputation_sandbox']
+raise 'config.yml missing file reputation sandbox section' unless file_reputation_sandbox
+Rails.configuration.file_reputation_sandbox        = ApiRequester::ApiRequester.config_of(file_reputation_sandbox)
+sandbox_api_keys = file_reputation_sandbox.fetch('api_keys', {})
+sandbox_api_keys[FileReputationDispute::SANDBOX_KEY_AC_REFRESH] ||=
+    sandbox_api_keys[FileReputationDispute::SANDBOX_KEY_AC_FORM]
+Rails.configuration.file_reputation_sandbox.api_keys = sandbox_api_keys
+
+
+magic_api_config = env_config['magic_api']
+raise 'config.yml missing MAgic section' unless magic_api_config
+Rails.configuration.magic_api           = ApiRequester::ApiRequester.config_of(magic_api_config)
 
 
 peakebridge_config = env_config.fetch('peakebridge', {})
@@ -68,11 +96,6 @@ rep_api = env_config.fetch('rep_api', nil)
 raise 'config.yml missing rep_api section' unless rep_api
 Rails.configuration.rep_api             = ApiRequester::ApiRequester.config_of(rep_api)
 
-# TODO Check if unused
-raise "config.yml missing ruletest section" unless env_config['ruletest']
-Rails.configuration.ruletest_server     = env_config['ruletest']['url']
-
-
 sds_config = env_config.fetch('sds', nil)
 raise 'config.yml missing SDS section' unless sds_config
 Rails.configuration.sds                 = ApiRequester::ApiRequester.config_of(sds_config)
@@ -80,26 +103,8 @@ Rails.configuration.sds.cert_file       = sds_config['cert_file'] || sds_config[
 Rails.configuration.sds.pkey_file       = sds_config['pkey_file']
 
 
-# TODO Check if unused
-Rails.configuration.snort_doc_max_fails = env_config['snort_doc_max_fails'] || 3
-
-# TODO Check if unused
-# New apirequester interface
-snort_org_config = env_config.fetch('snort_org', nil)
-raise 'config.yml missing snort_org section' unless snort_org_config
-Rails.configuration.snort_org           = ApiRequester::ApiRequester.config_of(snort_org_config)
-
-# TODO Check if unused
-raise "config.yml missing svn section" unless env_config['svn']
-Rails.configuration.svn_cmd             = env_config['svn']['cmd']
-Rails.configuration.svn_pwd             = env_config['svn']['password']
-Rails.configuration.rules_repo_url      = env_config['svn']['rules_repo_url']
-Rails.configuration.ruledocs_repo_url   = env_config['svn']['ruledocs_repo_url']
-Rails.configuration.snort_rule_path     = Rails.root.join(env_config['svn']['snort_rule_path'])
-
 talos_intelligence = env_config.fetch('talos_intelligence', {})
 Rails.configuration.talos_intelligence  = ApiRequester::ApiRequester.config_of(talos_intelligence)
-
 
 wbrs_config = env_config['wbrs']
 raise 'config.yml missing wbrs section' unless wbrs_config
@@ -138,9 +143,6 @@ reversing_labs_config = env_config['reversing_labs']
 raise 'config.yml missing ReversingLabs section' unless reversing_labs_config
 Rails.configuration.reversing_labs      = ApiRequester::ApiRequester.config_of(reversing_labs_config)
 
-magic_api_config = env_config['magic_api']
-raise 'config.yml missing MAgic section' unless magic_api_config
-Rails.configuration.magic_api           = ApiRequester::ApiRequester.config_of(magic_api_config)
 
 threatgrid = env_config.fetch('threatgrid', nil)
 raise 'config.yml missing threatgrid section' unless threatgrid
@@ -150,10 +152,3 @@ ticloud = env_config.fetch('ticloud', nil)
 raise 'config.yml missing ticloud section' unless ticloud
 Rails.configuration.ticloud             = ApiRequester::ApiRequester.config_of(ticloud)
 
-# New apirequester interface
-elastic_config = env_config.fetch('elastic', nil)
-raise 'config.yml missing elastic section' unless elastic_config
-Rails.configuration.elastic             = ApiRequester::ApiRequester.config_of(elastic_config)
-Rails.configuration.elastic.username    = elastic_config['username']
-Rails.configuration.elastic.password    = elastic_config['password']
-Rails.configuration.elastic.tls         = true

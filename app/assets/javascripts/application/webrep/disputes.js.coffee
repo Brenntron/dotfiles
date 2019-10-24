@@ -1558,8 +1558,9 @@ $ ->
   $(document).on 'click', (e)->
     if e.target.closest('.daterangepicker') == null && e.target.closest('.available') == null
       $("#advanced-search-dropdown").hide()
-    else
-      $("#advanced-search-dropdown").show()
+    else   # ensure webrep dash datepicker not open
+      unless $('.ltr.show-calendar').css('display') == 'block'
+        $("#advanced-search-dropdown").show()
 
   $(document).ready ->
     setInterval ->

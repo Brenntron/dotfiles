@@ -334,6 +334,22 @@ module API
               end
             end
 
+            params do
+              requires :uri, type: String
+            end
+
+            get 'uri_cat_info' do
+              data = {}
+
+              uri = permitted_params[:uri]
+              begin
+                data = ComplaintEntry.current_category_data_for_uri(uri)
+                return {:status => 'success', :data => data}.to_json
+              rescue
+                return {:status => 'error', :data => data}.to_json
+              end
+            end
+
             #####REPORT STATS######
 
             # curl -X POST -k -H "Authorization: Basic Y2xhY2xhaXI6RG91cGlleGVpOEFu" -H "Token: spMbfr4zXYPyyt3yRrRq" https://analyst-console.vrt.sourcefire.com/escalations/api/v1/escalations/user_preferences/

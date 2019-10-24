@@ -113,6 +113,8 @@ module API
                       raise ("Could not create the Dispute because of this error: #{e.message}")
                     end
                     render json: {status: 'Success', case_id: dispute.id, errors: duplicates}
+
+
                   else
                     raise ("Invalid assignee or assignee does not exist. Please try again.")
                   end

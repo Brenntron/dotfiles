@@ -22,7 +22,6 @@ class Ability
     # admin role includes developers who maintain the site
     if role_names.include?('admin')
       can :read, :all
-      can [:acknowledge_bug], Bug
       can :manage, [Admin, User, Role]
     end
 
@@ -46,8 +45,7 @@ class Ability
     end
 
     if role_names.include?('webcat user')
-      can :manage, [Complaint, ComplaintEntry, Attachment, Note]
-      can :publish_to_bugzilla, Note
+      can :manage, [Complaint, ComplaintEntry]
     end
 
 
@@ -59,15 +57,13 @@ class Ability
            :resolution_report, :export_per_resolution_report, :export_per_engineer_report, :resolution_age_report,
            :dashboard, :research],
           Dispute
-      can :read, [DisputeComment, DisputeEmail, DisputeEmailAttachment, DisputeEntry,
-                  Attachment, Note, Wbrs::ManualWlbl]
+      can :read, [DisputeComment, DisputeEmail, DisputeEmailAttachment, DisputeEntry, Wbrs::ManualWlbl]
       can :manage, [EmailTemplate]
     end
 
     if role_names.include?('webrep user')
-      can :manage, [Dispute, DisputeComment, DisputeEmail, DisputeEmailAttachment, Attachment, Note,
+      can :manage, [Dispute, DisputeComment, DisputeEmail, DisputeEmailAttachment,
                     DisputeEntry, EmailTemplate, Wbrs::ManualWlbl, ResolutionMessageTemplate]
-      can :publish_to_bugzilla, Note
     end
 
     if role_names.include?('filerep manager')
@@ -92,7 +88,7 @@ class Ability
       can [:delete], [FileRepComment]
 
       can :take, FileReputationDispute do |filerep_dispute|
-        filerep_dispute.user_id == User.vrtincoming.id
+        filerep_dispute.user_id == User.vrtincoming&.id
       end
 
       can :return, FileReputationDispute do |filerep_dispute|
@@ -105,15 +101,6 @@ class Ability
         user.ancestors.include?(current_user)
       end
 
-      #:manage allows -- :add_tag, :remove_tag, :add_whiteboard, :remove_whiteboard, :bug_metrics
-      can [:manage, :import], EscalationBug
-    end
-
-    if role_names.include?('ips escalator')
-      can [:manage, :import], EscalationBug
-      can :manage, [EscalationLink, Attachment, Note]
-      can :create, ResearchBug
-      can :publish_to_bugzilla, Note
     end
 
     # 'manager' role is 'ips rule manager', but renaming would break things.
@@ -121,34 +108,6 @@ class Ability
       can :manage, User do |user| #no delete UI is implemented
         user.ancestors.include?(current_user)
       end
-      can :read, [ResearchBug]
-    end
-
-    if role_names.include?('committer')
-      can [:manage, :acknowledge_bug, :import, :toggle_liberty], ResearchBug do |bug|
-        bug.check_permission(current_user)
-      end
-      can :manage, [EscalationLink, Attachment, Note]
-      can :publish_to_bugzilla, Note
-    end
-
-    if role_names.include?('analyst')
-      can [:manage, :acknowledge_bug, :import], ResearchBug do |bug|
-        bug.check_permission(current_user)
-      end
-      can :manage, [Attachment, Note]
-      # TODO When implementing escalation bugs re-enable
-      # can [:manage, :acknowledge_bug, :import], EscalationBug
-      # can :manage, EscalationLink
-      can :publish_to_bugzilla, Note
-      can :toggle_liberty, ResearchBug do |bug|
-        bug.liberty_clear?
-      end
-    end
-
-    if role_names.include?('build coordinator')
-      cannot [:update, :destroy, :create], [Bug, Attachment, Note]
-      can :read, [ResearchBug, Attachment, Note]
     end
   end
 end

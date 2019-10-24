@@ -16,7 +16,4 @@
 //= require bootstrap-multiselect
 //= require application/tree-table
 //= require application/util
-//= require legacy/attachments.js.coffee
-//= require legacy/bugs.js.coffee
-//= require legacy/notes.js.coffee
 //= require_directory ./application
