@@ -56,7 +56,6 @@ $ ->
 
 
         error: (response) ->
-          console.log response
           $('#loader-modal').modal 'hide'
           reset_form(form)
           error_list = response.responseJSON.message.split(': ')[1].trim().split(' ')
