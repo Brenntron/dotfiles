@@ -10385,7 +10385,7 @@ span.input-truncate {
 }
 
 // retain top navigation at top of page during scroll down for nav accessibility
-#nav-banner {
+#nav-banner.fixed-nav {
   position: -webkit-sticky;
   position: sticky;
   top: 0;
