@@ -192,17 +192,10 @@ window.advanced_webrep_index_table = () ->
   }
 
   window.current_search_data = data
-  if window.location.pathname == '/escalations/webrep/disputes'
-    if dispute_save_search_format.test(data.search_name) == true
-      std_msg_error('save search name error', ['Please enter a name without any special character', 'Example: !@#$%^&*()'])
-    else
-      window.populate_webrep_index_table(data)
+  if dispute_save_search_format.test(data.search_name) == true
+    std_msg_error('save search name error', ['Please enter a name without any special character', 'Example: !@#$%^&*()'])
   else
-    host = window.location.host
-    setTimeout(
-      window.location.assign(host + '/escalations/webrep/disputes')
-    ,600)
-    console.log 'in HERE MELISSA', host + '/escalations/webrep/disputes'
+    window.populate_webrep_index_table(data)
 
 window.standard_webrep_index_table = (search_name) ->
   data = {
