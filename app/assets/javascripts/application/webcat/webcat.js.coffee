@@ -260,8 +260,9 @@ $ ->
               setTimeout () ->
                 $('#complaints-index').DataTable().page(0).draw( true )
               , 100
+
             if localStorage.webcat_search_name
-              {webcat_search_type, webcat_search_name, webcat_search_conditions } = localStorage
+              { webcat_search_type, webcat_search_name, webcat_search_conditions } = localStorage
               last_tr = $('.webcat-named-search-list .saved-search').last().text()
               ### check variables below
                   text_check makes sure that the last table row doesn't match the named search being saved now

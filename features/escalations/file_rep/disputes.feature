@@ -39,6 +39,31 @@ Feature: Disputes
     And I should see "FILE REPUTATION TICKET CREATED."
 
   @javascript
+  Scenario: a user visits the FileRep Dispute show page and takes a ticket
+    Given a user with role "filerep user" exists and is logged in
+    And the following customers exist:
+      |id| name            |
+      |1 | Dispute Analyst |
+    And vrtincoming exists
+    And the following FileRep disputes exist:
+      | sha256_hash                                                       |
+      | 343518b26e0a872772808605f9f28aa75f64d86a6608e1347c979d033a72cb54  |
+    And bugzilla rest api always saves
+    And ThreatGrid API call is stubbed
+    And Reversing Labs certificates API call is stubbed
+    And Sandbox API call is stubbed
+    And ReversingLabs API call is stubbed
+    And AMP API call is stubbed
+    And Sample Zoo API call is stubbed
+    And ReversingLabs Creation Data API call is stubbed
+    And I go to "/escalations/file_rep/disputes/1"
+    And I dismiss modal "#msg-modal" if needed
+    And I click "#research-tab-link"
+    And I click "#data-resubmit-tg-cb"
+    And I click "#file-rep-resubmit-evaluate-button"
+    And I should see content "Successfully resubmitted to selected services: Talos Sandbox" within ".modal-dialog"
+
+  @javascript
   Scenario: an analyst tries to create a FileRep ticket but it is flagged as a duplicate and not processed
     Given a user with role "filerep user" exists and is logged in
     And the following customers exist:
@@ -596,6 +621,5 @@ Feature: Disputes
     And I should see content "Tell" within ".amp-notes"
     And I should see content "Everyone" within ".amp-public-notes"
     And I should see content "Now" within ".amp-contact"
-
 
 

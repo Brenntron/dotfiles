@@ -631,7 +631,15 @@ button {
   color: $content-label-color !important;
   font-size: 7pt;
 }
-
+.tg-data-run{
+  display: none;
+  width: 245px;
+  margin: 60px auto;
+  .data-report-wrapper{
+    display: flex;
+    width: 100%;
+  }
+}
 .toolbar-button-label {
   background-repeat: no-repeat;
   background-size: 20px 20px;
@@ -645,11 +653,8 @@ button {
   margin-right: 3px
 }
 .toolbar-button:disabled {
-  cursor: not-allowed;
+  cursor: not-allowed!important;
 }
-  .toolbar-button:disabled {
-    cursor: not-allowed;
-  }
 
   .dashboard-tickets-wrapper .toolbar-button-label {
     background-size: 16px 16px;
@@ -1955,6 +1960,7 @@ a.static-nav-item {
 .icon-talos-sandbox {background-image: url(image_path('icon_sandbox2.svg'));}
 .icon-threat-grid {background-image: url(image_path('icon_grid.svg'));}
 .icon-reversing-labs {background-image: url(image_path('icon_reverse.svg'));}
+.icon-reversing-labs-light {background-image: url(image_path('icon_reverse_light.svg'));}
 .icon-show-as-columns {background-image: url(image_path('icon_vertical.svg'));}
 .icon-show-as-stacked {background-image: url(image_path('icon_horizontal.svg'));}
 
@@ -4337,6 +4343,8 @@ button.tertiary {
 .icon-import-white {background-image: url(image_path('icon_import_white.svg'));}
 .icon-categories {background-image: url(image_path('icon_categories.svg'));}
 .icon-reports {background-image: url(image_path('icon_reports.svg'));}
+.icon-reports:disabled {background-image: url(image_path('icon_reports_grey.svg'));}
+.icon-reports-white {background-image: url(image_path('icon_reports_white.svg'));}
 .icon-new-white {background-image: url(image_path('icon_new_white.svg'));}
 .icon-categorize-white {background-image: url(image_path('icon_categorize_white.svg'));}
 .icon-user-page {background-image: url(image_path('icon_user_white.svg'));}
@@ -4358,6 +4366,16 @@ button.tertiary {
 
 .remove-input.remove-radio-input {
   margin-top: -28px;
+}
+#resubmit-to-resources{
+  .toolbar-select-wrapper{
+    width: fit-content;
+    float: left;
+  }
+  #file-rep-resubmit-evaluate-button{
+    float: right!important;
+    margin-left: 4px;
+  }
 }
 
 #login-div a:hover {
@@ -5890,7 +5908,7 @@ td.ticket-total::before {
 }
 
 .create-report {
-  background-image: url(image_path('icon_reports_white.svg'));
+  background-image: url(image_path('icon_create_reports_white.svg'));
   background-repeat: no-repeat;
   background-size: 26px;
   padding-left: 40px !important;
@@ -6574,7 +6592,12 @@ table.dispute-entry-table tbody tr.selected {
   font-weight: 300;
   width: auto;
 }
-
+.not-available{
+  .toolbar-button-text{
+    color: $type-faint-accent!important;
+    cursor: not-allowed;
+  }
+}
 .nested-complaint-data-wrapper button.secondary:disabled {
   color: $content-bg-color;
 }
@@ -8893,7 +8916,7 @@ hr.thin.form-divider {
   background-image: url(image_path('icon_grid.svg'));
 }
 
-.reversing-labs-header {
+.reversinglab-header {
   border-bottom-color: $success-color;
   background-image: url(image_path('icon_reverse.svg'));
 }
@@ -9134,15 +9157,30 @@ button.secondary.view-report-external-button {
   line-height: 1.25em;
 }
 
-.tg-data-present, .tg-data-missing, .rl-data-present, .rl-data-missing, .sb-data-present, .sb-data-missing, .sb-report-run {
+.tg-data-present,
+.tg-data-missing,
+.tg-report-run,
+.rl-data-present,
+.rl-data-missing,
+.rl-report-run,
+.sb-data-present,
+.sb-data-missing,
+.sb-report-run {
   display: none;
 }
 
-.tg-data-missing, .sb-data-missing, .rl-data-missing, .sb-report-run {
+.tg-data-missing,
+.sb-data-missing,
+.rl-data-missing,
+.sb-report-run,
+.tg-report-run,
+.rl-report-run {
   margin-top: 40px;
 }
 
-.sb-report-run .data-report-wrapper {
+.sb-report-run .data-report-wrapper,
+.tg-report-run .data-report-wrapper,
+.rl-report-run .data-report-wrapper {
   margin-top: 60px;
 }
 
