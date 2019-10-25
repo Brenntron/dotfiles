@@ -10409,7 +10409,10 @@ span.input-truncate {
   td:nth-child(7) {  width: 150px; }
   td:nth-child(8) {  width: 60px; }  // xbrs history
   td:nth-child(9) {  width: 140px; }
-  td:nth-child(10) { width: 110px; }
+  td:nth-child(10) {
+    width: 110px;  // reptool class
+    word-break: break-word;
+  }
   td:nth-child(12) { width: 190px; }  // wl/bl lists + threat cats
 }
 
