@@ -10383,3 +10383,11 @@ span.input-truncate {
 .owner-col {
   min-width: 80px;
 }
+
+// retain top navigation at top of page during scroll down for nav accessibility
+#nav-banner {
+  position: -webkit-sticky;
+  position: sticky;
+  top: 0;
+  z-index: 999;
+}
