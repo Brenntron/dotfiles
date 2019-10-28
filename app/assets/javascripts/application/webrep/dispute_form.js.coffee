@@ -61,7 +61,7 @@ $ ->
           error_list = response.responseJSON.message.split(': ')[1].trim().split(' ')
           message_html =
             "<p>Unable to create the following duplicate dispute entries: </p>" +
-            "<p class='dupe_list'>" + error_list.join(', ') + "</p>"
+            "<p class='dupe_list'>" + error_list.join(' ') + "</p>"
           std_msg_error("Error",[ message_html], reload: false)
       )
     else

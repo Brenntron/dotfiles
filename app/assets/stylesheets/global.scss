@@ -4871,7 +4871,14 @@ table > tbody > tr > td.dispute_rep_tools {
 .toolbar .dropdown.open {
   background-color: transparent;
 }
-
+.research_results{
+  .toolbar div:last-child{
+    margin-left: 0px!important;
+  }
+}
+.unset-text{
+  color: $type-darkest!important
+}
 .toolbar-dropdown {
   background-color: $content-bg-color;
   border: none !important;
@@ -5918,7 +5925,9 @@ td.data-table-emph {
     margin-top: -4px;
   }
 }
-
+.boo{
+  color: unset!important;
+}
 .dispute-wlbl-adjust-wrapper button, .dispute-reptool-adjust-wrapper button {
   text-transform: none;
   font-weight: 400;

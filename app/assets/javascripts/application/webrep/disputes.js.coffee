@@ -5,6 +5,18 @@ $(document).ready ->
       std_msg_error('No rows selected', ['Please select at least one row.'])
       return false
 
+  if $('.searched-for-url').length > 0
+    text = $('.searched-for-url').text().split(' ').join(', ').replace(/, ([^,]*)$/, ', and $1')
+    text = text.replace(/(, and|,)/g, '<span class="unset-text">$1</span>')
+
+    $('.searched-for-url').html(text)
+
+window.submit_rep = () ->
+  $('#loader-modal').modal({
+    backdrop: 'static',
+    keyboard: false
+  })
+
 window.select_or_deselect_all = (dispute_id)->
 
   $('.dispute-entry-checkbox_' + dispute_id).prop('checked', $('#' + dispute_id).prop('checked'))
