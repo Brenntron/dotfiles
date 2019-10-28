@@ -95,6 +95,7 @@ module API
               requires :sha256_hash, type: String, desc: "SHA256 hash"
             end
             get "/sandbox_run_sample/:sha256_hash" do
+              FileReputationApi::Magic.run_analysis(params[:sha256_hash])
               api_response = FileReputationApi::Sandbox.run_sample(params[:sha256_hash])
               render json: api_response
             end
