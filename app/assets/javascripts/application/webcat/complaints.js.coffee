@@ -7,7 +7,7 @@ $(document).on 'click', '.paginate_button', ->
     table_page = table.page.info().page
 
 $(document).on 'change','.nested-table-input','.selectize-input', ->
-  touchedFormChange()
+  touchedFormChange(this.dataset.domain)
 
 
 #### WBNP Reporting ####
@@ -80,10 +80,14 @@ check_wbnp = window.check_wbnp_status = (wbnp_report_id) ->
       std_msg_error("Unable to pull wbnp status", [], reload: false)
   )
 
-window.touchedFormChange = () ->
-  timesTouched = parseInt((sessionStorage.getItem("touchedForm")|| 0 )) + 1
-  sessionStorage.setItem("touchedForm", timesTouched)
+window.touchedFormChange = (url) ->
+  urls_touched = (sessionStorage.getItem("touchedForm")|| "" )
+  if !urls_touched.includes(url)
+    urls_touched += url + ","
+  sessionStorage.setItem("touchedForm", urls_touched)
 
+getTouchedFormCount = ()->
+  items = sessionStorage.getItem("touchedForm").split(",").length - 1
 
 window.updateURI = (event, complaint_entry_id) ->
   event.preventDefault()
@@ -131,7 +135,8 @@ window.updateURI = (event, complaint_entry_id) ->
 
 window.cat_new_url = ()->
   proceedeWithUpdate = true
-  timesTouched = parseInt((sessionStorage.getItem("touchedForm") || 0))
+  timesTouched = getTouchedFormCount()
+
   if timesTouched > 1
     proceedeWithUpdate = confirm("You have made " + timesTouched + " changes on this page. Do you want to proceed with updating this item? It will reload the page and you will lose your changes.")
   if proceedeWithUpdate == true
@@ -140,9 +145,14 @@ window.cat_new_url = ()->
 
     for i in [1...6] by 1
 
-      data[i] = {url: $("#url_#{i}").val(), cats: $("#cat_new_url_#{i}").val()}
+      categories = []
+      for j in [0...5] by 1
+        if $("#cat_new_url_#{i}")[0][j]
+          categories.push($("#cat_new_url_#{i}")[0][j].text)
 
-      if data[i].url.length > 0 && data[i].cats != null
+      data[i] = {url: $("#url_#{i}").val(), category_names: categories, category_ids: $("#cat_new_url_#{i}").val()}
+
+      if data[i].url.length > 0 && data[i].category_ids != null
         isEmpty = false
 
     if isEmpty == false
@@ -181,9 +191,15 @@ window.webcat_reset_search = ()->
 window.multiple_url_categorization = ()->
 
   urls = $("#categorize_urls").val().split(/\n/)
-  cats = $("#multi_cat_url_cats").val()
+  category_ids = $("#multi_cat_url_cats").val()
+  category_names = []
 
-  if $("#categorize_urls").val() != "" && cats != null
+  for category in $("#multi_cat_url_cats")
+    for i in [0..5] by 1
+      if category[i]
+        category_names.push(category[i].text)
+
+  if $("#categorize_urls").val() != "" && category_ids != null && category_names != null
     $('#loader-modal').modal({
       keyboard: false
     })
@@ -191,7 +207,7 @@ window.multiple_url_categorization = ()->
     std_msg_ajax(
       url:'/escalations/api/v1/escalations/webcat/complaints/multi_cat_new_url'
       method: 'POST'
-      data: {urls: urls, cats: cats}
+      data: {urls: urls, category_names: category_names, category_ids: category_ids}
       success: (response) ->
         $('#loader-modal').modal 'hide'
         std_msg_success('Success',["URLs/IPs successfully categorized."], reload: true)
@@ -328,7 +344,7 @@ window.domain_whois = (IP_Domain) ->
 
 window.updatePending = (id,row_id) ->
   proceedeWithUpdate = true
-  timesTouched = parseInt((sessionStorage.getItem("touchedForm") || 0))
+  timesTouched = getTouchedFormCount()
   if timesTouched > 1
     proceedeWithUpdate = confirm("You have made " + timesTouched + " changes on this page. Do you want to proceed with updating this item? It will reload the page and you will lose your changes.")
   if proceedeWithUpdate == true
@@ -411,7 +427,7 @@ window.updatePending = (id,row_id) ->
 ## Called when user submits categories / information to close a ticket
 window.updateEntryColumns = (entry_id,row_id) ->
   proceedeWithUpdate = true
-  timesTouched = parseInt((sessionStorage.getItem("touchedForm") || 0))
+  timesTouched = getTouchedFormCount()
   if timesTouched > 1
     proceedeWithUpdate = confirm("You have made " + timesTouched + " changes on this page. Do you want to proceed with updating this item? It will reload the page and you will lose your changes.")
   if proceedeWithUpdate == true
@@ -1081,12 +1097,12 @@ format = (complaint_entry_row) ->
       '<div class="col-xs-12">' +
       '<label class="content-label-sm">Edit URI</label><br/>' +
       '<input class="nested-table-input complaint-uri-input" id="complaint_prefix_' + complaint_entry.entry_id +
-      '" type="text" onclick="this.select()" value="' + host +
+      '" type="text" onclick="this.select()" data-domain="' + complaint_entry.domain + '" value="' + host +
       '"' + entry_status + '>' +
       '<button class="secondary inline-button" onclick="updateURI(event,' + complaint_entry.entry_id + ')">Update URI</button><br/>' +
       '<div class="complaint-selectize-col-wrapper">' +
       '<label class="content-label-sm">Edit Categories / Confidence Order</label>' +
-      '<select id="' + input_cat + '" name="[' + input_cat + '][]" class="' + status_class + '" placeholder="Enter up to 5 categories" value="" onchange="touchedFormChange()"></select>' +
+      '<select id="' + input_cat + '" name="[' + input_cat + '][]" class="' + status_class + '" placeholder="Enter up to 5 categories" value="" onchange="touchedFormChange(\'' + complaint_entry.domain + '\')"></select>' +
       '</div>' +
       '<div class="domain-categories" >' +
       '<label class="content-label-sm">Inherit Categories From Main Domain</label><br/>' +
@@ -1094,9 +1110,9 @@ format = (complaint_entry_row) ->
       '<button class="secondary inline-button" onclick="inheritCategories(' + complaint_entry.entry_id + ')">Inherit</button><br/>' +
       '</div>' +'</div><div class="col-xs-8">' +
       '<label class="content-label-sm">Internal Comment</label><br/>' +
-      '<input class="nested-table-input complaint-comment-input" id="complaint_comment_' + complaint_entry.entry_id + '" type="text" onclick="this.select()" class="nested-table-input" value="' + internal_comment + '" placeholder="Add a comment." ' + entry_status + '><br/>'  +
+      '<input class="nested-table-input complaint-comment-input" id="complaint_comment_' + complaint_entry.entry_id + '" type="text" onclick="this.select()" data-domain="' + complaint_entry.domain + '" class="nested-table-input" value="' + internal_comment + '" placeholder="Add a comment." ' + entry_status + '><br/>'  +
       '<label class="content-label-sm customer-label">Customer Facing Comment</label><br/>' +
-      '<input class="nested-table-input complaint-comment-input" id="complaint_resolution_comment_' + complaint_entry.entry_id + '" type="text" onclick="this.select()" value="' + resolution_comment + '" placeholder="Add a comment for the customer." ' + entry_status + '>' +
+      '<input class="nested-table-input complaint-comment-input" id="complaint_resolution_comment_' + complaint_entry.entry_id + '" type="text" onclick="this.select()" data-domain="' + complaint_entry.domain + '" value="' + resolution_comment + '" placeholder="Add a comment for the customer." ' + entry_status + '>' +
       '</div>' +
       '<div class="col-xs-4">' +
       '<label class="content-label-sm">Resolution</label><br/>' +
@@ -1524,8 +1540,10 @@ window.open_selected = () ->
   else
     open_selected(selected_rows, "true")
 window.open_all = () ->
-  selected_rows = $('#complaints-index').DataTable().rows()
-  open_selected(selected_rows, "true")
+  open_all = confirm("Are you sure you want to open ALL the windows on this page?!!")
+  if (open_all == true)
+    selected_rows = $('#complaints-index').DataTable().rows()
+    open_selected(selected_rows, "true")
 
 toggle_selected = (selectedRows, expand)->
   selectState = $('.selected')
@@ -1618,8 +1636,11 @@ window.triggerTooltips = (item) ->
 window.master_submit = () ->
   proceedeWithUpdate = true
   selectedItems = $('.selected + tr td.nested-complaint-data-wrapper')
-  timesTouched = parseInt((sessionStorage.getItem("touchedForm") || 0))
-  thingsSelected = Math.ceil((timesTouched / 1.25))
+
+  timesTouched = getTouchedFormCount()
+
+  thingsSelected = timesTouched
+
   if thingsSelected > selectedItems.length
     proceedeWithUpdate = confirm("I noticed you have made changes to at least " + thingsSelected +  " complaints but you only have " + selectedItems.length + " items selected. Do you want to proceed with updating these items? It will reload the page and you will lose your other changes.")
   if proceedeWithUpdate == true

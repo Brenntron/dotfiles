@@ -1,10 +1,10 @@
 $ ->
-  $("#file_rep_submit").attr("disabled", true)
+  document.getElementById('file_rep_submit').disabled = true
   $('#sha_errors_list').hide()
 
   $('#shas_list').on 'input', (e) ->
     $('#sha_errors_list .sha-msg').remove()
-    $("#file_rep_submit").attr("disabled", true)
+    document.getElementById('file_rep_submit').disabled = true
     $('#sha_errors_list').hide()
     shas_input_type = $('#shas_type_text').attr('name')
     shas_full_text = $('#shas_list').val()
@@ -37,7 +37,7 @@ $ ->
 
     else
       if !document.getElementById('bugzilla-login-notice')
-        $("#file_rep_submit").attr("disabled", false)
+        document.getElementById('file_rep_submit').disabled = false
 
   $('#new-file-rep-form').on 'submit', (e) ->
     e.preventDefault()

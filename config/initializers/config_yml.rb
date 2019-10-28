@@ -1,6 +1,7 @@
-
 all_configs = YAML.load_file(Rails.root.join("config", "config.yml"))
 env_config = all_configs[Rails.env]
+env_config['bugzilla']
+
 raise "config.yml missing #{Rails.env} section" unless env_config
 
 Rails.configuration.app_name = Rails.application.engine_name.gsub(/_application/,'')
