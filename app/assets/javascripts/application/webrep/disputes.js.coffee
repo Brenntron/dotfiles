@@ -6,9 +6,12 @@ $(document).ready ->
       return false
 
   if $('.searched-for-url').length > 0
-    text = $('.searched-for-url').text().split(' ').join(', ').replace(/, ([^,]*)$/, ', and $1')
-    text = text.replace(/(, and|,)/g, '<span class="unset-text">$1</span>')
-
+    text = $('.searched-for-url').text().split(' ')
+    if text.length == 2
+      text = text.join(', ').replace(/, / , ' and ')
+    else if text.length > 2
+      text = text.join(', ').replace(/, ([^,]*)$/, ', and $1')
+    text = text.replace(/(, and| and | ,)/g, '<span class="unset-text">$1</span>')
     $('.searched-for-url').html(text)
 
 window.submit_rep = () ->

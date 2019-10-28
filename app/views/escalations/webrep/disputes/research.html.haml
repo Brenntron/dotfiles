@@ -202,7 +202,7 @@
         %span.searched-for-url #{params['search']['uri']}
         (#{@entries.count} found)
       #research-page-toolbar.toolbar
-        %div
+        %div.toolbar-select-wrapper
           %label.toolbar-section-label
           %input#select-all-entries.esc-tooltipped{type:'checkbox',title: 'Select All', 'onclick':'select_all_detailed(this)'}
         %div
@@ -214,7 +214,7 @@
         %div
           %label.toolbar-section-label Edit
           %span.dropdown
-            %button.toolbar-button.add-to-ticket-button#add-to-ticket-button.esc-tooltipped{title: 'Add to Ticket','data-toggle': 'dropdown', 'aria-haspopup': 'true', 'aria-expanded': 'false'}
+            %button.toolbar-button.add-to-ticket-button#add-to-ticket-button.esc-tooltipped{title: 'Add to Ticket','data-toggle': 'dropdown', 'aria-haspopup': 'true', 'aria-expanded': 'false', 'disabled': 'disabled'}
               %span.toolbar-button-text Add to Ticket
             .dropdown-menu.toolbar-dropdown#add_to_ticket_dropdown{'aria-labelledby': 'add-to-ticket-button'}
               .dispute-wlbl-adjust-wrapper

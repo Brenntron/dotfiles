@@ -28,6 +28,18 @@ $ ->
     return
 
 $ ->
+  $(document).on 'click','#add-to-ticket-button', (e)->
+
+    { currentTarget } = e
+    setTimeout(
+      el = $('#research-page-toolbar textarea#ips_urls')
+      scrollheight = document.getElementById("ips_urls").scrollHeight
+      console.log scrollheight
+      el.attr('readonly', 'readonly')
+      el.css({'cursor': 'default', 'outline': 'none', 'border': 'none'})
+
+    , 900)
+
   $('#edit-dispute-entry-button').click ->
     if $('.dispute_check_box:checked').length > 0
       $('.edit-entries-buttons').removeClass('hidden')

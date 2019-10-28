@@ -586,7 +586,11 @@ button {
   margin-top: 4px;
 }
 
-
+#research-page-toolbar{
+  .toolbar-select-wrapper{
+    width: unset!important;
+  }
+}
 .toolbar input:focus, .toolbar select:focus {
   box-shadow: inset 0 0 5px $bug-section-color;
   outline: none;

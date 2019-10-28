@@ -29,6 +29,10 @@ $ ->
   window.select_all_detailed = (check)->
     is_checked = $(check).prop('checked')
     $('.dispute_check_box').prop('checked', is_checked)
+    if $('.dispute_check_box:checked').length > 0
+      $('#add-to-ticket-button').removeAttr('disabled')
+    else
+      $('#add-to-ticket-button').prop('disabled', 'disabled')
 
   $(document).on 'click', '.dispute_check_box', (e) ->
     is_checked = $(e.target).prop('checked')
@@ -36,6 +40,11 @@ $ ->
       $('#select-all-entries').prop('checked', false)
     else
       $('#select-all-entries').prop('checked', true)
+
+    if $('.dispute_check_box:checked').length > 0
+      $('#add-to-ticket-button').removeAttr('disabled')
+    else
+      $('#add-to-ticket-button').prop('disabled', 'disabled')
 
   window.close_modal = () ->
     $('#confirmation-modal').modal('toggle')
