@@ -985,7 +985,7 @@ thead th.sorting.center {
 #research-page-toolbar textarea {
   padding: 4px;
   border: 4px solid $content-bg-color;
-  outline: 1px solid #e5e5e5;
+  outline: 1px solid $nav-toolbar-color;
   width: 100%;
   font-size: 9.5pt;
   font-weight: 400;
@@ -5504,7 +5504,7 @@ td.left-bordered {
   margin-top: -1px;
   border-left: 6px solid transparent;
   border-right: 6px solid transparent;
-  border-top: 10px solid #fff;
+  border-top: 10px solid $ac-nav-bg-color;
 }
 .search-options-col, .search-box-col{
    display: none;
@@ -5622,8 +5622,8 @@ h5.entry-details-table-header {
   background-position: right 2px center;
   background-size: 16px;
   padding-bottom: 1px;
-  border: 2px solid #fff;
-  outline: 1px solid #e5e5e5;
+  border: 2px solid $ac-nav-bg-color;
+  outline: 1px solid $nav-toolbar-color;
   font-size: 9pt;
 }
 
@@ -5631,13 +5631,13 @@ h5.entry-details-table-header {
   background-color: $bug-section-color;
   color: $content-bg-color;
   background-image: url(image_path('icon_dropdown_white.svg'));
-  border: 2px solid #fff;
-  outline: 1px solid #e5e5e5;
+  border: 2px solid $ac-nav-bg-color;
+  outline: 1px solid $nav-toolbar-color;
 }
 
 .dropdown .inline-select-dropdown {
-  border: 2px solid #fff;
-  outline: 1px solid #e5e5e5;
+  border: 2px solid $ac-nav-bg-color;
+  outline: 1px solid $nav-toolbar-color;
 }
 
 .inline-dropdown-menu, .ticket-resolution-submenu, .toolbar-dropdown {
@@ -7369,7 +7369,7 @@ table#duplicates a {
 }
 
 .bug-tabs .nav-tabs li.active a {
-  background-color: #fff !important;
+  background-color: $ac-nav-bg-color !important;
 }
 
 .retro-styling #sidenav-menu-div a {
@@ -8666,7 +8666,7 @@ th.sorting_1, th.sorting_asc, th.sorting_desc {
 }
 
 .table-button-row .dropdown-menu h3 {
-  color: #fff;
+  color: $ac-nav-bg-color;
   padding: 6px 10px;
   font-weight: 400;
   font-size: 9pt;
@@ -10737,7 +10737,7 @@ input[type="radio"].resolution_radio_button {
     font-weight: 600;
     font-size: 9.5pt;
     border: none !important;
-    color: #fff;
+    color: #fff$type-lightest;
     display: inline-block;
   }
   hr.thin{
