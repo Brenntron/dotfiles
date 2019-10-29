@@ -1326,7 +1326,7 @@ thead th.sorting.center {
 }
 .dupe_list, .url_ip_list {
   font-style: oblique;
-  background-color: #f2f2f2;
+  background-color:$faint-neutral-color;
   max-height: 200px;
   overflow-y: scroll;
   width: 90%;
@@ -5210,7 +5210,7 @@ input.table-entry-input:focus {
     min-width: 140px;
   }
   li {
-    border-bottom: 1px solid #f2f2f2;
+    border-bottom: 1px solid $faint-neutral-color;
     border-top: none;
     padding: 5px;
     margin-right: 5px
