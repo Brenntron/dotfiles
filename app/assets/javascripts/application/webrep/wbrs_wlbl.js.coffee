@@ -73,7 +73,7 @@ window.get_current_wlbl = (button) ->
   # Add loading message while wl/bl rows are being built, this gets removed after data is loaded
   $(wlbl_list).html('<span class="loading-rows">Loading...<span class="mini-loader"></span></span>')
 
-  # Clean slate the Submit button on every dropdown click
+  # Clean slate the dropdown on every dropdown click
   $('.dispute-wlbl-adjust-wrapper .dropdown-submit-button').html('Submit Changes').prop('disabled', true)
 
   # Send entry content to wbrs
@@ -341,7 +341,7 @@ window.bulk_get_current_wlbl = (page) ->
 # inline adjust wl/bl and threat categories
 window.submit_individual_wlbl = (button_tag) ->
   wlbl_form = button_tag.form;
-  dispute_entry = $(wlbl_form).parents('.research-table-row').attr('data-entry-id')
+  dispute_entry_id = $(wlbl_form).parents('.research-table-row').attr('data-entry-id')
   dispute_ip_uri = $(wlbl_form).parents('.research-table-row').find('.entry-data-content').text()
   old_lists = $(wlbl_form).find('.wlbl-entry-wlbl').text()  # only used in confirmation modal, show what lists were changed
 
@@ -368,8 +368,10 @@ window.submit_individual_wlbl = (button_tag) ->
     lists: list_types,
     thrt_cat_ids: thrt_cat_ids,
     note: wlbl_form.getElementsByClassName('note-input')[0].value,
-    dispute_entries: [ dispute_entry ]
+    dispute_entries: [ dispute_entry_id ]   # id is unique to the url/ip, gets handled by back-end
   }
+
+  console.log data
 
   std_msg_ajax(
     url: '/escalations/api/v1/escalations/webrep/disputes/bulk_wlbl_threatcat_adjust'
@@ -378,9 +380,9 @@ window.submit_individual_wlbl = (button_tag) ->
     error_prefix: 'Error adjusting WL/BL information.'
     success_reload: true
     success: (response) ->
-      std_msg_success("Entry has been updated for: " + old_lists, [dispute_ip_uri, thrt_cat_str])
+      std_msg_success("Entry has been updated", [dispute_ip_uri, thrt_cat_str])
     error: (response) ->
-      std_api_error(response, 'Error updating this entry.')
+      std_api_error(response, 'Error updating this entry')
     completed: () ->
       $('.dispute-wlbl-adjust-wrapper .dropdown-submit-button').html('Submit Changes')
   )
@@ -455,7 +457,7 @@ window.submit_bulk_wlbl = (page) ->
       method: 'POST'
       data: data
       success: (response) ->
-        std_msg_success("Entries have been updated for: " + list_types, [ip_uris, tc_updated_str])
+        std_msg_success("Entries have been updated: ", [ip_uris, tc_updated_str])
       error: (response) ->
         std_api_error(response, 'Error updating these entries.')
       completed: () ->

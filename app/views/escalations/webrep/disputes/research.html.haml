@@ -57,15 +57,14 @@
                         %input{type: 'radio', name: 'wlbl-action-radio', id: 'wlbl-remove', value: 'wlbl-remove'}
                         %label.radio-label{for: 'wlbl-remove'} Remove from list
                       .col-xs-5.replace-tc-radio.hidden
-                        -# the 'change tcs' needs to retain value 'wlbl-add'
-                        %input{type: 'radio', name: 'wlbl-action-radio', id: 'wlbl-replace', value: 'wlbl-add'}
+                        %input{type: 'radio', name: 'wlbl-action-radio', id: 'wlbl-replace', value: 'wlbl-replace'}
                         %label.radio-label{for: 'wlbl-replace'} Replace threat categories
 
-                    .row.tc-replace-note
+                    .row.tc-replace-note.hidden
                       .col-xs-12
                         %span NOTE: Submitting zero threat categories removes associated blacklists too.
 
-                    -# BEGIN: WL BL LISTS ROW + THREAT CATS ROW (place this 1 indent past 'inline-tool')
+                    -# BEGIN: WL BL LISTS ROW + THREAT CATS ROW (place this 1 indent past 'inline-tool' above)
                     .row.lists-row
                       .col-xs-12
                         %label.content-label-sm{for: "wlbl-list-type-select"} Lists
