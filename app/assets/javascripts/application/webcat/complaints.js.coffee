@@ -133,52 +133,58 @@ window.updateURI = (event, complaint_entry_id) ->
 
  )
 
+processSubmitNewURL = () ->
+  data = {}
+  isEmpty = true
+
+  for i in [1...6] by 1
+
+    categories = []
+    for j in [0...5] by 1
+      if $("#cat_new_url_#{i}")[0][j]
+        categories.push($("#cat_new_url_#{i}")[0][j].text)
+
+    data[i] = {url: $("#url_#{i}").val(), category_names: categories, category_ids: $("#cat_new_url_#{i}").val()}
+
+    if data[i].url.length > 0 && data[i].category_ids != null
+      isEmpty = false
+
+  if isEmpty == false
+
+    $('#loader-modal').modal({
+      keyboard: false
+    })
+
+    std_msg_ajax(
+      url:'/escalations/api/v1/escalations/webcat/complaints/cat_new_url'
+      method: 'POST'
+      data: {data: data}
+      success: (response) ->
+        $('#loader-modal').modal 'hide'
+        std_msg_success('URLs categorized successfully',["Categorization of a Top URL will create a pending complaint entry.", "All other entries have been submitted directly to WBRS."], reload: true)
+
+      error: (response) ->
+        $('#loader-modal').modal 'hide'
+        if response.responseText.includes('Either no products have been defined to enter bugs against or you have not been given access to any.')
+          std_api_error(response, "Please make sure you have the appropriate permissions in Bugzilla. Unable to categorize url.", reload: false)
+        else
+          std_api_error(response, "Unable to categorize url.", reload: false)
+    )
+  else
+    std_msg_error("Unable to categorize", ["Please confirm that a URL and at least one category for each desired entry exists."], reload: false)
+
 window.cat_new_url = ()->
-  proceedeWithUpdate = true
   timesTouched = getTouchedFormCount()
-
   if timesTouched > 1
-    proceedeWithUpdate = confirm("You have made " + timesTouched + " changes on this page. Do you want to proceed with updating this item? It will reload the page and you will lose your changes.")
-  if proceedeWithUpdate == true
-    data = {}
-    isEmpty = true
-
-    for i in [1...6] by 1
-
-      categories = []
-      for j in [0...5] by 1
-        if $("#cat_new_url_#{i}")[0][j]
-          categories.push($("#cat_new_url_#{i}")[0][j].text)
-
-      data[i] = {url: $("#url_#{i}").val(), category_names: categories, category_ids: $("#cat_new_url_#{i}").val()}
-
-      if data[i].url.length > 0 && data[i].category_ids != null
-        isEmpty = false
-
-    if isEmpty == false
-
-      $('#loader-modal').modal({
-        keyboard: false
+    std_msg_confirm(
+      "You have made " + timesTouched + " changes on this page. Do you want to proceed with updating this item? It will reload the page and you will lose your changes.",
+      [],
+      {
+        reload: false,
+        confirm_dismiss: true,
+        confirm: ->
+          processSubmitNewURL()
       })
-
-      std_msg_ajax(
-        url:'/escalations/api/v1/escalations/webcat/complaints/cat_new_url'
-        method: 'POST'
-        data: {data: data}
-        success: (response) ->
-          $('#loader-modal').modal 'hide'
-          std_msg_success('URLs categorized successfully',["Categorization of a Top URL will create a pending complaint entry.", "All other entries have been submitted directly to WBRS."], reload: true)
-
-        error: (response) ->
-          $('#loader-modal').modal 'hide'
-          if response.responseText.includes('Either no products have been defined to enter bugs against or you have not been given access to any.')
-            std_api_error(response, "Please make sure you have the appropriate permissions in Bugzilla. Unable to categorize url.", reload: false)
-          else
-            std_api_error(response, "Unable to categorize url.", reload: false)
-      )
-    else
-      std_msg_error("Unable to categorize", ["Please confirm that a URL and at least one category for each desired entry exists."], reload: false)
-
 
 window.webcat_reset_search = ()->
   inputs = document.getElementsByClassName('form-control')
@@ -342,60 +348,142 @@ window.domain_whois = (IP_Domain) ->
       notice_html = "<p>Something went wrong: #{response.responseText}</p>"
   , this)
 
+processSubmitPending=()->
+  prefix = $('#complaint_prefix_'+id)[0].value
+  status = $('[name=resolution_review_'+id+']:checked').val()
+  comment = $('#complaint_comment_'+id)[0].value
+  resolution_comment = $('#complaint_resolution_comment_'+id)[0].value
+  resolution = $('.complaint-resolution'+id).text()
+  #get the selectize control for the category input
+  selectizeControl = $('#input_cat_'+id).selectize()[0].selectize
+  if $('#input_cat_'+id).val() == null
+    categories = null
+  else
+    categories = $('#input_cat_'+id).val().toString()
+
+  named_categories = ""
+  i = 0
+  if categories == null
+    cat_array = []
+  else
+    cat_array = categories.split(',')
+    while i < cat_array.length
+      named_categories = named_categories + selectizeControl.getItem(cat_array[i]).text()
+      i++
+      if i < cat_array.length
+        named_categories += ", "
+
+  std_msg_ajax(
+    url: '/escalations/api/v1/escalations/webcat/complaint_entries/update_pending'
+    method: 'POST'
+    data: {'id': id,'prefix': prefix,'commit':status,'status':resolution,'comment':comment, 'resolution_comment': resolution_comment, 'categories': categories, 'category_names':named_categories }
+    success: (response) ->
+      {uri, domain, subdomain, path, categories, error, entry_id, was_dismissed, status} = $.parseJSON(response)
+      if error
+        notice_html = "<p>Something went wrong: #{error}</p>"
+        alert(error)
+      else
+        table = $('#complaints-index').DataTable()
+        temp_row = table.row(row_id)
+        td = $(temp_row).next('tr').find('td:first')
+        unless $(td).hasClass 'nested-complaint-data-wrapper'
+          $(td).addClass 'nested-complaint-data-wrapper'
+        if was_dismissed
+          temp_row.node().className += ' highlight-was-dismissed'
+
+        temp_row.data().uri = uri
+        temp_row.data().category = categories
+        temp_row.data().status = status
+        temp_row.data().resolution = resolution
+        temp_row.data().internal_comment = comment
+        temp_row.data().resolution_comment = resolution_comment
+        temp_row.invalidate().page(table_page).draw(false)
+        temp_row.child().remove()
+        temp_row.child(format(temp_row)).show()
+
+        $('#input_cat_'+ temp_row.data().entry_id).selectize {
+          persist: false,
+          create: false,
+          maxItems: 5,
+          valueField: 'category_id',
+          labelField: 'category_name',
+          searchField: ['category_name', 'category_code'],
+          options: AC.WebCat.createSelectOptions(),
+          items: selected_options(temp_row.data().category)
+        }
+
+        $("#domain_#{entry_id}").text(domain)
+        $("#subdomain_#{entry_id}").text(subdomain)
+        $("#path_#{entry_id}").text(path)
+
+      tds = $('#complaints-index tbody').closest('td')
+      for td in tds
+        if td.className == ''
+          td.classList.add('nested-complaint-data-wrapper')
+    error: (response) ->
+      notice_html = "<p>Something went wrong: #{response.responseText}</p>"
+  , this)
+
 window.updatePending = (id,row_id) ->
-  proceedeWithUpdate = true
   timesTouched = getTouchedFormCount()
   if timesTouched > 1
-    proceedeWithUpdate = confirm("You have made " + timesTouched + " changes on this page. Do you want to proceed with updating this item? It will reload the page and you will lose your changes.")
-  if proceedeWithUpdate == true
-    prefix = $('#complaint_prefix_'+id)[0].value
-    status = $('[name=resolution_review_'+id+']:checked').val()
-    comment = $('#complaint_comment_'+id)[0].value
-    resolution_comment = $('#complaint_resolution_comment_'+id)[0].value
-    resolution = $('.complaint-resolution'+id).text()
-    #get the selectize control for the category input
-    selectizeControl = $('#input_cat_'+id).selectize()[0].selectize
-    if $('#input_cat_'+id).val() == null
-      categories = null
-    else
-      categories = $('#input_cat_'+id).val().toString()
+    std_msg_confirm(
+      "You have made " + timesTouched + " changes on this page. Do you want to proceed with updating this item? It will reload the page and you will lose your changes.",
+      [],
+      {
+        reload: false,
+        confirm_dismiss: true,
+        confirm: ->
+          processSubmitPending()
+      })
 
-    named_categories = ""
-    i = 0
-    if categories == null
-      cat_array = []
-    else
-      cat_array = categories.split(',')
-      while i < cat_array.length
-        named_categories = named_categories + selectizeControl.getItem(cat_array[i]).text()
-        i++
-        if i < cat_array.length
-          named_categories += ", "
+processSubmitEntry = () ->
+  $("#submit_changes_#{entry_id}").addClass('hidden')
+  $("#reopen_#{entry_id}").removeClass('hidden')
 
+  prefix = $('#complaint_prefix_'+entry_id)[0].value
+  if $('#input_cat_'+entry_id).val() != null
+    categories = $('#input_cat_'+entry_id).val().toString()
+  else
+    categories = null
+  category_name = $('#input_cat_' + entry_id).next('.selectize-control').find('.item')
+  category_names = []
+  category_name.each ->
+    category_names.push($(this).text())
+  category_names = category_names.toString()
+  resolution_status = $('[name=resolution'+entry_id+']:checked').val()
+  comment = $('#complaint_comment_'+entry_id)[0].value
+  resolution_comment = $('#complaint_resolution_comment_'+entry_id)[0].value
+  headers = {'Token': $('input[name="token"]').val(), 'Xmlrpc-Token': $('input[name="xml_token"]').val()}
+  fixed_flag = $('#fixed'+entry_id).is(':checked')
+
+  # If resolution is set to fixed, make sure it has categories applied
+  if categories == null && fixed_flag == true
+    std_msg_error("Must include at least one category.","", reload: false)
+    $("#submit_changes_#{entry_id}").removeClass('hidden')
+    $("#reopen_#{entry_id}").addClass('hidden')
+  else
     std_msg_ajax(
-      url: '/escalations/api/v1/escalations/webcat/complaint_entries/update_pending'
+      url: '/escalations/api/v1/escalations/webcat/complaint_entries/update'
       method: 'POST'
-      data: {'id': id,'prefix': prefix,'commit':status,'status':resolution,'comment':comment, 'resolution_comment': resolution_comment, 'categories': categories, 'category_names':named_categories }
+      headers: headers
+      data: {'id': entry_id, 'prefix': prefix, 'categories':categories, 'category_names':category_names, 'status':resolution_status, 'comment':comment, 'resolution_comment': resolution_comment }
       success: (response) ->
-        {uri, domain, subdomain, path, categories, error, entry_id, was_dismissed, status} = $.parseJSON(response)
-        if error
-          notice_html = "<p>Something went wrong: #{error}</p>"
-          alert(error)
-        else
-          table = $('#complaints-index').DataTable()
-          temp_row = table.row(row_id)
-          td = $(temp_row).next('tr').find('td:first')
-          unless $(td).hasClass 'nested-complaint-data-wrapper'
-            $(td).addClass 'nested-complaint-data-wrapper'
-          if was_dismissed
-            temp_row.node().className += ' highlight-was-dismissed'
+        {categories, error, uri, domain, subdomain, path, status, display_name} = $.parseJSON(response)
 
-          temp_row.data().uri = uri
-          temp_row.data().category = categories
+        if !error
+          table = $('#complaints-index').DataTable()
+
+          selected_rows = $('#complaints-index').DataTable().rows('.selected')
+          selected_rows.data().cell(selected_rows[0][0],14).data("#{display_name}").draw()
+
+          temp_row = table.row(row_id)
           temp_row.data().status = status
-          temp_row.data().resolution = resolution
+          temp_row.data().resolution = resolution_status
           temp_row.data().internal_comment = comment
           temp_row.data().resolution_comment = resolution_comment
+          temp_row.data().category = category_names
+          temp_row.data().category_names = category_names
           temp_row.invalidate().page(table_page).draw(false)
           temp_row.child().remove()
           temp_row.child(format(temp_row)).show()
@@ -403,84 +491,25 @@ window.updatePending = (id,row_id) ->
           $('#input_cat_'+ temp_row.data().entry_id).selectize {
             persist: false,
             create: false,
-            maxItems: 5,
+            maxItems: 5
             valueField: 'category_id',
             labelField: 'category_name',
             searchField: ['category_name', 'category_code'],
-            options: AC.WebCat.createSelectOptions(),
-            items: selected_options(temp_row.data().category)
+            options: AC.WebCat.createSelectOptions()
+            items: selected_options(categories)
           }
 
-          $("#domain_#{entry_id}").text(domain)
-          $("#subdomain_#{entry_id}").text(subdomain)
-          $("#path_#{entry_id}").text(path)
-
-        tds = $('#complaints-index tbody').closest('td')
-        for td in tds
-          if td.className == ''
-            td.classList.add('nested-complaint-data-wrapper')
-      error: (response) ->
-        notice_html = "<p>Something went wrong: #{response.responseText}</p>"
-    , this)
-
-
-## Called when user submits categories / information to close a ticket
-window.updateEntryColumns = (entry_id,row_id) ->
-  proceedeWithUpdate = true
-  timesTouched = getTouchedFormCount()
-  if timesTouched > 1
-    proceedeWithUpdate = confirm("You have made " + timesTouched + " changes on this page. Do you want to proceed with updating this item? It will reload the page and you will lose your changes.")
-  if proceedeWithUpdate == true
-    $("#submit_changes_#{entry_id}").addClass('hidden')
-    $("#reopen_#{entry_id}").removeClass('hidden')
-
-    prefix = $('#complaint_prefix_'+entry_id)[0].value
-    if $('#input_cat_'+entry_id).val() != null
-      categories = $('#input_cat_'+entry_id).val().toString()
-    else
-      categories = null
-    category_name = $('#input_cat_' + entry_id).next('.selectize-control').find('.item')
-    category_names = []
-    category_name.each ->
-      category_names.push($(this).text())
-    category_names = category_names.toString()
-    resolution_status = $('[name=resolution'+entry_id+']:checked').val()
-    comment = $('#complaint_comment_'+entry_id)[0].value
-    resolution_comment = $('#complaint_resolution_comment_'+entry_id)[0].value
-    headers = {'Token': $('input[name="token"]').val(), 'Xmlrpc-Token': $('input[name="xml_token"]').val()}
-    fixed_flag = $('#fixed'+entry_id).is(':checked')
-
-    # If resolution is set to fixed, make sure it has categories applied
-    if categories == null && fixed_flag == true
-      std_msg_error("Must include at least one category.","", reload: false)
-      $("#submit_changes_#{entry_id}").removeClass('hidden')
-      $("#reopen_#{entry_id}").addClass('hidden')
-    else
-      std_msg_ajax(
-        url: '/escalations/api/v1/escalations/webcat/complaint_entries/update'
-        method: 'POST'
-        headers: headers
-        data: {'id': entry_id, 'prefix': prefix, 'categories':categories, 'category_names':category_names, 'status':resolution_status, 'comment':comment, 'resolution_comment': resolution_comment }
-        success: (response) ->
-          {categories, error, uri, domain, subdomain, path, status, display_name} = $.parseJSON(response)
-
-          if !error
-            table = $('#complaints-index').DataTable()
-
-            selected_rows = $('#complaints-index').DataTable().rows('.selected')
-            selected_rows.data().cell(selected_rows[0][0],14).data("#{display_name}").draw()
-
-            temp_row = table.row(row_id)
-            temp_row.data().status = status
-            temp_row.data().resolution = resolution_status
-            temp_row.data().internal_comment = comment
-            temp_row.data().resolution_comment = resolution_comment
-            temp_row.data().category = category_names
-            temp_row.data().category_names = category_names
-            temp_row.invalidate().page(table_page).draw(false)
-            temp_row.child().remove()
-            temp_row.child(format(temp_row)).show()
-
+          $('#input_cat_pending'+ temp_row.data().entry_id).selectize {
+            persist: false,
+            create: false,
+            maxItems: 5
+            valueField: 'category_id',
+            labelField: 'category_name',
+            searchField: ['category_name', 'category_code'],
+            options: AC.WebCat.createSelectOptions()
+            items: selected_options(categories)
+          }
+          unless status == 'COMPLETED'
             $('#input_cat_'+ temp_row.data().entry_id).selectize {
               persist: false,
               create: false,
@@ -489,10 +518,12 @@ window.updateEntryColumns = (entry_id,row_id) ->
               labelField: 'category_name',
               searchField: ['category_name', 'category_code'],
               options: AC.WebCat.createSelectOptions()
-              items: selected_options(categories)
+              items: selected_options(temp_row.data().category_names)
             }
-
-            $('#input_cat_pending'+ temp_row.data().entry_id).selectize {
+          else
+            # For entries that are 'Completed', we need to initialize the selectize function
+            # and then disable it
+            $completed_selectize = $('#input_cat_'+ temp_row.data().entry_id).selectize {
               persist: false,
               create: false,
               maxItems: 5
@@ -500,52 +531,43 @@ window.updateEntryColumns = (entry_id,row_id) ->
               labelField: 'category_name',
               searchField: ['category_name', 'category_code'],
               options: AC.WebCat.createSelectOptions()
-              items: selected_options(categories)
+              items: selected_options(temp_row.data().category_names)
             }
-            unless status == 'COMPLETED'
-              $('#input_cat_'+ temp_row.data().entry_id).selectize {
-                persist: false,
-                create: false,
-                maxItems: 5
-                valueField: 'category_id',
-                labelField: 'category_name',
-                searchField: ['category_name', 'category_code'],
-                options: AC.WebCat.createSelectOptions()
-                items: selected_options(temp_row.data().category_names)
-              }
-            else
-              # For entries that are 'Completed', we need to initialize the selectize function
-              # and then disable it
-              $completed_selectize = $('#input_cat_'+ temp_row.data().entry_id).selectize {
-                persist: false,
-                create: false,
-                maxItems: 5
-                valueField: 'category_id',
-                labelField: 'category_name',
-                searchField: ['category_name', 'category_code'],
-                options: AC.WebCat.createSelectOptions()
-                items: selected_options(temp_row.data().category_names)
-              }
-              select_complete = $completed_selectize[0].selectize
-              select_complete.disable()
+            select_complete = $completed_selectize[0].selectize
+            select_complete.disable()
 
-            $("#complaint_prefix_#{entry_id}").val(uri)
-            $("#domain_#{entry_id}").text(domain)
-            $("#subdomain_#{entry_id}").text(subdomain)
-            $("#path_#{entry_id}").text(path)
-            $("#entry-uri-#{entry_id}").html("<a href='http://#{uri}' target='_blank' onclick='select_cat_text_field(#{entry_id})' >#{uri}</a>")
-            $("#site-search-#{entry_id}").html("<a href='https://www.google.com/search?q=site%3A#{uri}' target='_blank' onclick='select_cat_text_field(#{entry_id})'>#{uri}</a>")
+          $("#complaint_prefix_#{entry_id}").val(uri)
+          $("#domain_#{entry_id}").text(domain)
+          $("#subdomain_#{entry_id}").text(subdomain)
+          $("#path_#{entry_id}").text(path)
+          $("#entry-uri-#{entry_id}").html("<a href='http://#{uri}' target='_blank' onclick='select_cat_text_field(#{entry_id})' >#{uri}</a>")
+          $("#site-search-#{entry_id}").html("<a href='https://www.google.com/search?q=site%3A#{uri}' target='_blank' onclick='select_cat_text_field(#{entry_id})'>#{uri}</a>")
 
-          tds = $('#complaints-index tbody').closest('td')
-          for td in tds
-            if td.className == ''
-              td.classList.add('nested-complaint-data-wrapper')
+        tds = $('#complaints-index tbody').closest('td')
+        for td in tds
+          if td.className == ''
+            td.classList.add('nested-complaint-data-wrapper')
 
-        error: (response) ->
-          $("#submit_changes_#{entry_id}").removeClass('hidden')
-          $("#reopen_#{entry_id}").addClass('hidden')
-          std_msg_error(response,"", reload: false)
-      , this)
+      error: (response) ->
+        $("#submit_changes_#{entry_id}").removeClass('hidden')
+        $("#reopen_#{entry_id}").addClass('hidden')
+        std_msg_error(response,"", reload: false)
+    , this)
+
+
+## Called when user submits categories / information to close a ticket
+window.updateEntryColumns = (entry_id,row_id) ->
+  timesTouched = getTouchedFormCount()
+  if timesTouched > 1
+    std_msg_confirm(
+      "You have made " + timesTouched + " changes on this page. Do you want to proceed with updating this item? It will reload the page and you will lose your changes.",
+      [],
+      {
+        reload: false,
+        confirm_dismiss: true,
+        confirm: ->
+          processSubmitEntry()
+      })
 
 
 ## Allows analyst to set ticket status to reopened and allows them to interact with the submission form
@@ -1633,139 +1655,143 @@ window.triggerTooltips = (item) ->
     side: 'bottom'
   return
 
-window.master_submit = () ->
-  proceedeWithUpdate = true
-  selectedItems = $('.selected + tr td.nested-complaint-data-wrapper')
+processSubmitMaster = () ->
 
-  timesTouched = getTouchedFormCount()
+  data = []
 
-  thingsSelected = timesTouched
+  $('#loader-modal').modal({
+    keyboard: false
+  })
 
-  if thingsSelected > selectedItems.length
-    proceedeWithUpdate = confirm("I noticed you have made changes to at least " + thingsSelected +  " complaints but you only have " + selectedItems.length + " items selected. Do you want to proceed with updating these items? It will reload the page and you will lose your other changes.")
-  if proceedeWithUpdate == true
-    data = []
+  $('.selected + tr td.nested-complaint-data-wrapper').each ->
+    entry_id = $(this).find('tr').attr('entry_id')
+    row_id = $(this).find('tr').attr('row_id')
+    type = $(this).find('tr').attr('type')
 
-    $('#loader-modal').modal({
-      keyboard: false
-    })
+    if type == 'submit_changes' && entry_id && row_id
+      prefix = $(this).find("#complaint_prefix_#{entry_id}")[0].value
 
-    $('.selected + tr td.nested-complaint-data-wrapper').each ->
-      entry_id = $(this).find('tr').attr('entry_id')
-      row_id = $(this).find('tr').attr('row_id')
-      type = $(this).find('tr').attr('type')
+      category_names = []
+      categories = ""
+      if $(this).find("#input_cat_#{entry_id}").val()
+        categories = $(this).find("#input_cat_#{entry_id}").val().toString()
+      category_name = $(this).find("#input_cat_#{entry_id}").next('.selectize-control').find('.item')
+      category_name.each ->
+        category_names.push($(this).text())
+      category_names = category_names.toString()
+      status = $(this).find("[name=resolution#{entry_id}]:checked").val()
+      comment = $(this).find("#complaint_comment_#{entry_id}")[0].value
+      resolution_comment = $(this).find("#complaint_resolution_comment_#{entry_id}")[0].value
 
-      if type == 'submit_changes' && entry_id && row_id
-        prefix = $(this).find("#complaint_prefix_#{entry_id}")[0].value
+      if (categories.length > 0 && status == 'FIXED') || ((categories.length == 0) && (status == 'INVALID' || status == 'UNCHANGED'))
+        data.push({entry_id: entry_id, error: false, row_id: row_id, prefix: prefix, categories: categories, category_names: category_names, status: status, comment: comment, resolution_comment: resolution_comment})
+      else if status == 'UNCHANGED' || status == 'INVALID'
+        data.push({entry_id: entry_id, error: false, row_id: row_id, prefix: prefix, categories: categories, category_names: category_names, status: status, comment: comment, resolution_comment: resolution_comment})
+      else if (categories.length == 0) && status == 'FIXED'
+        data.push({entry_id, error: true, reason: 'nil_categories'})
 
-        category_names = []
-        categories = ""
-        if $(this).find("#input_cat_#{entry_id}").val()
-          categories = $(this).find("#input_cat_#{entry_id}").val().toString()
-        category_name = $(this).find("#input_cat_#{entry_id}").next('.selectize-control').find('.item')
-        category_name.each ->
-          category_names.push($(this).text())
-        category_names = category_names.toString()
-        status = $(this).find("[name=resolution#{entry_id}]:checked").val()
-        comment = $(this).find("#complaint_comment_#{entry_id}")[0].value
-        resolution_comment = $(this).find("#complaint_resolution_comment_#{entry_id}")[0].value
+  std_msg_ajax(
+    method: 'POST'
+    url: "/escalations/api/v1/escalations/webcat/complaint_entries/master_submit"
+    data: {data: data}
+    success: (response) ->
+      errors = false
 
-        if (categories.length > 0 && status == 'FIXED') || ((categories.length == 0) && (status == 'INVALID' || status == 'UNCHANGED'))
-          data.push({entry_id: entry_id, error: false, row_id: row_id, prefix: prefix, categories: categories, category_names: category_names, status: status, comment: comment, resolution_comment: resolution_comment})
-        else if status == 'UNCHANGED' || status == 'INVALID'
-          data.push({entry_id: entry_id, error: false, row_id: row_id, prefix: prefix, categories: categories, category_names: category_names, status: status, comment: comment, resolution_comment: resolution_comment})
-        else if (categories.length == 0) && status == 'FIXED'
-          data.push({entry_id, error: true, reason: 'nil_categories'})
+      nil_categories_errors = []
+      api_errors = []
+      success = []
 
-    std_msg_ajax(
-      method: 'POST'
-      url: "/escalations/api/v1/escalations/webcat/complaint_entries/master_submit"
-      data: {data: data}
-      success: (response) ->
-        errors = false
+      json = JSON.parse(response)
 
-        nil_categories_errors = []
-        api_errors = []
-        success = []
+      table = $('#complaints-index').DataTable()
 
-        json = JSON.parse(response)
-
-        table = $('#complaints-index').DataTable()
-
-        for entry in json
-          if entry.error == true && entry.reason == 'nil_categories'
-            nil_categories_errors.push(entry.entry_id)
-            errors = true
-          else if entry.error == true && entry.reason == 'api'
-            api_errors.push(entry.entry_id)
-            errors = true
-          else
-            success.push(entry.entry_id)
-
-            temp_row = table.row(entry.row_id)
-            temp_row.data().status = entry.status
-            temp_row.data().resolution = entry.resolution
-            temp_row.data().internal_comment = entry.comment
-            temp_row.data().resolution_comment = entry.resolution_comment
-            temp_row.data().category = entry.category_names
-            temp_row.data().category_names = entry.category_names
-            temp_row.invalidate().page(table_page).draw(false)
-            temp_row.child().remove()
-            temp_row.child(format(temp_row)).show()
-
-            $('#input_cat_'+ entry.entry_id).selectize {
-              persist: false,
-              create: false,
-              maxItems: 5
-              valueField: 'category_id',
-              labelField: 'category_name',
-              searchField: ['category_name', 'category_code'],
-              options: AC.WebCat.createSelectOptions()
-              items: selected_options(entry.categories)
-            }
-            $('#input_cat_pending'+ entry.entry_id).selectize {
-              persist: false,
-              create: false,
-              maxItems: 5
-              valueField: 'category_id',
-              labelField: 'category_name',
-              searchField: ['category_name', 'category_code'],
-              options: AC.WebCat.createSelectOptions()
-              items: selected_options(entry.categories)
-            }
-
-        success_boiler_plate = "The following entries were successfully saved: " + success.toString() + "<br>"
-        api_boiler_plate =  "The following entries could not be saved due to API errors: " + api_errors.toString() + "<br>"
-        no_cats_boiler_plate = "The following entries could not be saved (no categories): " + nil_categories_errors.toString()
-
-        error_msg = ''
-
-        if success.length > 0
-          error_msg += success_boiler_plate
-        if api_errors.length > 0
-          error_msg += api_boiler_plate
-
-        if nil_categories_errors.length > 0
-          error_msg += no_cats_boiler_plate
-
-        if errors == true
-          $('#loader-modal').modal 'hide'
-          std_msg_error(error_msg,"")
+      for entry in json
+        if entry.error == true && entry.reason == 'nil_categories'
+          nil_categories_errors.push(entry.entry_id)
+          errors = true
+        else if entry.error == true && entry.reason == 'api'
+          api_errors.push(entry.entry_id)
+          errors = true
         else
-          $('#loader-modal').modal 'hide'
-          std_msg_success('Success',["All complaints successfully processed."], reload: true)
+          success.push(entry.entry_id)
 
-        tds = $('#complaints-index tbody').closest('td')
-        for td in tds
-          if td.className == ''
-            td.classList.add('nested-complaint-data-wrapper')
+          temp_row = table.row(entry.row_id)
+          temp_row.data().status = entry.status
+          temp_row.data().resolution = entry.resolution
+          temp_row.data().internal_comment = entry.comment
+          temp_row.data().resolution_comment = entry.resolution_comment
+          temp_row.data().category = entry.category_names
+          temp_row.data().category_names = entry.category_names
+          temp_row.invalidate().page(table_page).draw(false)
+          temp_row.child().remove()
+          temp_row.child(format(temp_row)).show()
 
-      error: (response) ->
+          $('#input_cat_'+ entry.entry_id).selectize {
+            persist: false,
+            create: false,
+            maxItems: 5
+            valueField: 'category_id',
+            labelField: 'category_name',
+            searchField: ['category_name', 'category_code'],
+            options: AC.WebCat.createSelectOptions()
+            items: selected_options(entry.categories)
+          }
+          $('#input_cat_pending'+ entry.entry_id).selectize {
+            persist: false,
+            create: false,
+            maxItems: 5
+            valueField: 'category_id',
+            labelField: 'category_name',
+            searchField: ['category_name', 'category_code'],
+            options: AC.WebCat.createSelectOptions()
+            items: selected_options(entry.categories)
+          }
+
+      success_boiler_plate = "The following entries were successfully saved: " + success.toString() + "<br>"
+      api_boiler_plate =  "The following entries could not be saved due to API errors: " + api_errors.toString() + "<br>"
+      no_cats_boiler_plate = "The following entries could not be saved (no categories): " + nil_categories_errors.toString()
+
+      error_msg = ''
+
+      if success.length > 0
+        error_msg += success_boiler_plate
+      if api_errors.length > 0
+        error_msg += api_boiler_plate
+
+      if nil_categories_errors.length > 0
+        error_msg += no_cats_boiler_plate
+
+      if errors == true
         $('#loader-modal').modal 'hide'
-        std_msg_error("Unable to submit changes for selected entries.","", reload: false)
+        std_msg_error(error_msg,"")
+      else
+        $('#loader-modal').modal 'hide'
+        std_msg_success('Success',["All complaints successfully processed."], reload: true)
 
-    , this)
+      tds = $('#complaints-index tbody').closest('td')
+      for td in tds
+        if td.className == ''
+          td.classList.add('nested-complaint-data-wrapper')
 
+    error: (response) ->
+      $('#loader-modal').modal 'hide'
+      std_msg_error("Unable to submit changes for selected entries.","", reload: false)
+
+  , this)
+
+window.master_submit = () ->
+  selectedItems = $('.selected + tr td.nested-complaint-data-wrapper')
+  thingsSelected = getTouchedFormCount()
+  if thingsSelected > selectedItems.length
+    std_msg_confirm(
+      "I noticed you have made changes to at least " + thingsSelected +  " complaints but you only have " + selectedItems.length + " items selected. Do you want to proceed with updating these items? It will reload the page and you will lose your other changes.",
+      [],
+      {
+        reload: false,
+        confirm_dismiss: true,
+        confirm: ->
+          processSubmitMaster()
+      })
 
 window.verifyMasterSubmit = () ->
   boolean = false

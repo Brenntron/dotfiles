@@ -8,6 +8,29 @@ Feature: Webcat complaints
   #TODO: we need to update the user role on these tests
 
   @javascript
+  Scenario: a user should be alerted of impending doom
+    Given a user with role "webcat user" exists and is logged in
+    And the following complaint entries exist:
+      |id|  domain      | status |
+      |1 | food.com     |  NEW   |
+      |2 | blah.com     |  NEW   |
+      |3 | imhungry.com |  NEW   |
+    And a complaint entry preload exists
+    And I goto "/escalations/webcat/complaints?f=ALL"
+    And I wait for "2" seconds
+    And I click ".expand-row-button-1"
+    And I wait for "2" seconds
+    And I click ".expand-row-button-2"
+    And I wait for "2" seconds
+    And I fill in "complaint_comment_1" with "This is my favorite website"
+    And I fill in "complaint_comment_2" with "This is not my favorite website"
+    And I fill in "input_cat_1-selectized" with "Arts" and press enter
+    And I fill in "input_cat_2-selectized" with "Education" and press enter
+    And I wait for "2" seconds
+    When I click "master-submit"
+    Then I should see hidden element "#message-text" with content "I noticed you have made changes to at least 2 complaints but you only have 1 items selected."
+
+  @javascript
   Scenario: a user can manually create a new complaint
     Given a user with role "webcat user" exists and is logged in
     And bugzilla rest api always saves
@@ -201,7 +224,7 @@ Feature: Webcat complaints
     Then I click "#complaint_entry_report" and switch to the new window
     Then I should see "Webcat Complaint Entry Report"
 
-  # Test should work after WEB-5072 is complete
+  @now
   @javascript
   Scenario: a user attempts to submit changes without categories and receives expected error alert
     Given a user with role "webcat user" exists and is logged in
@@ -215,7 +238,7 @@ Feature: Webcat complaints
     And I wait for "5" seconds
     Then I should see "MUST INCLUDE AT LEAST ONE CATEGORY."
 
-  # Test should work after WEB-5001 is merged
+  @now
   @javascript
   Scenario: a user attempts to submit changes with resolution set to 'Unchanged'
     Given a user with role "webcat user" exists and is logged in
@@ -350,6 +373,7 @@ Feature: Webcat complaints
     Then I should see "UNABLE TO CATEGORIZE"
     And I should see "Please confirm that a URL and at least one category for each desired entry exists."
 
+  @now
   @javascript
   Scenario: a users tries to categorize a URL with an empty form
     Given a user with role "webcat user" exists and is logged in
@@ -472,7 +496,7 @@ Feature: Webcat complaints
     And I wait for "8" seconds
     Then I should see content "Nature" within ".sds_category"
 
-
+  @now
   @javascript
   Scenario: when a complaint in the WBNP queue is resolved,
             a bridge message should not be sent
@@ -494,7 +518,7 @@ Feature: Webcat complaints
     Then I should see "COMPLETED"
     And "0" bridge message should be in the delayed job queue
 
-
+  @now
   @javascript
   Scenario: when a complaint in the talos-intelligence queue is resolved,
   a bridge message should be sent via delayed jobs

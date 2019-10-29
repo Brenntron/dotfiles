@@ -9,6 +9,10 @@ end
 Given(/^I fill in "(.*?)" with "(.*?)"$/) do |field_label, value|
   fill_in field_label, :with => value
 end
+Given(/^I fill in "(.*?)" with "(.*?)" and press enter$/) do |field_label, value|
+  fill_in field_label, :with => value
+  find(:id, field_label).native.send_keys(:enter)
+end
 
 Given(/^I fill in element, "(.*?)" with "(.*?)"$/) do |identifier, value|
   page.find(identifier).set(value)
@@ -238,6 +242,15 @@ end
 Then(/^I should see "(.*?)"$/) do |content|
   # binding.pry
   raise "content not found" unless page.has_content?(content)
+end
+
+Then(/^I should see hidden element "(.*?)" with content "(.*?)"$/) do |element, content|
+  begin
+    page.find(element, visible: :all, text: content)
+  rescue Capybara::ElementNotFound => e
+    raise "content not found: #{content}"
+  end
+
 end
 
 Then(/^I should see either "(.*?)" or "(.*?)"$/) do |content1, content2|
