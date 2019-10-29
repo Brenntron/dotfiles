@@ -6,19 +6,28 @@ $ ->
     form.find('#assignee').val(user);
     form.find('#ticket-type-dropdown').val('Web');
 
+  window.ips_textarea_toggle = (dropdown) ->
+    if !$(dropdown).is('a')
+      $('#research-page-toolbar #ips_urls').addClass('hidden')
+      $('#research-page-toolbar .ips_urls_div').removeClass('hidden')
+
+
   window.submit_new_dispute = (submit_btn) ->
     data = {}
     form = $(submit_btn).closest('form')
     form_values = form.serializeArray()
+    text_area = form.find('#ips_urls')
     dropdown = $(submit_btn).closest(".dropdown-menu").prev()
     $('#loader-modal').modal({
       keyboard: false
     })
+
     for item in form_values
       { name, value } = item
       name = name.toLowerCase().replace(/-/g, '_')
       if name != 'token' && name != 'xml_token' && name != 'current_user'
         data[name] = value
+
     if data.ips_urls.trim().length > 0
       data.ips_urls = data.ips_urls.replace(/,/g, '').replace(/\n/g, ' ')
       std_msg_ajax(

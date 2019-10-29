@@ -544,7 +544,10 @@ button {
   border: 1px solid #ccc;
   padding: 4px 5px;
 }
-
+.ips_urls_div{
+  //display: none;
+  overflow-wrap: break-word;
+}
 .toolbar select {
   display: inline-block;
   background-color: $content-bg-color;

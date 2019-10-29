@@ -33,10 +33,8 @@ $ ->
     { currentTarget } = e
     setTimeout(
       el = $('#research-page-toolbar textarea#ips_urls')
-      scrollheight = document.getElementById("ips_urls").scrollHeight
-      console.log scrollheight
       el.attr('readonly', 'readonly')
-      el.css({'cursor': 'default', 'outline': 'none', 'border': 'none'})
+      el.css({'cursor': 'default', 'border': 'none'})
 
     , 900)
 
@@ -69,7 +67,6 @@ $ ->
   $('#add-to-ticket-button').on 'click', (e)->
     { currentTarget } = e
 
-    text = $('#research-page-toolbar #ips_urls').text()
     new_val = ''
     $('#disputes-research-table .dispute_check_box:checked').each ->
       tr = $( this ).closest('tr')
@@ -80,7 +77,7 @@ $ ->
       else
         new_val = url
     $('#research-page-toolbar #ips_urls').html( new_val.trim() )
-
+    $('#research-page-toolbar .ips_urls_div').html( new_val.trim() )
   $('.cancel-changes').click ->
     $('.editing-row').each ->
       editing_inputs = $(this).find('.table-entry-input')
