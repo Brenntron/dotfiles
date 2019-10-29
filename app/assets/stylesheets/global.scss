@@ -545,7 +545,6 @@ button {
   padding: 4px 5px;
 }
 .ips_urls_div{
-  //display: none;
   overflow-wrap: break-word;
 }
 .toolbar select {
@@ -1196,7 +1195,7 @@ thead th.sorting.center {
   width: 90%; /* this is not ideal, may have to come back and test other options, should not poke outside of the content wrapper though. */
   height: 10px;
   position: absolute;
-  background-color: white;
+  background-color: $ac-nav-bg-color;
   z-index: 1;
   margin-top: 43px;
   border-top-right-radius: 2px;
@@ -8263,7 +8262,7 @@ td.text-center span {
     background-color: $primary-section-color;
     background-size: 15px;
     background-position: 10px center;
-    color: white;
+    color: $type-lightest;
     padding: 12px 20px 12px 35px;
     &:hover {
       background-color: darken($primary-section-color, 10%)
@@ -9808,8 +9807,8 @@ button.secondary.view-report-external-button {
 }
 
 .form-control .ui-slider-handle.ui-state-focus{
-  background: #44a9d1;
-  color: white;
+  background: $primary-section-color;
+  color: $type-lightest;
   border: none;
 }
 .form-control .ui-slider-handle.ui-state-active{
