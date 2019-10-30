@@ -1,14 +1,14 @@
 $ ->
   window.reset_form = (form) ->
     user = form.find('#assignee').prop("defaultValue")
-    form.find('#ips_urls').val('');
+    form.find('.ips_urls').val('');
     form.find('#priority').val('P3');
     form.find('#assignee').val(user);
     form.find('#ticket-type-dropdown').val('Web');
 
   window.ips_textarea_toggle = (dropdown) ->
     if !$(dropdown).is('a')
-      $('#research-page-toolbar #ips_urls').addClass('hidden')
+      $('#research-page-toolbar .ips_urls').addClass('hidden')
       $('#research-page-toolbar .ips_urls_div').removeClass('hidden')
 
 
@@ -16,7 +16,7 @@ $ ->
     data = {}
     form = $(submit_btn).closest('form')
     form_values = form.serializeArray()
-    text_area = form.find('#ips_urls')
+    text_area = form.find('.ips_urls')
     dropdown = $(submit_btn).closest(".dropdown-menu").prev()
     $('#loader-modal').modal({
       keyboard: false
@@ -77,7 +77,7 @@ $ ->
       $('#loader-modal').modal 'hide'
       std_msg_error("Error",["Cannot submit form while URLs/IP Addresses field is empty. "])
 
-  $('#cancel_dispute').on 'click', ->
-    $('#ips_urls').val('')
-    $('#assignee').val('')
+  $('.cancel_dispute').on 'click', ->
+    $(this).find('.ips_urls').val('')
+    $(this).find('.assignee').val('')
     $(dropdown).dropdown 'toggle'

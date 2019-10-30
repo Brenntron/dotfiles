@@ -4247,7 +4247,7 @@ td.wbrs-highlight, td.sbrs-highlight {
 #advanced-search-wrapper input,
 #new-complaint-form input,
 #categorize-urls-form-wrapper input,
-#new-dispute-form input {
+.new-dispute-form input {
   margin-bottom: 8px;
   background-color: transparent;
   border: 1px solid darken($faint-neutral-color, 5%);
@@ -5896,7 +5896,7 @@ td.data-table-emph {
     width: 300px;
     border-radius: 3px;
   }
-  #new-dispute-form{
+  .new-dispute-form{
     height: 100%;
     width: 100%;
     padding-top: 1px;
@@ -9099,8 +9099,8 @@ hr.thin.form-divider {
   #research-page-toolbar .dispute-wlbl-adjust-wrapper{
     background: $primary-section-color;
   }
-  #research-page-toolbar #new-dispute-form {
-    background: white;
+  #research-page-toolbar .new-dispute-form {
+    background:$ac-nav-bg-color;
   }
   .search-condition:not(:last-child):after {
     content: ", ";

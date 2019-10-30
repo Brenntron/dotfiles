@@ -66,7 +66,7 @@ $ ->
         new_val = new_val += '&#10' + url
       else
         new_val = url
-    $('#research-page-toolbar #ips_urls').html( new_val.trim() )
+    $('#research-page-toolbar .ips_urls').html( new_val.trim() )
     $('#research-page-toolbar .ips_urls_div').html( new_val.trim() )
   $('.cancel-changes').click ->
     $('.editing-row').each ->

@@ -44,7 +44,7 @@ Feature: Disputes
     Then I should see "Entry Search Results for"
     Then I click "#select-all-entries"
     Then I click "add-to-ticket-button"
-    When I click "submit_new_dispute"
+    When I click ".submit_new_dispute"
     And I wait for "60" seconds
     Then I should see "ALL ENTRIES WERE SUCCESSFULLY CREATED."
 
