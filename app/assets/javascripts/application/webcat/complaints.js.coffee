@@ -1523,53 +1523,33 @@ toggle_selected = (selectedRows, expand)->
   $(selectState).addClass('selected')
 
 
+# webcat: hot key/shortcut to pin toolbar
+$(document).keypress (e) ->
+  if e.which == 54 && e.ctrlKey == true
+    pin_to_top()
 
-
-
-#
-#$(document).keydown = (e) ->
-#  console.log e
-#  if (e.keyCode == 54)
-#    alert 'hi there'
-
-
-
-# pin/unpin toolbar to top on webcat
-window.attach_to_top = () ->
-
-  # PIN TO TOP
-  if $('#attach-to-top').hasClass('pinned') == false
-    toolbar = $('#webcat-index-toolbar').detach()
+# webcat: pin/unpin toolbar to top on webcat
+window.pin_to_top = () ->
+  if !$('#pin-to-top').hasClass('pinned')
+    toolbar = $('#webcat-index-toolbar').detach()  # detach every time
     $(toolbar).addClass('pinned-toolbar')
     $('#nav-banner').append(toolbar)
 
-    $('#attach-to-top span').text('Unpin Toolbar from Top')
-    $('#attach-to-top').attr('title', 'Unpin Toolbar from Top (Ctrl/Cmd + Shift + 6)')
+    $('#pin-to-top span').text('Unpin Toolbar from Top')
+    $('#pin-to-top').attr('title', 'Unpin Toolbar from Top (Ctrl + 6)')
     $('#page-content-wrapper').css('padding-top','60px')
-    $('#attach-to-top').addClass('pinned')
-#    $('.tooltipster-sidetip .tooltipster-box').css('padding','4px 10px !important')
+    $('#pin-to-top').addClass('pinned')
     $('body').addClass('pinned-toolbar-true')
-#    $('body').append('<style>.tooltipster-sidetip .tooltipster-box{padding:4px 10px;}')
-
-  # already pinned to top?
-  else
+  else  # already pinned to top?
     toolbar = $('#webcat-index-toolbar').detach()
     $(toolbar).removeClass('pinned-toolbar')
     $('.webcat-main-area').prepend(toolbar)
 
-    $('#attach-to-top span').text('Pin Toolbar to Top')
-    $('#attach-to-top').attr('title', 'Pin Toolbar to Top (Ctrl/Cmd + Shift + 6)')
+    $('#pin-to-top span').text('Pin Toolbar to Top')
+    $('#pin-to-top').attr('title', 'Pin Toolbar to Top (Ctrl + 6)')
     $('#page-content-wrapper').css('padding-top','15px')
-    $('#attach-to-top').removeClass('pinned')
+    $('#pin-to-top').removeClass('pinned')
     $('body').removeClass('pinned-toolbar-true')
-#    $('.tooltipster-sidetip .tooltipster-box').css('padding','2px 2px !important')
-
-
-
-
-
-
-
 
 window.collapse_selected =()->
   selectedRows = $('.selected')

@@ -823,7 +823,7 @@ button {
 .return-ticket-toolbar-button:hover,
 .collapse-all:hover,
 .sync-button:hover,
-.attach-to-top-button:hover,
+.pin-to-top-button:hover,
 .expand-all:hover {
   background-color: lighten($nav-toolbar-color, 8%)!important;
 }
@@ -847,7 +847,7 @@ button {
 .return-ticket-toolbar-button:focus,
 .collapse-all:focus,
 .sync-button:focus,
-.attach-to-top-button:focus,
+.pin-to-top-button:focus,
 .expand-all:focus{
   background-color: lighten($bug-section-color, 28%);
 }
@@ -10394,7 +10394,7 @@ span.input-truncate {
   z-index: 999;
 }
 
-.attach-to-top-button {
+.pin-to-top-button {
   background-image: url(image_path('icon_pin1.svg'));
   background-size: 22px 22px;
   background-position: 3px 3px;
@@ -10426,10 +10426,12 @@ span.input-truncate {
   margin-bottom: 10px;
 }
 
-
-.pinned-toolbar .tooltipster-sidetip .tooltipster-box {
+// tooltipster adjustments for pinned toolbar tooltips
+.pinned-toolbar-true .tooltipster-sidetip .tooltipster-box {
   padding: 4px 6px;
 }
-.pinned-toolbar .tooltipster-sidetip {
-  top: 95px !important;   // one-off override
+
+// one-off override
+.pinned-toolbar-true .tooltipster-sidetip {
+  top: 85px !important;
 }
