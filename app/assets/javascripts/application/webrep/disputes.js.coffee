@@ -12,14 +12,11 @@ $(document).ready ->
         text = text.join(', ').replace(/, / , ' and ')
       else if text.length > 2
         text = text.join(', ').replace(/, ([^,]*)$/, ', and $1')
-      text = text.replace(/(, and| and | ,)/g, '<span class="unset-text">$1</span>')
+      text = text.replace(/(, and| and |, )/g, '<span class="unset-text">$1</span>')
     $('.searched-for-url').html(text)
 
 window.submit_rep = () ->
-  $('#loader-modal').modal({
-    backdrop: 'static',
-    keyboard: false
-  })
+  $('.bulk-ajax-message-div').css('display', 'flex')
 
 window.select_or_deselect_all = (dispute_id)->
   $('.dispute-entry-checkbox_' + dispute_id).prop('checked', $('#' + dispute_id).prop('checked'))

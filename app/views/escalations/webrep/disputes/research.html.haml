@@ -189,13 +189,17 @@
                 %td.col-reptool-class
                 %td.col-actions
                 %td.col-clear-actions
-
+  .col-xs-12
+    .bulk-ajax-message-div
+      .loader-gears
+        =inline_svg 'icon_gears_loader.svg'
+      %span.loader-msg Loading data...
   .row.research_results
     .col-xs-12
-      -#.ajax-message-div
-      -#  .loader-gears
-      -#    =inline_svg 'icon_gears_loader.svg'
-      -#  %span.loader-msg Loading data...
+      .ajax-message-div
+        .loader-gears
+          =inline_svg 'icon_gears_loader.svg'
+        %span.loader-msg Loading data...
 
       - if params['search']
         %h4 Entry Search Results for

@@ -5567,10 +5567,8 @@ h5.entry-details-table-header {
   font-weight: 600;
 }
 
-.ajax-message-div{
-  &{
-    position: absolute;
-    top: 148px;
+.ajax-message-div, .bulk-ajax-message-div{
+  & {
     display: none;
     width: 90%;
     justify-content: center;
@@ -5582,7 +5580,9 @@ h5.entry-details-table-header {
     margin: 5px;
   }
 }
-
+.ajax-message-div{
+    top: 148px;
+}
 .nested-table-tally {
   float: right;
   font-weight: 300;
