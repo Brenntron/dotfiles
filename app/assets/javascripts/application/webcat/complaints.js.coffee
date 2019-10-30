@@ -1522,6 +1522,55 @@ toggle_selected = (selectedRows, expand)->
         $(selectedRows[i]).addClass('selected')
   $(selectState).addClass('selected')
 
+
+
+
+
+#
+#$(document).keydown = (e) ->
+#  console.log e
+#  if (e.keyCode == 54)
+#    alert 'hi there'
+
+
+
+# pin/unpin toolbar to top on webcat
+window.attach_to_top = () ->
+
+  # PIN TO TOP
+  if $('#attach-to-top').hasClass('pinned') == false
+    toolbar = $('#webcat-index-toolbar').detach()
+    $(toolbar).addClass('pinned-toolbar')
+    $('#nav-banner').append(toolbar)
+
+    $('#attach-to-top span').text('Unpin Toolbar from Top')
+    $('#attach-to-top').attr('title', 'Unpin Toolbar from Top (Ctrl/Cmd + Shift + 6)')
+    $('#page-content-wrapper').css('padding-top','60px')
+    $('#attach-to-top').addClass('pinned')
+#    $('.tooltipster-sidetip .tooltipster-box').css('padding','4px 10px !important')
+    $('body').addClass('pinned-toolbar-true')
+#    $('body').append('<style>.tooltipster-sidetip .tooltipster-box{padding:4px 10px;}')
+
+  # already pinned to top?
+  else
+    toolbar = $('#webcat-index-toolbar').detach()
+    $(toolbar).removeClass('pinned-toolbar')
+    $('.webcat-main-area').prepend(toolbar)
+
+    $('#attach-to-top span').text('Pin Toolbar to Top')
+    $('#attach-to-top').attr('title', 'Pin Toolbar to Top (Ctrl/Cmd + Shift + 6)')
+    $('#page-content-wrapper').css('padding-top','15px')
+    $('#attach-to-top').removeClass('pinned')
+    $('body').removeClass('pinned-toolbar-true')
+#    $('.tooltipster-sidetip .tooltipster-box').css('padding','2px 2px !important')
+
+
+
+
+
+
+
+
 window.collapse_selected =()->
   selectedRows = $('.selected')
   expand = false;

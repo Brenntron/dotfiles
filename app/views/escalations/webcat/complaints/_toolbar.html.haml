@@ -30,11 +30,15 @@
       %span.toolbar-button-text Fetch Complaints
     %button.toolbar-button.sync-button#fetch_wbnp.esc-tooltipped{ onclick: 'fetch_wbnp_data();', title: 'Fetch WBNP Data'}
       %span.toolbar-button-text Fetch WBNP Data
-
   %div
     %label.toolbar-section-label Bulk
     %button.toolbar-button.master-submit-button#master-submit.esc-tooltipped{ onclick: 'master_submit();', title: 'Submit Changes', disabled: true}
       %span.toolbar-button-text Submit Changes
+  %div
+    %label.toolbar-section-label
+      Pin Toolbar
+    %button.toolbar-button.attach-to-top-button#attach-to-top.esc-tooltipped{ onclick: 'attach_to_top();', title: 'Pin Toolbar to Top (or press Cmd/Ctrl + Shift + 6)'}
+      %span.toolbar-button-text Pin Toolbar to Top
 
 
 

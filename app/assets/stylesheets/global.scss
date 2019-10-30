@@ -823,6 +823,7 @@ button {
 .return-ticket-toolbar-button:hover,
 .collapse-all:hover,
 .sync-button:hover,
+.attach-to-top-button:hover,
 .expand-all:hover {
   background-color: lighten($nav-toolbar-color, 8%)!important;
 }
@@ -846,6 +847,7 @@ button {
 .return-ticket-toolbar-button:focus,
 .collapse-all:focus,
 .sync-button:focus,
+.attach-to-top-button:focus,
 .expand-all:focus{
   background-color: lighten($bug-section-color, 28%);
 }
@@ -10390,4 +10392,44 @@ span.input-truncate {
   position: sticky;
   top: 0;
   z-index: 999;
+}
+
+.attach-to-top-button {
+  background-image: url(image_path('icon_pin1.svg'));
+  background-size: 22px 22px;
+  background-position: 3px 3px;
+  padding-left: 18px;
+}
+
+.pinned-toolbar {
+  background: $content-bg-color;
+  box-shadow: 2px 0 10px 1px rgba(0,0,0,0.3);
+  position: relative;
+  bottom: 20px;
+  padding: 8px 20px 6px;
+  .toolbar-checkbox-wrapper {
+    padding-top: 0;
+    padding-left: 5px;
+    font-weight: normal;
+  }
+  label {
+    display: none;
+  }
+}
+
+#webcat-index-title {
+  padding-top: 10px;
+  padding-left: 3px;
+}
+
+#webcat_searchref_container {
+  margin-bottom: 10px;
+}
+
+
+.pinned-toolbar .tooltipster-sidetip .tooltipster-box {
+  padding: 4px 6px;
+}
+.pinned-toolbar .tooltipster-sidetip {
+  top: 95px !important;   // one-off override
 }
