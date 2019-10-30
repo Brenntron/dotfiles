@@ -10405,8 +10405,8 @@ span.input-truncate {
   background: $content-bg-color;
   box-shadow: 2px 0 10px 1px rgba(0,0,0,0.3);
   position: relative;
-  bottom: 20px;
-  padding: 8px 20px 6px;
+  bottom: 18px;
+  padding: 4px 20px;
   .toolbar-checkbox-wrapper {
     padding-top: 0;
     padding-left: 5px;
@@ -10419,7 +10419,11 @@ span.input-truncate {
 
 #webcat-index-title {
   padding-top: 10px;
-  padding-left: 3px;
+}
+
+.pinned-toolbar-true #webcat-index-title {
+  padding-top: 25px;
+  line-height: 12px;
 }
 
 #webcat_searchref_container {
@@ -10434,4 +10438,9 @@ span.input-truncate {
 // one-off override
 .pinned-toolbar-true .tooltipster-sidetip {
   top: 85px !important;
+}
+
+// correction to reduce extraneous vertical space
+.pinned-toolbar-true .webcat-search-container {
+  height: 0;
 }

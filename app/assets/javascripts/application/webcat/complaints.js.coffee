@@ -1766,7 +1766,7 @@ $ ->
       $('#categorize-diff-form').hide()
       $('#categorize-same-form').show()
 
-  # webcat: hot key/shortcut to pin toolbar
+  # webcat: hot key/shortcut to pin toolbar (shift + 6)
   $(document).keypress (e) ->
     if e.key == '^'
       pin_to_top()
