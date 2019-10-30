@@ -271,7 +271,8 @@ module API
             desc "Bulk adjust WL/BLs and BL threat categories"
             params do
               requires :adjustment_type, type: String, desc: "Add, remove, or replace"
-              requires :dispute_entries, type: Array[Integer], desc: "analyst-console database id"
+              optional :dispute_entries, type: Array[Integer], desc: "analyst-console database id"
+              optional :urls, type: Array[String], desc: "URLs to modify, if Dispute Entry ID is not known"
               requires :lists, type: Array[String], desc: "type of WL/BL"
               optional :thrt_cat_ids, type: Array[Integer], desc: "threat categories"
               requires :note, type: String, desc: "note"
@@ -280,14 +281,17 @@ module API
               authorize!(:update, Wbrs::ManualWlbl)
 
               ip_uris = []
-              params[:dispute_entries].each do |dispute_entry_id|
-                dispute_entry = DisputeEntry.find(dispute_entry_id)
-                if dispute_entry.entry_type == "IP"
-                  ip_uris << dispute_entry.ip_address
-                else
-                  ip_uris << dispute_entry.uri
+              if params[:dispute_entries].present?
+                params[:dispute_entries].each do |dispute_entry_id|
+                  dispute_entry = DisputeEntry.find(dispute_entry_id)
+                  if dispute_entry.entry_type == "IP"
+                    ip_uris << dispute_entry.ip_address
+                  else
+                    ip_uris << dispute_entry.uri
+                  end
                 end
-              end
+              else
+                ip_uris = params[:urls]
 
               case params[:adjustment_type]
               when "add"
@@ -318,10 +322,13 @@ module API
                 "No valid adjustment type"
               end
 
-              params[:dispute_entries].each do |dispute_entry|
-                dispute = DisputeEntry.where({:id => dispute_entry}).first.dispute
-                DisputeComment.create(:dispute_id => dispute.id, :user_id => current_user.id, :comment => params[:note])
+              if params[:dispute_entries].present?
+                params[:dispute_entries].each do |dispute_entry|
+                  dispute = DisputeEntry.where({:id => dispute_entry}).first.dispute
+                  DisputeComment.create(:dispute_id => dispute.id, :user_id => current_user.id, :comment => params[:note])
+                end
               end
+
               true
             end
 
