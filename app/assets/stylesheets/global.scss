@@ -10421,6 +10421,10 @@ span.input-truncate {
   padding-top: 10px;
 }
 
+#webcat-index-toolbar {
+  margin: 15px 0 10px;
+}
+
 .pinned-toolbar-true #webcat-index-title {
   padding-top: 25px;
   line-height: 12px;
@@ -10428,6 +10432,7 @@ span.input-truncate {
 
 #webcat_searchref_container {
   margin-bottom: 10px;
+  padding: 6px 0;
 }
 
 // tooltipster adjustments for pinned toolbar tooltips
@@ -10438,6 +10443,10 @@ span.input-truncate {
 // one-off override
 .pinned-toolbar-true .tooltipster-sidetip {
   top: 85px !important;
+}
+
+.webcat-search-container {
+  height: 15px;
 }
 
 // correction to reduce extraneous vertical space
