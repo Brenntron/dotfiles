@@ -126,7 +126,8 @@ class ComplaintEntry < ApplicationRecord
 
             current_status = "COMPLETED"
             self.case_assigned_at ||= Time.now
-            update(status:current_status,
+            update!(status:current_status,
+                   category: categories_string,
                    internal_comment: comment,
                    resolution_comment: resolution_comment,
                    case_resolved_at: Time.now,
@@ -141,13 +142,12 @@ class ComplaintEntry < ApplicationRecord
                               casenumber: self.complaint.id)
             end
             cat_from_wbrs = self.set_current_category
-            update(url_primary_category: cat_from_wbrs, category: cat_from_wbrs)
+            update!(url_primary_category: cat_from_wbrs, category: cat_from_wbrs)
           else
             # dismiss from pending of important case
-
             current_status = "ASSIGNED"
-            update(status:current_status,
-                   url_primary_category: nil,
+            update!(status:current_status,
+                   url_primary_category: self.category,
                    internal_comment: comment,
                    resolution_comment: resolution_comment,
                    case_assigned_at: Time.now,
@@ -155,11 +155,9 @@ class ComplaintEntry < ApplicationRecord
           end
         else
           # important not from pending
-
           current_status = "PENDING"
-          update(resolution: entry_status,
+          update!(resolution: entry_status,
                  url_primary_category: category_names_string,
-                 category: categories_string,
                  status:current_status,
                  internal_comment: comment,
                  resolution_comment: resolution_comment,
@@ -169,7 +167,7 @@ class ComplaintEntry < ApplicationRecord
         # not important case or resolution is "unchanged"
         current_status = "COMPLETED"
         self.case_assigned_at ||= Time.now
-        update(resolution: entry_status,
+        update!(resolution: entry_status,
                url_primary_category: categories_string,
                category: categories_string,
                status: current_status,
@@ -186,7 +184,10 @@ class ComplaintEntry < ApplicationRecord
                           casenumber: self.complaint.id )
         end
         cat_from_wbrs = self.set_current_category
-        update(url_primary_category: cat_from_wbrs, category: cat_from_wbrs)
+        update!(url_primary_category: cat_from_wbrs, category: cat_from_wbrs)
+      end
+      if self.status == "COMPLETED" && self.complaint_entry_screenshot.present?
+        self.complaint_entry_screenshot.destroy
       end
     end
 
@@ -468,7 +469,7 @@ class ComplaintEntry < ApplicationRecord
       when 'standard'
         standard_search(search_name, user: user)
       when 'contains'
-        contains_search(params[:value])
+        contains_search(params['value'])
       else
         where({})
     end
@@ -947,8 +948,10 @@ class ComplaintEntry < ApplicationRecord
         self.complaint.save
       end
 
-      message = Bridge::ComplaintUpdateStatusEvent.new
-      message.post_complaint(self.complaint)
+      if self.complaint.ticket_source != ::Complaint::SOURCE_RULEUI
+        message = Bridge::ComplaintUpdateStatusEvent.new
+        message.post_complaint(self.complaint)
+      end
 
       return true
     else

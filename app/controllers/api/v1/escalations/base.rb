@@ -8,6 +8,7 @@ module API
         mount API::V1::Escalations::BugzillaRestLogin
         mount API::V1::Escalations::Attachments
         mount API::V1::Escalations::UserPreferences
+        mount API::V1::Escalations::FileRep::AmpNamingConvention
         mount API::V1::Escalations::FileRep::Detections
         mount API::V1::Escalations::FileRep::Research
         mount API::V1::Escalations::FileRep::ReversingLabs

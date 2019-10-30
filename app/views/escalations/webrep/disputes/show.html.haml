@@ -19,7 +19,7 @@
 
       .dispute-owner-wrapper
         %label.content-label-sm
-          Owner
+          Assignee
         %div
           - if @dispute.assignee == 'Unassigned'
             %span.missing-data#dispute-assignee= @dispute.assignee || "None"

@@ -52,11 +52,11 @@ class Complaint < ApplicationRecord
     status_list = complaint_entries.map{|entry| entry.status}
     case new_status
       when NEW
-        update(status: status_list.any? {|item| [ASSIGNED,PENDING,COMPLETED].include? item}? ACTIVE: NEW)
+        update!(status: status_list.any? {|item| [ASSIGNED,PENDING,COMPLETED].include? item}? ACTIVE: NEW)
       when ASSIGNED || PENDING
-        update(status:ACTIVE)
+        update!(status:ACTIVE)
       when COMPLETED
-        update(status: status_list.any? {|item| [ASSIGNED,PENDING,NEW].include? item}? ACTIVE: COMPLETED)
+        update!(status: status_list.any? {|item| [ASSIGNED,PENDING,NEW].include? item}? ACTIVE: COMPLETED)
     end
   end
 
@@ -127,16 +127,17 @@ class Complaint < ApplicationRecord
   end
 
 
-  def self.commit_without_complaint(ip_or_uri:, categories_string:, description:, user:, bugzilla_rest_session:)
+  def self.commit_without_complaint(ip_or_uri:, category_ids_string:, category_names_string:, description:, user:, bugzilla_rest_session:)
     # check to see if URL is in Top URLS
     top_url = Wbrs::TopUrl.check_urls([ip_or_uri]).first.is_important
     if top_url
       #create a complaint/complaint entry and set to pending
-      Complaint.create_action(bugzilla_rest_session, ip_or_uri, description, nil, nil, PENDING, categories_string)
+      Complaint.create_action(bugzilla_rest_session, ip_or_uri, description, nil, nil, PENDING, category_names_string)
     else
       # Look for existing prefix
       existing_prefix = Wbrs::Prefix.where({urls: [ip_or_uri]})
-      category_ids_array = Wbrs::Category.get_category_ids(categories_string.split(','))
+
+      category_ids_array = Wbrs::Category.get_category_ids(category_ids_string.split(','))
 
       if existing_prefix.present?
         prefix_object = Wbrs::Prefix.new
@@ -154,7 +155,7 @@ class Complaint < ApplicationRecord
     new_ips = new_entries_ips.keys.sort
 
     response = {}
-    possibles = complaint.customer.complaints.where.not(status: [ RESOLVED, DUPLICATE ])
+    possibles = complaint.customer.complaints.where.not(status: [ RESOLVED, DUPLICATE, COMPLETED ])
     candidates = []
 
     possibles.each do |poss|
@@ -192,6 +193,7 @@ class Complaint < ApplicationRecord
       new_payload_item[:resolution_message] = "This is a duplicate of a currently active ticket."
       new_payload_item[:resolution] = "DUPLICATE"
       new_payload_item[:status] = TI_RESOLVED
+      new_payload_item[:sugg_type] = entry["cat_sugg"]&.join(', ')
       return_payload[ip] = new_payload_item
       new_complaint_entry = ComplaintEntry.new
       new_complaint_entry.complaint_id = complaint.id
@@ -207,6 +209,7 @@ class Complaint < ApplicationRecord
       new_payload_item[:resolution_message] = "This is a duplicate of a currently active ticket."
       new_payload_item[:resolution] = "DUPLICATE"
       new_payload_item[:status] = TI_RESOLVED
+      new_payload_item[:sugg_type] = entry["cat_sugg"]&.join(', ')
       return_payload[url] = new_payload_item
       url_parts = parse_url(url)
       new_complaint_entry = ComplaintEntry.new

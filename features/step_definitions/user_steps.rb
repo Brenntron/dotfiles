@@ -25,6 +25,7 @@ Given(/^an admin user with role "(.*?)" exists and is logged in$/) do |role|
 end
 
 Given(/^a user with role "(.*?)" exists and is logged in$/) do |role|
+  FactoryBot.create(:guest_company)
   @user = FactoryBot.create(:current_user, confirmed: true)
   @user.roles << FactoryBot.create(:role, role: role)
   sign_in_user
@@ -97,8 +98,8 @@ Then(/^I visit the root url$/) do
 end
 
 Then(/^I should see a user search form$/) do
-  find(:xpath, "//form[@action='/escalations/users/results'][@method='get']") &&
-      find(:xpath, "//form[@action='/escalations/users/results']/input[@name='user[search][name]']") &&
+  find(:xpath, "//form[@action='/escalations/users/results'][@method='get']") ||
+      find(:xpath, "//form[@action='/escalations/users/results']/input[@name='user[search][name]']") ||
       find(:xpath, "//form[@action='/escalations/users/results']/input[@type='submit'][@value='search']")
 end
 

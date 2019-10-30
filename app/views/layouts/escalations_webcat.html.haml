@@ -10,7 +10,7 @@
       %span.nav-toolbar-icon-large.icon-categories
 
     %a#reports.nav-page-button{href: '/escalations/webcat/reports', class: ("active" if current_page?('/escalations/webcat/reports'))}
-      %span.nav-toolbar-icon-large.icon-reports
+      %span.nav-toolbar-icon-large.icon-reports-white
 
 
   .nav-tool-blocks.col-xs-1.col-sm-1.col-lg-1.dropdown
@@ -255,10 +255,10 @@
             .form-group.text-center
               %button#top_banner_bugzilla_login_button.panel-button.primary{'aria-label': 'Login', onclick: 'top_banner_bugzilla_login(); return false;'} Login
 
-          %a{href: "/users/#{current_user[:id]}"}
+          %a{href: "/escalations/users/#{current_user[:id]}"}
             Login settings
 
-      %a.nav-username{href: "/users/#{current_user[:id]}"}
+      %a.nav-username{href: "/escalations/users/#{current_user[:id]}"}
         = current_user[:display_name]
 
     -##username= current_user.cvs_username

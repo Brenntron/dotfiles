@@ -16,5 +16,5 @@ class Bridge::ComplaintCreatedEvent < Bridge::BaseMessage
                     })
   end
 
-  handle_asynchronously :post, :queue => "complaint_created"
+  handle_asynchronously :post, :queue => "complaint_created", :priority => 1
 end

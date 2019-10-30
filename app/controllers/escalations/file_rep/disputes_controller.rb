@@ -1,6 +1,8 @@
 class Escalations::FileRep::DisputesController < ApplicationController
 
   def index
+    @conventions = AmpNamingConvention.order(:table_sequence).all
+
     respond_to do |format|
       format.html {  }
       format.json do
@@ -18,7 +20,7 @@ class Escalations::FileRep::DisputesController < ApplicationController
   def show
     @file_rep_dispute = FileReputationDispute.find(params[:id])
     @versioned_items = @file_rep_dispute.compose_versioned_items
-
+    @conventions = AmpNamingConvention.order(:table_sequence).all
   end
 
   def sandbox_html_report
@@ -42,6 +44,11 @@ class Escalations::FileRep::DisputesController < ApplicationController
         send_data file_contents, :filename => "sandbox-report_#{Time.now}.html"
       end
     end
+  end
+
+  def naming_guide
+    # Sort records by table sequence
+    @conventions = AmpNamingConvention.order(:table_sequence).all
   end
 
 

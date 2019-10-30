@@ -19,7 +19,8 @@ $ ->
         localStorage.webcat_search_name = ''
         localStorage.webcat_search_conditions = JSON.stringify({value:webcat_search_string})
       refresh_url()
-
+  $('#filter-cases-list a').on 'click', (e)->
+    localStorage.setItem('webcat_reset_page', true)
   window.set_webcat_advanced = () ->
     # creating form object from array made from advanced dropdown form
     form = {}
@@ -118,6 +119,7 @@ $ ->
       window.location.replace( new_url + href )
     if !href && typeof parseInt(url_check) == 'number'
       window.location.replace('/escalations/webcat/complaints')
+    localStorage.setItem('webcat_reset_page', true)
 
   refresh_localStorage = () ->
     localStorage.removeItem('webcat_search_type')
@@ -236,10 +238,11 @@ $ ->
 
   build_complaints_table = () ->
         complaint_table = $('#complaints-index').DataTable(
-          lengthMenu: [[50, 100, 150], [50, 100, 150]]
+          lengthMenu: [[25, 50, 100, 150, 200], [25, 50, 100, 150, 200]]
           processing: true
           serverSide: true
           stateSave: true
+          select: true
           ajax:
             url: url
             data: build_data()
@@ -251,8 +254,15 @@ $ ->
               refresh_localStorage()
               refresh_url()
           drawCallback: ( settings ) ->
+            if localStorage.webcat_reset_page
+              localStorage.removeItem('webcat_reset_page')
+
+              setTimeout () ->
+                $('#complaints-index').DataTable().page(0).draw( true )
+              , 100
+
             if localStorage.webcat_search_name
-              {webcat_search_type, webcat_search_name, webcat_search_conditions } = localStorage
+              { webcat_search_type, webcat_search_name, webcat_search_conditions } = localStorage
               last_tr = $('.webcat-named-search-list .saved-search').last().text()
               ### check variables below
                   text_check makes sure that the last table row doesn't match the named search being saved now
@@ -281,9 +291,11 @@ $ ->
 
                 $(new_link).on 'click', () ->
                   window.build_webcat_named_search(webcat_search_name)
+
                 $(new_delete).on 'click', () ->
                   window.delete_disputes_named_search(this,  webcat_search_name)
                   refresh_localStorage()
+
                 $(new_tr).append(new_td)
                 $(new_td).append(new_link)
                 $(new_td).append(new_delete)
@@ -307,19 +319,18 @@ $ ->
               cell.addClass 'highlight-second-review'
             if was_dismissed
               cell.addClass 'highlight-was-dismissed'
-
           columnDefs: [
             {
               targets: [ 0 ]
               className: 'expandable-row-column'
-              orderable: false
               searchable: false
+              orderable: false
             }
             {
               targets: [1]
               className: 'important-flag-col'
-              orderable: false
               searchable: false
+              orderable: false
             }
             {
               targets: [ 2 ]
@@ -354,17 +365,15 @@ $ ->
                 width: '10px'
                 render: ( data )->
                   { is_important, was_dismissed } = data
-                  html = ''
-
-                  if is_important && was_dismissed
-                      return '<div class="container-important-tags">' +
-                        '<div class="esc-tooltipped is-important" tooltip title="Important"></div>' +
-                        '<div class="esc-tooltipped was-reviewed" tooltip title="Reviewed"></div>' +
+                  if is_important == "true" && was_dismissed == "true"
+                      return '<div class="container-important-tags ">' +
+                        '<div class="esc-tooltipped is-important highlight-second-review" tooltip title="Important"></div>' +
+                        '<div class="esc-tooltipped was-reviewed highlight-was-dismissed" tooltip title="Reviewed"></div>' +
                         '</div>'
-                  else if is_important && !was_dismissed
-                    return '<span class="esc-tooltipped is-important" tooltip title="Important"></span>'
-                  else if !is_important && was_dismissed
-                    return '<span class="esc-tooltipped was-reviewed" tooltip title="Reviewed"></span>'
+                  else if is_important == "true" && was_dismissed == "false"
+                    return '<span class="esc-tooltipped is-important highlight-second-review" tooltip title="Important"></span>'
+                  else if is_important == "false" && was_dismissed == "true"
+                    return '<span class="esc-tooltipped was-reviewed highlight-was-dismissed" tooltip title="Reviewed"></span>'
               }
               {
                 data: 'entry_id'
@@ -415,7 +424,7 @@ $ ->
                     tags = data.substring( 1, data.length-1 ).replace(/&quot;/g,'');
                     tag_list = tags.split(',').map ( tag ) -> return tag.trim();
 
-                    if tag_list.length > 1
+                    if tag_list.length >= 1
                       tag_items = ''
                       tag_list = tag_list.filter ( tag, index )-> return tag_list.indexOf( tag ) == index && tag != ''
                       for tag in tag_list
@@ -492,8 +501,6 @@ $ ->
               }
               {
                 data: 'assigned_to'
-                render: (data) ->
-                  data
               }
               {
                 data: 'age_int'
@@ -504,9 +511,8 @@ $ ->
         responsive: true)
 
   if $('#complaints-index').length
-    build_complaints_table()
-
     $('#complaints-index_filter input').addClass('table-search-input');
+    build_complaints_table()
 
     $('#complaints-index tbody').on 'click', ' .nested-complaint-data', ->
       $(this).focus()

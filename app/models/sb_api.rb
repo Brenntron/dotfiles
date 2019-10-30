@@ -78,7 +78,7 @@ class SbApi < ApplicationRecord
     retries ||= 0
 
     begin
-      json_response = self.get_auth_key(Rails.configuration.sds.user,Rails.configuration.sds.pass, params["retried"])
+      json_response = self.get_auth_key(Rails.configuration.sds.username,Rails.configuration.sds.password, params["retried"])
       lookup_data = self.build_request(params, host, json_response)
       uri = lookup_data[:uri]
       header = lookup_data[:header]

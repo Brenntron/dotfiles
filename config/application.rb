@@ -109,5 +109,9 @@ module AnalystConsoleEscalations
     config.job_timeout = 300    # 5 minutes
     config.action_controller.per_form_csrf_tokens = true
     config.ssl_options = { hsts: { subdomains: true } }
+
+    Kaminari.configure do |config|
+      config.page_method_name = :per_page_kaminari
+    end
   end
 end

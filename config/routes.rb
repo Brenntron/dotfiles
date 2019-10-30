@@ -1,26 +1,19 @@
 Rails.application.routes.draw do
 
-  mount RailsAdmin::Engine => '/escalations/admin', as: 'rails_admin'
+
   devise_for :users, controllers: {sessions: 'sessions'}
 
   namespace :escalations, except: [:destroy, :edit] do
+    get 'admin/extras' => 'admin#index'
     get 'sb_api/query_lookup' => 'sb_api#query_lookup'
+
+    resources :roles, except: [:show], controller: '/admin/roles'
 
     resources :rulehit_resolution_mailer_templates, only: [:new, :index, :create, :show, :update, :destroy, :edit]
     resources :sessions, controller: '/sessions', only: [:new, :create, :destroy]
 
     # TODO These may be reimplemented in the research passenger instance, and then removed from here
-    root 'bugs#index'
-    resources :escalation_bugs, controller: 'bugs'
-    resources :bugs do
-      member do
-        # post :create_rules
-        post :add_tag
-        post :add_whiteboard
-        patch :remove_tag
-        patch :remove_whiteboard
-      end
-    end
+    root '/pages#index'
 
     namespace :other_admin_tools do
       root 'tools#index'
@@ -28,6 +21,9 @@ Rails.application.routes.draw do
       get 'rule_api', to: 'tools#rule_api'
       get 'wbnp_reports', to: 'tools#wbnp_reports'
       get 'manage_escalations_sync', to: 'tools#manage_escalations_sync'
+
+      mount DelayedJobWeb, at: "delayed_job"
+      match "/delayed_job" => DelayedJobWeb, :anchor => false, :via => [:get, :post]
     end
 
     namespace :webcat do
@@ -94,6 +90,8 @@ Rails.application.routes.draw do
     namespace :file_rep do
       root 'disputes#index'
       resources :disputes, only: [:index, :show]
+
+      get 'naming_guide', to: 'disputes#naming_guide'
       get 'sandbox-html-report', to: 'disputes#sandbox_html_report'
     end
 
@@ -129,12 +127,8 @@ Rails.application.routes.draw do
       end
     end
   end #namespace :escalations
-
+  mount RailsAdmin::Engine => '/escalations/admin', as: 'rails_admin'
   namespace :admin do
-    constraints AccessDelayedJobWeb do
-      mount DelayedJobWeb, at: "delayed_job"
-      match "/delayed_job" => DelayedJobWeb, :anchor => false, :via => [:get, :post]
-    end
     root 'home#index'
     resources :roles, except: [:show]
     resources :org_subsets, except: [:show]
@@ -156,54 +150,6 @@ Rails.application.routes.draw do
   post "sessions/create" => "sessions#create"
   post "/attachments" => "attachments#create"
   root 'pages#index'
-
-
-
-  resources :users, only: [:index, :show, :update] do
-
-    collection do
-      get :results
-    end
-    get :status_metrics, defaults: {format: :json}
-    get :time_metrics, defaults: {format: :json}
-    get :pending_team_metrics, defaults: {format: :json}
-    get :resolved_team_metrics, defaults: {format: :json}
-    get :time_team_metrics, defaults: {format: :json}
-    get :component_team_metrics, defaults: {format: :json}
-    patch :add_to_team
-    patch :remove_from_team
-    resources :relationships, only: [:index, :show] do
-      collection do
-        get :member_status
-      end
-    end
-  end
-
-  resources :research_bugs, controller: 'bugs'
-  resources :bugs, only: [:index, :new, :create, :show, :update] do
-    member do
-      # post :create_rules
-      post :add_tag
-      post :add_whiteboard
-      patch :remove_tag
-      patch :remove_whiteboard
-    end
-    get :bug_metrics, defaults: { format: :json }
-  end
-
-
-  resources :notes, only: [:create] do
-    collection do
-      put :publish_to_bugzilla
-    end
-  end
-
-
   mount API::Base => '/escalations/api'
-
-  # Hack to test permissions to Admin page
-  if Rails.env.test?
-    get '/version', to: 'users#index'
-  end
 
 end

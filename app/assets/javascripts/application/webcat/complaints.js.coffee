@@ -14,6 +14,7 @@ $(document).ready ->
      $('body').hasClass('index-action')
     window.check_wbnp_status()
 
+
 # WBNP - Get report id
 window.fetch_wbnp_data = () ->
   $('#fetch_wbnp').attr('disabled', true)
@@ -96,13 +97,13 @@ window.updateURI = (event, complaint_entry_id) ->
 
       $('#loader-modal').modal 'hide'
 
-      $(".simple-nested-table##{complaint_entry_id} tbody > tr").remove()
+      $(".simple-nested-table#entry-table-#{complaint_entry_id} tbody > tr").remove()
 
       if 'ip' == status
         std_msg_error("Cannot edit IP entries.","")
       else
         $.each current_categories, (key, entry) ->
-          $(".simple-nested-table##{complaint_entry_id}").append("<tr><td>#{entry.confidence}</td><td>#{entry.mnem} - #{entry.descr}</td><td>#{entry.top_certainty}</span></td></tr>")
+          $(".simple-nested-table#entry-table-#{complaint_entry_id}").append("<tr><td>#{entry.confidence}</td><td>#{entry.mnem} - #{entry.descr}</td><td>#{entry.top_certainty}</span></td></tr>")
 
         $("#domain_#{complaint_entry_id}").text(domain)
         $("#subdomain_#{complaint_entry_id}").text(subdomain)
@@ -129,9 +130,14 @@ window.cat_new_url = ()->
 
   for i in [1...6] by 1
 
-    data[i] = {url: $("#url_#{i}").val(), cats: $("#cat_new_url_#{i}").val()}
+    categories = []
+    for j in [0...5] by 1
+      if $("#cat_new_url_#{i}")[0][j]
+        categories.push($("#cat_new_url_#{i}")[0][j].text)
 
-    if data[i].url.length > 0 && data[i].cats != null
+    data[i] = {url: $("#url_#{i}").val(), category_names: categories, category_ids: $("#cat_new_url_#{i}").val()}
+
+    if data[i].url.length > 0 && data[i].category_ids != null
       isEmpty = false
 
   if isEmpty == false
@@ -170,9 +176,15 @@ window.webcat_reset_search = ()->
 window.multiple_url_categorization = ()->
 
   urls = $("#categorize_urls").val().split(/\n/)
-  cats = $("#multi_cat_url_cats").val()
+  category_ids = $("#multi_cat_url_cats").val()
+  category_names = []
 
-  if $("#categorize_urls").val() != "" && cats != null
+  for category in $("#multi_cat_url_cats")
+    for i in [0..5] by 1
+      if category[i]
+        category_names.push(category[i].text)
+
+  if $("#categorize_urls").val() != "" && category_ids != null && category_names != null
     $('#loader-modal').modal({
       keyboard: false
     })
@@ -180,7 +192,7 @@ window.multiple_url_categorization = ()->
     std_msg_ajax(
       url:'/escalations/api/v1/escalations/webcat/complaints/multi_cat_new_url'
       method: 'POST'
-      data: {urls: urls, cats: cats}
+      data: {urls: urls, category_names: category_names, category_ids: category_ids}
       success: (response) ->
         $('#loader-modal').modal 'hide'
         std_msg_success('Success',["URLs/IPs successfully categorized."], reload: true)
@@ -321,15 +333,29 @@ window.updatePending = (id,row_id) ->
   comment = $('#complaint_comment_'+id)[0].value
   resolution_comment = $('#complaint_resolution_comment_'+id)[0].value
   resolution = $('.complaint-resolution'+id).text()
+  #get the selectize control for the category input
+  selectizeControl = $('#input_cat_'+id).selectize()[0].selectize
   if $('#input_cat_'+id).val() == null
     categories = null
   else
     categories = $('#input_cat_'+id).val().toString()
 
+  named_categories = ""
+  i = 0
+  if categories == null
+    cat_array = []
+  else
+    cat_array = categories.split(',')
+    while i < cat_array.length
+      named_categories = named_categories + selectizeControl.getItem(cat_array[i]).text()
+      i++
+      if i < cat_array.length
+        named_categories += ", "
+
   std_msg_ajax(
     url: '/escalations/api/v1/escalations/webcat/complaint_entries/update_pending'
     method: 'POST'
-    data: {'id': id,'prefix': prefix,'commit':status,'status':resolution,'comment':comment, 'resolution_comment': resolution_comment, 'categories': categories }
+    data: {'id': id,'prefix': prefix,'commit':status,'status':resolution,'comment':comment, 'resolution_comment': resolution_comment, 'categories': categories, 'category_names':named_categories }
     success: (response) ->
       {uri, domain, subdomain, path, categories, error, entry_id, was_dismissed, status} = $.parseJSON(response)
       if error
@@ -617,6 +643,7 @@ window.edit_selected_complaints = () ->
     std_msg_error("alert",["There was an error. Please select an entry to edit"])
 
 selected_options = (category_names) ->
+
   options = []
   if category_names
     options = category_names.split(',')
@@ -935,6 +962,7 @@ format = (complaint_entry_row) ->
     data: {'id': complaint_entry.entry_id}
     success: (response) ->
       $('#loader-modal').modal 'hide'
+    
       { current_category_data : current_categories, master_categories, sds_category} = JSON.parse(response)
 
       sds_category == '' unless sds_category != null
@@ -962,14 +990,14 @@ format = (complaint_entry_row) ->
 
           if key == '1.0'
             category_row = '<tr><td>' + confidence + '</td><td>' + mnemonic + ' - ' + name + '</td><td><span class="certainty-flag nested-tooltipped" onmouseover="triggerTooltips(this)" data-tooltip-content="#certainty_table' + complaint_entry.entry_id + '_' + cat_id + '">' + top_certainty + '</span>' + tooltip_all + '</td><td class=sds_category>' + sds_category + '</td></tr>'
-            $(".simple-nested-table" + "#" + complaint_entry.entry_id).append(category_row)
+            $(".simple-nested-table" + "#entry-table-" + complaint_entry.entry_id).append(category_row)
           else
             category_row = '<tr><td>' + confidence + '</td><td>' + mnemonic + ' - ' + name + '</td><td><span class="certainty-flag nested-tooltipped" onmouseover="triggerTooltips(this)" data-tooltip-content="#certainty_table' + complaint_entry.entry_id + '_' + cat_id + '">' + top_certainty + '</span>' + tooltip_all + '</td></tr>'
-            $(".simple-nested-table" + "#" + complaint_entry.entry_id).append(category_row)
+            $(".simple-nested-table" + "#entry-table-" + complaint_entry.entry_id).append(category_row)
 
       if jQuery.isEmptyObject(current_categories) == true && sds_category
         category_row = '<tr><td><td></td><td></td><td class=sds_category>' + sds_category + '</td></tr>'
-        $(".simple-nested-table" + "#" + complaint_entry.entry_id).append(category_row)
+        $(".simple-nested-table" + "#entry-table-" + complaint_entry.entry_id).append(category_row)
 
     error: (response) ->
       $('#loader-modal').modal 'hide'
@@ -1031,7 +1059,7 @@ format = (complaint_entry_row) ->
       '<label class="content-label-sm">Customer Description</label>' +
       '<span class="nested-complaint-data">' + customer_description + '</span>' +
       '</div></div><div class="col-xs-7 col-with-divider">' +
-      '<table class="simple-nested-table" id="' + complaint_entry.entry_id + '"><thead><tr><th class="col-sm-1">Conf</th><th class="col-sm-4">WBRS Categories</th><th class="col-sm-3">WBRS Certainty</th><th class="col-sm-4">SDS Category</tr></thead>' +
+      '<table class="simple-nested-table" id="entry-table-' + complaint_entry.entry_id + '"><thead><tr><th class="col-sm-1">Conf</th><th class="col-sm-4">WBRS Categories</th><th class="col-sm-3">WBRS Certainty</th><th class="col-sm-4">SDS Category</tr></thead>' +
       '</table>' +
       '</br>' +
       '</div><div class="col-xs-2">' +
@@ -1358,7 +1386,7 @@ window.click_table_buttons = (complaint_table, button)->
     td = $(tr).next('tr').find('td:first')
     unless $(td).hasClass 'nested-complaint-data-wrapper'
       $(td).addClass 'nested-complaint-data-wrapper'
-
+#    debugger
     if ['NEW','ASSIGNED','PENDING', 'REOPENED', 'ACTIVE'].includes(data.status)
       $( cat_select ).selectize {
         persist: false,
@@ -1458,9 +1486,10 @@ window.fetch_complaints = () ->
 
 
 open_selected = (selected_rows, toggle) ->
-  for i in selected_rows[0].length
-    { viewable, subdomain, domain, path, ip_address } = selected_rows.data()[i]
+  for selected_row in selected_rows.data()
+    { viewable, subdomain, domain, path, ip_address } = selected_row
     if viewable == toggle
+
       new_subdomain = ""
       new_domain = ""
       new_path = ""
@@ -1472,23 +1501,25 @@ open_selected = (selected_rows, toggle) ->
         new_domain = domain
         window.open("http://"+ new_subdomain + new_domain + new_path)
       else
-        window.open("http://"+selected_rows.data()[i].ip_address)
+        window.open("http://"+selected_row.ip_address)
 
 window.open_viewable = () ->
   selected_rows = $('#complaints-index').DataTable().rows()
-  open_selected(selected_rows, true)
+  open_selected(selected_rows, "true")
 window.open_nonviewable = () ->
   selected_rows = $('#complaints-index').DataTable().rows()
-  open_selected(selected_rows, false)
+  open_selected(selected_rows, "false")
 window.open_selected = () ->
   selected_rows = $('#complaints-index').DataTable().rows('.selected')
   if selected_rows[0].length == 0
     std_msg_error('No rows selected', ['Please select at least one row.'])
   else
-    open_selected(selected_rows, true)
+    open_selected(selected_rows, "true")
 window.open_all = () ->
-  selected_rows = $('#complaints-index').DataTable().rows()
-  open_selected(selected_rows, true)
+  open_all = confirm("Are you sure you want to open ALL the windows on this page?!!")
+  if (open_all == true)
+    selected_rows = $('#complaints-index').DataTable().rows()
+    open_selected(selected_rows, "true")
 
 toggle_selected = (selectedRows, expand)->
   selectState = $('.selected')
@@ -1611,7 +1642,6 @@ window.master_submit = () ->
         data.push({entry_id: entry_id, error: false, row_id: row_id, prefix: prefix, categories: categories, category_names: category_names, status: status, comment: comment, resolution_comment: resolution_comment})
       else if (categories.length == 0) && status == 'FIXED'
         data.push({entry_id, error: true, reason: 'nil_categories'})
-
 
   std_msg_ajax(
     method: 'POST'

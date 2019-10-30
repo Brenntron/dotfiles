@@ -13,6 +13,13 @@ class Virustotal::Base
     @port ||= Rails.configuration.virustotal.port || 443
   end
 
+  def self.read_timeout
+    @read_timeout ||= Rails.configuration.virustotal.read_timeout || Rails.configuration.api_master_timeout
+  end
+  def self.open_timeout
+    @open_timeout ||= Rails.configuration.virustotal.open_timeout || Rails.configuration.api_master_timeout
+  end
+
   def self.stringkey_params(conditions = {})
     conditions.inject({}) do |params, (key, value)|
       params[key.to_s] = value if value
@@ -29,6 +36,10 @@ class Virustotal::Base
     raise 'Path must start with slash (/)' unless '/' == path[0]
 
     request = HTTPI::Request.new("https://#{host}:#{port}#{path}&apikey=#{api_key}")
+
+    request.read_timeout = read_timeout
+    request.open_timeout = open_timeout
+
 
     request.ssl = true
     request.auth.ssl.verify_mode = :peer

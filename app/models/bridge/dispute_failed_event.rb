@@ -10,5 +10,5 @@ class Bridge::DisputeFailedEvent < Bridge::BaseMessage
     super(message: {source_key: source_key,
                     ac_status: ac_status})
   end
-  handle_asynchronously :post, :queue => "dispute_failed"
+  handle_asynchronously :post, :queue => "dispute_failed", :priority => 1
 end
