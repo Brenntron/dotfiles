@@ -5149,6 +5149,7 @@ input.table-entry-input:focus {
   background-color: transparent;
   position: absolute;
   bottom: -34px;
+  z-index: 9999;
   transition: 0.50s;
   -webkit-transition: 0.50s;
   -moz-transition: 0.50s;

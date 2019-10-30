@@ -515,3 +515,24 @@ Feature: Webcat complaints
     And I wait for "5" seconds
     Then I should see "COMPLETED"
     And "1" bridge message should be in the delayed job queue
+
+  @javascript
+  Scenario: user on webcat complaints index expands the dashboard to view simplified metrics
+    Given a user with role "webcat user" exists and is logged in
+    And the following complaint entries exist:
+      | uri             | domain        | subdomain | path | entry_type |
+      | whatever.com    | whatever.com  |           |      | URI/DOMAIN |
+    When I goto "/escalations/webcat/complaints"
+    And I click "#top_bar_toggle"
+    Then I should not see "Submitter Type"
+
+  @javascript
+  Scenario: user on webcat reports expands the dashboard to view full metrics
+    Given a user with role "webcat user" exists and is logged in
+    And the following complaint entries exist:
+      | uri             | domain        | subdomain | path | entry_type |
+      | whatever.com    | whatever.com  |           |      | URI/DOMAIN |
+    When I goto "/escalations/webcat/reports"
+    And I click "#top_bar_toggle"
+    And I wait for "1" seconds
+    Then I should see "SUBMITTER TYPE"

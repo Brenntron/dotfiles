@@ -568,3 +568,8 @@ $ ->
 $('#exampleModal').on 'shown.bs.modal', ->
   $('button.toolbar-button.cat-btn').addClass('active')
 
+
+$ ->
+  # webcat > some dashboard metrics should only be shown on reports page
+  if location.href.includes('webcat/complaints')
+    $('.webcat-reports-only').hide()

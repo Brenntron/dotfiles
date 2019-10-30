@@ -11,6 +11,23 @@
       %h5.wbnp-report-label WBNP Report Status:
       %span.wbnp-report-status Checking...
 .row#top_bar_extended_info
+  .col-xs-2.webcat-reports-only
+    %table.tickets-totals-table.table-condensed
+      %tr
+        %th{colspan: '2'}
+          %span.ticket-type-label Submitter Type
+      %tr
+        %td Customer
+        %td=@ti_comp_cust
+      %tr
+        %td Guest
+        %td=@ti_comp_guest
+      %tr
+        %td Internal
+        %td=@int_comp_entries
+      %tr
+        %td WBNP
+        %td=@wbnp
   .col-xs-2
     %table.tickets-totals-table.table-condensed
       %tr
@@ -42,6 +59,9 @@
       %tr
         %td Overdue
         %td=@overdue_comp
+      %tr.webcat-reports-only
+        %td Completed
+        %td=@completed_comp
   .col-xs-2
     %table.tickets-totals-table.table-condensed
       %tr
