@@ -591,6 +591,7 @@ button {
 #research-page-toolbar{
   .toolbar-select-wrapper{
     width: unset!important;
+    height: unset!important;
   }
 }
 .toolbar input:focus, .toolbar select:focus {
@@ -9388,11 +9389,9 @@ hr.thin.form-divider {
   color: $type-lighter-color;
 }
 
-.toolbar .plain-inline-dropdown-wrapper div {
-  //padding: 0;
+input.assignee.form-control{
+  background: $ac-nav-bg-color;
 }
-
-
 .research-data-header {
   font-weight: 700;
   color: $type-lighter-color;

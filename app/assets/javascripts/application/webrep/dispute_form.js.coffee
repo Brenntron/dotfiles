@@ -18,9 +18,6 @@ $ ->
     form_values = form.serializeArray()
     text_area = form.find('.ips_urls')
     dropdown = $(submit_btn).closest(".dropdown-menu").prev()
-    $('#loader-modal').modal({
-      keyboard: false
-    })
 
     for item in form_values
       { name, value } = item
@@ -42,7 +39,6 @@ $ ->
           ips_urls = ips_urls.map( (url) => return url.trim())
 
           $(dropdown).dropdown 'toggle'
-          $('#loader-modal').modal 'hide'
           if errors.length > 0
             errors = errors.map( (err) => return err.trim())
             successful_entries = []
@@ -65,7 +61,6 @@ $ ->
 
 
         error: (response) ->
-          $('#loader-modal').modal 'hide'
           reset_form(form)
           error_list = response.responseJSON.message.split(': ')[1].trim().split(' ')
           message_html =
@@ -74,7 +69,6 @@ $ ->
           std_msg_error("Error",[ message_html], reload: false)
       )
     else
-      $('#loader-modal').modal 'hide'
       std_msg_error("Error",["Cannot submit form while URLs/IP Addresses field is empty. "])
 
   $('.cancel_dispute').on 'click', ->
