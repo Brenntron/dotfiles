@@ -10384,3 +10384,29 @@ span.input-truncate {
 .owner-col {
   min-width: 80px;
 }
+
+// reports page specific styles
+.report_date_from label, .report_date_to label, .report_customer_name label {
+  width: 120px;
+}
+
+.report_customer_name input {
+  width: 300px;
+}
+
+.report-listing-div {
+  h2 {
+    margin-bottom: 15px;
+  }
+  input {
+    margin-bottom: 5px;
+  }
+  // web cat > report page buttons
+  input[type='submit'] {
+    padding: 5px 20px;
+    color: $content-bg-color;
+    background: darken($primary-section-color, 5%);
+    border: none;
+    margin-top: 5px;
+  }
+}
