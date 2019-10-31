@@ -22,7 +22,7 @@
             = search_form.radio_button(:scope, 'broad', id: 'research-search-broad', checked: !params['search'] || params['search']['scope'].eql?("broad"))
             %label.esc-tooltipped{title: 'Broad Search returns all records matching the URL pattern.', for: 'research-search-broad'} Broad Search
             %hr.thin
-            =search_form.submit(:Submit, id: 'submit-button rep-research', class: 'button_primary')
+            =search_form.submit(:Submit, id: 'submit-button rep-research', class: 'button_primary', onclick:"submit-research-query")
           .col-xs-8.col-sm-9.col-md-10.col-lg-10.col-xl-11
             = search_form.text_area(:uri, class: 'search-box', placeholder: 'URI or IP Address', autofocus: 'true')
         .search-options-col.tab-pane#lookup-quick{role:'tabpanel'}
@@ -224,7 +224,7 @@
                   New Dispute
                 = render 'escalations/webrep/disputes/new'
           %span.dropdown
-            %button#wlbl_entries_button.toolbar-button.adjust-wlbl-button.dropdown-toggle.esc-tooltipped.toolbar-button-spacer{title: 'Adjust WL/BL', 'data-toggle': 'dropdown', 'aria-haspopup': 'true', 'aria-expanded': 'false', onclick: 'bulk_get_current_wlbl("research")'}
+            %button#wlbl_entries_button_research.toolbar-button.adjust-wlbl-button.dropdown-toggle.esc-tooltipped.toolbar-button-spacer{title: 'Adjust WL/BL', 'data-toggle': 'dropdown', 'aria-haspopup': 'true', 'aria-expanded': 'false', onclick: 'bulk_get_current_wlbl("research")'}
               %span.toolbar-button-text Adjust WBRS WL/BL
             .dropdown-menu.toolbar-dropdown#wlbl_adjust_entries{'aria-labelledby': 'wlbl_entries_button'}
               = form_for :wlbl, html: {class: 'adjust-wlbl-form'} do |wlbl_form|
@@ -284,7 +284,7 @@
                       %button.primary.dropdown-submit-button{type: 'button', onclick:'submit_bulk_wlbl("research");', disabled: true}
                         Submit Reputation Changes
           %span.dropdown
-            %button#reptool_entries_button.toolbar-button.adjust-reptool-button.dropdown-toggle.esc-tooltipped{title: 'Adjust RepTool BL', 'data-toggle': 'dropdown', 'aria-haspopup': 'true', 'aria-expanded': 'false', onclick: 'bulk_get_current_reptool("research");'}
+            %button#reptool_entries_button_research.toolbar-button.adjust-reptool-button.dropdown-toggle.esc-tooltipped{title: 'Adjust RepTool BL', 'data-toggle': 'dropdown', 'aria-haspopup': 'true', 'aria-expanded': 'false', onclick: 'bulk_get_current_reptool("research");'}
               %span.toolbar-button-text Adjust RepTool WL/BL
             .dropdown-menu.toolbar-dropdown#reptool_adjust_entries{'aria-labelledby': 'reptool_entries_button'}
               =form_for :reptool, html: {class: 'adjust-reptool-form'} do |rep_form|
