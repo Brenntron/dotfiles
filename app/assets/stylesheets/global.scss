@@ -10454,7 +10454,8 @@ span.input-truncate {
   height: 0;
 }
 
-@media screen and (max-width: 1300px) {
+// handling the top-right username width issues
+@media screen and (max-width: 1200px) {
   #nav-banner a.nav-username {
     display: none;
   }
