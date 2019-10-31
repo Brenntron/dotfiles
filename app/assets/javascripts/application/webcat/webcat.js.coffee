@@ -573,3 +573,10 @@ $ ->
   # webcat > some dashboard metrics should only be shown on reports page
   if location.href.includes('webcat/complaints')
     $('.webcat-reports-only').hide()
+
+  if location.href.includes('webcat')
+    $('.webcat-hide').hide()
+
+  $('#top_bar_extended_info').show()
+#  $('#top_bar_toggle').toggleClass('top-info-open')
+

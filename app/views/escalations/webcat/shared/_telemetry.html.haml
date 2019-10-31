@@ -1,17 +1,83 @@
 .row
-  .col-xs-12.top-area-bar
+  .col-xs-2.top-area-bar
+
     %h1= content_for :webcat_page
-    %span.top-info-icon.dashboard-left-data{class: "#{content_for :webcat_icon}"}
+    %span.top-info-icon{class: "#{content_for :webcat_icon}"}
     .top-user-info
-      %h5.left-space= current_user.display_name
-      %p.dashboard-details.left-space
+      %h5.webcat-hide.left-space= current_user.display_name
+      %p.webcat-hide.dashboard-details.left-space
         = link_to "#{@current_user.cvs_username}", escalations_users_path(current_user[:id])
-    .wbnp-loader-message
-      %span.wbnp-loading-spinner.sync-button-white.sync_rotate
-      %h5.wbnp-report-label WBNP Report Status:
-      %span.wbnp-report-status Checking...
-.row#top_bar_extended_info
-  .col-xs-2.webcat-reports-only
+
+
+  -# NEW TABLE BELOW
+  .col-xs-5.reports-border-left
+    %table.webcat-banner-table.table-condensed
+      %thead
+        %tr
+          %th{colspan: '2'}
+            %span
+              Talos Intelligence
+          %th{colspan: '2'}
+            %span
+              WBNP
+          %th{colspan: '2'}
+            %span
+              Internal Entries
+      %tbody
+        -# New #'s for Complaint types
+        %tr
+          -# this # is SUBMITTER TYPE > customer.count + guest.count
+          %td=@dan_var
+          %td
+            New
+            %span.overdue-hidden (0 Overdue)
+          %td 0
+          %td
+            New
+            %span.overdue-hidden (0 Overdue)
+          %td 0
+          %td
+            New
+            %span.overdue-hidden (0 Overdue)
+        -# Assigned #'s for Complaint types
+        %tr
+          %td 0
+          %td Assigned
+          %td 0
+          %td Assigned
+          %td 0
+          %td Assigned
+  .col-xs-3.col-xs-offset-2
+    %table.webcat-banner-table.wbnp-reports-table.table-condensed
+      %thead
+        %tr
+          %th{colspan: '4'}
+            %span
+              WBNP Reports
+      %tbody
+        %tr
+          %td Status
+          %td
+            .wbnp-report-status
+          %td Succeeded
+          %td
+            #wbnp-report-succeeded
+        %tr
+          %td
+            Total Attempted
+          %td
+            #wbnp-report-attempted
+          %td
+            Rejected
+          %td
+            #wbnp-report-rejected
+
+
+-# LEGACY BELOW
+-# LEGACY BELOW
+-# LEGACY BELOW
+.row#top_bar_extended_info{style:'border-top: solid 1px #336699; padding-top: 10px;'}
+  .col-xs-2
     %table.tickets-totals-table.table-condensed
       %tr
         %th{colspan: '2'}
@@ -59,28 +125,24 @@
       %tr
         %td Overdue
         %td=@overdue_comp
-      %tr.webcat-reports-only
-        %td Completed
-        %td=@completed_comp
-  .col-xs-2
-    %table.tickets-totals-table.table-condensed
-      %tr
-        %th{colspan: '2'}
-          %span.ticket-type-label WBNP Reports
-      %tr
-        %td Status
-        %td.wbnp-report-status
-      %tr
-        %td Total Attempted
-        %td#wbnp-report-attempted
-      %tr
-        %td Number Succeeded
-        %td#wbnp-report-succeeded
-      %tr
-        %td Number Rejected
-        %td#wbnp-report-rejected
-
-
-.row
-  .col-xs-12.text-center
-    %button#top_bar_toggle{onclick: '$( "#top_bar_extended_info" ).slideToggle( ); $("#top_bar_toggle").toggleClass("top-info-open");'}
+      -#%tr
+      -#  %td Completed
+      -#  %td=@completed_comp
+  -#.col-xs-2
+  -#  %table.tickets-totals-table.table-condensed
+  -#    %tr
+  -#      %th{colspan: '2'}
+  -#        %span.ticket-type-label WBNP Reports
+  -#    %tr
+  -#      %td Status
+  -#      -#%td.wbnp-report-status
+  -#    %tr
+  -#      %td Total Attempted
+  -#      -#%td#wbnp-report-attempted
+  -#    %tr
+  -#      %td Number Succeeded
+  -#      -#%td#wbnp-report-succeeded
+  -#    %tr
+  -#      %td Number Rejected
+  -#      -#%td#wbnp-report-rejected
+  -#

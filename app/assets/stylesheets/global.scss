@@ -10410,3 +10410,62 @@ span.input-truncate {
     margin-top: 5px;
   }
 }
+
+// webcat complaints: banner at top with stats on webcat complaints index
+table.table-condensed.webcat-banner-table {
+  margin-bottom: 10px;
+  thead th {
+    border-bottom: none;
+    span {
+      border-bottom: solid 1px lighten($content-tab-color, 20%);
+      display: inline-block;
+      width: 90%;
+      padding-bottom: 2px;
+      font-size: 10pt;
+    }
+  }
+}
+
+// just the td's for this table
+table.table-condensed.webcat-banner-table > tbody > tr > td {
+  border: none;
+  padding: 8px 6px 4px !important;  // override needed
+  font-size: 9.5pt;
+  &:nth-child(odd) {
+    text-align: right;
+    width: 30px;
+  }
+  span {
+    color: $warning-accent-color;   // orange
+    font-weight: bold;
+    margin-left: 5px;
+    display: inline-block;
+  }
+}
+
+// the wbnp reports table on right has lots of differences
+table.table-condensed.webcat-banner-table.wbnp-reports-table > tbody > tr > td {
+  border: none;
+  padding: 8px 6px 4px !important;  // override needed
+  &:nth-child(odd) {  // first td, third td in row
+    text-align: left;
+    width: 120px;
+    letter-spacing: 0.5px;
+    font-weight: normal;
+  }
+  span {
+    color: $warning-accent-color;
+  }
+}
+
+#webcat-index-title {
+  margin-top: 15px;
+}
+
+.reports-border-left {
+  border-left: solid 1px lighten($content-tab-color, 40%);;
+}
+
+.complaint-mgt-top-area {
+  padding-bottom: 12px;
+}

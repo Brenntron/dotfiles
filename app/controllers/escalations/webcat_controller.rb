@@ -14,6 +14,24 @@ class Escalations::WebcatController < ApplicationController
     @new_comp = Complaint.new_count
     @overdue_comp = Complaint.overdue_count
 
+
+    # FIGURE THIS OUT
+    @dan_var = Complaint.dan_count
+
+    # NEED VARIABLES FOR:
+    # ticket_source == 'talos-intelligence' AND complaints.status.count of NEW
+    # ticket_source == 'talos-intelligence' AND complaints.status.count of OVERDUE
+    # ticket_source == 'talos-intelligence' AND complaints.status.count of ASSIGNED
+
+    # ticket_source == 'RuleUI' AND complaints.status.count of NEW
+    # ticket_source == 'RuleUI' AND complaints.status.count of OVERDUE
+    # ticket_source == 'RuleUI' AND complaints.status.count of ASSIGNED
+
+    # ticket_source == NULL AND complaints.status.count of NEW
+    # ticket_source == NULL AND complaints.status.count of OVERDUE
+    # ticket_source == NULL AND complaints.status.count of ASSIGNED
+
+
     @assigned = ComplaintEntry.assigned_count
     @pending = ComplaintEntry.pending_count
     @new = ComplaintEntry.new_count
