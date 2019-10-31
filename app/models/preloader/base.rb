@@ -56,6 +56,17 @@ class Preloader::Base
 
     while counter < TRIES
       begin
+        complete_wbrs_blob = Wbrs::ManualWlbl.where({:url => host})
+        wbrs_threat_category = [complete_wbrs_blob.last].select{ |wlbl| wlbl.state == "active"}.map{ |wlbl| wlbl.threat_cats }.join(', ')
+        break
+      rescue
+        counter = counter + 1
+      end
+    end
+    counter = 0
+
+    while counter < TRIES
+      begin
         if is_ip_address === true
           xbrs_history = Xbrs::GetXbrs.by_ip4(host, true)
         else
@@ -101,6 +112,7 @@ class Preloader::Base
       d.virustotal = virustotals
       d.wlbl = blacklist
       d.wbrs_list_type = wbrs_list_type
+      d.wbrs_threat_category = wbrs_threat_category
       d.umbrella = pretty_umbrella_status
     end
 
