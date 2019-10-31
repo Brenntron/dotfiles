@@ -551,7 +551,6 @@ button {
   display: inline-block;
   background-color: $content-bg-color;
   border-radius: 0 !important;
-  border: 1px solid #ccc !important;
   margin: 1px 2px;
 }
 
@@ -589,6 +588,10 @@ button {
 }
 
 #research-page-toolbar{
+  input[type='checkbox']{
+    position: relative;
+    top:-2px
+  }
   .toolbar-select-wrapper{
     width: unset!important;
     height: unset!important;
@@ -5583,8 +5586,9 @@ h5.entry-details-table-header {
 }
 
 .select-all-label{
-  margin-top: -19px;
+  margin-top: -18px;
 }
+
 .nested-table-tally {
   float: right;
   font-weight: 300;

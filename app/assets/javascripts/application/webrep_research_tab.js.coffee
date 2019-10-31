@@ -58,16 +58,17 @@ $ ->
     { currentTarget } = e
 
     new_val = ''
+    html_val = ''
     $('#disputes-research-table .dispute_check_box:checked').each ->
       tr = $( this ).closest('tr')
       url = $(tr).find('.entry-data-content').text().trim()
-
+      html_val += '<div>' + url+ '</div>'
       if new_val != ''
-        new_val = new_val += '&#10' + url
+        new_val += '&#10' + url
       else
         new_val = url
     $('#research-page-toolbar .ips_urls').html( new_val.trim() )
-    $('#research-page-toolbar .ips_urls_div').html( new_val.trim().replace(/\s/g, /\n/) )
+    $('#research-page-toolbar .ips_urls_div').html( html_val )
   $('.cancel-changes').click ->
     $('.editing-row').each ->
       editing_inputs = $(this).find('.table-entry-input')
