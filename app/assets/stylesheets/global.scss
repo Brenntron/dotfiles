@@ -4790,6 +4790,9 @@ table > tbody > tr > td.dispute_rep_tools {
 .add-to-ticket-button:disabled{
   background-image: url(image_path('icon_add_to_ticket_grey.svg'));
 }
+.dropdown.open .add-to-ticket-button {
+  background-image: url(image_path('icon_add_to_ticket_white.svg'));
+}
 .dropdown button.toolbar-button {
   height: 27px;
 }
