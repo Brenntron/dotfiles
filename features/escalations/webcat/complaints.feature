@@ -533,7 +533,7 @@ Feature: Webcat complaints
     And I click "#pin-to-top"
     Then I should see "Pin Toolbar"
 
-  @javascript @now
+  @javascript
   Scenario: press the hot key/shortcut to pin the toolbar to top, the button label changes to unpin
     Given a user with role "webcat user" exists and is logged in
     And the following complaints exist:
