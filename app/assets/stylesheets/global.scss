@@ -10453,3 +10453,9 @@ span.input-truncate {
 .pinned-toolbar-true .webcat-search-container {
   height: 0;
 }
+
+@media screen and (max-width: 1300px) {
+  #nav-banner a.nav-username {
+    display: none;
+  }
+}
