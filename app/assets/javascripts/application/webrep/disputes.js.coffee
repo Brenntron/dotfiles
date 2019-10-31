@@ -15,9 +15,6 @@ $(document).ready ->
       text = text.replace(/(, and| and |, )/g, '<span class="unset-text">$1</span>')
     $('.searched-for-url').html(text)
 
-window.submit_rep = () ->
-  $('.bulk-ajax-message-div').css('display', 'flex')
-
 window.select_or_deselect_all = (dispute_id)->
   $('.dispute-entry-checkbox_' + dispute_id).prop('checked', $('#' + dispute_id).prop('checked'))
   $('.dispute-entry-checkbox_' + dispute_id).each ->

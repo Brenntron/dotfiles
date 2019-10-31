@@ -13,12 +13,12 @@ $ ->
 
 
   window.submit_new_dispute = (submit_btn) ->
+    $('.ajax-message-div').css('display', 'flex')
     data = {}
     form = $(submit_btn).closest('form')
     form_values = form.serializeArray()
     text_area = form.find('.ips_urls')
     dropdown = $(submit_btn).closest(".dropdown-menu").prev()
-
     for item in form_values
       { name, value } = item
       name = name.toLowerCase().replace(/-/g, '_')
@@ -61,12 +61,15 @@ $ ->
 
 
         error: (response) ->
-          reset_form(form)
-          error_list = response.responseJSON.message.split(': ')[1].trim().split(' ')
-          message_html =
-            "<p>Unable to create the following duplicate dispute entries: </p>" +
-            "<p class='dupe_list'>" + error_list.join(' ') + "</p>"
-          std_msg_error("Error",[ message_html], reload: false)
+          if response.responseJSON.message.includes('duplicates')
+            error_list = response.responseJSON.message.split(': ')[1].trim().split(' ')
+            message =
+              "<p>Unable to create the following duplicate dispute entries: </p>" +
+              "<p class='dupe_list'>" + error_list.join(' ') + "</p>"
+          else
+            message = response.responseJSON.message
+
+          std_msg_error("Error",[ message], reload: false)
       )
     else
       std_msg_error("Error",["Cannot submit form while URLs/IP Addresses field is empty. "])

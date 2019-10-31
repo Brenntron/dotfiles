@@ -67,7 +67,7 @@ $ ->
       else
         new_val = url
     $('#research-page-toolbar .ips_urls').html( new_val.trim() )
-    $('#research-page-toolbar .ips_urls_div').html( new_val.trim() )
+    $('#research-page-toolbar .ips_urls_div').html( new_val.trim().replace(/\s/g, /\n/) )
   $('.cancel-changes').click ->
     $('.editing-row').each ->
       editing_inputs = $(this).find('.table-entry-input')

@@ -22,7 +22,7 @@
             = search_form.radio_button(:scope, 'broad', id: 'research-search-broad', checked: !params['search'] || params['search']['scope'].eql?("broad"))
             %label.esc-tooltipped{title: 'Broad Search returns all records matching the URL pattern.', for: 'research-search-broad'} Broad Search
             %hr.thin
-            =search_form.submit(:Submit, id: 'submit-button rep-research', class: 'button_primary', onclick:'submit_rep()')
+            =search_form.submit(:Submit, id: 'submit-button rep-research', class: 'button_primary')
           .col-xs-8.col-sm-9.col-md-10.col-lg-10.col-xl-11
             = search_form.text_area(:uri, class: 'search-box', placeholder: 'URI or IP Address', autofocus: 'true')
         .search-options-col.tab-pane#lookup-quick{role:'tabpanel'}
@@ -189,11 +189,7 @@
                 %td.col-reptool-class
                 %td.col-actions
                 %td.col-clear-actions
-  .col-xs-12
-    .bulk-ajax-message-div
-      .loader-gears
-        =inline_svg 'icon_gears_loader.svg'
-      %span.loader-msg Loading data...
+
   .row.research_results
     .col-xs-12
       .ajax-message-div
@@ -209,7 +205,8 @@
         %div
           %div.toolbar-select-wrapper
             %label.toolbar-section-label
-            %input#select-all-entries.esc-tooltipped{type:'checkbox',title: 'Select All', 'onclick':'select_all_detailed(this)'}
+            %input#select-all-entries.esc-tooltipped{type:'checkbox',title: 'Select All / Deselect All', 'onclick':'select_all_detailed(this)'}
+              %span.toolbar-button-text.select-all-label Select All / Deselect All
         %div
           %label.toolbar-section-label Table View
           %button.toolbar-button.expand-row-button#expand-all-rows.esc-tooltipped.toolbar-button-spacer{title: 'Expand All Rows'}
