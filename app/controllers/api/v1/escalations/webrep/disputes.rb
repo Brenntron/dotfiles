@@ -292,6 +292,7 @@ module API
                 end
               else
                 ip_uris = params[:urls]
+              end
 
               case params[:adjustment_type]
               when "add"
