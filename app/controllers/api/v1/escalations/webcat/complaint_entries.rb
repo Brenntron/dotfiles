@@ -349,6 +349,9 @@ module API
               std_api_v2 do
                 entry = ComplaintEntry.find(params[:complaint_entry_id])
                 ces = entry.complaint_entry_screenshot
+                unless ces
+                  ces = ComplaintEntryScreenshot.create(complaint_entry_id: entry.id )
+                end
                 ces.update(error_message:"Retaking screenshot please wait.", screenshot:nil)
                 ces.grab_screenshot
               end

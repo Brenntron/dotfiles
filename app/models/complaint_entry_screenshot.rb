@@ -3,7 +3,6 @@ class ComplaintEntryScreenshot < ApplicationRecord
 
   def grab_screenshot
     begin
-
       options = Selenium::WebDriver::Chrome::Options.new
       options.add_argument('--ignore-certificate-errors')
       options.add_argument('--disable-popup-blocking')
@@ -25,7 +24,8 @@ class ComplaintEntryScreenshot < ApplicationRecord
       host_lookup = self.complaint_entry.hostlookup
       url = host_lookup.match(/^(http|https):\/\//) ? host_lookup : "http://#{host_lookup}"
       Rails.logger.error ("Screenshotting url:#{url}")
-      driver.navigate.to url
+      driver.navigate.to "http://#{self.complaint_entry.domain}"
+
       
       #save the screenshot hopefully in the database so we dont have to worry about disk usage
       self.update(screenshot: driver.screenshot_as(:png), error_message: "")
