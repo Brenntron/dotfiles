@@ -5589,6 +5589,20 @@ h5.entry-details-table-header {
   margin-top: -18px;
 }
 
+@media (min-width: 1600px) {
+  .select-all-label{
+    min-width: 153px;
+  }
+  .adjust-container{
+    min-width: 434px;
+  }
+}
+@media (min-width: 1725px) {
+  .select-all-label{
+    margin-top: unset;
+  }
+
+}
 .nested-table-tally {
   float: right;
   font-weight: 300;
@@ -5936,6 +5950,7 @@ td.data-table-emph {
   }
   #submit-strict-changes{
     margin-top: -4px;
+    min-width: 260px!important;
   }
 }
 .boo{
