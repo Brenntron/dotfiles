@@ -35,6 +35,10 @@ class Sbrs::Base
     self.remote_lookup_sds_v3(self.build_sds_v3_request(sds_item, sds_type))
   end
 
+  def self.combo_call_sds_v3(uri, ip)
+    self.remote_lookup_sds_v3(self.build_sds_v3_combo_request(uri, ip))
+  end
+
   # Builds params for remote_lookup_sds_v3
   def self.build_sds_v3_request(sds_item, sds_type)
     uri_query                  = {}
@@ -42,6 +46,16 @@ class Sbrs::Base
     uri_query["query_string"]  = self.determine_sds_v3_uri(sds_type)
     uri_query["uri_item"]      = sds_item
     uri_query["sds_type"]      = sds_type
+    uri_query
+  end
+
+  def self.build_sds_v3_combo_request(uri_item, ip_item)
+    uri_query                  = {}
+    uri_query["hostname"]      = Sbrs::Base.sds_v3_host
+    uri_query["query_string"]  = '/score/single/json?url='+ uri_item + '&ip=' + ip_item
+    uri_query["uri_item"]      = uri_item
+    uri_query["ip_item"]       = ip_item
+    uri_query["sds_type"]      = "combo"
     uri_query
   end
 
@@ -235,7 +249,7 @@ class Sbrs::Base
     query_string = '/' + query_string if first_char != '/'
 
     request_string = "https://" + hostname + query_string
-
+    
     if request_type == 'wbrs' && params["uri_item"]
       request_string += params["uri_item"]
     end
@@ -271,7 +285,7 @@ class Sbrs::Base
           if response.code != "200"
             '{"response": "request failed"}'
           else
-            if request_type == 'wbrs'
+            if request_type == 'wbrs' || request_type == 'combo'
               sds_v3_response_parsed = JSON.parse(response.body)
 
               wbrs_response = {}
