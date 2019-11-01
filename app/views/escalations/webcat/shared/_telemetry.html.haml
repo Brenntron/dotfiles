@@ -7,83 +7,86 @@
   .col-xs-8.main-metrics
     .metrics-col
       %span.margin-left.first-first
-        .header-metric TALOS:
-        %span.number-metric
-          =@ti_total_comp
+        .metric-header TALOS:
+        %span.metric-number
+          =@ti_new_count
         New
       %span.metric-overdue
         (
-        %span.number-metric
+        %span.metric-number
           =@ti_overdue_count
         Overdue)
       %span.border-left
-        %span.number-metric 0
+        %span.metric-number
+          =@ti_assigned_count
         Assigned
 
     .metrics-col
       %span
-        .header-metric WBNP:
-        %span.number-metric
+        .metric-header WBNP:
+        %span.metric-number
           =@wbnp_new_count
         New
       %span.metric-overdue
         (
-        %span.number-metric
+        %span.metric-number
           =@wbnp_overdue_count
         Overdue)
       %span.border-left
-        %span.number-metric 0
+        %span.metric-number
+          =@wbnp_assigned_count
         Assigned
 
     .metrics-col
       %span
-        .header-metric INTERNAL:
-        %span.number-metric
+        .metric-header INTERNAL:
+        %span.metric-number
           =@int_new_count
         New
       %span.metric-overdue
         (
-        %span.number-metric
+        %span.metric-number
           =@int_overdue_count
         Overdue)
       %span.border-left
-        %span.number-metric 0
+        %span.metric-number
+          =@int_assigned_count
         Assigned
 
     .metrics-col
       %span
-        .header-metric PENDING:
-        %span.number-metric
-          =@pending
+        .metric-header PENDING:
+        %span.metric-number
+          =@pending_new_count
       %span.metric-overdue
         (
-        %span.number-metric
-          0
+        %span.metric-number
+          =@pending_overdue_count
         Overdue)
 
   .col-xs-2.wbnp-area
     .metrics-col
       %span
-        .header-metric
-          WBNP REPORT STATUS:
-        %a.wbnp-link.tooltip{'data-tooltip-content':'#wbnp_tooltip_content'}
+        .metric-header
+          WBNP Report Status:
+        %a#wbnp-report-status-link.tooltipstered.esc-tooltipped{'data-tooltip-content':'#tooltip_content'}
           .wbnp-report-status
 
 
--#.tooltip_templates
--#  %table.wbnp-table#wbnp_tooltip_content
--#    %tr
--#      %td Total Attempted
--#      %td
--#        #wbnp-report-attempted
--#    %tr
--#      %td Number Succeeded
--#      %td
--#        #wbnp-report-succeeded
--#    %tr
--#      %td Number Rejected
--#      %td
--#        #wbnp-report-rejected
+#tooltip_templates
+  %table.wbnp-table#tooltip_content
+    %tr
+      %td Total Attempted
+      %td
+        #wbnp-report-attempted
+    %tr
+      %td Number Succeeded
+      %td
+        #wbnp-report-succeeded
+    %tr
+      %td Number Rejected
+      %td
+        #wbnp-report-rejected
 
 
 

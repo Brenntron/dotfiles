@@ -10449,13 +10449,14 @@ span.input-truncate {
   .wbnp-report-status {
     display: inline-flex;
   }
-  .wbnp-link {
+  #wbnp-report-status-link {
     text-decoration: underline;
     text-decoration-style: dotted;
     color: $content-bg-color;
     cursor: default;
   }
-  .header-metric {
+  .metric-header {
+    text-transform: uppercase;
     padding-left: 5px;
     padding-right: 8px;
     font-weight: 700;
@@ -10476,7 +10477,7 @@ span.input-truncate {
     span {
       font-weight: normal;
     }
-    span.number-metric {
+    span.metric-number {
       padding-left: 0;
       padding-right: 4px;
       font-weight: 700;
@@ -10513,64 +10514,36 @@ span.input-truncate {
   padding: 5px 15px;
 }
 
-#wbnp_tooltip_content {
-  width: 220px !important;
+#tooltip_content {
+  width: 250px !important;
   tr td {
-    width: 100px;
+    width: 120px;
     padding: 2px;
     text-align: left;
   }
 }
 
-.tooltip_templates {
+
+
+
+#tooltip_templates {
   display: none;
 }
 
 
-// webcat complaints: banner at top with stats on webcat complaints index
-//table.table-condensed.webcat-banner-table {
-//  margin-bottom: 10px;
-//  thead th {
-//    border-bottom: none;
-//    span {
-//      border-bottom: solid 1px lighten($content-tab-color, 20%);
-//      display: inline-block;
-//      width: 90%;
-//      padding-bottom: 2px;
-//      font-size: 10pt;
-//    }
-//  }
-//}
 
-// just the td's for this table
-//table.table-condensed.webcat-banner-table > tbody > tr > td {
-//  border: none;
-//  padding: 8px 6px 4px !important;  // override needed
-//  font-size: 9.5pt;
-//  &:nth-child(odd) {
-//    text-align: right;
-//    width: 30px;
-//  }
-//  span {
-//    color: $warning-accent-color;   // orange
-//    font-weight: bold;
-//    margin-left: 5px;
-//    display: inline-block;
-//  }
-//}
 
-// the wbnp reports table on right has lots of differences
-//table.table-condensed.webcat-banner-table.wbnp-reports-table > tbody > tr > td {
-//  border: none;
-//  padding: 8px 6px 4px !important;  // override needed
-//  &:nth-child(odd) {  // first td, third td in row
-//    text-align: left;
-//    width: 120px;
-//    letter-spacing: 0.5px;
-//    font-weight: normal;
-//  }
-//  span {
-//    color: $warning-accent-color;
-//  }
-//}
-//
+
+
+.webcat-search-container {
+  height: 10px;
+}
+
+#webcat-index-toolbar {
+  margin: 20px 0 5px;
+}
+
+#webcat-index-title {
+  margin-top: 8px;
+}
+

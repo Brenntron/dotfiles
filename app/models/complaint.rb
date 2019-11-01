@@ -51,19 +51,16 @@ class Complaint < ApplicationRecord
   scope :from_int, -> { includes(:complaint_entries).where(channel: INT_CHANNEL) }
 
   scope :ti_new_count, -> { includes(:complaint_entries).where(channel: TI_CHANNEL).count }
-  scope :ti_overdue_count , -> { includes(:complaint_entries).where(channel: TI_CHANNEL).where("created_at < ?",Time.now - 24.hours).where.not(status:COMPLETED).count }
-  # scope :ti_assigned_count , -> { includes(:complaint_entries).where(channel: TI_CHANNEL).count }
+  scope :ti_overdue_count, -> { includes(:complaint_entries).where(channel: TI_CHANNEL).where("created_at < ?",Time.now - 24.hours).where.not(status:COMPLETED).count }
 
   scope :wbnp_new_count, -> { includes(:complaint_entries).where(channel: WBNP_CHANNEL).count }
-  scope :wbnp_overdue_count , -> { includes(:complaint_entries).where(channel: WBNP_CHANNEL).where("created_at < ?",Time.now - 24.hours).where.not(status:COMPLETED).count }
-  # scope :wbnp_assigned_count , -> { includes(:complaint_entries).where(channel: WBNP_CHANNEL).count }
+  scope :wbnp_overdue_count, -> { includes(:complaint_entries).where(channel: WBNP_CHANNEL).where("created_at < ?",Time.now - 24.hours).where.not(status:COMPLETED).count }
 
   scope :int_new_count, -> { includes(:complaint_entries).where(channel: INT_CHANNEL).count }
-  scope :int_overdue_count , -> { includes(:complaint_entries).where(channel: INT_CHANNEL).where("created_at < ?",Time.now - 24.hours).where.not(status:COMPLETED).count }
-  # scope :int_assigned_count , -> { includes(:complaint_entries).where(channel: INT_CHANNEL).count }
+  scope :int_overdue_count, -> { includes(:complaint_entries).where(channel: INT_CHANNEL).where("created_at < ?",Time.now - 24.hours).where.not(status:COMPLETED).count }
 
   scope :pending_new_count, -> { includes(:complaint_entries).where(channel: INT_CHANNEL).count }
-  scope :pending_overdue_count , -> { includes(:complaint_entries).where(channel: INT_CHANNEL).where("created_at < ?",Time.now - 24.hours).where.not(status:COMPLETED).count }
+  scope :pending_overdue_count, -> { includes(:complaint_entries).where(channel: INT_CHANNEL).where("created_at < ?",Time.now - 24.hours).where.not(status:COMPLETED).count }
 
   def set_status(new_status)
     status_list = complaint_entries.map{|entry| entry.status}
