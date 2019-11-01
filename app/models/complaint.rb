@@ -45,12 +45,23 @@ class Complaint < ApplicationRecord
   scope :by_guest, -> { joins(:customer).where(customers: {company_id: Company.guest.id}) }
   scope :by_cust, -> { joins(:customer).where.not(customers: {company_id: Company.guest.id}) }
   scope :open_comps, -> { where.not(status: COMPLETED) }
+
   scope :from_ti, -> { includes(:complaint_entries).where(channel: TI_CHANNEL) }
-  scope :from_ti_count, -> { includes(:complaint_entries).where(channel: TI_CHANNEL).count }
   scope :from_wbnp, -> { includes(:complaint_entries).where(channel: WBNP_CHANNEL) }
-  scope :from_wbnp_count, -> { includes(:complaint_entries).where(channel: WBNP_CHANNEL).count }
   scope :from_int, -> { includes(:complaint_entries).where(channel: INT_CHANNEL) }
+
+  # will uncomment and correct these
+  scope :from_ti_new_count, -> { includes(:complaint_entries).where(channel: TI_CHANNEL).count }
+  # scope :from_ti_overdue_count , -> {where("created_at < ?",Time.now - 24.hours).where.not(status:COMPLETED).count}
+  # scope :from_ti_assigned_count , -> { includes(:complaint_entries).where(channel: TI_CHANNEL).count }
+
+  scope :from_wbnp_new_count, -> { includes(:complaint_entries).where(channel: WBNP_CHANNEL).count }
+  # scope :from_wbnp_overdue_count , -> {where("created_at < ?",Time.now - 24.hours).where.not(status:COMPLETED).count}
+  # scope :from_wbnp_assigned_count , -> { includes(:complaint_entries).where(channel: WBNP_CHANNEL).count }
+
   scope :from_int_count, -> { includes(:complaint_entries).where(channel: INT_CHANNEL).count }
+  # scope :from_int_overdue_count , -> {where("created_at < ?",Time.now - 24.hours).where.not(status:COMPLETED).count}
+  # scope :from_int_assigned_count , -> { includes(:complaint_entries).where(channel: INT_CHANNEL).count }
 
   def set_status(new_status)
     status_list = complaint_entries.map{|entry| entry.status}
