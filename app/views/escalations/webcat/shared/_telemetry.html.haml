@@ -1,148 +1,164 @@
-.row
-  .col-xs-2.top-area-bar
+.row.complaints-metrics-banner
+  .col-xs-2.header-area
+    .top-area-bar
+      %h1= content_for :webcat_page
+      %span.top-info-icon{class: "#{content_for :webcat_icon}"}
 
-    %h1= content_for :webcat_page
-    %span.top-info-icon{class: "#{content_for :webcat_icon}"}
-    .top-user-info
-      %h5.webcat-hide.left-space= current_user.display_name
-      %p.webcat-hide.dashboard-details.left-space
-        = link_to "#{@current_user.cvs_username}", escalations_users_path(current_user[:id])
+  .col-xs-8.main-metrics
+    .metrics-col
+      %span.margin-left.first-first
+        .header-metric TALOS:
+        %span.number-metric
+          =@ti_total_comp
+        New
+      %span.metric-overdue
+        (
+        %span.number-metric
+          0
+        Overdue)
+      %span.border-left
+        %span.number-metric 0
+        Assigned
+
+    .metrics-col
+      %span
+        .header-metric WBNP:
+        %span.number-metric
+          =@from_wbnp_count
+        New
+      %span.metric-overdue
+        (
+        %span.number-metric
+          0
+        Overdue)
+      %span.border-left
+        %span.number-metric 0
+        Assigned
+
+    .metrics-col
+      %span
+        .header-metric INTERNAL:
+        %span.number-metric
+          =@from_int_count
+        New
+      %span.metric-overdue
+        (
+        %span.number-metric
+          =@overdue
+        Overdue)
+      %span.border-left
+        %span.number-metric 0
+        Assigned
+
+    .metrics-col
+      %span
+        .header-metric PENDING:
+        %span.number-metric
+          =@pending
+      %span.metric-overdue
+        (
+        %span.number-metric
+          0
+        Overdue)
+
+  .col-xs-2.wbnp-area
+    .metrics-col
+      %span
+        .header-metric
+          WBNP REPORT STATUS:
+        %a.wbnp-link.tooltip{'data-tooltip-content':'#wbnp_tooltip_content'}
+          .wbnp-report-status
+
+-#
+-#.tooltip_templates
+-#  %table.wbnp-table#wbnp_tooltip_content
+-#    %tr
+-#      %td Total Attempted
+-#      %td
+-#        #wbnp-report-attempted
+-#    %tr
+-#      %td Number Succeeded
+-#      %td
+-#        #wbnp-report-succeeded
+-#    %tr
+-#      %td Number Rejected
+-#      %td
+-#        #wbnp-report-rejected
 
 
-  -# NEW TABLE BELOW
-  .col-xs-5.reports-border-left
-    %table.webcat-banner-table.table-condensed
-      %thead
-        %tr
-          %th{colspan: '2'}
-            %span
-              Talos Intelligence
-          %th{colspan: '2'}
-            %span
-              WBNP
-          %th{colspan: '2'}
-            %span
-              Internal Entries
-      %tbody
-        -# New #'s for Complaint types
-        %tr
-          -# this # is SUBMITTER TYPE > customer.count + guest.count
-          %td=@dan_var
-          %td
-            New
-            %span.overdue-hidden (0 Overdue)
-          %td 0
-          %td
-            New
-            %span.overdue-hidden (0 Overdue)
-          %td 0
-          %td
-            New
-            %span.overdue-hidden (0 Overdue)
-        -# Assigned #'s for Complaint types
-        %tr
-          %td 0
-          %td Assigned
-          %td 0
-          %td Assigned
-          %td 0
-          %td Assigned
-  .col-xs-3.col-xs-offset-2
-    %table.webcat-banner-table.wbnp-reports-table.table-condensed
-      %thead
-        %tr
-          %th{colspan: '4'}
-            %span
-              WBNP Reports
-      %tbody
-        %tr
-          %td Status
-          %td
-            .wbnp-report-status
-          %td Succeeded
-          %td
-            #wbnp-report-succeeded
-        %tr
-          %td
-            Total Attempted
-          %td
-            #wbnp-report-attempted
-          %td
-            Rejected
-          %td
-            #wbnp-report-rejected
 
 
--# LEGACY BELOW
--# LEGACY BELOW
--# LEGACY BELOW
-.row#top_bar_extended_info{style:'border-top: solid 1px #336699; padding-top: 10px;'}
-  .col-xs-2
-    %table.tickets-totals-table.table-condensed
-      %tr
-        %th{colspan: '2'}
-          %span.ticket-type-label Submitter Type
-      %tr
-        %td Customer
-        %td=@ti_comp_cust
-      %tr
-        %td Guest
-        %td=@ti_comp_guest
-      %tr
-        %td Internal
-        %td=@int_comp_entries
-      %tr
-        %td WBNP
-        %td=@wbnp
-  .col-xs-2
-    %table.tickets-totals-table.table-condensed
-      %tr
-        %th{colspan: '2'}
-          %span.ticket-type-label Entries
-      %tr
-        %td Assigned
-        %td=@assigned
-      %tr
-        %td Pending
-        %td=@pending
-      %tr
-        %td New
-        %td=@new
-      %tr
-        %td Overdue
-        %td=@overdue
-  .col-xs-2
-    %table.tickets-totals-table.table-condensed
-      %tr
-        %th
-          %span.ticket-type-label Complaints
-      %tr
-        %td New
-        %td=@new_comp
-      %tr
-        %td Active
-        %td=@active_comp
-      %tr
-        %td Overdue
-        %td=@overdue_comp
-      -#%tr
-      -#  %td Completed
-      -#  %td=@completed_comp
-  -#.col-xs-2
-  -#  %table.tickets-totals-table.table-condensed
-  -#    %tr
-  -#      %th{colspan: '2'}
-  -#        %span.ticket-type-label WBNP Reports
-  -#    %tr
-  -#      %td Status
-  -#      -#%td.wbnp-report-status
-  -#    %tr
-  -#      %td Total Attempted
-  -#      -#%td#wbnp-report-attempted
-  -#    %tr
-  -#      %td Number Succeeded
-  -#      -#%td#wbnp-report-succeeded
-  -#    %tr
-  -#      %td Number Rejected
-  -#      -#%td#wbnp-report-rejected
-  -#
+-#LEGACY BELOW, delete this
+-#LEGACY BELOW, delete this
+-#
+-#.row#top_bar_extended_info
+-#  .col-xs-2
+-#    %table.tickets-totals-table.table-condensed
+-#      %tr
+-#        %th{colspan: '2'}
+-#          %span.ticket-type-label Submitter Type
+-#      %tr
+-#        %td Customer
+-#        %td=@ti_comp_cust
+-#      %tr
+-#        %td Guest
+-#        %td=@ti_comp_guest
+-#      %tr
+-#        %td Internal
+-#        %td=@int_comp_entries
+-#      %tr
+-#        %td WBNP
+-#        %td=@wbnp
+-#  .col-xs-2
+-#    %table.tickets-totals-table.table-condensed
+-#      %tr
+-#        %th{colspan: '2'}
+-#          %span.ticket-type-label Entries
+-#      %tr
+-#        %td Assigned
+-#        %td=@assigned
+-#      %tr
+-#        %td Pending
+-#        %td=@pending
+-#      %tr
+-#        %td New
+-#        %td=@new
+-#      %tr
+-#        %td Overdue
+-#        %td=@overdue
+-#  .col-xs-2
+-#    %table.tickets-totals-table.table-condensed
+-#      %tr
+-#        %th
+-#          %span.ticket-type-label Complaints
+-#      %tr
+-#        %td New
+-#        %td=@new_comp
+-#      %tr
+-#        %td Active
+-#        %td=@active_comp
+-#      %tr
+-#        %td Overdue
+-#        %td=@overdue_comp
+-#
+-#      %tr
+-#        %td Completed
+-#        %td=@completed_comp
+-#  .col-xs-2
+-#    %table.tickets-totals-table.table-condensed
+-#      %tr
+-#        %th{colspan: '2'}
+-#          %span.ticket-type-label WBNP Reports
+-#      %tr
+-#        %td Status
+-#        -#%td.wbnp-report-status
+-#      %tr
+-#        %td Total Attempted
+-#        -#%td#wbnp-report-attempted
+-#      %tr
+-#        %td Number Succeeded
+-#        -#%td#wbnp-report-succeeded
+-#      %tr
+-#        %td Number Rejected
+-#        -#%td#wbnp-report-rejected
+-#

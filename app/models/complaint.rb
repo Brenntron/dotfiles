@@ -46,14 +46,17 @@ class Complaint < ApplicationRecord
   # ADDING A NEW VARIABLE FOR TESTING
   # ADDING A NEW VARIABLE FOR TESTING
   scope :dan_count , -> {where(channel: WBNP_CHANNEL).count}
+  scope :dan_count2 , -> {where(channel: WBNP_CHANNEL).count}
 
-
-  scope :open_comps, -> { where.not(status: COMPLETED) }
-  scope :from_ti, -> { includes(:complaint_entries).where(channel: TI_CHANNEL) }
-  scope :from_int, -> { includes(:complaint_entries).where(channel: INT_CHANNEL) }
-  scope :from_wbnp, -> { includes(:complaint_entries).where(channel: WBNP_CHANNEL) }
   scope :by_guest, -> { joins(:customer).where(customers: {company_id: Company.guest.id}) }
   scope :by_cust, -> { joins(:customer).where.not(customers: {company_id: Company.guest.id}) }
+  scope :open_comps, -> { where.not(status: COMPLETED) }
+  scope :from_ti, -> { includes(:complaint_entries).where(channel: TI_CHANNEL) }
+  scope :from_ti_count, -> { includes(:complaint_entries).where(channel: TI_CHANNEL).count }
+  scope :from_wbnp, -> { includes(:complaint_entries).where(channel: WBNP_CHANNEL) }
+  scope :from_wbnp_count, -> { includes(:complaint_entries).where(channel: WBNP_CHANNEL).count }
+  scope :from_int, -> { includes(:complaint_entries).where(channel: INT_CHANNEL) }
+  scope :from_int_count, -> { includes(:complaint_entries).where(channel: INT_CHANNEL).count }
 
   def set_status(new_status)
     status_list = complaint_entries.map{|entry| entry.status}

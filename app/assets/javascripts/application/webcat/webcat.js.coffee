@@ -577,6 +577,15 @@ $ ->
   if location.href.includes('webcat')
     $('.webcat-hide').hide()
 
-  $('#top_bar_extended_info').show()
-#  $('#top_bar_toggle').toggleClass('top-info-open')
+  # wbnp report status on complaints header
+  $('.wbnp-link').tooltipster
+    theme: [
+      'tooltipster-borderless'
+      'tooltipster-borderless-customized'
+    ]
+    contentCloning: true
+    side: 'bottom'
+#    content: ''
+    trigger: 'hover'
+
 
