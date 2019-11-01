@@ -14,7 +14,7 @@
       %span.metric-overdue
         (
         %span.number-metric
-          0
+          =@ti_overdue_count
         Overdue)
       %span.border-left
         %span.number-metric 0
@@ -24,12 +24,12 @@
       %span
         .header-metric WBNP:
         %span.number-metric
-          =@from_wbnp_count
+          =@wbnp_new_count
         New
       %span.metric-overdue
         (
         %span.number-metric
-          0
+          =@wbnp_overdue_count
         Overdue)
       %span.border-left
         %span.number-metric 0
@@ -39,12 +39,12 @@
       %span
         .header-metric INTERNAL:
         %span.number-metric
-          =@from_int_count
+          =@int_new_count
         New
       %span.metric-overdue
         (
         %span.number-metric
-          =@overdue
+          =@int_overdue_count
         Overdue)
       %span.border-left
         %span.number-metric 0

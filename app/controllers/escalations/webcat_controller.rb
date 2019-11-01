@@ -14,22 +14,17 @@ class Escalations::WebcatController < ApplicationController
     @new_comp = Complaint.new_count
     @overdue_comp = Complaint.overdue_count
 
-    # NEED VARIABLES FOR:
-    # ticket_source == 'talos-intelligence' AND complaints.status.count of NEW
-    # ticket_source == 'talos-intelligence' AND complaints.status.count of OVERDUE
-    # ticket_source == 'talos-intelligence' AND complaints.status.count of ASSIGNED
+    @ti_new_count = Complaint.ti_new_count
+    @int_new_count = Complaint.int_new_count
+    @wbnp_new_count = Complaint.wbnp_new_count
 
-    # ticket_source == 'RuleUI' AND complaints.status.count of NEW
-    # ticket_source == 'RuleUI' AND complaints.status.count of OVERDUE
-    # ticket_source == 'RuleUI' AND complaints.status.count of ASSIGNED
+    @ti_overdue_count = Complaint.ti_overdue_count
+    @int_overdue_count = Complaint.int_overdue_count
+    @wbnp_overdue_count = Complaint.wbnp_overdue_count
 
-    # ticket_source == NULL AND complaints.status.count of NEW
-    # ticket_source == NULL AND complaints.status.count of OVERDUE
-    # ticket_source == NULL AND complaints.status.count of ASSIGNED
-
-    @from_ti_count = Complaint.from_ti_count
-    @from_int_count = Complaint.from_int_count
-    @from_wbnp_count = Complaint.from_wbnp_count
+    # @ti_assigned_count = Complaint.ti_assigned_count
+    # @int_assigned_count = Complaint.int_assigned_count
+    # @wbnp_assigned_count = Complaint.wbnp_assigned_count
 
     @ti_total_comp = @ti_comp_cust + @ti_comp_guest
 
