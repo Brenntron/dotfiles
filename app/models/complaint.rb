@@ -42,12 +42,6 @@ class Complaint < ApplicationRecord
   scope :new_count , -> {where(status:NEW).count}
   scope :overdue_count , -> {where("created_at < ?",Time.now - 24.hours).where.not(status:COMPLETED).count}
 
-  # ADDING A NEW VARIABLE FOR TESTING
-  # ADDING A NEW VARIABLE FOR TESTING
-  # ADDING A NEW VARIABLE FOR TESTING
-  scope :dan_count , -> {where(channel: WBNP_CHANNEL).count}
-  scope :dan_count2 , -> {where(channel: WBNP_CHANNEL).count}
-
   scope :by_guest, -> { joins(:customer).where(customers: {company_id: Company.guest.id}) }
   scope :by_cust, -> { joins(:customer).where.not(customers: {company_id: Company.guest.id}) }
   scope :open_comps, -> { where.not(status: COMPLETED) }
