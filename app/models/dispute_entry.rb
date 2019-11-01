@@ -832,4 +832,50 @@ class DisputeEntry < ApplicationRecord
       return false
     end
   end
+
+  def self.verdict_from_score(score)
+    verdict = ""
+    if score >= 6.0
+      verdict = "Trusted"
+    end
+    if score > 0 && score < 6.0
+      verdict = "Favorable"
+    end
+    if score >= -3 && score <= 0
+      verdict = "Neutral"
+    end
+    if score > -6 && score < -3
+      verdict = "Questionable"
+    end
+    if score <= -6
+      verdict = "Untrusted"
+    end
+
+    verdict
+  end
+
+  def is_disposition_matching?
+
+
+    begin
+
+      wbrs_stuff = Sbrs::Base.remote_call_sds_v3(self.hostlookup, "wbrs")
+
+      verdict = self.verdict_from_score(wbrs_stuff["wbrs"]["score"])
+
+      if self.suggested_disposition == verdict
+        self.status = STATUS_RESOLVED
+        self.resolution = STATUS_RESOLVED_UNCHANGED
+        self.resolution_comment = "#{self.hostlookup} has begun to improve and currently has a Neutral Talos Intelligence email reputation (within acceptable parameters).   The reputation should continue to improve as we receive additional good mail volume reports for the IP from our sensor network.  Please note that some customers may decide to block at neutral. We have no control over how passive or aggressive our customers choose to be when implementing our reputation information."
+        self.save
+
+        return true
+      end
+
+      return false
+
+    rescue
+      return false
+    end
+  end
 end
