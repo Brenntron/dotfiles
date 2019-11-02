@@ -4,69 +4,70 @@
       %h1= content_for :webcat_page
       %span.top-info-icon{class: "#{content_for :webcat_icon}"}
 
-  .col-xs-8.main-metrics
-    .metrics-col
-      %span.margin-left.first-first
-        .metric-header TALOS:
-        %span.metric-number
-          =@ti_new_count
-        New
-      %span.metric-overdue
-        (
-        %span.metric-number
-          =@ti_overdue_count
-        Overdue)
-      %span.border-left
-        %span.metric-number
-          =@ti_assigned_count
-        Assigned
+  .col-xs-10.main-metrics
+    .row
+      .col-lg-3.metrics-col
+        %span.margin-left.first-first
+          .metric-header TALOS:
+          %span.metric-number
+            =@ti_new_count
+          New
+        %span.metric-overdue
+          (
+          %span.metric-number
+            =@ti_overdue_count
+          Overdue)
 
-    .metrics-col
-      %span
-        .metric-header WBNP:
-        %span.metric-number
-          =@wbnp_new_count
-        New
-      %span.metric-overdue
-        (
-        %span.metric-number
-          =@wbnp_overdue_count
-        Overdue)
-      %span.border-left
-        %span.metric-number
-          =@wbnp_assigned_count
-        Assigned
+        %span.metric-assigned
+          %span.metric-number
+            =@ti_assigned_count
+          Assigned
 
-    .metrics-col
-      %span
-        .metric-header INTERNAL:
-        %span.metric-number
-          =@int_new_count
-        New
-      %span.metric-overdue
-        (
-        %span.metric-number
-          =@int_overdue_count
-        Overdue)
-      %span.border-left
-        %span.metric-number
-          =@int_assigned_count
-        Assigned
+      .col-lg-3.metrics-col
+        %span
+          .metric-header WBNP:
+          %span.metric-number
+            =@wbnp_new_count
+          New
+        %span.metric-overdue
+          (
+          %span.metric-number
+            =@wbnp_overdue_count
+          Overdue)
+        %span.metric-assigned
+          %span.metric-number
+            =@wbnp_assigned_count
+          Assigned
 
-    .metrics-col
-      %span
-        .metric-header PENDING:
-        %span.metric-number
-          =@pending_new_count
-      %span.metric-overdue
-        (
-        %span.metric-number
-          =@pending_overdue_count
-        Overdue)
+      .col-lg-3.metrics-col
+        %span
+          .metric-header INTERNAL:
+          %span.metric-number
+            =@int_new_count
+          New
+        %span.metric-overdue
+          (
+          %span.metric-number
+            =@int_overdue_count
+          Overdue)
+        %span.metric-assigned
+          %span.metric-number
+            =@int_assigned_count
+          Assigned
 
-  .col-xs-2.wbnp-area
-    .metrics-col
-      %span
+      .col-lg-2.metrics-col
+        %span
+          .metric-header PENDING:
+          %span.metric-number
+            =@pending_new_count
+        %span.metric-overdue
+          (
+          %span.metric-number
+            =@pending_overdue_count
+          Overdue)
+
+
+      %span.wbnp-area
         .metric-header
           WBNP Report Status:
         %a#wbnp-report-status-link.tooltipstered.esc-tooltipped{'data-tooltip-content':'#tooltip_content'}

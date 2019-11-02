@@ -10416,12 +10416,22 @@ span.input-truncate {
 .complaints-metrics-banner {
   display: flex;
   align-items: center;
-  justify-content: flex-start;
+  h1 {
+    margin-bottom: 0;
+  }
+  span {
+    display: inline-flex;
+  }
+  .col-lg-3 {
+    width: 23%;
+  }
   .header-area {
-    width: 220px;
     display: inline-flex;
     padding: 0;
-    border-right: solid 1px #eee;
+    border-right: solid 1px darken($content-bg-color, 5%);
+    margin-right: 15px;
+    min-width: 170px;
+    max-width: 220px;
   }
   .main-metrics {
     padding-left: 5px;
@@ -10431,20 +10441,15 @@ span.input-truncate {
     text-align: right;
     padding-left: 0;
     padding-right: 0;
+    position: absolute;
+    right: 5px;
+    top: 4px;
+    width: 11vw;
   }
-  h1 {
-    margin-bottom: 0;
-  }
-  .border-left {
+  .metric-assigned {
     margin-left: 10px;
     padding-left: 10px;
     border-left: solid 1px lighten($bug-accent-color, 20%);
-  }
-  .margin-left {
-    margin-left: 30px;
-  }
-  .margin-left.first-first {
-    margin-left: 2px;
   }
   .wbnp-report-status {
     display: inline-flex;
@@ -10461,19 +10466,11 @@ span.input-truncate {
     padding-right: 8px;
     font-weight: 700;
   }
-  span {
-    display: inline-flex;
-  }
   .icon-queue {
-    display: inline-flex;
     padding: 0;
   }
   .metrics-col {
-    margin-top: 0;
-    margin-right: 20px;
-    display: inline-flex;
-    vertical-align: top;
-    padding: 6px 4px;
+    padding: 4px;
     span {
       font-weight: normal;
     }
@@ -10485,7 +10482,7 @@ span.input-truncate {
   }
   .top-area-bar {
     display: inline;
-    padding: 5px 15px;
+    padding: 6px 15px;
   }
   .metric-overdue {
     padding-left: 5px;
@@ -10493,12 +10490,35 @@ span.input-truncate {
   }
 }
 
-.wbnp-table {
-  tr td {
+// SHORT WIDTHS, minor tweaks
+@media screen and (max-width: 1950px) {
+  .icon-queue.top-info-icon {
+    display: none;
+  }
+  .wbnp-area .metric-header {
+    width: 180px;
+    display: inline-block;
+  }
+  .complaints-metrics-banner .metric-assigned {
     border: none;
+    margin: 0;
+    padding: 6px 5px 0 6px;
+    display: block;
+  }
+}
+
+// refactor this up when time
+.wbnp-table {
+  width: 180px !important;
+  tr td {
+    padding: 0;
+    border: none;
+    width: 60px;
   }
   tr td:first-of-type {
+    width: 120px;
     padding: 2px;
+    text-align: left;
   }
 }
 
@@ -10514,26 +10534,9 @@ span.input-truncate {
   padding: 5px 15px;
 }
 
-#tooltip_content {
-  width: 250px !important;
-  tr td {
-    width: 120px;
-    padding: 2px;
-    text-align: left;
-  }
-}
-
-
-
-
 #tooltip_templates {
   display: none;
 }
-
-
-
-
-
 
 .webcat-search-container {
   height: 10px;
@@ -10547,3 +10550,7 @@ span.input-truncate {
   margin-top: 8px;
 }
 
+// ensure text doesn't break/wrap in data table
+.ticket-age-over12hr {
+  white-space: nowrap;
+}
