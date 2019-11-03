@@ -130,9 +130,14 @@ window.cat_new_url = ()->
 
   for i in [1...6] by 1
 
-    data[i] = {url: $("#url_#{i}").val(), cats: $("#cat_new_url_#{i}").val()}
+    categories = []
+    for j in [0...5] by 1
+      if $("#cat_new_url_#{i}")[0][j]
+        categories.push($("#cat_new_url_#{i}")[0][j].text)
 
-    if data[i].url.length > 0 && data[i].cats != null
+    data[i] = {url: $("#url_#{i}").val(), category_names: categories, category_ids: $("#cat_new_url_#{i}").val()}
+
+    if data[i].url.length > 0 && data[i].category_ids != null
       isEmpty = false
 
   if isEmpty == false
@@ -171,9 +176,15 @@ window.webcat_reset_search = ()->
 window.multiple_url_categorization = ()->
 
   urls = $("#categorize_urls").val().split(/\n/)
-  cats = $("#multi_cat_url_cats").val()
+  category_ids = $("#multi_cat_url_cats").val()
+  category_names = []
 
-  if $("#categorize_urls").val() != "" && cats != null
+  for category in $("#multi_cat_url_cats")
+    for i in [0..5] by 1
+      if category[i]
+        category_names.push(category[i].text)
+
+  if $("#categorize_urls").val() != "" && category_ids != null && category_names != null
     $('#loader-modal').modal({
       keyboard: false
     })
@@ -181,7 +192,7 @@ window.multiple_url_categorization = ()->
     std_msg_ajax(
       url:'/escalations/api/v1/escalations/webcat/complaints/multi_cat_new_url'
       method: 'POST'
-      data: {urls: urls, cats: cats}
+      data: {urls: urls, category_names: category_names, category_ids: category_ids}
       success: (response) ->
         $('#loader-modal').modal 'hide'
         std_msg_success('Success',["URLs/IPs successfully categorized."], reload: true)
@@ -1505,8 +1516,10 @@ window.open_selected = () ->
   else
     open_selected(selected_rows, "true")
 window.open_all = () ->
-  selected_rows = $('#complaints-index').DataTable().rows()
-  open_selected(selected_rows, "true")
+  open_all = confirm("Are you sure you want to open ALL the windows on this page?!!")
+  if (open_all == true)
+    selected_rows = $('#complaints-index').DataTable().rows()
+    open_selected(selected_rows, "true")
 
 toggle_selected = (selectedRows, expand)->
   selectState = $('.selected')

@@ -1,6 +1,7 @@
-
 all_configs = YAML.load_file(Rails.root.join("config", "config.yml"))
 env_config = all_configs[Rails.env]
+env_config['bugzilla']
+
 raise "config.yml missing #{Rails.env} section" unless env_config
 
 Rails.configuration.app_name = Rails.application.engine_name.gsub(/_application/,'')
@@ -101,6 +102,14 @@ raise 'config.yml missing SDS section' unless sds_config
 Rails.configuration.sds                 = ApiRequester::ApiRequester.config_of(sds_config)
 Rails.configuration.sds.cert_file       = sds_config['cert_file'] || sds_config['ca_cert_file']
 Rails.configuration.sds.pkey_file       = sds_config['pkey_file']
+
+sds_v3_config = env_config.fetch('sds_v3', nil)
+raise 'config.yml missing SDS_V3 section' unless sds_v3_config
+Rails.configuration.sds_v3                = ApiRequester::ApiRequester.config_of(sds_v3_config)
+Rails.configuration.sds_v3.host       = sds_v3_config['host']
+Rails.configuration.sds_v3.cert_file       = sds_v3_config['cert_file']
+Rails.configuration.sds_v3.beta_host       = sds_v3_config['beta_host']
+Rails.configuration.sds_v3.beta_cert_file       = sds_v3_config['beta_cert_file']
 
 
 talos_intelligence = env_config.fetch('talos_intelligence', {})
