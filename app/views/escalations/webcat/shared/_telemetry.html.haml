@@ -1,66 +1,54 @@
 .row.complaints-metrics-banner
   // left column
   .header-area
-    .top-area-bar
-      %h1= content_for :webcat_page
-      %span.top-info-icon{class: "#{content_for :webcat_icon}"}
+    %h1= content_for :webcat_page
+    %span.top-info-icon{class: "#{content_for :webcat_icon}"}
 
   // middle column
   .main-metrics
     .row
       .col-sm-3.metrics-col
         %span.metric-header TALOS:
-        %span.metric-number
-          =@ti_new_count
+        %span.metric-number= @ti_new_count
         %span.metric-label New
         %span.metric-overdue
           (
-          %span.metric-number
-            =@ti_overdue_count
+          %span.metric-number= @ti_overdue_count
           Overdue)
         %span.metric-assigned
-          %span.metric-number
-            =@ti_assigned_count
+          %span.metric-number= @ti_assigned_count
           Assigned
 
       .col-sm-3.metrics-col
         %span.metric-header WBNP:
-        %span.metric-number
-          =@wbnp_new_count
+        %span.metric-number= @wbnp_new_count
         %span.metric-label New
         %span.metric-overdue
           (
-          %span.metric-number
-            =@wbnp_overdue_count
+          %span.metric-number= @wbnp_overdue_count
           Overdue)
         %span.metric-assigned
-          %span.metric-number
-            =@wbnp_assigned_count
+          %span.metric-number= @wbnp_assigned_count
           Assigned
 
       .col-sm-3.metrics-col
         %span.metric-header INTERNAL:
-        %span.metric-number
-          =@int_new_count
+        %span.metric-number= @int_new_count
         %span.metric-label New
         %span.metric-overdue
           (
-          %span.metric-number
-            =@int_overdue_count
+          %span.metric-number= @int_overdue_count
           Overdue)
         %span.metric-assigned
-          %span.metric-number
-            =@int_assigned_count
+          %span.metric-number= @int_assigned_count
           Assigned
 
       .col-sm-3.metrics-col
         %span.metric-header PENDING:
-        %span.metric-number
-          =@pending_new_count
+        %span.metric-number= @pending_new_count
         %span.metric-overdue
           (
-          %span.metric-number
-            =@pending_overdue_count
+          %span.metric-number= @pending_overdue_count
           Overdue)
 
   // right column
@@ -69,6 +57,7 @@
       WBNP Report Status:
     %a#wbnp-report-status-link.tooltipstered.esc-tooltipped{'data-tooltip-content':'#tooltip-wbnp-content'}
       .wbnp-report-status
+      %span.wbnp-loading-spinner.sync-button-white.sync_rotate
 
 
 #tooltip-wbnp

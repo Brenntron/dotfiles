@@ -570,14 +570,11 @@ $('#exampleModal').on 'shown.bs.modal', ->
 
 
 $ ->
-  # webcat > some dashboard metrics should only be shown on reports page
-  if location.href.includes('webcat/complaints')
-    $('.webcat-reports-only').hide()
+  # complaint show page
+  if location.href.includes('webcat/complaints') && $('body').hasClass('show-action')
+    $('.wbnp-area').hide()
 
-  if location.href.includes('webcat')
-    $('.webcat-hide').hide()
-
-  # webcat > wbnp report status link
+  # wbnp report status link shows a table
   $('#wbnp-report-status-link').tooltipster
     theme: [
       'tooltipster-borderless'
