@@ -577,7 +577,7 @@ $ ->
   if location.href.includes('webcat')
     $('.webcat-hide').hide()
 
-
+  # webcat > wbnp report status link
   $('#wbnp-report-status-link').tooltipster
     theme: [
       'tooltipster-borderless'
@@ -586,12 +586,3 @@ $ ->
     contentCloning: true
     side: 'bottom'
     trigger: 'hover'
-
-
-#  $('#tooltip_templates').detach()
-
-# wbnp report status on complaints header
-#  $('.wbnp-link').tooltip({
-#    html: true
-#    placement: "bottom"
-#  })

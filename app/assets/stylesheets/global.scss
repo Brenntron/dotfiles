@@ -10412,44 +10412,79 @@ span.input-truncate {
 }
 
 
+// webcat > complaints area
+.complaint-mgt-top-area {
+  padding: 10px 15px;
+}
+
 // webcat > complaints metrics banner
 .complaints-metrics-banner {
   display: flex;
   align-items: center;
   h1 {
-    margin-bottom: 0;
+    margin-bottom: 2px;
+    margin-right: 10px;
   }
   span {
     display: inline-flex;
   }
-  .col-lg-3 {
-    width: 23%;
+  .top-info-icon {
+    margin: 0;
+    padding: 0;
+    vertical-align: text-bottom;
+    position: relative;
+    top: 2px;
   }
   .header-area {
-    display: inline-flex;
     padding: 0;
     border-right: solid 1px darken($content-bg-color, 5%);
     margin-right: 15px;
-    min-width: 170px;
-    max-width: 220px;
+    width: 220px;
   }
   .main-metrics {
+    width: 80%;
     padding-left: 5px;
     padding-right: 0;
+  }
+  .metrics-col {
+    padding: 4px;
+    max-width: 380px;
+  }
+  .metric-header {
+    text-transform: uppercase;
+    padding-left: 0;
+    padding-right: 5px;
+    font-weight: 700;
+  }
+  .metric-number {
+    padding-left: 0;
+    padding-right: 4px;
+    font-weight: 700;
+  }
+  .metric-label {
+    padding-left: 0;
+    position: relative;
+    right: 2px;
+  }
+  .metric-overdue {
+    padding-left: 0;
+    color: $warning-accent-color;
+    border-right: solid 1px lighten($bug-accent-color, 20%);
+    margin-right: 10px;
+    padding-right: 10px;
+  }
+  .metrics-col:first-of-type {
+    padding-left: 10px;
+  }
+  .metric-overdue:last-of-type {
+    border-right: none;
   }
   .wbnp-area {
     text-align: right;
     padding-left: 0;
-    padding-right: 0;
+    padding-right: 15px;
     position: absolute;
-    right: 5px;
-    top: 4px;
-    width: 11vw;
-  }
-  .metric-assigned {
-    margin-left: 10px;
-    padding-left: 10px;
-    border-left: solid 1px lighten($bug-accent-color, 20%);
+    right: 25px;
   }
   .wbnp-report-status {
     display: inline-flex;
@@ -10460,55 +10495,70 @@ span.input-truncate {
     color: $content-bg-color;
     cursor: default;
   }
-  .metric-header {
-    text-transform: uppercase;
-    padding-left: 5px;
-    padding-right: 8px;
-    font-weight: 700;
-  }
-  .icon-queue {
-    padding: 0;
-  }
-  .metrics-col {
-    padding: 4px;
-    span {
-      font-weight: normal;
-    }
-    span.metric-number {
-      padding-left: 0;
-      padding-right: 4px;
-      font-weight: 700;
-    }
+  .wbnp-header-label {
+    width: 180px;
   }
   .top-area-bar {
     display: inline;
     padding: 6px 15px;
   }
-  .metric-overdue {
-    padding-left: 5px;
-    color: $warning-accent-color;
-  }
 }
+
 
 // SHORT WIDTHS, minor tweaks
-@media screen and (max-width: 1950px) {
-  .icon-queue.top-info-icon {
-    display: none;
-  }
-  .wbnp-area .metric-header {
-    width: 180px;
-    display: inline-block;
-  }
-  .complaints-metrics-banner .metric-assigned {
-    border: none;
-    margin: 0;
-    padding: 6px 5px 0 6px;
-    display: block;
+@media screen and (max-width: 1850px) {
+  .complaints-metrics-banner {
+    .metric-overdue {
+      border: none;
+    }
+    .metric-assigned {
+       margin: 0;
+       padding: 6px 5px 0 0;
+       display: block;
+     }
+    .header-area {
+      width: 180px;
+    }
+    .metrics-col {
+      max-width: 280px;
+    }
+    .icon-queue.top-info-icon {
+      display: none;
+    }
+    .wbnp-area .metric-header {
+      width: 180px;
+      display: inline-block;
+    }
   }
 }
 
-// refactor this up when time
-.wbnp-table {
+// SHORTER WIDTHS, minor tweaks
+@media screen and (max-width: 1600px) {
+  .complaint-mgt-top-area {
+    padding: 6px 15px;
+  }
+  .complaints-metrics-banner {
+    .metrics-col {
+      max-width: 200px;
+    }
+    .metric-overdue {
+      padding-top: 2px;
+    }
+  }
+}
+
+// TINY WIDTHS
+@media screen and (max-width: 1200px) {
+  #nav-banner a.nav-username {
+    display: none;
+  }
+  .complaints-metrics-banner .wbnp-area {
+    position: relative;
+  }
+}
+
+// webcat > this is the tooltip table for wbrs status
+#tooltip-wbnp-content {
   width: 180px !important;
   tr td {
     padding: 0;
@@ -10530,11 +10580,7 @@ span.input-truncate {
   border-left: solid 1px lighten($content-tab-color, 40%);;
 }
 
-.complaint-mgt-top-area {
-  padding: 5px 15px;
-}
-
-#tooltip_templates {
+#tooltip-wbnp {
   display: none;
 }
 

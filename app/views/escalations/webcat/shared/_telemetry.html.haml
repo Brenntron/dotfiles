@@ -1,34 +1,33 @@
 .row.complaints-metrics-banner
-  .col-xs-2.header-area
+  // left column
+  .header-area
     .top-area-bar
       %h1= content_for :webcat_page
       %span.top-info-icon{class: "#{content_for :webcat_icon}"}
 
-  .col-xs-10.main-metrics
+  // middle column
+  .main-metrics
     .row
-      .col-lg-3.metrics-col
-        %span.margin-left.first-first
-          .metric-header TALOS:
-          %span.metric-number
-            =@ti_new_count
-          New
+      .col-sm-3.metrics-col
+        %span.metric-header TALOS:
+        %span.metric-number
+          =@ti_new_count
+        %span.metric-label New
         %span.metric-overdue
           (
           %span.metric-number
             =@ti_overdue_count
           Overdue)
-
         %span.metric-assigned
           %span.metric-number
             =@ti_assigned_count
           Assigned
 
-      .col-lg-3.metrics-col
-        %span
-          .metric-header WBNP:
-          %span.metric-number
-            =@wbnp_new_count
-          New
+      .col-sm-3.metrics-col
+        %span.metric-header WBNP:
+        %span.metric-number
+          =@wbnp_new_count
+        %span.metric-label New
         %span.metric-overdue
           (
           %span.metric-number
@@ -39,12 +38,11 @@
             =@wbnp_assigned_count
           Assigned
 
-      .col-lg-3.metrics-col
-        %span
-          .metric-header INTERNAL:
-          %span.metric-number
-            =@int_new_count
-          New
+      .col-sm-3.metrics-col
+        %span.metric-header INTERNAL:
+        %span.metric-number
+          =@int_new_count
+        %span.metric-label New
         %span.metric-overdue
           (
           %span.metric-number
@@ -55,27 +53,26 @@
             =@int_assigned_count
           Assigned
 
-      .col-lg-2.metrics-col
-        %span
-          .metric-header PENDING:
-          %span.metric-number
-            =@pending_new_count
+      .col-sm-3.metrics-col
+        %span.metric-header PENDING:
+        %span.metric-number
+          =@pending_new_count
         %span.metric-overdue
           (
           %span.metric-number
             =@pending_overdue_count
           Overdue)
 
+  // right column
+  %span.wbnp-area
+    .metric-header.wbnp-header-label
+      WBNP Report Status:
+    %a#wbnp-report-status-link.tooltipstered.esc-tooltipped{'data-tooltip-content':'#tooltip-wbnp-content'}
+      .wbnp-report-status
 
-      %span.wbnp-area
-        .metric-header
-          WBNP Report Status:
-        %a#wbnp-report-status-link.tooltipstered.esc-tooltipped{'data-tooltip-content':'#tooltip_content'}
-          .wbnp-report-status
 
-
-#tooltip_templates
-  %table.wbnp-table#tooltip_content
+#tooltip-wbnp
+  %table#tooltip-wbnp-content
     %tr
       %td Total Attempted
       %td
