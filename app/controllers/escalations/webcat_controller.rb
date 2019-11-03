@@ -20,22 +20,19 @@ class Escalations::WebcatController < ApplicationController
     @overdue_comp = Complaint.overdue_count
 
     @ti_new_count = Complaint.ti_new_count
-    @wbnp_new_count = Complaint.wbnp_new_count
-    @int_new_count = Complaint.int_new_count
-
     @ti_overdue_count = Complaint.ti_overdue_count
-    @wbnp_overdue_count = Complaint.wbnp_overdue_count
-    @int_overdue_count = Complaint.int_overdue_count
+    @ti_assigned_count = ComplaintEntry.where(complaint_id: Complaint.from_ti).where(status:"ASSIGNED").count
 
-    @ti_assigned_count = ComplaintEntry.where(complaint_id: Complaint.from_ti.open_comps).where(status:"ASSIGNED").count
-    @wbnp_assigned_count = ComplaintEntry.where(complaint_id: Complaint.from_wbnp.open_comps).where(status:"ASSIGNED").count
-    @int_assigned_count = ComplaintEntry.where(complaint_id: Complaint.from_int.open_comps).where(status:"ASSIGNED").count
+    @wbnp_new_count = Complaint.wbnp_new_count
+    @wbnp_overdue_count = Complaint.wbnp_overdue_count
+    @wbnp_assigned_count = ComplaintEntry.where(complaint_id: Complaint.from_wbnp).where(status:"ASSIGNED").count
+
+    @int_new_count = Complaint.int_new_count
+    @int_overdue_count = Complaint.int_overdue_count
+    @int_assigned_count = ComplaintEntry.where(complaint_id: Complaint.from_int).where(status:"ASSIGNED").count
 
     @pending_new_count = ComplaintEntry.where(status:"PENDING").count
-    @pending_overdue_count = ComplaintEntry.where(status:"PENDING").where("created_at < ?",Time.now - 24.hours).count
-
-    # below is probably not needed, delete if so
-    @ti_total_comp = @ti_comp_cust + @ti_comp_guest
+    @pending_overdue_count = ComplaintEntry.where(status:"PENDING").overdue_count
 
   end
 end
