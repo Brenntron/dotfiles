@@ -10389,8 +10389,14 @@ span.input-truncate {
 // top row of each
 .research-first-row {
   margin-top: 120px;
-  td:nth-child(2) {
-    width: 20px;
+  td:nth-child(1), td:nth-child(2) {
+    width: 20px;  // icons
+  }
+  td:nth-child(3) {
+    width: 50%;  // category
+  }
+  td:nth-child(4) {
+    width: 25%;  // hostname
   }
   span.entry-data-content {
     display: inline-block;
@@ -10406,9 +10412,15 @@ span.input-truncate {
     word-break: break-word;
     padding-right: 10px;
   }
-  td:nth-child(7) {  width: 150px; }
-  td:nth-child(8) {  width: 60px; }  // xbrs history
-  td:nth-child(9) {  width: 140px; }
+  td:nth-child(7) {
+    width: 150px;
+  }
+  td:nth-child(8) {
+    width: 60px;   // xbrs history
+  }
+  td:nth-child(9) {
+    width: 140px;
+  }
   td:nth-child(10) {
     width: 110px;  // reptool class
     word-break: break-word;
