@@ -515,3 +515,32 @@ Feature: Webcat complaints
     And I wait for "5" seconds
     Then I should see "COMPLETED"
     And "1" bridge message should be in the delayed job queue
+
+  @javascript
+  Scenario: ensure streamlined banner with metrics appears correctly at top of webcat complaints
+    Given a user with role "webcat user" exists and is logged in
+    And the following complaints exist:
+      | ticket_source             | id | status |
+      | talos-intelligence        | 1  | NEW    |
+    And the following complaint entries exist:
+      | uri             | domain        | subdomain | path | entry_type | complaint_id |
+      | whatever.com    | whatever.com  |           |      | URI/DOMAIN |  1           |
+    And I goto "/escalations/webcat/complaints"
+    And I wait for "2" seconds
+    Then I should see "Overdue"
+    Then I should see "Assigned"
+
+  @javascript
+  Scenario: ensure full banner with metrics appears correctly on webcat reports page
+    Given a user with role "webcat user" exists and is logged in
+    And the following complaints exist:
+      | ticket_source | id | status |
+      | RuleUI        | 1  | NEW    |
+    And the following complaint entries exist:
+      | uri             | domain        | subdomain | path | entry_type | complaint_id |
+      | whatever.com    | whatever.com  |           |      | URI/DOMAIN |  1           |
+    And I goto "/escalations/webcat/reports"
+    And I wait for "2" seconds
+    Then I should see "Submitter Type"
+    Then I should see "WBNP Reports"
+

@@ -576,6 +576,10 @@ $ ->
     $('.complaints-metrics-banner').addClass('hidden')
     $('.webcat-reports-only').removeClass('hidden')
 
+  # webcat > complaints show page, ensure this JS gets called
+  if location.href.includes('webcat/complaints') && $('body').addClass('show-action')
+    check_wbnp_status()
+
   # wbnp report status link shows a tooltip table
   $('.complaints-mgt-area #wbnp-report-status-link').tooltipster
     theme: [
