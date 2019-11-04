@@ -243,8 +243,13 @@
                     - else
                       %span.entry-data.entry-data-content
                         = entry.hostlookup
+                  -#    if entry = uri and there are no resolved ips
+                      %input.table-entry-input.wide{type:'text', value: "#{entry.hostlookup}"}
 
-                    %input.table-entry-input.wide{type:'text', value: "#{entry.hostlookup}"}
+                  %td.single-button-col.no-padding
+                    %button.add-ip-button.inline-button
+
+
                   %td
                     %label Category
                     - unless entry[:primary_category].nil?
@@ -517,7 +522,7 @@
                 %tr.research-overview-row
                   %td
                     -#Expander area
-                  %td.research-table-details-wrapper{colspan: '8'}
+                  %td.research-table-details-wrapper{colspan: '9'}
                     %table
                       %tr
                         %td.input-col
@@ -662,11 +667,11 @@
                     -#Expander area
                   %td.input-col.ip-label-col{rowspan: '2'}
                     -# IP label
-                  %td{colspan: '5'}
-                    Ips go here
-                  %td.text-right.no-padding-right{colspan:'2'}
-                    %button.edit-button.inline-edit-full-button
-                      Edit IPs
+                  %td.dual-edit-field{colspan: '7', 'data-id': entry.id, 'data-field': 'host'}
+                    %span.entry-data.entry-resolved-ip-content
+                      -# if ip/s are already associated with url, display here
+                      Ips go here
+                    %input.table-entry-input.wide{type:'text', value: "Ip goes here"}
 
                 %tr.research-uri-ip-data-row
                   %td.research-table-details-wrapper{colspan: '8'}
@@ -713,6 +718,7 @@
                           .entry-details-table.wbrs-details-table{'data-entry-id': "#{entry.id}"}
                             %h5.entry-details-table-header WBRS Rule Hit Details
                             - if entry.dispute_rule_hits.select {|rulehit| rulehit.rule_type == "WBRS"}.empty?
+                              -# if entry gets no results AND uri entry + ip also gets no results
                               %table
                                 %thead
                                   %tr
@@ -723,16 +729,26 @@
                               %table
                                 %thead
                                   %tr
+                                    %th
+                                    -#  Placeholder col for if a rule hit is from querying uri + ip
                                     %th Rule
                                     %th Rule Description
                                     %th Weight
                                 %tbody
                                   - entry.dispute_rule_hits.select {|rulehit| rulehit.rule_type == "WBRS"}.each do |wbrs_hit|
                                     %tr
+                                      %td
                                       %td= wbrs_hit.name
                                       %td= wbrs_hit.mnemonic
                                       %td
                                         -#Put weight of rule here
+                                  -# if any wbrs rulehits are returned from querying uri + ip each do
+                                  -#  %tr
+                                  -#    %td.uri-plus-ip-rule-indicator
+                                  -#    %td= wbrs_hit.name
+                                  -#    %td= wbrs_hit.mnemonic
+                                  -#    %td
+
                           .entry-details-table.sbrs-details-table{'data-entry-id': "#{entry.id}"}
                             %h5.entry-details-table-header SBRS Rule Hit Details
                             - if entry.dispute_rule_hits.select {|rulehit| rulehit.rule_type == "SBRS"}.empty?

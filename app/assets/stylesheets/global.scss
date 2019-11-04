@@ -10412,21 +10412,24 @@ span.input-truncate {
   vertical-align: middle;
 }
 
-.inline-edit-full-button {
-  background-image: url(image_path('icon_edit_white.svg'));
-  background-color: darken($nav-toolbar-color, 10%);
-  color: $content-bg-color;
-  height: 20px;
-  background-size: 16px 16px;
-  border-radius: 2px;
-  border: none;
-  background-repeat: no-repeat;
-  margin: 0 3px;
-  display: inline-block;
-  padding-left: 22px;
-  background-position: 2px center;
-}
-
 .no-padding-right {
   padding-right: 0 !important;
+}
+
+.uri-plus-ip-rule-indicator {
+  background-image: url(image_path('icon_plus_ip_blue.svg'));
+  background-repeat: no-repeat;
+  background-position: 6px 4px;
+  width: 24px;
+  background-size: 18px 18px;
+}
+
+.add-ip-button {
+  background-image: url(image_path('icon_plus_ip_white.svg'));
+  width: 20px !important;
+  height: 20px !important;
+}
+
+table > tbody > tr > td.no-padding {
+  padding: 0 !important;
 }
