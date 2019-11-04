@@ -10,11 +10,11 @@ $ ->
     if !$(dropdown).is('a')
       $('#research-page-toolbar .ips_urls').addClass('hidden')
       $('#research-page-toolbar .ips_urls_div').removeClass('hidden')
-
-  $(document).on 'click','#rep-research', ->
-    console.log 'in bitch'
-    debugger
+  window.submit_research_query = () ->
+    console.log 'ininin'
     $('.ajax-message-div').css('display', 'flex')
+  $(document).on 'click','#rep-research', ->
+    submit_research_query()
 
   window.submit_new_dispute = (submit_btn) ->
     $('.ajax-message-div').css('display', 'flex')
@@ -57,9 +57,12 @@ $ ->
               reset_form(form)
               std_msg_error("Duplicate",["#{message_html} <p class='ugh'>The following duplicate entries were not processed</p> <div class='dupe_list'>#{errors.join(', ')}</div> "], reload: true)
           else
+            ips_list = ''
+            for ips in ips_urls
+              ips_list += '<span>' + ips + '</span>'
               message_html =
-                "<p class='ugh'>The following entries referenced are on ticket number " + ticket_num + "</p>" +
-                "<p class='dupe_list'>" + ips_urls.join(', ') + "</p>"
+                "<p>The following entries referenced are on ticket number " + ticket_num + "</p>" +
+                "<p class='dupe_list'>" + ips_list + "</p>"
               reset_form(form)
               std_msg_success('All entries were successfully created.', [message_html], reload: true)
 

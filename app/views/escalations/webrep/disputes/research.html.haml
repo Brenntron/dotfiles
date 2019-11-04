@@ -22,7 +22,7 @@
             = search_form.radio_button(:scope, 'broad', id: 'research-search-broad', checked: !params['search'] || params['search']['scope'].eql?("broad"))
             %label.esc-tooltipped{title: 'Broad Search returns all records matching the URL pattern.', for: 'research-search-broad'} Broad Search
             %hr.thin
-            =search_form.submit(:Submit, id: 'submit-button rep-research', class: 'button_primary', onclick:"submit-research-query")
+            =search_form.submit(:Submit, id: 'submit-button rep-research', class: 'button_primary', onclick:"submit_research_query()")
           .col-xs-8.col-sm-9.col-md-10.col-lg-10.col-xl-11
             = search_form.text_area(:uri, class: 'search-box', placeholder: 'URI or IP Address', autofocus: 'true')
         .search-options-col.tab-pane#lookup-quick{role:'tabpanel'}

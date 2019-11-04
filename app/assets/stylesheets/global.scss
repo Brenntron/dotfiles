@@ -1332,6 +1332,9 @@ thead th.sorting.center {
   width: 90%;
   padding: 5px 10px;
   margin: 1px auto;
+  span{
+    display: block;
+  }
 }
 #modal-login-form {
   margin-top: 20px;

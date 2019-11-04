@@ -594,7 +594,6 @@ window.determine_checked = (box_names) ->
   box_flag = ($('.'+box_names+':checked').length > 0)
   unless box_flag
     alert('check something first')
-  console.log 'returning: ' + box_flag
   return box_flag
 
 
