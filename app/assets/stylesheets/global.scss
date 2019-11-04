@@ -10393,10 +10393,10 @@ span.input-truncate {
     width: 20px;  // icons
   }
   td:nth-child(3) {
-    width: 50%;  // category
+    width: 55%;  // category
   }
   td:nth-child(4) {
-    width: 25%;  // hostname
+    width: 20%;  // hostname
   }
   span.entry-data-content {
     display: inline-block;
@@ -10425,6 +10425,8 @@ span.input-truncate {
     width: 110px;  // reptool class
     word-break: break-word;
   }
-  td:nth-child(12) { width: 190px; }  // wl/bl lists + threat cats
+  td:nth-child(12) {
+    width: 190px;  // wl/bl lists + threat cats
+  }
 }
 
