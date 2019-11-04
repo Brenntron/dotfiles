@@ -10444,15 +10444,21 @@ span.input-truncate {
     max-height: 60px;
   }
   .main-metrics {
-    width: 80%;
+    width: 86%;
     padding-left: 5px;
     padding-right: 0;
   }
   .metrics-col {
-    padding: 4px;
+    padding: 4px 4px 4px 20px;
     max-width: 380px;
+    display: inline-block;
+    vertical-align: middle;
+  }
+  .wnbp-area {
+    display: inline-block;
   }
   .metric-header {
+    display: inline-block;
     text-transform: uppercase;
     padding-left: 0;
     padding-right: 5px;
@@ -10475,18 +10481,15 @@ span.input-truncate {
     margin-right: 10px;
     padding-right: 10px;
   }
-  .metrics-col:first-of-type {
-    padding-left: 10px;
-  }
   .metric-overdue:last-of-type {
     border-right: none;
   }
   .wbnp-area {
+    float: right;
     text-align: right;
     padding-left: 0;
     padding-right: 15px;
-    position: absolute;
-    right: 25px;
+    max-width: 220px;
   }
   .wbnp-report-status {
     display: inline-flex;
@@ -10496,9 +10499,6 @@ span.input-truncate {
     text-decoration-style: dotted;
     color: $content-bg-color;
     cursor: default;
-  }
-  .wbnp-header-label {
-    width: 190px;
   }
   .wbnp-loading-spinner {
     width: 20px;
@@ -10513,26 +10513,20 @@ span.input-truncate {
 
 @media screen and (max-width: 1950px) {
   .complaints-metrics-banner {
+    .main-metrics {
+      width: 99%;
+    }
     .header-area {
       display: none;
-    }
-    .main-metrics {
-      width: 90%;
-    }
-    .metrics-col:first-of-type {
-      padding-left: 30px;
     }
   }
 }
 
 // SHORT WIDTHS, minor tweaks
-@media screen and (max-width: 1501px) {
+@media screen and (max-width: 1551px) {
   .complaints-metrics-banner {
     .metric-overdue {
       border: none;
-    }
-    .main-metrics {
-      width: 100%;
     }
     .metric-assigned {
        margin: 0;
@@ -10540,23 +10534,23 @@ span.input-truncate {
        display: block;
      }
     .metrics-col:first-of-type {
-      max-width: 280px;
+      max-width: 290px;
     }
     .wbnp-area .metric-header {
-      width: 180px;
       display: inline-block;
+      vertical-align: middle;
     }
   }
 }
 
 // SHORTER WIDTHS, minor tweaks
-@media screen and (max-width: 1500px) {
+@media screen and (max-width: 1550px) {
   .complaint-mgt-top-area {
     padding: 6px 15px;
   }
   .complaints-metrics-banner {
     .metrics-col {
-      max-width: 200px;
+      max-width: 290px;
     }
     .metric-overdue {
       padding-top: 2px;
