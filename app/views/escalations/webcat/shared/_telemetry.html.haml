@@ -54,10 +54,10 @@
   // right column
   %span.wbnp-area
     .metric-header.wbnp-header-label
+      %span.wbnp-loading-spinner.sync-button-white.sync_rotate
       WBNP Report Status:
     %a#wbnp-report-status-link.tooltipstered.esc-tooltipped{'data-tooltip-content':'#tooltip-wbnp-content'}
-      .wbnp-report-status
-      %span.wbnp-loading-spinner.sync-button-white.sync_rotate
+      .wbnp-report-status Checking...
 
 
 #tooltip-wbnp
@@ -74,4 +74,82 @@
       %td Number Rejected
       %td
         #wbnp-report-rejected
+
+
+
+
+-# below gets shown on webcat/reports page
+.row.webcat-reports-only.hidden
+  .col-xs-2.header-area
+    %h1= content_for :webcat_page
+    %span.top-info-icon{class: "#{content_for :webcat_icon}"}
+  .col-xs-2
+    %table.tickets-totals-table.table-condensed
+      %tr
+        %th{colspan: '2'}
+          %span.ticket-type-label Submitter Type
+      %tr
+        %td Customer
+        %td=@ti_comp_cust
+      %tr
+        %td Guest
+        %td=@ti_comp_guest
+      %tr
+        %td Internal
+        %td=@int_comp_entries
+      %tr
+        %td WBNP
+        %td=@wbnp
+  .col-xs-2
+    %table.tickets-totals-table.table-condensed
+      %tr
+        %th{colspan: '2'}
+          %span.ticket-type-label Entries
+      %tr
+        %td Assigned
+        %td=@assigned
+      %tr
+        %td Pending
+        %td=@pending
+      %tr
+        %td New
+        %td=@new
+      %tr
+        %td Overdue
+        %td=@overdue
+  .col-xs-2
+    %table.tickets-totals-table.table-condensed
+      %tr
+        %th
+          %span.ticket-type-label Complaints
+      %tr
+        %td New
+        %td=@new_comp
+      %tr
+        %td Active
+        %td=@active_comp
+      %tr
+        %td Overdue
+        %td=@overdue_comp
+
+      %tr
+        %td Completed
+        %td=@completed_comp
+  .col-xs-2
+    %table.tickets-totals-table.table-condensed
+      %tr
+        %th{colspan: '2'}
+          %span.ticket-type-label WBNP Reports
+      %tr
+        %td Status
+        %td.wbnp-report-status
+      %tr
+        %td Total Attempted
+        %td#wbnp-report-attempted
+      %tr
+        %td Number Succeeded
+        %td#wbnp-report-succeeded
+      %tr
+        %td Number Rejected
+        %td#wbnp-report-rejected
 

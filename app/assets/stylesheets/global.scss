@@ -5086,6 +5086,7 @@ input.table-entry-input:focus {
   padding-bottom: 20px;
 }
 
+// this is the legacy "dashboard" for the webcat metrics, it is shown on /reports page
 #top_bar_extended_info {
   background-color: $content-tab-color;
   margin-top: 20px;
@@ -5093,7 +5094,6 @@ input.table-entry-input:focus {
   margin-bottom: -21px;
   border-radius: 0 0 4px 4px;
   padding-bottom: 30px;
-  display: none;
 }
 
 #top_bar_extended_info h3 {
@@ -10498,38 +10498,49 @@ span.input-truncate {
     cursor: default;
   }
   .wbnp-header-label {
-    width: 180px;
+    width: 190px;
   }
   .wbnp-loading-spinner {
-    width: 10px;
-    height: 10px;
-    float: right;
+    width: 20px;
+    height: 20px;
+    margin-top: -5px;
     margin-right: 5px;
+    margin-left: 5px;
     display: inline-block;
     background-repeat: no-repeat;
   }
 }
 
+@media screen and (max-width: 1950px) {
+  .complaints-metrics-banner {
+    .header-area {
+      display: none;
+    }
+    .main-metrics {
+      width: 90%;
+    }
+    .metrics-col:first-of-type {
+      padding-left: 30px;
+    }
+  }
+}
 
 // SHORT WIDTHS, minor tweaks
-@media screen and (max-width: 1850px) {
+@media screen and (max-width: 1501px) {
   .complaints-metrics-banner {
     .metric-overdue {
       border: none;
+    }
+    .main-metrics {
+      width: 100%;
     }
     .metric-assigned {
        margin: 0;
        padding: 6px 5px 0 0;
        display: block;
      }
-    .header-area {
-      width: 190px;
-    }
-    .metrics-col {
+    .metrics-col:first-of-type {
       max-width: 280px;
-    }
-    .top-info-icon {
-      display: none;
     }
     .wbnp-area .metric-header {
       width: 180px;
@@ -10539,7 +10550,7 @@ span.input-truncate {
 }
 
 // SHORTER WIDTHS, minor tweaks
-@media screen and (max-width: 1600px) {
+@media screen and (max-width: 1500px) {
   .complaint-mgt-top-area {
     padding: 6px 15px;
   }
@@ -10605,4 +10616,19 @@ span.input-truncate {
 // ensure text doesn't break/wrap in data table
 .ticket-age-over12hr {
   white-space: nowrap;
+}
+
+.webcat-reports-only {
+  .table-condensed > tbody > tr > td {
+    padding: 3px 4px !important; // need override
+  }
+  .top-info-icon {
+    margin-right: 0;
+    padding-right: 10px;
+  }
+  .header-area {
+    border-right: solid 1px $content-bg-color;
+    height: 95px;
+    max-width: 220px;
+  }
 }

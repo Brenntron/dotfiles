@@ -570,12 +570,14 @@ $('#exampleModal').on 'shown.bs.modal', ->
 
 
 $ ->
-  # complaint show page
-  if location.href.includes('webcat/complaints') && $('body').hasClass('show-action')
-    $('.wbnp-area').hide()
+  # webcat reports page needs full metrics banner
+  if location.href.includes('webcat/reports')
+    $('#tooltip-wbnp').empty()
+    $('.complaints-metrics-banner').addClass('hidden')
+    $('.webcat-reports-only').removeClass('hidden')
 
-  # wbnp report status link shows a table
-  $('#wbnp-report-status-link').tooltipster
+  # wbnp report status link shows a tooltip table
+  $('.complaints-mgt-area #wbnp-report-status-link').tooltipster
     theme: [
       'tooltipster-borderless'
       'tooltipster-borderless-customized'
