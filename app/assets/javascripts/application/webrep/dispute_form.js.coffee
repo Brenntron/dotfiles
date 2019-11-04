@@ -10,15 +10,15 @@ $ ->
     if !$(dropdown).is('a')
       $('#research-page-toolbar .ips_urls').addClass('hidden')
       $('#research-page-toolbar .ips_urls_div').removeClass('hidden')
+
   window.submit_research_query = () ->
-    console.log 'ininin'
+    $('.ajax-message-div').css( 'margin-top',' -33px')
     $('.ajax-message-div').css('display', 'flex')
-  $(document).on 'click','#rep-research', ->
-    submit_research_query()
-    debugger
 
   window.submit_new_dispute = (submit_btn) ->
+    $('.ajax-message-div').css( 'margin-top',' -33px')
     $('.ajax-message-div').css('display', 'flex')
+
     data = {}
     form = $(submit_btn).closest('form')
     form_values = form.serializeArray()
