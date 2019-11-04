@@ -655,6 +655,56 @@
                           %label Last Submitted
                         %td#last-submitted
                           = entry.last_submitted
+
+                -# If entry is uri
+                %tr.research-uri-ip-query-row
+                  %td{rowspan: '2'}
+                    -#Expander area
+                  %td.input-col.ip-label-col{rowspan: '2'}
+                    -# IP label
+                  %td{colspan: '5'}
+                    Ips go here
+                  %td.text-right.no-padding-right{colspan:'2'}
+                    %button.edit-button.inline-edit-full-button
+                      Edit IPs
+
+                %tr.research-uri-ip-data-row
+                  %td.research-table-details-wrapper{colspan: '8'}
+                    %table
+                      %tr.single-details-row
+                        %td
+                          %label WBRS
+                        %td.text-center.no-border
+                          -#  if entry + ip has wbrs score show here
+                          -#  else
+                          -#    %span.missing-data
+                          -#      No score.
+                        %td
+                          %label WBRS Rule Hits
+                        %td.text-center
+                          -#  if entry + ip has wbrs rules show count here
+                          -#  else
+                          -#  0
+                        %td
+                          %label WBRS Rules
+                        %td
+                          -#  if entry + ip has wbrs rules show here
+                          -#  else
+                          -#  %span.missing-data
+                          -#    No rules.
+                        %td
+                          %label Category
+                        %td
+                          -#  if entry + ip has category show here
+                          -#  else
+                          -#  %span.missing-data
+                          -#    Missing Data
+                        %td
+                          %label URI
+                        %td
+                          -#  if entry + ip has url proxy thing show here
+
+
                 %tr.nested-data-row{'data-entry-id': "#{entry.id}"}
                   %td.expanded-row{colspan: '9'}
                     .expanded-row-data-wrapper

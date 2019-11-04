@@ -5213,8 +5213,16 @@ input.table-entry-input:focus {
   padding: 6px;
 }
 
+.research-table-row-wrapper table > tbody > tr > td {
+  border: none;
+}
+
 .research-table-details-wrapper table tr:first-of-type td {
-  border-bottom: 1px solid $content-bg-color;
+  border-bottom: 1px solid $content-bg-color !important;
+}
+
+.research-table-details-wrapper table tr:first-of-type.single-details-row td {
+  border-bottom: none !important;
 }
 
 .input-col {
@@ -5235,6 +5243,10 @@ td.left-bordered {
   width: 28px;
   height: 28px;
   margin-right: 6px;
+}
+
+table > tbody > tr > td.research-table-row-wrapper {
+  border-bottom: 1px solid #CCCCCC !important;
 }
 
 .research-overview-row td:first-of-type, .research-table-details-wrapper, .research-table-row-wrapper {
@@ -10382,4 +10394,39 @@ span.input-truncate {
 
 .owner-col {
   min-width: 80px;
+}
+
+.ip-label-col {
+  width: 28px;
+  background-color: #CCCCCC;
+  background-repeat: no-repeat;
+  background-image: url(image_path('icon_plus_ip_grey.svg'));
+  background-size: 20px 20px;
+  background-position: center 5px;
+  border-right: 1px solid $content-bg-color !important;
+  border-top: 1px solid $content-bg-color !important;
+}
+
+.single-details-row td {
+  height: 29px;
+  vertical-align: middle;
+}
+
+.inline-edit-full-button {
+  background-image: url(image_path('icon_edit_white.svg'));
+  background-color: darken($nav-toolbar-color, 10%);
+  color: $content-bg-color;
+  height: 20px;
+  background-size: 16px 16px;
+  border-radius: 2px;
+  border: none;
+  background-repeat: no-repeat;
+  margin: 0 3px;
+  display: inline-block;
+  padding-left: 22px;
+  background-position: 2px center;
+}
+
+.no-padding-right {
+  padding-right: 0 !important;
 }
