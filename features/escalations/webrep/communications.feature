@@ -295,6 +295,8 @@ Feature: Webrep communications
 
   @javascript
   Scenario: a user attaches a file to an email and sends it
+    Then pending
+    # we need to figure out how selenium can interact with the file selector
     Given a user with role "webrep user" exists and is logged in
     And the following disputes exist and have entries:
     |id     |
