@@ -11,6 +11,10 @@ $ ->
       $('#research-page-toolbar .ips_urls').addClass('hidden')
       $('#research-page-toolbar .ips_urls_div').removeClass('hidden')
 
+  $(document).on 'click','#rep-research', ->
+    console.log 'in bitch'
+    debugger
+    $('.ajax-message-div').css('display', 'flex')
 
   window.submit_new_dispute = (submit_btn) ->
     $('.ajax-message-div').css('display', 'flex')

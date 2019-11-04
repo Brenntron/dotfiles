@@ -62,7 +62,7 @@ $ ->
     $('#disputes-research-table .dispute_check_box:checked').each ->
       tr = $( this ).closest('tr')
       url = $(tr).find('.entry-data-content').text().trim()
-      html_val += '<div>' + url+ '</div>'
+      html_val += '<div class="uneditable_urls">' + url+ '</div>'
       if new_val != ''
         new_val += '&#10' + url
       else

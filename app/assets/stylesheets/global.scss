@@ -1329,10 +1329,6 @@ thead th.sorting.center {
   line-height: normal;
 }
 .dupe_list, .url_ip_list {
-  font-style: oblique;
-  background-color:$faint-neutral-color;
-  max-height: 200px;
-  overflow-y: scroll;
   width: 90%;
   padding: 5px 10px;
   margin: 1px auto;
@@ -7159,7 +7155,12 @@ table.dispute-entry-table tbody tr.selected {
   padding: 4px 8px;
   line-height: 1.25em;
 }
-
+.uneditable_urls{
+  font-size: 8pt;
+  padding: 0!important;
+  margin: 0!important;
+  line-height: .9rem;
+}
 .searched-for-url {
   color: $bug-section-color;
 }
@@ -8391,6 +8392,7 @@ td.text-center span {
   .loader-msg {
     display: inline-block;
     line-height: 3.5;
+    font-style: oblique;
   }
 }
 
