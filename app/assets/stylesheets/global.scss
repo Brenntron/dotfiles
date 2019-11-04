@@ -1022,7 +1022,6 @@ thead th.sorting.center {
   font-weight: 400;
   padding-left: 8px;
   line-height: 1em;
-  white-space: nowrap;
 }
 
 .toolbar span.dropdown {
@@ -5580,7 +5579,7 @@ h5.entry-details-table-header {
   & {
     display: none;
     width: 90%;
-    margin-top:-45px;
+    position: absolute;
     justify-content: center;
     align-items: center;
   }
@@ -5946,6 +5945,7 @@ td.data-table-emph {
   .form-group{
     padding:0 10px!important;
     background: $content-bg-color
+
   }
   .form-group{
     padding:0 10px!important;

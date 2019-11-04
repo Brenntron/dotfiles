@@ -12,13 +12,15 @@ $ ->
       $('#research-page-toolbar .ips_urls_div').removeClass('hidden')
 
   window.submit_research_query = () ->
-    $('.ajax-message-div').css( 'margin-top',' -33px')
-    $('.ajax-message-div').css('display', 'flex')
+    if location.hash == "#lookup-quick"
+      top = '139px';
+    else
+      top = '-33px'
+      $('.ajax-message-div').css('display', 'flex')
+    $('.ajax-message-div').css( 'top', top)
 
   window.submit_new_dispute = (submit_btn) ->
-    $('.ajax-message-div').css( 'margin-top',' -33px')
-    $('.ajax-message-div').css('display', 'flex')
-
+    submit_research_query()
     data = {}
     form = $(submit_btn).closest('form')
     form_values = form.serializeArray()
