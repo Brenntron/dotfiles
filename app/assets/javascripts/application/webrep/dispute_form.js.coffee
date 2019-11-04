@@ -15,6 +15,7 @@ $ ->
     $('.ajax-message-div').css('display', 'flex')
   $(document).on 'click','#rep-research', ->
     submit_research_query()
+    debugger
 
   window.submit_new_dispute = (submit_btn) ->
     $('.ajax-message-div').css('display', 'flex')
@@ -55,7 +56,7 @@ $ ->
                 "<p >The following entries referenced on ticket number " + ticket_num + "</p>" +
                 "<p class='dupe_list'>" + successful_entries.join(', ') + "</p>"
               reset_form(form)
-              std_msg_error("Duplicate",["#{message_html} <p class='ugh'>The following duplicate entries were not processed</p> <div class='dupe_list'>#{errors.join(', ')}</div> "], reload: true)
+              std_msg_error("Duplicate",["#{message_html} <p class='ugh'>The following duplicate entries were not processed</p> <div class='dupe_list'>#{errors.join(', ')}</div> "], reload: false)
           else
             ips_list = ''
             for ips in ips_urls
@@ -64,7 +65,7 @@ $ ->
                 "<p>The following entries referenced are on ticket number " + ticket_num + "</p>" +
                 "<p class='dupe_list'>" + ips_list + "</p>"
               reset_form(form)
-              std_msg_success('All entries were successfully created.', [message_html], reload: true)
+              std_msg_success('All entries were successfully created.', [message_html], reload: false)
 
 
         error: (response) ->

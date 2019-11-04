@@ -594,7 +594,7 @@ button {
   }
   .toolbar-select-wrapper{
     width: unset!important;
-    height: unset!important;
+    height: 27px;
   }
 }
 .toolbar input:focus, .toolbar select:focus {
@@ -1019,6 +1019,7 @@ thead th.sorting.center {
   font-weight: 400;
   padding-left: 8px;
   line-height: 1em;
+  white-space: nowrap;
 }
 
 .toolbar span.dropdown {
