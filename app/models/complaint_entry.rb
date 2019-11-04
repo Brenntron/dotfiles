@@ -373,16 +373,18 @@ class ComplaintEntry < ApplicationRecord
 
 
   def self.create_complaint_entry(complaint, ip_url, user = nil, status = NEW, categories = nil)
+    new_complaint_entry = ComplaintEntry.new
     begin
-      new_complaint_entry = ComplaintEntry.new
-      new_complaint_entry.complaint_id = complaint.id
-      new_complaint_entry.status = status
-
       wbrs_stuff = Sbrs::ManualSbrs.get_wbrs_data({:url => URI.escape(ip_url)})
       wbrs_score = wbrs_stuff["wbrs"]["score"]
       new_complaint_entry.wbrs_score = wbrs_score
-
-
+    rescue Exception => e
+      Rails.logger.info (" Couldnt contact SBRS. #{e}")
+      new_complaint_entry.wbrs_score = 0
+    end
+    begin
+      new_complaint_entry.complaint_id = complaint.id
+      new_complaint_entry.status = status
       if is_ip?(ip_url)
         ip_url.chomp!("/")
         ip_network = ip_url.scan(/(?:[0-9]{1,3}\.){3}[0-9]{1,3}/)[0]
