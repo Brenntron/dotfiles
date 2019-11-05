@@ -2199,8 +2199,8 @@ a.static-nav-item {
   line-height: 1.25em;
   margin-right: 6px;
   margin-bottom: 3px;
-  font-weight: 400;
-  text-transform: none;
+  font-weight: 400 !important;
+  text-transform: none !important;
 }
 
 .content-label-sm.content-label-fullwidth {
@@ -10428,6 +10428,30 @@ span.input-truncate {
   background-image: url(image_path('icon_plus_ip_white.svg'));
   width: 20px !important;
   height: 20px !important;
+  margin-bottom: -5px;
+  display: block;
+}
+
+.add-ip-dropdown {
+  top: 21px;
+  left: 4px;
+  border-radius: 0 4px 4px 4px;
+  textarea {
+    width: 100%;
+    border: 1px solid darken($faint-neutral-color, 5%);
+    min-height: 60px;
+    margin-bottom: 8px;
+  }
+  .inline-tool-content-wrapper {
+    padding-top: 12px;
+  }
+  .content-label-sm {
+    margin-bottom: 0;
+  }
+}
+
+.single-button-col .open button {
+  background-color: $primary-section-color;
 }
 
 table > tbody > tr > td.no-padding {

@@ -2029,3 +2029,14 @@ $ ->
         $(g_ew_rows).each ->
           unless $(this).hasClass('hidden')
             $(this).addClass('hidden')
+
+
+
+    window.add_host_ips = () ->
+      # If a uri / domain entry (or result in the case of BFRP) does not have any ips associated with it
+#      Get entry id
+#      insert IP row
+#      with new addition
+#      call sdsv3 with entry + ip query
+#      show results
+#      remove this button
