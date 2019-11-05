@@ -10,48 +10,48 @@
       .metrics-col
         %span.metric-header TALOS:
         .number-container
-          %span.metric-number= @ti_new_count
+          %span#ti-new-count.metric-number= @ti_new_count
           %span.metric-label New
           %span.metric-overdue
             (
-            %span.metric-number= @ti_overdue_count
+            %span#ti-overdue-count.metric-number= @ti_overdue_count
             Overdue)
           %span.metric-assigned
-            %span.metric-number= @ti_assigned_count
+            %span#ti-assigned-count.metric-number= @ti_assigned_count
             Assigned
 
       .metrics-col
         %span.metric-header WBNP:
         .number-container
-          %span.metric-number= @wbnp_new_count
+          %span#wbnp-new-count.metric-number= @wbnp_new_count
           %span.metric-label New
-          %span.metric-overdue
+          %span#wbnp-overdue-count.metric-overdue
             (
             %span.metric-number= @wbnp_overdue_count
             Overdue)
           %span.metric-assigned
-            %span.metric-number= @wbnp_assigned_count
+            %span#wbnp-assigned-count.metric-number= @wbnp_assigned_count
             Assigned
 
       .metrics-col
         %span.metric-header INTERNAL:
         .number-container
-          %span.metric-number= @int_new_count
+          %span#int-new-count.metric-number= @int_new_count
           %span.metric-label New
           %span.metric-overdue
             (
-            %span.metric-number= @int_overdue_count
+            %span#int-overdue-count.metric-number= @int_overdue_count
             Overdue)
           %span.metric-assigned
-            %span.metric-number= @int_assigned_count
+            %span#int-assigned-count.metric-number= @int_assigned_count
             Assigned
 
       .metrics-col
         %span.metric-header PENDING:
-        %span.metric-number= @pending_new_count
+        %span#pending-new-count.metric-number= @pending_new_count
         %span.metric-overdue
           (
-          %span.metric-number= @pending_overdue_count
+          %span#pending-overdue-count.metric-number= @pending_overdue_count
           Overdue)
 
       // right column
@@ -115,7 +115,7 @@
         %td Pending
         %td=@pending
       %tr
-        %td New
+        %td#report-new-count New
         %td=@new
       %tr
         %td Overdue

@@ -517,44 +517,14 @@ Feature: Webcat complaints
     And "1" bridge message should be in the delayed job queue
 
   @javascript
-  Scenario: ensure streamlined banner with metrics appears correctly at top of webcat complaints
+  Scenario: a user clicks the "Pin Toolbar" button and sees the toolbar docked to the top navbar
     Given a user with role "webcat user" exists and is logged in
     And the following complaints exist:
       | ticket_source             | id | status |
       | talos-intelligence        | 1  | NEW    |
     And the following complaint entries exist:
-      | uri             | domain        | subdomain | path | entry_type | complaint_id |
-      | whatever.com    | whatever.com  |           |      | URI/DOMAIN |  1           |
-    And I goto "/escalations/webcat/complaints"
-    And I wait for "2" seconds
-    Then I should see "Overdue"
-    Then I should see "Assigned"
-
-  @javascript
-  Scenario: ensure full banner with metrics appears correctly on webcat reports page
-    Given a user with role "webcat user" exists and is logged in
-    And the following complaints exist:
-      | ticket_source | id | status |
-      | RuleUI        | 1  | NEW    |
-    And the following complaint entries exist:
-      | uri             | domain        | subdomain | path | entry_type | complaint_id |
-      | whatever.com    | whatever.com  |           |      | URI/DOMAIN |  1           |
-    And I goto "/escalations/webcat/reports"
-    And I wait for "2" seconds
-    Then I should see "Submitter Type"
-    Then I should see "WBNP Reports"
-
-
-
-  @javascript
-  Scenario: click the pin toolbar to top button, the button label toggles from pin to unpin
-    Given a user with role "webcat user" exists and is logged in
-    And the following complaints exist:
-      | ticket_source             | id | status |
-      | talos-intelligence        | 1  | NEW    |
-    And the following complaint entries exist:
-      | uri             | domain        | subdomain | path | entry_type | complaint_id |
-      | abc.com         | abc.com       |           |      | URI/DOMAIN |  1           |
+      | uri             | domain        | subdomain | path | entry_type | complaint_id | status |
+      | abc.com         | abc.com       |           |      | URI/DOMAIN |  1           | NEW    |
     And a complaint entry preload exists
     And I goto "/escalations/webcat/complaints"
     And I click "#pin-to-top"
@@ -563,15 +533,68 @@ Feature: Webcat complaints
     Then I should see "Pin Toolbar"
 
   @javascript
-  Scenario: press the hot key/shortcut to pin the toolbar to top, the button label changes to unpin
+  Scenario: a user types the hot key/shortcut to pin the toolbar to top and sees the toolbar docked
     Given a user with role "webcat user" exists and is logged in
     And the following complaints exist:
       | ticket_source             | id | status |
       | talos-intelligence        | 1  | NEW    |
     And the following complaint entries exist:
-      | uri             | domain        | subdomain | path | entry_type | complaint_id |
-      | abc.com         | abc.com       |           |      | URI/DOMAIN |  1           |
+      | uri             | domain        | subdomain | path | entry_type | complaint_id | status |
+      | abc.com         | abc.com       |           |      | URI/DOMAIN |  1           | NEW    |
     And a complaint entry preload exists
     And I goto "/escalations/webcat/complaints"
     And I enter the pin toolbar hot key
     Then I should not see "Pin Toolbar"
+
+  # webcat > complaints index > new banner w/ metrics
+  @javascript
+  Scenario: a user sees there is new/assigned Talos/WBNP/internal complaints in webcat index top banner
+    Given a user with role "webcat user" exists and is logged in
+    And the following complaints exist:
+      | channel       | id |
+      | talosintel    | 1  |
+      | talosintel    | 2  |
+      | talosintel    | 3  |
+      | talosintel    | 4  |
+      | wbnp          | 5  |
+      | wbnp          | 6  |
+      | wbnp          | 7  |
+      | internal      | 8  |
+      | internal      | 9  |
+    And the following complaint entries exist:
+      | uri            | domain          | entry_type | complaint_id | status     |
+      | abc.com        | abc.com         | URI/DOMAIN |  1           | NEW        |
+      | whatever.com   | whatever.com    | URI/DOMAIN |  2           | NEW        |
+      | url.com        | url.com         | URI/DOMAIN |  3           | ASSIGNED   |
+      | test.com       | test.com        | URI/DOMAIN |  4           | ASSIGNED   |
+      | something.com  | something.com   | URI/DOMAIN |  5           | NEW        |
+      | yadayada.com   | yadayada.com    | URI/DOMAIN |  6           | NEW        |
+      | nothing.com    | nothing.com     | URI/DOMAIN |  7           | ASSIGNED   |
+      | something.com  | something.com   | URI/DOMAIN |  8           | NEW        |
+      | blahblah.com   | blahblah.com    | URI/DOMAIN |  9           | ASSIGNED   |
+    And I goto "/escalations/webcat/complaints"
+    And I wait for "1" seconds
+    Then I should see content "2" within "#ti-new-count"
+    Then I should see content "2" within "#ti-assigned-count"
+    Then I should see content "2" within "#wbnp-new-count"
+    Then I should see content "1" within "#wbnp-assigned-count"
+    Then I should see content "1" within "#int-new-count"
+    Then I should see content "1" within "#int-assigned-count"
+
+  # webcat > complaints index > take a ticket, test assigned metric updates
+  @javascript
+  Scenario: a user sees a new complaint metric after making a New on webcat index, then takes ticket to see its assigned
+    Given a user with role "webcat user" exists and is logged in
+    And bugzilla rest api always saves
+    And I goto "/escalations/webcat/complaints"
+    And I wait for "5" seconds
+    And I click "#new-complaint"
+    And I fill in "ips_urls" with "example.com"
+    And I click ".primary"
+    And I wait for "5" seconds
+    And I click ".close"
+    And I wait for "3" seconds
+    And I click ".sorting_1"
+    And I click ".take-ticket-toolbar-button"
+    And I wait for "3" seconds
+    Then I should see content "1" within "#int-assigned-count"
