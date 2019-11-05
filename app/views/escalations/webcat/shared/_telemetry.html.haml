@@ -9,39 +9,42 @@
     .row
       .metrics-col
         %span.metric-header TALOS:
-        %span.metric-number= @ti_new_count
-        %span.metric-label New
-        %span.metric-overdue
-          (
-          %span.metric-number= @ti_overdue_count
-          Overdue)
-        %span.metric-assigned
-          %span.metric-number= @ti_assigned_count
-          Assigned
+        .number-container
+          %span.metric-number= @ti_new_count
+          %span.metric-label New
+          %span.metric-overdue
+            (
+            %span.metric-number= @ti_overdue_count
+            Overdue)
+          %span.metric-assigned
+            %span.metric-number= @ti_assigned_count
+            Assigned
 
       .metrics-col
         %span.metric-header WBNP:
-        %span.metric-number= @wbnp_new_count
-        %span.metric-label New
-        %span.metric-overdue
-          (
-          %span.metric-number= @wbnp_overdue_count
-          Overdue)
-        %span.metric-assigned
-          %span.metric-number= @wbnp_assigned_count
-          Assigned
+        .number-container
+          %span.metric-number= @wbnp_new_count
+          %span.metric-label New
+          %span.metric-overdue
+            (
+            %span.metric-number= @wbnp_overdue_count
+            Overdue)
+          %span.metric-assigned
+            %span.metric-number= @wbnp_assigned_count
+            Assigned
 
       .metrics-col
         %span.metric-header INTERNAL:
-        %span.metric-number= @int_new_count
-        %span.metric-label New
-        %span.metric-overdue
-          (
-          %span.metric-number= @int_overdue_count
-          Overdue)
-        %span.metric-assigned
-          %span.metric-number= @int_assigned_count
-          Assigned
+        .number-container
+          %span.metric-number= @int_new_count
+          %span.metric-label New
+          %span.metric-overdue
+            (
+            %span.metric-number= @int_overdue_count
+            Overdue)
+          %span.metric-assigned
+            %span.metric-number= @int_assigned_count
+            Assigned
 
       .metrics-col
         %span.metric-header PENDING:

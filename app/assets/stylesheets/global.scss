@@ -10412,22 +10412,19 @@ span.input-truncate {
 }
 
 
-// webcat > complaints area
+// webcat > complaints top area
 .complaint-mgt-top-area {
-  padding: 10px 15px;
+  padding: 10px 15px 8px;
 }
 
 // webcat > complaints metrics banner
 .complaints-metrics-banner {
-  display: flex;
+  display: flex;  // handle vertical centering
   align-items: center;
   h1 {
     margin-bottom: 2px;
     margin-right: 10px;
     line-height: 30px;
-  }
-  span {
-    display: inline-flex;
   }
   .top-info-icon {
     margin: 0;
@@ -10449,13 +10446,10 @@ span.input-truncate {
     padding-right: 0;
   }
   .metrics-col {
-    padding: 4px 4px 4px 20px;
+    padding: 4px 4px 4px 22px;
     max-width: 380px;
     display: inline-block;
     vertical-align: middle;
-  }
-  .wnbp-area {
-    display: inline-block;
   }
   .metric-header {
     display: inline-block;
@@ -10466,23 +10460,37 @@ span.input-truncate {
   }
   .metric-number {
     padding-left: 0;
-    padding-right: 4px;
+    padding-right: 0;
     font-weight: 700;
   }
+  .metrics-col > .metric-number:last-of-type {
+    padding-right: 20px;
+  }
   .metric-label {
-    padding-left: 0;
-    position: relative;
-    right: 2px;
+    padding-left: 2px;
+    padding-right: 4px;
   }
   .metric-overdue {
     padding-left: 0;
     color: $warning-accent-color;
     border-right: solid 1px lighten($bug-accent-color, 20%);
-    margin-right: 10px;
-    padding-right: 10px;
+    margin-right: 8px;
+    padding-right: 6px;
+    .metric-number {
+      padding-left: 0;  // 123 overdue
+      position: relative;
+      right: 2px;
+    }
+  }
+  .metric-assigned {
+    .metric-number {
+      padding-left: 0;
+      padding-right: 2px;
+    }
   }
   .metric-overdue:last-of-type {
     border-right: none;
+    margin-left: 3px;
   }
   .wbnp-area {
     float: right;
@@ -10490,24 +10498,33 @@ span.input-truncate {
     padding-left: 0;
     padding-right: 1vw;
     max-width: 230px;
-  }
-  .wbnp-report-status {
-    display: inline-flex;
-  }
-  #wbnp-report-status-link {
-    text-decoration: underline;
-    text-decoration-style: dotted;
-    color: $content-bg-color;
-    cursor: default;
-  }
-  .wbnp-loading-spinner {
-    width: 20px;
-    height: 20px;
-    margin-top: -5px;
-    margin-right: 5px;
-    margin-left: 5px;
     display: inline-block;
-    background-repeat: no-repeat;
+    .wbnp-report-status {
+      display: inline-block;
+      text-transform: capitalize;
+      text-decoration: underline;
+      text-decoration-style: dotted;
+    }
+    #wbnp-report-status-link {
+      text-decoration: underline;
+      text-decoration-style: dotted;
+      color: $content-bg-color;
+      cursor: default;
+    }
+    .wbnp-loading-spinner {
+      width: 20px;
+      height: 20px;
+      margin-top: -5px;
+      margin-right: 5px;
+      margin-left: 5px;
+      display: inline-block;
+      background-repeat: no-repeat;
+    }
+  }
+  .number-container {
+    display: inline-block;
+    padding: 0;
+    margin: 0;
   }
 }
 
@@ -10519,16 +10536,13 @@ span.input-truncate {
     .header-area {
       display: none;
     }
+    .wbnp-report-status {
+      padding-top: 2px;
+    }
   }
 }
 
-// SHORT WIDTHS, minor tweaks
-@media screen and (max-width: 1551px) {
-  .complaints-metrics-banner {
-  }
-}
-
-// SHORTER WIDTHS, minor tweaks
+// shorter widths, minor tweaks
 @media screen and (max-width: 1550px) {
   .complaint-mgt-top-area {
     padding: 6px 15px;
@@ -10547,16 +10561,23 @@ span.input-truncate {
       display: block;
     }
     .wbnp-area {
-      padding: 1vw;
+      padding: 0.8vw 1vw;
     }
     .wbnp-area .metric-header {
       display: inline-block;
       vertical-align: middle;
     }
+    .metric-header {
+      padding-top: 0;
+      vertical-align: top;
+    }
+    .metric-number {
+      padding-left: 0;
+    }
   }
 }
 
-// TINY WIDTHS
+// 1350px and smaller
 @media screen and (max-width: 1350px) {
   #nav-banner a.nav-username {
     display: none;
@@ -10571,7 +10592,7 @@ span.input-truncate {
   }
 }
 
-// SUPER TINY WIDTHS
+// 1255px and smaller
 @media screen and (max-width: 1255px) {
   #nav-banner a.nav-username {
     display: none;
@@ -10580,15 +10601,13 @@ span.input-truncate {
     .metrics-col {
       max-width: 200px;
     }
-    .metrics-col:first-of-type {
-      max-width: 180px;
-    }
     .wbnp-area {
       padding: 15px;
     }
   }
 }
-// EVEN MORE TINY
+
+// tiniest conceivable width for a laptop screen
 @media screen and (max-width: 1100px) {
   #nav-banner a.nav-username {
     display: none;
@@ -10606,6 +10625,7 @@ span.input-truncate {
     }
   }
 }
+// * end media queries */
 
 // webcat > this is the tooltip table for wbrs status
 #tooltip-wbnp-content {
@@ -10632,6 +10652,13 @@ span.input-truncate {
 
 #tooltip-wbnp {
   display: none;
+}
+
+// firefox teeny fix
+@-moz-document url-prefix() {
+  .complaint-mgt-top-area {
+    padding: 10px 15px 10px;
+  }
 }
 
 .webcat-search-container {
