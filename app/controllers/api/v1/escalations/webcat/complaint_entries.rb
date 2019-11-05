@@ -371,8 +371,11 @@ module API
                   master_categories = []
                 end
 
-                wbrs_categories = complaint_entry.current_category_data
-
+                begin
+                  wbrs_categories = complaint_entry.current_category_data
+                rescue Exception => e
+                  raise("having trouble with WBRS setting category to empty string : #{e.message}")
+                end
                 # Pull category from SDS
                 sds_params = {}
 
@@ -382,7 +385,13 @@ module API
                   sds_params['url'] = complaint_entry.ip_address
                 end
 
-                sds_category = Sbrs::ManualSbrs.call_wbrs_webcat(sds_params, type: 'wbrs')
+                begin
+                  Rails.logger.info("This is where the sbrs call is")
+                  sds_category = Sbrs::ManualSbrs.call_wbrs_webcat(sds_params, type: 'wbrs')
+                  Rails.logger.info("got it!")
+                rescue Exception => e
+                  raise("having trouble with SDS setting category to empty string : #{e.message}")
+                end
 
                 {master_categories: master_categories, current_category_data: wbrs_categories,
                  sds_category: sds_category }.to_json
