@@ -140,7 +140,7 @@ class DisputeEntry < ApplicationRecord
   def self.get_primary_category(uri)
     prefix_results = Wbrs::Prefix.where({:urls => [uri]})
 
-    return '' unless prefix_results.any?
+    return {} unless prefix_results.any?
 
     parsed_uri = Complaint.parse_url(uri)
     parsed_uri['path'] = '' unless parsed_uri['path'].present?
@@ -154,7 +154,7 @@ class DisputeEntry < ApplicationRecord
       end
     end
 
-    return '' unless final_results.any?
+    return {} unless final_results.any?
 
     # category_ids = final_results.first.categories.sort_by(&:confidence).map {|category| category.category_id}
     category_names = final_results.first.categories.sort_by(&:confidence).map {|category| category.descr}
