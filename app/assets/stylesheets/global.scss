@@ -10601,7 +10601,7 @@ span.input-truncate {
     margin-right: 8px;
     padding-right: 6px;
     .metric-number {
-      padding-left: 0;  // 123 overdue
+      padding-left: 0;
       position: relative;
       right: 2px;
     }
@@ -10621,7 +10621,8 @@ span.input-truncate {
     text-align: right;
     padding-left: 0;
     padding-right: 1vw;
-    max-width: 250px;  // accomodate the loading spinner
+    padding-top: 2px;
+    max-width: 250px;  // accommodate the loading spinner
     display: inline-block;
     .wbnp-report-status {
       display: inline-block;
