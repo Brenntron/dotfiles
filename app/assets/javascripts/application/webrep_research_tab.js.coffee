@@ -1,3 +1,4 @@
+
 $ ->
   # go back to the last tab after reload
   $('a[data-toggle="tab"]').on 'shown.bs.tab', (e) ->
@@ -12,8 +13,10 @@ $ ->
     tab = window.location.href
     if tab.includes('quick')
       $('#research-page-toolbar').hide()
+      $('.research_results').hide()
     else
       $('#research-page-toolbar').show()
+      $('.research_results').show()
 
   $(document).on 'ready page:load', (e) ->
     hide_toolbar()
@@ -26,7 +29,7 @@ $ ->
 
 $ ->
   $('#edit-dispute-entry-button').click ->
-    if ($('.dispute_check_box:checked').length > 0)
+    if $('.dispute_check_box:checked').length > 0
       $('.edit-entries-buttons').removeClass('hidden')
       $('.dispute_check_box').each ->
 
@@ -51,6 +54,21 @@ $ ->
       else
         e.preventDefault()
 
+  $('#add-to-ticket-button').on 'click', (e)->
+    { currentTarget } = e
+
+    new_val = ''
+    html_val = ''
+    $('#disputes-research-table .dispute_check_box:checked').each ->
+      tr = $( this ).closest('tr')
+      url = $(tr).find('.entry-data-content').text().trim()
+      html_val += '<div class="uneditable_urls">' + url+ '</div>'
+      if new_val != ''
+        new_val += '&#10' + url
+      else
+        new_val = url
+    $('#research-page-toolbar .ips_urls').html( new_val.trim() )
+    $('#research-page-toolbar .ips_urls_div').html( html_val )
   $('.cancel-changes').click ->
     $('.editing-row').each ->
       editing_inputs = $(this).find('.table-entry-input')
@@ -552,6 +570,8 @@ $ ->
     $('.entry-data-content:not(:contains(' + query + '))').parents('.research-table-row').hide()
     $('.entry-data-content:contains(' + query + ')').parents('.research-table-row').show()
 
+
+  $('.ajax-message-div').css('display', 'flex')
 $(document).ready ->
 
   ### Using 'tooltipped' class instead of 'tooltip' so that it doesn't interfere with Bootstrap ###

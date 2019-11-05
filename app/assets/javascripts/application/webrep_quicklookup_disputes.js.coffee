@@ -1,7 +1,6 @@
 
 $ ->
 
-
   completed_counter = 0
   $(document).bind(
     ###
@@ -26,6 +25,26 @@ $ ->
         return !Object.keys(item).length
       when 'string'
         return /^\s*$/.test(item)
+
+  window.select_all_detailed = (check)->
+    is_checked = $(check).prop('checked')
+    $('.dispute_check_box').prop('checked', is_checked)
+    if $('.dispute_check_box:checked').length > 0
+      $('#add-to-ticket-button').removeAttr('disabled')
+    else
+      $('#add-to-ticket-button').prop('disabled', 'disabled')
+
+  $(document).on 'click', '.dispute_check_box', (e) ->
+    is_checked = $(e.target).prop('checked')
+    if $('.dispute_check_box').not(':checked').length > 0
+      $('#select-all-entries').prop('checked', false)
+    else
+      $('#select-all-entries').prop('checked', true)
+
+    if $('.dispute_check_box:checked').length > 0
+      $('#add-to-ticket-button').removeAttr('disabled')
+    else
+      $('#add-to-ticket-button').prop('disabled', 'disabled')
 
   window.close_modal = () ->
     $('#confirmation-modal').modal('toggle')
@@ -578,7 +597,6 @@ $ ->
     e.stopPropagation()
 
   $(document).bind( "ajaxStart", () ->
-    console.log 'in'
     $('.ajax-message-div').css('display','flex')
   )
   $(document).on 'click', '#get-rep-data', (e) ->
@@ -635,10 +653,8 @@ $ ->
       headers: headers
       data: data
       dataType: 'json'
-      success: (response) ->
-        return response
-      error: (response) ->
-        return response
+      success: (response) -> return response
+      error: (response) -> return response
     )
 
   window.get_wrbs = (item, headers) ->
@@ -649,10 +665,8 @@ $ ->
       headers: headers
       data: data
       dataType: 'json'
-      success: (response) ->
-        return response
-      error: (response) ->
-        return response
+      success: (response) -> return response
+      error: (response) -> return response
     )
 
   window.get_cat = (item, headers) ->
@@ -663,10 +677,8 @@ $ ->
       headers: headers
       data: data
       dataType: 'json'
-      success: (response) ->
-        return response
-      error: (response) ->
-        return response
+      success: (response) -> return response
+      error: (response) -> return response
     )
 
   window.set_reptool = ( item, row, data) ->

@@ -90,7 +90,7 @@ module API
             post "" do
               std_api_v2 do
                 user_validation = User.where(cvs_username: permitted_params['assignee'])
-                separated_entries = permitted_params[:ips_urls].split("\n")
+                separated_entries = permitted_params[:ips_urls].split("\s")
                 non_duplicated_entries = []
                 duplicates = []
 
@@ -114,11 +114,12 @@ module API
                     end
                     render json: {status: 'Success', case_id: dispute.id, errors: duplicates}
 
+
                   else
                     raise ("Invalid assignee or assignee does not exist. Please try again.")
                   end
                 else
-                  raise ("Unable to create the following duplicate dispute entries: #{duplicates.join("\n")}")
+                  raise ("Unable to create the following duplicate dispute entries: #{duplicates.join(", ")}")
                 end
               end
             end

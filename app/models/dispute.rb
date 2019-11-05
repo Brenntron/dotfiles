@@ -105,7 +105,7 @@ class Dispute < ApplicationRecord
         'classification' => 'unclassified',
     }
     new_dispute = nil
-    
+
     bug_proxy = bugzilla_rest_session.create_bug(bug_attrs)
     ActiveRecord::Base.transaction do
       new_dispute = Dispute.create!(id: bug_proxy.id,

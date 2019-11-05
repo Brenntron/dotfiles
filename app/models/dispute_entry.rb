@@ -723,6 +723,7 @@ class DisputeEntry < ApplicationRecord
     domain_of_url = DisputeEntry.domain_of(url)
     entries = entries_of_url(url)
 
+
     # BEGIN LOGIC TO CONSOLIDATE WLBL INFO TO UNIQUE URIS
     entries.each do |entry|
       entry.class.module_eval { attr_accessor :consolidated_wlbl_strings}
@@ -734,6 +735,7 @@ class DisputeEntry < ApplicationRecord
     duplicate_entries = entries - unique_entries
 
     duplicate_entries.each do |duplicate_entry|
+
       #unique_entries.select{ |e| e.hostlookup == duplicate_entry.hostlookup}.map{ |e| e.consolidated_wlbl_strings << ", " + duplicate_entry.consolidated_wlbl_strings}
 
       unique_entries.select{ |e| e.hostlookup == duplicate_entry.hostlookup}.map do |e|
@@ -745,6 +747,7 @@ class DisputeEntry < ApplicationRecord
         end
 
       end
+
 
     end
 

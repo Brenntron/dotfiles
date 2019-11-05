@@ -544,12 +544,13 @@ button {
   border: 1px solid #ccc;
   padding: 4px 5px;
 }
-
+.ips_urls_div{
+  overflow-wrap: break-word;
+}
 .toolbar select {
   display: inline-block;
   background-color: $content-bg-color;
   border-radius: 0 !important;
-  border: 1px solid #ccc !important;
   margin: 1px 2px;
 }
 
@@ -586,7 +587,16 @@ button {
   margin-top: 4px;
 }
 
-
+#research-page-toolbar{
+  input[type='checkbox']{
+    position: relative;
+    top:-2px
+  }
+  .toolbar-select-wrapper{
+    width: unset!important;
+    height: 27px;
+  }
+}
 .toolbar input:focus, .toolbar select:focus {
   box-shadow: inset 0 0 5px $bug-section-color;
   outline: none;
@@ -734,6 +744,7 @@ button {
 .manage-button {background-image: url(image_path('icon_manage_team.svg'));}
 .show-col-button  {background-image: url(image_path('icon_columns.svg'));  }
 .collapse-button  {background-image: url(image_path('icon_collapse.svg'));}
+.select-all-button  {background-image: url(image_path('icon_check_grey.svg'));}
 .ticket-status-button {background-image: url(image_path('icon_status.svg'));}
 .mark-duplicate-button {background-image: url(image_path('icon_mark_duplicate.svg'));}
 .mark-related-button {background-image: url(image_path('icon_related.svg'));}
@@ -820,6 +831,9 @@ button {
   float: right;
   display: inline-block;
   border: none;
+}
+.expand-row-button{
+  white-space: nowrap;
 }
 
 .expand-row-button-inline {
@@ -975,6 +989,17 @@ thead th.sorting.center {
   line-height: initial;
 }
 
+#research-page-toolbar textarea {
+  padding: 4px;
+  border: 4px solid $content-bg-color;
+  outline: 1px solid $nav-toolbar-color;
+  width: 100%;
+  font-size: 9.5pt;
+  font-weight: 400;
+  line-height: 1.25em;
+  min-height: 100px;
+  margin-bottom: 15px;
+}
 .toolbar .input-label {
   margin: 8px 4px;
   color: $content-label-color;
@@ -1177,7 +1202,7 @@ thead th.sorting.center {
   width: 90%; /* this is not ideal, may have to come back and test other options, should not poke outside of the content wrapper though. */
   height: 10px;
   position: absolute;
-  background-color: white;
+  background-color: $ac-nav-bg-color;
   z-index: 1;
   margin-top: 43px;
   border-top-right-radius: 2px;
@@ -1304,8 +1329,16 @@ thead th.sorting.center {
   font-size: 8.5pt;
   color: $type-lighter-color;
   text-transform: uppercase;
+  line-height: normal;
 }
-
+.dupe_list, .url_ip_list {
+  width: 90%;
+  padding: 5px 10px;
+  margin: 1px auto;
+  span{
+    display: block;
+  }
+}
 #modal-login-form {
   margin-top: 20px;
 }
@@ -1741,7 +1774,7 @@ button.close {
   background-color: $sidebar-nav-base;
   display: block;
   position: absolute;
-  color: #fff;
+  color: $content-bg-color;
   text-transform: uppercase;
   font-weight: 700;
   line-height: $sidebar-width;
@@ -1760,7 +1793,7 @@ button.close {
 }
 
 #sidenav-menu-div a {
-  color: #fff;
+  color: $content-bg-color;
   display: block;
   width: 100%;
   height:100%;
@@ -1855,7 +1888,7 @@ button.close {
 }
 
 .nav-container li, .sidenav-icons li {
-  border-bottom: 1px solid #fff;
+  border-bottom: 1px solid $content-bg-color;
 }
 
 li.static-nav-item {
@@ -2064,7 +2097,7 @@ a.static-nav-item {
   content:"";
   border-style: solid;
   border-width: 0 8px 9px 8px;
-  border-color: transparent transparent #6dbcdb transparent;
+  border-color: transparent transparent $primary-section-color transparent;
   position: absolute;
   top: -8px;
   left: 20px;
@@ -3171,7 +3204,7 @@ fieldset.top-content {
   width: 0;
   pointer-events: none;
   border-color: rgba(136, 183, 213, 0);
-  border-right-color: #fff;
+  border-right-color: $content-bg-color;
   border-width: 10px;
   margin-top: -24px;
   margin-right: -1px;
@@ -4220,7 +4253,7 @@ td.wbrs-highlight, td.sbrs-highlight {
 #advanced-search-wrapper input,
 #new-complaint-form input,
 #categorize-urls-form-wrapper input,
-#new-dispute-form input {
+.new-dispute-form input {
   margin-bottom: 8px;
   background-color: transparent;
   border: 1px solid darken($faint-neutral-color, 5%);
@@ -4756,7 +4789,12 @@ table > tbody > tr > td.dispute_rep_tools {
 .add-to-ticket-button {
   background-image: url(image_path('icon_add_to_ticket.svg'));
 }
-
+.add-to-ticket-button:disabled{
+  background-image: url(image_path('icon_add_to_ticket_grey.svg'));
+}
+.dropdown.open .add-to-ticket-button {
+  background-image: url(image_path('icon_add_to_ticket_white.svg'));
+}
 .dropdown button.toolbar-button {
   height: 27px;
 }
@@ -4848,7 +4886,14 @@ table > tbody > tr > td.dispute_rep_tools {
 .toolbar .dropdown.open {
   background-color: transparent;
 }
-
+.research_results{
+  .toolbar div:last-child{
+    margin-left: 0px!important;
+  }
+}
+.unset-text{
+  color: $type-darkest!important
+}
 .toolbar-dropdown {
   background-color: $content-bg-color;
   border: none !important;
@@ -5174,7 +5219,7 @@ input.table-entry-input:focus {
     min-width: 140px;
   }
   li {
-    border-bottom: 1px solid #f2f2f2;
+    border-bottom: 1px solid $faint-neutral-color;
     border-top: none;
     padding: 5px;
     margin-right: 5px
@@ -5468,7 +5513,7 @@ td.left-bordered {
   margin-top: -1px;
   border-left: 6px solid transparent;
   border-right: 6px solid transparent;
-  border-top: 10px solid #fff;
+  border-top: 10px solid $ac-nav-bg-color;
 }
 .search-options-col, .search-box-col{
    display: none;
@@ -5531,11 +5576,10 @@ h5.entry-details-table-header {
 }
 
 .ajax-message-div{
-  &{
-    position: absolute;
-    top: 148px;
+  & {
     display: none;
     width: 90%;
+    position: absolute;
     justify-content: center;
     align-items: center;
   }
@@ -5546,6 +5590,24 @@ h5.entry-details-table-header {
   }
 }
 
+.select-all-label{
+  margin-top: -18px;
+}
+
+@media (min-width: 1600px) {
+  .select-all-label{
+    min-width: 153px;
+  }
+  .adjust-container{
+    min-width: 434px;
+  }
+}
+@media (min-width: 1725px) {
+  .select-all-label{
+    margin-top: unset;
+  }
+
+}
 .nested-table-tally {
   float: right;
   font-weight: 300;
@@ -5586,8 +5648,8 @@ h5.entry-details-table-header {
   background-position: right 2px center;
   background-size: 16px;
   padding-bottom: 1px;
-  border: 2px solid #fff;
-  outline: 1px solid #e5e5e5;
+  border: 2px solid $ac-nav-bg-color;
+  outline: 1px solid $nav-toolbar-color;
   font-size: 9pt;
 }
 
@@ -5595,13 +5657,13 @@ h5.entry-details-table-header {
   background-color: $bug-section-color;
   color: $content-bg-color;
   background-image: url(image_path('icon_dropdown_white.svg'));
-  border: 2px solid #fff;
-  outline: 1px solid #e5e5e5;
+  border: 2px solid $ac-nav-bg-color;
+  outline: 1px solid $nav-toolbar-color;
 }
 
 .dropdown .inline-select-dropdown {
-  border: 2px solid #fff;
-  outline: 1px solid #e5e5e5;
+  border: 2px solid $ac-nav-bg-color;
+  outline: 1px solid $nav-toolbar-color;
 }
 
 .inline-dropdown-menu, .ticket-resolution-submenu, .toolbar-dropdown {
@@ -5854,7 +5916,52 @@ td.data-table-emph {
 .dispute-wlbl-adjust-wrapper, .dispute-reptool-adjust-wrapper {
   padding: 0 !important;
 }
+#research-page-toolbar {
+  #add_to_ticket_dropdown{
+    background: $primary-section-color;
+    width: 300px;
+    border-radius: 3px;
+  }
+  .new-dispute-form{
+    height: 100%;
+    width: 100%;
+    padding-top: 1px;
+    .assignee-label{
+      margin-bottom: 11px;
+    }
+    button{
+      margin-bottom: 14px!important;
+    }
 
+  }
+  .toolbar select{
+    border: none!important;
+  }
+  .dispute-wlbl-adjust-wrapper form{
+    background: $content-bg-color;
+    border-bottom-left-radius: 3px;
+    border-bottom-right-radius: 3px;
+  }
+  .form-group{
+    padding:0 10px!important;
+    background: $content-bg-color
+
+  }
+  .form-group{
+    padding:0 10px!important;
+    background: $content-bg-color
+  }
+  .form-group:last-child{
+    margin-top:-16px
+  }
+  #submit-strict-changes{
+    margin-top: -4px;
+    min-width: 260px!important;
+  }
+}
+.boo{
+  color: unset!important;
+}
 .dispute-wlbl-adjust-wrapper button, .dispute-reptool-adjust-wrapper button {
   text-transform: none;
   font-weight: 400;
@@ -6496,7 +6603,7 @@ table.dispute-entry-table tbody tr.selected {
 .dispute-owner-buttons-wrapper .dropdown-menu {
   border-radius: 0 4px 4px 4px;
   border: none;
-  background-color: #6dbcdb;
+  background-color: $primary-section-color;
   min-width: 200px;
   top: 18px;
   left: 3px;
@@ -7055,7 +7162,12 @@ table.dispute-entry-table tbody tr.selected {
   padding: 4px 8px;
   line-height: 1.25em;
 }
-
+.uneditable_urls{
+  font-size: 8pt;
+  padding: 0!important;
+  margin: 0!important;
+  line-height: .9rem;
+}
 .searched-for-url {
   color: $bug-section-color;
 }
@@ -7290,7 +7402,7 @@ table#duplicates a {
 }
 
 .bug-tabs .nav-tabs li.active a {
-  background-color: #fff !important;
+  background-color: $ac-nav-bg-color !important;
 }
 
 .retro-styling #sidenav-menu-div a {
@@ -8183,7 +8295,7 @@ td.text-center span {
     background-color: $primary-section-color;
     background-size: 15px;
     background-position: 10px center;
-    color: white;
+    color: $type-lightest;
     padding: 12px 20px 12px 35px;
     &:hover {
       background-color: darken($primary-section-color, 10%)
@@ -8287,11 +8399,13 @@ td.text-center span {
   .loader-msg {
     display: inline-block;
     line-height: 3.5;
+    font-style: oblique;
   }
 }
 
 .loader-msg {
   color: $type-lighter-color;
+  font-style: oblique;
 }
 
 .cluster-table-toolbar {
@@ -8587,7 +8701,7 @@ th.sorting_1, th.sorting_asc, th.sorting_desc {
 }
 
 .table-button-row .dropdown-menu h3 {
-  color: #fff;
+  color: $ac-nav-bg-color;
   padding: 6px 10px;
   font-weight: 400;
   font-size: 9pt;
@@ -9004,7 +9118,7 @@ hr.thin.form-divider {
 
 #filerep_searchref_container, #webcat_searchref_container{
   & {
-    color: #6dbcdb;
+    color: $primary-section-color;
     max-width: 100%;
     font-size: 8pt;
     display: inline-block;
@@ -9017,7 +9131,12 @@ hr.thin.form-divider {
   .search-condition{
     padding: 1px
   }
-
+  #research-page-toolbar .dispute-wlbl-adjust-wrapper{
+    background: $primary-section-color;
+  }
+  #research-page-toolbar .new-dispute-form {
+    background:$ac-nav-bg-color;
+  }
   .search-condition:not(:last-child):after {
     content: ", ";
   }
@@ -9304,11 +9423,9 @@ hr.thin.form-divider {
   color: $type-lighter-color;
 }
 
-.toolbar .plain-inline-dropdown-wrapper div {
-  //padding: 0;
+input.assignee.form-control{
+  background: $ac-nav-bg-color;
 }
-
-
 .research-data-header {
   font-weight: 700;
   color: $type-lighter-color;
@@ -9723,8 +9840,8 @@ button.secondary.view-report-external-button {
 }
 
 .form-control .ui-slider-handle.ui-state-focus{
-  background: #44a9d1;
-  color: white;
+  background: $primary-section-color;
+  color: $type-lightest;
   border: none;
 }
 .form-control .ui-slider-handle.ui-state-active{
@@ -10653,7 +10770,7 @@ input[type="radio"].resolution_radio_button {
     font-weight: 600;
     font-size: 9.5pt;
     border: none !important;
-    color: #fff;
+    color: #fff$type-lightest;
     display: inline-block;
   }
   hr.thin{
@@ -10770,6 +10887,7 @@ span.input-truncate {
   position: absolute;
   left: 180px;
   float: none;
+  z-index: 111;
   border-radius: 5px;
   padding: 1px 5px;
 }
