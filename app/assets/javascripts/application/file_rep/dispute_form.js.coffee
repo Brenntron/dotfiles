@@ -1,5 +1,6 @@
 $ ->
-  document.getElementById('file_rep_submit').disabled = true
+  if $('#file_rep_submit').length > 0
+    document.getElementById('file_rep_submit').disabled = true
   $('#sha_errors_list').hide()
 
   $('#shas_list').on 'input', (e) ->
