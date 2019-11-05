@@ -823,6 +823,7 @@ button {
 .return-ticket-toolbar-button:hover,
 .collapse-all:hover,
 .sync-button:hover,
+.pin-to-top-button:hover,
 .expand-all:hover {
   background-color: lighten($nav-toolbar-color, 8%)!important;
 }
@@ -846,6 +847,7 @@ button {
 .return-ticket-toolbar-button:focus,
 .collapse-all:focus,
 .sync-button:focus,
+.pin-to-top-button:focus,
 .expand-all:focus{
   background-color: lighten($bug-section-color, 28%);
 }
@@ -10382,6 +10384,81 @@ span.input-truncate {
 
 .owner-col {
   min-width: 80px;
+}
+
+// retain top navigation at top of page during scroll down for nav accessibility
+#nav-banner.fixed-nav {
+  position: -webkit-sticky;
+  position: sticky;
+  top: 0;
+  z-index: 999;
+}
+
+.pin-to-top-button {
+  background-image: url(image_path('icon_pin1.svg'));
+  background-size: 22px 22px;
+  background-position: 3px 3px;
+  padding-left: 18px;
+}
+
+.pinned-toolbar {
+  background: $content-bg-color;
+  box-shadow: 2px 0 10px 1px rgba(0,0,0,0.3);
+  position: relative;
+  bottom: 18px;
+  padding: 4px 20px;
+  .toolbar-checkbox-wrapper {
+    padding-top: 0;
+    padding-left: 5px;
+    font-weight: normal;
+  }
+  label {
+    display: none;
+  }
+}
+
+#webcat-index-title {
+  padding-top: 10px;
+}
+
+#webcat-index-toolbar {
+  margin: 15px 0 10px;
+}
+
+.pinned-toolbar-true #webcat-index-title {
+  padding-top: 25px;
+  line-height: 12px;
+}
+
+#webcat_searchref_container {
+  margin-bottom: 10px;
+  padding: 6px 0;
+}
+
+// tooltipster adjustments for pinned toolbar tooltips
+.pinned-toolbar-true .tooltipster-sidetip .tooltipster-box {
+  padding: 4px 6px;
+}
+
+// one-off override
+.pinned-toolbar-true .tooltipster-sidetip {
+  top: 85px !important;
+}
+
+.webcat-search-container {
+  height: 15px;
+}
+
+// correction to reduce extraneous vertical space
+.pinned-toolbar-true .webcat-search-container {
+  height: 0;
+}
+
+// handling the top-right username width issues
+@media screen and (max-width: 1200px) {
+  #nav-banner a.nav-username {
+    display: none;
+  }
 }
 
 
