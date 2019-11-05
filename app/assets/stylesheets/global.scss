@@ -10385,6 +10385,53 @@ span.input-truncate {
   min-width: 80px;
 }
 
+
+// research rows alignment/formatting updates
+// top row of each
+.research-first-row {
+  margin-top: 120px;
+  td:nth-child(1), td:nth-child(2) {
+    width: 20px;  // icons
+  }
+  td:nth-child(3) {
+    //width: 55%;  // category, retain this commented line
+  }
+  td:nth-child(4) {
+    width: 20%;  // hostname
+  }
+  span.entry-data-content {
+    display: inline-block;
+    min-width: 500px;   // url/ip
+  }
+}
+
+// second row of each
+.research-overview-row {
+  background: $faint-neutral-color;
+  td:nth-child(6) {
+    width: 170px;  // rule hits list
+    word-break: break-word;
+    padding-right: 10px;
+  }
+  td:nth-child(7) {
+    width: 150px;
+  }
+  td:nth-child(8) {
+    width: 60px;   // xbrs history
+  }
+  td:nth-child(9) {
+    width: 140px;
+  }
+  td:nth-child(10) {
+    width: 110px;  // reptool class
+    word-break: break-word;
+  }
+  td:nth-child(12) {
+    width: 190px;  // wl/bl lists + threat cats
+  }
+}
+
+
 // reports page specific styles
 .report_date_from label, .report_date_to label, .report_customer_name label {
   width: 120px;
