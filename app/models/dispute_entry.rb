@@ -724,6 +724,17 @@ class DisputeEntry < ApplicationRecord
       domain_of_url = DisputeEntry.domain_of(url)
       entries = entries_of_url(url)
 
+      invalid_matches = []
+
+      if research_params['scope'] == "strict"
+        entries.each do |entry|
+          if url != entry.uri || entry.uri != "www." + entry.uri
+            invalid_matches << entry
+          end
+        end
+        entries = entries - invalid_matches
+      end
+
       # BEGIN LOGIC TO CONSOLIDATE WLBL INFO TO UNIQUE URIS
       entries.each do |entry|
         entry.class.module_eval { attr_accessor :consolidated_wlbl_strings}
