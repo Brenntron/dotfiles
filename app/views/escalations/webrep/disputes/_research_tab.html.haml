@@ -247,7 +247,7 @@
                     %input.table-entry-input.wide{type:'text', value: "#{entry.hostlookup}"}
                   %td
                     %label Category
-                    - unless entry[:primary_category].nil?
+                    - if entry[:primary_category].nil?
                       = entry[:primary_category]
                     - else
                       %span.missing-data No Data
