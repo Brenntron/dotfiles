@@ -143,6 +143,7 @@ $ ->
     nested_row = $(entry_row).find('.nested-data-row')[0]
     $(nested_row).toggle()
     $(expand_button).toggleClass('shown')
+    $('#loader-modal').modal('hide')
 
 
 # Show / hide the different research tables in the expanded row

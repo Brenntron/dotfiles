@@ -839,11 +839,7 @@ window.drop_current_categories = () ->
 )
 
 format = (complaint_entry_row) ->
-  $('#loader-modal').modal({
-    keyboard: false,
-  })
-
-
+  $('.inline-loader').css('display', 'flex')
   complaint_entry = complaint_entry_row.data()
   row_id = complaint_entry_row[0][0]
   missing_data = '<span class="missing-data">No Data</span>'
@@ -961,7 +957,7 @@ format = (complaint_entry_row) ->
     url: '/escalations/api/v1/escalations/webcat/complaint_entries/retrieve_current_categories'
     data: {'id': complaint_entry.entry_id}
     success: (response) ->
-      $('#loader-modal').modal 'hide'
+      $('.inline-loader').css('display', 'none')
     
       { current_category_data : current_categories, master_categories, sds_category} = JSON.parse(response)
 
@@ -1000,7 +996,7 @@ format = (complaint_entry_row) ->
         $(".simple-nested-table" + "#entry-table-" + complaint_entry.entry_id).append(category_row)
 
     error: (response) ->
-      $('#loader-modal').modal 'hide'
+      $('.inline-loader').css('display', 'none')
       current_categories = ''
   )
 
@@ -1633,9 +1629,7 @@ window.triggerTooltips = (item) ->
 window.master_submit = () ->
   data = []
 
-  $('#loader-modal').modal({
-    keyboard: false
-  })
+  $('.inline-loader').css('display', 'flex')
 
   $('.selected + tr td.nested-complaint-data-wrapper').each ->
     entry_id = $(this).find('tr').attr('entry_id')
@@ -1736,7 +1730,7 @@ window.master_submit = () ->
         error_msg += no_cats_boiler_plate
 
       if errors == true
-        $('#loader-modal').modal 'hide'
+        $('.inline-loader').modal 'hide'
         std_msg_error(error_msg,"")
       else
         $('#loader-modal').modal 'hide'
