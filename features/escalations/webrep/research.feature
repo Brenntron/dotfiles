@@ -36,3 +36,23 @@ Feature: Webrep, the BFRP
     When I goto "escalations/webrep/research?utf8=1&search%5Buri%5D=100.100.200.1&search%5Bscope%5D=strict&commit=Submit"
     Then I wait for "30" seconds
     Then I should see "3 ticket(s)"
+
+  @javascript
+  Scenario: A user uses broad search
+    Given a user with role "webrep user" exists and is logged in
+    And I go to "escalations/webrep/research"
+    When I click "#research-search-broad"
+    And I fill in "search_uri" with "cisco.com"
+    And I click "#submit-button"
+    And I wait for "120" seconds
+    Then multiple research entry exists
+
+  @javascript
+  Scenario: A user uses strict search
+    Given a user with role "webrep user" exists and is logged in
+    And I go to "escalations/webrep/research"
+    When I click "#research-search-strict"
+    And I fill in "search_uri" with "cisco.com"
+    And I click "#submit-button"
+    And I wait for "15" seconds
+    Then one research entry exists
