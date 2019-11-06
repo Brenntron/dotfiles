@@ -346,7 +346,7 @@ window.submit_individual_wlbl = (button_tag) ->
   # endpoint needs id's to represent url's by default, passing in url's is optional
   dispute_entry_id = $(wlbl_form).parents('.research-table-row').attr('data-entry-id')
   dispute_url = $(wlbl_form).parents('.research-table-row').find('.entry-data-content').text().trim()
-  old_lists = $(wlbl_form).find('.wlbl-entry-wlbl').text()  # only used in confirmation modal, show what lists were changed
+  old_lists_str = $(wlbl_form).find('.wlbl-entry-wlbl').text()  # only used in confirmation modal, show what lists were changed
 
   list_types = $('.wl-bl-list-inline:checkbox:checked').map(() ->
     this.value
@@ -366,33 +366,32 @@ window.submit_individual_wlbl = (button_tag) ->
       "<p class='tc-sentence'>With the following threat categories updated:
        <em>#{ thrt_cat_names.join(', ') }</em></p>"
 
-  old_lists_length = old_lists.split(' ').length
+  old_lists_array = old_lists_str.split(' ')
+  if old_lists_str == '' || old_lists_str.includes('Not')
+    old_lists_length == 0
+  else
+    old_lists_length = old_lists_array.length
+
   new_lists_length = list_types.length
 
   # simulate the add/replace/remove radio buttons with simple logic
-  if new_lists_length < old_lists_length  # adding new lists?
-    adjustment_type = 'add'
-  else
-    adjustment_type = 'replace'
+  if new_lists_length >= old_lists_length then adjustment_type = 'add'
+  else if new_lists_length == old_lists_length then adjustment_type = 'replace'
+  else if new_list_length < old_lists_length then adjustment_type = 'remove'
 
-  console.log old_lists_length + ' this is the old lists length'
-  console.log new_lists_length + ' this is the new lists length'
-  console.log adjustment_type
-  console.log location.href
-
-
+  # RESEARCH PAGE SUBMIT SCENARIOS
   # RESEARCH PAGE SUBMIT SCENARIOS
   if location.href.includes('webrep/disputes')
     # SCENARIO 1 (INLINE): SHOW PAGE REMOVE: USE NEW ENDPOINT + ONE ENTRY URL
     if adjustment_type == 'add' or adjustment_type == 'replace'  # use new endpoint
       data = {
-        adjustment_type: 'replace',  # new school
+        adjustment_type: adjustment_type,  # new school
         lists: list_types,
         thrt_cat_ids: thrt_cat_ids,
         note: $(wlbl_form).find('.note-input').text(),
-        dispute_entries: [ dispute_url ]
+        urls: [ dispute_url ]
       }
-      console.log 'scenario 1 inline'
+      console.log '# SCENARIO 1 (INLINE): SHOW PAGE REMOVE: USE NEW ENDPOINT + ONE ENTRY URL'
       console.log data
       std_msg_ajax(
         url: '/escalations/api/v1/escalations/webrep/disputes/bulk_wlbl_threatcat_adjust'
@@ -407,12 +406,12 @@ window.submit_individual_wlbl = (button_tag) ->
     # SCENARIO 2 (INLINE): SHOW PAGE REMOVE: USE OLD ENDPOINT + ONE ENTRY URL
     else if adjustment_type == 'remove'   # use old endpoint
       data = {
-        ip_uris: ip_uris,  # old school
+        ip_uris: dispute_url,  # old school
         list_types: list_types,
         note: $(wlbl_form).find('.note-input').text(),
         thrt_cat_ids: thrt_cat_ids
       }
-      console.log 'scenario 2 inline'
+      console.log '# SCENARIO 2 (INLINE): SHOW PAGE REMOVE: USE OLD ENDPOINT + ONE ENTRY URL'
       console.log data
       std_msg_ajax(
         url: '/escalations/api/v1/escalations/webrep/disputes/bulk_rule_ui_wlbl_remove'
@@ -426,17 +425,18 @@ window.submit_individual_wlbl = (button_tag) ->
       )
 
   # BFRP PAGE SUBMIT SCENARIOS
+  # BFRP PAGE SUBMIT SCENARIOS
   else if location.href.includes('webrep/research')
     # SCENARIO 3 (INLINE): BFRP ADD or REPLACE: USE NEW MICAH ENDPOINT + ONE ENTRY ID
     if adjustment_type == 'add' or adjustment_type == 'replace'  # use new endpoint
       data = {
-        adjustment_type: 'replace',
+        adjustment_type: 'add',   # new school
         lists: list_types,
         thrt_cat_ids: thrt_cat_ids,
         note: $(wlbl_form).find('.note-input').text(),
-        dispute_entries: [ dispute_entry_id ]
+        urls: [ dispute_url ]
       }
-      console.log 'scenario 3 inline'
+      console.log '# SCENARIO 3 (INLINE): BFRP ADD or REPLACE: USE NEW MICAH ENDPOINT + ONE ENTRY ID'
       console.log data
       std_msg_ajax(
         url: '/escalations/api/v1/escalations/webrep/disputes/bulk_wlbl_threatcat_adjust'
@@ -451,14 +451,13 @@ window.submit_individual_wlbl = (button_tag) ->
 
     # SCENARIO 4 (INLINE): BFRP REMOVE: USE OLD MICAH ENDPOINT + ONE ENTRY URL
     else if adjustment_type == 'remove'   # use old endpoint
-      console.log 'bfrp page do inline submit add/replace'
       data = {
-        ip_uris: ip_uris,
+        ip_uris: dispute_url,  # old school
         list_types: list_types,
         note: $(wlbl_form).find('.note-input').text(),
         thrt_cat_ids: thrt_cat_ids
       }
-      console.log 'scenario 4 inline'
+      console.log '# SCENARIO 4 (INLINE): BFRP REMOVE: USE OLD MICAH ENDPOINT + ONE ENTRY URL'
       console.log data
       std_msg_ajax(
         url: '/escalations/api/v1/escalations/webrep/disputes/bulk_rule_ui_wlbl_remove'
@@ -530,7 +529,7 @@ window.submit_bulk_wlbl = (page) ->
       ).toArray()
 
     # SCENARIO A (BULK): INDEX or SHOW PAGE and ADD or REPLACE:  USE NEW MICAH ENDPOINT + ENTRY ID ARRAY
-    if location.href.includes('webrep/disputes') && (adjustment_type != 'add' || adjustment_type != 'replace')
+    if location.href.includes('webrep/disputes') && adjustment_type == 'add'
       data = {
         adjustment_type: adjustment_type,   # new school
         lists: list_types,
@@ -549,7 +548,7 @@ window.submit_bulk_wlbl = (page) ->
       )
 
     # SCENARIO B (BULK): INDEX or SHOW PAGE and REMOVE:  USE OLD REMOVE ENDPOINT + ENTRY ID ARRAY
-    if location.href.includes('webrep/disputes') && adjustment_type != 'remove'
+    if location.href.includes('webrep/disputes') && adjustment_type == 'remove'
       data = {
         adjustment_type: adjustment_type,
         lists: list_types,
