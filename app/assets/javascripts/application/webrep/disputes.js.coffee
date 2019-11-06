@@ -655,12 +655,12 @@ window.return_dispute = (dispute_id) ->
   )
 
 window.save_dispute_entries = () ->
-
+  debugger
   data = {}
   $('#disputes-research-table').find('tr.research-table-row').each(() ->
     result = {}
     fielddata = $(this).find('.dual-edit-field').map(() ->
-
+      debugger
       new_value = switch (this.dataset.field)
         when 'status'
           if $(this).find("input[name='entry-status']:checked").attr('id') == undefined
@@ -668,6 +668,9 @@ window.save_dispute_entries = () ->
           else
             $(this).find("input[name='entry-status']:checked").attr('id')
 
+        when 'host-ip'
+          console.log 'we gotta check the ips now'
+          # add shit here
         else $(this).find('.table-entry-input')[0].value.trim()
 
       old_value = $(this).find('.entry-data')[0].innerText.trim()
@@ -702,6 +705,7 @@ window.save_dispute_entries = () ->
       data[this.dataset.entryId] = fielddata
 
   )
+  console.log data
   if $('input[name=entry-status]:checked').attr('id') == "RESOLVED_CLOSED" && !$('input[name=entry-resolution]:checked').val()
     std_msg_error('No resolution selected', ['Please select a ticket resolution.'])
   else
@@ -2033,7 +2037,6 @@ $ ->
 
   # Focus on the first field in the dropdown on open
   $('.dropdown').on 'shown.bs.dropdown', ->
-    debugger
     form = $(this).find('form')[0]
     if $(form).hasClass('add-host-ips')
       textarea = $(form).find('textarea')[0]
@@ -2069,7 +2072,7 @@ window.add_host_ips = (button) ->
       '<tr class="research-uri-ip-query-row">' +
         '<td rowspan="2"></td>' +
         '<td class="input-col ip-label-col" rowspan="2"></td>' +
-        '<td class="dual-edit-field" colspan="7" data-field="host" data-id="' + entry_id + '">' +
+        '<td class="dual-edit-field" colspan="7" data-field="host-ip" data-id="' + entry_id + '">' +
           '<span class="entry-data entry-resolved-ip-content">' + final_ips + '</span>' +
           '<input class="table-entry-input wide" type="text" value="' + final_ips + '">' +
         '</td>' +
@@ -2170,3 +2173,5 @@ window.query_uri_plus_ip = (uri, ips, entry_id) ->
       # Ignoring description and weight right now as I don't think we are getting that data currently
       rule_row = '<tr><td class="uri-plus-ip-rule-indicator"></td><td>' + this + '</td><td></td><td></td></tr>'
       $(wbrs_details_table).append(rule_row)
+
+  # TODO And save to database!
