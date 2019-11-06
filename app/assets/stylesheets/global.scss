@@ -10462,3 +10462,19 @@ span.input-truncate {
 table > tbody > tr > td.no-padding {
   padding: 0 !important;
 }
+
+.inline-row-loader {
+  display: inline-block;
+  font-style: italic;
+  color: lighten($type-lighter-color, 20%);
+  margin-left: 20px;
+  .sync-button {
+    display: inline-block;
+    margin-right: 4px;
+    height: 14px;
+    width: 14px;
+    background-repeat: no-repeat;
+    background-image: url('icon_sync_lt_grey.svg');
+    margin-bottom: -2px;
+  }
+}
