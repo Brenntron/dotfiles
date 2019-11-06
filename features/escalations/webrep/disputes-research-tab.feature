@@ -82,6 +82,6 @@ Feature: Disputes index, Research tab
     Then I should see content "REPTOOL CLASS" within ".research-table-row-wrapper"
     Then I should see content "UMBRELLA" within ".research-table-row-wrapper"
     Then I should see content "LAST SUBMITTED" within ".research-table-row-wrapper"
-    Then I should see content "No score." within ".research-table-row-wrapper"
+    Then I should see content "No score" within ".research-table-row-wrapper"
     Then I should see content "Unresolved" within ".research-table-row-wrapper"
     Then I should see content "Unclassified" within ".research-table-row-wrapper"

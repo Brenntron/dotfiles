@@ -323,7 +323,7 @@ window.bulk_get_current_wlbl = (page) ->
     table_dd = $(curr_dd).find('tbody')
     rows = $(table_dd).find('tr')
 
-    # basic sort by order-id/integer
+    # basic sort by id/integer
     rows.sort (a, b) ->
       x = $(a).attr('data-order-id')
       y = $(b).attr('data-order-id')
@@ -336,7 +336,6 @@ window.bulk_get_current_wlbl = (page) ->
 ########## SUBMISSION OF WL/BL CHANGES TO WBRS ##########
 
 ## BULK SUBMISSION of WL/BL changes - toolbar dropdown form
-## BULK SUBMISSION of WL/BL changes - toolbar dropdown form
 window.submit_bulk_wlbl = (page) ->
   data = {}
   ip_uris = []
@@ -345,6 +344,7 @@ window.submit_bulk_wlbl = (page) ->
   disputes_array = []
   wlbl_comment = ''
   dropdown = ''
+
 
   if $('.wl-bl-list-inline:checkbox:checked').length or $('.wlbl_thrt_cat_id:checked').length
     if page == 'index'
@@ -387,99 +387,78 @@ window.submit_bulk_wlbl = (page) ->
         console.log this['data-entry-id']
       ).toArray()
 
-    # SCENARIO A (BULK): *INDEX PAGE* and add/replace: USE NEW ENDPOINT + ENTRY ID ARRAY
-    # SCENARIO A (BULK): *INDEX PAGE* and add/replace: USE NEW ENDPOINT + ENTRY ID ARRAY
-    # SCENARIO A (BULK): *INDEX PAGE* and add/replace: USE NEW ENDPOINT + ENTRY ID ARRAY
-    if location.href.includes('webrep/disputes') && adjustment_type != 'remove'  # add or replace
-      data = {
-        adjustment_type: adjustment_type,   # new school
-        lists: list_types,
-        thrt_cat_ids: thrt_cat_ids,
-        note: wlbl_comment,
-        dispute_entries: disputes_array
-      }
-      console.log 'Using new endpoint...'
-      console.log '# SCENARIO A (BULK): *INDEX/SHOW PAGE* and add/replace: USE NEW ENDPOINT + ENTRY ID ARRAY'
-      console.log data
-      std_msg_ajax(
-        url: '/escalations/api/v1/escalations/webrep/disputes/bulk_wlbl_threatcat_adjust'
-        method: 'POST'
-        data: data
-        success: (response) -> std_msg_success("Entries have been updated: ", [ip_uris, tc_updated_str])
-        error: (response) -> std_api_error(response, 'Error updating these entries.')
-        completed: () -> $('.dispute-wlbl-adjust-wrapper .dropdown-submit-button').html('Submit Changes').prop('disabled', false)
-      )
 
-    # SCENARIO B (BULK): *INDEX PAGE* and remove: USE OLD REMOVE ENDPOINT + ENTRY ID ARRAY
-    # SCENARIO B (BULK): *INDEX PAGE* and remove: USE OLD REMOVE ENDPOINT + ENTRY ID ARRAY
-    # SCENARIO B (BULK): *INDEX PAGE* and remove: USE OLD REMOVE ENDPOINT + ENTRY ID ARRAY
-    if location.href.includes('webrep/disputes') && adjustment_type == 'remove'
-      data = {
-        ip_uris: ip_uris,  # old school
-        list_types: list_types,
-        note: $(wlbl_form).find('.note-input').text(),
-        thrt_cat_ids: thrt_cat_ids
-      }
-      console.log 'Using old endpoint...'
-      console.log '# SCENARIO B (BULK): INDEX or SHOW PAGE and REMOVE: USE OLD ENDPOINT + ENTRY ID ARRAY'
-      console.log data
-      std_msg_ajax(
-        url: '/escalations/api/v1/escalations/webrep/disputes/bulk_rule_ui_wlbl_remove'
-        method: 'POST'
-        data: data
-        success: (response) -> std_msg_success("Entries have been updated: ", [ip_uris, tc_updated_str])
-        error: (response) -> std_api_error(response, 'Error updating these entries.')
-        completed: () -> $('.dispute-wlbl-adjust-wrapper .dropdown-submit-button').html('Submit Changes').prop('disabled', false)
-      )
+    # INDEX and SHOW PAGE BULK ADJUST
+    if location.href.includes('webrep/disputes')
 
-    # SCENARIO C (BULK): *BFRP* and add/replace: USE NEW ENDPOINT + ENTRY URL ARRAY
-    # SCENARIO C (BULK): *BFRP* and add/replace: USE NEW ENDPOINT + ENTRY URL ARRAY
-    # SCENARIO C (BULK): *BFRP* and add/replace: USE NEW ENDPOINT + ENTRY URL ARRAY
-    if location.href.includes('webrep/research') && adjustment_type != 'remove'  # add or replace
-      data = {
-        adjustment_type: adjustment_type,   # new school
-        lists: list_types,
-        thrt_cat_ids: thrt_cat_ids,
-        note: wlbl_comment,
-        dispute_entries: disputes_array
-      }
-      console.log 'Using new endpoint...'
-      console.log 'BULK SCENARIO C: *BFRP* and add/replace: USE NEW ENDPOINT + ENTRY URL ARRAY'
-      console.log data
-      std_msg_ajax(
-        url: '/escalations/api/v1/escalations/webrep/disputes/bulk_wlbl_threatcat_adjust'
-        method: 'POST'
-        data: data
-        success: (response) -> std_msg_success("Entries have been updated: ", [ip_uris, tc_updated_str])
-        error: (response) -> std_api_error(response, 'Error updating these entries.')
-        completed: () -> $('.dispute-wlbl-adjust-wrapper .dropdown-submit-button').html('Submit Changes').prop('disabled', false)
-      )
+      # SCENARIO A (BULK): add/replace: USE NEW ENDPOINT + ENTRY ID ARRAY
+      if adjustment_type != 'remove'   # add or replace, use new endpoint, new object
+        data = { adjustment_type: adjustment_type, lists: list_types, thrt_cat_ids: thrt_cat_ids, note: wlbl_comment, dispute_entries: disputes_array }
 
-    # SCENARIO D (BULK): *BFRP* and remove: USE NEW ENDPOINT + ENTRY URL ARRAY
-    # SCENARIO D (BULK): *BFRP* and remove: USE NEW ENDPOINT + ENTRY URL ARRAY
-    # SCENARIO D (BULK): *BFRP* and remove: USE NEW ENDPOINT + ENTRY URL ARRAY
-    if location.href.includes('webrep/research') && adjustment_type == 'remove'
-      data = {
-        ip_uris: ip_uris,  # old school
-        list_types: list_types,
-        note: $(wlbl_form).find('.note-input').text(),
-        thrt_cat_ids: thrt_cat_ids
-      }
-      console.log 'Using old endpoint...'
-      console.log '# BULK SCENARIO D: BFRP and REMOVE: USE NEW ENDPOINT + ENTRY URL ARRAY'
-      console.log data
-      std_msg_ajax(
-        url: '/escalations/api/v1/escalations/webrep/disputes/bulk_rule_ui_wlbl_remove'
-        method: 'POST'
-        data: data
-        success: (response) -> std_msg_success("Entries have been updated: ", [ip_uris, tc_updated_str])
-        error: (response) -> std_api_error(response, 'Error updating these entries.')
-        completed: () -> $('.dispute-wlbl-adjust-wrapper .dropdown-submit-button').html('Submit Changes').prop('disabled', false)
-      )
+        console.log 'using new endpoint... # scenario a (bulk): *index/show page* and add/replace: use new endpoint + entry id array'
+        console.log data
+
+        std_msg_ajax(
+          url: '/escalations/api/v1/escalations/webrep/disputes/bulk_wlbl_threatcat_adjust'
+          method: 'POST'
+          data: data
+          success: (response) -> std_msg_success("Entries have been updated: ", [ip_uris, tc_updated_str])
+          error: (response) -> std_api_error(response, 'Error updating these entries.')
+          completed: () -> $('.dispute-wlbl-adjust-wrapper .dropdown-submit-button').html('Submit Changes').prop('disabled', false)
+        )
+
+      # SCENARIO B (BULK): remove: USE OLD REMOVE ENDPOINT + ENTRY ID ARRAY
+      else if adjustment_type == 'remove'
+        data = { ip_uris: ip_uris, list_types: list_types, note: wlbl_comment, thrt_cat_ids: thrt_cat_ids }  # legacy object
+
+        console.log 'using old endpoint... # scenario b (bulk): index or show page and remove: use old endpoint + entry id array'
+        console.log data
+
+        std_msg_ajax(
+          url: '/escalations/api/v1/escalations/webrep/disputes/bulk_rule_ui_wlbl_remove'
+          method: 'POST'
+          data: data
+          success: (response) -> std_msg_success("Entries have been updated: ", [ip_uris, tc_updated_str])
+          error: (response) -> std_api_error(response, 'Error updating these entries.')
+          completed: () -> $('.dispute-wlbl-adjust-wrapper .dropdown-submit-button').html('Submit Changes').prop('disabled', false)
+        )
+
+    # BFRP BULK ADJUST
+    if location.href.includes('webrep/research')
+      # SCENARIO C (BULK): *BFRP* and add/replace: USE NEW ENDPOINT + ENTRY URL ARRAY
+      if adjustment_type != 'remove'  # add or remove, use new endpoint, new object
+        data = { adjustment_type: adjustment_type, lists: list_types, thrt_cat_ids: thrt_cat_ids, note: wlbl_comment, dispute_entries: disputes_array }
+
+        console.log 'using new endpoint... bulk scenario c: *bfrp* and add/replace: use new endpoint + entry url array'
+        console.log data
+
+        std_msg_ajax(
+          url: '/escalations/api/v1/escalations/webrep/disputes/bulk_wlbl_threatcat_adjust'
+          method: 'POST'
+          data: data
+          success: (response) -> std_msg_success("Entries have been updated: ", [ip_uris, tc_updated_str])
+          error: (response) -> std_api_error(response, 'Error updating these entries.')
+          completed: () -> $('.dispute-wlbl-adjust-wrapper .dropdown-submit-button').html('Submit Changes').prop('disabled', false)
+          )
+
+      # SCENARIO D (BULK): *BFRP* and remove: USE NEW ENDPOINT + ENTRY URL ARRAY
+      else if adjustment_type == 'remove'
+        data = { ip_uris: ip_uris, list_types: list_types, note: wlbl_comment, thrt_cat_ids: thrt_cat_ids } # legacy object
+
+        console.log 'using old endpoint... # bulk scenario d: bfrp and remove: use new endpoint + entry url array'
+        console.log data
+
+        std_msg_ajax(
+          url: '/escalations/api/v1/escalations/webrep/disputes/bulk_rule_ui_wlbl_remove'
+          method: 'POST'
+          data: data
+          success: (response) -> std_msg_success("Entries have been updated: ", [ip_uris, tc_updated_str])
+          error: (response) -> std_api_error(response, 'Error updating these entries.')
+          completed: () -> $('.dispute-wlbl-adjust-wrapper .dropdown-submit-button').html('Submit Changes').prop('disabled', false)
+        )
 
 
 
-# INLINE ADJUST WL/BL AND THREAT CATEGORIES
 # INLINE ADJUST WL/BL AND THREAT CATEGORIES
 window.submit_individual_wlbl = (button_tag) ->
   wlbl_form = button_tag.form;
@@ -488,6 +467,8 @@ window.submit_individual_wlbl = (button_tag) ->
   dispute_entry_id = $(wlbl_form).parents('.research-table-row').attr('data-entry-id')
   dispute_url = $(wlbl_form).parents('.research-table-row').find('.entry-data-content').text().trim()
   old_lists_str = $(wlbl_form).find('.wlbl-entry-wlbl').text()  # only used in confirmation modal, show what lists were changed
+  curr_note = $(wlbl_form).find('.note-input').text()
+  curr_endpoint = ''
 
   list_types = $('.wl-bl-list-inline:checkbox:checked').map(() ->
     this.value
@@ -507,111 +488,63 @@ window.submit_individual_wlbl = (button_tag) ->
       "<p class='tc-sentence'>With the following threat categories updated:
        <em>#{ thrt_cat_names.join(', ') }</em></p>"
 
-  old_lists_array = old_lists_str.split(' ')
   if old_lists_str == '' || old_lists_str.includes('Not')
     old_lists_length == 0
   else
     old_lists_length = old_lists_array.length
 
   new_lists_length = list_types.length
+  old_lists_array = old_lists_str.split(' ')
 
-  # simulate the add/replace/remove radio buttons with simple logic
+  # adjustment type: figure out the add/replace/remove adjustment type
   if new_lists_length >= old_lists_length then adjustment_type = 'add'
   else if new_lists_length == old_lists_length then adjustment_type = 'replace'
-  else if new_list_length < old_lists_length then adjustment_type = 'remove'
+  else if new_lists_length < old_lists_length then adjustment_type = 'remove'
 
-  # RESEARCH PAGE SUBMIT SCENARIOS
-  # RESEARCH PAGE SUBMIT SCENARIOS
-  if location.href.includes('webrep/disputes')
-    # SCENARIO 1 (INLINE): SHOW PAGE REMOVE: USE NEW ENDPOINT + ONE ENTRY URL
-    if adjustment_type == 'add' or adjustment_type == 'replace'  # use new endpoint
-      data = {
-        adjustment_type: adjustment_type,  # new school
-        lists: list_types,
-        thrt_cat_ids: thrt_cat_ids,
-        note: $(wlbl_form).find('.note-input').text(),
-        urls: [ dispute_url ]
-      }
-      console.log '# SCENARIO 1 (INLINE): SHOW PAGE REMOVE: USE NEW ENDPOINT + ONE ENTRY URL'
-      console.log data
-      std_msg_ajax(
-        url: '/escalations/api/v1/escalations/webrep/disputes/bulk_wlbl_threatcat_adjust'
-        method: 'POST'
-        data: data
-        error_prefix: 'Error adjusting WL/BL information.'
-        success_reload: true
-        success: (response) -> std_msg_success("Entry has been updated", [dispute_url, thrt_cat_str])
-        error: (response) -> std_api_error(response, 'Error updating this entry')
-        completed: () -> $('.dispute-wlbl-adjust-wrapper .dropdown-submit-button').html('Submit Changes')
-      )
-    # SCENARIO 2 (INLINE): SHOW PAGE REMOVE: USE OLD ENDPOINT + ONE ENTRY URL
-    else if adjustment_type == 'remove'   # use old endpoint
-      data = {
-        ip_uris: dispute_url,  # old school
-        list_types: list_types,
-        note: $(wlbl_form).find('.note-input').text(),
-        thrt_cat_ids: thrt_cat_ids
-      }
-      console.log '# SCENARIO 2 (INLINE): SHOW PAGE REMOVE: USE OLD ENDPOINT + ONE ENTRY URL'
-      console.log data
-      std_msg_ajax(
-        url: '/escalations/api/v1/escalations/webrep/disputes/bulk_rule_ui_wlbl_remove'
-        method: 'POST'
-        data: data
-        error_prefix: 'Error adjusting WL/BL information.'
-        success_reload: true
-        success: (response) -> std_msg_success("Entry has been updated", [dispute_url, thrt_cat_str])
-        error: (response) -> std_api_error(response, 'Error updating this entry')
-        completed: () -> $('.dispute-wlbl-adjust-wrapper .dropdown-submit-button').html('Submit Changes')
-      )
 
-  # BFRP PAGE SUBMIT SCENARIOS
-  # BFRP PAGE SUBMIT SCENARIOS
-  else if location.href.includes('webrep/research')
-    # SCENARIO 3 (INLINE): BFRP ADD or REPLACE: USE NEW MICAH ENDPOINT + ONE ENTRY ID
-    if adjustment_type == 'add' or adjustment_type == 'replace'  # use new endpoint
-      data = {
-        adjustment_type: 'add',   # new school
-        lists: list_types,
-        thrt_cat_ids: thrt_cat_ids,
-        note: $(wlbl_form).find('.note-input').text(),
-        urls: [ dispute_url ]
-      }
-      console.log 'Using new endpoint...'
-      console.log '# SCENARIO 3 (INLINE): BFRP ADD or REPLACE: USE NEW MICAH ENDPOINT + ONE ENTRY ID'
-      console.log data
-      std_msg_ajax(
-        url: '/escalations/api/v1/escalations/webrep/disputes/bulk_wlbl_threatcat_adjust'
-        method: 'POST'
-        data: data
-        error_prefix: 'Error adjusting WL/BL information.'
-        success_reload: true
-        success: (response) -> std_msg_success("Entry has been updated", [dispute_url, thrt_cat_str])
-        error: (response) -> std_api_error(response, 'Error updating this entry')
-        completed: () -> $('.dispute-wlbl-adjust-wrapper .dropdown-submit-button').html('Submit Changes')
-      )
+  # user wants to add some lists
+  if adjustment_type == 'add' or adjustment_type == 'replace'
+    data =
+      adjustment_type: adjustment_type
+      lists: list_types
+      thrt_cat_ids: thrt_cat_ids
+      note: curr_note
 
-    # SCENARIO 4 (INLINE): BFRP REMOVE: USE OLD MICAH ENDPOINT + ONE ENTRY URL
-    else if adjustment_type == 'remove'   # use old endpoint
-      data = {
-        ip_uris: dispute_url,  # old school
-        list_types: list_types,
-        note: $(wlbl_form).find('.note-input').text(),
-        thrt_cat_ids: thrt_cat_ids
-      }
-      console.log 'Using old endpoint...'
-      console.log '# SCENARIO 4 (INLINE): BFRP REMOVE: USE OLD MICAH ENDPOINT + ONE ENTRY URL'
-      console.log data
-      std_msg_ajax(
-        url: '/escalations/api/v1/escalations/webrep/disputes/bulk_rule_ui_wlbl_remove'
-        method: 'POST'
-        data: data
-        error_prefix: 'Error adjusting WL/BL information.'
-        success_reload: true
-        success: (response) -> std_msg_success("Entry has been updated", [dispute_url, thrt_cat_str])
-        error: (response) -> std_api_error(response, 'Error updating this entry')
-        completed: () -> $('.dispute-wlbl-adjust-wrapper .dropdown-submit-button').html('Submit Changes')
-      )
+    curr_endpoint = '/escalations/api/v1/escalations/webrep/disputes/bulk_wlbl_threatcat_adjust'
+
+    if location.href.includes('webrep/disputes')  # add from index/show page to new endpoint
+      console.log 'SCENARIO 1 (inline): index/show page: use new endpoint + one entry url'
+      data.urls = [ dispute_url ]
+    else if location.href.includes('webrep/research')  # add from research page to new endpoint
+      console.log 'SCENARIO 2 (inline): using new endpoint + one entry id'
+      data.urls = [ dispute_entry_id ]
+
+
+  # user wants to remove some lists
+  else if adjustment_type = 'remove'
+    data =
+      ip_uris: dispute_url
+      list_types: list_types
+      note: curr_note
+      thrt_cat_ids: thrt_cat_ids
+
+    curr_endpoint = '/escalations/api/v1/escalations/webrep/disputes/bulk_rule_ui_wlbl_remove'
+    console.log 'SCENARIO 3 (inline) using old endpoint... index/show/bfrp page remove: use old endpoint + one entry url'
+
+
+  # submit ready? make sure our data object is correct
+  console.log data
+
+  std_msg_ajax(
+    url: curr_endpoint
+    method: 'POST'
+    data: data
+    error_prefix: 'Error adjusting WL/BL information.'
+    success_reload: true
+    success: (response) -> std_msg_success("Entry has been updated", [dispute_url, thrt_cat_str])
+    error: (response) -> std_api_error(response, 'Error updating this entry')
+    completed: () -> $('.dispute-wlbl-adjust-wrapper .dropdown-submit-button').html('Submit Changes')
+  )
 
 
 
