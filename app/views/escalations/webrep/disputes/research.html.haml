@@ -219,6 +219,7 @@
       %table#disputes-research-table.table.table-sm.bfrp-table
         %tbody
           - @entries.each do |entry|
+            -# currently the entry.id here on bfrp does not work, fyi
             %tr.research-table-row{'data-entry-id': "#{entry.id}"}
               %td.research-table-row-wrapper
                 %table
