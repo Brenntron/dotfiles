@@ -271,10 +271,10 @@ $ ->
     #    If cannot connect to resync data
     #    Show error message modal
     #    Else
-    $('#loader-modal').modal({
-      backdrop: 'static',
-      keyboard: false
-    })
+#    $('#loader-modal').modal({
+#      backdrop: 'static',
+#      keyboard: false
+#    })
 
     data = {
       'dispute_id': $(".case-id-tag").html()

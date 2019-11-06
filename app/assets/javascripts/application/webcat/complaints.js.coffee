@@ -1523,14 +1523,14 @@ window.open_all = () ->
 
 toggle_selected = (selectedRows, expand)->
   selectState = $('.selected')
-  for i in [0..selectedRows.length]
+  for row in selectedRows
     if expand
-      if !$(selectedRows[i]).hasClass('shown')
-        $(selectedRows[i]).find('.expand-row-button-inline').click()
+      if !$(row).hasClass('shown')
+        $(row).find('.expand-row-button-inline').click()
     else
-      if $(selectedRows[i]).hasClass('shown')
-        $(selectedRows[i]).find('.expand-row-button-inline').click()
-        $(selectedRows[i]).addClass('selected')
+      if $(row).hasClass('shown')
+        $(row).find('.expand-row-button-inline').click()
+        $(row).addClass('selected')
   $(selectState).addClass('selected')
 
 # webcat: pin/unpin toolbar to top on webcat
