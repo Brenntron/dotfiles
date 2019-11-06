@@ -44,7 +44,7 @@ Feature: Webrep, the BFRP
     When I click "#research-search-broad"
     And I fill in "search_uri" with "cisco.com"
     And I click "#submit-button"
-    And I wait for "250" seconds
+    And I wait for "500" seconds
     Then multiple research entry exists
 
   @javascript
