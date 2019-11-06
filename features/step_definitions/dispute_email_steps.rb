@@ -9,7 +9,7 @@ And(/^row with email_id "(.*?)" should have class "(.*?)"$/) do |email_id, class
 end
 
 And(/^I click on row with email_id "(.*?)"$/) do |email_id|
-  page.find(:xpath, "//tr[@email_id=#{email_id}]").click
+  page.first(:xpath, "//tr[@email_id=#{email_id}]/td").click
 end
 
 And(/^I fill in the reply textarea with "(.*?)"$/) do |text|
