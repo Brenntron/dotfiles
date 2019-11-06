@@ -10448,6 +10448,11 @@ span.input-truncate {
   .content-label-sm {
     margin-bottom: 0;
   }
+  button {
+    text-transform: none;
+    font-weight: 400;
+    font-size: 8.5pt;
+  }
 }
 
 .single-button-col .open button {

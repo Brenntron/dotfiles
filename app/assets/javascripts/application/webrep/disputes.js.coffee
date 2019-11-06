@@ -2032,7 +2032,66 @@ $ ->
 
 
 
-    window.add_host_ips = () ->
+window.add_host_ips = (button) ->
+  debugger
+
+  entry_id = $(button).attr('data-entry-id')
+  form     = $(button).parents('.add-host-ips')[0]
+  ips      = $(form).find('textarea').val()
+  ip_array = []
+
+  if ips.length > 0
+    # Breakup the ips
+    ip_array_initial = ips.replace(/\n/g, ",").split(",")
+    $(ip_array_initial).each ->
+      ip = this.trim()
+      ip_array.push(ip)
+
+    # Refined ip array back to string for DOM
+    final_ips = ip_array.join(', ')
+
+    # Create the IP rows
+    parent_row = $(form).parents('.research-table-row-wrapper')[0]
+    uri_data_row = $(parent_row).find('.research-overview-row')[0]
+    ip_row =
+      '<tr class="research-uri-ip-query-row">' +
+        '<td rowspan="2"></td>' +
+        '<td class="input-col ip-label-col" rowspan="2"></td>' +
+        '<td class="dual-edit-field" colspan="7" data-field="host" data-id="' + entry_id + '">' +
+          '<span class="entry-data entry-resolved-ip-content">' + final_ips + '</span>' +
+          '<input class="table-entry-input wide" type="text" value="' + final_ips + '">' +
+        '</td>' +
+      '</tr>'
+
+    ip_data_row =
+      '<tr class="research-uri-ip-data-row">' +
+        '<td class="research-table-details-wrapper" colspan="8">' +
+          '<table><tbody>' +
+            '<tr class="single-details-row">' +
+              '<td><label>WBRS</label></td>' +
+              '<td class="text-center no-border"></td>' +
+              '<td><label>WBRS Rule Hits</label></td>' +
+              '<td class="text-center"></td>' +
+              '<td><label>WBRS Rules</label></td>' +
+              '<td></td>' +
+              '<td><label>Category</label></td>' +
+              '<td></td>' +
+              '<td><label>URI</label></td>' +
+              '<td></td>' +
+            '</tr>' +
+          '</tbody></table>' +
+        '</td>' +
+      '</tr>'
+
+    $(uri_data_row).after(ip_data_row)
+    $(uri_data_row).after(ip_row)
+
+    # Time to make the donuts, make call to sdsv3 to populate this beautiful new row
+    # insert function here
+
+  else
+    console.log 'add an error above the textarea'
+
       # If a uri / domain entry (or result in the case of BFRP) does not have any ips associated with it
 #      Get entry id
 #      insert IP row
