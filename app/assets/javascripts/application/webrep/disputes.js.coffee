@@ -2031,6 +2031,16 @@ $ ->
             $(this).addClass('hidden')
 
 
+  # Focus on the first field in the dropdown on open
+  $('.dropdown').on 'shown.bs.dropdown', ->
+    debugger
+    form = $(this).find('form')[0]
+    if $(form).hasClass('add-host-ips')
+      textarea = $(form).find('textarea')[0]
+      $(textarea).focus()
+    return
+
+
 
 window.add_host_ips = (button) ->
   entry_id = $(button).attr('data-entry-id')
@@ -2155,9 +2165,7 @@ window.query_uri_plus_ip = (uri, ips, entry_id) ->
 
   # If there are rule hits, add to the rule hit details table
   if rule_hits > 0
-    debugger
     wbrs_details_table = $($('#entry-data-wrapper_' + entry_id).find('.wbrs-details-table')[0]).find('tbody')[0]
-
     $(fake_data.wbrs_rules).each ->
       # Ignoring description and weight right now as I don't think we are getting that data currently
       rule_row = '<tr><td class="uri-plus-ip-rule-indicator"></td><td>' + this + '</td><td></td><td></td></tr>'
