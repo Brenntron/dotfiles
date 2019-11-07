@@ -75,7 +75,9 @@ development:
     url: "https://localhost:3000/api_test"
   sds:
     host: "v2.sds.cisco.com"
+    v3_host: "v3-web-intel-rest.talos.cisco.com"
     ca_cert_file: "/usr/local/etc/sds-certificate.pem"
+    v3_cert: "REDACTED"
     pkey_file: "/usr/local/etc/sds-pkey.pem"
     username: "tidev"
     password: "REDACTED"
