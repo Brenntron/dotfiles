@@ -673,15 +673,13 @@ $ ->
 
   $('.delete-template').on 'click', ->
     template_id = $(this).attr('template_id')
-    confirmation = confirm('Are you sure you want to delete this template?')
+    std_msg_confirm('Are you sure you want to delete this template?', [])
 
-    if confirmation
+    $('.confirm').on 'click', ->
       std_msg_ajax(
         method: 'DELETE'
         url: "/escalations/api/v1/escalations/webrep/email_templates/#{template_id}"
         success_reload: true
-        success: (response) ->
-          std_msg_success('Email Template Deleted.', [], reload: true)
         error: (response) ->
           std_api_error(response, "Email Template could not be deleted.", reload: false)
       )
