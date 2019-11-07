@@ -296,8 +296,12 @@ module API
 
               case params[:adjustment_type]
               when "add"
-                parsed_ip_uris = ip_uris.map{|ip_uri| DisputeEntry.domain_of_with_path(ip_uri).strip}
-                unique_ip_uris = parsed_ip_uris.uniq
+                if params[:dispute_entries].present?
+                  parsed_ip_uris = ip_uris.map{|ip_uri| DisputeEntry.domain_of_with_path(ip_uri).strip}
+                  unique_ip_uris = parsed_ip_uris.uniq
+                else
+                  unique_ip_uris = ip_uris
+                end
 
                 wlbl_params =
                     {
