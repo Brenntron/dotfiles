@@ -460,21 +460,18 @@ window.submit_individual_wlbl = (button_tag) ->
       "<p class='tc-sentence'>With the following threat categories updated:
        <em>#{ thrt_cat_names.join(', ') }</em></p>"
 
+  new_lists_length = list_types.length
+  old_lists_array = old_lists_str.split(' ')
+
   if old_lists_str == '' || old_lists_str.includes('Not')
     old_lists_length == 0
   else
     old_lists_length = old_lists_array.length
 
-  new_lists_length = list_types.length
-  old_lists_array = old_lists_str.split(' ')
-
   # adjustment type: figure out the add/replace/remove adjustment type
   if new_lists_length >= old_lists_length then adjustment_type = 'add'
   else if new_lists_length == old_lists_length then adjustment_type = 'replace'
   else if new_lists_length < old_lists_length then adjustment_type = 'remove'
-
-
-
 
   # ADD TO LISTS?
   if adjustment_type == 'add' || adjustment_type == 'replace'
@@ -492,6 +489,8 @@ window.submit_individual_wlbl = (button_tag) ->
     else if location.href.includes('webrep/research')  # add from research page to new endpoint
       console.log 'INLINE SCENARIO 2: bfrp using new endpoint + one entry id'
       data.urls = [ dispute_entry_id ]
+      if $('body').hasClass('show-action')  # bfrp specific needs a url for inline
+        data.urls = [ dispute_url ]
 
   # REMOVE FROM LISTS?
   else if adjustment_type = 'remove'
