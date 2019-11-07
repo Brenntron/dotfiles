@@ -410,7 +410,6 @@ module API
               requires :field_data, type: Hash
             end
             patch 'entries/field_data' do
-              binding.pry
               std_api_v2 do
                 authorize!(:update, Dispute)
 

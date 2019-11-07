@@ -668,9 +668,6 @@ window.save_dispute_entries = () ->
           else
             $(this).find("input[name='entry-status']:checked").attr('id')
 
-        when 'host-ip'
-          console.log 'we gotta check the ips now'
-          # add shit here
         else $(this).find('.table-entry-input')[0].value.trim()
 
       old_value = $(this).find('.entry-data')[0].innerText.trim()
