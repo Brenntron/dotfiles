@@ -420,9 +420,6 @@ window.submit_bulk_wlbl = (page) ->
     method: 'POST'
     data: data
     success: (response) -> std_msg_success("Entries have been updated: ", [ip_uris, tc_updated_str])
-    success: (response) -> std_msg_success("Entries have been updated: ", [ip_uris, tc_updated_str])
-    success: (response) -> std_msg_success("Entries have been updated: ", [ip_uris, tc_updated_str])
-    success: (response) -> std_msg_success("Entries have been updated: ", [ip_uris, tc_updated_str])
     error: (response) -> std_api_error(response, 'Error updating these entries.')
     completed: () -> $('.dispute-wlbl-adjust-wrapper .dropdown-submit-button').html('Submit Changes').prop('disabled', false)
   )
