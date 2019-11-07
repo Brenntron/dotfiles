@@ -42,9 +42,9 @@ Feature: Webrep, the BFRP
     Given a user with role "webrep user" exists and is logged in
     And I go to "escalations/webrep/research"
     When I click "#research-search-broad"
-    And I fill in "search_uri" with "cisco.com"
+    And I fill in "search_uri" with "blizzard.com"
     And I click "#submit-button"
-    And I wait for "500" seconds
+    And I wait for "30" seconds
     Then multiple research entry exists
 
   @javascript
