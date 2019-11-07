@@ -31,8 +31,10 @@ namespace 'WebCat.RepLookup', (exports) ->
     }, this
 
   exports.queryWhoIs = (query_entry) ->
+    loader = $("[entry_id='" + query_entry + "']").find('.inline-loader')
+    loader.css('display', 'flex')
     successFunction = (result) ->
-      $('#loader-modal').modal 'hide'
+      loader.css('display', 'none')
       if result != null
         whois = result.data
 
@@ -53,12 +55,9 @@ namespace 'WebCat.RepLookup', (exports) ->
         $('#whois_content').append message
 
     errorFunction = (message) ->
-      $('#loader-modal').modal 'hide'
+      loader.css('display', 'none')
       std_msg_error("Error retrieving WHOIS query.","")
 
-    $('#loader-modal').modal({
-      backdrop: 'static',
-      keyboard: false
-    })
+
     WebCat.RepLookup.getLookup('/api/v2/whois/', query_entry).then successFunction, errorFunction
-    return
+#  eturn
