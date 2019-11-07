@@ -215,7 +215,7 @@ class AutoResolve
         end
 
     vt_status =
-        if Rails.configuration.virus_total.check
+        if Rails.configuration.virustotal.check
           check_virus_total_from_preload(dispute_entry, address)
         else
           nil
