@@ -839,8 +839,8 @@ window.drop_current_categories = () ->
 )
 
 format = (complaint_entry_row) ->
-  $('.inline-loader').css('display', 'flex')
   complaint_entry = complaint_entry_row.data()
+  console.log complaint_entry_row
   row_id = complaint_entry_row[0][0]
   missing_data = '<span class="missing-data">No Data</span>'
   uri = ''
@@ -957,8 +957,8 @@ format = (complaint_entry_row) ->
     url: '/escalations/api/v1/escalations/webcat/complaint_entries/retrieve_current_categories'
     data: {'id': complaint_entry.entry_id}
     success: (response) ->
-      $('.inline-loader').css('display', 'none')
-    
+      row_id = JSON.parse(this.data).id
+      $("[entry_id='" + row_id + "']").find('.inline-loader').css('display', 'none')
       { current_category_data : current_categories, master_categories, sds_category} = JSON.parse(response)
 
       sds_category == '' unless sds_category != null
@@ -996,7 +996,7 @@ format = (complaint_entry_row) ->
         $(".simple-nested-table" + "#entry-table-" + complaint_entry.entry_id).append(category_row)
 
     error: (response) ->
-      $('.inline-loader').css('display', 'none')
+      $("[entry_id='" + row_id + "']").find('.inline-loader').css('display', 'none')
       current_categories = ''
   )
 
@@ -1034,7 +1034,22 @@ format = (complaint_entry_row) ->
   retake_in_progress = false
   if complaint_entry.screen_shot_error == "Retaking screenshot please wait."
     retake_in_progress = true
-
+  svg =
+    '<!-- Generator: Adobe Illustrator 22.0.0, SVG Export Plug-In . SVG Version: 6.00 Build 0)  --><svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" version="1.1" id="Layer_1" x="0px" y="0px" viewBox="0 0 20 20" style="enable-background:new 0 0 20 20;" xml:space="preserve">
+      <style type="text/css">
+        .gear_one{fill:#BABABA;}
+        .bounding_box{fill:none;}
+        .gear_two:#4D4D4D;}
+      </style>
+      <g id="gear_larger" class="rotating">
+        <path class="gear_one" d="M7.9,11.5c0,0.7-0.5,1.1-1.1,1.1s-1.1-0.5-1.1-1.1c0-0.7,0.5-1.1,1.1-1.1S7.9,10.8,7.9,11.5z M12.3,11l-0.2-1   l-1.5-0.3L10.1,9l0.6-1.4L10,6.9L8.6,7.8L7.8,7.4L7.3,5.9h-1L5.7,7.4L4.9,7.8L3.6,6.9L2.9,7.6L3.5,9L3,9.8l-1.5,0.3l-0.2,1l1.3,0.8   l0.2,0.9l-1,1.1l0.4,1l1.5-0.3L4.4,15v1.5l1,0.4l1-1.1h0.9l1,1.1l1-0.4V15l0.7-0.6l1.5,0.3l0.5-0.9l-1-1.1l0.2-0.9L12.3,11z"></path>
+        <rect x="1.3" y="5.9" class="bounding_box" width="11" height="11"></rect>
+      </g>
+      <g id="gear_smaller" class="rotating">
+        <path class="gear_two" d="M13.8,7c0-0.5,0.4-0.9,0.9-0.9s0.9,0.4,0.9,0.9s-0.4,0.9-0.9,0.9C14.2,7.8,13.8,7.4,13.8,7z M17.3,6.6l1-1.1   l-0.5-0.9l-1.4,0.3l-0.6-0.4l-0.5-1.4h-1.1l-0.5,1.4L13,4.9l-1.4-0.3l-0.5,0.9l1,1.1v0.7l-1,1.1l0.5,0.9L13,9l0.6,0.4l0.5,1.4h1.1   l0.5-1.4L16.3,9l1.4,0.3l0.5-0.9l-1-1.1V6.6H17.3z"></path>
+        <rect x="10.7" y="2.9" class="bounding_box" width="8" height="8"></rect>
+      </g>
+    </svg>'
   complaint_entry_html =
       complaint_table_row_html +
       '<div class="col-xs-12 col-sm-8 nested-complaint-static-data">' +
@@ -1044,9 +1059,6 @@ format = (complaint_entry_row) ->
       '<img id="screenshot_id_' + complaint_entry.entry_id + '" class="screenshot-thumb-img" title="' + screen_shot_error + '" data-toggle="popover" onclick="enlarge_image(' + complaint_entry.entry_id + ',\'complaint_entries/serve_image?complaint_entry_id=' + complaint_entry.entry_id + '\',' + retake_in_progress + '\)" src="complaint_entries/serve_image?complaint_entry_id=' + complaint_entry.entry_id + '" />' +
       '</div>' +
       '<div class="complaint-entry-info">' +
-      '<div class="inline-loader">' +
-      '<div class="loadder-gears"></div>'
-=inline_svg 'icon_gears_loader.svg'
       '<label class="content-label-sm">Case ID</label>' +
       '<span class="nested-complaint-data case-id"><a href="complaints/' + complaint_entry.complaint_id + '">' + complaint_entry.complaint_id + '</a></span>' +
       '<label class="content-label-sm">Entry URI</label>' +
@@ -1060,6 +1072,9 @@ format = (complaint_entry_row) ->
       '</div></div><div class="col-xs-7 col-with-divider">' +
       '<table class="simple-nested-table" id="entry-table-' + complaint_entry.entry_id + '"><thead><tr><th class="col-sm-1">Conf</th><th class="col-sm-4">WBRS Categories</th><th class="col-sm-3">WBRS Certainty</th><th class="col-sm-4">SDS Category</tr></thead>' +
       '</table>' +
+      '<div class="inline-loader">' +
+      '<div class="loader-gears">' + svg + '</div>'+
+      '<span>Loading Data...</span></div>' +
       '</br>' +
       '</div><div class="col-xs-2">' +
       '<button class="secondary" id="lookup-' + complaint_entry.entry_id + '" onclick="WebCat.RepLookup.queryWhoIs(\'' + url + '\')">Lookup</button><br/>' +
@@ -1733,7 +1748,6 @@ window.master_submit = () ->
         error_msg += no_cats_boiler_plate
 
       if errors == true
-        $('.inline-loader').modal 'hide'
         std_msg_error(error_msg,"")
       else
         $('#loader-modal').modal 'hide'

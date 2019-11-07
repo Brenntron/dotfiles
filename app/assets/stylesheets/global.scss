@@ -1231,6 +1231,12 @@ thead th.sorting.center {
   display: none;
 }
 
+.inline-loader{
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
 #msg-modal, #loader-modal, #login-modal {
   .modal-dialog, .modal-dialog {
     margin-top: 180px;
