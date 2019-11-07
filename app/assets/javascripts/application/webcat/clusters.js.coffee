@@ -213,7 +213,7 @@ window.open_all_clusters = () ->
 
 # This is here because of weird namespace problems over at `complaints.js.coffee`
 open_selected_tabs = (selected_rows, toggle) ->
-  for i, rown in selected_rows[0]
+  for row, i in selected_rows[0]
     subdomain = ""
     domain = ""
     path = ""
@@ -304,8 +304,8 @@ window.toggle_all_checkboxes = () ->
   else
     $('#clusters-index').DataTable().rows().deselect()
     rows = $('table#clusters-index input[type="checkbox"]')
-    for row in  rows
-      $(rows[i])[0].checked = false
+    for row in rows
+      $(row)[0].checked = false
 
 # Select rows in Clusters Table
 $ ->

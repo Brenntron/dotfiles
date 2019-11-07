@@ -143,7 +143,6 @@ $ ->
     nested_row = $(entry_row).find('.nested-data-row')[0]
     $(nested_row).toggle()
     $(expand_button).toggleClass('shown')
-    $('#loader-modal').modal('hide')
 
 
 # Show / hide the different research tables in the expanded row
@@ -269,13 +268,13 @@ $ ->
 
   # Sync / refresh entry data. Initiate modal / animation
   $('#sync-data-button').click ->
-    #    If cannot connect to resync data
-    #    Show error message modal
-    #    Else
-#    $('#loader-modal').modal({
-#      backdrop: 'static',
-#      keyboard: false
-#    })
+#        If cannot connect to resync data
+#        Show error message modal
+#        Else
+    $('#loader-modal').modal({
+      backdrop: 'static',
+      keyboard: false
+    })
 
     data = {
       'dispute_id': $(".case-id-tag").html()
@@ -298,9 +297,6 @@ $ ->
     )
 
 #    When data is finish loading
-#    $('#loading-div').hide()
-#    $('#api-msg').show()
-#    $('#loader-modal.hidden).removeClass('hidden')
 #    Display success message in modal
 
   window.researchfilter = (element) ->

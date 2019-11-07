@@ -568,7 +568,7 @@ window.take_selected = ()->
   selected_rows = $('#complaints-index').DataTable().rows('.selected')
   if selected_rows[0].length > 0
     entry_ids = []
-    for i, row in selected_rows
+    for row, i in selected_rows[0]
       entry_ids.push(selected_rows.data()[i].entry_id)
     headers = {'Token': $('input[name="token"]').val(), 'Xmlrpc-Token': $('input[name="xml_token"]').val()}
     $.ajax(
@@ -838,7 +838,6 @@ window.drop_current_categories = () ->
 
 format = (complaint_entry_row) ->
   complaint_entry = complaint_entry_row.data()
-  console.log complaint_entry_row
   row_id = complaint_entry_row[0][0]
   missing_data = '<span class="missing-data">No Data</span>'
   uri = ''
