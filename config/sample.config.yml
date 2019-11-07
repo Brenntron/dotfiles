@@ -321,11 +321,6 @@ staging:
     pkey_file: "/usr/local/etc/sds-pkey.pem"
     username: "tidev"
     passname: "redacted"
-  sds_v3:
-    host: "v3-web-intel-rest.talos.cisco.com"
-    beta_host: "v3-web-intel-rest-beta.talos.cisco.com"
-    cert_file: "redacted"
-    beta_cert_file: "redacted"
   snort_doc_max_fails: 3
   snort_org:
     host: "localhost"
