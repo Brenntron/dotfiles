@@ -393,7 +393,7 @@ window.submit_bulk_wlbl = (page) ->
     console.log 'BULK SCENARIO 1: index/show ADD/REPLACE: USE NEW ENDPOINT + ENTRY URL ARRAY'
     data =
       adjustment_type: adjustment_type   # new object
-      urls: [ ip_uris ]
+      urls: ip_uris
       lists: list_types
       note: wlbl_comment
       thrt_cat_ids: thrt_cat_ids
@@ -441,6 +441,7 @@ window.submit_individual_wlbl = (button_tag) ->
   old_lists_str = $(wlbl_form).find('.wlbl-entry-wlbl').text()  # only used in confirmation modal, show what lists were changed
   curr_note = $(wlbl_form).find('.note-input').text()
   curr_endpoint = ''
+  modal_info_string = ''
 
   list_types = $('.wl-bl-list-inline:checkbox:checked').map(() ->
     this.value
@@ -482,14 +483,18 @@ window.submit_individual_wlbl = (button_tag) ->
       note: curr_note
 
     curr_endpoint = '/escalations/api/v1/escalations/webrep/disputes/bulk_wlbl_threatcat_adjust'
+    modal_info_string = "Lists have been added/replaced for this entry: #{dispute_url}, #{list_types} #{thrt_cat_str}"
 
     if location.href.includes('webrep/disputes')  # add from index/show page to new endpoint
       console.log 'INLINE SCENARIO 1: index/show page ADD/REPLACE: use new endpoint + one entry url'
       data.urls = [ dispute_url ]
+
     else if location.href.includes('webrep/research')  # add from research page to new endpoint
       console.log 'INLINE SCENARIO 2: bfrp ADD/REPLACE using new endpoint + one entry id'
       data.urls = [ dispute_entry_id ]
+
       if $('body').hasClass('research-action')  # bfrp specific needs a url for inline
+        console.log 'INLINE SCENARIO 2A: bfrp ADD/REPLACE using new endpoint + one entry id'
         data.urls = [ dispute_url ]
 
   # REMOVE FROM LISTS?
@@ -502,9 +507,11 @@ window.submit_individual_wlbl = (button_tag) ->
       thrt_cat_ids: thrt_cat_ids
 
     curr_endpoint = '/escalations/api/v1/escalations/webrep/disputes/bulk_rule_ui_wlbl_remove'
+    modal_info_string = "Lists (#{list_types}) have been removed for this entry: #{dispute_url}"
 
   # submit ready? make sure our data object is correct
   console.log data
+
 
   std_msg_ajax(
     url: curr_endpoint
@@ -512,9 +519,13 @@ window.submit_individual_wlbl = (button_tag) ->
     data: data
     error_prefix: 'Error adjusting WL/BL information.'
     success_reload: true
-    success: (response) -> std_msg_success("Entry has been updated", [dispute_url, thrt_cat_str])
-    error: (response) -> std_api_error(response, 'Error updating this entry')
-    completed: () -> $('.dispute-wlbl-adjust-wrapper .dropdown-submit-button').html('Submit Changes')
+    success: (response) ->
+#      std_msg_success("Entry has been updated", [dispute_url, thrt_cat_str])
+      std_msg_success("Entry has been updated", [modal_info_string])
+    error: (response) ->
+      std_api_error(response, 'Error updating this entry')
+    completed: () ->
+      $('.dispute-wlbl-adjust-wrapper .dropdown-submit-button').html('Submit Changes')
   )
 
 
