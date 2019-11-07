@@ -258,8 +258,15 @@ class Sbrs::Base
         request["X-Product-ID"] = "talosintelligence"
         request["X-Device-ID"] = "talosweb"
 
-        cert = OpenSSL::X509::Certificate.new(Rails.configuration.sds.v3_cert.gsub("\\n", "\n"))
-        key = OpenSSL::PKey::RSA.new(Rails.configuration.sds.v3_cert.gsub("\\n", "\n"))
+        cert_string = File.open(ca_cert_file, 'r') do |file|
+          file.read
+        end
+        pkey_string = File.open(pkey_file, 'r') do |file|
+          file.read
+        end
+
+        cert = OpenSSL::X509::Certificate.new(cert_string.gsub("\\n", "\n"))
+        key = OpenSSL::PKey::RSA.new(pkey_string.gsub("\\n", "\n"))
 
         req_options = {
             use_ssl: uri.scheme == "https",

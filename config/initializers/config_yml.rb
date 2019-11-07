@@ -101,7 +101,6 @@ sds_config = env_config.fetch('sds', nil)
 raise 'config.yml missing SDS section' unless sds_config
 Rails.configuration.sds                 = ApiRequester::ApiRequester.config_of(sds_config)
 Rails.configuration.sds.v3_host         = sds_config['v3_host']
-Rails.configuration.sds.v3_cert         = sds_config['v3_cert']
 Rails.configuration.sds.cert_file       = sds_config['cert_file'] || sds_config['ca_cert_file']
 Rails.configuration.sds.pkey_file       = sds_config['pkey_file']
 
