@@ -390,7 +390,7 @@ window.submit_bulk_wlbl = (page) ->
 
   # ADD TO LISTS BULK
   if adjustment_type == 'add' or adjustment_type == 'replace'
-    console.log 'BULK ADJUST: index/show and add/replace: USE NEW ENDPOINT + ENTRY URL ARRAY'
+    console.log 'BULK SCENARIO 1: index/show and add/replace: USE NEW ENDPOINT + ENTRY URL ARRAY'
     data =
       adjustment_type: adjustment_type   # new object
       urls: [ ip_uris ]
@@ -402,7 +402,7 @@ window.submit_bulk_wlbl = (page) ->
 
   # REMOVE FROM LISTS BULK
   else if adjustment_type == 'remove'
-    console.log 'BULK ADJUST: index/show/bfrp and remove: USE NEW ENDPOINT + ENTRY URL ARRAY'
+    console.log 'BULK SCENARIO 2: index/show/bfrp and remove: USE OLD ENDPOINT + ENTRY URL ARRAY'
     data =
       ip_uris: ip_uris    # old object
       list_types: list_types
@@ -487,15 +487,15 @@ window.submit_individual_wlbl = (button_tag) ->
     curr_endpoint = '/escalations/api/v1/escalations/webrep/disputes/bulk_wlbl_threatcat_adjust'
 
     if location.href.includes('webrep/disputes')  # add from index/show page to new endpoint
-      console.log 'INLINE ADJUST: index/show page: use new endpoint + one entry url'
+      console.log 'INLINE SCENARIO 1: index/show page: use new endpoint + one entry url'
       data.urls = [ dispute_url ]
     else if location.href.includes('webrep/research')  # add from research page to new endpoint
-      console.log 'INLINE ADJUST: bfrp using new endpoint + one entry id'
+      console.log 'INLINE SCENARIO 2: bfrp using new endpoint + one entry id'
       data.urls = [ dispute_entry_id ]
 
   # REMOVE FROM LISTS?
   else if adjustment_type = 'remove'
-    console.log 'INLINE ADJUST: index/show/bfrp page remove: use old endpoint + one entry url'
+    console.log 'INLINE SCENARIO 3: index/show/bfrp page remove: use old endpoint + one entry url'
     data =
       ip_uris: dispute_url
       list_types: list_types

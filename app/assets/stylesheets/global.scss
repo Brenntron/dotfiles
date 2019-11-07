@@ -10603,9 +10603,6 @@ span.threat-cat-no-data {
   td:nth-child(1), td:nth-child(2) {
     width: 20px;  // icons
   }
-  td:nth-child(3) {
-    //width: 55%;  // category, retain this commented line
-  }
   td:nth-child(4) {
     width: 20%;  // hostname
   }
@@ -10717,8 +10714,3 @@ span.threat-cat-no-data {
 .message-div ul {
   margin-top: 15px;
 }
-
-//.dispute-wlbl-adjust-wrapper .dropdown-submit-button:disabled {
-//  background-color: $disabled-bg !important;
-//  color: $disabled-txt !important;
-//}
