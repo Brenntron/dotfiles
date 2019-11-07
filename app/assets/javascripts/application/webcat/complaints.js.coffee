@@ -955,7 +955,8 @@ format = (complaint_entry_row) ->
     data: {'id': complaint_entry.entry_id}
     success: (response) ->
       row_id = JSON.parse(this.data).id
-      $("[entry_id='" + row_id + "']").find('.inline-loader').css('display', 'none')
+      loader = $("[entry_id='" + row_id + "']").find('.inline-loader')
+      loader.css('display', 'none')
       { current_category_data : current_categories, master_categories, sds_category} = JSON.parse(response)
 
       sds_category == '' unless sds_category != null
@@ -993,7 +994,7 @@ format = (complaint_entry_row) ->
         $(".simple-nested-table" + "#entry-table-" + complaint_entry.entry_id).append(category_row)
 
     error: (response) ->
-      $("[entry_id='" + row_id + "']").find('.inline-loader').css('display', 'none')
+      loader.css('display', 'none')
       current_categories = ''
   )
 
@@ -1071,7 +1072,7 @@ format = (complaint_entry_row) ->
       '</table>' +
       '<div class="inline-loader">' +
       '<div class="loader-gears">' + svg + '</div>'+
-      '<span>Loading Data...</span></div>' +
+      '<span class="missing-data">Loading Data...</span></div>' +
       '</br>' +
       '</div><div class="col-xs-2">' +
       '<button class="secondary" id="lookup-' + complaint_entry.entry_id + '" onclick="WebCat.RepLookup.queryWhoIs(\'' + url + '\')">Lookup</button><br/>' +
