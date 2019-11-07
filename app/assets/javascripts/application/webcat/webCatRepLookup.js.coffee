@@ -60,4 +60,4 @@ namespace 'WebCat.RepLookup', (exports) ->
 
 
     WebCat.RepLookup.getLookup('/api/v2/whois/', query_entry).then successFunction, errorFunction
-#  eturn
+    return
