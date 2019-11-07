@@ -1103,7 +1103,7 @@ $ ->
       if this.entry.primary_category != null
         category = this.entry.primary_category
       else
-        category = missing_data
+        category = '<span class="missing-data">No assigned categories</span>'
       status = ''
       if this.entry.status != null
         status = this.entry.status

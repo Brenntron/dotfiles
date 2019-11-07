@@ -10400,32 +10400,55 @@ span.input-truncate {
   }
   span.entry-data-content {
     display: inline-block;
-    min-width: 500px;   // url/ip
+    min-width: 400px;   // url/ip
   }
 }
 
 // second row of each
 .research-overview-row {
   background: $faint-neutral-color;
-  td:nth-child(6) {
-    width: 170px;  // rule hits list
+  .input-col{
+    padding: unset!important;
+    width: 27px;
+  }
+  .input-col input{
+    margin: auto 4px auto 7px;
+  }
+  label{
+    white-space: nowrap;
+  }
+  td{
+    .wbrs-input-wrapper { background-color: $bug-section-color; }
+    .sbrs-input-wrapper { background-color: $success-color;}
+    .xbrs-input-wrapper { background-color: $communication-accent-color;}
+    .crosslisted-input-wrapper { background-color: $warning-accent-color; }
+    .virus-total-input-wrapper { background-color: $rule-accent-color; }
+    .reptool-input-wrapper { background-color: $fifth-section-color; }
+  }
+  td:nth-child(3){
+    //background: red;
+    //width: 170px;  // rule hits list
+    width: 60px;
     word-break: break-word;
     padding-right: 10px;
   }
-  td:nth-child(7) {
-    width: 150px;
-  }
-  td:nth-child(8) {
-    width: 60px;   // xbrs history
+  td:nth-child(6) {
+    //background: red;
+    //width: 170px;  // rule hits list
+    word-break: break-word;
+    padding-right: 10px;
   }
   td:nth-child(9) {
-    width: 140px;
+    width: 130px;
   }
   td:nth-child(10) {
+    width: 20px;   // xbrs history
+  }
+  td:nth-child(12), td:nth-child(13) {
     width: 110px;  // reptool class
     word-break: break-word;
   }
-  td:nth-child(12) {
+  td:nth-child(16) {
     width: 190px;  // wl/bl lists + threat cats
   }
 }
