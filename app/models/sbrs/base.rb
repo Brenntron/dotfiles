@@ -24,11 +24,7 @@ class Sbrs::Base
   end
 
   def self.sds_v3_host
-    if Rails.env.production?
-      @sds_v3_host ||= Rails.configuration.sds_v3.host
-    else
-      @sds_v3_host ||= Rails.configuration.sds_v3.beta_host
-    end
+    @sds_v3_host ||= Rails.configuration.sds.v3_host
   end
 
   def self.remote_call_sds_v3(sds_item, sds_type)
@@ -262,13 +258,15 @@ class Sbrs::Base
         request["X-Product-ID"] = "talosintelligence"
         request["X-Device-ID"] = "talosweb"
 
-        if Rails.env.production?
-          cert = OpenSSL::X509::Certificate.new(Rails.configuration.sds_v3.cert_file.gsub("\\n", "\n"))
-          key = OpenSSL::PKey::RSA.new(Rails.configuration.sds_v3.cert_file.gsub("\\n", "\n"))
-        else
-          cert = OpenSSL::X509::Certificate.new(Rails.configuration.sds_v3.beta_cert_file.gsub("\\n", "\n"))
-          key = OpenSSL::PKey::RSA.new(Rails.configuration.sds_v3.beta_cert_file.gsub("\\n", "\n"))
+        cert_string = File.open(ca_cert_file, 'r') do |file|
+          file.read
         end
+        pkey_string = File.open(pkey_file, 'r') do |file|
+          file.read
+        end
+
+        cert = OpenSSL::X509::Certificate.new(cert_string.gsub("\\n", "\n"))
+        key = OpenSSL::PKey::RSA.new(pkey_string.gsub("\\n", "\n"))
 
         req_options = {
             use_ssl: uri.scheme == "https",

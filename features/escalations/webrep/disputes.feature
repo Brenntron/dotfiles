@@ -77,7 +77,6 @@ Feature: Disputes
 
   @javascript
   Scenario: a user takes a dispute and status is updated to assigned
-    Then pending
     Given a user with role "webrep user" exists with cvs_username, "Cucumber", exists and is logged in
     Given the following users exist
       | id | cvs_username |
@@ -92,7 +91,6 @@ Feature: Disputes
 
   @javascript
   Scenario: a user takes a dispute, returns a dispute, and takes the dispute again
-    Then pending
     Given a user with role "webrep user" exists with cvs_username, "Cucumber", exists and is logged in
     Given the following users exist
       | id | cvs_username |
@@ -153,6 +151,7 @@ Feature: Disputes
   @javascript
   Scenario: a user uses advanced search filter (Submitted Older/Modified Older) and exports to csv
     Given pending
+    # Note that selenium doesn't support viewing response headers as is required by this test, maybe just get rid of it
     Given a user with role "webrep user" exists and is logged in
     And the following disputes exist and have entries:
       | id |
@@ -243,9 +242,9 @@ Feature: Disputes
     And I click "#add-search-items-button"
     And I click "#company-cb"
     And I click "#add-search-criteria"
-    Then I fill in "company-input" with "Bobs Burgers"
+    Then I fill in "company-input" with "Guest"
     Then I click "#submit-advanced-search"
-    And I wait for "5" seconds
+    And I wait for "3" seconds
     And I click "#advanced-search-button"
     Then I wait for "5" seconds
     Then I should see "talosintelligence.com"
@@ -254,6 +253,7 @@ Feature: Disputes
   @javascript
   Scenario: a user tries to export selected dispute entries
     Given pending
+    # Note that selenium doesn't support viewing response headers as is required by this test, maybe just get rid of it
     Given a user with role "webrep user" exists and is logged in
     And the following disputes exist and have entries:
       | id | submission_type |
@@ -268,6 +268,7 @@ Feature: Disputes
   @javascript
   Scenario: a user tries to export selected dispute entries on the Research tab
     Given pending
+    # Note that selenium doesn't support viewing response headers as is required by this test, maybe just get rid of it
     Given a user with role "webrep user" exists and is logged in
     And the following disputes exist and have entries:
       | id |
