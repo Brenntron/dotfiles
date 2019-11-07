@@ -406,6 +406,8 @@ window.updatePending = (id,row_id) ->
 
 ## Called when user submits categories / information to close a ticket
 window.updateEntryColumns = (entry_id,row_id) ->
+  loader = $("[entry_id='" + entry_id + "']").find('.inline-loader')
+  loader.css('display', 'flex')
   $("#submit_changes_#{entry_id}").addClass('hidden')
   $("#reopen_#{entry_id}").removeClass('hidden')
 
@@ -427,6 +429,7 @@ window.updateEntryColumns = (entry_id,row_id) ->
 
   # If resolution is set to fixed, make sure it has categories applied
   if categories == null && fixed_flag == true
+    loader.css('display', 'none')
     std_msg_error("Must include at least one category.","", reload: false)
     $("#submit_changes_#{entry_id}").removeClass('hidden')
     $("#reopen_#{entry_id}").addClass('hidden')
@@ -438,7 +441,7 @@ window.updateEntryColumns = (entry_id,row_id) ->
       data: {'id': entry_id, 'prefix': prefix, 'categories':categories, 'category_names':category_names, 'status':resolution_status, 'comment':comment, 'resolution_comment': resolution_comment }
       success: (response) ->
         {categories, error, uri, domain, subdomain, path, status, display_name} = $.parseJSON(response)
-
+        loader.css('display', 'none')
         if !error
           table = $('#complaints-index').DataTable()
 
@@ -517,6 +520,7 @@ window.updateEntryColumns = (entry_id,row_id) ->
             td.classList.add('nested-complaint-data-wrapper')
 
       error: (response) ->
+        loader.css('display', 'none')
         $("#submit_changes_#{entry_id}").removeClass('hidden')
         $("#reopen_#{entry_id}").addClass('hidden')
         std_msg_error(response,"", reload: false)
@@ -525,10 +529,10 @@ window.updateEntryColumns = (entry_id,row_id) ->
 
 ## Allows analyst to set ticket status to reopened and allows them to interact with the submission form
 window.reopenComplaint = (entry_id, button) ->
-  $('#loader-modal').modal({
-    keyboard: false
-  })
-  # Getting all the fields that need to be interactive if reopened
+  loader = $("[entry_id='" + entry_id + "']").find('.inline-loader')
+  loader.css('display', 'flex')
+
+# Getting all the fields that need to be interactive if reopened
   # Changing these on the fly so the full page doesn't need to be reloaded
   editable_stuff = $(button).parents('.nested-complaint-editable-data')[0]
   inputs = $(editable_stuff).find('.nested-table-input')
@@ -543,7 +547,6 @@ window.reopenComplaint = (entry_id, button) ->
     method: 'POST'
     data: {'complaint_entry_id': entry_id}
     success: (response) ->
-      $('#loader-modal').modal 'hide'
       $(inputs).each ->
         $(this).prop('disabled', false)
       $(radios).each ->
@@ -553,8 +556,9 @@ window.reopenComplaint = (entry_id, button) ->
       $("#reopen_" + entry_id).addClass('hidden')
       $("#submit_changes_" + entry_id).removeClass('hidden')
       $(status_col).text('REOPENED')
-
+      loader.css('display', 'none')
     error: (response) ->
+      loader.css('display', 'none')
       std_msg_error(response,"", reload: false)
   )
 
@@ -564,10 +568,8 @@ window.take_selected = ()->
   selected_rows = $('#complaints-index').DataTable().rows('.selected')
   if selected_rows[0].length > 0
     entry_ids = []
-    i = 0
-    while i < selected_rows[0].length
+    for i, row in selected_rows
       entry_ids.push(selected_rows.data()[i].entry_id)
-      i++
     headers = {'Token': $('input[name="token"]').val(), 'Xmlrpc-Token': $('input[name="xml_token"]').val()}
     $.ajax(
       url: '/escalations/api/v1/escalations/webcat/complaint_entries/take_entry'
@@ -580,11 +582,9 @@ window.take_selected = ()->
           notice_html = "<p>Something went wrong: #{json.error}</p>"
           std_msg_error('take error', json.error)
         else
-          i = 0
-          while i < selected_rows[0].length
+          for row, i in selected_rows[0]
             selected_rows.data().cell(selected_rows[0][i],14).data(json.name).draw()
             selected_rows.data().cell(selected_rows[0][i],4).data("ASSIGNED").draw()
-            i++
 
       error: (response) ->
         notice_html = "<p>Something went wrong: #{response.responseText}</p>"
@@ -598,10 +598,8 @@ window.return_selected = ()->
   selected_rows = $('#complaints-index').DataTable().rows('.selected')
   if selected_rows[0].length > 0
     entry_ids = []
-    i = 0
-    while i < selected_rows[0].length
+    for row, i in selected_rows[0]
       entry_ids.push(selected_rows.data()[i].entry_id)
-      i++
     headers = {'Token': $('input[name="token"]').val(), 'Xmlrpc-Token': $('input[name="xml_token"]').val()}
     $.ajax(
       url: '/escalations/api/v1/escalations/webcat/complaint_entries/return_entry'
