@@ -424,12 +424,14 @@ window.submit_bulk_wlbl = (page) ->
 
     curr_endpoint = '/escalations/api/v1/escalations/webrep/disputes/bulk_rule_ui_wlbl_remove'
 
-
+  # REMOVE DUPLICATES FROM THE LIST_TYPES ARRAY HERE
+  # REMOVE DUPLICATES FROM THE LIST_TYPES ARRAY HERE
+  # REMOVE DUPLICATES FROM THE LIST_TYPES ARRAY HERE
 
   # define the string for the modal
   modal_info_string =
     "<div class='wlbl-info-modal'>Lists have been #{modal_word} for this entry:
-      <p>#{ip_uris}</p></div>"
+      <p>#{ip_uris} | <em>#{list_types}</em></p></div>"
 
   if thrt_cat_ids.length
     thrt_cat_str =   # for the confirmation modal only
@@ -490,10 +492,10 @@ window.submit_individual_wlbl = (button_tag) ->
   # THIS IS UGLY, CLEAN IT UP
   # figure which wl/bl lists were removed
 
-  compare_arrays = (arr1, arr2) ->
-    $(arr1).each (i, value) ->
+  compare_arrays = (new_array, old_array) ->
+    $(new_array).each (i, value) ->
       curr_value = value
-      $(arr2).each (i, value) ->
+      $(old_array).each (i, value) ->
         if curr_value != value
           removed_lists_arr.push(value)
 
@@ -501,11 +503,9 @@ window.submit_individual_wlbl = (button_tag) ->
 
   removed_lists_str = removed_lists_arr.join(', ')
 
-  console.log old_lists_arr
-  console.log new_lists_arr
+#  console.log old_lists_arr
+#  console.log new_lists_arr
   console.log removed_lists_arr
-
-#  console.log removed_lists_str
 
 
 
@@ -540,6 +540,10 @@ window.submit_individual_wlbl = (button_tag) ->
     adjustment_type = 'remove'
     modal_word = 'removed'
 
+  # define the info presented in the confirmation modal
+  modal_info_string =
+    "<div class='wlbl-info-modal'>Lists have been #{modal_word} for this entry: "
+
   # ADD TO LISTS INLINE
   if adjustment_type == 'add' || adjustment_type == 'replace'
     # replacing threat cats? get the wl/bl lists from top blue row
@@ -552,6 +556,7 @@ window.submit_individual_wlbl = (button_tag) ->
       note: curr_note
 
     curr_endpoint = '/escalations/api/v1/escalations/webrep/disputes/bulk_wlbl_threatcat_adjust'
+    modal_info_string += "<p>#{dispute_url} | <em>#{new_lists_arr}</em></p></div>"  # TEST THIS?
 
     if location.href.includes('webrep/disputes') || $('body').hasClass('research-action') # add from index/show page to new endpoint
       console.log 'INLINE SCENARIO 1: index/show/bfrp page ADD/REPLACE: use new endpoint + one entry url'
@@ -570,12 +575,9 @@ window.submit_individual_wlbl = (button_tag) ->
       thrt_cat_ids: thrt_cat_ids
 
     curr_endpoint = '/escalations/api/v1/escalations/webrep/disputes/bulk_rule_ui_wlbl_remove'
+    modal_info_string += "<p>#{dispute_url} | <em>#{removed_lists_str}</em></p></div>"  # TEST THIS?
 
-  # define the info presented in the confirmation modal
-  modal_info_string =
-    "<div class='wlbl-info-modal'>Lists have been #{modal_word} for this entry:
-      <p>#{dispute_url} | <em>#{removed_lists_str}</em></p></div>"  # IS THIS BROKEN?
-
+  # THREAT CATS PRESENT? ADD MORE TO MODAL
   if thrt_cat_ids.length
     thrt_cat_str =   # for the confirmation modal only
       "<p class='tc-sentence'>With the following threat categories updated:
