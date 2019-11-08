@@ -2,6 +2,192 @@
 # FUNCTIONS FOR POPULATING, SUBMITTING, ETC. WBRS WL/BL INFORMATION
 ################################################################################
 
+## Populating the toolbar Adjust WL/BL dropdown BULK
+## This works for index, research page, and research tab of show page
+window.bulk_get_current_wlbl = (page) ->
+  entries_checked = []
+  checkbox = ''
+  row = ''
+  tbody = ''
+  current_wbrs = ''
+  comment_box = ''
+  dropdown_wrapper = ''
+
+  # Define variables based on what page we're on
+  if page == 'index'
+    dropdown_wrapper = $('#wlbl_adjust_entries_index')
+    checkbox = '.dispute-entry-checkbox'
+    row = '.index-entry-row'
+    current_wbrs = '.entry-col-wbrs-score'
+    case_id = []
+
+  else if page == 'show'
+    dropdown_wrapper = $('#wlbl_adjust_entries')
+    checkbox = '.dispute_check_box'
+    row = '.research-table-row'
+    current_wbrs = '.current-wbrs-score'
+    case_id = $('#dispute_id').text()
+
+  else if page == 'research'
+    dropdown_wrapper = $('#wlbl_adjust_entries')
+    checkbox = '.dispute_check_box'
+    row = '.research-table-row'
+    current_wbrs = '.current-wbrs-score'
+    case_id = ''
+
+  wlbl_list = $(dropdown_wrapper).find('.wlbl-entry-wlbl')
+  tbody = $(dropdown_wrapper).find('table.dispute_tool_current').find('tbody')
+  comment_box = $(dropdown_wrapper).find('.adjust-wlbl-input')
+
+  ## Clear out any residual data
+  # Empty table
+  $(tbody).empty()
+  # Empty comment box
+  $(comment_box).text('')
+
+  # Clear the checkboxes
+  wl_weak = $(dropdown_wrapper).find('.wl-weak-checkbox')
+  wl_med = $(dropdown_wrapper).find('.wl-med-checkbox')
+  wl_heavy = $(dropdown_wrapper).find('.wl-heavy-checkbox')
+  bl_weak = $(dropdown_wrapper).find('.bl-weak-checkbox')
+  bl_med = $(dropdown_wrapper).find('.bl-med-checkbox')
+  bl_heavy = $(dropdown_wrapper).find('.bl-heavy-checkbox')
+  $(wl_weak[0]).prop('checked', false)
+  $(wl_med[0]).prop('checked', false)
+  $(wl_heavy[0]).prop('checked', false)
+  $(bl_weak[0]).prop('checked', false)
+  $(bl_med[0]).prop('checked', false)
+  $(bl_heavy[0]).prop('checked', false)
+
+  ## Get data to populate table
+  # Get all the checked entries
+  $(checkbox).each ->
+    if this.checked == true
+      entries_checked.push(this)
+
+  # Pull the entry content out
+  if (entries_checked.length > 0)
+    entries = []
+    wbrs = ''
+    comment_trail = ''
+    comment_array = []
+    $(entries_checked).each ->
+      # Slightly different structure to get the actual entry content
+      if row == '.research-table-row'
+        entry_row = $(this).parents(row)[0]
+        entry_content = $(entry_row).find('.entry-data-content').text().trim()
+        wbrs = $(entry_row).find(current_wbrs).text()
+      else if row == '.index-entry-row'
+        entry_row = $(this).parents(row)[0]
+        entry_content = $(entry_row).find('.entry-col-content').text().trim()
+        entry_case_id = $(entry_row).attr('data-case-id')
+        wbrs = $(entry_row).find(current_wbrs).text()
+        comment_array.push('#' + entry_case_id + ' - ' + entry_content)
+
+      entries.push(entry_content)
+    data = {'entries': entries}
+
+    if page == "show"
+      comment_trail = '\n \n------------------------------- \nBULK SUBMISSION: \n #' + case_id + ' - ' + entries.join(', ')
+    else if page == "research"
+      comment_trail = '\n \n------------------------------- \nRESEARCH BULK SUBMISSION: \n' + entries.join('\n')
+    else if page == "index"
+      comment_trail = '\n \n------------------------------- \nBULK SUBMISSION: \n' + comment_array.join('\n')
+
+    # add some loading text while the tbody gets built
+    $(tbody).empty().html('<tr class="loading-rows"><td>Loading...<div class="mini-loader"></div></td></tr>')
+
+    std_msg_ajax(
+      url: '/escalations/api/v1/escalations/webrep/disputes/bulk_rule_ui_wlbl_get_info_for_form'
+      method: 'POST'
+      data: data
+      success: (response) ->
+        response = JSON.parse(response)
+        for entry in response   # wait until tc's are resolved to write out the full table rows
+          tc_promise = new Promise (resolve, reject) ->
+            tc_json = get_threat_categories(entry.ip_uri)
+            if tc_json then resolve tc_json  # resolve goes to .then() below
+          .then( build_tc_row.bind(null, entry, tbody)).then ->
+            order_wlbl_table_rows()
+          .then null, (err) ->
+            std_msg_error( 'Error retrieving WL/BL Data', response)  # handle this error silently if needed
+
+          comment_box.text(comment_trail)
+      error: (response) ->
+        std_msg_error( 'Error retrieving WL/BL Data', response)
+    )
+  else
+    std_msg_error('No rows selected', ['Please select at least one entry row.'])
+    return false
+
+  # build the top blue dispute rows with wl/bl's and threat cats, ensures the row gets built correctly (KH refactor)
+  build_tc_row = (entry, tbody, result) ->
+    { threat_categories } = JSON.parse(result)
+    { ip_uri, list_types, wbrs_score, comment } = entry
+    tc_str = threat_categories.join(', ')
+
+    if list_types
+      list_types = entry['list_types'].sort().reverse().join(', ')  # sort by weak, then med, then heavy
+      if list_types.includes('BL-')  # show 'replace tc' radio if bl exists
+        $('.replace-tc-radio').removeClass('hidden')
+    else
+      list_types = ''
+      wbrs_score = wbrs
+    if !wbrs_score
+      wbrs_score = '<span class="missing-data text-left">No Score</span>'
+    if !comment then comment = ''
+
+
+    console.log 'show the wl/bl lists currently'
+    console.log list_types
+
+    console.log 'show the wbrs_score currently, if this is empty, then add a span to this line below'
+    console.log wbrs_score
+#    debugger
+
+    if list_types.length == 0
+      list_types = "<span class='missing-data'>Not on a list</span>"
+
+    table_row =
+      "<tr class='wlbl-dropdown-row'>
+      <td class='wlbl-entry-content'>#{ip_uri}</td>
+      <td class='wlbl-entry-wlbl'>#{list_types}</td>
+      <td class='wlbl-current-entry-wbrs'>#{wbrs_score}</td>
+      <td class='wlbl-threat-cat'>#{tc_str}</td>
+      </tr>"
+
+    $(tbody).append(table_row)
+    $(tbody).find('.loading-rows').addClass('hidden')
+
+  # order the rows after the build to ensure correct order on left and right sides
+  order_wlbl_table_rows = () ->
+    if $('#wlbl_adjust_entries_index').length > 0  # index dropdown
+      curr_dd = '#wlbl_adjust_entries_index'
+      left_cbs = '#disputes-index .dispute-entry-checkbox:checked'
+      url_entry = '.entry-col-content'
+    else  # show page dropdown
+      curr_dd = '#wlbl_adjust_entries'
+      left_cbs = '#disputes-research-table .dispute_check_box:checked'
+      url_entry = '.entry-data-content'
+
+    $(left_cbs).each (i) ->  # add the order ids to left and right sides
+      ip_uri = $(this).closest('tr').find(url_entry).text().trim()
+      $(this).closest('tr').attr('data-order-id', i)  # add row-id to the left
+      $(curr_dd).find('.wlbl-entry-content').each ->
+        if $(this).text().includes(ip_uri)
+          $(this).closest('tr').attr('data-order-id', i)  # add row-id to the right
+
+    table_dd = $(curr_dd).find('tbody')
+    rows = $(table_dd).find('tr')
+
+    # basic sort by id/integer
+    rows.sort (a, b) ->
+      x = $(a).attr('data-order-id')
+      y = $(b).attr('data-order-id')
+      x - y
+    $(rows).each (i, row) -> table_dd.append(row)
+
+
 
 
 #### POPULATING CURRENT WL/BL LISTS ####
@@ -140,195 +326,27 @@ window.get_current_wlbl = (button) ->
                     if value == $(curr).text().trim()
                       $(curr).find('input:checkbox').prop('checked', true)
 
-        $(wbrs_score).text(wbrs)
-
+        if wbrs.trim() == 'No score'
+          wbrs ="<span class='missing-data'>No score</span>"
+        $(wbrs_score).html(wbrs)
+        
         $(wlbl_list[0]).text(response.data.sort().reverse().join(', '))   # sort the lists from weak to heavy
         $('.wlbl-entry-wlbl').text(response.data.join(', '))
         if response.data.join(', ').length == 0
-          $('.wlbl-entry-wlbl').text('Not on a list')
+          $(dropdown).find('.wlbl-entry-wlbl').html('<span class="missing-data">Not on a list</span>')
         $(submit_button[0]).attr('disabled', true)
+
       else
-        $(wbrs_score).text(wbrs)
-        $(wlbl_list[0]).text('Not on a list')
+        if wbrs.trim() == 'No score'
+          wbrs = "<span class='missing-data'>No score</span>"
+        $(wbrs_score).html(wbrs)
+
+        $(wlbl_list[0]).text('<span class="missing-data">Not on a list</span>')
         $(submit_button[0]).attr('disabled', true)
     $(comment).text(comment_text)
     error: (response) ->
       popup_response_error(response, 'Error retrieving WL/BL Data')
   )
-
-
-## Populating the toolbar Adjust WL/BL dropdown BULK
-## This works for index, research page, and research tab of show page
-window.bulk_get_current_wlbl = (page) ->
-  entries_checked = []
-  checkbox = ''
-  row = ''
-  tbody = ''
-  current_wbrs = ''
-  comment_box = ''
-  dropdown_wrapper = ''
-
-  # Define variables based on what page we're on
-  if page == 'index'
-    dropdown_wrapper = $('#wlbl_adjust_entries_index')
-    checkbox = '.dispute-entry-checkbox'
-    row = '.index-entry-row'
-    current_wbrs = '.entry-col-wbrs-score'
-    case_id = []
-
-  else if page == 'show'
-    dropdown_wrapper = $('#wlbl_adjust_entries')
-    checkbox = '.dispute_check_box'
-    row = '.research-table-row'
-    current_wbrs = '.current-wbrs-score'
-    case_id = $('#dispute_id').text()
-
-  else if page == 'research'
-    dropdown_wrapper = $('#wlbl_adjust_entries')
-    checkbox = '.dispute_check_box'
-    row = '.research-table-row'
-    current_wbrs = '.current-wbrs-score'
-    case_id = ''
-
-  tbody = $(dropdown_wrapper).find('table.dispute_tool_current').find('tbody')
-  comment_box = $(dropdown_wrapper).find('.adjust-wlbl-input')
-
-  ## Clear out any residual data
-  # Empty table
-  $(tbody).empty()
-  # Empty comment box
-  $(comment_box).text('')
-
-  # Clear the checkboxes
-  wl_weak = $(dropdown_wrapper).find('.wl-weak-checkbox')
-  wl_med = $(dropdown_wrapper).find('.wl-med-checkbox')
-  wl_heavy = $(dropdown_wrapper).find('.wl-heavy-checkbox')
-  bl_weak = $(dropdown_wrapper).find('.bl-weak-checkbox')
-  bl_med = $(dropdown_wrapper).find('.bl-med-checkbox')
-  bl_heavy = $(dropdown_wrapper).find('.bl-heavy-checkbox')
-  $(wl_weak[0]).prop('checked', false)
-  $(wl_med[0]).prop('checked', false)
-  $(wl_heavy[0]).prop('checked', false)
-  $(bl_weak[0]).prop('checked', false)
-  $(bl_med[0]).prop('checked', false)
-  $(bl_heavy[0]).prop('checked', false)
-
-  ## Get data to populate table
-  # Get all the checked entries
-  $(checkbox).each ->
-    if this.checked == true
-      entries_checked.push(this)
-
-  # Pull the entry content out
-  if (entries_checked.length > 0)
-    entries = []
-    wbrs = ''
-    comment_trail = ''
-    comment_array = []
-    $(entries_checked).each ->
-      # Slightly different structure to get the actual entry content
-      if row == '.research-table-row'
-        entry_row = $(this).parents(row)[0]
-        entry_content = $(entry_row).find('.entry-data-content').text().trim()
-        wbrs = $(entry_row).find(current_wbrs).text()
-      else if row == '.index-entry-row'
-        entry_row = $(this).parents(row)[0]
-        entry_content = $(entry_row).find('.entry-col-content').text().trim()
-        entry_case_id = $(entry_row).attr('data-case-id')
-        wbrs = $(entry_row).find(current_wbrs).text()
-        comment_array.push('#' + entry_case_id + ' - ' + entry_content)
-
-      entries.push(entry_content)
-    data = {'entries': entries}
-
-    if page == "show"
-      comment_trail = '\n \n------------------------------- \nBULK SUBMISSION: \n #' + case_id + ' - ' + entries.join(', ')
-    else if page == "research"
-      comment_trail = '\n \n------------------------------- \nRESEARCH BULK SUBMISSION: \n' + entries.join('\n')
-    else if page == "index"
-      comment_trail = '\n \n------------------------------- \nBULK SUBMISSION: \n' + comment_array.join('\n')
-
-    # add some loading text while the tbody gets built
-    $(tbody).empty().html('<tr class="loading-rows"><td>Loading...<div class="mini-loader"></div></td></tr>')
-
-    std_msg_ajax(
-      url: '/escalations/api/v1/escalations/webrep/disputes/bulk_rule_ui_wlbl_get_info_for_form'
-      method: 'POST'
-      data: data
-      success: (response) ->
-        response = JSON.parse(response)
-        for entry in response   # wait until tc's are resolved to write out the full table rows
-          tc_promise = new Promise (resolve, reject) ->
-            tc_json = get_threat_categories(entry.ip_uri)
-            if tc_json then resolve tc_json  # resolve goes to .then() below
-          .then( build_tc_row.bind(null, entry, tbody)).then ->
-            order_wlbl_table_rows()
-          .then null, (err) ->
-            std_msg_error( 'Error retrieving WL/BL Data', response)  # handle this error silently if needed
-
-          comment_box.text(comment_trail)
-      error: (response) ->
-        std_msg_error( 'Error retrieving WL/BL Data', response)
-    )
-  else
-    std_msg_error('No rows selected', ['Please select at least one entry row.'])
-    return false
-
-  # ensures the table row w/ tc gets built correctly (KH refactor)
-  build_tc_row = (entry, tbody, result) ->
-    { threat_categories } = JSON.parse(result)
-    { ip_uri, list_types, wbrs_score, comment } = entry
-    tc_str = threat_categories.join(', ')
-
-    if list_types
-      list_types = entry['list_types'].sort().reverse().join(', ')  # sort by weak, then med, then heavy
-      if list_types.includes('BL-')  # show 'replace tc' radio if bl exists
-        $('.replace-tc-radio').removeClass('hidden')
-    else
-      list_types = ''
-      wbrs_score = wbrs
-    if !wbrs_score
-      wbrs_score = '<span class="missing-data text-left">No Score</span>'
-    if !comment then comment = ''
-
-    table_row =
-      "<tr class='wlbl-dropdown-row'>
-      <td class='wlbl-entry-content'>#{ip_uri}</td>
-      <td class='wlbl-entry-wlbl'>#{list_types}</td>
-      <td class='wlbl-current-entry-wbrs text-center'>#{wbrs_score}</td>
-      <td class='wlbl-threat-cat'>#{tc_str}</td>
-      </tr>"
-
-    $(tbody).append(table_row)
-    $(tbody).find('.loading-rows').addClass('hidden')
-
-  # order the rows after the build to ensure correct order on left and right sides
-  order_wlbl_table_rows = () ->
-    if $('#wlbl_adjust_entries_index').length > 0  # index dropdown
-      curr_dd = '#wlbl_adjust_entries_index'
-      left_cbs = '#disputes-index .dispute-entry-checkbox:checked'
-      url_entry = '.entry-col-content'
-    else  # show page dropdown
-      curr_dd = '#wlbl_adjust_entries'
-      left_cbs = '#disputes-research-table .dispute_check_box:checked'
-      url_entry = '.entry-data-content'
-
-    $(left_cbs).each (i) ->  # add the order ids to left and right sides
-      ip_uri = $(this).closest('tr').find(url_entry).text().trim()
-      $(this).closest('tr').attr('data-order-id', i)  # add row-id to the left
-      $(curr_dd).find('.wlbl-entry-content').each ->
-        if $(this).text().includes(ip_uri)
-          $(this).closest('tr').attr('data-order-id', i)  # add row-id to the right
-
-    table_dd = $(curr_dd).find('tbody')
-    rows = $(table_dd).find('tr')
-
-    # basic sort by id/integer
-    rows.sort (a, b) ->
-      x = $(a).attr('data-order-id')
-      y = $(b).attr('data-order-id')
-      x - y
-    $(rows).each (i, row) -> table_dd.append(row)
 
 
 
@@ -627,6 +645,7 @@ window.prepare_for_wbrs_preview = (toggle) ->
   remove = []
 
   if current_lists == "Not on a list"
+    current_lists = "<span class='missing-data'>Not on a list</span>"
     $(checked).each ->
       changed.push('changed')
   else
@@ -723,6 +742,7 @@ window.reset_score_preview = (button) ->
 
   # If current entry isn't on a list, all toggles should be 'off'
   if current_lists == "Not on a list"
+    current_lists = "<span class='missing-data'>Not on a list</span>"
     $(checkboxes).each ->
       $(this).prop('checked', false)
   else
