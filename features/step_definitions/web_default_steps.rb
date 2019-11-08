@@ -156,7 +156,7 @@ Then(/^Element with class "(.*?)" should have content "(.*?)"$/) do |class_name,
 end
 
 Then(/^Element with class "(.*?)" should not have content "(.*?)"$/) do |class_name, content|
-  element = page.find(:xpath, "//*[contains(@class, '#{class_name}')])")
+  element = find(:xpath, "//*[contains(@class, '#{class_name}')]")
   raise "content found when it should not have been found" if element.has_content?(content)
 end
 
@@ -176,6 +176,12 @@ end
 Then(/^I should see the "(.*?)" checkbox unchecked$/) do |checkbox_class|
   page.find(checkbox_class).should_not be_checked
 end
+
+Then(/^I click checkbox with value "(.*?)"$/) do |checkbox_value|
+  checkbox = page.find(:xpath, "//input[@type='checkbox' and @value='#{checkbox_value}']")
+  checkbox.should be_checked
+end
+
 
 Given(/^I click an image button in table "(.*?)" at row "(.*?)" and col "(.*?)" with class name "(.*?)"$/) do |table, row, column,class_name|
 page.find(:xpath, "//table[#{table}]//tr[#{row}]//td[#{column}]//*[contains(@class, '#{class_name}')]").click
@@ -451,4 +457,12 @@ end
 
 And(/^I enter the pin toolbar hot key$/) do
   page.find(:xpath, "//body").send_keys("^")
+end
+
+Then(/^button "(.*?)" should be enabled$/) do |button|
+  expect(page).to have_button(button)
+end
+
+Then(/^button "(.*?)" should be disabled$/) do |button|
+  expect(page).to have_button(button, disabled: true)
 end

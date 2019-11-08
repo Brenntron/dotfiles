@@ -276,7 +276,7 @@ Feature: Disputes
       | 1  | w               |
     Given the following dispute_entries exist:
       | id | uri                   |
-      | 1  | talosintelligence.com |
+      | 1  | imadethisurlup.com |
     Given the following dispute_entry_preloads exist:
       | id | dispute_entry_id | wbrs_list_type |
       | 1  | 1                | Wl-heavy       |
@@ -298,14 +298,14 @@ Feature: Disputes
 
 
   @javascript
-  Scenario: a user wants to add an entry to a WBRS list from the index page
+  Scenario: a user adds an entry to a WBRS list from the index page
     Given a user with role "webrep user" exists and is logged in
     Given the following disputes exist:
       | id | submission_type |
       | 1  | w               |
     Given the following dispute_entries exist:
       | id | uri                   |
-      | 1  | talosintelligence.com |
+      | 1  | imadethisurlup.com |
     Given the following dispute_entry_preloads exist:
       | id | dispute_entry_id | wbrs_list_type |
       | 1  | 1                | Wl-heavy       |
@@ -330,15 +330,15 @@ Feature: Disputes
     And  Element with class "wlbl-entry-wlbl" should have content "WL-med, WL-heavy"
 
 
-  @javascript @now
-  Scenario: a user wants to remove an entry from a WBRS list from the index page
+  @javascript
+  Scenario: a user removes an entry from a WBRS list from the index page
     Given a user with role "webrep user" exists and is logged in
     Given the following disputes exist:
       | id | submission_type |
       | 1  | w               |
     Given the following dispute_entries exist:
       | id | uri                   |
-      | 1  | talosintelligence.com |
+      | 1  | imadethisurlup.com |
     Given the following dispute_entry_preloads exist:
       | id | dispute_entry_id | wbrs_list_type |
       | 1  | 1                | Wl-heavy       |
@@ -364,7 +364,44 @@ Feature: Disputes
     And  Element with class "wlbl-entry-wlbl" should not have content "WL-heavy"
 
 
-    
+  @javascript @now
+  Scenario: a user adds an entry to a WBRS Blacklist
+    Given a user with role "webrep user" exists and is logged in
+    Given the following disputes exist:
+      | id | submission_type |
+      | 1  | w               |
+    Given the following dispute_entries exist:
+      | id | uri                   |
+      | 1  | imadethisurlup.com |
+    Given the following dispute_entry_preloads exist:
+      | id | dispute_entry_id | wbrs_list_type |
+      | 1  | 1                | Wl-heavy       |
+    #    And make sure the api agrees with the preload
+    When I goto "escalations/webrep/disputes?f=open"
+    And  I wait for "2" seconds
+    And  I click ".expand-row-button-inline"
+    And  I click ".dispute-entry-checkbox"
+    And  I click "#index-adjust-wlbl"
+    And  I wait for "2" seconds
+    And  Element with class "wlbl-entry-wlbl" should not have content "BL-weak"
+    Then I click "#wlbl-add"
+    And  I check checkbox with class "bl-weak-checkbox"
+    And  I wait for "1" seconds
+    And  I should see "Threat Categories"
+    And  I should see "Required for adding to any blacklist."
+    And  I click ".wlbl_thrt_cat_id_8"
+    And  I click "#index-bulk-submit-wbrs"
+    And  I wait for "10" seconds
+    And  I should see "ENTRIES HAVE BEEN UPDATED"
+    And  I click button with class "close"
+    And  I wait for "1" seconds
+    And  I click "#index-adjust-wlbl"
+    And  I wait for "2" seconds
+    And  take a screenshot
+    And  Element with class "wlbl-entry-wlbl" should have content "BL-weak"
+
+
+
 
 
   @javascript
