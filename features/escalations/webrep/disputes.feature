@@ -266,7 +266,9 @@ Feature: Disputes
     Then I should receive a file of type "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet"
 
 
-  # WBRS WL/BL Dropdown
+
+
+  ### WBRS WL/BL Dropdown
 
   @javascript
   Scenario: a user wants to view the current WBRS lists and score for an entry from the index page
@@ -276,25 +278,22 @@ Feature: Disputes
       | 1  | w               |
     Given the following dispute_entries exist:
       | id | uri                   |
-      | 1  | imadethisurlup.com |
-    Given the following dispute_entry_preloads exist:
-      | id | dispute_entry_id | wbrs_list_type |
-      | 1  | 1                | Wl-heavy       |
-#    And make sure the api agrees with the preload
-
+      | 1  | imadethisurlup.com    |
+    # Adding this step below to ensure the api data is clear
+    And  clean up wlbl and remove all wlbl entries on "imadethisurlup.com"
     When I goto "escalations/webrep/disputes?f=open"
     And  I wait for "2" seconds
     And  I click ".expand-row-button-inline"
     And  I click ".dispute-entry-checkbox"
     And  I click "#index-adjust-wlbl"
     And  I wait for "5" seconds
-    And  take a screenshot
     Then I should see "Current WL/BL List"
     And  I should see "Current WBRS Score"
     And  I should see "Threat Category"
-    And  Element with class "wlbl-entry-wlbl" should have content "WL-heavy"
-    # Note the score step might be tricky
-    And  Element with class "wlbl-current-entry-wbrs" should have content "9.2"
+    And  take a screenshot
+    # For fresh items with no data it's easier to just have the test look for the span element
+    And  I should see "Not on a list"
+    And  I should see "No Score"
 
 
   @javascript
@@ -304,55 +303,19 @@ Feature: Disputes
       | id | submission_type |
       | 1  | w               |
     Given the following dispute_entries exist:
-      | id | uri                   |
+      | id | uri                |
       | 1  | imadethisurlup.com |
-    Given the following dispute_entry_preloads exist:
-      | id | dispute_entry_id | wbrs_list_type |
-      | 1  | 1                | Wl-heavy       |
-    #    And make sure the api agrees with the preload
     When I goto "escalations/webrep/disputes?f=open"
     And  I wait for "2" seconds
     And  I click ".expand-row-button-inline"
     And  I click ".dispute-entry-checkbox"
     And  I click "#index-adjust-wlbl"
     And  I wait for "2" seconds
-    And  Element with class "wlbl-entry-wlbl" should have content "WL-heavy"
+    And  take a screenshot
+    And  I should see "Not on a list"
+    And  I should see "No Score"
     Then I click "#wlbl-add"
     And  I check checkbox with class "wl-med-checkbox"
-    And  I click "#index-bulk-submit-wbrs"
-    And  I wait for "10" seconds
-    And  I should see "ENTRIES HAVE BEEN UPDATED"
-    And  I click button with class "close"
-    And  I wait for "1" seconds
-    And  take a screenshot
-    And  I click "#index-adjust-wlbl"
-    And  I wait for "2" seconds
-    And  Element with class "wlbl-entry-wlbl" should have content "WL-med, WL-heavy"
-
-
-  @javascript
-  Scenario: a user removes an entry from a WBRS list from the index page
-    Given a user with role "webrep user" exists and is logged in
-    Given the following disputes exist:
-      | id | submission_type |
-      | 1  | w               |
-    Given the following dispute_entries exist:
-      | id | uri                   |
-      | 1  | imadethisurlup.com |
-    Given the following dispute_entry_preloads exist:
-      | id | dispute_entry_id | wbrs_list_type |
-      | 1  | 1                | Wl-heavy       |
-    #    And make sure the api agrees with the preload
-    When I goto "escalations/webrep/disputes?f=open"
-    And  I wait for "2" seconds
-    And  I click ".expand-row-button-inline"
-    And  I click ".dispute-entry-checkbox"
-    And  I click "#index-adjust-wlbl"
-    And  I wait for "2" seconds
-    And  take a screenshot
-    And  Element with class "wlbl-entry-wlbl" should have content "WL-heavy"
-    Then I click "#wlbl-remove"
-    And  I check checkbox with class "wl-heavy-checkbox"
     And  I click "#index-bulk-submit-wbrs"
     And  I wait for "10" seconds
     And  I should see "ENTRIES HAVE BEEN UPDATED"
@@ -361,22 +324,62 @@ Feature: Disputes
 #    And  take a screenshot
     And  I click "#index-adjust-wlbl"
     And  I wait for "2" seconds
-    And  Element with class "wlbl-entry-wlbl" should not have content "WL-heavy"
+    And  Element with class "wlbl-entry-wlbl" should have content "WL-med"
+    And  clean up wlbl and remove all wlbl entries on "imadethisurlup.com"
 
 
-  @javascript @now
+  @javascript
+  Scenario: a user removes an entry from a WBRS list from the index page (after adding it so we're starting with clean data from the api)
+    Given a user with role "webrep user" exists and is logged in
+    Given the following disputes exist:
+      | id | submission_type |
+      | 1  | w               |
+    Given the following dispute_entries exist:
+      | id | uri                |
+      | 1  | imadethisurlup.com |
+    When I goto "escalations/webrep/disputes?f=open"
+    And  I wait for "2" seconds
+    And  I click ".expand-row-button-inline"
+    And  I click ".dispute-entry-checkbox"
+    And  I click "#index-adjust-wlbl"
+    And  I wait for "2" seconds
+    And  take a screenshot
+    And  I should see "Not on a list"
+    Then I click "#wlbl-add"
+    And  I check checkbox with class "wl-med-checkbox"
+    And  I click "#index-bulk-submit-wbrs"
+    And  I wait for "10" seconds
+    And  I should see "ENTRIES HAVE BEEN UPDATED"
+    And  I click button with class "close"
+    And  I wait for "1" seconds
+    And  I click "#index-adjust-wlbl"
+    And  I wait for "2" seconds
+    And  Element with class "wlbl-entry-wlbl" should have content "WL-med"
+    Then I click "#wlbl-remove"
+    And  I check checkbox with class "wl-med-checkbox"
+    And  I click "#index-bulk-submit-wbrs"
+    And  I wait for "10" seconds
+    And  I should see "ENTRIES HAVE BEEN UPDATED"
+    And  I click button with class "close"
+    And  I wait for "1" seconds
+#    And  take a screenshot
+    And  I click "#index-adjust-wlbl"
+    And  I wait for "2" seconds
+    And  I should see "Not on a list"
+    And  I should see "No Score"
+    And  Element with class "wlbl-entry-wlbl" should not have content "WL-med"
+    And  clean up wlbl and remove all wlbl entries on "imadethisurlup.com"
+
+
+  @javascript
   Scenario: a user adds an entry to a WBRS Blacklist
     Given a user with role "webrep user" exists and is logged in
     Given the following disputes exist:
       | id | submission_type |
       | 1  | w               |
     Given the following dispute_entries exist:
-      | id | uri                   |
+      | id | uri                |
       | 1  | imadethisurlup.com |
-    Given the following dispute_entry_preloads exist:
-      | id | dispute_entry_id | wbrs_list_type |
-      | 1  | 1                | Wl-heavy       |
-    #    And make sure the api agrees with the preload
     When I goto "escalations/webrep/disputes?f=open"
     And  I wait for "2" seconds
     And  I click ".expand-row-button-inline"
@@ -399,7 +402,7 @@ Feature: Disputes
     And  I wait for "2" seconds
     And  take a screenshot
     And  Element with class "wlbl-entry-wlbl" should have content "BL-weak"
-
+    And  clean up wlbl and remove all wlbl entries on "imadethisurlup.com"
 
 
 
