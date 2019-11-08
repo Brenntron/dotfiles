@@ -13,6 +13,11 @@ window.bulk_get_current_wlbl = (page) ->
   comment_box = ''
   dropdown_wrapper = ''
 
+
+  # click bulk? if status in that row includes substring.toLowerCase() "resolved" then add 'disabled' to all inputs
+  # in the dropdown
+
+
   # Define variables based on what page we're on
   if page == 'index'
     dropdown_wrapper = $('#wlbl_adjust_entries_index')
@@ -38,12 +43,14 @@ window.bulk_get_current_wlbl = (page) ->
   wlbl_list = $(dropdown_wrapper).find('.wlbl-entry-wlbl')
   tbody = $(dropdown_wrapper).find('table.dispute_tool_current').find('tbody')
   comment_box = $(dropdown_wrapper).find('.adjust-wlbl-input')
+  comment_textarea = $(dropdown_wrapper).find('.note-input')
 
   ## Clear out any residual data
   # Empty table
   $(tbody).empty()
   # Empty comment box
   $(comment_box).text('')
+
 
   # Clear the checkboxes
   wl_weak = $(dropdown_wrapper).find('.wl-weak-checkbox')
@@ -58,6 +65,7 @@ window.bulk_get_current_wlbl = (page) ->
   $(bl_weak[0]).prop('checked', false)
   $(bl_med[0]).prop('checked', false)
   $(bl_heavy[0]).prop('checked', false)
+
 
   ## Get data to populate table
   # Get all the checked entries
@@ -96,6 +104,9 @@ window.bulk_get_current_wlbl = (page) ->
 
     # add some loading text while the tbody gets built
     $(tbody).empty().html('<tr class="loading-rows"><td>Loading...<div class="mini-loader"></div></td></tr>')
+
+    # Ensure the comment textarea is always reset to this text
+    $(comment_textarea).val(comment_trail)
 
     std_msg_ajax(
       url: '/escalations/api/v1/escalations/webrep/disputes/bulk_rule_ui_wlbl_get_info_for_form'
@@ -137,14 +148,7 @@ window.bulk_get_current_wlbl = (page) ->
       wbrs_score = '<span class="missing-data text-left">No Score</span>'
     if !comment then comment = ''
 
-
-    console.log 'show the wl/bl lists currently'
-    console.log list_types
-
-    console.log 'show the wbrs_score currently, if this is empty, then add a span to this line below'
-    console.log wbrs_score
-#    debugger
-
+    # ensure the 'not on a list' text is formatted correctly
     if list_types.length == 0
       list_types = "<span class='missing-data'>Not on a list</span>"
 
@@ -222,13 +226,13 @@ window.get_current_wlbl = (button) ->
   wbrs_score = $(dropdown).find('.wlbl-current-entry-wbrs')
   submit_button = $(dropdown).find('.dropdown-submit-button')
   comment = $(dropdown).find('.adjust-wlbl-input')
+  comment_textarea = $(dropdown).find('.note-input')
   wl_weak = $(dropdown).find('.wl-weak-checkbox')
   wl_med = $(dropdown).find('.wl-med-checkbox')
   wl_heavy = $(dropdown).find('.wl-heavy-checkbox')
   bl_weak = $(dropdown).find('.bl-weak-checkbox')
   bl_med = $(dropdown).find('.bl-med-checkbox')
   bl_heavy = $(dropdown).find('.bl-heavy-checkbox')
-
 
   # Clearing data to start in case user has page open for a while
   # and data needs to be regrabbed
@@ -258,6 +262,9 @@ window.get_current_wlbl = (button) ->
 
   # Add loading message while wl/bl rows are being built, this gets removed after data is loaded
   $(wlbl_list).html('<span class="loading-rows">Loading...<span class="mini-loader"></span></span>')
+
+  # Ensure the comment box is always reset to this text
+  $(comment_textarea).val(comment_text)
 
   # Clean slate the dropdown on every dropdown click
   $('.dispute-wlbl-adjust-wrapper .dropdown-submit-button').html('Submit Changes').prop('disabled', true)
@@ -329,7 +336,7 @@ window.get_current_wlbl = (button) ->
         if wbrs.trim() == 'No score'
           wbrs ="<span class='missing-data'>No score</span>"
         $(wbrs_score).html(wbrs)
-        
+
         $(wlbl_list[0]).text(response.data.sort().reverse().join(', '))   # sort the lists from weak to heavy
         $('.wlbl-entry-wlbl').text(response.data.join(', '))
         if response.data.join(', ').length == 0
@@ -343,7 +350,6 @@ window.get_current_wlbl = (button) ->
 
         $(wlbl_list[0]).text('<span class="missing-data">Not on a list</span>')
         $(submit_button[0]).attr('disabled', true)
-    $(comment).text(comment_text)
     error: (response) ->
       popup_response_error(response, 'Error retrieving WL/BL Data')
   )
@@ -413,14 +419,14 @@ window.submit_bulk_wlbl = (page) ->
     if adjustment_type == 'add'
       modal_info_string =
         "<div class='wlbl-info-modal'>Lists (<strong>#{list_types}</strong>) have been added for this entry:
-          <p>#{ip_uris}</p></div>"
+          <p>#{ip_uris.join('<br>')}</p></div>"
 
     if adjustment_type == 'replace'
       # replacing threat cats? get the wl/bl lists from top blue row
       list_types = $(dropdown).find('.wlbl-entry-wlbl').text().trim().split(', ')
       modal_info_string +=
         "<br>Threat Categories have been replaced for this entry:
-          <p>#{ip_uris}</p>"
+          <p>#{ip_uris.join('<br><br>')}</p>"
 
     data =
       adjustment_type: adjustment_type   # new object
@@ -448,8 +454,8 @@ window.submit_bulk_wlbl = (page) ->
 
   # define the string for the modal
   modal_info_string =
-    "<div class='wlbl-info-modal'>Lists have been #{modal_word} for this entry:
-      <p>#{ip_uris} | <em>#{list_types}</em></p></div>"
+    "<div class='wlbl-info-modal'><p>The following entries: </p>
+      <span>#{ip_uris.join('<br>')}</span> <span>Have been #{modal_word} to the following WBRS Lists: <p>#{list_types.join(', ')}</p></span></div>"
 
   if thrt_cat_ids.length
     thrt_cat_str =   # for the confirmation modal only
@@ -467,7 +473,7 @@ window.submit_bulk_wlbl = (page) ->
     method: 'POST'
     data: data
     success: (response) ->
-      std_msg_success("Entries have been updated: ", [modal_info_string])
+      std_msg_success("Entries have been updated", [modal_info_string])
     error: (response) ->
       std_api_error(response, 'Error updating these entries.')
     completed: () ->
@@ -523,6 +529,7 @@ window.submit_individual_wlbl = (button_tag) ->
 
 #  console.log old_lists_arr
 #  console.log new_lists_arr
+  console.log 'BELOW IS THE 1 or more WL/BL LISTS WE WILL NOW REMOVE'
   console.log removed_lists_arr
 
 
@@ -560,7 +567,7 @@ window.submit_individual_wlbl = (button_tag) ->
 
   # define the info presented in the confirmation modal
   modal_info_string =
-    "<div class='wlbl-info-modal'>Lists have been #{modal_word} for this entry: "
+    "<div class='wlbl-info-modal'><p>The following entries: </p>"
 
   # ADD TO LISTS INLINE
   if adjustment_type == 'add' || adjustment_type == 'replace'
@@ -574,9 +581,11 @@ window.submit_individual_wlbl = (button_tag) ->
       note: curr_note
 
     curr_endpoint = '/escalations/api/v1/escalations/webrep/disputes/bulk_wlbl_threatcat_adjust'
-    modal_info_string += "<p>#{dispute_url} | <em>#{new_lists_arr}</em></p></div>"  # TEST THIS?
+    modal_info_string += "<span>#{dispute_url}</span> <span>Have been #{modal_word} to the following WBRS Lists: <p>#{new_lists_arr.join(', ')}</p></span></div>"
 
-    if location.href.includes('webrep/disputes') || $('body').hasClass('research-action') # add from index/show page to new endpoint
+
+
+  if location.href.includes('webrep/disputes') || $('body').hasClass('research-action') # add from index/show page to new endpoint
       console.log 'INLINE SCENARIO 1: index/show/bfrp page ADD/REPLACE: use new endpoint + one entry url'
       data.urls = [ dispute_url ]
     else if location.href.includes('webrep/research')  # add from research page to new endpoint
@@ -588,12 +597,12 @@ window.submit_individual_wlbl = (button_tag) ->
     console.log 'INLINE SCENARIO 3: index/show/bfrp page REMOVE: use old endpoint + one entry url'
     data =
       ip_uris: dispute_url
-      list_types: new_lists_arr
+      list_types: removed_lists_arr
       note: curr_note
       thrt_cat_ids: thrt_cat_ids
 
     curr_endpoint = '/escalations/api/v1/escalations/webrep/disputes/bulk_rule_ui_wlbl_remove'
-    modal_info_string += "<p>#{dispute_url} | <em>#{removed_lists_str}</em></p></div>"  # TEST THIS?
+    modal_info_string += "<span>#{dispute_url}</span> <span>#{removed_lists_str}</span></div>"
 
   # THREAT CATS PRESENT? ADD MORE TO MODAL
   if thrt_cat_ids.length
