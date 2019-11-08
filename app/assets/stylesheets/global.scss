@@ -10725,3 +10725,11 @@ span.threat-cat-no-data {
     margin: 12px 5px 0;
   }
 }
+
+.wlbl-current-entry-wbrs {
+  text-align: center;
+  span.missing-data {
+    text-align: left;
+    font-style: italic;
+  }
+}
