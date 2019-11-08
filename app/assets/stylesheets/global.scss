@@ -10608,7 +10608,7 @@ span.threat-cat-no-data {
   }
   span.entry-data-content {
     display: inline-block;
-    min-width: 300px;   // url/ip
+    min-width: 400px;   // url/ip
   }
 }
 
@@ -10700,17 +10700,28 @@ span.threat-cat-no-data {
   cursor: default;
 }
 
-.tc-sentence {
-  font-style: italic;
-  margin: 10px 5px 0;
+.message-div ul {
+  margin-top: 15px;
+}
+
+// these are the information modals on wl/bl adjust
+.wlbl-info-modal {
+  line-height: 11pt;
   em {
-    font-style: normal;
-    display: block;
-    line-height: 11pt;
-    margin: 5px 5px 0;
+    font-style: italic;
+  }
+  p {
+    margin: 10px 0;
   }
 }
 
-.message-div ul {
-  margin-top: 15px;
+.tc-sentence {
+  font-style: normal;
+  margin: 20px 5px 0;
+  em {
+    font-style: italic;
+    display: block;
+    line-height: 11pt;
+    margin: 12px 5px 0;
+  }
 }

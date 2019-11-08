@@ -340,12 +340,13 @@ window.submit_bulk_wlbl = (page) ->
   data = {}
   ip_uris = []
   list_types = []
-  list_types = $('.wl-bl-list-inline:checkbox:checked').map(() -> this.value).toArray()
   disputes_array = []
   wlbl_comment = ''
   dropdown = ''
+  modal_word = ''
 
   if $('.wl-bl-list-inline:checkbox:checked').length or $('.wlbl_thrt_cat_id:checked').length
+    list_types = $('.wl-bl-list-inline:checkbox:checked').map(() -> this.value).toArray()
     if page == 'index'
       dropdown = $('#wlbl_adjust_entries_index')
     else if page == 'show' || page == 'research'
@@ -362,21 +363,22 @@ window.submit_bulk_wlbl = (page) ->
     thrt_cat_ids = []
     thrt_cat_names = []
     thrt_cat_array = $(dropdown).find('.wlbl_thrt_cat_id:checked')
-    tc_updated_str = ''
+    thrt_cat_str = ''
 
     $(thrt_cat_array).each ->
       thrt_cat_ids.push($(this).val())
       thrt_cat_names.push($(this).parent().text().trim())
 
-    if thrt_cat_ids.length
-      tc_updated_str =
-        "<p class='tc-sentence'>With the following threat categories updated:
-         <em>#{ thrt_cat_names.join(', ') }</em></p>"
-
     # adjustment type - add / remove / replace
-    if $('#wlbl-add').prop('checked') then adjustment_type = 'add'
-    else if $('#wlbl-remove').prop('checked') then adjustment_type = 'remove'
-    else if $('#wlbl-replace').prop('checked') then adjustment_type = 'replace'
+    if $('#wlbl-add').prop('checked')
+      adjustment_type = 'add'
+      modal_word = 'added'
+    else if $('#wlbl-remove').prop('checked')
+      adjustment_type = 'remove'
+      modal_word = 'updated'
+    else if $('#wlbl-replace').prop('checked')
+      adjustment_type = 'replace'
+      modal_word = 'removed'
 
     if page == 'index'
       disputes_array = $('.dispute-entry-checkbox:checked').map(-> this.id).toArray()
@@ -386,11 +388,22 @@ window.submit_bulk_wlbl = (page) ->
         console.log this['data-entry-id']
       ).toArray()
 
-
-
   # ADD TO LISTS BULK
   if adjustment_type == 'add' or adjustment_type == 'replace'
     console.log 'BULK SCENARIO 1: index/show ADD/REPLACE: USE NEW ENDPOINT + ENTRY URL ARRAY'
+
+    if adjustment_type == 'add'
+      modal_info_string =
+        "<div class='wlbl-info-modal'>Lists (<strong>#{list_types}</strong>) have been added for this entry:
+          <p>#{ip_uris}</p></div>"
+
+    if adjustment_type == 'replace'
+      # replacing threat cats? get the wl/bl lists from top blue row
+      list_types = $(dropdown).find('.wlbl-entry-wlbl').text().trim().split(', ')
+      modal_info_string +=
+        "<br>Threat Categories have been replaced for this entry:
+          <p>#{ip_uris}</p>"
+
     data =
       adjustment_type: adjustment_type   # new object
       urls: ip_uris
@@ -412,19 +425,34 @@ window.submit_bulk_wlbl = (page) ->
     curr_endpoint = '/escalations/api/v1/escalations/webrep/disputes/bulk_rule_ui_wlbl_remove'
 
 
+
+  # define the string for the modal
+  modal_info_string =
+    "<div class='wlbl-info-modal'>Lists have been #{modal_word} for this entry:
+      <p>#{ip_uris}</p></div>"
+
+  if thrt_cat_ids.length
+    thrt_cat_str =   # for the confirmation modal only
+      "<p class='tc-sentence'>With the following threat categories updated:
+       <em>#{ thrt_cat_names.join(', ') }</em></p>"
+    modal_info_string += "#{thrt_cat_str}"
+
+
+
   # submit ready? make sure our data object is correct
   console.log data
 
   std_msg_ajax(
-    url: '/escalations/api/v1/escalations/webrep/disputes/bulk_rule_ui_wlbl_remove'
+    url: curr_endpoint
     method: 'POST'
     data: data
-    success: (response) -> std_msg_success("Entries have been updated: ", [ip_uris, tc_updated_str])
-    error: (response) -> std_api_error(response, 'Error updating these entries.')
-    completed: () -> $('.dispute-wlbl-adjust-wrapper .dropdown-submit-button').html('Submit Changes').prop('disabled', false)
+    success: (response) ->
+      std_msg_success("Entries have been updated: ", [modal_info_string])
+    error: (response) ->
+      std_api_error(response, 'Error updating these entries.')
+    completed: () ->
+      $('.dispute-wlbl-adjust-wrapper .dropdown-submit-button').html('Submit Changes').prop('disabled', false)
   )
-
-
 
 
 
@@ -432,17 +460,57 @@ window.submit_bulk_wlbl = (page) ->
 window.submit_individual_wlbl = (button_tag) ->
   wlbl_form = button_tag.form;
 
-  # endpoint needs id's to represent url's by default, passing in url's is optional
+  # endpoint expects id's to represent url's by default, passing in url's is optional but acceptable too
   dispute_entry_id = $(wlbl_form).parents('.research-table-row').attr('data-entry-id')
   dispute_url = $(wlbl_form).parents('.research-table-row').find('.entry-data-content').text().trim()
-  old_lists_str = $(wlbl_form).find('.wlbl-entry-wlbl').text()  # only used in confirmation modal, show what lists were changed
+  old_lists_str = $(wlbl_form).find('.wlbl-entry-wlbl').text()  # lists (old) for this entry in string format
+  old_lists_arr = old_lists_str.split(', ')  # lists (old) for this entry in string format
+  new_lists_str = ''
+  new_lists_arr = []
   curr_note = $(wlbl_form).find('.note-input').text()
+  # remove these extraneous declarations?
+  # remove these extraneous declarations?
   curr_endpoint = ''
   modal_info_string = ''
+  modal_word = ''
+  old_threat_cats = ''
+  new_threat_cats = ''
+  removed_lists_arr = []
 
-  list_types = $('.wl-bl-list-inline:checkbox:checked').map(() ->
+  new_lists_arr = $('.wl-bl-list-inline:checkbox:checked').map(() ->
     this.value
   ).toArray()
+
+
+
+
+
+  # THIS IS UGLY, CLEAN IT UP
+  # THIS IS UGLY, CLEAN IT UP
+  # THIS IS UGLY, CLEAN IT UP
+  # figure which wl/bl lists were removed
+
+  compare_arrays = (arr1, arr2) ->
+    $(arr1).each (i, value) ->
+      curr_value = value
+      $(arr2).each (i, value) ->
+        if curr_value != value
+          removed_lists_arr.push(value)
+
+  compare_arrays(new_lists_arr, old_lists_arr)
+
+  removed_lists_str = removed_lists_arr.join(', ')
+
+  console.log old_lists_arr
+  console.log new_lists_arr
+  console.log removed_lists_arr
+
+#  console.log removed_lists_str
+
+
+
+
+
 
   thrt_cat_ids = []
   thrt_cat_names = []
@@ -453,12 +521,7 @@ window.submit_individual_wlbl = (button_tag) ->
     thrt_cat_ids.push($(this).val())
     thrt_cat_names.push($(this).parent().text().trim())
 
-  if thrt_cat_ids.length
-    tc_updated_str =   # for the confirmation modal only
-      "<p class='tc-sentence'>With the following threat categories updated:
-       <em>#{ thrt_cat_names.join(', ') }</em></p>"
-
-  new_lists_length = list_types.length
+  new_lists_length = new_lists_arr.length
   old_lists_array = old_lists_str.split(' ')
 
   if old_lists_str == '' || old_lists_str.includes('Not')
@@ -467,48 +530,60 @@ window.submit_individual_wlbl = (button_tag) ->
     old_lists_length = old_lists_array.length
 
   # adjustment type: figure out the add/replace/remove adjustment type
-  if new_lists_length >= old_lists_length then adjustment_type = 'add'
-  else if new_lists_length == old_lists_length then adjustment_type = 'replace'
-  else if new_lists_length < old_lists_length then adjustment_type = 'remove'
+  if new_lists_arr.length >= old_lists_arr.length
+    adjustment_type = 'add'
+    modal_word = 'added'
+  else if new_lists_arr.length == old_lists_arr.length
+    adjustment_type = 'replace'
+    modal_word = 'updated'
+  else if new_lists_arr.length < old_lists_arr.length
+    adjustment_type = 'remove'
+    modal_word = 'removed'
 
-  # ADD TO LISTS?
+  # ADD TO LISTS INLINE
   if adjustment_type == 'add' || adjustment_type == 'replace'
+    # replacing threat cats? get the wl/bl lists from top blue row
+    list_types = $(wlbl_form).find('.wlbl-entry-wlbl').text().trim().split(', ')
+
     data =
       adjustment_type: adjustment_type
-      lists: list_types
+      lists: new_lists_arr
       thrt_cat_ids: thrt_cat_ids
       note: curr_note
 
     curr_endpoint = '/escalations/api/v1/escalations/webrep/disputes/bulk_wlbl_threatcat_adjust'
-    modal_info_string = "Lists have been added/replaced for this entry: #{dispute_url}, #{list_types} #{thrt_cat_str}"
 
-    if location.href.includes('webrep/disputes')  # add from index/show page to new endpoint
-      console.log 'INLINE SCENARIO 1: index/show page ADD/REPLACE: use new endpoint + one entry url'
+    if location.href.includes('webrep/disputes') || $('body').hasClass('research-action') # add from index/show page to new endpoint
+      console.log 'INLINE SCENARIO 1: index/show/bfrp page ADD/REPLACE: use new endpoint + one entry url'
       data.urls = [ dispute_url ]
-
     else if location.href.includes('webrep/research')  # add from research page to new endpoint
       console.log 'INLINE SCENARIO 2: bfrp ADD/REPLACE using new endpoint + one entry id'
       data.urls = [ dispute_entry_id ]
 
-      if $('body').hasClass('research-action')  # bfrp specific needs a url for inline
-        console.log 'INLINE SCENARIO 2A: bfrp ADD/REPLACE using new endpoint + one entry id'
-        data.urls = [ dispute_url ]
-
-  # REMOVE FROM LISTS?
+  # REMOVE FROM LISTS INLINE
   else if adjustment_type = 'remove'
     console.log 'INLINE SCENARIO 3: index/show/bfrp page REMOVE: use old endpoint + one entry url'
     data =
       ip_uris: dispute_url
-      list_types: list_types
+      list_types: new_lists_arr
       note: curr_note
       thrt_cat_ids: thrt_cat_ids
 
     curr_endpoint = '/escalations/api/v1/escalations/webrep/disputes/bulk_rule_ui_wlbl_remove'
-    modal_info_string = "Lists (#{list_types}) have been removed for this entry: #{dispute_url}"
+
+  # define the info presented in the confirmation modal
+  modal_info_string =
+    "<div class='wlbl-info-modal'>Lists have been #{modal_word} for this entry:
+      <p>#{dispute_url} | <em>#{removed_lists_str}</em></p></div>"  # IS THIS BROKEN?
+
+  if thrt_cat_ids.length
+    thrt_cat_str =   # for the confirmation modal only
+      "<p class='tc-sentence'>With the following threat categories updated:
+       <em>#{ thrt_cat_names.join(', ') }</em></p>"
+    modal_info_string += "#{thrt_cat_str}"
 
   # submit ready? make sure our data object is correct
   console.log data
-
 
   std_msg_ajax(
     url: curr_endpoint
@@ -517,7 +592,6 @@ window.submit_individual_wlbl = (button_tag) ->
     error_prefix: 'Error adjusting WL/BL information.'
     success_reload: true
     success: (response) ->
-#      std_msg_success("Entry has been updated", [dispute_url, thrt_cat_str])
       std_msg_success("Entry has been updated", [modal_info_string])
     error: (response) ->
       std_api_error(response, 'Error updating this entry')
