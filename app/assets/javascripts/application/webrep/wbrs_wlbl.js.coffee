@@ -66,6 +66,9 @@ window.bulk_get_current_wlbl = (page) ->
     if this.checked == true
       entries_checked.push(this)
 
+  # Clean slate this attribute
+  $(dropdown_wrapper).removeAttr('data-disable-submit')
+
   # Pull the entry content out
   if (entries_checked.length > 0)
     entries = []
@@ -101,14 +104,6 @@ window.bulk_get_current_wlbl = (page) ->
 
     data = {'entries': entries}
 
-    # if user has selected any resolved/closed entries, disable the submit
-    disabled_submit_msg =
-      "<p class='disabled-submit-msg'>Submit Changes disabled as there are
-        selected entries set to RESOLVED_CLOSED.</p>"
-
-    if $(dropdown_wrapper).attr('data-disable-submit') == 'disable'
-      $(dropdown_wrapper).find('.dropdown-submit-button').before(disabled_submit_msg)
-
     if page == "show"
       comment_trail = '\n \n------------------------------- \nBULK SUBMISSION: \n #' + case_id + ' - ' + entries.join(', ')
     else if page == "research"
@@ -116,12 +111,16 @@ window.bulk_get_current_wlbl = (page) ->
     else if page == "index"
       comment_trail = '\n \n------------------------------- \nBULK SUBMISSION: \n' + comment_array.join('\n')
 
-    # add some loading text while the tbody gets built
+    # Add some loading text while the tbody gets built
     $(tbody).empty().html('<tr class="loading-rows"><td>Loading...<div class="mini-loader"></div></td></tr>')
 
-    # Ensure the comment textarea is always reset to this text
+    # Clean slate the dropdown
     $(comment_textarea).val(comment_trail)
+    $(dropdown_wrapper).find('.disabled-submit-msg').addClass('hidden')
 
+    # disable submit if any closed entries selected
+    if $(dropdown_wrapper).attr('data-disable-submit') == 'disable'
+      $(dropdown_wrapper).find('.disabled-submit-msg').removeClass('hidden')
 
     std_msg_ajax(
       url: '/escalations/api/v1/escalations/webrep/disputes/bulk_rule_ui_wlbl_get_info_for_form'
