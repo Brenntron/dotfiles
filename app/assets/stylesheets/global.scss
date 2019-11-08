@@ -514,7 +514,9 @@ button {
   position: relative;
   color: $type-lighter-color;
 }
-
+.toolbar#webcat-index-toolbar{
+  margin: 10px 0 -35px 0
+}
 .toolbar div {
   border: 1px solid $faint-neutral-color;
   padding: 3px;
@@ -526,7 +528,6 @@ button {
 }
 
 .toolbar div:last-child {
-  //width: 100%;
   margin-right: 0 !important;
 }
 
@@ -10147,7 +10148,7 @@ input[type="radio"].resolution_radio_button {
 }
 
 // webrep and webcat toolbars - between 1800px and 1600px, prevent breaking/wrapping of the buttons
-@media screen and (max-width: 1800px) and (min-width: 1600px) {
+@media screen and (max-width: 1800px) and (min-width: 1690px) {
   #webrep-index-toolbar, #webcat-index-toolbar {
     .toolbar-button {
       background-position: 4px 6px;
@@ -10157,6 +10158,11 @@ input[type="radio"].resolution_radio_button {
       background-size: 14px 14px; // icon size
       transition: background-color 0.2s;
     }
+  }
+}
+@media (max-width: 1690px)  {
+  #webcat-index-toolbar .toolbar-button-text {
+    display: none !important;
   }
 }
 
