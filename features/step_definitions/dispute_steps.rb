@@ -26,6 +26,12 @@ Given(/^the following dispute_entries exist:$/) do |dispute_entries|
   end
 end
 
+Given(/^the following dispute_entry_preloads exist:$/) do |dispute_entry_preloads|
+  dispute_entry_preloads.hashes.each do |dispute_entry_preloads_attrs|
+    FactoryBot.create(:dispute_entry_preload, dispute_entry_preloads_attrs)
+  end
+end
+
 
 Given(/^the following disputes exist and have entries:$/) do |disputes|
   FactoryBot.create(:customer) unless Customer.all.exists?

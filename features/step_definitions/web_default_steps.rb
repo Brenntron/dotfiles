@@ -74,6 +74,10 @@ When(/^I uncheck "(.*?)"$/) do |target|
   uncheck(target)
 end
 
+And (/^I check checkbox with class "(.*?)"$/) do |cb_class|
+  check(class: cb_class)
+end
+
 When(/^I choose "(.*?)"$/) do |target|
   choose(target)
 end
@@ -144,15 +148,15 @@ Given(/^I click "(.*?)" within the "(.*?)" row$/) do |target, row_number|
 end
 
 Then(/^Element with content "(.*?)" should have class "(.*?)"$/) do |content,class_name|
-  find(:xpath, "//div[contains(@class, '#{class_name}')][contains(text(), '#{content}')]")
+  find(:xpath, "//*[contains(@class, '#{class_name}')][contains(text(), '#{content}')]")
 end
 
 Then(/^Element with class "(.*?)" should have content "(.*?)"$/) do |class_name, content|
-  find(:xpath, "//div[contains(@class, '#{class_name}')][contains(text(), '#{content}')]")
+  find(:xpath, "//*[contains(@class, '#{class_name}')][contains(text(), '#{content}')]")
 end
 
 Then(/^Element with id "(.*?)" should have content "(.*?)"$/) do |id_name, content|
-  find(:xpath, "//div[contains(@id, '#{id_name}')][contains(text(), '#{content}')]")
+  find(:xpath, "//*[contains(@id, '#{id_name}')][contains(text(), '#{content}')]")
 end
 
 Then(/^I should see the "(.*?)" radio checked$/) do |radio_class|

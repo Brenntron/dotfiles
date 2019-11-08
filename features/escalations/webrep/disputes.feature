@@ -266,20 +266,59 @@ Feature: Disputes
     Then I should receive a file of type "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet"
 
 
+  # WBRS WL/BL Dropdown
+
+  @javascript @now
+  Scenario: a user wants to view the current WBRS lists and score for an entry from the index page
+    Given a user with role "webrep user" exists and is logged in
+    Given the following disputes exist:
+      | id | submission_type |
+      | 1  | w               |
+    Given the following dispute_entries exist:
+      | id | uri                   |
+      | 1  | talosintelligence.com |
+    Given the following dispute_entry_preloads exist:
+      | id | dispute_entry_id | wbrs_list_type |
+      | 1  | 1                | Wl-heavy       |
+#    And make sure the api agrees with the preload
+
+    When I goto "escalations/webrep/disputes?f=open"
+    And  I wait for "2" seconds
+    And  I click ".expand-row-button-inline"
+    And  I click ".dispute-entry-checkbox"
+    And  I click "#index-adjust-wlbl"
+    And  I wait for "5" seconds
+    And  take a screenshot
+    Then I should see "Current WL/BL List"
+    And  I should see "Current WBRS Score"
+    And  I should see "Threat Category"
+    And  Element with class "wlbl-entry-wlbl" should have content "WL-heavy"
+    # Note the score step might be tricky
+    And  Element with class "wlbl-current-entry-wbrs" should have content "9.2"
 
   @javascript
-  Scenario: a user wants to verify threat categories column appears in adjust wl/bl dropdown on webrep index
+  Scenario: a user wants to add an entry to a WBRS list from the index page
     Given a user with role "webrep user" exists and is logged in
     And the following disputes exist and have entries:
       | id | submission_type |
       | 1  | w               |
     When I goto "escalations/webrep/disputes?f=open"
-    And I wait for "2" seconds
-    And I click ".expand-row-button-inline"
-    And I click ".dispute-entry-checkbox"
-    And I click "#index-adjust-wlbl"
-    And I wait for "2" seconds
-    Then I should see "Threat Category"
+    And  I wait for "2" seconds
+    And  I click ".expand-row-button-inline"
+    And  I click ".dispute-entry-checkbox"
+    And  I click "#index-adjust-wlbl"
+    And  I wait for "2" seconds
+    And  I click "#wlbl-add"
+    And  I check checkbox with class "wl-med-checkbox"
+    And  I click "#index-bulk-submit-wbrs"
+    And  I wait for "10" seconds
+    And  I should see "ENTRIES HAVE BEEN UPDATED"
+    And  I click button with class "close"
+    And  I wait for "1" seconds
+    And  take a screenshot
+    And  I click "#index-adjust-wlbl"
+    And  I wait for "2" seconds
+
 
   @javascript
   Scenario: a user wants to verify threat categories column appears in adjust wl/bl dropdown on research tab
