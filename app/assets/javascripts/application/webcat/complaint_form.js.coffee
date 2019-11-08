@@ -104,10 +104,7 @@ $ ->
 
   $('#new-complaint-form').submit (e) ->
     e.preventDefault()
-    $('#loader-modal').modal({
-      backdrop: 'static',
-      keyboard: false
-    })
+    $('#main-inline-loader').removeClass('hidden')
     ips_urls = this.ips_urls.value
     desc = this.description.value
     customer = this.customers.value
@@ -122,10 +119,10 @@ $ ->
         customer: customer,
         tags: tags
       success: (response) ->
-        $('#loader-modal').modal 'hide'
+#        $('#main-inline-loader').addClass('hidden')
         std_msg_success('Complaint Created.', [], reload: true)
       error: (response) ->
-        $('#loader-modal').modal 'hide'
+#        $('#main-inline-loader').css('display', 'none')
         std_api_error(response, "Complaint was not created.", reload: false)
     )
 

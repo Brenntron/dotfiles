@@ -10,8 +10,13 @@
   .row.top-margin
     .col-xs-12
       %h1#webcat-index-title
+
     .col-xs-12
       #webcat_searchref_container{onmouseover: "triggerTooltips(this)"}
+  .gear-loader-wrapper.hidden#main-inline-loader
+    = inline_svg 'icon_gears_loader.svg', class: 'gears-loader'
+    %span.loading-msg
+      Completing task...
   .row
     .col-xs-12
       = render "toolbar"

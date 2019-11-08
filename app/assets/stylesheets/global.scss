@@ -1221,14 +1221,29 @@ thead th.sorting.center {
   background-position: center;
   text-align: center;
 }
-
+.important-flag-col{
+  width: 25px;
+}
 .success-msg::before {background-image: url(image_path('icon_success.svg'));}
 .error-msg::before, .alert-danger-msg::before {background-image: url(image_path('icon_error.svg'));}
 .fail-msg::before {background-image: url(image_path('icon_fail.svg'));}
 .hidden-msg {
   display: none;
 }
+#main-inline-loader{
+  position: absolute;
+  margin-top: -75px;
+  right: 190px;
+  .loading-msg{
+    position: absolute;
+    margin-top: 9px;
+    margin-left: 14px;
+    width: max-content;
+    color: #999;
+    font-style: italic;
+  }
 
+}
 #msg-modal, #loader-modal, #login-modal {
   .modal-dialog, .modal-dialog {
     margin-top: 180px;
@@ -10408,58 +10423,96 @@ span.input-truncate {
 #disputes-research-table{
   background: $ac-nav-bg-color;
 }
+
 .research-overview-row {
   background: $faint-neutral-color;
-  td{
+
+  td {
     vertical-align: top;
-    .wbrs-input-wrapper { background-color: $bug-section-color; }
-    .sbrs-input-wrapper { background-color: $success-color;}
-    .xbrs-input-wrapper { background-color: $communication-accent-color;}
-    .crosslisted-input-wrapper { background-color: $warning-accent-color; }
-    .virus-total-input-wrapper { background-color: $rule-accent-color; }
-    .reptool-input-wrapper { background-color: $fifth-section-color; }
+
+    .wbrs-input-wrapper {
+      background-color: $bug-section-color;
+    }
+
+    .sbrs-input-wrapper {
+      background-color: $success-color;
+    }
+
+    .xbrs-input-wrapper {
+      background-color: $communication-accent-color;
+    }
+
+    .crosslisted-input-wrapper {
+      background-color: $warning-accent-color;
+    }
+
+    .virus-total-input-wrapper {
+      background-color: $rule-accent-color;
+    }
+
+    .reptool-input-wrapper {
+      background-color: $fifth-section-color;
+    }
   }
-  .input-col input{
+
+  .input-col input {
     margin: 8px 8px auto 8px;
   }
-  td.input-col{
-    padding: unset!important;
-    width: 27px;
-  }
-  td:nth-child(3){
-     //background: red;
-     //width: 170px;  // rule hits list
-     min-width: 60px;
-     word-break: break-word;
-     padding-right: 10px;
-   }
-  td:nth-child(4){
-    min-width:90px;
-  }
-  .entry-data-wlbl{
-    min-width: 85px;
-  }
-  td:nth-child(6) {
-    padding-right: 10px;
-  }
-  td:nth-child(9) {
-    width: 130px;
-  }
-  td:nth-child(10) {
-    width: 20px;   // xbrs history
-  }
-  td:nth-child(12){
-    min-width: 106px;  // reptool class
-  }
-  td:nth-child(13) {
-    min-width: 110px;
-    word-break: break-word;
-  }
-  td:nth-child(16) {
-    width: 190px;  // wl/bl lists + threat cats
-  }
-  td:last-child{
-    min-width: 80px;
-  }
-}
 
+    td.input-col {
+      padding: unset !important;
+      width: 27px;
+    }
+
+    td:nth-child(3) {
+      min-width: 60px;
+      word-break: break-word;
+      padding-right: 10px;
+    }
+
+    td:nth-child(4) {
+      min-width: 90px;
+    }
+
+    .entry-data-wlbl {
+      min-width: 85px;
+    }
+
+    td:nth-child(6) {
+      padding-right: 10px;
+    }
+
+    td:nth-child(7) {
+      min-width: 130px !important;
+      max-width: 130px!important;
+      overflow-wrap: break-word;
+    }
+
+    td:nth-child(9) {
+      width: 130px;
+    }
+
+    td:nth-child(10) {
+      width: 20px; // xbrs history
+    }
+
+    td:nth-child(12) {
+      min-width: 106px; // reptool class
+    }
+
+    td:nth-child(13) {
+      min-width: 110px;
+      word-break: break-word;
+    }
+    td:nth-child(15) {
+      min-width: 110px;
+    }
+    td:nth-child(16) {
+      width: 190px; // wl/bl lists + threat cats
+    }
+
+    td:last-child {
+      min-width: 80px;
+    }
+  }
+//}
