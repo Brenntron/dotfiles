@@ -276,7 +276,7 @@
                       = entry[:hostname]
                   %td.dual-edit-field{'data-id': entry.id, 'data-field': 'status'}
                     %label Status
-                    %span.entry-data
+                    %span.entry-data.entry-data-status
                       - if entry[:status].nil?
                         NEW
                       - else
