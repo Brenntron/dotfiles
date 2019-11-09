@@ -291,7 +291,6 @@ Feature: Disputes
     And  I should see "Current WBRS Score"
     And  I should see "Threat Category"
     And  take a screenshot
-    # For fresh items with no data it's easier to just have the test look for the span element
     And  I should see "Not on a list"
     And  I should see "No Score"
 
@@ -392,19 +391,63 @@ Feature: Disputes
     And  I wait for "1" seconds
     And  I should see "Threat Categories"
     And  I should see "Required for adding to any blacklist."
-    And  I click ".wlbl_thrt_cat_id_8"
+    Then I click ".wlbl_thrt_cat_id_8"
     And  I click "#index-bulk-submit-wbrs"
     And  I wait for "10" seconds
     And  I should see "ENTRIES HAVE BEEN UPDATED"
-    And  I click button with class "close"
+    Then I click button with class "close"
     And  I wait for "1" seconds
-    And  I click "#index-adjust-wlbl"
+    Then I click "#index-adjust-wlbl"
     And  I wait for "2" seconds
-    And  take a screenshot
+#    And  take a screenshot
     And  Element with class "wlbl-entry-wlbl" should have content "BL-weak"
     And  clean up wlbl and remove all wlbl entries on "imadethisurlup.com"
 
 
+  @javascript @now
+  Scenario: a user removes an entry from one WBRS list and adds it to another on the dispute show page (after adding one first so we're starting with clean data)
+    Given a user with role "webrep user" exists and is logged in
+    Given the following disputes exist:
+      | id | submission_type |
+      | 1  | w               |
+    Given the following dispute_entries exist:
+      | id | uri                |
+      | 1  | imadethisurlup.com |
+    And  clean up wlbl and remove all wlbl entries on "imadethisurlup.com"
+    When I goto "escalations/webrep/disputes/1"
+    And  I wait for "2" seconds
+    Then I click "#research-tab-link"
+    And  I click "#wlbl_button_1"
+    And  I wait for "5" seconds
+    And  I should see "Not on a list"
+    And  I should see "No score"
+    Then I click "#wl-weak-slider"
+    And  I click "Submit Changes"
+    And  I wait for "5" seconds
+    Then I click button with class "close"
+    And  I wait for "1" seconds
+    And  I click "#wlbl_button_1"
+    And  I wait for "5" seconds
+    And  I should not see "Not on a list"
+    And  Element with class "wlbl-entry-wlbl" should have content "WL-weak"
+    # Now we're actually removing and adding
+    Then I click "#wl-weak-slider"
+    And  I click "#bl-weak-slider"
+    And  I click ".wlbl_thrt_cat_id_8"
+    And  I click "Submit Changes"
+    And  I wait for "5" seconds
+    Then I click button with class "close"
+    And  I wait for "1" seconds
+    And  I click "#wlbl_button_1"
+    And  I wait for "5" seconds
+    And  Element with class "wlbl-entry-wlbl" should have content "BL-weak"
+    And  Element with class "wlbl-entry-wlbl" should not have content "WL-weak"
+    And take a screenshot
+    And  clean up wlbl and remove all wlbl entries on "imadethisurlup.com"
+
+
+  @javascript
+    Scenario: a user adds multiple entries to a WBRS list from the dispute show page
 
 
   @javascript
