@@ -40,10 +40,8 @@ window.bulk_get_current_wlbl = (page) ->
   comment_box = $(dropdown_wrapper).find('.adjust-wlbl-input')
   comment_textarea = $(dropdown_wrapper).find('.note-input')
 
-  ## Clear out any residual data
-  # Empty table
+  # Clear out any residual data
   $(tbody).empty()
-  # Empty comment box
   $(comment_box).text('')
 
   # Clear the checkboxes
@@ -159,7 +157,7 @@ window.bulk_get_current_wlbl = (page) ->
       list_types = ''
       wbrs_score = wbrs
     if !wbrs_score
-      wbrs_score = '<span class="missing-data text-left">No Score</span>'
+      wbrs_score = '<span class="missing-data text-left">No score</span>'
     if !comment then comment = ''
 
     # ensure the 'not on a list' text is formatted correctly
@@ -173,6 +171,7 @@ window.bulk_get_current_wlbl = (page) ->
       <td class='wlbl-current-entry-wbrs'>#{wbrs_score}</td>
       <td class='wlbl-threat-cat'>#{tc_str}</td>
       </tr>"
+
 
     $(tbody).append(table_row)
     $(tbody).find('.loading-rows').addClass('hidden')
@@ -363,8 +362,8 @@ window.get_current_wlbl = (button) ->
         if wbrs.trim() == 'No score'
           wbrs = "<span class='missing-data'>No score</span>"
         $(wbrs_score).html(wbrs)
-
-        $(wlbl_list[0]).text('<span class="missing-data">Not on a list</span>')
+        # needs to be html below to ensure it uses the span
+        $(wlbl_list[0]).html('<span class="missing-data">Not on a list</span>')
         $(submit_button[0]).attr('disabled', true)
     error: (response) ->
       popup_response_error(response, 'Error retrieving WL/BL Data')

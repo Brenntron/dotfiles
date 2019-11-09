@@ -293,7 +293,7 @@ Feature: Disputes
     And  take a screenshot
     # For fresh items with no data it's easier to just have the test look for the span element
     And  I should see "Not on a list"
-    And  I should see "No Score"
+    And  I should see "No score"
 
 
   @javascript
@@ -313,7 +313,7 @@ Feature: Disputes
     And  I wait for "2" seconds
     And  take a screenshot
     And  I should see "Not on a list"
-    And  I should see "No Score"
+    And  I should see "No score"
     Then I click "#wlbl-add"
     And  I check checkbox with class "wl-med-checkbox"
     And  I click "#index-bulk-submit-wbrs"
@@ -366,7 +366,7 @@ Feature: Disputes
     And  I click "#index-adjust-wlbl"
     And  I wait for "2" seconds
     And  I should see "Not on a list"
-    And  I should see "No Score"
+    And  I should see "No score"
     And  Element with class "wlbl-entry-wlbl" should not have content "WL-med"
     And  clean up wlbl and remove all wlbl entries on "imadethisurlup.com"
 
