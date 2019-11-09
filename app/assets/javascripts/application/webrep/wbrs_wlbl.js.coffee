@@ -222,7 +222,6 @@ window.get_current_wlbl = (button) ->
   # On show page, if status is closed, then add a sentence that says you can't do anything
   if $(research_row).find('.entry-data-status').length
     entry_status = $(research_row).find('.entry-data-status').text().trim()
-    console.log entry_status
 
   if $('#dispute_id').length > 0
     case_id = $('#dispute_id').text()
@@ -429,11 +428,6 @@ window.submit_bulk_wlbl = (page) ->
       ).toArray()
 
 
-
-  # for the modal, the entries that can't be modified are in this array, then pop these in the modal screen too
-  closed_entries.push(curr_url)  # this will get dumped into the modal later
-
-
   # ADD TO LISTS BULK
   if adjustment_type == 'add' or adjustment_type == 'replace'
     console.log 'bulk scenario 1'  # index/show add/replace: use new endpoint + entry url array
@@ -479,12 +473,10 @@ window.submit_bulk_wlbl = (page) ->
     if($.inArray(el, unique_lists) == -1)
       unique_lists.push(el)
 
-
   # define the string for the modal
   modal_info_string =
     "<div class='wlbl-info-modal'><p>The following entries: </p>
-      <span>#{ip_uris.join('<br>')}</span> <span>Have been #{modal_action} to the following WBRS Lists: <p>#{unique_lists.join(', ')}</p></span></div>"
-  #   <span>#{ip_uris.join('<br>')}</span> <span>Have been #{modal_action} to the following WBRS Lists: <p>#{list_types.join(', ')}</p></span></div>"
+      <span>#{ip_uris.join('<br>')}</span> <span>Have been #{modal_action} for the following WBRS Lists: <p>#{unique_lists.join(', ')}</p></span></div>"
 
   if thrt_cat_ids.length
     thrt_cat_str =   # for the confirmation modal only
@@ -523,7 +515,6 @@ window.submit_individual_wlbl = (button_tag) ->
   new_lists_arr = []
   curr_note = $(wlbl_form).find('.note-input').text()
   # remove these extraneous declarations?
-  # remove these extraneous declarations?
   curr_endpoint = ''
   modal_info_string = ''
   modal_action = ''
@@ -535,35 +526,8 @@ window.submit_individual_wlbl = (button_tag) ->
     this.value
   ).toArray()
 
-
-
-
-
-  # THIS IS UGLY, CLEAN IT UP
-  # THIS IS UGLY, CLEAN IT UP
-  # THIS IS UGLY, CLEAN IT UP
-  # figure which wl/bl lists were removed
-
-  compare_arrays = (new_array, old_array) ->
-    $(new_array).each (i, value) ->
-      curr_value = value
-      $(old_array).each (i, value) ->
-        if curr_value != value
-          removed_lists_arr.push(value)
-
-  compare_arrays(new_lists_arr, old_lists_arr)
-
-  removed_lists_str = removed_lists_arr.join(', ')
-
-#  console.log old_lists_arr
-#  console.log new_lists_arr
-  console.log 'BELOW IS THE 1 or more WL/BL LISTS WE WILL NOW REMOVE'
-  console.log removed_lists_arr
-
-
-
-
-
+  # INLINE specific - need to use filter() to figure out which lists have been removed due to fancy-sliders
+  removed_lists_arr = old_lists_arr.filter((f) -> !new_lists_arr.includes(f))
 
   thrt_cat_ids = []
   thrt_cat_names = []
@@ -582,6 +546,7 @@ window.submit_individual_wlbl = (button_tag) ->
   else
     old_lists_length = old_lists_array.length
 
+  # CHANGE HOW THIS IS CALCULATED?
   # adjustment type: figure out the add/replace/remove adjustment type
   if new_lists_arr.length >= old_lists_arr.length
     adjustment_type = 'add'
@@ -630,7 +595,9 @@ window.submit_individual_wlbl = (button_tag) ->
       thrt_cat_ids: thrt_cat_ids
 
     curr_endpoint = '/escalations/api/v1/escalations/webrep/disputes/bulk_rule_ui_wlbl_remove'
-    modal_info_string += "<span>#{dispute_url}</span> <span>#{removed_lists_str}</span></div>"
+    modal_info_string +=
+      "<span>#{dispute_url}</span> <span>Have been removed from the following WBRS Lists:
+        <p>#{removed_lists_arr}</p></span></div>"
 
   # THREAT CATS PRESENT? ADD MORE TEXT TO CONFIRMATION MODAL
   if thrt_cat_ids.length
