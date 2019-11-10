@@ -328,7 +328,8 @@ Feature: Disputes
 
 
   @javascript
-  Scenario: a user removes an entry from a WBRS list from the index page (after adding it so we're starting with clean data from the api)
+  Scenario: a user removes an entry from a WBRS list from the index page
+  #  after adding it so we're starting with clean data from the api
     Given a user with role "webrep user" exists and is logged in
     Given the following disputes exist:
       | id | submission_type |
@@ -371,7 +372,7 @@ Feature: Disputes
 
 
   @javascript
-  Scenario: a user adds an entry to a WBRS Blacklist
+  Scenario: a user adds an entry to a WBRS Blacklist from the index page
     Given a user with role "webrep user" exists and is logged in
     Given the following disputes exist:
       | id | submission_type |
@@ -391,6 +392,9 @@ Feature: Disputes
     And  I wait for "1" seconds
     And  I should see "Threat Categories"
     And  I should see "Required for adding to any blacklist."
+    And  I should see "Bogon"
+    And  I should see "Cryptojacking"
+    And  I should see "Phishing"
     Then I click ".wlbl_thrt_cat_id_8"
     And  I click "#index-bulk-submit-wbrs"
     And  I wait for "10" seconds
@@ -404,8 +408,9 @@ Feature: Disputes
     And  clean up wlbl and remove all wlbl entries on "imadethisurlup.com"
 
 
-  @javascript @now
-  Scenario: a user removes an entry from one WBRS list and adds it to another on the dispute show page (after adding one first so we're starting with clean data)
+  @javascript
+  Scenario: a user removes an entry from one WBRS list and adds it to another on the dispute show page
+  #  after adding one first so we're starting with clean data
     Given a user with role "webrep user" exists and is logged in
     Given the following disputes exist:
       | id | submission_type |
@@ -433,6 +438,9 @@ Feature: Disputes
     # Now we're actually removing and adding
     Then I click "#wl-weak-slider"
     And  I click "#bl-weak-slider"
+    And  I should see "Bogon"
+    And  I should see "Cryptojacking"
+    And  I should see "Phishing"
     And  I click ".wlbl_thrt_cat_id_8"
     And  I click "Submit Changes"
     And  I wait for "5" seconds
@@ -442,42 +450,42 @@ Feature: Disputes
     And  I wait for "5" seconds
     And  Element with class "wlbl-entry-wlbl" should have content "BL-weak"
     And  Element with class "wlbl-entry-wlbl" should not have content "WL-weak"
-    And take a screenshot
+    And  take a screenshot
     And  clean up wlbl and remove all wlbl entries on "imadethisurlup.com"
 
 
-  @javascript
+  @javascript @now
     Scenario: a user adds multiple entries to a WBRS list from the dispute show page
-
-
-  @javascript
-  Scenario: a user wants to verify threat categories column appears in adjust wl/bl dropdown on research tab
     Given a user with role "webrep user" exists and is logged in
-    And the following disputes exist and have entries:
-      | id   | submission_type |
-      | 123  | w               |
-    When I goto "escalations/webrep/disputes/123"
-    And I wait for "2" seconds
-    And I click ".bfrp-inline-wlbl-button"
-    And I should see "Threat Category"
-
-  @javascript
-  Scenario: a user wants to see available threat categories to add to blacklists
-    Given a user with role "webrep user" exists and is logged in
-    And the following disputes exist and have entries:
+    Given the following disputes exist:
       | id | submission_type |
       | 1  | w               |
-    When I goto "escalations/webrep/disputes?f=open"
-    And I wait for "5" seconds
-    And I click ".expand-row-button-inline"
-    And I click ".dispute-entry-checkbox"
-    And I click "#index-adjust-wlbl"
-    And I wait for "5" seconds
-    And I click ".bl-weak-checkbox"
-    And I wait for "5" seconds
-    Then I should see "Bogon"
-    Then I should see "Cryptojacking"
-    Then I should see "Phishing"
+    Given the following dispute_entries exist:
+      | id | uri                |
+      | 1  | imadethisurlup.com |
+      | 2  | thisurlisfake.com  |
+    And  clean up wlbl and remove all wlbl entries on "imadethisurlup.com"
+    And  clean up wlbl and remove all wlbl entries on "thisurlisfake.com"
+    When I goto "escalations/webrep/disputes/1"
+    And  I wait for "2" seconds
+    Then I click "#research-tab-link"
+    And  I check checkbox with class "dispute-entry-cb-1"
+    And  I check checkbox with class "dispute-entry-cb-2"
+    And  I click button "wlbl_entries_button"
+    And  I wait for "5" seconds
+    Then I check checkbox with class "bl-weak-checkbox"
+    And  I click ".wlbl_thrt_cat_id_1"
+    And  I click ".wlbl_thrt_cat_id_2"
+    And  I click "Submit Changes"
+    And  I wait for "5" seconds
+    Then I click button with class "close"
+    And  I wait for "2" seconds
+    Then I click button "wlbl_entries_button"
+    And  I wait for "5" seconds
+# Add classes to the list cells in the wlbl coffee file
+    And  take a screenshot
+
+
 
 
 

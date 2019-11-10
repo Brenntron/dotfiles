@@ -113,7 +113,7 @@
                       .threat-cat-area
                         - Wbrs::ThreatCategory.selections.each do |label, value|
                           .threat-cat-cell
-                            = wlbl_form.check_box(:thrt_cat_id, {id: nil, class: 'wlbl_thrt_cat_id'}, value)
+                            = wlbl_form.check_box(:thrt_cat_id, {class: "wlbl_thrt_cat_id wlbl_thrt_cat_id_#{value}"}, value)
                             = label
                     -# END: WL BL LISTS ROW + THREAT CATS ROW
 
@@ -254,7 +254,7 @@
                   %td.expandable-row-column
                     %button.expand-row-button-inline{'data-entry-id': "#{entry.id}"}
                   %td
-                    %input.dispute_check_box{type: 'checkbox', 'data-entry-id': "#{entry.id}"}
+                    %input.dispute_check_box{type: 'checkbox', 'data-entry-id': "#{entry.id}", class: "dispute-entry-cb-#{entry.id}"}
                   %td.dual-edit-field{'data-id': entry.id, 'data-field': 'host'}
                     - if entry[:is_important]
                       %span.entry-data.entry-data-content.entry-important-flag
