@@ -575,7 +575,7 @@ window.submit_individual_wlbl = (button_tag) ->
 
     curr_endpoint = '/escalations/api/v1/escalations/webrep/disputes/bulk_wlbl_threatcat_adjust'
     modal_info_string +=
-      "<span>#{dispute_url}</span> <span>Have been #{modal_action} to the following WBRS Lists:
+      "<span>#{dispute_url}</span> <span>Have been #{modal_action} for the following WBRS Lists:
         <p>#{new_lists_arr.join(', ')}</p></span></div>"
 
     if location.href.includes('webrep/disputes') || $('body').hasClass('research-action')
@@ -1012,7 +1012,7 @@ window.add_wlbl_threat_cat_listeners = () ->
       ]
 
       # if they pass everything else, allow Submit to proceed
-      if conditionsArray.indexOf(true) >= 0 && disable_submit != 'disable'
+      if conditionsArray.indexOf(true) >= 0 && $(dropdown_id).attr('data-disable-submit') != 'disable'
         enableSubmit()
 
 

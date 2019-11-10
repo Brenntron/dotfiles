@@ -10763,16 +10763,18 @@ span.threat-cat-no-data {
 
 .dispute_rep_tools .dropdown-menu {
   border-radius: 4px 0 4px 4px;
-  top: 16px;
+  top: 18px;
   right: 3px;
 }
 
 // inline adjust dropdown button toggle should be blue
-.adjust-wlbl-button:hover {
+.dispute-inline-buttons.adjust-wlbl-button:hover {
   background-color: lighten($bug-section-color, 5%) !important;
 }
-.adjust-wlbl-button:focus {
+.dispute-inline-buttons.adjust-wlbl-button:focus {
   background-color: $bug-section-color;
 }
 
-
+.dispute_rep_tools .dropdown-menu h3.reptool-dropdown-header {
+  padding-top: 6px;
+}
