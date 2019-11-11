@@ -10778,3 +10778,8 @@ span.threat-cat-no-data {
 .dispute_rep_tools .dropdown-menu h3.reptool-dropdown-header {
   padding-top: 6px;
 }
+
+// inline adjust dropdown, if checkboxes are disabled, select the adjacent span
+.wl-bl-list-inline:disabled + span {
+  cursor: not-allowed;
+}
