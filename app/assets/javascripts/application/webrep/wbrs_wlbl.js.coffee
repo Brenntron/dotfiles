@@ -249,6 +249,8 @@ window.get_current_wlbl = (button) ->
   submit_button = $(dropdown).find('.dropdown-submit-button')
   comment = $(dropdown).find('.adjust-wlbl-input')
   comment_textarea = $(dropdown).find('.note-input')
+  tc_row = $(dropdown).find('.threat-cat-row')
+  list_cbs = $(dropdown).find('.wl-bl-list-inline:checkbox')
   wl_weak = $(dropdown).find('.wl-weak-checkbox')
   wl_med = $(dropdown).find('.wl-med-checkbox')
   wl_heavy = $(dropdown).find('.wl-heavy-checkbox')
@@ -284,9 +286,11 @@ window.get_current_wlbl = (button) ->
   # Add loading message while wl/bl rows are being built, this gets removed after data is loaded
   $(wlbl_list).html('<span class="loading-rows">Loading...<span class="mini-loader"></span></span>')
 
-  # Clean slate the dropdown on every dropdown click
+  # Clean slate the inline dropdowns on every dropdown click / spawn
   $(submit_button).html('Submit Changes').prop('disabled', true)
   $(comment_textarea).val(comment_text)
+  $(tc_row).addClass('hidden')
+  $(list_cbs).prop('disabled',false).closest('li').css('opacity','1')
 
   # Send entry content to wbrs
   data = {
@@ -452,19 +456,6 @@ window.submit_bulk_wlbl = (page) ->
   # ADD TO LISTS BULK
   if adjustment_type == 'add' or adjustment_type == 'replace'
     console.log 'bulk scenario 1'  # index/show add/replace: use new endpoint + entry url array
-
-#    if adjustment_type == 'add'
-#      modal_info_string =
-#        "<div class='wlbl-info-modal'>Lists (<strong>#{list_types}</strong>) have been added for this entry:
-#          <p>#{ip_uris.join('<br>')}</p></div>"
-
-    if adjustment_type == 'replace'
-      # replacing threat cats? get the wl/bl lists from top blue row
-      list_types = $(dropdown).find('.wlbl-entry-wlbl').text().trim().split(', ')
-      modal_info_string +=
-        "<br>Threat Categories have been replaced for this entry:
-          <p>#{ip_uris.join('<br><br>')}</p>"
-
     data =
       adjustment_type: adjustment_type   # new object
       urls: ip_uris
@@ -487,9 +478,9 @@ window.submit_bulk_wlbl = (page) ->
 
   # ensure we're showing only non-duplicate lists in the modal
   unique_lists = []
-  $.each list_types, (i, el) ->
-    if($.inArray(el, unique_lists) == -1)
-      unique_lists.push(el)
+  $.each list_types, (i, entry) ->
+    if($.inArray(entry, unique_lists) == -1)
+      unique_lists.push(entry)
 
   # define the string for the modal
   modal_info_string =
@@ -527,25 +518,21 @@ window.submit_individual_wlbl = (button_tag) ->
   # endpoint expects id's to represent url's by default, passing in url's is optional but acceptable too
   dispute_entry_id = $(wlbl_form).parents('.research-table-row').attr('data-entry-id')
   dispute_url = $(wlbl_form).parents('.research-table-row').find('.entry-data-content').text().trim()
-  old_lists_str = $(wlbl_form).find('.wlbl-entry-wlbl').text()  # lists (old) for this entry in string format
-  old_lists_arr = old_lists_str.split(', ')  # lists (old) for this entry in string format
-  new_lists_str = ''
-  new_lists_arr = []
+  old_lists_str = $(wlbl_form).find('.wlbl-entry-wlbl').text()  # lists (old) for this entry
+  old_lists_arr = old_lists_str.split(', ')
   curr_note = $(wlbl_form).find('.note-input').text()
-  # remove these extraneous declarations?
   curr_endpoint = ''
   modal_info_string = ''
   modal_action = ''
-  old_threat_cats = ''
-  new_threat_cats = ''
   removed_lists_arr = []
 
   new_lists_arr = $('.wl-bl-list-inline:checkbox:checked').map(() ->
     this.value
   ).toArray()
 
-  # INLINE specific - need to use filter() to figure out which lists have been removed due to fancy-sliders
-  removed_lists_arr = old_lists_arr.filter((f) -> !new_lists_arr.includes(f))
+  # inline specific - figure out which lists have been removed in the fancy-sliders using filter
+  removed_lists_arr = old_lists_arr.filter((list) ->
+    !new_lists_arr.includes(list))
 
   thrt_cat_ids = []
   thrt_cat_names = []
@@ -556,25 +543,26 @@ window.submit_individual_wlbl = (button_tag) ->
     thrt_cat_ids.push($(this).val())
     thrt_cat_names.push($(this).parent().text().trim())
 
-  new_lists_length = new_lists_arr.length
-  old_lists_array = old_lists_str.split(' ')
+  old_length = old_lists_arr.length
+  new_length = new_lists_arr.length
+  tc_length = thrt_cat_ids.length
 
   if old_lists_str == '' || old_lists_str.includes('Not')
-    old_lists_length == 0
-  else
-    old_lists_length = old_lists_array.length
+    old_length == 0
 
-  # CHANGE HOW THIS IS CALCULATED?
-  # adjustment type: figure out the add/replace/remove adjustment type
-  if new_lists_arr.length >= old_lists_arr.length
+  # adjustment type: figure out the add/replace/remove adjustment type, this determines which endpoint to use
+  if (new_length > old_length || new_length == old_length) and tc_length == 0
     adjustment_type = 'add'
-    modal_action = 'added'
-  else if new_lists_arr.length == old_lists_arr.length
+    modal_action = 'added'  # separate var to make it easier to change verbage
+  else if new_length == old_length and tc_length > 0
     adjustment_type = 'replace'
     modal_action = 'updated'
-  else if new_lists_arr.length < old_lists_arr.length
+  else if new_length < old_length and tc_length == 0
     adjustment_type = 'remove'
     modal_action = 'removed'
+  else
+    adjustment_type = 'add'
+    modal_action = 'updated'
 
   # define the info presented in the confirmation modal
   modal_info_string =
