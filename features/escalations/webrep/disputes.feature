@@ -487,6 +487,14 @@ Feature: Disputes
 
 
 
+# TODO   A user searches for an url on BFRP that has a Threat Category assigned to it
+# TODO   A user removes multiple entries from a WBRS list on the dispute show page
+# TODO   A user performs a search on BFRP and adds a result to a WBRS list
+# TODO   A user performs a search on BFRP and removes a result from a WBRS List
+# TODO   A user performs a search on BFRP and adds multiple results to a WBRS list
+# TODO   A user performs a search on BFRP and removes multiple results from a WBRS List
+
+
 
 
 

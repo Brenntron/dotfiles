@@ -72,21 +72,26 @@ window.bulk_get_current_wlbl = (page) ->
 
   # Pull the entry content out
   if (entries_checked.length > 0)
+    debugger
     entries = []
     wbrs = ''
     comment_trail = ''
     comment_array = []
     closed_entries = []
+    entry_ids = []
     $(entries_checked).each ->
       # Slightly different structure to get the actual entry content
       if row == '.index-entry-row'
+        debugger
         entry_row = $(this).parents(row)[0]
         entry_content = $(entry_row).find('.entry-col-content').text().trim()
         entry_case_id = $(entry_row).attr('data-case-id')
         wbrs = $(entry_row).find(current_wbrs).text()
         comment_array.push('#' + entry_case_id + ' - ' + entry_content)
         status = $(entry_row).find('.entry-col-status').text().trim()
+        entry_id = $(entry_row).find('.dispute-entry-checkbox').attr('id')
       else if row == '.research-table-row'
+        debugger
         entry_row = $(this).parents(row)[0]
         entry_content = $(entry_row).find('.entry-data-content').text().trim()
         wbrs = $(entry_row).find(current_wbrs).text()
