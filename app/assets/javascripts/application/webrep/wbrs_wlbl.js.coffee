@@ -72,7 +72,7 @@ window.bulk_get_current_wlbl = (page) ->
 
   # Pull the entry content out
   if (entries_checked.length > 0)
-    debugger
+#    debugger
     entries = []
     wbrs = ''
     comment_trail = ''
@@ -82,7 +82,7 @@ window.bulk_get_current_wlbl = (page) ->
     $(entries_checked).each ->
       # Slightly different structure to get the actual entry content
       if row == '.index-entry-row'
-        debugger
+#        debugger
         entry_row = $(this).parents(row)[0]
         entry_content = $(entry_row).find('.entry-col-content').text().trim()
         entry_case_id = $(entry_row).attr('data-case-id')
@@ -91,7 +91,7 @@ window.bulk_get_current_wlbl = (page) ->
         status = $(entry_row).find('.entry-col-status').text().trim()
         entry_id = $(entry_row).find('.dispute-entry-checkbox').attr('id')
       else if row == '.research-table-row'
-        debugger
+#        debugger
         entry_row = $(this).parents(row)[0]
         entry_content = $(entry_row).find('.entry-data-content').text().trim()
         wbrs = $(entry_row).find(current_wbrs).text()
@@ -198,9 +198,24 @@ window.bulk_get_current_wlbl = (page) ->
     $(left_cbs).each (i) ->  # add the order ids to left and right sides
       ip_uri = $(this).closest('tr').find(url_entry).text().trim()
       $(this).closest('tr').attr('data-order-id', i)  # add row-id to the left
+
+      # determine which page user is on to get the entry-id attrs from cb's, must be created for bfrp
+      if $('body').hasClass('index-action')
+        curr_entry_id = 'wlbl-entry-id-' + $(this).attr('id')
+      else if $('body').hasClass('show-action')
+        curr_entry_id = 'wlbl-entry-id-' + $(this).attr('data-entry-id')
+      else if $('body').hasClass('research-action')  # bfrp
+        # bfrp does not have numerical id, add the url-based id instead
+        curr_entry_id = 'wlbl-entry-id-' + ip_uri
+
       $(curr_dd).find('.wlbl-entry-content').each ->
         if $(this).text().includes(ip_uri)
           $(this).closest('tr').attr('data-order-id', i)  # add row-id to the right
+          $(this).closest('tr').find('.wlbl-entry-wlbl').addClass(curr_entry_id)  # add entry-id to the cell
+          if $('body').hasClass('research-action')  # bfrp? add an extra class to indicate this
+            $(this).closest('tr').find('.wlbl-entry-wlbl').addClass('wlbl-result-research-page')
+
+
 
     table_dd = $(curr_dd).find('tbody')
     rows = $(table_dd).find('tr')
