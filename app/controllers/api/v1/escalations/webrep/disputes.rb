@@ -864,6 +864,17 @@ module API
 
             end
 
+            desc 'super simple endpoint to quick look up bulk submit'
+            params do
+            end
+
+            post 'quick_bulk_update' do
+              data = params[:update_data]
+
+              Dispute.process_quick_bulk_entries(data)
+
+            end
+
           end
         end
       end

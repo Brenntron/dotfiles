@@ -28,6 +28,7 @@ class DisputeEntry < ApplicationRecord
   STATUS_RESOLVED_INVALID = "INVALID"
   STATUS_RESOLVED_TEST = "TEST_TRAINING"
   STATUS_RESOLVED_OTHER = "OTHER"
+  STATUS_RESOLVED_QUICK_BULK = "QUICK_BULK" #tickets created and closed using the quick bulk entry form.
 
   STATUS_RESOLVED_DUPLICATE = "DUPLICATE"
 
@@ -899,4 +900,5 @@ class DisputeEntry < ApplicationRecord
       return false
     end
   end
+
 end
