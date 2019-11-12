@@ -190,7 +190,7 @@ window.bulk_get_current_wlbl = (page) ->
       curr_dd = '#wlbl_adjust_entries_index'
       left_cbs = '#disputes-index .dispute-entry-checkbox:checked'
       url_entry = '.entry-col-content'
-    else  # show page dropdown
+    else  # show page dropdown and bfrp dropdown bulk
       curr_dd = '#wlbl_adjust_entries'
       left_cbs = '#disputes-research-table .dispute_check_box:checked'
       url_entry = '.entry-data-content'
@@ -198,23 +198,19 @@ window.bulk_get_current_wlbl = (page) ->
     $(left_cbs).each (i) ->  # add the order ids to left and right sides
       ip_uri = $(this).closest('tr').find(url_entry).text().trim()
       $(this).closest('tr').attr('data-order-id', i)  # add row-id to the left
+      curr_entry_id = 'wlbl-result-no-' + i   # this goes to research page by default
 
       # determine which page user is on to get the entry-id attrs from cb's, must be created for bfrp
       if $('body').hasClass('index-action')
         curr_entry_id = 'wlbl-entry-id-' + $(this).attr('id')
       else if $('body').hasClass('show-action')
         curr_entry_id = 'wlbl-entry-id-' + $(this).attr('data-entry-id')
-      else if $('body').hasClass('research-action')  # bfrp
-        # bfrp does not have numerical id, add the url-based id instead
-        curr_entry_id = 'wlbl-entry-id-' + ip_uri
 
+      # dropdowns > adding id's to list cells for testing
       $(curr_dd).find('.wlbl-entry-content').each ->
         if $(this).text().includes(ip_uri)
           $(this).closest('tr').attr('data-order-id', i)  # add row-id to the right
           $(this).closest('tr').find('.wlbl-entry-wlbl').addClass(curr_entry_id)  # add entry-id to the cell
-          if $('body').hasClass('research-action')  # bfrp? add an extra class to indicate this
-            $(this).closest('tr').find('.wlbl-entry-wlbl').addClass('wlbl-result-research-page')
-
 
 
     table_dd = $(curr_dd).find('tbody')
