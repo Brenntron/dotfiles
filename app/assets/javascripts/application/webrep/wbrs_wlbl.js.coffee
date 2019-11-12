@@ -67,6 +67,9 @@ window.bulk_get_current_wlbl = (page) ->
   # Clean slate this attribute
   $(dropdown_wrapper).removeAttr('data-disable-submit')
 
+  # Clean slate these bulk wl/bl cb enabled/disabled states
+  $(dropdown_wrapper).find('.wl-bl-list-inline:checkbox').prop('disabled',false).closest('li').css('opacity','1')
+
   # Pull the entry content out
   if (entries_checked.length > 0)
     entries = []
@@ -156,8 +159,11 @@ window.bulk_get_current_wlbl = (page) ->
     else
       list_types = ''
       wbrs_score = wbrs
-    if !wbrs_score
-      wbrs_score = '<span class="missing-data text-left">No score</span>'
+    if !wbrs_score or wbrs_score == 'No score'
+      wbrs_score = '<span class="missing-data">No score</span>'
+    else if wbrs_score == 'Missing Data'
+      wbrs_score = '<span class="missing-data">Missing data</span>'
+
     if !comment then comment = ''
 
     # ensure the 'not on a list' text is formatted correctly
@@ -171,7 +177,6 @@ window.bulk_get_current_wlbl = (page) ->
       <td class='wlbl-current-entry-wbrs'>#{wbrs_score}</td>
       <td class='wlbl-threat-cat'>#{tc_str}</td>
       </tr>"
-
 
     $(tbody).append(table_row)
     $(tbody).find('.loading-rows').addClass('hidden')
@@ -244,6 +249,8 @@ window.get_current_wlbl = (button) ->
   submit_button = $(dropdown).find('.dropdown-submit-button')
   comment = $(dropdown).find('.adjust-wlbl-input')
   comment_textarea = $(dropdown).find('.note-input')
+  tc_row = $(dropdown).find('.threat-cat-row')
+  list_cbs = $(dropdown).find('.wl-bl-list-inline:checkbox')
   wl_weak = $(dropdown).find('.wl-weak-checkbox')
   wl_med = $(dropdown).find('.wl-med-checkbox')
   wl_heavy = $(dropdown).find('.wl-heavy-checkbox')
@@ -279,9 +286,11 @@ window.get_current_wlbl = (button) ->
   # Add loading message while wl/bl rows are being built, this gets removed after data is loaded
   $(wlbl_list).html('<span class="loading-rows">Loading...<span class="mini-loader"></span></span>')
 
-  # Clean slate the dropdown on every dropdown click
+  # Clean slate the inline dropdowns on every dropdown click / spawn
   $(submit_button).html('Submit Changes').prop('disabled', true)
   $(comment_textarea).val(comment_text)
+  $(tc_row).addClass('hidden')
+  $(list_cbs).prop('disabled',false).closest('li').css('opacity','1')
 
   # Send entry content to wbrs
   data = {
@@ -337,7 +346,7 @@ window.get_current_wlbl = (button) ->
               tc_promise.then (result) ->
                 {threat_categories} = JSON.parse(result)
                 if threat_categories.length == 0
-                  tc_str = '<span class="threat-cat-no-data">No Category</span>'
+                  tc_str = '<span class="threat-cat-no-data">No category</span>'
                 else tc_str = threat_categories.join(', ')
 
                 $(tc_cell).html(tc_str)  # place the TC's in the html
@@ -366,6 +375,22 @@ window.get_current_wlbl = (button) ->
         $(submit_button[0]).attr('disabled', true)
     error: (response) ->
       popup_response_error(response, 'Error retrieving WL/BL Data')
+    complete: () ->
+      # inline specific - determine if wl's OR bl's are already pre-selected, disable ability to select opposite cb's
+      wl_num = $(dropdown).find('.lists-row input[value^="WL-"]:checked').length
+      bl_num = $(dropdown).find('.lists-row input[value^="BL-"]:checked').length
+
+      # clean slate the inline cb's
+      $(dropdown).find(".wl-bl-list-inline:checkbox")
+        .prop('disabled',false).closest('li').css('opacity','1')
+
+      # disable opposite cb's if something is already on a list
+      unless (wl_num > 0 and bl_num > 0) || (wl_num == 0 and bl_num == 0)
+        if bl_num > 0 && wl_num == 0 then curr_cbs = 'WL-'
+        else if wl_num > 0 && bl_num == 0 then curr_cbs = 'BL-'
+        $(dropdown).find(":checkbox[value^='#{curr_cbs}']")
+          .prop('disabled',true).closest('li').css('opacity','0.6')
+
   )
 
 
@@ -431,19 +456,6 @@ window.submit_bulk_wlbl = (page) ->
   # ADD TO LISTS BULK
   if adjustment_type == 'add' or adjustment_type == 'replace'
     console.log 'bulk scenario 1'  # index/show add/replace: use new endpoint + entry url array
-
-    if adjustment_type == 'add'
-      modal_info_string =
-        "<div class='wlbl-info-modal'>Lists (<strong>#{list_types}</strong>) have been added for this entry:
-          <p>#{ip_uris.join('<br>')}</p></div>"
-
-    if adjustment_type == 'replace'
-      # replacing threat cats? get the wl/bl lists from top blue row
-      list_types = $(dropdown).find('.wlbl-entry-wlbl').text().trim().split(', ')
-      modal_info_string +=
-        "<br>Threat Categories have been replaced for this entry:
-          <p>#{ip_uris.join('<br><br>')}</p>"
-
     data =
       adjustment_type: adjustment_type   # new object
       urls: ip_uris
@@ -464,14 +476,11 @@ window.submit_bulk_wlbl = (page) ->
 
     curr_endpoint = '/escalations/api/v1/escalations/webrep/disputes/bulk_rule_ui_wlbl_remove'
 
-
-  # REMOVE DUPLICATES FROM THE LIST_TYPES ARRAY HERE
-  # REMOVE DUPLICATES FROM THE LIST_TYPES ARRAY HERE
-  # REMOVE DUPLICATES FROM THE LIST_TYPES ARRAY HERE
+  # ensure we're showing only non-duplicate lists in the modal
   unique_lists = []
-  $.each list_types, (i, el) ->
-    if($.inArray(el, unique_lists) == -1)
-      unique_lists.push(el)
+  $.each list_types, (i, entry) ->
+    if($.inArray(entry, unique_lists) == -1)
+      unique_lists.push(entry)
 
   # define the string for the modal
   modal_info_string =
@@ -509,25 +518,21 @@ window.submit_individual_wlbl = (button_tag) ->
   # endpoint expects id's to represent url's by default, passing in url's is optional but acceptable too
   dispute_entry_id = $(wlbl_form).parents('.research-table-row').attr('data-entry-id')
   dispute_url = $(wlbl_form).parents('.research-table-row').find('.entry-data-content').text().trim()
-  old_lists_str = $(wlbl_form).find('.wlbl-entry-wlbl').text()  # lists (old) for this entry in string format
-  old_lists_arr = old_lists_str.split(', ')  # lists (old) for this entry in string format
-  new_lists_str = ''
-  new_lists_arr = []
+  old_lists_str = $(wlbl_form).find('.wlbl-entry-wlbl').text()  # lists (old) for this entry
+  old_lists_arr = old_lists_str.split(', ')
   curr_note = $(wlbl_form).find('.note-input').text()
-  # remove these extraneous declarations?
   curr_endpoint = ''
   modal_info_string = ''
   modal_action = ''
-  old_threat_cats = ''
-  new_threat_cats = ''
   removed_lists_arr = []
 
   new_lists_arr = $('.wl-bl-list-inline:checkbox:checked').map(() ->
     this.value
   ).toArray()
 
-  # INLINE specific - need to use filter() to figure out which lists have been removed due to fancy-sliders
-  removed_lists_arr = old_lists_arr.filter((f) -> !new_lists_arr.includes(f))
+  # inline specific - figure out which lists have been removed in the fancy-sliders using filter
+  removed_lists_arr = old_lists_arr.filter((list) ->
+    !new_lists_arr.includes(list))
 
   thrt_cat_ids = []
   thrt_cat_names = []
@@ -538,25 +543,26 @@ window.submit_individual_wlbl = (button_tag) ->
     thrt_cat_ids.push($(this).val())
     thrt_cat_names.push($(this).parent().text().trim())
 
-  new_lists_length = new_lists_arr.length
-  old_lists_array = old_lists_str.split(' ')
+  old_length = old_lists_arr.length
+  new_length = new_lists_arr.length
+  tc_length = thrt_cat_ids.length
 
   if old_lists_str == '' || old_lists_str.includes('Not')
-    old_lists_length == 0
-  else
-    old_lists_length = old_lists_array.length
+    old_length == 0
 
-  # CHANGE HOW THIS IS CALCULATED?
-  # adjustment type: figure out the add/replace/remove adjustment type
-  if new_lists_arr.length >= old_lists_arr.length
+  # adjustment type: figure out the add/replace/remove adjustment type, this determines which endpoint to use
+  if (new_length > old_length || new_length == old_length) and tc_length == 0
     adjustment_type = 'add'
-    modal_action = 'added'
-  else if new_lists_arr.length == old_lists_arr.length
+    modal_action = 'added'  # separate var to make it easier to change verbage
+  else if new_length == old_length and tc_length > 0
     adjustment_type = 'replace'
     modal_action = 'updated'
-  else if new_lists_arr.length < old_lists_arr.length
+  else if new_length < old_length and tc_length == 0
     adjustment_type = 'remove'
     modal_action = 'removed'
+  else
+    adjustment_type = 'add'
+    modal_action = 'updated'
 
   # define the info presented in the confirmation modal
   modal_info_string =
@@ -575,7 +581,7 @@ window.submit_individual_wlbl = (button_tag) ->
 
     curr_endpoint = '/escalations/api/v1/escalations/webrep/disputes/bulk_wlbl_threatcat_adjust'
     modal_info_string +=
-      "<span>#{dispute_url}</span> <span>Have been #{modal_action} to the following WBRS Lists:
+      "<span>#{dispute_url}</span> <span>Have been #{modal_action} for the following WBRS Lists:
         <p>#{new_lists_arr.join(', ')}</p></span></div>"
 
     if location.href.includes('webrep/disputes') || $('body').hasClass('research-action')
@@ -739,6 +745,7 @@ window.reset_score_preview = (button) ->
   preview_button = $(dropdown).find('.preview-wbrs-button')
   current_on = []
   current_off = []
+  curr_cbs = ''
 
   # Grab original 'current' lists
   current_lists = $($(dropdown).find('.wlbl-entry-wlbl')[0]).text()
@@ -757,6 +764,18 @@ window.reset_score_preview = (button) ->
         current = this.toString()
         if current == val
           current_on.push(checkbox)
+
+  # Clean slate the WL/BL checkboxes
+  $(dropdown).find(".wl-bl-list-inline:checkbox")
+    .prop('disabled', false).closest('li').css('opacity','1')
+
+  # Restore the disabled/enabled states of the list cb's for inline
+  unless current_lists.includes('WL-') and current_lists.includes('BL-')  # edge case
+    if current_lists.includes('WL-') then curr_cbs = 'BL-'
+    else if current_lists.includes('BL-') then curr_cbs = 'WL-'
+
+    $(dropdown).find(".wl-bl-list-inline:checkbox[value^='#{curr_cbs}']")
+      .prop('disabled', true).closest('li').css('opacity','0.6')
 
   # Any checkbox that doesn't match the current lists is 'off'
   i = checkboxes.length - 1
@@ -906,14 +925,13 @@ window.add_wlbl_threat_cat_listeners = () ->
 
       tc_promise.then (result) ->
         {threat_categories} = JSON.parse(result)
-        if threat_categories.length == 0 then tc_str = '<span class="threat-cat-no-data">No Category</span>'
+        if threat_categories.length == 0 then tc_str = '<span class="threat-cat-no-data">No category</span>'
         else tc_str = threat_categories.join(', ')
 
         tc_area.html(tc_str)  # place the TC's in the html
 
       .then null, (err) ->
         tc_area.html('<span class="error-threat-cat"></span>')
-
 
   # after a click inside a wl/bl dropdown, lets handle wl/bl + tc validation for bulk or inline adjust wl/bl
   $('.dispute-wlbl-adjust-wrapper input').click ->
@@ -956,6 +974,24 @@ window.add_wlbl_threat_cat_listeners = () ->
         $(dropdown_id).find('.threat-cat-row input').prop('checked', false)
         tc_row.addClass('hidden')
 
+      # BULK SPECIFIC
+      # clean slate the disabled for wl/bl cb's
+      if (wl_num == 0 && bl_num == 0) || (wl_num > 0 && bl_num > 0)
+        $(dropdown_id).find(":checkbox").prop('disabled',false).closest('li').css('opacity','1')
+
+      # ensure user doesnt accidentally select both wl's and bl's at the same time
+      if wl_num > 0 || bl_num > 0
+        if wl_num > 0 then curr_cbs = 'BL-'
+        if bl_num > 0 then curr_cbs = 'WL-'
+        $(dropdown_id).find(":checkbox[value^='#{curr_cbs}']")
+          .prop('disabled',true).closest('li').css('opacity','0.6')
+
+      else if wl_num == 0 || bl_num == 0
+        if wl_num == 0 then curr_cbs = 'BL-'
+        if bl_num == 0 then curr_cbs = 'WL-'
+        $(dropdown_id).find(":checkbox[value^='#{curr_cbs}']")
+          .prop('disabled',false).closest('li').css('opacity','1')
+
       # Add / Remove - clean slate on click, .merge() allows selecting mult vars in jquery
       $.merge(add_radio, remove_radio).click ->
         lists_row.removeClass('hidden')
@@ -963,7 +999,7 @@ window.add_wlbl_threat_cat_listeners = () ->
         clearAllInputs()
 
       replace_radio.click ->
-        tc_text_array = $('.wlbl-threat-cat').text().trim().split(', ')  # tc_text_array is the text array of 'Bogon', 'Botnets', etc
+        tc_text_array = $('.wlbl-threat-cat').text().trim().split(', ')  # tc_text_array is array of 'Bogon','Botnets', etc
         tc_cell_array = $(dropdown_id).find('.threat-cat-cell').toArray()
         $.merge(lists_row, tc_note_max).addClass('hidden')
         $.merge(tc_row, tc_note_replace).removeClass('hidden')
@@ -971,8 +1007,8 @@ window.add_wlbl_threat_cat_listeners = () ->
 
         disableSubmit()
 
-        # get a filtered array of tc's to pre-toggle the checkboxes
-        tc_toggle_array = tc_cell_array.filter (entry) ->  # entry of tc html elements, entry is an html element w/ label + input
+        # get a filtered array of tc's to pre-toggle the checkboxes, entry is an html element w/ label + input
+        tc_toggle_array = tc_cell_array.filter (entry) ->
           entry_matches = false
           $(tc_text_array).each (i, value) ->
             if value == $(entry).text().trim() then entry_matches = true
@@ -1012,7 +1048,7 @@ window.add_wlbl_threat_cat_listeners = () ->
       ]
 
       # if they pass everything else, allow Submit to proceed
-      if conditionsArray.indexOf(true) >= 0 && disable_submit != 'disable'
+      if conditionsArray.indexOf(true) >= 0 && $(dropdown_id).attr('data-disable-submit') != 'disable'
         enableSubmit()
 
 
