@@ -164,10 +164,8 @@ window.bulk_get_current_wlbl = (page) ->
     else
       list_types = ''
       wbrs_score = wbrs
-    if !wbrs_score or wbrs_score == 'No score'
+    if !wbrs_score || isNaN(wbrs_score)   # if score is not a number
       wbrs_score = '<span class="missing-data">No score</span>'
-    else if wbrs_score == 'Missing Data'
-      wbrs_score = '<span class="missing-data">Missing data</span>'
 
     if !comment then comment = ''
 
@@ -378,8 +376,10 @@ window.get_current_wlbl = (button) ->
         # needs to be html below to ensure it uses the span
         $(wlbl_list[0]).html('<span class="missing-data">Not on a list</span>')
         $(submit_button[0]).attr('disabled', true)
+
     error: (response) ->
       popup_response_error(response, 'Error retrieving WL/BL Data')
+
     complete: () ->
       # inline specific - determine if wl's OR bl's are already pre-selected, disable ability to select opposite cb's
       wl_num = $(dropdown).find('.lists-row input[value^="WL-"]:checked').length
@@ -395,7 +395,6 @@ window.get_current_wlbl = (button) ->
         else if wl_num > 0 && bl_num == 0 then curr_cbs = 'BL-'
         $(dropdown).find(":checkbox[value^='#{curr_cbs}']")
           .prop('disabled',true).closest('li').css('opacity','0.6')
-
   )
 
 
@@ -435,7 +434,7 @@ window.submit_bulk_wlbl = (page) ->
     thrt_cat_str = ''
 
     $(thrt_cat_array).each ->
-      thrt_cat_ids.push($(this).val())
+      thrt_cat_ids.push(parseInt($(this).val()))  # ensure this is an array of numbers, not strings
       thrt_cat_names.push($(this).parent().text().trim())
 
     # adjustment type - add / remove / replace
@@ -500,6 +499,7 @@ window.submit_bulk_wlbl = (page) ->
 
 
   # submit ready? make sure our data object is correct
+  console.log curr_endpoint
   console.log data
 
   std_msg_ajax(
@@ -525,7 +525,7 @@ window.submit_individual_wlbl = (button_tag) ->
   dispute_url = $(wlbl_form).parents('.research-table-row').find('.entry-data-content').text().trim()
   old_lists_str = $(wlbl_form).find('.wlbl-entry-wlbl').text()  # lists (old) for this entry
   old_lists_arr = old_lists_str.split(', ')
-  curr_note = $(wlbl_form).find('.note-input').text()
+  curr_note = $(wlbl_form).find('.note-input').val()
   curr_endpoint = ''
   modal_info_string = ''
   modal_action = ''
@@ -545,7 +545,7 @@ window.submit_individual_wlbl = (button_tag) ->
   thrt_cat_str = ''
 
   $(thrt_cat_array).each ->
-    thrt_cat_ids.push($(this).val())
+    thrt_cat_ids.push(parseInt($(this).val()))  # fix to ensure passing an array of numbers
     thrt_cat_names.push($(this).parent().text().trim())
 
   old_length = old_lists_arr.length
@@ -591,7 +591,7 @@ window.submit_individual_wlbl = (button_tag) ->
 
     if location.href.includes('webrep/disputes') || $('body').hasClass('research-action')
       console.log 'inline scenario 1'  #  index/show/bfrp add/replace: use new endpoint + one entry url
-      data.urls = [ dispute_url ]
+      data.urls = [ dispute_url ]  # this ends up down in the ajax call below, line 620ish
     else if location.href.includes('webrep/research')
       console.log 'inline scenario 2'  # bfrp add/replace using new endpoint + one entry id
       data.urls = [ dispute_entry_id ]
@@ -602,7 +602,7 @@ window.submit_individual_wlbl = (button_tag) ->
     data =
       ip_uris: dispute_url
       list_types: removed_lists_arr
-      note: curr_note
+      note: curr_note   # ensure this is working
       thrt_cat_ids: thrt_cat_ids
 
     curr_endpoint = '/escalations/api/v1/escalations/webrep/disputes/bulk_rule_ui_wlbl_remove'
@@ -618,6 +618,7 @@ window.submit_individual_wlbl = (button_tag) ->
     modal_info_string += "#{thrt_cat_str}"
 
   # submit ready? make sure our data object is correct
+  console.log curr_endpoint
   console.log data
 
   std_msg_ajax(
