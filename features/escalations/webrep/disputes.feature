@@ -408,7 +408,7 @@ Feature: Disputes
     And  clean up wlbl and remove all wlbl entries on "imadethisurlup.com"
 
 
-  @javascript
+  @javascript 
   Scenario: a user removes an entry from one WBRS list and adds it to another on the dispute show page
   #  after adding one first so we're starting with clean data
     Given a user with role "webrep user" exists and is logged in
@@ -485,6 +485,8 @@ Feature: Disputes
     And  take a screenshot
     And  Element with class "wlbl-entry-id-1" should have content "BL-weak"
     And  Element with class "wlbl-entry-id-2" should have content "BL-weak"
+    And  clean up wlbl and remove all wlbl entries on "imadethisurlup.com"
+    And  clean up wlbl and remove all wlbl entries on "thisurlisfake.com"
 
 
   @javascript
@@ -529,6 +531,8 @@ Feature: Disputes
     And  Element with class "wlbl-entry-id-1" should not have content "WL-med"
     And  Element with class "wlbl-entry-id-2" should have content "WL-weak"
     And  Element with class "wlbl-entry-id-2" should not have content "WL-med"
+    And  clean up wlbl and remove all wlbl entries on "imadethisurlup.com"
+    And  clean up wlbl and remove all wlbl entries on "thisurlisfake.com"
 
 
 
@@ -553,10 +557,13 @@ Feature: Disputes
     Given a user with role "webrep user" exists and is logged in
     When I goto "escalations/webrep/research"
     And  I choose "research-search-strict"
-    And  I type content "test.com" within input with id "search_uri"
+    And  I type content "testing.com" within input with id "search_uri"
     Then I hit enter within "#search_uri"
-    And  I wait for "10" seconds
+    And  I wait for "20" seconds
     And  take a screenshot
+    And  I click ".bfrp-inline-wlbl-button"
+    And  I wait for "5" seconds
+
 
 # TODO   A user performs a search on BFRP and adds a result to a WBRS list
 # TODO   A user performs a search on BFRP and removes a result from a WBRS List
