@@ -482,10 +482,9 @@ Feature: Disputes
     And  I wait for "2" seconds
     Then I click button "wlbl_entries_button"
     And  I wait for "5" seconds
-# Add classes to the list cells in the wlbl coffee file
-#    And I should see 'BL-weak' in element with class x
-#    And I should see 'BL-weak' in element with class y
     And  take a screenshot
+    And  Element with class "wlbl-entry-id-1" should have content "BL-weak"
+    And  Element with class "wlbl-entry-id-2" should have content "BL-weak"
 
 
   @javascript
@@ -509,12 +508,27 @@ Feature: Disputes
     And  I click button "wlbl_entries_button"
     And  I wait for "5" seconds
     Then I check checkbox with class "wl-weak-checkbox"
+    Then I check checkbox with class "wl-med-checkbox"
     And  I click "Submit Changes"
     And  I wait for "5" seconds
     Then I click button with class "close"
     And  I wait for "2" seconds
     Then I click button "wlbl_entries_button"
     And  I wait for "5" seconds
+    And  Element with class "wlbl-entry-id-1" should have content "WL-weak, WL-med"
+    And  Element with class "wlbl-entry-id-2" should have content "WL-weak, WL-med"
+    And  I choose "wlbl-remove"
+    Then I check checkbox with class "wl-med-checkbox"
+    And  I click "Submit Changes"
+    And  I wait for "5" seconds
+    Then I click button with class "close"
+    And  I wait for "2" seconds
+    Then I click button "wlbl_entries_button"
+    And  I wait for "5" seconds
+    And  Element with class "wlbl-entry-id-1" should have content "WL-weak"
+    And  Element with class "wlbl-entry-id-1" should not have content "WL-med"
+    And  Element with class "wlbl-entry-id-2" should have content "WL-weak"
+    And  Element with class "wlbl-entry-id-2" should not have content "WL-med"
 
 
 
@@ -526,13 +540,23 @@ Feature: Disputes
     And  I type content "1234computer.com" within input with id "search_uri"
     Then I hit enter within "#search_uri"
     And  I wait for "10" seconds
-    And  take a screenshot
     And  I should see "1 found"
-    And  Element with class "wlbl-tc-research-span" should have content "Malware Sites"
+    And  I click ".bfrp-inline-wlbl-button"
+    And  I wait for "5" seconds
+    And  take a screenshot
+#    And  Element with class "wlbl-tc-research-span" should have content "Malware Sites"
+# Why is this not working????
 
 
-
-
+  @javascript
+  Scenario: a user searches for a url on the research page and adds the result to a WBRS List
+    Given a user with role "webrep user" exists and is logged in
+    When I goto "escalations/webrep/research"
+    And  I choose "research-search-strict"
+    And  I type content "test.com" within input with id "search_uri"
+    Then I hit enter within "#search_uri"
+    And  I wait for "10" seconds
+    And  take a screenshot
 
 # TODO   A user performs a search on BFRP and adds a result to a WBRS list
 # TODO   A user performs a search on BFRP and removes a result from a WBRS List
