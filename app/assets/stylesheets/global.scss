@@ -526,6 +526,7 @@ button {
 }
 
 .toolbar div:last-child {
+  //width: 100%;
   margin-right: 0 !important;
 }
 
@@ -822,6 +823,7 @@ button {
 .return-ticket-toolbar-button:hover,
 .collapse-all:hover,
 .sync-button:hover,
+.pin-to-top-button:hover,
 .expand-all:hover {
   background-color: lighten($nav-toolbar-color, 8%)!important;
 }
@@ -845,6 +847,7 @@ button {
 .return-ticket-toolbar-button:focus,
 .collapse-all:focus,
 .sync-button:focus,
+.pin-to-top-button:focus,
 .expand-all:focus{
   background-color: lighten($bug-section-color, 28%);
 }
@@ -1220,29 +1223,14 @@ thead th.sorting.center {
   background-position: center;
   text-align: center;
 }
-.important-flag-col{
-  width: 25px;
-}
+
 .success-msg::before {background-image: url(image_path('icon_success.svg'));}
 .error-msg::before, .alert-danger-msg::before {background-image: url(image_path('icon_error.svg'));}
 .fail-msg::before {background-image: url(image_path('icon_fail.svg'));}
 .hidden-msg {
   display: none;
 }
-#main-inline-loader{
-  position: absolute;
-  margin-top: -75px;
-  right: 190px;
-  .loading-msg{
-    position: absolute;
-    margin-top: 9px;
-    margin-left: 14px;
-    width: max-content;
-    color: #999;
-    font-style: italic;
-  }
 
-}
 #msg-modal, #loader-modal, #login-modal {
   .modal-dialog, .modal-dialog {
     margin-top: 180px;
@@ -1425,11 +1413,7 @@ fieldset .col-xs-1, fieldset .col-xs-2, fieldset .col-xs-3, fieldset .col-xs-4, 
 .input-with-placeholder:focus-within {
   background-color: $faint-alt-highlight;
 }
-.dual-edit-field{
-  width: 200px;
-  word-break: break-all;
-  vertical-align: top;
-}
+
 textarea {
   display: block;
 }
@@ -10177,6 +10161,7 @@ input[type="radio"].resolution_radio_button {
 .toolbar#webcat-index-toolbar{
   margin: 10px 0 -35px 0
 }
+
 // webrep - research tab toolbar - between 1600px and 1400px, prevent breaking/wrapping buttons, this needs to be separate
 @media screen and (max-width: 1600px) and (min-width: 1401px) {
   #research-tab-toolbar {
@@ -10416,6 +10401,81 @@ span.input-truncate {
   min-width: 80px;
 }
 
+// retain top navigation at top of page during scroll down for nav accessibility
+#nav-banner.fixed-nav {
+  position: -webkit-sticky;
+  position: sticky;
+  top: 0;
+  z-index: 999;
+}
+
+.pin-to-top-button {
+  background-image: url(image_path('icon_pin1.svg'));
+  background-size: 22px 22px;
+  background-position: 3px 3px;
+  padding-left: 18px;
+}
+
+.pinned-toolbar {
+  background: $content-bg-color;
+  box-shadow: 2px 0 10px 1px rgba(0,0,0,0.3);
+  position: relative;
+  bottom: 18px;
+  padding: 4px 20px;
+  .toolbar-checkbox-wrapper {
+    padding-top: 0;
+    padding-left: 5px;
+    font-weight: normal;
+  }
+  label {
+    display: none;
+  }
+}
+
+#webcat-index-title {
+  padding-top: 10px;
+}
+
+#webcat-index-toolbar {
+  margin: 15px 0 10px;
+}
+
+.pinned-toolbar-true #webcat-index-title {
+  padding-top: 25px;
+  line-height: 12px;
+}
+
+#webcat_searchref_container {
+  margin-bottom: 10px;
+  padding: 6px 0;
+}
+
+// tooltipster adjustments for pinned toolbar tooltips
+.pinned-toolbar-true .tooltipster-sidetip .tooltipster-box {
+  padding: 4px 6px;
+}
+
+// one-off override
+.pinned-toolbar-true .tooltipster-sidetip {
+  top: 85px !important;
+}
+
+.webcat-search-container {
+  height: 15px;
+}
+
+// correction to reduce extraneous vertical space
+.pinned-toolbar-true .webcat-search-container {
+  height: 0;
+}
+
+// handling the top-right username width issues
+@media screen and (max-width: 1200px) {
+  #nav-banner a.nav-username {
+    display: none;
+  }
+}
+
 
 // research rows alignment/formatting updates
 // top row of each
@@ -10432,104 +10492,33 @@ span.input-truncate {
   }
   span.entry-data-content {
     display: inline-block;
-    min-width: 400px;   // url/ip
+    min-width: 500px;   // url/ip
   }
 }
 
 // second row of each
-#disputes-research-table{
-  background: $ac-nav-bg-color;
-}
-
 .research-overview-row {
   background: $faint-neutral-color;
-
-  td {
-    vertical-align: top;
-
-    .wbrs-input-wrapper {
-      background-color: $bug-section-color;
-    }
-
-    .sbrs-input-wrapper {
-      background-color: $success-color;
-    }
-
-    .xbrs-input-wrapper {
-      background-color: $communication-accent-color;
-    }
-
-    .crosslisted-input-wrapper {
-      background-color: $warning-accent-color;
-    }
-
-    .virus-total-input-wrapper {
-      background-color: $rule-accent-color;
-    }
-
-    .reptool-input-wrapper {
-      background-color: $fifth-section-color;
-    }
+  td:nth-child(6) {
+    width: 170px;  // rule hits list
+    word-break: break-word;
+    padding-right: 10px;
   }
-
-  .input-col input {
-    margin: 8px 8px auto 8px;
+  td:nth-child(7) {
+    width: 150px;
   }
-
-    td.input-col {
-      padding: unset !important;
-      width: 27px;
-    }
-
-    td:nth-child(3) {
-      min-width: 60px;
-      word-break: break-word;
-      padding-right: 10px;
-    }
-
-    td:nth-child(4) {
-      min-width: 90px;
-    }
-
-    .entry-data-wlbl {
-      min-width: 85px;
-    }
-
-    td:nth-child(6) {
-      padding-right: 10px;
-    }
-
-    td:nth-child(7) {
-      min-width: 130px !important;
-      max-width: 130px!important;
-      overflow-wrap: break-word;
-    }
-
-    td:nth-child(9) {
-      width: 130px;
-    }
-
-    td:nth-child(10) {
-      width: 20px; // xbrs history
-    }
-
-    td:nth-child(12) {
-      min-width: 106px; // reptool class
-    }
-
-    td:nth-child(13) {
-      min-width: 110px;
-      word-break: break-word;
-    }
-    td:nth-child(15) {
-      min-width: 110px;
-    }
-    td:nth-child(16) {
-      width: 190px; // wl/bl lists + threat cats
-    }
-
-    td:last-child {
-      min-width: 80px;
-    }
+  td:nth-child(8) {
+    width: 60px;   // xbrs history
   }
-//}
+  td:nth-child(9) {
+    width: 140px;
+  }
+  td:nth-child(10) {
+    width: 110px;  // reptool class
+    word-break: break-word;
+  }
+  td:nth-child(12) {
+    width: 190px;  // wl/bl lists + threat cats
+  }
+}
+
