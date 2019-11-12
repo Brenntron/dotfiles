@@ -12,6 +12,7 @@ window.bulk_get_current_wlbl = (page) ->
   current_wbrs = ''
   comment_box = ''
   dropdown_wrapper = ''
+  bfrp_row_index = 0
 
   # Define variables based on what page we're on
   if page == 'index'
@@ -145,7 +146,7 @@ window.bulk_get_current_wlbl = (page) ->
 
           comment_box.text(comment_trail)
       error: (response) ->
-        std_msg_error( 'Error retrieving WL/BL Data', response)
+        std_msg_error('Error retrieving WL/BL Data', response)
     )
   else
     std_msg_error('No rows selected', ['Please select at least one entry row.'])
@@ -164,7 +165,7 @@ window.bulk_get_current_wlbl = (page) ->
     else
       list_types = ''
       wbrs_score = wbrs
-    if !wbrs_score || isNaN(wbrs_score)   # if score is not a number
+    if !wbrs_score || isNaN(wbrs_score)   # if no score or not a number
       wbrs_score = '<span class="missing-data">No score</span>'
 
     if !comment then comment = ''
@@ -176,13 +177,16 @@ window.bulk_get_current_wlbl = (page) ->
     table_row =
       "<tr class='wlbl-dropdown-row'>
       <td class='wlbl-entry-content'>#{ip_uri}</td>
-      <td class='wlbl-entry-wlbl'>#{list_types}</td>
+      <td class='wlbl-entry-wlbl wlbl-result-no-#{bfrp_row_index}'>#{list_types}</td>
       <td class='wlbl-current-entry-wbrs'>#{wbrs_score}</td>
       <td class='wlbl-threat-cat'>#{tc_str}</td>
       </tr>"
 
     $(tbody).append(table_row)
     $(tbody).find('.loading-rows').addClass('hidden')
+
+    # specific iterator for bfrp bulk dropdown rows
+    bfrp_row_index++
 
   # order the rows after the build to ensure correct order on left and right sides
   order_wlbl_table_rows = () ->
@@ -198,13 +202,12 @@ window.bulk_get_current_wlbl = (page) ->
     $(left_cbs).each (i) ->  # add the order ids to left and right sides
       ip_uri = $(this).closest('tr').find(url_entry).text().trim()
       $(this).closest('tr').attr('data-order-id', i)  # add row-id to the left
-      curr_entry_id = 'wlbl-result-no-' + i   # this goes to research page by default
 
-      # determine which page user is on to get the entry-id attrs from cb's, must be created for bfrp
       if $('body').hasClass('index-action')
         curr_entry_id = 'wlbl-entry-id-' + $(this).attr('id')
       else if $('body').hasClass('show-action')
         curr_entry_id = 'wlbl-entry-id-' + $(this).attr('data-entry-id')
+      # for bfrp, we are added a specific iterator above, look for bfrp_row_index
 
       # dropdowns > adding id's to list cells for testing
       $(curr_dd).find('.wlbl-entry-content').each ->
@@ -985,7 +988,8 @@ window.add_wlbl_threat_cat_listeners = () ->
 
       if cb_value.includes('BL-') and bl_num > 0
         unless $(dropdown_id).find('#wlbl-remove').prop('checked')
-          tc_row.removeClass('hidden')
+          unless $('body').hasClass('research-action')  # bfrp can't replace tc's right now, will remove this when ready
+            tc_row.removeClass('hidden')
 
       else if cb_value.includes('BL-') and bl_num == 0 and add_radio.prop('checked')
         $(dropdown_id).find('.threat-cat-row input').prop('checked', false)
@@ -1019,7 +1023,8 @@ window.add_wlbl_threat_cat_listeners = () ->
         tc_text_array = $('.wlbl-threat-cat').text().trim().split(', ')  # tc_text_array is array of 'Bogon','Botnets', etc
         tc_cell_array = $(dropdown_id).find('.threat-cat-cell').toArray()
         $.merge(lists_row, tc_note_max).addClass('hidden')
-        $.merge(tc_row, tc_note_replace).removeClass('hidden')
+        unless $('body').hasClass('research-action')  # bfrp can't replace tc's right now, will remove this when ready
+          $.merge(tc_row, tc_note_replace).removeClass('hidden')
         $(dropdown_id).find('.dispute-wlbl-adjust-wrapper input:checkbox').prop('checked', false)
 
         disableSubmit()
