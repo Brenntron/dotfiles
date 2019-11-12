@@ -514,9 +514,7 @@ button {
   position: relative;
   color: $type-lighter-color;
 }
-.toolbar#webcat-index-toolbar{
-  margin: 10px 0 -35px 0
-}
+
 .toolbar div {
   border: 1px solid $faint-neutral-color;
   padding: 3px;
@@ -10164,12 +10162,21 @@ input[type="radio"].resolution_radio_button {
     }
   }
 }
+@media screen and (max-width: 1800px) and (min-width: 1690px){
+  #webcat-index-toolbar .toolbar-button-text {
+    .toolbar-button {
+      background-position: 4px 6px;
+    }
+  }
+}
 @media (max-width: 1690px)  {
   #webcat-index-toolbar .toolbar-button-text {
     display: none !important;
   }
 }
-
+.toolbar#webcat-index-toolbar{
+  margin: 10px 0 -35px 0
+}
 // webrep - research tab toolbar - between 1600px and 1400px, prevent breaking/wrapping buttons, this needs to be separate
 @media screen and (max-width: 1600px) and (min-width: 1401px) {
   #research-tab-toolbar {
