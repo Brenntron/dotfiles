@@ -733,6 +733,10 @@ class DisputeEntry < ApplicationRecord
           end
         end
         entries = entries - invalid_matches
+
+        unless entries.find{|entry| url == entry.uri}
+          entries << DisputeEntry.new(uri: url)
+        end
       end
 
       # BEGIN LOGIC TO CONSOLIDATE WLBL INFO TO UNIQUE URIS
@@ -778,12 +782,6 @@ class DisputeEntry < ApplicationRecord
       entries = final_entries
 
       # END WLBL LOGIC, WE SHOULD ONLY HAVE UNIQUE URIS NOW
-
-      if research_params['scope'] == "strict"
-        unless entries.find{|entry| url == entry.uri}
-          entries << DisputeEntry.new(uri: url)
-        end
-      end
 
       if research_params['scope'] == "broad" || entries.find{|entry| url == entry.uri}
         entries.each do |entry|
