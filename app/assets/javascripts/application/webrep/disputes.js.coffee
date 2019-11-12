@@ -1103,7 +1103,7 @@ $ ->
       if this.entry.primary_category != null
         category = this.entry.primary_category
       else
-        category = '<span class="missing-data">No assigned categories</span>'
+        category = missing_data
       status = ''
       if this.entry.status != null
         status = this.entry.status
@@ -1137,8 +1137,6 @@ $ ->
       if this.entry.sbrs_score != null
         sbrs_score = this.entry.sbrs_score
       else sbrs_score = missing_data
-      if category == '{}'
-        category = '<span class="missing-data">No assigned categories</span>'
       entry_row = '<tr class="index-entry-row" data-case-id="0000' + dispute.id + '">' + '<td><input type="checkbox" onclick="toggleRow(this)" class="dispute-entry-checkbox dispute-entry-checkbox_' + dispute.id + '" id= ' + dispute_entry_id + ' ></td>' + '<td class="entry-col-content ' + important + '">' + entry_content + '</td>' +
         '<td class="entry-col-status">' + status + '</td>' +
         resolution_col +
