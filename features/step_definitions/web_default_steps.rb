@@ -70,6 +70,7 @@ end
 When(/^I check "(.*?)"$/) do |target|
   check(target)
 end
+
 When(/^I uncheck "(.*?)"$/) do |target|
   uncheck(target)
 end
@@ -437,6 +438,10 @@ end
 
 Then (/^I should receive a file of type "(.*?)"/) do |type|
   result = page.response_headers['Content-Type'].should == type
+end
+
+Then (/^I type content "(.*?)" within input with id "(.*?)"/) do |content, input|
+  fill_in input, :with => content
 end
 
 Then (/^I hit enter within "(.*?)"/) do |element|

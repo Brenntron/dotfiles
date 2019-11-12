@@ -454,8 +454,8 @@ Feature: Disputes
     And  clean up wlbl and remove all wlbl entries on "imadethisurlup.com"
 
 
-  @javascript @now
-    Scenario: a user adds multiple entries to a WBRS list from the dispute show page
+  @javascript
+  Scenario: a user adds multiple entries to a WBRS list from the dispute show page
     Given a user with role "webrep user" exists and is logged in
     Given the following disputes exist:
       | id | submission_type |
@@ -483,12 +483,57 @@ Feature: Disputes
     Then I click button "wlbl_entries_button"
     And  I wait for "5" seconds
 # Add classes to the list cells in the wlbl coffee file
+#    And I should see 'BL-weak' in element with class x
+#    And I should see 'BL-weak' in element with class y
     And  take a screenshot
 
 
+  @javascript
+  Scenario: a user removes multiple entries from a WBRS list on the dispute show page
+  #  after adding them to one first so we start with clean api data
+    Given a user with role "webrep user" exists and is logged in
+    Given the following disputes exist:
+      | id | submission_type |
+      | 1  | w               |
+    Given the following dispute_entries exist:
+      | id | uri                |
+      | 1  | imadethisurlup.com |
+      | 2  | thisurlisfake.com  |
+    And  clean up wlbl and remove all wlbl entries on "imadethisurlup.com"
+    And  clean up wlbl and remove all wlbl entries on "thisurlisfake.com"
+    When I goto "escalations/webrep/disputes/1"
+    And  I wait for "2" seconds
+    Then I click "#research-tab-link"
+    And  I check checkbox with class "dispute-entry-cb-1"
+    And  I check checkbox with class "dispute-entry-cb-2"
+    And  I click button "wlbl_entries_button"
+    And  I wait for "5" seconds
+    Then I check checkbox with class "wl-weak-checkbox"
+    And  I click "Submit Changes"
+    And  I wait for "5" seconds
+    Then I click button with class "close"
+    And  I wait for "2" seconds
+    Then I click button "wlbl_entries_button"
+    And  I wait for "5" seconds
 
-# TODO   A user searches for an url on BFRP that has a Threat Category assigned to it
-# TODO   A user removes multiple entries from a WBRS list on the dispute show page
+
+
+  @javascript
+  Scenario: a user searches for a url on the research page that has a threat category assigned to it already
+    Given a user with role "webrep user" exists and is logged in
+    When I goto "escalations/webrep/research"
+    And  I choose "research-search-strict"
+    And  I type content "1234computer.com" within input with id "search_uri"
+    Then I hit enter within "#search_uri"
+    And  I wait for "10" seconds
+    And  take a screenshot
+    And  I should see "1 found"
+    And  Element with class "wlbl-tc-research-span" should have content "Malware Sites"
+
+
+
+
+
 # TODO   A user performs a search on BFRP and adds a result to a WBRS list
 # TODO   A user performs a search on BFRP and removes a result from a WBRS List
 # TODO   A user performs a search on BFRP and adds multiple results to a WBRS list
