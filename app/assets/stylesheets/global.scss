@@ -1427,7 +1427,11 @@ fieldset .col-xs-1, fieldset .col-xs-2, fieldset .col-xs-3, fieldset .col-xs-4, 
 .input-with-placeholder:focus-within {
   background-color: $faint-alt-highlight;
 }
-
+.dual-edit-field{
+  width: 200px;
+  word-break: break-all;
+  vertical-align: top;
+}
 textarea {
   display: block;
 }
