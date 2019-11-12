@@ -110,13 +110,14 @@ window.updateURI = (event, complaint_entry_id) ->
         $("#path_#{complaint_entry_id}").text(path)
         $("#category_#{complaint_entry_id}").text(category)
         $("#wbrs_score_#{complaint_entry_id}").text(wbrs_score)
-
+        query_who_params = "#{domain}, #{complaint_entry_id}"
+        console.log query_who_params
         $("#entry-uri-#{complaint_entry_id}").html("<a href='http://#{uri}' target='_blank' onclick='select_cat_text_field(#{complaint_entry_id})' >#{uri}</a>")
         $("#site-search-#{complaint_entry_id}").html("<a href='https://www.google.com/search?q=site%3A#{uri}' target='_blank' onclick='select_cat_text_field(#{complaint_entry_id})'>#{uri}</a>")
 
-        $("#lookup-#{complaint_entry_id}").replaceWith('<button class="secondary" id="lookup-' + complaint_entry_id + '" onclick="WebCat.RepLookup.queryWhoIs(\'' + domain + '\')">Lookup</button>')
+        $("#lookup-#{complaint_entry_id}").replaceWith('<button class="secondary" id="lookup-' + complaint_entry_id + '" onclick="WebCat.RepLookup.queryWhoIs('+query_who_params+ '\')">Lookup</button>')
         $("#history-#{complaint_entry_id}").replaceWith('<button class="secondary" id="history-' + complaint_entry_id + '" onclick="history_dialog(' + complaint_entry_id + ',\'' + uri + '\')">History</button>')
-        $("#domain-#{complaint_entry_id}").replaceWith('<button class="secondary" id="domain-' + complaint_entry_id + '" onclick="domain_whois(\''+domain+'\')">Domain</button>')
+        $("#domain-#{complaint_entry_id}").replaceWith('<button class="secondary" id="domain-' + complaint_entry_id + '" onclick="domain_whois(\''+query_who_params+'\')">Domain</button>')
     error: (response) ->
       $('#loader-modal').modal 'hide'
       std_msg_error("Unable to update URI", [response.responseJSON.message], reload: false)
@@ -1006,27 +1007,27 @@ format = (complaint_entry_row) ->
 
   whois_lookup = if complaint_entry.ip_address then complaint_entry.ip_address else complaint_entry.domain
 
-
+  { entry_id } = complaint_entry
   complaint_entry_html = ''
-  input_cat = 'input_cat_' + complaint_entry.entry_id
+  input_cat = 'input_cat_' + entry_id
 
   if complaint_entry.status == "PENDING"
     complaint_table_row_html = '<table class="active_table"><tr class="pending"><td class="no_pad"><div class="row">'
     complaint_submission_html =
-        '<input type="radio" name="resolution_review_' + complaint_entry.entry_id + '" value="commit" > Commit <br/>' +
-        '<input type="radio" name="resolution_review_' + complaint_entry.entry_id + '" value="decline" checked="checked"> Decline' +
+        '<input type="radio" name="resolution_review_' + entry_id + '" value="commit" > Commit <br/>' +
+        '<input type="radio" name="resolution_review_' + entry_id + '" value="decline" checked="checked"> Decline' +
         '<br/>' +
-        '<button class="tertiary" onclick="updatePending(' + complaint_entry.entry_id + ',' + row_id + ')"> Submit </button>' +
+        '<button class="tertiary" onclick="updatePending(' + entry_id + ',' + row_id + ')"> Submit </button>' +
         '</div>'
   else
-    complaint_table_row_html = '<table class="active_table"><tr class="active_master_submit" type="submit_changes" entry_id="' + complaint_entry.entry_id + '"  row_id = "' + row_id + '"><td class="no_pad"><div class="row">'
+    complaint_table_row_html = '<table class="active_table"><tr class="active_master_submit" type="submit_changes" entry_id="' + entry_id + '"  row_id = "' + row_id + '"><td class="no_pad"><div class="row">'
     complaint_submission_html =
-        '<input type="radio" class="resolution_radio_button" id="unchanged' + complaint_entry.entry_id + '" name="resolution' + complaint_entry.entry_id + '" value="UNCHANGED" ' + unchanged_radio + entry_status + '> Unchanged <br/> ' +
-        '<input type="radio" class="resolution_radio_button" id="fixed' + complaint_entry.entry_id + '" name="resolution' + complaint_entry.entry_id + '" value="FIXED"  ' + fixed_radio + entry_status + '> Fixed  <br/> ' +
-        '<input type="radio" class="resolution_radio_button" id="invalid' + complaint_entry.entry_id + '" name="resolution' + complaint_entry.entry_id + '" value="INVALID" ' + invalid_radio + entry_status + '> Invalid' +
+        '<input type="radio" class="resolution_radio_button" id="unchanged' + entry_id + '" name="resolution' + entry_id + '" value="UNCHANGED" ' + unchanged_radio + entry_status + '> Unchanged <br/> ' +
+        '<input type="radio" class="resolution_radio_button" id="fixed' + entry_id + '" name="resolution' + entry_id + '" value="FIXED"  ' + fixed_radio + entry_status + '> Fixed  <br/> ' +
+        '<input type="radio" class="resolution_radio_button" id="invalid' + entry_id + '" name="resolution' + entry_id + '" value="INVALID" ' + invalid_radio + entry_status + '> Invalid' +
         '<br/>' +
-        '<button class="tertiary submit_changes ' + submit_class + '" id="submit_changes_' + complaint_entry.entry_id + '" onclick="updateEntryColumns(' + complaint_entry.entry_id + ',' + row_id + ')">Submit Changes</button>' +
-        '<button class="tertiary ' + reopen_class + '" id="reopen_' + complaint_entry.entry_id + '" onclick="reopenComplaint(' + complaint_entry.entry_id + ', this)">Reopen Complaint</button>' +
+        '<button class="tertiary submit_changes ' + submit_class + '" id="submit_changes_' + entry_id + '" onclick="updateEntryColumns(' + entry_id + ',' + row_id + ')">Submit Changes</button>' +
+        '<button class="tertiary ' + reopen_class + '" id="reopen_' + entry_id + '" onclick="reopenComplaint(' + entry_id + ', this)">Reopen Complaint</button>' +
         '</div>'
 
   retake_in_progress = false
@@ -1050,56 +1051,56 @@ format = (complaint_entry_row) ->
     </svg>'
   complaint_entry_html =
       complaint_table_row_html +
-      '<div class="col-xs-12 col-sm-8 nested-complaint-static-data">' +
-      '<div class="row">' +
-      '<div class="col-xs-3 col-with-divider">' +
-      '<div class="screenshot-thumb-wrapper">' +
-      '<img id="screenshot_id_' + complaint_entry.entry_id + '" class="screenshot-thumb-img" title="' + screen_shot_error + '" data-toggle="popover" onclick="enlarge_image(' + complaint_entry.entry_id + ',\'complaint_entries/serve_image?complaint_entry_id=' + complaint_entry.entry_id + '\',' + retake_in_progress + '\)" src="complaint_entries/serve_image?complaint_entry_id=' + complaint_entry.entry_id + '" />' +
-      '</div>' +
-      '<div class="complaint-entry-info">' +
-      '<label class="content-label-sm">Case ID</label>' +
-      '<span class="nested-complaint-data case-id"><a href="complaints/' + complaint_entry.complaint_id + '">' + complaint_entry.complaint_id + '</a></span>' +
-      '<label class="content-label-sm">Entry URI</label>' +
-      '<span class="nested-complaint-data input-truncate esc-tooltipped" id="entry-uri-' + complaint_entry.entry_id + '" title="' + url + '">' + uri + '</span>' +
-      '<label class="content-label-sm" id="site-search">Site Search</label>' +
-      '<span class="nested-complaint-data input-truncate esc-tooltipped" id="site-search-' + complaint_entry.entry_id + '" title="' + url + '">' + search_uri + '</span>' +
-      '<label class="content-label-sm">Customer Name</label>' +
-      '<span class="nested-complaint-data">' + customer_name + '</span>' +
-      '<label class="content-label-sm">Customer Description</label>' +
-      '<span class="nested-complaint-data">' + customer_description + '</span>' +
-      '</div></div><div class="col-xs-7 col-with-divider">' +
-      '<table class="simple-nested-table" id="entry-table-' + complaint_entry.entry_id + '"><thead><tr><th class="col-sm-1">Conf</th><th class="col-sm-4">WBRS Categories</th><th class="col-sm-3">WBRS Certainty</th><th class="col-sm-4">SDS Category</tr></thead>' +
+      "<div class='col-xs-12 col-sm-8 nested-complaint-static-data'>" +
+      "<div class='row'>" +
+      "<div class='col-xs-3 col-with-divider'>" +
+      "<div class='screenshot-thumb-wrapper'>" +
+      "<img id='screenshot_id_#{entry_id}' class='screenshot-thumb-img' title='#{screen_shot_error}' data-toggle='popover' onclick='enlarge_image('#{entry_id} , complaint_entries/serve_image?complaint_entry_id='#{entry_id} , #{retake_in_progress}')' src='complaint_entries/serve_image?complaint_entry_id='#{entry_id}'/>" +
+      "</div>" +
+      "<div class='complaint-entry-info'>" +
+      "<label class='content-label-sm'>Case ID</label>"+
+      "<span class='nested-complaint-data case-id'><a href='complaints #{entry_id}'>#{entry_id}</a></span>" +
+      "<label class='content-label-sm'>Entry URI</label>" +
+      "<span class='nested-complaint-data input-truncate esc-tooltipped' id='entry-uri-#{entry_id}' title='#{url}'>#{url}</span>" +
+      "<label class='content-label-sm' id='site-search'>Site Search</label>" +
+      "<span class='nested-complaint-data input-truncate esc-tooltipped' id='site-search-#{entry_id}' title='#{url}'>#{search_uri}</span>" +
+      "<label class='content-label-sm'>Customer Name</label>" +
+      "<span class='nested-complaint-data'>#{customer_name}</span>" +
+      "<label class='content-label-sm'>Customer Description</label>" +
+      "<span class='nested-complaint-data'>#{customer_description}</span>" +
+      "</div></div><div class='col-xs-7 col-with-divider'>" +
+      '<table class="simple-nested-table" id="entry-table-' + entry_id + '"><thead><tr><th class="col-sm-1">Conf</th><th class="col-sm-4">WBRS Categories</th><th class="col-sm-3">WBRS Certainty</th><th class="col-sm-4">SDS Category</tr></thead>' +
       '</table>' +
       '<div class="inline-loader">' +
       '<div class="loader-gears">' + svg + '</div>'+
       '<span class="missing-data">Loading Data...</span></div>' +
       '</br>' +
       '</div><div class="col-xs-2">' +
-      '<button class="secondary" id="lookup-' + complaint_entry.entry_id + '" onclick="WebCat.RepLookup.queryWhoIs(\'' + url + '\')">Lookup</button><br/>' +
-      '<button class="secondary" id="history-' + complaint_entry.entry_id + '" onclick="history_dialog(' + complaint_entry.entry_id  + ',\'' + url + '\')">History</button><br/>' +
-      '<button class="secondary" id="domain-' + complaint_entry.entry_id + '" onclick="domain_whois(\'' + whois_lookup + '\')">Domain</domain>' +
+      '<button class="secondary" id="lookup-' + entry_id+ '" onclick="WebCat.RepLookup.queryWhoIs(' + entry_id  + ',\'' + url + '\')">Lookup</button><br/>' +
+      '<button class="secondary" id="history-' + entry_id + '" onclick="history_dialog(' + entry_id  + ',\'' + url + '\')">History</button><br/>' +
+      '<button class="secondary" id="domain-' + entry_id + '" onclick="domain_whois(\'' + whois_lookup + '\')">Domain</domain>' +
       '</div></div>' +
       '</div><div class="col-xs-12 col-sm-4 nested-complaint-editable-data">' +
       '<div class="row">' +
       '<div class="col-xs-12">' +
       '<label class="content-label-sm">Edit URI</label><br/>' +
-      '<input class="nested-table-input complaint-uri-input" id="complaint_prefix_' + complaint_entry.entry_id +
+      '<input class="nested-table-input complaint-uri-input" id="complaint_prefix_' + entry_id +
       '" type="text" onclick="this.select()" value="' + host +
       '"' + entry_status + '>' +
-      '<button class="secondary inline-button" onclick="updateURI(event,' + complaint_entry.entry_id + ')">Update URI</button><br/>' +
+      '<button class="secondary inline-button" onclick="updateURI(event,' + entry_id + ')">Update URI</button><br/>' +
       '<div class="complaint-selectize-col-wrapper">' +
       '<label class="content-label-sm">Edit Categories / Confidence Order</label>' +
       '<select id="' + input_cat + '" name="[' + input_cat + '][]" class="' + status_class + '" placeholder="Enter up to 5 categories" value=""></select>' +
       '</div>' +
       '<div class="domain-categories" >' +
       '<label class="content-label-sm">Inherit Categories From Main Domain</label><br/>' +
-      '<ul id="main-domain-categories_' + complaint_entry.entry_id + '"></ul>'+
-      '<button class="secondary inline-button" onclick="inheritCategories(' + complaint_entry.entry_id + ')">Inherit</button><br/>' +
+      '<ul id="main-domain-categories_' + entry_id + '"></ul>'+
+      '<button class="secondary inline-button" onclick="inheritCategories(' + entry_id + ')">Inherit</button><br/>' +
       '</div>' +'</div><div class="col-xs-8">' +
       '<label class="content-label-sm">Internal Comment</label><br/>' +
-      '<input class="nested-table-input complaint-comment-input" id="complaint_comment_' + complaint_entry.entry_id + '" type="text" onclick="this.select()" class="nested-table-input" value="' + internal_comment + '" placeholder="Add a comment." ' + entry_status + '><br/>'  +
+      '<input class="nested-table-input complaint-comment-input" id="complaint_comment_' + entry_id + '" type="text" onclick="this.select()" class="nested-table-input" value="' + internal_comment + '" placeholder="Add a comment." ' + entry_status + '><br/>'  +
       '<label class="content-label-sm customer-label">Customer Facing Comment</label><br/>' +
-      '<input class="nested-table-input complaint-comment-input" id="complaint_resolution_comment_' + complaint_entry.entry_id + '" type="text" onclick="this.select()" value="' + resolution_comment + '" placeholder="Add a comment for the customer." ' + entry_status + '>' +
+      '<input class="nested-table-input complaint-comment-input" id="complaint_resolution_comment_' + entry_id + '" type="text" onclick="this.select()" value="' + resolution_comment + '" placeholder="Add a comment for the customer." ' + entry_status + '>' +
       '</div>' +
       '<div class="col-xs-4">' +
       '<label class="content-label-sm">Resolution</label><br/>' +

@@ -8009,7 +8009,17 @@ td.text-center span {
 .loader-msg {
   color: $type-lighter-color;
 }
-
+.webcat-loader{
+  &{
+    margin: auto 29%;
+  }
+  .loader-msg{
+    font-size: 8.5pt;
+    position: absolute;
+    margin-left: 10px;
+    margin-top: -5px;
+  }
+}
 .cluster-table-toolbar {
   margin-bottom: 0;
 }

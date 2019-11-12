@@ -12,10 +12,8 @@ $ ->
       headers: headers
       success: (response) ->
         $('#customerList').empty()
-        i = 0
-        while i < response.data.length
-          $('#customerList').append '<option value=\'' + response.data[i] + '\'></option>'
-          i++
+        for data, i in response.data
+          $('#customerList').append '<option value="' + data + '"></option>'
     )
 
   $('#advanced-search-button').on 'click', ->
@@ -35,25 +33,21 @@ $ ->
 
         uniques = []
 
-        i = 0
-        while i < response.data.length
-          if uniques.indexOf(response.data[i]) == -1
-            uniques.push(response.data[i])
-          i++
+        for data, i in response.data
+          if uniques.indexOf(i) == -1
+            uniques.push(data)
 
-        j = 0
-        while j < uniques.length
-          $('#customerList').append '<option value=\'' + uniques[j] + '\'></option>'
-          j++
+        for customer in uniques
+          $('#customerList').append '<option value="' + customer + '"></option>'
 
         for status in complaint_status_list
-          $('#status-input-list').append '<option value=\'' + status + '\'></option>'
+          $('#status-input-list').append '<option value="' + status + '"></option>'
 
         for channel in complaint_channel_list
-          $('#channel-input-list').append '<option value=\'' + channel + '\'></option>'
+          $('#channel-input-list').append '<option value="' + channel + '"></option>'
 
         for resolution in complaint_resolution_list
-          $('#resolution-input-list').append '<option value=\'' + resolution + '\'></option>'
+          $('#resolution-input-list').append '<option value="' + resolution + '"></option>'
 
     )
 
@@ -67,16 +61,12 @@ $ ->
 
         uniques = []
 
-        i = 0
-        while i < response.data.length
-          if uniques.indexOf(response.data[i]) == -1
-            uniques.push(response.data[i])
-          i++
+        for data, i in response.data
+          if uniques.indexOf(i) == -1
+            uniques.push(data)
 
-        j = 0
-        while j < uniques.length
-          $('#customerCompanyList').append '<option value=\'' + uniques[j] + '\'></option>'
-          j++
+        for company in uniques
+          $('#customerCompanyList').append '<option value="' + company + '"></option>'
     )
 
     $.ajax(
@@ -89,25 +79,19 @@ $ ->
 
         uniques = []
 
-        i = 0
-        while i < response.data.length
-          if uniques.indexOf(response.data[i]) == -1
-            uniques.push(response.data[i])
-          i++
+        for data, i in response.data
+          if uniques.indexOf(i) == -1
+            uniques.push(data)
 
-        j = 0
-        while j < uniques.length
-          $('#customerEmailList').append '<option value=\'' + uniques[j] + '\'></option>'
-          j++
+        for email in uniques
+          $('#customerEmailList').append '<option value="' + email + '"></option>'
 
     )
 
   $('#new-complaint-form').submit (e) ->
     e.preventDefault()
-    $('#loader-modal').modal({
-      backdrop: 'static',
-      keyboard: false
-    })
+    loader = $(e.target).find('.gear-loader-wrapper')
+    loader.removeClass('hidden')
     ips_urls = this.ips_urls.value
     desc = this.description.value
     customer = this.customers.value
@@ -122,10 +106,10 @@ $ ->
         customer: customer,
         tags: tags
       success: (response) ->
-        $('#loader-modal').modal 'hide'
+        loader.addClass('hidden')
         std_msg_success('Complaint Created.', [], reload: true)
       error: (response) ->
-        $('#loader-modal').modal 'hide'
+        loader.addClass('hidden')
         std_api_error(response, "Complaint was not created.", reload: false)
     )
 

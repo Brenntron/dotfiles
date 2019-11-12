@@ -22,6 +22,9 @@
 
 
   %hr.thin
+  .webcat-loader.gear-loader-wrapper.hidden
+    = inline_svg 'icon_gears_loader.svg', class: 'gears-loader'
+    %span.loader-msg Loading data...
   .form-group.text-center
     %button.primary{value: 'submit', type: 'submit'}
       Create
