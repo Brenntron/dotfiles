@@ -515,3 +515,34 @@ Feature: Webcat complaints
     And I wait for "5" seconds
     Then I should see "COMPLETED"
     And "1" bridge message should be in the delayed job queue
+
+
+  @javascript
+  Scenario: click the pin toolbar to top button, the button label toggles from pin to unpin
+    Given a user with role "webcat user" exists and is logged in
+    And the following complaints exist:
+      | ticket_source             | id | status |
+      | talos-intelligence        | 1  | NEW    |
+    And the following complaint entries exist:
+      | uri             | domain        | subdomain | path | entry_type | complaint_id |
+      | abc.com         | abc.com       |           |      | URI/DOMAIN |  1           |
+    And a complaint entry preload exists
+    And I goto "/escalations/webcat/complaints"
+    And I click "#pin-to-top"
+    Then I should not see "Pin Toolbar"
+    And I click "#pin-to-top"
+    Then I should see "Pin Toolbar"
+
+  @javascript
+  Scenario: press the hot key/shortcut to pin the toolbar to top, the button label changes to unpin
+    Given a user with role "webcat user" exists and is logged in
+    And the following complaints exist:
+      | ticket_source             | id | status |
+      | talos-intelligence        | 1  | NEW    |
+    And the following complaint entries exist:
+      | uri             | domain        | subdomain | path | entry_type | complaint_id |
+      | abc.com         | abc.com       |           |      | URI/DOMAIN |  1           |
+    And a complaint entry preload exists
+    And I goto "/escalations/webcat/complaints"
+    And I enter the pin toolbar hot key
+    Then I should not see "Pin Toolbar"
