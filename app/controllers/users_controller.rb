@@ -1,5 +1,5 @@
 class UsersController < ApplicationController
-  load_and_authorize_resource
+  load_and_authorize_resource except: :show
 
   before_action :require_login
 
@@ -11,10 +11,6 @@ class UsersController < ApplicationController
   def show
     @user = User.where(id: params[:id]).first
 
-    @first_sibling = @user.siblings.first
-    @sibling_col = @user.siblings.count.to_f / 2
-    @first_child = @user.children.first
-    @children_col = @user.children.count.to_f / 2
     case
       when @user.nil?
         flash[:error] = "Could not find user '#{params[:id]}'"
@@ -23,6 +19,7 @@ class UsersController < ApplicationController
         flash[:error] = 'You are not authorized to view that user.'
         redirect_to escalations_users_path
       else
+        @sibling_col = @user.siblings.count.to_f / 2
         @users = current_user.children.order(:display_name)
     end
   end
