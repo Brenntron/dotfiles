@@ -198,7 +198,7 @@ window.bulk_get_current_wlbl = (page) ->
 
     $(left_cbs).each (i) ->  # add the order ids to left and right sides
       ip_uri = $(this).closest('tr').find(url_entry).text().trim()
-      if location.href.includes('research')
+      if $('.bfrp-table').length > 0
         ip_uri = $(this).closest('tr').find('.entry-data-content').text().trim()
       $(this).closest('tr').attr('data-order-id', i)  # add row-id to the left, this works on bfrp confirmed
 
@@ -209,9 +209,10 @@ window.bulk_get_current_wlbl = (page) ->
       else if location.href.includes('research')
         curr_entry_id = $(this).attr('class').split(' ').pop()
 
+      # fyi: bugfix for comparing the http/non-http versions of these urls/domains
       $(curr_dd).find('.wlbl-entry-content').each ->
-        console.log $(this).text()
-        if $(this).text().includes(ip_uri)
+        curr_text = $(this).text().trim()
+        if ip_uri.includes(curr_text)
           $(this).closest('tr').attr('data-order-id', i)  # add row-id to the right
           $(this).closest('tr').find('td.wlbl-entry-wlbl').addClass(curr_entry_id)
 
@@ -928,16 +929,16 @@ window.add_wlbl_threat_cat_listeners = () ->
     $('.dispute-wlbl-adjust-wrapper .dropdown-submit-button').html('Submit Changes')
 
 
-    
+
   # bfrp CLICK INPUT: add id's to this cb (on page) to bfrp bulk (in dropdown) for tests
   $('.bfrp-table .dispute_check_box').click ->
     $('.bfrp-table .dispute_check_box').each (i) ->
       $(this).attr('class','')   # clean slate the cbs to default first on each click
-      $(this).addClass("dispute_check_box", "bfrp-checkbox-#{i}")
+      $(this).addClass("dispute_check_box")
+      $(this).addClass("bfrp-checkbox-#{i}")
 #
     $('.bfrp-table .dispute_check_box:checked').each (i) ->
       $(this).addClass('bfrp-result-no-' + i)    # then for checked, add the clicked class for testing
-
 
 
   # wl/bl dropdowns, click a wl/bl list cell or tc cell and it will toggle the adjacent cb
@@ -1104,3 +1105,4 @@ $ ->
   add_wlbl_threat_cat_listeners()
 
   # bfrp fyi: threat category row is hidden on BFRP through the CSS, fyi
+
