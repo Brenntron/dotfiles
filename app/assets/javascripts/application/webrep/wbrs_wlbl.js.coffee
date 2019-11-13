@@ -12,7 +12,6 @@ window.bulk_get_current_wlbl = (page) ->
   current_wbrs = ''
   comment_box = ''
   dropdown_wrapper = ''
-  bfrp_row_index = 0
 
   # Define variables based on what page we're on
   if page == 'index'
@@ -69,7 +68,7 @@ window.bulk_get_current_wlbl = (page) ->
   $(dropdown_wrapper).removeAttr('data-disable-submit')
 
   # Clean slate these bulk wl/bl cb enabled/disabled states
-  $(dropdown_wrapper).find('.wl-bl-list-inline:checkbox').prop('disabled',false).closest('li').css('opacity','1')
+  $(dropdown_wrapper).find('.wl-bl-list-inline:checkbox').prop('disabled',false).closest('li').removeClass('grayed-out')
 
   # Pull the entry content out
   if (entries_checked.length > 0)
@@ -177,7 +176,7 @@ window.bulk_get_current_wlbl = (page) ->
     table_row =
       "<tr class='wlbl-dropdown-row'>
       <td class='wlbl-entry-content'>#{ip_uri}</td>
-      <td class='wlbl-entry-wlbl wlbl-result-no-#{bfrp_row_index}'>#{list_types}</td>
+      <td class='wlbl-entry-wlbl'>#{list_types}</td>
       <td class='wlbl-current-entry-wbrs'>#{wbrs_score}</td>
       <td class='wlbl-threat-cat'>#{tc_str}</td>
       </tr>"
@@ -185,11 +184,9 @@ window.bulk_get_current_wlbl = (page) ->
     $(tbody).append(table_row)
     $(tbody).find('.loading-rows').addClass('hidden')
 
-    # specific iterator for bfrp bulk dropdown rows
-    bfrp_row_index++
-
   # order the rows after the build to ensure correct order on left and right sides
   order_wlbl_table_rows = () ->
+    # at this point in the dom, the blue rows are built, and are ready to have classes added into them
     if $('#wlbl_adjust_entries_index').length > 0  # index dropdown
       curr_dd = '#wlbl_adjust_entries_index'
       left_cbs = '#disputes-index .dispute-entry-checkbox:checked'
@@ -201,20 +198,22 @@ window.bulk_get_current_wlbl = (page) ->
 
     $(left_cbs).each (i) ->  # add the order ids to left and right sides
       ip_uri = $(this).closest('tr').find(url_entry).text().trim()
-      $(this).closest('tr').attr('data-order-id', i)  # add row-id to the left
+      if location.href.includes('research')
+        ip_uri = $(this).closest('tr').find('.entry-data-content').text().trim()
+      $(this).closest('tr').attr('data-order-id', i)  # add row-id to the left, this works on bfrp confirmed
 
       if $('body').hasClass('index-action')
         curr_entry_id = 'wlbl-entry-id-' + $(this).attr('id')
       else if $('body').hasClass('show-action')
         curr_entry_id = 'wlbl-entry-id-' + $(this).attr('data-entry-id')
-      # for bfrp, we are added a specific iterator above, look for bfrp_row_index
+      else if location.href.includes('research')
+        curr_entry_id = $(this).attr('class').split(' ').pop()
 
-      # dropdowns > adding id's to list cells for testing
       $(curr_dd).find('.wlbl-entry-content').each ->
+        console.log $(this).text()
         if $(this).text().includes(ip_uri)
           $(this).closest('tr').attr('data-order-id', i)  # add row-id to the right
-          $(this).closest('tr').find('.wlbl-entry-wlbl').addClass(curr_entry_id)  # add entry-id to the cell
-
+          $(this).closest('tr').find('td.wlbl-entry-wlbl').addClass(curr_entry_id)
 
     table_dd = $(curr_dd).find('tbody')
     rows = $(table_dd).find('tr')
@@ -225,7 +224,6 @@ window.bulk_get_current_wlbl = (page) ->
       y = $(b).attr('data-order-id')
       x - y
     $(rows).each (i, row) -> table_dd.append(row)
-
 
 
 
@@ -307,7 +305,7 @@ window.get_current_wlbl = (button) ->
   $(submit_button).html('Submit Changes').prop('disabled', true)
   $(comment_textarea).val(comment_text)
   $(tc_row).addClass('hidden')
-  $(list_cbs).prop('disabled',false).closest('li').css('opacity','1')
+  $(list_cbs).prop('disabled',false).closest('li').removeClass('grayed-out')
 
   # Send entry content to wbrs
   data = {
@@ -387,7 +385,6 @@ window.get_current_wlbl = (button) ->
         if wbrs.trim() == 'No score'
           wbrs = "<span class='missing-data'>No score</span>"
         $(wbrs_score).html(wbrs)
-        # needs to be html below to ensure it uses the span
         $(wlbl_list[0]).html('<span class="missing-data">Not on a list</span>')
         $(submit_button[0]).attr('disabled', true)
 
@@ -401,14 +398,14 @@ window.get_current_wlbl = (button) ->
 
       # clean slate the inline cb's
       $(dropdown).find(".wl-bl-list-inline:checkbox")
-        .prop('disabled',false).closest('li').css('opacity','1')
+        .prop('disabled',false).closest('li').removeClass('grayed-out')
 
       # disable opposite cb's if something is already on a list
       unless (wl_num > 0 and bl_num > 0) || (wl_num == 0 and bl_num == 0)
         if bl_num > 0 && wl_num == 0 then curr_cbs = 'WL-'
         else if wl_num > 0 && bl_num == 0 then curr_cbs = 'BL-'
         $(dropdown).find(":checkbox[value^='#{curr_cbs}']")
-          .prop('disabled',true).closest('li').css('opacity','0.6')
+          .prop('disabled',true).closest('li').addClass('grayed-out')
   )
 
 
@@ -454,45 +451,44 @@ window.submit_bulk_wlbl = (page) ->
     # adjustment type - add / remove / replace
     if $('#wlbl-add').prop('checked')
       adjustment_type = 'add'
-      modal_action = 'added'
+      modal_action = 'added to'
     else if $('#wlbl-remove').prop('checked')
       adjustment_type = 'remove'
-      modal_action = 'updated'
+      modal_action = 'removed from'
     else if $('#wlbl-replace').prop('checked')
       adjustment_type = 'replace'
-      modal_action = 'removed'
+      modal_action = 'updated for'
 
     if page == 'index'
-      disputes_array = $('.dispute-entry-checkbox:checked').map(-> this.id).toArray()
-    else if page == 'show'
-      disputes_array = $('.dispute_check_box:checked').map( ->
-        this['data-entry-id']
-        console.log this['data-entry-id']
+      disputes_array = $('.dispute-entry-checkbox:checked').map(() ->
+        parseInt(this.id)  # pass number to endpoint, not string
       ).toArray()
+    else if page == 'show'
+      $('.dispute_check_box:checked').each ->
+        curr_entry_id = parseInt($(this).attr('data-entry-id'))
+        disputes_array.push(curr_entry_id)
 
 
   # ADD TO LISTS BULK
   if adjustment_type == 'add' or adjustment_type == 'replace'
     console.log 'bulk scenario 1'  # index/show add/replace: use new endpoint + entry url array
     data =
-      adjustment_type: adjustment_type   # new object
-      urls: ip_uris
+      dispute_entries: disputes_array   # new object, this needs to be dispute_entries (ids), not urls
       lists: list_types
       note: wlbl_comment
       thrt_cat_ids: thrt_cat_ids
-
-    curr_endpoint = '/escalations/api/v1/escalations/webrep/disputes/bulk_wlbl_threatcat_adjust'
+      adjustment_type: adjustment_type
+    endpoint = '/escalations/api/v1/escalations/webrep/disputes/bulk_wlbl_threatcat_adjust'
 
   # REMOVE FROM LISTS BULK
   else if adjustment_type == 'remove'
     console.log 'bulk scenario 2'  # index/show/bfrp remove: use old endpoint + entry url array
     data =
-      ip_uris: ip_uris    # old object
+      ip_uris: ip_uris    # old object, needs to be 'ip_uris'
       list_types: list_types
       note: wlbl_comment
       thrt_cat_ids: thrt_cat_ids
-
-    curr_endpoint = '/escalations/api/v1/escalations/webrep/disputes/bulk_rule_ui_wlbl_remove'
+    endpoint = '/escalations/api/v1/escalations/webrep/disputes/bulk_rule_ui_wlbl_remove'
 
   # ensure we're showing only non-duplicate lists in the modal
   unique_lists = []
@@ -500,24 +496,30 @@ window.submit_bulk_wlbl = (page) ->
     if($.inArray(entry, unique_lists) == -1)
       unique_lists.push(entry)
 
-  # define the string for the modal
+  # build the confirmation modal
   modal_info_string =
     "<div class='wlbl-info-modal'><p>The following entries: </p>
-      <span>#{ip_uris.join('<br>')}</span> <span>Have been #{modal_action} for the following WBRS Lists: <p>#{unique_lists.join(', ')}</p></span></div>"
+      <span>#{ip_uris.join('<br>')}</span>"
+
+  if unique_lists.length
+    modal_info_string +=
+      "<span>Have been #{modal_action} the following WBRS Lists:
+        <p>#{unique_lists.join(', ')}</p></span>"
 
   if thrt_cat_ids.length
-    thrt_cat_str =   # for the confirmation modal only
-      "<p class='tc-sentence'>With the following threat categories updated:
-       <em>#{ thrt_cat_names.join(', ') }</em></p>"
-    modal_info_string += "#{thrt_cat_str}"
+    modal_info_string +=
+      "<span>With the following threat categories updated:
+        <p>#{thrt_cat_names.join(', ')}</p></span>"
 
+  # finish the modal
+  modal_info_string += "</div>"
 
   # submit ready? make sure our data object is correct
-  console.log curr_endpoint
+  console.log endpoint
   console.log data
 
   std_msg_ajax(
-    url: curr_endpoint
+    url: endpoint
     method: 'POST'
     data: data
     success: (response) ->
@@ -535,12 +537,12 @@ window.submit_individual_wlbl = (button_tag) ->
   wlbl_form = button_tag.form;
 
   # endpoint expects id's to represent url's by default, passing in url's is optional but acceptable too
-  dispute_entry_id = $(wlbl_form).parents('.research-table-row').attr('data-entry-id')
+  dispute_entry_id = parseInt($(wlbl_form).parents('.research-table-row').attr('data-entry-id'))
   dispute_url = $(wlbl_form).parents('.research-table-row').find('.entry-data-content').text().trim()
   old_lists_str = $(wlbl_form).find('.wlbl-entry-wlbl').text()  # lists (old) for this entry
   old_lists_arr = old_lists_str.split(', ')
   curr_note = $(wlbl_form).find('.note-input').val()
-  curr_endpoint = ''
+  endpoint = ''
   modal_info_string = ''
   modal_action = ''
   removed_lists_arr = []
@@ -572,43 +574,46 @@ window.submit_individual_wlbl = (button_tag) ->
   # adjustment type: figure out the add/replace/remove adjustment type, this determines which endpoint to use
   if (new_length > old_length || new_length == old_length) and tc_length == 0
     adjustment_type = 'add'
-    modal_action = 'added'  # separate var to make it easier to change verbage
+    modal_action = 'added to'  # separate var to make it easier to change verbage
   else if new_length == old_length and tc_length > 0
     adjustment_type = 'replace'
-    modal_action = 'updated'
+    modal_action = 'updated for'
   else if new_length < old_length and tc_length == 0
     adjustment_type = 'remove'
-    modal_action = 'removed'
+    modal_action = 'removed from'
   else
     adjustment_type = 'add'
-    modal_action = 'updated'
+    modal_action = 'updated for'
 
-  # define the info presented in the confirmation modal
+
+  # build the confirmation modal
   modal_info_string =
-    "<div class='wlbl-info-modal'><p>The following entries: </p>"
+    "<div class='wlbl-info-modal'><p>The following entry:</p>
+      <span>#{dispute_url}</span>"
 
   # ADD TO LISTS INLINE
   if adjustment_type == 'add' || adjustment_type == 'replace'
     # replacing threat cats? get the wl/bl lists from top blue row
     list_types = $(wlbl_form).find('.wlbl-entry-wlbl').text().trim().split(', ')
-
     data =
       adjustment_type: adjustment_type
       lists: new_lists_arr
       thrt_cat_ids: thrt_cat_ids
       note: curr_note
+    endpoint = '/escalations/api/v1/escalations/webrep/disputes/bulk_wlbl_threatcat_adjust'
 
-    curr_endpoint = '/escalations/api/v1/escalations/webrep/disputes/bulk_wlbl_threatcat_adjust'
-    modal_info_string +=
-      "<span>#{dispute_url}</span> <span>Have been #{modal_action} for the following WBRS Lists:
-        <p>#{new_lists_arr.join(', ')}</p></span></div>"
-
-    if location.href.includes('webrep/disputes') || $('body').hasClass('research-action')
+    if location.href.includes('webrep/disputes')
       console.log 'inline scenario 1'  #  index/show/bfrp add/replace: use new endpoint + one entry url
-      data.urls = [ dispute_url ]  # this ends up down in the ajax call below, line 620ish
+      data.dispute_entries = [ dispute_entry_id ]  # ADD/REPLACE ALWAYS NEEDS AN ENTRY-ID, NOT A URL this ends up down in the ajax call below
     else if location.href.includes('webrep/research')
-      console.log 'inline scenario 2'  # bfrp add/replace using new endpoint + one entry id
-      data.urls = [ dispute_entry_id ]
+      console.log 'inline scenario 2'  # BFRP add/replace using new endpoint + one entry id
+      data.urls = [ ip_uri ]  # THIS MUST BE URLS/IP_URI, there is no entry.id on bfrp currently
+
+    # continue building the modal info
+    if new_lists_arr.length
+      modal_info_string +=
+        "<span>Has been #{modal_action} the following WBRS Lists:
+          <p>#{new_lists_arr.join(', ')}</p></span>"
 
   # REMOVE FROM LISTS INLINE
   else if adjustment_type = 'remove'
@@ -618,25 +623,28 @@ window.submit_individual_wlbl = (button_tag) ->
       list_types: removed_lists_arr
       note: curr_note   # ensure this is working
       thrt_cat_ids: thrt_cat_ids
+    endpoint = '/escalations/api/v1/escalations/webrep/disputes/bulk_rule_ui_wlbl_remove'
 
-    curr_endpoint = '/escalations/api/v1/escalations/webrep/disputes/bulk_rule_ui_wlbl_remove'
+    # continue building the modal info
     modal_info_string +=
-      "<span>#{dispute_url}</span> <span>Have been removed from the following WBRS Lists:
-        <p>#{removed_lists_arr}</p></span></div>"
+      "<span>#{dispute_url}</span><span>Has been removed from the following WBRS Lists:
+        <p>#{removed_lists_arr}</p></span>"
 
-  # THREAT CATS PRESENT? ADD MORE TEXT TO CONFIRMATION MODAL
+  # continue building the modal info outside of adjustment type
   if thrt_cat_ids.length
-    thrt_cat_str =   # for the confirmation modal only
-      "<p class='tc-sentence'>With the following threat categories updated:
-       <em>#{ thrt_cat_names.join(', ') }</em></p>"
-    modal_info_string += "#{thrt_cat_str}"
+    modal_info_string +=
+      "<span>With the following threat categories updated:
+        <p>#{thrt_cat_names.join(', ')}</p></span>"
+
+  # finish the modal
+  modal_info_string += "</div>"
 
   # submit ready? make sure our data object is correct
-  console.log curr_endpoint
+  console.log endpoint
   console.log data
 
   std_msg_ajax(
-    url: curr_endpoint
+    url: endpoint
     method: 'POST'
     data: data
     error_prefix: 'Error adjusting WL/BL information.'
@@ -787,7 +795,7 @@ window.reset_score_preview = (button) ->
 
   # Clean slate the WL/BL checkboxes
   $(dropdown).find(".wl-bl-list-inline:checkbox")
-    .prop('disabled', false).closest('li').css('opacity','1')
+    .prop('disabled', false).closest('li').removeClass('grayed-out')
 
   # Restore the disabled/enabled states of the list cb's for inline
   unless current_lists.includes('WL-') and current_lists.includes('BL-')  # edge case
@@ -795,7 +803,7 @@ window.reset_score_preview = (button) ->
     else if current_lists.includes('BL-') then curr_cbs = 'WL-'
 
     $(dropdown).find(".wl-bl-list-inline:checkbox[value^='#{curr_cbs}']")
-      .prop('disabled', true).closest('li').css('opacity','0.6')
+      .prop('disabled', true).closest('li').addClass('grayed-out')
 
   # Any checkbox that doesn't match the current lists is 'off'
   i = checkboxes.length - 1
@@ -901,7 +909,8 @@ window.wlbl_history_dialog = (id) ->
 # WL/BL dropdowns checkbox validation logic, these get added to the adjust wl/bl dropdowns on page load
 window.add_wlbl_threat_cat_listeners = () ->
   wlbl_dropdowns = $('.dropdown-menu .dispute-wlbl-adjust-wrapper')
-  list_cells = $('#index-adjust-wlbl, #wlbl_entries_button').next('.dropdown-menu').find('.lists-row li')
+  list_cells = $('#index-adjust-wlbl, #wlbl_entries_button')
+    .next('.dropdown-menu').find('.lists-row li')
   tc_cells = $('.dispute-wlbl-adjust-wrapper .threat-cat-cell')
 
   # clean slate all adjust wl/bl dropdowns
@@ -918,6 +927,16 @@ window.add_wlbl_threat_cat_listeners = () ->
     $(dd).find('.tc-replace-note, .threat-cat-row, .replace-tc-radio').addClass('hidden')
     $('.dispute-wlbl-adjust-wrapper .dropdown-submit-button').html('Submit Changes')
 
+  # bfrp-specific, to add id's to bfrp bulk for tests
+  $('.bfrp-table .dispute_check_box').click ->
+    $('.bfrp-table .dispute_check_box.bfrp-checkbox').each ->
+      $(this).attr('class', 'dispute_check_box')  # clean slate these classes
+
+    $('.bfrp-table .dispute_check_box:checked').each (i) ->
+      id_class = 'wlbl-result-no-' + i
+      $(this).addClass('bfrp-checkbox')
+      $(this).addClass(id_class)
+
   # wl/bl dropdowns, click a wl/bl list cell or tc cell and it will toggle the adjacent cb
   $.merge(list_cells, tc_cells).click (e) ->
     unless e.target.nodeName.toLowerCase() == 'input'
@@ -928,7 +947,7 @@ window.add_wlbl_threat_cat_listeners = () ->
     $(this).html('Processing...<span class="mini-loader loader-white"></span>').prop('disabled', true)
 
   # research rows: on page load, verify we're on research tab or bfrp, and then verify the wl/bl has text
-  if ($('#research-tab').length or $('.reputation-research-search-wrapper').length) and $('.wlbl-table-result').text().trim() != ''
+  if ($('#research-tab').length || $('.reputation-research-search-wrapper').length) && $('.wlbl-table-result').text().trim() != ''
     $('.research-table-row').each ->
       ip_uri = $(this).find('.entry-data-content').text().trim()
       tc_area = $(this).find('.wlbl-tc-research-span')
@@ -966,6 +985,7 @@ window.add_wlbl_threat_cat_listeners = () ->
     # Dropdown for adjust wl/bl, add some shortcuts for all these vars
     $(dropdown_id).ready ->
       lists_row = $(this).find('.lists-row')
+      old_lists = $(this).find('.wlbl-entry-wlbl').text().trim()
       wl_num = $(this).find('.lists-row input[value^="WL-"]:checked').length
       bl_num = $(this).find('.lists-row input[value^="BL-"]:checked').length
       tc_row = $(this).find('.threat-cat-row')
@@ -995,23 +1015,26 @@ window.add_wlbl_threat_cat_listeners = () ->
         $(dropdown_id).find('.threat-cat-row input').prop('checked', false)
         tc_row.addClass('hidden')
 
-      # BULK SPECIFIC
-      # clean slate the disabled for wl/bl cb's
-      if (wl_num == 0 && bl_num == 0) || (wl_num > 0 && bl_num > 0)
-        $(dropdown_id).find(":checkbox").prop('disabled',false).closest('li').css('opacity','1')
+      # ensure user doesnt accidentally select both wl's and bl's at same time, don't bother if curr lists has wl's and bl's
+      # if user selects a BL cb, gray out and disable the WL cb's, for example
+      unless old_lists.includes('WL-') and old_lists.includes('WL-')
+        if wl_num > 0 || bl_num > 0
+          if wl_num > 0 then curr_cbs = 'BL-'
+          if bl_num > 0 then curr_cbs = 'WL-'
+          $(dropdown_id).find(":checkbox[value^='#{curr_cbs}']")
+            .prop('disabled',true).closest('li').addClass('grayed-out')
 
-      # ensure user doesnt accidentally select both wl's and bl's at the same time
-      if wl_num > 0 || bl_num > 0
-        if wl_num > 0 then curr_cbs = 'BL-'
-        if bl_num > 0 then curr_cbs = 'WL-'
-        $(dropdown_id).find(":checkbox[value^='#{curr_cbs}']")
-          .prop('disabled',true).closest('li').css('opacity','0.6')
+        else if wl_num == 0 || bl_num == 0
+          if wl_num == 0 then curr_cbs = 'BL-'
+          if bl_num == 0 then curr_cbs = 'WL-'
+          $(dropdown_id).find(":checkbox[value^='#{curr_cbs}']")
+            .prop('disabled',false).closest('li').removeClass('grayed-out')
 
-      else if wl_num == 0 || bl_num == 0
-        if wl_num == 0 then curr_cbs = 'BL-'
-        if bl_num == 0 then curr_cbs = 'WL-'
-        $(dropdown_id).find(":checkbox[value^='#{curr_cbs}']")
-          .prop('disabled',false).closest('li').css('opacity','1')
+        # BULK SPECIFIC
+        # clean slate the disabled states for wl/bl cb's, at-a-time validation
+        if (wl_num == 0 && bl_num == 0) || (wl_num > 0 && bl_num > 0)
+          $(dropdown_id).find(":checkbox").prop('disabled',false).closest('li').removeClass('grayed-out')
+
 
       # Add / Remove - clean slate on click, .merge() allows selecting mult vars in jquery
       $.merge(add_radio, remove_radio).click ->
@@ -1023,8 +1046,7 @@ window.add_wlbl_threat_cat_listeners = () ->
         tc_text_array = $('.wlbl-threat-cat').text().trim().split(', ')  # tc_text_array is array of 'Bogon','Botnets', etc
         tc_cell_array = $(dropdown_id).find('.threat-cat-cell').toArray()
         $.merge(lists_row, tc_note_max).addClass('hidden')
-        unless $('body').hasClass('research-action')  # bfrp can't replace tc's right now, will remove this when ready
-          $.merge(tc_row, tc_note_replace).removeClass('hidden')
+        $.merge(tc_row, tc_note_replace).removeClass('hidden')
         $(dropdown_id).find('.dispute-wlbl-adjust-wrapper input:checkbox').prop('checked', false)
 
         disableSubmit()
@@ -1078,3 +1100,4 @@ window.add_wlbl_threat_cat_listeners = () ->
 $ ->
   add_wlbl_threat_cat_listeners()
 
+  # bfrp fyi: threat category row is hidden on BFRP through the CSS, fyi
