@@ -473,13 +473,23 @@ window.submit_bulk_wlbl = (page) ->
   # ADD TO LISTS BULK
   if adjustment_type == 'add' or adjustment_type == 'replace'
     console.log 'bulk scenario 1'  # index/show add/replace: use new endpoint + entry url array
+
+    # REPLACE THREAT CATEGORIES BULK
+    if adjustment_type == 'replace'
+      list_types = ['BL-weak']  # hardcoded, this will be ignored on a 'replace', this is intentional
+
     data =
-      dispute_entries: disputes_array   # new object, this needs to be dispute_entries (ids), not urls
-      lists: list_types
+      lists: list_types  # new object, this needs to be dispute_entries (ids), not urls
       note: wlbl_comment
       thrt_cat_ids: thrt_cat_ids
       adjustment_type: adjustment_type
     endpoint = '/escalations/api/v1/escalations/webrep/disputes/bulk_wlbl_threatcat_adjust'
+
+    # on index or show bulk (not bfrp), must use dispute entry ids array
+    if $('.bfrp-table').length == 0
+      data.dispute_entries = disputes_array
+    else # on bfrp bulk? pass in urls, has to be done, no ids on bfrp
+      data.urls = ip_uris
 
   # REMOVE FROM LISTS BULK
   else if adjustment_type == 'remove'
@@ -502,7 +512,7 @@ window.submit_bulk_wlbl = (page) ->
     "<div class='wlbl-info-modal'><p>The following entries: </p>
       <span>#{ip_uris.join('<br>')}</span>"
 
-  if unique_lists.length
+  if unique_lists.length && adjustment_type != 'replace'   # replace is for TC's only
     modal_info_string +=
       "<span>Have been #{modal_action} the following WBRS Lists:
         <p>#{unique_lists.join(', ')}</p></span>"
@@ -929,7 +939,6 @@ window.add_wlbl_threat_cat_listeners = () ->
     $('.dispute-wlbl-adjust-wrapper .dropdown-submit-button').html('Submit Changes')
 
 
-
   # bfrp CLICK INPUT: add id's to this cb (on page) to bfrp bulk (in dropdown) for tests
   $('.bfrp-table .dispute_check_box').click ->
     $('.bfrp-table .dispute_check_box').each (i) ->
@@ -938,7 +947,7 @@ window.add_wlbl_threat_cat_listeners = () ->
       $(this).addClass("bfrp-checkbox-#{i}")
 #
     $('.bfrp-table .dispute_check_box:checked').each (i) ->
-      $(this).addClass('bfrp-result-no-' + i)    # then for checked, add the clicked class for testing
+      $(this).addClass("bfrp-result-no-#{i}")    # then for checked, add class for testing
 
 
   # wl/bl dropdowns, click a wl/bl list cell or tc cell and it will toggle the adjacent cb
