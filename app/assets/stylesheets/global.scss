@@ -10802,15 +10802,13 @@ span.threat-cat-no-data {
   opacity: 0.6;
 }
 
-// BFRP TEMPORARY: REMOVE THIS WHEN READY
-// hide the threat cat row + replace radio, we can't replace threat categories currently on bfrp
-// on the new endpoint, no entry.id's
-.research-action .dispute-wlbl-adjust-wrapper {
-  .threat-cat-row {
-    //display: none;
+// bfrp: we can't replace threat cats currently on bfrp due to no entry.id's to use
+.research-action {
+  .inline-wlbl-form .threat-cat-row {
+    display: none;  // we need the bulk tc row to show for adding to bl's
   }
-  .replace-tc-radio {
-    //display: none;
+  .bulk-wlbl-form .replace-tc-radio {
+    display: none;  // on bulk, hide ability to replace
   }
 }
 

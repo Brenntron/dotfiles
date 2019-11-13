@@ -29,7 +29,7 @@
             %button#wlbl_entries_button.toolbar-button.adjust-wlbl-button.dropdown-toggle.esc-tooltipped.toolbar-button-spacer{title: 'Adjust WL/BL', 'data-toggle': 'dropdown', 'aria-haspopup': 'true', 'aria-expanded': 'false', onclick: 'bulk_get_current_wlbl("research")'}
               %span.toolbar-button-text Adjust WBRS WL/BL
             .dropdown-menu.toolbar-dropdown#wlbl_adjust_entries{'aria-labelledby': 'wlbl_entries_button'}
-              = form_for :wlbl, html: {class: 'adjust-wlbl-form'} do |wlbl_form|
+              = form_for :wlbl, html: {class: 'adjust-wlbl-form bulk-wlbl-form'} do |wlbl_form|
                 .dispute-wlbl-adjust-wrapper
                   .dropdown-tool-text-divider.primary-text-divider
                     Current WBRS Reputation
@@ -251,7 +251,7 @@
                           %button.dispute-inline-buttons.adjust-wlbl-button.bfrp-inline-wlbl-button.dropdown-toggle{title: 'Adjust WL/BL', 'data-toggle': 'dropdown', 'aria-haspopup': 'true', 'aria-expanded': 'false', onclick: 'get_current_wlbl(this);', class: "bfrp-inline-wlbl-#{i}"}
                           -# adding a unique id for this wl/bl dropdown + strip out special chars
                           .dropdown-menu{id: "wlbl_adjust_#{entry.hostlookup.gsub!(/[.:\/]/,'')}"}
-                            = form_for :wlbl, html: {class: 'adjust-wlbl-form'} do |wlbl_form|
+                            = form_for :wlbl, html: {class: 'adjust-wlbl-form inline-wlbl-form'} do |wlbl_form|
                               .dispute-wlbl-adjust-wrapper
                                 %input.adjust-wlbl-input.dispute-entry-content{type: 'hidden', value: "#{entry.hostlookup}" }
                                 %h3 Adjust WL/BL

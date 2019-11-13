@@ -938,7 +938,6 @@ window.add_wlbl_threat_cat_listeners = () ->
     $(dd).find('.tc-replace-note, .threat-cat-row, .replace-tc-radio').addClass('hidden')
     $('.dispute-wlbl-adjust-wrapper .dropdown-submit-button').html('Submit Changes')
 
-
   # bfrp CLICK INPUT: add id's to this cb (on page) to bfrp bulk (in dropdown) for tests
   $('.bfrp-table .dispute_check_box').click ->
     $('.bfrp-table .dispute_check_box').each (i) ->
@@ -1113,5 +1112,5 @@ window.add_wlbl_threat_cat_listeners = () ->
 $ ->
   add_wlbl_threat_cat_listeners()
 
-  # bfrp fyi: threat category row is hidden on BFRP through the CSS, fyi
+  # bfrp fyi: threat category row is hidden on BFRP through the CSS, look for .threat-cat-row in global
 
