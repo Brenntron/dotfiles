@@ -200,17 +200,19 @@ window.multiple_url_categorization = () ->
 
 
 window.inheritCategories = (complaint_entry_id) ->
+  loader = $("[entry_id='" + complaint_entry_id + "']").find('.inline-loader')
+  loader.css('display', 'flex')
   std_msg_ajax(
     url:'/escalations/api/v1/escalations/webcat/complaint_entries/inherit_categories_from_master_domain'
     method: 'POST'
     data: {'id': complaint_entry_id}
     success: (response) ->
-      $('#loader-modal').modal 'hide'
+      loader.css('display', 'none')
       $('.domain-categories').hide()
       std_msg_success('Success',["Successfully inherited categories from main domain."], reload: false)
 
     error: (response) ->
-      $('#loader-modal').modal 'hide'
+      loader.css('display', 'none')
       std_msg_error('Error' + ' ' + response.responseJSON.message,"", reload: false)
     )
 
@@ -218,11 +220,9 @@ name_servers =(server_list)->
   if undefined == server_list
     ''
   else
-    i = 0
     text = ""
-    while i < server_list.length
-      text += server_list[i] + '<br>'
-      i++
+    for server in server_list
+      text += server + '<br>'
     text
 
 format_domain_info = (info)->
@@ -335,14 +335,12 @@ window.updatePending = (id,row_id) ->
     categories = $('#input_cat_'+id).val().toString()
 
   named_categories = ""
-  i = 0
   if categories == null
     cat_array = []
   else
     cat_array = categories.split(',')
-    while i < cat_array.length
-      named_categories = named_categories + selectizeControl.getItem(cat_array[i]).text()
-      i++
+    for cat, i in cat_array
+      named_categories = named_categories + selectizeControl.getItem(cat).text()
       if i < cat_array.length
         named_categories += ", "
 
@@ -363,7 +361,6 @@ window.updatePending = (id,row_id) ->
           $(td).addClass 'nested-complaint-data-wrapper'
         if was_dismissed
           temp_row.node().className += ' highlight-was-dismissed'
-
         temp_row.data().uri = uri
         temp_row.data().category = categories
         temp_row.data().status = status
@@ -606,11 +603,9 @@ window.return_selected = ()->
           notice_html = "<p>Something went wrong: #{json.error}</p>"
           std_msg_error('return error', json.error)
         else
-          i = 0
-          while i < selected_rows[0].length
-            selected_rows.data().cell(selected_rows[0][i],14).data("Vrt Incoming").draw()
-            selected_rows.data().cell(selected_rows[0][i],4).data("NEW").draw()
-            i++
+          for row, i in selected_rows[0]
+            selected_rows.data().cell(row,14).data("Vrt Incoming").draw()
+            selected_rows.data().cell(row,4).data("NEW").draw()
 
       error: (response) ->
         notice_html = "<p>Something went wrong: #{response.responseText}</p>"
@@ -680,9 +675,7 @@ window.enlarge_image = (id,image,retake_in_progress)->
 
 window.lookup_prefix = () ->
 
-  $('#loader-modal').modal({
-    keyboard: false
-  })
+  $('.lookup-drop-loader').removeClass('hidden')
 
   urls = []
 
@@ -712,12 +705,13 @@ window.lookup_prefix = () ->
           i++
           continue
         i++
-      $('#loader-modal').modal 'hide'
+      $('.lookup-drop-loader').addClass('hidden')
   )
 
 window.retrieve_history = (position) ->
   $(".cat-url-error").hide()
-
+  loader = $('.lookup-drop-loader')
+  loader.removeClass('hidden')
   for url_position in [1..5]
     $("#url_#{url_position}").css("border-width", "")
     $("#url_#{url_position}").css("border-color", "")
@@ -726,17 +720,13 @@ window.retrieve_history = (position) ->
 
   if url.length > 0
 
-    $('#loader-modal').modal({
-      keyboard: false
-    })
-
     std_msg_ajax(
       url: '/escalations/api/v1/escalations/webcat/complaint_entries/categorize_urls_history'
       method: 'POST'
       data: {'position': position, url: url}
-      success: (response) ->
-        $('#loader-modal').modal 'hide'
 
+      success: (response) ->
+        loader.addClass('hidden')
         json = JSON.parse(response)
         if json.error
           std_msg_error("<p>Something went wrong: #{json.error}","")
@@ -778,7 +768,7 @@ window.retrieve_history = (position) ->
 
       error: (response) ->
         $("#cat-url-error-message-#{position}").text("No history associated with this url.")
-        $('#loader-modal').modal 'hide'
+        loader.addClass('hidden')
         $("#cat-url-#{position}").show()
         $("#url_#{position}").css("border-width", "2px")
         $("#url_#{position}").css("border-color", "#E47433")
@@ -795,9 +785,7 @@ window.drop_current_categories = () ->
   $(".cat-url-error").hide()
   $(".cat-url-success").hide()
 
-  $('#loader-modal').modal({
-    keyboard: false,
-  })
+  $('.lookup-drop-loader').removeClass('hidden')
 
   $("#url_#{i}").css("border-width", "")
   $("#url_#{i}").css("border-color", "")
@@ -825,8 +813,9 @@ window.drop_current_categories = () ->
           $("#url_#{key}").css("border-color", "#E47433")
           $("#cat-url-error-message-#{key}").text("Unable to drop categories.")
           $("#cat-url-#{key}").show()
-      $('#loader-modal').modal 'hide'
+      $('.lookup-drop-loader').addClass('hidden')
     error: (response) ->
+      $('.lookup-drop-loader').addClass('hidden')
       std_msg_error("<p>There has been an error dropping categories: #{json.error}","")
 )
 
@@ -1638,8 +1627,8 @@ window.triggerTooltips = (item) ->
 
 window.master_submit = () ->
   data = []
-
-  $('.inline-loader').css('display', 'flex')
+  loader = $('.inline-loader')
+  loader.css('display', 'flex')
 
   $('.selected + tr td.nested-complaint-data-wrapper').each ->
     entry_id = $(this).find('tr').attr('entry_id')
@@ -1742,7 +1731,7 @@ window.master_submit = () ->
       if errors == true
         std_msg_error(error_msg,"")
       else
-        $('#loader-modal').modal 'hide'
+        loader.css('display', 'none')
         std_msg_success('Success',["All complaints successfully processed."], reload: true)
 
       tds = $('#complaints-index tbody').closest('td')
@@ -1751,7 +1740,7 @@ window.master_submit = () ->
           td.classList.add('nested-complaint-data-wrapper')
 
     error: (response) ->
-      $('#loader-modal').modal 'hide'
+      loader.css('display', 'none')
       std_msg_error("Unable to submit changes for selected entries.","", reload: false)
 
   , this)
@@ -1864,10 +1853,8 @@ $ ->
         radio_button = $(this).prev('.ticket-status-radio')
         $(radio_button[0]).trigger('click')
         entry_ids = []
-        i = 0
-        while i < selected_rows[0].length
+        for row, i in selected_rows[0]
           entry_ids.push(selected_rows.data()[i].entry_id)
-          i++
         data = {
           complaint_entry_ids: entry_ids,
           resolution_name: $(radio_button).attr('id')

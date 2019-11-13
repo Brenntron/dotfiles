@@ -6,7 +6,8 @@ window.apply_filter_to_table = () ->
 
 window.populate_clusters_index_table = (filter) ->
   if $('#clusters-index_wrapper').length > 0
-    $('.cluster-mgt-loader-wrapper').removeClass('hidden')
+    loader = $('.cluster-mgt-loader-wrapper')
+    loader.removeClass('hidden')
     filter_param = ""
     if filter
       filter_param = "?regex=" + filter
@@ -17,7 +18,7 @@ window.populate_clusters_index_table = (filter) ->
       method: 'GET'
       headers: headers
       success: (response) ->
-        $('.cluster-mgt-loader-wrapper').addClass('hidden')
+        loader.addClass('hidden')
         json = $.parseJSON(response)
         if json.data.length == 0
           std_msg_error("No clusters available.","")
@@ -33,11 +34,13 @@ window.populate_clusters_index_table = (filter) ->
           $("#total_results").html(json.meta.rows_found)
 
       error: (response) ->
+        loader.addClass('hidden')
         std_msg_error('Table Error', [response.responseText])
     , this)
 
 window.categorize_clusters = () ->
-
+  loader = $('.cluster-mgt-loader-wrapper')
+  loader.removeClass('hidden')
   user_id = $("#user_id").val()
   comment = $("#cluster_comment_field").val()
   #cluster_id comment category_ids
@@ -67,7 +70,7 @@ window.categorize_clusters = () ->
     headers: headers
     data: data
     success: (response) ->
-
+      loader.addClass('hidden')
       json = $.parseJSON(response)
       if json.error
         std_msg_error('Process Error', [json.error])
@@ -80,6 +83,7 @@ window.categorize_clusters = () ->
           populate_clusters_index_table()
 
     error: (response) ->
+      loader.addClass('hidden')
       std_api_error(response, "There was an error loading search results.", reload: false)
   , this)
 

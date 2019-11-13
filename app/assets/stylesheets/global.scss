@@ -8020,6 +8020,20 @@ td.text-center span {
     margin-top: -5px;
   }
 }
+#cat_multiple_urls, #cat_dif_submit{
+  margin-top: 20px;
+}
+#categorize-same-form, #categorize-diff-form{
+    .webcat-loader {
+      margin: -10px 10%;
+      position: absolute;
+      display: inline-block;
+    }
+    .loader-msg{
+      width: 90px;
+      margin-top: 6px;
+    }
+}
 .cluster-table-toolbar {
   margin-bottom: 0;
 }
@@ -10148,7 +10162,17 @@ input[type="radio"].resolution_radio_button {
   background-size: 28px 28px;
   top: 4px;
 }
-
+.lookup-drop-loader{
+  display: block;
+  margin: 30px 35%;
+  width: 30px;
+  position: absolute;
+  border: none!important;
+  .loader-msg{
+    position: absolute;
+    margin-top: 5px;
+  }
+}
 // webrep and webcat toolbars - between 1800px and 1600px, prevent breaking/wrapping of the buttons
 @media screen and (max-width: 1800px) and (min-width: 1600px) {
   #webrep-index-toolbar, #webcat-index-toolbar {
