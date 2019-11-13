@@ -82,9 +82,8 @@ check_wbnp = window.check_wbnp_status = (wbnp_report_id) ->
 window.updateURI = (event, complaint_entry_id) ->
   event.preventDefault()
 
-  $('#loader-modal').modal({
-    keyboard: false
-  })
+  loader = $("[entry_id='" + complaint_entry_id + "']").find('.inline-loader')
+  loader.css('display', 'flex')
 
   uri = $("#complaint_prefix_#{complaint_entry_id}").val()
 
@@ -95,7 +94,7 @@ window.updateURI = (event, complaint_entry_id) ->
     success: (response) ->
       {current_categories, category, wbrs_score, domain, subdomain, path, status} = response.json
 
-      $('#loader-modal').modal 'hide'
+      loader.css('display', 'none')
 
       $(".simple-nested-table#entry-table-#{complaint_entry_id} tbody > tr").remove()
 
@@ -111,7 +110,6 @@ window.updateURI = (event, complaint_entry_id) ->
         $("#category_#{complaint_entry_id}").text(category)
         $("#wbrs_score_#{complaint_entry_id}").text(wbrs_score)
         query_who_params = "#{domain}, #{complaint_entry_id}"
-        console.log query_who_params
         $("#entry-uri-#{complaint_entry_id}").html("<a href='http://#{uri}' target='_blank' onclick='select_cat_text_field(#{complaint_entry_id})' >#{uri}</a>")
         $("#site-search-#{complaint_entry_id}").html("<a href='https://www.google.com/search?q=site%3A#{uri}' target='_blank' onclick='select_cat_text_field(#{complaint_entry_id})'>#{uri}</a>")
 
@@ -119,7 +117,7 @@ window.updateURI = (event, complaint_entry_id) ->
         $("#history-#{complaint_entry_id}").replaceWith('<button class="secondary" id="history-' + complaint_entry_id + '" onclick="history_dialog(' + complaint_entry_id + ',\'' + uri + '\')">History</button>')
         $("#domain-#{complaint_entry_id}").replaceWith('<button class="secondary" id="domain-' + complaint_entry_id + '" onclick="domain_whois(\''+query_who_params+'\')">Domain</button>')
     error: (response) ->
-      $('#loader-modal').modal 'hide'
+      loader.css('display', 'none')
       std_msg_error("Unable to update URI", [response.responseJSON.message], reload: false)
 
  )
