@@ -927,17 +927,22 @@ window.add_wlbl_threat_cat_listeners = () ->
     $(dd).find('.tc-replace-note, .threat-cat-row, .replace-tc-radio').addClass('hidden')
     $('.dispute-wlbl-adjust-wrapper .dropdown-submit-button').html('Submit Changes')
 
-  # bfrp: add a pre-checked cb identifier here, on PAGE LOAD
+  # verify this:
+  # bfrp PAGE LOAD: add a pre-checked cb identifier here, on PAGE LOAD
   $('.bfrp-table').ready ->
     if $('.bfrp-table .dispute_check_box:checked').length == 0
       $('.bfrp-table .dispute_check_box').each (i) ->
         cb_class = 'bfrp-checkbox-' + i
         $(this).addClass(cb_class)
 
-  # bfrp: to add id's to bfrp bulk for tests
+  # verify this:
+  # bfrp CLICK INPUT: to add id's to bfrp bulk for tests, on each click, do this
   $('.bfrp-table .dispute_check_box').click ->
-    $('.bfrp-table .dispute_check_box.bfrp-checkbox').each ->
-      $(this).attr('class', 'dispute_check_box')  # clean slate these classes
+    $('.bfrp-table .dispute_check_box').each (i) ->
+      cb_class = 'bfrp-checkbox-' + i
+      $(this).attr('class','')   # CLEAN SLATE ALL THE CLASSES
+      $(this).addClass('dispute_check_box')
+      $(this).addClass(cb_class)
 
     $('.bfrp-table .dispute_check_box:checked').each (i) ->
       id_class = 'wlbl-result-no-' + i
