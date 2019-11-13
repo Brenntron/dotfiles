@@ -10134,7 +10134,7 @@ input[type="radio"].resolution_radio_button {
 }
 
 // webrep and webcat toolbars - between 1800px and 1600px, prevent breaking/wrapping of the buttons
-@media screen and (max-width: 1800px) and (min-width: 1690px) {
+@media (min-width: 1850px) {
   #webrep-index-toolbar, #webcat-index-toolbar {
     .toolbar-button {
       background-position: 4px 6px;
@@ -10146,14 +10146,14 @@ input[type="radio"].resolution_radio_button {
     }
   }
 }
-@media screen and (max-width: 1800px) and (min-width: 1690px){
+@media screen and (max-width: 1800px) and (min-width: 1705px){
   #webcat-index-toolbar .toolbar-button-text {
     .toolbar-button {
       background-position: 4px 6px;
     }
   }
 }
-@media (max-width: 1690px)  {
+@media (max-width: 1850px)  {
   #webcat-index-toolbar .toolbar-button-text {
     display: none !important;
   }
