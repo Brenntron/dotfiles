@@ -128,7 +128,7 @@ window.cat_new_url = ()->
 
   data = {}
   isEmpty = true
-
+  loader = $('#categorize-diff-form').find('.webcat-loader')
   for i in [1...6] by 1
 
     categories = []
@@ -143,20 +143,18 @@ window.cat_new_url = ()->
 
   if isEmpty == false
 
-    $('#loader-modal').modal({
-      keyboard: false
-    })
+    loader.removeClass('hidden')
 
     std_msg_ajax(
       url:'/escalations/api/v1/escalations/webcat/complaints/cat_new_url'
       method: 'POST'
       data: {data: data}
       success: (response) ->
-        $('#loader-modal').modal 'hide'
+        loader.addClass('hidden')
         std_msg_success('URLs categorized successfully',["Categorization of a Top URL will create a pending complaint entry.", "All other entries have been submitted directly to WBRS."], reload: true)
 
       error: (response) ->
-        $('#loader-modal').modal 'hide'
+        loader.addClass('hidden')
         if response.responseText.includes('Either no products have been defined to enter bugs against or you have not been given access to any.')
           std_api_error(response, "Please make sure you have the appropriate permissions in Bugzilla. Unable to categorize url.", reload: false)
         else
@@ -174,35 +172,32 @@ window.webcat_reset_search = ()->
   tags_control = tags_select[0].selectize
   tags_control.clear()
 
-window.multiple_url_categorization = ()->
+window.multiple_url_categorization = () ->
 
   urls = $("#categorize_urls").val().split(/\n/)
   category_ids = $("#multi_cat_url_cats").val()
   category_names = []
-
+  loader = $('#categorize-urls-form-wrapper').find('.webcat-loader')
   for category in $("#multi_cat_url_cats")
     for i in [0..5] by 1
       if category[i]
         category_names.push(category[i].text)
 
   if $("#categorize_urls").val() != "" && category_ids != null && category_names != null
-    $('#loader-modal').modal({
-      keyboard: false
-    })
-
+    loader.removeClass('hidden')
     std_msg_ajax(
       url:'/escalations/api/v1/escalations/webcat/complaints/multi_cat_new_url'
       method: 'POST'
       data: {urls: urls, category_names: category_names, category_ids: category_ids}
       success: (response) ->
-        $('#loader-modal').modal 'hide'
+        loader.addClass('hidden')
         std_msg_success('Success',["URLs/IPs successfully categorized."], reload: true)
       error: (response) ->
-        $('#loader-modal').modal 'hide'
+        loader.addClass('hidden')
         std_msg_error('Error' + ' ' + response.responseJSON.message,"", reload: false)
     )
   else
-    $('#loader-modal').modal 'hide'
+    loader.addClass('hidden')
     std_msg_error('Error', ['Please check that a URL/IP has been inputted and that at least one category was selected.'], reload: false)
 
 
