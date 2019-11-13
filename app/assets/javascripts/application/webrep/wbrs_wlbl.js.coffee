@@ -927,24 +927,18 @@ window.add_wlbl_threat_cat_listeners = () ->
     $(dd).find('.tc-replace-note, .threat-cat-row, .replace-tc-radio').addClass('hidden')
     $('.dispute-wlbl-adjust-wrapper .dropdown-submit-button').html('Submit Changes')
 
-  # bfrp PAGE LOAD: add a pre-checked cb identifier here
-  $('.bfrp-table').ready ->
-    if $('.bfrp-table .dispute_check_box:checked').length == 0
-      $('.bfrp-table .dispute_check_box').each (i) ->
-        cb_class = 'bfrp-checkbox-' + i
-        $(this).addClass(cb_class)
 
+    
   # bfrp CLICK INPUT: add id's to this cb (on page) to bfrp bulk (in dropdown) for tests
   $('.bfrp-table .dispute_check_box').click ->
     $('.bfrp-table .dispute_check_box').each (i) ->
-      cb_class = 'bfrp-checkbox-' + i
       $(this).attr('class','')   # clean slate the cbs to default first on each click
-      $(this).addClass('dispute_check_box')
-      $(this).addClass(cb_class) # add a pre-checked cb identifier here
-
+      $(this).addClass("dispute_check_box", "bfrp-checkbox-#{i}")
+#
     $('.bfrp-table .dispute_check_box:checked').each (i) ->
-      id_class = 'wlbl-result-no-' + i
-      $(this).addClass(id_class)    # then for checked, add the clicked class for testing
+      $(this).addClass('bfrp-result-no-' + i)    # then for checked, add the clicked class for testing
+
+
 
   # wl/bl dropdowns, click a wl/bl list cell or tc cell and it will toggle the adjacent cb
   $.merge(list_cells, tc_cells).click (e) ->

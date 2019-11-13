@@ -218,16 +218,15 @@
     .col-xs-12
       %table#disputes-research-table.table.table-sm.bfrp-table
         %tbody
-          - @entries.each do |entry|
-            -# currently entry.id here on bfrp does not work, regardless if this url is on a ticket entry or not
-            %tr.research-table-row{'data-entry-id': "#{entry.id}"}
+          - @entries.each_with_index do |entry, i|
+            %tr.research-table-row{'data-entry-id': "#{entry.id}", class: "result-no-#{i}"}
               %td.research-table-row-wrapper
                 %table
                   %tr.research-first-row
                     %td.expandable-row-column
                       %button.expand-row-button-inline{'data-entry-id': "#{entry.id}"}
                     %td
-                      %input.dispute_check_box{type: 'checkbox', 'data-entry-id': "#{entry.id}"}
+                      %input.dispute_check_box{type: 'checkbox', class: "bfrp-checkbox-#{i}", 'data-entry-id': "#{entry.id}"}
                     %td
                       - if entry[:is_important]
                         %span.entry-data.entry-data-content.entry-important-flag
@@ -249,7 +248,7 @@
                     %td.dispute_rep_tools
                       %span.dispute_rep_tools_wrapper
                         %span.dropdown
-                          %button.dispute-inline-buttons.adjust-wlbl-button.bfrp-inline-wlbl-button.dropdown-toggle{title: 'Adjust WL/BL', 'data-toggle': 'dropdown', 'aria-haspopup': 'true', 'aria-expanded': 'false', onclick: 'get_current_wlbl(this);'}
+                          %button.dispute-inline-buttons.adjust-wlbl-button.bfrp-inline-wlbl-button.dropdown-toggle{title: 'Adjust WL/BL', 'data-toggle': 'dropdown', 'aria-haspopup': 'true', 'aria-expanded': 'false', onclick: 'get_current_wlbl(this);', class: "bfrp-inline-wlbl-#{i}"}
                           -# adding a unique id for this wl/bl dropdown + strip out special chars
                           .dropdown-menu{id: "wlbl_adjust_#{entry.hostlookup.gsub!(/[.:\/]/,'')}"}
                             = form_for :wlbl, html: {class: 'adjust-wlbl-form'} do |wlbl_form|
