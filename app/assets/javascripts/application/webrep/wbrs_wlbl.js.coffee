@@ -958,7 +958,7 @@ window.add_wlbl_threat_cat_listeners = () ->
       $(this).addClass("bfrp-checkbox-#{i}")
 #
     $('.bfrp-table .dispute_check_box:checked').each (i) ->
-      $(this).addClass("bfrp-result-no-#{i}")    # then for checked, add class for testing
+      $(this).addClass("bfrp-dd-result-no-#{i}")    # then for checked, add class for testing
 
 
   # wl/bl dropdowns, click a wl/bl list cell or tc cell and it will toggle the adjacent cb
