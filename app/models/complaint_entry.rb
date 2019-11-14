@@ -126,6 +126,7 @@ class ComplaintEntry < ApplicationRecord
 
             current_status = "COMPLETED"
             self.case_assigned_at ||= Time.now
+            # TODO categories_string is list of ids, but db uses list of names which is in category_names_string
             update!(status:current_status,
                    category: categories_string,
                    internal_comment: comment,
@@ -134,15 +135,21 @@ class ComplaintEntry < ApplicationRecord
                    user:current_user)
             complaint.set_status(current_status)
             #this is where we should send off the category to the API
-            if self.resolution != STATUS_RESOLVED_FIXED_INVALID && !categories_string.blank?
-              commit_category(ip_or_uri: prefix,
-                              categories_string: categories_string,
-                              description: comment,
-                              user: current_user.email,
-                              casenumber: self.complaint.id)
+            if self.resolution != STATUS_RESOLVED_FIXED_INVALID && categories_string.present?
+              existing_prefixes = Wbrs::Prefix.where({urls: [prefix]})
+              commit_category_from_prefixes(existing_prefixes,
+                                            ip_or_uri: prefix,
+                                            categories_string: categories_string,
+                                            description: comment,
+                                            user: current_user.email,
+                                            casenumber: self.complaint.id)
+              update!(url_primary_category: category_names_string, category: category_names_string)
+            else
+              # TODO Do we need to update the record when we are not making a change?
+              existing_prefixes = Wbrs::Prefix.where({urls: [prefix]})
+              cat_from_wbrs = self.set_current_category_from_prefix(existing_prefixes)
+              update!(url_primary_category: cat_from_wbrs, category: cat_from_wbrs)
             end
-            cat_from_wbrs = self.set_current_category
-            update!(url_primary_category: cat_from_wbrs, category: cat_from_wbrs)
           else
             # dismiss from pending of important case
             current_status = "ASSIGNED"
@@ -167,6 +174,7 @@ class ComplaintEntry < ApplicationRecord
         # not important case or resolution is "unchanged"
         current_status = "COMPLETED"
         self.case_assigned_at ||= Time.now
+        # TODO categories_string is list of ids, but db uses list of names which is in category_names_string
         update!(resolution: entry_status,
                url_primary_category: categories_string,
                category: categories_string,
