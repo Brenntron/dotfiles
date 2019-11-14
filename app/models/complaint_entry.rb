@@ -744,7 +744,6 @@ class ComplaintEntry < ApplicationRecord
   end
 
   def get_category_names_from_master
-    byebug
     prefix_results = Wbrs::Prefix.where({:urls => [self.domain]})
 
     if self.entry_type == 'URI/DOMAIN'
