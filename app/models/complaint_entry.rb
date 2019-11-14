@@ -176,14 +176,16 @@ class ComplaintEntry < ApplicationRecord
                case_resolved_at: Time.now,user:current_user)
         complaint.set_status(current_status)
         #this is where we should send off the category to the API
+        existing_prefixes = Wbrs::Prefix.where({urls: [prefix]})
         if ![STATUS_RESOLVED_FIXED_INVALID,STATUS_RESOLVED_FIXED_UNCHANGED].include?(entry_status) && !categories_string.blank?
-          commit_category(ip_or_uri: prefix,
-                          categories_string: categories_string,
-                          description: comment,
-                          user: current_user.email,
-                          casenumber: self.complaint.id )
+          commit_category_from_prefixes(existing_prefixes,
+                                        ip_or_uri: prefix,
+                                        categories_string: categories_string,
+                                        description: comment,
+                                        user: current_user.email,
+                                        casenumber: self.complaint.id )
         end
-        cat_from_wbrs = self.set_current_category
+        cat_from_wbrs = self.set_current_category_from_prefix(existing_prefixes)
         update!(url_primary_category: cat_from_wbrs, category: cat_from_wbrs)
       end
       if self.status == "COMPLETED" && self.complaint_entry_screenshot.present?
@@ -689,7 +691,6 @@ class ComplaintEntry < ApplicationRecord
   # @return [String] Comma separated list of category descr fields.
   def set_current_category_from_prefix(prefix_results)
     category_list = []
-    # prefix_results = Wbrs::Prefix.where({:urls => [URI.escape(self.hostlookup)]})
     if prefix_results
       if prefix_results.first&.is_active == 1
 
