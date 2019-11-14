@@ -193,12 +193,11 @@ class ComplaintEntry < ApplicationRecord
 
   end
 
-  def commit_category(ip_or_uri:, categories_string:, description:, user:, casenumber: nil)
+  def commit_category_from_prefixes(existing_prefixes, ip_or_uri:, categories_string:, description:, user:, casenumber: nil)
     # Look for existing prefix
     is_ip_address = !!(ip_or_uri  =~ Resolv::IPv4::Regex)
 
     url_parts = Complaint.parse_url(ip_or_uri)
-    existing_prefixes = Wbrs::Prefix.where({urls: [ip_or_uri]})
     existing_prefix = nil
     if existing_prefixes.present? && !is_ip_address
       existing_prefixes.each do |prefix_found|
@@ -229,6 +228,16 @@ class ComplaintEntry < ApplicationRecord
     else
       Wbrs::Prefix.create_from_url(url: ip_or_uri, categories: category_ids_array, user: user, description: description)
     end
+  end
+
+  def commit_category(ip_or_uri:, categories_string:, description:, user:, casenumber: nil)
+    existing_prefixes = Wbrs::Prefix.where({urls: [ip_or_uri]})
+    commit_category_from_prefixes(existing_prefixes,
+                                  ip_or_uri: ip_or_uri,
+                                  categories_string: categories_string,
+                                  description: description,
+                                  user: user,
+                                  casenumber: casenumber)
   end
 
   def inherit_categories(ip_or_uri:, description:, user:, casenumber: nil)
