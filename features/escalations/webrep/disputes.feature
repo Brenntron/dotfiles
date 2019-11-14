@@ -408,7 +408,7 @@ Feature: Disputes
     And  clean up wlbl and remove all wlbl entries on "imadethisurlup.com"
 
 
-  @javascript 
+  @javascript
   Scenario: a user removes an entry from one WBRS list and adds it to another on the dispute show page
   #  after adding one first so we're starting with clean data
     Given a user with role "webrep user" exists and is logged in
@@ -542,18 +542,38 @@ Feature: Disputes
     When I goto "escalations/webrep/research"
     And  I choose "research-search-strict"
     And  I type content "1234computer.com" within input with id "search_uri"
-    Then I hit enter within "#search_uri"
+    Then I click "Submit"
     And  I wait for "10" seconds
     And  I should see "1 found"
-    And  I click ".bfrp-inline-wlbl-button"
-    And  I wait for "5" seconds
     And  take a screenshot
-#    And  Element with class "wlbl-tc-research-span" should have content "Malware Sites"
-# Why is this not working????
+    And  Element with class "wlbl-tc-research-span" should have content "Malware Sites"
 
+
+  @javascript @now
+  Scenario: a user searches for a url on the research page and adds a result to a WBRS List
+    Given a user with role "webrep user" exists and is logged in
+    When I goto "escalations/webrep/research"
+    And  I choose "research-search-strict"
+    And  I type content "testing.com" within input with id "search_uri"
+    Then I click "Submit"
+    And  I wait for "20" seconds
+    And  I should see "7 found"
+    And  I click ".bfrp-inline-wlbl-0"
+    And  I wait for "5" seconds
+    Then I click "#bl-med-slider"
+    And  I click "Submit Changes"
+    And  I wait for "5" seconds
+    And  I should see "ENTRY HAS BEEN UPDATED"
+    And  I click ".close"
+    And  I wait for "2" seconds
+    Then I click ".bfrp-inline-wlbl-0"
+    And  Element with class "wlbl-entry-wlbl" should have content "BL-med"
+
+
+    And  take a screenshot
 
   @javascript
-  Scenario: a user searches for a url on the research page and adds the result to a WBRS List
+  Scenario: a user searches for a url on the research page and removes a result from a WBRS List
     Given a user with role "webrep user" exists and is logged in
     When I goto "escalations/webrep/research"
     And  I choose "research-search-strict"
@@ -561,14 +581,32 @@ Feature: Disputes
     Then I hit enter within "#search_uri"
     And  I wait for "20" seconds
     And  take a screenshot
-    And  I click ".bfrp-inline-wlbl-button"
-    And  I wait for "5" seconds
+    And  I should see "6 found"
+
+  @javascript
+  Scenario: a user searches for a url on the research page and adds multiple results to a WBRS List
+    Given a user with role "webrep user" exists and is logged in
+    When I goto "escalations/webrep/research"
+    And  I choose "research-search-strict"
+    And  I type content "testing.com" within input with id "search_uri"
+    Then I hit enter within "#search_uri"
+    And  I wait for "20" seconds
+    And  take a screenshot
+    And  I should see "6 found"
+
+  @javascript
+  Scenario: a user searches for a url on the research page and removes multiple results to a WBRS List
+    Given a user with role "webrep user" exists and is logged in
+    When I goto "escalations/webrep/research"
+    And  I choose "research-search-strict"
+    And  I type content "testing.com" within input with id "search_uri"
+    Then I hit enter within "#search_uri"
+    And  I wait for "20" seconds
+    And  take a screenshot
+    And  I should see "6 found"
 
 
-# TODO   A user performs a search on BFRP and adds a result to a WBRS list
-# TODO   A user performs a search on BFRP and removes a result from a WBRS List
-# TODO   A user performs a search on BFRP and adds multiple results to a WBRS list
-# TODO   A user performs a search on BFRP and removes multiple results from a WBRS List
+
 
 
 
