@@ -113,7 +113,7 @@
                       .threat-cat-area
                         - Wbrs::ThreatCategory.selections.each do |label, value|
                           .threat-cat-cell
-                            = wlbl_form.check_box(:thrt_cat_id, {class: "wlbl_thrt_cat_id wlbl_thrt_cat_id_#{value}"}, value)
+                            = wlbl_form.check_box(:thrt_cat_id, {id: "bulk_tc_cb_#{value}", class: "wlbl_thrt_cat_id wlbl_thrt_cat_id_#{value}"}, value)
                             = label
                     -# END: WL BL LISTS ROW + THREAT CATS ROW
 
@@ -439,7 +439,7 @@
                                   .threat-cat-area
                                     - Wbrs::ThreatCategory.selections.each do |label, value|
                                       .threat-cat-cell
-                                        = wlbl_form.check_box(:thrt_cat_id, {class: "wlbl_thrt_cat_id wlbl_thrt_cat_id_#{value}"}, value)
+                                        = wlbl_form.check_box(:thrt_cat_id, {id: "inline_tc_cb_#{value}", class: "wlbl_thrt_cat_id wlbl_thrt_cat_id_#{value}"}, value)
                                         = label
                                 -# END: THREAT CATS ROW
 

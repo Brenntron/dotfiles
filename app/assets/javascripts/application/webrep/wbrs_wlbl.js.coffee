@@ -618,7 +618,7 @@ window.submit_individual_wlbl = (button_tag) ->
       data.dispute_entries = [ dispute_entry_id ]  # ADD/REPLACE ALWAYS NEEDS AN ENTRY-ID, NOT A URL this ends up down in the ajax call below
     else if location.href.includes('webrep/research')
       console.log 'inline scenario 2'  # BFRP add/replace using new endpoint + one entry id
-      data.urls = [ ip_uri ]  # THIS MUST BE URLS/IP_URI, there is no entry.id on bfrp currently
+      data.urls = [ dispute_url ]  # THIS MUST BE URLS/IP_URI, there is no entry.id on bfrp currently
 
     # continue building the modal info
     if new_lists_arr.length
@@ -638,8 +638,8 @@ window.submit_individual_wlbl = (button_tag) ->
 
     # continue building the modal info
     modal_info_string +=
-      "<span>#{dispute_url}</span><span>Has been removed from the following WBRS Lists:
-        <p>#{removed_lists_arr}</p></span>"
+      "<span>Has been removed from the following WBRS Lists:
+        <p>#{removed_lists_arr.join(', ')}</p></span>"
 
   # continue building the modal info outside of adjustment type
   if thrt_cat_ids.length
