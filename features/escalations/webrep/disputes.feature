@@ -552,17 +552,22 @@ Feature: Disputes
   @javascript @now
   Scenario: a user searches for a url on the research page and adds a result to a WBRS List
     Given a user with role "webrep user" exists and is logged in
+    And  clean up wlbl and remove all wlbl entries on "testing.com"
     When I goto "escalations/webrep/research"
     And  I choose "research-search-strict"
     And  I type content "testing.com" within input with id "search_uri"
     Then I click "Submit"
     And  I wait for "20" seconds
     And  I should see "7 found"
-    And  I click ".bfrp-inline-wlbl-0"
+    And  I click ".bfrp-inline-wlbl-6"
     And  I wait for "5" seconds
     Then I click "#bl-med-slider"
+    And  I should see "Threat Categories"
+    And  I click ".wlbl_thrt_cat_id_8"
+
     And  I click "Submit Changes"
     And  I wait for "5" seconds
+    And  take a screenshot
     And  I should see "ENTRY HAS BEEN UPDATED"
     And  I click ".close"
     And  I wait for "2" seconds
@@ -570,7 +575,7 @@ Feature: Disputes
     And  Element with class "wlbl-entry-wlbl" should have content "BL-med"
 
 
-    And  take a screenshot
+
 
   @javascript
   Scenario: a user searches for a url on the research page and removes a result from a WBRS List
@@ -581,7 +586,7 @@ Feature: Disputes
     Then I hit enter within "#search_uri"
     And  I wait for "20" seconds
     And  take a screenshot
-    And  I should see "6 found"
+    And  I should see "7 found"
 
   @javascript
   Scenario: a user searches for a url on the research page and adds multiple results to a WBRS List
@@ -592,7 +597,7 @@ Feature: Disputes
     Then I hit enter within "#search_uri"
     And  I wait for "20" seconds
     And  take a screenshot
-    And  I should see "6 found"
+    And  I should see "7 found"
 
   @javascript
   Scenario: a user searches for a url on the research page and removes multiple results to a WBRS List
@@ -603,7 +608,7 @@ Feature: Disputes
     Then I hit enter within "#search_uri"
     And  I wait for "20" seconds
     And  take a screenshot
-    And  I should see "6 found"
+    And  I should see "7 found"
 
 
 
