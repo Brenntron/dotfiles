@@ -592,7 +592,7 @@ window.submit_individual_wlbl = (button_tag) ->
     modal_action = 'removed from'
   else
     adjustment_type = 'add'
-    modal_action = 'updated for'
+    modal_action = 'added to'
 
 
   # build the confirmation modal
@@ -618,11 +618,21 @@ window.submit_individual_wlbl = (button_tag) ->
       console.log 'inline scenario 2'  # BFRP add/replace using new endpoint + one entry id
       data.urls = [ dispute_url ]  # THIS MUST BE URLS/IP_URI, there is no entry.id on bfrp currently
 
+
+
+    # ensure we're showing only non-duplicate lists in the modal for adding, THIS DOES NOT WORK FOR SHOWING THE LISTS ADDED
+    added_lists = []
+    $.each new_lists_arr, (i, entry) ->
+      if($.inArray(entry, old_lists_arr) == -1)
+        added_lists.push(entry)
+
+
+
     # continue building the modal info
-    if new_lists_arr.length
+    if new_lists_arr.length   # below shows on 'adding', 'replacing' deals with TC's, not lists
       modal_info_string +=
         "<span>Has been #{modal_action} the following WBRS Lists:
-          <p>#{new_lists_arr.join(', ')}</p></span>"
+          <p>#{added_lists.join(', ')}</p></span>"  # never just show 'new_lists' because that's not specific enough
 
   # REMOVE FROM LISTS INLINE
   else if adjustment_type = 'remove'

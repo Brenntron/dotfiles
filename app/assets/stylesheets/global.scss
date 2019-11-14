@@ -10804,9 +10804,6 @@ span.threat-cat-no-data {
 
 // bfrp: we can't replace threat cats currently on bfrp due to no entry.id's to use
 .research-action {
-  .inline-wlbl-form .threat-cat-row {
-    display: none;  // we need the bulk tc row to show for adding to bl's
-  }
   .bulk-wlbl-form .replace-tc-radio {
     display: none;  // on bulk, hide ability to replace
   }
