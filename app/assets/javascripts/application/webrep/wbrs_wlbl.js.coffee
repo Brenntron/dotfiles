@@ -587,6 +587,9 @@ window.submit_individual_wlbl = (button_tag) ->
   else if new_length == old_length and tc_length > 0
     adjustment_type = 'replace'
     modal_action = 'updated for'
+    if $('body').hasClass('research-action')
+      adjustment_type = 'add'  # for bfrp inline, IT MUST BE ADD, AND NOT REPLACE
+      modal_action = 'added to'
   else if new_length < old_length and tc_length == 0
     adjustment_type = 'remove'
     modal_action = 'removed from'
