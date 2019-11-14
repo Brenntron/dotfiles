@@ -676,9 +676,11 @@ class ComplaintEntry < ApplicationRecord
   ####RULEUI RULEAPI METHODS
   #
 
-  def set_current_category
+  # Assigns self.category field to list of categories (descr field) from WBRS.
+  # @return [String] Comma separated list of category descr fields.
+  def set_current_category_from_prefix(prefix_results)
     category_list = []
-    prefix_results = Wbrs::Prefix.where({:urls => [URI.escape(self.hostlookup)]})
+    # prefix_results = Wbrs::Prefix.where({:urls => [URI.escape(self.hostlookup)]})
     if prefix_results
       if prefix_results.first&.is_active == 1
 
@@ -691,12 +693,10 @@ class ComplaintEntry < ApplicationRecord
 
         self.url_primary_category = category_list.uniq.join(',')
         self.category = category_list.uniq.join(',')
-      else
-        categories = nil
       end
     end
 
-    category_list.uniq.join(',')
+    self.category
   rescue => except
 
     Rails.logger.warn "Populating categories from Wbrs failed."
@@ -704,6 +704,10 @@ class ComplaintEntry < ApplicationRecord
     Rails.logger.warn except.backtrace.join("\n")
 
     ''
+  end
+
+  def set_current_category
+    set_current_category_from_prefix(Wbrs::Prefix.where({:urls => [URI.escape(self.hostlookup)]}))
   end
 
   def self.get_category_data(uri)
