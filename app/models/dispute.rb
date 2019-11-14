@@ -1919,6 +1919,14 @@ class Dispute < ApplicationRecord
       #DisputeEntry.quick_bulk_rep_update(url, data[url], note)
     end
 
+    return_hash = {}
+    return_hash[:dispute_id] = new_dispute.id
+    return_hash[:dispute_entries] = []
+    new_dispute.dispute_entries.each do |entry|
+      return_hash[:dispute_entries] << {:dispute_entry_id => entry.id, :entry => entry.hostlookup}
+    end  
+
+    return return_hash
   end
 
 end
