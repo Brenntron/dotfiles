@@ -69,7 +69,7 @@ class Wbrs::Prefix < Wbrs::Base
     prefixes.inject([]) do |category_names, prefix|
       category_names += prefix.category_names
       category_names
-    end.uniq
+    end.uniq.join(',')
   end
 
   # Get a prefix by id

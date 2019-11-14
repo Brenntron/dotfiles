@@ -138,11 +138,11 @@ class ComplaintEntry < ApplicationRecord
             if self.resolution != STATUS_RESOLVED_FIXED_INVALID && categories_string.present?
               existing_prefixes = Wbrs::Prefix.where({urls: [prefix]})
               commit_category(existing_prefixes,
-                                            ip_or_uri: prefix,
-                                            categories_string: categories_string,
-                                            description: comment,
-                                            user: current_user.email,
-                                            casenumber: self.complaint.id)
+                              ip_or_uri: prefix,
+                              categories_string: categories_string,
+                              description: comment,
+                              user: current_user.email,
+                              casenumber: self.complaint.id)
               update!(url_primary_category: category_names_string, category: category_names_string)
             else
               # TODO Do we need to update the record when we are not making a change?
@@ -187,11 +187,11 @@ class ComplaintEntry < ApplicationRecord
         if ![STATUS_RESOLVED_FIXED_INVALID,STATUS_RESOLVED_FIXED_UNCHANGED].include?(entry_status) && categories_string.present?
           existing_prefixes = Wbrs::Prefix.where({urls: [prefix]})
           commit_category(existing_prefixes,
-                                        ip_or_uri: prefix,
-                                        categories_string: categories_string,
-                                        description: comment,
-                                        user: current_user.email,
-                                        casenumber: self.complaint.id )
+                          ip_or_uri: prefix,
+                          categories_string: categories_string,
+                          description: comment,
+                          user: current_user.email,
+                          casenumber: self.complaint.id )
           update!(url_primary_category: category_names_string, category: category_names_string)
         else
           # TODO Do we need to update the record when we are not making a change?
@@ -691,21 +691,16 @@ class ComplaintEntry < ApplicationRecord
 
   # Assigns self.category field to list of categories (descr field) from WBRS.
   # @return [String] Comma separated list of category descr fields.
-  # TODO Maybe this would be good to do in the Wbrs::Prefix class, to get list of category names
   def set_current_category_from_prefix(prefix_results)
-    category_list = []
     if prefix_results
       if prefix_results.first&.is_active == 1
 
-        categories = prefix_results.find_all {|result| result.path == self.path}
-        categories.each do |cat|
-          if cat.subdomain == self.subdomain
-            category_list << Wbrs::Category.find(cat.category_id).descr
-          end
-        end
+        qualified_prefixes =
+            prefix_results.find_all {|result| result.path == self.path && cat.subdomain == self.subdomain}
+        category_names = Wbrs::Prefix.category_names(qualified_prefixes)
 
-        self.url_primary_category = category_list.uniq.join(',')
-        self.category = category_list.uniq.join(',')
+        self.url_primary_category = category_names
+        self.category = category_names
       end
     end
 
