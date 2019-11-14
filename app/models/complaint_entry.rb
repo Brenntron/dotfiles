@@ -691,6 +691,7 @@ class ComplaintEntry < ApplicationRecord
 
   # Assigns self.category field to list of categories (descr field) from WBRS.
   # @return [String] Comma separated list of category descr fields.
+  # TODO Maybe this would be good to do in the Wbrs::Prefix class, to get list of category names
   def set_current_category_from_prefix(prefix_results)
     category_list = []
     if prefix_results
