@@ -10801,11 +10801,3 @@ span.threat-cat-no-data {
 .grayed-out {
   opacity: 0.6;
 }
-
-// bfrp: we can't replace threat cats currently on bfrp due to no entry.id's to use
-.research-action {
-  .bulk-wlbl-form .replace-tc-radio {
-    display: none;  // on bulk, hide ability to replace
-  }
-}
-

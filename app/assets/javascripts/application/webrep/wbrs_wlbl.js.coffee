@@ -72,7 +72,6 @@ window.bulk_get_current_wlbl = (page) ->
 
   # Pull the entry content out
   if (entries_checked.length > 0)
-#    debugger
     entries = []
     wbrs = ''
     comment_trail = ''
@@ -82,7 +81,6 @@ window.bulk_get_current_wlbl = (page) ->
     $(entries_checked).each ->
       # Slightly different structure to get the actual entry content
       if row == '.index-entry-row'
-#        debugger
         entry_row = $(this).parents(row)[0]
         entry_content = $(entry_row).find('.entry-col-content').text().trim()
         entry_case_id = $(entry_row).attr('data-case-id')
@@ -91,7 +89,6 @@ window.bulk_get_current_wlbl = (page) ->
         status = $(entry_row).find('.entry-col-status').text().trim()
         entry_id = $(entry_row).find('.dispute-entry-checkbox').attr('id')
       else if row == '.research-table-row'
-#        debugger
         entry_row = $(this).parents(row)[0]
         entry_content = $(entry_row).find('.entry-data-content').text().trim()
         wbrs = $(entry_row).find(current_wbrs).text()
@@ -159,8 +156,8 @@ window.bulk_get_current_wlbl = (page) ->
 
     if list_types
       list_types = entry['list_types'].sort().reverse().join(', ')  # sort by weak, then med, then heavy
-      if list_types.includes('BL-')  # show 'replace tc' radio if bl exists
-        $('.replace-tc-radio').removeClass('hidden')
+      if list_types.includes('BL-') && !$('body').hasClass('research-action')
+        $('.replace-tc-radio').removeClass('hidden')  # show 'replace' radio if bl exists and NOT on bfrp
     else
       list_types = ''
       wbrs_score = wbrs
@@ -208,6 +205,8 @@ window.bulk_get_current_wlbl = (page) ->
         curr_entry_id = 'wlbl-entry-id-' + $(this).attr('data-entry-id')
       else if location.href.includes('research')
         curr_entry_id = $(this).attr('class').split(' ').pop()
+        # for the bulk dropdowns on bfrp, ensure unique classes in dropdown
+        curr_entry_id = curr_entry_id.replace('-result-','-dd-result-')
 
       # fyi: bugfix for comparing the http/non-http versions of these urls/domains
       $(curr_dd).find('.wlbl-entry-content').each ->
@@ -958,8 +957,8 @@ window.add_wlbl_threat_cat_listeners = () ->
       $(this).addClass("bfrp-checkbox-#{i}")
 #
     $('.bfrp-table .dispute_check_box:checked').each (i) ->
-      $(this).addClass("bfrp-dd-result-no-#{i}")    # then for checked, add class for testing
-
+#      $(this).addClass("bfrp-dd-result-no-#{i}")    # then for checked, add class for testing
+      $(this).addClass("bfrp-result-no-#{i}")    # then for checked, add class for testing, for the on-page checkboxes
 
   # wl/bl dropdowns, click a wl/bl list cell or tc cell and it will toggle the adjacent cb
   $.merge(list_cells, tc_cells).click (e) ->
@@ -1030,21 +1029,13 @@ window.add_wlbl_threat_cat_listeners = () ->
         $(wlbl_dropdowns).find('.tc-replace-note').addClass('hidden')
         disableSubmit()
 
-
-
-
-      # BFRP AND INLINE SHOW PAGE STUFF HERE, WILL CLEAN THIS UP IN A BIT
-
-#      if cb_value.includes('BL-') and bl_num > 0
+      # show/hide the the threat category row in dropdowns on BL cb click
       if cb_value.includes('BL-') and bl_num > 0
         unless $(dropdown_id).find('#wlbl-remove').prop('checked')
           tc_row.removeClass('hidden')
 
       if cb_value.includes('BL-') and bl_num == 0
         tc_row.addClass('hidden')
-
-
-
 
       # change this to else if, if restore above
       if cb_value.includes('BL-') and bl_num == 0 and add_radio.prop('checked')
@@ -1069,12 +1060,19 @@ window.add_wlbl_threat_cat_listeners = () ->
         if (wl_num == 0 && bl_num == 0) || (wl_num > 0 && bl_num > 0)
           $(dropdown_id).find(":checkbox").prop('disabled',false).closest('li').removeClass('grayed-out')
 
-
       # Add / Remove - clean slate on click, .merge() allows selecting mult vars in jquery
       $.merge(add_radio, remove_radio).click ->
         lists_row.removeClass('hidden')
         $.merge(tc_row, tc_note_replace).addClass('hidden')
         clearAllInputs()
+
+
+
+      # BFRP specific (temporary, leave for now)
+#      if $('body').hasClass('research-action')
+#        $(replace_radio).hide()  # hide, since we can't do a REPLACE for bfrp tc's, only 'add to bl + add tc's'
+
+
 
       replace_radio.click ->
         tc_text_array = $('.wlbl-threat-cat').text().trim().split(', ')  # tc_text_array is array of 'Bogon','Botnets', etc
