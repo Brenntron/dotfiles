@@ -398,15 +398,13 @@ window.get_current_wlbl = (button) ->
       bl_num = $(dropdown).find('.lists-row input[value^="BL-"]:checked').length
 
       # clean slate the inline cb's
-      $(dropdown).find(".wl-bl-list-inline:checkbox")
-        .prop('disabled',false).closest('li').removeClass('grayed-out')
+      $(dropdown).find(".wl-bl-list-inline:checkbox").prop('disabled',false).closest('li').removeClass('grayed-out')
 
-      # disable opposite cb's if something is already on a list
+      # disable opposite cb's if something is already pre-set on a list, at-a-time validation
       unless (wl_num > 0 and bl_num > 0) || (wl_num == 0 and bl_num == 0)
         if bl_num > 0 && wl_num == 0 then curr_cbs = 'WL-'
         else if wl_num > 0 && bl_num == 0 then curr_cbs = 'BL-'
-        $(dropdown).find(":checkbox[value^='#{curr_cbs}']")
-          .prop('disabled',true).closest('li').addClass('grayed-out')
+        $(dropdown).find(":checkbox[value^='#{curr_cbs}']").prop('disabled',true).closest('li').addClass('grayed-out')
   )
 
 
@@ -1029,18 +1027,16 @@ window.add_wlbl_threat_cat_listeners = () ->
 
       # ensure user doesnt accidentally select both wl's and bl's at same time, don't bother if curr lists has wl's and bl's
       # if user selects a BL cb, gray out and disable the WL cb's, for example
-      unless old_lists.includes('WL-') and old_lists.includes('WL-')
+      unless old_lists.includes('WL-') and old_lists.includes('BL-')
         if wl_num > 0 || bl_num > 0
           if wl_num > 0 then curr_cbs = 'BL-'
           if bl_num > 0 then curr_cbs = 'WL-'
-          $(dropdown_id).find(":checkbox[value^='#{curr_cbs}']")
-            .prop('disabled',true).closest('li').addClass('grayed-out')
+          $(dropdown_id).find(":checkbox[value^='#{curr_cbs}']").prop('disabled',true).closest('li').addClass('grayed-out')
 
         else if wl_num == 0 || bl_num == 0
           if wl_num == 0 then curr_cbs = 'BL-'
           if bl_num == 0 then curr_cbs = 'WL-'
-          $(dropdown_id).find(":checkbox[value^='#{curr_cbs}']")
-            .prop('disabled',false).closest('li').removeClass('grayed-out')
+          $(dropdown_id).find(":checkbox[value^='#{curr_cbs}']").prop('disabled',false).closest('li').removeClass('grayed-out')
 
         # BULK SPECIFIC
         # clean slate the disabled states for wl/bl cb's, at-a-time validation
