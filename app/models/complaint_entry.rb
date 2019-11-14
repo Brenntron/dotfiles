@@ -744,6 +744,7 @@ class ComplaintEntry < ApplicationRecord
   end
 
   def get_category_names_from_master
+    byebug
     prefix_results = Wbrs::Prefix.where({:urls => [self.domain]})
 
     if self.entry_type == 'URI/DOMAIN'
@@ -754,12 +755,8 @@ class ComplaintEntry < ApplicationRecord
       parsed_uri['path'] = '' unless parsed_uri['path'].present?
       parsed_uri['subdomain'] = '' unless parsed_uri['subdomain'].present?
 
-      qualified_prefixes = []
-
-      prefix_results.each do |prefix_result|
-        if ((prefix_result.subdomain == parsed_uri['subdomain']) || (parsed_uri['subdomain'] == 'www')) && prefix_result.path == parsed_uri['path']
-          qualified_prefixes << prefix_result
-        end
+      qualified_prefixes = prefix_results.find_all do
+        ((prefix_result.subdomain == parsed_uri['subdomain']) || (parsed_uri['subdomain'] == 'www')) && prefix_result.path == parsed_uri['path']
       end
 
       category_names =
