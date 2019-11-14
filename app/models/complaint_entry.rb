@@ -759,19 +759,19 @@ class ComplaintEntry < ApplicationRecord
       parsed_uri['path'] = '' unless parsed_uri['path'].present?
       parsed_uri['subdomain'] = '' unless parsed_uri['subdomain'].present?
 
-      categories = []
+      qualified_prefixes = []
 
       prefix_results.each do |prefix_result|
         if ((prefix_result.subdomain == parsed_uri['subdomain']) || (parsed_uri['subdomain'] == 'www')) && prefix_result.path == parsed_uri['path']
-          categories << prefix_result
+          qualified_prefixes << prefix_result
         end
       end
 
-      if categories.any?
-        categories = categories.first.categories.map {|category| category.descr}
+      if qualified_prefixes.any?
+        qualified_prefixes = qualified_prefixes.first.categories.map {|category| category.descr}
       end
 
-      categories
+      qualified_prefixes
     elsif self.entry_type == 'IP'
       raise ("Cannot inherit categories for IP entries.")
     end
