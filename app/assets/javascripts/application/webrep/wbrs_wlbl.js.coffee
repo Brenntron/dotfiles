@@ -1027,9 +1027,21 @@ window.add_wlbl_threat_cat_listeners = () ->
         $(wlbl_dropdowns).find('.tc-replace-note').addClass('hidden')
         disableSubmit()
 
+
+
+
+      # BFRP AND INLINE SHOW PAGE STUFF HERE, WILL CLEAN THIS UP IN A BIT
+
 #      if cb_value.includes('BL-') and bl_num > 0
-      unless $(dropdown_id).find('#wlbl-remove').prop('checked')
-        tc_row.removeClass('hidden')
+      if cb_value.includes('BL-') and bl_num > 0
+        unless $(dropdown_id).find('#wlbl-remove').prop('checked')
+          tc_row.removeClass('hidden')
+
+      if cb_value.includes('BL-') and bl_num == 0
+        tc_row.addClass('hidden')
+
+
+
 
       # change this to else if, if restore above
       if cb_value.includes('BL-') and bl_num == 0 and add_radio.prop('checked')
