@@ -779,7 +779,7 @@ class ComplaintEntry < ApplicationRecord
     certainty_on_urls = Wbrs::Prefix.get_certainty_sources_for_urls([domain_of])
 
     qualified_prefixes = prefix_results.find_all do |result|
-      result.path == self.path && ((cat.subdomain == self.subdomain) || (self.subdomain == 'www'))
+      result.path == self.path && ((result.subdomain == self.subdomain) || (self.subdomain == 'www'))
     end
 
     final_current_categories = {}
