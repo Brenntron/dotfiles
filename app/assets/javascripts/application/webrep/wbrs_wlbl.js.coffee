@@ -305,7 +305,7 @@ window.get_current_wlbl = (button) ->
   # Clean slate the inline dropdowns on every dropdown click / spawn
   $(submit_button).html('Submit Changes').prop('disabled', true)
   $(comment_textarea).val(comment_text)
-  $(tc_row).addClass('hidden')
+#  $(tc_row).addClass('hidden')
   $(list_cbs).prop('disabled',false).closest('li').removeClass('grayed-out')
 
   # Send entry content to wbrs
@@ -846,6 +846,7 @@ window.reset_score_preview = (button) ->
 
   # BL? then reset the state of the tc cb's to orig state
   if current_lists.includes('BL-')
+    $(dropdown).find('.threat-cat-row').removeClass('hidden')
     $(dropdown).find('.threat-cat-cell').each ->
       curr_tc = $(this)
       $(tc_array).each (i, value) ->
@@ -1016,14 +1017,14 @@ window.add_wlbl_threat_cat_listeners = () ->
         $(wlbl_dropdowns).find('.tc-replace-note').addClass('hidden')
         disableSubmit()
 
-      if cb_value.includes('BL-') and bl_num > 0
-        unless $(dropdown_id).find('#wlbl-remove').prop('checked')
-          unless $('body').hasClass('research-action')  # bfrp can't replace tc's right now, will remove this when ready
-            tc_row.removeClass('hidden')
+#      if cb_value.includes('BL-') and bl_num > 0
+      unless $(dropdown_id).find('#wlbl-remove').prop('checked')
+        tc_row.removeClass('hidden')
 
-      else if cb_value.includes('BL-') and bl_num == 0 and add_radio.prop('checked')
+      # change this to else if, if restore above
+      if cb_value.includes('BL-') and bl_num == 0 and add_radio.prop('checked')
         $(dropdown_id).find('.threat-cat-row input').prop('checked', false)
-        tc_row.addClass('hidden')
+#        tc_row.addClass('hidden')
 
       # ensure user doesnt accidentally select both wl's and bl's at same time, don't bother if curr lists has wl's and bl's
       # if user selects a BL cb, gray out and disable the WL cb's, for example
