@@ -782,12 +782,8 @@ class ComplaintEntry < ApplicationRecord
     domain_of = DisputeEntry.domain_of_with_path(self.hostlookup)
     certainty_on_urls = Wbrs::Prefix.get_certainty_sources_for_urls([domain_of])
 
-    qualified_categories = []
     qualified_prefixes = prefix_results.find_all do |result|
       result.path == self.path && ((cat.subdomain == self.subdomain) || (self.subdomain == 'www'))
-    end
-    qualified_prefixes.each do |cat|
-      qualified_categories << cat
     end
 
     final_current_categories = {}
