@@ -767,11 +767,14 @@ class ComplaintEntry < ApplicationRecord
         end
       end
 
-      if qualified_prefixes.any?
-        qualified_prefixes = qualified_prefixes.first.categories.map {|category| category.descr}
-      end
+      category_names =
+          if qualified_prefixes.any?
+            Wbrs::Prefix.category_names(qualified_prefixes)
+          else
+            []
+          end
 
-      qualified_prefixes
+      category_names
     elsif self.entry_type == 'IP'
       raise ("Cannot inherit categories for IP entries.")
     end
