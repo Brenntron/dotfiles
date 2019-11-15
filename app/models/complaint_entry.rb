@@ -109,6 +109,16 @@ class ComplaintEntry < ApplicationRecord
     uri.present? ? uri : ip_address
   end
 
+  # Returns the Wbre::Prefix object.
+  # Object may be cached.
+  # @param [String] prefix_given please give us the prefix to use, or we'll use the domain or ip_address field.
+  # @param [Boolean] reload set to true to get an up to date call to the API.
+  # @return [Wbrs::Prefix] the object for the Prefix remote stub.
+  def remote_prefixes(prefix_given: self.domain || self.ip_address, reload: false)
+    @remote_prefixes = nil if reload
+    @remote_prefixes ||= Wbrs::Prefix.where({urls: [prefix_given]})
+  end
+
   def change_category(prefix,
                       categories_string,
                       category_names_string,
@@ -136,7 +146,7 @@ class ComplaintEntry < ApplicationRecord
             complaint.set_status(current_status)
             #this is where we should send off the category to the API
             if self.resolution != STATUS_RESOLVED_FIXED_INVALID && categories_string.present?
-              existing_prefixes = Wbrs::Prefix.where({urls: [prefix]})
+              existing_prefixes = remote_prefixes(prefix_given: prefix)
               commit_category(existing_prefixes,
                               ip_or_uri: prefix,
                               categories_string: categories_string,
@@ -146,7 +156,7 @@ class ComplaintEntry < ApplicationRecord
               update!(url_primary_category: category_names_string, category: category_names_string)
             else
               # TODO Do we need to update the record when we are not making a change?
-              existing_prefixes = Wbrs::Prefix.where({urls: [prefix]})
+              existing_prefixes = remote_prefixes(prefix_given: prefix)
               cat_from_wbrs = self.set_current_category_from_prefix(existing_prefixes)
               update!(url_primary_category: cat_from_wbrs, category: cat_from_wbrs)
             end
@@ -185,7 +195,7 @@ class ComplaintEntry < ApplicationRecord
         complaint.set_status(current_status)
         #this is where we should send off the category to the API
         if ![STATUS_RESOLVED_FIXED_INVALID,STATUS_RESOLVED_FIXED_UNCHANGED].include?(entry_status) && categories_string.present?
-          existing_prefixes = Wbrs::Prefix.where({urls: [prefix]})
+          existing_prefixes = remote_prefixes(prefix_given: prefix)
           commit_category(existing_prefixes,
                           ip_or_uri: prefix,
                           categories_string: categories_string,
@@ -195,7 +205,7 @@ class ComplaintEntry < ApplicationRecord
           update!(url_primary_category: category_names_string, category: category_names_string)
         else
           # TODO Do we need to update the record when we are not making a change?
-          existing_prefixes = Wbrs::Prefix.where({urls: [prefix]})
+          existing_prefixes = remote_prefixes(prefix_given: prefix)
           cat_from_wbrs = self.set_current_category_from_prefix(existing_prefixes)
           update!(url_primary_category: cat_from_wbrs, category: cat_from_wbrs)
         end
