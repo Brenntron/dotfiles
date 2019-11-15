@@ -205,7 +205,7 @@ window.bulk_get_current_wlbl = (page) ->
         curr_entry_id = 'wlbl-entry-id-' + $(this).attr('data-entry-id')
       else if location.href.includes('research')
         curr_entry_id = $(this).attr('class').split(' ').pop()
-        # for the bulk dropdowns on bfrp, ensure unique classes in dropdown
+        # for the bulk dropdowns on bfrp, ensure unique classes in dropdown, bfrp bulk dd'S
         curr_entry_id = curr_entry_id.replace('-result-','-dd-result-')
 
       # fyi: bugfix for comparing the http/non-http versions of these urls/domains
@@ -213,7 +213,15 @@ window.bulk_get_current_wlbl = (page) ->
         curr_text = $(this).text().trim()
         if ip_uri.includes(curr_text)
           $(this).closest('tr').attr('data-order-id', i)  # add row-id to the right
-          $(this).closest('tr').find('td.wlbl-entry-wlbl').addClass(curr_entry_id)
+
+#          console.log curr_entry_id
+          # ENSURE YOU ALWAYS ADDING A UNIQUE -DD- CLASS-ID EACH TIME TO BULK DROPDOWN
+          $(this).closest('tr').find('td.wlbl-entry-wlbl').attr('class','wlbl-entry-wlbl').addClass(curr_entry_id)
+
+#          if $(curr_entry_id).length == 0
+#            $(this).closest('tr').find('td.wlbl-entry-wlbl').addClass(curr_entry_id)
+
+
 
     table_dd = $(curr_dd).find('tbody')
     rows = $(table_dd).find('tr')
@@ -1022,7 +1030,7 @@ window.add_wlbl_threat_cat_listeners = () ->
     $(dd).find('.tc-replace-note, .threat-cat-row, .replace-tc-radio').addClass('hidden')
     $('.dispute-wlbl-adjust-wrapper .dropdown-submit-button').html('Submit Changes')
 
-  # bfrp CLICK INPUT: add id's to this cb (on page) to bfrp bulk (in dropdown) for tests
+  # bulk bfrp CLICK INPUT: add id's to this cb (on page) to bfrp bulk (in dropdown) for tests
   $('.bfrp-table .dispute_check_box').click ->
     $('.bfrp-table .dispute_check_box').each (i) ->
       $(this).attr('class','')   # clean slate the cbs to default first on each click
@@ -1030,7 +1038,6 @@ window.add_wlbl_threat_cat_listeners = () ->
       $(this).addClass("bfrp-checkbox-#{i}")
 #
     $('.bfrp-table .dispute_check_box:checked').each (i) ->
-#      $(this).addClass("bfrp-dd-result-no-#{i}")    # then for checked, add class for testing
       $(this).addClass("bfrp-result-no-#{i}")    # then for checked, add class for testing, for the on-page checkboxes
 
   # wl/bl dropdowns, click a wl/bl list cell or tc cell and it will toggle the adjacent cb
