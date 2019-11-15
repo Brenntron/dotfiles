@@ -22,10 +22,11 @@ Feature: Disputes index, Research tab
       |1 |
     And the following dispute_entries exist:
       |dispute_id   |uri            |entry_type |
-      |1            |g-oogl-e.com   |URI/DOMAIN |
+      |1            |1234computer.com   |URI/DOMAIN |
     When I goto "escalations/webrep/disputes/1"
-    And I wait for "5" seconds
+    And  I wait for "5" seconds
     Then I click "#research-tab-link"
+    And  take a screenshot
     Then I should see "Malware Sites"
 
   @javascript
