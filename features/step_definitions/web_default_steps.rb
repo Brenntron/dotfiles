@@ -471,3 +471,8 @@ end
 Then(/^button "(.*?)" should be disabled$/) do |button|
   expect(page).to have_button(button, disabled: true)
 end
+
+Given(/^I fill in selectized with "(.*?)"$/) do |value|
+  find('div.selectize-input input', match: :first).set("#{value}")
+  find('div.selectize-dropdown-content > div', match: :first).click
+end
