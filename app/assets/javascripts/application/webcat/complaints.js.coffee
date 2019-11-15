@@ -1037,7 +1037,7 @@ format = (complaint_entry_row) ->
       "<div class='row'>" +
       "<div class='col-xs-3 col-with-divider'>" +
       "<div class='screenshot-thumb-wrapper'>" +
-      "<img id='screenshot_id_#{entry_id}' class='screenshot-thumb-img' title='#{screen_shot_error}' data-toggle='popover' onclick='enlarge_image('#{entry_id} , complaint_entries/serve_image?complaint_entry_id='#{entry_id} , #{retake_in_progress}')' src='complaint_entries/serve_image?complaint_entry_id='#{entry_id}'/>" +
+      "<img id='screenshot_id_#{entry_id}' class='screenshot-thumb-img' title='#{screen_shot_error}' data-toggle='popover' onclick='enlarge_image('#{entry_id} , complaint_entries/serve_image?complaint_entry_id='#{entry_id} , #{retake_in_progress}')' src='complaint_entries/serve_image?complaint_entry_id=#{entry_id}'/>" +
       "</div>" +
       "<div class='complaint-entry-info'>" +
       "<label class='content-label-sm'>Case ID</label>"+
