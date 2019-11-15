@@ -16,6 +16,9 @@ Feature: Filerep communications
     And the following FileRep email templates exist:
       | template_name | description      |
       | Filerep Test  | I am only a test |
-    And I goto "/escalations/file_rep/disputes/11"
+    And I goto "/escalations/file_rep/disputes/11#communication_tab"
+    # Dismiss error messages or else the Manage button won't be clickable
+    Then I click "button.close"
+    Then I wait for "3" seconds
     Then I click "Manage Email Templates"
     Then I should see "I am only a test"
