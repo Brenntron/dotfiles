@@ -1848,7 +1848,7 @@ class Dispute < ApplicationRecord
     urls = []
 
     data.keys.each do |key|
-      if DisputeEntry.is_ip(key)
+      if DisputeEntry.is_ip?(key)
         ips << key
       else
         urls << key
