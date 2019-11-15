@@ -543,13 +543,22 @@ class Dispute < ApplicationRecord
           when !false_negative_claim
             new_dispute_entry.status = DisputeEntry::NEW
           else
-            auto_resolve_verdict = new_dispute_entry.assign_from_auto_resolve(address: key,
-                                                                              total_hits: total_hits,
-                                                                              resolved_at: resolved_at,
-                                                                              dispute_entry: new_dispute_entry)
+            email_resolved = false
 
-            if auto_resolve_verdict.resolved? && auto_resolve_verdict.malicious?
-              verdicts_to_blacklist << [auto_resolve_verdict, new_dispute_entry]
+            if new_dispute.submitter_type == "NON-CUSTOMER"
+              email_resolved = AutoResolve.auto_resolve_email(new_dispute_entry, total_hits)
+            end
+
+            if email_resolved == false
+              auto_resolve_verdict = new_dispute_entry.assign_from_auto_resolve(address: key,
+                                                                                total_hits: total_hits,
+                                                                                resolved_at: resolved_at,
+                                                                                dispute_entry: new_dispute_entry)
+
+              if auto_resolve_verdict.resolved? && auto_resolve_verdict.malicious?
+                verdicts_to_blacklist << [auto_resolve_verdict, new_dispute_entry]
+              end
+
             end
           end
 
@@ -618,6 +627,7 @@ class Dispute < ApplicationRecord
           when !false_negative_claim
             new_dispute_entry.update(status: DisputeEntry::NEW)
           else
+
             auto_resolve_verdict = new_dispute_entry.assign_from_auto_resolve(address: key,
                                                                               total_hits: total_hits,
                                                                               resolved_at: resolved_at,
@@ -626,6 +636,8 @@ class Dispute < ApplicationRecord
             if auto_resolve_verdict.resolved? && auto_resolve_verdict.malicious?
               verdicts_to_blacklist << [auto_resolve_verdict, new_dispute_entry]
             end
+
+
           end
 
           new_dispute_entry.save!
