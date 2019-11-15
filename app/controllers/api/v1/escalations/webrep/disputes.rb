@@ -90,7 +90,7 @@ module API
             post "" do
               std_api_v2 do
                 user_validation = User.where(cvs_username: permitted_params['assignee'])
-                separated_entries = permitted_params[:ips_urls].split("\n")
+                separated_entries = permitted_params[:ips_urls].split("\s")
                 non_duplicated_entries = []
                 duplicates = []
 
@@ -113,11 +113,13 @@ module API
                       raise ("Could not create the Dispute because of this error: #{e.message}")
                     end
                     render json: {status: 'Success', case_id: dispute.id, errors: duplicates}
+
+
                   else
                     raise ("Invalid assignee or assignee does not exist. Please try again.")
                   end
                 else
-                  raise ("Unable to create the following duplicate dispute entries: #{duplicates.join("\n")}")
+                  raise ("Unable to create the following duplicate dispute entries: #{duplicates.join(", ")}")
                 end
               end
             end
@@ -340,14 +342,14 @@ module API
               requires :dispute_id
             end
             post "sync_data" do
-                
-                dispute = Dispute.where({:id => params[:dispute_id]}).first
-                dispute.dispute_entries.each do |dispute_entry|
 
-                  dispute_entry.sync_up
+              dispute = Dispute.where({:id => params[:dispute_id]}).first
+              dispute.dispute_entries.each do |dispute_entry|
 
-                end
-                {:status => "success"}.to_json
+                dispute_entry.sync_up
+
+              end
+              {:status => "success"}.to_json
 
             end
 
@@ -617,7 +619,7 @@ module API
 
               if information[params[:entry].gsub('http://', '').gsub('https://', '')] == "NOT_FOUND"
                 return {:entry => params[:entry], :classification => "not found", :expiration => "", :status => "", :comment => ""}.to_json
-              # TODO Make expiration human readable - Just the date
+                # TODO Make expiration human readable - Just the date
               else
                 expiration = ""
                 begin
@@ -653,7 +655,7 @@ module API
 
                     comment = ""
 
-		    comment = value["metadata"].fetch("VRT", {}).fetch("comment", "")
+		                comment = value["metadata"].fetch("VRT", {}).fetch("comment", "")
 
                     return_data.push(:entry => key, :classification => value["classifications"], :expiration => expiration, :status => value["status"], :comment => comment).to_json
                   end
@@ -668,7 +670,7 @@ module API
 
             get 'rule_ui_wlbl_get_info_for_form' do
               params[:entry] = params[:entry].strip
-              
+
               information = Wbrs::ManualWlbl.where({:url => params[:entry]})
 
               if information.blank?
@@ -835,6 +837,47 @@ module API
               assignees = User.joins(roles: :org_subset).where(org_subsets: { name: 'webrep' }).distinct.order(:cvs_username)
 
               render json: {assignees: assignees}
+            end
+
+            ## for bulk lookup
+
+            desc 'super simple endpoint for bulk lookup to consume'
+            params do
+              requires :uri, type: String
+            end
+
+            get 'wbrs_info' do
+              data = {}
+              data[:score] = nil
+              data[:rulehits] = []
+
+              url_to_test = permitted_params[:uri]
+
+              begin
+                results = Sbrs::ManualSbrs.call_wbrs({'url' => url_to_test}, type: 'wbrs')
+                data[:score] = results["wbrs"]["score"]
+                data[:rulehits] = Sbrs::ManualSbrs.get_rule_names_from_rulehits(results)
+                render json: {:status => "success", :data => data}
+              rescue
+                render json: {:status => "error", :data => data}
+              end
+
+            end
+
+            desc 'super simple endpoint to quick look up bulk submit'
+            params do
+            end
+
+            post 'quick_bulk_update' do
+              data = params[:update_data]
+
+              begin
+                response = Dispute.process_quick_bulk_entries(data)
+                {:status => "success", :data => response}.to_json
+              rescue
+                {:status => "error"}.to_json
+              end  
+
             end
 
           end

@@ -30,7 +30,25 @@ Feature: Disputes
     And I fill in "assignee" with "nherbert"
     When I click "submit"
     Then I should see "Unable to create the following duplicate dispute entries: talosintelligence.com"
-    
+
+  @javascript
+  Scenario: A user can create new disputes with urls found through lookup detail
+    Given a user with role "webrep user" exists and is logged in
+    And vrtincoming exists
+    And bugzilla rest api always saves
+    And Dispute Analyst customer exists
+    When I go to "/escalations/webrep/research#lookup-detail"
+    And I fill in "search_uri" with "ough.com"
+    Then I click "submit-button rep-research"
+    And I wait for "60" seconds
+    Then I should see "Entry Search Results for"
+    Then I click "#select-all-entries"
+    Then I click "add-to-ticket-button"
+    When I click ".submit_new_dispute"
+    And I wait for "60" seconds
+    Then I should see "ALL ENTRIES WERE SUCCESSFULLY CREATED."
+
+
   @javascript
   Scenario: A user cannot create a duplicate IP Dispute
     Given a user with role "webrep user" exists and is logged in

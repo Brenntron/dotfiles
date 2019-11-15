@@ -5,8 +5,17 @@ $(document).ready ->
       std_msg_error('No rows selected', ['Please select at least one row.'])
       return false
 
-window.select_or_deselect_all = (dispute_id)->
+  if $('.searched-for-url').length > 0
+    text = $('.searched-for-url').text().split(/\s+/)
+    if text.length > 1
+      if text.length == 2
+        text = text.join(', ').replace(/, / , ' and ')
+      else if text.length > 2
+        text = text.join(', ').replace(/, ([^,]*)$/, ', and $1')
+      text = text.replace(/(, and| and |, )/g, '<span class="unset-text">$1</span>')
+    $('.searched-for-url').html(text)
 
+window.select_or_deselect_all = (dispute_id)->
   $('.dispute-entry-checkbox_' + dispute_id).prop('checked', $('#' + dispute_id).prop('checked'))
   $('.dispute-entry-checkbox_' + dispute_id).each ->
     toggleRow(this)
@@ -156,6 +165,7 @@ window.advanced_webrep_index_table = () ->
 
   form = $('#disputes-advanced-search-form')
   submission_types = []
+#  TODO: This can be recfactored
   if form.find('input[name="advanced_search[submission_type]"][value="w"]').is(':checked')
     submission_types.push('w')
   if form.find('input[name="advanced_search[submission_type]"][value="e"]').is(':checked')
@@ -339,7 +349,6 @@ window.save_dispute = () ->
     error_prefix: 'Unable to update dispute.'
     success_reload: true
   )
-
 
 window.toolbar_index_edit_status = () ->
   statusName = $('input[name=entry-status]:checked').val()
@@ -585,7 +594,6 @@ window.determine_checked = (box_names) ->
   box_flag = ($('.'+box_names+':checked').length > 0)
   unless box_flag
     alert('check something first')
-  console.log 'returning: ' + box_flag
   return box_flag
 
 
@@ -846,7 +854,6 @@ $ ->
       $(wrapper).addClass('selected')
 
     if $(this).attr('id') == 'RESOLVED_CLOSED'
-#      debugger
       $('#show-ticket-resolution-submenu').show()
       stat_comment = $('#ticket-non-res-submit').find('.ticket-status-comment')
       $('#ticket-non-res-submit').hide()
@@ -946,7 +953,9 @@ $ ->
       'desc'
     ] ]
     dom: '<"datatable-top-tools no-margin-datatable-top-tool"lf>t<ip>'
+    stateSave: true
     language: {
+
       search: "_INPUT_"
       searchPlaceholder: "Search within table"
     }
@@ -1618,7 +1627,8 @@ $ ->
     success: (response) ->
       unless $('body').hasClass('escalations--file_rep--disputes-controller')
         response = JSON.parse(response)
-        $('#disputes-index').DataTable().page(response.currentpage).draw('page')
+        if response
+          $('#disputes-index').DataTable().page(response.currentpage).draw('page')
   )
 
   window.open_dashboard_dispute_table = $('#table-user-disputes-open').DataTable(
