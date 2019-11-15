@@ -543,7 +543,7 @@ class Dispute < ApplicationRecord
           else
             email_resolved = false
 
-            if new_dispute_entry.submitter_type == "NON-CUSTOMER"
+            if new_dispute.submitter_type == "NON-CUSTOMER"
               email_resolved = AutoResolve.auto_resolve_email(new_dispute_entry, total_hits)
             end
 
