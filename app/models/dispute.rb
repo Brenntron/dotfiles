@@ -1842,13 +1842,13 @@ class Dispute < ApplicationRecord
     message.post_entries(self.dispute_entries)
   end
 
-  def self.process_quick_bulk_entries(data, note=nil)
+  def self.process_quick_bulk_entries(data, user)
 
     ips = []
     urls = []
 
     data.keys.each do |key|
-      if DisputeEntry.is_ip(key)
+      if DisputeEntry.is_ip?(key)
         ips << key
       else
         urls << key
@@ -1856,7 +1856,6 @@ class Dispute < ApplicationRecord
     end
 
     customer = Customer.where(name: 'Dispute Analyst').first_or_create(name: 'Dispute Analyst')
-    user = User.where(cvs_username:"vrtincom").first
     summary = "New Web Reputation Dispute generated at #{DateTime.now.utc.strftime("%Y-%m-%d %H:%M")}"
     bugzilla_rest_session = BugzillaRest::Session.default_session
 

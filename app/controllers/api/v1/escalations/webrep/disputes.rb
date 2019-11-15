@@ -872,7 +872,7 @@ module API
               data = params[:update_data]
 
               begin
-                response = Dispute.process_quick_bulk_entries(data)
+                response = Dispute.process_quick_bulk_entries(data, current_user)
                 {:status => "success", :data => response}.to_json
               rescue
                 {:status => "error"}.to_json
