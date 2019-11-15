@@ -563,7 +563,7 @@ Feature: Disputes
     And  take a screenshot
 
 
-  @javascript
+  @javascript 
   Scenario: a user searches for a url on the research page and adds a result to a WBRS List
     Given a user with role "webrep user" exists and is logged in
     And  clean up wlbl and remove all wlbl entries on "testing.com"
@@ -571,7 +571,7 @@ Feature: Disputes
     And  I choose "research-search-strict"
     And  I type content "testing.com" within input with id "search_uri"
     Then I click "Submit"
-    And  I wait for "20" seconds
+    And  I wait for "30" seconds
     And  take a screenshot
     And  I click ".bfrp-inline-wlbl-6"
     And  I wait for "5" seconds
@@ -598,7 +598,7 @@ Feature: Disputes
     And  I choose "research-search-strict"
     And  I type content "testing.com" within input with id "search_uri"
     Then I click "Submit"
-    And  I wait for "20" seconds
+    And  I wait for "30" seconds
     And  I click ".bfrp-inline-wlbl-6"
     And  I wait for "5" seconds
     Then I click "#bl-med-slider"
@@ -626,7 +626,7 @@ Feature: Disputes
     And  clean up wlbl and remove all wlbl entries on "testing.com"
 
 
-# TODO This is getting fixed
+
   @javascript
   Scenario: a user searches for a url on the research page and removes a result from a WBRS List and adds it to another
     Given a user with role "webrep user" exists and is logged in
@@ -635,7 +635,7 @@ Feature: Disputes
     And  I choose "research-search-strict"
     And  I type content "testing.com" within input with id "search_uri"
     Then I click "Submit"
-    And  I wait for "20" seconds
+    And  I wait for "30" seconds
     And  I click ".bfrp-inline-wlbl-6"
     And  I wait for "5" seconds
     Then I click "#bl-med-slider"
@@ -667,7 +667,7 @@ Feature: Disputes
 
 
 
-  @javascript @now
+  @javascript
   Scenario: a user searches for a url on the research page and adds multiple results to a WBRS white list
     Given a user with role "webrep user" exists and is logged in
     And  clean up wlbl and remove all wlbl entries on "testing.com"
@@ -676,7 +676,7 @@ Feature: Disputes
     And  I choose "research-search-strict"
     And  I type content "testing.com" within input with id "search_uri"
     Then I click "Submit"
-    And  I wait for "25" seconds
+    And  I wait for "30" seconds
     Then I check checkbox with class "bfrp-checkbox-4"
     And  I check checkbox with class "bfrp-checkbox-6"
     And  I click button "wlbl_entries_button"
@@ -703,7 +703,6 @@ Feature: Disputes
     And  clean up wlbl and remove all wlbl entries on "prooftesting.com"
 
 
-#    TODO - confirm this works
   @javascript
   Scenario: a user searches for a url on the research page and adds multiple results to a WBRS blacklist
     Given a user with role "webrep user" exists and is logged in
@@ -713,7 +712,7 @@ Feature: Disputes
     And  I choose "research-search-strict"
     And  I type content "testing.com" within input with id "search_uri"
     Then I click "Submit"
-    And  I wait for "20" seconds
+    And  I wait for "30" seconds
     Then I check checkbox with class "bfrp-checkbox-4"
     And  I check checkbox with class "bfrp-checkbox-6"
     And  I click button "wlbl_entries_button"
@@ -741,7 +740,7 @@ Feature: Disputes
     And  clean up wlbl and remove all wlbl entries on "prooftesting.com"
 
 
-# TODO - confirm this works
+
   @javascript
   Scenario: a user searches for a url on the research page and removes multiple results from a WBRS List
     Given a user with role "webrep user" exists and is logged in
@@ -751,7 +750,7 @@ Feature: Disputes
     And  I choose "research-search-strict"
     And  I type content "testing.com" within input with id "search_uri"
     Then I hit enter within "#search_uri"
-    And  I wait for "20" seconds
+    And  I wait for "30" seconds
     And  take a screenshot
     Then I check checkbox with class "bfrp-checkbox-4"
     And  I check checkbox with class "bfrp-checkbox-6"
