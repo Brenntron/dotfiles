@@ -304,8 +304,13 @@ window.get_current_wlbl = (button) ->
   # Clean slate the inline dropdowns on every dropdown click / spawn
   $(submit_button).html('Submit Changes').prop('disabled', true)
   $(comment_textarea).val(comment_text)
-#  $(tc_row).addClass('hidden')
+  $(tc_row).addClass('hidden')
   $(list_cbs).prop('disabled',false).closest('li').removeClass('grayed-out')
+
+  # no cb's pre-checked? hide the tc row
+  # DELETABLE?
+  #  if $(dropdown).find('.wl-bl-list-inline:checked').length == 0
+  #    $(dropdown).find('.threat-cat-row').addClass('hidden')
 
   # Send entry content to wbrs
   data = {
@@ -1109,6 +1114,10 @@ window.add_wlbl_threat_cat_listeners = () ->
       if cb_value.includes('BL-') and bl_num == 0 and add_radio.prop('checked')
         $(dropdown_id).find('.threat-cat-row input').prop('checked', false)
 #        tc_row.addClass('hidden')
+#
+#      if bl_num == 0 and wl_num == 0
+#        tc_row.addClass('hidden')
+
 
       # ensure user doesnt accidentally select both wl's and bl's at same time, don't bother if curr lists has wl's and bl's
       # if user selects a BL cb, gray out and disable the WL cb's, for example
