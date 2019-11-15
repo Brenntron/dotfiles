@@ -48,7 +48,7 @@ class Sbrs::Base
   def self.build_sds_v3_combo_request(uri_item, ip_item)
     uri_query                  = {}
     uri_query["hostname"]      = Sbrs::Base.sds_v3_host
-    uri_query["query_string"]  = '/score/single/json?url='+ uri_item + '&ip=' + ip_item
+    uri_query["query_string"]  = self.determine_sds_v3_uri('wbrs') + uri_item + '&ip=' + ip_item
     uri_query["uri_item"]      = uri_item
     uri_query["ip_item"]       = ip_item
     uri_query["sds_type"]      = "combo"
