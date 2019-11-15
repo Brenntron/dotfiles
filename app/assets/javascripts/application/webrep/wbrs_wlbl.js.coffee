@@ -554,10 +554,14 @@ window.submit_individual_wlbl = (button_tag) ->
   modal_info_string = ''
   modal_action = ''
   removed_lists_arr = []
+  data = []
+  data_new = []
+  data_old = []
 
   new_lists_arr = $('.wl-bl-list-inline:checkbox:checked').map(() ->
     this.value
   ).toArray()
+  new_lists_str = new_lists_arr.join(', ')
 
   # inline specific - figure out which lists have been removed in the fancy-sliders using filter
   removed_lists_arr = old_lists_arr.filter((list) ->
@@ -572,6 +576,9 @@ window.submit_individual_wlbl = (button_tag) ->
     thrt_cat_ids.push(parseInt($(this).val()))  # fix to ensure passing an array of numbers
     thrt_cat_names.push($(this).parent().text().trim())
 
+  # start the adjustment type super-specific variables init, double-api call scenario (add + remove simultaneous)
+  adjustment_type = ''
+  second_adjustment_type = false  # CHANGE TO BOOL, this only gets used if user does add + remove at same time for inline
   old_length = old_lists_arr.length
   new_length = new_lists_arr.length
   tc_length = thrt_cat_ids.length
@@ -579,104 +586,164 @@ window.submit_individual_wlbl = (button_tag) ->
   if old_lists_str == '' || old_lists_str.includes('Not')
     old_length == 0
 
-  # adjustment type: figure out the add/replace/remove adjustment type, this determines which endpoint to use
+
+  # FIRST ADJUSTMENT_TYPE
+  # FIRST ADJUSTMENT_TYPE
   if (new_length > old_length || new_length == old_length) and tc_length == 0
     adjustment_type = 'add'
-    modal_action = 'added to'  # separate var to make it easier to change verbage
+    modal_action = 'added to'
   else if new_length == old_length and tc_length > 0
     adjustment_type = 'replace'
     modal_action = 'updated for'
-    if $('body').hasClass('research-action')
-      adjustment_type = 'add'  # for bfrp inline, IT MUST BE ADD, AND NOT REPLACE
+    if $('body').hasClass('research-action')  # bfrp doesn't do 'replace' on new endpoint
+      adjustment_type = 'add'
       modal_action = 'added to'
   else if new_length < old_length and tc_length == 0
     adjustment_type = 'remove'
     modal_action = 'removed from'
-  else
-    adjustment_type = 'add'
-    modal_action = 'added to'
 
 
-  # build the confirmation modal
+  # SECOND_ADJUSTMENT_TYPE (if needed, this is rare)
+  # SECOND_ADJUSTMENT_TYPE (if needed, this is rare
+  # CLEAN THIS UP!
+  # CLEAN THIS UP!
+  # CLEAN THIS UP!
+  # CLEAN THIS UP!
+  if old_lists_str.includes('BL') && new_lists_str.includes('WL') && !old_lists_str.includes('WL') && !new_lists_str.includes('BL')
+    second_adjustment_type = true
+    console.log 'inline scenario 4: you were on BL(s), but now you are removing BL(s) and adding WL(s)'
+
+  else if old_lists_str.includes('WL') && new_lists_str.includes('BL') && !old_lists_str.includes('BL') && !old_lists_str.includes('BL') && !new_lists_str.includes('WL')
+    second_adjustment_type = true
+    console.log 'inline scenario 5: you were on WL(s), but now you are removing WL(s) and adding BL(s)'
+
+
+  # start building the modal
   modal_info_string =
-    "<div class='wlbl-info-modal'><p>The following entry:</p>
-      <span>#{dispute_url}</span>"
+    "<div class='wlbl-info-modal'><p>The following entry:</p> <span>#{dispute_url}</span>"
 
   # ADD TO LISTS INLINE
   if adjustment_type == 'add' || adjustment_type == 'replace'
-    # replacing threat cats? get the wl/bl lists from top blue row
     list_types = $(wlbl_form).find('.wlbl-entry-wlbl').text().trim().split(', ')
-    data =
+    endpoint = '/escalations/api/v1/escalations/webrep/disputes/bulk_wlbl_threatcat_adjust'
+    data_new =
       adjustment_type: adjustment_type
       lists: new_lists_arr
       thrt_cat_ids: thrt_cat_ids
       note: curr_note
-    endpoint = '/escalations/api/v1/escalations/webrep/disputes/bulk_wlbl_threatcat_adjust'
 
     if location.href.includes('webrep/disputes')
       console.log 'inline scenario 1'  #  index/show/bfrp add/replace: use new endpoint + one entry url
-      data.dispute_entries = [ dispute_entry_id ]  # ADD/REPLACE ALWAYS NEEDS AN ENTRY-ID, NOT A URL this ends up down in the ajax call below
+      data_new.dispute_entries = [ dispute_entry_id ]  # ADD/REPLACE ALWAYS NEEDS AN ENTRY-ID, NOT A URL this ends up down in the ajax call below
     else if location.href.includes('webrep/research')
       console.log 'inline scenario 2'  # BFRP add/replace using new endpoint + one entry id
-      data.urls = [ dispute_url ]  # THIS MUST BE URLS/IP_URI, there is no entry.id on bfrp currently
+      data_new.urls = [ dispute_url ]  # THIS MUST BE URLS/IP_URI, there is no entry.id on bfrp currently
 
-
-
-    # ensure we're showing only non-duplicate lists in the modal for adding, THIS DOES NOT WORK FOR SHOWING THE LISTS ADDED
+    # used for the modal
     added_lists = []
     $.each new_lists_arr, (i, entry) ->
-      if($.inArray(entry, old_lists_arr) == -1)
-        added_lists.push(entry)
+      if($.inArray(entry, old_lists_arr) == -1) then added_lists.push(entry)
 
-
-
-    # continue building the modal info
     if new_lists_arr.length   # below shows on 'adding', 'replacing' deals with TC's, not lists
-      modal_info_string +=
-        "<span>Has been #{modal_action} the following WBRS Lists:
-          <p>#{added_lists.join(', ')}</p></span>"  # never just show 'new_lists' because that's not specific enough
+      modal_info_string += "<span>Has been #{modal_action} the following WBRS Lists: <p>#{added_lists.join(', ')}</p></span>"
 
   # REMOVE FROM LISTS INLINE
   else if adjustment_type = 'remove'
     console.log 'inline scenario 3' # index/show/bfrp page REMOVE: use old endpoint + one entry url'
-    data =
+    data_old =
       ip_uris: dispute_url
       list_types: removed_lists_arr
       note: curr_note   # ensure this is working
       thrt_cat_ids: thrt_cat_ids
     endpoint = '/escalations/api/v1/escalations/webrep/disputes/bulk_rule_ui_wlbl_remove'
 
-    # continue building the modal info
-    modal_info_string +=
-      "<span>Has been removed from the following WBRS Lists:
-        <p>#{removed_lists_arr.join(', ')}</p></span>"
+    modal_info_string += "<span>Has been removed from the following WBRS Lists: <p>#{removed_lists_arr.join(', ')}</p></span>"
 
-  # continue building the modal info outside of adjustment type
   if thrt_cat_ids.length
-    modal_info_string +=
-      "<span>With the following threat categories updated:
-        <p>#{thrt_cat_names.join(', ')}</p></span>"
+    modal_info_string += "<span>With the following threat categories updated: <p>#{thrt_cat_names.join(', ')}</p></span>"
 
-  # finish the modal
-  modal_info_string += "</div>"
+  modal_info_string += "</div>"  # finish the modal
 
-  # submit ready? make sure our data object is correct
-  console.log endpoint
-  console.log data
 
-  std_msg_ajax(
-    url: endpoint
-    method: 'POST'
-    data: data
-    error_prefix: 'Error adjusting WL/BL information.'
-    success_reload: true
-    success: (response) ->
-      std_msg_success("Entry has been updated", [modal_info_string])
-    error: (response) ->
-      std_api_error(response, 'Error updating this entry')
-    completed: () ->
-      $('.dispute-wlbl-adjust-wrapper .dropdown-submit-button').html('Submit Changes')
-  )
+  # 1) ONE API CALL - NORMAL SCENARIOS
+  # 1) ONE API CALL - NORMAL SCENARIOS
+  if second_adjustment_type == false
+    console.log 'SINGLE-API CALL SCENARIO BEGIN:'
+    if adjustment_type == 'add' || adjustment_type == 'replace'   # add or replace
+      data = data_new
+      endpoint = '/escalations/api/v1/escalations/webrep/disputes/bulk_wlbl_threatcat_adjust'
+    if adjustment_type == 'remove'
+      data = data_old
+      endpoint = '/escalations/api/v1/escalations/webrep/disputes/bulk_rule_ui_wlbl_remove'
+
+    console.log endpoint
+    console.log data
+
+    std_msg_ajax(
+      url: endpoint
+      method: 'POST'
+      data: data
+      error_prefix: 'Error adjusting WL/BL information.'
+      success_reload: true
+      success: (response) ->
+        std_msg_success("Entry has been updated", [modal_info_string])
+      error: (response) ->
+        std_api_error(response, 'Error updating this entry')
+      completed: () ->
+        $('.dispute-wlbl-adjust-wrapper .dropdown-submit-button').html('Submit Changes')
+    )
+
+  # 2) TWO API CALLS - RARE SCENARIOS (add and remove same time)
+  # 2) TWO API CALLS - RARE SCENARIOS (add and remove same time)
+  else if second_adjustment_type = true
+    console.log 'DOUBLE-API CALL SCENARIO BEGIN:'
+
+    # 111111 first api call
+    console.log 'FIRST API CALL STARTS HERE'
+    console.log '/escalations/api/v1/escalations/webrep/disputes/bulk_wlbl_threatcat_adjust'
+    console.log data_new
+
+    std_msg_ajax(
+      url: '/escalations/api/v1/escalations/webrep/disputes/bulk_wlbl_threatcat_adjust'
+      method: 'POST'
+      data: data_new
+      error_prefix: 'Error adjusting WL/BL information.'
+      success_reload: false
+      success: (response) ->
+        # 22222 second api call after 1111 api call succeeds
+        console.log 'FIRST API CALL SUCCESS'
+        console.log 'SECOND API CALL STARTS HERE'
+        console.log '/escalations/api/v1/escalations/webrep/disputes/bulk_rule_ui_wlbl_remove'
+
+        data_old =
+          ip_uris: dispute_url
+          list_types: removed_lists_arr
+          note: curr_note   # ensure this is working
+          thrt_cat_ids: thrt_cat_ids
+
+        console.log data_old
+
+        std_msg_ajax(
+          url: '/escalations/api/v1/escalations/webrep/disputes/bulk_rule_ui_wlbl_remove'
+          method: 'POST'
+          data: data_old
+          error_prefix: 'Error adjusting WL/BL information.'
+          success_reload: true
+          success: (response) ->
+            console.log 'SUCCESS: SECOND API CALL HAS PASSED'  # only show the modal_info_string after 2nd api completes
+            modal_info_string += '<div class="wlbl-info-modal"><span>Note: Removed those list(s) as well.</span></div>'
+            std_msg_success("Entry has been updated, add and remove is complete", [modal_info_string])
+          error: (response) ->
+            std_api_error(response, 'Error updating this entry')
+          completed: () ->
+            $('.dispute-wlbl-adjust-wrapper .dropdown-submit-button').html('Submit Changes')
+        )
+        # 22222 second api call
+
+      error: (response) ->
+        std_api_error(response, 'Error updating this entry')
+    )
+    # 111111 first api call
 
 
 
