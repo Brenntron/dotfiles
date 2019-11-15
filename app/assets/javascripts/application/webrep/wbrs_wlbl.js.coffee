@@ -605,10 +605,7 @@ window.submit_individual_wlbl = (button_tag) ->
 
   # SECOND_ADJUSTMENT_TYPE (if needed, this is rare)
   # SECOND_ADJUSTMENT_TYPE (if needed, this is rare
-  # CLEAN THIS UP!
-  # CLEAN THIS UP!
-  # CLEAN THIS UP!
-  # CLEAN THIS UP!
+  # TODDO: CLEAN THIS UP
   if old_lists_str.includes('BL') && new_lists_str.includes('WL') && !old_lists_str.includes('WL') && !new_lists_str.includes('BL')
     second_adjustment_type = true
     console.log 'inline scenario 4: you were on BL(s), but now you are removing BL(s) and adding WL(s)'
@@ -659,11 +656,6 @@ window.submit_individual_wlbl = (button_tag) ->
 
     modal_info_string += "<span>Has been removed from the following WBRS Lists: <p>#{removed_lists_arr.join(', ')}</p></span>"
 
-  if thrt_cat_ids.length
-    modal_info_string += "<span>With the following threat categories updated: <p>#{thrt_cat_names.join(', ')}</p></span>"
-
-  modal_info_string += "</div>"  # finish the modal
-
 
   # 1) ONE API CALL - NORMAL SCENARIOS
   # 1) ONE API CALL - NORMAL SCENARIOS
@@ -686,6 +678,12 @@ window.submit_individual_wlbl = (button_tag) ->
       error_prefix: 'Error adjusting WL/BL information.'
       success_reload: true
       success: (response) ->
+
+        if thrt_cat_ids.length
+          modal_info_string += "<span>With the following threat categories updated: <p>#{thrt_cat_names.join(', ')}</p></span>"
+
+        modal_info_string += "</div>"  # finish the modal
+
         std_msg_success("Entry has been updated", [modal_info_string])
       error: (response) ->
         std_api_error(response, 'Error updating this entry')
@@ -694,11 +692,10 @@ window.submit_individual_wlbl = (button_tag) ->
     )
 
   # 2) TWO API CALLS - RARE SCENARIOS (add and remove same time)
-  # 2) TWO API CALLS - RARE SCENARIOS (add and remove same time)
   else if second_adjustment_type = true
     console.log 'DOUBLE-API CALL SCENARIO BEGIN:'
 
-    # 111111 first api call
+    # FIRST API CALL
     console.log 'FIRST API CALL STARTS HERE'
     console.log '/escalations/api/v1/escalations/webrep/disputes/bulk_wlbl_threatcat_adjust'
     console.log data_new
@@ -711,18 +708,18 @@ window.submit_individual_wlbl = (button_tag) ->
       success_reload: false
       success: (response) ->
         # 22222 second api call after 1111 api call succeeds
-        console.log 'FIRST API CALL SUCCESS'
-        console.log 'SECOND API CALL STARTS HERE'
+        console.log 'FIRST API SUCCESS. \nSECOND API CALL STARTS HERE:'
         console.log '/escalations/api/v1/escalations/webrep/disputes/bulk_rule_ui_wlbl_remove'
 
         data_old =
           ip_uris: dispute_url
           list_types: removed_lists_arr
-          note: curr_note   # ensure this is working
+          note: curr_note
           thrt_cat_ids: thrt_cat_ids
 
         console.log data_old
 
+        # SECOND API CALL
         std_msg_ajax(
           url: '/escalations/api/v1/escalations/webrep/disputes/bulk_rule_ui_wlbl_remove'
           method: 'POST'
@@ -730,20 +727,24 @@ window.submit_individual_wlbl = (button_tag) ->
           error_prefix: 'Error adjusting WL/BL information.'
           success_reload: true
           success: (response) ->
-            console.log 'SUCCESS: SECOND API CALL HAS PASSED'  # only show the modal_info_string after 2nd api completes
-            modal_info_string += '<div class="wlbl-info-modal"><span>Note: Removed those list(s) as well.</span></div>'
-            std_msg_success("Entry has been updated, add and remove is complete", [modal_info_string])
+            console.log 'SECOND API SUCCESS: SECOND CALL HAS PASSED'  # only show the modal_info_string after 2nd api completes
+
+            modal_info_string += "<span>Has also been removed from the following WBRS Lists: <p>#{removed_lists_arr.join(', ')}</p></span>"
+            if thrt_cat_ids.length
+              modal_info_string += "<span>With the following threat categories updated: <p>#{thrt_cat_names.join(', ')}</p></span>"
+
+            modal_info_string += "</div>"  # finish the modal
+
+            std_msg_success("Entry has been updated", [modal_info_string])
           error: (response) ->
             std_api_error(response, 'Error updating this entry')
           completed: () ->
             $('.dispute-wlbl-adjust-wrapper .dropdown-submit-button').html('Submit Changes')
         )
-        # 22222 second api call
 
       error: (response) ->
         std_api_error(response, 'Error updating this entry')
     )
-    # 111111 first api call
 
 
 
