@@ -8,7 +8,7 @@ window.td_truncate = (str, max, long) ->
 $ ->
 
   # webcat: have top navigation bar scroll with page per user request
-  if location.href.includes('webcat')
+  if $('body').hasClass("escalations--webcat--complaints-controller")
     $('#nav-banner').addClass('fixed-nav')
 
   $('#web-cat-search #general_search').on 'keyup', (e) ->
@@ -574,15 +574,15 @@ $('#exampleModal').on 'shown.bs.modal', ->
 
 
 $ ->
-  # webcat reports page needs full metrics banner
-  if location.href.includes('webcat/reports')
+  # webcat > complaints show page, ensure this JS gets called
+  if $('body').hasClass('escalations--webcat--complaints-controller') && $('body').hasClass('show-action')
+    check_wbnp_status()
+
+  # webcat > reports page, show full metrics banner at top, not the streamlined one
+  if $('body').hasClass("escalations--webcat--reports-controller")
     $('#tooltip-wbnp').empty()
     $('.complaints-metrics-banner').addClass('hidden')
     $('.webcat-reports-only').removeClass('hidden')
-
-  # webcat > complaints show page, ensure this JS gets called
-  if location.href.includes('webcat/complaints') && $('body').addClass('show-action')
-    check_wbnp_status()
 
   # wbnp report status link shows a tooltip table
   $('.complaints-mgt-area #wbnp-report-status-link').tooltipster
