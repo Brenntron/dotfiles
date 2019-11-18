@@ -100,9 +100,9 @@ Rails.configuration.rep_api             = ApiRequester::ApiRequester.config_of(r
 sds_config = env_config.fetch('sds', nil)
 raise 'config.yml missing SDS section' unless sds_config
 Rails.configuration.sds                 = ApiRequester::ApiRequester.config_of(sds_config)
+Rails.configuration.sds.v3_host         = sds_config['v3_host']
 Rails.configuration.sds.cert_file       = sds_config['cert_file'] || sds_config['ca_cert_file']
 Rails.configuration.sds.pkey_file       = sds_config['pkey_file']
-
 
 talos_intelligence = env_config.fetch('talos_intelligence', {})
 Rails.configuration.talos_intelligence  = ApiRequester::ApiRequester.config_of(talos_intelligence)
