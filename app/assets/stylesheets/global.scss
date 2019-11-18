@@ -823,6 +823,7 @@ button {
 .return-ticket-toolbar-button:hover,
 .collapse-all:hover,
 .sync-button:hover,
+.pin-to-top-button:hover,
 .expand-all:hover {
   background-color: lighten($nav-toolbar-color, 8%)!important;
 }
@@ -846,6 +847,7 @@ button {
 .return-ticket-toolbar-button:focus,
 .collapse-all:focus,
 .sync-button:focus,
+.pin-to-top-button:focus,
 .expand-all:focus{
   background-color: lighten($bug-section-color, 28%);
 }
@@ -10144,7 +10146,7 @@ input[type="radio"].resolution_radio_button {
 }
 
 // webrep and webcat toolbars - between 1800px and 1600px, prevent breaking/wrapping of the buttons
-@media screen and (max-width: 1800px) and (min-width: 1600px) {
+@media (min-width: 1850px) {
   #webrep-index-toolbar, #webcat-index-toolbar {
     .toolbar-button {
       background-position: 4px 6px;
@@ -10155,6 +10157,21 @@ input[type="radio"].resolution_radio_button {
       transition: background-color 0.2s;
     }
   }
+}
+@media screen and (max-width: 1800px) and (min-width: 1705px){
+  #webcat-index-toolbar .toolbar-button-text {
+    .toolbar-button {
+      background-position: 4px 6px;
+    }
+  }
+}
+@media (max-width: 1850px)  {
+  #webcat-index-toolbar .toolbar-button-text {
+    display: none !important;
+  }
+}
+.toolbar#webcat-index-toolbar{
+  margin: 10px 0 -35px 0
 }
 
 // webrep - research tab toolbar - between 1600px and 1400px, prevent breaking/wrapping buttons, this needs to be separate
@@ -10476,5 +10493,126 @@ table > tbody > tr > td.no-padding {
     background-repeat: no-repeat;
     background-image: url('icon_sync_lt_grey.svg');
     margin-bottom: -2px;
+  }
+}
+
+// retain top navigation at top of page during scroll down for nav accessibility
+#nav-banner.fixed-nav {
+  position: -webkit-sticky;
+  position: sticky;
+  top: 0;
+  z-index: 999;
+}
+
+.pin-to-top-button {
+  background-image: url(image_path('icon_pin1.svg'));
+  background-size: 22px 22px;
+  background-position: 3px 3px;
+  padding-left: 18px;
+}
+
+.pinned-toolbar {
+  background: $content-bg-color;
+  box-shadow: 2px 0 10px 1px rgba(0,0,0,0.3);
+  position: relative;
+  bottom: 18px;
+  padding: 4px 20px;
+  .toolbar-checkbox-wrapper {
+    padding-top: 0;
+    padding-left: 5px;
+    font-weight: normal;
+  }
+  label {
+    display: none;
+  }
+}
+
+#webcat-index-title {
+  padding-top: 10px;
+}
+
+#webcat-index-toolbar {
+  margin: 15px 0 10px;
+}
+
+.pinned-toolbar-true #webcat-index-title {
+  padding-top: 25px;
+  line-height: 12px;
+}
+
+#webcat_searchref_container {
+  margin-bottom: 10px;
+  padding: 6px 0;
+}
+
+// tooltipster adjustments for pinned toolbar tooltips
+.pinned-toolbar-true .tooltipster-sidetip .tooltipster-box {
+  padding: 4px 6px;
+}
+
+// one-off override
+.pinned-toolbar-true .tooltipster-sidetip {
+  top: 85px !important;
+}
+
+.webcat-search-container {
+  height: 15px;
+}
+
+// correction to reduce extraneous vertical space
+.pinned-toolbar-true .webcat-search-container {
+  height: 0;
+}
+
+// handling the top-right username width issues
+@media screen and (max-width: 1200px) {
+  #nav-banner a.nav-username {
+    display: none;
+  }
+}
+
+
+// research rows alignment/formatting updates
+// top row of each
+.research-first-row {
+  margin-top: 120px;
+  td:nth-child(1), td:nth-child(2) {
+    width: 20px;  // icons
+  }
+  td:nth-child(3) {
+    //width: 55%;  // category, retain this commented line
+  }
+  td:nth-child(4) {
+    width: 20%;  // hostname
+  }
+  span.entry-data-content {
+    display: inline-block;
+    min-width: 500px;   // url/ip
+  }
+}
+
+// second row of each
+.research-overview-row {
+  background: $faint-neutral-color;
+  td:nth-child(6) {
+    width: 170px;  // rule hits list
+    word-break: break-word;
+    padding-right: 10px;
+  }
+  td:nth-child(7) {
+    width: 150px;
+  }
+  td:nth-child(8) {
+    width: 60px;   // xbrs history
+  }
+  td:nth-child(9) {
+    width: 140px;
+  }
+  td:nth-child(10) {
+    width: 110px;  // reptool class
+    word-break: break-word;
+  }
+  td:nth-child(12) {
+    width: 190px;  // wl/bl lists + threat cats
   }
 }

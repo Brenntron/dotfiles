@@ -100,9 +100,9 @@ Rails.configuration.rep_api             = ApiRequester::ApiRequester.config_of(r
 sds_config = env_config.fetch('sds', nil)
 raise 'config.yml missing SDS section' unless sds_config
 Rails.configuration.sds                 = ApiRequester::ApiRequester.config_of(sds_config)
+Rails.configuration.sds.v3_host         = sds_config['v3_host']
 Rails.configuration.sds.cert_file       = sds_config['cert_file'] || sds_config['ca_cert_file']
 Rails.configuration.sds.pkey_file       = sds_config['pkey_file']
-
 
 talos_intelligence = env_config.fetch('talos_intelligence', {})
 Rails.configuration.talos_intelligence  = ApiRequester::ApiRequester.config_of(talos_intelligence)
@@ -121,11 +121,11 @@ Rails.configuration.xbrs.consumer_key   = xbrs_config['consumer_key']
 
 
 virustotal = env_config.fetch('virustotal', nil)
-Rails.configuration.virus_total          = ApiRequester::ApiRequester.config_of(virustotal)
-Rails.configuration.virus_total.url      = virustotal['url']
+Rails.configuration.virustotal          = ApiRequester::ApiRequester.config_of(virustotal)
+Rails.configuration.virustotal.url      = virustotal['url']
 virustotal = env_config.fetch('auto_resolve',{}).fetch('virus_total', nil)
 raise 'config.yml missing virus_total section' unless virustotal
-Rails.configuration.virus_total.check    = virustotal['check']
+Rails.configuration.virustotal.check    = virustotal['check']
 
 # New apirequester interface
 bls_config = env_config.fetch('bls', {})

@@ -30,18 +30,18 @@
       %span.toolbar-button-text Fetch Complaints
     %button.toolbar-button.sync-button#fetch_wbnp.esc-tooltipped{ onclick: 'fetch_wbnp_data();', title: 'Fetch WBNP Data'}
       %span.toolbar-button-text Fetch WBNP Data
-
   %div
     %label.toolbar-section-label Bulk
     %button.toolbar-button.master-submit-button#master-submit.esc-tooltipped{ onclick: 'master_submit();', title: 'Submit Changes', disabled: true}
       %span.toolbar-button-text Submit Changes
-
+  %div
+    %label.toolbar-section-label
+      Pin Toolbar
+    %button.toolbar-button.pin-to-top-button#pin-to-top.esc-tooltipped{ onclick: 'pin_to_top();', title: 'Pin/Unpin Toolbar to Top (Shift+6)'}
+      %span.toolbar-button-text Pin Toolbar to Top
 
 
   %div.toolbar-checkbox-wrapper
     %input{type: 'checkbox', checked: true, id:'self_review'}
       Allow Self Review
-
-
-
 

@@ -439,3 +439,12 @@ end
 Given(/^I click on element "(.*?)" with accessor "(.*?)" of "(.*?)"$/) do |element, type, value|
   find("#{element}[#{type}='#{value}']").click
 end
+
+And(/^I enter the pin toolbar hot key$/) do
+  page.find(:xpath, "//body").send_keys("^")
+end
+
+Given(/^I fill in selectized with "(.*?)"$/) do |value|
+  find('div.selectize-input input', match: :first).set("#{value}")
+  find('div.selectize-dropdown-content > div', match: :first).click
+end

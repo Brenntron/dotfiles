@@ -7,6 +7,10 @@ window.td_truncate = (str, max, long) ->
 
 $ ->
 
+  # webcat: have top navigation bar scroll with page per user request
+  if location.href.includes('webcat')
+    $('#nav-banner').addClass('fixed-nav')
+
   $('#web-cat-search #general_search').on 'keyup', (e) ->
     { keyCode } = e
     { webcat_search_type, webcat_search_name, webcat_search_conditions }= localStorage
