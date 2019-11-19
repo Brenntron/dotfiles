@@ -31,6 +31,14 @@ class SbApi < ApplicationRecord
 
   end
 
+  def self.ca_cert_file
+    @ca_cert_file ||= Rails.configuration.sds.ca_cert_file
+  end
+
+  def self.pkey_file
+    @pkey_file ||= Rails.configuration.sds.pkey_file
+  end
+
   def self.build_request(request_params, request_host, request_json)
     #figure out if query_entry is an Object (ActionController::Parameters) or a string
     if request_params["query_entry"].is_a?(String)
