@@ -928,7 +928,7 @@ module API
             end
             desc 'Grab threat categories from SDSv3 API'
             post 'threat_categories' do
-              response = SbApi.remote_call_sds_v3(permitted_params[:uri],'wbrs')
+              response = SBRS::Base.remote_call_sds_v3(permitted_params[:uri],'wbrs')
 
               response
             end
@@ -938,7 +938,7 @@ module API
             end
             desc 'Grab threat levels from SDSv2 API'
             post 'threat_levels' do
-              response = SbApi.remote_call_sds(permitted_params[:uri],'wbrs')
+              response = SBRS::Base.remote_call_sds(permitted_params[:uri],'wbrs')
 
               response
             end

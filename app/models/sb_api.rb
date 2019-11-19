@@ -6,19 +6,11 @@ class SbApi < ApplicationRecord
   API_SOURCE = "www.senderbase.org"
 
   def self.sds_host
-    if Rails.env.production?
-      ENV['SDS_HOSTNAME']
-    else
-      ENV['SDS_BETA_HOSTNAME']
-    end
+    @sds_host ||= Rails.configuration.sds.host
   end
 
   def self.sds_v3_host
-    if Rails.env.production?
-      ENV['SDS_V3_HOSTNAME']
-    else
-      ENV['SDS_V3_BETA_HOSTNAME']
-    end
+    @sds_v3_host ||= Rails.configuration.sds.v3_host
   end
   
   def self.get_auth_key(user,pass,retried = nil)
@@ -125,6 +117,12 @@ class SbApi < ApplicationRecord
   end
 
   def self.remote_lookup_sds(params)
+    cert = File.open(ca_cert_file, 'r') do |file|
+      file.read
+    end
+    pkey = File.open(pkey_file, 'r') do |file|
+      file.read
+    end
     hostname = "#{params["hostname"]}"
     query_string = "#{params["query_string"]}"
     request_type = "#{params["sds_type"]}"
@@ -171,18 +169,10 @@ class SbApi < ApplicationRecord
           request["X-SDS-Categories-Version"] = "v" + self.pluck_webcat_version(webcat_list)
         end
 
-        if Rails.env.production?
-          cert = OpenSSL::X509::Certificate.new(ENV["SDS_CERT"].gsub("\\n", "\n"))
-          key = OpenSSL::PKey::RSA.new(ENV["SDS_CERT"].gsub("\\n", "\n"))
-        else
-          cert = OpenSSL::X509::Certificate.new(ENV["SDS_CERT_BETA"].gsub("\\n", "\n"))
-          key = OpenSSL::PKey::RSA.new(ENV["SDS_CERT_BETA"].gsub("\\n", "\n"))
-        end
-
         req_options = {
             use_ssl: uri.scheme == "https",
-            cert: cert,
-            key: key,
+            cert: OpenSSL::X509::Certificate.new(cert),
+            key: OpenSSL::PKey::RSA.new(pkey),
             verify_mode: OpenSSL::SSL::VERIFY_NONE
         }
         begin
@@ -220,6 +210,12 @@ class SbApi < ApplicationRecord
     hostname = "#{params["hostname"]}"
     query_string = "#{params["query_string"]}"
     request_type = "#{params["sds_type"]}"
+    cert = File.open(ca_cert_file, 'r') do |file|
+      file.read
+    end
+    pkey = File.open(pkey_file, 'r') do |file|
+      file.read
+    end
 
     if request_type.blank? && query_string.match?('/score/single/json')
       request_type = 'wbrs'
@@ -242,18 +238,10 @@ class SbApi < ApplicationRecord
         request["X-Product-ID"] = "talosintelligence"
         request["X-Device-ID"] = "talosweb"
 
-        if Rails.env.production?
-          cert = OpenSSL::X509::Certificate.new(ENV["SDS_CERT"].gsub("\\n", "\n"))
-          key = OpenSSL::PKey::RSA.new(ENV["SDS_CERT"].gsub("\\n", "\n"))
-        else
-          cert = OpenSSL::X509::Certificate.new(ENV["SDS_CERT_BETA"].gsub("\\n", "\n"))
-          key = OpenSSL::PKey::RSA.new(ENV["SDS_CERT_BETA"].gsub("\\n", "\n"))
-        end
-
         req_options = {
             use_ssl: uri.scheme == "https",
-            cert: cert,
-            key: key,
+            cert: OpenSSL::X509::Certificate.new(cert),
+            key: OpenSSL::PKey::RSA.new(pkey),
             verify_mode: OpenSSL::SSL::VERIFY_NONE
         }
 
