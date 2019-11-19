@@ -114,7 +114,7 @@ class ComplaintEntry < ApplicationRecord
   # @param [String] prefix_given please give us the prefix to use, or we'll use the domain or ip_address field.
   # @param [Boolean] reload set to true to get an up to date call to the API.
   # @return [Wbrs::Prefix] the object for the Prefix remote stub.
-  def remote_prefixes(prefix_given: self.domain || self.ip_address, reload: false)
+  def remote_prefixes(prefix_given: self.hostlookup, reload: false)
     @remote_prefixes = nil if reload
     @remote_prefixes ||= Wbrs::Prefix.where({urls: [prefix_given]})
   end
@@ -754,7 +754,7 @@ class ComplaintEntry < ApplicationRecord
   end
 
   def get_category_names_from_master
-    prefix_results = Wbrs::Prefix.where({:urls => [self.domain]})
+    prefix_results = remote_prefixes    # Should use self.domain
 
     if self.entry_type == 'URI/DOMAIN'
       parsed_uri = Complaint.parse_url(uri)
