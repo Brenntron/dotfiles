@@ -32,6 +32,12 @@ Given(/^the following FileRep disputes exist:$/) do |disputes|
   end
 end
 
+Given(/^the following FileRep email templates exist:$/) do |templates|
+  templates.hashes.each do |template_attrs|
+    FactoryBot.create(:file_rep_email_template, template_attrs)
+  end
+end
+
 Given(/^A FileRep Dispute with trait "(.*?)" exists$/) do |trait_name|
   FactoryBot.create(:file_reputation_dispute,trait_name.to_sym)
 end
