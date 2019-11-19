@@ -5151,7 +5151,7 @@ input.table-entry-input:focus {
   background-color: transparent;
   position: absolute;
   bottom: -34px;
-  z-index: 9999;
+  z-index: 1;
   transition: 0.50s;
   -webkit-transition: 0.50s;
   -moz-transition: 0.50s;
@@ -8428,7 +8428,7 @@ th.sorting_1, th.sorting_asc, th.sorting_desc {
 }
 
 .toolbar div.dropdown-tool-grey-row li, .dispute-reptool-adjust-wrapper .dropdown-tool-grey-row li {
-  padding: 2px 12px;
+  padding: 2px 2px 4px 10px;
 }
 
 .dropdown-tool-grey-row li:hover {
@@ -9815,7 +9815,7 @@ table.rl-content {
 // Datatables special display to get rid of sorting by placeholder 'Na' or 'Missing' etc. values
 
 .no-score::before {
-  content:'No Score';
+  content:'No score';
   display: block;
 }
 
@@ -10371,35 +10371,169 @@ hr.thin.extra-bottom-marg {
   opacity: 1;
 }
 
+.owner-col {
+  min-width: 80px;
+}
+// needs more width to encompass all threat categories now
+.dispute-wlbl-adjust-wrapper {
+  width: 480px;
+}
+
+// threat category stuff goes inside this wl/bl form
+.adjust-wlbl-form {
+  .dropdown-tool-grey-row {
+    li {
+      padding: 2px 2px 6px 12px;
+    }
+    .lists-row {
+      margin-bottom: 10px;
+    }
+  }
+  // threat categories row in adjust wl/bl
+  .dropdown-tool-grey-row.threat-cat-row {
+    margin-left: -10px !important; // need important overrides here
+    margin-right: -10px !important;
+    .threat-cat-note {
+      background-color: $content-bg-color;
+      padding-top: 10px;
+      padding-bottom: 0;
+      margin-bottom: 0;
+    }
+    .threat-cat-area {
+      padding: 3px;
+      height: 200px;
+      display: flex; // flex to alphabetize + sort the threat cats easily
+      flex-wrap: wrap;
+      flex-direction: column;
+      justify-content: space-around;
+      .threat-cat-cell {
+        width: 33%;
+        font-size: 8pt;
+        line-height: 10pt;
+        padding: 3px 0 3px 10px;
+        cursor: default;
+        input[type='checkbox'] {
+          float: left;
+          position: relative;
+          bottom: 3px;
+        }
+        li.threat-cat-cb {
+          padding-top: 6px;
+          padding-bottom: 8px;
+          input {
+            display: inline-block;
+            width: 12px;
+            margin-top: 1px;
+            margin-right: 4px;
+          }
+          label {
+            display: inline-block;
+            width: 120px;
+            vertical-align: top;
+            padding-top: 1px;
+          }
+        }
+      }
+    }
+    td.wlbl-threat-cat {
+      font-size: 8pt;
+      line-height: 11pt;
+      padding-left: 2px;
+    }
+  }
+}
+
+span.threat-cat-required {
+  margin-left: 5px;
+  margin-top: 1px;
+  color: $warning-accent-color;
+  font-size: 7pt;
+  padding-left: 2px;
+  .five-note {
+    margin-top: 0;
+    font-size: 7pt;
+  }
+  .required-bold {
+    font-weight: bold;
+    color: darken($warning-accent-color, 5%)
+  }
+}
+
+span.threat-cat-no-data {
+  float: none;
+  font-size: 8pt;
+  font-style: italic;
+  color: $content-label-color;
+  padding-left: 2px;
+}
+
+// adjust wl/bl dropdown - ensure long dispute url's break/wrap properly
+.dispute_tool_current .wlbl-dropdown-row td.wlbl-entry-content {
+  max-width: 180px;
+  min-width: 140px;
+  word-break: break-all;
+}
+
+.preview-wbrs-button {
+  margin-bottom: 8px;
+}
+
+.threat-cat-note label.content-label-sm {
+  margin-bottom: 2px;
+}
+
+// ensure vertical alignment on narrow screens
+.research-table-details-wrapper table tr:first-of-type td {
+  vertical-align: middle;
+}
+
 // webrep dispute index > ensure break/wrap properly for long url's containing parameters
+.dispute-entry-col {
+  min-width: 200px;
+}
+
 #disputes-index .entry-col-content {
   word-break: break-all;
   max-width: 250px;
 }
 
-// webrep disputes index table, domain or ip column
-span.input-truncate {
+// webrep dispute index > ensure the dispute count is to the right of the domain entry
+#disputes-index span.input-truncate {
   display: inline-block;
   position: relative;
-  padding-right: 25px;
-  width: 200px !important;
+  padding-right: 40px;
+  max-height: 20px !important;
+  max-width: 100% !important;
+  min-width: 98%;
+  .dispute-count {
+    border-radius: 5px;
+    padding: 1px 5px;
+    position: absolute;
+    right: 2px;
+    top: 0;
+  }
 }
 
-// webrep dispute index > ensure the dispute count is to the right of the domain entry
-.dispute-count {
-  position: absolute;
-  left: 180px;
-  float: none;
-  border-radius: 5px;
-  padding: 1px 5px;
+.wlbl-threat-cat, .wlbl-threat-cat-inline, table.dispute_tool_current th.th-threat-cat {
+  padding-left: 2px !important;
 }
 
-.dispute-entry-col {
-  min-width: 200px;
+// the main area in the research row to handle threat cats + wl/bls
+.wlbl-and-tc-area {
+  vertical-align: middle;
+  padding-top: 2px;
 }
 
-.owner-col {
+/* handles existing bug for wl/bl list duplicate entries (a.com issue) */
+.wlbl-table-result {
+  display: inline-block;
   min-width: 80px;
+  max-width: 150px;
+  max-height: 45px;
+  overflow-y: hidden;
+  padding-top: 1px;
+  padding-right: 15px;
+  vertical-align: middle;
 }
 
 // retain top navigation at top of page during scroll down for nav accessibility
@@ -10485,15 +10619,12 @@ span.input-truncate {
   td:nth-child(1), td:nth-child(2) {
     width: 20px;  // icons
   }
-  td:nth-child(3) {
-    //width: 55%;  // category, retain this commented line
-  }
   td:nth-child(4) {
-    width: 20%;  // hostname
+    width: 25%;  // hostname
   }
   span.entry-data-content {
     display: inline-block;
-    min-width: 500px;   // url/ip
+    min-width: 400px;   // url/ip
   }
 }
 
@@ -10524,7 +10655,52 @@ span.input-truncate {
 }
 
 
-// reports page specific styles
+.wlbl-tc-research-span {
+  display: inline-block;
+  padding-top: 1px;
+  min-width: 20px;
+  max-width: 150px;
+  vertical-align: middle;
+}
+
+.wlbl-and-tc-area .dispute-inline-buttons.history-button {
+  display: inline-block;
+  width: 20px;
+}
+
+.tc-replace-note span {
+  font-size: 7pt;
+  color: $warning-accent-color;
+  padding-left: 2px;
+  float: none;
+}
+
+.adjust-wlbl-form table.dispute_tool_current td {
+  padding: 8px 4px 4px 10px;
+}
+
+/* loader gif, but smaller, for dropdowns */
+.dropdown-menu .mini-loader {
+  display: inline-block;
+  width: 12px !important;
+  height: 12px !important;
+  position: relative;
+  top: 2px;
+  left: 4px;
+  background-size: 12px 12px;
+  animation-name: mini-spin;
+  animation-duration: 800ms;
+  animation-iteration-count: infinite;
+  animation-timing-function: linear;
+  background-image: url(image_path('icon_sync.svg'));
+  &.loader-white {
+    background-image: url(image_path('icon_sync_white.svg'));
+    top: 0;
+    left: 2px;
+  }
+}
+
+ // reports page specific styles
 .report_date_from label, .report_date_to label, .report_customer_name label {
   width: 120px;
 }
@@ -10550,6 +10726,108 @@ span.input-truncate {
   }
 }
 
+
+@keyframes mini-spin {
+  from { transform: rotate(0deg) }
+  to { transform: rotate(360deg) }
+}
+
+.loading-rows {
+  color: $type-lighter-color;
+  font-size: 8.5pt;
+  font-style: italic;
+}
+
+.lists-row ul li {
+  cursor: default;
+}
+
+.message-div ul {
+  margin-top: 15px;
+}
+
+// these are the information modals on wl/bl adjust
+.wlbl-info-modal {
+  line-height: 11pt;
+  p {
+    padding: 5px 0;
+  }
+  em {
+    font-style: italic;
+  }
+  // paragraphs in confirmation modal
+  span {
+    display: block;
+    text-align: center;
+    padding: 5px 10px 10px;
+    margin-bottom: 10px;
+    line-height: 15pt;
+    word-wrap: break-word;
+    border-bottom: solid 1px darken($content-bg-color, 4%);
+  }
+  // tc's in modal
+  span:last-of-type {
+    border-bottom: none;
+    margin-bottom: 0;
+  }
+}
+
+.tc-sentence {
+  font-style: normal;
+  margin: 0 5px;
+  padding-top: 5px;
+  em {
+    font-style: normal;
+    display: block;
+    line-height: 11pt;
+    margin: 10px 5px 5px;
+  }
+}
+
+.wlbl-current-entry-wbrs {
+  text-align: center;
+  span.missing-data {
+    text-align: left;
+    font-style: italic;
+  }
+}
+
+.inline-closed-msg {
+  padding: 20px;
+  text-align: center;
+}
+
+.disabled-submit-msg {
+  margin-top: 10px;
+}
+
+.dispute_rep_tools .dropdown-menu {
+  border-radius: 4px 0 4px 4px;
+  top: 18px;
+  right: 3px;
+}
+
+// inline adjust dropdown button toggle should be blue
+.dispute-inline-buttons.adjust-wlbl-button:hover {
+  background-color: lighten($bug-section-color, 5%) !important;
+}
+.dispute-inline-buttons.adjust-wlbl-button:focus {
+  background-color: $bug-section-color;
+}
+
+.dispute_rep_tools .dropdown-menu h3.reptool-dropdown-header {
+  padding-top: 6px;
+}
+
+// inline adjust dropdown, if checkboxes are disabled, select the adjacent span
+.wl-bl-list-inline:disabled + span {
+  cursor: not-allowed;
+}
+
+// applies to wl/bl cb's on adjust dropdown
+.grayed-out {
+  opacity: 0.6;
+}
 
 // webcat > complaints top area
 .complaint-mgt-top-area {

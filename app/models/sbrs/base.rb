@@ -293,6 +293,11 @@ class Sbrs::Base
               wbrs_response["wbrs"] = {"score" => sds_v3_response_parsed["rsp"]["thrt_scor"].to_f}
               wbrs_response["wbrs-rulehits"] = sds_v3_response_parsed["rsp"]["thrt_rhts"]
 
+              # This is just some cleaning for backwards-compatibility with the v2 format
+              if wbrs_response["wbrs-rulehits"] == nil
+                wbrs_response["wbrs-rulehits"] = {}
+              end
+
               wbrs_response
             elsif request_type == 'webcat_labels' || request_type == 'threatcat_labels'
               response.body
