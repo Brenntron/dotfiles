@@ -8,6 +8,7 @@ class FileReputationApi::SampleZoo
   set_basic_auth
 
   def self.sha256_lookup(sha256)
+    byebug
     cache_key = "sample_zoo:#{sha256}"
     if Rails.env.development? or Rails.cache.read(cache_key).blank?
       call_request_parsed(:get, "/samples/_search?q=SHA256:#{sha256}")
@@ -23,16 +24,13 @@ class FileReputationApi::SampleZoo
 
   def self.query_from_data(api_response)
     in_zoo = false
-    begin
-      if api_response[:error]
-        raise ("#{api_response[:error]}")
-      elsif api_response&.dig("hits","total") and api_response["hits"]["total"] > 0
-        in_zoo = true
-      else
-        in_zoo = false
-      end
-    rescue Exception => e
-        raise(e.message)
+
+    if api_response[:error]
+      raise ("#{api_response[:error]}")
+    elsif api_response&.dig("hits","total") and api_response["hits"]["total"] > 0
+      in_zoo = true
+    else
+      in_zoo = false
     end
 
     {in_zoo: in_zoo}
