@@ -73,7 +73,7 @@ Feature: Webcat complaints
     And I goto "/escalations/webcat/complaints?f=ALL"
     Then I select row "1"
     When I click "Open Selected"
-    And I wait for "4" seconds
+    And I wait for "2" seconds
     Then a new window should be opened
     When I switch to the new window
     And I should see "Company news"
