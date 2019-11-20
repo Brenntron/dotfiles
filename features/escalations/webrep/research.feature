@@ -55,7 +55,7 @@ Feature: Webrep, the BFRP
     And I fill in "search_uri" with "cisco.com"
     And I click "#submit-button"
     And I wait for "15" seconds
-    Then one research entry exists
+    Then two research entries exists
     
   Scenario: a user searches for a url on the research page that has a threat category assigned to it already
     Given a user with role "webrep user" exists and is logged in
