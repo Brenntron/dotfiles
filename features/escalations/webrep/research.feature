@@ -45,7 +45,7 @@ Feature: Webrep, the BFRP
     And I fill in "search_uri" with "blizzard.com"
     And I click "#submit-button"
     And I wait for "30" seconds
-    Then multiple research entry exists
+    Then multiple research entries exist
 
   @javascript
   Scenario: A user uses strict search
