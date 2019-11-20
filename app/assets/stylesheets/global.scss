@@ -10160,7 +10160,8 @@ input[type="radio"].resolution_radio_button {
   }
 }
 .toolbar#webcat-index-toolbar{
-  margin: 10px 0 -35px 0
+  margin: 10px 0 -35px 0;
+  z-index:10
 }
 
 // webrep - research tab toolbar - between 1600px and 1400px, prevent breaking/wrapping buttons, this needs to be separate
