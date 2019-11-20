@@ -73,7 +73,7 @@ Feature: Webcat complaints
     And I goto "/escalations/webcat/complaints?f=ALL"
     Then I select row "1"
     When I click "Open Selected"
-    And I wait for "2" seconds
+    And I wait for "4" seconds
     Then a new window should be opened
     When I switch to the new window
     And I should see "Company news"
@@ -250,7 +250,8 @@ Feature: Webcat complaints
     |1 |      |
     And a complaint entry preload exists
     And I goto "/escalations/webcat/complaints/1"
-    Then I should see "1.1.1.1"
+    Then take a screenshot
+    Then I should see "8.8.8.8"
 
   @javascript
   Scenario: lookup information is accessable via lookup button
