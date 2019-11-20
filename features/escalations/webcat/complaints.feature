@@ -250,7 +250,6 @@ Feature: Webcat complaints
     |1 |      |
     And a complaint entry preload exists
     And I goto "/escalations/webcat/complaints/1"
-    Then take a screenshot
     Then I should see "8.8.8.8"
 
   @javascript
