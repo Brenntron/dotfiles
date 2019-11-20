@@ -549,8 +549,10 @@ $ ->
       return false
 
   $(document).on 'change', '.dispute_check_box', ->
-    document.getElementById("disputes-index-export-form").onsubmit = () ->
-      return false
+    # ensure this only runs in file rep, there are dispute checkboxes on webrep
+    if $('#disputes-index-export-form').length
+      document.getElementById("disputes-index-export-form").onsubmit = () ->
+        return false
 
 
   window.export_file_rep_selected = () ->

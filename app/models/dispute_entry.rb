@@ -393,7 +393,7 @@ class DisputeEntry < ApplicationRecord
   end
 
   def wbrs_list_type
-    @wbrs_list_type ||= wbrs_xlist.select{ |wlbl| wlbl.state == "active" && wlbl.url == self.uri}.map{ |wlbl| wlbl.list_type }.join(', ')
+    @wbrs_list_type ||= wbrs_xlist.select{ |wlbl| wlbl.state == "active" && wlbl.url == self.hostlookup}.map{ |wlbl| wlbl.list_type }.join(', ')
   end
 
   def wbrs_xlist
@@ -613,13 +613,11 @@ class DisputeEntry < ApplicationRecord
     dispute_rule_hits.destroy_all
 
     ::Preloader::Base.fetch_all_api_data(self.hostlookup, self.id)
-
-    wbrs_stuff = Sbrs::ManualSbrs.get_wbrs_data({:url => self.hostlookup})
+    wbrs_stuff = Sbrs::Base.remote_call_sds_v3(self.hostlookup, "wbrs")
     wbrs_stuff_rulehits = Sbrs::ManualSbrs.get_rule_names_from_rulehits(wbrs_stuff)
-
     ip_addr = IPSocket.getaddress(hostlookup) rescue nil
     if ip_addr
-      wbrs_stuff_ip = Sbrs::ManualSbrs.get_wbrs_data(url: ip_addr)
+      wbrs_stuff_ip = Sbrs::Base.remote_call_sds_v3(ip_addr, "wbrs")
       wbrs_stuff_rulehits = wbrs_stuff_rulehits + Sbrs::ManualSbrs.get_rule_names_from_rulehits(wbrs_stuff_ip)
       wbrs_stuff_rulehits = wbrs_stuff_rulehits.uniq
     end
@@ -786,12 +784,13 @@ class DisputeEntry < ApplicationRecord
       if research_params['scope'] == "broad" || entries.find{|entry| url == entry.uri}
         entries.each do |entry|
           is_ip_address = !!(entry.uri  =~ Resolv::IPv4::Regex)
-          wbrs_stuff = Sbrs::ManualSbrs.get_wbrs_data({:url => entry.uri})
+
+          wbrs_stuff = Sbrs::Base.remote_call_sds_v3(entry.uri, "wbrs")
           wbrs_stuff_rulehits = Sbrs::ManualSbrs.get_rule_names_from_rulehits(wbrs_stuff)
 
           ip_addr = IPSocket.getaddress(entry.uri) rescue nil
           if ip_addr
-            wbrs_stuff_ip = Sbrs::ManualSbrs.get_wbrs_data(url: ip_addr)
+            wbrs_stuff_ip = Sbrs::Base.remote_call_sds_v3(ip_addr, "wbrs")
             wbrs_stuff_rulehits = wbrs_stuff_rulehits + Sbrs::ManualSbrs.get_rule_names_from_rulehits(wbrs_stuff_ip)
             wbrs_stuff_rulehits = wbrs_stuff_rulehits.uniq
           end

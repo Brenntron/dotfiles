@@ -43,7 +43,7 @@
             %button#wlbl_entries_button.toolbar-button.adjust-wlbl-button.dropdown-toggle.esc-tooltipped.toolbar-button-spacer{title: 'Adjust WL/BL', 'data-toggle': 'dropdown', 'aria-haspopup': 'true', 'aria-expanded': 'false', onclick: 'bulk_get_current_wlbl("show")'}
               %span.toolbar-button-text Adjust WL/BL
             .dropdown-menu.toolbar-dropdown#wlbl_adjust_entries{'aria-labelledby': 'wlbl_entries_button'}
-              = form_for :wlbl, html: {class: 'adjust-wlbl-form'} do |wlbl_form|
+              = form_for :wlbl, html: {class: 'adjust-wlbl-form bulk-wlbl-form'} do |wlbl_form|
                 .dispute-wlbl-adjust-wrapper
                   .dropdown-tool-text-divider.primary-text-divider
                     Current WBRS Reputation
@@ -54,6 +54,7 @@
                         %th.content-label-sm Dispute
                         %th.content-label-sm.no-word-break Current WL/BL List
                         %th.text-center.content-label-sm.no-word-break Current WBRS Score
+                        %th.content-label-sm.no-word-break.th-threat-cat Threat Category
                     %tbody
 
                       -# TODO Hook up ability to preview scores based on changes in WL/BL
@@ -63,41 +64,59 @@
 
                   .inline-tool-content-wrapper
                     .row
-                      .col-xs-2
-                        %label.content-label-sm Action
-                      .col-xs-5
+                      .col-xs-3
                         %input{type: 'radio', name: 'wlbl-action-radio', id: 'wlbl-add', value: 'wlbl-add', checked: true}
                         %label.radio-label{for: 'wlbl-add'} Add to list
-                      .col-xs-5
+                      .col-xs-4
                         %input{type: 'radio', name: 'wlbl-action-radio', id: 'wlbl-remove', value: 'wlbl-remove'}
                         %label.radio-label{for: 'wlbl-remove'} Remove from list
+                      .col-xs-5.replace-tc-radio.hidden
+                        %input{type: 'radio', name: 'wlbl-action-radio', id: 'wlbl-replace', value: 'wlbl-replace'}
+                        %label.radio-label{for: 'wlbl-replace'} Replace threat categories
 
-                    .row
+                    .row.tc-replace-note.hidden
+                      .col-xs-12
+                        %span NOTE: Submitting zero threat categories removes associated blacklists too.
+
+                    -# BEGIN: WL BL LISTS ROW + THREAT CATS ROW (place this 1 indent past 'inline-tool')
+                    .row.lists-row
                       .col-xs-12
                         %label.content-label-sm{for: "wlbl-list-type-select"} Lists
                         .row.dropdown-tool-grey-row
-                          .col-xs-5.col-xs-offset-2
+                          .col-xs-4
                             %ul
                               %li
-                                %input.wl-weak-checkbox.wl-bl-list-inline{type: 'checkbox', name: 'wl-bl-list-inline', value: "WL-weak"}
-                                  WL - Weak
+                                %input.wl-weak-checkbox.wl-bl-list-inline{type: 'checkbox', name: 'wl-bl-list-inline', value: "WL-weak"} WL - Weak
                               %li
-                                %input.wl-med-checkbox.wl-bl-list-inline{type: 'checkbox', name: 'wl-bl-list-inline', value: "WL-med"}
-                                  WL - Medium
-                              %li
-                                %input.wl-heavy-checkbox.wl-bl-list-inline{type: 'checkbox', name: 'wl-bl-list-inline', value: "WL-heavy"}
-                                  WL - Heavy
-                          .col-xs-5
+                                %input.bl-weak-checkbox.wl-bl-list-inline{type: 'checkbox', name: 'wl-bl-list-inline', value: "BL-weak"} BL - Weak
+                          .col-xs-4
                             %ul
                               %li
-                                %input.bl-weak-checkbox.wl-bl-list-inline{type: 'checkbox', name: 'wl-bl-list-inline', value: "BL-weak"}
-                                  BL - Weak
+                                %input.wl-med-checkbox.wl-bl-list-inline{type: 'checkbox', name: 'wl-bl-list-inline', value: "WL-med"} WL - Medium
                               %li
-                                %input.bl-med-checkbox.wl-bl-list-inline{type: 'checkbox', name: 'wl-bl-list-inline', value: "BL-med"}
-                                  BL - Medium
+                                %input.bl-med-checkbox.wl-bl-list-inline{type: 'checkbox', name: 'wl-bl-list-inline', value: "BL-med"} BL - Medium
+                          .col-xs-4
+                            %ul
                               %li
-                                %input.bl-heavy-checkbox.wl-bl-list-inline{type: 'checkbox', name: 'wl-bl-list-inline', value: "BL-heavy"}
-                                  BL - Heavy
+                                %input.wl-heavy-checkbox.wl-bl-list-inline{type: 'checkbox', name: 'wl-bl-list-inline', value: "WL-heavy"} WL - Heavy
+                              %li
+                                %input.bl-heavy-checkbox.wl-bl-list-inline{type: 'checkbox', name: 'wl-bl-list-inline', value: "BL-heavy"} BL - Heavy
+
+                    .row.dropdown-tool-grey-row.threat-cat-row.hidden
+                      .threat-cat-note
+                        %label.content-label-sm
+                          Threat Categories
+                          %span.threat-cat-required
+                            *Required for adding to any blacklist.
+                            %span.five-note Up to 5 can be selected
+
+                      .threat-cat-area
+                        - Wbrs::ThreatCategory.selections.each do |label, value|
+                          .threat-cat-cell
+                            = wlbl_form.check_box(:thrt_cat_id, {id: nil, class: "wlbl_thrt_cat_id wlbl_thrt_cat_id_#{value}"}, value)
+                            = label
+                    -# END: WL BL LISTS ROW + THREAT CATS ROW
+
 
                     .comment-wrapper
                       %label.content-label-sm WL/BL Comment
@@ -231,11 +250,11 @@
           %tr.research-table-row{'data-entry-id': "#{entry.id}"}
             %td.research-table-row-wrapper
               %table
-                %tr
+                %tr.research-first-row
                   %td.expandable-row-column
                     %button.expand-row-button-inline{'data-entry-id': "#{entry.id}"}
                   %td
-                    %input.dispute_check_box{type: 'checkbox', 'data-entry-id': "#{entry.id}"}
+                    %input.dispute_check_box{type: 'checkbox', 'data-entry-id': "#{entry.id}", class: "dispute-entry-cb-#{entry.id}"}
                   %td.dual-edit-field{'data-id': entry.id, 'data-field': 'host'}
                     - if entry[:is_important]
                       %span.entry-data.entry-data-content.entry-important-flag
@@ -257,7 +276,7 @@
                       = entry[:hostname]
                   %td.dual-edit-field{'data-id': entry.id, 'data-field': 'status'}
                     %label Status
-                    %span.entry-data
+                    %span.entry-data.entry-data-status
                       - if entry[:status].nil?
                         NEW
                       - else
@@ -344,7 +363,7 @@
                         - if (@dispute.resolution != Dispute::DUPLICATE) && (@dispute.status != Dispute::RESOLVED)
                           %button.dispute-inline-buttons.adjust-wlbl-button.bfrp-inline-wlbl-button.dropdown-toggle.esc-tooltipped{id: "wlbl_button_#{entry.id}", title: 'Adjust WL/BL', 'data-toggle': 'dropdown', 'aria-haspopup': 'true', 'aria-expanded': 'false', onclick: 'get_current_wlbl(this);'}
                         .dropdown-menu{id: "wlbl_adjust_#{entry.id}", 'aria-labelledby': "wlbl_button_#{entry.id}"}
-                          = form_for :wlbl, html: {class: 'adjust-wlbl-form'} do |wlbl_form|
+                          = form_for :wlbl, html: {class: 'adjust-wlbl-form inline-wlbl-form'} do |wlbl_form|
                             .dispute-wlbl-adjust-wrapper
                               %input.adjust-wlbl-input.dispute-entry-content{type: 'hidden', value: "#{entry.hostlookup}" }
                               %h3 Adjust WL/BL
@@ -354,61 +373,85 @@
                                     %th.content-label-sm.no-word-break Current WL/BL List
                                     %th.text-center.content-label-sm.no-word-break Current WBRS Score
                                     %th.text-center.content-label-sm.no-word-break Projected Score
+                                    %th.content-label-sm.no-word-break.th-threat-cat Threat Category
                                 %tbody
                                   %tr
                                     %td.wlbl-entry-wlbl
-                                    %td.wlbl-current-entry-wbrs.text-center
+                                    %td.wlbl-current-entry-wbrs
                                     %td.wlbl-projected-entry-wbrs.text-center
+                                    %td.wlbl-threat-cat-inline
+
                               .inline-tool-content-wrapper
                                 .row
                                   .col-xs-12
                                     %label.content-label-sm{for: "wlbl-list-type-select"} Adjust WL/BL List
-                                .row
-                                  .col-xs-6
+                                .row.lists-row
+                                  .col-xs-4
                                     %ul.wlbl-toggle-list
                                       %li
                                         %label.toggle-switch
                                           %input.wl-weak-checkbox{type: 'checkbox', name: 'wl-bl-list-inline', class: 'wl-bl-list-inline', value: 'WL-weak', onclick: 'prepare_for_wbrs_preview(this)'}
-                                          %span.toggle-slider
+                                          %span.toggle-slider#wl-weak-slider
                                         WL - Weak
                                       %li
                                         %label.toggle-switch
-                                          %input.wl-med-checkbox{type: 'checkbox', name: 'wl-bl-list-inline', class: 'wl-bl-list-inline', value: 'WL-med', onclick: 'prepare_for_wbrs_preview(this)'}
-                                          %span.toggle-slider
-                                        WL - Medium
-                                      %li
-                                        %label.toggle-switch
-                                          %input.wl-heavy-checkbox{type: 'checkbox', name: 'wl-bl-list-inline', class: 'wl-bl-list-inline', value: 'WL-heavy', onclick: 'prepare_for_wbrs_preview(this)'}
-                                          %span.toggle-slider
-                                        WL - Heavy
-                                  .col-xs-6
+                                          %input.bl-weak-checkbox{type: 'checkbox', name: 'wl-bl-list-inline', class: 'wl-bl-list-inline', value: 'BL-weak', onclick: 'prepare_for_wbrs_preview(this)'}
+                                          %span.toggle-slider#bl-weak-slider
+                                        BL - Weak
+                                  .col-xs-4
                                     %ul.wlbl-toggle-list
                                       %li
                                         %label.toggle-switch
-                                          %input.bl-weak-checkbox{type: 'checkbox', name: 'wl-bl-list-inline', class: 'wl-bl-list-inline', value: 'BL-weak', onclick: 'prepare_for_wbrs_preview(this)'}
-                                          %span.toggle-slider
-                                        BL - Weak
+                                          %input.wl-med-checkbox{type: 'checkbox', name: 'wl-bl-list-inline', class: 'wl-bl-list-inline', value: 'WL-med', onclick: 'prepare_for_wbrs_preview(this)'}
+                                          %span.toggle-slider#wl-med-slider
+                                        WL - Medium
                                       %li
                                         %label.toggle-switch
                                           %input.bl-med-checkbox{type: 'checkbox', name: 'wl-bl-list-inline', class: 'wl-bl-list-inline', value: 'BL-med', onclick: 'prepare_for_wbrs_preview(this)'}
-                                          %span.toggle-slider
+                                          %span.toggle-slider#bl-med-slider
                                         BL - Medium
+                                  .col-xs-4
+                                    %ul.wlbl-toggle-list
+                                      %li
+                                        %label.toggle-switch
+                                          %input.wl-heavy-checkbox{type: 'checkbox', name: 'wl-bl-list-inline', class: 'wl-bl-list-inline', value: 'WL-heavy', onclick: 'prepare_for_wbrs_preview(this)'}
+                                          %span.toggle-slider#wl-heavy-slider
+                                        WL - Heavy
                                       %li
                                         %label.toggle-switch
                                           %input.bl-heavy-checkbox{type: 'checkbox', name: 'wl-bl-list-inline', class: 'wl-bl-list-inline', value: 'BL-heavy', onclick: 'prepare_for_wbrs_preview(this)'}
-                                          %span.toggle-slider
+                                          %span.toggle-slider#bl-heavy-slider
                                         BL - Heavy
+
                                 .button-row-center
                                   %button.preview-wbrs-button{type: 'button', disabled: true, onclick: 'preview_wbrs_score(this);', 'data-add': '', 'data-remove': ''}
                                     Preview Projected Score
                                   %button.reset-form-button.esc-tooltipped{type: 'button', title: 'Reset list toggles.', onclick: 'reset_score_preview(this)'}
-                                %hr.thin
+
+                                -# BEGIN: THREAT CATS ROW
+                                .row.dropdown-tool-grey-row.threat-cat-row.hidden
+                                  .threat-cat-note
+                                    %label.content-label-sm
+                                      Threat Categories
+                                      %span.threat-cat-required
+                                        *Required for adding to any blacklist.
+                                        %span.five-note Up to 5 can be selected
+                                  .threat-cat-area
+                                    - Wbrs::ThreatCategory.selections.each do |label, value|
+                                      .threat-cat-cell
+                                        = wlbl_form.check_box(:thrt_cat_id, {id: nil, class: "wlbl_thrt_cat_id wlbl_thrt_cat_id_#{value}"}, value)
+                                        = label
+                                -# END: THREAT CATS ROW
+
                                 .comment-wrapper
                                   %label.content-label-sm Comment
                                   %textarea.dropdown-comment.adjust-wlbl-input.note-input
                                 .button-row-center
                                   %button.primary.dropdown-submit-button{type: 'button', disabled: true, onclick:'submit_individual_wlbl(this);'}
                                     Submit Changes
+
+
+
                       %span.dropdown
                         - if (@dispute.resolution != Dispute::DUPLICATE) && (@dispute.status != Dispute::RESOLVED)
                           %button.dispute-inline-buttons.adjust-reptool-button.dropdown-toggle.esc-tooltipped{onclick: "get_current_reptool(this, 'show')", id: "reptool_button_#{entry.id}", title: 'Adjust RepTool BL', 'data-toggle': 'dropdown', 'aria-haspopup': 'true', 'aria-expanded': 'false'}
@@ -417,7 +460,7 @@
                             .dispute-reptool-adjust-wrapper
                               %input.adjust-reptool-bl-input.dispute-entry-id{type: 'hidden', value: "#{entry.id}" }
                               %input.adjust-reptool-bl-input.dispute-entry-content{type: 'hidden', value: "#{entry.hostlookup}" }
-                              %h3 Adjust RepTool Classification
+                              %h3.reptool-dropdown-header Adjust RepTool Classification
                               %table.dispute_tool_current
                                 %thead
                                   %tr
@@ -517,7 +560,7 @@
                 %tr.research-overview-row
                   %td
                     -#Expander area
-                  %td.research-table-details-wrapper{colspan: '8'}
+                  %td.research-table-details-wrapper{colspan: '9'}
                     %table
                       %tr
                         %td.input-col
@@ -527,7 +570,7 @@
                         %td.text-center.entry-data-wbrs-score
                           - if entry.wbrs_score.nil?
                             %span.current-wbrs-score.missing-data
-                              No score.
+                              No score
                           - else
                             %span.current-wbrs-score
                               = entry.wbrs_score
@@ -566,7 +609,6 @@
                             = entry.virustotals_negatives_count
                             \/
                             = entry.virustotals.count
-
                         %td.left-bordered
                           %label WL/BL
                         %td.entry-data-wlbl
@@ -575,12 +617,13 @@
                           - else
                             %span.wlbl-table-result
                               = entry.wbrs_list_type
+                            %span.wlbl-tc-research-span
                             %button.dispute-inline-buttons.history-button.esc-tooltipped{title: 'WL/BL History', onclick: "wlbl_history_dialog(#{entry.id})"}
 
                         %td.left-bordered
                           %label Referenced on
                         %td.referenced-tickets-col
-                          - if entry.referenced_tickets.count < 1 
+                          - if entry.referenced_tickets.count < 1
                             %span.missing-data
                               Not on any other tickets
                           - else
@@ -604,7 +647,7 @@
                         %td.text-center
                           - if entry.sbrs_score.nil?
                             %span.current-sbrs-score.missing-data
-                              No score.
+                              No score
                           - else
                             %span.current-sbrs-score
                               = entry.sbrs_score

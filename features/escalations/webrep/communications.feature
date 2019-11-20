@@ -26,9 +26,9 @@ Feature: Webrep communications
       | id     |
       | 722    |
     And the following dispute emails exist:
-      |id  | dispute_id           | status |
-      | 1  | 722                  | unread |
-      | 2  | 722                  | read   |
+      |id  | dispute_id           | status | subject |
+      | 1  | 722                  | unread | One     |
+      | 2  | 722                  | read   | Another |
     And I goto "/escalations/webrep/disputes/722"
     And row with email_id "1" should have class "email-unread"
     And I click on row with email_id "1"
@@ -80,7 +80,7 @@ Feature: Webrep communications
     Given successful "::Bridge::SendEmailEvent" PeakeBridge post message is stubbed
     When I click "Send"
     And I wait for "2" seconds
-    And I should see "EMAIL SENT"
+    And I should see "I'm replying to your email"
 
 
 
@@ -103,7 +103,7 @@ Feature: Webrep communications
     Given successful "::Bridge::SendEmailEvent" PeakeBridge post message is stubbed
     Then I click "Send"
     And I wait for "2" seconds
-    And I should see "EMAIL SENT"
+    And I should see "Demo"
 
 
   @javascript
@@ -144,7 +144,7 @@ Feature: Webrep communications
     And I fill a content-editable field ".new-case-note-textarea" with "I like jelly beans"
     Then I click ".new-case-note-save-button"
     And I wait for "2" seconds
-    Then I should see "NOTE CREATED"
+    Then I should see "I like jelly beans"
 
 
   @javascript
@@ -167,7 +167,7 @@ Feature: Webrep communications
     And I fill a content-editable field ".note-block2" with "I am editing stuff"
     When I click ".update-note"
     Then I wait for "2" seconds
-    Then I should see "NOTE UPDATED"
+    Then I should see "I am editing stuff"
 
 
 
@@ -188,6 +188,8 @@ Feature: Webrep communications
 
     And I goto "/escalations/webrep/disputes/722"
     And I click the delete button of the first comment
+    Then I wait for "2" seconds
+    And I click ".confirm"
     Then I wait for "2" seconds
     Then I should see "NOTE COULD NOT BE DELETED"
 
@@ -211,7 +213,9 @@ Feature: Webrep communications
     And I goto "/escalations/webrep/disputes/722"
     And I click the delete button of the first comment
     Then I wait for "2" seconds
-    Then I should see "NOTE DELETED"
+    And I click ".confirm"
+    Then I wait for "2" seconds
+    Then I should not see "purple pigs are cool"
 
 
   ## Email Templates
@@ -265,9 +269,12 @@ Feature: Webrep communications
       |  PSB          | Our worldwide sensor network indicates that spam originated from IP (x.x.x.x) as recently as xx-xx-xx . | PSB description |
     And I goto "/escalations/webrep/disputes/722"
     And I click "Manage Email Templates"
+    And I should see "PSB"
     Then I click ".delete-template"
+    And I click ".confirm"
     And I wait for "3" seconds
-    Then I should see "EMAIL TEMPLATE DELETED"
+    And I click "Manage Email Templates"
+    Then I should not see "PSB"
 
   @javascript
   Scenario: a user views an email that should have the customer facing flag
@@ -289,21 +296,21 @@ Feature: Webrep communications
   @javascript
   Scenario: a user attaches a file to an email and sends it
     Then pending
+    # we need to figure out how selenium can interact with the file selector
     Given a user with role "webrep user" exists and is logged in
-    And the following bugs exist:
-    |id   |bugzilla_id|
-    |5370 |5370       |
     And the following disputes exist and have entries:
     |id     |
     |5370    |
+    And bugzilla rest creates a bug with id "5370"
     And I goto "/escalations/webrep/disputes/5370"
     Then I click "Compose New Email"
     And I wait for "2" seconds
     And I fill in "receiver" with "customer@gmail.com"
     And I click ".new-attachment"
     Then I wait for "2" seconds
-    Given I upload "test.png" from_button "attachment"
+    Given I upload "test_doc.txt" from_button "attachment"
+    Then I wait for "5" seconds
     Given successful "::Bridge::SendEmailEvent" PeakeBridge post message is stubbed
     Then I click "Send"
-    And I wait for "30" seconds
-    And I should see "EMAIL SENT"
+    And I wait for "3" seconds
+    And I should see "test_doc.txt"
