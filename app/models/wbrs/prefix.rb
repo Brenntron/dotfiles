@@ -59,6 +59,18 @@ class Wbrs::Prefix < Wbrs::Base
     end
   end
 
+  def category_object
+    case
+    when @category_object
+      # do nothing
+    when self.category_id
+      @category_object = Wbrs::Category.find(self.category_id)
+    else
+      @category_object = categories.first
+    end
+    @category_object
+  end
+
   def category_names
     categories.map {|category| category.descr}
   end

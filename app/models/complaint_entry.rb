@@ -795,7 +795,7 @@ class ComplaintEntry < ApplicationRecord
     final_current_categories = {}
 
     qualified_prefixes.each do |result|
-      current_categories = result.categories
+      current_categories = [ result.category_object ]
       category_certainty = {}
       certainty_on_urls.each do |cert_url, info|
 
