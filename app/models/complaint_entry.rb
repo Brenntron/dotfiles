@@ -116,7 +116,7 @@ class ComplaintEntry < ApplicationRecord
   # @return [Array[Wbrs::Prefix]] the object for the Prefix remote stub.
   def remote_prefixes(prefix_given: self.hostlookup, reload: false)
     @remote_prefixes = nil if reload
-    @remote_prefixes ||= Wbrs::Prefix.where({urls: [prefix_given]})
+    @remote_prefixes ||= Wbrs::Prefix.where({:urls => [URI.escape(prefix_given)]})
   end
 
   # Returns the Wbre::Prefix object called on domain_of_with_path
@@ -873,7 +873,7 @@ class ComplaintEntry < ApplicationRecord
   def historic_category_data
 
     prefix_history = []
-    prefixes = Wbrs::Prefix.where({:urls => [URI.escape(self.hostlookup)]})
+    prefixes = remote_prefixes
     prefixes.each do |prefix|
       if prefix.subdomain == self.subdomain && prefix.path == self.path
         prefix_id = prefix.prefix_id
