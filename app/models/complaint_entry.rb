@@ -958,4 +958,12 @@ class ComplaintEntry < ApplicationRecord
       return false
     end
   end
+
+  def process_resolution_change(resolution)
+    if self.is_important
+      self.update(status: "PENDING", resolution: resolution)
+    else
+      self.update(status: "COMPLETED", resolution: resolution)
+    end
+  end
 end

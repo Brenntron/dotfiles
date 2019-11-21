@@ -507,6 +507,27 @@ module API
               end
             end
 
+            params do
+              requires :complaint_entries, type: Array[Integer]
+              requires :resolution, type: String
+            end
+            post 'update_resolution' do
+              std_api_v2 do
+                errors = []
+                permitted_params[:complaint_entries].each do |entry|
+                  complaint_entry = ComplaintEntry.find(entry)
+
+                  begin
+                    complaint_entry.process_resolution_change(permitted_params[:resolution])
+                  rescue
+                    errors << entry
+                  end
+
+                end
+                errors.to_json
+              end
+            end
+
           end
         end
       end

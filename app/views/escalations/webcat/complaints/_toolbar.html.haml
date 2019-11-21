@@ -34,6 +34,17 @@
     %label.toolbar-section-label Bulk
     %button.toolbar-button.master-submit-button#master-submit.esc-tooltipped{ onclick: 'master_submit();', title: 'Submit Changes', disabled: true}
       %span.toolbar-button-text Submit Changes
+    %span.dropdown
+      %button#index_change_assign.toolbar-button.ticket-owner-button.show-col-button.dropdown-toggle.esc-tooltipped.toolbar-button-spacer{title: 'Change Assignee', 'data-toggle': 'dropdown', 'aria-haspopup': 'true', 'aria-expanded': 'false'}
+        %span.toolbar-button-text
+          Update Resolution
+      .dropdown-menu.toolbar-dropdown#index-change-assign-dropdown{'aria-labelledby': 'index_change_assign'}
+        .toolbar
+          %div
+            %label.toolbar-section-label Edit Resolution
+            = select(:complaint, :resolution, options_for_select([["Unchanged", "UNCHANGED"], ["Fixed", "FIXED"], ["Invalid", "INVALID"]]))
+          %button{class: 'primary', type:'button', id: 'button_update_resolution', onclick:'updateResolution();'}
+            Update
   %div
     %label.toolbar-section-label
       Pin Toolbar
