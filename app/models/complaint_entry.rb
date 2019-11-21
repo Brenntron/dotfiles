@@ -126,7 +126,7 @@ class ComplaintEntry < ApplicationRecord
   # @return [Array[Wbrs::Prefix]] the object for the Prefix remote stub.
   def remote_prefixes_with_path(prefix_given: self.hostlookup, reload: false)
     @remote_prefixes_with_path = nil if reload
-    @remote_prefixes_with_path ||= Wbrs::Prefix.where({:urls => [DisputeEntry.domain_of_with_path(self.hostlookup)]})
+    @remote_prefixes_with_path ||= Wbrs::Prefix.where({:urls => [DisputeEntry.domain_of_with_path(prefix_given)]})
   end
 
   def change_category(prefix,
