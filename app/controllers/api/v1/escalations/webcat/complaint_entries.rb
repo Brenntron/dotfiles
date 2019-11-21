@@ -32,7 +32,7 @@ module API
                                        permitted_params['comment'],
                                        permitted_params['resolution_comment'],
                                        current_user, "")
-                ComplaintEntryPreload.generate_preload_from_complaint_entry(entry)
+                Thread.new { ComplaintEntryPreload.generate_preload_from_complaint_entry(entry) }
                 if entry.complaint.ticket_source != Complaint::SOURCE_RULEUI
                   message = Bridge::ComplaintUpdateStatusEvent.new
                   message.post_complaint(entry.complaint)
