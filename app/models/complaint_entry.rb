@@ -109,14 +109,24 @@ class ComplaintEntry < ApplicationRecord
     uri.present? ? uri : ip_address
   end
 
-  # Returns the Wbre::Prefix object.
+  # Returns the Wbre::Prefix objects.
   # Object may be cached.
   # @param [String] prefix_given please give us the prefix to use, or we'll use the domain or ip_address field.
   # @param [Boolean] reload set to true to get an up to date call to the API.
-  # @return [Wbrs::Prefix] the object for the Prefix remote stub.
+  # @return [Array[Wbrs::Prefix]] the object for the Prefix remote stub.
   def remote_prefixes(prefix_given: self.hostlookup, reload: false)
     @remote_prefixes = nil if reload
     @remote_prefixes ||= Wbrs::Prefix.where({urls: [prefix_given]})
+  end
+
+  # Returns the Wbre::Prefix object called on domain_of_with_path
+  # Object may be cached.
+  # @param [String] prefix_given please give us the prefix to use, or we'll use the domain or ip_address field.
+  # @param [Boolean] reload set to true to get an up to date call to the API.
+  # @return [Array[Wbrs::Prefix]] the object for the Prefix remote stub.
+  def remote_prefixes_with_path(prefix_given: self.hostlookup, reload: false)
+    @remote_prefixes_with_path = nil if reload
+    @remote_prefixes_with_path ||= Wbrs::Prefix.where({:urls => [DisputeEntry.domain_of_with_path(self.hostlookup)]})
   end
 
   def change_category(prefix,
@@ -783,7 +793,7 @@ class ComplaintEntry < ApplicationRecord
 
   def current_category_data
 
-    prefix_results = Wbrs::Prefix.where({:urls => [DisputeEntry.domain_of_with_path(self.hostlookup)]})
+    prefix_results = remote_prefixes_with_path
     return {} unless prefix_results
     domain_of = DisputeEntry.domain_of_with_path(self.hostlookup)
     certainty_on_urls = Wbrs::Prefix.get_certainty_sources_for_urls([domain_of])

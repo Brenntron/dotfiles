@@ -12,7 +12,7 @@ module API
             end
 
 
-            desc 'update an entry '
+            desc 'update an entry'
             params do
               requires :id, type: Integer, desc:'complaint entry id'
               requires :prefix, type: String, desc: 'the url to categorize'
