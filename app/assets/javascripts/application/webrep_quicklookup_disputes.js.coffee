@@ -149,22 +149,32 @@ $ ->
       submit_btn.prop('disabled', false)
     else
       submit_btn.prop('disabled', true)
+  window.check_actions = (action_classes, action_tags) =>
+    if action_classes.includes('reptool')
+      if action_classes.includes('maintain')
+        return 'maintain': action_tags
+      else if action_classes.includes('override')
+        return 'override': action_tags
+      else if action_classes.includes('drop')
+        return 'drop'
+    else
+      if action_classes.includes('add')
+        return 'add': action_tags
+      else
+        return 'remove': action_tags
 
   window.quick_bulk_update = (data) ->
-    data = {
-      data: data
-    }
     password = $('form#top_banner_bugzilla_login_form').find('input[name=password]').val()
     std_msg_ajax(
       method: 'POST'
       url: '/escalations/api/v1/escalations/webrep/disputes/quick_bulk_update'
       data: {
-        update_data:{'google.com' : 'google.com'}
+        update_data: data
       }
       success_reload:false
       error_prefix: 'Error logging in.'
       success: (response) ->
-        console.log response
+        return response
     )
   window.confirm_rep_changes = () ->
     #  confirm actions to be taken, data is prepared and  final submission of disputes to be made
@@ -173,10 +183,42 @@ $ ->
     comment = $('.confirm-rep-input').val()
     reptool_dispute_changes = []
     wlbl_dispute_changes = []
+    disputes = {}
     $( confirmation_rows ).each ->
-      dispute = $( this ).find('td').first().text()
-      debugger
-      quick_bulk_update(dispute)
+      row = $( this ).find('td')
+      dispute = $( row[0] ).text()
+      actions = $( row[1] ).children()
+      disputes[dispute] = dispute
+      quick_bulk_update(disputes).then(
+          (response)=>
+            data = JSON.parse(response).data
+            action_list = []
+            for action in actions
+              action_tags = []
+              $(action).find('.col-tag').contents().each -> action_tags.push(this.data)
+              class_list = $(action).attr("class")
+              action_list.push( check_actions(class_list, action_tags) )
+            actions = action: action_list
+            disputes[dispute] = actions
+      ).then(()=>
+        dispute_check = true
+        for key, value of disputes
+          if typeof value != 'object'
+            dispute_check = false
+            break
+        if dispute_check
+          console.log 'all good', disputes
+      )
+
+#      dispute_timer = setInterval(
+#        console.log 'ininin'
+#        if disputes_check
+#          console.log disputes
+#          clearInterval(dispute_timer);
+#        , 1000);
+#        if $(action).classList.includes('maintain')
+#          disputeHist.dispute.action = {'maintain': action_tags}
+
   #    $( confirmation_rows ).each ->
 #      dispute = $( this ).find('td').first().text()
 #      action_col = $( this ).find('td').last().children()
