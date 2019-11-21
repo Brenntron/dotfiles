@@ -149,19 +149,99 @@ $ ->
       submit_btn.prop('disabled', false)
     else
       submit_btn.prop('disabled', true)
+
+  window.call_action_switchboard = (disputes) ->
+    comment = disputes[comment]
+    for dispute, value of disputes
+      if dispute != 'comment'
+        { action } = value
+        for act in action
+          for key, value of act
+            switch key
+              when 'maintain'
+                data = [{
+                  'action': 'ACTIVE'
+                  'entries': [dispute]
+                  'classifications': act['maintain']
+                  'comment': ''
+                }]
+#                HERE ANDREW
+                maintain_reptool_bl(data)
+#              when 'override'
+#                data = {
+#                  'action': 'ACTIVE'
+#                  'entries': [dispute]
+#                  'classifications': act['maintain'].join()
+#                  'comment': comment
+#                }
+#                reptool_bl(data)
+#              when 'drop'
+#                data = data = {
+#                  'action': 'EXPIRED'
+#                  'entries': [dispute]
+#                  'comment': comment
+#                }
+#                drop_reptool_bl(data)
+#              when 'add' || 'remove'
+#                data =
+#                  'dispute_entry_ids': dispute
+#                  'comment': comment
+
+
+  window.maintain_reptool_bl = (data)->
+    debugger
+    std_msg_ajax(
+      method: 'POST'
+      url: '/escalations/api/v1/escalations/webrep/disputes/maintain_reptool_bl'
+      data:
+        data: data
+      success_reload:false
+      success: (response) ->
+        return response
+    )
+
+  window.drop_reptool_bl = (data) ->
+    std_msg_ajax(
+      method: 'POST'
+      url: '/escalations/api/v1/escalations/webrep/disputes/drop_reptool_bl'
+      data: data
+      success_reload:false
+      success: (response) ->
+        return response
+    )
+  window.reptool_bl = (data) ->
+    std_msg_ajax(
+      method: 'POST'
+      url: '/escalations/api/v1/escalations/webrep/disputes/reptool_bl'
+      data: data
+      success_reload:false
+      success: (response) ->
+        return response
+    )
+  window.adjust_wlbl = (data) ->
+#    std_msg_ajax(
+#      method: 'POST'
+#      url: '/escalations/api/v1/escalations/webrep/disputes/uri_wlbl'
+#      url: '/escalations/api/v1/escalations/webrep/disputes/entry_wlbl'
+#      data: data
+#      success_reload:false
+#      success: (response) ->
+#        return response
+#    )
+
   window.check_actions = (action_classes, action_tags) =>
-    if action_classes.includes('reptool')
-      if action_classes.includes('maintain')
+#    if action_classes.includes('reptool')
+#      if action_classes.includes('maintain')
         return 'maintain': action_tags
-      else if action_classes.includes('override')
-        return 'override': action_tags
-      else if action_classes.includes('drop')
-        return 'drop'
-    else
-      if action_classes.includes('add')
-        return 'add': action_tags
-      else
-        return 'remove': action_tags
+#      else if action_classes.includes('override')
+#        return 'override': action_tags
+#      else if action_classes.includes('drop')
+#        return 'drop'
+#    else
+#      if action_classes.includes('add')
+#        return 'add': action_tags
+#      else
+#        return 'remove': action_tags
 
   window.quick_bulk_update = (data) ->
     password = $('form#top_banner_bugzilla_login_form').find('input[name=password]').val()
@@ -183,7 +263,9 @@ $ ->
     comment = $('.confirm-rep-input').val()
     reptool_dispute_changes = []
     wlbl_dispute_changes = []
-    disputes = {}
+    disputes = {
+      comment:$('.confirm-rep-input').text()
+    }
     $( confirmation_rows ).each ->
       row = $( this ).find('td')
       dispute = $( row[0] ).text()
@@ -203,99 +285,13 @@ $ ->
       ).then(()=>
         dispute_check = true
         for key, value of disputes
-          if typeof value != 'object'
-            dispute_check = false
-            break
+          if key != 'comment'
+            if typeof value != 'object'
+              dispute_check = false
+              break
         if dispute_check
-          console.log 'all good', disputes
+          call_action_switchboard(disputes)
       )
-
-#      dispute_timer = setInterval(
-#        console.log 'ininin'
-#        if disputes_check
-#          console.log disputes
-#          clearInterval(dispute_timer);
-#        , 1000);
-#        if $(action).classList.includes('maintain')
-#          disputeHist.dispute.action = {'maintain': action_tags}
-
-  #    $( confirmation_rows ).each ->
-#      dispute = $( this ).find('td').first().text()
-#      action_col = $( this ).find('td').last().children()
-#
-#      for action in action_col
-#        classList = $(action).attr('class').split(/\s+/)
-#        def_list = []
-#        action_taken = classList.filter( (el)-> ['add', 'remove', 'drop'].includes(el)).join()
-#        $(action).find('.col-tag').each -> def_list.push( $(this).text() )
-#
-#        if $(action).hasClass('reptool-action-col')
-#          if typeof $(action).attr('class') == 'string'
-#            submission_action = classList.filter( ( class_list )-> return class_list.endsWith('-submission')).join().replace('-submission','')
-#
-#          if reptool_dispute_changes.length
-#            existing_dispute = false
-#
-#            for i in [0...reptool_dispute_changes.length]
-#              { action, classifications } = reptool_dispute_changes[i]
-#              class_check = JSON.stringify(classifications) == JSON.stringify(def_list)
-#              action_check = action == action_taken
-#
-#              if action_check && class_check
-#                existing_dispute = true
-#                reptool_dispute_changes[i].entries.push(dispute)
-#
-#            if !existing_dispute
-#              data = {
-#                entries: [dispute]
-#                classifications: def_list
-#                classification_action: action_taken
-#                submission_action: submission_action
-#                comment: comment
-#              }
-#              reptool_dispute_changes.push(data)
-#          else
-#            data = {
-#              entries: [dispute]
-#              classifications: def_list
-#              submission_action: submission_action
-#              comment: comment
-#            }
-#            reptool_dispute_changes.push(data)
-#
-#        else
-#          wlbl_existing_dispute = false
-#
-#          if wlbl_dispute_changes.length
-#            wlbl_existing_dispute = false
-#
-#            for i in [0...wlbl_dispute_changes.length]
-#              { action, classifications } = wlbl_dispute_changes[i]
-#              class_check = JSON.stringify(classifications) == JSON.stringify(def_list)
-#              action_check = action == action_taken
-#              if action_check && class_check
-#                wlbl_existing_dispute = true
-#                wlbl_dispute_changes[i].entries.push(dispute)
-#
-#            if !wlbl_existing_dispute
-#              data = {
-#                action:  action_taken
-#                entries: [dispute]
-#                classifications: def_list
-#                comment: comment
-#              }
-#              wlbl_dispute_changes.push(data)
-#          else
-#              data = {
-#                action:  action_taken
-#                entries: [dispute]
-#                classifications: def_list
-#                comment: comment
-#              }
-#              wlbl_dispute_changes.push(data)
-#
-#    wlbl_dispute_changes = wlbl_dispute_changes.filter( (x)-> return x != undefined )
-#    reptool_dispute_changes = reptool_dispute_changes.filter( (x)-> return x != undefined )
 
   window.open_adjust_reptool = () ->
     dropdown = $('#reptool_entries_bl_dropdown')
