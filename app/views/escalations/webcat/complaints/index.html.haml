@@ -41,3 +41,17 @@
             %th Submitter Type
             %th Submitter Org
             %th Assignee
+
+.modal.fade#myModal
+  .modal-dialog.modal-sm
+    .modal-content
+      .modal-header
+        Complaint Entries To Update
+      .modal-body
+        %thead
+          #resolution
+        %table#complaint_entries_to_update
+      .modal-confirm
+        %button.primary{type: 'button', 'onclick': 'updateResolution();'} Confirm
+      .modal-footer
+        %button.close{type: 'button', 'data-dismiss': 'modal', 'aria-label': 'Close'}

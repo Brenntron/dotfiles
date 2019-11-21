@@ -43,7 +43,7 @@
           %div
             %label.toolbar-section-label Edit Resolution
             = select(:complaint, :resolution, options_for_select([["Unchanged", "UNCHANGED"], ["Fixed", "FIXED"], ["Invalid", "INVALID"]]))
-          %button{class: 'primary', type:'button', id: 'button_update_resolution', onclick:'updateResolution();'}
+          %button{class: 'primary', type:'button', id: 'button_update_resolution', onclick:'updateResolutionDialog();'}
             Update
   %div
     %label.toolbar-section-label

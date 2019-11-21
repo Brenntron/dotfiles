@@ -1762,6 +1762,20 @@ window.verifyMasterSubmit = () ->
         boolean = true
   return boolean
 
+window.updateResolutionDialog = (confirm) ->
+  $('#complaint_entries_to_update').empty()
+  resolution = $('#complaint_resolution')[0].value
+  selected_rows = $('tr.selected')
+
+  complaint_entries = []
+
+  for row in selected_rows
+    complaint_entries.push(row.id)
+    $('#complaint_entries_to_update').append('<tr><td>' + row.id + '</td></tr>')
+
+  $('#myModal').modal("show")
+  $('#resolution').text("Resolution: " + resolution)
+
 window.updateResolution = () ->
   resolution = $('#complaint_resolution')[0].value
   selected_rows = $('tr.selected')
@@ -1773,12 +1787,13 @@ window.updateResolution = () ->
 
   std_msg_ajax(
     method: 'POST'
-    url: '/escalations/api/v1/escalations/webcat/complaint_entries/update_resolution'
-    data: {'complaint_entries': complaint_entries, 'resolution':resolution}
+    url: "/escalations/api/v1/escalations/webcat/complaint_entries/update_resolution"
+    data: {'complaint_entries': complaint_entries, 'resolution': resolution}
     success_reload: true
     error: (response) ->
       std_api_error(response, "The following entries could not be updated.", reload: true)
   )
+
 
 $ ->
   $('#cat_new_url_modal').on 'shown.bs.modal', ->
