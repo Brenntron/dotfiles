@@ -138,6 +138,7 @@ window.bulk_get_current_wlbl = (page) ->
           .then( build_tc_row.bind(null, entry, tbody)).then ->
             order_wlbl_table_rows()
           .then null, (err) ->
+            debugger
             std_msg_error( 'Error retrieving WL/BL Data', response)  # handle this error silently if needed
 
           comment_box.text(comment_trail)
@@ -152,7 +153,9 @@ window.bulk_get_current_wlbl = (page) ->
   build_tc_row = (entry, tbody, result) ->
     { threat_categories } = JSON.parse(result)
     { ip_uri, list_types, wbrs_score, comment } = entry
-    tc_str = threat_categories.join(', ')
+    tc_str = ''
+    if threat_categories?
+      tc_str = threat_categories.join(', ')
 
     if list_types
       list_types = entry['list_types'].sort().reverse().join(', ')  # sort by weak, then med, then heavy
