@@ -10161,8 +10161,20 @@ input[type="radio"].resolution_radio_button {
 }
 .toolbar#webcat-index-toolbar{
   margin: 10px 0 -35px 0;
-  z-index:10
+  z-index: 10;
+  float: left;
+  width: auto;
 }
+
+.toolbar#webcat-index-toolbar.pinned-toolbar {
+  margin-top: 2px;
+  width: 100%;
+}
+
+#complaints-index_wrapper .datatable-top-tools {
+  margin-bottom: 10px !important;
+}
+
 
 // webrep - research tab toolbar - between 1600px and 1400px, prevent breaking/wrapping buttons, this needs to be separate
 @media screen and (max-width: 1600px) and (min-width: 1401px) {
