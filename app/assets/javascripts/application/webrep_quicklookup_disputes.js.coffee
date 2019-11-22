@@ -156,40 +156,26 @@ $ ->
       if dispute != 'comment'
         { action } = value
         for act in action
+          if act == 'drop'
+            data = [{
+              'action': 'ACTIVE'
+              'entries': [dispute]
+              'comment':  ' comment'
+            }]
+            drop_reptool_bl(data)
           for key, value of act
             switch key
-              when 'maintain'
+              when ('maintain' || 'override')
                 data = [{
                   'action': 'ACTIVE'
                   'entries': [dispute]
                   'classifications': act['maintain']
                   'comment': ''
                 }]
-#                HERE ANDREW
                 maintain_reptool_bl(data)
-#              when 'override'
-#                data = {
-#                  'action': 'ACTIVE'
-#                  'entries': [dispute]
-#                  'classifications': act['maintain'].join()
-#                  'comment': comment
-#                }
-#                reptool_bl(data)
-#              when 'drop'
-#                data = data = {
-#                  'action': 'EXPIRED'
-#                  'entries': [dispute]
-#                  'comment': comment
-#                }
-#                drop_reptool_bl(data)
-#              when 'add' || 'remove'
-#                data =
-#                  'dispute_entry_ids': dispute
-#                  'comment': comment
 
 
   window.maintain_reptool_bl = (data)->
-    debugger
     std_msg_ajax(
       method: 'POST'
       url: '/escalations/api/v1/escalations/webrep/disputes/maintain_reptool_bl'
@@ -207,17 +193,10 @@ $ ->
       data: data
       success_reload:false
       success: (response) ->
+        alert(response)
         return response
     )
-  window.reptool_bl = (data) ->
-    std_msg_ajax(
-      method: 'POST'
-      url: '/escalations/api/v1/escalations/webrep/disputes/reptool_bl'
-      data: data
-      success_reload:false
-      success: (response) ->
-        return response
-    )
+
   window.adjust_wlbl = (data) ->
 #    std_msg_ajax(
 #      method: 'POST'
@@ -230,18 +209,18 @@ $ ->
 #    )
 
   window.check_actions = (action_classes, action_tags) =>
-#    if action_classes.includes('reptool')
-#      if action_classes.includes('maintain')
+    if action_classes.indexOf('reptool') != -1
+      if action_classes.indexOf('maintain') != -1
         return 'maintain': action_tags
-#      else if action_classes.includes('override')
-#        return 'override': action_tags
-#      else if action_classes.includes('drop')
-#        return 'drop'
-#    else
-#      if action_classes.includes('add')
-#        return 'add': action_tags
-#      else
-#        return 'remove': action_tags
+      else if action_classes.indexOf('override') != -1
+        return 'override': action_tags
+      else if action_classes.indexOf('drop') != -1
+        return 'drop'
+    else
+      if action_classes.indexOf('add') != -1
+        return 'add': action_tags
+      else
+        return 'remove': action_tags
 
   window.quick_bulk_update = (data) ->
     password = $('form#top_banner_bugzilla_login_form').find('input[name=password]').val()
@@ -277,10 +256,15 @@ $ ->
             action_list = []
             for action in actions
               action_tags = []
-              $(action).find('.col-tag').contents().each -> action_tags.push(this.data)
               class_list = $(action).attr("class")
+              if class_list.indexOf('maintain') != -1
+                if $(action).attr('reptool_classes') != undefined
+                  action_tags = $(action).attr('reptool_classes').split(',')
+              $(action).find('.col-tag').contents().each -> action_tags.push(this.data)
+              console.log action_tags
               action_list.push( check_actions(class_list, action_tags) )
             actions = action: action_list
+            console.log actions
             disputes[dispute] = actions
       ).then(()=>
         dispute_check = true
