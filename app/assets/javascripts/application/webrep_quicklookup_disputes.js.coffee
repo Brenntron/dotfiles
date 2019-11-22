@@ -156,23 +156,25 @@ $ ->
       if dispute != 'comment'
         { action } = value
         for act in action
-          if act == 'drop'
-            data = [{
-              'action': 'ACTIVE'
-              'entries': [dispute]
-              'comment':  ' comment'
-            }]
-            drop_reptool_bl(data)
           for key, value of act
+            console.log key
             switch key
               when ('maintain' || 'override')
                 data = [{
                   'action': 'ACTIVE'
                   'entries': [dispute]
-                  'classifications': act['maintain']
+                  'classifications': act[key]
                   'comment': ''
                 }]
                 maintain_reptool_bl(data)
+              when 'drop'
+                data = {
+                  'action': 'EXPIRED'
+                  'entries': [dispute]
+                  'comment':  ' comment'
+                  'classifications': act[key]
+                }
+                drop_reptool_bl(data)
 
 
   window.maintain_reptool_bl = (data)->
@@ -183,7 +185,10 @@ $ ->
         data: data
       success_reload:false
       success: (response) ->
-        return response
+        if response
+          std_msg_success('Success.', ['Reptool classifications successfully updated.'], {reload: false})
+        else
+          std_msg_error('Error', [response], {reload: false})
     )
 
   window.drop_reptool_bl = (data) ->
@@ -193,8 +198,11 @@ $ ->
       data: data
       success_reload:false
       success: (response) ->
-        alert(response)
-        return response
+        $('#confirmation-modal').modal('hide')
+        if response
+          std_msg_success('Success.', ['Reptool classifications successfully dropped.'], {reload: false})
+        else
+          std_msg_error('Error', [response], {reload: false})
     )
 
   window.adjust_wlbl = (data) ->
@@ -215,7 +223,7 @@ $ ->
       else if action_classes.indexOf('override') != -1
         return 'override': action_tags
       else if action_classes.indexOf('drop') != -1
-        return 'drop'
+        return 'drop': action_tags
     else
       if action_classes.indexOf('add') != -1
         return 'add': action_tags
@@ -257,14 +265,22 @@ $ ->
             for action in actions
               action_tags = []
               class_list = $(action).attr("class")
-              if class_list.indexOf('maintain') != -1
+              maintain_check = class_list.indexOf('maintain') != -1
+              maintain_add = class_list.indexOf('add') != -1
+              drop_check = class_list.indexOf('drop') != -1
+              existing_classes = []
+              if maintain_check || drop_check
                 if $(action).attr('reptool_classes') != undefined
-                  action_tags = $(action).attr('reptool_classes').split(',')
+                  existing_classes = $(action).attr('reptool_classes').split(',')
+                  if maintain_check && class_list.indexOf('add') != -1
+                    action_tags = existing_classes
+
               $(action).find('.col-tag').contents().each -> action_tags.push(this.data)
-              console.log action_tags
+              if maintain_check && !maintain_add
+                action_tags = action_tags.filter(val) ->  existing_classes.indexOf(val) == -1
+
               action_list.push( check_actions(class_list, action_tags) )
             actions = action: action_list
-            console.log actions
             disputes[dispute] = actions
       ).then(()=>
         dispute_check = true
@@ -465,7 +481,7 @@ $ ->
             rep_list = action_data.trim().split(',')
 
         rep_list = this.innerText.split(',')
-        if class_reptool == 'maintain' && existing_reptool.length && !isEmpty(data)
+        if (class_reptool == 'maintain' || class_reptool == 'drop') && existing_reptool.length && !isEmpty(data)
           reptool_classes =  $(existing_reptool).text()
           $(action_col).attr( 'reptool_classes', reptool_classes )
 
