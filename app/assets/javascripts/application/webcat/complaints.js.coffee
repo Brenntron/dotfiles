@@ -1773,8 +1773,8 @@ window.updateResolutionDialog = (confirm) ->
     complaint_entries.push(row.id)
     $('#complaint_entries_to_update').append('<tr><td>' + row.id + '</td></tr>')
 
-  $('#myModal').modal("show")
-  $('#resolution').text("Resolution: " + resolution)
+  $('#resolution_dialog').modal("show")
+  $('#resolution_text').text("Resolution: " + resolution)
 
 window.updateResolution = () ->
   resolution = $('#complaint_resolution')[0].value

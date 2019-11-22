@@ -960,10 +960,12 @@ class ComplaintEntry < ApplicationRecord
   end
 
   def process_resolution_change(resolution)
-    if self.is_important
-      self.update(status: "PENDING", resolution: resolution)
-    else
-      self.update(status: "COMPLETED", resolution: resolution)
+    if self.status != "COMPLETED"
+      if self.is_important
+        self.update(status: "PENDING", resolution: resolution)
+      else
+        self.update(status: "COMPLETED", resolution: resolution)
+      end
     end
   end
 end
