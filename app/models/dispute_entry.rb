@@ -614,7 +614,10 @@ class DisputeEntry < ApplicationRecord
 
     ::Preloader::Base.fetch_all_api_data(self.hostlookup, self.id)
     wbrs_stuff = Sbrs::Base.remote_call_sds_v3(self.hostlookup, "wbrs")
-    wbrs_stuff_rulehits = Sbrs::ManualSbrs.get_rule_names_from_rulehits(wbrs_stuff)
+    wbrs_stuff_rulehits = Sbrs::ManualSbrs.get_rule_names_from_rulehits(wbrs_stuff) rescue nil
+    if wbrs_stuff_rulehits.blank?
+      wbrs_stuff_rulehits = []
+    end  
     ip_addr = IPSocket.getaddress(hostlookup) rescue nil
     if ip_addr
       wbrs_stuff_ip = Sbrs::Base.remote_call_sds_v3(ip_addr, "wbrs")
@@ -777,7 +780,10 @@ class DisputeEntry < ApplicationRecord
           is_ip_address = !!(entry.uri  =~ Resolv::IPv4::Regex)
 
           wbrs_stuff = Sbrs::Base.remote_call_sds_v3(entry.uri, "wbrs")
-          wbrs_stuff_rulehits = Sbrs::ManualSbrs.get_rule_names_from_rulehits(wbrs_stuff)
+          wbrs_stuff_rulehits = Sbrs::ManualSbrs.get_rule_names_from_rulehits(wbrs_stuff) rescue nil
+          if wbrs_stuff_rulehits.blank?
+            wbrs_stuff_rulehits = []
+          end  
 
           ip_addr = IPSocket.getaddress(entry.uri) rescue nil
           if ip_addr
