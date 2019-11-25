@@ -217,15 +217,15 @@ $ ->
 #    )
 
   window.check_actions = (action_classes, action_tags) =>
-    if action_classes.indexOf('reptool') != -1
-      if action_classes.indexOf('maintain') != -1
+    if stringIncludes(action_classes, 'reptool')
+      if stringIncludes(action_classes, 'maintain')
         return 'maintain': action_tags
-      else if action_classes.indexOf('override') != -1
+      else if stringIncludes(action_classes, 'override')
         return 'override': action_tags
-      else if action_classes.indexOf('drop') != -1
+      else if stringIncludes(action_classes, 'drop')
         return 'drop': action_tags
     else
-      if action_classes.indexOf('add') != -1
+      if stringIncludes(action_classes, 'add')
         return 'add': action_tags
       else
         return 'remove': action_tags
@@ -243,6 +243,9 @@ $ ->
       success: (response) ->
         return response
     )
+  window.stringIncludes = (str, substring) ->
+    return str.indexOf(substring) != -1
+
   window.confirm_rep_changes = () ->
     #  confirm actions to be taken, data is prepared and  final submission of disputes to be made
     # this is going to need to be changed and refactored
@@ -265,19 +268,21 @@ $ ->
             for action in actions
               action_tags = []
               class_list = $(action).attr("class")
-              maintain_check = class_list.indexOf('maintain') != -1
-              maintain_add = class_list.indexOf('add') != -1
-              drop_check = class_list.indexOf('drop') != -1
+              maintain_check = stringIncludes(class_list, 'maintain')
+              maintain_remove = stringIncludes(class_list, 'remove') && maintain_check
+              drop_check = stringIncludes(class_list, 'drop')
               existing_classes = []
+
               if maintain_check || drop_check
                 if $(action).attr('reptool_classes') != undefined
                   existing_classes = $(action).attr('reptool_classes').split(',')
-                  if maintain_check && class_list.indexOf('add') != -1
-                    action_tags = existing_classes
+                  if maintain_check
+                    if drop_check
+                      action_tags = existing_classes
 
               $(action).find('.col-tag').contents().each -> action_tags.push(this.data)
-              if maintain_check && !maintain_add
-                action_tags = action_tags.filter(val) ->  existing_classes.indexOf(val) == -1
+              if maintain_remove
+                action_tags = action_tags.filter( (action ) => existing_classes.indexOf(action) != -1)
 
               action_list.push( check_actions(class_list, action_tags) )
             actions = action: action_list
