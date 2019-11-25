@@ -109,7 +109,7 @@ class ComplaintEntry < ApplicationRecord
     uri.present? ? uri : ip_address
   end
 
-  # Returns the Wbre::Prefix objects.
+  # Returns the Wbrs::Prefix objects.
   # Object may be cached.
   # @param [String] prefix_given please give us the prefix to use, or we'll use the domain or ip_address field.
   # @param [Boolean] reload set to true to get an up to date call to the API.
@@ -119,7 +119,7 @@ class ComplaintEntry < ApplicationRecord
     @remote_prefixes ||= Wbrs::Prefix.where({:urls => [URI.escape(prefix_given)]})
   end
 
-  # Returns the Wbre::Prefix object called on domain_of_with_path
+  # Returns the Wbrs::Prefix object called on domain_of_with_path
   # Object may be cached.
   # @param [String] prefix_given please give us the prefix to use, or we'll use the domain or ip_address field.
   # @param [Boolean] reload set to true to get an up to date call to the API.
