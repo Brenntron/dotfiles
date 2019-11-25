@@ -157,24 +157,37 @@ $ ->
         { action } = value
         for act in action
           for key, value of act
-            console.log key
             switch key
               when ('maintain' || 'override')
                 data = [{
                   'action': 'ACTIVE'
                   'entries': [dispute]
                   'classifications': act[key]
-                  'comment': ''
+                  'comment': comment
                 }]
                 maintain_reptool_bl(data)
               when 'drop'
                 data = {
                   'action': 'EXPIRED'
                   'entries': [dispute]
-                  'comment':  ' comment'
+                  'comment':  comment
                   'classifications': act[key]
                 }
                 drop_reptool_bl(data)
+              when 'add'
+                data = {
+                  'urls':[dispute]
+                  'trgt_list': act[key]
+                  'note': 'comment'
+                }
+                adjust_wlbl(data)
+
+              when 'remove'
+                data = {
+                  'ip_uris': [dispute]
+                  'list_types': act[key]
+                }
+                remove_wlbl(data)
 
 
   window.maintain_reptool_bl = (data)->
@@ -185,6 +198,7 @@ $ ->
         data: data
       success_reload:false
       success: (response) ->
+        $('#confirmation-modal').modal('hide')
         if response
           std_msg_success('Success.', ['Reptool classifications successfully updated.'], {reload: false})
         else
@@ -206,15 +220,34 @@ $ ->
     )
 
   window.adjust_wlbl = (data) ->
-#    std_msg_ajax(
-#      method: 'POST'
-#      url: '/escalations/api/v1/escalations/webrep/disputes/uri_wlbl'
-#      url: '/escalations/api/v1/escalations/webrep/disputes/entry_wlbl'
-#      data: data
-#      success_reload:false
-#      success: (response) ->
-#        return response
-#    )
+    console.log data
+    std_msg_ajax(
+      method: 'POST'
+      url: '/escalations/api/v1/escalations/webrep/disputes/uri_wlbl'
+      data: data
+      success_reload:false
+      success: (response) ->
+        $('#confirmation-modal').modal('hide')
+        if response
+          std_msg_success('Success.', ['WLBL classifications successfully adjusted.'], {reload: false})
+        else
+          std_msg_error('Error', [response], {reload: false})
+    )
+
+  window.remove_wlbl = (data) ->
+    console.log data
+    std_msg_ajax(
+      method: 'POST'
+      url: '/escalations/api/v1/escalations/webrep/disputes/bulk_rule_ui_wlbl_remove'
+      data: data
+      success_reload:false
+      success: (response) ->
+        $('#confirmation-modal').modal('hide')
+        if response
+          std_msg_success('Success.', ['WLBL classifications successfully removed.'], {reload: false})
+        else
+          std_msg_error('Error', [response], {reload: false})
+    )
 
   window.check_actions = (action_classes, action_tags) =>
     if stringIncludes(action_classes, 'reptool')
@@ -243,6 +276,7 @@ $ ->
       success: (response) ->
         return response
     )
+    
   window.stringIncludes = (str, substring) ->
     return str.indexOf(substring) != -1
 
@@ -264,8 +298,9 @@ $ ->
       quick_bulk_update(disputes).then(
           (response)=>
             data = JSON.parse(response).data
+            dispute_entries = data.dispute_entries
             action_list = []
-            for action in actions
+            for action, i in actions
               action_tags = []
               class_list = $(action).attr("class")
               maintain_check = stringIncludes(class_list, 'maintain')
@@ -276,15 +311,21 @@ $ ->
               if maintain_check || drop_check
                 if $(action).attr('reptool_classes') != undefined
                   existing_classes = $(action).attr('reptool_classes').split(',')
-                  if maintain_check
-                    if drop_check
-                      action_tags = existing_classes
+                  if drop_check
+                    action_tags = existing_classes
 
               $(action).find('.col-tag').contents().each -> action_tags.push(this.data)
-              if maintain_remove
-                action_tags = action_tags.filter( (action ) => existing_classes.indexOf(action) != -1)
-
+#              if maintain_remove
+#                action_tags = action_tags.filter( (action ) => existing_classes.indexOf(action) != -1)
+              if action == 'remove'
+                remove_wlbl
+#                do a thing
               action_list.push( check_actions(class_list, action_tags) )
+#             e
+#              dispute_id = dispute_entries[i].dispute_entry_id
+#            else
+#              actions = action: action_list
+            console.log action_list
             actions = action: action_list
             disputes[dispute] = actions
       ).then(()=>
