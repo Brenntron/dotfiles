@@ -200,9 +200,11 @@ $ ->
       success: (response) ->
         $('#confirmation-modal').modal('hide')
         if response
-          std_msg_success('Success.', ['Reptool classifications successfully updated.'], {reload: false})
+          console.log response
+#          std_msg_success('Success.', ['Reptool classifications successfully updated.'], {reload: false})
         else
-          std_msg_error('Error', [response], {reload: false})
+          console.log response
+#          std_msg_error('Error', [response], {reload: false})
     )
 
   window.drop_reptool_bl = (data) ->
@@ -214,9 +216,11 @@ $ ->
       success: (response) ->
         $('#confirmation-modal').modal('hide')
         if response
-          std_msg_success('Success.', ['Reptool classifications successfully dropped.'], {reload: false})
+          console.log response
+#          std_msg_success('Success.', ['Reptool classifications successfully dropped.'], {reload: false})
         else
-          std_msg_error('Error', [response], {reload: false})
+          console.log response
+#          std_msg_error('Error', [response], {reload: false})
     )
 
   window.adjust_wlbl = (data) ->
@@ -229,9 +233,11 @@ $ ->
       success: (response) ->
         $('#confirmation-modal').modal('hide')
         if response
-          std_msg_success('Success.', ['WLBL classifications successfully adjusted.'], {reload: false})
+          console.log response
+#          std_msg_success('Success.', ['WLBL classifications successfully adjusted.'], {reload: false})
         else
-          std_msg_error('Error', [response], {reload: false})
+          console.log response
+#          std_msg_error('Error', [response], {reload: false})
     )
 
   window.remove_wlbl = (data) ->
@@ -244,9 +250,11 @@ $ ->
       success: (response) ->
         $('#confirmation-modal').modal('hide')
         if response
-          std_msg_success('Success.', ['WLBL classifications successfully removed.'], {reload: false})
+          console.log response
+#          std_msg_success('Success.', ['WLBL classifications successfully removed.'], {reload: false})
         else
-          std_msg_error('Error', [response], {reload: false})
+          console.log response
+#          std_msg_error('Error', [response], {reload: false})
     )
 
   window.check_actions = (action_classes, action_tags) =>
@@ -276,7 +284,7 @@ $ ->
       success: (response) ->
         return response
     )
-    
+
   window.stringIncludes = (str, substring) ->
     return str.indexOf(substring) != -1
 
