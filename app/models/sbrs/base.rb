@@ -49,12 +49,19 @@ class Sbrs::Base
     uri_query
   end
 
-  def self.build_sds_v3_combo_request(uri_item, ip_item)
+  def self.build_sds_v3_combo_request(uri_item, ip_items)
+
+    ip_params_string = ""
+    if ip_items.size > 0
+      ip_params_string = "&"
+    end
+
+    ip_params_string += ip_items.each {|ip| "ip=#{ip}"}.join("&")
+
     uri_query                  = {}
     uri_query["hostname"]      = Sbrs::Base.sds_v3_host
-    uri_query["query_string"]  = '/score/single/json?url='+ uri_item + '&ip=' + ip_item
-    uri_query["uri_item"]      = uri_item
-    uri_query["ip_item"]       = ip_item
+    uri_query["query_string"]  = '/score/single/json?url='+ uri_item + ip_params_string
+
     uri_query["sds_type"]      = "combo"
     uri_query
   end

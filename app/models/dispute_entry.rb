@@ -615,7 +615,7 @@ class DisputeEntry < ApplicationRecord
     ::Preloader::Base.fetch_all_api_data(self.hostlookup, self.id)
     #
     #if self.uri.present? && self.ip_address.present?
-    #  wbrs_stuff = Sbrs::Base.combo_call_sds_v3(self.uri, self.ip_address)
+    #  wbrs_stuff = Sbrs::Base.combo_call_sds_v3(self.uri, [self.ip_address])
     #else
     wbrs_stuff = Sbrs::Base.remote_call_sds_v3(self.hostlookup, "wbrs")
     #end
@@ -687,13 +687,13 @@ class DisputeEntry < ApplicationRecord
         attributes['uri'] = host
       end
     end
-    #begin
+
     #if self.uri.present? && self.ip_address.blank?
-    #  resolved_ip = Resolv.getaddress(self.domain_of(self.uri))
-    #  attributes['ip_address'] = resolved_ip
-    #rescue
-    #
-    #end
+    #  resolved_ip = Resolv.getaddress(self.domain_of(self.uri)) rescue nil
+    #  if resolved_ip.present?
+    #    attributes['ip_address'] = resolved_ip
+    #  end
+
     if attributes['ip_address'].present? && attributes['ip_address'] != self.ip_address
       sync_up
     end
@@ -788,13 +788,21 @@ class DisputeEntry < ApplicationRecord
           is_ip_address = !!(entry.uri  =~ Resolv::IPv4::Regex)
 
           wbrs_stuff = Sbrs::Base.remote_call_sds_v3(entry.uri, "wbrs")
-          wbrs_stuff_rulehits = Sbrs::ManualSbrs.get_rule_names_from_rulehits(wbrs_stuff)
+          wbrs_stuff_rulehits = Sbrs::ManualSbrs.get_rule_names_from_rulehits(wbrs_stuff) rescue []
 
           ip_addr = IPSocket.getaddress(entry.uri) rescue nil
+
+          if ip_addr.blank?
+            ip_addr = Resolv.getaddress(self.domain_of(entry.uri)) rescue nil
+          end
+
+
+
           if ip_addr
             wbrs_stuff_ip = Sbrs::Base.remote_call_sds_v3(ip_addr, "wbrs")
             wbrs_stuff_rulehits = wbrs_stuff_rulehits + Sbrs::ManualSbrs.get_rule_names_from_rulehits(wbrs_stuff_ip)
             wbrs_stuff_rulehits = wbrs_stuff_rulehits.uniq
+            entry.ip_address = ip_addr
           end
 
           entry.wbrs_score = wbrs_stuff["wbrs"]["score"]

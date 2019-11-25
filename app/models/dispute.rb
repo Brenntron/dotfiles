@@ -609,12 +609,11 @@ class Dispute < ApplicationRecord
 
           new_dispute_entry.assign_url_parts(key)
 
-          #begin
-          # resolved_ip = Resolv.getAddress(DisputeEntry.domain_of(new_dispute_entry.uri))
-          # new_dispute_entry.ip_address = resolved_ip
-          #rescue
-          #
-          #end
+
+          # resolved_ip = Resolv.getAddress(DisputeEntry.domain_of(new_dispute_entry.uri)) rescue nil
+          # if resolved_ip.present?
+          #   new_dispute_entry.ip_address = resolved_ip
+          # end
 
           new_dispute_entry.save!
 
