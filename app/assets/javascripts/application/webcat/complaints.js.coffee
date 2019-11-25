@@ -82,7 +82,7 @@ check_wbnp = window.check_wbnp_status = (wbnp_report_id) ->
 window.updateURI = (event, complaint_entry_id) ->
   event.preventDefault()
 
-  loader = $("[entry_id='" + complaint_entry_id + "']").find('.inline-loader')
+  loader = $('.inline-loader-' + complaint_entry_id)
   loader.css('display', 'flex')
 
   uri = $("#complaint_prefix_#{complaint_entry_id}").val()
@@ -126,7 +126,8 @@ window.cat_new_url = ()->
 
   data = {}
   isEmpty = true
-  loader = $('#categorize-diff-form').find('.webcat-loader')
+  loader = $('#inline-webcat.webcat-loader')
+  $('#categorize-urls').dropdown('toggle')
   for i in [1...6] by 1
 
     categories = []
@@ -175,7 +176,8 @@ window.multiple_url_categorization = () ->
   urls = $("#categorize_urls").val().split(/\n/)
   category_ids = $("#multi_cat_url_cats").val()
   category_names = []
-  loader = $('#categorize-urls-form-wrapper').find('.webcat-loader')
+  loader = $('#inline-webcat.webcat-loader')
+  console.log loader
   for category in $("#multi_cat_url_cats")
     for i in [0..5] by 1
       if category[i]
@@ -200,7 +202,7 @@ window.multiple_url_categorization = () ->
 
 
 window.inheritCategories = (complaint_entry_id) ->
-  loader = $("[entry_id='" + complaint_entry_id + "']").find('.inline-loader')
+  loader = $('.inline-loader-' + complaint_entry_id)
   loader.css('display', 'flex')
   std_msg_ajax(
     url:'/escalations/api/v1/escalations/webcat/complaint_entries/inherit_categories_from_master_domain'
@@ -397,7 +399,7 @@ window.updatePending = (id,row_id) ->
 
 ## Called when user submits categories / information to close a ticket
 window.updateEntryColumns = (entry_id,row_id) ->
-  loader = $("[entry_id='" + entry_id + "']").find('.inline-loader')
+  loader = $('.inline-loader-' + entry_id)
   loader.css('display', 'flex')
   $("#submit_changes_#{entry_id}").addClass('hidden')
   $("#reopen_#{entry_id}").removeClass('hidden')
@@ -520,7 +522,7 @@ window.updateEntryColumns = (entry_id,row_id) ->
 
 ## Allows analyst to set ticket status to reopened and allows them to interact with the submission form
 window.reopenComplaint = (entry_id, button) ->
-  loader = $("[entry_id='" + entry_id + "']").find('.inline-loader')
+  loader = $('.inline-loader-' + entry_id)
   loader.css('display', 'flex')
 
 # Getting all the fields that need to be interactive if reopened
@@ -938,7 +940,7 @@ format = (complaint_entry_row) ->
     data: {'id': complaint_entry.entry_id}
     success: (response) ->
       row_id = JSON.parse(this.data).id
-      loader = $("[entry_id='" + row_id + "']").find('.inline-loader')
+      loader = $('.inline-loader-' + row_id)
       loader.css('display', 'none')
       { current_category_data : current_categories, master_categories, sds_category} = JSON.parse(response)
 
@@ -1053,7 +1055,7 @@ format = (complaint_entry_row) ->
       "</div></div><div class='col-xs-7 col-with-divider'>" +
       '<table class="simple-nested-table" id="entry-table-' + entry_id + '"><thead><tr><th class="col-sm-1">Conf</th><th class="col-sm-4">WBRS Categories</th><th class="col-sm-3">WBRS Certainty</th><th class="col-sm-4">SDS Category</tr></thead>' +
       '</table>' +
-      '<div class="inline-loader">' +
+      "<div class='inline-loader inline-loader-#{entry_id}'>" +
       '<div class="loader-gears">' + svg + '</div>'+
       '<span class="missing-data">Loading Data...</span></div>' +
       '</br>' +

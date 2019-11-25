@@ -76,27 +76,23 @@ $ ->
       headers: headers
       success: (response) ->
         $('#customerEmailList').empty()
-
         uniques = []
-
         for data, i in response.data
           if uniques.indexOf(i) == -1
             uniques.push(data)
-
         for email in uniques
           $('#customerEmailList').append '<option value="' + email + '"></option>'
-
     )
 
   $('#new-complaint-form').submit (e) ->
     e.preventDefault()
-    loader = $(e.target).find('.gear-loader-wrapper')
+    loader = $('#inline-webcat.webcat-loader')
     loader.removeClass('hidden')
     ips_urls = this.ips_urls.value
     desc = this.description.value
     customer = this.customers.value
     tags = $('.selectize').val() || []
-
+    $('#new-complaint').dropdown('toggle');
     std_msg_ajax(
       url: '/escalations/api/v1/escalations/webcat/complaints'
       method: 'POST'

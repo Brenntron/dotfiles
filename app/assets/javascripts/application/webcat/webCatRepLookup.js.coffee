@@ -31,9 +31,8 @@ namespace 'WebCat.RepLookup', (exports) ->
     }, this
 
   exports.queryWhoIs = (entry_id, query_entry) ->
-    loader = $("[entry_id='" + entry_id + "']").find('.inline-loader')
+    loader = $('.inline-loader-' + entry_id)
     loader.css('display', 'flex')
-    console.log $("tr[entry_id='query_entry']"),loader
     successFunction = (result) ->
       loader.css('display', 'none')
       if result != null

@@ -8,6 +8,9 @@
     = render "escalations/webcat/shared/telemetry"
 
   .row.top-margin
+    #inline-webcat.webcat-loader.gear-loader-wrapper.hidden
+      = inline_svg 'icon_gears_loader.svg', class: 'gears-loader'
+      %span.loader-msg Loading...
     .col-xs-12
       %h1#webcat-index-title
     .col-xs-12.webcat-search-container

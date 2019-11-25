@@ -8010,14 +8010,19 @@ td.text-center span {
   color: $type-lighter-color;
 }
 .webcat-loader{
-  &{
-    margin: auto 29%;
-  }
+  margin: auto 29%;
   .loader-msg{
     font-size: 8.5pt;
     position: absolute;
     margin-left: 10px;
     margin-top: -5px;
+  }
+}
+#inline-webcat.webcat-loader{
+  margin: 12px 45%!important;
+  position: absolute;
+  .loader-msg{
+    margin-top: 10px;
   }
 }
 #cat_multiple_urls, #cat_dif_submit{
@@ -10172,6 +10177,9 @@ input[type="radio"].resolution_radio_button {
     position: absolute;
     margin-top: 5px;
   }
+}
+.loader-msg{
+  font-style: oblique!important;
 }
 // webrep and webcat toolbars - between 1800px and 1600px, prevent breaking/wrapping of the buttons
 @media screen and (max-width: 1800px) and (min-width: 1600px) {
