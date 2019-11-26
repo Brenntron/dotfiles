@@ -8,7 +8,6 @@ class FileReputationApi::SampleZoo
   set_basic_auth
 
   def self.sha256_lookup(sha256)
-    byebug
     cache_key = "sample_zoo:#{sha256}"
     if Rails.env.development? or Rails.cache.read(cache_key).blank?
       call_request_parsed(:get, "/samples/_search?q=SHA256:#{sha256}")
