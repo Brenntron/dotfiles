@@ -6,8 +6,10 @@ $(document).on 'click', '.paginate_button', ->
     table = $('#complaints-index').DataTable()
     table_page = table.page.info().page
 
-
-
+$( window ).ajaxStart ->
+  $('#inline-webcat.webcat-loader').removeClass('hidden')
+$( window ).ajaxStop ->
+  $('#inline-webcat.webcat-loader').addClass('hidden')
 #### WBNP Reporting ####
 $(document).ready ->
   if ($('body').hasClass('escalations--webcat--complaints-controller') || $('body').hasClass('escalations--webcat--reports-controller')) &&
@@ -82,9 +84,6 @@ check_wbnp = window.check_wbnp_status = (wbnp_report_id) ->
 window.updateURI = (event, complaint_entry_id) ->
   event.preventDefault()
 
-  loader = $('.inline-loader-' + complaint_entry_id)
-  loader.css('display', 'flex')
-
   uri = $("#complaint_prefix_#{complaint_entry_id}").val()
 
   std_msg_ajax(
@@ -93,8 +92,6 @@ window.updateURI = (event, complaint_entry_id) ->
     data: {complaint_entry_id: complaint_entry_id, uri: uri }
     success: (response) ->
       {current_categories, category, wbrs_score, domain, subdomain, path, status} = response.json
-
-      loader.css('display', 'none')
 
       $(".simple-nested-table#entry-table-#{complaint_entry_id} tbody > tr").remove()
 
@@ -117,7 +114,6 @@ window.updateURI = (event, complaint_entry_id) ->
         $("#history-#{complaint_entry_id}").replaceWith('<button class="secondary" id="history-' + complaint_entry_id + '" onclick="history_dialog(' + complaint_entry_id + ',\'' + uri + '\')">History</button>')
         $("#domain-#{complaint_entry_id}").replaceWith('<button class="secondary" id="domain-' + complaint_entry_id + '" onclick="domain_whois(\''+query_who_params+'\')">Domain</button>')
     error: (response) ->
-      loader.css('display', 'none')
       std_msg_error("Unable to update URI", [response.responseJSON.message], reload: false)
 
  )
@@ -202,19 +198,15 @@ window.multiple_url_categorization = () ->
 
 
 window.inheritCategories = (complaint_entry_id) ->
-  loader = $('.inline-loader-' + complaint_entry_id)
-  loader.css('display', 'flex')
   std_msg_ajax(
     url:'/escalations/api/v1/escalations/webcat/complaint_entries/inherit_categories_from_master_domain'
     method: 'POST'
     data: {'id': complaint_entry_id}
     success: (response) ->
-      loader.css('display', 'none')
       $('.domain-categories').hide()
       std_msg_success('Success',["Successfully inherited categories from main domain."], reload: false)
 
     error: (response) ->
-      loader.css('display', 'none')
       std_msg_error('Error' + ' ' + response.responseJSON.message,"", reload: false)
     )
 
@@ -399,8 +391,6 @@ window.updatePending = (id,row_id) ->
 
 ## Called when user submits categories / information to close a ticket
 window.updateEntryColumns = (entry_id,row_id) ->
-  loader = $('.inline-loader-' + entry_id)
-  loader.css('display', 'flex')
   $("#submit_changes_#{entry_id}").addClass('hidden')
   $("#reopen_#{entry_id}").removeClass('hidden')
 
@@ -422,7 +412,6 @@ window.updateEntryColumns = (entry_id,row_id) ->
 
   # If resolution is set to fixed, make sure it has categories applied
   if categories == null && fixed_flag == true
-    loader.css('display', 'none')
     std_msg_error("Must include at least one category.","", reload: false)
     $("#submit_changes_#{entry_id}").removeClass('hidden')
     $("#reopen_#{entry_id}").addClass('hidden')
@@ -434,7 +423,6 @@ window.updateEntryColumns = (entry_id,row_id) ->
       data: {'id': entry_id, 'prefix': prefix, 'categories':categories, 'category_names':category_names, 'status':resolution_status, 'comment':comment, 'resolution_comment': resolution_comment }
       success: (response) ->
         {categories, error, uri, domain, subdomain, path, status, display_name} = $.parseJSON(response)
-        loader.css('display', 'none')
         if !error
           table = $('#complaints-index').DataTable()
 
@@ -522,8 +510,6 @@ window.updateEntryColumns = (entry_id,row_id) ->
 
 ## Allows analyst to set ticket status to reopened and allows them to interact with the submission form
 window.reopenComplaint = (entry_id, button) ->
-  loader = $('.inline-loader-' + entry_id)
-  loader.css('display', 'flex')
 
 # Getting all the fields that need to be interactive if reopened
   # Changing these on the fly so the full page doesn't need to be reloaded
@@ -549,9 +535,7 @@ window.reopenComplaint = (entry_id, button) ->
       $("#reopen_" + entry_id).addClass('hidden')
       $("#submit_changes_" + entry_id).removeClass('hidden')
       $(status_col).text('REOPENED')
-      loader.css('display', 'none')
     error: (response) ->
-      loader.css('display', 'none')
       std_msg_error(response,"", reload: false)
   )
 
@@ -940,8 +924,6 @@ format = (complaint_entry_row) ->
     data: {'id': complaint_entry.entry_id}
     success: (response) ->
       row_id = JSON.parse(this.data).id
-      loader = $('.inline-loader-' + row_id)
-      loader.css('display', 'none')
       { current_category_data : current_categories, master_categories, sds_category} = JSON.parse(response)
 
       sds_category == '' unless sds_category != null
@@ -979,7 +961,6 @@ format = (complaint_entry_row) ->
         $(".simple-nested-table" + "#entry-table-" + complaint_entry.entry_id).append(category_row)
 
     error: (response) ->
-      loader.css('display', 'none')
       current_categories = ''
   )
 
@@ -1017,22 +998,7 @@ format = (complaint_entry_row) ->
   retake_in_progress = false
   if complaint_entry.screen_shot_error == "Retaking screenshot please wait."
     retake_in_progress = true
-  svg =
-    '<!-- Generator: Adobe Illustrator 22.0.0, SVG Export Plug-In . SVG Version: 6.00 Build 0)  --><svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" version="1.1" id="Layer_1" x="0px" y="0px" viewBox="0 0 20 20" style="enable-background:new 0 0 20 20;" xml:space="preserve">
-      <style type="text/css">
-        .gear_one{fill:#BABABA;}
-        .bounding_box{fill:none;}
-        .gear_two:#4D4D4D;}
-      </style>
-      <g id="gear_larger" class="rotating">
-        <path class="gear_one" d="M7.9,11.5c0,0.7-0.5,1.1-1.1,1.1s-1.1-0.5-1.1-1.1c0-0.7,0.5-1.1,1.1-1.1S7.9,10.8,7.9,11.5z M12.3,11l-0.2-1   l-1.5-0.3L10.1,9l0.6-1.4L10,6.9L8.6,7.8L7.8,7.4L7.3,5.9h-1L5.7,7.4L4.9,7.8L3.6,6.9L2.9,7.6L3.5,9L3,9.8l-1.5,0.3l-0.2,1l1.3,0.8   l0.2,0.9l-1,1.1l0.4,1l1.5-0.3L4.4,15v1.5l1,0.4l1-1.1h0.9l1,1.1l1-0.4V15l0.7-0.6l1.5,0.3l0.5-0.9l-1-1.1l0.2-0.9L12.3,11z"></path>
-        <rect x="1.3" y="5.9" class="bounding_box" width="11" height="11"></rect>
-      </g>
-      <g id="gear_smaller" class="rotating">
-        <path class="gear_two" d="M13.8,7c0-0.5,0.4-0.9,0.9-0.9s0.9,0.4,0.9,0.9s-0.4,0.9-0.9,0.9C14.2,7.8,13.8,7.4,13.8,7z M17.3,6.6l1-1.1   l-0.5-0.9l-1.4,0.3l-0.6-0.4l-0.5-1.4h-1.1l-0.5,1.4L13,4.9l-1.4-0.3l-0.5,0.9l1,1.1v0.7l-1,1.1l0.5,0.9L13,9l0.6,0.4l0.5,1.4h1.1   l0.5-1.4L16.3,9l1.4,0.3l0.5-0.9l-1-1.1V6.6H17.3z"></path>
-        <rect x="10.7" y="2.9" class="bounding_box" width="8" height="8"></rect>
-      </g>
-    </svg>'
+
   complaint_entry_html =
       complaint_table_row_html +
       "<div class='col-xs-12 col-sm-8 nested-complaint-static-data'>" +
@@ -1055,9 +1021,6 @@ format = (complaint_entry_row) ->
       "</div></div><div class='col-xs-7 col-with-divider'>" +
       '<table class="simple-nested-table" id="entry-table-' + entry_id + '"><thead><tr><th class="col-sm-1">Conf</th><th class="col-sm-4">WBRS Categories</th><th class="col-sm-3">WBRS Certainty</th><th class="col-sm-4">SDS Category</tr></thead>' +
       '</table>' +
-      "<div class='inline-loader inline-loader-#{entry_id}'>" +
-      '<div class="loader-gears">' + svg + '</div>'+
-      '<span class="missing-data">Loading Data...</span></div>' +
       '</br>' +
       '</div><div class="col-xs-2">' +
       '<button class="secondary" id="lookup-' + entry_id+ '" onclick="WebCat.RepLookup.queryWhoIs(' + entry_id  + ',\'' + url + '\')">Lookup</button><br/>' +
