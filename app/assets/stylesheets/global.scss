@@ -4674,10 +4674,9 @@ table > tbody > tr > td.dispute_rep_tools {
   width: 400px;
 }
 [aria-describedby="complaint_button_dialog"],[aria-describedby="history_dialog"]  {
-  top: 44px!important;
+  z-index: 999;
 }
 
-history_dialog
 #wlbl_adjust_entries.dropdown-menu li:hover, #wlbl_adjust_entries_index.dropdown-menu li:hover{
   background-color: transparent;
 }
