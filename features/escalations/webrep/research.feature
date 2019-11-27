@@ -46,7 +46,6 @@ Feature: Webrep, the BFRP
     Then I click "Submit"
     And  I wait for "10" seconds
     And  I should see "1 found"
-    And  take a screenshot
     And  Element with class "wlbl-tc-research-span" should have content "Malware Sites"
 
 
@@ -61,7 +60,6 @@ Feature: Webrep, the BFRP
     And  I wait for "20" seconds
     And  I click button "wlbl_entries_button"
     And  I should see "NO ROWS SELECTED"
-    And  take a screenshot
 
 
   @javascript
@@ -73,7 +71,6 @@ Feature: Webrep, the BFRP
     And  I type content "testing.com" within input with id "search_uri"
     Then I click "Submit"
     And  I wait for "60" seconds
-    And  take a screenshot
     And  I click ".bfrp-inline-wlbl-6"
     And  I wait for "5" seconds
     And  Element with class "wlbl-entry-wlbl" should not have content "BL-med"
@@ -123,7 +120,7 @@ Feature: Webrep, the BFRP
     And  I wait for "2" seconds
     Then I click ".bfrp-inline-wlbl-6"
     And  Element with class "wlbl-entry-wlbl" should not have content "BL-med"
-    And  take a screenshot
+
     And  clean up wlbl and remove all wlbl entries on "testing.com"
 
 
@@ -161,7 +158,7 @@ Feature: Webrep, the BFRP
     And  I wait for "2" seconds
     Then I click ".bfrp-inline-wlbl-6"
     And  I wait for "5" seconds
-    And  take a screenshot
+
     And  Element with class "wlbl-entry-wlbl" should not have content "BL-med"
     And  Element with class "wlbl-entry-wlbl" should have content "WL-weak"
     And  clean up wlbl and remove all wlbl entries on "testing.com"
@@ -199,7 +196,6 @@ Feature: Webrep, the BFRP
     And  I wait for "5" seconds
     And  Element with class "bfrp-dd-result-no-0" should have content "WL-weak"
     And  Element with class "bfrp-dd-result-no-1" should have content "WL-weak"
-    And  take a screenshot
     And  clean up wlbl and remove all wlbl entries on "testing.com"
     And  clean up wlbl and remove all wlbl entries on "prooftesting.com"
 
@@ -236,7 +232,6 @@ Feature: Webrep, the BFRP
     And  I wait for "5" seconds
     And  Element with class "bfrp-dd-result-no-0" should have content "BL-weak"
     And  Element with class "bfrp-dd-result-no-1" should have content "BL-weak"
-    And  take a screenshot
     And  clean up wlbl and remove all wlbl entries on "testing.com"
     And  clean up wlbl and remove all wlbl entries on "prooftesting.com"
 
@@ -252,7 +247,6 @@ Feature: Webrep, the BFRP
     And  I type content "testing.com" within input with id "search_uri"
     Then I hit enter within "#search_uri"
     And  I wait for "60" seconds
-    And  take a screenshot
     Then I check checkbox with class "bfrp-checkbox-4"
     And  I check checkbox with class "bfrp-checkbox-6"
     And  I click button "wlbl_entries_button"
@@ -289,6 +283,5 @@ Feature: Webrep, the BFRP
     And  I wait for "5" seconds
     And  Element with class "bfrp-dd-result-no-0" should not have content "BL-weak"
     And  Element with class "bfrp-dd-result-no-1" should not have content "BL-weak"
-    And  take a screenshot
     And  clean up wlbl and remove all wlbl entries on "testing.com"
     And  clean up wlbl and remove all wlbl entries on "prooftesting.com"

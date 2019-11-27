@@ -259,7 +259,6 @@ Feature: Disputes
       | id | submission_type |
       | 1  | w               |
     When I goto "escalations/webrep/disputes?f=open"
-    Then take a screenshot
     And I click ".dispute_check_box"
     And I click "Export Selected to CSV"
     Then I wait for "3" seconds
@@ -290,7 +289,6 @@ Feature: Disputes
     Then I should see "Current WL/BL List"
     And  I should see "Current WBRS Score"
     And  I should see "Threat Category"
-    And  take a screenshot
     And  I should see "Not on a list"
     And  I should see "No score"
 
@@ -310,7 +308,6 @@ Feature: Disputes
     And  I click ".dispute-entry-checkbox"
     And  I click "#index-adjust-wlbl"
     And  I wait for "2" seconds
-    And  take a screenshot
     And  I should see "Not on a list"
     And  I should see "No score"
     Then I click "#wlbl-add"
@@ -343,7 +340,6 @@ Feature: Disputes
     And  I click ".dispute-entry-checkbox"
     And  I click "#index-adjust-wlbl"
     And  I wait for "2" seconds
-    And  take a screenshot
     And  I should see "Not on a list"
     Then I click "#wlbl-add"
     And  I check checkbox with class "wl-med-checkbox"
@@ -450,7 +446,6 @@ Feature: Disputes
     And  I wait for "5" seconds
     And  Element with class "wlbl-entry-wlbl" should have content "BL-weak"
     And  Element with class "wlbl-entry-wlbl" should not have content "WL-weak"
-    And  take a screenshot
     And  clean up wlbl and remove all wlbl entries on "imadethisurlup.com"
 
 
@@ -482,7 +477,6 @@ Feature: Disputes
     And  I wait for "2" seconds
     Then I click button "wlbl_entries_button"
     And  I wait for "5" seconds
-    And  take a screenshot
     And  Element with class "wlbl-entry-id-1" should have content "BL-weak"
     And  Element with class "wlbl-entry-id-2" should have content "BL-weak"
     And  clean up wlbl and remove all wlbl entries on "imadethisurlup.com"
