@@ -96,7 +96,7 @@ window.updateURI = (event, complaint_entry_id) ->
     data: {complaint_entry_id: complaint_entry_id, uri: uri }
     success: (response) ->
       {current_categories, category, wbrs_score, domain, subdomain, path, status} = response.json
-      
+
       $(".simple-nested-table#entry-table-#{complaint_entry_id} tbody > tr").remove()
 
       if 'ip' == status
@@ -125,7 +125,6 @@ window.cat_new_url = ()->
 
   data = {}
   isEmpty = true
-  loader = $('#inline-webcat.webcat-loader')
   $('#categorize-urls').dropdown('toggle')
   for i in [1...6] by 1
 
@@ -141,18 +140,13 @@ window.cat_new_url = ()->
 
   if !isEmpty
 
-    loader.removeClass('hidden')
-
     std_msg_ajax(
       url:'/escalations/api/v1/escalations/webcat/complaints/cat_new_url'
       method: 'POST'
       data: {data: data}
       success: (response) ->
-        loader.addClass('hidden')
         std_msg_success('URLs categorized successfully',["Categorization of a Top URL will create a pending complaint entry.", "All other entries have been submitted directly to WBRS."], reload: true)
-
       error: (response) ->
-        loader.addClass('hidden')
         if response.responseText.includes('Either no products have been defined to enter bugs against or you have not been given access to any.')
           std_api_error(response, "Please make sure you have the appropriate permissions in Bugzilla. Unable to categorize url.", reload: false)
         else
@@ -175,14 +169,12 @@ window.multiple_url_categorization = () ->
   urls = $("#categorize_urls").val().split(/\n/)
   category_ids = $("#multi_cat_url_cats").val()
   category_names = []
-  loader = $('#inline-webcat.webcat-loader')
   for category in $("#multi_cat_url_cats")
     for i in [0..5] by 1
       if category[i]
         category_names.push(category[i].text)
 
   if $("#categorize_urls").val() != "" && category_ids != null && category_names != null
-    loader.removeClass('hidden')
     std_msg_ajax(
       url:'/escalations/api/v1/escalations/webcat/complaints/multi_cat_new_url'
       method: 'POST'
@@ -195,24 +187,19 @@ window.multiple_url_categorization = () ->
         std_msg_error('Error' + ' ' + response.responseJSON.message,"", reload: false)
     )
   else
-    loader.addClass('hidden')
     std_msg_error('Error', ['Please check that a URL/IP has been inputted and that at least one category was selected.'], reload: false)
 
 
 window.inheritCategories = (complaint_entry_id) ->
-  loader = $('.inline-loader-' + complaint_entry_id)
-  loader.css('display', 'flex')
   std_msg_ajax(
     url:'/escalations/api/v1/escalations/webcat/complaint_entries/inherit_categories_from_master_domain'
     method: 'POST'
     data: {'id': complaint_entry_id}
     success: (response) ->
-      loader.css('display', 'none')
       $('.domain-categories').hide()
       std_msg_success('Success',["Successfully inherited categories from main domain."], reload: false)
 
     error: (response) ->
-      loader.css('display', 'none')
       std_msg_error('Error' + ' ' + response.responseJSON.message,"", reload: false)
     )
 
@@ -397,8 +384,6 @@ window.updatePending = (id,row_id) ->
 
 ## Called when user submits categories / information to close a ticket
 window.updateEntryColumns = (entry_id,row_id) ->
-  loader = $('.inline-loader-' + entry_id)
-  loader.css('display', 'flex')
   $("#submit_changes_#{entry_id}").addClass('hidden')
   $("#reopen_#{entry_id}").removeClass('hidden')
 
@@ -420,7 +405,6 @@ window.updateEntryColumns = (entry_id,row_id) ->
 
   # If resolution is set to fixed, make sure it has categories applied
   if categories == null && fixed_flag == true
-    loader.css('display', 'none')
     std_msg_error("Must include at least one category.","", reload: false)
     $("#submit_changes_#{entry_id}").removeClass('hidden')
     $("#reopen_#{entry_id}").addClass('hidden')
@@ -432,7 +416,6 @@ window.updateEntryColumns = (entry_id,row_id) ->
       data: {'id': entry_id, 'prefix': prefix, 'categories':categories, 'category_names':category_names, 'status':resolution_status, 'comment':comment, 'resolution_comment': resolution_comment }
       success: (response) ->
         {categories, error, uri, domain, subdomain, path, status, display_name} = $.parseJSON(response)
-        loader.css('display', 'none')
         if !error
           table = $('#complaints-index').DataTable()
 
@@ -511,7 +494,6 @@ window.updateEntryColumns = (entry_id,row_id) ->
             td.classList.add('nested-complaint-data-wrapper')
 
       error: (response) ->
-        loader.css('display', 'none')
         $("#submit_changes_#{entry_id}").removeClass('hidden')
         $("#reopen_#{entry_id}").addClass('hidden')
         std_msg_error(response,"", reload: false)
@@ -520,9 +502,6 @@ window.updateEntryColumns = (entry_id,row_id) ->
 
 ## Allows analyst to set ticket status to reopened and allows them to interact with the submission form
 window.reopenComplaint = (entry_id, button) ->
-
-  loader = $('.inline-loader-' + entry_id)
-  loader.css('display', 'flex')
 
 # Getting all the fields that need to be interactive if reopened
   # Changing these on the fly so the full page doesn't need to be reloaded
@@ -548,9 +527,7 @@ window.reopenComplaint = (entry_id, button) ->
       $("#reopen_" + entry_id).addClass('hidden')
       $("#submit_changes_" + entry_id).removeClass('hidden')
       $(status_col).text('REOPENED')
-      loader.css('display', 'none')
     error: (response) ->
-      loader.css('display', 'none')
       std_msg_error(response,"", reload: false)
   )
 
@@ -937,8 +914,6 @@ format = (complaint_entry_row) ->
     data: {'id': complaint_entry.entry_id}
     success: (response) ->
       row_id = JSON.parse(this.data).id
-      loader = $('.inline-loader-' + row_id)
-      loader.css('display', 'none')
       { current_category_data : current_categories, master_categories, sds_category} = JSON.parse(response)
 
       sds_category == '' unless sds_category != null
@@ -976,7 +951,6 @@ format = (complaint_entry_row) ->
         $(".simple-nested-table" + "#entry-table-" + complaint_entry.entry_id).append(category_row)
 
     error: (response) ->
-      loader.css('display', 'none')
       current_categories = ''
   )
 
@@ -1410,9 +1384,9 @@ window.click_table_buttons = (complaint_table, button)->
       $('#master-submit').prop('disabled', false)
 
 window.display_preview_window = (entry) ->
-
-  $('#complaint_id_x_prefix')[0].value = entry.domain
-  $('#complaint_id_x_categories')[0].value = entry.category
+  {domain, category, id} = entry
+  $('#complaint_id_x_prefix')[0].value = domain
+  $('#complaint_id_x_categories')[0].value = category
   headers = {'Token': $('input[name="token"]').val(), 'Xmlrpc-Token': $('input[name="xml_token"]').val()}
   #when checkbox is clicked take the domain and path and try to open it in the iframe
   path = ""
@@ -1421,7 +1395,7 @@ window.display_preview_window = (entry) ->
     subdomain = entry.subdomain + "."
   if entry.path
     path = entry.path
-  loc = "http://" + subdomain + entry.domain + path
+  loc = "http://" + subdomain + domain + path
   $.ajax(
     url: '/escalations/api/v1/escalations/webcat/complaints/test_url'
     method: 'GET'
@@ -1442,7 +1416,7 @@ window.display_preview_window = (entry) ->
   , this)
 
   $(".complaint_selected" ).removeClass("complaint_selected")
-  $("#complaint_entry_row_"+ entry.id ).addClass("complaint_selected")
+  $("#complaint_entry_row_"+ id ).addClass("complaint_selected")
   document.getElementById('preview_window').src = loc
   document.getElementById('preview_window_header_p').innerHTML = loc
   document.getElementById('preview_window_header_a').href = loc
@@ -1604,8 +1578,6 @@ window.triggerTooltips = (item) ->
 
 window.master_submit = () ->
   data = []
-  loader = $('.inline-loader')
-  loader.css('display', 'flex')
 
   $('.selected + tr td.nested-complaint-data-wrapper').each ->
     entry_id = $(this).find('tr').attr('entry_id')
@@ -1708,7 +1680,6 @@ window.master_submit = () ->
       if errors == true
         std_msg_error(error_msg,"")
       else
-        loader.css('display', 'none')
         std_msg_success('Success',["All complaints successfully processed."], reload: true)
 
       tds = $('#complaints-index tbody').closest('td')
@@ -1717,7 +1688,6 @@ window.master_submit = () ->
           td.classList.add('nested-complaint-data-wrapper')
 
     error: (response) ->
-      loader.css('display', 'none')
       std_msg_error("Unable to submit changes for selected entries.","", reload: false)
 
   , this)

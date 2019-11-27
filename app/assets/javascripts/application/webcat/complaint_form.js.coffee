@@ -86,8 +86,6 @@ $ ->
 
   $('#new-complaint-form').submit (e) ->
     e.preventDefault()
-    loader = $('#inline-webcat.webcat-loader')
-    loader.removeClass('hidden')
     ips_urls = this.ips_urls.value
     desc = this.description.value
     customer = this.customers.value
@@ -102,10 +100,8 @@ $ ->
         customer: customer,
         tags: tags
       success: (response) ->
-        loader.addClass('hidden')
         std_msg_success('Complaint Created.', [], reload: true)
       error: (response) ->
-        loader.addClass('hidden')
         std_api_error(response, "Complaint was not created.", reload: false)
     )
 
