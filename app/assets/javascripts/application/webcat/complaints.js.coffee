@@ -7,9 +7,15 @@ $(document).on 'click', '.paginate_button', ->
     table_page = table.page.info().page
 
 
-
 #### WBNP Reporting ####
 $(document).ready ->
+  loader = $('#inline-webcat.webcat-loader')
+  $(this).bind(
+    ajaxStart: () ->
+      loader.removeClass('hidden')
+    ajaxStop: () ->
+      loader.addClass('hidden')
+    )
   if ($('body').hasClass('escalations--webcat--complaints-controller') || $('body').hasClass('escalations--webcat--reports-controller')) &&
      $('body').hasClass('index-action')
     window.check_wbnp_status()
@@ -82,8 +88,7 @@ check_wbnp = window.check_wbnp_status = (wbnp_report_id) ->
 window.updateURI = (event, complaint_entry_id) ->
   event.preventDefault()
 
-  loader = $('.inline-loader-' + complaint_entry_id)
-  loader.css('display', 'flex')
+#  inline loader kick off here
 
   uri = $("#complaint_prefix_#{complaint_entry_id}").val()
 
@@ -140,7 +145,7 @@ window.cat_new_url = ()->
     if data[i].url.length > 0 && data[i].category_ids != null
       isEmpty = false
 
-  if isEmpty == false
+  if !isEmpty
 
     loader.removeClass('hidden')
 
@@ -177,7 +182,6 @@ window.multiple_url_categorization = () ->
   category_ids = $("#multi_cat_url_cats").val()
   category_names = []
   loader = $('#inline-webcat.webcat-loader')
-  console.log loader
   for category in $("#multi_cat_url_cats")
     for i in [0..5] by 1
       if category[i]
@@ -623,10 +627,8 @@ window.edit_selected_complaints = () ->
   selected_rows = $('#complaints-index').DataTable().rows('.selected')
   if selected_rows.count() > 0
     complaint_ids = []
-    i = 0
-    while i < selected_rows[0].length
+    for row, i in selected_rows[0]
       complaint_ids.push(selected_rows.data()[i].complaint_id)
-      i++
     window.location = 'show_multiple?selected_ids=' + complaint_ids;
   else
     std_msg_error("alert",["There was an error. Please select an entry to edit"])
@@ -1017,22 +1019,6 @@ format = (complaint_entry_row) ->
   retake_in_progress = false
   if complaint_entry.screen_shot_error == "Retaking screenshot please wait."
     retake_in_progress = true
-  svg =
-    '<!-- Generator: Adobe Illustrator 22.0.0, SVG Export Plug-In . SVG Version: 6.00 Build 0)  --><svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" version="1.1" id="Layer_1" x="0px" y="0px" viewBox="0 0 20 20" style="enable-background:new 0 0 20 20;" xml:space="preserve">
-      <style type="text/css">
-        .gear_one{fill:#BABABA;}
-        .bounding_box{fill:none;}
-        .gear_two:#4D4D4D;}
-      </style>
-      <g id="gear_larger" class="rotating">
-        <path class="gear_one" d="M7.9,11.5c0,0.7-0.5,1.1-1.1,1.1s-1.1-0.5-1.1-1.1c0-0.7,0.5-1.1,1.1-1.1S7.9,10.8,7.9,11.5z M12.3,11l-0.2-1   l-1.5-0.3L10.1,9l0.6-1.4L10,6.9L8.6,7.8L7.8,7.4L7.3,5.9h-1L5.7,7.4L4.9,7.8L3.6,6.9L2.9,7.6L3.5,9L3,9.8l-1.5,0.3l-0.2,1l1.3,0.8   l0.2,0.9l-1,1.1l0.4,1l1.5-0.3L4.4,15v1.5l1,0.4l1-1.1h0.9l1,1.1l1-0.4V15l0.7-0.6l1.5,0.3l0.5-0.9l-1-1.1l0.2-0.9L12.3,11z"></path>
-        <rect x="1.3" y="5.9" class="bounding_box" width="11" height="11"></rect>
-      </g>
-      <g id="gear_smaller" class="rotating">
-        <path class="gear_two" d="M13.8,7c0-0.5,0.4-0.9,0.9-0.9s0.9,0.4,0.9,0.9s-0.4,0.9-0.9,0.9C14.2,7.8,13.8,7.4,13.8,7z M17.3,6.6l1-1.1   l-0.5-0.9l-1.4,0.3l-0.6-0.4l-0.5-1.4h-1.1l-0.5,1.4L13,4.9l-1.4-0.3l-0.5,0.9l1,1.1v0.7l-1,1.1l0.5,0.9L13,9l0.6,0.4l0.5,1.4h1.1   l0.5-1.4L16.3,9l1.4,0.3l0.5-0.9l-1-1.1V6.6H17.3z"></path>
-        <rect x="10.7" y="2.9" class="bounding_box" width="8" height="8"></rect>
-      </g>
-    </svg>'
   complaint_entry_html =
       complaint_table_row_html +
       "<div class='col-xs-12 col-sm-8 nested-complaint-static-data'>" +
@@ -1055,9 +1041,6 @@ format = (complaint_entry_row) ->
       "</div></div><div class='col-xs-7 col-with-divider'>" +
       '<table class="simple-nested-table" id="entry-table-' + entry_id + '"><thead><tr><th class="col-sm-1">Conf</th><th class="col-sm-4">WBRS Categories</th><th class="col-sm-3">WBRS Certainty</th><th class="col-sm-4">SDS Category</tr></thead>' +
       '</table>' +
-      "<div class='inline-loader inline-loader-#{entry_id}'>" +
-      '<div class="loader-gears">' + svg + '</div>'+
-      '<span class="missing-data">Loading Data...</span></div>' +
       '</br>' +
       '</div><div class="col-xs-2">' +
       '<button class="secondary" id="lookup-' + entry_id+ '" onclick="WebCat.RepLookup.queryWhoIs(' + entry_id  + ',\'' + url + '\')">Lookup</button><br/>' +
@@ -1234,14 +1217,12 @@ window.get_xbrs_history = (url, tab) ->
       else
         # Cycle through and assign index values to column headers
         col_headers = []
-        i = 0
-        while i < response['columns'].length
+        for col, i in response['columns']
           $(response['columns']).each ->
             col_defs = []
             col_defs["index"] = i
             col_defs["column"] = this.valueOf()
             col_headers.push(col_defs)
-            i++
 
         col_indexes = []
         ctime_index = ''
@@ -1263,14 +1244,12 @@ window.get_xbrs_history = (url, tab) ->
         # For each row of data, cycle through and assign index to each column
         $(response['data']).each ->
           col_data = []
-          d = 0
-          while d < this.length
+          for data, i in this
             $(this).each ->
               data = []
-              data["index"] = d
+              data["index"] = i
               data["data"] = this.valueOf()
               col_data.push(data)
-              d++
             row_data.push(col_data)
 
         # Sort rows by ctime
