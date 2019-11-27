@@ -252,62 +252,58 @@ class Sbrs::Base
 
     if request_string.present?
       uri = URI.parse(request_string)
-      if Rails.cache.read(uri).blank? or Rails.env.development?
-        request = Net::HTTP::Get.new(uri)
-        request["X-Client-ID"] = "talosweb"
-        request["X-Product-ID"] = "talosintelligence"
-        request["X-Device-ID"] = "talosweb"
+      request = Net::HTTP::Get.new(uri)
+      request["X-Client-ID"] = "talosweb"
+      request["X-Product-ID"] = "talosintelligence"
+      request["X-Device-ID"] = "talosweb"
 
-        cert_string = File.open(ca_cert_file, 'r') do |file|
-          file.read
+      cert_string = File.open(ca_cert_file, 'r') do |file|
+        file.read
+      end
+      pkey_string = File.open(pkey_file, 'r') do |file|
+        file.read
+      end
+
+      cert = OpenSSL::X509::Certificate.new(cert_string.gsub("\\n", "\n"))
+      key = OpenSSL::PKey::RSA.new(pkey_string.gsub("\\n", "\n"))
+
+      req_options = {
+          use_ssl: uri.scheme == "https",
+          cert: cert,
+          key: key,
+          verify_mode: OpenSSL::SSL::VERIFY_NONE
+      }
+
+      begin
+        response = Net::HTTP.start(uri.hostname, uri.port, req_options) do |http|
+          http.request(request)
         end
-        pkey_string = File.open(pkey_file, 'r') do |file|
-          file.read
-        end
 
-        cert = OpenSSL::X509::Certificate.new(cert_string.gsub("\\n", "\n"))
-        key = OpenSSL::PKey::RSA.new(pkey_string.gsub("\\n", "\n"))
-
-        req_options = {
-            use_ssl: uri.scheme == "https",
-            cert: cert,
-            key: key,
-            verify_mode: OpenSSL::SSL::VERIFY_NONE
-        }
-
-        begin
-          response = Net::HTTP.start(uri.hostname, uri.port, req_options) do |http|
-            http.request(request)
-          end
-
-          if response.code != "200"
-            '{"response": "request failed"}'
-          else
-            if request_type == 'wbrs' || request_type == 'combo'
-              sds_v3_response_parsed = JSON.parse(response.body)
-
-              wbrs_response = {}
-              wbrs_response["wbrs"] = {}
-              wbrs_response["wbrs-rulehits"] = {}
-
-              wbrs_response["wbrs"] = {"score" => sds_v3_response_parsed["rsp"]["thrt_scor"].to_f}
-              wbrs_response["wbrs-rulehits"] = sds_v3_response_parsed["rsp"]["thrt_rhts"]
-
-              # This is just some cleaning for backwards-compatibility with the v2 format
-              if wbrs_response["wbrs-rulehits"] == nil
-                wbrs_response["wbrs-rulehits"] = {}
-              end
-
-              wbrs_response
-            elsif request_type == 'webcat_labels' || request_type == 'threatcat_labels'
-              response.body
-            end
-          end
-        rescue
+        if response.code != "200"
           '{"response": "request failed"}'
+        else
+          if request_type == 'wbrs' || request_type == 'combo'
+            sds_v3_response_parsed = JSON.parse(response.body)
+
+            wbrs_response = {}
+            wbrs_response["wbrs"] = {}
+            wbrs_response["wbrs-rulehits"] = {}
+
+            wbrs_response["wbrs"] = {"score" => sds_v3_response_parsed["rsp"]["thrt_scor"].to_f}
+            wbrs_response["wbrs-rulehits"] = sds_v3_response_parsed["rsp"]["thrt_rhts"]
+
+            # This is just some cleaning for backwards-compatibility with the v2 format
+            if wbrs_response["wbrs-rulehits"] == nil
+              wbrs_response["wbrs-rulehits"] = {}
+            end
+
+            wbrs_response
+          elsif request_type == 'webcat_labels' || request_type == 'threatcat_labels'
+            response.body
+          end
         end
-      else
-        Rails.cache.read(uri)
+      rescue
+        '{"response": "request failed"}'
       end
     end
   end
