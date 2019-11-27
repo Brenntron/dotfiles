@@ -526,6 +526,7 @@ window.updateEntryColumns = (entry_id,row_id) ->
 
 ## Allows analyst to set ticket status to reopened and allows them to interact with the submission form
 window.reopenComplaint = (entry_id, button) ->
+
   loader = $('.inline-loader-' + entry_id)
   loader.css('display', 'flex')
 
@@ -1019,6 +1020,7 @@ format = (complaint_entry_row) ->
   retake_in_progress = false
   if complaint_entry.screen_shot_error == "Retaking screenshot please wait."
     retake_in_progress = true
+
   complaint_entry_html =
       complaint_table_row_html +
       "<div class='col-xs-12 col-sm-8 nested-complaint-static-data'>" +

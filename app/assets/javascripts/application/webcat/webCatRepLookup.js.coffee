@@ -31,13 +31,9 @@ namespace 'WebCat.RepLookup', (exports) ->
     }, this
 
   exports.queryWhoIs = (entry_id, query_entry) ->
-    loader = $('.inline-loader-' + entry_id)
-    loader.css('display', 'flex')
     successFunction = (result) ->
-      loader.css('display', 'none')
       if result != null
         whois = result.data
-
         if $("#whois_content").length
           whois_content = this
           $("#whois_content").html(whois)
