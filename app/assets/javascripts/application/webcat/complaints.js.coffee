@@ -88,8 +88,6 @@ check_wbnp = window.check_wbnp_status = (wbnp_report_id) ->
 window.updateURI = (event, complaint_entry_id) ->
   event.preventDefault()
 
-#  inline loader kick off here
-
   uri = $("#complaint_prefix_#{complaint_entry_id}").val()
 
   std_msg_ajax(
@@ -98,9 +96,7 @@ window.updateURI = (event, complaint_entry_id) ->
     data: {complaint_entry_id: complaint_entry_id, uri: uri }
     success: (response) ->
       {current_categories, category, wbrs_score, domain, subdomain, path, status} = response.json
-
-      loader.css('display', 'none')
-
+      
       $(".simple-nested-table#entry-table-#{complaint_entry_id} tbody > tr").remove()
 
       if 'ip' == status
@@ -121,9 +117,7 @@ window.updateURI = (event, complaint_entry_id) ->
         $("#lookup-#{complaint_entry_id}").replaceWith('<button class="secondary" id="lookup-' + complaint_entry_id + '" onclick="WebCat.RepLookup.queryWhoIs('+query_who_params+ '\')">Lookup</button>')
         $("#history-#{complaint_entry_id}").replaceWith('<button class="secondary" id="history-' + complaint_entry_id + '" onclick="history_dialog(' + complaint_entry_id + ',\'' + uri + '\')">History</button>')
         $("#domain-#{complaint_entry_id}").replaceWith('<button class="secondary" id="domain-' + complaint_entry_id + '" onclick="domain_whois(\''+query_who_params+'\')">Domain</button>')
-    error: (response) ->
-      loader.css('display', 'none')
-      std_msg_error("Unable to update URI", [response.responseJSON.message], reload: false)
+    error: (response) ->      std_msg_error("Unable to update URI", [response.responseJSON.message], reload: false)
 
  )
 
