@@ -242,6 +242,20 @@ $ ->
 
   build_complaints_table = () ->
         complaint_table = $('#complaints-index').DataTable(
+          initComplete: ->
+            input = $('.dataTables_filter input').unbind()
+            self = @api()
+            $searchButton = $('<button>').text('search').click(->
+              self.search(input.val()).draw()
+              return
+            )
+            $clearButton = $('<button>').text('clear').click(->
+              input.val ''
+              $searchButton.click()
+              return
+            )
+            $('.dataTables_filter').append $searchButton, $clearButton
+            return
           lengthMenu: [[25, 50, 100, 150, 200], [25, 50, 100, 150, 200]]
           processing: true
           serverSide: true
@@ -513,6 +527,7 @@ $ ->
             ]
         select: 'style': 'os'
         responsive: true)
+
 
   if $('#complaints-index').length
     $('#complaints-index_filter input').addClass('table-search-input');
