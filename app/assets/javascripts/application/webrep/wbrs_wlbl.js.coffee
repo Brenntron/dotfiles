@@ -140,12 +140,19 @@ window.bulk_get_current_wlbl = (page) ->
             tc_json = get_threat_categories(entry.ip_uri)
             if tc_json
               resolve tc_json  # resolve goes to .then() below
-          .then( build_tc_row.bind(null, entry, tbody)).then ->
-            order_wlbl_table_rows()
-
+          .then(
+            build_tc_row.bind(null, entry, tbody)
+          )
           comment_box.text(comment_trail)
+
       error: (response) ->
         std_msg_error('Error retrieving WL/BL Data in Bulk Adjust', response)
+
+      complete: () ->
+        # slight delay to ensure row ordering, refactor when time avail
+        setTimeout (->
+          bulk_order_rows()
+        ),600
     )
   else
     std_msg_error('No rows selected', ['Please select at least one entry row.'])
@@ -195,53 +202,54 @@ window.bulk_get_current_wlbl = (page) ->
     $(tbody).append(table_row)
     $(tbody).find('.loading-rows').addClass('hidden')
 
-  # order the rows after the build to ensure correct order on left and right sides
-  order_wlbl_table_rows = () ->
-    # at this point in the dom, the blue rows are built, and are ready to have classes added into them
-    if $('#wlbl_adjust_entries_index').length > 0  # index dropdown
-      curr_dd = '#wlbl_adjust_entries_index'
-      left_cbs = '#disputes-index .dispute-entry-checkbox:checked'
-      url_entry = '.entry-col-content'
-    else  # show page dropdown and bfrp dropdown bulk
-      curr_dd = '#wlbl_adjust_entries'
-      left_cbs = '#disputes-research-table .dispute_check_box:checked'
-      url_entry = '.entry-data-content'
-
-    $(left_cbs).each (i) ->  # add the order ids to left and right sides
-      ip_uri = $(this).closest('tr').find(url_entry).text().trim()
-      if $('.bfrp-table').length > 0
-        ip_uri = $(this).closest('tr').find('.entry-data-content').text().trim()
-      $(this).closest('tr').attr('data-order-id', i)  # add row-id to the left, this works on bfrp confirmed
-
-      if $('body').hasClass('index-action')
-        curr_entry_id = 'wlbl-entry-id-' + $(this).attr('id')
-      else if $('body').hasClass('show-action')
-        curr_entry_id = 'wlbl-entry-id-' + $(this).attr('data-entry-id')
-      else if location.href.includes('research')
-        curr_entry_id = $(this).attr('class').split(' ').pop()
-        # for the bulk dropdowns on bfrp, ensure unique classes in dropdown, bfrp bulk dd'S
-        curr_entry_id = curr_entry_id.replace('-result-','-dd-result-')
-
-      # fyi: bugfix for comparing the http/non-http versions of these urls/domains
-      $(curr_dd).find('.wlbl-entry-content').each ->
-        curr_text = $(this).text().trim()
-        if ip_uri.includes(curr_text)
-          $(this).closest('tr').attr('data-order-id', i)  # add row-id to the right
-
-          # ENSURE YOU ALWAYS ADDING A UNIQUE -DD- CLASS-ID EACH TIME TO BULK DROPDOWN
-          $(this).closest('tr').find('td.wlbl-entry-wlbl').attr('class','wlbl-entry-wlbl').addClass(curr_entry_id)
 
 
+# order the rows for bulk dropdown, same order on left as on right
+window.bulk_order_rows = () ->
+  if $('#wlbl_adjust_entries_index').length > 0  # index dropdown
+    curr_dd = '#wlbl_adjust_entries_index'
+    left_cbs = '#disputes-index .dispute-entry-checkbox:checked'
+    url_entry = '.entry-col-content'
+  else  # show page dropdown and bfrp dropdown bulk
+    curr_dd = '#wlbl_adjust_entries'
+    left_cbs = '#disputes-research-table .dispute_check_box:checked'
+    url_entry = '.entry-data-content'
 
-    table_dd = $(curr_dd).find('tbody')
-    rows = $(table_dd).find('tr')
+  $(left_cbs).each (i) ->  # add the order ids to left and right sides
+    ip_uri = $(this).closest('tr').find(url_entry).text().trim()
+    if $('.bfrp-table').length > 0
+      ip_uri = $(this).closest('tr').find('.entry-data-content').text().trim()
+    $(this).closest('tr').attr('data-order-id', i)  # add row-id to the left, this works on bfrp confirmed
 
-    # basic sort by id/integer
-    rows.sort (a, b) ->
-      x = $(a).attr('data-order-id')
-      y = $(b).attr('data-order-id')
-      x - y
-    $(rows).each (i, row) -> table_dd.append(row)
+    if $('body').hasClass('index-action')
+      curr_entry_id = 'wlbl-entry-id-' + $(this).attr('id')
+    else if $('body').hasClass('show-action')
+      curr_entry_id = 'wlbl-entry-id-' + $(this).attr('data-entry-id')
+    else if $('body').hasClass('research-action')
+      curr_entry_id = $(this).attr('class').split(' ').pop()
+      # for the bulk dropdowns on bfrp, ensure unique classes in dropdown, bfrp bulk dd'S
+      curr_entry_id = curr_entry_id.replace('-result-','-dd-result-')
+
+    # fyi: bugfix for comparing the http/non-http versions of these urls/domains
+    $(curr_dd).find('.wlbl-entry-content').each ->
+      curr_text = $(this).text().trim()
+      if ip_uri.includes(curr_text)
+        $(this).closest('tr').attr('data-order-id', i)  # add row-id to the right
+
+        # ENSURE YOU ALWAYS ADDING A UNIQUE -DD- CLASS-ID EACH TIME TO BULK DROPDOWN
+        $(this).closest('tr').find('td.wlbl-entry-wlbl').attr('class','wlbl-entry-wlbl').addClass(curr_entry_id)
+
+  table_dd = $(curr_dd).find('tbody')
+  rows = $(table_dd).find('tr')
+
+  # basic sort by id/integer
+  rows.sort (a, b) ->
+    x = $(a).attr('data-order-id')
+    y = $(b).attr('data-order-id')
+    x - y
+  $(rows).each (i, row) -> table_dd.append(row)
+
+
 
 
 
