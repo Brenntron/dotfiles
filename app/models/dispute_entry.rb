@@ -896,9 +896,9 @@ class DisputeEntry < ApplicationRecord
       wbrs_stuff = Sbrs::Base.remote_call_sds_v3(self.hostlookup, "wbrs")
 
       if self.entry_type == "URI/DOMAIN"
-        verdict = self.verdict_from_score(wbrs_stuff["wbrs"]["score"])
+        verdict = self.class.verdict_from_score(wbrs_stuff["wbrs"]["score"])
       else
-        verdict = self.email_verdict_from_score(self.sbrs_score)
+        verdict = self.class.email_verdict_from_score(self.sbrs_score)
       end
 
       if self.suggested_disposition == verdict
