@@ -139,11 +139,8 @@ window.bulk_get_current_wlbl = (page) ->
           tc_promise = new Promise (resolve, reject) ->
             tc_json = get_threat_categories(entry.ip_uri)
             if tc_json
-              # change this to pass in an array of tc_json and current ip_uri
               resolve(tc_json)  # resolve goes to .then() below
-          .then(
-            build_tc_row.bind(null, entry, tbody)
-          )
+          .then(build_tc_row.bind(null, entry, tbody))
           comment_box.text(comment_trail)
 
       error: (response) ->
@@ -160,7 +157,7 @@ window.bulk_get_current_wlbl = (page) ->
     return false
 
   # build the top blue dispute rows with wl/bl's and threat cats, ensures the row gets built correctly (KH refactor)
-  build_tc_row = (entry, tbody, result) ->
+  window.build_tc_row = (entry, tbody, result) ->
     console.log 'YOU HAVE ENTERED build_tc_row, HERE IS CURR ENTRY:'
     console.log entry
 
