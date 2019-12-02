@@ -40,13 +40,15 @@ class Complaint < ApplicationRecord
   scope :active_count , -> {where(status:ACTIVE).count}
   scope :completed_count , -> {where(status:COMPLETED).count}
   scope :new_count , -> {where(status:NEW).count}
-  scope :overdue_count , -> {where("created_at < ?",Time.now - 24.hours).where.not(status:COMPLETED).count}
+  scope :overdue_count , -> {where("created_at < ?",Time.now - 12.hours).where.not(status:COMPLETED).count}
   scope :open_comps, -> { where.not(status: COMPLETED) }
-  scope :from_ti, -> { includes(:complaint_entries).where(channel: TI_CHANNEL) }
-  scope :from_int, -> { includes(:complaint_entries).where(channel: INT_CHANNEL) }
-  scope :from_wbnp, -> { includes(:complaint_entries).where(channel: WBNP_CHANNEL) }
+
   scope :by_guest, -> { joins(:customer).where(customers: {company_id: Company.guest.id}) }
   scope :by_cust, -> { joins(:customer).where.not(customers: {company_id: Company.guest.id}) }
+
+  scope :from_ti, -> { includes(:complaint_entries).where(channel: TI_CHANNEL) }
+  scope :from_wbnp, -> { includes(:complaint_entries).where(channel: WBNP_CHANNEL) }
+  scope :from_int, -> { includes(:complaint_entries).where(channel: INT_CHANNEL) }
 
   def set_status(new_status)
     status_list = complaint_entries.map{|entry| entry.status}

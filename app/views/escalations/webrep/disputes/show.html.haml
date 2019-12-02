@@ -160,7 +160,7 @@
     .col-xs-2.col-with-divider
       %label.content-label-sm
         Dispute Entries
-      %div
+      %div.dispute-entry-ip-uri
         = @entries.first.hostlookup if @entries.present?
         -#- @entries.each do |entry|
         -#  = entry.hostlookup
@@ -183,7 +183,7 @@
           %button.cancel-button.dispute-top-buttons#cancel-dispute-button.hidden.esc-tooltipped{title: 'Cancel'}
 
 
-  .row#top_bar_extended_info
+  .row#top_bar_extended_info{style: 'display: none'}
     .col-xs-12
       %h3 Submitter Information
       .row

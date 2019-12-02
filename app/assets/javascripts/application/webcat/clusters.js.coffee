@@ -362,7 +362,7 @@ $ ->
         '<th class="clusterpath-col-wbrs text-center">WBRS Score</th>' +
         '</tr>' +
         '</thead>' + '<tbody>'
-      missing_data = '<span class="missing-data">Missing Data</span>'
+      missing_data = '<span class="missing-data">Missing data</span>'
       entry_rows = []
 
 
