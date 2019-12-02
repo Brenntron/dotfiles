@@ -8008,7 +8008,18 @@ td.text-center span {
     line-height: 3.5;
   }
 }
-
+.ugh{
+  font-weight: 200;
+}
+.webcat-full-domain{
+  max-width: 485px;
+  display: inline-block;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  overflow: hidden;
+  vertical-align: bottom;
+  font-weight: 600;
+}
 .loader-msg {
   color: $type-lighter-color;
 }

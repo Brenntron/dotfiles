@@ -1772,11 +1772,14 @@ window.updateResolutionDialog = (confirm) ->
   for row in selected_rows
     { id } = row
     complaint_entries.push(id)
-    subdomain = $(row).find("#subdomain_#{id}") + '.'
-    domain = $(row).find("#domain_#{id}")
-    path = $(row).find("#path_#{id}")
-    console.log subdomain, domain, path
-    $('#complaint_entries_to_update').append("<tr><td>#{id} | #{subdomain}#{domain}#{path}</td></tr>")
+    full_domain = ''
+    subdomain = $(row).find("#subdomain_#{id}").text() + '.'
+    domain = $(row).find("#domain_#{id}").text()
+    path = $(row).find("#path_#{id}").text()
+    if subdomain != '.'
+      full_domain = subdomain
+    full_domain += domain + path
+    $('#complaint_entries_to_update').append("<tr><td><span class='ugh'>#{id} |</span> <span class='webcat-full-domain'>#{full_domain}</span></td></tr>")
 
   $('#resolution_dialog').modal("show")
   $('#resolution_text').text("Resolution: #{resolution}")
