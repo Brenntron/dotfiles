@@ -592,7 +592,10 @@ window.take_selected = ()->
   else
     std_msg_error('No rows selected', ['Please select at least one row.'])
 
-
+window.index_update_resolution = () ->
+  rows = $('#complaints-index').DataTable().rows('.selected')
+  if !rows[0].length
+    std_msg_error("alert",["There was an error. Please select an entry to edit"])
 
 window.return_selected = ()->
   selected_rows = $('#complaints-index').DataTable().rows('.selected')
@@ -1782,7 +1785,12 @@ window.updateResolutionDialog = (confirm) ->
     $('#complaint_entries_to_update').append("<tr><td><span class='ugh'>#{id} |</span> <span class='webcat-full-domain'>#{full_domain}</span></td></tr>")
 
   $('#resolution_dialog').modal("show")
-  $('#resolution_text').text("Resolution: #{resolution}")
+  $('#resolution_text').html("The following entries will have their resolutions set to <span class='resolution-emp'>#{resolution}.</span>")
+  tbody = $('#resolution_dialog').find('tbody')
+  setTimeout ->
+    if $('#complaint_entries_to_update').height() > 399
+      $(tbody).addClass('scrollable-table')
+  , 300
 
 window.updateResolution = () ->
   resolution = $('#complaint_resolution')[0].value

@@ -59,7 +59,7 @@ $dropshadow: 2px 0 10px 1px rgba(0,0,0,0.1);
 $type-base-color:    #333;   /* Dark Grey */
 $type-lighter-color: #666;   /* Medium Grey */
 $type-faint-accent: #D7DADB; /* Lighter Grey */
-
+$type-lightest: #fff; /* White */
 /* Additional Colors */
 /* for use on gridlines, form inputs, and other very subtle elements against the content bg color */
 $faint-neutral-color: #f2f2f2;
@@ -733,6 +733,7 @@ button {
   background-image: url(image_path('icon_submit_arrow.svg'));
   background-color: $warning-accent-color;
 }
+.resolution-submit-button {background-image: url(image_path('icon_submit_arrow_grey.svg'));}
 .open-viewable {background-image: url(image_path('icon_open_viewable.svg'));}
 .open-nonviewable {background-image: url(image_path('icon_open_nonviewable.svg'));}
 .open-selected {background-image: url(image_path('icon_open_selected.svg'));}
@@ -8484,13 +8485,34 @@ hr.thin.form-divider {
     top: 3px;
     right: 3px;
   }
-  .modal-header {
-    border-bottom: none;
-    font-weight: 700;
+  tbody{
+    display: block;
+    margin-top: 10px;
   }
-    .modal-footer{
+  .modal-header {
+    background-color: $primary-section-color;
+    color: $type-lightest;
+    font-size: 14pt;
+    font-weight: 300;
+    border-top-left-radius: 6px;
+    border-top-right-radius: 6px;
+  }
+  .scrollable-table{
+    border: 1px solid $nav-toolbar-color;
+    max-height: 400px;
+    overflow-y: scroll!important;
+    padding: 2px;
+  }
+  .modal-footer{
       text-align: center;
-    }
+  }
+  #resolution_text{
+    padding-left: 7px;
+  }
+  .resolution-emp{
+    font-weight:600;
+    color: $primary-section-color
+  }
 }
 
 #complaint_entries_to_update tbody tr:last-child td{
@@ -10172,7 +10194,7 @@ input[type="radio"].resolution_radio_button {
 }
 
 // webrep and webcat toolbars - between 1800px and 1600px, prevent breaking/wrapping of the buttons
-@media (min-width: 1850px) {
+@media (min-width: 1974px) {
   #webrep-index-toolbar, #webcat-index-toolbar {
     .toolbar-button {
       background-position: 4px 6px;
@@ -10191,7 +10213,7 @@ input[type="radio"].resolution_radio_button {
     }
   }
 }
-@media (max-width: 1850px)  {
+@media (max-width: 1975px)  {
   #webcat-index-toolbar .toolbar-button-text {
     display: none !important;
   }
