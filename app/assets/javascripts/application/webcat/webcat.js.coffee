@@ -245,16 +245,17 @@ $ ->
           initComplete: ->
             input = $('.dataTables_filter input').unbind()
             self = @api()
-            $searchButton = $('<button>').text('search').click(->
+
+            $searchButton = $('<button class="dt-button dt-search-button esc-tooltipped" title="Search">').click(->
               self.search(input.val()).draw()
               return
             )
-            $clearButton = $('<button>').text('clear').click(->
+            $clearButton = $('<button class="dt-button dt-search-clear-button esc-tooltipped" title="Clear">').click(->
               input.val ''
               $searchButton.click()
               return
             )
-            $('.dataTables_filter').append $searchButton, $clearButton
+            $('.dataTables_filter').append $clearButton, $searchButton
             return
           lengthMenu: [[25, 50, 100, 150, 200], [25, 50, 100, 150, 200]]
           processing: true
@@ -530,8 +531,12 @@ $ ->
 
 
   if $('#complaints-index').length
-    $('#complaints-index_filter input').addClass('table-search-input');
+#    debugger
+
     build_complaints_table()
+
+    # Make the search prettier
+    $('#complaints-index_filter input').addClass('restricted-table-search-input');
 
     $('#complaints-index tbody').on 'click', ' .nested-complaint-data', ->
       $(this).focus()
