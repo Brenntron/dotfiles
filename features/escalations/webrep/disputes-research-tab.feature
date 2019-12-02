@@ -26,7 +26,6 @@ Feature: Disputes index, Research tab
     When I goto "escalations/webrep/disputes/1"
     And  I wait for "5" seconds
     Then I click "#research-tab-link"
-    And  take a screenshot
     Then I should see "Malware Sites"
 
   @javascript

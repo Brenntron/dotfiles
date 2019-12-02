@@ -246,11 +246,11 @@ Feature: Webcat complaints
   Scenario: a user visits a complaint show page and sees its IP
     Given a user with role "webcat user" exists and is logged in
     And the following complaint entries exist:
-    |id|domain|
-    |1 |      |
+    |id|ip_address|domain|
+    |1 |1.2.3.4   |      |
     And a complaint entry preload exists
     And I goto "/escalations/webcat/complaints/1"
-    Then I should see "1.1.1.1"
+    Then I should see "1.2.3.4"
 
   @javascript
   Scenario: lookup information is accessable via lookup button

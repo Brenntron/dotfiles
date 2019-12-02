@@ -94,30 +94,26 @@ class SbApi < ApplicationRecord
       lookup_data = self.build_request(params, host, json_response)
       uri = lookup_data[:uri]
       header = lookup_data[:header]
-      if Rails.cache.read(uri).blank?
-        request = Net::HTTP::Get.new(uri)
-        request["Authorization"] = "#{header}" #add the request header
-        req_options = {
-            use_ssl: uri.scheme == "https",
-        }
 
-        response = Net::HTTP.start(uri.hostname, uri.port, req_options) do |http|
-          http.request(request)
-        end
-        #retry the look up at least once if it fails
+      request = Net::HTTP::Get.new(uri)
+      request["Authorization"] = "#{header}" #add the request header
+      req_options = {
+          use_ssl: uri.scheme == "https",
+      }
 
-        if response.code == "401" && (retries.present? && retries <= API_RETRY_LIMIT)
+      response = Net::HTTP.start(uri.hostname, uri.port, req_options) do |http|
+        http.request(request)
+      end
+      #retry the look up at least once if it fails
 
-          params["retried"] = true
-          #this is the actual line that will increment retries until it hits the max attempt as defined by API_RETRY_LIMIT
-          retries += 1
-          response = query_lookup(params, retries)
-        else
-          Rails.cache.write(uri, response.body)
-          response.body
-        end
+      if response.code == "401" && (retries.present? && retries <= API_RETRY_LIMIT)
+
+        params["retried"] = true
+        #this is the actual line that will increment retries until it hits the max attempt as defined by API_RETRY_LIMIT
+        retries += 1
+        response = query_lookup(params, retries)
       else
-        Rails.cache.read(uri)
+        response.body
       end
     rescue
       '{}'
@@ -169,46 +165,41 @@ class SbApi < ApplicationRecord
     end
     if request_string.present?
       uri = URI.parse(request_string)
-      if Rails.cache.read(uri).blank? or Rails.env.development? or full_response
-        request = Net::HTTP::Get.new(uri)
-        request["X-Client-ID"] = "talosweb"
-        request["X-Product-ID"] = "talosintelligence"
-        if request_type == "wbrs"
-          request["X-SDS-Categories-Version"] = "v" + self.pluck_webcat_version(webcat_list)
+      request = Net::HTTP::Get.new(uri)
+      request["X-Client-ID"] = "talosweb"
+      request["X-Product-ID"] = "talosintelligence"
+
+      if request_type == "wbrs"
+        request["X-SDS-Categories-Version"] = "v" + self.pluck_webcat_version(webcat_list)
+      end
+
+      req_options = {
+          use_ssl: uri.scheme == "https",
+          cert: OpenSSL::X509::Certificate.new(cert),
+          key: OpenSSL::PKey::RSA.new(pkey),
+          verify_mode: OpenSSL::SSL::VERIFY_NONE
+      }
+      begin
+        response = Net::HTTP.start(uri.hostname, uri.port, req_options) do |http|
+          http.request(request)
         end
 
-        req_options = {
-            use_ssl: uri.scheme == "https",
-            cert: OpenSSL::X509::Certificate.new(cert),
-            key: OpenSSL::PKey::RSA.new(pkey),
-            verify_mode: OpenSSL::SSL::VERIFY_NONE
-        }
-        begin
-          response = Net::HTTP.start(uri.hostname, uri.port, req_options) do |http|
-            http.request(request)
-          end
-
-          if response.code != "200"  #there was an issue
-            '{"response": "request failed"}'
+        if response.code != "200"  #there was an issue
+          '{"response": "request failed"}'
+        else
+          if request_type == "webcat_labels"
+            response.body # already been parsed?
           else
-            if request_type == "webcat_labels"
-              response.body # already been parsed?
+            if full_response
+              response.body
             else
-              if full_response
-                response.body
-              else
-                sds_response = build_sds_response(response, webcat_list, request_type)
-                Rails.cache.write(uri, sds_response)
-                sds_response
-              end
+              build_sds_response(response, webcat_list, request_type)
             end
           end
+        end
         rescue
           '{"response": "request failed"}'
         end
-      else
-        Rails.cache.read(uri)
-      end
     else
       '{"response": "no query_string clause for [' + query_string + ']"}'
     end
@@ -240,54 +231,49 @@ class SbApi < ApplicationRecord
 
     if request_string.present?
       uri = URI.parse(request_string)
-      if Rails.cache.read(uri).blank? or Rails.env.development?
-        request = Net::HTTP::Get.new(uri)
-        request["X-Client-ID"] = "talosweb"
-        request["X-Product-ID"] = "talosintelligence"
-        request["X-Device-ID"] = "talosweb"
+      request = Net::HTTP::Get.new(uri)
+      request["X-Client-ID"] = "talosweb"
+      request["X-Product-ID"] = "talosintelligence"
+      request["X-Device-ID"] = "talosweb"
 
-        req_options = {
-            use_ssl: uri.scheme == "https",
-            cert: OpenSSL::X509::Certificate.new(cert),
-            key: OpenSSL::PKey::RSA.new(pkey),
-            verify_mode: OpenSSL::SSL::VERIFY_NONE
-        }
+      req_options = {
+          use_ssl: uri.scheme == "https",
+          cert: OpenSSL::X509::Certificate.new(cert),
+          key: OpenSSL::PKey::RSA.new(pkey),
+          verify_mode: OpenSSL::SSL::VERIFY_NONE
+      }
 
-        begin
-          response = Net::HTTP.start(uri.hostname, uri.port, req_options) do |http|
-            http.request(request)
-          end
-
-          if response.code != "200"
-            '{"response": "request failed"}'
-          else
-            if request_type == 'wbrs'
-              # Retrieve WebCat labels
-              begin
-                webcat_list = JSON.parse(self.remote_lookup_sds_v3(self.build_sds_v3_request(nil, 'webcat_labels')))
-              rescue
-                webcat_list = '{"response": "request failed"}'
-              end
-
-              # Retrieve ThreatCat labels
-              begin
-                threatcat_list = JSON.parse(self.remote_lookup_sds_v3(self.build_sds_v3_request(nil, 'threatcat_labels')))
-              rescue
-                threatcat_list = '{"response": "request failed"}'
-              end
-
-              sds_response = build_sds_v3_response(response, webcat_list, threatcat_list)
-              Rails.cache.write(uri, sds_response)
-              sds_response
-            elsif request_type == 'webcat_labels' || request_type == 'threatcat_labels'
-              response.body
-            end
-          end
-        rescue
-          '{"response": "request failed"}'
+      begin
+        response = Net::HTTP.start(uri.hostname, uri.port, req_options) do |http|
+          http.request(request)
         end
-      else
-        Rails.cache.read(uri)
+
+        if response.code != "200"
+          '{"response": "request failed"}'
+        else
+          if request_type == 'wbrs'
+            # Retrieve WebCat labels
+            begin
+              webcat_list = JSON.parse(self.remote_lookup_sds_v3(self.build_sds_v3_request(nil, 'webcat_labels')))
+            rescue
+              webcat_list = '{"response": "request failed"}'
+            end
+
+            # Retrieve ThreatCat labels
+            begin
+              threatcat_list = JSON.parse(self.remote_lookup_sds_v3(self.build_sds_v3_request(nil, 'threatcat_labels')))
+            rescue
+              threatcat_list = '{"response": "request failed"}'
+            end
+
+            build_sds_v3_response(response, webcat_list, threatcat_list)
+
+          elsif request_type == 'webcat_labels' || request_type == 'threatcat_labels'
+            response.body
+          end
+        end
+      rescue
+        '{"response": "request failed"}'
       end
     end
   end
