@@ -8465,7 +8465,26 @@ hr.thin.form-divider {
 .comment-wrapper + hr.thin {
   margin: 15px 6px;
 }
+#resolution_dialog{
+  .modal-dialog{
+    width: 600px;
+  }
+  .close{
+    top: 3px;
+    right: 3px;
+  }
+  .modal-header {
+    border-bottom: none;
+    font-weight: 700;
+  }
+    .modal-footer{
+      text-align: center;
+    }
+}
 
+#complaint_entries_to_update tbody tr:last-child td{
+  border-bottom: none!important;
+}
 .nested-radio-row .col-xs-6:first-of-type {
   padding-left: 15px;
 }
@@ -8479,7 +8498,6 @@ hr.thin.form-divider {
   padding-top: 6px !important;
   padding-bottom: 12px !important;
 }
-
 
 .preview-wbrs-button {
   background-color: $warning-accent-color;

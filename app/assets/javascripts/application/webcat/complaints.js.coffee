@@ -1770,11 +1770,16 @@ window.updateResolutionDialog = (confirm) ->
   complaint_entries = []
 
   for row in selected_rows
-    complaint_entries.push(row.id)
-    $('#complaint_entries_to_update').append('<tr><td>' + row.id + '</td></tr>')
+    { id } = row
+    complaint_entries.push(id)
+    subdomain = $(row).find("#subdomain_#{id}") + '.'
+    domain = $(row).find("#domain_#{id}")
+    path = $(row).find("#path_#{id}")
+    console.log subdomain, domain, path
+    $('#complaint_entries_to_update').append("<tr><td>#{id} | #{subdomain}#{domain}#{path}</td></tr>")
 
   $('#resolution_dialog').modal("show")
-  $('#resolution_text').text("Resolution: " + resolution)
+  $('#resolution_text').text("Resolution: #{resolution}")
 
 window.updateResolution = () ->
   resolution = $('#complaint_resolution')[0].value
