@@ -9,7 +9,7 @@ $(document).on 'click', '.paginate_button', ->
 
 #### WBNP Reporting ####
 $(document).ready ->
-  loader = $('#inline-webcat.webcat-loader')
+  loader = $('#inline-webcat')
   $(this).bind(
     ajaxStart: () ->
       loader.removeClass('hidden')
