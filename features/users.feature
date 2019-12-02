@@ -36,10 +36,8 @@ Feature: User Accounts
   ### Scenarios User management ###
 
   @javascript
-
   Scenario: A regular user should see a not found flash message
-    Then pending
-    Given a user with role "analyst" exists and is logged in
+    Given a user with role "webrep user" exists and is logged in
     Given I wait for "3" seconds
     When I goto "/escalations/users/1001"
     Then I should see could not find user "1001" flash massage
