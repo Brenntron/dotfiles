@@ -139,7 +139,8 @@ window.bulk_get_current_wlbl = (page) ->
           tc_promise = new Promise (resolve, reject) ->
             tc_json = get_threat_categories(entry.ip_uri)
             if tc_json
-              resolve tc_json  # resolve goes to .then() below
+              # change this to pass in an array of tc_json and current ip_uri
+              resolve(tc_json)  # resolve goes to .then() below
           .then(
             build_tc_row.bind(null, entry, tbody)
           )
@@ -149,9 +150,9 @@ window.bulk_get_current_wlbl = (page) ->
         std_msg_error('Error retrieving WL/BL Data in Bulk Adjust', response)
 
       complete: () ->
-        # slight delay to ensure row ordering, refactor when time avail
+        # slight delay to ensure row order, refactor when time avail
         setTimeout (->
-          bulk_order_rows()
+          bulk_order_rows()  # first, order the rows
         ),600
     )
   else
@@ -168,6 +169,9 @@ window.bulk_get_current_wlbl = (page) ->
 
     console.log 'THREAT CATEGORIES IF ANY:'
     console.log threat_categories
+
+    # first row is built? hide the loading row
+    $(tbody).find('.loading-rows').addClass('hidden')
 
     tc_str = ''
     if threat_categories?
@@ -200,11 +204,10 @@ window.bulk_get_current_wlbl = (page) ->
       </tr>"
 
     $(tbody).append(table_row)
-    $(tbody).find('.loading-rows').addClass('hidden')
 
 
 
-# order the rows for bulk dropdown, same order on left as on right
+# order the rows for bulk dropdown, same order on left cbs as on right dd rows
 window.bulk_order_rows = () ->
   if $('#wlbl_adjust_entries_index').length > 0  # index dropdown
     curr_dd = '#wlbl_adjust_entries_index'
