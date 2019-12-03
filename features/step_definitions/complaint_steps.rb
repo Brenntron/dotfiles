@@ -32,3 +32,7 @@ Given(/^I go ?to a "(.*?)" report surrounding the current year$/) do |report_typ
   url = "/escalations/webcat/reports/#{report_type}?utf8=1&report%5Bdate_from%5D=#{low_date}-01-01&report%5Bdate_to%5D=#{high_date}-01-01&report%5Bcustomer_name%5D=&commit=Report"
   visit (url)
 end
+
+Given(/^the following complaint entry with id: "(.*?)" has a resolution of: "(.*?)"$/) do |id, resolution|
+  expect(ComplaintEntry.find(id).resolution==resolution).to eq(true)
+end

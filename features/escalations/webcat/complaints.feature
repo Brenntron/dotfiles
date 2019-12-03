@@ -598,3 +598,26 @@ Feature: Webcat complaints
     And I click ".take-ticket-toolbar-button"
     And I wait for "3" seconds
     Then I should see content "1" within "#int-assigned-count"
+
+  @javascript
+  Scenario: a user uses the Update Resolution feature on multiple entries
+    Given a user with role "webcat user" exists and is logged in
+    And the following complaint entries exist:
+      |id| domain            |
+      |1 | blah.com          |
+      |2 | food.com          |
+      |3 | im.hungry.com     |
+    And I goto "/escalations/webcat/complaints"
+    When I select row "3"
+    And I select row "2"
+    And I select row "1"
+    And I click "#index_update_resolution"
+    And I wait for "9000" seconds
+    And I select "FIXED" from "complaint_resolution"
+    And I should see "The following 3 entries will have their RESOLUTIONS set to FIXED."
+    And I click ".primary"
+    Then the following complaint entry with id: "1" has a resolution of: "FIXED"
+    Then the following complaint entry with id: "2" has a resolution of: "FIXED"
+    Then the following complaint entry with id: "3" has a resolution of: "TET"
+
+
