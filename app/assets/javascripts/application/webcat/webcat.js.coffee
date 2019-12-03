@@ -452,11 +452,24 @@ $ ->
               {
                 data: 'domain'
                 render:( data, type, full, meta )->
-                  { domain, ip_address, entry_id } = full
+                  { domain, ip_address, entry_id, subdomain, path } = full
+                  data_full = ''
+                  if subdomain != ''
+                    subdomain += '.'
+                    data_full = subdomain
+                  if domain != ''
+                    data_full += domain
+                  if path != ''
+                    data_full += path
+                  if ip_address != ''
+                    data_full = ip_address
+                  if data_full != ''
+                    data_full = "data-full=" + data_full
+                  title = "title=" + domain
                   if domain
-                    '<p class="input-truncate esc-tooltipped" id="domain_' + entry_id + '" title="' + domain + '">' + domain + '</p>'
+                    "<p class='input-truncate esc-tooltipped' #{data_full} id='domain_#{entry_id}' #{title}>#{domain}</p>"
                   else
-                    '<a href="http://' + ip_address + '" target="blank">' + ip_address + '</a>'
+                    "<a id='domain_#{entry_id}' #{data_full} href='http://#{ip_address}' target='blank'>#{ip_address}</a>"
               }
               {
                 data: 'path'
