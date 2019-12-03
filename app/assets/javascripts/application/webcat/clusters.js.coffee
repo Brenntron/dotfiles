@@ -6,7 +6,8 @@ window.apply_filter_to_table = () ->
 
 window.populate_clusters_index_table = (filter) ->
   if $('#clusters-index_wrapper').length > 0
-    $('.cluster-mgt-loader-wrapper').removeClass('hidden')
+    loader = $('.cluster-mgt-loader-wrapper')
+    loader.removeClass('hidden')
     filter_param = ""
     if filter
       filter_param = "?regex=" + filter
@@ -17,7 +18,7 @@ window.populate_clusters_index_table = (filter) ->
       method: 'GET'
       headers: headers
       success: (response) ->
-        $('.cluster-mgt-loader-wrapper').addClass('hidden')
+        loader.addClass('hidden')
         json = $.parseJSON(response)
         if json.data.length == 0
           std_msg_error("No clusters available.","")
@@ -33,11 +34,13 @@ window.populate_clusters_index_table = (filter) ->
           $("#total_results").html(json.meta.rows_found)
 
       error: (response) ->
+        loader.addClass('hidden')
         std_msg_error('Table Error', [response.responseText])
     , this)
 
 window.categorize_clusters = () ->
-
+  loader = $('.cluster-mgt-loader-wrapper')
+  loader.removeClass('hidden')
   user_id = $("#user_id").val()
   comment = $("#cluster_comment_field").val()
   #cluster_id comment category_ids
@@ -67,7 +70,7 @@ window.categorize_clusters = () ->
     headers: headers
     data: data
     success: (response) ->
-
+      loader.addClass('hidden')
       json = $.parseJSON(response)
       if json.error
         std_msg_error('Process Error', [json.error])
@@ -80,6 +83,7 @@ window.categorize_clusters = () ->
           populate_clusters_index_table()
 
     error: (response) ->
+      loader.addClass('hidden')
       std_api_error(response, "There was an error loading search results.", reload: false)
   , this)
 
@@ -172,38 +176,30 @@ $ ->
 # expand all functionality
 window.expand_all_clusters = (tableId) ->
   selectedRows = $('table#' + tableId + ' tr[role="row"]')
-  i = 0
-  while i < selectedRows.length
-    if !$(selectedRows[i]).hasClass('shown')
-      $(selectedRows[i]).find('.expand-row-button-inline').click()
-    i = i + 1
+  for row in selectedRows
+    if !$(row).hasClass('shown')
+      $(row).find('.expand-row-button-inline').click()
 
 # collapse all functionality
 window.collapse_all_clusters = (tableId) ->
   selectedRows = $('table#' + tableId + ' tr[role="row"]')
-  i = 0
-  while i < selectedRows.length
-    if $(selectedRows[i]).hasClass('shown')
-      $(selectedRows[i]).find('.expand-row-button-inline').click()
-    i = i + 1
+  for row in selectedRows
+    if $(row).hasClass('shown')
+      $(row).find('.expand-row-button-inline').click()
 
 #  expand selected funtionality
 window.expand_selected_clusters = (tableId) ->
   selectedRows = $('table#' + tableId + ' tr[role="row"].selected')
-  i = 0
-  while i < selectedRows.length
-    if !$(selectedRows[i]).hasClass('shown')
-      $(selectedRows[i]).find('.expand-row-button-inline').click()
-    i = i + 1
+  for row in selectedRows
+    if !$(row).hasClass('shown')
+      $(row).find('.expand-row-button-inline').click()
 
 #  collapse selected funtionality
 window.collapse_selected_clusters = (tableId) ->
   selectedRows = $('table#' + tableId + ' tr[role="row"].selected')
-  i = 0
-  while i < selectedRows.length
-    if $(selectedRows[i]).hasClass('shown')
-      $(selectedRows[i]).find('.expand-row-button-inline').click()
-    i = i + 1
+  for row in selectedRows
+    if $(row).hasClass('shown')
+      $(row).find('.expand-row-button-inline').click()
 
 # open selected funtionality
 window.open_selected_clusters = () ->
@@ -221,8 +217,7 @@ window.open_all_clusters = () ->
 
 # This is here because of weird namespace problems over at `complaints.js.coffee`
 open_selected_tabs = (selected_rows, toggle) ->
-  i = 0
-  while i < selected_rows[0].length
+  for row, i in selected_rows[0]
     subdomain = ""
     domain = ""
     path = ""
@@ -236,7 +231,6 @@ open_selected_tabs = (selected_rows, toggle) ->
       window.open("http://"+ subdomain + domain + path)
     else
       window.open("http://"+selected_rows.data()[i].ip_address)
-    i++
 
 window.copycat_dialog = () ->
   $('#copycat_dialog').dialog({
@@ -272,19 +266,14 @@ window.copycat_paste = () ->
     std_msg_error('CopyCat Error', ['No categories selected.'])
   else
     selectedRows = $('#clusters-index tr[role="row"].selected')
-    i = 0
-    values = []
 
   if (selectedRows.length == 0)
     std_msg_error('CopyCat Error', ['Select at least one row to paste categories to.'])
   else
     selectedRows = $('#clusters-index tr[role="row"].selected')
-    i = 0
-    values = []
-    while i < selectedRows.length
-      rowSelectize = $(selectedRows[i]).find('.category-column .selectize')[0].selectize
+    for row in selectedRows
+      rowSelectize = $(row).find('.category-column .selectize')[0].selectize
       rowSelectize.setValue(selectedValues, true)
-      i++
 
 
 
@@ -319,10 +308,8 @@ window.toggle_all_checkboxes = () ->
   else
     $('#clusters-index').DataTable().rows().deselect()
     rows = $('table#clusters-index input[type="checkbox"]')
-    i = 1
-    while i < rows.length
-      $(rows[i])[0].checked = false
-      i++
+    for row in rows
+      $(row)[0].checked = false
 
 # Select rows in Clusters Table
 $ ->
@@ -374,7 +361,6 @@ $ ->
           $('.cluster-mgt-loader-wrapper').addClass('hidden')
           json = $.parseJSON(response)
           entry = json.data
-          entry_count = 0
           total_shown_entries = 0
           total_entries = $($(tr[0]).find('.entry-count')[0]).text()
 
@@ -390,10 +376,9 @@ $ ->
 
 
 
-          $(entry).each ->
-            entry_count++
+          $(entry).each (i) ->
 
-            if entry_count <= 25
+            if i <= 25
               entry_row = '<tr class="index-entry-row">' +
                 '<td class="clusterpath-col-path">' + this.url + '</td>' +
                 '<td class="clusterpath-col-path">' + this.customer_name + '</td>' +
@@ -406,7 +391,7 @@ $ ->
                 '<td class="clusterpath-col-wbrs text-center">' + this.wbrs_score + '</td>' +
                 '</tr>'
               entry_rows.push entry_row
-              total_shown_entries = entry_count
+              total_shown_entries = i
               return
 
           bottom_row = '<tr class="cluster-entry-bottom-row">' +
@@ -450,12 +435,8 @@ window.expandClusterEntryPreview = (cluster, expand_table_row, max_viewable_entr
         $('.cluster-mgt-loader-wrapper').addClass('hidden')
         json = $.parseJSON(response)
         entry = json.data
-        entry_count = 0
-
-        $(entry).each ->
-          entry_count++
-
-          if entry_count > 25
+        $(entry).each (i) ->
+          if i > 25
             entry_row = '<tr class="index-entry-row">' +
               '<td class="clusterpath-col-path">' + this.url + '</td>' +
               '<td class="clusterpath-col-path">' + this.customer_name + '</td>' +
@@ -484,15 +465,13 @@ window.expandClusterEntryPreview = (cluster, expand_table_row, max_viewable_entr
   else
     $('.cluster-mgt-loader-wrapper').addClass('hidden')
     rows = $(table_body).children('tr')
-    row_count = 0
     replacement_text = footer_link_text.replace("collapse", "preview")
     $(expand_table_row).text(replacement_text)
     $(expand_table_row).removeClass("collapse-cluster-entries")
     $(total_shown_entries[0]).text('25')
 
-    $(rows).each ->
-      row_count++
-      if row_count > 25
+    $(rows).each (i) ->
+      if i > 25
         $(this).remove()
 
 
