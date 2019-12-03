@@ -12,7 +12,7 @@ module API
             end
 
 
-            desc 'update an entry '
+            desc 'update an entry'
             params do
               requires :id, type: Integer, desc:'complaint entry id'
               requires :prefix, type: String, desc: 'the url to categorize'
@@ -32,7 +32,7 @@ module API
                                        permitted_params['comment'],
                                        permitted_params['resolution_comment'],
                                        current_user, "")
-                ComplaintEntryPreload.generate_preload_from_complaint_entry(entry)
+                Thread.new { ComplaintEntryPreload.generate_preload_from_complaint_entry(entry) }
                 if entry.complaint.ticket_source != Complaint::SOURCE_RULEUI
                   message = Bridge::ComplaintUpdateStatusEvent.new
                   message.post_complaint(entry.complaint)
@@ -85,6 +85,29 @@ module API
                                        permitted_params['comment'],
                                        permitted_params['resolution_comment'],
                                        current_user, permitted_params['commit'])
+
+                if permitted_params['commit'] == 'decline'
+                  category_data = entry.current_category_data.to_a
+
+                  if category_data.present?
+                    categories = []
+
+                    for i in 0..5 do
+                      if category_data[i].present?
+                        categories << category_data[i][1][:descr]
+                      end
+                    end
+
+                    categories_string = categories.join(',')
+                    # 1. If the pending ticket was declined, reassign it to the declining user
+                    # 2. If the pending ticket had currently existing categories and was declined, set the ticket's categories to its WBRS categories
+                    entry.update(url_primary_category: categories_string, user_id: current_user.id)
+                  else
+                    # 3. If the pending ticket had no currently existing categories and was declined, just reassign it to the declining user
+                    entry.update(user_id: current_user.id)
+                  end
+                end
+
                 if entry.complaint.ticket_source != Complaint::SOURCE_RULEUI
                   message = Bridge::ComplaintUpdateStatusEvent.new
                   message.post_complaint(entry.complaint)
