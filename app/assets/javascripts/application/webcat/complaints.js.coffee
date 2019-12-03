@@ -390,8 +390,9 @@ window.updatePending = (id,row_id) ->
           options: AC.WebCat.createSelectOptions(),
           items: selected_options(temp_row.data().category)
         }
-        if subdomain != ''
-          subdomain += '.'
+        $("#domain_#{entry_id}").text(domain)
+        $("#subdomain_#{entry_id}").text(subdomain)
+        $("#path_#{entry_id}").text(path)
 
       tds = $('#complaints-index tbody').closest('td')
       for td in tds
@@ -591,9 +592,8 @@ window.take_selected = ()->
     std_msg_error('No rows selected', ['Please select at least one row.'])
 
 $(document).on 'click', '#complaints-index tr, #complaints_check_box', ->
-  console.log 'inin'
   rows = $('#complaints-index').DataTable().rows('.selected')
-  disabled = rows[0].length == 0
+  disabled = !rows[0].length
   if !disabled
     $('#index_update_resolution').removeAttr('disabled')
   else
