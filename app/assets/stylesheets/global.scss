@@ -8596,7 +8596,7 @@ hr.thin.form-divider {
   }
 }
 #complaints-index_length, #complaints-index_filter{
-  z-index: 999;
+  z-index: 50;
   position: relative;
   display: block;
 }
@@ -10305,8 +10305,8 @@ input[type="radio"].resolution_radio_button {
 .loader-msg{
   font-style: oblique!important;
 }
-// webrep and webcat toolbars - between 1800px and 1600px, prevent breaking/wrapping of the buttons
-@media (min-width: 1974px) {
+// webrep and webcat toolbars - between 2020px and 2025px, prevent breaking/wrapping of the buttons
+@media (min-width: 2025px) {
   #webrep-index-toolbar, #webcat-index-toolbar {
     .toolbar-button {
       background-position: 4px 6px;
@@ -10325,7 +10325,7 @@ input[type="radio"].resolution_radio_button {
     }
   }
 }
-@media (max-width: 1975px)  {
+@media (max-width: 2026px)  {
   #webcat-index-toolbar .toolbar-button-text {
     display: none !important;
   }
