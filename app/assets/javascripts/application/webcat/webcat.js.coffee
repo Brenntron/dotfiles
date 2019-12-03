@@ -531,10 +531,8 @@ $ ->
 
 
   if $('#complaints-index').length
-#    debugger
-
     build_complaints_table()
-
+    
     # Make the search prettier
     $('#complaints-index_filter input').addClass('restricted-table-search-input');
 
