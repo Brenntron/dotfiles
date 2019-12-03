@@ -814,7 +814,12 @@ class DisputeEntry < ApplicationRecord
           wbrs_stuff_rulehits = wbrs_stuff_rulehits.uniq
         end
 
-        entry.wbrs_score = wbrs_stuff["wbrs"]["score"]
+        if wbrs_stuff.kind_of?(Hash)
+          entry.wbrs_score = wbrs_stuff["wbrs"]["score"]
+        else
+          entry.wbrs_score = nil
+        end
+
         wbrs_stuff_rulehits.each do |rule_hit|
           new_rule_hit = DisputeRuleHit.new
           new_rule_hit.dispute_entry_id = entry.id
