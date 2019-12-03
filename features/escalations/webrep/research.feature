@@ -150,8 +150,8 @@ Feature: Webrep, the BFRP
     And  I choose "research-search-strict"
     And  I type content "testing.com" within input with id "search_uri"
     Then I click "Submit"
-    And  I wait for "60" seconds
-    And  I click ".bfrp-inline-wlbl-6"
+    And  I wait for "30" seconds
+    And  I click ".bfrp-inline-wlbl-0"
     And  I wait for "5" seconds
     Then I click "#bl-med-slider"
     And  I should see "Threat Categories"
@@ -163,7 +163,7 @@ Feature: Webrep, the BFRP
     And  I click ".close"
     And  I wait for "2" seconds
 #    Here is where we actually remove / add new
-    Then I click ".bfrp-inline-wlbl-6"
+    Then I click ".bfrp-inline-wlbl-0"
     And  Element with class "wlbl-entry-wlbl" should have content "BL-med"
     Then I click "#bl-med-slider"
     Then I click "#wl-weak-slider"
@@ -173,9 +173,8 @@ Feature: Webrep, the BFRP
     And  I should see "Has been added"
     And  I click ".close"
     And  I wait for "2" seconds
-    Then I click ".bfrp-inline-wlbl-6"
+    Then I click ".bfrp-inline-wlbl-0"
     And  I wait for "5" seconds
-
     And  Element with class "wlbl-entry-wlbl" should not have content "BL-med"
     And  Element with class "wlbl-entry-wlbl" should have content "WL-weak"
     And  clean up wlbl and remove all wlbl entries on "testing.com"
@@ -188,12 +187,12 @@ Feature: Webrep, the BFRP
     And  clean up wlbl and remove all wlbl entries on "testing.com"
     And  clean up wlbl and remove all wlbl entries on "prooftesting.com"
     When I goto "escalations/webrep/research"
-    And  I choose "research-search-strict"
+    And  I choose "research-search-broad"
     And  I type content "testing.com" within input with id "search_uri"
     Then I click "Submit"
     And  I wait for "60" seconds
-    Then I check checkbox with class "bfrp-checkbox-4"
-    And  I check checkbox with class "bfrp-checkbox-6"
+    Then I check checkbox with class "bfrp-checkbox-0"
+    And  I check checkbox with class "bfrp-checkbox-5"
     And  I click button "wlbl_entries_button"
     And  I wait for "5" seconds
     And  I should see "Not on a list"
@@ -211,11 +210,8 @@ Feature: Webrep, the BFRP
     And  I wait for "2" seconds
     And  I click button "wlbl_entries_button"
     And  I wait for "5" seconds
-    And  Element with class "bfrp-dd-result-no-0" should have content "WL-weak"
     And  Element with class "bfrp-dd-result-no-1" should have content "WL-weak"
     And  clean up wlbl and remove all wlbl entries on "testing.com"
-    And  clean up wlbl and remove all wlbl entries on "prooftesting.com"
-
 
   @javascript
   Scenario: a user searches for a url on the research page and adds multiple results to a WBRS blacklist
@@ -223,16 +219,15 @@ Feature: Webrep, the BFRP
     And  clean up wlbl and remove all wlbl entries on "testing.com"
     And  clean up wlbl and remove all wlbl entries on "prooftesting.com"
     When I goto "escalations/webrep/research"
-    And  I choose "research-search-strict"
+    And  I choose "research-search-broad"
     And  I type content "testing.com" within input with id "search_uri"
     Then I click "Submit"
-    And  I wait for "60" seconds
-    Then I check checkbox with class "bfrp-checkbox-4"
-    And  I check checkbox with class "bfrp-checkbox-6"
+    And  I wait for 60" seconds
+    Then I check checkbox with class "bfrp-checkbox-0"
+    And  I check checkbox with class "bfrp-checkbox-1"
     And  I click button "wlbl_entries_button"
     And  I wait for "5" seconds
     And  I should see "Not on a list"
-    And  Element with class "bfrp-dd-result-no-0" should not have content "BL-weak"
     And  Element with class "bfrp-dd-result-no-1" should not have content "BL-weak"
     And  I choose "wlbl-add"
     And  I check checkbox with class "bl-weak-checkbox"
@@ -247,12 +242,8 @@ Feature: Webrep, the BFRP
     And  I wait for "2" seconds
     And  I click button "wlbl_entries_button"
     And  I wait for "5" seconds
-    And  Element with class "bfrp-dd-result-no-0" should have content "BL-weak"
     And  Element with class "bfrp-dd-result-no-1" should have content "BL-weak"
     And  clean up wlbl and remove all wlbl entries on "testing.com"
-    And  clean up wlbl and remove all wlbl entries on "prooftesting.com"
-
-
 
   @javascript
   Scenario: a user searches for a url on the research page and removes multiple results from a WBRS List
