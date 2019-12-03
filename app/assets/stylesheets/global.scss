@@ -351,17 +351,53 @@ table.dataTable.no-footer {
   background-position: 3px center;
   color: $type-lighter-color;
 }
-.table-search-input::-webkit-input-placeholder {
+
+.restricted-table-search-input {
+  height: 100%;
+  padding: 0 8px;
+  font-weight: 400;
+  border: 1px solid #ccc;
+  border-radius: 2px;
+  margin-left: 4px !important;
+  float: left;
+}
+
+// Don't consolidate these further, they don't work in different orders
+.table-search-input::-webkit-input-placeholder, .restricted-table-search-input::-webkit-input-placeholder {
   font-size: 7pt;
   color: $content-tab-color;
 }
-.table-search-input::-moz-placeholder {
+.table-search-input::-moz-placeholder, .restricted-table-search-input::-moz-placeholder {
   font-size: 7pt;
   color: $content-tab-color;
 }
-.table-search-input::-ms-input-placeholder {
+.table-search-input::-ms-input-placeholder, .restricted-table-search-input::-ms-input-placeholder {
   font-size: 7pt;
   color: $content-tab-color;
+}
+
+.dt-button {
+  margin-left: 4px;
+  border-radius: 2px;
+  height: 27px;
+  width: 27px;
+  background-repeat: no-repeat;
+  border: none;
+  float: right;
+}
+
+.dt-search-button {
+  background-color: $primary-section-color;
+  background-image: url(image_path('icon_search_white.svg'));
+  background-size: 18px;
+  background-position: center center;
+}
+
+.dt-search-clear-button {
+  background-color: $nav-toolbar-color;
+  background-image: url(image_path('icon_reset_grey.svg'));
+  background-size: 24px;
+  background-position: 1px 1px;
 }
 
 /***** Pretty Tables *****/
@@ -1229,6 +1265,12 @@ thead th.sorting.center {
 .fail-msg::before {background-image: url(image_path('icon_fail.svg'));}
 .hidden-msg {
   display: none;
+}
+
+.inline-loader{
+  display: flex;
+  flex-direction: column;
+  align-items: center;
 }
 
 #msg-modal, #loader-modal, #login-modal {
@@ -4673,7 +4715,7 @@ table > tbody > tr > td.dispute_rep_tools {
 #reptool_adjust_entries.dropdown-menu, .reptool-inline-dropdown {
   width: 400px;
 }
-[aria-describedby="complaint_button_dialog"],[aria-describedby="history_dialog"]  {
+[aria-describedby="complaint_button_dialog"],[aria-describedby="history_dialog"],[aria-describedby="whois_content"]  {
   z-index: 999;
 }
 
@@ -7986,28 +8028,60 @@ td.text-center span {
   margin-top: 4px !important;
 }
 
-.cluster-mgt-loader-wrapper {
+.cluster-mgt-loader-wrapper, .webcat-loader-wrapper  {
   display: block;
   position: absolute;
-  margin: 100px 37%;
   width: 170px;
-
   .gear-loader-wrapper {
     margin-right: 5px;
     margin-top: 6px;
     float: left;
   }
-
   .loader-msg {
     display: inline-block;
     line-height: 3.5;
   }
 }
+.cluster-mgt-loader-wrapper{
+  margin: 100px 37%;
+}
+.webcat-loader-wrapper {
+  margin: 0 37%;
+}
 
 .loader-msg {
   color: $type-lighter-color;
 }
-
+.webcat-loader{
+  margin: auto 29%;
+  .loader-msg{
+    font-size: 8.5pt;
+    position: absolute;
+    margin-left: 10px;
+    margin-top: -5px;
+  }
+}
+#inline-webcat.webcat-loader{
+  margin: 12px 45%!important;
+  position: absolute;
+  .loader-msg{
+    margin-top: 10px;
+  }
+}
+#cat_multiple_urls, #cat_dif_submit{
+  margin-top: 20px;
+}
+#categorize-same-form, #categorize-diff-form{
+    .webcat-loader {
+      margin: -10px 10%;
+      position: absolute;
+      display: inline-block;
+    }
+    .loader-msg{
+      width: 90px;
+      margin-top: 6px;
+    }
+}
 .cluster-table-toolbar {
   margin-bottom: 0;
 }
@@ -10136,7 +10210,20 @@ input[type="radio"].resolution_radio_button {
   background-size: 28px 28px;
   top: 4px;
 }
-
+.lookup-drop-loader{
+  display: block;
+  margin: 30px 35%;
+  width: 30px;
+  position: absolute;
+  border: none!important;
+  .loader-msg{
+    position: absolute;
+    margin-top: 5px;
+  }
+}
+.loader-msg{
+  font-style: oblique!important;
+}
 // webrep and webcat toolbars - between 1800px and 1600px, prevent breaking/wrapping of the buttons
 @media (min-width: 1850px) {
   #webrep-index-toolbar, #webcat-index-toolbar {
