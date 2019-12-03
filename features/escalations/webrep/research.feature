@@ -56,7 +56,8 @@ Feature: Webrep, the BFRP
     And I click "#submit-button"
     And I wait for "15" seconds
     Then two research entries exists
-    
+
+  @javascript
   Scenario: a user searches for a url on the research page that has a threat category assigned to it already
     Given a user with role "webrep user" exists and is logged in
     When I goto "escalations/webrep/research"
@@ -64,9 +65,8 @@ Feature: Webrep, the BFRP
     And  I type content "1234computer.com" within input with id "search_uri"
     Then I click "Submit"
     And  I wait for "10" seconds
-    And  I should see "1 found"
-    And  Element with class "wlbl-tc-research-span" should have content "Malware Sites"
-
+    And  I should see "2 found"
+    And I should see content "Malware Sites" within first element of class ".wlbl-tc-research-span"
 
   @javascript
   Scenario: a user searches for a url on the research page and tries to add a result to a WBRS list but doesn't select any entries
@@ -80,7 +80,6 @@ Feature: Webrep, the BFRP
     And  I click button "wlbl_entries_button"
     And  I should see "NO ROWS SELECTED"
 
-
   @javascript
   Scenario: a user searches for a url on the research page and adds a result to a WBRS List
     Given a user with role "webrep user" exists and is logged in
@@ -89,8 +88,8 @@ Feature: Webrep, the BFRP
     And  I choose "research-search-strict"
     And  I type content "testing.com" within input with id "search_uri"
     Then I click "Submit"
-    And  I wait for "60" seconds
-    And  I click ".bfrp-inline-wlbl-6"
+    And  I wait for "30" seconds
+    And  I click ".bfrp-inline-wlbl-0"
     And  I wait for "5" seconds
     And  Element with class "wlbl-entry-wlbl" should not have content "BL-med"
     Then I click "#bl-med-slider"
@@ -102,7 +101,7 @@ Feature: Webrep, the BFRP
     And  I should see "Has been added"
     And  I click ".close"
     And  I wait for "2" seconds
-    Then I click ".bfrp-inline-wlbl-6"
+    Then I click ".bfrp-inline-wlbl-0"
     And  Element with class "wlbl-entry-wlbl" should have content "BL-med"
     And  clean up wlbl and remove all wlbl entries on "testing.com"
 
@@ -115,8 +114,8 @@ Feature: Webrep, the BFRP
     And  I choose "research-search-strict"
     And  I type content "testing.com" within input with id "search_uri"
     Then I click "Submit"
-    And  I wait for "60" seconds
-    And  I click ".bfrp-inline-wlbl-6"
+    And  I wait for "30" seconds
+    And  I click ".bfrp-inline-wlbl-0"
     And  I wait for "5" seconds
     Then I click "#bl-med-slider"
     And  I should see "Threat Categories"
@@ -128,7 +127,7 @@ Feature: Webrep, the BFRP
     And  I click ".close"
     And  I wait for "2" seconds
 #    Here is where we actually remove
-    Then I click ".bfrp-inline-wlbl-6"
+    Then I click ".bfrp-inline-wlbl-0"
     And  Element with class "wlbl-entry-wlbl" should have content "BL-med"
     Then I click "#bl-med-slider"
     And  I click "Submit Changes"
@@ -137,9 +136,8 @@ Feature: Webrep, the BFRP
     And  I should see "Has been removed"
     And  I click ".close"
     And  I wait for "2" seconds
-    Then I click ".bfrp-inline-wlbl-6"
+    Then I click ".bfrp-inline-wlbl-0"
     And  Element with class "wlbl-entry-wlbl" should not have content "BL-med"
-
     And  clean up wlbl and remove all wlbl entries on "testing.com"
 
 
