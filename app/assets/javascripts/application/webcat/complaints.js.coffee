@@ -590,11 +590,14 @@ window.take_selected = ()->
   else
     std_msg_error('No rows selected', ['Please select at least one row.'])
 
-window.index_update_resolution = () ->
+$(document).on 'click', '#complaints-index tr, #complaints_check_box', ->
+  console.log 'inin'
   rows = $('#complaints-index').DataTable().rows('.selected')
-  if !rows[0].length
-    std_msg_error("alert",["There was an error. Please select an entry to edit"])
-
+  disabled = rows[0].length == 0
+  if !disabled
+    $('#index_update_resolution').removeAttr('disabled')
+  else
+    $('#index_update_resolution').prop('disabled', disabled)
 window.return_selected = ()->
   selected_rows = $('#complaints-index').DataTable().rows('.selected')
   if selected_rows[0].length > 0

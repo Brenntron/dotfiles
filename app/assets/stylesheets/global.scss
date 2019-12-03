@@ -735,6 +735,7 @@ button {
   background-color: $warning-accent-color;
 }
 .resolution-submit-button {background-image: url(image_path('icon_submit_arrow_grey.svg'));}
+.resolution-submit-button:disabled {background-image: url(image_path('icon_submit_arrow_grey_disabled.svg'));}
 .open-viewable {background-image: url(image_path('icon_open_viewable.svg'));}
 .open-nonviewable {background-image: url(image_path('icon_open_nonviewable.svg'));}
 .open-selected {background-image: url(image_path('icon_open_selected.svg'));}
