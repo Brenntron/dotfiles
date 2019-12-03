@@ -34,5 +34,9 @@ Given(/^I go ?to a "(.*?)" report surrounding the current year$/) do |report_typ
 end
 
 Given(/^the following complaint entry with id: "(.*?)" has a resolution of: "(.*?)"$/) do |id, resolution|
-  expect(ComplaintEntry.find(id).resolution==resolution).to eq(true)
+  expect(ComplaintEntry.find(id).resolution).to eq(resolution)
+end
+
+Given(/^the following complaint entry with id: "(.*?)" has a status of: "(.*?)"$/) do |id, status|
+  expect(ComplaintEntry.find(id).status).to eq(status)
 end

@@ -611,13 +611,39 @@ Feature: Webcat complaints
     When I select row "3"
     And I select row "2"
     And I select row "1"
+    And I click "#subdomain_1"
     And I click "#index_update_resolution"
-    And I wait for "9000" seconds
-    And I select "FIXED" from "complaint_resolution"
-    And I should see "The following 3 entries will have their RESOLUTIONS set to FIXED."
+    And I select "Fixed" from "complaint_resolution"
     And I click ".primary"
+    And I should see "The following 3 entries will have their RESOLUTIONS set to FIXED."
+    And I click "#submit_resolution_changes"
     Then the following complaint entry with id: "1" has a resolution of: "FIXED"
     Then the following complaint entry with id: "2" has a resolution of: "FIXED"
-    Then the following complaint entry with id: "3" has a resolution of: "TET"
+    Then the following complaint entry with id: "3" has a resolution of: "FIXED"
+
+
+  @javascript
+  Scenario: a user uses the Update Resolution feature on an important entry
+    Given a user with role "webcat user" exists and is logged in
+    And the following complaint entries exist:
+      |id| domain            | is_important |
+      |1 | blah.com          |      1       |
+      |2 | food.com          |      0       |
+      |3 | im.hungry.com     |      0       |
+    And I goto "/escalations/webcat/complaints"
+    When I select row "3"
+    And I select row "2"
+    And I select row "1"
+    And I click "#subdomain_1"
+    And I click "#index_update_resolution"
+    And I select "Invalid" from "complaint_resolution"
+    And I click ".primary"
+    And I should see "The following 3 entries will have their RESOLUTIONS set to INVALID."
+    And I click "#submit_resolution_changes"
+    And I wait for "3" seconds
+    Then the following complaint entry with id: "1" has a resolution of: "INVALID"
+    Then the following complaint entry with id: "1" has a status of: "PENDING"
+    Then the following complaint entry with id: "2" has a resolution of: "INVALID"
+    Then the following complaint entry with id: "3" has a resolution of: "INVALID"
 
 
