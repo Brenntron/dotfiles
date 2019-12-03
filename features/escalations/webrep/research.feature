@@ -181,8 +181,10 @@ Feature: Webrep, the BFRP
 
 
 
+  # Pending front-end work (WEB-5534)
   @javascript
   Scenario: a user searches for a url on the research page and adds multiple results to a WBRS white list
+    Given pending
     Given a user with role "webrep user" exists and is logged in
     And  clean up wlbl and remove all wlbl entries on "testing.com"
     And  clean up wlbl and remove all wlbl entries on "prooftesting.com"
@@ -213,8 +215,10 @@ Feature: Webrep, the BFRP
     And  Element with class "bfrp-dd-result-no-1" should have content "WL-weak"
     And  clean up wlbl and remove all wlbl entries on "testing.com"
 
+  # Pending front-end work (WEB-5534)
   @javascript
   Scenario: a user searches for a url on the research page and adds multiple results to a WBRS blacklist
+    Given pending
     Given a user with role "webrep user" exists and is logged in
     And  clean up wlbl and remove all wlbl entries on "testing.com"
     And  clean up wlbl and remove all wlbl entries on "prooftesting.com"
@@ -245,8 +249,10 @@ Feature: Webrep, the BFRP
     And  Element with class "bfrp-dd-result-no-1" should have content "BL-weak"
     And  clean up wlbl and remove all wlbl entries on "testing.com"
 
+  # Pending front-end work (WEB-5534)
   @javascript
   Scenario: a user searches for a url on the research page and removes multiple results from a WBRS List
+    Given pending
     Given a user with role "webrep user" exists and is logged in
     And  clean up wlbl and remove all wlbl entries on "testing.com"
     And  clean up wlbl and remove all wlbl entries on "prooftesting.com"
