@@ -1091,39 +1091,34 @@ $ ->
     missing_data = '<span class="missing-data">Missing data</span>'
     entry_rows = []
     $(entry).each ->
-      entry_content = ''
-      if this.entry.ip_address != null
-        entry_content = this.entry.ip_address
-      else if this.entry.uri != null
-        entry_content = this.entry.uri
-      else
-        entry_content = missing_data
+      { ip_address, uri, primary_category} = this.entry
+      entry_content = missing_data
+      if ip_address != null
+        entry_content = ip_address
+      else if uri != null
+        entry_content = uri
 
-      category = ''
+      category = missing_data
       if this.entry.primary_category != null
         category = this.entry.primary_category
-      else
-        category = missing_data
-      status = ''
+
+      status = missing_data
       if this.entry.status != null
         status = this.entry.status
-      else
-        status = missing_data
-      resolution = ''
+
+      resolution = missing_data
       if this.entry.resolution != null
         resolution = this.entry.resolution
-      else
-        resolution = missing_data
+
       if this.entry.resolution_comment != null
         resolution_comment = this.entry.resolution_comment
         resolution_col = '<td class="entry-col-res esc-tooltipped" title="' + resolution_comment + '">' + resolution + '</td>'
       else
         resolution_col = '<td class="entry-col-res">' + resolution + '</td>'
-      suggested_disposition = ''
+      suggested_disposition = missing_data
       if this.entry.suggested_disposition != null
         suggested_disposition = this.entry.suggested_disposition
-      else
-        suggested_disposition = missing_data
+
       if this.entry.is_important == true
         important = 'entry-important-flag'
       else
