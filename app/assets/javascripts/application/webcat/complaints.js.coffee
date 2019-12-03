@@ -392,7 +392,7 @@ window.updatePending = (id,row_id) ->
         }
         if subdomain != ''
           subdomain += '.'
-        $("#domain_#{entry_id}").attr('title', subdomain + domain + path)
+
       tds = $('#complaints-index tbody').closest('td')
       for td in tds
         if td.className == ''
@@ -1773,7 +1773,9 @@ window.updateResolutionDialog = (confirm) ->
     { id } = row
     complaint_entries.push(id)
     full_domain = ''
-    domain = $(row).find("#domain_#{id}").attr('title')
+    domain = $(row).find("#domain_#{id}").attr('data-full')
+#    if domain == undefined
+#      domain = $(row).find("#domain_#{id}").text()
     $('#complaint_entries_to_update').append("<tr><td><span class='res_id'>#{id} |</span> <span class='webcat-full-domain'>#{domain}</span></td></tr>")
 
   $('#resolution_dialog').modal("show")
