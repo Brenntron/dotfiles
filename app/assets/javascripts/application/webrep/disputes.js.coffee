@@ -1097,9 +1097,9 @@ $ ->
         entry_content = ip_address
       else if uri != null
         entry_content = uri
-
+      console.log this.entry.primary_category
       category = missing_data
-      if this.entry.primary_category != null
+      if this.entry.primary_category != '{}'
         category = this.entry.primary_category
 
       status = missing_data
