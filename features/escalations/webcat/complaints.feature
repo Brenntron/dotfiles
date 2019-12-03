@@ -224,7 +224,6 @@ Feature: Webcat complaints
     Then I click "#complaint_entry_report" and switch to the new window
     Then I should see "Webcat Complaint Entry Report"
 
-  @now
   @javascript
   Scenario: a user attempts to submit changes without categories and receives expected error alert
     Given a user with role "webcat user" exists and is logged in
@@ -238,7 +237,6 @@ Feature: Webcat complaints
     And I wait for "5" seconds
     Then I should see "MUST INCLUDE AT LEAST ONE CATEGORY."
 
-  @now
   @javascript
   Scenario: a user attempts to submit changes with resolution set to 'Unchanged'
     Given a user with role "webcat user" exists and is logged in
@@ -373,7 +371,6 @@ Feature: Webcat complaints
     Then I should see "UNABLE TO CATEGORIZE"
     And I should see "Please confirm that a URL and at least one category for each desired entry exists."
 
-  @now
   @javascript
   Scenario: a users tries to categorize a URL with an empty form
     Given a user with role "webcat user" exists and is logged in
@@ -496,7 +493,6 @@ Feature: Webcat complaints
     And I wait for "8" seconds
     Then I should see content "Nature" within ".sds_category"
 
-  @now
   @javascript
   Scenario: when a complaint in the WBNP queue is resolved,
             a bridge message should not be sent
@@ -518,7 +514,7 @@ Feature: Webcat complaints
     Then I should see "COMPLETED"
     And "0" bridge message should be in the delayed job queue
 
-  @now
+
   @javascript
   Scenario: when a complaint in the talos-intelligence queue is resolved,
   a bridge message should be sent via delayed jobs

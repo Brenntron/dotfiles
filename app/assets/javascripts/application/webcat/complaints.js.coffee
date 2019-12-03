@@ -87,7 +87,11 @@ window.touchedFormChange = (url) ->
   sessionStorage.setItem("touchedForm", urls_touched)
 
 getTouchedFormCount = ()->
-  items = sessionStorage.getItem("touchedForm").split(",").length - 1
+  form_item = sessionStorage.getItem("touchedForm")
+  items = 0
+  if form_item
+    items = form_item.split(",").length - 1
+  return items
 
 window.updateURI = (event, complaint_entry_id) ->
   event.preventDefault()
@@ -138,7 +142,6 @@ processSubmitNewURL = () ->
   isEmpty = true
 
   for i in [1...6] by 1
-
     categories = []
     for j in [0...5] by 1
       if $("#cat_new_url_#{i}")[0][j]
@@ -185,6 +188,8 @@ window.cat_new_url = ()->
         confirm: ->
           processSubmitNewURL()
       })
+  else
+    processSubmitNewURL()
 
 window.webcat_reset_search = ()->
   inputs = document.getElementsByClassName('form-control')
@@ -437,7 +442,7 @@ window.updatePending = (id,row_id) ->
           processSubmitPending()
       })
 
-processSubmitEntry = () ->
+processSubmitEntry = (entry_id,row_id) ->
   $("#submit_changes_#{entry_id}").addClass('hidden')
   $("#reopen_#{entry_id}").removeClass('hidden')
 
@@ -566,8 +571,10 @@ window.updateEntryColumns = (entry_id,row_id) ->
         reload: false,
         confirm_dismiss: true,
         confirm: ->
-          processSubmitEntry()
+          processSubmitEntry(entry_id,row_id)
       })
+  else
+    processSubmitEntry(entry_id,row_id)
 
 
 ## Allows analyst to set ticket status to reopened and allows them to interact with the submission form
@@ -1803,6 +1810,7 @@ processSubmitMaster = () ->
 window.master_submit = () ->
   selectedItems = $('.selected + tr td.nested-complaint-data-wrapper')
   thingsSelected = getTouchedFormCount()
+  debugger
   if thingsSelected > selectedItems.length
     std_msg_confirm(
       "I noticed you have made changes to at least " + thingsSelected +  " complaints but you only have " + selectedItems.length + " items selected. Do you want to proceed with updating these items? It will reload the page and you will lose your other changes.",
@@ -1813,6 +1821,9 @@ window.master_submit = () ->
         confirm: ->
           processSubmitMaster()
       })
+  else
+    processSubmitMaster()
+
 
 window.verifyMasterSubmit = () ->
   boolean = false
