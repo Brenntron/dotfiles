@@ -6,9 +6,12 @@ $(document).on 'click', '.paginate_button', ->
     table = $('#complaints-index').DataTable()
     table_page = table.page.info().page
 
+$(document).on 'change','.nested-table-input','.selectize-input', ->
+  touchedFormChange(this.dataset.domain)
 
 #### WBNP Reporting ####
 $(document).ready ->
+  sessionStorage.removeItem("touchedForm");
   loader = $('#inline-webcat')
   $(this).bind(
     ajaxStart: () ->
@@ -83,7 +86,18 @@ check_wbnp = window.check_wbnp_status = (wbnp_report_id) ->
       std_msg_error("Unable to pull wbnp status", [], reload: false)
   )
 
+window.touchedFormChange = (url) ->
+  urls_touched = (sessionStorage.getItem("touchedForm")|| "" )
+  if !urls_touched.includes(url)
+    urls_touched += url + ","
+  sessionStorage.setItem("touchedForm", urls_touched)
 
+getTouchedFormCount = ()->
+  form_item = sessionStorage.getItem("touchedForm")
+  items = 0
+  if form_item
+    items = form_item.split(",").length - 1
+  return items
 
 window.updateURI = (event, complaint_entry_id) ->
   event.preventDefault()
@@ -121,13 +135,11 @@ window.updateURI = (event, complaint_entry_id) ->
 
  )
 
-window.cat_new_url = ()->
-
+processSubmitNewURL = () ->
   data = {}
   isEmpty = true
   $('#categorize-urls').dropdown('toggle')
   for i in [1...6] by 1
-
     categories = []
     for j in [0...5] by 1
       if $("#cat_new_url_#{i}")[0][j]
@@ -155,6 +167,20 @@ window.cat_new_url = ()->
   else
     std_msg_error("Unable to categorize", ["Please confirm that a URL and at least one category for each desired entry exists."], reload: false)
 
+window.cat_new_url = ()->
+  timesTouched = getTouchedFormCount()
+  if timesTouched > 1
+    std_msg_confirm(
+      "You have made " + timesTouched + " changes on this page. Do you want to proceed with updating this item? It will reload the page and you will lose your changes.",
+      [],
+      {
+        reload: false,
+        confirm_dismiss: true,
+        confirm: ->
+          processSubmitNewURL()
+      })
+  else
+    processSubmitNewURL()
 
 window.webcat_reset_search = ()->
   inputs = document.getElementsByClassName('form-control')
@@ -308,7 +334,7 @@ window.domain_whois = (IP_Domain) ->
       notice_html = "<p>Something went wrong: #{response.responseText}</p>"
   , this)
 
-window.updatePending = (id,row_id) ->
+processSubmitPending=()->
   prefix = $('#complaint_prefix_'+id)[0].value
   status = $('[name=resolution_review_'+id+']:checked').val()
   comment = $('#complaint_comment_'+id)[0].value
@@ -381,9 +407,20 @@ window.updatePending = (id,row_id) ->
       notice_html = "<p>Something went wrong: #{response.responseText}</p>"
   , this)
 
+window.updatePending = (id,row_id) ->
+  timesTouched = getTouchedFormCount()
+  if timesTouched > 1
+    std_msg_confirm(
+      "You have made " + timesTouched + " changes on this page. Do you want to proceed with updating this item? It will reload the page and you will lose your changes.",
+      [],
+      {
+        reload: false,
+        confirm_dismiss: true,
+        confirm: ->
+          processSubmitPending()
+      })
 
-## Called when user submits categories / information to close a ticket
-window.updateEntryColumns = (entry_id,row_id) ->
+processSubmitEntry = (entry_id,row_id) ->
   $("#submit_changes_#{entry_id}").addClass('hidden')
   $("#reopen_#{entry_id}").removeClass('hidden')
 
@@ -443,7 +480,7 @@ window.updateEntryColumns = (entry_id,row_id) ->
             options: AC.WebCat.createSelectOptions()
             items: selected_options(categories)
           }
-  
+
           $('#input_cat_pending'+ temp_row.data().entry_id).selectize {
             persist: false,
             create: false,
@@ -498,6 +535,23 @@ window.updateEntryColumns = (entry_id,row_id) ->
         $("#reopen_#{entry_id}").addClass('hidden')
         std_msg_error(response,"", reload: false)
     , this)
+
+
+## Called when user submits categories / information to close a ticket
+window.updateEntryColumns = (entry_id,row_id) ->
+  timesTouched = getTouchedFormCount()
+  if timesTouched > 1
+    std_msg_confirm(
+      "You have made " + timesTouched + " changes on this page. Do you want to proceed with updating this item? It will reload the page and you will lose your changes.",
+      [],
+      {
+        reload: false,
+        confirm_dismiss: true,
+        confirm: ->
+          processSubmitEntry(entry_id,row_id)
+      })
+  else
+    processSubmitEntry(entry_id,row_id)
 
 
 ## Allows analyst to set ticket status to reopened and allows them to interact with the submission form
@@ -962,7 +1016,7 @@ format = (complaint_entry_row) ->
 
   whois_lookup = if complaint_entry.ip_address then complaint_entry.ip_address else complaint_entry.domain
 
-  { entry_id, complaint_id } = complaint_entry
+  { entry_id, domain, complaint_id } = complaint_entry
   complaint_entry_html = ''
   input_cat = 'input_cat_' + entry_id
 
@@ -988,7 +1042,6 @@ format = (complaint_entry_row) ->
   retake_in_progress = false
   if complaint_entry.screen_shot_error == "Retaking screenshot please wait."
     retake_in_progress = true
-
   complaint_entry_html =
       complaint_table_row_html +
       "<div class='col-xs-12 col-sm-8 nested-complaint-static-data'>" +
@@ -1022,12 +1075,12 @@ format = (complaint_entry_row) ->
       '<div class="col-xs-12">' +
       '<label class="content-label-sm">Edit URI</label><br/>' +
       '<input class="nested-table-input complaint-uri-input" id="complaint_prefix_' + entry_id +
-      '" type="text" onclick="this.select()" value="' + host +
+      '" type="text" onclick="this.select()" data-domain="' + domain + '"value="' + host +
       '"' + entry_status + '>' +
       '<button class="secondary inline-button" onclick="updateURI(event,' + entry_id + ')">Update URI</button><br/>' +
       '<div class="complaint-selectize-col-wrapper">' +
       '<label class="content-label-sm">Edit Categories / Confidence Order</label>' +
-      '<select id="' + input_cat + '" name="[' + input_cat + '][]" class="' + status_class + '" placeholder="Enter up to 5 categories" value=""></select>' +
+      '<select id="' + input_cat + '" name="[' + input_cat + '][]" class="' + status_class + '" placeholder="Enter up to 5 categories" value="" onchange="touchedFormChange(\'' + complaint_entry.domain + '\')"></select>' +
       '</div>' +
       '<div class="domain-categories" >' +
       '<label class="content-label-sm">Inherit Categories From Main Domain</label><br/>' +
@@ -1035,9 +1088,9 @@ format = (complaint_entry_row) ->
       '<button class="secondary inline-button" onclick="inheritCategories(' + entry_id + ')">Inherit</button><br/>' +
       '</div>' +'</div><div class="col-xs-8">' +
       '<label class="content-label-sm">Internal Comment</label><br/>' +
-      '<input class="nested-table-input complaint-comment-input" id="complaint_comment_' + entry_id + '" type="text" onclick="this.select()" class="nested-table-input" value="' + internal_comment + '" placeholder="Add a comment." ' + entry_status + '><br/>'  +
+      '<input class="nested-table-input complaint-comment-input" id="complaint_comment_' + entry_id + '" type="text" onclick="this.select()" data-domain="' + domain + '" class="nested-table-input" value="' + internal_comment + '" placeholder="Add a comment." ' + entry_status + '><br/>'  +
       '<label class="content-label-sm customer-label">Customer Facing Comment</label><br/>' +
-      '<input class="nested-table-input complaint-comment-input" id="complaint_resolution_comment_' + entry_id + '" type="text" onclick="this.select()" value="' + resolution_comment + '" placeholder="Add a comment for the customer." ' + entry_status + '>' +
+      '<input class="nested-table-input complaint-comment-input" id="complaint_resolution_comment_' + entry_id + '" type="text" onclick="this.select()" data-domain="' + domain + '" value="' + resolution_comment + '" placeholder="Add a comment for the customer." ' + entry_status + '>' +
       '</div>' +
       '<div class="col-xs-4">' +
       '<label class="content-label-sm">Resolution</label><br/>' +
@@ -1332,7 +1385,6 @@ window.click_table_buttons = (complaint_table, button)->
     td = $(tr).next('tr').find('td:first')
     unless $(td).hasClass 'nested-complaint-data-wrapper'
       $(td).addClass 'nested-complaint-data-wrapper'
-#    debugger
     if ['NEW','ASSIGNED','PENDING', 'REOPENED', 'ACTIVE'].includes(data.status)
       $( cat_select ).selectize {
         persist: false,
@@ -1576,7 +1628,8 @@ window.triggerTooltips = (item) ->
     side: 'bottom'
   return
 
-window.master_submit = () ->
+processSubmitMaster = () ->
+
   data = []
 
   $('.selected + tr td.nested-complaint-data-wrapper').each ->
@@ -1691,6 +1744,23 @@ window.master_submit = () ->
       std_msg_error("Unable to submit changes for selected entries.","", reload: false)
 
   , this)
+
+window.master_submit = () ->
+  selectedItems = $('.selected + tr td.nested-complaint-data-wrapper')
+  thingsSelected = getTouchedFormCount()
+  debugger
+  if thingsSelected > selectedItems.length
+    std_msg_confirm(
+      "I noticed you have made changes to at least " + thingsSelected +  " complaints but you only have " + selectedItems.length + " items selected. Do you want to proceed with updating these items? It will reload the page and you will lose your other changes.",
+      [],
+      {
+        reload: false,
+        confirm_dismiss: true,
+        confirm: ->
+          processSubmitMaster()
+      })
+  else
+    processSubmitMaster()
 
 
 window.verifyMasterSubmit = () ->
