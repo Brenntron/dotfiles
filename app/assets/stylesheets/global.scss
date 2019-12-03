@@ -10306,8 +10306,20 @@ input[type="radio"].resolution_radio_button {
   font-style: oblique!important;
 }
 // webrep and webcat toolbars - between 2020px and 2025px, prevent breaking/wrapping of the buttons
+@media (min-width: 1600px) {
+  #webrep-index-toolbar{
+    .toolbar-button {
+      background-position: 4px 6px;
+      padding-left: 13px;
+      padding-right: 7px;
+      min-height: 25px;
+      background-size: 14px 14px; // icon size
+      transition: background-color 0.2s;
+    }
+  }
+}
 @media (min-width: 2025px) {
-  #webrep-index-toolbar, #webcat-index-toolbar {
+  #webcat-index-toolbar {
     .toolbar-button {
       background-position: 4px 6px;
       padding-left: 13px;
