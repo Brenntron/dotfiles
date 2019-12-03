@@ -236,7 +236,7 @@
                           = entry.hostlookup
                     %td
                       %label Category
-                      - if entry[:primary_category] != "{}"
+                      - unless entry[:primary_category] == '{}' || entry[:primary_category].nil?
                         = entry[:primary_category]
                       - else
                         %span.missing-data No Data
@@ -445,9 +445,9 @@
                     %td.research-table-details-wrapper{colspan: '8'}
                       %table
                         %tr
-                          %td.input-col
-                            %span.research-table-input-wrapper.wbrs-input-wrapper
-                              %input.research-row-checkbox.wbrs-checkbox{type: 'checkbox', checked: 'true', value: "#{entry.id}"}
+                          %td.input-col.wbrs-input-wrapper
+                            %input.research-row-checkbox.wbrs-checkbox{type: 'checkbox', checked: 'true', value: "#{entry.id}"}
+                          %td
                             %label WBRS
                           %td.text-center.entry-data-wbrs-score
                             = entry.wbrs_score.to_d.truncate(2).to_f if entry.wbrs_score
@@ -471,16 +471,16 @@
                                   = wbrs_hit.name
                                   - unless wbrs_hit.equal? entry.dispute_rule_hits.select {|rule_hit| rule_hit.rule_type == "WBRS" }.last
                                     = ","
-                          %td.input-col
-                            %span.research-table-input-wrapper.xbrs-input-wrapper
-                              %input.research-row-checkbox.xbrs-checkbox{type: 'checkbox', checked: 'true', value: "#{entry.id}"}
+                          %td.input-col.xbrs-input-wrapper
+                            %input.research-row-checkbox.xbrs-checkbox{type: 'checkbox', checked: 'true', value: "#{entry.id}"}
+                          %td
                             %label XBRS History
                           %td.text-center
                             - unless entry.hostlookup.nil?
                               = entry.find_xbrs[1]['data'].count
-                          %td.input-col
-                            %span.research-table-input-wrapper.virus-total-input-wrapper
-                              %input.research-row-checkbox.virus-total-checkbox{type: 'checkbox', checked: 'true', value: "#{entry.id}"}
+                          %td.input-col.virus-total-input-wrapper
+                            %input.research-row-checkbox.virus-total-checkbox{type: 'checkbox', checked: 'true', value: "#{entry.id}"}
+                          %td
                             %label Virustotal
                           %td.text-center
                             - if entry.virustotals.count == 0
@@ -524,9 +524,9 @@
                                           = reference.case_opened_at
 
                         %tr
-                          %td.input-col
-                            %span.research-table-input-wrapper.sbrs-input-wrapper
-                              %input.research-row-checkbox.sbrs-checkbox{type: 'checkbox', checked: 'true', value: "#{entry.id}"}
+                          %td.input-col.sbrs-input-wrapper
+                            %input.research-row-checkbox.sbrs-checkbox{type: 'checkbox', checked: 'true', value: "#{entry.id}"}
+                          %td
                             %label SBRS
                           %td.text-center= entry.sbrs_score.to_d.truncate(2).to_f if entry.sbrs_score
                           %td
@@ -549,15 +549,15 @@
                                   = sbrs_hit.name
                                   - unless sbrs_hit.equal? entry.dispute_rule_hits.select {|rule_hit| rule_hit.rule_type == "WBRS" }.last
                                     = ","
-                          %td.input-col
-                            %span.research-table-input-wrapper.crosslisted-input-wrapper
-                              %input.research-row-checkbox.crosslisted-checkbox{type: 'checkbox', checked: 'true', value: "#{entry.id}"}
+                          %td.input-col.crosslisted-input-wrapper
+                            %input.research-row-checkbox.crosslisted-checkbox{type: 'checkbox', checked: 'true', value: "#{entry.id}"}
+                          %td
                             %label Crosslisted URLs
                           %td.text-center
                             = entry.wbrs_xlist.count
-                          %td.input-col
-                            %span.research-table-input-wrapper.reptool-input-wrapper
-                              %input.research-row-checkbox.reptool-checkbox{type: 'checkbox', checked: 'true', value: "#{entry.id}"}
+                          %td.input-col.reptool-input-wrapper
+                            %input.research-row-checkbox.reptool-checkbox{type: 'checkbox', checked: 'true', value: "#{entry.id}"}
+                          %td
                             %label RepTool Class
                             %td.entry-reptool-data
                               - if entry.classifications.first.nil?
