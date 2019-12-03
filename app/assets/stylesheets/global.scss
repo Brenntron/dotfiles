@@ -351,17 +351,53 @@ table.dataTable.no-footer {
   background-position: 3px center;
   color: $type-lighter-color;
 }
-.table-search-input::-webkit-input-placeholder {
+
+.restricted-table-search-input {
+  height: 100%;
+  padding: 0 8px;
+  font-weight: 400;
+  border: 1px solid #ccc;
+  border-radius: 2px;
+  margin-left: 4px !important;
+  float: left;
+}
+
+// Don't consolidate these further, they don't work in different orders
+.table-search-input::-webkit-input-placeholder, .restricted-table-search-input::-webkit-input-placeholder {
   font-size: 7pt;
   color: $content-tab-color;
 }
-.table-search-input::-moz-placeholder {
+.table-search-input::-moz-placeholder, .restricted-table-search-input::-moz-placeholder {
   font-size: 7pt;
   color: $content-tab-color;
 }
-.table-search-input::-ms-input-placeholder {
+.table-search-input::-ms-input-placeholder, .restricted-table-search-input::-ms-input-placeholder {
   font-size: 7pt;
   color: $content-tab-color;
+}
+
+.dt-button {
+  margin-left: 4px;
+  border-radius: 2px;
+  height: 27px;
+  width: 27px;
+  background-repeat: no-repeat;
+  border: none;
+  float: right;
+}
+
+.dt-search-button {
+  background-color: $primary-section-color;
+  background-image: url(image_path('icon_search_white.svg'));
+  background-size: 18px;
+  background-position: center center;
+}
+
+.dt-search-clear-button {
+  background-color: $nav-toolbar-color;
+  background-image: url(image_path('icon_reset_grey.svg'));
+  background-size: 24px;
+  background-position: 1px 1px;
 }
 
 /***** Pretty Tables *****/
