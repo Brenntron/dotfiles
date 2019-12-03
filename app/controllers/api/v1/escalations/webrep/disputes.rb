@@ -256,7 +256,7 @@ module API
             params do
               requires :urls, type: Array[String], desc: "uris to wl/bl"
               requires :trgt_list, type: Array[String], desc: "type of WL/BL"
-              optional :thrt_cats, type: Array[String], desc: "threat categories"
+              optional :thrt_cat_ids, type: Array[Integer], desc: "threat categories"
               requires :note, type: String, desc: "note"
             end
             post "uri_wlbl" do
@@ -265,6 +265,88 @@ module API
               true
             end
 
+
+
+
+            desc "Bulk adjust WL/BLs and BL threat categories"
+            params do
+              requires :adjustment_type, type: String, desc: "Add, remove, or replace"
+              optional :dispute_entries, type: Array[Integer], desc: "analyst-console database id"
+              optional :urls, type: Array[String], desc: "URLs to modify, if Dispute Entry ID is not known"
+              requires :lists, type: Array[String], desc: "type of WL/BL"
+              optional :thrt_cat_ids, type: Array[Integer], desc: "threat categories"
+              requires :note, type: String, desc: "note"
+            end
+            post "bulk_wlbl_threatcat_adjust" do
+              authorize!(:update, Wbrs::ManualWlbl)
+
+              ip_uris = []
+              if params[:dispute_entries].present?
+                params[:dispute_entries].each do |dispute_entry_id|
+                  dispute_entry = DisputeEntry.find(dispute_entry_id)
+                  if dispute_entry.entry_type == "IP"
+                    ip_uris << dispute_entry.ip_address
+                  else
+                    ip_uris << dispute_entry.uri
+                  end
+                end
+              else
+                ip_uris = params[:urls]
+              end
+
+              case params[:adjustment_type]
+              when "add"
+                if params[:dispute_entries].present?
+                  parsed_ip_uris = ip_uris.map{|ip_uri| DisputeEntry.domain_of_with_path(ip_uri).strip}
+                  unique_ip_uris = parsed_ip_uris.uniq
+                else
+                  unique_ip_uris = ip_uris
+                end
+
+                wlbl_params =
+                    {
+                        urls: unique_ip_uris,
+                        trgt_list: params['lists'],
+                        note: params['note'],
+                        usr: current_user.cvs_username,
+                        thrt_cat_ids: permitted_params['thrt_cat_ids']
+                    }
+                Wbrs::ManualWlbl.bulk_new_wlbl_from_params(wlbl_params)
+              when "remove"
+                Wbrs::ManualWlbl.destroy_from_params(ip_uris, params['lists'], username: current_user.cvs_username)
+              when "replace"
+                replace_params_formatted =
+                {
+                    dispute_entry_ids: params[:dispute_entries],
+                    trgt_list: params[:lists],
+                    thrt_cats: params[:thrt_cat_ids],
+                    note: params[:note]
+                }
+                Wbrs::ManualWlbl.adjust_entries_from_params(replace_params_formatted, username: current_user.cvs_username)
+              else
+                "No valid adjustment type"
+              end
+
+              if params[:dispute_entries].present?
+                params[:dispute_entries].each do |dispute_entry|
+                  dispute = DisputeEntry.where({:id => dispute_entry}).first.dispute
+                  DisputeComment.create(:dispute_id => dispute.id, :user_id => current_user.id, :comment => params[:note])
+                end
+              end
+
+              true
+            end
+
+
+
+
+
+
+
+
+
+
+            # TODO: unused?
             desc "Adjust a WL/BL entry"
             params do
               requires :dispute_entry_ids, type: Array[Integer], desc: "analyst-console database id"
@@ -280,6 +362,7 @@ module API
               true
             end
 
+            # TODO: unused?
             desc "Adjust a WL/BL entry"
             params do
               requires :dispute_ids, type: Array[Integer], desc: "analyst-console database id"
@@ -750,6 +833,7 @@ module API
               requires :ip_uris, type: Array[String]
               requires :list_types, type: Array[String]
               requires :note, type: String
+              optional :thrt_cat_ids, type: Array[Integer], desc: "threat categories"
             end
 
             post 'bulk_rule_ui_wlbl_add' do
@@ -763,7 +847,8 @@ module API
                         urls: unique_ip_uris,
                         trgt_list: permitted_params['list_types'],
                         note: permitted_params['note'],
-                        usr: current_user.cvs_username
+                        usr: current_user.cvs_username,
+                        thrt_cat_ids: permitted_params['thrt_cat_ids']
                     }
 
                 Wbrs::ManualWlbl.bulk_new_wlbl_from_params(wlbl_params)
@@ -835,6 +920,24 @@ module API
               assignees = User.joins(roles: :org_subset).where(org_subsets: { name: 'webrep' }).distinct.order(:cvs_username)
 
               render json: {assignees: assignees}
+            end
+
+            params do
+              requires :uri, type: String
+            end
+            desc 'Grab threat categories from SDSv3 API'
+            post 'threat_categories' do
+              response = SbApi.remote_call_sds_v3(permitted_params[:uri],'wbrs')
+              response
+            end
+
+            params do
+              requires :uri, type: String
+            end
+            desc 'Grab threat levels from SDSv2 API'
+            post 'threat_levels' do
+              response = SbApi.remote_call_sds(permitted_params[:uri],'wbrs')
+              response
             end
 
           end

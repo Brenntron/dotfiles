@@ -1579,6 +1579,27 @@ toggle_selected = (selectedRows, expand)->
         $(selectedRows[i]).addClass('selected')
   $(selectState).addClass('selected')
 
+# webcat: pin/unpin toolbar to top on webcat
+window.pin_to_top = () ->
+  if !$('#pin-to-top').hasClass('pinned')
+    toolbar = $('#webcat-index-toolbar').detach()  # detach every time
+    $(toolbar).addClass('pinned-toolbar')
+    $('#nav-banner').append(toolbar)
+
+    $('#pin-to-top span').text('Unpin Toolbar from Top')
+    $('#page-content-wrapper').css('padding-top','60px')
+    $('#pin-to-top').addClass('pinned')
+    $('body').addClass('pinned-toolbar-true')
+  else  # already pinned to top?
+    toolbar = $('#webcat-index-toolbar').detach()
+    $(toolbar).removeClass('pinned-toolbar')
+    $('.webcat-main-area').prepend(toolbar)
+
+    $('#pin-to-top span').text('Pin Toolbar to Top')
+    $('#page-content-wrapper').css('padding-top','15px')
+    $('#pin-to-top').removeClass('pinned')
+    $('body').removeClass('pinned-toolbar-true')
+
 window.collapse_selected =()->
   selectedRows = $('.selected')
   expand = false;
@@ -1815,6 +1836,11 @@ $ ->
     if $('#cat-urls-same').prop('checked')
       $('#categorize-diff-form').hide()
       $('#categorize-same-form').show()
+
+  # webcat: hot key/shortcut to pin toolbar (shift + 6)
+  $(document).keypress (e) ->
+    if e.key == '^'
+      pin_to_top()
 
   $(document).on 'change', '.resolution_radio_button', ->
     $('#master-submit').prop('disabled', false)

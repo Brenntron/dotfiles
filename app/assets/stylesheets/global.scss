@@ -823,6 +823,7 @@ button {
 .return-ticket-toolbar-button:hover,
 .collapse-all:hover,
 .sync-button:hover,
+.pin-to-top-button:hover,
 .expand-all:hover {
   background-color: lighten($nav-toolbar-color, 8%)!important;
 }
@@ -846,6 +847,7 @@ button {
 .return-ticket-toolbar-button:focus,
 .collapse-all:focus,
 .sync-button:focus,
+.pin-to-top-button:focus,
 .expand-all:focus{
   background-color: lighten($bug-section-color, 28%);
 }
@@ -4671,6 +4673,9 @@ table > tbody > tr > td.dispute_rep_tools {
 #reptool_adjust_entries.dropdown-menu, .reptool-inline-dropdown {
   width: 400px;
 }
+[aria-describedby="complaint_button_dialog"],[aria-describedby="history_dialog"]  {
+  z-index: 999;
+}
 
 #wlbl_adjust_entries.dropdown-menu li:hover, #wlbl_adjust_entries_index.dropdown-menu li:hover{
   background-color: transparent;
@@ -5086,6 +5091,7 @@ input.table-entry-input:focus {
   padding-bottom: 20px;
 }
 
+// this is the legacy "dashboard" for the webcat metrics, it is shown on /reports page
 #top_bar_extended_info {
   background-color: $content-tab-color;
   margin-top: 20px;
@@ -5093,7 +5099,6 @@ input.table-entry-input:focus {
   margin-bottom: -21px;
   border-radius: 0 0 4px 4px;
   padding-bottom: 30px;
-  display: none;
 }
 
 #top_bar_extended_info h3 {
@@ -5149,6 +5154,7 @@ input.table-entry-input:focus {
   background-color: transparent;
   position: absolute;
   bottom: -34px;
+  z-index: 1;
   transition: 0.50s;
   -webkit-transition: 0.50s;
   -moz-transition: 0.50s;
@@ -8425,7 +8431,7 @@ th.sorting_1, th.sorting_asc, th.sorting_desc {
 }
 
 .toolbar div.dropdown-tool-grey-row li, .dispute-reptool-adjust-wrapper .dropdown-tool-grey-row li {
-  padding: 2px 12px;
+  padding: 2px 2px 4px 10px;
 }
 
 .dropdown-tool-grey-row li:hover {
@@ -9812,7 +9818,7 @@ table.rl-content {
 // Datatables special display to get rid of sorting by placeholder 'Na' or 'Missing' etc. values
 
 .no-score::before {
-  content:'No Score';
+  content:'No score';
   display: block;
 }
 
@@ -10132,7 +10138,7 @@ input[type="radio"].resolution_radio_button {
 }
 
 // webrep and webcat toolbars - between 1800px and 1600px, prevent breaking/wrapping of the buttons
-@media screen and (max-width: 1800px) and (min-width: 1600px) {
+@media (min-width: 1850px) {
   #webrep-index-toolbar, #webcat-index-toolbar {
     .toolbar-button {
       background-position: 4px 6px;
@@ -10144,6 +10150,34 @@ input[type="radio"].resolution_radio_button {
     }
   }
 }
+@media screen and (max-width: 1800px) and (min-width: 1705px){
+  #webcat-index-toolbar .toolbar-button-text {
+    .toolbar-button {
+      background-position: 4px 6px;
+    }
+  }
+}
+@media (max-width: 1850px)  {
+  #webcat-index-toolbar .toolbar-button-text {
+    display: none !important;
+  }
+}
+.toolbar#webcat-index-toolbar{
+  margin: 10px 0 -35px 0;
+  z-index: 10;
+  float: left;
+  width: auto;
+}
+
+.toolbar#webcat-index-toolbar.pinned-toolbar {
+  margin-top: 2px;
+  width: 100%;
+}
+
+#complaints-index_wrapper .datatable-top-tools {
+  margin-bottom: 10px !important;
+}
+
 
 // webrep - research tab toolbar - between 1600px and 1400px, prevent breaking/wrapping buttons, this needs to be separate
 @media screen and (max-width: 1600px) and (min-width: 1401px) {
@@ -10353,33 +10387,742 @@ hr.thin.extra-bottom-marg {
   opacity: 1;
 }
 
+.owner-col {
+  min-width: 80px;
+}
+// needs more width to encompass all threat categories now
+.dispute-wlbl-adjust-wrapper {
+  width: 480px;
+}
+
+// threat category stuff goes inside this wl/bl form
+.adjust-wlbl-form {
+  .dropdown-tool-grey-row {
+    li {
+      padding: 2px 2px 6px 12px;
+    }
+    .lists-row {
+      margin-bottom: 10px;
+    }
+  }
+  // threat categories row in adjust wl/bl
+  .dropdown-tool-grey-row.threat-cat-row {
+    margin-left: -10px !important; // need important overrides here
+    margin-right: -10px !important;
+    .threat-cat-note {
+      background-color: $content-bg-color;
+      padding-top: 10px;
+      padding-bottom: 0;
+      margin-bottom: 0;
+    }
+    .threat-cat-area {
+      padding: 3px;
+      height: 200px;
+      display: flex; // flex to alphabetize + sort the threat cats easily
+      flex-wrap: wrap;
+      flex-direction: column;
+      justify-content: space-around;
+      .threat-cat-cell {
+        width: 33%;
+        font-size: 8pt;
+        line-height: 10pt;
+        padding: 3px 0 3px 10px;
+        cursor: default;
+        input[type='checkbox'] {
+          float: left;
+          position: relative;
+          bottom: 3px;
+        }
+        li.threat-cat-cb {
+          padding-top: 6px;
+          padding-bottom: 8px;
+          input {
+            display: inline-block;
+            width: 12px;
+            margin-top: 1px;
+            margin-right: 4px;
+          }
+          label {
+            display: inline-block;
+            width: 120px;
+            vertical-align: top;
+            padding-top: 1px;
+          }
+        }
+      }
+    }
+    td.wlbl-threat-cat {
+      font-size: 8pt;
+      line-height: 11pt;
+      padding-left: 2px;
+    }
+  }
+}
+
+span.threat-cat-required {
+  margin-left: 5px;
+  margin-top: 1px;
+  color: $warning-accent-color;
+  font-size: 7pt;
+  padding-left: 2px;
+  .five-note {
+    margin-top: 0;
+    font-size: 7pt;
+  }
+  .required-bold {
+    font-weight: bold;
+    color: darken($warning-accent-color, 5%)
+  }
+}
+
+span.threat-cat-no-data {
+  float: none;
+  font-size: 8pt;
+  font-style: italic;
+  color: $content-label-color;
+  padding-left: 2px;
+}
+
+// adjust wl/bl dropdown - ensure long dispute url's break/wrap properly
+.dispute_tool_current .wlbl-dropdown-row td.wlbl-entry-content {
+  max-width: 180px;
+  min-width: 140px;
+  word-break: break-all;
+}
+
+.preview-wbrs-button {
+  margin-bottom: 8px;
+}
+
+.threat-cat-note label.content-label-sm {
+  margin-bottom: 2px;
+}
+
+// ensure vertical alignment on narrow screens
+.research-table-details-wrapper table tr:first-of-type td {
+  vertical-align: middle;
+}
+
 // webrep dispute index > ensure break/wrap properly for long url's containing parameters
+.dispute-entry-col {
+  min-width: 200px;
+}
+
 #disputes-index .entry-col-content {
   word-break: break-all;
   max-width: 250px;
 }
 
-// webrep disputes index table, domain or ip column
-span.input-truncate {
+// webrep dispute index > ensure the dispute count is to the right of the domain entry
+#disputes-index span.input-truncate {
   display: inline-block;
   position: relative;
-  padding-right: 25px;
-  width: 200px !important;
+  padding-right: 40px;
+  max-height: 20px !important;
+  max-width: 100% !important;
+  min-width: 98%;
+  .dispute-count {
+    border-radius: 5px;
+    padding: 1px 5px;
+    position: absolute;
+    right: 2px;
+    top: 0;
+  }
 }
 
-// webrep dispute index > ensure the dispute count is to the right of the domain entry
-.dispute-count {
-  position: absolute;
-  left: 180px;
-  float: none;
-  border-radius: 5px;
-  padding: 1px 5px;
+.wlbl-threat-cat, .wlbl-threat-cat-inline, table.dispute_tool_current th.th-threat-cat {
+  padding-left: 2px !important;
 }
 
-.dispute-entry-col {
-  min-width: 200px;
+// the main area in the research row to handle threat cats + wl/bls
+.wlbl-and-tc-area {
+  vertical-align: middle;
+  padding-top: 2px;
 }
 
-.owner-col {
+/* handles existing bug for wl/bl list duplicate entries (a.com issue) */
+.wlbl-table-result {
+  display: inline-block;
   min-width: 80px;
+  max-width: 150px;
+  max-height: 45px;
+  overflow-y: hidden;
+  padding-top: 1px;
+  padding-right: 15px;
+  vertical-align: middle;
+}
+
+// retain top navigation at top of page during scroll down for nav accessibility
+#nav-banner.fixed-nav {
+  position: -webkit-sticky;
+  position: sticky;
+  top: 0;
+  z-index: 999;
+}
+
+.pin-to-top-button {
+  background-image: url(image_path('icon_pin1.svg'));
+  background-size: 22px 22px;
+  background-position: 3px 3px;
+  padding-left: 18px;
+}
+
+.pinned-toolbar {
+  background: $content-bg-color;
+  box-shadow: 2px 0 10px 1px rgba(0,0,0,0.3);
+  position: relative;
+  bottom: 18px;
+  padding: 4px 20px;
+  .toolbar-checkbox-wrapper {
+    padding-top: 0;
+    padding-left: 5px;
+    font-weight: normal;
+  }
+  label {
+    display: none;
+  }
+}
+
+#webcat-index-title {
+  padding-top: 10px;
+}
+
+#webcat-index-toolbar {
+  margin: 15px 0 10px;
+}
+
+.pinned-toolbar-true #webcat-index-title {
+  padding-top: 25px;
+  line-height: 12px;
+}
+
+#webcat_searchref_container {
+  margin-bottom: 10px;
+  padding: 6px 0;
+}
+
+// tooltipster adjustments for pinned toolbar tooltips
+.pinned-toolbar-true .tooltipster-sidetip .tooltipster-box {
+  padding: 4px 6px;
+}
+
+// one-off override
+.pinned-toolbar-true .tooltipster-sidetip {
+  top: 85px !important;
+}
+
+.webcat-search-container {
+  height: 15px;
+}
+
+// correction to reduce extraneous vertical space
+.pinned-toolbar-true .webcat-search-container {
+  height: 0;
+}
+
+// handling the top-right username width issues
+@media screen and (max-width: 1200px) {
+  #nav-banner a.nav-username {
+    display: none;
+  }
+}
+
+
+// research rows alignment/formatting updates
+// top row of each
+.research-first-row {
+  margin-top: 120px;
+  td:nth-child(1), td:nth-child(2) {
+    width: 20px;  // icons
+  }
+  td:nth-child(4) {
+    width: 25%;  // hostname
+  }
+  span.entry-data-content {
+    display: inline-block;
+    min-width: 400px;   // url/ip
+  }
+}
+
+// second row of each
+.research-overview-row {
+  background: $faint-neutral-color;
+  td:nth-child(6) {
+    width: 170px;  // rule hits list
+    word-break: break-word;
+    padding-right: 10px;
+  }
+  td:nth-child(7) {
+    width: 150px;
+  }
+  td:nth-child(8) {
+    width: 60px;   // xbrs history
+  }
+  td:nth-child(9) {
+    width: 140px;
+  }
+  td:nth-child(10) {
+    width: 110px;  // reptool class
+    word-break: break-word;
+  }
+  td:nth-child(12) {
+    width: 190px;  // wl/bl lists + threat cats
+  }
+}
+
+
+.wlbl-tc-research-span {
+  display: inline-block;
+  padding-top: 1px;
+  min-width: 20px;
+  max-width: 150px;
+  vertical-align: middle;
+}
+
+.wlbl-and-tc-area .dispute-inline-buttons.history-button {
+  display: inline-block;
+  width: 20px;
+}
+
+.tc-replace-note span {
+  font-size: 7pt;
+  color: $warning-accent-color;
+  padding-left: 2px;
+  float: none;
+}
+
+.adjust-wlbl-form table.dispute_tool_current td {
+  padding: 8px 4px 4px 10px;
+}
+
+/* loader gif, but smaller, for dropdowns */
+.dropdown-menu .mini-loader {
+  display: inline-block;
+  width: 12px !important;
+  height: 12px !important;
+  position: relative;
+  top: 2px;
+  left: 4px;
+  background-size: 12px 12px;
+  animation-name: mini-spin;
+  animation-duration: 800ms;
+  animation-iteration-count: infinite;
+  animation-timing-function: linear;
+  background-image: url(image_path('icon_sync.svg'));
+  &.loader-white {
+    background-image: url(image_path('icon_sync_white.svg'));
+    top: 0;
+    left: 2px;
+  }
+}
+
+ // reports page specific styles
+.report_date_from label, .report_date_to label, .report_customer_name label {
+  width: 120px;
+}
+
+.report_customer_name input {
+  width: 300px;
+}
+
+.report-listing-div {
+  h2 {
+    margin-bottom: 15px;
+  }
+  input {
+    margin-bottom: 5px;
+  }
+  // web cat > report page buttons
+  input[type='submit'] {
+    padding: 5px 20px;
+    color: $content-bg-color;
+    background: darken($primary-section-color, 5%);
+    border: none;
+    margin-top: 5px;
+  }
+}
+
+
+@keyframes mini-spin {
+  from { transform: rotate(0deg) }
+  to { transform: rotate(360deg) }
+}
+
+.loading-rows {
+  color: $type-lighter-color;
+  font-size: 8.5pt;
+  font-style: italic;
+}
+
+.lists-row ul li {
+  cursor: default;
+}
+
+.message-div ul {
+  margin-top: 15px;
+}
+
+// these are the information modals on wl/bl adjust
+.wlbl-info-modal {
+  line-height: 11pt;
+  p {
+    padding: 5px 0;
+  }
+  em {
+    font-style: italic;
+  }
+  // paragraphs in confirmation modal
+  span {
+    display: block;
+    text-align: center;
+    padding: 5px 10px 10px;
+    margin-bottom: 10px;
+    line-height: 15pt;
+    word-wrap: break-word;
+    border-bottom: solid 1px darken($content-bg-color, 4%);
+  }
+  // tc's in modal
+  span:last-of-type {
+    border-bottom: none;
+    margin-bottom: 0;
+  }
+}
+
+.tc-sentence {
+  font-style: normal;
+  margin: 0 5px;
+  padding-top: 5px;
+  em {
+    font-style: normal;
+    display: block;
+    line-height: 11pt;
+    margin: 10px 5px 5px;
+  }
+}
+
+.wlbl-current-entry-wbrs {
+  text-align: center;
+  span.missing-data {
+    text-align: left;
+    font-style: italic;
+  }
+}
+
+.inline-closed-msg {
+  padding: 20px;
+  text-align: center;
+}
+
+.disabled-submit-msg {
+  margin-top: 10px;
+}
+
+.dispute_rep_tools .dropdown-menu {
+  border-radius: 4px 0 4px 4px;
+  top: 18px;
+  right: 3px;
+}
+
+// inline adjust dropdown button toggle should be blue
+.dispute-inline-buttons.adjust-wlbl-button:hover {
+  background-color: lighten($bug-section-color, 5%) !important;
+}
+.dispute-inline-buttons.adjust-wlbl-button:focus {
+  background-color: $bug-section-color;
+}
+
+.dispute_rep_tools .dropdown-menu h3.reptool-dropdown-header {
+  padding-top: 6px;
+}
+
+// inline adjust dropdown, if checkboxes are disabled, select the adjacent span
+.wl-bl-list-inline:disabled + span {
+  cursor: not-allowed;
+}
+
+// applies to wl/bl cb's on adjust dropdown
+.grayed-out {
+  opacity: 0.6;
+}
+
+// webcat > complaints top area
+.complaint-mgt-top-area {
+  padding: 10px 15px 8px;
+}
+
+// webcat > complaints metrics banner
+.complaints-metrics-banner {
+  display: flex;  // handle vertical centering
+  align-items: center;
+  h1 {
+    margin-bottom: 2px;
+    margin-right: 10px;
+    line-height: 30px;
+  }
+  .top-info-icon {
+    margin: 0;
+    padding: 0;
+    vertical-align: text-bottom;
+    position: relative;
+    top: 2px;
+  }
+  .header-area {
+    width: 220px;
+    padding: 0 15px;
+    margin-right: 15px;
+    border-right: solid 1px darken($content-bg-color, 5%);
+    max-height: 60px;
+  }
+  .main-metrics {
+    width: 87%;
+    padding-left: 10px;
+    padding-right: 0;
+  }
+  .metrics-col {
+    padding: 4px 4px 4px 22px;
+    max-width: 380px;
+    display: inline-block;
+    vertical-align: middle;
+  }
+  .metric-header {
+    display: inline-block;
+    text-transform: uppercase;
+    padding-left: 0;
+    padding-right: 5px;
+    font-weight: 700;
+  }
+  .metric-number {
+    padding-left: 0;
+    padding-right: 0;
+    font-weight: 700;
+  }
+  .metrics-col > .metric-number:last-of-type {
+    padding-right: 20px;
+  }
+  .metric-label {
+    padding-left: 2px;
+    padding-right: 4px;
+  }
+  .metric-overdue {
+    padding-left: 0;
+    color: $warning-accent-color;
+    border-right: solid 1px lighten($bug-accent-color, 20%);
+    margin-right: 8px;
+    padding-right: 6px;
+    .metric-number {
+      padding-left: 0;
+      position: relative;
+      right: 2px;
+    }
+  }
+  .metric-assigned {
+    .metric-number {
+      padding-left: 0;
+      padding-right: 2px;
+    }
+  }
+  .metric-overdue:last-of-type {
+    border-right: none;
+    margin-left: 3px;
+  }
+  .wbnp-area {
+    float: right;
+    text-align: right;
+    padding-left: 0;
+    padding-right: 1vw;
+    padding-top: 2px;
+    max-width: 250px;  // accommodate the loading spinner
+    display: inline-block;
+    .wbnp-report-status {
+      display: inline-block;
+      text-transform: capitalize;
+      text-decoration: underline;
+      text-decoration-style: dotted;
+    }
+    #wbnp-report-status-link {
+      text-decoration: underline;
+      text-decoration-style: dotted;
+      color: $content-bg-color;
+      cursor: default;
+    }
+    .wbnp-loading-spinner {
+      width: 20px;  // appears to left of wbnp report status
+      height: 20px;
+      margin-top: -5px;
+      margin-right: 5px;
+      margin-left: 5px;
+      display: inline-block;
+      background-repeat: no-repeat;
+    }
+  }
+  .number-container {
+    display: inline-block;
+    padding: 0;
+    margin: 0;
+  }
+}
+
+@media screen and (max-width: 1950px) {
+  .complaints-metrics-banner {
+    .main-metrics {
+      width: 99%;
+    }
+    .header-area {
+      display: none;
+    }
+    .wbnp-report-status {
+      padding-top: 2px;
+    }
+  }
+}
+
+// shorter widths, minor tweaks
+@media screen and (max-width: 1550px) {
+  .complaint-mgt-top-area {
+    padding: 6px 15px;
+  }
+  .complaints-metrics-banner {
+    .metrics-col {
+      max-width: 290px;
+    }
+    .metric-overdue {
+      padding-top: 2px;
+      border: none;
+    }
+    .metric-assigned {
+      margin: 0;
+      padding: 6px 5px 0 0;
+      display: block;
+    }
+    .wbnp-area {
+      padding: 0.8vw 1vw;
+    }
+    .wbnp-area .metric-header {
+      display: inline-block;
+      vertical-align: middle;
+    }
+    .metric-header {
+      padding-top: 0;
+      vertical-align: top;
+    }
+    .metric-number {
+      padding-left: 0;
+    }
+  }
+}
+
+// 1350px and smaller
+@media screen and (max-width: 1350px) {
+  #nav-banner a.nav-username {
+    display: none;
+  }
+  .complaints-metrics-banner {
+    .wbnp-area {
+      padding: 8px 15px 8px 10px;
+    }
+    .wbnp-area .metric-header {
+      width: 110px;
+    }
+  }
+}
+
+// 1255px and smaller
+@media screen and (max-width: 1255px) {
+  #nav-banner a.nav-username {
+    display: none;
+  }
+  .complaints-metrics-banner {
+    .metrics-col {
+      max-width: 200px;
+    }
+    .wbnp-area {
+      padding: 15px;
+    }
+  }
+}
+
+// tiniest conceivable width for a laptop screen
+@media screen and (max-width: 1100px) {
+  #nav-banner a.nav-username {
+    display: none;
+  }
+  .complaints-metrics-banner {
+    .metrics-col {
+      max-width: 170px;
+    }
+    .metrics-col:first-of-type {
+      max-width: 160px;
+    }
+    .wbnp-area {
+      padding: 15px;
+      max-width: 200px;
+    }
+  }
+}
+// * end media queries */
+
+// webcat > this is the tooltip table for wbrs status
+#tooltip-wbnp-content {
+  width: 180px !important;
+  tr td {
+    padding: 0;
+    border: none;
+    width: 60px;
+  }
+  tr td:first-of-type {
+    width: 120px;
+    padding: 2px;
+    text-align: left;
+  }
+}
+
+#webcat-index-title {
+  margin-top: 15px;
+}
+
+.reports-border-left {
+  border-left: solid 1px lighten($content-tab-color, 40%);;
+}
+
+#tooltip-wbnp {
+  display: none;
+}
+
+// firefox teeny fix
+@-moz-document url-prefix() {
+  .complaint-mgt-top-area {
+    padding: 10px 15px 10px;
+  }
+}
+
+.webcat-search-container {
+  height: 10px;
+}
+
+#webcat-index-toolbar {
+  margin: 20px 0 5px;
+}
+
+#webcat-index-title {
+  margin-top: 8px;
+}
+
+// ensure text doesn't break/wrap in data table
+.ticket-age-over12hr {
+  white-space: nowrap;
+}
+
+.webcat-reports-only {
+  .table-condensed > tbody > tr > td {
+    padding: 3px 4px !important; // need override
+  }
+  .top-info-icon {
+    margin-right: 0;
+    padding-right: 10px;
+  }
+  .header-area {
+    border-right: solid 1px $content-bg-color;
+    height: 95px;
+    max-width: 220px;
+  }
 }

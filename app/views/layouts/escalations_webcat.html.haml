@@ -188,7 +188,7 @@
                   %a.delete-search{title: 'Delete Saved Search', onclick: "delete_disputes_named_search(this, '#{named_search.name}');"}
                     = image_tag('icon_cancel_grey.svg')
 
-  .nav-tool-blocks.col-xs-2.col-sm-3.col-lg-4.search-wrapper
+  .nav-tool-blocks.col-xs-2.col-sm-3.col-lg-3.search-wrapper
     .input-group.search-group#web-cat-search
       = text_field_tag 'general_search', "#{}", class: 'search-box', placeholder: 'Search'
 
@@ -234,7 +234,7 @@
           -#    that other way
 
   - if current_user
-    #login-div.nav-tool-block.col-sm-2.col-lg-2
+    #login-div.nav-tool-block.col-sm-2.col-lg-3
       = bugzilla_rest_login_icon(bugzilla_rest_session)
       %span.dropdown
         %span#user-settings-dropdown-button.dropdown-toggle.esc-tooltipped{'title': 'Login to Bugzilla', 'data-toggle': 'dropdown', 'aria-expanded': 'false', 'aria-haspopup': 'true', type: 'button'}

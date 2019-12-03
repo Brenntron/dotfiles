@@ -1,6 +1,6 @@
 class Virustotal::Scan < Virustotal::Base
   def self.scan_query_string(address:)
-    "apikey=#{Rails.configuration.virus_total.api_key}&resource=#{address}"
+    "apikey=#{Rails.configuration.virustotal.api_key}&resource=#{address}"
   end
 
   def self.full_scan_url(address:)
