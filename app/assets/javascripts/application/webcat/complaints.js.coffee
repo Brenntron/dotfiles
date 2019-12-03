@@ -390,11 +390,9 @@ window.updatePending = (id,row_id) ->
           options: AC.WebCat.createSelectOptions(),
           items: selected_options(temp_row.data().category)
         }
-
-        $("#domain_#{entry_id}").text(domain)
-        $("#subdomain_#{entry_id}").text(subdomain)
-        $("#path_#{entry_id}").text(path)
-
+        if subdomain != ''
+          subdomain += '.'
+        $("#domain_#{entry_id}").attr('title', subdomain + domain + path)
       tds = $('#complaints-index tbody').closest('td')
       for td in tds
         if td.className == ''
@@ -1771,33 +1769,34 @@ window.updateResolutionDialog = (confirm) ->
   selected_rows = $('tr.selected')
 
   complaint_entries = []
-
   for row in selected_rows
     { id } = row
     complaint_entries.push(id)
     full_domain = ''
-    subdomain = $(row).find("#subdomain_#{id}").text() + '.'
-    domain = $(row).find("#domain_#{id}").text()
-    path = $(row).find("#path_#{id}").text()
-    if subdomain != '.'
-      full_domain = subdomain
-    full_domain += domain + path
-    $('#complaint_entries_to_update').append("<tr><td><span class='ugh'>#{id} |</span> <span class='webcat-full-domain'>#{full_domain}</span></td></tr>")
+    domain = $(row).find("#domain_#{id}").attr('title')
+    $('#complaint_entries_to_update').append("<tr><td><span class='res_id'>#{id} |</span> <span class='webcat-full-domain'>#{domain}</span></td></tr>")
 
   $('#resolution_dialog').modal("show")
-  $('#resolution_text').html("The following entries will have their resolutions set to <span class='resolution-emp'>#{resolution}.</span>")
+  if selected_rows.length > 1
+    html = "The following #{selected_rows.length} entries will have their <span class='bold'>RESOLUTIONS</span> set to <span class='resolution-emp bold'>#{resolution}.</span>"
+  else
+    html = "The following entry will have its <span class='bold'>RESOLUTION</span> set to <span class='resolution-emp bold'>#{resolution}.</span>"
+  $('#resolution_text').html(html)
+
   tbody = $('#resolution_dialog').find('tbody')
   setTimeout ->
     if $('#complaint_entries_to_update').height() > 399
       $(tbody).addClass('scrollable-table')
-  , 300
+      $('#resolution_text').css('padding-left', 0)
+    else
+      $('#resolution_text').css('padding-left', '7px')
+  , 200
 
 window.updateResolution = () ->
   resolution = $('#complaint_resolution')[0].value
   selected_rows = $('tr.selected')
 
   complaint_entries = []
-
   for row in selected_rows
     complaint_entries.push(row.id)
 

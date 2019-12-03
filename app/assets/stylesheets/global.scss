@@ -60,6 +60,7 @@ $type-base-color:    #333;   /* Dark Grey */
 $type-lighter-color: #666;   /* Medium Grey */
 $type-faint-accent: #D7DADB; /* Lighter Grey */
 $type-lightest: #fff; /* White */
+$type-darkest: #000; /* black */
 /* Additional Colors */
 /* for use on gridlines, form inputs, and other very subtle elements against the content bg color */
 $faint-neutral-color: #f2f2f2;
@@ -8009,17 +8010,16 @@ td.text-center span {
     line-height: 3.5;
   }
 }
-.ugh{
+.res_id{
   font-weight: 200;
 }
 .webcat-full-domain{
-  max-width: 485px;
-  display: inline-block;
-  text-overflow: ellipsis;
-  white-space: nowrap;
-  overflow: hidden;
-  vertical-align: bottom;
-  font-weight: 600;
+  //text-overflow: ellipsis;
+  //overflow-x: visible;
+  //white-space: nowrap;
+  //vertical-align: bottom;
+  //font-weight: 600;
+
 }
 .loader-msg {
   color: $type-lighter-color;
@@ -8477,18 +8477,20 @@ hr.thin.form-divider {
 .comment-wrapper + hr.thin {
   margin: 15px 6px;
 }
-#resolution_dialog{
-  .modal-dialog{
+#resolution_dialog {
+  .modal-dialog {
     width: 600px;
   }
-  .close{
+
+  .close {
     top: 3px;
     right: 3px;
   }
-  tbody{
-    display: block;
+
+  tbody {
     margin-top: 10px;
   }
+
   .modal-header {
     background-color: $primary-section-color;
     color: $type-lightest;
@@ -8497,26 +8499,38 @@ hr.thin.form-divider {
     border-top-left-radius: 6px;
     border-top-right-radius: 6px;
   }
-  .scrollable-table{
+
+  .scrollable-table {
     border: 1px solid $nav-toolbar-color;
     max-height: 400px;
-    overflow-y: scroll!important;
+    overflow-y: scroll !important;
     padding: 2px;
   }
-  .modal-footer{
-      text-align: center;
+
+  .modal-footer {
+    text-align: center;
   }
-  #resolution_text{
+
+  #resolution_text {
     padding-left: 7px;
-  }
-  .resolution-emp{
-    font-weight:600;
-    color: $primary-section-color
+    color: $type-lighter-color;
+
+    .resolution-emp {
+      color: $primary-section-color
+    }
   }
 }
+#complaints-index_length, #complaints-index_filter{
+  z-index: 999;
+  position: relative;
+  display: block;
+}
 
-#complaint_entries_to_update tbody tr:last-child td{
-  border-bottom: none!important;
+#complaint_entries_to_update {
+  margin-top: 15px;
+  tbody tr:last-child td {
+    border-bottom: none !important;
+  }
 }
 .nested-radio-row .col-xs-6:first-of-type {
   padding-left: 15px;
