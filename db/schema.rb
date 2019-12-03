@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 2019_07_16_183924) do
+ActiveRecord::Schema.define(version: 2019_10_31_150245) do
 
   create_table "alerts", options: "ENGINE=InnoDB DEFAULT CHARSET=utf8", force: :cascade do |t|
     t.datetime "created_at", null: false
@@ -20,6 +20,16 @@ ActiveRecord::Schema.define(version: 2019_07_16_183924) do
     t.integer "attachment_id", null: false
     t.string "policy"
     t.index ["test_group", "attachment_id", "rule_id"], name: "index_alerts_on_test_group_and_attachment_id_and_rule_id"
+  end
+
+  create_table "amp_false_positives", options: "ENGINE=InnoDB DEFAULT CHARSET=utf8", force: :cascade do |t|
+    t.integer "sr_id"
+    t.text "payload"
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.bigint "file_reputation_ticket_id"
+    t.index ["file_reputation_ticket_id"], name: "index_amp_false_positives_on_file_reputation_ticket_id"
+    t.index ["payload"], name: "index_amp_false_positives_on_payload", length: 15
   end
 
   create_table "amp_naming_conventions", options: "ENGINE=InnoDB DEFAULT CHARSET=latin1", force: :cascade do |t|
@@ -191,6 +201,16 @@ ActiveRecord::Schema.define(version: 2019_07_16_183924) do
     t.index ["complaint_entry_id"], name: "index_complaint_entry_screenshots_on_complaint_entry_id"
   end
 
+  create_table "complaint_marked_commits", options: "ENGINE=InnoDB DEFAULT CHARSET=utf8", force: :cascade do |t|
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.integer "user_id"
+    t.integer "complaint_entry_id"
+    t.string "comment"
+    t.string "category_list"
+    t.index ["user_id"], name: "index_complaint_marked_commits_on_user_id"
+  end
+
   create_table "complaint_tags", options: "ENGINE=InnoDB DEFAULT CHARSET=utf8", force: :cascade do |t|
     t.string "name"
     t.datetime "created_at", null: false
@@ -256,6 +276,7 @@ ActiveRecord::Schema.define(version: 2019_07_16_183924) do
     t.string "access_complexity"
     t.string "authentication"
     t.text "affected_systems", limit: 4294967295
+    t.string "snort_doc_status", default: "NOTYET", null: false
     t.index ["cve_key"], name: "index_cves_on_cve_key", unique: true
     t.index ["reference_id"], name: "index_cves_on_reference_id", unique: true
   end
@@ -366,6 +387,7 @@ ActiveRecord::Schema.define(version: 2019_07_16_183924) do
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
     t.text "umbrella", limit: 4294967295
+    t.text "wbrs_threat_category"
     t.index ["dispute_entry_id"], name: "index_dispute_entry_preloads_on_dispute_entry_id"
   end
 
@@ -451,6 +473,13 @@ ActiveRecord::Schema.define(version: 2019_07_16_183924) do
     t.index ["snort_research_bug_id", "snort_escalation_bug_id"], name: "index_escalation_links"
   end
 
+  create_table "escalations", options: "ENGINE=InnoDB DEFAULT CHARSET=latin1", force: :cascade do |t|
+    t.integer "snort_research_escalation_bug_id"
+    t.integer "snort_escalation_research_bug_id"
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+  end
+
   create_table "events", options: "ENGINE=InnoDB DEFAULT CHARSET=utf8", force: :cascade do |t|
     t.string "user"
     t.string "action"
@@ -483,6 +512,12 @@ ActiveRecord::Schema.define(version: 2019_07_16_183924) do
     t.integer "reference_id"
     t.index ["exploit_id", "reference_id"], name: "index_exploits_references_on_exploit_id_and_reference_id"
     t.index ["reference_id"], name: "index_exploits_references_on_reference_id"
+  end
+
+  create_table "false_positive_selections", options: "ENGINE=InnoDB DEFAULT CHARSET=utf8", force: :cascade do |t|
+    t.string "display"
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
   end
 
   create_table "false_positives", options: "ENGINE=InnoDB DEFAULT CHARSET=latin1", force: :cascade do |t|
@@ -536,7 +571,7 @@ ActiveRecord::Schema.define(version: 2019_07_16_183924) do
     t.string "status", default: "NEW", null: false
     t.string "source"
     t.string "platform"
-    t.text "description", collation: "utf8mb4_general_ci"
+    t.text "description", collation: "utf8mb4_0900_ai_ci"
     t.string "file_name"
     t.integer "file_size"
     t.string "sha256_hash"
@@ -592,6 +627,28 @@ ActiveRecord::Schema.define(version: 2019_07_16_183924) do
     t.index ["gib_type", "gib_id"], name: "index_giblets_on_gib_type_and_gib_id"
   end
 
+  create_table "immunet_false_positives", options: "ENGINE=InnoDB DEFAULT CHARSET=utf8", force: :cascade do |t|
+    t.string "version"
+  end
+
+  create_table "mitre_data", options: "ENGINE=InnoDB DEFAULT CHARSET=utf8", force: :cascade do |t|
+    t.string "external_id", null: false
+    t.string "platform", default: "enterprise"
+    t.string "category", null: false
+    t.string "sub_category", null: false
+    t.datetime "modified"
+    t.datetime "created"
+    t.text "description", null: false
+    t.text "detection", null: false
+    t.text "url", null: false
+    t.string "version", default: "1.0"
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.bigint "mitre_tactic_id"
+    t.index ["external_id"], name: "index_mitre_data_on_external_id"
+    t.index ["mitre_tactic_id"], name: "index_mitre_data_on_mitre_tactic_id"
+  end
+
   create_table "morsels", options: "ENGINE=InnoDB DEFAULT CHARSET=latin1", force: :cascade do |t|
     t.text "output"
     t.datetime "created_at", null: false
@@ -603,7 +660,7 @@ ActiveRecord::Schema.define(version: 2019_07_16_183924) do
     t.datetime "updated_at", null: false
     t.integer "named_search_id"
     t.string "field_name"
-    t.string "value"
+    t.text "value"
     t.index ["named_search_id"], name: "index_named_search_criteria_on_named_search_id"
   end
 
@@ -654,6 +711,13 @@ ActiveRecord::Schema.define(version: 2019_07_16_183924) do
     t.index ["reference_type_id"], name: "index_references_on_reference_type_id"
   end
 
+  create_table "reputation_files", options: "ENGINE=InnoDB DEFAULT CHARSET=utf8", force: :cascade do |t|
+    t.integer "bugzilla_attachment_id"
+    t.string "sha256"
+    t.string "file_path"
+    t.string "file_name"
+  end
+
   create_table "resolution_message_templates", options: "ENGINE=InnoDB DEFAULT CHARSET=latin1", force: :cascade do |t|
     t.string "name"
     t.text "description"
@@ -680,6 +744,7 @@ ActiveRecord::Schema.define(version: 2019_07_16_183924) do
     t.string "category"
     t.datetime "created_at"
     t.datetime "updated_at"
+    t.text "blurb"
     t.index ["category"], name: "index_rule_categories_on_category"
   end
 
@@ -702,6 +767,30 @@ ActiveRecord::Schema.define(version: 2019_07_16_183924) do
     t.string "snort_doc_status", default: "NOTYET"
     t.string "snort_on_off", default: "on"
     t.index ["rule_id"], name: "index_rule_docs_on_rule_id"
+  end
+
+  create_table "rule_documents", options: "ENGINE=InnoDB DEFAULT CHARSET=utf8", force: :cascade do |t|
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.integer "rule_id", null: false
+    t.integer "rule_vulnerability_id", null: false
+    t.text "trigger"
+    t.text "explanation", null: false
+    t.text "refs"
+    t.integer "false_positive_selection_id", null: false
+    t.text "false_positive_blurb"
+    t.text "contributors"
+    t.boolean "seen_in_wild"
+    t.string "snort_doc_status", default: "NOTYET", null: false
+    t.string "mitre_category"
+    t.string "mitre_sub_category"
+  end
+
+  create_table "rule_vulnerabilities", options: "ENGINE=InnoDB DEFAULT CHARSET=utf8", force: :cascade do |t|
+    t.string "display_name"
+    t.text "blurb"
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
   end
 
   create_table "rulehit_resolution_mailer_templates", options: "ENGINE=InnoDB DEFAULT CHARSET=utf8", force: :cascade do |t|
@@ -775,6 +864,23 @@ ActiveRecord::Schema.define(version: 2019_07_16_183924) do
     t.index ["updated_at"], name: "index_sessions_on_updated_at"
   end
 
+  create_table "snort_false_positives", options: "ENGINE=InnoDB DEFAULT CHARSET=utf8", force: :cascade do |t|
+    t.integer "bug_id"
+    t.string "user_email"
+    t.string "sid"
+    t.text "description"
+    t.string "source_authority"
+    t.string "source_key"
+    t.string "os"
+    t.string "version"
+    t.string "built_from"
+    t.string "pcap_lib"
+    t.string "cmd_line_options"
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.index ["source_authority", "source_key"], name: "index_snort_false_positives_on_source_authority_and_source_key"
+  end
+
   create_table "snort_researches", options: "ENGINE=InnoDB DEFAULT CHARSET=utf8", force: :cascade do |t|
     t.integer "bug_id"
     t.integer "snort_research_to_research_bug_id"
@@ -804,6 +910,8 @@ ActiveRecord::Schema.define(version: 2019_07_16_183924) do
     t.datetime "stats_updated_at"
     t.string "type", default: "Task"
     t.string "policy"
+    t.datetime "scheduled_at"
+    t.datetime "completed_at"
     t.index ["bug_id"], name: "index_tasks_on_bug_id"
     t.index ["user_id"], name: "index_tasks_on_user_id"
   end
@@ -828,6 +936,16 @@ ActiveRecord::Schema.define(version: 2019_07_16_183924) do
     t.datetime "updated_at", null: false
   end
 
+  create_table "unused_attachments_exploits", options: "ENGINE=InnoDB DEFAULT CHARSET=utf8", force: :cascade do |t|
+    t.integer "attachment_id"
+    t.integer "exploit_id"
+  end
+
+  create_table "unused_attachments_rules", id: false, options: "ENGINE=InnoDB DEFAULT CHARSET=utf8", force: :cascade do |t|
+    t.integer "attachment_id"
+    t.integer "rule_id"
+  end
+
   create_table "unused_complaint_marked_commits", options: "ENGINE=InnoDB DEFAULT CHARSET=utf8", force: :cascade do |t|
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
@@ -843,6 +961,13 @@ ActiveRecord::Schema.define(version: 2019_07_16_183924) do
     t.integer "snort_escalation_research_bug_id"
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
+  end
+
+  create_table "unused_references_rules", id: false, options: "ENGINE=InnoDB DEFAULT CHARSET=utf8", force: :cascade do |t|
+    t.integer "reference_id"
+    t.integer "rule_id"
+    t.index ["reference_id"], name: "index_unused_references_rules_on_reference_id"
+    t.index ["rule_id"], name: "index_unused_references_rules_on_rule_id"
   end
 
   create_table "user_api_keys", options: "ENGINE=InnoDB DEFAULT CHARSET=latin1", force: :cascade do |t|
@@ -899,7 +1024,7 @@ ActiveRecord::Schema.define(version: 2019_07_16_183924) do
     t.index ["rgt"], name: "index_users_on_rgt"
   end
 
-  create_table "versions", options: "ENGINE=InnoDB DEFAULT CHARSET=utf8mb4", force: :cascade do |t|
+  create_table "versions", options: "ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci", force: :cascade do |t|
     t.string "item_type", limit: 191, null: false
     t.integer "item_id", null: false
     t.string "event", null: false
