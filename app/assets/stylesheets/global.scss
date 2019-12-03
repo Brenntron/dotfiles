@@ -7992,22 +7992,25 @@ td.text-center span {
   margin-top: 4px !important;
 }
 
-.cluster-mgt-loader-wrapper {
+.cluster-mgt-loader-wrapper, .webcat-loader-wrapper  {
   display: block;
   position: absolute;
-  margin: 100px 37%;
   width: 170px;
-
   .gear-loader-wrapper {
     margin-right: 5px;
     margin-top: 6px;
     float: left;
   }
-
   .loader-msg {
     display: inline-block;
     line-height: 3.5;
   }
+}
+.cluster-mgt-loader-wrapper{
+  margin: 100px 37%;
+}
+.webcat-loader-wrapper {
+  margin: 0 37%;
 }
 
 .loader-msg {
