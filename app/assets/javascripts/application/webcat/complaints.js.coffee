@@ -962,7 +962,7 @@ format = (complaint_entry_row) ->
 
   whois_lookup = if complaint_entry.ip_address then complaint_entry.ip_address else complaint_entry.domain
 
-  { entry_id } = complaint_entry
+  { entry_id, complaint_id } = complaint_entry
   complaint_entry_html = ''
   input_cat = 'input_cat_' + entry_id
 
@@ -999,7 +999,7 @@ format = (complaint_entry_row) ->
       "</div>" +
       "<div class='complaint-entry-info'>" +
       "<label class='content-label-sm'>Case ID</label>"+
-      "<span class='nested-complaint-data case-id'><a href='complaints #{entry_id}'>#{entry_id}</a></span>" +
+      "<span class='nested-complaint-data case-id'><a href='complaints/#{complaint_id}'>#{complaint_id}</a></span>" +
       "<label class='content-label-sm'>Entry URI</label>" +
       "<span class='nested-complaint-data input-truncate esc-tooltipped' id='entry-uri-#{entry_id}' title='#{url}'>#{url}</span>" +
       "<label class='content-label-sm' id='site-search'>Site Search</label>" +
