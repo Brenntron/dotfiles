@@ -625,9 +625,9 @@ Feature: Webcat complaints
   Scenario: a user uses the Update Resolution feature on a PENDING/COMPLETED ComplaintEntry and nothing is transacted
     Given a user with role "webcat user" exists and is logged in
     And the following complaint entries exist:
-      |id| uri            | status    | resolution | entry_type  |
-      |1 | blah.com       | PENDING   | FIXED      |  URI/DOMAIN |
-      |2 | food.com       | COMPLETED | FIXED      |  URI/DOMAIN |
+      |id| domain   | uri            | status    | resolution | entry_type  |
+      |1 | blah.com | blah.com       | PENDING   | FIXED      |  URI/DOMAIN |
+      |2 | food.com | food.com       | COMPLETED | FIXED      |  URI/DOMAIN |
     And I goto "/escalations/webcat/complaints"
     And I select row "2"
     And I select row "1"
@@ -642,7 +642,6 @@ Feature: Webcat complaints
     Then the following complaint entry with id: "1" has a resolution of: "FIXED"
     Then the following complaint entry with id: "2" has a status of: "COMPLETED"
     Then the following complaint entry with id: "2" has a resolution of: "FIXED"
-    Then I wait for "900" seconds
     Then I should see "Cannot process a resolution update to INVALID on Complaint Entry (blah.com) of status COMPLETED"
     Then I should see "Cannot process a resolution update to INVALID on Complaint Entry (food.com) of status PENDING"
 
