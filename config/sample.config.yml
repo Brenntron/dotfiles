@@ -1,7 +1,4 @@
 development:
-  amq: #active message queue
-    host: "localhost"
-    timeout: 2
   api_timeout:
     timeout: 15
   auto_resolve:
@@ -36,6 +33,9 @@ development:
       AC-Form: "redacted"
       TI-Form: "redacted"
       TI-API: "redacted"
+  magic_api:
+    host: "magic.vrt.sourcefire.com"
+    port: 80
   peakebridge:
     host: "localhost"
     port: 2966
@@ -50,14 +50,6 @@ development:
         aws_s3_host_name: "US East (N. Virginia)"
         aws_region: "us-east-1"
         aws_bucket: "redacted"
-  perl:
-    cmd: "/usr/bin/env perl"
-    canvas_root: "extras"
-    extras_dir: 'extras'
-    visruleparser_path: "extras/visruleparser.pl"
-    snort_json_path: 'extras/snort_json_parser.pl'
-    cve2x_path: "extras/cve2x.pl"
-    rule2yaml_path: "extras/rule2yaml.pl"
   rep_api:
     host: "fmdreputation.vrt.sourcefire.com"
     port: 443
@@ -71,8 +63,6 @@ development:
     verify_mode: "verify-none"
     username: "u/sourcefire"
     password: "redacted"
-  ruletest:
-    url: "https://localhost:3000/api_test"
   sds:
     host: "v2.sds.cisco.com"
     v3_host: "v3-web-intel-rest.talos.cisco.com"
@@ -80,17 +70,6 @@ development:
     pkey_file: "/usr/local/etc/sds-pkey.pem"
     username: "tidev"
     password: "REDACTED"
-  snort_doc_max_fails: 3
-  snort_org:
-    host: "localhost"
-    port: 3000
-    api_key: "redacted"
-  svn:
-    cmd: "/usr/bin/env svn"
-    password: ""
-    rules_repo_url: "https://repo-test.vrt.sourcefire.com/svn/rules/trunk"
-    ruledocs_repo_url: "https://repo-test.vrt.sourcefire.com/svn/rules/trunk/docs/rulesdocs/"
-    snort_rule_path: "extras/snort/snort-rules"
   talos_intelligence:
     host: "localhost"
     port: 3000
@@ -124,9 +103,6 @@ development:
     gssnegotiate: false
 
 test:
-  amq: #active message queue
-    host: "localhost"
-    timeout: 2
   api_timeout:
     timeout: 15
   auto_resolve:
@@ -160,6 +136,9 @@ test:
       AC-Form: "redacted"
       TI-Form: "redacted"
       TI-API: "redacted"
+  magic_api:
+    host: "magic.vrt.sourcefire.com"
+    port: 80
   peakebridge:
     host: "localhost"
     port: 2966
@@ -173,14 +152,6 @@ test:
         aws_s3_host_name: "US East (N. Virginia)"
         aws_region: "us-east-1"
         aws_bucket: "redacted"
-  perl:
-    cmd: "/usr/bin/env perl"
-    canvas_root: "extras"
-    extras_dir: 'extras'
-    visruleparser_path: "extras/visruleparser_dev.pl"
-    snort_json_path: 'extras/snort_json_parser.pl'
-    cve2x_path: "extras/cve2x_dev.pl"
-    rule2yaml_path: "extras/rule2yaml_dev.pl"
   rep_api:
     #host: "localhost"
     #port: 2944                          #default port for wbrs_stub
@@ -195,8 +166,6 @@ test:
     url: "https://ticloud-cdn-api.reversinglabs.com/"
     username: "u/sourcefire"
     password: "redacted"
-  ruletest:
-    url: "https://localhost:3000/api_test"
   sds:
     host: "v2.sds.cisco.com"
     ca_cert_file: "/usr/local/etc/sds-certificate.pem"
@@ -208,12 +177,6 @@ test:
     host: "localhost"
     port: 3000
     api_key: "redacted"
-  svn:
-    cmd: "/usr/bin/env svn"
-    password: "redacted"
-    rules_repo_url: "https://repo-test.vrt.sourcefire.com/svn/rules/trunk"
-    ruledocs_repo_url: "https://repo-test.vrt.sourcefire.com/svn/rules/trunk/docs/rulesdocs/"
-    snort_rule_path: "extras/snort/snort-rules"
   talos_intelligence:
     host: "localhost"
     port: 3000
@@ -224,6 +187,10 @@ test:
     port: 443
     verify_mode: "verify-none"
     api_key: "redacted"
+  ticloud:
+    host: "ticloud-cdn-api.reversinglabs.com"
+    port: 443
+    verify_mode: "verify-none"
   virustotal:
     url: "https://www.virustotal.com/vtapi/v2/url/report"
     host: "www.virustotal.com"
@@ -244,9 +211,6 @@ test:
     gssnegotiate: false
 
 staging:
-  amq:
-    host: "fmd-actmq-01stg.vrt.sourcefire.com"
-    timeout: 2
   api_timeout:
     timeout: 15
   auto_resolve:
@@ -277,7 +241,13 @@ staging:
     host: "intel.api.sourcefire.com"
     # verify_mode { "no-tls" for http, "verify-none" for self signed cert, "verify-peer" for CA }
     verify_mode: "verify-none"
-    api_key: "redacted"
+    api_keys:
+      AC-Form: "redacted"
+      TI-Form: "redacted"
+      TI-API: "redacted"
+  magic_api:
+    host: "magic.vrt.sourcefire.com"
+    port: 80
   peakebridge:
     host: "stevensville-stage.vrt.sourcefire.com"
     port: 443
@@ -291,14 +261,6 @@ staging:
         aws_s3_host_name: "US East (N. Virginia)"
         aws_region: "us-east-1"
         aws_bucket: "redacted"
-  perl:
-    cmd: "/usr/local/bin/perl"
-    canvas_root: "extras"
-    extras_dir: 'extras'
-    visruleparser_path: "extras/visruleparser.pl"
-    snort_json_path: 'extras/snort_json_parser.pl'
-    cve2x_path: "extras/cve2x.pl"
-    rule2yaml_path: "extras/rule2yaml.pl"
   rep_api:
     host: "fmdreputation.vrt.sourcefire.com"
     port: 443
@@ -312,25 +274,12 @@ staging:
     verify_mode: "verify-peer"
     username: "u/sourcefire"
     password: "redacted"
-  ruletest:
-    url: "https://ruletest-staging.vrt.sourcefire.com"
   sds:
     host: "v2.sds.cisco.com"
     cert_file: "/usr/local/etc/sds-certificate.pem"
     pkey_file: "/usr/local/etc/sds-pkey.pem"
     username: "tidev"
     passname: "redacted"
-  snort_doc_max_fails: 3
-  snort_org:
-    host: "localhost"
-    port: 3000
-    api_key: "redacted"
-  svn:
-    cmd: "/usr/local/bin/svn"
-    password: ""
-    rules_repo_url: "https://repo-staging.vrt.sourcefire.com/svn/rules/trunk"
-    ruledocs_repo_url: "https://repo-staging.vrt.sourcefire.com/svn/rules/trunk/docs/ruledocs/"
-    snort_rule_path: "extras/snort/snort-rules"
   talos_intelligence:
     host: "localhost"
     port: 3000
@@ -367,9 +316,10 @@ staging:
     gssnegotiate: false
 
 production:
-  amq: #active message queue
-    host: "mq.vrt.sourcefire.com"
-    timeout: 2
+  #amp_poke:
+  #  host: "redacted"
+  #  # verify_mode { "no-tls" for http, "verify-none" for self signed cert, "verify-peer" for CA }
+  #  verify_mode: "verify-peer"
   api_timeout:
     timeout: 15
   auto_resolve:
@@ -381,6 +331,9 @@ production:
       check: true
       url: "https://investigate.api.umbrella.com/domains/categorization/"
       api_key: "redacted"
+  bls:
+    host: "stage-bls-vip.sv4.ironport.com"
+    port: 443
   bugzilla:
     host: "bugzilla.vrt.sourcefire.com"
     api_key: "redacted"
@@ -401,6 +354,9 @@ production:
       AC-Form: "redacted"
       TI-Form: "redacted"
       TI-API: "redacted"
+  magic_api:
+    host: "magic.vrt.sourcefire.com"
+    port: 80
   peakebridge:
     host: "stevensville.vrt.sourcefire.com"
     port: 443
@@ -434,25 +390,12 @@ production:
     verify_mode: "verify-peer"
     username: "u/sourcefire"
     password: "redacted"
-  ruletest:
-    url: "https://ruletest.vrt.sourcefire.com"
   sds:
     host: "v2.sds.cisco.com"
     cert_file: "/usr/local/etc/sds-certificate.pem"
     pkey_file: "/usr/local/etc/sds-pkey.pem"
     username: "tidev"
     passname: "redacted"
-  snort_doc_max_fails: 10
-  snort_org:
-    host: "snort.org"
-    port: 443
-    api_key: "redacted"
-  svn:
-    cmd: "/usr/local/bin/svn"
-    password: ""
-    rules_repo_url: "https://repo.vrt.sourcefire.com/svn/rules/trunk"
-    ruledocs_repo_url: "https://repo.vrt.sourcefire.com/svn/rules/trunk/docs/ruledocs/"
-    snort_rule_path: "extras/snort/snort-rules"
   talos_intelligence:
     host: "localhost"
     port: 3000
@@ -464,6 +407,10 @@ production:
     # verify_mode { "no-tls" for http, "verify-none" for self signed cert, "verify-peer" for CA }
     verify_mode: "verify-peer"
     api_key: "redacted"
+  ticloud:
+    host: "ticloud-cdn-api.reversinglabs.com"
+    port: 443
+    verify_mode: "verify-none"
   virustotal:
     url: "https://www.virustotal.com/vtapi/v2/url/report"
     host: "www.virustotal.com"
