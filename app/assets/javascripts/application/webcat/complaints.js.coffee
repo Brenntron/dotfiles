@@ -1752,9 +1752,16 @@ window.updateResolution = () ->
     data: {'complaint_entries': complaint_entries, 'resolution': resolution, 'internal_comment': internal_comment, 'customer_facing_comment': customer_facing_comment}
     success_reload: true
     success: (response) ->
+      console.log response
       $('#resolution_dialog').modal('hide')
-      error_messages = JSON.parse(response).map (error) -> error.error_message
-      std_msg_error("The following entries could not be updated.", [error_messages], reload: true) unless error_messages.length == 0
+      error_complaints = JSON.parse(response).map (error) ->
+        disp = error.error_message
+        return err = error.error_message.substring(
+          error.error_message.lastIndexOf("Entry (") + 1,
+          error.error_message.lastIndexOf(") of")
+      )
+      console.log error_complaints
+      std_msg_error("The following entries could not be updated.", [error_complaints], reload: true)
   )
 
 $ ->
