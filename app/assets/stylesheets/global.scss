@@ -10640,7 +10640,8 @@ span.threat-cat-no-data {
   }
   span.entry-data-content {
     display: inline-block;
-    min-width: 400px;   // url/ip
+    min-width: 150px;
+    max-width: 400px;   // url/ip
   }
 }
 
@@ -10648,7 +10649,7 @@ span.threat-cat-no-data {
 .research-overview-row {
   background: $faint-neutral-color;
   td:nth-child(6) {
-    width: 170px;  // rule hits list
+    width: 130px;  // rule hits list
     word-break: break-word;
     padding-right: 10px;
   }

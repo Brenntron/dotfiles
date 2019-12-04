@@ -1098,8 +1098,8 @@ $ ->
       else if uri != null
         entry_content = uri
 
-      category = missing_data
-      if this.entry.primary_category != null
+      category = '<span class="missing-data">No assigned categories</span>'
+      if this.entry.primary_category != null && this.entry.primary_category != '{}'
         category = this.entry.primary_category
 
       status = missing_data
