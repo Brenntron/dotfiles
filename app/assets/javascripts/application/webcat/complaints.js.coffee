@@ -1739,6 +1739,8 @@ window.updateResolutionDialog = (confirm) ->
 window.updateResolution = () ->
   resolution = $('#complaint_resolution')[0].value
   selected_rows = $('tr.selected')
+  internal_comment = $('#internal_comment')[0].value
+  customer_facing_comment = $('#customer_facing_comment')[0].value
 
   complaint_entries = []
   for row in selected_rows
@@ -1747,12 +1749,13 @@ window.updateResolution = () ->
   std_msg_ajax(
     method: 'POST'
     url: "/escalations/api/v1/escalations/webcat/complaint_entries/update_resolution"
-    data: {'complaint_entries': complaint_entries, 'resolution': resolution}
+    data: {'complaint_entries': complaint_entries, 'resolution': resolution, 'internal_comment': internal_comment, 'customer_facing_comment': customer_facing_comment}
     success_reload: true
-    error: (response) ->
-      std_api_error(response, "The following entries could not be updated.", reload: true)
+    success: (response) ->
+      $('#resolution_dialog').modal('hide')
+      error_messages = JSON.parse(response).map (error) -> error.error_message
+      std_msg_error("The following entries could not be updated.", [error_messages], reload: true) unless error_messages.length == 0
   )
-
 
 $ ->
   $('#cat_new_url_modal').on 'shown.bs.modal', ->

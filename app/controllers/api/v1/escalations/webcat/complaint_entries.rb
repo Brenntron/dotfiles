@@ -533,24 +533,27 @@ module API
             params do
               requires :complaint_entries, type: Array[Integer]
               requires :resolution, type: String
+              optional :internal_comment, type: String
+              optional :customer_facing_comment, type: String
             end
             post 'update_resolution' do
               std_api_v2 do
                 errors = []
                 permitted_params[:complaint_entries].each do |entry|
-                  complaint_entry = ComplaintEntry.find(entry)
-
                   begin
-                    complaint_entry.process_resolution_change(permitted_params[:resolution])
+                    complaint_entry = ComplaintEntry.find(entry)
+                    processed = complaint_entry.process_resolution_changes(permitted_params[:resolution], permitted_params[:internal_comment], permitted_params[:customer_facing_comment])
+                    errors << processed unless processed.empty?
                   rescue
-                    errors << entry
+                    errors << {id: entry.id, resolution: permitted_params[:resolution], internal_comment: permitted_params[:internal_comment],
+                               customer_facing_comment: permitted_params[:customer_facing_comment,
+                               error_message: "Database error occurred on the  while processing Complaint Entry (#{self.hostlookup})"]
+                              }
                   end
-
                 end
                 errors.to_json
               end
             end
-
           end
         end
       end

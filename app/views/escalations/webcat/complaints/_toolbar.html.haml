@@ -42,7 +42,14 @@
         .toolbar
           %div
             %label.toolbar-section-label Edit Resolution
-            = select(:complaint, :resolution, options_for_select([["Unchanged", "UNCHANGED"], ["Fixed", "FIXED"], ["Invalid", "INVALID"]]))
+            = select(:complaint, :resolution, options_for_select([["Unchanged", "UNCHANGED"], ["Invalid", "INVALID"], ["Reopened", "REOPENED"]]))
+            %br
+            %br
+            %br
+            %input.inline-input.form-control#internal_comment{:name => "token", :type => "text", :value => "", :placeholder=>"Internal Comment"}
+            %br
+            %br
+            %input.inline-input.form-control#customer_facing_comment{:name => "token", :type => "text", :value => "", :placeholder=>"Customer Facing Comment"}
           %button{class: 'primary', type:'button', id: 'button_update_resolution', onclick:'updateResolutionDialog();'}
             Update
   %div

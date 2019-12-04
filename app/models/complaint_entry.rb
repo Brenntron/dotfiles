@@ -986,13 +986,25 @@ class ComplaintEntry < ApplicationRecord
     end
   end
 
-  def process_resolution_change(resolution)
-    if self.status != "COMPLETED"
+  def process_resolution_changes(resolution, internal_comment, customer_facing_comment)
+    error = {}
+    if self.status != "COMPLETED" && resolution != "REOPENED"
       if self.is_important
-        self.update(status: "PENDING", resolution: resolution)
+        self.update(status: "PENDING", resolution: resolution, internal_comment: internal_comment, resolution_comment: customer_facing_comment)
       else
-        self.update(status: "COMPLETED", resolution: resolution)
+        self.update(status: "COMPLETED", resolution: resolution, internal_comment: internal_comment, resolution_comment: customer_facing_comment)
       end
+      # Error catch: cannot set a ComplaintEntry to "REOPENED" unless it has a status of "COMPLETED"
+    elsif self.status != "COMPLETED" && resolution == "REOPENED"
+      error.update(id: self.id, resolution: resolution, internal_comment: internal_comment, customer_facing_comment: customer_facing_comment,
+                    error_message: "Cannot process a status update of #{resolution} on Complaint Entry (#{self.hostlookup}) of status #{self.status}")
+    elsif self.status == "COMPLETED" && resolution == "REOPENED"
+      self.update(status: "REOPENED", resolution: nil)
+    else
+      # Error catch: cannot update a ComplaintEntry's resolution if it has a status of "COMPLETED"
+     error.update(id: self.id, resolution: resolution, internal_comment: internal_comment, customer_facing_comment: customer_facing_comment,
+                    error_message: "Cannot process a resolution update to #{resolution} on Complaint Entry (#{self.hostlookup})  of status #{self.status}")
     end
+    error
   end
 end
