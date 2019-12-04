@@ -10635,8 +10635,8 @@ span.threat-cat-no-data {
 .research-first-row {
   margin-top: 120px;
   td:nth-child(3) {
-    min-width: 60px;
-    width:300px;
+    max-width: 300px;
+    min-width: 100px;
     word-break: break-word;
     padding-right: 10px;
   }
@@ -10648,8 +10648,15 @@ span.threat-cat-no-data {
   .entry-data-wlbl {
     min-width: 85px;
   }
+  span.entry-data-content {
+    display: inline-block;
+    min-width: 150px;
+    max-width: 400px;   // url/ip
+  }
 
   td:nth-child(6) {
+    width: 130px;  // rule hits list
+    word-break: break-word;
     padding-right: 10px;
   }
 
