@@ -10630,77 +10630,114 @@ span.threat-cat-no-data {
 }
 
 
-// research rows alignment/formatting updates
-// top row of each
+// RESEARCH ROWS ON SHOW PAGE + BFRP
+.research-table-details-wrapper table td {
+  padding: 7px 4px 7px 8px;
+}
+
+.research-table-details-wrapper table td.input-col {
+  padding: 6px 6px 6px 9px;
+  text-align: center;
+}
+
+.research-table-details-wrapper table tr:first-of-type td.input-col {
+  vertical-align: middle;
+}
+
+// FIRST ROW of each entry (contains the URL + category)
 .research-first-row {
   margin-top: 120px;
-  td:nth-child(3) {
-    max-width: 300px;
-    min-width: 100px;
-    word-break: break-word;
+  // PRIMARY CELL WIDTHS
+  .expandable-cell {
+    width: 20px;
+  }
+  .cb-cell {
+    width: 20px;
+  }
+  .url-cell {
+    width: 500px;
     padding-right: 10px;
+    span.entry-data-content {
+      display: inline-block;
+      word-break: break-all;
+      min-width: 150px;
+      max-width: 400px;
+    }
   }
-
-  td:nth-child(4) {
-    min-width: 90px;
+  .category-cell {
+    width: 300px;
   }
-
-  .entry-data-wlbl {
-    min-width: 85px;
+  .hostname-cell {
+    width: 200px;
   }
-  span.entry-data-content {
-    display: inline-block;
-    min-width: 150px;
-    max-width: 400px;   // url/ip
+  .status-cell {
+    width: 150px;
   }
-
-  td:nth-child(7) {
-    min-width: 130px !important;
-    max-width: 150px!important;
-    overflow-wrap: break-word;
+  .resolution-cell {
+    width: 200px;
   }
-
-  td:nth-child(9) {
-    width: 130px;
-  }
-
-  td:nth-child(10) {
-    width: 20px; // xbrs history
-  }
-
-  td:nth-child(12) {
-    min-width: 10px; // reptool class
-  }
-
-  td:nth-child(13) {
-    min-width: 110px;
-    word-break: break-word;
-  }
-  td:nth-child(15) {
-    min-width: 110px;
-  }
-  td:nth-child(16) {
-    width: 190px; // wl/bl lists + threat cats
-  }
-
-  td:last-child {
-    min-width: 80px;
-  }
-
-  span.entry-data-content {
-    display: inline-block;
-    min-width: 500px;   // url/ip
+  .date-time-cell {
+    width: 200px;
   }
 }
 
-// second row of each
+
+// SECOND ROW of each entry
 .research-overview-row {
   background: $faint-neutral-color;
+  // PRIMARY CELL WIDTHS
+  .wbrs-score-label-cell {
+    width: 50px;
+  }
+  .wbrs-score-cell {
+    width: 60px;
+  }
+  .wbrs-rule-hits-label-cell {
+    width: 90px;
+  }
+  .wbrs-rule-hits-cell {
+    width: 50px;
+  }
+  .wbrs-rules-label-cell {
+    width: 80px;
+  }
+  .wbrs-rules-cell {
+    width: 120px;
+    word-break: break-all;
+  }
+  .xbrs-history-label-cell {
+    width: 100px;
+  }
+  .xbrs-history-cell {
+    width: 50px;
+  }
+  .virustotal-label-cell {
+    width: 80px;
+  }
+  .virustotal-cell {
+    width: 50px;
+  }
+  .wlbl-tc-label-cell {
+    width: 80px;
+  }
+  .wlbl-tc-cell {
+    width: 140px;
+  }
+  .referenced-tickets-label-cell {
+    width: 80px;
+  }
+  .referenced-tickets-cell {
+    width: 150px;
+  }
+  .reptool-cell {
+    max-width: 180px;
+  }
+  // bg colors for checkbox cells
   td {
+    vertical-align: middle;
     &:first-child{
       background: $content-bg-color;
     }
-    vertical-align: top;
     .wbrs-input-wrapper {
       background-color: $bug-section-color;
     }
@@ -10721,7 +10758,7 @@ span.threat-cat-no-data {
     }
   }
   .input-col input {
-    margin: 8px 8px auto 8px;
+    margin: 2px 8px auto 8px;
   }
   .rule-hits-cols-list {
     width: 130px;  // rule hits list
