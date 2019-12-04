@@ -538,20 +538,20 @@ module API
             end
             post 'update_resolution' do
               std_api_v2 do
-                errors = []
+                confirmations = []
                 permitted_params[:complaint_entries].each do |entry|
                   begin
                     complaint_entry = ComplaintEntry.find(entry)
                     processed = complaint_entry.process_resolution_changes(permitted_params[:resolution], permitted_params[:internal_comment], permitted_params[:customer_facing_comment])
-                    errors << processed unless processed.empty?
+                    confirmations << processed
                   rescue
-                    errors << {id: entry.id, resolution: permitted_params[:resolution], internal_comment: permitted_params[:internal_comment],
-                               customer_facing_comment: permitted_params[:customer_facing_comment,
-                               error_message: "Database error occurred on the  while processing Complaint Entry (#{self.hostlookup})"]
-                              }
+                    confirmations << {status: 'ERROR', id: entry.id, resolution: permitted_params[:resolution], internal_comment: permitted_params[:internal_comment],
+                                      customer_facing_comment: permitted_params[:customer_facing_comment,
+                                      message: "Database error occurred on the  while processing Complaint Entry (#{self.hostlookup})"]
+                                     }
                   end
                 end
-                errors.to_json
+                confirmations.to_json
               end
             end
           end

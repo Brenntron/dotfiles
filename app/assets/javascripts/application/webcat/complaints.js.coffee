@@ -1753,8 +1753,11 @@ window.updateResolution = () ->
     success_reload: true
     success: (response) ->
       $('#resolution_dialog').modal('hide')
-      error_messages = JSON.parse(response).map (error) -> error.error_message
-      std_msg_error("The following entries could not be updated.", [error_messages], reload: true) unless error_messages.length == 0
+      confirmation_messages = JSON.parse(response).map (error) -> error.message
+
+      console.log(JSON.parse(response))
+      # Determine whether to render a success or error modal accordingly
+      std_msg_success("The following entries could not be updated.", [confirmation_messages], reload: true) unless confirmation_messages.length == 0
   )
 
 $ ->

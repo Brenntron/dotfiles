@@ -987,24 +987,30 @@ class ComplaintEntry < ApplicationRecord
   end
 
   def process_resolution_changes(resolution, internal_comment, customer_facing_comment)
-    error = {}
+    confirmation = {}
     if !["COMPLETED","PENDING"].include?(self.status) && resolution != "REOPENED"
       if self.is_important
         self.update(status: "PENDING", resolution: resolution, internal_comment: internal_comment, resolution_comment: customer_facing_comment)
+        confirmation.update(status: 'SUCCESS', host: self.hostlookup, resolution: resolution, internal_comment: internal_comment, customer_facing_comment: customer_facing_comment,
+                            message: "Successfully processed a resolution update of #{resolution} on Complaint Entry (#{self.hostlookup}) of status #{self.status}")
       else
         self.update(status: "COMPLETED", resolution: resolution, internal_comment: internal_comment, resolution_comment: customer_facing_comment)
+        confirmation.update(status: 'SUCCESS', host: self.hostlookup, resolution: resolution, internal_comment: internal_comment, customer_facing_comment: customer_facing_comment,
+                            message: "Successfully processed a resolution update of #{resolution} on Complaint Entry (#{self.hostlookup}) of status #{self.status}")
       end
       # Error catch: cannot set a ComplaintEntry to "REOPENED" unless it has a status of "COMPLETED"
     elsif self.status != "COMPLETED" && resolution == "REOPENED"
-      error.update(id: self.id, resolution: resolution, internal_comment: internal_comment, customer_facing_comment: customer_facing_comment,
-                    error_message: "Cannot process a status update of #{resolution} on Complaint Entry (#{self.hostlookup}) of status #{self.status}")
+      confirmation.update(status: 'ERROR', host: self.hostlookup, resolution: resolution, internal_comment: internal_comment, customer_facing_comment: customer_facing_comment,
+                          message: "Cannot process a status update of #{resolution} on Complaint Entry (#{self.hostlookup}) of status #{self.status}")
     elsif self.status == "COMPLETED" && resolution == "REOPENED"
       self.update(status: "REOPENED", resolution: nil)
+      confirmation.update(status: 'SUCCESS', host: self.hostlookup, resolution: resolution, internal_comment: internal_comment, customer_facing_comment: customer_facing_comment,
+                          message: "Successfully processed a status update of #{resolution} on Complaint Entry (#{self.hostlookup}) of status #{self.status}")
     else
       # Error catch: cannot update a ComplaintEntry's resolution if it has a status of "COMPLETED" or "PENDING"
-     error.update(id: self.id, resolution: resolution, internal_comment: internal_comment, customer_facing_comment: customer_facing_comment,
-                    error_message: "Cannot process a resolution update to #{resolution} on Complaint Entry (#{self.hostlookup})  of status #{self.status}")
+      confirmation.update(status: 'ERROR', host: self.hostlookup, resolution: resolution, internal_comment: internal_comment, customer_facing_comment: customer_facing_comment,
+                          message: "Cannot process a resolution update to #{resolution} on Complaint Entry (#{self.hostlookup})  of status #{self.status}")
     end
-    error
+    confirmation
   end
 end
