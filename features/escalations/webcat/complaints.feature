@@ -635,6 +635,7 @@ Feature: Webcat complaints
     And I click "#index_update_resolution"
     And I select "Invalid" from "complaint_resolution"
     And I click ".primary"
+    Then I wait for "2" seconds
     And I should see "The following 2 entries will have their RESOLUTIONS set to INVALID."
     And I click "#submit_resolution_changes"
     And I wait for "3" seconds
@@ -642,8 +643,8 @@ Feature: Webcat complaints
     Then the following complaint entry with id: "1" has a resolution of: "FIXED"
     Then the following complaint entry with id: "2" has a status of: "COMPLETED"
     Then the following complaint entry with id: "2" has a resolution of: "FIXED"
-    Then I should see "Cannot process a resolution update to INVALID on Complaint Entry (blah.com) of status COMPLETED"
-    Then I should see "Cannot process a resolution update to INVALID on Complaint Entry (food.com) of status PENDING"
+    Then I should see "Cannot process a resolution update to INVALID on Complaint Entry (blah.com) of status PENDING"
+    Then I should see "Cannot process a resolution update to INVALID on Complaint Entry (food.com) of status COMPLETED"
 
 
   @javascript
