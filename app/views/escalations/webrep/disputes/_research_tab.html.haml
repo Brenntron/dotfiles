@@ -560,7 +560,7 @@
                 %tr.research-overview-row
                   %td
                     -#Expander area
-                  %td.research-table-details-wrapper{colspan: '9'}
+                  %td.research-table-details-wrapper{colspan: '20'}
                     %table
                       %tr
                         %td.input-col.wbrs-input-wrapper
@@ -618,7 +618,8 @@
                             %span.wlbl-table-result
                               = entry.wbrs_list_type
                             %span.wlbl-tc-research-span
-                            %button.dispute-inline-buttons.history-button.esc-tooltipped{title: 'WL/BL History', onclick: "wlbl_history_dialog(#{entry.id})"}
+                        %td.history-button-cell
+                          %button.dispute-inline-buttons.history-button.esc-tooltipped{title: 'WL/BL History', onclick: "wlbl_history_dialog(#{entry.id})"}
 
                         %td.left-bordered.referenced-tickets-label-cell
                           %label Referenced on
@@ -693,6 +694,7 @@
                           %label Umbrella
                         %td.text-center.umbrella-cell
                           = entry.umbrellaresult
+                        %td
 
                         %td.left-bordered
                           %label Last Submitted

@@ -10631,23 +10631,52 @@ span.threat-cat-no-data {
 
 
 // RESEARCH ROWS ON SHOW PAGE + BFRP
+// RESEARCH ROWS ON SHOW PAGE + BFRP
+#disputes-research-table {
+  border-collapse: separate;
+  border-spacing: 0 10px;  // add vertical space between rows
+}
+
+#research-tab-toolbar, #research-page-toolbar {
+  margin-bottom: 5px;
+}
+
 .research-table-details-wrapper table td {
   padding: 7px 4px 7px 8px;
+}
+
+#disputes-research-table .research-table-details-wrapper table td label {
+  padding-right: 0;
 }
 
 .research-table-details-wrapper table td.input-col {
   padding: 6px 6px 6px 9px;
   text-align: center;
+  max-width: 15px;
 }
 
 .research-table-details-wrapper table tr:first-of-type td.input-col {
   vertical-align: middle;
 }
 
+.research-table-row:not(:first-of-type) {
+  padding-top: 40px;
+}
+
+// ensure basic formatting here
+.dispute_rep_tools_wrapper {
+  position: static;
+  width: 90px;
+  margin-left: 0;
+  margin-top: 0;
+}
+
+// fit-content = min(max-content, max(min-content, fill-available))
+
 // FIRST ROW of each entry (contains the URL + category)
 .research-first-row {
   margin-top: 120px;
-  // PRIMARY CELL WIDTHS
+  // PRIMARY CELL WIDTHS, NEEDS PRECISE WIDTH ADJUSTMENTS TO ENSURE CONSISTENCY
   .expandable-cell {
     width: 20px;
   }
@@ -10657,11 +10686,16 @@ span.threat-cat-no-data {
   .url-cell {
     width: 500px;
     padding-right: 10px;
+    vertical-align: top;
     span.entry-data-content {
       display: inline-block;
       word-break: break-all;
-      min-width: 150px;
-      max-width: 400px;
+    }
+  }
+  // huge screens, allow more url width
+  @media screen and (min-width: 1600px) {
+    .url-cell {
+      width: 30%;
     }
   }
   .category-cell {
@@ -10679,58 +10713,74 @@ span.threat-cat-no-data {
   .date-time-cell {
     width: 200px;
   }
+  .rep-tools-cell {
+    width: 130px;
+    button {
+      margin-right: 1px;
+    }
+  }
 }
 
 
 // SECOND ROW of each entry
 .research-overview-row {
   background: $faint-neutral-color;
-  // PRIMARY CELL WIDTHS
+  // PRIMARY CELL WIDTHS, NEEDS PRECISE WIDTH ADJUSTMENTS
   .wbrs-score-label-cell {
-    width: 50px;
+    width: 3%;
+    max-width: 50px;
   }
   .wbrs-score-cell {
-    width: 60px;
+    width: 40px;
   }
   .wbrs-rule-hits-label-cell {
-    width: 90px;
+    width: 6%;
+    max-width: 80px;
   }
   .wbrs-rule-hits-cell {
-    width: 50px;
+    width: 30px;
   }
   .wbrs-rules-label-cell {
-    width: 80px;
+    width: 6%;
+    max-width: 70px;
   }
   .wbrs-rules-cell {
-    width: 120px;
+    width: 5%;
     word-break: break-all;
   }
   .xbrs-history-label-cell {
-    width: 100px;
+    width: 6%;
+    max-width: 90px;
   }
   .xbrs-history-cell {
     width: 50px;
   }
   .virustotal-label-cell {
-    width: 80px;
+    max-width: 80px;
+    width: 5%;
   }
   .virustotal-cell {
     width: 50px;
   }
   .wlbl-tc-label-cell {
-    width: 80px;
+    width: 2%;  // use percentage to ensure certain widths
   }
   .wlbl-tc-cell {
-    width: 140px;
+    width: 5%;
+  }
+  .history-button-cell {
+    padding: 6px 0;
+    width: 2%;
+    max-width: 20px;
+    button {
+      float: none;
+    }
   }
   .referenced-tickets-label-cell {
     width: 80px;
   }
   .referenced-tickets-cell {
-    width: 150px;
-  }
-  .reptool-cell {
-    max-width: 180px;
+    width: 110px;
   }
   // bg colors for checkbox cells
   td {
@@ -10773,14 +10823,14 @@ td.input-col {
 
 
 .wlbl-tc-research-span {
-  display: inline-block;
+  display: inline;
   padding-top: 1px;
   min-width: 0;
   max-width: 150px;
   vertical-align: middle;
 }
 
-.wlbl-and-tc-area .dispute-inline-buttons.history-button {
+.research-table-details-wrapper .history-button {
   display: inline-block;
   width: 20px;
 }
@@ -11243,4 +11293,9 @@ td.input-col {
 
 #disputes-research-table{
   background: $ac-nav-bg-color;
+  max-width: 2200px;  // set a reasonable max-width
+}
+
+.dispute-entry-ip-uri {
+  word-break: break-all;
 }

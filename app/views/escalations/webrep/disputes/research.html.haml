@@ -442,7 +442,7 @@
                   %tr.research-overview-row
                     %td
                     -#Expander area
-                    %td.research-table-details-wrapper{colspan: '8'}
+                    %td.research-table-details-wrapper{colspan: '20'}
                       %table
                         %tr
                           %td.input-col.wbrs-input-wrapper
@@ -498,8 +498,8 @@
                               %span.wlbl-table-result
                                 = entry.consolidated_wlbl_strings
                               %span.wlbl-tc-research-span
-                              %button.dispute-inline-buttons.history-button.esc-tooltipped{title: 'WL/BL History', onclick: "wlbl_history_dialog('#{entry.hostlookup}')"}
-
+                          %td.history-button-cell
+                            %button.dispute-inline-buttons.history-button.esc-tooltipped{title: 'WL/BL History', onclick: "wlbl_history_dialog('#{entry.hostlookup}')"}
 
                           %td.left-bordered.referenced-tickets-label-cell
                             %label Referenced on
