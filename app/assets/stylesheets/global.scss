@@ -9065,7 +9065,7 @@ button.secondary.view-report-external-button {
     margin: 0 0 0 20px;
     width: 100%;
     min-width: 200px;
-    max-width: 450px;
+    max-width: 550px;
   }
 
   // search input field
@@ -9098,6 +9098,7 @@ button.secondary.view-report-external-button {
     float: right;
   }
 
+
   // file rep navbar specific styles - minor width adjustments, col-lg-1 is too tight, col-lg-2 too wide
   @media screen and (min-width: 1200px) {
     .col-lg-1.nav-naming-guide, .col-lg-1.nav-new-ticket {
@@ -9106,6 +9107,16 @@ button.secondary.view-report-external-button {
     // below ensures the navbar widths adds up correctly
     .col-lg-2.nav-username {
       width: 17%;
+    }
+  }
+
+  // 1430px specific
+  @media screen and (min-width: 1201px) and (max-width: 1500px) {
+    .nav-page-button-wrapper {
+      width: 120px;
+    }
+    .col-lg-2.nav-username {
+      display: none;
     }
   }
 
