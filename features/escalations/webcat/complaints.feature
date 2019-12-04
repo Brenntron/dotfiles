@@ -621,6 +621,31 @@ Feature: Webcat complaints
     Then the following complaint entry with id: "2" has a resolution of: "FIXED"
     Then the following complaint entry with id: "3" has a resolution of: "FIXED"
 
+  @javascript
+  Scenario: a user uses the Update Resolution feature on a PENDING/COMPLETED ComplaintEntry and nothing is transacted
+    Given a user with role "webcat user" exists and is logged in
+    And the following complaint entries exist:
+      |id| uri            | status    | resolution | entry_type  |
+      |1 | blah.com       | PENDING   | FIXED      |  URI/DOMAIN |
+      |2 | food.com       | COMPLETED | FIXED      |  URI/DOMAIN |
+    And I goto "/escalations/webcat/complaints"
+    And I select row "2"
+    And I select row "1"
+    And I click "#subdomain_1"
+    And I click "#index_update_resolution"
+    And I select "Invalid" from "complaint_resolution"
+    And I click ".primary"
+    And I should see "The following 2 entries will have their RESOLUTIONS set to INVALID."
+    And I click "#submit_resolution_changes"
+    And I wait for "3" seconds
+    Then the following complaint entry with id: "1" has a status of: "PENDING"
+    Then the following complaint entry with id: "1" has a resolution of: "FIXED"
+    Then the following complaint entry with id: "2" has a status of: "COMPLETED"
+    Then the following complaint entry with id: "2" has a resolution of: "FIXED"
+    Then I wait for "900" seconds
+    Then I should see "Cannot process a resolution update to INVALID on Complaint Entry (blah.com) of status COMPLETED"
+    Then I should see "Cannot process a resolution update to INVALID on Complaint Entry (food.com) of status PENDING"
+
 
   @javascript
   Scenario: a user uses the Update Resolution feature on an important entry
