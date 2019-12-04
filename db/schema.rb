@@ -370,6 +370,7 @@ ActiveRecord::Schema.define(version: 2019_11_07_162402) do
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
     t.text "umbrella", limit: 4294967295
+    t.text "wbrs_threat_category"
     t.index ["dispute_entry_id"], name: "index_dispute_entry_preloads_on_dispute_entry_id"
   end
 
@@ -957,7 +958,7 @@ ActiveRecord::Schema.define(version: 2019_11_07_162402) do
     t.index ["rgt"], name: "index_users_on_rgt"
   end
 
-  create_table "versions", options: "ENGINE=InnoDB DEFAULT CHARSET=utf8mb4", force: :cascade do |t|
+  create_table "versions", options: "ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci", force: :cascade do |t|
     t.string "item_type", limit: 191, null: false
     t.integer "item_id", null: false
     t.string "event", null: false

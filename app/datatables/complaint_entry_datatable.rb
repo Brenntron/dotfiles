@@ -87,7 +87,7 @@ class ComplaintEntryDatatable < AjaxDatatablesRails::ActiveRecord
   # private
 
   def get_raw_records
-    ComplaintEntry.all
+    ComplaintEntry.includes(complaint: {customer: :company}, user: {})
   end
 
   def filter_records(records)

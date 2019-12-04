@@ -125,34 +125,54 @@ window.bulk_get_current_wlbl = (page) ->
     if $(dropdown_wrapper).attr('data-disable-submit') == 'disable'
       $(dropdown_wrapper).find('.disabled-submit-msg').removeClass('hidden')
 
+    console.log 'YOU ARE IN BULK ADJUST, DO THE AJAX CALL...'
+
     std_msg_ajax(
       url: '/escalations/api/v1/escalations/webrep/disputes/bulk_rule_ui_wlbl_get_info_for_form'
       method: 'POST'
       data: data
       success: (response) ->
+        console.log 'RESPONSE:'
+        console.log response
         response = JSON.parse(response)
         for entry in response   # wait until tc's are resolved to write out the full table rows
           tc_promise = new Promise (resolve, reject) ->
             tc_json = get_threat_categories(entry.ip_uri)
-            if tc_json then resolve tc_json  # resolve goes to .then() below
-          .then( build_tc_row.bind(null, entry, tbody)).then ->
-            order_wlbl_table_rows()
-          .then null, (err) ->
-            std_msg_error( 'Error retrieving WL/BL Data', response)  # handle this error silently if needed
-
+            if tc_json
+              resolve(tc_json)  # resolve goes to .then() below
+          .then(build_tc_row.bind(null, entry, tbody))
           comment_box.text(comment_trail)
+
       error: (response) ->
-        std_msg_error('Error retrieving WL/BL Data', response)
+        std_msg_error('Error retrieving WL/BL Data in Bulk Adjust', response)
+
+      complete: () ->
+        # slight delay to ensure row order, refactor when time avail
+        setTimeout (->
+          bulk_order_rows()  # first, order the rows
+        ),600
     )
   else
     std_msg_error('No rows selected', ['Please select at least one entry row.'])
     return false
 
   # build the top blue dispute rows with wl/bl's and threat cats, ensures the row gets built correctly (KH refactor)
-  build_tc_row = (entry, tbody, result) ->
+  window.build_tc_row = (entry, tbody, result) ->
+    console.log 'YOU HAVE ENTERED build_tc_row, HERE IS CURR ENTRY:'
+    console.log entry
+
     { threat_categories } = JSON.parse(result)
     { ip_uri, list_types, wbrs_score, comment } = entry
-    tc_str = threat_categories.join(', ')
+
+    console.log 'THREAT CATEGORIES IF ANY:'
+    console.log threat_categories
+
+    # first row is built? hide the loading row
+    $(tbody).find('.loading-rows').addClass('hidden')
+
+    tc_str = ''
+    if threat_categories?
+      tc_str = threat_categories.join(', ')
 
     if list_types
       list_types = entry['list_types'].sort().reverse().join(', ')  # sort by weak, then med, then heavy
@@ -170,6 +190,8 @@ window.bulk_get_current_wlbl = (page) ->
     if list_types.length == 0
       list_types = "<span class='missing-data'>Not on a list</span>"
 
+    console.log ip_uri, list_types, wbrs_score
+
     table_row =
       "<tr class='wlbl-dropdown-row'>
       <td class='wlbl-entry-content'>#{ip_uri}</td>
@@ -179,59 +201,55 @@ window.bulk_get_current_wlbl = (page) ->
       </tr>"
 
     $(tbody).append(table_row)
-    $(tbody).find('.loading-rows').addClass('hidden')
-
-  # order the rows after the build to ensure correct order on left and right sides
-  order_wlbl_table_rows = () ->
-    # at this point in the dom, the blue rows are built, and are ready to have classes added into them
-    if $('#wlbl_adjust_entries_index').length > 0  # index dropdown
-      curr_dd = '#wlbl_adjust_entries_index'
-      left_cbs = '#disputes-index .dispute-entry-checkbox:checked'
-      url_entry = '.entry-col-content'
-    else  # show page dropdown and bfrp dropdown bulk
-      curr_dd = '#wlbl_adjust_entries'
-      left_cbs = '#disputes-research-table .dispute_check_box:checked'
-      url_entry = '.entry-data-content'
-
-    $(left_cbs).each (i) ->  # add the order ids to left and right sides
-      ip_uri = $(this).closest('tr').find(url_entry).text().trim()
-      if $('.bfrp-table').length > 0
-        ip_uri = $(this).closest('tr').find('.entry-data-content').text().trim()
-      $(this).closest('tr').attr('data-order-id', i)  # add row-id to the left, this works on bfrp confirmed
-
-      if $('body').hasClass('index-action')
-        curr_entry_id = 'wlbl-entry-id-' + $(this).attr('id')
-      else if $('body').hasClass('show-action')
-        curr_entry_id = 'wlbl-entry-id-' + $(this).attr('data-entry-id')
-      else if location.href.includes('research')
-        curr_entry_id = $(this).attr('class').split(' ').pop()
-        # for the bulk dropdowns on bfrp, ensure unique classes in dropdown, bfrp bulk dd'S
-        curr_entry_id = curr_entry_id.replace('-result-','-dd-result-')
-
-      # fyi: bugfix for comparing the http/non-http versions of these urls/domains
-      $(curr_dd).find('.wlbl-entry-content').each ->
-        curr_text = $(this).text().trim()
-        if ip_uri.includes(curr_text)
-          $(this).closest('tr').attr('data-order-id', i)  # add row-id to the right
-
-#          console.log curr_entry_id
-          # ENSURE YOU ALWAYS ADDING A UNIQUE -DD- CLASS-ID EACH TIME TO BULK DROPDOWN
-          $(this).closest('tr').find('td.wlbl-entry-wlbl').attr('class','wlbl-entry-wlbl').addClass(curr_entry_id)
-
-#          if $(curr_entry_id).length == 0
-#            $(this).closest('tr').find('td.wlbl-entry-wlbl').addClass(curr_entry_id)
 
 
 
-    table_dd = $(curr_dd).find('tbody')
-    rows = $(table_dd).find('tr')
+# order the rows for bulk dropdown, same order on left cbs as on right dd rows
+window.bulk_order_rows = () ->
+  if $('#wlbl_adjust_entries_index').length > 0  # index dropdown
+    curr_dd = '#wlbl_adjust_entries_index'
+    left_cbs = '#disputes-index .dispute-entry-checkbox:checked'
+    url_entry = '.entry-col-content'
+  else  # show page dropdown and bfrp dropdown bulk
+    curr_dd = '#wlbl_adjust_entries'
+    left_cbs = '#disputes-research-table .dispute_check_box:checked'
+    url_entry = '.entry-data-content'
 
-    # basic sort by id/integer
-    rows.sort (a, b) ->
-      x = $(a).attr('data-order-id')
-      y = $(b).attr('data-order-id')
-      x - y
-    $(rows).each (i, row) -> table_dd.append(row)
+  $(left_cbs).each (i) ->  # add the order ids to left and right sides
+    ip_uri = $(this).closest('tr').find(url_entry).text().trim()
+    if $('.bfrp-table').length > 0
+      ip_uri = $(this).closest('tr').find('.entry-data-content').text().trim()
+    $(this).closest('tr').attr('data-order-id', i)  # add row-id to the left, this works on bfrp confirmed
+
+    if $('body').hasClass('index-action')
+      curr_entry_id = 'wlbl-entry-id-' + $(this).attr('id')
+    else if $('body').hasClass('show-action')
+      curr_entry_id = 'wlbl-entry-id-' + $(this).attr('data-entry-id')
+    else if $('body').hasClass('research-action')
+      curr_entry_id = $(this).attr('class').split(' ').pop()
+      # for the bulk dropdowns on bfrp, ensure unique classes in dropdown, bfrp bulk dd'S
+      curr_entry_id = curr_entry_id.replace('-result-','-dd-result-')
+
+    # fyi: bugfix for comparing the http/non-http versions of these urls/domains
+    $(curr_dd).find('.wlbl-entry-content').each ->
+      curr_text = $(this).text().trim()
+      if ip_uri.includes(curr_text)
+        $(this).closest('tr').attr('data-order-id', i)  # add row-id to the right
+
+        # ENSURE YOU ALWAYS ADDING A UNIQUE -DD- CLASS-ID EACH TIME TO BULK DROPDOWN
+        $(this).closest('tr').find('td.wlbl-entry-wlbl').attr('class','wlbl-entry-wlbl').addClass(curr_entry_id)
+
+  table_dd = $(curr_dd).find('tbody')
+  rows = $(table_dd).find('tr')
+
+  # basic sort by id/integer
+  rows.sort (a, b) ->
+    x = $(a).attr('data-order-id')
+    y = $(b).attr('data-order-id')
+    x - y
+  $(rows).each (i, row) -> table_dd.append(row)
+
+
 
 
 
@@ -314,11 +332,6 @@ window.get_current_wlbl = (button) ->
   $(comment_textarea).val(comment_text)
   $(tc_row).addClass('hidden')
   $(list_cbs).prop('disabled',false).closest('li').removeClass('grayed-out')
-
-  # no cb's pre-checked? hide the tc row
-  # DELETABLE?
-  #  if $(dropdown).find('.wl-bl-list-inline:checked').length == 0
-  #    $(dropdown).find('.threat-cat-row').addClass('hidden')
 
   # Send entry content to wbrs
   data = {
@@ -601,7 +614,6 @@ window.submit_individual_wlbl = (button_tag) ->
 
 
   # FIRST ADJUSTMENT_TYPE
-  # FIRST ADJUSTMENT_TYPE
   if (new_length > old_length || new_length == old_length) and tc_length == 0
     adjustment_type = 'add'
     modal_action = 'added to'
@@ -616,9 +628,8 @@ window.submit_individual_wlbl = (button_tag) ->
     modal_action = 'removed from'
 
 
-  # SECOND_ADJUSTMENT_TYPE (if needed, this is rare)
   # SECOND_ADJUSTMENT_TYPE (if needed, this is rare
-  # TODDO: CLEAN THIS UP
+  # TODO: CLEAN THIS UP
   if old_lists_str.includes('BL') && new_lists_str.includes('WL') && !old_lists_str.includes('WL') && !new_lists_str.includes('BL')
     second_adjustment_type = true
     console.log 'inline scenario 4: you were on BL(s), but now you are removing BL(s) and adding WL(s)'
@@ -671,7 +682,6 @@ window.submit_individual_wlbl = (button_tag) ->
 
 
   # 1) ONE API CALL - NORMAL SCENARIOS
-  # 1) ONE API CALL - NORMAL SCENARIOS
   if second_adjustment_type == false
     console.log 'SINGLE-API CALL SCENARIO BEGIN:'
     if adjustment_type == 'add' || adjustment_type == 'replace'   # add or replace
@@ -720,7 +730,6 @@ window.submit_individual_wlbl = (button_tag) ->
       error_prefix: 'Error adjusting WL/BL information.'
       success_reload: false
       success: (response) ->
-        # 22222 second api call after 1111 api call succeeds
         console.log 'FIRST API SUCCESS. \nSECOND API CALL STARTS HERE:'
         console.log '/escalations/api/v1/escalations/webrep/disputes/bulk_rule_ui_wlbl_remove'
 
@@ -1072,9 +1081,6 @@ window.add_wlbl_threat_cat_listeners = () ->
 
         tc_area.html(tc_str)  # place the TC's in the html
 
-      .then null, (err) ->
-        tc_area.html('<span class="error-threat-cat"></span>')
-
   # after a click inside a wl/bl dropdown, lets handle wl/bl + tc validation for bulk or inline adjust wl/bl
   $('.dispute-wlbl-adjust-wrapper input').click ->
     cb_value = $(this).attr('value')
@@ -1120,10 +1126,6 @@ window.add_wlbl_threat_cat_listeners = () ->
       # change this to else if, if restore above
       if cb_value.includes('BL-') and bl_num == 0 and add_radio.prop('checked')
         $(dropdown_id).find('.threat-cat-row input').prop('checked', false)
-#        tc_row.addClass('hidden')
-#
-#      if bl_num == 0 and wl_num == 0
-#        tc_row.addClass('hidden')
 
 
       # ensure user doesnt accidentally select both wl's and bl's at same time, don't bother if curr lists has wl's and bl's
@@ -1149,13 +1151,6 @@ window.add_wlbl_threat_cat_listeners = () ->
         lists_row.removeClass('hidden')
         $.merge(tc_row, tc_note_replace).addClass('hidden')
         clearAllInputs()
-
-
-
-      # BFRP specific (temporary, leave for now)
-#      if $('body').hasClass('research-action')
-#        $(replace_radio).hide()  # hide, since we can't do a REPLACE for bfrp tc's, only 'add to bl + add tc's'
-
 
 
       replace_radio.click ->
@@ -1215,6 +1210,3 @@ window.add_wlbl_threat_cat_listeners = () ->
 # on page load, add the wl/bl + tc input event listeners inside the dropdowns
 $ ->
   add_wlbl_threat_cat_listeners()
-
-  # bfrp fyi: threat category row is hidden on BFRP through the CSS, look for .threat-cat-row in global
-
