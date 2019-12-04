@@ -10545,12 +10545,12 @@ span.threat-cat-no-data {
 /* handles existing bug for wl/bl list duplicate entries (a.com issue) */
 .wlbl-table-result {
   display: inline-block;
-  min-width: 80px;
+  min-width: 0;
   max-width: 150px;
   max-height: 45px;
   overflow-y: hidden;
   padding-top: 1px;
-  padding-right: 15px;
+  padding-right: 5px;
   vertical-align: middle;
 }
 
@@ -10669,7 +10669,7 @@ span.threat-cat-no-data {
   }
 
   td:nth-child(12) {
-    min-width: 106px; // reptool class
+    min-width: 10px; // reptool class
   }
 
   td:nth-child(13) {
@@ -10738,7 +10738,7 @@ td.input-col {
 .wlbl-tc-research-span {
   display: inline-block;
   padding-top: 1px;
-  min-width: 20px;
+  min-width: 0;
   max-width: 150px;
   vertical-align: middle;
 }
