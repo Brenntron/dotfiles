@@ -10654,12 +10654,6 @@ span.threat-cat-no-data {
     max-width: 400px;   // url/ip
   }
 
-  td:nth-child(6) {
-    width: 130px;  // rule hits list
-    word-break: break-word;
-    padding-right: 10px;
-  }
-
   td:nth-child(7) {
     min-width: 130px !important;
     max-width: 150px!important;
@@ -10703,6 +10697,9 @@ span.threat-cat-no-data {
 .research-overview-row {
   background: $faint-neutral-color;
   td {
+    &:first-child{
+      background: $content-bg-color;
+    }
     vertical-align: top;
     .wbrs-input-wrapper {
       background-color: $bug-section-color;
@@ -10726,12 +10723,16 @@ span.threat-cat-no-data {
   .input-col input {
     margin: 8px 8px auto 8px;
   }
+  .rule-hits-cols-list {
+    width: 130px;  // rule hits list
+    word-break: break-word;
+    padding-right: 10px;
+  }
 }
 td.input-col {
   padding: unset !important;
   width: 27px;
 }
-
 
 
 .wlbl-tc-research-span {
