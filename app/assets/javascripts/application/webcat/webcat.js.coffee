@@ -31,11 +31,14 @@ $ ->
 
     if !$('.selectize-control').closest('.form-group').hasClass('hidden')
       tags = tag_input[0].selectize.items
+      companies = $('#company-input')[0].selectize.items
       { items, options }= category_input[0].selectize
       if tags.length
         form['tags'] = tags.join()
       if items.length
         form['category'] = items.map( (cat) -> options[cat].category_name).join(', ')
+      if companies.length
+        form['companies'] = companies.join()
 
     for item in $('#cat_named_search :input:not(:hidden)').serializeArray()
       { name, value } = item
@@ -43,6 +46,7 @@ $ ->
       if name != 'tags' && name != 'category'
         form[name] = value
 
+    debugger
     localStorage.webcat_search_type = 'advanced'
     localStorage.webcat_search_name = form.search_name
     localStorage.webcat_search_conditions = JSON.stringify(
@@ -55,7 +59,7 @@ $ ->
       category: form.category
       customer_name: form.customer_name
       customer_email: form.customer_email
-      company_name: form.company
+      company_name: form.companies
       domain: form.domain
       tags: form.tags
       submitted_older: form.date_submitted_older
@@ -532,7 +536,7 @@ $ ->
 
   if $('#complaints-index').length
     build_complaints_table()
-    
+
     # Make the search prettier
     $('#complaints-index_filter input').addClass('restricted-table-search-input');
 
@@ -571,7 +575,7 @@ $ ->
     tag_input = $('#tags-input').selectize {
       persist: false
       create: false
-      maxItmes: null
+      maxItems: null
       valueField: 'name'
       labelField: 'name'
       searchField: 'name'
@@ -590,7 +594,7 @@ $ ->
       persist: false,
       create: false,
       maxItems: 5,
-      valueField: 'company_id',
+      valueField: 'company_name',
       labelField: 'company_name',
       searchField: ['company_name', 'company_id'],
       options: AC.WebCat.createCompanyOptions()

@@ -17,6 +17,7 @@ $ ->
     )
 
   $('#advanced-search-button').on 'click', ->
+    console.log("Test")
 
     headers = {'Token': $('input[name="token"]').val(), 'Xmlrpc-Token': $('input[name="xml_token"]').val()}
     $.ajax(
@@ -48,6 +49,8 @@ $ ->
 
         for resolution in complaint_resolution_list
           $('#resolution-input-list').append '<option value="' + resolution + '"></option>'
+
+        AC.WebCat.createCompanyOptions()
 
     )
 
