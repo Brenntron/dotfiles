@@ -1752,16 +1752,32 @@ window.updateResolution = () ->
     data: {'complaint_entries': complaint_entries, 'resolution': resolution, 'internal_comment': internal_comment, 'customer_facing_comment': customer_facing_comment}
     success_reload: true
     success: (response) ->
-      console.log response
       $('#resolution_dialog').modal('hide')
-      error_complaints = JSON.parse(response).map (error) ->
-        disp = error.error_message
-        return err = error.error_message.substring(
-          error.error_message.lastIndexOf("Entry (") + 1,
-          error.error_message.lastIndexOf(") of")
-      )
-      console.log error_complaints
-      std_msg_error("The following entries could not be updated.", [error_complaints], reload: true)
+      data = JSON.parse(response)
+      resolution = data[0].resolution
+      modal_message = ""
+      error = []
+      success = []
+      for entry in data
+        {host, status} = entry
+        if entry.status == "ERROR"
+          error.push(host)
+        else
+          success.push(host)
+      console.log 'success',success, 'error', error
+      if success.length
+        success = success.join(', ')
+        modal_message = "<div class='resolution-message'>Resolution updated to #{resolution} for the following Complaint Entries:</div> <div class='update-resolution-entries'>#{success}</div>"
+        if !error.length
+          std_msg_success("The following entries were successfully updated.", [modal_message], reload: true)
+      if error.length
+        error = error.join(', ')
+        console.log error
+        modal_message += "<div class='resolution-message'>Cannot update resolution to #{resolution} for the following Complaint Entries:</div> <div class='update-resolution-entries'>#{error}</div>"
+        console.log modal_message
+        std_msg_error("The following entries could not be updated.", [modal_message], reload: true)
+      # Determine whether to render a success or error modal accordingly
+
   )
 
 $ ->
