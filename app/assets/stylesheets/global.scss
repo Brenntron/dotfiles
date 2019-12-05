@@ -9054,18 +9054,16 @@ button.secondary.view-report-external-button {
 
 // dbinebri: updates below for file rep navbar layout new
 .escalations--file_rep--disputes-controller {
-
   .nav-tool-blocks.search-wrapper {
     padding: 7px 7px 7px 40px;
     text-align: left;
   }
-
   .input-group.search-group {
     padding: 3px 3px 3px 5px;
     margin: 0 0 0 20px;
     width: 100%;
     min-width: 200px;
-    max-width: 550px;
+    max-width: 450px;  // shorten to handle longer usernames on right
   }
 
   // search input field
@@ -9107,6 +9105,9 @@ button.secondary.view-report-external-button {
     // below ensures the navbar widths adds up correctly
     .col-lg-2.nav-username {
       width: 17%;
+      display: inline-block;
+      position: absolute;
+      right: 0;
     }
   }
 
