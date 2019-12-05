@@ -40,18 +40,17 @@
           Submit Resolution
       .dropdown-menu.toolbar-dropdown#index-change-assign-dropdown{'aria-labelledby': 'index_update_resolution'}
         .toolbar
-          %div
-            %label.toolbar-section-label Edit Resolution
+          .edit-resolution-container
+            %label.toolbar-section-label.edit-resolution-label Edit Resolution
             = select(:complaint, :resolution, options_for_select([["Unchanged", "UNCHANGED"], ["Invalid", "INVALID"], ["Reopened", "REOPENED"]]))
-            %br
-            %br
-            %br
-            %input.inline-input.form-control#internal_comment{:name => "token", :type => "text", :value => "", :placeholder=>"Internal Comment"}
-            %br
-            %br
-            %input.inline-input.form-control#customer_facing_comment{:name => "token", :type => "text", :value => "", :placeholder=>"Customer Facing Comment"}
-          %button{class: 'primary', type:'button', id: 'button_update_resolution', onclick:'updateResolutionDialog();'}
-            Update
+            .comment-wrapper.internal_comment_container
+              %label.toolbar-section-label Internal Comment
+              %textarea.form-control#internal_comment{:name => "token", :type => "text", :value => ""}
+            .comment-wrapper.customer_facing_comment_container
+              %label.toolbar-section-label Customer Facing Comment
+              %textarea.form-control#customer_facing_comment{:name => "token", :type => "text", :value => ""}
+            %button{class: 'primary', type:'button', id: 'button_update_resolution', onclick:'updateResolutionDialog();'}
+              Update
   %div
     %label.toolbar-section-label
       Pin Toolbar

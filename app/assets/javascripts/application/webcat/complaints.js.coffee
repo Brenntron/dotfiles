@@ -1753,11 +1753,30 @@ window.updateResolution = () ->
     success_reload: true
     success: (response) ->
       $('#resolution_dialog').modal('hide')
-      confirmation_messages = JSON.parse(response).map (error) -> error.message
-
-      console.log(JSON.parse(response))
+      data = JSON.parse(response)
+      resolution = data[0].resolution
+      modal_message = ""
+      error = []
+      success = []
+      for entry in data
+        {host, status} = entry
+        if entry.status == "ERROR"
+          error.push(host)
+        else
+          success.push(host)
+      console.log 'success',success, 'error', error
+      if success.length
+        success = success.join(', ')
+        modal_message = "<div class='resolution-message'>Resolution updated to #{resolution} for the following Complaint Entries:</div> <div class='update-resolution-entries'>#{success}</div>"
+        if !error.length
+          std_msg_success("The following entries were successfully updated.", [modal_message], reload: true)
+      if error.length
+        error = error.join(', ')
+        modal_message += "<div class='resolution-message'>Cannot update resolution to #{resolution} for the following Complaint Entries:</div> <div class='update-resolution-entries'>#{error}</div>"
+        console.log modal_message
+        std_msg_error("The following entries could not be updated.", [modal_message], reload: true)
       # Determine whether to render a success or error modal accordingly
-      std_msg_success("The following entries could not be updated.", [confirmation_messages], reload: true) unless confirmation_messages.length == 0
+
   )
 
 $ ->

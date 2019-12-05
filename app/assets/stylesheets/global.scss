@@ -2783,14 +2783,41 @@ a.code-content:hover {
 #new-comment-wrapper {
   border-top: none;
 }
+.edit-resolution-container{
+  .internal_comment_container{
+    margin-top: 10px;
+  }
+  .internal_comment_container, .customer_facing_comment_container {
+    margin-top: 30px;
+    .toolbar-section-label{
+      margin-top:-25px;
+    }
+  }
+  #internal_comment, #customer_facing_comment{
+    min-height: 100px;
+    min-width: 250px;
+  }
+  #button_update_resolution{
+    padding: 8px 20px;
+    width: 150px;
+    margin: 11px 60px 0 60px;
+  }
 
+}
+
+.update-resolution-entries{
+  margin: 10px;
+}
 .missing-note {
   display: inline-block;
   font-style: italic;
   font-size: 9pt;
   color: $content-label-color;
 }
-
+.edit-resolution-label{
+  position: relative;
+  left: 3px;
+}
 .code-block.note {
   margin-top: 3px;
 }
@@ -6261,14 +6288,6 @@ table.dispute-entry-table tbody tr.selected {
 }
 
 #button_reassign{
-  text-transform: none;
-  display: inline-block;
-  padding: 8px 20px;
-  font-weight: 400;
-  margin: 0 6px 0 6px;
-}
-
-#button_update_resolution{
   text-transform: none;
   display: inline-block;
   padding: 8px 20px;
