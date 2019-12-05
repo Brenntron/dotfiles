@@ -643,7 +643,6 @@ class ComplaintEntry < ApplicationRecord
                                                   modified_older: params['modified_older'])
     end
 
-    binding.pry
     if params['tags'].present?
       relation = relation.joins(complaint: :complaint_tags).where(complaint_tags: {name: params['tags'].split(',')})
       # relation = relation.joins(complaint: :complaint_tags).where(complaint_tags: {name: "[P3] .com.au URLs"})
@@ -667,7 +666,7 @@ class ComplaintEntry < ApplicationRecord
       end
 
       if company_name.present?
-        relation = relation.where(companies: {name: company_name})
+        relation = relation.where(companies: {name: company_name.split(',')})
       end
     end
 

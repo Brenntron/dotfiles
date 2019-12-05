@@ -29,16 +29,16 @@ $ ->
     # creating form object from array made from advanced dropdown form
     form = {}
 
-    if !$('.selectize-control').closest('.form-group').hasClass('hidden')
-      tags = tag_input[0].selectize.items
-      companies = $('#company-input')[0].selectize.items
-      { items, options }= category_input[0].selectize
-      if tags.length
-        form['tags'] = tags.join()
-      if items.length
-        form['category'] = items.map( (cat) -> options[cat].category_name).join(', ')
-      if companies.length
-        form['companies'] = companies.join()
+    tags = tag_input[0].selectize.items
+    companies = $('#company-input')[0].selectize.items
+    { items, options } = category_input[0].selectize
+
+    if tags.length
+      form['tags'] = tags.join()
+    if items.length
+      form['category'] = items.map( (cat) -> options[cat].category_name).join(', ')
+    if companies.length
+      form['companies'] = companies.join()
 
     for item in $('#cat_named_search :input:not(:hidden)').serializeArray()
       { name, value } = item
