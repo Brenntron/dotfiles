@@ -11213,3 +11213,29 @@ span.threat-cat-no-data {
     max-width: 220px;
   }
 }
+
+// categorize urls dropdown vertical spacing tightening
+.escalations--webcat--complaints-controller #categorize-urls-form-wrapper {
+  padding: 10px 20px;
+  hr {
+    display: none;
+  }
+  #cat_dif_submit {
+    margin: 10px 15px 0;
+  }
+  .form-group {
+    margin-bottom: 12px;
+    //padding-bottom: 10px;
+    //border-bottom: dashed 1px darken($content-bg-color, 10%);
+  }
+  .form-control.selectize {
+    font-size: 10px;
+    line-height: 20px;
+    height: 28px;
+  }
+  .item {
+    font-size: 12px;
+    line-height: 16px;
+    margin: 3px !important; // override needed
+  }
+}
