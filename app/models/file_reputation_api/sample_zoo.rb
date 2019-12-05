@@ -16,8 +16,13 @@ class FileReputationApi::SampleZoo
     end
 
   rescue JSON::ParserError
+    Rails.logger.error('SampleZoo returned invalid JSON.')
     {error: 'Invalid Hash'}
+  rescue ApiRequester::ApiRequester::ApiRequesterNotAuthorized
+    Rails.logger.error('SampleZoo returned an "Unauthorized" response.')
+    {error: 'Unauthorized'}
   rescue
+    Rails.logger.error('SampleZoo returned an error response.')
     {error: 'Data Currently Unavailable'}
   end
 
