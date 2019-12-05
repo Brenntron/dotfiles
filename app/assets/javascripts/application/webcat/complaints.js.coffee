@@ -1772,7 +1772,6 @@ window.updateResolution = () ->
           std_msg_success("The following entries were successfully updated.", [modal_message], reload: true)
       if error.length
         error = error.join(', ')
-        console.log error
         modal_message += "<div class='resolution-message'>Cannot update resolution to #{resolution} for the following Complaint Entries:</div> <div class='update-resolution-entries'>#{error}</div>"
         console.log modal_message
         std_msg_error("The following entries could not be updated.", [modal_message], reload: true)
