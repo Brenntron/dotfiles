@@ -562,16 +562,23 @@ window.take_selected = ()->
 
 $(document).on 'click', '#complaints-index tr, #complaints_check_box', ->
   rows = $('#complaints-index').DataTable().rows('.selected').data()
-  disabled = !rows.length
   reopened = false
   invalid_unchanged = false
+  disabled = true
   for row in rows
     { status } = row
+    console.log status
     if status == 'COMPLETED'
         reopened = true
-    if  status == 'RESOLVED' || status == 'NEW' || status == 'ASSIGNED'
+        disabled = false
+    if  status == 'RESOLVED' || status == 'NEW' || status == 'ASSIGNED'|| status == 'REOPENED'
         invalid_unchanged = true
-
+        disabled = false
+  console.log disabled
+  if disabled == false
+    $('#index_update_resolution').removeAttr('disabled')
+  else
+    $('#index_update_resolution').prop('disabled', disabled)
   reopened_opt = $('#complaint_resolution option:contains("Reopened")')
   invalid_opt = $('#complaint_resolution option:contains("Invalid")')
   unchanged_opt = $('#complaint_resolution option:contains("Unchanged")')
@@ -587,11 +594,6 @@ $(document).on 'click', '#complaints-index tr, #complaints_check_box', ->
     invalid_opt.removeAttr("disabled");
     unchanged_opt.removeAttr("disabled");
     invalid_opt.prop('selected', true)
-
-  if !disabled
-    $('#index_update_resolution').removeAttr('disabled')
-  else
-    $('#index_update_resolution').prop('disabled', disabled)
 
 window.return_selected = ()->
   selected_rows = $('#complaints-index').DataTable().rows('.selected')
@@ -1744,15 +1746,13 @@ window.updateResolutionDialog = (confirm) ->
       complaint_entries.push(id)
       full_domain = ''
       domain = $(row).find("#domain_#{id}").attr('data-full')
-  #    if domain == undefined
-  #      domain = $(row).find("#domain_#{id}").text()
       $('#complaint_entries_to_update').append("<tr><td><span class='res_id'>#{id} |</span> <span class='webcat-full-domain'>#{domain}</span></td></tr>")
     else
       if pending_msg == ''
-        pending_msg = "<div>*Entries with a PENDING status cannot be edited.<div>"
+        pending_msg = "<div class='small pending-note'>*Entries with a PENDING status cannot be edited.<div>"
   $('#resolution_dialog').modal("show")
   if selected_rows.length > 1
-    html = "The following #{selected_rows.length} entries will have their <span class='bold'>RESOLUTIONS</span> set to <span class='resolution-emp bold'>#{resolution}.</span>"
+    html = "The following #{complaint_entries.length} entries will have their <span class='bold'>RESOLUTIONS</span> set to <span class='resolution-emp bold'>#{resolution}.</span>"
   else
     html = "The following entry will have its <span class='bold'>RESOLUTION</span> set to <span class='resolution-emp bold'>#{resolution}.</span>"
   html += pending_msg
@@ -1775,7 +1775,9 @@ window.updateResolution = () ->
 
   complaint_entries = []
   for row in selected_rows
-    complaint_entries.push(row.id)
+    status = $(row).find('.state-col').text()
+    if status != 'PENDING'
+      complaint_entries.push(row.id)
 
   std_msg_ajax(
     method: 'POST'
@@ -1795,16 +1797,15 @@ window.updateResolution = () ->
           error.push(host)
         else
           success.push(host)
+
       if success.length
-        success = success.join(', ')
-        modal_message = "<div class='resolution-message'>Resolution updated to #{resolution} for the following Complaint Entries:</div> <div class='update-resolution-entries'>#{success}</div>"
+        modal_message = "<div class='resolution-message'>Successfully updated <span class='bold'>RESOLUTION</span> to <span class='resolution-emp bold'>#{resolution}</span> for #{success.length} Complaint Entries</div>"
         if !error.length
-          std_msg_success("The following entries were successfully updated.", [modal_message], reload: true)
+          std_msg_success("All entries were successfully updated.", [modal_message], reload: true)
       if error.length
-        error = error.join(', ')
-        modal_message += "<div class='resolution-message'>Cannot update resolution to #{resolution} for the following Complaint Entries:</div> <div class='update-resolution-entries'>#{error}</div>"
-        console.log modal_message
-        std_msg_error("The following entries could not be updated.", [modal_message], reload: true)
+        error_list = error.join(', ')
+        modal_message += "<div class='resolution-message'>Error updating the <span class='bold'>RESOLUTION</span> of the following #{error.length} Complaint Entries:</div> <div class='update-resolution-entries'>#{error_list}</div>"
+        std_msg_error("Error updating resolutions.", [modal_message], reload: true)
       # Determine whether to render a success or error modal accordingly
 
   )
