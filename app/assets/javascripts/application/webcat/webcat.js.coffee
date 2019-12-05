@@ -586,6 +586,15 @@ $ ->
       searchField: ['category_name', 'category_code'],
       options: AC.WebCat.createSelectOptions()
     }
+    company_input = $('#company-input').selectize {
+      persist: false,
+      create: false,
+      maxItems: 5,
+      valueField: 'company_id',
+      labelField: 'company_name',
+      searchField: ['company_name', 'company_id'],
+      options: AC.WebCat.createCompanyOptions()
+    }
 
 $('#exampleModal').on 'shown.bs.modal', ->
   $('button.toolbar-button.cat-btn').addClass('active')

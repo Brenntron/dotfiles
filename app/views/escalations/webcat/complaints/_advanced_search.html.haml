@@ -48,8 +48,7 @@
     %button.remove-input
   .form-group.search-item.hidden
     %label.content-label-sm Company
-    %input.form-control#company-input{name: 'company', list: 'customerCompanyList'}
-    %datalist#customerCompanyList
+    %select.form-control.selectize#company-input{name: 'company-input', placeholder: "Enter up to 5 categories", multiple: "multiple", tabindex:"-1"}
     %button.remove-input
   .form-group.search-item.hidden
     %label.content-label-sm Date Submitted (Newer)
