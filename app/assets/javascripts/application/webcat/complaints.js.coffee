@@ -419,7 +419,9 @@ window.updatePending = (id,row_id) ->
         confirm: ->
           processSubmitPending()
       })
-
+  else
+    processSubmitPending()
+    
 processSubmitEntry = (entry_id,row_id) ->
   $("#submit_changes_#{entry_id}").addClass('hidden')
   $("#reopen_#{entry_id}").removeClass('hidden')
