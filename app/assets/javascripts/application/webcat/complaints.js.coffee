@@ -561,12 +561,38 @@ window.take_selected = ()->
     std_msg_error('No rows selected', ['Please select at least one row.'])
 
 $(document).on 'click', '#complaints-index tr, #complaints_check_box', ->
-  rows = $('#complaints-index').DataTable().rows('.selected')
-  disabled = !rows[0].length
+  rows = $('#complaints-index').DataTable().rows('.selected').data()
+  disabled = !rows.length
+  reopened = false
+  invalid_unchanged = false
+  for row in rows
+    { status } = row
+    if status == 'COMPLETED'
+        reopened = true
+    if  status == 'RESOLVED' || status == 'NEW' || status == 'ASSIGNED'
+        invalid_unchanged = true
+
+  reopened_opt = $('#complaint_resolution option:contains("Reopened")')
+  invalid_opt = $('#complaint_resolution option:contains("Invalid")')
+  unchanged_opt = $('#complaint_resolution option:contains("Unchanged")')
+  if !reopened
+    reopened_opt.attr("disabled","disabled");
+  else
+    reopened_opt.removeAttr("disabled");
+    reopened_opt.prop('selected', true)
+  if !invalid_unchanged
+    invalid_opt.attr("disabled","disabled");
+    unchanged_opt.attr("disabled","disabled");
+  else
+    invalid_opt.removeAttr("disabled");
+    unchanged_opt.removeAttr("disabled");
+    invalid_opt.prop('selected', true)
+
   if !disabled
     $('#index_update_resolution').removeAttr('disabled')
   else
     $('#index_update_resolution').prop('disabled', disabled)
+
 window.return_selected = ()->
   selected_rows = $('#complaints-index').DataTable().rows('.selected')
   if selected_rows[0].length > 0
@@ -1709,22 +1735,27 @@ window.updateResolutionDialog = (confirm) ->
   $('#complaint_entries_to_update').empty()
   resolution = $('#complaint_resolution')[0].value
   selected_rows = $('tr.selected')
-
+  pending_msg = ''
   complaint_entries = []
   for row in selected_rows
     { id } = row
-    complaint_entries.push(id)
-    full_domain = ''
-    domain = $(row).find("#domain_#{id}").attr('data-full')
-#    if domain == undefined
-#      domain = $(row).find("#domain_#{id}").text()
-    $('#complaint_entries_to_update').append("<tr><td><span class='res_id'>#{id} |</span> <span class='webcat-full-domain'>#{domain}</span></td></tr>")
-
+    status = $(row).find('.state-col').text()
+    if status != 'PENDING'
+      complaint_entries.push(id)
+      full_domain = ''
+      domain = $(row).find("#domain_#{id}").attr('data-full')
+  #    if domain == undefined
+  #      domain = $(row).find("#domain_#{id}").text()
+      $('#complaint_entries_to_update').append("<tr><td><span class='res_id'>#{id} |</span> <span class='webcat-full-domain'>#{domain}</span></td></tr>")
+    else
+      if pending_msg == ''
+        pending_msg = "<div>*Entries with a PENDING status cannot be edited.<div>"
   $('#resolution_dialog').modal("show")
   if selected_rows.length > 1
     html = "The following #{selected_rows.length} entries will have their <span class='bold'>RESOLUTIONS</span> set to <span class='resolution-emp bold'>#{resolution}.</span>"
   else
     html = "The following entry will have its <span class='bold'>RESOLUTION</span> set to <span class='resolution-emp bold'>#{resolution}.</span>"
+  html += pending_msg
   $('#resolution_text').html(html)
 
   tbody = $('#resolution_dialog').find('tbody')
@@ -1764,7 +1795,6 @@ window.updateResolution = () ->
           error.push(host)
         else
           success.push(host)
-      console.log 'success',success, 'error', error
       if success.length
         success = success.join(', ')
         modal_message = "<div class='resolution-message'>Resolution updated to #{resolution} for the following Complaint Entries:</div> <div class='update-resolution-entries'>#{success}</div>"
