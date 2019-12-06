@@ -2822,6 +2822,7 @@ a.code-content:hover {
   font-size: 9pt;
   color: $content-label-color;
 }
+
 .edit-resolution-label{
   position: relative;
   left: 3px;
@@ -8600,15 +8601,6 @@ hr.thin.form-divider {
     border-top-left-radius: 6px;
     border-top-right-radius: 6px;
   }
-
-  .scrollable-table {
-    border: 1px solid $nav-toolbar-color;
-    display: inline-block;
-    max-height: 400px;
-    overflow-y: scroll !important;
-    padding: 2px;
-  }
-
   .modal-footer {
     text-align: center;
   }
@@ -8619,8 +8611,52 @@ hr.thin.form-divider {
 
   }
 }
+.scrollable-table, .scrollable-list{
+  border: 1px solid $nav-toolbar-color;
+  display: inline-block;
+  max-height: 400px;
+  overflow-y: scroll !important;
+  padding: 2px;
+}
+
+.update-resolution-entries.scrollable-list {
+    li {
+    border-bottom: 1px solid #f2f2f2;
+    border-top: none!important;
+    text-align: left;
+    margin: 0!important;
+    padding: 7px 5px!important;
+    line-height: 1.3em;
+  }
+  .resolution-error-host {
+    word-break: keep-all;
+    display: block;
+    font-weight: 600;
+    text-overflow: ellipsis;
+    overflow: hidden;
+  }
+}
+
+.update-resolution-entries{
+  width: 450px;
+  .resolution-error-host {
+    display: block;
+    font-weight: 600;
+  }
+  li {
+    border-bottom: 1px solid #f2f2f2;
+    text-align: left;
+    margin: 0!important;
+    padding: 7px 5px!important;
+    line-height: 1.3em;
+  }
+}
 .resolution-emp {
   color: $primary-section-color
+}
+.resolution-error-host{
+  display: block;
+  font-weight: 600;
 }
 #complaints-index_length, #complaints-index_filter{
   z-index: 50;
