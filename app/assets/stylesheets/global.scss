@@ -771,7 +771,8 @@ button {
   background-color: $warning-accent-color;
 }
 .resolution-submit-button {background-image: url(image_path('icon_submit_arrow_grey.svg'));}
-.resolution-submit-button:disabled {background-image: url(image_path('icon_submit_arrow_grey_disabled.svg'));}
+.open .resolution-submit-button {background-image: url(image_path('icon_submit_arrow.svg'));}
+.resolution-submit-button:disabled, .master-submit-button:disabled {background-image: url(image_path('icon_submit_arrow_grey_disabled.svg'));}
 .open-viewable {background-image: url(image_path('icon_open_viewable.svg'));}
 .open-nonviewable {background-image: url(image_path('icon_open_nonviewable.svg'));}
 .open-selected {background-image: url(image_path('icon_open_selected.svg'));}
@@ -2793,13 +2794,7 @@ a.code-content:hover {
       margin-top:-25px;
     }
   }
-  #internal_comment, #customer_facing_comment{
-    min-height: 100px;
-    min-width: 250px;
-  }
   #button_update_resolution{
-    padding: 8px 20px;
-    width: 150px;
     margin: 11px 60px 0 60px;
   }
 
