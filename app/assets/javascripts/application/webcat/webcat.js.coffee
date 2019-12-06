@@ -23,6 +23,7 @@ $ ->
         localStorage.webcat_search_name = ''
         localStorage.webcat_search_conditions = JSON.stringify({value:webcat_search_string})
       refresh_url()
+
   $('#filter-cases-list a').on 'click', (e)->
     localStorage.setItem('webcat_reset_page', true)
   window.set_webcat_advanced = () ->
@@ -638,6 +639,8 @@ $ ->
       searchField: 'name'
       options: null
     }
+    window.clearSelectize = (input) ->
+      $("##{input}")[0].selectize.clear()
 
 $('#exampleModal').on 'shown.bs.modal', ->
   $('button.toolbar-button.cat-btn').addClass('active')
