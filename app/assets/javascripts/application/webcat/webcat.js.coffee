@@ -43,10 +43,9 @@ $ ->
     for item in $('#cat_named_search :input:not(:hidden)').serializeArray()
       { name, value } = item
       name = name.toLowerCase().replace(/-/g, '_')
-      if name != 'tags' && name != 'category'
+      if name != 'tags' && name != 'category'&&  name != 'companies'
         form[name] = value
 
-    debugger
     localStorage.webcat_search_type = 'advanced'
     localStorage.webcat_search_name = form.search_name
     localStorage.webcat_search_conditions = JSON.stringify(
