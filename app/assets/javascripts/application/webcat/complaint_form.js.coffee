@@ -17,8 +17,6 @@ $ ->
     )
 
   $('#advanced-search-button').on 'click', ->
-    console.log("Test")
-
     headers = {'Token': $('input[name="token"]').val(), 'Xmlrpc-Token': $('input[name="xml_token"]').val()}
     $.ajax(
       url: '/escalations/api/v1/escalations/webcat/customers_names'
@@ -51,6 +49,7 @@ $ ->
           $('#resolution-input-list').append '<option value="' + resolution + '"></option>'
 
         AC.WebCat.createCompanyOptions()
+        AC.WebCat.createCustomerNameOptions()
 
     )
 

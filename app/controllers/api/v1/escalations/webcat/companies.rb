@@ -6,13 +6,13 @@ module API
           include API::V1::Defaults
             resource "escalations/webcat/companies" do
 
-              desc "get all company names"
+              desc "return company names as objects (for Selectize)"
               params do
               end
               get "" do
-                companies = Company.all.map {|company| {company_id: company.id, company_name: company.name}}
+                companies = Company.all.map {|company| {company_name: company.name}}
 
-                companies.to_json
+                companies.sort_by {|hash| hash[:company_name]}.to_json
               end
             end
         end

@@ -29,22 +29,34 @@ $ ->
     # creating form object from array made from advanced dropdown form
     form = {}
 
+#    if !$('.selectize-control').closest('.form-group').hasClass('hidden')
     tags = tag_input[0].selectize.items
-    companies = $('#company-input')[0].selectize.items
+    company = $('#company-input')[0].selectize.items
+    status = $('#status-input')[0].selectize.items
+    resolution = $('#resolution-input')[0].selectize.items
+    customer_name = $('#name-input')[0].selectize.items
     { items, options } = category_input[0].selectize
 
     if tags.length
       form['tags'] = tags.join()
     if items.length
       form['category'] = items.map( (cat) -> options[cat].category_name).join(', ')
-    if companies.length
-      form['companies'] = companies.join()
+    if company.length
+      form['company'] = company.join()
+    if status.length
+      form['status'] = status.join()
+    if resolution.length
+      form['resolution'] = resolution.join()
+    if customer_name.length
+      form['customer_name'] = customer_name.join()
 
     for item in $('#cat_named_search :input:not(:hidden)').serializeArray()
       { name, value } = item
       name = name.toLowerCase().replace(/-/g, '_')
       if name != 'tags' && name != 'category'&&  name != 'companies'
         form[name] = value
+
+    debugger
 
     localStorage.webcat_search_type = 'advanced'
     localStorage.webcat_search_name = form.search_name
@@ -58,7 +70,7 @@ $ ->
       category: form.category
       customer_name: form.customer_name
       customer_email: form.customer_email
-      company_name: form.companies
+      company_name: form.company
       domain: form.domain
       tags: form.tags
       submitted_older: form.date_submitted_older
@@ -595,8 +607,36 @@ $ ->
       maxItems: 5,
       valueField: 'company_name',
       labelField: 'company_name',
-      searchField: ['company_name', 'company_id'],
-      options: AC.WebCat.createCompanyOptions()
+      searchField: 'company_name',
+      options: null
+    }
+    status_input = $('#status-input').selectize {
+      persist: false,
+      create: false,
+      maxItems: 5,
+      valueField: 'name'
+      labelField: 'name'
+      searchField: 'name'
+      options: [{name: "NEW"}, {name: "RESOLVED"}, {name: "ASSIGNED"}, {name: "ACTIVE"},
+               {name: "COMPLETED"}, {name: "PENDING"}, {name: "REOPENED"}]
+    }
+    resolution_input = $('#resolution-input').selectize {
+      persist: false,
+      create: false,
+      maxItems: 5,
+      valueField: 'name'
+      labelField: 'name'
+      searchField: 'name'
+      options: [{name: "FIXED"}, {name: "INVALID"}, {name: "UNCHANGED"}, {name: "DUPLICATE"}]
+    }
+    customer_input = $('#name-input').selectize {
+      persist: false,
+      create: false,
+      maxItems: 5,
+      valueField: 'name'
+      labelField: 'name'
+      searchField: 'name'
+      options: null
     }
 
 $('#exampleModal').on 'shown.bs.modal', ->

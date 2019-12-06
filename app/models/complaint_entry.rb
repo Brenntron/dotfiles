@@ -598,7 +598,16 @@ class ComplaintEntry < ApplicationRecord
 
     present_params = params.select{|ignore_key, value| value.present?}
 
+    if present_params['status'].present?
+      present_params['status'] = present_params['status'].split(',')
+    end
+
+    if present_params['resolution'].present?
+      present_params['resolution'] = present_params['resolution'].split(',')
+    end
+
     simple_params = present_params.slice(*%w{id complaint_id resolution status})
+
     relation = where(simple_params)
 
     if params['submitted_newer'].present?
@@ -658,7 +667,7 @@ class ComplaintEntry < ApplicationRecord
       end
 
       if customer_params['customer_name'].present?
-        relation = relation.where(customers: {name: customer_params['customer_name']})
+        relation = relation.where(customers: {name: customer_params['customer_name'].split(',')})
       end
 
       if customer_params['customer_email'].present?
