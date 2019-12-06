@@ -335,8 +335,12 @@ Then(/^I should see div element with class "(.*?)"$/) do |element|
   page.should have_selector(:xpath, "//div[contains(@class, '#{element}')]")
 end
 
-Then(/^I should not see div element with class "(.*?)"$/) do |element|
-  page.should have_no_selector(:xpath, "//div[contains(@class, '#{element}')]")
+Then(/^I should see tr element with id "(.*?)"$/) do |element|
+  page.should have_selector(:xpath, "//tr[contains(@id, '#{element}')]")
+end
+
+Then(/^I should not see tr element with id "(.*?)"$/) do |element|
+  page.should have_no_selector(:xpath, "//tr[contains(@id, '#{element}')]")
 end
 
 Then(/^the textarea with id "(.*?)" should contain "(.*?)"$/) do |id, content|
@@ -488,4 +492,10 @@ end
 Given(/^I fill in selectized with "(.*?)"$/) do |value|
   find('div.selectize-input input', match: :first).set("#{value}")
   find('div.selectize-dropdown-content > div', match: :first).click
+end
+
+Given(/^I fill in selectized of element "(.*?)" with "(.*?)"$/) do |element, value|
+
+  page.execute_script("$('#{element}')[0].selectize.setValue(#{value})")
+
 end
