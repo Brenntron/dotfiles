@@ -9123,7 +9123,7 @@ button.secondary.view-report-external-button {
 
   // dbinebri: the tooltips for file rep get too wide, limit the max-width
   .tooltipster-sidetip {
-    max-width: 410px !important;
+    max-width: 460px !important;
   }
 }
 
@@ -9216,7 +9216,7 @@ button.secondary.view-report-external-button {
 
 // dbinebri: the tooltips for modals on file rep get too wide, limit the max-width a little bit
 .tooltipster-sidetip .tooltipster-box {
-  max-width: 410px !important;
+  max-width: 460px !important;
 }
 
 .data-report-wrapper hr.thin {
@@ -11223,5 +11223,35 @@ span.threat-cat-no-data {
     border-right: solid 1px $content-bg-color;
     height: 95px;
     max-width: 220px;
+  }
+}
+
+// file rep nav bar - ensure top-left nav icons never break/wrap + minor spacing updates
+.escalations--file_rep--disputes-controller {
+  .nav-page-button-wrapper {
+    white-space: nowrap;
+  }
+  #filerep-index-title {
+    margin-left: 2px;
+  }
+  .file-rep-index-toolbar {
+    margin-top: 25px;
+  }
+  .search-condition-name {
+    margin-left: 2px;
+    margin-bottom: 5px;
+  }
+  #filerep_searchref_container {
+    margin-bottom: 0;
+    display: inline;  // ensure no used vertical space when empty
+  }
+  // show 25 entries
+  #file-rep-datatable_length label {
+    margin-left: 3px;
+    margin-bottom: 15px;
+  }
+  // cursor default for show/hide menu
+  #file-index-table-show-columns-dropdown ul li {
+    cursor: default;
   }
 }
