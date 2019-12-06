@@ -23,6 +23,7 @@ $ ->
         localStorage.webcat_search_name = ''
         localStorage.webcat_search_conditions = JSON.stringify({value:webcat_search_string})
       refresh_url()
+
   $('#filter-cases-list a').on 'click', (e)->
     localStorage.setItem('webcat_reset_page', true)
   window.set_webcat_advanced = () ->
@@ -574,6 +575,7 @@ $ ->
     tag_input = $('#tags-input').selectize {
       persist: false
       create: false
+      clear: true,
       maxItems: null
       valueField: 'name'
       labelField: 'name'
@@ -583,6 +585,7 @@ $ ->
     category_input = $('#category-input').selectize {
       persist: false,
       create: false,
+      clear: true,
       maxItems: 5,
       valueField: 'category_id',
       labelField: 'category_name',
@@ -592,12 +595,15 @@ $ ->
     company_input = $('#company-input').selectize {
       persist: false,
       create: false,
+      clear: true,
       maxItems: 5,
       valueField: 'company_name',
       labelField: 'company_name',
       searchField: ['company_name', 'company_id'],
       options: AC.WebCat.createCompanyOptions()
     }
+    window.clearSelectize = (input) ->
+      $("##{input}")[0].selectize.clear()
 
 $('#exampleModal').on 'shown.bs.modal', ->
   $('button.toolbar-button.cat-btn').addClass('active')
