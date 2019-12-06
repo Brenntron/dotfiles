@@ -134,6 +134,7 @@ $ ->
     persist: false,
     create: false,
     maxItems: 5,
+    closeAfterSelect: true,
     valueField: 'category_id',
     labelField: 'category_name',
     searchField: ['category_name', 'category_code'],
