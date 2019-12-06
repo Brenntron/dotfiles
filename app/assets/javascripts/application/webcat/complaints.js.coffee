@@ -1790,10 +1790,9 @@ window.updateResolution = () ->
       error = []
       success = []
       for entry in data
-        { host, status} = entry
-        console.log entry
-        if entry.state == "ERROR"
-          error_msg = "<li>#{host} | Cannot change entry with status of <span class='resolution-emp bold'>#{state}</span> to <span class='resolution-emp bold'>#{resolution}</span></li>"
+        { host, status, state} = entry
+        if state == "ERROR"
+          error_msg = "<li><span class='resolution-error-host'>#{host}</span> Cannot change entry with status of <span class='resolution-emp bold'>#{status}</span> to <span class='resolution-emp bold'>#{resolution}</span></li>"
           error.push(error_msg)
         else
           success.push(host)
@@ -1805,8 +1804,12 @@ window.updateResolution = () ->
       if error.length
         error_list = error.join('')
 
-        modal_message += "<div class='resolution-message'>Error updating the <span class='bold'>RESOLUTION</span> of the following #{error.length} Complaint Entries:</div> <ul class='update-resolution-entries'>#{error_list}</ul>"
+        modal_message += "<div class='resolution-message'>Error updating the  following #{error.length} Complaint Entries:</div> <ul class='update-resolution-entries'>#{error_list}</ul>"
         std_msg_error("Error updating resolutions.", [modal_message], reload: true)
+        setTimeout ->
+          if $('.update-resolution-entries').height() > 300
+            $('.update-resolution-entries').addClass('scrollable-list')
+        ,200
       # Determine whether to render a success or error modal accordingly
 
   )
