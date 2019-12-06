@@ -21,7 +21,7 @@ $(document).ready ->
     window.check_wbnp_status()
 
 
-# WBNP - Get report id
+# WBNP - Get report idF
 window.fetch_wbnp_data = () ->
   $('#fetch_wbnp').attr('disabled', true)
   $('#fetch_wbnp').addClass('esc-tooltipped')
@@ -567,14 +567,12 @@ $(document).on 'click', '#complaints-index tr, #complaints_check_box', ->
   disabled = true
   for row in rows
     { status } = row
-    console.log status
     if status == 'COMPLETED'
         reopened = true
         disabled = false
     if  status == 'RESOLVED' || status == 'NEW' || status == 'ASSIGNED'|| status == 'REOPENED'
         invalid_unchanged = true
         disabled = false
-  console.log disabled
   if disabled == false
     $('#index_update_resolution').removeAttr('disabled')
   else
@@ -1792,9 +1790,11 @@ window.updateResolution = () ->
       error = []
       success = []
       for entry in data
-        {host, status} = entry
-        if entry.status == "ERROR"
-          error.push(host)
+        { host, status} = entry
+        console.log entry
+        if entry.state == "ERROR"
+          error_msg = "<li>#{host} | Cannot change entry with status of <span class='resolution-emp bold'>#{state}</span> to <span class='resolution-emp bold'>#{resolution}</span></li>"
+          error.push(error_msg)
         else
           success.push(host)
 
@@ -1803,8 +1803,9 @@ window.updateResolution = () ->
         if !error.length
           std_msg_success("All entries were successfully updated.", [modal_message], reload: true)
       if error.length
-        error_list = error.join(', ')
-        modal_message += "<div class='resolution-message'>Error updating the <span class='bold'>RESOLUTION</span> of the following #{error.length} Complaint Entries:</div> <div class='update-resolution-entries'>#{error_list}</div>"
+        error_list = error.join('')
+
+        modal_message += "<div class='resolution-message'>Error updating the <span class='bold'>RESOLUTION</span> of the following #{error.length} Complaint Entries:</div> <ul class='update-resolution-entries'>#{error_list}</ul>"
         std_msg_error("Error updating resolutions.", [modal_message], reload: true)
       # Determine whether to render a success or error modal accordingly
 
