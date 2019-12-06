@@ -575,7 +575,6 @@ $ ->
     tag_input = $('#tags-input').selectize {
       persist: false
       create: false
-      clear: true,
       maxItems: null
       valueField: 'name'
       labelField: 'name'
@@ -585,7 +584,6 @@ $ ->
     category_input = $('#category-input').selectize {
       persist: false,
       create: false,
-      clear: true,
       maxItems: 5,
       valueField: 'category_id',
       labelField: 'category_name',
@@ -595,7 +593,6 @@ $ ->
     company_input = $('#company-input').selectize {
       persist: false,
       create: false,
-      clear: true,
       maxItems: 5,
       valueField: 'company_name',
       labelField: 'company_name',
