@@ -334,18 +334,18 @@ window.domain_whois = (IP_Domain) ->
       notice_html = "<p>Something went wrong: #{response.responseText}</p>"
   , this)
 
-processSubmitPending=()->
-  prefix = $('#complaint_prefix_'+id)[0].value
-  status = $('[name=resolution_review_'+id+']:checked').val()
-  comment = $('#complaint_comment_'+id)[0].value
-  resolution_comment = $('#complaint_resolution_comment_'+id)[0].value
-  resolution = $('.complaint-resolution'+id).text()
+processSubmitPending=(entry_id,row_id)->
+  prefix = $('#complaint_prefix_'+entry_id)[0].value
+  status = $('[name=resolution_review_'+entry_id+']:checked').val()
+  comment = $('#complaint_comment_'+entry_id)[0].value
+  resolution_comment = $('#complaint_resolution_comment_'+entry_id)[0].value
+  resolution = $('.complaint-resolution'+entry_id).text()
   #get the selectize control for the category input
-  selectizeControl = $('#input_cat_'+id).selectize()[0].selectize
-  if $('#input_cat_'+id).val() == null
+  selectizeControl = $('#input_cat_'+entry_id).selectize()[0].selectize
+  if $('#input_cat_'+entry_id).val() == null
     categories = null
   else
-    categories = $('#input_cat_'+id).val().toString()
+    categories = $('#input_cat_'+entry_id).val().toString()
 
   named_categories = ""
   if categories == null
@@ -360,7 +360,7 @@ processSubmitPending=()->
   std_msg_ajax(
     url: '/escalations/api/v1/escalations/webcat/complaint_entries/update_pending'
     method: 'POST'
-    data: {'id': id,'prefix': prefix,'commit':status,'status':resolution,'comment':comment, 'resolution_comment': resolution_comment, 'categories': categories, 'category_names':named_categories }
+    data: {'id': entry_id,'prefix': prefix,'commit':status,'status':resolution,'comment':comment, 'resolution_comment': resolution_comment, 'categories': categories, 'category_names':named_categories }
     success: (response) ->
       {uri, domain, subdomain, path, categories, error, entry_id, was_dismissed, status} = $.parseJSON(response)
       if error
@@ -417,11 +417,11 @@ window.updatePending = (id,row_id) ->
         reload: false,
         confirm_dismiss: true,
         confirm: ->
-          processSubmitPending()
+          processSubmitPending(id,row_id)
       })
   else
-    processSubmitPending()
-    
+    processSubmitPending(id,row_id)
+
 processSubmitEntry = (entry_id,row_id) ->
   $("#submit_changes_#{entry_id}").addClass('hidden')
   $("#reopen_#{entry_id}").removeClass('hidden')
