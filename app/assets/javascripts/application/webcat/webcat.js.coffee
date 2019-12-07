@@ -520,7 +520,7 @@ $ ->
                 render: ( data, type, full, meta ) ->
                   { wbrs_score, entry_id } = full
                   rep = wbrs_display(score)
-                  icon = "<span class='reputation-icon icon-#{rep}'></span>"
+                  icon = "<span class='reputation-icon icon-#{rep} esc-tooltipped' title='#{rep.toUpperCase()}'></span>"
                   return "#{icon}<span id='wbrs_score_#{entry_id}'>#{wbrs_score}</span>"
               }
               {
