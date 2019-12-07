@@ -5,6 +5,19 @@ window.td_truncate = (str, max, long) ->
   long = long or '...'
   if typeof str == 'string' and str.length > max then str.substring(0, max) + long else str
 
+window.wbrs_display = (score) ->
+  if score == 'unknown' || typeof score != 'number'
+    return 'unknown'
+  else if  score <= -6
+    return 'untrusted'
+  else if score <= -3
+    return 'questionable'
+  else if score <= 0
+    return 'neutral'
+  else if score < 6
+    return 'favorable'
+  else if score >= 6
+    return 'trusted'
 $ ->
 
   # webcat: have top navigation bar scroll with page per user request
@@ -506,7 +519,9 @@ $ ->
                 width: '20px'
                 render: ( data, type, full, meta ) ->
                   { wbrs_score, entry_id } = full
-                  '<span id="wbrs_score_' + entry_id + '">' + wbrs_score + '</span>'
+                  rep = wbrs_display(score)
+                  icon = "<span class='reputation-icon icon-#{rep}'></span>"
+                  return "#{icon}<span id='wbrs_score_#{entry_id}'>#{wbrs_score}</span>"
               }
               {
                 data: 'submitter_type'
