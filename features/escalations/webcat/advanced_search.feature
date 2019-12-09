@@ -112,18 +112,12 @@ Feature: WebCat Advanced Search
       | 2  | DUPLICATE  | COMPLETED | 2            |
       | 3  | FIXED      | PENDING   | 3            |
       | 4  | DUPLICATE  | COMPLETED | 4            |
-    Given the following customers exist:
-      | id | name          | email                  |
-      | 1  | Bilbo Baggins | avarice@gold.com       |
-      | 2  | Draco Malfoy  | slytherin@hogwarts.com |
-      | 3  | Eric Cartman  | southpark@denver.com   |
-      | 4  | Thor          | asgard@marvel.com      |
     Given the following complaint_tags exist:
-    | id | name       |
-    | 1  | Slytherin  |
-    | 2  | Gryffindor |
-    | 3  | Ravenclaw  |
-    | 4  | Hufflepuff |
+      | id | name       |
+      | 1  | Slytherin  |
+      | 2  | Gryffindor |
+      | 3  | Ravenclaw  |
+      | 4  | Hufflepuff |
     Given I add a complaint_tag of id "1" to complaint of id "1"
     Given I add a complaint_tag of id "2" to complaint of id "2"
     Given I add a complaint_tag of id "3" to complaint of id "3"
@@ -141,5 +135,5 @@ Feature: WebCat Advanced Search
     And I wait for "4" seconds
     Then I should see tr element with id "1"
     Then I should see tr element with id "4"
+    Then I should not see tr element with id "2"
     Then I should not see tr element with id "3"
-    Then I should not see tr element with id "4"
