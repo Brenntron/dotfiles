@@ -245,8 +245,6 @@ Feature: Disputes
     Then I fill in "company-input" with "Guest"
     Then I click "#submit-advanced-search"
     And I wait for "3" seconds
-    And I click "#advanced-search-button"
-    Then I wait for "5" seconds
     Then I should see "talosintelligence.com"
     Then I should see "0000000001"
 

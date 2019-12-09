@@ -5,6 +5,7 @@ FactoryBot.define do
 
     factory :guest_company do
       name          { "Guest" }
+      initialize_with {Company.find_or_create_by(name:name)}
     end
 
     factory :bogus_company do
