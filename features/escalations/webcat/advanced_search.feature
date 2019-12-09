@@ -1,25 +1,5 @@
 Feature: WebCat Advanced Search
 
-  Background:
-    Given a guest company exists
-
-  @javascript
-  Scenario: I perform an advanced search on all "PENDING" and "COMPLETE" entries
-    Given a user with role "webcat user" exists and is logged in
-    Given the following complaint entries exist:
-    | id | status        |
-    | 1  | PENDING       |
-    | 2  | COMPLETED     |
-    | 3  | NEW           |
-    When I go to "/escalations/webcat/complaints"
-    And I click "#advanced-search-button"
-    And I fill in selectized of element "#status-input" with "['COMPLETED','PENDING']"
-    And I click "#submit-advanced-search"
-    And I wait for "4" seconds
-    Then I should see tr element with id "1"
-    Then I should see tr element with id "2"
-    Then I should not see tr element with id "3"
-
   @javascript
   Scenario: I perform an advanced search on status and resolution fields simultaneously
     Given a user with role "webcat user" exists and is logged in
@@ -40,3 +20,40 @@ Feature: WebCat Advanced Search
     Then I should not see tr element with id "3"
     Then I should not see tr element with id "4"
 
+
+  @javascript
+  Scenario: I perform an advanced search on company name
+    Given a user with role "webcat user" exists and is logged in
+    Given the following complaints exist:
+      | id | customer_id |
+      | 1  | 1           |
+      | 2  | 2           |
+      | 3  |             |
+      | 4  |             |
+    Given the following complaint entries exist:
+      | id | resolution | status    | complaint_id |
+      | 1  | FIXED      | PENDING   | 1            |
+      | 2  | DUPLICATE  | COMPLETED | 2            |
+      | 3  | FIXED      | PENDING   | 3            |
+      | 4  | DUPLICATE  | COMPLETED | 4            |
+    Given the following customers exist:
+      | id | company_id | email             |
+      | 1  | 22         |  tokyo@gmail.com  |
+      | 2  | 33         |  boston@gmail.com |
+    Given the following companies exist:
+      | id  | name          |
+      | 22  | Bobby Burgers |
+      | 33  | Pizza Dojo    |
+    When I go to "/escalations/webcat/complaints"
+    And I click "#advanced-search-button"
+    And I click "#add-search-items-button"
+    And I click "#company-cb"
+    And I click "#add-search-criteria"
+    And I fill in selectized of element "#company-input" with "['Bobby Burgers','Pizza Dojo']"
+    And I fill in selectized of element "#status-input" with "['PENDING','COMPLETED']"
+    And I click "#submit-advanced-search"
+    And I wait for "4" seconds
+    Then I should see tr element with id "1"
+    Then I should see tr element with id "2"
+    Then I should not see tr element with id "3"
+    Then I should not see tr element with id "4"

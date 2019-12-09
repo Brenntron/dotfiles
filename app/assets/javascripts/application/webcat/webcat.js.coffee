@@ -57,8 +57,6 @@ $ ->
       if name != 'tags' && name != 'category'&&  name != 'companies'
         form[name] = value
 
-    debugger
-
     localStorage.webcat_search_type = 'advanced'
     localStorage.webcat_search_name = form.search_name
     localStorage.webcat_search_conditions = JSON.stringify(
