@@ -68,7 +68,7 @@ class Sbrs::Base
   end
 
   def self.ca_cert_file
-    @ca_cert_file ||= Rails.configuration.sds.ca_cert_file
+    @ca_cert_file ||= Rails.configuration.sds.cert_file
   end
 
   def self.pkey_file
