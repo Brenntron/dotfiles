@@ -155,7 +155,7 @@ class Sbrs::Base
     parsed_response.to_json
   end
 
-  def self.request_sds(path:, body:, type: nil, use_sds_version: "v2")
+  def self.request_sds(path:, body:, type: nil)
     # adapted from TI/sb_api, then heavily modified
     query_string = path
     cert = File.open(ca_cert_file, 'r') do |file|
@@ -171,12 +171,8 @@ class Sbrs::Base
         uri_item = "#{body['ip']}"
       end
 
-      case use_sds_version
-      when "v3"
-        request_string = "https://" + sds_v3_host + query_string + uri_item
-      else
-        request_string = "https://" + sds_host + query_string + uri_item
-      end
+
+      request_string = "https://" + sds_host + query_string + uri_item
 
       uri = URI.parse(request_string)
       request = Net::HTTP::Get.new(uri)
@@ -197,8 +193,10 @@ class Sbrs::Base
         response = Net::HTTP.start(uri.hostname, uri.port, req_options) do |http|
           http.request(request)
         end
+
         if response.code != "200"  #there was an issue
           '{"response": "request failed"}'
+
         else
           response # was: response.body per T/I source code
         end
