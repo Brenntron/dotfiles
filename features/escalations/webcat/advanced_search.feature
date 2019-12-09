@@ -20,7 +20,6 @@ Feature: WebCat Advanced Search
     Then I should not see tr element with id "3"
     Then I should not see tr element with id "4"
 
-
   @javascript
   Scenario: I perform an advanced search on company name
     Given a user with role "webcat user" exists and is logged in
