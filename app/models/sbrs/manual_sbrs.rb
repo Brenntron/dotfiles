@@ -65,6 +65,10 @@ class Sbrs::ManualSbrs < Sbrs::Base
     parse_wbrs(request_sds(path: '/score/wbrs;wbrs-rulehits/json?url=', body: params, type: type))
   end
 
+  def self.call_wbrs_v3(params, type: nil)
+    parse_wbrs(request_sds(path: '/score/wbrs;wbrs-rulehits/json?url=', body: params, type: type))
+  end
+
   def self.call_wbrs_webcat(params, type: nil)
     sds_response = parse_wbrs(request_sds(path: '/score/webcat/json?url=', body: params, type: type))
     webcatlist = parse_wbrs(request_sds(path: '/labels/webcat/json', body: params, type: type))
