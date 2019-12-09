@@ -2641,8 +2641,10 @@ table#bug-rules-table tbody {
 
 //wbrs reputation icons//
 .reputation-icon{
-  height: 30px;
-  width: 30px;
+  height: 20px;
+  width: 20px;
+  position: relative;
+  top: 5px;
   background-repeat: no-repeat;
   display: inline-block;
 }

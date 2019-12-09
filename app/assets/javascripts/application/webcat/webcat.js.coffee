@@ -6,7 +6,8 @@ window.td_truncate = (str, max, long) ->
   if typeof str == 'string' and str.length > max then str.substring(0, max) + long else str
 
 window.wbrs_display = (score) ->
-  if score == 'unknown' || typeof score != 'number'
+  score = parseInt(score)
+  if score == NaN
     return 'unknown'
   else if  score <= -6
     return 'untrusted'
@@ -519,7 +520,7 @@ $ ->
                 width: '20px'
                 render: ( data, type, full, meta ) ->
                   { wbrs_score, entry_id } = full
-                  rep = wbrs_display(score)
+                  rep = wbrs_display(wbrs_score)
                   icon = "<span class='reputation-icon icon-#{rep} esc-tooltipped' title='#{rep.toUpperCase()}'></span>"
                   return "#{icon}<span id='wbrs_score_#{entry_id}'>#{wbrs_score}</span>"
               }
