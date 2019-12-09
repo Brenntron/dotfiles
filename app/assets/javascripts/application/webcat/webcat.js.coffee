@@ -30,7 +30,6 @@ $ ->
     # creating form object from array made from advanced dropdown form
     form = {}
 
-#    if !$('.selectize-control').closest('.form-group').hasClass('hidden')
     tags = tag_input[0].selectize.items
     company = $('#company-input')[0].selectize.items
     status = $('#status-input')[0].selectize.items
