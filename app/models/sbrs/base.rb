@@ -155,7 +155,7 @@ class Sbrs::Base
     parsed_response.to_json
   end
 
-  def self.request_sds(path:, body:, type: nil)
+  def self.request_sds(path:, body:, type: nil, use_sds_version: "v2")
     # adapted from TI/sb_api, then heavily modified
     query_string = path
     cert = File.open(ca_cert_file, 'r') do |file|
@@ -171,85 +171,13 @@ class Sbrs::Base
         uri_item = "#{body['ip']}"
       end
 
-      request_string = "https://" + sds_host + query_string + uri_item
-      uri = URI.parse(request_string)
-      request = Net::HTTP::Get.new(uri)
-
-      request["X-SDS-Categories-Version"] = "v8"     # <-- dude totally deal with this mess ::: SDS CATEGORY VERSION
-      request["X-Client-ID"] = "talosweb"
-      request["X-Product-ID"] = "talosintelligence"
-      req_options = {
-          use_ssl: uri.scheme == "https",
-          cert: OpenSSL::X509::Certificate.new(cert),
-          key: OpenSSL::PKey::RSA.new(pkey),
-          # ca_file: Rails.configuration.sds.cert_file,
-          verify_mode: OpenSSL::SSL::VERIFY_NONE,
-          read_timeout: read_timeout,
-          open_timeout: open_timeout
-      }
-      begin
-        response = Net::HTTP.start(uri.hostname, uri.port, req_options) do |http|
-          http.request(request)
-        end
-        if response.code != "200"  #there was an issue
-          '{"response": "request failed"}'
-        else
-          response # was: response.body per T/I source code
-        end
-      rescue
-        '{"response": "request failed"}'
-      end
-    elsif /\/labels\// =~ query_string ? true : false
-      request_string = "https://" + sds_host + query_string
-
-      uri = URI.parse(request_string)
-      request = Net::HTTP::Get.new(uri)
-      request["X-Client-ID"] = "talosweb"
-      request["X-Product-ID"] = "talosintelligence"
-      req_options = {
-          use_ssl: uri.scheme == "https",
-          cert: OpenSSL::X509::Certificate.new(cert),
-          key: OpenSSL::PKey::RSA.new(pkey),
-          # ca_file: Rails.configuration.sds.cert_file,
-          verify_mode: OpenSSL::SSL::VERIFY_NONE
-      }
-      begin
-        response = Net::HTTP.start(uri.hostname, uri.port, req_options) do |http|
-          http.request(request)
-        end
-        if response.code != "200"  #there was an issue
-          '{"response": "request failed"}'
-        else
-          response # was: response.body per T/I source code
-        end
-      rescue
-        '{"response": "request failed"}'
-      end
-
-
-    else
-      '{"response": "no query_string clause for [' + query_string + ']"}'
-    end
-  end
-
-
-  def self.request_sds_v3(path:, body:, type: nil)
-    # adapted from TI/sb_api, then heavily modified
-    query_string = path
-    cert = File.open(ca_cert_file, 'r') do |file|
-      file.read
-    end
-    pkey = File.open(pkey_file, 'r') do |file|
-      file.read
-    end
-    if /\/score\// =~ query_string ? true : false
-      if type == 'wbrs'
-        uri_item = "#{body['url']}"
+      case use_sds_version
+      when "v3"
+        request_string = "https://" + sds_v3_host + query_string + uri_item
       else
-        uri_item = "#{body['ip']}"
+        request_string = "https://" + sds_host + query_string + uri_item
       end
 
-      request_string = "https://" + sds_v3_host + query_string + uri_item
       uri = URI.parse(request_string)
       request = Net::HTTP::Get.new(uri)
 

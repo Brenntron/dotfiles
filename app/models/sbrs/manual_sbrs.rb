@@ -66,7 +66,7 @@ class Sbrs::ManualSbrs < Sbrs::Base
   end
 
   def self.get_wbrs_from_sdsv3(params, type: nil)
-    parse_wbrs(request_sds_v3(path: '/score/wbrs;wbrs-rulehits/json?url=', body: params, type: type))
+    parse_wbrs(request_sds(path: '/score/wbrs;wbrs-rulehits/json?url=', body: params, type: type, use_sds_version: "v3"))
   end
 
   def self.call_wbrs_webcat(params, type: nil)
