@@ -11255,3 +11255,83 @@ span.threat-cat-no-data {
     cursor: default;
   }
 }
+
+
+// CATEGORIZE URLs dropdown - overall wrapper
+.escalations--webcat--complaints-controller .nav-tools-dropdown[aria-labelledby='categorize-urls'] {
+  padding-top: 5px;
+  h3 {
+    padding: 6px 5px 9px;
+  }
+}
+
+// CATEGORIZE URLs dropdown - vertical spacing tightening (below the radio buttons)
+.escalations--webcat--complaints-controller #categorize-urls-form-wrapper {
+  // "Different categories for each url" is radio selected (the default view)
+  padding: 8px 15px 5px;
+  input {
+    display: block;
+    font-size: 8pt;
+    line-height: 12pt;
+    margin-bottom: 5px;
+  }
+  hr {
+    display: none;
+  }
+  .form-group {
+    margin-bottom: 20px;
+  }
+  .form-control.selectize {
+    font-size: 8.5pt;
+    line-height: 14pt;
+    height: 28px;
+    max-width: 455px;
+  }
+  .item {
+    font-size: 8pt;
+    line-height: 12pt;
+    margin: 3px 2px 0 !important; // override needed
+  }
+  .content-label-sm {
+    display: inline-block;
+    float: left;
+    width: 60px;
+    padding-top: 6px;
+    padding-left: 2px;
+  }
+  .form-control.selectize {
+    margin-bottom: 4px;
+  }
+  input, .form-control.selectize {
+    display: inline-block;
+    width: 360px;
+    padding-left: 2px;
+  }
+  .toolbar span {
+    font-size: 8pt;
+    line-height: 12pt;
+  }
+  .toolbar-button {
+    font-size: 8pt;
+    line-height: 12pt;
+    background-size: 16px 16px;
+    background-position: 5px center;
+  }
+  button#cat_dif_submit {
+    font-size: 9pt;
+    line-height: 14pt;
+    margin: 0 10px;
+    padding: 12px 30px;
+  }
+  // "Same categories for each url" is the radio selected
+  #categorize-same-form {
+    label.content-label-sm {
+      padding-top: 5px;
+      display: block;
+      width: 90%;
+    }
+    .form-group {
+      margin-bottom: 10px;
+    }
+  }
+}
