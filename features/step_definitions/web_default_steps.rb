@@ -9,6 +9,10 @@ end
 Given(/^I fill in "(.*?)" with "(.*?)"$/) do |field_label, value|
   fill_in field_label, :with => value
 end
+Given(/^I fill in "(.*?)" with "(.*?)" and press enter$/) do |field_label, value|
+  fill_in field_label, :with => value
+  find(:id, field_label).native.send_keys(:enter)
+end
 
 Given(/^I fill in element, "(.*?)" with "(.*?)"$/) do |identifier, value|
   page.find(identifier).set(value)
@@ -70,8 +74,13 @@ end
 When(/^I check "(.*?)"$/) do |target|
   check(target)
 end
+
 When(/^I uncheck "(.*?)"$/) do |target|
   uncheck(target)
+end
+
+And (/^I check checkbox with class "(.*?)"$/) do |cb_class|
+  check(class: cb_class)
 end
 
 When(/^I choose "(.*?)"$/) do |target|
@@ -144,15 +153,20 @@ Given(/^I click "(.*?)" within the "(.*?)" row$/) do |target, row_number|
 end
 
 Then(/^Element with content "(.*?)" should have class "(.*?)"$/) do |content,class_name|
-  find(:xpath, "//div[contains(@class, '#{class_name}')][contains(text(), '#{content}')]")
+  find(:xpath, "//*[contains(@class, '#{class_name}')][contains(text(), '#{content}')]")
 end
 
 Then(/^Element with class "(.*?)" should have content "(.*?)"$/) do |class_name, content|
-  find(:xpath, "//div[contains(@class, '#{class_name}')][contains(text(), '#{content}')]")
+  find(:xpath, "//*[contains(@class, '#{class_name}')][contains(text(), '#{content}')]")
+end
+
+Then(/^Element with class "(.*?)" should not have content "(.*?)"$/) do |class_name, content|
+  element = find(:xpath, "//*[contains(@class, '#{class_name}')]")
+  raise "content found when it should not have been found" if element.has_content?(content)
 end
 
 Then(/^Element with id "(.*?)" should have content "(.*?)"$/) do |id_name, content|
-  find(:xpath, "//div[contains(@id, '#{id_name}')][contains(text(), '#{content}')]")
+  find(:xpath, "//*[contains(@id, '#{id_name}')][contains(text(), '#{content}')]")
 end
 
 Then(/^I should see the "(.*?)" radio checked$/) do |radio_class|
@@ -167,6 +181,12 @@ end
 Then(/^I should see the "(.*?)" checkbox unchecked$/) do |checkbox_class|
   page.find(checkbox_class).should_not be_checked
 end
+
+Then(/^I click checkbox with value "(.*?)"$/) do |checkbox_value|
+  checkbox = page.find(:xpath, "//input[@type='checkbox' and @value='#{checkbox_value}']")
+  checkbox.should be_checked
+end
+
 
 Given(/^I click an image button in table "(.*?)" at row "(.*?)" and col "(.*?)" with class name "(.*?)"$/) do |table, row, column,class_name|
 page.find(:xpath, "//table[#{table}]//tr[#{row}]//td[#{column}]//*[contains(@class, '#{class_name}')]").click
@@ -238,6 +258,15 @@ end
 Then(/^I should see "(.*?)"$/) do |content|
   # binding.pry
   raise "content not found" unless page.has_content?(content)
+end
+
+Then(/^I should see hidden element "(.*?)" with content "(.*?)"$/) do |element, content|
+  begin
+    page.find(element, visible: :all, text: content)
+  rescue Capybara::ElementNotFound => e
+    raise "content not found: #{content}"
+  end
+
 end
 
 Then(/^I should see either "(.*?)" or "(.*?)"$/) do |content1, content2|
@@ -424,6 +453,10 @@ Then (/^I should receive a file of type "(.*?)"/) do |type|
   result = page.response_headers['Content-Type'].should == type
 end
 
+Then (/^I type content "(.*?)" within input with id "(.*?)"/) do |content, input|
+  fill_in input, :with => content
+end
+
 Then (/^I hit enter within "(.*?)"/) do |element|
   find(element).native.send_keys(:return)
 end
@@ -442,6 +475,14 @@ end
 
 And(/^I enter the pin toolbar hot key$/) do
   page.find(:xpath, "//body").send_keys("^")
+end
+
+Then(/^button "(.*?)" should be enabled$/) do |button|
+  expect(page).to have_button(button)
+end
+
+Then(/^button "(.*?)" should be disabled$/) do |button|
+  expect(page).to have_button(button, disabled: true)
 end
 
 Given(/^I fill in selectized with "(.*?)"$/) do |value|

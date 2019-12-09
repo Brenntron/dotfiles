@@ -1097,7 +1097,7 @@ $ ->
   window.format = (dispute) ->
     table_head = '<table class="table dispute-entry-table">' + '<thead>' + '<tr>' + '<th><input class="dispute_entry_select_all" type="checkbox" onclick="select_or_deselect_all(' + dispute.id + ')" id=' + dispute.id + ' /></th>' + '<th class="entry-col-content">Dispute Entry</th>' + '<th class="entry-col-status">Dispute Entry Status</th>' + '<th class="entry-col-res">Dispute Entry Resolution</th>' + '<th class="entry-col-disp">Suggested Disposition</th>' + '<th class="entry-col-cat">Category</th>' + '<th class="entry-col-wbrs-score">WBRS Score</th>' + '<th class="entry-col-wbrs-hits">WBRS Total Rule Hits</th>' + '<th class="entry-col-wbrs-rules">WBRS Rules</th>' + '<th class="entry-col-sbrs-score">SBRS Score</th>' + '<th class="entry-col-sbrs-hits">SBRS Total Rule Hits</th>' + '<th class="entry-col-sbrs-rules">SBRS Rules</th>' + '</tr>' + '</thead>' + '<tbody>'
     entry = dispute.dispute_entries
-    missing_data = '<span class="missing-data">Missing Data</span>'
+    missing_data = '<span class="missing-data">Missing data</span>'
     entry_rows = []
     $(entry).each ->
       entry_content = ''
@@ -1554,6 +1554,26 @@ window.webrep_research_export_selected_rows = () ->
     window.open("/escalations/webrep/export_selected_dispute_entry_rows#{query_string}", "_blank")
   else
     std_msg_error('Error',['Please select at least one row before exporting'])
+
+window.get_threat_categories = (uri) ->
+  data = {'uri': uri}
+  std_msg_ajax(
+    url: '/escalations/api/v1/escalations/webrep/disputes/threat_categories'
+    method: 'POST'
+    data: data
+    success: (response) ->
+      return response
+  )
+
+window.get_threat_levels = (uri) ->
+  data = {'uri': uri}
+  std_msg_ajax(
+    url: '/escalations/api/v1/escalations/webrep/disputes/threat_levels'
+    method: 'POST'
+    data: data
+    success: (response) ->
+      return response
+  )
 
 $ ->
   $('#advanced-search-button').click ->

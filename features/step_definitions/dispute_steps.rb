@@ -26,6 +26,12 @@ Given(/^the following dispute_entries exist:$/) do |dispute_entries|
   end
 end
 
+Given(/^the following dispute_entry_preloads exist:$/) do |dispute_entry_preloads|
+  dispute_entry_preloads.hashes.each do |dispute_entry_preloads_attrs|
+    FactoryBot.create(:dispute_entry_preload, dispute_entry_preloads_attrs)
+  end
+end
+
 
 Given(/^the following disputes exist and have entries:$/) do |disputes|
   FactoryBot.create(:customer) unless Customer.all.exists?
@@ -87,4 +93,9 @@ end
   
 Given (/^Dispute entry should have a status of, "(.*?)"/) do |status|
   expect(Dispute.first.priority).to eq(status)
+end
+
+Then(/^clean up wlbl and remove all wlbl entries on "(.*?)"$/) do |url|
+  @user = User.first
+  Wbrs::ManualWlbl.adjust_urls_from_params({:urls=>[url], "trgt_list"=>[], "note"=>""}, username: @user.cvs_username)
 end

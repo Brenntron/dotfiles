@@ -48,6 +48,7 @@
 //= require application/webcat/webCatRepLookup
 //= require application/webrep/webrep-report-engine
 //= require application/file_rep/file_rep
+//= require application/file_rep/communications
 //= require application/file_rep/naming_guide
 //= require application/file_rep/research
 //= require application/file_rep/dispute_form
