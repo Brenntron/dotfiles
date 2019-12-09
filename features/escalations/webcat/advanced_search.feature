@@ -140,6 +140,6 @@ Feature: WebCat Advanced Search
     And I click "#submit-advanced-search"
     And I wait for "4" seconds
     Then I should see tr element with id "1"
-    Then I should see tr element with id "2"
+    Then I should see tr element with id "4"
     Then I should not see tr element with id "3"
     Then I should not see tr element with id "4"
