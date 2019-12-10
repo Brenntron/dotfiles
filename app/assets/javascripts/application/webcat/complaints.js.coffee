@@ -21,7 +21,7 @@ $(document).ready ->
     window.check_wbnp_status()
 
 
-# WBNP - Get report idF
+# WBNP - Get report id
 window.fetch_wbnp_data = () ->
   $('#fetch_wbnp').attr('disabled', true)
   $('#fetch_wbnp').addClass('esc-tooltipped')
