@@ -40,3 +40,11 @@ end
 Given(/^the following complaint entry with id: "(.*?)" has a status of: "(.*?)"$/) do |id, status|
   expect(ComplaintEntry.find(id).status).to eq(status)
 end
+
+Given(/^the following complaint entry with id: "(.*?)" has a internal comment of: "(.*?)"$/) do |id, internal_comment|
+  expect(ComplaintEntry.find(id).internal_comment).to eq(internal_comment)
+end
+
+Given(/^the following complaint entry with id: "(.*?)" has a resolution comment of: "(.*?)"$/) do |id, resolution_comment|
+  expect(ComplaintEntry.find(id).resolution_comment).to eq(resolution_comment)
+end
