@@ -2,7 +2,20 @@ window.apply_filter_to_table = () ->
   filter = $("#cluster_filter_field").val()
   $('#regex-filter').html(filter)
   populate_clusters_index_table(filter);
-
+window.wbrs_display = (score) ->
+  score = parseInt(score)
+  if score == NaN
+    return 'unknown'
+  else if  score <= -6
+    return 'untrusted'
+  else if score <= -3
+    return 'questionable'
+  else if score <= 0
+    return 'neutral'
+  else if score < 6
+    return 'favorable'
+  else if score >= 6
+    return 'trusted'
 
 window.populate_clusters_index_table = (filter) ->
   if $('#clusters-index_wrapper').length > 0
@@ -158,7 +171,16 @@ $ ->
       }
       {
         data: 'wbrs_score'
-        defaultContent: 'N/A'
+        width: '75px'
+        render: ( data ) ->
+          if data == undefined
+            data = ''
+          rep = wbrs_display(data)
+          if rep == undefined
+            rep = 'unknown'
+          tooltip_rep = rep.toUpperCase()
+          icon = "<span class='reputation-icon icon-#{rep} esc-tooltipped' title='#{tooltip_rep}'></span>"
+          return "#{icon}<span>#{data}</span>"
       }
       {
         data: 'cluster_id'
