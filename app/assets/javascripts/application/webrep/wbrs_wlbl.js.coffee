@@ -769,7 +769,6 @@ window.submit_individual_wlbl = (button_tag) ->
     )
 
 
-<<<<<<< HEAD
     data = {ip_uris: ip_uris, list_types: list_types, note: wlbl_comment}
 
     if $('#wlbl-remove').prop('checked') == true
@@ -788,13 +787,11 @@ window.submit_individual_wlbl = (button_tag) ->
         method: 'POST'
         data: data
         success: (response) ->
-          console.log response
           std_msg_success("The following entries have been added to " + list_types, ip_uris)
         error: (response) ->
           std_api_error(response, 'Error retrieving WL/BL Data')
       )
-=======
->>>>>>> master
+
 
 
 

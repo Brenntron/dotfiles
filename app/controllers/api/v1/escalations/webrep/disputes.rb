@@ -924,7 +924,6 @@ module API
               render json: {assignees: assignees}
             end
 
-<<<<<<< HEAD
             ## for bulk lookup
 
             desc 'super simple endpoint for bulk lookup to consume'
@@ -962,9 +961,8 @@ module API
                 {:status => "success", :data => response}.to_json
               rescue
                 {:status => "error"}.to_json
-              end  
-
-=======
+              end
+            end
             params do
               requires :uri, type: String
             end
@@ -981,7 +979,6 @@ module API
             post 'threat_levels' do
               response = SbApi.remote_call_sds(permitted_params[:uri],'wbrs')
               response
->>>>>>> master
             end
 
           end

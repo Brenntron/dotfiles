@@ -1,6 +1,5 @@
 .content-wrapper
   .reputation-research-search-wrapper
-<<<<<<< HEAD
     .research-header-wrapper
       %span.icon-research.top-info-icon
       %h1 Reputation Research
@@ -192,20 +191,7 @@
                 %td.col-clear-actions
 
   .row.research_results
-=======
-    %h1 Reputation Research
-    = form_for(:search, method: "get") do |search_form|
-      = search_form.text_field(:uri, class: 'search-box', placeholder: 'URI or IP Address', autofocus: 'true')
-      .row.search-options-row
-        .col-xs-6
-          = search_form.radio_button(:scope, 'strict', id: 'research-search-strict', checked: params['search'] && params['search']['scope'].eql?("strict"))
-          %label.esc-tooltipped{title: 'Strict Search returns only records matching the exact URL.', for: 'research-search-strict'} Strict Search
-        .col-xs-6
-          = search_form.radio_button(:scope, 'broad', id: 'research-search-broad', checked: !params['search'] || params['search']['scope'].eql?("broad"))
-          %label.esc-tooltipped{title: 'Broad Search returns all records matching the URL pattern.', for: 'research-search-broad'} Broad Search
-      =search_form.submit :Submit, id: 'submit-button'
-  .row
->>>>>>> master
+
     .col-xs-12
       .ajax-message-div
         .loader-gears
@@ -265,9 +251,7 @@
                       .col-xs-4
                         %input{type: 'radio', name: 'wlbl-action-radio', id: 'wlbl-remove', value: 'wlbl-remove'}
                         %label.radio-label{for: 'wlbl-remove'} Remove from list
-<<<<<<< HEAD
                     .row
-=======
                       .col-xs-5.replace-tc-radio.hidden
                         %input{type: 'radio', name: 'wlbl-action-radio', id: 'wlbl-replace', value: 'wlbl-replace'}
                         %label.radio-label{for: 'wlbl-replace'} Replace threat categories
@@ -278,7 +262,6 @@
 
                     -# BEGIN: WL BL LISTS ROW + THREAT CATS ROW (place this 1 indent past 'inline-tool' above)
                     .row.lists-row
->>>>>>> master
                       .col-xs-12
                         %label.content-label-sm{for: "wlbl-list-type-select"} Lists
                         .row.dropdown-tool-grey-row
@@ -299,12 +282,7 @@
                               %li
                                 %input.wl-heavy-checkbox.wl-bl-list-inline{type: 'checkbox', name: 'wl-bl-list-inline', value: "WL-heavy"} WL - Heavy
                               %li
-<<<<<<< HEAD
-                                %input.bl-heavy-checkbox.wl-bl-list-inline{type: 'checkbox', name: 'wl-bl-list-inline', value: "BL-heavy"}
-                                  BL - Heavy
-=======
                                 %input.bl-heavy-checkbox.wl-bl-list-inline{type: 'checkbox', name: 'wl-bl-list-inline', value: "BL-heavy"} BL - Heavy
-
                     .row.dropdown-tool-grey-row.threat-cat-row.hidden
                       .threat-cat-note
                         %label.content-label-sm
@@ -320,7 +298,6 @@
                     -# END: WL BL LISTS ROW + THREAT CATS ROW
 
 
->>>>>>> master
                     .comment-wrapper
                       %label.content-label-sm WL/BL Comment
                       %textarea.dropdown-comment.adjust-wlbl-input.note-input
@@ -689,7 +666,6 @@
                                     = wbrs_hit.name
                                     - unless wbrs_hit.equal? entry.dispute_rule_hits.select {|rule_hit| rule_hit.rule_type == "WBRS" }.last
                                       = ","
-<<<<<<< HEAD
                             %td.input-col
                               %span.research-table-input-wrapper.xbrs-input-wrapper
                                 %input.research-row-checkbox.xbrs-checkbox{type: 'checkbox', checked: 'true', value: "#{entry.id}"}
@@ -762,87 +738,6 @@
                                       = sbrs_hit.name
                                       - unless sbrs_hit.equal? entry.dispute_rule_hits.select {|rule_hit| rule_hit.rule_type == "SBRS" }.last
                                         = ","
-                                  - else
-=======
-                                - else
-                                  = wbrs_hit.name
-                                  - unless wbrs_hit.equal? entry.dispute_rule_hits.select {|rule_hit| rule_hit.rule_type == "WBRS" }.last
-                                    = ","
-                          %td.input-col
-                            %span.research-table-input-wrapper.xbrs-input-wrapper
-                              %input.research-row-checkbox.xbrs-checkbox{type: 'checkbox', checked: 'true', value: "#{entry.id}"}
-                            %label XBRS History
-                          %td.text-center
-                            - unless entry.hostlookup.nil?
-                              = entry.find_xbrs[1]['data'].count
-                          %td.input-col
-                            %span.research-table-input-wrapper.virus-total-input-wrapper
-                              %input.research-row-checkbox.virus-total-checkbox{type: 'checkbox', checked: 'true', value: "#{entry.id}"}
-                            %label Virustotal
-                          %td.text-center
-                            - if entry.virustotals.count == 0
-                              %span.missing-data N/A
-                            - else
-                              = entry.virustotals.count {|vt| vt[:result] != "clean site" && vt[:result] != "unrated site" }
-                              \\
-                              = entry.virustotals.count
-                          %td.left-bordered
-                            %label WL/BL
-                          %td.wlbl-and-tc-area
-                            - if !entry.respond_to?(:consolidated_wlbl_strings)
-                              %span.missing-data Not currently on a list
-                            - else
-                              %span.wlbl-table-result
-                                = entry.consolidated_wlbl_strings
-                              %span.wlbl-tc-research-span
-                              %button.dispute-inline-buttons.history-button.esc-tooltipped{title: 'WL/BL History', onclick: "wlbl_history_dialog('#{entry.hostlookup}')"}
-
-
-                          %td.left-bordered
-                            %label Referenced on
-                          %td
-                            - referenced_entries = entry.research_referenced_tickets
-                            - referenced_entries_size = referenced_entries.size
-                            - if referenced_entries_size < 1
-                              %span.missing-data
-                              Not on any other tickets
-                            - else
-                              %span.dropdown
-                                %button.show_references.dropdown-toggle.references-dropdown-button{title: 'Referenced on', 'data-toggle': 'dropdown', 'aria-haspopup': 'true', 'aria-expanded': 'false'}
-                                  = "#{referenced_entries_size} ticket(s)"
-                                .dropdown-menu.references-dropdown{'aria-labelledby': 'show_references'}
-                                  %table
-                                    - referenced_entries.each do |reference|
-                                      %tr
-                                        %td
-                                          %a{href: escalations_webrep_dispute_path(reference.id)}
-                                            = reference.id
-                                        %td
-                                          = reference.case_opened_at
-
-                        %tr
-                          %td.input-col
-                            %span.research-table-input-wrapper.sbrs-input-wrapper
-                              %input.research-row-checkbox.sbrs-checkbox{type: 'checkbox', checked: 'true', value: "#{entry.id}"}
-                            %label SBRS
-                          %td.text-center= entry.sbrs_score.to_d.truncate(2).to_f if entry.sbrs_score
-                          %td
-                            %label SBRS Rule Hits
-                          %td.text-center
-                            = entry.dispute_rule_hits.select{|hit| hit.rule_type == 'SBRS'}.count
-                          %td
-                            %label SBRS Rules
-                          %td.rule-hits-col-list
-                            - if entry.dispute_rule_hits.select{|hit| hit.rule_type == 'SBRS'}.count == 0
-                              %span.missing-data No rule hits
-                            - else
-                              - entry.dispute_rule_hits.select{|hit| hit.rule_type == 'SBRS'}.each do |sbrs_hit|
-                                - unless RulehitResolutionMailerTemplate.select{|template| template.mnemonic == sbrs_hit.name}.count == 0
-                                  %a.adhoc-email-trigger{href: '#', 'data-url': "#{entry.uri}", 'data-name': sbrs_hit.name}
->>>>>>> master
-                                    = sbrs_hit.name
-                                    - unless sbrs_hit.equal? entry.dispute_rule_hits.select {|rule_hit| rule_hit.rule_type == "WBRS" }.last
-                                      = ","
                             %td.input-col
                               %span.research-table-input-wrapper.crosslisted-input-wrapper
                                 %input.research-row-checkbox.crosslisted-checkbox{type: 'checkbox', checked: 'true', value: "#{entry.id}"}
@@ -1067,3 +962,22 @@
 = render 'escalations/webrep/disputes/new_email_dialog'
 %input{:name => "token", :type => "hidden", :value => "#{current_user.authentication_token}"}
 %input{:name => "xml_token", :type => "hidden", :value => "#{xml_token}"}
+
+
+
+
+  -#  h1 Reputation Research
+  -#  = form_for(:search, method: "get") do |search_form|
+  -#    = search_form.text_field(:uri, class: 'search-box', placeholder: 'URI or IP Address', autofocus: 'true')
+  -#    .row.search-options-row
+  -#      .col-xs-6
+  -#        = search_form.radio_button(:scope, 'strict', id: 'research-search-strict', checked: params['search'] && params['search']['scope'].eql?("strict"))
+  -#        %label.esc-tooltipped{title: 'Strict Search returns only records matching the exact URL.', for: 'research-search-strict'} Strict Search
+  -#      .col-xs-6
+  -#        = search_form.radio_button(:scope, 'broad', id: 'research-search-broad', checked: !params['search'] || params['search']['scope'].eql?("broad"))
+  -#        %label.esc-tooltipped{title: 'Broad Search returns all records matching the URL pattern.', for: 'research-search-broad'} Broad Search
+  -#    =search_form.submit :Submit, id: 'submit-button'
+  -#.row
+  -#
+  -#
+  -#
