@@ -517,7 +517,7 @@ $ ->
               }
               {
                 data: 'wbrs_score'
-                width: '20px'
+                width: '55px'
                 render: ( data, type, full, meta ) ->
                   { wbrs_score, entry_id } = full
                   rep = wbrs_display(wbrs_score)
