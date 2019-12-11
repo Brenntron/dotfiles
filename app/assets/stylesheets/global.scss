@@ -10623,6 +10623,9 @@ span.threat-cat-no-data {
   td{
     border-bottom: unset;
   }
+  th.entry-col-wbrs-score{
+    display: block;
+  }
   .entry-col-wbrs-score{
     display: inline-flex;
     .reputation-icon{
