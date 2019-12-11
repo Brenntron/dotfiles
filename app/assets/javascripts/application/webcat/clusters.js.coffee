@@ -179,7 +179,7 @@ $ ->
           if rep == undefined
             rep = 'unknown'
           tooltip_rep = rep.toUpperCase()
-          icon = "<span class='reputation-icon icon-#{rep} esc-tooltipped' title='#{tooltip_rep}'></span>"
+          icon = "<span class='reputation-icon icon-#{rep} esc-tooltipped' title='#{tooltip_rep}'></span><span>#{data}</span>"
           return "#{icon}<span>#{data}</span>"
       }
       {

@@ -1085,6 +1085,22 @@ $ ->
 
     ])
   $('#disputes-index_filter input').addClass('table-search-input');
+
+  window.wbrs_display = (score) ->
+    score = parseInt(score)
+    if score == NaN
+      return 'unknown'
+    else if  score <= -6
+      return 'untrusted'
+    else if score <= -3
+      return 'questionable'
+    else if score <= 0
+      return 'neutral'
+    else if score < 6
+      return 'favorable'
+    else if score >= 6
+      return 'trusted'
+
   window.format = (dispute) ->
     table_head = '<table class="table dispute-entry-table">' + '<thead>' + '<tr>' + '<th><input class="dispute_entry_select_all" type="checkbox" onclick="select_or_deselect_all(' + dispute.id + ')" id=' + dispute.id + ' /></th>' + '<th class="entry-col-content">Dispute Entry</th>' + '<th class="entry-col-status">Dispute Entry Status</th>' + '<th class="entry-col-res">Dispute Entry Resolution</th>' + '<th class="entry-col-disp">Suggested Disposition</th>' + '<th class="entry-col-cat">Category</th>' + '<th class="entry-col-wbrs-score">WBRS Score</th>' + '<th class="entry-col-wbrs-hits">WBRS Total Rule Hits</th>' + '<th class="entry-col-wbrs-rules">WBRS Rules</th>' + '<th class="entry-col-sbrs-score">SBRS Score</th>' + '<th class="entry-col-sbrs-hits">SBRS Total Rule Hits</th>' + '<th class="entry-col-sbrs-rules">SBRS Rules</th>' + '</tr>' + '</thead>' + '<tbody>'
     entry = dispute.dispute_entries
@@ -1116,7 +1132,6 @@ $ ->
         resolution = missing_data
       if this.entry.resolution_comment != null
         resolution_comment = this.entry.resolution_comment
-        resolution_col = '<td class="entry-col-res esc-tooltipped" title="' + resolution_comment + '">' + resolution + '</td>'
       else
         resolution_col = '<td class="entry-col-res">' + resolution + '</td>'
       suggested_disposition = ''
@@ -1133,7 +1148,11 @@ $ ->
       dispute_entry_id = this.entry.id
       if this.entry.wbrs_score != null
         wbrs_score = this.entry.wbrs_score
-      else wbrs_score = missing_data
+        rep = wbrs_display(wbrs_score)
+        tooltip_rep = rep.toUpperCase()
+      else
+        wbrs_score = 'unknown'
+
       if this.entry.sbrs_score != null
         sbrs_score = this.entry.sbrs_score
       else sbrs_score = missing_data
@@ -1142,7 +1161,9 @@ $ ->
         resolution_col +
         '<td class="entry-col-disp">' + suggested_disposition + '</td>' +
         '<td class="entry-col-cat">' + category + '</td>' +
-        '<td class="entry-col-wbrs-score">' + wbrs_score + '</td>' +
+        '<td class="entry-col-wbrs-score">' +
+          "<span class='reputation-icon icon-#{rep} esc-tooltipped' title='#{tooltip_rep}'></span><span>#{wbrs_score}</span>" +
+        '</td>' +
         '<td class="entry-col-wbrs-hits">' +  this.wbrs_rule_hits.length + '</td>' +
         '<td class="entry-col-wbrs-rules">' + this.wbrs_rule_hits.join(', ') + '</td>' +
         '<td class="entry-col-sbrs-score">' + sbrs_score + '</td>' +

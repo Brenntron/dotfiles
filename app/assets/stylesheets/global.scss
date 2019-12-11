@@ -10618,6 +10618,18 @@ span.threat-cat-no-data {
   max-width: 250px;
 }
 
+#disputes-index{
+  background: $content-bg-color;
+  td{
+    border-bottom: unset;
+  }
+  .entry-col-wbrs-score{
+    display: inline-flex;
+    .reputation-icon{
+    top: 0
+    }
+  }
+}
 // webrep dispute index > ensure the dispute count is to the right of the domain entry
 #disputes-index span.input-truncate {
   display: inline-block;
