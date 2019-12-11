@@ -617,7 +617,7 @@ Feature: Webcat complaints
     And I fill in element, "#internal_comment" with "Cisco"
     And I fill in element, "#customer_facing_comment" with "Disco"
     And I click "#button_update_resolution"
-    And I should see "The following 3 entries will have their RESOLUTIONS set to UNCHANGED."
+    And I should see "Set the following 3 entries to RESOLUTION UNCHANGED."
     And I click "#submit_resolution_changes"
     Then the following complaint entry with id: "1" has a resolution of: "UNCHANGED"
     Then the following complaint entry with id: "2" has a resolution of: "UNCHANGED"
@@ -664,7 +664,8 @@ Feature: Webcat complaints
     And I click "#index_update_resolution"
     And I select "Invalid" from "complaint_resolution"
     And I click "#button_update_resolution"
-    Then I should see "The following 3 entries will have their RESOLUTIONS set to INVALID."
+
+    Then I should see "Set the following 3 entries to RESOLUTION INVALID."
     When I click "#submit_resolution_changes"
     And I wait for "3" seconds
     Then the following complaint entry with id: "1" has a resolution of: "INVALID"
@@ -691,7 +692,7 @@ Feature: Webcat complaints
     And I select "Reopened" from "complaint_resolution"
     And I click "#button_update_resolution"
     # Waiting on front-end to change this text
-    Then I should see "The following 3 entries will have their STATUSES set to REOPENED"
+    Then I should see "Set the following 3 entries to RESOLUTION REOPENED"
     When I click "#submit_resolution_changes"
     And I wait for "3" seconds
     Then the following complaint entry with id: "1" has a status of: "REOPENED"
