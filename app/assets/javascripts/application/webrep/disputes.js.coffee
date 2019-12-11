@@ -1132,8 +1132,10 @@ $ ->
         resolution = missing_data
       if this.entry.resolution_comment != null
         resolution_comment = this.entry.resolution_comment
+        resolution_col = "<td class='entry-col-res'>#{resolution_comment}</td>"
       else
-        resolution_col = '<td class="entry-col-res">' + resolution + '</td>'
+        resolution_comment = ''
+        resolution_col = "<td class='entry-col-res'>#{resolution}</td>"
       suggested_disposition = ''
       if this.entry.suggested_disposition != null
         suggested_disposition = this.entry.suggested_disposition
@@ -1156,19 +1158,25 @@ $ ->
       if this.entry.sbrs_score != null
         sbrs_score = this.entry.sbrs_score
       else sbrs_score = missing_data
-      entry_row = '<tr class="index-entry-row" data-case-id="0000' + dispute.id + '">' + '<td><input type="checkbox" onclick="toggleRow(this)" class="dispute-entry-checkbox dispute-entry-checkbox_' + dispute.id + '" id= ' + dispute_entry_id + ' ></td>' + '<td class="entry-col-content ' + important + '">' + entry_content + '</td>' +
-        '<td class="entry-col-status">' + status + '</td>' +
-        resolution_col +
-        '<td class="entry-col-disp">' + suggested_disposition + '</td>' +
-        '<td class="entry-col-cat">' + category + '</td>' +
-        '<td class="entry-col-wbrs-score">' +
-          "<span class='reputation-icon icon-#{rep} esc-tooltipped' title='#{tooltip_rep}'></span><span>#{wbrs_score}</span>" +
-        '</td>' +
-        '<td class="entry-col-wbrs-hits">' +  this.wbrs_rule_hits.length + '</td>' +
-        '<td class="entry-col-wbrs-rules">' + this.wbrs_rule_hits.join(', ') + '</td>' +
-        '<td class="entry-col-sbrs-score">' + sbrs_score + '</td>' +
-        '<td class="entry-col-sbrs-hits">' + this.sbrs_rule_hits.length + '</td>' +
-        '<td class="entry-col-sbrs-rules">' + this.sbrs_rule_hits.join(', ') + '</td>'
+      entry_row = "<tr class='index-entry-row' data-case-id='0000#{dispute.id}'>
+        <td>
+          <input type='checkbox' onclick='toggleRow(this)' class='dispute-entry-checkbox dispute-entry-checkbox_#{dispute.id}' id='#{dispute_entry_id}'>
+        </td>
+        <td class='entry-col-content#{important}'> #{entry_content}</td>
+        <td class='entry-col-status'>#{status}</td>
+        #{resolution_col}
+        <td class='entry-col-disp'>#{suggested_disposition}</td>
+        <td class='entry-col-cat'>#{category}</td>
+        <td class='entry-col-wbrs-score'>
+          <span class='reputation-icon icon-#{rep} esc-tooltipped' title='#{tooltip_rep}'></span>
+          <span>#{wbrs_score}</span>
+        </td>
+        <td class='entry-col-wbrs-hits'> #{this.wbrs_rule_hits.length}</td>
+        <td class='entry-col-wbrs-rules'>#{this.wbrs_rule_hits.join(', ')}</td>
+        <td class='entry-col-sbrs-score'>#{sbrs_score}</td>
+        <td class='entry-col-sbrs-hits'>#{this.sbrs_rule_hits.length}</td>
+        <td class='entry-col-sbrs-rules'>#{this.sbrs_rule_hits.join(', ')}</td>
+        </tr>"
       entry_rows.push entry_row
       return
     # `d` is the original data object for the row
