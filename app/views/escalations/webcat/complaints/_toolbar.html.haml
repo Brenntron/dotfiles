@@ -44,11 +44,11 @@
             %label.toolbar-section-label.edit-resolution-label Resolution
             = select(:complaint, :resolution, options_for_select([["Unchanged", "UNCHANGED"], ["Invalid", "INVALID"], ["Reopened", "REOPENED"]]))
             .comment-wrapper.internal_comment_container
-              %label.toolbar-section-label Internal Comment
-              %input.form-control#internal_comment{:name => "token", :type => "text", :value => ""}
+              %label.toolbar-section-label{'for':'internal_comment'} Internal Comment
+              %input.form-control#internal_comment{:name => "internal_comment", :placeholder => "Add a comment.", :type => "text", :value => ""}
             .comment-wrapper.customer_facing_comment_container
-              %label.toolbar-section-label Customer Facing Comment
-              %input.form-control#customer_facing_comment{:name => "token", :type => "text", :value => ""}
+              %label.toolbar-section-label{'for':'customer_facing_comment'} Customer Facing Comment
+              %input.form-control#customer_facing_comment{:name => "customer_facing_comment", :placeholder => "Add a comment for the customer.", :type => "text", :value => ""}
             %button{class: 'primary', type:'button', id: 'button_update_resolution', onclick:'updateResolutionDialog();'}
               Update
   %div
