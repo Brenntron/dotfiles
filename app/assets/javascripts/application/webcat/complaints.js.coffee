@@ -1750,9 +1750,9 @@ window.updateResolutionDialog = (confirm) ->
         pending_msg = "<div class='small pending-note'>*Entries with a PENDING status cannot be edited.<div>"
   $('#resolution_dialog').modal("show")
   if selected_rows.length > 1
-    html = "The following #{complaint_entries.length} entries will have their <span class='bold'>RESOLUTIONS</span> set to <span class='resolution-emp bold'>#{resolution}.</span>"
+    html = "Set the following #{complaint_entries.length} entries to <span class='resolution-emp bold'>#{resolution}.</span>"
   else
-    html = "The following entry will have its <span class='bold'>RESOLUTION</span> set to <span class='resolution-emp bold'>#{resolution}.</span>"
+    html = "Set the following entry to <span class='resolution-emp bold'>#{resolution}.</span>"
   html += pending_msg
   $('#resolution_text').html(html)
 

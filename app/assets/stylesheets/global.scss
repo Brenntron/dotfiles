@@ -1542,7 +1542,11 @@ fieldset.tight {
                           $content-bg-color 15px
           );
 }
-
+#index-change-assign-dropdown{
+  #internal_comment ,#customer_facing_comment{
+    font-size: inherit;
+  }
+}
 /*** Overriding selectize plugin styles to work with our forms ***/
 .selectize-input {
   border: none;
