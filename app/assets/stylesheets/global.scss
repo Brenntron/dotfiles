@@ -10626,11 +10626,11 @@ span.threat-cat-no-data {
   th.entry-col-wbrs-score{
     display: block;
   }
-  .entry-col-wbrs-container{
-    display: inline-flex;
-    .reputation-icon{
-      top: 0
-    }
+}
+.reputation-icon-container{
+  display: inline-flex;
+  .reputation-icon{
+    top: -1px
   }
 }
 // webrep dispute index > ensure the dispute count is to the right of the domain entry

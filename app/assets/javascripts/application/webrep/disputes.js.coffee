@@ -1169,7 +1169,7 @@ $ ->
         <td class='entry-col-disp'>#{suggested_disposition}</td>
         <td class='entry-col-cat'>#{category}</td>
         <td class='entry-col-wbrs-score'>
-          <div class='entry-col-wbrs-container'>
+          <div class='reputation-icon-container'>
             <span class='reputation-icon icon-#{rep} esc-tooltipped' title='#{tooltip_rep}'></span>
             <span>#{wbrs_score}</span>
           <div>

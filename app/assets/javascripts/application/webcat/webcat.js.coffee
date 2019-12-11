@@ -525,7 +525,7 @@ $ ->
                     rep = 'unknown'
                   tooltip_rep = rep.toUpperCase()
                   icon = "<span class='reputation-icon icon-#{rep} esc-tooltipped' title='#{tooltip_rep}'></span>"
-                  return "#{icon}<span id='wbrs_score_#{entry_id}'>#{wbrs_score}</span>"
+                  return "<div class='reputation-icon-container'>#{icon}<span id='wbrs_score_#{entry_id}'>#{wbrs_score}</span>"
               }
               {
                 data: 'submitter_type'
