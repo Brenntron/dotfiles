@@ -1169,8 +1169,10 @@ $ ->
         <td class='entry-col-disp'>#{suggested_disposition}</td>
         <td class='entry-col-cat'>#{category}</td>
         <td class='entry-col-wbrs-score'>
-          <span class='reputation-icon icon-#{rep} esc-tooltipped' title='#{tooltip_rep}'></span>
-          <span>#{wbrs_score}</span>
+          <div class='entry-col-wbrs-container'>
+            <span class='reputation-icon icon-#{rep} esc-tooltipped' title='#{tooltip_rep}'></span>
+            <span>#{wbrs_score}</span>
+          <div>
         </td>
         <td class='entry-col-wbrs-hits'> #{this.wbrs_rule_hits.length}</td>
         <td class='entry-col-wbrs-rules'>#{this.wbrs_rule_hits.join(', ')}</td>

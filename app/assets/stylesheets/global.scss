@@ -10618,18 +10618,18 @@ span.threat-cat-no-data {
   max-width: 250px;
 }
 
-#disputes-index{
+.dispute-entry-table-wrapper{
   background: $content-bg-color;
   td{
-    border-bottom: unset;
+    border-color: $table-dark-header;
   }
   th.entry-col-wbrs-score{
     display: block;
   }
-  .entry-col-wbrs-score{
+  .entry-col-wbrs-container{
     display: inline-flex;
     .reputation-icon{
-    top: 0
+      top: 0
     }
   }
 }
