@@ -619,7 +619,7 @@ Feature: Webcat complaints
     And I wait for "3" seconds
     Then I should see content "1" within "#int-assigned-count"
 
-  @javascript @now
+  @javascript
   Scenario: a user uses the Update Resolution feature on multiple entries and includes an internal and resolution comment
     Given a user with role "webcat user" exists and is logged in
     And the following complaint entries exist:
@@ -628,9 +628,7 @@ Feature: Webcat complaints
       |2 | food.com      | NEW    |
       |3 | im.hungry.com | NEW    |
     When I goto "/escalations/webcat/complaints"
-    And I select row "3"
-    And I select row "2"
-    And I select row "1"
+    And I click "#complaints_check_box"
     And I click "#index_update_resolution"
     And I select "Unchanged" from "complaint_resolution"
     And I fill in element, "#internal_comment" with "Cisco"
@@ -652,7 +650,7 @@ Feature: Webcat complaints
     Then the following complaint entry with id: "2" has a resolution comment of: "Disco"
     Then the following complaint entry with id: "3" has a resolution comment of: "Disco"
 
-  @javascript @now
+  @javascript
   Scenario: a user attempts to use Update Resolution on a Pending/Completed Complaint Entry, but INVALID and UNCHANGED are disabled from the drop-down menu
     Given a user with role "webcat user" exists and is logged in
     And the following complaint entries exist:
@@ -660,10 +658,10 @@ Feature: Webcat complaints
       |1 | blah.com | blah.com       | PENDING   | FIXED      | URI/DOMAIN |
       |2 | food.com | food.com       | COMPLETED | FIXED      | URI/DOMAIN |
     When I goto "/escalations/webcat/complaints"
-    And I select row "2"
-    And I select row "1"
-    And take a screenshot
+    And I wait for "2" seconds
+    And I click "#complaints_check_box"
     And I click "#index_update_resolution"
+    And I wait for "4" seconds
     Then the "Unchanged" option from "complaint_resolution" is disabled
     Then the "Invalid" option from "complaint_resolution" is disabled
     Then the "Reopened" option from "complaint_resolution" is not disabled
@@ -677,14 +675,11 @@ Feature: Webcat complaints
       |2 | food.com          |      0       | NEW    |
       |3 | im.hungry.com     |      0       | NEW    |
     When I goto "/escalations/webcat/complaints"
-    And I select row "3"
-    And I select row "2"
-    And I select row "1"
+    And I click "#complaints_check_box"
     And I click "#index_update_resolution"
-    And I select "Invalid" from "complaint[resolution]"
+    And I select "Invalid" from "complaint_resolution"
     And I click "#button_update_resolution"
-    And I wait for "4" seconds
-    And take a screenshot
+    And I wait for "2" seconds
     Then I should see "Set the following 3 entries to RESOLUTION INVALID."
     When I click "#submit_resolution_changes"
     And I wait for "1" seconds
@@ -704,9 +699,7 @@ Feature: Webcat complaints
       |2 | food.com          | COMPLETED |
       |3 | im.hungry.com     | NEW       |
     When I goto "/escalations/webcat/complaints"
-    And I select row "3"
-    And I select row "2"
-    And I select row "1"
+    And I click "#complaints_check_box"
     And I click "#index_update_resolution"
     And I select "Reopened" from "complaint_resolution"
     And I click "#button_update_resolution"
