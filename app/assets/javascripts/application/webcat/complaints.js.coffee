@@ -623,16 +623,20 @@ $(document).on 'click', '#complaints-index tr, #complaints_check_box', ->
   disabled = true
   for row in rows
     { status } = row
+
     if status == 'COMPLETED'
         reopened = true
         disabled = false
     if  status == 'RESOLVED' || status == 'NEW' || status == 'ASSIGNED'|| status == 'REOPENED'
         invalid_unchanged = true
         disabled = false
+
   if disabled == false
-    $('#index_update_resolution').removeAttr('disabled')
+    $('#index_update_resolution').attr('disabled', false)
+    debugger
   else
     $('#index_update_resolution').prop('disabled', disabled)
+
   reopened_opt = $('#complaint_resolution option:contains("Reopened")')
   invalid_opt = $('#complaint_resolution option:contains("Invalid")')
   unchanged_opt = $('#complaint_resolution option:contains("Unchanged")')
