@@ -1543,6 +1543,7 @@ fieldset.tight {
           );
 }
 #index-change-assign-dropdown{
+  padding: 20px 0 12px 0!important;
   #internal_comment ,#customer_facing_comment{
     font-size: inherit;
   }
@@ -8582,7 +8583,11 @@ hr.thin.form-divider {
   .modal-dialog {
     width: 600px;
   }
-
+  .modal-footer{
+    border-top: none;
+    margin: 7px 0px;
+    adding: 0 0 0 15px;
+  }
   .close {
     top: 3px;
     right: 3px;

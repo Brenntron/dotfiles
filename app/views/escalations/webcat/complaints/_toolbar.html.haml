@@ -39,18 +39,17 @@
         %span.toolbar-button-text
           Submit Resolution
       .dropdown-menu.toolbar-dropdown#index-change-assign-dropdown{'aria-labelledby': 'index_update_resolution'}
-        .toolbar
-          .edit-resolution-container
-            %label.toolbar-section-label.edit-resolution-label{for:'complaint[resolution]'} Resolution
-            = select(:complaint, :resolution, options_for_select([["Unchanged", "UNCHANGED"], ["Invalid", "INVALID"], ["Reopened", "REOPENED"]]))
-            .comment-wrapper.internal_comment_container
-              %label.toolbar-section-label{'for':'internal_comment'} Internal Comment
-              %input.form-control#internal_comment{:name => "internal_comment", :placeholder => "Add a comment.", :type => "text", :value => ""}
-            .comment-wrapper.customer_facing_comment_container
-              %label.toolbar-section-label{'for':'customer_facing_comment'} Customer Facing Comment
-              %input.form-control#customer_facing_comment{:name => "customer_facing_comment", :placeholder => "Add a comment for the customer.", :type => "text", :value => ""}
-            %button{class: 'primary', type:'button', id: 'button_update_resolution', onclick:'updateResolutionDialog();'}
-              Update
+        .edit-resolution-container
+          %label.toolbar-section-label.edit-resolution-label{for:'complaint[resolution]'} Resolution
+          = select(:complaint, :resolution, options_for_select([["Unchanged", "UNCHANGED"], ["Invalid", "INVALID"], ["Reopened", "REOPENED"]]))
+          .comment-wrapper.internal_comment_container
+            %label.toolbar-section-label{'for':'internal_comment'} Internal Comment
+            %input.form-control#internal_comment{:name => "internal_comment", :placeholder => "Add a comment.", :type => "text", :value => ""}
+          .comment-wrapper.customer_facing_comment_container
+            %label.toolbar-section-label{'for':'customer_facing_comment'} Customer Facing Comment
+            %input.form-control#customer_facing_comment{:name => "customer_facing_comment", :placeholder => "Add a comment for the customer.", :type => "text", :value => ""}
+          %button{class: 'primary', type:'button', id: 'button_update_resolution', onclick:'updateResolutionDialog();'}
+            Update
   %div
     %label.toolbar-section-label
       Pin Toolbar

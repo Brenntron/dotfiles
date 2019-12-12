@@ -1732,6 +1732,16 @@ window.verifyMasterSubmit = () ->
   return boolean
 
 window.updateResolutionDialog = (confirm) ->
+
+
+
+#   { status } = row
+#  if status == 'COMPLETED'
+#    reopened = true
+#    disabled = false
+#  if  status == 'RESOLVED' || status == 'NEW' || status == 'ASSIGNED'|| status == 'REOPENED'
+#    invalid_unchanged = true
+#    disabled = false
   $('#complaint_entries_to_update').empty()
   resolution = $('#complaint_resolution')[0].value
   selected_rows = $('tr.selected')
@@ -1740,14 +1750,24 @@ window.updateResolutionDialog = (confirm) ->
   for row in selected_rows
     { id } = row
     status = $(row).find('.state-col').text()
-    if status != 'PENDING'
-      complaint_entries.push(id)
-      full_domain = ''
-      domain = $(row).find("#domain_#{id}").attr('data-full')
-      $('#complaint_entries_to_update').append("<tr><td><span class='res_id'>#{id} |</span> <span class='webcat-full-domain'>#{domain}</span></td></tr>")
-    else
+    if status == 'PENDING'
       if pending_msg == ''
         pending_msg = "<div class='small pending-note'>*Entries with a PENDING status cannot be edited.<div>"
+    else
+      push_row = false
+      if resolution == 'REOPENED' && status == 'COMPLETED'
+        push_row = true
+
+      if resolution == 'RESOLVED' || status == 'NEW' || status == 'ASSIGNED'|| status == 'REOPENED'
+        if resolution == 'INVALID' || resolution == 'UNCHANGED'
+          push_row = true
+
+      if push_row
+        $(row).addClass('filtered-row')
+        complaint_entries.push(id)
+        full_domain = ''
+        domain = $(row).find("#domain_#{id}").attr('data-full')
+        $('#complaint_entries_to_update').append("<tr><td><span class='res_id'>#{id} |</span> <span class='webcat-full-domain'>#{domain}</span></td></tr>")
   $('#resolution_dialog').modal("show")
   if selected_rows.length > 1
     html = "Set the following #{complaint_entries.length} entries to <span class='bold'>RESOLUTION</span> <span class='resolution-emp bold'>#{resolution}.</span>"
@@ -1767,7 +1787,7 @@ window.updateResolutionDialog = (confirm) ->
 
 window.updateResolution = () ->
   resolution = $('#complaint_resolution')[0].value
-  selected_rows = $('tr.selected')
+  selected_rows = $('tr.selected.filtered-row')
   internal_comment = $('#internal_comment')[0].value
   customer_facing_comment = $('#customer_facing_comment')[0].value
 
