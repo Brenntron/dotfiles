@@ -3,7 +3,7 @@ Feature: Webrep, the BFRP
   I will provide an interface to search these
   by domain.
 
-  @javascript @now
+  @javascript
   Scenario: Duplicate entries are consolidated into a single row in this view
     Given a user with role "webrep user" exists and is logged in
     And the following disputes exist:
@@ -20,7 +20,7 @@ Feature: Webrep, the BFRP
     Then I wait for "30" seconds
     Then I should see "3 ticket(s)"
 
-  @javascript @now
+  @javascript
   Scenario: Duplicate resolution also works with IP addresses
     Given a user with role "webrep user" exists and is logged in
     And the following disputes exist:

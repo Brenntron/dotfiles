@@ -619,7 +619,7 @@ Feature: Webcat complaints
     And I wait for "3" seconds
     Then I should see content "1" within "#int-assigned-count"
 
-  @javascript
+  @javascript @now
   Scenario: a user uses the Update Resolution feature on multiple entries and includes an internal and resolution comment
     Given a user with role "webcat user" exists and is logged in
     And the following complaint entries exist:
@@ -631,12 +631,12 @@ Feature: Webcat complaints
     And I select row "3"
     And I select row "2"
     And I select row "1"
-    And I click "#subdomain_1"
     And I click "#index_update_resolution"
     And I select "Unchanged" from "complaint_resolution"
     And I fill in element, "#internal_comment" with "Cisco"
     And I fill in element, "#customer_facing_comment" with "Disco"
     And I click "#button_update_resolution"
+    And I wait for "4" seconds
     And I should see "Set the following 3 entries to RESOLUTION UNCHANGED."
     And I click "#submit_resolution_changes"
     Then the following complaint entry with id: "1" has a resolution of: "UNCHANGED"
@@ -652,7 +652,7 @@ Feature: Webcat complaints
     Then the following complaint entry with id: "2" has a resolution comment of: "Disco"
     Then the following complaint entry with id: "3" has a resolution comment of: "Disco"
 
-  @javascript
+  @javascript @now
   Scenario: a user attempts to use Update Resolution on a Pending/Completed Complaint Entry, but INVALID and UNCHANGED are disabled from the drop-down menu
     Given a user with role "webcat user" exists and is logged in
     And the following complaint entries exist:
@@ -662,7 +662,7 @@ Feature: Webcat complaints
     When I goto "/escalations/webcat/complaints"
     And I select row "2"
     And I select row "1"
-    And I click "#subdomain_1"
+    And take a screenshot
     And I click "#index_update_resolution"
     Then the "Unchanged" option from "complaint_resolution" is disabled
     Then the "Invalid" option from "complaint_resolution" is disabled
@@ -680,11 +680,11 @@ Feature: Webcat complaints
     And I select row "3"
     And I select row "2"
     And I select row "1"
-    And I click "#subdomain_1"
     And I click "#index_update_resolution"
-    And I select "Invalid" from "complaint_resolution"
+    And I select "Invalid" from "complaint[resolution]"
     And I click "#button_update_resolution"
-
+    And I wait for "4" seconds
+    And take a screenshot
     Then I should see "Set the following 3 entries to RESOLUTION INVALID."
     When I click "#submit_resolution_changes"
     And I wait for "1" seconds
@@ -707,10 +707,10 @@ Feature: Webcat complaints
     And I select row "3"
     And I select row "2"
     And I select row "1"
-    And I click "#subdomain_1"
     And I click "#index_update_resolution"
     And I select "Reopened" from "complaint_resolution"
     And I click "#button_update_resolution"
+    And I wait for "5" seconds
     Then I should see "Set the following 2 entries to RESOLUTION REOPENED"
     When I click "#submit_resolution_changes"
     And I wait for "1" seconds
