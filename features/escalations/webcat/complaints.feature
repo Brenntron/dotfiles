@@ -693,6 +693,7 @@ Feature: Webcat complaints
     And I click "#button_update_resolution"
     Then I should see "Set the following 2 entries to RESOLUTION REOPENED"
     When I click "#submit_resolution_changes"
+    And I wait for "3" seconds
     Then the following complaint entry with id: "1" has a status of: "REOPENED"
     Then the following complaint entry with id: "2" has a status of: "REOPENED"
     Then the following complaint entry with id: "3" has a status of: "NEW"
