@@ -36,6 +36,10 @@ $ ->
     resolution = $('#resolution-input')[0].selectize.items
     customer_name = $('#name-input')[0].selectize.items
     { items, options } = category_input[0].selectize
+    complaints = $('#complaint-input')[0].selectize.items
+    channels = $('#channel-input')[0].selectize.items
+    entry_ids = $('#entryid-input')[0].selectize.items
+    complaint_ids = $('#complaintid-input')[0].selectize.items
 
     if tags.length
       form['tags'] = tags.join()
@@ -49,6 +53,15 @@ $ ->
       form['resolution'] = resolution.join()
     if customer_name.length
       form['customer_name'] = customer_name.join()
+    if complaints.length
+      form['ip_or_uri'] = complaints.join()
+    if channels.length
+      form['Channel'] = channels.join()
+    if entry_ids.length
+      form['entry_id'] = entry_ids.join()
+    if complaint_ids.length
+      form['complaint_id'] = complaint_ids.join()
+
 
     for item in $('#cat_named_search :input:not(:hidden)').serializeArray()
       { name, value } = item
@@ -585,10 +598,6 @@ $ ->
     tag_input = $('#tags-input').selectize {
       persist: false
       create: false
-      maxItems: null
-      valueField: 'name'
-      labelField: 'name'
-      searchField: 'name'
       options: createSelectOptions()
     }
     category_input = $('#category-input').selectize {
@@ -603,39 +612,65 @@ $ ->
     company_input = $('#company-input').selectize {
       persist: false,
       create: false,
-      maxItems: 5,
       valueField: 'company_name',
       labelField: 'company_name',
       searchField: 'company_name',
-      options: null
     }
     status_input = $('#status-input').selectize {
       persist: false,
       create: false,
-      maxItems: 5,
-      valueField: 'name'
-      labelField: 'name'
-      searchField: 'name'
+      maxItems: 6,
+      valueField: 'name',
+      labelField: 'name',
+      searchField: 'name',
       options: [{name: "NEW"}, {name: "RESOLVED"}, {name: "ASSIGNED"}, {name: "ACTIVE"},
                {name: "COMPLETED"}, {name: "PENDING"}, {name: "REOPENED"}]
     }
     resolution_input = $('#resolution-input').selectize {
       persist: false,
       create: false,
-      maxItems: 5,
-      valueField: 'name'
-      labelField: 'name'
-      searchField: 'name'
+      maxItems: 3,
+      valueField: 'name',
+      labelField: 'name',
+      searchField: 'name',
       options: [{name: "FIXED"}, {name: "INVALID"}, {name: "UNCHANGED"}, {name: "DUPLICATE"}]
     }
     customer_input = $('#name-input').selectize {
       persist: false,
       create: false,
-      maxItems: 5,
-      valueField: 'name'
-      labelField: 'name'
-      searchField: 'name'
-      options: null
+      valueField: 'name',
+      labelField: 'name',
+      searchField: 'name',
+    }
+    complaint_input = $('#complaint-input').selectize {
+      persist: false,
+      create: false,
+      valueField: 'name',
+      labelField: 'name',
+      searchField: 'name',
+    }
+    channel_input = $('#channel-input').selectize {
+      persist: false,
+      create: false,
+      maxItems: 2,
+      valueField: 'name',
+      labelField: 'name',
+      searchField: 'name',
+      options: [{name: "Internal"}, {name: "TalosIntel"}, {name: "WBNP"}]
+    }
+    entry_ids = $('#entryid-input').selectize {
+      persist: false,
+      create: false,
+      valueField: 'name',
+      labelField: 'name',
+      searchField: 'name',
+    }
+    complaint_ids = $('#complaintid-input').selectize {
+      persist: false,
+      create: false,
+      valueField: 'name',
+      labelField: 'name',
+      searchField: 'name',
     }
     window.clearSelectize = (input) ->
       $("##{input}")[0].selectize.clear()
