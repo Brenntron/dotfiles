@@ -633,7 +633,6 @@ $(document).on 'click', '#complaints-index tr, #complaints_check_box', ->
 
   if disabled == false
     $('#index_update_resolution').attr('disabled', false)
-    debugger
   else
     $('#index_update_resolution').prop('disabled', disabled)
 
