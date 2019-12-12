@@ -9204,18 +9204,16 @@ button.secondary.view-report-external-button {
 
 // dbinebri: updates below for file rep navbar layout new
 .escalations--file_rep--disputes-controller {
-
   .nav-tool-blocks.search-wrapper {
     padding: 7px 7px 7px 40px;
     text-align: left;
   }
-
   .input-group.search-group {
     padding: 3px 3px 3px 5px;
     margin: 0 0 0 20px;
     width: 100%;
     min-width: 200px;
-    max-width: 450px;
+    max-width: 450px;  // shorten to handle longer usernames on right
   }
 
   // search input field
@@ -9248,6 +9246,7 @@ button.secondary.view-report-external-button {
     float: right;
   }
 
+
   // file rep navbar specific styles - minor width adjustments, col-lg-1 is too tight, col-lg-2 too wide
   @media screen and (min-width: 1200px) {
     .col-lg-1.nav-naming-guide, .col-lg-1.nav-new-ticket {
@@ -9256,12 +9255,25 @@ button.secondary.view-report-external-button {
     // below ensures the navbar widths adds up correctly
     .col-lg-2.nav-username {
       width: 17%;
+      display: inline-block;
+      position: absolute;
+      right: 0;
+    }
+  }
+
+  // 1430px specific
+  @media screen and (min-width: 1201px) and (max-width: 1500px) {
+    .nav-page-button-wrapper {
+      width: 120px;
+    }
+    .col-lg-2.nav-username {
+      display: none;
     }
   }
 
   // dbinebri: the tooltips for file rep get too wide, limit the max-width
   .tooltipster-sidetip {
-    max-width: 410px !important;
+    max-width: 460px !important;
   }
 }
 
@@ -9354,7 +9366,7 @@ button.secondary.view-report-external-button {
 
 // dbinebri: the tooltips for modals on file rep get too wide, limit the max-width a little bit
 .tooltipster-sidetip .tooltipster-box {
-  max-width: 410px !important;
+  max-width: 460px !important;
 }
 
 .data-report-wrapper hr.thin {
@@ -11376,5 +11388,115 @@ span.threat-cat-no-data {
     border-right: solid 1px $content-bg-color;
     height: 95px;
     max-width: 220px;
+  }
+}
+
+// file rep nav bar - ensure top-left nav icons never break/wrap + minor spacing updates
+.escalations--file_rep--disputes-controller {
+  .nav-page-button-wrapper {
+    white-space: nowrap;
+  }
+  #filerep-index-title {
+    margin-left: 2px;
+  }
+  .file-rep-index-toolbar {
+    margin-top: 25px;
+  }
+  .search-condition-name {
+    margin-left: 2px;
+    margin-bottom: 5px;
+  }
+  #filerep_searchref_container {
+    margin-bottom: 0;
+    display: inline;  // ensure no used vertical space when empty
+  }
+  // show 25 entries
+  #file-rep-datatable_length label {
+    margin-left: 3px;
+    margin-bottom: 15px;
+  }
+  // cursor default for show/hide menu
+  #file-index-table-show-columns-dropdown ul li {
+    cursor: default;
+  }
+}
+
+
+// CATEGORIZE URLs dropdown - overall wrapper
+.escalations--webcat--complaints-controller .nav-tools-dropdown[aria-labelledby='categorize-urls'] {
+  padding-top: 5px;
+  h3 {
+    padding: 6px 5px 9px;
+  }
+}
+
+// CATEGORIZE URLs dropdown - vertical spacing tightening (below the radio buttons)
+.escalations--webcat--complaints-controller #categorize-urls-form-wrapper {
+  // "Different categories for each url" is radio selected (the default view)
+  padding: 8px 15px 5px;
+  input {
+    display: block;
+    font-size: 8pt;
+    line-height: 12pt;
+    margin-bottom: 5px;
+  }
+  hr {
+    display: none;
+  }
+  .form-group {
+    margin-bottom: 20px;
+  }
+  .form-control.selectize {
+    font-size: 8.5pt;
+    line-height: 14pt;
+    height: 28px;
+    max-width: 455px;
+  }
+  .item {
+    font-size: 8pt;
+    line-height: 12pt;
+    margin: 3px 2px 0 !important; // override needed
+  }
+  .content-label-sm {
+    display: inline-block;
+    float: left;
+    width: 60px;
+    padding-top: 6px;
+    padding-left: 2px;
+  }
+  .form-control.selectize {
+    margin-bottom: 4px;
+  }
+  input, .form-control.selectize {
+    display: inline-block;
+    width: 360px;
+    padding-left: 2px;
+  }
+  .toolbar span {
+    font-size: 8pt;
+    line-height: 12pt;
+  }
+  .toolbar-button {
+    font-size: 8pt;
+    line-height: 12pt;
+    background-size: 16px 16px;
+    background-position: 5px center;
+  }
+  button#cat_dif_submit {
+    font-size: 9pt;
+    line-height: 14pt;
+    margin: 0 10px;
+    padding: 12px 30px;
+  }
+  // "Same categories for each url" is the radio selected
+  #categorize-same-form {
+    label.content-label-sm {
+      padding-top: 5px;
+      display: block;
+      width: 90%;
+    }
+    .form-group {
+      margin-bottom: 10px;
+    }
   }
 }

@@ -32,7 +32,7 @@ describe Complaint do
     {
         "data" => [
             {
-                "category" => 5,
+                "category_id" => 5,
                 "desc_long" => "Auctions; bartering; online purchasing; coupons and free offers; yellow pages; classified ads; general office supplies; online catalogs; online malls.",
                 "descr" => "Shopping",
                 "mnem" => "shop",
