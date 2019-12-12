@@ -6042,7 +6042,9 @@ td.ticket-total::before {
   margin-left: 0;
   min-width: 0;
 }
-
+#resolution_dialog hr{
+  margin: 0 10px;
+}
 #index-change-assign-dropdown .toolbar, #file-disp-dropdown .toolbar {
   margin-bottom: 5px;
 }
