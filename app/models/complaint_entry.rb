@@ -654,7 +654,6 @@ class ComplaintEntry < ApplicationRecord
 
     if params['tags'].present?
       relation = relation.joins(complaint: :complaint_tags).where(complaint_tags: {name: params['tags'].split(',')})
-      # relation = relation.joins(complaint: :complaint_tags).where(complaint_tags: {name: "[P3] .com.au URLs"})
     end
     customer_params = present_params.slice(*%w{customer_name customer_email company_name})
     unless customer_params.empty?
