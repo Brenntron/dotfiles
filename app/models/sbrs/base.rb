@@ -171,7 +171,9 @@ class Sbrs::Base
         uri_item = "#{body['ip']}"
       end
 
+
       request_string = "https://" + sds_host + query_string + uri_item
+
       uri = URI.parse(request_string)
       request = Net::HTTP::Get.new(uri)
 
@@ -191,8 +193,10 @@ class Sbrs::Base
         response = Net::HTTP.start(uri.hostname, uri.port, req_options) do |http|
           http.request(request)
         end
+
         if response.code != "200"  #there was an issue
           '{"response": "request failed"}'
+
         else
           response # was: response.body per T/I source code
         end
@@ -231,6 +235,7 @@ class Sbrs::Base
       '{"response": "no query_string clause for [' + query_string + ']"}'
     end
   end
+
 
   def self.remote_lookup_sds_v3(params)
     hostname = "#{params["hostname"]}"
