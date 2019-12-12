@@ -631,6 +631,7 @@ Feature: Webcat complaints
     And I select row "3"
     And I select row "2"
     And I select row "1"
+    And I click "#subdomain_1"
     And I click "#index_update_resolution"
     And I select "Unchanged" from "complaint_resolution"
     And I fill in element, "#internal_comment" with "Cisco"
@@ -662,8 +663,9 @@ Feature: Webcat complaints
     When I goto "/escalations/webcat/complaints"
     And I select row "2"
     And I select row "1"
-    And take a screenshot
+    And I click "#subdomain_2"
     And I click "#index_update_resolution"
+    And I wait for "3" seconds
     Then the "Unchanged" option from "complaint_resolution" is disabled
     Then the "Invalid" option from "complaint_resolution" is disabled
     Then the "Reopened" option from "complaint_resolution" is not disabled
@@ -680,6 +682,7 @@ Feature: Webcat complaints
     And I select row "3"
     And I select row "2"
     And I select row "1"
+    And I click "#subdomain_1"
     And I click "#index_update_resolution"
     And I select "Invalid" from "complaint[resolution]"
     And I click "#button_update_resolution"
@@ -707,6 +710,7 @@ Feature: Webcat complaints
     And I select row "3"
     And I select row "2"
     And I select row "1"
+    And I click "#subdomain_1"
     And I click "#index_update_resolution"
     And I select "Reopened" from "complaint_resolution"
     And I click "#button_update_resolution"
