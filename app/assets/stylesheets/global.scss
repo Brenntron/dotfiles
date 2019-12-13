@@ -10642,7 +10642,7 @@ span.threat-cat-no-data {
 /* handles existing bug for wl/bl list duplicate entries (a.com issue) */
 .wlbl-table-result {
   display: inline-block;
-  min-width: 80px;
+  min-width: 50px;
   max-width: 150px;
   max-height: 45px;
   overflow-y: hidden;

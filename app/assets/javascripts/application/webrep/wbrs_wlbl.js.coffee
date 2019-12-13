@@ -1,6 +1,6 @@
-################################################################################
-# FUNCTIONS FOR POPULATING, SUBMITTING, ETC. WBRS WL/BL INFORMATION
-################################################################################
+######################################################################################
+# FUNCTIONS FOR POPULATING, SUBMITTING, ETC. WBRS WL/BL, THREAT CATEGORY INFORMATION
+######################################################################################
 
 ## Populating the toolbar Adjust WL/BL dropdown BULK
 ## This works for index, research page, and research tab of show page
@@ -203,7 +203,6 @@ window.bulk_get_current_wlbl = (page) ->
     $(tbody).append(table_row)
 
 
-
 # order the rows for bulk dropdown, same order on left cbs as on right dd rows
 window.bulk_order_rows = () ->
   if $('#wlbl_adjust_entries_index').length > 0  # index dropdown
@@ -264,6 +263,7 @@ window.get_current_wlbl = (button) ->
   entry_content = $(entry_wrapper).text().trim()
   wbrs = $($(research_row).find('.entry-data-wbrs-score')[0]).text()
   tc_cell = $($(research_row).find('.wlbl-threat-cat-inline')[0])
+  tcs_from_row = ''  # grab tc's from the research row (show or bfrp) for the dd
 
   # On show page, if status is closed, then add a sentence that says you can't do anything
   if $(research_row).find('.entry-data-status').length
@@ -382,15 +382,19 @@ window.get_current_wlbl = (button) ->
 
               tc_promise = new Promise (resolve, reject) ->   # get and set the tc's with a promise
                 tc_json = get_threat_categories(entry_content)
-                if tc_json then resolve tc_json  # resolve goes to .then() below
+                if tc_json
+                  resolve tc_json  # resolve goes to .then() below
 
               tc_promise.then (result) ->
                 {threat_categories} = JSON.parse(result)
+
+                ### retain this commented block for now. delete when obvious it's safe to do so.
                 if threat_categories.length == 0
                   tc_str = '<span class="threat-cat-no-data">No category</span>'
                 else tc_str = threat_categories.join(', ')
+                $(tc_cell).html(tc_str)  # write the tc's into the dd
+                ###
 
-                $(tc_cell).html(tc_str)  # place the TC's in the html
                 $(dropdown).find('.threat-cat-cell').each ->
                   curr = $(this)  # pre-toggle the tc cb's in the tc row below
                   $(threat_categories).each (i, value) ->
@@ -398,7 +402,7 @@ window.get_current_wlbl = (button) ->
                       $(curr).find('input:checkbox').prop('checked', true)
 
         if wbrs.trim() == 'No score'
-          wbrs ="<span class='missing-data'>No score</span>"
+          wbrs = "<span class='missing-data'>No score</span>"
         $(wbrs_score).html(wbrs)
 
         $(wlbl_list[0]).text(response.data.sort().reverse().join(', '))   # sort the lists from weak to heavy
@@ -418,6 +422,10 @@ window.get_current_wlbl = (button) ->
       popup_response_error(response, 'Error retrieving WL/BL Data')
 
     complete: () ->
+      # show the current tc's inside the dropdown, even if no bl's present
+      tcs_from_row = $(research_row).find('.wlbl-tc-research-span').html()  # from the research row, get the curr tc's
+      $(dropdown).find('.wlbl-threat-cat-inline').html(tcs_from_row)  # into the dropdown, add those tc's
+
       # inline specific - determine if wl's OR bl's are already pre-selected, disable ability to select opposite cb's
       wl_num = $(dropdown).find('.lists-row input[value^="WL-"]:checked').length
       bl_num = $(dropdown).find('.lists-row input[value^="BL-"]:checked').length
@@ -1058,8 +1066,8 @@ window.add_wlbl_threat_cat_listeners = () ->
   $('.dispute-wlbl-adjust-wrapper .dropdown-submit-button').click ->
     $(this).html('Processing...<span class="mini-loader loader-white"></span>').prop('disabled', true)
 
-  # research rows: on page load, verify we're on research tab or bfrp, and then verify the wl/bl has text
-  if ($('#research-tab').length || $('.reputation-research-search-wrapper').length) && $('.wlbl-table-result').text().trim() != ''
+  # research rows: on page load, verify we're on research tab or bfrp
+  if $('#research-tab').length || $('.reputation-research-search-wrapper').length
     $('.research-table-row').each ->
       ip_uri = $(this).find('.entry-data-content').text().trim()
       tc_area = $(this).find('.wlbl-tc-research-span')
