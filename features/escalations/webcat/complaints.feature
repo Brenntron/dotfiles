@@ -115,16 +115,8 @@ Feature: Webcat complaints
     Then I wait for "3" seconds
     Then I should see "ASSIGNED"
 
-  @javascript
-  Scenario: a user tries to take multiple complaints one of which is invalid
-    Given a user with role "webcat user" exists and is logged in
-    And the following complaint entries exist:
-      |id|  domain      |
-      |1 | blah.com     |
-      |2 | food.com     |
-      |3 | im.hungry.com     |
-    And a complaint entry preload exists
-    Then pending
+  # TODO write this test
+  # Scenario: a user tries to take multiple complaints one of which is invalid
 
   @javascript
   Scenario: a user can return a complaint
