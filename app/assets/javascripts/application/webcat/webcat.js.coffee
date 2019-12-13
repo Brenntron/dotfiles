@@ -644,14 +644,14 @@ $ ->
       labelField: 'name',
       searchField: 'name',
     }
-    complaint_input = $('#complaint-input').selectize {
-      persist: false,
-      create: (input) ->
-        {
-          value: input
-          text: input
-        }
-    }
+#    complaint_input = $('#complaint-input').selectize {
+#      persist: false,
+#      create: (input) ->
+#        {
+#          value: input
+#          text: input
+#        }
+#    }
     channel_input = $('#channel-input').selectize {
       persist: false,
       create: false,
@@ -679,6 +679,8 @@ $ ->
           text: input
         }
     }
+
+
     window.clearSelectize = (input) ->
       $("##{input}")[0].selectize.clear()
 

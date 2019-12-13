@@ -606,6 +606,22 @@ class ComplaintEntry < ApplicationRecord
       present_params['resolution'] = present_params['resolution'].split(',')
     end
 
+    if present_params['id'].present?
+      present_params['id'] = present_params['id'].split(',')
+    end
+
+    if present_params['complaint_id'].present?
+      present_params['complaint_id'] = present_params['complaint_id'].split(',')
+    end
+
+    if present_params['channel'].present?
+      present_params['channel'] = present_params['channel'].split(',')
+    end
+
+    if present_params['ip_or_uri'].present?
+      present_params['ip_or_uri'] = present_params['ip_or_uri'].split(',')
+    end
+
     simple_params = present_params.slice(*%w{id complaint_id resolution status})
 
     relation = where(simple_params)
@@ -688,6 +704,7 @@ class ComplaintEntry < ApplicationRecord
     ip_or_uri = present_params['ip_or_uri']
     if ip_or_uri.present?
       ip_or_uri_clause = "ip_address = :ip_or_uri OR uri like :ip_or_uri_pattern OR domain like :ip_or_uri_pattern"
+      binding.pry
       relation = relation.where(ip_or_uri_clause, ip_or_uri: ip_or_uri, ip_or_uri_pattern: "%#{ip_or_uri}%")
     end
 
