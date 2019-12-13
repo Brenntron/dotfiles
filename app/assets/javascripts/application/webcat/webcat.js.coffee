@@ -56,7 +56,7 @@ $ ->
     if complaints.length
       form['ip_or_uri'] = complaints.join()
     if channels.length
-      form['Channel'] = channels.join()
+      form['channel'] = channels.join()
     if entry_ids.length
       form['entry_id'] = entry_ids.join()
     if complaint_ids.length
