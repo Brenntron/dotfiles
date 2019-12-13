@@ -2,20 +2,6 @@ window.apply_filter_to_table = () ->
   filter = $("#cluster_filter_field").val()
   $('#regex-filter').html(filter)
   populate_clusters_index_table(filter);
-window.wbrs_display = (score) ->
-  score = parseInt(score)
-  if score == NaN
-    return 'unknown'
-  else if  score <= -6
-    return 'untrusted'
-  else if score <= -3
-    return 'questionable'
-  else if score <= 0
-    return 'neutral'
-  else if score < 6
-    return 'favorable'
-  else if score >= 6
-    return 'trusted'
 
 window.populate_clusters_index_table = (filter) ->
   if $('#clusters-index_wrapper').length > 0

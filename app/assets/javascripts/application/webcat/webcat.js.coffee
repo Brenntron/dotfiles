@@ -6,7 +6,7 @@ window.td_truncate = (str, max, long) ->
   if typeof str == 'string' and str.length > max then str.substring(0, max) + long else str
 
 window.wbrs_display = (score) ->
-  score = parseInt(score)
+  score = parseFloat(score)
   if score == NaN
     return 'unknown'
   else if  score <= -6
