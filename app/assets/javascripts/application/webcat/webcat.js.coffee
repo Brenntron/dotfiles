@@ -598,6 +598,8 @@ $ ->
     tag_input = $('#tags-input').selectize {
       persist: false
       create: false
+      valueField: 'name',
+      labelField: 'name',
       options: createSelectOptions()
     }
     category_input = $('#category-input').selectize {
@@ -642,6 +644,7 @@ $ ->
       labelField: 'name',
       searchField: 'name',
     }
+
     complaint_input = $('#complaint-input').selectize {
       persist: false,
       create: false,
