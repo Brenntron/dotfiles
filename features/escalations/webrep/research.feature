@@ -126,7 +126,7 @@ Feature: Webrep, the BFRP
     And  I should see "Has been added"
     And  I click ".close"
     And  I wait for "2" seconds
-#    Here is where we actually remove
+    #Here is where we actually remove
     Then I click ".bfrp-inline-wlbl-0"
     And  Element with class "wlbl-entry-wlbl" should have content "BL-med"
     Then I click "#bl-med-slider"
@@ -198,8 +198,8 @@ Feature: Webrep, the BFRP
     And  I click button "wlbl_entries_button"
     And  I wait for "5" seconds
     And  I should see "Not on a list"
-    And  Element with class "bfrp-dd-result-no-0" should not have content "WL-weak"
-    And  Element with class "bfrp-dd-result-no-1" should not have content "WL-weak"
+    And  Element with class "bfrp-result-no-0" should not have content "WL-weak"
+    And  Element with class "bfrp-result-no-1" should not have content "WL-weak"
     And  I choose "wlbl-add"
     And  I check checkbox with class "wl-weak-checkbox"
     And  I should not see "Threat Categories"
@@ -212,7 +212,7 @@ Feature: Webrep, the BFRP
     And  I wait for "2" seconds
     And  I click button "wlbl_entries_button"
     And  I wait for "5" seconds
-    And  Element with class "bfrp-dd-result-no-1" should have content "WL-weak"
+    And  Element with class "bfrp-result-no-0" should have content "WL-weak"
     And  clean up wlbl and remove all wlbl entries on "testing.com"
 
   # Pending front-end work (WEB-5534)
@@ -232,7 +232,7 @@ Feature: Webrep, the BFRP
     And  I click button "wlbl_entries_button"
     And  I wait for "5" seconds
     And  I should see "Not on a list"
-    And  Element with class "bfrp-dd-result-no-1" should not have content "BL-weak"
+    And  Element with class "bfrp-result-no-1" should not have content "BL-weak"
     And  I choose "wlbl-add"
     And  I check checkbox with class "bl-weak-checkbox"
     And  I should see "Threat Categories"
@@ -246,7 +246,7 @@ Feature: Webrep, the BFRP
     And  I wait for "2" seconds
     And  I click button "wlbl_entries_button"
     And  I wait for "5" seconds
-    And  Element with class "bfrp-dd-result-no-1" should have content "BL-weak"
+    And  Element with class "bfrp-result-no-0" should have content "BL-weak"
     And  clean up wlbl and remove all wlbl entries on "testing.com"
 
   # Pending front-end work (WEB-5534)
@@ -266,8 +266,8 @@ Feature: Webrep, the BFRP
     And  I click button "wlbl_entries_button"
     And  I wait for "5" seconds
     And  I should see "Not on a list"
-    And  Element with class "bfrp-dd-result-no-0" should not have content "BL-weak"
-    And  Element with class "bfrp-dd-result-no-1" should not have content "BL-weak"
+    And  Element with class "bfrp-result-no-0" should not have content "BL-weak"
+    And  Element with class "bfrp-result-no-1" should not have content "BL-weak"
     And  I choose "wlbl-add"
     And  I check checkbox with class "bl-weak-checkbox"
     And  I should see "Threat Categories"
@@ -281,8 +281,8 @@ Feature: Webrep, the BFRP
     And  I wait for "2" seconds
     And  I click button "wlbl_entries_button"
     And  I wait for "5" seconds
-    And  Element with class "bfrp-dd-result-no-0" should have content "BL-weak"
-    And  Element with class "bfrp-dd-result-no-1" should have content "BL-weak"
+    And  Element with class "bfrp-result-no-0" should have content "BL-weak"
+    And  Element with class "bfrp-result-no-1" should have content "BL-weak"
     # and now we remove
     And  I choose "wlbl-remove"
     And  I should not see "Threat Categories"
@@ -295,7 +295,7 @@ Feature: Webrep, the BFRP
     And  I wait for "2" seconds
     And  I click button "wlbl_entries_button"
     And  I wait for "5" seconds
-    And  Element with class "bfrp-dd-result-no-0" should not have content "BL-weak"
-    And  Element with class "bfrp-dd-result-no-1" should not have content "BL-weak"
+    And  Element with class "bfrp-result-no-0" should not have content "BL-weak"
+    And  Element with class "bfrp-result-no-1" should not have content "BL-weak"
     And  clean up wlbl and remove all wlbl entries on "testing.com"
     And  clean up wlbl and remove all wlbl entries on "prooftesting.com"
