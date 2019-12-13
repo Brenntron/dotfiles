@@ -644,13 +644,13 @@ $ ->
       labelField: 'name',
       searchField: 'name',
     }
-
     complaint_input = $('#complaint-input').selectize {
       persist: false,
-      create: false,
-      valueField: 'name',
-      labelField: 'name',
-      searchField: 'name',
+      create: (input) ->
+        {
+          value: input
+          text: input
+        }
     }
     channel_input = $('#channel-input').selectize {
       persist: false,
@@ -662,18 +662,22 @@ $ ->
       options: [{name: "Internal"}, {name: "TalosIntel"}, {name: "WBNP"}]
     }
     entry_ids = $('#entryid-input').selectize {
+      delimiter: ',',
       persist: false,
-      create: false,
-      valueField: 'name',
-      labelField: 'name',
-      searchField: 'name',
+      create: (input) ->
+        {
+          value: input
+          text: input
+        }
     }
     complaint_ids = $('#complaintid-input').selectize {
+      delimiter: ',',
       persist: false,
-      create: false,
-      valueField: 'name',
-      labelField: 'name',
-      searchField: 'name',
+      create: (input) ->
+        {
+          value: input
+          text: input
+        }
     }
     window.clearSelectize = (input) ->
       $("##{input}")[0].selectize.clear()
