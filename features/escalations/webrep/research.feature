@@ -226,7 +226,7 @@ Feature: Webrep, the BFRP
     And  I choose "research-search-broad"
     And  I type content "testing.com" within input with id "search_uri"
     Then I click "Submit"
-    And  I wait for 60" seconds
+    And  I wait for "60" seconds
     Then I check checkbox with class "bfrp-checkbox-0"
     And  I check checkbox with class "bfrp-checkbox-1"
     And  I click button "wlbl_entries_button"
