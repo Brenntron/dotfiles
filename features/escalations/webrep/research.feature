@@ -184,118 +184,115 @@ Feature: Webrep, the BFRP
   # Pending front-end work (WEB-5534)
   @javascript
   Scenario: a user searches for a url on the research page and adds multiple results to a WBRS white list
-    Given pending
     Given a user with role "webrep user" exists and is logged in
     And  clean up wlbl and remove all wlbl entries on "testing.com"
     And  clean up wlbl and remove all wlbl entries on "prooftesting.com"
     When I goto "escalations/webrep/research"
     And  I choose "research-search-broad"
     And  I type content "testing.com" within input with id "search_uri"
-    Then I click "Submit"
+    And  I click "Submit"
     And  I wait for "60" seconds
-    Then I check checkbox with class "bfrp-checkbox-0"
+    When I check checkbox with class "bfrp-checkbox-0"
     And  I check checkbox with class "bfrp-checkbox-5"
     And  I click button "wlbl_entries_button"
     And  I wait for "5" seconds
-    And  I should see "Not on a list"
-    And  Element with class "bfrp-result-no-0" should not have content "WL-weak"
-    And  Element with class "bfrp-result-no-1" should not have content "WL-weak"
-    And  I choose "wlbl-add"
+    Then I should see "Not on a list"
+    And  wl/bl result number "0" should not have content "WL-weak"
+    And  wl/bl result number "1" should not have content "WL-weak"
+    When I choose "wlbl-add"
     And  I check checkbox with class "wl-weak-checkbox"
-    And  I should not see "Threat Categories"
+    Then I should not see "Threat Categories"
     And  I should not see "Bogon"
-    And  I click "Submit Changes"
+    When I click "Submit Changes"
     And  I wait for "5" seconds
-    And  I should see "ENTRIES HAVE BEEN UPDATED"
+    Then I should see "ENTRIES HAVE BEEN UPDATED"
     And  I should see "Have been added"
-    And  I click ".close"
+    When I click ".close"
     And  I wait for "2" seconds
     And  I click button "wlbl_entries_button"
     And  I wait for "5" seconds
-    And  Element with class "bfrp-result-no-0" should have content "WL-weak"
+    Then wl/bl result number "0" should have content "WL-weak"
     And  clean up wlbl and remove all wlbl entries on "testing.com"
 
   # Pending front-end work (WEB-5534)
   @javascript
   Scenario: a user searches for a url on the research page and adds multiple results to a WBRS blacklist
-    Given pending
     Given a user with role "webrep user" exists and is logged in
     And  clean up wlbl and remove all wlbl entries on "testing.com"
     And  clean up wlbl and remove all wlbl entries on "prooftesting.com"
     When I goto "escalations/webrep/research"
     And  I choose "research-search-broad"
     And  I type content "testing.com" within input with id "search_uri"
-    Then I click "Submit"
+    When I click "Submit"
     And  I wait for "60" seconds
-    Then I check checkbox with class "bfrp-checkbox-0"
+    And  I check checkbox with class "bfrp-checkbox-0"
     And  I check checkbox with class "bfrp-checkbox-1"
     And  I click button "wlbl_entries_button"
     And  I wait for "5" seconds
-    And  I should see "Not on a list"
-    And  Element with class "bfrp-result-no-1" should not have content "BL-weak"
-    And  I choose "wlbl-add"
+    #Then I should see "Not on a list"
+    And  wl/bl result number "1" should not have content "BL-weak"
+    When I choose "wlbl-add"
     And  I check checkbox with class "bl-weak-checkbox"
-    And  I should see "Threat Categories"
+    Then I should see "Threat Categories"
     And  I should see "Bogon"
-    And  I click ".wlbl_thrt_cat_id_8"
+    When I click ".wlbl_thrt_cat_id_8"
     And  I click "Submit Changes"
     And  I wait for "5" seconds
-    And  I should see "ENTRIES HAVE BEEN UPDATED"
+    Then I should see "ENTRIES HAVE BEEN UPDATED"
     And  I should see "Have been added"
-    And  I click ".close"
+    When I click ".close"
     And  I wait for "2" seconds
     And  I click button "wlbl_entries_button"
     And  I wait for "5" seconds
-    And  Element with class "bfrp-result-no-0" should have content "BL-weak"
+    And  wl/bl result number "0" should not have content "BL-weak"
     And  clean up wlbl and remove all wlbl entries on "testing.com"
 
   # Pending front-end work (WEB-5534)
   @javascript
   Scenario: a user searches for a url on the research page and removes multiple results from a WBRS List
-    Given pending
     Given a user with role "webrep user" exists and is logged in
     And  clean up wlbl and remove all wlbl entries on "testing.com"
     And  clean up wlbl and remove all wlbl entries on "prooftesting.com"
     When I goto "escalations/webrep/research"
     And  I choose "research-search-strict"
     And  I type content "testing.com" within input with id "search_uri"
-    Then I hit enter within "#search_uri"
+    When I hit enter within "#search_uri"
     And  I wait for "60" seconds
-    Then I check checkbox with class "bfrp-checkbox-4"
-    And  I check checkbox with class "bfrp-checkbox-6"
+    Then I check checkbox with class "bfrp-checkbox-0"
+    And  I check checkbox with class "bfrp-checkbox-1"
     And  I click button "wlbl_entries_button"
     And  I wait for "5" seconds
-    And  I should see "Not on a list"
-    And  Element with class "bfrp-result-no-0" should not have content "BL-weak"
-    And  Element with class "bfrp-result-no-1" should not have content "BL-weak"
-    And  I choose "wlbl-add"
+    Then I should see "Not on a list"
+    And  wl/bl result number "0" should not have content "BL-weak"
+    And  wl/bl result number "1" should not have content "BL-weak"
+    When I choose "wlbl-add"
     And  I check checkbox with class "bl-weak-checkbox"
-    And  I should see "Threat Categories"
+    Then I should see "Threat Categories"
     And  I should see "Bogon"
-    And  I click ".wlbl_thrt_cat_id_8"
+    When I click ".wlbl_thrt_cat_id_8"
     And  I click "Submit Changes"
     And  I wait for "5" seconds
-    And  I should see "ENTRIES HAVE BEEN UPDATED"
+    Then I should see "ENTRIES HAVE BEEN UPDATED"
     And  I should see "Have been added"
-    And  I click ".close"
+    When I click ".close"
     And  I wait for "2" seconds
     And  I click button "wlbl_entries_button"
     And  I wait for "5" seconds
-    And  Element with class "bfrp-result-no-0" should have content "BL-weak"
-    And  Element with class "bfrp-result-no-1" should have content "BL-weak"
+    Then wl/bl result number "0" should have content "BL-weak"
+    And  wl/bl result number "1" should have content "BL-weak"
     # and now we remove
     And  I choose "wlbl-remove"
-    And  I should not see "Threat Categories"
+    Then I should not see "Threat Categories"
     And  I check checkbox with class "bl-weak-checkbox"
-    And  I click "Submit Changes"
+    When I click "Submit Changes"
     And  I wait for "5" seconds
-    And  I should see "ENTRIES HAVE BEEN UPDATED"
+    Then I should see "ENTRIES HAVE BEEN UPDATED"
     And  I should see "Have been removed"
-    And  I click ".close"
+    When I click ".close"
     And  I wait for "2" seconds
     And  I click button "wlbl_entries_button"
     And  I wait for "5" seconds
-    And  Element with class "bfrp-result-no-0" should not have content "BL-weak"
-    And  Element with class "bfrp-result-no-1" should not have content "BL-weak"
+    Then wl/bl result number "0" should not have content "BL-weak"
+    And  wl/bl result number "1" should not have content "BL-weak"
     And  clean up wlbl and remove all wlbl entries on "testing.com"
     And  clean up wlbl and remove all wlbl entries on "prooftesting.com"
