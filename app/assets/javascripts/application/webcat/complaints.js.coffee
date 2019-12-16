@@ -616,6 +616,8 @@ window.take_selected = ()->
   else
     std_msg_error('No rows selected', ['Please select at least one row.'])
 
+
+
 $(document).on 'click', '#complaints-index tr, #complaints_check_box', ->
   rows = $('#complaints-index').DataTable().rows('.selected').data()
   reopened = false
@@ -639,11 +641,13 @@ $(document).on 'click', '#complaints-index tr, #complaints_check_box', ->
   reopened_opt = $('#complaint_resolution option:contains("Reopened")')
   invalid_opt = $('#complaint_resolution option:contains("Invalid")')
   unchanged_opt = $('#complaint_resolution option:contains("Unchanged")')
+
   if !reopened
     reopened_opt.attr("disabled","disabled");
   else
     reopened_opt.removeAttr("disabled");
     reopened_opt.prop('selected', true)
+
   if !invalid_unchanged
     invalid_opt.attr("disabled","disabled");
     unchanged_opt.attr("disabled","disabled");
@@ -651,6 +655,29 @@ $(document).on 'click', '#complaints-index tr, #complaints_check_box', ->
     invalid_opt.removeAttr("disabled");
     unchanged_opt.removeAttr("disabled");
     invalid_opt.prop('selected', true)
+
+  comment_check()
+$(document).on 'change','#complaint_resolution', ->
+  internal_comment = $('.internal_comment_container')
+  customer_comment = $('.customer_facing_comment_container')
+  if $(this).val() == 'REOPENED'
+    internal_comment.css('display', 'none')
+    customer_comment.css('display', 'none')
+  else
+    internal_comment.css('display', 'block')
+    customer_comment.css('display', 'block')
+
+window.comment_check = ()->
+  invalid_opt = $('#complaint_resolution option:contains("Invalid"):not(:disabled)').length == 1
+  reopened_opt = $('#complaint_resolution option:contains("Reopened"):not(:disabled)').length == 1
+  internal_comment = $('.internal_comment_container')
+  customer_comment = $('.customer_facing_comment_container')
+  if reopened_opt && invalid_opt || invalid_opt
+    internal_comment.css('display', 'block')
+    customer_comment.css('display', 'block')
+  else
+    internal_comment.css('display', 'none')
+    customer_comment.css('display', 'none')
 
 window.return_selected = ()->
   selected_rows = $('#complaints-index').DataTable().rows('.selected')
