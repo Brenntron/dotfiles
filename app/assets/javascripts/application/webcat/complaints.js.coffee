@@ -186,9 +186,30 @@ window.webcat_reset_search = ()->
   inputs = document.getElementsByClassName('form-control')
   for i in inputs
     i.value = ""
-  tags_select = $('#tags-input').selectize()
-  tags_control = tags_select[0].selectize
-  tags_control.clear()
+
+  tag_input = $('#tags-input')[0].selectize
+  assignee_input = $('#assignee-input')[0].selectize
+  category_input = $('#category-input')[0].selectize
+  company_input = $('#company-input')[0].selectize
+  status_input = $('#status-input')[0].selectize
+  resolution_input = $('#resolution-input')[0].selectize
+  customer_input = $('#name-input')[0].selectize
+  complaint_input = $('#complaint-input')[0].selectize
+  channel_input = $('#channel-input')[0].selectize
+  entry_input = $('#entryid-input')[0].selectize
+  complaint_id_input = $('#complaintid-input')[0].selectize
+
+  tag_input.clear()
+  assignee_input.clear()
+  category_input.clear()
+  company_input.clear()
+  status_input.clear()
+  resolution_input.clear()
+  customer_input.clear()
+  complaint_input.clear()
+  channel_input.clear()
+  entry_input.clear()
+  complaint_id_input.clear()
 
 window.multiple_url_categorization = () ->
 

@@ -46,7 +46,6 @@ Feature: WebCat Advanced Search
     When I go to "/escalations/webcat/complaints"
     And I click "#advanced-search-button"
     And I click "#add-search-items-button"
-    And I click "#company-cb"
     And I click "#resolution-cb"
     And I click "#add-search-criteria"
     And I fill in selectized of element "#resolution-input" with "['FIXED','DUPLICATE']"
