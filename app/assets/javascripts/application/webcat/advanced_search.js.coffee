@@ -29,3 +29,18 @@ namespace 'AC.WebCat', (exports) ->
         for customer_name in json
           selectize.addOption(customer_name)
     )
+
+  exports.createAssigneeOptions = ->
+    std_msg_ajax(
+      method: 'GET'
+      url: "/escalations/api/v1/users/json"
+      success_reload: false
+      success: (response) ->
+        element = $('#assignee-input')
+        selectize = element[0].selectize
+
+        json = JSON.parse(response)
+
+        for assignee in json
+          selectize.addOption(assignee)
+    )

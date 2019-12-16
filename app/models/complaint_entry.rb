@@ -622,9 +622,18 @@ class ComplaintEntry < ApplicationRecord
       present_params['ip_or_uri'] = present_params['ip_or_uri'].split(',')
     end
 
+    if present_params['user_id'].present?
+      present_params['user_id'] = present_params['user_id'].split(',')
+    end
+
     simple_params = present_params.slice(*%w{id complaint_id resolution status})
 
     relation = where(simple_params)
+
+    if params['user_id'].present?
+      relation =
+          relation.joins(:user).where(:users => { cvs_username: present_params['user_id']})
+    end
 
     if params['submitted_newer'].present?
       relation =

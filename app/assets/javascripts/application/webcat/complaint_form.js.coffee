@@ -46,6 +46,7 @@ $ ->
 
         AC.WebCat.createCompanyOptions()
         AC.WebCat.createCustomerNameOptions()
+        AC.WebCat.createAssigneeOptions()
 
     )
 
