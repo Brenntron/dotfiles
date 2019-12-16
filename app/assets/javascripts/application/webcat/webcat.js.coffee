@@ -708,3 +708,17 @@ $ ->
     contentCloning: true
     side: 'bottom'
     trigger: 'hover'
+
+
+
+  # Prevent the many selectizes from running into each other
+  $('#advanced-search-wrapper .selectize-input').click ->
+    $('#advanced-search-wrapper .selectize-input').each ->
+      select_parent = $(this).parents('.form-control')[0]
+
+      if $(this).hasClass('focus')
+        $(select_parent).css('z-index', '3')
+      else
+        $(select_parent).css('z-index', '1')
+
+
