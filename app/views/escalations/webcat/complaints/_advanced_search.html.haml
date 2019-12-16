@@ -34,6 +34,11 @@
 
   -# Additional search criteria
   .form-group.search-item.hidden
+    %label.content-label-sm Assignee
+    %select.form-control.selectize#assignee-input{name: 'assignee-input', multiple: 'multiple', tabindex:"-1"}
+    %button.remove-input{onclick:'clearSelectize("assignee-input")'}
+
+  .form-group.search-item.hidden
     %label.content-label-sm Category
     %select.form-control.selectize#category-input{name: 'category-input', multiple: 'multiple', tabindex:'-1'}
     %button.remove-input{onclick:'clearSelectize("category-input")'}
@@ -114,6 +119,10 @@
           %label.search-criteria-label
             %input.search-checkbox#category-cb{type: 'checkbox', name: 'search-criteria', value: 'Category', for: 'category-input'}
             Category
+        %li
+          %label.search-criteria-label
+            %input.search-checkbox#assignee-cb{type: 'checkbox', name: 'search-criteria', value: 'Assignee', for: 'assignee-input'}
+            Assignee
         %li
           %label.search-criteria-label
             %input.search-checkbox#entry-id-cb{type: 'checkbox', name: 'search-criteria', value: 'Entry ID', for: 'entryid-input'}

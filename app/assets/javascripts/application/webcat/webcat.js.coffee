@@ -30,6 +30,7 @@ $ ->
     # creating form object from array made from advanced dropdown form
     form = {}
 
+    user_id = $('#assignee-input')[0].selectize.items
     tags = tag_input[0].selectize.items
     company = $('#company-input')[0].selectize.items
     status = $('#status-input')[0].selectize.items
@@ -56,12 +57,13 @@ $ ->
     if complaints.length
       form['ip_or_uri'] = complaints.join()
     if channels.length
-      form['Channel'] = channels.join()
+      form['channel'] = channels.join()
     if entry_ids.length
       form['entry_id'] = entry_ids.join()
     if complaint_ids.length
       form['complaint_id'] = complaint_ids.join()
-
+    if user_id.length
+      form['user_id'] = user_id.join()
 
     for item in $('#cat_named_search :input:not(:hidden)').serializeArray()
       { name, value } = item
@@ -84,6 +86,7 @@ $ ->
       company_name: form.company
       domain: form.domain
       tags: form.tags
+      user_id: form.user_id
       submitted_older: form.date_submitted_older
       submitted_newer: form.date_submitted_newer
       modified_older: form.date_modified_newer
@@ -595,6 +598,13 @@ $ ->
           options.push {name: x}
         return options
 
+    assignee_input = $('#assignee-input').selectize {
+      persist: false
+      create: false
+      valueField: 'name',
+      labelField: 'display_name',
+      searchField: 'display_name',
+    }
     tag_input = $('#tags-input').selectize {
       persist: false
       create: false

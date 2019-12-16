@@ -1,5 +1,4 @@
 complaint_status_list= ["NEW", "RESOLVED", "ASSIGNED", "ACTIVE","COMPLETED", "PENDING", "REOPENED" ]
-complaint_channel_list=["Internal", "TalosIntel", "WBNP"]
 complaint_resolution_list=["FIXED", "INVALID", "UNCHANGED", "DUPLICATE"]
 $ ->
 
@@ -42,14 +41,12 @@ $ ->
         for status in complaint_status_list
           $('#status-input-list').append '<option value="' + status + '"></option>'
 
-        for channel in complaint_channel_list
-          $('#channel-input-list').append '<option value="' + channel + '"></option>'
-
         for resolution in complaint_resolution_list
           $('#resolution-input-list').append '<option value="' + resolution + '"></option>'
 
         AC.WebCat.createCompanyOptions()
         AC.WebCat.createCustomerNameOptions()
+        AC.WebCat.createAssigneeOptions()
 
     )
 
