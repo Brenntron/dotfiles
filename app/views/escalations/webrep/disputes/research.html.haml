@@ -569,9 +569,9 @@
                                   = entry.blacklist.status
                                 %span.inline-col-breakup.entry-reptool-comment
                                   = entry.blacklist.metadata&.fetch('VRT', {})['comment']
-                            %td.left-bordered
+                            %td.left-bordered{colspan: '3'}
                               %label Umbrella
-                            %td.text-center.umbrella-cell
+                            %td.text-center.umbrella-cell{colspan: '2'}
                               = entry.umbrellaresult
                   %tr.nested-data-row{'data-entry-id': "#{entry.id}"}
                     %td.expanded-row{colspan: '8'}
