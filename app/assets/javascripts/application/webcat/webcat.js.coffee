@@ -134,6 +134,7 @@ $ ->
     persist: false,
     create: false,
     maxItems: 5,
+    closeAfterSelect: true,
     valueField: 'category_id',
     labelField: 'category_name',
     searchField: ['category_name', 'category_code'],
@@ -242,6 +243,21 @@ $ ->
 
   build_complaints_table = () ->
         complaint_table = $('#complaints-index').DataTable(
+          initComplete: ->
+            input = $('.dataTables_filter input').unbind()
+            self = @api()
+
+            $searchButton = $('<button class="dt-button dt-search-button esc-tooltipped" title="Search">').click(->
+              self.search(input.val()).draw()
+              return
+            )
+            $clearButton = $('<button class="dt-button dt-search-clear-button esc-tooltipped" title="Clear">').click(->
+              input.val ''
+              $searchButton.click()
+              return
+            )
+            $('.dataTables_filter').append $clearButton, $searchButton
+            return
           lengthMenu: [[25, 50, 100, 150, 200], [25, 50, 100, 150, 200]]
           processing: true
           serverSide: true
@@ -514,9 +530,12 @@ $ ->
         select: 'style': 'os'
         responsive: true)
 
+
   if $('#complaints-index').length
-    $('#complaints-index_filter input').addClass('table-search-input');
     build_complaints_table()
+    
+    # Make the search prettier
+    $('#complaints-index_filter input').addClass('restricted-table-search-input');
 
     $('#complaints-index tbody').on 'click', ' .nested-complaint-data', ->
       $(this).focus()

@@ -209,21 +209,21 @@ class AutoResolve
   # Sets this object state to convention of NEW: human review needed, MALICIOUS: auto resolve, or nil unknown.
   def check_sources(rule_hits:, dispute_entry:, address:)
     wbrs_hits =
-        if Rails.configuration.complaints.check
+        if Rails.configuration.auto_resolve.check_complaints
           check_complaints(rule_hits: rule_hits)
         else
           nil
         end
 
     vt_status =
-        if Rails.configuration.virustotal.check
+        if Rails.configuration.auto_resolve.check_virus_total
           check_virus_total_from_preload(dispute_entry, address)
         else
           nil
         end
 
     umbrella_status =
-        if Rails.configuration.umbrella.check
+        if Rails.configuration.auto_resolve.check_umbrella
           check_umbrella_from_preload(dispute_entry, address)
         else
           nil
@@ -350,7 +350,7 @@ class AutoResolve
   def self.auto_resolve_email(dispute_entry, rule_hits)
     bad_mnems = rule_hits.select{|rule_hit| bad_email_mnem?(rule_hit)}
     if bad_mnems.any?
-      dispute_entry.resolution = DisputeEntry::STATUS_RESOLVED_FIXED_FN
+      dispute_entry.resolution = DisputeEntry::STATUS_RESOLVED_UNCHANGED
       dispute_entry.status = DisputeEntry::STATUS_RESOLVED
       dispute_entry.case_closed_at = Time.now
       dispute_entry.case_resolved_at = Time.now

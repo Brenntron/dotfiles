@@ -1568,6 +1568,18 @@ $ ->
     $('#search_name').val("")
     $('#advanced-search-dropdown').toggle()
 
+  $('.esc-tooltipped').tooltipster
+    theme: [
+      'tooltipster-borderless'
+      'tooltipster-borderless-customized'
+      'tooltipster-borderless-comment'
+    ]
+    debug: false
+    maxWidth: 500
+
+  $('.esc-tooltipped:disabled').tooltipster
+    disable: true
+
   $(document).on 'click', (e)->
     if e.target.closest('.daterangepicker') == null && e.target.closest('.available') == null
       $("#advanced-search-dropdown").hide()
@@ -1580,18 +1592,6 @@ $ ->
       if window.current_search_data
         window.populate_webrep_index_table(window.current_search_data, true)
     , 60000
-
-    $('body').on 'mouseover mouseenter', '.esc-tooltipped', ->
-      $(this).tooltipster
-        debug: false,
-        theme: [
-          'tooltipster-borderless'
-          'tooltipster-borderless-customized'
-          'tooltipster-borderless-comment'
-        ]
-        'maxWidth': 500
-      $(this).tooltipster 'show'
-    return
 
 
   window.averageTimeToCloseLabel = (hourAmount) ->
