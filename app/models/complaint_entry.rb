@@ -606,6 +606,22 @@ class ComplaintEntry < ApplicationRecord
       present_params['resolution'] = present_params['resolution'].split(',')
     end
 
+    if present_params['id'].present?
+      present_params['id'] = present_params['id'].split(',')
+    end
+
+    if present_params['complaint_id'].present?
+      present_params['complaint_id'] = present_params['complaint_id'].split(',')
+    end
+
+    if present_params['channel'].present?
+      present_params['channel'] = present_params['channel'].split(',')
+    end
+
+    if present_params['ip_or_uri'].present?
+      present_params['ip_or_uri'] = present_params['ip_or_uri'].split(',')
+    end
+
     simple_params = present_params.slice(*%w{id complaint_id resolution status})
 
     relation = where(simple_params)
@@ -686,9 +702,19 @@ class ComplaintEntry < ApplicationRecord
     end
 
     ip_or_uri = present_params['ip_or_uri']
+
+    # Constructs a gigantic, but valid where clause
     if ip_or_uri.present?
-      ip_or_uri_clause = "ip_address = :ip_or_uri OR uri like :ip_or_uri_pattern OR domain like :ip_or_uri_pattern"
-      relation = relation.where(ip_or_uri_clause, ip_or_uri: ip_or_uri, ip_or_uri_pattern: "%#{ip_or_uri}%")
+      ip_or_uri_clause = nil
+      ip_or_uri.each_with_index do |single, index|
+        if index == 0
+          ip_or_uri_clause = "ip_address = '#{single}' OR uri like '%#{single}%' OR domain like '%#{single}%'"
+        else
+          ip_or_uri_clause = ip_or_uri_clause + " OR " + "ip_address = '#{single}' OR uri like '%#{single}%' OR domain like '%#{single}%'"
+        end
+      end
+
+      relation = relation.where(ip_or_uri_clause)
     end
 
     complaint_fields = present_params.to_h.slice(*%w{description channel})
