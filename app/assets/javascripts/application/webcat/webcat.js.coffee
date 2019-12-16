@@ -602,8 +602,8 @@ $ ->
       persist: false
       create: false
       valueField: 'name',
-      labelField: 'name',
-      searchField: 'name',
+      labelField: 'display_name',
+      searchField: 'display_name',
     }
     tag_input = $('#tags-input').selectize {
       persist: false

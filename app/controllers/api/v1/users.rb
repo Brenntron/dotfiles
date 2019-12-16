@@ -14,7 +14,7 @@ module API
         get "json", root: :users do
           authorize!(:index, User)
 
-          users = User.all.map{|customer| {name: customer.cvs_username, id: customer.id}}
+          users = User.all.where.not(display_name: [nil,""]).map{|customer| {name: customer.cvs_username, display_name: customer.display_name}}
           users.sort_by {|hash| hash[:name]}.to_json
         end
 

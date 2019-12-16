@@ -136,3 +136,40 @@ Feature: WebCat Advanced Search
     Then I should see tr element with id "4"
     Then I should not see tr element with id "2"
     Then I should not see tr element with id "3"
+
+  @javascript
+  Scenario: I perform an advanced search on assignee
+    Given a user with role "webcat user" exists and is logged in
+    Given the following complaints exist:
+      | id | customer_id |
+      | 1  | 1           |
+      | 2  | 2           |
+      | 3  | 3           |
+      | 4  | 4           |
+    Given the following complaint entries exist:
+      | id | resolution | status    | complaint_id | user_id |
+      | 1  | FIXED      | PENDING   | 1            | 33      |
+      | 2  | DUPLICATE  | COMPLETED | 2            | 11      |
+      | 3  | FIXED      | PENDING   | 3            | 22      |
+      | 4  | DUPLICATE  | COMPLETED | 4            | 46      |
+    Given the following users exist
+      | id | cvs_username  | display_name |
+      | 33 | ancheng33     | Andrew Cheng |
+      | 46 | jesler46      | Joel Esler   |
+    When I go to "/escalations/webcat/complaints"
+    And I click "#advanced-search-button"
+    And I click "#add-search-items-button"
+    And I click "#assignee-cb"
+    And I click "#resolution-cb"
+    And I click "#add-search-criteria"
+    And I fill in selectized of element "#resolution-input" with "['FIXED','DUPLICATE']"
+    And I fill in selectized of element "#assignee-input" with "['ancheng33','jesler46']"
+    And I fill in selectized of element "#status-input" with "['PENDING','COMPLETED']"
+    Then take a screenshot
+    And I click "#submit-advanced-search"
+    And I wait for "4" seconds
+    Then take a screenshot
+    Then I should see tr element with id "1"
+    Then I should see tr element with id "4"
+    Then I should not see tr element with id "2"
+    Then I should not see tr element with id "3"
