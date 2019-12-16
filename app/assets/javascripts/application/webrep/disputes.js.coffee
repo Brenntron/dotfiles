@@ -1140,8 +1140,8 @@ $ ->
 
       if this.entry.sbrs_score != null
         sbrs_score = this.entry.sbrs_score
-      else sbrs_score = missing_data
-      console.log category
+      else
+        sbrs_score = missing_data
       entry_row = "<tr class='index-entry-row' data-case-id='0000#{dispute.id}'>
         <td>
           <input type='checkbox' onclick='toggleRow(this)' class='dispute-entry-checkbox dispute-entry-checkbox_#{dispute.id}' id='#{dispute_entry_id}'>
