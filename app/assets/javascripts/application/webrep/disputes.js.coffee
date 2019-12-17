@@ -1138,7 +1138,8 @@ $ ->
         if wbrs_score == NaN then wbrs_score = '--'
         tooltip_rep = rep.toUpperCase()
       else
-        wbrs_score = 'unknown'
+        rep = 'unknown'
+        wbrs_score = '--'
 
       if this.entry.sbrs_score != null
         sbrs_score = this.entry.sbrs_score
