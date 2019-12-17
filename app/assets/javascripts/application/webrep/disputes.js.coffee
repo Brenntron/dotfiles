@@ -1134,6 +1134,8 @@ $ ->
       if this.entry.wbrs_score != null
         wbrs_score = this.entry.wbrs_score
         rep = wbrs_display(wbrs_score)
+        wbrs_score = parseFloat(wbrs_score).toFixed(1)
+        if wbrs_score == NaN then wbrs_score = '--'
         tooltip_rep = rep.toUpperCase()
       else
         wbrs_score = 'unknown'

@@ -159,14 +159,14 @@ $ ->
         data: 'wbrs_score'
         width: '75px'
         render: ( data ) ->
-          if data == undefined
-            data = ''
-          rep = wbrs_display(data)
-          if rep == undefined
-            rep = 'unknown'
-          tooltip_rep = rep.toUpperCase()
-          icon = "<span class='reputation-icon icon-#{rep} esc-tooltipped' title='#{tooltip_rep}'></span>"
-          return "<div class='reputation-icon-container'>#{icon}<span>#{data}</span></div>"
+          if data == undefined then data = ''
+          wbrs_rep = wbrs_display(data)
+          wbrs_score = parseFloat(data).toFixed(1)
+          if wbrs_rep == undefined then wbrs_rep = 'unknown'
+          if wbrs_rep == 'unknown'then wbrs_score = '--'
+          tooltip_rep = wbrs_rep.toUpperCase()
+          icon = "<span class='reputation-icon icon-#{wbrs_rep} esc-tooltipped' title='#{tooltip_rep}'></span>"
+          return "<div class='reputation-icon-container'>#{icon}<span>#{wbrs_score}</span></div>"
       }
       {
         data: 'cluster_id'
@@ -387,8 +387,8 @@ $ ->
           $(entry).each (i) ->
               {url, customer_name, apac_volume, emrg_volume, eurp_volume, glob_volume, japn_volume, noam_volume, wbrs_score}= this
               wbrs_rep = window.wbrs_display(wbrs_score)
-              if wbrs_rep == undefined
-                wbrs_rep = 'unknown'
+              if wbrs_rep == undefined then wbrs_rep = 'unknown'
+              if wbrs_rep == 'unknown'then wbrs_score = '--'
               wbrs_col = "<div class='reputation-icon-container'><span class='reputation-icon icon-#{wbrs_rep} esc-tooltipped' title='#{wbrs_rep.toUpperCase()}'></span> #{wbrs_score}</div>"
               entry_row = "<tr class='index-entry-row'>
                       <td class='clusterpath-col-path'>#{url}</td>
@@ -451,6 +451,11 @@ window.expandClusterEntryPreview = (cluster, expand_table_row, max_viewable_entr
             wbrs_rep = window.wbrs_display(wbrs_score)
             if wbrs_rep == undefined
               wbrs_rep = 'unknown'
+
+            if wbrs_rep == 'unknown'
+              wbrs_score = '--'
+            else
+              wbrs_score = parseFloat(wbrs_score).toFixed(1)
             wbrs_col = "<div class='.reputation-icon-container'><span class='reputation-icon icon-#{wbrs_rep} esc-tooltipped' title='#{wbrs_rep.toUpperCase()}'></span> #{wbrs_score}</div>"
             entry_row = "<tr class='index-entry-row'>
                     <td class='clusterpath-col-path'>#{url}</td>

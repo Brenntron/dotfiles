@@ -521,8 +521,9 @@ $ ->
                 render: ( data, type, full, meta ) ->
                   { wbrs_score, entry_id } = full
                   rep = wbrs_display(wbrs_score)
-                  if rep == undefined
-                    rep = 'unknown'
+                  wbrs_score = parseFloat(wbrs_score).toFixed(1)
+                  if rep == undefined then rep = 'unknown'
+                  if rep == 'unknown' then wbrs_score = '--'
                   tooltip_rep = rep.toUpperCase()
                   icon = "<span class='reputation-icon icon-#{rep} esc-tooltipped' title='#{tooltip_rep}'></span>"
                   return "<div class='reputation-icon-container'>#{icon}<span id='wbrs_score_#{entry_id}'>#{wbrs_score}</span>"
