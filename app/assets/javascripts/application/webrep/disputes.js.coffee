@@ -1139,6 +1139,7 @@ $ ->
         tooltip_rep = rep.toUpperCase()
       else
         rep = 'unknown'
+        tooltip_rep = rep.toUpperCase()
         wbrs_score = '--'
 
       if this.entry.sbrs_score != null
