@@ -56,6 +56,19 @@
                           .col-xs-12
                             %label.content-label-sm.reptool-section-label{for: "reptool-class-type-select"} Lists
                             %ul.dropdown-wlbl-list
+                            .row.dropdown-tool-grey-row.threat-cat-row.hidden
+                              .threat-cat-note
+                                %label.content-label-sm
+                                  Threat Categories
+                                  %span.threat-cat-required
+                                    *Required for adding to any blacklist.
+                                    %span.five-note Up to 5 can be selected
+                              .threat-cat-area
+                                -#- Wbrs::ThreatCategory.selections.ea
+                                ch do |label, value|
+                                -#  .threat-cat-cell
+                                -#    = wlbl_form.check_box(:thrt_cat_id, {id: nil, class: "wlbl_thrt_cat_id wlbl_thrt_cat_id_#{value}"}, value)
+                                -#    = label
                       .col-xs-12
                         .comment-wrapper
                           %label.col-x-3.reptool-section-label{required: true} WL/BL Comment

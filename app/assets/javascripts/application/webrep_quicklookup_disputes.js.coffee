@@ -145,10 +145,27 @@ $ ->
 
   $(document).on 'change', '.adjust_wlbl_checkbox', () ->
     submit_btn = $('#wlbl_entries_dropdown .dropdown-submit-button')
-    if $('.adjust_wlbl_checkbox:checked').length
-      submit_btn.prop('disabled', false)
+    all_checked = $('.adjust_wlbl_checkbox:checked')
+    current_val = $(this).val()
+    threat_cats = $('#wlbl_entries_dropdown .threat-cat-row')
+    disabled = true
+    bl_array = ['BL-weak', 'BL-med', 'BL-heavy']
+    bl_hide = true
+
+    for check in all_checked
+      console.log check, $(check).val()
+      val = $(check).val()
+      if bl_array.indexOf(val) > -1
+        bl_hide = false
+    if !bl_hide
+      $(threat_cats).removeClass('hidden')
     else
-      submit_btn.prop('disabled', true)
+      $(threat_cats).addClass('hidden')
+
+    if $('.adjust_wlbl_checkbox:checked').length
+      disabled = true
+
+    submit_btn.prop('disabled', disabled)
 
   window.call_action_switchboard = (disputes) ->
     comment = disputes[comment]
