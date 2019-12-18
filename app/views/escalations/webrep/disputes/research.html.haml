@@ -64,11 +64,10 @@
                                     *Required for adding to any blacklist.
                                     %span.five-note Up to 5 can be selected
                               .threat-cat-area
-                                -#- Wbrs::ThreatCategory.selections.ea
-                                ch do |label, value|
-                                -#  .threat-cat-cell
-                                -#    = wlbl_form.check_box(:thrt_cat_id, {id: nil, class: "wlbl_thrt_cat_id wlbl_thrt_cat_id_#{value}"}, value)
-                                -#    = label
+                                - Wbrs::ThreatCategory.selections.each do |label, value|
+                                  .threat-cat-cell
+                                    %input{type: 'checkbox',id: nil, class: "wlbl_thrt_cat_id wlbl_thrt_cat_id_#{value}", value: value}
+                                    %label #{label}
                       .col-xs-12
                         .comment-wrapper
                           %label.col-x-3.reptool-section-label{required: true} WL/BL Comment
