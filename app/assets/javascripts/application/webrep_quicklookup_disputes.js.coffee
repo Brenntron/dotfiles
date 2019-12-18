@@ -150,13 +150,19 @@ $ ->
     threat_cats = $('#wlbl_entries_dropdown .threat-cat-row')
     disabled = true
     bl_array = ['BL-weak', 'BL-med', 'BL-heavy']
+    wl_array = ['WL-weak', 'WL-med', 'WL-heavy']
     bl_hide = true
+    wl_check = true
 
     for check in all_checked
-      console.log check, $(check).val()
       val = $(check).val()
       if bl_array.indexOf(val) > -1
         bl_hide = false
+      if wl_array.indexOf(val) > -1
+        wl_check = false
+    if wl_check
+      for bl in bl_array
+        $("[name=#{}]").prop('disabled', true)
     if !bl_hide
       $(threat_cats).removeClass('hidden')
     else

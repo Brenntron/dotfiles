@@ -8914,12 +8914,14 @@ th.sorting_1, th.sorting_asc, th.sorting_desc {
 
 .dropdown-wlbl-list{
   &{
-    -webkit-column-count: 2;
-    -moz-column-count: 2;
-    column-count: 2;
+    display: flex;
+    flex-wrap: wrap;
     background: $faint-neutral-color;
     margin: auto -17px;
     padding: 10px 25px;
+  }
+  li{
+    width: 33%;
   }
 }
 
