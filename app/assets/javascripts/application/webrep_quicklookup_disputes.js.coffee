@@ -85,12 +85,15 @@ $ ->
   $('.wlbl_thrt_cat_id').on 'click', ->
     checked = $('.wlbl_thrt_cat_id:checked').length
     submit_btn = $('#wlbl_entries_dropdown .dropdown-submit-button')
+    console.log 'ininininn', checked
     if checked > 0 && checked < 6
       $(submit_btn).removeAttr('disabled')
       $('.five-note').removeClass('required-bold')
-    else if checked > 5
+    else
       $(submit_btn).attr('disabled', true)
-      $('.five-note').addClass('required-bold')
+      if checked > 5
+        $('.five-note').addClass('required-bold')
+
   $(document).on 'click', '.row-action-clear', (e) ->
     #This removes all actions from a single row
     e.preventDefault()
@@ -182,8 +185,11 @@ $ ->
     for wl in wl_array
       wl_el = $("[name=#{wl}]")
       wl_el.prop('disabled', !bl_hide )
+      checked = $('.wlbl_thrt_cat_id:checked').length
       if !bl_hide
         $(wl_el.closest('li')).addClass('grayed-out')
+        if checked > 0 && checked < 6
+          disabled = false
       else
         $(wl_el.closest('li')).removeClass('grayed-out')
 
@@ -195,9 +201,7 @@ $ ->
     else
       $(threat_cats).addClass('hidden')
 
-    if $('.adjust_wlbl_checkbox:checked').length
-      disabled = true
-      submit_btn.prop('disabled', disabled)
+    submit_btn.prop('disabled', disabled)
   window.call_action_switchboard = (disputes) ->
     comment = disputes[comment]
     for dispute, value of disputes
