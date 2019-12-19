@@ -82,6 +82,15 @@ $ ->
       $( row ).find('.col-actions').empty()
       $( row ).find('.col-clear-actions').empty()
 
+  $('.wlbl_thrt_cat_id').on 'click', ->
+    checked = $('.wlbl_thrt_cat_id:checked').length
+    submit_btn = $('#wlbl_entries_dropdown .dropdown-submit-button')
+    if checked > 0 && checked < 6
+      $(submit_btn).removeAttr('disabled')
+      $('.five-note').removeClass('required-bold')
+    else if checked > 5
+      $(submit_btn).attr('disabled', true)
+      $('.five-note').addClass('required-bold')
   $(document).on 'click', '.row-action-clear', (e) ->
     #This removes all actions from a single row
     e.preventDefault()
@@ -152,17 +161,35 @@ $ ->
     bl_array = ['BL-weak', 'BL-med', 'BL-heavy']
     wl_array = ['WL-weak', 'WL-med', 'WL-heavy']
     bl_hide = true
-    wl_check = true
+    wl_check = false
 
     for check in all_checked
       val = $(check).val()
       if bl_array.indexOf(val) > -1
         bl_hide = false
       if wl_array.indexOf(val) > -1
-        wl_check = false
+        wl_check = true
+
+
+    for bl in bl_array
+      bl_el = $("[name=#{bl}]")
+      bl_el.prop('disabled', wl_check )
+      if wl_check
+        $(bl_el.closest('li')).addClass('grayed-out')
+      else
+        $(bl_el.closest('li')).removeClass('grayed-out')
+
+    for wl in wl_array
+      wl_el = $("[name=#{wl}]")
+      wl_el.prop('disabled', !bl_hide )
+      if !bl_hide
+        $(wl_el.closest('li')).addClass('grayed-out')
+      else
+        $(wl_el.closest('li')).removeClass('grayed-out')
+
     if wl_check
-      for bl in bl_array
-        $("[name=#{}]").prop('disabled', true)
+      disabled = false
+
     if !bl_hide
       $(threat_cats).removeClass('hidden')
     else
@@ -170,9 +197,7 @@ $ ->
 
     if $('.adjust_wlbl_checkbox:checked').length
       disabled = true
-
-    submit_btn.prop('disabled', disabled)
-
+      submit_btn.prop('disabled', disabled)
   window.call_action_switchboard = (disputes) ->
     comment = disputes[comment]
     for dispute, value of disputes
