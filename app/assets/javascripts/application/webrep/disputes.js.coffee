@@ -1080,11 +1080,10 @@ $ ->
         data: 'age_int'
         visible: false
       }
-
-
-
+      
     ])
   $('#disputes-index_filter input').addClass('table-search-input');
+
   window.format = (dispute) ->
     table_head = '<table class="table dispute-entry-table">' + '<thead>' + '<tr>' + '<th><input class="dispute_entry_select_all" type="checkbox" onclick="select_or_deselect_all(' + dispute.id + ')" id=' + dispute.id + ' /></th>' + '<th class="entry-col-content">Dispute Entry</th>' + '<th class="entry-col-status">Dispute Entry Status</th>' + '<th class="entry-col-res">Dispute Entry Resolution</th>' + '<th class="entry-col-disp">Suggested Disposition</th>' + '<th class="entry-col-cat">Category</th>' + '<th class="entry-col-wbrs-score">WBRS Score</th>' + '<th class="entry-col-wbrs-hits">WBRS Total Rule Hits</th>' + '<th class="entry-col-wbrs-rules">WBRS Rules</th>' + '<th class="entry-col-sbrs-score">SBRS Score</th>' + '<th class="entry-col-sbrs-hits">SBRS Total Rule Hits</th>' + '<th class="entry-col-sbrs-rules">SBRS Rules</th>' + '</tr>' + '</thead>' + '<tbody>'
     entry = dispute.dispute_entries
@@ -1116,9 +1115,10 @@ $ ->
         resolution = missing_data
       if this.entry.resolution_comment != null
         resolution_comment = this.entry.resolution_comment
-        resolution_col = '<td class="entry-col-res esc-tooltipped" title="' + resolution_comment + '">' + resolution + '</td>'
+        resolution_col = "<td class='entry-col-res'>#{resolution_comment}</td>"
       else
-        resolution_col = '<td class="entry-col-res">' + resolution + '</td>'
+        resolution_comment = ''
+        resolution_col = "<td class='entry-col-res'>#{resolution}</td>"
       suggested_disposition = ''
       if this.entry.suggested_disposition != null
         suggested_disposition = this.entry.suggested_disposition
@@ -1133,21 +1133,40 @@ $ ->
       dispute_entry_id = this.entry.id
       if this.entry.wbrs_score != null
         wbrs_score = this.entry.wbrs_score
-      else wbrs_score = missing_data
+        rep = wbrs_display(wbrs_score)
+        wbrs_score = parseFloat(wbrs_score).toFixed(1)
+        if wbrs_score == NaN then wbrs_score = '--'
+        tooltip_rep = rep.toUpperCase()
+      else
+        rep = 'unknown'
+        tooltip_rep = rep.toUpperCase()
+        wbrs_score = '--'
+
       if this.entry.sbrs_score != null
         sbrs_score = this.entry.sbrs_score
-      else sbrs_score = missing_data
-      entry_row = '<tr class="index-entry-row" data-case-id="0000' + dispute.id + '">' + '<td><input type="checkbox" onclick="toggleRow(this)" class="dispute-entry-checkbox dispute-entry-checkbox_' + dispute.id + '" id= ' + dispute_entry_id + ' ></td>' + '<td class="entry-col-content ' + important + '">' + entry_content + '</td>' +
-        '<td class="entry-col-status">' + status + '</td>' +
-        resolution_col +
-        '<td class="entry-col-disp">' + suggested_disposition + '</td>' +
-        '<td class="entry-col-cat">' + category + '</td>' +
-        '<td class="entry-col-wbrs-score">' + wbrs_score + '</td>' +
-        '<td class="entry-col-wbrs-hits">' +  this.wbrs_rule_hits.length + '</td>' +
-        '<td class="entry-col-wbrs-rules">' + this.wbrs_rule_hits.join(', ') + '</td>' +
-        '<td class="entry-col-sbrs-score">' + sbrs_score + '</td>' +
-        '<td class="entry-col-sbrs-hits">' + this.sbrs_rule_hits.length + '</td>' +
-        '<td class="entry-col-sbrs-rules">' + this.sbrs_rule_hits.join(', ') + '</td>'
+      else
+        sbrs_score = missing_data
+      entry_row = "<tr class='index-entry-row' data-case-id='0000#{dispute.id}'>
+        <td>
+          <input type='checkbox' onclick='toggleRow(this)' class='dispute-entry-checkbox dispute-entry-checkbox_#{dispute.id}' id='#{dispute_entry_id}'>
+        </td>
+        <td class='entry-col-content #{important}'> #{entry_content}</td>
+        <td class='entry-col-status'>#{status}</td>
+        #{resolution_col}
+        <td class='entry-col-disp'>#{suggested_disposition}</td>
+        <td class='entry-col-cat'>#{category}</td>
+        <td class='entry-col-wbrs-score'>
+          <div class='reputation-icon-container'>
+            <span class='reputation-icon icon-#{rep} esc-tooltipped' title='#{tooltip_rep}'></span>
+            <span>#{wbrs_score}</span>
+          <div>
+        </td>
+        <td class='entry-col-wbrs-hits'> #{this.wbrs_rule_hits.length}</td>
+        <td class='entry-col-wbrs-rules'>#{this.wbrs_rule_hits.join(', ')}</td>
+        <td class='entry-col-sbrs-score'>#{sbrs_score}</td>
+        <td class='entry-col-sbrs-hits'>#{this.sbrs_rule_hits.length}</td>
+        <td class='entry-col-sbrs-rules'>#{this.sbrs_rule_hits.join(', ')}</td>
+        </tr>"
       entry_rows.push entry_row
       return
     # `d` is the original data object for the row
