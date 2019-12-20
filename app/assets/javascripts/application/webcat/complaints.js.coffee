@@ -191,6 +191,8 @@ window.webcat_reset_search = ()->
   tags_control.clear()
 
 window.multiple_url_categorization = () ->
+  loader = $('.lookup-drop-loader')
+  loader.removeClass('hidden')
 
   urls = $("#categorize_urls").val().split(/\n/)
   category_ids = $("#multi_cat_url_cats").val()
