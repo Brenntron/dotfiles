@@ -85,7 +85,6 @@ $ ->
   $('.wlbl_thrt_cat_id').on 'click', ->
     checked = $('.wlbl_thrt_cat_id:checked').length
     submit_btn = $('#wlbl_entries_dropdown .dropdown-submit-button')
-    console.log 'ininininn', checked
     if checked > 0 && checked < 6
       $(submit_btn).removeAttr('disabled')
       $('.five-note').removeClass('required-bold')
@@ -430,10 +429,18 @@ $ ->
     list_action = $('.wlbl-radio-add:checked').val()
     list_class = '.' + list_action
     action_desc = 'Add to: '
-
+    threat_cats = []
     if list_action == 'remove'
       action_desc = 'Remove from: '
     checked_bl = $('.adjust_wlbl_checkbox:checked').map( () -> return $(this).val() ).get()
+    console.log checked_bl
+    if checked_bl[0].indexOf('BL') != -1
+      checked = $('.wlbl_thrt_cat_id:checked')
+      for check in checked
+        val = $(check).next('label').html()
+        threat_cats.push(val)
+        console.log val
+    threat_cats = threat_cats.join()
     error_array = []
     error_header = '<h4>Cannot ' + list_action + ' the following Reptool Classification disputes <h4> '
     selected_rows.each ()->
@@ -452,7 +459,7 @@ $ ->
           switch(list_action)
             when 'add'
               if wlbl_col.includes(wlbl)
-                error_message += '<span class="col-tag dialog-tag">' + wlbl + '</span>, '
+                error_message += "<span class='col-tag dialog-tag'>  #{wlbl}</span>,"
               return !wlbl_col.includes(wlbl)
             when 'remove'
               if !wlbl_col.includes(wlbl)
