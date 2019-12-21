@@ -390,6 +390,7 @@ processSubmitPending=(entry_id,row_id)->
           persist: false,
           create: false,
           maxItems: 5,
+          closeAfterSelect: true,
           valueField: 'category_id',
           labelField: 'category_name',
           searchField: ['category_name', 'category_code'],
@@ -477,7 +478,8 @@ processSubmitEntry = (entry_id,row_id) ->
           $('#input_cat_'+ temp_row.data().entry_id).selectize {
             persist: false,
             create: false,
-            maxItems: 5
+            maxItems: 5,
+            closeAfterSelect: true,
             valueField: 'category_id',
             labelField: 'category_name',
             searchField: ['category_name', 'category_code'],
@@ -488,7 +490,8 @@ processSubmitEntry = (entry_id,row_id) ->
           $('#input_cat_pending'+ temp_row.data().entry_id).selectize {
             persist: false,
             create: false,
-            maxItems: 5
+            maxItems: 5,
+            closeAfterSelect: true,
             valueField: 'category_id',
             labelField: 'category_name',
             searchField: ['category_name', 'category_code'],
@@ -499,7 +502,8 @@ processSubmitEntry = (entry_id,row_id) ->
             $('#input_cat_'+ temp_row.data().entry_id).selectize {
               persist: false,
               create: false,
-              maxItems: 5
+              maxItems: 5,
+              closeAfterSelect: true,
               valueField: 'category_id',
               labelField: 'category_name',
               searchField: ['category_name', 'category_code'],
@@ -512,7 +516,8 @@ processSubmitEntry = (entry_id,row_id) ->
             $completed_selectize = $('#input_cat_'+ temp_row.data().entry_id).selectize {
               persist: false,
               create: false,
-              maxItems: 5
+              maxItems: 5,
+              closeAfterSelect: true,
               valueField: 'category_id',
               labelField: 'category_name',
               searchField: ['category_name', 'category_code'],
@@ -1394,6 +1399,7 @@ window.click_table_buttons = (complaint_table, button)->
         persist: false,
         create: false,
         maxItems: 5,
+        closeAfterSelect: true,
         valueField: 'category_id',
         labelField: 'category_name',
         searchField: ['category_name', 'category_code'],
@@ -1414,6 +1420,7 @@ window.click_table_buttons = (complaint_table, button)->
         persist: false,
         create: false,
         maxItems: 5,
+        closeAfterSelect: true,
         valueField: 'category_id',
         labelField: 'category_name',
         searchField: ['category_name', 'category_code'],
@@ -1702,7 +1709,8 @@ processSubmitMaster = () ->
           $('#input_cat_'+ entry.entry_id).selectize {
             persist: false,
             create: false,
-            maxItems: 5
+            maxItems: 5,
+            closeAfterSelect: true,
             valueField: 'category_id',
             labelField: 'category_name',
             searchField: ['category_name', 'category_code'],
@@ -1712,7 +1720,8 @@ processSubmitMaster = () ->
           $('#input_cat_pending'+ entry.entry_id).selectize {
             persist: false,
             create: false,
-            maxItems: 5
+            maxItems: 5,
+            closeAfterSelect: true,
             valueField: 'category_id',
             labelField: 'category_name',
             searchField: ['category_name', 'category_code'],
@@ -1820,6 +1829,7 @@ $ ->
           persist: false,
           create: false,
           maxItems: 5,
+          closeAfterSelect: true,
           valueField: 'category_id',
           labelField: 'category_name',
           searchField: ['category_name', 'category_code'],
