@@ -253,6 +253,25 @@ window.bulk_order_rows = () ->
 
 
 
+  # DE-DUPE THE DUPLICATE CLASSES AND ROW-ORDER IDS
+  # DE-DUPE THE DUPLICATE CLASSES AND ROW-ORDER IDS
+  # DE-DUPE THE DUPLICATE CLASSES AND ROW-ORDER IDS
+  existing_set = {}
+
+  $(curr_dd).find('.wlbl-entry-wlbl').each ->
+    curr_entry = $(this)
+    if existing_set[curr_entry.attr('class')]
+      curr_entry.attr('class','wlbl-entry-wlbl')
+      curr_entry.parent().removeAttr('data-order-id')
+    else
+      existing_set[curr_entry.attr('class')] = true
+
+
+
+
+
+      
+
 #### POPULATING CURRENT WL/BL LISTS ####
 
 ## INLINE - Populating the inline Adjust WL/BL dropdown for
