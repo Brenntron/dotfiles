@@ -45,3 +45,17 @@
             %th Submitter Type
             %th Submitter Org
             %th Assignee
+
+.modal.fade#resolution_dialog
+  .modal-dialog.modal-sm
+    .modal-content
+      .modal-header
+        Resolve Complaint Entries
+      .modal-body
+        %thead
+          #resolution_text
+        %table#complaint_entries_to_update
+      .modal-footer
+        %hr.thin.form-divider
+        %button#submit_resolution_changes.primary{type: 'button', 'onclick': 'updateResolution();'} Confirm
+        %button.secondary{type: 'button', 'data-dismiss': 'modal', 'aria-label': 'Cancel'} Cancel

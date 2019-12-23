@@ -59,7 +59,8 @@ $dropshadow: 2px 0 10px 1px rgba(0,0,0,0.1);
 $type-base-color:    #333;   /* Dark Grey */
 $type-lighter-color: #666;   /* Medium Grey */
 $type-faint-accent: #D7DADB; /* Lighter Grey */
-
+$type-lightest: #fff; /* White */
+$type-darkest: #000; /* black */
 /* Additional Colors */
 /* for use on gridlines, form inputs, and other very subtle elements against the content bg color */
 $faint-neutral-color: #f2f2f2;
@@ -769,6 +770,9 @@ button {
   background-image: url(image_path('icon_submit_arrow.svg'));
   background-color: $warning-accent-color;
 }
+.resolution-submit-button {background-image: url(image_path('icon_submit_arrow_grey.svg'));}
+.open .resolution-submit-button {background-image: url(image_path('icon_submit_arrow.svg'));}
+.resolution-submit-button:disabled, .master-submit-button:disabled {background-image: url(image_path('icon_submit_arrow_grey_disabled.svg'));}
 .open-viewable {background-image: url(image_path('icon_open_viewable.svg'));}
 .open-nonviewable {background-image: url(image_path('icon_open_nonviewable.svg'));}
 .open-selected {background-image: url(image_path('icon_open_selected.svg'));}
@@ -1538,7 +1542,13 @@ fieldset.tight {
                           $content-bg-color 15px
           );
 }
-
+#index-change-assign-dropdown{
+  padding: 20px 0 12px 0!important;
+  #internal_comment ,#customer_facing_comment{
+    font-size: inherit;
+    height: 30px;
+  }
+}
 /*** Overriding selectize plugin styles to work with our forms ***/
 .selectize-input {
   border: none;
@@ -2798,7 +2808,31 @@ a.code-content:hover {
 #new-comment-wrapper {
   border-top: none;
 }
+.edit-resolution-container{
+  .internal_comment_container{
+    margin-top: 10px;
+  }
+  .internal_comment_container, .customer_facing_comment_container {
+    margin-top: 30px;
+    .toolbar-section-label{
+      margin-top:-25px;
+    }
+  }
+  #button_update_resolution{
+    margin: 11px 60px 0 60px;
+  }
 
+}
+.resolution-message{
+  margin: 5px 0 10px 0;
+}
+.update-resolution-entries{
+  display: block;
+  width: 490px;
+  margin: 0 auto;
+  line-height: 1.3em;
+  word-break: break-word;
+}
 .missing-note {
   display: inline-block;
   font-style: italic;
@@ -2806,6 +2840,10 @@ a.code-content:hover {
   color: $content-label-color;
 }
 
+.edit-resolution-label{
+  position: relative;
+  left: 3px;
+}
 .code-block.note {
   margin-top: 3px;
 }
@@ -6021,7 +6059,9 @@ td.ticket-total::before {
   margin-left: 0;
   min-width: 0;
 }
-
+#resolution_dialog hr{
+  margin: 0 10px;
+}
 #index-change-assign-dropdown .toolbar, #file-disp-dropdown .toolbar {
   margin-bottom: 5px;
 }
@@ -8060,9 +8100,15 @@ td.text-center span {
     line-height: 3.5;
   }
 }
+
+.res_id{
+  font-weight: 200;
+}
+
 .cluster-mgt-loader-wrapper{
   margin: 100px 37%;
 }
+
 .webcat-loader-wrapper {
   margin: 0 37%;
 }
@@ -8552,7 +8598,111 @@ hr.thin.form-divider {
 .comment-wrapper + hr.thin {
   margin: 15px 6px;
 }
+#resolution_dialog {
+  .modal-dialog {
+    width: 600px;
+  }
+  .modal-footer{
+    border-top: none;
+    margin: 7px 0px;
+    adding: 0 0 0 15px;
+  }
+  .close {
+    top: 3px;
+    right: 3px;
+  }
 
+  tbody {
+    margin-top: 10px;
+  }
+
+  .modal-header {
+    background-color: $primary-section-color;
+    color: $type-lightest;
+    font-size: 14pt;
+    font-weight: 300;
+    border-top-left-radius: 6px;
+    border-top-right-radius: 6px;
+  }
+  .modal-footer {
+    text-align: center;
+  }
+
+  #resolution_text {
+    padding-left: 7px;
+    color: $type-lighter-color;
+
+  }
+}
+.scrollable-table, .scrollable-list{
+  border: 1px solid $nav-toolbar-color;
+  display: inline-block;
+  max-height: 400px;
+  overflow-y: scroll !important;
+  padding: 2px;
+}
+
+.update-resolution-entries.scrollable-list {
+    li {
+    border-bottom: 1px solid #f2f2f2;
+    border-top: none!important;
+    text-align: left;
+    margin: 0!important;
+    padding: 7px 5px!important;
+    line-height: 1.3em;
+  }
+  .resolution-error-host {
+    word-break: keep-all;
+    display: block;
+    font-weight: 600;
+    text-overflow: ellipsis;
+    overflow: hidden;
+  }
+}
+
+.update-resolution-entries{
+  width: 450px;
+  .resolution-error-host {
+    display: block;
+    font-weight: 600;
+  }
+  li {
+    border-bottom: 1px solid #f2f2f2;
+    text-align: left;
+    margin: 0!important;
+    padding: 7px 5px!important;
+    line-height: 1.3em;
+  }
+}
+.resolution-emp {
+  color: $primary-section-color
+}
+.resolution-error-host{
+  display: block;
+  font-weight: 600;
+}
+#complaints-index_length, #complaints-index_filter{
+  z-index: 50;
+  position: relative;
+  display: block;
+}
+
+#complaint_entries_to_update {
+  margin-top: 15px;
+  td{
+    white-space: nowrap;
+    display: block;
+    overflow: hidden;
+    text-overflow: ellipsis;
+  }
+  tr{
+    width: 566px!important;
+    display: block;
+  }
+  tbody tr:last-child td {
+    border-bottom: none !important;
+  }
+}
 .nested-radio-row .col-xs-6:first-of-type {
   padding-left: 15px;
 }
@@ -8566,7 +8716,6 @@ hr.thin.form-divider {
   padding-top: 6px !important;
   padding-bottom: 12px !important;
 }
-
 
 .preview-wbrs-button {
   background-color: $warning-accent-color;
@@ -10254,9 +10403,21 @@ input[type="radio"].resolution_radio_button {
 .loader-msg{
   font-style: oblique!important;
 }
-// webrep and webcat toolbars - between 1800px and 1600px, prevent breaking/wrapping of the buttons
-@media (min-width: 1850px) {
-  #webrep-index-toolbar, #webcat-index-toolbar {
+// webrep and webcat toolbars - between 2020px and 2025px, prevent breaking/wrapping of the buttons
+@media (min-width: 1600px) {
+  #webrep-index-toolbar{
+    .toolbar-button {
+      background-position: 4px 6px;
+      padding-left: 13px;
+      padding-right: 7px;
+      min-height: 25px;
+      background-size: 14px 14px; // icon size
+      transition: background-color 0.2s;
+    }
+  }
+}
+@media (min-width: 2025px) {
+  #webcat-index-toolbar {
     .toolbar-button {
       background-position: 4px 6px;
       padding-left: 13px;
@@ -10274,7 +10435,7 @@ input[type="radio"].resolution_radio_button {
     }
   }
 }
-@media (max-width: 1850px)  {
+@media (max-width: 2026px)  {
   #webcat-index-toolbar .toolbar-button-text {
     display: none !important;
   }
@@ -10503,7 +10664,10 @@ hr.thin.extra-bottom-marg {
 .small-flash-button:hover {
   opacity: 1;
 }
-
+.pending-note{
+  font-size: 85%;
+  padding-top: 5px
+}
 .owner-col {
   min-width: 80px;
 }

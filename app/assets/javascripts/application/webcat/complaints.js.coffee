@@ -397,7 +397,6 @@ processSubmitPending=(entry_id,row_id)->
           options: AC.WebCat.createSelectOptions(),
           items: selected_options(temp_row.data().category)
         }
-
         $("#domain_#{entry_id}").text(domain)
         $("#subdomain_#{entry_id}").text(subdomain)
         $("#path_#{entry_id}").text(path)
@@ -625,6 +624,67 @@ window.take_selected = ()->
     std_msg_error('No rows selected', ['Please select at least one row.'])
 
 
+
+$(document).on 'click', '#complaints-index tr, #complaints_check_box', ->
+  rows = $('#complaints-index').DataTable().rows('.selected').data()
+  reopened = false
+  invalid_unchanged = false
+  disabled = true
+  for row in rows
+    { status } = row
+
+    if status == 'COMPLETED'
+        reopened = true
+        disabled = false
+    if  status == 'RESOLVED' || status == 'NEW' || status == 'ASSIGNED'|| status == 'REOPENED'
+        invalid_unchanged = true
+        disabled = false
+
+  if disabled == false
+    $('#index_update_resolution').attr('disabled', false)
+  else
+    $('#index_update_resolution').prop('disabled', disabled)
+
+  reopened_opt = $('#complaint_resolution option:contains("Reopened")')
+  invalid_opt = $('#complaint_resolution option:contains("Invalid")')
+  unchanged_opt = $('#complaint_resolution option:contains("Unchanged")')
+
+  if !reopened
+    reopened_opt.attr("disabled","disabled");
+  else
+    reopened_opt.removeAttr("disabled");
+    reopened_opt.prop('selected', true)
+
+  if !invalid_unchanged
+    invalid_opt.attr("disabled","disabled");
+    unchanged_opt.attr("disabled","disabled");
+  else
+    invalid_opt.removeAttr("disabled");
+    unchanged_opt.removeAttr("disabled");
+    invalid_opt.prop('selected', true)
+
+  comment_check()
+$(document).on 'change','#complaint_resolution', ->
+  internal_comment = $('.internal_comment_container')
+  customer_comment = $('.customer_facing_comment_container')
+  if $(this).val() == 'REOPENED'
+    internal_comment.css('display', 'none')
+    customer_comment.css('display', 'none')
+  else
+    internal_comment.css('display', 'block')
+    customer_comment.css('display', 'block')
+
+window.comment_check = ()->
+  invalid_opt = $('#complaint_resolution option:contains("Invalid"):not(:disabled)').length == 1
+  reopened_opt = $('#complaint_resolution option:contains("Reopened"):not(:disabled)').length == 1
+  internal_comment = $('.internal_comment_container')
+  customer_comment = $('.customer_facing_comment_container')
+  if reopened_opt && invalid_opt || invalid_opt
+    internal_comment.css('display', 'block')
+    customer_comment.css('display', 'block')
+  else
+    internal_comment.css('display', 'none')
+    customer_comment.css('display', 'none')
 
 window.return_selected = ()->
   selected_rows = $('#complaints-index').DataTable().rows('.selected')
@@ -1783,6 +1843,109 @@ window.verifyMasterSubmit = () ->
       if (!$(this).closest('tr').hasClass("pending"))
         boolean = true
   return boolean
+
+window.updateResolutionDialog = (confirm) ->
+
+
+
+#   { status } = row
+#  if status == 'COMPLETED'
+#    reopened = true
+#    disabled = false
+#  if  status == 'RESOLVED' || status == 'NEW' || status == 'ASSIGNED'|| status == 'REOPENED'
+#    invalid_unchanged = true
+#    disabled = false
+  $('#complaint_entries_to_update').empty()
+  resolution = $('#complaint_resolution')[0].value
+  selected_rows = $('tr.selected')
+  pending_msg = ''
+  complaint_entries = []
+  for row in selected_rows
+    { id } = row
+    status = $(row).find('.state-col').text()
+    if status == 'PENDING'
+      if pending_msg == ''
+        pending_msg = "<div class='small pending-note'>*Entries with a PENDING status cannot be edited.<div>"
+    else
+      push_row = false
+      if resolution == 'REOPENED' && status == 'COMPLETED'
+        push_row = true
+
+      if resolution == 'RESOLVED' || status == 'NEW' || status == 'ASSIGNED'|| status == 'REOPENED'
+        if resolution == 'INVALID' || resolution == 'UNCHANGED'
+          push_row = true
+
+      if push_row
+        $(row).addClass('filtered-row')
+        complaint_entries.push(id)
+        full_domain = ''
+        domain = $(row).find("#domain_#{id}").attr('data-full')
+        $('#complaint_entries_to_update').append("<tr><td><span class='res_id'>#{id} |</span> <span class='webcat-full-domain'>#{domain}</span></td></tr>")
+  $('#resolution_dialog').modal("show")
+  if selected_rows.length > 1
+    html = "Set the following #{complaint_entries.length} entries to <span class='bold'>RESOLUTION</span> <span class='resolution-emp bold'>#{resolution}.</span>"
+  else
+    html = "Set the following entry to <span class='bold'>RESOLUTION</span> <span class='resolution-emp bold'>#{resolution}.</span>"
+  html += pending_msg
+  $('#resolution_text').html(html)
+
+  tbody = $('#resolution_dialog').find('tbody')
+  setTimeout ->
+    if $('#complaint_entries_to_update').height() > 399
+      $(tbody).addClass('scrollable-table')
+      $('#resolution_text').css('padding-left', 0)
+    else
+      $('#resolution_text').css('padding-left', '7px')
+  , 200
+
+window.updateResolution = () ->
+  resolution = $('#complaint_resolution')[0].value
+  selected_rows = $('tr.selected.filtered-row')
+  internal_comment = $('#internal_comment')[0].value
+  customer_facing_comment = $('#customer_facing_comment')[0].value
+
+  complaint_entries = []
+  for row in selected_rows
+    status = $(row).find('.state-col').text()
+    if status != 'PENDING'
+      complaint_entries.push(row.id)
+
+  std_msg_ajax(
+    method: 'POST'
+    url: "/escalations/api/v1/escalations/webcat/complaint_entries/update_resolution"
+    data: {'complaint_entries': complaint_entries, 'resolution': resolution, 'internal_comment': internal_comment, 'customer_facing_comment': customer_facing_comment}
+    success_reload: true
+    success: (response) ->
+      $('#resolution_dialog').modal('hide')
+      data = JSON.parse(response)
+      resolution = data[0].resolution
+      modal_message = ""
+      error = []
+      success = []
+      for entry in data
+        { host, status, state} = entry
+        if state == "ERROR"
+          error_msg = "<li><span class='resolution-error-host'>#{host}</span> Cannot change entry with status of <span class='resolution-emp bold'>#{status}</span> to <span class='resolution-emp bold'>#{resolution}</span></li>"
+          error.push(error_msg)
+        else
+          success.push(host)
+
+      if success.length
+        modal_message = "<div class='resolution-message'>Successfully updated <span class='bold'>RESOLUTION</span> to <span class='resolution-emp bold'>#{resolution}</span> for #{success.length} Complaint Entries</div>"
+        if !error.length
+          std_msg_success("All entries were successfully updated.", [modal_message], reload: true)
+      if error.length
+        error_list = error.join('')
+
+        modal_message += "<div class='resolution-message'>Error updating the  following #{error.length} Complaint Entries:</div> <ul class='update-resolution-entries'>#{error_list}</ul>"
+        std_msg_error("Error updating resolutions.", [modal_message], reload: true)
+        setTimeout ->
+          if $('.update-resolution-entries').height() > 300
+            $('.update-resolution-entries').addClass('scrollable-list')
+        ,200
+      # Determine whether to render a success or error modal accordingly
+
+  )
 
 $ ->
   $('#cat_new_url_modal').on 'shown.bs.modal', ->
