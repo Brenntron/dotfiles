@@ -390,7 +390,7 @@ Feature: Webcat complaints
     And I fill in selectized with "Adult"
     And I click "#cat-urls-same"
     And I click ".primary"
-    And I wait for "20" seconds
+    And I wait for "15" seconds
     Then I should see "SUCCESS"
     And I should see "URLs/IPs successfully categorized."
 
