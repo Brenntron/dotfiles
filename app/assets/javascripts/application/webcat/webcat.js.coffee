@@ -5,6 +5,20 @@ window.td_truncate = (str, max, long) ->
   long = long or '...'
   if typeof str == 'string' and str.length > max then str.substring(0, max) + long else str
 
+window.wbrs_display = (score) ->
+  score = parseFloat(score)
+  if score == NaN
+    return 'unknown'
+  else if  score <= -6
+    return 'untrusted'
+  else if score <= -3
+    return 'questionable'
+  else if score <= 0
+    return 'neutral'
+  else if score < 6
+    return 'favorable'
+  else if score >= 6
+    return 'trusted'
 $ ->
 
   # webcat: have top navigation bar scroll with page per user request
@@ -503,10 +517,16 @@ $ ->
               }
               {
                 data: 'wbrs_score'
-                width: '20px'
+                width: '55px'
                 render: ( data, type, full, meta ) ->
                   { wbrs_score, entry_id } = full
-                  '<span id="wbrs_score_' + entry_id + '">' + wbrs_score + '</span>'
+                  rep = wbrs_display(wbrs_score)
+                  wbrs_score = parseFloat(wbrs_score).toFixed(1)
+                  if rep == undefined then rep = 'unknown'
+                  if rep == 'unknown' then wbrs_score = '--'
+                  tooltip_rep = rep.toUpperCase()
+                  icon = "<span class='reputation-icon icon-#{rep} esc-tooltipped' title='#{tooltip_rep}'></span>"
+                  return "<div class='reputation-icon-container'>#{icon}<span id='wbrs_score_#{entry_id}'>#{wbrs_score}</span>"
               }
               {
                 data: 'submitter_type'

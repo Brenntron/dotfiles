@@ -2638,6 +2638,24 @@ table#bug-rules-table tbody {
   height: 20px;
 }
 
+
+//wbrs reputation icons//
+.reputation-icon{
+  height: 20px;
+  width: 20px;
+  position: relative;
+  top: 5px;
+  background-repeat: no-repeat;
+  display: inline-block;
+}
+.icon-trusted{ background-image: url(image_path("icon_trusted.svg"));}
+.icon-favorable{ background-image: url(image_path("icon_favorable.svg"));}
+.icon-neutral{ background-image: url(image_path("icon_neutral.svg"));}
+.icon-questionable{ background-image: url(image_path("icon_questionable.svg"));}
+.icon-untrusted{ background-image: url(image_path("icon_untrusted.svg"));}
+.icon-unknown{ background-image: url(image_path("icon_unknown.svg"));}
+//end wbrs reputation icons //
+
 .alerts-col-header {background-image: url(image_path("icon_alert.svg"));}
 .tests-col-header  {background-image: url(image_path("icon_test.svg"));}
 .commit-col-header {background-image: url(image_path("icon_committer"));}
@@ -10609,6 +10627,21 @@ span.threat-cat-no-data {
   max-width: 250px;
 }
 
+.dispute-entry-table-wrapper{
+  background: $content-bg-color;
+  td{
+    border-color: $table-dark-header;
+  }
+  th.entry-col-wbrs-score{
+    display: block;
+  }
+}
+.reputation-icon-container{
+  display: inline-flex;
+  .reputation-icon{
+    top: -1px
+  }
+}
 // webrep dispute index > ensure the dispute count is to the right of the domain entry
 #disputes-index span.input-truncate {
   display: inline-block;
