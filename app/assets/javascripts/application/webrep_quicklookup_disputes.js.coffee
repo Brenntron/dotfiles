@@ -4,8 +4,8 @@ $ ->
   completed_counter = 0
   $(document).bind(
     ###
-      This controls the show/hide of the loading wheel depending on if all ajax calls have been completed.
-      There were issues with using ajaxStop, but this works
+    #This controls the show/hide of the loading wheel depending on if all ajax calls have been completed.
+    #There were issues with using ajaxStop, but this works
     ###
     ajaxStart: () ->
       $('.ajax-message-div').css('display', 'flex')
@@ -54,9 +54,9 @@ $ ->
 # because I don't want to type the same html element over and over
     for opt in arr
       checkbox =
-        '<li> <label>' +
-          '<input name="' + opt + '" value="' + opt + '"type ="checkbox" class="adjust_' + type + '_checkbox"/>'+ opt +
-          '</label> </li>'
+        "<li> <label>
+          <input name='#{opt}' value='#{opt}' type='checkbox' class='adjust_#{type}_checkbox'/>#{opt}
+        </label> </li>"
       $(list).append(checkbox)
 
   window.col_tag_format = (array) ->
@@ -65,7 +65,7 @@ $ ->
     check_list_array = []
     check_list = ''
     for val in array
-      check_name = "<span class='col-tag'>" + val + "</span> "
+      check_name = "<span class='col-tag'>#{val}</span>"
       check_list_array.push(check_name)
     if check_list_array.length == 2
       check_list = check_list_array.join(' and ')
@@ -113,7 +113,7 @@ $ ->
     $(target).remove()
 
     data = data.filter((data_actions)-> return action != data_actions)
-    col_dialog = action_edit + ': ' + col_tag_format(data)
+    col_dialog = "#{action_edit}: #{col_tag_format(data)}"
 
     $(action_p).attr('data', data)
     $(action_p).html(col_dialog)
@@ -252,10 +252,8 @@ $ ->
         $('#confirmation-modal').modal('hide')
         if response
           console.log response
-#          std_msg_success('Success.', ['Reptool classifications successfully updated.'], {reload: false})
         else
           console.log response
-#          std_msg_error('Error', [response], {reload: false})
     )
 
   window.drop_reptool_bl = (data) ->
@@ -268,10 +266,8 @@ $ ->
         $('#confirmation-modal').modal('hide')
         if response
           console.log response
-#          std_msg_success('Success.', ['Reptool classifications successfully dropped.'], {reload: false})
         else
           console.log response
-#          std_msg_error('Error', [response], {reload: false})
     )
 
   window.adjust_wlbl = (data) ->
@@ -285,10 +281,8 @@ $ ->
         $('#confirmation-modal').modal('hide')
         if response
           console.log response
-#          std_msg_success('Success.', ['WLBL classifications successfully adjusted.'], {reload: false})
         else
           console.log response
-#          std_msg_error('Error', [response], {reload: false})
     )
 
   window.remove_wlbl = (data) ->
@@ -302,10 +296,8 @@ $ ->
         $('#confirmation-modal').modal('hide')
         if response
           console.log response
-#          std_msg_success('Success.', ['WLBL classifications successfully removed.'], {reload: false})
         else
           console.log response
-#          std_msg_error('Error', [response], {reload: false})
     )
 
   window.check_actions = (action_classes, action_tags) =>
@@ -433,25 +425,23 @@ $ ->
     if list_action == 'remove'
       action_desc = 'Remove from: '
     checked_bl = $('.adjust_wlbl_checkbox:checked').map( () -> return $(this).val() ).get()
-    console.log checked_bl
     if checked_bl[0].indexOf('BL') != -1
       checked = $('.wlbl_thrt_cat_id:checked')
       for check in checked
         val = $(check).next('label').html()
         threat_cats.push(val)
-        console.log val
     threat_cats = threat_cats.join()
     error_array = []
-    error_header = '<h4>Cannot ' + list_action + ' the following Reptool Classification disputes <h4> '
+    error_header = "<h4>Cannot #{list_action} the following Reptool Classification disputes <h4>"
     selected_rows.each ()->
       row = $(this).closest('tr')
       selected_rows = $('.col-select-all input:checked')
       data = row.find('.col-bulk-dispute').text()
 
       if !isEmpty(data)
-        error_message = data + ': '
+        error_message = "#{data}: "
         action_col = row.find('.col-actions')
-        existing_p = action_col.find( list_class + '.wlbl-action-col')
+        existing_p = "#{action_col.find( list_class)}  .wlbl-action-col"
         clear_col = row.find('.col-clear-actions')
         wlbl_col = row.find('.col-wlbl').text().replace(/ /g, '').split(',')
 
@@ -463,17 +453,17 @@ $ ->
               return !wlbl_col.includes(wlbl)
             when 'remove'
               if !wlbl_col.includes(wlbl)
-                error_message += '<span class="col-tag dialog-tag">' + wlbl + '</span>, '
+                error_message += "<span class='col-tag dialog-tag'>  #{wlbl}</span>,"
               return wlbl_col.includes(wlbl)
         )
 
         check_list = col_tag_format(check_list_array)
-        col_dialog = "<p class='wlbl-action-col " +  list_action + "' data='" + check_list_array + "'>" + action_desc + check_list + "<p>"
+        col_dialog = "<p class='wlbl-action-col #{list_action} data='#{check_list_array}'>#{action_desc}  #{check_list}<p>"
         delete_button = '<button class="clear-action-button row-action-clear"></button>'
 
         if error_message.endsWith(', ')
           error_message = error_message.slice(0, error_message.length - 2);
-          error_html = '<div>' + error_message + '<div>'
+          error_html = "<div>#{error_message}<div>"
           error_array.push(error_html)
         if check_list_array.length
           $(existing_p).remove()
@@ -507,24 +497,22 @@ $ ->
       actions_col = $( this ).find('.col-actions')
 
       existing_reptool = ''
-      if actions_col.attr('reptool_classes') != undefined
-        existing_reptool = 'reptool_classes =' + actions_col.attr('reptool_classes')
+      rep_classes = actions_col.attr('reptool_classes')
+      if rep_classes != undefined
+        existing_reptool = "reptool_classes = #{rep_classes}"
 
       if !isEmpty(new_data) && new_data != undefined
         actions_col = $( this ).find('.col-actions')
         children = actions_col.children()
         existing_actions = actions_col
         if children.length
-
-          html =
-            '<tr> <td>' +
-            new_data +
-            '</td> <td>'
-
+          html = "<tr>
+                    <td> #{new_data} </td>
+                  <td>"
           for child in children
             classes = $(child).attr("class")
             if !isEmpty(classes) && classes != undefined
-              html +=  '<div ' + existing_reptool + ' class="' + classes + '">' + $(child).html() + '</div>'
+              html +=  "<div #{existing_reptool} class='#{classes}'>#{$(child).html()}</div>"
 
           html += '</td> </tr>'
 
@@ -622,13 +610,13 @@ $ ->
           if reptool_add.toLowerCase() == 'remove'
             check_list = check_vals.filter( (rep)->
               if !rep_list.includes(rep)
-                error_message += '<span class="col-tag dialog-tag">' + rep + '</span>, '
+                error_message += "<span class='col-tag dialog-tag'>#{rep} </span>, "
               return rep_list.includes(rep)
             )
           else if reptool_add.toLowerCase() == 'add'
             check_list = check_vals.filter( (rep)->
               if existing_actions.includes(rep) || rep_list.includes(rep)
-                error_message += '<span class="col-tag dialog-tag">' + rep + '</span>, '
+                error_message += "<span class='col-tag dialog-tag'>#{rep} </span>, "
               return !existing_actions.includes(rep) && !rep_list.includes(rep))
           else
 
@@ -637,13 +625,13 @@ $ ->
         delete_button = '<button class="clear-action-button row-action-clear"></button>'
         if error_message.endsWith(', ')
           error_message = error_message.slice(0, error_message.length - 2);
-          error_html = '<div>' + error_message + '<div>'
+          error_html = "<div>#{error_message}<div>"
           error_array.push(error_html)
         else if error_message.includes('has no classifications to drop')
-          error_html = '<div>' + error_message + '<div>'
+          error_html = "<div>#{error_message}<div>"
           error_array.push(error_html)
 
-        col_dialog = "<p class='" + reptool_class + ' ' + status_class + " reptool-action-col' data=' " + check_list + " '>" + status_string + col_tag_format(check_list) + "<p>"
+        col_dialog = "<p class='#{reptool_class} #{status_class} reptool-action-col' data='#{check_list}'> #{status_string} #{col_tag_format(check_list)} <p>"
         drop_check = reptool_add  == 'drop' && existing_reptool.length
         if check_list.length || drop_check
           clear_col.show()
@@ -698,22 +686,22 @@ $ ->
 # if the dispute is not an HTML object, set the HTML of the new row to the below
       if typeof disputes[i] != 'object'
         tbody.innerHTML +=
-          '<tr>' +
-            '<td class="col-select-all">' +
-            '<span class="checkbox-wrapper">' +
-            '<input type="checkbox" checked>' +
-            '</span>' +
-            '</td>'+
-            '<td class="col-bulk-dispute" contenteditable="true" data=' + disputes[i] + '><p>' + disputes[i] + '</p></td>'+
-            '<td class="col-wbrs"></td>'+
-            '<td class="col-wbrs-rule-hits"></td>'+
-            '<td class="col-wbrs-rules"></td>'+
-            '<td class="col-category"></td>'+
-            '<td class="col-wlbl"></td>'+
-            '<td class="col-reptool-class"></td>'+
-            '<td class="col-actions" data=""></td>' +
-            '<td class="col-clear-actions"></td>' +
-            '</tr>'
+          "<tr>
+            <td class='col-select-all'>
+              <span class='checkbox-wrapper'>
+                <input type='checkbox' checked>
+              </span>
+            </td>
+            <td class='col-bulk-dispute' contenteditable='true' data='#{disputes[i]}'><p> #{disputes[i]} </p></td>
+            <td class='col-wbrs'></td>
+            <td class='col-wbrs-rule-hits'></td>
+            <td class='col-wbrs-rules'></td>
+            <td class='col-category'></td>
+            <td class='col-wlbl'></td>
+            <td class='col-reptool-class'></td>
+            <td class='col-actions' data=''></td>
+            <td class='col-clear-actions'></td>
+          </tr>"
       else
 # if the dispute is an HTML object, set it as OuterHTML to avoid formatting issues
         tbody.innerHTML += disputes[i].outerHTML
