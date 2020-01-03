@@ -1352,6 +1352,14 @@ $ ->
 
 
   $(document).ready ->
+    # Hide loader cogs when page is done loading
+    loader = $('#inline-webrep')
+    $(this).bind(
+      ajaxStart: () ->
+        loader.removeClass('hidden')
+      ajaxStop: () ->
+        loader.addClass('hidden')
+    )
 
     if window.location.pathname == '/escalations/webrep/disputes'
       $('#new-complaint').show()
