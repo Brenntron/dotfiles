@@ -275,7 +275,7 @@ $ ->
           lengthMenu: [[25, 50, 100, 150, 200], [25, 50, 100, 150, 200]]
           processing: true
           serverSide: true
-          stateSave: true
+          stateSave: false
           select: true
           ajax:
             url: url
@@ -626,6 +626,29 @@ $('#exampleModal').on 'shown.bs.modal', ->
 
 
 $ ->
+
+  # SHOW / HIDE COLUMNS ON WEBCAT INDEX, DOES THIS WORK??
+  # SHOW / HIDE COLUMNS ON WEBCAT INDEX
+  $('.toggle-vis-webcat').each ->
+    table = $('#complaints-index').DataTable()
+    column = table.column($(this).attr('data-column'))
+    checkbox = $(this).find('input')
+
+#    if $(checkbox).prop('checked')
+#      column.visible(true)
+#    else
+#      column.visible(false)
+
+    $(this).click (e) ->
+      $(checkbox).prop('checked', !checkbox.prop('checked'))
+      column.visible(!column.visible())
+
+    # on click a check box, dont do anything
+    $(checkbox).click (e) ->
+      $(checkbox).prop('checked', !checkbox.prop('checked'))
+
+
+
   # webcat > complaints show page, ensure this JS gets called
   if $('body').hasClass('escalations--webcat--complaints-controller') && $('body').hasClass('show-action')
     check_wbnp_status()

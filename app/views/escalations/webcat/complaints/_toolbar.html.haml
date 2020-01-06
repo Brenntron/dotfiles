@@ -1,6 +1,42 @@
 .toolbar#webcat-index-toolbar
   %div
     %label.toolbar-section-label
+      View
+    %span.dropdown
+      %button#webcat-index-table-show-columns-button.toolbar-button.show-col-button.dropdown-toggle.esc-tooltipped{title: 'Show/Hide Columns', 'data-toggle': 'dropdown', 'aria-haspopup': 'true', 'aria-expanded': 'false'}
+        %span.toolbar-button-text
+          Show/Hide Columns
+      .dropdown-menu.toolbar-dropdown#webcat-index-show-columns-dropdown{'aria-labelledby': 'webcat-index-table-show-columns-button'}
+        %ul
+          %li.toggle-vis-webcat{'data-column':'3'}
+            %input{type: 'checkbox', checked: true, id: 'age-checkbox'} Age
+          %li.toggle-vis-webcat{'data-column':'4'}
+            %input{type: 'checkbox', checked: true, id: 'status-checkbox'} Status
+          %li.toggle-vis-webcat{'data-column':'5'}
+            %input{type: 'checkbox', checked: true, id: 'tags-checkbox'} Tags
+          %li.toggle-vis-webcat{'data-column':'6'}
+            %input{type: 'checkbox', checked: true, id: 'subdomain-checkbox'} Subdomain
+          %li.toggle-vis-webcat{'data-column':'7'}
+            %input{type: 'checkbox', checked: true, id: 'domain-ip-checkbox'} Domain / IP
+          %li.toggle-vis-webcat{'data-column':'8'}
+            %input{type: 'checkbox', checked: true, id: 'path-checkbox'} Path
+
+        %ul
+          %li.toggle-vis-webcat{'data-column':'9'}
+            %input{type: 'checkbox', checked: true, id: 'primary-cat-checkbox'} Primary Cat
+          %li.toggle-vis-webcat{'data-column':'10'}
+            %input{type: 'checkbox', checked: true, id: 'suggested-cat-checkbox' } Suggested Cat
+          %li.toggle-vis-webcat{'data-column':'11'}
+            %input{type: 'checkbox', checked: true, id: 'wbrs-checkbox'} WBRS
+          %li.toggle-vis-webcat{'data-column':'12'}
+            %input{type: 'checkbox', checked: true, id: 'submitter-type-checkbox'} Submitter Type
+          %li.toggle-vis-webcat{'data-column':'13'}
+            %input{type: 'checkbox', checked: true, id: 'submitter-org-checkbox'} Submitter Org
+          %li.toggle-vis-webcat{'data-column':'14'}
+            %input{type: 'checkbox', checked: true, id: 'assignee-checkbox'} Assignee
+
+  %div
+    %label.toolbar-section-label
       Open in New Tab
     %button.toolbar-button.open-selected.esc-tooltipped.toolbar-button-spacer{onclick: 'open_selected()', type: 'button', title: 'Open Selected'}
       %span.toolbar-button-text Open Selected
