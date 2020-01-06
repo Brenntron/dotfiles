@@ -6177,7 +6177,9 @@ td.ticket-total::before {
   display: inline-block;
   content: '';
 }
-
+.important-flag-col{
+  width: 25px;
+}
 .entry-important-flag::before, .highlight-second-review .important-flag-col .is-important {
   background-image: url(image_path('icon_important.svg'));
   background-repeat: no-repeat;
@@ -10779,11 +10781,6 @@ span.threat-cat-no-data {
   margin-bottom: 2px;
 }
 
-// ensure vertical alignment on narrow screens
-.research-table-details-wrapper table tr:first-of-type td {
-  vertical-align: middle;
-}
-
 // webrep dispute index > ensure break/wrap properly for long url's containing parameters
 .dispute-entry-col {
   min-width: 200px;
@@ -10839,12 +10836,12 @@ span.threat-cat-no-data {
 /* handles existing bug for wl/bl list duplicate entries (a.com issue) */
 .wlbl-table-result {
   display: inline-block;
-  min-width: 80px;
+  min-width: 0;
   max-width: 150px;
   max-height: 45px;
   overflow-y: hidden;
   padding-top: 1px;
-  padding-right: 15px;
+  padding-right: 5px;
   vertical-align: middle;
 }
 
@@ -10924,58 +10921,217 @@ span.threat-cat-no-data {
 }
 
 
-// research rows alignment/formatting updates
-// top row of each
+// RESEARCH ROWS ON SHOW PAGE + BFRP
+// RESEARCH ROWS ON SHOW PAGE + BFRP
+#disputes-research-table {
+  border-collapse: separate;
+  border-spacing: 0 10px;  // add vertical space between rows
+}
+
+#research-tab-toolbar, #research-page-toolbar {
+  margin-bottom: 5px;
+}
+
+.research-table-details-wrapper table td {
+  padding: 7px 4px 7px 8px;
+}
+
+#disputes-research-table .research-table-details-wrapper table td label {
+  padding-right: 0;
+}
+
+// checkbox table cells in a row
+.research-table-details-wrapper table td.input-col {
+  padding: 6px 6px 6px 9px;
+  text-align: center;
+  width: 2%;
+  max-width: 10px;
+  vertical-align: middle;
+}
+
+// ensure basic formatting here
+.dispute_rep_tools_wrapper {
+  position: static;
+  width: 90px;
+  margin-left: 0;
+  margin-top: 0;
+}
+
+// FIRST ROW of each entry (contains the URL + category)
 .research-first-row {
   margin-top: 120px;
-  td:nth-child(1), td:nth-child(2) {
-    width: 20px;  // icons
+  // PRIMARY CELL WIDTHS, NEEDS PRECISE FIXED + FLUID WIDTHS
+  .expandable-cell {
+    width: 1.2%;
+    max-width: 10px;
   }
-  td:nth-child(4) {
-    width: 25%;  // hostname
+  .cb-cell {
+    width: 1.5%;
+    max-width: 20px;
   }
-  span.entry-data-content {
-    display: inline-block;
-    min-width: 400px;   // url/ip
+  .url-cell {
+    width: 20%;
+    padding-right: 10px;
+    vertical-align: top;
+    span.entry-data-content {
+      display: inline-block;
+      word-break: break-all;
+    }
+  }
+  .category-cell {
+    width: 300px;
+  }
+  .hostname-cell {
+    width: 200px;
+  }
+  .status-cell {
+    width: 150px;
+  }
+  .resolution-cell {
+    width: 200px;
+  }
+  .date-time-cell {
+    width: 200px;
+  }
+  .rep-tools-cell {
+    button {
+      margin-right: 0;
+    }
   }
 }
 
-// second row of each
-.research-overview-row {
-  background: $faint-neutral-color;
-  td:nth-child(6) {
-    width: 170px;  // rule hits list
-    word-break: break-word;
-    padding-right: 10px;
-  }
-  td:nth-child(7) {
-    width: 150px;
-  }
-  td:nth-child(8) {
-    width: 60px;   // xbrs history
-  }
-  td:nth-child(9) {
-    width: 140px;
-  }
-  td:nth-child(10) {
-    width: 110px;  // reptool class
-    word-break: break-word;
-  }
-  td:nth-child(12) {
-    width: 190px;  // wl/bl lists + threat cats
+// FIRST ROW - BFRP SPECIFIC
+.research-action .research-first-row {
+  .url-cell {
+    width: 40%;
   }
 }
+
+// SECOND ROW of each entry
+.research-overview-row {
+  background: $faint-neutral-color;
+  // PRIMARY CELL WIDTHS, NEEDS PRECISE FIXED + FLUID WIDTHS
+  .wbrs-score-label-cell {
+    width: 3%;
+    max-width: 50px;
+  }
+  .wbrs-score-cell {
+    width: 40px;
+  }
+  .wbrs-rule-hits-label-cell {
+    width: 7%;   // use percentage to ensure certain widths
+    max-width: 80px;
+  }
+  .wbrs-rule-hits-cell {
+    width: 3%;
+  }
+  .wbrs-rules-label-cell {
+    width: 6%;
+    max-width: 70px;
+  }
+  .wbrs-rules-cell {
+    width: 7%;
+  }
+  .xbrs-history-label-cell {
+    width: 8%;
+    max-width: 100px;
+  }
+  .xbrs-history-cell {
+    width: 5%;
+  }
+  .virustotal-label-cell {
+    max-width: 80px;
+    width: 7%;
+  }
+  .virustotal-cell {
+    width: 50px;
+  }
+  .wlbl-tc-label-cell {
+    width: 2%;
+  }
+  .wlbl-tc-cell {
+    width: 5%;
+  }
+  .history-button-cell {
+    padding: 6px 0;
+    width: 2%;
+    max-width: 20px;
+    button {
+      float: none;
+    }
+  }
+  .referenced-tickets-label-cell {
+    width: 80px;
+  }
+  .referenced-tickets-cell {
+    width: 110px;
+  }
+  td {
+    vertical-align: middle;
+    &:first-child {
+      background: $content-bg-color;
+    }
+    // bg colors for checkbox cells
+    .wbrs-input-wrapper {
+      background-color: $bug-section-color;
+    }
+    .sbrs-input-wrapper {
+      background-color: $success-color;
+    }
+    .xbrs-input-wrapper {
+      background-color: $communication-accent-color;
+    }
+    .crosslisted-input-wrapper {
+      background-color: $warning-accent-color;
+    }
+    .virus-total-input-wrapper {
+      background-color: $rule-accent-color;
+    }
+    .reptool-input-wrapper {
+      background-color: $fifth-section-color;
+    }
+  }
+}
+
+
+// FF firefox needs formatting tweaks
+@-moz-document url-prefix() {
+  #disputes-research-table td.dispute_rep_tools {
+    padding: 3px !important; // needs override
+    min-width: 90px;
+  }
+  .dispute_rep_tools_wrapper {
+    position: relative;
+    bottom: 4px;
+    margin-left: unset;
+    margin-top: unset;
+  }
+}
+
+
+.rule-hits-cols-list {
+  width: 130px;  // rule hits list
+  word-break: break-word;
+  padding-right: 10px;
+}
+
+
+// ensure vertical alignment on narrow screens
+.research-table-details-wrapper table tr:first-of-type td {
+  vertical-align: middle;
+}
+
 
 
 .wlbl-tc-research-span {
-  display: inline-block;
+  display: inline;
   padding-top: 1px;
-  min-width: 20px;
+  min-width: 0;
   max-width: 150px;
   vertical-align: middle;
 }
 
-.wlbl-and-tc-area .dispute-inline-buttons.history-button {
+.research-table-details-wrapper .history-button {
   display: inline-block;
   width: 20px;
 }
@@ -11421,6 +11577,29 @@ span.threat-cat-no-data {
     height: 95px;
     max-width: 220px;
   }
+}
+
+#main-inline-loader{
+  position: absolute;
+  margin-top: -75px;
+  right: 190px;
+  .loading-msg{
+    position: absolute;
+    margin-top: 9px;
+    margin-left: 14px;
+    width: max-content;
+    color: #999;
+    font-style: italic;
+  }
+}
+
+#disputes-research-table{
+  background: $ac-nav-bg-color;
+  max-width: 2300px;  // set a reasonable max-width
+}
+
+.dispute-entry-ip-uri {
+  word-break: break-all;
 }
 
 // file rep nav bar - ensure top-left nav icons never break/wrap + minor spacing updates
