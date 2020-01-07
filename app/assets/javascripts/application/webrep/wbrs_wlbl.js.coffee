@@ -249,17 +249,10 @@ window.bulk_order_rows = () ->
     x - y
   $(rows).each (i, row) -> table_dd.append(row)
 
-  # de-dupe the css classes for 'http/non-http' entries, i.e. 'bfrp-dd-result-0'
-  existing_set = {}
-
-  $(curr_dd).find('.wlbl-entry-wlbl').each ->
-    curr_entry = $(this)
-    if existing_set[curr_entry.attr('class')]
-      curr_entry.attr('class','wlbl-entry-wlbl')
-      curr_entry.parent().removeAttr('data-order-id')
-    else
-      existing_set[curr_entry.attr('class')] = true
-
+  # bfrp > after sorted, for each entry add a numerical "bfrp-dd-result-0" for tests
+  $(curr_dd).find('.wlbl-entry-wlbl').each (i) ->
+    $(this).attr("class","wlbl-entry-wlbl bfrp-dd-result-#{i}")
+    $(this).parent().removeAttr('data-order-id')
 
       
 
