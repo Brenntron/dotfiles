@@ -1090,40 +1090,35 @@ $ ->
     missing_data = '<span class="missing-data">Missing data</span>'
     entry_rows = []
     $(entry).each ->
-      entry_content = ''
-      if this.entry.ip_address != null
-        entry_content = this.entry.ip_address
-      else if this.entry.uri != null
-        entry_content = this.entry.uri
-      else
-        entry_content = missing_data
-
-      category = ''
-      if this.entry.primary_category != null
+      { ip_address, uri, primary_category} = this.entry
+      entry_content = missing_data
+      if ip_address != null
+        entry_content = ip_address
+      else if uri != null
+        entry_content = uri
+      category = '<span class="missing-data">No assigned categories</span>'
+      if this.entry.primary_category != null && this.entry.primary_category != '{}'
         category = this.entry.primary_category
-      else
-        category = missing_data
-      status = ''
+
+      status = missing_data
       if this.entry.status != null
         status = this.entry.status
-      else
-        status = missing_data
-      resolution = ''
+
+      resolution = missing_data
       if this.entry.resolution != null
         resolution = this.entry.resolution
-      else
-        resolution = missing_data
+
       if this.entry.resolution_comment != null
         resolution_comment = this.entry.resolution_comment
         resolution_col = "<td class='entry-col-res'>#{resolution_comment}</td>"
       else
         resolution_comment = ''
         resolution_col = "<td class='entry-col-res'>#{resolution}</td>"
+
       suggested_disposition = ''
       if this.entry.suggested_disposition != null
         suggested_disposition = this.entry.suggested_disposition
-      else
-        suggested_disposition = missing_data
+
       if this.entry.is_important == true
         important = 'entry-important-flag'
       else
