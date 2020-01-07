@@ -39,9 +39,9 @@
     %label.toolbar-section-label
       Open in New Tab
     %button.toolbar-button.open-selected.esc-tooltipped.toolbar-button-spacer{onclick: 'open_selected()', type: 'button', title: 'Open Selected'}
-      %span.toolbar-button-text Open Selected
+      %span.toolbar-button-text Selected
     %button.toolbar-button.open-all.esc-tooltipped{onclick: 'open_all()', type: 'button', title: 'Open All'}
-      %span.toolbar-button-text Open All
+      %span.toolbar-button-text.text-button-all All
   %div
     %label.toolbar-section-label
       Edit
@@ -51,21 +51,24 @@
       %span.toolbar-button-text Return
   %div
     %label.toolbar-section-label
-      View Nested Data
+      Collapse
     %button.toolbar-button.collapse-button.esc-tooltipped.toolbar-button-spacer{onclick: 'collapse_selected()', type: 'button', title: 'Collapse Selected'}
-      %span.toolbar-button-text Collapse Selected
+      %span.toolbar-button-text Selected
     %button.toolbar-button.collapse-all.esc-tooltipped.toolbar-button-spacer{onclick: 'collapse_all()', type: 'button', title: 'Collapse All'}
-      %span.toolbar-button-text Collapse All
-    %button.toolbar-button.expand-row-button.esc-tooltipped.toolbar-button-spacer{onclick: 'expand_selected()', type: 'button', title: 'Expand Selected'}
-      %span.toolbar-button-text Expand Selected
-    %button.toolbar-button.expand-all.esc-tooltipped{type: 'button', title: 'Expand All'}
-      %span.toolbar-button-text Expand All
+      %span.toolbar-button-text.text-button-all All
   %div
-    %label.toolbar-section-label Data
+    %label.toolbar-section-label
+      Expand
+    %button.toolbar-button.expand-row-button.esc-tooltipped.toolbar-button-spacer{onclick: 'expand_selected()', type: 'button', title: 'Expand Selected'}
+      %span.toolbar-button-text Selected
+    %button.toolbar-button.expand-all.esc-tooltipped{type: 'button', title: 'Expand All'}
+      %span.toolbar-button-text.text-button-all All
+  %div
+    %label.toolbar-section-label Fetch Data
     %button.toolbar-button.sync-button#fetch.esc-tooltipped.toolbar-button-spacer{ onclick: 'fetch_complaints();', title: 'Fetch Complaints'}
-      %span.toolbar-button-text Fetch Complaints
+      %span.toolbar-button-text Complaints
     %button.toolbar-button.sync-button#fetch_wbnp.esc-tooltipped{ onclick: 'fetch_wbnp_data();', title: 'Fetch WBNP Data'}
-      %span.toolbar-button-text Fetch WBNP Data
+      %span.toolbar-button-text WBNP Data
   %div
     %label.toolbar-section-label Bulk
     %button.toolbar-button.master-submit-button#master-submit.esc-tooltipped.toolbar-button-spacer{ onclick: 'master_submit();', title: 'Submit Changes', disabled: true}
