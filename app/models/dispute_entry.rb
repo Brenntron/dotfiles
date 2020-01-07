@@ -614,11 +614,11 @@ class DisputeEntry < ApplicationRecord
 
     ::Preloader::Base.fetch_all_api_data(self.hostlookup, self.id)
     #
-    #if self.uri.present? && self.ip_address.present?
-    #  wbrs_stuff = Sbrs::Base.combo_call_sds_v3(self.uri, [self.ip_address])
-    #else
-    wbrs_stuff = Sbrs::Base.remote_call_sds_v3(self.hostlookup, "wbrs")
-    #end
+    if self.uri.present? && self.web_ips.present?
+      wbrs_stuff = Sbrs::Base.combo_call_sds_v3(self.uri, [self.web_ips.join(" ")])
+    else
+      wbrs_stuff = Sbrs::Base.remote_call_sds_v3(self.hostlookup, "wbrs")
+    end
     wbrs_stuff_rulehits = Sbrs::ManualSbrs.get_rule_names_from_rulehits(wbrs_stuff)
     ip_addr = IPSocket.getaddress(hostlookup) rescue nil
     if ip_addr
@@ -688,11 +688,13 @@ class DisputeEntry < ApplicationRecord
       end
     end
 
-    #if self.uri.present? && self.ip_address.blank?
-    #  resolved_ip = Resolv.getaddress(self.domain_of(self.uri)) rescue nil
-    #  if resolved_ip.present?
-    #    attributes['ip_address'] = resolved_ip
-    #  end
+    if attributes['uri'].present? && attributes['web_ips'].blank?
+      resolved_ip = Resolv.getaddress(self.domain_of(self.uri)) rescue nil
+      if resolved_ip.present?
+        attributes['web_ips'] = resolved_ip
+      end
+    end
+
 
     if attributes['ip_address'].present? && attributes['ip_address'] != self.ip_address
       sync_up
@@ -701,7 +703,7 @@ class DisputeEntry < ApplicationRecord
       sync_up
     end
 
-    update!(attributes.slice(*%w{entry_type ip_address hostname uri status resolution resolution_comment case_accepted_at case_resolved_at case_closed_at}))
+    update!(attributes.slice(*%w{web_ips entry_type ip_address hostname uri status resolution resolution_comment case_accepted_at case_resolved_at case_closed_at}))
   end
 
   def self.update_from_field_data(field_data)
@@ -849,5 +851,40 @@ class DisputeEntry < ApplicationRecord
     elsif !is_ip?(entry) && !DisputeEntry.where(uri: entry).present?
       return false
     end
+  end
+
+  def self.process_multi_ip_info(uri, ips, dispute_entry = nil)
+
+    result = {}
+
+    results = Sbrs::Base.combo_call_sds_v3(uri, ips)
+
+
+    wbrs_rule_hits = Sbrs::ManualSbrs.get_rule_names_from_rulehits(results) rescue nil
+    wbrs_score = results["wbrs"]["score"]
+
+    if dispute_entry.present? && !wbrs_rule_hits.nil?
+      rule_hits_to_destroy = dispute_entry.dispute_rule_hits.where(:is_multi_ip_rulehit => true)
+
+      ###
+
+      rule_hits_to_destroy.destroy_all
+
+      wbrs_rule_hits.each do |rule_hit|
+
+        DisputeRuleHit.create(rule_type:'WBRS', name: rule_hit, dispute_entry_id: dispute_entry.id)
+
+      end
+
+      dispute_entry.score = wbrs_score
+      dispute_entry.save
+
+    end
+
+    result[:rulehits] = wbrs_rule_hits
+    result[:score] = wbrs_score
+
+    return results
+
   end
 end
