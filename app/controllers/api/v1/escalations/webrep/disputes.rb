@@ -837,6 +837,24 @@ module API
               render json: {assignees: assignees}
             end
 
+            desc ''
+            post 'update_multi_ip' do
+              uri = params[:uri]
+              ips = params[:ip_addresses]
+              dispute_entry_id = params[:dispute_entry_id]
+
+              dispute_entry = nil
+
+              if dispute_entry_id.present?
+                dispute_entry = DisputeEntry.where(:id => dispute_entry_id)
+              end
+
+              results = DisputeEntry.process_multi_ip_info(uri, ips, dispute_entry)
+
+              render json: {:status => "success", :rulehits => results[:rulehits], :score => results[:score]}
+
+            end
+
           end
         end
       end
