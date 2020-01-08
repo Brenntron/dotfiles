@@ -6,8 +6,12 @@
       %button#webcat-index-table-show-columns-button.toolbar-button.show-col-button.dropdown-toggle.esc-tooltipped{title: 'Show/Hide Columns', 'data-toggle': 'dropdown', 'aria-haspopup': 'true', 'aria-expanded': 'false'}
         %span.toolbar-button-text
           Show/Hide Columns
-      .dropdown-menu.toolbar-dropdown#webcat-index-show-columns-dropdown{'aria-labelledby': 'webcat-index-table-show-columns-button'}
+      .dropdown-menu.toolbar-dropdown#webcat-index-table-show-columns-dropdown{'aria-labelledby': 'webcat-index-table-show-columns-button'}
         %ul
+          %li.toggle-vis-webcat{'data-column':'1'}
+            %input{type: 'checkbox', checked: true, id: 'expand-checkbox'} Expand
+          %li.toggle-vis-webcat{'data-column':'2'}
+            %input{type: 'checkbox', checked: true, id: 'important-checkbox'} Important
           %li.toggle-vis-webcat{'data-column':'3'}
             %input{type: 'checkbox', checked: true, id: 'age-checkbox'} Age
           %li.toggle-vis-webcat{'data-column':'4'}
@@ -17,15 +21,15 @@
           %li.toggle-vis-webcat{'data-column':'6'}
             %input{type: 'checkbox', checked: true, id: 'subdomain-checkbox'} Subdomain
           %li.toggle-vis-webcat{'data-column':'7'}
-            %input{type: 'checkbox', checked: true, id: 'domain-ip-checkbox'} Domain / IP
-          %li.toggle-vis-webcat{'data-column':'8'}
-            %input{type: 'checkbox', checked: true, id: 'path-checkbox'} Path
+            %input{type: 'checkbox', checked: true, id: 'domain-checkbox'} Domain / IP
 
         %ul
+          %li.toggle-vis-webcat{'data-column':'8'}
+            %input{type: 'checkbox', checked: true, id: 'path-checkbox'} Path
           %li.toggle-vis-webcat{'data-column':'9'}
-            %input{type: 'checkbox', checked: true, id: 'primary-cat-checkbox'} Primary Cat
+            %input{type: 'checkbox', checked: true, id: 'primary-checkbox'} Primary Cat
           %li.toggle-vis-webcat{'data-column':'10'}
-            %input{type: 'checkbox', checked: true, id: 'suggested-cat-checkbox' } Suggested Cat
+            %input{type: 'checkbox', checked: true, id: 'suggested-checkbox' } Suggested Cat
           %li.toggle-vis-webcat{'data-column':'11'}
             %input{type: 'checkbox', checked: true, id: 'wbrs-checkbox'} WBRS
           %li.toggle-vis-webcat{'data-column':'12'}
@@ -34,6 +38,7 @@
             %input{type: 'checkbox', checked: true, id: 'submitter-org-checkbox'} Submitter Org
           %li.toggle-vis-webcat{'data-column':'14'}
             %input{type: 'checkbox', checked: true, id: 'assignee-checkbox'} Assignee
+
 
   %div
     %label.toolbar-section-label

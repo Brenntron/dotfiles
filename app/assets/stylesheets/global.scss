@@ -9058,25 +9058,6 @@ hr.thin.form-divider {
 .create-det-button {background-image: url(image_path('icon_target_white.svg'));}
 .change-disp-button {background-image: url(image_path('icon_hazard_white.svg'));}
 
-
-#webcat-index-show-columns-dropdown {
-  width: 320px;
-  ul {
-    display: inline-block;
-    padding: 10px;
-    width: 49%;
-    li {
-      font-size: 9pt;
-      padding: 4px 12px;
-      cursor: default;
-      input {
-        margin-right: 8px;
-      }
-    }
-  }
-}
-
-
 #file-index-table-show-columns-dropdown {
   min-width: 390px;
 }
@@ -11736,3 +11717,24 @@ span.threat-cat-no-data {
 .text-button-all {
   min-width: 30px;
 }
+
+
+
+// webcat index DT, adhering to existing naming conventions
+#webcat-index-table-show-columns-dropdown {
+  width: 320px;
+  ul {
+    display: inline-block;
+    padding: 10px;
+    width: 49%;
+    li {
+      font-size: 9pt;
+      padding: 4px 12px;
+      cursor: default;
+      input {
+        margin-right: 8px;
+      }
+    }
+  }
+}
+

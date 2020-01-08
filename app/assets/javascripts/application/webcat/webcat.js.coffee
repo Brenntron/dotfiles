@@ -627,26 +627,69 @@ $('#exampleModal').on 'shown.bs.modal', ->
 
 $ ->
 
-  # SHOW / HIDE COLUMNS ON WEBCAT INDEX, DOES THIS WORK??
-  # SHOW / HIDE COLUMNS ON WEBCAT INDEX
   $('.toggle-vis-webcat').each ->
     table = $('#complaints-index').DataTable()
     column = table.column($(this).attr('data-column'))
     checkbox = $(this).find('input')
 
-#    if $(checkbox).prop('checked')
-#      column.visible(true)
-#    else
-#      column.visible(false)
+    if $(checkbox).prop('checked')
+      column.visible(true)
+    else
+      column.visible(false)
 
     $(this).click (e) ->
       $(checkbox).prop('checked', !checkbox.prop('checked'))
       column.visible(!column.visible())
 
-    # on click a check box, dont do anything
     $(checkbox).click (e) ->
       $(checkbox).prop('checked', !checkbox.prop('checked'))
 
+
+  # webcat > get the show/hide state for these checkboxes
+  if window.location.pathname == '/escalations/webcat/complaints'
+    std_msg_ajax(
+      method: 'POST'
+      url: "/escalations/api/v1/escalations/user_preferences/"
+      data: {name: 'WebCatColumns'}
+      success: (response) ->
+        response = JSON.parse(response)
+
+        $.each response, (column, state) ->
+          if state == true
+            $("##{column}-checkbox").prop('checked', true)
+            $('#complaints-index').DataTable().column("##{column}").visible true
+          else
+            $("##{column}-checkbox").prop('checked', false)
+            $('#complaints-index').DataTable().column("##{column}").visible false
+
+    )
+
+  # webcat > on click any show/hide column, update user prefs table
+  $('.toggle-vis-webcat').on "click", ->
+    data = {}
+    data['expand'] = $("#expand-checkbox").is(':checked')
+    data['important'] = $("#important-checkbox").is(':checked')
+    data['age'] = $("#age-checkbox").is(':checked')
+    data['status'] = $("#status-checkbox").is(':checked')
+    data['tags'] = $("#tags-checkbox").is(':checked')
+    data['subdomain'] = $("#subdomain-checkbox").is(':checked')
+    data['domain'] = $("#domain-checkbox").is(':checked')
+    data['path'] = $("#path-checkbox").is(':checked')
+    data['primary'] = $("#primary-checkbox").is(':checked')
+    data['suggested'] = $("#suggested-checkbox").is(':checked')
+    data['wbrs'] = $("#wbrs-checkbox").is(':checked')
+    data['submittertype'] = $("#submittertype-checkbox").is(':checked')
+    data['submitterorg'] = $("#submitterorg-checkbox").is(':checked')
+    data['assignee'] = $("#assignee-checkbox").is(':checked')
+
+    std_msg_ajax(
+      url: "/escalations/api/v1/escalations/user_preferences/update"
+      method: 'POST'
+      data: {data, name: 'WebCatColumns'}
+      dataType: 'json'
+      success: (response) ->
+        console.log 'Webcat column show/hide preferences are updated in user_prefs table.'
+    )
 
 
   # webcat > complaints show page, ensure this JS gets called
