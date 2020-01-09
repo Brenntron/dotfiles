@@ -2166,12 +2166,14 @@ window.query_uri_plus_ip = (uri, ips, entry_id) ->
       $(wbrs_cat_cell).text(proxy)
 
       # If there are rule hits, add to the rule hit details table
+      entry_wrapper = $('#entry-data-wrapper_' + entry_id)
+      wbrs_details_table = $($(entry_wrapper).find('.wbrs-details-table')[0]).find('tbody')[0]
       if rule_hits > 0
-        debugger
-        wbrs_details_table = $($('#entry-data-wrapper_' + entry_id).find('.wbrs-details-table')[0]).find('tbody')[0]
-        $(rules).each ->
+        $(response.json.rulehits).each ->
+          debugger
           # Ignoring description and weight right now as I don't think we are getting that data currently
           rule_row = '<tr><td class="uri-plus-ip-rule-indicator"></td><td>' + this + '</td><td></td><td></td></tr>'
+          debugger
           $(wbrs_details_table).append(rule_row)
 
   )
