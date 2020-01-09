@@ -854,7 +854,6 @@ class DisputeEntry < ApplicationRecord
   end
 
   def self.process_multi_ip_info(uri, ips, dispute_entry = nil)
-
     result = {}
 
     results = Sbrs::Base.combo_call_sds_v3(uri, ips)
@@ -884,7 +883,7 @@ class DisputeEntry < ApplicationRecord
     result[:rulehits] = wbrs_rule_hits
     result[:score] = wbrs_score
 
-    return results
+    return result
 
   end
 end

@@ -837,7 +837,7 @@ module API
               render json: {assignees: assignees}
             end
 
-            desc ''
+            desc 'Get URL + IP data from SDS V3'
             post 'update_multi_ip' do
               uri = params[:uri]
               ips = params[:ip_addresses]
@@ -846,11 +846,10 @@ module API
               dispute_entry = nil
 
               if dispute_entry_id.present?
-                dispute_entry = DisputeEntry.where(:id => dispute_entry_id)
+                dispute_entry = DisputeEntry.where(:id => dispute_entry_id).first
               end
 
               results = DisputeEntry.process_multi_ip_info(uri, ips, dispute_entry)
-
               render json: {:status => "success", :rulehits => results[:rulehits], :score => results[:score]}
 
             end

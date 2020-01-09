@@ -2119,56 +2119,62 @@ window.query_uri_plus_ip = (uri, ips, entry_id) ->
 
 #  Could be called via the 'Add ips', the Save changes to an entry, or refresh data button
 #  Send the uri and ips to sdsv3
-#  std_msg_ajax(
-#    url: "/escalations/api/v1/escalations/webrep/disputes/whatever"
-#    method: 'GET'
-#    data: {}
-#    dataType: 'json'
-#    success: (response) ->
-#      response = JSON.parse(response)
-#      status = response.status
-#
-#  )
 
-#  let's pretend this is what sdsv3 returns and it's successful
-  fake_data = {
-    "wbrs_score": 2.5,
-    "wbrs_rules": ["a1m_vturl_neutral", "suwl", "a500"],
-    "category": ["Shopping", "Transportation"]
-  }
 
-  # Kill the loader and the 'Add IP Addresses' dropdown
-  inserted_loader = $('#entry-data-wrapper_' + entry_id).find('.inline-row-loader')
-  $(inserted_loader).remove()
-  dropdown = $('#add_ip_button_' + entry_id).parent()
-  $(dropdown).remove()
+  std_msg_ajax(
+    url: "/escalations/api/v1/escalations/webrep/disputes/update_multi_ip"
+    method: 'POST'
+    data: {
+      uri: uri,
+      ip_addresses: ips,
+      dispute_entry_id: entry_id
+    }
+    success: (response) ->
+      debugger
+      console.log response
 
-  # Prep for inserting into DOM
-  rules = fake_data.wbrs_rules.join(', ')
-  cats  = fake_data.category.join(', ')
-  rule_hits = fake_data.wbrs_rules.length
+      # Kill the loader and the 'Add IP Addresses' dropdown
+      inserted_loader = $('#entry-data-wrapper_' + entry_id).find('.inline-row-loader')
+      $(inserted_loader).remove()
+      dropdown = $('#add_ip_button_' + entry_id).parent()
+      $(dropdown).remove()
 
-  # Find our entry's (or result's) + ip data row
-  ip_data_row = $('#entry-data-wrapper_' + entry_id).find('.research-uri-ip-data-row')[0]
+      # Prep for inserting into DOM
+      rules     = response.json.rulehits.join(', ')
+      rule_hits = response.json.rulehits.length
+      score     = response.json.score.toFixed(2)
 
-  # Populate with our new data!
-  wbrs_score_cell = $(ip_data_row).find('.uri-ip-wbrs-score')[0]
-  wbrs_hits_cell  = $(ip_data_row).find('.uri-ip-wbrs-rule-total')[0]
-  wbrs_rules_cell = $(ip_data_row).find('.uri-ip-wbrs-rules')[0]
-  wbrs_cat_cell   = $(ip_data_row).find('.uri-ip-category')[0]
-  wbrs_proxy_cell = $(ip_data_row).find('.uri-ip-proxy')[0]
-  $(wbrs_score_cell).text(fake_data.wbrs_score)
-  $(wbrs_hits_cell).text(rule_hits)
-  $(wbrs_rules_cell).text(rules)
-  $(wbrs_cat_cell).text(cats)
-  $(wbrs_cat_cell).text(fake_data.proxy)
+      # Need to add but don't exist yet
+      # cats      = response.json.category.join(', ')
+      # proxy     = response.json.proxy
+      cats = ''
+      proxy = ''
 
-  # If there are rule hits, add to the rule hit details table
-  if rule_hits > 0
-    wbrs_details_table = $($('#entry-data-wrapper_' + entry_id).find('.wbrs-details-table')[0]).find('tbody')[0]
-    $(fake_data.wbrs_rules).each ->
-      # Ignoring description and weight right now as I don't think we are getting that data currently
-      rule_row = '<tr><td class="uri-plus-ip-rule-indicator"></td><td>' + this + '</td><td></td><td></td></tr>'
-      $(wbrs_details_table).append(rule_row)
+      # Find our entry's (or result's) + ip data row
+      ip_data_row = $('#entry-data-wrapper_' + entry_id).find('.research-uri-ip-data-row')[0]
 
-  # TODO And save to database!
+      # Populate with our new data!
+      wbrs_score_cell = $(ip_data_row).find('.uri-ip-wbrs-score')[0]
+      wbrs_hits_cell  = $(ip_data_row).find('.uri-ip-wbrs-rule-total')[0]
+      wbrs_rules_cell = $(ip_data_row).find('.uri-ip-wbrs-rules')[0]
+      wbrs_cat_cell   = $(ip_data_row).find('.uri-ip-category')[0]
+      wbrs_proxy_cell = $(ip_data_row).find('.uri-ip-proxy')[0]
+      $(wbrs_score_cell).text(score)
+      $(wbrs_hits_cell).text(rule_hits)
+      $(wbrs_rules_cell).text(rules)
+      $(wbrs_cat_cell).text(cats)
+      $(wbrs_cat_cell).text(proxy)
+
+      # If there are rule hits, add to the rule hit details table
+      if rule_hits > 0
+        debugger
+        wbrs_details_table = $($('#entry-data-wrapper_' + entry_id).find('.wbrs-details-table')[0]).find('tbody')[0]
+        $(rules).each ->
+          # Ignoring description and weight right now as I don't think we are getting that data currently
+          rule_row = '<tr><td class="uri-plus-ip-rule-indicator"></td><td>' + this + '</td><td></td><td></td></tr>'
+          $(wbrs_details_table).append(rule_row)
+
+  )
+
+
+
