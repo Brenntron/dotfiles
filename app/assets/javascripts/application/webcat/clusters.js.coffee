@@ -387,6 +387,7 @@ $ ->
 
 
           $(entry).each (i) ->
+            if i <= 24
               {url, customer_name, apac_volume, emrg_volume, eurp_volume, glob_volume, japn_volume, noam_volume, wbrs_score}= this
               wbrs_rep = window.wbrs_display(wbrs_score)
               if wbrs_rep == undefined then wbrs_rep = 'unknown'
@@ -404,6 +405,7 @@ $ ->
                       <td class='clusterpath-col-wbrs text-center'>#{wbrs_col}</td>
                       </tr>"
               entry_rows.push entry_row
+              total_shown_entries = i + 1
               return
 
           bottom_row = '<tr class="cluster-entry-bottom-row">' +
@@ -493,7 +495,7 @@ window.expandClusterEntryPreview = (cluster, expand_table_row, max_viewable_entr
     $(total_shown_entries[0]).text('25')
 
     $(rows).each (i) ->
-      if i > 25
+      if i > 24
         $(this).remove()
 
 
