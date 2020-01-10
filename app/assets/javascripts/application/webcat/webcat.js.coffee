@@ -667,7 +667,6 @@ $ ->
   # webcat > on click any show/hide column, update user prefs table
   $('.toggle-vis-webcat').on "click", ->
     data = {}
-    data['expand'] = $("#expand-checkbox").is(':checked')
     data['important'] = $("#important-checkbox").is(':checked')
     data['age'] = $("#age-checkbox").is(':checked')
     data['status'] = $("#status-checkbox").is(':checked')
@@ -678,8 +677,8 @@ $ ->
     data['primary'] = $("#primary-checkbox").is(':checked')
     data['suggested'] = $("#suggested-checkbox").is(':checked')
     data['wbrs'] = $("#wbrs-checkbox").is(':checked')
-    data['submittertype'] = $("#submittertype-checkbox").is(':checked')
-    data['submitterorg'] = $("#submitterorg-checkbox").is(':checked')
+    data['submitter-type'] = $("#submitter-type-checkbox").is(':checked')
+    data['submitter-org'] = $("#submitter-org-checkbox").is(':checked')
     data['assignee'] = $("#assignee-checkbox").is(':checked')
 
     std_msg_ajax(
