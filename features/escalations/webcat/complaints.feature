@@ -702,3 +702,22 @@ Feature: Webcat complaints
     Then the following complaint entry with id: "1" has a status of: "REOPENED"
     Then the following complaint entry with id: "2" has a status of: "REOPENED"
     Then the following complaint entry with id: "3" has a status of: "NEW"
+
+  @javascript
+  Scenario: a user can show/hide columns in the webcat/complaints view
+    Given a user with role "webcat user" exists and is logged in
+    And the following disputes exist and have entries:
+      | id | submitter_type |
+      | 1  | CUSTOMER       |
+    Then I goto "escalations/webcat/complaints"
+    Then I wait for "2" seconds
+    When I click "#webcat-index-table-show-columns-button"
+    And I click "#primary-checkbox"
+    And I click "#primary-checkbox"
+    Then I should see table header with id "primary"
+    And I click "#assignee-checkbox"
+    And I click "#assignee-checkbox"
+    Then I should see table header with id "assignee"
+    And I click "#submitter-type-checkbox"
+    And I click "#submitter-type-checkbox"
+    Then I should see table header with id "submitter-type"
