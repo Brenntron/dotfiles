@@ -1123,7 +1123,7 @@ format = (complaint_entry_row) ->
       "<label class='content-label-sm'>Case ID</label>"+
       "<span class='nested-complaint-data case-id'><a href='complaints/#{complaint_id}'>#{complaint_id}</a></span>" +
       "<label class='content-label-sm'>Entry URI</label>" +
-      "<span class='nested-complaint-data input-truncate esc-tooltipped' id='entry-uri-#{entry_id}' title='#{url}'>#{url}</span>" +
+      "<span class='nested-complaint-data input-truncate esc-tooltipped' id='entry-uri-#{entry_id}' title='#{url}'><a href='http://#{url}' target='_blank'>#{url}</a></span>" +
       "<label class='content-label-sm' id='site-search'>Site Search</label>" +
       "<span class='nested-complaint-data input-truncate esc-tooltipped' id='site-search-#{entry_id}' title='#{url}'>#{search_uri}</span>" +
       "<label class='content-label-sm'>Customer Name</label>" +
