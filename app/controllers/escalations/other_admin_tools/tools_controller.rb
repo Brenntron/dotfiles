@@ -13,6 +13,10 @@ class Escalations::OtherAdminTools::ToolsController < ApplicationController
 
   end
 
+  def rep_tool
+
+  end
+
   def wbnp_reports
     @wbnp_reports = WbnpReport.all
   end
