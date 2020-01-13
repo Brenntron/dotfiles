@@ -275,7 +275,7 @@ $ ->
           lengthMenu: [[25, 50, 100, 150, 200], [25, 50, 100, 150, 200]]
           processing: true
           serverSide: true
-          stateSave: false
+          stateSave: true
           select: true
           ajax:
             url: url
