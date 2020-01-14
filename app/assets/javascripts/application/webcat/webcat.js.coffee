@@ -667,15 +667,19 @@ $ ->
   # webcat > on click any show/hide column, update user prefs table
   $('.toggle-vis-webcat').on "click", ->
     data = {}
-    cb_array = []
-
-    # build a list of the cb names
-    $(".toggle-vis-webcat input").each (i) ->
-      cb_array.push $(this).attr('id').split('-')[0]   # important, age, etc
-
-    # for these cb states, build the data object for show/hide columns
-    for cb in cb_array
-      data["#{cb}"] = $("##{cb}-checkbox").is(':checked')
+    data['important'] = $("#important-checkbox").is(':checked')
+    data['age'] = $("#age-checkbox").is(':checked')
+    data['status'] = $("#status-checkbox").is(':checked')
+    data['tags'] = $("#tags-checkbox").is(':checked')
+    data['subdomain'] = $("#subdomain-checkbox").is(':checked')
+    data['domain'] = $("#domain-checkbox").is(':checked')
+    data['path'] = $("#path-checkbox").is(':checked')
+    data['primary'] = $("#primary-checkbox").is(':checked')
+    data['suggested'] = $("#suggested-checkbox").is(':checked')
+    data['wbrs'] = $("#wbrs-checkbox").is(':checked')
+    data['submittertype'] = $("#submittertype-checkbox").is(':checked')
+    data['submitter-org'] = $("#submitterorg-checkbox").is(':checked')
+    data['assignee'] = $("#assignee-checkbox").is(':checked')
 
     std_msg_ajax(
       url: "/escalations/api/v1/escalations/user_preferences/update"
