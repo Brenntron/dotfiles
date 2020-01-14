@@ -251,10 +251,11 @@ window.bulk_order_rows = () ->
 
   # bfrp > after sorted, for each entry add a numerical "bfrp-dd-result-0" for tests
   $(curr_dd).find('.wlbl-entry-wlbl').each (i) ->
-    $(this).attr("class","wlbl-entry-wlbl bfrp-dd-result-#{i}")
+    # wlbl-entry-id-1 for show page, bfrp-dd-result-0 for research page for existing iteration conventions
+    $(this).attr("class","wlbl-entry-wlbl wlbl-entry-id-#{i+1} bfrp-dd-result-#{i}")
     $(this).parent().removeAttr('data-order-id')
 
-      
+
 
 #### POPULATING CURRENT WL/BL LISTS ####
 
