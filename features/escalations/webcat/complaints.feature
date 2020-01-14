@@ -724,3 +724,25 @@ Feature: Webcat complaints
     Then I should not see table header with id "submittertype"
     And I click "#submittertype-checkbox"
     Then I should see table header with id "submittertype"
+
+  @javascript
+  Scenario: a user can ensure show/hide column states are saved in the database after a page reload
+    Given a user with role "webcat user" exists and is logged in
+    And the following disputes exist and have entries:
+      | id | submitter_type |
+      | 1  | CUSTOMER       |
+    Then I goto "escalations/webcat/complaints"
+    And I wait for "2" seconds
+    And I click "#webcat-index-table-show-columns-button"
+    And I click "#subdomain-checkbox"
+    And I click "#assignee-checkbox"
+    Then I should not see table header with id "subdomain"
+    Then I should not see table header with id "assignee"
+    Then I should see table header with id "tags"
+    Then I should see table header with id "path"
+    And I goto "escalations/webcat/complaints"
+    And I wait for "2" seconds
+    Then I should not see table header with id "subdomain"
+    Then I should not see table header with id "assignee"
+    Then I should see table header with id "tags"
+    Then I should see table header with id "path"
