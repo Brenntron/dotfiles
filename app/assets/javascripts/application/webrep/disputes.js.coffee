@@ -136,7 +136,8 @@ window.populate_webrep_index_table = (data = {}, reload = false) ->
           data: {name: 'WebRepSortOrder'}
           success: (response) ->
             response = JSON.parse(response)
-            $('#disputes-index').DataTable().order(response.sortorder).draw()
+            if response?
+              $('#disputes-index').DataTable().order(response.sortorder).draw()
           error: () ->
         )
 
@@ -1375,14 +1376,14 @@ $ ->
         data: {name: 'WebRepColumns'}
         success: (response) ->
           response = JSON.parse(response)
-
-          $.each response, (column, state) ->
-            if state == true
-              $("##{column}-checkbox").prop('checked', true)
-              window.dispute_table.column("##{column}").visible true
-            else
-              $("##{column}-checkbox").prop('checked', false)
-              window.dispute_table.column("##{column}").visible false
+          if response?
+            $.each response, (column, state) ->
+              if state == true
+                $("##{column}-checkbox").prop('checked', true)
+                window.dispute_table.column("##{column}").visible true
+              else
+                $("##{column}-checkbox").prop('checked', false)
+                window.dispute_table.column("##{column}").visible false
 
       )
 
@@ -1640,9 +1641,10 @@ $ ->
     success: (response) ->
       unless $('body').hasClass('escalations--file_rep--disputes-controller')
         response = JSON.parse(response)
-        $('select[name="disputes-index_length"]').val(response.entriesperpage)
-        $('#disputes-index').DataTable().page.len(response.entriesperpage).draw('page')
-        pageLength = response.entriesperpage
+        if response?
+          $('select[name="disputes-index_length"]').val(response.entriesperpage)
+          $('#disputes-index').DataTable().page.len(response.entriesperpage).draw('page')
+          pageLength = response.entriesperpage
   )
 
   std_msg_ajax(
@@ -1652,7 +1654,8 @@ $ ->
     success: (response) ->
       unless $('body').hasClass('escalations--file_rep--disputes-controller')
         response = JSON.parse(response)
-        $('#disputes-index').DataTable().page(response.currentpage).draw('page')
+        if response?
+          $('#disputes-index').DataTable().page(response.currentpage).draw('page')
   )
 
   window.open_dashboard_dispute_table = $('#table-user-disputes-open').DataTable(
