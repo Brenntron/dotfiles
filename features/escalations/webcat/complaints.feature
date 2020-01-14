@@ -712,17 +712,17 @@ Feature: Webcat complaints
     Then I goto "escalations/webcat/complaints"
     Then I wait for "2" seconds
     When I click "#webcat-index-table-show-columns-button"
-    And I click "#primary-checkbox"
+    And I click ".primary-checkbox"
     Then I should not see table header with id "primary"
-    And I click "#primary-checkbox"
+    And I click ".primary-checkbox"
     Then I should see table header with id "primary"
-    And I click "#assignee-checkbox"
+    And I click ".assignee-checkbox"
     Then I should not see table header with id "assignee"
-    And I click "#assignee-checkbox"
+    And I click ".assignee-checkbox"
     Then I should see table header with id "assignee"
-    And I click "#submittertype-checkbox"
+    And I click ".submittertype-checkbox"
     Then I should not see table header with id "submittertype"
-    And I click "#submittertype-checkbox"
+    And I click ".submittertype-checkbox"
     Then I should see table header with id "submittertype"
 
   @javascript
@@ -734,8 +734,10 @@ Feature: Webcat complaints
     Then I goto "escalations/webcat/complaints"
     And I wait for "2" seconds
     And I click "#webcat-index-table-show-columns-button"
-    And I click "#subdomain-checkbox"
-    And I click "#assignee-checkbox"
+    And I should see the ".subdomain-checkbox" checkbox checked
+    And I should see the ".assignee-checkbox" checkbox checked
+    And I click ".subdomain-checkbox"
+    And I click ".assignee-checkbox"
     Then I should not see table header with id "subdomain"
     Then I should not see table header with id "assignee"
     Then I should see table header with id "tags"
