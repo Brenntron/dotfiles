@@ -1382,14 +1382,14 @@ $ ->
         data: {name: 'FileRepColumns'}
         success: (response) ->
           response = JSON.parse(response)
-
-          $.each response, (column, state) ->
-            if state == true
-              $("##{column}-checkbox").prop('checked', true)
-              $('#file-rep-datatable').DataTable().column("##{column}").visible true
-            else
-              $("##{column}-checkbox").prop('checked', false)
-              $('#file-rep-datatable').DataTable().column("##{column}").visible false
+          if response?
+            $.each response, (column, state) ->
+              if state == true
+                $("##{column}-checkbox").prop('checked', true)
+                $('#file-rep-datatable').DataTable().column("##{column}").visible true
+              else
+                $("##{column}-checkbox").prop('checked', false)
+                $('#file-rep-datatable').DataTable().column("##{column}").visible false
 
       )
 
@@ -1401,7 +1401,8 @@ $ ->
         data: {name: 'FileRepSortOrder'}
         success: (response) ->
           response = JSON.parse(response)
-          $('#file-rep-datatable').DataTable().order(response.sortorder).draw()
+          if response?
+            $('#file-rep-datatable').DataTable().order(response.sortorder).draw()
         error: () ->
       )
 
@@ -1411,7 +1412,8 @@ $ ->
         data: {name: 'FileRepCurrentPage'}
         success: (response) ->
           response = JSON.parse(response)
-          $('#file-rep-datatable').DataTable().page(response.currentpage).draw('page')
+          if response?
+            $('#file-rep-datatable').DataTable().page(response.currentpage).draw('page')
         error: () ->
       )
 
@@ -1421,7 +1423,8 @@ $ ->
         data: {name: 'FileRepEntriesPerPage'}
         success: (response) ->
           response = JSON.parse(response)
-          $('#file-rep-datatable').DataTable().page.len(response.entriesperpage).draw('page')
+          if response?
+            $('#file-rep-datatable').DataTable().page.len(response.entriesperpage).draw('page')
         error: () ->
       )
 
