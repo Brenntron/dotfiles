@@ -637,14 +637,19 @@ $ ->
       valueField: 'name',
       labelField: 'display_name',
       searchField: 'display_name',
+      options: AC.WebCat.createAssigneeOptions()
+      render: option: (item, escape) ->
+        name = item.display_name
+        user_id = item.name
+        '<div class="custom-render-selectize"><span>' + escape(name) + ' (' + escape(user_id) + ')' + '</span></div>'
     }
     tag_input = $('#tags-input').selectize {
-      persist: false
-      create: false
-      valueField: 'name',
-      labelField: 'name',
-      options: createSelectOptions()
-    }
+        persist: false
+        create: false
+        valueField: 'name',
+        labelField: 'name',
+        options: createSelectOptions()
+      }
     category_input = $('#category-input').selectize {
       persist: false,
       create: false,

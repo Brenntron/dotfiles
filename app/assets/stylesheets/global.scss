@@ -1584,6 +1584,12 @@ fieldset.tight {
   border: none;
 }
 
+.custom-render-selectize {
+  line-height: 1.5em;
+  min-height: 20px;
+  padding: 4px;
+}
+
 .form-col-list {
   -webkit-column-count:3;
   -moz-column-count:3;
