@@ -56,7 +56,7 @@ class DisputeEntry < ApplicationRecord
       if is_ip?(ip_url)
         params['ip'] = ip_url
 
-        wbrs_api_response = Sbrs::ManualSbrs.call_wbrs(params)
+        wbrs_api_response = Sbrs::Base.remote_call_sds_v3(params['ip'], "wbrs")
         sbrs_api_response = Sbrs::ManualSbrs.call_sbrs(params)
         sbrs_api_rulehit_response =  Sbrs::GetSbrs.get_sbrs_rules_for_ip(ip_url)
         wbrs_prefix_response = ComplaintEntry.get_category(params['ip'])
@@ -85,7 +85,7 @@ class DisputeEntry < ApplicationRecord
       else
         params['url'] = ip_url
 
-        wbrs_api_response = Sbrs::ManualSbrs.call_wbrs(params, type: 'wbrs')
+        wbrs_api_response = Sbrs::Base.remote_call_sds_v3(params['url'], "wbrs")
         sbrs_api_response = Sbrs::ManualSbrs.call_sbrs(params, type: 'wbrs')
         wbrs_prefix_response = ComplaintEntry.get_category(params['url'])
 

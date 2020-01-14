@@ -16,6 +16,10 @@
       %h1#webcat-index-title
     .col-xs-12.webcat-search-container
       #webcat_searchref_container{onmouseover: "triggerTooltips(this)"}
+        .gear-loader-wrapper.hidden#main-inline-loader
+          = inline_svg 'icon_gears_loader.svg', class: 'gears-loader'
+          %span.loading-msg
+            Completing task...
   .row
     .col-xs-12.webcat-main-area
       = render "toolbar"
@@ -45,3 +49,17 @@
             %th Submitter Type
             %th Submitter Org
             %th Assignee
+
+.modal.fade#resolution_dialog
+  .modal-dialog.modal-sm
+    .modal-content
+      .modal-header
+        Resolve Complaint Entries
+      .modal-body
+        %thead
+          #resolution_text
+        %table#complaint_entries_to_update
+      .modal-footer
+        %hr.thin.form-divider
+        %button#submit_resolution_changes.primary{type: 'button', 'onclick': 'updateResolution();'} Confirm
+        %button.secondary{type: 'button', 'data-dismiss': 'modal', 'aria-label': 'Cancel'} Cancel

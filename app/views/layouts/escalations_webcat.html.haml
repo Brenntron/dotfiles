@@ -138,6 +138,7 @@
                 %span.loader-msg Loading data...
               %button.primary#cat_multiple_urls{:type => "button", :onclick=>"multiple_url_categorization()"} Categorize URLs
 
+
   .nav-tool-blocks.col-xs-2.col-sm-1.col-lg-1.dropdown
     %a{href: '#', class: 'dropdown-toggle', id: 'filter-complaints', 'data-toggle': 'dropdown', 'aria-haspopup': 'true', 'aria-expanded': 'false'}
       %span{class: 'nav-toolbar-icon icon-filter-white'}
@@ -266,6 +267,5 @@
         = current_user[:display_name]
 
     -##username= current_user.cvs_username
-
 
 = render template: "layouts/rocket"
