@@ -321,7 +321,7 @@ class ComplaintEntry < ApplicationRecord
       wbrs_score = wbrs_stuff["wbrs"]["score"]
       new_complaint_entry.wbrs_score = wbrs_score
     rescue
-      #do nothing continue with saving the entry
+      # do nothing continue with saving the entry
     end
 
     if is_ip?(ip_url)
@@ -335,17 +335,21 @@ class ComplaintEntry < ApplicationRecord
     else
       new_complaint_entry.uri = ip_url
       new_complaint_entry.entry_type = "URI/DOMAIN"
-      new_complaint_entry.subdomain = url_parts["subdomain"]
-      new_complaint_entry.domain = url_parts["domain"]
-      new_complaint_entry.path = url_parts["path"]
+
+      # Parse the ip_url
+      parsed_url = Complaint.parse_url(ip_url)
+
+      new_complaint_entry.subdomain = parsed_url[:subdomain]
+      new_complaint_entry.domain = parsed_url[:domain]
+      new_complaint_entry.path = parsed_url[:path]
     end
-    #lets query the top url API endpoint to determine if this is an important site or not
+    # lets query the top url API endpoint to determine if this is an important site or not
     # but you better believe i dont trust this API so we have some checks to ensure the entry gets created
     begin
       importance = self_importance(ip_url)
       new_complaint_entry.is_important = importance if importance
     rescue
-      #do nothing keep building entry
+      # do nothing keep building entry
     end
     new_complaint_entry.user = user
     new_complaint_entry.case_assigned_at ||= Time.now if user && user.display_name != "Vrt Incoming"
@@ -1027,5 +1031,33 @@ class ComplaintEntry < ApplicationRecord
     else
       return false
     end
+  end
+
+  def process_resolution_changes(resolution, internal_comment, customer_facing_comment)
+    confirmation = {}
+    if !["COMPLETED","PENDING"].include?(self.status) && resolution != "REOPENED"
+      if self.is_important
+        self.update(status: "PENDING", resolution: resolution, internal_comment: internal_comment, resolution_comment: customer_facing_comment)
+        confirmation.update(state: 'SUCCESS', host: self.hostlookup, status: self.status, resolution: resolution, internal_comment: internal_comment, customer_facing_comment: customer_facing_comment,
+                            message: "Successfully processed a resolution update of #{resolution} on Complaint Entry (#{self.hostlookup}) of status #{self.status}")
+      else
+        self.update(status: "COMPLETED", resolution: resolution, internal_comment: internal_comment, resolution_comment: customer_facing_comment)
+        confirmation.update(state: 'SUCCESS', host: self.hostlookup, status: self.status, resolution: resolution, internal_comment: internal_comment, customer_facing_comment: customer_facing_comment,
+                            message: "Successfully processed a resolution update of #{resolution} on Complaint Entry (#{self.hostlookup}) of status #{self.status}")
+      end
+      # Error catch: cannot set a ComplaintEntry to "REOPENED" unless it has a status of "COMPLETED"
+    elsif self.status != "COMPLETED" && resolution == "REOPENED"
+      confirmation.update(state: 'ERROR', host: self.hostlookup, status: self.status,resolution: resolution, internal_comment: internal_comment, customer_facing_comment: customer_facing_comment,
+                          message: "Cannot process a status update of #{resolution} on Complaint Entry (#{self.hostlookup}) of status #{self.status}")
+    elsif self.status == "COMPLETED" && resolution == "REOPENED"
+      self.update(status: "REOPENED", resolution: nil)
+      confirmation.update(state: 'SUCCESS', host: self.hostlookup, status: self.status, resolution: resolution, internal_comment: internal_comment, customer_facing_comment: customer_facing_comment,
+                          message: "Successfully processed a status update of #{resolution} on Complaint Entry (#{self.hostlookup}) of status #{self.status}")
+    else
+      # Error catch: cannot update a ComplaintEntry's resolution if it has a status of "COMPLETED" or "PENDING"
+      confirmation.update(state: 'ERROR', host: self.hostlookup, status: self.status,resolution: resolution, internal_comment: internal_comment, customer_facing_comment: customer_facing_comment,
+                          message: "Cannot process a resolution update to #{resolution} on Complaint Entry (#{self.hostlookup})  of status #{self.status}")
+    end
+    confirmation
   end
 end
