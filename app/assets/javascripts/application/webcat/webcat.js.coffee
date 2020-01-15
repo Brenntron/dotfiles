@@ -767,8 +767,8 @@ $ ->
       select_parent = $(this).parents('.form-control')[0]
 
       if $(this).hasClass('focus')
-        $(select_parent).css('z-index', '3')
+        $(select_parent).css('z-index', '4')
       else
-        $(select_parent).css('z-index', '1')
+        $(select_parent).css('z-index', '2')
 
 
