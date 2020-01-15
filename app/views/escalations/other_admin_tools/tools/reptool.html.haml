@@ -19,7 +19,7 @@
 
 .control-banner
   %label /blacklist/get:
-  = text_field "admin_tools", "args", :value => '{}', :class => '2-reptool-args'
+  = text_field "admin_tools", "args", :value => '{"entries":["stupid.com","google.com"]}', :class => '2-reptool-args'
   %button#execute-reptool-button-2 Go!
 .control-banner#reptool-output-2
 %br
@@ -27,7 +27,7 @@
 
 .control-banner
   %label /blacklist/add:
-  = text_field "admin_tools", "args", :value => '{}', :class => '3-reptool-args'
+  = text_field "admin_tools", "args", :value => '{"entry":"yammer.com","author":"person","comment":"things","classification":"malware"}', :class => '3-reptool-args'
   %button#execute-reptool-button-3 Go!
 .control-banner#reptool-output-3
 %br
@@ -35,7 +35,7 @@
 
 .control-banner
   %label /blacklist/expire:
-  = text_field "admin_tools", "args", :value => '{}', :class => '4-reptool-args'
+  = text_field "admin_tools", "args", :value => '{"entry":"stupid.com"}', :class => '4-reptool-args'
   %button#execute-reptool-button-4 Go!
 .control-banner#reptool-output-4
 %br
