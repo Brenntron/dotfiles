@@ -10405,7 +10405,7 @@ input[type="radio"].resolution_radio_button {
 .loader-msg{
   font-style: oblique!important;
 }
-// webrep and webcat toolbars - between 2020px and 2025px, prevent breaking/wrapping of the buttons
+// webrep and webcat toolbars - prevent breaking/wrapping of the buttons
 @media (min-width: 1600px) {
   #webrep-index-toolbar{
     .toolbar-button {
@@ -10418,7 +10418,8 @@ input[type="radio"].resolution_radio_button {
     }
   }
 }
-@media (min-width: 2025px) {
+// webcat - 1950px below is our current "widest" breakpoint
+@media (min-width: 1950px) {
   #webcat-index-toolbar {
     .toolbar-button {
       background-position: 4px 6px;
@@ -10430,16 +10431,16 @@ input[type="radio"].resolution_radio_button {
     }
   }
 }
+@media (max-width: 1951px)  {
+  #webcat-index-toolbar .toolbar-button-text {
+    display: none !important;
+  }
+}
 @media screen and (max-width: 1800px) and (min-width: 1705px){
   #webcat-index-toolbar .toolbar-button-text {
     .toolbar-button {
       background-position: 4px 6px;
     }
-  }
-}
-@media (max-width: 2026px)  {
-  #webcat-index-toolbar .toolbar-button-text {
-    display: none !important;
   }
 }
 .toolbar#webcat-index-toolbar{
@@ -11710,4 +11711,34 @@ span.threat-cat-no-data {
       margin-bottom: 10px;
     }
   }
+}
+
+// webcat > button text "All" in toolbar
+.text-button-all {
+  min-width: 30px;
+}
+
+
+
+// webcat index DT, adhering to existing naming conventions
+#webcat-index-table-show-columns-dropdown {
+  width: 320px;
+  ul {
+    display: inline-block;
+    padding: 10px;
+    width: 49%;
+    vertical-align: text-top;
+    li {
+      font-size: 9pt;
+      padding: 4px 12px;
+      cursor: default;
+      input {
+        margin-right: 8px;
+      }
+    }
+  }
+}
+
+#webcat-index-toolbar .collapse-all {
+  margin-right: 0;
 }

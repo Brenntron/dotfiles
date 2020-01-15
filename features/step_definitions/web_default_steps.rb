@@ -319,6 +319,10 @@ Then(/^I should see table header with id "(.*?)"$/) do |element|
   page.should have_selector(:xpath, "//th[contains(@id, '#{element}')]")
 end
 
+Then(/^I should not see table header with id "(.*?)"$/) do |element|
+  page.should have_no_selector(:xpath, "//th[contains(@id, '#{element}')]")
+end
+
 Then(/^I should not see button with class "(.*?)"$/) do |element|
   page.should have_no_selector(:xpath, "//button[contains(@class, '#{element}')]")
 end
