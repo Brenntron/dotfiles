@@ -644,6 +644,10 @@ $ ->
           name = item.display_name
           user_id = item.name
           '<div class="custom-render-selectize"><span>' + escape(name) + ' (' + escape(user_id) + ')' + '</span></div>'
+      onFocus: () ->
+        window.toggle_selectize_layer(this, 'true')
+      onBlur: () ->
+        window.toggle_selectize_layer(this, 'false')
     }
     tag_input = $('#tags-input').selectize {
       persist: false
@@ -651,6 +655,10 @@ $ ->
       valueField: 'name',
       labelField: 'name',
       options: createSelectOptions()
+      onFocus: () ->
+        window.toggle_selectize_layer(this, 'true')
+      onBlur: () ->
+        window.toggle_selectize_layer(this, 'false')
     }
     category_input = $('#category-input').selectize {
       persist: false,
@@ -660,6 +668,10 @@ $ ->
       labelField: 'category_name',
       searchField: ['category_name', 'category_code'],
       options: AC.WebCat.createSelectOptions()
+      onFocus: () ->
+        window.toggle_selectize_layer(this, 'true')
+      onBlur: () ->
+        window.toggle_selectize_layer(this, 'false')
     }
     company_input = $('#company-input').selectize {
       persist: false,
@@ -667,6 +679,10 @@ $ ->
       valueField: 'company_name',
       labelField: 'company_name',
       searchField: 'company_name',
+      onFocus: () ->
+        window.toggle_selectize_layer(this, 'true')
+      onBlur: () ->
+        window.toggle_selectize_layer(this, 'false')
     }
     status_input = $('#status-input').selectize {
       persist: false,
@@ -677,6 +693,10 @@ $ ->
       searchField: 'name',
       options: [{name: "NEW"}, {name: "RESOLVED"}, {name: "ASSIGNED"}, {name: "ACTIVE"},
                {name: "COMPLETED"}, {name: "PENDING"}, {name: "REOPENED"}]
+      onFocus: () ->
+        window.toggle_selectize_layer(this, 'true')
+      onBlur: () ->
+        window.toggle_selectize_layer(this, 'false')
     }
     resolution_input = $('#resolution-input').selectize {
       persist: false,
@@ -686,6 +706,10 @@ $ ->
       labelField: 'name',
       searchField: 'name',
       options: [{name: "FIXED"}, {name: "INVALID"}, {name: "UNCHANGED"}, {name: "DUPLICATE"}]
+      onFocus: () ->
+        window.toggle_selectize_layer(this, 'true')
+      onBlur: () ->
+        window.toggle_selectize_layer(this, 'false')
     }
     customer_input = $('#name-input').selectize {
       persist: false,
@@ -693,6 +717,10 @@ $ ->
       valueField: 'name',
       labelField: 'name',
       searchField: 'name',
+      onFocus: () ->
+        window.toggle_selectize_layer(this, 'true')
+      onBlur: () ->
+        window.toggle_selectize_layer(this, 'false')
     }
     complaint_input = $('#complaint-input').selectize {
       persist: false,
@@ -701,6 +729,10 @@ $ ->
           value: input
           text: input
         }
+      onFocus: () ->
+        window.toggle_selectize_layer(this, 'true')
+      onBlur: () ->
+        window.toggle_selectize_layer(this, 'false')
     }
     channel_input = $('#channel-input').selectize {
       persist: false,
@@ -710,6 +742,10 @@ $ ->
       labelField: 'name',
       searchField: 'name',
       options: [{name: "Internal"}, {name: "TalosIntel"}, {name: "WBNP"}]
+      onFocus: () ->
+        window.toggle_selectize_layer(this, 'true')
+      onBlur: () ->
+        window.toggle_selectize_layer(this, 'false')
     }
     entry_ids = $('#entryid-input').selectize {
       delimiter: ',',
@@ -719,6 +755,10 @@ $ ->
           value: input
           text: input
         }
+      onFocus: () ->
+        window.toggle_selectize_layer(this, 'true')
+      onBlur: () ->
+        window.toggle_selectize_layer(this, 'false')
     }
     complaint_ids = $('#complaintid-input').selectize {
       delimiter: ',',
@@ -728,6 +768,10 @@ $ ->
           value: input
           text: input
         }
+      onFocus: () ->
+        window.toggle_selectize_layer(this, 'true')
+      onBlur: () ->
+        window.toggle_selectize_layer(this, 'false')
     }
 
 
@@ -760,15 +804,16 @@ $ ->
     trigger: 'hover'
 
 
+# Prevent the many selectizes from running into each other
+window.toggle_selectize_layer = (input, focus) ->
+  input = input.$control_input[0]
+  select_parent = $(input).parents('.form-control')[0]
 
-  # Prevent the many selectizes from running into each other
-  $('#advanced-search-wrapper .selectize-input').click ->
-    $('#advanced-search-wrapper .selectize-input').each ->
-      select_parent = $(this).parents('.form-control')[0]
+  if focus == 'true'
+    $(select_parent).css('z-index', '4')
+  else
+    $(select_parent).css('z-index', '2')
 
-      if $(this).hasClass('focus')
-        $(select_parent).css('z-index', '4')
-      else
-        $(select_parent).css('z-index', '2')
+
 
 
