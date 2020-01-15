@@ -53,3 +53,58 @@ $(document).ready ->
         $($(this).parent()).parent().removeClass('hidden')
     $($(this).parent()).addClass('hidden')
     return
+
+
+
+
+  $('.search-criteria-label').click ->
+    window.toggle_search_criteria(this)
+
+  $('.remove-input').click ->
+    window.toggle_search_criteria(this)
+
+
+# Doing this a little bit differently to help with storing user preferences
+window.toggle_search_criteria = (element) ->
+  search_wrapper = $(element).parents('#advanced-search-wrapper')[0]
+  debugger
+  if $(element).hasClass('search-criteria-label')
+    # show criteria
+    criteria = $($(element).find('.search-checkbox')[0]).attr('for')
+    criteria_wrapper = $(element).parents('li')[0]
+    search_input = $(search_wrapper).find('#' + criteria)[0]
+    input_wrapper = $(search_input).parents('.search-item')[0]
+
+    $(criteria_wrapper).addClass('hidden')
+    $(input_wrapper).removeClass('hidden')
+
+  else if $(element).hasClass('remove-input')
+    # hide criteria
+    input_wrapper = $(element).parents('.search-item')[0]
+    search_input = $(input_wrapper).find('.form-control')[0]
+    criteria = $(search_input).attr('id')
+    criteria_toggle = $(search_wrapper).find('input[for="' + criteria + '"]')
+    criteria_wrapper = $(criteria_toggle).parents('li')[0]
+
+    $(input_wrapper).addClass('hidden')
+    $(criteria_wrapper).removeClass('hidden')
+
+  # grab visible criteria
+  search_criteria = $(search_wrapper).find('.search-item')
+  search_pref = []
+  $(search_criteria).each ->
+    console.log 'shit'
+    unless $(this).hasClass('hidden')
+      search_item = $($(this).find('.form-control')).attr('id')
+      search_pref.push(search_item)
+
+  data = search_pref.join()
+  console.log data
+  # save to db
+  std_msg_ajax(
+    url: "/escalations/api/v1/escalations/user_preferences/update"
+    method: 'POST'
+    data: {data, name: 'WebCatAdvancedSearchFieldsDisplayed'}
+    dataType: 'json'
+    success: (response) ->
+  )

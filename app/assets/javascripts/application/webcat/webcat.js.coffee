@@ -808,12 +808,7 @@ $ ->
 window.toggle_selectize_layer = (input, focus) ->
   input = input.$control_input[0]
   select_parent = $(input).parents('.form-control')[0]
-
   if focus == 'true'
     $(select_parent).css('z-index', '4')
   else
     $(select_parent).css('z-index', '2')
-
-
-
-
