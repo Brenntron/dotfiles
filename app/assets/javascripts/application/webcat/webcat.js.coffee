@@ -43,8 +43,7 @@ $ ->
   window.set_webcat_advanced = () ->
     # creating form object from array made from advanced dropdown form
     form = {}
-
-    user_id = $('#assignee-input')[0].selectize.items
+    user_id = assignee_input[0].selectize.items
     tags = tag_input[0].selectize.items
     company = $('#company-input')[0].selectize.items
     status = $('#status-input')[0].selectize.items
@@ -77,7 +76,7 @@ $ ->
     if complaint_ids.length
       form['complaint_id'] = complaint_ids.join()
     if user_id.length
-      form['user_id'] = user_id.join()
+      form['user_id'] = user_id.join(', ')
 
     for item in $('#cat_named_search :input:not(:hidden)').serializeArray()
       { name, value } = item
@@ -203,6 +202,8 @@ $ ->
       if condition != ''
         if condition_name == 'id'
           condition_name = 'Entry Id'
+        if condition_name == 'user_id'
+          condition_name = 'Assignee'
         condition_name = condition_name.replace(/_/g, " ").toUpperCase()
         condition_name_HTML = '<span class="search-condition-name text-uppercase">' + condition_name + ': </span>'
 
@@ -638,18 +639,19 @@ $ ->
       labelField: 'display_name',
       searchField: 'display_name',
       options: AC.WebCat.createAssigneeOptions()
-      render: option: (item, escape) ->
-        name = item.display_name
-        user_id = item.name
-        '<div class="custom-render-selectize"><span>' + escape(name) + ' (' + escape(user_id) + ')' + '</span></div>'
+      render:
+        option: (item, escape) ->
+          name = item.display_name
+          user_id = item.name
+          '<div class="custom-render-selectize"><span>' + escape(name) + ' (' + escape(user_id) + ')' + '</span></div>'
     }
     tag_input = $('#tags-input').selectize {
-        persist: false
-        create: false
-        valueField: 'name',
-        labelField: 'name',
-        options: createSelectOptions()
-      }
+      persist: false
+      create: false
+      valueField: 'name',
+      labelField: 'name',
+      options: createSelectOptions()
+    }
     category_input = $('#category-input').selectize {
       persist: false,
       create: false,
