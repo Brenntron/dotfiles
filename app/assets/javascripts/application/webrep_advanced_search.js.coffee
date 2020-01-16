@@ -8,6 +8,10 @@ $(document).ready ->
     $('#search-criteria-options').hide()
     false
 
+  $('#advanced-search-wrapper').click ->
+    $('#search-criteria-options').hide()
+    false
+
   $('#add-search-criteria').click ->
     add_button = $('#add-search-items-button')
     selected_checkboxes = []

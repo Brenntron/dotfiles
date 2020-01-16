@@ -47,7 +47,7 @@ Feature: WebCat Advanced Search
     And I click "#advanced-search-button"
     And I click "#add-search-items-button"
     And I click "#resolution-cb"
-    And I click "#add-search-criteria"
+    And I click "#cancel-add-criteria"
     And I fill in selectized of element "#resolution-input" with "['FIXED','DUPLICATE']"
     And I fill in selectized of element "#company-input" with "['Bobby Burgers','Pizza Dojo']"
     And I fill in selectized of element "#status-input" with "['PENDING','COMPLETED']"
@@ -84,7 +84,7 @@ Feature: WebCat Advanced Search
     And I click "#add-search-items-button"
     And I click "#name-cb"
     And I click "#resolution-cb"
-    And I click "#add-search-criteria"
+    And I click "#cancel-add-criteria"
     And I fill in selectized of element "#resolution-input" with "['FIXED','DUPLICATE']"
     And I fill in selectized of element "#name-input" with "['Draco Malfoy','Bilbo Baggins']"
     And I fill in selectized of element "#status-input" with "['PENDING','COMPLETED']"
@@ -125,7 +125,7 @@ Feature: WebCat Advanced Search
     And I click "#add-search-items-button"
     And I click "#name-cb"
     And I click "#resolution-cb"
-    And I click "#add-search-criteria"
+    And I click "#cancel-add-criteria"
     And I fill in selectized of element "#resolution-input" with "['FIXED','DUPLICATE']"
     And I fill in selectized of element "#tags-input" with "['Slytherin','Hufflepuff']"
     And I fill in selectized of element "#status-input" with "['PENDING','COMPLETED']"
@@ -136,7 +136,7 @@ Feature: WebCat Advanced Search
     Then I should not see tr element with id "2"
     Then I should not see tr element with id "3"
 
-  @javascript
+  @javascript @now
   Scenario: I perform an advanced search on assignee
     Given a user with role "webcat user" exists and is logged in
     Given the following complaints exist:
@@ -160,13 +160,13 @@ Feature: WebCat Advanced Search
     And I click "#add-search-items-button"
     And I click "#assignee-cb"
     And I click "#resolution-cb"
-    And I click "#add-search-criteria"
+    And I click "#cancel-add-criteria"
     And I fill in selectized of element "#resolution-input" with "['FIXED','DUPLICATE']"
     And I fill in selectized of element "#assignee-input" with "['ancheng33','jesler46']"
     And I fill in selectized of element "#status-input" with "['PENDING','COMPLETED']"
-    Then take a screenshot
+#    Then take a screenshot
     And I click "#submit-advanced-search"
-    And I wait for "4" seconds
+    And I wait for "10" seconds
     Then take a screenshot
     Then I should see tr element with id "1"
     Then I should see tr element with id "4"
