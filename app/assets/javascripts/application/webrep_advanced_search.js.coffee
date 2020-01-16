@@ -92,12 +92,13 @@ window.toggle_search_criteria = (element) ->
   search_criteria = $(search_wrapper).find('.search-item')
   search_pref = {}
   $(search_criteria).each ->
-    unless $(this).hasClass('hidden')
-      search_item = $($(this).find('.form-control')).attr('id')
+    search_item = $($(this).find('.form-control')).attr('id')
+    if $(this).hasClass('hidden')
+      search_pref[search_item] = 'false'
+    else
       search_pref[search_item] = 'true'
-
   data = search_pref
-  debugger
+
   # save to db
   std_msg_ajax(
     url: "/escalations/api/v1/escalations/user_preferences/update"
@@ -106,4 +107,28 @@ window.toggle_search_criteria = (element) ->
     dataType: 'json'
     success: (response) ->
       return false
+  )
+
+
+#  Pull in the saved user preferences of search items
+window.set_advanced_search_pref = () ->
+  std_msg_ajax(
+    method: 'POST'
+    url: "/escalations/api/v1/escalations/user_preferences/"
+    data: {name: 'WebCatAdvancedSearchFieldsDisplayed'}
+    success: (response) ->
+      response = JSON.parse(response)
+      if response?
+        $.each response, (criteria, state) ->
+          criteria_id   = '#' + criteria
+          search_input  = $($(criteria_id)[0]).parents('.search-item')[0]
+          search_toggle = $($('input[for="' + criteria + '"]')[0]).parents('li')[0]
+
+          if state == 'true'
+            $(search_input).removeClass('hidden')
+            $(search_toggle).addClass('hidden')
+          else
+            $(search_input).addClass('hidden')
+            $(search_toggle).removeClass('hidden')
+
   )
