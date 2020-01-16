@@ -67,7 +67,6 @@ $(document).ready ->
 # Doing this a little bit differently to help with storing user preferences
 window.toggle_search_criteria = (element) ->
   search_wrapper = $(element).parents('#advanced-search-wrapper')[0]
-  debugger
   if $(element).hasClass('search-criteria-label')
     # show criteria
     criteria = $($(element).find('.search-checkbox')[0]).attr('for')
@@ -91,15 +90,14 @@ window.toggle_search_criteria = (element) ->
 
   # grab visible criteria
   search_criteria = $(search_wrapper).find('.search-item')
-  search_pref = []
+  search_pref = {}
   $(search_criteria).each ->
-    console.log 'shit'
     unless $(this).hasClass('hidden')
       search_item = $($(this).find('.form-control')).attr('id')
-      search_pref.push(search_item)
+      search_pref[search_item] = 'true'
 
-  data = search_pref.join()
-  console.log data
+  data = search_pref
+  debugger
   # save to db
   std_msg_ajax(
     url: "/escalations/api/v1/escalations/user_preferences/update"
@@ -107,4 +105,5 @@ window.toggle_search_criteria = (element) ->
     data: {data, name: 'WebCatAdvancedSearchFieldsDisplayed'}
     dataType: 'json'
     success: (response) ->
+      return false
   )
