@@ -825,3 +825,16 @@ Feature: Disputes
     And I should see content "WL-med" within ".entry-data-wlbl"
     And I should see content "BL-heavy" within ".entry-data-wlbl"
 
+  @javascript
+  Scenario: Loading cogs appear when landing on a page and disappear after it is done loading
+    Given a user with role "webrep user" exists and is logged in
+    And the following disputes exist:
+      | id   |
+      | 5370 |
+    And I create WebRep Entries Per Page UserPreference
+    And I create WebRep Sort Order UserPreference
+    And I create WebRep Current Page UserPreference
+    When I goto "/escalations/webrep/disputes/"
+    Then I should see "Loading data..."
+    And I wait for "1" seconds
+    Then I should not see "Loading data..."

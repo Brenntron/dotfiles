@@ -39,10 +39,7 @@ window.populate_webrep_index_table = (data = {}, reload = false) ->
       array_of_showns.push row.data().id
 
   headers = {'Token': $('input[name="token"]').val(), 'Xmlrpc-Token': $('input[name="xml_token"]').val()}
-  $('#loader-modal').modal({
-    backdrop: 'static',
-    keyboard: false
-  })
+
   $.ajax(
     url: '/escalations/api/v1/escalations/webrep/disputes'
     method: 'GET'
@@ -58,7 +55,6 @@ window.populate_webrep_index_table = (data = {}, reload = false) ->
         std_msg_error("No tickets matching filter or search.","")
 
       if json.error
-        $('#loader-modal').modal 'hide'
         $('#refresh-working-msg').hide()
         $('#refresh-error-msg').show()
         $('#refresh-error-msg').html('An error occured while retrieving data')
@@ -92,17 +88,13 @@ window.populate_webrep_index_table = (data = {}, reload = false) ->
                     $('.dispute-entry-table td, .dispute-entry-table th').each ->
                       if $(this).hasClass(checkbox_trigger)
                         $(this).show()
-                      $('#loader-modal').modal 'hide'
                       return
                   else if $(checkbox).prop('checked') == false
                     $('.dispute-entry-table td, .dispute-entry-table th').each ->
                       if $(this).hasClass(checkbox_trigger)
                         $(this).hide()
-                      $('#loader-modal').modal 'hide'
                       return
-                  $('#loader-modal').modal 'hide'
                   return
-                $('#loader-modal').modal 'hide'
                 return
 
         if array_of_dispute_clicks.length > 0
@@ -140,14 +132,7 @@ window.populate_webrep_index_table = (data = {}, reload = false) ->
               $('#disputes-index').DataTable().order(response.sortorder).draw()
           error: () ->
         )
-
-
-
-
-        $('#loader-modal').modal 'hide'
-
     error: (response) ->
-      $('#loader-modal').modal 'hide'
       $('#refresh-working-msg').hide()
       $('#refresh-error-msg').show()
       $('#refresh-error-msg').html('An error occured while retrieving data')
@@ -1363,6 +1348,14 @@ $ ->
 
 
   $(document).ready ->
+    # Hide loader cogs when page is done loading
+    loader = $('#inline-webrep')
+    $(this).bind(
+      ajaxStart: () ->
+        loader.removeClass('hidden')
+      ajaxStop: () ->
+        loader.addClass('hidden')
+    )
 
     if window.location.pathname == '/escalations/webrep/disputes'
       $('#new-complaint').show()

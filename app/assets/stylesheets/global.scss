@@ -8088,7 +8088,7 @@ td.text-center span {
   margin-top: 4px !important;
 }
 
-.cluster-mgt-loader-wrapper, .webcat-loader-wrapper  {
+.cluster-mgt-loader-wrapper, .webcat-loader-wrapper, .webrep-loader-wrapper  {
   display: block;
   position: absolute;
   width: 170px;
@@ -8111,7 +8111,7 @@ td.text-center span {
   margin: 100px 37%;
 }
 
-.webcat-loader-wrapper {
+.webcat-loader-wrapper, .webrep-loader-wrapper {
   margin: 0 37%;
 }
 
