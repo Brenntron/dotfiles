@@ -637,7 +637,7 @@ $ ->
       create: false
       valueField: 'name',
       labelField: 'display_name',
-      searchField: 'display_name',
+      searchField: ['name', 'display_name'],
       options: AC.WebCat.createAssigneeOptions()
       render:
         option: (item, escape) ->
