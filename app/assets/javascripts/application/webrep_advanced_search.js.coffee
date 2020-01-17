@@ -8,7 +8,7 @@ $(document).ready ->
     $('#search-criteria-options').hide()
     false
 
-  $('#advanced-search-wrapper').click ->
+  $('.search-item').click ->
     $('#search-criteria-options').hide()
     false
 
