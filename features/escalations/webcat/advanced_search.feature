@@ -1,7 +1,7 @@
 Feature: WebCat Advanced Search
 
   @javascript
-  Scenario: I perform an advanced search on status and resolution fields simultaneously
+  Scenario: a user performs an advanced search on status and resolution fields simultaneously
     Given a user with role "webcat user" exists and is logged in
     Given the following complaint entries exist:
       | id | resolution | status    |
@@ -20,8 +20,9 @@ Feature: WebCat Advanced Search
     Then I should not see tr element with id "3"
     Then I should not see tr element with id "4"
 
+
   @javascript
-  Scenario: I perform an advanced search on company name
+  Scenario: a user performs an advanced search on company name
     Given a user with role "webcat user" exists and is logged in
     Given the following complaints exist:
       | id | customer_id |
@@ -58,8 +59,9 @@ Feature: WebCat Advanced Search
     Then I should not see tr element with id "3"
     Then I should not see tr element with id "4"
 
+
   @javascript
-  Scenario: I perform an advanced search on customer name
+  Scenario: a user performs an advanced search on customer name
     Given a user with role "webcat user" exists and is logged in
     Given the following complaints exist:
       | id | customer_id |
@@ -95,8 +97,9 @@ Feature: WebCat Advanced Search
     Then I should not see tr element with id "3"
     Then I should not see tr element with id "4"
 
+
   @javascript
-  Scenario: I perform an advanced search on tags
+  Scenario: a user performs an advanced search on tags
     Given a user with role "webcat user" exists and is logged in
     Given the following complaints exist:
       | id | customer_id |
@@ -136,8 +139,9 @@ Feature: WebCat Advanced Search
     Then I should not see tr element with id "2"
     Then I should not see tr element with id "3"
 
-  @javascript @now
-  Scenario: I perform an advanced search on assignee
+
+  @javascript
+  Scenario: a user performs an advanced search on assignee
     Given a user with role "webcat user" exists and is logged in
     Given the following complaints exist:
       | id | customer_id |
@@ -172,3 +176,41 @@ Feature: WebCat Advanced Search
     Then I should see tr element with id "4"
     Then I should not see tr element with id "2"
     Then I should not see tr element with id "3"
+
+
+  @javascript @now
+  Scenario: a user changes the fields they want displayed in the advanced search and those are maintained
+    Given a user with role "webcat user" exists and is logged in
+    Given the following complaints exist:
+      | id | customer_id |
+      | 1  | 1           |
+      | 2  | 2           |
+      | 3  | 3           |
+      | 4  | 4           |
+    Given the following complaint entries exist:
+      | id | resolution | status    | complaint_id | user_id |
+      | 1  | FIXED      | PENDING   | 1            | 33      |
+      | 2  | DUPLICATE  | COMPLETED | 2            | 11      |
+      | 3  | FIXED      | PENDING   | 3            | 22      |
+      | 4  | DUPLICATE  | COMPLETED | 4            | 46      |
+    Given the following users exist
+      | id | cvs_username  | display_name |
+      | 33 | ancheng33     | Andrew Cheng |
+      | 46 | jesler46      | Joel Esler   |
+    When I go to "/escalations/webcat/complaints"
+    And  I click "#advanced-search-button"
+    Then I should see "Complaint (URL/IP/Domain)"
+    And  I should see "Added Through Channel"
+    And  I should not see "Customer Name"
+    And  I click "#remove-criteria-complaint"
+    And  I should not see "Complaint (URL/IP/Domain)"
+    And  I click "#remove-criteria-channel"
+    And  I should not see "Added Through Channel"
+    And  I click "#add-search-items-button"
+    And  I click "#name-cb"
+    And  I should see "Customer Name"
+    And  I go to "/escalations/webcat/complaints"
+    And  I click "#advanced-search-button"
+    And  I should not see "Complaint (URL/IP/Domain)"
+    And  I should not see "Added Through Channel"
+    And  I should see "Customer Name"

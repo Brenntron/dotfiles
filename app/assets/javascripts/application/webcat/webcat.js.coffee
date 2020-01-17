@@ -56,25 +56,25 @@ $ ->
     complaint_ids = $('#complaintid-input')[0].selectize.items
 
     if tags.length
-      form['tags'] = tags.join()
+      form['tags'] = tags.join(', ')
     if items.length
       form['category'] = items.map( (cat) -> options[cat].category_name).join(', ')
     if company.length
-      form['company'] = company.join()
+      form['company'] = company.join(', ')
     if status.length
-      form['status'] = status.join()
+      form['status'] = status.join(', ')
     if resolution.length
-      form['resolution'] = resolution.join()
+      form['resolution'] = resolution.join(', ')
     if customer_name.length
-      form['customer_name'] = customer_name.join()
+      form['customer_name'] = customer_name.join(', ')
     if complaints.length
-      form['ip_or_uri'] = complaints.join()
+      form['ip_or_uri'] = complaints.join(', ')
     if channels.length
-      form['channel'] = channels.join()
+      form['channel'] = channels.join(', ')
     if entry_ids.length
-      form['entry_id'] = entry_ids.join()
+      form['entry_id'] = entry_ids.join(', ')
     if complaint_ids.length
-      form['complaint_id'] = complaint_ids.join()
+      form['complaint_id'] = complaint_ids.join(', ')
     if user_id.length
       form['user_id'] = user_id.join(', ')
 
