@@ -150,7 +150,6 @@ Feature: Disputes
 
   @javascript
   Scenario: a user uses advanced search filter (Submitted Older/Modified Older) and exports to csv
-    Given pending
     # Note that selenium doesn't support viewing response headers as is required by this test, maybe just get rid of it
     Given a user with role "webrep user" exists and is logged in
     And the following disputes exist and have entries:
@@ -162,9 +161,12 @@ Feature: Disputes
     And I click "#submitted-older-cb"
     And I click "#modified-older-cb"
     And I click "#add-search-criteria"
-    Then I click ".export-button"
-    Then I wait for "3" seconds
-    Then I should receive a file of type "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet"'
+    And I click "#submit-advanced-search"
+    Then I click ".export-all-btn"
+    # Thomas Walpole says that selenium driver does not provide access to response headers
+    # https://stackoverflow.com/questions/55584140/capybara-fails-with-notsupportedbydrivererror
+    # Then I wait for "3" seconds
+    # Then I should receive a file of type "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet"'
 
   @javascript
   Scenario: a user adds and selects columns from the Column drop-down
@@ -252,7 +254,6 @@ Feature: Disputes
 
   @javascript
   Scenario: a user tries to export selected dispute entries
-    Given pending
     # Note that selenium doesn't support viewing response headers as is required by this test, maybe just get rid of it
     Given a user with role "webrep user" exists and is logged in
     And the following disputes exist and have entries:
@@ -260,9 +261,11 @@ Feature: Disputes
       | 1  | w               |
     When I goto "escalations/webrep/disputes?f=open"
     And I click ".dispute_check_box"
-    And I click "Export Selected to CSV"
-    Then I wait for "3" seconds
-    Then I should receive a file of type "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet"
+    And I click ".export-selected-btn"
+    # Thomas Walpole says that selenium driver does not provide access to response headers
+    # https://stackoverflow.com/questions/55584140/capybara-fails-with-notsupportedbydrivererror
+    # Then I wait for "3" seconds
+    # Then I should receive a file of type "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet"
 
 
 
@@ -535,7 +538,6 @@ Feature: Disputes
 
   @javascript
   Scenario: a user tries to export selected dispute entries on the Research tab
-    Given pending
     # Note that selenium doesn't support viewing response headers as is required by this test, maybe just get rid of it
     Given a user with role "webrep user" exists and is logged in
     And the following disputes exist and have entries:
@@ -545,8 +547,10 @@ Feature: Disputes
     And I click "#research-tab-link"
     And I click ".dispute_check_box"
     And I click "Export Selected to CSV"
-    Then I wait for "3" seconds
-    Then I should receive a file of type "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet"
+    # Thomas Walpole says that selenium driver does not provide access to response headers
+    # https://stackoverflow.com/questions/55584140/capybara-fails-with-notsupportedbydrivererror
+    #Then I wait for "3" seconds
+    #Then I should receive a file of type "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet"
 
   @javascript
   Scenario: A user creates a new resolution message template
@@ -821,3 +825,16 @@ Feature: Disputes
     And I should see content "WL-med" within ".entry-data-wlbl"
     And I should see content "BL-heavy" within ".entry-data-wlbl"
 
+  @javascript
+  Scenario: Loading cogs appear when landing on a page and disappear after it is done loading
+    Given a user with role "webrep user" exists and is logged in
+    And the following disputes exist:
+      | id   |
+      | 5370 |
+    And I create WebRep Entries Per Page UserPreference
+    And I create WebRep Sort Order UserPreference
+    And I create WebRep Current Page UserPreference
+    When I goto "/escalations/webrep/disputes/"
+    Then I should see "Loading data..."
+    And I wait for "1" seconds
+    Then I should not see "Loading data..."

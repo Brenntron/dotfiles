@@ -5,6 +5,20 @@ window.td_truncate = (str, max, long) ->
   long = long or '...'
   if typeof str == 'string' and str.length > max then str.substring(0, max) + long else str
 
+window.wbrs_display = (score) ->
+  score = parseFloat(score)
+  if score == NaN
+    return 'unknown'
+  else if  score <= -6
+    return 'untrusted'
+  else if score <= -3
+    return 'questionable'
+  else if score <= 0
+    return 'neutral'
+  else if score < 6
+    return 'favorable'
+  else if score >= 6
+    return 'trusted'
 $ ->
 
   # webcat: have top navigation bar scroll with page per user request
@@ -468,11 +482,24 @@ $ ->
               {
                 data: 'domain'
                 render:( data, type, full, meta )->
-                  { domain, ip_address, entry_id } = full
+                  { domain, ip_address, entry_id, subdomain, path } = full
+                  data_full = ''
+                  if subdomain != ''
+                    subdomain += '.'
+                    data_full = subdomain
+                  if domain != ''
+                    data_full += domain
+                  if path != ''
+                    data_full += path
+                  if ip_address != ''
+                    data_full = ip_address
+                  if data_full != ''
+                    data_full = "data-full=" + data_full
+                  title = "title=" + domain
                   if domain
-                    '<p class="input-truncate esc-tooltipped" id="domain_' + entry_id + '" title="' + domain + '">' + domain + '</p>'
+                    "<p class='input-truncate esc-tooltipped' #{data_full} id='domain_#{entry_id}' #{title}>#{domain}</p>"
                   else
-                    '<a href="http://' + ip_address + '" target="blank">' + ip_address + '</a>'
+                    "<a id='domain_#{entry_id}' #{data_full} href='http://#{ip_address}' target='blank'>#{ip_address}</a>"
               }
               {
                 data: 'path'
@@ -503,10 +530,16 @@ $ ->
               }
               {
                 data: 'wbrs_score'
-                width: '20px'
+                width: '55px'
                 render: ( data, type, full, meta ) ->
                   { wbrs_score, entry_id } = full
-                  '<span id="wbrs_score_' + entry_id + '">' + wbrs_score + '</span>'
+                  rep = wbrs_display(wbrs_score)
+                  wbrs_score = parseFloat(wbrs_score).toFixed(1)
+                  if rep == undefined then rep = 'unknown'
+                  if rep == 'unknown' then wbrs_score = '--'
+                  tooltip_rep = rep.toUpperCase()
+                  icon = "<span class='reputation-icon icon-#{rep} esc-tooltipped' title='#{tooltip_rep}'></span>"
+                  return "<div class='reputation-icon-container'>#{icon}<span id='wbrs_score_#{entry_id}'>#{wbrs_score}</span>"
               }
               {
                 data: 'submitter_type'
@@ -593,6 +626,71 @@ $('#exampleModal').on 'shown.bs.modal', ->
 
 
 $ ->
+
+  $('.toggle-vis-webcat').each ->
+    table = $('#complaints-index').DataTable()
+    column = table.column($(this).attr('data-column'))
+    checkbox = $(this).find('input')
+
+    if $(checkbox).prop('checked')
+      column.visible(true)
+    else
+      column.visible(false)
+
+    $(this).click (e) ->
+      $(checkbox).prop('checked', !checkbox.prop('checked'))
+      column.visible(!column.visible())
+
+    $(checkbox).click (e) ->
+      $(checkbox).prop('checked', !checkbox.prop('checked'))
+
+
+  # webcat > get the show/hide state for these checkboxes
+  if window.location.pathname == '/escalations/webcat/complaints'
+    std_msg_ajax(
+      method: 'POST'
+      url: "/escalations/api/v1/escalations/user_preferences/"
+      data: {name: 'WebCatColumns'}
+      success: (response) ->
+        response = JSON.parse(response)
+
+        $.each response, (column, state) ->
+          if state == true
+            $("##{column}-checkbox").prop('checked', true)
+            $('#complaints-index').DataTable().column("##{column}").visible true
+          else
+            $("##{column}-checkbox").prop('checked', false)
+            $('#complaints-index').DataTable().column("##{column}").visible false
+
+    )
+
+  # webcat > on click any show/hide column, update user prefs table
+  $('.toggle-vis-webcat').on "click", ->
+    data = {}
+    data['important'] = $("#important-checkbox").is(':checked')
+    data['age'] = $("#age-checkbox").is(':checked')
+    data['status'] = $("#status-checkbox").is(':checked')
+    data['tags'] = $("#tags-checkbox").is(':checked')
+    data['subdomain'] = $("#subdomain-checkbox").is(':checked')
+    data['domain'] = $("#domain-checkbox").is(':checked')
+    data['path'] = $("#path-checkbox").is(':checked')
+    data['primary'] = $("#primary-checkbox").is(':checked')
+    data['suggested'] = $("#suggested-checkbox").is(':checked')
+    data['wbrs'] = $("#wbrs-checkbox").is(':checked')
+    data['submittertype'] = $("#submittertype-checkbox").is(':checked')
+    data['submitter-org'] = $("#submitterorg-checkbox").is(':checked')
+    data['assignee'] = $("#assignee-checkbox").is(':checked')
+
+    std_msg_ajax(
+      url: "/escalations/api/v1/escalations/user_preferences/update"
+      method: 'POST'
+      data: {data, name: 'WebCatColumns'}
+      dataType: 'json'
+      success: (response) ->
+        console.log 'Webcat column show/hide preferences are updated in user_prefs table.'
+    )
+
+
   # webcat > complaints show page, ensure this JS gets called
   if $('body').hasClass('escalations--webcat--complaints-controller') && $('body').hasClass('show-action')
     check_wbnp_status()
