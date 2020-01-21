@@ -151,14 +151,14 @@ Feature: WebCat Advanced Search
       | 4  | 4           |
     Given the following complaint entries exist:
       | id | resolution | status    | complaint_id | user_id |
-      | 1  | FIXED      | PENDING   | 1            | 33      |
+      | 1  | FIXED      | PENDING   | 1            | 1      |
       | 2  | DUPLICATE  | COMPLETED | 2            | 11      |
       | 3  | FIXED      | PENDING   | 3            | 22      |
-      | 4  | DUPLICATE  | COMPLETED | 4            | 46      |
+      | 4  | DUPLICATE  | COMPLETED | 4            | 2      |
     Given the following users exist
       | id | cvs_username  | display_name |
-      | 33 | ancheng33     | Andrew Cheng |
-      | 46 | jesler46      | Joel Esler   |
+      | 11  | hpotter       | Harry Potter |
+      | 22  | rweasle       | Ron Weasley  |
     When I go to "/escalations/webcat/complaints"
     And I click "#advanced-search-button"
     And I click "#add-search-items-button"
@@ -166,37 +166,20 @@ Feature: WebCat Advanced Search
     And I click "#resolution-cb"
     And I click "#cancel-add-criteria"
     And I fill in selectized of element "#resolution-input" with "['FIXED','DUPLICATE']"
-    And I fill in selectized of element "#assignee-input" with "['ancheng33','jesler46']"
+    And I fill in selectized of element "#assignee-input" with "['hpotter','rweasle']"
     And I fill in selectized of element "#status-input" with "['PENDING','COMPLETED']"
-#    Then take a screenshot
     And I click "#submit-advanced-search"
     And I wait for "10" seconds
     Then take a screenshot
-    Then I should see tr element with id "1"
-    Then I should see tr element with id "4"
-    Then I should not see tr element with id "2"
-    Then I should not see tr element with id "3"
+    Then I should see tr element with id "2"
+    Then I should see tr element with id "3"
+    Then I should not see tr element with id "1"
+    Then I should not see tr element with id "4"
 
 
-  @javascript @now
+  @javascript
   Scenario: a user changes the fields they want displayed in the advanced search and those are maintained
     Given a user with role "webcat user" exists and is logged in
-    Given the following complaints exist:
-      | id | customer_id |
-      | 1  | 1           |
-      | 2  | 2           |
-      | 3  | 3           |
-      | 4  | 4           |
-    Given the following complaint entries exist:
-      | id | resolution | status    | complaint_id | user_id |
-      | 1  | FIXED      | PENDING   | 1            | 33      |
-      | 2  | DUPLICATE  | COMPLETED | 2            | 11      |
-      | 3  | FIXED      | PENDING   | 3            | 22      |
-      | 4  | DUPLICATE  | COMPLETED | 4            | 46      |
-    Given the following users exist
-      | id | cvs_username  | display_name |
-      | 33 | ancheng33     | Andrew Cheng |
-      | 46 | jesler46      | Joel Esler   |
     When I go to "/escalations/webcat/complaints"
     And  I click "#advanced-search-button"
     Then I should see "Complaint (URL/IP/Domain)"
