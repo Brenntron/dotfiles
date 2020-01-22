@@ -854,15 +854,19 @@ class DisputeEntry < ApplicationRecord
   end
 
   def self.process_multi_ip_info(uri, ips, dispute_entry = nil)
+    binding.pry
     result = {}
 
     results = Sbrs::Base.combo_call_sds_v3(uri, ips)
 
-
+    ip_addresses = ips
     wbrs_rule_hits = Sbrs::ManualSbrs.get_rule_names_from_rulehits(results) rescue nil
     wbrs_score = results["wbrs"]["score"]
 
+    binding.pry
+
     if dispute_entry.present? && !wbrs_rule_hits.nil?
+      binding.pry
       rule_hits_to_destroy = dispute_entry.dispute_rule_hits.where(:is_multi_ip_rulehit => true)
 
       ###
@@ -874,8 +878,9 @@ class DisputeEntry < ApplicationRecord
         DisputeRuleHit.create(rule_type:'WBRS', name: rule_hit, dispute_entry_id: dispute_entry.id)
 
       end
-
+      binding.pry
       dispute_entry.score = wbrs_score
+      dispute_entry.ip_address = ip_addresses
       dispute_entry.save
 
     end

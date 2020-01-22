@@ -655,6 +655,7 @@ window.return_dispute = (dispute_id) ->
   )
 
 window.save_dispute_entries = () ->
+#  TODO Make sure new fields are being properly saved to db
   debugger
   data = {}
   $('#disputes-research-table').find('tr.research-table-row').each(() ->
@@ -675,6 +676,7 @@ window.save_dispute_entries = () ->
       if new_value == undefined
         new_value = old_value
 
+      debugger
       data[this.dataset.id] = [{
         id: this.dataset.id
         field: this.dataset.field
@@ -2117,10 +2119,17 @@ window.query_uri_plus_ip = (uri, ips, entry_id) ->
   loader = '<span class="inline-row-loader"><span class="sync-button sync_rotate"></span>Loading...</span>'
   $(ip_row).after(loader)
 
-#  Could be called via the 'Add ips', the Save changes to an entry, or refresh data button
-#  Send the uri and ips to sdsv3
+  # Find our entry's (or result's) + ip data row and cells
+  ip_data_row = $('#entry-data-wrapper_' + entry_id).find('.research-uri-ip-data-row')[0]
+  wbrs_score_cell = $(ip_data_row).find('.uri-ip-wbrs-score')[0]
+  wbrs_hits_cell  = $(ip_data_row).find('.uri-ip-wbrs-rule-total')[0]
+  wbrs_rules_cell = $(ip_data_row).find('.uri-ip-wbrs-rules')[0]
+  wbrs_cat_cell   = $(ip_data_row).find('.uri-ip-category')[0]
+  wbrs_proxy_cell = $(ip_data_row).find('.uri-ip-proxy')[0]
 
 
+  #  Could be called via the 'Add ips', the Save changes to an entry, or refresh data button
+  #  Send the uri and ips to sdsv3
   std_msg_ajax(
     url: "/escalations/api/v1/escalations/webrep/disputes/update_multi_ip"
     method: 'POST'
@@ -2130,9 +2139,8 @@ window.query_uri_plus_ip = (uri, ips, entry_id) ->
       dispute_entry_id: entry_id
     }
     success: (response) ->
-      debugger
-      console.log response
 
+      debugger
       # Kill the loader and the 'Add IP Addresses' dropdown
       inserted_loader = $('#entry-data-wrapper_' + entry_id).find('.inline-row-loader')
       $(inserted_loader).remove()
@@ -2150,15 +2158,7 @@ window.query_uri_plus_ip = (uri, ips, entry_id) ->
       cats = ''
       proxy = ''
 
-      # Find our entry's (or result's) + ip data row
-      ip_data_row = $('#entry-data-wrapper_' + entry_id).find('.research-uri-ip-data-row')[0]
-
       # Populate with our new data!
-      wbrs_score_cell = $(ip_data_row).find('.uri-ip-wbrs-score')[0]
-      wbrs_hits_cell  = $(ip_data_row).find('.uri-ip-wbrs-rule-total')[0]
-      wbrs_rules_cell = $(ip_data_row).find('.uri-ip-wbrs-rules')[0]
-      wbrs_cat_cell   = $(ip_data_row).find('.uri-ip-category')[0]
-      wbrs_proxy_cell = $(ip_data_row).find('.uri-ip-proxy')[0]
       $(wbrs_score_cell).text(score)
       $(wbrs_hits_cell).text(rule_hits)
       $(wbrs_rules_cell).text(rules)
@@ -2170,12 +2170,41 @@ window.query_uri_plus_ip = (uri, ips, entry_id) ->
       wbrs_details_table = $($(entry_wrapper).find('.wbrs-details-table')[0]).find('tbody')[0]
       if rule_hits > 0
         $(response.json.rulehits).each ->
-          debugger
           # Ignoring description and weight right now as I don't think we are getting that data currently
           rule_row = '<tr><td class="uri-plus-ip-rule-indicator"></td><td>' + this + '</td><td></td><td></td></tr>'
-          debugger
           $(wbrs_details_table).append(rule_row)
 
+  )
+
+  # Need to save new fields to db
+  debugger
+  data = {}
+  entry_data = []
+
+  entry_data.push(
+    id: entry_id
+    field: "web_ips"
+    new: ips
+  )
+
+  entry_data.push(
+    id: entry_id
+    field: "score"
+    new: $(wbrs_score_cell).text()
+  )
+
+  data[entry_id] = {
+      entry_data
+  }
+
+  std_msg_ajax(
+    method: 'PATCH'
+    url: "/escalations/api/v1/escalations/webrep/disputes/entries/field_data"
+    data: {
+      field_data: data
+    }
+    success_reload: true
+    error_prefix: 'Error updating data.'
   )
 
 
