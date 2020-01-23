@@ -750,7 +750,7 @@
                                     %th Rule Description
                                     %th Weight
                                 %tbody
-                                  - entry.dispute_rule_hits.select {|rulehit| rulehit.rule_type == "WBRS"}.each do |wbrs_hit|
+                                  - entry.dispute_rule_hits.select {|rulehit| rulehit.rule_type == "WBRS" && rulehit.is_multi_ip_rulehit != true}.each do |wbrs_hit|
                                     %tr
                                       %td
                                       %td= wbrs_hit.name
@@ -758,11 +758,12 @@
                                       %td
                                         -#Put weight of rule here
                                   -# if any wbrs rulehits are returned from querying uri + ip each do
-                                  -#  %tr
-                                  -#    %td.uri-plus-ip-rule-indicator
-                                  -#    %td= wbrs_hit.name
-                                  -#    %td= wbrs_hit.mnemonic
-                                  -#    %td
+                                  - entry.dispute_rule_hits.select {|rulehit| rulehit.rule_type == "WBRS" && rulehit.is_multi_ip_rulehit == true}.each do |wbrs_hit|
+                                    %tr
+                                      %td.uri-plus-ip-rule-indicator
+                                      %td= wbrs_hit.name
+                                      %td= wbrs_hit.mnemonic
+                                      %td
 
                           .entry-details-table.sbrs-details-table{'data-entry-id': "#{entry.id}"}
                             %h5.entry-details-table-header SBRS Rule Hit Details
