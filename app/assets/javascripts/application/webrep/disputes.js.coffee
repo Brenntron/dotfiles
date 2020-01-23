@@ -2132,7 +2132,6 @@ window.query_uri_plus_ip = (uri, ips, entry_id) ->
       dispute_entry_id: entry_id
     }
     success: (response) ->
-
       debugger
       # Kill the loader and the 'Add IP Addresses' dropdown
       inserted_loader = $('#entry-data-wrapper_' + entry_id).find('.inline-row-loader')
@@ -2175,8 +2174,6 @@ window.query_uri_plus_ip = (uri, ips, entry_id) ->
           rule_row = '<tr><td class="uri-plus-ip-rule-indicator"></td><td>' + this + '</td><td></td><td></td></tr>'
           $(wbrs_details_table).append(rule_row)
 
-    error: (response) ->
-      console.log response
   )
 
   # Need to save field data (save entries) and save the new data that is returned, might be two separate functions

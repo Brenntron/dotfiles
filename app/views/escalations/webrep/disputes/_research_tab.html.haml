@@ -682,7 +682,9 @@
                       -# IP label
                     %td.dual-edit-field{colspan: '7', 'data-id': entry.id, 'data-field': 'host-ip'}
                       %span.entry-data.entry-resolved-ip-content
-                        = entry[:web_ips]
+                        - ips = JSON.parse entry[:web_ips]
+                        = ips.to_sentence(last_word_connector: ", ")
+
                       %input.table-entry-input.wide{type:'text', value: "Ip goes here"}
 
                   %tr.research-uri-ip-data-row
@@ -748,14 +750,14 @@
                                     -#  Placeholder col for if a rule hit is from querying uri + ip
                                     %th Rule
                                     %th Rule Description
-                                    %th Weight
+                                    -#%th Weight <- hiding this as it currently is not set up and just takes up space
                                 %tbody
                                   - entry.dispute_rule_hits.select {|rulehit| rulehit.rule_type == "WBRS" && rulehit.is_multi_ip_rulehit != true}.each do |wbrs_hit|
                                     %tr
                                       %td
                                       %td= wbrs_hit.name
                                       %td= wbrs_hit.mnemonic
-                                      %td
+                                      -#%td
                                         -#Put weight of rule here
                                   -# if any wbrs rulehits are returned from querying uri + ip each do
                                   - entry.dispute_rule_hits.select {|rulehit| rulehit.rule_type == "WBRS" && rulehit.is_multi_ip_rulehit == true}.each do |wbrs_hit|
@@ -763,7 +765,7 @@
                                       %td.uri-plus-ip-rule-indicator
                                       %td= wbrs_hit.name
                                       %td= wbrs_hit.mnemonic
-                                      %td
+                                      -#%td
 
                           .entry-details-table.sbrs-details-table{'data-entry-id': "#{entry.id}"}
                             %h5.entry-details-table-header SBRS Rule Hit Details
