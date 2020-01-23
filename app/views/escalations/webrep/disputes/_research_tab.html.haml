@@ -246,21 +246,21 @@
                       %input.table-entry-input.wide{type:'text', value: "#{entry.hostlookup}"}
 
                   -# if entry = uri and there are no resolved ips
-                  %td.single-button-col.no-padding
-                    %span.dropdown
-                      %button.add-ip-button.inline-button.esc-tooltipped{id: "add_ip_button_#{entry.id}", title: 'Add host IP addresses', 'aria-expanded': 'false', 'aria-haspopup': 'true', 'data-toggle': 'dropdown'}
-                      %div.dropdown-menu.toolbar-dropdown.add-ip-dropdown{id: "add_ip_dropdown_#{entry.id}", 'aria-labelledby': "add_ip_button_#{entry.id}"}
-                        %form.add-host-ips
-                          .inline-tool-content-wrapper
-                            .row
-                              .col-sm-12
-                                %label.content-label-sm IP Addresses
-                                %textarea
-                            .button-row-center
-                              %button.primary.dropdown-submit-button{type: 'button', onclick: 'add_host_ips(this)', 'data-entry-id': "#{entry.id}"} Submit Query
-
-                  -# else just have a spacer td so we don't have to redo all the colspans
-                  -#%td.no-padding
+                  - unless entry[:web_ips].nil?
+                    %td.no-padding
+                  - else
+                    %td.single-button-col.no-padding
+                      %span.dropdown
+                        %button.add-ip-button.inline-button.esc-tooltipped{id: "add_ip_button_#{entry.id}", title: 'Add host IP addresses', 'aria-expanded': 'false', 'aria-haspopup': 'true', 'data-toggle': 'dropdown'}
+                        %div.dropdown-menu.toolbar-dropdown.add-ip-dropdown{id: "add_ip_dropdown_#{entry.id}", 'aria-labelledby': "add_ip_button_#{entry.id}"}
+                          %form.add-host-ips
+                            .inline-tool-content-wrapper
+                              .row
+                                .col-sm-12
+                                  %label.content-label-sm IP Addresses
+                                  %textarea
+                              .button-row-center
+                                %button.primary.dropdown-submit-button{type: 'button', onclick: 'add_host_ips(this)', 'data-entry-id': "#{entry.id}"} Submit Query
 
                   %td
                     %label Category
@@ -551,11 +551,11 @@
                         %td
                           %label WBRS Rule Hits
                         %td.text-center
-                          = entry.dispute_rule_hits.wbrs_rule_hits.count
+                          = entry.dispute_rule_hits.select {|rule_hit| rule_hit.rule_type == "WBRS" && rule_hit.is_multi_ip_rulehit != true }.length
                         %td
                           %label WBRS Rules
                         %td.rule-hits-col-list
-                          - entry.dispute_rule_hits.select {|rule_hit| rule_hit.rule_type == "WBRS" }.each do |wbrs_hit|
+                          - entry.dispute_rule_hits.select {|rule_hit| rule_hit.rule_type == "WBRS" && rule_hit.is_multi_ip_rulehit != true }.each do |wbrs_hit|
                             - unless RulehitResolutionMailerTemplate.select{|template| template.mnemonic == wbrs_hit.name}.count == 0
                               %a.wbrs-rule-trigger{href: '#', 'data-id': "#{wbrs_hit.id}", id: "inline-wbrs-hit-#{wbrs_hit.id}"}
                                 = wbrs_hit.name
@@ -674,52 +674,55 @@
                           = entry.last_submitted
 
                 -# If entry is uri and has a resolved host ip
-                -#%tr.research-uri-ip-query-row
-                -#  %td{rowspan: '2'}
-                -#    -#Expander area
-                -#  %td.input-col.ip-label-col{rowspan: '2'}
-                -#    -# IP label
-                -#  %td.dual-edit-field{colspan: '7', 'data-id': entry.id, 'data-field': 'host-ip'}
-                -#    %span.entry-data.entry-resolved-ip-content
-                -#      -# if ip/s are already associated with url, display here
-                -#      Ips go here
-                -#    %input.table-entry-input.wide{type:'text', value: "Ip goes here"}
-                -#
-                -#%tr.research-uri-ip-data-row
-                -#  %td.research-table-details-wrapper{colspan: '8'}
-                -#    %table
-                -#      %tr.single-details-row
-                -#        %td
-                -#          %label WBRS
-                -#        %td.text-center.no-border.uri-ip-wbrs-score
-                -#          -#  if entry + ip has wbrs score show here
-                -#          -#  else
-                -#          -#    %span.missing-data
-                -#          -#      No score.
-                -#        %td
-                -#          %label WBRS Rule Hits
-                -#        %td.text-center.uri-ip-wbrs-rule-total
-                -#          -#  if entry + ip has wbrs rules show count here
-                -#          -#  else
-                -#          -#  0
-                -#        %td
-                -#          %label WBRS Rules
-                -#        %td.uri-ip-wbrs-rules
-                -#          -#  if entry + ip has wbrs rules show here
-                -#          -#  else
-                -#          -#  %span.missing-data
-                -#          -#    No rules.
-                -#        %td
-                -#          %label Category
-                -#        %td.uri-ip-category
-                -#          -#  if entry + ip has category show here
-                -#          -#  else
-                -#          -#  %span.missing-data
-                -#          -#    Missing Data
-                -#        %td.uri-ip-proxy
-                -#          %label URI
-                -#        %td
-                -#          -#  if entry + ip has url proxy thing show here
+                - unless entry[:web_ips].nil?
+                  %tr.research-uri-ip-query-row
+                    %td{rowspan: '2'}
+                      -#Expander area
+                    %td.input-col.ip-label-col{rowspan: '2'}
+                      -# IP label
+                    %td.dual-edit-field{colspan: '7', 'data-id': entry.id, 'data-field': 'host-ip'}
+                      %span.entry-data.entry-resolved-ip-content
+                        = entry[:web_ips]
+                      %input.table-entry-input.wide{type:'text', value: "Ip goes here"}
+
+                  %tr.research-uri-ip-data-row
+                    %td.research-table-details-wrapper{colspan: '8'}
+                      %table
+                        %tr.single-details-row
+                          %td
+                            %label WBRS
+                          %td.text-center.no-border.uri-ip-wbrs-score
+                            - unless entry[:score].nil?
+                              = entry[:score]
+                            - else
+                              %span.missing-data
+                                No score.
+                          %td
+                            %label WBRS Rule Hits
+                          %td.text-center.uri-ip-wbrs-rule-total
+                            = entry.dispute_rule_hits.select {|rule_hit| rule_hit.rule_type == "WBRS" && rule_hit.is_multi_ip_rulehit == true }.length
+                          %td
+                            %label WBRS Rules
+                          %td.uri-ip-wbrs-rules
+                            - unless entry.dispute_rule_hits.select {|rule_hit| rule_hit.rule_type == "WBRS" && rule_hit.is_multi_ip_rulehit == true }.length == 0
+                              - entry.dispute_rule_hits.select {|rule_hit| rule_hit.rule_type == "WBRS" && rule_hit.is_multi_ip_rulehit == true }.each do |wbrs_hit|
+                                = wbrs_hit.name
+                            - else
+                              %span.missing-data
+                                No rules.
+                          %td
+                            %label Category
+                          %td.uri-ip-category
+                            -# TODO - Add at a later time when we can fetch this info
+                            -#  if entry + ip has category show here
+                            -#  else
+                            -#  %span.missing-data
+                            -#    Missing Data
+                          %td.uri-ip-proxy
+                            %label URI
+                          %td
+                            -# TODO - Add at a later time when we can fetch this info
+                            -#  if entry + ip has url proxy thing show here
 
 
                 %tr.nested-data-row{'data-entry-id': "#{entry.id}"}

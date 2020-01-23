@@ -2045,6 +2045,7 @@ $ ->
 
 
 window.add_host_ips = (button) ->
+  debugger
   entry_id = $(button).attr('data-entry-id')
   form     = $(button).parents('.add-host-ips')[0]
   ips      = $(form).find('textarea').val()
@@ -2071,7 +2072,7 @@ window.add_host_ips = (button) ->
       '<tr class="research-uri-ip-query-row">' +
         '<td rowspan="2"></td>' +
         '<td class="input-col ip-label-col" rowspan="2"></td>' +
-        '<td class="dual-edit-field" colspan="7" data-field="host-ip" data-id="' + entry_id + '">' +
+        '<td class="dual-edit-field" colspan="7" data-field="web-ips" data-id="' + entry_id + '">' +
           '<span class="entry-data entry-resolved-ip-content">' + final_ips + '</span>' +
           '<input class="table-entry-input wide" type="text" value="' + final_ips + '">' +
         '</td>' +
@@ -2114,19 +2115,11 @@ window.add_host_ips = (button) ->
 
 
 window.query_uri_plus_ip = (uri, ips, entry_id) ->
+  debugger
   # Find our ip row for this entry in the DOM & insert inline loader
   ip_row = $('#entry-data-wrapper_' + entry_id).find('.entry-resolved-ip-content')
   loader = '<span class="inline-row-loader"><span class="sync-button sync_rotate"></span>Loading...</span>'
   $(ip_row).after(loader)
-
-  # Find our entry's (or result's) + ip data row and cells
-  ip_data_row = $('#entry-data-wrapper_' + entry_id).find('.research-uri-ip-data-row')[0]
-  wbrs_score_cell = $(ip_data_row).find('.uri-ip-wbrs-score')[0]
-  wbrs_hits_cell  = $(ip_data_row).find('.uri-ip-wbrs-rule-total')[0]
-  wbrs_rules_cell = $(ip_data_row).find('.uri-ip-wbrs-rules')[0]
-  wbrs_cat_cell   = $(ip_data_row).find('.uri-ip-category')[0]
-  wbrs_proxy_cell = $(ip_data_row).find('.uri-ip-proxy')[0]
-
 
   #  Could be called via the 'Add ips', the Save changes to an entry, or refresh data button
   #  Send the uri and ips to sdsv3
@@ -2158,6 +2151,14 @@ window.query_uri_plus_ip = (uri, ips, entry_id) ->
       cats = ''
       proxy = ''
 
+      # Find our entry's (or result's) + ip data row and cells
+      ip_data_row = $('#entry-data-wrapper_' + entry_id).find('.research-uri-ip-data-row')[0]
+      wbrs_score_cell = $(ip_data_row).find('.uri-ip-wbrs-score')[0]
+      wbrs_hits_cell  = $(ip_data_row).find('.uri-ip-wbrs-rule-total')[0]
+      wbrs_rules_cell = $(ip_data_row).find('.uri-ip-wbrs-rules')[0]
+      wbrs_cat_cell   = $(ip_data_row).find('.uri-ip-category')[0]
+      wbrs_proxy_cell = $(ip_data_row).find('.uri-ip-proxy')[0]
+
       # Populate with our new data!
       $(wbrs_score_cell).text(score)
       $(wbrs_hits_cell).text(rule_hits)
@@ -2174,38 +2175,42 @@ window.query_uri_plus_ip = (uri, ips, entry_id) ->
           rule_row = '<tr><td class="uri-plus-ip-rule-indicator"></td><td>' + this + '</td><td></td><td></td></tr>'
           $(wbrs_details_table).append(rule_row)
 
+    error: (response) ->
+      console.log response
   )
 
-  # Need to save new fields to db
-  debugger
-  data = {}
-  entry_data = []
+  # Need to save field data (save entries) and save the new data that is returned, might be two separate functions
 
-  entry_data.push(
-    id: entry_id
-    field: "web_ips"
-    new: ips
-  )
-
-  entry_data.push(
-    id: entry_id
-    field: "score"
-    new: $(wbrs_score_cell).text()
-  )
-
-  data[entry_id] = {
-      entry_data
-  }
-
-  std_msg_ajax(
-    method: 'PATCH'
-    url: "/escalations/api/v1/escalations/webrep/disputes/entries/field_data"
-    data: {
-      field_data: data
-    }
-    success_reload: true
-    error_prefix: 'Error updating data.'
-  )
+#  # Need to save new fields to db
+#  debugger
+#  data = {}
+#  entry_data = []
+#
+#  entry_data.push(
+#    id: entry_id
+#    field: "web_ips"
+#    new: ips
+#  )
+#
+#  entry_data.push(
+#    id: entry_id
+#    field: "score"
+#    new: $(wbrs_score_cell).text()
+#  )
+#
+#  data[entry_id] = {
+#      entry_data
+#  }
+#
+#  std_msg_ajax(
+#    method: 'PATCH'
+#    url: "/escalations/api/v1/escalations/webrep/disputes/entries/field_data"
+#    data: {
+#      field_data: data
+#    }
+#    success_reload: true
+#    error_prefix: 'Error updating data.'
+#  )
 
 
 
