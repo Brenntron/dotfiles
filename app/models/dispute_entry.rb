@@ -656,6 +656,7 @@ class DisputeEntry < ApplicationRecord
   end
 
   def update_from_field_data(field_hash)
+    # binding.pry
     attributes = field_hash.inject({}) do |attrs, field_data|
       attrs[field_data['field']] = field_data['new']
       attrs
@@ -863,7 +864,6 @@ class DisputeEntry < ApplicationRecord
     wbrs_rule_hits = Sbrs::ManualSbrs.get_rule_names_from_rulehits(results) rescue nil
     wbrs_score = results["wbrs"]["score"]
 
-    binding.pry
 
     if dispute_entry.present? && !wbrs_rule_hits.nil?
       binding.pry
@@ -874,16 +874,16 @@ class DisputeEntry < ApplicationRecord
       rule_hits_to_destroy.destroy_all
 
       wbrs_rule_hits.each do |rule_hit|
-
-        DisputeRuleHit.create(rule_type:'WBRS', name: rule_hit, dispute_entry_id: dispute_entry.id)
+        binding.pry
+        DisputeRuleHit.create(rule_type:'WBRS', name: rule_hit, dispute_entry_id: dispute_entry.id, is_multi_ip_rulehit: true)
 
       end
-      binding.pry
-      dispute_entry.score = wbrs_score
-      dispute_entry.ip_address = ip_addresses
-      dispute_entry.save
-
     end
+
+    dispute_entry.score = wbrs_score
+    dispute_entry.web_ips = ip_addresses
+    dispute_entry.save
+
 
     result[:rulehits] = wbrs_rule_hits
     result[:score] = wbrs_score

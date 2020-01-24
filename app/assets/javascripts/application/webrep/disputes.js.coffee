@@ -2139,12 +2139,18 @@ window.query_uri_plus_ip = (uri, ips, entry_id) ->
       dropdown = $('#add_ip_button_' + entry_id).parent()
       $(dropdown).remove()
 
+      console.log response
+
       # Prep for inserting into DOM
-      rules     = response.json.rulehits.join(', ')
-      rule_hits = response.json.rulehits.length
+      if response.json.rulehits?
+        rules     = response.json.rulehits.join(', ')
+        rule_hits = response.json.rulehits.length
+      else
+        rules = ''
+        rule_hits = 0
       score     = response.json.score.toFixed(2)
 
-      # Need to add but don't exist yet
+      # Need to add but don't exist in the response yet
       # cats      = response.json.category.join(', ')
       # proxy     = response.json.proxy
       cats = ''
@@ -2176,8 +2182,8 @@ window.query_uri_plus_ip = (uri, ips, entry_id) ->
 
   )
 
-  # Need to save field data (save entries) and save the new data that is returned, might be two separate functions
-
+#  # Need to save field data (save entries) and save the new data that is returned, might be two separate functions
+#
 #  # Need to save new fields to db
 #  debugger
 #  data = {}
