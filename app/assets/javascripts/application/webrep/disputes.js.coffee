@@ -2182,38 +2182,5 @@ window.query_uri_plus_ip = (uri, ips, entry_id) ->
 
   )
 
-#  # Need to save field data (save entries) and save the new data that is returned, might be two separate functions
-#
-#  # Need to save new fields to db
-#  debugger
-#  data = {}
-#  entry_data = []
-#
-#  entry_data.push(
-#    id: entry_id
-#    field: "web_ips"
-#    new: ips
-#  )
-#
-#  entry_data.push(
-#    id: entry_id
-#    field: "score"
-#    new: $(wbrs_score_cell).text()
-#  )
-#
-#  data[entry_id] = {
-#      entry_data
-#  }
-#
-#  std_msg_ajax(
-#    method: 'PATCH'
-#    url: "/escalations/api/v1/escalations/webrep/disputes/entries/field_data"
-#    data: {
-#      field_data: data
-#    }
-#    success_reload: true
-#    error_prefix: 'Error updating data.'
-#  )
-
 
 

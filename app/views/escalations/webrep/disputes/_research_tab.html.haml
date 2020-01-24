@@ -555,16 +555,19 @@
                         %td
                           %label WBRS Rules
                         %td.rule-hits-col-list
-                          - entry.dispute_rule_hits.select {|rule_hit| rule_hit.rule_type == "WBRS" && rule_hit.is_multi_ip_rulehit != true }.each do |wbrs_hit|
+                          - wbrs_rules = entry.dispute_rule_hits.select {|rule_hit| rule_hit.rule_type == "WBRS" && rule_hit.is_multi_ip_rulehit != true }
+                          - wbrs_rules.each do |wbrs_hit|
                             - unless RulehitResolutionMailerTemplate.select{|template| template.mnemonic == wbrs_hit.name}.count == 0
                               %a.wbrs-rule-trigger{href: '#', 'data-id': "#{wbrs_hit.id}", id: "inline-wbrs-hit-#{wbrs_hit.id}"}
-                                = wbrs_hit.name
-                                - unless wbrs_hit.equal? entry.dispute_rule_hits.select {|rule_hit| rule_hit.rule_type == "WBRS" }.last
-                                  = ","
+                                - if wbrs_hit.equal? wbrs_rules.last
+                                  = wbrs_hit.name
+                                - else
+                                  = "#{wbrs_hit.name}, "
                             - else
-                              = wbrs_hit.name
-                              - unless wbrs_hit.equal? entry.dispute_rule_hits.select {|rule_hit| rule_hit.rule_type == "WBRS" }.last
-                                = ","
+                              - if wbrs_hit.equal? wbrs_rules.last
+                                = wbrs_hit.name
+                              - else
+                                = "#{wbrs_hit.name}, "
                         %td.input-col
                           %span.research-table-input-wrapper.xbrs-input-wrapper
                             %input.research-row-checkbox.xbrs-checkbox{type: 'checkbox', checked: 'true', value: "#{entry.id}"}
@@ -683,9 +686,9 @@
                     %td.dual-edit-field{colspan: '7', 'data-id': entry.id, 'data-field': 'host-ip'}
                       %span.entry-data.entry-resolved-ip-content
                         - ips = JSON.parse entry[:web_ips]
-                        = ips.to_sentence(last_word_connector: ", ")
+                        = ips.to_sentence(last_word_connector: ', ')
 
-                      %input.table-entry-input.wide{type:'text', value: "Ip goes here"}
+                      %input.table-entry-input.wide{type:'text', value: "#{ips.to_sentence(last_word_connector: ', ')}"}
 
                   %tr.research-uri-ip-data-row
                     %td.research-table-details-wrapper{colspan: '8'}
@@ -702,13 +705,17 @@
                           %td
                             %label WBRS Rule Hits
                           %td.text-center.uri-ip-wbrs-rule-total
-                            = entry.dispute_rule_hits.select {|rule_hit| rule_hit.rule_type == "WBRS" && rule_hit.is_multi_ip_rulehit == true }.length
+                            - ip_rule_hits = entry.dispute_rule_hits.select {|rule_hit| rule_hit.rule_type == "WBRS" && rule_hit.is_multi_ip_rulehit == true }
+                            = ip_rule_hits.length
                           %td
                             %label WBRS Rules
                           %td.uri-ip-wbrs-rules
-                            - unless entry.dispute_rule_hits.select {|rule_hit| rule_hit.rule_type == "WBRS" && rule_hit.is_multi_ip_rulehit == true }.length == 0
-                              - entry.dispute_rule_hits.select {|rule_hit| rule_hit.rule_type == "WBRS" && rule_hit.is_multi_ip_rulehit == true }.each do |wbrs_hit|
-                                = wbrs_hit.name
+                            - unless ip_rule_hits.length == 0
+                              - ip_rule_hits.each do |wbrs_hit|
+                                - if wbrs_hit == ip_rule_hits.last
+                                  = wbrs_hit.name
+                                - else
+                                  = "#{wbrs_hit.name}, "
                             - else
                               %span.missing-data
                                 No rules.

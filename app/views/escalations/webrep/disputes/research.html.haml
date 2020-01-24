@@ -416,23 +416,26 @@
                           %td
                             %label WBRS Rule Hits
                           %td.text-center
-                            = entry.dispute_rule_hits.select{|hit| hit.rule_type == 'WBRS'}.count
+                            - wbrs_rules = entry.dispute_rule_hits.select{|hit| hit.rule_type == 'WBRS'}
+                            = wbrs_rules.count
                           %td
                             %label WBRS Rules
                           %td.rule-hits-col-list
-                            - if entry.dispute_rule_hits.select{|hit| hit.rule_type == 'WBRS'}.count == 0
+                            - if wbrs_rules.count == 0
                               %span.missing-data No rule hits
                             - else
-                              - entry.dispute_rule_hits.select{|hit| hit.rule_type == 'WBRS'}.each do |wbrs_hit|
+                              - wbrs_rules.each do |wbrs_hit|
                                 - unless RulehitResolutionMailerTemplate.select{|template| template.mnemonic == wbrs_hit.name}.count == 0
                                   %a.adhoc-email-trigger{href: '#', 'data-url': "#{entry.uri}", 'data-name': wbrs_hit.name}
-                                    = wbrs_hit.name
-                                    - unless wbrs_hit.equal? entry.dispute_rule_hits.select {|rule_hit| rule_hit.rule_type == "WBRS" }.last
-                                      = ","
+                                    - if wbrs_hit.equal? wbrs_rules.last
+                                      = wbrs_hit.name
+                                    - else
+                                      = "#{wbrs_hit.name}, "
                                 - else
-                                  = wbrs_hit.name
-                                  - unless wbrs_hit.equal? entry.dispute_rule_hits.select {|rule_hit| rule_hit.rule_type == "WBRS" }.last
-                                    = ","
+                                  - if wbrs_hit.equal? wbrs_rules.last
+                                    = wbrs_hit.name
+                                  - else
+                                    = "#{wbrs_hit.name}, "
                           %td.input-col
                             %span.research-table-input-wrapper.xbrs-input-wrapper
                               %input.research-row-checkbox.xbrs-checkbox{type: 'checkbox', checked: 'true', value: "#{entry.id}"}

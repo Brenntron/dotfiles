@@ -15,7 +15,8 @@ $ ->
 
 
   $('#edit-dispute-entry-button').click ->
-
+    debugger
+#    TODO - make sure new items are saved / old items are saved correctly
     if ($('.dispute_check_box:checked').length > 0)
       $('.edit-entries-buttons').removeClass('hidden')
       $('.dispute_check_box').each ->
@@ -78,6 +79,8 @@ $ ->
 
 # Inline Edit Button
   $('.inline-edit-entry-button').click ->
+    debugger
+#    TODO Confirm this works with the new fields
     edit_button = $(this)
     entry_row = $(this).parents('.research-table-row')[0]
     $(entry_row).addClass('editing-row')
