@@ -26,6 +26,10 @@ POWERLEVEL9K_CUSTOM_RUBY_VERSION="echo '\ue23e' `(cd $PWD && asdf current ruby |
 POWERLEVEL9K_CUSTOM_RUBY_VERSION_BACKGROUND="red"
 POWERLEVEL9K_CUSTOM_RUBY_VERSION_FOREGROUND="black"
 
+POWERLEVEL9K_CUSTOM_PYTHON_VERSION="echo '\uf81f' `(cd $PWD && asdf current python | sed -ne \
+  's/[^0-9]*\(\([0-9]\.\)\{0,4\}[0-9][^.]\).*/\1/p')`"
+POWERLEVEL9K_CUSTOM_PYTHON_VERSION_BACKGROUND="steelblue3"
+
 POWERLEVEL9K_NODE_VERSION_FOREGROUND='grey30'
 
 POWERLEVEL9K_TIME_ICON=''
@@ -46,7 +50,7 @@ POWERLEVEL9K_RIGHT_PROMPT_ELEMENTS=(
   status
   time
   node_version
-  custom_ruby_version
+  custom_python_version
   dir_writable
 )
 POWERLEVEL9K_PROMPT_ADD_NEWLINE=true
@@ -162,11 +166,36 @@ done
 
 . $HOME/.asdf/completions/asdf.bash
 
+SSH_ENV=~/.ssh/environment
+
+# start the ssh-agent
+function start_agent {
+    echo "Initializing new SSH agent..."
+    # spawn ssh-agent
+    /usr/bin/ssh-agent | sed 's/^echo/#echo/' > "${SSH_ENV}"
+    echo succeeded
+    chmod 600 "${SSH_ENV}"
+    . "${SSH_ENV}" > /dev/null
+    /usr/bin/ssh-add
+}
+
+if [ -f "${SSH_ENV}" ]; then
+     . "${SSH_ENV}" > /dev/null
+     ps -ef | grep ${SSH_AGENT_PID} | grep ssh-agent$ > /dev/null || {
+        start_agent;
+    }
+else
+    start_agent;
+  fi
+
 [ -f ~/.fzf.zsh ] && source ~/.fzf.zsh
 alias config='/usr/bin/git --git-dir=/Users/Brenntron/.myconfigs/ --work-tree=/Users/Brenntron'
 alias tmux="tmux -2"
 
-export PATH="$HOME/.yarn/bin:$HOME/.config/yarn/global/node_modules/.bin:$PATH"
+export asdf_nodejs_path="echo `asdf where nodejs`"
+export PATH="/usr/local/opt/mysql@5.7/bin:$HOME/.yarn/bin:$HOME/.config/yarn/global/node_modules/.bin:$PATH"
 export LDFLAGS="-L/usr/local/opt/zlib/lib"
 export CPPFLAGS="-I/usr/local/opt/zlib/include"
 export PKG_CONFIG_PATH="/usr/local/opt/zlib/lib/pkgconfig"
+export PATH="$HOME/.fastlane/bin:$PATH"
+export FZF_DEFAULT_COMMAND='ag --hidden --ignore .git -g ""'

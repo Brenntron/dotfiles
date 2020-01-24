@@ -78,6 +78,9 @@ Plug 'andreshazard/vim-freemarker'
 " TypeScript Support
 Plug 'leafgarland/typescript-vim'
 
+" JavaScript Support
+Plug 'flowtype/vim-flow'
+
 " Vue.js
 Plug 'posva/vim-vue'
 
@@ -103,7 +106,6 @@ Plug 'atelierbram/Base2Tone-vim'
 Plug 'colepeters/spacemacs-theme.vim'
 Plug 'flazz/vim-colorschemes'
 Plug 'rafi/awesome-vim-colorschemes'
-Plug 'chrisharrisx/laser-theme'
 Plug 'exitface/synthwave.vim'
 Plug 'liuchengxu/space-vim-dark'
 
@@ -132,6 +134,7 @@ set softtabstop=2
 set smarttab
 set expandtab
 set noshiftround
+let g:node_host_prog = $ASDF_DIR . '/installs/nodejs/11.6.0/bin/npm'
 
 syn match javaScriptCommentSkip "^[ \t]*\*\($\|[ \t]\+\)"
 syn region javaScriptComment start="/\*" end="\*/" contains=@Spell,javaScriptCommentTodo
@@ -153,37 +156,45 @@ syn region javaScriptStringD	start=+"+ skip=+\\\\\|\\"+ end=+"\|$+	contains=java
 syn region javaScriptStringS	start=+'+ skip=+\\\\\|\\'+ end=+'\|$+	contains=javaScriptSpecial,@htmlPreproc
 syn match javaScriptSpecialCharacter "'\\.'"
 syn match javaScriptNumber	"-\=\<\d\+L\=\>\|0[xX][0-9a-fA-F]\+\>"
+autocmd FileType json syntax match Comment +\/\/.\+$+
 
 " Ale Configuration
-let g:ale_linter_aliases = {'es6': ['javascript']}
+let g:ale_linter_aliases = {'es6': ['javascript'], 'jsx': ['css', 'javascript']}
 
 let g:ale_linters = {
-\  'javascript': ['eslint'],
+\  'javascript': ['eslint', 'flow'],
 \  'typescript': ['tslint'],
 \  'es6': ['eslint'],
 \  'scss': ['stylelint'],
-\  'ruby': ['rubocop']
+\  'ruby': ['rubocop'],
+\  'jsx': ['stylelint','javascript']
 \}
 
 let g:ale_fixers = {
 \  '*': ['remove_trailing_lines', 'trim_whitespace'],
-\  'javascript': ['eslint'],
+\  'javascript': ['eslint', 'prettier'],
 \  'typescript': ['tslint'],
 \  'es6': ['eslint'],
-\  'scss': ['stylelint'],
+\  'scss': ['stylelint', 'prettier'],
+\  'css': ['stylelint', 'prettier'],
 \  'ruby': ['rubocop']
 \}
 
 let g:ale_enabled = 1
 let g:ale_lint_on_text_changed = 1
+let g:ale_set_loclist = 0
 let g:ale_set_quickfix = 1
 let g:ale_sign_column_always = 1
 let g:ale_open_list = 1
+let g:ale_keep_list_window_open = 1
 let g:ale_fix_on_save = 1
 let g:ale_linter_explicit = 1
+let g:ale_sign_error = 'X'
+let g:ale_sign_warning = '?'
+let g:ale_statusline_format = ['X %d', '? %d', '']
+let g:ale_echo_msg_format = '%linter% says %s'
 
 " Airline
-
 let g:airline#extensions#ale#enabled = 1
 let g:airline#extensions#branch#enabled = 1
 let g:airline#extensions#tabline#enabled = 1
@@ -257,14 +268,6 @@ augroup markdown
     au BufNewFile,BufRead *.md,*.markdown setlocal filetype=ghmarkdown
 augroup END
 
-" Github Issues Configuration
-let g:github_access_token = "e6fb845bd306a3ca7f086cef82732d1d5d9ac8e0"
-
-" Vim-Alchemist Configuration
-let g:alchemist#elixir_erlang_src = "/Users/amacgregor/Projects/Github/alchemist-source"
-let g:alchemist_tag_disable = 1
-
-" Settings for Writting
 let g:pencil#wrapModeDefault = 'soft'   " default is 'hard'
 let g:languagetool_jar  = '/opt/languagetool/languagetool-commandline.jar'
 
@@ -273,6 +276,12 @@ augroup pencil
   autocmd!
   autocmd FileType markdown,mkd call pencil#init()
   autocmd FileType text         call pencil#init()
+augroup END
+
+" JSX Syntax support
+augroup FiletypeGroup
+    autocmd!
+    au BufNewFile,BufRead *.jsx set filetype=javascript.jsx
 augroup END
 
 " Vim-UtilSnips Configuration
@@ -330,6 +339,8 @@ nmap <silent> gd <Plug>(coc-definition)
 nmap <silent> gy <Plug>(coc-type-definition)
 nmap <silent> gi <Plug>(coc-implementation)
 nmap <silent> gr <Plug>(coc-references)
+
+command! -nargs=0 Prettier :call CocAction('runCommand',. 'prettier.formatFile')
 
 " fzf config
 nmap ; :Buffers<CR>
