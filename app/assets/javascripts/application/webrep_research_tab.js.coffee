@@ -79,9 +79,6 @@ $ ->
 
 # Inline Edit Button
   $('.inline-edit-entry-button').click ->
-    debugger
-#    TODO Confirm this works with the new fields
-    edit_button = $(this)
     entry_row = $(this).parents('.research-table-row')[0]
     $(entry_row).addClass('editing-row')
     editable_data = $(entry_row).find('.entry-data')
@@ -94,6 +91,18 @@ $ ->
     $(first_item).next('.table-entry-input')[0].focus()
     if $('.edit-entries-buttons').hasClass('hidden')
       $('.edit-entries-buttons').removeClass('hidden')
+
+# Inline Edit Resolved Host Ips
+  $('.inline-edit-ip-button').click ->
+    entry_row = $(this).parents('.research-table-row')[0]
+    ip_input = $(entry_row).find('.table-ip-input')[0]
+    ip_data  = $(entry_row).find('.entry-resolved-ip-content')[0]
+    ip_save  = $(entry_row).find('.inline-save-ip-button')[0]
+    $(this).hide()
+    $(ip_data).hide()
+    $(ip_input).show()
+    $(ip_save).show()
+    $(ip_input).focus()
 
 # Inline Edit Status
   $('.radio-label').click ->

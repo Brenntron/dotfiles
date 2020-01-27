@@ -683,12 +683,17 @@
                       -#Expander area
                     %td.input-col.ip-label-col{rowspan: '2'}
                       -# IP label
-                    %td.dual-edit-field{colspan: '7', 'data-id': entry.id, 'data-field': 'host-ip'}
-                      %span.entry-data.entry-resolved-ip-content
+                    %td.dual-edit-field{colspan: '5', 'data-id': entry.id, 'data-field': 'host-ip'}
+                      %span.entry-resolved-ip-content
                         - ips = JSON.parse entry[:web_ips]
                         = ips.to_sentence(last_word_connector: ', ')
 
-                      %input.table-entry-input.wide{type:'text', value: "#{ips.to_sentence(last_word_connector: ', ')}"}
+                      %input.table-ip-input{type:'text', value: "#{ips.to_sentence(last_word_connector: ', ')}"}
+                    %td.text-right.no-padding-right{colspan: '3'}
+                      %button.edit-button.inline-edit-ip-button.esc-tooltipped{title: 'Edit IP Addresses'}
+                        Edit IP Addresses
+                      %button.save-button.inline-save-ip-button.esc-tooltipped{title: 'Save IP Addresses'}
+                        Save IP Addresses
 
                   %tr.research-uri-ip-data-row
                     %td.research-table-details-wrapper{colspan: '8'}

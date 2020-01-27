@@ -10616,3 +10616,42 @@ table > tbody > tr > td.no-padding {
     width: 190px;  // wl/bl lists + threat cats
   }
 }
+
+.inline-edit-ip-button {
+  background-image: url(image_path('icon_edit_white.svg'));
+  background-color: #bcc1c3;
+}
+.inline-save-ip-button {
+  display: none;
+}
+.inline-edit-ip-button, .inline-save-ip-button {
+  background-repeat: no-repeat;
+  height: 20px;
+  border-radius: 2px;
+  color: #fff;
+  border: none;
+  background-size: 16px 16px;
+  background-position: 2px center;
+  padding-left: 20px;
+}
+
+
+.right-aligned-nested-button-wrapper {
+  padding-right: 0 !important;
+  padding-top: 0 !important;
+  padding-bottom: 0 !important;
+}
+
+.table-ip-input {
+  display: none;
+  width: 100%;
+  border: 2px solid #fff;
+  outline: 1px solid #e5e5e5;
+}
+
+.table-ip-input:focus {
+  background-color: #fff7cd;
+  outline-offset: 0;
+}
+
+
