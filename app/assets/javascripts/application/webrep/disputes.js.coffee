@@ -2172,10 +2172,13 @@ window.query_uri_plus_ip = (uri, ips, entry_id) ->
       # If there are rule hits, add to the rule hit details table
       entry_wrapper = $('#entry-data-wrapper_' + entry_id)
       wbrs_details_table = $($(entry_wrapper).find('.wbrs-details-table')[0]).find('tbody')[0]
+      plus_ip_rule_rows = $(wbrs_details_table).find('.plus-ip-rule-row')
+      $(plus_ip_rule_rows).each ->
+        $(this).remove()
       if rule_hits > 0
         $(response.json.rulehits).each ->
           # Ignoring description and weight right now as I don't think we are getting that data currently
-          rule_row = '<tr><td class="uri-plus-ip-rule-indicator"></td><td>' + this + '</td><td></td><td></td></tr>'
+          rule_row = '<tr class="plus-ip-rule-row"><td class="uri-plus-ip-rule-indicator"></td><td>' + this + '</td><td></td><td></td></tr>'
           $(wbrs_details_table).append(rule_row)
       return
   )
