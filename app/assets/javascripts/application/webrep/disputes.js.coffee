@@ -2115,7 +2115,6 @@ window.add_host_ips = (button) ->
 
 
 window.query_uri_plus_ip = (uri, ips, entry_id) ->
-  debugger
   # Find our ip row for this entry in the DOM & insert inline loader
   ip_row = $('#entry-data-wrapper_' + entry_id).find('.entry-resolved-ip-content')
   loader = '<span class="inline-row-loader"><span class="sync-button sync_rotate"></span>Loading...</span>'
@@ -2132,7 +2131,6 @@ window.query_uri_plus_ip = (uri, ips, entry_id) ->
       dispute_entry_id: entry_id
     }
     success: (response) ->
-      debugger
       # Kill the loader and the 'Add IP Addresses' dropdown
       inserted_loader = $('#entry-data-wrapper_' + entry_id).find('.inline-row-loader')
       $(inserted_loader).remove()
@@ -2179,7 +2177,7 @@ window.query_uri_plus_ip = (uri, ips, entry_id) ->
           # Ignoring description and weight right now as I don't think we are getting that data currently
           rule_row = '<tr><td class="uri-plus-ip-rule-indicator"></td><td>' + this + '</td><td></td><td></td></tr>'
           $(wbrs_details_table).append(rule_row)
-
+      return
   )
 
 

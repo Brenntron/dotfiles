@@ -688,7 +688,7 @@
                         - ips = JSON.parse entry[:web_ips]
                         = ips.to_sentence(last_word_connector: ', ')
 
-                      %input.table-ip-input{type:'text', value: "#{ips.to_sentence(last_word_connector: ', ')}"}
+                      %input.table-ip-input{type:'text', value: "#{ips.to_sentence(last_word_connector: ', ')}", placeholder: '1.1.1.1, 2.2.2.2'}
                     %td.text-right.no-padding-right{colspan: '3'}
                       %button.edit-button.inline-edit-ip-button.esc-tooltipped{title: 'Edit IP Addresses'}
                         Edit IP Addresses

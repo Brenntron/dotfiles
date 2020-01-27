@@ -839,7 +839,6 @@ module API
 
             desc 'Get URL + IP data from SDS V3'
             post 'update_multi_ip' do
-              binding.pry
               uri = params[:uri]
               ips = params[:ip_addresses]
               dispute_entry_id = params[:dispute_entry_id]

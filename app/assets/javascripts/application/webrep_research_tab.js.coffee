@@ -15,8 +15,6 @@ $ ->
 
 
   $('#edit-dispute-entry-button').click ->
-    debugger
-#    TODO - make sure new items are saved / old items are saved correctly
     if ($('.dispute_check_box:checked').length > 0)
       $('.edit-entries-buttons').removeClass('hidden')
       $('.dispute_check_box').each ->
@@ -92,6 +90,7 @@ $ ->
     if $('.edit-entries-buttons').hasClass('hidden')
       $('.edit-entries-buttons').removeClass('hidden')
 
+
 # Inline Edit Resolved Host Ips
   $('.inline-edit-ip-button').click ->
     entry_row = $(this).parents('.research-table-row')[0]
@@ -103,6 +102,38 @@ $ ->
     $(ip_input).show()
     $(ip_save).show()
     $(ip_input).focus()
+
+
+# Save edits to resovled host IPs
+  $('.inline-save-ip-button').click ->
+    entry_row = $(this).parents('.research-table-row')[0]
+    entry_id  = $(entry_row).attr('data-entry-id')
+    entry_uri = $.trim($($(entry_row).find('.entry-data-content')[0]).text())
+    ip_input  = $(entry_row).find('.table-ip-input')[0]
+    ip_data   = $(entry_row).find('.entry-resolved-ip-content')[0]
+    ip_edit   = $(entry_row).find('.inline-edit-ip-button')[0]
+    ip_save   = $(this)
+    old_ips   = $(ip_data).text()
+    new_ips   = $(ip_input).val()
+
+    if $.trim(old_ips) != new_ips
+      ip_arry = new_ips.split(', ')
+
+      $(ip_save).hide()
+      $(ip_input).hide()
+      $(ip_data).show()
+      $(ip_data).text(new_ips)
+      $(ip_edit).show()
+
+      # Get query data & save to db
+      query_uri_plus_ip(entry_uri, ip_arry, entry_id)
+
+    else
+      alert 'no changes made!'
+
+
+
+
 
 # Inline Edit Status
   $('.radio-label').click ->

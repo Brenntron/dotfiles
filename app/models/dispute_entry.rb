@@ -656,7 +656,6 @@ class DisputeEntry < ApplicationRecord
   end
 
   def update_from_field_data(field_hash)
-    # binding.pry
     attributes = field_hash.inject({}) do |attrs, field_data|
       attrs[field_data['field']] = field_data['new']
       attrs
@@ -855,7 +854,6 @@ class DisputeEntry < ApplicationRecord
   end
 
   def self.process_multi_ip_info(uri, ips, dispute_entry = nil)
-    binding.pry
     result = {}
 
     results = Sbrs::Base.combo_call_sds_v3(uri, ips)
@@ -866,7 +864,6 @@ class DisputeEntry < ApplicationRecord
 
 
     if dispute_entry.present? && !wbrs_rule_hits.nil?
-      binding.pry
       rule_hits_to_destroy = dispute_entry.dispute_rule_hits.where(:is_multi_ip_rulehit => true)
 
       ###
@@ -874,9 +871,7 @@ class DisputeEntry < ApplicationRecord
       rule_hits_to_destroy.destroy_all
 
       wbrs_rule_hits.each do |rule_hit|
-        binding.pry
         DisputeRuleHit.create(rule_type:'WBRS', name: rule_hit, dispute_entry_id: dispute_entry.id, is_multi_ip_rulehit: true)
-
       end
     end
 
