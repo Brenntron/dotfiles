@@ -603,31 +603,31 @@ class ComplaintEntry < ApplicationRecord
     present_params = params.select{|ignore_key, value| value.present?}
 
     if present_params['status'].present?
-      present_params['status'] = present_params['status'].split(',')
+      present_params['status'] = present_params['status'].split(',').map {|item| item.strip }
     end
 
     if present_params['resolution'].present?
-      present_params['resolution'] = present_params['resolution'].split(',')
+      present_params['resolution'] = present_params['resolution'].split(',').map {|item| item.strip }
     end
 
     if present_params['id'].present?
-      present_params['id'] = present_params['id'].split(',')
+      present_params['id'] = present_params['id'].split(',').map {|item| item.strip }
     end
 
     if present_params['complaint_id'].present?
-      present_params['complaint_id'] = present_params['complaint_id'].split(',')
+      present_params['complaint_id'] = present_params['complaint_id'].split(',').map {|item| item.strip }
     end
 
     if present_params['channel'].present?
-      present_params['channel'] = present_params['channel'].split(',')
+      present_params['channel'] = present_params['channel'].split(',').map {|item| item.strip }
     end
 
     if present_params['ip_or_uri'].present?
-      present_params['ip_or_uri'] = present_params['ip_or_uri'].split(',')
+      present_params['ip_or_uri'] = present_params['ip_or_uri'].split(',').map {|item| item.strip }
     end
 
     if present_params['user_id'].present?
-      present_params['user_id'] = present_params['user_id'].split(',')
+      present_params['user_id'] = present_params['user_id'].split(',').map {|item| item.strip }
     end
 
     simple_params = present_params.slice(*%w{id complaint_id resolution status})
@@ -635,6 +635,7 @@ class ComplaintEntry < ApplicationRecord
     relation = where(simple_params)
 
     if params['user_id'].present?
+      
       relation =
           relation.joins(:user).where(:users => { cvs_username: present_params['user_id']})
     end
@@ -682,7 +683,7 @@ class ComplaintEntry < ApplicationRecord
     end
 
     if params['tags'].present?
-      relation = relation.joins(complaint: :complaint_tags).where(complaint_tags: {name: params['tags'].split(',')})
+      relation = relation.joins(complaint: :complaint_tags).where(complaint_tags: {name: params['tags'].split(',').map {|item| item.strip }})
     end
     customer_params = present_params.slice(*%w{customer_name customer_email company_name})
     unless customer_params.empty?
@@ -695,7 +696,7 @@ class ComplaintEntry < ApplicationRecord
       end
 
       if customer_params['customer_name'].present?
-        relation = relation.where(customers: {name: customer_params['customer_name'].split(',')})
+        relation = relation.where(customers: {name: customer_params['customer_name'].split(',').map {|item| item.strip }})
       end
 
       if customer_params['customer_email'].present?
@@ -703,7 +704,7 @@ class ComplaintEntry < ApplicationRecord
       end
 
       if company_name.present?
-        relation = relation.where(companies: {name: company_name.split(',')})
+        relation = relation.where(companies: {name: company_name.split(',').map {|item| item.strip }})
       end
     end
 

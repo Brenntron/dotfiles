@@ -43,8 +43,7 @@ $ ->
   window.set_webcat_advanced = () ->
     # creating form object from array made from advanced dropdown form
     form = {}
-
-    user_id = $('#assignee-input')[0].selectize.items
+    user_id = assignee_input[0].selectize.items
     tags = tag_input[0].selectize.items
     company = $('#company-input')[0].selectize.items
     status = $('#status-input')[0].selectize.items
@@ -57,27 +56,27 @@ $ ->
     complaint_ids = $('#complaintid-input')[0].selectize.items
 
     if tags.length
-      form['tags'] = tags.join()
+      form['tags'] = tags.join(', ')
     if items.length
       form['category'] = items.map( (cat) -> options[cat].category_name).join(', ')
     if company.length
-      form['company'] = company.join()
+      form['company'] = company.join(', ')
     if status.length
-      form['status'] = status.join()
+      form['status'] = status.join(', ')
     if resolution.length
-      form['resolution'] = resolution.join()
+      form['resolution'] = resolution.join(', ')
     if customer_name.length
-      form['customer_name'] = customer_name.join()
+      form['customer_name'] = customer_name.join(', ')
     if complaints.length
-      form['ip_or_uri'] = complaints.join()
+      form['ip_or_uri'] = complaints.join(', ')
     if channels.length
-      form['channel'] = channels.join()
+      form['channel'] = channels.join(', ')
     if entry_ids.length
-      form['entry_id'] = entry_ids.join()
+      form['entry_id'] = entry_ids.join(', ')
     if complaint_ids.length
-      form['complaint_id'] = complaint_ids.join()
+      form['complaint_id'] = complaint_ids.join(', ')
     if user_id.length
-      form['user_id'] = user_id.join()
+      form['user_id'] = user_id.join(', ')
 
     for item in $('#cat_named_search :input:not(:hidden)').serializeArray()
       { name, value } = item
@@ -203,6 +202,8 @@ $ ->
       if condition != ''
         if condition_name == 'id'
           condition_name = 'Entry Id'
+        if condition_name == 'user_id'
+          condition_name = 'Assignee'
         condition_name = condition_name.replace(/_/g, " ").toUpperCase()
         condition_name_HTML = '<span class="search-condition-name text-uppercase">' + condition_name + ': </span>'
 
@@ -636,7 +637,17 @@ $ ->
       create: false
       valueField: 'name',
       labelField: 'display_name',
-      searchField: 'display_name',
+      searchField: ['name', 'display_name'],
+      options: AC.WebCat.createAssigneeOptions()
+      render:
+        option: (item, escape) ->
+          name = item.display_name
+          user_id = item.name
+          '<div class="custom-render-selectize"><span>' + escape(name) + ' (' + escape(user_id) + ')' + '</span></div>'
+      onFocus: () ->
+        window.toggle_selectize_layer(this, 'true')
+      onBlur: () ->
+        window.toggle_selectize_layer(this, 'false')
     }
     tag_input = $('#tags-input').selectize {
       persist: false
@@ -644,6 +655,10 @@ $ ->
       valueField: 'name',
       labelField: 'name',
       options: createSelectOptions()
+      onFocus: () ->
+        window.toggle_selectize_layer(this, 'true')
+      onBlur: () ->
+        window.toggle_selectize_layer(this, 'false')
     }
     category_input = $('#category-input').selectize {
       persist: false,
@@ -653,6 +668,10 @@ $ ->
       labelField: 'category_name',
       searchField: ['category_name', 'category_code'],
       options: AC.WebCat.createSelectOptions()
+      onFocus: () ->
+        window.toggle_selectize_layer(this, 'true')
+      onBlur: () ->
+        window.toggle_selectize_layer(this, 'false')
     }
     company_input = $('#company-input').selectize {
       persist: false,
@@ -660,6 +679,10 @@ $ ->
       valueField: 'company_name',
       labelField: 'company_name',
       searchField: 'company_name',
+      onFocus: () ->
+        window.toggle_selectize_layer(this, 'true')
+      onBlur: () ->
+        window.toggle_selectize_layer(this, 'false')
     }
     status_input = $('#status-input').selectize {
       persist: false,
@@ -670,6 +693,10 @@ $ ->
       searchField: 'name',
       options: [{name: "NEW"}, {name: "RESOLVED"}, {name: "ASSIGNED"}, {name: "ACTIVE"},
                {name: "COMPLETED"}, {name: "PENDING"}, {name: "REOPENED"}]
+      onFocus: () ->
+        window.toggle_selectize_layer(this, 'true')
+      onBlur: () ->
+        window.toggle_selectize_layer(this, 'false')
     }
     resolution_input = $('#resolution-input').selectize {
       persist: false,
@@ -679,6 +706,10 @@ $ ->
       labelField: 'name',
       searchField: 'name',
       options: [{name: "FIXED"}, {name: "INVALID"}, {name: "UNCHANGED"}, {name: "DUPLICATE"}]
+      onFocus: () ->
+        window.toggle_selectize_layer(this, 'true')
+      onBlur: () ->
+        window.toggle_selectize_layer(this, 'false')
     }
     customer_input = $('#name-input').selectize {
       persist: false,
@@ -686,6 +717,10 @@ $ ->
       valueField: 'name',
       labelField: 'name',
       searchField: 'name',
+      onFocus: () ->
+        window.toggle_selectize_layer(this, 'true')
+      onBlur: () ->
+        window.toggle_selectize_layer(this, 'false')
     }
     complaint_input = $('#complaint-input').selectize {
       persist: false,
@@ -694,6 +729,10 @@ $ ->
           value: input
           text: input
         }
+      onFocus: () ->
+        window.toggle_selectize_layer(this, 'true')
+      onBlur: () ->
+        window.toggle_selectize_layer(this, 'false')
     }
     channel_input = $('#channel-input').selectize {
       persist: false,
@@ -703,6 +742,10 @@ $ ->
       labelField: 'name',
       searchField: 'name',
       options: [{name: "Internal"}, {name: "TalosIntel"}, {name: "WBNP"}]
+      onFocus: () ->
+        window.toggle_selectize_layer(this, 'true')
+      onBlur: () ->
+        window.toggle_selectize_layer(this, 'false')
     }
     entry_ids = $('#entryid-input').selectize {
       delimiter: ',',
@@ -712,6 +755,10 @@ $ ->
           value: input
           text: input
         }
+      onFocus: () ->
+        window.toggle_selectize_layer(this, 'true')
+      onBlur: () ->
+        window.toggle_selectize_layer(this, 'false')
     }
     complaint_ids = $('#complaintid-input').selectize {
       delimiter: ',',
@@ -721,6 +768,10 @@ $ ->
           value: input
           text: input
         }
+      onFocus: () ->
+        window.toggle_selectize_layer(this, 'true')
+      onBlur: () ->
+        window.toggle_selectize_layer(this, 'false')
     }
 
 
@@ -753,15 +804,11 @@ $ ->
     trigger: 'hover'
 
 
-
-  # Prevent the many selectizes from running into each other
-  $('#advanced-search-wrapper .selectize-input').click ->
-    $('#advanced-search-wrapper .selectize-input').each ->
-      select_parent = $(this).parents('.form-control')[0]
-
-      if $(this).hasClass('focus')
-        $(select_parent).css('z-index', '3')
-      else
-        $(select_parent).css('z-index', '1')
-
-
+# Prevent the many selectizes from running into each other
+window.toggle_selectize_layer = (input, focus) ->
+  input = input.$control_input[0]
+  select_parent = $(input).parents('.form-control')[0]
+  if focus == 'true'
+    $(select_parent).css('z-index', '4')
+  else
+    $(select_parent).css('z-index', '2')
