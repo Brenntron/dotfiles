@@ -10621,10 +10621,10 @@ table > tbody > tr > td.no-padding {
   background-image: url(image_path('icon_edit_white.svg'));
   background-color: #bcc1c3;
 }
-.inline-save-ip-button {
+.inline-save-ip-button, .inline-cancel-ip-button {
   display: none;
 }
-.inline-edit-ip-button, .inline-save-ip-button {
+.inline-edit-ip-button, .inline-save-ip-button, .inline-cancel-ip-button {
   background-repeat: no-repeat;
   height: 20px;
   border-radius: 2px;
@@ -10635,6 +10635,14 @@ table > tbody > tr > td.no-padding {
   padding-left: 20px;
 }
 
+.inline-cancel-ip-button {
+  float: right;
+  margin-left: 8px;
+  background-position: center center !important;
+  padding-left: 0 !important;
+  width: 20px;
+  background-size: 22px !important;
+}
 
 .right-aligned-nested-button-wrapper {
   padding-right: 0 !important;

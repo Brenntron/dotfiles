@@ -91,48 +91,64 @@ $ ->
       $('.edit-entries-buttons').removeClass('hidden')
 
 
-# Inline Edit Resolved Host Ips
+
+  # Edit resolved host IPs
   $('.inline-edit-ip-button').click ->
-    entry_row = $(this).parents('.research-table-row')[0]
-    ip_input = $(entry_row).find('.table-ip-input')[0]
-    ip_data  = $(entry_row).find('.entry-resolved-ip-content')[0]
-    ip_save  = $(entry_row).find('.inline-save-ip-button')[0]
-    $(this).hide()
-    $(ip_data).hide()
-    $(ip_input).show()
-    $(ip_save).show()
-    $(ip_input).focus()
+    edit_ip_query_functions(this, 'edit')
 
-
-# Save edits to resovled host IPs
+  # Save edits to resovled host IPs
   $('.inline-save-ip-button').click ->
-    entry_row = $(this).parents('.research-table-row')[0]
+    edit_ip_query_functions(this, 'save')
+
+  # Cancel edits to resolved host IPs
+  $('.inline-cancel-ip-button').click ->
+    edit_ip_query_functions(this, 'cancel')
+
+  # TODO - add checks for the ip input
+
+
+  window.edit_ip_query_functions = (button, action) ->
+    # Get our DOM elements
+    entry_row = $(button).parents('.research-table-row')[0]
     entry_id  = $(entry_row).attr('data-entry-id')
     entry_uri = $.trim($($(entry_row).find('.entry-data-content')[0]).text())
     ip_input  = $(entry_row).find('.table-ip-input')[0]
     ip_data   = $(entry_row).find('.entry-resolved-ip-content')[0]
     ip_edit   = $(entry_row).find('.inline-edit-ip-button')[0]
-    ip_save   = $(this)
+    ip_save   = $(entry_row).find('.inline-save-ip-button')[0]
+    ip_cancel = $(entry_row).find('.inline-cancel-ip-button')[0]
     old_ips   = $(ip_data).text()
     new_ips   = $(ip_input).val()
 
-    if $.trim(old_ips) != new_ips
-      ip_arry = new_ips.split(', ')
-
-      $(ip_save).hide()
-      $(ip_input).hide()
-      $(ip_data).show()
-      $(ip_data).text(new_ips)
-      $(ip_edit).show()
-
-      # Get query data & save to db
-      query_uri_plus_ip(entry_uri, ip_arry, entry_id)
+    if action == 'edit'
+      $(ip_edit).hide()
+      $(ip_data).hide()
+      $(ip_input).show()
+      $(ip_save).show()
+      $(ip_cancel).show()
+      $(ip_input).focus()
 
     else
-      alert 'no changes made!'
+      $(ip_cancel).hide()
+      $(ip_save).hide()
+      $(ip_input).hide()
+      $(ip_edit).show()
+      $(ip_data).show()
 
+      if action == 'save'
+        if $.trim(old_ips) != new_ips
+          ip_arry = new_ips.split(', ')
+          $(ip_data).text(new_ips)
 
+          # Get query data & save to db
+          query_uri_plus_ip(entry_uri, ip_arry, entry_id)
 
+        else
+          alert 'no changes made!'
+
+      if action == 'cancel'
+        if $.trim(old_ips) != new_ips
+          $(ip_input).val(old_ips)
 
 
 # Inline Edit Status
