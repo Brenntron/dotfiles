@@ -217,16 +217,19 @@ $ ->
 
     if search_condition_tooltip.length > 0
       container.css('display', 'inline-block')
-      container.addClass('esc-tooltipped')
-      list = document.createElement('ul')
-      $(list).addClass('tooltip_content')
+      list = $(container).find('#search-tooltip_content')[0]
       for  li in search_condition_tooltip
         item = document.createElement('li')
         item.appendChild(document.createTextNode(li))
         list.appendChild(item)
-      container.prepend(list)
-      $(list).hide()
-      container.attr('data-tooltip-content', '.tooltip_content')
+      container.attr('data-tooltip-content', '#search-tooltip_content')
+      container.tooltipster(
+        theme: [
+          'tooltipster-borderless'
+          'tooltipster-borderless-customized'
+        ]
+        contentCloning: true
+      )
 
   build_header = (data) ->
     ###
