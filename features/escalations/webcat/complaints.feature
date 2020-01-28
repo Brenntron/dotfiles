@@ -38,8 +38,8 @@ Feature: Webcat complaints
     And WBRS top url is stubbed
     And WBRS Prefix where is stubbed
     And the following companies exist:
-    |id| name  |
-    | 1| Cisco |
+    | name  |
+    | Cisco |
     And the following customers exist:
     | company_id | name         | email           |
     | 1          | Talos Person | talos@cisco.com |
@@ -339,7 +339,7 @@ Feature: Webcat complaints
     And I fill in "url_1" with "mary.com"
     And I fill in selectized with "Adult"
     And I click ".primary"
-    And I wait for "45" seconds
+    And I wait for "10" seconds
     Then I should see "URLS CATEGORIZED SUCCESSFULLY"
     And I should see "Categorization of a Top URL will create a pending complaint entry. All other entries have been submitted directly to WBRS."
 
