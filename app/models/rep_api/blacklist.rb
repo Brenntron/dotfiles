@@ -73,6 +73,7 @@ class RepApi::Blacklist < RepApi::Base
     string_array = entries.map {|entry| "entry=#{entry}"}
 
     response = call_json_request(:post, '/blacklist/get', body: build_request_body(string_array))
+
     return response.body if raw == true
     response_body = JSON.parse(response.body)
     response_body.inject({}) do |collection_hash, (entry, value)|
@@ -254,4 +255,37 @@ class RepApi::Blacklist < RepApi::Base
         raise "No known action '#{params['action']}'."
     end
   end
+
+
+  #########
+  ## for testing API
+  #########
+
+  #arg needs
+  #classification
+  #entry
+  #author
+  #comment
+  def self.add_reptool_entry(params)
+    input = stringkey_params(params)
+    raise "Missing parameter: author" unless input.has_key?('author')
+    raise "Missing parameter: comment" unless input.has_key?('comment')
+    raise "Missing parameter: classification" unless input.has_key?('classification')
+    input = input.to_a
+
+    response = call_json_request(:post, '/blacklist/add', body: build_request_body(input))
+
+    return JSON.parse(response.body)
+  end
+
+  #arg needs
+  #entry
+  def self.expire_reptool_entry(params)
+    input = stringkey_params(params)
+
+    response = call_json_request(:post, '/blacklist/expire', body: build_request_body(input))
+
+    return JSON.parse(response.body)
+  end
+
 end

@@ -32,3 +32,19 @@ Given(/^I go ?to a "(.*?)" report surrounding the current year$/) do |report_typ
   url = "/escalations/webcat/reports/#{report_type}?utf8=1&report%5Bdate_from%5D=#{low_date}-01-01&report%5Bdate_to%5D=#{high_date}-01-01&report%5Bcustomer_name%5D=&commit=Report"
   visit (url)
 end
+
+Given(/^the following complaint entry with id: "(.*?)" has a resolution of: "(.*?)"$/) do |id, resolution|
+  expect(ComplaintEntry.find(id).resolution).to eq(resolution)
+end
+
+Given(/^the following complaint entry with id: "(.*?)" has a status of: "(.*?)"$/) do |id, status|
+  expect(ComplaintEntry.find(id).status).to eq(status)
+end
+
+Given(/^the following complaint entry with id: "(.*?)" has a internal comment of: "(.*?)"$/) do |id, internal_comment|
+  expect(ComplaintEntry.find(id).internal_comment).to eq(internal_comment)
+end
+
+Given(/^the following complaint entry with id: "(.*?)" has a resolution comment of: "(.*?)"$/) do |id, resolution_comment|
+  expect(ComplaintEntry.find(id).resolution_comment).to eq(resolution_comment)
+end

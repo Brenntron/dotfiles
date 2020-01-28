@@ -88,6 +88,7 @@ class Sbrs::ManualSbrs < Sbrs::Base
     all_rules = Sbrs::Base.rules_matchup
 
     uri_rules = []
+
     if rep_data["wbrs-rulehits"].present?
       rep_data["wbrs-rulehits"].each do |rule_id|
         rule_id = rule_id.to_s

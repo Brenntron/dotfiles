@@ -8,6 +8,29 @@ Feature: Webcat complaints
   #TODO: we need to update the user role on these tests
 
   @javascript
+  Scenario: a user should be alerted of impending doom
+    Given a user with role "webcat user" exists and is logged in
+    And the following complaint entries exist:
+      |id|  domain      | status |
+      |1 | food.com     |  NEW   |
+      |2 | blah.com     |  NEW   |
+      |3 | imhungry.com |  NEW   |
+    And a complaint entry preload exists
+    And I goto "/escalations/webcat/complaints?f=ALL"
+    And I wait for "2" seconds
+    And I click ".expand-row-button-1"
+    And I wait for "2" seconds
+    And I click ".expand-row-button-2"
+    And I wait for "2" seconds
+    And I fill in "complaint_comment_1" with "This is my favorite website"
+    And I fill in "complaint_comment_2" with "This is not my favorite website"
+    And I fill in "input_cat_1-selectized" with "Arts" and press enter
+    And I fill in "input_cat_2-selectized" with "Education" and press enter
+    And I wait for "2" seconds
+    When I click "master-submit"
+    Then I should see hidden element "#message-text" with content "I noticed you have made changes to at least 2 complaints but you only have 1 items selected."
+
+  @javascript
   Scenario: a user can manually create a new complaint
     Given a user with role "webcat user" exists and is logged in
     And bugzilla rest api always saves
@@ -15,8 +38,8 @@ Feature: Webcat complaints
     And WBRS top url is stubbed
     And WBRS Prefix where is stubbed
     And the following companies exist:
-    |id| name  |
-    | 1| Cisco |
+    | name  |
+    | Cisco |
     And the following customers exist:
     | company_id | name         | email           |
     | 1          | Talos Person | talos@cisco.com |
@@ -92,16 +115,8 @@ Feature: Webcat complaints
     Then I wait for "3" seconds
     Then I should see "ASSIGNED"
 
-  @javascript
-  Scenario: a user tries to take multiple complaints one of which is invalid
-    Given a user with role "webcat user" exists and is logged in
-    And the following complaint entries exist:
-      |id|  domain      |
-      |1 | blah.com     |
-      |2 | food.com     |
-      |3 | im.hungry.com     |
-    And a complaint entry preload exists
-    Then pending
+  # TODO write this test
+  # Scenario: a user tries to take multiple complaints one of which is invalid
 
   @javascript
   Scenario: a user can return a complaint
@@ -201,7 +216,6 @@ Feature: Webcat complaints
     Then I click "#complaint_entry_report" and switch to the new window
     Then I should see "Webcat Complaint Entry Report"
 
-  # Test should work after WEB-5072 is complete
   @javascript
   Scenario: a user attempts to submit changes without categories and receives expected error alert
     Given a user with role "webcat user" exists and is logged in
@@ -215,7 +229,6 @@ Feature: Webcat complaints
     And I wait for "5" seconds
     Then I should see "MUST INCLUDE AT LEAST ONE CATEGORY."
 
-  # Test should work after WEB-5001 is merged
   @javascript
   Scenario: a user attempts to submit changes with resolution set to 'Unchanged'
     Given a user with role "webcat user" exists and is logged in
@@ -246,11 +259,11 @@ Feature: Webcat complaints
   Scenario: a user visits a complaint show page and sees its IP
     Given a user with role "webcat user" exists and is logged in
     And the following complaint entries exist:
-    |id|domain|
-    |1 |      |
+    |id|ip_address|domain|
+    |1 |1.2.3.4   |      |
     And a complaint entry preload exists
     And I goto "/escalations/webcat/complaints/1"
-    Then I should see "1.1.1.1"
+    Then I should see "1.2.3.4"
 
   @javascript
   Scenario: lookup information is accessable via lookup button
@@ -326,7 +339,7 @@ Feature: Webcat complaints
     And I fill in "url_1" with "mary.com"
     And I fill in selectized with "Adult"
     And I click ".primary"
-    And I wait for "45" seconds
+    And I wait for "10" seconds
     Then I should see "URLS CATEGORIZED SUCCESSFULLY"
     And I should see "Categorization of a Top URL will create a pending complaint entry. All other entries have been submitted directly to WBRS."
 
@@ -369,7 +382,7 @@ Feature: Webcat complaints
     And I fill in selectized with "Adult"
     And I click "#cat-urls-same"
     And I click ".primary"
-    And I wait for "20" seconds
+    And I wait for "15" seconds
     Then I should see "SUCCESS"
     And I should see "URLs/IPs successfully categorized."
 
@@ -472,7 +485,6 @@ Feature: Webcat complaints
     And I wait for "8" seconds
     Then I should see content "Nature" within ".sds_category"
 
-
   @javascript
   Scenario: when a complaint in the WBNP queue is resolved,
             a bridge message should not be sent
@@ -516,16 +528,15 @@ Feature: Webcat complaints
     Then I should see "COMPLETED"
     And "1" bridge message should be in the delayed job queue
 
-
   @javascript
-  Scenario: click the pin toolbar to top button, the button label toggles from pin to unpin
+  Scenario: a user clicks the "Pin Toolbar" button and sees the toolbar docked to the top navbar
     Given a user with role "webcat user" exists and is logged in
     And the following complaints exist:
       | ticket_source             | id | status |
       | talos-intelligence        | 1  | NEW    |
     And the following complaint entries exist:
-      | uri             | domain        | subdomain | path | entry_type | complaint_id |
-      | abc.com         | abc.com       |           |      | URI/DOMAIN |  1           |
+      | uri             | domain        | subdomain | path | entry_type | complaint_id | status |
+      | abc.com         | abc.com       |           |      | URI/DOMAIN |  1           | NEW    |
     And a complaint entry preload exists
     And I goto "/escalations/webcat/complaints"
     And I click "#pin-to-top"
@@ -534,15 +545,206 @@ Feature: Webcat complaints
     Then I should see "Pin Toolbar"
 
   @javascript
-  Scenario: press the hot key/shortcut to pin the toolbar to top, the button label changes to unpin
+  Scenario: a user types the hot key/shortcut to pin the toolbar to top and sees the toolbar docked
     Given a user with role "webcat user" exists and is logged in
     And the following complaints exist:
       | ticket_source             | id | status |
       | talos-intelligence        | 1  | NEW    |
     And the following complaint entries exist:
-      | uri             | domain        | subdomain | path | entry_type | complaint_id |
-      | abc.com         | abc.com       |           |      | URI/DOMAIN |  1           |
+      | uri             | domain        | subdomain | path | entry_type | complaint_id | status |
+      | abc.com         | abc.com       |           |      | URI/DOMAIN |  1           | NEW    |
     And a complaint entry preload exists
     And I goto "/escalations/webcat/complaints"
     And I enter the pin toolbar hot key
     Then I should not see "Pin Toolbar"
+
+  # webcat > complaints index > new banner w/ metrics
+  @javascript
+  Scenario: a user sees there is new/assigned Talos/WBNP/internal complaints in webcat index top banner
+    Given a user with role "webcat user" exists and is logged in
+    And the following complaints exist:
+      | channel       | id |
+      | talosintel    | 1  |
+      | talosintel    | 2  |
+      | talosintel    | 3  |
+      | talosintel    | 4  |
+      | wbnp          | 5  |
+      | wbnp          | 6  |
+      | wbnp          | 7  |
+      | internal      | 8  |
+      | internal      | 9  |
+    And the following complaint entries exist:
+      | uri            | domain          | entry_type | complaint_id | status     |
+      | abc.com        | abc.com         | URI/DOMAIN |  1           | NEW        |
+      | whatever.com   | whatever.com    | URI/DOMAIN |  2           | NEW        |
+      | url.com        | url.com         | URI/DOMAIN |  3           | ASSIGNED   |
+      | test.com       | test.com        | URI/DOMAIN |  4           | ASSIGNED   |
+      | something.com  | something.com   | URI/DOMAIN |  5           | NEW        |
+      | yadayada.com   | yadayada.com    | URI/DOMAIN |  6           | NEW        |
+      | nothing.com    | nothing.com     | URI/DOMAIN |  7           | ASSIGNED   |
+      | something.com  | something.com   | URI/DOMAIN |  8           | NEW        |
+      | blahblah.com   | blahblah.com    | URI/DOMAIN |  9           | ASSIGNED   |
+    And I goto "/escalations/webcat/complaints"
+    And I wait for "1" seconds
+    Then I should see content "2" within "#ti-new-count"
+    Then I should see content "2" within "#ti-assigned-count"
+    Then I should see content "2" within "#wbnp-new-count"
+    Then I should see content "1" within "#wbnp-assigned-count"
+    Then I should see content "1" within "#int-new-count"
+    Then I should see content "1" within "#int-assigned-count"
+
+  # webcat > complaints index > take a ticket, test assigned metric updates
+  @javascript
+  Scenario: a user sees a new complaint metric after making a New on webcat index, then takes ticket to see its assigned
+    Given a user with role "webcat user" exists and is logged in
+    And bugzilla rest api always saves
+    And I goto "/escalations/webcat/complaints"
+    And I wait for "5" seconds
+    And I click "#new-complaint"
+    And I fill in "ips_urls" with "example.com"
+    And I click ".primary"
+    And I wait for "5" seconds
+    And I click ".close"
+    And I wait for "3" seconds
+    And I click ".sorting_1"
+    And I click ".take-ticket-toolbar-button"
+    And I wait for "3" seconds
+    Then I should see content "1" within "#int-assigned-count"
+
+  @javascript
+  Scenario: a user uses the Update Resolution feature on multiple entries and includes an internal and resolution comment
+    Given a user with role "webcat user" exists and is logged in
+    And the following complaint entries exist:
+      |id| domain        | status |
+      |1 | blah.com      | NEW    |
+      |2 | food.com      | NEW    |
+      |3 | im.hungry.com | NEW    |
+    When I goto "/escalations/webcat/complaints"
+    And I click "#complaints_check_box"
+    And I click "#index_update_resolution"
+    And I select "Unchanged" from "complaint_resolution"
+    And I fill in element, "#internal_comment" with "Cisco"
+    And I fill in element, "#customer_facing_comment" with "Disco"
+    And I click "#button_update_resolution"
+    And I wait for "4" seconds
+    And I should see "Set the following 3 entries to RESOLUTION UNCHANGED."
+    And I click "#submit_resolution_changes"
+    Then the following complaint entry with id: "1" has a resolution of: "UNCHANGED"
+    Then the following complaint entry with id: "2" has a resolution of: "UNCHANGED"
+    Then the following complaint entry with id: "3" has a resolution of: "UNCHANGED"
+    Then the following complaint entry with id: "1" has a status of: "COMPLETED"
+    Then the following complaint entry with id: "2" has a status of: "COMPLETED"
+    Then the following complaint entry with id: "3" has a status of: "COMPLETED"
+    Then the following complaint entry with id: "1" has a internal comment of: "Cisco"
+    Then the following complaint entry with id: "2" has a internal comment of: "Cisco"
+    Then the following complaint entry with id: "3" has a internal comment of: "Cisco"
+    Then the following complaint entry with id: "1" has a resolution comment of: "Disco"
+    Then the following complaint entry with id: "2" has a resolution comment of: "Disco"
+    Then the following complaint entry with id: "3" has a resolution comment of: "Disco"
+
+  @javascript
+  Scenario: a user attempts to use Update Resolution on a Pending/Completed Complaint Entry, but INVALID and UNCHANGED are disabled from the drop-down menu
+    Given a user with role "webcat user" exists and is logged in
+    And the following complaint entries exist:
+      |id| domain   | uri            | status    | resolution | entry_type |
+      |1 | blah.com | blah.com       | PENDING   | FIXED      | URI/DOMAIN |
+      |2 | food.com | food.com       | COMPLETED | FIXED      | URI/DOMAIN |
+    When I goto "/escalations/webcat/complaints"
+    And I wait for "2" seconds
+    And I click "#complaints_check_box"
+    And I click "#index_update_resolution"
+    And I wait for "4" seconds
+    Then the "Unchanged" option from "complaint_resolution" is disabled
+    Then the "Invalid" option from "complaint_resolution" is disabled
+    Then the "Reopened" option from "complaint_resolution" is not disabled
+
+  @javascript
+  Scenario: a user uses the Update Resolution feature on an important entry
+    Given a user with role "webcat user" exists and is logged in
+    And the following complaint entries exist:
+      |id| domain            | is_important | status |
+      |1 | blah.com          |      1       | NEW    |
+      |2 | food.com          |      0       | NEW    |
+      |3 | im.hungry.com     |      0       | NEW    |
+    When I goto "/escalations/webcat/complaints"
+    And I click "#complaints_check_box"
+    And I click "#index_update_resolution"
+    And I select "Invalid" from "complaint_resolution"
+    And I click "#button_update_resolution"
+    And I wait for "2" seconds
+    Then I should see "Set the following 3 entries to RESOLUTION INVALID."
+    When I click "#submit_resolution_changes"
+    And I wait for "1" seconds
+    Then the following complaint entry with id: "1" has a resolution of: "INVALID"
+    Then the following complaint entry with id: "1" has a status of: "PENDING"
+    Then the following complaint entry with id: "2" has a resolution of: "INVALID"
+    Then the following complaint entry with id: "2" has a status of: "COMPLETED"
+    Then the following complaint entry with id: "3" has a resolution of: "INVALID"
+    Then the following complaint entry with id: "3" has a status of: "COMPLETED"
+
+  @javascript
+  Scenario: a user uses the Update Resolution feature to reopen a completed ComplaintEntry
+    Given a user with role "webcat user" exists and is logged in
+    And the following complaint entries exist:
+      |id| domain            | status    |
+      |1 | blah.com          | COMPLETED |
+      |2 | food.com          | COMPLETED |
+      |3 | im.hungry.com     | NEW       |
+    When I goto "/escalations/webcat/complaints"
+    And I click "#complaints_check_box"
+    And I click "#index_update_resolution"
+    And I select "Reopened" from "complaint_resolution"
+    And I click "#button_update_resolution"
+    And I wait for "5" seconds
+    Then I should see "Set the following 2 entries to RESOLUTION REOPENED"
+    When I click "#submit_resolution_changes"
+    And I wait for "1" seconds
+    Then the following complaint entry with id: "1" has a status of: "REOPENED"
+    Then the following complaint entry with id: "2" has a status of: "REOPENED"
+    Then the following complaint entry with id: "3" has a status of: "NEW"
+
+  @javascript
+  Scenario: a user can show/hide columns in the webcat/complaints view
+    Given a user with role "webcat user" exists and is logged in
+    And the following disputes exist and have entries:
+      | id | submitter_type |
+      | 1  | CUSTOMER       |
+    Then I goto "escalations/webcat/complaints"
+    Then I wait for "2" seconds
+    When I click "#webcat-index-table-show-columns-button"
+    And I click ".primary-checkbox"
+    Then I should not see table header with id "primary"
+    And I click ".primary-checkbox"
+    Then I should see table header with id "primary"
+    And I click ".assignee-checkbox"
+    Then I should not see table header with id "assignee"
+    And I click ".assignee-checkbox"
+    Then I should see table header with id "assignee"
+    And I click ".submittertype-checkbox"
+    Then I should not see table header with id "submittertype"
+    And I click ".submittertype-checkbox"
+    Then I should see table header with id "submittertype"
+
+  @javascript
+  Scenario: a user can ensure show/hide column states are saved in the database after a page reload
+    Given a user with role "webcat user" exists and is logged in
+    And the following disputes exist and have entries:
+      | id | submitter_type |
+      | 1  | CUSTOMER       |
+    Then I goto "escalations/webcat/complaints"
+    And I wait for "2" seconds
+    And I click "#webcat-index-table-show-columns-button"
+    And I should see the ".subdomain-checkbox" checkbox checked
+    And I should see the ".assignee-checkbox" checkbox checked
+    And I click ".subdomain-checkbox"
+    And I click ".assignee-checkbox"
+    Then I should not see table header with id "subdomain"
+    Then I should not see table header with id "assignee"
+    Then I should see table header with id "tags"
+    Then I should see table header with id "path"
+    And I goto "escalations/webcat/complaints"
+    And I wait for "2" seconds
+    Then I should not see table header with id "subdomain"
+    Then I should not see table header with id "assignee"
+    Then I should see table header with id "tags"
+    Then I should see table header with id "path"

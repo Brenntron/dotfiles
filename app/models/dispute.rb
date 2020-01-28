@@ -539,17 +539,20 @@ class Dispute < ApplicationRecord
           logger.info "fetching preload"
           ::Preloader::Base.fetch_all_api_data(key, new_dispute_entry.id)
 
-          case
-          when !false_negative_claim
-            new_dispute_entry.status = DisputeEntry::NEW
-          else
-            email_resolved = false
 
-            if new_dispute.submitter_type == "NON-CUSTOMER"
-              email_resolved = AutoResolve.auto_resolve_email(new_dispute_entry, total_hits)
-            end
+          matching_disposition = new_dispute_entry.is_disposition_matching?
 
-            if email_resolved == false
+          if !matching_disposition
+
+            if !false_negative_claim
+              new_dispute_entry.status = DisputeEntry::NEW
+
+              if new_dispute.submitter_type == "NON-CUSTOMER"
+                AutoResolve.auto_resolve_email(new_dispute_entry, total_hits)
+              end
+
+            else
+
               auto_resolve_verdict = new_dispute_entry.assign_from_auto_resolve(address: key,
                                                                                 total_hits: total_hits,
                                                                                 resolved_at: resolved_at,
@@ -559,10 +562,11 @@ class Dispute < ApplicationRecord
                 verdicts_to_blacklist << [auto_resolve_verdict, new_dispute_entry]
               end
 
-            end
-          end
 
-          new_dispute_entry.save!
+            end
+            new_dispute_entry.save!
+
+          end
 
           #this is for return back to TI to populate its ticket show pages
           return_payload[key] = new_dispute_entry.new_payload_item
@@ -597,6 +601,7 @@ class Dispute < ApplicationRecord
           #grab xbrs, reptool stuff, wl/bl entries, virustotal
           #
 
+
           false_negative_claim = false
 
           if ["Suspicious sites", "High risk","Poor"].include?(entry["rep_sugg"])
@@ -626,27 +631,29 @@ class Dispute < ApplicationRecord
 
           new_dispute_entry.save!
 
+          matching_disposition = new_dispute_entry.is_disposition_matching?
+
           logger.info "fetching preload"
           ::Preloader::Base.fetch_all_api_data(key, new_dispute_entry.id)
 
-          case
-          when !false_negative_claim
-            new_dispute_entry.update(status: DisputeEntry::NEW)
-          else
 
-            auto_resolve_verdict = new_dispute_entry.assign_from_auto_resolve(address: key,
-                                                                              total_hits: total_hits,
-                                                                              resolved_at: resolved_at,
-                                                                              dispute_entry: new_dispute_entry)
+          if !matching_disposition
+            if !false_negative_claim
+              new_dispute_entry.update(status: DisputeEntry::NEW)
+            else
+              auto_resolve_verdict = new_dispute_entry.assign_from_auto_resolve(address: key,
+                                                                                total_hits: total_hits,
+                                                                                resolved_at: resolved_at,
+                                                                                dispute_entry: new_dispute_entry)
 
-            if auto_resolve_verdict.resolved? && auto_resolve_verdict.malicious?
-              verdicts_to_blacklist << [auto_resolve_verdict, new_dispute_entry]
+              if auto_resolve_verdict.resolved? && auto_resolve_verdict.malicious?
+                verdicts_to_blacklist << [auto_resolve_verdict, new_dispute_entry]
+              end
             end
 
+            new_dispute_entry.save!
 
           end
-
-          new_dispute_entry.save!
 
           return_payload[key] = new_dispute_entry.new_payload_item
           return_payload[key]['sugg_type'] = new_dispute_entry.suggested_disposition

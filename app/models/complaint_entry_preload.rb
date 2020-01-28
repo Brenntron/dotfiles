@@ -11,7 +11,7 @@ class ComplaintEntryPreload < ApplicationRecord
       begin
         current_category_information ||= complaint_entry.current_category_data
         break
-      rescue
+      rescue Wbrs::WbrsError
         counter = counter + 1
       end
     end

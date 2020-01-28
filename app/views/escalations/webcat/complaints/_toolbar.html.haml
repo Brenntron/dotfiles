@@ -1,11 +1,47 @@
 .toolbar#webcat-index-toolbar
   %div
     %label.toolbar-section-label
+      View
+    %span.dropdown
+      %button#webcat-index-table-show-columns-button.toolbar-button.show-col-button.dropdown-toggle.esc-tooltipped{title: 'Show/Hide Columns', 'data-toggle': 'dropdown', 'aria-haspopup': 'true', 'aria-expanded': 'false'}
+        %span.toolbar-button-text
+          Show/Hide Columns
+      .dropdown-menu.toolbar-dropdown#webcat-index-table-show-columns-dropdown{'aria-labelledby': 'webcat-index-table-show-columns-button'}
+        %ul
+          %li.toggle-vis-webcat{'data-column':'3'}
+            %input.age-checkbox{type: 'checkbox', checked: true, id: 'age-checkbox'} Age
+          %li.toggle-vis-webcat{'data-column':'4'}
+            %input.status-checkbox{type: 'checkbox', checked: true, id: 'status-checkbox'} Status
+          %li.toggle-vis-webcat{'data-column':'5'}
+            %input.tags-checkbox{type: 'checkbox', checked: true, id: 'tags-checkbox'} Tags
+          %li.toggle-vis-webcat{'data-column':'6'}
+            %input.subdomain-checkbox{type: 'checkbox', checked: true, id: 'subdomain-checkbox'} Subdomain
+          %li.toggle-vis-webcat{'data-column':'7'}
+            %input.domain-checkbox{type: 'checkbox', checked: true, id: 'domain-checkbox'} Domain / IP
+          %li.toggle-vis-webcat{'data-column':'8'}
+            %input.path-checkbox{type: 'checkbox', checked: true, id: 'path-checkbox'} Path
+
+        %ul
+          %li.toggle-vis-webcat{'data-column':'9'}
+            %input.primary-checkbox{type: 'checkbox', checked: true, id: 'primary-checkbox'} Primary Cat
+          %li.toggle-vis-webcat{'data-column':'10'}
+            %input.suggested-checkbox{type: 'checkbox', checked: true, id: 'suggested-checkbox' } Suggested Cat
+          %li.toggle-vis-webcat{'data-column':'11'}
+            %input.wbrs-checkbox{type: 'checkbox', checked: true, id: 'wbrs-checkbox'} WBRS
+          %li.toggle-vis-webcat{'data-column':'12'}
+            %input.submittertype-checkbox{type: 'checkbox', checked: true, id: 'submittertype-checkbox'} Submitter Type
+          %li.toggle-vis-webcat{'data-column':'13'}
+            %input.submitterorg-checkbox{type: 'checkbox', checked: true, id: 'submitterorg-checkbox'} Submitter Org
+          %li.toggle-vis-webcat{'data-column':'14'}
+            %input.assignee-checkbox{type: 'checkbox', checked: true, id: 'assignee-checkbox'} Assignee
+
+  %div
+    %label.toolbar-section-label
       Open in New Tab
     %button.toolbar-button.open-selected.esc-tooltipped.toolbar-button-spacer{onclick: 'open_selected()', type: 'button', title: 'Open Selected'}
-      %span.toolbar-button-text Open Selected
+      %span.toolbar-button-text Selected
     %button.toolbar-button.open-all.esc-tooltipped{onclick: 'open_all()', type: 'button', title: 'Open All'}
-      %span.toolbar-button-text Open All
+      %span.toolbar-button-text.text-button-all All
   %div
     %label.toolbar-section-label
       Edit
@@ -15,25 +51,44 @@
       %span.toolbar-button-text Return
   %div
     %label.toolbar-section-label
-      View Nested Data
+      Collapse
     %button.toolbar-button.collapse-button.esc-tooltipped.toolbar-button-spacer{onclick: 'collapse_selected()', type: 'button', title: 'Collapse Selected'}
-      %span.toolbar-button-text Collapse Selected
+      %span.toolbar-button-text Selected
     %button.toolbar-button.collapse-all.esc-tooltipped.toolbar-button-spacer{onclick: 'collapse_all()', type: 'button', title: 'Collapse All'}
-      %span.toolbar-button-text Collapse All
-    %button.toolbar-button.expand-row-button.esc-tooltipped.toolbar-button-spacer{onclick: 'expand_selected()', type: 'button', title: 'Expand Selected'}
-      %span.toolbar-button-text Expand Selected
-    %button.toolbar-button.expand-all.esc-tooltipped{type: 'button', title: 'Expand All'}
-      %span.toolbar-button-text Expand All
+      %span.toolbar-button-text.text-button-all All
   %div
-    %label.toolbar-section-label Data
+    %label.toolbar-section-label
+      Expand
+    %button.toolbar-button.expand-row-button.esc-tooltipped.toolbar-button-spacer{onclick: 'expand_selected()', type: 'button', title: 'Expand Selected'}
+      %span.toolbar-button-text Selected
+    %button.toolbar-button.expand-all.esc-tooltipped{type: 'button', title: 'Expand All'}
+      %span.toolbar-button-text.text-button-all All
+  %div
+    %label.toolbar-section-label Fetch Data
     %button.toolbar-button.sync-button#fetch.esc-tooltipped.toolbar-button-spacer{ onclick: 'fetch_complaints();', title: 'Fetch Complaints'}
-      %span.toolbar-button-text Fetch Complaints
+      %span.toolbar-button-text Complaints
     %button.toolbar-button.sync-button#fetch_wbnp.esc-tooltipped{ onclick: 'fetch_wbnp_data();', title: 'Fetch WBNP Data'}
-      %span.toolbar-button-text Fetch WBNP Data
+      %span.toolbar-button-text WBNP Data
   %div
     %label.toolbar-section-label Bulk
-    %button.toolbar-button.master-submit-button#master-submit.esc-tooltipped{ onclick: 'master_submit();', title: 'Submit Changes', disabled: true}
+    %button.toolbar-button.master-submit-button#master-submit.esc-tooltipped.toolbar-button-spacer{ onclick: 'master_submit();', title: 'Submit Changes', disabled: true}
       %span.toolbar-button-text Submit Changes
+    %span.dropdown
+      %button#index_update_resolution.toolbar-button.resolution-submit-button.dropdown-toggle.esc-tooltipped{title: 'Submit Resolution', 'data-toggle': 'dropdown', 'aria-haspopup': 'true', 'aria-expanded': 'false', disabled: true}
+        %span.toolbar-button-text
+          Submit Resolution
+      .dropdown-menu.toolbar-dropdown#index-change-assign-dropdown{'aria-labelledby': 'index_update_resolution'}
+        .edit-resolution-container
+          %label.toolbar-section-label.edit-resolution-label{for:'complaint[resolution]'} Resolution
+          = select(:complaint, :resolution, options_for_select([["Unchanged", "UNCHANGED"], ["Invalid", "INVALID"], ["Reopened", "REOPENED"]]))
+          .comment-wrapper.internal_comment_container
+            %label.toolbar-section-label{'for':'internal_comment'} Internal Comment
+            %input.form-control#internal_comment{:name => "internal_comment", :placeholder => "Add a comment.", :type => "text", :value => ""}
+          .comment-wrapper.customer_facing_comment_container
+            %label.toolbar-section-label{'for':'customer_facing_comment'} Customer Facing Comment
+            %input.form-control#customer_facing_comment{:name => "customer_facing_comment", :placeholder => "Add a comment for the customer.", :type => "text", :value => ""}
+          %button{class: 'primary', type:'button', id: 'button_update_resolution', onclick:'updateResolutionDialog();'}
+            Update
   %div
     %label.toolbar-section-label
       Pin Toolbar
