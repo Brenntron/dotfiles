@@ -873,12 +873,12 @@ class DisputeEntry < ApplicationRecord
       wbrs_rule_hits.each do |rule_hit|
         DisputeRuleHit.create(rule_type:'WBRS', name: rule_hit, dispute_entry_id: dispute_entry.id, is_multi_ip_rulehit: true)
       end
+
+      dispute_entry.score = wbrs_score
+      dispute_entry.web_ips = ip_addresses
+      dispute_entry.save
+
     end
-
-    dispute_entry.score = wbrs_score
-    dispute_entry.web_ips = ip_addresses
-    dispute_entry.save
-
 
     result[:rulehits] = wbrs_rule_hits
     result[:score] = wbrs_score
