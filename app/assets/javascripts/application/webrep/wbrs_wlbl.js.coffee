@@ -229,13 +229,13 @@ window.bulk_order_rows = () ->
       # for the bulk dropdowns on bfrp, ensure unique classes in dropdown, bfrp bulk dd'S
       curr_entry_id = curr_entry_id.replace('-result-','-dd-result-')
 
-    # fyi: bugfix for comparing the http/non-http versions of these urls/domains
+    # comparing the http/non-http versions of these urls/domains
     $(curr_dd).find('.wlbl-entry-content').each ->
       curr_text = $(this).text().trim()
       if ip_uri.includes(curr_text)
         $(this).closest('tr').attr('data-order-id', i)  # add row-id to the right
 
-        # ENSURE YOU ALWAYS ADDING A UNIQUE -DD- CLASS-ID EACH TIME TO BULK DROPDOWN
+        # ensure always adding a unique -dd- class-id each time to bulk dropdown
         $(this).closest('tr').find('td.wlbl-entry-wlbl').attr('class','wlbl-entry-wlbl').addClass(curr_entry_id)
 
   table_dd = $(curr_dd).find('tbody')
@@ -248,7 +248,11 @@ window.bulk_order_rows = () ->
     x - y
   $(rows).each (i, row) -> table_dd.append(row)
 
-
+  # bfrp > after sorted, for each entry add a numerical "bfrp-dd-result-0" for tests
+  $(curr_dd).find('.wlbl-entry-wlbl').each (i) ->
+    # wlbl-entry-id-1 for show page, bfrp-dd-result-0 for research page for existing iteration conventions
+    $(this).attr("class","wlbl-entry-wlbl wlbl-entry-id-#{i+1} bfrp-dd-result-#{i}")
+    $(this).parent().removeAttr('data-order-id')
 
 
 
