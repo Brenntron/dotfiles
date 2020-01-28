@@ -880,6 +880,18 @@ module API
 
             end
 
+            desc 'valid url?'
+
+            params do
+              requires :uri, type: String
+            end
+            #this needs to start with 'http' or 'https'
+            get 'is_valid_url' do
+              url = permitted_params[:uri]
+
+              {:status => "success", :data => DisputeEntry.valid_url?(url)}
+            end
+
           end
         end
       end
