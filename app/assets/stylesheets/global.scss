@@ -4644,7 +4644,7 @@ table > tbody > tr > td.dispute_rep_tools {
 .dispute_rep_tools_wrapper {
   position: absolute;
   width: 90px;
-  margin-left: -90px;
+  right: 12px;
   margin-top: 7px;
 }
 
@@ -10663,3 +10663,6 @@ table > tbody > tr > td.no-padding {
 }
 
 
+.research-page-ip-query-details {
+  display: none;
+}

@@ -804,7 +804,7 @@ class DisputeEntry < ApplicationRecord
             wbrs_stuff_ip = Sbrs::Base.remote_call_sds_v3(ip_addr, "wbrs")
             wbrs_stuff_rulehits = wbrs_stuff_rulehits + (Sbrs::ManualSbrs.get_rule_names_from_rulehits(wbrs_stuff_ip) rescue [])
             wbrs_stuff_rulehits = wbrs_stuff_rulehits.uniq
-            entry.ip_address = ip_addr
+            entry.web_ips = ip_addr
           end
 
           entry.wbrs_score = wbrs_stuff["wbrs"]["score"]

@@ -537,54 +537,61 @@
                             %td.text-center
                               = entry.umbrellaresult
 
+                  - if entry.uri?
+                    -#If entry is uri and has a resolved host ip
+                    %tr.research-uri-ip-query-row
+                      %td{rowspan: '2'}
+                        -#Expander area
+                      %td.input-col.ip-label-col{rowspan: '2'}
+                        -# IP label
+                      %td.dual-edit-field{colspan: '5', 'data-id': entry.id, 'data-field': 'host-ip'}
+                        %span.entry-resolved-ip-content
+                          = entry.web_ips
+                        %input.table-ip-input{type:'text', value: "#{entry.web_ips}"}
+                      %td.text-right.no-padding-right{colspan: '3'}
+                        %button.edit-button.inline-edit-ip-button.esc-tooltipped{title: 'Edit IP Addresses'}
+                          Edit IP Addresses
+                        %button.save-button.inline-save-ip-button.esc-tooltipped{title: 'Query IP Addresses'}
+                          Query IP Addresses
+                        %button.cancel-button.inline-cancel-ip-button.esc-tooltipped{title: 'Cancel IP Addresses'}
 
-                  -# If entry is uri and has a resolved host ip
-                  -#%tr.research-uri-ip-query-row
-                  -#  %td{rowspan: '2'}
-                  -#    -#Expander area
-                  -#  %td.input-col.ip-label-col{rowspan: '2'}
-                  -#    -# IP label
-                  -#  %td.dual-edit-field{colspan: '7', 'data-id': entry.id, 'data-field': 'host-ip'}
-                  -#    %span.entry-data.entry-resolved-ip-content
-                  -#      -# if ip/s are already associated with url, display here
-                  -#      Ips go here
-                  -#    %input.table-entry-input.wide{type:'text', value: "Ip goes here"}
-                  -#
-                  -#%tr.research-uri-ip-data-row
-                  -#  %td.research-table-details-wrapper{colspan: '8'}
-                  -#    %table
-                  -#      %tr.single-details-row
-                  -#        %td
-                  -#          %label WBRS
-                  -#        %td.text-center.no-border.uri-ip-wbrs-score
-                  -#          -#  if entry + ip has wbrs score show here
-                  -#          -#  else
-                  -#          -#    %span.missing-data
-                  -#          -#      No score.
-                  -#        %td
-                  -#          %label WBRS Rule Hits
-                  -#        %td.text-center.uri-ip-wbrs-rule-total
-                  -#          -#  if entry + ip has wbrs rules show count here
-                  -#          -#  else
-                  -#          -#  0
-                  -#        %td
-                  -#          %label WBRS Rules
-                  -#        %td.uri-ip-wbrs-rules
-                  -#          -#  if entry + ip has wbrs rules show here
-                  -#          -#  else
-                  -#          -#  %span.missing-data
-                  -#          -#    No rules.
-                  -#        %td
-                  -#          %label Category
-                  -#        %td.uri-ip-category
-                  -#          -#  if entry + ip has category show here
-                  -#          -#  else
-                  -#          -#  %span.missing-data
-                  -#          -#    Missing Data
-                  -#        %td.uri-ip-proxy
-                  -#          %label URI
-                  -#        %td
-                  -#          -#  if entry + ip has url proxy thing show here
+                    %tr.research-uri-ip-data-row.research-page-ip-query-details
+                      %td.research-table-details-wrapper{colspan: '8'}
+                        %table
+                          %tr.single-details-row
+                            %td
+                              %label WBRS
+                            %td.text-center.no-border.uri-ip-wbrs-score
+                              -#- unless wbrs_stuff_ip['wbrs'].nil?
+                              -#  = wbrs_stuff_ip['wbrs']
+                              -#  if entry + ip has wbrs score show here
+                              -#  else
+                              -#    %span.missing-data
+                              -#      No score.
+                            %td
+                              %label WBRS Rule Hits
+                            %td.text-center.uri-ip-wbrs-rule-total
+                              -#  if entry + ip has wbrs rules show count here
+                              -#  else
+                              -#  0
+                            %td
+                              %label WBRS Rules
+                            %td.uri-ip-wbrs-rules
+                              -#  if entry + ip has wbrs rules show here
+                              -#  else
+                              -#  %span.missing-data
+                              -#    No rules.
+                            %td
+                              %label Category
+                            %td.uri-ip-category
+                              -#  if entry + ip has category show here
+                              -#  else
+                              -#  %span.missing-data
+                              -#    Missing Data
+                            %td.uri-ip-proxy
+                              %label URI
+                            %td
+                              -#  if entry + ip has url proxy thing show here
 
 
 
