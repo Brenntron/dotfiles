@@ -211,6 +211,45 @@ module API
                 {:status => "success", :data => disputes, :assignee => assignee}.to_json
               end
             end
+
+            params do
+              requires :sha256_hash, type: String
+              requires :service, type: String
+              optional :refresh_magic, type: String
+            end
+
+            post 'submit_for_evaluation' do
+              std_api_v2 do
+                authorize!(:update, FileReputationDispute)
+
+                FileReputationDispute.submit_for_evaluation(permitted_params[:sha256_hash], permitted_params[:service], permitted_params[:refresh_magic])
+
+                {:status => "success"}.to_json
+
+              end
+            end
+
+            params do
+              requires :sha256_hash, type: String
+            end
+
+            post 'get_tg_status' do
+              std_api_v2 do
+                result = Threatgrid::Search.data(permitted_params[:sha256_hash])
+
+                status = "complete"
+                begin
+                  if result["data"]["items"].first["item"]["state"] != "succ"
+                    status = "incomplete"
+                  end
+                rescue
+                  status = "norunning"
+                end
+
+                {:status => status}.to_json
+
+              end
+            end
           end
         end
       end

@@ -141,7 +141,8 @@ module API
                 params["data"].each do |item, prefix|
                   if prefix["url"].present?
                     Complaint.commit_without_complaint(ip_or_uri: prefix["url"],
-                                                       categories_string: prefix["cats"].join(','),
+                                                       category_ids_string: prefix["category_ids"].join(','),
+                                                       category_names_string: prefix["category_names"].join(','),
                                                        description: '',
                                                        user: current_user.email,
                                                        bugzilla_rest_session: bugzilla_rest_session)
@@ -154,13 +155,15 @@ module API
             desc 'categorize multiple urls without complaint'
             params do
               requires :urls, type: Array[String], desc: "URLS for categorization"
-              requires :cats, type: Array[String], desc: "Categories to apply"
+              requires :category_names, type: Array[String], desc: "Categories to apply to WBRS"
+              requires :category_ids, type: Array[String], desc: "Categories to apply to complaint entry"
             end
             post 'multi_cat_new_url' do
               std_api_v2 do
                 permitted_params['urls'].each do |prefix|
                   Complaint.commit_without_complaint(ip_or_uri: prefix,
-                                                     categories_string: permitted_params["cats"].join(','),
+                                                     category_ids_string: permitted_params["category_ids"].join(','),
+                                                     category_names_string: permitted_params["category_names"].join(','),
                                                      description: '',
                                                      user: current_user.email,
                                                      bugzilla_rest_session: bugzilla_rest_session)

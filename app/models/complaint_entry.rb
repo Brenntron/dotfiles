@@ -126,6 +126,26 @@ class ComplaintEntry < ApplicationRecord
     uri.present? ? uri : ip_address
   end
 
+  # Returns the Wbrs::Prefix objects.
+  # Object may be cached.
+  # @param [String] prefix_given please give us the prefix to use, or we'll use the domain or ip_address field.
+  # @param [Boolean] reload set to true to get an up to date call to the API.
+  # @return [Array[Wbrs::Prefix]] the object for the Prefix remote stub.
+  def remote_prefixes(prefix_given: self.hostlookup, reload: false)
+    @remote_prefixes = nil if reload
+    @remote_prefixes ||= Wbrs::Prefix.where({:urls => [URI.escape(prefix_given)]})
+  end
+
+  # Returns the Wbrs::Prefix object called on domain_of_with_path
+  # Object may be cached.
+  # @param [String] prefix_given please give us the prefix to use, or we'll use the domain or ip_address field.
+  # @param [Boolean] reload set to true to get an up to date call to the API.
+  # @return [Array[Wbrs::Prefix]] the object for the Prefix remote stub.
+  def remote_prefixes_with_path(prefix_given: self.hostlookup, reload: false)
+    @remote_prefixes_with_path = nil if reload
+    @remote_prefixes_with_path ||= Wbrs::Prefix.where({:urls => [DisputeEntry.domain_of_with_path(prefix_given)]})
+  end
+
   def change_category(prefix,
                       categories_string,
                       category_names_string,
@@ -143,6 +163,7 @@ class ComplaintEntry < ApplicationRecord
 
             current_status = "COMPLETED"
             self.case_assigned_at ||= Time.now
+            # TODO categories_string is list of ids, but db uses list of names which is in category_names_string
             update!(status:current_status,
                    category: categories_string,
                    internal_comment: comment,
@@ -151,15 +172,21 @@ class ComplaintEntry < ApplicationRecord
                    user:current_user)
             complaint.set_status(current_status)
             #this is where we should send off the category to the API
-            if self.resolution != STATUS_RESOLVED_FIXED_INVALID && !categories_string.blank?
-              commit_category(ip_or_uri: prefix,
+            if self.resolution != STATUS_RESOLVED_FIXED_INVALID && categories_string.present?
+              existing_prefixes = remote_prefixes(prefix_given: prefix)
+              commit_category(existing_prefixes,
+                              ip_or_uri: prefix,
                               categories_string: categories_string,
                               description: comment,
                               user: current_user.email,
                               casenumber: self.complaint.id)
+              update!(url_primary_category: category_names_string, category: category_names_string)
+            else
+              # TODO Do we need to update the record when we are not making a change?
+              existing_prefixes = remote_prefixes(prefix_given: prefix)
+              cat_from_wbrs = self.set_current_category_from_prefix(existing_prefixes)
+              update!(url_primary_category: cat_from_wbrs, category: cat_from_wbrs)
             end
-            cat_from_wbrs = self.set_current_category
-            update!(url_primary_category: cat_from_wbrs, category: cat_from_wbrs)
           else
             # dismiss from pending of important case
             current_status = "ASSIGNED"
@@ -184,6 +211,7 @@ class ComplaintEntry < ApplicationRecord
         # not important case or resolution is "unchanged"
         current_status = "COMPLETED"
         self.case_assigned_at ||= Time.now
+        # TODO categories_string is list of ids, but db uses list of names which is in category_names_string
         update!(resolution: entry_status,
                url_primary_category: categories_string,
                category: categories_string,
@@ -193,15 +221,21 @@ class ComplaintEntry < ApplicationRecord
                case_resolved_at: Time.now,user:current_user)
         complaint.set_status(current_status)
         #this is where we should send off the category to the API
-        if ![STATUS_RESOLVED_FIXED_INVALID,STATUS_RESOLVED_FIXED_UNCHANGED].include?(entry_status) && !categories_string.blank?
-          commit_category(ip_or_uri: prefix,
+        if ![STATUS_RESOLVED_FIXED_INVALID,STATUS_RESOLVED_FIXED_UNCHANGED].include?(entry_status) && categories_string.present?
+          existing_prefixes = remote_prefixes(prefix_given: prefix)
+          commit_category(existing_prefixes,
+                          ip_or_uri: prefix,
                           categories_string: categories_string,
                           description: comment,
                           user: current_user.email,
                           casenumber: self.complaint.id )
+          update!(url_primary_category: category_names_string, category: category_names_string)
+        else
+          # TODO Do we need to update the record when we are not making a change?
+          existing_prefixes = remote_prefixes(prefix_given: prefix)
+          cat_from_wbrs = self.set_current_category_from_prefix(existing_prefixes)
+          update!(url_primary_category: cat_from_wbrs, category: cat_from_wbrs)
         end
-        cat_from_wbrs = self.set_current_category
-        update!(url_primary_category: cat_from_wbrs, category: cat_from_wbrs)
       end
       if self.status == "COMPLETED" && self.complaint_entry_screenshot.present?
         self.complaint_entry_screenshot.destroy
@@ -210,12 +244,11 @@ class ComplaintEntry < ApplicationRecord
 
   end
 
-  def commit_category(ip_or_uri:, categories_string:, description:, user:, casenumber: nil)
+  def commit_category(existing_prefixes, ip_or_uri:, categories_string:, description:, user:, casenumber: nil)
     # Look for existing prefix
     is_ip_address = !!(ip_or_uri  =~ Resolv::IPv4::Regex)
 
     url_parts = Complaint.parse_url(ip_or_uri)
-    existing_prefixes = Wbrs::Prefix.where({urls: [ip_or_uri]})
     existing_prefix = nil
     if existing_prefixes.present? && !is_ip_address
       existing_prefixes.each do |prefix_found|
@@ -693,27 +726,22 @@ class ComplaintEntry < ApplicationRecord
   ####RULEUI RULEAPI METHODS
   #
 
-  def set_current_category
-    category_list = []
-    prefix_results = Wbrs::Prefix.where({:urls => [URI.escape(self.hostlookup)]})
+  # Assigns self.category field to list of categories (descr field) from WBRS.
+  # @return [String] Comma separated list of category descr fields.
+  def set_current_category_from_prefix(prefix_results)
     if prefix_results
       if prefix_results.first&.is_active == 1
 
-        categories = prefix_results.find_all {|result| result.path == self.path}
-        categories.each do |cat|
-          if cat.subdomain == self.subdomain
-            category_list << Wbrs::Category.find(cat.category_id).descr
-          end
-        end
+        qualified_prefixes =
+            prefix_results.find_all {|result| result.path == self.path && cat.subdomain == self.subdomain}
+        category_names = Wbrs::Prefix.category_names(qualified_prefixes)
 
-        self.url_primary_category = category_list.uniq.join(',')
-        self.category = category_list.uniq.join(',')
-      else
-        categories = nil
+        self.url_primary_category = category_names
+        self.category = category_names
       end
     end
 
-    category_list.uniq.join(',')
+    self.category
   rescue => except
 
     Rails.logger.warn "Populating categories from Wbrs failed."
@@ -721,6 +749,10 @@ class ComplaintEntry < ApplicationRecord
     Rails.logger.warn except.backtrace.join("\n")
 
     ''
+  end
+
+  def set_current_category
+    set_current_category_from_prefix(Wbrs::Prefix.where({:urls => [URI.escape(self.hostlookup)]}))
   end
 
   def self.get_category_data(uri)
@@ -749,7 +781,7 @@ class ComplaintEntry < ApplicationRecord
   end
 
   def get_category_names_from_master
-    prefix_results = Wbrs::Prefix.where({:urls => [self.domain]})
+    prefix_results = remote_prefixes    # Should use self.domain
 
     if self.entry_type == 'URI/DOMAIN'
       parsed_uri = Complaint.parse_url(uri)
@@ -759,19 +791,18 @@ class ComplaintEntry < ApplicationRecord
       parsed_uri['path'] = '' unless parsed_uri['path'].present?
       parsed_uri['subdomain'] = '' unless parsed_uri['subdomain'].present?
 
-      categories = []
-
-      prefix_results.each do |prefix_result|
-        if ((prefix_result.subdomain == parsed_uri['subdomain']) || (parsed_uri['subdomain'] == 'www')) && prefix_result.path == parsed_uri['path']
-          categories << prefix_result
-        end
+      qualified_prefixes = prefix_results.find_all do
+        ((prefix_result.subdomain == parsed_uri['subdomain']) || (parsed_uri['subdomain'] == 'www')) && prefix_result.path == parsed_uri['path']
       end
 
-      if categories.any?
-        categories = categories.first.categories.map {|category| category.descr}
-      end
+      category_names =
+          if qualified_prefixes.any?
+            Wbrs::Prefix.category_names(qualified_prefixes)
+          else
+            []
+          end
 
-      categories
+      category_names
     elsif self.entry_type == 'IP'
       raise ("Cannot inherit categories for IP entries.")
     end
@@ -779,22 +810,18 @@ class ComplaintEntry < ApplicationRecord
 
   def current_category_data
 
-    prefix_results = Wbrs::Prefix.where({:urls => [DisputeEntry.domain_of_with_path(self.hostlookup)]})
+    prefix_results = remote_prefixes_with_path
     return {} unless prefix_results
     domain_of = DisputeEntry.domain_of_with_path(self.hostlookup)
     certainty_on_urls = Wbrs::Prefix.get_certainty_sources_for_urls([domain_of])
 
-    final_results = []
-    categories = prefix_results.find_all {|result| result.path == self.path}
-    categories.each do |cat|
-      if (cat.subdomain == self.subdomain) || (self.subdomain == 'www')
-        final_results << cat
-      end
+    qualified_prefixes = prefix_results.find_all do |result|
+      result.path == self.path && ((result.subdomain == self.subdomain) || (self.subdomain == 'www'))
     end
 
     final_current_categories = {}
 
-    final_results.each do |result|
+    qualified_prefixes.each do |result|
       current_categories = result.categories
       category_certainty = {}
       certainty_on_urls.each do |cert_url, info|
@@ -882,7 +909,7 @@ class ComplaintEntry < ApplicationRecord
   def historic_category_data
 
     prefix_history = []
-    prefixes = Wbrs::Prefix.where({:urls => [URI.escape(self.hostlookup)]})
+    prefixes = remote_prefixes
     prefixes.each do |prefix|
       if prefix.subdomain == self.subdomain && prefix.path == self.path
         prefix_id = prefix.prefix_id

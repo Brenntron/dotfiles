@@ -7,6 +7,10 @@ window.td_truncate = (str, max, long) ->
 
 $ ->
 
+  # webcat: have top navigation bar scroll with page per user request
+  if $('body').hasClass("escalations--webcat--complaints-controller")
+    $('#nav-banner').addClass('fixed-nav')
+
   $('#web-cat-search #general_search').on 'keyup', (e) ->
     { keyCode } = e
     { webcat_search_type, webcat_search_name, webcat_search_conditions }= localStorage
@@ -130,6 +134,7 @@ $ ->
     persist: false,
     create: false,
     maxItems: 5,
+    closeAfterSelect: true,
     valueField: 'category_id',
     labelField: 'category_name',
     searchField: ['category_name', 'category_code'],
@@ -238,6 +243,21 @@ $ ->
 
   build_complaints_table = () ->
         complaint_table = $('#complaints-index').DataTable(
+          initComplete: ->
+            input = $('.dataTables_filter input').unbind()
+            self = @api()
+
+            $searchButton = $('<button class="dt-button dt-search-button esc-tooltipped" title="Search">').click(->
+              self.search(input.val()).draw()
+              return
+            )
+            $clearButton = $('<button class="dt-button dt-search-clear-button esc-tooltipped" title="Clear">').click(->
+              input.val ''
+              $searchButton.click()
+              return
+            )
+            $('.dataTables_filter').append $clearButton, $searchButton
+            return
           lengthMenu: [[25, 50, 100, 150, 200], [25, 50, 100, 150, 200]]
           processing: true
           serverSide: true
@@ -260,8 +280,9 @@ $ ->
               setTimeout () ->
                 $('#complaints-index').DataTable().page(0).draw( true )
               , 100
+
             if localStorage.webcat_search_name
-              {webcat_search_type, webcat_search_name, webcat_search_conditions } = localStorage
+              { webcat_search_type, webcat_search_name, webcat_search_conditions } = localStorage
               last_tr = $('.webcat-named-search-list .saved-search').last().text()
               ### check variables below
                   text_check makes sure that the last table row doesn't match the named search being saved now
@@ -509,9 +530,12 @@ $ ->
         select: 'style': 'os'
         responsive: true)
 
+
   if $('#complaints-index').length
-    $('#complaints-index_filter input').addClass('table-search-input');
     build_complaints_table()
+    
+    # Make the search prettier
+    $('#complaints-index_filter input').addClass('restricted-table-search-input');
 
     $('#complaints-index tbody').on 'click', ' .nested-complaint-data', ->
       $(this).focus()
@@ -567,3 +591,24 @@ $ ->
 $('#exampleModal').on 'shown.bs.modal', ->
   $('button.toolbar-button.cat-btn').addClass('active')
 
+
+$ ->
+  # webcat > complaints show page, ensure this JS gets called
+  if $('body').hasClass('escalations--webcat--complaints-controller') && $('body').hasClass('show-action')
+    check_wbnp_status()
+
+  # webcat > reports page, show full metrics banner at top, not the streamlined one
+  if $('body').hasClass("escalations--webcat--reports-controller")
+    $('#tooltip-wbnp').empty()
+    $('.complaints-metrics-banner').addClass('hidden')
+    $('.webcat-reports-only').removeClass('hidden')
+
+  # wbnp report status link shows a tooltip table
+  $('.complaints-mgt-area #wbnp-report-status-link').tooltipster
+    theme: [
+      'tooltipster-borderless'
+      'tooltipster-borderless-customized'
+    ]
+    contentCloning: true
+    side: 'bottom'
+    trigger: 'hover'

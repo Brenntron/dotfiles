@@ -95,7 +95,6 @@ Feature: Disputes
 
   @javascript
   Scenario: a user takes a dispute and status is updated to assigned
-    Then pending
     Given a user with role "webrep user" exists with cvs_username, "Cucumber", exists and is logged in
     Given the following users exist
       | id | cvs_username |
@@ -110,7 +109,6 @@ Feature: Disputes
 
   @javascript
   Scenario: a user takes a dispute, returns a dispute, and takes the dispute again
-    Then pending
     Given a user with role "webrep user" exists with cvs_username, "Cucumber", exists and is logged in
     Given the following users exist
       | id | cvs_username |
@@ -171,6 +169,7 @@ Feature: Disputes
   @javascript
   Scenario: a user uses advanced search filter (Submitted Older/Modified Older) and exports to csv
     Given pending
+    # Note that selenium doesn't support viewing response headers as is required by this test, maybe just get rid of it
     Given a user with role "webrep user" exists and is logged in
     And the following disputes exist and have entries:
       | id |
@@ -261,9 +260,9 @@ Feature: Disputes
     And I click "#add-search-items-button"
     And I click "#company-cb"
     And I click "#add-search-criteria"
-    Then I fill in "company-input" with "Bobs Burgers"
+    Then I fill in "company-input" with "Guest"
     Then I click "#submit-advanced-search"
-    And I wait for "5" seconds
+    And I wait for "3" seconds
     And I click "#advanced-search-button"
     Then I wait for "5" seconds
     Then I should see "talosintelligence.com"
@@ -272,20 +271,290 @@ Feature: Disputes
   @javascript
   Scenario: a user tries to export selected dispute entries
     Given pending
+    # Note that selenium doesn't support viewing response headers as is required by this test, maybe just get rid of it
     Given a user with role "webrep user" exists and is logged in
     And the following disputes exist and have entries:
       | id | submission_type |
       | 1  | w               |
     When I goto "escalations/webrep/disputes?f=open"
-    Then take a screenshot
     And I click ".dispute_check_box"
     And I click "Export Selected to CSV"
     Then I wait for "3" seconds
     Then I should receive a file of type "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet"
 
+
+
+
+  ### WBRS WL/BL Dropdown
+
+  @javascript
+  Scenario: a user wants to view the current WBRS lists and score for an entry from the index page
+    Given a user with role "webrep user" exists and is logged in
+    Given the following disputes exist:
+      | id | submission_type |
+      | 1  | w               |
+    Given the following dispute_entries exist:
+      | id | uri                   |
+      | 1  | imadethisurlup.com    |
+    # Adding this step below to ensure the api data is clear
+    And  clean up wlbl and remove all wlbl entries on "imadethisurlup.com"
+    When I goto "escalations/webrep/disputes?f=open"
+    And  I wait for "2" seconds
+    And  I click ".expand-row-button-inline"
+    And  I click ".dispute-entry-checkbox"
+    And  I click "#index-adjust-wlbl"
+    And  I wait for "5" seconds
+    Then I should see "Current WL/BL List"
+    And  I should see "Current WBRS Score"
+    And  I should see "Threat Category"
+    And  I should see "Not on a list"
+    And  I should see "No score"
+
+
+  @javascript
+  Scenario: a user adds an entry to a WBRS list from the index page
+    Given a user with role "webrep user" exists and is logged in
+    Given the following disputes exist:
+      | id | submission_type |
+      | 1  | w               |
+    Given the following dispute_entries exist:
+      | id | uri                |
+      | 1  | imadethisurlup.com |
+    When I goto "escalations/webrep/disputes?f=open"
+    And  I wait for "2" seconds
+    And  I click ".expand-row-button-inline"
+    And  I click ".dispute-entry-checkbox"
+    And  I click "#index-adjust-wlbl"
+    And  I wait for "2" seconds
+    And  I should see "Not on a list"
+    And  I should see "No score"
+    Then I click "#wlbl-add"
+    And  I check checkbox with class "wl-med-checkbox"
+    And  I click "#index-bulk-submit-wbrs"
+    And  I wait for "10" seconds
+    And  I should see "ENTRIES HAVE BEEN UPDATED"
+    And  I click button with class "close"
+    And  I wait for "1" seconds
+#    And  take a screenshot
+    And  I click "#index-adjust-wlbl"
+    And  I wait for "2" seconds
+    And  Element with class "wlbl-entry-wlbl" should have content "WL-med"
+    And  clean up wlbl and remove all wlbl entries on "imadethisurlup.com"
+
+
+  @javascript
+  Scenario: a user removes an entry from a WBRS list from the index page
+  #  after adding it so we're starting with clean data from the api
+    Given a user with role "webrep user" exists and is logged in
+    Given the following disputes exist:
+      | id | submission_type |
+      | 1  | w               |
+    Given the following dispute_entries exist:
+      | id | uri                |
+      | 1  | imadethisurlup.com |
+    When I goto "escalations/webrep/disputes?f=open"
+    And  I wait for "2" seconds
+    And  I click ".expand-row-button-inline"
+    And  I click ".dispute-entry-checkbox"
+    And  I click "#index-adjust-wlbl"
+    And  I wait for "2" seconds
+    And  I should see "Not on a list"
+    Then I click "#wlbl-add"
+    And  I check checkbox with class "wl-med-checkbox"
+    And  I click "#index-bulk-submit-wbrs"
+    And  I wait for "10" seconds
+    And  I should see "ENTRIES HAVE BEEN UPDATED"
+    And  I click button with class "close"
+    And  I wait for "1" seconds
+    And  I click "#index-adjust-wlbl"
+    And  I wait for "2" seconds
+    And  Element with class "wlbl-entry-wlbl" should have content "WL-med"
+    Then I click "#wlbl-remove"
+    And  I check checkbox with class "wl-med-checkbox"
+    And  I click "#index-bulk-submit-wbrs"
+    And  I wait for "10" seconds
+    And  I should see "ENTRIES HAVE BEEN UPDATED"
+    And  I click button with class "close"
+    And  I wait for "1" seconds
+#    And  take a screenshot
+    And  I click "#index-adjust-wlbl"
+    And  I wait for "2" seconds
+    And  I should see "Not on a list"
+    And  I should see "No score"
+    And  Element with class "wlbl-entry-wlbl" should not have content "WL-med"
+    And  clean up wlbl and remove all wlbl entries on "imadethisurlup.com"
+
+
+  @javascript
+  Scenario: a user adds an entry to a WBRS Blacklist from the index page
+    Given a user with role "webrep user" exists and is logged in
+    Given the following disputes exist:
+      | id | submission_type |
+      | 1  | w               |
+    Given the following dispute_entries exist:
+      | id | uri                |
+      | 1  | imadethisurlup.com |
+    When I goto "escalations/webrep/disputes?f=open"
+    And  I wait for "2" seconds
+    And  I click ".expand-row-button-inline"
+    And  I click ".dispute-entry-checkbox"
+    And  I click "#index-adjust-wlbl"
+    And  I wait for "2" seconds
+    And  Element with class "wlbl-entry-wlbl" should not have content "BL-weak"
+    Then I click "#wlbl-add"
+    And  I check checkbox with class "bl-weak-checkbox"
+    And  I wait for "1" seconds
+    And  I should see "Threat Categories"
+    And  I should see "Required for adding to any blacklist."
+    And  I should see "Bogon"
+    And  I should see "Cryptojacking"
+    And  I should see "Phishing"
+    Then I click ".wlbl_thrt_cat_id_8"
+    And  I click "#index-bulk-submit-wbrs"
+    And  I wait for "10" seconds
+    And  I should see "ENTRIES HAVE BEEN UPDATED"
+    Then I click button with class "close"
+    And  I wait for "1" seconds
+    Then I click "#index-adjust-wlbl"
+    And  I wait for "2" seconds
+#    And  take a screenshot
+    And  Element with class "wlbl-entry-wlbl" should have content "BL-weak"
+    And  clean up wlbl and remove all wlbl entries on "imadethisurlup.com"
+
+
+  @javascript
+  Scenario: a user removes an entry from one WBRS list and adds it to another on the dispute show page
+  #  after adding one first so we're starting with clean data
+    Given a user with role "webrep user" exists and is logged in
+    Given the following disputes exist:
+      | id | submission_type |
+      | 1  | w               |
+    Given the following dispute_entries exist:
+      | id | uri                |
+      | 1  | imadethisurlup.com |
+    And  clean up wlbl and remove all wlbl entries on "imadethisurlup.com"
+    When I goto "escalations/webrep/disputes/1"
+    And  I wait for "2" seconds
+    Then I click "#research-tab-link"
+    And  I click "#wlbl_button_1"
+    And  I wait for "5" seconds
+    And  I should see "Not on a list"
+    And  I should see "No score"
+    Then I click "#wl-weak-slider"
+    And  I click "Submit Changes"
+    And  I wait for "5" seconds
+    Then I click button with class "close"
+    And  I wait for "1" seconds
+    And  I click "#wlbl_button_1"
+    And  I wait for "5" seconds
+    And  I should not see "Not on a list"
+    And  Element with class "wlbl-entry-wlbl" should have content "WL-weak"
+    # Now we're actually removing and adding
+    Then I click "#wl-weak-slider"
+    And  I click "#bl-weak-slider"
+    And  I should see "Bogon"
+    And  I should see "Cryptojacking"
+    And  I should see "Phishing"
+    And  I click ".wlbl_thrt_cat_id_8"
+    And  I click "Submit Changes"
+    And  I wait for "5" seconds
+    Then I click button with class "close"
+    And  I wait for "1" seconds
+    And  I click "#wlbl_button_1"
+    And  I wait for "5" seconds
+    And  Element with class "wlbl-entry-wlbl" should have content "BL-weak"
+    And  Element with class "wlbl-entry-wlbl" should not have content "WL-weak"
+    And  clean up wlbl and remove all wlbl entries on "imadethisurlup.com"
+
+
+  @javascript
+  Scenario: a user adds multiple entries to a WBRS list from the dispute show page
+    Given a user with role "webrep user" exists and is logged in
+    Given the following disputes exist:
+      | id | submission_type |
+      | 1  | w               |
+    Given the following dispute_entries exist:
+      | id | uri                |
+      | 1  | imadethisurlup.com |
+      | 2  | thisurlisfake.com  |
+    And  clean up wlbl and remove all wlbl entries on "imadethisurlup.com"
+    And  clean up wlbl and remove all wlbl entries on "thisurlisfake.com"
+    When I goto "escalations/webrep/disputes/1"
+    And  I wait for "2" seconds
+    Then I click "#research-tab-link"
+    And  I check checkbox with class "dispute-entry-cb-1"
+    And  I check checkbox with class "dispute-entry-cb-2"
+    And  I click button "wlbl_entries_button"
+    And  I wait for "5" seconds
+    Then I check checkbox with class "bl-weak-checkbox"
+    And  I click ".wlbl_thrt_cat_id_1"
+    And  I click ".wlbl_thrt_cat_id_2"
+    And  I click "Submit Changes"
+    And  I wait for "5" seconds
+    Then I click button with class "close"
+    And  I wait for "2" seconds
+    Then I click button "wlbl_entries_button"
+    And  I wait for "5" seconds
+    And  Element with class "wlbl-entry-id-1" should have content "BL-weak"
+    And  Element with class "wlbl-entry-id-2" should have content "BL-weak"
+    And  clean up wlbl and remove all wlbl entries on "imadethisurlup.com"
+    And  clean up wlbl and remove all wlbl entries on "thisurlisfake.com"
+
+
+  @javascript
+  Scenario: a user removes multiple entries from a WBRS list on the dispute show page
+  #  after adding them to one first so we start with clean api data
+    Given a user with role "webrep user" exists and is logged in
+    Given the following disputes exist:
+      | id | submission_type |
+      | 1  | w               |
+    Given the following dispute_entries exist:
+      | id | uri                |
+      | 1  | imadethisurlup.com |
+      | 2  | thisurlisfake.com  |
+    And  clean up wlbl and remove all wlbl entries on "imadethisurlup.com"
+    And  clean up wlbl and remove all wlbl entries on "thisurlisfake.com"
+    When I goto "escalations/webrep/disputes/1"
+    And  I wait for "2" seconds
+    Then I click "#research-tab-link"
+    And  I check checkbox with class "dispute-entry-cb-1"
+    And  I check checkbox with class "dispute-entry-cb-2"
+    And  I click button "wlbl_entries_button"
+    And  I wait for "5" seconds
+    Then I check checkbox with class "wl-weak-checkbox"
+    Then I check checkbox with class "wl-med-checkbox"
+    And  I click "Submit Changes"
+    And  I wait for "5" seconds
+    Then I click button with class "close"
+    And  I wait for "2" seconds
+    Then I click button "wlbl_entries_button"
+    And  I wait for "5" seconds
+    And  Element with class "wlbl-entry-id-1" should have content "WL-weak, WL-med"
+    And  Element with class "wlbl-entry-id-2" should have content "WL-weak, WL-med"
+    And  I choose "wlbl-remove"
+    Then I check checkbox with class "wl-med-checkbox"
+    And  I click "Submit Changes"
+    And  I wait for "5" seconds
+    Then I click button with class "close"
+    And  I wait for "2" seconds
+    Then I click button "wlbl_entries_button"
+    And  I wait for "5" seconds
+    And  Element with class "wlbl-entry-id-1" should have content "WL-weak"
+    And  Element with class "wlbl-entry-id-1" should not have content "WL-med"
+    And  Element with class "wlbl-entry-id-2" should have content "WL-weak"
+    And  Element with class "wlbl-entry-id-2" should not have content "WL-med"
+    And  clean up wlbl and remove all wlbl entries on "imadethisurlup.com"
+    And  clean up wlbl and remove all wlbl entries on "thisurlisfake.com"
+
+
+
+
+
+
   @javascript
   Scenario: a user tries to export selected dispute entries on the Research tab
     Given pending
+    # Note that selenium doesn't support viewing response headers as is required by this test, maybe just get rid of it
     Given a user with role "webrep user" exists and is logged in
     And the following disputes exist and have entries:
       | id |

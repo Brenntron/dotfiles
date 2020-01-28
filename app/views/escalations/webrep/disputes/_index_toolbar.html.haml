@@ -252,7 +252,7 @@
       %button#index-adjust-wlbl.toolbar-button.adjust-wlbl-button.dropdown-button-margin-right.dropdown-toggle.esc-tooltipped{title: 'Adjust WL/BL', 'data-toggle': 'dropdown', 'aria-haspopup': 'true', 'aria-expanded': 'false', onclick: 'bulk_get_current_wlbl("index")'}
         %span.toolbar-button-text Adjust WL/BL
       .dropdown-menu.toolbar-dropdown#wlbl_adjust_entries_index{'aria-labelledby': 'wlbl_entries_button'}
-        = form_for :wlbl, html: {class: 'adjust-wlbl-form'} do |wlbl_form|
+        = form_for :wlbl, html: {class: 'adjust-wlbl-form bulk-wlbl-form'} do |wlbl_form|
           .dispute-wlbl-adjust-wrapper
             .dropdown-tool-text-divider.primary-text-divider
               Current WBRS Reputation
@@ -263,6 +263,7 @@
                   %th.content-label-sm Dispute
                   %th.content-label-sm.no-word-break Current WL/BL List
                   %th.text-center.content-label-sm.no-word-break Current WBRS Score
+                  %th.content-label-sm.th-threat-cat.no-word-break Threat Category
               %tbody
 
               -# TODO Hook up ability to preview scores based on changes in WL/BL
@@ -272,48 +273,67 @@
 
             .inline-tool-content-wrapper
               .row
-                .col-xs-2
-                  %label.content-label-sm Action
-                .col-xs-5
+                .col-xs-3
                   %input{type: 'radio', name: 'wlbl-action-radio', id: 'wlbl-add', value: 'wlbl-add', checked: true}
                   %label.radio-label{for: 'wlbl-add'} Add to list
-                .col-xs-5
+                .col-xs-4
                   %input{type: 'radio', name: 'wlbl-action-radio', id: 'wlbl-remove', value: 'wlbl-remove'}
                   %label.radio-label{for: 'wlbl-remove'} Remove from list
+                .col-xs-5.replace-tc-radio.hidden
+                  %input{type: 'radio', name: 'wlbl-action-radio', id: 'wlbl-replace', value: 'wlbl-replace'}
+                  %label.radio-label{for: 'wlbl-replace'} Replace threat categories
 
-                .row
-                  .col-xs-12
-                    %label.content-label-sm{for: "wlbl-list-type-select"} Lists
-                    .row.dropdown-tool-grey-row
-                      .col-xs-5.col-xs-offset-2
-                        %ul
-                          %li
-                            %input.wl-weak-checkbox.wl-bl-list-inline{type: 'checkbox', name: 'wl-bl-list-inline', value: "WL-weak"}
-                              WL - Weak
-                          %li
-                            %input.wl-med-checkbox.wl-bl-list-inline{type: 'checkbox', name: 'wl-bl-list-inline', value: "WL-med"}
-                              WL - Medium
-                          %li
-                            %input.wl-heavy-checkbox.wl-bl-list-inline{type: 'checkbox', name: 'wl-bl-list-inline', value: "WL-heavy"}
-                              WL - Heavy
-                      .col-xs-5
-                        %ul
-                          %li
-                            %input.bl-weak-checkbox.wl-bl-list-inline{type: 'checkbox', name: 'wl-bl-list-inline', value: "BL-weak"}
-                              BL - Weak
-                          %li
-                            %input.bl-med-checkbox.wl-bl-list-inline{type: 'checkbox', name: 'wl-bl-list-inline', value: "BL-med"}
-                              BL - Medium
-                          %li
-                            %input.bl-heavy-checkbox.wl-bl-list-inline{type: 'checkbox', name: 'wl-bl-list-inline', value: "BL-heavy"}
-                              BL - Heavy
+              .row.tc-replace-note
+                .col-xs-12
+                  %span Note: Threat Categories selected below will replace existing threat categories.
+
+              -# BEGIN: WL BL LISTS ROW + THREAT CATS ROW (place this 1 indent past 'inline-tool')
+              .row.lists-row
+                .col-xs-12
+                  %label.content-label-sm{for: "wlbl-list-type-select"} Lists
+                  .row.dropdown-tool-grey-row
+                    .col-xs-4
+                      %ul
+                        %li
+                          %input.wl-weak-checkbox.wl-bl-list-inline{type: 'checkbox', name: 'wl-bl-list-inline', value: "WL-weak"} WL - Weak
+                        %li
+                          %input.bl-weak-checkbox.wl-bl-list-inline{type: 'checkbox', name: 'wl-bl-list-inline', value: "BL-weak"} BL - Weak
+                    .col-xs-4
+                      %ul
+                        %li
+                          %input.wl-med-checkbox.wl-bl-list-inline{type: 'checkbox', name: 'wl-bl-list-inline', value: "WL-med"} WL - Medium
+                        %li
+                          %input.bl-med-checkbox.wl-bl-list-inline{type: 'checkbox', name: 'wl-bl-list-inline', value: "BL-med"} BL - Medium
+                    .col-xs-4
+                      %ul
+                        %li
+                          %input.wl-heavy-checkbox.wl-bl-list-inline{type: 'checkbox', name: 'wl-bl-list-inline', value: "WL-heavy"} WL - Heavy
+                        %li
+                          %input.bl-heavy-checkbox.wl-bl-list-inline{type: 'checkbox', name: 'wl-bl-list-inline', value: "BL-heavy"} BL - Heavy
+
+              .row.dropdown-tool-grey-row.threat-cat-row.hidden
+                .threat-cat-note
+                  %label.content-label-sm
+                    Threat Categories
+                    %span.threat-cat-required
+                      *Required for adding to any blacklist.
+                      %span.five-note Up to 5 can be selected
+                .threat-cat-area
+                  - Wbrs::ThreatCategory.selections.each do |label, value|
+                    .threat-cat-cell
+                      = wlbl_form.check_box(:thrt_cat_id, {id: nil, class: "wlbl_thrt_cat_id wlbl_thrt_cat_id_#{value}"}, value)
+                      = label
+              -# END: WL BL LISTS ROW + THREAT CATS ROW
+
 
               .comment-wrapper
                 %label.content-label-sm Comment
                 %textarea.dropdown-comment.adjust-wlbl-input.note-input
               .button-row-center
-                %button.primary.dropdown-submit-button{type: 'button', disabled: true, onclick:'submit_bulk_wlbl("index");'}
-                  Submit Reputation Changes
+                %p.disabled-submit-msg.hidden
+                  Submit Changes disabled as there are selected entries set to RESOLVED_CLOSED.
+                %button#index-bulk-submit-wbrs.primary.dropdown-submit-button{type: 'button', disabled: true, onclick:'submit_bulk_wlbl("index");'}
+                  Submit Changes
 
     %span.dropdown
       %button.toolbar-button.adjust-reptool-button.dropdown-toggle#reptool_index_entries_button.esc-tooltipped{title: 'Adjust RepTool BL', 'data-toggle': 'dropdown', 'aria-haspopup': 'true', 'aria-expanded': 'false', onclick: 'bulk_get_current_reptool("index");'}

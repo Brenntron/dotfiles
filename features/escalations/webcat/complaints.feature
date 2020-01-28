@@ -8,6 +8,29 @@ Feature: Webcat complaints
   #TODO: we need to update the user role on these tests
 
   @javascript
+  Scenario: a user should be alerted of impending doom
+    Given a user with role "webcat user" exists and is logged in
+    And the following complaint entries exist:
+      |id|  domain      | status |
+      |1 | food.com     |  NEW   |
+      |2 | blah.com     |  NEW   |
+      |3 | imhungry.com |  NEW   |
+    And a complaint entry preload exists
+    And I goto "/escalations/webcat/complaints?f=ALL"
+    And I wait for "2" seconds
+    And I click ".expand-row-button-1"
+    And I wait for "2" seconds
+    And I click ".expand-row-button-2"
+    And I wait for "2" seconds
+    And I fill in "complaint_comment_1" with "This is my favorite website"
+    And I fill in "complaint_comment_2" with "This is not my favorite website"
+    And I fill in "input_cat_1-selectized" with "Arts" and press enter
+    And I fill in "input_cat_2-selectized" with "Education" and press enter
+    And I wait for "2" seconds
+    When I click "master-submit"
+    Then I should see hidden element "#message-text" with content "I noticed you have made changes to at least 2 complaints but you only have 1 items selected."
+
+  @javascript
   Scenario: a user can manually create a new complaint
     Given a user with role "webcat user" exists and is logged in
     And bugzilla rest api always saves
@@ -201,7 +224,6 @@ Feature: Webcat complaints
     Then I click "#complaint_entry_report" and switch to the new window
     Then I should see "Webcat Complaint Entry Report"
 
-  # Test should work after WEB-5072 is complete
   @javascript
   Scenario: a user attempts to submit changes without categories and receives expected error alert
     Given a user with role "webcat user" exists and is logged in
@@ -215,7 +237,6 @@ Feature: Webcat complaints
     And I wait for "5" seconds
     Then I should see "MUST INCLUDE AT LEAST ONE CATEGORY."
 
-  # Test should work after WEB-5001 is merged
   @javascript
   Scenario: a user attempts to submit changes with resolution set to 'Unchanged'
     Given a user with role "webcat user" exists and is logged in
@@ -246,11 +267,11 @@ Feature: Webcat complaints
   Scenario: a user visits a complaint show page and sees its IP
     Given a user with role "webcat user" exists and is logged in
     And the following complaint entries exist:
-    |id|domain|
-    |1 |      |
+    |id|ip_address|domain|
+    |1 |1.2.3.4   |      |
     And a complaint entry preload exists
     And I goto "/escalations/webcat/complaints/1"
-    Then I should see "1.1.1.1"
+    Then I should see "1.2.3.4"
 
   @javascript
   Scenario: lookup information is accessable via lookup button
@@ -472,7 +493,6 @@ Feature: Webcat complaints
     And I wait for "8" seconds
     Then I should see content "Nature" within ".sds_category"
 
-
   @javascript
   Scenario: when a complaint in the WBNP queue is resolved,
             a bridge message should not be sent
@@ -515,3 +535,86 @@ Feature: Webcat complaints
     And I wait for "5" seconds
     Then I should see "COMPLETED"
     And "1" bridge message should be in the delayed job queue
+
+  @javascript
+  Scenario: a user clicks the "Pin Toolbar" button and sees the toolbar docked to the top navbar
+    Given a user with role "webcat user" exists and is logged in
+    And the following complaints exist:
+      | ticket_source             | id | status |
+      | talos-intelligence        | 1  | NEW    |
+    And the following complaint entries exist:
+      | uri             | domain        | subdomain | path | entry_type | complaint_id | status |
+      | abc.com         | abc.com       |           |      | URI/DOMAIN |  1           | NEW    |
+    And a complaint entry preload exists
+    And I goto "/escalations/webcat/complaints"
+    And I click "#pin-to-top"
+    Then I should not see "Pin Toolbar"
+    And I click "#pin-to-top"
+    Then I should see "Pin Toolbar"
+
+  @javascript
+  Scenario: a user types the hot key/shortcut to pin the toolbar to top and sees the toolbar docked
+    Given a user with role "webcat user" exists and is logged in
+    And the following complaints exist:
+      | ticket_source             | id | status |
+      | talos-intelligence        | 1  | NEW    |
+    And the following complaint entries exist:
+      | uri             | domain        | subdomain | path | entry_type | complaint_id | status |
+      | abc.com         | abc.com       |           |      | URI/DOMAIN |  1           | NEW    |
+    And a complaint entry preload exists
+    And I goto "/escalations/webcat/complaints"
+    And I enter the pin toolbar hot key
+    Then I should not see "Pin Toolbar"
+
+  # webcat > complaints index > new banner w/ metrics
+  @javascript
+  Scenario: a user sees there is new/assigned Talos/WBNP/internal complaints in webcat index top banner
+    Given a user with role "webcat user" exists and is logged in
+    And the following complaints exist:
+      | channel       | id |
+      | talosintel    | 1  |
+      | talosintel    | 2  |
+      | talosintel    | 3  |
+      | talosintel    | 4  |
+      | wbnp          | 5  |
+      | wbnp          | 6  |
+      | wbnp          | 7  |
+      | internal      | 8  |
+      | internal      | 9  |
+    And the following complaint entries exist:
+      | uri            | domain          | entry_type | complaint_id | status     |
+      | abc.com        | abc.com         | URI/DOMAIN |  1           | NEW        |
+      | whatever.com   | whatever.com    | URI/DOMAIN |  2           | NEW        |
+      | url.com        | url.com         | URI/DOMAIN |  3           | ASSIGNED   |
+      | test.com       | test.com        | URI/DOMAIN |  4           | ASSIGNED   |
+      | something.com  | something.com   | URI/DOMAIN |  5           | NEW        |
+      | yadayada.com   | yadayada.com    | URI/DOMAIN |  6           | NEW        |
+      | nothing.com    | nothing.com     | URI/DOMAIN |  7           | ASSIGNED   |
+      | something.com  | something.com   | URI/DOMAIN |  8           | NEW        |
+      | blahblah.com   | blahblah.com    | URI/DOMAIN |  9           | ASSIGNED   |
+    And I goto "/escalations/webcat/complaints"
+    And I wait for "1" seconds
+    Then I should see content "2" within "#ti-new-count"
+    Then I should see content "2" within "#ti-assigned-count"
+    Then I should see content "2" within "#wbnp-new-count"
+    Then I should see content "1" within "#wbnp-assigned-count"
+    Then I should see content "1" within "#int-new-count"
+    Then I should see content "1" within "#int-assigned-count"
+
+  # webcat > complaints index > take a ticket, test assigned metric updates
+  @javascript
+  Scenario: a user sees a new complaint metric after making a New on webcat index, then takes ticket to see its assigned
+    Given a user with role "webcat user" exists and is logged in
+    And bugzilla rest api always saves
+    And I goto "/escalations/webcat/complaints"
+    And I wait for "5" seconds
+    And I click "#new-complaint"
+    And I fill in "ips_urls" with "example.com"
+    And I click ".primary"
+    And I wait for "5" seconds
+    And I click ".close"
+    And I wait for "3" seconds
+    And I click ".sorting_1"
+    And I click ".take-ticket-toolbar-button"
+    And I wait for "3" seconds
+    Then I should see content "1" within "#int-assigned-count"
