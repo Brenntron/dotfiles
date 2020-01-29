@@ -443,7 +443,7 @@
                   %tr.research-overview-row
                     %td
                     -#Expander area
-                    %td.research-table-details-wrapper{colspan: '20'}
+                    %td.research-table-details-wrapper{colspan: '5'}
                       %table
                         %tr
                           %td.input-col.wbrs-input-wrapper
@@ -452,13 +452,11 @@
                             %label WBRS
                           %td.text-center.entry-data-wbrs-score.wbrs-score-cell
                             = entry.wbrs_score.to_d.truncate(2).to_f if entry.wbrs_score
-                          %td.wbrs-rule-hits-label-cell
-                            %label WBRS Rule Hits
+                          %td
+                            %label WBRS Rules
                           %td.text-center.wbrs-rule-hits-cell
                             - wbrs_rules = entry.dispute_rule_hits.select{|hit| hit.rule_type == 'WBRS'}
                             = wbrs_rules.count
-                          %td
-                            %label WBRS Rules
                           %td.rule-hits-col-list.wbrs-rules-cell
                             - if wbrs_rules.count == 0
                               %span.missing-data No rule hits
@@ -534,11 +532,10 @@
                             %label SBRS
                           %td.text-center.sbrs-score-cell= entry.sbrs_score.to_d.truncate(2).to_f if entry.sbrs_score
                           %td
-                            %label SBRS Rule Hits
+                            %label SBRS Rules
                           %td.text-center.sbrs-rule-hits-cell
                             = entry.dispute_rule_hits.select{|hit| hit.rule_type == 'SBRS'}.count
-                          %td
-                            %label SBRS Rules
+
                           %td.rule-hits-col-list.sbrs-rules-cell
                             - if entry.dispute_rule_hits.select{|hit| hit.rule_type == 'SBRS'}.count == 0
                               %span.missing-data No rule hits
@@ -585,11 +582,11 @@
                         -#Expander area
                       %td.input-col.ip-label-col{rowspan: '2'}
                         -# IP label
-                      %td.dual-edit-field{colspan: '5', 'data-id': entry.id, 'data-field': 'host-ip'}
+                      %td.dual-edit-field{colspan: '2', 'data-id': entry.id, 'data-field': 'host-ip'}
                         %span.entry-resolved-ip-content
                           = entry.web_ips
                         %input.table-ip-input{type:'text', value: "#{entry.web_ips}"}
-                      %td.text-right.no-padding-right{colspan: '3'}
+                      %td.text-right.no-padding-right{colspan: '2'}
                         %button.edit-button.inline-edit-ip-button.esc-tooltipped{title: 'Edit IP Addresses'}
                           Edit IP Addresses
                         %button.save-button.inline-save-ip-button.esc-tooltipped{title: 'Query IP Addresses'}
@@ -597,7 +594,7 @@
                         %button.cancel-button.inline-cancel-ip-button.esc-tooltipped{title: 'Cancel IP Addresses'}
 
                     %tr.research-uri-ip-data-row.research-page-ip-query-details
-                      %td.research-table-details-wrapper{colspan: '8'}
+                      %td.research-table-details-wrapper{colspan: '4'}
                         %table
                           %tr.single-details-row
                             %td
@@ -608,22 +605,20 @@
                               -#  if entry + ip has wbrs score show here
                               -#  else
                               -#    %span.missing-data
-                              -#      No score.
-                            %td
-                              %label WBRS Rule Hits
-                            %td.text-center.uri-ip-wbrs-rule-total
-                              -#  if entry + ip has wbrs rules show count here
-                              -#  else
-                              -#  0
+                              -#      No score
                             %td
                               %label WBRS Rules
+                            %td.text-center.uri-ip-wbrs-rule-total
+                            -#  if entry + ip has wbrs rules show count here
+                            -#  else
+                            -#  0
                             %td.uri-ip-wbrs-rules
                               -#  if entry + ip has wbrs rules show here
                               -#  else
                               -#  %span.missing-data
                               -#    No rules.
                             %td
-                              %label Category
+                              %label Threat Category
                             %td.uri-ip-category
                               -#  if entry + ip has category show here
                               -#  else
