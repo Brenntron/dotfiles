@@ -264,6 +264,8 @@
                         = entry.hostlookup
                       %input.table-entry-input.wide{type:'text', value: "#{entry.hostlookup}"}
 
+
+
                   -# if entry = uri and there are no resolved ips
                   - unless entry[:web_ips].nil?
                     %td.no-padding
@@ -281,8 +283,6 @@
                               .button-row-center
                                 %button.primary.dropdown-submit-button{type: 'button', onclick: 'add_host_ips(this)', 'data-entry-id': "#{entry.id}"} Submit Query
 
-                  %td
-                    %input.table-entry-input.wide{type:'text', value: "#{entry.hostlookup}"}
                   %td.category-cell
                     %label Category
                     - if entry[:primary_category] != '{}' && !entry[:primary_category].nil?
@@ -580,7 +580,7 @@
                   %td
                     -#Expander area
 
-                  %td.research-table-details-wrapper{colspan: '20'}
+                  %td.research-table-details-wrapper{colspan: '9'}
                     %table
                       %tr
                         %td.input-col.wbrs-input-wrapper
@@ -594,12 +594,11 @@
                           - else
                             %span.current-wbrs-score
                               = entry.wbrs_score
-                        %td.wbrs-rule-hits-label-cell
-                          %label WBRS Rule Hits
-                        %td.text-center.wbrs-rule-hits-cell
-                          = entry.dispute_rule_hits.select {|rule_hit| rule_hit.rule_type == "WBRS" && rule_hit.is_multi_ip_rulehit != true }.length
                         %td.wbrs-rules-label-cell
                           %label WBRS Rules
+                        %td.text-center.wbrs-rule-hits-cell
+                          = entry.dispute_rule_hits.select {|rule_hit| rule_hit.rule_type == "WBRS" && rule_hit.is_multi_ip_rulehit != true }.length
+
                         %td.rule-hits-col-list.wbrs-rules-cell
                           - wbrs_rules = entry.dispute_rule_hits.select {|rule_hit| rule_hit.rule_type == "WBRS" && rule_hit.is_multi_ip_rulehit != true }
                           - wbrs_rules.each do |wbrs_hit|
@@ -678,11 +677,10 @@
                             %span.current-sbrs-score
                               = entry.sbrs_score
                         %td
-                          %label SBRS Rule Hits
+                          %label SBRS Rules
                         %td.text-center.sbrs-rule-hits-cell
                           = entry.dispute_rule_hits.select {|rule_hit| rule_hit.rule_type == "SBRS" }.size
-                        %td
-                          %label SBRS Rules
+
                         %td.rule-hits-col-list.sbrs-rules-cell
                           - entry.dispute_rule_hits.select {|rule_hit| rule_hit.rule_type == "SBRS" }.each do |sbrs_hit|
                             - unless RulehitResolutionMailerTemplate.select{|template| template.mnemonic == sbrs_hit.name}.count == 0

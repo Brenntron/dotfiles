@@ -452,7 +452,7 @@
                             %label WBRS
                           %td.text-center.entry-data-wbrs-score.wbrs-score-cell
                             = entry.wbrs_score.to_d.truncate(2).to_f if entry.wbrs_score
-                          %td
+                          %td.wbrs-rules-label-cell
                             %label WBRS Rules
                           %td.text-center.wbrs-rule-hits-cell
                             - wbrs_rules = entry.dispute_rule_hits.select{|hit| hit.rule_type == 'WBRS'}
@@ -597,7 +597,7 @@
                       %td.research-table-details-wrapper{colspan: '4'}
                         %table
                           %tr.single-details-row
-                            %td
+                            %td.wbrs-rules-label-cell
                               %label WBRS
                             %td.text-center.no-border.uri-ip-wbrs-score
                               -#- unless wbrs_stuff_ip['wbrs'].nil?
