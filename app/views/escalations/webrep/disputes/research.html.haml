@@ -600,36 +600,16 @@
                             %td.wbrs-rules-label-cell
                               %label WBRS
                             %td.text-center.no-border.uri-ip-wbrs-score
-                              -#- unless wbrs_stuff_ip['wbrs'].nil?
-                              -#  = wbrs_stuff_ip['wbrs']
-                              -#  if entry + ip has wbrs score show here
-                              -#  else
-                              -#    %span.missing-data
-                              -#      No score
                             %td
                               %label WBRS Rules
                             %td.text-center.uri-ip-wbrs-rule-total
-                            -#  if entry + ip has wbrs rules show count here
-                            -#  else
-                            -#  0
                             %td.uri-ip-wbrs-rules
-                              -#  if entry + ip has wbrs rules show here
-                              -#  else
-                              -#  %span.missing-data
-                              -#    No rules.
                             %td
                               %label Threat Category
                             %td.uri-ip-category
-                              -#  if entry + ip has category show here
-                              -#  else
-                              -#  %span.missing-data
-                              -#    Missing Data
-                            %td.uri-ip-proxy
-                              %label URI
                             %td
-                              -#  if entry + ip has url proxy thing show here
-
-
+                              %label URI
+                            %td.uri-ip-proxy
 
 
                   %tr.nested-data-row{'data-entry-id': "#{entry.id}"}

@@ -2082,8 +2082,10 @@ window.add_host_ips = (button) ->
   ip_array = []
 
   if ips.length > 0
+    debugger
     # Breakup the ips
-    ip_array_initial = ips.replace(/\n/g, ",").split(",")
+    console.log ips
+    ip_array_initial = ips.replace(/( +?)/g, '').split(",")
     $(ip_array_initial).each ->
       ip = this.trim()
       ip_array.push(ip)
@@ -2153,6 +2155,7 @@ window.query_uri_plus_ip = (uri, ips, entry_id) ->
 
   #  Could be called via the 'Add ips', the Save changes to an entry, or refresh data button
   #  Send the uri and ips to sdsv3
+#  check to make sure ips are valid in the ruby code
   std_msg_ajax(
     url: "/escalations/api/v1/escalations/webrep/disputes/update_multi_ip"
     method: 'POST'
