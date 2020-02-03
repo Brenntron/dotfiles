@@ -267,7 +267,7 @@
 
 
                   -# if entry = uri and there are no resolved ips
-                  - unless entry[:web_ips].nil?
+                  - unless entry[:web_ips].blank?
                     %td.no-padding
                   - else
                     %td.single-button-col.no-padding
@@ -724,7 +724,7 @@
                           = entry.last_submitted
 
                 -# If entry is uri and has a resolved host ip
-                - unless entry[:web_ips].nil?
+                - unless entry[:web_ips].blank?
                   %tr.research-uri-ip-query-row
                     %td{rowspan: '2'}
                       -#Expander area
@@ -732,10 +732,11 @@
                       -# IP label
                     %td.dual-edit-field{colspan: '5', 'data-id': entry.id, 'data-field': 'host-ip'}
                       %span.entry-resolved-ip-content
-                        - ips = JSON.parse entry[:web_ips]
-                        = ips.to_sentence(two_words_connector: ', ', last_word_connector: ', ')
+                        - ip_record = JSON.parse entry[:web_ips]
+                        - ips = ip_record.to_sentence(two_words_connector: ', ', last_word_connector: ', ')
+                        = ips
 
-                      %input.table-ip-input{type:'text', value: "#{ips.to_sentence(two_words_connector: ', ', last_word_connector: ', ')}", placeholder: '1.1.1.1, 2.2.2.2'}
+                      %input.table-ip-input{type:'text', value: "#{ips}", placeholder: '1.1.1.1, 2.2.2.2'}
                     %td.text-right.no-padding-right{colspan: '3'}
                       %button.edit-button.inline-edit-ip-button.esc-tooltipped{title: 'Edit IP Addresses'}
                         Edit IP Addresses
