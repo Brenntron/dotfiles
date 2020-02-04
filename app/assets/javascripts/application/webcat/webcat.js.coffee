@@ -15,6 +15,7 @@ window.timeMatch = (age)->
       time = 'minutes'
     else if def_includes(age, 'h') && def_includes(age, 'm')
       time =  'hours'
+  return time
 
 window.wbrs_display = (score) ->
   score = parseFloat(score)
