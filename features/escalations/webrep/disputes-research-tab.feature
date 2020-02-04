@@ -21,7 +21,7 @@ Feature: Disputes index, Research tab
       |id|
       |1 |
     And the following dispute_entries exist:
-      |dispute_id   |uri            |entry_type |
+      |dispute_id   |uri                |entry_type |
       |1            |1234computer.com   |URI/DOMAIN |
     When I goto "escalations/webrep/disputes/1"
     And  I wait for "5" seconds
@@ -51,6 +51,7 @@ Feature: Disputes index, Research tab
     |id|user_id|
     |2 |3      |
     When I goto "escalations/webrep/disputes/2"
+    And take a screenshot
     And I click "#research-tab-link"
     When I wait for the ajax request to finish
     Then "#disputes-research-table" should be visible
@@ -85,3 +86,79 @@ Feature: Disputes index, Research tab
     Then I should see content "No score" within ".research-table-row-wrapper"
     Then I should see content "Unresolved" within ".research-table-row-wrapper"
     Then I should see content "Unclassified" within ".research-table-row-wrapper"
+
+
+
+# Querying URI + IP (+ IP)
+  @javascript @now
+  Scenario: a user wants to add a single resolved host IP to a dispute entry
+    Given a user with role "webrep user" exists and is logged in
+    And the following disputes exist:
+      |id|
+      |1 |
+    And the following dispute_entries exist:
+      |dispute_id   |uri                |entry_type |
+      |1            |1234computer.com   |URI/DOMAIN |
+    When I goto "escalations/webrep/disputes/1"
+    And  I wait for "5" seconds
+    Then I click "#research-tab-link"
+    And  take a screenshot
+
+  @javascript
+  Scenario: a user wants to add multiple resolved host IPs to a dispute entry
+    Given a user with role "webrep user" exists and is logged in
+    And the following disputes exist:
+      |id|
+      |1 |
+    And the following dispute_entries exist:
+      |dispute_id   |uri            |entry_type |
+      |1            |1234computer.com   |URI/DOMAIN |
+    When I goto "escalations/webrep/disputes/1"
+    And  I wait for "5" seconds
+    Then I click "#research-tab-link"
+
+  @javascript
+  Scenario: a user tries to add an improper IP address as a resolved host IP to a dispute entry
+    Given a user with role "webrep user" exists and is logged in
+    And the following disputes exist:
+      |id|
+      |1 |
+    And the following dispute_entries exist:
+      |dispute_id   |uri            |entry_type |
+      |1            |1234computer.com   |URI/DOMAIN |
+    When I goto "escalations/webrep/disputes/1"
+    And  I wait for "5" seconds
+    Then I click "#research-tab-link"
+
+  @javascript
+  Scenario: a user wants to view a dispute entry that has a resolved host IP added previously
+    Given a user with role "webrep user" exists and is logged in
+    And the following disputes exist:
+      |id|
+      |1 |
+    And the following dispute_entries exist:
+      |dispute_id   |uri            |entry_type |
+      |1            |1234computer.com   |URI/DOMAIN |
+    When I goto "escalations/webrep/disputes/1"
+    And  I wait for "5" seconds
+    Then I click "#research-tab-link"
+
+  @javascript
+  Scenario: a user wants to edit and submit a new resolved host IP on a dispute entry
+    Given a user with role "webrep user" exists and is logged in
+    And the following disputes exist:
+      |id|
+      |1 |
+    And the following dispute_entries exist:
+      |dispute_id   |uri            |entry_type |
+      |1            |1234computer.com   |URI/DOMAIN |
+    When I goto "escalations/webrep/disputes/1"
+    And  I wait for "5" seconds
+    Then I click "#research-tab-link"
+
+  @javascript
+  Scenario: a user cannot add a resolved host IP to a dispute entry with type IP
+    Given a user with role "webrep user" exists and is logged in
+    And the following disputes exist:
+      |id|
+      |1 |
