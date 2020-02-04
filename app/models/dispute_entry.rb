@@ -890,6 +890,8 @@ class DisputeEntry < ApplicationRecord
     ip_addresses = ips
     wbrs_rule_hits = Sbrs::ManualSbrs.get_rule_names_from_rulehits(results) rescue nil
     wbrs_score = results["wbrs"]["score"]
+    proxy_uri = results["proxy_uri"]
+    threat_cats = results["threat_cats"]
 
 
     if dispute_entry.present? && !wbrs_rule_hits.nil?
@@ -909,6 +911,16 @@ class DisputeEntry < ApplicationRecord
 
     end
 
+    # TODO find the labels for the threat cat ids
+    # if threat_cats.present?
+    #   threat_cats.each do |threat_cat|
+    #     # SbApi.remote
+    #     # Not sure what to do here, need to get the threat cat labels
+    #   end
+    # end
+
+    result[:threat_cats] = threat_cats
+    result[:proxy_uri] = proxy_uri
     result[:rulehits] = wbrs_rule_hits
     result[:score] = wbrs_score
 

@@ -2176,11 +2176,15 @@ window.query_uri_plus_ip = (uri, ips, entry_row) ->
         rule_hits = 0
       score     = response.json.score.toFixed(1)
 
-      # Need to add but don't exist in the response yet
-      # cats      = response.json.category.join(', ')
-      # proxy     = response.json.proxy
-      cats = ''
-      proxy = ''
+      if response.json.theat_cats?
+       threat_cats = response.json.theat_cats.join(', ')
+      else
+        thrat_cats = ''
+
+      if response.json.proxy_uri?
+       proxy     = response.json.proxy_uri
+      else
+        proxy = ''
 
       # Find our entry's (or result's) + ip data row and cells
       ip_data_row     = $(entry_row).find('.research-uri-ip-data-row')[0]
@@ -2194,7 +2198,7 @@ window.query_uri_plus_ip = (uri, ips, entry_row) ->
       $(wbrs_score_cell).text(score)
       $(wbrs_hits_cell).text(rule_hits)
       $(wbrs_rules_cell).text(rules)
-      $(wbrs_cat_cell).text(cats)
+      $(wbrs_cat_cell).text(threat_cats)
       $(wbrs_cat_cell).text(proxy)
 
       # If there are rule hits, add to the rule hit details table

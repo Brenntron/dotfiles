@@ -945,7 +945,7 @@ module API
               end
 
               results = DisputeEntry.process_multi_ip_info(uri, ips, dispute_entry)
-              render json: {:status => "success", :rulehits => results[:rulehits], :score => results[:score]}
+              render json: {:status => "success", :rulehits => results[:rulehits], :score => results[:score], :proxy_uri => results[:proxy_uri], :threat_cats => results[:threat_cats]}
             end
 
 
