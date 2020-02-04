@@ -141,8 +141,11 @@ $ ->
 
       if action == 'save'
         if $.trim(old_ips) != new_ips
-          ip_arry = new_ips.split(', ')
-          $(ip_data).text(new_ips)
+          ip_arry = cleanse_array(new_ips)
+          # show the prettier cleansed array as a string
+          ip_str = ip_arry.join(', ')
+          $(ip_data).text(ip_str)
+          $(ip_input).val(ip_str)
 
           # Get query data & save to db
           query_uri_plus_ip(entry_uri, ip_arry, entry_id)

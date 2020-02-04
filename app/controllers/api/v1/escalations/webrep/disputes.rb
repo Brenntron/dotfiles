@@ -925,11 +925,20 @@ module API
 
             desc 'Get URL + IP data from SDS V3'
             post 'update_multi_ip' do
+
               uri = params[:uri]
-              ips = params[:ip_addresses]
+              provided_ips = params[:ip_addresses]
+              ips = []
               dispute_entry_id = params[:dispute_entry_id]
 
               dispute_entry = nil
+
+              # Make sure the ips are legit
+              provided_ips.each do |ip|
+                if DisputeEntry.is_ip?(ip)
+                  ips << ip
+                end
+              end
 
               if dispute_entry_id.present?
                 dispute_entry = DisputeEntry.where(:id => dispute_entry_id).first
@@ -938,6 +947,7 @@ module API
               results = DisputeEntry.process_multi_ip_info(uri, ips, dispute_entry)
               render json: {:status => "success", :rulehits => results[:rulehits], :score => results[:score]}
             end
+
 
             params do
               requires :uri, type: String

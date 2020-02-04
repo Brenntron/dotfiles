@@ -641,13 +641,10 @@ window.return_dispute = (dispute_id) ->
   )
 
 window.save_dispute_entries = () ->
-#  TODO Make sure new fields are being properly saved to db
-  debugger
   data = {}
   $('#disputes-research-table').find('tr.research-table-row').each(() ->
     result = {}
     fielddata = $(this).find('.dual-edit-field').map(() ->
-      debugger
       new_value = switch (this.dataset.field)
         when 'status'
           if $(this).find("input[name='entry-status']:checked").attr('id') == undefined
@@ -662,7 +659,6 @@ window.save_dispute_entries = () ->
       if new_value == undefined
         new_value = old_value
 
-      debugger
       data[this.dataset.id] = [{
         id: this.dataset.id
         field: this.dataset.field
@@ -835,7 +831,6 @@ $ ->
       $(wrapper).addClass('selected')
 
     if $(this).attr('id') == 'RESOLVED_CLOSED'
-#      debugger
       $('#show-ticket-resolution-submenu').show()
       stat_comment = $('#ticket-non-res-submit').find('.ticket-status-comment')
       $('#ticket-non-res-submit').hide()
@@ -2073,19 +2068,19 @@ $ ->
     return
 
 
+# Removes various new lines, extra spaces and crappy comma separation into single type of separation
+window.cleanse_array = (array) ->
+  clean_array = array.replace(/( +?)/g, '').replace(/( +?|\n+)/g, ',').split(',')
+
 
 window.add_host_ips = (button) ->
-  debugger
   entry_id = $(button).attr('data-entry-id')
   form     = $(button).parents('.add-host-ips')[0]
   ips      = $(form).find('textarea').val()
   ip_array = []
 
   if ips.length > 0
-    debugger
-    # Breakup the ips
-    console.log ips
-    ip_array_initial = ips.replace(/( +?)/g, '').split(",")
+    ip_array_initial = cleanse_array(ips)
     $(ip_array_initial).each ->
       ip = this.trim()
       ip_array.push(ip)
@@ -2147,7 +2142,6 @@ window.add_host_ips = (button) ->
 
 
 window.query_uri_plus_ip = (uri, ips, entry_id) ->
-  debugger
   # Find our ip row for this entry in the DOM & insert inline loader
   ip_row = $('#entry-data-wrapper_' + entry_id).find('.entry-resolved-ip-content')
   loader = '<span class="inline-row-loader"><span class="sync-button sync_rotate"></span>Loading...</span>'
@@ -2165,7 +2159,6 @@ window.query_uri_plus_ip = (uri, ips, entry_id) ->
       dispute_entry_id: entry_id
     }
     success: (response) ->
-      debugger
       # Kill the loader and the 'Add IP Addresses' dropdown
       inserted_loader = $('#entry-data-wrapper_' + entry_id).find('.inline-row-loader')
       $(inserted_loader).remove()
