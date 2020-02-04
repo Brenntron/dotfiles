@@ -8,6 +8,8 @@
           Show/Hide Columns
       .dropdown-menu.toolbar-dropdown#webcat-index-table-show-columns-dropdown{'aria-labelledby': 'webcat-index-table-show-columns-button'}
         %ul
+          %li.toggle-vis-webcat.hidden{'data-column':'1'}
+            %input.age-checkbox{type: 'checkbox', checked: true, id: 'important-checkbox'} Important
           %li.toggle-vis-webcat{'data-column':'3'}
             %input.age-checkbox{type: 'checkbox', checked: true, id: 'age-checkbox'} Age
           %li.toggle-vis-webcat{'data-column':'4'}
