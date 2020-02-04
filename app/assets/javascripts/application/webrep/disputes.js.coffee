@@ -2141,15 +2141,15 @@ window.add_host_ips = (button) ->
 
 
 
-window.query_uri_plus_ip = (uri, ips, entry_id) ->
+window.query_uri_plus_ip = (uri, ips, entry_row) ->
   # Find our ip row for this entry in the DOM & insert inline loader
-  ip_row = $('#entry-data-wrapper_' + entry_id).find('.entry-resolved-ip-content')
+  ip_row = $(entry_row).find('.entry-resolved-ip-content')
   loader = '<span class="inline-row-loader"><span class="sync-button sync_rotate"></span>Loading...</span>'
   $(ip_row).after(loader)
+  entry_id = $(entry_row).attr('data-entry-id')
 
   #  Could be called via the 'Add ips', the Save changes to an entry, or refresh data button
   #  Send the uri and ips to sdsv3
-#  check to make sure ips are valid in the ruby code
   std_msg_ajax(
     url: "/escalations/api/v1/escalations/webrep/disputes/update_multi_ip"
     method: 'POST'
@@ -2160,7 +2160,7 @@ window.query_uri_plus_ip = (uri, ips, entry_id) ->
     }
     success: (response) ->
       # Kill the loader and the 'Add IP Addresses' dropdown
-      inserted_loader = $('#entry-data-wrapper_' + entry_id).find('.inline-row-loader')
+      inserted_loader = $(entry_row).find('.inline-row-loader')
       $(inserted_loader).remove()
       dropdown = $('#add_ip_button_' + entry_id).parent()
       $(dropdown).remove()
@@ -2174,7 +2174,7 @@ window.query_uri_plus_ip = (uri, ips, entry_id) ->
       else
         rules = ''
         rule_hits = 0
-      score     = response.json.score.toFixed(2)
+      score     = response.json.score.toFixed(1)
 
       # Need to add but don't exist in the response yet
       # cats      = response.json.category.join(', ')
@@ -2183,7 +2183,7 @@ window.query_uri_plus_ip = (uri, ips, entry_id) ->
       proxy = ''
 
       # Find our entry's (or result's) + ip data row and cells
-      ip_data_row = $('#entry-data-wrapper_' + entry_id).find('.research-uri-ip-data-row')[0]
+      ip_data_row     = $(entry_row).find('.research-uri-ip-data-row')[0]
       wbrs_score_cell = $(ip_data_row).find('.uri-ip-wbrs-score')[0]
       wbrs_hits_cell  = $(ip_data_row).find('.uri-ip-wbrs-rule-total')[0]
       wbrs_rules_cell = $(ip_data_row).find('.uri-ip-wbrs-rules')[0]
@@ -2198,8 +2198,7 @@ window.query_uri_plus_ip = (uri, ips, entry_id) ->
       $(wbrs_cat_cell).text(proxy)
 
       # If there are rule hits, add to the rule hit details table
-      entry_wrapper = $('#entry-data-wrapper_' + entry_id)
-      wbrs_details_table = $($(entry_wrapper).find('.wbrs-details-table')[0]).find('tbody')[0]
+      wbrs_details_table = $($(entry_row).find('.wbrs-details-table')[0]).find('tbody')[0]
       plus_ip_rule_rows = $(wbrs_details_table).find('.plus-ip-rule-row')
       $(plus_ip_rule_rows).each ->
         $(this).remove()
