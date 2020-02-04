@@ -9,12 +9,12 @@ window.def_includes = (check, str) ->
   return check.indexOf(str) != -1
 
 window.timeMatch = (age)->
-  if def_includes(age, 'm') && def_includes(age, 's') && !def_includes(age, 'months')
-    return 'minutes'
-  else if def_includes(age, 'h') && def_includes(age, 'm') && !def_includes(age, 'months')
-    return 'hours'
-  else
-    return 'exceeds limit'
+  time = ''
+  if !def_includes(age, 'months')
+    if def_includes(age, 'm') && def_includes(age, 's') && !def_includes(age, 'months')
+      time = 'minutes'
+    else if def_includes(age, 'h') && def_includes(age, 'm') && !def_includes(age, 'months')
+      time =  'hours'
 
 window.wbrs_display = (score) ->
   score = parseFloat(score)
@@ -472,7 +472,9 @@ $ ->
                         age_class = 'ticket-age-over3hr'
                       else if hour > 12
                         age_class = 'ticket-age-over12hr'
-                    when 'exceeds limit'
+                    when ''
+                      # time exceeds hours
+                      # days, weeks, months, years
                       age_class = 'ticket-age-over12hr'
                   return "<span class='#{age_class}'>#{age}</span>"
 
