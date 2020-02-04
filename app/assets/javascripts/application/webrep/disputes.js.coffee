@@ -2179,10 +2179,10 @@ window.query_uri_plus_ip = (uri, ips, entry_row) ->
       if response.json.theat_cats?
        threat_cats = response.json.theat_cats.join(', ')
       else
-        thrat_cats = ''
+        threat_cats = ''
 
       if response.json.proxy_uri?
-       proxy     = response.json.proxy_uri
+       proxy = response.json.proxy_uri
       else
         proxy = ''
 
