@@ -107,6 +107,7 @@ $ ->
   $('#cancel_complaint').on 'click', ->
     $(':input','#new-complaint-form').val('')
     $('#new-complaint').dropdown('toggle')
+    $('#select-to-new').selectize()[0].selectize.clear()
 
 
   createSelectOptions = ->

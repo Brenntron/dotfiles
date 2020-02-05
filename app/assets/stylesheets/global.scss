@@ -6457,6 +6457,9 @@ table.dispute-entry-table tbody tr.selected {
 
 #new-complaint-wrapper {
   min-width: 350px;
+  //.form-control.selectize{
+  //  display: unset!important;
+  //}
 }
 
 #new-complaint-wrapper textarea, #new-complaint-wrapper input, #categorize-urls-form-wrapper textarea {
@@ -6498,7 +6501,8 @@ table.dispute-entry-table tbody tr.selected {
   border: 4px solid $content-bg-color;
   outline: 1px solid darken($faint-neutral-color, 5%);
   padding: 1px;
-  height: 32px;
+  min-height: 32px;
+  height: 100%;
 }
 
 .category-column .form-control.selectize {
@@ -6512,6 +6516,7 @@ table.dispute-entry-table tbody tr.selected {
 
 .selectize-dropdown.multi.form-control.selectize {
   min-height: 32px !important;
+  height: 100%;
   height: auto !important;
   background-color: $content-bg-color !important;
 }
