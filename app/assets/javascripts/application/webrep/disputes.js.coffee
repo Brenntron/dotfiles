@@ -2116,9 +2116,9 @@ window.add_host_ips = (button) ->
               '<td class="text-center uri-ip-wbrs-rule-total"></td>' +
               '<td><label>WBRS Rules</label></td>' +
               '<td class="uri-ip-wbrs-rules"></td>' +
-              '<td><label>Category</label></td>' +
+              '<td><label>Threat Category</label></td>' +
               '<td class="uri-ip-category"></td>' +
-              '<td><label>URI</label></td>' +
+              '<td><label>Proxy URI</label></td>' +
               '<td class="uri-ip-proxy"></td>' +
             '</tr>' +
           '</tbody></table>' +

@@ -90,7 +90,7 @@ Feature: Disputes index, Research tab
 
 
 # Querying URI + IP (+ IP)
-  @javascript @now
+  @javascript
   Scenario: a user wants to add a single resolved host IP to a dispute entry
     Given a user with role "webrep user" exists and is logged in
     And the following disputes exist:
@@ -102,7 +102,13 @@ Feature: Disputes index, Research tab
     When I goto "escalations/webrep/disputes/1"
     And  I wait for "5" seconds
     Then I click "#research-tab-link"
-    And  take a screenshot
+    And  I should see element ".add-ip-button"
+    Then I click ".add-ip-button"
+    And  I fill in element, ".add-ip-input" with "1.1.1.1"
+    And  I click "Submit Query"
+    Then I wait for "15" seconds
+    Then I should see content "1.1.1.1" within ".entry-resolved-ip-content"
+
 
   @javascript
   Scenario: a user wants to add multiple resolved host IPs to a dispute entry
@@ -111,11 +117,18 @@ Feature: Disputes index, Research tab
       |id|
       |1 |
     And the following dispute_entries exist:
-      |dispute_id   |uri            |entry_type |
+      |dispute_id   |uri                |entry_type |
       |1            |1234computer.com   |URI/DOMAIN |
     When I goto "escalations/webrep/disputes/1"
     And  I wait for "5" seconds
     Then I click "#research-tab-link"
+    And  I should see element ".add-ip-button"
+    Then I click ".add-ip-button"
+    And  I fill in element, ".add-ip-input" with "1.1.1.1, 2.2.2.2"
+    And  I click "Submit Query"
+    Then I wait for "15" seconds
+    Then I should see content "1.1.1.1, 2.2.2.2" within ".entry-resolved-ip-content"
+
 
   @javascript
   Scenario: a user tries to add an improper IP address as a resolved host IP to a dispute entry
@@ -129,6 +142,12 @@ Feature: Disputes index, Research tab
     When I goto "escalations/webrep/disputes/1"
     And  I wait for "5" seconds
     Then I click "#research-tab-link"
+    Then I click ".add-ip-button"
+    And  I fill in element, ".add-ip-input" with "drumf"
+    And  I click "Submit Query"
+    Then I wait for "15" seconds
+    And  I should not see content "drumf" within ".entry-resolved-ip-content"
+
 
   @javascript
   Scenario: a user wants to view a dispute entry that has a resolved host IP added previously
@@ -137,11 +156,13 @@ Feature: Disputes index, Research tab
       |id|
       |1 |
     And the following dispute_entries exist:
-      |dispute_id   |uri            |entry_type |
-      |1            |1234computer.com   |URI/DOMAIN |
+      |dispute_id   |uri                |entry_type |web_ips     |
+      |1            |1234computer.com   |URI/DOMAIN |["1.1.1.1"] |
     When I goto "escalations/webrep/disputes/1"
     And  I wait for "5" seconds
     Then I click "#research-tab-link"
+    And  I should not see content "drumf" within ".entry-resolved-ip-content"
+
 
   @javascript
   Scenario: a user wants to edit and submit a new resolved host IP on a dispute entry
@@ -150,15 +171,25 @@ Feature: Disputes index, Research tab
       |id|
       |1 |
     And the following dispute_entries exist:
-      |dispute_id   |uri            |entry_type |
-      |1            |1234computer.com   |URI/DOMAIN |
+      |dispute_id   |uri                |entry_type |web_ips     |
+      |1            |1234computer.com   |URI/DOMAIN |["1.1.1.1"] |
     When I goto "escalations/webrep/disputes/1"
     And  I wait for "5" seconds
     Then I click "#research-tab-link"
+    And  I should see content "1.1.1.1" within ".entry-resolved-ip-content"
 
-  @javascript
+
+  @javascript @now
   Scenario: a user cannot add a resolved host IP to a dispute entry with type IP
     Given a user with role "webrep user" exists and is logged in
     And the following disputes exist:
       |id|
-      |1 |
+      |5 |
+    And the following dispute_entries exist:
+      | id | dispute_id |ip_address   | uri |
+      | 1  | 5          |123.63.22.24 |     |
+    When I goto "escalations/webrep/disputes/5"
+    And  I wait for "5" seconds
+    Then I click "#research-tab-link"
+    And  take a screenshot
+    And  I should not see element with class "add-ip-button"
