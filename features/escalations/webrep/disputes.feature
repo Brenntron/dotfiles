@@ -823,6 +823,27 @@ Feature: Disputes
     And I should see content "WL-med" within ".entry-data-wlbl"
     And I should see content "BL-heavy" within ".entry-data-wlbl"
 
+
+  # Gathering resolved host ip on creation / additional query to sdsv3 for url+ip data
+#  TODO FINISH THE DEV FOR THIS
+  @javascript @now
+  Scenario: a user creates a new dispute ticket and the entry returns with a resolved host ip
+    Given a user with role "webrep user" exists and is logged in
+    And the following disputes exist:
+      | id   |
+      | 5370 |
+    And  I goto "/escalations/webrep/disputes"
+    And  I wait for "3" seconds
+    Then I click "#new-dispute"
+    And  I wait for "1" seconds
+#    WHY IS THERE A COMMA IN THIS STEP DEF?
+    And  I fill in element, "#ips_urls" with "petful.com"
+    And  I click button "submit"
+    And  I wait for "10" seconds
+    And take a screenshot
+
+
+
   @javascript
   Scenario: Loading cogs appear when landing on a page and disappear after it is done loading
     Given a user with role "webrep user" exists and is logged in
@@ -836,3 +857,6 @@ Feature: Disputes
     Then I should see "Loading data..."
     And I wait for "1" seconds
     Then I should not see "Loading data..."
+
+
+

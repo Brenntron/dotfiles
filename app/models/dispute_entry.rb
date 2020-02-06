@@ -907,7 +907,6 @@ class DisputeEntry < ApplicationRecord
 
     if dispute_entry.present?
       unless wbrs_rule_hits.nil?
-        binding.pry
         rule_hits_to_destroy = dispute_entry.dispute_rule_hits.where(:is_multi_ip_rulehit => true)
 
         ###

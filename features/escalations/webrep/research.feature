@@ -195,6 +195,7 @@ Feature: Webrep, the BFRP
     And  I check checkbox with class "bfrp-checkbox-5"
     And  I click button "wlbl_entries_button"
     And  I wait for "5" seconds
+    And  take a screenshot
     Then I should see "Not on a list"
     And  wl/bl result number "0" should not have content "WL-weak"
     And  wl/bl result number "1" should not have content "WL-weak"
@@ -283,6 +284,7 @@ Feature: Webrep, the BFRP
     And  I check checkbox with class "bl-weak-checkbox"
     When I click "Submit Changes"
     And  I wait for "5" seconds
+    And  take a screenshot
     Then I should see "ENTRIES HAVE BEEN UPDATED"
     And  I should see "Have been removed"
     When I click ".close"
@@ -357,7 +359,7 @@ Feature: Webrep, the BFRP
     And  I fill in element, "#table-ip-input-no-0" with "drumf"
     And  I click "Query IP Addresses"
     Then I wait for "15" seconds
-    And  I should not see content "drumf" within ".entry-resolved-ip-content"
+    And  I should not see content "drumf" within "#resolved-ip-content-no-0"
 
 
 # This test is pending due to a bug discovered when searching for ips on bfrp - ips searched for are being labeled as uri
