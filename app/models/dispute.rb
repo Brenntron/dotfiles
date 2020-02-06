@@ -636,6 +636,9 @@ class Dispute < ApplicationRecord
           logger.info "fetching preload"
           ::Preloader::Base.fetch_all_api_data(key, new_dispute_entry.id)
 
+          #threat cats for urls
+          complete_wbrs_blob = Wbrs::ManualWlbl.where({:url => new_dispute_entry.uri})
+          new_dispute_entry.wbrs_threat_category = [complete_wbrs_blob.last].select{ |wlbl| wlbl.state == "active"}.map{ |wlbl| wlbl.threat_cats }.join(', ')
 
           if !matching_disposition
             if !false_negative_claim

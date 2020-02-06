@@ -893,6 +893,9 @@ class DisputeEntry < ApplicationRecord
     proxy_uri = results["proxy_uri"]
     threat_cats = results["threat_cats"]
 
+    if threat_cats.present?
+      threat_cat_info = threat_cats_from_ids(threat_cats)
+    end
 
     if dispute_entry.present? && !wbrs_rule_hits.nil?
       rule_hits_to_destroy = dispute_entry.dispute_rule_hits.where(:is_multi_ip_rulehit => true)
@@ -904,7 +907,7 @@ class DisputeEntry < ApplicationRecord
       wbrs_rule_hits.each do |rule_hit|
         DisputeRuleHit.create(rule_type:'WBRS', name: rule_hit, dispute_entry_id: dispute_entry.id, is_multi_ip_rulehit: true)
       end
-
+      dispute_entry.multi_wbrs_threat_category = threat_cats.join(",")
       dispute_entry.score = wbrs_score
       dispute_entry.web_ips = ip_addresses
       dispute_entry.save
@@ -919,7 +922,7 @@ class DisputeEntry < ApplicationRecord
     #   end
     # end
 
-    result[:threat_cats] = threat_cats
+    result[:threat_cats] = threat_cat_info
     result[:proxy_uri] = proxy_uri
     result[:rulehits] = wbrs_rule_hits
     result[:score] = wbrs_score
@@ -976,6 +979,25 @@ class DisputeEntry < ApplicationRecord
     end
 
     verdict
+
+  end
+
+  def self.threat_cats_from_ids(ids)
+    results = JSON.parse(Sbrs::Base.remote_call_sds_v3("", "threatcat_labels"))
+
+    response = []
+
+    ids.each do |id|
+      threat_cat = {}
+      threat_cat[:id] = id
+      threat_cat[:mnemonic] = results[id.to_s]["mnemonic"]
+      threat_cat[:name] = results[id.to_s]["name"]
+      threat_cat[:description] = results[id.to_s]["description"]
+
+      response << threat_cat
+    end
+
+    response
 
   end
 
