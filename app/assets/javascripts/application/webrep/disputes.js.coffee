@@ -2182,7 +2182,7 @@ window.query_uri_plus_ip = (uri, ips, entry_row) ->
       score     = response.json.score.toFixed(1)
 
       if response.json.threat_cats?
-       threat_cats = response.json.threat_cats
+       threat_cats = response.json.threat_cats.join(', ')
       else
         threat_cats = ''
 
@@ -2204,7 +2204,7 @@ window.query_uri_plus_ip = (uri, ips, entry_row) ->
       $(wbrs_hits_cell).text(rule_hits)
       $(wbrs_rules_cell).text(rules)
       $(wbrs_cat_cell).text(threat_cats)
-      $(wbrs_cat_cell).text(proxy)
+      $(wbrs_proxy_cell).text(proxy)
 
       # If there are rule hits, add to the rule hit details table
       wbrs_details_table = $($(entry_row).find('.wbrs-details-table')[0]).find('tbody')[0]

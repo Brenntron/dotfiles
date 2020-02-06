@@ -894,15 +894,15 @@ class DisputeEntry < ApplicationRecord
     threat_cats = results["threat_cats"]
 
 
-    threat_cat_name = []
+    threat_cat_names = []
     if threat_cats.present?
       threat_cat_info = threat_cats_from_ids(threat_cats)
       threat_cat_info.each do |name|
-        threat_cat_name << name[:name]
+        threat_cat_names << name[:name]
       end
-      threat_cat_name
+      threat_cat_names
     end
-    threat_cat_names = threat_cat_name.join(',')
+
 
 
     if dispute_entry.present?
