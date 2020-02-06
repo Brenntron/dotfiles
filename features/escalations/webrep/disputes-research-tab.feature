@@ -106,6 +106,7 @@ Feature: Disputes index, Research tab
     Then I click ".add-ip-button"
     And  I fill in element, ".add-ip-input" with "1.1.1.1"
     And  I click "Submit Query"
+    And  take a screenshot
     Then I wait for "15" seconds
     Then I should see content "1.1.1.1" within ".entry-resolved-ip-content"
 
@@ -161,7 +162,7 @@ Feature: Disputes index, Research tab
     When I goto "escalations/webrep/disputes/1"
     And  I wait for "5" seconds
     Then I click "#research-tab-link"
-    And  I should not see content "drumf" within ".entry-resolved-ip-content"
+    And  I should see content "1.1.1.1" within ".entry-resolved-ip-content"
 
 
   @javascript
@@ -177,10 +178,16 @@ Feature: Disputes index, Research tab
     And  I wait for "5" seconds
     Then I click "#research-tab-link"
     And  I should see content "1.1.1.1" within ".entry-resolved-ip-content"
+    Then I click "Edit IP Addresses"
+    And  I fill in element, ".table-ip-input" with "2.2.2.2"
+    And  I click "Save IP Addresses"
+    And  I wait for "5" seconds
+    And  I should see content "2.2.2.2" within ".entry-resolved-ip-content"
+    And  take a screenshot
 
 
-  @javascript @now
-  Scenario: a user cannot add a resolved host IP to a dispute entry with type IP
+  @javascript
+  Scenario: a user cannot add a resolved host IP to a dispute entry that is an IP entry
     Given a user with role "webrep user" exists and is logged in
     And the following disputes exist:
       |id|
