@@ -129,5 +129,9 @@ $ ->
     labelField: 'name'
     searchField: 'name'
     options: createSelectOptions()
+    onFocus: () ->
+      window.toggle_selectize_layer(this, 'true')
+    onBlur: () ->
+      window.toggle_selectize_layer(this, 'false')
 
   }
