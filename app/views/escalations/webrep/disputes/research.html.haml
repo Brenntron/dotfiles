@@ -583,15 +583,15 @@
                       %td.input-col.ip-label-col{rowspan: '2'}
                         -# IP label
                       %td.dual-edit-field{colspan: '2', 'data-id': entry.id, 'data-field': 'host-ip'}
-                        %span.entry-resolved-ip-content
+                        %span.entry-resolved-ip-content{id: "resolved-ip-content-no-#{i}"}
                           = entry.web_ips
-                        %input.table-ip-input{type:'text', value: "#{entry.web_ips}"}
+                        %input.table-ip-input{type:'text', value: "#{entry.web_ips}", id: "table-ip-input-no-#{i}"}
                       %td.text-right.no-padding-right{colspan: '2'}
-                        %button.edit-button.inline-edit-ip-button.esc-tooltipped{title: 'Edit IP Addresses'}
+                        %button.edit-button.inline-edit-ip-button.esc-tooltipped{title: 'Edit IP Addresses', id: "edit-ip-result-no-#{i}"}
                           Edit IP Addresses
-                        %button.save-button.inline-save-ip-button.esc-tooltipped{title: 'Query IP Addresses'}
+                        %button.save-button.inline-save-ip-button.esc-tooltipped{title: 'Query IP Addresses', id: "save-ip-result-no-#{i}"}
                           Query IP Addresses
-                        %button.cancel-button.inline-cancel-ip-button.esc-tooltipped{title: 'Cancel IP Addresses'}
+                        %button.cancel-button.inline-cancel-ip-button.esc-tooltipped{title: 'Cancel IP Addresses', id: "cancel-ip-result-no-#{i}"}
 
                     %tr.research-uri-ip-data-row.research-page-ip-query-details
                       %td.research-table-details-wrapper{colspan: '4'}
