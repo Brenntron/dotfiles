@@ -2093,7 +2093,7 @@ window.add_host_ips = (button) ->
     $(dropdown).dropdown('toggle')
 
     # Create the IP rows
-    parent_row = $(form).parents('.research-table-row-wrapper')[0]
+    parent_row = $(form).parents('.research-table-row')[0]
     uri_data_row = $(parent_row).find('.research-overview-row')[0]
     ip_row =
       '<tr class="research-uri-ip-query-row">' +
@@ -2138,7 +2138,7 @@ window.add_host_ips = (button) ->
 
     # Time to make the donuts
     # Make call to sdsv3 to populate this beautiful new row
-    query_uri_plus_ip(entry_uri, ip_array, entry_id)
+    query_uri_plus_ip(entry_uri, ip_array, parent_row)
 
   else
     console.log 'add an error above the textarea'
@@ -2181,8 +2181,8 @@ window.query_uri_plus_ip = (uri, ips, entry_row) ->
         rule_hits = 0
       score     = response.json.score.toFixed(1)
 
-      if response.json.theat_cats?
-       threat_cats = response.json.theat_cats.join(', ')
+      if response.json.threat_cats?
+       threat_cats = response.json.threat_cats
       else
         threat_cats = ''
 

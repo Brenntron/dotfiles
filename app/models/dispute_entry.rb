@@ -893,36 +893,41 @@ class DisputeEntry < ApplicationRecord
     proxy_uri = results["proxy_uri"]
     threat_cats = results["threat_cats"]
 
+
+    threat_cat_name = []
     if threat_cats.present?
       threat_cat_info = threat_cats_from_ids(threat_cats)
-    end
-
-    if dispute_entry.present? && !wbrs_rule_hits.nil?
-      rule_hits_to_destroy = dispute_entry.dispute_rule_hits.where(:is_multi_ip_rulehit => true)
-
-      ###
-
-      rule_hits_to_destroy.destroy_all
-
-      wbrs_rule_hits.each do |rule_hit|
-        DisputeRuleHit.create(rule_type:'WBRS', name: rule_hit, dispute_entry_id: dispute_entry.id, is_multi_ip_rulehit: true)
+      threat_cat_info.each do |name|
+        threat_cat_name << name[:name]
       end
-      dispute_entry.multi_wbrs_threat_category = threat_cats.join(",")
+      threat_cat_name
+    end
+    threat_cat_names = threat_cat_name.join(',')
+
+
+    if dispute_entry.present?
+      unless wbrs_rule_hits.nil?
+        binding.pry
+        rule_hits_to_destroy = dispute_entry.dispute_rule_hits.where(:is_multi_ip_rulehit => true)
+
+        ###
+
+        rule_hits_to_destroy.destroy_all
+
+        wbrs_rule_hits.each do |rule_hit|
+          DisputeRuleHit.create(rule_type:'WBRS', name: rule_hit, dispute_entry_id: dispute_entry.id, is_multi_ip_rulehit: true)
+        end
+      end
+
+      dispute_entry.multi_wbrs_threat_category = threat_cat_names
+      dispute_entry.proxy_url = proxy_uri
       dispute_entry.score = wbrs_score
       dispute_entry.web_ips = ip_addresses
       dispute_entry.save
 
     end
 
-    # TODO find the labels for the threat cat ids
-    # if threat_cats.present?
-    #   threat_cats.each do |threat_cat|
-    #     # SbApi.remote
-    #     # Not sure what to do here, need to get the threat cat labels
-    #   end
-    # end
-
-    result[:threat_cats] = threat_cat_info
+    result[:threat_cats] = threat_cat_names
     result[:proxy_uri] = proxy_uri
     result[:rulehits] = wbrs_rule_hits
     result[:score] = wbrs_score
