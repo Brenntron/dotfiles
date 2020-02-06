@@ -2099,9 +2099,14 @@ window.add_host_ips = (button) ->
       '<tr class="research-uri-ip-query-row">' +
         '<td rowspan="2"></td>' +
         '<td class="input-col ip-label-col" rowspan="2"></td>' +
-        '<td class="dual-edit-field" colspan="7" data-field="web-ips" data-id="' + entry_id + '">' +
+        '<td class="dual-edit-field" colspan="5" data-field="host-ip" data-id="' + entry_id + '">' +
           '<span class="entry-data entry-resolved-ip-content">' + final_ips + '</span>' +
-          '<input class="table-entry-input wide" type="text" value="' + final_ips + '">' +
+          '<input class="table-ip-input wide" type="text" value="' + final_ips + '">' +
+        '</td>' +
+        '<td class="text-right no-padding-right" colspan="3">' +
+          '<button class="edit-button inline-edit-ip-button esc-tooltipped" title="Edit IP Addresses">Edit IP Addresses</button>' +
+          '<button class="save-button inline-save-ip-button esc-tooltipped" title="Save IP Addresses">Save IP Addresses</button>' +
+          '<button class="cancel-button inline-cancel-ip-button esc-tooltipped"></button>' +
         '</td>' +
       '</tr>'
 
@@ -2116,9 +2121,9 @@ window.add_host_ips = (button) ->
               '<td class="text-center uri-ip-wbrs-rule-total"></td>' +
               '<td><label>WBRS Rules</label></td>' +
               '<td class="uri-ip-wbrs-rules"></td>' +
-              '<td><label>Category</label></td>' +
+              '<td><label>Threat Category</label></td>' +
               '<td class="uri-ip-category"></td>' +
-              '<td><label>URI</label></td>' +
+              '<td><label>Proxy URI</label></td>' +
               '<td class="uri-ip-proxy"></td>' +
             '</tr>' +
           '</tbody></table>' +
