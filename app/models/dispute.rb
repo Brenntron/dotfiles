@@ -624,7 +624,7 @@ class Dispute < ApplicationRecord
           new_dispute_entry.assign_url_parts(key)
 
 
-          resolved_ip = Resolv.getAddress(DisputeEntry.domain_of(new_dispute_entry.uri)) rescue nil
+          resolved_ip = Resolv.getaddress(DisputeEntry.domain_of(new_dispute_entry.uri)) rescue nil
           if resolved_ip.present?
             new_dispute_entry.web_ips = resolved_ip
           end
