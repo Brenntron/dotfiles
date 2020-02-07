@@ -111,7 +111,6 @@ class DisputeEntry < ApplicationRecord
         else
           new_dispute_entry.sbrs_score = nil
         end
-        binding.pry
         resolved_ip = Resolv.getaddress(DisputeEntry.domain_of(new_dispute_entry.uri)) rescue nil
         if resolved_ip.present?
           new_dispute_entry.web_ips = [resolved_ip]

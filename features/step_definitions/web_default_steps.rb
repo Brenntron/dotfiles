@@ -165,6 +165,13 @@ Then(/^Element with class "(.*?)" should not have content "(.*?)"$/) do |class_n
   raise "content found when it should not have been found" if element.has_content?(content)
 end
 
+Then(/^Element with class "(.*?)" should not be empty$/) do |class_name|
+  element = find(:xpath, "//*[contains(@class, '#{class_name}')]")
+  unless element.has_content?
+    raise "content not found when it should have been found"
+  end
+end
+
 Then(/^Element with id "(.*?)" should have content "(.*?)"$/) do |id_name, content|
   find(:xpath, "//*[contains(@id, '#{id_name}')][contains(text(), '#{content}')]")
 end

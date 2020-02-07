@@ -204,12 +204,14 @@ module API
                 Preloader::Base.fetch_all_api_data(entry.ip_address, entry.id)
               else
                 entry.uri = params[:uri]
-                Preloader::Base.fetch_all_api_data(entry.uri, entry.id)
-                resolved_ip = Resolv.getaddress(DisputeEntry.domain_of(new_dispute_entry.uri)) rescue nil
+                resolved_ip = Resolv.getaddress(DisputeEntry.domain_of(entry.uri)) rescue nil
                 if resolved_ip.present?
                   entry.web_ips = [resolved_ip]
                 end
                 entry.save
+
+                Preloader::Base.fetch_all_api_data(entry.uri, entry.id)
+
               end
 
               json_packet << entry

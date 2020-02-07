@@ -828,7 +828,6 @@ Feature: Disputes
 #  TODO FINISH THE DEV FOR THIS
   @javascript @now
   Scenario: a user creates a new dispute ticket and the entry returns with a resolved host ip
-    And pending
     Given a user with role "webrep user" exists and is logged in
     And bugzilla rest api always saves
     And the following disputes exist:
@@ -851,6 +850,7 @@ Feature: Disputes
     And  I wait for "10" seconds
     Then I click "#research-tab-link"
     And  I wait for "3" seconds
+    And  Element with class "entry-resolved-ip-content" should not be empty
     And take a screenshot
 #    And I should see a resolved host ip etc.
 
