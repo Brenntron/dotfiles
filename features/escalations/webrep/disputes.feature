@@ -828,10 +828,15 @@ Feature: Disputes
 #  TODO FINISH THE DEV FOR THIS
   @javascript @now
   Scenario: a user creates a new dispute ticket and the entry returns with a resolved host ip
+    And pending
     Given a user with role "webrep user" exists and is logged in
+    And bugzilla rest api always saves
     And the following disputes exist:
       | id   |
       | 5370 |
+    And the following customers exist:
+      |id| name            |
+      |1 | Dispute Analyst |
     And  I goto "/escalations/webrep/disputes"
     And  I wait for "3" seconds
     Then I click "#new-dispute"
@@ -839,8 +844,15 @@ Feature: Disputes
 #    WHY IS THERE A COMMA IN THIS STEP DEF?
     And  I fill in element, "#ips_urls" with "petful.com"
     And  I click button "submit"
+    And  I wait for "1" seconds
+    And  I click button with class "close"
+    And  I wait for "3" seconds
+    Then I click "0000010101"
     And  I wait for "10" seconds
+    Then I click "#research-tab-link"
+    And  I wait for "3" seconds
     And take a screenshot
+#    And I should see a resolved host ip etc.
 
 
 
