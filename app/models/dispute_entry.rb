@@ -114,7 +114,7 @@ class DisputeEntry < ApplicationRecord
         binding.pry
         resolved_ip = Resolv.getaddress(DisputeEntry.domain_of(new_dispute_entry.uri)) rescue nil
         if resolved_ip.present?
-          new_dispute_entry.web_ips = resolved_ip
+          new_dispute_entry.web_ips = [resolved_ip]
         end
 
       end
