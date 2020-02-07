@@ -775,10 +775,11 @@
                           %td
                             %label Threat Category
                           %td.uri-ip-category
-
+                            = entry[:multi_wbrs_threat_category]
                           %td
                             %label Proxy URI
                           %td.uri-ip-proxy
+                            = entry[:proxy_uri]
 
 
                 %tr.nested-data-row{'data-entry-id': "#{entry.id}"}
