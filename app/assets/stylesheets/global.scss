@@ -1756,7 +1756,7 @@ button.close {
   background-color: $sidebar-nav-base;
   display: block;
   position: absolute;
-  color: $content-bg-color
+  color: $content-bg-color;
   text-transform: uppercase;
   font-weight: 700;
   line-height: $sidebar-width;
@@ -6564,6 +6564,7 @@ table.dispute-entry-table tbody tr.selected {
 #new-complaint-wrapper .selectize-dropdown.multi.form-control.selectize {
   background-color: $content-bg-color;
   height: auto !important;
+  margin-top: 10px;
 }
 
 .selectize-dropdown-content {
