@@ -143,9 +143,9 @@ module API
                 end
                 unless error_entry_ids.keys.empty?
                   if error_count == permitted_params['complaint_entry_ids'].count
-                    error_message = ["---The following entrys could not be taken because---"]
+                    error_message = ["---The following entries could not be taken because---"]
                   else
-                    error_message = ["---Some entries were taken however, The following entrys could not be taken because---"]
+                    error_message = ["---Some entries were taken however, The following entries could not be taken because---"]
                   end
                   error_entry_ids.keys.each do |key|
                     error_message << "#{key}: entry IDs -> #{error_entry_ids[key].to_sentence}"
@@ -185,9 +185,9 @@ module API
                 end
                 unless error_entry_ids.keys.empty?
                   if error_count == permitted_params['complaint_entry_ids'].count
-                    error_message = ["---The following entrys could not be returned because---"]
+                    error_message = ["---The following entries could not be returned because---"]
                   else
-                    error_message = ["---Some entries were returned however, The following entrys could not be returned because---"]
+                    error_message = ["---Some entries were returned however, The following entries could not be returned because---"]
                   end
                   error_entry_ids.keys.each do |key|
                     error_message << "#{key}: entry IDs -> #{error_entry_ids[key].to_sentence}"
