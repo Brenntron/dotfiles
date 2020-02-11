@@ -2,7 +2,7 @@
 development:
   adapter: mysql2
   encoding: utf8
-  database: analyst_console
+  database: ac_dev
   username: root
   host: localhost
 
