@@ -148,7 +148,7 @@ module API
                     error_message = ["Some entries were successfully taken, but the following entries could not be taken:"]
                   end
                   error_entry_ids.keys.each do |key|
-                    error_message << "#{key}: #{error_entry_ids[key].to_sentence}"
+                    error_message << "#{key} - #{error_entry_ids[key].to_sentence}"
                   end
                   unless error_count == permitted_params['complaint_entry_ids'].count
                     error_message << "Refresh the page to pickup the latest changes."
