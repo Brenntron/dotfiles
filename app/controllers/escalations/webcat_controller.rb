@@ -20,15 +20,15 @@ class Escalations::WebcatController < ApplicationController
     @overdue_comp = Complaint.overdue_count
 
     @ti_new_count = ComplaintEntry.where(complaint_id: Complaint.from_ti).where(status:"NEW").count
-    @ti_overdue_count = ComplaintEntry.where(complaint_id: Complaint.from_ti).where.not(status:"COMPLETED").where("created_at < ?",Time.now - 12.hours).count
+    @ti_overdue_count = ComplaintEntry.where(complaint_id: Complaint.from_ti).where.not(status:["RESOLVED", "COMPLETED"]).where("created_at < ?",Time.now - 12.hours).count
     @ti_assigned_count = ComplaintEntry.where(complaint_id: Complaint.from_ti).where(status:"ASSIGNED").count
 
     @wbnp_new_count = ComplaintEntry.where(complaint_id: Complaint.from_wbnp).where(status:"NEW").count
-    @wbnp_overdue_count = ComplaintEntry.where(complaint_id: Complaint.from_wbnp).where.not(status:"COMPLETED").where("created_at < ?",Time.now - 12.hours).count
+    @wbnp_overdue_count = ComplaintEntry.where(complaint_id: Complaint.from_wbnp).where.not(status:["RESOLVED","COMPLETED"]).where("created_at < ?",Time.now - 12.hours).count
     @wbnp_assigned_count = ComplaintEntry.where(complaint_id: Complaint.from_wbnp).where(status:"ASSIGNED").count
 
     @int_new_count = ComplaintEntry.where(complaint_id: Complaint.from_int).where(status:"NEW").count
-    @int_overdue_count = ComplaintEntry.where(complaint_id: Complaint.from_int).where.not(status:"COMPLETED").where("created_at < ?",Time.now - 12.hours).count
+    @int_overdue_count = ComplaintEntry.where(complaint_id: Complaint.from_int).where.not(status:["RESOLVED","COMPLETED"]).where("created_at < ?",Time.now - 12.hours).count
     @int_assigned_count = ComplaintEntry.where(complaint_id: Complaint.from_int).where(status:"ASSIGNED").count
 
     @pending_new_count = ComplaintEntry.where(status:"PENDING").count
