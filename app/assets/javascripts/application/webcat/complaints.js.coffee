@@ -1163,9 +1163,11 @@ format = (complaint_entry_row) ->
       '</div><div class="col-xs-12 col-sm-4 nested-complaint-editable-data">' +
       '<div class="row">' +
       '<div class="col-xs-12">' +
+      '<div><label class="content-label-sm">Original</label></div> ' +
+      '<div>' + host  + '</div>' +
       '<label class="content-label-sm">Edit URI</label><br/>' +
       '<input class="nested-table-input complaint-uri-input" id="complaint_prefix_' + entry_id +
-      '" type="text" onclick="this.select()" data-domain="' + domain + '"value="' + host +
+      '" type="text" onclick="this.select()" data-domain="' + domain + '"value="' + domain +
       '"' + entry_status + '>' +
       '<button class="secondary inline-button" onclick="updateURI(event,' + entry_id + ')">Update URI</button><br/>' +
       '<div class="complaint-selectize-col-wrapper">' +
