@@ -945,6 +945,7 @@ format = (complaint_entry_row) ->
   missing_data = '<span class="missing-data">No Data</span>'
   uri = ''
   host = ''
+  fqdn = ''
   url = ''
   search_uri = ''
   if complaint_entry.uri
@@ -968,6 +969,10 @@ format = (complaint_entry_row) ->
     search_uri = '<a href="https://www.google.com/search?q=site%3A' + complaint_entry.ip_address + '" target="_blank" onclick="select_cat_text_field(' + complaint_entry.entry_id + ')">' + complaint_entry.ip_address + '</a>'
   else
     uri = missing_data
+
+  fqdn = complaint_entry.domain
+  if complaint_entry.subdomain
+    fqdn = complaint_entry.subdomain + '.' + fqdn
 
   entry_status = ""
   reopen_class = "hidden"
@@ -1167,7 +1172,7 @@ format = (complaint_entry_row) ->
       '<div>' + host  + '</div>' +
       '<label class="content-label-sm">Edit URI</label><br/>' +
       '<input class="nested-table-input complaint-uri-input" id="complaint_prefix_' + entry_id +
-      '" type="text" onclick="this.select()" data-domain="' + domain + '"value="' + domain +
+      '" type="text" onclick="this.select()" data-domain="' + domain + '" data-fqdn=" '+ fqdn + '" value="' + domain +
       '"' + entry_status + '>' +
       '<button class="secondary inline-button" onclick="updateURI(event,' + entry_id + ')">Update URI</button><br/>' +
       '<div class="complaint-selectize-col-wrapper">' +
@@ -1844,7 +1849,6 @@ processSubmitMaster = () ->
 window.master_submit = () ->
   selectedItems = $('.selected + tr td.nested-complaint-data-wrapper')
   thingsSelected = getTouchedFormCount()
-  debugger
   if thingsSelected > selectedItems.length
     std_msg_confirm(
       "I noticed you have made changes to at least " + thingsSelected +  " complaints but you only have " + selectedItems.length + " items selected. Do you want to proceed with updating these items? It will reload the page and you will lose your other changes.",
