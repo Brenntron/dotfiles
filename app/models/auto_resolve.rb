@@ -1,7 +1,7 @@
 class AutoResolve
   include ActiveModel::Model
 
-  attr_accessor :address_type, :address, :resolved, :status, :rule_hits, :internal_comment, :resolution_comment
+  attr_accessor :address_type, :address, :resolved, :status, :rule_hits, :internal_comment, :resolution_comment, :auto_resolve_log
 
   ADDRESS_TYPE_IP           = 'IP'
   ADDRESS_TYPE_URI          = 'URI'
@@ -49,6 +49,11 @@ class AutoResolve
     @resolution_comment += str
   end
 
+  def append_auto_resolve_log(str)
+    @auto_resolve_log ||= ''
+    @auto_resolve_log += str
+  end
+
   def good_mnem?(rule_hit)
     %w{tuse a500 vsvd suwl wlw wlm wlh deli ciwl beaker_drl}.include?(rule_hit)
   end
@@ -57,15 +62,20 @@ class AutoResolve
   # Sets this object state to convention of NEW: human review needed, MALICIOUS: auto resolve, or nil unknown.
   def check_complaints(rule_hits:)
     return false unless rule_hits&.any?
-
+    auto_resolve_log = "----------BLS Positive Hit Check-------------\n"
     good_mnems = rule_hits.select{|rule_hit| good_mnem?(rule_hit)}
     if good_mnems.any?
+      auto_resolve_log += "\nPositive Hits were found:\n"
+      auto_resolve_log += "data: #{good_mnems.inspect.to_s}\n"
+
       append_comment("BLS positive hit(s): #{good_mnems.join(', ')}; ")
       true
     else
+      auto_resolve_log += "\nno Positive Hits were found\n"
       append_comment('BLS: -; ')
       false
     end
+    append_auto_resolve_log(auto_resolve_log)
   end
 
   def virus_total_scan_names
@@ -113,16 +123,25 @@ class AutoResolve
       scan_hits = scan_results.select do |scan|
         scan && scan['detected']
       end
+      auto_resolve_log = "----------Virus Total Check-------------\n"
       if scan_hits.any?
         hit_messages = scan_hits.map {|scan| "#{scan['name']}: #{scan['result']}"}
+        auto_resolve_log += "there were scan hits for this dispute entry.\n"
+        auto_resolve_log += "scan hits: #{hit_messages.join(', ')}\n"
+        auto_resolve_log += "VT verdict: Malicious"
         append_comment("#{hit_messages.join(', ')}; ")
         return STATUS_MALICIOUS
       else
+        auto_resolve_log += "there were no scan hits for this dispute entry.\n"
+        auto_resolve_log += "VT verdict: Non Malicious"
         append_comment('VT: -; ')
         return STATUS_NONMALICIOUS
       end
+      auto_resolve_log += "\n---------------------------------------\n\n"
+      append_auto_resolve_log(auto_resolve_log)
     end
   rescue
+    append_auto_resolve_log("\nError in VT check\n")
     append_comment('VT: error; ')
     return nil
   end
@@ -143,17 +162,23 @@ class AutoResolve
   # Sets this object state to convention of NEW: human review needed, MALICIOUS: auto resolve, or nil unknown.
   def check_umbrella(address: self.address)
     result = call_umbrella(address: address)
+    auto_resolve_log = "----------Umbrella Check-------------\n"
     if result && result[address]
       verdict = result[address]
       if 0 > verdict['status']
+        auto_resolve_log += "Umbrella Verdict: Malicious\n"
         append_comment('Umbrella: malicious domain.; ')
         return STATUS_MALICIOUS
       else
+        auto_resolve_log += "Umbrella Verdict: Non Malicious\n"
         append_comment('Umbrella: -; ')
         return STATUS_NONMALICIOUS
       end
     end
+    auto_resolve_log += "data: #{result.inspect.to_s}\n"
+    append_auto_resolve_log(auto_resolve_log)
   rescue
+    append_auto_resolve_log("\nError in Umbrella check\n")
     append_comment('Umbrella: error; ')
     return nil
   end
@@ -161,25 +186,35 @@ class AutoResolve
   def check_umbrella_from_preload(dispute_entry, address)
     if dispute_entry&.dispute_entry_preload&.umbrella.present?
       result = dispute_entry.dispute_entry_preload.umbrella
+      auto_resolve_log = "----------Umbrella Check (preload)-------------\n"
       if result == 'Malicious'
+        auto_resolve_log += "Umbrella Verdict: Malicious\n"
         append_comment('Umbrella: malicious domain.; ')
         return STATUS_MALICIOUS
       else
+        auto_resolve_log += "Umbrella Verdict: Non Malicious\n"
         append_comment('Umbrella: -; ')
         return STATUS_NONMALICIOUS
       end
+      auto_resolve_log += "data: #{result.inspect.to_s}\n"
+      append_auto_resolve_log(auto_resolve_log)
     else
       result = call_umbrella(address: address)
+      auto_resolve_log = "----------Umbrella Check-------------\n"
       if result && result[address]
         verdict = result[address]
         if 0 > verdict['status']
+          auto_resolve_log += "Umbrella Verdict: Malicious\n"
           append_comment('Umbrella: malicious domain.; ')
           return STATUS_MALICIOUS
         else
+          auto_resolve_log += "Umbrella Verdict: Non Malicious\n"
           append_comment('Umbrella: -; ')
           return STATUS_NONMALICIOUS
         end
       end
+      auto_resolve_log += "data: #{result.inspect.to_s}\n"
+      append_auto_resolve_log(auto_resolve_log)
     end
 
   rescue
@@ -348,13 +383,16 @@ class AutoResolve
   end
 
   def self.auto_resolve_email(dispute_entry, rule_hits)
+    auto_resolve_log = "\n-----------non customer email ip check--------------\n"
     bad_mnems = rule_hits.select{|rule_hit| bad_email_mnem?(rule_hit)}
     if bad_mnems.any?
+      auto_resolve_log += "bad email hits were found:\n"
+      auto_resolve_log += "#{bad_mnems.inspect.to_s}\n"
       dispute_entry.resolution = DisputeEntry::STATUS_RESOLVED_UNCHANGED
       dispute_entry.status = DisputeEntry::STATUS_RESOLVED
       dispute_entry.case_closed_at = Time.now
       dispute_entry.case_resolved_at = Time.now
-
+      dispute_entry.auto_resolve_log += auto_resolve_log
       dispute_entry.resolution_comment = build_resolution_message(rule_hits)
       dispute_entry.save
 
