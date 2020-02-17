@@ -158,6 +158,9 @@
                                 %input.reptool-class-cb{type: 'checkbox', name: 'classification', value: 'attackers', onclick: 'reptool_form_prep(this, "bulk")'}
                                   attackers
                               %li
+                                %input.reptool-class-cb{type: 'checkbox', name: 'classification', value: 'banking_fraud', onclick: 'reptool_form_prep(this, "bulk")'}
+                                  banking_fraud
+                              %li
                                 %input.reptool-class-cb{type: 'checkbox', name: 'classification', value: 'bogon', onclick: 'reptool_form_prep(this, "bulk")'}
                                   bogon
                               %li
@@ -169,25 +172,40 @@
                               %li
                                 %input.reptool-class-cb{type: 'checkbox', name: 'classification', value: 'cryptomining', onclick: 'reptool_form_prep(this, "bulk")'}
                                   cryptomining
-                          .col-xs-4
-                            %ul
                               %li
                                 %input.reptool-class-cb{type: 'checkbox', name: 'classification', value: 'dga', onclick: 'reptool_form_prep(this, "bulk")'}
                                   dga
                               %li
                                 %input.reptool-class-cb{type: 'checkbox', name: 'classification', value: 'exploitkit', onclick: 'reptool_form_prep(this, "bulk")'}
                                   exploitkit
+                          .col-xs-4
+                            %ul
+                              %li
+                                %input.reptool-class-cb{type: 'checkbox', name: 'classification', value: 'high_risk', onclick: 'reptool_form_prep(this, "bulk")'}
+                                  high_risk
+                              %li
+                                %input.reptool-class-cb{type: 'checkbox', name: 'classification', value: 'ioc', onclick: 'reptool_form_prep(this, "bulk")'}
+                                  ioc
+                              %li
+                                %input.reptool-class-cb{type: 'checkbox', name: 'classification', value: 'link_sharing', onclick: 'reptool_form_prep(this, "bulk")'}
+                                  link_sharing
+                              %li
+                                %input.reptool-class-cb{type: 'checkbox', name: 'classification', value: 'malicious', onclick: 'reptool_form_prep(this, "bulk")'}
+                                  malicious
                               %li
                                 %input.reptool-class-cb{type: 'checkbox', name: 'classification', value: 'malware', onclick: 'reptool_form_prep(this, "bulk")'}
                                   malware
                               %li
+                                %input.reptool-class-cb{type: 'checkbox', name: 'classification', value: 'newly_seen', onclick: 'reptool_form_prep(this, "bulk")'}
+                                  newly_seen
+                              %li
                                 %input.reptool-class-cb{type: 'checkbox', name: 'classification', value: 'open_proxy', onclick: 'reptool_form_prep(this, "bulk")'}
                                   open_proxy
+                          .col-xs-4
+                            %ul
                               %li
                                 %input.reptool-class-cb{type: 'checkbox', name: 'classification', value: 'open_relay', onclick: 'reptool_form_prep(this, "bulk")'}
                                   open_relay
-                          .col-xs-4
-                            %ul
                               %li
                                 %input.reptool-class-cb{type: 'checkbox', name: 'classification', value: 'phishing', onclick: 'reptool_form_prep(this, "bulk")'}
                                   phishing
@@ -197,6 +215,9 @@
                               %li
                                 %input.reptool-class-cb{type: 'checkbox', name: 'classification', value: 'spam', onclick: 'reptool_form_prep(this, "bulk")'}
                                   spam
+                              %li
+                                %input.reptool-class-cb{type: 'checkbox', name: 'classification', value: 'spyware', onclick: 'reptool_form_prep(this, "bulk")'}
+                                  spyware
                               %li
                                 %input.reptool-class-cb{type: 'checkbox', name: 'classification', value: 'suspicious', onclick: 'reptool_form_prep(this, "bulk")'}
                                   suspicious
@@ -380,6 +401,9 @@
                                               %input.reptool-class-cb{type: 'checkbox', name: 'classification', value: 'attackers', onclick: 'reptool_form_prep(this, "individual")'}
                                                 attackers
                                             %li
+                                              %input.reptool-class-cb{type: 'checkbox', name: 'classification', value: 'banking_fraud', onclick: 'reptool_form_prep(this, "individual")'}
+                                                banking_fraud
+                                            %li
                                               %input.reptool-class-cb{type: 'checkbox', name: 'classification', value: 'bogon', onclick: 'reptool_form_prep(this, "individual")'}
                                                 bogon
                                             %li
@@ -391,25 +415,40 @@
                                             %li
                                               %input.reptool-class-cb{type: 'checkbox', name: 'classification', value: 'cryptomining', onclick: 'reptool_form_prep(this, "individual")'}
                                                 cryptomining
-                                        .col-xs-4
-                                          %ul
                                             %li
                                               %input.reptool-class-cb{type: 'checkbox', name: 'classification', value: 'dga', onclick: 'reptool_form_prep(this, "individual")'}
                                                 dga
                                             %li
                                               %input.reptool-class-cb{type: 'checkbox', name: 'classification', value: 'exploitkit', onclick: 'reptool_form_prep(this, "individual")'}
                                                 exploitkit
+                                        .col-xs-4
+                                          %ul
+                                            %li
+                                              %input.reptool-class-cb{type: 'checkbox', name: 'classification', value: 'high_risk', onclick: 'reptool_form_prep(this, "individual")'}
+                                                high_risk
+                                            %li
+                                              %input.reptool-class-cb{type: 'checkbox', name: 'classification', value: 'ioc', onclick: 'reptool_form_prep(this, "individual")'}
+                                                ioc
+                                            %li
+                                              %input.reptool-class-cb{type: 'checkbox', name: 'classification', value: 'link_sharing', onclick: 'reptool_form_prep(this, "individual")'}
+                                                link_sharing
+                                            %li
+                                              %input.reptool-class-cb{type: 'checkbox', name: 'classification', value: 'malicious', onclick: 'reptool_form_prep(this, "individual")'}
+                                                malicious
                                             %li
                                               %input.reptool-class-cb{type: 'checkbox', name: 'classification', value: 'malware', onclick: 'reptool_form_prep(this, "individual")'}
                                                 malware
                                             %li
+                                              %input.reptool-class-cb{type: 'checkbox', name: 'classification', value: 'newly_seen', onclick: 'reptool_form_prep(this, "individual")'}
+                                                newly_seen
+                                            %li
                                               %input.reptool-class-cb{type: 'checkbox', name: 'classification', value: 'open_proxy', onclick: 'reptool_form_prep(this, "individual")'}
                                                 open_proxy
+                                        .col-xs-4
+                                          %ul
                                             %li
                                               %input.reptool-class-cb{type: 'checkbox', name: 'classification', value: 'open_relay', onclick: 'reptool_form_prep(this, "individual")'}
                                                 open_relay
-                                        .col-xs-4
-                                          %ul
                                             %li
                                               %input.reptool-class-cb{type: 'checkbox', name: 'classification', value: 'phishing', onclick: 'reptool_form_prep(this, "individual")'}
                                                 phishing
@@ -419,6 +458,9 @@
                                             %li
                                               %input.reptool-class-cb{type: 'checkbox', name: 'classification', value: 'spam', onclick: 'reptool_form_prep(this, "individual")'}
                                                 spam
+                                            %li
+                                              %input.reptool-class-cb{type: 'checkbox', name: 'classification', value: 'spyware', onclick: 'reptool_form_prep(this, "individual")'}
+                                                spyware
                                             %li
                                               %input.reptool-class-cb{type: 'checkbox', name: 'classification', value: 'suspicious', onclick: 'reptool_form_prep(this, "individual")'}
                                                 suspicious
