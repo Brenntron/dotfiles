@@ -939,13 +939,19 @@ window.drop_current_categories = () ->
       std_msg_error("<p>There has been an error dropping categories: #{json.error}","")
 )
 
+window.fill_qual_subdomain =(anchor_tag, input_id, qual_subdomain) ->
+  event.preventDefault();
+  $('#' + input_id)[0].value = qual_subdomain
+  return false;
+
+
 format = (complaint_entry_row) ->
   complaint_entry = complaint_entry_row.data()
   row_id = complaint_entry_row[0][0]
   missing_data = '<span class="missing-data">No Data</span>'
   uri = ''
   host = ''
-  fqdn = ''
+  qual_subdomain = ''
   url = ''
   search_uri = ''
   if complaint_entry.uri
@@ -970,9 +976,9 @@ format = (complaint_entry_row) ->
   else
     uri = missing_data
 
-  fqdn = complaint_entry.domain
+  qual_subdomain = complaint_entry.domain
   if complaint_entry.subdomain
-    fqdn = complaint_entry.subdomain + '.' + fqdn
+    qual_subdomain = complaint_entry.subdomain + '.' + qual_subdomain
 
   entry_status = ""
   reopen_class = "hidden"
@@ -1172,9 +1178,10 @@ format = (complaint_entry_row) ->
       '<div>' + host  + '</div>' +
       '<label class="content-label-sm">Edit URI</label><br/>' +
       '<input class="nested-table-input complaint-uri-input" id="complaint_prefix_' + entry_id +
-      '" type="text" onclick="this.select()" data-domain="' + domain + '" data-fqdn=" '+ fqdn + '" value="' + domain +
+      '" type="text" onclick="this.select()" data-domain="' + domain + '" data-qual_subdomain="'+ qual_subdomain + '" value="' + domain +
       '"' + entry_status + '>' +
       '<button class="secondary inline-button" onclick="updateURI(event,' + entry_id + ')">Update URI</button><br/>' +
+      '<div><a href="#" onclick="fill_qual_subdomain(this, \'complaint_prefix_' + entry_id + '\', \''+ qual_subdomain + '\')">subdomain</a></div>' +
       '<div class="complaint-selectize-col-wrapper">' +
       '<label class="content-label-sm">Edit Categories / Confidence Order</label>' +
       '<select id="' + input_cat + '" name="[' + input_cat + '][]" class="' + status_class + '" placeholder="Enter up to 5 categories" value="" onchange="touchedFormChange(\'' + complaint_entry.domain + '\')"></select>' +
