@@ -41,6 +41,9 @@ window.update_file_rep_status = () ->
       std_msg_error('Unable to update File Reputation Ticket status.')
   )
 
+window.show_auto_resolve = () ->
+  $('#auto-resolve-modal').modal('show')
+
 window.update_file_rep_status_on_show = () ->
   resolution = ""
   comment = ""

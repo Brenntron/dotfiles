@@ -14,19 +14,29 @@
                 Case ID
               .top-info-data.case-id-tag#dispute_id
                 = @file_rep_dispute.id.to_s.rjust(10, '0')
+
+              %div.modal.fade#auto-resolve-modal{tabindex:"-1", role:"dialog", 'aria-labelledby':'auto-resolve-modal'}
+                .modal-dialog{role:"document"}
+                .modal-content
+                  .modal-header
+                    %h1 Auto Resolve Log
+                    %button{type:"button", class:"close", 'data-dismiss':"modal", 'aria-label':"Close"}
+                  .modal-body
+                    = @file_rep_dispute.auto_resolve_log
+
               %label.content-label-sm Date/Time Submitted
               .top-info-data= @file_rep_dispute.created_at.strftime("%b %e, %Y %l:%M %p")
 
               %label.content-label-sm
                 Status
               -#  Add ruby code for status here
+
               %span.dropdown.top-info-data
                 %button#show-edit-ticket-status-button.inline-select-dropdown.ticket-status-button.dropdown-toggle{title:'Edit Ticket Status', 'data-toggle': 'dropdown', 'aria-haspopup': 'true', 'aria-expanded': 'false',  }
                   - if @file_rep_dispute.status.nil?
                     NEW
                   - else
                     = @file_rep_dispute.status
-
                 .dropdown-menu.inline-dropdown-menu#show-edit-ticket-status-dropdown{'aria-labelledby': 'show-edit-ticket-status-button'}
                   %ul
                     %li.status-radio-wrapper
@@ -87,7 +97,8 @@
                       .button-row-center
                         %button.primary.change_ticket_status_button{type:'button', id:'webrep_change_ticket_status', onclick:'update_file_rep_status_on_show();'}
                           Submit
-
+              %button#auto_resolve_log_button.primary{onclick:'show_auto_resolve()'}
+                Auto Resolve Log
 
             .col-xs-6.col-sm-6.col-md-6.col-lg-6.col-xl-6.col-with-divider.col-assignee
               %label.content-label-sm

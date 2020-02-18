@@ -2185,6 +2185,18 @@ a.static-nav-item {
   margin-top: 0;
   width: 155px;
 }
+#auto_resolve_log_button.primary{
+  padding: 7px;
+  font-size: .85em;
+  margin: 0
+}
+#auto-resolve-modal{
+  width: 50%;
+  margin: 0 auto;
+ .close{
+   margin: 5px
+ }
+}
 #add_dispute_entry:focus {
   border: none !important;
 }
