@@ -76,7 +76,7 @@ class ComplaintEntry < ApplicationRecord
         return("Already completed")
       end
     else
-      return("Someone elses complaint")
+      return("Currently assigned to someone else")
     end
     return("Complaint taken")
   end
