@@ -14,15 +14,8 @@
                 Case ID
               .top-info-data.case-id-tag#dispute_id
                 = @file_rep_dispute.id.to_s.rjust(10, '0')
-
-              %div.modal.fade#auto-resolve-modal{tabindex:"-1", role:"dialog", 'aria-labelledby':'auto-resolve-modal'}
-                .modal-dialog{role:"document"}
-                .modal-content
-                  .modal-header
-                    %h1 Auto Resolve Log
-                    %button{type:"button", class:"close", 'data-dismiss':"modal", 'aria-label':"Close"}
-                  .modal-body
-                    = @file_rep_dispute.auto_resolve_log
+              #auto-resolve-modal
+                = @file_rep_dispute.auto_resolve_log
 
               %label.content-label-sm Date/Time Submitted
               .top-info-data= @file_rep_dispute.created_at.strftime("%b %e, %Y %l:%M %p")

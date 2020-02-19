@@ -2180,7 +2180,9 @@ a.static-nav-item {
   outline: none;
   font-weight: 400;
 }
-
+.hidden-auto-resolve{
+  z-index: 0;
+}
 #add_dispute_entry {
   margin-top: 0;
   width: 155px;
@@ -4014,6 +4016,14 @@ input.communication-subject {
   display: inline-block;
 }
 
+.ui-dialog[aria-describedby=auto-resolve-modal]{
+  width: 500px!important;
+}
+#auto-resolve-modal{
+  padding: 13px;
+  max-height: 700px;
+  overflow-x: auto;
+}
 .email-reply-header-information, .dialog-form-information {
   padding: 5px;
   background-color: $faint-neutral-color;
@@ -10243,7 +10253,7 @@ table.rl-content {
 }
 
 // AMP history dialog positioning - jquery overrides
-.ui-dialog[aria-describedby=amp-history-dialog] {
+.ui-dialog[aria-describedby=amp-history-dialog]{
   margin-top: 55px;
   margin-right: 15px;
   border-radius: 5px;

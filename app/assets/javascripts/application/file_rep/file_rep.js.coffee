@@ -1,3 +1,10 @@
+$(document).on 'ready',->
+  if $('#auto-resolve-modal').length > 0
+    $('#auto-resolve-modal').dialog({
+      autoOpen : false
+    });
+window.show_auto_resolve = () ->
+  $('#auto-resolve-modal').dialog('open')
 window.update_file_rep_status = () ->
   checked_disputes = []
   resolution = ""
@@ -40,9 +47,6 @@ window.update_file_rep_status = () ->
     error: (response) ->
       std_msg_error('Unable to update File Reputation Ticket status.')
   )
-
-window.show_auto_resolve = () ->
-  $('#auto-resolve-modal').modal('show')
 
 window.update_file_rep_status_on_show = () ->
   resolution = ""
