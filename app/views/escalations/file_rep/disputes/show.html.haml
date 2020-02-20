@@ -14,22 +14,19 @@
                 Case ID
               .top-info-data.case-id-tag#dispute_id
                 = @file_rep_dispute.id.to_s.rjust(10, '0')
-              #auto-resolve-modal
-                = @file_rep_dispute.auto_resolve_log
-
               %label.content-label-sm Date/Time Submitted
               .top-info-data= @file_rep_dispute.created_at.strftime("%b %e, %Y %l:%M %p")
 
               %label.content-label-sm
                 Status
               -#  Add ruby code for status here
-
               %span.dropdown.top-info-data
                 %button#show-edit-ticket-status-button.inline-select-dropdown.ticket-status-button.dropdown-toggle{title:'Edit Ticket Status', 'data-toggle': 'dropdown', 'aria-haspopup': 'true', 'aria-expanded': 'false',  }
                   - if @file_rep_dispute.status.nil?
                     NEW
                   - else
                     = @file_rep_dispute.status
+
                 .dropdown-menu.inline-dropdown-menu#show-edit-ticket-status-dropdown{'aria-labelledby': 'show-edit-ticket-status-button'}
                   %ul
                     %li.status-radio-wrapper
@@ -90,8 +87,7 @@
                       .button-row-center
                         %button.primary.change_ticket_status_button{type:'button', id:'webrep_change_ticket_status', onclick:'update_file_rep_status_on_show();'}
                           Submit
-              %button#auto_resolve_log_button.primary{onclick:'show_auto_resolve()'}
-                Auto Resolve Log
+
 
             .col-xs-6.col-sm-6.col-md-6.col-lg-6.col-xl-6.col-with-divider.col-assignee
               %label.content-label-sm
@@ -164,6 +160,10 @@
                   = @file_rep_dispute.description
                 - else
                   %span.missing-data No details submitted.
+              %button#auto_resolve_log_button.primary{onclick:'show_auto_resolve()'}
+                Auto Resolve Log
+              #auto-resolve-modal
+                = @file_rep_dispute.auto_resolve_log
 
 
   .col-xs-12.col-sm-6
