@@ -52,7 +52,7 @@ class Sbrs::Base
       ip_params_string = "&"
     end
 
-    ip_params_string += ip_items.each {|ip| "ip=#{ip}"}.join("&")
+    ip_params_string += ip_items.map {|ip| "ip=#{ip}"}.join("&")
 
     uri_query                  = {}
     uri_query["hostname"]      = Sbrs::Base.sds_v3_host
