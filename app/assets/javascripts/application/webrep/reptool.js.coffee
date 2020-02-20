@@ -10,10 +10,11 @@
 ## research page and research tab (individual submission form)
 $(document).ready ->
   $('.webrep_auto_resolve').each ->
-    $(this).dialog({autoOpen : false});
+    $(this).dialog({autoOpen : false, width: 500});
 
 window.show_webrep_auto_resolve = (entry) ->
-  $('#webrep_auto_resolve-' + entry ).dialog('open')
+  dialog = $('#webrep_auto_resolve-' + entry)
+  dialog.dialog('open')
 
 window.get_current_reptool =(button, page) ->
   dropdown = $(button).parents('.dropdown')[0]

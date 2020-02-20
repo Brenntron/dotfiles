@@ -1,10 +1,11 @@
 $(document).on 'ready',->
-  if $('#auto-resolve-modal').length > 0
-    $('#auto-resolve-modal').dialog({
+  if $('#auto-resolve-dialog').length > 0
+    $('#auto-resolve-dialog').dialog({
       autoOpen : false
+      width: 500
     });
 window.show_auto_resolve = () ->
-  $('#auto-resolve-modal').dialog('open')
+  $('#auto-resolve-dialog').dialog('open')
 window.update_file_rep_status = () ->
   checked_disputes = []
   resolution = ""
