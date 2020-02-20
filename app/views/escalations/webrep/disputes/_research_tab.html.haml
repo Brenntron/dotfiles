@@ -6,6 +6,7 @@
 %h1 Research Data
 .row
   .col-xs-12
+
     #research-tab-toolbar.toolbar
       %div
         %label.toolbar-section-label Table View
@@ -236,8 +237,6 @@
             %span.toolbar-button-text Export
         %button.toolbar-button.export-button.esc-tooltipped.toolbar-button-spacer{title: 'Export Selected to CSV', onclick: 'webrep_research_export_selected_rows();'}
           %span.toolbar-button-text Export Selected to CSV
-        %button.toolbar-button.auto-resolve-button#sync-data-button.toolbar-button-spacer
-          %span.toolbar-button-text Auto Resolve Log
 
       .edit-button-wrapper.edit-entries-buttons.hidden
         %button.save-all-changes.panel-button.save-button.tooltipped{title: 'Save All Changes',
@@ -357,7 +356,11 @@
                     = entry.dispute_entry_preload&.created_at&.strftime('%F %T')
 
                   %td.dispute_rep_tools.rep-tools-cell
+                    .webrep_auto_resolve{id:"webrep_auto_resolve-#{entry.id}"}
+                      = entry.auto_resolve_log
                     %span.dispute_rep_tools_wrapper
+
+                      %button.dispute-inline-buttons.auto-resolve-button.esc-tooltipped{'data-entry-id': "#{entry.id}", title: 'View Auto Resolve Log', onclick:"show_webrep_auto_resolve(#{entry.id})"}
                       - if (@dispute.resolution != Dispute::DUPLICATE) && (@dispute.status != Dispute::RESOLVED)
                         %button.dispute-inline-buttons.edit-button.inline-edit-entry-button.esc-tooltipped{'data-entry-id': "#{entry.id}", title: 'Edit this entry'}
                       %span.dropdown

@@ -8,6 +8,13 @@
 
 ## Populating the inline Adjust Reptool dropdown for
 ## research page and research tab (individual submission form)
+$(document).ready ->
+  $('.webrep_auto_resolve').each ->
+    $(this).dialog({autoOpen : false});
+
+window.show_webrep_auto_resolve = (entry) ->
+  $('#webrep_auto_resolve-' + entry ).dialog('open')
+
 window.get_current_reptool =(button, page) ->
   dropdown = $(button).parents('.dropdown')[0]
   submit_button = $(dropdown).find('.dropdown-submit-button')[0]
