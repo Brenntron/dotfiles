@@ -927,7 +927,7 @@ class DisputeEntry < ApplicationRecord
       if self.suggested_disposition == verdict
         self.status = STATUS_RESOLVED
         self.resolution = STATUS_RESOLVED_UNCHANGED
-        self.resolution_comment = "#{self.hostlookup} has begun to improve and currently has a Neutral Talos Intelligence email reputation (within acceptable parameters).   The reputation should continue to improve as we receive additional good mail volume reports for the IP from our sensor network.  Please note that some customers may decide to block at neutral. We have no control over how passive or aggressive our customers choose to be when implementing our reputation information."
+        self.resolution_comment = "The Suggested Disposition provided for the Dispute Entry matches its Current Disposition."
         self.save
 
         return true
