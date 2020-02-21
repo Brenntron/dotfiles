@@ -2184,6 +2184,11 @@ a.static-nav-item {
 .hidden-auto-resolve{
   z-index: 0;
 }
+.webrep_auto_resolve, #auto-resolve-dialog{
+  padding: 13px!important;
+  max-height: 600px!important;
+  overflow-x: scroll!important;
+}
 #add_dispute_entry {
   margin-top: 0;
   width: 155px;
