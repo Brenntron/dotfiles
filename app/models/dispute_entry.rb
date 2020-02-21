@@ -3,6 +3,8 @@ require 'socket'
 class DisputeEntry < ApplicationRecord
   attr_writer :wbrs_xlist
 
+  attr_accessor :running_verdict
+
   has_paper_trail on: [:update], ignore: [:updated_at, :entry_type]
   belongs_to :dispute, touch: true
   belongs_to :user, optional: true
@@ -912,19 +914,23 @@ class DisputeEntry < ApplicationRecord
 
   end
 
+  def running_verdict
+    @running_verdict
+  end
+
   def is_disposition_matching?
 
     begin
-      verdict = ""
+
       wbrs_stuff = Sbrs::Base.remote_call_sds_v3(self.hostlookup, "wbrs")
 
       if self.entry_type == "URI/DOMAIN"
-        verdict = self.class.verdict_from_score(wbrs_stuff["wbrs"]["score"])
+        @running_verdict = self.class.verdict_from_score(wbrs_stuff["wbrs"]["score"])
       else
-        verdict = self.class.email_verdict_from_score(self.sbrs_score)
+        @running_verdict = self.class.email_verdict_from_score(self.sbrs_score)
       end
 
-      if self.suggested_disposition == verdict
+      if self.suggested_disposition == @running_verdict
         self.status = STATUS_RESOLVED
         self.resolution = STATUS_RESOLVED_UNCHANGED
         self.resolution_comment = "#{self.hostlookup} has begun to improve and currently has a Neutral Talos Intelligence email reputation (within acceptable parameters).   The reputation should continue to improve as we receive additional good mail volume reports for the IP from our sensor network.  Please note that some customers may decide to block at neutral. We have no control over how passive or aggressive our customers choose to be when implementing our reputation information."

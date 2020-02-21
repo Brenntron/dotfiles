@@ -36,6 +36,10 @@ class AutoResolve
     @resolved
   end
 
+  def auto_resolve_log
+    @auto_resolve_log
+  end
+
   # @return [Boolean] true if auto resolve check is bad and entry auto resolves to malicious.
   def malicious?
     STATUS_MALICIOUS == self.status
