@@ -529,6 +529,7 @@ class Dispute < ApplicationRecord
           total_hits = (wbrs_hits + sbrs_hits).uniq
 
           new_dispute_entry = new_dispute.dispute_entries.build(entry_type: 'IP', ip_address: key)
+          new_dispute_entry.auto_resolve_log = ""
           new_dispute_entry.case_opened_at = opened_at
           new_dispute_entry.sbrs_score = entry[:sbrs]["SBRS_SCORE"] == "No score" ? nil : entry[:sbrs]["SBRS_SCORE"]
           new_dispute_entry.wbrs_score = entry[:wbrs]["WBRS_SCORE"] == "No score" ? nil : entry[:wbrs]["WBRS_SCORE"]
@@ -629,7 +630,7 @@ class Dispute < ApplicationRecord
           new_dispute_entry.wbrs_score = entry["WBRS_SCORE"] == "No score" ? nil : entry["WBRS_SCORE"]
           new_dispute_entry.suggested_disposition = entry["rep_sugg"]
           new_dispute_entry.is_important = is_important?(key)
-
+          new_dispute_entry.auto_resolve_log = ""
           new_dispute_entry.assign_url_parts(key)
 
           new_dispute_entry.save!
