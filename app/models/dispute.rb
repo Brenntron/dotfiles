@@ -542,6 +542,14 @@ class Dispute < ApplicationRecord
 
           matching_disposition = new_dispute_entry.is_disposition_matching?
 
+          initial_log = "--------Starting Data---------\n"
+          initial_log += "suggested disposition: #{new_dispute_entry.suggested_disposition}\n"
+          initial_log += "effective disposition info: #{new_dispute_entry.running_dispute.inspect.to_s}\n"
+          initial_log += "-----------------------------\n"
+
+          new_dispute_entry.auto_resolve_log += initial_log
+          new_dispute_entry.save!
+
           if !matching_disposition
 
             if !false_negative_claim
@@ -564,6 +572,7 @@ class Dispute < ApplicationRecord
 
 
             end
+            new_dispute.auto_resolve_log += auto_resolve_verdict.auto_resolve_log
             new_dispute_entry.save!
 
           end
@@ -629,6 +638,15 @@ class Dispute < ApplicationRecord
 
           logger.info "fetching preload"
           ::Preloader::Base.fetch_all_api_data(key, new_dispute_entry.id)
+
+
+          initial_log = "--------Starting Data---------\n"
+          initial_log += "suggested disposition: #{new_dispute_entry.suggested_disposition}\n"
+          initial_log += "effective disposition info: #{new_dispute_entry.running_dispute.inspect.to_s}\n"
+          initial_log += "-----------------------------\n"
+
+          new_dispute_entry.auto_resolve_log += initial_log
+          new_dispute_entry.save!
 
 
           if !matching_disposition
