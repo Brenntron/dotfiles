@@ -312,6 +312,38 @@ window.submit_bulk_reptool = () ->
       'classifications': current_classes
     }
 
+  # Comment reconstruction for Reptool. it needs a single-line format now without newlines
+  delimiter = '-------------------------------' # use the dashline to separate the comment in half
+
+  # get the 'typed in' part of the comment
+  comm_typed_in = comment.split(delimiter)[0]
+  comm_typed_in = comm_typed_in.replace(/(\r\n|\n|\r)/gm, " ")  # replace newlines with spaces
+
+  # get the 'auto-generated' part of the comment
+  comm_gen = comment.split(delimiter)[1]
+  comm_gen = comm_gen.replace(/(\r\n|\n|\r)/gm, ", ")  # replace newlines with commas
+
+  # take the legacy all-caps strings for recasing
+  type_a = 'RESEARCH BULK SUBMISSION'
+  type_b = 'BULK SUBMISSION'
+
+  # generate the reconstructed comment that is now single-line
+  if comm_gen.indexOf(type_a) > 0
+    comm_gen = comm_gen.replace(type_a, '')
+    comment = "AC Research Bulk Submission:#{comm_gen}"
+  else if comm_gen.indexOf(type_b) > 0
+    comm_gen = comm_gen.replace(type_b, '')
+    comment = "AC Bulk Submission:#{comm_gen}"
+
+  # if they typed anything as an additional comment above the auto-generated part, add it to the end
+  if comm_typed_in.trim() != ''
+    comment = "#{comment} || Comment: #{comm_typed_in}"
+
+  # comment is now ready to send to Reptool, do a one-off format fix
+  comment = comment.replace(' , : ,', '')
+  console.clear()  # DELETE THIS
+  console.log(comment)  # DELETE THIS
+
   # If user wants to override existing classes we only need what they've checked
   if submission_action == "reptool-override"
     data = {

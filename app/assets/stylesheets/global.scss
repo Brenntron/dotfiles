@@ -11765,3 +11765,8 @@ span.threat-cat-no-data {
 #webcat-index-toolbar .collapse-all {
   margin-right: 0;
 }
+
+// reptool dropdown urls are too long, need to wrap/break
+.reptool-entry-name {
+  word-break: break-all;
+}
