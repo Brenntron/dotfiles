@@ -13,7 +13,7 @@ window.get_current_reptool =(button, page) ->
   submit_button = $(dropdown).find('.dropdown-submit-button')[0]
   entry_row = $(button).parents('.research-table-row')[0]
   entry = $(entry_row).find('.entry-data-content')
-  entry_content = $(entry).text().trim()
+  entry_content = $(entry).text().trim()   # entry_content is simply the URL in this row, this is working
   case_id = $('#dispute_id').text().trim()
   comment_trail = ''
 
@@ -30,10 +30,17 @@ window.get_current_reptool =(button, page) ->
   else if page == "research"
     comment_trail = '\n \n------------------------------- \nINDIVIDUAL RESEARCH SUBMISSION: \n' + entry_content
 
+  # ensure ip_uris is valid for the endpoint, it is just the URL for this row
+  ip_uris = entry_content
+
   # Send entry content to reptool
   data = {
     'entry': entry_content
   }
+
+  console.clear()
+  console.log ip_uris
+
   std_msg_ajax(
     url: '/escalations/api/v1/escalations/webrep/disputes/bulk_reptool_get_info_for_form'
     method: 'POST'
@@ -204,6 +211,41 @@ window.submit_individual_reptool = (button) ->
   classification_action = $($(dropdown).find("input[name='reptool-classes-radio']:checked")).val()
   comment = $($(dropdown).find('.dropdown-comment')).val()
 
+
+  # BEGIN INLINE: Comment reconstruction for Reptool, it needs a single-line format now w/o newlines, BEGIN
+  delimiter = '-------------------------------' # use the dashline to separate the comment in half
+
+  # get the 'typed in' part of the comment
+  comm_typed_in = comment.split(delimiter)[0]
+  comm_typed_in = comm_typed_in.replace(/(\r\n|\n|\r)/gm, " ")  # replace newlines w/ spaces
+
+  # get the 'auto-generated' part of the comment
+  comm_gen = comment.split(delimiter)[1]
+  comm_gen = comm_gen.replace(/(\r\n|\n|\r)/gm, ", ")  # replace newlines w/ commas
+
+  # set the legacy all-caps strings for recasing
+  type_a = 'INLINE BULK SUBMISSION'
+  type_b = 'INLINE SUBMISSION'
+
+  # generate the reconstructed comment that is now single-line
+  if comm_gen.indexOf(type_a) > 0
+    comm_gen = comm_gen.replace(type_a, '')
+    comment = "AC Research Bulk Submission:#{comm_gen}"
+  else if comm_gen.indexOf(type_b) > 0
+    comm_gen = comm_gen.replace(type_b, '')
+    comment = "AC Bulk Submission:#{comm_gen}"
+
+  # if they typed anything as an additional comment above the auto-generated part, add it to the end
+  if comm_typed_in.trim() != ''
+    comment = "#{comment} || Comment: #{comm_typed_in}"
+
+  # comment is now ready to send to Reptool, do a one-off format fix
+  comment = comment.replace(' , : ,', '')
+  console.clear()
+  console.log comment
+  # END INLINE: comment is now a single-line, and ready for Reptool now
+
+
   # If user wants to override existing classes we only need what they've checked
   if submission_action == "reptool-override"
     api_url = '/escalations/api/v1/escalations/webrep/disputes/reptool_bl'
@@ -312,18 +354,18 @@ window.submit_bulk_reptool = () ->
       'classifications': current_classes
     }
 
-  # Comment reconstruction for Reptool. it needs a single-line format now without newlines
+  # BEGIN BULK: Comment reconstruction for Reptool, it needs a single-line format now without any newlines
   delimiter = '-------------------------------' # use the dashline to separate the comment in half
 
   # get the 'typed in' part of the comment
   comm_typed_in = comment.split(delimiter)[0]
-  comm_typed_in = comm_typed_in.replace(/(\r\n|\n|\r)/gm, " ")  # replace newlines with spaces
+  comm_typed_in = comm_typed_in.replace(/(\r\n|\n|\r)/gm, " ")  # replace newlines w/ spaces
 
   # get the 'auto-generated' part of the comment
   comm_gen = comment.split(delimiter)[1]
-  comm_gen = comm_gen.replace(/(\r\n|\n|\r)/gm, ", ")  # replace newlines with commas
+  comm_gen = comm_gen.replace(/(\r\n|\n|\r)/gm, ", ")  # replace newlines w/ commas
 
-  # take the legacy all-caps strings for recasing
+  # set the legacy all-caps strings for recasing
   type_a = 'RESEARCH BULK SUBMISSION'
   type_b = 'BULK SUBMISSION'
 
@@ -341,8 +383,9 @@ window.submit_bulk_reptool = () ->
 
   # comment is now ready to send to Reptool, do a one-off format fix
   comment = comment.replace(' , : ,', '')
-  console.clear()  # DELETE THIS
-  console.log(comment)  # DELETE THIS
+  console.clear()
+  console.log comment
+  # END BULK: comment is now a single-line, and ready for Reptool now
 
   # If user wants to override existing classes we only need what they've checked
   if submission_action == "reptool-override"
