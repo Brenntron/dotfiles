@@ -89,7 +89,7 @@
       Edit Ticket
 
     %span.dropdown
-      %button#index_change_assign.toolbar-button.ticket-owner-button.show-col-button.dropdown-toggle.esc-tooltipped.toolbar-button-spacer{title: 'Change Assignee', 'data-toggle': 'dropdown', 'aria-haspopup': 'true', 'aria-expanded': 'false'}
+      %button#index_change_assign.toolbar-button.ticket-owner-button.dropdown-toggle.esc-tooltipped.toolbar-button-spacer{title: 'Change Assignee', 'data-toggle': 'dropdown', 'aria-haspopup': 'true', 'aria-expanded': 'false'}
         %span.toolbar-button-text
           Change Assignee
       .dropdown-menu.toolbar-dropdown#index-change-assign-dropdown{'aria-labelledby': 'index_change_assign'}
@@ -443,10 +443,10 @@
       File
     %form#disputes-index-export-form{action: escalations_webrep_disputes_path(format: :xlsx), method: :get}
       = hidden_field_tag('data_json', '{}', id: 'disputes-index-export-data-input')
-      %button.toolbar-button.dropdown-button-margin-right.export-button.esc-tooltipped{title: 'Export to CSV'}
+      %button.toolbar-button.dropdown-button-margin-right.export-button.export-all-btn.esc-tooltipped{title: 'Export to CSV'}
         %span.toolbar-button-text
           Export to CSV
-    %button.toolbar-button.export-button.esc-tooltipped{title: 'Export Selected to CSV', onclick: 'webrep_export_selected_rows();'}
+    %button.toolbar-button.export-button.export-selected-btn.esc-tooltipped{title: 'Export Selected to CSV', onclick: 'webrep_export_selected_rows();'}
       %span.toolbar-button-text
         Export Selected to CSV
 

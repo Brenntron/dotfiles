@@ -11,6 +11,32 @@ module API
             before do
               PaperTrail.request.whodunnit = current_user.id if current_user.present?
             end
+
+            desc 'reptool call'
+            params do
+              requires :path, type: String
+              optional :user_arg, type: String
+            end
+
+            post "reptool_call" do
+              unless current_user.has_role?('admin')
+                return {:status => 'error', :message => 'you do not have permissions to run this'}.to_json
+              end
+
+              #begin
+              path = permitted_params[:path]
+              arg = nil
+              arg = permitted_params[:user_arg] unless permitted_params[:user_arg].blank?
+              response = ReptoolAdminTool.process(path, arg).to_json
+
+              {:status => 'success', :message => response}
+
+              #rescue
+              #  {:status => 'error', :message => 'something went fucky'}
+              #end
+
+            end
+
             desc 'execute task'
             params do
               requires :task, type: String

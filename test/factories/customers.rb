@@ -16,6 +16,6 @@ FactoryBot.define do
     name            { "Guest" }
     email           { "guest@gst.com" }
     phone           { "18005548378" }
-    initialize_with {Customer.first_or_create(email:email)}
+    initialize_with {Customer.find_or_create_by(email:email)}
   end
 end

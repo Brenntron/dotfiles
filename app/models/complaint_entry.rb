@@ -338,7 +338,7 @@ class ComplaintEntry < ApplicationRecord
       wbrs_score = wbrs_stuff["wbrs"]["score"]
       new_complaint_entry.wbrs_score = wbrs_score
     rescue
-      #do nothing continue with saving the entry
+      # do nothing continue with saving the entry
     end
 
     if is_ip?(ip_url)
@@ -352,17 +352,21 @@ class ComplaintEntry < ApplicationRecord
     else
       new_complaint_entry.uri = ip_url
       new_complaint_entry.entry_type = "URI/DOMAIN"
-      new_complaint_entry.subdomain = url_parts["subdomain"]
-      new_complaint_entry.domain = url_parts["domain"]
-      new_complaint_entry.path = url_parts["path"]
+
+      # Parse the ip_url
+      parsed_url = Complaint.parse_url(ip_url)
+
+      new_complaint_entry.subdomain = parsed_url[:subdomain]
+      new_complaint_entry.domain = parsed_url[:domain]
+      new_complaint_entry.path = parsed_url[:path]
     end
-    #lets query the top url API endpoint to determine if this is an important site or not
+    # lets query the top url API endpoint to determine if this is an important site or not
     # but you better believe i dont trust this API so we have some checks to ensure the entry gets created
     begin
       importance = self_importance(ip_url)
       new_complaint_entry.is_important = importance if importance
     rescue
-      #do nothing keep building entry
+      # do nothing keep building entry
     end
     new_complaint_entry.user = user
     new_complaint_entry.case_assigned_at ||= Time.now if user && user.display_name != "Vrt Incoming"
@@ -615,8 +619,43 @@ class ComplaintEntry < ApplicationRecord
 
     present_params = params.select{|ignore_key, value| value.present?}
 
+    if present_params['status'].present?
+      present_params['status'] = present_params['status'].split(',').map {|item| item.strip }
+    end
+
+    if present_params['resolution'].present?
+      present_params['resolution'] = present_params['resolution'].split(',').map {|item| item.strip }
+    end
+
+    if present_params['id'].present?
+      present_params['id'] = present_params['id'].split(',').map {|item| item.strip }
+    end
+
+    if present_params['complaint_id'].present?
+      present_params['complaint_id'] = present_params['complaint_id'].split(',').map {|item| item.strip }
+    end
+
+    if present_params['channel'].present?
+      present_params['channel'] = present_params['channel'].split(',').map {|item| item.strip }
+    end
+
+    if present_params['ip_or_uri'].present?
+      present_params['ip_or_uri'] = present_params['ip_or_uri'].split(',').map {|item| item.strip }
+    end
+
+    if present_params['user_id'].present?
+      present_params['user_id'] = present_params['user_id'].split(',').map {|item| item.strip }
+    end
+
     simple_params = present_params.slice(*%w{id complaint_id resolution status})
+
     relation = where(simple_params)
+
+    if params['user_id'].present?
+      
+      relation =
+          relation.joins(:user).where(:users => { cvs_username: present_params['user_id']})
+    end
 
     if params['submitted_newer'].present?
       relation =
@@ -661,9 +700,8 @@ class ComplaintEntry < ApplicationRecord
     end
 
     if params['tags'].present?
-      relation = relation.joins(complaint: :complaint_tags).where(complaint_tags: {name: params['tags']})
+      relation = relation.joins(complaint: :complaint_tags).where(complaint_tags: {name: params['tags'].split(',').map {|item| item.strip }})
     end
-
     customer_params = present_params.slice(*%w{customer_name customer_email company_name})
     unless customer_params.empty?
       company_name = nil
@@ -675,7 +713,7 @@ class ComplaintEntry < ApplicationRecord
       end
 
       if customer_params['customer_name'].present?
-        relation = relation.where(customers: {name: customer_params['customer_name']})
+        relation = relation.where(customers: {name: customer_params['customer_name'].split(',').map {|item| item.strip }})
       end
 
       if customer_params['customer_email'].present?
@@ -683,7 +721,7 @@ class ComplaintEntry < ApplicationRecord
       end
 
       if company_name.present?
-        relation = relation.where(companies: {name: company_name})
+        relation = relation.where(companies: {name: company_name.split(',').map {|item| item.strip }})
       end
     end
 
@@ -695,9 +733,19 @@ class ComplaintEntry < ApplicationRecord
     end
 
     ip_or_uri = present_params['ip_or_uri']
+
+    # Constructs a gigantic, but valid where clause
     if ip_or_uri.present?
-      ip_or_uri_clause = "ip_address = :ip_or_uri OR uri like :ip_or_uri_pattern OR domain like :ip_or_uri_pattern"
-      relation = relation.where(ip_or_uri_clause, ip_or_uri: ip_or_uri, ip_or_uri_pattern: "%#{ip_or_uri}%")
+      ip_or_uri_clause = nil
+      ip_or_uri.each_with_index do |single, index|
+        if index == 0
+          ip_or_uri_clause = "ip_address = '#{single}' OR uri like '%#{single}%' OR domain like '%#{single}%'"
+        else
+          ip_or_uri_clause = ip_or_uri_clause + " OR " + "ip_address = '#{single}' OR uri like '%#{single}%' OR domain like '%#{single}%'"
+        end
+      end
+
+      relation = relation.where(ip_or_uri_clause)
     end
 
     complaint_fields = present_params.to_h.slice(*%w{description channel})
@@ -1020,5 +1068,33 @@ class ComplaintEntry < ApplicationRecord
     else
       return false
     end
+  end
+
+  def process_resolution_changes(resolution, internal_comment, customer_facing_comment)
+    confirmation = {}
+    if !["COMPLETED","PENDING"].include?(self.status) && resolution != "REOPENED"
+      if self.is_important
+        self.update(status: "PENDING", resolution: resolution, internal_comment: internal_comment, resolution_comment: customer_facing_comment)
+        confirmation.update(state: 'SUCCESS', host: self.hostlookup, status: self.status, resolution: resolution, internal_comment: internal_comment, customer_facing_comment: customer_facing_comment,
+                            message: "Successfully processed a resolution update of #{resolution} on Complaint Entry (#{self.hostlookup}) of status #{self.status}")
+      else
+        self.update(status: "COMPLETED", resolution: resolution, internal_comment: internal_comment, resolution_comment: customer_facing_comment)
+        confirmation.update(state: 'SUCCESS', host: self.hostlookup, status: self.status, resolution: resolution, internal_comment: internal_comment, customer_facing_comment: customer_facing_comment,
+                            message: "Successfully processed a resolution update of #{resolution} on Complaint Entry (#{self.hostlookup}) of status #{self.status}")
+      end
+      # Error catch: cannot set a ComplaintEntry to "REOPENED" unless it has a status of "COMPLETED"
+    elsif self.status != "COMPLETED" && resolution == "REOPENED"
+      confirmation.update(state: 'ERROR', host: self.hostlookup, status: self.status,resolution: resolution, internal_comment: internal_comment, customer_facing_comment: customer_facing_comment,
+                          message: "Cannot process a status update of #{resolution} on Complaint Entry (#{self.hostlookup}) of status #{self.status}")
+    elsif self.status == "COMPLETED" && resolution == "REOPENED"
+      self.update(status: "REOPENED", resolution: nil)
+      confirmation.update(state: 'SUCCESS', host: self.hostlookup, status: self.status, resolution: resolution, internal_comment: internal_comment, customer_facing_comment: customer_facing_comment,
+                          message: "Successfully processed a status update of #{resolution} on Complaint Entry (#{self.hostlookup}) of status #{self.status}")
+    else
+      # Error catch: cannot update a ComplaintEntry's resolution if it has a status of "COMPLETED" or "PENDING"
+      confirmation.update(state: 'ERROR', host: self.hostlookup, status: self.status,resolution: resolution, internal_comment: internal_comment, customer_facing_comment: customer_facing_comment,
+                          message: "Cannot process a resolution update to #{resolution} on Complaint Entry (#{self.hostlookup})  of status #{self.status}")
+    end
+    confirmation
   end
 end

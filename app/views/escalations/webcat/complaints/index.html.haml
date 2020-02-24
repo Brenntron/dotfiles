@@ -15,7 +15,10 @@
     .col-xs-12
       %h1#webcat-index-title
     .col-xs-12.webcat-search-container
-      #webcat_searchref_container{onmouseover: "triggerTooltips(this)"}
+      #webcat_searchref_container
+        .hidden
+          %ul#search-tooltip_content
+
   .row
     .col-xs-12.webcat-main-area
       = render "toolbar"
@@ -31,17 +34,31 @@
             %th.sorting_disabled
               -#  Expandable button area
               %input#complaints_check_box{type: 'checkbox'}
-            %th
-            %th Entry ID
-            %th Age
-            %th Status
-            %th Tags
-            %th Subdomain
-            %th Domain / IP
-            %th Path
-            %th Primary Cat
-            %th Suggested Cat
-            %th WBRS
-            %th Submitter Type
-            %th Submitter Org
-            %th Assignee
+            %th.webcat-sorting#important
+            %th.webcat-sorting#entry Entry ID
+            %th.webcat-sorting#age Age
+            %th.webcat-sorting#status Status
+            %th.webcat-sorting#tags Tags
+            %th.webcat-sorting#subdomain Subdomain
+            %th.webcat-sorting#domain Domain / IP
+            %th.webcat-sorting#path Path
+            %th.webcat-sorting#primary Primary Cat
+            %th.webcat-sorting#suggested Suggested Cat
+            %th.webcat-sorting#wbrs WBRS
+            %th.webcat-sorting#submittertype Submitter Type
+            %th.webcat-sorting#submitterorg Submitter Org
+            %th.webcat-sorting#assignee Assignee
+
+.modal.fade#resolution_dialog
+  .modal-dialog.modal-sm
+    .modal-content
+      .modal-header
+        Resolve Complaint Entries
+      .modal-body
+        %thead
+          #resolution_text
+        %table#complaint_entries_to_update
+      .modal-footer
+        %hr.thin.form-divider
+        %button#submit_resolution_changes.primary{type: 'button', 'onclick': 'updateResolution();'} Confirm
+        %button.secondary{type: 'button', 'data-dismiss': 'modal', 'aria-label': 'Cancel'} Cancel

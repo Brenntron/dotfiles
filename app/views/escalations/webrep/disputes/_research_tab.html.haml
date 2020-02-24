@@ -251,11 +251,11 @@
             %td.research-table-row-wrapper
               %table
                 %tr.research-first-row
-                  %td.expandable-row-column
+                  %td.expandable-row-column.expandable-cell
                     %button.expand-row-button-inline{'data-entry-id': "#{entry.id}"}
-                  %td
+                  %td.cb-cell
                     %input.dispute_check_box{type: 'checkbox', 'data-entry-id': "#{entry.id}", class: "dispute-entry-cb-#{entry.id}"}
-                  %td.dual-edit-field{'data-id': entry.id, 'data-field': 'host'}
+                  %td.dual-edit-field.url-cell{'data-id': entry.id, 'data-field': 'host'}
                     - if entry[:is_important]
                       %span.entry-data.entry-data-content.entry-important-flag
                         = entry.hostlookup
@@ -264,17 +264,17 @@
                         = entry.hostlookup
 
                     %input.table-entry-input.wide{type:'text', value: "#{entry.hostlookup}"}
-                  %td
+                  %td.category-cell
                     %label Category
-                    - unless entry[:primary_category].nil?
+                    - if entry[:primary_category] != '{}' && !entry[:primary_category].nil?
                       = entry[:primary_category]
                     - else
-                      %span.missing-data No Data
-                  %td
+                      %span.missing-data No assigned categories
+                  %td.hostname-cell
                     %label Hostname
                     - unless entry[:hostname].nil?
                       = entry[:hostname]
-                  %td.dual-edit-field{'data-id': entry.id, 'data-field': 'status'}
+                  %td.dual-edit-field.status-cell{'data-id': entry.id, 'data-field': 'status'}
                     %label Status
                     %span.entry-data.entry-data-status
                       - if entry[:status].nil?
@@ -337,7 +337,7 @@
                           %li.status-radio-wrapper
                             %input.entry-status-radio{type: 'radio', name: 'entry-status', class: "RE-OPENED_#{entry.id}", id: "RE-OPENED", onclick: 'populate_status_selection();'}
                             %label.radio-label{for: "#{DisputeEntry::STATUS_REOPENED}"} Re-Opened
-                  %td
+                  %td.resolution-cell
                     - if entry.resolution.nil?
                       %label Resolution
                       %span.missing-data
@@ -350,12 +350,12 @@
                         %label Resolution
                         = entry.resolution
 
-                  %td
+                  %td.date-time-cell
                     %label As of
                     = entry.dispute_entry_preload&.created_at&.strftime('%F %T')
 
 
-                  %td.dispute_rep_tools
+                  %td.dispute_rep_tools.rep-tools-cell
                     %span.dispute_rep_tools_wrapper
                       - if (@dispute.resolution != Dispute::DUPLICATE) && (@dispute.status != Dispute::RESOLVED)
                         %button.dispute-inline-buttons.edit-button.inline-edit-entry-button.esc-tooltipped{'data-entry-id': "#{entry.id}", title: 'Edit this entry'}
@@ -560,27 +560,27 @@
                 %tr.research-overview-row
                   %td
                     -#Expander area
-                  %td.research-table-details-wrapper{colspan: '9'}
+                  %td.research-table-details-wrapper{colspan: '20'}
                     %table
                       %tr
-                        %td.input-col
-                          %span.research-table-input-wrapper.wbrs-input-wrapper
-                            %input.research-row-checkbox.wbrs-checkbox{type: 'checkbox', checked: 'true', value: "#{entry.id}"}
+                        %td.input-col.wbrs-input-wrapper
+                          %input.research-row-checkbox.wbrs-checkbox{type: 'checkbox', checked: 'true', value: "#{entry.id}"}
+                        %td.wbrs-score-label-cell
                           %label WBRS
-                        %td.text-center.entry-data-wbrs-score
+                        %td.text-center.entry-data-wbrs-score.wbrs-score-cell
                           - if entry.wbrs_score.nil?
                             %span.current-wbrs-score.missing-data
                               No score
                           - else
                             %span.current-wbrs-score
                               = entry.wbrs_score
-                        %td
+                        %td.wbrs-rule-hits-label-cell
                           %label WBRS Rule Hits
-                        %td.text-center
+                        %td.text-center.wbrs-rule-hits-cell
                           = entry.dispute_rule_hits.wbrs_rule_hits.count
-                        %td
+                        %td.wbrs-rules-label-cell
                           %label WBRS Rules
-                        %td.rule-hits-col-list
+                        %td.rule-hits-col-list.wbrs-rules-cell
                           - entry.dispute_rule_hits.select {|rule_hit| rule_hit.rule_type == "WBRS" }.each do |wbrs_hit|
                             - unless RulehitResolutionMailerTemplate.select{|template| template.mnemonic == wbrs_hit.name}.count == 0
                               %a.wbrs-rule-trigger{href: '#', 'data-id': "#{wbrs_hit.id}", id: "inline-wbrs-hit-#{wbrs_hit.id}"}
@@ -591,38 +591,39 @@
                               = wbrs_hit.name
                               - unless wbrs_hit.equal? entry.dispute_rule_hits.select {|rule_hit| rule_hit.rule_type == "WBRS" }.last
                                 = ","
-                        %td.input-col
-                          %span.research-table-input-wrapper.xbrs-input-wrapper
-                            %input.research-row-checkbox.xbrs-checkbox{type: 'checkbox', checked: 'true', value: "#{entry.id}"}
+                        %td.input-col.xbrs-input-wrapper
+                          %input.research-row-checkbox.xbrs-checkbox{type: 'checkbox', checked: 'true', value: "#{entry.id}"}
+                        %td.xbrs-history-label-cell
                           %label XBRS History
-                        %td.text-center
+                        %td.text-center.xbrs-history-cell
                           - if entry.hostlookup
                             = entry.find_xbrs[1]['data'].count
-                        %td.input-col
-                          %span.research-table-input-wrapper.virus-total-input-wrapper
-                            %input.research-row-checkbox.virus-total-checkbox{type: 'checkbox', checked: 'true', value: "#{entry.id}"}
+                        %td.input-col.virus-total-input-wrapper
+                          %input.research-row-checkbox.virus-total-checkbox{type: 'checkbox', checked: 'true', value: "#{entry.id}"}
+                        %td.virustotal-label-cell
                           %label Virustotal
-                        %td.text-center
+                        %td.text-center.virustotal-cell
                           - if entry.virustotals.count == 0
                             %span.missing-data N/A
                           - else
                             = entry.virustotals_negatives_count
                             \/
                             = entry.virustotals.count
-                        %td.left-bordered
+                        %td.left-bordered.wlbl-tc-label-cell
                           %label WL/BL
-                        %td.entry-data-wlbl
+                        %td.entry-data-wlbl.wlbl-tc-cell
                           - if entry.wbrs_list_type.nil?
                             %span.missing-data Not currently on a list
                           - else
                             %span.wlbl-table-result
                               = entry.wbrs_list_type
                             %span.wlbl-tc-research-span
-                            %button.dispute-inline-buttons.history-button.esc-tooltipped{title: 'WL/BL History', onclick: "wlbl_history_dialog(#{entry.id})"}
+                        %td.history-button-cell
+                          %button.dispute-inline-buttons.history-button.esc-tooltipped{title: 'WL/BL History', onclick: "wlbl_history_dialog(#{entry.id})"}
 
-                        %td.left-bordered
+                        %td.left-bordered.referenced-tickets-label-cell
                           %label Referenced on
-                        %td.referenced-tickets-col
+                        %td.referenced-tickets-col.referenced-tickets-cell
                           - if entry.referenced_tickets.count < 1
                             %span.missing-data
                               Not on any other tickets
@@ -640,11 +641,11 @@
                                       %td
                                         = reference.case_opened_at
                       %tr
-                        %td.input-col
-                          %span.research-table-input-wrapper.sbrs-input-wrapper
-                            %input.research-row-checkbox.sbrs-checkbox{type: 'checkbox', checked: 'true', value: "#{entry.id}"}
+                        %td.input-col.sbrs-input-wrapper
+                          %input.research-row-checkbox.sbrs-checkbox{type: 'checkbox', checked: 'true', value: "#{entry.id}"}
+                        %td
                           %label SBRS
-                        %td.text-center
+                        %td.text-center.sbrs-score-cell
                           - if entry.sbrs_score.nil?
                             %span.current-sbrs-score.missing-data
                               No score
@@ -653,11 +654,11 @@
                               = entry.sbrs_score
                         %td
                           %label SBRS Rule Hits
-                        %td.text-center
+                        %td.text-center.sbrs-rule-hits-cell
                           = entry.dispute_rule_hits.select {|rule_hit| rule_hit.rule_type == "SBRS" }.size
                         %td
                           %label SBRS Rules
-                        %td.rule-hits-col-list
+                        %td.rule-hits-col-list.sbrs-rules-cell
                           - entry.dispute_rule_hits.select {|rule_hit| rule_hit.rule_type == "SBRS" }.each do |sbrs_hit|
                             - unless RulehitResolutionMailerTemplate.select{|template| template.mnemonic == sbrs_hit.name}.count == 0
                               %a.wbrs-rule-trigger{href: '#', 'data-id': "#{sbrs_hit.id}", id: "inline-sbrs-hit-#{sbrs_hit.id}"}
@@ -669,17 +670,17 @@
                               - unless sbrs_hit.equal? entry.dispute_rule_hits.select {|rule_hit| rule_hit.rule_type == "SBRS" }.last
                                 = ","
                           -#= entry.dispute_rule_hits.sbrs_rule_hits.map {|rule_hit| rule_trigger(rule_hit)}.join(', ').html_safe
-                        %td.input-col
-                          %span.research-table-input-wrapper.crosslisted-input-wrapper
-                            %input.research-row-checkbox.crosslisted-checkbox{type: 'checkbox', checked: 'true', value: "#{entry.id}"}
+                        %td.input-col.crosslisted-input-wrapper
+                          %input.research-row-checkbox.crosslisted-checkbox{type: 'checkbox', checked: 'true', value: "#{entry.id}"}
+                        %td.crosslisted-urls-label-cell
                           %label Crosslisted URLs
-                        %td.text-center
+                        %td.text-center.crosslisted-urls-cell
                           = entry.wbrs_xlist.count
-                        %td.input-col
-                          %span.research-table-input-wrapper.reptool-input-wrapper
-                            %input.research-row-checkbox.reptool-checkbox{type: 'checkbox', checked: 'true', value: "#{entry.id}"}
+                        %td.input-col.reptool-input-wrapper
+                          %input.research-row-checkbox.reptool-checkbox{type: 'checkbox', checked: 'true', value: "#{entry.id}"}
+                        %td
                           %label RepTool Class
-                        %td.entry-reptool-data
+                        %td.entry-reptool-data.reptool-class-cell
                           - if entry.classifications.first.nil?
                             %span.missing-data.entry-reptool-class Not on RepTool
                           - else
@@ -691,12 +692,12 @@
                               = entry.blacklist.metadata&.fetch('VRT', {})&.fetch('comment', {})
                         %td.left-bordered
                           %label Umbrella
-                        %td.text-center
+                        %td.text-center.umbrella-cell{colspan: '2'}
                           = entry.umbrellaresult
 
                         %td.left-bordered
                           %label Last Submitted
-                        %td#last-submitted
+                        %td#last-submitted.last-submitted-cell
                           = entry.last_submitted
                 %tr.nested-data-row{'data-entry-id': "#{entry.id}"}
                   %td.expanded-row{colspan: '9'}

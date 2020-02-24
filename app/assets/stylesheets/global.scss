@@ -63,7 +63,7 @@ $type-base-color:    #333;   /* Dark Grey */
 $type-lighter-color: #666;   /* Medium Grey */
 $type-faint-accent: #D7DADB; /* Lighter Grey */
 $type-lightest: #fff; /* White */
-
+$type-darkest: #000; /* black */
 /* Additional Colors */
 /* for use on gridlines, form inputs, and other very subtle elements against the content bg color */
 $faint-neutral-color: #f2f2f2;
@@ -813,6 +813,9 @@ button {
   background-image: url(image_path('icon_submit_arrow.svg'));
   background-color: $warning-accent-color;
 }
+.resolution-submit-button {background-image: url(image_path('icon_submit_arrow_grey.svg'));}
+.open .resolution-submit-button {background-image: url(image_path('icon_submit_arrow.svg'));}
+.resolution-submit-button:disabled, .master-submit-button:disabled {background-image: url(image_path('icon_submit_arrow_grey_disabled.svg'));}
 .open-viewable {background-image: url(image_path('icon_open_viewable.svg'));}
 .open-nonviewable {background-image: url(image_path('icon_open_nonviewable.svg'));}
 .open-selected {background-image: url(image_path('icon_open_selected.svg'));}
@@ -1621,7 +1624,13 @@ fieldset.tight {
                           $content-bg-color 15px
           );
 }
-
+#index-change-assign-dropdown{
+  padding: 20px 0 12px 0!important;
+  #internal_comment ,#customer_facing_comment{
+    font-size: inherit;
+    height: 30px;
+  }
+}
 /*** Overriding selectize plugin styles to work with our forms ***/
 .selectize-input {
   border: none;
@@ -1655,6 +1664,12 @@ fieldset.tight {
 .selectize-control.multi .selectize-input [data-value].active {
   background: darken($primary-section-color, 25%) !important;
   border: none;
+}
+
+.custom-render-selectize {
+  line-height: 1.5em;
+  min-height: 20px;
+  padding: 4px;
 }
 
 .form-col-list {
@@ -2284,31 +2299,6 @@ a.static-nav-item {
   min-width: 400px;
   z-index: 51;
 }
-.selectize-dropdown{
-  z-index: 4000;
-}
-#advanced-search-dropdown {
-  .nav-tool-content-wrapper .form-control.selectize{
-    min-height: 26px;
-    height: 100%;
-  }
-  .selectize-dropdown{
-    border: 1px solid #ccc;
-    border: 1px solid rgba(0, 0, 0, 0.15);
-    border-radius: 4px;
-    -webkit-box-shadow: 0 6px 12px rgba(0, 0, 0, 0.175);
-    box-shadow: 0 6px 12px rgba(0, 0, 0, 0.175);
-    position: absolute;
-    transform:translateY(15px);
-  }
-  .selectize-control.form-control.selectize.multi{
-    padding-top: 3px !important;
-    padding-left: 6px !important;
-    background: white;
-    z-index: 3;
-  }
-
-}
 
 .search-group form {
   display: inline-block;
@@ -2721,6 +2711,24 @@ table#bug-rules-table tbody {
   height: 20px;
 }
 
+
+//wbrs reputation icons//
+.reputation-icon{
+  height: 20px;
+  width: 20px;
+  position: relative;
+  top: 5px;
+  background-repeat: no-repeat;
+  display: inline-block;
+}
+.icon-trusted{ background-image: url(image_path("icon_trusted.svg"));}
+.icon-favorable{ background-image: url(image_path("icon_favorable.svg"));}
+.icon-neutral{ background-image: url(image_path("icon_neutral.svg"));}
+.icon-questionable{ background-image: url(image_path("icon_questionable.svg"));}
+.icon-untrusted{ background-image: url(image_path("icon_untrusted.svg"));}
+.icon-unknown{ background-image: url(image_path("icon_unknown.svg"));}
+//end wbrs reputation icons //
+
 .alerts-col-header {background-image: url(image_path("icon_alert.svg"));}
 .tests-col-header  {background-image: url(image_path("icon_test.svg"));}
 .commit-col-header {background-image: url(image_path("icon_committer"));}
@@ -2863,7 +2871,31 @@ a.code-content:hover {
 #new-comment-wrapper {
   border-top: none;
 }
+.edit-resolution-container{
+  .internal_comment_container{
+    margin-top: 10px;
+  }
+  .internal_comment_container, .customer_facing_comment_container {
+    margin-top: 30px;
+    .toolbar-section-label{
+      margin-top:-25px;
+    }
+  }
+  #button_update_resolution{
+    margin: 11px 60px 0 60px;
+  }
 
+}
+.resolution-message{
+  margin: 5px 0 10px 0;
+}
+.update-resolution-entries{
+  display: block;
+  width: 490px;
+  margin: 0 auto;
+  line-height: 1.3em;
+  word-break: break-word;
+}
 .missing-note {
   display: inline-block;
   font-style: italic;
@@ -2871,6 +2903,10 @@ a.code-content:hover {
   color: $content-label-color;
 }
 
+.edit-resolution-label{
+  position: relative;
+  left: 3px;
+}
 .code-block.note {
   margin-top: 3px;
 }
@@ -4310,9 +4346,7 @@ td.wbrs-highlight, td.sbrs-highlight {
   border-radius: 1px;
 }
 
-#advanced-search-wrapper .content-label-sm {
-  margin-bottom: 0;
-}
+
 
 #categorize-urls-form-wrapper .modal-header {
   background-color: $bug-section-color;
@@ -6425,7 +6459,9 @@ td.ticket-total::before {
   margin-left: 0;
   min-width: 0;
 }
-
+#resolution_dialog hr{
+  margin: 0 10px;
+}
 #index-change-assign-dropdown .toolbar, #file-disp-dropdown .toolbar {
   margin-bottom: 5px;
 }
@@ -6541,7 +6577,9 @@ td.ticket-total::before {
   display: inline-block;
   content: '';
 }
-
+.important-flag-col{
+  width: 25px;
+}
 .entry-important-flag::before, .highlight-second-review .important-flag-col .is-important {
   background-image: url(image_path('icon_important.svg'));
   background-repeat: no-repeat;
@@ -6942,29 +6980,73 @@ table.dispute-entry-table tbody tr.selected {
   height: auto !important;
 }
 
-#advanced-search-wrapper .selectize-dropdown.multi.form-control.selectize {
-  background-color: $content-bg-color;
-  height: auto !important;
-  top: 8px !important;
-  width: auto;
-  max-width: 409px !important;
-}
-
 .selectize-dropdown-content {
   min-height: 28px !important;
   font-size: 8.5pt;
 }
 
-#advanced-search-wrapper .selectize-input.dropdown-active::before {
-  display: none;
-}
+#advanced-search-wrapper {
+  input {
+    min-height: 34px;
+  }
+  .form-control.selectize{
+    min-height: 34px;
+    //border-top: 4px solid #fff;
+    border-left: 4px solid #fff;
+    border-right: 4px solid #fff;
+    border-bottom: none;
+    border-top: none;
+    height: auto;
+    padding: 0 !important;
+    margin-bottom: 9px;
+  }
+  .selectize-input {
+    padding: 0 !important;
+    .item {
+      margin: 2px 3px 2px 0 !important;
+      padding: 2px 6px;
+    }
+    z-index: 2;
+  }
+  .selectize-input.items {
+    height: 100%;
+    margin: 4px 4px 0 2px !important;
+    background-color: $content-bg-color;
+    input {
+      height: 100%;
+    }
+  }
+  .selectize-input.items.not-full {
+    min-height: 26px !important;
+  }
+  .selectize-control.selectize {
+    background-color: $content-bg-color;
+  }
+  .selectize-dropdown {
+    border: 1px solid #ccc;
+    -webkit-box-shadow: 0 6px 12px rgba(0, 0, 0, 0.175);
+    box-shadow: 0 6px 12px rgba(0, 0, 0, 0.175);
+  }
+  .selectize-dropdown.multi.form-control.selectize {
+    background-color: $content-bg-color;
+    height: auto !important;
+    width: auto;
+  }
+  .selectize-input.dropdown-active::before {
+    display: none;
+  }
 
-#advanced-search-wrapper .selectize-input.items.not-full.has-options.focus.input-active.dropdown-active, #advanced-search-wrapper .selectize-control.form-control.selectize.multi {
-  max-width: 409px !important;
-}
-
-#advanced-search-wrapper .selectize-dropdown.multi.form-control.selectize {
-  z-index: 5000  !important;
+  .selectize-input.items.not-full.has-options.focus.input-active.dropdown-active,
+  .selectize-control.form-control.selectize.multi, .selectize-dropdown.multi.form-control.selectize {
+    max-width: 409px !important;
+  }
+  .selectize-dropdown.multi.form-control.selectize {
+    position: absolute;
+    margin-top: 4px;
+  }
+  .content-label-sm {
+    margin-bottom: 0;
+  }
 }
 
 .nav-tool-content-wrapper select.form-control, #categorize-urls-form-wrapper select.form-control {
@@ -8455,7 +8537,7 @@ td.text-center span {
   margin-top: 4px !important;
 }
 
-.cluster-mgt-loader-wrapper, .webcat-loader-wrapper  {
+.cluster-mgt-loader-wrapper, .webcat-loader-wrapper, .webrep-loader-wrapper  {
   display: block;
   position: absolute;
   width: 170px;
@@ -8470,10 +8552,16 @@ td.text-center span {
     font-style: oblique;
   }
 }
+
+.res_id{
+  font-weight: 200;
+}
+
 .cluster-mgt-loader-wrapper{
   margin: 100px 37%;
 }
-.webcat-loader-wrapper {
+
+.webcat-loader-wrapper, .webrep-loader-wrapper {
   margin: 0 37%;
 }
 
@@ -9050,7 +9138,111 @@ hr.thin.form-divider {
 .comment-wrapper + hr.thin {
   margin: 15px 6px;
 }
+#resolution_dialog {
+  .modal-dialog {
+    width: 600px;
+  }
+  .modal-footer{
+    border-top: none;
+    margin: 7px 0px;
+    adding: 0 0 0 15px;
+  }
+  .close {
+    top: 3px;
+    right: 3px;
+  }
 
+  tbody {
+    margin-top: 10px;
+  }
+
+  .modal-header {
+    background-color: $primary-section-color;
+    color: $type-lightest;
+    font-size: 14pt;
+    font-weight: 300;
+    border-top-left-radius: 6px;
+    border-top-right-radius: 6px;
+  }
+  .modal-footer {
+    text-align: center;
+  }
+
+  #resolution_text {
+    padding-left: 7px;
+    color: $type-lighter-color;
+
+  }
+}
+.scrollable-table, .scrollable-list{
+  border: 1px solid $nav-toolbar-color;
+  display: inline-block;
+  max-height: 400px;
+  overflow-y: scroll !important;
+  padding: 2px;
+}
+
+.update-resolution-entries.scrollable-list {
+    li {
+    border-bottom: 1px solid #f2f2f2;
+    border-top: none!important;
+    text-align: left;
+    margin: 0!important;
+    padding: 7px 5px!important;
+    line-height: 1.3em;
+  }
+  .resolution-error-host {
+    word-break: keep-all;
+    display: block;
+    font-weight: 600;
+    text-overflow: ellipsis;
+    overflow: hidden;
+  }
+}
+
+.update-resolution-entries{
+  width: 450px;
+  .resolution-error-host {
+    display: block;
+    font-weight: 600;
+  }
+  li {
+    border-bottom: 1px solid #f2f2f2;
+    text-align: left;
+    margin: 0!important;
+    padding: 7px 5px!important;
+    line-height: 1.3em;
+  }
+}
+.resolution-emp {
+  color: $primary-section-color
+}
+.resolution-error-host{
+  display: block;
+  font-weight: 600;
+}
+#complaints-index_length, #complaints-index_filter{
+  z-index: 50;
+  position: relative;
+  display: block;
+}
+
+#complaint_entries_to_update {
+  margin-top: 15px;
+  td{
+    white-space: nowrap;
+    display: block;
+    overflow: hidden;
+    text-overflow: ellipsis;
+  }
+  tr{
+    width: 566px!important;
+    display: block;
+  }
+  tbody tr:last-child td {
+    border-bottom: none !important;
+  }
+}
 .nested-radio-row .col-xs-6:first-of-type {
   padding-left: 15px;
 }
@@ -9102,7 +9294,6 @@ hr.thin.form-divider {
   padding-top: 6px !important;
   padding-bottom: 12px !important;
 }
-
 
 .preview-wbrs-button {
   background-color: $warning-accent-color;
@@ -9611,18 +9802,16 @@ button.secondary.view-report-external-button {
 
 // dbinebri: updates below for file rep navbar layout new
 .escalations--file_rep--disputes-controller {
-
   .nav-tool-blocks.search-wrapper {
     padding: 7px 7px 7px 40px;
     text-align: left;
   }
-
   .input-group.search-group {
     padding: 3px 3px 3px 5px;
     margin: 0 0 0 20px;
     width: 100%;
     min-width: 200px;
-    max-width: 450px;
+    max-width: 450px;  // shorten to handle longer usernames on right
   }
 
   // search input field
@@ -9655,6 +9844,7 @@ button.secondary.view-report-external-button {
     float: right;
   }
 
+
   // file rep navbar specific styles - minor width adjustments, col-lg-1 is too tight, col-lg-2 too wide
   @media screen and (min-width: 1200px) {
     .col-lg-1.nav-naming-guide, .col-lg-1.nav-new-ticket {
@@ -9663,12 +9853,25 @@ button.secondary.view-report-external-button {
     // below ensures the navbar widths adds up correctly
     .col-lg-2.nav-username {
       width: 17%;
+      display: inline-block;
+      position: absolute;
+      right: 0;
+    }
+  }
+
+  // 1430px specific
+  @media screen and (min-width: 1201px) and (max-width: 1500px) {
+    .nav-page-button-wrapper {
+      width: 120px;
+    }
+    .col-lg-2.nav-username {
+      display: none;
     }
   }
 
   // dbinebri: the tooltips for file rep get too wide, limit the max-width
   .tooltipster-sidetip {
-    max-width: 410px !important;
+    max-width: 460px !important;
   }
 }
 
@@ -9759,7 +9962,7 @@ button.secondary.view-report-external-button {
 
 // dbinebri: the tooltips for modals on file rep get too wide, limit the max-width a little bit
 .tooltipster-sidetip .tooltipster-box {
-  max-width: 410px !important;
+  max-width: 460px !important;
 }
 
 .data-report-wrapper hr.thin {
@@ -10779,9 +10982,9 @@ input[type="radio"].resolution_radio_button {
 .loader-msg{
   font-style: oblique!important;
 }
-// webrep and webcat toolbars - between 1800px and 1600px, prevent breaking/wrapping of the buttons
-@media (min-width: 1850px) {
-  #webrep-index-toolbar, #webcat-index-toolbar {
+// webrep and webcat toolbars - prevent breaking/wrapping of the buttons
+@media (min-width: 1600px) {
+  #webrep-index-toolbar{
     .toolbar-button {
       background-position: 4px 6px;
       padding-left: 13px;
@@ -10792,6 +10995,24 @@ input[type="radio"].resolution_radio_button {
     }
   }
 }
+// webcat - 1950px below is our current "widest" breakpoint
+@media (min-width: 1950px) {
+  #webcat-index-toolbar {
+    .toolbar-button {
+      background-position: 4px 6px;
+      padding-left: 13px;
+      padding-right: 7px;
+      min-height: 25px;
+      background-size: 14px 14px; // icon size
+      transition: background-color 0.2s;
+    }
+  }
+}
+@media (max-width: 1951px)  {
+  #webcat-index-toolbar .toolbar-button-text {
+    display: none !important;
+  }
+}
 @media screen and (max-width: 1800px) and (min-width: 1705px){
   #webcat-index-toolbar .toolbar-button-text {
     .toolbar-button {
@@ -10799,13 +11020,8 @@ input[type="radio"].resolution_radio_button {
     }
   }
 }
-@media (max-width: 1850px)  {
-  #webcat-index-toolbar .toolbar-button-text {
-    display: none !important;
-  }
-}
 .toolbar#webcat-index-toolbar{
-  margin: 10px 0 -35px 0;
+  margin: 25px 0 -35px 0;
   z-index: 10;
   float: left;
   width: auto;
@@ -11028,7 +11244,10 @@ hr.thin.extra-bottom-marg {
 .small-flash-button:hover {
   opacity: 1;
 }
-
+.pending-note{
+  font-size: 85%;
+  padding-top: 5px
+}
 .owner-col {
   min-width: 80px;
 }
@@ -11161,11 +11380,6 @@ span.threat-cat-no-data {
   margin-bottom: 2px;
 }
 
-// ensure vertical alignment on narrow screens
-.research-table-details-wrapper table tr:first-of-type td {
-  vertical-align: middle;
-}
-
 // webrep dispute index > ensure break/wrap properly for long url's containing parameters
 .dispute-entry-col {
   min-width: 200px;
@@ -11176,6 +11390,21 @@ span.threat-cat-no-data {
   max-width: 250px;
 }
 
+.dispute-entry-table-wrapper{
+  background: $content-bg-color;
+  td{
+    border-color: $table-dark-header;
+  }
+  th.entry-col-wbrs-score{
+    display: block;
+  }
+}
+.reputation-icon-container{
+  display: inline-flex;
+  .reputation-icon{
+    top: -1px
+  }
+}
 // webrep dispute index > ensure the dispute count is to the right of the domain entry
 #disputes-index span.input-truncate {
   display: inline-block;
@@ -11215,12 +11444,12 @@ span.threat-cat-no-data {
 /* handles existing bug for wl/bl list duplicate entries (a.com issue) */
 .wlbl-table-result {
   display: inline-block;
-  min-width: 80px;
+  min-width: 0;
   max-width: 150px;
   max-height: 45px;
   overflow-y: hidden;
   padding-top: 1px;
-  padding-right: 15px;
+  padding-right: 5px;
   vertical-align: middle;
 }
 
@@ -11300,58 +11529,217 @@ span.threat-cat-no-data {
 }
 
 
-// research rows alignment/formatting updates
-// top row of each
+// RESEARCH ROWS ON SHOW PAGE + BFRP
+// RESEARCH ROWS ON SHOW PAGE + BFRP
+#disputes-research-table {
+  border-collapse: separate;
+  border-spacing: 0 10px;  // add vertical space between rows
+}
+
+#research-tab-toolbar, #research-page-toolbar {
+  margin-bottom: 5px;
+}
+
+.research-table-details-wrapper table td {
+  padding: 7px 4px 7px 8px;
+}
+
+#disputes-research-table .research-table-details-wrapper table td label {
+  padding-right: 0;
+}
+
+// checkbox table cells in a row
+.research-table-details-wrapper table td.input-col {
+  padding: 6px 6px 6px 9px;
+  text-align: center;
+  width: 2%;
+  max-width: 10px;
+  vertical-align: middle;
+}
+
+// ensure basic formatting here
+.dispute_rep_tools_wrapper {
+  position: static;
+  width: 90px;
+  margin-left: 0;
+  margin-top: 0;
+}
+
+// FIRST ROW of each entry (contains the URL + category)
 .research-first-row {
   margin-top: 120px;
-  td:nth-child(1), td:nth-child(2) {
-    width: 20px;  // icons
+  // PRIMARY CELL WIDTHS, NEEDS PRECISE FIXED + FLUID WIDTHS
+  .expandable-cell {
+    width: 1.2%;
+    max-width: 10px;
   }
-  td:nth-child(4) {
-    width: 25%;  // hostname
+  .cb-cell {
+    width: 1.5%;
+    max-width: 20px;
   }
-  span.entry-data-content {
-    display: inline-block;
-    min-width: 400px;   // url/ip
+  .url-cell {
+    width: 20%;
+    padding-right: 10px;
+    vertical-align: top;
+    span.entry-data-content {
+      display: inline-block;
+      word-break: break-all;
+    }
+  }
+  .category-cell {
+    width: 300px;
+  }
+  .hostname-cell {
+    width: 200px;
+  }
+  .status-cell {
+    width: 150px;
+  }
+  .resolution-cell {
+    width: 200px;
+  }
+  .date-time-cell {
+    width: 200px;
+  }
+  .rep-tools-cell {
+    button {
+      margin-right: 0;
+    }
   }
 }
 
-// second row of each
-.research-overview-row {
-  background: $faint-neutral-color;
-  td:nth-child(6) {
-    width: 170px;  // rule hits list
-    word-break: break-word;
-    padding-right: 10px;
-  }
-  td:nth-child(7) {
-    width: 150px;
-  }
-  td:nth-child(8) {
-    width: 60px;   // xbrs history
-  }
-  td:nth-child(9) {
-    width: 140px;
-  }
-  td:nth-child(10) {
-    width: 110px;  // reptool class
-    word-break: break-word;
-  }
-  td:nth-child(12) {
-    width: 190px;  // wl/bl lists + threat cats
+// FIRST ROW - BFRP SPECIFIC
+.research-action .research-first-row {
+  .url-cell {
+    width: 40%;
   }
 }
+
+// SECOND ROW of each entry
+.research-overview-row {
+  background: $faint-neutral-color;
+  // PRIMARY CELL WIDTHS, NEEDS PRECISE FIXED + FLUID WIDTHS
+  .wbrs-score-label-cell {
+    width: 3%;
+    max-width: 50px;
+  }
+  .wbrs-score-cell {
+    width: 40px;
+  }
+  .wbrs-rule-hits-label-cell {
+    width: 7%;   // use percentage to ensure certain widths
+    max-width: 80px;
+  }
+  .wbrs-rule-hits-cell {
+    width: 3%;
+  }
+  .wbrs-rules-label-cell {
+    width: 6%;
+    max-width: 70px;
+  }
+  .wbrs-rules-cell {
+    width: 7%;
+  }
+  .xbrs-history-label-cell {
+    width: 8%;
+    max-width: 100px;
+  }
+  .xbrs-history-cell {
+    width: 5%;
+  }
+  .virustotal-label-cell {
+    max-width: 80px;
+    width: 7%;
+  }
+  .virustotal-cell {
+    width: 50px;
+  }
+  .wlbl-tc-label-cell {
+    width: 2%;
+  }
+  .wlbl-tc-cell {
+    width: 5%;
+  }
+  .history-button-cell {
+    padding: 6px 0;
+    width: 2%;
+    max-width: 20px;
+    button {
+      float: none;
+    }
+  }
+  .referenced-tickets-label-cell {
+    width: 80px;
+  }
+  .referenced-tickets-cell {
+    width: 110px;
+  }
+  td {
+    vertical-align: middle;
+    &:first-child {
+      background: $content-bg-color;
+    }
+    // bg colors for checkbox cells
+    .wbrs-input-wrapper {
+      background-color: $bug-section-color;
+    }
+    .sbrs-input-wrapper {
+      background-color: $success-color;
+    }
+    .xbrs-input-wrapper {
+      background-color: $communication-accent-color;
+    }
+    .crosslisted-input-wrapper {
+      background-color: $warning-accent-color;
+    }
+    .virus-total-input-wrapper {
+      background-color: $rule-accent-color;
+    }
+    .reptool-input-wrapper {
+      background-color: $fifth-section-color;
+    }
+  }
+}
+
+
+// FF firefox needs formatting tweaks
+@-moz-document url-prefix() {
+  #disputes-research-table td.dispute_rep_tools {
+    padding: 3px !important; // needs override
+    min-width: 90px;
+  }
+  .dispute_rep_tools_wrapper {
+    position: relative;
+    bottom: 4px;
+    margin-left: unset;
+    margin-top: unset;
+  }
+}
+
+
+.rule-hits-cols-list {
+  width: 130px;  // rule hits list
+  word-break: break-word;
+  padding-right: 10px;
+}
+
+
+// ensure vertical alignment on narrow screens
+.research-table-details-wrapper table tr:first-of-type td {
+  vertical-align: middle;
+}
+
 
 
 .wlbl-tc-research-span {
-  display: inline-block;
+  display: inline;
   padding-top: 1px;
-  min-width: 20px;
+  min-width: 0;
   max-width: 150px;
   vertical-align: middle;
 }
 
-.wlbl-and-tc-area .dispute-inline-buttons.history-button {
+.research-table-details-wrapper .history-button {
   display: inline-block;
   width: 20px;
 }
@@ -11799,6 +12187,59 @@ span.threat-cat-no-data {
   }
 }
 
+#main-inline-loader{
+  position: absolute;
+  margin-top: -75px;
+  right: 190px;
+  .loading-msg{
+    position: absolute;
+    margin-top: 9px;
+    margin-left: 14px;
+    width: max-content;
+    color: #999;
+    font-style: italic;
+  }
+}
+
+#disputes-research-table{
+  background: $ac-nav-bg-color;
+  max-width: 2300px;  // set a reasonable max-width
+}
+
+.dispute-entry-ip-uri {
+  word-break: break-all;
+}
+
+// file rep nav bar - ensure top-left nav icons never break/wrap + minor spacing updates
+.escalations--file_rep--disputes-controller {
+  .nav-page-button-wrapper {
+    white-space: nowrap;
+  }
+  #filerep-index-title {
+    margin-left: 2px;
+  }
+  .file-rep-index-toolbar {
+    margin-top: 25px;
+  }
+  .search-condition-name {
+    margin-left: 2px;
+    margin-bottom: 5px;
+  }
+  #filerep_searchref_container {
+    margin-bottom: 0;
+    display: inline;  // ensure no used vertical space when empty
+  }
+  // show 25 entries
+  #file-rep-datatable_length label {
+    margin-left: 3px;
+    margin-bottom: 15px;
+  }
+  // cursor default for show/hide menu
+  #file-index-table-show-columns-dropdown ul li {
+    cursor: default;
+  }
+}
+
 
 // CATEGORIZE URLs dropdown - overall wrapper
 .escalations--webcat--complaints-controller .nav-tools-dropdown[aria-labelledby='categorize-urls'] {
@@ -11877,4 +12318,34 @@ span.threat-cat-no-data {
       margin-bottom: 10px;
     }
   }
+}
+
+// webcat > button text "All" in toolbar
+.text-button-all {
+  min-width: 30px;
+}
+
+
+
+// webcat index DT, adhering to existing naming conventions
+#webcat-index-table-show-columns-dropdown {
+  width: 320px;
+  ul {
+    display: inline-block;
+    padding: 10px;
+    width: 49%;
+    vertical-align: text-top;
+    li {
+      font-size: 9pt;
+      padding: 4px 12px;
+      cursor: default;
+      input {
+        margin-right: 8px;
+      }
+    }
+  }
+}
+
+#webcat-index-toolbar .collapse-all {
+  margin-right: 0;
 }

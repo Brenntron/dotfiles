@@ -3,7 +3,6 @@ window.apply_filter_to_table = () ->
   $('#regex-filter').html(filter)
   populate_clusters_index_table(filter);
 
-
 window.populate_clusters_index_table = (filter) ->
   if $('#clusters-index_wrapper').length > 0
     loader = $('.cluster-mgt-loader-wrapper')
@@ -158,7 +157,16 @@ $ ->
       }
       {
         data: 'wbrs_score'
-        defaultContent: 'N/A'
+        width: '75px'
+        render: ( data ) ->
+          if data == undefined then data = ''
+          wbrs_rep = wbrs_display(data)
+          wbrs_score = parseFloat(data).toFixed(1)
+          if wbrs_rep == undefined then wbrs_rep = 'unknown'
+          if wbrs_rep == 'unknown'then wbrs_score = '--'
+          tooltip_rep = wbrs_rep.toUpperCase()
+          icon = "<span class='reputation-icon icon-#{wbrs_rep} esc-tooltipped' title='#{tooltip_rep}'></span>"
+          return "<div class='reputation-icon-container'>#{icon}<span>#{wbrs_score}</span></div>"
       }
       {
         data: 'cluster_id'
@@ -243,6 +251,7 @@ window.copycat_dialog = () ->
         persist: false,
         create: false,
         maxItems: 5,
+        closeAfterSelect: true,
         valueField: 'category_id',
         labelField: 'category_name',
         searchField: ['category_name', 'category_code'],
@@ -291,6 +300,7 @@ window.selectize_category_inputs = () ->
         persist: false,
         create: false,
         maxItems: 5,
+        closeAfterSelect: true,
         valueField: 'category_id',
         labelField: 'category_name',
         searchField: ['category_name', 'category_code'],
@@ -377,21 +387,25 @@ $ ->
 
 
           $(entry).each (i) ->
-
-            if i <= 25
-              entry_row = '<tr class="index-entry-row">' +
-                '<td class="clusterpath-col-path">' + this.url + '</td>' +
-                '<td class="clusterpath-col-path">' + this.customer_name + '</td>' +
-                '<td class="clusterpath-col-volume text-center">' + this.apac_volume + '</td>' +
-                '<td class="clusterpath-col-volume text-center">' + this.emrg_volume + '</td>' +
-                '<td class="clusterpath-col-volume text-center">' + this.eurp_volume + '</td>' +
-                '<td class="clusterpath-col-volume text-center">' + this.glob_volume + '</td>' +
-                '<td class="clusterpath-col-volume text-center">' + this.japn_volume + '</td>' +
-                '<td class="clusterpath-col-volume text-center">' + this.noam_volume + '</td>' +
-                '<td class="clusterpath-col-wbrs text-center">' + this.wbrs_score + '</td>' +
-                '</tr>'
+            if i <= 24
+              {url, customer_name, apac_volume, emrg_volume, eurp_volume, glob_volume, japn_volume, noam_volume, wbrs_score}= this
+              wbrs_rep = window.wbrs_display(wbrs_score)
+              if wbrs_rep == undefined then wbrs_rep = 'unknown'
+              if wbrs_rep == 'unknown'then wbrs_score = '--'
+              wbrs_col = "<div class='reputation-icon-container'><span class='reputation-icon icon-#{wbrs_rep} esc-tooltipped' title='#{wbrs_rep.toUpperCase()}'></span> #{wbrs_score}</div>"
+              entry_row = "<tr class='index-entry-row'>
+                      <td class='clusterpath-col-path'>#{url}</td>
+                      <td class='clusterpath-col-path'>#{customer_name}</td>
+                      <td class='clusterpath-col-volume text-center'>#{apac_volume}</td>
+                      <td class='clusterpath-col-volume text-center'>#{emrg_volume}</td>
+                      <td class='clusterpath-col-volume text-center'>#{eurp_volume}</td>
+                      <td class='clusterpath-col-volume text-center'>#{glob_volume}</td>
+                      <td class='clusterpath-col-volume text-center'>#{japn_volume}</td>
+                      <td class='clusterpath-col-volume text-center'>#{noam_volume}</td>
+                      <td class='clusterpath-col-wbrs text-center'>#{wbrs_col}</td>
+                      </tr>"
               entry_rows.push entry_row
-              total_shown_entries = i
+              total_shown_entries = i + 1
               return
 
           bottom_row = '<tr class="cluster-entry-bottom-row">' +
@@ -437,17 +451,27 @@ window.expandClusterEntryPreview = (cluster, expand_table_row, max_viewable_entr
         entry = json.data
         $(entry).each (i) ->
           if i > 25
-            entry_row = '<tr class="index-entry-row">' +
-              '<td class="clusterpath-col-path">' + this.url + '</td>' +
-              '<td class="clusterpath-col-path">' + this.customer_name + '</td>' +
-              '<td class="clusterpath-col-volume text-center">' + this.apac_volume + '</td>' +
-              '<td class="clusterpath-col-volume text-center">' + this.emrg_volume + '</td>' +
-              '<td class="clusterpath-col-volume text-center">' + this.eurp_volume + '</td>' +
-              '<td class="clusterpath-col-volume text-center">' + this.glob_volume + '</td>' +
-              '<td class="clusterpath-col-volume text-center">' + this.japn_volume + '</td>' +
-              '<td class="clusterpath-col-volume text-center">' + this.noam_volume + '</td>' +
-              '<td class="clusterpath-col-wbrs text-center">' + this.wbrs_score + '</td>' +
-              '</tr>'
+            {url, customer_name, apac_volume, emrg_volume, eurp_volume, glob_volume, japn_volume, noam_volume, wbrs_score}= this
+            wbrs_rep = window.wbrs_display(wbrs_score)
+            if wbrs_rep == undefined
+              wbrs_rep = 'unknown'
+
+            if wbrs_rep == 'unknown'
+              wbrs_score = '--'
+            else
+              wbrs_score = parseFloat(wbrs_score).toFixed(1)
+            wbrs_col = "<div class='.reputation-icon-container'><span class='reputation-icon icon-#{wbrs_rep} esc-tooltipped' title='#{wbrs_rep.toUpperCase()}'></span> #{wbrs_score}</div>"
+            entry_row = "<tr class='index-entry-row'>
+                    <td class='clusterpath-col-path'>#{url}</td>
+                    <td class='clusterpath-col-path'>#{customer_name}</td>
+                    <td class='clusterpath-col-volume text-center'>#{apac_volume}</td>
+                    <td class='clusterpath-col-volume text-center'>#{emrg_volume}</td>
+                    <td class='clusterpath-col-volume text-center'>#{eurp_volume}</td>
+                    <td class='clusterpath-col-volume text-center'>#{glob_volume}</td>
+                    <td class='clusterpath-col-volume text-center'>#{japn_volume}</td>
+                    <td class='clusterpath-col-volume text-center'>#{noam_volume}</td>
+                    <td class='clusterpath-col-wbrs text-center'>#{wbrs_col}</td>
+                    </tr>"
             entry_rows.push entry_row
             return
 
@@ -471,7 +495,7 @@ window.expandClusterEntryPreview = (cluster, expand_table_row, max_viewable_entr
     $(total_shown_entries[0]).text('25')
 
     $(rows).each (i) ->
-      if i > 25
+      if i > 24
         $(this).remove()
 
 

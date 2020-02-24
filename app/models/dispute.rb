@@ -547,25 +547,23 @@ class Dispute < ApplicationRecord
 
             if !false_negative_claim
               new_dispute_entry.status = DisputeEntry::NEW
-            else
-              email_resolved = false
 
               if new_dispute.submitter_type == "NON-CUSTOMER"
-                email_resolved = AutoResolve.auto_resolve_email(new_dispute_entry, total_hits)
+                AutoResolve.auto_resolve_email(new_dispute_entry, total_hits)
               end
 
-              if email_resolved == false
+            else
 
-                auto_resolve_verdict = new_dispute_entry.assign_from_auto_resolve(address: key,
-                                                                                  total_hits: total_hits,
-                                                                                  resolved_at: resolved_at,
-                                                                                  dispute_entry: new_dispute_entry)
+              auto_resolve_verdict = new_dispute_entry.assign_from_auto_resolve(address: key,
+                                                                                total_hits: total_hits,
+                                                                                resolved_at: resolved_at,
+                                                                                dispute_entry: new_dispute_entry)
 
-                if auto_resolve_verdict.resolved? && auto_resolve_verdict.malicious?
-                  verdicts_to_blacklist << [auto_resolve_verdict, new_dispute_entry]
-                end
-
+              if auto_resolve_verdict.resolved? && auto_resolve_verdict.malicious?
+                verdicts_to_blacklist << [auto_resolve_verdict, new_dispute_entry]
               end
+
+
             end
             new_dispute_entry.save!
 

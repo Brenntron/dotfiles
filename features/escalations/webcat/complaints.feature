@@ -38,8 +38,8 @@ Feature: Webcat complaints
     And WBRS top url is stubbed
     And WBRS Prefix where is stubbed
     And the following companies exist:
-    |id| name  |
-    | 1| Cisco |
+    | name  |
+    | Cisco |
     And the following customers exist:
     | company_id | name         | email           |
     | 1          | Talos Person | talos@cisco.com |
@@ -115,16 +115,8 @@ Feature: Webcat complaints
     Then I wait for "3" seconds
     Then I should see "ASSIGNED"
 
-  @javascript
-  Scenario: a user tries to take multiple complaints one of which is invalid
-    Given a user with role "webcat user" exists and is logged in
-    And the following complaint entries exist:
-      |id|  domain      |
-      |1 | blah.com     |
-      |2 | food.com     |
-      |3 | im.hungry.com     |
-    And a complaint entry preload exists
-    Then pending
+  # TODO write this test
+  # Scenario: a user tries to take multiple complaints one of which is invalid
 
   @javascript
   Scenario: a user can return a complaint
@@ -347,7 +339,7 @@ Feature: Webcat complaints
     And I fill in "url_1" with "mary.com"
     And I fill in selectized with "Adult"
     And I click ".primary"
-    And I wait for "45" seconds
+    And I wait for "10" seconds
     Then I should see "URLS CATEGORIZED SUCCESSFULLY"
     And I should see "Categorization of a Top URL will create a pending complaint entry. All other entries have been submitted directly to WBRS."
 
@@ -390,7 +382,7 @@ Feature: Webcat complaints
     And I fill in selectized with "Adult"
     And I click "#cat-urls-same"
     And I click ".primary"
-    And I wait for "20" seconds
+    And I wait for "15" seconds
     Then I should see "SUCCESS"
     And I should see "URLs/IPs successfully categorized."
 
@@ -618,3 +610,141 @@ Feature: Webcat complaints
     And I click ".take-ticket-toolbar-button"
     And I wait for "3" seconds
     Then I should see content "1" within "#int-assigned-count"
+
+  @javascript
+  Scenario: a user uses the Update Resolution feature on multiple entries and includes an internal and resolution comment
+    Given a user with role "webcat user" exists and is logged in
+    And the following complaint entries exist:
+      |id| domain        | status |
+      |1 | blah.com      | NEW    |
+      |2 | food.com      | NEW    |
+      |3 | im.hungry.com | NEW    |
+    When I goto "/escalations/webcat/complaints"
+    And I click "#complaints_check_box"
+    And I click "#index_update_resolution"
+    And I select "Unchanged" from "complaint_resolution"
+    And I fill in element, "#internal_comment" with "Cisco"
+    And I fill in element, "#customer_facing_comment" with "Disco"
+    And I click "#button_update_resolution"
+    And I wait for "4" seconds
+    And I should see "Set the following 3 entries to RESOLUTION UNCHANGED."
+    And I click "#submit_resolution_changes"
+    Then the following complaint entry with id: "1" has a resolution of: "UNCHANGED"
+    Then the following complaint entry with id: "2" has a resolution of: "UNCHANGED"
+    Then the following complaint entry with id: "3" has a resolution of: "UNCHANGED"
+    Then the following complaint entry with id: "1" has a status of: "COMPLETED"
+    Then the following complaint entry with id: "2" has a status of: "COMPLETED"
+    Then the following complaint entry with id: "3" has a status of: "COMPLETED"
+    Then the following complaint entry with id: "1" has a internal comment of: "Cisco"
+    Then the following complaint entry with id: "2" has a internal comment of: "Cisco"
+    Then the following complaint entry with id: "3" has a internal comment of: "Cisco"
+    Then the following complaint entry with id: "1" has a resolution comment of: "Disco"
+    Then the following complaint entry with id: "2" has a resolution comment of: "Disco"
+    Then the following complaint entry with id: "3" has a resolution comment of: "Disco"
+
+  @javascript
+  Scenario: a user attempts to use Update Resolution on a Pending/Completed Complaint Entry, but INVALID and UNCHANGED are disabled from the drop-down menu
+    Given a user with role "webcat user" exists and is logged in
+    And the following complaint entries exist:
+      |id| domain   | uri            | status    | resolution | entry_type |
+      |1 | blah.com | blah.com       | PENDING   | FIXED      | URI/DOMAIN |
+      |2 | food.com | food.com       | COMPLETED | FIXED      | URI/DOMAIN |
+    When I goto "/escalations/webcat/complaints"
+    And I wait for "2" seconds
+    And I click "#complaints_check_box"
+    And I click "#index_update_resolution"
+    And I wait for "4" seconds
+    Then the "Unchanged" option from "complaint_resolution" is disabled
+    Then the "Invalid" option from "complaint_resolution" is disabled
+    Then the "Reopened" option from "complaint_resolution" is not disabled
+
+  @javascript
+  Scenario: a user uses the Update Resolution feature on an important entry
+    Given a user with role "webcat user" exists and is logged in
+    And the following complaint entries exist:
+      |id| domain            | is_important | status |
+      |1 | blah.com          |      1       | NEW    |
+      |2 | food.com          |      0       | NEW    |
+      |3 | im.hungry.com     |      0       | NEW    |
+    When I goto "/escalations/webcat/complaints"
+    And I click "#complaints_check_box"
+    And I click "#index_update_resolution"
+    And I select "Invalid" from "complaint_resolution"
+    And I click "#button_update_resolution"
+    And I wait for "2" seconds
+    Then I should see "Set the following 3 entries to RESOLUTION INVALID."
+    When I click "#submit_resolution_changes"
+    And I wait for "1" seconds
+    Then the following complaint entry with id: "1" has a resolution of: "INVALID"
+    Then the following complaint entry with id: "1" has a status of: "PENDING"
+    Then the following complaint entry with id: "2" has a resolution of: "INVALID"
+    Then the following complaint entry with id: "2" has a status of: "COMPLETED"
+    Then the following complaint entry with id: "3" has a resolution of: "INVALID"
+    Then the following complaint entry with id: "3" has a status of: "COMPLETED"
+
+  @javascript
+  Scenario: a user uses the Update Resolution feature to reopen a completed ComplaintEntry
+    Given a user with role "webcat user" exists and is logged in
+    And the following complaint entries exist:
+      |id| domain            | status    |
+      |1 | blah.com          | COMPLETED |
+      |2 | food.com          | COMPLETED |
+      |3 | im.hungry.com     | NEW       |
+    When I goto "/escalations/webcat/complaints"
+    And I click "#complaints_check_box"
+    And I click "#index_update_resolution"
+    And I select "Reopened" from "complaint_resolution"
+    And I click "#button_update_resolution"
+    And I wait for "5" seconds
+    Then I should see "Set the following 2 entries to RESOLUTION REOPENED"
+    When I click "#submit_resolution_changes"
+    And I wait for "1" seconds
+    Then the following complaint entry with id: "1" has a status of: "REOPENED"
+    Then the following complaint entry with id: "2" has a status of: "REOPENED"
+    Then the following complaint entry with id: "3" has a status of: "NEW"
+
+  @javascript
+  Scenario: a user can show/hide columns in the webcat/complaints view
+    Given a user with role "webcat user" exists and is logged in
+    And the following disputes exist and have entries:
+      | id | submitter_type |
+      | 1  | CUSTOMER       |
+    Then I goto "escalations/webcat/complaints"
+    Then I wait for "2" seconds
+    When I click "#webcat-index-table-show-columns-button"
+    And I click ".primary-checkbox"
+    Then I should not see table header with id "primary"
+    And I click ".primary-checkbox"
+    Then I should see table header with id "primary"
+    And I click ".assignee-checkbox"
+    Then I should not see table header with id "assignee"
+    And I click ".assignee-checkbox"
+    Then I should see table header with id "assignee"
+    And I click ".submittertype-checkbox"
+    Then I should not see table header with id "submittertype"
+    And I click ".submittertype-checkbox"
+    Then I should see table header with id "submittertype"
+
+  @javascript
+  Scenario: a user can ensure show/hide column states are saved in the database after a page reload
+    Given a user with role "webcat user" exists and is logged in
+    And the following disputes exist and have entries:
+      | id | submitter_type |
+      | 1  | CUSTOMER       |
+    Then I goto "escalations/webcat/complaints"
+    And I wait for "2" seconds
+    And I click "#webcat-index-table-show-columns-button"
+    And I should see the ".subdomain-checkbox" checkbox checked
+    And I should see the ".assignee-checkbox" checkbox checked
+    And I click ".subdomain-checkbox"
+    And I click ".assignee-checkbox"
+    Then I should not see table header with id "subdomain"
+    Then I should not see table header with id "assignee"
+    Then I should see table header with id "tags"
+    Then I should see table header with id "path"
+    And I goto "escalations/webcat/complaints"
+    And I wait for "2" seconds
+    Then I should not see table header with id "subdomain"
+    Then I should not see table header with id "assignee"
+    Then I should see table header with id "tags"
+    Then I should see table header with id "path"
