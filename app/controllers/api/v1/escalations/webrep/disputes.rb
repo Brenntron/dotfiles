@@ -192,31 +192,13 @@ module API
             post "new_adhoc_entry" do
               json_packet = []
 
-              user = Dispute.find(params[:dispute_id]).user_id
+              dispute = Dispute.find(params[:dispute_id])
 
-              entry = DisputeEntry.new(:dispute_id => params[:dispute_id], :user_id => user, status: Dispute::NEW, case_opened_at: Time.now)
-
-              is_ip_address = !!(params[:uri]  =~ Resolv::IPv4::Regex)
-
-              if is_ip_address
-                entry.ip_address = params[:uri]
-                entry.save
-                Preloader::Base.fetch_all_api_data(entry.ip_address, entry.id)
-              else
-                entry.uri = params[:uri]
-                resolved_ip = Resolv.getaddress(DisputeEntry.domain_of(entry.uri)) rescue nil
-                if resolved_ip.present?
-                  entry.web_ips = [resolved_ip]
-                end
-                entry.save
-
-                Preloader::Base.fetch_all_api_data(entry.uri, entry.id)
-
-              end
+              entry = DisputeEntry.create_dispute_entry(dispute, params[:uri])
 
               json_packet << entry
 
-              {:status => "success", :data => json_packet}.to_json if entry.save
+              {:status => "success", :data => json_packet}.to_json
             end
 
             desc "Change assignee of a group of dispute IDs"

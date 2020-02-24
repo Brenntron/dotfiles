@@ -119,7 +119,7 @@ class DisputeEntry < ApplicationRecord
       end
 
       new_dispute_entry.save!
-
+      ::Preloader::Base.fetch_all_api_data(ip_url, new_dispute_entry.id)
       # Create Dispute Entry RuleHits
       wbrs_rule_hits = Sbrs::ManualSbrs.get_rule_names_from_rulehits(wbrs_api_response)
 
@@ -134,7 +134,7 @@ class DisputeEntry < ApplicationRecord
           DisputeRuleHit.create(rule_type:'SBRS', name: rule_hit, dispute_entry_id: new_dispute_entry.id)
         end
       end
-
+      return new_dispute_entry
     rescue Exception => e
       raise Exception.new("{DisputeEntry creation error: {content: #{ip_url},error:#{e}}}")
     end
@@ -619,13 +619,19 @@ class DisputeEntry < ApplicationRecord
 
     ::Preloader::Base.fetch_all_api_data(self.hostlookup, self.id)
     #
+    extra_wbrs_stuff = nil
     if self.uri.present? && self.web_ips.present?
-      wbrs_stuff = Sbrs::Base.combo_call_sds_v3(self.uri, [self.web_ips.join(" ")])
+      web_ips_formatted = self.web_ips.gsub("[", "").gsub("]", "").gsub("\"", "").split(", ")
+      extra_wbrs_stuff = Sbrs::Base.combo_call_sds_v3(self.uri, web_ips_formatted)
+      wbrs_stuff = Sbrs::Base.remote_call_sds_v3(self.hostlookup, "wbrs")
     else
       wbrs_stuff = Sbrs::Base.remote_call_sds_v3(self.hostlookup, "wbrs")
     end
 
     wbrs_stuff_rulehits = Sbrs::ManualSbrs.get_rule_names_from_rulehits(wbrs_stuff) rescue nil
+
+    extra_wbrs_stuff_rulehits = Sbrs::ManualSbrs.get_rule_names_from_rulehits(extra_wbrs_stuff) rescue []
+
     if wbrs_stuff_rulehits.blank?
       wbrs_stuff_rulehits = []
     end  
@@ -638,12 +644,25 @@ class DisputeEntry < ApplicationRecord
     end
 
 
+    if extra_wbrs_stuff.present?
+      self.score = wbrs_stuff["wbrs"]["score"]
+    end
+
     self.wbrs_score = wbrs_stuff["wbrs"]["score"]
     wbrs_stuff_rulehits.each do |rule_hit|
       new_rule_hit = DisputeRuleHit.new
       new_rule_hit.dispute_entry_id = self.id
       new_rule_hit.name = rule_hit.strip
       new_rule_hit.rule_type = "WBRS"
+      new_rule_hit.save
+    end
+
+    extra_wbrs_stuff_rulehits.each do |rule_hit|
+      new_rule_hit = DisputeRuleHit.new
+      new_rule_hit.dispute_entry_id = self.id
+      new_rule_hit.name = rule_hit.strip
+      new_rule_hit.rule_type = "WBRS"
+      new_rule_hit.is_multi_ip_rulehit = true
       new_rule_hit.save
     end
 
