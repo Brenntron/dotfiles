@@ -622,6 +622,7 @@ class DisputeEntry < ApplicationRecord
     extra_wbrs_stuff = nil
     if self.uri.present? && self.web_ips.present?
       web_ips_formatted = self.web_ips.gsub("[", "").gsub("]", "").gsub("\"", "").split(", ")
+      
       extra_wbrs_stuff = Sbrs::Base.combo_call_sds_v3(self.uri, web_ips_formatted)
       wbrs_stuff = Sbrs::Base.remote_call_sds_v3(self.hostlookup, "wbrs")
     else
@@ -645,7 +646,7 @@ class DisputeEntry < ApplicationRecord
 
 
     if extra_wbrs_stuff.present?
-      self.score = wbrs_stuff["wbrs"]["score"]
+      self.score = extra_wbrs_stuff["wbrs"]["score"]
     end
 
     self.wbrs_score = wbrs_stuff["wbrs"]["score"]
