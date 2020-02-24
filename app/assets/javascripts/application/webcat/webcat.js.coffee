@@ -507,9 +507,9 @@ $ ->
                   {subdomain, entry_id} = full
 
                   if subdomain
-                    '<span id="subdomain_' + entry_id + '">' + subdomain + '</span>'
+                    '<span id="subdomain_' + entry_id + '" class="webcat-subdomain-holder">' + subdomain + '</span>'
                   else
-                    '<span id="subdomain_' + entry_id + '">' + '</span>'
+                    '<span id="subdomain_' + entry_id + '" class="webcat-subdomain-holder">' + '</span>'
                 width: '50px'
               }
               {
@@ -530,7 +530,7 @@ $ ->
                     data_full = "data-full=" + data_full
                   title = "title=" + domain
                   if domain
-                    "<p class='input-truncate esc-tooltipped' #{data_full} id='domain_#{entry_id}' #{title}>#{domain}</p>"
+                    "<p class='input-truncate esc-tooltipped webcat-domain-holder' #{data_full} id='domain_#{entry_id}' #{title}>#{domain}</p>"
                   else
                     "<a id='domain_#{entry_id}' #{data_full} href='http://#{ip_address}' target='blank'>#{ip_address}</a>"
               }

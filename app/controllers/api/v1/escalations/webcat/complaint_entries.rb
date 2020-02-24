@@ -409,6 +409,40 @@ module API
               end
             end
 
+
+            desc 'Retrieve current categories by URL only (not complaint entry ID)'
+            params do
+              requires :domain, type: String # Must be in the form of "domain.com" only, no http/s or path
+            end
+            post 'retrieve_current_categories_by_url' do
+              std_api_v2 do
+                complaint_entry = ComplaintEntry.where(:domain => params[:domain]).order(:created_at).last
+
+                if complaint_entry.subdomain.present? || complaint_entry.path.present?
+                  master_categories = complaint_entry.get_category_names_from_master
+                else
+                  master_categories = []
+                end
+
+                wbrs_categories = complaint_entry.current_category_data
+
+                # Pull category from SDS
+                sds_params = {}
+
+                if complaint_entry.entry_type == 'URI/DOMAIN'
+                  sds_params['url'] = complaint_entry.uri
+                elsif complaint_entry.entry_type == 'IP'
+                  sds_params['url'] = complaint_entry.ip_address
+                end
+
+                sds_category = Sbrs::ManualSbrs.call_wbrs_webcat(sds_params, type: 'wbrs')
+
+                {master_categories: master_categories, current_category_data: wbrs_categories,
+                 sds_category: sds_category }.to_json
+              end
+            end
+
+
             desc 'Retrieve category names from master domain'
             params do
               requires :id, type: Integer
