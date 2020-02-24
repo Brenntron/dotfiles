@@ -405,7 +405,7 @@ module API
                 sds_category = Sbrs::ManualSbrs.call_wbrs_webcat(sds_params, type: 'wbrs')
 
                 {master_categories: master_categories, current_category_data: wbrs_categories,
-                 sds_category: sds_category }.to_json
+                 sds_category: sds_category}.to_json
               end
             end
 
@@ -438,7 +438,7 @@ module API
                 sds_category = Sbrs::ManualSbrs.call_wbrs_webcat(sds_params, type: 'wbrs')
 
                 {master_categories: master_categories, current_category_data: wbrs_categories,
-                 sds_category: sds_category }.to_json
+                 sds_category: sds_category, complaint_entry_id: complaint_entry.id }.to_json
               end
             end
 
