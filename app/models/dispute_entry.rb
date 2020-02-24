@@ -124,6 +124,7 @@ class DisputeEntry < ApplicationRecord
 
           extra_wbrs_stuff = Sbrs::Base.combo_call_sds_v3(new_dispute_entry.uri, web_ips_formatted)
           extra_wbrs_stuff_rulehits = Sbrs::ManualSbrs.get_rule_names_from_rulehits(extra_wbrs_stuff) rescue []
+
           if extra_wbrs_stuff.present?
             new_dispute_entry.score = extra_wbrs_stuff["wbrs"]["score"]
 
@@ -138,7 +139,7 @@ class DisputeEntry < ApplicationRecord
               new_dispute_entry.multi_wbrs_threat_category = threat_cat_names
             end
           end
-
+          new_dispute_entry.save
 
           extra_wbrs_stuff_rulehits.each do |rule_hit|
             new_rule_hit = DisputeRuleHit.new
