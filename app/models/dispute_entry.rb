@@ -924,6 +924,34 @@ class DisputeEntry < ApplicationRecord
           wbrs_stuff_rulehits = wbrs_stuff_rulehits + (Sbrs::ManualSbrs.get_rule_names_from_rulehits(wbrs_stuff_ip) rescue [])
           wbrs_stuff_rulehits = wbrs_stuff_rulehits.uniq
           entry.web_ips = ip_addr
+          web_ips_formatted = entry.web_ips.gsub("[", "").gsub("]", "").gsub("\"", "").split(", ")
+          
+          extra_wbrs_stuff = Sbrs::Base.combo_call_sds_v3(entry.uri, web_ips_formatted)
+          extra_wbrs_stuff_rulehits = Sbrs::ManualSbrs.get_rule_names_from_rulehits(extra_wbrs_stuff) rescue []
+
+          if extra_wbrs_stuff.present?
+            entry.score = extra_wbrs_stuff["wbrs"]["score"]
+
+            threat_cats = extra_wbrs_stuff["threat_cats"]
+
+            threat_cat_names = []
+            if threat_cats.present?
+              threat_cat_info = DisputeEntry.threat_cats_from_ids(threat_cats)
+              threat_cat_info.each do |name|
+                threat_cat_names << name[:name]
+              end
+              entry.multi_wbrs_threat_category = threat_cat_names
+            end
+          end
+
+
+          extra_wbrs_stuff_rulehits.each do |rule_hit|
+            new_rule_hit = DisputeRuleHit.new
+            new_rule_hit.name = rule_hit.strip
+            new_rule_hit.rule_type = "WBRS"
+            new_rule_hit.is_multi_ip_rulehit = true
+            entry.dispute_rule_hits << new_rule_hit
+          end
         end
 
         if wbrs_stuff.kind_of?(Hash)
