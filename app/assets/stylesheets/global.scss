@@ -11770,3 +11770,24 @@ span.threat-cat-no-data {
 .reptool-entry-name {
   word-break: break-all;
 }
+
+.reptool-generated-comment, .toolbar div.reptool-generated-comment {
+  word-break: break-all;
+  white-space: pre-line;
+  background: lighten($medium-neutral-color, 5%);
+  color: $type-lighter-color;
+  margin-top: 10px;
+  line-height: 16px;
+  padding: 5px 6px;
+  max-height: 90px;
+  overflow-y: auto;
+}
+
+.inline-tool-content-wrapper .comment-wrapper .dropdown-comment.adjust-reptool-bl-input {
+  // placeholder text below
+  &::placeholder {
+    color: $content-label-color;
+  }
+  min-height: 60px;
+}
+

@@ -21,14 +21,13 @@ window.get_current_reptool =(button, page) ->
   # Empty table
   tbody = $(dropdown).find('table.dispute_tool_current').find('tbody')
   $(tbody).empty()
-  # Empty the comment box
-  comment_box = $(dropdown).find('.comment-input')
-  comment_box.val('')
+  # Find the comment div inside this dropdown
+  comment_box = $(dropdown).find('.reptool-generated-comment')
 
   if page == "show"
-    comment_trail = '\n \n------------------------------- \nINDIVIDUAL SUBMISSION: \n #' + case_id + ' - ' + entry_content
+    comment_trail = 'AC INDIVIDUAL SUBMISSION: \n #' + case_id + ' - ' + entry_content
   else if page == "research"
-    comment_trail = '\n \n------------------------------- \nINDIVIDUAL RESEARCH SUBMISSION: \n' + entry_content
+    comment_trail = 'AC INDIVIDUAL RESEARCH SUBMISSION: \n' + entry_content
 
   # ensure ip_uris is valid for the endpoint, it is just the URL for this row
   ip_uris = entry_content
@@ -53,7 +52,9 @@ window.get_current_reptool =(button, page) ->
       else
         rep_class = '<span class="missing-data">No active classifications</span>'
       tbody.append('<tr class="reptool-entry-row" data-case-id="' + 'case_id' + '"><td class="reptool-entry-class">' + rep_class + '</td><td class="reptool-entry-expiration">' + entry['expiration'] + '</td><td class="reptool-entry-comment">' + entry['comment'] + '</td></tr>')
-      comment_box.val(comment_trail)
+
+      #  comment_box.val(comment_trail)
+      $(comment_box).html(comment_trail)  # put the auto-generated comment into the read-only div
 
     error: (response) ->
       std_api_error(response, "Error retrieving Reptool Data", reload: false)
@@ -102,11 +103,11 @@ window.bulk_get_current_reptool = (page) ->
       ip_uris.push(entry_content)
 
     if page == "show"
-      comment_trail = '\n \n------------------------------- \nBULK SUBMISSION: \n #' + case_id + ' - ' + ip_uris.join(', ')
+      comment_trail = 'AC BULK SUBMISSION: \n #' + case_id + ' - ' + ip_uris.join(', ')
     else if page == "research"
-      comment_trail = '\n \n------------------------------- \nRESEARCH BULK SUBMISSION: \n' + ip_uris.join('\n')
+      comment_trail = 'AC RESEARCH BULK SUBMISSION: \n' + ip_uris.join('\n')
     else if page == "index"
-      comment_trail = '\n \n------------------------------- \nBULK SUBMISSION: \n' + comment_array.join('\n')
+      comment_trail = 'AC BULK SUBMISSION: \n' + comment_array.join('\n')
 
     std_msg_ajax(
       url: '/escalations/api/v1/escalations/webrep/disputes/bulk_reptool_get_info_for_form'
@@ -129,7 +130,11 @@ window.bulk_get_current_reptool = (page) ->
             rep_class_list = '<span class="missing-data">No active classifications</span>'
 
           tbody.append('<tr class="reptool-entry-row" data-case-id="' + case_id + '"><td class="reptool-entry-name">' + entry['entry'] + '</td><td class="reptool-entry-class" data-classification="' + rep_class_attr + '">' + rep_class_list + '</td><td>' + rep_class_exp + '</td><td class="reptool-entry-comment">' + entry['comment'] + '</td></tr>')
-        comment_box.val(comment_trail)
+
+
+#        comment_box.val(comment_trail)
+        $('.reptool-generated-comment').html(comment_trail)  # put the auto-generated comment into the read-only div
+
 
         if entry['comment'].length > 50
           entry_comment_trunc = entry['comment'].substring(0, 50) + '...'
@@ -212,7 +217,7 @@ window.submit_individual_reptool = (button) ->
   comment = $($(dropdown).find('.dropdown-comment')).val()
 
 
-  # BEGIN INLINE: Comment reconstruction for Reptool, it needs a single-line format now w/o newlines, BEGIN
+  # BEGIN INLINE: Comment reconstruction for Reptool, it needs a single-line format now w/o newlines
   delimiter = '-------------------------------' # use the dashline to separate the comment in half
 
   # get the 'typed in' part of the comment

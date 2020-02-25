@@ -433,8 +433,8 @@
 
               .comment-wrapper
                 %label.content-label-sm RepTool Comment
-                %textarea.dropdown-comment.adjust-reptool-bl-input.comment-input
-                %hr.thin
+                %textarea.dropdown-comment.adjust-reptool-bl-input.comment-input{placeholder: 'Reason behind this change...'}
+                .reptool-generated-comment
               .button-row-center
                 %button.primary.dropdown-submit-button{type: 'button', onclick: 'submit_bulk_reptool()', disabled: true}
                   Submit Changes
