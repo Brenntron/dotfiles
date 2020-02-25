@@ -206,8 +206,8 @@
 
                     .comment-wrapper
                       %label.content-label-sm RepTool Comment
-                      %textarea.dropdown-comment.adjust-reptool-bl-input.comment-input
-                      %hr.thin
+                      %textarea.dropdown-comment.adjust-reptool-bl-input.comment-input.typed-in-comment-bulk
+                      .reptool-generated-comment
                     .button-row-center
                       %button.primary.dropdown-submit-button{type: 'button', onclick: 'submit_bulk_reptool();'}
                         Submit Changes
@@ -427,10 +427,8 @@
                                                 tor_exit_node
                                   .comment-wrapper
                                     %label.content-label-sm RepTool Comment
-                                    %textarea.dropdown-comment.adjust-reptool-bl-input.comment-input
-                                      \
-                                      \
-                                      \--------------------------
+                                    %textarea.dropdown-comment.adjust-reptool-bl-input.comment-input.typed-in-comment-inline
+                                    .reptool-generated-comment
                                       INDIVIDUAL RESEARCH SUBMISSION:
                                       &#x000A; #{entry.hostlookup}
                                     %hr.thin

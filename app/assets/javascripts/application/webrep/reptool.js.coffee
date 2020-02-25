@@ -24,6 +24,7 @@ window.get_current_reptool =(button, page) ->
   # Find the comment div inside this dropdown
   comment_box = $(dropdown).find('.reptool-generated-comment')
 
+  # Can leave the \n's, they will get replaced with regex
   if page == "show"
     comment_trail = 'AC INDIVIDUAL SUBMISSION: \n #' + case_id + ' - ' + entry_content
   else if page == "research"
@@ -103,11 +104,11 @@ window.bulk_get_current_reptool = (page) ->
       ip_uris.push(entry_content)
 
     if page == "show"
-      comment_trail = 'AC BULK SUBMISSION: \n #' + case_id + ' - ' + ip_uris.join(', ')
+      comment_trail = 'AC Bulk Submission: \n #' + case_id + ' - ' + ip_uris.join(', ')
     else if page == "research"
-      comment_trail = 'AC RESEARCH BULK SUBMISSION: \n' + ip_uris.join('\n')
+      comment_trail = 'AC Research Bulk Submission: \n' + ip_uris.join('\n')
     else if page == "index"
-      comment_trail = 'AC BULK SUBMISSION: \n' + comment_array.join('\n')
+      comment_trail = 'AC Bulk Submission: \n' + comment_array.join('\n')
 
     std_msg_ajax(
       url: '/escalations/api/v1/escalations/webrep/disputes/bulk_reptool_get_info_for_form'
@@ -214,41 +215,36 @@ window.submit_individual_reptool = (button) ->
   reptool_classes = checked_classes.join(', ')
 
   classification_action = $($(dropdown).find("input[name='reptool-classes-radio']:checked")).val()
-  comment = $($(dropdown).find('.dropdown-comment')).val()
+  comm_typed_in = ''
+  comm_generated = ''
+  comment = ''
 
 
-  # BEGIN INLINE: Comment reconstruction for Reptool, it needs a single-line format now w/o newlines
-  delimiter = '-------------------------------' # use the dashline to separate the comment in half
 
-  # get the 'typed in' part of the comment
-  comm_typed_in = comment.split(delimiter)[0]
-  comm_typed_in = comm_typed_in.replace(/(\r\n|\n|\r)/gm, " ")  # replace newlines w/ spaces
+  # Begin: Comment reconstruction for Reptool, it needs a single-line format now w/o newlines
+  # get the 'typed in' part of the comment from the dropdown for inline
+  comm_typed_in = $(dropdown).find('.typed-in-comment-inline').val()  # get the 'typed in' part of the comment, textarea
+  comm_typed_in = comm_typed_in.replace(/(\r\n|\n|\r)/gm, " ")  # replace newlines w/ spaces if there are any
 
-  # get the 'auto-generated' part of the comment
-  comm_gen = comment.split(delimiter)[1]
-  comm_gen = comm_gen.replace(/(\r\n|\n|\r)/gm, ", ")  # replace newlines w/ commas
-
-  # set the legacy all-caps strings for recasing
-  type_a = 'INLINE BULK SUBMISSION'
-  type_b = 'INLINE SUBMISSION'
-
-  # generate the reconstructed comment that is now single-line
-  if comm_gen.indexOf(type_a) > 0
-    comm_gen = comm_gen.replace(type_a, '')
-    comment = "AC Research Bulk Submission:#{comm_gen}"
-  else if comm_gen.indexOf(type_b) > 0
-    comm_gen = comm_gen.replace(type_b, '')
-    comment = "AC Bulk Submission:#{comm_gen}"
-
+  # get the 'auto-generated' part of the comment from the dropdown for inline
+  comm_generated = $(dropdown).find('.reptool-generated-comment').text()
+  comm_generated = comm_generated.replace(/(\r\n|\n|\r)/gm, ", ")  # replace newlines w/ commas
   # if they typed anything as an additional comment above the auto-generated part, add it to the end
   if comm_typed_in.trim() != ''
-    comment = "#{comment} || Comment: #{comm_typed_in}"
+    comment = "#{comm_generated} || Comment: #{comm_typed_in}"
+  else
+    comment = comm_generated
 
+  # one-off comment fix
+  comment = comment.replace(': ,', ':')
+
+  # so is comment now a COMBINATION of TYPED_IN and GENERATED???
   # comment is now ready to send to Reptool, do a one-off format fix
-  comment = comment.replace(' , : ,', '')
   console.clear()
   console.log comment
-  # END INLINE: comment is now a single-line, and ready for Reptool now
+  # End: comment is now a single-line, and ready for Reptool now
+
+
 
 
   # If user wants to override existing classes we only need what they've checked
@@ -332,7 +328,7 @@ window.submit_individual_reptool = (button) ->
 ## Submit Bulk changes to Reptool - toolbar dropdown form
 ## This works on index, research page, and research tab of show page
 window.submit_bulk_reptool = () ->
-  bulk_reptool_menu = $('#reptool_adjust_entries')
+  bulk_reptool_menu = $('#reptool_adjust_entries')   # this is the dropdown
   submission_action = $(bulk_reptool_menu).find("input[name='reptool-action-radio']:checked").val()
 
   checked_classes = []
@@ -344,7 +340,9 @@ window.submit_bulk_reptool = () ->
   reptool_classes = checked_classes.join()
 
   classification_action = $(bulk_reptool_menu).find("input[name='reptool-classes-radio']:checked").val()
-  comment = bulk_reptool_menu.find('.dropdown-comment').val()
+  comm_typed_in = ''
+  comm_generated = ''
+  comment = ''
 
   #  Get the entries
   entry_rows = $(bulk_reptool_menu).find('.reptool-entry-row')
@@ -359,38 +357,32 @@ window.submit_bulk_reptool = () ->
       'classifications': current_classes
     }
 
-  # BEGIN BULK: Comment reconstruction for Reptool, it needs a single-line format now without any newlines
-  delimiter = '-------------------------------' # use the dashline to separate the comment in half
 
+
+  # Comment reconstruction for Reptool, it needs a single-line format now without any newlines
   # get the 'typed in' part of the comment
-  comm_typed_in = comment.split(delimiter)[0]
+  comm_typed_in = $(bulk_reptool_menu).find('.typed-in-comment-bulk').val()  # get the 'typed in' part of the comment, textarea
   comm_typed_in = comm_typed_in.replace(/(\r\n|\n|\r)/gm, " ")  # replace newlines w/ spaces
 
   # get the 'auto-generated' part of the comment
-  comm_gen = comment.split(delimiter)[1]
-  comm_gen = comm_gen.replace(/(\r\n|\n|\r)/gm, ", ")  # replace newlines w/ commas
+  comm_generated = $(bulk_reptool_menu).find('.reptool-generated-comment').text()
+  comm_generated = comm_generated.replace(/(\r\n|\n|\r)/gm, ", ")  # replace newlines w/ commas
 
-  # set the legacy all-caps strings for recasing
-  type_a = 'RESEARCH BULK SUBMISSION'
-  type_b = 'BULK SUBMISSION'
-
-  # generate the reconstructed comment that is now single-line
-  if comm_gen.indexOf(type_a) > 0
-    comm_gen = comm_gen.replace(type_a, '')
-    comment = "AC Research Bulk Submission:#{comm_gen}"
-  else if comm_gen.indexOf(type_b) > 0
-    comm_gen = comm_gen.replace(type_b, '')
-    comment = "AC Bulk Submission:#{comm_gen}"
-
-  # if they typed anything as an additional comment above the auto-generated part, add it to the end
+  # if they typed anything as an additional comment (optional but they should), append it
   if comm_typed_in.trim() != ''
-    comment = "#{comment} || Comment: #{comm_typed_in}"
+    comment = "#{comm_generated} || Comment: #{comm_typed_in}"
+  else
+    comment = comm_generated
+
+  # one-off comment fix
+  comment = comment.replace(': ,', ':')
 
   # comment is now ready to send to Reptool, do a one-off format fix
-  comment = comment.replace(' , : ,', '')
   console.clear()
   console.log comment
-  # END BULK: comment is now a single-line, and ready for Reptool now
+  # End: comment is now a single-line, and ready for Reptool now
+
+
 
   # If user wants to override existing classes we only need what they've checked
   if submission_action == "reptool-override"
