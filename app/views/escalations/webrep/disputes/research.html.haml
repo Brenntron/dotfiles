@@ -600,17 +600,37 @@
                             %td.wbrs-rules-label-cell
                               %label WBRS
                             %td.text-center.no-border.uri-ip-wbrs-score
+                              - unless entry[:score].nil?
+                                = entry[:score]
+                              - else
+                                %span.missing-data
+                                  No score.
                             %td
                               %label WBRS Rules
                             %td.text-center.uri-ip-wbrs-rule-total
+                              - ip_rule_hits = entry.dispute_rule_hits.select {|rule_hit| rule_hit.rule_type == "WBRS" && rule_hit.is_multi_ip_rulehit == true }
+                              = ip_rule_hits.length
                             %td.uri-ip-wbrs-rules
+                              - unless ip_rule_hits.length == 0
+                                - ip_rule_hits.each do |wbrs_hit|
+                                  - if wbrs_hit == ip_rule_hits.last
+                                    = wbrs_hit.name
+                                  - else
+                                    = "#{wbrs_hit.name}, "
+                              - else
+                                %span.missing-data
+                                  No rules.
                             %td
                               %label Threat Category
                             %td.uri-ip-category
+                              - unless entry[:multi_wbrs_threat_category].nil?
+                                - ip_tc_record = JSON.parse entry[:multi_wbrs_threat_category]
+                                - ip_tc = ip_tc_record.to_sentence(two_words_connector: ', ', last_word_connector: ', ')
+                                = ip_tc
                             %td
                               %label Proxy URI
                             %td.uri-ip-proxy
-
+                              = entry[:proxy_uri]
 
                   %tr.nested-data-row{'data-entry-id': "#{entry.id}"}
                     %td.expanded-row{colspan: '8'}

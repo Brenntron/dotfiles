@@ -756,12 +756,10 @@
                               %span.missing-data
                                 No score.
                           %td
-                            %label WBRS Rule Hits
+                            %label WBRS Rules
                           %td.text-center.uri-ip-wbrs-rule-total
                             - ip_rule_hits = entry.dispute_rule_hits.select {|rule_hit| rule_hit.rule_type == "WBRS" && rule_hit.is_multi_ip_rulehit == true }
                             = ip_rule_hits.length
-                          %td
-                            %label WBRS Rules
                           %td.uri-ip-wbrs-rules
                             - unless ip_rule_hits.length == 0
                               - ip_rule_hits.each do |wbrs_hit|

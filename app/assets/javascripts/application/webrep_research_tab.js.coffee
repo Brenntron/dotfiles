@@ -120,10 +120,6 @@ $ ->
     if action == 'edit'
       $(ip_edit).hide()
       $(ip_data).hide()
-
-      if $('.bfrp-table').length > 0
-        $($(entry_row).find('.research-page-ip-query-details')).show()
-
       $(ip_input).show()
       $(ip_save).show()
       $(ip_cancel).show()
