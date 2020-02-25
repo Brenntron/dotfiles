@@ -38,9 +38,6 @@ window.get_current_reptool =(button, page) ->
     'entry': entry_content
   }
 
-  console.clear()
-  console.log ip_uris
-
   std_msg_ajax(
     url: '/escalations/api/v1/escalations/webrep/disputes/bulk_reptool_get_info_for_form'
     method: 'POST'
@@ -132,10 +129,8 @@ window.bulk_get_current_reptool = (page) ->
 
           tbody.append('<tr class="reptool-entry-row" data-case-id="' + case_id + '"><td class="reptool-entry-name">' + entry['entry'] + '</td><td class="reptool-entry-class" data-classification="' + rep_class_attr + '">' + rep_class_list + '</td><td>' + rep_class_exp + '</td><td class="reptool-entry-comment">' + entry['comment'] + '</td></tr>')
 
-
-#        comment_box.val(comment_trail)
-        $('.reptool-generated-comment').html(comment_trail)  # put the auto-generated comment into the read-only div
-
+        # put the auto-generated comment into the read-only div
+        $('.reptool-generated-comment').html(comment_trail)
 
         if entry['comment'].length > 50
           entry_comment_trunc = entry['comment'].substring(0, 50) + '...'
@@ -219,8 +214,6 @@ window.submit_individual_reptool = (button) ->
   comm_generated = ''
   comment = ''
 
-
-
   # Begin: Comment reconstruction for Reptool, it needs a single-line format now w/o newlines
   # get the 'typed in' part of the comment from the dropdown for inline
   comm_typed_in = $(dropdown).find('.typed-in-comment-inline').val()  # get the 'typed in' part of the comment, textarea
@@ -238,14 +231,10 @@ window.submit_individual_reptool = (button) ->
   # one-off comment fix
   comment = comment.replace(': ,', ':')
 
-  # so is comment now a COMBINATION of TYPED_IN and GENERATED???
   # comment is now ready to send to Reptool, do a one-off format fix
   console.clear()
   console.log comment
   # End: comment is now a single-line, and ready for Reptool now
-
-
-
 
   # If user wants to override existing classes we only need what they've checked
   if submission_action == "reptool-override"
@@ -357,8 +346,6 @@ window.submit_bulk_reptool = () ->
       'classifications': current_classes
     }
 
-
-
   # Comment reconstruction for Reptool, it needs a single-line format now without any newlines
   # get the 'typed in' part of the comment
   comm_typed_in = $(bulk_reptool_menu).find('.typed-in-comment-bulk').val()  # get the 'typed in' part of the comment, textarea
@@ -381,8 +368,6 @@ window.submit_bulk_reptool = () ->
   console.clear()
   console.log comment
   # End: comment is now a single-line, and ready for Reptool now
-
-
 
   # If user wants to override existing classes we only need what they've checked
   if submission_action == "reptool-override"
