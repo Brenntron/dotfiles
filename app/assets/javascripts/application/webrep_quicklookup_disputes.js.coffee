@@ -105,6 +105,7 @@ $ ->
   $(document).on 'click', '.col-actions .col-tag', (e) ->
 # This handles deleting individual actions from an action column and reformatting the div it lives in
     { target } = e
+    col_clear = $(target).closest('.col-clear-actions')
     action = $(target).text()
     action_p = $(target).closest('p')
     action_edit = action_p.text().split(':')[0];
@@ -112,10 +113,13 @@ $ ->
     $(target).remove()
 
     data = data.filter((data_actions)-> return action != data_actions)
-    col_dialog = "#{action_edit}: #{col_tag_format(data)}"
-
-    $(action_p).attr('data', data)
-    $(action_p).html(col_dialog)
+    if data.length
+      col_dialog = "#{action_edit}: #{col_tag_format(data)}"
+      $(action_p).attr('data', data)
+      $(action_p).html(col_dialog)
+    else
+      action_p.remove()
+      col_clear.empty()
 
   $(document).on 'change', '#select-all-bulk', (e) ->
 # handles selection of all checkboxes in quicklookup table
@@ -166,11 +170,8 @@ $ ->
 
     for check in all_checked
       val = $(check).val()
-      if bl_array.indexOf(val) > -1
-        bl_hide = false
-      if wl_array.indexOf(val) > -1
-        wl_check = true
-
+      if bl_array.indexOf(val) > -1 then bl_hide = false
+      if wl_array.indexOf(val) > -1 then wl_check = true
 
     for bl in bl_array
       bl_el = $("[name=#{bl}]")
@@ -263,10 +264,7 @@ $ ->
       success_reload:false
       success: (response) ->
         $('#confirmation-modal').modal('hide')
-        if response
-          console.log response
-        else
-          console.log response
+        return response
     )
 
   window.adjust_wlbl = (data) ->
@@ -278,10 +276,7 @@ $ ->
       success_reload:false
       success: (response) ->
         $('#confirmation-modal').modal('hide')
-        if response
-          console.log response
-        else
-          console.log response
+        return response
     )
 
   window.remove_wlbl = (data) ->
@@ -293,10 +288,7 @@ $ ->
       success_reload:false
       success: (response) ->
         $('#confirmation-modal').modal('hide')
-        if response
-          console.log response
-        else
-          console.log response
+        return response
     )
 
   window.check_actions = (action_classes, action_tags) =>
@@ -412,22 +404,25 @@ $ ->
 
 
   window.set_action_wlbl_col = () ->
-    $('#error_modal').dialog()
-    $('#error_modal .modal-body' ).empty()
-    $('#error_modal').dialog( 'destroy' )
+
     selected_rows = $('.col-select-all input:checked')
     list_action = $('.wlbl-radio-add:checked').val()
-    action_desc = 'Add to: '
+    checked_bl = $('.adjust_wlbl_checkbox:checked').map( () -> return $(this).val() ).get()
+    bl_check = checked_bl[0].indexOf('BL') != -1
     threat_cats = []
+
     if list_action == 'remove'
       action_desc = 'Remove from: '
-    checked_bl = $('.adjust_wlbl_checkbox:checked').map( () -> return $(this).val() ).get()
-    if checked_bl[0].indexOf('BL') != -1
-      checked = $('.wlbl_thrt_cat_id:checked')
+    else
+      action_desc = 'Add to: '
 
-      for check in checked
+    if bl_check
+      # if bl is checked, format threat cats for the dispute
+      checked_tc = $('.wlbl_thrt_cat_id:checked')
+      for check in checked_tc
         val = $(check).next('label').html()
         threat_cats.push(val)
+        
     threat_cats = threat_cats.join()
     if threat_cats != ''
       threat_cats = "data_threat_cat='#{threat_cats}'"
@@ -514,9 +509,7 @@ $ ->
             classes = $(child).attr("class")
             if !isEmpty(classes) && classes != undefined
               html += "<div #{existing_reptool} class='#{classes}'>#{$(child).html()}</div>"
-
           html += '</td> </tr>'
-
           confirmation_dialog.push( html )
 
     $('#confirmation-modal tbody').append(confirmation_dialog)
@@ -619,7 +612,6 @@ $ ->
               if existing_actions.includes(rep) || rep_list.includes(rep)
                 error_message += "<span class='col-tag dialog-tag'>#{rep} </span>, "
               return !existing_actions.includes(rep) && !rep_list.includes(rep))
-          else
 
         clear_col = $( row.find('.col-clear-actions') )
         existing_p = action_col.find('.' + reptool_class + '.reptool-action-col')
@@ -801,10 +793,8 @@ $ ->
       method: 'POST'
       data: data
       headers: headers
-      success: (response) ->
-        return response
-      error: (response) ->
-        return response
+      success: (response) -> return response
+      error: (response) -> return response
     )
 
   window.get_wlbl = (item, headers) ->
