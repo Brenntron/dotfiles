@@ -796,7 +796,7 @@ class FileReputationDispute < ApplicationRecord
 
         #POKE CLEAN HERE
         if Rails.env.production?
-          FileReputationApi::Detection.update_detection(self.sha256_hash, FileReputationApi::Detection::DISPOSITION_CLEAN)
+          FileReputationApi::Detection.update_detection(file_rep.sha256_hash, FileReputationApi::Detection::DISPOSITION_CLEAN)
         end
         file_rep.disposition = DISPOSITION_CLEAN
         file_rep.status = STATUS_RESOLVED
