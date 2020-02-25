@@ -1,4 +1,3 @@
-
 $ ->
 
   completed_counter = 0
@@ -74,7 +73,7 @@ $ ->
     return check_list
 
   $(document).on 'click', '#clear-all-actions', (e) ->
-    #this clears actions from every row
+#this clears actions from every row
     e.preventDefault()
     selected_rows = $('.col-select-all input:checked')
     $( selected_rows ).each ()->
@@ -94,7 +93,7 @@ $ ->
         $('.five-note').addClass('required-bold')
 
   $(document).on 'click', '.row-action-clear', (e) ->
-    #This removes all actions from a single row
+#This removes all actions from a single row
     e.preventDefault()
     { target } = e
     row = $(target).closest('tr')
@@ -104,7 +103,7 @@ $ ->
     submit_rep_check()
 
   $(document).on 'click', '.col-actions .col-tag', (e) ->
-    # This handles deleting individual actions from an action column and reformatting the div it lives in
+# This handles deleting individual actions from an action column and reformatting the div it lives in
     { target } = e
     action = $(target).text()
     action_p = $(target).closest('p')
@@ -119,14 +118,14 @@ $ ->
     $(action_p).html(col_dialog)
 
   $(document).on 'change', '#select-all-bulk', (e) ->
-    # handles selection of all checkboxes in quicklookup table
+# handles selection of all checkboxes in quicklookup table
     e_val = e.currentTarget.checked
     select_cols = $('.col-select-all input')
     for col in select_cols
       $(col).prop('checked', e_val)
 
   $(document).on 'change', '.col-select-all input', (e) ->
-    # handles selection of sindlge checkboxes in quicklookup table
+# handles selection of sindlge checkboxes in quicklookup table
     select_cols = $('.col-select-all input')
     select_vals = []
     for col in select_cols
@@ -332,8 +331,8 @@ $ ->
     return str.indexOf(substring) != -1
 
   window.confirm_rep_changes = () ->
-    #  confirm actions to be taken, data is prepared and  final submission of disputes to be made
-    # this is going to need to be changed and refactored
+#  confirm actions to be taken, data is prepared and  final submission of disputes to be made
+# this is going to need to be changed and refactored
     confirmation_rows = $('#confirmation-modal tbody').find('tr')
     comment = $('.confirm-rep-input').val()
     reptool_dispute_changes = []
@@ -347,38 +346,38 @@ $ ->
       actions = $( row[1] ).children()
       disputes[dispute] = dispute
       quick_bulk_update(disputes).then(
-          (response)=>
-            data = JSON.parse(response).data
-            dispute_entries = data.dispute_entries
-            action_list = []
-            for action, i in actions
-              action_tags = []
-              class_list = $(action).attr("class")
-              maintain_check = stringIncludes(class_list, 'maintain')
-              maintain_remove = stringIncludes(class_list, 'remove') && maintain_check
-              drop_check = stringIncludes(class_list, 'drop')
-              existing_classes = []
+        (response)=>
+          data = JSON.parse(response).data
+          dispute_entries = data.dispute_entries
+          action_list = []
+          for action, i in actions
+            action_tags = []
+            class_list = $(action).attr("class")
+            maintain_check = stringIncludes(class_list, 'maintain')
+            maintain_remove = stringIncludes(class_list, 'remove') && maintain_check
+            drop_check = stringIncludes(class_list, 'drop')
+            existing_classes = []
 
-              if maintain_check || drop_check
-                if $(action).attr('reptool_classes') != undefined
-                  existing_classes = $(action).attr('reptool_classes').split(',')
-                  if drop_check
-                    action_tags = existing_classes
+            if maintain_check || drop_check
+              if $(action).attr('reptool_classes') != undefined
+                existing_classes = $(action).attr('reptool_classes').split(',')
+                if drop_check
+                  action_tags = existing_classes
 
-              $(action).find('.col-tag').contents().each -> action_tags.push(this.data)
-#              if maintain_remove
-#                action_tags = action_tags.filter( (action ) => existing_classes.indexOf(action) != -1)
-              if action == 'remove'
-                remove_wlbl
-#                do a thing
-              action_list.push( check_actions(class_list, action_tags) )
-#             e
-#              dispute_id = dispute_entries[i].dispute_entry_id
-#            else
-#              actions = action: action_list
-            console.log action_list
-            actions = action: action_list
-            disputes[dispute] = actions
+            $(action).find('.col-tag').contents().each -> action_tags.push(this.data)
+            #              if maintain_remove
+            #                action_tags = action_tags.filter( (action ) => existing_classes.indexOf(action) != -1)
+            if action == 'remove'
+              remove_wlbl
+            #                do a thing
+            action_list.push( check_actions(class_list, action_tags) )
+          #             e
+          #              dispute_id = dispute_entries[i].dispute_entry_id
+          #            else
+          #              actions = action: action_list
+          console.log action_list
+          actions = action: action_list
+          disputes[dispute] = actions
       ).then(()=>
         dispute_check = true
         for key, value of disputes
@@ -461,7 +460,7 @@ $ ->
         check_list = col_tag_format(check_list_array)
         col_dialog = "<p class='wlbl-action-col #{list_action}' #{threat_cats} data='#{check_list_array}'>#{action_desc}  #{check_list}<p>"
         delete_button = '<button class="clear-action-button row-action-clear"></button>'
-#
+        #
         if error_message.endsWith(', ')
           error_message = error_message.slice(0, error_message.length - 2);
           error_html = "<div>#{error_message}<div>"
@@ -495,6 +494,7 @@ $ ->
 
     $(rows).each ->
       new_data = $(this).find('.col-bulk-dispute').text()
+
       actions_col = $( this ).find('.col-actions')
 
       existing_reptool = ''
@@ -699,6 +699,7 @@ $ ->
             <td class='col-wbrs-rules'></td>
             <td class='col-category'></td>
             <td class='col-wlbl'></td>
+            <td class='col-threat-cats'></td>
             <td class='col-reptool-class'></td>
             <td class='col-actions' data=''></td>
             <td class='col-clear-actions'></td>
@@ -785,6 +786,9 @@ $ ->
         new get_cat(item, headers)
           .then ( set_cat.bind( null, item, row) )
           .then null, (err) -> console.log err
+        new get_threat_cat(item, headers)
+          .then ( set_threat_cat.bind( null, item, row) )
+          .then null, (err) -> console.log err
         new get_wrbs(item, headers)
           .then( set_wrbs.bind( null, item, row) )
           .then null, (err) -> console.log err
@@ -839,6 +843,18 @@ $ ->
       error: (response) -> return response
     )
 
+  window.get_threat_cat = (item, headers) ->
+    data = {'uri': item}
+    $.ajax(
+      url: '/escalations/api/v1/escalations/webrep/disputes/threat_categories'
+      method: 'POST'
+      headers: headers
+      data: data
+      dataType: 'json'
+      success: (response) -> return response
+      error: (response) -> return response
+    )
+
   window.set_reptool = ( item, row, data) ->
     { classification } = JSON.parse(data)[0]
     col_reptool = $(row).children('.col-reptool-class')
@@ -872,6 +888,16 @@ $ ->
     else
       cat_col.text('No data')
       cat_col.addClass('missing-data')
+
+  window.set_threat_cat = ( item, row, data) ->
+    col_tc = $(row).children('.col-threat-cats')
+    data = ['Bogon', 'Botnets', 'Malicious Sites']
+    if data.length
+      text = data.join(', ')
+    else
+      text = 'No Threat Cats availbable'
+      col_tc.addClass('missing-data')
+    col_tc.text( text )
 
   window.set_wrbs = ( item, row, data) ->
     { score, rulehits } = data.json.data
