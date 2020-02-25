@@ -455,7 +455,7 @@
                           %td.wbrs-rules-label-cell
                             %label WBRS Rules
                           %td.text-center.wbrs-rule-hits-cell
-                            - wbrs_rules = entry.dispute_rule_hits.select{|hit| hit.rule_type == 'WBRS'}
+                            - wbrs_rules = entry.dispute_rule_hits.select{|hit| hit.rule_type == 'WBRS' && hit.is_multi_ip_rulehit != true}
                             = wbrs_rules.count
                           %td.rule-hits-col-list.wbrs-rules-cell
                             - if wbrs_rules.count == 0
