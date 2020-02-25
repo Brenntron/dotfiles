@@ -357,17 +357,7 @@ $ ->
                   action_tags = existing_classes
 
             $(action).find('.col-tag').contents().each -> action_tags.push(this.data)
-            #              if maintain_remove
-            #                action_tags = action_tags.filter( (action ) => existing_classes.indexOf(action) != -1)
-            if action == 'remove'
-              remove_wlbl
-            #                do a thing
             action_list.push( check_actions(class_list, action_tags) )
-          #             e
-          #              dispute_id = dispute_entries[i].dispute_entry_id
-          #            else
-          #              actions = action: action_list
-          console.log action_list
           actions = action: action_list
           disputes[dispute] = actions
       ).then(()=>
@@ -394,11 +384,10 @@ $ ->
       build_checkbox_list(reptool_options, list, type)
 
   window.open_wlbl = () ->
-    dropdown = $('#wlbl_entries_dropdown')
-    list = $(dropdown).find('ul')
+    list = $('#wlbl_entries_dropdown').find('ul')
     type = 'wlbl'
-    wlbl_options = [ "WL-weak", "WL-med", "WL-heavy",
-      "BL-weak", "BL-med", "BL-heavy"]
+    wlbl_options = [ "WL-weak", "WL-med", "WL-heavy", "BL-weak", "BL-med", "BL-heavy"]
+
     if !$(list).has('label').length
       build_checkbox_list(wlbl_options, list, type)
 
@@ -422,7 +411,7 @@ $ ->
       for check in checked_tc
         val = $(check).next('label').html()
         threat_cats.push(val)
-        
+
     threat_cats = threat_cats.join()
     if threat_cats != ''
       threat_cats = "data_threat_cat='#{threat_cats}'"
@@ -489,14 +478,11 @@ $ ->
 
     $(rows).each ->
       new_data = $(this).find('.col-bulk-dispute').text()
-
       actions_col = $( this ).find('.col-actions')
-
       existing_reptool = ''
       rep_classes = actions_col.attr('reptool_classes')
       if rep_classes != undefined
         existing_reptool = "reptool_classes = #{rep_classes}"
-
       if !isEmpty(new_data) && new_data != undefined
         actions_col = $( this ).find('.col-actions')
         children = actions_col.children()
@@ -545,7 +531,7 @@ $ ->
     switch (class_reptool)
       when 'maintain'
         reptool_dialog = reptool_add.charAt(0).toUpperCase() + reptool_add.slice(1)
-        status_string = reptool_dialog + ' classifications: '
+        status_string = "#{reptool_dialog } classifications:"
         status_class = 'reptool-maintain-submission'
       when 'drop'
         status_string = 'Drop all classifications (set entry to EXPIRED)'
@@ -560,7 +546,7 @@ $ ->
         reptool_class = reptool_add
 
     error_array = []
-    error_header = '<h4>Cannot ' + reptool_add + ' the following Reptool Classification disputes <h4> '
+    error_header = "<h4>Cannot #{reptool_add} the following Reptool Classification dispute<h4>"
 
     selected_rows.each () ->
       row = $(this).closest('tr')
@@ -580,7 +566,7 @@ $ ->
           reptool_classes =  $(existing_reptool).text()
           $(action_col).attr( 'reptool_classes', reptool_classes )
 
-      error_message = data + ': '
+      error_message = "#{data} :"
       if !isEmpty(data)
 
         if reptool_add == 'drop'
@@ -599,7 +585,7 @@ $ ->
             check_class = '.add'
             existing_actions = existing_actions.concat(rep_list)
 
-          $(actions).find(check_class + ' .col-tag').each () -> existing_actions.push( this.innerText )
+          $(actions).find("#{check_class} .col-tag").each () -> existing_actions.push( this.innerText )
 
           if reptool_add.toLowerCase() == 'remove'
             check_list = check_vals.filter( (rep)->
@@ -614,7 +600,7 @@ $ ->
               return !existing_actions.includes(rep) && !rep_list.includes(rep))
 
         clear_col = $( row.find('.col-clear-actions') )
-        existing_p = action_col.find('.' + reptool_class + '.reptool-action-col')
+        existing_p = action_col.find(".#{reptool_class}.reptool-action-col")
         delete_button = '<button class="clear-action-button row-action-clear"></button>'
         if error_message.endsWith(', ')
           error_message = error_message.slice(0, error_message.length - 2);
@@ -785,7 +771,6 @@ $ ->
           .then( set_wrbs.bind( null, item, row) )
           .then null, (err) -> console.log err
 
-
   window.get_reptool = (item, headers) ->
     data = {'ip_uris':[item]}
     $.ajax(
@@ -872,7 +857,7 @@ $ ->
       categories = ''
       for key, value of data
         { descr } = value
-        categories += descr + ', '
+        categories += "#{descr}, "
       categories = categories.substring(0, categories.length - 2)
       cat_col.text( categories )
     else
