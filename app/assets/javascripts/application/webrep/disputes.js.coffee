@@ -686,7 +686,6 @@ window.save_dispute_entries = () ->
       data[this.dataset.entryId] = fielddata
 
   )
-  console.log data
   if $('input[name=entry-status]:checked').attr('id') == "RESOLVED_CLOSED" && !$('input[name=entry-resolution]:checked').val()
     std_msg_error('No resolution selected', ['Please select a ticket resolution.'])
   else
@@ -2139,9 +2138,6 @@ window.add_host_ips = (button) ->
     # Time to make the donuts
     # Make call to sdsv3 to populate this beautiful new row
     query_uri_plus_ip(entry_uri, ip_array, parent_row)
-
-  else
-    console.log 'add an error above the textarea'
 
 
 
