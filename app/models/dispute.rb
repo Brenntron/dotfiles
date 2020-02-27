@@ -633,6 +633,12 @@ class Dispute < ApplicationRecord
           new_dispute_entry.auto_resolve_log = ""
           new_dispute_entry.assign_url_parts(key)
 
+
+          resolved_ip = Resolv.getaddress(DisputeEntry.domain_of(new_dispute_entry.uri)) rescue nil
+          if resolved_ip.present?
+            new_dispute_entry.web_ips = [resolved_ip]
+          end
+
           new_dispute_entry.save!
 
           matching_disposition = new_dispute_entry.is_disposition_matching?
@@ -640,6 +646,9 @@ class Dispute < ApplicationRecord
           logger.info "fetching preload"
           ::Preloader::Base.fetch_all_api_data(key, new_dispute_entry.id)
 
+          #threat cats for urls
+          complete_wbrs_blob = Wbrs::ManualWlbl.where({:url => new_dispute_entry.uri})
+          new_dispute_entry.wbrs_threat_category = [complete_wbrs_blob.last].select{ |wlbl| wlbl.state == "active"}.map{ |wlbl| wlbl.threat_cats }.join(', ')
 
           initial_log = "--------Starting Data---------\n"
           initial_log += "suggested disposition: #{new_dispute_entry.suggested_disposition}\n"

@@ -45,12 +45,18 @@ class Sbrs::Base
     uri_query
   end
 
-  def self.build_sds_v3_combo_request(uri_item, ip_item)
+  def self.build_sds_v3_combo_request(uri_item, ip_items)
+
+    ip_params_string = ""
+    if ip_items.size > 0
+      ip_params_string = "&"
+    end
+
+    ip_params_string += ip_items.map {|ip| "ip=#{ip}"}.join("&")
+
     uri_query                  = {}
     uri_query["hostname"]      = Sbrs::Base.sds_v3_host
-    uri_query["query_string"]  = self.determine_sds_v3_uri('wbrs') + uri_item + '&ip=' + ip_item
-    uri_query["uri_item"]      = uri_item
-    uri_query["ip_item"]       = ip_item
+    uri_query["query_string"]  = '/score/single/json?url='+ uri_item + ip_params_string
     uri_query["sds_type"]      = "combo"
     uri_query
   end
@@ -291,11 +297,10 @@ class Sbrs::Base
             sds_v3_response_parsed = JSON.parse(response.body)
 
             wbrs_response = {}
-            wbrs_response["wbrs"] = {}
-            wbrs_response["wbrs-rulehits"] = {}
-
             wbrs_response["wbrs"] = {"score" => sds_v3_response_parsed["rsp"]["thrt_scor"].to_f}
             wbrs_response["wbrs-rulehits"] = sds_v3_response_parsed["rsp"]["thrt_rhts"]
+            wbrs_response["proxy_uri"] = sds_v3_response_parsed["rsp"]["uri"] rescue ""
+            wbrs_response["threat_cats"] = sds_v3_response_parsed["rsp"]["thrt_cats"] rescue nil
 
             # This is just some cleaning for backwards-compatibility with the v2 format
             if wbrs_response["wbrs-rulehits"] == nil
