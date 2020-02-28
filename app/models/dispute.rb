@@ -573,7 +573,7 @@ class Dispute < ApplicationRecord
 
 
             end
-            new_dispute.auto_resolve_log += auto_resolve_verdict.auto_resolve_log
+            new_dispute_entry.auto_resolve_log += auto_resolve_verdict.auto_resolve_log
             new_dispute_entry.save!
 
           end
