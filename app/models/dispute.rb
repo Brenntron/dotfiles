@@ -571,9 +571,12 @@ class Dispute < ApplicationRecord
                 verdicts_to_blacklist << [auto_resolve_verdict, new_dispute_entry]
               end
 
-
+              if auto_resolve_verdict.present? && autoresolve_verdict.auto_resolve_log.present?
+                new_dispute_entry.auto_resolve_log += auto_resolve_verdict.auto_resolve_log
+              end
             end
-            new_dispute_entry.auto_resolve_log += auto_resolve_verdict.auto_resolve_log
+
+
             new_dispute_entry.save!
 
           end
