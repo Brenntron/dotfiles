@@ -24,7 +24,7 @@ window.get_current_reptool =(button, page) ->
   # Find the comment div inside this dropdown
   comment_box = $(dropdown).find('.reptool-generated-comment')
 
-  # Can leave the \n's, they will get replaced with regex
+  # Can leave the \n's, they will get replaced with spaces on submission to Reptool
   if page == "show"
     comment_trail = 'AC INDIVIDUAL SUBMISSION: \n #' + case_id + ' - ' + entry_content
   else if page == "research"
@@ -49,9 +49,17 @@ window.get_current_reptool =(button, page) ->
         rep_class = entry.classification.join(', ')
       else
         rep_class = '<span class="missing-data">No active classifications</span>'
-      tbody.append('<tr class="reptool-entry-row" data-case-id="' + 'case_id' + '"><td class="reptool-entry-class">' + rep_class + '</td><td class="reptool-entry-expiration">' + entry['expiration'] + '</td><td class="reptool-entry-comment">' + entry['comment'] + '</td></tr>')
 
-      #  comment_box.val(comment_trail)
+      full_comment = entry['comment']
+      full_comment = full_comment.replace(': ,', ':')  # one-off string fix
+
+      # ellipsis-trick the reptool dropdown comment
+      if full_comment.length > 80
+        truncated_comment = full_comment.substring(0, 80) + '...'
+        full_comment = '<span title="' + full_comment + '">' + truncated_comment + '</span>'
+
+      tbody.append('<tr class="reptool-entry-row" data-case-id="' + 'case_id' + '"><td class="reptool-entry-class">' + rep_class + '</td><td class="reptool-entry-expiration">' + entry['expiration'] + '</td><td class="reptool-entry-comment">' + full_comment + '</td></tr>')
+
       $(comment_box).html(comment_trail)  # put the auto-generated comment into the read-only div
 
     error: (response) ->
@@ -129,9 +137,8 @@ window.bulk_get_current_reptool = (page) ->
 
           tbody.append('<tr class="reptool-entry-row" data-case-id="' + case_id + '"><td class="reptool-entry-name">' + entry['entry'] + '</td><td class="reptool-entry-class" data-classification="' + rep_class_attr + '">' + rep_class_list + '</td><td>' + rep_class_exp + '</td><td class="reptool-entry-comment">' + entry['comment'] + '</td></tr>')
 
-        # put the auto-generated comment into the read-only div
-        $('.reptool-generated-comment').html(comment_trail)
 
+        # ellipsis-trick the comment if too huge for reptool dropdown
         if entry['comment'].length > 50
           entry_comment_trunc = entry['comment'].substring(0, 50) + '...'
           $('.reptool-entry-comment').text(entry_comment_trunc)
@@ -140,6 +147,8 @@ window.bulk_get_current_reptool = (page) ->
         else
           $('.reptool-entry-comment').text(entry['comment'])
 
+        # put the auto-generated comment into the read-only div
+        $('.reptool-generated-comment').html(comment_trail)
       error: (response) ->
         std_api_error(response, "Error retrieving Reptool Data", reload: false)
     )
@@ -507,3 +516,20 @@ window.submit_bulk_reptool = () ->
           errormsg = [response.responseText]
         std_msg_error('Error', ['Error adjusting WL/BL'].concat(errormsg) )
     )
+
+
+# page-load on webrep show page or bfrp page, manage the reptool comments from growing too huge
+$ ->
+  # ellipsis-trick the reptool class table cell in research row
+  if $('span.entry-reptool-comment').length > 0  # user is on a webrep show page or bfrp results page?
+    $('span.entry-reptool-comment').each ->
+      full = $(this).text().trim()
+      if full.indexOf('Comment:') > 0  # this means a "real" comment was typed in, we don't need the auto-generated
+        typed_in = full.split('Comment: ')[1]
+        $(this).attr('title', typed_in)  # mouseover the text to see full comment
+        if typed_in.length > 80   # if its huge, ellipsis-trick the comment
+          typed_in = typed_in.substring(0, 80) + '...'
+        $('.entry-reptool-comment').text(typed_in)
+      else
+        $(this).text('')  # leave empty
+

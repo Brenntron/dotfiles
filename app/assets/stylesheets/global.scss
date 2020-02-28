@@ -11795,3 +11795,20 @@ span.threat-cat-no-data {
 table.dispute_tool_current tr.reptool-entry-row td {
   color: darken($type-lighter-color, 10%);
 }
+
+/* define the full width of the reptool dropdown container and individual columns */
+#reptool_adjust_entries.dropdown-menu, .reptool-inline-dropdown {
+  width: 440px;
+  .th-reptool-dispute {
+    width: 120px;
+  }
+  .th-reptool-active-classes {
+    width: 80px;
+  }
+  .th-reptool-expiration {
+    width: 80px;
+  }
+  .th-reptool-comment {
+    width: 140px;
+  }
+}
