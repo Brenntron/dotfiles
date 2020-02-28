@@ -339,6 +339,7 @@
 
                         %span.dropdown
                           %button.dispute-inline-buttons.adjust-reptool-button.dropdown-toggle{onclick: "get_current_reptool(this, 'research')", id: "reptool_button_#{entry.id}", title: 'Adjust RepTool BL', 'data-toggle': 'dropdown', 'aria-haspopup': 'true', 'aria-expanded': 'false'}
+                          -# TODO - these items don't have entry ids since they are fresh lookups, need to avoid the id syntax below as its creating dup ids
                           .dropdown-menu.toolbar-dropdown.reptool-inline-dropdown{id: "reptool_adjust_#{entry.id}", 'aria-labelledby': "reptool_button_#{entry.id}"}
                             = form_for :reptool, html: {class: 'adjust-reptool-form'} do |rep_form|
                               .dispute-reptool-adjust-wrapper
@@ -440,7 +441,7 @@
                   %tr.research-overview-row
                     %td
                     -#Expander area
-                    %td.research-table-details-wrapper{colspan: '20'}
+                    %td.research-table-details-wrapper{colspan: '5'}
                       %table
                         %tr
                           %td.input-col.wbrs-input-wrapper
@@ -449,26 +450,27 @@
                             %label WBRS
                           %td.text-center.entry-data-wbrs-score.wbrs-score-cell
                             = entry.wbrs_score.to_d.truncate(2).to_f if entry.wbrs_score
-                          %td.wbrs-rule-hits-label-cell
-                            %label WBRS Rule Hits
-                          %td.text-center.wbrs-rule-hits-cell
-                            = entry.dispute_rule_hits.select{|hit| hit.rule_type == 'WBRS'}.count
                           %td.wbrs-rules-label-cell
                             %label WBRS Rules
+                          %td.text-center.wbrs-rule-hits-cell
+                            - wbrs_rules = entry.dispute_rule_hits.select{|hit| hit.rule_type == 'WBRS' && hit.is_multi_ip_rulehit != true}
+                            = wbrs_rules.count
                           %td.rule-hits-col-list.wbrs-rules-cell
-                            - if entry.dispute_rule_hits.select{|hit| hit.rule_type == 'WBRS'}.count == 0
+                            - if wbrs_rules.count == 0
                               %span.missing-data No rule hits
                             - else
-                              - entry.dispute_rule_hits.select{|hit| hit.rule_type == 'WBRS'}.each do |wbrs_hit|
+                              - wbrs_rules.each do |wbrs_hit|
                                 - unless RulehitResolutionMailerTemplate.select{|template| template.mnemonic == wbrs_hit.name}.count == 0
                                   %a.adhoc-email-trigger{href: '#', 'data-url': "#{entry.uri}", 'data-name': wbrs_hit.name}
-                                    = wbrs_hit.name
-                                    - unless wbrs_hit.equal? entry.dispute_rule_hits.select {|rule_hit| rule_hit.rule_type == "WBRS" }.last
-                                      = ","
+                                    - if wbrs_hit.equal? wbrs_rules.last
+                                      = wbrs_hit.name
+                                    - else
+                                      = "#{wbrs_hit.name}, "
                                 - else
-                                  = wbrs_hit.name
-                                  - unless wbrs_hit.equal? entry.dispute_rule_hits.select {|rule_hit| rule_hit.rule_type == "WBRS" }.last
-                                    = ","
+                                  - if wbrs_hit.equal? wbrs_rules.last
+                                    = wbrs_hit.name
+                                  - else
+                                    = "#{wbrs_hit.name}, "
                           %td.input-col.xbrs-input-wrapper
                             %input.research-row-checkbox.xbrs-checkbox{type: 'checkbox', checked: 'true', value: "#{entry.id}"}
                           %td.xbrs-history-label-cell
@@ -528,11 +530,10 @@
                             %label SBRS
                           %td.text-center.sbrs-score-cell= entry.sbrs_score.to_d.truncate(2).to_f if entry.sbrs_score
                           %td
-                            %label SBRS Rule Hits
+                            %label SBRS Rules
                           %td.text-center.sbrs-rule-hits-cell
                             = entry.dispute_rule_hits.select{|hit| hit.rule_type == 'SBRS'}.count
-                          %td
-                            %label SBRS Rules
+
                           %td.rule-hits-col-list.sbrs-rules-cell
                             - if entry.dispute_rule_hits.select{|hit| hit.rule_type == 'SBRS'}.count == 0
                               %span.missing-data No rule hits
@@ -571,6 +572,64 @@
                               %label Umbrella
                             %td.text-center.umbrella-cell{colspan: '2'}
                               = entry.umbrellaresult
+
+                  - if entry.uri?
+                    -#If entry is uri and has a resolved host ip
+                    %tr.research-uri-ip-query-row
+                      %td{rowspan: '2'}
+                        -#Expander area
+                      %td.input-col.ip-label-col{rowspan: '2'}
+                        -# IP label
+                      %td.dual-edit-field{colspan: '2', 'data-id': entry.id, 'data-field': 'host-ip'}
+                        %span.entry-resolved-ip-content{id: "resolved-ip-content-no-#{i}"}
+                          = entry.web_ips
+                        %input.table-ip-input{type:'text', value: "#{entry.web_ips}", id: "table-ip-input-no-#{i}"}
+                      %td.text-right.no-padding-right{colspan: '2'}
+                        %button.edit-button.inline-edit-ip-button.esc-tooltipped{title: 'Edit IP Addresses', id: "edit-ip-result-no-#{i}"}
+                          Edit IP Addresses
+                        %button.save-button.inline-save-ip-button.esc-tooltipped{title: 'Query IP Addresses', id: "save-ip-result-no-#{i}"}
+                          Query IP Addresses
+                        %button.cancel-button.inline-cancel-ip-button.esc-tooltipped{title: 'Cancel IP Addresses', id: "cancel-ip-result-no-#{i}"}
+
+                    %tr.research-uri-ip-data-row.research-page-ip-query-details
+                      %td.research-table-details-wrapper{colspan: '4'}
+                        %table
+                          %tr.single-details-row
+                            %td.wbrs-rules-label-cell
+                              %label WBRS
+                            %td.text-center.no-border.uri-ip-wbrs-score
+                              - unless entry[:score].nil?
+                                = entry[:score]
+                              - else
+                                %span.missing-data
+                                  No score.
+                            %td
+                              %label WBRS Rules
+                            %td.text-center.uri-ip-wbrs-rule-total
+                              - ip_rule_hits = entry.dispute_rule_hits.select {|rule_hit| rule_hit.rule_type == "WBRS" && rule_hit.is_multi_ip_rulehit == true }
+                              = ip_rule_hits.length
+                            %td.uri-ip-wbrs-rules
+                              - unless ip_rule_hits.length == 0
+                                - ip_rule_hits.each do |wbrs_hit|
+                                  - if wbrs_hit == ip_rule_hits.last
+                                    = wbrs_hit.name
+                                  - else
+                                    = "#{wbrs_hit.name}, "
+                              - else
+                                %span.missing-data
+                                  No rules.
+                            %td
+                              %label Threat Category
+                            %td.uri-ip-category
+                              - unless entry[:multi_wbrs_threat_category].nil?
+                                - ip_tc_record = JSON.parse entry[:multi_wbrs_threat_category]
+                                - ip_tc = ip_tc_record.to_sentence(two_words_connector: ', ', last_word_connector: ', ')
+                                = ip_tc
+                            %td
+                              %label Proxy URI
+                            %td.uri-ip-proxy
+                              = entry[:proxy_uri]
+
                   %tr.nested-data-row{'data-entry-id': "#{entry.id}"}
                     %td.expanded-row{colspan: '8'}
                       .expanded-row-data-wrapper
@@ -607,6 +666,12 @@
                                         %td= wbrs_hit.mnemonic
                                         %td
                                           -#Put weight of rule here
+                                      -# if any wbrs rulehits are returned from querying uri + ip each do
+                                      -#  %tr
+                                      -#    %td.uri-plus-ip-rule-indicator
+                                      -#    %td= wbrs_hit.name
+                                      -#    %td= wbrs_hit.mnemonic
+                                      -#    %td
                             .entry-details-table.sbrs-details-table{'data-entry-id': "#{entry.id}"}
                               %h5.entry-details-table-header
                                 SBRS Rule Hit Details

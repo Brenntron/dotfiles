@@ -85,7 +85,14 @@ class DisputeEntry < ApplicationRecord
       else
         params['url'] = ip_url
 
-        wbrs_api_response = Sbrs::Base.remote_call_sds_v3(params['url'], "wbrs")
+        resolved_ip = Resolv.getaddress(DisputeEntry.domain_of(ip_url)) rescue nil
+        if resolved_ip.present?
+          new_dispute_entry.web_ips = [resolved_ip]
+        end
+
+
+
+        wbrs_api_response = Sbrs::Base.remote_call_sds_v3(ip_url, "wbrs")
         sbrs_api_response = Sbrs::ManualSbrs.call_sbrs(params, type: 'wbrs')
         wbrs_prefix_response = ComplaintEntry.get_category(params['url'])
 
@@ -111,10 +118,47 @@ class DisputeEntry < ApplicationRecord
         else
           new_dispute_entry.sbrs_score = nil
         end
+
+        if new_dispute_entry.uri.present? && new_dispute_entry.web_ips.present?
+          web_ips_formatted = new_dispute_entry.web_ips.gsub("[", "").gsub("]", "").gsub("\"", "").split(", ")
+
+          extra_wbrs_stuff = Sbrs::Base.combo_call_sds_v3(new_dispute_entry.uri, web_ips_formatted)
+          extra_wbrs_stuff_rulehits = Sbrs::ManualSbrs.get_rule_names_from_rulehits(extra_wbrs_stuff) rescue []
+
+          if extra_wbrs_stuff.present?
+            new_dispute_entry.score = extra_wbrs_stuff["wbrs"]["score"]
+
+            threat_cats = extra_wbrs_stuff["threat_cats"]
+
+            threat_cat_names = []
+            if threat_cats.present?
+              threat_cat_info = DisputeEntry.threat_cats_from_ids(threat_cats)
+              threat_cat_info.each do |name|
+                threat_cat_names << name[:name]
+              end
+              new_dispute_entry.multi_wbrs_threat_category = threat_cat_names
+            end
+          end
+          new_dispute_entry.save
+
+          extra_wbrs_stuff_rulehits.each do |rule_hit|
+            new_rule_hit = DisputeRuleHit.new
+            new_rule_hit.dispute_entry_id = new_dispute_entry.id
+            new_rule_hit.name = rule_hit.strip
+            new_rule_hit.rule_type = "WBRS"
+            new_rule_hit.is_multi_ip_rulehit = true
+            new_rule_hit.save
+          end
+
+        end
+
+
+
+
       end
 
       new_dispute_entry.save!
-
+      ::Preloader::Base.fetch_all_api_data(ip_url, new_dispute_entry.id)
       # Create Dispute Entry RuleHits
       wbrs_rule_hits = Sbrs::ManualSbrs.get_rule_names_from_rulehits(wbrs_api_response)
 
@@ -129,7 +173,7 @@ class DisputeEntry < ApplicationRecord
           DisputeRuleHit.create(rule_type:'SBRS', name: rule_hit, dispute_entry_id: new_dispute_entry.id)
         end
       end
-
+      return new_dispute_entry
     rescue Exception => e
       raise Exception.new("{DisputeEntry creation error: {content: #{ip_url},error:#{e}}}")
     end
@@ -613,11 +657,25 @@ class DisputeEntry < ApplicationRecord
     dispute_rule_hits.destroy_all
 
     ::Preloader::Base.fetch_all_api_data(self.hostlookup, self.id)
-    wbrs_stuff = Sbrs::Base.remote_call_sds_v3(self.hostlookup, "wbrs")
+    #
+    extra_wbrs_stuff = nil
+    if self.uri.present? && self.web_ips.present?
+      web_ips_formatted = self.web_ips.gsub("[", "").gsub("]", "").gsub("\"", "").split(", ")
+
+      extra_wbrs_stuff = Sbrs::Base.combo_call_sds_v3(self.uri, web_ips_formatted)
+      wbrs_stuff = Sbrs::Base.remote_call_sds_v3(self.hostlookup, "wbrs")
+    else
+      wbrs_stuff = Sbrs::Base.remote_call_sds_v3(self.hostlookup, "wbrs")
+    end
+
     wbrs_stuff_rulehits = Sbrs::ManualSbrs.get_rule_names_from_rulehits(wbrs_stuff) rescue nil
+
+    extra_wbrs_stuff_rulehits = Sbrs::ManualSbrs.get_rule_names_from_rulehits(extra_wbrs_stuff) rescue []
+
     if wbrs_stuff_rulehits.blank?
       wbrs_stuff_rulehits = []
     end  
+
     ip_addr = IPSocket.getaddress(hostlookup) rescue nil
     if ip_addr
       wbrs_stuff_ip = Sbrs::Base.remote_call_sds_v3(ip_addr, "wbrs")
@@ -626,12 +684,52 @@ class DisputeEntry < ApplicationRecord
     end
 
 
+    if extra_wbrs_stuff.present?
+      self.score = extra_wbrs_stuff["wbrs"]["score"]
+
+      threat_cats = extra_wbrs_stuff["threat_cats"]
+
+      threat_cat_names = []
+      if threat_cats.present?
+        threat_cat_info = DisputeEntry.threat_cats_from_ids(threat_cats)
+        threat_cat_info.each do |name|
+          threat_cat_names << name[:name]
+        end
+        self.multi_wbrs_threat_category = threat_cat_names
+      end
+    end
+
+
+
     self.wbrs_score = wbrs_stuff["wbrs"]["score"]
+
+    if wbrs_stuff["threat_cats"].present?
+      threat_cats = wbrs_stuff["threat_cats"]
+
+      threat_cat_names = []
+
+      threat_cat_info = DisputeEntry.threat_cats_from_ids(threat_cats)
+      threat_cat_info.each do |name|
+        threat_cat_names << name[:name]
+      end
+      self.wbrs_threat_category = threat_cat_names
+
+    end
+
     wbrs_stuff_rulehits.each do |rule_hit|
       new_rule_hit = DisputeRuleHit.new
       new_rule_hit.dispute_entry_id = self.id
       new_rule_hit.name = rule_hit.strip
       new_rule_hit.rule_type = "WBRS"
+      new_rule_hit.save
+    end
+
+    extra_wbrs_stuff_rulehits.each do |rule_hit|
+      new_rule_hit = DisputeRuleHit.new
+      new_rule_hit.dispute_entry_id = self.id
+      new_rule_hit.name = rule_hit.strip
+      new_rule_hit.rule_type = "WBRS"
+      new_rule_hit.is_multi_ip_rulehit = true
       new_rule_hit.save
     end
 
@@ -686,6 +784,14 @@ class DisputeEntry < ApplicationRecord
       end
     end
 
+    if attributes['uri'].present? && attributes['web_ips'].blank?
+      resolved_ip = Resolv.getaddress(self.domain_of(self.uri)) rescue nil
+      if resolved_ip.present?
+        attributes['web_ips'] = resolved_ip
+      end
+    end
+
+
     if attributes['ip_address'].present? && attributes['ip_address'] != self.ip_address
       sync_up
     end
@@ -693,7 +799,7 @@ class DisputeEntry < ApplicationRecord
       sync_up
     end
 
-    update!(attributes.slice(*%w{entry_type ip_address hostname uri status resolution resolution_comment case_accepted_at case_resolved_at case_closed_at}))
+    update!(attributes.slice(*%w{web_ips entry_type ip_address hostname uri status resolution resolution_comment case_accepted_at case_resolved_at case_closed_at}))
   end
 
   def self.update_from_field_data(field_data)
@@ -802,16 +908,50 @@ class DisputeEntry < ApplicationRecord
         is_ip_address = !!(entry.uri  =~ Resolv::IPv4::Regex)
 
         wbrs_stuff = Sbrs::Base.remote_call_sds_v3(entry.uri, "wbrs")
-        wbrs_stuff_rulehits = Sbrs::ManualSbrs.get_rule_names_from_rulehits(wbrs_stuff) rescue nil
+        wbrs_stuff_rulehits = Sbrs::ManualSbrs.get_rule_names_from_rulehits(wbrs_stuff) rescue []
         if wbrs_stuff_rulehits.blank?
           wbrs_stuff_rulehits = []
         end  
 
         ip_addr = IPSocket.getaddress(entry.uri) rescue nil
+
+        if ip_addr.blank?
+          ip_addr = Resolv.getaddress(self.domain_of(entry.uri)) rescue nil
+        end
+
         if ip_addr
           wbrs_stuff_ip = Sbrs::Base.remote_call_sds_v3(ip_addr, "wbrs")
-          wbrs_stuff_rulehits = wbrs_stuff_rulehits + Sbrs::ManualSbrs.get_rule_names_from_rulehits(wbrs_stuff_ip)
+          wbrs_stuff_rulehits = wbrs_stuff_rulehits + (Sbrs::ManualSbrs.get_rule_names_from_rulehits(wbrs_stuff_ip) rescue [])
           wbrs_stuff_rulehits = wbrs_stuff_rulehits.uniq
+          entry.web_ips = ip_addr
+          web_ips_formatted = entry.web_ips.gsub("[", "").gsub("]", "").gsub("\"", "").split(", ")
+          
+          extra_wbrs_stuff = Sbrs::Base.combo_call_sds_v3(entry.uri, web_ips_formatted)
+          extra_wbrs_stuff_rulehits = Sbrs::ManualSbrs.get_rule_names_from_rulehits(extra_wbrs_stuff) rescue []
+
+          if extra_wbrs_stuff.present?
+            entry.score = extra_wbrs_stuff["wbrs"]["score"]
+
+            threat_cats = extra_wbrs_stuff["threat_cats"]
+
+            threat_cat_names = []
+            if threat_cats.present?
+              threat_cat_info = DisputeEntry.threat_cats_from_ids(threat_cats)
+              threat_cat_info.each do |name|
+                threat_cat_names << name[:name]
+              end
+              entry.multi_wbrs_threat_category = threat_cat_names
+            end
+          end
+
+
+          extra_wbrs_stuff_rulehits.each do |rule_hit|
+            new_rule_hit = DisputeRuleHit.new
+            new_rule_hit.name = rule_hit.strip
+            new_rule_hit.rule_type = "WBRS"
+            new_rule_hit.is_multi_ip_rulehit = true
+            entry.dispute_rule_hits << new_rule_hit
+          end
         end
 
         if wbrs_stuff.kind_of?(Hash)
@@ -860,6 +1000,59 @@ class DisputeEntry < ApplicationRecord
       return false
     end
   end
+
+  def self.process_multi_ip_info(uri, ips, dispute_entry = nil)
+    result = {}
+
+    results = Sbrs::Base.combo_call_sds_v3(uri, ips)
+
+    ip_addresses = ips
+    wbrs_rule_hits = Sbrs::ManualSbrs.get_rule_names_from_rulehits(results) rescue nil
+    wbrs_score = results["wbrs"]["score"]
+    proxy_uri = results["proxy_uri"]
+    threat_cats = results["threat_cats"]
+
+
+    threat_cat_names = []
+    if threat_cats.present?
+      threat_cat_info = threat_cats_from_ids(threat_cats)
+      threat_cat_info.each do |name|
+        threat_cat_names << name[:name]
+      end
+      threat_cat_names
+    end
+
+
+
+    if dispute_entry.present?
+      unless wbrs_rule_hits.nil?
+        rule_hits_to_destroy = dispute_entry.dispute_rule_hits.where(:is_multi_ip_rulehit => true)
+
+        ###
+
+        rule_hits_to_destroy.destroy_all
+
+        wbrs_rule_hits.each do |rule_hit|
+          DisputeRuleHit.create(rule_type:'WBRS', name: rule_hit, dispute_entry_id: dispute_entry.id, is_multi_ip_rulehit: true)
+        end
+      end
+
+      dispute_entry.multi_wbrs_threat_category = threat_cat_names
+      dispute_entry.proxy_url = proxy_uri
+      dispute_entry.score = wbrs_score
+      dispute_entry.web_ips = ip_addresses
+      dispute_entry.save
+
+    end
+
+    result[:threat_cats] = threat_cat_names
+    result[:proxy_uri] = proxy_uri
+    result[:rulehits] = wbrs_rule_hits
+    result[:score] = wbrs_score
+
+    return result
+  end
+
 
   def self.verdict_from_score(score)
     verdict = ""
@@ -912,6 +1105,25 @@ class DisputeEntry < ApplicationRecord
 
   end
 
+  def self.threat_cats_from_ids(ids)
+    results = JSON.parse(Sbrs::Base.remote_call_sds_v3("", "threatcat_labels"))
+
+    response = []
+
+    ids.each do |id|
+      threat_cat = {}
+      threat_cat[:id] = id
+      threat_cat[:mnemonic] = results[id.to_s]["mnemonic"]
+      threat_cat[:name] = results[id.to_s]["name"]
+      threat_cat[:description] = results[id.to_s]["description"]
+
+      response << threat_cat
+    end
+
+    response
+
+  end
+
   def is_disposition_matching?
 
     begin
@@ -927,7 +1139,7 @@ class DisputeEntry < ApplicationRecord
       if self.suggested_disposition == verdict
         self.status = STATUS_RESOLVED
         self.resolution = STATUS_RESOLVED_UNCHANGED
-        self.resolution_comment = "#{self.hostlookup} has begun to improve and currently has a Neutral Talos Intelligence email reputation (within acceptable parameters).   The reputation should continue to improve as we receive additional good mail volume reports for the IP from our sensor network.  Please note that some customers may decide to block at neutral. We have no control over how passive or aggressive our customers choose to be when implementing our reputation information."
+        self.resolution_comment = "The Suggested Disposition provided for the Dispute Entry matches its Current Disposition."
         self.save
 
         return true

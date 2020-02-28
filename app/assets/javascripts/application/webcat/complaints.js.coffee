@@ -939,12 +939,19 @@ window.drop_current_categories = () ->
       std_msg_error("<p>There has been an error dropping categories: #{json.error}","")
 )
 
+window.fill_qual_subdomain =(anchor_tag, input_id, qual_subdomain) ->
+  event.preventDefault();
+  $('#' + input_id)[0].value = qual_subdomain
+  return false;
+
+
 format = (complaint_entry_row) ->
   complaint_entry = complaint_entry_row.data()
   row_id = complaint_entry_row[0][0]
   missing_data = '<span class="missing-data">No Data</span>'
   uri = ''
   host = ''
+  qual_subdomain = ''
   url = ''
   search_uri = ''
   if complaint_entry.uri
@@ -968,6 +975,10 @@ format = (complaint_entry_row) ->
     search_uri = '<a href="https://www.google.com/search?q=site%3A' + complaint_entry.ip_address + '" target="_blank" onclick="select_cat_text_field(' + complaint_entry.entry_id + ')">' + complaint_entry.ip_address + '</a>'
   else
     uri = missing_data
+
+  qual_subdomain = complaint_entry.domain
+  if complaint_entry.subdomain
+    qual_subdomain = complaint_entry.subdomain + '.' + qual_subdomain
 
   entry_status = ""
   reopen_class = "hidden"
@@ -1163,11 +1174,14 @@ format = (complaint_entry_row) ->
       '</div><div class="col-xs-12 col-sm-4 nested-complaint-editable-data">' +
       '<div class="row">' +
       '<div class="col-xs-12">' +
+      '<div><label class="content-label-sm">Original</label></div> ' +
+      '<div>' + host  + '</div>' +
       '<label class="content-label-sm">Edit URI</label><br/>' +
       '<input class="nested-table-input complaint-uri-input" id="complaint_prefix_' + entry_id +
-      '" type="text" onclick="this.select()" data-domain="' + domain + '"value="' + host +
+      '" type="text" onclick="this.select()" data-domain="' + domain + '" data-qual_subdomain="'+ qual_subdomain + '" value="' + domain +
       '"' + entry_status + '>' +
       '<button class="secondary inline-button" onclick="updateURI(event,' + entry_id + ')">Update URI</button><br/>' +
+      '<div><a href="#" onclick="fill_qual_subdomain(this, \'complaint_prefix_' + entry_id + '\', \''+ qual_subdomain + '\')">subdomain</a></div>' +
       '<div class="complaint-selectize-col-wrapper">' +
       '<label class="content-label-sm">Edit Categories / Confidence Order</label>' +
       '<select id="' + input_cat + '" name="[' + input_cat + '][]" class="' + status_class + '" placeholder="Enter up to 5 categories" value="" onchange="touchedFormChange(\'' + complaint_entry.domain + '\')"></select>' +
@@ -1842,7 +1856,6 @@ processSubmitMaster = () ->
 window.master_submit = () ->
   selectedItems = $('.selected + tr td.nested-complaint-data-wrapper')
   thingsSelected = getTouchedFormCount()
-  debugger
   if thingsSelected > selectedItems.length
     std_msg_confirm(
       "I noticed you have made changes to at least " + thingsSelected +  " complaints but you only have " + selectedItems.length + " items selected. Do you want to proceed with updating these items? It will reload the page and you will lose your other changes.",
