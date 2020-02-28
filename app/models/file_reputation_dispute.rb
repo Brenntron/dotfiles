@@ -770,6 +770,7 @@ class FileReputationDispute < ApplicationRecord
       self.auto_resolve_log += auto_resolve_log
       self.save
       if [threatgrid_present, sandbox_present, reversinglab_present, malware_zoo_present].any? {|prez| prez == false } && [threatgrid_present, sandbox_present, reversinglab_present, malware_zoo_present].any? {|prez| prez == true }
+        self.auto_resolve_log += "\n-------\nSetting Status To New as there are some True's and some False's with the 4 presence sources.\n------\n"
         self.status = STATUS_NEW
         self.save
         return auto_resolved_boolean
