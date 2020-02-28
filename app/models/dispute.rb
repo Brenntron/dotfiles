@@ -545,7 +545,7 @@ class Dispute < ApplicationRecord
 
           initial_log = "--------Starting Data---------\n"
           initial_log += "suggested disposition: #{new_dispute_entry.suggested_disposition}\n"
-          initial_log += "effective disposition info: #{new_dispute_entry.running_dispute.inspect.to_s}\n"
+          initial_log += "effective disposition info: #{new_dispute_entry.running_verdict.inspect.to_s}\n"
           initial_log += "-----------------------------\n"
 
           new_dispute_entry.auto_resolve_log += initial_log
@@ -643,7 +643,7 @@ class Dispute < ApplicationRecord
 
           initial_log = "--------Starting Data---------\n"
           initial_log += "suggested disposition: #{new_dispute_entry.suggested_disposition}\n"
-          initial_log += "effective disposition info: #{new_dispute_entry.running_dispute.inspect.to_s}\n"
+          initial_log += "effective disposition info: #{new_dispute_entry.running_verdict.inspect.to_s}\n"
           initial_log += "-----------------------------\n"
 
           new_dispute_entry.auto_resolve_log += initial_log

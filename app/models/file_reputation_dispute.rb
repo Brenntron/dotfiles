@@ -609,6 +609,8 @@ class FileReputationDispute < ApplicationRecord
         new_dispute.description = message_payload[:payload][:summary_description]
         new_dispute.customer_id = customer&.id
         new_dispute.submitter_type = (new_dispute.customer.nil? || new_dispute.customer&.company_id == guest.id) ? SUBMITTER_TYPE_NONCUSTOMER : SUBMITTER_TYPE_CUSTOMER
+        new_dispute.auto_resolve_log = ""
+        new_dispute.save
 
         check_for_duplicate = FileReputationDispute.where(sha256_hash: message_payload[:payload][:sha256]).where.not(status: FileReputationDispute::STATUS_RESOLVED)
         if check_for_duplicate.any?
@@ -767,7 +769,7 @@ class FileReputationDispute < ApplicationRecord
       auto_resolve_log += "-----------------------------------\n"
 
       self.auto_resolve_log += auto_resolve_log
-
+      self.save
       if [threatgrid_present, sandbox_present, reversinglab_present, malware_zoo_present].any? {|prez| prez == false } && [threatgrid_present, sandbox_present, reversinglab_present, malware_zoo_present].any? {|prez| prez == true }
         self.status = STATUS_NEW
         self.save
