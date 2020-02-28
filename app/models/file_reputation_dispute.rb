@@ -610,7 +610,6 @@ class FileReputationDispute < ApplicationRecord
         new_dispute.customer_id = customer&.id
         new_dispute.submitter_type = (new_dispute.customer.nil? || new_dispute.customer&.company_id == guest.id) ? SUBMITTER_TYPE_NONCUSTOMER : SUBMITTER_TYPE_CUSTOMER
         new_dispute.auto_resolve_log = ""
-        new_dispute.save
 
         check_for_duplicate = FileReputationDispute.where(sha256_hash: message_payload[:payload][:sha256]).where.not(status: FileReputationDispute::STATUS_RESOLVED)
         if check_for_duplicate.any?
