@@ -231,16 +231,15 @@ window.submit_individual_reptool = (button) ->
   # get the 'auto-generated' part of the comment from the dropdown for inline
   comm_generated = $(dropdown).find('.reptool-generated-comment').text()
   comm_generated = comm_generated.replace(/(\r\n|\n|\r)/gm, ", ")  # replace newlines w/ commas
+  comm_generated = comm_generated.replace(': ,', ':')  # one-off comment fix
+
   # if they typed anything as an additional comment above the auto-generated part, add it to the end
   if comm_typed_in.trim() != ''
     comment = "#{comm_generated} || Comment: #{comm_typed_in}"
   else
     comment = comm_generated
 
-  # one-off comment fix
-  comment = comment.replace(': ,', ':')
-
-  # comment is now ready to send to Reptool, do a one-off format fix
+  # comment is now ready to send to Reptool
   console.clear()
   console.log comment
   # End: comment is now a single-line, and ready for Reptool now
@@ -363,6 +362,7 @@ window.submit_bulk_reptool = () ->
   # get the 'auto-generated' part of the comment
   comm_generated = $(bulk_reptool_menu).find('.reptool-generated-comment').text()
   comm_generated = comm_generated.replace(/(\r\n|\n|\r)/gm, ", ")  # replace newlines w/ commas
+  comm_generated = comm_generated.replace(': ,', ':')  # one-off comment fix
 
   # if they typed anything as an additional comment (optional but they should), append it
   if comm_typed_in.trim() != ''
@@ -370,10 +370,7 @@ window.submit_bulk_reptool = () ->
   else
     comment = comm_generated
 
-  # one-off comment fix
-  comment = comment.replace(': ,', ':')
-
-  # comment is now ready to send to Reptool, do a one-off format fix
+  # comment is now ready to send to Reptool
   console.clear()
   console.log comment
   # End: comment is now a single-line, and ready for Reptool now

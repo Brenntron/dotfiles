@@ -826,7 +826,7 @@ Feature: Disputes
 
   # Gathering resolved host ip on creation / additional query to sdsv3 for url+ip data
 #  TODO FINISH THE DEV FOR THIS
-  @javascript @now
+  @javascript
   Scenario: a user creates a new dispute ticket and the entry returns with a resolved host ip
     Given a user with role "webrep user" exists and is logged in
     And bugzilla rest api always saves
