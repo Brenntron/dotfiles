@@ -116,7 +116,10 @@ $ ->
     col_dialog = "#{action_edit}: #{col_tag_format(data)}"
 
     $(action_p).attr('data', data)
-    $(action_p).html(col_dialog)
+    if data.length == 0
+      $(action_p).remove()
+    else
+      $(action_p).html(col_dialog)
 
   $(document).on 'change', '#select-all-bulk', (e) ->
     # handles selection of all checkboxes in quicklookup table
@@ -416,10 +419,13 @@ $ ->
     $('#error_modal').dialog()
     $('#error_modal .modal-body' ).empty()
     $('#error_modal').dialog( 'destroy' )
+
     selected_rows = $('.col-select-all input:checked')
     list_action = $('.wlbl-radio-add:checked').val()
     action_desc = 'Add to: '
+    threat_cats_el = []
     threat_cats = []
+
     if list_action == 'remove'
       action_desc = 'Remove from: '
     checked_bl = $('.adjust_wlbl_checkbox:checked').map( () -> return $(this).val() ).get()
@@ -429,13 +435,18 @@ $ ->
       for check in checked
         val = $(check).next('label').html()
         threat_cats.push(val)
-    threat_cats = threat_cats.join()
-    if threat_cats != ''
-      threat_cats = "data_threat_cat='#{threat_cats}'"
+        threat_cats_el.push("<span class='col-tag'>#{val}</span>")
+
+    if threat_cats.length > 0
+      threat_cats = "<p data='#{threat_cats}'> Threat Categories:#{threat_cats_el.join(', ')} </p>"
+    else
+      threat_cats = ''
     error_array = []
     error_header = "<h4>Cannot #{list_action} the following Reptool Classification disputes <h4>"
     selected_rows.each ()->
+
       row = $(this).closest('tr')
+      $(row).find('.wlbl-action-col').remove()
       selected_rows = $('.col-select-all input:checked')
       data = row.find('.col-bulk-dispute').text()
 
@@ -459,7 +470,7 @@ $ ->
         )
 
         check_list = col_tag_format(check_list_array)
-        col_dialog = "<p class='wlbl-action-col #{list_action}' #{threat_cats} data='#{check_list_array}'>#{action_desc}  #{check_list}<p>"
+        col_dialog = "<p class='wlbl-action-col #{list_action}' data='#{check_list_array}'>#{action_desc}  #{check_list} #{threat_cats}<p>"
         delete_button = '<button class="clear-action-button row-action-clear"></button>'
 #
         if error_message.endsWith(', ')
