@@ -399,7 +399,6 @@ $ ->
     checked_bl = $('.adjust_wlbl_checkbox:checked').map( () -> return $(this).val() ).get()
     bl_check = checked_bl[0].indexOf('BL') != -1
     threat_cats = []
-
     if list_action == 'remove'
       action_desc = 'Remove from: '
     else
@@ -418,7 +417,9 @@ $ ->
     error_array = []
     error_header = "<h4>Cannot #{list_action} the following Reptool Classification disputes <h4>"
     selected_rows.each ()->
+
       row = $(this).closest('tr')
+      existing_wlbl_action = $(row).find('.wlbl-action-col')
       selected_rows = $('.col-select-all input:checked')
       data = row.find('.col-bulk-dispute').text()
 
@@ -440,7 +441,8 @@ $ ->
                 error_message += "<span class='col-tag dialog-tag'>  #{wlbl}</span>,"
               return wlbl_col.includes(wlbl)
         )
-
+        console.log existing_wlbl_action
+        $(existing_wlbl_action).remove()
         check_list = col_tag_format(check_list_array)
         col_dialog = "<p class='wlbl-action-col #{list_action}' #{threat_cats} data='#{check_list_array}'>#{action_desc}  #{check_list}<p>"
         delete_button = '<button class="clear-action-button row-action-clear"></button>'
