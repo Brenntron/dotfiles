@@ -105,7 +105,9 @@ $ ->
   $(document).on 'click', '.col-actions .col-tag', (e) ->
 # This handles deleting individual actions from an action column and reformatting the div it lives in
     { target } = e
-    col_clear = $(target).closest('.col-clear-actions')
+    row = $(target).closest('tr')
+    console.log
+    col_clear = $(row).find('.col-clear-actions')
     action = $(target).text()
     action_p = $(target).closest('p')
     action_edit = action_p.text().split(':')[0];
@@ -117,6 +119,12 @@ $ ->
 
     $(action_p).attr('data', data)
     if data.length == 0
+      if $(action_p).hasClass('wlbl-action-col')
+        console.log $(row).find('.threat-cat-col')
+        $(row).find('.threat-cat-col').remove()
+      if $(action_p).hasClass('threat-cat-col')
+        console.log $(row).find('.wlbl-action-col')
+        $(row).find('.wlbl-action-col').remove()
       $(action_p).remove()
     else
       $(action_p).html(col_dialog)
@@ -421,7 +429,7 @@ $ ->
 
     threat_cats = threat_cats.join()
     if threat_cats.length > 0
-      threat_cats = "<p data='#{threat_cats}'> Threat Categories:#{threat_cats_el.join(', ')} </p>"
+      threat_cats = "<p data='#{threat_cats}' class='threat-cat-col'> Threat Categories:#{threat_cats_el.join(', ')} </p>"
     else
       threat_cats = ''
     error_array = []
@@ -430,6 +438,7 @@ $ ->
 
       row = $(this).closest('tr')
       $(row).find('.wlbl-action-col').remove()
+      $(row).find('.threat-cat-col').remove()
       selected_rows = $('.col-select-all input:checked')
       data = row.find('.col-bulk-dispute').text()
 
