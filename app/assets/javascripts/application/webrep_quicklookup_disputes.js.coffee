@@ -120,10 +120,8 @@ $ ->
     $(action_p).attr('data', data)
     if data.length == 0
       if $(action_p).hasClass('wlbl-action-col')
-        console.log $(row).find('.threat-cat-col')
         $(row).find('.threat-cat-col').remove()
       if $(action_p).hasClass('threat-cat-col')
-        console.log $(row).find('.wlbl-action-col')
         $(row).find('.wlbl-action-col').remove()
       $(action_p).remove()
     else
