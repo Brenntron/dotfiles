@@ -3,7 +3,7 @@ Feature: Reptool Dropdown
   Comments need to be appearing and submitting properly
 
   @javascript
-  Scenario: a user clicks the bulk reptool dropdown to submit a reptool comment
+  Scenario: a user submits a change to an entry's reptool classification using the bulk reptool dropdown
     Given a user with role "webrep user" exists and is logged in
     Given the following disputes exist:
       | id | submission_type |
@@ -32,7 +32,7 @@ Feature: Reptool Dropdown
     And I should see "Test comment for bulk."
 
   @javascript
-  Scenario: a user clicks an inline reptool dropdown to submit a reptool comment
+  Scenario: a user submits a change to an entry's reptool classification using the inline reptool dropdown
     Given a user with role "webrep user" exists and is logged in
     Given the following disputes exist:
       | id | submission_type |
