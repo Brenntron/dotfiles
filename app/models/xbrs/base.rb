@@ -119,8 +119,12 @@ class Xbrs::Base
       when 300 > response.code
         response
       when 404 == response.code
-        body = JSON.parse(response.body)
-        return {:error => "HTTP response #{response.code} #{body['Error']}"}
+        begin
+          body = JSON.parse(response.body)
+          return {:error => "HTTP response #{response.code} #{body['Error']}"}
+        rescue JSON::ParserError
+          return {:error => "HTTP response #{response.code} non-JSON response"}
+        end
       else
         begin
           return JSON.parse(response.body)
