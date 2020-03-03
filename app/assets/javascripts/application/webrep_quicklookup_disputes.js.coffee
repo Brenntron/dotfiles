@@ -106,12 +106,12 @@ $ ->
 # This handles deleting individual actions from an action column and reformatting the div it lives in
     { target } = e
     row = $(target).closest('tr')
-    console.log
     col_clear = $(row).find('.col-clear-actions')
     action = $(target).text()
     action_p = $(target).closest('p')
     action_edit = action_p.text().split(':')[0];
     data = $(action_p).attr('data').split(',')
+    action_col = $(row).find('.row-action-clear')
     $(target).remove()
 
     data = data.filter((data_actions)-> return action != data_actions)
@@ -124,6 +124,8 @@ $ ->
       if $(action_p).hasClass('threat-cat-col')
         $(row).find('.wlbl-action-col').remove()
       $(action_p).remove()
+      if $(action_col).html() == ''
+        $(col_clear).find('button').click()
     else
       $(action_p).html(col_dialog)
 
