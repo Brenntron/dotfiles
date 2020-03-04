@@ -741,6 +741,8 @@ $ ->
           else
             errors.push(url)
       )
+    return updated_urls
+
 
   set_row_text = (e, el) ->
     { which: key, type, shiftKey } = e
@@ -758,11 +760,15 @@ $ ->
       when 13
         if !shiftKey && text_list.length
           bindControls()
-          check_urls(text_list)
-          buildRow(text_list, row)
+          console.log check_urls(text_list)
+          if check_urls(text_list).length
+            buildRow(text_list, row)
+
       when 0
         if text_list.length > 1
-          buildRow(text_list, row)
+          console.log check_urls(text_list)
+          if check_urls(text_list).length
+            buildRow(text_list, row)
         else
           $(row).data(text)
       when 8
