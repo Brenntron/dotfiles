@@ -1,6 +1,7 @@
 $ ->
 
   completed_counter = 0
+  headers =  'Token': $('input[name="token"]').val(),'Xmlrpc-Token': $('input[name="xml_token"]').val()
   $(document).bind(
     ###
     #This controls the show/hide of the loading wheel depending on if all ajax calls have been completed.
@@ -723,6 +724,24 @@ $ ->
       $( document ).on 'focusout', '.col-bulk-dispute', (e) -> set_row_text(e, this)
     , 250
 
+  window.check_urls = (text_list) ->
+    updated_urls = []
+    errors = []
+    for url in text_list
+      data = {'uri': url}
+      $.ajax(
+        url: '/escalations/api/v1/escalations/webrep/disputes/is_valid_url'
+        method: 'GET'
+        headers: headers
+        data: data
+        dataType: 'json'
+        success: (response) ->
+          if response.data
+            updated_urls.push(url)
+          else
+            errors.push(url)
+      )
+
   set_row_text = (e, el) ->
     { which: key, type, shiftKey } = e
 
@@ -739,6 +758,7 @@ $ ->
       when 13
         if !shiftKey && text_list.length
           bindControls()
+          check_urls(text_list)
           buildRow(text_list, row)
       when 0
         if text_list.length > 1
@@ -760,7 +780,6 @@ $ ->
     e.preventDefault()
     search_items = []
     rows = $('.research-table tbody tr')
-    headers =  'Token': $('input[name="token"]').val(),'Xmlrpc-Token': $('input[name="xml_token"]').val()
 
     $('.col-bulk-dispute').each ( ) ->
       text = $(this).text()
