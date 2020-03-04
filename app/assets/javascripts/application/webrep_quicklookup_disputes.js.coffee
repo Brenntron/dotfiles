@@ -277,7 +277,6 @@ $ ->
     )
 
   window.adjust_wlbl = (data) ->
-    console.log data
     std_msg_ajax(
       method: 'POST'
       url: '/escalations/api/v1/escalations/webrep/disputes/uri_wlbl'
@@ -724,24 +723,6 @@ $ ->
       $( document ).on 'focusout', '.col-bulk-dispute', (e) -> set_row_text(e, this)
     , 250
 
-  window.check_urls = (text_list) ->
-    updated_urls = []
-    errors = []
-    for url in text_list
-      data = {'uri': url}
-      $.ajax(
-        url: '/escalations/api/v1/escalations/webrep/disputes/is_valid_url'
-        method: 'GET'
-        headers: headers
-        data: data
-        dataType: 'json'
-        success: (response) ->
-          if response.data
-            updated_urls.push(url)
-          else
-            errors.push(url)
-      )
-    return updated_urls
 
 
   set_row_text = (e, el) ->
@@ -760,15 +741,11 @@ $ ->
       when 13
         if !shiftKey && text_list.length
           bindControls()
-          console.log check_urls(text_list)
-          if check_urls(text_list).length
-            buildRow(text_list, row)
+          buildRow(text_list, row)
 
       when 0
         if text_list.length > 1
-          console.log check_urls(text_list)
-          if check_urls(text_list).length
-            buildRow(text_list, row)
+          buildRow(text_list, row)
         else
           $(row).data(text)
       when 8
@@ -817,18 +794,20 @@ $ ->
           .then null, (err) -> console.log err
 
   window.get_reptool = (item, headers) ->
-    data = {'ip_uris':[item]}
+    data = {'ip_uris':[item.trim()]}
     $.ajax(
       url: '/escalations/api/v1/escalations/webrep/disputes/bulk_reptool_get_info_for_form'
       method: 'POST'
       data: data
       headers: headers
-      success: (response) -> return response
+      success: (response) ->
+        console.log response
+        return response
       error: (response) -> return response
     )
 
   window.get_wlbl = (item, headers) ->
-    data = {'entry': item}
+    data = {'entry': item.trim()}
     $.ajax(
       url: '/escalations/api/v1/escalations/webrep/disputes/rule_ui_wlbl_get_info_for_form'
       method: 'GET'
@@ -840,7 +819,7 @@ $ ->
     )
 
   window.get_wrbs = (item, headers) ->
-    data = {'uri': item}
+    data = {'uri': item.trim()}
     $.ajax(
       url: '/escalations/api/v1/escalations/webrep/disputes/wbrs_info'
       method: 'GET'
@@ -852,26 +831,29 @@ $ ->
     )
 
   window.get_cat = (item, headers) ->
-    data = {'uri': item}
+    data = {'uri': item.trim()}
     $.ajax(
       url: '/escalations/api/v1/escalations/webcat/complaints/uri_cat_info'
       method: 'GET'
       headers: headers
       data: data
       dataType: 'json'
-      success: (response) -> return response
+      success: (response) ->
+        return response
       error: (response) -> return response
     )
 
   window.get_threat_cat = (item, headers) ->
-    data = {'uri': item}
+    data = {'uri': item.trim()}
     $.ajax(
       url: '/escalations/api/v1/escalations/webrep/disputes/threat_categories'
       method: 'POST'
       headers: headers
       data: data
       dataType: 'json'
-      success: (response) -> return response
+      success: (response) ->
+#        console.log response
+        return response
       error: (response) -> return response
     )
 
