@@ -897,7 +897,7 @@ $ ->
     if threat_categories.length
       text = threat_categories.join(', ')
     else
-      text = 'No Threat Cats availbable'
+      text = 'No data'
       col_tc.addClass('missing-data')
     col_tc.text( text )
 
