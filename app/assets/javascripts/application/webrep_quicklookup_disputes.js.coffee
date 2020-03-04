@@ -735,23 +735,26 @@ $ ->
     setTimeout () ->
       $( document ).on 'focusout', '.col-bulk-dispute', (e) -> set_row_text(e, this)
     , 250
-
   window.check_urls = (text_list, row) ->
     validated_urls = []
     errors = []
-    data = {'uri': text_list.join()}
-    $.ajax(
-      url: '/escalations/api/v1/escalations/webrep/disputes/is_valid_url'
-      method: 'GET'
-      headers: headers
-      data: data
-      dataType: 'json'
-      success: (response) ->
-        console.log response
-#        if response.data
-#          buildRow([url], row)
-    )
-
+    ajax_count = text_list.length
+    for url in text_list
+      data = {'uri': url}
+      $.ajax(
+        url: '/escalations/api/v1/escalations/webrep/disputes/is_valid_url'
+        method: 'GET'
+        headers: headers
+        data: data
+        dataType: 'json'
+        success: (response) ->
+          ajax_count--
+          {data, checked_url } = response
+          if data
+            validated_urls.push(checked_url)
+          if ajax_count == 0
+            buildRow(validated_urls, row)
+      )
 
   set_row_text = (e, el) ->
     { which: key, type, shiftKey } = e
