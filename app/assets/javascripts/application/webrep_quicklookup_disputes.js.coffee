@@ -893,9 +893,9 @@ $ ->
 
   window.set_threat_cat = ( item, row, data) ->
     col_tc = $(row).children('.col-threat-cats')
-    data = ['Bogon', 'Botnets', 'Malicious Sites']
-    if data.length
-      text = data.join(', ')
+    { threat_categories } = JSON.parse(data)
+    if threat_categories.length
+      text = threat_categories.join(', ')
     else
       text = 'No Threat Cats availbable'
       col_tc.addClass('missing-data')
