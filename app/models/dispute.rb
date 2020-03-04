@@ -638,7 +638,7 @@ class Dispute < ApplicationRecord
 
           #threat cats for urls
           complete_wbrs_blob = Wbrs::ManualWlbl.where({:url => new_dispute_entry.uri})
-          new_dispute_entry.wbrs_threat_category = [complete_wbrs_blob.last].select{ |wlbl| wlbl.state == "active"}.map{ |wlbl| wlbl.threat_cats }.join(', ')
+          new_dispute_entry.wbrs_threat_category = [complete_wbrs_blob.last].select{ |wlbl| wlbl&.state == "active"}.map{ |wlbl| wlbl.threat_cats }.join(', ')
 
           if !matching_disposition
             if !false_negative_claim
