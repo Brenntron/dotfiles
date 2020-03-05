@@ -190,7 +190,6 @@ $ ->
   wl_array = ['WL-weak', 'WL-med', 'WL-heavy']
 
   $(document).on 'change', '.adjust_wlbl_checkbox', () ->
-    # XXXXXXX
     submit_btn = $('#wlbl_entries_dropdown .dropdown-submit-button')
     all_checked_items = $('.adjust_wlbl_checkbox:checked')
     current_val = $(this).val()
