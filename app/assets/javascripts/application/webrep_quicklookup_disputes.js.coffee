@@ -490,7 +490,7 @@ $ ->
         val = $(check).val()
         label = $(check).next('label').html()
         threat_cats.push("#{val}")
-        threat_cats_el.push("<span data='val' class='col-tag'>#{label}</span>")
+        threat_cats_el.push("<span data='#{val}' class='col-tag'>#{label}</span>")
 
     threat_cats = threat_cats.join()
 
@@ -531,13 +531,17 @@ $ ->
             tc = $(tc).text().trim()
             if tc_col.includes(tc)
               tc_err += threat_cats_el + ', '
+              tc_id = parseInt( $(threat_cats_el).data() )
+              threat_cats_el.indexOf(tc)
+              if (threat_cats_el.indexOf(tc)!= -1) then threat_cats_el.splice(index, 1)
+              if (threat_cats.indexOf(tc)!= -1) then threat_cats.splice(index, 1)
             return !tc_col.includes(tc)
         )
 
         if wlbl_err != ''
-          error_message += "<span>WLBL | #{wlbl_err.slice(0, wlbl_err.length - 2);}</span> "
+          error_message += "<span>WLBL | #{wlbl_err.slice(0, wlbl_err.length - 2);}</span>"
         if tc_err != ''
-          error_message += "<span> Threat Categories | #{tc_err.slice(0, tc_err.length - 2);}</span> "
+          error_message += "<span> Threat Categories | #{tc_err.slice(0, tc_err.length - 2);}</span>"
         check_list = col_tag_format(check_list_array)
         col_dialog = "<p class='wlbl-action-col #{list_action}' data='#{check_list_array}'>#{action_desc}  #{check_list} #{threat_cats}<p>"
         delete_button = '<button class="clear-action-button row-action-clear"></button>'

@@ -17,12 +17,12 @@ $(document).ready ->
 
 window.select_or_deselect_all = (dispute_id)->
   checkbox = $(".dispute-entry-checkbox_#{dispute_id}")
-  checkbox.prop('checked', $('#' + dispute_id).prop('checked'))
+  checkbox.prop("checked", $("##{dispute_id}").prop("checked"))
   checkbox.each ->
     toggleRow(this)
 
 window.populate_webrep_index_table = (data = {}, reload = false) ->
-  data['reload'] = reload
+  data["reload"] = reload
 
   array_of_showns = []
   array_of_dispute_clicks = []
