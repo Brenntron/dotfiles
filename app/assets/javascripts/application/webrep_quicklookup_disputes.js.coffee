@@ -72,7 +72,7 @@ $ ->
     check_list_array = []
     check_list = ''
     for val in array
-      check_name = "<span class='col-tag'>#{val}</span>"
+      check_name = "<span data='#{val}' class='col-tag'>#{val}</span>"
       check_list_array.push(check_name)
     if check_list_array.length == 2
       check_list = check_list_array.join(' and ')
@@ -114,24 +114,37 @@ $ ->
     $( col_actions ).empty()
     submit_rep_check()
 
-  $(document).on 'click', '.col-actions .col-tag', (e) ->
+  $(document).on 'click', '.col-actions .col-tag', () ->
     ####
     # handles deleting individual actions from an action column and reformatting the div it lives in + updating the data attribute of the action <p>
     ####
 
-    { target } = e
-    row = $(target).closest('tr')
-    col_clear = $(row).find('.col-clear-actions')
-    action = $(target).text()
-    action_p = $(target).closest('p')
-    action_edit = action_p.text().split(':')[0];
+#    { target } = e
+#    row = $(this).closest('tr')
+#    col_clear = $(row).find('.col-clear-actions')
+#    action = $(target).text()
+#    action_p = $(target).closest('p')
+#    action_edit = action_p.text().split(':')[0];
+#    data = $(action_p).attr('data').split(',')
+#    action_col = $(row).find('.row-action-clear')
+#    $(target).remove()
+
+    action = $(this).attr('data')
+    action_p = $(this).parents('p')[0]
+    action_edit = $(action_p).text().split(':')[0]
+
+    row = $(this).parents('tr')[0]
+    col_clear = $(row).find('.col-clear-actions')[0]
+    action_col = $(row).find('.row-action-clear')[0]
+
+    # original data
     data = $(action_p).attr('data').split(',')
-    action_col = $(row).find('.row-action-clear')
-    $(target).remove()
+    # newly refined data with shit removed
+    data = data.filter((data_actions) ->
+      action != data_actions
+    )
 
-    data = data.filter((data_actions)-> return action != data_actions)
-    col_dialog = "#{action_edit}: #{col_tag_format(data)}"
-
+    $(this).remove()
     $(action_p).attr('data', data)
     if data.length == 0
       if $(action_p).hasClass('wlbl-action-col')
@@ -142,7 +155,10 @@ $ ->
       if $(action_col).html() == ''
         $(col_clear).find('button').click()
     else
-      $(action_p).html(col_dialog)
+      unless $.trim(action_edit) == 'Threat Categories'
+        col_dialog = "#{action_edit}: #{col_tag_format(data)}"
+        $(action_p).html(col_dialog)
+
 
   $(document).on 'change', '#select-all-bulk', (e) ->
     ####
@@ -489,12 +505,12 @@ $ ->
         val = $(check).val()
         label = $(check).next('label').html()
         threat_cats.push("#{val}")
-        threat_cats_el.push("<span data='#{val}' class='col-tag'>#{label}</span>")
+        threat_cats_el.push("<span data='#{val}' class='col-tag threat-cat-tag'>#{label}</span>")
 
     threat_cats = threat_cats.join()
 
     if threat_cats.length > 0
-      threat_cats = "<p data='#{threat_cats}' class='threat-cat-col'> Threat Categories:#{threat_cats_el.join(', ')} </p>"
+      threat_cats = "<p data='#{threat_cats}' class='threat-cat-col'>Threat Categories: #{threat_cats_el.join('')} </p>"
     else
       threat_cats = ''
 
@@ -542,6 +558,9 @@ $ ->
         if tc_err != ''
           error_message += "<span> Threat Categories | #{tc_err.slice(0, tc_err.length - 2);}</span>"
         check_list = col_tag_format(check_list_array)
+
+
+        # Right here
         col_dialog = "<p class='wlbl-action-col #{list_action}' data='#{check_list_array}'>#{action_desc}  #{check_list} #{threat_cats}<p>"
         delete_button = '<button class="clear-action-button row-action-clear"></button>'
 
