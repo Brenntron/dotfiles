@@ -57,7 +57,7 @@ class Preloader::Base
     while counter < TRIES
       begin
         complete_wbrs_blob = Wbrs::ManualWlbl.where({:url => host})
-        wbrs_threat_category = [complete_wbrs_blob.last].select{ |wlbl| wlbl.state == "active"}.map{ |wlbl| wlbl.threat_cats }.join(', ')
+        wbrs_threat_category = [complete_wbrs_blob.last].select{ |wlbl| wlbl&.state == "active"}.map{ |wlbl| wlbl.threat_cats }.join(', ')
         break
       rescue
         counter = counter + 1

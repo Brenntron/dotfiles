@@ -574,14 +574,15 @@ class DisputeEntry < ApplicationRecord
   end
 
   def new_payload_item
+
     case
     when NEW == status
-      {
+      payload = {
           status: Dispute::TI_NEW,
           resolution_message: '',
       }
     when STATUS_RESOLVED_FIXED_FN == resolution
-      {
+      payload = {
           resolution_message: 'Talos has lowered our reputation score for the URL/Domain/Host to block access.',
           resolution: 'FIXED',
           status: Dispute::TI_RESOLVED,
@@ -593,12 +594,17 @@ class DisputeEntry < ApplicationRecord
           else
             'The Talos web reputation will remain unchanged, based on available information. If you have further information regarding this URL/Domain/Host that indicates its involvement in malicious activity, please open an escalation with TAC and provide that information.'
           end
-      {
+      payload = {
           resolution_message: message,
           resolution: 'UNCHANGED',
           status: Dispute::TI_RESOLVED,
       }
     end
+    if self.resolution_comment.present? && self.resolution_comment != ""
+      payload[:resolution_message] = self.resolution_comment
+    end
+
+    payload
   end
 
   def referenced_tickets
