@@ -3,10 +3,10 @@ $ ->
   completed_counter = 0
   headers =  'Token': $('input[name="token"]').val(),'Xmlrpc-Token': $('input[name="xml_token"]').val()
   $(document).bind(
-    ###
+    ####
     #This controls the show/hide of the loading wheel depending on if all ajax calls have been completed.
     #There were issues with using ajaxStop, but this works
-    ###
+    ####
     ajaxStart: () ->
       $('.ajax-message-div').css('display', 'flex')
     ajaxStop: () ->
@@ -18,7 +18,9 @@ $ ->
         $('.ajax-message-div').hide()
   )
   window.isEmpty = (item) ->
-# function to check whether or not objects and strings are empty, more variable types can be added as needed
+    ####
+    # function to check whether or not objects and strings are empty, more variable types can be added as needed
+    ####
     type = typeof item
     switch(type)
       when 'object'
@@ -50,8 +52,10 @@ $ ->
     $('#confirmation-modal').modal('toggle')
 
   window.build_checkbox_list = (arr, list, type) ->
-# the checkbox list for the dropdown is built here when the dropdown is first opened
-# because I don't want to type the same html element over and over
+    ####
+    # the checkbox list for the dropdown is built here when the dropdown is first opened
+    # because I don't want to type the same html element over and over + easier if drop in more vals without having to change it in multiple places
+    ####
     for opt in arr
       checkbox =
         "<li> <label>
@@ -60,6 +64,9 @@ $ ->
       $(list).append(checkbox)
 
   window.col_tag_format = (array) ->
+    ####
+    # like it says on the tin, formatting the initial col-tags for the action column
+    ####
     if typeof array == 'string'
       array = array.split(',')
     check_list_array = []
@@ -74,7 +81,9 @@ $ ->
     return check_list
 
   $(document).on 'click', '#clear-all-actions', (e) ->
-#this clears actions from every row
+    ####
+    # clears all actions from every selected row
+    ####
     e.preventDefault()
     selected_rows = $('.col-select-all input:checked')
     $( selected_rows ).each ()->
@@ -94,7 +103,9 @@ $ ->
         $('.five-note').addClass('required-bold')
 
   $(document).on 'click', '.row-action-clear', (e) ->
-#This removes all actions from a single row
+    ####
+    #This removes all actions from a single row
+    ####
     e.preventDefault()
     { target } = e
     row = $(target).closest('tr')
@@ -104,7 +115,10 @@ $ ->
     submit_rep_check()
 
   $(document).on 'click', '.col-actions .col-tag', (e) ->
-# This handles deleting individual actions from an action column and reformatting the div it lives in
+    ####
+    # handles deleting individual actions from an action column and reformatting the div it lives in + updating the data attribute of the action <p>
+    ####
+
     { target } = e
     row = $(target).closest('tr')
     col_clear = $(row).find('.col-clear-actions')
@@ -131,14 +145,18 @@ $ ->
       $(action_p).html(col_dialog)
 
   $(document).on 'change', '#select-all-bulk', (e) ->
-# handles selection of all checkboxes in quicklookup table
+    ####
+    # handles selection of all checkboxes in quicklookup table
+    ####
     e_val = e.currentTarget.checked
     select_cols = $('.col-select-all input')
     for col in select_cols
       $(col).prop('checked', e_val)
 
   $(document).on 'change', '.col-select-all input', (e) ->
-# handles selection of sindlge checkboxes in quicklookup table
+    ####
+    # handles selection of single checkboxes in quicklookup table
+    ####
     select_cols = $('.col-select-all input')
     select_vals = []
     for col in select_cols
@@ -147,7 +165,9 @@ $ ->
     $('#select-all-bulk').prop('checked', bulk_value)
 
   $(document).on 'change', '.adjust_reptool_checkbox, .status_bl', () ->
-#    depending on what radio button is selected, the available actions in the reptool dropdown will change
+    ####
+    # depending on what radio button is selected, the available actions in the reptool dropdown will change
+    ####
     submit_btn = $('#reptool_entries_bl_dropdown .dropdown-submit-button')
     class_bl = $('.status_bl:checked').val().replace('reptool-', '')
 
@@ -170,15 +190,17 @@ $ ->
   wl_array = ['WL-weak', 'WL-med', 'WL-heavy']
 
   $(document).on 'change', '.adjust_wlbl_checkbox', () ->
+    # XXXXXXX
     submit_btn = $('#wlbl_entries_dropdown .dropdown-submit-button')
-    all_checked = $('.adjust_wlbl_checkbox:checked')
+    all_checked_items = $('.adjust_wlbl_checkbox:checked')
     current_val = $(this).val()
+    add_wlbl = $('#wlbl-reptool-add:checked').length > 0
     threat_cats = $('#wlbl_entries_dropdown .threat-cat-row')
     disabled = true
     bl_hide = true
     wl_check = false
 
-    for check in all_checked
+    for check in all_checked_items
       val = $(check).val()
       if bl_array.indexOf(val) > -1 then bl_hide = false
       if wl_array.indexOf(val) > -1 then wl_check = true
@@ -205,7 +227,7 @@ $ ->
     if wl_check
       disabled = false
 
-    if !bl_hide
+    if !bl_hide && add_wlbl
       $(threat_cats).removeClass('hidden')
     else
       $(threat_cats).addClass('hidden')
@@ -223,7 +245,6 @@ $ ->
       if action != undefined
         for act in action
           for key, value of act
-            console.log 'xxxxxxxx', key
             switch key
               when ('maintain' || 'override')
                 data = [{
@@ -345,16 +366,16 @@ $ ->
       }
       success_reload:false
       error_prefix: 'Error logging in.'
-      success: (response) ->
-        return response
+      success: (response) -> return response
     )
 
   window.stringIncludes = (str, substring) ->
     return str.indexOf(substring) != -1
 
   window.confirm_rep_changes = () ->
-#  confirm actions to be taken, data is prepared and  final submission of disputes to be made
-# this is going to need to be changed and refactored
+    ####
+    #  confirm actions to be taken, data is prepared and  final submission of disputes to be made
+    ####
     confirmation_rows = $('#confirmation-modal tbody').find('tr')
     comment = $('.confirm-rep-input').val()
     reptool_dispute_changes = []
@@ -370,6 +391,10 @@ $ ->
       disputes[dispute] = dispute
 
       quick_bulk_update(disputes).then(
+        ####
+        # super simple endpoint to quick look up bulk submit-thus sayeth chris
+        # on success, parse actions
+        ####
         (response)=>
           data = JSON.parse(response).data
           dispute_entries = data.dispute_entries
@@ -377,12 +402,14 @@ $ ->
           for action, i in actions
 
             action_tags = []
+            existing_classes = []
+            existing_wlbl = []
             class_list = $(action).attr("class")
+
             maintain_check = stringIncludes(class_list, 'maintain')
             maintain_remove = stringIncludes(class_list, 'remove') && maintain_check
             drop_check = stringIncludes(class_list, 'drop')
             threat_cat = stringIncludes(class_list, 'threat-cat-col')
-            existing_classes = []
 
             if maintain_check || drop_check
               if $(action).attr('reptool_classes') != undefined
@@ -402,7 +429,7 @@ $ ->
             action_list.push( "#{formatted_action}": action_tags )
           actions = action: action_list
           disputes[dispute] = actions
-      ).then(()=>
+      ).then( ()=>
         dispute_check = true
         for key, value of disputes
           if key != 'comment'
@@ -435,6 +462,7 @@ $ ->
 
 
   window.set_action_wlbl_col = () ->
+    $('.grayed-out').removeClass('grayed-out')
 
     $('#error_modal').dialog()
     $('#error_modal .modal-body' ).empty()
@@ -445,8 +473,10 @@ $ ->
     action_desc = 'Add to: '
     checked_bl = $('.adjust_wlbl_checkbox:checked').map( () -> return $(this).val() ).get()
     bl_check = checked_bl[0].indexOf('BL') != -1
+
     threat_cats_el = []
     threat_cats = []
+    error_array = []
 
     if list_action == 'remove'
       action_desc = 'Remove from: '
@@ -463,14 +493,13 @@ $ ->
         threat_cats_el.push("<span data='val' class='col-tag'>#{label}</span>")
 
     threat_cats = threat_cats.join()
+
     if threat_cats.length > 0
       threat_cats = "<p data='#{threat_cats}' class='threat-cat-col'> Threat Categories:#{threat_cats_el.join(', ')} </p>"
     else
       threat_cats = ''
-    error_array = []
-    error_header = "<h4>Cannot #{list_action} the following Reptool Classification disputes <h4>"
-    selected_rows.each ()->
 
+    selected_rows.each ()->
       row = $(this).closest('tr')
       $(row).find('.wlbl-action-col').remove()
       $(row).find('.threat-cat-col').remove()
@@ -483,27 +512,40 @@ $ ->
         existing_p = ".#{list_action}  .wlbl-action-col"
         clear_col = row.find('.col-clear-actions')
         wlbl_col = row.find('.col-wlbl').text().replace(/ /g, '').split(',')
-
+        tc_col = row.find('.col-threat-cats').text().split(', ')
+        wlbl_err = ''
+        tc_err = ''
         check_list_array = checked_bl.filter( (wlbl)->
           switch(list_action)
             when 'add'
               if wlbl_col.includes(wlbl)
-                error_message += "<span class='col-tag dialog-tag'>  #{wlbl}</span>,"
+                wlbl_err += "<span class='col-tag dialog-tag'>  #{wlbl}</span>, "
               return !wlbl_col.includes(wlbl)
             when 'remove'
               if !wlbl_col.includes(wlbl)
-                error_message += "<span class='col-tag dialog-tag'>  #{wlbl}</span>,"
+                wlbl_err += "<span class='col-tag dialog-tag'>  #{wlbl}</span>, "
               return wlbl_col.includes(wlbl)
         )
+        threat_cat_array = threat_cats_el.filter( (tc)->
+          if list_action == 'add'
+            tc = $(tc).text().trim()
+            if tc_col.includes(tc)
+              tc_err += threat_cats_el + ', '
+            return !tc_col.includes(tc)
+        )
 
+        if wlbl_err != ''
+          error_message += "<span>WLBL | #{wlbl_err.slice(0, wlbl_err.length - 2);}</span> "
+        if tc_err != ''
+          error_message += "<span> Threat Categories | #{tc_err.slice(0, tc_err.length - 2);}</span> "
         check_list = col_tag_format(check_list_array)
         col_dialog = "<p class='wlbl-action-col #{list_action}' data='#{check_list_array}'>#{action_desc}  #{check_list} #{threat_cats}<p>"
         delete_button = '<button class="clear-action-button row-action-clear"></button>'
-        #
-        if error_message.endsWith(', ')
-          error_message = error_message.slice(0, error_message.length - 2);
+
+        if error_message.endsWith('</span>')
           error_html = "<div>#{error_message}<div>"
           error_array.push(error_html)
+
         if check_list_array.length
           $(existing_p).remove()
           $(action_col).append(col_dialog)
@@ -517,7 +559,7 @@ $ ->
           at: 'top+15%',
           of: window
       })
-      $( '#error_modal .modal-header' ).html( error_header )
+      $( '#error_modal .modal-header' ).html( "<h4>Cannot #{list_action} the following WLBL disputes <h4>" )
       $( '#error_modal .modal-body' ).append( error_array )
     submit_rep_check()
 
