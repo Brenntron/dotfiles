@@ -166,14 +166,15 @@ $ ->
     else
       submit_btn.prop('disabled', true)
 
+  bl_array = ['BL-weak', 'BL-med', 'BL-heavy']
+  wl_array = ['WL-weak', 'WL-med', 'WL-heavy']
+
   $(document).on 'change', '.adjust_wlbl_checkbox', () ->
     submit_btn = $('#wlbl_entries_dropdown .dropdown-submit-button')
     all_checked = $('.adjust_wlbl_checkbox:checked')
     current_val = $(this).val()
     threat_cats = $('#wlbl_entries_dropdown .threat-cat-row')
     disabled = true
-    bl_array = ['BL-weak', 'BL-med', 'BL-heavy']
-    wl_array = ['WL-weak', 'WL-med', 'WL-heavy']
     bl_hide = true
     wl_check = false
 
@@ -210,13 +211,19 @@ $ ->
       $(threat_cats).addClass('hidden')
 
     submit_btn.prop('disabled', disabled)
+
   window.call_action_switchboard = (disputes) ->
-    comment = disputes[comment]
+    ####
+    # data is set and each action calls the appropriate endpoint here
+    ####
+    comment = $('#confirmation-modal').find('.comment-input').text()
+    $('#confirmation-modal').modal('hide')
     for dispute, value of disputes
-      if dispute != 'comment'
-        { action } = value
+      { action } = value
+      if action != undefined
         for act in action
           for key, value of act
+            console.log 'xxxxxxxx', key
             switch key
               when ('maintain' || 'override')
                 data = [{
@@ -234,19 +241,29 @@ $ ->
                   'classifications': act[key]
                 }
                 drop_reptool_bl(data)
+
               when 'add'
                 data = {
                   'urls':[dispute]
                   'trgt_list': act[key]
-                  'thrt_cat_ids':[1]
-                  'note': 'comment'
+                  'note': comment
                 }
+                if stringIncludes(act[key][0], 'BL')
+                  for el in action
+                    #####
+                    # set the values of threat_cat ids if the BL is being set
+                    #####
+                    if el.tc_ids
+                      { tc_ids } = el
+                      data.thrt_cat_ids = tc_ids
+
                 adjust_wlbl(data)
 
               when 'remove'
                 data = {
                   'ip_uris': [dispute]
                   'list_types': act[key]
+                  'note': comment
                 }
                 remove_wlbl(data)
 
@@ -260,10 +277,7 @@ $ ->
       success_reload:false
       success: (response) ->
         $('#confirmation-modal').modal('hide')
-        if response
-          console.log response
-        else
-          console.log response
+        console.log response
     )
 
   window.drop_reptool_bl = (data) ->
@@ -274,10 +288,11 @@ $ ->
       success_reload:false
       success: (response) ->
         $('#confirmation-modal').modal('hide')
-        return response
+        console.log response
     )
 
   window.adjust_wlbl = (data) ->
+    console.log 'inininininin'
     std_msg_ajax(
       method: 'POST'
       url: '/escalations/api/v1/escalations/webrep/disputes/uri_wlbl'
@@ -285,7 +300,7 @@ $ ->
       success_reload:false
       success: (response) ->
         $('#confirmation-modal').modal('hide')
-        return response
+        console.log response
     )
 
   window.remove_wlbl = (data) ->
@@ -297,22 +312,28 @@ $ ->
       success_reload:false
       success: (response) ->
         $('#confirmation-modal').modal('hide')
-        return response
+        console.log response
     )
 
-  window.check_actions = (action_classes, action_tags) =>
+  window.check_actions = (action_classes) =>
+
     if stringIncludes(action_classes, 'reptool')
+
       if stringIncludes(action_classes, 'maintain')
-        return 'maintain': action_tags
+        return 'maintain'
       else if stringIncludes(action_classes, 'override')
-        return 'override': action_tags
+        return 'override'
       else if stringIncludes(action_classes, 'drop')
-        return 'drop': action_tags
+        return 'drop'
+
     else
+
       if stringIncludes(action_classes, 'add')
-        return 'add': action_tags
+        return 'add'
+      else if stringIncludes(action_classes, 'add')
+        return 'remove'
       else
-        return 'remove': action_tags
+        return 'tc_ids'
 
   window.quick_bulk_update = (data) ->
     password = $('form#top_banner_bugzilla_login_form').find('input[name=password]').val()
@@ -342,21 +363,25 @@ $ ->
       comment:$('.confirm-rep-input').text()
     }
     $( confirmation_rows ).each ->
+
       row = $( this ).find('td')
       dispute = $( row[0] ).text()
       actions = $( row[1] ).children()
       disputes[dispute] = dispute
+
       quick_bulk_update(disputes).then(
         (response)=>
           data = JSON.parse(response).data
           dispute_entries = data.dispute_entries
           action_list = []
           for action, i in actions
+
             action_tags = []
             class_list = $(action).attr("class")
             maintain_check = stringIncludes(class_list, 'maintain')
             maintain_remove = stringIncludes(class_list, 'remove') && maintain_check
             drop_check = stringIncludes(class_list, 'drop')
+            threat_cat = stringIncludes(class_list, 'threat-cat-col')
             existing_classes = []
 
             if maintain_check || drop_check
@@ -365,8 +390,16 @@ $ ->
                 if drop_check
                   action_tags = existing_classes
 
-            $(action).find('.col-tag').contents().each -> action_tags.push(this.data)
-            action_list.push( check_actions(class_list, action_tags) )
+            if threat_cat
+              tc_ids = $(action).attr('data').split(',')
+              for tc_id in tc_ids
+                action_tags.push( parseInt(tc_id) )
+            else
+              $(action).find('.col-tag').contents().each ->
+                action_tags.push(this.data)
+            formatted_action = check_actions(class_list)
+
+            action_list.push( "#{formatted_action}": action_tags )
           actions = action: action_list
           disputes[dispute] = actions
       ).then(()=>
@@ -424,9 +457,10 @@ $ ->
       # if bl is checked, format threat cats for the dispute
       checked_tc = $('.wlbl_thrt_cat_id:checked')
       for check in checked_tc
-        val = $(check).next('label').html()
-        threat_cats.push(val)
-        threat_cats_el.push("<span class='col-tag'>#{val}</span>")
+        val = $(check).val()
+        label = $(check).next('label').html()
+        threat_cats.push("#{val}")
+        threat_cats_el.push("<span data='val' class='col-tag'>#{label}</span>")
 
     threat_cats = threat_cats.join()
     if threat_cats.length > 0
@@ -515,7 +549,10 @@ $ ->
           for child in children
             classes = $(child).attr("class")
             if !isEmpty(classes) && classes != undefined
-              html += "<div #{existing_reptool} class='#{classes}'>#{$(child).html()}</div>"
+              threat_cat_data = ''
+              if classes == 'threat-cat-col'
+                threat_cat_data = "data='#{$(child).attr('data')}'"
+              html += "<div #{existing_reptool} #{threat_cat_data} class='#{classes}'>#{$(child).html()}</div>"
           html += '</td> </tr>'
           confirmation_dialog.push( html )
 
@@ -743,7 +780,6 @@ $ ->
           if data
             validated_urls.push(checked_url)
           if ajax_count == 0
-            console.log data, validated_urls
             buildRow(validated_urls, row)
       )
 
@@ -760,7 +796,6 @@ $ ->
     text_list = text_list.filter (item, index) ->
       if item != ''
         return text_list.indexOf item == index
-    console.log 'ininin'
     if key == 13
       if !shiftKey && text_list.length
 #          bindControls()
@@ -822,9 +857,7 @@ $ ->
       method: 'POST'
       data: data
       headers: headers
-      success: (response) ->
-        console.log response
-        return response
+      success: (response) -> return response
       error: (response) -> return response
     )
 
@@ -894,7 +927,6 @@ $ ->
     if data.length
       data = data.join(', ')
     col_wlbl.text( data )
-    console.log data
   window.set_cat = ( item, row, data) ->
     { data } = JSON.parse(data)
     cat_col = $(row).children('.col-category')
