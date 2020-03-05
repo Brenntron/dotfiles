@@ -16,8 +16,9 @@ $(document).ready ->
     $('.searched-for-url').html(text)
 
 window.select_or_deselect_all = (dispute_id)->
-  $('.dispute-entry-checkbox_' + dispute_id).prop('checked', $('#' + dispute_id).prop('checked'))
-  $('.dispute-entry-checkbox_' + dispute_id).each ->
+  checkbox = $(".dispute-entry-checkbox_#{dispute_id}")
+  checkbox.prop('checked', $('#' + dispute_id).prop('checked'))
+  checkbox.each ->
     toggleRow(this)
 
 window.populate_webrep_index_table = (data = {}, reload = false) ->
@@ -127,7 +128,7 @@ window.populate_webrep_index_table = (data = {}, reload = false) ->
 
         if undefined != json.search_name
           searchId = 'saved_search_' + json.search_id
-          if $('#saved-search-tbody tr#' + searchId).length == 0
+          if $("#saved-search-tbody tr##{searchId}").length == 0
             $('#saved-search-tbody').append(named_search_tag(json.search_name, json.search_id))
 
 
@@ -211,8 +212,8 @@ window.named_webrep_index_table = (search_name) ->
 
 window.call_contains_search = (search_form) ->
   data = {
-    search_type: 'contains'
-    value: search_form.querySelector('input.search-box').value
+    search_type: "contains"
+    value: search_form.querySelector("input.search-box").value
   }
   window.current_search_data = data
   window.populate_webrep_index_table(data)
@@ -269,7 +270,7 @@ window.dispute_resolution_drop_down = (dispute_id) ->
 
 window.entry_status_drop_down = (dispute_entry_id) ->
 
-  headers = {'Token': $('input[name="token"]').val(), 'Xmlrpc-Token': $('input[name="xml_token"]').val()}
+  headers = {'Token': $('input[name="token"]').val(), "Xmlrpc-Token": $("input[name='xml_token']").val()}
 
   $.ajax(
     url: "/escalations/api/v1/escalations/webrep/disputes/dispute_entry_status/#{dispute_entry_id}"
@@ -329,7 +330,7 @@ window.save_dispute = () ->
   }
 
   std_msg_ajax(
-    url: '/escalations/api/v1/escalations/webrep/disputes/' + $('#dispute_id').text()
+    url: "/escalations/api/v1/escalations/webrep/disputes/#{$('#dispute_id').text()}"
     method: 'PUT'
     data: data
     error_prefix: 'Unable to update dispute.'
@@ -341,7 +342,7 @@ window.toolbar_index_edit_status = () ->
 
   data = {}
 
-  entry_ids = $('.dispute-entry-checkbox:checked').map(() ->
+  entry_ids = $(".dispute-entry-checkbox:checked").map(() ->
     data[this.id] = [{
       id: this.id
       field: "status"
@@ -352,18 +353,18 @@ window.toolbar_index_edit_status = () ->
       data[this.id].push({
         id: this.id
         field: "resolution"
-        new: $('input[name=entry-resolution]:checked').val()
+        new: $("input[name=entry-resolution]:checked").val()
       })
 
       data[this.id].push({
         id: this.id
         field: "resolution_comment"
-        new: $('#entry-status-comment').val()
+        new: $("#entry-status-comment").val()
       })
   )
 
-  if statusName == "RESOLVED_CLOSED" && !$('input[name=entry-resolution]:checked').val()
-    std_msg_error('No resolution selected', ['Please select an entry resolution.'])
+  if statusName == "RESOLVED_CLOSED" && !$("input[name=entry-resolution]:checked").val()
+    std_msg_error("No resolution selected", ["Please select an entry resolution."])
   else
     std_msg_ajax(
       method: 'PATCH'
@@ -375,15 +376,15 @@ window.toolbar_index_edit_status = () ->
 
 
 window.show_page_edit_status = () ->
-  statusName = $('input[name=dispute-status]:checked').val()
-  comment = $('.ticket-status-comment').val()
-  dispute_id = $('#dispute_id').text()
+  statusName = $("input[name=dispute-status]:checked").val()
+  comment = $(".ticket-status-comment").val()
+  dispute_id = $("#dispute_id").text()
 
   if statusName == "RESOLVED_CLOSED"
-    if $('#show-edit-ticket-status-dropdown').find('input[name=dispute-resolution]').is(':checked')
-      resolution = $('input[name=dispute-resolution]:checked').val()
+    if $("#show-edit-ticket-status-dropdown").find("input[name=dispute-resolution]").is(":checked")
+      resolution = $("input[name=dispute-resolution]:checked").val()
     else
-      std_msg_error('No resolution selected', ['Please select a ticket resolution.'])
+      std_msg_error("No resolution selected", ["Please select a ticket resolution."])
       return
 
   data = {
@@ -397,21 +398,20 @@ window.show_page_edit_status = () ->
     data.comment = $('.ticket-resolution-comment').val()
 
   std_msg_ajax(
-    url: '/escalations/api/v1/escalations/webrep/disputes/set_disputes_status'
+    url: "/escalations/api/v1/escalations/webrep/disputes/set_disputes_status"
     method: 'POST'
     data: data
-    error_prefix: 'Unable to update dispute.'
+    error_prefix: "Unable to update dispute."
     success_reload: true
   )
 
 window.toolbar_index_change_assignee = () ->
-
-  entry_ids = $('.dispute_check_box:checkbox:checked').map(() ->
+  entry_ids = $(".dispute_check_box:checkbox:checked").map(() ->
 # this.dataset['entryId']
     Number(this.value)
   ).toArray()
 
-  new_assignee = $('#index_target_assignee option:selected').val()
+  new_assignee = $("#index_target_assignee option:selected").val()
   data = {
     'dispute_ids': entry_ids,
     'new_assignee': new_assignee
@@ -440,7 +440,6 @@ window.toolbar_show_change_assignee = () ->
     'new_assignee': new_assignee
   }
 
-  headers = {'Token': $('input[name="token"]').val(), 'Xmlrpc-Token': $('input[name="xml_token"]').val()}
   $.ajax(
     url: '/escalations/api/v1/escalations/webrep/disputes/change_assignee'
     method: 'POST'

@@ -238,6 +238,7 @@ $ ->
                 data = {
                   'urls':[dispute]
                   'trgt_list': act[key]
+                  'thrt_cat_ids':[1]
                   'note': 'comment'
                 }
                 adjust_wlbl(data)
@@ -717,11 +718,34 @@ $ ->
       , 20
 
   window.bindControls = () ->
-# unbind and rebind focusout to prevent the rebuilding of the table from being stuck in a loop
+    # unbind and rebind focusout to prevent the rebuilding of the table from being stuck in a loop
+    #THESE MAY NOT ACTUALLY BE NECESSARY, standby or details
     $(document).unbind('focusout')
     setTimeout () ->
       $( document ).on 'focusout', '.col-bulk-dispute', (e) -> set_row_text(e, this)
     , 250
+
+  window.check_urls = (text_list, row) ->
+    validated_urls = []
+    errors = []
+    ajax_count = text_list.length
+    for url in text_list
+      data = {'uri': url}
+      $.ajax(
+        url: '/escalations/api/v1/escalations/webrep/disputes/is_valid_url'
+        method: 'GET'
+        headers: headers
+        data: data
+        dataType: 'json'
+        success: (response) ->
+          ajax_count--
+          {data, checked_url } = response
+          if data
+            validated_urls.push(checked_url)
+          if ajax_count == 0
+            console.log data, validated_urls
+            buildRow(validated_urls, row)
+      )
 
 
 
@@ -736,19 +760,17 @@ $ ->
     text_list = text_list.filter (item, index) ->
       if item != ''
         return text_list.indexOf item == index
-
-    switch( key )
-      when 13
-        if !shiftKey && text_list.length
-          bindControls()
-          buildRow(text_list, row)
-
-      when 0
-        if text_list.length > 1
-          buildRow(text_list, row)
-        else
-          $(row).data(text)
-      when 8
+    console.log 'ininin'
+    if key == 13
+      if !shiftKey && text_list.length
+#          bindControls()
+        check_urls(text_list, row)
+    else if key == 0
+      if text_list.length > 1
+        check_urls(text_list, row)
+      else
+        $(row).data(text)
+    else if key == 8
         if isEmpty(text) && $(tbody).children().length > 1
           $(row).remove()
 
@@ -851,9 +873,7 @@ $ ->
       headers: headers
       data: data
       dataType: 'json'
-      success: (response) ->
-#        console.log response
-        return response
+      success: (response) -> return response
       error: (response) -> return response
     )
 
@@ -871,11 +891,10 @@ $ ->
   window.set_wlbl = ( item, row, data) ->
     { data } = JSON.parse(data)
     col_wlbl = $(row).children('.col-wlbl')
-
     if data.length
       data = data.join(', ')
     col_wlbl.text( data )
-
+    console.log data
   window.set_cat = ( item, row, data) ->
     { data } = JSON.parse(data)
     cat_col = $(row).children('.col-category')

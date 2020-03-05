@@ -990,7 +990,7 @@ module API
             get 'is_valid_url' do
               url = permitted_params[:uri]
 
-              {:status => "success", :data => DisputeEntry.valid_url?(url)}
+              {:status => "success", :data => DisputeEntry.valid_url?(url), :checked_url => url}
             end
 
           end
