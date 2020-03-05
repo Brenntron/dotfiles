@@ -17,7 +17,7 @@ $(document).ready ->
 
 window.select_or_deselect_all = (dispute_id)->
   checkbox = $(".dispute-entry-checkbox_#{dispute_id}")
-  checkbox.prop("checked", $("##{dispute_id}").prop("checked"))
+  checkbox.prop('checked', $("##{dispute_id}").prop("checked"))
   checkbox.each ->
     toggleRow(this)
 

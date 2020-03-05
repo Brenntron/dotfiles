@@ -293,3 +293,40 @@ Feature: Webrep, the BFRP
     And  wl/bl result number "1" should not have content "BL-weak"
     And  clean up wlbl and remove all wlbl entries on "testing.com"
     And  clean up wlbl and remove all wlbl entries on "prooftesting.com"
+
+
+  @javascript
+  Scenario: a user can add multiple rows of valid urls to quick lookup on enter
+    Given a user with role "webrep user" exists and is logged in
+    When I goto "escalations/webrep/research"
+    And I click "#research"
+    And I click ".quick-lookup-tab"
+    Then I should see content "Submit Reputation Changes" within "#submit-rep-changes"
+    And I enter content "https://1234computer.com https://g-oogl-e.com faketestcom" within p with class ".col-bulk-dispute"
+    Then I hit enter within ".col-bulk-dispute"
+    And  I wait for "2" seconds
+    Then quick lookup entry "1" should have content "https://1234computer.com"
+    Then quick lookup entry "2" should have content "https://g-oogl-e.com"
+
+  @javascript
+  Scenario: a user can get the reputation data for each row added in quicklookup
+    Given a user with role "webrep user" exists and is logged in
+    When I goto "escalations/webrep/research"
+    And I click "#research"
+    And I click ".quick-lookup-tab"
+    Then I should see content "Submit Reputation Changes" within "#submit-rep-changes"
+    And I enter content "https://www.1234computer.com https://www.g-oogl-e.com" within p with class ".col-bulk-dispute"
+    Then I hit enter within ".col-bulk-dispute"
+    Then I click "#get-rep-data"
+    And  I wait for "5" seconds
+    Then quick lookup entry "wbrs" "1" should have content "-9.5"
+    Then quick lookup entry "wlbl" "2" should have content "BL-weak, BL-med"
+#    And the following disputes exist:
+#      |id|
+#      |1 |
+#    And the following dispute_entries exist:
+#      |status           | resolution | case_resolved_at  |
+#      |RESOLVED_CLOSED  | FIXED_FP   | 2018-11-06 16:29:5|
+#    When I goto "escalations/webrep/dashboard"
+#    And I click "My Team Tickets"
+#    Then I should see content "My Team Tickets" within ".dashboard-header"

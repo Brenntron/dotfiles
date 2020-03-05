@@ -465,6 +465,9 @@ Then (/^I type content "(.*?)" within input with id "(.*?)"/) do |content, input
   fill_in input, :with => content
 end
 
+Given (/^I enter content "(.*?)" within p with class "(.*?)"/) do |content, p|
+  page.execute_script( "$('#{p}').html('#{content}')" )
+end
 Then (/^I hit enter within "(.*?)"/) do |element|
   find(element).native.send_keys(:return)
 end
