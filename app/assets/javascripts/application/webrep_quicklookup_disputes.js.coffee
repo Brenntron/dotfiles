@@ -114,25 +114,15 @@ $ ->
     $( col_actions ).empty()
     submit_rep_check()
 
+
+
   $(document).on 'click', '.col-actions .col-tag', () ->
     ####
     # handles deleting individual actions from an action column and reformatting the div it lives in + updating the data attribute of the action <p>
     ####
-
-#    { target } = e
-#    row = $(this).closest('tr')
-#    col_clear = $(row).find('.col-clear-actions')
-#    action = $(target).text()
-#    action_p = $(target).closest('p')
-#    action_edit = action_p.text().split(':')[0];
-#    data = $(action_p).attr('data').split(',')
-#    action_col = $(row).find('.row-action-clear')
-#    $(target).remove()
-
     action = $(this).attr('data')
     action_p = $(this).parents('p')[0]
     action_edit = $(action_p).text().split(':')[0]
-
     row = $(this).parents('tr')[0]
     col_clear = $(row).find('.col-clear-actions')[0]
     action_col = $(row).find('.row-action-clear')[0]
@@ -158,6 +148,7 @@ $ ->
       unless $.trim(action_edit) == 'Threat Categories'
         col_dialog = "#{action_edit}: #{col_tag_format(data)}"
         $(action_p).html(col_dialog)
+
 
 
   $(document).on 'change', '#select-all-bulk', (e) ->
