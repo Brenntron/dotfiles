@@ -824,6 +824,9 @@ $ ->
     errors = []
     ajax_count = text_list.length
     for url in text_list
+      if !url.startsWith('https://') && !url.startsWith('http://')
+        # TODO: Take this out, this if statement is temporary, use until urls not beginning w/http can be validated
+        url = 'http://' + url
       data = {'uri': url}
       $.ajax(
         url: '/escalations/api/v1/escalations/webrep/disputes/is_valid_url'
