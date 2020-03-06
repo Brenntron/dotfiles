@@ -474,15 +474,16 @@ $ ->
     $('#error_modal .modal-body' ).empty()
     $('#error_modal').dialog( 'destroy' )
 
-    selected_rows = $('.col-select-all input:checked')
-    list_action = $('.wlbl-radio-add:checked').val()
     action_desc = 'Add to: '
     checked_bl = $('.adjust_wlbl_checkbox:checked').map( () -> return $(this).val() ).get()
     bl_check = checked_bl[0].indexOf('BL') != -1
+    selected_rows = $('.col-select-all input:checked')
+    list_action = $('.wlbl-radio-add:checked').val()
 
+    error_array = []
     threat_cats_el = []
     threat_cats = []
-    error_array = []
+
 
     if list_action == 'remove'
       action_desc = 'Remove from: '
@@ -498,12 +499,6 @@ $ ->
         threat_cats.push("#{val}")
         threat_cats_el.push("<span data='#{val}' class='col-tag threat-cat-tag'>#{label}</span>")
 
-    threat_cats = threat_cats.join()
-
-    if threat_cats.length > 0
-      threat_cats = "<p data='#{threat_cats}' class='threat-cat-col'>Threat Categories: #{threat_cats_el.join('')} </p>"
-    else
-      threat_cats = ''
 
     selected_rows.each ()->
       row = $(this).closest('tr')
@@ -519,6 +514,8 @@ $ ->
         clear_col = row.find('.col-clear-actions')
         wlbl_col = row.find('.col-wlbl').text().replace(/ /g, '').split(',')
         tc_col = row.find('.col-threat-cats').text().split(', ')
+        current_threat_cats = threat_cats
+        current_threat_cats_el = threat_cats_el
         wlbl_err = ''
         tc_err = ''
         check_list_array = checked_bl.filter( (wlbl)->
@@ -532,27 +529,30 @@ $ ->
                 wlbl_err += "<span class='col-tag dialog-tag'>  #{wlbl}</span>, "
               return wlbl_col.includes(wlbl)
         )
-        threat_cat_array = threat_cats_el.filter( (tc)->
+        console.log
+        current_threat_cats_el.filter( (tc)->
           if list_action == 'add'
-            tc = $(tc).text().trim()
-            if tc_col.includes(tc)
-              tc_err += threat_cats_el + ', '
-              tc_id = parseInt( $(threat_cats_el).data() )
-              threat_cats_el.indexOf(tc)
-              if (threat_cats_el.indexOf(tc)!= -1) then threat_cats_el.splice(index, 1)
-              if (threat_cats.indexOf(tc)!= -1) then threat_cats.splice(index, 1)
-            return !tc_col.includes(tc)
+            tc_name = $(tc).text().trim()
+            tc_check = stringIncludes(tc_col, tc_name)
+            if tc_check
+              tc_err += tc
+              tc_id = parseInt( $(tc).data() )
+              if (current_threat_cats_el.indexOf(tc)!= -1) then current_threat_cats_el.splice(current_threat_cats_el.indexOf(tc), 1)
+              if (current_threat_cats.indexOf(tc_id)!= -1) then current_threat_cats.splice(current_threat_cats.indexOf(tc_id ), 1)
         )
 
         if wlbl_err != ''
-          error_message += "<span>WLBL | #{wlbl_err.slice(0, wlbl_err.length - 2);}</span>"
+          error_message += "<span>WLBL | #{wlbl_err;}</span>"
         if tc_err != ''
-          error_message += "<span> Threat Categories | #{tc_err.slice(0, tc_err.length - 2);}</span>"
+          error_message += "<span> Threat Categories | #{tc_err;}</span>"
         check_list = col_tag_format(check_list_array)
 
-
-        # Right here
-        col_dialog = "<p class='wlbl-action-col #{list_action}' data='#{check_list_array}'>#{action_desc}  #{check_list} #{threat_cats}<p>"
+        if current_threat_cats.join().length > 0
+           current_threat_cats = "<p data='#{current_threat_cats}' class='threat-cat-col'>Threat Categories: #{current_threat_cats_el.join('')} </p>"
+        else
+          current_threat_cats = ''
+#        # Right here
+        col_dialog = "<p class='wlbl-action-col #{list_action}' data='#{check_list_array}'>#{action_desc}  #{check_list} #{current_threat_cats}<p>"
         delete_button = '<button class="clear-action-button row-action-clear"></button>'
 
         if error_message.endsWith('</span>')
