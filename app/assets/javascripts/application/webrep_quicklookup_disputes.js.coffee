@@ -532,18 +532,20 @@ $ ->
                 wlbl_err += "<span class='col-tag dialog-tag'>  #{wlbl}</span>, "
               return wlbl_col.includes(wlbl)
         )
-        current_threat_cats_el.filter( (tc)->
-          if list_action == 'add'
-            tc_name = $(tc).text().trim()
-            tc_check = stringIncludes(tc_col, tc_name)
-            if tc_check
-              tc_err += tc
-              tc_id = $(tc)[0].getAttribute('data')
-              if (current_threat_cats_el.indexOf(tc)!= -1) then current_threat_cats_el.splice(current_threat_cats_el.indexOf(tc), 1)
-              if (current_threat_cats.indexOf(tc_id)!= -1) then current_threat_cats.splice(current_threat_cats.indexOf(tc_id ), 1)
+        threat_id_array = []
+        current_threat_cats = []
+        for tc in threat_cats_el
+          tc_name = $(tc)[0].innerText
+          tc_check = stringIncludes(tc_col, tc_name)
+          console.log tc_name, tc_check
+          if list_action == 'add' && tc_check
+            tc_err += tc
+            tc_id = $(tc)[0].getAttribute('data')
+          else
+            current_threat_cats.push(tc)
+            threat_id_array.push(tc_id = $(tc)[0].getAttribute('data'))
 
-        )
-
+        console.log current_threat_cats
         if wlbl_err != ''
           error_message += "<span>WLBL | #{wlbl_err;}</span>"
         if tc_err != ''
