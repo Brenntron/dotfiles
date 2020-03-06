@@ -9010,6 +9010,12 @@ th.sorting_1, th.sorting_asc, th.sorting_desc {
   }
   li{
     width: 33%;
+    label {
+      cursor: pointer;
+    }
+  }
+  li:hover {
+    background-color: transparent !important;
   }
 }
 
@@ -11329,13 +11335,14 @@ hr.thin.extra-bottom-marg {
     justify-content: space-around;
   }
   .threat-cat-cell label{
-    color:$type-lighter-color!important
+    color:$type-lighter-color!important;
+    cursor: pointer;
   }
   .dropdown-tool-grey-row{
     margin-left: -17px !important;
     margin-right: -17px !important;
     padding: 4px!important;
-    margin-top: 5px !important;
+    margin-top: 1px !important;
   }
 }
 
@@ -11418,7 +11425,6 @@ span.threat-cat-no-data {
     padding: 1px 5px;
     position: absolute;
     right: 2px;
-    left: 0;
     top: 0;
   }
 }
@@ -11426,7 +11432,6 @@ span.threat-cat-no-data {
 // webrep dispute index > ensure the dispute count is to the right of the domain entry
 .dispute-count {
   position: absolute;
-  left: 180px;
   float: none;
   z-index: 111;
   border-radius: 5px;
