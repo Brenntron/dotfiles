@@ -508,8 +508,6 @@ $ ->
       $(row).find('.threat-cat-col').remove()
       selected_rows = $('.col-select-all input:checked')
       data = row.find('.col-bulk-dispute').text()
-      current_threat_cats = threat_cats
-      current_threat_cats_el = threat_cats_el
       wlbl_err = ''
       tc_err = ''
 
@@ -532,17 +530,18 @@ $ ->
                 wlbl_err += "<span class='col-tag dialog-tag'>  #{wlbl}</span>, "
               return wlbl_col.includes(wlbl)
         )
-        current_threat_cats_el.filter( (tc)->
-          if list_action == 'add'
-            tc_name = $(tc).text().trim()
-            tc_check = stringIncludes(tc_col, tc_name)
-            if tc_check
-              tc_err += tc
-              tc_id = $(tc)[0].getAttribute('data')
-              if (current_threat_cats_el.indexOf(tc)!= -1) then current_threat_cats_el.splice(current_threat_cats_el.indexOf(tc), 1)
-              if (current_threat_cats.indexOf(tc_id)!= -1) then current_threat_cats.splice(current_threat_cats.indexOf(tc_id ), 1)
-
-        )
+        threat_id_array = []
+        current_threat_cats = []
+        for tc in threat_cats_el
+          tc_name = $(tc)[0].innerText
+          tc_check = stringIncludes(tc_col, tc_name)
+          console.log tc_name, tc_check
+          if list_action == 'add' && tc_check
+            tc_err += tc
+            tc_id = $(tc)[0].getAttribute('data')
+          else
+            current_threat_cats.push(tc)
+            threat_id_array.push(tc_id = $(tc)[0].getAttribute('data'))
 
         if wlbl_err != ''
           error_message += "<span>WLBL | #{wlbl_err;}</span>"
@@ -551,7 +550,7 @@ $ ->
         check_list = col_tag_format(check_list_array)
 
         if current_threat_cats.join().length > 0
-           current_threat_cats = "<p data='#{current_threat_cats}' class='threat-cat-col'>Threat Categories: #{current_threat_cats_el.join('')} </p>"
+           current_threat_cats = "<p data='#{threat_id_array}' class='threat-cat-col'>Threat Categories: #{current_threat_cats.join('')} </p>"
         else
           current_threat_cats = ''
 
@@ -825,6 +824,9 @@ $ ->
     errors = []
     ajax_count = text_list.length
     for url in text_list
+      if !url.startsWith('https://') && !url.startsWith('http://')
+        # TODO: Take this out, this if statement is temporary, use until urls not beginning w/http can be validated
+        url = 'http://' + url
       data = {'uri': url}
       $.ajax(
         url: '/escalations/api/v1/escalations/webrep/disputes/is_valid_url'
