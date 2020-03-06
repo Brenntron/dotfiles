@@ -993,6 +993,18 @@ module API
               {:status => "success", :data => DisputeEntry.valid_url?(url), :checked_url => url}
             end
 
+            desc 'valid url?'
+
+            params do
+              requires :ip_address, type: String
+            end
+            #this needs to start with 'http' or 'https'
+            get 'is_valid_ip' do
+              ip = permitted_params[:ip_address]
+
+              {:status => "success", :data => DisputeEntry.is_ip?(ip), :checked_ip => ip}
+            end
+
           end
         end
       end
