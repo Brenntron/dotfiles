@@ -499,13 +499,18 @@ $ ->
         threat_cats.push("#{val}")
         threat_cats_el.push("<span data='#{val}' class='col-tag threat-cat-tag'>#{label}</span>")
 
-
     selected_rows.each ()->
+      ##RIGHT HERE DAN
+      ## use https://www.1234computer.com https://www.G-oogl-e.com
       row = $(this).closest('tr')
       $(row).find('.wlbl-action-col').remove()
       $(row).find('.threat-cat-col').remove()
       selected_rows = $('.col-select-all input:checked')
       data = row.find('.col-bulk-dispute').text()
+      current_threat_cats = threat_cats
+      current_threat_cats_el = threat_cats_el
+      wlbl_err = ''
+      tc_err = ''
 
       if !isEmpty(data)
         error_message = "#{data}: "
@@ -514,10 +519,7 @@ $ ->
         clear_col = row.find('.col-clear-actions')
         wlbl_col = row.find('.col-wlbl').text().replace(/ /g, '').split(',')
         tc_col = row.find('.col-threat-cats').text().split(', ')
-        current_threat_cats = threat_cats
-        current_threat_cats_el = threat_cats_el
-        wlbl_err = ''
-        tc_err = ''
+
         check_list_array = checked_bl.filter( (wlbl)->
           switch(list_action)
             when 'add'
@@ -529,16 +531,16 @@ $ ->
                 wlbl_err += "<span class='col-tag dialog-tag'>  #{wlbl}</span>, "
               return wlbl_col.includes(wlbl)
         )
-        console.log
         current_threat_cats_el.filter( (tc)->
           if list_action == 'add'
             tc_name = $(tc).text().trim()
             tc_check = stringIncludes(tc_col, tc_name)
             if tc_check
               tc_err += tc
-              tc_id = parseInt( $(tc).data() )
+              tc_id = $(tc)[0].getAttribute('data')
               if (current_threat_cats_el.indexOf(tc)!= -1) then current_threat_cats_el.splice(current_threat_cats_el.indexOf(tc), 1)
               if (current_threat_cats.indexOf(tc_id)!= -1) then current_threat_cats.splice(current_threat_cats.indexOf(tc_id ), 1)
+
         )
 
         if wlbl_err != ''
@@ -551,7 +553,7 @@ $ ->
            current_threat_cats = "<p data='#{current_threat_cats}' class='threat-cat-col'>Threat Categories: #{current_threat_cats_el.join('')} </p>"
         else
           current_threat_cats = ''
-#        # Right here
+
         col_dialog = "<p class='wlbl-action-col #{list_action}' data='#{check_list_array}'>#{action_desc}  #{check_list} #{current_threat_cats}<p>"
         delete_button = '<button class="clear-action-button row-action-clear"></button>'
 
