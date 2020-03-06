@@ -508,8 +508,6 @@ $ ->
       $(row).find('.threat-cat-col').remove()
       selected_rows = $('.col-select-all input:checked')
       data = row.find('.col-bulk-dispute').text()
-      current_threat_cats = threat_cats
-      current_threat_cats_el = threat_cats_el
       wlbl_err = ''
       tc_err = ''
 
@@ -545,7 +543,6 @@ $ ->
             current_threat_cats.push(tc)
             threat_id_array.push(tc_id = $(tc)[0].getAttribute('data'))
 
-        console.log current_threat_cats
         if wlbl_err != ''
           error_message += "<span>WLBL | #{wlbl_err;}</span>"
         if tc_err != ''
@@ -553,7 +550,7 @@ $ ->
         check_list = col_tag_format(check_list_array)
 
         if current_threat_cats.join().length > 0
-           current_threat_cats = "<p data='#{current_threat_cats}' class='threat-cat-col'>Threat Categories: #{current_threat_cats_el.join('')} </p>"
+           current_threat_cats = "<p data='#{threat_id_array}' class='threat-cat-col'>Threat Categories: #{current_threat_cats.join('')} </p>"
         else
           current_threat_cats = ''
 
