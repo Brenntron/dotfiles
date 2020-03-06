@@ -200,7 +200,7 @@ $ ->
     submit_btn = $('#wlbl_entries_dropdown .dropdown-submit-button')
     all_checked_items = $('.adjust_wlbl_checkbox:checked')
     current_val = $(this).val()
-    add_wlbl = $('#wlbl-reptool-add:checked').length > 0
+    add_wlbl = $('#wlbl-add:checked').length > 0
     threat_cats = $('#wlbl_entries_dropdown .threat-cat-row')
     disabled = true
     bl_hide = true
@@ -468,7 +468,6 @@ $ ->
 
 
   window.set_action_wlbl_col = () ->
-
 
     $('.grayed-out').removeClass('grayed-out')
 
@@ -845,7 +844,6 @@ $ ->
 
   set_row_text = (e, el) ->
     { which: key, type, shiftKey } = e
-
     text = el.innerText.trim()
     text_list = text.replace( /\n|\s/g, ", " ).split(", ")
     row = el.closest('tr')
@@ -1022,3 +1020,19 @@ $ ->
       col_wbrs.text( score )
     else
       col_wbrs.text( '0.0' )
+
+
+  $('.wlbl-radio-add').click ->
+    toggle_tc_visibility(this)
+
+  window.toggle_tc_visibility = (radio) ->
+    action  = $(radio).val()
+    wrapper = $(radio).parents('.dropdown-menu')[0]
+    tc_row  = $(wrapper).find('.threat-cat-row')[0]
+
+    if action == 'remove'
+      $(tc_row).addClass('hidden')
+      $('.wlbl_thrt_cat_id').each ->
+        $(this).prop('checked', false)
+    else
+      $(tc_row).removeClass('hidden')
