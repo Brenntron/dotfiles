@@ -468,6 +468,8 @@ $ ->
 
 
   window.set_action_wlbl_col = () ->
+
+
     $('.grayed-out').removeClass('grayed-out')
 
     $('#error_modal').dialog()
@@ -483,7 +485,6 @@ $ ->
     error_array = []
     threat_cats_el = []
     threat_cats = []
-
 
     if list_action == 'remove'
       action_desc = 'Remove from: '
@@ -501,7 +502,7 @@ $ ->
 
     selected_rows.each ()->
       ##RIGHT HERE DAN
-      ## use https://www.1234computer.com https://www.G-oogl-e.com
+     
       row = $(this).closest('tr')
       $(row).find('.wlbl-action-col').remove()
       $(row).find('.threat-cat-col').remove()
