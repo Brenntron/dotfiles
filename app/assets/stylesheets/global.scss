@@ -9056,7 +9056,11 @@ th.sorting_1, th.sorting_asc, th.sorting_desc {
     }
   }
 }
-
+.error-tag{
+  font-weight: 200;
+  padding: 0 3px;
+  font-size: 8pt;
+}
 .col-tag{
   background: $faint-neutral-color;
   font-weight: 200;

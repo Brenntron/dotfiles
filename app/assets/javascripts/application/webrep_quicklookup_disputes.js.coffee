@@ -509,7 +509,7 @@ $ ->
       tc_err = ''
 
       if !isEmpty(data)
-        error_message = "#{data}: "
+        error_message = "#{data}| "
         action_col = row.find('.col-actions')
         existing_p = ".#{list_action}  .wlbl-action-col"
         clear_col = row.find('.col-clear-actions')
@@ -541,9 +541,9 @@ $ ->
             threat_id_array.push(tc_id = $(tc)[0].getAttribute('data'))
 
         if wlbl_err != ''
-          error_message += "<span>WLBL | #{wlbl_err;}</span>"
+          error_message += "<span class='error-tag'>WLBL : #{wlbl_err;}</span>"
         if tc_err != ''
-          error_message += "<span> Threat Categories | #{tc_err;}</span>"
+          error_message += "<span class='error-tag'> Threat Categories : #{tc_err;}</span>"
         check_list = col_tag_format(check_list_array)
 
         if current_threat_cats.join().length > 0
@@ -678,7 +678,7 @@ $ ->
           reptool_classes =  $(existing_reptool).text()
           $(action_col).attr( 'reptool_classes', reptool_classes )
 
-      error_message = "#{data} :"
+      error_message = "#{data} |"
       if !isEmpty(data)
 
         if reptool_add == 'drop'
@@ -922,6 +922,7 @@ $ ->
 
   window.get_reptool = (item, headers) ->
     data = {'ip_uris':[item.trim()]}
+    console.log headers, data
     $.ajax(
       url: '/escalations/api/v1/escalations/webrep/disputes/bulk_reptool_get_info_for_form'
       method: 'POST'
