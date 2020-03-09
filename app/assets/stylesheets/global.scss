@@ -749,6 +749,7 @@ button {
 .ticket-owner-button {background-image: url(image_path('icon_user_grey.svg'));}
 .sort-by-button {background-image: url(image_path('icon_sort_by.svg'));}
 .sync-button {background-image: url(image_path('icon_sync.svg'));}
+.auto-resolve-button {background-image: url(image_path('icon_reports_white.svg'));}
 .detection-button {background-image: url(image_path('icon_target.svg'));}
 .disposition-button {background-image: url(image_path('icon_hazard.svg'));}
 .take-ticket-button-full {background-image: url(image_path('icon_take.svg'));}
@@ -2180,10 +2181,29 @@ a.static-nav-item {
   outline: none;
   font-weight: 400;
 }
-
+.hidden-auto-resolve{
+  z-index: 0;
+}
+.webrep_auto_resolve, #auto-resolve-dialog{
+  padding: 13px!important;
+  max-height: 600px!important;
+  overflow-x: scroll!important;
+}
 #add_dispute_entry {
   margin-top: 0;
   width: 155px;
+}
+#auto_resolve_log_button.primary{
+  padding: 7px;
+  font-size: .85em;
+  margin: 0
+}
+#auto-resolve-dialog{
+  width: 50%;
+  margin: 0 auto;
+ .close{
+   margin: 5px
+ }
 }
 #add_dispute_entry:focus {
   border: none !important;
@@ -4002,6 +4022,12 @@ input.communication-subject {
   display: inline-block;
 }
 
+
+#auto-resolve-dialog{
+  padding: 13px;
+  max-height: 700px;
+  overflow-x: auto;
+}
 .email-reply-header-information, .dialog-form-information {
   padding: 5px;
   background-color: $faint-neutral-color;
@@ -4713,7 +4739,7 @@ input.file_attachment {
 }
 
 table > tbody > tr > td.dispute_rep_tools {
-  width: 90px;
+  width: 116px;
   padding: 0 0 8px 0 !important;
   text-align: right;
 }
@@ -4734,7 +4760,6 @@ table > tbody > tr > td.dispute_rep_tools {
 .dispute_rep_tools_wrapper .edit-button {
   background-image: url(image_path('icon_edit_white.svg'));
 }
-
 .dispute_rep_tools .dropdown.open {
   background-color: transparent;
 }
@@ -10243,7 +10268,7 @@ table.rl-content {
 }
 
 // AMP history dialog positioning - jquery overrides
-.ui-dialog[aria-describedby=amp-history-dialog] {
+.ui-dialog[aria-describedby=amp-history-dialog]{
   margin-top: 55px;
   margin-right: 15px;
   border-radius: 5px;
