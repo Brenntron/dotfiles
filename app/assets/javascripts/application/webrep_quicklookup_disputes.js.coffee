@@ -389,6 +389,7 @@ $ ->
     disputes = {
       comment:$('.confirm-rep-input').text()
     }
+    $('#confirmation-modal').modal('toggle');
     $( confirmation_rows ).each ->
 
       row = $( this ).find('td')
@@ -678,7 +679,7 @@ $ ->
           reptool_classes =  $(existing_reptool).text()
           $(action_col).attr( 'reptool_classes', reptool_classes )
 
-      error_message = "#{data} |"
+      error_message = "#{data} | "
       if !isEmpty(data)
 
         if reptool_add == 'drop'

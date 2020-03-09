@@ -83,8 +83,8 @@ And (/^I check checkbox with class "(.*?)"$/) do |cb_class|
   check(class: cb_class)
 end
 
-When(/^I choose "(.*?)"$/) do |target|
-  choose(target)
+And (/^I check the first checkbox with class "(.*?)"$/) do |cb_class|
+  check(class: cb_class)
 end
 
 When(/^I click a table row$/) do

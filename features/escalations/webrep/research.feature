@@ -295,38 +295,64 @@ Feature: Webrep, the BFRP
     And  clean up wlbl and remove all wlbl entries on "prooftesting.com"
 
 
+
+  ####
+  # Quicklookup feature
+  ####
+
   @javascript
-  Scenario: a user can add multiple rows of valid urls to quick lookup on enter
+  Scenario: a user can add multiple rows of valid urls and ips to quick lookup on enter. invalid entries should not have rows built
     Given a user with role "webrep user" exists and is logged in
     When I goto "escalations/webrep/research"
     And I click "#research"
     And I click ".quick-lookup-tab"
     Then I should see content "Submit Reputation Changes" within "#submit-rep-changes"
-    And I enter content "https://1234computer.com https://g-oogl-e.com faketestcom" within p with class ".col-bulk-dispute"
+    And I enter content "1.2.3.4 https://1234computer.com g-oogl-e.com faketestcom" within p with class ".col-bulk-dispute"
     Then I hit enter within ".col-bulk-dispute"
     And  I wait for "2" seconds
-    Then quick lookup entry "1" should have content "https://1234computer.com"
-    Then quick lookup entry "2" should have content "https://g-oogl-e.com"
+    Then quick lookup entry "bulk-dispute" column number "1" should have content "1.2.3.4"
+    Then quick lookup entry "bulk-dispute" column number "2" should have content "https://1234computer.com"
+    Then quick lookup entry "bulk-dispute" column number "3" should have content "g-oogl-e.com"
+    Then I should not see content "faketestcom" within "#research-table"
 
   @javascript
   Scenario: a user can get the reputation data for each row added in quicklookup
     Given a user with role "webrep user" exists and is logged in
-    When I goto "escalations/webrep/research"
-    And I click "#research"
-    And I click ".quick-lookup-tab"
+    When I goto "escalations/webrep/research#lookup-quick"
     Then I should see content "Submit Reputation Changes" within "#submit-rep-changes"
-    And I enter content "https://www.1234computer.com https://www.g-oogl-e.com" within p with class ".col-bulk-dispute"
+    And I enter content "https://www.1234computer.com www.g-oogl-e.com" within p with class ".col-bulk-dispute"
     Then I hit enter within ".col-bulk-dispute"
     Then I click "#get-rep-data"
     And  I wait for "5" seconds
-    Then quick lookup entry "wbrs" "1" should have content "-9.5"
-    Then quick lookup entry "wlbl" "2" should have content "BL-weak, BL-med"
-#    And the following disputes exist:
-#      |id|
-#      |1 |
-#    And the following dispute_entries exist:
-#      |status           | resolution | case_resolved_at  |
-#      |RESOLVED_CLOSED  | FIXED_FP   | 2018-11-06 16:29:5|
-#    When I goto "escalations/webrep/dashboard"
-#    And I click "My Team Tickets"
-#    Then I should see content "My Team Tickets" within ".dashboard-header"
+    # column number 1 == https://www.1234computer.com
+    Then quick lookup entry "wbrs" column number "1" should have content "-9.5"
+    # column number 2 == www.g-oogl-e.com
+    Then quick lookup entry "wlbl" column number "2" should have content "BL-weak, BL-med"
+
+  @javascript
+  Scenario: a user can set the reptool action column and submit reptool suggestions for selected entries
+    Given a user with role "webrep user" exists and is logged in
+    When I goto "escalations/webrep/research#lookup-quick"
+    Then I should see content "Submit Reputation Changes" within "#submit-rep-changes"
+    And I enter content "https://www.1234computer.com www.g-oogl-e.com" within p with class ".col-bulk-dispute"
+    Then I hit enter within ".col-bulk-dispute"
+    Then I click "#get-rep-data"
+    And  I wait for "5" seconds
+    Then I toggle checkbox of quick lookup entry row number "2"
+    Then I click "reptool_entries_button"
+    And  I should see "Adjust Reptool Classification"
+    Then I click "input[name='attackers']"
+    Then I click "input[name='open_proxy']"
+    Then I click "input[name='malware']"
+    Then I click "quick-lookup-reptool-submit"
+    And  I wait for "1" seconds
+    And  I should see "Cannot Add The Following Reptool Classification Dispute"
+    And I should see "https://www.1234computer.com | malware"
+    And I click ".ui-dialog-titlebar-close"
+    Then quick lookup entry "actions" column number "1" should have content "Add classifications: attackers, open_proxy"
+    Then I click "submit-rep-changes"
+    And I should see "New Reputation Dispute Ticket"
+    And I type content "A truly fantastic test comment" within input with id "confirm-rep-input"
+    Then I click "confirm-rep-changes"
+    Then I should see "Loading data..."
+#   Need confirmation that dispute was successfully submitted or errs

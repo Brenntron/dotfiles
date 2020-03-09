@@ -118,7 +118,7 @@
                         .col-x-6
                           %hr.thin
                         .button-row-center
-                          %button.primary.dropdown-submit-button{type: 'button', disabled: true, onclick: 'set_action_col();'}
+                          %button.primary.dropdown-submit-button#quick-lookup-reptool-submit{type: 'button', disabled: true, onclick: 'set_action_col();'}
                             Add Action to Entries
               %div
                 %label.toolbar-section-label File
@@ -149,7 +149,7 @@
                   .comment-wrapper
                     %label.content-label-sm
                       Comment
-                    %textarea.dropdown-comment.confirm-rep-input.comment-input
+                    %textarea#confirm-rep-input.dropdown-comment.confirm-rep-input.comment-input
                   .modal-footer
                     .button-group
                       %button.primary{id:'confirm-rep-changes', onclick: 'confirm_rep_changes(); return false;' } Confirm Reputation Changes
