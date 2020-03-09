@@ -839,7 +839,8 @@ $ ->
         {status, data } = response
         if status == 'success'
           for name, value of data
-            valid_list.push(name)
+            if value
+              valid_list.push(name)
           buildRow(valid_list, row)
     )
   window.check_ips = (text_list) ->
