@@ -38,7 +38,7 @@
                 %span.dropdown
                   %button#wlbl_entries_button.toolbar-button.toolbar-button-spacer.adjust-wlbl-button.dropdown-toggle.esc-tooltipped{title: 'Adjust WL/BL', 'data-toggle': 'dropdown', 'aria-haspopup': 'true', 'aria-expanded': 'false', onclick:'open_wlbl();'}
                     %span.toolbar-button-text Adjust WL/BL
-                  .dropdown-menu.toolbar-dropdown#wlbl_entries_dropdown{'aria-labelledby': 'wlbl_reptool'}
+                  .dropdown-menu.toolbar-dropdown#wlbl_entries_dropdown{'aria-labelledby': 'wlbl_entries_button'}
                     .dropdown-tool-text-divider.secondary-text-divider
                       Adjust WL/BL
                     .col-xs-12
@@ -47,11 +47,11 @@
                           .col-xs-2
                             %label.content-label-sm.reptool-section-label{for: "reptool-class-type-select"} Action
                           .col-xs-5
-                            %input{type: 'radio', class:'wlbl-radio-add', name: 'wlbl-radio', id: 'wlbl-reptool-add', value: 'add', checked: true}
-                            %label.radio-label{for: 'wlbl-reptool-add'} Add to List
+                            %input{type: 'radio', class:'wlbl-radio-add', name: 'wlbl-radio', id: 'wlbl-add', value: 'add', checked: true}
+                            %label.radio-label{for: 'wlbl-add'} Add to List
                           .col-xs-5
-                            %input{type: 'radio', class:'wlbl-radio-add', name: 'wlbl-radio', id: 'wlbl-reptool-remove', value: 'remove'}
-                            %label.radio-label{for: 'wlbl-reptool-remove'} Remove from List
+                            %input{type: 'radio', class:'wlbl-radio-add', name: 'wlbl-radio', id: 'wlbl-remove', value: 'remove'}
+                            %label.radio-label{for: 'wlbl-remove'} Remove from List
                         .row.reptool-classifications-row
                           .col-xs-12
                             %label.content-label-sm.reptool-section-label{for: "reptool-class-type-select"} Lists
@@ -66,8 +66,8 @@
                               .threat-cat-area
                                 - Wbrs::ThreatCategory.selections.each do |label, value|
                                   .threat-cat-cell
-                                    %input{type: 'checkbox',id: nil, class: "wlbl_thrt_cat_id wlbl_thrt_cat_id_#{value}", value: value}
-                                    %label #{label}
+                                    %input{type: 'checkbox',id: "bulk-wlbl-thrtcat-#{value}", class: "wlbl_thrt_cat_id wlbl_thrt_cat_id_#{value}", value: value}
+                                    %label{for: "bulk-wlbl-thrtcat-#{value}"} #{label}
                       .col-xs-12
                         .comment-wrapper
                           %label.col-x-3.reptool-section-label{required: true} WL/BL Comment
@@ -83,7 +83,7 @@
                 %span.dropdown
                   %button#reptool_entries_button.toolbar-button.adjust-reptool-button.dropdown-toggle.esc-tooltipped{title: 'Adjust RepTool BL', 'data-toggle': 'dropdown', 'aria-haspopup': 'true', 'aria-expanded': 'false', onclick: 'open_adjust_reptool();'}
                     %span.toolbar-button-text Adjust RepTool BL
-                  .dropdown-menu.toolbar-dropdown#reptool_entries_bl_dropdown{'aria-labelledby': 'adjust_reptool_bl'}
+                  .dropdown-menu.toolbar-dropdown#reptool_entries_bl_dropdown{'aria-labelledby': 'reptool_entries_button'}
                     .dropdown-tool-text-divider.secondary-text-divider
                       Adjust Reptool Classification
                     .inline-tool-content-wrapper

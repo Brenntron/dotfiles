@@ -984,13 +984,35 @@ module API
             desc 'valid url?'
 
             params do
-              requires :uri, type: String
+              requires :uri, type: Array[String]
             end
             #this needs to start with 'http' or 'https'
             get 'is_valid_url' do
-              url = permitted_params[:uri]
+              urls = permitted_params[:uri]
+              result = {}
+              urls.each do |url|
+                if url.start_with?( 'https://', 'http://')
+                  result[url] = DisputeEntry.valid_url?(url)
+                else
+                  result[url] = DisputeEntry.valid_url?('http://' + url)
+                end
+              end
+              {:status => "success", :data => result, :checked_url => urls}
+            end
 
-              {:status => "success", :data => DisputeEntry.valid_url?(url), :checked_url => url}
+            desc 'valid url?'
+
+            params do
+              requires :ip_address, type: Array[String]
+            end
+            #this needs to start with 'http' or 'https'
+            get 'is_valid_ip' do
+              ips = permitted_params[:ip_address]
+              result = {}
+              ips.each do |ip|
+                result[ip] = DisputeEntry.is_ip?(ip)
+              end
+              {:status => "success", :data => result, :checked_ips => ips}
             end
 
           end

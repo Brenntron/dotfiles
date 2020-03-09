@@ -72,7 +72,7 @@ $ ->
     check_list_array = []
     check_list = ''
     for val in array
-      check_name = "<span class='col-tag'>#{val}</span>"
+      check_name = "<span data='#{val}' class='col-tag'>#{val}</span>"
       check_list_array.push(check_name)
     if check_list_array.length == 2
       check_list = check_list_array.join(' and ')
@@ -114,24 +114,27 @@ $ ->
     $( col_actions ).empty()
     submit_rep_check()
 
-  $(document).on 'click', '.col-actions .col-tag', (e) ->
+
+
+  $(document).on 'click', '.col-actions .col-tag', () ->
     ####
     # handles deleting individual actions from an action column and reformatting the div it lives in + updating the data attribute of the action <p>
     ####
+    action = $(this).attr('data')
+    action_p = $(this).parents('p')[0]
+    action_edit = $(action_p).text().split(':')[0]
+    row = $(this).parents('tr')[0]
+    col_clear = $(row).find('.col-clear-actions')[0]
+    action_col = $(row).find('.row-action-clear')[0]
 
-    { target } = e
-    row = $(target).closest('tr')
-    col_clear = $(row).find('.col-clear-actions')
-    action = $(target).text()
-    action_p = $(target).closest('p')
-    action_edit = action_p.text().split(':')[0];
+    # original data
     data = $(action_p).attr('data').split(',')
-    action_col = $(row).find('.row-action-clear')
-    $(target).remove()
+    # newly refined data with shit removed
+    data = data.filter((data_actions) ->
+      action != data_actions
+    )
 
-    data = data.filter((data_actions)-> return action != data_actions)
-    col_dialog = "#{action_edit}: #{col_tag_format(data)}"
-
+    $(this).remove()
     $(action_p).attr('data', data)
     if data.length == 0
       if $(action_p).hasClass('wlbl-action-col')
@@ -142,7 +145,11 @@ $ ->
       if $(action_col).html() == ''
         $(col_clear).find('button').click()
     else
-      $(action_p).html(col_dialog)
+      unless $.trim(action_edit) == 'Threat Categories'
+        col_dialog = "#{action_edit}: #{col_tag_format(data)}"
+        $(action_p).html(col_dialog)
+
+
 
   $(document).on 'change', '#select-all-bulk', (e) ->
     ####
@@ -190,11 +197,10 @@ $ ->
   wl_array = ['WL-weak', 'WL-med', 'WL-heavy']
 
   $(document).on 'change', '.adjust_wlbl_checkbox', () ->
-    # XXXXXXX
     submit_btn = $('#wlbl_entries_dropdown .dropdown-submit-button')
     all_checked_items = $('.adjust_wlbl_checkbox:checked')
     current_val = $(this).val()
-    add_wlbl = $('#wlbl-reptool-add:checked').length > 0
+    add_wlbl = $('#wlbl-add:checked').length > 0
     threat_cats = $('#wlbl_entries_dropdown .threat-cat-row')
     disabled = true
     bl_hide = true
@@ -462,21 +468,22 @@ $ ->
 
 
   window.set_action_wlbl_col = () ->
+
     $('.grayed-out').removeClass('grayed-out')
 
     $('#error_modal').dialog()
     $('#error_modal .modal-body' ).empty()
     $('#error_modal').dialog( 'destroy' )
 
-    selected_rows = $('.col-select-all input:checked')
-    list_action = $('.wlbl-radio-add:checked').val()
     action_desc = 'Add to: '
     checked_bl = $('.adjust_wlbl_checkbox:checked').map( () -> return $(this).val() ).get()
     bl_check = checked_bl[0].indexOf('BL') != -1
+    selected_rows = $('.col-select-all input:checked')
+    list_action = $('.wlbl-radio-add:checked').val()
 
+    error_array = []
     threat_cats_el = []
     threat_cats = []
-    error_array = []
 
     if list_action == 'remove'
       action_desc = 'Remove from: '
@@ -490,14 +497,7 @@ $ ->
         val = $(check).val()
         label = $(check).next('label').html()
         threat_cats.push("#{val}")
-        threat_cats_el.push("<span data='#{val}' class='col-tag'>#{label}</span>")
-
-    threat_cats = threat_cats.join()
-
-    if threat_cats.length > 0
-      threat_cats = "<p data='#{threat_cats}' class='threat-cat-col'> Threat Categories:#{threat_cats_el.join(', ')} </p>"
-    else
-      threat_cats = ''
+        threat_cats_el.push("<span data='#{val}' class='col-tag threat-cat-tag'>#{label}</span>")
 
     selected_rows.each ()->
       row = $(this).closest('tr')
@@ -505,16 +505,17 @@ $ ->
       $(row).find('.threat-cat-col').remove()
       selected_rows = $('.col-select-all input:checked')
       data = row.find('.col-bulk-dispute').text()
+      wlbl_err = ''
+      tc_err = ''
 
       if !isEmpty(data)
-        error_message = "#{data}: "
+        error_message = "#{data}| "
         action_col = row.find('.col-actions')
         existing_p = ".#{list_action}  .wlbl-action-col"
         clear_col = row.find('.col-clear-actions')
         wlbl_col = row.find('.col-wlbl').text().replace(/ /g, '').split(',')
         tc_col = row.find('.col-threat-cats').text().split(', ')
-        wlbl_err = ''
-        tc_err = ''
+
         check_list_array = checked_bl.filter( (wlbl)->
           switch(list_action)
             when 'add'
@@ -526,24 +527,31 @@ $ ->
                 wlbl_err += "<span class='col-tag dialog-tag'>  #{wlbl}</span>, "
               return wlbl_col.includes(wlbl)
         )
-        threat_cat_array = threat_cats_el.filter( (tc)->
-          if list_action == 'add'
-            tc = $(tc).text().trim()
-            if tc_col.includes(tc)
-              tc_err += threat_cats_el + ', '
-              tc_id = parseInt( $(threat_cats_el).data() )
-              threat_cats_el.indexOf(tc)
-              if (threat_cats_el.indexOf(tc)!= -1) then threat_cats_el.splice(index, 1)
-              if (threat_cats.indexOf(tc)!= -1) then threat_cats.splice(index, 1)
-            return !tc_col.includes(tc)
-        )
+        threat_id_array = []
+        current_threat_cats = []
+        for tc in threat_cats_el
+          tc_name = $(tc)[0].innerText
+          tc_check = stringIncludes(tc_col, tc_name)
+          console.log tc_name, tc_check
+          if list_action == 'add' && tc_check
+            tc_err += tc
+            tc_id = $(tc)[0].getAttribute('data')
+          else
+            current_threat_cats.push(tc)
+            threat_id_array.push(tc_id = $(tc)[0].getAttribute('data'))
 
         if wlbl_err != ''
-          error_message += "<span>WLBL | #{wlbl_err.slice(0, wlbl_err.length - 2);}</span>"
+          error_message += "<span class='error-tag'>WLBL : #{wlbl_err;}</span>"
         if tc_err != ''
-          error_message += "<span> Threat Categories | #{tc_err.slice(0, tc_err.length - 2);}</span>"
+          error_message += "<span class='error-tag'> Threat Categories : #{tc_err;}</span>"
         check_list = col_tag_format(check_list_array)
-        col_dialog = "<p class='wlbl-action-col #{list_action}' data='#{check_list_array}'>#{action_desc}  #{check_list} #{threat_cats}<p>"
+
+        if current_threat_cats.join().length > 0
+           current_threat_cats = "<p data='#{threat_id_array}' class='threat-cat-col'>Threat Categories: #{current_threat_cats.join('')} </p>"
+        else
+          current_threat_cats = ''
+
+        col_dialog = "<p class='wlbl-action-col #{list_action}' data='#{check_list_array}'>#{action_desc}  #{check_list} #{current_threat_cats}<p>"
         delete_button = '<button class="clear-action-button row-action-clear"></button>'
 
         if error_message.endsWith('</span>')
@@ -670,7 +678,7 @@ $ ->
           reptool_classes =  $(existing_reptool).text()
           $(action_col).attr( 'reptool_classes', reptool_classes )
 
-      error_message = "#{data} :"
+      error_message = "#{data} |"
       if !isEmpty(data)
 
         if reptool_add == 'drop'
@@ -731,6 +739,7 @@ $ ->
 
   window.buildRow = ( text_list, parent_row) ->
 # build and append new rows to the HTML in quick lookup
+    bindControls()
     tbody = document.querySelector('.research-table tbody')
     disputes = []
     disputes_data = []
@@ -808,32 +817,44 @@ $ ->
       $( document ).on 'focusout', '.col-bulk-dispute', (e) -> set_row_text(e, this)
     , 250
 
-  window.check_urls = (text_list, row) ->
-    validated_urls = []
-    errors = []
-    ajax_count = text_list.length
-    for url in text_list
-      data = {'uri': url}
-      $.ajax(
-        url: '/escalations/api/v1/escalations/webrep/disputes/is_valid_url'
-        method: 'GET'
-        headers: headers
-        data: data
-        dataType: 'json'
-        success: (response) ->
-          ajax_count--
-          {data, checked_url } = response
-          if data
-            validated_urls.push(checked_url)
-          if ajax_count == 0
-            buildRow(validated_urls, row)
-      )
-
-
+  window.check_urls = (text_list, row, data) ->
+    checked = data.data
+    urls = []
+    valid_list = []
+    for name, value of checked
+      if !value
+        urls.push(name)
+      else
+        valid_list.push(name)
+    data = {'uri': urls}
+    console.log data, headers
+    $.ajax(
+      url: '/escalations/api/v1/escalations/webrep/disputes/is_valid_url'
+      method: 'GET'
+      headers: headers
+      data: data
+      dataType: 'json'
+      success: (response) ->
+        {status, data } = response
+        if status == 'success'
+          for name, value of data
+            if value
+              valid_list.push(name)
+          buildRow(valid_list, row)
+    )
+  window.check_ips = (text_list) ->
+    data = {'ip_address': text_list}
+    $.ajax(
+      url: '/escalations/api/v1/escalations/webrep/disputes/is_valid_ip'
+      method: 'GET'
+      headers: headers
+      data: data
+      dataType: 'json'
+      success: (response) -> return response
+    )
 
   set_row_text = (e, el) ->
     { which: key, type, shiftKey } = e
-
     text = el.innerText.trim()
     text_list = text.replace( /\n|\s/g, ", " ).split(", ")
     row = el.closest('tr')
@@ -844,11 +865,14 @@ $ ->
         return text_list.indexOf item == index
     if key == 13
       if !shiftKey && text_list.length
-#          bindControls()
-        check_urls(text_list, row)
+        check_ips(text_list, headers, row)
+          .then ( check_urls.bind( null, text_list, row) )
+          .then null, (err) -> console.log err
     else if key == 0
       if text_list.length > 1
-        check_urls(text_list, row)
+        check_ips(text_list, headers, row)
+          .then ( check_urls.bind( null, text_list, row) )
+          .then null, (err) -> console.log err
       else
         $(row).data(text)
     else if key == 8
@@ -898,6 +922,7 @@ $ ->
 
   window.get_reptool = (item, headers) ->
     data = {'ip_uris':[item.trim()]}
+    console.log headers, data
     $.ajax(
       url: '/escalations/api/v1/escalations/webrep/disputes/bulk_reptool_get_info_for_form'
       method: 'POST'
@@ -1010,3 +1035,19 @@ $ ->
       col_wbrs.text( score )
     else
       col_wbrs.text( '0.0' )
+
+
+  $('.wlbl-radio-add').click ->
+    toggle_tc_visibility(this)
+
+  window.toggle_tc_visibility = (radio) ->
+    action  = $(radio).val()
+    wrapper = $(radio).parents('.dropdown-menu')[0]
+    tc_row  = $(wrapper).find('.threat-cat-row')[0]
+
+    if action == 'remove'
+      $(tc_row).addClass('hidden')
+      $('.wlbl_thrt_cat_id').each ->
+        $(this).prop('checked', false)
+    else
+      $(tc_row).removeClass('hidden')

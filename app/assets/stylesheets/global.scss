@@ -9010,6 +9010,12 @@ th.sorting_1, th.sorting_asc, th.sorting_desc {
   }
   li{
     width: 33%;
+    label {
+      cursor: pointer;
+    }
+  }
+  li:hover {
+    background-color: transparent !important;
   }
 }
 
@@ -9050,7 +9056,11 @@ th.sorting_1, th.sorting_asc, th.sorting_desc {
     }
   }
 }
-
+.error-tag{
+  font-weight: 200;
+  padding: 0 3px;
+  font-size: 8pt;
+}
 .col-tag{
   background: $faint-neutral-color;
   font-weight: 200;
@@ -11329,13 +11339,14 @@ hr.thin.extra-bottom-marg {
     justify-content: space-around;
   }
   .threat-cat-cell label{
-    color:$type-lighter-color!important
+    color:$type-lighter-color!important;
+    cursor: pointer;
   }
   .dropdown-tool-grey-row{
     margin-left: -17px !important;
     margin-right: -17px !important;
     padding: 4px!important;
-    margin-top: 5px !important;
+    margin-top: 1px !important;
   }
 }
 
@@ -11418,6 +11429,7 @@ span.threat-cat-no-data {
     padding: 1px 5px;
     position: absolute;
     right: 2px;
+    left: unset;
     top: 0;
   }
 }
@@ -11425,7 +11437,6 @@ span.threat-cat-no-data {
 // webrep dispute index > ensure the dispute count is to the right of the domain entry
 .dispute-count {
   position: absolute;
-  left: 180px;
   float: none;
   z-index: 111;
   border-radius: 5px;
@@ -12348,4 +12359,11 @@ span.threat-cat-no-data {
 
 #webcat-index-toolbar .collapse-all {
   margin-right: 0;
+}
+
+.threat-cat-tag:not(:first-child)::before {
+  content: ', ';
+  background-color: #fff;
+  padding: 0 !important;
+  margin: 0 !important;
 }
