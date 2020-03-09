@@ -991,7 +991,11 @@ module API
               urls = permitted_params[:uri]
               result = {}
               urls.each do |url|
-                result[url] = DisputeEntry.valid_url?(url)
+                if url.start_with?( 'https://', 'http://')
+                  result[url] = DisputeEntry.valid_url?(url)
+                else
+                  result[url] = DisputeEntry.valid_url?('http://' + url)
+                end
               end
               {:status => "success", :data => result, :checked_url => urls}
             end

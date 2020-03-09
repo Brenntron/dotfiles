@@ -819,9 +819,6 @@ $ ->
     , 250
 
   window.check_urls = (text_list, row, data) ->
-
-    #      if !url.startsWith('https://') && !url.startsWith('http://')
-    #        url = 'http://' + url    console.log "url", text_list, data, row
     checked = data.data
     urls = []
     valid_list = []
