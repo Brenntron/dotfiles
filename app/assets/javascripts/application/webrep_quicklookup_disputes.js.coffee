@@ -818,31 +818,43 @@ $ ->
       $( document ).on 'focusout', '.col-bulk-dispute', (e) -> set_row_text(e, this)
     , 250
 
-  window.check_urls = (text_list, row) ->
-    validated_urls = []
-    errors = []
-    ajax_count = text_list.length
-    for url in text_list
-      if !url.startsWith('https://') && !url.startsWith('http://')
-        # TODO: Take this out, this if statement is temporary, use until urls not beginning w/http can be validated
-        url = 'http://' + url
-      data = {'uri': url}
-      $.ajax(
-        url: '/escalations/api/v1/escalations/webrep/disputes/is_valid_url'
-        method: 'GET'
-        headers: headers
-        data: data
-        dataType: 'json'
-        success: (response) ->
-          ajax_count--
-          {data, checked_url } = response
-          if data
-            validated_urls.push(checked_url)
-          if ajax_count == 0
-            buildRow(validated_urls, row)
-      )
+  window.check_urls = (text_list, row, data) ->
 
-
+    #      if !url.startsWith('https://') && !url.startsWith('http://')
+    #        url = 'http://' + url    console.log "url", text_list, data, row
+    checked = data.data
+    urls = []
+    valid_list = []
+    for name, value of checked
+      if !value
+        urls.push(name)
+      else
+        valid_list.push(name)
+    data = {'uri': urls}
+    console.log data, headers
+    $.ajax(
+      url: '/escalations/api/v1/escalations/webrep/disputes/is_valid_url'
+      method: 'GET'
+      headers: headers
+      data: data
+      dataType: 'json'
+      success: (response) ->
+        {status, data } = response
+        if status == 'success'
+          for name, value of data
+            valid_list.push(name)
+          buildRow(valid_list, row)
+    )
+  window.check_ips = (text_list) ->
+    data = {'ip_address': text_list}
+    $.ajax(
+      url: '/escalations/api/v1/escalations/webrep/disputes/is_valid_ip'
+      method: 'GET'
+      headers: headers
+      data: data
+      dataType: 'json'
+      success: (response) -> return response
+    )
 
   set_row_text = (e, el) ->
     { which: key, type, shiftKey } = e
@@ -856,11 +868,14 @@ $ ->
         return text_list.indexOf item == index
     if key == 13
       if !shiftKey && text_list.length
-#          bindControls()
-        check_urls(text_list, row)
+        check_ips(text_list, headers, row)
+          .then ( check_urls.bind( null, text_list, row) )
+          .then null, (err) -> console.log err
     else if key == 0
       if text_list.length > 1
-        check_urls(text_list, row)
+        check_ips(text_list, headers, row)
+          .then ( check_urls.bind( null, text_list, row) )
+          .then null, (err) -> console.log err
       else
         $(row).data(text)
     else if key == 8

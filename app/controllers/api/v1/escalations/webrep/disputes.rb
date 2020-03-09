@@ -991,7 +991,7 @@ module API
               urls = permitted_params[:uri]
               result = {}
               urls.each do |url|
-                result[:url] = DisputeEntry.valid_url?(url)
+                result[url] = DisputeEntry.valid_url?(url)
               end
               {:status => "success", :data => result, :checked_url => urls}
             end
