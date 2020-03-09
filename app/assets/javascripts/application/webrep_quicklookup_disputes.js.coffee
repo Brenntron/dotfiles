@@ -500,8 +500,6 @@ $ ->
         threat_cats_el.push("<span data='#{val}' class='col-tag threat-cat-tag'>#{label}</span>")
 
     selected_rows.each ()->
-      ##RIGHT HERE DAN
-     
       row = $(this).closest('tr')
       $(row).find('.wlbl-action-col').remove()
       $(row).find('.threat-cat-col').remove()
@@ -741,6 +739,7 @@ $ ->
 
   window.buildRow = ( text_list, parent_row) ->
 # build and append new rows to the HTML in quick lookup
+    bindControls()
     tbody = document.querySelector('.research-table tbody')
     disputes = []
     disputes_data = []
