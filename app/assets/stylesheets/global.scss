@@ -5377,12 +5377,12 @@ input.table-entry-input:focus {
   }
 }
 
+/* quicklookup > bulk dispute div functions as an input */
 .col-bulk-dispute{
   min-width: 150px;
   min-height: 12px;
 }
-
-/* quicklookup > page load, this contenteditable div should be empty, and have a border to indicate its an input */
+/* have a border to indicate its an input */
 .col-bulk-dispute:empty {
   outline: 1px solid darken($content-bg-color, 10%);
   padding: 2px;
@@ -5392,7 +5392,6 @@ input.table-entry-input:focus {
   content: 'Enter one or more URLs or IPs here...';
   color: darken($content-bg-color, 25%);
 }
-
 
 .research-toolbar{
   color: $type-darkest;
