@@ -196,16 +196,16 @@ $ ->
   bl_array = ['BL-weak', 'BL-med', 'BL-heavy']
   wl_array = ['WL-weak', 'WL-med', 'WL-heavy']
 
-  $(document).on 'change', '.adjust_wlbl_checkbox', () ->
+  $(document).on 'change', '.adjust_wlbl_checkbox', '.wlbl-radio-add', () ->
     submit_btn = $('#wlbl_entries_dropdown .dropdown-submit-button')
     all_checked_items = $('.adjust_wlbl_checkbox:checked')
     current_val = $(this).val()
-    add_wlbl = $('#wlbl-add:checked').length > 0
+    add_wlbl = $('#wlbl-add').is(":checked")
+
     threat_cats = $('#wlbl_entries_dropdown .threat-cat-row')
     disabled = true
     bl_hide = true
     wl_check = false
-
     for check in all_checked_items
       val = $(check).val()
       if bl_array.indexOf(val) > -1 then bl_hide = false
@@ -225,7 +225,10 @@ $ ->
       checked = $('.wlbl_thrt_cat_id:checked').length
       if !bl_hide
         $(wl_el.closest('li')).addClass('grayed-out')
-        if checked > 0 && checked < 6
+        if add_wlbl
+          if checked > 0 && checked < 6
+            disabled = false
+        else
           disabled = false
       else
         $(wl_el.closest('li')).removeClass('grayed-out')
@@ -562,13 +565,14 @@ $ ->
         current_threat_cats = []
         for tc in threat_cats_el
           tc_name = $(tc)[0].innerText
-          tc_check = stringIncludes(tc_col, tc_name)
-          if list_action == 'add' && tc_check
-            tc_err += tc
-            tc_id = $(tc)[0].getAttribute('data')
-          else
-            current_threat_cats.push(tc)
-            threat_id_array.push(tc_id = $(tc)[0].getAttribute('data'))
+          if tc_name != undefined
+            tc_check = stringIncludes(tc_col, tc_name)
+            if list_action == 'add' && tc_check
+              tc_err += tc
+              tc_id = $(tc)[0].getAttribute('data')
+            else
+              current_threat_cats.push(tc)
+              threat_id_array.push(tc_id = $(tc)[0].getAttribute('data'))
 
         if wlbl_err != ''
           error_message += "<span class='error-tag'>WLBL : #{wlbl_err;}</span>"
