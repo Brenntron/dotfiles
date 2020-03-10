@@ -5370,13 +5370,27 @@ input.table-entry-input:focus {
   th {
     color: $type-darkest;
     border-bottom: 1px solid $faint-neutral-color!important;
-    padding: 8px;
+    padding: 8px 8px 8px 10px;
+  }
+  td {
+    padding: 8px 8px 8px 10px;
   }
 }
 
+/* quicklookup > bulk dispute div functions as an input */
 .col-bulk-dispute{
   min-width: 150px;
   min-height: 12px;
+}
+/* have a border to indicate its an input */
+.col-bulk-dispute:empty {
+  outline: 1px solid darken($content-bg-color, 10%);
+  padding: 2px;
+  margin: 3px 20px 3px 0;
+}
+.col-bulk-dispute:empty:after {
+  content: 'Enter one or more URLs or IPs here...';
+  color: darken($content-bg-color, 25%);
 }
 
 .research-toolbar{
@@ -5393,7 +5407,7 @@ input.table-entry-input:focus {
   display: flex;
   align-items: flex-end;
   padding-left: 5px;
-  padding-bottom: 5px;
+  padding-bottom: 6px;
   color: $type-lighter-color;
 }
 
@@ -5791,9 +5805,11 @@ h5.entry-details-table-header {
   background-color: $bug-section-color;
 }
 
+/* quicklookup > adjust reptool dropdown  */
 #reptool_entries_bl_dropdown {
   &{
     min-width: 400px;
+    margin-left: 0;
   }
   hr{
     opacity: 1;
@@ -5832,6 +5848,17 @@ h5.entry-details-table-header {
   }
   .nested-radio-row .col-xs-6:first-of-type{
     padding-left: 8px!important;
+  }
+  .dropdown-tool-text-divider.secondary-text-divider {
+    background: $primary-section-color;
+  }
+  .dropdown-reptool-list li:hover {
+    background: none;
+    cursor: pointer;
+  }
+  .dropdown-reptool-list li label:hover {
+    background: none;
+    cursor: pointer;
   }
 }
 
@@ -9006,7 +9033,7 @@ th.sorting_1, th.sorting_asc, th.sorting_desc {
     flex-wrap: wrap;
     background: $faint-neutral-color;
     margin: auto -17px;
-    padding: 10px 25px;
+    padding: 5px 5px 10px 20px;
   }
   li{
     width: 33%;
@@ -9023,10 +9050,12 @@ th.sorting_1, th.sorting_asc, th.sorting_desc {
   margin-top: 1px;
 }
 
+/* quicklookup > adjust wlbl dropdown  */
 #wlbl_entries_dropdown{
   &{
-    min-width: 507px;
+    min-width: 510px;
     padding: 0 8px !important;
+    margin-left: 0;
   }
   .wlbl-radio-add{
     margin-right: 5px
@@ -9055,6 +9084,13 @@ th.sorting_1, th.sorting_asc, th.sorting_desc {
       padding: 4px 0!important;
     }
   }
+  .dropdown-tool-text-divider.secondary-text-divider {
+    background: $primary-section-color;
+  }
+  .radio-label {
+    margin-left: 4px !important;
+    display: inline-block;
+  }
 }
 .error-tag{
   font-weight: 200;
@@ -9067,6 +9103,7 @@ th.sorting_1, th.sorting_asc, th.sorting_desc {
   padding: 0 3px;
   font-size: 8pt;
   font-family: "Fira Mono", monospace;
+  cursor: default;
 }
 
 .col-actions .col-tag:hover:after{
@@ -11348,6 +11385,9 @@ hr.thin.extra-bottom-marg {
     padding: 4px!important;
     margin-top: 1px !important;
   }
+  .threat-cat-note {
+    padding-left: 10px;
+  }
 }
 
 
@@ -12366,4 +12406,9 @@ span.threat-cat-no-data {
   background-color: #fff;
   padding: 0 !important;
   margin: 0 !important;
+}
+
+/* research page radio buttons */
+#research-search-broad {
+  margin-left: 12px;
 }
