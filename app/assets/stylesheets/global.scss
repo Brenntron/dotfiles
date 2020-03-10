@@ -5791,6 +5791,7 @@ h5.entry-details-table-header {
   background-color: $bug-section-color;
 }
 
+/* quicklookup > adjust reptool dropdown  */
 #reptool_entries_bl_dropdown {
   &{
     min-width: 400px;
@@ -5832,6 +5833,17 @@ h5.entry-details-table-header {
   }
   .nested-radio-row .col-xs-6:first-of-type{
     padding-left: 8px!important;
+  }
+  .dropdown-tool-text-divider.secondary-text-divider {
+    background: $primary-section-color;
+  }
+  .dropdown-reptool-list li:hover {
+    background: none;
+    cursor: pointer;
+  }
+  .dropdown-reptool-list li label:hover {
+    background: none;
+    cursor: pointer;
   }
 }
 
@@ -9023,9 +9035,10 @@ th.sorting_1, th.sorting_asc, th.sorting_desc {
   margin-top: 1px;
 }
 
+/* quicklookup > adjust wlbl dropdown  */
 #wlbl_entries_dropdown{
   &{
-    min-width: 507px;
+    min-width: 360px;
     padding: 0 8px !important;
   }
   .wlbl-radio-add{
@@ -9054,6 +9067,13 @@ th.sorting_1, th.sorting_asc, th.sorting_desc {
     .reptool-section-label{
       padding: 4px 0!important;
     }
+  }
+  .dropdown-tool-text-divider.secondary-text-divider {
+    background: $primary-section-color;
+  }
+  .radio-label {
+    margin-left: 4px !important;
+    display: inline-block;
   }
 }
 .error-tag{
@@ -12366,4 +12386,9 @@ span.threat-cat-no-data {
   background-color: #fff;
   padding: 0 !important;
   margin: 0 !important;
+}
+
+/* research page radio buttons */
+#research-search-broad {
+  margin-left: 12px;
 }

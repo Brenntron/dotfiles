@@ -18,7 +18,6 @@
           .col-xs-4.col-sm-3.col-md-2.col-lg-2.col-xl-1
             = search_form.radio_button(:scope, 'strict', id: 'research-search-strict', checked: params['search'] && params['search']['scope'].eql?("strict"))
             %label.esc-tooltipped{title: 'Strict Search returns the inputted URI/IP as an entry, in addition to all entries that match the URL pattern.', for: 'research-search-strict'} Strict Search
-            %br
             = search_form.radio_button(:scope, 'broad', id: 'research-search-broad', checked: !params['search'] || params['search']['scope'].eql?("broad"))
             %label.esc-tooltipped{title: 'Broad Search returns all records matching the URL pattern.', for: 'research-search-broad'} Broad Search
             %hr.thin
