@@ -5382,6 +5382,13 @@ input.table-entry-input:focus {
   min-height: 12px;
 }
 
+/* quicklookup > page load, this contenteditable div should be empty, and have a border to indicate its an input */
+.col-bulk-dispute:empty {
+  outline: 1px solid darken($content-bg-color, 10%);
+  padding: 2px;
+  margin: 3px 20px 3px 0;
+}
+
 .research-toolbar{
   color: $type-darkest;
   width: unset;
