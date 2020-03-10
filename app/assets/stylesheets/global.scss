@@ -5388,6 +5388,11 @@ input.table-entry-input:focus {
   padding: 2px;
   margin: 3px 20px 3px 0;
 }
+.col-bulk-dispute:empty:after {
+  content: 'Enter one or more URLs or IPs here...';
+  color: darken($content-bg-color, 25%);
+}
+
 
 .research-toolbar{
   color: $type-darkest;
