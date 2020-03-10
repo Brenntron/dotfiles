@@ -246,6 +246,19 @@ $ ->
     ####
     comment = $('#confirmation-modal').find('.comment-input').text()
     $('#confirmation-modal').modal('hide')
+
+    error_array = []
+    ajax_count = Object.keys(disputes).length - 1
+    
+    dispute_calls = setInterval(()->
+       if ajax_count == 0
+         if error_array.length == 0
+          std_msg_success('Success', ["All actions on entries were successfully submitted"], reload: false)
+         else
+           std_msg_error('Error', error_array, reload: false)
+         clearInterval(dispute_calls);
+    , 500);
+
     for dispute, value of disputes
       { action } = value
       if action != undefined
@@ -255,23 +268,32 @@ $ ->
               when ('maintain' || 'override')
                 data = [{
                   'action': 'ACTIVE'
-                  'entries': [dispute]
+                  'entries': [dispute.trim()]
                   'classifications': act[key]
                   'comment': comment
                 }]
-                maintain_reptool_bl(data)
+                maintain_reptool_bl(data).then((response, data)=>
+                  ajax_count--
+                  if !response
+                    error_message = "<p>Unable to update all reptool entries.</p>"
+                    error_array.push(error_message)
+                ).then null, (err) -> console.log err
               when 'drop'
                 data = {
                   'action': 'EXPIRED'
-                  'entries': [dispute]
+                  'entries': [dispute.trim()]
                   'comment':  comment
                   'classifications': act[key]
                 }
-                drop_reptool_bl(data)
-
+                drop_reptool_bl(data).then((response,  data)=>
+                  ajax_count--
+                  if !response
+                    error_message = "<p>Unable to drop all reptool entries.</p>"
+                    error_array.push(error_message)
+                ).then null, (err) -> console.log err
               when 'add'
                 data = {
-                  'urls':[dispute]
+                  'urls':[dispute.trim()]
                   'trgt_list': act[key]
                   'note': comment
                 }
@@ -284,7 +306,12 @@ $ ->
                       { tc_ids } = el
                       data.thrt_cat_ids = tc_ids
 
-                adjust_wlbl(data)
+                adjust_wlbl(data).then((response)=>
+                  ajax_count--
+                  if !response
+                    error_message = "<p>Unable to adjust all wlbl entries.</p>"
+                    error_array.push(error_message)
+                ).then null, (err) -> console.log err
 
               when 'remove'
                 data = {
@@ -292,7 +319,12 @@ $ ->
                   'list_types': act[key]
                   'note': comment
                 }
-                remove_wlbl(data)
+                remove_wlbl(data).then((response)=>
+                  ajax_count--
+                  if !response
+                    error_message = "<p>Unable to remove all wlbl entries.</p>"
+                    error_array.push(error_message)
+                ).then null, (err) -> console.log err
 
 
   window.maintain_reptool_bl = (data)->
@@ -319,7 +351,6 @@ $ ->
     )
 
   window.adjust_wlbl = (data) ->
-    console.log 'inininininin'
     std_msg_ajax(
       method: 'POST'
       url: '/escalations/api/v1/escalations/webrep/disputes/uri_wlbl'
@@ -331,7 +362,6 @@ $ ->
     )
 
   window.remove_wlbl = (data) ->
-    console.log data
     std_msg_ajax(
       method: 'POST'
       url: '/escalations/api/v1/escalations/webrep/disputes/bulk_rule_ui_wlbl_remove'
@@ -533,7 +563,6 @@ $ ->
         for tc in threat_cats_el
           tc_name = $(tc)[0].innerText
           tc_check = stringIncludes(tc_col, tc_name)
-          console.log tc_name, tc_check
           if list_action == 'add' && tc_check
             tc_err += tc
             tc_id = $(tc)[0].getAttribute('data')
@@ -828,7 +857,6 @@ $ ->
       else
         valid_list.push(name)
     data = {'uri': urls}
-    console.log data, headers
     $.ajax(
       url: '/escalations/api/v1/escalations/webrep/disputes/is_valid_url'
       method: 'GET'
@@ -923,7 +951,6 @@ $ ->
 
   window.get_reptool = (item, headers) ->
     data = {'ip_uris':[item.trim()]}
-    console.log headers, data
     $.ajax(
       url: '/escalations/api/v1/escalations/webrep/disputes/bulk_reptool_get_info_for_form'
       method: 'POST'
