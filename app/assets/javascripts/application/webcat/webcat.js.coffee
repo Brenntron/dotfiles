@@ -5,6 +5,18 @@ window.td_truncate = (str, max, long) ->
   long = long or '...'
   if typeof str == 'string' and str.length > max then str.substring(0, max) + long else str
 
+window.def_includes = (check, str) ->
+  return check.indexOf(str) != -1
+
+window.timeMatch = (age)->
+  time = 'exceeds time'
+  if !def_includes(age, 'months')
+    if def_includes(age, 'm') && def_includes(age, 's')
+      time = 'minutes'
+    else if def_includes(age, 'h') && def_includes(age, 'm')
+      time =  'hours'
+  return time
+
 window.wbrs_display = (score) ->
   score = parseFloat(score)
   if score == NaN
@@ -450,32 +462,20 @@ $ ->
 #               age column
                 width: '40px'
                 render: ( data, type, full, meta) ->
-                  { age, case_opened_at } = full
-                  if age != "<1 hr"
-                    dispute_duration = moment( case_opened_at ).fromNow()
-                  if dispute_duration.includes('minute')
-                    dispute_latency = age
-                  if dispute_duration.includes('hour')
-                    hours = parseInt(dispute_duration.replace(/[^0-9]/g, ''))
-                  if hours <= 3
-                    dispute_latency = age
-                  else
-                    dispute_latency = '<span class="ticket-age-over3hr">' + age + '</span>'
-                  if hours > 12
-                    dispute_latency = '<span class="ticket-age-over12hr">' + age + '</span>'
-                  else
-                    dispute_latency = '<span class="ticket-age-over12hr">' + age + '</span>'
-                  if dispute_duration.includes('day')
-                    day = parseInt(age.replace(/[^0-9]/g, ''))
-                  if day >= 1
-                    dispute_latency = '<span class="ticket-age-over12hr">' + age + '</span>'
-                  if dispute_duration.includes('months')
-                    month = parseInt(age.replace(/[^0-9]/g, ''))
-                    dispute_latency = '<span class="ticket-age-over12hr">' + age + '</span>'
-                  if dispute_duration.includes('year')
-                    year = parseInt(age.replace(/[^0-9]/g, ''))
-                    dispute_latency = '<span class="ticket-age-over12hr">' + age + '</span>'
-                  dispute_latency
+                  { age } = full
+                  time = timeMatch(age)
+                  switch ( time )
+                    when 'minutes'
+                      age_class = ''
+                    when 'hours'
+                      hour = parseInt( age.split("h")[0] )
+                      if hour >= 3 && hour < 12
+                        age_class = 'ticket-age-over3hr'
+                      else if hour > 12
+                        age_class = 'ticket-age-over12hr'
+                    when 'exceeds time'
+                      age_class = 'ticket-age-over12hr'
+                  return "<span class='#{age_class}'>#{age}</span>"
               }
               {
                 data: 'status'
