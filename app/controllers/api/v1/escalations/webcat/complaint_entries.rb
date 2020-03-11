@@ -543,6 +543,7 @@ module API
                   begin
                     complaint_entry = ComplaintEntry.find(entry)
                     processed = complaint_entry.process_resolution_changes(permitted_params[:resolution], permitted_params[:internal_comment], permitted_params[:customer_facing_comment])
+
                     confirmations << processed
                   rescue
                     confirmations << {status: 'ERROR', id: entry.id, resolution: permitted_params[:resolution], internal_comment: permitted_params[:internal_comment],
