@@ -390,7 +390,7 @@ $ ->
 
       if stringIncludes(action_classes, 'add')
         return 'add'
-      else if stringIncludes(action_classes, 'add')
+      else if stringIncludes(action_classes, 'remove')
         return 'remove'
       else
         return 'tc_ids'
@@ -844,11 +844,11 @@ $ ->
       , 20
 
   window.bindControls = () ->
-    # unbind and rebind focusout to prevent the rebuilding of the table from being stuck in a loop
+    # unbind and rebind blur to prevent the rebuilding of the table from being stuck in a loop
     #THESE MAY NOT ACTUALLY BE NECESSARY, standby or details
-    $(document).unbind('focusout')
+    $(document).unbind('blur')
     setTimeout () ->
-      $( document ).on 'focusout', '.col-bulk-dispute', (e) -> set_row_text(e, this)
+      $( document ).on 'blur', '.col-bulk-dispute', (e) -> set_row_text(e, this)
     , 250
 
   window.check_urls = (text_list, row, data) ->
@@ -912,7 +912,7 @@ $ ->
         if isEmpty(text) && $(tbody).children().length > 1
           $(row).remove()
 
-  $( document ).on 'keydown focusout', '.col-bulk-dispute', (e) ->
+  $( document ).on 'keydown blur', '.col-bulk-dispute', (e) ->
     set_row_text(e, this)
     e.stopPropagation()
 
