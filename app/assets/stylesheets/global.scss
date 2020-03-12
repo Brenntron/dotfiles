@@ -5381,8 +5381,9 @@ input.table-entry-input:focus {
 .col-bulk-dispute{
   min-width: 150px;
   min-height: 12px;
+  vertical-align: top;
 }
-/* have a border to indicate its an input */
+/* add a border to indicate its an input */
 .col-bulk-dispute:empty {
   outline: 1px solid darken($content-bg-color, 10%);
   padding: 2px;
