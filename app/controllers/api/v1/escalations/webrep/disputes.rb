@@ -782,7 +782,7 @@ module API
             end
 
             get 'rule_api_info' do
-              params[:entry] = params[:entry].strip
+              params[:uri] = params[:uri].strip
 
               information = Wbrs::ManualWlbl.where({:url => params[:uri]})
 
@@ -792,7 +792,7 @@ module API
 
               data = []
               information.each do |entry|
-                if entry.url == params[:entry]
+                if entry.url == params[:uri]
                   if entry.state == "active"
                     entry.threat_cats = DisputeEntry.threat_cats_from_ids(entry.threat_cats)
                     data << entry
@@ -800,7 +800,7 @@ module API
                 end
               end
 
-              note_entries = note_entries.uniq
+              note_entries = []
 
               return {:status => "success", :data => data, :notes => note_entries.first}.to_json
 

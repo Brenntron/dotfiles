@@ -1046,12 +1046,15 @@ $ ->
   window.get_rule_threat_cat = (item, headers) ->
     data = {'uri': item.trim()}
     $.ajax(
-      url: '/escalations/api/v1/escalations/webrep/disputes/threat_categories'
-      method: 'POST'
+      url: '/escalations/api/v1/escalations/webrep/disputes/rule_api_info'
+      method: 'GET'
       headers: headers
       data: data
       dataType: 'json'
-      success: (response) -> return response
+      success: (response) ->
+        console.log response
+        debugger
+        return response
       error: (response) -> return response
     )
 
@@ -1105,14 +1108,22 @@ $ ->
     { threat_categories } = JSON.parse(data)
     if threat_categories != undefined
       if threat_categories.length
-        text = threat_categories.join(', ')
+        text = "<span class='rule-api-tc esc-tooltipped' title = 'SDS will take a few hours to reflect changes.'> #{threat_categories.join(', ')}</span>"
       else
-        console.log 'inininininin'
-        text = '<span class="missing-data">No Rule API data</span>'
+        text = '<span class="missing-data rule-api-tc esc-tooltipped" title = "SDS will take a few hours to reflect changes."> No Rule API data</span>'
       col_tc.append("| #{text}")
     else
-      console.log 'inininininin'
-      col_tc.append( '| <span class="missing-data">No Rule API data</span>' )
+      col_tc.append( "| <span class='missing-data rule-api-tc esc-tooltipped' title = 'SDS will take a few hours to reflect changes.'> No Rule API data</span>" )
+
+
+
+  $('body').on 'mouseenter', '.rule-api-tc:not(.tooltipstered)', ->
+    console.log 'ininininin'
+    $(this).tooltipster(
+      side: 'bottom'
+      interactive: true
+      theme: ['tooltipster-borderless', 'tooltipster-borderless-customized']
+    ).tooltipster 'open'
 
   window.set_wrbs = ( item, row, data) ->
     { score, rulehits } = data.json.data
