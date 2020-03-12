@@ -800,7 +800,7 @@ module API
                 end
               end
 
-              note_entries = note_entries.uniq
+              note_entries = []
 
               return {:status => "success", :data => data, :notes => note_entries.first}.to_json
 
