@@ -11,11 +11,13 @@ $ ->
       $('.ajax-message-div').css('display', 'flex')
     ajaxStop: () ->
       $('.ajax-message-div').hide()
+
     ajaxComplete: () ->
       completed_counter++
       selected_rows = $('.col-select-all input:checked').length * 4 - 4
       if completed_counter == selected_rows
         $('.ajax-message-div').hide()
+
   )
   window.isEmpty = (item) ->
     ####
@@ -202,7 +204,7 @@ $ ->
     current_val = $(this).val()
     add_wlbl = $('#wlbl-add').is(":checked")
 
-    threat_cats = $('#wlbl_entries_dropdown .threat-cat-row')
+    tc_rows = $('#wlbl_entries_dropdown .threat-cat-row')
     disabled = true
     bl_hide = true
     wl_check = false
@@ -237,11 +239,26 @@ $ ->
       disabled = false
 
     if !bl_hide && add_wlbl
-      $(threat_cats).removeClass('hidden')
+      $(tc_row).removeClass('hidden')
     else
-      $(threat_cats).addClass('hidden')
+      $(tc_row).addClass('hidden')
 
     submit_btn.prop('disabled', disabled)
+
+  $('.wlbl-radio-add').click ->
+    toggle_tc_visibility(this)
+
+  window.toggle_tc_visibility = (radio) ->
+    action  = $(radio).val()
+    wrapper = $(radio).parents('.dropdown-menu')[0]
+    tc_row  = $(wrapper).find('.threat-cat-row')[0]
+
+    if action == 'remove'
+      $(tc_row).addClass('hidden')
+      $('.wlbl_thrt_cat_id').each ->
+        $(this).prop('checked', false)
+    else
+      $(tc_row).removeClass('hidden')
 
   window.call_action_switchboard = (disputes) ->
     ####
@@ -774,6 +791,7 @@ $ ->
   window.buildRow = ( text_list, parent_row) ->
 # build and append new rows to the HTML in quick lookup
     bindControls()
+    # Once the table has been rebuilt, find the empty row and focus on it
     tbody = document.querySelector('.research-table tbody')
     disputes = []
     disputes_data = []
@@ -833,9 +851,7 @@ $ ->
 # if the dispute is an HTML object, set it as OuterHTML to avoid formatting issues
         tbody.innerHTML += disputes[i].outerHTML
 
-      # Once the table has been rebuilt, find the empty row and focus on it
-      col_dispute = $(tbody).find('tr .col-bulk-dispute')
-      col_dispute.each ->
+      $(tbody).find('tr .col-bulk-dispute').each ->
         if isEmpty( $(this).attr('data') )
           this.focus()
 
@@ -843,10 +859,11 @@ $ ->
         $("br").remove()
       , 20
 
+
+
   window.bindControls = () ->
     # unbind and rebind blur to prevent the rebuilding of the table from being stuck in a loop
-    #THESE MAY NOT ACTUALLY BE NECESSARY, standby or details
-    $(document).unbind('blur')
+    $(document).off('blur', '.col-bulk-dispute')
     setTimeout () ->
       $( document ).on 'blur', '.col-bulk-dispute', (e) -> set_row_text(e, this)
     , 250
@@ -860,21 +877,25 @@ $ ->
         urls.push(name)
       else
         valid_list.push(name)
-    data = {'uri': urls}
-    $.ajax(
-      url: '/escalations/api/v1/escalations/webrep/disputes/is_valid_url'
-      method: 'GET'
-      headers: headers
-      data: data
-      dataType: 'json'
-      success: (response) ->
-        {status, data } = response
-        if status == 'success'
-          for name, value of data
-            if value
-              valid_list.push(name)
-          buildRow(valid_list, row)
-    )
+    if urls.length
+      data = {'uri': urls}
+      $.ajax(
+        url: '/escalations/api/v1/escalations/webrep/disputes/is_valid_url'
+        method: 'GET'
+        headers: headers
+        data: data
+        dataType: 'json'
+        success: (response) ->
+          {status, data } = response
+          if status == 'success'
+            for name, value of data
+              if value
+                valid_list.push(name)
+            buildRow(valid_list, row)
+      )
+    else
+      buildRow(valid_list, row)
+      return true
   window.check_ips = (text_list) ->
     data = {'ip_address': text_list}
     $.ajax(
@@ -920,6 +941,7 @@ $ ->
     $('.ajax-message-div').css('display','flex')
   )
   $(document).on 'click', '#get-rep-data', (e) ->
+#   needs to be an onclick to prevent from refreshing the page
     e.preventDefault()
     search_items = []
     rows = $('.research-table tbody tr')
@@ -1067,19 +1089,3 @@ $ ->
       col_wbrs.text( score )
     else
       col_wbrs.text( '0.0' )
-
-
-  $('.wlbl-radio-add').click ->
-    toggle_tc_visibility(this)
-
-  window.toggle_tc_visibility = (radio) ->
-    action  = $(radio).val()
-    wrapper = $(radio).parents('.dropdown-menu')[0]
-    tc_row  = $(wrapper).find('.threat-cat-row')[0]
-
-    if action == 'remove'
-      $(tc_row).addClass('hidden')
-      $('.wlbl_thrt_cat_id').each ->
-        $(this).prop('checked', false)
-    else
-      $(tc_row).removeClass('hidden')
