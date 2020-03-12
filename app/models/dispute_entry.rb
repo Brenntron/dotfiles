@@ -982,6 +982,25 @@ class DisputeEntry < ApplicationRecord
 
   end
 
+  def self.threat_cats_from_ids(ids)
+    results = JSON.parse(Sbrs::Base.remote_call_sds_v3("", "threatcat_labels"))
+
+    response = []
+
+    ids.each do |id|
+      threat_cat = {}
+      threat_cat[:id] = id
+      threat_cat[:mnemonic] = results[id.to_s]["mnemonic"]
+      threat_cat[:name] = results[id.to_s]["name"]
+      threat_cat[:description] = results[id.to_s]["description"]
+
+      response << threat_cat
+    end
+
+    response
+
+  end
+
   def is_disposition_matching?
 
     begin
