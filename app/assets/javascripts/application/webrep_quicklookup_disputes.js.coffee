@@ -14,7 +14,8 @@ $ ->
 
     ajaxComplete: () ->
       completed_counter++
-      selected_rows = $('.col-select-all input:checked').length * 4 - 4
+#     selected_rows needs to be multiplied by the number of ajax calls that are being made to accurately gauge the number of calls
+      selected_rows = $('.col-select-all input:checked').length * 5
       if completed_counter == selected_rows
         $('.ajax-message-div').hide()
 
@@ -204,7 +205,7 @@ $ ->
     current_val = $(this).val()
     add_wlbl = $('#wlbl-add').is(":checked")
 
-    tc_rows = $('#wlbl_entries_dropdown .threat-cat-row')
+    tc_row = $('#wlbl_entries_dropdown .threat-cat-row')
     disabled = true
     bl_hide = true
     wl_check = false
@@ -310,8 +311,10 @@ $ ->
                   if !response
                     error_message = "<p>Unable to drop all reptool entries.</p>"
                     error_array.push(error_message)
-                ).then null, (err) -> console.log err
+                )
+#                  .then null, (err) -> console.log err
               when 'add'
+
                 data = {
                   'urls':[dispute.trim()]
                   'trgt_list': act[key]
@@ -325,13 +328,14 @@ $ ->
                     if el.tc_ids
                       { tc_ids } = el
                       data.thrt_cat_ids = tc_ids
-
+                      console.log data
                 adjust_wlbl(data).then((response)=>
                   ajax_count--
                   if !response
                     error_message = "<p>Unable to adjust all wlbl entries.</p>"
                     error_array.push(error_message)
-                ).then null, (err) -> console.log err
+                )
+#                  .then null, (err) -> console.log err
 
               when 'remove'
                 data = {
@@ -371,6 +375,7 @@ $ ->
     )
 
   window.adjust_wlbl = (data) ->
+
     std_msg_ajax(
       method: 'POST'
       url: '/escalations/api/v1/escalations/webrep/disputes/uri_wlbl'
@@ -941,7 +946,7 @@ $ ->
     $('.ajax-message-div').css('display','flex')
   )
   $(document).on 'click', '#get-rep-data', (e) ->
-#   needs to be an onclick to prevent from refreshing the page
+  #   needs to be an onclick to prevent from refreshing the page
     e.preventDefault()
     search_items = []
     rows = $('.research-table tbody tr')
@@ -970,6 +975,9 @@ $ ->
           .then null, (err) -> console.log err
         new get_threat_cat(item, headers)
           .then ( set_threat_cat.bind( null, item, row) )
+          .then null, (err) -> console.log err
+        new get_rule_threat_cat(item, headers)
+          .then ( set_rule_threat_cat.bind( null, item, row) )
           .then null, (err) -> console.log err
         new get_wrbs(item, headers)
           .then( set_wrbs.bind( null, item, row) )
@@ -1035,6 +1043,18 @@ $ ->
       error: (response) -> return response
     )
 
+  window.get_rule_threat_cat = (item, headers) ->
+    data = {'uri': item.trim()}
+    $.ajax(
+      url: '/escalations/api/v1/escalations/webrep/disputes/threat_categories'
+      method: 'POST'
+      headers: headers
+      data: data
+      dataType: 'json'
+      success: (response) -> return response
+      error: (response) -> return response
+    )
+
   window.set_reptool = ( item, row, data) ->
     { classification } = JSON.parse(data)[0]
     col_reptool = $(row).children('.col-reptool-class')
@@ -1070,12 +1090,29 @@ $ ->
   window.set_threat_cat = ( item, row, data) ->
     col_tc = $(row).children('.col-threat-cats')
     { threat_categories } = JSON.parse(data)
-    if threat_categories.length
-      text = threat_categories.join(', ')
+    if threat_categories != undefined
+      if threat_categories.length
+        text = threat_categories.join(', ')
+      else
+        text = '<span class="missing-data">No data</span>'
+      col_tc.prepend( text )
     else
-      text = 'No data'
-      col_tc.addClass('missing-data')
-    col_tc.text( text )
+      console.log 'undefined', item, row, data
+      col_tc.prepend( '<span class="missing-data">No data</span>')
+
+  window.set_rule_threat_cat = ( item, row, data) ->
+    col_tc = $(row).children('.col-threat-cats')
+    { threat_categories } = JSON.parse(data)
+    if threat_categories != undefined
+      if threat_categories.length
+        text = threat_categories.join(', ')
+      else
+        console.log 'inininininin'
+        text = '<span class="missing-data">No Rule API data</span>'
+      col_tc.append("| #{text}")
+    else
+      console.log 'inininininin'
+      col_tc.append( '| <span class="missing-data">No Rule API data</span>' )
 
   window.set_wrbs = ( item, row, data) ->
     { score, rulehits } = data.json.data
