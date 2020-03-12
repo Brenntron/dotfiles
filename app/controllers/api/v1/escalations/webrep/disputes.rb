@@ -778,6 +778,43 @@ module API
             end
 
             params do
+              requires :uri, type: String
+            end
+
+            get 'rule_api_info' do
+              params[:entry] = params[:entry].strip
+
+              information = Wbrs::ManualWlbl.where({:url => params[:uri]})
+
+              if information.blank?
+                return {:status => 'success', :data => ""}.to_json
+              end
+
+              data = []
+              information.each do |entry|
+                if entry.url == params[:entry]
+                  if entry.state == "active"
+                    entry.threat_cats = DisputeEntry.threat_cats_from_ids(entry.threat_cats)
+                    data << entry
+                  end
+                end
+              end
+
+              note_entries = note_entries.uniq
+
+              return {:status => "success", :data => data, :notes => note_entries.first}.to_json
+
+            end
+
+
+
+
+
+
+
+
+
+            params do
               requires :entries, type: Array[String]
             end
 
@@ -1000,7 +1037,7 @@ module API
               {:status => "success", :data => result, :checked_url => urls}
             end
 
-            desc 'valid url?'
+            desc 'valid ip?'
 
             params do
               requires :ip_address, type: Array[String]
