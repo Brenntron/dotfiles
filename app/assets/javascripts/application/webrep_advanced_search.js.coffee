@@ -35,6 +35,7 @@ $(document).ready ->
 
   $('.remove-input').click ->
     field = $(this).parent()
+    field.find('input').val('')  # on a minus icon click, clear value of field
     field_name = field.find('input').attr('id') || field.find('select').attr('id')
     field_wrapper = field.attr('id')
     $('.search-checkbox').each ->
