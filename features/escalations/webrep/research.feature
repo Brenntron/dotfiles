@@ -195,6 +195,7 @@ Feature: Webrep, the BFRP
     And  I check checkbox with class "bfrp-checkbox-5"
     And  I click button "wlbl_entries_button"
     And  I wait for "5" seconds
+    And  take a screenshot
     Then I should see "Not on a list"
     And  wl/bl result number "0" should not have content "WL-weak"
     And  wl/bl result number "1" should not have content "WL-weak"
@@ -283,6 +284,7 @@ Feature: Webrep, the BFRP
     And  I check checkbox with class "bl-weak-checkbox"
     When I click "Submit Changes"
     And  I wait for "5" seconds
+    And  take a screenshot
     Then I should see "ENTRIES HAVE BEEN UPDATED"
     And  I should see "Have been removed"
     When I click ".close"
@@ -365,5 +367,80 @@ Feature: Webrep, the BFRP
     And I type content "A truly fantastic test comment" within input with id "confirm-rep-input"
     Then I click "confirm-rep-changes"
 #    Then I should see "Loading data..."
-#    Quicklookup ajax call isn't working, data is undefined, fuck this
 #   Need confirmation that dispute was successfully submitted or errs
+
+  # Querying URI + IP (+ IP)
+  @javascript
+  Scenario: a user wants to search for a url on the research page and view its initial resolved ips
+    Given a user with role "webrep user" exists and is logged in
+    When I goto "escalations/webrep/research"
+    And  I choose "research-search-strict"
+    And  I type content "testing.com" within input with id "search_uri"
+    When I hit enter within "#search_uri"
+    And  I wait for "60" seconds
+    And  I should see content "2606:4700:3037::6818:6431" within "#resolved-ip-content-no-0"
+
+
+  @javascript
+  Scenario: a user wants to query a different host ip than the one returned on a research page result
+    Given a user with role "webrep user" exists and is logged in
+    When I goto "escalations/webrep/research"
+    And  I choose "research-search-strict"
+    And  I type content "testing.com" within input with id "search_uri"
+    When I hit enter within "#search_uri"
+    And  I wait for "60" seconds
+    And  I should see content "2606:4700:3037::6818:6431" within "#resolved-ip-content-no-0"
+    And  I should not see content "1.1.1.1" within "#resolved-ip-content-no-0"
+    And  I should see element "#edit-ip-result-no-0"
+    Then I click "#edit-ip-result-no-0"
+    And  I fill in element, "#table-ip-input-no-0" with "1.1.1.1"
+    And  I should see "Query IP Addresses"
+    And  I click "Query IP Addresses"
+    Then I wait for "15" seconds
+    And  I should see content "1.1.1.1" within "#resolved-ip-content-no-0"
+
+
+  @javascript
+  Scenario: a user wants to add multiple resolved host IPs to a research page result
+    Given a user with role "webrep user" exists and is logged in
+    When I goto "escalations/webrep/research"
+    And  I choose "research-search-strict"
+    And  I type content "testing.com" within input with id "search_uri"
+    When I hit enter within "#search_uri"
+    And  I wait for "60" seconds
+    And  I should not see content "1.1.1.1" within "#resolved-ip-content-no-0"
+    And  I should see element "#edit-ip-result-no-0"
+    Then I click "#edit-ip-result-no-0"
+    And  I fill in element, "#table-ip-input-no-0" with "1.1.1.1, 2.2.2.2"
+    And  I should see "Query IP Addresses"
+    And  I click "Query IP Addresses"
+    Then I wait for "15" seconds
+    And  I should see content "1.1.1.1, 2.2.2.2" within "#resolved-ip-content-no-0"
+
+
+  @javascript
+  Scenario: a user tries to add an improper IP address as a resolved host IP to a dispute entry
+    Given a user with role "webrep user" exists and is logged in
+    When I goto "escalations/webrep/research"
+    And  I choose "research-search-strict"
+    And  I type content "testing.com" within input with id "search_uri"
+    When I hit enter within "#search_uri"
+    And  I wait for "60" seconds
+    Then I click "#edit-ip-result-no-0"
+    And  I fill in element, "#table-ip-input-no-0" with "drumf"
+    And  I click "Query IP Addresses"
+    Then I wait for "15" seconds
+    And  I should not see content "drumf" within "#resolved-ip-content-no-0"
+
+
+# This test is pending due to a bug discovered when searching for ips on bfrp - ips searched for are being labeled as uri
+  @javascript
+  Scenario: a user cannot add a resolved host IP to a dispute entry that is an IP entry
+    Then  pending
+    Given a user with role "webrep user" exists and is logged in
+    When I goto "escalations/webrep/research"
+    And  I choose "research-search-strict"
+    And  I type content "67.227.226.240" within input with id "search_uri"
+    When I hit enter within "#search_uri"
+    And  I wait for "60" seconds
+    And  I should not see element with class "add-ip-button"

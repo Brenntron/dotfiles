@@ -2316,8 +2316,8 @@ a.static-nav-item {
   line-height: 1.25em;
   margin-right: 6px;
   margin-bottom: 3px;
-  font-weight: 400;
-  text-transform: none;
+  font-weight: 400 !important;
+  text-transform: none !important;
 }
 
 .content-label-sm.content-label-fullwidth {
@@ -4810,7 +4810,7 @@ table > tbody > tr > td.dispute_rep_tools {
 .dispute_rep_tools_wrapper {
   position: absolute;
   width: 90px;
-  margin-left: -90px;
+  right: 12px;
   margin-top: 7px;
 }
 
@@ -5515,8 +5515,16 @@ input.table-entry-input:focus {
   padding: 6px;
 }
 
+.research-table-row-wrapper table > tbody > tr > td {
+  border: none;
+}
+
 .research-table-details-wrapper table tr:first-of-type td {
-  border-bottom: 1px solid $content-bg-color;
+  border-bottom: 1px solid $content-bg-color !important;
+}
+
+.research-table-details-wrapper table tr:first-of-type.single-details-row td {
+  border-bottom: none !important;
 }
 
 .input-col {
@@ -5537,6 +5545,10 @@ td.left-bordered {
   width: 28px;
   height: 28px;
   margin-right: 6px;
+}
+
+table > tbody > tr > td.research-table-row-wrapper {
+  border-bottom: 1px solid #CCCCCC !important;
 }
 
 .research-overview-row td:first-of-type, .research-table-details-wrapper, .research-table-row-wrapper {
@@ -11521,6 +11533,89 @@ span.threat-cat-no-data {
   vertical-align: middle;
 }
 
+.ip-label-col {
+  width: 28px;
+  background-color: #CCCCCC;
+  background-repeat: no-repeat;
+  background-image: url(image_path('icon_plus_ip_grey.svg'));
+  background-size: 20px 20px;
+  background-position: center 5px;
+  border-right: 1px solid $content-bg-color !important;
+  border-top: 1px solid $content-bg-color !important;
+}
+
+.single-details-row td {
+  height: 29px;
+  vertical-align: middle;
+}
+
+.no-padding-right {
+  padding-right: 0 !important;
+}
+
+.uri-plus-ip-rule-indicator {
+  background-image: url(image_path('icon_plus_ip_blue.svg'));
+  background-repeat: no-repeat;
+  background-position: 6px 4px;
+  width: 24px;
+  background-size: 18px 18px;
+}
+
+.add-ip-button {
+  background-image: url(image_path('icon_plus_ip_white.svg'));
+  width: 20px !important;
+  height: 20px !important;
+  margin-bottom: -5px;
+  display: block;
+}
+
+.add-ip-dropdown {
+  top: 21px;
+  left: 4px;
+  border-radius: 0 4px 4px 4px;
+  textarea {
+    width: 100%;
+    border: 1px solid darken($faint-neutral-color, 5%);
+    min-height: 60px;
+    margin-bottom: 8px;
+  }
+  .inline-tool-content-wrapper {
+    padding-top: 12px;
+  }
+  .content-label-sm {
+    margin-bottom: 0;
+  }
+  button {
+    text-transform: none;
+    font-weight: 400;
+    font-size: 8.5pt;
+  }
+}
+
+.single-button-col .open button {
+  background-color: $primary-section-color;
+}
+
+table > tbody > tr > td.no-padding {
+  padding: 0 !important;
+}
+
+.inline-row-loader {
+  display: inline-block;
+  font-style: italic;
+  color: lighten($type-lighter-color, 20%);
+  margin-left: 20px;
+  .sync-button {
+    display: inline-block;
+    margin-right: 4px;
+    height: 14px;
+    width: 14px;
+    background-repeat: no-repeat;
+    background-image: url('icon_sync_lt_grey.svg');
+    margin-bottom: -2px;
+  }
+}
+
 // retain top navigation at top of page during scroll down for nav accessibility
 #nav-banner.fixed-nav {
   position: -webkit-sticky;
@@ -12315,6 +12410,52 @@ span.threat-cat-no-data {
   h3 {
     padding: 6px 5px 9px;
   }
+}
+
+
+.inline-edit-ip-button {
+  background-image: url(image_path('icon_edit_white.svg'));
+  background-color: #bcc1c3;
+}
+.inline-save-ip-button, .inline-cancel-ip-button {
+  display: none;
+}
+.inline-edit-ip-button, .inline-save-ip-button, .inline-cancel-ip-button {
+  background-repeat: no-repeat;
+  height: 20px;
+  border-radius: 2px;
+  color: #fff;
+  border: none;
+  background-size: 16px 16px;
+  background-position: 2px center;
+  padding-left: 20px;
+}
+
+.inline-cancel-ip-button {
+  float: right;
+  margin-left: 8px;
+  background-position: center center !important;
+  padding-left: 0 !important;
+  width: 20px;
+  background-size: 22px !important;
+}
+
+.right-aligned-nested-button-wrapper {
+  padding-right: 0 !important;
+  padding-top: 0 !important;
+  padding-bottom: 0 !important;
+}
+
+.table-ip-input {
+  display: none;
+  width: 100%;
+  border: 2px solid #fff;
+  outline: 1px solid #e5e5e5;
+}
+
+.table-ip-input:focus {
+  background-color: #fff7cd;
+  outline-offset: 0;
 }
 
 // CATEGORIZE URLs dropdown - vertical spacing tightening (below the radio buttons)

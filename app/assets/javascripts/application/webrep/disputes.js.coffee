@@ -648,12 +648,10 @@ window.return_dispute = (dispute_id) ->
   )
 
 window.save_dispute_entries = () ->
-
   data = {}
   $('#disputes-research-table').find('tr.research-table-row').each(() ->
     result = {}
     fielddata = $(this).find('.dual-edit-field').map(() ->
-
       new_value = switch (this.dataset.field)
         when 'status'
           if $(this).find("input[name='entry-status']:checked").attr('id') == undefined
@@ -2067,3 +2065,164 @@ $ ->
         $(g_ew_rows).each ->
           unless $(this).hasClass('hidden')
             $(this).addClass('hidden')
+
+
+  # Focus on the first field in the dropdown on open
+  $('.dropdown').on 'shown.bs.dropdown', ->
+    form = $(this).find('form')[0]
+    if $(form).hasClass('add-host-ips')
+      textarea = $(form).find('textarea')[0]
+      $(textarea).focus()
+    return
+
+
+# Removes various new lines, extra spaces and crappy comma separation into single type of separation
+window.cleanse_array = (array) ->
+  clean_array = array.replace(/( +?)/g, '').replace(/( +?|\n+)/g, ',').split(',')
+
+
+window.add_host_ips = (button) ->
+  entry_id = $(button).attr('data-entry-id')
+  form     = $(button).parents('.add-host-ips')[0]
+  ips      = $(form).find('textarea').val()
+  ip_array = []
+
+  if ips.length > 0
+    ip_array_initial = cleanse_array(ips)
+    $(ip_array_initial).each ->
+      ip = this.trim()
+      ip_array.push(ip)
+
+    # Refined ip array back to string for DOM
+    final_ips = ip_array.join(', ')
+
+    # Close the dropdown
+    dropdown = $('#add_ip_button_' + entry_id).parent()
+    $(dropdown).dropdown('toggle')
+
+    # Create the IP rows
+    parent_row = $(form).parents('.research-table-row')[0]
+    uri_data_row = $(parent_row).find('.research-overview-row')[0]
+    ip_row =
+      '<tr class="research-uri-ip-query-row">' +
+        '<td rowspan="2"></td>' +
+        '<td class="input-col ip-label-col" rowspan="2"></td>' +
+        '<td class="dual-edit-field" colspan="5" data-field="host-ip" data-id="' + entry_id + '">' +
+          '<span class="entry-data entry-resolved-ip-content">' + final_ips + '</span>' +
+          '<input class="table-ip-input wide" type="text" value="' + final_ips + '">' +
+        '</td>' +
+        '<td class="text-right no-padding-right" colspan="3">' +
+          '<button class="edit-button inline-edit-ip-button esc-tooltipped" title="Edit IP Addresses">Edit IP Addresses</button>' +
+          '<button class="save-button inline-save-ip-button esc-tooltipped" title="Save IP Addresses">Save IP Addresses</button>' +
+          '<button class="cancel-button inline-cancel-ip-button esc-tooltipped"></button>' +
+        '</td>' +
+      '</tr>'
+
+    ip_data_row =
+      '<tr class="research-uri-ip-data-row">' +
+        '<td class="research-table-details-wrapper" colspan="8">' +
+          '<table><tbody>' +
+            '<tr class="single-details-row">' +
+              '<td><label>WBRS</label></td>' +
+              '<td class="text-center no-border uri-ip-wbrs-score"></td>' +
+              '<td><label>WBRS Rule Hits</label></td>' +
+              '<td class="text-center uri-ip-wbrs-rule-total"></td>' +
+              '<td><label>WBRS Rules</label></td>' +
+              '<td class="uri-ip-wbrs-rules"></td>' +
+              '<td><label>Threat Category</label></td>' +
+              '<td class="uri-ip-category"></td>' +
+              '<td><label>Proxy URI</label></td>' +
+              '<td class="uri-ip-proxy"></td>' +
+            '</tr>' +
+          '</tbody></table>' +
+        '</td>' +
+      '</tr>'
+
+    $(uri_data_row).after(ip_data_row)
+    $(uri_data_row).after(ip_row)
+
+    entry_uri = $($(parent_row).find('.entry-data-content')[0]).text()
+    entry_uri = entry_uri.trim()
+
+    # Time to make the donuts
+    # Make call to sdsv3 to populate this beautiful new row
+    query_uri_plus_ip(entry_uri, ip_array, parent_row)
+
+
+
+
+window.query_uri_plus_ip = (uri, ips, entry_row) ->
+  # Find our ip row for this entry in the DOM & insert inline loader
+  ip_row = $(entry_row).find('.entry-resolved-ip-content')
+  loader = '<span class="inline-row-loader"><span class="sync-button sync_rotate"></span>Loading...</span>'
+  $(ip_row).after(loader)
+  entry_id = $(entry_row).attr('data-entry-id')
+
+  #  Could be called via the 'Add ips', the Save changes to an entry, or refresh data button
+  #  Send the uri and ips to sdsv3
+  std_msg_ajax(
+    url: "/escalations/api/v1/escalations/webrep/disputes/update_multi_ip"
+    method: 'POST'
+    data: {
+      uri: uri,
+      ip_addresses: ips,
+      dispute_entry_id: entry_id
+    }
+    success: (response) ->
+      # Kill the loader and the 'Add IP Addresses' dropdown
+      inserted_loader = $(entry_row).find('.inline-row-loader')
+      $(inserted_loader).remove()
+      dropdown = $('#add_ip_button_' + entry_id).parent()
+      $(dropdown).remove()
+
+      console.log response
+
+      # Prep for inserting into DOM
+      if response.json.rulehits?
+        rules     = response.json.rulehits.join(', ')
+        rule_hits = response.json.rulehits.length
+      else
+        rules = ''
+        rule_hits = 0
+      score     = response.json.score.toFixed(1)
+
+      if response.json.threat_cats?
+       threat_cats = response.json.threat_cats.join(', ')
+      else
+        threat_cats = ''
+
+      if response.json.proxy_uri?
+       proxy = response.json.proxy_uri
+      else
+        proxy = ''
+
+      # Find our entry's (or result's) + ip data row and cells
+      ip_data_row     = $(entry_row).find('.research-uri-ip-data-row')[0]
+      wbrs_score_cell = $(ip_data_row).find('.uri-ip-wbrs-score')[0]
+      wbrs_hits_cell  = $(ip_data_row).find('.uri-ip-wbrs-rule-total')[0]
+      wbrs_rules_cell = $(ip_data_row).find('.uri-ip-wbrs-rules')[0]
+      wbrs_cat_cell   = $(ip_data_row).find('.uri-ip-category')[0]
+      wbrs_proxy_cell = $(ip_data_row).find('.uri-ip-proxy')[0]
+
+      # Populate with our new data!
+      $(wbrs_score_cell).text(score)
+      $(wbrs_hits_cell).text(rule_hits)
+      $(wbrs_rules_cell).text(rules)
+      $(wbrs_cat_cell).text(threat_cats)
+      $(wbrs_proxy_cell).text(proxy)
+
+      # If there are rule hits, add to the rule hit details table
+      wbrs_details_table = $($(entry_row).find('.wbrs-details-table')[0]).find('tbody')[0]
+      plus_ip_rule_rows = $(wbrs_details_table).find('.plus-ip-rule-row')
+      $(plus_ip_rule_rows).each ->
+        $(this).remove()
+      if rule_hits > 0
+        $(response.json.rulehits).each ->
+          # Ignoring description and weight right now as I don't think we are getting that data currently
+          rule_row = '<tr class="plus-ip-rule-row"><td class="uri-plus-ip-rule-indicator"></td><td>' + this + '</td><td></td><td></td></tr>'
+          $(wbrs_details_table).append(rule_row)
+      return
+  )
+
+
+

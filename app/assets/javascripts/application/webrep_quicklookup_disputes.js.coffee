@@ -270,15 +270,16 @@ $ ->
 
     error_array = []
     ajax_count = Object.keys(disputes).length - 1
-    
+    submitted_rows = []
     dispute_calls = setInterval(()->
-       if ajax_count == 0
+        if ajax_count == 0
+         clearInterval(dispute_calls)
          if error_array.length == 0
           std_msg_success('Success', ["All actions on entries were successfully submitted"], reload: false)
          else
            std_msg_error('Error', error_array, reload: false)
-         clearInterval(dispute_calls);
-    , 500);
+
+    , 2000);
 
     for dispute, value of disputes
       { action } = value
@@ -294,10 +295,15 @@ $ ->
                   'comment': comment
                 }]
                 maintain_reptool_bl(data).then((response, data)=>
+                  console.log inininin
                   ajax_count--
+                  console.log data
                   if !response
                     error_message = "<p>Unable to update all reptool entries.</p>"
                     error_array.push(error_message)
+                  else
+                    el = document.querySelectorAll("td[data='#{data.url}']")
+                    $(el).closest('tr').remove()
                 ).then null, (err) -> console.log err
               when 'drop'
                 data = {
@@ -307,12 +313,15 @@ $ ->
                   'classifications': act[key]
                 }
                 drop_reptool_bl(data).then((response,  data)=>
+                  console.log data
                   ajax_count--
                   if !response
                     error_message = "<p>Unable to drop all reptool entries.</p>"
                     error_array.push(error_message)
+                  else
+                    el = document.querySelectorAll("td[data='#{data.url}']")
+                    $(el).closest('tr').remove()
                 )
-#                  .then null, (err) -> console.log err
               when 'add'
 
                 data = {
@@ -328,14 +337,12 @@ $ ->
                     if el.tc_ids
                       { tc_ids } = el
                       data.thrt_cat_ids = tc_ids
-                      console.log data
-                adjust_wlbl(data).then((response)=>
+                adjust_wlbl(data).then((response, hey) =>
                   ajax_count--
                   if !response
                     error_message = "<p>Unable to adjust all wlbl entries.</p>"
                     error_array.push(error_message)
                 )
-#                  .then null, (err) -> console.log err
 
               when 'remove'
                 data = {
@@ -343,11 +350,16 @@ $ ->
                   'list_types': act[key]
                   'note': comment
                 }
-                remove_wlbl(data).then((response)=>
+                remove_wlbl(data).then((response, data)=>
                   ajax_count--
+                  console.log data
                   if !response
                     error_message = "<p>Unable to remove all wlbl entries.</p>"
                     error_array.push(error_message)
+                  else
+                    el = document.querySelectorAll("td[data='#{data.url}']")
+                    console.log el, $(el), $(el).closest('tr')
+                    $(el).closest('tr').remove()
                 ).then null, (err) -> console.log err
 
 
@@ -381,9 +393,11 @@ $ ->
       url: '/escalations/api/v1/escalations/webrep/disputes/uri_wlbl'
       data: data
       success_reload:false
-      success: (response) ->
+      success: (response, more) ->
         $('#confirmation-modal').modal('hide')
-        console.log response
+        for url in data.urls
+          el = document.querySelectorAll("td[data='#{url}']")
+          $(el).closest('tr').remove()
     )
 
   window.remove_wlbl = (data) ->
