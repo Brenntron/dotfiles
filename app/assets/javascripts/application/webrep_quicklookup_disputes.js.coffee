@@ -570,7 +570,7 @@ $ ->
         existing_p = ".#{list_action}  .wlbl-action-col"
         clear_col = row.find('.col-clear-actions')
         wlbl_col = row.find('.col-wlbl').text().replace(/ /g, '').split(',')
-        tc_col = row.find('.col-threat-cats').text().split(', ')
+        tc_col = row.find('.col-threat-cats .rule-api-tc').text().split(', ')
 
         check_list_array = checked_bl.filter( (wlbl)->
           switch(list_action)
@@ -973,8 +973,8 @@ $ ->
         new get_cat(item, headers)
           .then ( set_cat.bind( null, item, row) )
           .then null, (err) -> console.log err
-        new get_threat_cat(item, headers)
-          .then ( set_threat_cat.bind( null, item, row) )
+        new get_sds_threat_cat(item, headers)
+          .then ( set_sds_threat_cat.bind( null, item, row) )
           .then null, (err) -> console.log err
         new get_rule_threat_cat(item, headers)
           .then ( set_rule_threat_cat.bind( null, item, row) )
@@ -1031,7 +1031,7 @@ $ ->
       error: (response) -> return response
     )
 
-  window.get_threat_cat = (item, headers) ->
+  window.get_sds_threat_cat = (item, headers) ->
     data = {'uri': item.trim()}
     $.ajax(
       url: '/escalations/api/v1/escalations/webrep/disputes/threat_categories'
@@ -1052,8 +1052,7 @@ $ ->
       data: data
       dataType: 'json'
       success: (response) ->
-        console.log response
-        debugger
+        {threat_cats}= JSON.parse(response)
         return response
       error: (response) -> return response
     )
@@ -1090,35 +1089,38 @@ $ ->
       cat_col.text('No data')
       cat_col.addClass('missing-data')
 
-  window.set_threat_cat = ( item, row, data) ->
-    col_tc = $(row).children('.col-threat-cats')
-    { threat_categories } = JSON.parse(data)
-    if threat_categories != undefined
-      if threat_categories.length
-        text = threat_categories.join(', ')
-      else
-        text = '<span class="missing-data">No data</span>'
-      col_tc.prepend( text )
-    else
-      console.log 'undefined', item, row, data
-      col_tc.prepend( '<span class="missing-data">No data</span>')
-
   window.set_rule_threat_cat = ( item, row, data) ->
     col_tc = $(row).children('.col-threat-cats')
+    $(row).find('.rule-api-tc').remove()
+    data = JSON.parse(data).data
+    if data.length > 0 && data != undefined && data != ''
+      data = data[ data.length - 1]
+      { threat_cats } = data
+      tc_array = threat_cats.map(( threat_cats ) => threat_cats.name);
+      if tc_array.length
+        text = "<span class='rule-api-tc'> #{tc_array.join(', ')}</span>"
+      else
+        text = '<span class="missing-data rule-api-tc"> No Rule API data</span>'
+      col_tc.prepend(" #{text}")
+    else
+      col_tc.prepend( " <span class='missing-data rule-api-tc'> No Rule API data</span>" )
+
+  window.set_sds_threat_cat = ( item, row, data) ->
+    col_tc = $(row).children('.col-threat-cats')
+    $(row).find('.tc_data').remove()
     { threat_categories } = JSON.parse(data)
     if threat_categories != undefined
       if threat_categories.length
-        text = "<span class='rule-api-tc esc-tooltipped' title = 'SDS will take a few hours to reflect changes.'> #{threat_categories.join(', ')}</span>"
+        text = "<span class = 'tc_data esc-tooltipped' title= 'It will take several hours for SDS threat category values to reflect changes.'> |  #{threat_categories.join(', ')} </span>"
       else
-        text = '<span class="missing-data rule-api-tc esc-tooltipped" title = "SDS will take a few hours to reflect changes."> No Rule API data</span>'
-      col_tc.append("| #{text}")
+        text = '<span class="missing-data tc_data esc-tooltipped" title= "It will take several hours for SDS threat category values to reflect changes."> | No SDS data</span>'
+      col_tc.append( text )
     else
-      col_tc.append( "| <span class='missing-data rule-api-tc esc-tooltipped' title = 'SDS will take a few hours to reflect changes.'> No Rule API data</span>" )
+      console.log 'undefined', item, row, data
+      col_tc.append( '<span class="missing-data tc_data esc-tooltipped" title= "It will take several hours for SDS threat category values to reflect changes."> | No SDS data</span>')
 
 
-
-  $('body').on 'mouseenter', '.rule-api-tc:not(.tooltipstered)', ->
-    console.log 'ininininin'
+  $('body').on 'mouseenter', '.tc_data:not(.tooltipstered)', ->
     $(this).tooltipster(
       side: 'bottom'
       interactive: true
@@ -1133,6 +1135,10 @@ $ ->
 
     col_wbrs_rule.text( rulehits.join(', ') )
     col_wbrs_hits.text( rulehits.length )
+    if rulehits.length == 0
+      col_wbrs_rule.text('No data')
+    else
+      col_wbrs_rule.text( rulehits.join(', ') )
     if score != 'noscore'
       col_wbrs.text( score )
     else
