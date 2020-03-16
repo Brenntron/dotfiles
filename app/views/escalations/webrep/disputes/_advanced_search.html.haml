@@ -4,34 +4,34 @@
   .form-group.search-item
     %label.content-label-sm Case IDs
     %input.form-control#caseid-input{name: 'case_id'}
-    %button.remove-input
+    %button.remove-input#remove-criteria-caseid
   .form-group.search-item
     %label.content-label-sm Dispute (URL/IP/Domain)
     %input.form-control#dispute-input{name: 'ip_or_uri'}
-    %button.remove-input
+    %button.remove-input#remove-criteria-dispute
   .form-group.search-item
     %label.content-label-sm Assignee
     %input.form-control#owner-input{name: 'username', list: 'user-list'}
     %datalist#user-list
-    %button.remove-input
+    %button.remove-input#remove-criteria-assignee
   .form-group.search-item
     %label.content-label-sm Status
     %input.form-control#status-input{name: 'status', list: 'status-list'}
     %datalist#status-list
-    %button.remove-input
+    %button.remove-input#remove-criteria-status
   .form-group.search-item.hidden
     %label.content-label-sm Priority
     %input.form-control#priority-input{name: 'priority'}
-    %button.remove-input
+    %button.remove-input#remove-criteria-owner
   .form-group.search-item.hidden
     %label.content-label-sm Suggested Disposition
     %input.form-control#disposition-input{name: 'disposition'}
-    %button.remove-input
+    %button.remove-input#remove-criteria-disposition
   .form-group.search-item.hidden
     %label.content-label-sm Resolution
     %input.form-control#resolution-input{name: 'resolution', list: 'resolution-list'}
     %datalist#resolution-list
-    %button.remove-input
+    %button.remove-input#remove-criteria-resolution
   .form-group.search-item.hidden#submission-type
     %label.content-label-sm Submission Type
     .radio-wrapper
@@ -49,50 +49,50 @@
     %label.content-label-sm Submitter Type
     %input.form-control#submitter-input{name: 'submitter', list: 'submittertype-list'}
     %datalist#submittertype-list
-    %button.remove-input
+    %button.remove-input#remove-criteria-submitter
   .form-group.search-item.hidden
     %label.content-label-sm Contact Name
     %input.form-control#name-input{name: 'contact-name', list: 'contactname-list'}
     %datalist#contactname-list
-    %button.remove-input
+    %button.remove-input#remove-criteria-contact-name
   .form-group.search-item.hidden
     %label.content-label-sm Contact Email
     %input.form-control#email-input{name: 'contact-email', list: 'contactemail-list'}
     %datalist#contactemail-list
-    %button.remove-input
+    %button.remove-input#remove-criteria-contact-email
   .form-group.search-item.hidden
     %label.content-label-sm Company
     %input.form-control#company-input{name: 'company', list: 'company-list'}
     %datalist#company-list
-    %button.remove-input
+    %button.remove-input#remove-criteria-company
   .form-group.search-item.hidden
     %label.content-label-sm Submitter Domain
     %input.form-control#domain-input{name: 'domain'}
-    %button.remove-input
+    %button.remove-input#remove-criteria-domain
   .form-group.search-item.hidden
     %label.content-label-sm Date Submitted (Newer)
     %input.form-control#submitted-newer-input{type: 'date', name: 'date-submitted-newer'}
-    %button.remove-input
+    %button.remove-input#remove-criteria-submitted-newer
   .form-group.search-item.hidden
     %label.content-label-sm Date Submitted (Older)
     %input.form-control#submitted-older-input{type: 'date', name: 'date-submitted-older'}
-    %button.remove-input
+    %button.remove-input#remove-criteria-submitted-older
   .form-group.search-item.hidden
     %label.content-label-sm Case Age (Newer) ex: 30d 12h
     %input.form-control#age-newer-input{name: 'age'}
-    %button.remove-input
+    %button.remove-input#remove-criteria-age-newer
   .form-group.search-item.hidden
     %label.content-label-sm Case Age (Older) ex: 7d 12h
     %input.form-control#age-older-input{name: 'age'}
-    %button.remove-input
+    %button.remove-input#remove-criteria-age-older
   .form-group.search-item.hidden
     %label.content-label-sm Last Modified (Newer)
     %input.form-control#modified-newer-input{type: 'date', name: 'date-modified-newer'}
-    %button.remove-input
+    %button.remove-input#remove-criteria-modified-newer
   .form-group.search-item.hidden
     %label.content-label-sm Last Modified (Older)
     %input.form-control#modified-older-input{type: 'date', name: 'date-modified-older'}
-    %button.remove-input
+    %button.remove-input#remove-criteria-modified-older
 
   %button#add-search-items-button
     Add Search Criteria
