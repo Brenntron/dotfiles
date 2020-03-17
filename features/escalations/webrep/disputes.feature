@@ -262,6 +262,7 @@ Feature: Disputes
     And I click "#remove-criteria-status"
     And I wait for "1" seconds
     And I click "#advanced-search-button"
+    And I click "#add-search-items-button"
     And I click "#status-cb"
     And I click "#cancel-add-criteria"
     Then I should not see "ESCALATED"
