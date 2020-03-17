@@ -283,6 +283,7 @@ $ ->
 
     for dispute, value of disputes
       { action } = value
+
       if action != undefined
         for act in action
           for key, value of act
@@ -295,16 +296,12 @@ $ ->
                   'comment': comment
                 }]
                 maintain_reptool_bl(data).then((response, data)=>
-                  console.log inininin
                   ajax_count--
                   console.log data
                   if !response
                     error_message = "<p>Unable to update all reptool entries.</p>"
                     error_array.push(error_message)
-                  else
-                    el = document.querySelectorAll("td[data='#{data.url}']")
-                    $(el).closest('tr').remove()
-                ).then null, (err) -> console.log err
+                )
               when 'drop'
                 data = {
                   'action': 'EXPIRED'
@@ -313,14 +310,11 @@ $ ->
                   'classifications': act[key]
                 }
                 drop_reptool_bl(data).then((response,  data)=>
-                  console.log data
                   ajax_count--
                   if !response
                     error_message = "<p>Unable to drop all reptool entries.</p>"
                     error_array.push(error_message)
-                  else
-                    el = document.querySelectorAll("td[data='#{data.url}']")
-                    $(el).closest('tr').remove()
+
                 )
               when 'add'
 
@@ -356,11 +350,7 @@ $ ->
                   if !response
                     error_message = "<p>Unable to remove all wlbl entries.</p>"
                     error_array.push(error_message)
-                  else
-                    el = document.querySelectorAll("td[data='#{data.url}']")
-                    console.log el, $(el), $(el).closest('tr')
-                    $(el).closest('tr').remove()
-                ).then null, (err) -> console.log err
+                )
 
 
   window.maintain_reptool_bl = (data)->
@@ -371,10 +361,11 @@ $ ->
         data: data
       success_reload:false
       success: (response) ->
-        $('#confirmation-modal').modal('hide')
-        console.log response
+        $('#confirmation-modal').modal('hide')entries
+        for entries in data.entries
+          el = document.querySelectorAll("td[data='#{entries}']")
+          $(el).closest('tr').remove()
     )
-
   window.drop_reptool_bl = (data) ->
     std_msg_ajax(
       method: 'POST'
@@ -383,11 +374,12 @@ $ ->
       success_reload:false
       success: (response) ->
         $('#confirmation-modal').modal('hide')
-        console.log response
+        for entries in data.entries
+          el = document.querySelectorAll("td[data='#{entries}']")
+          $(el).closest('tr').remove()
     )
 
   window.adjust_wlbl = (data) ->
-
     std_msg_ajax(
       method: 'POST'
       url: '/escalations/api/v1/escalations/webrep/disputes/uri_wlbl'
@@ -408,7 +400,9 @@ $ ->
       success_reload:false
       success: (response) ->
         $('#confirmation-modal').modal('hide')
-        console.log response
+        for url in data.urls
+          el = document.querySelectorAll("td[data='#{url}']")
+          $(el).closest('tr').remove()
     )
 
   window.check_actions = (action_classes) =>
@@ -490,8 +484,7 @@ $ ->
             if maintain_check || drop_check
               if $(action).attr('reptool_classes') != undefined
                 existing_classes = $(action).attr('reptool_classes').split(',')
-                if drop_check
-                  action_tags = existing_classes
+                action_tags = existing_classes
 
             if threat_cat
               tc_ids = $(action).attr('data').split(',')
