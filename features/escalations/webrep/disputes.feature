@@ -247,6 +247,26 @@ Feature: Disputes
     Then I should see "0000000001"
 
   @javascript
+  Scenario: a user wants to do an advanced search and ensure when removing criteria the values are cleared out
+    Given a user with role "webrep user" exists and is logged in
+    And the following disputes exist and have entries:
+      | id | submission_type |
+      | 1  | w               |
+    When I goto "escalations/webrep/disputes?f=all"
+    And I should see "All Tickets"
+    And I click "#advanced-search-button"
+    And I should see "Advanced Search"
+    And I fill in "status-input" with "ESCALATED"
+    And I should see content "ESCALATED" within "#status-input"
+    And I wait for "1" seconds
+    And I click "#remove-criteria-status"
+    And I wait for "1" seconds
+    And I click "#advanced-search-button"
+    And I click "#status-cb"
+    And I click "#cancel-add-criteria"
+    Then I should not see "ESCALATED"
+
+  @javascript
   Scenario: a user tries to export selected dispute entries
     # Note that selenium doesn't support viewing response headers as is required by this test, maybe just get rid of it
     Given a user with role "webrep user" exists and is logged in
@@ -821,7 +841,6 @@ Feature: Disputes
 
 
   # Gathering resolved host ip on creation / additional query to sdsv3 for url+ip data
-#  TODO FINISH THE DEV FOR THIS
   @javascript
   Scenario: a user creates a new dispute ticket and the entry returns with a resolved host ip
     Given a user with role "webrep user" exists and is logged in
@@ -866,23 +885,3 @@ Feature: Disputes
     And I wait for "1" seconds
     Then I should not see "Loading data..."
 
-
-  @javascript
-  Scenario: a user wants to do an advanced search and ensure when removing criteria the values are cleared out
-    Given a user with role "webrep user" exists and is logged in
-    And the following disputes exist and have entries:
-      | id | submission_type |
-      | 1  | w               |
-    When I goto "escalations/webrep/disputes?f=all"
-    And I should see "All Tickets"
-    And I click "#advanced-search-button"
-    And I should see "Advanced Search"
-    And I fill in "status-input" with "ESCALATED"
-    And I should see content "ESCALATED" within "#status-input"
-    And I wait for "1" seconds
-    And I click "#remove-criteria-status"
-    And I wait for "1" seconds
-    And I click "#advanced-search-button"
-    And I click "#status-cb"
-    And I click "#cancel-add-criteria"
-    Then I should not see "ESCALATED"
