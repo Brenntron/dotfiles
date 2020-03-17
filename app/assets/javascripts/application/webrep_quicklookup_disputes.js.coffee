@@ -288,16 +288,30 @@ $ ->
         for act in action
           for key, value of act
             switch key
-              when ('maintain' || 'override')
+              when 'maintain'
                 data = [{
                   'action': 'ACTIVE'
                   'entries': [dispute.trim()]
                   'classifications': act[key]
                   'comment': comment
                 }]
+
                 maintain_reptool_bl(data).then((response, data)=>
                   ajax_count--
-                  console.log data
+                  if !response
+                    error_message = "<p>Unable to update all reptool entries.</p>"
+                    error_array.push(error_message)
+                )
+              when 'override'
+                data = [{
+                  'action': 'ACTIVE'
+                  'entries': [dispute.trim()]
+                  'classifications': act[key]
+                  'comment': comment
+                }]
+
+                maintain_reptool_bl(data).then((response, data)=>
+                  ajax_count--
                   if !response
                     error_message = "<p>Unable to update all reptool entries.</p>"
                     error_array.push(error_message)
@@ -346,7 +360,6 @@ $ ->
                 }
                 remove_wlbl(data).then((response, data)=>
                   ajax_count--
-                  console.log data
                   if !response
                     error_message = "<p>Unable to remove all wlbl entries.</p>"
                     error_array.push(error_message)
@@ -361,11 +374,12 @@ $ ->
         data: data
       success_reload:false
       success: (response) ->
-        $('#confirmation-modal').modal('hide')entries
+        $('#confirmation-modal').modal('hide')
         for entries in data.entries
           el = document.querySelectorAll("td[data='#{entries}']")
           $(el).closest('tr').remove()
     )
+
   window.drop_reptool_bl = (data) ->
     std_msg_ajax(
       method: 'POST'
@@ -1123,7 +1137,6 @@ $ ->
         text = '<span class="missing-data tc_data esc-tooltipped" title= "It will take several hours for SDS threat category values to reflect changes."> | No SDS data</span>'
       col_tc.append( text )
     else
-      console.log 'undefined', item, row, data
       col_tc.append( '<span class="missing-data tc_data esc-tooltipped" title= "It will take several hours for SDS threat category values to reflect changes."> | No SDS data</span>')
 
 
