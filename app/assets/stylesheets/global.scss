@@ -11931,3 +11931,17 @@ table > tbody > tr > td.no-padding {
 #webcat-index-toolbar .collapse-all {
   margin-right: 0;
 }
+
+// adding the down caret icon using the sort_by svg for advanced search button
+#advanced-search-button::after {
+  content: '';
+  display: block;
+  width: 16px;
+  height: 14px;
+  right: 0;
+  background-image: url(image_path('icon_sort_by.svg'));
+  background-repeat: no-repeat;
+  background-position: 30% 92%;
+  background-size: 26px 26px;
+  float: right;
+}
