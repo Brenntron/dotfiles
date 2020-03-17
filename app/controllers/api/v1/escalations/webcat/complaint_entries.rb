@@ -15,14 +15,16 @@ module API
             desc 'update an entry'
             params do
               requires :id, type: Integer, desc:'complaint entry id'
-              requires :prefix, type: String, desc: 'the url to categorize'
-              requires :categories, type: String, desc: 'a list of categories to assign to this prefix'
-              requires :category_names, type: String, desc: 'a list of category names to assign to Complaint Entry record'
-              requires :status, type: String, desc: 'setting the status of the entry'
+              optional :prefix, type: String, desc: 'the url to categorize'
+              optional :categories, type: String, desc: 'a list of categories to assign to this prefix'
+              optional :category_names, type: String, desc: 'a list of category names to assign to Complaint Entry record'
+              optional :status, type: String, desc: 'setting the status of the entry'
               optional :comment, type: String, desc: 'internal comment'
               optional :resolution_comment, type: String, desc: 'resolution comment for the customer'
             end
             post 'update'do
+              std_api_v2 do
+
               begin
                 entry = ComplaintEntry.find(permitted_params['id'])
                 entry.change_category( permitted_params['prefix'],
@@ -43,6 +45,7 @@ module API
               end
               {display_name: current_user.display_name, status: entry.status, entry_resolution: permitted_params['status'],
                uri: entry.uri, domain: entry.domain, subdomain: entry.subdomain, path: entry.path, categories: params[:categories]}.to_json
+              end
             end
 
             desc 'Bulk update entry resolutions'
