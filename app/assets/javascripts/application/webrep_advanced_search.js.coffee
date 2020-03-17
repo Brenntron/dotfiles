@@ -12,27 +12,6 @@ $(document).ready ->
     $('#search-criteria-options').hide()
     false
 
-  $('#add-search-criteria').click ->
-    add_button = $('#add-search-items-button')
-    selected_checkboxes = []
-    $('.search-checkbox:checked').each ->
-      cb_for = $(this).attr('for')
-      search_criteria_group = $('#advanced-search-wrapper').find('.form-group')
-      $(search_criteria_group).each ->
-        group_id = $(this).attr('id')
-        input = $(this).find('.form-control')
-        select = $(this).find('select')
-        selectize = $(this).find('select.selectize')
-        if $(input).attr('id') == cb_for || $(select).attr('id') == cb_for || group_id == cb_for || cb_for.startsWith( $(selectize).attr('id') )
-          $(this).removeClass('hidden')
-
-      $($(this).parent()).parent().addClass('hidden')
-      $(this).prop 'checked', false
-      return
-
-    $('#search-criteria-options').hide()
-    false
-
   $('.remove-input').click ->
     field = $(this).parent()
     field.find('input').val('')  # on a minus icon click, clear value of field

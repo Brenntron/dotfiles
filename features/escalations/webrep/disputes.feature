@@ -160,7 +160,6 @@ Feature: Disputes
     And I click "#add-search-items-button"
     And I click "#submitted-older-cb"
     And I click "#modified-older-cb"
-    And I click "#add-search-criteria"
     And I click "#submit-advanced-search"
     Then I click ".export-all-btn"
     # Thomas Walpole says that selenium driver does not provide access to response headers
@@ -204,7 +203,6 @@ Feature: Disputes
     And I click "#advanced-search-button"
     And I click "#add-search-items-button"
     And I click "#name-cb"
-    And I click "#add-search-criteria"
     Then I fill in "name-input" with "Bob Jones"
     Then I click "#submit-advanced-search"
     And I wait for "5" seconds
@@ -224,7 +222,6 @@ Feature: Disputes
     And I click "#advanced-search-button"
     And I click "#add-search-items-button"
     And I click "#email-cb"
-    And I click "#add-search-criteria"
     Then I fill in "email-input" with "bob@bob.com"
     Then I click "#submit-advanced-search"
     And I wait for "3" seconds
@@ -243,7 +240,6 @@ Feature: Disputes
     And I click "#advanced-search-button"
     And I click "#add-search-items-button"
     And I click "#company-cb"
-    And I click "#add-search-criteria"
     Then I fill in "company-input" with "Guest"
     Then I click "#submit-advanced-search"
     And I wait for "3" seconds
@@ -887,7 +883,6 @@ Feature: Disputes
     And I click "#remove-criteria-status"
     And I wait for "1" seconds
     And I click "#advanced-search-button"
-    And I click "#add-search-items-button"
     And I click "#status-cb"
     And I click "#cancel-add-criteria"
     Then I should not see "ESCALATED"
