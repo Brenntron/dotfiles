@@ -269,9 +269,9 @@ $ ->
     $('#confirmation-modal').modal('hide')
 
     error_array = []
-    ajax_count = Object.keys(disputes).length - 1
-    submitted_rows = []
     submitted_disputes = []
+
+    ajax_count = Object.keys(disputes).length - 1
     dispute_calls = setInterval(()->
         ####
         # super simple endpoint to quick look up bulk submit-thus sayeth chris
@@ -976,9 +976,11 @@ $ ->
   $(document).bind( "ajaxStart", () ->
     $('.ajax-message-div').css('display','flex')
   )
-  $(document).on 'click', '#get-rep-data', (e) ->
+  window.get_rep_data = ()->
+#  .on 'click', '#get-rep-data', (e) ->
+
   #   needs to be an onclick to prevent from refreshing the page
-    e.preventDefault()
+#    e.preventDefault()
     search_items = []
     rows = $('.research-table tbody tr')
 
@@ -1021,7 +1023,9 @@ $ ->
       method: 'POST'
       data: data
       headers: headers
-      success: (response) -> return response
+      success: (response) ->
+        console.log response
+        return response
       error: (response) -> return response
     )
 
@@ -1089,14 +1093,14 @@ $ ->
     )
 
   window.set_reptool = ( item, row, data) ->
-    { classification } = JSON.parse(data)[0]
+    { classification, status } = JSON.parse(data)[0]
     col_reptool = $(row).children('.col-reptool-class')
 
     if classification != 'No active classifications'
       new_reptool = classification.toString()
-      col_reptool.text( new_reptool )
+      col_reptool.html( new_reptool + " <span class='rep-status'>#{status}</span>")
     else
-      col_reptool.text( 'Not on RepTool' )
+      col_reptool.html( 'Not on RepTool' )
       col_reptool.addClass('missing-data')
 
   window.set_wlbl = ( item, row, data) ->

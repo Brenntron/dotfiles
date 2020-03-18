@@ -30,7 +30,7 @@
               =inline_svg 'icon_gears_loader.svg'
             %span.loader-msg Loading data...
           .col-xs-12.toolbar-quicklookup
-            %button.primary#get-rep-data{onclick: 'submit_research_query();'} Get Reputation Data
+            %button.primary#get-rep-data{onclick: 'get_rep_data();return false;'} Get Reputation Data
             .toolbar.research-toolbar
               %div
                 %label.toolbar-section-label Adjust Reputation
