@@ -271,14 +271,21 @@ $ ->
     error_array = []
     ajax_count = Object.keys(disputes).length - 1
     submitted_rows = []
+
     dispute_calls = setInterval(()->
+        #      disputes[dispute] = dispute
+        #      console.log disputes
+        #      quick_bulk_update(disputes)
+        ####
+        # super simple endpoint to quick look up bulk submit-thus sayeth chris
+        # on success, parse actions
+        ####
         if ajax_count == 0
          clearInterval(dispute_calls)
          if error_array.length == 0
           std_msg_success('Success', ["All actions on entries were successfully submitted"], reload: false)
          else
            std_msg_error('Error', error_array, reload: false)
-
     , 2000);
 
     for dispute, value of disputes
@@ -287,6 +294,7 @@ $ ->
       if action != undefined
         for act in action
           for key, value of act
+            console.log key
             switch key
               when 'maintain'
                 data = [{
@@ -302,6 +310,7 @@ $ ->
                     error_message = "<p>Unable to update all reptool entries.</p>"
                     error_array.push(error_message)
                 )
+
               when 'override'
                 data = [{
                   'action': 'ACTIVE'
@@ -328,7 +337,6 @@ $ ->
                   if !response
                     error_message = "<p>Unable to drop all reptool entries.</p>"
                     error_array.push(error_message)
-
                 )
               when 'add'
 
@@ -381,12 +389,14 @@ $ ->
     )
 
   window.drop_reptool_bl = (data) ->
+    console.log 'XXXXXXXXX', data
     std_msg_ajax(
       method: 'POST'
       url: '/escalations/api/v1/escalations/webrep/disputes/drop_reptool_bl'
       data: data
       success_reload:false
       success: (response) ->
+        debugger
         $('#confirmation-modal').modal('hide')
         for entries in data.entries
           el = document.querySelectorAll("td[data='#{entries}']")
@@ -440,7 +450,6 @@ $ ->
         return 'tc_ids'
 
   window.quick_bulk_update = (data) ->
-    password = $('form#top_banner_bugzilla_login_form').find('input[name=password]').val()
     std_msg_ajax(
       method: 'POST'
       url: '/escalations/api/v1/escalations/webrep/disputes/quick_bulk_update'
@@ -460,68 +469,63 @@ $ ->
     #  confirm actions to be taken, data is prepared and  final submission of disputes to be made
     ####
     confirmation_rows = $('#confirmation-modal tbody').find('tr')
+    $('#confirmation-modal').modal('toggle');
+
     comment = $('.confirm-rep-input').val()
     reptool_dispute_changes = []
     wlbl_dispute_changes = []
     disputes = {
       comment:$('.confirm-rep-input').text()
     }
-    $('#confirmation-modal').modal('toggle');
+
+
     $( confirmation_rows ).each ->
 
-      row = $( this ).find('td')
-      dispute = $( row[0] ).text()
-      actions = $( row[1] ).children()
-      disputes[dispute] = dispute
+      action_list = []
+      cells = $( this ).find('td')
+      dispute = $( cells[0] ).text()
+      actions = $( cells[1] ).children()
 
-      quick_bulk_update(disputes).then(
-        ####
-        # super simple endpoint to quick look up bulk submit-thus sayeth chris
-        # on success, parse actions
-        ####
-        (response)=>
-          data = JSON.parse(response).data
-          dispute_entries = data.dispute_entries
-          action_list = []
-          for action, i in actions
+      for action, i in actions
 
-            action_tags = []
-            existing_classes = []
-            existing_wlbl = []
-            class_list = $(action).attr("class")
+        action_tags = []
+        existing_classes = []
+        existing_wlbl = []
+        class_list = $(action).attr("class")
 
-            maintain_check = stringIncludes(class_list, 'maintain')
-            maintain_remove = stringIncludes(class_list, 'remove') && maintain_check
-            drop_check = stringIncludes(class_list, 'drop')
-            threat_cat = stringIncludes(class_list, 'threat-cat-col')
+        maintain_check = stringIncludes(class_list, 'maintain')
+        maintain_remove = stringIncludes(class_list, 'remove') && maintain_check
+        drop_check = stringIncludes(class_list, 'drop')
+        threat_cat = stringIncludes(class_list, 'threat-cat-col')
 
-            if maintain_check || drop_check
-              if $(action).attr('reptool_classes') != undefined
-                existing_classes = $(action).attr('reptool_classes').split(',')
-                action_tags = existing_classes
+        if maintain_check || drop_check
+          if $(action).attr('reptool_classes') != undefined
+            existing_classes = $(action).attr('reptool_classes').split(',')
+            action_tags = existing_classes
 
-            if threat_cat
-              tc_ids = $(action).attr('data').split(',')
-              for tc_id in tc_ids
-                action_tags.push( parseInt(tc_id) )
-            else
-              $(action).find('.col-tag').contents().each ->
-                action_tags.push(this.data)
-            formatted_action = check_actions(class_list)
+        if threat_cat
+          tc_ids = $(action).attr('data').split(',')
+          for tc_id in tc_ids
+            action_tags.push( parseInt(tc_id) )
+        else
+          $(action).find('.col-tag').contents().each ->
+            action_tags.push(this.data)
+        formatted_action = check_actions(class_list)
 
-            action_list.push( "#{formatted_action}": action_tags )
-          actions = action: action_list
-          disputes[dispute] = actions
-      ).then( ()=>
-        dispute_check = true
-        for key, value of disputes
-          if key != 'comment'
-            if typeof value != 'object'
-              dispute_check = false
-              break
-        if dispute_check
-          call_action_switchboard(disputes)
-      )
+        action_list.push( "#{formatted_action}": action_tags )
+
+      actions = action: action_list
+      disputes[dispute] = actions
+      dispute_check = true
+
+      for key, value of disputes
+        if key != 'comment'
+          if typeof value != 'object'
+            dispute_check = false
+            break
+      if dispute_check
+        call_action_switchboard(disputes)
+
 
   window.open_adjust_reptool = () ->
     dropdown = $('#reptool_entries_bl_dropdown')
@@ -529,7 +533,7 @@ $ ->
     type = 'reptool'
 
     reptool_options = [ "attackers", "bogon", "bots", "cnc", "cryptomining",
-      "dga", "exploit kit", "malware", "open_proxy", "open_relay",
+      "dga", "exploitkit", "malware", "open_proxy", "open_relay",
       "phishing", "response", "spam", "suspicious", "tor_exit_node"]
 
     if !$(list).has('label').length
