@@ -153,7 +153,6 @@ $ ->
         $(action_p).html(col_dialog)
 
 
-
   $(document).on 'change', '#select-all-bulk', (e) ->
     ####
     # handles selection of all checkboxes in quicklookup table
@@ -273,17 +272,10 @@ $ ->
 
     ajax_count = Object.keys(disputes).length - 1
     dispute_calls = setInterval(()->
-        ####
-        # super simple endpoint to quick look up bulk submit-thus sayeth chris
-        # on success, parse actions
-        ####
-        if ajax_count == 0
+
+      if ajax_count == 0
          clearInterval(dispute_calls)
-         if error_array.length == 0
-          std_msg_success('Success', ["All actions on entries were successfully submitted"], reload: false)
-         else
-           std_msg_error('Error', error_array, reload: false)
-         quick_bulk_update(disputes)
+         quick_bulk_update(disputes, error_array)
     , 2000);
 
     for dispute, value of disputes
@@ -391,9 +383,6 @@ $ ->
       success_reload:false
       success: (response) ->
         $('#confirmation-modal').modal('hide')
-        for entries in data.entries
-          el = document.querySelectorAll("td[data='#{entries}']")
-          $(el).closest('tr').remove()
     )
 
   window.drop_reptool_bl = (data) ->
@@ -404,9 +393,6 @@ $ ->
       success_reload:false
       success: (response) ->
         $('#confirmation-modal').modal('hide')
-        for entries in data.entries
-          el = document.querySelectorAll("td[data='#{entries}']")
-          $(el).closest('tr').remove()
     )
 
   window.adjust_wlbl = (data) ->
@@ -417,9 +403,6 @@ $ ->
       success_reload:false
       success: (response, more) ->
         $('#confirmation-modal').modal('hide')
-        for url in data.urls
-          el = document.querySelectorAll("td[data='#{url}']")
-          $(el).closest('tr').remove()
     )
 
   window.remove_wlbl = (data) ->
@@ -430,9 +413,6 @@ $ ->
       success_reload:false
       success: (response) ->
         $('#confirmation-modal').modal('hide')
-        for url in data.urls
-          el = document.querySelectorAll("td[data='#{url}']")
-          $(el).closest('tr').remove()
     )
 
   window.check_actions = (action_classes) =>
@@ -455,7 +435,11 @@ $ ->
       else
         return 'tc_ids'
 
-  window.quick_bulk_update = (data) ->
+  window.quick_bulk_update = (data, errors) ->
+      ####
+      # super simple endpoint to quick look up bulk submit-thus sayeth chris
+      # on success of at least some data, make disputes, otherwise display error message
+      ####
     std_msg_ajax(
       method: 'POST'
       url: '/escalations/api/v1/escalations/webrep/disputes/quick_bulk_update'
@@ -464,7 +448,15 @@ $ ->
       }
       success_reload:false
       error_prefix: 'Error logging in.'
-      success: (response) -> return response
+      success: (response) ->
+        if response
+          for key, val of data
+            if key != 'comment'
+              el = document.querySelectorAll("td[data='#{key}']")
+              $(el).remove()
+
+#          std_msg_success('Success', ["All actions on entries were successfully submitted"], reload: false)
+        return response x
     )
 
   window.stringIncludes = (str, substring) ->
