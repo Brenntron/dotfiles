@@ -160,6 +160,7 @@ Feature: Disputes
     And I click "#add-search-items-button"
     And I click "#submitted-older-cb"
     And I click "#modified-older-cb"
+    Then I click "#cancel-add-criteria"
     And I click "#submit-advanced-search"
     Then I click ".export-all-btn"
     # Thomas Walpole says that selenium driver does not provide access to response headers
@@ -204,6 +205,7 @@ Feature: Disputes
     And I click "#add-search-items-button"
     And I click "#name-cb"
     Then I fill in "name-input" with "Bob Jones"
+    Then I click "#cancel-add-criteria"
     Then I click "#submit-advanced-search"
     And I wait for "5" seconds
     And I click "#advanced-search-button"
@@ -223,6 +225,7 @@ Feature: Disputes
     And I click "#add-search-items-button"
     And I click "#email-cb"
     Then I fill in "email-input" with "bob@bob.com"
+    Then I click "#cancel-add-criteria"
     Then I click "#submit-advanced-search"
     And I wait for "3" seconds
     And I click "#advanced-search-button"
@@ -241,6 +244,7 @@ Feature: Disputes
     And I click "#add-search-items-button"
     And I click "#company-cb"
     Then I fill in "company-input" with "Guest"
+    Then I click "#cancel-add-criteria"
     Then I click "#submit-advanced-search"
     And I wait for "3" seconds
     Then I should see "talosintelligence.com"
