@@ -449,13 +449,23 @@ $ ->
       success_reload:false
       error_prefix: 'Error logging in.'
       success: (response) ->
+        submitted_entries = []
         if response
           for key, val of data
             if key != 'comment'
+              submitted_entries.push(key.trim())
               el = document.querySelectorAll("td[data='#{key}']")
               $(el).remove()
+          if  errors.length == 0
+            std_msg_success('All Disputes were successfully created', ["Disputes were successfully created for the following entries:<div>#{submitted_entries.join(', ')}</div>"], reload: false)
+          else
+            submitted_msg = ''
+            if submitted_entries.length > 0
+              submitted_msg = "<div>Successfully created entries: #{submitted_entries.join(', ')}</div>"
+              errors = "<div>Error creating the following entries: #{submitted_entries.join(', ')}</div>"
+            std_msg_error('Error Creating disputes',[errors + submitted_msg], reload: false)
 
-#          std_msg_success('Success', ["All actions on entries were successfully submitted"], reload: false)
+
         return response
     )
 
