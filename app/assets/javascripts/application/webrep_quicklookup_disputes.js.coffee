@@ -271,11 +271,8 @@ $ ->
     error_array = []
     ajax_count = Object.keys(disputes).length - 1
     submitted_rows = []
-
+    submitted_disputes = []
     dispute_calls = setInterval(()->
-        #      disputes[dispute] = dispute
-        #      console.log disputes
-        #      quick_bulk_update(disputes)
         ####
         # super simple endpoint to quick look up bulk submit-thus sayeth chris
         # on success, parse actions
@@ -286,20 +283,21 @@ $ ->
           std_msg_success('Success', ["All actions on entries were successfully submitted"], reload: false)
          else
            std_msg_error('Error', error_array, reload: false)
+         quick_bulk_update(disputes)
     , 2000);
 
     for dispute, value of disputes
+      dispute = dispute.trim()
       { action } = value
 
       if action != undefined
         for act in action
           for key, value of act
-            console.log key
             switch key
               when 'maintain'
                 data = [{
                   'action': 'ACTIVE'
-                  'entries': [dispute.trim()]
+                  'entries': [dispute]
                   'classifications': act[key]
                   'comment': comment
                 }]
@@ -309,12 +307,14 @@ $ ->
                   if !response
                     error_message = "<p>Unable to update all reptool entries.</p>"
                     error_array.push(error_message)
+                  else
+                    submitted_disputes.push(dispute)
                 )
 
               when 'override'
                 data = [{
                   'action': 'ACTIVE'
-                  'entries': [dispute.trim()]
+                  'entries': [dispute]
                   'classifications': act[key]
                   'comment': comment
                 }]
@@ -324,11 +324,13 @@ $ ->
                   if !response
                     error_message = "<p>Unable to update all reptool entries.</p>"
                     error_array.push(error_message)
+                  else
+                    submitted_disputes.push(dispute)
                 )
               when 'drop'
                 data = {
                   'action': 'EXPIRED'
-                  'entries': [dispute.trim()]
+                  'entries': [dispute]
                   'comment':  comment
                   'classifications': act[key]
                 }
@@ -337,11 +339,13 @@ $ ->
                   if !response
                     error_message = "<p>Unable to drop all reptool entries.</p>"
                     error_array.push(error_message)
+                  else
+                    submitted_disputes.push(disput)
                 )
               when 'add'
 
                 data = {
-                  'urls':[dispute.trim()]
+                  'urls':[dispute]
                   'trgt_list': act[key]
                   'note': comment
                 }
@@ -358,6 +362,8 @@ $ ->
                   if !response
                     error_message = "<p>Unable to adjust all wlbl entries.</p>"
                     error_array.push(error_message)
+                  else
+                    submitted_disputes.push(dispute)
                 )
 
               when 'remove'
@@ -371,6 +377,8 @@ $ ->
                   if !response
                     error_message = "<p>Unable to remove all wlbl entries.</p>"
                     error_array.push(error_message)
+                  else
+                    submitted_disputes.push(dispute)
                 )
 
 
@@ -389,14 +397,12 @@ $ ->
     )
 
   window.drop_reptool_bl = (data) ->
-    console.log 'XXXXXXXXX', data
     std_msg_ajax(
       method: 'POST'
       url: '/escalations/api/v1/escalations/webrep/disputes/drop_reptool_bl'
       data: data
       success_reload:false
       success: (response) ->
-        debugger
         $('#confirmation-modal').modal('hide')
         for entries in data.entries
           el = document.querySelectorAll("td[data='#{entries}']")
