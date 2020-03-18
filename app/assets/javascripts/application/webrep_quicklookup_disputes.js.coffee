@@ -456,7 +456,7 @@ $ ->
               $(el).remove()
 
 #          std_msg_success('Success', ["All actions on entries were successfully submitted"], reload: false)
-        return response x
+        return response
     )
 
   window.stringIncludes = (str, substring) ->
