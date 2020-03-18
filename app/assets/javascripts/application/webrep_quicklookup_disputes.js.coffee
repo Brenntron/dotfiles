@@ -454,8 +454,8 @@ $ ->
           for key, val of data
             if key != 'comment'
               submitted_entries.push(key.trim())
-              el = document.querySelectorAll("td[data='#{key}']")
-              $(el).remove()
+              el = document.querySelectorAll("td[data='#{key.trim()}']")
+              $(el).closest('tr').remove()
           if  errors.length == 0
             std_msg_success('All Disputes were successfully created', ["Disputes were successfully created for the following entries:<div>#{submitted_entries.join(', ')}</div>"], reload: false)
           else
@@ -1025,9 +1025,7 @@ $ ->
       method: 'POST'
       data: data
       headers: headers
-      success: (response) ->
-        console.log response
-        return response
+      success: (response) -> return response
       error: (response) -> return response
     )
 
