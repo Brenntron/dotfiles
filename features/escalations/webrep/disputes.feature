@@ -852,7 +852,7 @@ Feature: Disputes
     When I click "#add-entries-button"
     And I fill in "add_dispute_entry" with "cisco.com"
     And I click "#button_add_dispute_entry"
-    And I wait for "15" seconds
+    And I wait for "5" seconds
     Then I should see content "cisco.com" within ".entry-data-content"
     And I should see content "WL-med" within ".entry-data-wlbl"
     And I should see content "BL-heavy" within ".entry-data-wlbl"
@@ -876,15 +876,14 @@ Feature: Disputes
 #    WHY IS THERE A COMMA IN THIS STEP DEF?
     And  I fill in element, "#ips_urls" with "petful.com"
     And  I click button "submit"
-    And  I wait for "20" seconds
+    And  I wait for "10" seconds
     And  I click button with class "close"
     And  I wait for "3" seconds
-    Then I click "0000010101"
-    And  I wait for "10" seconds
+    Then I click "0000005370"
+    And  I wait for "5" seconds
     Then I click "#research-tab-link"
     And  I wait for "3" seconds
-    And  Element with class "entry-resolved-ip-content" should not be empty
-    And take a screenshot
+#    And  Element with class "entry-resolved-ip-content" should not be empty
 #    And I should see a resolved host ip etc.
 
 
