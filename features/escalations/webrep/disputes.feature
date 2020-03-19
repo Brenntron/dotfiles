@@ -194,6 +194,7 @@ Feature: Disputes
     Then I should see "CONTACT NAME"
     Then I should see "CONTACT EMAIL"
 
+
   @javascript
   Scenario: a users uses advanced search with 'Contact Name' as a search criteria
     Given a user with role "webrep user" exists and is logged in
@@ -201,6 +202,9 @@ Feature: Disputes
       | id | submission_type |
       | 1  | w               |
     When I goto "escalations/webrep/disputes?f=all"
+    And I click "#table-show-columns-button"
+    And I click "#contact-name-checkbox"
+    And I click "#table-show-columns-button"
     And I click "#advanced-search-button"
     And I click "#add-search-items-button"
     And I click "#name-cb"
@@ -212,7 +216,7 @@ Feature: Disputes
     Then I wait for "5" seconds
     Then I should see "talosintelligence.com"
     Then I should see "0000000001"
-
+    Then I should see "Bob Jones"
 
   @javascript
   Scenario: a users uses advanced search with 'Contact Email' as a search criteria
@@ -221,17 +225,21 @@ Feature: Disputes
       | id | submission_type |
       | 1  | w               |
     When I goto "escalations/webrep/disputes?f=all"
+    And I click "#table-show-columns-button"
+    And I click "#contact-email-checkbox"
+    And I click "#table-show-columns-button"
     And I click "#advanced-search-button"
     And I click "#add-search-items-button"
     And I click "#email-cb"
-    Then I fill in "email-input" with "bob@bob.com"
     Then I click "#cancel-add-criteria"
+    Then I fill in "email-input" with "bob@bob.com"
     Then I click "#submit-advanced-search"
     And I wait for "3" seconds
     And I click "#advanced-search-button"
     Then I wait for "5" seconds
     Then I should see "talosintelligence.com"
     Then I should see "0000000001"
+    Then I should see "bob@bob.com"
 
   @javascript
   Scenario: a users uses advanced search with 'Company' as a search criteria
@@ -240,15 +248,20 @@ Feature: Disputes
       | id | submission_type |
       | 1  | w               |
     When I goto "escalations/webrep/disputes?f=all"
+    And I click "#table-show-columns-button"
+    And I click "#submitter-org-checkbox"
+    And I click "#table-show-columns-button"
     And I click "#advanced-search-button"
     And I click "#add-search-items-button"
     And I click "#company-cb"
-    Then I fill in "company-input" with "Guest"
+    Then I fill in "company-input" with "Bobs Burgers"
     Then I click "#cancel-add-criteria"
     Then I click "#submit-advanced-search"
     And I wait for "3" seconds
     Then I should see "talosintelligence.com"
     Then I should see "0000000001"
+    Then I should see "Bobs Burgers"
+
 
   @javascript
   Scenario: a user wants to do an advanced search and ensure when removing criteria the values are cleared out
@@ -863,7 +876,7 @@ Feature: Disputes
 #    WHY IS THERE A COMMA IN THIS STEP DEF?
     And  I fill in element, "#ips_urls" with "petful.com"
     And  I click button "submit"
-    And  I wait for "1" seconds
+    And  I wait for "20" seconds
     And  I click button with class "close"
     And  I wait for "3" seconds
     Then I click "0000010101"
