@@ -62,7 +62,7 @@ $ ->
     for opt in arr
       checkbox =
         "<li> <label>
-          <input name='#{opt}' value='#{opt}' type='checkbox' class='adjust_#{type}_checkbox'/>#{opt}
+          <input name='#{opt}' id='#{opt}' value='#{opt}' type='checkbox' class='adjust_#{type}_checkbox'/>#{opt}
         </label> </li>"
       $(list).append(checkbox)
 
@@ -1107,8 +1107,11 @@ $ ->
     { data } = JSON.parse(data)
     col_wlbl = $(row).children('.col-wlbl')
     if data.length
-      data = data.join(', ')
-    col_wlbl.text( data )
+      text = data.join(', ')
+    else
+      text = "<span class='missing-data'>No Data</span>"
+    col_wlbl.html( text )
+
   window.set_cat = ( item, row, data) ->
     { data } = JSON.parse(data)
     cat_col = $(row).children('.col-category')

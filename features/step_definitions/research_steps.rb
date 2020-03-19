@@ -16,7 +16,7 @@ Then(/wl\/bl result number "(.*?)" should not have content "(.*?)"/) do |result_
 end
 
 Then(/quick lookup entry "(.*?)" column number "(.*?)" should have content "(.*?)"/) do |type, number, content|
-  page.evaluate_script("$('tr .col-#{type}')[#{number}].textContent === '#{content}'")
+  page.evaluate_script("$('tr .col-#{type}')[#{number}].textContent.indexOf('#{content}') !== -1")
 end
 
 Then(/ toggle checkbox of quick lookup entry row number "(.*?)"/) do |number|
