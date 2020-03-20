@@ -505,11 +505,12 @@ $ ->
         maintain_remove = stringIncludes(class_list, 'remove') && maintain_check
         drop_check = stringIncludes(class_list, 'drop')
         threat_cat = stringIncludes(class_list, 'threat-cat-col')
-
-        if maintain_check || drop_check
-          if $(action).attr('reptool_classes') != undefined
-            existing_classes = $(action).attr('reptool_classes').split(',')
-            action_tags = existing_classes
+        if maintain_remove
+        else
+          if maintain_check || drop_check
+            if $(action).attr('reptool_classes') != undefined
+              existing_classes = $(action).attr('reptool_classes').split(',')
+              action_tags = existing_classes
 
         if threat_cat
           tc_ids = $(action).attr('data').split(',')
@@ -764,7 +765,8 @@ $ ->
 
         rep_list = this.innerText.split(',')
         if (class_reptool == 'maintain' || class_reptool == 'drop') && existing_reptool.length && !isEmpty(data)
-          reptool_classes =  $(existing_reptool).text()
+          reptool_array =  $(existing_reptool).text().split(/[\s,]+/)
+          reptool_classes = Array.from(new Set(reptool_array)).join(',')
           $(action_col).attr( 'reptool_classes', reptool_classes )
 
       error_message = "#{data} | "
@@ -792,7 +794,10 @@ $ ->
             check_list = check_vals.filter( (rep)->
               if !rep_list.includes(rep)
                 error_message += "<span class='col-tag dialog-tag'>#{rep} </span>, "
-              return rep_list.includes(rep)
+              else
+                rep_classes = $(action_col).attr( 'reptool_classes').replace("#{rep},",'');
+                $(action_col).attr( 'reptool_classes', rep_classes)
+                return rep_list.includes(rep)
             )
           else if reptool_add.toLowerCase() == 'add'
             check_list = check_vals.filter( (rep)->
