@@ -799,6 +799,7 @@ $ ->
                 $(action_col).attr( 'reptool_classes', rep_classes)
                 return rep_list.includes(rep)
             )
+            console.log check_list
           else if reptool_add.toLowerCase() == 'add'
             check_list = check_vals.filter( (rep)->
               if existing_actions.includes(rep) || rep_list.includes(rep)
