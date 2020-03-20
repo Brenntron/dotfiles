@@ -37,7 +37,7 @@ window.get_current_reptool =(button, page) ->
   std_msg_ajax(
     url: '/escalations/api/v1/escalations/webrep/disputes/bulk_reptool_get_info_for_form'
     method: 'POST'
-    data: { ip_uris: entry_content }
+    data: { ip_uris: [entry_content] }
     success: (response) ->
       response = JSON.parse(response)
       entry = response[0]
