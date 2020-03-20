@@ -99,3 +99,11 @@ Then(/^clean up wlbl and remove all wlbl entries on "(.*?)"$/) do |url|
   @user = User.first
   Wbrs::ManualWlbl.adjust_urls_from_params({:urls=>[url], "trgt_list"=>[], "note"=>""}, username: @user.cvs_username)
 end
+
+Then(/^clean up reptool and remove all reptool entries on "(.*?)"$/) do |url|
+  @user = User.first
+  reptool_params = {}
+  reptool_params["action"] = "EXPIRED"
+  reptool_params["entries"] = [url]
+  RepApi::Blacklist.adjust_from_params(reptool_params, username: @user.cvs_username)
+end

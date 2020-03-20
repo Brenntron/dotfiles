@@ -281,7 +281,6 @@ $ ->
     for dispute, value of disputes
       dispute = dispute.trim()
       { action } = value
-
       if action != undefined
         for act in action
           for key, value of act
@@ -375,20 +374,24 @@ $ ->
 
 
   window.maintain_reptool_bl = (data)->
-    std_msg_ajax(
-      method: 'POST'
-      url: '/escalations/api/v1/escalations/webrep/disputes/maintain_reptool_bl'
-      data:
-        data: data
-      success_reload:false
-      success: (response) ->
-        $('#confirmation-modal').modal('hide')
-    )
+    console.log data
+    debugger
+#    std_msg_ajax(
+#      method: 'POST'
+#      url: '/escalations/api/v1/escalations/webrep/disputes/maintain_reptool_bl'
+#      headers: headers
+#      data:
+#        data: data
+#      success_reload:false
+#      success: (response) ->
+#        $('#confirmation-modal').modal('hide')
+#    )
 
   window.drop_reptool_bl = (data) ->
     std_msg_ajax(
       method: 'POST'
       url: '/escalations/api/v1/escalations/webrep/disputes/drop_reptool_bl'
+      headers: headers
       data: data
       success_reload:false
       success: (response) ->
@@ -409,6 +412,7 @@ $ ->
     std_msg_ajax(
       method: 'POST'
       url: '/escalations/api/v1/escalations/webrep/disputes/bulk_rule_ui_wlbl_remove'
+      headers: headers
       data: data
       success_reload:false
       success: (response) ->
@@ -493,7 +497,7 @@ $ ->
       cells = $( this ).find('td')
       dispute = $( cells[0] ).text()
       actions = $( cells[1] ).children()
-
+      col_tags = $(actions).children().map( ()=> return $(this).text() )
       for action, i in actions
 
         action_tags = []
@@ -502,14 +506,17 @@ $ ->
         class_list = $(action).attr("class")
 
         maintain_check = stringIncludes(class_list, 'maintain')
-        maintain_remove = stringIncludes(class_list, 'remove') && maintain_check
+        maintain_remove = stringIncludes(class_list, 'remove')
         drop_check = stringIncludes(class_list, 'drop')
         threat_cat = stringIncludes(class_list, 'threat-cat-col')
-        if maintain_remove
-        else
-          if maintain_check || drop_check
-            if $(action).attr('reptool_classes') != undefined
-              existing_classes = $(action).attr('reptool_classes').split(',')
+        if maintain_check || drop_check
+          if $(action).attr('reptool_classes') != undefined
+            existing_classes = $(action).attr('reptool_classes').split(',')
+            if maintain_remove
+              removed_classes = Array.from(new Set( col_tags ))
+              action_tags = existing_classes.filter( ( el ) =>  removed_classes.indexOf( el ) == -1 )
+              console.log 'action_tags:', action_tags, 'existing_classes', existing_classes.filter( ( el ) =>  removed_classes.indexOf( el ) == -1 ),
+            else
               action_tags = existing_classes
 
         if threat_cat
@@ -792,19 +799,16 @@ $ ->
 
           if reptool_add.toLowerCase() == 'remove'
             check_list = check_vals.filter( (rep)->
-              if !rep_list.includes(rep)
+              if existing_actions.indexOf(rep) == -1 || rep_list.indexOf(rep) == -1
                 error_message += "<span class='col-tag dialog-tag'>#{rep} </span>, "
-              else
-                rep_classes = $(action_col).attr( 'reptool_classes').replace("#{rep},",'');
-                $(action_col).attr( 'reptool_classes', rep_classes)
-                return rep_list.includes(rep)
-            )
+              return existing_actions.indexOf(rep) > -1 && rep_list.indexOf(rep) > -1)
             console.log check_list
+
           else if reptool_add.toLowerCase() == 'add'
             check_list = check_vals.filter( (rep)->
-              if existing_actions.includes(rep) || rep_list.includes(rep)
+              if existing_actions.indexOf(rep) > -1 || rep_list.indexOf(rep) > -1
                 error_message += "<span class='col-tag dialog-tag'>#{rep} </span>, "
-              return !existing_actions.includes(rep) && !rep_list.includes(rep))
+              return existing_actions.indexOf(rep) == -1 && rep_list.indexOf(rep) == -1)
 
         clear_col = $( row.find('.col-clear-actions') )
         existing_p = action_col.find(".#{reptool_class}.reptool-action-col")
