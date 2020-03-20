@@ -108,7 +108,7 @@ class RepApi::Blacklist < RepApi::Base
     entries = entry.kind_of?(Array) ? entry : [entry]
     input += entries.map{ |entry_curr| "entry=#{entry_curr}" }
 
-    response = call_json_request(:post, '/blacklist/add', body: build_request_body(input))
+    response = call_json_request(:post, '/escalations/add', body: build_request_body(input))
 
     @new_record = false
     blacklist_hash = JSON.parse(response.body).inject({}) do |hash, message|
@@ -273,7 +273,7 @@ class RepApi::Blacklist < RepApi::Base
     raise "Missing parameter: classification" unless input.has_key?('classification')
     input = input.to_a
 
-    response = call_json_request(:post, '/blacklist/add', body: build_request_body(input))
+    response = call_json_request(:post, '/escalations/add', body: build_request_body(input))
 
     return JSON.parse(response.body)
   end
