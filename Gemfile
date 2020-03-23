@@ -5,7 +5,11 @@ gem 'rack', '>= 2.0.8'
 gem 'rails', '5.2.1'
 gem 'rack-cors', '0.4.1', require: 'rack/cors'
 gem 'active_model_serializers', '0.10.8'
+<<<<<<< HEAD
 gem 'grape', '1.3.0'
+=======
+gem 'grape', '1.3.1'
+>>>>>>> development
 gem 'grape-swagger', '0.31.1'
 gem 'grape-swagger-rails', '0.3.0'
 gem 'grape-active_model_serializers', '1.5.2'
@@ -33,6 +37,7 @@ gem 'net-ssh', '5.0.2'
 gem 'peake-bridge-client', '>= 0.0.9.0', git: "https://git.vrt.sourcefire.com/talosweb/peake-bridge-client.git"
 gem 'stomp', '1.4.6'
 gem 'aws-sdk', '2.11.170'
+gem 'nokogiri' ,'1.10.4'
 
 gem 'mysql2', '0.5.2'
 gem 'rmagick', '~> 2.16.0'

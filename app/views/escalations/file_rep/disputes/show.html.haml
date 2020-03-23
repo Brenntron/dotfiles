@@ -161,6 +161,11 @@
                 - else
                   %span.missing-data No details submitted.
 
+              %label.content-label-sm Auto Resolve Log
+              %button#auto_resolve_log_button.dispute-inline-buttons.auto-resolve-button.esc-tooltipped{onclick:'show_auto_resolve()', title:'Auto Resolve Log'}
+              #auto-resolve-dialog{title: 'Auto Resolve Log'}
+                = @file_rep_dispute.auto_resolve_log
+
 
   .col-xs-12.col-sm-6
     .content-wrapper.top-case-info

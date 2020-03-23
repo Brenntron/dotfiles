@@ -192,25 +192,13 @@ module API
             post "new_adhoc_entry" do
               json_packet = []
 
-              user = Dispute.find(params[:dispute_id]).user_id
+              dispute = Dispute.find(params[:dispute_id])
 
-              entry = DisputeEntry.new(:dispute_id => params[:dispute_id], :user_id => user, status: Dispute::NEW, case_opened_at: Time.now)
-
-              is_ip_address = !!(params[:uri]  =~ Resolv::IPv4::Regex)
-
-              if is_ip_address
-                entry.ip_address = params[:uri]
-                entry.save
-                Preloader::Base.fetch_all_api_data(entry.ip_address, entry.id)
-              else
-                entry.uri = params[:uri]
-                entry.save
-                Preloader::Base.fetch_all_api_data(entry.uri, entry.id)
-              end
+              entry = DisputeEntry.create_dispute_entry(dispute, params[:uri])
 
               json_packet << entry
 
-              {:status => "success", :data => json_packet}.to_json if entry.save
+              {:status => "success", :data => json_packet}.to_json
             end
 
             desc "Change assignee of a group of dispute IDs"
@@ -922,6 +910,33 @@ module API
               render json: {assignees: assignees}
             end
 
+
+            desc 'Get URL + IP data from SDS V3'
+            post 'update_multi_ip' do
+
+              uri = params[:uri]
+              provided_ips = params[:ip_addresses]
+              ips = []
+              dispute_entry_id = params[:dispute_entry_id]
+
+              dispute_entry = nil
+
+              # Make sure the ips are legit
+              provided_ips.each do |ip|
+                if DisputeEntry.is_ip?(ip)
+                  ips << ip
+                end
+              end
+
+              if dispute_entry_id.present?
+                dispute_entry = DisputeEntry.where(:id => dispute_entry_id).first
+              end
+
+              results = DisputeEntry.process_multi_ip_info(uri, ips, dispute_entry)
+              render json: {:status => "success", :rulehits => results[:rulehits], :score => results[:score], :proxy_uri => results[:proxy_uri], :threat_cats => results[:threat_cats]}
+            end
+
+
             params do
               requires :uri, type: String
             end
@@ -938,6 +953,7 @@ module API
             post 'threat_levels' do
               response = SbApi.remote_call_sds(permitted_params[:uri],'wbrs')
               response
+
             end
 
           end

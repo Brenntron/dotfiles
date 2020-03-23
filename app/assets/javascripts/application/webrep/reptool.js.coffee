@@ -8,6 +8,14 @@
 
 ## Populating the inline Adjust Reptool dropdown for
 ## research page and research tab (individual submission form)
+$(document).ready ->
+  $('.webrep_auto_resolve').each ->
+    $(this).dialog({autoOpen : false, width: 500});
+
+window.show_webrep_auto_resolve = (entry) ->
+  dialog = $('#webrep_auto_resolve-' + entry)
+  dialog.dialog('open')
+
 window.get_current_reptool =(button, page) ->
   dropdown = $(button).parents('.dropdown')[0]
   submit_button = $(dropdown).find('.dropdown-submit-button')[0]
@@ -37,7 +45,7 @@ window.get_current_reptool =(button, page) ->
   std_msg_ajax(
     url: '/escalations/api/v1/escalations/webrep/disputes/bulk_reptool_get_info_for_form'
     method: 'POST'
-    data: { ip_uris: entry_content }
+    data: { ip_uris: [entry_content] }
     success: (response) ->
       response = JSON.parse(response)
       entry = response[0]
