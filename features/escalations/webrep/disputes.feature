@@ -264,25 +264,42 @@ Feature: Disputes
 
 
   @javascript
-  Scenario: a user wants to do an advanced search and ensure when removing criteria the values are cleared out
+  Scenario: a user wants to do an advanced search and ensure those previous values are cleared on subsequent search
     Given a user with role "webrep user" exists and is logged in
-    And the following disputes exist and have entries:
-      | id | submission_type |
-      | 1  | w               |
+    Given the following disputes exist:
+      | id | submission_type | status    |
+      | 1  | w               | ESCALATED |
+      | 2  | e               | PENDING   |
+    And the following dispute_entries exist:
+      | dispute_id   | uri             | entry_type |
+      | 1            | whatever.com    | URI/DOMAIN |
+      | 2            | iamatest.com    | URI/DOMAIN |
     When I goto "escalations/webrep/disputes?f=all"
     And I should see "All Tickets"
     And I click "#advanced-search-button"
     And I should see "Advanced Search"
     And I fill in "status-input" with "ESCALATED"
     And I should see content "ESCALATED" within "#status-input"
-    And I wait for "1" seconds
-    And I click "#remove-criteria-status"
-    And I wait for "1" seconds
+    Then I click "#submit-advanced-search"
+    And I wait for "3" seconds
+    Then I should see "0000000001"
+    Then I should see "ESCALATED"
+    Then I should not see "0000000002"
+    Then I should not see "PENDING"
     And I click "#advanced-search-button"
+    And I click "#remove-criteria-status"
     And I click "#add-search-items-button"
     And I click "#status-cb"
     And I click "#cancel-add-criteria"
+    And I should not see content "ESCALATED" within "#status-input"
+    And I fill in "dispute-input" with "iamatest.com"
+    And I should see content "iamatest.com" within "#dispute-input"
+    Then I click "#submit-advanced-search"
+    And I wait for "3" seconds
+    Then I should see "0000000002"
+    Then I should see "iamatest.com"
     Then I should not see "ESCALATED"
+
 
   @javascript
   Scenario: a user tries to export selected dispute entries
