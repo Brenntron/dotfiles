@@ -497,7 +497,7 @@ $ ->
       cells = $( this ).find('td')
       dispute = $( cells[0] ).text()
       actions = $( cells[1] ).children()
-      col_tags = $(actions).children().map( ()=> return $(this).text() )
+#      col_tags = $(actions).children().map( ()=> console.log $(this) )
       for action, i in actions
 
         action_tags = []
@@ -512,12 +512,9 @@ $ ->
         if maintain_check || drop_check
           if $(action).attr('reptool_classes') != undefined
             existing_classes = $(action).attr('reptool_classes').split(',')
-            if maintain_remove
-              removed_classes = Array.from(new Set( col_tags ))
-              action_tags = existing_classes.filter( ( el ) =>  removed_classes.indexOf( el ) == -1 )
-              console.log 'action_tags:', action_tags, 'existing_classes', existing_classes.filter( ( el ) =>  removed_classes.indexOf( el ) == -1 ),
-            else
-              action_tags = existing_classes
+            console.log existing_classes
+            debugger
+            action_tags = existing_classes
 
         if threat_cat
           tc_ids = $(action).attr('data').split(',')
@@ -540,6 +537,8 @@ $ ->
             dispute_check = false
             break
       if dispute_check
+        console.log dispute_check
+        debugger
         call_action_switchboard(disputes)
 
 
@@ -802,7 +801,10 @@ $ ->
               if existing_actions.indexOf(rep) == -1 || rep_list.indexOf(rep) == -1
                 error_message += "<span class='col-tag dialog-tag'>#{rep} </span>, "
               return existing_actions.indexOf(rep) > -1 && rep_list.indexOf(rep) > -1)
-            console.log check_list
+
+            reptool_tags = $(action_col).attr( 'reptool_classes').split(',')
+            action_tags = reptool_tags.filter( (val) => if check_list.indexOf(val) == -1  && val != 'ACTIVE' && val != 'EXPIRED' then return val )
+            $(action_col).attr( 'reptool_classes', action_tags )
 
           else if reptool_add.toLowerCase() == 'add'
             check_list = check_vals.filter( (rep)->
