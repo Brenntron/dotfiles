@@ -489,7 +489,7 @@ module API
 
                 permitted_params['field_data'].each do |index, entry|
                   if entry.length == 3 && entry.last['field'] == 'resolution_comment' && !entry.last['new'].empty?
-                    comment = entry.last.new
+                    comment = entry.last["new"]
                     dispute_entry_id = index
                     Dispute.create_note(current_user, comment, dispute_entry_id)
                   end
