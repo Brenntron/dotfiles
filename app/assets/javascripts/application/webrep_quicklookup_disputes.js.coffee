@@ -776,7 +776,7 @@ $ ->
             error_message = data + ' has no classifications to drop.'
         else
           $( '.drop.reptool-action-col' ).remove()
-          rep_status = row.find('.rep-status').innerHTML() == "ACTIVE"
+          rep_status = row.find('.rep-status').innerHTML
           actions = row.find('.col-actions')
 
           if reptool_add.toLowerCase() == 'add'
@@ -791,8 +791,10 @@ $ ->
             check_list = check_vals.filter( (rep)->
               if existing_actions.indexOf(rep) == -1 || rep_list.indexOf(rep) == -1
                 error_message += "<span class='col-tag dialog-tag'>#{rep} </span>, "
-              return existing_actions.indexOf(rep) > -1 && rep_list.indexOf(rep) > -1)
-
+              else
+                if rep_status == "ACTIVE"
+                  return rep
+              )
             reptool_tags = $(action_col).attr( 'reptool_classes').split(',')
             action_tags = reptool_tags.filter( (val) => if check_list.indexOf(val) == -1  && val != 'ACTIVE' && val != 'EXPIRED' then return val )
             $(action_col).attr( 'reptool_classes', action_tags )
@@ -801,13 +803,15 @@ $ ->
             check_list = check_vals.filter( (rep)->
               if existing_actions.indexOf(rep) > -1 || rep_list.indexOf(rep) > -1
                 error_message += "<span class='col-tag dialog-tag'>#{rep} </span>, "
-              return existing_actions.indexOf(rep) == -1 && rep_list.indexOf(rep) == -1 && rep != 'ACTIVE' && rep != 'EXPIRED')
+              else
+                if rep_status == "ACTIVE"
+                  return rep
+            )
             $(action_col).attr( 'reptool_classes', check_list.concat(existing_actions) )
 
         clear_col = $( row.find('.col-clear-actions') )
         existing_p = action_col.find(".#{reptool_class}.reptool-action-col")
         delete_button = '<button class="clear-action-button row-action-clear"></button>'
-        
         if error_message.endsWith(', ')
           error_message = error_message.slice(0, error_message.length - 2);
           error_html = "<div>#{error_message}<div>"
