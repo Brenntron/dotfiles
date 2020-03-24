@@ -262,7 +262,7 @@ $ ->
 
   window.call_action_switchboard = (disputes) ->
     ####
-    # data is set and each action calls the appropriate endpoint here
+    # data is set and each action calls the appropriate endpoint herereptool_classes
     ####
     comment = $('#confirmation-modal').find('.comment-input').text()
     $('#confirmation-modal').modal('hide')
@@ -374,18 +374,16 @@ $ ->
 
 
   window.maintain_reptool_bl = (data)->
-    console.log data
-    debugger
-#    std_msg_ajax(
-#      method: 'POST'
-#      url: '/escalations/api/v1/escalations/webrep/disputes/maintain_reptool_bl'
-#      headers: headers
-#      data:
-#        data: data
-#      success_reload:false
-#      success: (response) ->
-#        $('#confirmation-modal').modal('hide')
-#    )
+    std_msg_ajax(
+      method: 'POST'
+      url: '/escalations/api/v1/escalations/webrep/disputes/maintain_reptool_bl'
+      headers: headers
+      data:
+        data: data
+      success_reload:false
+      success: (response) ->
+        $('#confirmation-modal').modal('hide')
+    )
 
   window.drop_reptool_bl = (data) ->
     std_msg_ajax(
@@ -497,7 +495,6 @@ $ ->
       cells = $( this ).find('td')
       dispute = $( cells[0] ).text()
       actions = $( cells[1] ).children()
-#      col_tags = $(actions).children().map( ()=> console.log $(this) )
       for action, i in actions
 
         action_tags = []
@@ -509,22 +506,18 @@ $ ->
         maintain_remove = stringIncludes(class_list, 'remove')
         drop_check = stringIncludes(class_list, 'drop')
         threat_cat = stringIncludes(class_list, 'threat-cat-col')
+
         if maintain_check || drop_check
           if $(action).attr('reptool_classes') != undefined
             existing_classes = $(action).attr('reptool_classes').split(',')
-            console.log existing_classes
-            debugger
             action_tags = existing_classes
 
         if threat_cat
           tc_ids = $(action).attr('data').split(',')
           for tc_id in tc_ids
             action_tags.push( parseInt(tc_id) )
-        else
-          $(action).find('.col-tag').contents().each ->
-            action_tags.push(this.data)
-        formatted_action = check_actions(class_list)
 
+        formatted_action = check_actions(class_list)
         action_list.push( "#{formatted_action}": action_tags )
 
       actions = action: action_list
@@ -537,8 +530,6 @@ $ ->
             dispute_check = false
             break
       if dispute_check
-        console.log dispute_check
-        debugger
         call_action_switchboard(disputes)
 
 
@@ -771,10 +762,10 @@ $ ->
 
         rep_list = this.innerText.split(',')
         if (class_reptool == 'maintain' || class_reptool == 'drop') && existing_reptool.length && !isEmpty(data)
-          reptool_array =  $(existing_reptool).text().split(/[\s,]+/)
+          reptools =  $(existing_reptool).text().split(/[\s,]+/)
+          reptool_array = reptools.filter( (val) => return val != 'ACTIVE' && val != 'EXPIRED')
           reptool_classes = Array.from(new Set(reptool_array)).join(',')
           $(action_col).attr( 'reptool_classes', reptool_classes )
-
       error_message = "#{data} | "
       if !isEmpty(data)
 
@@ -785,15 +776,15 @@ $ ->
             error_message = data + ' has no classifications to drop.'
         else
           $( '.drop.reptool-action-col' ).remove()
+          rep_status = row.find('.rep-status').innerHTML() == "ACTIVE"
           actions = row.find('.col-actions')
-          existing_actions = []
 
           if reptool_add.toLowerCase() == 'add'
             check_class = '.remove'
           else
             check_class = '.add'
-            existing_actions = existing_actions.concat(rep_list)
 
+          existing_actions = rep_list
           $(actions).find("#{check_class} .col-tag").each () -> existing_actions.push( this.innerText )
 
           if reptool_add.toLowerCase() == 'remove'
@@ -810,11 +801,13 @@ $ ->
             check_list = check_vals.filter( (rep)->
               if existing_actions.indexOf(rep) > -1 || rep_list.indexOf(rep) > -1
                 error_message += "<span class='col-tag dialog-tag'>#{rep} </span>, "
-              return existing_actions.indexOf(rep) == -1 && rep_list.indexOf(rep) == -1)
+              return existing_actions.indexOf(rep) == -1 && rep_list.indexOf(rep) == -1 && rep != 'ACTIVE' && rep != 'EXPIRED')
+            $(action_col).attr( 'reptool_classes', check_list.concat(existing_actions) )
 
         clear_col = $( row.find('.col-clear-actions') )
         existing_p = action_col.find(".#{reptool_class}.reptool-action-col")
         delete_button = '<button class="clear-action-button row-action-clear"></button>'
+        
         if error_message.endsWith(', ')
           error_message = error_message.slice(0, error_message.length - 2);
           error_html = "<div>#{error_message}<div>"
