@@ -3,12 +3,12 @@
     .research-header-wrapper
       %span.icon-research.top-info-icon
       %h1 Reputation Research
-      %ul{class:"nav nav-tabs", role:'tablist'}
-        %li{role:"presentation", class: "active"}
+      %ul#research-tabs{class:"nav nav-tabs", role:'tablist'}
+        %li{role:"presentation", class: "active", data:"lookup-detail"}
           %a{href:'#lookup-detail','aria-controls':'lookup-detail', 'aria-label': 'Detail lookup tab','data-toggle':'tab', role:"tab"}
             %span.icon-lookup-detail.top-info-icon
             Detailed Lookup
-        %li{role:'presentation'}
+        %li{role:'presentation', data:'lookup-quick'}
           %a{href:'#lookup-quick', 'aria-controls':'lookup-quick','aria-label': 'Quick lookup tab','data-toggle':'tab', role:"tab"}
             %span.icon-lookup-quick.top-info-icon
             Quick Lookup
@@ -192,12 +192,11 @@
 
 
   .row
-    .col-xs-12
+    .col-xs-12.lookup-detail
       .ajax-message-div
         .loader-gears
           =inline_svg 'icon_gears_loader.svg'
         %span.loader-msg Loading data...
-
       - if params['search']
         %h4 Results for
         %span.searched-for-url #{params['search']['uri']}
