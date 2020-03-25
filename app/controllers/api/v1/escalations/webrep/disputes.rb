@@ -104,11 +104,11 @@ module API
                 if non_duplicated_entries.any?
                   if user_validation.present?
                     begin
-                    dispute = Dispute.create_action(bugzilla_rest_session,
-                                                    non_duplicated_entries,
-                                            permitted_params[:assignee],
-                                            permitted_params[:priority],
-                                            permitted_params[:ticket_type])
+                      dispute = Dispute.create_action(bugzilla_rest_session,
+                                                      non_duplicated_entries,
+                                                      permitted_params[:assignee],
+                                                      permitted_params[:priority],
+                                                      permitted_params[:ticket_type])
                     rescue Exception => e
                       raise ("Could not create the Dispute because of this error: #{e.message}")
                     end
@@ -194,25 +194,13 @@ module API
             post "new_adhoc_entry" do
               json_packet = []
 
-              user = Dispute.find(params[:dispute_id]).user_id
+              dispute = Dispute.find(params[:dispute_id])
 
-              entry = DisputeEntry.new(:dispute_id => params[:dispute_id], :user_id => user, status: Dispute::NEW, case_opened_at: Time.now)
-
-              is_ip_address = !!(params[:uri]  =~ Resolv::IPv4::Regex)
-
-              if is_ip_address
-                entry.ip_address = params[:uri]
-                entry.save
-                Preloader::Base.fetch_all_api_data(entry.ip_address, entry.id)
-              else
-                entry.uri = params[:uri]
-                entry.save
-                Preloader::Base.fetch_all_api_data(entry.uri, entry.id)
-              end
+              entry = DisputeEntry.create_dispute_entry(dispute, params[:uri])
 
               json_packet << entry
 
-              {:status => "success", :data => json_packet}.to_json if entry.save
+              {:status => "success", :data => json_packet}.to_json
             end
 
             desc "Change assignee of a group of dispute IDs"
@@ -258,7 +246,7 @@ module API
             params do
               requires :urls, type: Array[String], desc: "uris to wl/bl"
               requires :trgt_list, type: Array[String], desc: "type of WL/BL"
-              optional :thrt_cats, type: Array[String], desc: "threat categories"
+              optional :thrt_cat_ids, type: Array[Integer], desc: "threat categories"
               requires :note, type: String, desc: "note"
             end
             post "uri_wlbl" do
@@ -267,6 +255,88 @@ module API
               true
             end
 
+
+
+
+            desc "Bulk adjust WL/BLs and BL threat categories"
+            params do
+              requires :adjustment_type, type: String, desc: "Add, remove, or replace"
+              optional :dispute_entries, type: Array[Integer], desc: "analyst-console database id"
+              optional :urls, type: Array[String], desc: "URLs to modify, if Dispute Entry ID is not known"
+              requires :lists, type: Array[String], desc: "type of WL/BL"
+              optional :thrt_cat_ids, type: Array[Integer], desc: "threat categories"
+              requires :note, type: String, desc: "note"
+            end
+            post "bulk_wlbl_threatcat_adjust" do
+              authorize!(:update, Wbrs::ManualWlbl)
+
+              ip_uris = []
+              if params[:dispute_entries].present?
+                params[:dispute_entries].each do |dispute_entry_id|
+                  dispute_entry = DisputeEntry.find(dispute_entry_id)
+                  if dispute_entry.entry_type == "IP"
+                    ip_uris << dispute_entry.ip_address
+                  else
+                    ip_uris << dispute_entry.uri
+                  end
+                end
+              else
+                ip_uris = params[:urls]
+              end
+
+              case params[:adjustment_type]
+              when "add"
+                if params[:dispute_entries].present?
+                  parsed_ip_uris = ip_uris.map{|ip_uri| DisputeEntry.domain_of_with_path(ip_uri).strip}
+                  unique_ip_uris = parsed_ip_uris.uniq
+                else
+                  unique_ip_uris = ip_uris
+                end
+
+                wlbl_params =
+                    {
+                        urls: unique_ip_uris,
+                        trgt_list: params['lists'],
+                        note: params['note'],
+                        usr: current_user.cvs_username,
+                        thrt_cat_ids: permitted_params['thrt_cat_ids']
+                    }
+                Wbrs::ManualWlbl.bulk_new_wlbl_from_params(wlbl_params)
+              when "remove"
+                Wbrs::ManualWlbl.destroy_from_params(ip_uris, params['lists'], username: current_user.cvs_username)
+              when "replace"
+                replace_params_formatted =
+                    {
+                        dispute_entry_ids: params[:dispute_entries],
+                        trgt_list: params[:lists],
+                        thrt_cats: params[:thrt_cat_ids],
+                        note: params[:note]
+                    }
+                Wbrs::ManualWlbl.adjust_entries_from_params(replace_params_formatted, username: current_user.cvs_username)
+              else
+                "No valid adjustment type"
+              end
+
+              if params[:dispute_entries].present?
+                params[:dispute_entries].each do |dispute_entry|
+                  dispute = DisputeEntry.where({:id => dispute_entry}).first.dispute
+                  DisputeComment.create(:dispute_id => dispute.id, :user_id => current_user.id, :comment => params[:note])
+                end
+              end
+
+              true
+            end
+
+
+
+
+
+
+
+
+
+
+            # TODO: unused?
             desc "Adjust a WL/BL entry"
             params do
               requires :dispute_entry_ids, type: Array[Integer], desc: "analyst-console database id"
@@ -282,6 +352,7 @@ module API
               true
             end
 
+            # TODO: unused?
             desc "Adjust a WL/BL entry"
             params do
               requires :dispute_ids, type: Array[Integer], desc: "analyst-console database id"
@@ -655,7 +726,7 @@ module API
 
                     comment = ""
 
-		                comment = value["metadata"].fetch("VRT", {}).fetch("comment", "")
+                    comment = value["metadata"].fetch("VRT", {}).fetch("comment", "")
 
                     return_data.push(:entry => key, :classification => value["classifications"], :expiration => expiration, :status => value["status"], :comment => comment).to_json
                   end
@@ -752,6 +823,7 @@ module API
               requires :ip_uris, type: Array[String]
               requires :list_types, type: Array[String]
               requires :note, type: String
+              optional :thrt_cat_ids, type: Array[Integer], desc: "threat categories"
             end
 
             post 'bulk_rule_ui_wlbl_add' do
@@ -765,7 +837,8 @@ module API
                         urls: unique_ip_uris,
                         trgt_list: permitted_params['list_types'],
                         note: permitted_params['note'],
-                        usr: current_user.cvs_username
+                        usr: current_user.cvs_username,
+                        thrt_cat_ids: permitted_params['thrt_cat_ids']
                     }
 
                 Wbrs::ManualWlbl.bulk_new_wlbl_from_params(wlbl_params)
@@ -839,6 +912,7 @@ module API
               render json: {assignees: assignees}
             end
 
+
             ## for bulk lookup
 
             desc 'super simple endpoint for bulk lookup to consume'
@@ -861,7 +935,51 @@ module API
               rescue
                 render json: {:status => "error", :data => data}
               end
+            end
 
+
+            desc 'Get URL + IP data from SDS V3'
+            post 'update_multi_ip' do
+
+              uri = params[:uri]
+              provided_ips = params[:ip_addresses]
+              ips = []
+              dispute_entry_id = params[:dispute_entry_id]
+
+              dispute_entry = nil
+
+              # Make sure the ips are legit
+              provided_ips.each do |ip|
+                if DisputeEntry.is_ip?(ip)
+                  ips << ip
+                end
+              end
+
+              if dispute_entry_id.present?
+                dispute_entry = DisputeEntry.where(:id => dispute_entry_id).first
+              end
+
+              results = DisputeEntry.process_multi_ip_info(uri, ips, dispute_entry)
+              render json: {:status => "success", :rulehits => results[:rulehits], :score => results[:score], :proxy_uri => results[:proxy_uri], :threat_cats => results[:threat_cats]}
+            end
+
+
+            params do
+              requires :uri, type: String
+            end
+            desc 'Grab threat categories from SDSv3 API'
+            post 'threat_categories' do
+              response = SbApi.remote_call_sds_v3(permitted_params[:uri],'wbrs')
+              response
+            end
+
+            params do
+              requires :uri, type: String
+            end
+            desc 'Grab threat levels from SDSv2 API'
+            post 'threat_levels' do
+              response = SbApi.remote_call_sds(permitted_params[:uri],'wbrs')
+              response
             end
 
           end
