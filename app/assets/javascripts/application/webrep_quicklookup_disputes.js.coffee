@@ -286,10 +286,11 @@ $ ->
           for key, value of act
             switch key
               when 'maintain'
+                classifications = Array.from(new Set(act[key]))
                 data = [{
                   'action': 'ACTIVE'
                   'entries': [dispute]
-                  'classifications': act[key]
+                  'classifications': classifications
                   'comment': comment
                 }]
 
@@ -303,10 +304,11 @@ $ ->
                 )
 
               when 'override'
+                classifications = Array.from(new Set(act[key]))
                 data = [{
                   'action': 'ACTIVE'
                   'entries': [dispute]
-                  'classifications': act[key]
+                  'classifications': classifications
                   'comment': comment
                 }]
 
@@ -749,6 +751,7 @@ $ ->
 
     selected_rows.each () ->
       row = $(this).closest('tr')
+      rep_status = row.find('.rep-status').text()
       data = row.find('.col-bulk-dispute').text()
       action_col = row.find('.col-actions')
       existing_reptool = row.find('.col-reptool-class:not(.missing-data)')
@@ -776,7 +779,6 @@ $ ->
             error_message = data + ' has no classifications to drop.'
         else
           $( '.drop.reptool-action-col' ).remove()
-          rep_status = row.find('.rep-status').innerHTML
           actions = row.find('.col-actions')
 
           if reptool_add.toLowerCase() == 'add'
@@ -790,10 +792,13 @@ $ ->
           if reptool_add.toLowerCase() == 'remove'
             check_list = check_vals.filter( (rep)->
               if existing_actions.indexOf(rep) == -1 || rep_list.indexOf(rep) == -1
-                error_message += "<span class='col-tag dialog-tag'>#{rep} </span>, "
-              else
                 if rep_status == "ACTIVE"
-                  return rep
+                  error_message += "<span class='col-tag dialog-tag'>#{rep} </span>, "
+                  return false
+                else
+                    return true
+              else
+                return true
               )
             reptool_tags = $(action_col).attr( 'reptool_classes').split(',')
             action_tags = reptool_tags.filter( (val) => if check_list.indexOf(val) == -1  && val != 'ACTIVE' && val != 'EXPIRED' then return val )
@@ -802,10 +807,13 @@ $ ->
           else if reptool_add.toLowerCase() == 'add'
             check_list = check_vals.filter( (rep)->
               if existing_actions.indexOf(rep) > -1 || rep_list.indexOf(rep) > -1
-                error_message += "<span class='col-tag dialog-tag'>#{rep} </span>, "
-              else
                 if rep_status == "ACTIVE"
-                  return rep
+                  error_message += "<span class='col-tag dialog-tag'>#{rep} </span>, "
+                  return false
+                else
+                  return true
+              else
+                return true
             )
             $(action_col).attr( 'reptool_classes', check_list.concat(existing_actions) )
 

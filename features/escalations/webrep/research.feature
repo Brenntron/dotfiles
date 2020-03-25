@@ -415,7 +415,6 @@ Feature: Webrep, the BFRP
     And I enter content "https://www.1234computer.com www.g-oogl-e.com" within p with class ".col-bulk-dispute"
     Then I hit enter within ".col-bulk-dispute"
     Then I click "#get-rep-data"
-    Then I should see "Loading data..."
     And  I wait for "5" seconds
     Then quick lookup entry "wbrs" column number "1" should have content "-9.5"
     Then quick lookup entry "wbrs" column number "2" should have content "-9.5"
@@ -444,12 +443,11 @@ Feature: Webrep, the BFRP
     And I should see "New Reputation Dispute Ticket"
     And I type content "A truly fantastic test comment" within input with id "confirm-rep-input"
     Then I click "confirm-rep-changes"
-    Then I should see "Loading data..."
-    Then I wait for "25" seconds
+]    Then I wait for "25" seconds
     Then I should see "ALL DISPUTES WERE SUCCESSFULLY CREATED"
 
   @javascript
-  Scenario: a user can set the reptool action column and submit reptool suggestions for selected entries
+  Scenario: a user can set the reptool action column and submit reptool suggestions for selected entries, col should disappear on success
     Given a user with role "webrep user" exists and is logged in
     Then clean up reptool and remove all reptool entries on "https://www.1234computer.com"
     When I goto "escalations/webrep/research#lookup-quick"
@@ -471,7 +469,26 @@ Feature: Webrep, the BFRP
     And I should see "New Reputation Dispute Ticket"
     And I type content "A truly fantastic test comment" within input with id "confirm-rep-input"
     Then I click "confirm-rep-changes"
-    Then I should see "Loading data..."
     Then I wait for "10" seconds
     Then I should see "ALL DISPUTES WERE SUCCESSFULLY CREATED"
+
 #   Need confirmation that dispute was successfully submitted or errs, also need a way to wipe reptool data from the database
+
+  @javascript
+  Scenario: a user will recieve an error for attempting to submit duplicate classifications to an ACTIVE reptool entry
+    Given a user with role "webrep user" exists and is logged in
+    When I goto "escalations/webrep/research#lookup-quick"
+    Then I should see content "Submit Reputation Changes" within "#submit-rep-changes"
+    And I enter content "https://www.1234computer.com" within p with class ".col-bulk-dispute"
+    Then I hit enter within ".col-bulk-dispute"
+    Then I click "#get-rep-data"
+    And  I wait for "5" seconds
+    Then I click "reptool_entries_button"
+    And  I should see "Adjust Reptool Classification"
+    Then I click "input[name='attackers']"
+    Then I click "input[name='open_proxy']"
+    Then I click "input[name='malware']"
+    Then I click "input[name='cnc']"
+    Then I click "quick-lookup-reptool-submit"
+    Then I wait for "20" seconds
+    Then quick lookup entry "actions" column number "1" should have content ""
