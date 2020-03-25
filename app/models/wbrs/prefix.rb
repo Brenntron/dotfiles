@@ -26,6 +26,7 @@ class Wbrs::Prefix < Wbrs::Base
   # @param [Integer] limit: Max number of records to return
   # @param [Integer] offset: Offset of the first record to return
   # @return [Array<Wbrs::Prefix>] Array of the results.
+  # TODO Almost all the time "where" is called with "urls", so add a convenience method "from_urls"
   def self.where(conditions = {})
     params = stringkey_params(conditions)
     # category_ids = Wbrs::Category.category_ids_from_params(params)
@@ -56,6 +57,31 @@ class Wbrs::Prefix < Wbrs::Base
                                    confidence: datum['confidence'],
                                    is_active: datum['is_active'])
     end
+  end
+
+  def category_object
+    case
+    when @category_object
+      # do nothing
+    when self.category_id
+      @category_object = Wbrs::Category.find(self.category_id)
+    else
+      @category_object = categories.first
+    end
+    @category_object
+  end
+
+  def category_names
+    categories.map {|category| category.descr}
+  end
+
+  # @param prefixes Array of these objects
+  # @return Array[String] Array of category names
+  def self.category_names(prefixes)
+    prefixes.inject([]) do |category_names, prefix|
+      category_names += prefix.category_names
+      category_names
+    end.uniq.join(',')
   end
 
   # Get a prefix by id

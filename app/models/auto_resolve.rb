@@ -1,7 +1,7 @@
 class AutoResolve
   include ActiveModel::Model
 
-  attr_accessor :address_type, :address, :resolved, :status, :rule_hits, :internal_comment, :resolution_comment
+  attr_accessor :address_type, :address, :resolved, :status, :rule_hits, :internal_comment, :resolution_comment, :auto_resolve_log
 
   ADDRESS_TYPE_IP           = 'IP'
   ADDRESS_TYPE_URI          = 'URI'
@@ -10,6 +10,7 @@ class AutoResolve
   STATUS_NEW                = 'NEW'
   STATUS_MALICIOUS          = 'MALICIOUS'
   STATUS_NONMALICIOUS       = 'CLEAR'
+
 
   # @return (Boolean) true if address type is IP.
   def ip?
@@ -35,6 +36,10 @@ class AutoResolve
     @resolved
   end
 
+  def auto_resolve_log
+    @auto_resolve_log
+  end
+
   # @return [Boolean] true if auto resolve check is bad and entry auto resolves to malicious.
   def malicious?
     STATUS_MALICIOUS == self.status
@@ -48,6 +53,11 @@ class AutoResolve
     @resolution_comment += str
   end
 
+  def append_auto_resolve_log(str)
+    @auto_resolve_log ||= ''
+    @auto_resolve_log += str
+  end
+
   def good_mnem?(rule_hit)
     %w{tuse a500 vsvd suwl wlw wlm wlh deli ciwl beaker_drl}.include?(rule_hit)
   end
@@ -56,15 +66,20 @@ class AutoResolve
   # Sets this object state to convention of NEW: human review needed, MALICIOUS: auto resolve, or nil unknown.
   def check_complaints(rule_hits:)
     return false unless rule_hits&.any?
-
+    auto_resolve_log = "----------BLS Positive Hit Check-------------\n"
     good_mnems = rule_hits.select{|rule_hit| good_mnem?(rule_hit)}
     if good_mnems.any?
+      auto_resolve_log += "\nPositive Hits were found:\n"
+      auto_resolve_log += "data: #{good_mnems.inspect.to_s}\n"
+
       append_comment("BLS positive hit(s): #{good_mnems.join(', ')}; ")
       true
     else
+      auto_resolve_log += "\nno Positive Hits were found\n"
       append_comment('BLS: -; ')
       false
     end
+    append_auto_resolve_log(auto_resolve_log)
   end
 
   def virus_total_scan_names
@@ -112,16 +127,25 @@ class AutoResolve
       scan_hits = scan_results.select do |scan|
         scan && scan['detected']
       end
+      auto_resolve_log = "----------Virus Total Check-------------\n"
       if scan_hits.any?
         hit_messages = scan_hits.map {|scan| "#{scan['name']}: #{scan['result']}"}
+        auto_resolve_log += "there were scan hits for this dispute entry.\n"
+        auto_resolve_log += "scan hits: #{hit_messages.join(', ')}\n"
+        auto_resolve_log += "VT verdict: Malicious"
         append_comment("#{hit_messages.join(', ')}; ")
         return STATUS_MALICIOUS
       else
+        auto_resolve_log += "there were no scan hits for this dispute entry.\n"
+        auto_resolve_log += "VT verdict: Non Malicious"
         append_comment('VT: -; ')
         return STATUS_NONMALICIOUS
       end
+      auto_resolve_log += "\n---------------------------------------\n\n"
+      append_auto_resolve_log(auto_resolve_log)
     end
   rescue
+    append_auto_resolve_log("\nError in VT check\n")
     append_comment('VT: error; ')
     return nil
   end
@@ -142,17 +166,23 @@ class AutoResolve
   # Sets this object state to convention of NEW: human review needed, MALICIOUS: auto resolve, or nil unknown.
   def check_umbrella(address: self.address)
     result = call_umbrella(address: address)
+    auto_resolve_log = "----------Umbrella Check-------------\n"
     if result && result[address]
       verdict = result[address]
       if 0 > verdict['status']
+        auto_resolve_log += "Umbrella Verdict: Malicious\n"
         append_comment('Umbrella: malicious domain.; ')
         return STATUS_MALICIOUS
       else
+        auto_resolve_log += "Umbrella Verdict: Non Malicious\n"
         append_comment('Umbrella: -; ')
         return STATUS_NONMALICIOUS
       end
     end
+    auto_resolve_log += "data: #{result.inspect.to_s}\n"
+    append_auto_resolve_log(auto_resolve_log)
   rescue
+    append_auto_resolve_log("\nError in Umbrella check\n")
     append_comment('Umbrella: error; ')
     return nil
   end
@@ -160,25 +190,35 @@ class AutoResolve
   def check_umbrella_from_preload(dispute_entry, address)
     if dispute_entry&.dispute_entry_preload&.umbrella.present?
       result = dispute_entry.dispute_entry_preload.umbrella
+      auto_resolve_log = "----------Umbrella Check (preload)-------------\n"
       if result == 'Malicious'
+        auto_resolve_log += "Umbrella Verdict: Malicious\n"
         append_comment('Umbrella: malicious domain.; ')
         return STATUS_MALICIOUS
       else
+        auto_resolve_log += "Umbrella Verdict: Non Malicious\n"
         append_comment('Umbrella: -; ')
         return STATUS_NONMALICIOUS
       end
+      auto_resolve_log += "data: #{result.inspect.to_s}\n"
+      append_auto_resolve_log(auto_resolve_log)
     else
       result = call_umbrella(address: address)
+      auto_resolve_log = "----------Umbrella Check-------------\n"
       if result && result[address]
         verdict = result[address]
         if 0 > verdict['status']
+          auto_resolve_log += "Umbrella Verdict: Malicious\n"
           append_comment('Umbrella: malicious domain.; ')
           return STATUS_MALICIOUS
         else
+          auto_resolve_log += "Umbrella Verdict: Non Malicious\n"
           append_comment('Umbrella: -; ')
           return STATUS_NONMALICIOUS
         end
       end
+      auto_resolve_log += "data: #{result.inspect.to_s}\n"
+      append_auto_resolve_log(auto_resolve_log)
     end
 
   rescue
@@ -208,21 +248,21 @@ class AutoResolve
   # Sets this object state to convention of NEW: human review needed, MALICIOUS: auto resolve, or nil unknown.
   def check_sources(rule_hits:, dispute_entry:, address:)
     wbrs_hits =
-        if Rails.configuration.complaints.check
+        if Rails.configuration.auto_resolve.check_complaints
           check_complaints(rule_hits: rule_hits)
         else
           nil
         end
 
     vt_status =
-        if Rails.configuration.virus_total.check
+        if Rails.configuration.auto_resolve.check_virus_total
           check_virus_total_from_preload(dispute_entry, address)
         else
           nil
         end
 
     umbrella_status =
-        if Rails.configuration.umbrella.check
+        if Rails.configuration.auto_resolve.check_umbrella
           check_umbrella_from_preload(dispute_entry, address)
         else
           nil
@@ -305,4 +345,68 @@ class AutoResolve
                                      author: author,
                                      comment: comment)
   end
+
+
+  ########################################
+  #for custom email based auto resolve
+  ########################################
+
+  def self.publish_to_rep_api(dispute = nil, uri, author: 'reptooluser')
+    if dispute.present?
+      comment = "TE SecHub-Auto-#{dispute_id}"
+    else
+      comment = "TE SecHub-Auto"
+    end
+
+    RepApi::Blacklist.add_from_hosts(hostnames: [ uri ],
+                                     classifications: [ 'malware' ],
+                                     author: author,
+                                     comment: comment)
+  end
+
+  def self.bad_email_mnem?(rule_hit)
+    ["Sbl", "Pbl", "Cbl", "iaH", "Dh"].include?(rule_hit)
+  end
+
+  def self.build_resolution_message(rule_hits)
+
+    message = ""
+    if rule_hits.include?("iaH") || rule_hits.include?("Dh")
+      message += "Our worldwide sensor network indicates that spam originated from your IP. "
+      if rule_hits.include?("Dh")
+        message += "] In addition, our sensors indicate server access attempts from this IP to mail servers within our Sensor Network. This behavior is indicative of email directory harvesting attempts and also results in reputation impact to the IP. Directory harvest detection fires when you are sending to invalid email addresses. "
+      end
+      message += "It is possible that your network or a system in your network may be compromised by a trojan spam virus, or perhaps there is an open port 25 through which a spammer may be gaining access and sending out spam. The last possibility is that one of your users is sending spam through the IP. We suggest checking these possibilities to help isolate the root cause of the spam and mail server access attempts originating from your IP.In general, once all issues have been addressed (fixed), reputation recovery can take anywhere from a few hours to just over one week to improve, depending on the specifics of the situation, and how much email volume the IP sends. Complaint ratios determine the amount of risk for receiving mail from an IP, so logically, reputation improves as the ratio of legitimate mails increases with respect to the number of complaints. Speeding up the process is not really possible. Talos Intelligence Reputation is an automated system over which we have very little manual influence."
+    end
+
+    if rule_hits.include?("Sbl") || rule_hits.include?("Pbl") || rule_hits.include?("Cbl")
+      message += "Your IP has a poor Talos Intelligence Reputation due to currently being listed on Spamhaus (http://www.spamhaus.org/) Review the status and reason(s) by visiting https://www.spamhaus.org/lookup/and entering your IP. Please contact Spamhaus directly to resolve this listing issue. Once delisted, the Talos Intelligence Reputation for the IP should improve within 24 hours."
+    end
+
+    message
+  end
+
+  def self.auto_resolve_email(dispute_entry, rule_hits)
+    auto_resolve_log = "\n-----------non customer email ip check--------------\n"
+    bad_mnems = rule_hits.select{|rule_hit| bad_email_mnem?(rule_hit)}
+    if bad_mnems.any?
+      auto_resolve_log += "bad email hits were found:\n"
+      auto_resolve_log += "#{bad_mnems.inspect.to_s}\n"
+      dispute_entry.resolution = DisputeEntry::STATUS_RESOLVED_UNCHANGED
+      dispute_entry.status = DisputeEntry::STATUS_RESOLVED
+      dispute_entry.case_closed_at = Time.now
+      dispute_entry.case_resolved_at = Time.now
+      dispute_entry.auto_resolve_log += auto_resolve_log
+      dispute_entry.resolution_comment = build_resolution_message(rule_hits)
+      dispute_entry.save
+
+      return true
+
+    end
+
+    return false
+
+  end
+
+
 end

@@ -10,6 +10,14 @@ module API
           User.all
         end
 
+        desc "Return all users as JSON"
+        get "json", root: :users do
+          authorize!(:index, User)
+
+          users = User.all.where.not(display_name: [nil,""]).map{|customer| {name: customer.cvs_username, display_name: customer.display_name}}
+          users.sort_by {|hash| hash[:name]}.to_json
+        end
+
         desc "Return a user"
         params do
           requires :id, type: String, desc: "ID of the user"

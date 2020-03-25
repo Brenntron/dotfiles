@@ -1,0 +1,42 @@
+%h1 RuleAPI Console Page
+
+%input#user_id{type: 'hidden', name: 'user_id', value: "#{current_user.id}"}
+%input{:name => "token", :type => "hidden", :value => "#{current_user.authentication_token}"}
+%input{:type => "hidden", :name => "xml_token", :value => "#{xml_token}"}
+
+
+
+%h3 Reptool
+
+
+.control-banner
+  %label /blacklist/classifications:
+  = text_field "admin_tools", "args", :value => '{}', :class => '1-reptool-args'
+  %button#execute-reptool-button-1 Go!
+.control-banner#reptool-output-1
+%br
+%br
+
+.control-banner
+  %label /blacklist/get:
+  = text_field "admin_tools", "args", :value => '{"entries":["stupid.com","google.com"]}', :class => '2-reptool-args'
+  %button#execute-reptool-button-2 Go!
+.control-banner#reptool-output-2
+%br
+%br
+
+.control-banner
+  %label /blacklist/add:
+  = text_field "admin_tools", "args", :value => '{"entry":"yammer.com","author":"person","comment":"things","classification":"malware"}', :class => '3-reptool-args'
+  %button#execute-reptool-button-3 Go!
+.control-banner#reptool-output-3
+%br
+%br
+
+.control-banner
+  %label /blacklist/expire:
+  = text_field "admin_tools", "args", :value => '{"entry":"stupid.com"}', :class => '4-reptool-args'
+  %button#execute-reptool-button-4 Go!
+.control-banner#reptool-output-4
+%br
+%br

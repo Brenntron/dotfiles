@@ -88,14 +88,17 @@ class Sbrs::ManualSbrs < Sbrs::Base
     all_rules = Sbrs::Base.rules_matchup
 
     uri_rules = []
-    rep_data["wbrs-rulehits"].each do |rule_id|
-      rule_id = rule_id.to_s
-      if all_rules[rule_id].present?
-        uri_rules.append(all_rules[rule_id]["mnemonic"])
 
-      else
-        uri_rules.append(rule_id)
+    if rep_data["wbrs-rulehits"].present?
+      rep_data["wbrs-rulehits"].each do |rule_id|
+        rule_id = rule_id.to_s
+        if all_rules[rule_id].present?
+          uri_rules.append(all_rules[rule_id]["mnemonic"])
 
+        else
+          uri_rules.append(rule_id)
+
+        end
       end
     end
     uri_rules

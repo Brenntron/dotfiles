@@ -9,8 +9,13 @@ class Company < ApplicationRecord
   end
 
   def self.thread_safe_find_or_create_by(attributes)
-    with_advisory_lock("company_create", timeout_seconds: 20) do
-      find_or_create_by(attributes)
+    begin
+      with_advisory_lock("company_create", timeout_seconds: 20) do
+        find_or_create_by(attributes)
+      end
+    rescue Exception => e
+      Rails.logger.error e
+      raise "Failed to create new Company with the following attributes: '#{attributes}'"
     end
   end
 end

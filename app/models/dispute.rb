@@ -529,6 +529,7 @@ class Dispute < ApplicationRecord
           total_hits = (wbrs_hits + sbrs_hits).uniq
 
           new_dispute_entry = new_dispute.dispute_entries.build(entry_type: 'IP', ip_address: key)
+          new_dispute_entry.auto_resolve_log = ""
           new_dispute_entry.case_opened_at = opened_at
           new_dispute_entry.sbrs_score = entry[:sbrs]["SBRS_SCORE"] == "No score" ? nil : entry[:sbrs]["SBRS_SCORE"]
           new_dispute_entry.wbrs_score = entry[:wbrs]["WBRS_SCORE"] == "No score" ? nil : entry[:wbrs]["WBRS_SCORE"]
@@ -539,21 +540,46 @@ class Dispute < ApplicationRecord
           logger.info "fetching preload"
           ::Preloader::Base.fetch_all_api_data(key, new_dispute_entry.id)
 
-          case
-          when !false_negative_claim
-            new_dispute_entry.status = DisputeEntry::NEW
-          else
-            auto_resolve_verdict = new_dispute_entry.assign_from_auto_resolve(address: key,
-                                                                              total_hits: total_hits,
-                                                                              resolved_at: resolved_at,
-                                                                              dispute_entry: new_dispute_entry)
 
-            if auto_resolve_verdict.resolved? && auto_resolve_verdict.malicious?
-              verdicts_to_blacklist << [auto_resolve_verdict, new_dispute_entry]
-            end
-          end
+          matching_disposition = new_dispute_entry.is_disposition_matching?
 
+          initial_log = "--------Starting Data---------\n"
+          initial_log += "suggested disposition: #{new_dispute_entry.suggested_disposition}\n"
+          initial_log += "effective disposition info: #{new_dispute_entry.running_verdict.inspect.to_s}\n"
+          initial_log += "-----------------------------\n"
+
+          new_dispute_entry.auto_resolve_log += initial_log
           new_dispute_entry.save!
+
+          if !matching_disposition
+
+            if !false_negative_claim
+              new_dispute_entry.status = DisputeEntry::NEW
+
+              if new_dispute.submitter_type == "NON-CUSTOMER"
+                AutoResolve.auto_resolve_email(new_dispute_entry, total_hits)
+              end
+
+            else
+
+              auto_resolve_verdict = new_dispute_entry.assign_from_auto_resolve(address: key,
+                                                                                total_hits: total_hits,
+                                                                                resolved_at: resolved_at,
+                                                                                dispute_entry: new_dispute_entry)
+
+              if auto_resolve_verdict.resolved? && auto_resolve_verdict.malicious?
+                verdicts_to_blacklist << [auto_resolve_verdict, new_dispute_entry]
+              end
+
+              if auto_resolve_verdict.present? && autoresolve_verdict.auto_resolve_log.present?
+                new_dispute_entry.auto_resolve_log += auto_resolve_verdict.auto_resolve_log
+              end
+            end
+
+
+            new_dispute_entry.save!
+
+          end
 
           #this is for return back to TI to populate its ticket show pages
           return_payload[key] = new_dispute_entry.new_payload_item
@@ -588,6 +614,7 @@ class Dispute < ApplicationRecord
           #grab xbrs, reptool stuff, wl/bl entries, virustotal
           #
 
+
           false_negative_claim = false
 
           if ["Suspicious sites", "High risk","Poor"].include?(entry["rep_sugg"])
@@ -606,29 +633,52 @@ class Dispute < ApplicationRecord
           new_dispute_entry.wbrs_score = entry["WBRS_SCORE"] == "No score" ? nil : entry["WBRS_SCORE"]
           new_dispute_entry.suggested_disposition = entry["rep_sugg"]
           new_dispute_entry.is_important = is_important?(key)
-
+          new_dispute_entry.auto_resolve_log = ""
           new_dispute_entry.assign_url_parts(key)
 
+
+          resolved_ip = Resolv.getaddress(DisputeEntry.domain_of(new_dispute_entry.uri)) rescue nil
+          if resolved_ip.present?
+            new_dispute_entry.web_ips = [resolved_ip]
+          end
+
           new_dispute_entry.save!
+
+          matching_disposition = new_dispute_entry.is_disposition_matching?
 
           logger.info "fetching preload"
           ::Preloader::Base.fetch_all_api_data(key, new_dispute_entry.id)
 
-          case
-          when !false_negative_claim
-            new_dispute_entry.update(status: DisputeEntry::NEW)
-          else
-            auto_resolve_verdict = new_dispute_entry.assign_from_auto_resolve(address: key,
-                                                                              total_hits: total_hits,
-                                                                              resolved_at: resolved_at,
-                                                                              dispute_entry: new_dispute_entry)
+          #threat cats for urls
+          complete_wbrs_blob = Wbrs::ManualWlbl.where({:url => new_dispute_entry.uri})
+          new_dispute_entry.wbrs_threat_category = [complete_wbrs_blob.last].select{ |wlbl| wlbl&.state == "active"}.map{ |wlbl| wlbl.threat_cats }.join(', ')
 
-            if auto_resolve_verdict.resolved? && auto_resolve_verdict.malicious?
-              verdicts_to_blacklist << [auto_resolve_verdict, new_dispute_entry]
-            end
-          end
+          initial_log = "--------Starting Data---------\n"
+          initial_log += "suggested disposition: #{new_dispute_entry.suggested_disposition}\n"
+          initial_log += "effective disposition info: #{new_dispute_entry.running_verdict.inspect.to_s}\n"
+          initial_log += "-----------------------------\n"
 
+          new_dispute_entry.auto_resolve_log += initial_log
           new_dispute_entry.save!
+
+
+          if !matching_disposition
+            if !false_negative_claim
+              new_dispute_entry.update(status: DisputeEntry::NEW)
+            else
+              auto_resolve_verdict = new_dispute_entry.assign_from_auto_resolve(address: key,
+                                                                                total_hits: total_hits,
+                                                                                resolved_at: resolved_at,
+                                                                                dispute_entry: new_dispute_entry)
+
+              if auto_resolve_verdict.resolved? && auto_resolve_verdict.malicious?
+                verdicts_to_blacklist << [auto_resolve_verdict, new_dispute_entry]
+              end
+            end
+
+            new_dispute_entry.save!
+
+          end
 
           return_payload[key] = new_dispute_entry.new_payload_item
           return_payload[key]['sugg_type'] = new_dispute_entry.suggested_disposition

@@ -912,7 +912,6 @@ module API
               render json: {assignees: assignees}
             end
 
-
             ## for bulk lookup
 
             desc 'super simple endpoint for bulk lookup to consume'
@@ -936,7 +935,6 @@ module API
                 render json: {:status => "error", :data => data}
               end
             end
-
 
             desc 'Get URL + IP data from SDS V3'
             post 'update_multi_ip' do

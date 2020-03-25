@@ -1,3 +1,11 @@
+$(document).on 'ready',->
+  if $('#auto-resolve-dialog').length > 0
+    $('#auto-resolve-dialog').dialog({
+      autoOpen : false
+      width: 500
+    });
+window.show_auto_resolve = () ->
+  $('#auto-resolve-dialog').dialog('open')
 window.update_file_rep_status = () ->
   checked_disputes = []
   resolution = ""
@@ -549,10 +557,10 @@ $ ->
       return false
 
   $(document).on 'change', '.dispute_check_box', ->
-    if $("#disputes-index-export-form").length > 0
-        document.getElementById("disputes-index-export-form").onsubmit = () ->
-          return false
-
+    # ensure this only runs in file rep, there are dispute checkboxes on webrep
+    if $('#disputes-index-export-form').length
+      document.getElementById("disputes-index-export-form").onsubmit = () ->
+        return false
   window.export_file_rep_selected = () ->
     data = build_data()
     if data.selected_cases.length <= 0
@@ -1380,14 +1388,14 @@ $ ->
         data: {name: 'FileRepColumns'}
         success: (response) ->
           response = JSON.parse(response)
-
-          $.each response, (column, state) ->
-            if state == true
-              $("##{column}-checkbox").prop('checked', true)
-              $('#file-rep-datatable').DataTable().column("##{column}").visible true
-            else
-              $("##{column}-checkbox").prop('checked', false)
-              $('#file-rep-datatable').DataTable().column("##{column}").visible false
+          if response?
+            $.each response, (column, state) ->
+              if state == true
+                $("##{column}-checkbox").prop('checked', true)
+                $('#file-rep-datatable').DataTable().column("##{column}").visible true
+              else
+                $("##{column}-checkbox").prop('checked', false)
+                $('#file-rep-datatable').DataTable().column("##{column}").visible false
 
       )
 
@@ -1399,7 +1407,8 @@ $ ->
         data: {name: 'FileRepSortOrder'}
         success: (response) ->
           response = JSON.parse(response)
-          $('#file-rep-datatable').DataTable().order(response.sortorder).draw()
+          if response?
+            $('#file-rep-datatable').DataTable().order(response.sortorder).draw()
         error: () ->
       )
 
@@ -1409,7 +1418,8 @@ $ ->
         data: {name: 'FileRepCurrentPage'}
         success: (response) ->
           response = JSON.parse(response)
-          $('#file-rep-datatable').DataTable().page(response.currentpage).draw('page')
+          if response?
+            $('#file-rep-datatable').DataTable().page(response.currentpage).draw('page')
         error: () ->
       )
 
@@ -1419,7 +1429,8 @@ $ ->
         data: {name: 'FileRepEntriesPerPage'}
         success: (response) ->
           response = JSON.parse(response)
-          $('#file-rep-datatable').DataTable().page.len(response.entriesperpage).draw('page')
+          if response?
+            $('#file-rep-datatable').DataTable().page.len(response.entriesperpage).draw('page')
         error: () ->
       )
 

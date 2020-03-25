@@ -9,6 +9,10 @@ end
 Given(/^I fill in "(.*?)" with "(.*?)"$/) do |field_label, value|
   fill_in field_label, :with => value
 end
+Given(/^I fill in "(.*?)" with "(.*?)" and press enter$/) do |field_label, value|
+  fill_in field_label, :with => value
+  find(:id, field_label).native.send_keys(:enter)
+end
 
 Given(/^I fill in element, "(.*?)" with "(.*?)"$/) do |identifier, value|
   page.find(identifier).set(value)
@@ -70,8 +74,13 @@ end
 When(/^I check "(.*?)"$/) do |target|
   check(target)
 end
+
 When(/^I uncheck "(.*?)"$/) do |target|
   uncheck(target)
+end
+
+And (/^I check checkbox with class "(.*?)"$/) do |cb_class|
+  check(class: cb_class)
 end
 
 When(/^I choose "(.*?)"$/) do |target|
@@ -144,15 +153,27 @@ Given(/^I click "(.*?)" within the "(.*?)" row$/) do |target, row_number|
 end
 
 Then(/^Element with content "(.*?)" should have class "(.*?)"$/) do |content,class_name|
-  find(:xpath, "//div[contains(@class, '#{class_name}')][contains(text(), '#{content}')]")
+  find(:xpath, "//*[contains(@class, '#{class_name}')][contains(text(), '#{content}')]")
 end
 
 Then(/^Element with class "(.*?)" should have content "(.*?)"$/) do |class_name, content|
-  find(:xpath, "//div[contains(@class, '#{class_name}')][contains(text(), '#{content}')]")
+  find(:xpath, "//*[contains(@class, '#{class_name}')][contains(text(), '#{content}')]")
+end
+
+Then(/^Element with class "(.*?)" should not have content "(.*?)"$/) do |class_name, content|
+  element = find(:xpath, "//*[contains(@class, '#{class_name}')]")
+  raise "content found when it should not have been found" if element.has_content?(content)
+end
+
+Then(/^Element with class "(.*?)" should not be empty$/) do |class_name|
+  element = find(:xpath, "//*[contains(@class, '#{class_name}')]")
+  unless element.has_content?
+    raise "content not found when it should have been found"
+  end
 end
 
 Then(/^Element with id "(.*?)" should have content "(.*?)"$/) do |id_name, content|
-  find(:xpath, "//div[contains(@id, '#{id_name}')][contains(text(), '#{content}')]")
+  find(:xpath, "//*[contains(@id, '#{id_name}')][contains(text(), '#{content}')]")
 end
 
 Then(/^I should see the "(.*?)" radio checked$/) do |radio_class|
@@ -167,6 +188,12 @@ end
 Then(/^I should see the "(.*?)" checkbox unchecked$/) do |checkbox_class|
   page.find(checkbox_class).should_not be_checked
 end
+
+Then(/^I click checkbox with value "(.*?)"$/) do |checkbox_value|
+  checkbox = page.find(:xpath, "//input[@type='checkbox' and @value='#{checkbox_value}']")
+  checkbox.should be_checked
+end
+
 
 Given(/^I click an image button in table "(.*?)" at row "(.*?)" and col "(.*?)" with class name "(.*?)"$/) do |table, row, column,class_name|
 page.find(:xpath, "//table[#{table}]//tr[#{row}]//td[#{column}]//*[contains(@class, '#{class_name}')]").click
@@ -240,6 +267,26 @@ Then(/^I should see "(.*?)"$/) do |content|
   raise "content not found" unless page.has_content?(content)
 end
 
+Then(/^I should see element "(.*?)"$/) do |element|
+  begin
+    page.find(element)
+  rescue Capybara::ElementNotFound => e
+    raise "element not found: #{element}"
+  end
+end
+
+Then(/^I should not see element with class "(.*?)"$/) do |classname|
+  page.should have_no_selector(:xpath, "//*[contains(@id, '#{classname}')]")
+end
+
+Then(/^I should see hidden element "(.*?)" with content "(.*?)"$/) do |element, content|
+  begin
+    page.find(element, visible: :all, text: content)
+  rescue Capybara::ElementNotFound => e
+    raise "content not found: #{content}"
+  end
+end
+
 Then(/^I should see either "(.*?)" or "(.*?)"$/) do |content1, content2|
   raise "content not found" unless ( page.has_content?(content1) || page.has_content?(content2) )
 end
@@ -290,6 +337,10 @@ Then(/^I should see table header with id "(.*?)"$/) do |element|
   page.should have_selector(:xpath, "//th[contains(@id, '#{element}')]")
 end
 
+Then(/^I should not see table header with id "(.*?)"$/) do |element|
+  page.should have_no_selector(:xpath, "//th[contains(@id, '#{element}')]")
+end
+
 Then(/^I should not see button with class "(.*?)"$/) do |element|
   page.should have_no_selector(:xpath, "//button[contains(@class, '#{element}')]")
 end
@@ -306,8 +357,12 @@ Then(/^I should see div element with class "(.*?)"$/) do |element|
   page.should have_selector(:xpath, "//div[contains(@class, '#{element}')]")
 end
 
-Then(/^I should not see div element with class "(.*?)"$/) do |element|
-  page.should have_no_selector(:xpath, "//div[contains(@class, '#{element}')]")
+Then(/^I should see tr element with id "(.*?)"$/) do |element|
+  page.should have_selector(:xpath, "//tr[contains(@id, '#{element}')]")
+end
+
+Then(/^I should not see tr element with id "(.*?)"$/) do |element|
+  page.should have_no_selector(:xpath, "//tr[contains(@id, '#{element}')]")
 end
 
 Then(/^the textarea with id "(.*?)" should contain "(.*?)"$/) do |id, content|
@@ -424,6 +479,10 @@ Then (/^I should receive a file of type "(.*?)"/) do |type|
   result = page.response_headers['Content-Type'].should == type
 end
 
+Then (/^I type content "(.*?)" within input with id "(.*?)"/) do |content, input|
+  fill_in input, :with => content
+end
+
 Then (/^I hit enter within "(.*?)"/) do |element|
   find(element).native.send_keys(:return)
 end
@@ -438,4 +497,27 @@ end
 
 Given(/^I click on element "(.*?)" with accessor "(.*?)" of "(.*?)"$/) do |element, type, value|
   find("#{element}[#{type}='#{value}']").click
+end
+
+And(/^I enter the pin toolbar hot key$/) do
+  page.find(:xpath, "//body").send_keys("^")
+end
+
+Then(/^button "(.*?)" should be enabled$/) do |button|
+  expect(page).to have_button(button)
+end
+
+Then(/^button "(.*?)" should be disabled$/) do |button|
+  expect(page).to have_button(button, disabled: true)
+end
+
+Given(/^I fill in selectized with "(.*?)"$/) do |value|
+  find('div.selectize-input input', match: :first).set("#{value}")
+  find('div.selectize-dropdown-content > div', match: :first).click
+end
+
+Given(/^I fill in selectized of element "(.*?)" with "(.*?)"$/) do |element, value|
+
+  page.execute_script("$('#{element}')[0].selectize.setValue(#{value})")
+
 end

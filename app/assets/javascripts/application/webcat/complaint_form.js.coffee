@@ -1,5 +1,4 @@
 complaint_status_list= ["NEW", "RESOLVED", "ASSIGNED", "ACTIVE","COMPLETED", "PENDING", "REOPENED" ]
-complaint_channel_list=["Internal", "TalosIntel", "WBNP"]
 complaint_resolution_list=["FIXED", "INVALID", "UNCHANGED", "DUPLICATE"]
 $ ->
 
@@ -12,14 +11,11 @@ $ ->
       headers: headers
       success: (response) ->
         $('#customerList').empty()
-        i = 0
-        while i < response.data.length
-          $('#customerList').append '<option value=\'' + response.data[i] + '\'></option>'
-          i++
+        for data, i in response.data
+          $('#customerList').append '<option value="' + data + '"></option>'
     )
 
   $('#advanced-search-button').on 'click', ->
-
     headers = {'Token': $('input[name="token"]').val(), 'Xmlrpc-Token': $('input[name="xml_token"]').val()}
     $.ajax(
       url: '/escalations/api/v1/escalations/webcat/customers_names'
@@ -35,25 +31,22 @@ $ ->
 
         uniques = []
 
-        i = 0
-        while i < response.data.length
-          if uniques.indexOf(response.data[i]) == -1
-            uniques.push(response.data[i])
-          i++
+        for data, i in response.data
+          if uniques.indexOf(i) == -1
+            uniques.push(data)
 
-        j = 0
-        while j < uniques.length
-          $('#customerList').append '<option value=\'' + uniques[j] + '\'></option>'
-          j++
+        for customer in uniques
+          $('#customerList').append '<option value="' + customer + '"></option>'
 
         for status in complaint_status_list
-          $('#status-input-list').append '<option value=\'' + status + '\'></option>'
-
-        for channel in complaint_channel_list
-          $('#channel-input-list').append '<option value=\'' + channel + '\'></option>'
+          $('#status-input-list').append '<option value="' + status + '"></option>'
 
         for resolution in complaint_resolution_list
-          $('#resolution-input-list').append '<option value=\'' + resolution + '\'></option>'
+          $('#resolution-input-list').append '<option value="' + resolution + '"></option>'
+
+        AC.WebCat.createCompanyOptions()
+        AC.WebCat.createCustomerNameOptions()
+        AC.WebCat.createAssigneeOptions()
 
     )
 
@@ -67,16 +60,12 @@ $ ->
 
         uniques = []
 
-        i = 0
-        while i < response.data.length
-          if uniques.indexOf(response.data[i]) == -1
-            uniques.push(response.data[i])
-          i++
+        for data, i in response.data
+          if uniques.indexOf(i) == -1
+            uniques.push(data)
 
-        j = 0
-        while j < uniques.length
-          $('#customerCompanyList').append '<option value=\'' + uniques[j] + '\'></option>'
-          j++
+        for company in uniques
+          $('#customerCompanyList').append '<option value="' + company + '"></option>'
     )
 
     $.ajax(
@@ -86,33 +75,21 @@ $ ->
       headers: headers
       success: (response) ->
         $('#customerEmailList').empty()
-
         uniques = []
-
-        i = 0
-        while i < response.data.length
-          if uniques.indexOf(response.data[i]) == -1
-            uniques.push(response.data[i])
-          i++
-
-        j = 0
-        while j < uniques.length
-          $('#customerEmailList').append '<option value=\'' + uniques[j] + '\'></option>'
-          j++
-
+        for data, i in response.data
+          if uniques.indexOf(i) == -1
+            uniques.push(data)
+        for email in uniques
+          $('#customerEmailList').append '<option value="' + email + '"></option>'
     )
 
   $('#new-complaint-form').submit (e) ->
     e.preventDefault()
-    $('#loader-modal').modal({
-      backdrop: 'static',
-      keyboard: false
-    })
     ips_urls = this.ips_urls.value
     desc = this.description.value
     customer = this.customers.value
     tags = $('.selectize').val() || []
-
+    $('#new-complaint').dropdown('toggle');
     std_msg_ajax(
       url: '/escalations/api/v1/escalations/webcat/complaints'
       method: 'POST'
@@ -122,10 +99,8 @@ $ ->
         customer: customer,
         tags: tags
       success: (response) ->
-        $('#loader-modal').modal 'hide'
         std_msg_success('Complaint Created.', [], reload: true)
       error: (response) ->
-        $('#loader-modal').modal 'hide'
         std_api_error(response, "Complaint was not created.", reload: false)
     )
 

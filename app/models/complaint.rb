@@ -40,13 +40,15 @@ class Complaint < ApplicationRecord
   scope :active_count , -> {where(status:ACTIVE).count}
   scope :completed_count , -> {where(status:COMPLETED).count}
   scope :new_count , -> {where(status:NEW).count}
-  scope :overdue_count , -> {where("created_at < ?",Time.now - 24.hours).where.not(status:COMPLETED).count}
+  scope :overdue_count , -> {where("created_at < ?",Time.now - 12.hours).where.not(status:COMPLETED).count}
   scope :open_comps, -> { where.not(status: COMPLETED) }
-  scope :from_ti, -> { includes(:complaint_entries).where(channel: TI_CHANNEL) }
-  scope :from_int, -> { includes(:complaint_entries).where(channel: INT_CHANNEL) }
-  scope :from_wbnp, -> { includes(:complaint_entries).where(channel: WBNP_CHANNEL) }
+
   scope :by_guest, -> { joins(:customer).where(customers: {company_id: Company.guest.id}) }
   scope :by_cust, -> { joins(:customer).where.not(customers: {company_id: Company.guest.id}) }
+
+  scope :from_ti, -> { includes(:complaint_entries).where(channel: TI_CHANNEL) }
+  scope :from_wbnp, -> { includes(:complaint_entries).where(channel: WBNP_CHANNEL) }
+  scope :from_int, -> { includes(:complaint_entries).where(channel: INT_CHANNEL) }
 
   def set_status(new_status)
     status_list = complaint_entries.map{|entry| entry.status}
@@ -127,16 +129,17 @@ class Complaint < ApplicationRecord
   end
 
 
-  def self.commit_without_complaint(ip_or_uri:, categories_string:, description:, user:, bugzilla_rest_session:)
+  def self.commit_without_complaint(ip_or_uri:, category_ids_string:, category_names_string:, description:, user:, bugzilla_rest_session:)
     # check to see if URL is in Top URLS
     top_url = Wbrs::TopUrl.check_urls([ip_or_uri]).first.is_important
     if top_url
       #create a complaint/complaint entry and set to pending
-      Complaint.create_action(bugzilla_rest_session, ip_or_uri, description, nil, nil, PENDING, categories_string)
+      Complaint.create_action(bugzilla_rest_session, ip_or_uri, description, nil, nil, PENDING, category_names_string)
     else
       # Look for existing prefix
       existing_prefix = Wbrs::Prefix.where({urls: [ip_or_uri]})
-      category_ids_array = Wbrs::Category.get_category_ids(categories_string.split(','))
+
+      category_ids_array = Wbrs::Category.get_category_ids(category_ids_string.split(','))
 
       if existing_prefix.present?
         prefix_object = Wbrs::Prefix.new

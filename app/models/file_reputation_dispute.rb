@@ -609,6 +609,7 @@ class FileReputationDispute < ApplicationRecord
         new_dispute.description = message_payload[:payload][:summary_description]
         new_dispute.customer_id = customer&.id
         new_dispute.submitter_type = (new_dispute.customer.nil? || new_dispute.customer&.company_id == guest.id) ? SUBMITTER_TYPE_NONCUSTOMER : SUBMITTER_TYPE_CUSTOMER
+        new_dispute.auto_resolve_log = ""
 
         check_for_duplicate = FileReputationDispute.where(sha256_hash: message_payload[:payload][:sha256]).where.not(status: FileReputationDispute::STATUS_RESOLVED)
         if check_for_duplicate.any?
@@ -702,10 +703,23 @@ class FileReputationDispute < ApplicationRecord
   end
 
   def auto_resolve_on_matching_disposition(from: 'ACE')
+
+      auto_resolve_log = ""
+
       auto_resolved_boolean = false
 
+      auto_resolve_log += "-------------------------------\n"
+      auto_resolve_log += "suggested: #{self.disposition_suggested}\n"
+      if self.clean?
+        auto_resolve_log += "actual: clean\n"
+      end
+      if self.malicious?
+        auto_resolve_log += "actual: malicious\n"
+      end
+      auto_resolve_log += "--------------------------------\n"
+
       if (self.clean? && self.suggested_clean?) || (self.malicious? && self.suggested_malicious?)
-        self.update(status: STATUS_RESOLVED, resolution: RESOLUTION_AUTORESOLVED, resolution_comment: RESOLUTION_AUTORESOLVED_COMMENT)
+        self.update(status: STATUS_RESOLVED, resolution: RESOLUTION_AUTORESOLVED, resolution_comment: RESOLUTION_AUTORESOLVED_COMMENT, auto_resolve_log: auto_resolve_log)
 
         auto_resolved_boolean = true
       end
@@ -717,12 +731,16 @@ class FileReputationDispute < ApplicationRecord
       reversinglab_present = true
       malware_zoo_present = false
 
+      auto_resolve_log += "\n\n"
+      auto_resolve_log += "-----Source Presence Checks------\n"
 
       ##query sources for file sample existence
       threatgrid_response = Threatgrid::Search.query(self.sha256_hash)
       if threatgrid_response[:threatgrid_score].present?
         threatgrid_present = true
       end
+
+
 
       rev_lab = FileReputationApi::ReversingLabs.lookup(self.sha256_hash)
       rev_lab_json = JSON.parse(rev_lab.raw_json)
@@ -731,12 +749,28 @@ class FileReputationDispute < ApplicationRecord
         reversinglab_present = false
       end
 
+
+
       zoo_response = FileReputationApi::SampleZoo.sha256_lookup(self.sha256_hash)
       malware_zoo_present = FileReputationApi::SampleZoo.query_from_data(zoo_response)[:in_zoo]
 
       sandbox_present = FileReputationApi::Sandbox.sample_exists(self.sha256_hash, :api_key_type => self.sandbox_key)
 
+      auto_resolve_log += "threatgrid present: #{threatgrid_present}\n"
+      auto_resolve_log += "reversing lab present: #{reversinglab_present}\n"
+      auto_resolve_log += "malware zoo present: #{malware_zoo_present}\n"
+      auto_resolve_log += "sandbox present: #{sandbox_present}\n"
+
+      auto_resolve_log += "-----data-----\n"
+      auto_resolve_log += "threatgrid:\n #{threatgrid_response.inspect.to_s}\n\n--\n"
+      auto_resolve_log += "reversing lab: too large (we just look for the existence of 'error' -> 'Not in RL')\n\n--\n"
+      auto_resolve_log += "malware zoo: #{zoo_response.inspect.to_s}\n\n--\n"
+      auto_resolve_log += "-----------------------------------\n"
+
+      self.auto_resolve_log += auto_resolve_log
+      self.save
       if [threatgrid_present, sandbox_present, reversinglab_present, malware_zoo_present].any? {|prez| prez == false } && [threatgrid_present, sandbox_present, reversinglab_present, malware_zoo_present].any? {|prez| prez == true }
+        self.auto_resolve_log += "\n-------\nSetting Status To New as there are some True's and some False's with the 4 presence sources.\n------\n"
         self.status = STATUS_NEW
         self.save
         return auto_resolved_boolean
@@ -748,7 +782,6 @@ class FileReputationDispute < ApplicationRecord
         self.resolution = RESOLUTION_AUTORESOLVED
         self.resolution_comment = RESOLUTION_AUTORESOLVED_NO_FILE_COMMENT
         self.save
-
         return auto_resolved_boolean
       end
 
@@ -768,17 +801,25 @@ class FileReputationDispute < ApplicationRecord
       file_rep = FileReputationDispute.find(file_rep_id)
 
       detection = FileReputationApi::Detection.get_bulk(file_rep.sha256_hash)
+      auto_resolve_log = ""
+      auto_resolve_log += "\n---------final check---------\n"
+      auto_resolve_log += "amp poke verdict: #{detection.disposition}\n"
+      auto_resolve_log += "amp poke name: #{detection.name}\n"
+      auto_resolve_log += "amp poke score: #{detection.score}\n"
+
       if detection.malicious?
         #notify customer that there is no sample and to escalate via TAC with sample
         file_rep.disposition = DISPOSITION_MALICIOUS
         file_rep.status = STATUS_RESOLVED
         file_rep.resolution = RESOLUTION_AUTORESOLVED
         file_rep.resolution_comment = RESOLUTION_AUTORESOLVED_MALICIOUS_COMMENT
+        file_rep.auto_resolve_log += auto_resolve_log
         file_rep.save
         conn = ::Bridge::FileRepUpdateStatusEvent.new(addressee: "talos-intelligence")
         conn.post(file_rep, source_authority: "talos-intelligence", source_key: file_rep.ticket_source_key)
 
       else
+        file_rep.auto_resolve_log += auto_resolve_log
         file_rep.status = STATUS_NEW
         file_rep.save
       end
@@ -792,16 +833,22 @@ class FileReputationDispute < ApplicationRecord
 
       file_rep = FileReputationDispute.find(file_rep_id)
 
+      auto_resolve_log = "\n-------final check----------\n"
+
+
       if FileReputationApi::ReversingLabs.has_trusted_signature?(file_rep.sha256_hash)
+
+        auto_resolve_log += "Reversing Labs has returned a trusted signature for this sha256 (['rl']['malware_presence']['trust_factor'] == 0), poking clean via amp poke"
 
         #POKE CLEAN HERE
         if Rails.env.production?
-          FileReputationApi::Detection.update_detection(self.sha256_hash, FileReputationApi::Detection::DISPOSITION_CLEAN)
+          FileReputationApi::Detection.update_detection(file_rep.sha256_hash, FileReputationApi::Detection::DISPOSITION_CLEAN)
         end
         file_rep.disposition = DISPOSITION_CLEAN
         file_rep.status = STATUS_RESOLVED
         file_rep.resolution = RESOLUTION_AUTORESOLVED_STATUS_FP
         file_rep.resolution_comment = RESOLUTION_AUTORESOLVED_FP_CLEAN
+        file_rep.auto_resolve_log += auto_resolve_log
         file_rep.save
 
         FileReputationApi::ReversingLabs.subscribe(file_rep.sha256_hash)
@@ -818,6 +865,8 @@ class FileReputationDispute < ApplicationRecord
       if !results["error"].present?
         results = results["rl"]["sample"]["xref"]["entries"].first["scanners"]
       else
+        auto_resolve_log += "There was an error looking up reversing lab scanners, setting sha256 to human review"
+        file_rep.auto_resolve_log += auto_resolve_log
         file_rep.status = STATUS_NEW
         file_rep.save
         return
@@ -843,6 +892,10 @@ class FileReputationDispute < ApplicationRecord
       end
 
       if is_malicious == true
+        auto_resolve_log += "Found to be malicious either from >= 15 RL scanners or >=2 critical scanners\n"
+        auto_resolve_log += "scanners: #{mal_results.to_s}\n\n"
+        auto_resolve_log += "critical scanners: #{critical_mals.to_s}\n\n"
+        file_rep.auto_resolve_log += auto_resolve_log
         file_rep.status = STATUS_RESOLVED
         file_rep.resolution = RESOLUTION_AUTORESOLVED
         file_rep.resolution_comment = RESOLUTION_AUTORESOLVED_UNCHANGED
@@ -852,6 +905,8 @@ class FileReputationDispute < ApplicationRecord
         conn.post(file_rep, source_authority: "talos-intelligence", source_key: file_rep.ticket_source_key)
 
       else
+        auto_resolve_log += "Found to not be malicious, setting to NEW for human review\n"
+        file_rep.auto_resolve_log += auto_resolve_log
         file_rep.status = STATUS_NEW
         file_rep.save
         return
@@ -1014,6 +1069,21 @@ class FileReputationDispute < ApplicationRecord
   def manual_sync
     conn = ::Bridge::FileRepUpdateStatusEvent.new(addressee: "talos-intelligence")
     conn.post(self, source_authority: "talos-intelligence", source_key: self.ticket_source_key)
+  end
+
+  def self.submit_for_evaluation(sha256_hash, service, refresh_magic)
+    services = service.split(" ")
+
+    if services.include?("threatgrid")
+      FileReputationApi::Sandbox.send_to_threatgrid(sha256_hash, api_key_type: SANDBOX_KEY_AC_REFRESH)
+    end
+    ##placeholder
+    if services.include?("reversinglab")
+
+    end
+    if refresh_magic == "true"
+      FileReputationApi::Magic.run_analysis(sha256_hash)
+    end
   end
 
   def self.check_for_rep_updates
