@@ -1004,6 +1004,7 @@ class DisputeEntry < ApplicationRecord
       total_uris.each do |uri|
         result_r = uri.split("\r")
         result_n = uri.split("\n")
+        result_u = uri.split("\u2028")
         result_s = uri.split(" ")
 
 
@@ -1018,6 +1019,11 @@ class DisputeEntry < ApplicationRecord
 
         if result_n.size > 1
           final_result += result_n
+          was_split = true
+        end
+
+        if result_u.size > 1
+          final_result += result_u
           was_split = true
         end
 
