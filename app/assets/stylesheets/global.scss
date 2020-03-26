@@ -11438,19 +11438,10 @@ span.threat-cat-no-data {
   max-height: 20px !important;
   max-width: 100% !important;
   min-width: 98%;
-  .dispute-count {
-    border-radius: 5px;
-    padding: 1px 5px;
-    position: absolute;
-    top: 0;
-  }
 }
 
 // webrep dispute index > ensure the dispute count is to the right of the domain entry
 .dispute-count {
-  position: absolute;
-  left: 180px;
-  float: none;
   z-index: 111;
   border-radius: 5px;
   padding: 1px 5px;
