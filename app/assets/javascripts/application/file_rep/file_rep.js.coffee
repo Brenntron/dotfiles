@@ -1186,7 +1186,7 @@ $ ->
           if disposition == 'malicious'
             $('.amp-area .disposition').addClass('disp-negative')
 
-          history_icon = '<span class="amp-history-icon esc-tooltipped tooltipstered" title="View full available AMP history"></span>'
+          history_icon = '<span class="amp-history-icon esc-tooltipped" title="View full available AMP history"></span>'
           $('.amp-area .detection-last-updated').append(history_icon)
 
           # Retain this event listener below, need to ensure all previous succeeds first
