@@ -88,7 +88,7 @@ namespace 'AC.WebCat', (exports) ->
     'mail - Web-based Email'
   ]
 
-  categories2 = {
+  categories3 = {
     'adlt - Adult': 6,
     'adv - Advertisements': 27,
     'alc - Alcohol': 77,
@@ -177,31 +177,54 @@ namespace 'AC.WebCat', (exports) ->
   }
 
 
-  exports.createSelectOptions = ->
-#    options1 = []
-#
-#    for x in categories1
-#      value_name = x.split(' - ')[1]
-#      code = x.split(' - ')[0]
-#      options1.push {value: value_name, text: code}
-#    return options1
 
-    options2 = []
-    for x, y of categories2
-      value_name = x.split(' - ')[1]
-      code = x.split(' - ')[0]
-      options2.push {category_id: y, category_name: value_name, category_code: code}
-    return options2
+  exports.getAUPCategories = ->
+    headers = {'Token': $('input[name="token"]').val(), 'Xmlrpc-Token': $('input[name="xml_token"]').val()}
+    $.ajax(
+      url: "/escalations/api/v1/escalations/webcat/complaints/category_list"
+      method: 'GET'
+      headers: headers
+      success: (response) ->
+        return response
+      error: (response) ->
+        return response
+    )
+
+
+  exports.createSelectOptions = ->
+
+    cats_promise = new Promise (resolve, reject) ->   # get and set the tc's with a promise
+      categories2 = AC.WebCat.getAUPCategories()
+      if categories2
+        resolve categories2  # resolve goes to .then() below
+
+    cats_promise.then (result) ->
+      categories2 = result
+      options2 = []
+      for x, y of categories2
+        value_name = x.split(' - ')[1]
+        code = x.split(' - ')[0]
+        options2.push {category_id: y, category_name: value_name, category_code: code}
+      return options2
+
 
   exports.getCategoryIds = (category_names) ->
 
-    category_ids = []
 
-    for name in category_names
-      for x, y of categories2
-        value_name = x.split(' - ')[1]
+    cats_promise = new Promise (resolve, reject) ->   # get and set the tc's with a promise
+      categories2 = AC.WebCat.getAUPCategories()
+      if categories2
+        resolve categories2
 
-        if name == value_name
-          category_ids.push(y)
+    cats_promise.then (result) ->
+      categories2 = result
+      category_ids = []
 
-    return category_ids
+      for name in category_names
+        for x, y of categories2
+          value_name = x.split(' - ')[1]
+
+          if name == value_name
+            category_ids.push(y)
+
+      return category_ids

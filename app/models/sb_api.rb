@@ -401,6 +401,26 @@ class SbApi < ApplicationRecord
     self.remote_lookup_sds_v3(self.build_sds_v3_request(sds_item, sds_type))
   end
 
+  def self.category_lookup
+    lookup_list = {}
+    begin
+      full_data = remote_call_sds_v3('', 'webcat_labels')
+      json = JSON.parse(full_data)
+      json = json.reject { |_, attributes| attributes['is_deprecated'] == 1 }
+      if json.key?("META_CATEGORIES_VERSION")
+        json.keys.each do |key|
+          if key.to_i > 0
+            hash_key = json[key]["mnemonic"] + " - " + json[key]["name"]
+            lookup_list[hash_key] = key.to_i
+          end
+        end
+      end
+    rescue
+      {}
+    end
+    lookup_list.sort.to_h
+  end
+
   def self.score_to_text(original_score, score_type = "wbrs")
     txt = 'Unavailable'
     begin
