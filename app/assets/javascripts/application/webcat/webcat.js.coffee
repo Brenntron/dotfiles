@@ -851,6 +851,9 @@ $ ->
         console.log 'Webcat column show/hide preferences are updated in user_prefs table.'
     )
 
+  # webcat > complaints show page, disable two Submit toolbar buttons on page load
+  if $('body').hasClass('escalations--webcat--complaints-controller')
+    $('#master-submit, #index_update_resolution').prop('disabled','disabled')
 
   # webcat > complaints show page, ensure this JS gets called
   if $('body').hasClass('escalations--webcat--complaints-controller') && $('body').hasClass('show-action')
