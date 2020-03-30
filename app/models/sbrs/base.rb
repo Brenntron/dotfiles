@@ -1,6 +1,6 @@
 class Sbrs::Base
   include ActiveModel::Model
-
+  TEST_URL = "www.google.com"
   #TODO: all of this needs to be refactored and improved.  Finished up quickly because of deadline.
 
   def self.load_rules_matchup
@@ -390,5 +390,42 @@ class Sbrs::Base
   # TODO replace with call_json_request
   def self.post_request(path:, body:)
     request_error_handling(make_post_request(path: path, body: body))
+  end
+
+  def self.health_check
+    health_report = {}
+
+    times_to_try = 3
+    times_tried = 0
+    times_successful = 0
+    times_failed = 0
+    is_healthy = false
+
+    (1..times_to_try).each do |i|
+      begin
+        result = combo_call_sds_v3(TEST_URL,[])
+        if result["wbrs"].present?
+          times_successful += 1
+        else
+          times_failed += 1
+        end
+        times_tried += 1
+      rescue
+        times_failed += 1
+        times_tried += 1
+      end
+
+    end
+
+    if times_successful > times_failed
+      is_healthy = true
+    end
+
+    health_report[:times_tried] = times_tried
+    health_report[:times_successful] = times_successful
+    health_report[:times_failed] = times_failed
+    health_report[:is_healthy] = is_healthy
+
+    health_report
   end
 end
