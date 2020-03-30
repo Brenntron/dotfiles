@@ -12,8 +12,19 @@ class Wbrs::ManualWlbl < Wbrs::Base
   }
   attr_accessor *FIELD_SYMS
 
+  def initialize(attributes = {})
+    if attributes.keys.present?
+      attributes.keys.each do |attr|
+        if !FIELD_NAMES.include?(attr)
+          self.class.module_eval { attr_accessor attr.to_sym}
+        end
+      end
+    end
+    super
+  end
+
   def self.new_from_attributes(attributes)
-    new(attributes.slice(*FIELD_NAMES))
+    new(attributes)
   end
 
   # Get all the manual WL/BL entries.

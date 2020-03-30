@@ -10,6 +10,13 @@ class RepApi::Blacklist < RepApi::Base
   validates :entry, :classifications, presence: true
 
   def initialize(attributes = {})
+    if attributes.keys.present?
+      attributes.keys.each do |attr|
+        if !FIELD_NAMES.include?(attr)
+          self.class.module_eval { attr_accessor attr.to_sym}
+        end
+      end
+    end
     @new_record = attributes.has_key?(:new_record) ? attributes.delete(:new_record) : true
     super
   end
