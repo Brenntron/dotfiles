@@ -1446,3 +1446,13 @@ window.file_rep_select_all = () ->
   else
     $(table).find(':checkbox').prop('checked', false)
     $(table).find('tr').removeClass('selected')
+
+
+$ ->
+  # properly init these icons inside this datatable, must be done on 'draw.dt', not on page-load, DT doesn't exist on page-load yet
+  $('#file-rep-datatable_wrapper').on 'draw.dt', ->
+    $('#refresh-filter-button').tooltipster
+      theme: [
+        'tooltipster-borderless'
+        'tooltipster-borderless-customized'
+      ]

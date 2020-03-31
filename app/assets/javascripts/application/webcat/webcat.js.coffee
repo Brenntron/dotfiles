@@ -316,6 +316,15 @@ $ ->
               return
             )
             $('.dataTables_filter').append $clearButton, $searchButton
+
+            # properly init these search/clear icons
+            $('.dt-button').tooltipster
+              theme: [
+                'tooltipster-borderless'
+                'tooltipster-borderless-customized'
+                'tooltipster-borderless-comment'
+              ]
+
             return
           lengthMenu: [[25, 50, 100, 150, 200], [25, 50, 100, 150, 200]]
           processing: true
@@ -889,7 +898,7 @@ window.toggle_selectize_layer = (input, focus) ->
 $ ->
   # properly init these icons inside this datatable, must be done on 'draw.dt', not on page-load, DT doesn't exist on page-load yet
   $('#complaints-index_wrapper').on 'draw.dt', ->
-    $('.is-important, .was-reviewed, .reputation-icon').tooltipster
+    $('.is-important, .was-reviewed, .reputation-icon, .complaint-submitter-type').tooltipster
       theme: [
         'tooltipster-borderless'
         'tooltipster-borderless-customized'
