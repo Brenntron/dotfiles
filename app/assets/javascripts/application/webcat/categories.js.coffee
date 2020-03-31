@@ -193,12 +193,12 @@ namespace 'AC.WebCat', (exports) ->
 
   exports.createSelectOptions = ->
 
-    cats_promise = new Promise (resolve, reject) ->   # get and set the tc's with a promise
+    cats_promise = new Promise (resolve, reject) =>
       categories2 = AC.WebCat.getAUPCategories()
       if categories2
         resolve categories2  # resolve goes to .then() below
 
-    cats_promise.then (result) ->
+    cats_promise.then (result) =>
       categories2 = result
       options2 = []
       for x, y of categories2
@@ -207,16 +207,15 @@ namespace 'AC.WebCat', (exports) ->
         options2.push {category_id: y, category_name: value_name, category_code: code}
       return options2
 
-
   exports.getCategoryIds = (category_names) ->
 
 
-    cats_promise = new Promise (resolve, reject) ->   # get and set the tc's with a promise
+    cats_promise = new Promise (resolve, reject) => 
       categories2 = AC.WebCat.getAUPCategories()
       if categories2
         resolve categories2
 
-    cats_promise.then (result) ->
+    cats_promise.then (result) =>
       categories2 = result
       category_ids = []
 
