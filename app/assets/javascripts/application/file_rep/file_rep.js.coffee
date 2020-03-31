@@ -1,3 +1,7 @@
+window.onkeydown = (e) ->
+  if (e.altKey && e.which == 84) #alt + t
+    filerep_take_disputes()
+
 window.update_file_rep_status = () ->
   checked_disputes = []
   resolution = ""
