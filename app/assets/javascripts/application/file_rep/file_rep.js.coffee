@@ -1,6 +1,11 @@
+#toolbar shortcuts
 window.onkeydown = (e) ->
   if (e.altKey && e.which == 84) #alt + t
-    filerep_take_disputes()
+    filerep_take_disputes() #take ticket
+  else if (e.altKey && e.ctrlKey && e.which == 80) #alt + ctrl + t
+    export_file_rep_all() #export all files to .csv
+  else if (e.altKey && e.which == 80) #alt + t
+    export_file_rep_selected() #export selected files to .csv
 
 window.update_file_rep_status = () ->
   checked_disputes = []

@@ -1186,11 +1186,15 @@ $ ->
   #toolbar shortcuts
   window.onkeydown = (e) ->
     if (e.altKey && e.which == 71) #alt + g
-      $('#expand-all-index-rows').click()
+      $('#expand-all-index-rows').click() #expand all tickets
     else if (e.altKey && e.which == 72) #alt + h
-      $('#collapse-all-index-rows').click()
+      $('#collapse-all-index-rows').click() #collapse all tickets
     else if (e.altKey && e.which == 84) #alt + t
-      take_disputes()
+      take_disputes() #take ticket
+    else if (e.altKey && e.ctrlKey && e.which == 80) #alt + ctrl + t
+      export_file_rep_all() #export all files to .csv
+    else if (e.altKey && e.which == 80) #alt + t
+      export_file_rep_selected() #export selected files to .csv
 
   # Expand all rows via toolbar button
   $('#expand-all-index-rows').click ->
