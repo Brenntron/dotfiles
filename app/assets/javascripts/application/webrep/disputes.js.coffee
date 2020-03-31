@@ -1183,6 +1183,15 @@ $ ->
         return
     return
 
+  #toolbar shortcuts
+  window.onkeydown = (e) ->
+    if (e.altKey && e.which == 71) #alt + g
+      $('#expand-all-index-rows').click()
+    else if (e.altKey && e.which == 72) #alt + h
+      $('#collapse-all-index-rows').click()
+    else if (e.altKey && e.which == 84) #alt + t
+      take_disputes()
+
   # Expand all rows via toolbar button
   $('#expand-all-index-rows').click ->
     td = $('#disputes-index').find('td.expandable-row-column')
