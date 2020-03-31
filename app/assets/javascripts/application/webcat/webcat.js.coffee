@@ -884,3 +884,14 @@ window.toggle_selectize_layer = (input, focus) ->
     $(select_parent).css('z-index', '4')
   else
     $(select_parent).css('z-index', '2')
+
+
+$ ->
+  # properly init these icons inside this datatable, must be done on 'draw.dt', not on page-load, DT doesn't exist on page-load yet
+  $('#complaints-index_wrapper').on 'draw.dt', ->
+    $('.is-important, .was-reviewed, .reputation-icon').tooltipster
+      theme: [
+        'tooltipster-borderless'
+        'tooltipster-borderless-customized'
+        'tooltipster-borderless-comment'
+      ]
