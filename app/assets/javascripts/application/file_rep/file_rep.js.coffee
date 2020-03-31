@@ -2,9 +2,9 @@
 window.onkeydown = (e) ->
   if (e.altKey && e.which == 84) #alt + t
     filerep_take_disputes() #take ticket
-  else if (e.altKey && e.ctrlKey && e.which == 80) #alt + ctrl + t
+  else if (e.altKey && e.ctrlKey && e.shiftKey && e.which == 80) #alt + ctrl + shift + p
     export_file_rep_all() #export all files to .csv
-  else if (e.altKey && e.which == 80) #alt + t
+  else if (e.altKey && e.ctrlKey && e.which == 80) #alt + ctrl + p
     export_file_rep_selected() #export selected files to .csv
 
 window.update_file_rep_status = () ->
