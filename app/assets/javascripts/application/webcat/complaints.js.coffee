@@ -462,6 +462,7 @@ processSubmitEntry = (entry_id,row_id) ->
   resolution_status = $('[name=resolution'+entry_id+']:checked').val()
   comment = $('#complaint_comment_'+entry_id)[0].value
   resolution_comment = $('#complaint_resolution_comment_'+entry_id)[0].value
+  uri_as_categorized = $('#complaint_prefix_'+entry_id)[0].value
   headers = {'Token': $('input[name="token"]').val(), 'Xmlrpc-Token': $('input[name="xml_token"]').val()}
   fixed_flag = $('#fixed'+entry_id).is(':checked')
 
@@ -475,7 +476,7 @@ processSubmitEntry = (entry_id,row_id) ->
       url: '/escalations/api/v1/escalations/webcat/complaint_entries/update'
       method: 'POST'
       headers: headers
-      data: {'id': entry_id, 'prefix': prefix, 'categories':categories, 'category_names':category_names, 'status':resolution_status, 'comment':comment, 'resolution_comment': resolution_comment }
+      data: {'id': entry_id, 'prefix': prefix, 'categories':categories, 'category_names':category_names, 'status':resolution_status, 'comment':comment, 'resolution_comment': resolution_comment, 'uri_as_categorized': uri_as_categorized }
       success: (response) ->
         {categories, error, uri, domain, subdomain, path, status, display_name} = $.parseJSON(response)
         if !error
@@ -1125,6 +1126,10 @@ format = (complaint_entry_row) ->
   input_cat = 'input_cat_' + entry_id
 
   if complaint_entry.status == "PENDING"
+
+    domain = complaint_entry.uri_as_categorized
+    # Wondering what the line above does? See here: https://jira.vrt.sourcefire.com/browse/WEB-5880
+
     complaint_table_row_html = '<table class="active_table"><tr class="pending"><td class="no_pad"><div class="row">'
     complaint_submission_html =
         '<input type="radio" name="resolution_review_' + entry_id + '" value="commit" > Commit <br/>' +
