@@ -896,11 +896,12 @@ window.toggle_selectize_layer = (input, focus) ->
 
 
 $ ->
-  # properly init these icons inside this datatable, must be done on 'draw.dt', not on page-load, DT doesn't exist on page-load yet
-  $('#complaints-index_wrapper').on 'draw.dt', ->
-    $('.is-important, .was-reviewed, .reputation-icon, .complaint-submitter-type').tooltipster
+  # tooltip init these icons inside this DT, this MUST be on 'draw.dt', not page-load, DT doesn't exist on page-load
+  $('#complaints-index').on 'draw.dt', ->
+    $('#complaints-index .tooltipstered').tooltipster('destroy')  # remove existing dt tt attachments, then restore title attr
+    $('#complaints-index .esc-tooltipped').tooltipster
+      restoration: 'previous'
       theme: [
         'tooltipster-borderless'
         'tooltipster-borderless-customized'
-        'tooltipster-borderless-comment'
       ]

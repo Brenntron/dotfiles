@@ -507,3 +507,17 @@ window.expandClusterEntryPreview = (cluster, expand_table_row, max_viewable_entr
     if event.keyCode == 13
       apply_filter_to_table()
     return
+
+
+
+$ ->
+# tooltip init these icons inside this DT, this MUST be on 'draw.dt', not page-load, DT doesn't exist on page-load
+  $('#clusters-index').on 'draw.dt', ->
+    $('#clusters-index .tooltipstered').tooltipster('destroy')  # remove existing dt tt attachments, then restore title attr
+    $('#clusters-index .esc-tooltipped').tooltipster
+      restoration: 'previous'
+      theme: [
+        'tooltipster-borderless'
+        'tooltipster-borderless-customized'
+      ]
+

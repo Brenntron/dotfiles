@@ -102,7 +102,7 @@ window.filerep_take_disputes = () ->
     success: (response) ->
       for dispute_id in response.dispute_ids
         # dbinebri: adding the take/return button swap logic here
-        $('.take-ticket-button').replaceWith("<button class='return-ticket-button' title='Return ticket to open queue' onclick='file_rep_return_dispute(#{dispute_id});'></button>")
+        $('.take-ticket-button').replaceWith("<button class='esc-tooltipped return-ticket-button' title='Return ticket to open queue' onclick='file_rep_return_dispute(#{dispute_id});'></button>")
         $('#owner_' + dispute_id).text(response.username).removeClass('missing-data')
         $('#status_' + dispute_id).text("ASSIGNED")
 
@@ -146,7 +146,7 @@ window.file_rep_take_dispute = (dispute_id) ->
     dispute_id: dispute_id
     error_prefix: 'Error updating ticket'
     success: (response) ->
-      $('.inline-take-dispute-' + dispute_id).replaceWith("<button class='return-ticket-button inline-return-ticket-#{dispute_id}' title='Assign this ticket to me' onclick='file_rep_return_dispute(#{dispute_id});'></button>")
+      $('.inline-take-dispute-' + dispute_id).replaceWith("<button class='esc-tooltipped return-ticket-button inline-return-ticket-#{dispute_id}' title='Assign this ticket to me' onclick='file_rep_return_dispute(#{dispute_id});'></button>")
       $("#owner_#{dispute_id}").text(response.username).removeClass('missing-data')
       $('#status_' + dispute_id).text("ASSIGNED")
   )
@@ -159,7 +159,7 @@ window.file_rep_return_dispute = (dispute_id) ->
     dispute_id: dispute_id
     error_prefix: 'Error updating ticket'
     success: (response) ->
-      $('.inline-return-ticket-' + dispute_id).replaceWith("<button class='take-ticket-button inline-take-dispute-#{dispute_id}' title='Assign this ticket to me' onclick='file_rep_take_dispute(#{dispute_id});'></button>")
+      $('.inline-return-ticket-' + dispute_id).replaceWith("<button class='esc-tooltipped take-ticket-button inline-take-dispute-#{dispute_id}' title='Assign this ticket to me' onclick='file_rep_take_dispute(#{dispute_id});'></button>")
       $("#owner_#{dispute_id}").text("Unassigned").addClass('missing-data')
       $('#status_' + dispute_id).text("NEW")
   )
@@ -863,9 +863,9 @@ $ ->
         className: "alt-col assignee-col"
         render: (data, type, full, meta) ->
           if full.current_user == data
-            return "<span id='owner_#{full.id}'> #{data} </span><button class='return-ticket-button inline-return-ticket-#{full.id}' title='Return ticket.' onclick='file_rep_return_dispute(#{full.id});'></button>"
+            return "<span id='owner_#{full.id}'> #{data} </span><button class='esc-tooltipped return-ticket-button inline-return-ticket-#{full.id}' title='Return ticket.' onclick='file_rep_return_dispute(#{full.id});'></button>"
           else if data == 'vrtincom' || data == ""
-            return "<span class='missing-data missing-data-index' id='owner_#{full.id}'>Unassigned</span> <span title='Assign to me' class='esc-tooltipped'><button class='take-ticket-button inline-take-dispute-#{full.id}' onClick='file_rep_take_dispute(#{full.id})'/></button></span>"
+            return "<span class='missing-data missing-data-index' id='owner_#{full.id}'>Unassigned</span> <span title='Assign to me' class='esc-tooltipped'><button class='esc-tooltipped take-ticket-button inline-take-dispute-#{full.id}' onClick='file_rep_take_dispute(#{full.id})'/></button></span>"
           else
             return data
       }
@@ -1449,9 +1449,11 @@ window.file_rep_select_all = () ->
 
 
 $ ->
-  # properly init these icons inside this datatable, must be done on 'draw.dt', not on page-load, DT doesn't exist on page-load yet
-  $('#file-rep-datatable_wrapper').on 'draw.dt', ->
-    $('#refresh-filter-button').tooltipster
+  # tooltip init these icons inside this DT, this MUST be on 'draw.dt', not page-load, DT doesn't exist on page-load
+  $('#file-rep-datatable').on 'draw.dt', ->
+    $('#file-rep-datatable .tooltipstered:not(.rl-hover)').tooltipster('destroy')  # remove existing dt tt attachments, then restore title attr
+    $('#file-rep-datatable .esc-tooltipped:not(.rl-hover), #filerep-index-title #refresh-filter-button').tooltipster
+      restoration: 'previous'
       theme: [
         'tooltipster-borderless'
         'tooltipster-borderless-customized'
