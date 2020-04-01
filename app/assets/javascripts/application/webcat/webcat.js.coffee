@@ -192,7 +192,7 @@ $ ->
     valueField: 'category_id',
     labelField: 'category_name',
     searchField: ['category_name', 'category_code'],
-    options: AC.WebCat.createSelectOptions()
+    options: AC.WebCat.createSelectOptions('.cat_new_url')
   }
 
   url = $('#complaints-index').data('source')
@@ -670,7 +670,7 @@ $ ->
       valueField: 'category_id',
       labelField: 'category_name',
       searchField: ['category_name', 'category_code'],
-      options: AC.WebCat.createSelectOptions()
+      options: AC.WebCat.createSelectOptions('#category-input')
       onFocus: () ->
         window.toggle_selectize_layer(this, 'true')
       onBlur: () ->

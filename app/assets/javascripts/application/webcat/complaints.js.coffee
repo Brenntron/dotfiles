@@ -415,7 +415,7 @@ processSubmitPending=(entry_id,row_id)->
           valueField: 'category_id',
           labelField: 'category_name',
           searchField: ['category_name', 'category_code'],
-          options: AC.WebCat.createSelectOptions(),
+          options: AC.WebCat.createSelectOptions('#input_cat_'+ temp_row.data().entry_id),
           items: selected_options(temp_row.data().category)
         }
         $("#domain_#{entry_id}").text(domain)
@@ -503,7 +503,7 @@ processSubmitEntry = (entry_id,row_id) ->
             valueField: 'category_id',
             labelField: 'category_name',
             searchField: ['category_name', 'category_code'],
-            options: AC.WebCat.createSelectOptions()
+            options: AC.WebCat.createSelectOptions('#input_cat_'+ temp_row.data().entry_id)
             items: selected_options(categories)
           }
 
@@ -515,7 +515,7 @@ processSubmitEntry = (entry_id,row_id) ->
             valueField: 'category_id',
             labelField: 'category_name',
             searchField: ['category_name', 'category_code'],
-            options: AC.WebCat.createSelectOptions()
+            options: AC.WebCat.createSelectOptions('#input_cat_pending'+ temp_row.data().entry_id)
             items: selected_options(categories)
           }
           unless status == 'COMPLETED'
@@ -527,7 +527,7 @@ processSubmitEntry = (entry_id,row_id) ->
               valueField: 'category_id',
               labelField: 'category_name',
               searchField: ['category_name', 'category_code'],
-              options: AC.WebCat.createSelectOptions()
+              options: AC.WebCat.createSelectOptions('#input_cat_'+ temp_row.data().entry_id)
               items: selected_options(temp_row.data().category_names)
             }
           else
@@ -541,7 +541,7 @@ processSubmitEntry = (entry_id,row_id) ->
               valueField: 'category_id',
               labelField: 'category_name',
               searchField: ['category_name', 'category_code'],
-              options: AC.WebCat.createSelectOptions()
+              options: AC.WebCat.createSelectOptions('#input_cat_'+ temp_row.data().entry_id)
               items: selected_options(temp_row.data().category_names)
             }
             select_complete = $completed_selectize[0].selectize
@@ -1501,7 +1501,7 @@ window.click_table_buttons = (complaint_table, button)->
         valueField: 'category_id',
         labelField: 'category_name',
         searchField: ['category_name', 'category_code'],
-        options: AC.WebCat.createSelectOptions(),
+        options: AC.WebCat.createSelectOptions(cat_select),
         items: AC.WebCat.getCategoryIds(selected_options(data.category)),
         onItemAdd: ->
           if verifyMasterSubmit() == true
@@ -1522,7 +1522,7 @@ window.click_table_buttons = (complaint_table, button)->
         valueField: 'category_id',
         labelField: 'category_name',
         searchField: ['category_name', 'category_code'],
-        options: AC.WebCat.createSelectOptions(),
+        options: AC.WebCat.createSelectOptions(cat_select),
         items: selected_options(data.category),
       }
       select_complete = $completed_selectize[0].selectize
@@ -1812,7 +1812,7 @@ processSubmitMaster = () ->
             valueField: 'category_id',
             labelField: 'category_name',
             searchField: ['category_name', 'category_code'],
-            options: AC.WebCat.createSelectOptions()
+            options: AC.WebCat.createSelectOptions('#input_cat_'+ entry.entry_id)
             items: selected_options(entry.categories)
           }
           $('#input_cat_pending'+ entry.entry_id).selectize {
@@ -1823,7 +1823,7 @@ processSubmitMaster = () ->
             valueField: 'category_id',
             labelField: 'category_name',
             searchField: ['category_name', 'category_code'],
-            options: AC.WebCat.createSelectOptions()
+            options: AC.WebCat.createSelectOptions('#input_cat_pending'+ entry.entry_id)
             items: selected_options(entry.categories)
           }
 
@@ -2033,7 +2033,7 @@ $ ->
           valueField: 'category_id',
           labelField: 'category_name',
           searchField: ['category_name', 'category_code'],
-          options: AC.WebCat.createSelectOptions()
+          options: AC.WebCat.createSelectOptions('#input_cat_'+ row.data().entry_id)
           items: selected_options(row.data().category)
         }
 

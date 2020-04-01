@@ -191,21 +191,17 @@ namespace 'AC.WebCat', (exports) ->
     )
 
 
-  exports.createSelectOptions = ->
+  exports.createSelectOptions = (id) ->
+    if id
+      AC.WebCat.getAUPCategories().then( (categories) =>
+        webcat_options = []
+        for key, value of categories
+          value_name = key.split(' - ')[1]
+          cat_code = key.split(' - ')[0]
+          webcat_options.push {category_id: value, category_name: value_name, category_code: cat_code}
+        $(id)[0].selectize.addOption(webcat_options)
+      )
 
-    cats_promise = new Promise (resolve, reject) =>
-      categories2 = AC.WebCat.getAUPCategories()
-      if categories2
-        resolve categories2  # resolve goes to .then() below
-
-    cats_promise.then (result) =>
-      categories2 = result
-      options2 = []
-      for x, y of categories2
-        value_name = x.split(' - ')[1]
-        code = x.split(' - ')[0]
-        options2.push {category_id: y, category_name: value_name, category_code: code}
-      return options2
 
   exports.getCategoryIds = (category_names) ->
 
