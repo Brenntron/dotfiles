@@ -424,7 +424,14 @@ $ ->
             expand_table_row = this
             expandClusterEntryPreview(cluster, expand_table_row, max_viewable_entries)
 
-        error: (response) ->
+          # subrow icons on clusters DT need the TT init on row expand, these icons don't exist on dt draw.dt, init them here
+          $('#clusters-index .reputation-icon').tooltipster
+            theme: [
+              'tooltipster-borderless'
+              'tooltipster-borderless-customized'
+            ]
+
+          error: (response) ->
           $('.cluster-mgt-loader-wrapper').addClass('hidden')
           std_api_error(response, "There was an error loading cluster data.", reload: false)
       )
