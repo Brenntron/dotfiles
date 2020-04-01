@@ -1728,15 +1728,6 @@ window.load_screenshot = (img_tag, complaint_entry_id) ->
       this.img_tag.src = src
   )
 
-window.triggerTooltips = (item) ->
-  $('.nested-tooltipped').tooltipster
-    theme: [
-      'tooltipster-borderless'
-      'tooltipster-borderless-customized'
-    ]
-    side: 'bottom'
-  return
-
 processSubmitMaster = () ->
 
   data = []

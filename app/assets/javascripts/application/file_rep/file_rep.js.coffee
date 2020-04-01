@@ -272,15 +272,19 @@ $ ->
           resolution_comment += " Please open a TAC case and provide additional details if you need further assistance."
     $(".resolution-status-comment").html(resolution_comment)
 
+  # note: this function below affects the global space, can be accessed everywhere
+  # these window-level funcs should probably be moved into a "global JS" file when time available
   window.triggerTooltips = (item) ->
-    $('.tooltip_content').show()
-    $('.nested-tooltipped').tooltipster
-      theme: [
-        'tooltipster-borderless'
-        'tooltipster-borderless-customized'
-      ]
-      side: 'bottom'
-    return
+    # line below is 'unless this element already has a tooltip'
+    unless $(item).hasClass('tooltipstered')
+      $('.tooltip_content').show()
+      $('.nested-tooltipped').tooltipster
+        theme: [
+          'tooltipster-borderless'
+          'tooltipster-borderless-customized'
+        ]
+        side: 'bottom'
+      return
 
   window.reset_slider = (slider) ->
     if slider == "sandbox"

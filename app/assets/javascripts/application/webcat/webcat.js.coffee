@@ -905,3 +905,10 @@ $ ->
         'tooltipster-borderless'
         'tooltipster-borderless-customized'
       ]
+
+  # one-off init for 'clear search results' icon
+  $('#webcat-index-title #refresh-filter-button').tooltipster
+    theme: [
+      'tooltipster-borderless'
+      'tooltipster-borderless-customized'
+    ]
