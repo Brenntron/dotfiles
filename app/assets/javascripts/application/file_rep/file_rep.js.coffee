@@ -146,7 +146,7 @@ window.file_rep_take_dispute = (dispute_id) ->
     dispute_id: dispute_id
     error_prefix: 'Error updating ticket'
     success: (response) ->
-      $('.inline-take-dispute-' + dispute_id).replaceWith("<button class='esc-tooltipped return-ticket-button inline-return-ticket-#{dispute_id}' title='Assign this ticket to me' onclick='file_rep_return_dispute(#{dispute_id});'></button>")
+      $(".inline-take-dispute-#{dispute_id}").replaceWith("<button class='esc-tooltipped return-ticket-button inline-return-ticket-#{dispute_id}' title='Assign this ticket to me' onclick='file_rep_return_dispute(#{dispute_id});'></button>")
       $("#owner_#{dispute_id}").text(response.username).removeClass('missing-data')
       $('#status_' + dispute_id).text("ASSIGNED")
   )
@@ -1452,9 +1452,16 @@ $ ->
   # tooltip init these icons inside this DT, this MUST be on 'draw.dt', not page-load, DT doesn't exist on page-load
   $('#file-rep-datatable').on 'draw.dt', ->
     $('#file-rep-datatable .tooltipstered:not(.rl-hover)').tooltipster('destroy')  # remove existing dt tt attachments, then restore title attr
-    $('#file-rep-datatable .esc-tooltipped:not(.rl-hover), #filerep-index-title #refresh-filter-button').tooltipster
+    $('#file-rep-datatable .esc-tooltipped:not(.rl-hover)').tooltipster
       restoration: 'previous'
       theme: [
         'tooltipster-borderless'
         'tooltipster-borderless-customized'
       ]
+
+  # one-off init for 'clear search results' icon
+  $('#filerep-index-title #refresh-filter-button').tooltipster
+    theme: [
+      'tooltipster-borderless'
+      'tooltipster-borderless-customized'
+    ]
