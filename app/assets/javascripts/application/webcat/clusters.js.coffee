@@ -520,4 +520,3 @@ $ ->
         'tooltipster-borderless'
         'tooltipster-borderless-customized'
       ]
-

@@ -1165,6 +1165,13 @@ $ ->
       td = $(tr).next('tr').find('td:first')
       $(td).addClass 'dispute-entry-table-wrapper'
 
+      # subrow icons need the TT init on row expand, these icons don't exist on dt draw.dt, init them here
+      $('#disputes-index .reputation-icon').tooltipster
+        theme: [
+          'tooltipster-borderless'
+          'tooltipster-borderless-customized'
+        ]
+
       # Check to see which columns should be displayed
       $('.toggle-vis-nested').each ->
         checkbox_trigger = $(this).attr('data-column')
@@ -2223,6 +2230,14 @@ $ ->
     $("#disputes-index .tooltipstered").tooltipster('destroy')  # remove existing dt tt attachments, then restore title attr
     $('#disputes-index .esc-tooltipped').tooltipster
       restoration: 'previous'
+      theme: [
+        'tooltipster-borderless'
+        'tooltipster-borderless-customized'
+      ]
+
+  # subrow icons need the TT init on expand click, these icons don't exist on dt draw.dt
+  $('#disputes-index .expand-row-button-inline').click ->
+    $('.reputation-icon').tooltipster
       theme: [
         'tooltipster-borderless'
         'tooltipster-borderless-customized'
