@@ -706,9 +706,6 @@ button {
 .toolbar-button:disabled {
   cursor: not-allowed!important;
 }
-.toolbar-button:disabled {
-  cursor: not-allowed;
-}
 
 .dashboard-tickets-wrapper .toolbar-button-label {
   background-size: 16px 16px;
@@ -11442,9 +11439,11 @@ span.threat-cat-no-data {
 
 // webrep dispute index > ensure the dispute count is to the right of the domain entry
 .dispute-count {
-  z-index: 111;
   border-radius: 5px;
   padding: 1px 5px;
+  position: absolute;
+  right: 2px;
+  top: 0;
 }
 .wlbl-threat-cat, .wlbl-threat-cat-inline, table.dispute_tool_current th.th-threat-cat {
   padding-left: 2px !important;

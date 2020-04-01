@@ -725,6 +725,7 @@
                               %span.missing-data N/A
                             - else
                               = entry.virustotals.count {|vt| vt[:result] != "clean site" && vt[:result] != "unrated site" }
+                              \/
                               = entry.virustotals.count
                           %td.left-bordered.wlbl-tc-label-cell
                             %label WL/BL
