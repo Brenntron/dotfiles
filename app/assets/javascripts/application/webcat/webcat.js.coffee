@@ -184,16 +184,19 @@ $ ->
     localStorage.removeItem('webcat_search_name')
     localStorage.removeItem('webcat_search_conditions')
 
-  $('.cat_new_url').selectize {
-    persist: false,
-    create: false,
-    maxItems: 5,
-    closeAfterSelect: true,
-    valueField: 'category_id',
-    labelField: 'category_name',
-    searchField: ['category_name', 'category_code'],
-    options: AC.WebCat.createSelectOptions('.cat_new_url')
-  }
+
+  for select in $('select.cat_new_url')
+
+    $(select).selectize {
+      persist: false,
+      create: false,
+      maxItems: 5,
+      closeAfterSelect: true,
+      valueField: 'category_id',
+      labelField: 'category_name',
+      searchField: ['category_name', 'category_code'],
+      options: AC.WebCat.createSelectOptions("##{select.id}")
+    }
 
   url = $('#complaints-index').data('source')
   current_url = window.location.href
