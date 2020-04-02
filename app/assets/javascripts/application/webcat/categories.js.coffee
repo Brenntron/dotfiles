@@ -197,37 +197,25 @@ namespace 'AC.WebCat', (exports) ->
       AC.WebCat.getAUPCategories().then( (categories) =>
         webcat_options = []
         for key, value of categories
-          value_name = key.split(' - ')[1]
-          cat_code = key.split(' - ')[0]
+          cat_code = key.split(' - ')[1]
+          value_name = key.split(' - ')[0]
           webcat_options.push {category_id: value, category_name: value_name, category_code: cat_code}
-
-        if id = '.cat_new_url'
-          for select in $('select.cat_new_url')
-            $(select)[0].selectize.addOption(webcat_options)
-        else
-          $(id)[0].selectize.addOption(webcat_options)
+        $(id)[0].selectize.addOption(webcat_options)
       )
 
     else return
 
 
-  exports.getCategoryIds = (category_names) ->
+  exports.getCategoryIds = (category_names, id) ->
 
-
-    cats_promise = new Promise (resolve, reject) => 
-      categories2 = AC.WebCat.getAUPCategories()
-      if categories2
-        resolve categories2
-
-    cats_promise.then (result) =>
-      categories2 = result
+    AC.WebCat.getAUPCategories().then( (categories) =>
       category_ids = []
-
       for name in category_names
-        for x, y of categories2
-          value_name = x.split(' - ')[1]
+        for x, y of categories
+          value_name = x.split(' - ')[0]
 
           if name == value_name
             category_ids.push(y)
 
-      return category_ids
+      $(id)[0].selectize.addItem(category_ids)
+    )

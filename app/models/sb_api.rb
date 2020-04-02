@@ -410,7 +410,7 @@ class SbApi < ApplicationRecord
       if json.key?("META_CATEGORIES_VERSION")
         json.keys.each do |key|
           if key.to_i > 0
-            hash_key = json[key]["mnemonic"] + " - " + json[key]["name"]
+            hash_key = json[key]["name"] + " - " + json[key]["mnemonic"]
             lookup_list[hash_key] = key.to_i
           end
         end
