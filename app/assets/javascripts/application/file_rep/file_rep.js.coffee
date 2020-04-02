@@ -275,16 +275,14 @@ $ ->
   # note: this function below affects the global space, can be accessed everywhere
   # these window-level funcs should probably be moved into a "global JS" file when time available
   window.triggerTooltips = (item) ->
-    # line below is 'unless this element already has a tooltip'
-    unless $(item).hasClass('tooltipstered')
-      $('.tooltip_content').show()
-      $('.nested-tooltipped').tooltipster
-        theme: [
-          'tooltipster-borderless'
-          'tooltipster-borderless-customized'
-        ]
-        side: 'bottom'
-      return
+    $('.tooltip_content').show()
+    $('.nested-tooltipped').tooltipster
+      theme: [
+        'tooltipster-borderless'
+        'tooltipster-borderless-customized'
+      ]
+      side: 'bottom'
+    return
 
   window.reset_slider = (slider) ->
     if slider == "sandbox"
