@@ -1356,7 +1356,7 @@ $ ->
 
 
   $(document).ready ->
-    # Hide loader cogs when page is done loading
+# Hide loader cogs when page is done loading
     loader = $('#inline-webrep')
     $(this).bind(
       ajaxStart: () ->
