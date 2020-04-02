@@ -1502,7 +1502,7 @@ window.click_table_buttons = (complaint_table, button)->
         labelField: 'category_name',
         searchField: ['category_name', 'category_code'],
         options: AC.WebCat.createSelectOptions(cat_select),
-        items: AC.WebCat.getCategoryIds(selected_options(data.category)),
+        items: AC.WebCat.getCategoryIds(selected_options(data.category), cat_select),
         onItemAdd: ->
           if verifyMasterSubmit() == true
             $('#master-submit').prop('disabled', false)
@@ -1523,7 +1523,7 @@ window.click_table_buttons = (complaint_table, button)->
         labelField: 'category_name',
         searchField: ['category_name', 'category_code'],
         options: AC.WebCat.createSelectOptions(cat_select),
-        items: selected_options(data.category),
+        items: AC.WebCat.getCategoryIds(selected_options(data.category), cat_select),
       }
       select_complete = $completed_selectize[0].selectize
       select_complete.disable()
