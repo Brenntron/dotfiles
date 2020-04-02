@@ -304,7 +304,7 @@ window.selectize_category_inputs = () ->
         valueField: 'category_id',
         labelField: 'category_name',
         searchField: ['category_name', 'category_code'],
-        options: AC.WebCat.createSelectOptions(this),
+        options: AC.WebCat.createSelectOptions("##{this.id}"),
       }
 
 window.toggle_all_checkboxes = () ->
