@@ -119,8 +119,6 @@ $ ->
       $('.edit-entries-buttons').removeClass('hidden')
 
 
-
-
   # Edit resolved host IPs
   $('.inline-edit-ip-button').click ->
     edit_ip_query_functions(this, 'edit')
@@ -298,106 +296,6 @@ $ ->
       wlbl_submit.attr('disabled', false)
     else
       wlbl_submit.attr('disabled', true)
-
-
-
-  ## Populating the toolbar Adjust WL/BL Button (works for index, research page, and research tab of show page)
-  window.bulk_get_current_wlbl = (page) ->
-    entries_checked = []
-    checkbox = ''
-    row = ''
-    tbody = ''
-    current_wbrs = ''
-
-    # Define variables based on what page we're on
-    if page == 'index'
-      checkbox = '.dispute-entry-checkbox'
-      row = '.index-entry-row'
-      tbody = $('#wlbl_adjust_entries_index').find('table.dispute_tool_current').find('tbody')
-      current_wbrs = '.entry-col-wbrs-score'
-    else if page == 'show' || page == 'research'
-      checkbox = '.dispute_check_box'
-      row = '.research-table-row'
-      tbody = $('#wlbl_adjust_entries').find('table.dispute_tool_current').find('tbody')
-      current_wbrs = '.current-wbrs-score'
-
-    ## Clear out any residual data
-    # Empty table
-    $(tbody).empty()
-
-    # Clear the checkboxes
-    wl_weak = $('#wlbl_adjust_entries').find('.wl-weak-checkbox')
-    wl_med = $('#wlbl_adjust_entries').find('.wl-med-checkbox')
-    wl_heavy = $('#wlbl_adjust_entries').find('.wl-heavy-checkbox')
-    bl_weak = $('#wlbl_adjust_entries').find('.bl-weak-checkbox')
-    bl_med = $('#wlbl_adjust_entries').find('.bl-med-checkbox')
-    bl_heavy = $('#wlbl_adjust_entries').find('.bl-heavy-checkbox')
-    $(wl_weak[0]).prop('checked', false)
-    $(wl_med[0]).prop('checked', false)
-    $(wl_heavy[0]).prop('checked', false)
-    $(bl_weak[0]).prop('checked', false)
-    $(bl_med[0]).prop('checked', false)
-    $(bl_heavy[0]).prop('checked', false)
-
-    # Empty comment box
-    comment_box = $('#wlbl_adjust_entries').find('.adjust-wlbl-input')
-    $(comment_box).val('')
-
-    ## Get data to populate table
-    # Get all the checked entries
-    $(checkbox).each ->
-      if this.checked == true
-        entries_checked.push(this)
-
-    # Pull the entry content out
-    if (entries_checked.length > 0)
-      data = {'entries': []}
-      wbrs = ''
-      $(entries_checked).each ->
-# Slightly different structure to get the actual entry content
-        if row == '.research-table-row'
-          entry_row = $(this).parents('.research-table-row')[0]
-          entry_content = $(entry_row).find('.entry-data-content').text()
-          wbrs = $(entry_row).find(current_wbrs).text()
-          data['entries'].push(entry_content)
-
-        else if row == '.index-entry-row'
-          entry_row = $(this).parents('.index-entry-row')[0]
-          entry_content = $(entry_row).find('.entry-col-content').text()
-          data['entries'].push("\n" + entry_content + "\n")
-          wbrs = $(entry_row).find(current_wbrs).text()
-
-      std_msg_ajax(
-        url: '/escalations/api/v1/escalations/webrep/disputes/bulk_rule_ui_wlbl_get_info_for_form'
-        method: 'POST'
-        data: data
-        success: (response) ->
-          $(tbody).empty()
-          response = JSON.parse(response)
-          for entry in response
-            ip_uri = entry['ip_uri']
-            list_types = entry['list_types']
-            wbrs_score = entry['wbrs_score']
-            comment = entry['notes']
-            if list_types
-              list_types = entry['list_types']
-            else
-              list_types = ''
-              wbrs_score = wbrs
-            if wbrs_score == null
-              wbrs_score = '<span class="missing-data">No score.</span>'
-            if comment == null
-              comment = ''
-
-            $(tbody).append('<tr class="wlbl-dropdown-row">' + '<td class="wlbl-entry-content">' + ip_uri + '</td><td class="wlbl-entry-wlbl">' + list_types + '</td>' + '<td class="wlbl-current-entry-wbrs text-center">' + wbrs_score + '</td>')
-
-        error: (response) ->
-          std_msg_error( 'Error retrieving WL/BL Data', response)
-      )
-    else
-      std_msg_error('No rows selected', ['Please select at least one entry row.'])
-      $(dropdown).removeClass('open')
-      return false
 
 
   ## Bulk submission of WL/BL changes (works on index, research page, and research tab of show page)

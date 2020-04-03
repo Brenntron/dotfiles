@@ -3,6 +3,8 @@ require 'socket'
 class DisputeEntry < ApplicationRecord
   attr_writer :wbrs_xlist
 
+  attr_accessor :running_verdict
+
   has_paper_trail on: [:update], ignore: [:updated_at, :entry_type]
   belongs_to :dispute, touch: true
   belongs_to :user, optional: true
@@ -304,8 +306,8 @@ class DisputeEntry < ApplicationRecord
 
     if !url.starts_with?("http")
       url = "http://" + url
-    end  
-    
+    end
+
     uri = URI.parse(URI.parse(url).scheme.nil? ? "http://#{url}" : url)
     domain = PublicSuffix.parse(uri.host, :ignore_private => true)
 
@@ -393,8 +395,8 @@ class DisputeEntry < ApplicationRecord
       end
       if col == 'mtime'
         mtime_column_index = index
-      end  
-    end 
+      end
+    end
 
     if data.size > 1000
       doable_data = data.first(100)
@@ -407,12 +409,12 @@ class DisputeEntry < ApplicationRecord
       end
       if mtime_column_index
         datum[mtime_column_index] = Time.at(datum[mtime_column_index])
-      end 
+      end
 
-      formatted_data.last['data'] << datum 
-    end  
+      formatted_data.last['data'] << datum
+    end
 
-    formatted_data 
+    formatted_data
 
   end
 
@@ -482,12 +484,12 @@ class DisputeEntry < ApplicationRecord
         scans.each do |s|
           item = {:name => s[0], :result => s[1]["result"]}
           case item[:result]
-            when "clean site"
-              scans_clean << item
-            when "unrated site"
-              scans_unrated << item
-            else
-              scans_hit << item
+          when "clean site"
+            scans_clean << item
+          when "unrated site"
+            scans_unrated << item
+          else
+            scans_hit << item
           end
         end
         scans_hit.each { |hit| sordiddata << hit }
@@ -682,7 +684,7 @@ class DisputeEntry < ApplicationRecord
 
     if wbrs_stuff_rulehits.blank?
       wbrs_stuff_rulehits = []
-    end  
+    end
 
     ip_addr = IPSocket.getaddress(hostlookup) rescue nil
     if ip_addr
@@ -833,167 +835,163 @@ class DisputeEntry < ApplicationRecord
 
   ######################################################################################
   def self.process_research_for_uri(research_params)
-    if research_params.present? && research_params['uri'].strip != ''
-      url = research_params['uri'].gsub(/\r\n?/, "\n").strip # Remove all white spaces and newlines
-      domain_of_url = DisputeEntry.domain_of(url)
-      entries = entries_of_url(url)
+    url = research_params['uri'].gsub(/\r\n?/, "\n").strip # Remove all white spaces and newlines
+    domain_of_url = DisputeEntry.domain_of(url)
+    entries = entries_of_url(url)
 
-      invalid_matches = []
+    invalid_matches = []
 
-      if research_params['scope'] == "strict"
-        entries.each do |entry|
-          if url != entry.uri || entry.uri != "www." + entry.uri
-            invalid_matches << entry
-          end
-        end
-        entries = entries - invalid_matches
-      end
-
-      # Make sure there will always be a "www" and "non-www" form to an inputted URL
-
-      if !url.include?("www.")
-        unless entries.find{|entry| url == "www." + entry.uri}
-          entries.prepend DisputeEntry.new(uri: "www."+ url)
-        end
-      elsif url.include?("www.")
-        unless entries.find{|entry| url.gsub("www.","") == entry.uri}
-          entries.prepend DisputeEntry.new(uri: url.gsub("www.",""))
-        end
-      end
-
-      # Make sure the inputted URL is added as an entry
-      unless entries.find{|entry| url == entry.uri}
-        entries.prepend DisputeEntry.new(uri: url)
-      end
-
-      # BEGIN LOGIC TO CONSOLIDATE WLBL INFO TO UNIQUE URIS
+    if research_params['scope'] == "strict"
       entries.each do |entry|
-        entry.class.module_eval { attr_accessor :consolidated_wlbl_strings}
-        entry.consolidated_wlbl_strings = entry.wbrs_list_type
-        entry.primary_category = DisputeEntry.get_primary_category(entry.hostlookup)
-      end
-
-      unique_entries = entries.uniq{|e| e.hostlookup}
-      duplicate_entries = entries - unique_entries
-
-      duplicate_entries.each do |duplicate_entry|
-
-        unique_entries.select{ |e| e.hostlookup == duplicate_entry.hostlookup}.map do |e|
-
-          if e.consolidated_wlbl_strings.blank? && duplicate_entry.consolidated_wlbl_strings.present?
-            e.consolidated_wlbl_strings << duplicate_entry.consolidated_wlbl_strings
-          elsif e.consolidated_wlbl_strings.present? && duplicate_entry.consolidated_wlbl_strings.present?
-            e.consolidated_wlbl_strings << ", " + duplicate_entry.consolidated_wlbl_strings
-          end
-
-        end
-
-
-      end
-
-      #entries = unique_entries
-
-      #get rid of weird entries
-
-      final_entries = []
-      rejected_entries = []
-      unique_entries.each do |r_entry|
-        entry_domain = DisputeEntry.domain_of(r_entry.hostlookup)
-        if entry_domain.include?(domain_of_url)
-          final_entries << r_entry
-        else
-          rejected_entries << r_entry
+        if url != entry.uri || entry.uri != "www." + entry.uri
+          invalid_matches << entry
         end
       end
+      entries = entries - invalid_matches
+    end
 
-      entries = final_entries
+    # Make sure there will always be a "www" and "non-www" form to an inputted URL
 
-      # END WLBL LOGIC, WE SHOULD ONLY HAVE UNIQUE URIS NOW
+    if !url.include?("www.")
+      unless entries.find{|entry| url == "www." + entry.uri}
+        entries.prepend DisputeEntry.new(uri: "www."+ url)
+      end
+    elsif url.include?("www.")
+      unless entries.find{|entry| url.gsub("www.","") == entry.uri}
+        entries.prepend DisputeEntry.new(uri: url.gsub("www.",""))
+      end
+    end
 
+    # Make sure the inputted URL is added as an entry
+    unless entries.find{|entry| url == entry.uri}
+      entries.prepend DisputeEntry.new(uri: url)
+    end
 
-      entries.each do |entry|
-        is_ip_address = !!(entry.uri  =~ Resolv::IPv4::Regex)
+    # BEGIN LOGIC TO CONSOLIDATE WLBL INFO TO UNIQUE URIS
+    entries.each do |entry|
+      entry.class.module_eval { attr_accessor :consolidated_wlbl_strings}
+      entry.consolidated_wlbl_strings = entry.wbrs_list_type
+      entry.primary_category = DisputeEntry.get_primary_category(entry.hostlookup)
+    end
 
-        wbrs_stuff = Sbrs::Base.remote_call_sds_v3(entry.uri, "wbrs")
-        wbrs_stuff_rulehits = Sbrs::ManualSbrs.get_rule_names_from_rulehits(wbrs_stuff) rescue []
-        if wbrs_stuff_rulehits.blank?
-          wbrs_stuff_rulehits = []
+    unique_entries = entries.uniq{|e| e.hostlookup}
+    duplicate_entries = entries - unique_entries
+
+    duplicate_entries.each do |duplicate_entry|
+
+      unique_entries.select{ |e| e.hostlookup == duplicate_entry.hostlookup}.map do |e|
+
+        if e.consolidated_wlbl_strings.blank? && duplicate_entry.consolidated_wlbl_strings.present?
+          e.consolidated_wlbl_strings << duplicate_entry.consolidated_wlbl_strings
+        elsif e.consolidated_wlbl_strings.present? && duplicate_entry.consolidated_wlbl_strings.present?
+          e.consolidated_wlbl_strings << ", " + duplicate_entry.consolidated_wlbl_strings
         end
 
-        ip_addr = IPSocket.getaddress(entry.uri) rescue nil
+      end
 
-        if ip_addr.blank?
-          ip_addr = Resolv.getaddress(self.domain_of(entry.uri)) rescue nil
-        end
 
-        if ip_addr
-          wbrs_stuff_ip = Sbrs::Base.remote_call_sds_v3(ip_addr, "wbrs")
-          wbrs_stuff_rulehits = wbrs_stuff_rulehits + (Sbrs::ManualSbrs.get_rule_names_from_rulehits(wbrs_stuff_ip) rescue [])
-          wbrs_stuff_rulehits = wbrs_stuff_rulehits.uniq
-          entry.web_ips = ip_addr
-          web_ips_formatted = entry.web_ips.gsub("[", "").gsub("]", "").gsub("\"", "").split(", ")
-          
-          extra_wbrs_stuff = Sbrs::Base.combo_call_sds_v3(entry.uri, web_ips_formatted)
-          extra_wbrs_stuff_rulehits = Sbrs::ManualSbrs.get_rule_names_from_rulehits(extra_wbrs_stuff) rescue []
+    end
 
-          if extra_wbrs_stuff.present?
-            entry.score = extra_wbrs_stuff["wbrs"]["score"]
+    #entries = unique_entries
 
-            threat_cats = extra_wbrs_stuff["threat_cats"]
+    #get rid of weird entries
 
-            threat_cat_names = []
-            if threat_cats.present?
-              threat_cat_info = DisputeEntry.threat_cats_from_ids(threat_cats)
-              threat_cat_info.each do |name|
-                threat_cat_names << name[:name]
-              end
-              entry.multi_wbrs_threat_category = threat_cat_names
+    final_entries = []
+    rejected_entries = []
+    unique_entries.each do |r_entry|
+      entry_domain = DisputeEntry.domain_of(r_entry.hostlookup)
+      if entry_domain.include?(domain_of_url)
+        final_entries << r_entry
+      else
+        rejected_entries << r_entry
+      end
+    end
+
+    entries = final_entries
+
+    # END WLBL LOGIC, WE SHOULD ONLY HAVE UNIQUE URIS NOW
+
+
+    entries.each do |entry|
+      is_ip_address = !!(entry.uri  =~ Resolv::IPv4::Regex)
+
+      wbrs_stuff = Sbrs::Base.remote_call_sds_v3(entry.uri, "wbrs")
+      wbrs_stuff_rulehits = Sbrs::ManualSbrs.get_rule_names_from_rulehits(wbrs_stuff) rescue []
+      if wbrs_stuff_rulehits.blank?
+        wbrs_stuff_rulehits = []
+      end
+
+      ip_addr = IPSocket.getaddress(entry.uri) rescue nil
+
+      if ip_addr.blank?
+        ip_addr = Resolv.getaddress(self.domain_of(entry.uri)) rescue nil
+      end
+
+      if ip_addr
+        wbrs_stuff_ip = Sbrs::Base.remote_call_sds_v3(ip_addr, "wbrs")
+        wbrs_stuff_rulehits = wbrs_stuff_rulehits + (Sbrs::ManualSbrs.get_rule_names_from_rulehits(wbrs_stuff_ip) rescue [])
+        wbrs_stuff_rulehits = wbrs_stuff_rulehits.uniq
+        entry.web_ips = ip_addr
+        web_ips_formatted = entry.web_ips.gsub("[", "").gsub("]", "").gsub("\"", "").split(", ")
+
+        extra_wbrs_stuff = Sbrs::Base.combo_call_sds_v3(entry.uri, web_ips_formatted)
+        extra_wbrs_stuff_rulehits = Sbrs::ManualSbrs.get_rule_names_from_rulehits(extra_wbrs_stuff) rescue []
+
+        if extra_wbrs_stuff.present?
+          entry.score = extra_wbrs_stuff["wbrs"]["score"]
+
+          threat_cats = extra_wbrs_stuff["threat_cats"]
+
+          threat_cat_names = []
+          if threat_cats.present?
+            threat_cat_info = DisputeEntry.threat_cats_from_ids(threat_cats)
+            threat_cat_info.each do |name|
+              threat_cat_names << name[:name]
             end
-          end
-
-
-          extra_wbrs_stuff_rulehits.each do |rule_hit|
-            new_rule_hit = DisputeRuleHit.new
-            new_rule_hit.name = rule_hit.strip
-            new_rule_hit.rule_type = "WBRS"
-            new_rule_hit.is_multi_ip_rulehit = true
-            entry.dispute_rule_hits << new_rule_hit
+            entry.multi_wbrs_threat_category = threat_cat_names
           end
         end
 
-        if wbrs_stuff.kind_of?(Hash)
-          entry.wbrs_score = wbrs_stuff["wbrs"]["score"]
-        else
-          entry.wbrs_score = nil
-        end
 
-        wbrs_stuff_rulehits.each do |rule_hit|
+        extra_wbrs_stuff_rulehits.each do |rule_hit|
+          new_rule_hit = DisputeRuleHit.new
+          new_rule_hit.name = rule_hit.strip
+          new_rule_hit.rule_type = "WBRS"
+          new_rule_hit.is_multi_ip_rulehit = true
+          entry.dispute_rule_hits << new_rule_hit
+        end
+      end
+
+      if wbrs_stuff.kind_of?(Hash)
+        entry.wbrs_score = wbrs_stuff["wbrs"]["score"]
+      else
+        entry.wbrs_score = nil
+      end
+
+      wbrs_stuff_rulehits.each do |rule_hit|
+        new_rule_hit = DisputeRuleHit.new
+        new_rule_hit.dispute_entry_id = entry.id
+        new_rule_hit.name = rule_hit.strip
+        new_rule_hit.rule_type = "WBRS"
+        entry.dispute_rule_hits << new_rule_hit
+      end
+
+      if is_ip_address === true
+        sbrs_stuff = Sbrs::ManualSbrs.get_sbrs_data({:ip => entry.uri})
+        entry.sbrs_score = sbrs_stuff["sbrs"]["score"]
+        sbrs_stuff_rules = Sbrs::GetSbrs.get_sbrs_rules_for_ip(entry.uri)
+
+        sbrs_stuff_rules.each do |rule_hit|
           new_rule_hit = DisputeRuleHit.new
           new_rule_hit.dispute_entry_id = entry.id
           new_rule_hit.name = rule_hit.strip
-          new_rule_hit.rule_type = "WBRS"
+          new_rule_hit.rule_type = "SBRS"
           entry.dispute_rule_hits << new_rule_hit
         end
-
-        if is_ip_address === true
-          sbrs_stuff = Sbrs::ManualSbrs.get_sbrs_data({:ip => entry.uri})
-          entry.sbrs_score = sbrs_stuff["sbrs"]["score"]
-          sbrs_stuff_rules = Sbrs::GetSbrs.get_sbrs_rules_for_ip(entry.uri)
-
-          sbrs_stuff_rules.each do |rule_hit|
-            new_rule_hit = DisputeRuleHit.new
-            new_rule_hit.dispute_entry_id = entry.id
-            new_rule_hit.name = rule_hit.strip
-            new_rule_hit.rule_type = "SBRS"
-            entry.dispute_rule_hits << new_rule_hit
-          end
-        end
       end
-
-      entries
-    else
-      []
     end
+
+    entries
   end
 
 
@@ -1007,6 +1005,7 @@ class DisputeEntry < ApplicationRecord
       total_uris.each do |uri|
         result_r = uri.split("\r")
         result_n = uri.split("\n")
+        result_u = uri.split("\u2028")
         result_s = uri.split(" ")
 
 
@@ -1024,6 +1023,11 @@ class DisputeEntry < ApplicationRecord
           was_split = true
         end
 
+        if result_u.size > 1
+          final_result += result_u
+          was_split = true
+        end
+
         if result_s.size > 1
           final_result += result_s
           was_split = true
@@ -1038,6 +1042,7 @@ class DisputeEntry < ApplicationRecord
         if final_result.size > 1
           final_uris += final_result
         end
+
       end
 
       final_uris = final_uris.flatten
@@ -1059,6 +1064,7 @@ class DisputeEntry < ApplicationRecord
       []
     end
   end
+
 
   def self.check_for_duplicates(entry)
     if is_ip?(entry) && DisputeEntry.where(ip_address: entry).present?
@@ -1163,14 +1169,14 @@ class DisputeEntry < ApplicationRecord
       if is_float(score)         # failing this should include "noscore"
         score = score.to_f
         case
-          when score >= 1.0                 # Good is +1.0 to +10
-            verdict = 'Good'
-          when score > -2.0                 # Neutral is -1.9 to 0.9
-            verdict = 'Neutral'
-          when score <= -2.0                # Poor is -10 to -2.0
-            verdict = 'Poor'
-          else
-            verdict = ''
+        when score >= 1.0                 # Good is +1.0 to +10
+          verdict = 'Good'
+        when score > -2.0                 # Neutral is -1.9 to 0.9
+          verdict = 'Neutral'
+        when score <= -2.0                # Poor is -10 to -2.0
+          verdict = 'Poor'
+        else
+          verdict = ''
         end
       end
     rescue
@@ -1179,6 +1185,11 @@ class DisputeEntry < ApplicationRecord
 
     verdict
 
+  end
+
+
+  def running_verdict
+    @running_verdict
   end
 
   def self.threat_cats_from_ids(ids)
@@ -1197,22 +1208,21 @@ class DisputeEntry < ApplicationRecord
     end
 
     response
-
   end
 
   def is_disposition_matching?
 
     begin
-      verdict = ""
+
       wbrs_stuff = Sbrs::Base.remote_call_sds_v3(self.hostlookup, "wbrs")
 
       if self.entry_type == "URI/DOMAIN"
-        verdict = self.class.verdict_from_score(wbrs_stuff["wbrs"]["score"])
+        @running_verdict = self.class.verdict_from_score(wbrs_stuff["wbrs"]["score"])
       else
-        verdict = self.class.email_verdict_from_score(self.sbrs_score)
+        @running_verdict = self.class.email_verdict_from_score(self.sbrs_score)
       end
 
-      if self.suggested_disposition == verdict
+      if self.suggested_disposition == @running_verdict
         self.status = STATUS_RESOLVED
         self.resolution = STATUS_RESOLVED_UNCHANGED
         self.resolution_comment = "The Suggested Disposition provided for the Dispute Entry matches its Current Disposition."

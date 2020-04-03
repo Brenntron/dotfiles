@@ -158,8 +158,6 @@ window.bulk_get_current_wlbl = (page) ->
 
   # build the top blue dispute rows with wl/bl's and threat cats, ensures the row gets built correctly (KH refactor)
   window.build_tc_row = (entry, tbody, result) ->
-    console.log 'YOU HAVE ENTERED build_tc_row, HERE IS CURR ENTRY:'
-    console.log entry
 
     { threat_categories } = JSON.parse(result)
     { ip_uri, list_types, wbrs_score, comment } = entry
@@ -190,7 +188,6 @@ window.bulk_get_current_wlbl = (page) ->
     if list_types.length == 0
       list_types = "<span class='missing-data'>Not on a list</span>"
 
-    console.log ip_uri, list_types, wbrs_score
 
     table_row =
       "<tr class='wlbl-dropdown-row'>
@@ -803,7 +800,6 @@ window.submit_individual_wlbl = (button_tag) ->
         error: (response) ->
           std_api_error(response, 'Error retrieving WL/BL Data')
       )
-
 
 
 

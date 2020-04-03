@@ -5,7 +5,6 @@ FactoryBot.define do
     email           { "bob@bob.com" }
     phone           { "1234567890" }
     initialize_with {Customer.first_or_create(email:email)}
-
     factory :dispute_analyst do
       name            { "Dispute Analyst" }
     end

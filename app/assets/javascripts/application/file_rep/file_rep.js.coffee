@@ -1,3 +1,11 @@
+$(document).on 'ready',->
+  if $('#auto-resolve-dialog').length > 0
+    $('#auto-resolve-dialog').dialog({
+      autoOpen : false
+      width: 500
+    });
+window.show_auto_resolve = () ->
+  $('#auto-resolve-dialog').dialog('open')
 window.update_file_rep_status = () ->
   checked_disputes = []
   resolution = ""
@@ -549,10 +557,10 @@ $ ->
       return false
 
   $(document).on 'change', '.dispute_check_box', ->
-    if $("#disputes-index-export-form").length > 0
+# ensure this only runs in file rep, there are dispute checkboxes on webrep
+  if $("#disputes-index-export-form").length > 0
         document.getElementById("disputes-index-export-form").onsubmit = () ->
           return false
-
   window.export_file_rep_selected = () ->
     data = build_data()
     if data.selected_cases.length <= 0

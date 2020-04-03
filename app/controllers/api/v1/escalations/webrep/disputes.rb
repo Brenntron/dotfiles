@@ -104,11 +104,11 @@ module API
                 if non_duplicated_entries.any?
                   if user_validation.present?
                     begin
-                    dispute = Dispute.create_action(bugzilla_rest_session,
-                                                    non_duplicated_entries,
-                                            permitted_params[:assignee],
-                                            permitted_params[:priority],
-                                            permitted_params[:ticket_type])
+                      dispute = Dispute.create_action(bugzilla_rest_session,
+                                                      non_duplicated_entries,
+                                                      permitted_params[:assignee],
+                                                      permitted_params[:priority],
+                                                      permitted_params[:ticket_type])
                     rescue Exception => e
                       raise ("Could not create the Dispute because of this error: #{e.message}")
                     end
@@ -306,12 +306,12 @@ module API
                 Wbrs::ManualWlbl.destroy_from_params(ip_uris, params['lists'], username: current_user.cvs_username)
               when "replace"
                 replace_params_formatted =
-                {
-                    dispute_entry_ids: params[:dispute_entries],
-                    trgt_list: params[:lists],
-                    thrt_cats: params[:thrt_cat_ids],
-                    note: params[:note]
-                }
+                    {
+                        dispute_entry_ids: params[:dispute_entries],
+                        trgt_list: params[:lists],
+                        thrt_cats: params[:thrt_cat_ids],
+                        note: params[:note]
+                    }
                 Wbrs::ManualWlbl.adjust_entries_from_params(replace_params_formatted, username: current_user.cvs_username)
               else
                 "No valid adjustment type"
@@ -726,7 +726,7 @@ module API
 
                     comment = ""
 
-		                comment = value["metadata"].fetch("VRT", {}).fetch("comment", "")
+                    comment = value["metadata"].fetch("VRT", {}).fetch("comment", "")
 
                     return_data.push(:entry => key, :classification => value["classifications"], :expiration => expiration, :status => value["status"], :comment => comment).to_json
                   end

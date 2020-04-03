@@ -63,17 +63,18 @@ window.populate_webrep_index_table = (data = {}, reload = false) ->
 
       if json.data.length == 0
         std_msg_error("No tickets matching filter or search.","")
-
+        $('#inline-webrep').addClass('hidden')
       if json.error
         $('#refresh-working-msg').hide()
         $('#refresh-error-msg').show()
         $('#refresh-error-msg').html('An error occured while retrieving data')
-
+        $('#inline-webrep').addClass('hidden')
       else
         $('#refresh-error-msg').hide()
         $('#refresh-working-msg').show()
         $('#refresh-working-msg').html('Table data updating correctly')
         $('#dispute-index-title').text(json['title'])
+        $('#inline-webrep').addClass('hidden')
         datatable = $('#disputes-index').DataTable()
         datatable.clear();
         datatable.rows.add(json.data);
@@ -1354,7 +1355,7 @@ $ ->
 
 
   $(document).ready ->
-    # Hide loader cogs when page is done loading
+# Hide loader cogs when page is done loading
     loader = $('#inline-webrep')
     $(this).bind(
       ajaxStart: () ->
