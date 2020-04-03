@@ -35,6 +35,7 @@
 //= require application/chartjs-plugin-datalabels.min
 //= require application/jquery-ui.min
 //= require application/daterangepicker
+//= require application/toolbar-shortcuts
 //= require application/webrep_advanced_search
 //= require application/webcat/complaints
 //= require application/webcat/clusters
