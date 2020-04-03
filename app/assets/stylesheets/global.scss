@@ -5504,6 +5504,11 @@ input.table-entry-input:focus {
   margin: -30px -30px -150px -30px;
   padding: 50px 10px 0 10px;
 }
+#lookup-quick{
+  .ajax-message-div{
+    top: 140px;
+  }
+}
 .research-search-form .button_primary {
   margin: 10px 0;
 }
