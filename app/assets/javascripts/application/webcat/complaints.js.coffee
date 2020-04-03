@@ -1610,20 +1610,6 @@ open_selected = (selected_rows, toggle) ->
       else
         window.open("http://"+selected_row.ip_address)
 
-#toolbar shortcuts
-window.onkeydown = (e) ->
-  if (e.altKey && e.which == 84) #alt + t
-    take_selected() #take ticket
-  else if (e.altKey && e.which == 82) #alt + r
-    return_selected() #return ticket
-  else if ( e.altKey && e.which == 70) #alt + f
-    collapse_selected() #collapse selected tickets
-  else if (e.altKey && e.which == 72) #alt + h
-    collapse_all() #collapse all tickets
-  else if (e.altKey && e.which == 68) #alt + d
-    expand_selected() #expand selected tickets
-  else if (e.altKey && e.which == 71) #alt + g
-    expand_all() #expand all tickets
 
 window.open_viewable = () ->
   selected_rows = $('#complaints-index').DataTable().rows()
