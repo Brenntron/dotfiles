@@ -1610,7 +1610,6 @@ open_selected = (selected_rows, toggle) ->
       else
         window.open("http://"+selected_row.ip_address)
 
-
 window.open_viewable = () ->
   selected_rows = $('#complaints-index').DataTable().rows()
   open_selected(selected_rows, "true")

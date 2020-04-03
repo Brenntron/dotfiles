@@ -1,4 +1,3 @@
-
 window.update_file_rep_status = () ->
   checked_disputes = []
   resolution = ""
