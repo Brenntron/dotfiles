@@ -6,7 +6,7 @@ $(document).ready ->
       return false
 
   if $('.searched-for-url').length > 0
-    text = $('.searched-for-url').text().split(/\s+/)
+    text = $('.searched-for-url').text().trim().split(/\s+/)
     if text.length > 1
       if text.length == 2
         text = text.join(', ').replace(/, / , ' and ')
