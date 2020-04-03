@@ -10,7 +10,7 @@ class RepApi::Whitelist < RepApi::Base
     if attributes.keys.present?
       attributes.keys.each do |attr|
         if !FIELD_NAMES.include?(attr)
-          self.class.module_eval { attr_accessor :stuff}
+          self.class.module_eval { attr_accessor attr.to_sym}
         end
       end
     end
