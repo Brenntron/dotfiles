@@ -4,7 +4,7 @@ window.onkeydown = (e) ->
   #File Reputation - Disputes
   if $('body').hasClass('escalations--file_rep--disputes-controller')
     if (e.altKey && e.which == 84) #alt + t
-      $('.take-ticket-button-full').click() #take ticket
+      filerep_take_disputes() #take ticket
     else if (e.altKey && e.ctrlKey && e.shiftKey && e.which == 80) #alt + ctrl + shift + p
       export_file_rep_all() #export all files to .csv
     else if (e.altKey && e.ctrlKey && e.which == 80) #alt + ctrl + p
