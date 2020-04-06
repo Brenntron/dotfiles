@@ -556,7 +556,7 @@ class Dispute < ApplicationRecord
             if !false_negative_claim
               new_dispute_entry.status = DisputeEntry::NEW
 
-              if new_dispute.submitter_type == "NON-CUSTOMER"
+              if new_dispute.submitter_type == "NON-CUSTOMER" && new_dispute.submission_type == "e"
                 AutoResolve.auto_resolve_email(new_dispute_entry, total_hits)
               end
 
