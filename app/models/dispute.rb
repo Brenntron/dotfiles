@@ -560,6 +560,23 @@ class Dispute < ApplicationRecord
                 AutoResolve.auto_resolve_email(new_dispute_entry, total_hits)
               end
 
+            else
+              if new_dispute.submission_type == "w"
+                auto_resolve_verdict = new_dispute_entry.assign_from_auto_resolve(address: key,
+                                                                                  total_hits: total_hits,
+                                                                                  resolved_at: resolved_at,
+                                                                                  dispute_entry: new_dispute_entry)
+
+                if auto_resolve_verdict.resolved? && auto_resolve_verdict.malicious?
+                  verdicts_to_blacklist << [auto_resolve_verdict, new_dispute_entry]
+                end
+
+                if auto_resolve_verdict.present? && autoresolve_verdict.auto_resolve_log.present?
+                  new_dispute_entry.auto_resolve_log += auto_resolve_verdict.auto_resolve_log
+                end
+
+              end
+
             end
 
             new_dispute_entry.save!
