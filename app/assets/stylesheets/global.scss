@@ -1757,7 +1757,7 @@ button.close {
   background-color: $sidebar-nav-base;
   display: block;
   position: absolute;
-  color: #fff;
+  color: $content-bg-color;
   text-transform: uppercase;
   font-weight: 700;
   line-height: $sidebar-width;
@@ -1776,7 +1776,7 @@ button.close {
 }
 
 #sidenav-menu-div a {
-  color: #fff;
+  color: $type-lightest;
   display: block;
   width: 100%;
   height:100%;
@@ -1871,7 +1871,7 @@ button.close {
 }
 
 .nav-container li, .sidenav-icons li {
-  border-bottom: 1px solid #fff;
+  border-bottom: 1px solid $type-lightest;
 }
 
 li.static-nav-item {
@@ -3228,7 +3228,7 @@ fieldset.top-content {
   width: 0;
   pointer-events: none;
   border-color: rgba(136, 183, 213, 0);
-  border-right-color: #fff;
+  border-right-color: $content-bg-color;
   border-width: 10px;
   margin-top: -24px;
   margin-right: -1px;
@@ -5397,7 +5397,7 @@ table > tbody > tr > td.research-table-row-wrapper {
   margin-top: -1px;
   border-left: 6px solid transparent;
   border-right: 6px solid transparent;
-  border-top: 10px solid #fff;
+  border-top: 10px solid $content-bg-color;
 }
 
 .expanded-row-data-wrapper {
@@ -5490,7 +5490,7 @@ h5.entry-details-table-header {
   background-position: right 2px center;
   background-size: 16px;
   padding-bottom: 1px;
-  border: 2px solid #fff;
+  border: 2px solid $content-bg-color;
   outline: 1px solid #e5e5e5;
   font-size: 9pt;
 }
@@ -5499,12 +5499,12 @@ h5.entry-details-table-header {
   background-color: $bug-section-color;
   color: $content-bg-color;
   background-image: url(image_path('icon_dropdown_white.svg'));
-  border: 2px solid #fff;
+  border: 2px solid $content-bg-color;
   outline: 1px solid #e5e5e5;
 }
 
 .dropdown .inline-select-dropdown {
-  border: 2px solid #fff;
+  border: 2px solid $content-bg-color;
   outline: 1px solid #e5e5e5;
 }
 
@@ -6494,6 +6494,12 @@ table.dispute-entry-table tbody tr.selected {
 
 #new-complaint-wrapper {
   min-width: 350px;
+  .selectize-dropdown.multi.form-control.selectize {
+    min-height: 32px !important;
+    height: 100%;
+    height: auto !important;
+    background-color: $content-bg-color !important;
+  }
 }
 
 #new-complaint-wrapper textarea, #new-complaint-wrapper input, #categorize-urls-form-wrapper textarea {
@@ -6535,7 +6541,8 @@ table.dispute-entry-table tbody tr.selected {
   border: 4px solid $content-bg-color;
   outline: 1px solid darken($faint-neutral-color, 5%);
   padding: 1px;
-  height: 32px;
+  min-height: 32px;
+  height: 100%;
 }
 
 .category-column .form-control.selectize {
@@ -6549,6 +6556,7 @@ table.dispute-entry-table tbody tr.selected {
 
 .selectize-dropdown.multi.form-control.selectize {
   min-height: 32px !important;
+  height: 100%;
   height: auto !important;
   background-color: $content-bg-color !important;
 }
@@ -6591,9 +6599,9 @@ table.dispute-entry-table tbody tr.selected {
 }
 
 #new-complaint-wrapper .selectize-dropdown.multi.form-control.selectize {
-  top: 28px !important;
   background-color: $content-bg-color;
   height: auto !important;
+  margin-top: 10px;
 }
 
 .selectize-dropdown-content {
@@ -6607,9 +6615,8 @@ table.dispute-entry-table tbody tr.selected {
   }
   .form-control.selectize{
     min-height: 34px;
-    //border-top: 4px solid #fff;
-    border-left: 4px solid #fff;
-    border-right: 4px solid #fff;
+    border-left: 4px solid $content-bg-color;
+    border-right: 4px solid $content-bg-color;
     border-bottom: none;
     border-top: none;
     height: auto;
@@ -7166,7 +7173,7 @@ table#duplicates a {
 }
 
 .bug-tabs .nav-tabs li.active a {
-  background-color: #fff !important;
+  background-color: $content-bg-color !important;
 }
 
 .retro-styling #sidenav-menu-div a {
@@ -8501,7 +8508,7 @@ th.sorting_1, th.sorting_asc, th.sorting_desc {
 }
 
 .table-button-row .dropdown-menu h3 {
-  color: #fff;
+  color: $type-lightest;
   padding: 6px 10px;
   font-weight: 400;
   font-size: 9pt;
@@ -10630,7 +10637,7 @@ input[type="radio"].resolution_radio_button {
     font-weight: 600;
     font-size: 9.5pt;
     border: none !important;
-    color: #fff;
+    color: $type-lightest;
     display: inline-block;
   }
   hr.thin{
