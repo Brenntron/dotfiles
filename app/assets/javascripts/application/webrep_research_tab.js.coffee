@@ -547,11 +547,6 @@ $(document).ready ->
       $('#show-ticket-resolution-submenu').hide()
       $(res_comment[0]).val('')
 
-  $('.esc-tooltipped').tooltipster theme: [
-    'tooltipster-borderless'
-    'tooltipster-borderless-customized'
-    ]
-
   $('.ticket-status-radio').click ->
     all_stat_radios = $('#show-edit-ticket-status-dropdown').find('.status-radio-wrapper')
     if $(this).is(':checked')
