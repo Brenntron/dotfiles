@@ -1,0 +1,2 @@
+
+Curl::Multi.autoclose = true

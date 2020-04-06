@@ -6,6 +6,7 @@
 %h1 Research Data
 .row
   .col-xs-12
+
     #research-tab-toolbar.toolbar
       %div
         %label.toolbar-section-label Table View
@@ -393,9 +394,12 @@
                     %label As of
                     = entry.dispute_entry_preload&.created_at&.strftime('%F %T')
 
-
                   %td.dispute_rep_tools.rep-tools-cell
+                    .webrep_auto_resolve{id:"webrep_auto_resolve-#{entry.id}", title:"Auto Resolve Log"}
+                      = entry.auto_resolve_log
                     %span.dispute_rep_tools_wrapper
+
+                      %button.dispute-inline-buttons.auto-resolve-button.esc-tooltipped{'data-entry-id': "#{entry.id}", title: 'View Auto Resolve Log', onclick:"show_webrep_auto_resolve(#{entry.id})"}
                       - if (@dispute.resolution != Dispute::DUPLICATE) && (@dispute.status != Dispute::RESOLVED)
                         %button.dispute-inline-buttons.edit-button.inline-edit-entry-button.esc-tooltipped{'data-entry-id': "#{entry.id}", title: 'Edit this entry'}
                       %span.dropdown
