@@ -48,7 +48,7 @@ class Wbrs::RuleLink < Wbrs::Base
             when prefixes[prefix_id]
               prefixes[prefix_id]
             else
-              prefixes[prefix_id] = Wbrs::Prefix.new(datum.slice(*Wbrs::Prefix::FIELD_NAMES))
+              prefixes[prefix_id] = Wbrs::Prefix.new(datum)
           end
       new_from_related_objects(category_id: datum['category'], prefix: prefix)
     end
