@@ -7,10 +7,19 @@ $ ->
     #This controls the show/hide of the loading wheel depending on if all ajax calls have been completed.
     #There were issues with using ajaxStop, but this works
     ####
+
+    if window.location.hash == '#lookup-quick'
+      loader = $('#lookup-quick-loader')
+    else
+      loader = $('#lookup-detail-loader')
+
     ajaxStart: () ->
-      $('.ajax-message-div').css('display', 'flex')
+      if location == '#lookup-quick'
+        loader.css('display', 'flex')
+      else
+        loader.css('display', 'flex')
     ajaxStop: () ->
-      $('.ajax-message-div').hide()
+      loader.hide()
 
     ajaxComplete: () ->
       completed_counter++
@@ -20,6 +29,12 @@ $ ->
         $('.ajax-message-div').hide()
 
   )
+#  $(document).on 'click', '#research-tabs', ->
+#    CONSO''
+  $(document).ready = () ->
+    console.clear()
+    console.log 'inininin'
+
   window.isEmpty = (item) ->
     ####
     # function to check whether or not objects and strings are empty, more variable types can be added as needed
@@ -39,8 +54,7 @@ $ ->
     else
       $('#add-to-ticket-button').prop('disabled', 'disabled')
 
-  $(document).on 'click', '.dispute_check_box', (e) ->
-    is_checked = $(e.target).prop('checked')
+  $(document).on 'click', '.dispute_check_box', () ->
     if $('.dispute_check_box').not(':checked').length > 0
       $('#select-all-entries').prop('checked', false)
     else

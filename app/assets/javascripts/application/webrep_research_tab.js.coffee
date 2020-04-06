@@ -118,7 +118,6 @@ $ ->
     if $('.edit-entries-buttons').hasClass('hidden')
       $('.edit-entries-buttons').removeClass('hidden')
 
-
   # Edit resolved host IPs
   $('.inline-edit-ip-button').click ->
     edit_ip_query_functions(this, 'edit')

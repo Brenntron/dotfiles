@@ -11,14 +11,6 @@ $ ->
       $('#research-page-toolbar .ips_urls').addClass('hidden')
       $('#research-page-toolbar .ips_urls_div').removeClass('hidden')
 
-  window.submit_research_query = () ->
-    if location.hash == "#lookup-quick"
-      top = '139px';
-    else
-      top = '-33px'
-      $('.ajax-message-div').css('display', 'flex')
-    $('.ajax-message-div').css( 'top', top)
-
   window.submit_new_dispute = (submit_btn) ->
     submit_research_query()
     data = {}
