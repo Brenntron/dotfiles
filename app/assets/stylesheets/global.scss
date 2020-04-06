@@ -10842,6 +10842,11 @@ span.threat-cat-no-data {
   margin-bottom: 2px;
 }
 
+// set Webrep table bg color to white for visibility when columns extend past table
+#disputes-index{
+  background-color: $content-bg-color;
+}
+
 // webrep dispute index > ensure break/wrap properly for long url's containing parameters
 .dispute-entry-col {
   min-width: 200px;
