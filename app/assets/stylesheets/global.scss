@@ -2859,6 +2859,10 @@ a.code-content:hover {
   display: inline-block;
 }
 
+.author-username{
+  word-break: break-all;
+}
+
 .author-username, #email-reply .receiver-email {
   font-size: 8pt;
   color: $type-base-color;
@@ -3747,6 +3751,8 @@ fieldset.top-content {
   line-height: 1.3em;
   border: none;
   width: 100%;
+  word-break: break-all;
+
 }
 
 input.communication-subject {
@@ -3822,6 +3828,7 @@ input.communication-subject {
 
 .receiver-email {
   font-size: 8pt;
+  word-break: break-all;
 }
 
 .reply-button   {background-image: url(image_path('icon_reply_white.svg'));}
