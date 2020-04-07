@@ -10860,7 +10860,7 @@ span.threat-cat-no-data {
 }
 
 // set Webrep table bg color to white for visibility when columns extend past table
-#disputes-index thead, tbody{
+#disputes-index {
   background-color: $content-bg-color;
 }
 
