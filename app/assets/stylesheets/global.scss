@@ -1318,6 +1318,9 @@ thead th.sorting.center {
 
 #message-text {
   padding-top: 5px;
+  li {
+    word-break: break-all;
+  }
 }
 
 #message-text, .message-text {
@@ -10857,7 +10860,7 @@ span.threat-cat-no-data {
 }
 
 // set Webrep table bg color to white for visibility when columns extend past table
-#disputes-index thead, tbody{
+#disputes-index {
   background-color: $content-bg-color;
 }
 
@@ -11963,4 +11966,51 @@ table > tbody > tr > td.no-padding {
   background-position: 30% 92%;
   background-size: 26px 26px;
   float: right;
+}
+
+// reptool dropdown urls are too long, need to wrap/break
+.reptool-entry-name {
+  word-break: break-all;
+}
+
+.reptool-generated-comment, .toolbar div.reptool-generated-comment {
+  word-break: break-all;
+  white-space: pre-line;
+  background: lighten($medium-neutral-color, 5%);
+  color: $type-lighter-color;
+  margin-top: 10px;
+  line-height: 16px;
+  padding: 5px 6px;
+  max-height: 90px;
+  overflow-y: auto;
+}
+
+.inline-tool-content-wrapper .comment-wrapper .dropdown-comment.adjust-reptool-bl-input {
+  // placeholder text below
+  &::placeholder {
+    color: $content-label-color;
+  }
+  min-height: 60px;
+}
+
+/* for inline reptool dropdown, match the text color as bulk for reptool dropdown */
+table.dispute_tool_current tr.reptool-entry-row td {
+  color: darken($type-lighter-color, 10%);
+}
+
+/* define the full width of the reptool dropdown container and individual columns */
+#reptool_adjust_entries.dropdown-menu, .reptool-inline-dropdown {
+  width: 420px;
+  .th-reptool-dispute {
+    width: 120px;
+  }
+  .th-reptool-active-classes {
+    width: 80px;
+  }
+  .th-reptool-expiration {
+    width: 80px;
+  }
+  .th-reptool-comment {
+    width: 120px;
+  }
 }
