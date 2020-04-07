@@ -752,7 +752,7 @@ window.change_ticket_status = (event) ->
 
   for dispute in checked_disputes
 #    event.preventDefault()
-    data.dispute_ids = dispute
+    data.dispute_ids = [dispute]
     $.ajax(
       url: '/escalations/api/v1/escalations/webrep/disputes/set_disputes_status'
       method: 'POST'

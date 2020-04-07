@@ -6,9 +6,20 @@ class Wbrs::Category < Wbrs::Base
 
   alias_method(:id, :category_id)
 
+  def initialize(attributes = {})
+    if attributes.keys.present?
+      attributes.keys.each do |attr|
+        if !FIELD_NAMES.include?(attr)
+          self.class.module_eval { attr_accessor attr.to_sym}
+        end
+      end
+    end
+    super
+  end
+
   def self.new_from_datum(datum)
     datum['category_id'] = datum.delete('category') if datum['category'].present?
-    new(datum.slice(*FIELD_NAMES))
+    new(datum)
   end
 
   # Get all the categories.
