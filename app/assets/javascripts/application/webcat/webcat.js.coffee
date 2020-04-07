@@ -316,6 +316,15 @@ $ ->
               return
             )
             $('.dataTables_filter').append $clearButton, $searchButton
+
+            # properly init these search/clear icons
+            $('.dt-button').tooltipster
+              theme: [
+                'tooltipster-borderless'
+                'tooltipster-borderless-customized'
+                'tooltipster-borderless-comment'
+              ]
+
             return
           lengthMenu: [[25, 50, 100, 150, 200], [25, 50, 100, 150, 200]]
           processing: true
@@ -507,9 +516,9 @@ $ ->
                   {subdomain, entry_id} = full
 
                   if subdomain
-                    '<span id="subdomain_' + entry_id + '">' + subdomain + '</span>'
+                    '<span id="subdomain_' + entry_id + '" class="webcat-subdomain-holder">' + subdomain + '</span>'
                   else
-                    '<span id="subdomain_' + entry_id + '">' + '</span>'
+                    '<span id="subdomain_' + entry_id + '" class="webcat-subdomain-holder">' + '</span>'
                 width: '50px'
               }
               {
@@ -530,7 +539,7 @@ $ ->
                     data_full = "data-full=" + data_full
                   title = "title=" + domain
                   if domain
-                    "<p class='input-truncate esc-tooltipped' #{data_full} id='domain_#{entry_id}' #{title}>#{domain}</p>"
+                    "<p class='input-truncate esc-tooltipped webcat-domain-holder' #{data_full} id='domain_#{entry_id}' #{title}>#{domain}</p>"
                   else
                     "<a id='domain_#{entry_id}' #{data_full} href='http://#{ip_address}' target='blank'>#{ip_address}</a>"
               }
@@ -851,6 +860,9 @@ $ ->
         console.log 'Webcat column show/hide preferences are updated in user_prefs table.'
     )
 
+  # webcat > complaints show page, disable two Submit toolbar buttons on page load
+  if $('body').hasClass('escalations--webcat--complaints-controller')
+    $('#master-submit, #index_update_resolution').prop('disabled','disabled')
 
   # webcat > complaints show page, ensure this JS gets called
   if $('body').hasClass('escalations--webcat--complaints-controller') && $('body').hasClass('show-action')
@@ -881,3 +893,22 @@ window.toggle_selectize_layer = (input, focus) ->
     $(select_parent).css('z-index', '4')
   else
     $(select_parent).css('z-index', '2')
+
+
+$ ->
+  # tooltip init these icons inside this DT, this MUST be on 'draw.dt', not page-load, DT doesn't exist on page-load
+  $('#complaints-index').on 'draw.dt', ->
+    $('#complaints-index .tooltipstered').tooltipster('destroy')  # remove existing dt tt attachments, then restore title attr
+    $('#complaints-index .esc-tooltipped').tooltipster
+      restoration: 'previous'
+      theme: [
+        'tooltipster-borderless'
+        'tooltipster-borderless-customized'
+      ]
+
+  # one-off init for 'clear search results' icon
+  $('#webcat-index-title #refresh-filter-button').tooltipster
+    theme: [
+      'tooltipster-borderless'
+      'tooltipster-borderless-customized'
+    ]

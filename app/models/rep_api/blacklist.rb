@@ -1,8 +1,8 @@
 class RepApi::Blacklist < RepApi::Base
   FIELD_NAMES = %w{entry disposition public excluded classifications manual_classifications class_id
-                   expiration hostname author primary_source metadata seen_by
+                   expiration expired hostname author primary_source metadata seen_by
                    _id _rev first_seen last_seen stale status ip ipi
-                   message seen_since_exclude}
+                   message seen_since_exclude comment}
   FIELD_SYMS = FIELD_NAMES.map{|name| name.to_sym}
 
   attr_accessor *FIELD_SYMS
@@ -10,6 +10,13 @@ class RepApi::Blacklist < RepApi::Base
   validates :entry, :classifications, presence: true
 
   def initialize(attributes = {})
+    if attributes.keys.present?
+      attributes.keys.each do |attr|
+        if !FIELD_NAMES.include?(attr)
+          self.class.module_eval { attr_accessor attr.to_sym}
+        end
+      end
+    end
     @new_record = attributes.has_key?(:new_record) ? attributes.delete(:new_record) : true
     super
   end
@@ -108,7 +115,7 @@ class RepApi::Blacklist < RepApi::Base
     entries = entry.kind_of?(Array) ? entry : [entry]
     input += entries.map{ |entry_curr| "entry=#{entry_curr}" }
 
-    response = call_json_request(:post, '/blacklist/add', body: build_request_body(input))
+    response = call_json_request(:post, '/escalations/add', body: build_request_body(input))
 
     @new_record = false
     blacklist_hash = JSON.parse(response.body).inject({}) do |hash, message|
@@ -273,7 +280,7 @@ class RepApi::Blacklist < RepApi::Base
     raise "Missing parameter: classification" unless input.has_key?('classification')
     input = input.to_a
 
-    response = call_json_request(:post, '/blacklist/add', body: build_request_body(input))
+    response = call_json_request(:post, '/escalations/add', body: build_request_body(input))
 
     return JSON.parse(response.body)
   end

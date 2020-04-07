@@ -107,6 +107,7 @@ $ ->
   $('#cancel_complaint').on 'click', ->
     $(':input','#new-complaint-form').val('')
     $('#new-complaint').dropdown('toggle')
+    $('#select-to-new').selectize()[0].selectize.clear()
 
 
   createSelectOptions = ->
@@ -128,5 +129,9 @@ $ ->
     labelField: 'name'
     searchField: 'name'
     options: createSelectOptions()
+    onFocus: () ->
+      window.toggle_selectize_layer(this, 'true')
+    onBlur: () ->
+      window.toggle_selectize_layer(this, 'false')
 
   }
