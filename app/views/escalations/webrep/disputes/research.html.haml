@@ -207,7 +207,7 @@
 
                     .comment-wrapper
                       %label.content-label-sm RepTool Comment
-                      %textarea.dropdown-comment.adjust-reptool-bl-input.comment-input.typed-in-comment-bulk
+                      %textarea.dropdown-comment.adjust-reptool-bl-input.comment-input.typed-in-comment-bulk{placeholder: 'Reason behind this change...'}
                       .reptool-generated-comment
                     .button-row-center
                       %button.primary.dropdown-submit-button{type: 'button', onclick: 'submit_bulk_reptool();'}
@@ -429,7 +429,7 @@
                                                 tor_exit_node
                                   .comment-wrapper
                                     %label.content-label-sm RepTool Comment
-                                    %textarea.dropdown-comment.adjust-reptool-bl-input.comment-input.typed-in-comment-inline
+                                    %textarea.dropdown-comment.adjust-reptool-bl-input.comment-input.typed-in-comment-inline{placeholder: 'Reason behind this change...'}
                                     .reptool-generated-comment
                                       INDIVIDUAL RESEARCH SUBMISSION:
                                       &#x000A; #{entry.hostlookup}
