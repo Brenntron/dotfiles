@@ -1136,7 +1136,7 @@ class Dispute < ApplicationRecord
       when 'named'
         named_search(search_name, user: user, reload: reload)
       when 'standard'
-        standard_search(search_name, user: user)
+        standard_search(search_name, user: user).includes(:customer => [:company])
       when 'contains'
         contains_search(params['value'])
       else
