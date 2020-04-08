@@ -1375,6 +1375,9 @@ thead th.sorting.center {
 
 #message-text {
   padding-top: 5px;
+  li {
+    word-break: break-all;
+  }
 }
 
 #message-text, .message-text {
@@ -1858,7 +1861,7 @@ button.close {
 }
 
 #sidenav-menu-div a {
-  color: $content-bg-color;
+  color: $type-lightest;
   display: block;
   width: 100%;
   height:100%;
@@ -2941,6 +2944,10 @@ a.code-content:hover {
   display: inline-block;
 }
 
+.author-username{
+  word-break: break-all;
+}
+
 .author-username, #email-reply .receiver-email {
   font-size: 8pt;
   color: $type-base-color;
@@ -3829,6 +3836,8 @@ fieldset.top-content {
   line-height: 1.3em;
   border: none;
   width: 100%;
+  word-break: break-all;
+
 }
 
 input.communication-subject {
@@ -3904,6 +3913,7 @@ input.communication-subject {
 
 .receiver-email {
   font-size: 8pt;
+  word-break: break-all;
 }
 
 .reply-button   {background-image: url(image_path('icon_reply_white.svg'));}
@@ -5670,7 +5680,7 @@ table > tbody > tr > td.research-table-row-wrapper {
   margin-top: -1px;
   border-left: 6px solid transparent;
   border-right: 6px solid transparent;
-  border-top: 10px solid $ac-nav-bg-color;
+  border-top: 10px solid $content-bg-color;
 }
 .search-options-col, .search-box-col{
    display: none;
@@ -5806,7 +5816,7 @@ h5.entry-details-table-header {
   background-size: 16px;
   padding-bottom: 1px;
   border: 2px solid $ac-nav-bg-color;
-  outline: 1px solid $nav-toolbar-color;
+  outline: 1px solid $disabled-bg;
   font-size: 9pt;
 }
 
@@ -5814,13 +5824,13 @@ h5.entry-details-table-header {
   background-color: $bug-section-color;
   color: $content-bg-color;
   background-image: url(image_path('icon_dropdown_white.svg'));
-  border: 2px solid $ac-nav-bg-color;
-  outline: 1px solid $nav-toolbar-color;
+  border: 2px solid $content-bg-color;
+  outline: 1px solid #e5e5e5;
 }
 
 .dropdown .inline-select-dropdown {
-  border: 2px solid $ac-nav-bg-color;
-  outline: 1px solid $nav-toolbar-color;
+  border: 2px solid $content-bg-color;
+  outline: 1px solid #e5e5e5;
 }
 
 .inline-dropdown-menu, .ticket-resolution-submenu, .toolbar-dropdown {
@@ -6964,6 +6974,12 @@ table.dispute-entry-table tbody tr.selected {
 
 #new-complaint-wrapper {
   min-width: 350px;
+  .selectize-dropdown.multi.form-control.selectize {
+    min-height: 32px !important;
+    height: 100%;
+    height: auto !important;
+    background-color: $content-bg-color !important;
+  }
 }
 
 #new-complaint-wrapper textarea, #new-complaint-wrapper input, #categorize-urls-form-wrapper textarea {
@@ -7005,7 +7021,8 @@ table.dispute-entry-table tbody tr.selected {
   border: 4px solid $content-bg-color;
   outline: 1px solid darken($faint-neutral-color, 5%);
   padding: 1px;
-  height: 32px;
+  min-height: 32px;
+  height: 100%;
 }
 
 .category-column .form-control.selectize {
@@ -7019,6 +7036,7 @@ table.dispute-entry-table tbody tr.selected {
 
 .selectize-dropdown.multi.form-control.selectize {
   min-height: 32px !important;
+  height: 100%;
   height: auto !important;
   background-color: $content-bg-color !important;
 }
@@ -7061,9 +7079,9 @@ table.dispute-entry-table tbody tr.selected {
 }
 
 #new-complaint-wrapper .selectize-dropdown.multi.form-control.selectize {
-  top: 28px !important;
   background-color: $content-bg-color;
   height: auto !important;
+  margin-top: 10px;
 }
 
 .selectize-dropdown-content {
@@ -7077,9 +7095,8 @@ table.dispute-entry-table tbody tr.selected {
   }
   .form-control.selectize{
     min-height: 34px;
-    //border-top: 4px solid #fff;
-    border-left: 4px solid #fff;
-    border-right: 4px solid #fff;
+    border-left: 4px solid $content-bg-color;
+    border-right: 4px solid $content-bg-color;
     border-bottom: none;
     border-top: none;
     height: auto;
@@ -7641,7 +7658,7 @@ table#duplicates a {
 }
 
 .bug-tabs .nav-tabs li.active a {
-  background-color: $ac-nav-bg-color !important;
+  background-color: $content-bg-color !important;
 }
 
 .retro-styling #sidenav-menu-div a {
@@ -8978,7 +8995,7 @@ th.sorting_1, th.sorting_asc, th.sorting_desc {
 }
 
 .table-button-row .dropdown-menu h3 {
-  color: $ac-nav-bg-color;
+  color: $type-lightest;
   padding: 6px 10px;
   font-weight: 400;
   font-size: 9pt;
@@ -11261,7 +11278,7 @@ input[type="radio"].resolution_radio_button {
     font-weight: 600;
     font-size: 9.5pt;
     border: none !important;
-    color: #fff$type-lightest;
+    color: $type-lightest;
     display: inline-block;
   }
   hr.thin{
@@ -11498,6 +11515,11 @@ span.threat-cat-no-data {
   margin-bottom: 2px;
 }
 
+// set Webrep table bg color to white for visibility when columns extend past table
+#disputes-index {
+  background-color: $content-bg-color;
+}
+
 // webrep dispute index > ensure break/wrap properly for long url's containing parameters
 .dispute-entry-col {
   min-width: 200px;
@@ -11544,13 +11566,7 @@ span.threat-cat-no-data {
 
 // webrep dispute index > ensure the dispute count is to the right of the domain entry
 .dispute-count {
-//<<<<<<< HEAD
-//  position: absolute;
-//  float: none;
-//  z-index: 111;
-//  border-radius: 5px;
-//  padding: 1px 5px;
-//=======
+
   border-radius: 5px;
   padding: 1px 5px;
   position: absolute;
@@ -12615,4 +12631,64 @@ table > tbody > tr > td.no-padding {
 /* research page radio buttons */
 #research-search-broad {
   margin-left: 12px;
+}
+// adding the down caret icon using the sort_by svg for advanced search button
+#advanced-search-button::after {
+  content: '';
+  display: block;
+  width: 16px;
+  height: 14px;
+  right: 0;
+  background-image: url(image_path('icon_sort_by.svg'));
+  background-repeat: no-repeat;
+  background-position: 30% 92%;
+  background-size: 26px 26px;
+  float: right;
+}
+
+// reptool dropdown urls are too long, need to wrap/break
+.reptool-entry-name {
+  word-break: break-all;
+}
+
+.reptool-generated-comment, .toolbar div.reptool-generated-comment {
+  word-break: break-all;
+  white-space: pre-line;
+  background: lighten($medium-neutral-color, 5%);
+  color: $type-lighter-color;
+  margin-top: 10px;
+  line-height: 16px;
+  padding: 5px 6px;
+  max-height: 90px;
+  overflow-y: auto;
+}
+
+.inline-tool-content-wrapper .comment-wrapper .dropdown-comment.adjust-reptool-bl-input {
+  // placeholder text below
+  &::placeholder {
+    color: $content-label-color;
+  }
+  min-height: 60px;
+}
+
+/* for inline reptool dropdown, match the text color as bulk for reptool dropdown */
+table.dispute_tool_current tr.reptool-entry-row td {
+  color: darken($type-lighter-color, 10%);
+}
+
+/* define the full width of the reptool dropdown container and individual columns */
+#reptool_adjust_entries.dropdown-menu, .reptool-inline-dropdown {
+  width: 420px;
+  .th-reptool-dispute {
+    width: 120px;
+  }
+  .th-reptool-active-classes {
+    width: 80px;
+  }
+  .th-reptool-expiration {
+    width: 80px;
+  }
+  .th-reptool-comment {
+    width: 120px;
+  }
 }

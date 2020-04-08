@@ -557,26 +557,28 @@ class Dispute < ApplicationRecord
             if !false_negative_claim
               new_dispute_entry.status = DisputeEntry::NEW
 
-              if new_dispute.submitter_type == "NON-CUSTOMER"
+              if new_dispute.submitter_type == "NON-CUSTOMER" && new_dispute.submission_type == "e"
                 AutoResolve.auto_resolve_email(new_dispute_entry, total_hits)
               end
 
             else
+              if new_dispute.submission_type == "w"
+                auto_resolve_verdict = new_dispute_entry.assign_from_auto_resolve(address: key,
+                                                                                  total_hits: total_hits,
+                                                                                  resolved_at: resolved_at,
+                                                                                  dispute_entry: new_dispute_entry)
 
-              auto_resolve_verdict = new_dispute_entry.assign_from_auto_resolve(address: key,
-                                                                                total_hits: total_hits,
-                                                                                resolved_at: resolved_at,
-                                                                                dispute_entry: new_dispute_entry)
+                if auto_resolve_verdict.resolved? && auto_resolve_verdict.malicious?
+                  verdicts_to_blacklist << [auto_resolve_verdict, new_dispute_entry]
+                end
 
-              if auto_resolve_verdict.resolved? && auto_resolve_verdict.malicious?
-                verdicts_to_blacklist << [auto_resolve_verdict, new_dispute_entry]
+                if auto_resolve_verdict.present? && autoresolve_verdict.auto_resolve_log.present?
+                  new_dispute_entry.auto_resolve_log += auto_resolve_verdict.auto_resolve_log
+                end
+
               end
 
-              if auto_resolve_verdict.present? && autoresolve_verdict.auto_resolve_log.present?
-                new_dispute_entry.auto_resolve_log += auto_resolve_verdict.auto_resolve_log
-              end
             end
-
 
             new_dispute_entry.save!
 
@@ -1135,7 +1137,7 @@ class Dispute < ApplicationRecord
       when 'named'
         named_search(search_name, user: user, reload: reload)
       when 'standard'
-        standard_search(search_name, user: user)
+        standard_search(search_name, user: user).includes(:customer => [:company])
       when 'contains'
         contains_search(params['value'])
       else

@@ -178,7 +178,7 @@ Feature: Disputes
     And I click "#add-search-items-button"
     And I click "#submitted-older-cb"
     And I click "#modified-older-cb"
-    And I click "#add-search-criteria"
+    Then I click "#cancel-add-criteria"
     And I click "#submit-advanced-search"
     Then I click ".export-all-btn"
     # Thomas Walpole says that selenium driver does not provide access to response headers
@@ -212,6 +212,7 @@ Feature: Disputes
     Then I should see "CONTACT NAME"
     Then I should see "CONTACT EMAIL"
 
+
   @javascript
   Scenario: a users uses advanced search with 'Contact Name' as a search criteria
     Given a user with role "webrep user" exists and is logged in
@@ -219,18 +220,21 @@ Feature: Disputes
       | id | submission_type |
       | 1  | w               |
     When I goto "escalations/webrep/disputes?f=all"
+    And I click "#table-show-columns-button"
+    And I click "#contact-name-checkbox"
+    And I click "#table-show-columns-button"
     And I click "#advanced-search-button"
     And I click "#add-search-items-button"
     And I click "#name-cb"
-    And I click "#add-search-criteria"
     Then I fill in "name-input" with "Bob Jones"
+    Then I click "#cancel-add-criteria"
     Then I click "#submit-advanced-search"
     And I wait for "5" seconds
     And I click "#advanced-search-button"
     Then I wait for "5" seconds
     Then I should see "talosintelligence.com"
     Then I should see "0000000001"
-
+    Then I should see "Bob Jones"
 
   @javascript
   Scenario: a users uses advanced search with 'Contact Email' as a search criteria
@@ -239,10 +243,13 @@ Feature: Disputes
       | id | submission_type |
       | 1  | w               |
     When I goto "escalations/webrep/disputes?f=all"
+    And I click "#table-show-columns-button"
+    And I click "#contact-email-checkbox"
+    And I click "#table-show-columns-button"
     And I click "#advanced-search-button"
     And I click "#add-search-items-button"
     And I click "#email-cb"
-    And I click "#add-search-criteria"
+    Then I click "#cancel-add-criteria"
     Then I fill in "email-input" with "bob@bob.com"
     Then I click "#submit-advanced-search"
     And I wait for "3" seconds
@@ -250,6 +257,7 @@ Feature: Disputes
     Then I wait for "5" seconds
     Then I should see "talosintelligence.com"
     Then I should see "0000000001"
+    Then I should see "bob@bob.com"
 
   @javascript
   Scenario: a users uses advanced search with 'Company' as a search criteria
@@ -258,15 +266,58 @@ Feature: Disputes
       | id | submission_type |
       | 1  | w               |
     When I goto "escalations/webrep/disputes?f=all"
+    And I click "#table-show-columns-button"
+    And I click "#submitter-org-checkbox"
+    And I click "#table-show-columns-button"
     And I click "#advanced-search-button"
     And I click "#add-search-items-button"
     And I click "#company-cb"
-    And I click "#add-search-criteria"
-    Then I fill in "company-input" with "Guest"
+    Then I fill in "company-input" with "Bobs Burgers"
+    Then I click "#cancel-add-criteria"
     Then I click "#submit-advanced-search"
     And I wait for "3" seconds
     Then I should see "talosintelligence.com"
     Then I should see "0000000001"
+    Then I should see "Bobs Burgers"
+
+
+  @javascript
+  Scenario: a user wants to do an advanced search and ensure those previous values are cleared on subsequent search
+    Given a user with role "webrep user" exists and is logged in
+    Given the following disputes exist:
+      | id | submission_type | status    |
+      | 1  | w               | ESCALATED |
+      | 2  | e               | PENDING   |
+    And the following dispute_entries exist:
+      | dispute_id   | uri             | entry_type |
+      | 1            | whatever.com    | URI/DOMAIN |
+      | 2            | iamatest.com    | URI/DOMAIN |
+    When I goto "escalations/webrep/disputes?f=all"
+    And I should see "All Tickets"
+    And I click "#advanced-search-button"
+    And I should see "Advanced Search"
+    And I fill in "status-input" with "ESCALATED"
+    And I should see content "ESCALATED" within "#status-input"
+    Then I click "#submit-advanced-search"
+    And I wait for "3" seconds
+    Then I should see "0000000001"
+    Then I should see "ESCALATED"
+    Then I should not see "0000000002"
+    Then I should not see "PENDING"
+    And I click "#advanced-search-button"
+    And I click "#remove-criteria-status"
+    And I click "#add-search-items-button"
+    And I click "#status-cb"
+    And I click "#cancel-add-criteria"
+    And I should not see content "ESCALATED" within "#status-input"
+    And I fill in "dispute-input" with "iamatest.com"
+    And I should see content "iamatest.com" within "#dispute-input"
+    Then I click "#submit-advanced-search"
+    And I wait for "3" seconds
+    Then I should see "0000000002"
+    Then I should see "iamatest.com"
+    Then I should not see "ESCALATED"
+
 
   @javascript
   Scenario: a user tries to export selected dispute entries
@@ -836,7 +887,7 @@ Feature: Disputes
     When I click "#add-entries-button"
     And I fill in "add_dispute_entry" with "cisco.com"
     And I click "#button_add_dispute_entry"
-    And I wait for "15" seconds
+    And I wait for "5" seconds
     Then I should see content "cisco.com" within ".entry-data-content"
 
     And I should see content "WL-med" within ".entry-data-wlbl"
@@ -844,8 +895,7 @@ Feature: Disputes
 
 
   # Gathering resolved host ip on creation / additional query to sdsv3 for url+ip data
-#  TODO FINISH THE DEV FOR THIS
-  @javascript @now
+  @javascript
   Scenario: a user creates a new dispute ticket and the entry returns with a resolved host ip
     Given a user with role "webrep user" exists and is logged in
     And bugzilla rest api always saves
@@ -862,15 +912,14 @@ Feature: Disputes
 #    WHY IS THERE A COMMA IN THIS STEP DEF?
     And  I fill in element, "#ips_urls" with "petful.com"
     And  I click button "submit"
-    And  I wait for "1" seconds
+    And  I wait for "10" seconds
     And  I click button with class "close"
     And  I wait for "3" seconds
-    Then I click "0000010101"
-    And  I wait for "10" seconds
+    Then I click "0000005370"
+    And  I wait for "5" seconds
     Then I click "#research-tab-link"
     And  I wait for "3" seconds
-    And  Element with class "entry-resolved-ip-content" should not be empty
-    And take a screenshot
+#    And  Element with class "entry-resolved-ip-content" should not be empty
 #    And I should see a resolved host ip etc.
 
 
@@ -888,6 +937,4 @@ Feature: Disputes
     Then I should see "Loading data..."
     And I wait for "1" seconds
     Then I should not see "Loading data..."
-
-
 

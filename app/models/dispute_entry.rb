@@ -185,7 +185,15 @@ class DisputeEntry < ApplicationRecord
   end
 
   def self.get_primary_category(uri)
-    prefix_results = Wbrs::Prefix.where({:urls => [uri]})
+    begin
+      prefix_results = Wbrs::Prefix.where({:urls => [uri]})
+    rescue => except
+      Rails.logger.error("Something is wrong with RuleAPI connection")
+      Rails.logger.error(except)
+      Rails.logger.error(except.backtrace.join("\n"))
+
+      return {}
+    end
 
     return {} unless prefix_results.any?
 
