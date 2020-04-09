@@ -8,18 +8,16 @@ $ ->
     #There were issues with using ajaxStop, but this works
     ####
 
-    if window.location.hash == '#lookup-quick'
-      loader = $('#lookup-quick-loader')
-    else
-      loader = $('#lookup-detail-loader')
-
     ajaxStart: () ->
-      if location == '#lookup-quick'
-        loader.css('display', 'flex')
+      if window.location.hash == '#lookup-quick'
+        $('#lookup-quick-loader').css('display', 'flex')
       else
-        loader.css('display', 'flex')
+        $('#lookup-detail-loader').css('display', 'flex')
     ajaxStop: () ->
-      loader.hide()
+      if window.location.hash == '#lookup-quick'
+        $('#lookup-quick-loader').css('display', 'none')
+      else
+        $('#lookup-detail-loader').css('display', 'none')
 
     ajaxComplete: () ->
       completed_counter++
@@ -29,11 +27,6 @@ $ ->
         $('.ajax-message-div').hide()
 
   )
-#  $(document).on 'click', '#research-tabs', ->
-#    CONSO''
-  $(document).ready = () ->
-    console.clear()
-    console.log 'inininin'
 
   window.isEmpty = (item) ->
     ####
