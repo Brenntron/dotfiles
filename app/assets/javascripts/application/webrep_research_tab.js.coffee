@@ -486,13 +486,6 @@ $ ->
 
   # Sync / refresh entry data. Initiate modal / animation
   $('#sync-data-button').click ->
-#    If cannot connect to resync data
-#    Show error message modal
-#    Else
-    $('#loader-modal').modal({
-      backdrop: 'static',
-      keyboard: false
-    })
 
     data = {
       'dispute_id': $(".case-id-tag").html()
@@ -514,20 +507,13 @@ $ ->
         window.location.reload()
     )
 
-  #    When data is finish loading
-  #    $('#loading-div').hide()
-  #    $('#api-msg').show()
-  #    $('#loader-modal.hidden).removeClass('hidden')
-  #    Display success message in modal
-
   window.researchfilter = (element) ->
     query = $(element).val();
     #    Rather than doing the javascript .each for this, let's use CSS
-    $('.entry-data-content:not(:contains(' + query + '))').parents('.research-table-row').hide()
-    $('.entry-data-content:contains(' + query + ')').parents('.research-table-row').show()
+    $(".entry-data-content:not(:contains('#{query}'))").parents('.research-table-row').hide()
+    $(".entry-data-content:contains('#{query}')").parents('.research-table-row').show()
 
 
-  $('.ajax-message-div').css('display', 'flex')
 $(document).ready ->
 
   ### Using 'tooltipped' class instead of 'tooltip' so that it doesn't interfere with Bootstrap ###

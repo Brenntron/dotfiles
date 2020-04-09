@@ -9,24 +9,32 @@ $ ->
     ####
 
     ajaxStart: () ->
+      $('.ajax-message-div').css('display', 'flex')
       if window.location.hash == '#lookup-quick'
-        $('#lookup-quick-loader').css('display', 'flex')
-      else
-        $('#lookup-detail-loader').css('display', 'flex')
-    ajaxStop: () ->
-      if window.location.hash == '#lookup-quick'
-        $('#lookup-quick-loader').css('display', 'none')
-      else
-        $('#lookup-detail-loader').css('display', 'none')
-
+        $('.ajax-message-div').css('top', '140px')
+      else if window.location.hash == '#lookup-detail' || window.location.hash == ''
+        $('.ajax-message-div').css('top', '50%')
+      ajaxStop: () ->
+        $('.ajax-message-div').css('display', 'none')
     ajaxComplete: () ->
       completed_counter++
 #     selected_rows needs to be multiplied by the number of ajax calls that are being made to accurately gauge the number of calls
       selected_rows = $('.col-select-all input:checked').length * 5
       if completed_counter == selected_rows
-        $('.ajax-message-div').hide()
-
+        $('.ajax-message-div').css('display', 'none')
   )
+
+  $(document).ready ->
+    if window.location.hash == '#lookup-quick'
+      $('.lookup-detail').css('display', 'none')
+    else if window.location.hash == '#lookup-detail' || window.location.hash == ''
+      $('.lookup-detail').css('display', 'unset')
+
+  $('#research-tabs li').on 'click', ->
+    if $(this).attr('data') == 'lookup-detail'
+      $('.lookup-detail').css('display', 'unset')
+    else
+      $('.lookup-detail').css('display', 'none')
 
   window.isEmpty = (item) ->
     ####
@@ -920,6 +928,7 @@ $ ->
       setTimeout () ->
         $("br").remove()
       , 20
+    $('.ajax-message-div').css('display', 'none')
 
 
 
@@ -999,14 +1008,8 @@ $ ->
     set_row_text(e, this)
     e.stopPropagation()
 
-  $(document).bind( "ajaxStart", () ->
-    $('.ajax-message-div').css('display','flex')
-  )
-  window.get_rep_data = ()->
-#  .on 'click', '#get-rep-data', (e) ->
 
-  #   needs to be an onclick to prevent from refreshing the page
-#    e.preventDefault()
+  window.get_rep_data = ()->
     search_items = []
     rows = $('.research-table tbody tr')
 
@@ -1020,9 +1023,8 @@ $ ->
       row = rows[i]
 
       if !isEmpty(item)
-        $('.ajax-message-div').css('display', 'flex')
         # for each search item, call a promise to get the data. If success, the first then runs, setting the data in the rows.
-        # if it fails, the secon runs, catching the error
+        # if it fails, the second runs, catching the error
         new get_reptool(item, headers)
           .then ( set_reptool.bind( null, item, row) )
           .then null, (err) -> console.log err

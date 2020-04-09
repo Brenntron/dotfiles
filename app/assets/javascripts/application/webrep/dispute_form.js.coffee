@@ -1,5 +1,5 @@
 $ ->
-  window.reset_form = (form) ->
+  window.reset_webrep_form = (form) ->
     user = form.find('#assignee').prop("defaultValue")
     form.find('.ips_urls').val('');
     form.find('#priority').val('P3');
@@ -48,7 +48,7 @@ $ ->
 
             if successful_entries.length > 0
               message_html = "<p >The following entries referenced on ticket number #{ticket_num} </p> <p class='dupe_list'>#{ successful_entries.join(', ') }</p>"
-              reset_form(form)
+              reset_webrep_form(form)
               std_msg_error("Duplicate",["#{message_html} <p class='ugh'>The following duplicate entries were not processed</p> <div class='dupe_list'>#{errors.join(', ')}</div> "], reload: false)
 
           else
@@ -57,7 +57,7 @@ $ ->
             for ips in ips_urls
               ips_list += "<span>#{ips}</span>"
               message_html = "<p>The following entries referenced are on ticket number #{ticket_num}</p> <p class='dupe_list'>#{ips_list}</p>"
-              reset_form(form)
+              reset_webrep_form(form)
               std_msg_success('All entries were successfully created.', [message_html], reload: false)
 
 
