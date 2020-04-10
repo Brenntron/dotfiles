@@ -5056,7 +5056,9 @@ table > tbody > tr > td.dispute_rep_tools {
 .inline-tool-content-wrapper .toolbar div {
   border: 1px solid $faint-neutral-color !important;;
 }
-
+.detail-label{
+  color: $type-lightest!important;
+}
 .dropdown-comment, .form-comment-box {
   width: 100%;
   min-height: 20px;
