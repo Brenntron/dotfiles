@@ -315,9 +315,10 @@
                   %table.dispute_tool_current
                     %thead
                       %tr
-                        %th.content-label-sm Dispute
-                        %th.content-label-sm Active Classes | Expiration
-                        %th.content-label-sm Comment
+                        %th.content-label-sm.th-reptool-dispute Dispute
+                        %th.content-label-sm.th-reptool-active-classes Active Classes
+                        %th.content-label-sm.th-reptool-expiration Expiration
+                        %th.content-label-sm.th-reptool-comment Comment
                     %tbody
                   -# Each checked entry will populate information here
                   .dropdown-tool-text-divider.secondary-text-divider
@@ -418,8 +419,8 @@
                                   tor_exit_node
                     .comment-wrapper
                       %label.content-label-sm RepTool Comment
-                      %textarea.dropdown-comment.adjust-reptool-bl-input.comment-input
-                      %hr.thin
+                      %textarea.dropdown-comment.adjust-reptool-bl-input.comment-input.typed-in-comment-bulk{placeholder: 'Reason behind this change...'}
+                      .reptool-generated-comment
                     .button-row-center
                       %button.primary.dropdown-submit-button{type: 'button', onclick: 'submit_bulk_reptool();'}
                         Submit Changes
@@ -463,7 +464,7 @@
                     %td.dispute_rep_tools.rep-tools-cell
                       %span.dispute_rep_tools_wrapper
                         %span.dropdown
-                          %button.dispute-inline-buttons.adjust-wlbl-button.bfrp-inline-wlbl-button.dropdown-toggle{title: 'Adjust WL/BL', 'data-toggle': 'dropdown', 'aria-haspopup': 'true', 'aria-expanded': 'false', onclick: 'get_current_wlbl(this);', class: "bfrp-inline-wlbl-#{i}"}
+                          %button.dispute-inline-buttons.adjust-wlbl-button.bfrp-inline-wlbl-button.esc-tooltipped.dropdown-toggle{title: 'Adjust WL/BL', 'data-toggle': 'dropdown', 'aria-haspopup': 'true', 'aria-expanded': 'false', onclick: 'get_current_wlbl(this);', class: "bfrp-inline-wlbl-#{i}"}
                           -# adding a unique id for this wl/bl dropdown + strip out special chars
                           .dropdown-menu{id: "wlbl_adjust_#{entry.hostlookup.gsub(/[.:\/]/,'')}"}
                             = form_for :wlbl, html: {class: 'adjust-wlbl-form inline-wlbl-form'} do |wlbl_form|
@@ -565,7 +566,7 @@
                                     %tr
                                       %th.content-label-sm Active Classes
                                       %th.content-label-sm Expiration
-                                      %th.content-label-sm Comment
+                                      %th.content-label-sm.th-reptool-comment Comment
                                   %tbody
                                   -#  Will call up-to-date information from the api
                                 .inline-tool-content-wrapper
@@ -664,13 +665,10 @@
                                                 tor_exit_node
                                   .comment-wrapper
                                     %label.content-label-sm RepTool Comment
-                                    %textarea.dropdown-comment.adjust-reptool-bl-input.comment-input
-                                      \
-                                      \
-                                      \--------------------------
+                                    %textarea.dropdown-comment.adjust-reptool-bl-input.comment-input.typed-in-comment-inline{placeholder: 'Reason behind this change...'}
+                                    .reptool-generated-comment
                                       INDIVIDUAL RESEARCH SUBMISSION:
                                       &#x000A; #{entry.hostlookup}
-                                    %hr.thin
                                   .button-row-center
                                     %button.primary.dropdown-submit-button{type: 'button', onclick: 'submit_individual_reptool(this)', disabled: true}
                                       Submit Changes

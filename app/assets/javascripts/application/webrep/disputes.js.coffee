@@ -592,7 +592,7 @@ window.take_dispute = (dispute_id) ->
     dispute_id: dispute_id
     error_prefix: 'Error updating ticket.'
     success: (response) ->
-      $('.take-dispute-' + dispute_id).replaceWith("<button class='return-ticket-button return-ticket-#{dispute_id}' title='Assign this ticket to me' onclick='return_dispute(#{dispute_id});'></button>")
+      $('.take-dispute-' + dispute_id).replaceWith("<button class='esc-tooltipped return-ticket-button return-ticket-#{dispute_id}' title='Assign this ticket to me' onclick='return_dispute(#{dispute_id});'></button>")
       $('#owner_' + dispute_id).text(response.username)
       $('#status_' + dispute_id).text("Assigned")
   )
@@ -643,7 +643,7 @@ window.return_dispute = (dispute_id) ->
     data: {}
     error_prefix: 'Error updating ticket.'
     success: (response) ->
-      $('.return-ticket-' + dispute_id).replaceWith("<button class='take-ticket-button take-dispute-#{dispute_id}' title='Assign this ticket to me' onclick='take_dispute(#{dispute_id});'></button>")
+      $('.return-ticket-' + dispute_id).replaceWith("<button class='esc-tooltipped take-ticket-button take-dispute-#{dispute_id}' title='Assign this ticket to me' onclick='take_dispute(#{dispute_id});'></button>")
       $('#owner_' + response.dispute_id).text('Unassigned')
       $('#status_' + response.dispute_id).text('NEW')
 
@@ -753,7 +753,7 @@ window.change_ticket_status = (event) ->
 
   for dispute in checked_disputes
 #    event.preventDefault()
-    data.dispute_ids = dispute
+    data.dispute_ids = [dispute]
     $.ajax(
       url: '/escalations/api/v1/escalations/webrep/disputes/set_disputes_status'
       method: 'POST'
@@ -1176,6 +1176,13 @@ $ ->
       tr.addClass 'shown'
       td = $(tr).next('tr').find('td:first')
       $(td).addClass 'dispute-entry-table-wrapper'
+
+      # subrow icons need the TT init on row expand, these icons don't exist on dt draw.dt, init them here
+      $('#disputes-index .reputation-icon').tooltipster
+        theme: [
+          'tooltipster-borderless'
+          'tooltipster-borderless-customized'
+        ]
 
       # Check to see which columns should be displayed
       $('.toggle-vis-nested').each ->
@@ -2228,3 +2235,22 @@ window.query_uri_plus_ip = (uri, ips, entry_row) ->
 
 
 
+
+$ ->
+  # tooltip init these icons inside this DT, this MUST be on 'draw.dt', not page-load, DT doesn't exist on page-load
+  $('#disputes-index').on 'draw.dt', ->
+    $("#disputes-index .tooltipstered").tooltipster('destroy')  # remove existing dt tt attachments, then restore title attr
+    $('#disputes-index .esc-tooltipped').tooltipster
+      restoration: 'previous'
+      theme: [
+        'tooltipster-borderless'
+        'tooltipster-borderless-customized'
+      ]
+
+  # subrow icons need the TT init on expand click, these icons don't exist on dt draw.dt
+  $('#disputes-index .expand-row-button-inline').click ->
+    $('.reputation-icon').tooltipster
+      theme: [
+        'tooltipster-borderless'
+        'tooltipster-borderless-customized'
+      ]
