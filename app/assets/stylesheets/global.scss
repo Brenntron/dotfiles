@@ -2269,6 +2269,9 @@ a.static-nav-item {
 .hidden-auto-resolve{
   z-index: 0;
 }
+.reputation-research-search-wrapper #confirmation-modal .modal-body{
+  color:$type-darkest!important
+}
 .webrep_auto_resolve, #auto-resolve-dialog{
   padding: 13px!important;
   max-height: 600px!important;
@@ -5058,6 +5061,7 @@ table > tbody > tr > td.dispute_rep_tools {
   width: 100%;
   min-height: 20px;
   border: 1px solid darken($faint-neutral-color, 5%);
+  color: $type-darkest
 }
 
 .form-comment-box {
@@ -6208,7 +6212,7 @@ button.dropdown-submit-button {
 
 .search-options-col label {
   margin-left: 8px;
-  color: $content-bg-color;
+  color: $content-label-color;
   font-size: 8pt;
   font-weight: 400;
   padding: 8px 0;
@@ -6912,7 +6916,7 @@ table.dispute-entry-table tbody tr.selected {
   margin-top: 20px;
 }
 .related-dropdown-text{
-  color: #999 !important;
+  color: $content-label-color !important;
 }
 
 #set-related-dispute-div {
@@ -12421,7 +12425,7 @@ table > tbody > tr > td.no-padding {
     margin-top: 9px;
     margin-left: 14px;
     width: max-content;
-    color: #999;
+    color: $content-label-color;
     font-style: italic;
   }
 }

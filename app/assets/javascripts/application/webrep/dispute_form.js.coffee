@@ -12,12 +12,10 @@ $ ->
       $('#research-page-toolbar .ips_urls_div').removeClass('hidden')
 
   window.submit_new_dispute = (submit_btn) ->
-    submit_research_query()
     data = {}
     form = $(submit_btn).closest('form')
     form_values = form.serializeArray()
-    text_area = form.find('.ips_urls')
-    dropdown = $(submit_btn).closest(".dropdown-menu").prev()
+
     for item in form_values
       { name, value } = item
       name = name.toLowerCase().replace(/-/g, '_')
@@ -37,7 +35,7 @@ $ ->
           ips_urls = data.ips_urls.split(' ')
           ips_urls = ips_urls.map( (url) => return url.trim())
 
-          $(dropdown).dropdown 'toggle'
+          $(submit_btn).closest(".dropdown-menu").prev().dropdown 'toggle'
           if errors.length > 0
             errors = errors.map( (err) => return err.trim())
             successful_entries = []

@@ -9,24 +9,32 @@ $ ->
     ####
 
     ajaxStart: () ->
-      if window.location.hash == '#lookup-quick'
-        $('#lookup-quick-loader').css('display', 'flex')
-      else
-        $('#lookup-detail-loader').css('display', 'flex')
+      console.log 'in'
+      $('.ajax-message-div').css('display', 'flex')
     ajaxStop: () ->
-      if window.location.hash == '#lookup-quick'
-        $('#lookup-quick-loader').css('display', 'none')
-      else
-        $('#lookup-detail-loader').css('display', 'none')
-
+      $('.ajax-message-div').css('display', 'none')
     ajaxComplete: () ->
       completed_counter++
 #     selected_rows needs to be multiplied by the number of ajax calls that are being made to accurately gauge the number of calls
       selected_rows = $('.col-select-all input:checked').length * 5
       if completed_counter == selected_rows
-        $('.ajax-message-div').hide()
+        $('.ajax-message-div').css('display', 'none')
 
   )
+  $(document).ready ->
+    update_tabs( window.location.hash )
+
+  $('#research-tabs li').on 'click', ->
+    update_tabs( window.location.hash )
+  window.detail_loader = () ->
+    $('.ajax-message-div').css('display', 'flex')
+  window.update_tabs = ( location ) ->
+    if location == '#lookup-quick'
+      $('.lookup-detail').css('display', 'none')
+      $('.ajax-message-div').css('top', '138px')
+    else if location == '#lookup-detail' || location == ''
+      $('.lookup-detail').css('display', 'unset')
+      $('.ajax-message-div').css('top', '370px')
 
   window.isEmpty = (item) ->
     ####
@@ -671,9 +679,6 @@ $ ->
       $( '#error_modal .modal-body' ).append( error_array )
     submit_rep_check()
 
-  wlbl_values= []
-  reptool_values= []
-
   window.submit_quick_lookup = () ->
     $('#confirmation-modal tbody').empty()
     $('#confirmation-modal').modal()
@@ -691,9 +696,8 @@ $ ->
       if !isEmpty(new_data) && new_data != undefined
         actions_col = $( this ).find('.col-actions')
         children = actions_col.children()
-        existing_actions = actions_col
         if children.length
-          html = "<tr>
+          html = "<tr class ='hey'>
                     <td> #{new_data} </td>
                   <td>"
           for child in children
@@ -702,7 +706,7 @@ $ ->
               threat_cat_data = ''
               if classes == 'threat-cat-col'
                 threat_cat_data = "data='#{$(child).attr('data')}'"
-              html += "<div #{existing_reptool} #{threat_cat_data} class='#{classes}'>#{$(child).html()}</div>"
+              html += "<div #{existing_reptool} #{threat_cat_data} class='#{classes} repuation-dispute-modal'>#{$(child).html()}</div>"
           html += '</td> </tr>'
           confirmation_dialog.push( html )
 
@@ -733,7 +737,7 @@ $ ->
     selected_rows = $( '.col-select-all input:checked' )
     check_vals = $( '.adjust_reptool_checkbox:checked' ).map( () -> return $(this).val() ).get()
     class_reptool = $( '.status_bl:checked' ).val().replace( 'reptool-' , '' )
-    reptool_add  = $( '.reptool-add:checked' ).val()
+    reptool_add = $( '.reptool-add:checked' ).val()
     reptool_class = reptool_add
 
     switch (class_reptool)
@@ -745,7 +749,6 @@ $ ->
         status_string = 'Drop all classifications (set entry to EXPIRED)'
         reptool_add = 'drop'
         reptool_class = 'drop'
-        check_list = ''
         status_class = 'reptool-drop-submission'
       when 'override'
         status_string = 'Add classifications: '
@@ -765,17 +768,18 @@ $ ->
       rep_list = []
       actions = $(this).closest('tr').find('.col-actions')
       existing_reptool.each () ->
+        rep_list = this.innerText.split(',')
         $(actions).children().each ->
           action_data = $(this).attr('data')
           if action_data
             rep_list = action_data.trim().split(',')
 
-        rep_list = this.innerText.split(',')
         if (class_reptool == 'maintain' || class_reptool == 'drop') && existing_reptool.length && !isEmpty(data)
           reptools =  $(existing_reptool).text().split(/[\s,]+/)
           reptool_array = reptools.filter( (val) => return val != 'ACTIVE' && val != 'EXPIRED')
           reptool_classes = Array.from(new Set(reptool_array)).join(',')
           $(action_col).attr( 'reptool_classes', reptool_classes )
+
       error_message = "#{data} | "
       if !isEmpty(data)
 
@@ -920,7 +924,7 @@ $ ->
       setTimeout () ->
         $("br").remove()
       , 20
-
+    $('.ajax-message-div').css('display', 'none')
 
 
   window.bindControls = () ->
@@ -970,7 +974,7 @@ $ ->
     )
 
   set_row_text = (e, el) ->
-    { which: key, type, shiftKey } = e
+    { which: key, shiftKey } = e
     text = el.innerText.trim()
     text_list = text.replace( /\n|\s/g, ", " ).split(", ")
     row = el.closest('tr')
@@ -999,14 +1003,9 @@ $ ->
     set_row_text(e, this)
     e.stopPropagation()
 
-  $(document).bind( "ajaxStart", () ->
-    $('.ajax-message-div').css('display','flex')
-  )
-  window.get_rep_data = ()->
-#  .on 'click', '#get-rep-data', (e) ->
 
-  #   needs to be an onclick to prevent from refreshing the page
-#    e.preventDefault()
+  window.get_rep_data = ()->
+
     search_items = []
     rows = $('.research-table tbody tr')
 
