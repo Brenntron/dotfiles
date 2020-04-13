@@ -1,6 +1,7 @@
 $(document).ready ->
   Chart.defaults.global.plugins.datalabels.display = false
-  $('span#mark-as-related').on 'show.bs.dropdown', ->
+
+  $('#mark-as-related').on 'show.bs.dropdown', ->
     if $('.dispute_check_box:checked').length == 0
       std_msg_error('No rows selected', ['Please select at least one row.'])
       return false
@@ -75,6 +76,7 @@ window.populate_webrep_index_table = (data = {}, reload = false) ->
         $('#refresh-working-msg').html('Table data updating correctly')
         $('#dispute-index-title').text(json['title'])
         $('#inline-webrep').addClass('hidden')
+
         datatable = $('#disputes-index').DataTable()
         datatable.clear();
         datatable.rows.add(json.data);
@@ -131,7 +133,6 @@ window.populate_webrep_index_table = (data = {}, reload = false) ->
           searchId = 'saved_search_' + json.search_id
           if $("#saved-search-tbody tr##{searchId}").length == 0
             $('#saved-search-tbody').append(named_search_tag(json.search_name, json.search_id))
-
 
         std_msg_ajax(
           method: 'POST'
@@ -213,8 +214,8 @@ window.named_webrep_index_table = (search_name) ->
 
 window.call_contains_search = (search_form) ->
   data = {
-    search_type: "contains"
-    value: search_form.querySelector("input.search-box").value
+    search_type: 'contains'
+    value: search_form.querySelector('input.search-box').value
   }
   window.current_search_data = data
   window.populate_webrep_index_table(data)
@@ -343,7 +344,7 @@ window.toolbar_index_edit_status = () ->
 
   data = {}
 
-  entry_ids = $(".dispute-entry-checkbox:checked").map(() ->
+  $('.dispute-entry-checkbox:checked').map(() ->
     data[this.id] = [{
       id: this.id
       field: "status"
@@ -354,18 +355,18 @@ window.toolbar_index_edit_status = () ->
       data[this.id].push({
         id: this.id
         field: "resolution"
-        new: $("input[name=entry-resolution]:checked").val()
+        new: $('input[name=entry-resolution]:checked').val()
       })
 
       data[this.id].push({
         id: this.id
         field: "resolution_comment"
-        new: $("#entry-status-comment").val()
+        new: $('#entry-status-comment').val()
       })
   )
 
-  if statusName == "RESOLVED_CLOSED" && !$("input[name=entry-resolution]:checked").val()
-    std_msg_error("No resolution selected", ["Please select an entry resolution."])
+  if statusName == "RESOLVED_CLOSED" && !$('input[name=entry-resolution]:checked').val()
+    std_msg_error('No resolution selected', ['Please select an entry resolution.'])
   else
     std_msg_ajax(
       method: 'PATCH'
@@ -377,15 +378,15 @@ window.toolbar_index_edit_status = () ->
 
 
 window.show_page_edit_status = () ->
-  statusName = $("input[name=dispute-status]:checked").val()
-  comment = $(".ticket-status-comment").val()
-  dispute_id = $("#dispute_id").text()
+  statusName = $('input[name=dispute-status]:checked').val()
+  comment = $('.ticket-status-comment').val()
+  dispute_id = $('#dispute_id').text()
 
   if statusName == "RESOLVED_CLOSED"
-    if $("#show-edit-ticket-status-dropdown").find("input[name=dispute-resolution]").is(":checked")
-      resolution = $("input[name=dispute-resolution]:checked").val()
+    if $('#show-edit-ticket-status-dropdown').find('input[name=dispute-resolution]').is(':checked')
+      resolution = $('input[name=dispute-resolution]:checked').val()
     else
-      std_msg_error("No resolution selected", ["Please select a ticket resolution."])
+      std_msg_error('No resolution selected', ['Please select a ticket resolution.'])
       return
 
   data = {
@@ -399,20 +400,20 @@ window.show_page_edit_status = () ->
     data.comment = $('.ticket-resolution-comment').val()
 
   std_msg_ajax(
-    url: "/escalations/api/v1/escalations/webrep/disputes/set_disputes_status"
+    url: '/escalations/api/v1/escalations/webrep/disputes/set_disputes_status'
     method: 'POST'
     data: data
-    error_prefix: "Unable to update dispute."
+    error_prefix: '/escalations/api/v1/escalations/webrep/disputes/set_disputes_status'
     success_reload: true
   )
 
 window.toolbar_index_change_assignee = () ->
-  entry_ids = $(".dispute_check_box:checkbox:checked").map(() ->
-# this.dataset['entryId']
+
+  entry_ids = $('.dispute_check_box:checkbox:checked').map(() ->
     Number(this.value)
   ).toArray()
 
-  new_assignee = $("#index_target_assignee option:selected").val()
+  new_assignee = $('#index_target_assignee option:selected').val()
   data = {
     'dispute_ids': entry_ids,
     'new_assignee': new_assignee

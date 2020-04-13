@@ -780,7 +780,7 @@ window.submit_individual_wlbl = (button_tag) ->
 
     data = {ip_uris: ip_uris, list_types: list_types, note: wlbl_comment}
 
-    if $('#wlbl-remove').prop('checked') == true
+    if $('#wlbl-remove').prop('checked')
       std_msg_ajax(
         url: '/escalations/api/v1/escalations/webrep/disputes/bulk_rule_ui_wlbl_remove'
         method: 'POST'
@@ -790,7 +790,8 @@ window.submit_individual_wlbl = (button_tag) ->
         error: (response) ->
           std_api_error(response, 'Error retrieving WL/BL Data')
       )
-    else if $('#wlbl-add').prop('checked') == true
+
+    if $('#wlbl-add').prop('checked')
       std_msg_ajax(
         url: '/escalations/api/v1/escalations/webrep/disputes/bulk_rule_ui_wlbl_add'
         method: 'POST'

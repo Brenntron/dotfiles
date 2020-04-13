@@ -1,6 +1,6 @@
-
 $ ->
   # go back to the last tab after reload
+
   $('a[data-toggle="tab"]').on 'shown.bs.tab', (e) ->
     localStorage.setItem 'lastTab', $(this).attr('id')
     return
@@ -22,17 +22,16 @@ $ ->
     hide_toolbar()
     lastTab = localStorage.getItem('lastTab')
     if lastTab
-      $('#' + lastTab).tab('show')
+      $('#' + lastTab).tab('show');
     else
       $('#communication-tab-link').tab('show')
     return
 
 $ ->
   $('#edit-dispute-entry-button').click ->
-    if $('.dispute_check_box:checked').length > 0
+    if ($('.dispute_check_box:checked').length > 0)
       $('.edit-entries-buttons').removeClass('hidden')
       $('.dispute_check_box').each ->
-
         if $(this).prop('checked')
           entry_row = $(this).parents('.research-table-row')[0]
           $(entry_row).addClass('editing-row')
@@ -54,21 +53,20 @@ $ ->
       else
         e.preventDefault()
 
-  $('#add-to-ticket-button').on 'click', (e)->
-    { currentTarget } = e
-
+  $('#add-to-ticket-button').on 'click', ()->
     new_val = ''
     html_val = ''
     $('#disputes-research-table .dispute_check_box:checked').each ->
       tr = $( this ).closest('tr')
       url = $(tr).find('.entry-data-content').text().trim()
-      html_val += '<div class="uneditable_urls">' + url+ '</div>'
+      html_val += "<div class='uneditable_urls'> #{url} </div>"
       if new_val != ''
-        new_val += '&#10' + url
+        new_val += "&#10 #{url}"
       else
         new_val = url
     $('#research-page-toolbar .ips_urls').html( new_val.trim() )
     $('#research-page-toolbar .ips_urls_div').html( html_val )
+
   $('.cancel-changes').click ->
     $('.editing-row').each ->
       editing_inputs = $(this).find('.table-entry-input')
@@ -117,6 +115,8 @@ $ ->
     $(first_item).next('.table-entry-input')[0].focus()
     if $('.edit-entries-buttons').hasClass('hidden')
       $('.edit-entries-buttons').removeClass('hidden')
+
+
 
   # Edit resolved host IPs
   $('.inline-edit-ip-button').click ->
@@ -220,7 +220,6 @@ $ ->
   #  Expand / Collapse the expandable row (inline button)
   $('.expand-row-button-inline').click ->
     expand_button = $(this)
-    entry_id = $(this).attr('data-entry-id')
     entry_row = $(this).parents('.research-table-row')[0]
     nested_row = $(entry_row).find('.nested-data-row')[0]
     $(nested_row).toggle()
@@ -514,11 +513,6 @@ $ ->
         window.location.reload()
     )
 
-  #    When data is finish loading
-  #    $('#loading-div').hide()
-  #    $('#api-msg').show()
-  #    $('#loader-modal.hidden).removeClass('hidden')
-  #    Display success message in modal
 
   window.researchfilter = (element) ->
     query = $(element).val();
@@ -527,7 +521,6 @@ $ ->
     $('.entry-data-content:contains(' + query + ')').parents('.research-table-row').show()
 
 
-  $('.ajax-message-div').css('display', 'flex')
 $(document).ready ->
 
   ### Using 'tooltipped' class instead of 'tooltip' so that it doesn't interfere with Bootstrap ###
