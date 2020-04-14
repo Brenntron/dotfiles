@@ -37,6 +37,15 @@ $ ->
       $('.lookup-detail').css('display', 'unset')
       $('.ajax-message-div').css('top', '370px')
 
+  window.reset_error_modal = () ->
+    $( '#error_modal' ).dialog(
+      position:
+        my: "right",
+        at: "top+15%",
+        of: window
+    )
+    $( '#error_modal .modal-body' ).empty()
+    $( '#error_modal' ).dialog( 'destroy' )
 
   window.open_adjust_reptool = () ->
     dropdown = $('#reptool_entries_bl_dropdown')
@@ -178,7 +187,6 @@ $ ->
 
     $(this).remove()
     action_p.setAttribute(data_type, data)
-    
     if data.length == 0
       if $(action_p).hasClass('wlbl-action-col')
         $(row).find('.threat-cat-col').remove()
@@ -241,7 +249,6 @@ $ ->
   $(document).on 'change', '.adjust_wlbl_checkbox', '.wlbl-radio-add', () ->
     submit_btn = $('#wlbl_entries_dropdown .dropdown-submit-button')
     all_checked_items = $('.adjust_wlbl_checkbox:checked')
-    current_val = $(this).val()
     add_wlbl = $('#wlbl-add').is(":checked")
 
     tc_row = $('#wlbl_entries_dropdown .threat-cat-row')
@@ -307,9 +314,7 @@ $ ->
     # data is set and each action calls the appropriate endpoint here
     ####
     comment = $('#confirmation-modal').find('.comment-input').text()
-
     error_array = []
-    submitted_disputes = []
 
     ajax_count = Object.keys(disputes).length - 1
     dispute_calls = setInterval(()->
@@ -340,8 +345,6 @@ $ ->
                   if !response
                     error_message = "<p>Unable to update all reptool entries.</p>"
                     error_array.push(error_message)
-                  else
-                    submitted_disputes.push(dispute)
                 )
 
               when 'override'
@@ -358,8 +361,6 @@ $ ->
                   if !response
                     error_message = "<p>Unable to update all reptool entries.</p>"
                     error_array.push(error_message)
-                  else
-                    submitted_disputes.push(dispute)
                 )
               when 'drop'
                 data = {
@@ -373,8 +374,6 @@ $ ->
                   if !response
                     error_message = "<p>Unable to drop all reptool entries.</p>"
                     error_array.push(error_message)
-                  else
-                    submitted_disputes.push(disput)
                 )
               when 'add'
 
@@ -383,6 +382,7 @@ $ ->
                   'trgt_list': act[key]
                   'note': comment
                 }
+
                 if stringIncludes(act[key][0], 'BL')
                   for el in action
                     #####
@@ -391,13 +391,12 @@ $ ->
                     if el.tc_ids
                       { tc_ids } = el
                       data.thrt_cat_ids = tc_ids
+
                 adjust_wlbl(data).then((response) =>
                   ajax_count--
                   if !response
                     error_message = "<p>Unable to adjust all wlbl entries.</p>"
                     error_array.push(error_message)
-                  else
-                    submitted_disputes.push(dispute)
                 )
 
               when 'remove'
@@ -411,8 +410,6 @@ $ ->
                   if !response
                     error_message = "<p>Unable to remove all wlbl entries.</p>"
                     error_array.push(error_message)
-                  else
-                    submitted_disputes.push(dispute)
                 )
 
 
@@ -424,7 +421,7 @@ $ ->
       data:
         data: data
       success_reload:false
-      success: (response) ->
+      success: () ->
         $('#confirmation-modal').modal('hide')
     )
 
@@ -443,9 +440,10 @@ $ ->
     std_msg_ajax(
       method: 'POST'
       url: '/escalations/api/v1/escalations/webrep/disputes/uri_wlbl'
+      headers: headers
       data: data
       success_reload:false
-      success: (response) ->
+      success: () ->
         $('#confirmation-modal').modal('hide')
     )
 
@@ -456,7 +454,7 @@ $ ->
       headers: headers
       data: data
       success_reload:false
-      success: (response) ->
+      success: () ->
         $('#confirmation-modal').modal('hide')
     )
 
@@ -522,59 +520,49 @@ $ ->
     ####
     #  confirm actions to be taken, data is prepared and  final submission of disputes to be made
     ####
-    confirmation_rows = document.querySelector('#confirmation-modal table').rows
+    confirmation_rows = document.querySelector('#confirmation-modal tbody').rows
     $('#confirmation-modal').modal('toggle');
 
     disputes = { comment: $('.confirm-rep-input').text() }
 
     $( confirmation_rows ).each ->
+        action_list = []
+        cells = $(this).find('td')
+        dispute = $( cells[0] ).text()
+        actions = $( cells[1] ).children()
 
-      action_list = []
-      cells = $( this ).find('td')
-      dispute = $( cells[0] ).text()
-      actions = $( cells[1] ).children()
-
-      for action, i in actions
-        action_tags = []
-        class_list = action.classList
-
-        maintain_check = stringIncludes(class_list, 'maintain')
-        drop_check = stringIncludes(class_list, 'drop')
-        threat_cat = stringIncludes(class_list, 'threat-cat-col')
-
-        if maintain_check || drop_check
-          if $(action).attr('reptool_classes') != undefined
-            action_tags = $(action).attr('reptool_classes').split(',')
-        else
-          if threat_cat
-            action_tags = action_tags.map((x) -> return parseInt(x) )
-          else
+        for action, i in actions
+          action_tags = []
+          class_list = $(action).attr('class')
+          if stringIncludes(class_list, 'reptool') && !stringIncludes(class_list, 'drop')
+            action_tags = $(action).attr('reptool_data').split(',')
+          if stringIncludes(class_list, 'wlbl')
             action_tags = $(action).attr('wlbl_data').split(',')
+          if stringIncludes(class_list, 'threat-cat-col')
+            action_tags = $(action).attr('data').split(',').map((x) -> return parseInt(x) )
 
+          formatted_action = check_actions(class_list)
+          action_list.push( "#{formatted_action}": action_tags )
 
-        formatted_action = check_actions(class_list)
-        action_list.push( "#{formatted_action}": action_tags )
+        actions = action: action_list
+        disputes[dispute] = actions
+        dispute_check = true
 
-      actions = action: action_list
-      disputes[dispute] = actions
-      dispute_check = true
+        for key, value of disputes
+          if key != 'comment'
+            if typeof value != 'object'
+              dispute_check = false
+              break
 
-      for key, value of disputes
-        if key != 'comment'
-          if typeof value != 'object'
-            dispute_check = false
-            break
-
-      if dispute_check
-        call_action_switchboard(disputes)
+        if dispute_check
+          call_action_switchboard(disputes)
 
 
   window.set_action_wlbl_col = () ->
 
     $('.grayed-out').removeClass('grayed-out')
     $('#error_modal').dialog()
-    $('#error_modal .modal-body' ).empty()
-    $('#error_modal').dialog( 'destroy' )
+    reset_error_modal()
 
     error_array = []
     threat_cats_el = []
@@ -676,7 +664,7 @@ $ ->
     submit_rep_check()
 
   window.submit_quick_lookup = () ->
-    $('#confirmation-modal tbody').empty()
+    $('#confirmation-modal  tbody').empty()
     $('#confirmation-modal').modal()
 
     rows = $( '.col-select-all' ).closest('tr')
@@ -689,8 +677,8 @@ $ ->
       existing_reptool = ''
       wlbl_list = ''
 
-      if actions_col.attr('reptool_classes') != undefined
-        existing_reptool = "reptool_classes = #{actions_col.attr('reptool_classes')}"
+      if actions_col.attr('reptool_data') != undefined
+        existing_reptool = "reptool_data = #{actions_col.attr('reptool_data')}"
       if wlbl_actions != undefined
         wlbl_list = "wlbl_data = #{wlbl_actions}"
       if !isEmpty(new_data) && new_data != undefined
@@ -725,40 +713,28 @@ $ ->
       $('#submit-rep-changes').attr('disabled', true)
 
   window.set_action_col = () ->
-    $( '#error_modal' ).dialog(
-      position:
-        my: "right",
-        at: "top+15%",
-        of: window
-    )
-    $( '#error_modal .modal-body' ).empty()
-    $( '#error_modal' ).dialog( 'destroy' )
+    reset_error_modal()
 
-    selected_rows = $( '.col-select-all input:checked' )
     check_vals = $( '.adjust_reptool_checkbox:checked' ).map( () -> return $(this).val() ).get()
     class_reptool = $( '.status_bl:checked' ).val().replace( 'reptool-' , '' )
     reptool_add = $( '.reptool-add:checked' ).val()
     reptool_class = reptool_add
+    status_class = "reptool-#{class_reptool}-submission"
+    check_list = ''
+    error_array = []
+    error_header = "<h4>Cannot #{reptool_add} the following Reptool Classification dispute<h4>"
 
     switch (class_reptool)
       when 'maintain'
-        reptool_dialog = reptooZ l_add.charAt(0).toUpperCase() + reptool_add.slice(1)
-        status_string = "#{reptool_dialog } classifications:"
-        status_class = 'reptool-maintain-submission'
+        status_string = "#{reptool_add.charAt(0).toUpperCase()} #{reptool_add.slice(1)} classifications:"
+      when 'override'
+        status_string = 'Add classifications: '
       when 'drop'
         status_string = 'Drop all classifications (set entry to EXPIRED)'
         reptool_add = 'drop'
         reptool_class = 'drop'
-        status_class = 'reptool-drop-submission'
-      when 'override'
-        status_string = 'Add classifications: '
-        status_class = 'reptool-override-submission'
-        reptool_add  = $( '.reptool-add:checked' ).val()
 
-    error_array = []
-    error_header = "<h4>Cannot #{reptool_add} the following Reptool Classification dispute<h4>"
-
-    selected_rows.each () ->
+    $('.col-select-all input:checked').each () ->
       row = $(this).closest('tr')
       rep_status = row.find('.rep-status').text()
       data = row.find('.col-bulk-dispute').text()
@@ -767,18 +743,17 @@ $ ->
       rep_list = []
       actions = $(this).closest('tr').find('.col-actions')
       existing_reptool.each () ->
-        rep_list = this.innerText.split(',')
         $(actions).children().each ->
           action_data = $(this).attr('data')
           if action_data
             rep_list = action_data.trim().split(',')
 
+        rep_list = this.innerText.split(',')
         if (class_reptool == 'maintain' || class_reptool == 'drop') && existing_reptool.length && !isEmpty(data)
           reptools =  $(existing_reptool).text().split(/[\s,]+/)
           reptool_array = reptools.filter( (val) => return val != 'ACTIVE' && val != 'EXPIRED')
           reptool_classes = Array.from(new Set(reptool_array)).join(',')
           $(action_col).attr( 'reptool_classes', reptool_classes )
-
       error_message = "#{data} | "
       if !isEmpty(data)
 
@@ -796,25 +771,25 @@ $ ->
           else
             check_class = '.add'
 
-          existing_actions = rep_list
-          $(actions).find("#{check_class} .col-tag").each () -> existing_actions.push( this.innerText )
+        existing_actions = rep_list
+        $(actions).find("#{check_class} .col-tag").each () -> existing_actions.push( this.innerText )
 
-          if reptool_add.toLowerCase() == 'remove'
+        if reptool_add.toLowerCase() == 'remove'
             check_list = check_vals.filter( (rep)->
               if existing_actions.indexOf(rep) == -1 || rep_list.indexOf(rep) == -1
                 if rep_status == "ACTIVE"
                   error_message += "<span class='col-tag dialog-tag'>#{rep} </span>, "
                   return false
                 else
-                    return true
+                  return true
               else
                 return true
-              )
+            )
             reptool_tags = $(action_col).attr( 'reptool_classes').split(',')
             action_tags = reptool_tags.filter( (val) => if check_list.indexOf(val) == -1  && val != 'ACTIVE' && val != 'EXPIRED' then return val )
             $(action_col).attr( 'reptool_classes', action_tags )
 
-          else if reptool_add.toLowerCase() == 'add'
+        else if reptool_add.toLowerCase() == 'add'
             check_list = check_vals.filter( (rep)->
               if existing_actions.indexOf(rep) > -1 || rep_list.indexOf(rep) > -1
                 if rep_status == "ACTIVE"
@@ -852,6 +827,7 @@ $ ->
       $( '#error_modal' ).dialog().position('top')
       $( '#error_modal .modal-header' ).html( error_header )
       $( '#error_modal .modal-body' ).append(error_array)
+
 
   window.buildRow = ( text_list, parent_row) ->
 # build and append new rows to the HTML in quick lookup
