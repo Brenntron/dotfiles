@@ -41,7 +41,8 @@
 //= require application/webcat/complaint_form
 //= require application/webrep/dispute_form
 //= require application/webrep_research_tab
-//= require application/webrep_quicklookup_disputes
+//= require application/webrep/webrep_quicklookup_disputes
+//= require application/webrep/quicklookup_rows
 //= require application/webcat/webcat
 //= require application/webcat/categories
 //= require application/webcat/advanced_search

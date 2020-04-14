@@ -9,7 +9,7 @@ $ ->
     ####
 
     ajaxStart: () ->
-      detail_loader()
+      $('.ajax-message-div').css('display', 'flex')
     ajaxStop: () ->
       $('.ajax-message-div').css('display', 'none')
     ajaxComplete: () ->
@@ -18,18 +18,22 @@ $ ->
       selected_rows = $('.col-select-all input:checked').length * 5
       if completed_counter == selected_rows
         $('.ajax-message-div').css('display', 'none')
-
   )
+
+  window.close_modal = () ->
+    $('#confirmation-modal').modal('toggle')
+
+  window.detail_loader = () ->
+    $('.ajax-message-div').css('display', 'flex')
+
   $(document).ready ->
     update_tabs( window.location.hash )
 
   $('#research-tabs li').on 'click', ->
     update_tabs( window.location.hash )
 
-  window.detail_loader = () ->
-    $('.ajax-message-div').css('display', 'flex')
-
   window.update_tabs = ( location ) ->
+#    just making sure that the loader div is in the right spot. having one and changing location has been less buggy/complicated than having 2 seperate ones
     if location == '#lookup-quick'
       $('.lookup-detail').css('display', 'none')
       $('.ajax-message-div').css('top', '138px')
@@ -97,9 +101,6 @@ $ ->
     else
       $('#add-to-ticket-button').prop('disabled', 'disabled')
 
-  window.close_modal = () ->
-    $('#confirmation-modal').modal('toggle')
-
   window.build_checkbox_list = (arr, list, type) ->
     ####
     # the checkbox list for the dropdown is built here when the dropdown is first opened
@@ -141,6 +142,9 @@ $ ->
       $( row ).find('.col-clear-actions').empty()
 
   $('.wlbl_thrt_cat_id').on 'click', ->
+    ####
+    #Only allow 5 threat cat ids to be selected
+    ####
     checked = $('.wlbl_thrt_cat_id:checked').length
     submit_btn = $('#wlbl_entries_dropdown .dropdown-submit-button')
     if checked > 0 && checked < 6
@@ -162,7 +166,6 @@ $ ->
     $(target).remove()
     $( col_actions ).empty()
     submit_rep_check()
-
 
 
   $(document).on 'click', '.col-actions .col-tag', () ->
@@ -247,11 +250,11 @@ $ ->
   wl_array = ['WL-weak', 'WL-med', 'WL-heavy']
 
   $(document).on 'change', '.adjust_wlbl_checkbox', '.wlbl-radio-add', () ->
-    submit_btn = $('#wlbl_entries_dropdown .dropdown-submit-button')
+    submit_btn = document.querySelector('#wlbl_entries_dropdown .dropdown-submit-button')
     all_checked_items = $('.adjust_wlbl_checkbox:checked')
     add_wlbl = $('#wlbl-add').is(":checked")
 
-    tc_row = $('#wlbl_entries_dropdown .threat-cat-row')
+    tc_row = document.querySelector('#wlbl_entries_dropdown .threat-cat-row')
     disabled = true
     bl_hide = true
     wl_check = false
@@ -290,7 +293,7 @@ $ ->
     else
       $(tc_row).addClass('hidden')
 
-    submit_btn.prop('disabled', disabled)
+    $(submit_btn).prop('disabled', disabled)
 
   $('.wlbl-radio-add').click ->
     toggle_tc_visibility(this)
@@ -389,8 +392,7 @@ $ ->
                     # set the values of threat_cat ids if the BL is being set
                     #####
                     if el.tc_ids
-                      { tc_ids } = el
-                      data.thrt_cat_ids = tc_ids
+                      data.thrt_cat_ids = el.tc_ids
 
                 adjust_wlbl(data).then((response) =>
                   ajax_count--
@@ -654,15 +656,9 @@ $ ->
           if !$(clear_col).has(".clear-action-button").length
             $(clear_col).append(delete_button)
 
-    if  error_array.length
-      $( '.error_modal' ).dialog({
-        position:
-          my: 'right',
-          at: 'top+15%',
-          of: window
-      })
-      $( '#error_modal .modal-header' ).html( "<h4>Cannot #{list_action} the following WLBL disputes <h4>" )
-      $( '#error_modal .modal-body' ).append( error_array )
+        if error_array.length
+          $( '#error_modal .modal-header' ).html( "<h4>Cannot #{list_action} the following WLBL disputes <h4>" )
+          $( '#error_modal .modal-body' ).append( error_array )
     submit_rep_check()
 
   window.submit_quick_lookup = () ->
@@ -715,6 +711,10 @@ $ ->
       $('#submit-rep-changes').attr('disabled', true)
 
   window.set_action_col = () ->
+    #####
+    # set and format action to be taken in each row's action column
+    #####
+
     reset_error_modal()
 
     check_vals = $( '.adjust_reptool_checkbox:checked' ).map( () -> return $(this).val() ).get()
@@ -831,158 +831,12 @@ $ ->
       $( '#error_modal .modal-body' ).append(error_array)
 
 
-  window.buildRow = ( text_list, parent_row) ->
-# build and append new rows to the HTML in quick lookup
-    bindControls()
-    # Once the table has been rebuilt, find the empty row and focus on it
-    tbody = document.querySelector('.research-table tbody')
-    disputes = []
-    disputes_data = []
-    existing_rows = $(tbody).find('tr')
-    parent_data = $(parent_row).find('.col-bulk-dispute').attr('data')
-    parent_index = parent_row.rowIndex
-    prev_row = existing_rows.eq(parent_index - 2)[0].innerText
-
-    $(existing_rows).each ->
-      data = $(this).find('.col-bulk-dispute').attr('data')
-      if !isEmpty(data)
-        disputes_data.push(data)
-        disputes.push(this)
-
-    if !isEmpty(parent_data) && !text_list.includes(parent_data)
-      index = disputes.indexOf(parent_data)
-      disputes.splice(index, 1)
-      parent_index = parent_index - 1
-
-    text_list = text_list.filter( (text)-> return !disputes_data.includes(text) )
-    text_list.push(' ')
-    enter_check = isEmpty(prev_row) && text_list.length == 1 && parent_index > 1 || isEmpty(parent_data)
-
-    if disputes.length
-      if enter_check
-        parent_index = parent_index - 1
-      for i in [0...text_list.length]
-        disputes.splice parent_index + i, 0, text_list[i]
-    else
-      for i in [0...text_list.length]
-        disputes.push(text_list[i])
-
-    # reset the innerHTML to nothing
-    tbody.innerHTML = ''
-    for i in [0...disputes.length]
-# if the dispute is not an HTML object, set the HTML of the new row to the below
-      if typeof disputes[i] != 'object'
-        tbody.innerHTML +=
-          "<tr>
-            <td class='col-select-all'>
-              <span class='checkbox-wrapper'>
-                <input type='checkbox' checked>
-              </span>
-            </td>
-            <td class='col-bulk-dispute' contenteditable='true' data='#{disputes[i]}'><p> #{disputes[i]} </p></td>
-            <td class='col-wbrs'></td>
-            <td class='col-wbrs-rule-hits'></td>
-            <td class='col-wbrs-rules'></td>
-            <td class='col-category'></td>
-            <td class='col-wlbl'></td>
-            <td class='col-threat-cats'></td>
-            <td class='col-reptool-class'></td>
-            <td class='col-actions' data=''></td>
-            <td class='col-clear-actions'></td>
-          </tr>"
-      else
-# if the dispute is an HTML object, set it as OuterHTML to avoid formatting issues
-        tbody.innerHTML += disputes[i].outerHTML
-
-      $(tbody).find('tr .col-bulk-dispute').each ->
-        if isEmpty( $(this).attr('data') )
-          this.focus()
-
-      setTimeout () ->
-        $("br").remove()
-      , 20
-    $('.ajax-message-div').css('display', 'none')
-
-
-  window.bindControls = () ->
-    # unbind and rebind blur to prevent the rebuilding of the table from being stuck in a loop
-    $(document).off('blur', '.col-bulk-dispute')
-    setTimeout () ->
-      $( document ).on 'blur', '.col-bulk-dispute', (e) -> set_row_text(e, this)
-    , 250
-
-  window.check_urls = (text_list, row, data) ->
-    checked = data.data
-    urls = []
-    valid_list = []
-    for name, value of checked
-      if !value
-        urls.push(name)
-      else
-        valid_list.push(name)
-    if urls.length
-      data = {'uri': urls}
-      $.ajax(
-        url: '/escalations/api/v1/escalations/webrep/disputes/is_valid_url'
-        method: 'GET'
-        headers: headers
-        data: data
-        dataType: 'json'
-        success: (response) ->
-          {status, data } = response
-          if status == 'success'
-            for name, value of data
-              if value
-                valid_list.push(name)
-            buildRow(valid_list, row)
-      )
-    else
-      buildRow(valid_list, row)
-      return true
-  window.check_ips = (text_list) ->
-    data = {'ip_address': text_list}
-    $.ajax(
-      url: '/escalations/api/v1/escalations/webrep/disputes/is_valid_ip'
-      method: 'GET'
-      headers: headers
-      data: data
-      dataType: 'json'
-      success: (response) -> return response
-    )
-
-  set_row_text = (e, el) ->
-    { which: key, shiftKey } = e
-    text = el.innerText.trim()
-    text_list = text.replace( /\n|\s/g, ", " ).split(", ")
-    row = el.closest('tr')
-    tbody = row.closest('tbody')
-
-    text_list = text_list.filter (item, index) ->
-      if item != ''
-        return text_list.indexOf item == index
-    if key == 13
-      if !shiftKey && text_list.length
-        check_ips(text_list, headers, row)
-          .then ( check_urls.bind( null, text_list, row) )
-          .then null, (err) -> console.log err
-    else if key == 0
-      if text_list.length > 1
-        check_ips(text_list, headers, row)
-          .then ( check_urls.bind( null, text_list, row) )
-          .then null, (err) -> console.log err
-      else
-        $(row).data(text)
-    else if key == 8
-        if isEmpty(text) && $(tbody).children().length > 1
-          $(row).remove()
-
-  $( document ).on 'keydown blur', '.col-bulk-dispute', (e) ->
-    set_row_text(e, this)
-    e.stopPropagation()
-
 
   window.get_rep_data = ()->
-
+    ####
+    # get reputation data for all rows
+    # after getting data, display in the appropriate column
+    ####
     search_items = []
     rows = $('.research-table tbody tr')
 
@@ -1061,8 +915,7 @@ $ ->
       headers: headers
       data: data
       dataType: 'json'
-      success: (response) ->
-        return response
+      success: (response) -> return response
       error: (response) -> return response
     )
 
@@ -1086,9 +939,7 @@ $ ->
       headers: headers
       data: data
       dataType: 'json'
-      success: (response) ->
-        {threat_cats}= JSON.parse(response)
-        return response
+      success: (response) -> return response
       error: (response) -> return response
     )
 
@@ -1156,13 +1007,6 @@ $ ->
     else
       col_tc.append( '<span class="missing-data tc_data esc-tooltipped" title= "It will take several hours for SDS threat category values to reflect changes."> | No SDS data</span>')
 
-
-  $('body').on 'mouseenter', '.tc_data:not(.tooltipstered)', ->
-    $(this).tooltipster(
-      side: 'bottom'
-      interactive: true
-      theme: ['tooltipster-borderless', 'tooltipster-borderless-customized']
-    ).tooltipster 'open'
 
   window.set_wrbs = ( item, row, data) ->
     { score, rulehits } = data.json.data
