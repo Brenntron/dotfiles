@@ -1,5 +1,23 @@
 $ ->
 
+
+
+  window.isEmpty = (item) ->
+    ####
+    # function to check whether or not objects and strings are empty, more variable types can be added as needed
+    ####
+    type = typeof item
+    switch(type)
+      when 'object'
+        return !Object.keys(item).length
+      when 'string'
+        return /^\s*$/.test(item)
+
+  window.stringIncludes = (str, substring) ->
+    return str.indexOf(substring) != -1
+
+
+
   completed_counter = 0
   headers =  'Token': $('input[name="token"]').val(),'Xmlrpc-Token': $('input[name="xml_token"]').val()
   $(document).bind(
@@ -33,7 +51,8 @@ $ ->
     update_tabs( window.location.hash )
 
   window.update_tabs = ( location ) ->
-#    just making sure that the loader div is in the right spot. having one and changing location has been less buggy/complicated than having 2 seperate ones
+#    just making sure that the loader div is in the right spot.
+#    having one and changing location has been less buggy/complicated than having 2 separate ones
     if location == '#lookup-quick'
       $('.lookup-detail').css('display', 'none')
       $('.ajax-message-div').css('top', '138px')
@@ -70,17 +89,6 @@ $ ->
 
     if !$(list).has('label').length
       build_checkbox_list(wlbl_options, list, type)
-
-  window.isEmpty = (item) ->
-    ####
-    # function to check whether or not objects and strings are empty, more variable types can be added as needed
-    ####
-    type = typeof item
-    switch(type)
-      when 'object'
-        return !Object.keys(item).length
-      when 'string'
-        return /^\s*$/.test(item)
 
   window.select_all_detailed = (check)->
     is_checked = $(check).prop('checked')
@@ -312,7 +320,6 @@ $ ->
 
   window.call_action_switchboard = (disputes) ->
     $('#confirmation-modal').modal('hide')
-
     ####
     # data is set and each action calls the appropriate endpoint here
     ####
@@ -323,6 +330,7 @@ $ ->
     dispute_calls = setInterval(()->
 
       if ajax_count == 0
+         # Once all Disputes have been processed, pass list of disputes and error array to the bulk quick update
          clearInterval(dispute_calls)
          quick_bulk_update(disputes, error_array)
     , 2000);
@@ -461,6 +469,7 @@ $ ->
     )
 
   window.check_actions = (action_classes) =>
+    # depending on classlists, return appropriate action to take for final data for ajax call
 
     if stringIncludes(action_classes, 'reptool')
 
@@ -485,17 +494,17 @@ $ ->
       # super simple endpoint to quick look up bulk submit-thus sayeth chris
       # on success of at least some data, make disputes, otherwise display error message
       ####
+    errors = Array.from(new Set(errors))
     std_msg_ajax(
       method: 'POST'
       url: '/escalations/api/v1/escalations/webrep/disputes/quick_bulk_update'
-      data: {
-        update_data: data
-      }
+      data: update_data: data
       success_reload:false
       error_prefix: 'Error logging in.'
       success: (response) ->
         submitted_entries = []
         if response
+
           for key, val of data
             if key != 'comment'
               submitted_entries.push(key.trim())
@@ -509,13 +518,8 @@ $ ->
               submitted_msg = "<div>Successfully created entries: #{submitted_entries.join(', ')}</div>"
               errors = "<div>Error creating the following entries: #{submitted_entries.join(', ')}</div>"
             std_msg_error('Error Creating disputes',[errors + submitted_msg], reload: false)
-
-
         return response
     )
-
-  window.stringIncludes = (str, substring) ->
-    return str.indexOf(substring) != -1
 
   window.confirm_rep_changes = () ->
 
@@ -536,8 +540,7 @@ $ ->
         for action, i in actions
           action_tags = []
           class_list = $(action).attr('class')
-          console.log class_list, $(action).attr('reptool_classes')
-          debugger
+
           if stringIncludes(class_list, 'reptool') && !stringIncludes(class_list, 'drop')
             action_tags = $(action).attr('reptool_classes').split(',')
           if stringIncludes(class_list, 'wlbl')
@@ -565,7 +568,6 @@ $ ->
   window.set_action_wlbl_col = () ->
 
     $('.grayed-out').removeClass('grayed-out')
-    $('#error_modal').dialog()
     reset_error_modal()
 
     error_array = []
@@ -619,8 +621,10 @@ $ ->
                 wlbl_err.push( "<span class='col-tag dialog-tag'>  #{wlbl}</span>" )
               return wlbl_col.includes(wlbl)
         )
+
         threat_id_array = []
         current_threat_cats = []
+
         for tc in threat_cats_el
           tc_name = $(tc)[0].innerText
           if tc_name != undefined
@@ -632,7 +636,7 @@ $ ->
               current_threat_cats.push(tc)
               threat_id_array.push(tc_id = $(tc)[0].getAttribute('data'))
 
-        if wlbl_err != []
+        if wlbl_err.length > 0
           error_message += "<span class='error-tag'>WLBL : #{wlbl_err.join(', ')}</span>"
         if tc_err != ''
           error_message += "<span class='error-tag'> Threat Categories : #{tc_err}</span>"
@@ -656,10 +660,12 @@ $ ->
           if !$(clear_col).has(".clear-action-button").length
             $(clear_col).append(delete_button)
 
-        if error_array.length
-          $( '#error_modal .modal-header' ).html( "<h4>Cannot #{list_action} the following WLBL disputes <h4>" )
-          $( '#error_modal .modal-body' ).append( error_array )
     submit_rep_check()
+
+    if error_array.length
+      $( '#error_modal' ).dialog().position('top')
+      $( '#error_modal .modal-header' ).html( "<h4>Cannot #{list_action} the following WLBL disputes <h4>" )
+      $( '#error_modal .modal-body' ).append( error_array )
 
   window.submit_quick_lookup = () ->
     $('#confirmation-modal  tbody').empty()
@@ -1006,7 +1012,6 @@ $ ->
       col_tc.append( text )
     else
       col_tc.append( '<span class="missing-data tc_data esc-tooltipped" title= "It will take several hours for SDS threat category values to reflect changes."> | No SDS data</span>')
-
 
   window.set_wrbs = ( item, row, data) ->
     { score, rulehits } = data.json.data
