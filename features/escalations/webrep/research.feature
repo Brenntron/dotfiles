@@ -372,9 +372,7 @@ Feature: Webrep, the BFRP
     And  I wait for "60" seconds
     And  I should not see element with class "add-ip-button"
 
-
-
-
+    
   ####
   # Quicklookup feature
   ####
@@ -443,7 +441,7 @@ Feature: Webrep, the BFRP
     And I should see "New Reputation Dispute Ticket"
     And I type content "A truly fantastic test comment" within input with id "confirm-rep-input"
     Then I click "confirm-rep-changes"
-]    Then I wait for "25" seconds
+    Then I wait for "25" seconds
     Then I should see "ALL DISPUTES WERE SUCCESSFULLY CREATED"
 
   @javascript
@@ -490,5 +488,5 @@ Feature: Webrep, the BFRP
     Then I click "input[name='malware']"
     Then I click "input[name='cnc']"
     Then I click "quick-lookup-reptool-submit"
-    Then I wait for "20" seconds
+    Then I wait for "5" seconds
     Then quick lookup entry "actions" column number "1" should have content ""
