@@ -1,7 +1,6 @@
 $ ->
 
 
-
   window.isEmpty = (item) ->
     ####
     # function to check whether or not objects and strings are empty, more variable types can be added as needed
@@ -32,7 +31,10 @@ $ ->
       $('.ajax-message-div').css('display', 'none')
     ajaxComplete: () ->
       completed_counter++
-#     selected_rows needs to be multiplied by the number of ajax calls that are being made to accurately gauge the number of calls
+      ####
+      # selected_rows needs to be multiplied by the number of ajax calls that are being made to
+      # accurately gauge the number of calls
+      ####
       selected_rows = $('.col-select-all input:checked').length * 5
       if completed_counter == selected_rows
         $('.ajax-message-div').css('display', 'none')
@@ -784,12 +786,9 @@ $ ->
 
         if reptool_add.toLowerCase() == 'remove'
             check_list = check_vals.filter( (rep)->
-              if existing_actions.indexOf(rep) == -1
-                if rep_status == "ACTIVE"
+              if existing_actions.indexOf(rep) == -1 && rep_status == "ACTIVE"
                   error_message += "<span class='col-tag dialog-tag'>#{rep} </span>, "
                   return false
-                else
-                  return true
               else
                 return true
             )
@@ -799,12 +798,9 @@ $ ->
 
         else if reptool_add.toLowerCase() == 'add'
             check_list = check_vals.filter( (rep)->
-              if existing_actions.indexOf(rep) > -1
-                if rep_status == "ACTIVE"
+              if existing_actions.indexOf(rep) > -1 && rep_status == "ACTIVE"
                   error_message += "<span class='col-tag dialog-tag'>#{rep} </span>, "
                   return false
-                else
-                  return true
               else
                 return true
             )
@@ -846,10 +842,13 @@ $ ->
     search_items = []
     rows = $('.research-table tbody tr')
 
+
     $('.col-bulk-dispute').each ( ) ->
-      text = $(this).text()
-      if !isEmpty(text)
-        search_items.push(text)
+      checkbox = $(this).prev().find('input')
+      if checkbox.length
+        text = $(this).text()
+        if !isEmpty(text) && checkbox[0].checked
+          search_items.push(text)
 
     for i in [0...search_items.length]
       item = search_items[i]
