@@ -534,8 +534,10 @@ $ ->
         for action, i in actions
           action_tags = []
           class_list = $(action).attr('class')
+          console.log class_list, $(action).attr('reptool_classes')
+          debugger
           if stringIncludes(class_list, 'reptool') && !stringIncludes(class_list, 'drop')
-            action_tags = $(action).attr('reptool_data').split(',')
+            action_tags = $(action).attr('reptool_classes').split(',')
           if stringIncludes(class_list, 'wlbl')
             action_tags = $(action).attr('wlbl_data').split(',')
           if stringIncludes(class_list, 'threat-cat-col')
@@ -677,8 +679,8 @@ $ ->
       existing_reptool = ''
       wlbl_list = ''
 
-      if actions_col.attr('reptool_data') != undefined
-        existing_reptool = "reptool_data = #{actions_col.attr('reptool_data')}"
+      if actions_col.attr('reptool_classes') != undefined
+        existing_reptool = "reptool_classes= #{actions_col.attr('reptool_classes')}"
       if wlbl_actions != undefined
         wlbl_list = "wlbl_data = #{wlbl_actions}"
       if !isEmpty(new_data) && new_data != undefined
@@ -726,7 +728,7 @@ $ ->
 
     switch (class_reptool)
       when 'maintain'
-        status_string = "#{reptool_add.charAt(0).toUpperCase()} #{reptool_add.slice(1)} classifications:"
+        status_string = "#{reptool_add.charAt(0).toUpperCase()}#{reptool_add.slice(1)} classifications:"
       when 'override'
         status_string = 'Add classifications: '
       when 'drop'
@@ -776,7 +778,7 @@ $ ->
 
         if reptool_add.toLowerCase() == 'remove'
             check_list = check_vals.filter( (rep)->
-              if existing_actions.indexOf(rep) == -1 || rep_list.indexOf(rep) == -1
+              if existing_actions.indexOf(rep) == -1
                 if rep_status == "ACTIVE"
                   error_message += "<span class='col-tag dialog-tag'>#{rep} </span>, "
                   return false
@@ -791,7 +793,7 @@ $ ->
 
         else if reptool_add.toLowerCase() == 'add'
             check_list = check_vals.filter( (rep)->
-              if existing_actions.indexOf(rep) > -1 || rep_list.indexOf(rep) > -1
+              if existing_actions.indexOf(rep) > -1
                 if rep_status == "ACTIVE"
                   error_message += "<span class='col-tag dialog-tag'>#{rep} </span>, "
                   return false
