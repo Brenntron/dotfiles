@@ -1,7 +1,7 @@
 GIT
   remote: https://git.vrt.sourcefire.com/talosweb/peake-bridge-client.git
   revision: 8c500eeeba990db092b097f9afe6a8019d658f82
-  specs:axiom-types (0.1.1)
+  specs:
     peake-bridge-client (0.0.9.0)
       curb (~> 0.9)
       httpi (~> 2.4)
