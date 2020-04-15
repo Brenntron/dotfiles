@@ -12698,3 +12698,13 @@ table.dispute_tool_current tr.reptool-entry-row td {
     width: 120px;
   }
 }
+
+#confirmation-modal{
+  textarea{
+    min-height: 60px;
+    margin-bottom: 25px;
+  }
+  tbody{
+    line-height: 1.1em;
+  }
+}

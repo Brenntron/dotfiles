@@ -372,7 +372,7 @@ Feature: Webrep, the BFRP
     And  I wait for "60" seconds
     And  I should not see element with class "add-ip-button"
 
-    
+
   ####
   # Quicklookup feature
   ####
