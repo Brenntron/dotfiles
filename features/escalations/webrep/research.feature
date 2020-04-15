@@ -392,6 +392,23 @@ Feature: Webrep, the BFRP
     Then quick lookup entry "bulk-dispute" column number "3" should have content "g-oogl-e.com"
     Then I should not see content "faketestcom" within "#research-table"
 
+@javascript
+  Scenario: a user can remove a row and add more rows successfully
+    Given a user with role "webrep user" exists and is logged in
+    When I goto "escalations/webrep/research#lookup-quick"
+    Then I should see content "Submit Reputation Changes" within "#submit-rep-changes"
+    And I enter content "1.2.3.4" within p with class ".col-bulk-dispute"
+    Then I hit enter within ".col-bulk-dispute"
+    And  I wait for "2" seconds
+    Then quick lookup entry "bulk-dispute" column number "1" should have content "1.2.3.4"
+    Then I remove row ".col-bulk-dispute"
+    Then There is only one element of class, "col-bulk-dispute"
+    And I enter content "1.2.3.4  https://1234computer.com" within p with class ".col-bulk-dispute"
+    Then I hit enter within ".col-bulk-dispute"
+    And  I wait for "2" seconds
+    Then quick lookup entry "bulk-dispute" column number "1" should have content "1.2.3.4"
+    Then quick lookup entry "bulk-dispute" column number "2" should have content "https://1234computer.com"
+
   @javascript
   Scenario: a user can add only ips in quicklookup without error
     Given a user with role "webrep user" exists and is logged in
