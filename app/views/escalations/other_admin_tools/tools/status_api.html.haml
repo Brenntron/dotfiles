@@ -1,7 +1,11 @@
-%body{onload:"window.get_api_status()"}
-    %h1 API Status
-    #status_api_container
-        .ajax-message-div.status_api
-            .loader-gears
-                =inline_svg 'icon_gears_loader.svg'
-            %span.loader-msg Loading data...
+%html
+    %head
+        %title API Status
+    %body{onload:"window.get_api_status()"}
+        %h1 API Status
+        #status_api_container
+            .ajax-message-div.status_api
+                .loader-gears
+                    =inline_svg 'icon_gears_loader.svg'
+                %span.loader-msg Loading data...
+            %table#status_api_table

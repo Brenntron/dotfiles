@@ -169,17 +169,16 @@ window.get_api_status = () ->
 
     error: (response) ->
       $('.ajax-message-div').css('display','none')
-      console.log response
+      std_msg_error("There was an error when attempting to get api status.",[response.responseText], reload: false)
   , this)
 
 window.format_statuses = (data) ->
   { servers } = data
-  container = document.getElementById('status_api_container')
-  stat_table = document.createElement("table");
+  stat_table = document.getElementById('status_api_table')
   stat_table.innerHTML =
     "<tr>
-      <th>Server</th>
       <th>API</th>
+      <th>Server</th>
       <th>Status</th>
     </tr>"
   for server, name of servers
@@ -189,6 +188,7 @@ window.format_statuses = (data) ->
       status_class = 'api-status-fail'
 
     tr = document.createElement("tr");
+
     tr.innerHTML =
       "<td class = 'content-label-md'>
         #{server}
@@ -199,10 +199,8 @@ window.format_statuses = (data) ->
        <td>
         <span class='#{status_class}'></span>
       </td>"
+
     stat_table.append(tr)
-  container.append(stat_table)
-#    console.log server, name
-#    console.log data[server]
 $ ->
 
   $("#sync-all-disputes").click ->
