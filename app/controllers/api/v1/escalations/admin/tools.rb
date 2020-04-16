@@ -186,7 +186,7 @@ module API
                 status_response[:reptool] = RepApi::Blacklist.health_check
                 status_response[:rule_api] = Wbrs::ThreatCategory.health_check
                 status_response[:sds_v3] = Sbrs::Base.health_check
-                status_response[:threatgrid] = ThreatGrid::Search.health_check
+                status_response[:threatgrid] = Threatgrid::Search.health_check
                 status_response[:reversing_lab] = FileReputationApi::ReversingLabs.health_check
                 status_response[:sandbox] = FileReputationApi::Sandbox.health_check
                 status_response[:xbrs] = Xbrs::GetXbrs.health_check

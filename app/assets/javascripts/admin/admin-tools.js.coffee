@@ -1,6 +1,6 @@
 window.submit_wbrs_call = (arg, path, output) ->
-  headers = {'Token': $('input[name="token"]').val(), 'Xmlrpc-Token': $('input[name="xml_token"]').val()}
 
+  headers = {'Token': $('input[name="token"]').val(), 'Xmlrpc-Token': $('input[name="xml_token"]').val()}
 
   $.ajax(
     url: '/escalations/api/v1/escalations/admin/tools/wbrs_call'
@@ -156,6 +156,53 @@ window.purge_mozilla_corefiles =() ->
       std_msg_error("there was an error when attempting to purge core files.",[response.responseText], reload: false)
   , this)
 
+window.get_api_status = () ->
+  headers = {'Token': $('input[name="token"]').val(), 'Xmlrpc-Token': $('input[name="xml_token"]').val()}
+  std_msg_ajax(
+    method: 'GET'
+    headers: headers
+    url: '/escalations/api/v1/escalations/admin/tools/api_status_report'
+    data:{}
+    success: (response) ->
+      $('.ajax-message-div').css('display','none')
+      format_statuses(response)
+
+    error: (response) ->
+      $('.ajax-message-div').css('display','none')
+      console.log response
+  , this)
+
+window.format_statuses = (data) ->
+  { servers } = data
+  container = document.getElementById('status_api_container')
+  stat_table = document.createElement("table");
+  stat_table.innerHTML =
+    "<tr>
+      <th>Server</th>
+      <th>API</th>
+      <th>Status</th>
+    </tr>"
+  for server, name of servers
+    if data[server].is_healthy
+      status_class = 'api-status-success'
+    else
+      status_class = 'api-status-fail'
+
+    tr = document.createElement("tr");
+    tr.innerHTML =
+      "<td class = 'content-label-md'>
+        #{server}
+       </td>
+       <td>
+        #{name}
+        </td>
+       <td>
+        <span class='#{status_class}'></span>
+      </td>"
+    stat_table.append(tr)
+  container.append(stat_table)
+#    console.log server, name
+#    console.log data[server]
 $ ->
 
   $("#sync-all-disputes").click ->

@@ -2360,6 +2360,17 @@ table .bug-priority {
   margin-right: 0;
   color: transparent;
 }
+.api-status-fail{
+    display: inline-block;
+    background-image: url(image_path("icon_fail.svg"));
+    height: 20px;
+}
+.api-status-success{
+    background-image: url(image_path("icon_check_green.svg"));
+    height: 20px;
+    display: inline-block;
+}
+
 
 .bug-priority.p-Unspecified {background-image: url(image_path("icon_p_unknown.svg"));}
 .bug-priority.p-P1 {background-image: url(image_path("icon_p1.svg"));}
