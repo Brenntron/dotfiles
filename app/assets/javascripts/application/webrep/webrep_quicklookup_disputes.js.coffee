@@ -262,7 +262,7 @@ $ ->
   $(document).on 'change', '.adjust_wlbl_checkbox', '.wlbl-radio-add', () ->
     submit_btn = document.querySelector('#wlbl_entries_dropdown .dropdown-submit-button')
     all_checked_items = $('.adjust_wlbl_checkbox:checked')
-    add_wlbl = $('#wlbl-add').is(":checked")
+    add_wlbl = $('#wlbl-quick-add').is(":checked")
 
     tc_row = document.querySelector('#wlbl_entries_dropdown .threat-cat-row')
     disabled = true
