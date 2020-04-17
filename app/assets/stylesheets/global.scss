@@ -12708,3 +12708,13 @@ table.dispute_tool_current tr.reptool-entry-row td {
     line-height: 1.1em;
   }
 }
+
+#add_addtional_row {
+  border: none;
+  background-image: url(image_path('icon_add_grey.svg'));
+  height: 20px;
+  width: 20px;
+  display: none;
+  position:absolute;
+  margin-top: -94px;
+}

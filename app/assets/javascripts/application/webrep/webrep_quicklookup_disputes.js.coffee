@@ -145,6 +145,7 @@ $ ->
     # clears all actions from every selected row
     ####
     e.preventDefault()
+    $('#submit-rep-changes').attr('disabled', true)
     selected_rows = $('.col-select-all input:checked')
     $( selected_rows ).each ()->
       row = $( this ).closest('tr')

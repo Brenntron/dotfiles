@@ -153,7 +153,31 @@ $ ->
     else if key == 8
       if isEmpty(text) && $(tbody).children().length > 1
         $(row).remove()
+        if !isEmpty( $(tbody).find('tr').last() )
+          $('#add_addtional_row').css('display', 'flex')
 
+  $(document).on 'click', '#add_addtional_row', ->
+    row =
+      "<tr>
+            <td class='col-select-all'>
+              <span class='checkbox-wrapper'>
+                <input type='checkbox' checked>
+              </span>
+            </td>
+            <td class='col-bulk-dispute' contenteditable='true' data=' '><p> </p></td>
+            <td class='col-wbrs'></td>
+            <td class='col-wbrs-rule-hits'></td>
+            <td class='col-wbrs-rules'></td>
+            <td class='col-category'></td>
+            <td class='col-wlbl'></td>
+            <td class='col-threat-cats'></td>
+            <td class='col-reptool-class'></td>
+            <td class='col-actions' data=''></td>
+            <td class='col-clear-actions'></td>
+          </tr>"
+    $('#add_addtional_row').css('display', 'none')
+    $('#research-table').append(row)
+    
   $( document ).on 'keydown blur', '.col-bulk-dispute', (e) ->
     set_row_text(e, this)
     e.stopPropagation()
