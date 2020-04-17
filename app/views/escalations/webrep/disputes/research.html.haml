@@ -1,4 +1,4 @@
-.content-wrapper
+.content-wrapper.research-page
 
   .reputation-research-search-wrapper
 
@@ -15,13 +15,13 @@
       %ul#research-tabs{class:"nav nav-tabs", role:'tablist'}
         -# Detailed and Quick Lookup tabs
         %li{role:"presentation", class: "active", data:"lookup-detail"}
-          %a{href:'#lookup-detail','aria-controls':'lookup-detail', 'aria-label': 'Detail lookup tab','data-toggle':'tab', role:"tab"}
+          %a.esc-tooltipped{href:'#lookup-detail','aria-controls':'lookup-detail', 'aria-label': 'Detail lookup tab','data-toggle':'tab', role:"tab", title:"Detailed Lookup"}
             %span.icon-lookup-detail.top-info-icon
-            Detailed Lookup
+            %span.tab-text Detailed Lookup
         %li{role:'presentation', data:"lookup-quick"}
-          %a{href:'#lookup-quick',class:'quick-lookup-tab', 'aria-controls':'lookup-quick','aria-label': 'Quick lookup tab','data-toggle':'tab', role:"tab"}
+          %a.esc-tooltipped{href:'#lookup-quick',class:'quick-lookup-tab', 'aria-controls':'lookup-quick','aria-label': 'Quick lookup tab','data-toggle':'tab', role:"tab", title:"Quick Lookup"}
             %span.icon-lookup-quick.top-info-icon
-            Quick Lookup
+            %span.tab-text Quick Lookup
 
     .research-search-form.row.tab-content
       = form_for(:search, method: "get") do |search_form|
@@ -204,7 +204,7 @@
                 %th WBRS Rules
                 %th Category
                 %th WL/BL
-                %th Threat Categories
+                %th Threat Categories (Pending | Current)
                 %th Reptool Classification
                 %th Actions
                 %th

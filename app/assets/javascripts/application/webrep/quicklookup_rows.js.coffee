@@ -177,7 +177,7 @@ $ ->
           </tr>"
     $('#add_addtional_row').css('display', 'none')
     $('#research-table').append(row)
-    
+
   $( document ).on 'keydown blur', '.col-bulk-dispute', (e) ->
     set_row_text(e, this)
     e.stopPropagation()

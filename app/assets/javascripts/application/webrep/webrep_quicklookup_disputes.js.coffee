@@ -1004,14 +1004,15 @@ $ ->
     col_tc = $(row).children('.col-threat-cats')
     $(row).find('.tc_data').remove()
     { threat_categories } = JSON.parse(data)
+    title = "It may take several hours for SDS threat category values to reflect changes."
     if threat_categories != undefined
       if threat_categories.length
-        text = "<span class = 'tc_data esc-tooltipped' title= 'It will take several hours for SDS threat category values to reflect changes.'> |  #{threat_categories.join(', ')} </span>"
+        text = "<span class = 'tc_data esc-tooltipped' title= '#{title}'> |  #{threat_categories.join(', ')} </span>"
       else
-        text = '<span class="missing-data tc_data esc-tooltipped" title= "It will take several hours for SDS threat category values to reflect changes."> | No SDS data</span>'
+        text = "<span class='missing-data tc_data esc-tooltipped' title= '#{title}'> | No SDS data</span>"
       col_tc.append( text )
     else
-      col_tc.append( '<span class="missing-data tc_data esc-tooltipped" title= "It will take several hours for SDS threat category values to reflect changes."> | No SDS data</span>')
+      col_tc.append( "<span class='missing-data tc_data esc-tooltipped' title='#{title}'> | No SDS data</span>")
 
   window.set_wrbs = ( item, row, data) ->
     { score, rulehits } = data.json.data
