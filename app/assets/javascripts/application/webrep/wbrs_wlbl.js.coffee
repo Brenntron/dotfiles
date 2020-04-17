@@ -681,7 +681,7 @@ window.submit_individual_wlbl = (button_tag) ->
   else if adjustment_type = 'remove'
     console.log 'inline scenario 3' # index/show/bfrp page REMOVE: use old endpoint + one entry url'
     data_old =
-      ip_uris: dispute_url
+      ip_uris: [dispute_url]
       list_types: removed_lists_arr
       note: curr_note   # ensure this is working
       thrt_cat_ids: thrt_cat_ids
@@ -743,12 +743,13 @@ window.submit_individual_wlbl = (button_tag) ->
         console.log '/escalations/api/v1/escalations/webrep/disputes/bulk_rule_ui_wlbl_remove'
 
         data_old =
-          ip_uris: dispute_url
+          ip_uris: [dispute_url]
           list_types: removed_lists_arr
           note: curr_note
           thrt_cat_ids: thrt_cat_ids
 
         console.log data_old
+
 
         # SECOND API CALL
         std_msg_ajax(
