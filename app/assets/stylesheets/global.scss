@@ -5405,13 +5405,13 @@ input.table-entry-input:focus {
 }
 
 #research-table {
-  &{
-    line-height: 1.6em;
-  }
+  line-height: 1.6em;
+  background-color: $content-bg-color;
   th {
     color: $type-darkest;
     border-bottom: 1px solid $faint-neutral-color!important;
     padding: 8px 8px 8px 10px;
+    white-space: nowrap;
   }
   td {
     padding: 8px 8px 8px 10px;
