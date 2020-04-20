@@ -48,3 +48,7 @@ end
 Given(/^the following complaint entry with id: "(.*?)" has a resolution comment of: "(.*?)"$/) do |id, resolution_comment|
   expect(ComplaintEntry.find(id).resolution_comment).to eq(resolution_comment)
 end
+
+Then (/^that Complaint Ticket should have an assignee of current user$/) do
+  expect(ComplaintEntry.first.user_id).to eq(1)
+end

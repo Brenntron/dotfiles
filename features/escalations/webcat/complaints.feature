@@ -748,3 +748,63 @@ Feature: Webcat complaints
     Then I should not see table header with id "assignee"
     Then I should see table header with id "tags"
     Then I should see table header with id "path"
+
+
+  @javascript
+  Scenario: a user returns a ticket
+    Given a user with role "webcat user" exists and is logged in
+    And the following complaint entries exist:
+      | uri            | domain          | entry_type | complaint_id | status     |
+      | abc.com        | abc.com         | URI/DOMAIN |  1           | NEW        |
+      | whatever.com   | whatever.com    | URI/DOMAIN |  2           | NEW        |
+      | url.com        | url.com         | URI/DOMAIN |  3           | ASSIGNED   |
+      | test.com       | test.com        | URI/DOMAIN |  4           | ASSIGNED   |
+      | something.com  | something.com   | URI/DOMAIN |  5           | NEW        |
+      | yadayada.com   | yadayada.com    | URI/DOMAIN |  6           | NEW        |
+      | nothing.com    | nothing.com     | URI/DOMAIN |  7           | ASSIGNED   |
+      | something.com  | something.com   | URI/DOMAIN |  8           | NEW        |
+      | blahblah.com   | blahblah.com    | URI/DOMAIN |  9           | ASSIGNED   |
+    And I goto "/escalations/webcat/complaints?f=ALL"
+    Then I select row "3"
+    Then I select row "4"
+    Then take a screenshot
+
+  @javascript
+  Scenario: a user takes a ticket
+    Given a user with role "webcat user" exists and is logged in
+    And the following complaints exist:
+      | channel       | id |
+      | talosintel    | 1  |
+    And the following complaint entries exist:
+      | uri            | domain          | entry_type | complaint_id | status     |
+      | abc.com        | abc.com         | URI/DOMAIN |  1           | NEW        |
+    And I goto "/escalations/webcat/complaints?f=ALL"
+    Then I select row "1"
+    Then I click ".take-ticket-toolbar-button"
+    Then that Complaint Ticket should have an assignee of current user
+    Then take a screenshot
+
+  @javascript
+  Scenario: a user tries to return a ticket that is complete
+
+
+  @javascript
+  Scenario: a user tries to return a ticket that is not assigned to them
+
+  @javascript
+  Scenario: a user tries to take a ticket that is already assigned
+
+  @javascript
+  Scenario: a user tries to take multiple tickets, some of which are already assigned
+    Given a user with role "webcat user" exists and is logged in
+    And the following complaint entries exist:
+      | uri            | domain          | entry_type | complaint_id | status     |
+      | abc.com        | abc.com         | URI/DOMAIN |  1           | NEW        |
+      | whatever.com   | whatever.com    | URI/DOMAIN |  2           | NEW        |
+      | url.com        | url.com         | URI/DOMAIN |  3           | ASSIGNED   |
+      | test.com       | test.com        | URI/DOMAIN |  4           | ASSIGNED   |
+      | something.com  | something.com   | URI/DOMAIN |  5           | NEW        |
+      | yadayada.com   | yadayada.com    | URI/DOMAIN |  6           | NEW        |
+      | nothing.com    | nothing.com     | URI/DOMAIN |  7           | ASSIGNED   |
+      | something.com  | something.com   | URI/DOMAIN |  8           | NEW        |
+      | blahblah.com   | blahblah.com    | URI/DOMAIN |  9           | ASSIGNED   |
