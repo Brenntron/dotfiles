@@ -21,6 +21,7 @@ module API
               requires :status, type: String, desc: 'setting the status of the entry'
               optional :comment, type: String, desc: 'internal comment'
               optional :resolution_comment, type: String, desc: 'resolution comment for the customer'
+              optional :uri_as_categorized, type: String, desc: 'Value of the `Edit Uri` box at the time analyst submitted it'
             end
             post 'update'do
               begin
@@ -31,6 +32,7 @@ module API
                                        permitted_params['status'],
                                        permitted_params['comment'],
                                        permitted_params['resolution_comment'],
+                                       permitted_params['uri_as_categorized'],
                                        current_user, "")
                 Thread.new { ComplaintEntryPreload.generate_preload_from_complaint_entry(entry) }
                 if entry.complaint.ticket_source != Complaint::SOURCE_RULEUI
