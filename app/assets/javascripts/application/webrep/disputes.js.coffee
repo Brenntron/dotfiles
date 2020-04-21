@@ -403,7 +403,7 @@ window.show_page_edit_status = () ->
     url: '/escalations/api/v1/escalations/webrep/disputes/set_disputes_status'
     method: 'POST'
     data: data
-    error_prefix: '/escalations/api/v1/escalations/webrep/disputes/set_disputes_status'
+    error_prefix: 'Unable to update dispute.'
     success_reload: true
   )
 
