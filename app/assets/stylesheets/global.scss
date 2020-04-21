@@ -2269,6 +2269,9 @@ a.static-nav-item {
 .hidden-auto-resolve{
   z-index: 0;
 }
+.reputation-research-search-wrapper #confirmation-modal .modal-body{
+  color:$type-darkest!important
+}
 .webrep_auto_resolve, #auto-resolve-dialog{
   padding: 13px!important;
   max-height: 600px!important;
@@ -3004,12 +3007,12 @@ a.code-content:hover {
   margin-right: 5px;
 }
 
-
-
 .col-rule-details .col-xs-9 {
   padding-left: 0;
 }
-
+.col-reptool-class{
+  word-break: break-word;
+}
 .rule-content-subsection {
   margin-bottom: 20px;
   font-size: 9pt;
@@ -5053,11 +5056,14 @@ table > tbody > tr > td.dispute_rep_tools {
 .inline-tool-content-wrapper .toolbar div {
   border: 1px solid $faint-neutral-color !important;;
 }
-
+.detail-label{
+  color: $type-lightest!important;
+}
 .dropdown-comment, .form-comment-box {
   width: 100%;
   min-height: 20px;
   border: 1px solid darken($faint-neutral-color, 5%);
+  color: $type-darkest
 }
 
 .form-comment-box {
@@ -5399,19 +5405,47 @@ input.table-entry-input:focus {
 }
 
 #research-table {
-  &{
-    line-height: 1.6em;
-  }
+  line-height: 1.6em;
+  background-color: $content-bg-color;
   th {
     color: $type-darkest;
     border-bottom: 1px solid $faint-neutral-color!important;
-    padding: 8px;
+    padding: 8px 8px 8px 10px;
+    white-space: nowrap;
+  }
+  td {
+    padding: 8px 8px 8px 10px;
+  }
+  .tc-header{
+    text-transform: none;
+    font-weight: 600;
+    font-size: 10px;
   }
 }
 
+.no-transition{
+  -webkit-transition:  width 0s!important;
+  -moz-transition:  width 0s!important;
+  -ms-transition:  width 0s!important;
+  -o-transition:  width 0s!important;
+  transition: width 0s!important;
+}
+
+/* quicklookup > bulk dispute div functions as an input */
 .col-bulk-dispute{
   min-width: 150px;
   min-height: 12px;
+  vertical-align: top;
+}
+/* add a border to indicate its an input */
+.col-bulk-dispute:empty {
+  outline: 1px solid darken($content-bg-color, 10%);
+  padding: 2px;
+  margin: 3px 20px 3px 0;
+}
+.col-bulk-dispute:empty:after {
+  content: 'Enter one or more URLs or IPs here...';
+  color: darken($content-bg-color, 25%);
 }
 
 .research-toolbar{
@@ -5420,6 +5454,7 @@ input.table-entry-input:focus {
   height: 32px;
   margin: 20px 15px;
   padding: 0px 13px;
+  min-width: 140px;
   border-left: 1px solid $faint-neutral-color;
   border-right: 1px solid $faint-neutral-color;
 }
@@ -5428,7 +5463,7 @@ input.table-entry-input:focus {
   display: flex;
   align-items: flex-end;
   padding-left: 5px;
-  padding-bottom: 5px;
+  padding-bottom: 6px;
   color: $type-lighter-color;
 }
 
@@ -5462,7 +5497,7 @@ input.table-entry-input:focus {
   content:unset;
 }
 .reputation-research-search-wrapper .nav-tabs{
-   margin:0
+   margin:0;
  }
 .reputation-research-search-wrapper h1 {
   color: $content-bg-color;
@@ -5498,6 +5533,11 @@ input.table-entry-input:focus {
   background: $ac-nav-bg-color;
   margin: -30px -30px -150px -30px;
   padding: 50px 10px 0 10px;
+}
+#lookup-quick{
+  .ajax-message-div{
+    top: 140px;
+  }
 }
 .research-search-form .button_primary {
   margin: 10px 0;
@@ -5624,12 +5664,23 @@ table > tbody > tr > td.research-table-row-wrapper {
   color: $type-lightest;
 }
 .research-header-wrapper .nav-tabs > li > a:hover{
-  color: $type-lightest
+  color: $type-lightest;
+  white-space:nowrap;
 }
 .research-header-wrapper .nav-tabs > li.active > a {
   border: none;
   background: $primary-section-color;
   transition: background-color .1s ease-in;
+}
+@media (max-width: 1000px) {
+  .research-header-wrapper {
+    .nav-tabs > li > a{
+      width: 100px;
+    }
+    .tab-text{
+      display: none;
+    }
+  }
 }
 //caret for active tab  in reputation toolbar
 .research-header-wrapper li::after {
@@ -5674,8 +5725,13 @@ table > tbody > tr > td.research-table-row-wrapper {
 .toolbar-quicklookup{
   display:flex;
   height: 60px;
+  button{
+    white-space: nowrap;
+  }
 }
-
+.content-wrapper.research-page{
+  min-width: 400px;
+}
 .entry-details-table {
   margin: 20px;
   padding-left: 7px;
@@ -5838,9 +5894,11 @@ h5.entry-details-table-header {
   background-color: $bug-section-color;
 }
 
+/* quicklookup > adjust reptool dropdown  */
 #reptool_entries_bl_dropdown {
   &{
     min-width: 400px;
+    margin-left: 0;
   }
   hr{
     opacity: 1;
@@ -5879,6 +5937,17 @@ h5.entry-details-table-header {
   }
   .nested-radio-row .col-xs-6:first-of-type{
     padding-left: 8px!important;
+  }
+  .dropdown-tool-text-divider.secondary-text-divider {
+    background: $primary-section-color;
+  }
+  .dropdown-reptool-list li:hover {
+    background: none;
+    cursor: pointer;
+  }
+  .dropdown-reptool-list li label:hover {
+    background: none;
+    cursor: pointer;
   }
 }
 
@@ -6175,7 +6244,7 @@ button.dropdown-submit-button {
 
 .search-options-col label {
   margin-left: 8px;
-  color: $content-bg-color;
+  color: $content-label-color;
   font-size: 8pt;
   font-weight: 400;
   padding: 8px 0;
@@ -6624,8 +6693,13 @@ td.ticket-total::before {
   display: inline-block;
   content: '';
 }
+
 .important-flag-col{
   width: 25px;
+}
+
+.tc_data {
+    display: inline-block;
 }
 .entry-important-flag::before, .highlight-second-review .important-flag-col .is-important {
   background-image: url(image_path('icon_important.svg'));
@@ -6863,7 +6937,7 @@ table.dispute-entry-table tbody tr.selected {
   margin-top: 20px;
 }
 .related-dropdown-text{
-  color: #999 !important;
+  color: $content-label-color !important;
 }
 
 #set-related-dispute-div {
@@ -9056,12 +9130,20 @@ th.sorting_1, th.sorting_asc, th.sorting_desc {
 
 .dropdown-wlbl-list{
   &{
-    -webkit-column-count: 2;
-    -moz-column-count: 2;
-    column-count: 2;
+    display: flex;
+    flex-wrap: wrap;
     background: $faint-neutral-color;
     margin: auto -17px;
-    padding: 10px 25px;
+    padding: 5px 5px 10px 20px;
+  }
+  li{
+    width: 33%;
+    label {
+      cursor: pointer;
+    }
+  }
+  li:hover {
+    background-color: transparent !important;
   }
 }
 
@@ -9069,10 +9151,12 @@ th.sorting_1, th.sorting_asc, th.sorting_desc {
   margin-top: 1px;
 }
 
+/* quicklookup > adjust wlbl dropdown  */
 #wlbl_entries_dropdown{
   &{
-    min-width: 310px;
+    min-width: 510px;
     padding: 0 8px !important;
+    margin-left: 0;
   }
   .wlbl-radio-add{
     margin-right: 5px
@@ -9101,14 +9185,26 @@ th.sorting_1, th.sorting_asc, th.sorting_desc {
       padding: 4px 0!important;
     }
   }
+  .dropdown-tool-text-divider.secondary-text-divider {
+    background: $primary-section-color;
+  }
+  .radio-label {
+    margin-left: 4px !important;
+    display: inline-block;
+  }
 }
-
+.error-tag{
+  font-weight: 200;
+  padding: 0 3px;
+  font-size: 8pt;
+}
 .col-tag{
   background: $faint-neutral-color;
   font-weight: 200;
   padding: 0 3px;
   font-size: 8pt;
   font-family: "Fira Mono", monospace;
+  cursor: default;
 }
 
 .col-actions .col-tag:hover:after{
@@ -11379,6 +11475,31 @@ hr.thin.extra-bottom-marg {
     }
   }
 }
+#wlbl_entries_dropdown{
+  .threat-cat-area{
+    padding: 3px;
+    height: 200px;
+    display: flex;
+    flex-wrap: wrap;
+    flex-direction: column;
+    justify-content: space-around;
+  }
+  .threat-cat-cell label{
+    color:$type-lighter-color!important;
+    cursor: pointer;
+  }
+  .dropdown-tool-grey-row{
+    margin-left: -17px !important;
+    margin-right: -17px !important;
+    padding: 4px!important;
+    margin-top: 1px !important;
+  }
+  .threat-cat-note {
+    padding-left: 10px;
+  }
+}
+
+
 
 span.threat-cat-required {
   margin-left: 5px;
@@ -11457,10 +11578,20 @@ span.threat-cat-no-data {
   max-height: 20px !important;
   max-width: 100% !important;
   min-width: 98%;
+  .dispute-count {
+    border-radius: 5px;
+    padding: 1px 5px;
+    position: absolute;
+    right: 2px;
+    left: unset;
+    top: 0;
+  }
+
 }
 
 // webrep dispute index > ensure the dispute count is to the right of the domain entry
 .dispute-count {
+
   border-radius: 5px;
   padding: 1px 5px;
   position: absolute;
@@ -12315,7 +12446,7 @@ table > tbody > tr > td.no-padding {
     margin-top: 9px;
     margin-left: 14px;
     width: max-content;
-    color: #999;
+    color: $content-label-color;
     font-style: italic;
   }
 }
@@ -12515,6 +12646,17 @@ table > tbody > tr > td.no-padding {
   margin-right: 0;
 }
 
+.threat-cat-tag:not(:first-child)::before {
+  content: ', ';
+  background-color: #fff;
+  padding: 0 !important;
+  margin: 0 !important;
+}
+
+/* research page radio buttons */
+#research-search-broad {
+  margin-left: 12px;
+}
 // adding the down caret icon using the sort_by svg for advanced search button
 #advanced-search-button::after {
   content: '';
@@ -12574,4 +12716,24 @@ table.dispute_tool_current tr.reptool-entry-row td {
   .th-reptool-comment {
     width: 120px;
   }
+}
+
+#confirmation-modal{
+  textarea{
+    min-height: 60px;
+    margin-bottom: 25px;
+  }
+  tbody{
+    line-height: 1.1em;
+  }
+}
+
+#add_addtional_row {
+  border: none;
+  background-image: url(image_path('icon_add_grey.svg'));
+  height: 20px;
+  width: 20px;
+  display: none;
+  position:absolute;
+  margin-top: -94px;
 }

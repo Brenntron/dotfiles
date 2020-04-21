@@ -14,3 +14,11 @@ Then(/wl\/bl result number "(.*?)" should not have content "(.*?)"/) do |result_
   element = find("table.bfrp-table tr.result-no-#{result_number} .wlbl-table-result")
   raise "content found when it should not have been found" if element.has_content?(content)
 end
+
+Then(/quick lookup entry "(.*?)" column number "(.*?)" should have content "(.*?)"/) do |type, number, content|
+  page.evaluate_script("$('tr .col-#{type}')[#{number}].textContent.indexOf('#{content}') !== -1")
+end
+
+Then(/ toggle checkbox of quick lookup entry row number "(.*?)"/) do |number|
+  page.evaluate_script("$('tr input')[#{number}].checked = !$('tr input')[#{number}].checked")
+end

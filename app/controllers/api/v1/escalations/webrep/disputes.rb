@@ -766,6 +766,43 @@ module API
             end
 
             params do
+              requires :uri, type: String
+            end
+
+            get 'rule_api_info' do
+              params[:uri] = params[:uri].strip
+
+              information = Wbrs::ManualWlbl.where({:url => params[:uri]})
+
+              if information.blank?
+                return {:status => 'success', :data => ""}.to_json
+              end
+
+              data = []
+              information.each do |entry|
+                if entry.url == params[:uri]
+                  if entry.state == "active"
+                    entry.threat_cats = DisputeEntry.threat_cats_from_ids(entry.threat_cats)
+                    data << entry
+                  end
+                end
+              end
+
+              note_entries = []
+
+              return {:status => "success", :data => data, :notes => note_entries.first}.to_json
+
+            end
+
+
+
+
+
+
+
+
+
+            params do
               requires :entries, type: Array[String]
             end
 
@@ -934,6 +971,22 @@ module API
               rescue
                 render json: {:status => "error", :data => data}
               end
+
+            end
+
+            desc 'super simple endpoint to quick look up bulk submit'
+            params do
+            end
+
+            post 'quick_bulk_update' do
+              data = params[:update_data]
+
+              begin
+                response = Dispute.process_quick_bulk_entries(data, current_user)
+                {:status => "success", :data => response}.to_json
+              rescue
+                {:status => "error"}.to_json
+              end
             end
 
             desc 'Get URL + IP data from SDS V3'
@@ -978,6 +1031,41 @@ module API
             post 'threat_levels' do
               response = SbApi.remote_call_sds(permitted_params[:uri],'wbrs')
               response
+
+            end
+
+            desc 'valid url?'
+
+            params do
+              requires :uri, type: Array[String]
+            end
+            #this needs to start with 'http' or 'https'
+            get 'is_valid_url' do
+              urls = permitted_params[:uri]
+              result = {}
+              urls.each do |url|
+                if url.start_with?( 'https://', 'http://')
+                  result[url] = DisputeEntry.valid_url?(url)
+                else
+                  result[url] = DisputeEntry.valid_url?('http://' + url)
+                end
+              end
+              {:status => "success", :data => result, :checked_url => urls}
+            end
+
+            desc 'valid ip?'
+
+            params do
+              requires :ip_address, type: Array[String]
+            end
+            #this needs to start with 'http' or 'https'
+            get 'is_valid_ip' do
+              ips = permitted_params[:ip_address]
+              result = {}
+              ips.each do |ip|
+                result[ip] = DisputeEntry.is_ip?(ip)
+              end
+              {:status => "success", :data => result, :checked_ips => ips}
             end
 
           end

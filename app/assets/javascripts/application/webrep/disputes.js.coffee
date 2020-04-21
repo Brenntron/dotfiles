@@ -1,12 +1,13 @@
 $(document).ready ->
   Chart.defaults.global.plugins.datalabels.display = false
-  $('span#mark-as-related').on 'show.bs.dropdown', ->
+
+  $('#mark-as-related').on 'show.bs.dropdown', ->
     if $('.dispute_check_box:checked').length == 0
       std_msg_error('No rows selected', ['Please select at least one row.'])
       return false
 
   if $('.searched-for-url').length > 0
-    text = $('.searched-for-url').text().split(/\s+/)
+    text = $('.searched-for-url').text().trim().split(/\s+/)
     if text.length > 1
       if text.length == 2
         text = text.join(', ').replace(/, / , ' and ')
@@ -16,12 +17,13 @@ $(document).ready ->
     $('.searched-for-url').html(text)
 
 window.select_or_deselect_all = (dispute_id)->
-  $('.dispute-entry-checkbox_' + dispute_id).prop('checked', $('#' + dispute_id).prop('checked'))
-  $('.dispute-entry-checkbox_' + dispute_id).each ->
+  checkbox = $(".dispute-entry-checkbox_#{dispute_id}")
+  checkbox.prop('checked', $("##{dispute_id}").prop("checked"))
+  checkbox.each ->
     toggleRow(this)
 
 window.populate_webrep_index_table = (data = {}, reload = false) ->
-  data['reload'] = reload
+  data["reload"] = reload
 
   array_of_showns = []
   array_of_dispute_clicks = []
@@ -74,6 +76,7 @@ window.populate_webrep_index_table = (data = {}, reload = false) ->
         $('#refresh-working-msg').html('Table data updating correctly')
         $('#dispute-index-title').text(json['title'])
         $('#inline-webrep').addClass('hidden')
+
         datatable = $('#disputes-index').DataTable()
         datatable.clear();
         datatable.rows.add(json.data);
@@ -128,9 +131,8 @@ window.populate_webrep_index_table = (data = {}, reload = false) ->
 
         if undefined != json.search_name
           searchId = 'saved_search_' + json.search_id
-          if $('#saved-search-tbody tr#' + searchId).length == 0
+          if $("#saved-search-tbody tr##{searchId}").length == 0
             $('#saved-search-tbody').append(named_search_tag(json.search_name, json.search_id))
-
 
         std_msg_ajax(
           method: 'POST'
@@ -270,7 +272,7 @@ window.dispute_resolution_drop_down = (dispute_id) ->
 
 window.entry_status_drop_down = (dispute_entry_id) ->
 
-  headers = {'Token': $('input[name="token"]').val(), 'Xmlrpc-Token': $('input[name="xml_token"]').val()}
+  headers = {'Token': $('input[name="token"]').val(), "Xmlrpc-Token": $("input[name='xml_token']").val()}
 
   $.ajax(
     url: "/escalations/api/v1/escalations/webrep/disputes/dispute_entry_status/#{dispute_entry_id}"
@@ -330,7 +332,7 @@ window.save_dispute = () ->
   }
 
   std_msg_ajax(
-    url: '/escalations/api/v1/escalations/webrep/disputes/' + $('#dispute_id').text()
+    url: "/escalations/api/v1/escalations/webrep/disputes/#{$('#dispute_id').text()}"
     method: 'PUT'
     data: data
     error_prefix: 'Unable to update dispute.'
@@ -342,7 +344,7 @@ window.toolbar_index_edit_status = () ->
 
   data = {}
 
-  entry_ids = $('.dispute-entry-checkbox:checked').map(() ->
+  $('.dispute-entry-checkbox:checked').map(() ->
     data[this.id] = [{
       id: this.id
       field: "status"
@@ -408,7 +410,6 @@ window.show_page_edit_status = () ->
 window.toolbar_index_change_assignee = () ->
 
   entry_ids = $('.dispute_check_box:checkbox:checked').map(() ->
-# this.dataset['entryId']
     Number(this.value)
   ).toArray()
 
@@ -441,7 +442,6 @@ window.toolbar_show_change_assignee = () ->
     'new_assignee': new_assignee
   }
 
-  headers = {'Token': $('input[name="token"]').val(), 'Xmlrpc-Token': $('input[name="xml_token"]').val()}
   $.ajax(
     url: '/escalations/api/v1/escalations/webrep/disputes/change_assignee'
     method: 'POST'

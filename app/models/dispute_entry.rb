@@ -30,6 +30,7 @@ class DisputeEntry < ApplicationRecord
   STATUS_RESOLVED_INVALID = "INVALID"
   STATUS_RESOLVED_TEST = "TEST_TRAINING"
   STATUS_RESOLVED_OTHER = "OTHER"
+  STATUS_RESOLVED_QUICK_BULK = "QUICK_BULK" #tickets created and closed using the quick bulk entry form.
 
   STATUS_RESOLVED_DUPLICATE = "DUPLICATE"
 
@@ -1085,6 +1086,11 @@ class DisputeEntry < ApplicationRecord
     end
   end
 
+  def self.valid_url?(test_url)
+    url_regexp = /^(http|https):\/\/[a-z0-9]+([\-\.]{1}[a-z0-9]+)*\.[a-z]{2,5}(:[0-9]{1,5})?(\/.*)?$/ix
+    test_url =~ url_regexp ? true : false
+  end
+
   def self.process_multi_ip_info(uri, ips, dispute_entry = nil)
     result = {}
 
@@ -1239,4 +1245,5 @@ class DisputeEntry < ApplicationRecord
       return false
     end
   end
+
 end

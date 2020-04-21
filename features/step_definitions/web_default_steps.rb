@@ -83,8 +83,8 @@ And (/^I check checkbox with class "(.*?)"$/) do |cb_class|
   check(class: cb_class)
 end
 
-When(/^I choose "(.*?)"$/) do |target|
-  choose(target)
+And (/^I check the first checkbox with class "(.*?)"$/) do |cb_class|
+  check(class: cb_class)
 end
 
 When(/^I click a table row$/) do
@@ -483,6 +483,9 @@ Then (/^I type content "(.*?)" within input with id "(.*?)"/) do |content, input
   fill_in input, :with => content
 end
 
+Given (/^I enter content "(.*?)" within p with class "(.*?)"/) do |content, p|
+  page.execute_script( "$('#{p}').html('#{content}')" )
+end
 Then (/^I hit enter within "(.*?)"/) do |element|
   find(element).native.send_keys(:return)
 end
@@ -521,3 +524,18 @@ Given(/^I fill in selectized of element "(.*?)" with "(.*?)"$/) do |element, val
   page.execute_script("$('#{element}')[0].selectize.setValue(#{value})")
 
 end
+
+When(/^I select contenteditable text in "(.*?)"$/) do |target|
+  page.execute_script("$('#{target} p:first').select()")
+end
+
+When(/^I delete text "(.*?)"$/) do |target|
+  page.execute_script("$('#{target} p:first').select()")
+end
+
+Given(/^I remove row "(.*?)"$/) do |element|
+  field = find("#{element}", match: :first)
+  field.native.clear
+  field.send_keys [:backspace]
+end
+
